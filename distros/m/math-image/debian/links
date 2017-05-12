@@ -1,0 +1,25 @@
+# Copyright 2012 Kevin Ryde
+#
+# This file is part of Math-Image.
+#
+# Math-Image is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# Math-Image is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Math-Image.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# math-image.desktop installed under /usr/share/perl5/App/MathImage for now,
+# link it to the right place.  Probably need desktop-file-utils 0.15-2 for
+# its automatic trigger on .desktop files, but no need to "Depends:" that.
+#
+usr/share/perl5/App/MathImage/math-image.desktop usr/share/applications/math-image.desktop
+
+usr/bin/math-image usr/lib/xscreensaver/math-image

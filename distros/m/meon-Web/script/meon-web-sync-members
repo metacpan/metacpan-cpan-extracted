@@ -1,0 +1,84 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use Path::Class 'dir';
+use meon::Web::Config;
+use meon::Web::env;
+use 5.010;
+
+exit main();
+
+sub main {
+    my $help;
+    my $verbose;
+    my $dummy;
+    GetOptions(
+        'help|h'    => \$help,
+        'verbose|v' => \$verbose,
+        'dummy|n'   => \$dummy,
+    ) or pod2usage;
+    pod2usage if $help;
+    my ($src_domain, $dst_domain) = @ARGV;
+    pod2usage unless defined $src_domain;
+    pod2usage unless defined $dst_domain;
+
+    my $domains = meon::Web::Config->get->{domains} // {};
+    my $src_hostname_dir = dir(
+        meon::Web::SPc->srvdir,
+        'www',
+        'meon-web',
+        meon::Web::Config->hostname_to_folder($src_domain),
+        'content',
+        'members',
+        'profile',
+    );
+    my $dst_hostname_dir = dir(
+        meon::Web::SPc->srvdir,
+        'www', 'meon-web',
+        meon::Web::Config->hostname_to_folder($dst_domain),
+        'content',
+        'members',
+        'profile',
+    );
+
+    foreach my $profile_dir ($src_hostname_dir->children(no_hidden => 1)) {
+        next unless $profile_dir->is_dir;
+        next unless -r $profile_dir->file('index.xml');
+
+        my $username = $profile_dir->basename;
+        my $dst_profile_dir = $dst_hostname_dir->subdir($username);
+
+        unless (-d $dst_profile_dir) {
+            say('mkdir ',$dst_profile_dir)
+                if $verbose;
+            mkdir($dst_profile_dir)
+                unless $dummy;
+        }
+        unless (-e $dst_profile_dir->file('index.xml')) {
+            say('cd ', $dst_profile_dir) if $verbose;
+            chdir($dst_profile_dir) unless $dummy;
+            my $rel_index = $profile_dir->file('index.xml')->relative($dst_profile_dir);
+            say('ln -s ', $rel_index, ' index.xml') if $verbose;
+            symlink($rel_index,'index.xml') || die $! unless ($dummy);
+        }
+    }
+
+    return 0;
+}
+
+=head1 NAME
+
+meon-web-sync-members - loops through all members of one instance and symlink to another
+
+=head1 SYNOPSIS
+
+    meon-web-sync-members src.domain dst.domain
+
+=head1 DESCRIPTION
+
+
+=cut

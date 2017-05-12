@@ -1,0 +1,721 @@
+#!/usr/bin/perl
+#
+#   mmmf: multi-master mysql failover
+#   http://nigilist.ru/nit/mmmf/
+#
+#
+#   petya.kohts@gmail.com
+#
+#
+
+use strict;
+use warnings;
+
+use Data::Dumper;
+use DBI;
+use Yandex::Tools;
+
+my $cfg;
+my $new_master;
+
+sub help() {
+  print '
+    mmmf -- multi-master mysql failover
+
+    command-line options:
+      --cfg <FILENAME> -- specifies configuration file
+
+      --failover-to <SLAVE_ID> [--switch-master <OLD_MASTER_ID>]
+
+          run mmmf and choose SLAVE_ID (as specified in mmmf.conf)
+          as the new master; optionally can switch OLD_MASTER_ID
+          to the new master withouth performing any checks
+          (almost like switchover but without checking that
+          no one is writing into old master)
+    
+      --show-config
+
+';
+  exit 0;
+}
+
+sub read_config() {
+  if (Yandex::Tools::defined_cmdline_param('cfg')) {
+    do "" . Yandex::Tools::get_cmdline_param('cfg');
+  }
+  elsif (-f "/etc/mmmf.conf") {
+    do "/etc/mmmf.conf";
+  }
+  else {
+    main::die "no --cfg option and /etc/mmmf.conf does not exist";
+  }
+
+  $cfg = $mmmf::db;
+}
+
+sub log_die {
+  my ($msg) = @_;
+  Yandex::Tools::do_log($msg);
+  main::die($msg);
+}
+
+sub die {
+  my ($message, $suppress_callstack) = @_;
+
+  # You can assign a number to $!  to set errno if, for instance,
+  # you want "$!"  to return the string for error n, or you want to set
+  # the exit value for the die() operator. (Mnemonic: What just went bang?)
+  $! = 1;
+
+  CORE::die $message . ($suppress_callstack ? "\n" : Yandex::Tools::get_callstack());
+}
+
+sub err {
+  my $errstr = shift || "";
+  my $previous_object;
+
+  if (ref($_[0]) eq 'HASH') {
+    $previous_object = shift;
+  }
+
+  if ($previous_object) {
+    $previous_object->{'err'} = 1;
+    $previous_object->{'errstr'} = $errstr . Yandex::Tools::get_callstack();
+
+    return $previous_object;
+  }
+  else {
+    my %res = (
+      "err" => 1,
+      "errstr" => $errstr . Yandex::Tools::get_callstack(),
+      );
+  
+    return \%res;
+  }
+}
+
+sub build_mysqlbinlog_cmd {
+  my ($opts) = @_;
+
+  $opts = {} unless $opts;
+  $opts->{'mysqlbinlog'} = "/usr/bin/mysqlbinlog" unless $opts->{'mysqlbinlog'};
+
+  main::die("Programmer error: build_mysqlbinlog_cmd expects host, user, pass, port, master_log_file, master_log_pos")
+    unless $opts->{'host'} && $opts->{'user'} && defined($opts->{'pass'}) && $opts->{'port'} &&
+      $opts->{'master_log_pos'} && $opts->{'master_log_file'};
+
+  my $mysqlbinlog_cmd = "$opts->{'mysqlbinlog'} --read-from-remote-server --host=$opts->{'host'} --user=$opts->{'user'} --password='$opts->{'pass'}' --port=$opts->{'port'} --protocol=TCP --to-last-log --start-position=$opts->{'master_log_pos'} $opts->{'master_log_file'}";
+  return $mysqlbinlog_cmd;
+}
+
+sub build_change_master_sql {
+  my ($opts) = @_;
+  $opts = {} unless $opts;
+
+  main::die("Programmer error: build_change_master_sql expects host, file, position at least")
+    unless $opts->{'host'} && defined($opts->{'file'}) && defined($opts->{'position'});
+
+  my $change_master_sql =
+    "change master to master_host = '" . $opts->{'host'} . "', " .
+    "master_log_file = '" . $opts->{'file'} . "', " .
+    "master_log_pos = " . $opts->{'position'} . 
+    ($opts->{'port'} ? (", master_port = " . $opts->{'port'}) : '') .
+    ($opts->{'user'} ? (", master_user = '" . $opts->{'user'} . "'") : '') .
+    ($opts->{'pass'} ? (", master_password = '" . $opts->{'pass'} . "'") : '') .
+    ""
+    ;
+
+  return $change_master_sql;
+}
+
+# !!! near copy of gcontrol.pl check_slave_replication,
+# should be moved into library
+#
+sub check_slave_replication {
+  my ($opts) = @_;
+
+  my $dbh = $opts->{'slave_dbh'};
+
+  my $repl_row;
+  
+  my $repl_tries = {};
+  my $best_try = 1;
+  my $max_exec_master_log_pos = 0;
+  my $max_relay_master_log_file = "";
+
+  # how many times each Exec_Master_Log_Pos value was encountered
+  my $tries_by_pos = {};
+
+  # what try it was when we got given Exec_Master_Log_Pos
+  my $tries_by_pos_num = {};
+
+  foreach my $try (qw/1 2 3 4 5/) {
+    $repl_tries->{$try} = $dbh->selectrow_hashref("show slave status");
+
+    # all tries must succeed (in terms of issuing them)
+    if (!$repl_tries->{$try}) {
+      return err("replication is not configured");
+    }
+
+    # reinitialize
+    if ($repl_tries->{$try}->{'Relay_Master_Log_File'} ne $max_relay_master_log_file) {
+      $max_relay_master_log_file = $repl_tries->{$try}->{'Relay_Master_Log_File'};
+      $max_exec_master_log_pos = $repl_tries->{$try}->{'Exec_Master_Log_Pos'};
+      $best_try = $try;
+      $tries_by_pos = {};
+      $tries_by_pos_num = {};
+    }
+
+    # record all the encountered Exec_Master_Log_Pos
+    # (for one Relay_Master_Log_File only)
+    $tries_by_pos->{$repl_tries->{$try}->{'Exec_Master_Log_Pos'}} = 0
+      unless $tries_by_pos->{$repl_tries->{$try}->{'Exec_Master_Log_Pos'}};
+    $tries_by_pos->{$repl_tries->{$try}->{'Exec_Master_Log_Pos'}}++;
+
+    # record last try for the Exec_Master_Log_Pos
+    $tries_by_pos_num->{$repl_tries->{$try}->{'Exec_Master_Log_Pos'}} = $try;
+
+    if ($repl_tries->{$try}->{'Exec_Master_Log_Pos'} > $max_exec_master_log_pos) {
+      $max_exec_master_log_pos = $repl_tries->{$try}->{'Exec_Master_Log_Pos'};
+      $best_try = $try;
+    }
+  }
+
+  my $num_different_pos = scalar(keys %{$tries_by_pos});
+
+  if ($num_different_pos eq 1) {
+    # most obvious situation in which
+    # there were no writes and
+    # no mysql Exec_Master_Log_Pos bug
+    # (or it was last try and
+    # Relay_Master_Log_File changed
+    $best_try = 1;
+  }
+  elsif ($num_different_pos eq 2) {
+
+    # this seems to be the Exec_Master_Log_Pos bug (!)
+    #
+    my @pos_arr = keys %{$tries_by_pos};
+    my $p1 = $pos_arr[0];
+    my $p2 = $pos_arr[1];
+
+    # choose the position which was encountered more times
+    #
+    if ($tries_by_pos->{$p1} > $tries_by_pos->{$p2}) {
+      $best_try = $tries_by_pos_num->{$p1};
+    }
+    elsif ($tries_by_pos->{$p2} < $tries_by_pos->{$p1}) {
+      $best_try = $tries_by_pos_num->{$p2};
+    }
+    else {
+      # we got equal number of times for different Exec_Master_Log_Pos,
+      # choosing those try during which Exec_Master_Log_Pos was higher
+      # (hoping that buggy position is lower)
+      #
+      if ($p1 > $p2) {
+        $best_try = $tries_by_pos_num->{$p1};
+      }
+      else {
+        $best_try = $tries_by_pos_num->{$p2};
+      }
+    }
+  }
+  else {
+    # this might be just active writing
+    # or active writing and the bug,
+    # trying simple max (which
+    # was calculated above)
+  }
+
+  # finally here is the replication row
+  # which seems to be the best
+  $repl_row = $repl_tries->{$best_try};
+
+  if($opts->{'failover1'}) {
+    if (!(
+      $repl_row->{'Slave_SQL_Running'} =~ /yes/i &&
+      ($repl_row->{'Slave_IO_Running'} =~ /no/i || $repl_row->{'Slave_IO_Running'} =~ /yes/i)
+#      && $repl_row->{'Slave_IO_State'} =~ /reconnecting/i
+      )) {
+      return err("does not seem that slave was replicating master", $repl_row);
+    }
+  }
+  elsif ($opts->{'failover2'}) {
+    # slave was stopped, no checks needed
+  }
+  else {
+    if ($repl_row->{'Slave_SQL_Running'} =~ /no/i || $repl_row->{'Slave_IO_Running'} =~ /no/i) {
+      return err("replication is not running", $repl_row);
+    }
+  }
+
+  # check whether it lags dramatically
+  #
+  if ($repl_row->{'Master_Log_File'} ne $repl_row->{'Relay_Master_Log_File'}) {
+    return err("Master_Log_File [$repl_row->{'Master_Log_File'}] Relay_Master_Log_File [$repl_row->{'Relay_Master_Log_File'}]", $repl_row);
+  }
+  if ($repl_row->{'Read_Master_Log_Pos'} - $repl_row->{'Exec_Master_Log_Pos'} > 100_000) {
+    return err("read - exec difference: " . ($repl_row->{'Read_Master_Log_Pos'} - $repl_row->{'Exec_Master_Log_Pos'}), $repl_row);
+  }
+
+  return $repl_row;
+}
+
+sub connect_db {
+    my ($db) = @_;
+
+    $db->{'dbname'} = "mysql" unless $db->{'dbname'};
+
+    $db->{'_dsn'} = "DBI:mysql:database=$db->{'dbname'}" .
+      ($db->{'host'} ? ';host=' . $db->{'host'} : '') .
+      ($db->{'port'} ? ';port=' . $db->{'port'} : '') .
+      ($db->{'sock'} ? ";mysql_socket=$db->{'sock'}" : '') .
+      ";mysql_connect_timeout=2"
+      ;
+
+    my $dbh;
+    my $loop = 1;
+    my $tries = 2;
+    while ($loop) {
+      $loop = 0;
+
+      $dbh = DBI->connect($db->{'_dsn'}, $db->{'user'}, $db->{'pass'}, {
+          PrintError => 1,
+          RaiseError => 0,
+          AutoCommit => 1,
+          });
+
+      if (! $dbh) {
+        # if max connections, try again shortly.
+        if ($DBI::err == 1040 && $tries) {
+            $tries--;
+            $loop = 1;
+            sleep 1;
+        }
+      }
+    }
+
+    my $DBI_err = $DBI::err || 0;
+
+    # if we've got new connection and user specified
+    # some non-default encoding -- apply it
+    #
+    if ($DBI_err eq 0 && $db->{'encoding'}) {
+      $dbh->do("SET NAMES " . $db->{'encoding'});
+      $db->{'dbh'} = $dbh;
+    }
+    else {
+      delete($db->{'dbh'});
+    }
+  
+    return $db;
+}
+
+
+sub failover() {
+  $new_master = Yandex::Tools::get_cmdline_param('failover-to');
+  if (!$cfg->{$new_master}) {
+    main::die("no db connection [$new_master] is configured\n");
+  }
+
+  my $old_master;
+  my $old_master_db;
+  if (Yandex::Tools::defined_cmdline_param('switch-master')) {
+    $old_master = Yandex::Tools::get_cmdline_param('switch-master');
+    $old_master_db = $cfg->{$old_master};
+    if (!$old_master_db) {
+      log_die("no db connection [$old_master] is configured");
+    }
+    connect_db($old_master_db);
+    if (!$old_master_db->{'dbh'}) {
+      log_die("unable to connect to the [$old_master]");
+    }
+  }
+
+  Yandex::Tools::debug("starting failover to [$new_master]");
+
+  my $mysql_status = {
+    'slaves_not_available' => {},
+    'slaves_available' => {},
+    'slaves_available_not_enabled' => {},
+    'slaves_enabled' => 0,
+    'slave_masters_by_name' => {},
+    };
+
+  my $run_forked_opts = {'timeout' => 30, 'child_BEGIN' => sub {
+        # invalidate db handle in child
+        foreach my $db_name (keys %{$cfg}) {
+          if ($cfg->{$db_name}->{'dbh'}) {
+            $cfg->{$db_name}->{'dbh'}->{'InactiveDestroy'} = 1;
+            undef $cfg->{$db_name}->{'dbh'};
+          }
+        }
+      }
+    };
+
+  my $r = Yandex::Tools::run_forked("which mysqlbinlog", $run_forked_opts);
+  if ($r->{'exit_code'} ne 0 || !$r->{'stdout'}) {
+    print "Unable to find mysqlbinlog\n";
+    exit 1;
+  }
+  my $mysqlbinlog = $r->{'stdout'};
+  $mysqlbinlog =~ s/[\r\n]*$//goi;
+  Yandex::Tools::debug("mysqlbinlog found at: $mysqlbinlog");
+
+  foreach my $db_name (keys %{$cfg}) {
+    Yandex::Tools::debug("checking db connection [$db_name]");
+
+    my $db = $cfg->{$db_name};
+
+    connect_db($db);
+
+    if (!$db->{'dbh'}) {
+      $mysql_status->{'slaves_not_available'}->{$db_name} = "unable to connect";
+      next;
+    }
+
+    my $slave_repl_row = check_slave_replication({
+      'slave_dbh' => $db->{'dbh'},
+      'failover1' => 1,
+      });
+    if ($slave_repl_row->{'err'}) {
+      $mysql_status->{'slaves_not_available'}->{$db_name} = $slave_repl_row->{'errstr'};
+      next;
+    }
+    elsif ($slave_repl_row->{'Master_Host'}) {
+      $mysql_status->{'slave_masters_by_name'}->{$slave_repl_row->{'Master_Host'}} = 0
+        unless defined($mysql_status->{'slave_masters_by_name'}->{$slave_repl_row->{'Master_Host'}});
+
+      $mysql_status->{'slave_masters_by_name'}->{$slave_repl_row->{'Master_Host'}}++;
+
+      $mysql_status->{'slave_masters_by_name'}->{$slave_repl_row->{'Master_Host'}} = 0
+        unless defined($mysql_status->{'slave_masters_by_name'}->{$slave_repl_row->{'Master_Host'}});
+    }
+
+    $mysql_status->{'slaves_available'}->{$db_name} = {
+      'dbh' => $db->{'dbh'},
+      'slave_row' => $slave_repl_row,
+      'dbinfo' => $db,
+      'name' => $db_name,
+      };
+  }
+
+  # new master should be available
+  if (!$mysql_status->{'slaves_available'}->{$new_master}) {
+    print STDERR Yandex::Tools::Dumper($mysql_status) . "\n";
+    log_die("unable to connect to the new master [$new_master], aborting...");
+  }
+
+  # here is the check for correct master host for slaves,
+  # currently the rule is simple: there should be ONE
+  # and only master host for all the slaves, otherwise
+  # something is wrong.
+  #
+  my $num_of_different_masters = scalar(keys %{$mysql_status->{'slave_masters_by_name'}});
+  if ($num_of_different_masters ne 1) {
+    print Data::Dumper::Dumper($mysql_status);
+    log_die("slaves are replicating from $num_of_different_masters different masters: " . join(",", keys %{$mysql_status->{'slave_masters_by_name'}}));
+  }
+
+  # when doing failover not only old master is not available
+  # but some slaves which reside in the same location as old master
+  # might be unavailable too.
+  #
+  # this check is a bit more relaxed than during switchover
+  # (should it be relaxed there too?): decide that we can go on
+  # if there are more (or equal: to take in account set ups
+  # with only 2 locations) available than unavailable slaves.
+  #
+  my $num_ok_slaves = scalar(keys %{$mysql_status->{'slaves_available'}});
+  my $num_failed_slaves = scalar(keys %{$mysql_status->{'slaves_not_available'}});
+
+  if ($num_ok_slaves < $num_failed_slaves) {
+    log_die("got $num_ok_slaves available slaves and $num_failed_slaves, won't continue");
+  }
+
+  # for each ok slave check connection with mysqlbinlog.
+  #
+  # if we were able to connect to database with DBI,
+  # mysqlbinlog should also succeed, otherwise die
+  #
+  foreach my $slave_name (keys %{$mysql_status->{'slaves_available'}}) {
+    my $slave_def = $mysql_status->{'slaves_available'}->{$slave_name};
+
+    $slave_def->{'master_row'} = $slave_def->{'dbh'}->selectrow_hashref("show master status");
+    if (!$slave_def->{'master_row'}) {
+      log_die("$slave_name: lost connection during `show master status`: " . $slave_def->{'dbh'}->errstr());
+    }
+
+    Yandex::Tools::debug("checking mysql db (mysqlbinlog): $slave_name");
+
+    my $mysqlbinlog_cmd = build_mysqlbinlog_cmd({
+      'mysqlbinlog' => $mysqlbinlog,
+      'host' => $slave_def->{'dbinfo'}->{'host'},
+      'port' => $slave_def->{'dbinfo'}->{'port'},
+      'user' => $slave_def->{'dbinfo'}->{'user'},
+      'pass' => $slave_def->{'dbinfo'}->{'pass'},
+      'master_log_file' => $slave_def->{'master_row'}->{'File'},
+      'master_log_pos' => $slave_def->{'master_row'}->{'Position'},
+      });
+
+    my $last_transactions = Yandex::Tools::run_forked($mysqlbinlog_cmd, $run_forked_opts);
+    if ($last_transactions->{'timeout'} ||
+      $last_transactions->{'exit_code'} ne 0 ||
+      !$last_transactions->{'stdout'}) {
+
+      log_die("error running $mysqlbinlog_cmd: [$last_transactions->{'exit_code'}] $last_transactions->{'merged'}");
+    }
+  }
+
+  Yandex::Tools::do_log("failover to [$new_master] started");
+  
+  my $best_slave = {
+    'by_Relay_Master_Log_File' => {},
+    'by_Relay_Master_Log_File_count' => {},
+    };
+
+  foreach my $slave_name (keys %{$mysql_status->{'slaves_available'}}) {
+    my $slave_def = $mysql_status->{'slaves_available'}->{$slave_name};
+
+    $slave_def->{'dbh'}->do("stop slave");
+    if ($slave_def->{'dbh'}->err) {
+      log_die("error stopping slave $slave_name: " . $slave_def->{'dbh'}->errstr());
+    }
+
+    $slave_def->{'slave_row'} = check_slave_replication({
+      'slave_dbh' => $slave_def->{'dbh'},
+      'failover2' => 1,
+      });
+    if ($slave_def->{'slave_row'}->{'err'}) {
+      log_die("error while repopulating slave_row for $slave_name: " . $slave_def->{'slave_row'}->{'errstr'});
+    }
+
+    $slave_def->{'master_row'} = $slave_def->{'dbh'}->selectrow_hashref("show master status");
+    if (!$slave_def->{'master_row'}) {
+      log_die("error while repopulating master_row for $slave_name: " . $slave_def->{'dbh'}->errstr());
+    }
+
+    my $ss = $slave_def->{'slave_row'};
+
+    $best_slave->{'by_Relay_Master_Log_File'}->{$ss->{'Relay_Master_Log_File'}}->{$slave_name} = $slave_def;
+
+    $best_slave->{'by_Relay_Master_Log_File_count'}->{$ss->{'Relay_Master_Log_File'}} = 0
+      unless $best_slave->{'by_Relay_Master_Log_File_count'}->{$ss->{'Relay_Master_Log_File'}};
+    $best_slave->{'by_Relay_Master_Log_File_count'}->{$ss->{'Relay_Master_Log_File'}}++;
+
+    Yandex::Tools::do_log("stopped slave [$slave_name], " .
+      "master [$slave_def->{'master_row'}->{'File'}/$slave_def->{'master_row'}->{'Position'}], " .
+      "slave [$slave_def->{'slave_row'}->{'Relay_Master_Log_File'}/$slave_def->{'slave_row'}->{'Exec_Master_Log_Pos'}]");
+  }
+
+  # choose the Relay_Master_Log_File "in which"
+  # there are more slaves.
+  #
+  # this could lead to lost transactions
+  # if connectivity with master was lost
+  # right after it has switched to the new
+  # binary log; currently happens twice a day:
+  #
+  # golem1:~# ls -lh /var/lib/mysql/golem1-bin.*
+  # -rw-rw---- 1 mysql mysql 130M 2010-10-16 06:25 /var/lib/mysql/golem1-bin.000978
+  # -rw-rw---- 1 mysql mysql 308M 2010-10-16 23:10 /var/lib/mysql/golem1-bin.000979
+  # -rw-rw---- 1 mysql mysql 128M 2010-10-17 06:25 /var/lib/mysql/golem1-bin.000980
+  # -rw-rw---- 1 mysql mysql 307M 2010-10-17 23:10 /var/lib/mysql/golem1-bin.000981
+  # -rw-rw---- 1 mysql mysql 127M 2010-10-18 06:25 /var/lib/mysql/golem1-bin.000982
+  # -rw-rw---- 1 mysql mysql 319M 2010-10-18 23:10 /var/lib/mysql/golem1-bin.000983
+  # -rw-rw---- 1 mysql mysql 127M 2010-10-19 06:25 /var/lib/mysql/golem1-bin.000984
+  # -rw-rw---- 1 mysql mysql 137M 2010-10-19 13:55 /var/lib/mysql/golem1-bin.000985
+  # -rw-rw---- 1 mysql mysql  160 2010-10-19 06:25 /var/lib/mysql/golem1-bin.index
+  #
+  # TODO: account for such (quite random) situations
+  #
+  my $best_Relay_Master_Log_File;
+  my $best_Relay_Master_Log_File_max = 0;
+  foreach my $tmp (keys %{$best_slave->{'by_Relay_Master_Log_File_count'}}) {
+    if ($best_slave->{'by_Relay_Master_Log_File_count'}->{$tmp} > $best_Relay_Master_Log_File_max) {
+      $best_Relay_Master_Log_File_max = $best_slave->{'by_Relay_Master_Log_File_count'}->{$tmp};
+      $best_Relay_Master_Log_File = $tmp;
+    }
+  }
+
+  Yandex::Tools::do_log("best Relay_Master_Log_File: $best_Relay_Master_Log_File");
+
+  # choose best slave (most synced) from the list of those
+  # which point to the best Relay_Master_Log_File
+  #
+  my $best_Exec_Master_Log_Pos = 0;
+  my $best_slave_def;
+  foreach my $slave_name (keys %{$best_slave->{'by_Relay_Master_Log_File'}->{$best_Relay_Master_Log_File}}) {
+    my $slave_def = $best_slave->{'by_Relay_Master_Log_File'}->{$best_Relay_Master_Log_File}->{$slave_name};
+    
+    if ($slave_def->{'slave_row'}->{'Exec_Master_Log_Pos'} > $best_Exec_Master_Log_Pos) {
+      $best_Exec_Master_Log_Pos = $slave_def->{'slave_row'}->{'Exec_Master_Log_Pos'};
+      $best_slave_def = $slave_def;
+    }
+  }
+
+  Yandex::Tools::do_log("best Exec_Master_Log_Pos: $best_Exec_Master_Log_Pos (slave $best_slave_def->{'name'})");
+
+  
+
+  my $equalized_slaves = {};
+
+  # we've got best slave, normalize other available slaves,
+  # only those which are "in the same Relay_Master_Log_File",
+  # other slaves are considered to be "bad" and should be
+  # fixed manually.
+  #
+  EQUALIZE: foreach my $slave_name (keys %{$best_slave->{'by_Relay_Master_Log_File'}->{$best_Relay_Master_Log_File}}) {
+    my $slave_def = $best_slave->{'by_Relay_Master_Log_File'}->{$best_Relay_Master_Log_File}->{$slave_name};
+    
+    # skip slaves which are already full
+    # (though add to pool of equalized [ok] slaves)
+    if ($slave_def->{'slave_row'}->{'Exec_Master_Log_Pos'} eq $best_Exec_Master_Log_Pos) {
+      $equalized_slaves->{$slave_name} = $slave_def;
+      next EQUALIZE;
+    }
+
+    Yandex::Tools::debug("$slave_name needs to be equalized");
+
+    my $difference = $best_Exec_Master_Log_Pos - $slave_def->{'slave_row'}->{'Exec_Master_Log_Pos'};
+    my $read_start_pos = $best_slave_def->{'master_row'}->{'Position'} - $difference;
+
+    if ($read_start_pos < 0) {
+      Yandex::Tools::do_log("not enough information in $best_slave_def->{'name'} [$best_slave_def->{'master_row'}->{'File'}] " .
+        "for $slave_def->{'name'} (offset $read_start_pos), skipping", {'stderr' => 1});
+      next EQUALIZE;
+    }
+
+    Yandex::Tools::do_log("updating $slave_def->{'name'} from $best_slave_def->{'name'} " .
+      "[$best_slave_def->{'master_row'}->{'File'}/$read_start_pos]");
+    
+    my $mysqlbinlog_cmd = build_mysqlbinlog_cmd({
+      'mysqlbinlog' => $mysqlbinlog,
+      'host' => $best_slave_def->{'dbinfo'}->{'host'},
+      'port' => $best_slave_def->{'dbinfo'}->{'port'},
+      'user' => $best_slave_def->{'dbinfo'}->{'user'},
+      'pass' => $best_slave_def->{'dbinfo'}->{'pass'},
+      'master_log_file' => $best_slave_def->{'master_row'}->{'File'},
+      'master_log_pos' => $read_start_pos,
+      });
+
+    my $last_transactions = Yandex::Tools::run_forked($mysqlbinlog_cmd, $run_forked_opts);
+    if ($last_transactions->{'timeout'} ||
+      $last_transactions->{'exit_code'} ne 0 ||
+      !$last_transactions->{'stdout'}) {
+
+      Yandex::Tools::do_log("error $last_transactions->{'exit_code'} getting difference for $slave_def->{'name'}: " .
+        "$last_transactions->{'merged'}", {'stderr' => 1});
+      next EQUALIZE;
+    }
+
+    # $last_transactions->{'stdout'} holds sql
+    # which should be executed against $slave_def
+    #
+    while ($last_transactions->{'stdout'} =~ /\G(.*?)[\r\n]/sgo) {
+      my $line = $1;
+  #    print $line . "\n";
+
+      next if $line =~ /^\/\*/o;
+     
+      $slave_def->{'dbh'}->do($line);
+      if ($slave_def->{'dbh'}->err) {
+        Yandex::Tools::do_log("error applying [$line] to $slave_def->{'name'}: " . $slave_def->{'dbh'}->errstr);
+        next EQUALIZE;
+      }
+    }
+
+    # update slave master row, so we know
+    # where to switch replication to --
+    # new master SHOULD be among previous slaves (!)
+    #
+    $slave_def->{'master_row'} = $slave_def->{'dbh'}->selectrow_hashref("show master status");
+    if (!$slave_def->{'master_row'}) {
+      Yandex::Tools::do_log("error getting master status: " . $slave_def->{'dbh'}->errstr());
+      next EQUALIZE;
+    }
+
+    $equalized_slaves->{$slave_name} = $slave_def;
+  }
+
+  Yandex::Tools::do_log("all slaves equalized up to $best_slave_def->{'name'} [$best_Relay_Master_Log_File/$best_Exec_Master_Log_Pos]");
+
+  if (!$equalized_slaves->{$new_master}) {
+    log_die("SEVERE ERROR: new_master was not equalized, unable to continue!");
+  }
+
+  my $new_master_dbdef = $mysql_status->{'slaves_available'}->{$new_master};
+
+  Yandex::Tools::do_log("MASTER CANDIDATE: $new_master: binlog position $new_master_dbdef->{'master_row'}->{'File'}/$new_master_dbdef->{'master_row'}->{'Position'}");
+  Yandex::Tools::do_log("CHOOSING NEW MASTER: $new_master_dbdef->{'name'}: $new_master_dbdef->{'master_row'}->{'File'}/$new_master_dbdef->{'master_row'}->{'Position'}");
+
+
+  my $change_master_sql = build_change_master_sql({
+    'host' => $new_master_dbdef->{'dbinfo'}->{'host'},
+    'file' => $new_master_dbdef->{'master_row'}->{'File'},
+    'position' => $new_master_dbdef->{'master_row'}->{'Position'},
+    'user' => $new_master_dbdef->{'dbinfo'}->{'user'},
+    'pass' => $new_master_dbdef->{'dbinfo'}->{'pass'},
+    'port' => $new_master_dbdef->{'dbinfo'}->{'port'},
+    });
+
+  my $switched = {};
+  foreach my $slave_name (keys %{$equalized_slaves}) {
+    
+    # do not start slave on the host which is going to master right now
+    next if $slave_name eq $new_master_dbdef->{'name'};
+
+    my $slave_def = $equalized_slaves->{$slave_name};
+
+    Yandex::Tools::debug("$slave_name: switching replication");
+    
+    $slave_def->{'dbh'}->do($change_master_sql);
+    if ($slave_def->{'dbh'}->err) {
+      Yandex::Tools::do_log("$slave_name: error while switching replication: " . $slave_def->{'dbh'}->errstr, {'stderr' => 1});
+      next;
+    }
+
+    $slave_def->{'dbh'}->do("start slave");
+    if ($slave_def->{'dbh'}->err) {
+      Yandex::Tools::do_log("$slave_name: error while starting slave: " . $slave_def->{'dbh'}->errstr, {'stderr' => 1});
+      next;
+    }
+
+    $switched->{$slave_name} = 1;
+  }
+
+  if (Yandex::Tools::defined_cmdline_param('switch-master')) {
+    Yandex::Tools::debug("$old_master: switching replication");
+
+    $old_master_db->{'dbh'}->do($change_master_sql);
+    if ($old_master_db->{'dbh'}->err) {
+      Yandex::Tools::do_log("$old_master: error while switching replication: " . $old_master_db->{'dbh'}->errstr, {'stderr' => 1});
+    }
+    $old_master_db->{'dbh'}->do("start slave");
+    if ($old_master_db->{'dbh'}->err) {
+      Yandex::Tools::do_log("$old_master: error while starting slave: " . $old_master_db->{'dbh'}->errstr, {'stderr' => 1});
+    }
+  }
+  
+  Yandex::Tools::do_log("done");
+}
+
+Yandex::Tools::read_cmdline();
+
+if (Yandex::Tools::defined_cmdline_param('failover-to')) {
+  read_config();
+  undef $mmmf::LOG;
+  Yandex::Tools::set_log_filename($mmmf::LOG || "/tmp/mmmf.log");
+  failover();
+}
+elsif (Yandex::Tools::defined_cmdline_param('show-config')) {
+  read_config();
+  print Data::Dumper::Dumper($mmmf::db);
+}
+elsif (Yandex::Tools::defined_cmdline_param('help')) {
+  help();
+}
+else {
+  help();
+}
+

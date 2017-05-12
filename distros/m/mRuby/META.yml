@@ -1,0 +1,51 @@
+---
+abstract: 'mruby binding for perl5.'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Cwd::Guard: '0'
+  File::Which: '0'
+  Module::Build: '0.4005'
+  Module::Build::XSUtil: '0.03'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: mRuby
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  mRuby:
+    file: lib/mRuby.pm
+    version: '0.12'
+  mRuby::Bool:
+    file: lib/mRuby/Bool.pm
+  mRuby::Symbol:
+    file: lib/mRuby/Symbol.pm
+requires:
+  Encode: '0'
+  Exporter: '5.57'
+  parent: '0'
+  perl: '5.008008'
+resources:
+  bugtracker: https://github.com/tokuhirom/mRuby.pm/issues
+  homepage: https://github.com/tokuhirom/mRuby.pm
+  repository: git://github.com/tokuhirom/mRuby.pm.git
+version: '0.12'
+x_contributors:
+  - 'karupanerura <karupanerura@users.noreply.github.com>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+  - 'karupanerura <karupa@cpan.org>'

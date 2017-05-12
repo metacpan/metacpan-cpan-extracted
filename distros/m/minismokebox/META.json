@@ -1,0 +1,74 @@
+{
+   "abstract" : "a small lightweight SmokeBox",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "minismokebox",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Config" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::SmokeBox::PerlVersion" : "0.16",
+            "Config::Tiny" : "2.12",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "Module::Load" : "0",
+            "Module::Pluggable" : "0",
+            "POE" : "1.005",
+            "POE::Component::SmokeBox" : "0.36",
+            "POE::Component::SmokeBox::Dists" : "1.04",
+            "POE::Component::SmokeBox::Recent" : "1.3",
+            "Pod::Usage" : "1.00",
+            "Time::Duration" : "1.06",
+            "perl" : "5.006",
+            "unless" : "0.02"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "HTTP::Date" : "0",
+            "HTTP::Response" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "POE::Filter::HTTP::Parser" : "1.06",
+            "Test::More" : "0.47",
+            "Test::POE::Server::TCP" : "0.12"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/minismokebox",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/minismokebox.git",
+         "web" : "https://github.com/bingos/minismokebox"
+      }
+   },
+   "version" : "0.66",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+}
+

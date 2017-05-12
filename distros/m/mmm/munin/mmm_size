@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use MMM;
+use MMM::MirrorTask;
+use MMM::Utils;
+
+my $mmm = MMM->new(
+    configfile => $ENV{MMM_CONFIG},
+    verbosity => 0,
+);
+
+if (($ARGV[0] || '') eq 'autoconf') {
+    if ($mmm && $mmm->get_tasks_by_name($mmm->list_tasks)) {
+        print "yes\n";
+        exit(0);
+    } else {
+        print "No mmm found";
+        exit(1);
+    }
+} elsif (($ARGV[0] || '') eq 'config') {
+    print <<EOF;
+graph_title Mirrors size from mmm
+graph_args --base 1024 --lower-limit 0
+graph_vlabel Bytes
+graph_category mmm
+EOF
+
+    foreach ($mmm->get_tasks_by_name($mmm->list_tasks)) {
+        $_->is_disable and next;
+        yes_no($_->val('compute_size')) or next;
+        my $n = $_->name;
+        $n =~ s:(/|-|\.):_:g;
+        printf "%s.label %s\n", $n, $_->name;
+        printf "%s.min 0\n", $n;
+    }
+} else {
+    foreach ($mmm->get_tasks_by_name($mmm->list_tasks)) {
+        $_->is_disable and next;
+        yes_no($_->val('compute_size')) or next;
+        my $n = $_->name;
+        $n =~ s:(/|-|\.):_:g;
+        my %info = $_->state_info();
+        printf("%s.value %d\n", $n, ($info{job}{size} || 0) * 1024);
+    }
+}
+
+__END__

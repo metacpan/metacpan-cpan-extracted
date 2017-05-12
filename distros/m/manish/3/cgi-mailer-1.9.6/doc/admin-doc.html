@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+ <head>
+  <title>cgi-mailer: an easy to use form-to-email gateway
+ </title>
+  <link rev="made" href="mailto:gleeson@unimelb.edu.au">
+  <meta name="keywords" content="cgi-mailer, HTML forms, email,
+     form-to-email gateway, administrator documentation, Martin Gleeson">
+  <meta name="description" content="cgi-mailer administrator documentation.">
+ </head>
+ <body bgcolor="#FFFFFF">
+ <!-- ===================================================================== -->
+ <hr size="2" noshade>
+ <table border="0" width="100%" cellpadding="5" cellspacing="3">
+  <tr align="center" valign="middle">
+   <td><h1>cgi-mailer: an easy to use form-to-email gateway</h1>
+  </td>
+   <td><a href="http://www.unimelb.edu.au/cgi-mailer/"><img
+       src="cgi-mailer-logo.gif" border="0" hspace="5" vspace="5"
+       alt=" [cgi-mailer] " width="220" height="40"></a>
+  </td>
+ </tr>
+</table>
+ <!-- ===================================================================== -->
+ <hr size="2" noshade>
+ <h2>Administrator Documentation
+</h2>
+ <p>Contents
+</p>
+ <ul>
+  <li><a href="#req">Requirements</a></li>
+  <li><a href="#getting">Obtaining cgi-mailer</a></li>
+  <li><a href="#install">Installation & Configuration</a></li>
+</ul>
+ <!-- ===================================================================== -->
+ <hr size="2" noshade>
+ <h3><a name="req">Requirements</a>
+</h3>
+ <p>cgi-mailer requires perl 5.001 or later and the LWP module. See the
+    <a href="http://www.perl.com/">Perl Home Page</a> for information on
+    how to get perl and/or how to get the LWP module.
+</p>
+ <p>If you want to use Mail::Send or Net::SMTP instead of sendmail to deliver
+    the email, then you will need to get the MailTools or libnet modules,
+    respectively.
+</p>
+ <p>cgi-mailer has been tested under Unix, and may work on other systems
+    such as MacOS or Windows NT. Please <a
+    href="mailto:gleeson@unimelb.edu.au">email me</a> with any information
+    on changes needed to get cgi-mailer running on other systems.
+</p>
+ <hr size="1" noshade>
+ <h3><a name="getting">Obtaining cgi-mailer</a>
+</h3>
+ <p>cgi-mailer source is available in the following formats:
+</p>
+ <dl>
+  <dt>unix tar:</dt>
+  <dd><a href="ftp://www.unimelb.edu.au/pub/www/tools/unix/cgi-mailer/cgi-mailer-1.9.6.tar">
+     ftp://www.unimelb.edu.au/pub/www/tools/unix/cgi-mailer/cgi-mailer-1.9.6.tar
+     </a> (80k)
+ </dd>
+  <dt>unix tar, compressed:</dt>
+  <dd><a href="ftp://www.unimelb.edu.au/pub/www/tools/unix/cgi-mailer/cgi-mailer-1.9.6.tar.Z">
+     ftp://www.unimelb.edu.au/pub/www/tools/unix/cgi-mailer/cgi-mailer-1.9.6.tar.Z
+     </a> (31k)
+ </dd>
+  <dt>unix tar, GNU zipped:</dt>
+  <dd><a href="ftp://www.unimelb.edu.au/pub/www/tools/unix/cgi-mailer/cgi-mailer-1.9.6.tar.gz">
+     ftp://www.unimelb.edu.au/pub/www/tools/unix/cgi-mailer/cgi-mailer-1.9.6.tar.gz
+     </a> (15k)
+ </dd>
+  <dt>pkzip:</dt>
+  <dd><a href="ftp://www.unimelb.edu.au/pub/www/tools/unix/cgi-mailer/cgi-mailer-1.9.6.zip">
+     ftp://www.unimelb.edu.au/pub/www/tools/unix/cgi-mailer/cgi-mailer-1.9.6.zip
+     </a> (24k)
+ </dd>
+</dl>
+ <p>Because some users have reported difficulties in retrieving cgi-mailer
+    by ftp, due to slow internet links, I have created an autoresponse system
+    where the cgi-mailer distribution can be mailed to you.
+</p>
+ <p>To obtain cgi-mailer via email, send a message to
+    <tt>auto-mailer@www.unimelb.edu.au</tt> with no subject, and the
+    following line (<strong>exactly</strong>) in the <strong>body</strong>
+    of the message:<br><br><tt>send <i>&lt;filename&gt;</i></tt><br><br>
+    where <tt><i>&lt;filename&gt;</i></tt> is one of the filenames above
+    (e.g. <tt>cgi-mailer-1.9.6.tar.gz</tt> etc.)
+</p>
+ <!-- ===================================================================== -->
+ <hr size="1" noshade>
+ <h3><a name="install">Installation & Configuration</a>
+</h3>
+ <p>After you obtain the source, open cgi-mailer.pl in your text editor.
+    You'll need to set the variables for the location of sendmail (unless
+    you have the MailTools module installed), the location of your logfile
+    and your local domain if you wish to restrict use of cgi-mailer to those
+    within your organisation.  You may need to change the invocation line
+    (the first line in the file) to reflect the location of perl on your
+    system.
+</p>
+ <p>Once you've set the configuration variables, copy cgi-mailer.pl into
+    your cgi-bin (or similar) directory. Make sure the permissions are
+    set to read and execute (<tt>chmod a+rx cgi-mailer.pl</tt>). You
+    should be ready to go. There is a sample HTML form in the test directory
+    of the distribution that you can use to check that everything is working.
+    Be sure to put your email address in the appropriate place in the form
+    before using it.
+</p>
+ <p><span style="color: red">Note:</span> If you are using Windows 95 or NT,
+    Apply the instructions above to the file <tt>cgi-mailer.bat</tt> in the
+    <tt>Win32</tt> subdirectory of the distribution.
+</p>
+ <p>You should make a local copy of <tt>user-doc.html</tt> from the
+    distribution, and change all instances of <i>your-local-host</i> to the 
+    hostname where you have cgi-mailer.pl installed (and remove the &lt;i&gt;
+    tags). You can then give your users the URL of the local copy of the user
+    documentation.
+</p>
+ <!-- ===================================================================== -->
+ <hr size="1" noshade>
+ <p>Please report any bugs, suggestions or corrections to <a
+    href="mailto:gleeson@unimelb.edu.au">gleeson@unimelb.edu.au</a>.
+</p>
+ <!-- ===================================================================== -->
+ <hr size="2" noshade>
+ <pre>Created:       23 April 1996
+Last modified: 28 February 2000
+Access:        Unrestricted.
+Copyright &#169 1996-2000 Martin Gleeson.
+&lt;URL:http://www.unimelb.edu.au/cgi-mailer/admin-doc.html&gt;
+</pre> <!-- ===================================================================== -->
+ <hr size="2" noshade>
+ <table border="0" width="100%">
+  <tr>
+   <td>
+     <address>
+     <a href="http://www.unimelb.edu.au/%7Egleeson/">Martin Gleeson,</a>
+     <a href="mailto:gleeson@unimelb.edu.au">gleeson@unimelb.edu.au</a>
+    </address>
+  </td>
+   <td align="RIGHT">
+     <p> <a href="http://www.unimelb.edu.au/html-check/validation-form.html">
+         <img src="valid_html.4.0.gif" border="0"
+              alt="HTML 4.0 Checked!"></a>
+    </p>
+  </td>
+ </tr>
+</table>
+ <!-- ===================================================================== -->
+ <hr size="2" noshade>
+</body>
+</html>

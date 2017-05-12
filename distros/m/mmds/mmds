@@ -1,0 +1,5 @@
+#!/bin/sh
+: ${MMDSLIB:=`dirname $0`}
+export MMDSLIB
+PATH=$MMDSLIB:$PATH; export PATH
+exec perl -S `basename $0`.pl ${1+"$@"}

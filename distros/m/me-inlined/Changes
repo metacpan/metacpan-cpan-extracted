@@ -1,0 +1,16 @@
+Revision history for me-inlined
+
+0.004     2017-03-16 01:01:19Z
+          - small tweaks to distribution tooling
+
+0.003     2014-12-06 05:46:18Z
+          - Don't import module_notional_filename() from Module::Runtime,
+            then we don't have to clean it out of the namespace.
+          - Made reference to LAWALSH be a link to her MetaCPAN author page
+
+0.002     2014-08-16 22:27:52Z
+          - a bit of documentation tweaking
+
+0.001     2013-04-21 21:55:41Z
+          - Initial release.
+

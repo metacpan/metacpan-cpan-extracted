@@ -1,0 +1,67 @@
+==================================================
+Changes from 2012-04-11 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.40 at 2017-04-10 19:03:34 +0000
+-----------------------------------------
+
+  Change: 4f3e9e02bcfdb0575857fa636b4a837ee001b0a3
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-04-10 20:03:34 +0000
+
+    Switch dist to Dist::Zilla 
+
+-----------------------------------------
+version 0.38 at 2017-02-17 11:25:28 +0000
+-----------------------------------------
+
+  Change: 5fa00a419ed352a425fbb746153c2091f65e1e95
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-02-17 11:25:28 +0000
+
+    Match only on . in Makefile.PL 
+
+-----------------------------------------
+version 0.36 at 2017-02-16 17:56:09 +0000
+-----------------------------------------
+
+  Change: 0692fa86e45b63e7dc43112ef79ff5e4a45f1890
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-02-16 17:56:09 +0000
+
+    Add . to @INC in Makefile.PL if it is not already 
+
+-----------------------------------------
+version 0.34 at 2017-02-16 12:43:58 +0000
+-----------------------------------------
+
+  Change: dca9629c32546ee5754fca1370acbe6f8a143551
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-02-16 12:43:58 +0000
+
+    Deal with perls without dot in @INC in Makefile.PL 
+
+-----------------------------------------
+version 0.32 at 2014-03-12 21:19:22 +0000
+-----------------------------------------
+
+  Change: df64a1cd11bb3dffa81dcf7b66896663b368430c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-03-12 21:19:22 +0000
+
+    Added new option nocurl for disabling upstream curl use 
+
+-----------------------------------------
+version 0.30 at 2013-04-13 16:00:22 +0000
+-----------------------------------------
+
+  Change: d13dd3476dac540e1ed09ac670702a956d332f2e
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-04-13 17:00:22 +0000
+
+    Added metabase::relayd and added prereq 'unless' 
+
+=================================================
+Plus 14 releases after 2012-04-11 00:00:00 +0000.
+=================================================

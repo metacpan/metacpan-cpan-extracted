@@ -1,0 +1,20 @@
+Changes
+lib/mcoder.pm
+lib/mcoder/set.pm
+lib/mcoder/get.pm
+lib/mcoder/proxy.pm
+lib/mcoder/calculated.pm
+lib/mcoder/array/set.pm
+lib/mcoder/array/get.pm
+lib/mcoder/array/calculated.pm
+lib/mcoder/bool/set.pm
+lib/mcoder/bool/unset.pm
+lib/mcoder/virtual.pm
+Makefile.PL
+MANIFEST
+README
+t/1_use.t
+t/2_proxies.t
+t/3_getset.t
+t/4_sugar.t
+META.yml                                 Module meta-data (added by MakeMaker)

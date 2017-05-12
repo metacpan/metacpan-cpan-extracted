@@ -1,0 +1,195 @@
+{
+   "abstract" : "XML+XSLT file based \"CMS\"",
+   "author" : [
+      "Jozef Kutej <jkutej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "meon-Web",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::SysPath" : "0.13",
+            "Test::Most" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3607",
+            "Module::Build::SysPath" : "0.13"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Action::RenderView" : "0",
+            "Catalyst::Authentication::Store::UserXML" : "0.03",
+            "Catalyst::Model::Factory::PerRequest" : "0",
+            "Catalyst::Plugin::Authentication" : "0",
+            "Catalyst::Plugin::ConfigLoader" : "0",
+            "Catalyst::Plugin::Session" : "0.37",
+            "Catalyst::Plugin::Session::State::Cookie" : "0",
+            "Catalyst::Plugin::Session::Store::File" : "0",
+            "Catalyst::Plugin::SmartURI" : "0",
+            "Catalyst::Plugin::Static::Simple" : "0",
+            "Catalyst::Plugin::Unicode::Encoding" : "0",
+            "Catalyst::Runtime" : "5.90007",
+            "Catalyst::View::XSLT" : "0.10",
+            "Class::Load" : "0",
+            "Config::INI::Reader" : "0",
+            "Data::Dumper" : "0",
+            "Data::Header::Fields" : "0",
+            "Data::UUID::LibUUID" : "0",
+            "Data::asXML" : "0.07",
+            "DateTime::Format::HTTP" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "Digest::SHA" : "0",
+            "Email::MIME" : "0",
+            "Email::Sender::Simple" : "0",
+            "Email::Valid" : "0",
+            "File::Copy" : "0",
+            "File::Find::Age" : "0",
+            "File::MimeInfo" : "0",
+            "Getopt::Long" : "0",
+            "HTML::FormHandler::Moose" : "0",
+            "IO::Any" : "0",
+            "Imager" : "0",
+            "JSON::XS" : "0",
+            "List::MoreUtils" : "0",
+            "Moose" : "0",
+            "MooseX::StrictConstructor" : "0",
+            "MooseX::Types::Path::Class" : "0",
+            "Path::Class" : "0.04",
+            "Pod::Usage" : "0",
+            "Run::Env" : "0",
+            "Scalar::Util" : "0",
+            "Text::Unidecode" : "0",
+            "URI::Escape" : "0",
+            "WWW::Mechanize" : "0",
+            "XML::LibXML" : "1.70",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "meon::Web" : {
+         "file" : "lib/meon/Web.pm",
+         "version" : "0.04"
+      },
+      "meon::Web::Config" : {
+         "file" : "lib/meon/Web/Config.pm"
+      },
+      "meon::Web::Controller::API" : {
+         "file" : "lib/meon/Web/Controller/API.pm"
+      },
+      "meon::Web::Controller::Members" : {
+         "file" : "lib/meon/Web/Controller/Members.pm"
+      },
+      "meon::Web::Controller::Root" : {
+         "file" : "lib/meon/Web/Controller/Root.pm"
+      },
+      "meon::Web::Data::CategoryProduct" : {
+         "file" : "lib/meon/Web/Data/CategoryProduct.pm"
+      },
+      "meon::Web::Filter::CategoryProduct" : {
+         "file" : "lib/meon/Web/Filter/CategoryProduct.pm"
+      },
+      "meon::Web::Form::CategoryProduct" : {
+         "file" : "lib/meon/Web/Form/CategoryProduct.pm"
+      },
+      "meon::Web::Form::Delete" : {
+         "file" : "lib/meon/Web/Form/Delete.pm"
+      },
+      "meon::Web::Form::ExtendMembership" : {
+         "file" : "lib/meon/Web/Form/ExtendMembership.pm"
+      },
+      "meon::Web::Form::FileDelete" : {
+         "file" : "lib/meon/Web/Form/FileDelete.pm"
+      },
+      "meon::Web::Form::FileUpload" : {
+         "file" : "lib/meon/Web/Form/FileUpload.pm"
+      },
+      "meon::Web::Form::ImageUpload" : {
+         "file" : "lib/meon/Web/Form/ImageUpload.pm"
+      },
+      "meon::Web::Form::Login" : {
+         "file" : "lib/meon/Web/Form/Login.pm"
+      },
+      "meon::Web::Form::MemberRegistration" : {
+         "file" : "lib/meon/Web/Form/MemberRegistration.pm"
+      },
+      "meon::Web::Form::MemberUpdate" : {
+         "file" : "lib/meon/Web/Form/MemberUpdate.pm"
+      },
+      "meon::Web::Form::PasswordChange" : {
+         "file" : "lib/meon/Web/Form/PasswordChange.pm"
+      },
+      "meon::Web::Form::PasswordReset" : {
+         "file" : "lib/meon/Web/Form/PasswordReset.pm"
+      },
+      "meon::Web::Form::SendEmail" : {
+         "file" : "lib/meon/Web/Form/SendEmail.pm"
+      },
+      "meon::Web::Form::TimelineUpdate" : {
+         "file" : "lib/meon/Web/Form/TimelineUpdate.pm"
+      },
+      "meon::Web::Form::TrainingCourse" : {
+         "file" : "lib/meon/Web/Form/TrainingCourse.pm"
+      },
+      "meon::Web::Member" : {
+         "file" : "lib/meon/Web/Member.pm"
+      },
+      "meon::Web::Model::ResponseXML" : {
+         "file" : "lib/meon/Web/Model/ResponseXML.pm"
+      },
+      "meon::Web::NotFound::CategoryProduct" : {
+         "file" : "lib/meon/Web/NotFound/CategoryProduct.pm",
+         "version" : "0.01"
+      },
+      "meon::Web::ResponseXML" : {
+         "file" : "lib/meon/Web/ResponseXML.pm"
+      },
+      "meon::Web::Role::Form" : {
+         "file" : "lib/meon/Web/Role/Form.pm"
+      },
+      "meon::Web::SPc" : {
+         "file" : "lib/meon/Web/SPc.pm",
+         "version" : "0.01"
+      },
+      "meon::Web::TimelineAggregate" : {
+         "file" : "lib/meon/Web/TimelineAggregate.pm"
+      },
+      "meon::Web::TimelineEntry" : {
+         "file" : "lib/meon/Web/TimelineEntry.pm"
+      },
+      "meon::Web::Util" : {
+         "file" : "lib/meon/Web/Util.pm"
+      },
+      "meon::Web::View::JSON" : {
+         "file" : "lib/meon/Web/View/JSON.pm"
+      },
+      "meon::Web::View::XSLT" : {
+         "file" : "lib/meon/Web/View/XSLT.pm"
+      },
+      "meon::Web::XML2Comment" : {
+         "file" : "lib/meon/Web/XML2Comment.pm"
+      },
+      "meon::Web::env" : {
+         "file" : "lib/meon/Web/env.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.04"
+}

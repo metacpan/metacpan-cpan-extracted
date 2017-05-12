@@ -1,0 +1,42 @@
+Revision history for Perl extension mcoder.
+
+0.10  Apr 29 2005
+	- added support for array_set and array_get
+	- INCOMPATIBLE CHANGE: calculated_array renamed as
+	  array_calculated.
+
+0.09  Apr 06 2005
+	- added support for virtual methods
+
+0.08  Apr 06 2005
+	- added support for calculated_array methods
+	- some typos in the docs corrected
+	- some new tests for calculated methods
+
+0.07  Sep 19 2003
+	- corrected buf in mcoder::calculated
+	- MANIFEST corrected
+
+0.06  Sep 19 2003
+	- added mcoder::bool::set and mcoder::bool::unset modules
+
+0.05  Sep 19 2003
+	- "Why you should use mcoder instead of * also from CPAN"
+	  added to the docs
+
+0.04  Sep 18 2003
+	- support for bool_set and bool_unset
+
+0.03  Sep 18 2003
+	- corrected import methods for mcoder::*
+	- new test for mcoder::*
+	- bad package name on mcoder::proxy corrected
+
+0.02  Sep 18 2003
+	- README updated
+	- module name changed to mcoder
+
+0.01  Wed Sep 17 16:41:19 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n code
+

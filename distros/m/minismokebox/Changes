@@ -1,0 +1,67 @@
+==================================================
+Changes from 2012-04-11 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.66 at 2017-04-10 19:35:27 +0000
+-----------------------------------------
+
+  Change: 115b67a7c0998dd9b19fdd9d326353fd46a65f36
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-04-10 20:35:27 +0000
+
+    Switch dist to Dist::Zilla 
+
+-----------------------------------------
+version 0.64 at 2017-02-17 11:20:09 +0000
+-----------------------------------------
+
+  Change: b6d2e31419d07ad6eb0a988e0bbe29141d62eca7
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-02-17 11:20:09 +0000
+
+    Match only on . in Makefile.PL 
+
+-----------------------------------------
+version 0.62 at 2017-02-16 17:59:04 +0000
+-----------------------------------------
+
+  Change: 3d274bcf114aaae5c6e7abf9be3e62d05297420d
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-02-16 17:59:04 +0000
+
+    Add . to @INC in Makefile.PL if it is not already 
+
+-----------------------------------------
+version 0.60 at 2017-02-16 12:34:11 +0000
+-----------------------------------------
+
+  Change: b605766a78658b97584c6818bde8b307d337bee1
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-02-16 12:34:11 +0000
+
+    Deal with perls without dot in @INC in Makefile.PL 
+
+-----------------------------------------
+version 0.58 at 2013-09-29 17:40:04 +0000
+-----------------------------------------
+
+  Change: 66cacc633d6f7aff842c857e63f74ce633f10f41
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-09-29 18:40:04 +0000
+
+    Add support for osvers in the plugins 
+
+-----------------------------------------
+version 0.56 at 2013-04-13 15:47:12 +0000
+-----------------------------------------
+
+  Change: 04c30ac32c66c8876b7c6362d4d6e055d23ca8a4
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-04-13 16:47:12 +0000
+
+    Require unless and use it. Add minismokebox.pm and move docs to there 
+
+=================================================
+Plus 19 releases after 2012-04-11 00:00:00 +0000.
+=================================================

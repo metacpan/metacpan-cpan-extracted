@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+use 5.010;
+use utf8;
+use warnings;
+use strict;
+use YAML;
+use MARC::Moose::Record;
+use MARC::Moose::Parser::Marcxml;
+use MARC::Moose::Parser::MarcxmlSax;
+use MARC::File::XML;
+use File::Slurp;
+
+use Time::HiRes qw(gettimeofday);
+
+binmode(STDOUT, ':encoding(utf8)');
+
+
+# Number of time the records are parsed
+my $max = 5000;
+
+
+my $json = read_file("onerecord.iso");
+my $record = MARC::Moose::Record::new_from($json, "iso2709");
+say $record->as('Text');
+
+my $rec = MARC::Moose::Record::new_from("
+{
+  fields => [
+    [ '001' => 1234 ],
+    [ '245' => {
+      ind1 => ' ',
+      ind2 => '1',
+      subfields => [
+        'a', 'Mon titre',
+        'b', 'Mon sous-titre',
+      ],
+  ]
+}
+"
+,"json");
+say $rec->as('json');
+

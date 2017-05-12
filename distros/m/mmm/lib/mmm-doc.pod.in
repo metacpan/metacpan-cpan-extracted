@@ -1,0 +1,61 @@
+=head1 NAME
+
+mmm
+
+=head1 DESCRIPTION
+
+mmm is a tool to keep synchronized tree (mirrors). Tree are synchronized with
+rsync or mirrordir (for ftp tree).
+
+=head2 Features
+
+=over 4
+
+=item Centralized configuration
+
+All jobs are setup in only one ini like file.
+
+=item Per tree delay
+
+Each mirror has its own delay separating two sync
+
+=item Error logging
+
+=item Immediate retry on error
+
+=back
+
+=head1 CONFIGURATION
+
+=head2 @SYSCONFDIR@/mmm/mmm.cfg
+
+This file is a ini file like. It contains the main configuration, including
+all mirrors to perform.
+
+See L<mmm.cfg> for more information.
+
+=head1 LICENSE
+
+=head1 AUTHOR
+
+Olivier Thauvin <nanardon@nanardon.zarb.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+    Copyright (C) 2006 Olivier Thauvin
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+=cut

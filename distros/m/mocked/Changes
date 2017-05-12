@@ -1,0 +1,31 @@
+0.09 - Tue Dec 11 12:34:11 PST 2007
+ - bump version to get into cpan.
+
+0.08 - Mon Dec 10 18:45:21 PST 2007
+ - make nested mocked files DTRT when unmocked
+   is used from within the nested mocked file
+
+0.07 - Fri Aug  3 11:26:53 PDT 2007
+ - Added unmocked.pm, to allow you to load real libraries
+   from within your mocked libraries
+
+0.06 - Fri Jun  8 12:25:48 PDT 2007
+ - load Exporter, so mocked libraries can export things;
+ - Make extra sure that $module has not been loaded from another package by
+   seeing if the symbol table for that package has been decorated.
+    (Scott McWhirter [konobi]).
+
+0.05 - Tue Mar 13 17:25:54 PDT 2007
+ - Fixed pod typo - thanks David Cantrell
+
+0.04 - Sun Mar 11 12:05:47 PDT 2007
+ - Added build dependency on Test::Exception
+
+0.03 - Sat Mar 10 15:11:29 PST 2007
+ - Added ability to mock from particular directories (Scott McWhirter [konobi]).
+
+0.02 - Wed Feb 21 21:56:51 PST 2007
+ - Added README
+
+0.01 - Wed Feb 21 21:56:37 PST 2007
+ - initial release

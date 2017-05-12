@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               mmmf
+version:            0.03
+abstract:           multi-master mysql failover
+author:
+    - Petya Kohts <petya@kohts.ru>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Data::Dumper:   0
+    DBI:            0
+    Yandex::Tools:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,3 @@
+
+fast and easy marc manipulation
+see lib/MARC/MIR/Tutorial.pod for futher informations

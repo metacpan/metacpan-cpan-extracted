@@ -1,0 +1,75 @@
+match-simple
+============
+
+Created:      2013-05-19
+Home page:    <https://metacpan.org/release/match-simple>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=match-simple>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.010	2017-01-31
+
+ [ Bug Fixes ]
+ - Fix for arrays of scalars.
+   Fixes RT#117345.
+   <https://rt.cpan.org/Ticket/Display.html?id=117345>
+
+0.009	2014-07-02
+
+ - Backport to Perl 5.6.
+ - Don't load Sub::Infix unless needed.
+
+0.008	2014-03-03
+
+ [ Packaging ]
+ - Bump recommended version of match::simple::XS to 0.001.
+
+ [ Other ]
+ - Don't use match::simple::XS if it's too old, or is unstable.
+
+0.007_03	2014-03-02
+
+ [ Test Suite ]
+ - Don't do `no overloading` on Perl < 5.10.1 in test cases.
+
+0.007_02	2014-03-02
+
+ [ Test Suite ]
+ - Improved match::simple test cases.
+
+0.007_01	2014-02-21
+
+ - Use match::simple::XS if it's installed.
+
+0.006	2013-09-29
+
+ [ Packaging ]
+ - Fix dependencies.
+
+0.005	2013-09-28
+
+ [ Packaging ]
+ - use Dist::Inkt
+
+ [ Other ]
+ - Updated: use Exporter::Tiny
+
+0.004	2013-05-20
+
+ [ Bug Fixes ]
+ - Further fix smartmatch test cases on archaic Perl.
+
+0.003	2013-05-20
+
+ [ Bug Fixes ]
+ - Fix smartmatch test cases on archaic Perl.
+
+0.002	2013-05-20
+
+ [ Bug Fixes ]
+ - Better parity with Perl's smartmatch operator.
+ - Proper checks for overloaded ~~.
+
+ [ Packaging ]
+ - Bundle tests based on Perl's tests for the smartmatch operator.
+
+0.001	2013-05-19	Initial release

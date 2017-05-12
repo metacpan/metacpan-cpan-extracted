@@ -1,0 +1,40 @@
+# Copyright 2011 Kevin Ryde
+
+# This file is part of Math-Image.
+#
+# Math-Image is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# Math-Image is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Math-Image.  If not, see <http://www.gnu.org/licenses/>.
+
+#
+# Crib notes:
+#
+# Possible categories are at
+#     http://standards.freedesktop.org/menu-spec/latest/apa.html
+#
+
+[Desktop Entry]
+Type=Application
+Version=1.0
+Encoding=UTF-8
+Name=Math-Image
+GenericName=Mathematical Images
+Comment=Display various mathematical images
+# Icon=math-image.xpm   ... not yet
+Exec=math-image
+Terminal=false
+Categories=Graphics;2DGraphics;Math;
+#
+# "Math-image" here comes from the executable filename.
+# GtkWindow gets it from gdk_progclass(), which is setup by gdk_init()
+# from g_get_prgname() with an upper case first letter.
+StartupWMClass=Math-image

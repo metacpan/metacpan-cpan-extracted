@@ -1,0 +1,26 @@
+Revision history for Perl extension modules.
+
+0.01  Wed Mar 20 12:20:07 2002
+	- original version; created by h2xs 1.21 with options
+		-A -X -a -n modules
+
+0.02 03-22-2002 15:55
+
+	- Added checking for eval-errors
+
+	'Jesse Porter' pointed me to include it.
+
+0.03 25.06.2002 13:48
+
+	- Added option 'force'. It is turned ON by default. It
+	controls if 'modules' tries to catch locally-not-loadable
+	modules from CPAN via the CPAN module.
+
+	- Module arguments are now passable via a hashref. Have
+	a look on example 2 in the pod.
+
+0.04 26.06.2002 00:11
+
+	- Bug fix: Options now only can be turned on/off with +/-.
+
+	- Bug fix: The debug flag/output is off per default.

@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 995f20784d4413c18b848a4151b75020d8b0159b Changes
+SHA1 504040629e552628812533194797cd161e101b24 MANIFEST
+SHA1 c8f956fa30fa8ffc4729c465e38d9013a4f5ae9e META.yml
+SHA1 629634590f70e361e8ef01bf0aa507d5564b7f4d Makefile.PL
+SHA1 617377059aad807e0f752c6d0501f1573b2bb0b4 README
+SHA1 1e0840c95edfab3a1f4cf257d3e1a4331806fee3 README.mkdn
+SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
+SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
+SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
+SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
+SHA1 27ffe05bb181a2ddd79c4846ed29950896459f39 inc/Module/Install/GithubMeta.pm
+SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
+SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
+SHA1 3b9281ddf7dd6d6f5de0a9642c69333023193c80 inc/Module/Install/Package.pm
+SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
+SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
+SHA1 26d58a041cd6b3d21db98b32e8fd1841aae21204 inc/Module/Package.pm
+SHA1 43e39b144c19dd9b760b4aaa0cc0d922fc07ed6c inc/Pod/Markdown.pm
+SHA1 6c22c417a8b9ba296d21e821ca31a0ba4116ede6 lib/methods.pm
+SHA1 3fddfd3200c10d6d074202ecf0a6f534b18cf43f t/00-load.t
+SHA1 1f241ee50cf49395684587d8bb0c385cba6af705 t/01-parse-proto.t
+SHA1 2c89e18083bf9ed8233f4745a86216fc5c726e98 t/02-use.t
+SHA1 9c13992ddb5fb47a551d6c980e9f5da395bd34a0 t/03-config.t
+SHA1 5589f633d5058dc90bbc5e1d7ec01b702a40d1be t/methods-invoker.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (Darwin)
+
+iEYEARECAAYFAlEJP6YACgkQtLPdNzw1AaDW2QCfbQ52+ng2Z+ep8gsVJAvbq7Or
+IwoAoLTTc3nS3NLDfEA79d10dTobRilD
+=IwaL
+-----END PGP SIGNATURE-----

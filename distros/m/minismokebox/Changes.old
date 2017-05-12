@@ -1,0 +1,92 @@
+minismokebox
+============
+
+0.46 Wed May 25 22:07:28 BST 2011
+  - Added configuration options to pass custom env vars to the
+    Backend process
+
+0.44 Tue Mar  8 11:34:14 GMT 2011
+  - Update required version of POE::Filter::HTTP::Parser
+
+0.42 Thu Feb 10 21:52:04 GMT 2011
+  - Make noepoch option actually do what it is supposed to do
+    and work from the configuration file
+
+0.40 Thu Dec  9 19:59:42 GMT 2010
+  - Finally get rid of the USE_SIGCHLD redefined warnings
+  - Add 'random' option to smoke random CPAN dists
+
+0.38 Fri Nov 26 12:48:47 GMT 2010
+  - Add noepoch option to explicitly disable the most recent
+    uploads smoking based on when the smoker was last started.
+
+0.36 Tue Nov 16 22:10:38 GMT 2010
+  - Fix an incredibly fatal flaw in the epoch time logic.
+
+0.34 Tue Nov 16 12:56:01 GMT 2010
+  - Write a timestamp file on finish, consult it on startup,
+    only smoke dists uploaded since then.
+
+0.32 Mon Sep 27 11:40:36 BST 2010
+  - Detect the version and archname of the given perl executable.
+    Pass this information on to loaded plugins.
+
+0.30 Thu Sep  2 15:44:20 BST 2010
+  - Added --rss option
+
+0.26  Tue Mar 23 16:30:47 GMT 2010
+  - Actually activate the --nolog option
+
+0.24  Tue Mar 23 12:59:05 GMT 2010
+  - added --nolog option
+
+0.22  Wed Dec  2 13:54:03 GMT 2009
+  - Minor fixes to plugin
+
+0.21_01  Tue Nov 24 21:57:59 GMT 2009
+  - Implemented plugin system
+
+0.20  Sun Nov  8 14:51:02 GMT 2009
+  - Changes to Makefile.PL
+  - Added 'home' option to change HOME env var for spawned
+    processes.
+
+0.18	Sat Apr  4 22:14:12 BST 2009
+	- Changed the default CPAN mirror used to the CPAN Testers mirror
+	- Added repository META.
+
+0.16	Sun Feb 22 21:32:38 GMT 2009
+	- Specify the POE::Loop::Event dependency explicitly
+	  if the user wants Event.
+
+0.14	Fri Feb  6 12:27:53 GMT 2009
+	- Fixed refcount leaks.
+	- Updated dependencies to fixed versions.
+
+0.12	Mon Feb  2 22:12:15 GMT 2009
+	- Added some more env vars that needed setting.
+
+0.10	Mon Feb  2 13:14:06 GMT 2009
+	- Always set AUTOMATED_TESTING env var. Some backends
+	  don't set it, so we must. *sigh*
+
+0.08	Thu Jan 29 21:16:38 GMT 2009
+	- added --reverse option
+	- Improved tests
+	- Refined Makefile.PL
+
+0.06	Tue Jan 13 21:04:40 GMT 2009
+	- Fixed META.yml, abstract was wrong.
+
+0.04	Mon Jan 12 16:20:11 GMT 2009
+	- Print out the options we are going to use
+
+0.02	Mon Jan 12 09:48:15 GMT 2009
+	- Initial CPAN 'stable' release
+
+0.01_02	Sat Jan 10 22:47:01 GMT 2009
+	- Slight issue with commandline options. Fixed.
+
+0.01_01	Sat Jan 10 22:09:09 GMT 2009
+	- Initial CPAN developer release
+Fri May 27 11:02:28 BST 2011

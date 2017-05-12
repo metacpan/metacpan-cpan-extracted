@@ -1,0 +1,65 @@
+{
+   "abstract" : "the guts of the metabase-relayd command",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "metabase-relayd",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Config" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Tiny" : "2.12",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "Module::Load::Conditional" : "0.38",
+            "POE" : "1.310",
+            "POE::Component::Metabase::Relay::Server" : "0.34",
+            "Pod::Usage" : "1.00",
+            "perl" : "5.006",
+            "unless" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.47"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/metabase-relayd",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/metabase-relayd.git",
+         "web" : "https://github.com/bingos/metabase-relayd"
+      }
+   },
+   "version" : "0.40",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+}
+

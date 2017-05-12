@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns="http://web.meon.eu/"
+    xmlns:w="http://web.meon.eu/"
+>
+
+<meta>
+    <title>localhost</title>
+</meta>
+
+<content><div xmlns="http://www.w3.org/1999/xhtml">
+
+<div class="container">
+
+<h1>Welcome to bootstrap@meon::Web!</h1>
+
+<p>Examples:</p>
+
+<ul>
+    <li>
+        Navbar
+        <ul>
+            <li><a href="navbar/">Navbar default</a></li>
+            <li><a href="navbar-static-top/">Navbar static top</a></li>
+            <li><a href="navbar-fixed-top/">Navbar fixed top</a></li>
+        </ul>
+    </li>
+</ul>
+
+</div>
+
+</div></content>
+
+</page>

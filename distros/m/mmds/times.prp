@@ -1,0 +1,4 @@
+# Default settings for Times font.
+
+documents.default.args = "Times justify"
+

@@ -1,0 +1,49 @@
+{
+   "abstract" : "Plugin for geocoding and reverse geocoding features!",
+   "author" : [
+      "Rohit Deshmukh <raigad1630@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.84, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-GeoCoder",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Geo::Coder::Google" : "0",
+            "Mojolicious" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/raigad/mojolicious-plugin-geocoder/issues"
+      },
+      "homepage" : "http://search.cpan.org/~raigad/mojolicious-plugin-geocoder/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/raigad/mojolicious-plugin-geocoder.git",
+         "web" : "https://github.com/raigad/mojolicious-plugin-geocoder"
+      }
+   },
+   "version" : "0.05"
+}

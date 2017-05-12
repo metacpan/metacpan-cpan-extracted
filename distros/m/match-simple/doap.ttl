@@ -1,0 +1,230 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/match-simple/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-recommendation [
+		doap-deps:on "match::simple::XS 0.001"^^doap-deps:CpanId;
+	];
+	doap-deps:runtime-requirement [
+		doap-deps:on "Exporter::Tiny 0.026"^^doap-deps:CpanId;
+	], [ doap-deps:on "List::Util 1.33"^^doap-deps:CpanId ], [ doap-deps:on "Scalar::Util"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.006001"^^doap-deps:CpanId ], [ doap-deps:on "Sub::Infix 0.004"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=match-simple>;
+	doap:created         "2013-05-19"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/match-simple>;
+	doap:homepage        <https://metacpan.org/release/match-simple>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "match-simple";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-001>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-002>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-003>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-004>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-005>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-006>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-007_01>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-007_02>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-007_03>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-008>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-009>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-010>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-match-simple>;
+	];
+	doap:shortdesc       "simplified clone of smartmatch operator".
+
+<http://purl.org/NET/cpan-uri/dist/match-simple/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "match-simple-0.001"^^xsd:string;
+	dc:issued            "2013-05-19"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/match-simple-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/match-simple/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "match-simple-0.002"^^xsd:string;
+	dc:issued            "2013-05-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Bundle tests based on Perl's tests for the smartmatch operator.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Proper checks for overloaded ~~.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Better parity with Perl's smartmatch operator.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/match-simple-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/match-simple/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "match-simple-0.003"^^xsd:string;
+	dc:issued            "2013-05-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix smartmatch test cases on archaic Perl.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/match-simple-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/match-simple/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "match-simple-0.004"^^xsd:string;
+	dc:issued            "2013-05-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Further fix smartmatch test cases on archaic Perl.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/match-simple-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/match-simple/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "match-simple-0.005"^^xsd:string;
+	dc:issued            "2013-09-28"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "use Dist::Inkt";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "use Exporter::Tiny";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/match-simple-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/match-simple/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "match-simple-0.006"^^xsd:string;
+	dc:issued            "2013-09-29"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Fix dependencies.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/match-simple-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/match-simple/v_0-007_01>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "match-simple-0.007_01"^^xsd:string;
+	dc:issued            "2014-02-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Use match::simple::XS if it's installed.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/match-simple-0.007_01.tar.gz>;
+	doap:revision        "0.007_01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/match-simple/v_0-007_02>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "match-simple-0.007_02"^^xsd:string;
+	dc:issued            "2014-03-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Improved match::simple test cases.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/match-simple-0.007_02.tar.gz>;
+	doap:revision        "0.007_02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/match-simple/v_0-007_03>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "match-simple-0.007_03"^^xsd:string;
+	dc:issued            "2014-03-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Don't do `no overloading` on Perl < 5.10.1 in test cases.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/match-simple-0.007_03.tar.gz>;
+	doap:revision        "0.007_03"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/match-simple/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "match-simple-0.008"^^xsd:string;
+	dc:issued            "2014-03-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Bump recommended version of match::simple::XS to 0.001.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Don't use match::simple::XS if it's too old, or is unstable.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/match-simple-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/match-simple/v_0-009>
+	a                    doap:Version;
+	dc:identifier        "match-simple-0.009"^^xsd:string;
+	dc:issued            "2014-07-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Don't load Sub::Infix unless needed.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Backport to Perl 5.6.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/match-simple-0.009.tar.gz>;
+	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/match-simple/v_0-010>
+	a                    doap:Version;
+	dc:identifier        "match-simple-0.010"^^xsd:string;
+	dc:issued            "2017-01-31"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix for arrays of scalars.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/117345>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/match-simple-0.010.tar.gz>;
+	doap:revision        "0.010"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/117345>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "117345"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=117345>.
+

@@ -1,0 +1,273 @@
+<collection xmlns="http://www.loc.gov/MARC21/slim">
+<record>
+  <leader>01529    a2200217   4500</leader>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">0-19-877306-4</subfield>
+  </datafield>
+  <datafield tag="041" ind1=" " ind2=" ">
+    <subfield code="a">eng</subfield>
+  </datafield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Burda, Michael C.</subfield>
+    <subfield code="u">Economics and Political Science</subfield>
+  </datafield>
+  <datafield tag="245" ind1=" " ind2=" ">
+    <subfield code="a">Macroeconomics:</subfield>
+    <subfield code="b">a European text</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="b">Oxford University Press,</subfield>
+    <subfield code="c">1993.</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">486 p. :</subfield>
+    <subfield code="b">Graphs ;</subfield>
+    <subfield code="c">25 cm.</subfield>
+  </datafield>
+  <datafield tag="504" ind1=" " ind2=" ">
+    <subfield code="a">Includes bibliographical references and index and glossary</subfield>
+  </datafield>
+  <datafield tag="520" ind1=" " ind2=" ">
+    <subfield code="a">The book covers two courses. The first part (chapters 1-12) corresponds to the macro course. It starts with an open economy from the very beginning, presents the building blocks of the economic model, explores the controversies and concludes on the eclectic view. Thus the view is taken that macroeconomists are actually in agreement over a large range of issues and that the points of disagreement need not be over-emphasized for the general public. At the same time differing views are presented, mostly emphasizing the assumptions on one hand, and the policy implication on the other. It illustrates each concept and result with examples drawn from the real world. Considerable effort is expended in analysing the supply-side in Europe, which is wholly neglected in US textbooks</subfield>
+  </datafield>
+  <datafield tag="690" ind1=" " ind2=" ">
+    <subfield code="a">Economics</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="a">Wyplosz, Charles</subfield>
+  </datafield>
+  <datafield tag="942" ind1=" " ind2=" ">
+    <subfield code="c">IBK</subfield>
+  </datafield>
+  <datafield tag="952" ind1=" " ind2=" ">
+    <subfield code="1">0</subfield>
+    <subfield code="7">0</subfield>
+    <subfield code="a">DO</subfield>
+    <subfield code="b">DO</subfield>
+    <subfield code="c">MC</subfield>
+    <subfield code="o">HB172.5 .B87 1993</subfield>
+    <subfield code="p">000426795</subfield>
+    <subfield code="y">IBK</subfield>
+  </datafield>
+  <datafield tag="952" ind1=" " ind2=" ">
+    <subfield code="1">0</subfield>
+    <subfield code="7">0</subfield>
+    <subfield code="a">DO</subfield>
+    <subfield code="b">DO</subfield>
+    <subfield code="c">MC</subfield>
+    <subfield code="o">HB172.5 .B87 1993</subfield>
+    <subfield code="p">000426811</subfield>
+    <subfield code="y">IBK</subfield>
+  </datafield>
+  <datafield tag="952" ind1=" " ind2=" ">
+    <subfield code="1">0</subfield>
+    <subfield code="7">0</subfield>
+    <subfield code="a">DO</subfield>
+    <subfield code="b">DO</subfield>
+    <subfield code="c">MC</subfield>
+    <subfield code="o">HB172.5 .B87 1993</subfield>
+    <subfield code="p">000466130</subfield>
+    <subfield code="y">IBK</subfield>
+  </datafield>
+  <datafield tag="952" ind1=" " ind2=" ">
+    <subfield code="1">0</subfield>
+    <subfield code="7">0</subfield>
+    <subfield code="a">TA</subfield>
+    <subfield code="b">TA</subfield>
+    <subfield code="c">MC</subfield>
+    <subfield code="o">HB172.5 .B87 1993</subfield>
+    <subfield code="p">900099163</subfield>
+    <subfield code="y">IBK</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="b">76</subfield>
+    <subfield code="e">8</subfield>
+  </datafield>
+</record>
+<record>
+  <leader>02703    a2200229   4500</leader>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">0-7484-0456-2</subfield>
+  </datafield>
+  <datafield tag="041" ind1=" " ind2=" ">
+    <subfield code="a">eng</subfield>
+  </datafield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Van Wassenhove, Luk N.</subfield>
+    <subfield code="u">Technology and Operations Management</subfield>
+  </datafield>
+  <datafield tag="245" ind1=" " ind2=" ">
+    <subfield code="a">OR at work:</subfield>
+    <subfield code="b">practical experiences of operational research</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="b">Taylor &amp; Francis,</subfield>
+    <subfield code="c">1996.</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">359 p. ;</subfield>
+    <subfield code="c">24 cm.</subfield>
+  </datafield>
+  <datafield tag="504" ind1=" " ind2=" ">
+    <subfield code="a">Includes bibliographical references and index</subfield>
+  </datafield>
+  <datafield tag="505" ind1=" " ind2=" ">
+    <subfield code="a">Includes Chapter by Van Wassenhove, Luk; Fortuin, Leonard; Van Beek, Paul Hordijk, Leen &quot;OR and the environment. A fruitful combination&quot; p.269-286                                                                                                       Van Wassenhove, Luk; Fortuin, Leonard; Van Beek, Paul &quot;OR epilogue&quot; p.337-342                                              Van Wassenhove, Luk; Fortuin, Leonard; Van Beek, Paul &quot;OR introduction&quot; p.1-19                                                Van Wassenhove, Luk; Kroon, L.G; Dijkstra M.C &quot;Planning the size and organization of KLM&apos;s aircraft maintenance personnel&quot; p.163-177                                                                                                                                    Van Wassenhove, Luk; Corbett, C.J; Overmeer, W.J.A.M &quot;What the cases don&apos;t tell us&quot; p.305-335                                 Van Wassenhove, Luk; Corbett, C.J. &quot;Crisis? What crisis?. Four decades of debate on operational research&quot; p.289-304</subfield>
+  </datafield>
+  <datafield tag="520" ind1=" " ind2=" ">
+    <subfield code="a">Operational research is a discipline concerned with real life problems and with people dealing with these problems and it is characterised by an analytical way of looking at things. This can create problems as too much amphasis on mathematical techniques may hamper the effectiveness of OR to human decision makers working in real organisations. Good practice means appropriate analytical skills as well as the employment of skills of teamwork and facilitation. OR at Work contains 5 cases where decision makers face difficult problems in complex situations. Descriptions of successful practice give students as well as potential users a clear picture of what OR is about and how OR projects are conducted. Interviews with successful OR practitioners and their clients are included, complementing the case descriptions. Application areas studied include transport and logistics, product and process design, maintenance and financial services, as well as healthcare and environmental decision making</subfield>
+  </datafield>
+  <datafield tag="583" ind1=" " ind2=" ">
+    <subfield code="a">Digitized</subfield>
+  </datafield>
+  <datafield tag="690" ind1=" " ind2=" ">
+    <subfield code="a">Technology management</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="a">Fortuin, Léonard</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="a">Van Beek, Paul</subfield>
+  </datafield>
+  <datafield tag="942" ind1=" " ind2=" ">
+    <subfield code="c">IBK</subfield>
+  </datafield>
+  <datafield tag="952" ind1=" " ind2=" ">
+    <subfield code="1">0</subfield>
+    <subfield code="7">0</subfield>
+    <subfield code="a">DO</subfield>
+    <subfield code="b">DO</subfield>
+    <subfield code="c">MC</subfield>
+    <subfield code="o">T57.6 .O67 1996</subfield>
+    <subfield code="p">000366405</subfield>
+    <subfield code="y">IBK</subfield>
+  </datafield>
+  <datafield tag="952" ind1=" " ind2=" ">
+    <subfield code="1">0</subfield>
+    <subfield code="7">0</subfield>
+    <subfield code="a">TA</subfield>
+    <subfield code="b">TA</subfield>
+    <subfield code="c">MC</subfield>
+    <subfield code="o">T57.6 .O67 1996</subfield>
+    <subfield code="p">900163361</subfield>
+    <subfield code="y">IBK</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="b">113</subfield>
+    <subfield code="e">8</subfield>
+  </datafield>
+</record>
+<record>
+  <leader>01666    a2200205   4500</leader>
+  <datafield tag="041" ind1=" " ind2=" ">
+    <subfield code="a">eng</subfield>
+  </datafield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Weiss, Lawrence A.</subfield>
+    <subfield code="u">Accounting and Control</subfield>
+  </datafield>
+  <datafield tag="245" ind1=" " ind2=" ">
+    <subfield code="a">An Analysis of state-wide variation in bankruptcy rates in the United States (RV of 96/43/AC)</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Fontainebleau :</subfield>
+    <subfield code="b">INSEAD,</subfield>
+    <subfield code="c">1996.</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">18 p.</subfield>
+  </datafield>
+  <datafield tag="440" ind1=" " ind2=" ">
+    <subfield code="a">Working Paper ;</subfield>
+    <subfield code="n">96/56/AC (revised version of 96/43/AC)</subfield>
+  </datafield>
+  <datafield tag="520" ind1=" " ind2=" ">
+    <subfield code="a">While not discounting non-quantifiable legal cultural variables, the present study is an advance over previous empirical work dealing with statewide variations in bankruptcy filing rates in at least three ways. First, we include a larger menu of both legal and economic explanatory variables than in pevious studies. Second, we employ a larger and more recent data set. Third, both chapter 7 and chaprter 13 filings are studied and, unlike previous work, the explanatory power of our model is comparatively high. We begin by briefly reviewing the related literature in section II. Section III describes the data utilized in this study, and the construction of econometric variables. This is followed in section IV by a discussion of the methodology employed. Our results are discussed in section V. The concluding section suggests avenues fo future research in this area.</subfield>
+  </datafield>
+  <datafield tag="583" ind1=" " ind2=" ">
+    <subfield code="a">Digitized</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="a">Bhandari, J. S.</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="a">Robins, R.</subfield>
+  </datafield>
+  <datafield tag="780" ind1=" " ind2=" ">
+    <subfield code="9">223259</subfield>
+    <subfield code="t">Analysis of state-wide variation in bankruptcy rates in the United States - Bhandari, J. S.;Weiss, Lawrence A.;Robin - 1996 - INSEAD Working Paper</subfield>
+  </datafield>
+  <datafield tag="856" ind1=" " ind2=" ">
+    <subfield code="u">http://flora.insead.edu/fichiersti_wp/inseadwp1996/96-56.pdf</subfield>
+  </datafield>
+  <datafield tag="942" ind1=" " ind2=" ">
+    <subfield code="c">IWP</subfield>
+  </datafield>
+  <datafield tag="952" ind1=" " ind2=" ">
+    <subfield code="1">0</subfield>
+    <subfield code="7">0</subfield>
+    <subfield code="a">VL</subfield>
+    <subfield code="b">VL</subfield>
+    <subfield code="p">BC000001</subfield>
+    <subfield code="y">IWP</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="b">123</subfield>
+    <subfield code="e">13</subfield>
+  </datafield>
+</record>
+<record>
+  <leader>00768    a2200181   4500</leader>
+  <datafield tag="041" ind1=" " ind2=" ">
+    <subfield code="a">eng</subfield>
+  </datafield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Kets de Vries, Manfred F. R.</subfield>
+    <subfield code="u">Entrepreneurship and Family Enterprise</subfield>
+  </datafield>
+  <datafield tag="245" ind1=" " ind2=" ">
+    <subfield code="a">Transforming the mind-set of the organization:</subfield>
+    <subfield code="b">an owner&apos;s manual</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Fontainebleau :</subfield>
+    <subfield code="b">INSEAD,</subfield>
+    <subfield code="c">1996.</subfield>
+  </datafield>
+  <datafield tag="440" ind1=" " ind2=" ">
+    <subfield code="a">Working Paper ;</subfield>
+    <subfield code="n">96/81/ENT</subfield>
+  </datafield>
+  <datafield tag="520" ind1=" " ind2=" ">
+    <subfield code="a">Abstract not available</subfield>
+  </datafield>
+  <datafield tag="583" ind1=" " ind2=" ">
+    <subfield code="a">Digitized</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="a">Balazs, Katharina</subfield>
+  </datafield>
+  <datafield tag="785" ind1=" " ind2=" ">
+    <subfield code="9">223326</subfield>
+    <subfield code="t">Beyond the quick fix: the psychodynamics of organizational transformation and change (RV of 96/81/ENT) - Kets de Vries, Manfred F. R.;Balazs, Kat - 1997 - INSEAD Working Paper</subfield>
+  </datafield>
+  <datafield tag="856" ind1=" " ind2=" ">
+    <subfield code="u">http://flora.insead.edu/fichiersti_wp/inseadwp1996/96-81.pdf</subfield>
+  </datafield>
+  <datafield tag="942" ind1=" " ind2=" ">
+    <subfield code="c">IWP</subfield>
+  </datafield>
+  <datafield tag="952" ind1=" " ind2=" ">
+    <subfield code="1">0</subfield>
+    <subfield code="7">0</subfield>
+    <subfield code="a">VL</subfield>
+    <subfield code="b">VL</subfield>
+    <subfield code="p">BC000002</subfield>
+    <subfield code="y">IWP</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="b">125</subfield>
+    <subfield code="e">13</subfield>
+  </datafield>
+</record>
+</collection>

@@ -1,0 +1,35 @@
+match-simple-XS
+===============
+
+Created:      2014-02-20
+Home page:    <https://metacpan.org/release/match-simple-XS>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=match-simple-XS>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.001	2014-03-03	Initial stable release
+
+0.000_05	2014-03-02	Preview
+
+ [ Test Suite ]
+ - Don't do `no overloading` on Perl < 5.10.1 in test cases.
+
+0.000_04	2014-03-02	Preview
+
+ [ Bug Fixes ]
+ - Fix testing $b->can('MATCH') from XS.
+
+ [ Test Suite ]
+ - Greatly improved test suite.
+
+0.000_03	2014-02-21	Preview
+
+ [ Bug Fixes ]
+ - Emulate SvRXOK on versions of Perl too old to support it.
+
+0.000_02	2014-02-21	Preview
+
+ [ Bug Fixes ]
+ - av_tindex() doesn't work on Perl earlier than 5.18; use av_len()
+   instead.
+
+0.000_01	2014-02-21	Preview

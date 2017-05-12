@@ -1,0 +1,35 @@
+---
+abstract: 'the guts of the metabase-relayd command'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.47'
+configure_requires:
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: metabase-relayd
+requires:
+  Config::Tiny: '2.12'
+  File::Path: '0'
+  File::Spec: '0'
+  Module::Load::Conditional: '0.38'
+  POE: '1.310'
+  POE::Component::Metabase::Relay::Server: '0.34'
+  Pod::Usage: '1.00'
+  perl: '5.006'
+  unless: '0'
+resources:
+  homepage: https://github.com/bingos/metabase-relayd
+  repository: https://github.com/bingos/metabase-relayd.git
+version: '0.40'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,0 +1,33 @@
+=head1 NAME
+
+mRuby::State - state object for mRuby
+
+=head1 DESCRIPTION
+
+This is a perl representation of mrb_state.
+
+=head1 METHODS
+
+=over 4
+
+=item C<< my $state = mRuby::State->new() : mRuby::State >>
+
+Create new instance of mRuby::State.
+
+=item C<< $state->parse_string($src : Str) : mRuby::ParserState >>
+
+Parse ruby string and return new instance of L<mRuby::ParserState>.
+
+=item C<< $state->generate_code($parser_state : mRuby::ParserState) : mRuby::RProc >>
+
+Generate code from L<mRuby::ParserState>.
+
+=item C<< my $ret = $state->run($proc : mRuby::RProc, $val : Any) : Any >>
+
+Run the C<< $proc >> and get a return value.
+
+=item C<< my $ret = $state->funcall($proc : mRuby::RProc, $funcname : Str, ...) : Any >>
+
+Call specified named function in the C<< $proc >> context and get a return value.
+
+=back

@@ -1,0 +1,25 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/GithubMeta.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Package.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/Module/Package.pm
+inc/Pod/Markdown.pm
+lib/methods.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+README.mkdn
+t/00-load.t
+t/01-parse-proto.t
+t/02-use.t
+t/03-config.t
+t/methods-invoker.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

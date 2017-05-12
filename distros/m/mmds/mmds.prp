@@ -1,0 +1,127 @@
+# Default configuration settings for MMDS.
+
+config {
+    # These are set for convenience. Other property files can use these.
+    mmdslib = ${MMDSLIB:/usr/local/lib/mmds}
+    texdir  = '${config.mmdslib}/texdir'
+}
+
+general {
+
+  # Default language setting.
+  language   = en
+
+  # Default input encoding.
+  input.encoding = iso-8859-1
+
+  # Defaults for document headers.
+  company    = "Squirrel Consultancy"
+  cmpy       = "MMDS"
+  city       = "Haarlem"
+  department = ${.company}
+
+}
+
+printers {
+
+  # Generic PostScript printer.
+  ps {
+    driver = ps
+    cmd    = lpr
+  }
+
+  # PostScript printer that uses bitmap (PK) fonts.
+  pspk {
+    driver = pk
+    cmd    = lpr
+  }
+
+  # Some other possible settings.
+  sample {
+    # Print pages in reversed order.
+    reversed = true
+  }
+}
+
+documents {
+
+  # Default settings.
+  # The document type is always added as the first argument before
+  # the other arguments.
+
+  default {
+    style    = mmds_doc
+    args     = "justify"
+  }
+
+  # For each property not specified explicitly, the default is taken.
+
+  letter {
+    style    = mmds_let
+  }
+
+  slides {
+    style    = mmds_sli
+  }
+}
+
+tools {
+
+  # Path settings must be single quoted, since they make use of
+  # variables like ${config.mmdslib} and ${config.texdir} that will
+  # not have their definitive values until used.
+
+  # The (optional) LaTeX filter postprocesses the latex source before
+  # feeding it to LaTeX. It is a real standard input to standard
+  # output filter.
+  #
+  # latexfilter {
+  #   cmd  = xxx
+  #   args = "yyy zzz"
+  # }
+
+  # The index preprocessor processes the LaTeX generated .ind file
+  # from the first pass into and .idx file for the second LaTeX pass.
+
+  indexpp {
+    cmd	   = indexpp
+    args   =
+  }   
+
+  # Note, in all LaTeX related path settings, do not forget to include
+  # a leading, trailing or double colon to include the standard paths.
+
+  latex {
+    cmd     = latex
+    # Use T1/TS1 encodings.
+    use_ts1 = 1
+    inputs  = '.:${config.texdir}::'
+  }
+
+  # dvips requires different settings dependent on the driver used.
+  # These are the default settings for all drivers.
+  dvips {
+    cmd     = dvips
+    config  = '.:${config.texdir}::'
+    headers = '.:${config.texdir}::'
+  }
+
+  # Settings for other drivers. Everything not set explicitly will
+  # default to the above settings.
+
+  dviviewer {
+    cmd     = xdvi
+  }
+
+  psviewer {
+    cmd     = gv
+  }
+
+  pspdf {
+    cmd     = ps2pdf
+  }
+
+  pdfviewer {
+    cmd     = acroread
+  }
+}

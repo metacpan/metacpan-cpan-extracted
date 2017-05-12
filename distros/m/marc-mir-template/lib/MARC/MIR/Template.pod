@@ -1,0 +1,43 @@
+=head1 MIR Template
+
+MIR Template is a specification to store a cataloging grid. 
+MIR::Template objects that uses this grid to 
+
+    * create marc records from datastructures using a grid
+    * build datastructures from marc records using a grid
+
+=head1 MIR::Template to create MIR
+
+please see t/00_test.t for now 
+
+=head1 MIR::Template to read from MIR
+
+please see t/00_test.t for now 
+
+=head1 Contributors
+
+L<http://github.com/eiro/p5-marc-mir> 
+
+=head1 BUGS
+
+None known for now, you can fill them using the good request tracker
+(cpan or github)
+
+=head1 TODO
+
+=head2 support for indicators
+
+basically:
+
+    700:
+        - [ author_fst , { a: name, b: firstname }, '01' ]
+        - [ author_snd , { a: name, b: firstname }, ['1','0'] ]
+    701:
+        - [ secondary_author , { a: name, b: firstname }, '01' ]
+    700:
+        - [ auteur1 , { a: nom, b: prenom }, '01' ]
+        - [ auteur2 , { a: name, b: firstname }, ['1','0'] ]
+    701:
+        - [ secondary_author , { a: name, b: firstname }, '01' ]
+
+is the first idea

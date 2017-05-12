@@ -1,0 +1,53 @@
+'modules' version 0.01
+======================
+
+Example:
+
+	use modules qw(strict warnings 5.006 Data::Dumper);
+
+becomes the short version for:
+
+	use 5.006;
+	use strict;
+	use warnings;
+	use Data::Dumper;
+
+ABSTRACT
+
+If you are bored by multiple 'use'-statement and asked why you cannot load
+several modules/pragma's with one single 'use'-line: Then you will find
+'modules' handy, because thats what it does.
+
+Ironically 'modules' is a module. The name was choosen (against the recommendation
+to use lower case names for pragma's only), because the 'use modules' construct
+sounds so self-explanatory.
+
+INSTALLATION
+
+To install this module type the following (on Win32 use ie. 'nmake'):
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+The 'CPAN' module if the 'force' feature is turned on.
+
+FEATURES
+
+	- automatically loads modules from CPAN (via the CPAN module) if they fail
+	loading. So just 'use modules qw(Exotic::Module)' in your script and do not care if
+	its on the local system or not, because if not 'modules' catches and installs
+	it from CPAN.
+
+AUTHOR
+
+Murat Ünalan (muenalan@cpan.org)
+
+COPYRIGHT NOTICE
+
+Copyright (c) 2002 Murat Ünalan. All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

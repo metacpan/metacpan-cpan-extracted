@@ -1,0 +1,69 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 925997bf140e4a006346647e13f4439e62aecae3 Build.PL
+SHA1 1127534ece29ea848cef58eec595aadf51d25c65 Changes
+SHA1 74b1c398020b9c1e8849b7982751cb70ecc5de8d LICENSE
+SHA1 cefd234331e8c8c78e2488b5185ccc388e55fc14 MANIFEST
+SHA1 a1dbf257177f9f76372ac111f127bc34f4f3fb24 MANIFEST.SKIP
+SHA1 210161fcab7dede6240a5933984376fe97654ef9 META.yml
+SHA1 7b38ecbaea288aa0c08d6560ba58969198cfbca2 Makefile.PL
+SHA1 696409b8c0fb054a254179721ecf58a136ca38db README
+SHA1 7753362ce325d0ba53c5fe011c31fdb3997e2d38 eg/maybe.pl
+SHA1 20fae3c2c3aceee735357d596a98f7bc9395f008 lib/maybe.pm
+SHA1 7b9cb558d1610a2d6c6f10eeb76d038c189675e8 t/01_use_package.t
+SHA1 299f306ee39fcee7ffe2f85ff0251516d6656cbd t/02_maybe_package.t
+SHA1 fb7d10578c5308b136b6558b764515cbd2c78817 t/03_use_package_version_good.t
+SHA1 a908e16eabea626dbf9e9720af634042876f0eab t/04_maybe_package_version_good.t
+SHA1 004e349898df789a2814e2443b37d0a71847d423 t/05_use_package_version_bad.t
+SHA1 9067f10466d461b0b1376c58d3c1315472ee1945 t/06_maybe_package_version_bad.t
+SHA1 4ddd952ecccb29be06873b56fae3a5c60dbe354f t/07_use_package_list.t
+SHA1 88075d8934aab23cf5312469770438661e8c7380 t/08_maybe_package_list.t
+SHA1 a262dd6e67beb36eb5519c3dae187f04325eee1c t/09_use_package_empty.t
+SHA1 f4e43c0155d3fbf7323e76a73431de28c746c7a7 t/10_maybe_package_empty.t
+SHA1 dfdf83d8f08aaeaad0933f8e78f99fd69c9084ad t/11_use_list_undef.t
+SHA1 a877f97176b2ca9b7220a2f9087fe1bb40765949 t/12_maybe_list_undef.t
+SHA1 766cdbeb02e7116300d7ead16fc774189275fc2d t/13_maybe_empty.t
+SHA1 568d20f1369eb036ea7b87e26364a21cb83cfe59 t/14_maybe_list_and_empty.t
+SHA1 abec3fa7149e59f9f36680c5a49dfbbebd9d6ecc t/test.pl
+SHA1 af7c420f46f9c774b7773faf4d32dc4a71a72ec1 t/tlib/maybe/Test1.pm
+SHA1 dbf9b33b1ab5dca6aba41af9b1d39517e7e5d2d3 t/tlib/maybe/Test2.pm
+SHA1 6dee095e9d8eb60da8e21882ca37d8a5eafee219 t/tlib/maybe/Test3.pm
+SHA1 7cbb78a293cce3672171861afe62e798e3e78af2 t/tlib/maybe/Test4.pm
+SHA1 0bbb7e5920abc8acfd45bb3e2dbf8024ab80fa27 t/tlib/maybe/Test5.pm
+SHA1 7b181c678a3c1407b08eed859b862b8ee923b3f2 t/tlib/maybe/Test6.pm
+SHA1 90353a99ac0f719b6f3e58029804d8556cedc2ab xt/check_changes.t
+SHA1 a56d0c02b6c992e04a77d13a6ee89504bd718572 xt/consistent_version_numbers.t
+SHA1 67bb4c141ea95809f3db2d526ce91d9e6d894756 xt/copyright.t
+SHA1 650dccfa9b6f5a98cf731c89041bea8935dbc623 xt/cover.pl
+SHA1 f5aac658ae1888964274e68d179413782082b7ad xt/distribution.t
+SHA1 44147122d52fef90ab3a2c65ebba4f89342174f8 xt/kwalitee.t
+SHA1 6e7f9dde7560793bcb40acc41561e07d163ad6d1 xt/minimumversion.t
+SHA1 e8daa0c73cfc304c240fad2d2c2b1b628175a89d xt/perlcritic.t
+SHA1 ede4ee29792dc8ca86d33e6c220ff493d8fdbe56 xt/perlcriticrc
+SHA1 775b3ac02805b6d703614f42608732fb43af2a41 xt/pod_coverage.t
+SHA1 bef7d46eb5cbc3e67956d4e823ec199f41ab9268 xt/pod_spell.t
+SHA1 d2881960bebb9fbc63bceaf9e6afe38ddf5debb2 xt/pod_spellrc
+SHA1 2c579b58def8daec94f41b628ac81c256faaa2b1 xt/pod_syntax.t
+SHA1 a38994922fda6d64e2ee75198fadc464a221fea9 xt/signature.t
+SHA1 0e85a628e788b202992a1a7087fece52b70e947f xt/trace.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAksb0cMACgkQhMHHe8CxClvh/QCg5exEwH9RsFsXWxwE4+Z7t1Rp
+nTwAoN0e8dsiD6VJskIdMFjxdDu5YQde
+=/Bj8
+-----END PGP SIGNATURE-----

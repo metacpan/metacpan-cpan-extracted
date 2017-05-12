@@ -1,0 +1,5 @@
+#!/bin/sh
+
+BASEDIR="$(dirname $0)/.."
+
+PERL5LIB=$BASEDIR/lib plackup -r -p 5000 -s Starman $BASEDIR/script/meon-web.psgi

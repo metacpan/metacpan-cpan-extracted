@@ -1,0 +1,309 @@
+#!/usr/bin/perl
+
+use 5.010;
+use utf8;
+use warnings;
+use strict;
+use YAML;
+use MARC::Moose::Record;
+use MARC::Moose::Parser::Marcxml;
+use MARC::Moose::Parser::MarcxmlSax;
+use MARC::File::XML;
+
+use Time::HiRes qw(gettimeofday);
+
+binmode(STDOUT, ':encoding(utf8)');
+
+
+# Number of time the records are parsed
+my $max = 5000;
+
+# Tested SAX parsers
+my @xml_parsers = qw(
+    XML::LibXML::SAX::Parser
+    XML::SAX::Expat
+    XML::SAX::ExpatXS
+);
+
+my $raw_xml = <<EOS;
+<record>
+  <leader>00675cam a22002051  4500</leader>
+  <controlfield tag="001">   10026159 </controlfield>
+  <controlfield tag="003">DLC</controlfield>
+  <controlfield tag="005">20050815184409.0</controlfield>
+  <controlfield tag="008">830916s1910    gw            000 0 ger  </controlfield>
+  <datafield tag="010" ind1=" " ind2=" ">
+    <subfield code="a">   10026159 </subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)9914473</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">DLC</subfield>
+    <subfield code="c">OCU</subfield>
+    <subfield code="d">OCU</subfield>
+    <subfield code="d">DLC</subfield>
+  </datafield>
+  <datafield tag="042" ind1=" " ind2=" ">
+    <subfield code="a">premarc</subfield>
+  </datafield>
+  <datafield tag="050" ind1="0" ind2="0">
+    <subfield code="a">PA6792.Z9</subfield>
+    <subfield code="b">G4</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Germann, Peter.</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="4">
+    <subfield code="a">Die sogenannten Sententiae Varronis.</subfield>
+    <subfield code="c">Von Peter Germann.</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Paderborn,</subfield>
+    <subfield code="b">F. Schöningh,</subfield>
+    <subfield code="c">1910.</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">2 p. l., 98 p., 1 l.</subfield>
+    <subfield code="c">24 cm.</subfield>
+  </datafield>
+  <datafield tag="440" ind1=" " ind2="0">
+    <subfield code="a">Studien zur Geschichte und Kultur des Altertums ...</subfield>
+    <subfield code="v">3. Bd., 6. Hft</subfield>
+  </datafield>
+  <datafield tag="600" ind1="1" ind2="0">
+    <subfield code="a">Varro, Marcus Terentius.</subfield>
+    <subfield code="k">Spurious and doubtful works.</subfield>
+    <subfield code="t">Sententiae Varronis.</subfield>
+  </datafield>
+</record>
+EOS
+
+my $raw_json = '{"leader":"00675cam a22002051  4500","fields":["001","   10026159 ","003","DLC","005","20050815184409.0","008","830916s1910    gw            000 0 ger  ","010",{"subfields":["a","   10026159 "],"ind1":" ","ind2":" "},"035",{"subfields":["a","(OCoLC)9914473"],"ind1":" ","ind2":" "},"040",{"subfields":["a","DLC","c","OCU","d","OCU","d","DLC"],"ind1":" ","ind2":" "},"042",{"subfields":["a","premarc"],"ind1":" ","ind2":" "},"050",{"subfields":["a","PA6792.Z9","b","G4"],"ind1":"","ind2":""},"100",{"subfields":["a","Germann, Peter."],"ind1":"1","ind2":" "},"245",{"subfields":["a","Die sogenannten Sententiae Varronis.","c","Von Peter Germann."],"ind1":"1","ind2":"4"},"260",{"subfields":["a","Paderborn,","b","F. Schöningh,","c","1910."],"ind1":" ","ind2":" "},"300",{"subfields":["a","2 p. l., 98 p., 1 l.","c","24 cm."],"ind1":" ","ind2":" "},"440",{"subfields":["a","Studien zur Geschichte und Kultur des Altertums ...","v","3. Bd., 6. Hft"],"ind1":" ","ind2":""},"600",{"subfields":["a","Varro, Marcus Terentius.","k","Spurious and doubtful works.","t","Sententiae Varronis."],"ind1":"1","ind2":""}]}';
+
+my $raw_yaml = <<EOS;
+--- !!perl/hash:MARC::Moose::Record 
+fields: 
+  - !!perl/hash:MARC::Moose::Field::Control 
+    tag: 001
+    value: "   10026159 "
+  - !!perl/hash:MARC::Moose::Field::Control 
+    tag: 003
+    value: DLC
+  - !!perl/hash:MARC::Moose::Field::Control 
+    tag: 005
+    value: 20050815184409.0
+  - !!perl/hash:MARC::Moose::Field::Control 
+    tag: 008
+    value: "830916s1910    gw            000 0 ger  "
+  - !!perl/hash:MARC::Moose::Field::Std 
+    ind1: " "
+    ind2: " "
+    subf: 
+      - 
+        - a
+        - "   10026159 "
+    tag: 010
+  - !!perl/hash:MARC::Moose::Field::Std 
+    ind1: " "
+    ind2: " "
+    subf: 
+      - 
+        - a
+        - (OCoLC)9914473
+    tag: 035
+  - !!perl/hash:MARC::Moose::Field::Std 
+    ind1: " "
+    ind2: " "
+    subf: 
+      - 
+        - a
+        - DLC
+      - 
+        - c
+        - OCU
+      - 
+        - d
+        - OCU
+      - 
+        - d
+        - DLC
+    tag: 040
+  - !!perl/hash:MARC::Moose::Field::Std 
+    ind1: " "
+    ind2: " "
+    subf: 
+      - 
+        - a
+        - premarc
+    tag: 042
+  - !!perl/hash:MARC::Moose::Field::Std 
+    ind1: ''
+    ind2: ''
+    subf: 
+      - 
+        - a
+        - PA6792.Z9
+      - 
+        - b
+        - G4
+    tag: 050
+  - !!perl/hash:MARC::Moose::Field::Std 
+    ind1: 1
+    ind2: " "
+    subf: 
+      - 
+        - a
+        - Germann, Peter.
+    tag: 100
+  - !!perl/hash:MARC::Moose::Field::Std 
+    ind1: 1
+    ind2: 4
+    subf: 
+      - 
+        - a
+        - Die sogenannten Sententiae Varronis.
+      - 
+        - c
+        - Von Peter Germann.
+    tag: 245
+  - !!perl/hash:MARC::Moose::Field::Std 
+    ind1: " "
+    ind2: " "
+    subf: 
+      - 
+        - a
+        - Paderborn,
+      - 
+        - b
+        - F. Schöningh,
+      - 
+        - c
+        - 1910.
+    tag: 260
+  - !!perl/hash:MARC::Moose::Field::Std 
+    ind1: " "
+    ind2: " "
+    subf: 
+      - 
+        - a
+        - 2 p. l., 98 p., 1 l.
+      - 
+        - c
+        - 24 cm.
+    tag: 300
+  - !!perl/hash:MARC::Moose::Field::Std 
+    ind1: " "
+    ind2: ''
+    subf: 
+      - 
+        - a
+        - Studien zur Geschichte und Kultur des Altertums ...
+      - 
+        - v
+        - 3. Bd., 6. Hft
+    tag: 440
+  - !!perl/hash:MARC::Moose::Field::Std 
+    ind1: 1
+    ind2: ''
+    subf: 
+      - 
+        - a
+        - Varro, Marcus Terentius.
+      - 
+        - k
+        - Spurious and doubtful works.
+      - 
+        - t
+        - Sententiae Varronis.
+    tag: 600
+leader: 00675cam a22002051  4500
+EOS
+
+my $raw_iso2709 = "00671cam a22002051  4500001001300000003000400013005001700017008004100034010001700075035001900092040002300111042001200134050001600146100002000162245006100182260003800243300003300281440007100314600008000385   10026159 DLC20050815184409.0830916s1910    gw            000 0 ger    a   10026159   a(OCoLC)9914473  aDLCcOCUdOCUdDLC  apremarcaPA6792.Z9bG41 aGermann, Peter.14aDie sogenannten Sententiae Varronis.cVon Peter Germann.  aPaderborn,bF. Schöningh,c1910.  a2 p. l., 98 p., 1 l.c24 cm. aStudien zur Geschichte und Kultur des Altertums ...v3. Bd., 6. Hft1aVarro, Marcus Terentius.kSpurious and doubtful works.tSententiae Varronis.";
+
+sub moose_parse {
+    my ($raw, $type) = @_;
+    my $count = 0;
+    my $start = gettimeofday;
+    for ( my $count = 0; $count < $max; $count++ ) {
+        my $record = MARC::Moose::Record::new_from( $raw, $type );
+        $count++;
+    }
+    print "Parsed $max records from $type using MARC::Moose : ",
+          gettimeofday - $start, "\n";
+}
+
+
+my $tester = {
+    MARCXML => {
+        format => 'MARCXML',
+        raw => $raw_xml,
+        test => sub {
+            my $raw = shift;
+
+            my $parser = MARC::Moose::Parser::Marcxml->new();
+            my $start = gettimeofday;
+            for ( my $count = 0; $count < $max; $count++ ) {
+                my $record = $parser->parse($raw);
+            }
+            print "Parsed $max records from XML using MARC::Moose (pure Perl): ",
+                  gettimeofday - $start, "\n";
+
+            for my $sax_parser ( @xml_parsers ) {
+                $XML::SAX::ParserPackage = $sax_parser;
+                my $parser = MARC::Moose::Parser::MarcxmlSax->new();
+                $start = gettimeofday;
+                for ( my $count = 0; $count < $max; $count++ ) {
+                    my $record = $parser->parse( $raw );
+                }
+                print "Parsed $max records from XML using MARC::Moose and ",
+                      "$sax_parser : ", gettimeofday - $start, "\n";
+                $start = gettimeofday;
+                for ( my $count = 0; $count < $max; $count++ ) {
+                    my $record = MARC::Record->new_from_xml($raw);
+                    $count++;
+                }
+                print "Parsed $max records from XML using MARC::Record and ",
+                      "$sax_parser : ", gettimeofday - $start, "\n";
+            }
+        },
+    },
+    JSON => {
+        raw => $raw_json,
+        test => sub {
+            moose_parse(shift, 'JSON');
+        },
+
+    },
+    YAML => {
+        raw => $raw_yaml,
+        test => sub {
+            moose_parse(shift, 'YAML');
+        },
+
+    },
+    ISO2709 => {
+        raw => $raw_iso2709,
+        test => sub {
+            my $raw = shift;
+            moose_parse($raw, 'ISO2709');
+
+            my $start = gettimeofday;
+            for ( my $count = 0; $count < $max; $count++ ) {
+                my $record = MARC::Record::new_from_usmarc($raw);
+            }
+            print "Parsed $max records from ISO2709 using MARC::Record: ",
+                  gettimeofday - $start, "\n";
+
+        },
+
+    },
+};
+
+
+
+while ( my ($format, $test) = each %$tester ) {
+    $test->{test}->($test->{raw});
+}
+

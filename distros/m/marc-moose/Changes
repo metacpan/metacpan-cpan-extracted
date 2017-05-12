@@ -1,0 +1,189 @@
+Revision history for Perl module MARC::Moose
+
+1.0.33 2016-09-13
+
+  - Fix typo in UnimarcToMarc21, thks Julien Sicot
+
+1.0.32 2016-06-07
+
+  - Fix Unimarc to MARC21 conversion for records above 010 without subfields
+  - Add Isis parsing format to marcmoose script
+
+1.0.31 2016-05-04
+
+  - Fix MARC::Moose::Field::Std->clone()
+
+1.0.30 2016-04-21
+
+  - Marcxml parsing was failing when <record> element has an attribute. 
+
+1.0.29 2016-01-30
+
+  - Fix ISO2709 formater when strings aren't utf8
+
+1.0.28 2015-06-29
+
+  - Fix linter to allow checker subclassing
+
+1.0.27 2015-06-11
+
+  - Fix encoding error in Legacy formater
+
+1.0.26 2015-05-20
+
+  - Fix marcxml parsing, when indicator equals 0
+
+1.0.25 2015-04-30
+
+  - Fix a bug in linting, displaying wrong tag repetition count
+
+1.0.24 2015-03-25
+
+  - Add a method clone() to MARC::Moose::Record
+
+1.0.23 2015-03-06
+
+  - Escape 1B character when output in XML. Should be done by XML::Writer
+
+1.0.22 2015-02-26
+
+  - Conversion MARC21 to UNIMARC: stop using given/when statement which are
+    deprecated in Perl 5.18+
+
+1.0.21 2015-02-04
+
+  - Linter: add the ability to check coded values in coded fields like 101$a
+    againt table.
+
+1.0.20 2014-01-24
+
+  - Improve UnimarcToMarc21 converter
+  - Improve linter
+
+1.0.18 2014-10-05
+
+  - 'lint' added to parser in order to type record
+
+1.0.11 2014-09-30
+
+  - Add a MARC biblio record 'lint' checker, processor, and command line script
+
+1.0.7 2014-09-05
+
+  - Fix a bug in Legay (aka MARC::Record) formater, which was striping subfield
+    values equals to 0
+
+1.0.6 2014-04-12
+
+  - Unimarc to MARC21: calculate 245-Title field second indicator based on
+    NSB/NSE characters
+
+1.0.5 2014-04-10
+
+  - Unimarc to MARC21 improvement: - 076 => 024 ; - 600 complete conversion ;
+    - 9xx copied as they are
+
+1.0.4 2013-10-30
+
+  - Improve Unimarc to MARC21: keep 9xx fields
+  - Few docs
+
+1.0.3 2013-10-28
+
+  - Fix RT#89817 Undefined subroutine &bytes::substr called
+    Thanks Andreas Koenig
+
+1.0.2 2013-10-25
+
+  - Changes compliance with CPAN::Changes::Spec
+
+1.0.1 2013-10-25
+
+  - Improve Unimarc to MARC21 conversion: 675 => 080
+
+1.0.0 2013-10-04
+
+  - Bump version to 1.0! It's stable.
+  - Fix Unimarc to MARC21 failing due to malformed 100 fixed field
+
+0.030 2013-04-12
+
+  - Fix bug on 630/650/651 MARC21 fields. $x and $y subfields where inverted.
+  - Improve support of bad formatted UNIMARC records.
+
+0.029 2013-03-04
+
+  - Fix RT Bug #83123, when 210$l
+
+0.028 2012-10-18
+
+  - Fix MARCXML parsing. Forces indicators to space if there are empty in XML
+    source file, which is wrong but occurs.
+
+0.027 2012-09-13
+
+  - Fix a bug in MARC::Moose::Formater::Legacy
+
+0.026 2012-04-10
+
+  - Add a JSON parser
+
+0.025 2012-03-24
+
+  - Fix cloning field MARC::Moose::Field::Control
+  - Copy 001 tag from UNIMARC to MARC21
+  - Fix MARC21 207 tag conversion
+
+0.024 2012-03-07
+
+  - Add UNIMARC 125 conversion in M::M::F::UnimarcToMarc21 class
+
+0.023 2012-02-21
+
+  - Add a delete method to MARC::Moose::Record class, and test case
+
+0.022 2012-02-17
+
+  - MooseX::RW integration
+
+0.021 2012-02-16
+
+  - A new script marcmoose to manipulate MARC records files
+  - Code cleaning
+
+0.020 2012-01-31
+
+  - Add clone method to MARC::Moose::Field
+  - Add a MARC::Moose::Formater::UnimarcToMarc21 class
+
+0.019 2012-01-24
+
+  - Add some tests
+  - Improve documentation
+  - Use SAX parser by default for MARCXML records
+
+0.018 2011-11-30
+
+0.017 2011-08-23
+
+0.016 2011-06-25
+
+0.015 2011-06-15
+
+0.014 2011-03-31
+
+0.013 2011-03-30
+
+0.012 2011-01-10
+
+0.011 2010-11-26
+
+0.010 2010-11-24
+
+0.009 2010-11-14
+
+0.008 2010-11-14
+
+0.007 2010-11-12
+
+0.006 2010-11-12

@@ -1,0 +1,27 @@
+#! /usr/bin/perl
+use Modern::Perl; 
+use autodie;
+use Perlude;
+use YAML ();
+use MARC::MIR;
+use IO::All;
+
+my $count=0;
+
+now {
+    $count++;
+    my $raw = $_;
+    my $rec = eval { from_iso2709 };
+    if ( $@ || !$rec ) {
+	die 
+	"error ($@) at record $count"
+    };
+    my $newraw = to_iso2709 $rec;
+    unless ( $raw eq $newraw ) {
+        io('OLD') < keys %ENV;
+        # io('OLD') < $raw;
+        io('NEW') < $newraw;
+	exit;
+    }
+} iso2709_records_of shift;
+say "$count record successfully passed";

@@ -1,0 +1,3 @@
+# crontab for meon::Web
+
+40 3 * * * meonweb meon-web-expire-members

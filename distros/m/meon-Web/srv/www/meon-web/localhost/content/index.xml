@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns="http://web.meon.eu/"
+    xmlns:w="http://web.meon.eu/"
+>
+
+<meta>
+    <title>localhost</title>
+</meta>
+
+<content><div xmlns="http://www.w3.org/1999/xhtml">
+
+<h1>Welcome to localhost!</h1>
+
+<p>This meon::Web default page.</p>
+
+</div></content>
+
+</page>

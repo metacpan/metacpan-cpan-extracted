@@ -1,0 +1,4 @@
+# Default settings for Palatino font.
+
+documents.default.args = "Palatino justify"
+

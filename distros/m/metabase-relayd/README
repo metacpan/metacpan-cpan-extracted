@@ -1,0 +1,29 @@
+NAME
+
+    metabase::relayd
+
+VERSION
+
+    version 0.40
+
+NAME
+
+    metabase::relayd - the guts of the metabase-relayd command
+
+SEE ALSO
+
+    metabase-relayd
+
+    App::Metabase::Relayd
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

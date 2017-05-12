@@ -1,0 +1,236 @@
+#!perl
+# PODNAME: metabase-relayd
+#ABSTRACT: A relay server for Metabase
+
+use strict;
+use warnings;
+use App::Metabase::Relayd;
+$|=1; # Make STDOUT hot
+App::Metabase::Relayd->run();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+metabase-relayd - A relay server for Metabase
+
+=head1 VERSION
+
+version 0.40
+
+=head1 SYNOPSIS
+
+ metabase-relayd [options]
+
+ Options:
+   --debug	      - display interesting things;
+   --help	        - Display program usage;
+   --version	    - Display program version;
+   --url URI	    - The URI of a Metabase server to use;
+   --idfile       - The path to an ID file to use;
+   --dbfile       - The path to the database file to use;
+   --address      - A particular IP address to listen on;
+   --port         - The TCP port to listen on;
+   --multiple     - Whether to use multiple HTTP clients;
+   --submissions  - control the number of 'multiple' clients;
+   --offline      - disable report submissions to the Metabase;
+   --nocurl       - disable automatic usage of POE::Component::Curl::Multi;
+
+=head1 DESCRIPTION
+
+metabase-relayd is a L<Metabase> relay server that acts an intermediate between
+L<Test::Reporter::Transport::Socket> based CPAN Tester clients and a L<Metabase>
+server.
+
+=head1 COMMAND LINE OPTIONS
+
+Command line options override options given in the L</"CONFIGURATION FILE">
+
+=over
+
+=item C<--debug>
+
+Turns on all output.
+
+=item C<--help>
+
+Displays program usage and exits.
+
+=item C<--version>
+
+Displays the program version and exits.
+
+=item C<--idfile FILE>
+
+Specify a L<Metabase> ID file to use.
+
+The default is C<metabase_id.json> located in the C<.metabase> directory.
+
+=item C<--dbfile FILE>
+
+Specify the file that L<DBD::SQLite> will use for the queue storage.
+
+The default is C<relay.db> located in the C<.metabase> directory.
+
+=item C<--url URI>
+
+The URL of a L<Metabase> server to send reports to.
+
+=item C<--address IP_ADDRESS>
+
+Specify a particular IP address for the listening socket to bind to. The default is INADDR_ANY.
+This may also be a comma-separated list of IP addresses, if you wish to bind to more than one
+address.
+
+=item C<--port TCP_PORT>
+
+Specify the TCP port for the listening socket to bind to. The default is 0, ie. pick a random port.
+
+=item C<--multiple>
+
+By default a single L<POE::Component::Client::HTTP> instance is created and used to send
+each report. Enabling this option means that a new instance of L<POE::Component::Client::HTTP> will
+be created for each report submitted.
+
+=item C<--submissions INTEGER>
+
+In conjunction with C<multiple> controls the number of concurrent submissions to the Metabase.
+
+=item C<--offline>
+
+Enable this so that reports are recorded to the database but not submitted to the Metabase.
+
+=item C<--nocurl>
+
+Enable this to disable automatic usage of L<POE::Component::Curl::Multi>.
+
+=back
+
+=head1 CONFIGURATION FILE
+
+A number of the above options may be specified in a configuration file, C<relayd>, that is stored in the C<.metabase>
+directory. See L</"ENVIRONMENT"> for where the C<.metabase> directory is located and how to effect its location.
+
+Command line options will override options from the configuration file.
+
+The configuration file is parsed using L<Config::Tiny>.
+
+A subset of the command line options can be specified in the configuration file:
+
+=over
+
+=item C<debug=BOOL>
+
+Set to a true value to turn on all output.
+
+  debug=1
+
+=item C<idfile=FILE>
+
+Specify a L<Metabase> ID file to use.
+
+  idfile=/home/bingos/.metabase/id.json
+
+The default is C<metabase_id.json> located in the C<.metabase> directory.
+
+=item C<dbfile=FILE>
+
+Specify the file that L<DBD::SQLite> will use for the queue storage.
+
+  dbfile=/home/bingos/.metabase/relaydb
+
+The default is C<relay.db> located in the C<.metabase> directory.
+
+=item C<url=URI>
+
+The URL of a L<Metabase> server to send reports to.
+
+  url=https://metabase.example.url/
+
+=item C<address=IP_ADDRESS>
+
+Specify a particular IP address for the listening socket to bind to. The default is INADDR_ANY.
+This may also be a comma-separated list of IP addresses, if you wish to bind to more than one
+address.
+
+  address=192.168.0.254
+
+  address=192.168.0.254,127.0.0.1
+
+=item C<port=TCP_PORT>
+
+Specify the TCP port for the listening socket to bind to. The default is 0, ie. pick a random port.
+
+  port=8080
+
+=item C<multiple=BOOL>
+
+By default a single L<POE::Component::Client::HTTP> instance is created and used to send
+each report. Enabling this option means that a new instance of L<POE::Component::Client::HTTP> will
+be created for each report submitted.
+
+  multiple=1
+
+=item C<submissions=INTEGER>
+
+In conjunction with C<multiple> controls the number of concurrent submissions to the Metabase.
+
+  submissions=10
+
+=item C<offline=BOOL>
+
+Enable this so that reports are recorded to the database but not submitted to the Metabase.
+
+  offline=1
+
+=item C<nocurl=BOOL>
+
+Enable this to disable automatic usage of L<POE::Component::Curl::Multi>.
+
+  nocurl=1
+
+=back
+
+=head1 ENVIRONMENT
+
+C<metabase-relayd> uses the C<.metabase> directory to locate the configuration file, C<relayd>.
+
+This is usually located in the current user's home directory. Setting the environment variable C<PERL5_MBRELAYD_DIR> will
+effect where the C<.metabase> directory is located.
+
+=head1 KUDOS
+
+Thanks go to Ricardo SIGNES for L<CPAN::Mini> which inspired the design of this script/module.
+
+=head1 SEE ALSO
+
+L<http://www.cpantesters.org/>		- CPAN Testers: Index
+
+L<http://wiki.cpantesters.org/>	- CPAN Testers Wiki
+
+L<http://stats.cpantesters.org/>	- CPAN Testers Statistics
+
+L<Metabase>
+
+L<DBD::SQLite>
+
+L<Config::Tiny>
+
+L<POE::Component::Metabase::Relay::Server>
+
+=head1 AUTHOR
+
+Chris Williams <chris@bingosnet.co.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Chris Williams.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

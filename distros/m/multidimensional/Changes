@@ -1,0 +1,54 @@
+Revision history for multidimensional
+
+0.013     2017-04-20 15:05:14+01:00 Europe/London
+ - Switch to Dist::Zilla::PluginBundle::Starter
+   and ::Plugin::DymamicPrereqs
+ - Use Devel::PPPort insted of hand-rolled compat macros
+
+0.012     2016-05-16 19:18:11+01:00 Europe/London
+  - Use "multidimensional/disabled" as the hints hash key
+  - Fix building on -DPERL_OP_PARENT perls (RT#114395)
+
+0.011     2013-02-07 18:14:26 Europe/London
+  - Fix documentation typos
+
+0.010     2012-01-27 12:34:39 Europe/London
+ - Generate default versions of META.yml and .json
+   This fixes configure_requires for older toolchains.
+
+0.009     2011-09-15 21:21:20 Europe/London
+
+ - Require fixed version of CPAN::Meta (RT#70916)
+
+0.008     2011-09-12 13:05:28 Europe/London
+ - Test string eval (RT#70602)
+ - Require fixed version of Lexical::SealRequireHints (RT#70602)
+ - Require fixed version of B::Hooks::OP::Check (RT#70599)
+ - Make sure errors fire at compile time
+ - Use META.{yml,json} version 2
+
+0.007     2010-12-06 23:06:16 Europe/London
+ - Fix code before declaration in multidimensional.xs
+   (RT#63676)
+
+0.006     2010-11-22 12:44:03 Europe/London
+ - Add B::Hooks::OP::Check to ConfigureRequires
+
+0.005     2010-11-20 21:21:15 Europe/London
+ - Make work with perl < 5.8.8
+
+0.004     2010-11-19 12:58:33 Europe/London
+ - Perl 5.8 fixes
+   - use Lexical::SealRequireHints
+   - set $^H |= 0x20000
+   - use hv_fetch() instead of hv_fetchs()
+
+0.003     2010-11-18 12:53:38 Europe/London
+ - Call ExtUtils::Depends from the built Makefile.PL,
+   not when building it
+
+0.002 2010-11-16
+ - Don't disallow explicit join($;, ...) in hash subscript
+
+0.001 2010-11-16
+ - initial release

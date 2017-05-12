@@ -1,0 +1,377 @@
+Copyright 2010, 2011, 2012, 2013 Kevin Ryde
+
+This file is part of math-image.
+
+math-image is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 3, or (at your option) any later
+version.
+
+math-image is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You can get a copy of the GNU General Public License online at
+<http://www.gnu.org/licenses/>.
+
+
+
+Version 110, November 2013
+    - misc bits
+
+Version 109, February 2013
+    - fix for Wx experimental "ThisPath" hurting some OEIS
+
+Version 108, September 2012
+    - X11 flash on virtual root
+
+Version 107, September 2012
+    - misc bits
+
+Version 106, August 2012
+    - some wx printing
+
+Version 105, July 2012
+    - use PlanePath tree_n_children()
+
+Version 104, July 2012
+    - new --oeis option shorthand for --values=OEIS,anum=A000000
+
+Version 103, July 2012
+    - new figure "arrow"
+
+Version 102, June 2012
+    - misc bits
+
+Version 101, June 2012
+    - bit more Prima
+
+Version 100, June 2012
+    - bit more Wx
+
+Version 99, May 2012
+    - PodViewer on NumSeq values modules too
+    - Wx,Tk mouse drag and scroll wheel
+
+Version 98, May 2012
+    - misc fixes
+
+Version 97, March 2012
+    - experimental xscreensaver support
+    - bit more Wx
+
+Version 96, March 2012
+    - misc more stuff
+
+Version 95, February 2012
+    - bit more Tk
+
+Version 94, February 2012
+    - misc split outs
+
+Version 93, February 2012
+    - status message multiple N on DragonCurve and similar
+
+Version 92, February 2012
+    - fixes for GUI set root window menu item
+
+Version 91, January 2012
+    - new "rounded" line type
+    - better drawing of some exponential sequences+paths
+
+Version 90, January 2012
+    - more stuff
+
+Version 89, January 2012
+    - grey "undrawn" for undef ith()s
+
+Version 88, December 2011
+    - lines midpoint option
+    - fixes for bignum paths and values
+
+Version 87, December 2011
+    - more stuff
+
+Version 86, December 2011
+    - foreground/background for 2-value sequences
+
+Version 85, December 2011
+    - fix for values combobox tooltip
+
+Version 84, December 2011
+    - use NumSeq characteristic(increasing) etc
+
+Version 83, December 2011
+    - colours shades for fractional values
+
+Version 82, November 2011
+    - more stuff
+
+Version 81, November 2011
+    - misc stuff
+
+Version 80, November 2011
+    - OeisEntry tooltip
+
+Version 79, October 2011
+    - misc stuff
+
+Version 78, October 2011
+    - fix for ComboBoxEntry width setting
+
+Version 77, October 2011
+    - fixes for DigitCountLow and DigitCountHigh
+
+Version 76, October 2011
+    - use BigInt if necessary for big paths like RationalsTree
+
+Version 75, October 2011
+    - more sequences and path stuff
+
+Version 74, October 2011
+    - fix for some background drawing
+
+Version 73, September 2011
+    - quintet paths split out
+
+Version 72, September 2011
+    - numseq expression, mobius split out
+
+Version 71, September 2011
+    - fix drawing non-ith() sequences like Aronson when away from origin
+    - fix die on unrecognised command line options
+
+Version 70, September 2011
+    - koch squareflakes split out
+
+Version 69, September 2011
+    - more split outs
+
+Version 68, August 2011
+    - quadric split out
+
+Version 67, August 2011
+    - more stuff
+
+Version 66, August 2011
+    - flowsnake split out
+    - command line --twin and --polygonal fixes
+    - NumSeq split out
+
+Version 65, July 2011
+    - some tk gui interface
+
+Version 64, July 2011
+    - diamond in Image::Base
+    - lines increment parameter
+
+Version 63, July 2011
+    - new Happy numbers
+
+Version 62, July 2011
+    - misc bits
+
+Version 61, June 2011
+    - RadixWithoutDigit fixes
+
+Version 60, June 2011
+    - mucho fixups, try some heatmap colours
+
+Version 59, June 2011
+    - path and values parameter options from the command line
+
+Version 58, May 2011
+    - experimental HexHypot
+
+Version 57, May 2011
+    - more stuff
+
+Version 56, May 2011
+    - fix for string parameter entry
+
+Version 55, May 2011
+    - more stuff
+
+Version 54, April 2011
+    - tests couple of fixes, maybe
+
+Version 53, April 2011
+    - more X11 root
+
+Version 52, April 2011
+    - better OEIS A-number entrybox
+    - math-image.desktop file
+    - X11 root exposures if windows moved while drawing
+    - DigitLength and DigitLengthCumulative sequences, generalizing
+      BinaryLengths
+
+Version 51, April 2011
+    - some module split outs
+
+Version 50, March 2011
+    - oops, fix for many sequences
+    - need Geometry::AffineTransform 1.3
+
+Version 49, March 2011
+    - fix for some multi-colour (XY style) drawing
+    - misc more stuff
+
+Version 48, March 2011
+    - PlanePath modules recommended rather than depended
+
+Version 47, March 2011
+    - tests check X11::Protocol::Other for relevant bits
+    - tests fix for when no OEIS downloads
+
+Version 46, March 2011
+    - document the --flash option
+    - split out some X11 bits
+
+Version 45, February 2011
+    - more stuff
+    - tests fix some OEIS catalogue bits, hopefully
+
+Version 44, February 2011
+    - fix for File/Save
+    - fix for AbundantNumbers pred()
+    - new Tools/Golly passing an image to "golly" program
+
+Version 43, January 2011
+    - PixelRings split out
+
+Version 42, January 2011
+    - fix colours for CountPrimeFactors
+    - tests fix the OEIS default sequence tried
+
+Version 41, January 2011
+    - Language::Expr expressions
+    - experimental OEIS values from b-files
+
+Version 40, January 2011
+    - better Flowsnake
+
+Version 39, January 2011
+    - oops, tests fix leftover FractionBits stuff
+    - Peano and Staircase split out
+
+Version 38, January 2011
+    - fraction,sqrt,sum digits in any radix
+    - polygonal first,second,both
+
+Version 37, December 2010
+    - try not to hammer the X server
+
+Version 36, December 2010
+    - Palindrome numbers
+
+Version 35, December 2010
+    - add Hilbert path, split out Z Order (was "Replicating Squares")
+
+Version 34, November 2010
+    - tests more care destroying toplevels
+    - Tribonacci numbers
+
+Version 33, November 2010
+    - ask for newer File::Copy to avoid some tests warnings
+
+Version 32, November 2010
+    - don't rely on C library cbrt(27) being exact
+    - fix for "point" centring and square/X widths
+
+Version 31, November 2010
+    - choice of square/circle/point figure
+    - sync to avoid flooding the server in gtk
+    - Math::TriangularNumbers disappeared
+
+Version 30, November 2010
+    - avoid big ReplicationSquares in random choice
+
+Version 29, November 2010
+    - Repdigits radix, new Emirps
+
+Version 28, October 2010
+    - Vogel floret rotation types
+
+Version 27, October 2010
+    - fix centring when changing scale
+
+Version 26, October 2010
+    - some printing and drag scrolling support
+    - extend filter option to values choices
+
+Version 25, October 2010
+    - new mobius function, modularize the values choices
+
+Version 24, October 2010
+    - count of prime factors as grey scale
+
+Version 23, September 2010
+    - draw by x,y if path goes wildly off screen
+    - HexSpiral and HexSpiralSkewed "wider" option
+
+Version 22, September 2010
+    - more for --prima
+
+Version 21, September 2010
+    - show POD with Gtk2::Ex::PodViewer if available
+
+Version 20, September 2010
+    - ComboBoxBits split out
+
+Version 19, September 2010
+    - display some axes
+
+Version 18, September 2010
+    - fix Random button
+
+Version 17, August 2010
+    - split out Math::Aronson
+
+Version 16, August 2010
+    - png output can use GdkPixbuf
+
+Version 15, August 2010
+    - Aronson french option
+
+Version 14, August 2010
+    - fix some dependencies
+
+Version 13, August 2010
+    - more stuff
+
+Version 12, July 2010
+    - bug fixes
+
+Version 11, July 2010
+    - only save root resources if dynamic colormap
+
+Version 10, July 2010
+    - split out X11 image stuff, and more
+
+Version 9, July 2010
+    - more paths and values
+
+Version 8, July 2010
+    - progressive drawing for slow paths or big screens
+
+Version 7, July 2010
+    - more stuff and fixes
+
+Version 6, July 2010
+    - more stuff
+
+Version 5, July 2010
+    - more stuff
+
+Version 4, June 2010
+    - more stuff
+
+Version 3, June 2010
+    - more stuff
+
+Version 2, June 2010
+    - more stuff
+
+Version 1, June 2010
+    - the first version

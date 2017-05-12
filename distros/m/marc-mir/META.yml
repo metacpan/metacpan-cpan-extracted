@@ -1,0 +1,23 @@
+---
+abstract: 'DSL to manipulate MIR records.'
+author:
+  - 'Marc Chantreux <khatar@phear.org>'
+build_requires:
+  Test::More: 0
+  YAML: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300029, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: marc-mir
+requires:
+  Exporter: 0
+  Modern::Perl: 0
+  Perlude: 0
+  autodie: 0
+  parent: 0
+version: 0.4

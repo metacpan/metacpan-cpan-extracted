@@ -1,0 +1,157 @@
+=head1 MIR: MARC Intermediate Representation
+
+MARC::MIR is not a library, it's a specification for in-memory representation
+of a MARC record with simplcity in mind. The current module comes with a set of
+helpers to manipulate it (i call it MARC::MIR DSL).
+
+The DSL itself is designed to  be used the more natural way possible. Here are
+some basic exemples (combined with Perlude).
+
+    use Modern::Perl;
+    use MARC::MIR;
+    use Perlude;
+
+    # marcdump
+
+    now {say for_humans from_iso2709} iso2709_records_of 'source.mrc'
+
+    # report the IDs of the 10 first records of the file
+
+    now {
+        any_fields {
+            tag eq '001' and say value
+        } from_iso2709
+    } take 10, iso2709_records_of 'echantillon_ecparis.raw';
+
+    # or 
+
+    now {
+        $_ = from_iso2709;
+        any_fields {
+            tag eq '001' and say value
+        }
+    } take 10, iso2709_records_of 'echantillon_ecparis.raw';
+
+Some other modules and documentations are worth to read.
+
+=head2 MARC::MIR::Template
+
+(shipped appart) is a description format to import/export a MIR from/to a
+datastructures that fit modern formats like JSON or XML.
+
+=head2 MARC::MIR::Tutorial 
+
+gives basic exemples of use of the MARC::MIR DSL described below.
+
+=head1 WARNINGS 
+
+t/* is empty and the API may change (i even i think it's quiet stable on the
+basics). i think the doc is up to date and the stability of MARC::MIR.
+
+Anyway: waiting for the tests, MARC::MIR runs daily on linux stations (perl
+5.12 to 5.17) on large amount of data. It is as faster and easier to use than
+older libraries and is designed to get the data back from iso files, no matter
+the quality of the serialization dictionnary so for one shot scripts, i'm now
+more confident in MARC::MIR than i ever was in MARC::Record, for example. 
+
+=head1 MOTIVATION
+
+I dealt with lot of MARC records in the past (mainly from/to iso2709 files) and
+was really annoyed by the state of art: 
+
+ISO2709 was a clever format when it was invented (more than 40 years ago! older
+than FTP or even UNIX) but the world has changed a so drastic way most of the
+IT crowd, bred to modern serialization formats (YAML, JSON, XML) are clueless
+when it comes to magnetic tapes friendly serializations. Librarians haven't got
+it since recently.
+
+As a result, IT people just flee libraries and reinvent information sciences
+from scratch with modern tools fitting the modern interconnected world when
+librarians are left with the rest of us, dead bored programmers using old
+school tools and bad designed modules with painfull OO approach. I don't blame
+anyone: it's just the way the things gone.
+
+But if you come back to the roots: A MARC record is a very simple structure so
+they must be simple to manulate. MARC::MIR is an attempt to get the simplicity back.
+
+=head1 SPECIFICATION
+
+so MIR is just an array of array (see
+man perllol) with very simple rules:
+
+    record       = [ header, [fields] ]
+    fields       = controlfield | datafield
+    controlfield = [tag,string]
+    datafield    = [tag,[subfields],indicators]
+    indicators   = [ ind1, ind2 ] # can be represented as a 2 chars fields
+    subfields    = [tag,string]
+
+note that tags are always at the index 0, data always at 1.
+
+All the indexes that are not used by the spec can be used to store instructions
+for middleware and serializer purposes. there is no convention there.
+
+=head2  Examples
+
+A MIR control field is a tag and a value.
+
+    [ '001', '1231313145' ]
+
+A MIR data field
+
+    [ $tag, [@subfield] ]
+    [ $tag, [@subfield], "  " ]
+    [ $tag, [@subfield], [' ',' '] ]
+
+A MIR record 
+
+    [ '01972cam0a2200541   450' => 
+	[ [ '001' => '2344564564' ] # this is the ID
+	,   [ '856'
+	    , [ [ q => "jpeg" ]
+	      , [ z => "cover from original version" ] 
+	      , [ u => "http://localhost/img/" ] 
+	      ]
+	    ]
+	]
+    ]
+
+=head1 DSL
+
+the use of C<$_> and thd C<(_)> prototype is idiomatic: almost every subs are
+written to be used a very natural way (my hope is librians to write some code).
+So we prefer to write 
+
+    say for_humans from_iso2709
+
+than a more pythonic way
+
+    say( for_humans( from_iso2709( $_ )))
+
+=head2 map_*, with_*, any_*, grep_*
+
+# TODO: maybe an array there ? 
+
+=head2 tag, value, indicators
+
+=head2 ISO2709 handling
+
+# TODO: from|to_iso2709 
+
+=head2 CIB handling
+
+# TODO: from|to_iso2709 
+
+=head1 Authors
+
+    * Marc Chantreux (eiro) marcc(at)cpan.org
+    * You? https://github.com/eiro/p5-marc-mir
+
+=head1 KNOWN BUGS
+
+feedbacks are very welcome. the only known bugs are
+
+     * with_fields needs $_
+     * map_datafields can't work 
+     * *_values? must crash on references
+

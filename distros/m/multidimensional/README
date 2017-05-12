@@ -1,0 +1,51 @@
+NAME
+
+    multidimensional - disables multidimensional array emulation
+
+VERSION
+
+    version 0.013
+
+SYNOPSIS
+
+        no multidimensional;
+    
+        $hash{1, 2};                # dies
+        $hash{join($;, 1, 2)};      # doesn't die
+
+DESCRIPTION
+
+    Perl's multidimensional array emulation stems from the days before the
+    language had references, but these days it mostly serves to bite you
+    when you typo a hash slice by using the $ sigil instead of @.
+
+    This module lexically makes using multidimensional array emulation a
+    fatal error at compile time.
+
+METHODS
+
+ unimport
+
+    Disables multidimensional array emulation for the remainder of the
+    scope being compiled.
+
+ import
+
+    Enables multidimensional array emulation for the remainder of the scope
+    being compiled;
+
+SEE ALSO
+
+    "$;" in perlvar, B::Hooks::OP::Check.
+
+AUTHOR
+
+    Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2010 - 2016 by Dagfinn Ilmari Mannsåker.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

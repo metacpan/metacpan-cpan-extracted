@@ -1,0 +1,320 @@
+=head1 NAME
+
+mmm.cfg - Main configuration file for mmm
+
+=head1 DESCRIPTION
+
+=head2 SYNTAXE
+
+This control mmm behavior and mirrors task to achieve.
+
+The format is ini-files like. The files contains sections,
+each section is identified by a keyword between "[]".
+
+Each section is a mirror task to do. The C<default> section contains
+global settings, which applied to all mirroring tasks.
+
+    [default]
+    pidfile = /var/run/mmm.pid
+
+    [task1]
+    path = /any/path/
+    url = rsync://server/share/
+
+=head2 FIELDS TYPE
+
+=head3 string
+
+The field accept any string. The meaning depend of paramter type.
+
+=head3 yes/no
+
+This field are boolean. Several keywords are accepted:
+
+    yes  / no
+    true / false
+    on   / off
+    1    / 0
+
+=head3 delay
+
+Accepted number, can by suffixed by a unity. Without any unity, the delay
+is in minute.
+Valid unity are
+
+    - m: minutes
+    - h: hours
+    - d: day
+    - w: week (7 days)
+
+=head1 GLOBAL PARAMETERS
+
+All these parameters goes into the B<default> section.
+
+=head2 MANDATORY FIELD
+
+=head3 statedir
+
+(L</"string">)
+
+The directory where mmm will store data and cache about its jobs.
+
+    statedir = @LOCALSTATEDIR@/mmm
+
+=head3 pidfile
+
+(L</"string">)
+
+Use by L<mmmd> only. The path of a file to keep a pointer of the current
+L<mmmd> PID.
+
+    pidfile = /var/run/mmm.pid
+
+=head2 OPTIONNALS FIELD
+
+=head3 mirrordir
+
+(L</"string">)
+
+The directory where xml mirrors list are located.
+These list are used when mirroring task use L</"source"> to find nearest mirrors.
+
+    mirrordir = @SYSCONFDIR@/mmm
+
+=head1 TASK PARAMETERS
+
+All this parameters can be setup in the "default" section.
+
+=head2 MANDATORY FIELD
+
+=head3 path
+
+(L</"string">)
+
+The destination directory where this mirror should done. Probably inside
+your public ftp tree.
+
+    path = /var/ftp/pub/mirrors/a_software/
+
+=head3 url
+
+(L</"string">)
+
+The url of the the computer hosting the tree mmm should stay synched.
+It should be a valid url, either using B<rsync> or B<ftp> protocol.
+
+    url = rsync://any.host.com/share/
+
+    url = ftp://any.host.com/pub/mirrors/a_software/
+
+
+This field is optionnal if L</"source"> filed is set.
+
+=cut
+# TODO: URL / source need verification
+
+=head3 period
+
+(L</"delay">)
+
+The time between two synchronisation (start of process), in minute (I hope nobody
+is crazy enough to sync more the one time a minute).
+
+    period = 120
+
+which can also be setup as
+
+    period = 2h
+
+=head2 OPTIONNALS FIELD
+
+=head3 disable
+
+(L</"yes/no">)
+
+The task is not run, neither show in report, like it was not setup.
+
+    disable = no
+
+=head3 waitafter
+
+(L</"delay">)
+
+A minimum delay in minutes between the end of a task and the beginning of the
+next one.
+This is usefull to avoid overload on remote server when a process has taken
+likelly the L</"period"> time.
+
+    waitafter = 10
+
+=head3 tempdir
+
+(L</"string">)
+
+A directory to store temporary files. This option make C<rsync> to be called
+with C<--temp-dir> option, this setup the C<TMPDIR> environnement variable
+with B<mirrordir>.
+
+    tempdir = /tmp
+
+=head3 partialdir
+
+(L</"string">)
+
+With C<rsync> only, a directory where partially transfered files are store.
+See C<--partial-dir> and C<--partial> C<rsync> options.
+
+    partialdir = /tmp
+
+=head3 delete
+
+(L</"yes/no">)
+
+Should we remove old files that does not exists anymore on remote server ?
+In most of case, would be true.
+
+    delete = yes
+
+=head3 delete-after
+
+(L</"yes/no">)
+
+With C<rsync> only, make file to be deleted at the end of synchronisation.
+
+    delete-after = no
+
+=head3 password
+
+(L</"string">)
+
+Can be setup if the server need a password to access to share. This allow
+to not include the password in L</"url"> as it can appear by some way.
+
+It is passed an environnement variable to C<rsync>, with C<--passord> argument
+to B<mirrordir>.
+
+    password = anypassword
+
+=head3 rsync_use_ssh
+
+(L</"yes/no">)
+
+This parameter allow to use C<rsync> over C<ssh>. This requires to setup
+ssh keys to login w/o password. See C<ssh> documentation for more detail.
+
+    rsync_use_ssh = no
+
+=head3 compute_size
+
+(L</"yes/no">)
+
+When set, make mmm calculating the size of the tree. This result
+is done by C<du -s> and is always performed after a synchronization.
+
+    compute_size = no
+
+See also L</"size_delay">.
+
+=head3 size_delay
+
+(L</"delay">)
+
+When L</"compute_size"> is set, set the time between two size update.
+
+    size_delay = 12h
+
+=head3 pre_exec
+
+(L</"string">)
+
+Path an execute program or script to execute before processing the
+synchronization.
+
+The script is called with this argument:
+
+=over 4
+
+=item The name of task
+
+=item The path of the mirrored tree
+
+=back
+
+    pre_exec = /path/to/script
+
+=head3 post_exec
+
+(L</"string">)
+
+Path an execute program or script to execute before processing the
+synchronization.
+
+The script is called with this argument:
+
+=over 4
+
+=item The name of task
+
+=item The path of the mirrored tree
+
+=back
+
+This envirronement variable are set:
+
+=over 4
+
+=item MMM_RESULT
+
+Set to 1 if synchronization succeed, 0 on failure
+
+=item MMM_MIRROR
+
+The mirror hostname used, if success.
+
+=item MMM_URL
+
+The url used if success.
+
+=back
+
+Example:
+
+    post_exec = /path/to/script
+
+Example of script: setting debian trace:
+
+    #!/bin/sh
+
+    export LC_ALL=C
+
+    mpath=${2}
+    [ "${MMM_RESULT}" == 1 ] || exit 0
+
+    date -u > ${mpath}/project/trace/`hostname -f`
+
+=head1 AUTHOR
+
+Olivier Thauvin <nanardon@nanardon.zarb.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+    Copyright (C) 2006 Olivier Thauvin
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+=cut
+
+
+=cut

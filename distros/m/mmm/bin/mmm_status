@@ -1,0 +1,113 @@
+#!/usr/bin/perl
+
+use strict;
+use lib ('../lib');
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+
+=head1 NAME
+
+mmm - Mmm Mirror Manager
+
+=head1 SYNOPSIS
+
+    mmm <configfile> [<action>]
+    mmm <configfile> <status|lmirror|run>
+    mmm <configfile> run <mirrored_path>
+
+=head1 DESCRIPTION
+
+mmm is a tools to easilly manage multiple mirroring.
+
+Without any specified action, mmm will run all rync job needing
+to be run according the config file given as first argument.
+
+List of action:
+
+=cut
+
+my $mmm;
+
+if ( defined( $ENV{SERVER_NAME} ) ) {
+
+    # we are in cgi mode
+    require CGI;
+    if ( CGI::path_info() =~ m@/*lists.xml$@ ) {
+        require MMM;
+        print CGI::header( -type => 'text/xml' );
+        $mmm = MMM->new( configfile => $ENV{MMM_CONFIG} ) or do {
+            print "Please setup MMM_CONFIG in apache config";
+            exit(0);
+        };
+        $mmm->load_queues();
+        $mmm->build_list();
+        exit(0);
+    }
+    else {
+        print CGI::header();
+        require MMM::Report::Html;
+        $mmm = MMM::Report::Html->new( configfile => $ENV{MMM_CONFIG} ) or do {
+            print "Please setup MMM_CONFIG in apache config";
+            exit(0);
+        };
+    }
+}
+else {
+    my $verbosity = 3;
+    GetOptions(
+        'mail'     => \my $mail,
+        'v'          => sub { $verbosity++ },
+        's'          => sub { $verbosity-- },
+        'source=s'   => \my $source,
+        'config|c=s' => \my $configfile,
+    ) or pod2usage();
+    my %opts = (
+        configfile => $configfile,
+        verbosity  => $verbosity,
+    );
+
+    if ($mail) {
+        require MMM::Report::Mail;
+        $mmm =
+          MMM::Report::Mail->new(%opts);
+     } else {
+        require MMM::Report::Console;
+        $mmm =
+          MMM::Report::Console->new(%opts);
+     }
+}
+
+$mmm or die "Cannot start mmm\n";
+
+$mmm->run();
+
+__END__
+
+=head1 SEE ALSO
+
+L<mmm>
+
+=head1 AUTHOR
+
+Olivier Thauvin <nanardon@nanardon.zarb.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006 Olivier Thauvin
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+=cut

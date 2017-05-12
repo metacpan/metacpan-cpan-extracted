@@ -1,0 +1,48 @@
+---
+abstract: 'Moose based MARC records set of tools'
+author:
+  - 'Frédéric Demians <f.demians@tamil.fr>'
+build_requires:
+  File::Slurp: '0'
+  MARC::File::XML: '0'
+  Test::More: '0'
+  Time::HiRes: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+  File::ShareDir::Install: '0.03'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: marc-moose
+requires:
+  AnyEvent::Processor: '0'
+  Carp: '0'
+  Getopt::Long: '0'
+  JSON: '0'
+  List::Util: '0'
+  MARC::Record: '0'
+  Modern::Perl: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::RW::Reader: '0'
+  MooseX::RW::Reader::File: '0'
+  MooseX::RW::Writer: '0'
+  Pod::Usage: '0'
+  Text::Iconv: '1.7'
+  XML::SAX: '0'
+  XML::SAX::Base: '0'
+  XML::Simple: '0'
+  XML::Writer: '0'
+  YAML: '0'
+  YAML::Syck: '0'
+  base: '0'
+  bytes: '0'
+  perl: '5.010'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+version: 1.0.33

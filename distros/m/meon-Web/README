@@ -1,0 +1,75 @@
+NAME
+    meon::Web - XML+XSLT file based "CMS"
+
+SYNOPSIS
+        script/run_meon-web_devel
+
+        cpan -i meon::Web
+        cd /srv/www/meon-web/localhost/
+        tree
+
+        # in apache virtual host
+        <Perl>
+            use Plack::Handler::Apache2;
+            Plack::Handler::Apache2->preload("/usr/local/bin/meon-web.psgi");
+        </Perl>
+        <Location />
+            SetHandler perl-script
+            PerlResponseHandler Plack::Handler::Apache2
+            PerlSetVar psgi_app /usr/local/bin/meon-web.psgi
+        </Location>
+
+WARNING
+    Highly experimental at the moment, usable only for real adventurers.
+
+DESCRIPTION
+    meon-Web is CMS for designers or publishers that wants to use the whole
+    power of HTML for their sites, but doesn't want to bother with
+    programming.
+
+    Main implementation goal is be able to have sites as files and go as far
+    as possible with standard XML+XSLT without database usage.
+
+    Each web pages is XML files with content part of given page. Then the
+    rest of the page (menu + header + footer) are added via XSLT. Any
+    advanced dynamically generated content on the page can be easily
+    implemented as special tag, which will be rendered via XSLT.
+
+FEATURES
+    *   multiple domains/websites at once support - stored simple in
+        different folders, switched per request based on "Host:" header.
+
+    *   login + members area - users + credentials are stored in XML files.
+        Login restriction simply by adding XML tag to meta headers.
+
+    *   form2email - send form to email address
+
+EXAMPLES
+    See srv/www/meon-web/localhost/ inside this distribution for simple
+    example.
+
+SEE ALSO
+    Template::Tools::ttree
+
+AUTHOR
+    Jozef Kutej, `<jkutej at cpan.org>'
+
+CONTRIBUTORS
+    The following people have contributed to the meon::Web by committing
+    their code, sending patches, reporting bugs, asking questions,
+    suggesting useful advice, nitpicking, chatting on IRC or commenting on
+    my blog (in no particular order):
+
+        Andrea Pavlovic
+
+LICENSE AND COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+
+srv/www/meon-web/bootstrap/
+    Are examples from https://github.com/twbs/bootstrap, check there for
+    license and copyright.
+

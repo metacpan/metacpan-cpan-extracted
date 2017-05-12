@@ -1,0 +1,65 @@
+=head1 Tutorial for MARC::MIR DSL
+
+=head2 the DSL
+
+to make things more readable and less error prone, we also add a DSL. Every keywords of this DSL works the same way. FIXME : explain. 
+
+also, iso2709_records_of is an helper that stream the records of an ISO2709 formatted file.
+
+=head2 some examples 
+
+the perfect boilerplate
+
+    use autodie;
+    use Modern::Perl;
+    use Perlude;
+    use MARC::MIR;
+
+print all the ids of the records (assuming the id is in 001, the common case)
+
+    now    { say record_id from_iso2709 } iso2709_records_of "biblio.marc";
+
+or
+
+    marawk { say $ID } "biblio.marc";
+
+remove every 9.. fields
+
+    now {
+	$_ = from_iso2709;
+	with_fields { @$_ = grep { (tag) !~ /^9/ } @$_ };
+	print to_iso2709;
+    } iso2709_records_of "biblio.marc";
+
+every 856$q must be jpeg
+
+    now {
+	$_ = from_iso2709;
+	map_fields {
+	    tag eq '856' and map_subfields {
+		(tag) eq 'z' and with_value { $_ = 'jpeg' }
+	    }
+	}
+	with_fields { @$_ = grep_fields { (tag) !~ /^9/ } @$_ };
+    } iso2709_records_of "biblio.marc";
+
+or 
+
+    marawk { map_values { $_ = 'jpeg' } [qw< 856 z >] } "biblio.marc"
+
+collect every 856$z by id
+
+    use Modern::Perl;
+    use YAML;
+    use MARC::MIR;
+
+    my %seen;
+    marawk {
+	map_values { push @{ $seen{$ID} }, $_ } [qw< 856 z >]
+    } "data/*.RAW";
+    say YAML::Dump \%seen;
+
+=head2 marawk
+
+# TODO:
+

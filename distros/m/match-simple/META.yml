@@ -1,0 +1,48 @@
+---
+abstract: 'simplified clone of smartmatch operator'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: match-simple
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  match::simple:
+    file: lib/match/simple.pm
+    version: '0.010'
+  match::smart:
+    file: lib/match/smart.pm
+    version: '0.010'
+recommends:
+  match::simple::XS: '0.001'
+requires:
+  Exporter::Tiny: '0.026'
+  List::Util: '1.33'
+  Scalar::Util: '0'
+  Sub::Infix: '0.004'
+  perl: '5.006001'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/match-simple/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=match-simple
+  homepage: https://metacpan.org/release/match-simple
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-match-simple.git
+version: '0.010'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,14 @@
+Revision history for HTML::SuperForm
+
+1.01 - 2004-09-07
+     - Fixed mistake which prevented the ability to
+     - pass an Apache::Request object to the
+     - constructor and be able to get at the parameters
+     - later.
+1.02 - 2004-09-25
+     - Field values are now html-escaped
+1.03 - 2004-10-13
+     - Added radio_group method to HTML::SuperForm, whoops.
+     - Thanks to Ken Railey for pointing out its absence.
+1.04 - 2004-10-17
+     - Changed $VERSION to 1.04 so cpan shell will update

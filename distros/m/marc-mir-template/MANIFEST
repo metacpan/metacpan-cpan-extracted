@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/MARC/MIR/Template.pm
+lib/MARC/MIR/Template.pod
+t/00_test.t

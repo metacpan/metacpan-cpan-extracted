@@ -1,0 +1,163 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use DBI;
+use lib ('../lib');
+use MMM::MirrorList;
+use MMM::Host;
+use LWP::UserAgent;
+use HTTP::Request;
+use Unicode::MapUTF8 qw(to_utf8);
+
+my $db = DBI->connect(
+    "dbi:Pg:dbname=mmm;host=virgo",
+    $ENV{MMMUSER} || $ENV{USER},
+    $ENV{MMMPASS}, { AutoCommit => 0 }
+);
+
+my $findurl = $db->prepare(qq{select * from mirrorslist});
+my $trash_from_ref =
+  $db->prepare(qq{delete from mirrorsfrom where mirrorslist = ?});
+my $find_mirror_url =
+  $db->prepare(qq{select * from mirrors where url = ? and source = ?});
+my $updmirrorlist =
+  $db->prepare(qq{update mirrorslist set updated = now() where key = ?});
+my $updmirror =
+  $db->prepare(
+qq{update mirrors set level = ?, frequency = ?, revision = ?, hostname = ? where key = ?}
+  );
+my $add_mirror =
+  $db->prepare(
+qq{insert into mirrors (url, frequency, level, source, revision, hostname) values (?,?,?,?,?,?)}
+  );
+my $findsource = $db->prepare(qq{select * from sources where name = ?});
+my $addsource  = $db->prepare(qq{ insert into sources (name) values (?)});
+my $addfrom =
+  $db->prepare(qq{insert into mirrorsfrom (mirrors, mirrorslist) values (?,?)});
+my $add_host =
+  $db->prepare(
+qq{insert into hosts (hostname, revision, latitude, longitude, city, country) values (?,?,?,?,?,?)}
+  );
+my $find_host = $db->prepare(qq{select hostname from hosts where hostname = ?});
+
+my $find_host_incomplete =
+  $db->prepare(qq{select * from hosts where latitude is null});
+my $updhost = $db->prepare(
+qq{update hosts set latitude = ?, longitude = ?, city = ?, country = ?, revision = ?
+    where hostname = ?}
+);
+
+$find_host_incomplete->execute();
+
+while ( my $reshost = $find_host_incomplete->fetchrow_hashref() ) {
+    my $host = MMM::Host->new(%$reshost);
+    defined( $host->get_geo() ) or next;
+    $updhost->execute(
+        $host->geo,
+        $host->{city}    || undef,
+        $host->{country} || undef,
+        $host->revision, $host->hostname
+    ) or $db->rollback;
+    $db->commit;
+}
+
+$findurl->execute();
+while ( my $resurl = $findurl->fetchrow_hashref() ) {
+
+    my $ml = MMM::MirrorList->new();
+    if ( $resurl->{url} =~ m@^http://@ ) {
+        my $ua = LWP::UserAgent->new;
+        my $http = HTTP::Request->new( POST => $resurl->{url} );
+        $http->content_type('application/x-www-form-urlencoded');
+        if ( my $res = $ua->request($http) ) {
+            $ml->load_list( $res->content );
+        }
+        else { next }
+    }
+    else {
+        foreach my $xmlfile ( glob("$resurl->{url}/*.xml") ) {
+            $ml->load_list($xmlfile);
+        }
+    }
+    $trash_from_ref->execute( $resurl->{key} );
+    foreach my $source ( $ml->list_sources() ) {
+        my $sourcekey;
+        do {
+            {
+                $findsource->execute($source);
+                if ( my $ressource = $findsource->fetchrow_hashref() ) {
+                    $sourcekey = $ressource->{key};
+                }
+                else {
+                    $addsource->execute($source);
+                }
+            }
+        } while ( !$sourcekey );
+        foreach my $m ( $ml->mirrors($source) ) {
+            my $mirrorkey;
+            do {
+                {
+                    $find_mirror_url->execute( $m->url, $sourcekey );
+                    my $resfm = $find_mirror_url->fetchrow_hashref();
+                    if ($resfm) {
+                        $mirrorkey = $resfm->{key};
+                        my %newval;
+                        foreach my $var (qw(level frequency revision)) {
+                            $newval{$var} =
+                              defined( $m->{$var} )
+                              && ( ( $m->{revision} || 0 ) >
+                                ( $resfm->{revision} || 0 )
+                                || !defined( $resfm->{$var} ) )
+                              ? $m->{$var}
+                              : $resfm->{$var};
+                        }
+                        $updmirror->execute( $newval{level}, $newval{frequency},
+                            $newval{revision}, $m->host, $mirrorkey, );
+                    }
+                    else {
+                        $find_host->execute( $m->host );
+                        if ( !$find_host->fetchrow_hashref() ) {
+                            my $host = MMM::Host->new(
+                                hostname => $m->host,
+                                revision => $m->revision
+                            );
+                            $host->get_geo();
+                            if (
+                                !$add_host->execute(
+                                    $m->host,
+                                    $m->{revision},
+                                    $host->geo,
+                                    $host->{city} ? to_utf8(
+                                        {
+                                            -string  => $host->{city},
+                                            -charset => 'ISO-8859-1'
+                                        }
+                                      ) : undef,
+                                    $host->{country} ? to_utf8(
+                                        {
+                                            -string  => $host->{country},
+                                            -charset => 'ISO-8859-1'
+                                        }
+                                      ) : undef,
+                                )
+                              )
+                            {
+                                $db->pg_rollback_to('host');
+                            }
+                        }
+                        $add_mirror->execute( $m->url, $m->{frequency},
+                            $m->{level}, $sourcekey, $m->{revision}, $m->host );
+                    }
+                }
+            } while ( !$mirrorkey );
+            $addfrom->execute( $mirrorkey, $resurl->{key} );
+        }
+    }
+    $db->prepare(
+        qq{delete from mirrors where key not in
+           (select mirrors from mirrorsfrom)}
+    )->execute();
+    $updmirrorlist->execute( $resurl->{key} );
+    $db->commit();
+}

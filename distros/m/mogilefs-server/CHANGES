@@ -1,0 +1,317 @@
+2007-07-03: Release version 2.17
+
+        * get_paths command now takes a pathcount option, defaulting to
+          2, instead of having a hardcoded constant of 2. This allows
+          requesting more than 2 paths to a file.
+
+        * make fsck log over-replicated files as policy violations.  it
+          won't delete over-replicated files, though, just log
+
+        * Document how to test MogileFS under doc/testing.txt. You really
+          should read this if you want to use MogileFS to store your data.
+
+        * Add a safety check to ensure that Postgresql-8.2 or newer is used.
+
+        * Update mogdbsetup usage, and ensure it choses the correct admin
+          username automatically.
+
+        * Document the --type option to mogdbsetup.
+
+        * Introduce the Postgres Store implementation. The locking system might
+          still have issues, beware of stale locks! Initial prototype by Radu
+          Greab <rg@yx.ro>, and developed heavily by Robin H. Johnson
+          <robbat2@gentoo.org>.
+
+        * start of support to make mogstored wrap Apache + web_dav
+
+        * Remove duplicated [fsck] in log output of Fsck worker.
+
+        * Handle HiRes gettimeofday correctly to get useful results. Arrays are
+          important. This gives us correct timing output.
+
+        * Handle input to log() correctly. Based on the implementation of
+          Sys::Syslog::syslog(), produces no ugly warnings, and makes sure that
+          printf stuff works nicely.
+
+        * The unix_timestamp function belongs to the Store, not other classes.
+          Need to add testcases for process_deletes and stats.
+
+        * Using NULL during an INSERT for the AUTO_INCREMENT column does not
+          work very well outside of MySQL. Pass the correct number of arguments
+          to the INSERT instead.
+
+        * Clean up all raw usages of UNIX_TIMETAMP() function, in preparation
+          for database independence. If you need the unix timestamp, include the output
+          of $self->unix_timestamp directly into your query.
+
+        * Alter $0 so that the scripts show up as '$SCRIPTNAME' in the process
+          listing instead of '/usr/bin/perl $SCRIPTNAME'. This makes init.d
+          scripts easier to manage.
+
+        * make mogstored's lighttpd config use mod_status for "/", so
+          mogadm doesn't think it's dead when it previously saw a 404
+          (Justin Huff <jjhuff@mspin.net>)
+
+        * remove Linux::AIO support, now that Perlbal has removed it as well,
+          and because Linux::AIO support (when Perlbal then chooses
+          IO::AIO) was hanging mogstored on shutdown.  so also add a
+          mogstored shutdown test (after a full daemonization of it)
+
+        * make Mgd::validate_dbh() re-check/ping slave dbhs as well.
+          (problem mentioned by Steven Shou <steven.shou@verizon.net>)
+
+        * support drive identifiers above sdz (Arjan <info@bouncetek.com>)
+
+        * make mogstored's iostat child process properly shutdown,
+          even when iostat binary isn't installed.  (previously
+          it was stuck in a loop every 10 seconds, hoping for
+          iostat to be installed, but never respecting parent
+          process' death)
+
+        * Change delete worker to use new DeviceStates interface.
+
+        * Fix get_paths to honor new device state of 'drain' via new
+          DeviceStates interface.
+
+        * use signifigantly less CPU when re-broadcasting around
+          iostat device utilization% to child processes.  (future:
+          don't rebroadcast at all and use shared memory)
+
+        * slightly faster fsck (do less syscalls)
+
+        * efficiency: don't broadcast dup state information to children
+          (track in parent what children know already)
+
+        * if using Gearman::Server >= 1.09, respawn the fidsizes
+          worker if it dies.
+
+2007-05-09: Release version 2.16
+
+        * BUG FIX from 2.15:  partially written but never closed
+          tempfiles weren't being cleaned up properly.
+
+        * start to work better when compiled as a stand-alone
+          PAR all-in-one script/archive
+
+2007-05-07: Release version 2.15 ("fsck/drain/rebalance")
+
+        * minor bug fixes and enhancements for MultipleHosts replication
+          policy.  bunch of corner cases now checked with new tests.
+          now easy to write more replication policy tests in future.
+
+        * replication policies can now return "desperate" requests,
+          signalling that a replication reassessment should be
+          enqueued for the future, to see if things could be improved.
+          (that part's not currently implemented, but the real feature
+           and motivation is that the rebalancer now won't delete a
+           DevFID if it results in a desperate move, only an ideal move. )
+
+        * replication policies now can optionally return a new return
+          value of the (new) type MogileFS::ReplicationRequest, which
+          has pretty accessor names, can suggest multiple places,
+          can indicate non-ideal emergency replication decisions.
+          old plugins' return values will be transparently upgraded
+          to the equivalent new return value objects.
+
+        * adding new device state: "drain".  it's a hybrid of "dead"
+          (in that files are migrated off it) and "readonly", it that
+          it still serves traffic... it just doesn't get new files.
+          this also introduces the new object-oriented DeviceState class,
+          and device_state($name) utility function to get the DeviceState
+          singleton by name
+
+        * internal code cleanup.  notably, kill the old & nasty legacy
+          'find_deviceid' function which was ridiculously long and hairy.
+          the two callers are now more readable with sorts/greps/etc.
+
+        * make mogstored's devN/usage writing process (DiskUsage) be less
+          racy with the mogilefsd monitoring code... don't open file for
+          write... open read/write, then in one write system call, write
+          the entire file, with newline padding at end to cover old data,
+          then truncate it if necessary.  should remove harmless (but scary)
+          error messages previously reported by the mogilefsd monitor
+          about zero-length usage files.
+
+        * new protocol commands to list/set (certain) server settings,
+          with value sanity checking (see MogileFS::Config for which
+          are settable, and with what values).  needed for "enable_rebalance".
+          was partially enabled before for slave settings.  also needed
+          for memcached support before, which was never possible to
+          set with mogadm, only with db tweaking.
+
+        * make mogilefsd fsck use new mogstored fid_sizes command, to
+          do bulk stats.  speeds up fscks a ton.
+
+        * be robust against system clocks that go backwards between
+          gettimeofday calls:
+          http://lists.danga.com/pipermail/mogilefs/2007-April/000897.html
+
+        * Put gearman server in mogstored process, add worker
+          'mogstored-fidsizes' which runs as subprocess of mogstored. Add
+          side-channel command 'fid_sizes' which allows us to quickly enumerate
+          and get sizes for files across entire devices on a storage node.
+
+        * remove all code like $state eq "readonly", $state=~ /^dead|down$/
+          and instead convert it into specific questions on policy/traits
+          of given state, like $dev->should_put_new_files_on, or
+          $dev->should_drain_files_off.  see MogileFS::DeviceState,
+          objects of which are accessed via $dev->dstate, or new
+          MogileFS::Util device_state($name) wrapper.
+
+        * start of rebalance support.  (where replication workers, in their
+          idle time, can rearrange files to even out disk space and/or IO
+          activity on storage nodes... policy isn't hard-coded, and is
+          in fact currently random)
+
+        * lighttpd support in both mogilefsd and mogstored.  passes test
+          suite with environment MOGSTORED_SERVER_TYPE=lighttpd set now.
+
+        * abstract out the HTTP server support in mogstored, so
+          mogstored isn't just a perlbal wrapper, but an anything
+          wrapper. (in particular, lighttpd and apache)  mogstored still
+          exists for all its other misc admin/monitoring functions,
+          but can then manage/configure apache/lighttpd child process(es).
+          so far they're just stubbed out.
+
+        * split mogstored into separate files per class, rather than one
+          large script.
+
+2007-04-24: Release version 2.10
+
+        * bug from earlier refactoring:  changing some 'next' to 'return'
+          in MogileFS::Device's create_directory method.  (thanks to
+          Justin Huff <jjhuff@mspin.net>)
+
+        * make sure mogdbsetup doesn't upgrade an existing table (with
+          potentially lot of data) from MyISAM to InnoDB.  just warn.
+          only new tables should become InnoDB on creation.  also,
+          detect InnoDB even on old MySQL 4.0.x, not just 4.1/5.0.
+
+        * make fsck faster by reducing number of db queries (both
+          reads and writes), though more unrelated fastness remains to
+          be done.
+
+        * make fsck_status faster (keep summary stats of evcode counts,
+          rather than doing a full GROUP BY query all the time)
+
+2007-04-20: Release version 2.09
+
+        * filesystem checker (Fsck worker).  off by default, unless
+          it's enabled via protocol.  Control/monitor it with mogadm
+          in MogileFS-Utils 2.08, which needs MogileFS::Client 1.06.
+
+        * replication speed-up on configurations with only 1 host.
+          (replication would randomly have no suggestions before, when
+           there was only 1 target host, so replication would be rescheduled
+           until the future, when random returned a different device on
+           that host)
+
+2007-04-17: Release version 2.08
+
+        * (no runtime-visible changes from 2.07)
+
+        * mogilefsd: remove incomplete "Checker" worker, replace with
+          incomplete "Fsck" worker.
+
+        * test cleanup/robustness improvements.  properly skips testing when
+          testin deps not found.  but searches harder for them now, too.
+          tests run under "make disttest".
+
+        * packaging cleanups, released using ShipIt.
+
+
+2007-03/04:
+
+        * mogilefsd: Split Plugin::MetaData and Plugin::FilePaths into their own distributions.
+
+        * mogilefsd: Fix mogdbsetup to not ask empty questions.
+
+        * mogilefsd: command line/config file support for listening on specific IPs, also
+           support for listening on multiple IPs/ports
+
+2007-03-19:
+        * mogstored: use XS HTTPHeaders by default, unless disabled with environment variable
+
+        * mogilefsd: memcache support for get_paths (see doc/memcache-support.txt)
+
+2007-03-16:
+        * mogstored: make child processes be exec'ed (as as their own scripts, not inhertting
+          Perlbal, Linux::AIO/IO::AIO, etc baggage).  so they don't own listening
+          sockets, pipes to child workers, signal handlers, etc.  just a lot
+          cleaner now, and SIGTERM, SIGINT properly shut everything down now,
+          both in foreground and as daemon
+
+2007-03-15:
+        * mogstored: this changelog is totally neglected.  :/  see svn log.
+
+        * mogstored: make perlbal's "shutdown graceful" work, by not doing
+          sidechannel accepting ourselves (which never hung up),
+          but subclass Perlbal's TCPListener class, which does it
+          all correctly.
+
+2006-12/2007-01:  (2.00_05)
+        * mogilefsd: everything converted to OO API internally.  old internal APIs removed.
+
+        * mogilefsd: be database-agnostic.  Currently only works with MySQL (and
+           SQLite as a joke/demo), but Pg/Oracle coming in the future.
+
+        * mogilefsd: built-in I/O activity monitoring between mogstored/mogilefsd Monitor
+           now.
+
+        * mogilefsd: much improved internal communication between worker processes
+
+        * mogilefsd: start of better docs
+
+2006-12-28
+        * mogilefsd: pidfile support (Radu Greab <radu@yx.ro>)
+
+2006-12-28
+2006-12-27
+        * mogilefsd: remove all old internal APIs, update everything to use new OO APIs,
+           expanding OO APIs where necessary (lots of places).  so much more
+           beautifully hackable now.
+
+        * mogstored: kill child processes (diskusage and iostat) when being killed.
+
+2006-11-05:
+        * mogstored: set aio threads after daemonizing.  needed by Linux::AIO/IO::AIO, it seems?
+
+2006-09-29
+        * mogilefsd: remove non-HTTP mode ("NFS mode") from the server
+
+2006-09-23:
+        * mogstored: refuse to start up with missing Linux::AIO/IO::AIO or broken Linux::AIO
+
+2006-09-04:
+        * mogstored: set aio_threads as a function of number of disks
+
+2006-07 -> 2006-09
+        * mogilefsd: major refactoring/cleanup/new features ("MogileFS 2.0")
+
+2006-03-01 (Brad)
+        * mogilefsd: fix dataloss bug when the 'tempfile' table is Innodb and the
+           server is restarted while the tempfile table is empty.
+
+2006-02-28 (Jr)
+        * mogilefsd: allow create_open to take optional fid parameter which enables you to
+        dictate which fid to use internally and to not rely on MySQL's auto_increment
+
+2006-01-10 (Brad)
+        * mogilefsd: make Mgd::get_device_summary() always return all devices, regardless
+        of status.
+
+        * mogilefsd: update all callers of get_device_summary to filter on the device
+        status, if they need to. (provided more clarity into what
+        callers' intentions were...)
+
+        * mogilefsd: add a new device state 'readonly' which means: it can be read from
+        from clients, it can be replicated from, but no new files can go
+        on it or be replicated onto it. and it also reaps, meaning the
+        device is fucked. the filesystem probably ate itself.
+
+2005-08-10:
+        * mogstored: write out usage files for devices, even if they're not on their own mount point.
+          also explicitly include the '-k' flag to df, so we know they're KiB.
+
+2005-08-07:
+        * mogstored: new config syntax and command line options

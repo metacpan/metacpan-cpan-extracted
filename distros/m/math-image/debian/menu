@@ -1,0 +1,32 @@
+# Debian menu system entry.
+
+# Copyright 2011 Kevin Ryde
+
+# This file is part of Math-Image.
+#
+# Math-Image is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# Math-Image is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Math-Image.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Crib note: Menu policy is in /usr/share/doc/menu/menu.txt.gz, part
+# 3.5 has the possible menu sections.  Applications/Office is for the
+# new menu structure in menu 2.1.35.
+
+?package(math-image):needs="x11" \
+	section="Applications/Science/Mathematics" \
+	title="Math-Image" \
+	hints="graphics" \
+	command="math-image"
+
+# no icon yet
+# icon="/usr/share/perl5/App/MathImage/math-image.xpm"

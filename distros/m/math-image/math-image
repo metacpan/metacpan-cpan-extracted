@@ -1,0 +1,671 @@
+#!perl -w
+
+# Copyright 2010, 2011, 2012, 2013 Kevin Ryde
+
+# This file is part of Math-Image.
+#
+# Math-Image is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# Math-Image is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Math-Image.  If not, see <http://www.gnu.org/licenses/>.
+
+use 5.004;
+use strict;
+use App::MathImage;
+
+use vars '$VERSION';
+$VERSION = 110;
+
+exit App::MathImage->command_line;
+
+__END__
+
+=for stopwords Gtk Gtk2 Ulam's --ulam Ulam Vogel pronic
+--pronic fibonacci --fibonacci fullscreen --fullscreen unfullscreened --png
+png --xpm xpm RGB menubar toplevel colormap Ryde ie perrin --perrin padovan
+--padovan Perrin Padovan Vogel's --vogel Archimedian WIDTHxHEIGHT
+--theodorus Theodorus semiprimes segfault Aronson's --aronson startup
+GdkPixbuf prima Prima --prima tty renamings MathImageFoo OEIS tribonnaci
+TrueColor PNGwriter Imager ImageMagick Tk tk PythagoreanTree
+
+=head1 NAME
+
+math-image -- display some mathematical images
+
+=head1 SYNOPSIS
+
+ math-image [--options]
+
+=head1 DESCRIPTION
+
+C<math-image> displays some mathematical images, either
+
+=over
+
+=item *
+
+in a Gtk2 or Wx GUI,
+
+=item *
+
+as an image file output,
+
+=item * or setting the root window.
+
+=back
+
+There's many options for what to display, in particular the display includes
+Ulam's spiral of prime numbers and several variations on the numbers in a
+path such as Sacks spiral and Vogel floret.  Try C<--random> or the
+Randomize button for interesting combinations.
+
+Most of the code is plain Perl, so it's not blindingly fast, but the GUI or
+root window is drawn progressively so you can see what's happening.  In the
+GUI you can change the controls while drawing to start again on something
+else.
+
+Mouse button 1 in the GUI drags the image to see parts away from the origin
+and which otherwise wouldn't fit on screen.  This can become quite slow when
+displaying things like prime numbers which must be calculated all the way up
+to the desired part.
+
+The number sequences displayed come from L<Math::NumSeq>, and the paths
+they're plotted on from L<Math::PlanePath>.
+
+=head1 OPTIONS
+
+=head2 Values Options
+
+The following options control what set of values to display.  The
+C<--values> option described last is the most general.
+
+=over
+
+=item --primes
+
+The prime numbers.
+
+=item --twin
+
+=item --twin1
+
+=item --twin2
+
+The twin primes.  C<--twin> is both twins like 11,13.  C<--twin1> is just
+the first of each like 11, or C<--twin2> is just the second like 13.
+
+=item --semi-primes
+
+=item --semi-primes-odd
+
+The semi-prime or bi-prime numbers, meaning integers which have two prime
+factors p*q.  This includes p==q squares of primes.  C<--semi-primes-odd> is
+just the odd semiprimes, so 2 excluded from p and q.
+
+=item --squares
+
+The perfect squares 1, 4, 9, 16, 25, 36, etc.
+
+=item --pronic
+
+The pronic numbers 2, 6, 12, 20, 30, 42, etc, k*(k+1).  These are half way
+between successive perfect squares, and twice the triangular numbers.
+
+=item --triangular
+
+The triangular numbers 1, 3, 6, 10, 15, 21, etc, k*(k+1)/2.
+
+=item --polygonal=K
+
+The K-sided polygon numbers.  For example C<--polygonal=3> is the triangular
+numbers, C<--polygonal=4> is the squares.
+
+=item --cubes
+
+=item --tetrahedral
+
+The cubes 1, 8, 27, 64, 125, etc or tetrahedral numbers 1, 4, 10, 20, 35,
+56, etc.  These tend to grow too quickly to display much of a pattern,
+though the Vogel floret is close,
+
+    math-image --cubes --vogel
+
+=item --fibonacci
+
+The Fibonacci numbers 1,1,2,3,5,8,13,21, etc.  On the Vogel floret these
+fall on an axis going to the right.  For other spirals and paths they tend
+to grow too quickly to show much.
+
+=item --perrin
+
+The Perrin numbers 3, 0, 2, 3, 2, 5, 5, 7, 10, etc.  These are a cubic
+recurrence and tend to grow too quickly to display much of a pattern.
+
+=cut
+
+# Math::NumSeq::Padovan not ready yet
+#
+# =item --padovan
+# 
+#   Or Padovan numbers 1,
+# 1, 1, 2, 2, 3, 4, 5, 7, 9, etc.
+
+=item --fraction=5/29
+
+=item --fraction=1.234
+
+The digits in the decimal expansion of a fraction.  For example the default
+in the GUI is 5/29.  A decimal like 1.234 means 1234/1000.
+
+A fraction is always a repeating pattern, with length no longer than the
+denominator, but it can give interesting patterns for various paths.  For
+example
+
+    math-image --corner \
+               --values=FractionDigits,radix=2,fraction=1/137
+
+gives the fine structure constant 1/137 in binary on the Corner path.  It's
+a repeating pattern of an angry man with a beard and a skull wearing a hat.
+No doubt this has deep cosmic significance.
+
+=item --all
+
+=item --odd
+
+=item --even
+
+All integers, or just odd or even integers.  For the paths which fill the
+plane C<--all> will just fill the screen (slowly!), but for things like
+C<--sacks> and C<--vogel> it shows where all the points lie.
+
+=item --aronson
+
+Aronson's sequence 1,4,9,... of "T is the first, fourth, ninth, ...".  This
+requires the L<Math::NumSeq::Aronson> module.
+
+=item --expression='i**2 + 2*i + 1'
+
+Draw values following a formula.  It should have a single variable which
+will be evaluated at 0,1,2, etc.  The default is Perl syntax on an "i".  See
+L<Math::NumSeq::Expression> for more information.
+
+=item --oeis=A000217
+
+Values selected by their A-number per Sloane's Online Encyclopedia of
+Integer Sequences.  Some A-numbers are implemented by code modules, others
+can be read from files in a F<~/OEIS/> directory.  See L<Math::NumSeq::OEIS>
+for details.  For example the triangular numbers are A000217,
+
+    math-image --oeis=A000217
+
+=item --lines
+
+Draw lines along the path instead of a set of selected points.  This shows
+where a path travels though you may have to increase the C<--scale> to see
+it properly.
+
+When the scale is big enough the usual figure is drawn at each point
+(default a square or circle).  Use C<--figure=point> for just the lines.
+
+=item --values=MODULE
+
+=item --values=MODULE,NAME=VALUE,NAME=VALUE,...
+
+Draw values from the given C<Math::NumSeq> module (including experimental
+C<MathImageWhatever> ones).  For example
+
+    math-image --values=Emirps
+
+Parameters can be passed as comma separated NAME=VALUE, for example
+
+    math-image --values=TwinPrimes,pairs=both
+
+The C<File> module can read values from a text file (L<Math::NumSeq::File>)
+
+    math-image --values=File,filename=/my/dir/data.txt
+
+=back
+
+=head2 Path Options
+
+The following control the path in the plane where on which the values will
+be displayed.  The C<--path> option described last is the most general.
+
+=over 4
+
+=item --ulam
+
+Ulam's primes in a square spiral (currently the default).
+
+=item --vogel
+
+Vogel's floret design for the positions of seeds in a sunflower (see
+L<Math::PlanePath::VogelFloret>).  Try the following to see all the points
+in the pattern before applying various special sets of values.
+
+    math-image --vogel --all --scale=10
+
+Scaling up helps the circles draw properly.  When the values displayed are
+less than all the integers a lower scale can be used.
+
+=item --sacks
+
+An Archimedian spiral with the square root as angle of rotation, by Robert
+Sacks (see L<Math::PlanePath::SacksSpiral>).
+
+=item --theodorus
+
+The spiral of Theodorus or square-root spiral (see
+L<Math::PlanePath::TheodorusSpiral>).
+
+=item --diamond
+
+A diamond shaped spiral (see L<Math::PlanePath::DiamondSpiral>).
+
+=item --pyramid
+
+The sides of a pyramid shape (see L<Math::PlanePath::PyramidSides>).
+
+=item --pyramid-rows
+
+A pyramid made from horizontal rows (see L<Math::PlanePath::PyramidRows>).
+
+=item --corner
+
+=item --diagonals
+
+Corners or diagonals between the X and Y axes, per
+L<Math::PlanePath::Corner> and L<Math::PlanePath::Diagonals>.
+
+=item --rows
+
+=item --columns
+
+Points drawn in successive rows or columns.
+
+=item --path=MODULE
+
+=item --path=MODULE,NAME=VALUE,NAME=VALUE,...
+
+Draw with the given C<Math::PlanePath> module.  For example
+
+    math-image --path=HeptSpiralSkewed
+
+This includes experimental paths "MathImageFoo", but expect them to change
+when finished.
+
+Parameters to the path can be supplied as comma separated C<NAME=VALUE>.
+For example,
+
+    math-image --path=SquareSpiral,wider=3
+
+=back
+
+=head2 Other Options
+
+=over
+
+=item --random
+
+Choose a path and values at random.  For example in your F<~/.xsession>
+
+    math-image --root --random
+
+=item --foreground=COLOUR
+
+=item --background=COLOUR
+
+Set the foreground and background colours.  The colours can be either names
+or hex style #RRGGBB or #RRRRGGGGBBBB.  For example white on a shade of red,
+
+    math-image --foreground=white --background=#A01010
+
+The default is white foreground on black background.  For a C<--root>
+background a full white can be a bit hard on the eye when there's a lot of
+points shown.  Try a shade of grey instead
+
+    math-image --root --foreground=lightgrey
+
+Available names depend on the output module.  C<X11::Protocol> C<--root>
+uses the server's database, usually F</etc/X11/rgb.txt>.  Gtk2 uses a
+hard-coded copy of that F</etc/X11/rgb.txt>.  C<--png> with GD has the
+C<GD::Simple> names.  C<--xpm> with C<Image::Xpm> passes anything at all
+through to the file.  For C<--text> currently the colours can be single
+characters to show, though perhaps that will change.
+
+=item --size=PIXELS
+
+=item --size=WIDTHxHEIGHT
+
+Set the size of the image in pixels.  A single value means that size square,
+otherwise WIDTHxHEIGHT.  For C<--root> this size is currently ignored and
+the full screen used.
+
+For the GUI this is an initial size, though the menu bar might make the
+window wider than requested.  Under C<--fullscreen> the size is the
+unfullscreened window if you switch back to that (menu entry
+Tools/Fullscreen).
+
+The default for the GUI is about 4/5 of the screen.  The default for PNG etc
+image file output is an arbitrary 200x200, or for C<--text> output the size
+of the terminal from C<Term::Size>.
+
+=item --scale=PIXELS
+
+How many pixels for each value shown.  The current default is 3 to show 3x3
+pixel squares, or for C<--text> output just 1 for a single character per
+point.
+
+=item --figure=F
+
+Draw a given shape figure at each point.  The default is either a square or
+circle depending on the path.  The choices are
+
+    point             single pixel
+    square            solid
+    box               unfilled square
+    circle            solid
+    ring              unfilled circle
+    diamond           solid
+    diamunf           unfilled diamond
+    plus              "+" shape
+    X                 "X" shape
+    L                 "L" shape
+    N                 "N" shape
+    V                 "V" shape
+    Z                 "Z" shape
+    arrow             arrow in direction of path
+
+=cut
+
+# not sure about these yet
+    # triangle
+    # hexagon
+    # undiamond
+    # unellipse
+
+=item --help, -?
+
+Print a summary of the options.
+
+=item --version
+
+Print the program version number.
+
+=back
+
+=head2 GUI Options
+
+The default is to run the Gtk GUI.
+
+=over
+
+=item --display=DPY
+
+Select the X server for X11 or Gtk output.  The default is from the
+C<DISPLAY> environment variable (normally set at X startup).
+
+    math-image --display=:3
+
+=item --fullscreen
+
+Start the GUI in full screen mode.  The Tools/Fullscreen menu entry can
+toggle between full screen and a normal window.  In full screen mode the
+menus still work, just press Alt-F, Alt-T, etc as normal to pop up.
+
+=item --wx
+
+Run the wxWidgets GUI.  This requires wxPerl (see L<Wx>), probably for
+wxWidgets 2.8 or higher.
+GUI.
+
+=item --prima
+
+Run the Prima GUI.  This requires the Prima module (see L<Prima>) and the
+separate C<Image::Base::Prima::Drawable> module.  It doesn't yet have the
+full set of options the Gtk2 GUI does, but works as far as it goes.
+
+=item --tk
+
+Run the Tk GUI.  This requires Perl-Tk (see L<Tk>).  It doesn't yet have the
+full set of options the Gtk GUI does, but works as far as it goes.
+
+=item --<gtk-options>
+
+Standard Gtk options.  See L<gtk-options(7)> for the full list.  The only
+one which does much for C<math-image> is C<--display> to set the X display
+(default from the C<DISPLAY> environment variable).
+
+=back
+
+The Gtk and Prima GUIs have printer output through their usual printing
+mechanisms.  In the current code the Gtk one is a screen dump but the Prima
+one is a PostScript re-run of the image drawing which might be a bit slow,
+but might be higher resolution for circle figures.
+
+There's some very rudimentary support for other GUIs with C<--module=Curses>
+for C<Curses::UI> and C<--module=Gtk1> for the older Gtk 1.2 and
+corresponding Gtk-Perl.  They're only meant to see how well those GUIs work
+as yet.
+
+=head2 Output Types
+
+=over
+
+=item --root
+
+Set the root window background to the requested image and exit.  For example
+to draw a random image from your F<~/.xsession> startup,
+
+    math-image --root --random &
+
+Add C<--verbose> to print what was chosen and displayed (output from
+F<~/.xsession> normally goes to the F<~/.xsession-errors> file).  Sometimes
+C<--random> may use a lot of memory, so consider C<limit> or C<timeout> or
+both, and perhaps low priority (see L<sh(1)>, L<timeout(1)> and L<nice(1)>).
+
+The root window is set with C<Gtk2>, or under X with
+C<X11::Protocol::XSetRoot> if available.  The C<XSetRoot> method uses
+C<Esetroot> style and so supports pseudo-transparency such as C<Eterm
+--trans>.  C<XSetRoot> also preserves colormap entries on a C<PseudoColor>
+visual and can act on an C<__SWM_VROOT> style window manager virtual root.
+
+=item --flash
+
+Flash the requested image on the screen instead of starting the GUI.
+A combination C<--root --flash> means draw to the root and then flash.  This
+is good if updating the background randomly every so often, since it shows
+the completed image briefly where it might be hidden underneath windows.
+
+    math-image --root --random --flash
+
+The flash is done with a temporary full-screen window, either some X11
+native or a Gtk2 (see L<Gtk2::Ex::Splash>).  In both cases the keyboard
+focus is not moved so you don't lose any typing, but the flash does eat
+mouse clicks.
+
+=item --png
+
+=item --xpm
+
+Write a PNG or XPM image file to standard output and exit.  PNG is always
+possible with C<Gtk2::Gdk::Pixbuf> but it can also use GD, PNGwriter,
+Imager, ImageMagick, Prima, Tk or Wx with the right libraries and
+C<Image::Base> supporting module.
+
+    math-image --png >/tmp/my-file.png
+
+XPM output requires either C<Image::Xpm>, ImageMagick, Prima, Tk or Wx.
+
+Combinations C<--prima --png>, or C<--tk --xpm>, etc, force the respective
+output module rather than an automatic choice among available possibilities.
+Prima, Tk and Wx under X use the X server even when writing to a file and
+may give obscure error messages if no display.
+
+=item --text
+
+Write a text-only image to standard output and exit.  The default size
+follows the terminal with C<Term::Size> or can be set with
+C<--size=WIDTH,HEIGHT>, A typical tty size like 80x25 is usually too small
+to see much, but a bigger image might be cute to send to a line printer or
+similar.
+
+    math-image --text --size=130x49 | lpr
+
+For images which would be colours in the GUI the text output is a digit
+which is the value at that point.  This is slightly experimental, especially
+for big sequence values, but currently for example
+
+    math-image --values=PrimeFactorCount --text --size=5x5
+
+    14221
+    31213
+    12011
+    31322
+    22142
+
+=item --xscreensaver
+
+Run under the L<xscreensaver(1)> program.  This requires the
+C<X11::Protocol::XSetRoot> module.  This option is slightly experimental but
+works as far as it goes.
+
+To make C<math-image> available in C<xscreensaver> add to the "programs:"
+section of your F<~/.xscreensaver> file,
+
+    math-image --xscreensaver \n\
+
+File F<xscreensaver/math-image.xml> in the Math-Image sources can be used
+give a description in the C<xscreensaver-demo> program.  Currently "make
+install" doesn't try to install this so it must be copied manually to the
+F</usr/share/xscreensaver/config/> directory..
+
+There's no options for the screensaver yet.  The intention would be a
+control for the redraw rate (unless there's a global xscreensaver option for
+that), and to limit each image drawing to the redraw time so slow or very
+slow things aren't continued indefinitely.
+
+For reference, under C<xscreensaver> a saver program draws to a target
+window given either by C<__SWM_VROOT> root window property from the
+C<xscreensaver> daemon, or by a C<-window-id> command line option under
+C<xscreensaver-demo>.  C<__SWM_VROOT> is recognised by
+C<X11::Protocol::XSetRoot> version 18 and up.
+
+=back
+
+=head1 MODULES
+
+In addition to the various modules noted above, the following are used in
+the Gtk2 GUI if available,
+
+=over
+
+=item C<Gtk2::Ex::PodViewer>
+
+=item C<Tk::Pod>
+
+=item C<Wx::Perl::PodBrowser>
+
+The "Help/POD Documentation" menu items to display this documentation and
+the various path and values classes, under Gtk, Tk or Wx respectively.
+
+=item C<Gtk2::Ex::CrossHair>
+
+Lines following the cursor, enabled from the Tools/Cross menu item.
+
+=item C<Gtk2::Ex::ErrorTextDialog>
+
+Error messages in a dialog instead of to C<STDERR>.  Of course there
+shouldn't be any errors!
+
+=item C<Gtk2::Ex::QuadButton>
+
+Scroll arrows in the bottom right corner.
+
+=back
+
+=head1 ENVIRONMENT VARIABLES
+
+=over
+
+=item C<DISPLAY>
+
+The X display to use.
+
+=item C<TMPDIR>
+
+A temporary directory to use, as per L<File::Temp> and L<File::Spec> (and on
+MS-DOS C<File::Spec> may look at C<TEMP> or C<TMP> too, see
+L<File::Spec::Win32>).
+
+=back
+
+=head1 BUGS
+
+Some of the values plotted can be a slow to generate or use a lot of memory,
+or both.  When the path goes out to large positions, or when scrolled out
+away from the origin the display might hang a little or a lot while
+generating values.
+
+The paths which have big N values near the origin, such as C<RationalsTree>
+or C<PythagoreanTree>, are calculated with C<Math::BigInt> for accuracy.
+This becomes very slow.  In some cases the values and/or path calculations
+might end up rounding off anyway.
+
+When plotting colours on paths which duplicate points (eg. the
+C<DragonCurve>), the colour shown is sometimes the smallest N or sometimes
+the biggest N due to overwriting.  Not sure whether to try some colour
+mixing, or force the smallest among overlaps.
+
+Colours for counts etc have some hard-coded scaling to show a range of
+colours for the typical range of values.  There ought to be a user control
+for this.  Perhaps relevant C<NumSeq> modules should indicate their
+approximate growth rate to make a sensible initial scale.
+
+=head1 SEE ALSO
+
+L<gtk-options(7)>, L<xsetroot(1)>
+
+L<Math::PlanePath>,
+L<Math::NumSeq>
+
+L<Gtk2>,
+L<X11::Protocol>,
+L<X11::Protocol::XSetRoot>,
+L<Gtk2::Ex::PodViewer>,
+L<Gtk2::Ex::CrossHair>,
+L<Gtk2::Ex::ErrorTextDialog>
+
+L<xscreensaver(1)>, and in particular its L<ccurve(6x)> which is a saver
+displaying various C curve, dragon curve and Koch curves.
+
+=head1 HOME PAGE
+
+L<http://user42.tuxfamily.org/math-image/index.html>
+
+=head1 LICENSE
+
+Math-Image is Copyright 2010, 2011, 2012, 2013 Kevin Ryde
+
+Math-Image is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 3, or (at your option) any later
+version.
+
+Math-Image is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+Math-Image.  If not, see <http://www.gnu.org/licenses/>.
+
+=cut

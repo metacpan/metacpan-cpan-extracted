@@ -1,0 +1,15 @@
+general {
+
+  # Default language setting.
+  language   = nl
+
+  # Default input encoding.
+  input.encoding = iso-8859-15
+
+  # Defaults for document headers.
+  company    = "Squirrel Consultancy"
+  cmpy       = "SQC"
+  city       = "Haarlem"
+  department = ${.company}
+
+}

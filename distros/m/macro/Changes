@@ -1,0 +1,32 @@
+Revision history for macro
+
+0.06 Tue Aug 11 17:29:57 2009
+	- depend on PPI 1.205
+
+0.05 Wed Jul 15 12:04:20 2009
+	- no code changes
+	- fix pods
+	- move pod tests to author tests
+	- add repository info
+
+0.04 Tue Sep 16 09:30:53 2008
+	- change to prune declarative statements from macros
+	- optimize single-statement macros
+	- fix the case where 'pmc_support' is used
+	- refer to 'pmc_support' provided by Module::Install::PMC
+
+0.03 Wed Sep  3 13:40:26 2008
+	- fix scope-lexicality in macro::compiler
+	- fix the deparse routine with prototypes/attributes to work correctly
+	- fix an issue on freshness check
+	- check validity of supplied subroutines (XSUB, undefined sub)
+
+0.02 Mon Sep  1 09:11:05 2008
+	- add freshness check to macro::compiler
+	- fix scope-lexicality
+	- fix multiple 'use macro::compiler' statements
+	- report line numbers in PERL_MACRO_DEBUG=2
+
+0.01  Tue Aug 26 23:35:26 2008
+	- original version; created by Module::Starter
+

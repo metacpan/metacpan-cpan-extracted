@@ -1,0 +1,12 @@
+Revision history for Mojolicious-Plugin-GeoCoder
+0.05	6 Dec 2014
+	Added META.json and META.yml file
+0.04 	2 Dec 2014
+	Corrected path
+0.03 	2 Dec 2014
+	Corrected typo mistake in Makefile.PL
+0.02	30 Nov 2014 
+	Added Mojolicious as dependency
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

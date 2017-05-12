@@ -1,0 +1,109 @@
+# Defaults config value for MMM
+# Check you're editing .in otherwise changes will be lost
+
+package MMM::Config;
+
+=head1 NAME
+
+MMM::Config - Default value for MMM
+
+=cut
+
+use strict;
+use warnings;
+use Exporter;
+
+our @ISA = qw(Exporter);
+our @EXPORT = grep { $_ ne 'BEGIN' } keys %{MMM::Config::};
+
+=head1 VALUES
+
+=head2 STATEDIR
+
+Directory for working data
+
+=cut
+
+sub STATEDIR { '@LOCALSTATEDIR@/mmm' }
+
+=head2 CONFIGFILE
+
+The default config file location
+
+=cut
+
+sub CONFIGFILE { '@SYSCONFDIR@/mmm/mmm.cfg' }
+
+=head2 MIRRORDIR
+
+The location were static mirror list are stored
+
+=cut
+
+sub MIRRORDIR { '@SYSCONFDIR@/mmm' }
+
+=head2 PIDFILE
+
+The PID file path
+
+=cut
+
+sub PIDFILE { '/var/run/mmm/mmm.pid' }
+
+=head2 PERIOD
+
+The default delay between two sync
+
+=cut
+
+sub PERIOD { 120 } # in minutes
+
+=head2 WAITAFTER_MINIMA
+
+Minimal time between two sync (pause)
+
+=cut
+
+sub WAITAFTER_MINIMA { 10 } # in minutes
+
+=head2 MAX_TRY
+
+Count of try per mirror
+
+=cut
+
+sub MAX_TRY { 2 }
+
+=head2 VERBOSITY
+
+Default verbosity
+
+=cut
+
+sub VERBOSITY { 3 }
+
+=head2 LISTDELAY
+
+Delay before remote mirrors list refresh
+
+=cut
+
+sub LISTDELAY { 10800 } # 3 heures
+
+=head2 SIZE_DELAY
+
+Default delay between size calculation
+
+=cut
+
+sub SIZE_DELAY { 43200 } # 12 heures
+
+1;
+
+__END__
+
+=head1 AUTHOR
+
+Olivier Thauvin <nanardon@nanardon.zarb.org>
+
+=cut

@@ -1,0 +1,157 @@
+#!/usr/bin/perl
+
+package main;
+# PODNAME: marcmoose
+# ABSTRACT: Read and output MARC record file
+$main::VERSION = '1.0.33';
+use Modern::Perl;
+use Pod::Usage;
+use Getopt::Long;
+use MARC::Moose::Record;
+use MARC::Moose::Writer;
+use MARC::Moose::Reader::File::Iso2709;
+use MARC::Moose::Reader::File::Marcxml;
+use MARC::Moose::Reader::File::Isis;
+use YAML;
+
+
+my $verbose   = 0;
+my $help      = 0;
+my $parser    = 'iso2709';
+my $formater  = 'text';
+my $output    = '';
+my $converter = '';
+GetOptions(
+    'verbose'       => \$verbose,
+    'help'          => \$help,
+    'p|parser=s'    => \$parser,
+    'f|formater=s'  => \$formater,
+    'o|output=s'    => \$output,
+    'c|converter=s' => \$converter,
+);
+
+usage() if $help ||
+           $parser !~ /iso2709|marcxml|isis/ ||
+           $formater !~ /text|iso2709|marcxml|json/ ||
+           ( $converter && $converter !~ /unimarctomarc21/ );
+
+my $fh;
+if ( $output ) {
+    open $fh, ">", $output or die "Can't create file: $output";
+}
+else {
+    $fh = *STDOUT;
+}
+binmode($fh, ':encoding(utf8)');
+my $writer = MARC::Moose::Writer->new(
+    fh => $fh,
+    formater => $MARC::Moose::Record::formater->{$formater}->new(),
+);
+$writer->begin();
+
+my $reader;
+if (@ARGV) {
+    for (@ARGV) {
+        unless (-f) {
+            say "File doesn't exist: $_";
+            next;
+        }
+        $reader =
+            $parser =~ /iso2709/
+            ? MARC::Moose::Reader::File::Iso2709->new( file => $_ )
+            : $parser =~ /isis/ ? MARC::Moose::Reader::File::Isis->new( file => $_ )
+            : MARC::Moose::Reader::File::Marcxml->new( file => $_ );
+        readwrite();
+    }
+}
+else {
+    $reader =
+        $parser =~ /iso2709/
+        ? MARC::Moose::Reader::File::Iso2709->new( fh => *STDIN )
+        : MARC::Moose::Reader::File::Marcxml->new( fh => *STDIN );
+    readwrite();
+}
+
+$writer->end();
+
+
+sub usage {
+    pod2usage( -verbose => 2 );
+}
+
+sub readwrite {
+    while ( my $record = $reader->read() ) {
+        $record = $record->as($converter)  if $converter;   
+        $writer->write($record);
+    }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+marcmoose - Read and output MARC record file
+
+=head1 VERSION
+
+version 1.0.33
+
+=head1 DESCRIPTION
+
+Command line utility using MARC::Moose module to handle MARC records which are
+read from files or stdin.
+
+=head1 SYNOPSYS
+
+ marcmoose
+ marcmoose --help
+ marcmoose marc.iso
+ marcmoose --formater text marc.iso
+ marcmoose --formater json marc.iso
+ marcmoose --parser isis marc.iso
+ marcmoose --converter unimarctomarc21 marc.iso
+ marcmoose --parser marcxml --formater iso2709 --output marc.xml marc.iso
+
+=head1 PARAMETERS
+
+=over
+
+=item -h|--help
+
+Display this help.
+
+=item -p|--parser iso2709|marcxml|isis
+
+Parse input file. Three formats are accepted: ISO2709, Isis and MarcXML. Isis
+(WinIsis equivalent) is just a ISO2709 file with some idiosyncrasies.
+
+=item -f|--formater text|json|iso2709|marcxml
+
+Format records. By default text.
+
+=item -o|--output C<file name>
+
+Output record to a file. Without this parameter output to stdout.
+
+=item -c|--converter unimarctomarc21
+
+Performs a conversion from UNIMARC to MARC21.
+
+=back
+
+=head1 AUTHOR
+
+Frédéric Demians <f.demians@tamil.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Frédéric Demians.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

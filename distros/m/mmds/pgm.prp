@@ -1,0 +1,37 @@
+# This is an example how to use private font sets.
+# See also the my.texdir for details.
+
+documents.default.args = "Garamond justify"
+
+my.texdir = '${HOME}/src/mmds/src/texdir-pgm'
+
+tools {
+
+  # Path settings must be single quoted, since they make use of
+  # variables like ${mmdslib} that will not have their definitive
+  # value until used.
+  # Note, in all path settings, do not forget to include a leading,
+  # trailing or double colon to include the standard paths.
+
+  latex {
+    inputs  = '.:${my.texdir}:${config.texdir}::'
+    fonts   = '.:${my.texdir}::'
+  }
+
+  # dvips requires different settings dependent on the driver used.
+  # These are the default settings for all drivers.
+  dvips {
+    cfg     = pgm
+    config  = '.:${my.texdir}::'
+    headers = '.:${my.texdir}:${config.texdir}::'
+    fonts   = '.:${my.texdir}::'
+  }
+
+  # Note that for PostScript fonts, the dviviewer will in general not
+  # be able to show the dvi file.
+  dviviewer {
+    cmd     = xdvi
+    fonts   = '.:${my.texdir}::'
+  }
+
+}

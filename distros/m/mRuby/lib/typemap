@@ -1,0 +1,26 @@
+TYPEMAP
+
+mrb_state      *   O_OBJECT
+struct mrb_parser_state *   O_OBJECT
+struct RProc *   O_OBJECT
+
+const char     *   T_PV
+ 
+OUTPUT
+# The perl object is blessed into 'CLASS' which should
+# be a char * having the name of the package for the blessing.
+O_OBJECT
+    sv_setref_pv( $arg, "mrb_state", (void*)$var );
+ 
+INPUT
+O_OBJECT
+    if ( sv_isobject( $arg ) && ( SvTYPE( SvRV( $arg ) ) == SVt_PVMG ) )
+    {
+        $var = ($type)SvIV( (SV*)SvRV( $arg ) );
+    }
+    else
+    {
+        warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+        XSRETURN_UNDEF;
+    }
+

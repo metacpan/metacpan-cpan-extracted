@@ -1,0 +1,25 @@
+.perlcriticrc
+.perltidyrc
+Build.PL
+Changes
+lib/mixin.pm
+lib/mixin/with.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/compile_error.t
+t/constant.t
+t/lib/Dog/CompileError.pm
+t/lib/Dog/Hamish.pm
+t/lib/Test/Builder.pm
+t/lib/Test/More.pm
+t/lib/Test/Simple.pm
+t/mixin.t
+t/mixin_twice.t
+t/mixup_errors.t
+t/private_methods.t
+t/SUPER.t
+t/universal.t
+README
+LICENSE
+META.yml
+META.json

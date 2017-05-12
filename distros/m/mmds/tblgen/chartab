@@ -1,0 +1,148 @@
+# chartab -- character encoding tables
+#
+# SCCS Status     : @(#)@ chartab	2.7
+# Author          : Johan Vromans
+# Created On      : Sun Sep  9 13:32:19 1990
+# Last Modified By: Johan Vromans
+# Last Modified On: Tue Jul 13 10:22:19 1993
+# Update Count    : 38
+# Status          : Good
+#
+# TAB separated entries per line
+#   ISO code (in octal)
+#   Apple's extension code (hex)
+#   PC code (decimal) is the XXX character set
+#   Symbol code incharacter pairs
+#   TeX coding depends on PostScript fonts.
+#
+#ISO	Apple	Symbol	PC	TeX	Name
+240	ca	  		~	Nobreakspace
+241	c1	!!		\char'016	Exclamdown
+242	a2	|c		\char'242	Cent
+243	a3	-L		\char'243	Sterling
+244	db	xo		\char'250	Currency
+245	b4	=Y		\char'245	Yen
+246		||		\char'174	Brokenbar
+247	a4	S!		\char'247	Section
+250	ac	" 		\char'177	Diaeresis
+251	a9	cp		\copyright	Copyright
+252	bb	O_		\char'343	Ordfeminine
+253	c7	<<		\char'253	Guillemotleft
+254	c2	',		$\neg$	Notsign
+255	d0	--		\char'261	En-dash
+256	a8	rg		\char'250	Registered
+257	f8	^_		\char'026	Macron
+260	a1	^0		\char'027	Degree
+261	b1	+-		$\pm$	Plusminus
+262		^2		$^{2}$	Twosuperior
+263		^3		$^{3}$	Threesuperior
+264	ab	''		\char'023	Acute
+265	b5	/U		$\mu$	Mu
+266	a6	P!		\char'266	Paragraph
+267	a5	^.		\char'264	Periodcentered
+270	fc	,,		\char'030	Cedilla
+271		^1		$^{1}$	Onesuperior
+272	bc	O_		\char'353	Masculine
+273	c8	>>		\char'273	Guillemotright
+274		14		\mbox{$^{1}$\char'244$_{4}$}	Onequarter
+275		12		\mbox{$^{1}$\char'244$_{2}$}	Onehalf
+276		34		\mbox{$^{3}$\char'244$_{4}$}	Threequarters
+277	c0	??		\char'017	Questiondown
+300	cb	`A		\`{A}	Agrave
+301	e7	'A		\'{A}	Aacute
+302	e5	^A		\^{A}	Acircumflex
+303	cc	~A		\~{A}	Atilde
+304	80	"A		\"{A}	Adiaeresis
+305	81	0A		\AA	Aring
+306	ae	AE		\AE	AE
+307	82	,C		\c{C}	Ccedilla
+310	e9	`E		\`{E}	Egrave
+311	83	'E		\'{E}	Eacute
+312	e6	^E		\^{E}	Ecircumflex
+313	e8	"E		\"{E}	Ediaeresis
+314	ed	`I		\`{I}	Igrave
+315	ea	'I		\'{I}	Iacute
+316	eb	^I		\^{I}	Icircumflex
+317	ec	"I		\"{I}	Idiaeresis
+320	22	"		\mbox{\char'015\char'015}	Second [nonISO, should be Eth]
+321	84	~N		\~{N}	Ntilde
+322	f1	`O		\`{O}	Ograve
+323	ee	'O		\'{O}	Oacute
+324	ef	^O		\^{O}	Ocircumflex
+325	cd	~O		\~{O}	Otilde
+326	85	"O		\"{O}	Odiaeresis
+327		xx		$\times$	Multiply
+330	af	/o		\O	Oslash
+331	f4	`U		\`{U}	Ugrave
+332	f2	'U		\'{U}	Uacute
+333	f3	^U		\^{U}	Ucircumflex
+334	86	"U		\"{U}	Udiaeresis
+335		`y		\`{y}	Yacute
+336	27	'		\char'015	Minute [nonISO, should be Thorn]
+337	a7	ss		\ss	Ssharp
+340	88	`a		\`{a}	Agrave
+341	87	'a		\'{a}	Aacute
+342	89	^a		\^{a}	Acircumflex
+343	8b	~a		\~{a}	Atilde
+344	8a	"a		\"{a}	Adiaeresis
+345	8c	0a		\aa	Aring
+346	be	ae		\ae	Ae
+347	8d	,c		\c{c}	Ccedilla
+350	8f	`e		\`{e}	Egrave
+351	8e	'e		\'{e}	Eacute
+352	90	^e		\^{e}	Ecircumflex
+353	91	"e		\"{e}	Ediaeresis
+354	93	`i		\`{\i}	Igrave
+355	92	'i		\'{\i}	Iacute
+356	94	^i		\^{\i}	Icircumflex
+357	95	"i		\"{\i}	Idiaeresis
+360		-d		\char'250	Eth
+361	96	~n		\~{n}	Ntilde
+362	98	`o		\`{o}	Ograve
+363	97	'o		\'{o}	Oacute
+364	99	^o		\^{o}	Ocircumflex
+365	9b	~o		\~{o}	Otilde
+366	9a	"o		\"{o}	Odiaeresis
+367	d6	-:		$\div$	Division
+370	bf	/o		\o	Oslash
+371	9d	`u		\`{u}	Ugrave
+372	9c	'u		\'{u}	Uacute
+373	9e	^u		\^{u}	Ucircumflex
+374	9f	"u		\"{u}	Udiaeresis
+375		'y		\'{y}	Yacute
+376		th		\char'250	Thorn
+377	d8	"y		\"{y}	Ydiaeresis
+#
+# The following are non-ISO characters
+#
+	a5	oo		\char'267	Bullet
+	aa	tm			Trademark
+	ad	/=		$\neq$	Notequal
+	b0	8		$\infty$	Infinite
+	b2	_<		$\leq$	Lessequal
+	b3	_>		$\geq$	Greaterequal
+	b6	d		$\delta$	delta
+	b7	S		$\Sigma$	Sigma
+	b8	Pi		$\Pi$	Pi
+	b9	pi		$\pi$	pi
+	bd	O		$\Omega$	Omega
+	c3	V		$\surd$	Root
+	c4	f		\char'246	Florin
+	c6	D		$\Delta$	Delta
+	c9	..		\char'274	Elipses
+	ce	OE		\char'036	OE
+	cf	oe		\char'033	oe
+#	d0	-		\char'261	Endash
+	d1	_		\char'320	Emdash
+	d2			\char'252	Openquote
+	d3			\char'272	Closequote
+	d4			\char'140	Opensinglequote
+	d5			\char'047	Closesinglequote
+	d7			$\Diamond$	Diamond
+
+# Emacs support--
+# Local Variables:
+# mode:text
+# eval:(auto-fill-mode -1)
+# eval:(headers)
+# End:

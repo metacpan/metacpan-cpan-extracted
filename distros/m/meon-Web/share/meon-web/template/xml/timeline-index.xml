@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns="http://web.meon.eu/" xmlns:w="http://web.meon.eu/">
+
+<meta>
+    <redirect>{$TIMELINE_NEWEST}/</redirect>
+</meta>
+
+<content><div xmlns="http://www.w3.org/1999/xhtml">
+</div></content>
+
+</page>

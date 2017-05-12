@@ -1,0 +1,159 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use 5.010;
+
+use Getopt::Long;
+use Pod::Usage;
+use Path::Class 'dir';
+use meon::Web::Config;
+use meon::Web::env;
+use meon::Web::Util;
+use Spreadsheet::ParseExcel;
+use meon::Web::Data::CategoryProduct;
+
+exit main();
+
+sub main {
+    my $help;
+    my $hostname_dir;
+    my $master_category;
+    GetOptions(
+        'help|h'              => \$help,
+        'hostname-dir|d=s'    => \$hostname_dir,
+        'master-category|m=s' => \$master_category,
+    ) or pod2usage;
+    pod2usage if $help;
+    pod2usage unless $hostname_dir;
+
+    meon::Web::env->clear;
+    meon::Web::env->hostname_dir(
+        dir(
+            meon::Web::SPc->srvdir, 'www', 'meon-web', $hostname_dir
+        )
+    );
+
+    my $filename = shift(@ARGV);
+    pod2usage unless $filename;
+
+    my $parser   = Spreadsheet::ParseExcel->new();
+    my $workbook = $parser->parse($filename);
+
+    if ( !defined $workbook ) {
+        die $filename.' '.$parser->error(), ".\n";
+    }
+
+    my @ws_items_all = $workbook->worksheets();
+
+    my @all_categories;
+    foreach my $ws_items (@ws_items_all) {
+        my $worksheet = $ws_items;
+        my $worksheet_name = $worksheet->get_name;
+        my ( $row_min, $row_max ) = $worksheet->row_range();
+        my ( $col_min, $col_max ) = $worksheet->col_range();
+
+        my %cident_to_col;
+        my %col_to_cident;
+        for my $row ( $row_min .. $row_min ) {
+            for my $col ( $col_min .. $col_max ) {
+                my $cell = $worksheet->get_cell( $row, $col );
+                next unless $cell;
+                $cident_to_col{meon::Web::Util->fix_cell_value($cell)} = $col;
+                $col_to_cident{$col} = meon::Web::Util->fix_cell_value($cell);
+            }
+        }
+
+        my $is_missing = 0;
+        foreach my $req_column (qw(ordering-ident ident title)) {
+            warn 'missing mandatory column '.$req_column.' in '.$worksheet_name
+                unless exists $cident_to_col{$req_column};
+        }
+        next if $is_missing;
+
+        my $current_category;
+        my @sub_category_products;
+        for my $row ( $row_min+1 .. $row_max ) {
+            my %row_data;
+            for my $col ( $col_min .. $col_max ) {
+                my $ident = $col_to_cident{$col};
+                next unless $ident;
+
+                my $cell = $worksheet->get_cell( $row, $col );
+                next unless $cell;
+
+                if ($ident eq 'part') {
+                    $row_data{$ident} //= [];
+                    push(@{$row_data{$ident}}, meon::Web::Util->fix_cell_value($cell));
+                }
+                else {
+                    $row_data{$ident} = meon::Web::Util->fix_cell_value($cell);
+                }
+            }
+            next unless $row_data{ident};
+
+            my $ident            = meon::Web::Util->to_ident($row_data{'ident'});
+            my $ordering_ident   = $row_data{'ordering-ident'};
+            my $title            = $row_data{'title'};
+            my $category_product = meon::Web::Data::CategoryProduct->new(
+                ident => $ident,
+            );
+            $category_product->set_element('title' => $title);
+            if ($ordering_ident) {
+                $category_product->set_element('ordering-ident' => $ordering_ident);
+                $category_product->set_element('description'    => 'TODO')
+                    unless $category_product->get_element('description');
+                $category_product->store();
+                push(@sub_category_products,$ident);
+            }
+            else {
+                if ($current_category) {
+                    $current_category->set_sub_category_products_element(
+                        'subcategory-products' => \@sub_category_products
+                    );
+                    @sub_category_products = ();
+                    $current_category->store();
+                }
+                $current_category = $category_product;
+                push(@all_categories,$ident);
+            }
+        }
+        if ($current_category) {
+            $current_category->set_sub_category_products_element(
+                'subcategory-products' => \@sub_category_products
+            );
+            @sub_category_products = ();
+            $current_category->store();
+        }
+    }
+
+    say 'all categories:';
+    foreach my $cat (@all_categories) {
+        say $cat;
+    }
+    if ($master_category) {
+        my $category_product = meon::Web::Data::CategoryProduct->new(
+            ident => $master_category,
+        );
+        $category_product->set_sub_category_products_element(
+            'subcategory-products' => \@all_categories
+        );
+        $category_product->store;
+    }
+
+    return 0;
+}
+
+=head1 NAME
+
+meon-web-generate-product-categories - generate products and categories from spreadsheet
+
+=head1 SYNOPSIS
+
+    meon-web-generate-product-categories --hostname-dir my-b2b-web --master-category cat import.xls
+
+=head1 DESCRIPTION
+
+
+=cut

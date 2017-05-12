@@ -1,0 +1,224 @@
+
+=encoding utf-8
+
+=head1 NAME
+
+macro::JA - マクロプロセッサ
+
+=head1 SYNOPSIS
+
+	use macro add => sub{ $_[0] + $_[1] };
+	say add(1, 3); # it's replaced into 'say do{ (1) + (3) };'
+
+	use macro sum => sub{ my $sum=0; for my $v(@_){ $sum+=$v }; $sum };
+	say sum(1, 2, 3); # => 6
+
+	use macro my_if => sub{ $_[0] ? $_[1] : $_[2] };
+	my_if( 0, print('true'), print('false') ); # only 'false' is printed
+
+	# or compile only
+	$ perl -c Module.pm # makes Module.pmc
+
+
+=head1 DESCRIPTION
+
+C<macro>プラグマはCのプリプロセッサに似たマクロを提供する。
+このマクロを呼び出すと，マクロのコードをマクロの呼び出し元に展開され，
+関数呼び出しを伴わずにコードが実行される。このマクロ展開はコンパイル時に
+ソースフィルタリングメカニズムを通して行われる。また，ソースコードの解析にはC<PPI>
+を用いている。
+
+このマクロの呼び出しは非常に高速だが，Cプリプロセッサのマクロと同じ制限もある。たとえば，
+マクロの中でC<return()>を呼ぶと期待通りには動作しない。マクロの定義は関数
+の宣言のようにに見えるが，実際には関数のように動作するわけではない。
+
+マクロが展開される様子は，環境変数C<PERL_MACRO_DEBUG>にC<2>を指定することに
+よって知ることができる。
+
+なお，マクロはレキシカルスコープである。
+
+=head2 MACRO CALL
+
+マクロの呼び出しは関数の呼び出しに似ており，マクロの名前の後に括弧で括った引数
+リストを付けて呼び出す。引数リストの括弧を省略することはできない。
+
+C<&>を付けた関数呼び出しやアロー演算子によるメソッド呼び出しははマクロ呼び出しとは見做されないが，
+間接オブジェクト構文によるメソッド呼び出しはマクロ呼び出しと区別がつかず，誤って展開される可能性がある。
+
+なお，PPIの制限により，ダブルクォートの中の式展開や，C<s/regex/expr/e>の式展開は
+パースされず，その結果マクロの展開も行われない。
+
+
+=head2 MACRO ARGUMENTS
+
+マクロの展開はCプリプロセッサに似ている。
+
+マクロの定義において，C<@_>やC<$_[0]>によってマクロの実引数を参照できる。
+たとえば，C<$_[0]>はマクロ呼び出しの第一引数に置き換えられる。
+これは関数の引数に似ているが，実体はまったく異なり，C<@_>のようなトークンを
+実際の値に置き換えている。このとき，C<$_[0]>というのはこれで単一のトークン
+として扱われ，添字として使えるのは単純な数値だけである。たとえば，C<$_[$i]>は
+マクロの引数としては扱われず，マクロを呼び出した関数の引数を参照する。
+
+Cプリプロセッサのマクロと同じく，C<$_[0]>などのプレースホルダを参照しなければ
+実引数は評価されず，プレースホルダを複数回参照すれば，実引数は複数回評価される。
+
+また，Cプリプロセッサと違い，プレースホルダによって置き換えられる実引数
+は常に単項プラス演算子が前に置かれ，括弧で囲まれる（つまりC<+(expr)>となる）。
+これは以下のようなマクロ定義を正しくおこなうためである。
+
+	use macro say => sub{ print @_, "\n" };
+	say('Hello, world!');
+
+この引数のプレースホルダC<@_>は以下のように置き換えられる。
+
+	print +('Hello, world!'), "\n";
+
+引数の扱いでは実行時のコンテキストが考慮されず，Cプリプロセッサのように
+扱う点でも関数の呼び出しとは異なる。
+
+	use macro my_each => sub{ foreach ($_[0]) { $_[1] } };
+	my_each( (@a, @b, @c), say($_) );
+
+これは以下のように置き換えられる。
+
+	foreach ( +(@a, @b, @c) ){ +(say($_)) }
+
+また，ダブルクォートの中のプレースホルダ(@_)は置き換えられない。
+以下のマクロのC<@_>は展開されず，マクロの呼び出し元の引数が参照される。
+
+	use macro println => sub{ print "@_\n" }; # おそらく予想外の挙動
+
+マクロの中ではC<package>やプラグマの効果はなく，常に呼び出し元の環境の下で実行される。
+
+=head2 BACKEND MODULE
+
+このモジュールのバックエンドとして，C<macro::filter>とC<macro::compiler>が
+存在する。デフォルトのバックエンドはC<macro::compiler>だが，
+環境変数C<PERL_MACRO_DEBUG>にC<1>を設定することで，C<macro::filter>の
+使用を強制できる。
+
+C<macro::filter>はソースフィルタとして働くため，スクリプトをロードする度に
+マクロ展開を行うが，余計なファイルを作成しない。
+
+C<macro::compiler>はC<Module::Compile>に似たスクリプトコンパイラとして動作し，
+ファイルの末尾にC<c>が付加されたスクリプトファイルを生成する
+（たとえば，C<Foo.pm>からはC<Foo.pmc>が作られる）。PerlのC<use Foo>
+ディレクティブはC<Foo.pmc>が存在すればC<Foo.pmc>を読み込むので，コンパイル済み
+のスクリプトファイルは常に高速に動作する。また，コンパイルされたファイルは，
+オリジナルファイルの修正時間(mtime)に基づくチェックを行い，自動的に再コンパイル
+を行う。
+オリジナルファイルはコンパイル済みファイルと同じディレクトリにあると仮定され，
+オリジナルファイルが見つからない場合はいかなるチェックも行われない。
+
+perlを-cスイッチと共に使うことで，C<macro::compiler>によるコンパイルのみを行う
+こともできる。
+
+バックエンドモジュールをロード後に変更することはできないが，バックエンド
+モジュールを直接C<use>することはできる。
+
+実行時の速度はどちらのバックエンドも変わらない。
+
+=head2 PMC Support
+
+C<macro>を使うモジュールは，C<Module::Install::PMC>を使ってインストールの前にモジュールをコンパイルすることができる。
+そのためには，C<Makefile.PL>に以下のように書けばよい。
+
+	use inc::Module::Install;
+	...
+	build_requires 'macro';
+	pmc_support;
+	...
+
+L<Module::Compile>とL<Module::Install::PMC>も参照せよ。
+
+=head1 METHODS
+
+=head2 macro->backend()
+
+バックエンドモジュールの名前を返す。
+これはC<macro::filter>かC<macro::compiler>である。
+
+C<macro::compiler>バックエンドによってコンパイルされたファイルは，C<macro.pm>
+をロードしないため，C<<macro->backend()>>を呼び出すことができないので注意せよ。
+
+=head2 macro->new()
+
+マクロプロセッサのインスタンスC<$macro>を返す。
+
+C<new()>, C<defmacro()>, C<process()>はバックエンドモジュールを
+実装するためのメソッドである。
+
+=head2 $macro->defmacro(name => sub{ ... })
+
+マクロプロセッサI<$macro>にマクロを定義する。
+
+=head2 $macro->process($source)
+
+PerlソースコードI<$source>を受け取り，マクロ展開を行ったソースコードを返す。
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head2 PERL_MACRO_DEBUG=value
+
+デバッグモードを設定する。
+
+この値を指定しないか0であれば，C<macro::compiler>がバックエンドとして使われる。
+
+この値が1より大きければ，C<macro::filter>がバックエンドとして使われる。
+
+この値が2より大きければ，マクロの展開の様子がC<STDERR>に出力される。
+
+=head1 INSTALL
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+=head1 DEPENDENCIES
+
+=over 4
+
+=item *
+
+Perl 5.8.1 or later.
+
+=item *
+
+C<PPI> - Perl parser.
+
+=item *
+
+C<Filter::Util::Call> - Source filter utility.
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+C<bug-macro@rt.cpan.org/>, or through the web interface at
+L<http://rt.cpan.org/>.
+
+=head1 SEE ALSO
+
+L<macro::filter> - macro.pm source filter backend.
+
+L<macro::compiler> - macro.pm compiler backend.
+
+=head1 AUTHOR
+
+Goro Fuji E<lt>gfuji(at)cpan.orgE<gt>.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2008-2009, Goro Fuji E<lt>gfuji(at)cpan.orgE<gt>. Some rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

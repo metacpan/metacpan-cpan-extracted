@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use Path::Class 'dir';
+use meon::Web::Config;
+use meon::Web::env;
+
+exit main();
+
+sub main {
+    my $help;
+    GetOptions(
+        'help|h'  => \$help,
+    ) or pod2usage;
+    pod2usage if $help;
+
+    my $now = DateTime->now(time_zone=>'local');
+    foreach my $hostname_dir (keys %{meon::Web::Config->get->{domains} || {}}) {
+        meon::Web::env->clear;
+        meon::Web::env->hostname_dir(
+            dir(
+                meon::Web::SPc->srvdir, 'www', 'meon-web', $hostname_dir
+            )
+        );
+
+        foreach my $member (meon::Web::env->all_members) {
+            next unless $member->is_active;
+            my $expires = $member->expires;
+            next unless $expires;
+
+            $member->user->set_status('expired')
+                if $expires < $now;
+        }
+    }
+
+    return 0;
+}
+
+=head1 NAME
+
+meon-web-expire-members - loops through all members and marks expired
+
+=head1 SYNOPSIS
+
+    meon-web-expire-members
+
+=head1 DESCRIPTION
+
+
+=cut

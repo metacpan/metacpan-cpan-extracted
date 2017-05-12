@@ -1,0 +1,113 @@
+.i  adding-fonts.txt -- 		-*-mh_doc-*-
+
+.i  RCS Info        : $Id$
+.i  Author          : Johan Vromans
+.i  Created On      : Wed Jan  1 18:01:16 2003
+.i  Last Modified By: Johan Vromans
+.i  Last Modified On: Fri Jan  3 17:00:19 2003
+.i  Update Count    : 25
+.i  Status          : Unknown, Use with caution!
+
+Note: XX
+Title:  Adding LaTeX Fonts for MMDS
+----
+
+      MMDS uses LaTeX for typesetting, so all normal LaTeX fonts can
+      be used through MMDS. Also, the standard LaTeX tools for font
+      manipulation can be used to add new fonts. In particular, adding
+      Type1 fonts is rather trivial using the ªtªfontinstª~tª
+      utilityªfªVersion 1.800 or later.ª~fª.
+
+      For example, to add a set of Garamond Type1 fonts, get the metrics
+      files and name them according to TeX conventions:
+
+      [literal]
+      cp Garamond-Regular.afm    pgmr8a.afm
+      cp Garamond-Italic.afm     pgmri8a.afm
+      cp Garamond-Bold.afm       pgmb8a.afm
+      cp Garamond-BoldItalic.afm pgmbi8a.afm
+      [end literal]
+
+      Next, run ªtªfontinstª~tª:
+
+      [literal]
+      tex fontinst.sty '\latinfamily{pgm}{} \bye'
+      [end literal]
+
+      Create the metrics for TeX:
+
+      [literal]
+      for f in *.pl;  do pltotf $f; done
+      for f in *.vpl; do vptovf $f; done
+      rm -f pgm*.pl pgm*.vpl pgm*.mtx
+      [end literal]
+
+      ªtªdvipsª~tª needs the following information:
+
+      [screen]
+      pgmr8r  Garamond-Regular    "TeXBase1Encoding ReEncodeFont" <[8r.enc <pgmr8a.pfb
+      pgmri8r Garamond-Italic     "TeXBase1Encoding ReEncodeFont" <[8r.enc <pgmri8a.pfb
+      pgmb8r  Garamond-Bold       "TeXBase1Encoding ReEncodeFont" <[8r.enc <pgmb8a.pfb
+      pgmbi8r Garamond-BoldItalic "TeXBase1Encoding ReEncodeFont" <[8r.enc <pgmbi8a.pfb
+      [end literal]
+
+      This is all described in the extensive ªtªfontinstª~tª
+      documentation.
+
+      If, however, you want to use iso-8859-15 (Latin9) input
+      encoding because of the Euro symbol, the situation becomes a
+      little more complex. 
+
+      MMDS supports iso-8859-1 and iso-8859-15 character sets by using
+      LaTeX font encodings T1 (Extended TeX Font Encoding) and TS1
+      (TeX Text Companion Symbols). The real symbols in the font, the
+      glyphs, are encoded using TeXBase1Encoding. Only the glyphs that
+      are encoded this way are available to the program. And currently
+      (January 2003) the Euro is not part of this encoding.
+
+      ªtªfontinstª~tª version 1.900 or later supports fonts with a
+      Euro symbol by adding it to the TeXBase1Encoding. If you have
+      that version you should be okayªfªTo check this, look for the
+      text "\setslot{Euro}" in file ªtª8r.etxª~tª. '8r' is the
+      internal mnemonic code for TeXBase1Encoding.ª~fª. If not, and
+      you cannot upgrade, well, you need to perform some trickery.
+
+      There is an alternative to the TeXBase1Encoding, called TeX
+      Typewriter and Windows ANSI (short: TeXnANSIEncoding, menmonic
+      code '8y'). TeXnANSIEncoding provides access to the Euro symbol
+      since 1998, but unfortunately ªtªfontinstª~tª version 1.801 does
+      not yet have the Euro symbol available in the appropriate file,
+      ªtª8y.etxª~tª. To use the Euro symbol you need to patch this
+      file first. Copy it to the current directory and locate the line
+
+      [literal]
+      \nextslot{4}
+      [end literal]
+
+      Insert the following text ªiªbeforeª~iª this line:
+
+      [literal]
+      \nextslot{1}
+      \setslot{Euro}
+        \comment{The european currency symbol `\texteuro'.}
+      \endsetslot
+      [end literal]
+
+      To run the necessary ªtªfontinstª~tª commands, create a file
+      called ªtªfontinst.rcª~tª with contents:
+
+      [literal]
+      \def\raw_encoding{8y}
+      [end literal]
+
+      You can now run ªtªfontinstª~tª as usual.
+
+      Upon completion, generate the LaTeX metrics as described above. 
+      The information for ªtªdvipsª~tª now becomes:
+
+      [screen]
+      pgmr8y  Garamond-Regular    "TeXnANSIEncoding ReEncodeFont" <[texnansi.enc <pgmr8a.pfb
+      pgmri8y Garamond-Italic     "TeXnANSIEncoding ReEncodeFont" <[texnansi.enc <pgmri8a.pfb
+      pgmb8y  Garamond-Bold       "TeXnANSIEncoding ReEncodeFont" <[texnansi.enc <pgmb8a.pfb
+      pgmbi8y Garamond-BoldItalic "TeXnANSIEncoding ReEncodeFont" <[texnansi.enc <pgmbi8a.pfb
+      [end literal]

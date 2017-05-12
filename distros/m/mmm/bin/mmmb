@@ -1,0 +1,115 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Pod::Usage;
+use Getopt::Long;
+use MMM::Batch;
+use Mail::Send;
+use MMM::Config;
+
+=head1 NAME
+
+mmm - Mmm Mirror Manager
+
+=head1 SYNOPSIS
+
+    mmm <configfile> [<action>]
+    mmm <configfile> <status|lmirror|run>
+    mmm <configfile> run <mirrored_path>
+
+=head1 DESCRIPTION
+
+mmm is a tools to easilly manage multiple mirroring.
+
+Without any specified action, mmm will run all rync job needing
+to be run according the config file given as first argument.
+
+List of action:
+
+=head2 run
+
+run is the default action.
+An optionnal list of path can be passed, then they will proceed immediatelly
+one by one. Otherwise, all queue needing to be run are proceed.
+
+=head2 lmirror
+
+List all queue and setup mirror in order of their prioriy according the
+configuration.
+
+=head2 status
+
+Print a status for all path, including the last processing and the next
+planned.
+
+=cut
+
+my $verbosity;
+
+GetOptions(
+    'at-requeue' => \my $forcequeue,
+    'mailto=s'   => \my $mailto,
+    'nomail'     => \my $nomail,
+    'v'          => sub {
+        if (defined($verbosity)) {
+            $verbosity++
+        } else { 
+            $verbosity = VERBOSITY + 1 
+        }
+    },
+    's'          => sub {
+        if (defined($verbosity)) {
+            $verbosity++
+        } else { 
+            $verbosity = VERBOSITY - 1 
+        }
+    },
+    'source=s'   => \my $source,
+    'config|c=s' => \my $configfile,
+    'dry-run'    => \my $dryrun,
+    'nofork'     => \my $nofork,
+) or pod2usage();
+
+my ( $mailmessage );
+
+my $mmm = MMM::Batch->new(
+    configfile => $configfile,
+    verbosity  => $verbosity,
+    dryrun     => $dryrun,
+    nofork     => $nofork,
+) or pod2usage();
+
+$mmm->check_config() or die "MMM setup error\n";
+
+exit(!$mmm->run());
+
+__END__
+
+=head1 SEE ALSO
+
+L<mmmb>
+
+=head1 AUTHOR
+
+Olivier Thauvin <nanardon@nanardon.zarb.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006 Olivier Thauvin
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+=cut

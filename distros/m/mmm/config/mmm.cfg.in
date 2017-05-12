@@ -1,0 +1,89 @@
+# Common and default value
+[default]
+# directory containing xml mirror list
+mirrordir = @SYSCONFDIR@/mmm
+
+# URL from which to fetch mirror list
+remote_mirrorlist = http://mmm.zarb.org/lists/mirrors.xml
+
+# directory where lock files are stored
+statedir = @LOCALSTATEDIR@/mmm
+
+pidfile = /var/run/mmm.pid
+
+# how many rsync in same time ? (0 mean everything in same time)
+# parallel = 2
+
+# Path to ssh for mirror using ssh
+# ssh_path = ssh
+
+# path to a mirror list self generated
+# publish_list =
+
+# This list can include another predefined
+# add_to_publish_list =
+
+# when using --batch, the mail address where to send error
+# default use $USER env variable
+# mailto =
+
+# Each section describe a mirror process
+# section name is the destination directory
+[name]
+# where the mirror is done
+path = /any/path/
+
+# the mirror source to use
+# source = foo
+
+# url when using a single mirror
+url = rsync://host/share/
+
+# Should we use ssh
+# rsync_use_ssh = 0
+
+# is this queue disable
+# disable = 0
+
+# if we mirror only a subdirectory
+# subdir =
+
+# the mirror level we want to be,
+# mean all mirror with level >= will not be used
+# level = 5
+
+# time between two rsync for each tree in minutes
+# period = 120
+
+# Wait x minutes after last end
+# waitafter = 0
+
+# Wait x minutes after last success end
+# waitaftersuccess = 0
+
+# delete removed files ?
+delete = yes
+
+# we'll run rsync with --delete-after
+delete-after = 1
+
+# delete excluded file ? see exclude also
+# delete-excluded = 0
+
+# How long we prefer to stay unsync to not use another mirror (in minutes)
+# failure_time =
+
+# set rsync timeout, default to 150, 0 to disable
+# timeout = 150
+
+# arbitraty options to add to rsync
+# rsync_opts =
+
+# Url to announce if this mirror provide rsync access
+# announce =
+
+# should job be queue with at
+# use_at = no
+
+# mmm path if not in $PATH
+# mmm =

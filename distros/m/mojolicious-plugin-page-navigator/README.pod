@@ -1,0 +1,72 @@
+=head1 NAME
+
+Mojolicious::Plugin::PageNavigator - Page Navigator plugin for Mojolicious
+
+=head1 SYNOPSIS
+
+  # Mojolicious::Lite
+  plugin 'page_navigator'
+
+  # Mojolicious
+  $self->plugin( 'page_navigator' );
+
+=head1 DESCRIPTION
+
+L<Mojolicious::Plugin::PageNavigator> generates standard page navigation bar, like 
+  
+<<  1  2 ... 11 12 13 14 15 ... 85 86 >>
+
+=head1 HELPERS
+
+=head2 page_navigator
+
+  %= page_navigator( $current_page, $total_pages, $opts );
+
+=head3 Options
+
+Options is a optional ref hash.
+
+  %= page_navigator( $current_page, $total_pages, {
+      round => 4,
+      outer => 2,
+      class => 'number',
+      param => 'page' } );
+
+=over 1
+
+=item round
+
+Number of pages arround the current page. Default: 4.
+
+=item outer
+
+Number of outer window pages (first and last pages). Default 2.
+
+=item class
+
+Class for each page number element. Default: 'number'
+
+=item param
+
+Name of param for query url. Default: 'page'
+
+=back
+
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+
+=head1 DEVELOPMENT
+
+=head2 Repository
+
+    https://github.com/silvioq/mojolicious-page-navigator
+
+=head1 COPYRIGHT
+
+Copyright (C) 2011, Silvio Quadri
+
+This program is free software, you can redistribute it and/or modify it
+under the terms of the Artistic License version 2.0.
+
+=cut

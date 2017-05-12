@@ -1,0 +1,80 @@
+{
+   "abstract" : "simplified clone of smartmatch operator",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "match-simple",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "match::simple::XS" : "0.001"
+         },
+         "requires" : {
+            "Exporter::Tiny" : "0.026",
+            "List::Util" : "1.33",
+            "Scalar::Util" : "0",
+            "Sub::Infix" : "0.004",
+            "perl" : "5.006001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "match::simple" : {
+         "file" : "lib/match/simple.pm",
+         "version" : "0.010"
+      },
+      "match::smart" : {
+         "file" : "lib/match/smart.pm",
+         "version" : "0.010"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=match-simple"
+      },
+      "homepage" : "https://metacpan.org/release/match-simple",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-match-simple.git",
+         "web" : "https://github.com/tobyink/p5-match-simple"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/match-simple/project"
+   },
+   "version" : "0.010",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

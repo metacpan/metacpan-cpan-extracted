@@ -1,0 +1,223 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+ <head>
+  <title>cgi-mailer: an easy to use form-to-email gateway
+ </title>
+  <link rev="made" href="mailto:gleeson@unimelb.edu.au">
+  <meta name="keywords" content="cgi-mailer, HTML forms, email
+     form-to-email gateway, user documentation, Martin Gleeson">
+  <meta name="description" content="cgi-mailer user documentation.">
+ </head>
+ <body bgcolor="#FFFFFF">
+ <!-- ===================================================================== -->
+ <hr size="2" noshade>
+ <table border="0" width="100%" cellpadding="5" cellspacing="3">
+  <tr align="center" valign="middle">
+   <td><h1>cgi-mailer: an easy to use form-to-email gateway</h1>
+  </td>
+   <td><a href="http://www.unimelb.edu.au/cgi-mailer/"><img
+       src="cgi-mailer-logo.gif" border="0" hspace="5" vspace="5"
+       alt=" [cgi-mailer] " width="220" height="40"></a>
+  </td>
+ </tr>
+</table>
+ <!-- ===================================================================== -->
+ <hr size="2" noshade>
+ <h2>User Documentation
+</h2>
+ <!-- ===================================================================== -->
+ <hr size="1" noshade>
+ <h3>Requirements
+</h3>
+ <p>All you need is your html form, a format file and (optionally) a
+    response file.
+</p>
+ <!-- ===================================================================== -->
+ <hr size="1" noshade>
+ <h3>Instructions
+</h3>
+ <ol>
+  <li><p>Your html form must have two hidden input fields, named
+      'destination' and 'subject'. The 'destination' field will have the
+      email address where the email is to be sent, and the 'subject' field
+      will contain the subject for the email message.</p>
+ </li>
+  <li><p>Other message headers can be set using inputs of the form
+      <tt>header:&lt;header-name&gt;</tt> For example, to set the
+      <b>Reply-To:</b> header, use the html &lt;input
+      name=&quot;header:Reply-To&quot; value=&quot;j.smith@domain.com&quot;
+      type=&quot;hidden&quot;&gt;.</p>
+  </li>
+   <li><p>The format file is essentially the body of the email message
+      to be sent. Form fields that you want in the email message
+      just need to have a '$' pre-pended to them. i.e. a form field
+      of 'name' will become '$name' in the format file.</p>
+  </li>
+   <li><p>The ACTION attribute of the FORM tag should be set to
+      <tt>http://<i>your-local-host</i>/cgi-bin/cgi-mailer.pl</tt>, and
+      the METHOD should be POST.</p>
+  </li>
+   <li><p>The format file must be in the same directory as the HTML form,
+       and with the same name as the form, but with an extension of '.data'
+       instead of '.html'. e.g. If your form is 'myform.html', then your
+       format file must be called 'myform.data'.</p>
+  </li>
+   <li><p>The response file must be in the same directory as the HTML form,
+       and with the same name as the form, but with an extension of '.response'
+       instead of '.html' (as with '.data' above). The response file will
+       contain the html page you be returned to the user upon successful
+       completion of the form. It can also contain the same fields as the
+       format file (i.e. use $name to display fields that the user filled
+       out).</p>
+  </li>
+   <li><p>If you wish to make the filling out of some fields in your
+       form mandatory, you can add a &quot;required&quot; file. Create
+       a file called 'myform.required', containing one or more lines
+       of <tt>field-name&lt;tab&gt;Description</tt>. Each field name
+       will be checked against the input to see if it isn't empty. If
+       it is, an error will be shown using the Description to instruct
+       the user to fill in that particular field.</p>
+  </li>
+   <li><p>If you don't wish to send an email message, and only want to
+       format and show the response file, include an input field of
+       the name <tt>nodata</tt> set to the value <tt>true</tt>.<br>
+       e.g. <tt>&lt;input name=&quot;nodata&quot; value=&quot;true&quot;
+       type=&quot;hidden&quot;&gt;</tt><br> In this situation, you don't
+       need a format (<tt>.data</tt>) file, just a response file.</p>
+  </li>
+   <li><p>If you want to use an index file for your form (i.e. where the
+       URL of the page ends in '/'), you will need to include a hidden
+       field which specifies the name of the index file:<br>
+       i.e. <tt>&lt;input name=&quot;index-file&quot;
+       value=&quot;index.html&quot; type=&quot;hidden&quot;&gt;</tt><br>
+       You can replace &quot;index.html&quot; with the appropriate
+       filename.</p>
+  </li>
+   <li><p>You might also like to add a hidden field that contains the
+       absolute URL of the form. This will assist users whose browsers
+       or proxy servers don't send or remove the Referer header (which
+       CGI-Mailer relies upon). This field <em>must</em> be called
+       <tt>CgiMailerReferer</tt>.<br>
+       e.g. <tt>&lt;input name=&quot;CgiMailerReferer&quot;
+       value=&quot;http://www.foo.com/forms/feedback.html&quot;
+       type=&quot;hidden&quot;&gt;</tt><br>
+       You can replace &quot;http://www.foo.com/forms/feedback.html&quot;
+       with the appropriate URL.</p>
+  </li>
+   <li><p>You can reproduce CGI environment variables in the email message
+       and response page by simply referring to them directly. e.g.
+       <tt>$ENV{'REMOTE_HOST'}</tt></p>
+ </li>
+   <li><p>[Note: users with inferior and/or broken operating systems that
+       only allow 8.3 filenames can use <tt>.htm</tt>, <tt>.dat</tt>,
+       <tt>.res</tt> &amp; <tt>.req</tt> extensions.]</p>
+  </li>
+</ol>
+ <!-- ===================================================================== -->
+ <hr size="1" noshade>
+ <p>Example HTML form:</p>
+ <p><tt>&lt;HTML&gt;&lt;HEAD&gt;&lt;TITLE&gt;Test Form&lt;/TITLE&gt;&lt;/HEAD&gt;<br>
+    &lt;BODY&gt;<br>
+    &lt;H1&gt;Enter some values:&lt;/H1&gt;<br>
+    &lt;FORM METHOD=&quot;POST&quot; ACTION=&quot;http://<i>your-local-host</i>/cgi-bin/cgi-mailer.pl&quot;&gt;<br>
+    &lt;INPUT TYPE=&quot;HIDDEN&quot; NAME=&quot;<font color="#FF0000">destination</font>&quot; VALUE=&quot;gleeson@domain.com&quot;&gt;<br>
+    &lt;INPUT TYPE=&quot;HIDDEN&quot; NAME=&quot;<font color="#FF0000">subject</font>&quot; VALUE=&quot;testing cgi-mailer&quot;&gt;<br>
+    &lt;P&gt;<br>
+    &lt;INPUT TYPE=&quot;TEXT&quot; NAME=&quot;<font color="#FF0000">one</font>&quot;   SIZE=&quot;20&quot;&gt;<br>
+    &lt;INPUT TYPE=&quot;TEXT&quot; NAME=&quot;<font color="#FF0000">two</font>&quot;   SIZE=&quot;20&quot;&gt;<br>
+    &lt;INPUT TYPE=&quot;TEXT&quot; NAME=&quot;<font color="#FF0000">three</font>&quot; SIZE=&quot;20&quot;&gt;&lt;BR&gt;<br>
+    &lt;INPUT TYPE=&quot;TEXT&quot; NAME=&quot;<font color="#FF0000">four</font>&quot;  SIZE=&quot;20&quot;&gt;<br>
+    &lt;INPUT TYPE=&quot;TEXT&quot; NAME=&quot;<font color="#FF0000">five</font>&quot;  SIZE=&quot;20&quot;&gt;<br>
+    &lt;INPUT TYPE=&quot;TEXT&quot; NAME=&quot;<font color="#FF0000">six</font>&quot;   SIZE=&quot;20&quot;&gt;&lt;BR&gt;<br>
+    &lt;SELECT NAME=&quot;<font color="#FF0000">list</font>&quot;&gt;&lt;BR&gt;<br>
+    &lt;OPTION VALUE=&quot;red&quot;&gt;Red&lt;/OPTION&gt;<br>
+    &lt;OPTION VALUE=&quot;green&quot; SELECTED&gt;Green&lt;/OPTION&gt;<br>
+    &lt;OPTION VALUE=&quot;blue&quot;&gt;Blue&lt;/OPTION&gt;<br>
+    &lt;/SELECT&gt;<br>
+    &lt;INPUT TYPE=&quot;SUBMIT&quot; VALUE=&quot;Submit&quot;&gt;<br>
+    &lt;/FORM&gt;<br>
+    &lt;/BODY&gt;&lt;/HTML&gt;<br></tt>
+</p>
+ <p>Example format file:
+</p>
+ <p><tt>First Value: <font color="#FF0000">$one</font><br>
+    Third Value: <font color="#FF0000">$three</font><br>
+    --------------------------------<br>
+    Fourth: <font color="#FF0000">$four</font>; Second: <font color="#FF0000">$two</font><br>
+    --------------------------------<br>
+    Fifth: <font color="#FF0000">$five</font>;  Sixth: <font color="#FF0000">$six</font><br>
+    --------------------------------<br>
+    List option: <font color="#FF0000">$list</font><br></tt>
+</p>
+ <!-- ===================================================================== -->
+ <hr size="1" noshade>
+ <p>If the HTML form above is filled out as below, it will result in
+    the following email:
+</p>
+ <!-- ===================================================================== -->
+ <hr size="1" noshade>
+ <h3>Enter some values:</h3>
+ <form method="POST" action="">
+ <p>
+ <input type="TEXT" name="one"   size="20" value="The">
+ <input type="TEXT" name="two"   size="20" value="Cat">
+ <input type="TEXT" name="three" size="20" value="Sat"><br>
+ <input type="TEXT" name="four"  size="20" value="On">
+ <input type="TEXT" name="five"  size="20" value="The">
+ <input type="TEXT" name="six"   size="20" value="Mat"><br>
+ <select name="list">
+ <option value="red">Red</option>
+ <option value="green" selected>Green</option>
+ <option value="blue">Blue</option>
+ </select>
+ <input type="SUBMIT" value="Submit">
+ </form>
+ <!-- ===================================================================== -->
+ <hr size="1" noshade>
+ <p><tt>To: gleeson@domain.com<br>
+    Subject: testing cgi-mailer<br>
+    <br>
+    First Value: The<br>
+    Third Value: Sat<br>
+    --------------------------------<br>
+    Fourth: On; Second: Cat<br>
+    --------------------------------<br>
+    Fifth: The;  Sixth: Mat<br>
+    --------------------------------<br>
+    List option: green<br></tt>
+</p>
+ <!-- ===================================================================== -->
+ <hr size="1" noshade>
+ <p><font color="#FF0000" size="+2">Note:</font> Be sure that the field names
+    in the &quot;.data&quot; and &quot;.response&quot; files are
+    <strong>exactly</strong> the same as those in the &quot;.html&quot; file.
+ </p>
+ <!-- ===================================================================== -->
+ <hr size="2" noshade>
+ <pre>Created:       23 April 1996
+Last modified: 20 May 1999
+Access:        Unrestricted.
+Copyright &#169 1996-1999 <a href="http://www.unimelb.edu.au/">The University of Melbourne.</a>
+&lt;URL:http://www.unimelb.edu.au/cgi-mailer/user-doc.html&gt;</pre>
+ <!-- ===================================================================== -->
+ <hr size="2" noshade>
+ <table border="0" width="100%">
+  <tr>
+   <td>
+     <address>
+     <a href="http://www.unimelb.edu.au/%7Egleeson/">Martin Gleeson,</a>
+     <a href="mailto:gleeson@unimelb.edu.au">gleeson@unimelb.edu.au</a>
+    </address>
+  </td>
+   <td align="RIGHT">
+     <p> <a href="http://www.unimelb.edu.au/html-check/validation-form.html">
+         <img src="valid_html.4.0.gif" border="0"
+              alt="HTML 4.0 Checked!"></a>
+    </p>
+  </td>
+ </tr>
+</table>
+ <!-- ===================================================================== -->
+ <hr size="2" noshade>
+</body>
+</html>

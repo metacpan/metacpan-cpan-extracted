@@ -1,0 +1,31 @@
+2008-06-05 v1.02
+
+    Use $RealBin as the starting point for locating the prefix.
+
+
+
+2008-05-26 v1.01
+
+    Wrong $Etc when lib in parent directory [RT#36188]
+
+
+
+2008-05-23 v1.00
+
+    Exporter tweak for compatibility with older perls.
+
+    Now exports the $Etc variable as well.
+
+    Doc tweaks.
+
+
+
+2008-05-16 v0.02
+
+    Forgot to actually export as documented.
+
+
+
+2008-05-16 v0.01
+
+    Initial version

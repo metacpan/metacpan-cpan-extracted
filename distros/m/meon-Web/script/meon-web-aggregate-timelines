@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use Path::Class 'dir';
+
+use meon::Web::TimelineAggregate;
+
+exit main();
+
+sub main {
+    my $help;
+    my $month = DateTime->now->strftime('%m');
+    my $year = DateTime->now->strftime('%Y');
+    GetOptions(
+        'help|h'  => \$help,
+        'month=s' => \$month,
+        'year=s'  => \$year,
+    ) or pod2usage;
+    pod2usage if $help;
+
+    die 'bad year'
+        if $year !~ m/^20[0-9]{2}$/;
+    die 'bad month (01 02 … 12)'
+        unless ($month =~ m/^[0-9]{2}$/) || $month < 1 || $month > 12;
+
+    my $timeline_dir = shift(@ARGV);
+    pod2usage unless $timeline_dir;
+    my @other_timeline_dirs = @ARGV;
+    @other_timeline_dirs = map { chomp;$_ } (<>)
+        unless @other_timeline_dirs;
+    pod2usage unless @other_timeline_dirs;
+    @other_timeline_dirs = map {
+        dir($_)->subdir($year, $month)
+    } @other_timeline_dirs;
+
+    $timeline_dir = dir($timeline_dir);
+    die 'no such folder '.$timeline_dir
+        unless -e $timeline_dir;
+    my $timeline_sub_dir = $timeline_dir->subdir($year, $month);
+
+    my $aggregate = meon::Web::TimelineAggregate->new(
+        timeline_dir        => $timeline_dir,
+        timeline_sub_dir    => $timeline_sub_dir,
+        other_timeline_dirs => \@other_timeline_dirs,
+    );
+    $aggregate->refresh;
+
+    return 0;
+}
+
+=head1 NAME
+
+meon-web-aggregate-timelines - aggregate timelines into one
+
+=head1 SYNOPSIS
+
+    meon-web-aggregate-timelines NEWS_FOLDER \
+        SRC_FOLDER1 SRC_FOLDER2 SRC3 ...
+
+    ls -d content/members/*/timeline \
+        | meon-web-aggregate-timelines content/members/our/news/
+
+=head1 DESCRIPTION
+
+Merges mutiple timelines and merges them into one.
+
+=cut

@@ -1,0 +1,21 @@
+mocked - use mocked libraries in unit tests
+
+Synopsis:
+
+  # use a fake LWP::Simple for testing from t/lib/LWP/Simple.pm
+  use mocked 'LWP::Simple';
+  my $text = get($url);
+
+
+Often during unit testing, you may find the need to use mocked libraries
+to test edge cases, or prevent unit tests from using slow or external
+code.
+
+This is where mocking libraries can help.
+
+When you mock a library, you are creating a fake one that will be used
+in place of the real one.  The code can do as much or as little as is
+needed.
+
+Use mocked.pm as a safety measure (so it actually loads the right
+module), and as a way to document the tests for future maintainers.

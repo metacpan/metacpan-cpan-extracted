@@ -1,0 +1,32 @@
+NAME
+    match::simple::XS - XS backend for match::simple
+
+SYNOPSIS
+      use match::simple;
+
+DESCRIPTION
+    Nothing to see here; move along.
+
+SEE ALSO
+    match::simple.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+THANKS
+    Thanks to alh, bulk88, rafl, leont, and ilmari on the *#xs* IRC channel
+    for helping me translate a bunch ideas from Perl to XS.
+
+    The XS source code for Scalar::Util was also very useful.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

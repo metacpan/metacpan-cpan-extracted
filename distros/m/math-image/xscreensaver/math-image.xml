@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- Copyright 2012 Kevin Ryde
+
+     This file is part of Math-Image.
+     
+     Math-Image is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License as
+     published by the Free Software Foundation; either version 3, or
+     (at your option) any later version.
+        
+     Math-Image is distributed in the hope that it will be useful, but
+     WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+     General Public License for more details.
+        
+     You should have received a copy of the GNU General Public License
+     along with Math-Image.  If not, see <http://www.gnu.org/licenses/>.
+
+
+     This file normally lives in
+     /usr/share/xscreensaver/config/math-image.xml
+ -->
+
+<screensaver name="math-image" _label="Math-Image">
+
+<command arg="--xscreensaver" />
+<_description> 
+Display random mathematical images.
+See "man math-image" for details.
+
+Sometimes a random image is blank, or just a line across the bottom of
+the screen which looks blank.  The code tries to be both random and
+interesting but doesn't always succeed.  It also may be a bit slow
+sometimes.
+
+The math-image home page is:
+http://user42.tuxfamily.org/math-image/index.html
+</_description>
+
+</screensaver>

@@ -1,0 +1,597 @@
+% $Id: presentation_en.tex 117 2006-07-07 10:02:38Z nanardon $
+%\documentclass[blends,slideColor,colorBG,pdf,ps2pdf]{prosper}
+\documentclass[notes]{beamer}
+\usepackage[frenchb]{babel}
+\usepackage[T1]{fontenc}
+%\usepackage{multicol}
+\usepackage{moreverb}
+\usepackage{amssymb}
+\usepackage[framesassubsections]{beamerprosper}
+
+\mode<presentation>
+{
+  \definecolor{beamerstructure}{RGB}{143,79,112}
+  \definecolor{sidebackground}{RGB}{230,242,250}
+  \color{beamerstructure}
+  \usetheme{Antibes}
+  \usepackage{times}
+  \userightsidebarcolortemplate{\color{sidebackground}}
+  \beamertemplateballitem
+}
+
+
+\title{MMM Mirror Manager}
+\subtitle{How to manage your mirror server}
+\author{Olivier Thauvin}
+%\email{nanardon@nanardon.zarb.org}
+%%\institution{
+%%  \includegraphics*[height=0.3\textheight]{gnutux.eps}
+%%}
+
+%\NoFrenchBabelItemize
+
+\begin{document}
+\frame{\maketitle}
+
+\AtBeginSubsection[]{
+    \frame{
+        \tableofcontents[currentsection,currentsubsection]
+    }
+}
+
+\section{Bases}
+
+\subsection{rsync}
+
+\begin{frame}[fragile]
+\frametitle{rsync}
+Outils qui synchronise des arborescences.
+
+Disponible \verb+http://rsync.samba.org/+
+
+\pause
+\begin{itemize}
+\item client - serveur
+    \begin{itemize}
+    \item tcp/ip: (x)inetd
+    \item encapsulé: rsh ou ssh
+    \end{itemize}
+\pause
+\item minimise les transferts réseau
+\pause
+\item préserve les dates, permissions et liens durs (hard link)
+\pause
+\item possède plein d'options
+\pause
+\item fonctionne sous Windows, Cygwin, Unix
+\end{itemize}
+\end{frame}
+
+\subsection{miroirs}
+
+\begin{frame}
+\frametitle{Miroir, mon beau miroir}
+\begin{itemize}
+\item serveur, accessible
+    \begin{itemize}
+    \item ftp, http
+    \item \textbf{rsync}
+    \end{itemize}
+\item un répertoire et son contenu
+\end{itemize}
+\pause
+On peut résumé (hâtivement) un miroir à une \textbf{url}.
+
+\pause
+\bigskip
+Le but des miroirs est la redistribution de données (codes, base de données)
+à grande échelle.
+\end{frame}
+
+\begin{frame}
+\frametitle{strate de miroirs}
+\begin{itemize}
+\item 0 (primaire)
+    \begin{itemize}
+    \item est rarement le vrai 0
+    \item premier exposé
+    \item normalement unique
+    \item souvent d'accès restreint
+    \end{itemize}
+\pause
+\item 1 (secondaire)
+    \begin{itemize}
+    \item se synchronise sur le niveau 0
+    \item accès non restreint
+    \item nombre plus ou moins limité
+    \end{itemize}
+\pause
+\item les autres: 2, 3, $\infty$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Information relative aux miroirs}
+Au delà de l'url, les données implicites:
+\bigskip
+\begin{itemize}
+\item son niveau dans la hiérarchie
+\pause
+\item sa fréquence de rafraîchissement
+\pause
+\item sa localisation
+    \begin{itemize}
+    \item sur le réseau
+    \item géographique
+    \end{itemize}
+\pause
+\item ses performances (size does matter)
+    \begin{itemize}
+    \item bande passante réseau
+    \item puissance CPU
+    \item accès disques
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\section{But, Problématique}
+
+\subsection{lancer rsync}
+
+\begin{frame}[fragile]
+\frametitle{Lancer rsync}
+\begin{small}
+\begin{verbatim}
+0,15,30,45 * * * * rsync -aqz --delete \
+    rsync://serveur/partage/ \
+    /destination/
+\end{verbatim}
+\end{small}
+\bigskip
+$\Rightarrow$ problème si le rsync dure plus de 15 minutes.%
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Lancer rsync}
+\begin{small}
+\begin{verbatim}
+#!/bin/sh
+[ -f lockfile ] && exit 0
+touch lockfile
+rsync -aqz --delete \
+rsync://serveur/partage/ /destination/
+rm lockfile
+\end{verbatim}
+\end{small}
+\bigskip
+$\Rightarrow$ mieux, mais lourd si on doit gérer plusieurs rsync.
+\end{frame}
+
+\begin{frame}
+\frametitle{Lancer de rsync}
+\begin{itemize}
+\item gestion de lock
+\pause
+\item gestion des intervalles entre deux run
+    \begin{itemize}
+    \item en temps normal
+    \item en cas d'erreur
+    \item éviter les run trop fréquents
+    \end{itemize}
+\pause
+\item gestion des erreurs
+    \begin{itemize}
+    \item comprendre l'erreur
+    \item seconde tentative
+    \item utiliser un miroir de secours (cf choix des miroirs)
+    \item avoir un rapport des succès et erreurs
+    \end{itemize}
+\pause
+\item faciliter le passages des options (rsync -aqH)
+\end{itemize}
+\end{frame}
+
+\subsection{Choisir un miroir}
+
+\begin{frame}
+\frametitle{Bien choisir}
+\begin{itemize}
+\item trouver le miroir (potentiellement) le plus à jours
+\pause
+\item trouver le miroir le plus rapide
+\pause
+\item éviter la surcharge
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Info sur la synchronisation}
+\begin{itemize}
+\item niveau dans la hiérarchie
+    \begin{itemize}
+    \item être niveau 1 implique peu de choix (voir pas)
+    \item plus le niveau est élevé plus la latence est grande
+    \end{itemize}
+\pause
+\item fréquence de rafraîchissement
+    \begin{itemize}
+    \item elle doit être $<=$ à celle que l'on veut
+    \item un $\Delta$ important est inutile
+    \end{itemize}
+\pause
+\item fréquence et niveau ensemble: effet de bord
+    \begin{itemize}
+    \item un miroir de niveau bas peut avoir une latence très forte
+    \item il y a cumul des latences avec la montée des niveaux
+    \item hasard de horaires de synchronisations
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Information sur le serveur}
+\begin{itemize}
+\item distance réseau (débit, nombre de sauts)
+    \begin{itemize}
+    \item variante selon l'état du réseau
+    \item pas forcément mesurable (filtrage)
+    \end{itemize}
+\pause
+\item distance kilométrique
+    \begin{itemize}
+    \item ne tiens pas compte du réseau
+    \item généralement inconnu ou imprécise
+    \end{itemize}
+\pause
+\item bande passante
+    \begin{itemize}
+    \item théorique: lien du serveur
+    \item pratique: minima entre les deux points
+    \end{itemize}
+\pause
+\item charge de la machine
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Trouver ces informations}
+Deux sources:
+\begin{itemize}
+\item les administrateurs des miroirs\\
+A priori les mieux placés pour savoir ce que font leurs serveurs
+\pause
+\item les distributeurs (gestionnaires du projet, développeurs\ldots)\\
+Ce sont eux qui gèrent les listes pour leurs projets.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Listes des miroirs: État des Lieux}
+
+\begin{itemize}
+\item pas de standardisation des formats
+\pause
+\item difficilement récupérable automatiquement
+\pause
+\item liste qui utilise des alias (FreeBSD, gentoo)
+\pause
+\item difficulté à avoir toutes les informations
+\pause
+\item mauvaise gestion ou gestion contre productrice
+\pause
+\item listes inexistantes
+\end{itemize}
+\end{frame}
+
+\section{MMM}
+
+\subsection{présentation}
+
+\begin{frame}
+Ils se compose de deux parties:
+\pause
+\begin{itemize}
+\item une série de programmes pour gérer les miroirs
+\pause
+\item une base de données visible depuis le web
+\end{itemize}
+\pause
+\bigskip
+
+\begin{itemize}
+\item écrit en perl (base de donnée sous PostgreSQL)
+\pause
+\item \url{http://mmm.zarb.org/}
+\pause
+\item sous licence ultra propriétaire (GPL) :)
+\pause
+\item code sous darcs (patches welcome)
+\end{itemize}
+\end{frame}
+
+\subsection{les outils de gestion des miroirs}
+
+\begin{frame}
+\frametitle{Les outils}
+\begin{itemize}
+\item mmm\\
+Le soft en lui même
+\pause
+\item mmm\_list\\
+Créer/édite les listes de miroirs
+\pause
+\item mmm\_status\\
+Affiche un état des différentes synchronisations
+    \begin{itemize}
+    \item mode texte
+    \item html en mode CGI
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{configuration}
+\begin{itemize}
+\item un fichier de configuration unique
+\pause
+\item un répertoire contenant les listes de miroirs
+\pause
+\item un répertoire contenant les fichiers d'états
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Fichier de configuration: exemple}
+
+{\scriptsize
+\begin{verbatim}
+[default]
+mirrordir = /home/distrib/etc/mirrorlist
+remote_mirrorlist = http://mmm.zarb.org/lists/mirrors.xml
+statedir = /home/distrib/var
+waitafter = 15
+delete = 1
+delete-after = 1
+partialdir = /distrib/tmp/
+tempdir = /distrib/tmp/
+
+[/distrib/linux/plf-mirror/]
+source = plf
+period = 30
+announce = rsync://distrib-coffee.ipsl.jussieu.fr/plf/
+level = 1
+\end{verbatim}
+}
+\end{frame}
+
+\begin{frame}
+\frametitle{Rapport des synchronisations}
+{\center
+\includegraphics[height=0.7\textheight]{reportwww}
+}
+\end{frame}
+
+\subsection{liste de miroir}
+
+\begin{frame}[fragile]
+\frametitle{Comment avoir les urls ?}
+Deux sources d'information de miroirs:
+\pause
+
+\begin{itemize}
+\item listes locales, générées par l'utilisateur
+\pause
+\item liste distante, récupéré en http
+\end{itemize}
+\pause
+\bigskip
+Format: XML, pas encore de DTD (je sais c'est mal mais patches welcome)
+
+\pause
+{\scriptsize
+\begin{verbatim}
+<?xml version="1.0" encoding="UTF-8"?>
+<mmm>
+  <source name="kororaa">
+    <mirror>
+      <url>rsync://distrib-coffee.ipsl.jussieu.fr/kororaa/</url>
+      <level>0</level>
+      <revision>20061112041144</revision>
+    </mirror>
+  </source>
+</mmm>
+\end{verbatim}
+}
+\end{frame}
+
+\begin{frame}
+\frametitle{échange de listes}
+{\center
+\includegraphics[height=0.7\textheight]{listsexchanges}
+}
+\end{frame}
+
+\subsection{Base de donnée des miroirs}
+
+\begin{frame}
+\begin{itemize}
+\item sous PostgreSQL (\url{http://www.postgresql.org/})
+\item visible depuis \url{http://mmm.zarb.org/lists}
+\item construite à partir des url inscrites
+\end{itemize}
+
+\pause
+{\center
+\includegraphics[height=0.6\textheight]{listswww}
+}
+\end{frame}
+
+\subsection{En interne}
+
+\begin{frame}[fragile]
+\frametitle{MMM internal}
+\begin{itemize}
+\item \verb+MMM+
+    \begin{itemize}
+    \item lit la configuration
+    \item lit les listes de miroirs
+    \item gère les différents rsync à faire tourner
+    \end{itemize}
+\pause
+\item \verb+MMM::Mirror+
+    \begin{itemize}
+    \item un miroir
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{MMM internal}
+\begin{itemize}
+\item \verb+MMM::MirrorList+
+    \begin{itemize}
+    \item gère une collection de miroir (\verb+MMM::Mirror+)
+    \item charge une liste au format xml
+    \item "dump" de la liste au format xml
+    \end{itemize}
+\pause
+\item \verb+MMM::MirrorQueue+
+    \begin{itemize}
+    \item \verb+@ISA MMM::MirrorList+
+    \item tri les miroirs par priorité
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{MMM internal}
+\begin{itemize}
+\item \verb+MMM::Rsync+
+    \begin{itemize}
+    \item vérifie que la synchronisation est nécessaire
+    \item verrouille la synchronisation
+    \item lance rsync et gère les erreurs
+    \item écrit les traces et repères
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\section{Solution apporté par MMM}
+
+\subsection{Rsync}
+
+\begin{frame}[fragile]
+\frametitle{Lancer Rsync}
+
+Éviter un double lancement:
+\begin{itemize}
+\item écriture de \verb+$$+ dans le fichier de statuts
+\item vérification de la valeur et test sur \verb+/proc/$$+
+\end{itemize}
+\pause
+\bigskip
+Récupérer les erreurs:
+\begin{itemize}
+\item \verb+IPC::Open3()+, récupération de \verb+STDOUT+ et \verb+STDERR+
+\item teste de \verb+$?+, traitement spéciale de certaines valeur (cf~\verb+man rsync+)
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Lancement périodique}
+\begin{itemize}
+\item Cron
+
+On lance seulement les job qui ont besoin de l'être.
+\pause
+\bigskip
+\item At
+
+Chaque job se programme en lançant \textbf{at}
+\pause
+\bigskip
+\item Démon \textit{non implémenté}
+
+Faire tourner le programme en tâche de fond et utiliser \verb+alarm()+. 
+\end{itemize}
+\end{frame}
+
+\subsection{Choix des miroirs}
+
+\begin{frame}
+\frametitle{trouver un miroir}
+Tri et ordonnancement:
+\begin{enumerate}
+\item retrait des miroirs qui identifie la machine elle même (hostname)
+\item fusion des listes, tri des informations par miroir
+\item par niveau
+
+On garde les miroirs de niveau inférieur par ordre décroissant.
+
+Si on veut être de niveau \textbf{5}, on garde les miroirs de niveaux
+\textbf{4, 3, 2, 1, 0}.
+
+Les miroirs de niveau supérieur sont éliminés (éviter les boucles A $\Rightarrow$ B $\Rightarrow$ A)
+\pause
+\item réutilisation de l'ancien miroir
+\pause
+\item au sein de chaque niveau: tri des miroirs par proximité de fréquence
+de synchronisation
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Localisation}
+
+Calcul de la distance (l'angle) entre deux points sur le globe:
+\bigskip
+
+$\angle = \arccos(\sin(lat1)*\sin(lat2)+\cos(lat1)*\cos(lat2)*\cos(lon1 - lon2))$
+\footnote{Latitudes et longitudes sont exprimées en radian.}
+\end{frame}
+
+\begin{frame}
+Le problème est de trouver les coordonnées des miroirs:
+\begin{itemize}
+\item mettre les coordonnées dans les listes
+    \begin{itemize}
+    \item qui le fera ?
+    \end{itemize}
+\pause
+\item \url{hostip.info}
+\item champs LOC des dns
+    \begin{itemize}
+    \item reste à l'initiative de l'administrateur
+    \end{itemize}
+\pause
+\item trouver les coordonnées à partir du pays et de la ville
+    \begin{itemize}
+    \item informations facile à avoir
+    \item il faut une base de données (complète) des coordonnées des villes et pays
+    \end{itemize}
+\pause
+\bigskip
+\item la première pour laquelle on a les informations\ldots
+\end{itemize}
+\end{frame}
+
+\section*{Conclusion}
+
+\begin{frame}
+Ca marche !
+\pause
+\bigskip
+
+Manque encore de doc et le code doit être nettoyé
+\pause
+\bigskip
+
+Le site de la base de donnée n'est pas fini
+\pause
+\bigskip
+
+{\LARGE Question ?}
+\end{frame}
+
+\end{document}

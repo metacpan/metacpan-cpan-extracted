@@ -1,0 +1,19 @@
+0.04 Thu 28 May 11:29:07 CEST 2015
+    - namespace change for Catalyst-Authentication-Store-UserXML
+
+0.03  2015-05-20
+    - replace smartmatch and given/when
+    - support for dynamic products and categories
+    - using_frontend_proxy on as default
+    - timeline fixes
+    - allow including of other xml files
+    - external authentication
+    - support for virtual (non local storage) users
+    - member has gender
+
+0.02  2014-10-28 21:14
+    - bootstrap example
+    - and more...
+
+0.01  2012-10-26 18:55:27
+    - initial version

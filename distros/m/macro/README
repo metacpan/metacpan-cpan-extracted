@@ -1,0 +1,112 @@
+NAME
+    macro - An implementation of macro processor
+
+VERSION
+    This document describes macro version 0.06.
+
+SYNOPSIS
+            use macro add => sub{ $_[0] + $_[1] };
+                      say => sub{ print @_, "\n"};
+            say(add(1, 3)); # it's replaced into 'print do{ (1) + (3) }, "\n";'
+
+            use macro my_if => sub{ $_[0] ? $_[1] : $_[2] };
+            my_if( 0, say('true'), say('false') ); # only 'false' is printed
+
+            sub mul{ $_[0] * $_[1] }
+            use macro mul => \&mul;
+            say( mul(2, 3) ); # macro version of mul()
+            say(&mul(2, 3) ); # subroutine version
+            say( mul 2, 3  ); # subroutine version
+
+            # or compile only
+            $ perl -c Module.pm # make Module.pmc
+
+DESCRIPTION
+    The "macro" pragma provides macros, a sort of inline functions, which is
+    like C pre-processor's macro.
+
+    The macros are very fast (about 200% faster than subroutines), but they
+    have some limitations that C pre-processor's macros have, e.g. they
+    cannot call "return()" expectedly, although they seem anonymous
+    subroutines.
+
+    Try "PERL_MACRO_DEBUG=2" if you want to know how this module works.
+
+  PMC Support
+    Modules using "macro" are able to compile themselves before installed,
+    by using the "Module::Install::PMC". Write the following to the
+    "Makefile.PL" and the modules will be compiled at build time.
+
+            use inc::Module::Install;
+            ...
+            build_requires macro => 0;
+            pmc_support;
+            ...
+
+    See Module::Compile and Module::Install::PMC for details.
+
+METHODS
+  macro->backend()
+    Returns the backend module, "macro::filter" or "macro::compiler".
+
+  macro->new()
+    Returns an instance of macro processor, $macro.
+
+    "new()", "defmacro()" and "process()" are provided for backend modules.
+
+  $macro->defmacro(name => sub{ ... });
+    Defines macros into *$macro*.
+
+  $macro->process($source)
+    Processes Perl source code *$source*, and returns processed source code.
+
+CONFIGURATION AND ENVIRONMENT
+  PERL_MACRO_DEBUG=value
+    Sets the debug mode.
+
+    if it's == 0, "macro::compiler" is used as the backend.
+
+    if it's >= 1, "macro::filter" is used as the backend.
+
+    If it's >= 2, all macro expansions are reported to "STDERR".
+
+INSTALL
+    To install this module, run the following commands:
+
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+DEPENDENCIES
+    *   Perl 5.8.1 or later.
+
+    *   "PPI" - Perl parser.
+
+    *   "Filter::Util::Call" - Source filter utility (CORE).
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to "bug-macro@rt.cpan.org/",
+    or through the web interface at <http://rt.cpan.org/>.
+
+SEE ALSO
+    macro::JA.
+
+    macro::filter - macro.pm source filter backend.
+
+    macro::compiler - macro.pm compiler backend.
+
+    Module::Compile.
+
+AUTHOR
+    Goro Fuji <gfuji(at)cpan.org>.
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2008-2009, Goro Fuji <gfuji(at)cpan.org>. Some rights
+    reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

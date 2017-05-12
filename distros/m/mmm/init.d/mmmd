@@ -1,0 +1,85 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          mmm
+# Required-Start:    $network
+# Required-Stop:     $network
+# Default-Start:     3 4 5
+# Short-Description: MMM Mirror manager service
+# Description:       Manage massive mirror setup
+### END INIT INFO
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+[ "${NETWORKING}" = "no" ] && exit 0
+
+CONFIGFILE=/etc/mmm/mmm.cfg
+
+[ -f /etc/sysconfig/mmm ] && . /etc/sysconfig/mmm
+
+NAME=mmmd
+LOCKFILE=/var/lock/subsys/mmmd
+CMD=mmmd
+
+
+start()  {
+    if [ ! -f $LOCKFILE ]; then
+	echo "Starting $NAME"
+
+	daemon $CMD -c $CONFIGFILE
+	rc=$?
+	echo
+	if [ $rc != 0 ]; then
+	    return $rc
+	fi
+
+	touch $LOCKFILE
+    fi
+    return 0
+}
+
+stop()  {
+    echo "Stopping $NAME"
+
+	echo -n "Stopping $NAME: "
+	killproc mmmd
+	rc=$?
+	echo
+	if [ $rc != 0 ]; then
+	    return $rc
+	fi
+
+    rm -f $LOCKFILE
+    return 0
+}
+
+# See how we were called.
+case "$1" in
+    start)
+	start
+	;;
+    stop)
+	stop
+	;;
+    status)
+
+	;;
+    reload)
+    kill -1 `cat /var/run/mmm/mmm.pid`
+    ;;
+    restart)
+	stop
+	start
+	;;
+    *)
+	echo "Usage: $0 {start|stop|restart|reload|status}"
+	exit 1
+	;;
+esac
+
+exit 0

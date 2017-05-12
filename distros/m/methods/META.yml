@@ -1,0 +1,34 @@
+---
+abstract: 'Provide method syntax and sweep namespaces'
+author:
+  - '唐鳳 <cpan@audreyt.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: methods
+name: methods
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Method::Signatures::Simple: 0
+  invoker: 0
+  namespace::sweep: 0
+  perl: 5.8.0
+  true::VERSION: 0
+resources:
+  homepage: https://github.com/audreyt/methods/tree
+  repository:
+    type: git
+    url: git://github.com/audreyt/methods.git
+    web: https://github.com/audreyt/methods/tree
+version: 0.12

@@ -1,0 +1,123 @@
+NAME
+    mixin - Mix-in inheritance, an alternative to multiple inheritance
+
+SYNOPSIS
+      package Dog;
+      sub speak { print "Bark!\n" }
+      sub new { my $class = shift;  bless {}, $class }
+
+      package Dog::Small;
+      use base 'Dog';
+      sub speak { print "Yip!\n"; }
+
+      package Dog::Retriever;
+      use mixin::with 'Dog';
+      sub fetch { print "Get your own stinking $_[1]\n" }
+
+      package Dog::Small::Retriever;
+      use base 'Dog::Small';
+      use mixin 'Dog::Retriever';
+
+      my $small_retriever = Dog::Small::Retriever->new;
+      $small_retriever->speak;          # Yip!
+      $small_retriever->fetch('ball');  # Get your own stinking ball
+
+DESCRIPTION
+    NOTE You probably want to look into the similar but superior concept of
+    traits/roles instead. See "SEE ALSO" for suggested modules.
+
+    Mixin inheritance is an alternative to the usual multiple-inheritance
+    and solves the problem of knowing which parent will be called. It also
+    solves a number of tricky problems like diamond inheritence.
+
+    The idea is to solve the same sets of problems which MI solves without
+    the problems of MI. For all practical purposes you can think of a mixin
+    as multiple inheritance without the actual inheritance.
+
+    Mixins are a band-aid for the problems of MI. A better solution is to
+    use traits (called "Roles" in Perl 6), which are like mixins on
+    steroids. Class::Trait implements this.
+
+  Using a mixin class
+    There are two steps to using a mixin-class.
+
+    First, make sure you are inherited from the class with which the
+    mixin-class is to be mixed.
+
+      package Dog::Small::Retriever;
+      use base 'Dog::Small';
+
+    Since Dog::Small isa Dog, that does it. Then simply mixin the new
+    functionality
+
+      use mixin 'Dog::Retriever';
+
+    and now you can use fetch().
+
+  Writing a mixin class
+    See mixin::with.
+
+  Mixins, Inheritance and SUPER
+    A class which uses a mixin *does not* inherit from it. However, through
+    some clever trickery, "SUPER" continues to work. Here's an example.
+
+        {
+            package Parent;
+            sub foo { "Parent" }
+        }
+
+        {
+            package Middle;
+            use mixin::with "Parent";
+
+            sub foo {
+                my $self = shift;
+                return $self->SUPER::foo(), "Middle";
+            }
+        }
+
+        {
+            package Child;
+            use base "Parent";
+            use mixin "Middle";
+
+            sub foo {
+                my $self = shift;
+                return $self->SUPER::foo(), "Child";
+            }
+        }
+
+        print join " ", Child->foo;  # Parent Middle Child
+
+    This will print "Parent Middle Child". You'll note that this is the same
+    result if Child inherited from Middle and Middle from Parent. Its also
+    the same result if Child multiply inherited from Middle and Parent but
+    *NOT* if it inherited from Parent then Middle. The advantage of mixins
+    vs multiple inheritance is such ambiguities do not exist.
+
+    Note that even though both the Child and Middle define foo() the Middle
+    mixin does not overwrite Child's foo(). A mixin does not simply export
+    its methods into the mixer and thus does not blow over existing methods.
+
+NOTES
+    A mixin will not warn if the mixin and the user define the same method.
+
+AUTHOR
+    Michael G Schwern <schwern@pobox.com>
+
+LICENSE
+    Copyright 2002-2015 by Michael G Schwern
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    <http://dev.perl.org/licenses/>
+
+SEE ALSO
+    Role::Tiny - A stand alone implementation of traits/roles, like mixins
+    but better.
+
+    Moose::Role - Moose's implementation of traits/roles.
+
+    mro and Class::C3 make multiple inheritance work more sensibly.
+

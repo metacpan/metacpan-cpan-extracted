@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use MMM;
+use MMM::MirrorTask;
+use MMM::Utils;
+
+my $mmm = MMM->new(
+    configfile => $ENV{MMM_CONFIG},
+    verbosity => 0,
+);
+
+if (($ARGV[0] || '') eq 'autoconf') {
+    if ($mmm && $mmm->get_tasks_by_name($mmm->list_tasks)) {
+        print "yes\n";
+        exit(0);
+    } else {
+        print "No mmm found";
+        exit(1);
+    }
+} elsif (($ARGV[0] || '') eq 'config') {
+    print <<EOF;
+graph_title Sync error delay in day (mmm)
+graph_args --base 1000 --lower-limit 0
+graph_vlabel Count
+graph_category mmm
+EOF
+
+    foreach ($mmm->get_tasks_by_name($mmm->list_tasks)) {
+        $_->is_disable and next;
+        my $n = $_->name;
+        $n =~ s:(/|-|\.):_:g;
+        printf "%s.label %s\n", $n, $_->name;
+        printf "%s.min 0\n", $n;
+    }
+} else {
+    my $now = scalar(time);
+    foreach ($mmm->get_tasks_by_name($mmm->list_tasks)) {
+        $_->is_disable and next;
+        my $n = $_->name;
+        $n =~ s:(/|-|\.):_:g;
+        my %info = $_->state_info();
+        printf("%s.value %f\n", $n, $info{job}{success} ? 0 : 
+            (($now - ($info{success}{end} || $info{job}{first_sync} || $now)) / (3600 * 24)));
+    }
+}
+
+__END__

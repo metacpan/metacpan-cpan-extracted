@@ -1,0 +1,19 @@
+-   Make sure that dependency uses a Field.pm method to test for not_blank
+    so that can be defined per field.
+
+-  Checkboxes don't make sense being required.
+
+
+-   Add warnings in addition to errors.  The example would be validating
+    HTML where Tidy reports an error or warning that you wish to ignore.
+    This would be an extra checkbox next to the warnings.
+
+-   Currently fields call SUPER to validate first, but that sometimes
+    generates messages that don't make sense if the error message
+    describes the correct format.  Consider PosInteger calling Integer.
+
+-   Docs on all fields.
+
+
+
+

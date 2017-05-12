@@ -1,0 +1,96 @@
+.i  testfonts.txt -- 		-*-mh_doc-*-
+.i  SCCS Status     : %Z%@ %M%	%I%
+.i  Author          : Johan Vromans
+.i  Created On      : Fri Mar 27 12:51:19 1992
+.i  Last Modified By: Johan Vromans
+.i  Last Modified On: Wed Jan  8 12:26:19 2003
+.i  Update Count    : 7
+.i  Status          : Unknown, Use with caution!
+.i  HyperButtons    : [Preview]  [Check Syntax]  [Print]  [Print...]  [Make]
+
+Offerte:   TestFonts
+Titel:     Test
+           van
+           Fonts
+Opties:    KeyCaps, No TitlePage
+DocumentOpmaak: + ragged
+--------------------------
+
+1.      The Quick Brown Fox Jumps Over The Lazy Dog
+
+1.1      The Quick Brown Fox Jumps Over The Lazy Dog
+
+1.1.1      The Quick Brown Fox Jumps Over The Lazy Dog
+
+1.1.1.1      The Quick Brown Fox Jumps Over The Lazy Dog
+
+1.1.1.1.1      The Quick Brown Fox Jumps Over The Lazy Dog
+
+        * Gewone tekst.
+
+          The quick -- brown --- fox jumps over the lazy dog 0123456789
+          !@#$%^&*()_+=-{}][|\"':;?/>.<,`~
+          The quick brown fox jumps over the lazy dog 0123456789
+          !@#$%^&*()_+=-{}][|\"':;?/>.<,`~
+          The quick brown fox jumps over the lazy dog 0123456789
+          !@#$%^&*()_+=-{}][|\"':;?/>.<,`~
+          The quick brown fox jumps over the lazy dog 0123456789
+          !@#$%^&*()_+=-{}][|\"':;?/>.<,`~
+          áéíóúàèìòùäëïöüâêîôû        
+          ÁÉÍÓÚÀÈÌÒÙÄËÏÖÜÂÊÎÔÛ        
+          ff fi fl ff ffi ffl
+
+        * Cursief:
+
+          [emphasis]
+          The quick brown fox jumps over the lazy dog 0123456789
+          !@#$%^&*()_+=-{}][|\"':;?/>.<,`~
+          The quick brown fox jumps over the lazy dog 0123456789
+          !@#$%^&*()_+=-{}][|\"':;?/>.<,`~
+          áéíóúàèìòùäëïöüâêîôû ÁÉÍÓÚÀÈÌÒÙÄËÏÖÜÂÊÎÔÛ        
+          ff fi fl ff ffi ffl
+
+        * Vet:
+
+          [strong]
+          The quick brown fox jumps over the lazy dog 0123456789
+          !@#$%^&*()_+=-{}][|\"':;?/>.<,`~
+          The quick brown fox jumps over the lazy dog 0123456789
+          !@#$%^&*()_+=-{}][|\"':;?/>.<,`~
+          áéíóúàèìòùäëïöüâêîôû ÁÉÍÓÚÀÈÌÒÙÄËÏÖÜÂÊÎÔÛ        
+          ff fi fl ff ffi ffl
+
+        * Literal:
+
+          [literal]
+          The quick brown fox jumps over the lazy dog 0123456789
+          !@#$%^&*()_+=-{}][|\"':;?/>.<,`~
+          The quick brown fox jumps over the lazy dog 0123456789
+          !@#$%^&*()_+=-{}][|\"':;?/>.<,`~
+          áéíóúàèìòùäëïöüâêîôû ÁÉÍÓÚÀÈÌÒÙÄËÏÖÜÂÊÎÔÛ        
+          ff fi fl ff ffi ffl
+          [end literal]
+
+        * Screen:
+
+          [screen]
+          The quick brown fox jumps over the lazy dog 0123456789
+          !@#$%^&*()_+=-{}][|\"':;?/>.<,`~
+          The quick brown fox jumps over the lazy dog 0123456789
+          !@#$%^&*()_+=-{}][|\"':;?/>.<,`~
+          áéíóúàèìòùäëïöüâêîôû ÁÉÍÓÚÀÈÌÒÙÄËÏÖÜÂÊÎÔÛ
+          ff fi fl ff ffi ffl
+          [end screen]
+
+        * KeyCaps:
+
+          The quick brown fox jumps over the lazy dog 0123456789
+          !@#$%^&*()_+=-{}][|\"':;?/>.<,`~
+          The quick brown fox jumps over the lazy dog 0123456789
+          !@#$%^&*()_+=-{}][|\"':;?/>.<,`~
+          [Return] [Alt] [Next] [Prev] foo
+          The quick brown fox jumps over the lazy dog 0123456789
+          !@#$%^&*()_+=-{}][|\"':;?/>.<,`~
+          The quick brown fox jumps over the lazy dog 0123456789
+          !@#$%^&*()_+=-{}][|\"':;?/>.<,`~
+

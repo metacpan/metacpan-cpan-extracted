@@ -1,0 +1,42 @@
+<html>
+ <head>
+  <title>cgi-mailer test form
+ </title>
+</head>
+ <body bgcolor="#FFFFFF">
+  <!-- =============================================================== -->
+  <hr>
+  <h2>cgi-mailer test form: enter some values and select Submit.
+ </h2>
+   <!-- =============================================================== -->
+  <hr>
+  
+  <form method="POST" action="/cgi-bin/cgi-mailer.pl">
+  
+   <!-- You may need to change the ACTION attribute above
+        if cgi-mailer.pl is installed in a different place
+        on your system -->
+        
+   <input type="HIDDEN" name="destination" value="">
+
+   <!-- put your email address in the VALUE attribute above -->
+
+   <input type="HIDDEN" name="subject" value="testing cgi-mailer">
+   <input type="HIDDEN" name="header:x-no-archive" value="yes">
+   <input type="HIDDEN" name="header:summary" value="foo, bar, baz">
+   <input type="HIDDEN" name="header:keywords" value="foo">
+
+   <input type="TEXT" name="one"   size="20">
+   <input type="TEXT" name="two"   size="20">
+   <input type="TEXT" name="three" size="20">
+   <input type="TEXT" name="four"  size="20">
+
+   <input type="SUBMIT" value="Submit">
+   
+ </form>
+ 
+  <!-- =============================================================== -->
+  <hr>
+
+</body>
+</html>

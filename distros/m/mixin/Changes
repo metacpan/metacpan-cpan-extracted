@@ -1,0 +1,48 @@
+0.07  Fri Jan 22 10:43:10 PST 2010
+  Bug Fixes:
+  * Classes which defined constants did not work with mixin on
+    Perl 5.10.x. [rt.cpan.org 40495]
+
+  Interface:
+  - Slightly better error message when trying to use a mixin and you're
+    not of the right class.
+
+  Documentation:
+  * Add copyright and license
+
+
+0.06  Wed Apr 18 10:08:59 PDT 2007
+  Documentation:
+  * Documented the behavior of SUPER
+  * The user of a mixin does not inherit from the mixin.
+  * A mixin does not blow over existing methods [rt.cpan.org 26289]
+  * Reference Class::Trait and Class::C3
+  * Talk a bit about mixins vs traits
+  - A mixin will not warn if it has the same methods as the user
+
+0.05  Mon Mar 19 20:35:49 PDT 2007
+  Bug fixes:
+  * "use mixin" will now throw an error if the mixed in module cannot be
+    loaded. [rt.cpan.org 5366]
+
+  Documentation:
+  - Explained how to write a mixin that can mixin with anything.
+  - Improved the "no private methods" documentation to use lexical
+    private methods.
+
+0.04  Mon Apr 29 18:45:58 EDT 2002
+  * And I forgot to test it. :(
+
+0.03  Mon Apr 29 18:33:45 EDT 2002
+  * mixin forgot to require the package being mixed in!
+
+0.02  Wed Apr 17 11:05:08 EDT 2002
+  * Removed the caveat about mixins not having any superclasses.
+  * Removed the caveat about mixins not working stand-alone.
+  * Fixed so a mixin can use it's parent's methods during
+    initialization.
+  * Made flexible enough to work with Class::DBI, which is pretty
+    pathological.
+
+0.01  Tue Apr 16 15:42:01 EDT 2002
+  * It works
