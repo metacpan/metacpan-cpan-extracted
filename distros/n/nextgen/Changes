@@ -1,0 +1,50 @@
+Revision history for nextgen
+
+0.06 - 2010-10-08
+  Added reasons for nextgen::blacklist
+  Fixed bug with: perl -Mnextgen -Mnext -e1
+
+0.05 - 2010-10-06
+  Added support for nextgen::blacklist, for all your blacklisting needs (chained require implimentation)
+  Many more tests
+  Added more useage examples in the synopsis
+
+0.04 - 2010-10-05
+  Reimpliment the -e portion now `perl -Mnextgen -e'package Foo; use nextgen; Foo->new'` works
+    added t/02* for tests
+
+0.03 - 2010-10-04
+  With community input fixedbugs with importing Moose, over Moose::Role
+    provided a flag to disable the assumption of programming in the OO
+    paradigm
+
+0.02 - 2010-10-04
+  Fixed bug with '-e' or '-E', added tests
+    Aparently `use Mod ();`, stop BEGIN {} from running, not in perldoc -f use
+
+0.01 - 2010-10-04
+	Initial fork:
+	- Added Moose for non-Main packages
+	- Added oose.pm when run under '-e', or '-E'
+  - Added autodie
+  - Added indirect
+  - Changes to Module::Install
+  - renamed to `nextgen`
+  - added ltos of tests
+
+Revision history for Modern::Perl
+
+1.03    Wed Feb 18 00:40:40 UTC 2009
+    - removed duplicate use lines (Damien Learns Perl)
+    - fixed (hopefully) v-string warnings (Damien, David Moreno)
+    - enabled C3 MRO (Evan Carroll)
+
+1.02    Tue Jan 27 03:44:29 UTC 2009
+    - removed the current need for B::Hooks::Parser (suggested by chocolateboy)
+
+1.01    Tue Jan 27 01:11:48 UTC 2009
+    - fixed a documentation typo reported by Vasily Chekalkin
+    - added caveats to the documentation per bug report from Ben Hengst
+
+1.00    Mon Jan 26 22:41:28 UTC 2009
+    - First version, released on an unsuspecting world.

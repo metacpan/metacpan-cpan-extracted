@@ -1,0 +1,27 @@
+---
+abstract: 'neverbounce.com email verification API integration module '
+author:
+  - 'Manu Mathew <whitewind@cpan.org>'
+build_requires: {}
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: neverbounce
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.006'
+  Convert::Base64: '0'
+  Data::Dumper: '0'
+  HTTP::Request::Common: '0'
+  JSON: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Test::Manifest: '0.9'
+  Test::More: '0'
+version: '0.07'

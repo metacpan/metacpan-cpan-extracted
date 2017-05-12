@@ -1,0 +1,15 @@
+TYPEMAP
+Request	*		REQ_OBJ
+Session *		SES_OBJ
+
+OUTPUT
+REQ_OBJ
+	sv_setref_iv($arg, "Netscape::Server::Request", I32 $var)
+SES_OBJ
+	sv_setref_iv($arg, "Netscape::Server::Session", I32 $var)
+
+INPUT
+REQ_OBJ
+	$var = (Request *)SvIV((SV*)SvRV($arg))
+SES_OBJ
+	$var = (Session *)SvIV((SV*)SvRV($arg))

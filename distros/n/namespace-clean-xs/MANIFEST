@@ -1,0 +1,40 @@
+.travis.yml
+Changes
+lib/namespace/clean/xs.pm
+lib/namespace/clean/xs/all.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-basic.t
+t/01-function-wipeout.t
+t/02-inheritance.t
+t/03-unimport.t
+t/04-except.t
+t/05-explicit-cleanee.t
+t/05-syntax-error.t
+t/06-other-types.t
+t/07-debugger.t
+t/08-const-sub.t
+t/09-fiddle-hinthash.t
+t/10-get-functions.t
+t/11-get-class-store.t
+t/12-utf8.t
+t/13-mro.t
+t/14-all.t
+t/80-threads.t
+t/90-leaktrace.t
+t/lib/CleaneeBridge.pm
+t/lib/CleaneeBridgeDirect.pm
+t/lib/CleaneeBridgeExplicit.pm
+t/lib/CleaneeTarget.pm
+t/lib/ExporterTest.pm
+t/lib/FunctionWipeout.pm
+t/lib/Inheritance.pm
+t/lib/OtherTypes.pm
+t/lib/SyntaxError.pm
+t/lib/Unimport.pm
+t/lib/UnimportTarget.pm
+xs.xs
+xs/compat.h
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

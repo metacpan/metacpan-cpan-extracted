@@ -1,0 +1,11 @@
+0.02  Mon, 26 Mar 2012 15:46:48 +0200
+  [ Zefram ]
+    * Hook the peep chain earlier.
+    * We should work from 5.8.1 on, not 5.8.8, as declared in previous releases.
+    * Avoid a couple of C compiler warnings.
+    * Make the replacement logic work on Perl 5.11.2+.
+    * Document a caveat around aliasing subroutine calls without parens on Perls
+      prior to 5.11.2.
+
+0.01  Sat, 22 Aug 2009 17:34:04 +0200
+  * Initial release.

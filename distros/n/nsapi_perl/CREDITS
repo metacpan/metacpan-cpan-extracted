@@ -1,0 +1,28 @@
+Thanks to Steve Nielsen <Steve.Nielsen@infores.com> and Craig Riter
+<criter@riter.com> for helping with getting this thing working on
+Win32.
+
+Thanks especially to Steve who provided a Makefile.PL that works on
+Win32.
+
+Olivier Dehon <dehon_olivier@jpmorgan.com> found and fixed several
+bugs, including fixing the crude way I initially implemented net_read.
+
+William Ward <wrw@bayview.com> is hard at work porting
+nsapi_perl to IRIX.  Stay tuned.
+
+Thanks also to Danny Sadinoff (dsadinof@olf.com).
+
+In spite of their help, all blame for bugs should be directed at me
+and not at my collabarators.
+
+Lastly, a big thank you must go to Doug MacEachern <dougm@osf.org> for
+creating mod_perl, from which the concept and much of the execution of
+nsapi_perl was borrowed and without which none of nsapi_perl would
+have been possible.
+
+Any contributions you can make are welcome!
+
+-Ben Sugars
+<bsugars@canoe.ca>
+March 2, 1998

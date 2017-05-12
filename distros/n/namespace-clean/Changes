@@ -1,0 +1,170 @@
+0.27  2016-05-18 02:24 (UTC)
+        - Allow packages to be cleaned multiple times
+        - Ensure the debugger workarounds are applied only when
+          DB::sub is actively used (they are superfluous otherwise)
+        - Work around P5#72210, resulting in fails on 5.8.8 -Duselongdouble
+        - Fix incorrect name in META (RT#107813)
+
+0.26  2015-10-07 17:43 (UTC)
+        - Exclusively use Package::Stash::PP on perls < 5.8.7 until a fixed
+          Package::Stash::XS ships - breakage keeps getting reintroduced
+          ( RT#107343, RT#74151 )
+        - Explicitly document the late runtime binding of `sort SUBNAME ...`
+          ( RT#101247 )
+        - No longer rely on Sub::Identify - either use Sub::Util or B
+          ( should solve RT#96945 )
+
+
+0.25  2014-03-05 11:27 (UTC)
+        - Fix incorrect ExtUtils::CBuilder detection routine leading to
+          Makefile.PL crashes when EU::CB is not available
+
+
+0.24  2012-12-04 22:59 (UTC)
+        - Properly skip debugger test when optional deps not available
+        - Make sure pure-perl tests pass correctly on space-containing
+          paths (RT#77528)
+        - Remove all the pure-perl fallback code and depend on PP-capable
+          B::H::EOS 0.12
+
+
+0.23  2012-03-11 15:06 (UTC)
+        - Rely on B::Hooks::EndOfScope version 0.10 to fix issues with
+          new Module::Runtime versions (>= 0.012) on perl 5.10 due
+          to incorrect hook firing due to %^H localisation.
+        - Fix failures on 5.13.6 due to incorrect version number threshold
+          (RT#74683)
+
+
+0.22 (official fix of all the %^H ickyness)  2011-12-26 13:04 (UTC)
+        - Simplify the >= 5.10 PP variant even more - move the hook from
+          DESTROY into DELETE
+        - Force explicit callback invocation order on 5.8 PP
+
+
+0.21_02  2011-12-22 11:33 (UTC)
+        - Replace the %^H tie approach with fieldhashes, fixes all known
+          corner cases and caveats on supported perls >= 5.8.1 (FC)
+        - Compile away the debugger fixup on perls >= 5.15.5 (FC)
+
+
+0.21_01  2011-12-21 11:39 (UTC)
+        - More robust handling of the tied %^H in pure perl mode (RT#73402)
+        - Limit the debugger workarounds to perls between 5.8.8 and 5.14,
+          extend debugger support to all perl versions (FC) (RT#69862)
+        - If possible, automatically install (but not load) the debugger
+          workaround libraries on perls between 5.8.8 and 5.14 (RT#72368)
+        - Add back dropped NAME section (RT#70259)
+
+
+0.21  2011-08-03 21:51 (UTC)
+        - When using the tie() fallback ensure we do not obliterate a
+          foreign tie()
+        - Better document how to disable the tie() fallback
+
+
+0.20_01 (the "mst made me do it" release)   2011-07-31 09:26 (UTC)
+        - Only invoke the deleted sub stashing if we run udner a debugger
+          (avoid runtime penalty of Sub::Name/Sub::Identify)
+        - Spellfixes (RT#54388)
+        - When B::Hooks::EndOfScope is not available, switch to a simple
+          tie() of %^H. While it can not 100% replace B::H::EOS, it does
+          everything n::c needs
+
+
+0.20  2011-01-06 18:07 (UTC)
+        - Bump Package::Stash dependency to 0.22 to pull in a bugfix in
+          Package::Stash::XS 0.19.
+
+
+0.19  2011-01-03 16:36 (UTC)
+        - Port to the new Package::Stash 0.18 API and depend on it.
+        - Don't rely on package::stash's remove_package_symbol implementation
+          (doy).
+
+
+0.18  2010-06-13 17:12 (UTC)
+        - Make sure we continue working on future Package::Stash
+          versions (doy).
+
+
+0.17  2010-06-05 23:16 (UTC)
+        - Make sure the debugger author test is skipped for
+          non-authors before the debugger is even loaded.
+
+
+0.16  2010-06-05 20:53 (UTC)
+        - Release all changes of 0.15 as part of a stable release.
+        - Convert from Module::Install to Dist::Zilla.
+
+
+0.15 TRIAL release  2010-05-14 17:30 (UTC)
+        - Use Package::Stash for the stash manipulation bits (doy).
+
+
+0.14  2010-03-18 11:15:38 (CET)
+        - Disable auto_install.
+        - Turn the error prone debugger test into an author test.
+
+
+0.13  2010-01-17 02:40:48 (CET)
+        - Skip failing debugger tests on 5.8.8 and older.
+
+
+0.12  2010-01-14 03:22:03 (CET)
+        - Stop relying on stash entries always being upgraded into real GVs
+          (Zefram).
+        - Work around $DB::sub (Yuval Kogman).
+        - Fix restoring of non-code symbols when cleaning (Ben Morrows).
+
+
+0.11  2009-03-03 17:34:49 (CET)
+        - Added -cleanee option to specify the package to clean (Closes
+          RT#41850).
+        - Added n:c->clean_subroutines($cleanee, @subs).
+
+
+0.10  2009-02-20 14:31:36 (CET)
+        - Depend on B::Hooks::EndOfScope 0.07 to avoid segfaults and lost error
+          messages when something goes wrong.
+
+
+0.09  2008-10-22 17:48:49 (CEST)
+        - Use B::Hooks::EndOfScope instead of %^H + Scope::Guard.
+
+
+0.08  2008-03-09 22:01:01 (CET)
+        - Added explicit cleanup behaviour
+
+
+0.07  2008-03-09 20:13:33 (CET)
+        - Switched from Filter::EOF to a much saner implementation via
+          %^H and Scope::Guard. (mst & autobox)++ for this.
+
+
+0.06  2008-02-20 15:09:00 (CET)
+        - Fixed 'uninitialized value in ref-to-glob cast' error
+          if unimport was used before.
+
+
+0.05  2007-08-12 18:24:49 (CEST)
+        - Minor POD improvements
+        - -except now accepts a single value too
+
+
+0.04  2007-03-17 16:22:10 (CET)
+        - Added -except flag
+        - Non-CODE type slots will not be removed
+
+
+0.03  2007-02-24 22:34:55 (CET)
+        - Minor comment and POD cleanups
+        - Tried to clarify how the module works
+
+
+0.02  2007-02-19 00:38:24 (CET)
+        - Added unimport behaviour
+
+
+0.01  2007-02-18 17:33:18 (CET)
+        - Initial Version

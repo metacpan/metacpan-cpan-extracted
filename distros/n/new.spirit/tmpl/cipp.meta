@@ -1,0 +1,5 @@
+$VAR1 = {
+          'mime_type' => 'text/html',
+          'description' => '',
+          'use_strict' => 1
+        };

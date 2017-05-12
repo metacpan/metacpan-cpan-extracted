@@ -1,0 +1,20 @@
+Volunteers are wanted to help address the following issues.  If you
+can make a contribution, even if it's as simple as giving advice, send
+an email to the nsapi_perl mailing list at nsapi_perl@samurai.com.
+
+-The following modules would be very useful:
+        -"Thread-hot" nsapi_perl.  Steve Nielsen is working on this as
+        we speak.
+        -Authentication via DBM
+        -Authentication via DBI
+        -Persistent database connections
+        -Perl embedded in HTML documents
+        -Server configuration in Perl
+
+-Basically anything done by Apache/mod_perl I think could, in theory,
+be done with nsapi_perl.  (Of course, mod_perl has the advantage of
+being able to poke around under the hood of its server.)
+
+-Ben Sugars
+<bsugars@canoe.ca>
+March 2, 1998

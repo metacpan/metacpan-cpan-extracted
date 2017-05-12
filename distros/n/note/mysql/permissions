@@ -1,0 +1,2 @@
+insert into user values
+   ('localhost','','','Y','Y','Y','Y','Y','Y','N','N','N','N','N','N','N','Y');

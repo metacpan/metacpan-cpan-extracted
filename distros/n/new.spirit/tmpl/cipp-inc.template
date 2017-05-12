@@ -1,0 +1,29 @@
+#-------=-------=---------------=---------------------------------------------
+# INCLUDE
+#       x.objectname
+#
+# DESCRIPTION
+#       description
+#
+# INPUT
+#       $i_par1                 description
+#
+# OPTIONAL
+#       $i_par2                 description
+#
+# OUTPUT
+#       $o_par1                 description
+#
+# AUTHOR
+#       $author
+#
+# COPYRIGHT
+#       Copyright (c) 2001, dimedis GmbH, Cologne, Germany,
+#	All Rights Reserved
+# 
+#-----------------------------------------------------------------------------
+
+<?INCINTERFACE
+	INPUT=""
+	OPTIONAL=""
+	OUTPUT="">

@@ -1,0 +1,24 @@
+Changes
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/nextgen.pm
+lib/nextgen/blacklist.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01_procedural_and_blacklist.t
+t/02_01_DashE_wo_nextgen.t
+t/02_02_DashE_w_nextgen.t
+t/03_oo_nextgen.t
+t/03_oo_vanilla.t
+t/10_blacklist_require_chain.t

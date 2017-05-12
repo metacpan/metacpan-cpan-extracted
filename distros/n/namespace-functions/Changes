@@ -1,0 +1,14 @@
+------------------------------------------------------------------------
+0.0101 | Piotr Roszatycki <dexter@cpan.org> | 2011-01-30
+
+Fixes:
+
+* Added missing prerequisite: Symbol::Util.
+* Fixed test script for Moose example.
+
+------------------------------------------------------------------------
+0.01 | Piotr Roszatycki <dexter@cpan.org> | 2011-01-26
+
+* First CPAN release.
+
+------------------------------------------------------------------------

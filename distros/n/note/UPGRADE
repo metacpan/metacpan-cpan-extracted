@@ -1,0 +1,73 @@
+1.0.5 important note upgrade information
+========================================
+
+If you are upgrading from previous versions of note, you 
+will need to create a new config file, since the format of
+that file has completely changed!
+
+Take a look at the sample in config/noterc for details.
+
+note will NOT work with an existing database and an old config.
+You have to create a new config based on your old settings.
+
+
+Please don't forget to make a backup of your database before 
+upgrading! I am not responsible for data loss!
+
+I told ya...
+
+
+
+
+
+Thomas Linden <tom@daemon.de>
+READ THIS FILE, IF YOU ARE UPGRADING FROM 0.9 TO 1.0.x
+======================================================
+
+
+In any case: BACKUP your existing note database!!!!!!!
+The format has not changed, but some default values
+(see the new config file-sample). Use this command
+to save your note database with your *old* version
+of note:
+	"note -D"
+This works with both the mysql and the binary version.
+
+You need to reedit your configfile. Please refer to the
+sample config in config/noterc.
+
+======================================================
+
+This version of note has now encryption support build in.
+If you decide to use it, you need to re-initialize your
+note database. That's why, because your current database
+is unencrypted and *if* you want to secure your data, you
+need to secure everything. That means, your existing data
+must be encrypted before you can use this new capability!
+
+Follow this steps:
+	o backup existing db:
+	  $ note -D
+	o backup the db:
+	  $ cp .notedb .notedb.save
+	  or (for mysql users!):
+	  $ cp -r /usr/local/mysql/data/notedb ~/notedb.mysql.save
+	o go into note and delete all existing notes:
+	  $ note -d 1-20 (or however)
+ 	o now upgrade your note installation:
+	  $ perl Makefile.PL; make install
+	o re-configure note. Turn $USE_CRYPT on by setting it
+	  to "YES".
+	o re-initialize your database:
+	  $ note -I note.dump.2323 (or whatever)
+	  note will prompt you for a passphrase. It will be used
+	  by Crypt::CBC for encrypting your data.
+From now on, your data is encrypted. You will need the passphrase
+you set above for decrypting it! So - don't forget it!
+
+======================================================
+
+AGAIN:	YOU HAVE BEEN WARNED! DO NOT UPGRADE WITHOUT MADE A 
+	BACKUP OF YOUR DATABASE! I AM NOT RESPONSIBLE IF YOU
+	LOOSE DATA!
+	

@@ -1,0 +1,878 @@
+#!/usr/dim/bin/perl
+
+# kopiert von /usr/projects/newspirit2/bin/newspirit rev 1.1.2.11
+use strict;
+
+use Carp;
+use Getopt::Std;
+use File::Basename;
+use Cwd;
+
+$| = 1;
+
+my $VERSION = "0.08";
+
+my $USAGE = <<__EOU;
+new.spirit command line client, version $VERSION
+Copyright 2001-2002 dimedis GmbH, All Rights Reserved
+
+usage: newspirit [global-options] command [command-options] [ object|project ]
+
+global-options:
+	-s	new.spirit server cgi-bin URL, e.g. "http://newspirit/cgi-bin"
+		(if not set, the environment variable NEWSPIRIT_SERVER
+		 is used instead)
+
+	-f	a filename is provided instead of an object name. -s is
+		autodetected in this case by reading the correspondent
+		project base configuration file
+
+	-g	Use Gtk windows for login and command output. Requires
+		Perl Gtk module.
+
+	-b	start process in background (useful in combination with -g)
+
+commands:
+	login
+		log into server, no options
+	
+	logout
+		logout from server, no options
+	
+	install object
+		install/process the object on the server
+
+	compile [-T] [-D] project
+		perform a "Project Compilation" for the selected project
+		-T	no dependency database truncation
+		-D	no prior deletion of production files
+
+	dist [-P] [-s] base-config-object
+		perform a "Project Installation" for the selected
+		base config object
+		-P	without prod directory SQL files
+		-s	with src tree for SQL execution
+
+	Object names are expected in dotted notation.
+
+__EOU
+
+main: {
+	my %global_opts;
+	my $opt_ok = getopts("fbgs:", \%global_opts);
+	
+	usage() if not $opt_ok;
+
+	my $server = $global_opts{s} || $ENV{NEWSPIRIT_SERVER};
+
+	my $command = shift @ARGV;
+	
+	usage() if not $command;
+
+	my %command_opts;
+	$opt_ok = getopts("TDPs", \%command_opts);
+	
+	usage() if not $opt_ok;
+	
+	my $object = shift @ARGV;
+
+	if ( $global_opts{f} ) {
+		($server, $object) = autodetect_from_file (
+			filename => $object
+		);
+		$global_opts{s} = $server;
+	}
+
+	my $client_module = $global_opts{g} ? "NewSpirit::Client::GUI" :
+					      "NewSpirit::Client";
+
+	if ( $global_opts{b} ) {
+		exit if fork();
+		close STDIN;
+		close STDERR;
+		close STDOUT;
+	}
+
+	eval {
+		my $client = $client_module->new (
+			server       => $server,
+			global_opts  => \%global_opts,
+		);
+
+		$client->login if $command ne 'login' and
+				  $command ne 'logout';
+
+		my $request = $client->request (
+			command      => $command,
+			command_opts => \%command_opts,
+			object       => $object,
+		);
+
+		$request->execute;
+	};
+	
+	if ( $@ =~ /^err\t/ ) {
+		my $error = $@;
+		$error =~ s/^err\t//;
+		$error =~ s/\s+at\s+[^\s]+\s+line\s+\d+$//;
+		print $error;
+		exit 1;
+	} elsif ( $@ ) {
+		confess $@;
+	}
+
+	1;
+}
+
+sub usage {
+	print $USAGE;
+	exit 1;
+}
+
+sub autodetect_from_file {
+	my %par = @_;
+	my ($filename) = @par{'filename'};
+
+	if ( $filename !~ m!^/! ) {
+		$filename = cwd()."/".$filename;
+	}
+
+	my ($server, $object);
+
+	# search for $prefix/src/configuration.cipp-base-config
+	my $prefix = dirname($filename);
+	my $base_config_file;
+
+	while ( $prefix ) {
+		$base_config_file = "$prefix/src/configuration.cipp-base-config";
+		last if -f $base_config_file;
+		$base_config_file = "";
+		$prefix = dirname($prefix);
+		last if $prefix eq '/';
+	}
+
+	if ( not $base_config_file ) {
+		print "new.spirit base configuration not found!\n";
+		exit 1;
+	}
+
+	# read base config
+	my $base_config = do $base_config_file;
+	my $project = $base_config->{_base_project};
+	my $server  = $base_config->{_base_server};
+
+	if ( not $project or not $server ) {
+		print "No server configuration found in base config!\n";
+		exit 1;
+	}
+	
+	$filename =~ s!^$prefix/src/!!;
+	$filename =~ s!\.[^.]+$!!;
+	$filename =~ s!/!.!g;
+
+	$object = "$project.$filename";
+
+	return ($server, $object);
+}
+
+package NewSpirit::Client;
+
+use Carp;
+use FileHandle;
+use Data::Dumper;
+
+sub server		{ shift->{server}				}
+sub global_opts		{ shift->{global_opts}				}
+
+sub nspass		{ shift->{nspass}				}
+sub set_nspass		{ shift->{nspass}			= $_[1] }
+
+sub credentials {
+	my $self = shift;
+	return $self->nspass->{$self->server}
+}
+
+sub set_credentials {
+	my $self = shift;
+	return $self->nspass->{$self->server} = shift;
+}
+
+sub new {
+	my $type = shift;
+	my %par = @_;
+	my ($server, $global_opts) = @par{'server','global_opts'};
+
+	croak "err\tserver not set" if not $server;	
+
+	my $self = {
+		global_opts	=> $global_opts,
+		server          => $server,
+	};
+
+	bless $self, $type;
+	
+	$self->load_nspass;
+	
+	return $self;
+}
+
+sub request {
+	my $self = shift;
+	my %par = @_;
+	my  ($command, $command_opts, $object) =
+	@par{'command','command_opts','object'};
+
+	return NewSpirit::Client::Request->new (
+		client       => $self,
+		command      => $command,
+		command_opts => $command_opts,
+		object       => $object,
+	);
+}
+
+sub login {
+	my $self = shift;
+	
+	my $credentials = $self->credentials;
+
+	if ( not $credentials ) {
+		my $request = $self->request (
+			command => "login",
+		);
+		$request->execute;
+		$credentials = $self->credentials;
+	}
+
+	$self->error ( message => "not logged in") if not $credentials;
+
+	return;
+}
+
+sub logout {
+	my $self = shift;
+	
+	delete $self->nspass->{$self->server};
+
+	$self->save_nspass;
+
+	$self->info (
+		message => "Logged out."
+	);
+
+	1;
+}
+
+sub save_nspass {
+	my $self = shift;
+
+	my $nspass_file = "$ENV{HOME}/.nspass";
+
+	my $fh = FileHandle->new;
+	open ($fh, "> $nspass_file")
+		or $self->error ( message => "can't write $nspass_file");
+
+	my $dd = Data::Dumper->new([$self->nspass],['nspass']);
+	print $fh $dd->Dump;
+
+	close $fh;
+	
+	1;
+}
+
+sub load_nspass {
+	my $self = shift;
+
+	$self->set_nspass({});
+
+	my $nspass_file = "$ENV{HOME}/.nspass";
+	return if not -r $nspass_file;
+
+	my $server = $self->server;
+
+	my $fh = FileHandle->new;
+	open ($fh, $nspass_file)
+		or $self->error ( message => "can't read $nspass_file" );
+	my $data = join ('',<$fh>);
+	close $fh;
+
+	my $nspass;
+	{
+		# prevent error message for old file format
+		no strict;
+		$nspass = eval($data);
+	}
+	$nspass = {} if not ref $nspass;
+
+	$self->set_nspass($nspass);
+	
+	1;
+}
+
+sub error {
+	my $self = shift;
+	my %par = @_;
+	my ($message) = @par{'message'};
+	
+	croak "err\t$message";
+}
+
+sub info {
+	my $self = shift;
+	my %par = @_;
+	my ($message) = @par{'message'};
+	
+	$self->print("$message\n");
+	
+	1;
+}
+
+sub print {
+	my $self = shift;
+	print @_;
+	1;
+}
+
+package NewSpirit::Client::Request;
+
+use Carp;
+use Term::ReadKey;
+use LWP::UserAgent qw();
+use CGI;
+
+sub client		{ shift->{client}	}
+sub command		{ shift->{command}	}
+sub command_opts	{ shift->{command_opts}	}
+sub object		{ shift->{object}	}
+
+sub new {
+	my $type = shift;
+	my %par = @_;
+	my  ($client, $command, $command_opts, $object) =
+	@par{'client','command','command_opts','object'};
+	
+	my $self = {
+		client		=> $client,
+		command		=> $command,
+		command_opts	=> $command_opts,
+		object		=> $object,
+	};
+	
+	return bless $self, $type;
+}
+
+sub need_object {
+	my $self = shift;
+	
+	if ( not $self->object ) {
+		$self->client->error (
+			message => "Missing object parameter.",
+		);
+	}
+	
+	1;
+}
+
+sub execute {
+	my $self = shift;
+	
+	if ( not $self->client->server ) {
+		$self->client->error (
+			message => "No new.spirit server set. Specify -s option\n".
+		      		   "or set NEWSPIRIT_SERVER environment variable."
+		);
+	}
+
+	my $command = $self->command;
+	my $method = "command_$command";
+
+	if ( $self->can($method) ) {
+		$self->$method();
+	} else {
+		$self->client->error (
+			message => "Unknown command '$command'."
+		);
+	}
+
+	1;
+}
+
+sub crypt_credentials {
+	my $self = shift;
+	my %par = @_;
+	my ($username, $password) = @par{'username','password'};
+	
+	my $credentials = "$username:$password";
+
+	for ( my $i=0; $i < length($credentials); ++$i ) {
+		substr($credentials,$i,1) =
+			chr(ord(substr($credentials,$i,1))+3);
+	}
+
+	return $credentials;
+}
+
+sub request {
+	my $self = shift;
+	my %par = @_;
+
+	my $program         = delete $par{'program'};
+	my $filter_callback = delete $par{'filter_callback'};
+	my $silent          = delete $par{'silent'};
+
+	if ( $program eq 'admin' ) {
+		$program = "admin.cgi" if $program eq 'admin';
+	} else {
+		$program = "nph-$program.cgi" if $program ne 'admin';
+	}
+	
+	my $url = $self->client->server;
+
+	$url .= "/$program?";
+
+	$par{command_line_mode} = exists $par{object} ? 1 : 2;
+	$par{credentials}       = $self->client->credentials;
+
+	if ( not $par{credentials} and $par{e} ne 'check' ) {
+		$self->client->error (
+			message => "You need to be logged in."
+		);
+	}
+
+	my ($k,$v);
+	while ( ($k, $v) = each %par ) {
+		$url .= "$k=".CGI::escape($v)."&";
+	}
+	$url =~ s/&$//;
+
+	# now send the request
+	my $ua   = LWP::UserAgent->new;
+	my $req  = HTTP::Request->new ('GET', $url);
+	
+	my $new_line_printed;
+	my $error = 0;
+
+	my $answer;
+	my $resp = $ua->request ($req, sub {
+		return if $error;
+		$_ = $_[0];
+		if ( /no access on this project|internal error/i ) {
+			print "Project and/or object does not exist or you have no access right.";
+			$error = 1;
+			return;
+		}
+		s!&nbsp;! !sg;
+		s!<br>!\n!sg;
+		s!<p>!\n!sg;
+		s!<script>.*?</script>!!sg;
+		s!<html>.*?<body!<body!sg;
+		s!<[^\?]*?>! !sg;
+		s!<a.*?>! !sg;
+		s!\s*\n+!\n!sg;
+		s!^\s+!!mg;
+		s! +! !g;
+#		s!^[^<]*?[^=]>!!;
+		s!&lt;!<!g;
+		&$filter_callback() if $filter_callback;
+		$self->client->print($_) if not $silent;
+		$answer .= $_;
+		next if $_ eq '';
+		$new_line_printed = m/\n$/;
+	}, 4096 );
+
+	$self->client->print("\n") if not $silent and not $new_line_printed;
+
+	if ( not $resp->is_success ) {
+		print "Error executing this command on the server.\n";
+	}
+
+	return $answer;
+}
+
+sub command_login {
+	my $self = shift;
+	
+	my ($username, $password);
+
+	print "Username: ";
+	$username = <STDIN>;
+	chomp($username);
+
+	ReadMode(2);
+	print "Password: ";
+	$password = <STDIN>;
+	chomp($password);
+	ReadMode(0);
+	print "\n";
+
+	my $ok = $self->check_login (
+		username => $username,
+		password => $password,
+	);
+	
+	if ( $ok ) {
+		$self->client->info ( message => "Successfully logged in.");
+	} else {
+		$self->client->error (
+			message => "Can't login to server with these credentials."
+		);
+	}
+
+	1;
+}
+
+sub check_login {
+	my $self = shift;
+	my %par = @_;
+	my ($username, $password) = @par{'username','password'};
+
+	my $answer = $self->request (
+		program  => 'admin',
+		e        => 'check',
+		username => $username,
+		password => $password,
+		silent   => 1,
+	);
+
+	if ( $answer and $answer !~ /invalid/i ) {
+		$self->client->set_credentials (
+			$self->crypt_credentials (
+				username => $username,
+				password => $password,
+			)
+		);
+		$self->client->save_nspass;
+		return 1;
+
+	} else {
+		return;
+	}
+}
+
+sub command_logout {
+	my $self = shift;
+	
+	$self->client->logout;
+	
+	1;
+}
+
+sub command_install {
+	my $self = shift;
+	
+	$self->need_object;
+
+	my $answer = $self->request (
+		program         => 'object',
+		e               => 'install_last_saved_object',
+		object          => $self->object,
+		filter_callback => sub {
+			s!\s*\[DOWNLOAD.*\]\s*!!i;
+			s!\[Show Perl Source\]!!i;
+		},
+	);
+
+	1;
+}
+
+sub command_compile {
+	my $self = shift;
+	
+	$self->need_object;
+
+	my $opts = $self->command_opts;
+
+	my $project = $self->object;
+	$project =~ /^([^.]+)/;
+	$project = $1;
+
+	my $answer = $self->request (
+		program         => 'install',
+		e               => 'compile_project',
+		clear_prod_tree => ($opts->{D} ? 0 : 1),
+		trunc_depend    => ($opts->{T} ? 0 : 1),
+		project         => $project,
+		filter_callback => sub {
+			s!CLOSE\s+WINDOW\n!!;
+			s!\s(\d+/\d+)!\n$1!g;
+			s!Line\n!!;
+			s!Message\n!!;
+		}
+	);
+
+	1;
+}
+
+sub command_dist {
+	my $self = shift;
+	
+	$self->need_object;
+
+	my $opts = $self->command_opts;
+
+	my $object = $self->object;
+	my ($project) = ($object =~ m!^([^.]+)!);
+	$object =~ s!^([^.]+).!!;
+	$object =~ tr!.!/!;
+	$object .= ".cipp-base-config";
+
+	my $answer = $self->request (
+		program             => 'install',
+		e                   => 'install_project',
+		with_sql_prod_files => ($opts->{P} ? 0 : 1),
+		build_src_tree      => ($opts->{s} ? 1 : 0),
+		base_config         => $object,
+		project             => $project,
+		filter_callback => sub {
+			s!CLOSE\s+WINDOW\n!!;
+		}
+	);
+
+	1;
+}
+
+package NewSpirit::Client::GUI;
+
+BEGIN { @NewSpirit::Client::GUI::ISA = qw ( NewSpirit::Client ) }
+
+sub new {
+	my $class = shift;
+
+	eval "use Gtk";
+	Gtk->init;
+
+	return $class->SUPER::new(@_);
+}
+
+sub request {
+	my $self = shift;
+	my %par = @_;
+	my  ($command, $command_opts, $object) =
+	@par{'command','command_opts','object'};
+
+	return NewSpirit::Client::Request::GUI->new (
+		client       => $self,
+		command      => $command,
+		command_opts => $command_opts,
+		object       => $object,
+	);
+}
+
+package NewSpirit::Client::Request::GUI;
+
+use FileHandle;
+
+BEGIN { @NewSpirit::Client::Request::GUI::ISA = qw ( NewSpirit::Client::Request ) }
+
+sub execute {
+	my $self = shift;
+
+	my $global_opts  = $self->client->global_opts;
+	my $command      = $self->command;
+	my $command_opts = $self->command_opts;
+	my $object       = $self->object;
+
+	return $self->command_login if $command eq 'login';
+
+	my $execute = "$0 ";
+	$execute .= "-$_ ".($global_opts->{$_} eq '1' ? '' : $global_opts->{$_})." "
+		foreach grep !/^(g|b|f)$/, keys %{$global_opts};
+	$execute .= "$command ";	
+	$execute .= "-$_ ".($command_opts->{$_} eq '1' ? '' : $command_opts->{$_})." "
+		foreach grep !/^(g|b|f)$/, keys %{$command_opts};
+	$execute .= "$object";
+
+	$self->execute_in_window (
+		command => $execute
+	);
+	
+	1;
+}
+
+sub command_login {
+	my $self = shift;
+	
+	my ($username, $password, $ok);
+
+        my $win = Gtk::Window->new;
+        $win->set_title ("new.spirit Login");
+        $win->set_position ("center");
+	$win->signal_connect("destroy", sub { Gtk->main_quit } );
+
+	my $frame_vbox = Gtk::VBox->new;
+	$frame_vbox->show;
+	$frame_vbox->set_border_width(10);
+	$win->add ($frame_vbox);
+	
+	my $frame = Gtk::Frame->new ("new.spirit Login");
+	$frame->show;
+	$frame_vbox->pack_start ($frame, 0, 1, 0);
+
+	my $vbox = Gtk::VBox->new;
+	$vbox->show;
+	$vbox->set_border_width(10);
+	$frame->add ($vbox);
+
+        my $table = new Gtk::Table( 3, 2, 0 );
+        $table->show();
+        $table->set_row_spacings( 5 );
+	$table->set_col_spacings( 5 );
+        $vbox->pack_start($table, 1, 1, 0);
+	
+	my ($label, $hbox, $entry, $button_box, $button);
+
+	my $row = 0;
+	$label = Gtk::Label->new("Username");
+	$label->show;
+	$hbox = Gtk::HBox->new;
+	$hbox->show;
+	$hbox->pack_start ($label, 0, 1, 0);
+	$table->attach_defaults ($hbox, 0, 1, $row, $row+1);
+
+	$entry = Gtk::Entry->new;
+	$entry->show;
+	$entry->grab_focus;
+	$entry->signal_connect ( "changed", sub { $username = $_[0]->get_text} );
+	$table->attach_defaults ($entry, 1, 2, $row, $row+1);
+
+	++$row;
+	$label = Gtk::Label->new("Password");
+	$label->show;
+	$hbox = Gtk::HBox->new;
+	$hbox->show;
+	$hbox->pack_start ($label, 0, 1, 0);
+	$table->attach_defaults ($hbox, 0, 1, $row, $row+1);
+
+	$entry = Gtk::Entry->new;
+	$entry->show;
+	$entry->set_visibility (0);
+	$entry->signal_connect ( "changed", sub { $password = $_[0]->get_text} );
+	$table->attach_defaults ($entry, 1, 2, $row, $row+1);
+
+	$button_box = new Gtk::HButtonBox();
+	$button_box->show;
+	$button_box->set_spacing_default(2);
+	$frame_vbox->pack_start ($button_box, 1, 0, 1);
+
+	++$row;
+	$label = Gtk::Label->new("Status");
+	$label->show;
+	$hbox = Gtk::HBox->new;
+	$hbox->show;
+	$hbox->pack_start ($label, 0, 1, 0);
+	$table->attach_defaults ($hbox, 0, 1, $row, $row+1);
+
+	my $status_label = Gtk::Label->new("Credentials not checked.");
+	$status_label->show;
+	$hbox = Gtk::HBox->new;
+	$hbox->show;
+	$hbox->pack_start ($status_label, 0, 1, 0);
+	$table->attach_defaults ($hbox, 1, 2, $row, $row+1);
+
+	$button_box = new Gtk::HButtonBox();
+	$button_box->show;
+	$button_box->set_spacing_default(2);
+	$frame_vbox->pack_start ($button_box, 1, 0, 1);
+
+	# Transcode and split Button
+	$button = Gtk::Button->new_with_label ("Cancel");
+	$button->show;
+	$button->signal_connect ( "clicked", sub { $win->destroy } );
+	$button_box->add ($button);
+
+	# Transcode only Button
+	$button = Gtk::Button->new_with_label ("Ok");
+	$button->show;
+	$button->signal_connect ( "clicked", sub {
+		my $login_ok = $self->check_login (
+			username => $username,
+			password => $password,
+		);
+		if ( $login_ok ) {
+			$status_label->set ("Ok");
+			$ok = 1;
+			$win->destroy;
+		} else {
+			$status_label->set ("Not Ok. Try again.");
+		}
+		
+	} );
+	$button_box->add ($button);
+
+	$win->show;
+	Gtk->main;
+
+	exit if not $ok;
+
+	1;
+}
+
+sub execute_in_window {
+        my $self = shift;
+        my %par = @_;
+        my ($command) = @par{'command'};
+
+        my $win = Gtk::Window->new;
+        $win->set_title ("new.spirit command Output");
+	$win->signal_connect("destroy", sub { Gtk->main_quit } );
+        $win->set_default_size (620, 400);
+        $win->set_position ("center");
+
+        my $vbox = Gtk::VBox->new;
+        $vbox->show;
+        $vbox->set_border_width(10);
+        $win->add($vbox);
+
+        my $text_table = new Gtk::Table( 2, 2, 0 );
+        $text_table->show();
+        $text_table->set_row_spacing( 0, 2 );
+        $text_table->set_col_spacing( 0, 2 );
+        $vbox->pack_start($text_table, 1, 1, 0);
+
+        my $text = new Gtk::Text( undef, undef );
+        $text->show;
+        $text->set_usize (undef, 100);
+        $text->set_editable( 0 );
+        $text->set_word_wrap ( 0 );
+        $text_table->attach( $text, 0, 1, 0, 1,
+                       [ 'expand', 'shrink', 'fill' ],
+                       [ 'expand', 'shrink', 'fill' ],
+                       0, 0 );
+
+	my $style = $text->style->copy;
+	$style->font (Gtk::Gdk::Font->load ("-*-courier-medium-r-*-*-*-120-*-*-*-*-*-*"));
+	$text->set_style ($style);
+
+        my $vscrollbar = new Gtk::VScrollbar( $text->vadj );
+        $vscrollbar->show();
+        $text_table->attach( $vscrollbar, 1, 2, 0, 1, 'fill',
+                       [ 'expand', 'shrink', 'fill' ], 0, 0 );
+
+        my $ok = Gtk::Button->new (" Cancel ");
+        $ok->show;
+        $ok->signal_connect( "clicked", sub { $win->destroy } );
+	$ok->can_default(1);
+	$ok->grab_default;
+
+        $vbox->pack_start ( $ok, 0, 1, 0 );
+
+        $win->show;
+
+	my $fh = FileHandle->new;
+	open ($fh, "$command |") or die "can't fork $command";
+	my $input;
+	$input = Gtk::Gdk->input_add ( $fh->fileno, 'read', sub {
+		if ( eof($fh) ) {
+			close $fh;
+			Gtk::Gdk->input_remove ($input);
+			$ok->child->set("Ok");
+		}
+		my $line = <$fh>;
+		$text->insert (undef, undef, undef, $line);
+	} );
+
+	Gtk->main;
+
+        return;
+}
+
+1;

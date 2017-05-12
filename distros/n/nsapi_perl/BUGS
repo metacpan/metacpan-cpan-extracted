@@ -1,0 +1,16 @@
+This document lists a few of the more obvious bugs I have come
+accross.  There are no doubt more bugs, but I have not yet had the
+time to identify them all.  Please send bug reports to the nsapi_perl
+mailing list at nsapi_perl@samurai.com.
+
+Bugs in Netscape::Server and related modules 
+--------------------------------------------
+-When using rq->vars to iterate over the hash, eg "keys %{rq->vars}",
+you get an infinite loop.
+-Threads.  See the README file, and be patient.
+
+Bugs related to CGI.pm/Registry.pm
+----------------------------------
+-CGI programs can't muck with @INC
+-CGI::Carp qw/fatalsToBrowser/ does not work yet
+-PATH_INFO is not reliable

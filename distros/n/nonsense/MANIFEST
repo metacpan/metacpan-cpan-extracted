@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/nonsense.pm
+t/class.pm
+t/library.pm
+t/load.pm
+t/load.t
+t/release-pod-syntax.t
+t/role.pm
+t/typelibrary.pm

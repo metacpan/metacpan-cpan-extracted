@@ -1,0 +1,113 @@
+----------------------------------------------------------------------
+    This is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+ 
+    This software is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+ 
+    You should have received a copy of the GNU General Public License
+    along with this software. If not, write to the Free Software
+    Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+----------------------------------------------------------------------
+
+        *** This is alpha software -- use at your own risks ***
+
+INSTALL file for nsapi_perl version 0.24.
+
+
+Introduction
+------------
+
+Building nsapi_perl should be relatively straight-forward on Solaris and NT.
+Thanks to Steve Nielsen for contributing a Makefile.PL that smoothes the Win32
+install considerably.
+
+You should be able to install nsapi_perl on Unix platforms other than Solaris, but
+it may require some mucking with the install process.  If you succeed, please let
+the nsapi_perl mailing list (nsapi_perl@samurai.com) know, so that we can
+incorporate any changes you had to make in the next release.
+
+
+Steps
+-----
+
+(The following commands assume Unix-ness.  Of course, if you're on NT
+your path separator will be \ )
+
+1.  From the same directory as this file, enter;
+    perl ./Makefile.PL
+    make
+    make install    
+
+    This will ask you some questions regarding the location of your
+    Netscape server, NSAPI compilation options, and so on.  It will
+    then proceed to build two shared objects.  One shared object is
+    the NSAPI plugin that your web server will load at runtime.  The
+    other shared object implements the Netscape::Server Perl module
+    and its friends.
+
+2.  Edit your server config files so that Netscape knows about
+    nsapi_perl.
+
+    The following lines will need to be added to your Netscape server
+    obj.conf file.
+        Init fn=load-modules
+             shlib=$plugin_dir/nsapi_perl.so
+             funcs=nsapi_perl_init,nsapi_perl_handler
+        Init fn=nsapi_perl_init
+             init-script=$plugin_dir/nsapi_perl_init.pl
+             shlib=$plugin_dir/nsapi_perl.so
+    The value of $plugin_dir where the NSAPI shared object has been
+    installed.  This location is determined when running the top-level
+    Makefile.PL from step 1.
+
+    Strictly speaking, the shlib argument to nsapi_perl_init is not
+    needed on all platforms, but it never hurts in any event.  Its
+    purpose is to let the symbols defined in nsapi_perl.so be visible
+    to other shared objects loaded in by Perl.  See the nsapi_perl pod
+    page for more details.
+
+3. Try running your server.
+
+    Start your server the usual way.  You should see a message like
+        nsapi_perl_init: loaded a perl version 5.00401 interpreter
+
+    If you see something like this, congratulations!  You have
+    embedded Perl in Netscape.
+
+The next thing to do is start to actually *use* your embedded Perl
+interpreter.  To do this see the nsapi_perl pod documentation file.
+
+
+Notes
+-----
+
+-If you successfully build nsapi_perl please send the nsapi_perl mailing list
+(nsapi_perl@samurai.com) an email letting us know what you had to do.  That way we
+can start to build up a hints file that may make life easier for the next person
+building on your platform.  You will also receive a prominent position in the
+CREDITS file.
+
+-If you have trouble building nsapi_perl please send email to the nsapi_perl
+mailing list (nsapi_perl@samurai.com).  We'll do our best to help.  If you wish to
+join the mailing list, send email to
+    majordomo@samurai.com
+with
+    subscribe nsapi_perl
+in the body of the message.
+
+-Problems seem to occur when using nsapi_perl in conjunction with a
+Perl has been compiled to have binary compatibility with 5.003.  At
+this time the only workaround seems to be recompiling Perl so that it
+agrees with nsapi_perl.
+
+-Earlier versions of nsapi_perl also had problems with Perls that used
+a static Perl library, such as libperl.a.  The symptons are bus errors
+at server start-up.  If this happens to you, try recompiling Perl so
+that it uses a shared Perl library, like libperl.so.
+
+-Ben Sugars
+<bsugars@canoe.ca>
+April 1, 1998

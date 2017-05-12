@@ -1,0 +1,33 @@
+Changes
+inc/ExtUtils/HasCompiler.pm
+lib/namespace/clean.pm
+lib/namespace/clean/_Util.pm
+Makefile.PL
+MANIFEST			This list of files
+t/00-basic.t
+t/01-function-wipeout.t
+t/02-inheritance.t
+t/03-unimport.t
+t/04-except.t
+t/05-explicit-cleanee.t
+t/05-syntax-error.t
+t/06-other-types.t
+t/07-debugger.t
+t/07-pseudo-debugger.t
+t/08-const-sub.t
+t/09-fiddle-hinthash.t
+t/10-pure-perl.t
+t/11-multiclean-in-scope.t
+t/lib/CleaneeBridge.pm
+t/lib/CleaneeBridgeDirect.pm
+t/lib/CleaneeBridgeExplicit.pm
+t/lib/CleaneeTarget.pm
+t/lib/Devel/_NC_TEST_DashD.pm
+t/lib/ExporterTest.pm
+t/lib/FunctionWipeout.pm
+t/lib/Inheritance.pm
+t/lib/OtherTypes.pm
+t/lib/SyntaxError.pm
+t/lib/Unimport.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

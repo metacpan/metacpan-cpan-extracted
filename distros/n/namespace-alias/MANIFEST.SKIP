@@ -1,0 +1,13 @@
+^\.
+\.bak$
+\.swp$
+\.o$
+\.bs$
+^alias.c$
+^Makefile$
+^Makefile.old$
+^namespace-alias-*
+^cover_db\b
+^blib\b
+^pm_to_blib$
+^MYMETA\.

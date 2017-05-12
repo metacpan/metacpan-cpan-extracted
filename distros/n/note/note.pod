@@ -1,0 +1,539 @@
+# -*-perl-*-
+
+=head1 NAME
+
+note - a perl script for maintaining notes.
+
+
+=head1 SYNPOPSIS
+
+note [options] [ number [,number...]]
+
+
+=head1 DESCRIPTION
+
+B<note> is a small console program written in perl, which allows 
+you to manage notes similar to programs like "knotes" but from 
+the commandline. Note can use different database-backends for 
+notes-storage. It ships with a DBI-based mysql-module(which 
+can also be used for other by DBI supported DBMS), another 
+module, which uses a binary file for storage and a DBM module.
+There are also two modules available which uses a text file.
+Note supports since version 1.0.0 encryption(IDEA or DES)!
+
+
+=head1 OPTIONS
+
+
+=over
+
+=item I<-c, --config file>
+
+Use another config file than the default ~/.noterc.
+
+
+=item I<-l, --list [topic]>
+
+Lists all existing notes. If no topic were specified,
+it will display a list of all existing topics.
+See the section I<TOPICS> for details about topics.
+
+=item I<-L, --longlist [topic]>
+
+The same as I<-l> but prints also the timestamp of the notes.
+
+
+=item I<-t, --topic>
+
+Prints a list of all topics as a tree.
+
+
+=item I<-T, --longtopic>
+
+Prints the topic-tree with the notes under each topic.
+
+
+=item I<-s, --search string>
+
+Searches for <string> trough the notes database. See the section
+I<SEARCHING> for details about the search engine.
+
+
+=item I<-e, --edit number>
+
+Edit the note with the number <number> using your default editor
+or the one you specified in the config file.
+
+
+=item I<-d, --delete number>
+
+Delete the note with the number <number>. You can delete multiple notes
+with one command. "1-4" deletes the notes 1,2,3,4. And "1,5,7" deletes
+the specified ones.
+
+
+=item I<-D, --Dump [file | -]>
+
+Dumps all notes to the textfile <file>. If <file> is a "-" it will 
+be printed out to standard output (STDOUT).
+
+
+=item I<-I, --Import file | ->
+
+Imports a previously dumped textfile into the
+note database. Data will be appended by default.
+You can also specify a dash I<note -I -> instead of a <file>,
+which causes note, silently to read in a dump from STDIN.
+
+
+=item I<-o, --overwrite>
+
+Only suitable for use with --Import. Overwrites an 
+existing notedb. Use with care.
+
+
+=item I<-r, --raw>
+
+Raw mode, output will not be formatted. Works not in interactive
+mode, only on cmd-line for list and display. That means, no colors
+will be used and no lines or titles.
+
+
+=item I<-i, --interactive>
+
+Start note in interactive mode. See the section I<INTERACTIVE MODE>
+for details on this mode.
+	
+
+=item I<--encrypt cleartext>
+
+Encrypt the given clear text string. You would need that if you want to
+store the mysql password not in cleartext in the config(if you are using
+the mysql backend!).
+
+
+=item I<-h, --help>
+
+Display this help screen.
+
+
+=item I<-v, --version>
+
+Display the version number.
+
+
+=item B<->
+
+If you run note just with one dash: B<note ->, then it will read in a new
+note from STDIN until EOF. This makes it possible to pipe text into a new note, i.e.:
+
+ cat sometextfile | note -
+
+
+=back
+
+
+
+
+=head1 USAGE
+
+=head2 GENERAL USAGE
+
+If you don't know, how to run note, try "note -h" first.
+It will tell you all available commandline options.
+
+To create a new note, simply run "note". You can enter
+the note (the length is by default limited to 4096 bytes,
+which you can change from your config file if you are using
+the binary backend, otherwise there is no limitation).
+End by typing a . on a line itself. note will tell you the
+number of the note.
+
+If you want to view the note, type "note 1", if the notenumber
+was 1.
+
+If you want to get an overview of all notes, type "note -l".
+You will get a list of all notes, containing the number,
+the first line and the creation date. If topic-support is
+turned on (which is by default), then all subtopics under the
+current topic will be displayed first.
+If you want to see the timestamps, use "-L" instead of "-l".
+Read more about topics below in the section "Topics".
+You can also specify the topic which notes you want to see:
+"-l mytopic" does the trick.
+Additional, you might want to get an overview of your topic-
+structure. You can use the command "-t" in this case, which
+will display a tree-view of your topic-structure. You can
+use the command "-T" if you want to see the notes under each
+topic too. "-T" will also show the number of each note.
+
+To edit a certain note, type "note -e 1". It will invoke your
+editor (vi or pico). You can edit it, after saving, note
+will store the changed note to the database.
+
+Of course you can drop a certain note: "note -d 1" deletes
+note number 1. If a note in the middle or the beginning of
+the database will be deleted, note will recount the other
+existent notes. For example there are 3 notes, number 1, 2
+and 3. If you delete number 2, then number 3 will become
+number 2.
+You can also make use of the extended delete-syntax:
+To delete note 1 and 2, use "-d 1,2"
+To delete note 1,2 and 3, use "-d 1-3".
+
+
+
+=head2 SEARCHING
+
+If you cannot remember, which note you are looking for, you
+can use the search capability of note: "note -s <searchstring>".
+note will search the whole note database case insensitive for
+an occurence of this string and tell you the number and first-
+line it has.
+
+You can extend the searchstring using B<AND>, B<OR> ( and ) and
+shell-like wildcards:
+
+ $ note -s "moses AND lenin"
+
+or:
+
+ $ note -s "(mike OR arnold) AND (jackson OR schwarzenegger)"
+
+If note finds a note, which first line is a topic, then it will
+display it's second line.
+
+These rules apply for the interactive search too.
+
+You need to know, that note searches for the expression in every
+note. In other words, "moses AND lenin" searches for an occurence
+of "moses" and "lenin" in ONE note. Or, if you are looking for
+"mike OR daniel", then it searches for an occurence of "mike" or
+daniel" in ONE note. Thus a note with the text "mike oldfield" will
+match that search.
+
+
+=head2 TOPICS
+
+If topic-support is turned on (which is by default), the various
+notes are sorted under various topics. There is no special database
+field for the topic. Instead the topic will be stored right in the
+note.
+If the first line of your note contains some text bordered by slashes
+(or whatever you prefer, set "TopicSeparator" in your config! default
+is slash), then note will consider it as the topic of this certain
+note. For examle:
+
+ B</TodoList/>
+
+If you are using topics, no data after the topic is allowed, if there
+is any text, note will consider it as a subtopic! Therefore, don't for-
+get to put a newline after the topic-line.
+
+The list-command will only show you notes under this topic. If you
+create a new note, it will automagically inserted under the current
+topic (note will prepend  the string "/topicname/" to the text of your
+note).
+
+You can create at any time from any point a new topic. Just create a new
+note and type the name of the new topic bordered by slashes (or
+TopicSeparator) at the first line of this note. After saving, there
+will be available a new topic with one note in it.
+
+You can create as many subtopics as you like, the format is similar to
+a filesystem-path. An example, say, you want to create such a
+structure:
+
+ (root - top level)
+ |
+ |----test
+ |      |----subtopic
+ |      |       |--note 1
+ |      |       |--note 2
+ |      |
+ |      |--note 4
+ |
+ |--note 3
+
+Then you may create those 4 new notes:
+
+ --- snip ---
+ /test/subtopic/
+ note 1
+ --- snip ---
+ /test/subtopic/
+ note 2
+ --- snip ---
+ note 3
+ --- snip ---
+ /test/
+ note 4
+ --- snip ---
+
+I hope, you got the point ;-)
+
+If a note does not contain the "magic" /topic/ construction on the first
+line, it will be listed under the "root" of note, that is the point
+you are at the startup of note.
+
+You can subsequently move a note without a topic to a certain topic.
+Simply edit it and insert at the first line the above mentioned
+construction.
+
+Note: Please don't forget the prepending and appending a slash of a
+topic.  You will get strange results without it!
+
+
+
+
+=head2 INTERACTIVE MODE
+
+If you start note with the commandline flag B<-i>, then it starts
+with an interactive interface.
+It will start with a listing under the default top-topic ("/").
+You can enter the name of a topic to change to that topic. This works
+similar to a filesystem structure. The current topic will be 
+displayed on the top of the screen.
+
+The following commands are available:
+
+=over
+
+=item B<L [topic]>
+
+This command lists all notes with a timestamp. If you specify a topic, it
+will only list the notes under this topic. If you are under a certain subtopic,
+then it will only display the notes under this topic.
+
+=item B<l [topic]>
+
+This commands behaves similar to B<L> but it does not display the timestamp.
+You can achieve the same result by simply pressing enter at any time.
+
+
+=item B<N>
+
+You can create a new note by simply pressing B<N> or B<n>. You favorite
+editor will be started and you can enter your note text. If you are already
+under a topic then this new note will automatically go to this topic.
+note adds an aditional line to the top of the note with the topic. But
+you can of course specify your own topic.
+
+Note will tell you which number it has assigned to the newly created note.
+
+=item B<E number>
+
+By entering B<E> or B<e> and a note-number you can edit an existing note
+using your favorite editor. This way you can also move an existing note
+from one topic to another one by editing the first line of the note.
+
+
+=item B<D number>
+
+B<E> or B<e> deletes one or more existing note(s). It requires a note number
+or a set of note numbers. 1-5 and 1,7,9 are possible values.
+After one or more notes has been deleted note will recount all remaining notes.
+Say if you delete 1 and 2, then 3 will become 1, 4 will become 5 and so forth.
+
+
+=item B<S [expression]>
+
+You can search for the occurence of a text in your notes-database with the
+command B<S> or B<s>. If you omit an expression note will ask you for one.
+
+If your search criteria matches on exactly one entry, note will display
+that note entry instead of displaying its number.
+
+=item B<T>
+
+This prints a tree-view of your topic-structure. B<T> displays the tree with
+notes, B<t> displays just the topics without notes.
+
+=item B<C>
+
+It is possible to change note's behavior at runtime. Specify the parameter
+you'd like to modify followed by equalsign and the new value. Use with
+care! However, database related parameters cannot be changed at runtime.
+Entering just "c" without parameters displays the customizable variables.
+
+=item B<cd topic>
+
+Change the actual topic under which you are. This works identical like just
+entering the topic but it has some advantages. You can enter B<cd ..> if
+you want to go one level up in the topic-structure. And you can enter B<cd />
+to go to the top of the structure. You can always leave out the 'cd' keyword too.
+
+Additional it is possible to enter a note-number instead of a topic name.
+For this feature to be active you need to set the config option B<ShortCd>
+to B<1> or B<yes>. If you use a number and the note with this number is
+under a certain topic then you will "cd" to this topic. This allows you
+to do kind of jumps over multiple levels of topics.
+
+If is possible to abbreviate a topic. This works only if the abbreviation
+matches on one single topic. If it matches more than one topic then the
+available ones will be suggested.
+
+
+=item B<? or h>
+
+Display a short help screen.
+
+
+=item B<Q>
+
+Quit note.
+
+=back
+
+
+
+
+
+=head2 BACKUP
+
+You can also dump the contents of your note-database into a
+ASCII-textfile(I<-D>). You can use this file later to import it into
+your note-database(-I). This is usefull, if you want quickly trans-
+fer your notes from one host to another (i.e. you could mail
+your note-dump form your office to home and import it there
+for further use).
+
+The dumps from the two versions of note are in the same format.
+Using dumps it is also possible to reinitialize your database. You
+can use the "-o" switch whcih causes note to overwrite your existing
+database. This is very handy if you changed heavily your config. And
+it is required, if you changed: encryption, db-driver, (binary-format)
+and the password. You can use the following command for reinitializing:
+
+ $ note -D - | note -o -I -
+
+What the hell, does this do?! Step by step:
+
+=over
+
+=item *
+
+B<note -D -> creates a note-database dump and prints it out
+to stantdard output.
+
+=item *
+
+B<|> this is the shell's pipe command. It takes the output
+of the left program and gives it to the right program as
+standard input.
+
+=item *
+
+B<note -o -I -> imports a note-database dump from standard
+input and overwrites an existing database.
+
+=back
+
+Before you use the B<-o> switch, I consider you to make a backup!
+
+=head3 BACKUP FILE FORMAT
+
+B<Caution>: since version 1.3.8 note uses a new file format
+for backups: YAML. The old format is only supported by the
+B<-I> option to import old backups. New backups are always
+created as YAML files. See L<YAML>.
+
+
+
+=head2 FORMATING
+
+Another very nice feature is the possibility to format the note-text
+(as much as shell allows it). First, you can use the note-internal
+"magic-strings" for colorizing. Those strings looks much like HTML:
+"<green>here is a green line of text</green> no more green."
+As you see, the beginning of another color starts with a tag(kinda) of
+the color <colorname> and ends with an end tag </colorname>.
+
+The following colors are available:
+black, red, green, yellow, blue, magenta, cyan and white.
+
+Beside colorizing text, you can also create bold or underlined text! If
+you decide to use this (additional) feature, you need to set the
+Config-Option "FormatText" to 1 which turns it on.
+Usage is very straightforward, if a word (a word is defined as some
+text with at least one space surrounded) is between a magic mark-
+character. Here are the available things, you can do:
+
+ bold:       **word**
+ underlined: __word__
+ inverse:    {{word}}
+ hidden:     //word//
+
+The text will be formatted using the actually note-color.
+
+The hidden formatting will use blue forground and blue background
+to hide a string from the terminal, which is usefull for passwords.
+
+If you set "FormatText" to I<simple> then the formatting can be
+done this way instead:
+
+ bold:       *word*
+ underlined: _word_
+ inverse:    {word}
+ hidden:     /word/
+
+=head1 ENCRYPTION
+
+You can turn on encryption from the config file.
+Simply set UseEncryption to 1. Please note, that you need
+to decide, if you want to use encryption before the first use
+of note! If have already a note database and want to "migrate"
+to encryption, I suggest you to follow the directions in the
+file UPGRADE!
+
+You can choose from different encryption algorythms. The default
+is IDEA, but DES or BLOWFISH are also possible. You need to have
+installed the following additional perl-modules on your system:
+MD5
+Crypt::IDEA
+Crypt::DES
+Crypt::CBC
+
+After turning on encryption, note will ask you for a passphrase
+everytime it runs! It will *not* store this passphrase!
+So, don't forget it! Be careful!
+
+
+
+
+=head1 CONFIGURATION
+
+You can use a configuration file with note but it is not required.
+Note will use default values if there is no config.
+
+The default config file is B<~/.noterc>. You may specify another
+one with the commandline flag I<--config>.
+
+Comments start with #, empty lines will be ignored.
+
+To turn on an option, set it to: B<1>, B<on> or B<yes>.
+
+To turn off an option, set it to: B<0>, B<off> or B<no>.
+
+An option consists of an atribute-value pair separated
+by minimum one space (more spaces and/or tabs are allowed)
+and an optional equal sign in between.
+
+Variable names are case in-sensitive.
+
+For a detailed explanation of each possible parameter take a look
+at the supplied sample configuration file in B<config/noterc>.
+
+
+
+
+
+=head1 AUTHOR
+
+T.v.Dein <tlinden@cpan.org>
+
+=head1 VERSION
+
+1.3.20
+
+=cut

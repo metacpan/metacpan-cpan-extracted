@@ -1,0 +1,158 @@
+----------------------------------------------------------------------
+    This is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+ 
+    This software is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+ 
+    You should have received a copy of the GNU General Public License
+    along with this software. If not, write to the Free Software
+    Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+----------------------------------------------------------------------
+
+	*** This is alpha software -- use at your own risks ***
+
+README for nsapi_perl version 0.24.
+
+
+Introduction
+------------
+
+nsapi_perl is provides a mechanism to embed a Perl interpreter in a
+Netscape web server (in the tradition of mod_perl for the Apache
+server).  This allows one to program to the Netscape Server API
+(NSAPI) in Perl rather than in C.
+
+
+Installation
+------------
+
+See the file INSTALL for complete installation instructions. If you
+successfully install nsapi_perl please let me know so that you can be
+kept up-to-date with changes and bug fixes.
+
+The prerequisites are
+        -Perl version 5.004 or more recent.
+        -A Netscape web server.  Should work with almost any Netscape
+        server that supports NSAPI programming.
+
+Installation should be relatively straight-forward on Solaris and NT
+systems.  It should also be possible on other Unix systems where Perl
+has been compiled and which have working Netscape servers.  However,
+on non-Solaris Unixes the install process might need some
+hand-holding.
+
+Earlier versions of nsapi_perl seemed only to work with a shared Perl
+library, such as libperl.so.  This version, however, works (for me)
+with either shared or static Perl libraries.  YMMV.  If you have
+problems with a static Perl library (the symptons are bus errors at
+server start-up), try using a shared Perl library.
+
+Some problems have also been reported when using Perls that have
+binary compatibility with 5.003.  I recommend using a Perl compiled
+without binary compatibility with 5.003.
+
+
+Further Reading
+---------------
+
+Once you have installed nsapi_perl the following pod documents will
+provide further direction:
+
+        -perldoc nsapi_perl - a general overview of how to configure
+        nsapi_perl plus a couple of examples of how to use it.  Start
+        here.
+
+        -perldoc Netscape::Server - describes a module that provides
+        the framework upon which the Perl interface to NSAPI works.
+
+        -perldoc Netscape::Server::Session - describes a class which
+        you'll use when writing nsapi_perl subroutines.
+
+        -perldoc Netscape::Server::Request - another class which your
+        subroutines will use.
+
+        -perldoc Netscape::Registry - this module lets you run perl
+        CGI scripts unmodified from within the httpd process itself.
+        This offers a large performance boost.
+
+
+Issues, Bugs and Wishes
+-----------------------
+
+See the file TO_DO for a complete wish list.  You are encouraged to try
+to address issues identified in TO_DO yourself.  My only request is
+that you let me know what you have done so that you can get the proper
+credit for it.
+
+Here are the major issues at this time:
+
+Extension modules that use dynamic loading of C code remain
+problematic.  As of this release, dynamic loading works as expected on
+*at least* Solaris and Win32.  It may well work properly on other
+platforms too.  If you try to run a script or module that uses an
+extension and you get error messages, you may have to recompile the
+module so that it contains a runpath to the shared perl library.  In
+other words, for module Foo, an ldd on Foo.so needs to so
+        libperl.so =>    /lib/perl5/sun4-solaris/5.00401/CORE/libperl.so
+or something like that.
+
+Threading.  Grrrr.  Netscape *used* to let you run their multi-threaded
+servers as multiprocess single-threaded servers if you wanted to.  The
+3.x line doesn't let you do this, AFAIK.  So, we need a thread-safe
+Perl library.  Steve Nielsen (spn@enteract.com) is working on
+integrating the new threaded Perl with nsapi_perl.  Stay tuned.
+
+In the meantime, you can use nsapi_perl with a multi-threaded server
+(because the Perl hooks are enclosed in critical sections) but you do
+so at your own since if Perl hangs your whole server will freeze
+(because the Perl hooks are enclosed in critical sections).
+
+
+Notes
+-----
+
+Send comments, criticisms, bug reports, et al. to the nsapi_perl
+mailing list at
+    nsapi_perl@samurai.com
+
+If you wish to subscribe to the mailing list, send an email to
+    majordomo@samurai.com
+with
+    subscribe nsapi_perl
+in the body of the message.
+
+The nsapi_perl home page is at
+    http://interact.canoe.ca/~bsugars/nsapi_perl.html
+
+If you find and fix a bug, please let us know so that everyone can
+benefit and so that you get the proper credit.
+
+
+Acknowledgments
+----------------
+
+My sincere gratitude goes out to
+
+    Steve Nielsen <Steve.Nielsen@infores.com> for many invaluable
+    patches and for providing Win32 support.
+
+    Olivier Dehon <dehon_olivier@jpmorgan.com> net_read() patches, and
+    other enhancements to Netscape::Server.pm.
+
+    Other people who have tried and tested nsapi_perl, especially Danny
+    Sadinoff <dsadinof@olf.com> and Craig Riter <criter@riter.com>.
+
+and especially
+
+    Doug MacEachern <dougm@telebusiness.co.nz> for creating mod_perl,
+    from which the concept and much of the execution of nsapi_perl was
+    borrowed and without which none of nsapi_perl would have been
+    possible.
+
+-Ben Sugars
+<bsugars@canoe.ca>
+April 1, 1998
+

@@ -1,0 +1,74 @@
+README for the mysql database installation for note
+
+Requirements
+============
+
+        You need the following things:
+                o perl installed (5.004x)
+                o mysql database installed and running
+                o Mysql perlmodule (you can find it on 
+                  http://www.mysql.org) PLEASE NOTE:
+                  It needs the Module "Mysql". The install.sh
+		  script will install it for you directly from
+		  CPAN if you like. Newer versions
+                  are DBI, which you can also use to access
+                  mysql databases. If you want to use it, you
+                  have to rewrite the program. Please let me
+                  know, if you did it :-)
+                o permissions to create a new database and
+                  to write data to this database.
+
+
+
+Installation
+============
+
+        First, make sure all these things above are ok.
+        You can use the script "install.sh" to create a new
+        database and the table structure. You might edit 
+        the script before running it.
+
+        If you are getting trouble, i.e. if you have not the 
+        required permissions to do that, please make sure,
+        you can. 
+        As user root, you have to give your user the 
+        neccessary permissions. Please refer to the mysql 
+        documentation, how to do that.
+        After that repeat the step above.
+
+	You can find a sample config file within the subdirectory
+	"config" named noterc. There are some special values
+	which you can use to connect to a different database
+	then the default.
+	install.sh will create the following database:
+		name: 		user_note
+		Maintable: 	note
+		Number:		number(int 10)
+		Note:		note(text)
+		Date:		date(text)
+
+	You can use the file "permissions" as a template for
+	modifying a users permissions to her database. Please
+	note, that there are different version of mysql out 
+	there with different access privilege systems, which
+	are not compatible, refer to the documentation shipped
+	with your mysql installation to learn, how many fields
+	are available and what they are for.
+
+	You may also take a look to:
+	http://www.mysql.org/Manual_chapter/manual_Privilege_system.html	
+
+
+        This should be all.
+
+Manual Installation
+===================
+
+	1) create a mysql database
+		mysqladmin create $db
+
+	2) add the required GRANT to a user and database
+		echo "GRANT ALL PRIVILEGES ON $db TO $user@localhost IDENTIFIED BY '$password'" | mysql mysql
+
+	3) create the schema: 
+		mysql $db < sql

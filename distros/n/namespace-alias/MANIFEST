@@ -1,0 +1,22 @@
+alias.xs
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/namespace/alias.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+ppport.h
+ptable.h
+t/basic.t
+t/lib/SomeModule.pm
+t/scope.t
+t/sugar.t
+typemap

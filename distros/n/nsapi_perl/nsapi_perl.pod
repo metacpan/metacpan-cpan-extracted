@@ -1,0 +1,653 @@
+=head1 NAME
+
+nsapi_perl - Integrate Perl with Netscape servers
+
+=head1 SYNOPSIS
+
+In F<obj.conf>
+
+ Init fn="load-modules"
+      shlib="/path/nsapi_perl.so"
+      funcs="nsapi_perl_init,nsapi_perl_handler"
+ Init fn="nsapi_perl_init"
+      init-script="/path/nsapi_perl_init.pl"
+      shlib="/path/nsapi_perl.so"
+      tracelog="/tmp/nsapi_perl.log"
+
+ <Object ppath="/document/root/path/*">
+ Directive fn="nsapi_perl_handler"
+      module="Netscape::ModuleName" sub="sub_name"
+ </Object>
+
+In F<nsapi_perl_init.pl>
+
+ use Netscape::ModuleName;
+
+=head1 DESCRIPTION
+
+nsapi_perl is the collective name for a set of Netscape Server API
+(NSAPI) functions and Perl modules that integrate Perl with the
+Netscape web server family.  This is achieved by embedding within the
+server executable a Perl interpreter, much as mod_perl does for the
+Apache web server.
+
+Once the interpreter has been embedded the server can be configured so
+that at any point during a client session a Perl subroutine can be
+called.  These Perl subroutines are passed as arguments Perl objects
+that allow direct access to the server's API.
+
+The rest of this document describes how to configure and use
+nsapi_perl; it also provides a couple of examples.  It is hoped that
+as real-world examples start to roll in this document can evolve into
+a sort of cookbook illustrating how approach common nsapi_perl tasks.
+
+=head1 CONFIGURATION
+
+=head2 Orientation
+
+nsapi_perl consists of the following components
+
+=over 4
+
+=item B<nsapi_perl.so>
+
+This is the shared object containing the NSAPI  functions that embed a
+Perl interpreter in the server and run the Perl subroutines.
+
+=item B<nsapi_perl_init.pl>
+
+This is a Perl program that is (optionally) executed when the server
+starts.  F<nsapi_perl_init.pl> can be used to load modules containing
+nsapi_perl subroutines at startup, or to predefine global (Perl)
+configuration variables.
+
+=item B<Netscape::Server>
+
+This is a Perl module that provides the basic framework for the Perl
+interface to the NSAPI.
+
+=item B<Netscape::Server::Session, Netscape::Server::Request>
+
+These are Perl classes from which objects that are passed as arguments
+to nsapi_perl subroutines are instantiated.  These modules are
+automatically loaded at start-up.
+
+=item B<Netscape::Registry>
+
+This module allows you run run CGI scripts unmodified from within the
+Netscape server httpd process.  This provides a large performance
+boost.  Netscape::Registry has its own man page.
+
+=back
+
+=head2 Initialization
+
+For the server to embed a Perl interpreter it must be told at startup
+to link with F<nsapi_perl.so> This is done by adding the following to
+the Server's F<obj.conf> file.
+
+ Init fn="load-modules" shlib="/path/nsapi_perl.so"
+      funcs="nsapi_perl_init,nsapi_perl_handler"
+
+(You can wrap it on to multiple lines so long as the second line
+starts with whitespace). Here, F</path> is the full path to where you
+installed F<nsapi_perl.so>.  (For Netscape 1.x servers this should be
+added to the file F<magnus.conf> and should be on a single line.)
+
+After linking to F<nsapi_perl.so> the server must then be told to run
+the function nsapi_perl_init, which initializes the Perl interpreter.
+This is done by adding the following line the the server's F<obj.conf>
+file.
+
+ Init fn="nsapi_perl_init"
+
+(Again for Netscape 1.x servers this is to be done in F<magnus.conf>.)
+
+nsapi_perl_init optionally accepts the B<init-script=>I<path>
+key/value pair as an arugment.  If this argument is specified, I<path>
+is the full path to a perl script which will be parsed and executed at
+server start-up.
+
+Conventionally this script is called F<nsapi_perl_init.pl>, although
+you're free to choose any name you wish. For example, the following
+line will run F<foobar.pl> in my home directory at server start-up.
+
+ Init fn="nsapi_perl_init"
+      init-script="/home/benjamin/foobar.pl"
+
+Early versions of nsapi_perl mandated that nsapi_perl_init be passed
+the B<conf>=I<path> key/value pair as an argument.  The B<conf>
+argument is still accepted, if given, but a warning is issued about
+its deprecated nature.  If the B<conf> argument is given, then the
+file specified by I<path> will be parsed and run exactly as for the
+B<init-script> argument.
+
+nsapi_perl_init also accepts two additional optional arguments:
+B<shlib> and B<tracelog>.
+
+B<shlib> will almost certainly prove to be necessary on Unix
+platforms.  Its purpose is to make the symbols defined in the
+nsapi_perl shared library have global visibility.  Without this
+argument, dynamic loading of extension modules - including the
+Netscape::* modules - will probably fail on Unix.
+See L</DYNAMIC LOADING OF EXTENSIONS> for details.
+
+The B<tracelog> argument may be used to enable nsapi_perl tracing; see
+L</DIAGNOSTICS> for full details.
+
+F<nsapi_perl_init.pl> may load the Perl code you wish to have executed
+by the server.  For instance, if you wish to use the
+Netscape::Registry module, add you can add line like this to
+F<nsapi_perl_init.pl>.
+
+ use Netscape::Registry;
+
+The module's subroutines will then be pre-compiled when it comes time for
+the server to run them.
+
+Since F<nsapi_perl_init.pl> is a Perl program that is executed when
+the server starts, you can use it to perform a multitude of
+initialization tasks like opening log files, defining global
+configuration variables, and so on.
+
+If you choose not to use() any modules in F<nsapi_perl_init.pl>, they
+will be automatically loaded for you when they are needed.  However,
+relying on this method may not be as effiecient in terms of memory for
+multi-process servers.  Auto-loading of modules also implies a small
+performance penalty when responding to the first request that causes a
+module to be loaded, since that module has to be compiled before the
+request can be answered.
+
+In general, therefore, it is probably better to use() all of your
+modules from F<nsapi_perl_init.pl>.
+
+With the above lines inserted into F<obj.conf> you should see a
+message like this when starting your server:
+
+ [11/Feb/1998:16:22:00] info: nsapi_perl_init reports: \
+ loaded a perl version 5.00401 interpreter
+
+(This message may go to your server's error log, your screen, or both,
+depending upong your setup.)
+
+At this point Perl is primed and the server is ready to run.  Cool.
+
+
+=head1 USAGE
+
+=head2 How Netscape Serves
+
+To know how to tell the server when to run a subroutine, it helps to
+know a little of how Netscape servers process requests from clients.
+Netscape, like Apache, breaks the processing of requests into discrete
+steps.
+
+=over 4
+
+=item B<1. AuthTrans>
+
+During this stage authorization information from the client is checked.
+
+=item B<2. NameTrans>
+
+The virtual path sent by the client as part of its URL is mapped to
+physical path on the server's file system.
+
+=item B<3. PathCheck>
+
+Given the authorization and path information, the server checks whether
+the client is allowed access or not.
+
+=item B<4. ObjectType>
+
+The mime type of the file requested is determined.
+
+=item B<5. Service>
+
+The client's request is processed, usually by sending them the
+requested file but sometimes by doing something more fun such as
+running a CGI program.
+
+=item B<6. AddLog>
+
+The request is logged.
+
+=back
+
+If at any of these stages an error occurs, such as failed
+authentication or a file not being found, the sequence is aborted and
+error processing occurs.
+
+Normally F<obj.conf> is set up in such a way that the server's
+built-in functions handle each stage of the request.  However, you can
+modify F<obj.conf> so that for certain paths special processing
+occurs.  For instance, adding the following to F<obj.conf> overrides
+the normal list of Service functions for files within the
+F</document/root/foo> directory
+
+ <Object ppath="/document/root/foo/*">
+ Service fn="special_function" argument="value"
+ </Object>
+
+This would cause all client requests of the form
+B<http://my.server.domain/foo/*> to be serviced by
+B<special_function>.
+
+Basically each part of the web site that needs special processing is
+declared as an I<object>.  For each object you can then specify one or
+more I<directives>.  A directive is the name of one of 6 processing
+steps listed above, such as AuthTrans, NameTrans, etc.  In the example
+above, the directive is B<Service>.  After each directive comes a
+sequence like B<fn="special_function"> indicating the name of the
+function to fulfill that stage of the request for that object.
+Following this is a sequence of zero or more name=value pairs that
+will be passed to the function when it executes.
+
+There are other ways to define an object that are beyond the scope of
+this document; for full details on how to specify special processing
+for certain parts of your web site I refer you to your Netscape
+documentation.  From here on, I will assume you have at least a rough
+idea of how to do it.
+
+=head2 Calling Your Perl Subroutines
+
+To call Perl subroutines from the server, you need to create an object
+and have that object call the nsapi_perl function
+B<nsapi_perl_handler> passing the module and subroutine names as
+arguments.  For example, the sequence
+
+ <Object ppath="/document/root/perl/*">
+ Service fn="nsapi_perl_handler" module="Netscape::PerlService
+     sub="send_stuff"
+ </Object>
+
+would call the Perl subroutine
+&Netscape::PerlService::send_stuff for all requests that have
+a URI beginning with F</perl>.
+
+To make mod_perl enthusiasts feel at home, if the name of the
+subroutine is omitted the name B<handler> is assumed.  Therefore, the
+following is an equivalent declaration to the one above:
+
+ <Object ppath="/document/root/perl/*">
+ Service fn="nsapi_perl_handler" module="Netscape::Service"
+ </Object>
+
+You can have more than one directive for an object including more than
+one directive of a single type.  The following would all requests to
+F</perl> be handled entirely by Perl:
+
+ <Object ppath="/document/root/perl/*">
+ AuthTrans fn="nsapi_perl_handler" module="Netscape::AuthTrans
+ NameTrans fn="nsapi_perl_handler" module="Netscape::NameTrans
+ PathCheck fn="nsapi_perl_handler" module="Netscape::PathCheck
+ ObjectType fn="nsapi_perl_handler" module="Netscape::ObjectType
+ Service fn="nsapi_perl_handler" module="Netscape::Service
+ AddLog fn="nsapi_perl_handler" module="Netscape::AddLog
+ </Object>
+
+Any module name can be chosen to process a request.  I recommend,
+however, that all modules used with nsapi_perl be named somewhere in
+the Netscape:: hierarchy.
+
+If a module chosen to process a request has not yet been loaded by the
+server process, it will be compiled by the server at request time.  As
+mentioned in L</Initialization>, such auto-loading will incur at
+performance penalty for the first request that causes that module to
+be used (but not for subequent requests).  This auto-loading may also
+incur a memory-use penalty for multi-process servers.  It is therefore
+recommended that you pre-load modules using a perl start-up script, as
+described in L</Initialization>.
+
+=head1 SUBROUTINES
+
+=head2 Arguments passed to subroutines.
+
+When a Perl subroutine is called by nsapi_perl it is passed three
+arguments:
+
+ sub handler {
+     my($pb, $sn, $rq) = @_;
+     ...
+ }
+
+$pb is a reference to a hash that contains the key=value pairs passed
+as arguments to nsapi_perl_handler.  For instance, if the following
+was in your F<obj.conf>,
+
+ NameTrans fn="nsapi_perl_handler" module="Netscape::Redirect"
+     from="/special" alt="/default/home.html" url="/for_mozilla/home.html"
+
+
+then the following all would be true:
+
+ $pb->{'fn'} eq 'nsapi_perl_handler';
+ $pb->{'module'} eq 'Netscape::Redirect';
+ $pb->{'from'} eq '/special';
+ $pb->{'alt'} eq '/default/home.html';
+ $pb->{'url'} eq '/for_mozilla/home.html';
+
+The contents of %{$pb} should be treated read-only.
+
+$sn is an instance of Netscape::Server::Session which has its own man
+page.  Basically a Session object contains information about the
+connection to the client host such as its IP address, its socket
+descriptor and so on. See L<Netscape::Server::Session> for full
+details, or bear with me here for a while since you'll soon see an
+example.
+
+$rq is an instance of Netscape::Server::Request which also has its own
+man page.  A Request object contains information derived from the
+client's http header and is where information constructed by the
+server in its response is stored.  Again, see
+L<Netscape::Server::Request> or hang on just a little while longer.
+
+The general idea is to use the values in %{$pb} and to implement
+methods on $sn and $rq to process the request in special ways.  The
+man pages for each of Netscape::Server::Session and
+Netscape::Server::Request list the available methods.
+
+Anyone whose done NSAPI C programming will recognize the parallel
+between how nsapi_perl subroutines are called and how NSAPI C
+functions are called.
+
+=head2 Subroutine Return Values
+
+NSAPI C functions are expected to return one of a set of constants
+indicating success, failure, bewilderment, or whatever.  These
+constants are termed request-response codes.  Any nsapi_perl
+subroutine should also always return one of these constants.  The
+constants are defined in the Netscape::Server module which should
+therefore always be use()d by your nsapi_perl module.
+
+The following will import the request-response codes from
+Netscape::Server.
+
+ use Netscape::Server qw/:request_codes/;
+
+The constants are described in detail in L<Netscape::Server>; I will
+list them here for reference:
+
+ REQ_ABORTED, REQ_EXIT, REQ_NOACTION, REQ_PROCEED
+
+The interpretation of the value returned by the subroutine to the
+server depends on what stage of the request was being processed, as
+the following table indicates.
+
+ Request   |            Subroutine returns
+ Stage     |REQ_ABORTED|REQ_EXIT|REQ_NOACTION|REQ_PROCEED
+ --------------------------------------------------------
+ AuthTrans |     x     |   x    |     n      |     s
+ NameTrans |     x     |   x    |     n      |     s
+ PathCheck |     x     |   x    |     s      |     s
+ ObjectType|     x     |   x    |     s      |     s
+ Service   |     x     |   x    |     n      |     s
+ AddLog    |     ?     |   ?    |     ?      |     ?
+ --------------------------------------------------------
+
+ x - request is aborted entirely
+ s - request skips to next stage
+ n - request goes to next directive in same stage
+
+Basically REQ_ABORTED and REQ_EXIT each indicate an error, but you
+should only use REQ_EXIT if there was an I/O error when talking to the
+client.  REQ_PROCEED always causes processing to move to the next
+stage.  REQ_NOACTION sometimes causes the next directive in the same
+stage to be called.  This could be used to implement, for instance, a
+sequence of NameTrans functions each mapping in their own way the
+request path.
+
+I have never seen any documentation about how the server interprets
+values returned by AddLog functions.  I suppose since it is the last
+step anyway, it may not really matter.
+
+Netscape::Server also provides other constants that can be used to set
+the http status of the request or the severity of errors; see
+L<Netscape::Server> for full details.
+
+=head1 DYNAMIC LOADING OF EXTENSIONS
+
+When you put a statement in a module that causes automatic loading of
+a Perl extension, such as
+
+ use Socket;
+
+you may get error messages from the run-time loader that look like:
+
+ Can't load '/path/lib/perl5/arch/auto/Foo/Foo.so' for module Foo:
+ ld.so.1: ./ns-httpd: fatal: relocation error: symbol not found:
+ Perl_sv_undef: referenced in '/path/lib/perl5/arch/auto/Foo/Foo.so'
+ at /path/lib/perl5/arch/5.00404/DynaLoader.pm line 166.
+
+This is because the Perl library is loaded into the Netscape server by
+dlopen(3) (or its equivalent).  On many platforms symbols contained in
+objects loaded in by dlopen are not visibile to other objects loaded
+in by dlopen (such as Foo.so in the above example).
+
+On some operating systems, this restriction may be worked around by
+adding the B<shlib> argument to the nsapi_perl_init() function call in
+obj.conf, like this:
+
+ Init fn="nsapi_perl_init"
+      init-script="/home/benjamin/foobar.pl"
+      shlib="/path/to/nsapi_perl.so"
+
+Here, F</path/to/nsapi_perl.so> should be the full path to the
+nsapi_perl shared object.  This location was determined during the
+installation of nsapi_perl.
+
+The presence of a B<shlib> argument in the call to nsapi_perl_init
+causes nsapi_perl to call dlopen(3) on F</path/to/nsapi_perl.so>, passing
+dlopen a flag (RTLD_GLOBAL) that tells the runtime linker symbols
+within this object are to be visible to other objects acquired at a
+later time via dlopen.
+
+Obviously this workaround only works on those systems that define
+RTLD_GLOBAL.  Currently this includes at least Solaris and IRIX; there
+may be others too that I am not aware of.  A B<shlib> argument on a
+system that does not support RTLD_GLOBAL is silently ignored.
+
+(Earlier versions of nsapi_perl used a libperl argument to nsapi_perl
+init instead of shlib.  libperl was expected to point to a (shared)
+perl library, like libperl.so.  It is now recommended that you use the
+shlib argument instead of the libperl argument, and that you point to
+the nsapi_perl shared object itself, rather than the shared Perl
+library.)
+
+Incidently, extension modules on Win32 are reported to work just fine
+"out of the box".
+
+=head1 EXAMPLES
+
+=head2 Hello World
+
+In F<obj.conf>:
+
+ <Object ppath="/document/root/greetings/*">
+ ObjectType fn="nsapi_perl_handler" module="Netscape::HelloWorld"
+     sub="content_type" type="text/html"
+ Service fn="nsapi_perl_handler" module="Netscape::HelloWorld"
+ </Object>
+
+In F<nsapi_perl_init.pl>:
+ use Netscape::HelloWorld;
+
+In F<HelloWorld.pm>:
+
+ package Netscape::HelloWorld;
+ use strict;
+ use Netscape::Server qw/:all/;
+
+ sub content_type {
+     my($pb, $sn, $rq) = @_;
+  
+     # --- Set the content type as configured   
+     my $type = $pb->{'type'};
+     defined $type or
+         return REQ_ABORTED;
+     $rq->srvhdrs('content-type', $type);
+     return REQ_PROCEED;
+ }
+
+ sub handler {
+     my($pb, $sn, $rq) = @_;
+     my($proceed);
+
+     # --- Set status to 200 OK
+     $sn->protocol_status($rq, PROTOCOL_OK);
+
+     # --- Initiate response
+     $proceed = $sn->protocol_start_response($rq);
+     if ($proceed == REQ_PROCEED) {
+         $sn->net_write("<h1>Hello World</h1>\n");
+         return REQ_PROCEED;
+     } elsif ($proceed == REQ_NOACTION) {
+         # --- Client probably did an if-modified request
+         return REQ_PROCEED;
+     } else {
+         # --- Yikes! Something bad has happened
+         return $proceed;
+     }
+ }
+
+ 1;
+
+=head2 Redirect
+
+Here's a Perl equivalent to the https_redirect function listed on page
+143 of the Enterprise 2.0 Unix Programmer Guide. Note that I don't
+particularly care for the logic of this subroutine, or the original C
+function from which it was derived.  It is presented here merely to
+illustrate the potential advantages of nsapi_perl.
+
+In F<obj.conf>:
+
+ NameTrans fn="nsapi_perl_handler" module="Netscape::Redirect"
+     from="/special" alt="/default/home.html" url="/for_mozilla/home.html"
+
+In F<nsapi_perl_init.pl>:
+
+ use Netscape::Redirect;
+
+In F<Redirect.pm>:
+
+ package Netscape::Redirect;
+ use strict;
+ use Netscape::Server qw/:all/;
+
+ sub handler {
+     my($pb, $sn, $rq) = @_;
+
+     my $ppath = $rq->vars('ppath');
+     my $from = $pb->{'from'};
+     my $url = $pb->{'url'};
+     my $alt = $pb->{'alt'};
+
+     if (not defined $from or not defined $url) {
+         log_error(LOG_MISCONFIG, "handler", $sn, $rq,
+                   'missing parameter (need from, url)');
+         return REQ_ABORTED;
+     }
+
+     # --- Here's where the poor sucker using raw NSAPI has to
+     # --- resort to the utterly bogus shexp_cmp()
+     $ppath =~ /^$from/o or
+         return REQ_NOACTION;
+
+     # --- Get the user agent
+     defined(my $ua = $rq->headers('user-agent')) or
+         return REQ_ABORTED;
+
+     # --- NSAPI has a built-in that looks for Mozilla-like browser,
+     # --- but MSIE fools it.  However, now we can use a full Perl
+     # --- regular expression here if we want
+     if ($ua =~ /Mozilla/ and $ua !~ /MSIE/) {
+         $rq->protocol_status($sn, PROTOCOL_REDIRECT);
+         $rq->vars('url', $url);
+         return REQ_ABORTED;
+     }
+     
+     # --- No match.  Could be MSIE or Lynx or whomever.
+     if (defined $alt) {
+         # --- Rewrite the request string
+         $rq->vars('ppath', $alt);
+         return REQ_NOACTION;
+     }
+     
+     # --- Else do nothing
+     return REQ_NOACTION;
+ }
+
+ 1;
+
+=head1 DIAGNOSTICS
+
+nsapi_perl has a trace facility that can be enabled by providing the
+B<tracelog> argument to nsapi_perl_init in F<obj.conf>.  The value of
+the tracelog argument is the path to a file where tracing messages
+will be written.  This path is nominally relative to the server's
+F<config> directory, but that depends on Netscape internals.  To be on
+the safe side, specify a full path.  For example, the stanza
+
+ Init fn=nsapi_perl_init
+      init-script=/usr/local/suitespot/lib/startup.pl
+      tracelog=/usr/local/suitespot/https-foo/logs/nsapi_perl.log
+
+in F<obj.conf> will write the tracelog to
+F</usr/local/suitespot/https-foo/logs/nsapi_perl.log>.
+
+If the file specified by the B<tracelog> argument already exists, it
+will be appended to.
+
+=head1 BUGS
+
+Send bug reports, comments, or questions to the nsapi_perl mailing
+list: nsapi_perl@samurai.com.
+
+Here are the major issues at this time:
+
+=over 4
+
+=item o
+
+Threading.  Although this version contains the first working
+integration of Perl and Netscape threads, there are still some
+unresolved issues.  Most importantly, Netscape::Registry.pm is not
+thread-safe at this time.
+
+A mechanism has been identified that will (hopefully) make
+Netscape::Registry.pm thread-safe, but at the time of writing this
+mechanism has not been implemented.
+
+=item o
+
+Early versions of nsapi_perl had problems with Perls that use a static
+Perl library (such as libperl.a) rather than a dynamic perl library
+(libperl.so).  This seems to be fixed (for me) in version 0.23, but
+I'm not sure what I did to fix it so YMMV.  If are using a static
+libperl.a and have problems with nsapi_perl, try to recompile Perl so
+that is uses a dynamic Perl library.
+
+=back
+
+=head1 AUTHOR
+
+Benjamin Sugars <bsugars@canoe.ca>, with lots of help from Steve
+Nielsen <Steve.Nielsen@infores.com> and Olivier Dehon
+<dehon_olivier@jpmorgan.com>.
+
+Please send comments, feature requests, bug reports to the nsapi_perl
+mailing list: nsapi_perl@samurai.com.
+
+=head1 SEE ALSO
+
+Netscape::Server, Netscape::Server::Session,
+Netscape::Server::Request, Netscape::Registry
+
+perl(1)
+
+dlopen(3)
+
+Netscape documentation about their line of web servers and NSAPI.
+
+=cut

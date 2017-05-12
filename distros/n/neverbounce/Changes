@@ -1,0 +1,17 @@
+Revision history for neverbounce
+
+0.01    09/27/2016 00:00:00
+        Initial release
+0.02    09/28/2016 16:33:00
+        Addition of dependencies.
+0.03    09/28/2016 17:18:00
+        Addition of dependencies.
+0.04    09/28/2016 20:01:00
+        Addition of dependencies.
+0.05    09/29/2016 09:07:05
+        Addition of dependencies.
+0.06    09/29/2016 09:07:05
+        Addition of Build.pl
+0.07    04/12/2017 09:07:05
+        Renamed Build.pl to Build.PL
+

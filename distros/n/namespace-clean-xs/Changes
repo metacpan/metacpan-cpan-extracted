@@ -1,0 +1,25 @@
+Revision history for namespace::clean::xs.
+
+0.07 Thu Jun  9 16:03:22 MSK 2016
+    - fix compilation for older clang
+
+0.06 Thu Apr 28 14:43:32 MSK 2016
+    - backport to 5.10
+
+0.05 Sat Apr  2 13:18:40 MSK 2016
+    - fix explicit cleaner for non-sub entries
+    - perform more thorough cleanup for leftover globs
+
+0.04 Thu Mar 17 02:41:57 MSK 2016
+    - workaround rt#127708
+
+0.03 Mon Mar 14 21:15:46 MSK 2016
+    - set namespace::clean compability version
+
+0.02 Mon Mar 14 20:08:41 MSK 2016
+    - speedup storage lookups by using preshared keys
+    - fix compilation in c89 mode
+    - threading tests
+
+0.01 Mon Mar 14 00:43:39 MSK 2016
+    - initial release

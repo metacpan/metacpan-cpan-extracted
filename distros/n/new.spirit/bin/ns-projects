@@ -1,0 +1,28 @@
+#!/usr/dim/perl/bin/perl
+
+# $Id: ns-projects,v 1.1 2002/09/03 12:58:57 joern Exp $
+
+use strict;
+
+BEGIN {
+	if ( not $ENV{NEWSPIRIT_HOME} ) {
+		print "Environment variable NEWSPIRIT_HOME not set.\n";
+		exit 1;
+	}
+	require "$ENV{NEWSPIRIT_HOME}/etc/newspirit.conf";
+	use lib "$ENV{NEWSPIRIT_HOME}/lib";
+}
+
+use NewSpirit::Project;
+
+main: {
+	my $p = NewSpirit::Project->new;
+
+	my $projects = $p->get_project_root_directories;
+
+	foreach my $project ( sort keys %{$projects} ) {
+		print "$project\t$projects->{$project}\n";
+	}
+
+	1;
+}

@@ -1,0 +1,108 @@
+Revision history for namespace-autoclean
+
+0.28      2015-10-13 01:25:26Z
+  - skip failing tests with old Moo or when Sub::Util is broken (RT#107643)
+
+0.27      2015-09-09 02:29:20Z
+  - package with only ExtUtils::MakeMaker to ease installation on perl 5.6
+
+0.26      2015-06-07 02:53:17Z
+  - mark all Mouse tests as TODO below perl 5.010, to enable installation
+    despite apparent instability issues (see RT#101825)
+
+0.25      2015-06-03 01:09:06Z
+  - load Moo::Role earlier in a test, to make a potential misconfiguration
+    more visible
+
+0.24      2015-01-03 20:44:36Z
+  - re-release to fix problematic $VERSION declaration (RT#101095)
+
+0.23      2014-12-27 04:07:03Z
+  - be more lenient in optional Mouse tests to handle edge cases in older and
+    pure perl versions
+
+0.22      2014-11-04 06:19:54Z
+  - fix an erroneous change in 0.21
+
+0.21      2014-11-04 05:24:36Z
+  - drop testing of MooseX::MarkAsMethods, now that Moose 2.1400 has better
+    overload handling
+
+0.20      2014-09-06 23:04:12Z
+  - Moose earlier than 2.0300 had a broken ->does method, which called methods
+    on a class's meta when it might not be initialized (RT#98424)
+
+0.19      2014-06-17 04:57:07Z
+  - more comprehensive testing with Moo/Mouse/Moose
+  - fixed cleaning of constants
+
+0.18      2014-06-14 20:12:59Z
+  - better method detection for Mouse (github #4, Graham Knop)
+
+0.17      2014-06-10 20:13:14Z
+  - Add -except to import options. This allows you to explicitly not clean a
+    sub. (github #3, Dave Rolsky)
+
+0.16      2014-05-27 04:50:22Z (TRIAL RELEASE)
+  - Changed the code to no longer _require_ Class::MOP. If your class is not a
+    Moose class then we don't load Class::MOP. This was particularly
+    problematic for Moo classes. Using namespace::autoclean with a Moo class
+    "upgraded" it to be a Moose class.
+  - Using this module broke overloading in a class. Reported by Chris
+    Weyl. (RT#50938)
+
+0.15      2013-12-14 17:47:21Z
+  - update configure_requires checking in Makefile.PL, add CONTRIBUTING file
+
+0.14      2013-10-09 03:06:00Z
+  - bump dependency on B::Hooks::EndOfScope, to get the separation of
+    pure-perl and XS components (RT#89245)
+  - repository migrated to the github moose organization
+
+0.13      2011-08-24 09:33:00Z
+  - Fix issue in dist.ini which was causing links to be incorrectly generated.
+  - Re-package to remove BEGIN { $VERSION hackery by using a newer
+    Dist-Zilla.
+
+0.12      2011-02-04 10:39:00Z
+  - Bump namespace::clean dep to 0.20 to pull in the bugfix for
+    Package::Stash::XS 0.19
+
+0.11      2010-05-07 17:32:37Z
+  - Improve distribution metadata.
+
+0.10      2010-05-01 18:32:59Z
+  - Fix documentation typo (Andrew Rodland).
+
+0.09      2009-09-15 05:45:16Z
+  - Fix to avoid deprecation warnings from the latest Class::MOP, but
+    it still works with older versions too. (Dave Rolsky)
+  - Fix a documentation typo (Jonathan Yu).
+
+0.08      2009-06-07 15:34:02Z
+  - Run the role tests again Moose >= 0.56 only.
+  - Add diagnostic for the Moose version to the role test.
+
+0.07      2009-05-27 20:27:46Z
+  - Drop the useless Class::MOP::class_of call (Chris Prather).
+  - Extend -also to make it accept coderefs and regexen (Kent Fredric).
+
+0.06      2009-05-20 13:14:36Z
+  - Allow selection of explicit cleanee (Shawn M Moore).
+
+0.05      2009-05-01 10:44:25Z
+  - Don't clean the 'meta' method for Moose roles, even if it's not
+    included in get_method_list.
+
+0.04      2009-04-22 05:42:32Z
+  - Make -also accept a plain string instead of only an array ref.
+
+0.03      2009-04-18 09:43:10Z
+  - Changes dependeny of Class::MOP to 0.80, this is the first version
+    with class_of.
+
+0.02      2009-04-17 12:21:46Z
+  - Allow removing symbols other than imports using the -also option.
+
+0.01      2009-04-11 00:41:50Z
+  - Initial release.

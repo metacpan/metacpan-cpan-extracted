@@ -1,0 +1,6 @@
+- &output() has to be rewritten, its a historically
+  growed mutant.
+
+- ncurses support
+
+  

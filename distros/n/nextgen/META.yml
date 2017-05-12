@@ -1,0 +1,43 @@
+---
+abstract: 'enable all of the features of next-generation perl 5 with one command'
+author:
+  - 'Evan Carroll, C<< <me at evancarroll.com> >>'
+  - 'Evan Carroll <me@evancarroll.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: nextgen
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  B::Hooks::EndOfScope: 0
+  Filter::Simple: 0
+  IO::Handle: 0
+  Moose: 0
+  autodie: 0
+  feature: 0
+  if: 0
+  indirect: 0
+  mro: 0
+  namespace::autoclean: 0
+  oose: 0
+  perl: 5.10.1
+  strict: 0
+  utf8: 0
+  warnings: 0
+resources:
+  bugtracker: http://github.com/EvanCarroll/nextgen/issues
+  homepage: 'http://github.com/EvanCarroll/nextgen '
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/EvanCarroll/nextgen.git
+version: 0.06

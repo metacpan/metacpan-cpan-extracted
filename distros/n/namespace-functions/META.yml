@@ -1,0 +1,24 @@
+---
+abstract: "Keep package's namespace clean"
+author:
+  - 'Piotr Roszatycki <dexter@cpan.org>'
+build_requires:
+  Test::More: 0
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: namespace-functions
+provides:
+  namespace::functions:
+    file: lib/namespace/functions.pm
+    version: 0.0101
+requires:
+  Symbol::Util: 0
+  perl: 5.006
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=namespace-functions
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/dex4er/perl-namespace-functions
+version: 0.0101

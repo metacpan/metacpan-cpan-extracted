@@ -1,0 +1,60 @@
+v0.10 - Wed Nov 19 10:31:38 EST 1997
+      - First public version.
+
+v0.15 - Thu Dec 11 14:28:05 EST 1997
+      - Added Netscape::Registry;
+      - Added Netscape::Server::Socket;
+      - fixed bug with $path_info = $rq->path_info;
+      - fixed bug with $query_string = $rq->query_string;
+      - various other small bug fixes.
+
+v0.16 - Tue Jan 27 15:32:56 EST 1998
+      - Fixed annoying bug in nsapi_perl.c that would
+        cause "undefined subroutine" error mesages.  Thanks
+        to Olivier Dehon (dehon_olivier@jpmorgan.com) and
+        others for finding it.
+
+v0.17 - Mon Feb  2 14:25:45 EST 1998
+      - Added Steve Nielsen's (spn@enteract.com) patch to
+        cooperate better with Win32.
+      - Started using Steve's Makefile.PL to make installation
+        easier on all platforms.
+      - Moved examples into the Netscape::eg::* namespace.
+      - Added Steve's Netscape::eg::Test.pm module
+      - Various bug fixes, thanks mostly to Steve.
+
+v0.18 - Mon Feb  9 16:37:40 EST 1998
+      - Added Steve's patch that plugs several memory leaks.
+      - Modules are now loaded by perl_require_module.
+      - Applied Olivier's net_read and sys_net_read patches.
+      - nsapi_perl.conf is now nsapi_perl_init.pl.
+      - Added Olivier's func_exec function.
+      - net_write should now be able to handle data containing
+        NULs and not necessarily terminated by a NUL.
+      - Updated documentation.
+
+v0.20 - Tue Feb 17 11:10:14 EST 1998
+      - Fixed example obj.conf directory.
+      - Renamed top-level conf directory to config.
+
+v0.21 - Wed Feb 18 09:56:49 EST 1998
+      - Fixed README file
+
+v0.22 - Mon Mar  2 10:05:50 EST 1998
+      - Added nsapi_perl_bootstrap() to let dynamic loading work
+        properly under Solaris.
+      - 'make install' no longer clobbers existing nsapi_perl_init.pl
+      - Implemented William Ward's (wrw@bayview.com) suggestion that
+        the top level Makefile.PL do a search for the include
+        directory.
+
+v0.23 - Wed Apr  1 14:39:07 EST 1998
+      - Registry.pm now properly sets AUTH_TYPE and REMOTE_USER
+      - Applied Bill Ward's Makefile.PL patch
+      - Jumbo Makefile.PL patch to allow perl Makefile.PL &&
+        make && make install.
+
+v0.24 - Fri Apr 24 15:34:14 EDT 1998
+      - Fixed concurrency bug exposed by Wade Ford (cwford@dallas.net)
+      - Replaced <> with <STDIN> in Makefile.PL so that it doesn't
+        munge command-line args.  Thanks to Michael King (mike808@mo.net).

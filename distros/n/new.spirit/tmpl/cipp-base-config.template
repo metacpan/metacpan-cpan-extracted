@@ -1,0 +1,9 @@
+$VAR1 = {
+          'base_error_text' => 'An error occured. Please contact the webmaster',
+          'base_perl_lib_dir' => '',
+          'base_http_header' => 'Pragma		no-cache',
+          'base_doc_url' => '/',
+          'base_default_db' => 'b',
+          'base_error_show' => 1,
+          'base_cgi_url' => '/cgi-bin'
+        };

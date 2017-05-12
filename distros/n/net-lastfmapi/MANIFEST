@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-LastFMAPI.t
+lib/Net/LastFMAPI.pm
+bin/portablog-scrobbler.pl
+bin/scrobble.pl
+bin/cmd.pl

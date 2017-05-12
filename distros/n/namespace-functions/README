@@ -1,0 +1,60 @@
+NAME
+    namespace::functions - Keep package's namespace clean
+
+SYNOPSIS
+      package My::Class;
+
+      # import some function
+      use Scalar::Util 'looks_like_number';
+
+      # collect the names of all previously created functions
+      use namespace::functions;
+
+      # our function uses imported function
+      sub is_num {
+          my ($self, $val) = @_;
+          return looks_like_number("$val");
+      }
+
+      # delete all previously collected functions
+      no namespace::functions;
+
+      # our package doesn't provide imported function anymore!
+
+DESCRIPTION
+    This pragma allows to collect all functions existing in package's
+    namespace and finally delete them.
+
+    The problem is that any function which is imported to your package,
+    stays a part of public API of this package. I.e.:
+
+      package My::PollutedClass;
+      use Scalar::Util 'looks_like_number';
+
+      sub is_num {
+          my ($val) = @_;
+          return looks_like_number("$val");
+      }
+
+      package main;
+      print My::PollutedClass->can('looks_like_number');  # true
+
+    Deleting imported function from package's stash is a solution, because
+    the function will be not available at run-time:
+
+      delete {\%My::PoorSolutionClass::}->{looks_like_number};
+
+    The `namespace::functions' collects the function names and finally
+    deletes them from package's namespace.
+
+AUTHOR
+    Piotr Roszatycki <dexter@cpan.org>
+
+COPYRIGHT
+    Copyright (C) 2009, 2011 by Piotr Roszatycki <dexter@cpan.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

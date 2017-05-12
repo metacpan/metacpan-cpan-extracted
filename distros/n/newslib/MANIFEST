@@ -1,0 +1,16 @@
+README.txt
+Changes
+MANIFEST
+LICENSE
+Makefile.PL
+test.pl
+Version.pm
+News/Article/Response.pm
+News/Article/Ref.pm
+News/Article/Clean.pm
+News/Article/Cancel.pm
+News/NNTPAuth.pm
+Net/NNTP/Auth.pm
+Net/NNTP/Proxy.pm
+Net/NNTP/Client.pm
+Net/NNTP/Functions.pm

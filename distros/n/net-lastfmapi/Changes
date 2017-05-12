@@ -1,0 +1,40 @@
+Revision history for Perl extension Net::LastFMAPI.
+
+0.63 2012-02-07
+	- $VERSION in ""
+
+0.62 2012-02-07
+	- nothing
+
+0.61 2012-02-07
+	- nothing
+
+0.60 2012-02-07
+	- code preening
+	- symlinks don't work on windows
+
+0.5 2011-11-29
+	- simpler date format in changelog
+	- use File::HomeDir instead of env var
+	- extract rows/lastfm_iter now works with cache (thanks Christian Walde)
+	- refactored the error message
+	- refactored documentation
+
+0.4  Thu Nov 24 19:46:48 2011
+	- default to using JSON
+	- add lastfm_config() configurator function
+	- add lastfm_iter() which knows about pagination
+	- link to relevant documentation in errors
+
+0.3  Mon Nov 14 20:53:17 2011
+	- scrobble.pl command line scrobbler
+	- test fix
+
+0.2  Thu Nov 10 08:39:55 2011
+	- refresh session key if env $NET_LASTFMAPI_REAUTH
+	- cmd.pl command line interface
+
+0.1  Tue Nov  8 01:04:46 2011
+	- original version; created by h2xs 1.23 with options
+		-AX Net::LastFMAPI
+

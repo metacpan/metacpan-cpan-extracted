@@ -1,0 +1,62 @@
+NAME
+    namespace - Perl pragma to use like C++ namespace aliasing
+
+SYNOPSIS
+     use namespace File => IO::File;
+
+     my $fh = new File "foo", O_CREAT|O_WRONLY;
+     if( defined $fh )
+     {
+         print $fh "bar\n";
+         $fh->close;
+     }
+
+DESCRIPTION
+    Allow aliasing namespace. May be useful for reusability increase.
+
+     use namespace ALIAS => PACKAGE 
+        [, qw/IMPORT_LIST [ ::SUBPACKAGE [ IMPORT_LIST ]] /];
+
+     ALIAS and PACKAGE is required parameters;
+     IMPORT_LIST is the usual list of import.
+
+    Also may be undefined namespace and they subnamespaces:
+
+     no namespace ALIAS;
+
+    If ALIAS begin with '::', then alias will be expandet to caller
+    namespace. If following example of pragma namespace called from main::
+    module, then alias will be expandet to main::ALIAS::.
+
+     use namespace ::ALIAS => PACKAGE
+    
+EXAMPLES
+     EXAMPLE 1
+
+     use namespace DOM => XML::DOM, qw/$VERSION ::Document $VERSION/;
+
+        # DOM is alias for XML::DOM
+        #       $VERSION from XML::DOM will be imported to DOM
+        #
+        # ::Document subpackage of XML::DOM will be aliased to DOM::Document
+        #       $VERSION from XML::DOM::Document will be imported to DOM::Document
+
+     my $doc = new DOM::Document;
+     print "Current used DOM version is $DOM::VERSION \n";
+
+     no namespace DOM;
+
+        # namespace DOM and all subnamespaces will be destroyed
+
+     EXAMPLE 2
+
+     use namespace DOM => XML::DOM, qw/::Document/;
+     # or
+     # use namespace DOM => XML::Sablotron::DOM, qw/:constants ::Document/;
+
+     my $doc = new DOM::Document;
+     print "Constant 'TEXT_NODE' = ", TEXT_NODE;
+
+AUTHOR
+    Albert MICHEEV <amichauer@cpan.org>
+

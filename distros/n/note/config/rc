@@ -1,0 +1,154 @@
+comments start with #, empty lines will be ignored.
+1 turns an option on, 0 turns it off.
+An option consists of an atribute-value pair separated
+by minimum one space (more spaces and/or tabs are allowed)
+
+
+Your home directory, better do not change it!
+can be an environment variable or a path
+Home			$ENV{'HOME'}
+
+
+specify the path, where the NOTEDB lib directory
+resides. This will only used if it is not
+installed inside the perl-lib directory structure!
+LibPath			/usr/local/lib
+
+
+you need to decide which database backend you want
+to use. Please refer to the corresponding documentation
+for closer information about the certain backend!
+Currently supported types: "binary", "dbm" or "mysql".
+You must also edit/uncomment one section below for the
+backend you want to use!
+DbDriver		binary
+
+
+backend specific settings for sql backend
+DbHost			localhost
+DbUser			you
+DbPasswd
+DbName			mynotes
+DbTable		note
+FieldNumber		number
+FieldNote		note
+FieldDate		date
+use an encrypted password, generate it with note "--encrypt_passwd"
+encrypt_passwd		1
+#### specific end ###
+
+
+backend specific settings for binary(default) backend
+NoteDb			~/.notedb
+Define the maximum bytes fields can have in a
+note-entry. Do not change MaxTimeByte to less than 64!
+
+MaxNoteByte		4096
+MaxTimeByte		64
+#### specific end ###
+
+
+backend specific settings for DBM backend
+this must be an existing directory!
+#DbName			/home/you/.notedbm
+#### specific end ###
+
+You can use encryption with note, that means notes and
+timestamps will be stored encrypted. This is supported
+by every db-backend.
+Set to 1 to turn it on. The Default is 0 (off)
+UseEncryption		0
+
+Specify the encryption protocol. The appropriate perl
+module needs to be installed. Possible velues are
+IDEA, DES or Blowfish, the default is IDEA.
+CryptMethod		IDEA
+
+
+You can run note always in interactive mode by simply
+typing "note". Set this option to 1 to turn it on.
+The default is 0 (off).
+AlwaysInteractive	0
+
+
+In interactive mode, note issues a list command if you 
+simply hit enter. By turning this on, it will issue a
+longlist command instead if you hit just enter. 
+The default is 0 (off)
+DefaultLong		0
+
+
+
+You can use an external editor everytime from note instead
+of STDIN for creating new notes. Set to 1 to turn it on.
+The default is 0 (off).
+AlwaysEditor		0
+
+
+uncomment and edit it, if you want to use another
+editor than the default $EDITOR or as fallback vi.
+#PreferredEditor 	emacs
+
+
+If you dont prefer that note updates the timestamp of a
+note after editing, turn this on. It will
+keep the original timestamp if this option is set.
+The default is 0(off), to turn it on set to 1.
+KeepTimeStamp		0
+
+
+You can specify your own topic separator here.
+the default topic separator is a normal slash: "/"
+see README for details about topics!
+TopicSeparator		/
+
+
+The maximum width for displaying a note, in CHARS.
+Depends on your screen-size. You can set it to 
+"auto", if you wish that note sould determine the
+available size, but it experimental, be aware!
+MaxLen			30
+
+
+note can use colors for output, set this option to
+1, if you don't want it, or if your terminal does
+not support it, set to 0. The default is 1 (on).
+UseColors		1
+
+
+Color-definitions of the various items. Will only 
+take effect, if "UseColors" is turned on!
+BorderColor		BLACK
+NumberColor		blue
+NoteColor		green
+TimeColor		black
+TopicColor		BLACK
+The following colors are available:
+black, red, green, yellow, blue, magenta, cyan and white.  
+for bold color write it uppercase (BLACK will be bold black)
+for underlined color append an underscore (blue_ will be underlined blue)
+for inverted color append an "I" (greenI will be inverted green)
+
+
+Additional to colors, you can also do a little bit of formatting your
+notes (bold, underlined, italic), see README!
+You need to set this Option to 1, if you decide to make use of this
+capabily
+FormatText		1
+
+
+You might specify your own directory for temporary files.
+note needs to create some temp files during editing of notes.
+You could protect this directory using the command: chmod 700 directory.
+The default is /tmp
+TempDirectory		/home/you/tmp
+
+
+
+You can jump to a topic by typing "cd 13" in interactive mode.
+You need to set thi soption to 1 if you want to use this feature.
+ShortCd			0
+
+That's all about it for now.
+If you still have any questiosn, please feel free to contact
+me by email: Thomas Linden <tom@daemon.de>

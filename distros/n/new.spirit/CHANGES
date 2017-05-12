@@ -1,0 +1,625 @@
+Changes of new.spirit
+
+2.2.1 Mon Oct 31 2005, joern
+        Features:
+        - Initial Perl Statement for database configuration
+          objects (forward-ported from new.spirit 2.0.x)
+
+2.2.0 Wed Sep 21 2005, joern
+	Features:
+	- Base configuration:
+	  - switch to enable XHTML conform code generation
+	  - switch to enable whitespace truncation around
+	    CIPP tags
+
+2.1.26 Tue Aug 9 2005, joern
+	Bugfix:
+	- Sometimes a project dist installation the cipp.conf
+	  was not replaced with the proper version of the
+	  production system, due to a wrong cache check.
+
+2.1.25 Tue Nov 9 2004, joern
+	Features:
+        - dbshell.pl: escape internal dbshell.pl commands with
+          a backslash, e.g. \set, to pass the command to the
+          database although it's an internal dbshell.pl command.
+
+2.1.24 Thu Nov 4 2004, joern
+	Bugfixes:
+	- project installation: HTML files were generated in the wrong
+          context (config files of the development system instead of
+          production system)
+
+2.1.23 Thu Nov 4 2004, joern
+	Features:
+	- base configuration: automatcially add #! to the shebang
+	  line if missing
+
+2.1.22 Fri Sep 10 2004, joern
+	Features:
+	- support for LDAP v1 and v2, configurable at
+	  installation time
+
+2.1.20	Thu Aug 21 2003, joern
+        Features:
+        - save_filter_command is executed after installation, not
+          only after saving. This way the filter is also triggered
+          if you use the newspirit client programm.
+
+2.1.19  Tue Aug 12 2003, joern
+	Bugfixes:
+	- "Project compilation" created "html.m" files for folders
+	  named "html".
+
+2.1.18  Thu Aug 07 2003, joern
+	Bugfixes:
+	- sometimes the project compilation claimed to be error-free,
+	  but wasn't
+	- database prod config file was corrupt if the user entered
+	  ' characters in database configuration parameters.
+	- fixed a minor typo in the README file
+
+2.1.17
+	Bugfixes:
+	- fixed passwd/session deadlock problem
+	- ' in fields of a database configuration created an
+	  invalid prod .db-conf file.
+
+	Features:
+	- new project configuration parameter: add_prod_dir.
+	  Enables searching for includes, libs and configs in
+	  external CIPP3 projects. Needs CIPP 2.9.22.
+
+2.1.16
+	Bugfixes:
+	- prod replacing didn't work
+	- inc/ directory wasn't installed
+
+2.1.15
+	Features:
+	- New project attribute 'utf8', which enables the utf8-awareness
+	  of CIPP >= 2.9.19
+
+	Bugfixes:
+	- Perl syntax checking of HTML objects didn't work,
+	  runtime errors were supressed, HTML code creation
+	  failed silently. (#3170)
+	- "Not an ARRAY reference" exception in case of base configuration
+	  dependency errors fixed.
+
+2.1.14
+	Features:
+	- perl shebang line can also be configured for
+	  the development environment, not only for
+	  production environment.
+2.1.13
+	Features:
+	- new command line program ns-projects. It lists all
+	  projects with name and root directory, delimited
+	  by a tab character.
+
+2.1.12
+	Features:
+	- scrolling for depenceny installation less aggressive
+	  (only one scroll command per second)
+	- synchronized with some internal CIPP3 API changes
+
+2.1.11 2002/08/26 joern
+	Features:
+	- new attribute in the base configuration: CGI parameter
+	  delimiter. You can decide between ; and  &. & is known
+	  to make problems with some browsers, because specific
+	  strings may be interpreted as an entity, even inside
+	  an URL (e.g. &not=1).
+	  You must recompile the whole project after changing this
+	  attribute.
+
+	Bugfixes:
+	- cipp-html objects didn't depend on the base configuration
+	- compilation of cipp-html objects was cached, what's
+	  nonsense, because the document is generated at compile time
+
+2.1.10 2002/06/07 joern
+	Features:
+	- dbshell.pl: added -x option which enables abort mode
+
+2.1.9 2002/06/04 joern
+	Features:
+	- dbshell.pl: support CIPP3 .db-conf files
+
+2.1.8 2002/04/09 joern
+	Features:
+	- support for brief error supports in cmd line mode
+
+2.1.7 2002/04/08 joern
+	Features:
+	- name of new.spirit server is stored in base configuration
+	  source file
+	- newspirit command line tool has -g switch for opening
+	  a Gtk+ window with its output. useful for integration
+	  into an external IDE.
+
+2.1.6  2002/04/05 joern
+	Features:
+	- project name is stored in base configuration source file
+
+2.1.5  2002/03/21 joern
+	Bugfixes:
+	- sometimes cached errors wasn't reported
+
+	Features:
+	- caching for all object types
+
+2.1.4  2001/10/29 joern
+	Bugfixes:
+	- users can't be modified in LDAP mode
+
+2.1.3  2001/10/26 joern
+	Features:
+	- LDAP support
+
+2.1.2  2001/10/25 joern
+	- first internal Alpha Release with CIPP3 support. This
+	  version REQUIRES CIPP3
+
+2.0.15 2002/01/23 joern
+	Features:
+	- a new attribute of the database configuration object
+	  enables you to use persistent database connections in
+	  conjunction with mod_perl or SpeedyCGI.
+
+	  Note: this requires CIPP version 2.42 with CIPP::Runtime
+	        version 0.40 in the production environment.
+
+	  You can even use programs and configurations produced
+	  with new.spirit 2.0.15 in conjunction with older CIPP
+	  releases. But then, enabling persistent database connections
+	  in new.spirit will be without effect on the production
+	  system.
+
+2.0.14 2001/11/23 joern
+	Features:
+	- new.spirit now ships with a command line client, installed
+	  as bin/newspirit. You can install programs, compile and
+	  install projects with this tool. It's usable for scripting
+	  update and installation procedures.
+	  
+	  Execute bin/newspirit to get the usage description.
+	  
+	  BE CAREAFUL: the state of this program is ALPHA. It should
+	  not destroy any data, because it calls the appropriate
+	  CGI programs remotely on the server. But don't rely too much
+	  on its output. Really safe error processing is currently
+	  not possible, because messages are mainly passed through
+	  without change. Parsing them, may fail if message formats
+	  change on the server.
+
+2.0.13 2001/10/30 joern
+	Bugfixes:
+	- generic and blob files (e.g. jar files) were not processed
+	  by 'Project Compilation'
+	- removed shebang line and execute flags from install.pl, to
+	  prevent confusing when started directly without 'perl'
+	  
+	Features:
+	- update shipped CIPP version to 2.40
+
+2.0.12 2001/10/12 joern
+	Features:
+	- dbshell.pl has a new 'set display_style' parameter: tab.
+	  This produces TAB delimited output of SELECT statements,
+	  great for creating reports.
+
+2.0.11 2001/10/08 joern
+	Bugfixes:
+	- CGI Program execution did not work, if the project root
+	  directory was specified with a trailing slash on
+	  project creation.
+	- on systems where the installation program decides to
+	  use GDBM_File the passwd initialization failed. The
+	  file was created with DB_File, but later new.spirit
+	  tried to open it with GDBM_File.
+	- deletion of x.configuration now impossible
+
+2.0.10 2001/09/26 joern
+	Bugfix:
+	- project meta directory was not created for new projects
+
+	Features:
+	- project specific object templates. Just create a folder
+	  x.tmpl and put objects there which are named like the
+	  corresponding object type. E.g. for CIPP Programs
+	  call it 'cipp', for Includes 'cipp-inc' and so on.
+	  When new objects of this type are created, they are
+	  initialized based on these templates.
+
+2.0.9 2001/09/21 joern
+	Bugfix:
+	- shebang map did not accept object names of form x.foo.bla.
+	  The x wasn't replaced by the project name.
+
+2.0.8 2001/09/21 joern
+	Features:
+	- shebang map. You can configure a map in additional base
+	  configuration objects, which assigns objects and folders
+	  to the shebang, which should be used when installing this
+	  project. Useful for controlling SpeedyCGI in detail.
+
+	Bugfix:
+	- text object types were not installed via "Project Compilation"
+	- installation error messages were not printed, only "NOT OK"
+
+2.0.7 2001/08/13 joern
+	Bugfix:
+	- Project Installation: prod replacing of configs was too
+	  late. installed html objects did use the original configs,
+	  instead of the replaced configs.
+
+2.0.6 2001/08/07 joern
+	Features:
+	- not only CGI programs can be executed via the object editor,
+	  CIPP/HTML pages can be viewed, too.
+
+2.0.5 2001/07/24 joern
+	Bugfix:
+	- Bugzilla Bug #639
+	  dbshell.pl: Tabulator key produces spaces instead of weird
+	  command completion (if Term::ReadLine::Perl is used. With
+	  Term::ReadLine::Gnu currently Tab keys will be ignored)
+	- Bugzilla Bug #835:
+	  History viewing did not work on CIPP CGI objects, when the
+	  version number exceeded the maximum version number of the
+	- "Test CGI" renamed to "Execute CGI"
+	- fixed a typo in an "Execute CGI" error message popup window.
+	  base configuration object.
+	  
+	Features:
+	- Bugzilla Enhancement #684:
+	  new "Java File" object type for files with the extensions:
+	  jar, cap, class and properties. These files are handled
+	  through a new internal generic Blob handler. It is easy
+	  to add new blob file types with this handler.
+
+	- but this generic blob handler is unable to handle
+	  files with unknown extensions. For those files a new
+	  object type for generic / unknown file types has been added
+	  You can upload such files and decide to install them into
+	  htdocs, cgi-bin or not to install. CIPP is able to get the URL
+	  of such an object.
+	
+2.0.4_01 2001/05/14 joern
+	INTERNAL BETA RELEASE
+	Bugfix:
+	- Bugzilla Bug #132:
+	  CIPP 2.36_01, which fixes some mod_perl issues, is shipped
+	  with this release
+	- Bugzilla Bug #316:
+	  prod/logs is now created for a new project
+
+	Features:
+	- Bugzilla Bug #99:
+	  Direct execution of CGI programs is now possible. A new entry
+	  in the editor window popup appears: "Test CGI". A new window
+	  is opened with the URL of the current CIPP CGI program (window
+	  position and size can be configured). You can pass parameters
+	  through the generic text input field, formatted the standard
+	  URL encoded way: 'a=1&b=2'. Thanks go to kurt@dimedis.de for his
+	  suggestion.
+	- install.pl warns now if the installed CIPP version is older
+	  than the shipped version
+	- added Artistic and Gnu Public Licenses to the distribution
+
+2.0.3 2001/04/03 joern
+	Bugfix:
+	- deletion of DB Configuration objects did not work
+
+2.0.2 2001/03/26 joern
+	Bugfixes:
+	- Project Installation: database config replacing did not
+	  work properly
+
+2.0.1 2001/03/23 joern
+	Bugfixes:
+	- fixed a bug in the bugfix ;)
+	  New deterministic meta file format was messed up in some cases
+
+2.0.0 2001/03/23 joern
+	Bugfixes:
+	- fixed a regex which checks object existence. Due to this bug
+	  specifying a replace action object failed under some
+	  circumstances
+	- Project Installation: "Refresh Base Configs Popup" link was
+	  missing, if no base configs are in the base config cache,
+	  so recreating the cache was impossible in this case
+	- Alternative Base Configurations:
+	  Falling back to default project root did not work.
+	- format of object property data files is now deterministic,
+	  so CVS should not report unnecessary conflicts anymore.
+	- meta files of CIPP Config objects were saved unnecessaryly
+	  on every access, which caused problems in read only
+	  environments
+	- login was impossible if the users access right on his last
+	  selected project was revoked
+	- dbshell.pl: execution of prod/sql scripts was broken.
+	  dbshell.pl was unable to find the correspondent database
+	  configuration.
+
+	Because there are no significant known bugs on the TODO list:
+
+	WELCOME TO VERSION 2.0.0 :)
+
+1.99.22 2001/03/19 joern
+	Bugfixes:
+	- SQL execution was completely broken, due to a bug in the
+	  command line parser module
+
+1.99.21 2001/03/15 joern
+	Bugfixes:
+	- Mozilla wrapped long lines of the project tree browser
+	- If the last command of a SQL script was not terminated
+	  by a semicolon, it was executed infinetely.
+
+	Features:
+	- save trigger filter
+	  Now you can specify a save filter script for each object.
+	  This means: everytime you save the object, this filter
+	  script is invoked with the source of the object connected
+	  to STDIN. It is possible to pass the full path name of
+	  the object file as an argument, using a %s wildcard.
+	  Configuration of the save filter script is placed in the
+	  properties dialog.
+	- Project Installation: #! is implicitely added to the
+	  shebang line, if the user did omit it
+
+1.99.20 2001/03/14 joern
+	Features:
+	- you now can configure an Perl shebang line for project
+	  installation in CIPP Base Configuration objects
+
+1.99.19 2001/03/09 joern
+	Bugfixes:
+	- included actual CIPP version 2.29, which fixes a serious
+	  <?!HTTPHEADER> bug (see Changes file of CIPP, for details)
+	- user preferences are now applied immediately after saving
+	
+	Features:
+	- New preferences:
+	  - Treeview font face/size
+	  - Select last opened project by default after login
+	- new created projects now have default values in their
+	  base configuration (e.g. http header Pragma: no-cache)
+	- new created SQL objects now refer to the default
+	  database configuration
+	- you can limit the maximum size of the object history,
+	  by setting an appropriate value in the base configuration
+	  (default is 20)
+	- Project Compilation "replace object" output reduced.
+	- new.spirit now checks for object existence, if you configure
+	  a object to be replaced while installation
+	- during the installation process your are warned, if an object
+	  is replaced more than once
+
+1.99.18 2001/03/07 joern
+	Features:
+	- included actual CIPP version 2.28
+	- added htdocs/doc/index.html for some information about
+	  documentation
+
+1.99.17 2001/03/05 joern
+	Bugfixes:
+	- the CIPP BEGIN block, which sets the library path, was
+	  stripped off for syntax checking. So projects, which
+	  depend on a additional library path failed in compilation.
+	  This version of new.spirit REQUIRES now CIPP version 2.27
+
+1.99.16 2001/03/05 joern
+	Bugfixes:
+	- "Project Compilation" with dependency truncation did not
+	  delete the internal modules hash file. If a module was moved
+	  by hand, new.spirit complains about a double module definition,
+	  and even a project compilation did not fix this.
+	- BEGIN{} and/or END{} blocks were executed during Perl syntnax
+	  check, which sometimes makes the system hang.
+
+	Features:
+	- you can now define more than one additional perl library search
+	  directory by delimiting them with a colon.
+
+1.99.15 2001/02/27 joern
+	Bugfixes:
+	- the 'use_strict' attribute of CIPP modules was not always
+	  correctly initialized (enabled). Now this attribute should
+	  always default to 1.
+	- error formatting in case of a CIPP/new.spirit module name
+	  clashing was messed up
+
+1.99.14 2001/02/19 joern
+	Bugfixes:
+	- "Project Installation" did not install the prod/lib/
+	  directory
+	- "Project Installation" did not install the proper
+	  default database configuration
+	- first installation of a new module did throw an error message
+	- creation of image objects did not work
+	- project deletion without selection of a project entry was
+	  possible
+	- object creation using irregular names is prevented now
+	- project list is now sorted by project name instead of project
+	  description. This fixes also a bug: two projects with the
+	  same description were indistinguishable
+	- first time creation of a base configuration object causes
+	  an exception
+	- the NewSpirit::Object class did *always* set a lock on the
+	  object, even if this was an internal instantiation, e.g.
+	  for a "Project Compilation".
+
+	Features:
+	- timestamps of installed files (using "Project Installation")
+	  are now set to the source file timestamps. This make
+	  rsync's job easier.
+
+1.99.13 2001/02/15 joern
+	Bugfix:
+	- database connection code of generated modules was broken
+	- now new.spirit needs CIPP 2.19 or better, due to the
+	  extensions of dynamic database connections (which
+	  also fixes the bug stated above)
+	
+	ATTENTION:
+	----------
+	You must upgrade your production environments with the
+	shipped CIPP 2.19 release, because the CIPP::Runtime did
+	change. CGI programs created with this release WILL NOT
+	RUN with CIPP versions < 2.19 (resp. CIPP::Runtime < 0.36)
+
+
+1.99.12 2001/02/14 joern
+	Bugfixes:
+	- alternative database names did still not work.
+	- a htdocs mapping of '/' did produce wrong URLs
+
+	Features:
+	- base configuration objects have a new field for
+	  a additional perl library directory. So external private
+	  libraries can easily be included into your project.
+
+1.99.11 2001/02/13 joern
+	Bugfixes:
+	- missing Lock Files produce only warnings and no exceptions
+	  (this happens, if a project disappears from the filesystem.
+	   The thrown exception prevents from selecting another project,
+	   so we had a classical deadlock situation ;)
+	- creating a project where the project root dir alredy exists,
+	  but was not owned by the spirit webserver user, did not work,
+	  although if the user has write access
+	- dependency processing did sometimes compile too much objects,
+	  because transitive dependencies were not filtered enough
+	- prod replace function did not work properly
+
+1.99.10 2001/02/12 joern
+	Bugfixes:
+	- alternative database names did not work
+
+1.99.9 2001/02/11 joern
+	Features:
+	- bin/convert_cipp-img.pl can execute appropriate cvs
+	  commands for you
+
+1.99.8 2001/02/09 joern
+	Bugfixes:
+	- SQL object database assignment conversion (spirit 1.x ->
+	  new.spirit 2.x) did not work
+	- usage of Archive::Tar is replaced by a internal new.spirit function
+	  for copying directories recursively. This fixes the problelm
+	  with Archive::Tar under Windows platforms. Also this is much
+	  faster and more reliable than the Archive::Tar solution.
+
+	Cleanup:
+	- default mappings changed: /newspirit2 and /cgi-bin2
+	
+	Features:
+	- the object editor has a new popup entry for submitting:
+	  "Install (edited external)". Use this method, if you modified
+	  the object file with an external editor and want new.spirit
+	  to install this file, without saving the content of the
+	  object editor.
+	- there is a new user preference. The use can decide, if the
+	  editor submit popup should not be preselected with any entry,
+	  so the user must decide actively, which action should be
+	  performed.
+	- Link to the CHANGES file on the login page
+
+1.99.7 2001/02/07 joern
+	Cleanup:
+	- some local perl library path modifications in newspirit.conf
+	  are removed by mktardist.pl. I need them on my development system
+	  to work with the almost actual CIPP release, without need to
+	  install CIPP into my official perl library path.
+
+	Features:
+	- 'Project Installation' can now include SQL prod and src files.
+	  src files in that way, that a miniminal src tree is built, which
+	  can be used on the production system to execute SQL scripts and
+	  arbitrary SQL commands (of course, only if you install new.spirit
+	  on the production system for this purpose ;). This src tree only
+	  includes a base configuration, all database configuration files
+	  and SQL objects.
+
+1.99.6 2001/02/01 joern
+	Bugfixes:
+	- extended base configuration paramters
+	  - project root of production system
+	- Installation procedure did not copy images to
+	  the installation directory
+	- session preservation did not always work
+	- removed switch for omitting Include processing
+	  in 'Project Compilation'. Due to this, Include dependencies
+	  were broken
+	- create 'logs' directory in 'Project Installation'
+
+	Features:
+	- removed the NEWSPIRIT subdirectories. A new 'meta' subdirectory
+	  on project root toplevel takes the corresponding files. So the
+	  'src' tree ist free of non CVSable files, which makes life
+	  much easier
+	- object property files reside now in the same directory as the
+	  corresponding object file, with '.m' attached to the extension.
+	  So adding new files to CVS is easier.
+	- CIPP 2.16_01 is mandatory for this new.spirit release
+	- final filesystem structure: all files modified by the webserver
+	  are now inside the var tree
+
+1.99.5 2001/01/29 joern
+	Bugfixes:
+	- verbosity of include error output in dependency installation
+	  was too high
+	- optimized the builtin Perl syntax checker (solves open2
+	  resource problem unter Windows NT)
+
+	Features:
+	- Project Compilation:
+	  - user can decide, whether includes should
+	    be processed seperately (for error checking) or not
+	  - with or without deletion of the production tree
+	- upgraded shipped CIPP distribution to 2.15
+
+1.99.4 2001/01/25 joern
+	First release candiate.
+
+	Bugfixes:
+	- dependency processing had an esoteric bug. Sometimes dependent
+	  objects were not processed
+	
+	Features:
+	- project installation. If you're on a windows box, refer to
+	  the release notes.
+	- needed Perl modules are bundled with the new.spirit
+	  distribution
+
+1.99.2 2000/?/? joern
+	Bugfixes:
+	- install.pl did not use the determined DB_File module
+	  itself. instead the module of our development environment
+	  was used
+	- cipp-html objects now always depend on the base
+	  configuration
+	- renamed /icons URL to /i
+	  => shorter HTML code
+	  => no clashing with Apache standard mapping "/icons"
+
+	Features:
+	- project compilation now shows number of objects
+	  to process
+	- creation of cipp-html objects with .css extension
+	  now possible
+
+1.99.1 2000/08/10 joern
+	First dimedis internal beta release
+	- basic project installation stuff
+
+1.99.0 2000/xx/xx joern
+	First internal alpha release, lacks many features, e.g.
+	- cvs support
+	- project installation
+	- generic tool interface
+

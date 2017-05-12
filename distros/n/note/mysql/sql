@@ -1,0 +1,9 @@
+CREATE TABLE note (
+  number int(10) DEFAULT '0' NOT NULL auto_increment,
+  topic text,
+  note text,
+  date text,
+  PRIMARY KEY (number)
+);
+# sample grant statement:
+#GRANT ALL PRIVILEGES ON tom_note TO tom@localhost IDENTIFIED BY 'password';

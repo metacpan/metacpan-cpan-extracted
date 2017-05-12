@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                nvidia-ml
+version:             4.304.2
+abstract:            Perl bindings to the NVIDIA Management Library NVML
+license:             bsd
+generated_by:        ExtUtils::MakeMaker
+distribution_type:   module
+requires:
+  ExtUtils::MakeMaker: 0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+

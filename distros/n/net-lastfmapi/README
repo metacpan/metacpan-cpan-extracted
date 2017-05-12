@@ -1,0 +1,31 @@
+Net-LastFMAPI version 0.01
+==========================
+
+Functions for interacting with the LastFM API version 2.0.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP::UserAgent
+  Digest::MD5
+  JSON::XS
+  File::Slurp
+  File::Path
+
+COPYRIGHT AND LICENCE
+
+   Copyright (c) 2011, Steev Eeeriumn. All Rights Reserved.
+ This module is free software. It may be used, redistributed
+and/or modified under the terms of the Perl Artistic License
+     (see http://www.perl.com/perl/misc/Artistic.html)
+
