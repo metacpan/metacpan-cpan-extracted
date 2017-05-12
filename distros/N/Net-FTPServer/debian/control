@@ -1,0 +1,35 @@
+Source: libnet-ftpserver-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 4.0.2)
+Build-Depends-Indep: perl (>= 5.8.0-7), libio-stringy-perl (>= 1.126), libarchive-tar-perl, libauthen-pam-perl (>= 0.12), libbsd-resource-perl, libarchive-zip-perl (>= 0.11), libcompress-zlib-perl (>= 1.14), libdbi-perl, libfile-sync-perl, libnet-perl
+Maintainer: Chip Salzenberg <chip@debian.org>
+Standards-Version: 3.6.1
+
+Package: libnet-ftpserver-perl
+Architecture: all
+Depends: perl (>= 5.8.0-7), ${misc:Depends}, libio-stringy-perl (>= 1.126)
+Recommends: libarchive-tar-perl, libauthen-pam-perl (>= 0.12), libbsd-resource-perl
+Suggests: libarchive-zip-perl (>= 0.11), libcompress-zlib-perl (>= 1.14), libdbi-perl, libfile-sync-perl, libnet-perl
+Description:  A secure, extensible and configurable Perl FTP server
+ Net::FTPServer is a secure, extensible and configurable FTP
+ server written in Perl.
+ .
+ Current features include:
+ .
+   * Authenticated FTP access.
+   * Anonymous FTP access.
+   * Complete implementation of current RFCs.
+   * ASCII or binary type file transfers.
+   * Active or passive mode file transfers.
+   * Run standalone or from inetd(8).
+   * Security features: chroot, resource limits, tainting,
+     protection against buffer overflows.
+   * IP-based and/or IP-less virtual hosts.
+   * Complete access control system.
+   * Anonymous read-only FTP personality.
+   * Virtual filesystem allows files to be served from a database.
+   * Directory aliases and CDPATH support.
+   * Extensible command set.
+   * Generate archives on the fly.
+   * FTP proxy daemon (experimental).

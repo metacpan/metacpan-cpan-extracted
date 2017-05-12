@@ -1,0 +1,81 @@
+Revision history for Perl extension Net::SNMPTrapd.
+
+0.17  Wed Dec  7 12:30:00 2016
+      - Makefile.PL require 5.10.1 minimum.
+      - Fix version compare for Socket module (for IPv6) with 'use version'.
+
+0.16  Thu Mar 19 20:30:00 2015
+      - Updated bin/snmptrapd-simple.pl server.
+
+0.15  Wed Mar 18 16:30:00 2015
+      - Fixed informRequest response coming from UDP 162 with original 
+        server socket.
+      - Fixed v6Only tag when selecting IPv6 to account for Windows issues.
+
+0.14  Mon Mar  2 09:30:00 2015
+      - Missing semicolon in bin/snmptrapd-sendtest.pl.
+      - Updated v6Only tag when selecting IPv6 to account for Linux issues.
+
+0.13  Mon Aug  4 09:30:00 2014
+      - Top down order for Changes.
+      - Added LICENSE to Makefile.PL.
+      - Cleanup code (remove Exporter).
+
+0.12  Fri Aug 16 09:30:00 2013
+      - Updated Convert::ASN1 into single encode/decode.
+      - Added NULL varbind.
+      - Updated bin scripts: send has NULL value option, server has dump
+
+0.11  Mon Feb  4 09:30:00 2013
+      - pack_sockaddr_in / _in6 needed Socket:: prefix - RT# 83021.
+
+0.10  Tue Nov 20 21:30:00 2012
+      - Any Socket will do, fixed inet_ntoa issue with IPv6 in version 1.
+
+0.09  Sun Oct  7 21:30:00 2012
+      - Require Socket 1.87.
+
+0.08  Thu Oct  4 23:59:00 2012
+      - Make IO::Socket::IP optional with failback to IP::Socket::INET
+        with SUPER.
+      - Changed peeraddr(), peerport() accessors to remoteaddr(),
+        remoteport() to remove conflict with IO::Socket::*.
+
+0.07  Tue Sep  4 12:00:00 2012
+      - Timeout on advanced tests with EU::MM prompt().
+
+0.06  Fri Aug 24 12:00:00 2012
+      - Added server() accessor.
+
+0.05  Thu Aug 23 19:00:00 2012
+      - Changed to IO::Socket::IP and enabled IPv6 support.
+      - Updated bin/ scripts.
+
+0.04  Thu Oct 21 12:00:00 2010
+      - Based on request user request, implemented parsing and
+        response for SNMPv2 InformRequest PDUs.
+      - Added the pdu_type method.
+      - Updated Convert::ASN1 structures used in module.
+      - Updated bin/ scripts.
+      - Updated test.pl script to test for InformRequest and
+        Response.
+      - Increased default PDU size to 65467.
+      - Added PDU size and timeout options to get_trap() method.
+        Provided options for RFC and recommended PDU sizes.
+      - Added hex dump option to datagram() method.
+      - Added dump() method/subroutine to use the Convert::ASN1
+        debug subroutines directly for ASN.1 decode troubleshooting.
+      - More detailed error messages and more code comments.
+
+0.03  Mon Feb  5 09:29:48 2010
+      - Updated tests to address Activestate auto-building of PPM
+        which threw an error even though one didn't exist and
+        every other version of build - including CPAN Testers
+        had NO issues whatsoever.
+
+0.02  Mon Jan 18 16:29:48 2010
+      - Allowed legacy and case insensitive calling of switches.
+
+0.01  Wed Jan 13 13:40:44 2010
+      - original version; created by h2xs 1.23 with options
+            -b 5.6.1 -v 0.01 -XAn Net::SNMPTrapd

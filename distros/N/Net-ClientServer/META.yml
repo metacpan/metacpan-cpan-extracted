@@ -1,0 +1,22 @@
+---
+abstract: 'A client/server platform for IPC on localhost'
+author:
+  - 'Robert Krimen <robertkrimen@gmail.com>'
+build_requires:
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+generated_by: 'Dist::Zilla version 2.101170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-ClientServer
+recommends: {}
+requires:
+  Any::Moose: 0
+  Daemon::Daemonize: 0
+  File::HomeDir: 0
+  IO::Socket::INET: 0
+  Path::Class: 0
+version: 0.0007

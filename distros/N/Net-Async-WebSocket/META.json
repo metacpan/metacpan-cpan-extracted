@@ -1,0 +1,61 @@
+{
+   "abstract" : "use WebSockets with C<IO::Async>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Async-WebSocket",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::Async::OS" : "0",
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Async::Listener" : "0.61",
+            "IO::Async::Notifier" : "0.63",
+            "IO::Async::Stream" : "0.34",
+            "Protocol::WebSocket" : "0.00902",
+            "Protocol::WebSocket::Frame" : "0",
+            "Protocol::WebSocket::Handshake::Client" : "0",
+            "Protocol::WebSocket::Handshake::Server" : "0",
+            "URI" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Async::WebSocket" : {
+         "file" : "lib/Net/Async/WebSocket.pm",
+         "version" : "0.10"
+      },
+      "Net::Async::WebSocket::Client" : {
+         "file" : "lib/Net/Async/WebSocket/Client.pm",
+         "version" : "0.10"
+      },
+      "Net::Async::WebSocket::Protocol" : {
+         "file" : "lib/Net/Async/WebSocket/Protocol.pm",
+         "version" : "0.10"
+      },
+      "Net::Async::WebSocket::Server" : {
+         "file" : "lib/Net/Async/WebSocket/Server.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.10"
+}

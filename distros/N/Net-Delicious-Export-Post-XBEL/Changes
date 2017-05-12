@@ -1,0 +1,83 @@
+# -*-n3-*-
+
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix doap:    <http://usefulinc.com/ns/doap#> .
+@prefix asc:     <http://aaronland.info/ns/changefile/> .
+                                     
+<>
+        dc:identifier           "$Id: Changes,v 1.8 2005/12/11 19:14:40 asc Exp $" ;
+        dc:description          "Changes for Net::Delicious::Export::Post::XBEL.pm" ;
+        dcterms:references      <http://aaronland.info/perl/net/delicious/export/post/xbel/> .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-Export-Post-XBEL-1.4.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/export/post/xbel/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-Export-Post-XBEL-1.3.tar.gz>
+
+        doap:Version    [
+                        doap:revision     "1.4" ;
+                        doap:created      "2005-12-11" ;
+                        ];
+        asc:changes     [
+                        asc:addition     "Added MANIFEST.SKIP." ;
+                        asc:update       "Require Net::Delicious::Export 1.2" ;
+                        asc:update       "Update to use Module::Build" ;
+                        asc:update       "Updated 'Changes' file to use N3 formatting." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-Export-Post-XBEL-1.3.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/export/post/xbel/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-Export-Post-XBEL-1.2.tar.gz>
+
+        doap:Version    [
+                        doap:revision     "1.3" ;
+                        doap:created      "2004-02-28" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Fixed bug where '/xbel/desc' was being written as '/xbel/description'." ;
+                        asc:bugfix        "It's 'bookmark/@href' not 'bookmark/@url'." ;
+                        asc:comment       "The inevitable Ima::Moron release.  What the hell was I smoking when I wrote this?" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-Export-Post-XBEL-1.2.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/export/post/xbel/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-Export-Post-XBEL-1.1.tar.gz>
+
+        doap:Version    [
+                        doap:revision     "1.2" ;
+                        doap:created      "2004-02-09" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Added support for 'hierarchical tags' (e.g. foo/bar/baz) to 'by_tag' method." ;
+                        asc:addition      "Added 'visited' attribute for <url> elements." ;
+                        asc:addition      "Added dependency on N:D:E:Post." ;
+                        asc:update        "Updated POD." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-Export-Post-XBEL-1.1.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/export/post/xbel/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-Export-Post-XBEL-1.0.tar.gz>
+
+        doap:Version    [
+                        doap:revision     "1.1" ;
+                        doap:created      "2004-02-09" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Added 'by_tag' object method." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-Export-Post-XBEL-1.0.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/export/post/xbel/> ;
+
+        doap:Version    [
+                        doap:revision     "1.0" ;
+                        doap:created      "2004-02-09" ;
+                        ];
+        asc:changes     [
+                        asc:comment       "Initial release." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/export/post/xbel/>
+        a doap:Project ;
+        doap:download-page      "http://search.cpan.org/dist/Net-Delicious-Export-Post-XBEL/" ;
+        doap:download-mirror    "http://aaronland.info/perl/net/delicious/export/post/xbel/" .

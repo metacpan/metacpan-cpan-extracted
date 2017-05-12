@@ -1,0 +1,39 @@
+From 9068b312ebc86a7b2202bc8db910c93a897501ba Mon Sep 17 00:00:00 2001
+From: Jens Rehsack <sno@NetBSD.org>
+Date: Mon, 2 Jul 2012 10:14:58 +0200
+Subject: [PATCH 2/4] fix use of uninitialized values
+
+---
+ skeletons/asn_codecs_prim.c |    2 +-
+ skeletons/per_encoder.c     |    2 +-
+ 2 Dateien geändert, 2 Zeilen hinzugefügt(+), 2 Zeilen entfernt(-)
+
+diff --git a/skeletons/asn_codecs_prim.c b/skeletons/asn_codecs_prim.c
+index 4e5c639..518cac1 100644
+--- a/skeletons/asn_codecs_prim.c
++++ b/skeletons/asn_codecs_prim.c
+@@ -15,7 +15,7 @@ ber_decode_primitive(asn_codec_ctx_t *opt_codec_ctx,
+ 	void **sptr, const void *buf_ptr, size_t size, int tag_mode) {
+ 	ASN__PRIMITIVE_TYPE_t *st = (ASN__PRIMITIVE_TYPE_t *)*sptr;
+ 	asn_dec_rval_t rval;
+-	ber_tlv_len_t length;
++	ber_tlv_len_t length = 0; /* dummy function in unber.c doesn't initialize it properly */
+ 
+ 	/*
+ 	 * If the structure is not there, allocate it.
+diff --git a/skeletons/per_encoder.c b/skeletons/per_encoder.c
+index e76ef74..656e66c 100644
+--- a/skeletons/per_encoder.c
++++ b/skeletons/per_encoder.c
+@@ -118,7 +118,7 @@ _uper_encode_flush_outp(asn_per_outp_t *po) {
+ static asn_enc_rval_t
+ uper_encode_internal(asn_TYPE_descriptor_t *td, asn_per_constraints_t *constraints, void *sptr, asn_app_consume_bytes_f *cb, void *app_key) {
+ 	asn_per_outp_t po;
+-	asn_enc_rval_t er;
++	asn_enc_rval_t er = { RC_OK };
+ 
+ 	/*
+ 	 * Invoke type-specific encoder.
+-- 
+1.7.10.5
+

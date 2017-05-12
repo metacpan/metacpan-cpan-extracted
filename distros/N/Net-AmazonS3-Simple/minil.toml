@@ -1,0 +1,6 @@
+name = "Net-AmazonS3-Simple"
+badges = ["travis"]
+authority="cpan:JASEI"
+
+module_maker="ModuleBuildTiny"
+

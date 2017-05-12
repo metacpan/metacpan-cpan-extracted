@@ -1,0 +1,124 @@
+Revision history for NetHack-Item
+
+0.21    Dec 10 2013
+        Disambiguate cost and nutrition into *_each and total_* (Sartak)
+        Fix Moose compat issue (doy)
+
+0.20    Jul 20 2013
+        Potion dilution management (Sartak)
+        Scroll and spellbook blanking management (Sartak)
+
+0.19    Jul 6 2013
+        Support for custom fruit names (Sartak)
+        Notice when a piece of equipment goes missing (Sartak)
+        Add item type for statue too, rather than "other" (Sartak)
+        Track spellbook->difficult_for_int (Sartak)
+        Wand identity trackers now have an is_nomessage helper (Sartak)
+        Modernize testing with done_testing and Test::Fatal (Sartak)
+
+0.18    Jul 5 2013
+        Add item type for gold, rather than stuffing it into "other" (Sartak)
+        $food->nutrition_per_weight (Sartak)
+
+0.17    Jul 5 2013
+        Add evolve_from API (Sartak)
+            (it's what we did for reconciling Inventory, but now we want it for TAEB tiles too)
+
+0.16    Jun 30 2013
+        Oops (Sartak)
+
+0.15    Jun 30 2013
+        Skill and direction spoilers for spells (Sartak)
+        Track spellbook->difficult_for_level (Sartak)
+        Basic polymorph support (Sartak)
+
+0.14    Jun 27 2013
+        Adjust regex to accommodate new nethack.alt.org patches (Sartak)
+
+0.13    Apr 9 2011
+        delegate attr functionality manually to avoid warnings (Jason May)
+        appease future dzil deprecation (Jason May)
+
+0.12    Wed Sep 30 22:45:12 2009
+        Arrrrgh packaging. (doy)
+
+0.11    Wed Sep 30 21:28:31 2009
+        Better handling for unknown/inconsistent BUC states (Sartak)
+        More Moose fixes (doy)
+
+0.10    Sun May 10 16:22:14 2009
+        Make incorporate_stats and incorporate_stats_from a parameterized
+            role (Sartak)
+        Moose fixes (doy)
+
+0.09    Sun Apr 5 15:40:31 2009
+        Depend on NetHack::Monster::Spoiler instead of including monster
+            spoilers in this dist (doy)
+        Add vegan and vegetarian to food spoilers (doy)
+        Tin fixes (doy)
+        Replace 'unsafe' with a hash of what's actually unsafe about food (doy)
+        Reify statues and figurines (doy)
+        Add glyphs (doy)
+
+0.08    Sat Mar 14 11:08:32 2009
+        Fix major bug where equipment would get out of date (sorear)
+
+0.07    Wed Feb 25 01:52:39 2009
+        Spoiler->all_identities (Sartak)
+        Instrument->tonal (Sartak)
+        Item->fits_in_slot, under_cursed, blockers, slots_inside_out (sorear)
+        Fix update_armor to work on rings (sorear)
+        Support for tracking worn amulet and blindfold (sorear)
+        Parser enhancement for "4 daggers (wielded)" (sorear)
+        Materials are now listed in spoilers (sorear)
+        Item->is_metallic (sorear)
+        Better handling for unique corpses (sorear)
+        NetHack::Item::Slot (equipment) type (sorear)
+
+0.06    Tue Feb 17 23:18:05 2009
+        Gold never goes into the inventory
+        Throw a warning if we're throwing away an inventory item in an update
+        Improved artifact handling
+        Fix evolving charge (both items need to do the role)
+        MooseX::Role::Matcher is recommended (but not used) in place of our
+            horrible hack which is now gone
+        Many fixes for equipment tracking
+        Handle plural unidentified eggs
+        Load all tracker classes
+        new_item no longer does inventory tracking, since it could be a
+            container slot
+        Account for quantity in weight
+        Remove some hacks that sneaked in for initial TAEB support
+        Spoilers now track stackability, tin weight, corpse permanence
+        You can't drop worn items
+
+        Item->spoiler_values, maybe_is, remove_damage, throw_range
+        Item->name which is artifact or identity or appearance
+        Inventory->exact_weight, decrease_quantity, add
+        Armor->base_ac
+        Corpse->monster
+        Trackers->possible_appearances_of(identity)
+        ItemPool->item_class, _create_item
+
+0.05    Tue Dec 9 00:46:18 2008
+        Depend on Set::Object. Oops.
+
+0.04    Sat Dec 6 01:12:36 2008
+        Implementation of all the features I need is done!
+        NetHack::ItemPool and its modules are now part of this dist
+
+0.03    Sun Nov 16 03:00:00 2008
+        Item->incorporate_stats_from(Item) and Item->is_evolution_of(Item)
+            These are used to update items with obvious stats from newer copies
+            of the same item. Such as when you look at your inventory again and
+            notice your sword has increased in enchantment.
+        Tests for charging (thanks arcanehl) and fixes
+        Corpses are now a subtype of food
+
+0.02    Wed Nov 12 22:54:18 2008
+        Too much to list, biggest is addition of subtypes and plenty of
+            internals cleanup
+
+0.01    Fri Jul 04 07:42:41 2008
+        First version, released on an unsuspecting world.
+

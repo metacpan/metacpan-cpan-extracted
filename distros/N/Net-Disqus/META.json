@@ -1,0 +1,56 @@
+{
+   "abstract" : "Disqus.com API access",
+   "author" : [
+      "Ben van Staveren <madcat@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Disqus",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.38",
+            "Test::Exception" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31",
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : 0,
+            "JSON::PP" : 0,
+            "LWP::UserAgent" : 0,
+            "Try::Tiny" : 0,
+            "URI" : 0,
+            "URI::Escape" : 0,
+            "overload" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/benvanstaveren/Net-Disqus/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/Net-Disqus/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/benvanstaveren/Net-Disqus.git",
+         "web" : "https://github.com/benvanstaveren/Net-Disqus"
+      }
+   },
+   "version" : "1.19"
+}
+

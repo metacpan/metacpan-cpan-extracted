@@ -1,0 +1,107 @@
+<vars type="widget" name="header" charset_name="UTF-8" lang_name="en" />
+
+{first_name} <vars name="fname" /><br>
+{last_name} <vars name="lname" /><br>
+{email} <vars type="var" name='email' /><br>
+{website} <vars type="var" name="website" /><br>
+<br>
+
+global variables:<br>
+language: <vars name='lang' /><br>
+theme: <vars name="theme" /><br>
+base url: <vars name="base_url" /><br>
+image url: <vars name="image_url" /><br>
+css url: <vars name="css_url" /><br>
+new url: <a href="<vars name="base_url" />comments" >comments</a><br>
+image: <img src="<vars name="image_url" />logo.png" /><br>
+<br>
+first visit: <vars name="first_visit" /><br>
+visitor count: <vars name="visitor_count" /><br>
+<br>
+
+{date_now} <vars type="plugin" method="Date->date" format="%a, %d %b %Y %H:%M:%S" /><br>
+{time_now} <vars type="plugin" method="Date->time" format="%A %d, %B %Y  %T %p" /><br>
+{date_time} <vars type="plugin" method="Date::now" capture="1" format="%B %d, %Y  %r" /><br>
+
+<br>
+<vars type="module" method="Home::Home->welcome" message="Welcome back!" /><br>
+<br>
+
+Our Version: <vars type="perl"><![CDATA[print $self->app->VERSION; return;]]></vars><br>
+<br>
+
+<pre>
+<vars type="perl">system ('dir *.cgi');</vars>
+</pre>
+<br>
+
+<vars type="var" name="singleline" width="400px" height="300px" content="ahmed<b>class/subclass">
+cdata start here is may have html tags and 'single' and "double" qoutes
+</vars>
+<br>
+
+<vars type="var" name="multiline" width="400px" height="300px"><![CDATA[ 
+	cdata start here is may have html tags <b>hello</b> and 'single' and "double" qoutes
+	another cdata line
+]]></vars>
+<br>
+
+<vars type="perl"><![CDATA[ 
+	say "";
+	say "<br>active language: " . $self->app->var->get("lang");
+	say "<br>active theme: " . $self->app->var->get("theme");
+	say "<br>app path: " . $self->app->var->get("path");
+	say "<br>";
+]]></vars>
+<br><br>
+
+html content 1-5 top
+<!--block:first-->
+    <table border="1" style="color:red;">
+    <tr class="lines">
+        <td align="left" valign="<--valign-->">
+            <b>bold</b><a href="http://www.mewsoft.com">mewsoft</a>
+            <!--hello--> <--again--><!--world-->
+            some html content here 1 top
+            <!--block:second-->
+                some html content here 2 top
+                <!--block:third-->
+                    some html content here 3 top
+                    <!--block:fourth-->
+                    some html content here 4 top
+                        <!--block:fifth-->
+                            some html content here 5a
+                            some html content here 5b
+                        <!--endblock-->
+                    <!--endblock-->
+                    some html content here 3a
+                some html content here 3b
+            <!--endblock-->
+        some html content here 2 bottom
+        </tr>
+    <!--endblock-->
+    some html content here 1 bottom
+</table>
+<!--endblock-->
+html content 1-5 bottom
+
+<br><br>
+
+html content 6-8 top
+<!--block:six-->
+    some html content here 6 top
+    <!--block:seven-->
+        some html content here 7 top
+        <!--block:eight-->
+            some html content here 8a
+            some html content here 8b
+        <!--endblock-->
+        some html content here 7 bottom
+    <!--endblock-->
+    some html content here 6 bottom
+<!--endblock-->
+html content 6-8 bottom
+
+<br><br>
+
+ <vars type="widget" name="footer" title="cairo" lang="ar" />

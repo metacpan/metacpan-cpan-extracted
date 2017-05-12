@@ -1,0 +1,15 @@
+Build.PL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Net/COLOURlovers.pm
+lib/Net/COLOURlovers/Color.pm
+lib/Net/COLOURlovers/Lover.pm
+lib/Net/COLOURlovers/Palette.pm
+lib/Net/COLOURlovers/Pattern.pm
+lib/Net/COLOURlovers/Stat.pm
+t/app.t

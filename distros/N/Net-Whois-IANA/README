@@ -1,0 +1,53 @@
+Net/Whois/IANA version 0.23
+===========================
+
+  This is a simple module to extract the descriptive whois
+information about various IPs as they are stored in the five
+regional whois registries of IANA - RIPE (Europe, Middle East),
+APNIC (Asia/Pacific), ARIN (North America), AFRINIC (Africa)
+and LACNIC (Latin American & Caribbean).
+
+  It is designed to serve statistical harvesters of various
+access logs and likewise, therefore it only collects partial
+and [rarely] unprecise information.
+
+  Various Net::Whois and IP:: modules have been created.
+This is just something I had to write because none of them s
+uited my purpose. It is conceptually based on Net::Whois::IP
+by Ben Schmitz <bschmitz@orbitz.com>.
+
+* Important Note 1:
+When make test, sometimes a test may fail merely due to network problems.
+
+* Important Note 2:
+When testing too eagerly, i.e. querying the IANA registries too often, you
+may get your access to them suspended, temporarily or permanently.
+Handle with care!
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+IO::Socket
+Net::CIDR;
+Bit::Vector;
+Perl 5.008+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2003-2007 Bolet Consulting <bolet@parparov.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

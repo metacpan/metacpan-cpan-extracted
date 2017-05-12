@@ -1,0 +1,10 @@
+$args =
+{
+ message_type => MQTT_SUBSCRIBE,
+ message_id => 1,
+ topics => [ [ 'testing' => MQTT_QOS_AT_MOST_ONCE ] ],
+}
+
+82 0c 00 01  00 07 74 65    73 74 69 6e  67 00
+
+Subscribe/at-least-once 1 testing/at-most-once 

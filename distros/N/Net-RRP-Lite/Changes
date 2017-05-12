@@ -1,0 +1,9 @@
+2003-10-10  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* Net::RRP::Lite::Response param method become a case insensitive.
+	* treat multiple value response correctly.
+
+2003-10-10  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* original version. 
+

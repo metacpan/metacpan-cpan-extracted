@@ -1,0 +1,27 @@
+---
+name: Net-SAP
+version: 0.10
+author:
+  - 'Nicholas J Humfrey, njh@cpan.org'
+abstract: Session Announcement Protocol (rfc2974)
+license: perl
+requires:
+  Compress::Zlib: 1.14
+  Getopt::Std: 0
+  IO::Interface: 1.00
+  IO::Socket::Multicast6: 0.02
+  Pod::Usage: 0
+  Test::More: 0
+  perl: 5.5.0
+recommends:
+  Net::SDP: 0
+build_requires:
+  Module::Build: 0.20
+provides:
+  Net::SAP:
+    file: lib/Net/SAP.pm
+    version: 0.10
+  Net::SAP::Packet:
+    file: lib/Net/SAP/Packet.pm
+    version: 0.10
+generated_by: Module::Build version 0.26

@@ -1,0 +1,36 @@
+---
+abstract: 'Perl Agent for NewRelic APM'
+author:
+  - 'Ali Anari <ali@anari.me>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  ExtUtils::ParseXS: '3.30'
+  ExtUtils::XSpp: '0.18'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: NewRelic-Agent
+requires:
+  Carp: '0'
+  XSLoader: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/aanari/NewRelic-Agent/issues
+  repository: git://github.com/aanari/NewRelic-Agent.git
+version: '0.0532'
+x_contributors:
+  - 'Slobodan Mišković <slobodan@miskovic.ca>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Tim Bunce <tim.bunce@pobox.com>'
+  - 'Tim Bunce <tim@tigerlms.com>'

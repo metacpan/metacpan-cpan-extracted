@@ -1,0 +1,95 @@
+#!/usr/bin/env perl 
+#===============================================================================
+#
+#         FILE:  testqueue
+#
+#        USAGE:  ./testqueue
+#
+#  DESCRIPTION:
+#
+#      OPTIONS:  ---
+# REQUIREMENTS:  ---
+#         BUGS:  ---
+#        NOTES:  ---
+#       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
+#      COMPANY:  Net.Style
+#      VERSION:  1.0
+#      CREATED:  30.07.2009 09:17:50 UTC
+#     REVISION:  ---
+#===============================================================================
+
+use 5.8.0;
+use strict;
+use warnings;
+
+QueueTester->run(
+	has_config => 0,
+	verbose    => 1,
+);
+
+1;
+
+package QueueTester;
+
+use 5.8.0;
+use strict;
+use warnings;
+
+use version; our $VERSION = '1.000';
+
+use base 'NetSDS::App';
+use NetSDS::Queue;
+use Getopt::Long;
+
+use Data::Dumper;
+
+sub process {
+
+	my ($this) = @_;
+
+	print "NetSDS-Queue testing tool v 1.000\n";
+
+	my $queue = NetSDS::Queue->new();
+	
+	$queue->push("tstq", {a=>1, b=>2});
+
+	print Dumper($queue->pull("tstq"));
+
+	$this->{to_finalize} = 1;
+}
+
+1;
+#===============================================================================
+
+__END__
+
+=head1 NAME
+
+testqueue
+
+=head1 SYNOPSIS
+
+testqueue
+
+=head1 DESCRIPTION
+
+FIXME
+
+=head1 EXAMPLES
+
+FIXME
+
+=head1 BUGS
+
+Unknown.
+
+=head1 TODO
+
+Empty.
+
+=head1 AUTHOR
+
+Michael Bochkaryov <misha@rattler.kiev.ua>
+
+=cut
+

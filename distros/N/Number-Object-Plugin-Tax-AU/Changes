@@ -1,0 +1,11 @@
+Revision history for Number::Object::Plugin::Tax::AU::GST
+
+0.03    2009-12-16
+        Fix META.yml
+
+0.02    2009-11-17  9:29:12
+        Add META.yml, list Number::Object as pre-requisite,
+        swap tests to use Test::More
+
+0.01    2009-11-16 16:04:34
+        First version, released on an unsuspecting world.

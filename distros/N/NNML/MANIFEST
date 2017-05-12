@@ -1,0 +1,16 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+NNML/Active.pm
+NNML/Auth.pm
+NNML/Connection.pm
+NNML/Group.pm
+NNML/Server.pm
+NNML/Handle.pm
+README
+nnmirror.PL
+overview.PL
+t/base.t
+eg/NNML.conf
+nnsync.PL
+META.yml                                 Module meta-data (added by MakeMaker)

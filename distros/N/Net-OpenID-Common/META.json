@@ -1,0 +1,64 @@
+{
+   "abstract" : "Libraries shared between Net::OpenID::Consumer and Net::OpenID::Server",
+   "author" : [
+      "Robert Norris <rob@eatenbyagrue.org>",
+      "Roger Crew <crew@cs.stanford.edu>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-OpenID-Common",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::DH::GMP" : "0.00011",
+            "Encode" : "0",
+            "HTML::Parser" : "3.40",
+            "HTTP::Headers::Util" : "0",
+            "HTTP::Message" : "5.814",
+            "HTTP::Request" : "0",
+            "HTTP::Status" : "0",
+            "MIME::Base64" : "0",
+            "Math::BigInt" : "0",
+            "Time::Local" : "0",
+            "XML::Simple" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-net-openid-common@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-OpenID-Common"
+      },
+      "homepage" : "http://groups.google.com/group/openid-perl",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/wrog/Net-OpenID-Common.git",
+         "web" : "http://github.com/wrog/Net-OpenID-Common"
+      }
+   },
+   "version" : "1.20"
+}
+

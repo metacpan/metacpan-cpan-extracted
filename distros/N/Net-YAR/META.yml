@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               Net-YAR
+version:            1.083
+abstract:           Perl interface to the YAR (Yet Another Registrar) API
+author:
+    - Paul Seamons
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    HTTP::Headers:   0
+    HTTP::Request:   0
+    JSON:            0
+    LWP::UserAgent:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

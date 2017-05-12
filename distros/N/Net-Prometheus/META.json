@@ -1,0 +1,77 @@
+{
+   "abstract" : "export monitoring metrics for F<prometheus>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Prometheus",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "1.33",
+            "Struct::Dumb" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "List::Util" : "1.29",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Prometheus" : {
+         "file" : "lib/Net/Prometheus.pm",
+         "version" : "0.05"
+      },
+      "Net::Prometheus::Counter" : {
+         "file" : "lib/Net/Prometheus/Counter.pm",
+         "version" : "0.05"
+      },
+      "Net::Prometheus::Gauge" : {
+         "file" : "lib/Net/Prometheus/Gauge.pm",
+         "version" : "0.05"
+      },
+      "Net::Prometheus::Histogram" : {
+         "file" : "lib/Net/Prometheus/Histogram.pm",
+         "version" : "0.05"
+      },
+      "Net::Prometheus::Metric" : {
+         "file" : "lib/Net/Prometheus/Metric.pm",
+         "version" : "0.05"
+      },
+      "Net::Prometheus::ProcessCollector" : {
+         "file" : "lib/Net/Prometheus/ProcessCollector.pm",
+         "version" : "0.05"
+      },
+      "Net::Prometheus::ProcessCollector::linux" : {
+         "file" : "lib/Net/Prometheus/ProcessCollector/linux.pm",
+         "version" : "0.05"
+      },
+      "Net::Prometheus::Summary" : {
+         "file" : "lib/Net/Prometheus/Summary.pm",
+         "version" : "0.05"
+      },
+      "Net::Prometheus::Types" : {
+         "file" : "lib/Net/Prometheus/Types.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

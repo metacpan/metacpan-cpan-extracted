@@ -1,0 +1,48 @@
+Net-SSL-AutoCA
+
+This provides a method for finding CA bundles.
+
+If you have ca_root_nss or nss installed, it should
+find the bundle that comes with it.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+If you want a collection of root CAs to install, install
+ca_root_nss/nss.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::SSL::AutoCA
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-SSL-AutoCA
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-SSL-AutoCA
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-SSL-AutoCA
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-SSL-AutoCA/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Zane C. Bowers
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

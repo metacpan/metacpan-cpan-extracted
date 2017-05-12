@@ -1,0 +1,43 @@
+Msmgr $Revision: 0.16 $
+==================
+
+
+OVERVIEW
+
+    This is a set of perl modules for encapsulating interactions with
+    the Microsoft Network "Messenger" chat system. You might use it to
+    develop clients, or robots. The components are, this module,
+    Net::Msmgr, which contains some non-object helper routines (mostly
+    the authentication chain for using MSNP8 (Protocol version 8) and
+    a handful of manifest constants for debugging.
+
+    The latest version of this file is usually availabe at
+
+    http://cluon.com/PerlMSN/Net-Msmgr-latest.tar.gz
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    LWP::UserAgent;	Used for MSNP8 Authentication
+    HTTP::Request;	...also requires SSL 
+    HTTP::Response;
+    
+    URI::Escape;	For handling Friendly Names
+
+COPYRIGHT AND LICENCE
+
+Copyright © 2003 Scott Lawrence Statton - All Rights Reserved
+
+This program is free software; You can redistribute it and/or modify
+it under the same terms as Perl itself.
+

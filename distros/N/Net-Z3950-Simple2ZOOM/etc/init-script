@@ -1,0 +1,89 @@
+#! /bin/sh
+#
+# Start/stop script for the simple2zoom SRU gateway
+#
+# $Id: init-script,v 1.1 2007-07-06 15:31:51 mike Exp $
+#
+
+set -e
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DESC="SRU/Z39.50 Gateway"
+NAME=simple2zoom
+BASEDIR=$(dirname $0)
+DAEMON=$BASEDIR/$NAME
+PIDFILE=/var/run/$NAME.pid
+SCRIPTNAME=/etc/init.d/$NAME
+LOGFILE=$BASEDIR/sru.log
+SOCKET=tcp:@:8888
+USER=www-data
+
+# Gracefully exit if the package has been removed.
+test -x $DAEMON || exit 0
+
+#
+#	Function that starts the daemon/service.
+#
+d_start() {
+    if [ -f $PIDFILE ] ; then
+        echo
+        echo "Already running as pid $(cat $PIDFILE)"
+        exit 1;
+    fi
+
+    $DAEMON -D -p $PIDFILE -l $LOGFILE -u $USER $SOCKET > $LOGFILE 2>&1
+}
+
+#
+#	Function that stops the daemon/service.
+#
+d_stop() {
+    kill $(cat $PIDFILE)
+    rm $PIDFILE
+}
+
+
+case "$1" in
+  start)
+	echo -n "Starting $DESC: $NAME"
+	d_start
+	echo "."
+	;;
+  stop)
+	echo -n "Stopping $DESC: $NAME"
+	d_stop
+	echo "."
+	;;
+  #reload)
+	#
+	#	If the daemon can reload its configuration without
+	#	restarting (for example, when it is sent a SIGHUP),
+	#	then implement that here.
+	#
+	#	If the daemon responds to changes in its config file
+	#	directly anyway, make this an "exit 0".
+	#
+	# echo -n "Reloading $DESC configuration..."
+	# d_reload
+	# echo "done."
+  #;;
+  restart|force-reload)
+	#
+	#	If the "reload" option is implemented, move the "force-reload"
+	#	option to the "reload" entry above. If not, "force-reload" is
+	#	just the same as "restart".
+	#
+	echo -n "Restarting $DESC: $NAME"
+	d_stop
+	sleep 1
+	d_start
+	echo "."
+	;;
+  *)
+	# echo "Usage: $SCRIPTNAME {start|stop|restart|reload|force-reload}" >&2
+	echo "Usage: $SCRIPTNAME {start|stop|restart|force-reload}" >&2
+	exit 1
+	;;
+esac
+
+exit 0

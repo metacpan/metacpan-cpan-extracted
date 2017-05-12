@@ -1,0 +1,12 @@
+Revision history for Perl extension Net-Airbrake
+
+0.02 2015-05-13T14:11:06Z
+
+    - Update and fix documents
+    - Update a parameter name of Net::Airbrake#new
+    - Support 'base_url' parameter by new() to send reports somewhere for test
+
+0.01 2015-05-08T09:12:39Z
+
+    - original version
+

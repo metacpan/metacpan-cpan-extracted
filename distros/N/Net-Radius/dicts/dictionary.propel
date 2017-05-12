@@ -1,0 +1,13 @@
+#
+#	Found on the net.
+#
+#	$Id: dictionary.propel 45 2006-11-14 17:45:00Z lem $
+#
+
+VENDOR Propel 14895
+
+ATTRIBUTE Propel-Accelerate		1	integer	Propel
+ATTRIBUTE Propel-Dialed-Digits		2	string	Propel
+ATTRIBUTE Propel-Client-IP-Address	3	ipaddr	Propel
+ATTRIBUTE Propel-Client-NAS-IP-Address	4	ipaddr	Propel
+ATTRIBUTE Propel-Client-Source-ID	5	integer	Propel

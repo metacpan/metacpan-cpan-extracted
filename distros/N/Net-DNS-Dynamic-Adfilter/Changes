@@ -1,0 +1,67 @@
+Revision history for Perl module Net::DNS::Dynamic::Adfilter
+
+0.075 Mon Feb 17 05:28:07 EST 2014
+    - replace stub and test scripts
+
+0.074 Tue Feb 11 01:29:16 EST 2014
+    - fix timeout, test scripts
+
+0.073 Fri Feb 7 03:17:18 EST 2014
+    - require min. versions of Net::DNS and Perl
+
+0.072 Mon Jan 6 01:19:35 EST 2014
+    - configurable loopback address - rt 90614
+
+0.071 Tue Oct 30 09:59:26 EDT 2012
+    - simplify script installation
+
+0.070 Sun Oct 28 11:56:48 EDT 2012
+    - fix for lwp 6.0 ca
+
+0.069 Thu Oct 25 12:32:04 EDT 2012
+    - dns switching; fix regexs, host default 
+
+0.068 Tue Jun 12 17:00:09 EDT 2012
+    - minor edits, improve kwalitee rating
+
+0.067 Mon Jun 11 10:22:02 EDT 2012
+    - fix addressing/sharing of dns server
+
+0.066 Sun May 27 08:32:24 EDT 2012
+    - parse adblock plus subscription links, add whitelist capability, add data::dumper method
+
+0.065 Wed May 16 21:55:41 EDT 2012
+    - use general adblock loader/parser, allow infinite number of adblock lists
+
+0.064 Tue May  8 11:34:20 EDT 2012 
+    - accommodate ipv6, ^www and second level domain queries
+ 
+0.063 Sat Apr 28 11:08:35 EDT 2012
+    - use Net::Address::IP::Local to address ::INET incompatibilities on some systems
+
+0.062 Thu Apr 26 04:07:39 EDT 2012
+    - comment out system calls blunder
+
+0.061 Wed Apr 25 11:18:05 EDT 2012
+    - remove redundant hashes, minor pod edit
+
+0.06 Mon Apr 23 21:27:44 EDT 2012
+    - changed reply_handler to 'around' modifier
+
+0.05_01 Wed Apr 18 14:00:35 EDT 2012
+    - bundled initial cpan release
+
+0.05 Mon Apr 16 10:51:06 EDT 2012
+    - moved ad hosts into cache hashref, added secondary hosts hashref
+
+0.04 Tue Apr  3 03:08:30 EDT 2012
+    - moved variables into adfilter hashref, moved defaults into script
+
+0.03 Fri Mar 30 03:25:05 EDT 2012
+    - merged ttl with refresh value of pgl adhost list
+
+0.02 Sun Mar 25 2012
+    - added parsing of secondary ad hosts file
+
+0.01 Mon Mar 19 13:41:55 2012
+    - original version; created by ExtUtils::ModuleMaker 0.51

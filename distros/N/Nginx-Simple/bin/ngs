@@ -1,0 +1,673 @@
+#!/usr/bin/perl
+
+use YAML;
+use strict;
+use Data::Dumper;
+use File::Path;
+use Time::HiRes 'usleep';
+use Cwd;
+
+my $tmp_dir  = "/tmp";
+
+my %default_options = (
+    config             => 'conf/ngs.conf',
+    port               => 8080,
+    host               => '127.0.0.1',
+    bind               => '127.0.0.1',
+    worker_processes   => 5,
+    worker_connections => 1024,
+    access_log_path    => '/dev/stdout',
+    error_log_path     => '/dev/stdout',
+    nginx              => '/usr/local/nginx/sbin/nginx',
+);
+
+my $tmp_path = "$tmp_dir/td-$$";
+
+my $is_daemon = 0;
+
+$SIG{TERM} = \&cleanup;
+$SIG{INT}  = \&cleanup;
+
+# our primary dispatched sub
+sub run
+{
+    my $self = shift;
+    my $cwd  = cwd;
+
+    $self->parse_options;
+
+    # load yaml
+    $self->load_config;
+
+    for my $key (keys %default_options)
+    {
+        $self->{options}{$key} = $default_options{$key}
+        unless $self->{options}{$key} or $self->{config}{$key};
+    }
+
+    return $self->help           if $self->{options}{help};
+    return $self->list_processes if $self->{options}{list};
+    return $self->prune          if $self->{options}{prune};
+    return $self->stop           if $self->{options}{stop};
+
+    # hack for --single to work
+    $self->{options}{worker_processes} = 1
+        if $self->{options}{single};
+
+    # apache httpd holdover
+    $self->{options}{worker_processes} = 1
+        if $self->{options}{X};
+
+    # hack for --start to work
+    $self->{options}{daemon} = 1
+        if $self->{options}{start};
+
+    $self->prune
+        if $self->{options}{start};
+
+    return $self->write_nginx_config(dump => 1)
+        if $self->{options}{dump_config};
+
+    if ($self->config_option('daemon'))
+    {
+        my $basename = (split('/', $0))[-1];
+        warn "[$basename] - started as daemon\n";
+        exit(0) if fork;
+        $is_daemon = 1;
+    }
+
+    # reassert PID, in case we fork.
+    $tmp_path = "$tmp_dir/td-$$";
+    mkdir($tmp_path) unless -d $tmp_path;
+
+    my $config_file = $self->config_file;
+    my $cwd = ($config_file !~ /^\//) ? cwd : '';
+
+    open(MT, ">$tmp_path/config.path");
+    print MT "$cwd/$config_file\n";
+    close(MT);
+
+    open(MT, ">$tmp_path/td.pid");
+    print MT "$$\n";
+    close(MT);
+
+    # write mime types, if needed
+    $self->write_mime_types;
+    $self->write_nginx_config;
+
+    $self->start_nginx;
+
+    # wait! (no need to take up 100% of cpu)
+    while (getc()) {};
+}
+
+sub stop
+{
+    my $self = shift;
+
+    my @procs = $self->get_active_pids;
+    my $config_file = $self->config_file;
+    my $cwd         = ($config_file !~ /^\//) ? cwd : '';
+    my $full_config = "$cwd/$config_file";
+
+    my $killed = 0;
+    for my $proc (@procs)
+    {
+        $full_config =~ s{//}{/};
+
+        next unless $proc->{config_file} eq $full_config;
+        kill(15, $proc->{pid});
+        print "killed: [pid: $proc->{pid}] $proc->{config_file}\n";
+        $killed++;
+    }
+
+    $self->prune;
+
+    print "No active sessions.\n" unless $killed;
+}
+
+sub list_processes
+{
+    my $self = shift;
+
+    my @procs = $self->get_active_pids;
+
+    unless (@procs)
+    {
+        print "No active sessions.\n";
+        return;
+    }
+
+    print "Active sessions:\n";
+    for my $proc (@procs)
+    {
+        my $pid = $proc->{pid} || 'ZOMBIE';
+        print "  [pid: $pid] $proc->{config_file} [$proc->{dir}]\n";
+    }
+}
+
+sub get_active_pids
+{
+    my $self = shift;
+
+    opendir(DIR, $tmp_dir);
+    my @dirs = grep { -d "$tmp_dir/$_" and $_ =~ /^td-\d+$/ } readdir(DIR);
+    closedir(DIR);
+
+    my @pid_data;
+    for my $dir (@dirs)
+    {
+        # is this process running?
+        open (NGPID, "$tmp_dir/$dir/nginx.pid");
+        my $pid = <NGPID>;
+        close(NGPID);
+
+        # clense
+        $pid =~ s/[\n\r]//g;
+        
+        next unless -d "/proc/$pid";
+
+        open(CF, "$tmp_dir/$dir/config.path");
+        my $config_location = <CF>;
+        close(CF);
+
+        chomp($config_location);
+
+        # avoid path starting with //
+        $config_location =~ s{//}{/};
+
+        push @pid_data, {
+            config_file => $config_location,
+            pid         => $pid,
+            dir         => "$tmp_dir/$dir/",
+        };
+    }
+
+    return @pid_data;
+}
+
+sub prune
+{
+    my $self = shift;
+
+    opendir(DIR, $tmp_dir);
+    my @dirs = grep { -d "$tmp_dir/$_" and $_ =~ /^td-\d+$/ } readdir(DIR);
+    closedir(DIR);
+
+    for my $dir (@dirs)
+    {
+        # is this process running?
+        open (NGPID, "$tmp_dir/$dir/nginx.pid");
+        my $pid = <NGPID>;
+        close(NGPID);
+
+        # clense
+        $pid =~ s/[\n\r]//g;
+
+        next if -d "/proc/$pid" and $pid;
+
+        open(CF, "$tmp_dir/$dir/nginx.pid");
+        my $nginx_pid = <CF>;
+        close(CF);
+
+        kill(15, $nginx_pid)
+            if $nginx_pid and -d "/proc/$nginx_pid";
+
+        rmtree("$tmp_dir/$dir");
+        print "Pruned: $tmp_dir/$dir\n";
+    }
+}
+
+sub cleanup
+{
+    my $self   = shift;
+    my $daemon = $is_daemon;
+
+    if (-e "$tmp_path/nginx.pid")
+    {
+        open(PID, "$tmp_path/nginx.pid");
+        my $pid = <PID>;
+        close(PID);
+
+        kill(15, $pid) if $pid;
+    }
+
+    unless ($daemon)
+    {
+        usleep(200000);
+    }
+
+    unlink("$tmp_path/nginx.conf");
+    unlink("$tmp_path/error.log");
+    unlink("$tmp_path/access.log");
+    unlink("$tmp_path/mime.types");
+    rmtree($tmp_path);
+
+    if ($daemon)
+    {
+        exit(0);
+    }
+    else
+    {
+        die "\n\nNginx stopped successfully.\n";
+    }
+}
+
+sub start_nginx
+{
+    my $self = shift;
+    my $path = $self->config_option('nginx');
+
+    my $daemon   = $self->config_option('daemon');
+    my $project  = $self->config_option('project');
+
+    warn "Starting $project...\n\n" if $project and not $daemon;
+
+    system($path, '-c', "$tmp_path/nginx.conf");
+
+    my $bind     = $self->config_option('bind');
+    my $ssl_port = $self->config_option('ssl_port');
+
+    my $o_bind = $bind;
+    $bind = 'localhost' if $bind eq 'all';
+
+    unless ($daemon)
+    {
+        my $port    = $self->config_option('port');
+        warn "Nginx is running on: http://$bind:$port/\n";
+        warn "  * Running with SSL on port $ssl_port.\n" if $ssl_port;
+        warn "  * Bound to all sockets.\n" if $o_bind eq 'all';
+        warn "\n";
+    }
+}
+
+sub config_option
+{
+    my ($self, $key) = @_;
+
+    my $config  = $self->{config};
+    my $options = $self->{options};
+
+    return $options->{$key} || $config->{$key} || '';
+}
+
+sub write_mime_types
+{
+    my $self = shift;
+
+    return if -e ">$tmp_path/mime.types";
+
+    my $txt = q[types {
+    text/html                             html htm shtml;
+    text/css                              css;
+    text/xml                              xml rss;
+    image/gif                             gif;
+    image/jpeg                            jpeg jpg;
+    application/x-javascript              js;
+    application/atom+xml                  atom;
+
+    text/mathml                           mml;
+    text/plain                            txt;
+    text/vnd.sun.j2me.app-descriptor      jad;
+    text/vnd.wap.wml                      wml;
+    text/x-component                      htc;
+
+    image/png                             png;
+    image/tiff                            tif tiff;
+    image/vnd.wap.wbmp                    wbmp;
+    image/x-icon                          ico;
+    image/x-jng                           jng;
+    image/x-ms-bmp                        bmp;
+    image/svg+xml                         svg;
+
+    application/java-archive              jar war ear;
+    application/mac-binhex40              hqx;
+    application/msword                    doc;
+    application/pdf                       pdf;
+    application/postscript                ps eps ai;
+    application/rtf                       rtf;
+    application/vnd.ms-excel              xls;
+    application/vnd.ms-powerpoint         ppt;
+    application/vnd.wap.wmlc              wmlc;
+    application/vnd.wap.xhtml+xml         xhtml;
+    application/x-cocoa                   cco;
+    application/x-java-archive-diff       jardiff;
+    application/x-java-jnlp-file          jnlp;
+    application/x-makeself                run;
+    application/x-perl                    pl pm;
+    application/x-pilot                   prc pdb;
+    application/x-rar-compressed          rar;
+    application/x-redhat-package-manager  rpm;
+    application/x-sea                     sea;
+    application/x-shockwave-flash         swf;
+    application/x-stuffit                 sit;
+    application/x-tcl                     tcl tk;
+    application/x-x509-ca-cert            der pem crt;
+    application/x-xpinstall               xpi;
+    application/zip                       zip;
+
+    application/octet-stream              bin exe dll;
+    application/octet-stream              deb;
+    application/octet-stream              dmg;
+    application/octet-stream              eot;
+    application/octet-stream              iso img;
+    application/octet-stream              msi msp msm;
+
+    audio/midi                            mid midi kar;
+    audio/mpeg                            mp3;
+    audio/x-realaudio                     ra;
+
+    video/3gpp                            3gpp 3gp;
+    video/mpeg                            mpeg mpg;
+    video/quicktime                       mov;
+    video/x-flv                           flv;
+    video/x-mng                           mng;
+    video/x-ms-asf                        asx asf;
+    video/x-ms-wmv                        wmv;
+    video/x-msvideo                       avi;
+}
+];    
+
+    open(MT, ">$tmp_path/mime.types");
+    print MT $txt;
+    close(MT);
+}
+
+sub base_path
+{
+    my $self = shift;
+
+    return $self->config_option('root')
+        if $self->config_option('root');
+
+    my $config_file = $self->config_file;
+    my $cwd         = ($config_file !~ /^\//) ? cwd : '';
+    my $full_config = "$cwd/$config_file";
+
+    my @paths = split ('/', $full_config);
+    pop @paths; # rid of file name
+    pop @paths if $paths[-1] eq 'conf'; # rid of config directory
+
+    return join '/', @paths;
+}
+
+sub write_nginx_config
+{
+    my ($self, %params)    = @_;
+    my $base_path          = $self->base_path;
+    my $worker_processes   = $self->config_option('worker_processes');
+    my $worker_connections = $self->config_option('worker_connections');
+    my $require_module     = $self->config_option('require_module');
+    my $handler            = $self->config_option('handler');
+    my $app_path           = $self->config_option('app_path');
+
+    my @lj = grep { $_ } (
+        $self->config_option('bind'), $self->config_option('port')
+    );
+
+    $self->{options}{ssl_port} = $self->config_option('port') + 1000
+        if $self->config_option('ssl') and not $self->config_option('ssl_port');
+
+    # remove when bind is 'all'
+    shift @lj if $self->config_option('bind') eq 'all';
+
+    my $listen = join(':', @lj);
+    my $host   = $self->config_option('host');
+    my $port   = $self->config_option('port');
+
+    my @required = @{$self->{config}{require_modules} || [ ]};
+    my $perl_requires = '';
+    for my $req (@required)
+    {
+        $perl_requires .= "perl_require $req;\n";
+    }
+
+    my $locations = '';
+    my @locations = @{$self->{config}{locations} || [ ]};
+    for my $location (@locations)
+    {
+        if ($location->{handler})
+        {
+            $locations .= "\n";
+            $locations .= "\tlocation $location->{path} {\n";
+            $locations .= "\t\tperl $location->{handler};\n";
+            $locations .= "\t}\n";
+        }
+        else
+        {
+            $locations .= "\n";
+            $locations .= "\tlocation $location->{path} {\n";
+            $locations .= "\t\troot $base_path/$location->{root};\n";
+            $locations .= "\t\tindex $location->{index};\n";
+            $locations .= "\t}\n";
+        }
+    }            
+
+    $locations .= $self->config_option('location_raw')
+        if $self->config_option('location_raw');
+
+    my $ssl_port = $self->config_option('ssl_port');
+    my $ssl = '';
+    if ($ssl_port)
+    {
+        my @slj = grep { $_ } (
+            $self->config_option('bind'), $self->config_option('ssl_port')
+        );
+
+        # remove when bind is 'all'
+        shift @slj if $self->config_option('bind') eq 'all';
+
+        my $ssl_listen = join(':', @slj);
+
+        $ssl = qq|
+    server {      
+        listen       $ssl_listen;
+        set          \$is_ssl   1;
+        set          \$ssl_port $ssl_port;
+        server_name  $host;
+
+        error_page   404              /404.html;
+        error_page   500 502 503 504  /50x.html;
+
+        ssl                  on;
+        ssl_certificate      $base_path/ssl/cert.pem;
+        ssl_certificate_key  $base_path/ssl/cert.key;
+        ssl_session_timeout  5m;
+        ssl_protocols  SSLv2 SSLv3 TLSv1;
+        ssl_ciphers  ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP;
+        ssl_prefer_server_ciphers   on;
+        gzip on;
+
+        $locations
+    }
+|;
+    }
+
+    my $access_log_path = $self->config_option('access_log_path');
+    my $error_log_path = $self->config_option('error_log_path');
+
+    my $access_log = $self->config_option('access_log') eq 'off'
+        ? 'access_log  /dev/null  main;' : "access_log  $access_log_path  main;";
+
+    my $error_log = $self->config_option('error_log') eq 'off'
+        ? 'error_log  /dev/null;' : "error_log  $error_log_path;";
+
+    my $set_ssl_port = $ssl_port ? " set  \$ssl_port $ssl_port; " : '';
+
+    my $template = qq|
+worker_processes  $worker_processes;
+
+pid        $tmp_path/nginx.pid;
+
+$error_log
+
+events {
+    worker_connections  $worker_connections;
+}                            
+
+http {
+    include       $tmp_path/mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '[\$time_local] \$remote_addr - \$request '
+                      '"\$status" \$body_bytes_sent';              
+
+    $access_log
+
+    sendfile           on;
+    keepalive_timeout  65;
+
+    perl_modules $base_path/lib;
+    
+    $perl_requires
+
+    server {                                                                    
+        listen       $listen;
+        server_name  $host;
+        $set_ssl_port
+        gzip on;
+
+        error_page   404              /404.html;
+        error_page   500 502 503 504  /50x.html;
+
+        $locations
+    }
+
+    $ssl
+}
+|;
+
+    if ($params{dump})
+    {
+        print $template;
+    }
+    else
+    {
+        open(CT, ">$tmp_path/nginx.conf");
+        print CT $template;
+        close(CT);
+    }
+}
+
+sub load_config
+{
+    my $self = shift;
+    my $config_file = $self->config_file;
+
+    my $str_data;
+    open(CF, $config_file);
+    read(CF, $str_data, -s $config_file);
+    close(CF);
+
+    my $config = Load($str_data);
+
+    $self->{config} = $config;
+}
+
+sub config_file
+{
+    my $self = shift;
+    my $file = $self->{options}{config} || 'conf/ngs.conf';
+    if ($file)
+    {
+        $self->error("'$file' does not exist.")
+            unless -e $file;
+    }
+    else
+    {
+        $self->error("You must specify a config path.");
+    }
+
+    return $file;
+}
+
+sub error
+{
+    my ($self, $error) = @_;
+    my $basename = (split('/', $0))[-1];
+
+    die "[$basename] fatal error: $error\n";
+}
+
+sub help
+{
+    my $basename = (split('/', $0))[-1];
+    my $usage  = "usage: $basename [ options ]\n";
+    $usage    .= "  Options:\n";
+    $usage    .= "    --help                 (displays this message)\n";
+    $usage    .= "    --dump_config          (dumps generated nginx.conf only)\n";
+    $usage    .= "    --bind=[address|all]\n";
+    $usage    .= "    --config=path/to/conf  (default conf/ngs.conf)\n";
+    $usage    .= "    --port=[port]          (default 8080)\n";
+    $usage    .= "    --access_log=[on|off]  (default on)\n";
+    $usage    .= "    --error_log=[on|off]   (default on)\n";
+    $usage    .= "    --access_log_path=/pa  (default /dev/stdout)\n";
+    $usage    .= "    --error_log_path=/pa   (default /dev/stdout)\n";
+    $usage    .= "    --ssl                  (auto enable ssl on port 9080)\n";
+    $usage    .= "    --ssl_port=[port]      (enables ssl)\n";
+    $usage    .= "    --worker_processes=[#processes]\n";
+    $usage    .= "    --worker_connections=[#connections]\n";
+    $usage    .= "    --single               (only run one worker process)\n";
+    $usage    .= "    --nginx=/usr/local/nginx/sbin/nginx\n";
+    $usage    .= "  Daemon Mode:\n";
+    $usage    .= "    --daemon|--start       (default off)\n";
+    $usage    .= "    --list                 (list all active sessions)\n";
+    $usage    .= "    --prune                (cleanup all defunct sessions)\n";
+    $usage    .= "    --stop                 (stop session based on config)\n";
+
+    die $usage;
+}
+
+# quick and dirty
+sub parse_options
+{
+    my $self    = shift;
+ 
+    my %options;
+
+    my @acceptable_options = qw(
+        bind      port       access_log         error_log 
+        ssl       ssl_port   worker_processes   single     
+        nginx     help       worker_connections config
+        host      X          access_log_path    error_log_path
+        daemon    list       prune              stop
+        start     dump_config                   location_raw
+    );
+
+    for my $arg (@ARGV)
+    {
+        # cleanse all parameters of all unrighteousness
+        #   `--` & `-` any parameter shall be removed
+        $arg =~ s/^--//;
+        $arg =~ s/^-//;
+
+        # does this carry an assignment?
+        if ($arg =~ /=/)
+        {
+            my ($key, $value) = split('=', $arg);
+
+            $options{$key} = $value;
+        }
+        else
+        {
+            $options{$arg} = 1;
+        }
+    }
+
+    for my $option (keys %options)
+    {
+        $self->error("`$option` is an invalid option")
+            unless (grep { $_ eq $option } @acceptable_options)
+    }
+
+    $self->{options} = \%options;
+
+    return \%options;
+}
+
+# BANG!
+my $run = {}; 
+bless($run);
+$run->run;
+
+1;

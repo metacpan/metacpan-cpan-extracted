@@ -1,0 +1,121 @@
+{
+   "abstract" : "RPC client for Neovim",
+   "author" : [
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Neovim-RPC",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "IO::Socket::INET" : "0",
+            "List::AllUtils" : "0",
+            "List::Util" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "MooseX::Role::Loggable" : "0",
+            "MsgPack::Decoder" : "0",
+            "MsgPack::Encoder" : "0",
+            "MsgPack::RPC" : "0",
+            "MsgPack::Type::Ext" : "0",
+            "Promises" : "0",
+            "Try::Tiny" : "0",
+            "experimental" : "0",
+            "perl" : "v5.20.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Exporter" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Net::EmptyPort" : "0",
+            "Test::Class::Moose" : "0",
+            "Test::Class::Moose::Load" : "0",
+            "Test::Class::Moose::Runner" : "0",
+            "Test::More" : "0",
+            "lib" : "0",
+            "parent" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Neovim::RPC" : {
+         "file" : "lib/Neovim/RPC.pm",
+         "version" : "v0.2.0"
+      },
+      "Neovim::RPC::API" : {
+         "file" : "lib/Neovim/RPC/API.pm",
+         "version" : "v0.2.0"
+      },
+      "Neovim::RPC::API::AutoDiscover" : {
+         "file" : "lib/Neovim/RPC/API/AutoDiscover.pm",
+         "version" : "v0.2.0"
+      },
+      "Neovim::RPC::API::Command" : {
+         "file" : "lib/Neovim/RPC/API/Command.pm",
+         "version" : "v0.2.0"
+      },
+      "Neovim::RPC::Plugin" : {
+         "file" : "lib/Neovim/RPC/Plugin.pm",
+         "version" : "v0.2.0"
+      },
+      "Neovim::RPC::Plugin::FileToPackageName" : {
+         "file" : "lib/Neovim/RPC/Plugin/FileToPackageName.pm",
+         "version" : "v0.2.0"
+      },
+      "Neovim::RPC::Plugin::LoadPlugin" : {
+         "file" : "lib/Neovim/RPC/Plugin/LoadPlugin.pm",
+         "version" : "v0.2.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yanick/Neovim-RPC/issues"
+      },
+      "homepage" : "https://github.com/yanick/Neovim-RPC",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/Neovim-RPC.git",
+         "web" : "https://github.com/yanick/Neovim-RPC"
+      }
+   },
+   "version" : "0.2.0",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "Yanick Champoux <yanick@babyl.dyndns.org>",
+      "Yanick Champoux <yanick@qwerty-PC>"
+   ]
+}
+

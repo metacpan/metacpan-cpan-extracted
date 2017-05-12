@@ -1,0 +1,21 @@
+* Do profiling and figure out what is the real slow code - parsing
+  a big document with many annotations takes quite long now.
+* Maybe try to preserve annotation IDs - that would help debugging
+  using xmldiff. Otherwise both the original and the processed XML
+  would need to be processed to remove the Id attribute before 
+  comparision because those do seem to change.
+  -> if using Ids we need to also assign them for freshly created
+  annotations - how is this done in GATE?
+* Maybe implement CompoundDocument to support those also.
+* Implement offset-based accessors for annotations
+* implement a fast indexing datastructure for checking for contained
+  annotations: 
+    do a topological sort of all annotations and put into list
+    create an array for all possible offsets in the document
+    for each offset point to the first ann in the sorted list which
+      starts at or after this offset
+    Then:
+      to find contained in [a,b] find starting ann through offset[a],
+      then go through list until listel.from > b and take all where
+      listel.from <= b and listel.to <= b 
+

@@ -1,0 +1,37 @@
+NAME
+    Net::Delicious::Export - base class for exporting Net::Delicious
+    thingies
+
+SYNOPSIS
+     Ceci n'est pas une boite noire.
+
+DESCRIPTION
+    Base class for exporting Net::Delicious thingies
+
+    This package subclasses *XML::SAX::Base*.
+
+PACKAGE METHODS
+  __PACKAGE__->new(%args)
+    Valid arguments are anything you can pass a *XML::SAX::Base*
+    constructor.
+
+    Returns a *Net::Delicious::Export* object, Woot!
+
+VERSION
+    1.2
+
+DATE
+    $Date: 2005/09/29 13:22:57 $
+
+AUTHOR
+    Aaron Straup Cope <ascope@cpan.org>
+
+SEE ALSO
+    XML::SAX
+
+LICENSE
+    Copyright (c) 2004 Aaron Straup Cope. All Rights Reserved.
+
+    This is free software, you may use it and distribute it under the same
+    terms as Perl itself.
+

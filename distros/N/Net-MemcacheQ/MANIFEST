@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+README
+examples/pusher
+examples/shifter
+lib/Net/MemcacheQ.pm
+t/00-critic.t
+t/00-distribution.t
+t/00-pod.t
+t/00-podcoverage.t
+t/10-memcacheq.t
+t/sock.pm
+Makefile.PL
+Build.PL
+META.yml
+SIGNATURE    Added here by Module::Build

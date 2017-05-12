@@ -1,0 +1,56 @@
+# NAME
+
+Net::CIDR::MobileJP - mobile ip address in Japan
+
+# SYNOPSIS
+
+    use Net::CIDR::MobileJP;
+    my $cidr = Net::CIDR::MobileJP->new('net-cidr-mobile-jp.yaml');
+    $cidr->get_carrier('222.7.56.248');
+    # => 'E'
+
+# DESCRIPTION
+
+Net::CIDR::MobileJP is an utility to detect an ip address is mobile (cellular) ip address or not.
+
+# METHODS
+
+## new
+
+    my $cidr = Net::CIDR::MobileJP->new('net-cidr-mobile-jp.yaml');  # from yaml
+    my $cidr = Net::CIDR::MobileJP->new({E => ['59.135.38.128/25'], ...});
+
+create new instance.
+
+The argument is 'path to yaml' or 'raw data'.
+
+## get_carrier
+
+    $cidr->get_carrier('222.7.56.248');
+
+Get the career name from IP address.
+
+Carrier name is compatible with [HTTP::MobileAgent](http://search.cpan.org/perldoc?HTTP::MobileAgent).
+
+# AUTHORS
+
+  Tokuhiro Matsuno  C<< <tokuhiro __at__ mobilefactory.jp> >>
+  Jiro Nishiguchi
+
+# THANKS TO
+
+  Tatsuhiko Miyagawa
+  Masayoshi Sekimura
+  HIROSE, Masaaki
+
+# SEE ALSO
+
+[http://d.hatena.ne.jp/spiritloose/20061010/1160471510](http://d.hatena.ne.jp/spiritloose/20061010/1160471510)
+
+# COPYRIGHT
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.

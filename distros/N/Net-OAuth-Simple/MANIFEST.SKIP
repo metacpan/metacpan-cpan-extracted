@@ -1,0 +1,8 @@
+\.tar\.gz$
+\.svn
+_build
+blib
+Build
+\.bak$
+^MYMETA.yml$
+^\.

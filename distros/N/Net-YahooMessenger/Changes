@@ -1,0 +1,95 @@
+Revision history for Perl extension Net::YahooMessenger.
+0.19  Sun Jun 27 11:20:45 EEST 2010
+    - added patch for proxy awareness, "Bug #51628 for Net-YahooMessenger: HTTPS proxy awareness"
+      (provided by alexw)
+    - added patch for uri_escape $seed, "Bug #57615 for Net-YahooMessenger: _https_login needs to uri_escape the seed when"
+      (provided by Nick Purvis, Stefan Gipper)
+
+0.17  Sat Sep 19 11:36:47 EEST 2009
+    - Fixed the module for the new version of the protocol
+      (Emil Dragu <emil.dragu@webwave.ro>) 
+
+0.16  Sat Nov 13 23:29:29 JST 2004
+	- fixed bug of "Can't call method "status" on an undefined value"
+	  (Thanks to Hiroyuki Oyama)
+
+0.15  Wed Jan 14 02:58:27 JST 2004
+	- Maintainers are now wanted.
+
+0.14  Tue Oct 21 06:14:33 JST 2003
+	- Tatsuhiko Miyagawa now takes over the module from Hiroyuki Oyama.
+
+0.13  Wed Jun 26 19:15:03 JST 2002
+        - Fix undefined value used warning.
+          'Argument "" isn\'t numeric in pack'
+          'Use of uninitialized value in length'
+          etc...
+          (Thanks to mayuresh kadu <mayureshk@aftek.com>)
+        - Fix The problem which cannot acquire 'buddy list' is repaired.
+        - Add better test scripts.
+0.12  Wed Jun 19 20:10:22 2002
+        - Refine Compatibility with protocol version 9.
+          Add YMSG9 Challenge-Response Authentication Mechanism
+              -> Net::YahooMessenger::CRAM.pm
+          Modify Login sequence.
+
+          It fixed so that it could communicate by the Japan and U.S. server.
+          (Thanks to Rajesh Kannan <rajeshin2000@yahoo.com>
+           and mayuresh kadu <mayureshk@aftek.com>)
+        - Independent from Crypt::PasswdMD5 module.
+        - Modify sample script.
+          (Thanks to mayuresh kadu <mayureshk@aftek.com>)
+0.09  Mon Jan  7 12:38:20 2002
+        - Add NewFriendAlert event
+          Add NullEvent event
+          Add HTTP transaction sequence. get all buddy list and Socket
+                server list.
+          Add friend's state maintenance function was mounted.
+          Add Net::YahooMessenger::ping() method and ServerIsAlive event
+          Add bin/ymsgj. Connect to Yahoo!Japan server.
+        - Modify Net::YahooMessenger::EventFactory::create()
+          Modify The method of specifying a connection place server was decided.
+          Modify Net::YahooMessenger::_create_message(),
+                Net::YahooMessenger::EventFactory::get_message_body()
+                Generation and analysis of a header were substituted for
+                the simple thing of a pack()/unpack() function base.
+                In order to transmit OFFLINE MESSAGE, addition information was
+                given to the header.
+        - Rename Net::YahooMessenger::Logon.pm -> Net::YahooMessenger::Login.pm
+          Rename Net::YahooMessenger::CannotLogon.pm
+              -> Net::YahooMessenger::InvalidLogin.pm
+          Remove bin/uptime_agent, bin/banner_stat.
+0.08  Wed Dec 26 21:06:48 2001
+        - Bugfix Net::YahooMessenger::login() The problem to freeze is
+          corrected when login goes wrong.
+0.07  Fri Dec 21 18:52:47 2001
+        - Modify Event handling architecture.
+                Although it was the complicated thing which used the Visitor
+                pattern, it changed into the simple thing which uses an
+                EventHandler object.
+0.06  Mon Dec 17 14:23:25 2001
+        - Modify Net::YahooMessenger::_get_request() and
+          Net::YahooMessenger::EventFactory::_get_message_body(), The
+          method of acquiring the length of a message was changed.
+0.05  Tue Dec  4 20:20:34 2001
+        - Add Net::YahooMessenger::Logon event
+          Add bin/banner_stat. a state is rewritten so that a banner may cross.
+        - Modify Socket operation methods
+0.04  Thu Nov 29 22:52:24 2001
+        - Modify Net::YahooMessenger::EventFactory.pm and Event.pm
+        - Add bin/uptime_agent. talk to 'uptime_agent', it will answer by the
+          result of Unix 'uptime'.
+0.03  Sat Nov 24 11:30:31 2001
+        - Replace ymsg script. Thanks Takefumi KIMURA<takefumi@takefumi.com>
+        - Modify Event model of Visitor pattern(GoF)
+                Add Net::YahooMessenger::EventVisitor.pm
+                    Net::YahooMessenger::JapaneseCommandLineVisitor.pm
+          Add POD manual page
+0.02  Sat Nov 24 02:37:35 2001
+        - Add GoesOnline event
+          Add GoesOffline event
+          Add UnImplementEvent event
+          Modify YMSG message parser
+0.01  Sat Nov 24 02:37:35 2001
+        - original version; created by h2xs 1.21 with options
+                -X -n Net::YahooMessenger

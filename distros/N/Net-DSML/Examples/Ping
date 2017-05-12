@@ -1,0 +1,39 @@
+#!/usr/local/bin/perl 
+use Net::DSML;
+use Net::DSML::Filter;
+use Net::DSML::Control;
+        
+
+# 
+# This example does what is known as a dsml ping.
+# If there is a DSML server on line you should get a ping batch response.
+# 
+
+my $server = "http://dsml.yourcompany.com:8080/dsml";
+
+ 
+   #
+   #  We are going to do a DSML Ping
+   #
+   $webdsml = Net::DSML->new(  { url => $server } );
+   print "Doing ping request.\n";
+
+   if (!($webdsml->Ping()))
+   {
+      print "Ping request error.\n";
+      print $webdsml->error(),"\n";
+      exit;
+   }
+
+   if (!($webdsml->send()))
+   {
+      print "Ping send error.\n";
+      print $webdsml->error(),"\n";
+      exit;
+   }
+                   
+
+# get the return xml content, should be the status of the dsml request.
+$postData = $webdsml->content(); 
+print $postData, "\n"; # print the xml data.
+                

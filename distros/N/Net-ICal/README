@@ -1,0 +1,52 @@
+README for Net::ICal 0.15
+
+------------------------------------------------------------------------
+(C) COPYRIGHT 2000-2001, Reefknot developers.
+
+See the AUTHORS file included in the distribution for a full list.
+
+This package is free software and is provided "as is" without
+express or implied warranty.  It may be used, redistributed and/or
+modified under the same terms as perl itself. ( Either the Artistic
+License or the GPL, included in the distribution as COPYING.Artistic
+and COPYING.GPL )
+------------------------------------------------------------------------
+
+#########################################################################
+Note, this is ALPHA QUALITY SOFTWARE, and versions after 0.12alpha have a
+different interface than .11. Read the documentation for individual
+classes for more information. It's not finished yet; if it breaks, you
+get to keep both pieces. It requires Perl 5.6.x.
+#########################################################################
+
+Net::ICal is a set of classes for reading, writing and manipulating
+iCalendar data. The iCalendar data units and protocols permit users to
+store and retrieve calendar data on remote servers and to schedule
+events with other calendar users. For more information on iCalendar,
+see the working group's web page at:
+
+	http://www.imc.org/ietf-calendar/
+
+Net::ICal implements RFC 2445; other classes under development 
+implement RFC 2446 (Net::ITIP) and RFC 2447 (Net::IMIP). It's one of the
+base classes for the Reefknot project, which aims to create 
+standards-compliant open-source tools for shared calendaring. 
+
+This is an ALPHA RELEASE; that means that it's not yet feature-complete,
+and there are KNOWN BUGS. See the BUGS file for more information on
+known bugs as of this release.
+
+This code is under active development. If you would like to contribute
+to the project, see the Reefknot project page at: 
+
+	http://reefknot.sourceforge.net/
+
+The TODO file will give you a list of suggested tasks, if you're 
+interested in helping. 
+
+If you use this software or have interest in working on it, please join
+one or both of our mailing lists; reefknot-devel for contributors and
+reefknot-users for end-users. You can subscribe to either of these at:
+
+    http://sourceforge.net/mail/?group_id=14603
+

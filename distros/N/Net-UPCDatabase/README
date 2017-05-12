@@ -1,0 +1,30 @@
+Net/UPCDatabase version 0.05
+============================
+
+SEE ALSO
+
+Documentation within the module itself.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+RPC::XML
+RPC::XML::Client
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Dusty Wilson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

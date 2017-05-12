@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:               Net-DNS-ZoneParse
+version:            0.103
+abstract:           Perl extension for Parsing and Writing BIND8/9
+author:
+    - Benjamin Tietz <benjamin.tietz@micronet24.de>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Class::Accessor:  0
+    Net::DNS:         0.66
+    Test::Deep:       0
+    Test::More:       0
+no_index:
+    directory:
+        - t
+        - inc
+    namespace:
+        - Net::DNS::RR
+    package:
+        - Net::DNS::RR
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

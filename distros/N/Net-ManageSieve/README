@@ -1,0 +1,14 @@
+This module implements the ManageSieve protocol as described in
+http://tools.ietf.org/id/draft-martin-managesieve-09.txt
+
+It does not by itself provides Sieve mechanisms, but lets you
+transfer your Sieve scripts to/from the server and manage them.
+
+Supported are SASL (authentification) and STARTTLS (encryption).
+
+In order to test the ManageSieve commands, you need to update the file
+managesieve-test-account (see managesieve-test-account.sample) and fill
+in the host and account data to connect to / with.
+
+The implementation has been influenced by Net::Cmd a lot, however,
+its inability of doing TLS forced me to roll my own.

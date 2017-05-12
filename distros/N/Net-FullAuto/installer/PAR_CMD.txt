@@ -1,0 +1,9 @@
+wxpar --gui -o FullAuto-AWS-Installer-Dashboard-MSWin.exe fa_installer.pl -M Term::Menus -M Wx::Perl::Packager -M Wx -M File::Copy -M Wx::Perl::ProcessStream -a FA.ico -a fullautogreenbannerpower.png -a fakey.png -a puttycfg.exe -a puttykey.exe -a pscp.exe -a putty.exe -a puttygen.exe -a runputty.exe -a runcleanup.exe -a puttyyes.exe -a cmds.template -a cmds_saved.template -a cmds_cleanup.template -a engineroom.jpg -a engine.exe -a standup.gif -a Scratched_Steel_Texture_by_AaronDesign_Enlarged.jpg -a presshere.jpg -a notready.jpg -a underway.jpg -a taskdone.jpg -a exit.txt -a tcping.exe -a MyConfig.pm -a cb.png -a gnusoc.png -a donate.png -a zip.exe -a "FullAuto Windows Dashboard CLIPBUCKET Linux Installation Instructions.pdf" -a "FullAuto Windows Dashboard GNU Social Installation Instructions.pdf" --compress=9
+
+wxpar --gui -o FullAuto-AWS-Installer-Dashboard-MSWin.exe fa_installer.pl -M Term::Menus -M Wx::Perl::Packager -M Wx -M File::Copy -M Wx::Perl::ProcessStream -a FA.ico -a fullautogreenbannerpower.png -a fakey.png -a puttykey.exe -a puttycfg.exe -a pscp.exe -a putty.exe -a puttygen.exe -a runputty.exe -a runcleanup.exe -a puttyyes.exe -a cmds.template -a cmds_saved.template -a cmds_cleanup.template -a engineroom.jpg -a engine.exe -a standup.gif -a Scratched_Steel_Texture_by_AaronDesign_Enlarged.jpg -a presshere.jpg -a notready.jpg -a underway.jpg -a taskdone.jpg -a MyConfig.pm -a exit.txt -a tcping.exe -a ip.txt -a fullauto.pem -a fullauto.ppk -a cb.png -a gnusoc.png -a donate.png -a zip.exe -a "FullAuto Windows Dashboard CLIPBUCKET Linux Installation Instructions.pdf" -a "FullAuto Windows Dashboard GNU Social Installation Instructions.pdf" --compress=9
+
+pp -o engine.exe -M Term::RawInput -M Term::Menus -M Data::Dump::Streamer engine.pl
+
+# how to set putty logfile using putty command line
+http://stackoverflow.com/questions/21831161/how-to-set-putty-logfile-using-putty-command-line
+

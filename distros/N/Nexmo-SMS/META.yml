@@ -1,0 +1,24 @@
+---
+abstract: 'Module for the Nexmo SMS API!'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142060'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Nexmo-SMS
+requires:
+  HTTP::Response: '5.836'
+  JSON::PP: '2.26000'
+  LWP::Protocol::https: '6.04'
+  LWP::UserAgent: '5.835'
+resources:
+  bugtracker: http://github.com/reneeb/perl-Nexmo-SMS/issues
+  homepage: http://github.com/reneeb/perl-Nexmo-SMS
+  repository: http://github.com/reneeb/perl-Nexmo-SMS.git
+version: '0.09'

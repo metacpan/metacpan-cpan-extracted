@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+###########################################
+# xx -- 
+# Mike Schilli, 2003 (m@perlmeister.com)
+###########################################
+use warnings;
+use strict;
+
+use Net::Amazon;
+
+my $ua = Net::Amazon->new(
+    associate_tag => $ENV{AMAZON_ASSOCIATE_TAG},
+    token         => $ENV{AMAZON_TOKEN},
+    secret_key    => $ENV{AMAZON_SECRET_KEY},
+);
+
+# Get a request object
+my $resp = $ua->search(asin => 'B000000WA4');
+
+if($resp->is_success()) {
+    my($cd) = $resp->properties();
+    print "Album ....... ", $cd->album, "\n";
+    print "Artist ...... ", $cd->artist, "\n";
+    print "Year ........ ", $cd->year, "\n";
+    print "OurPrice .... ", $cd->OurPrice, "\n";
+    print "ListPrice ... ", $cd->ListPrice, "\n";
+    print "UPC ......... ", $cd->upc, "\n";
+    print "nummedia .... ", $cd->nummedia, "\n";
+    print "label ....... ", $cd->label, "\n";
+    print "media ....... ", $cd->media, "\n";
+    print "tracks ...... ", join("\n              ", $cd->tracks()), "\n";
+} else {
+    print $resp->message();
+}

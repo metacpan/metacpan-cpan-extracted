@@ -1,0 +1,11 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/Net/BitTorrent/File.pm
+t/001_load.t
+t/002_methods.t
+t/003_io.t
+t/testdata/test.torrent
+Makefile.PL

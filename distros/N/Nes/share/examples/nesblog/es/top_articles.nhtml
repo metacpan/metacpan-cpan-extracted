@@ -1,0 +1,31 @@
+{: NES 1.0 none :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  Nes 1.03 by Skriptke
+  Copyright 2009 - 2010 Enrique Castañón
+  Licensed under the GNU GPL.
+
+  Sample:
+  http://nes.sourceforge.net/
+
+  CPAN:
+  http://search.cpan.org/dist/Nes/
+
+  Repository:
+  http://github.com/Skriptke/nes
+
+  -----------------------------------------------------------------------------
+:}
+            <h3>Top Articles</h3>
+            <ul>
+                <li><a href="./?action=item&item=Principios de Nes">Por el principio</a></li>
+                <li><a href="./?action=item&item=Hello World">Hello World</a></li>
+                <li><a href="./?action=item&item=Sintaxis de Nes">Sintaxis</a></li>
+                <li><a href="./?action=item&item=Paradigma Nes">Paradigma Nes</a></li>
+                <li><a href="./?action=item&item=Nes Tags">Nes Tags</a></li>
+                <li><a href="./?action=item&item=Incluir PHP y otros">Incluir PHP y otros</a></li>
+                <li><a href="./?action=item&item=Seguridad">Seguridad</a></li>
+                <li><a href="./?action=item&item=Archivo de configuración Nes">Configuración</a></li>
+                <li><a href="./?action=item&item=Instalación">Instalación</a></li>
+            </ul>           

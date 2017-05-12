@@ -1,0 +1,21 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/NKTI-general.t
+lib/NKTI/general.pm
+lib/NKTI/general.pod
+lib/NKTI/general/check.pm
+lib/NKTI/general/dbconnect.pm
+lib/NKTI/general/dbconnect_devel.pm
+lib/NKTI/general/char/split.pm
+lib/NKTI/general/char/split.pod
+lib/NKTI/general/dbms/mysql.pm
+lib/NKTI/general/dbms/sqlite.pm
+lib/NKTI/general/file.pm
+lib/NKTI/general/file/create.pm
+lib/NKTI/general/file/read.pm
+lib/NKTI/general/request/post.pm
+lib/NKTI/general/hash.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

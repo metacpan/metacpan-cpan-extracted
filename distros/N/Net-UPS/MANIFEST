@@ -1,0 +1,16 @@
+bin/zipcode
+Changes
+INSTALL
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01.t
+t/02address.t
+UPS.pm
+UPS/Address.pm
+UPS/ErrorHandler.pm
+UPS/Package.pm
+UPS/Rate.pm
+UPS/Service.pm
+UPS/Tutorial.pm
+META.yml                                 Module meta-data (added by MakeMaker)

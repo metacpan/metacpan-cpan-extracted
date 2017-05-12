@@ -1,0 +1,51 @@
+Net-SLP version 0.01
+========================
+
+This module provides a Perl interface the the standard SLP API as
+described in RFC2614. SLP is the Service Location Protocol, and is
+used to find servers for specific services. SLPv2 is described in
+RFC2608.
+
+This module has been tested against Openslp 1.0.11 and 1.2.1
+(http://www.openslp.org). In principal it should work with other SLP
+APIs that conform to the RFC, though this has not been tested. Details
+and reports of other ports (and patches) are welcome.
+
+The module provides a straight translation of the C API. There is no
+OO interface.
+
+The following SSL API calls are not implemented: 
+SLPParseSrvURL()
+SLPFree()
+
+Asynchronous operation has not been tested.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Openslp 1.0.11 or 1.2.1 or later (if you install from RPMS, you will
+need both openslp and openslp-devel). http://www.openslp.org
+
+An SLP server (slpd) is required to be running during 'make test',
+since the test suite accesses the server. The test suite creates a
+test service entry, runs some tests on it, then deletes the service.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Mike McCauley (mikem@airspayce.com)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

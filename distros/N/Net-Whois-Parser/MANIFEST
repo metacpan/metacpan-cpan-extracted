@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/Net/Whois/Parser.pm
+MANIFEST
+README
+t/000-base.t
+t/001-parse-all-zones.pl
+examples/info.pl
+examples/key_count.pl
+examples/keys_by_whois.pl
+Makefile.PL
+META.yml
+META.json

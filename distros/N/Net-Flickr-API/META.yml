@@ -1,0 +1,28 @@
+---
+abstract: 'base API class for Net::Flickr::* libraries'
+author:
+  - 'Aaron Straup Cope E<lt>ascope@cpan.orgE<gt>'
+build_requires:
+  Test::Simple: 0.47
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Flickr-API
+provides:
+  Net::Flickr::API:
+    file: lib/Net/Flickr/API.pm
+    version: 1.7
+requires:
+  Config::Simple: 0
+  Flickr::API: 1.04
+  Flickr::Upload: 1.32
+  Log::Dispatch: 2.10
+  Readonly: 0
+  XML::XPath: 1.13
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.7

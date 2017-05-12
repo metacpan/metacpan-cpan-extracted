@@ -1,0 +1,10 @@
+TODO list for Net-P0f
+
+ * include fingerprints files in case no one is given
+
+ * implement Socket and XS backends
+
+ * add support for masquerade detection
+
+ * more tests...
+

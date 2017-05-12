@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-SMS-MunduSMS.t
+lib/Net/SMS/MunduSMS.pm
+META.yml                                 Module meta-data (added by MakeMaker)

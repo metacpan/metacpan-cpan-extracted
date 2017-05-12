@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<request method="client.create">
+    <client>
+        <first_name>Jane</first_name>
+        <last_name>Doe</last_name>
+        <organization>ABC Corp</organization>
+        <email>janedoe@freshbooks.com</email>
+        <username>janedoe</username>
+        <work_phone>(555) 123-4567</work_phone>
+        <home_phone>(555) 234-5678</home_phone>
+        <p_street1>123 Fake St.</p_street1>
+        <p_street2>Unit 555</p_street2>
+        <p_city>New York</p_city>
+        <p_state>New York</p_state>
+        <p_country>United States</p_country>
+        <p_code>553132</p_code>
+        <password>seCret!7</password>
+    </client>
+</request>

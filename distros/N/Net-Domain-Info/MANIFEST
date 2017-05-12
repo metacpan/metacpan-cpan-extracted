@@ -1,0 +1,12 @@
+Changes
+lib/Net/Domain/Info.pm
+lib/Net/Domain/Info/IDN.pm
+lib/Net/Domain/Info/SEO.pm
+lib/Net/Domain/Info/Whois.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/000-idn.t
+t/001-whois.t
+t/002-seo.t

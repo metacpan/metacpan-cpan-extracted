@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::LMTP.
+
+0.01  Mon May 14 18:49:02 2001
+	- original version; created by h2xs 1.20 with options
+		-X Net::LMTP
+

@@ -1,0 +1,116 @@
+NAME
+    Net::ISC::DHCPd - Interacts with ISC DHCPd
+
+VERSION
+    0.1709
+
+SYNOPSIS
+        my $dhcpd = Net::ISC::DHCPd->new(
+                        config => { file => "path/to/config" },
+                        leases => { file => "path/to/leases" },
+                        omapi => { key => "some key" },
+                    );
+
+        $dhcpd->config->parse;
+
+    See the tests bundled to this distribution for more examples.
+
+DESCRIPTION
+    This namespace contains three semi-separate projects, which this module
+    binds together: dhcpd.conf, dhcpd.leases and omapi. It is written with
+    Moose which provides classes and roles to represents things like a host,
+    a lease or any other thing.
+
+    The distribution as a whole is targeted an audience who configure and/or
+    analyze the Internet Systems Consortium DHCP Server
+    <http://www.isc.org/software/dhcp>. If you are not familiar with the
+    server, check out the man pages
+    <http://www.google.com/search?q=man+dhcpd>.
+
+ATTRIBUTES
+  config
+    This attribute holds a read-only Net::ISC::DHCPd::Config object. It can
+    be set from the constructor, using either an object or a hash-ref. The
+    hash-ref will then be passed on to the constructor.
+
+  leases
+    This attribute holds a read-only Net::ISC::DHCPd::Leases object. It can
+    be set from the constructor, using either an object or a hash-ref. The
+    hash-ref will then be passed on to the constructor.
+
+  omapi
+    This attribute holds a read-only Net::ISC::DHCPd::OMAPI object. It can
+    be set from the constructor, using either an object or a hash-ref. The
+    hash-ref will then be passed on to the constructor.
+
+  binary
+    This attribute holds a Path::Class::File object to the dhcpd binary. It
+    is read-only and the default is "dhcpd3".
+
+  errstr
+    Holds the last know error as a plain string. This only applies to OMAPI.
+
+METHODS
+  parse
+     $config->parse;
+
+    This parses the config file or the leases file.
+
+  generate
+     print $config->generate;
+
+    This generates a copy of the config file in plaintext.
+
+  test
+     $bool = $self->test("config");
+     $bool = $self->test("leases");
+
+    Will test either the config or leases file. It returns a boolean value
+    which indicates if it is valid or not: True means it is valid, while
+    false means it is invalid. Check "errstr" on failure - it will contain a
+    descriptive string from either this module, $! or the exit value
+    (integer stored as a string).
+
+SEE ALSO
+    Net::DHCP::Info
+            "Net::DHCP::Info" an older dhcpd.leases and dhcpd.conf parser,
+            also written by Jan Henning Thorsen. It has many limitations
+            that these modules address.
+
+    kea.isc.org
+            "kea.isc.org" a replacement DHCP server from ISC that is
+            high-performance and supports an API and on-line configuration
+            directly.
+
+BUGS
+    Please report any bugs or feature requests to "bug-net-isc-dhcpd at
+    rt.cpan.org", or through the web interface at
+    <https://github.com/jhthorsen/net-isc-dhcpd/issues>. I will be notified,
+    and then you'll automatically be notified of progress on your bug as I
+    make changes.
+
+COPYRIGHT & LICENSE
+    Copyright 2007 Jan Henning Thorsen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Jan Henning Thorsen, "<jhthorsen at cpan.org>"
+
+MAINTAINER
+    Robert Drake, "<rdrake at cpan.org>"
+
+CONTRIBUTORS
+    Nito Martinez
+
+    Alexey Illarionov
+
+    Patrick
+
+    napetrov
+
+    zoffixznet
+
+    Bossi
+

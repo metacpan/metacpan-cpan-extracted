@@ -1,0 +1,63 @@
+1.9 Nov 10 2008
+	* new: gg_notify, need to be called after successful connection
+	* new: EVENT_WELCOME, EVENT_XML_EVENT
+	* minor fixes
+
+1.8 Apr 21 2007
+	* new: gg_add_notify
+	* new: gg_remove_notify
+	* new: EVENT_STATUS60, EVENT_NOTIFY, EVENT_NOTIFY_DESCR, EVENT_NOTIFY60 support
+	* send notify EVENT_DISCONNECT if gg_watch_fd() return NULL this avoid loop (Sebastian Zagrodzki, s.zagrodzki at net.icm.edu.pl)
+	* update example
+	
+1.7 Dec 09 2006
+	* change_status_descr (Dawid CieszyÅ„ski, dkc at o2.pl)
+	
+1.5 May 26 2005
+	* wyszukiwanie dzia³a,
+	* zmiana API wyszukiwania
+	* po³±czenie asynchroniczne jest preferowane
+	* zmiany w okolicach zmiany statusów, powinno byæ wygodniej
+	* aktualizacja dokumentacji i przyk³adów
+
+1.0 Mar 1 2005
+        * fixed segfault while event occured
+ 
+0.9 Aug  15
+	* changes in contrib/irssi_gg.pl (Dawid)
+
+0.8 Jun  16
+	* changes in contrib/irssi_gg.pl
+	* fixed segfault while searching people
+
+0.7 Jun  12
+	* ->check_event fixed
+	* docs update
+
+0.6 Jun  11
+	* ->search_uin()
+	* ->get_event zwraca juz hasza zamiast hasza w tablicy (zonk!)
+	* contrib/irssi_gg.pl
+	* prototypy dla gg_search (powodowalo ostrzenia)
+	* zapomialem wyciac jedno printf sluzace do debugu, juz wycialem
+	* "famale" -> "female"
+	* update dokumentacji
+	
+0.5  Jun  6
+	* documentation update
+	* ->search(..,$active) added;
+	* new() parameters (async,server)
+	* Events
+	
+0.4  Jun  2
+	* Net::Gadu
+	* $gg->search(..);
+
+0.2  Jun  2
+	* $gg->logout();
+	* changing status
+	* documentation update
+	
+0.1  May 30 23:22:38 2002
+	* first initial test version
+

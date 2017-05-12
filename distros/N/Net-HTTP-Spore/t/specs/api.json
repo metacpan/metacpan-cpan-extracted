@@ -1,0 +1,45 @@
+{
+    "name": "Test API",
+    "methods" : {
+        "get_info" : {
+            "authentication": true,
+            "path" : "/show",
+            "method" : "GET",
+            "optional_params" : [
+                "user",
+                "border"
+            ]
+        },
+        "get_user_info" : {
+            "required_params" : [
+                "user"
+            ],
+            "optional_params" : [
+                "border"
+            ],
+            "path" : "/show",
+            "method" : "GET"
+        },
+      "add_user": {
+        "path":"/add",
+        "method":"POST"
+      },
+      "add_email" : {
+        "path" : "/email",
+        "method" : "POST",
+        "form-data" : {
+          "email" : ":email"
+        },
+        "required_params" : [
+          "email"
+        ]
+      },
+      "attach_file" : {
+        "path":"/file",
+        "method":"POST",
+        "headers": {
+          "content-type":":content_type"
+        }
+      }
+    }
+}

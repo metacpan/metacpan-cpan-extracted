@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 87e38f940238a65ffa97f669d28b73c2aa1a3b87 Build.PL
+SHA1 e818be4694b27de973876052f23e8f40ba8c045f MANIFEST
+SHA1 1ae80e90d6065cceaeb065ac83b73dcfe9ae3d64 META.yml
+SHA1 cf6095d90c9a0eb7d1fb099899c4f4369fe22dfe Makefile.PL
+SHA1 108efb9c073972a9d554f86c9c9a3b26ba22628d README
+SHA1 2d03253f6c3245991b062480f295f1c191b72882 lib/Net/DAAP/Server/MythTV.pm
+SHA1 8716c88d18454b4979f02c472d38160e065ddcd6 mythdaap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iGUEARECACUFAkX4aWgeGGhrcDovL2NnaS5zZnUuY2E6ODAvfmpkYmF0ZXMvAAoJ
+EDQq9j8F5ZSEHuMAoIJ7TdjwL7gcFudmpSSKhcnp5dNcAJ9VW+GOIhuyog7uFXlt
+mojU8vjmBQ==
+=9jXj
+-----END PGP SIGNATURE-----

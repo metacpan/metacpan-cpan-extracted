@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Shaper.pm
+t/01_basic.t

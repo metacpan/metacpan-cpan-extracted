@@ -1,0 +1,51 @@
+Number-Convert-Roman
+
+DESCRIPTION
+
+Number::Convert::Roman converts natural numbers between Roman and Arabic numeral systems.
+
+VERSION
+
+Number::Convert::Roman version 0.01.
+
+USER VISIBLE CHANGES SINCE LAST RELEASE
+
+N/A
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Number::Convert::Roman
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Number-Convert-Roman
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Number-Convert-Roman
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Number-Convert-Roman
+
+    Search CPAN
+        http://search.cpan.org/dist/Number-Convert-Roman/
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2015 José Santos. All rights reserved.
+
+This program is free software. It can be redistributed and/or modified under the 
+same terms as Perl itself.

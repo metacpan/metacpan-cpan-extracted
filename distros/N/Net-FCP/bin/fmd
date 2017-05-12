@@ -1,0 +1,761 @@
+#!/opt/bin/perl
+
+system "echo $$ >fmd.pid";
+use Coro::Debug; our $server = new_unix_server Coro::Debug "debug";
+
+=head1 fmd - the freenet mass downloader
+
+Fmd is at a very early stage of development (and very hackish, too), as I
+am learning the basics of freenet myself.
+
+However, I use it in production, and since it verifies everything it
+decodes etc., it seems to be quite safe to use, that is, if you know how
+to debug perl :)
+
+=head2 FEATURES
+
+ - decoding is done "in place", i.e. all non-checkblock blocks are
+   stored in-place and will not be moved, only checkblocks will
+   be moved to their final position in the file before decoding.
+ - high resistance against failures of fred or fmd
+ - extremely persistent retry behaviour - there is no such thing
+   as a permanent failure.
+ - handles hundreds of simultaneous downloads with grace.
+
+=head2 ENVIRONMENT
+
+Set FMD_HOME to a directory (default ~/fmd) where fmd will store it's
+files. It will not store your porn files or other freenet data outside
+that directory.
+
+The subdirectory db will contain a database (soon to go away), while tmp
+contains queue files and partial splitfiles. All finished files will be
+moved to the done subdir.
+
+FREDHOST and FREDPORT do the obvious. Fix these docs if you disagree.
+
+Also edit the fmd executable for the number of threads and other
+non-useful constants. The default number (250) works for me, probably not
+for you.
+
+=head2 COMMANDS
+
+=over 4
+
+=item CHK@... (space or "/") filename
+
+Just pasting a CHK and a filename sperated by one or more spaces or
+slashes will add files to the queue. The line can have leading garbage,
+i.e. you can paste full uris.
+
+=item <attachment>...</attachment>
+
+=item <attach>...</attach>
+
+=item <attached>...</attached>
+
+Will add frosts mentally deranged pseudo-xml format, soon to be replaced
+by something even more horrible.
+
+=item l
+
+List all jobs by number.
+
+=item <number> (optionally trailing command)
+
+Selects the job with the given number for further comamnds that require a current job.
+
+=item s
+
+Show the current job. Bot useful right now.
+
+=item k
+
+Kill the current job. This will keep the temp. file around. Sorry. (But it
+could be used to reconstruct the download.. hmm..)
+
+=item pri<number>
+
+Set the current job priority to <pri>. The default is 1. A job with higher
+priority will (on average) get more requests.
+
+The useful range is probably 0..100, but be careful and limit yourself to
+small values (<10), otherwise your other downloads might starve!
+
+=item q
+
+Kill the command prompt. Yupp.
+
+=back
+
+=cut
+
+use strict;
+
+use EV;
+use Coro::EV;
+
+use Net::FCP;
+use Storable ();
+use Time::HiRes;
+use Coro 4.23;
+use Coro::Channel;
+use Coro::Handle;
+use Coro::Signal;
+use Coro::Timer;
+use Coro::AIO;
+use Coro::Storable ();
+use List::Util;
+use Digest::SHA1;
+use Algorithm::FEC;
+use Digest::SHA1;
+use Net::FCP::Util;
+use POSIX ();
+
+Coro::AIO::max_poll_time 0.05;
+Coro::AIO::min_parallel 4;
+Coro::AIO::max_parallel 4;
+
+$|=1;
+
+our $MAX_TXN = 50; # use max. this many transactions in parallel
+our @HTL = (3,20);
+our $VERIFY_CHK = 1; # verify all blocks, again and again (only useful to debugging).
+our $FMD_HOME = $ENV{FMD_HOME} || "$ENV{HOME}/fmd";
+
+our $FCP = new Net::FCP;
+
+defined $FMD_HOME
+   or die "you currently must define FMD_HOME to a persistent directory";
+
+mkdir $FMD_HOME, 0700;
+
+our $QUEUE_HOME = "$FMD_HOME/job";
+mkdir $QUEUE_HOME, 0700;
+our $DATA_HOME = "$FMD_HOME/tmp";
+mkdir $DATA_HOME, 0700;
+our $DONE_HOME = "$FMD_HOME/done";
+mkdir $DONE_HOME, 0700;
+
+our %job;
+
+sub push_key {
+   my ($key, $title) = @_;
+
+   for my $job (values %job) {
+      if ($job->{p}{key} eq $key) {
+         warn "job $job->{id} already works on this, not adding";
+         return;
+      }
+   }
+
+   my $job = job->new_from_key ($key, $title);
+   warn "added as job $job->{id}\n";
+   $job;
+}
+
+sub cmdline {
+   my ($i, $o) = @_;
+
+   my $cmd = async {
+      my $job;
+      while (print $o "> " and defined ($_ = <$i>)) {
+         chomp;
+         if (/<attach(?:ment|ed|)>(.*) \* (CHK[^<]+)<\/attach/) {
+            $job = push_key $2, $1;
+         } elsif (/(CHK\@[a-zA-Z0-9,~\-]{54})[\/ ]+(.*?)\s*$/) {
+            $job = push_key $1, $2;
+         } elsif (s/^(\d+)//) {
+            if ($job = $job{$1}) {
+#               print $o delete $job->{log};
+#               if ($job->{input}) {
+#               }
+            }
+            redo;
+         } elsif (/^q/) {
+            close $i;
+            close $o;
+         } elsif (/^l/) {
+            for my $job (sort { $a->{id} <=> $b->{id} } values %job) {
+               print $o "$_ $job->{id}: $job->{p}{key} $job->{p}{title} $job->{status}\n";
+            }
+#         } elsif (/^pri\s*(\d+)/) {
+#            if ($job) {
+#               $job->{p}{pri} = $1;
+#               $job->save;
+#            }
+         } elsif (/^s$/) {
+            print $o $job->show if $job;
+         } elsif (/^k$/) {
+            $job->kill if $job;
+         } elsif (/^p(.*)/) {
+            print $o +(join " ", eval $1), "\n";
+         } elsif (/\S/) {
+            #
+         } else {
+            print $o "?\n";
+         }
+         for my $job (sort { $a->{id} <=> $b->{id} } values %job) {
+            if ($job->{_input}) {
+                print $o "> $job->{id} $job->{title} $job->{status}\n";
+            }
+         }
+      }
+   };
+}
+
+package job;
+
+use strict;
+
+use Coro;
+use Coro::AIO;
+use Fcntl;
+use IO::Handle;
+use Array::Heap2;
+
+our $count = 0;
+
+sub new {
+   my $class = shift;
+
+   my $self = bless { @_ }, $class;
+
+   for my $job (values %job) {
+      if ($job->{p}{key} eq $self->{p}{key}) {
+         warn "job $job->{id} already works on this, not adding";
+         aio_unlink $self->{job};
+         return;
+      }
+   }
+
+   $self->{p}{title} !~ /\//
+      or die "$self->{p}{title}: malformed key\n";
+
+   $self->{p}{title} =~ s/\s+$//;
+   $self->{p}{title} =~ s/\n/_/g;
+
+   $self->{id} = ++$count;
+   $self->{job} ||= "$QUEUE_HOME/" . Time::HiRes::time . ":$count.j";
+
+   $job{$self->{id}} = $self;
+
+   $self->start;
+   $self
+}
+
+sub new_from_key {
+   my ($class, $key, $title) = @_;
+   $class->new (p => { key => $key, title => $title, state => "examine" });
+}
+
+sub new_from_file {
+   my ($class, $path) = @_;
+   $class->new (job => $path, p => Storable::retrieve $path);
+}
+
+sub save {
+   my ($self) = @_;
+   if (my $fh = aio_open "$self->{job}~", O_CREAT|O_TRUNC|O_WRONLY, 0600) {
+      my $data = Coro::Storable::blocking_nfreeze $self->{p};
+      aio_write $fh, 0, undef, $data, 0;
+      aio_fsync $fh;
+      aio_close $fh;
+      aio_rename "$self->{job}~", $self->{job};
+      aio_pathsync $QUEUE_HOME;
+   }
+}
+
+sub clean {
+   my ($self) = @_;
+
+   delete $job{$self->{id}};
+   $self->save;
+   system "mv", $self->{job}, "$DONE_HOME/$self->{p}{title}.job";
+   unlink $self->{job};
+}
+
+sub kill {
+   my ($self) = @_;
+
+   $self->clean;
+   $self->{coro}->cancel;
+}
+
+our @queue;
+our $queue_change = new Coro::Signal;
+our $queue_alloc = 0;
+
+async {
+   for (;;) {
+      while (@queue
+             and (($queue[0][0] > 10 and $queue_alloc < $MAX_TXN)
+               or ($queue[0][0] >  1 and $queue_alloc < $MAX_TXN - 3)
+               or $queue_alloc < $MAX_TXN - 5)) {
+         (pop_heap @queue)->[1]->send;
+         $queue_alloc++;
+         #Coro::Timer::sleep 0.05;
+      }
+      $queue_change->wait;
+   }
+};
+
+sub txn_begin {
+   my ($pri) = @_;
+   my $sig = new Coro::Signal;
+
+   #warn "txn_begin $pri\n";#d#
+   push_heap @queue, [$pri, $sig];
+   $queue_change->send;
+   $sig->wait;
+}
+
+sub txn_end {
+   $queue_alloc--;
+   $queue_change->send;
+}
+
+sub txn_client_get {
+   my %arg = @_;
+
+   txn_begin $arg{pri};
+   $FCP->txn_client_get ($arg{uri}, $arg{htl})->cb (unblock_sub {
+      txn_end;
+
+      $arg{cb}->(@_);
+   });
+}
+
+sub fetch_uri {
+   my ($pri, $uri) = @_;
+
+   for(my $count = 1; ; $count += 0.3) {
+      for my $htl (@HTL) {
+         txn_begin time + $htl + $count;
+         my ($meta, $data) = eval { @{ $FCP->client_get ($uri, $htl) } };
+         txn_end;
+         if ($@) {
+            if (UNIVERSAL::isa ($@, Net::FCP::Exception::)) {
+               if ($@->type ("data_not_found")
+                   || $@->type ("route_not_found")) {
+                  next;
+               }
+               if ($@->type ("short_data")) {
+                  warn "(short_data, redo)\n";
+                  redo;
+               }
+               die;
+            }
+         }
+         if (defined $data) {
+            return ($meta, $data);
+         }
+      }
+   }
+
+   die;
+}
+
+sub log {
+   my ($self, $text) = @_;
+   my $time = POSIX::strftime "%Y-%m-%d %H:%M:%S", localtime time;
+   warn "$time $self->{id},$self->{p}{pri}: $text\n";
+
+   unless ($text =~ /Net::FCP::Exception/) {
+      $self->{p}{log} .= "$time $text\n";
+      $self->save;
+   }
+}
+
+sub feedback {
+   my ($self, $prompt) = @_;
+   $self->{input} = [$Coro::current, $prompt];
+   Coro::schedule;
+}
+
+sub show {
+   my ($self) = @_;
+
+   "\n$self->{p}{log}\n"
+      . "ID: $self->{id}\n"
+      . "Title: $self->{p}{title}\n"
+      . "Blocks#: " . @{$self->{p}{blk} || []} . "\n"
+      . "Blocks: " . (join "", map {
+         $_->{done} ? "+" : "-"
+      } @{$self->{p}{blk} || []}) . "\n" .
+   ""
+}
+
+our $id;
+
+sub MAXSEG (){ 128*1024*1024 }
+sub MINSEG (){   6* 128*1024 }
+
+sub blocksize($) {
+   return
+        $_[0] >= 64*1024*1024 ? 1024*1024
+      : $_[0] >= 32*1024*1024 ?  512*1024
+      : $_[0] >=    1024*1024 ?  256*1024
+                              :  128*1024;
+}
+
+sub start {
+   my ($self) = @_;
+
+   $self->{p}{pri} ||= 1;
+   $self->{p}{state} ||= "examine";
+
+   $self->{job} =~ /\/([^\/]*)\.j$/ or die "$self->{job}: missing .j";
+   $self->{file} = "$DATA_HOME/$1.d";
+   sysopen $self->{fh}, $self->{file}, O_RDWR|O_CREAT, 0600
+   #$self->{fh} = aio_open $self->{file}, O_RDWR|O_CREAT, 0600 
+      or die "$self->{file}: $!";
+
+   $self->{status} = "starting";
+   $self->{coro} = async {
+      $self->save;
+
+      for(;;) {
+         my ($state, @args) = ref $self->{p}{state} ? @{$self->{p}{state}} : $self->{p}{state};
+         my $next = eval { $self->can ("state_$state")->($self, @args) };
+         if ($@) {
+            $self->log ($@);
+            $next = $self->feedback ("continue with state: ");
+         }
+         $self->log ($self->{status} = "STATE CHANGE: ". join ", ", ref $next ? @$next : $next);
+         $self->{p}{state} = $next;
+         $self->save;
+      }
+   };
+}
+
+sub state_finish {
+   my ($self, $save) = @_;
+
+   if ($save) {
+      aio_fsync $self->{fh};
+      close $self->{fh};
+
+      aio_unlink "$DONE_HOME/$self->{p}{title}";
+      aio_link $self->{file}, "$DONE_HOME/$self->{p}{title}"
+         and die "link: $self->{file} => $DONE_HOME/$self->{p}{title}: $!";
+      aio_pathsync $DONE_HOME;
+   }
+   $self->clean;
+
+   aio_unlink $self->{file};
+
+   $self->{status} = "finished";
+   $self->feedback ("finished");
+   terminate;
+}
+
+sub state_examine {
+   my ($self) = @_;
+   my $p = $self->{p};
+
+   $self->{status} = "initial fetch";
+
+   for (;;) {
+      $self->log ("fetching $p->{key} (=$p->{title})");
+
+      ($p->{meta}, $p->{data}) = fetch_uri 100, "freenet:$p->{key}";
+      $self->save;
+      #use PApp::Util; print STDERR PApp::Util::dumpval [keys %{$meta->{document}[0]{split_file}}];
+      $self->log ("type $p->{meta}{document}[0]{info}{format}");
+
+      if (my $splitfile = $p->{meta}{document}[0]{split_file}) {
+         return "splitfile";
+      } elsif ((defined $p->{data}) and (length $p->{data})) {
+         syswrite $self->{fh}, delete $p->{data};
+         aio_fsync $self->{fh};
+         return ["finish", 1];
+      }
+
+      $self->log ("EMPTY, retrying in an hour");
+      Coro::Timer::sleep 3600;
+   }
+
+}
+
+sub state_splitfile {
+   my ($self) = @_;
+   my $p = $self->{p};
+
+   my $splitfile = $p->{meta}{document}[0]{split_file};
+   my $filesize = hex $splitfile->{size};
+
+   if ($splitfile->{algo_name} eq "OnionFEC_a_1_2") {
+      my $data_packets = hex $splitfile->{block_count};
+      my $check_packets = hex $splitfile->{check_block_count};
+
+      my $blk = ($p->{blk} ||= []);
+
+      unless (@$blk) {
+         for (1..$data_packets) {
+            push @$blk, {
+               uri => $splitfile->{block}{sprintf "%x", $_},
+            };
+         }
+         for (1..$check_packets) {
+            push @$blk, {
+               uri => $splitfile->{check_block}{sprintf "%x", $_},
+            };
+         }
+      }
+
+      my @segments;
+      my $segments = 0;
+
+      {
+         # that is a horrible algorithm :(, these freenet freaks are... java-disabled
+         # hardcoding lots of magic parameters is soo dumb.
+         my $size = $filesize;
+         my $offset = 0;
+         my $offset2 = ($filesize & ~(1024*1024-1)) + 1024*1024; # leave enough space after last data block
+         my $idx  = 0;
+         my $idx2 = $data_packets;
+         my @redundandy = (0,1,2); # maybe OnionFAC_a_1_2 means 1/2 redundancy(?)
+
+         while ($size > 0) {
+            my $segsize = $size >= MAXSEG ? MAXSEG : $size <= MINSEG ? MINSEG : $size;
+            my $blksize = blocksize $segsize;
+            my $seg    = 
+               {
+                  id      => $segments++,
+                  todo    => int (($segsize + $blksize - 1) / $blksize),
+                  done    => 0,
+                  blk     => [],
+                  blksize => $blksize,
+               };
+
+            push @segments, $seg;
+            $size -= $segsize;
+
+            while ($segsize > 0) {
+               push @{$seg->{blk}}, $idx;
+               for ($blk->[$idx++]) {
+                  $_->{offset} = $offset;
+                  #$_->{size}   = $blksize > $segsize ? $segsize : $blksize; # WRONG
+                  $_->{size}   = $blksize;
+                  $_->{seg}    = $seg;
+               }
+
+               $segsize -= $blksize;
+               $offset  += $blksize;
+
+               if (($redundandy[0] += $redundandy[1]) >= $redundandy[2]) {
+                  $redundandy[0] -= $redundandy[2];
+
+                  push @{$seg->{blk}}, $idx2;
+                  for ($blk->[$idx2++]) {
+                     $_->{offset} = $offset2;
+                     $_->{size}   = $blksize;
+                     $_->{seg}    = $seg;
+                  }
+
+                  $offset2 += $blksize;
+               }
+            }
+         }
+
+         $idx == $data_packets
+            or die "$self->{id}/$p->{tile} $self->{job}\nidx $idx != data_packets $data_packets";
+         $idx2 == $data_packets + $check_packets
+            or die "$self->{id}/$p->{tile} $self->{job}\nidx2 $idx2 != data_packets $data_packets + check_packets $check_packets";
+      }
+
+      for (@$blk) {
+         ++$_->{seg}{done} if $_->{done};
+         delete $_->{htl};
+      }
+
+      my $fail = 0;
+      my $sig = new Coro::Signal;
+
+      $self->{status} = "splitfile fetch (" .  @$blk . " blocks)";
+
+      my @txn;
+
+      for (;;) {
+         for my $id (0 .. $#$blk) {
+            my $blk = $blk->[$id];
+
+            next if $txn[$id] || $blk->{done} || $blk->{seg}{todo} <= $blk->{seg}{done};
+
+            my $htl = $HTL[$blk->{htl}++ % @HTL];
+            my $pri = int EV::now + $htl / 20 * 7200 * rand;
+
+            #warn $self->{id} . ", GET<$htl, $pri>\n";#d#
+            my $start = EV::now;
+
+            $txn[$id] ||= txn_client_get pri => $pri, uri => $blk->{uri}, htl => $htl, cb => sub {
+               undef $txn[$id];
+
+               my $seg = $blk->{seg};
+
+               my ($meta, $data) = eval { @{ $_[0]->result } };
+
+               if (defined $data) {
+                  $blk->{size} == length $data
+                     or die sprintf "block $id expected size %d, got %d\n", $blk->{size}, length $data;
+
+                  (length $data) == (aio_write $self->{fh}, $blk->{offset}, (length $data), $data, 0)
+                     or die "unable to write chunk to disk, not setting valid flag";
+                  aio_fsync $self->{fh};
+
+                  $blk->{done} = 1;
+                  $blk->{meta} = $meta->{raw} if length $meta->{raw};#d#
+                  $seg->{done}++;
+                  $self->save;
+
+                  $::htl_sum += $htl;
+                  $::htl_cnt++;
+
+                  $self->log (sprintf "got block $seg->{id}.$id %d ($seg->{done}/$seg->{todo}) at htl $htl (%f) and pri $pri (%.1fs)",
+                                       length $data, $::htl_sum / $::htl_cnt, EV::now - $start);
+               } else {
+                  if ($@) {
+                     if ($@->type ("data_not_found")) {
+                        # nop
+                     } elsif ($@->type ("network_error")) {
+                        $self->log ("$@, retrying in 1s");
+                        CORE::sleep 1;
+                     } else {
+                        $self->log ("$@");
+                     }
+                  }
+                  ++$fail;
+               }
+               $self->{status} = "splitfile fetch ($seg->{done}/$seg->{todo}, $fail failed)";
+
+               $sig->send;
+            };
+         }
+
+         for my $seg (@segments) {
+            if ($seg->{done} >= $seg->{todo} && !$seg->{finished}) {
+
+               $self->log ("segment done, cancelling segment $seg->{id}");
+               for my $id (@{$seg->{blk}}) {
+                  (delete $txn[$id])->cancel if $txn[$id];
+               }
+
+               my $verify;
+               for my $id (@{$seg->{blk}}) {
+                  my $blk = $blk->[$id];
+                  if ($blk->{done}) {
+                     aio_read $self->{fh}, $blk->{offset}, $blk->{size}, my $buf, 0;
+
+                     my $k1 = Net::FCP::Util::extract_chk_hash $blk->{uri};
+                     my $k2 = Net::FCP::Util::generate_chk_hash $blk->{meta}, $buf;
+
+                     if ($k1 ne $k2) {
+                        $verify .= "v";
+                        #warn sprintf "$p->{title} block $id BROKEN (%s != %s)", (unpack "H*", $k1), (unpack "H*", $k2);
+                        $blk->{done} = 0;
+                        $seg->{done}--;
+                        $self->save;
+                     } else {
+                        $verify .= "V";
+                     }
+                  }
+               }
+               $self->log ("verified segment $seg->{id}");
+               $self->log ($verify);
+
+               if ($seg->{done} >= $seg->{todo} && !$seg->{finished}) {
+                  $self->log ("verified segment OK $seg->{id}");
+                  $seg->{finished}++;
+                  $segments--;
+               } else {
+                  $self->log ("verified segment NOT OK $seg->{id}");
+               }
+            }
+         }
+
+         last unless $segments;
+
+         $sig->wait;
+      }
+
+      $self->log ("decoding < $self->{job} $self->{file} $filesize >");
+
+      for my $seg (@segments) {
+         my @part;
+         my @idx;
+         my @blk = map $blk->[$_], sort { $a <=> $b } @{$seg->{blk}};
+
+         for my $id (0 .. $#blk) {
+            my $blk = $blk[$id];
+            next unless $blk->{done};
+
+            push @part, [$self->{fh}, $blk->{offset}];
+            push @idx, $id;
+
+            last if @idx == $seg->{todo};
+         }
+
+         my $fec = new Algorithm::FEC
+                          $seg->{todo},
+                          scalar @blk,
+                          $seg->{blksize};
+
+         $fec->shuffle (\@part, \@idx);
+
+         # now copy check blocks to their destination position
+         for my $i (0 .. $#idx) {
+            next if $idx[$i] == $i;
+
+            my $src = $part[$i];
+            $part[$i] = [$self->{fh}, $blk[$i]{offset}];
+            $fec->copy ($src, $part[$i]);
+         }
+
+         $fec->set_decode_blocks (\@part, \@idx);
+         $fec->decode;
+      }
+
+      my $sha1 = new Digest::SHA1;
+      open my $dd, "-|", "head -c$filesize \Q$self->{file}\E"
+         or die "DD: $!";
+      #$dd = Coro::Handle::unblock $dd;
+      $sha1->addfile ($dd);
+      $sha1 = $sha1->hexdigest;
+
+      if (exists $p->{meta}{document}[0]{info}{checksum}
+          and $p->{meta}{document}[0]{info}{checksum} ne $sha1) {
+         $self->log ("META: $p->{meta}{document}[0]{info}{checksum} and real checksum $sha1 for $filesize DIFFER");
+#         $self->feedback ("CHECKSUM ERROR");
+#         terminate;
+      }
+
+      truncate $self->{fh}, $filesize;
+      sysseek $self->{fh}, 0, 0;
+
+      return ["finish", 1];
+   } else {
+      $self->log ("splitfile algo '$splitfile->{algo_name}' unknown");
+      $self->feedback ("algo unknown");
+      terminate;
+   }
+}
+
+package main;
+
+$|=1;
+
+for (<\Q$QUEUE_HOME\E/*.j>) {
+   job->new_from_file ($_);
+   print "J";
+}
+print "\n";
+
+open my $stdin , "<&0" or die;
+open my $stdout, ">&1" or die;
+cmdline unblock $stdin, unblock $stdout;
+
+EV::set_io_collect_interval 0.1;
+
+EV::loop;
+

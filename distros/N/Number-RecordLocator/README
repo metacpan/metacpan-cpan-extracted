@@ -1,0 +1,73 @@
+Number::RecordLocator(3U)ser Contributed Perl DocumentatiNounmber::RecordLocator(3)
+
+
+
+NNAAMMEE
+       Number::RecordLocator - [One line description of module's purpose here]
+
+SSYYNNOOPPSSIISS
+           use Number::RecordLocator;
+
+           my $generator = Number::RecordLocator->new();
+           my $string = $generator->encode("123456");
+
+           # $string = "5RL2";
+
+           my $number = $generator->decode($string);
+
+           # $number = "123456";
+
+DDEESSCCRRIIPPTTIIOONN
+       "Number::RecordLocator" encodes integers into a 32 character "alphabet"
+       designed to be short and easy to read and pronounce.  The encoding
+       maps:
+
+           0 to O
+           1 to I
+           S to F
+           B to P
+
+       With a 32 bit encoding, you can map 33.5 million unique ids into a 5
+       character code.
+
+       This certainly isn't an exact science and I'm not yet 100% sure of the
+       encoding.  Feedback is much appreciated.
+
+       nneeww
+
+       Instantiate a new "Number::RecordLocator" object. Right now, we don't
+       actually store any object-specific data, but in the future, we might.
+
+       iinniitt
+
+       Initializes our integer to character and character to integer mapping
+       tables.
+
+       eennccooddee IINNTTEEGGEERR
+
+       Takes an integer. Returns a Record Locator string.
+
+       ddeeccooddee SSTTRRIINNGG
+
+       Takes a record locator string and returns an integer. If you pass in a
+       string containing an invalid character, it returns undef.
+
+BBUUGGSS AANNDD LLIIMMIITTAATTIIOONNSS
+       No bugs have been reported.
+
+       Please report any bugs or feature requests to "bug-number-recordloca-
+       tor@rt.cpan.org", or through the web interface at <http://rt.cpan.org>.
+
+AAUUTTHHOORR
+       Jesse Vincent  "<jesse@bestpractical.com>"
+
+LLIICCEENNCCEE AANNDD CCOOPPYYRRIIGGHHTT
+       Copyright (c) 2006, Best Practical Solutions, LLC.  All rights
+       reserved.
+
+       This module is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself. See perlartistic.
+
+
+
+perl v5.8.7                       2006-04-29          Number::RecordLocator(3)

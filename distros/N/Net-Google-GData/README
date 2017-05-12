@@ -1,0 +1,70 @@
+NAME
+    Net::Google::GData - Handle basic communication with Google services
+
+VERSION
+      This document describes v0.03 of Net::Google::GData - released December 25, 2012 as part of Net-Google-GData.
+
+SYNOPSIS
+    THIS MODULE IS NOT MAINTAINED ANYMORE
+
+    I fixed what was causing cpantesters to barf. I don't think the API this
+    was written for is even valid anymore.
+
+    Net::Google::GData handles the basic communication details with Google
+    services.
+
+    This module should normally only be used by modules subclassing GData.
+
+DESCRIPTION
+    would go here
+
+FUNCTIONS
+  new
+    Typical constructor. You can optionally pass in a hash of data to set
+    values. Unknown data/value pairs will be silently ignored.
+
+  GET
+  POST
+  PUT
+  DELETE
+PRIVATE FUNCTIONS
+  _ua
+    Private method that creates and holds a LWP user agent.
+
+    Does not accept any parameters.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+AUTHOR
+    Alan Young <harleypig@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Alan Young.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

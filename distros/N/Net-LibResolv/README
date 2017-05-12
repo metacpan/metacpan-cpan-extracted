@@ -1,0 +1,95 @@
+NAME
+    "Net::LibResolv" - a Perl wrapper around libresolv
+
+SYNOPSIS
+     use Net::LibResolv qw( res_query NS_C_IN NS_T_A $h_errno );
+     use Net::DNS::Packet;
+ 
+     my $answer = res_query( "www.cpan.org", NS_C_IN, NS_T_A );
+     defined $answer or die "DNS failure - $h_errno\n";
+ 
+     foreach my $rr ( Net::DNS::Packet->new( \$answer )->answer ) {
+        print $rr->string, "\n";
+     }
+
+DESCRIPTION
+    The libresolv library provides functions to use the platform's standard
+    DNS resolver to perform DNS queries. This Perl module provides a
+    wrapping for the two primary functions, res_query(3) and res_search(3),
+    allowing them to be used from Perl.
+
+    The return value from each function is a byte buffer containing the
+    actual DNS response packet. This will need to be parsed somehow to
+    obtain the useful information out of it; most likely by using Net::DNS.
+
+FUNCTIONS
+  $answer = res_query( $dname, $class, $type )
+    Calls the res_query(3) function on the given domain name, class and type
+    number. Returns the answer byte buffer on success, or "undef" on
+    failure. On failure sets the value of the $h_errno package variable.
+
+    $dname should be a plain string. $class and $type should be numerical
+    codes. See the "CONSTANTS" section for convenient definitions.
+
+  $answer = res_search( $dname, $class, $type )
+    Calls the res_search(3) function on the given domain name, class and
+    type number. Returns the answer byte buffer on success, or "undef" on
+    failure. On failure sets the value of the $h_errno package variable.
+
+    $dname should be a plain string. $class and $type should be numerical
+    codes. See the "CONSTANTS" section for convenient definitions.
+
+VARIABLES
+  $h_errno
+    After an error from "res_query" or "res_search", this variable will be
+    set to the error value, as a dual-valued scalar. Its numerical value
+    will be one of the error constants (see below); it string value will be
+    an error message version of the same (similar to the $! perl core
+    variable).
+
+     if( !defined( my $answer = res_query( ... ) ) ) {
+        print "Try again later...\n" if $h_errno == TRY_AGAIN;
+     }
+
+
+
+     defined( my $answer = res_query( ... ) ) or
+        die "Cannot res_query() - $h_errno\n";
+
+CONSTANTS
+  Class IDs
+    The following set of constants define values for the $class parameter.
+    Typically only "NS_C_IN" is actually used, for Internet.
+
+     NS_C_IN NS_C_CHAOS NS_C_HS
+     NS_C_INVALD NS_C_NONE NS_C_ANY
+
+  $id = class_name2value( $name )
+  $name = class_value2name( $id )
+    Functions to convert between class names and ID values.
+
+  Type IDs
+    The following are examples of constants define values for the $type
+    parameter. (They all follow the same naming pattern, named after the
+    record type, so only a few are listed here.)
+
+     NS_T_A NS_T_NS NS_T_CNAME NS_T_PTR NS_T_MX NS_T_TXT NS_T_SRV NS_T_AAAA
+     NS_T_INVALID NS_T_ANY
+
+  $id = type_name2value( $name )
+  $name = type_value2name( $id )
+    Functions to convert between type names and ID values.
+
+  Errors
+    The following constants define error values for $h_errno.
+
+     HOST_NOT_FOUND NO_ADDRESS NO_DATA NO_RECOVERY TRY_AGAIN
+
+    The values of "NO_ADDRESS" and "NO_DATA" may be the same.
+
+SEE ALSO
+    *   Net::DNS - Perl interface to the DNS resolver
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

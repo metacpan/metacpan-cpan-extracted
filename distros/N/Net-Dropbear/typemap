@@ -1,0 +1,12 @@
+enum signkey_type                               T_ENUM
+pid_t                                           T_IV
+uid_t                                           T_IV
+gid_t                                           T_IV
+
+struct dropbear_chansess_accept *		T_PTROBJ
+Net::Dropbear::XS::SessionAccept		T_PTROBJ
+Net__Dropbear__XS__SessionAccept                T_PTROBJ
+
+struct AuthState *              		T_PTROBJ
+Net::Dropbear::XS::AuthState    		T_PTROBJ
+Net__Dropbear__XS__AuthState                    T_PTROBJ

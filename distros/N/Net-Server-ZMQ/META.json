@@ -1,0 +1,57 @@
+{
+   "abstract" : "Preforking ZeroMQ job server",
+   "author" : [
+      "Ido Perlmuter <ido@ido50.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Server-ZMQ",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Getopt::Long" : "0",
+            "Net::Server::PreFork" : "0",
+            "Net::Server::SIG" : "0",
+            "POSIX" : "0",
+            "Pod::Usage" : "0",
+            "ZMQ::FFI" : "0",
+            "ZMQ::FFI::Constants" : "0",
+            "base" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ido50/Net-Server-ZMQ/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ido50/Net-Server-ZMQ.git",
+         "web" : "https://github.com/ido50/Net-Server-ZMQ"
+      }
+   },
+   "version" : "0.001001"
+}
+

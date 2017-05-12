@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-SDEE.t
+lib/Net/SDEE.pm
+lib/Net/SDEE/Session.pm
+lib/Net/SDEE/Subscription.pm
+lib/Net/SDEE/Query.pm
+lib/Net/SDEE/Common.pm
+lib/XML/SDEE.pm
+example/sdee.pl
+META.yml                                 Module meta-data (added by MakeMaker)

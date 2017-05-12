@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+######################################################
+# Browse node search
+# Jackie Hamilton <kira@cgi101.com>, 2003
+# Mike Schilli <na@perlmeister.com>, 2003
+######################################################
+use warnings;
+use strict;
+
+use Net::Amazon;
+
+#use Log::Log4perl qw(:easy);
+#Log::Log4perl->easy_init({level => $DEBUG, file => "out"});
+
+die "usage: $0 node mode [keywords]\n".
+    "(use '4025' 'books' 'perl' as an example)\n"
+    unless defined $ARGV[1];
+
+my $ua = Net::Amazon->new(
+    associate_tag => $ENV{AMAZON_ASSOCIATE_TAG},
+    token         => $ENV{AMAZON_TOKEN},
+    secret_key    => $ENV{AMAZON_SECRET_KEY},
+);
+
+my $resp = $ua->search(
+    browsenode => $ARGV[0], 
+    mode => $ARGV[1],
+    defined $ARGV[2] ? 
+        (keywords => join('', @ARGV[2,])) : 
+        (),
+);
+
+die $resp->message() unless $resp->is_success();
+
+for ($resp->properties) {
+
+   unless($_->can("title")) {
+       warn "Not a book: ", $_->as_string();
+       next;
+   }
+   print $_->Asin(), " ",
+         $_->title(), " ",
+         $_->OurPrice(), "\n";
+}

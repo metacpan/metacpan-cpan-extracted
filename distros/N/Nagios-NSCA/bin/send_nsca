@@ -1,0 +1,6 @@
+#!/usr/bin/perl
+use lib '.';
+use strict;
+use warnings;
+use Nagios::NSCA::Client;
+Nagios::NSCA::Client->run(argv => \@ARGV);

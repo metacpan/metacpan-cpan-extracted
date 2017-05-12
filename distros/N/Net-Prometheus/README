@@ -1,0 +1,179 @@
+NAME
+
+    Net::Prometheus - export monitoring metrics for prometheus
+
+SYNOPSIS
+
+       use Net::Prometheus;
+    
+       my $client = Net::Prometheus->new;
+    
+       my $counter = $client->new_counter(
+          name => "requests",
+          help => "Number of received requests",
+       );
+    
+       sub handle_request
+       {
+          $counter->inc;
+          ...
+       }
+    
+       use Plack::Builder;
+    
+       builder {
+          mount "/metrics" => $client->psgi_app;
+          ...
+       }
+
+DESCRIPTION
+
+    This module provides the ability for a program to collect monitoring
+    metrics and export them to the prometheus.io monitoring server.
+
+    As prometheus will expect to collect the metrics by making an HTTP
+    request, facilities are provided to yield a PSGI application that the
+    containing program can embed in its own structure to provide the
+    results, or the application can generate a plain-text result directly
+    and serve them by its own means.
+
+CONSTRUCTOR
+
+ new
+
+       $prometheus = Net::Prometheus->new;
+
+    Returns a new Net::Prometheus instance.
+
+    Takes the following named arguments:
+
+    disable_process_collector => BOOL
+
+      If present and true, this instance will not load the default process
+      collector from Net::Prometheus::ProcessCollector. If absent or false,
+      such a collector will be loaded by default. This is usually what you
+      want.
+
+METHODS
+
+ register
+
+       $collector = $prometheus->register( $collector )
+
+    Registers a new collector to be collected from by the render method.
+    The collector instance itself is returned, for convenience.
+
+ unregister
+
+       $prometheus->unregister( $collector )
+
+    Removes a previously-registered collector.
+
+ new_gauge
+
+       $gauge = $prometheus->new_gauge( %args )
+
+    Constructs a new Net::Prometheus::Gauge using the arguments given and
+    registers it with the exporter. The newly-constructed gauge is
+    returned.
+
+ new_counter
+
+       $counter = $prometheus->new_counter( %args )
+
+    Constructs a new Net::Prometheus::Counter using the arguments given and
+    registers it with the exporter. The newly-constructed counter is
+    returned.
+
+ new_summary
+
+       $summary = $prometheus->new_summary( %args )
+
+    Constructs a new Net::Prometheus::Summary using the arguments given and
+    registers it with the exporter. The newly-constructed summary is
+    returned.
+
+ new_histogram
+
+       $histogram = $prometheus->new_histogram( %args )
+
+    Constructs a new Net::Prometheus::Histogram using the arguments given
+    and registers it with the exporter. The newly-constructed histogram is
+    returned.
+
+ new_metricgroup
+
+       $group = $prometheus->new_metricgroup( %args )
+
+    Returns a new Metric Group instance as a convenience for registering
+    multiple metrics using the same namespace and subsystem arguments.
+    Takes the following named arguments:
+
+    namespace => STR
+
+    subsystem => STR
+
+      String values to pass by default into new metrics the group will
+      construct.
+
+    Once constructed, the group acts as a proxy to the other new_* methods,
+    passing in these values as overrides.
+
+       $gauge = $group->new_gauge( ... )
+       $counter = $group->new_counter( ... )
+       $summary = $group->new_summary( ... )
+       $histogram = $group->new_histogram( ... )
+
+ collect
+
+       @metricsamples = $prometheus->collect
+
+    Returns a list of "MetricSamples" in Net::Prometheus::Types obtained
+    from all of the currently-registered collectors.
+
+ render
+
+       $str = $prometheus->render
+
+    Returns a string in the Prometheus text exposition format containing
+    the current values of all the registered metrics.
+
+ psgi_app
+
+       $app = $prometheus->psgi_app
+
+    Returns a new PSGI application as a CODE reference. This application
+    will render the metrics in the Prometheus text exposition format,
+    suitable for scraping by the Prometheus collector.
+
+    This application will respond to any GET request, and reject requests
+    for any other method.
+
+COLLECTORS
+
+    The toplevel Net::Prometheus object stores a list of "collector"
+    instances, which are used to generate the values that will be made
+    visible via the "render" method. A collector can be any object instance
+    that has a method called collect, which when invoked is passed no
+    arguments and expected to return a list of "MetricSamples" in
+    Net::Prometheus::Types structures.
+
+       @metricsamples = $collector->collect
+
+    The Net::Prometheus::Metric class is already a valid collector (and
+    hence, so too are the individual metric type subclasses). This
+    interface allows the creation of new custom collector objects, that
+    more directly collect information to be exported.
+
+TODO
+
+      * Perl-specific variable collector - arena stats?
+
+      * Split Registry out from toplevel instance.
+
+      * Write some actual example programs.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

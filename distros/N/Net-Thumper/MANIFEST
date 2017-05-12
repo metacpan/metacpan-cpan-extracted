@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Net/Thumper.pm
+t/amqp0-8.xml
+t/lib/Test/Net/Thumper.pm
+t/thumper.t

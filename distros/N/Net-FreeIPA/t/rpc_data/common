@@ -1,0 +1,30 @@
+$cmds{fail_find}{cmd}="0 host_find";
+$cmds{fail_find}{error}={message => 'unittest error'};
+
+$cmds{no_find}{cmd}="1 host_find";
+$cmds{no_find}{count}=0;
+
+$cmds{one_find}{cmd}="2 host_find";
+$cmds{one_find}{result}=[{unittest => 1}];
+
+$cmds{two_find}{cmd}="3 host_find";
+$cmds{two_find}{count}=2;
+$cmds{two_find}{result}=[{unittest => 2},{unittest => 3}];
+
+$cmds{fail_add}{cmd}="0 host_add";
+$cmds{fail_add}{error}={name => 'unittest'};
+
+$cmds{fail_add_already}{cmd}="1 host_add";
+$cmds{fail_add_already}{error}={name => 'DuplicateEntry'};
+
+$cmds{fail_mod}{cmd}="1 host_mod";
+$cmds{fail_mod}{error}={name => 'NotFound'};
+
+$cmds{fail_disable}{cmd}="1 host_disable";
+$cmds{fail_disable}{error}={name => 'AlreadyInactive'};
+
+$cmds{four_find}{cmd}="4 host_find";
+$cmds{four_find}{error}={name => 'NotFound'};
+
+$cmds{ok_add}{cmd}="2 host_add";
+$cmds{ok_add}{result}={unittest => { woohoo => 1}};

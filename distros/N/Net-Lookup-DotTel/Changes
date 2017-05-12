@@ -1,0 +1,16 @@
+**** 0.03 May 13, 2009
+
+Fixed handling of third level domains by lookup(). The lookup() method now
+uses a query for 'any' records (instead of 'ns') to see if a domain exists.
+Reported by Ralph Bullet.
+
+**** 0.02 May 6, 2009
+
+Fixed processing of non-terminal NAPTR records and handling of
+get_services() without any parameters. Patch by Henri Asseily.
+
+Fixed the total lack of a test suite; added some basic tests.
+
+**** 0.01 April 9, 2009
+
+Initial release.

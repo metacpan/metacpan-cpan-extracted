@@ -1,0 +1,6 @@
+\#.*\#
+.git
+.*~
+MYMETA.json
+.*.gz
+.*.bz2

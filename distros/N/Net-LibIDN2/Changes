@@ -1,0 +1,13 @@
+0.03 2013-01-25
+	* doc changes
+	* include Devel::CheckLib to check for GNU LibIDN dependency
+0.02 2013-01-05
+	* support for u8/ul versions
+	* support for check_version
+	* doc changes
+	* CPAN release prep
+0.01 2012-02-19
+	* initial commit
+	* no support for u8/ul versions yet
+
+# vim:set tabstop=4 shiftwidth=4 noexpandtab:

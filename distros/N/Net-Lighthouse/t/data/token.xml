@@ -1,0 +1,10 @@
+<token>
+  <created-at type="datetime">2007-04-21T18:17:32Z</created-at>
+  <note>test 1</note>
+  <project-id type="integer"></project-id>
+  <read-only type="boolean">false</read-only>
+  <token>01234567890123456789012345678900123456789</token>
+  <user-id type="integer">1</user-id>
+  <account>http://activereload.lighthouseapp.com</account>
+</token>
+

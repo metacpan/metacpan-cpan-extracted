@@ -1,0 +1,33 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.002001
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+0.002000 2016-04-27T14:15:14Z
+ [Added / configure requires]
+ - perl 5.010
+
+ [Added / runtime requires]
+ - JSON::MaybeXS
+
+ [Added / test requires]
+ - File::Spec
+ - perl 5.010
+
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Changed / runtime requires]
+ - Moo 0 → 1.000008
+
+ [Removed / runtime requires]
+ - JSON
+ - utf8
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+0.001001 2014-04-22T11:33:16Z

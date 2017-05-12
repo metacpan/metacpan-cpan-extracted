@@ -1,0 +1,36 @@
+Revision history for Number-AnyBase
+
+1.60000       2013-01-04 19:04:33 Europe/Rome
+
+   * Doc Fixes
+      * The DNA Compression and the Binary-to-text Encoding recipes did not
+        consider the zero-padding issue.
+
+1.50002       2013-01-04 16:53:57 Europe/Rome
+
+   * Doc Enhancements
+      * Minor enhancements in the code of the Binary-to-text Encoding recipe.
+
+1.50001       2013-01-04 16:07:30 Europe/Rome
+
+   * Doc Enhancements
+      * Some clarifications on the DNA Compression recipe in the COOKBOOK and
+        some other minor changes here and there.
+
+1.50000       2013-01-04 14:12:56 Europe/Rome
+
+   * Code Fixes
+      * Contrary to the docs, base64 and base64url alphabets were not sorted.
+
+   * Code Enhancements
+      * Specialized constructors added: new_hex_lc, new_dna, new_dna_lc,
+        new_bytes.
+
+   * Doc Enhancements
+      * Recipes added to the COOKBOOK section: DNA Compression,
+        Binary-to-text Encoding, UUID Compression.
+      * Several minor fixes and enhancements.
+
+1.00000       2012-12-31 07:05:49 Europe/Rome
+
+   * First release.

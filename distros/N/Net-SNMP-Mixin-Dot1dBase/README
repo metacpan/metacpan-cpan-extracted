@@ -1,0 +1,117 @@
+NAME
+    Net::SNMP::Mixin::Dot1dBase - mixin class for the switch dot1d base
+    values
+
+VERSION
+    Version 0.06
+
+SYNOPSIS
+    A Net::SNMP mixin class for Dot1d base info.
+
+      use Net::SNMP;
+      use Net::SNMP::Mixin;
+
+      # class based mixin
+      Net::SNMP->mixer('Net::SNMP::Mixin::Dot1dBase');
+
+      # ...
+
+      my $session = Net::SNMP->session( -hostname => 'foo.bar.com' );
+
+      $session->mixer('Net::SNMP::Mixin::Dot1dBase');
+      $session->init_mixins;
+      snmp_dispatcher() if $session->nonblocking;
+      $session->init_ok;
+      die $session->errors if $session->errors;
+
+      my $base_group = $session->get_dot1d_base_group;
+
+      printf "BridgeAddr: %s NumPorts: %d Type: %d\n",
+        $base_group->{dot1dBaseBridgeAddress},
+        $base_group->{dot1dBaseNumPorts},
+        $base_group->{dot1dBaseType};
+
+      my $map = $session->map_bridge_ports2if_indexes;
+
+      foreach my $bridge_port ( sort {$a <=> $b} keys %$map ) {
+        my $if_index = $map->{$bridge_port};
+        printf "bridgePort: %4d -> ifIndex: %4\n", $bridge_port, $if_index;
+      }
+
+DESCRIPTION
+    A mixin class for basic switch information from the BRIDGE-MIB.
+
+    Besides the bridge address and the number of bridge ports, it's primary
+    use is the mapping between dot1dBasePorts and ifIndexes.
+
+MIXIN METHODS
+  OBJ->get_dot1d_base_group()
+    Returns the dot1dBase group as a hash reference:
+
+      {
+        dot1dBaseBridgeAddress => MacAddress,
+        dot1dBaseNumPorts      => INTEGER,
+        dot1dBaseType          => INTEGER,
+      }
+
+  OBJ->map_bridge_ports2if_indexes()
+    Returns a reference to a hash with the following entries:
+
+      {
+        # INTEGER        INTEGER
+        dot1dBasePort => dot1dBasePortIfIndex,
+      }
+
+  OBJ->map_if_indexes2bridge_ports()
+    Returns a reference to a hash with the following entries:
+
+      {
+        # INTEGER               INTEGER
+        dot1dBasePortIfIndex => dot1dBasePort ,
+      }
+
+INITIALIZATION
+  OBJ->_init($reload)
+    Fetch the dot1d base related snmp values from the host. Don't call this
+    method direct!
+
+PRIVATE METHODS
+    Only for developers or maintainers.
+
+  _fetch_dot1d_base($session)
+    Fetch values from the dot1dBase group once during object initialization.
+
+  _dot1d_base_cb($session)
+    The callback for _fetch_dot1d_base.
+
+  _fetch_dot1d_base_ports($session)
+    Populate the object with the dot1dBasePorts.
+
+  _dot1d_base_ports_cb($session)
+    The callback for _fetch_dot1d_base_ports.
+
+REQUIREMENTS
+    Net::SNMP, Net::SNMP::Mixin
+
+BUGS, PATCHES & FIXES
+    There are no known bugs at the time of this release. However, if you
+    spot a bug or are experiencing difficulties that are not explained
+    within the POD documentation, please submit a bug to the RT system (see
+    link below). However, it would help greatly if you are able to pinpoint
+    problems or even supply a patch.
+
+    Fixes are dependant upon their severity and my availablity. Should a fix
+    not be forthcoming, please feel free to (politely) remind me by sending
+    an email to gaissmai@cpan.org .
+
+      RT: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-SNMP-Mixin-Dot1dBase
+
+AUTHOR
+    Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
+
+COPYRIGHT & LICENSE
+    Copyright 2008-2016 Karl Gaissmaier, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

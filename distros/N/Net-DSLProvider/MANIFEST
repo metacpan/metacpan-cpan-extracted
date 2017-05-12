@@ -1,0 +1,18 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+LICENSE
+lib/Net/DSLProvider.pm
+lib/Net/DSLProvider/Cerberus/soap.pm
+lib/Net/DSLProvider/Cerberus.pm
+lib/Net/DSLProvider/Enta.pm
+lib/Net/DSLProvider/Entanet.pm
+lib/Net/DSLProvider/Murphx.pm
+t/00-load.t
+t/01-murphx.t
+t/02-murphx-live.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

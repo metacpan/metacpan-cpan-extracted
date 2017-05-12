@@ -1,0 +1,10 @@
+$args =
+{
+ message_type => MQTT_UNSUBSCRIBE,
+ message_id => 1,
+ topics => [ qw/testing/ ],
+}
+
+a2 0b 00 01  00 07 74 65    73 74 69 6e  67
+
+Unsubscribe/at-least-once 1 testing 

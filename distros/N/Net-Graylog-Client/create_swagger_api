@@ -1,0 +1,349 @@
+#!/usr/bin/env perl
+# create_api
+# should be able to be used with any swagger backed api-docs
+# info on swagger here https://helloreverb.com/developers/swagger
+
+# (c) Kevin Mulholland, moodfarm@cpan.org
+# this code is released under the Perl Artistic License
+
+use 5.16.0;
+use strict;
+use warnings;
+use POSIX qw(strftime);
+use Data::Printer;
+use Furl;
+use JSON;
+use Path::Tiny;
+use App::Simple;
+
+my $verbose;
+
+# -----------------------------------------------------------------------------
+# basic debug to STDERR, redirect to anywhere you like
+
+sub other_debug {
+    my ( $lvl, $debug ) = @_;
+    if ( !$debug ) {
+        $debug = $lvl;
+
+        # set a default level
+        $lvl = 'INFO';
+    }
+
+    say STDERR strftime( '%Y-%m-%d %H:%M:%S', gmtime( time() ) ) . " [$lvl] " . get_program() . " " . $debug if ($verbose);
+}
+
+# -----------------------------------------------------------------------------
+# if the url contains braces {}, these need to be escaped
+sub escape_braces {
+    my ($url) = @_;
+
+    $url =~ s/\{/%7B/g;
+    $url =~ s/\}/%7D/g;
+
+    return $url;
+}
+
+# -----------------------------------------------------------------------------
+# fetch json from the passed url
+sub fetch_json {
+    my ($url) = @_;
+    debug( "INFO", "Fetching $url" );
+
+    $url = escape_braces($url);
+    my $json;
+
+    my $furl = Furl->new(
+        agent   => __PACKAGE__,
+        timeout => 1,
+    );
+
+    my $res = $furl->get($url);
+
+    if ( $res->is_success ) {
+        $json = decode_json( $res->content );
+    }
+
+    # add json into the furl response, a bit dodgy to do this but keeps things
+    # clean
+    $res->{json} = $json;
+    return $res;
+}
+
+# -----------------------------------------------------------------------------
+# main
+
+my $program = get_program();
+
+my %opt = init_app(
+    help_text    => "Build a perl module to interface with a server API from a hosted Swagger API",
+    help_cmdline => "",
+    options      => {
+        'verbose|v' => 'Dump extra useful information',
+        'url|u=s'   => {
+            desc     => 'URL of swagger server (eg http://localhost:12900/api-docs)',
+            required => 1,
+            validate => sub {
+                my $url = shift;
+                return $url =~ m|^http\s?://.*?/api-docs/?$|;
+            },
+        },
+        'module|m=s' => { desc => 'Name of perl module to create', required => 1 },
+        'file|f=s' => { desc => 'File to write module into'},
+    }
+);
+
+my ($commands, %names);
+
+set_debug( \&other_debug );
+
+$verbose = $opt{verbose};
+debug( "INFO", "Started" );
+
+$opt{url} =~ s|/$||;    # remove any trailing '/'
+
+# 12900 is the default port for the graylog reporting server
+# api-docs is the base url for the docs, gives us JSON to find other docs
+# based on swagger
+my $base_url = $opt{url};
+
+# from the base url we can get the list of api components
+
+my $res = fetch_json($base_url);
+if ( !$res->is_success ) {
+    msg_exit( "Could not connect to $base_url (" . $res->message . ")", 2 );
+}
+
+my $api_data = $res->{json};
+
+if ( !$api_data || !$api_data->{apis} ) {
+    msg_exit( "This server does not seem to provide Swagger APIs", 2 );
+}
+
+#@todo save the API files that were fetched from the server
+
+foreach my $api ( @{ $api_data->{apis} } ) {
+    my $api_url = "$base_url$api->{path}";
+    $res = fetch_json($api_url);
+    if ( !$res->is_success ) {
+        say STDERR "Could not obtain API from $api_url (" . $res->code . ")";
+        next;
+    }
+
+    my $apis = $res->{json};
+
+    # say STDERR p($apis);
+    if ( !$apis || !$apis->{apis} ) {
+        say STDERR "Could not decode API from $api_url";
+
+        next;
+    }
+    $commands .= "=head2 $api->{name}
+
+$api->{description}
+
+=cut\n\n";
+
+    foreach my $ops ( @{ $apis->{apis} } ) {
+        my $path = $ops->{path};
+
+        # array of operations
+        foreach my $op ( @{ $ops->{operations} } ) {
+            my $doc = "# " . ( "-" x 77 ) . "\n\n";
+            my $name = $api->{name} . "_$op->{nickname}";
+
+            # prefix
+            $name =~ s/([A-Z])/_$1/g;
+            $name = lc($name);
+            $name =~ s/^_//;
+            $name =~ s|/||g;
+
+            # somethines the delete methods have the same name as the
+            # list methods, this allows us to have distinct names
+            if( $names{$name}) {
+                $name = lc($op->{method}) . "_$name" ;
+            }
+            $names{ $name} = $name ;
+
+            $doc .= "=head3 $name\n\n";
+
+            $doc .= "$op->{summary}\n\n"     if ( $op->{summary} );
+            $doc .= "Note: $op->{notes}\n\n" if ( $op->{notes} );
+
+            my $current = "sub $name {
+\tmy \$self = shift ;
+\tmy (\$params) = \@_ ;
+\tmy (\$url) ;
+\tmy \@required ;
+";
+
+            # if we need to include a parameter in the path
+            if ( $path =~ /\{/ ) {
+                my $new = $path;
+                $new =~ s/\{(.*?)\}/\$params->{$1}/g;
+                $current .= "\t\$url = '$new' ; \n";
+            }
+            else {
+                $current .= "\t\$url = '$path' ; \n";
+            }
+
+            # now add in any required fields
+            my @req;
+            my $optional = "";
+            my $required = "";
+            foreach my $p ( @{ $op->{parameters} } ) {
+                if ( $p->{required} ) {
+                    $required .= "  * $p->{name}\t$p->{description}\n";
+                }
+                else {
+                    $optional .= "  * $p->{name}\t$p->{description}\n";
+                }
+                push @req, $p->{name};
+            }
+            $doc .= "Required parameters\n\n$required\n" if ($required);
+            $doc .= "Optional parameters\n\n$optional\n" if ($optional);
+
+            # decide what data is being returned
+            if ( $op->{produces} ) {
+                if ( grep ( /application\/json/, @{ $op->{produces} } ) ) {
+                    $doc .= "Returns: Normal Furl::Response with decoded JSON in json element\n\n";
+                }
+                elsif ( grep ( /text\/plain/, @{ $op->{produces} } ) ) {
+                    $doc .= "Returns: Normal Furl::Response, possible plain text response in content\n\n";
+                }
+                elsif ( grep ( /applicatino\/xml/, @{ $op->{produces} } ) ) {
+                    $doc .= "Returns: Normal Furl::Response, XML in content\n\n";
+                }
+                else {
+                    $doc .= "Returns: Normal Furl::Response, encoded data in  content\n\n";
+                }
+            }
+            else {
+                $doc .= "Returns: Normal Furl::Response, possible data in content\n\n";
+            }
+
+            # check required parameters in the script
+            $current .= "
+\tmap { die( \"Missing parameter \$_ \") if( !\$params->{\$_}) ; } qw( " . join( ' ', @req ) . ") ;
+";
+
+            $current .= "
+\tmy \$res = \$self->_furl->" . lc( $op->{method} ) . "(\$url, {}, \$params);\n";
+
+            if ( $op->{produces} && grep ( /application\/json/, @{ $op->{produces} } ) ) {
+
+                # add a JSON decode if needed
+                $current .= "
+\tif ( \$res->is_success ) {
+\t\tmy \$json = decode_json( \$res->content );
+\t\t\$res->{json} = \$json;
+\t}" ;
+            }
+            $current .= "\treturn \$res;
+}\n\n";
+
+            $commands .= "$doc=cut\n\n$current";
+
+        }
+    }
+}
+
+# read the data section after __END__
+my $module = join( "", <DATA> );
+
+$module =~ s/%%MODULE%%/$opt{module}/gsm;
+$module =~ s/%%COMMANDS%%/$commands/gsm;
+my $package = get_program() ;
+$module =~ s/%%AUTHOR%%/$package/gsm;
+
+if( $opt{file}) {
+    path($opt{file})->spew($module);
+} else {
+    say $module ;
+}
+
+# -----------------------------------------------------------------------------
+
+__END__
+
+# ABSTRACT: API Client for %%MODULE%%
+
+=head1 NAME
+
+%%MODULE%%
+
+=head1 SYNOPSIS
+
+  use %%MODULE%% ;
+ 
+  my $api = %%MODULE%%->new( url => 'http://server:12345' ) ;
+
+  $api->api_command( message => 'testing', 'debug') ;
+
+=head1 DESCRIPTION
+
+This module has been autogenerated against a Swagger API, hopefully
+the author has fixed up the documentation
+
+=head1 AUTHOR
+
+autogenerated by %%AUTHOR%%, 
+Which was created by kevin Mulholland, moodfarm@cpan.org
+ 
+=head1 VERSIONS
+
+v0.1  
+
+=head1 Notes
+
+
+=cut
+
+# I am assuming you are using Dist::Zilla and have set [PkgVersion] in yout dist.ini
+# to create the $%%MODULE%%::VERSION variable
+
+package %%MODULE%%;
+
+use 5.16.0;
+use strict;
+use warnings;
+use Furl;
+use Moo;
+
+use namespace::clean;
+
+# -----------------------------------------------------------------------------
+
+=head1 Public Functions
+
+=over 4
+
+=cut
+
+=item new
+
+Create a new instance of the api connection
+
+    my $api = %%MODULE%%->new( url => 'http://server:12345') ;
+
+B<Parameters>
+  url the url of the server API, of the form http://server:12345
+
+=cut
+
+has url      => ( is => 'ro', required => 1 );
+has user     => ( is => 'ro', required => 1 );
+has password => ( is => 'ro', required => 1 );
+
+has _furl => ( 
+    is => 'ro', 
+    default => sub {
+        return Furl->new( agent => __PACKAGE__, timeout => 1 );
+    }, 
+    init_arg => undef 
+);
+
+%%COMMANDS%%
+
+# -----------------------------------------------------------------------------
+1;

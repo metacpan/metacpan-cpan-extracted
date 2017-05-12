@@ -1,0 +1,34 @@
+Revision history for Number-Format-Metric
+
+0.60    2014-12-05 (PERLANCAR)
+
+        - Rename module/dist from SHARYANTO-Number-Util to Number-Format-Metric.
+
+
+0.59    2014-05-05 (SHARYANTO)
+
+        - No functional changes.
+
+        - Fix setlocale invocation in test, derp.
+
+
+0.58    2014-05-01 (SHARYANTO)
+
+        - No functional changes.
+
+        - Try to set locale earlier and with POSIX::setlocale to avoid failure
+          reports [CT#94487].
+
+
+0.57    2014-04-07 (SHARYANTO)
+
+        - No functional changes.
+
+        - Fix some broken tests by changing LANG to LC_ALL [thanks Slaven
+          Rezic, CT#94487].
+
+
+0.56    2013-09-10 (SHARYANTO)
+
+        - No functional changes. Split from SHARYANTO-Utils to minimize
+          dependencies (I'm trying to make Text::ANSITable work under Windows).

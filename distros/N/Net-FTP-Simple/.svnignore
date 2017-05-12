@@ -1,0 +1,13 @@
+blib*
+Makefile
+Build
+_build*
+pm_to_blib*
+*.tar.gz
+.lwpcookies
+Net-FTP-Simple-*
+cover_db
+tmp/*
+.*.swp
+*.bak
+*.old

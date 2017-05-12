@@ -1,0 +1,30 @@
+---
+abstract: 'The EFS project, NetApp API'
+author:
+  - 'Phillip Moore <wpm@openefs.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Exception: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.93'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: NetApp
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Std: 0
+  Clone: 0
+  IPC::Cmd: 0
+  Memoize: 0
+  Net::Telnet: 0
+  Params::Validate: 0
+  Regexp::Common: 0
+  perl: 5.10.0
+version: 500.002

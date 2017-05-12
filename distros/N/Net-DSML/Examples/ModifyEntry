@@ -1,0 +1,54 @@
+#!/usr/local/bin/perl 
+use Net::DSML;
+use Net::DSML::Filter;
+use Net::DSML::Control;
+
+# 
+# Be sure to set up the first line to point to your perl executable location.
+#
+# Fill in the server, dn, replace hash key and tel variables with values that
+# match your configuration.
+#
+# 
+# This example shows how to modify an entry in the ldap directory.
+# 
+my $server = "http://dsml.yourcompany.com:8080/dsml";
+ 
+   #
+   #  We are going to do a Modify entry request
+   #
+   # Also going to specify a specific batch requestID.
+   # HTTP Basic authenication.
+   #
+   #
+   $webdsml = Net::DSML->new(  { url => $server, 
+                            bid => "999", 
+                            dn => "master", 
+                            password => "blaster"} );
+  # 
+  # This is an example of the using a proxydn for authenication.
+  #
+  # $webdsml->setAuth( { dn => "uid=master,ou=people,dc=yourcompany,dc=com" } );
+
+  my $tel = "456-543-7894";
+   if (!($webdsml->modify( { 
+            dn => "cn=Burning Man, ou=people, dc=yourcompany, dc=com",
+            modify => { 
+            replace => { telephoneNumber => \$tel } } } ) ) )
+   {
+      print "Modify error.\n";
+      print $webdsml->error, "\n";
+      exit;
+   }
+
+   if (!($webdsml->send()))
+   {
+      print "Modify entry send request error.\n";
+      print $webdsml->error(),"\n";
+      exit;
+   }
+
+# get the return xml content, should be the status of the dsml request.
+$postData = $webdsml->content();
+print $postData, "\n";
+

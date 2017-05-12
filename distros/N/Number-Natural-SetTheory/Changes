@@ -1,0 +1,27 @@
+Number-Natural-SetTheory
+========================
+
+Created:      2011-11-30
+Home page:    <https://metacpan.org/release/Number-Natural-SetTheory>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Number-Natural-SetTheory>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.004	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.003	2012-12-12
+
+ [ Documentation ]
+ - Document test suite.
+
+ [ Other ]
+ - 'use base' instead of 'use parent'.
+
+0.002	2011-12-03
+
+ [ Packaging ]
+ - Use newer version of Module::Package::RDF
+
+0.001	2011-11-30	Initial release

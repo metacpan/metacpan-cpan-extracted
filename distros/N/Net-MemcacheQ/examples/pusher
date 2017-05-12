@@ -1,0 +1,10 @@
+#!/usr/bin/env perl -T
+use strict;
+use warnings;
+use Net::MemcacheQ;
+
+my $nmq = Net::MemcacheQ->new();
+
+for my $i (1..100) {
+  $nmq->push('demoqueue', "message $i");
+}

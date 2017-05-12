@@ -1,0 +1,232 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use App::Rad;
+use Net::Rackspace::Notes qw(notes);
+use Term::ReadPassword qw(read_password);
+
+sub setup {
+    my $c = shift;
+    $c->register_commands({
+        add     => 'add a new note, content is read from stdin',
+        append  => 'append the content of stdin to the note',
+        delete  => 'delete the note',
+        list    => 'lists id and subject of all notes',
+        replace => 'replace the contents of the note',
+        show    => 'show the contents of the note',
+    });
+}
+
+sub pre_process {
+    my $c = shift;
+    my $cmd = $c->cmd;
+    return if not $cmd or $cmd eq 'help';
+    return unless grep { $_ eq $cmd } $c->commands;
+    my ($email, $password) = get_login_info($c);
+    $c->stash->{racknotes} = Net::Rackspace::Notes->new(
+        email    => $email,
+        password => $password,
+    );
+}
+
+App::Rad->run();
+
+# commands ---------------------------------------------------------------------
+
+sub add {
+    my $c = shift;
+    my $subject = get_arg('subject');
+    my $body = read_stdin();
+    my $racknotes = $c->stash->{racknotes};
+    my $response = $racknotes->add_note($subject, $body);
+    #print $response->content . "\n" unless $response->is_success;
+    return "status: " . $response->status_line;
+}
+
+sub append {
+    my $c = shift;
+    my $num = get_arg('note number');
+    my $racknotes = $c->stash->{racknotes};
+    my $body = read_stdin();
+    my $note = $racknotes->notes->[$num];
+    my $content = $note->{content} . $body;
+    my $response = $racknotes->put_note($content, $num);
+    return "status: " . $response->status_line;
+}
+
+sub replace {
+    my $c = shift;
+    my $num = get_arg('note number');
+    my $racknotes = $c->stash->{racknotes};
+    my $body = read_stdin();
+    my $response = $racknotes->put_note($body, $num);
+    return "status: " . $response->status_line;
+}
+
+sub delete {
+    my $c = shift;
+    my $num = get_arg('note number');
+    my $racknotes = $c->stash->{racknotes};
+    my $response = $racknotes->delete_note($num);
+    return ref $response ? "status: " . $response->status_line : $response;
+}
+
+sub show {
+    my $c = shift;
+    my $num = get_arg('note number');
+    my $racknotes = $c->stash->{racknotes};
+    my $note = $racknotes->notes->[$num];
+    return join "\n",
+        "Subject: $note->{subject}",
+        "Date: " . localtime $note->{last_modified},
+        "Note:\n$note->{content}";
+}
+
+sub list {
+    my $c = shift;
+    my $count = 0;
+    my $racknotes = $c->stash->{racknotes};
+    return join "\n",
+        map { sprintf "%2d: %s", $count++, $_->{subject} } $racknotes->notes;
+}
+
+sub get_arg {
+    my $name = shift;
+    die "$name is required\n" unless @ARGV;
+    die "too many arguments\n" if @ARGV > 1;
+    return $ARGV[0];
+}
+
+sub get_login_info {
+    my $c = shift;
+    my ($email, $password);
+    my $config_path = "$ENV{HOME}/.racknotes";
+    if (-f $config_path) {
+        $c->load_config($config_path);
+        ($email, $password) = @{$c->config}{qw(email password)};
+        validate_email($email);
+        $password = read_password('password: ')
+            if not defined($password) or $password eq '';
+    } else {
+        print "If you don't want to enter your account info each time, you\n",
+            "can create a config file at $config_path with 2 entries:\n",
+            "  email = bob\@foo.com\n",
+            "  password = foo\n\n",
+            "Your config file may also just contain the email entry without\n",
+            "the password entry. You will then just be prompted for your\n",
+            "password when you run racknotes.\n\n";
+
+        print "email: ";
+        chomp($email = <STDIN>);
+        validate_email($email);
+        $password = read_password('password: ');
+    }
+    return ($email, $password);
+}
+
+sub read_stdin { local $/; <STDIN> }
+
+sub validate_email {
+    my $email = shift;
+    $email = '' if not defined $email;
+    die "[$email] is not a valid email address\n" unless $email =~ /.+@.+\..+/;
+}
+
+# ABSTRACT: A command line interface to Rackspace Email Notes.
+# PODNAME: racknotes
+
+
+__END__
+=pod
+
+=head1 NAME
+
+racknotes - A command line interface to Rackspace Email Notes.
+
+=head1 VERSION
+
+version 1.0000
+
+=head1 SYNOPSIS
+
+  Usage: racknotes command [arguments]
+  
+  Available Commands:
+      add         add a new note, content is read from stdin
+      append      append the content of stdin to the note
+      delete      delete the note
+      help        show syntax and available commands
+      list        lists id and subject of all notes
+      replace     replace the contents of the note
+      show        show the contents of the note
+
+  # List all of your notes.
+  $ racknotes list
+
+  # Delete note number 3.
+  $ racknotes delete 3
+
+  # Some commands expect to read text from stdin. You can type some text
+  # and then hit <ctrl-d> when you are done.
+  $ racknotes add 'some subject'
+  blah blah blah
+  <ctrl-d>
+
+  # Or you could use pipes or redirection.
+  $ echo allo | racknotes add 'adding note via pipe'
+  $ racknotes add 'adding note via file redirection' < some_file.txt
+
+=head1 DESCRIPTION
+
+This program is a command line tool to interface with Rackspace Email Notes.
+
+=head1 COMMANDS
+
+=over 4
+
+=item B<help>
+
+Print a brief help message.
+
+=item B<add subject>
+
+Add a new note with the given subject.
+The contents of the note will be read from stdin.
+
+=item B<append num>
+
+Append the content of stdin to the note.
+
+=item B<delete num>
+
+Delete the note.
+
+=item B<list>
+
+List all the notes.
+Each note is numbered so that other commands can refer to them via the number.
+
+=item B<replace num>
+
+Replace the contents of the note.
+The new content is read from stdin.
+
+=item B<show num>
+
+Show the contents of the note.
+
+=back
+
+=head1 AUTHOR
+
+Naveed Massjouni <naveedm9@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Naveed Massjouni.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

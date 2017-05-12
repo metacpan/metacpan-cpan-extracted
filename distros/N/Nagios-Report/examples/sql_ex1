@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+use strict ;
+
+use Nagios::Report ;
+
+# $SIG{__WARN__} = sub { 0 } ;
+# Futile attempt to shut up whining by DBI/AnyData.
+
+my $x = Nagios::Report->new('local_cgi Nagios_Server Auth_Nagios_User', [ '24x7' ], '0000 01.02.2006 - 1500 27.02.2006') ;
+
+my $SQL =<<SQL;
+SELECT host_name,
+       total_time_down,
+       time_down_scheduled,
+       time_down_unscheduled
+FROM tab_24x7
+     WHERE total_time_down   >= 300
+SQL
+
+my ($d) = $x->to_dbh ;
+my $s   = $d->prepare($SQL) ;
+
+   $s->execute ;
+   $s->dump_results ;
+   $s->finish ;
+   $d->disconnect ;

@@ -1,0 +1,17 @@
+Build.PL
+Changes
+examples/addr_net6.pl
+examples/intf_get6.pl
+examples/intf_get_dst6.pl
+examples/route_get6.pl
+lib/Net/Libdnet6.pm
+LICENSE
+LICENSE.Artistic
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-use.t
+t/02-test-pod.t
+t/03-pod-coverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

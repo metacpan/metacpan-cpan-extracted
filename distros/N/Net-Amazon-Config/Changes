@@ -1,0 +1,12 @@
+Revision history for Net-Amazon-Config
+
+0.002     2014-02-27 22:29:04-05:00 America/New_York
+
+    [CHANGED]
+
+    - Updated metadata, repo and bugtracker
+
+    - Switched distribution management to Dist::Zilla
+
+0.001 Thu Mar  4 17:03:50 EST 2010
+    - first release to CPAN

@@ -1,0 +1,14 @@
+Revision history for noid script and Noid module.
+
+0.424	Some portability fixes.  Added notes to README file on installation
+	of noid and its prerequisites in user space, with addition of a
+	step to untaint PERL5LIB (which wasn't getting through).  Noted
+	that a future version of noid will have to change the minter
+	database directory from NOID to dbnoid due to potential conflicts
+	on case-insensitive filesystems (eg, Mac OS).
+
+0.423	Documentation fixes.
+
+0.422	Fixed flock bug.
+
+0.421	Initial release.

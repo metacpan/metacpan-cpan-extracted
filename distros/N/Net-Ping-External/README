@@ -1,0 +1,19 @@
+Net::Ping::External README
+
+Author: Alexandr Ciornii (alexchorny AT gmail.com) (2006-2007)
+Colin McMillen (colinm AT cpan.org) (2001-2003)
+
+Installation:
+-------------
+perl Makefile.PL
+make
+make test
+make install
+
+ActiveState Installation:
+-------------
+Package available from http://chorny.net/perlmod/
+
+Description:
+------------
+See the POD in External.pm for more information.

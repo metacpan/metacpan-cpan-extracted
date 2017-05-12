@@ -1,0 +1,66 @@
+//
+// $Id$
+//
+
+digraph db_schema {
+   //
+   // Tables
+   //
+   SystemClass   [label="{SystemClass|idSystemClass\lsystemClass\l}", shape=record];
+   Vendor        [label="{Vendor|idVendor\lvendor\l}", shape=record];
+   Os            [label="{Os|idOs\los\l}", shape=record];
+   OsVersion     [label="{OsVersion|idOsVersion\losVersion\l}", shape=record];
+   OsVersionFamily [label="{OsVersionFamily|idOsVersionFamily\losVersionFamily\l}", shape=record];
+   OsVersionChildren [label="{OsVersionChildren|idOsVersionChildren\lidSignature\lidSignatureP\lidOsVersion\l}", shape=record];
+   PatternBinary [label="{PatternBinary|idPatternBinary\lpatternBinaryHeuristic0\lpatternBinaryHeuristic1\lpatternBinaryHeuristic2\l}", shape=record];
+   PatternTcpFlags [label="{PatternTcpFlags|idPatternTcpFlags\lpatternTcpFlagsHeuristic0\lpatternTcpFlagsHeuristic1\lpatternTcpFlagsHeuristic2\l}", shape=record];
+   PatternTcpWindow [label="{PatternTcpWindow|idPatternTcpWindow\lpatternTcpWindowHeuristic0\lpatternTcpWindowHeuristic1\lpatternTcpWindowHeuristic2\l}", shape=record];
+   PatternTcpOptions [label="{PatternTcpOptions|idPatternTcpOptions\lpatternTcpOptionsHeuristic0\lpatternTcpOptionsHeuristic1\lpatternTcpOptionsHeuristic2\l}", shape=record];
+   PatternTcpMss [label="{PatternTcpMss|idPatternTcpMss\lpatternTcpMssHeuristic0\lpatternTcpMssHeuristic1\lpatternTcpMssHeuristic2\l}", shape=record];
+   PatternTcpWScale [label="{PatternTcpWScale|idPatternTcpWScale\lpatternTcpWScaleHeuristic0\lpatternTcpWScaleHeuristic1\lpatternTcpWScaleHeuristic2\l}", shape=record];
+   PatternTcpOLength [label="{PatternTcpOLength|idPatternTcpOLength\lpatternTcpOLengthHeuristic0\lpatternTcpOLengthHeuristic1\lpatternTcpOLengthHeuristic2\l}", shape=record];
+   IpVersion     [label="{IpVersion|idIpVersion\lipVersion\l}", shape=record];
+   Signature     [label="{Signature|idSignature\ltrusted\lidIpVersion\lidSystemClass\lidVendor\lidOs\lidOsVersion\lidOsVersionFamily\lidS1PatternBinary\lidS1PatternTcpFlags\lidS1PatternTcpWindow\lidS1PatternTcpOptions\lidS1PatternTcpMss\lidS1PatternTcpWScale\lidS1PatternTcpOLength\lidS2PatternBinary\lidS2PatternTcpFlags\lidS2PatternTcpWindow\lidS2PatternTcpOptions\lidS2PatternTcpMss\lidS2PatternTcpWScale\lidS2PatternTcpOLength\lidS3PatternBinary\lidS3PatternTcpFlags\lidS3PatternTcpWindow\lidS3PatternTcpOptions\lidS3PatternTcpMss\lidS3PatternTcpWScale\lidS3PatternTcpOLength\l}", shape=record];
+
+   SignatureP   [label="{SignatureP|idSignatureP\ltrusted\lidIpVersion\lidSystemClass\lidVendor\lidOs\lidOsVersion\lidOsVersionFamily\lidPatternTcpFlags\lidPatternTcpWindow\lidPatternTcpOptions\lidPatternTcpMss\lidPatternTcpWScale\lidPatternTcpOLength\l}", shape=record];
+
+   //
+   // Active mode relations
+   //
+   Signature -> IpVersion     [label=idIpVersion, fontcolor=blue, color=blue];
+   Signature -> SystemClass   [label=idSystemClass, fontcolor=blue, color=blue];
+   Signature -> Vendor        [label=idVendor, fontcolor=blue, color=blue];
+   Signature -> Os            [label=idOs, fontcolor=blue, color=blue];
+   Signature -> OsVersion     [label=idOsVersion, fontcolor=blue, color=blue];
+   Signature -> OsVersionFamily [label=idOsVersionFamily, fontcolor=blue, color=blue];
+   Signature -> OsVersion     [label=idOsVersionChildren, fontcolor=blue, color=blue];
+   Signature -> PatternBinary [label=idPatternBinary, fontcolor=blue, color=blue];
+   Signature -> PatternTcpFlags [label=idPatternTcpFlags, fontcolor=blue, color=blue];
+   Signature -> PatternTcpWindow [label=idPatternTcpWindow, fontcolor=blue, color=blue];
+   Signature -> PatternTcpOptions [label=idPatternTcpOptions, fontcolor=blue, color=blue];
+   Signature -> PatternTcpMss [label=idPatternTcpMss, fontcolor=blue, color=blue];
+   Signature -> PatternTcpWScale [label=idPatternTcpWScale, fontcolor=blue, color=blue];
+   Signature -> PatternTcpOLength [label=idPatternTcpOLength, fontcolor=blue, color=blue];
+
+   OsVersionChildren -> Signature [label=idSignature, fontcolor=red, color=red];
+   OsVersionChildren -> OsVersion [label=idOsVersion, fontcolor=red, color=red];
+
+   //
+   // Passive mode relations
+   //
+   SignatureP -> IpVersion     [label=idIpVersion, fontcolor=blue, color=blue];
+   SignatureP -> SystemClass   [label=idSystemClass, fontcolor=blue, color=blue];
+   SignatureP -> Vendor        [label=idVendor, fontcolor=blue, color=blue];
+   SignatureP -> Os            [label=idOs, fontcolor=blue, color=blue];
+   SignatureP -> OsVersion     [label=idOsVersion, fontcolor=blue, color=blue];
+   SignatureP -> OsVersionFamily [label=idOsVersionFamily, fontcolor=blue, color=blue];
+   SignatureP -> OsVersion     [label=idOsVersionChildren, fontcolor=blue, color=blue];
+   SignatureP -> PatternTcpFlags [label=idPatternTcpFlags, fontcolor=blue, color=blue];
+   SignatureP -> PatternTcpWindow [label=idPatternTcpWindow, fontcolor=blue, color=blue];
+   SignatureP -> PatternTcpOptions [label=idPatternTcpOptions, fontcolor=blue, color=blue];
+   SignatureP -> PatternTcpMss [label=idPatternTcpMss, fontcolor=blue, color=blue];
+   SignatureP -> PatternTcpWScale [label=idPatternTcpWScale, fontcolor=blue, color=blue];
+   SignatureP -> PatternTcpOLength [label=idPatternTcpOLength, fontcolor=blue, color=blue];
+
+   OsVersionChildren -> SignatureP [label=idSignatureP, fontcolor=red, color=red];
+}

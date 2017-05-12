@@ -1,0 +1,20 @@
+Changes
+lib/Net/Frame/Layer/IGMP.pm
+lib/Net/Frame/Layer/IGMP/v3Query.pm
+lib/Net/Frame/Layer/IGMP/v3Report.pm
+LICENSE
+LICENSE.Artistic
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-use.t
+t/02-pod-coverage.t
+t/03-test-pod.t
+t/04-igmp.t
+t/05-v3Query.t
+t/06-v3Report.t
+t/07-v1.t
+t/08-v2.t
+t/09-v3.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

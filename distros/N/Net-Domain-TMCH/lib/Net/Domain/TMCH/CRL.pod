@@ -1,0 +1,120 @@
+=encoding utf8
+
+=head1 NAME
+
+Net::Domain::TMCH::CRL - TMCH Certificates Revokation List
+
+=head1 INHERITANCE
+
+ Net::Domain::TMCH::CRL
+   is a Exporter
+
+=head1 SYNOPSIS
+
+  # End-user interface
+
+  my $tmch = Net::Domain::TMCH->new
+    ( ...
+    , cert_revocations => $fn    # or $uri
+    );
+  $crl = $tmch->crl;
+
+  # create explicitly
+
+  my $crl  = Net::Domain::TMCH::CRL->fromFile($fn, %options);
+  my $crl  = Net::Domain::TMCH::CRL->fromURI($uri, %options);
+  my $crl  = Net::Domain::TMCH::CRL->new(source => 'hardcoded'
+    , revoked => \@serials);
+  my $tmch = Net::Domain::TMCH->new(..., cert_revocations => $crl);
+
+  if($crl->isRevoked($certificate)) ...
+  if($crl->isRevoked($certificate->serial)) ...
+
+=head1 DESCRIPTION
+
+Draft RFC L<http://tools.ietf.org/html/draft-lozano-tmch-func-07>
+specifies a way for TLD (domain registries) to exchange trademark rights
+(brand registrations).  This module manages the revocation list for TMV
+(Trademark Validator) certificates.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item $obj-E<gt>B<fromFile>($filename, %options)
+
+Read a CRL from file, for instance a cached or test CRL.
+The %options are passed to L<new()|Net::Domain::TMCH::CRL/"Constructors">.
+
+=item $obj-E<gt>B<fromString>(STRING, %options)
+
+Read a CRL from STRING, for instance a cached or test CRL.
+The %options are passed to L<new()|Net::Domain::TMCH::CRL/"Constructors">.
+
+=item $obj-E<gt>B<fromURI>($uri, %options)
+
+Create a new CRL object from an $uri, which is collected via LWP.  The
+%options are passed to L<new()|Net::Domain::TMCH::CRL/"Constructors">.
+
+=item Net::Domain::TMCH::CRL-E<gt>B<new>(%options)
+
+ -Option --Default
+  revoked  []
+  source   <required>
+
+=over 2
+
+=item revoked => HASH|ARRAY
+
+ARRAY of serial numbers from revoked certificates, or a HASH of which the
+keys are the revoked serials.
+
+=item source => STRING|FILENAME|URI
+
+Identification for the source of this list, to be used in error message
+and such.
+
+=back
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<source>()
+
+=back
+
+=head2 Actions
+
+=over 4
+
+=item $obj-E<gt>B<isRevoked>($certificate|$serial)
+
+Checks whether a $certificate (Crypt::OpenSSL::X509 object) has been
+revoked.  It is sufficient to provide a $serial number of the certificate.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Net-Domain-TMCH distribution version 0.18,
+built on December 30, 2015.  Development was supported by NIC.at, the Austrian
+Domainname Registry.
+
+ Website: F<http://perl.overmeer.net/net-domain-tmch/>
+
+The documentation and interface style is consistent with a large set of
+modules, belonging to the L<XML::Compile> suite.
+
+=head1 LICENSE
+
+Copyrights 2013-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

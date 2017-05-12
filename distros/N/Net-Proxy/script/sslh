@@ -1,0 +1,230 @@
+#!/usr/bin/perl -w
+use strict;
+use Getopt::Long;
+use Net::Proxy;
+
+# default values
+our %CONF = (
+    port    => 'localhost:443',
+    timeout => 2,
+    ssh     => 'localhost:22',
+    ssl     => 'localhost:443',
+    verbose => 0,
+);
+
+# get the options
+Getopt::Long::Configure("bundling");
+GetOptions( \%CONF, "help|h", "port|p=s", "timeout|t=i", "verbose|v+",
+    "version|V", "ssh|s=s", "ssl|https|l=s", )
+    or die << 'USAGE';
+Usage: sslh [-v] [-p host:port] [-t timeout] [--ssh host:port] [--ssl host:port]
+USAGE
+
+# set up the verbosity level
+Net::Proxy->set_verbosity( $CONF{verbose} );
+
+# check the options
+die "--timeout <seconds> must be a positive number (possibly fractional)\n"
+  unless $CONF{timeout} > 0;
+die "--ssh and -ssl must point to different servers\n"
+  if $CONF{ssh} eq $CONF{ssl};
+
+# create the proxy listening socket
+die "--port <port> option required\n"
+  unless exists $CONF{port};
+
+# compute host / port
+{
+    my %hostport;
+    for (qw( ssl ssh port )) {
+        $CONF{$_} = "localhost:$CONF{$_}"
+            if index( $CONF{$_}, ':' ) < 0;
+        $CONF{$_} = [ split /:/, $CONF{$_} ];
+        push @{
+            $hostport{
+                join ':', ( gethostbyname( $CONF{$_}[0] ) )[0],
+                $CONF{$_}[1]
+                }
+            },
+            $_;
+    }
+
+    # check for duplicates
+    for( keys %hostport ) {
+        if( @{$hostport{$_}} != 1 ) {
+            die "Options "
+                . join( " and ", map {"--$_"} @{ $hostport{$_} } )
+                . " are identical! ($_)\n";
+        }
+    }
+}
+
+# create the proxy
+my $proxy = Net::Proxy->new( {
+    in => {
+        type => 'dual',
+        host => $CONF{port}[0],
+        port => $CONF{port}[1],
+        timeout => $CONF{timeout},
+        server_first => {
+            type => 'tcp',
+            host => $CONF{ssh}[0],
+            port => $CONF{ssh}[1],
+        },
+        client_first => {
+            type => 'tcp',
+            host => $CONF{ssl}[0],
+            port => $CONF{ssl}[1],
+        },
+    },
+    out => { type => 'dummy'},
+});
+
+$proxy->register();
+
+Net::Proxy->mainloop();
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+sslh - Switch incoming connection between SSH and SSL/HTTPS servers
+
+=head1 SYNOPSIS
+
+B<sslh> S<[ B<-v> ]> S<[ B<-p> I<[host:]port> ]> S<[ B<-t> I<timeout> ]>
+     S<[ B<--ssh> I<[host:]port> ]> S<[ B<--ssl> I<[host:]port> ]>
+
+=head1 DESCRIPTION
+
+B<sslh> is a simple script that lets you switch an incoming connection
+on a single port between distinct SSH and SSL/HTTPS servers.
+
+B<sslh> listens for connections on a port and is able to redirect
+them either to an HTTPS web server or a SSH server.
+
+This lets one setup both a HTTPS web server and a SSH server
+and access them through the same host+port.
+
+=head1 OPTIONS
+
+The program follows the usual GNU command line syntax, with long
+options starting with two dashes.
+
+=over 4
+
+=item B<-p>, B<--port> I<[host:]port>
+
+The port the proxy will listen to.
+If no port is given, 443 is used by default.
+If no host is given, C<localhost> is used by default.
+
+=item B<-s>, B<--ssh> I<[host:]port>
+
+The SSH server which the SSH connections must be forwarded to.
+If omitted, the default is I<localhost:22>.
+
+=item B<-l>, B<--ssl>, B<--https> I<[host:]port>
+
+The HTTPS server which the HTTPS connections must be forwarded to.
+If omitted, the default is I<localhost:443>.
+
+=item B<-t>, B<--timeout> I<delay>
+
+Timeout in seconds before a silent incoming connection is considered
+as a SSH connection. The number can be fractional.
+
+The default is I<2>seconds.
+
+=item B<-v>, B<--verbose>
+
+Verbose output.
+This option can be used several times for more verbose output.
+
+=back
+
+=head1 EXAMPLE OF USE
+ 
+Is this tool actually useful? Yes.
+
+For example one can use it to access both a SSH server and a secure
+web server via a corporate proxy that only accepts to relay connections
+to port 443. Creating a tunnel that passes SSH connection through a
+CONNECT-enabled web proxy is easy with B<connect-tunnel> (also
+included in the C<Net::Proxy> distribution).
+
+The proxy will let both SSH and HTTPS connections out (since they
+all point to port 443), and the home server will connect those incoming
+connections to the appropriate server. This only requires to run the
+HTTPS server on a non standard port (not 443).
+
+=head1 TECHNICAL NOTE
+
+How can this proxy find out what kind of protocol is using a TCP
+connection to port 443, without being connected (yet) to the server?
+We actually rely on a slight difference between the SSL and SSH
+protocols (found thanks to B<ethereal>):
+
+=over 4
+
+=item SSH
+
+Once the TCP connection is established, the server speaks first,
+presenting itself by saying something like:
+
+    SSH-2.0-OpenSSH_3.6.1p2 Debian 1:3.6.1p2-1
+
+=item SSL
+
+With SSL, it's always the client that speaks first.
+
+=back
+
+This means that B<sslh> can be used with any pair of protocols/services
+that share this property (the client speaks first for one and the server
+speaks first for the other).
+
+=head1 AUTHORS
+
+=over 4
+
+=item Original idea and C version
+
+Frédéric Plé C<< <frederic.ple+sslh@gmail.com> >>.
+
+=item Perl versions
+
+Philippe 'BooK' Bruhat C<< <book@cpan.org> >>.
+
+=back
+
+=head1 SCRIPT HISTORY
+
+Version 0.01 of the script was a quick hack designed in 2003 as a proof
+of concept.
+
+Version 0.02 (and higher) are based on C<Net::Proxy>, and included with
+the C<Net::Proxy> distribution. Version 0.02 didn't work, though.
+
+Version 0.03 correctly initialised the C<in> connector.
+
+Version 0.04 lets the proxy listen on any address (instead of C<localhost>,
+which is still the default). Thanks to Dieter Voegtli for spotting this.
+
+=head1 SEE ALSO
+
+L<Net::Proxy>, L<Net::Proxy::Connector::dual>.
+
+=head1 COPYRIGHT
+
+Copyright 2003-2008, Philippe Bruhat. All rights reserved.
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it or modify it under
+the same terms as Perl itself.
+
+=cut
+

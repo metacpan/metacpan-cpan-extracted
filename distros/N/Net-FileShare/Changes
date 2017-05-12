@@ -1,0 +1,41 @@
+Revision history for Perl extension Net::FileShare.
+
+1.00  Fri Jan 17 13:23:55 2003
+	- original version; created by h2xs 1.19
+
+1.01  Sat Jan 18 03:21:05 2003
+	- added server_run_once sub, for use in the testing process...
+	- fixed problem with the _recv_packet sub.
+	- worked on some more fun loving pod
+
+1.02  Sat Jan 18 13:06:05 2003
+	- added tests to distribution
+	- tested the first installation of module as Net::FileShare
+
+1.03  Sat Jan 18 13:23:56 2003
+	- made additions to pod and updated the server_run_once and DESTROY_SELF subs
+
+1.04  Fri Jan 31 09:10:02 2003
+	- fixed the SYNOPSIS area in pod for FileShare.pm
+	- added error checking to the send_cmd() sub. This will check for invalid packet types from server and client, and if they exist, croak.
+
+1.05 Tues Feb 11 17:00:03 2003
+	- fixed test.pl (the tests for the distro)
+	- bundled in Test::Simple to be used with test.pl
+	- fixed problems in the server_run_one and DESTROY_SELF subs. I had over zelously used croak(), which was causing problems with my tests.
+	- Added a README file to the distribution.
+	- Added a TODO file to the distribution.
+	- Fixed area in client_connection sub, which takes a file_name. Instead of checking for a blank file by seeing if it's eq to " ", check lenght($file_name) eq 0.
+
+############################################################################################################################
+
+0.18 Fri Feb 28 23:42:00 2003
+	- Scrapped the initial code base. The previous implimentation of Net::FileShare.pm was flawed in both structure and style. So, over the last week I've completely rewritten Net::FileShare.pm from scratch. The changes to the initial implimentation are listed below.
+	- server_connection now has forking personality...so to say...
+	- new method rewritten, so users no longer need to enter all hash variables for object creation. Servers must specify _send_only and _directory only. Clients only need to specify _directory. Both should specify _debug, but it is not necessary. 
+	- two client personalities, an automated (similiar to the previous implimentation) and and interactive.
+	- clients now have the ability to request lists of files which are available...an oversight on my part in the previous implimentation.
+	- the mode of handling requests on the server side is now handled by a seperate subroutine (handle_request).
+	- for accuracy, I've switched all message passing and file transfer to use the C sys functions (sysread, syswrite)
+	- expansion of the protocol which clients and servers can communicate with. This allows for more descriptive messages if complications arise in the request process. 
+ 

@@ -1,0 +1,140 @@
+# NAME
+
+Net::Bullfinch - Perl wrapper for talking with Bullfinch
+
+# VERSION
+
+version 0.16
+
+# SYNOPSIS
+
+    use Net::Bullfinch;
+
+    my $client = Net::Bullfinch->new(host => '172.16.49.130');
+    my $req = { statement => 'some-query' };
+    my $items = $client->send(
+        request_queue => 'test-net-kestrel',
+        request => $req,
+        response_queue_suffix => 'foobar'
+    );
+    foreach my $item (@{ $items }) {
+        # whatever
+    }
+
+# DESCRIPTION
+
+Net::Bullfinch is a thin wrapper around [Memcached::Client](http://search.cpan.org/perldoc?Memcached::Client) for communicating with
+a [Bullfinch](https://github.com/gphat/bullfinch/).
+
+This module handles JSON encoding of the request, the addition of a response
+queue, waiting for a response, confirmation of the message, decoding of the
+response and deletion of the response queue.
+
+If you're expecting large numbers of results you might enjoy using
+[Net::Bullfinch::Iterator](http://search.cpan.org/perldoc?Net::Bullfinch::Iterator) to return any given number of max\_results at a time.
+
+# TRACING
+
+Bullfinch supports adding a tracing a request so that performance metrics
+and responses can be tracked.
+
+    my $items = $client->send(
+        request_queue => 'test-net-kestrel',
+        request => $req,
+        response_queue_suffix => 'foobar'
+        trace => 1
+    );
+
+A UUID will be added to the request.  This UUID will be included in the
+performance code in bullfinch workers and included in the response you
+receive.
+
+# ATTRIBUTES
+
+## host
+
+The IP address of the host that we'll be connecting to.
+
+## port
+
+The port of the IP address of the host we'll be connecting to.
+
+## response\_prefix
+
+The prefix used for the name of the response queue.
+
+## timeout
+
+Set the timeout (in milliseconds) that will be used when awaiting a response
+back from Bullfinch.
+
+## error\_on\_no\_response
+
+Set an error explicitly when there is no response from bullfinch default
+behavior is false which will return them same empty array is for success or
+timeout on insert/delete/update statements
+
+# METHODS
+
+## send( request\_queue => $queue, request => \\%data, response\_queue\_suffix => $response\_name, process\_by => $procby, expiration => $expire);
+
+Send the request to the specified queue and await a response.  The data
+should be a hashref and the queuename (optional) will be appended to
+`response_prefix`.  This allows you to create a unique response queue per
+request.
+
+    # Response queue will be "response-net-kestrel-foobar"
+    my $items = $client->send(\%data, "foobar");
+
+Any messages sent in response (save the EOF message) are returned as an
+arrayref to the caller.
+
+The optional `no_response` will cause no response to be returned
+
+The optional `process_by` must be an ISO 8601 date.
+
+The optional `expiration` is the number of seconds this request should live
+in the queue before expiring.
+
+__Note:__ Send will die if it fails to properly enqueue the request.
+
+## iterate\_async( request\_queue => $queue, request => \\%data, response\_queue\_suffix => $response\_name, expiration => $expire, result\_cb => \\&cb, error\_cb => \\&err\_cb);
+
+Send the request to the specified queue asynchronously and register `result_cb`
+and `error_cb` to be called upon the arrival of any results or the occurence of
+an error, respectively.
+
+The data should be a hashref and the queuename (optional) will be appended to
+`response_prefix`.  This allows you to create a unique response queue per
+request.
+
+Any messages received in response (save the EOF message) are passed to a call to
+the `result_cb` as the only argument.
+
+The optional `expiration` is the number of seconds this request should live
+in the queue before expiring.
+
+Encountering any errors, such as not being able to enqueue the request, will
+cause the `error_cb` to be invoked with a string describing the error as the
+only argument.
+
+__Note__ that this method returns immediately after enqueueing the request. It's
+the callers responsibility to run an [AnyEvent](http://search.cpan.org/perldoc?AnyEvent) compatible event loop in order
+for the enqueued request to actually be sent and the result callbacks to be
+invoked.
+
+# AUTHORS
+
+- Cory G Watson <gphat@cpan.org>
+- Stevan Little <stevan.little@iinteractive.com>
+- Jay Hannah <jay.hannah@iinteractive.com>
+- Trey Bianchini <trey.bianchini@iinteractive.com>
+- Jesse Luehrs <doy@tozt.net>
+- Florian Ragwitz <rafl@debian.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Infinity Interactive, Inc.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

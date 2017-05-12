@@ -1,0 +1,10 @@
+$args =
+{
+ message_type => MQTT_PINGRESP,
+ remaining => 'HELLOWORLD',
+}
+
+d0 0a 48 45  4c 4c 4f 57    4f 52 4c 44
+
+PingResp/at-most-once 
+  48 45 4c 4c 4f 57 4f 52 4c 44                    HELLOWORLD

@@ -1,0 +1,486 @@
+NAME
+    Net::Connection::Sniffer -- gather stats on network connections
+
+SYNOPSIS
+      use Net::Connection::Sniffer;
+
+      gather($config)
+
+DESCRIPTION
+    Net::Connection::Sniffer is a perl module to gather connection
+    statistics by listening to ethernet traffic. Traffic is filtered using
+    standard BPF notation as described in the "tcpdump" documentation and
+    implemented using the standard "pcap" library to sniff packets on host
+    network interfaces.
+
+CONFIGURATION
+    Create a directory with appropriate permissions for the pid file and the
+    profile statistics dump file. Typical installation:
+
+      mkdir -p /var/run/nc.sniffer
+
+    Edit the nc.sniffer.pl.sample file to change or set the following:
+
+      my $config = {
+
+      # specify the directory for the pid file for this daemon.
+      # The directory must exist and have writable permissions.
+      # [required]
+      #
+            piddir  =>  '/var/run/nc.sniffer',
+
+      # specify the directory for the statistics file for this 
+      # daemon. The directory must exist and have writable
+      # permissions
+      # [required]
+      #
+            sniffer =>  '/var/run/nc.sniffer',
+
+      # BPF filter statement. See examples below.
+      # [required]
+      #
+            bpf     => 'src host myhost.com and tcp port 80',
+
+      # size of the portion of packet to capture, defaults
+      # to the minimum size necessary to determine the
+      # source and destination IP addresses and port numbers
+      # [optional]          ETH_head + IPV4_head + 4
+
+      #     snaplen => 38,
+
+      # filter condition: payload must contain this string.
+      # case insensitive match of the payload data to this string. 
+      # [optional]
+
+      #     match   => 'somestring',
+
+      # filter condition: payload must NOT contain this string.
+      # case insensitive match of the payload data to this string.
+      # [optional]
+
+      #     nomatch => 'some.other.string',
+
+      # offset of the payload from the packet start
+      # typically at least 60 for tcp, 44 for udp
+      # [optional]... but [required] for 'match', 'nomatch'
+      #
+      #     payload => 44,
+
+      # UDP listen port to trigger a dump file
+      # [optional]
+      #
+            port    => 10004,
+
+      # HOST address on which to listen for dump request
+      # may be one of a HOSTNAME, IP address, or
+      # strings 'INADDR_ANY', 'INADDR_LOOPBACK'
+      # [optional] default 127.0.0.1 == INADDR_LOOPBACK
+      #
+            host    => 'INADDR_LOOPBACK',
+
+      # ALLOWED connecting host(s)
+      # may be HOSTNAME or IP address
+      # [optional] default 127.0.0.1
+      #
+            allowed => ['127.0.0.1',],
+
+      };
+
+    To generate a web report to STDOUT with or without a cache file, edit
+    the nc.sniffer.cgi.sample file to change or set the configuration
+    parameters. See the Net::Connection::Sniffer::Report manpage::web_report
+    or the sample file for details.
+
+      Usage: <!--#exec cmd="./nc.sniffer.cgi 0" -->
+        or   <!--#exec cmd="./nc.sniffer.cgi 1" -->
+
+    where an argument of "0" produces a report ordered by /24 by usage and
+    an argument of "1" produces a report ordered by subdomain by usage.
+
+REMOTE CONFIGURATION, multiple hosts
+    To configure the reporting function to retrieve statistics from multiple
+    remote hosts (and localhost) do the following:
+
+            1) read the config section of
+               nc.sniffer.coalesce.cgi.sample
+            2) read the config section of
+               nc.sniffer.dump.pl.sample 
+
+    On the remote host(s), install nc.sniffer.dump.pl in an appropriate
+    sandbox account and install an ssh certificate to permit access to the
+    sandbox ssh executable as well as the directory from which to rsync the
+    stats file on that host.
+
+    nc.sniffer.dump.pl should be installed mode 755 or as appropriate to be
+    accessed remotely by the ssh -e function.
+
+    On the web host, configure nc.sniffer.coalesce.cgi and place the
+    execution cgi string in your web page to produce the report
+
+    nc.sniffer.coalesce.cgi should be SUID to the web user, not root, so
+    that the web engine can safely execute the script. The ssh certificate
+    must be generated for the web user and go in the nobody:nogroup/.ssh
+    directory (or equivalent web user directory).
+
+      usage: <!--#exec cmd="./nc.sniffer.coalesce.cgi" -->
+
+OPERATION
+    Launch the daemon with the command:
+
+            nc.sniffer.pl start
+
+      Syntax: nc.sniffer.pl start
+              nc.sniffer.pl stop
+              nc.sniffer.pl restart
+              nc.sniffer.pl status
+              nc.sniffer.pl dump
+              nc.sniffer.pl config
+
+              -d switch may be added to
+               redirect output to STDERR
+
+    On most systems it will be necessary to wrap a shell script around
+    nc.sniffer.pl if the path for perl is not in scope during boot.
+
+      #!/bin/sh
+      #
+      # shell script 'rc.nc.sniffer'
+      #
+      /path/to/nc.sniffer.pl $*
+
+    A sample shell script is included in the distribution as rc.nc.sniffer
+
+    To run multiple copies of nc.sniffer for data collection on various
+    ports or IP's at the same time, name them:
+
+            nc.sniffer1.pl
+            nc.sniffer2.pl
+            etc...
+
+      start         start daemon if not running, write pid file
+      stop          stop a running daemon
+      restart       do stop, then start
+      status        report if daemon running or not
+      dump          refresh/write statistics file
+      config        print configuration to STDOUT
+
+SIGNALS
+    The statistics information will be written to the file specified in the
+    configuration upon receipt of a SIG USR1
+
+            SIG     TERM            write stats file, terminate
+            SIG     HUP             write stats file, start over
+            SIG     USR1            write statistics file
+
+UDP listener -- statistics file dump
+    If the nc.sniffer daemon is configured for a UDP listen port, sending a
+    message dump will produce the same result as SIG USR1. The daemon will
+    respond OK timestamp, but this is NOT syncronized with the file dump and
+    only indicates that the statistics file should not have a timestamp
+    earlier that the epoch value returned. When either a dump or SIG USR1 is
+    issued, you must check the ctime of the file to determine if it has been
+    updated.
+
+BUGS / RESTRICTIONS
+    Net::Connection::Sniffer uses libpcap. The data collection is
+    accomplished using a selectable capture device which is NOT SUPPORTED on
+    Windows and some older BSD platforms. The next two paragraphs are from
+    the pcap library and describe the platform limitations.
+
+    Some "BPF" ...devices do not support select() or poll() (for example,
+    regular network devices on FreeBSD 4.3 and 4.4, and Endace DAG
+    devices)...
+
+    ...On most versions of most BSDs (including Mac OS X), select() and
+    poll() do not work correctly on BPF devices. "While a BPF file
+    descriptor will be returned" ...on most of those versions (the
+    exceptions being FreeBSD 4.3 and 4.4), a simple select() or poll() will
+    not return even after a... "specified timeout" expires... ...In FreeBSD
+    4.6 and later, select() and poll() work correctly on BPF devices...
+
+EXAMPLES
+  BPF examples
+
+    The bpf entry in the configuration hash uses the standard language
+    documented in detail in the tcpdump man(1) page. The bpf statement must
+    contain at a minimum, 'host somename [or IP address]'. The host
+    specification must be for a single unique IP address and be the first
+    such specification if there are multiple src/dest host specifications in
+    the statment.
+
+    Capture all traffic to/from a particular host:
+
+      bpf   => 'host particular.host.com',
+
+    Capture traffic to/from your mail server:
+
+      bpf   => 'host my.mx.com and tcp port 25',
+
+    Capture request traffic arriving at your DNS server:
+
+      bpf   => 'dst host my.dns.com and udp port 53',
+
+    Capture response traffic leaving your DNS server:
+
+      bpf   => 'src host my.dns.com and udp port 53',
+
+  Content MATCH/NOMATCH examples
+
+    The match and nomatch configuration entries can be used to further
+    discriminate which packets to sniff. When the match entry is set, only
+    packets which meet the BPF criteria AND have matching data within the
+    packet capture buffer are selected for analysis. Conversely, when the
+    nomatch entry is set, packets which meet the BPF criteria and match the
+    nomatch string are unconditionally dropped. match and nomatch may both
+    be set.
+
+    NOTE: that matches are made on a case insensitive basis.
+
+    Capture request traffic arriving at the DNS port with a query for
+    "somedomain.com". From RFC1035, we know that a datagram might need to
+    use the domain names F.ISI.ARPA, FOO.F.ISI.ARPA, ARPA, and the root.
+    Ignoring the other fields of the message, these domain names might be
+    represented as:
+
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+        20 |      decimal 1        |           F           |
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+        22 |      decimal 3        |           I           |
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+        24 |           S           |           I           |
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+        26 |      decimal 4        |           A           |
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+        28 |           R           |           P           |
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+        30 |           A           |           0           |
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+        40 |      decmial 3        |           F           |
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+        42 |           O           |           O           |
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+        44 | 1  1|            decimal 20                   |
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+        64 | 1  1|            decimal 26                   |
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+        92 |      decimal 0        |                       |
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+
+    Our examples somedomain.com would be represented in the datagram as
+    follows:
+
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+        20 |      decimal 10       |           s           |
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+        22 |           o           |           m           |
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+        24 |           e           |           d           |
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+        26 |           o           |           m           |
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+        28 |           a           |           i           |
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+        30 |           n           |      decimal 3        |
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+             
+        30 |           c           |           o           |
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+             
+        30 |           m           |      decimal 0        |
+           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+             
+
+    This translates to the perl string:
+
+            where 10 becomes hex \x{a}
+
+      $string = "\x{a}somedomain\x{3}com"
+
+    The offset of the query QUESTION is:
+
+      ETH header    16
+      IP header     20
+      UDP header    8
+      Query head    12
+                    --
+                    54
+
+    and the snaplen needs to be long enough to alway capture the domain
+    name. There, our example configuration becomes:
+
+      bpf     => 'dst host my.dns.com and udp port 53',
+      match   => "\x{a}somedomain\x{3}com",
+      snaplen => 90,
+            # eth head + ip head + udp head + query head
+      payload => 54,
+
+DUMP FILE FORMAT
+    The dump file is written in a format compatible with that produced by
+    Data::Dumper. It may be imported for analysis using Perl's 'do' or by
+    using File::SafeDO.
+
+      # start:        1145923212,     Mon Apr 24 17:00:12 2006
+      # current:      1145923334,     Mon Apr 24 17:02:14 2006
+      # hits:         3832 per minute
+      # bytes:        5927 per second
+      # users:        1234 users now
+      # device:       eth1:1  non-promiscuous
+      # bpf:          dst host my.host.com
+      # [optional if match/nomatch present]
+      # fragment:   nn -- mm
+      # contains:   match.string
+      # excludes:   nomatch.string
+      {
+        my $dump = {
+           '69.3.95.131'     => {
+                    B       => 240,
+                    C       => 4,
+                    E       => 1145760699,
+                    N       => ['hostname1','hostname2','...'],
+                    R       => 723,
+                    S       => 1145757331,
+                    T       => 1145790478,
+                    W       => 43359,
+            },
+      }
+
+    * start:
+        The start time of this data collection in seconds since the epoch
+        and local time.
+
+    * current:
+        The time the file was written in seconds since the epoch and local
+        time.
+
+    * hits:
+        The connections per minute collected by this filter configuration.
+
+    * bytes:
+        The bandwidth in bytes per second collected by this filter
+        configuration.
+
+    * users:
+        The total number of discreet hosts logged at this instant
+
+    * device:
+        The network device being sniffed and whether or not the device is in
+        promiscuous mode.
+
+    * bpf:
+        The bpf statment used for data collection
+
+    * value hash pointer for one or more IP addresses.
+        Time values are seconds since the epoch.
+
+          Hash pointer = {
+
+              IP address => {
+                  B     => incremental byte count
+                  C     => incremental connection count
+                  E     => last update time
+                  N     => ['hostname1','hostname2','...'],
+                  R     => connections / hour
+                  S     => start time this data set
+                  T     => TTL expiration for hostname
+                  W     => bytes / hour
+              },
+
+              next IP address => {
+                ...
+
+        NOTE: if the hostname lookup results in an NXDOMAIN return, the
+        hostname will be parsed from the SOA record and presented prefixed
+        with a colon
+
+          i.e.  ':soahost.com'
+
+EXPORTS
+    Only one function is exported by Sniffer.pm. This function is called in
+    the nc.sniffer.pl.sample script to launch the nc.sniffer daemon.
+
+    gather($config);
+        Launch the nc.sniffer daemon.
+
+          input:        config hash
+          returns:      nothing (exits)
+
+PREREQUISITES
+    The "pcap" library ("libpcap") which is part of "tcpdump" and is
+    included in most *nix distributions. Available from:
+
+      http://sourceforge.net/projects/libpcap/
+
+    the NetAddr::IP::Util manpage which is part of distribution the
+    NetAddr::IP manpage
+
+    the Net::Interface manpage
+
+    the Net::DNS::Codes manpage
+
+    the Net::DNS::ToolKit manpage
+
+    the Net::NBsocket manpage
+
+    the Proc::PidUtil manpage
+
+    the Sys::Hostname::FQDN manpage
+
+    the Sys::Sig manpage
+
+BUGS
+    There is a memory leak when run under Perl 5.0503 that has not yielded
+    to debug attempts. This leak is not present in Perl 5.0601. Not tested
+    in other versions. From reading through the Changes file for the
+    transition between versions 5.005 and 5.6, I'm reasonably sure it is a
+    scalar leak in Perl itself that was corrected with the updates to 5.6.
+
+    My recommend fix for now when running with Perl versions older than 5.6
+    is to restart the daemon daily to prevent excessive memory consumption.
+
+COPYRIGHT 2004 - 2014
+    Michael Robinton <michael@bizsystems.com>
+
+    All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either:
+
+      a) the GNU General Public License as published by the Free
+      Software Foundation; either version 2, or (at your option) any
+      later version, or
+
+      b) the "Artistic License" which comes with this distribution.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See either the GNU
+    General Public License or the Artistic License for more details.
+
+    You should have received a copy of the Artistic License with this
+    distribution, in the file named "Artistic". If not, I'll be glad to
+    provide one.
+
+    You should also have received a copy of the GNU General Public License
+    along with this program in the file named "Copying". If not, write to
+    the
+
+            Free Software Foundation, Inc.
+            59 Temple Place, Suite 330
+            Boston, MA  02111-1307, USA
+
+    or visit their web page on the internet at:
+
+            http://www.gnu.org/copyleft/gpl.html.
+
+AUTHOR
+    Michael Robinton <michael@bizsystems.com>
+
+SEE ALSO
+            man (1) tcpdump
+            man (3) pcap
+
+    the Net::Connection::Sniffer::Report manpage
+

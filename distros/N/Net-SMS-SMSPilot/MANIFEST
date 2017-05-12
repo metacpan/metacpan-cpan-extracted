@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-SMS-SMSPilot.t
+lib/Net/SMS/SMSPilot.pm

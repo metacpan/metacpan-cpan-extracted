@@ -1,0 +1,18 @@
+; vim: syntax=dosini
+name = Net-API-RPX
+author = Scott McWhirter <konobi@cpan.org>
+author = Kent Fredric <kentnl@cpan.org>
+license = BSD
+copyright_holder = Cloudtone Studios
+
+
+[@Author::KENTNL]
+:version = 2.024
+bumpversions = 1
+authority = cpan:KONOBI
+toolkit = eumm
+toolkit_hardness = soft
+normal_form = numify
+mantissa = 6
+copyfiles = LICENSE
+srcreadme = mkdn

@@ -1,0 +1,212 @@
+Revision history for Perl extension Net::Domain::ExpireDate.
+
+0.01 2002-Oct-02	Walery Studennikov
+	- original version; created by h2xs 1.21
+
+0.03 2003-Jan-13	Walery Studennikov
+	- fixed parsing of whois results of whois.bulkregister.com
+
+0.04 2003-Feb-10	Walery Studennikov
+	- fixed parsing of whois results of whois.networksolutions.com
+
+0.06 2003-Feb-14	Walery Studennikov
+	- documendation update: added functions reference
+
+0.07 2003-Feb-17	Walery Studennikov
+	- fixed parsing of whois results of whois.ripn.net
+
+0.09 2003-Mar-05	Walery Studennikov
+	- fixed decode_date(), now exporting decode_date
+
+0.10 2003-Mar-07	Walery Studennikov
+	- fixed parsing of data from whois.ripn.net (for .RU domains)
+
+0.11 2003-Apr-24	Walery Studennikov
+	- fixed parsing of data from whois.ripn.net (for .RU domains)
+
+
+0.12 2003-May-11	Walery Studennikov
+	- adopted to new version Net::Whois::Raw
+	  (explicitly importing $OMIT_MSG $CHECK_FAIL)
+
+0.13 2003-May-11	Walery Studennikov
+	- more fixes regarding new Net::Whois::Raw
+
+0.14 2003-May-14	Walery Studennikov
+	- more fixes regarding new Net::Whois::Raw
+	  (they have changed the interface!)
+
+0.15 2003-Jul-16	Walery Studennikov
+	- not exporting decode_date by default
+
+0.16 2003-Jul-16	Walery Studennikov
+	- guessing expiration date of .RU and .SU domains
+	- howmany_days_passed function removed
+
+0.17 2003-Aug-11	Walery Studennikov
+	- fixed parsing of data from itsyourdomain.com
+
+
+
+0.20 2003-Aug-11	Walery Studennikov
+	- major change for .com .net .org domains:
+	  extract expiration date from
+	  whois.crsnic.net and whois.publicinterestregistry.net
+	  rather than from servers of specific registrar.
+	  If you want old behaviour:
+	    use Net::Domain::ExpireDate qw( $USE_REGISTRAR_SERVERS );
+	    $USE_REGISTRAR_SERVERS = 1;
+
+0.21 2003-Aug-25	Ahmed Akef
+	- new patterns for whois.enom.com
+
+0.22 2003-Nov-03	Walery Studennikov
+	- support of new TLDs: .biz, .info and .us
+
+0.23 2003-Nov-10	Walery Studennikov
+	- more date recognition templates for .biz domains
+
+0.25 2004-Mar-25	Kyrian <kyrian@ore.org>
+	- new patterns for .co.uk domains
+
+0.26 2004-Aug-17	Walery Studennikov
+	- export $USE_REGISTRAR_SERVERS;
+	  new magic numbers for $USE_REGISTRAR_SERVERS
+
+0.30 2004-Dec-09	Walery Studennikov
+	- added initial support of obtaining domain creation dates;
+	- new exported functions: domain_dates domdates_int
+
+0.31 2005-Feb-26	Walery Studennikov
+	- more creation date patterns;
+	- new exported function: credate_fmt
+
+0.32 2005-Feb-26	Walery Studennikov
+	- more creation date patterns;
+
+0.33 2005-Mar-03	Walery Studennikov
+	- more creation and expiration date patterns;
+
+0.34 2005-Apr-05	Walery Studennikov
+	- improved obtaining expiration date of .ru domains
+
+0.35 2005-Apr-13	Walery Studennikov
+	- fixed bug with whois queries to .com .net .org registries
+
+0.36 2005-Sep-30	Tomi Rekonen <tomi.rekonen@elma.net>
+	- new rule to match .fi domains
+	- fixed tests at test.pl
+
+0.37 2006-Mar-20	Walery Studennikov
+	- modify patterns for whois.cira.ca
+
+0.38 2006-Jul-29	Walery Studennikov
+	- ducumentation fixes
+
+0.39 2006-Oct-09	Walery Studennikov
+	- added support for .JP domains
+	- fixed tests
+
+0.40 2006-Nov-18	Walery Studennikov
+	- new module config variables: $CACHE_TIME and $CACHE_DIR,
+	  this config passes to Net::Whois::Raw
+
+0.41 2007-May-16	Walery Studennikov
+	- patch for understanding .biz and .cn by Yulia Shtyrjakova
+
+0.42 2007-Aug-15	Walery Studennikov
+	- updated POD documentstion (subroutines descriptions)
+
+0.80 2007-Sep-06	Walery Studennikov
+	- added support for cretion dates for *.(com|net|org|pp).ru domains (by Pavel Boldin)
+	- don't use Exporter anymore; revised export list (can cause some incompatibilities, so version number bumped)
+	- user Test::More for tests; tests revised
+
+0.90 2008-Apr-29	Walery Studennikov
+	- added domdates script
+	- updated Makefile.PL and MANIFEST
+
+0.91 2008-Jul-02	Matsui Shinsuke
+	- added support for .AC domains
+
+0.92 2008-Aug-02	dhiggins
+	- cira, the canadian domain authority (whois.cira.ca) changed their date format
+
+0.93 2008-Nov-14	ivan baktsheev + Walery Studennikov
+	- added support for some old .com domains (as example, intel.com) / ivan baktsheev
+	- reorder directory structure, add Build.PL / Walery Studennikov
+
+0.94 2009-Jan-06	Walery Studennikov
+	- fix regexp for rule #1.1
+
+0.96 2009-Jul-24	Walery Studennikov
+	- consider $USE_REGISTRAR_SERVERS in domain_dates function
+
+0.97 2009-Nov-10	Walery Studennikov
+	- tests fixed
+	
+0.98 2010-Mar-2		Alexander Ponomarev
+	- fixed some tests
+
+0.99 2010-Oct-11	Timur Nozadze
+	- fixed some tests
+
+1.00 2010-Oct-20	Walery Studennikov
+	- suports .xn--p1ai domains
+
+1.01 2011-Jun-03	Walery Studennikov
+	- added support for .nu domains
+
+1.02 2011-Nov-05	Walery Studennikov
+	- fixed some tests
+
+1.03 2012-Jun-07	Timur Nozadze
+	- whois.nic.me support
+
+1.04 2012-Aug-13	Alexander Nalobin
+	- added support for Ukrainian Whois query server
+
+1.05 2012-Sep-03	Alexander Nalobin
+	- added support for misc ccTLDs whois servers
+
+1.06 2012-Sep-06	Walery Studennikov
+	- constants ONE_YEAR and ONE_DAY made local
+
+1.07 2012-Sep-08	Walery Studennikov
+	- tests fixed
+
+1.08 2012-Sep-24	Alexander Nalobin
+	- parse .AM creation dates
+
+1.09 2012-Oct-31	Walery Studenikov
+	- fixed test
+
+1.10 2013-Jan-14        Vladimir Melnichenko
+    - parse DD.MM.YYYY creation date
+
+1.11 2013-Mar-20        Walery Studennikov
+    - fixed test
+
+1.12 2014-Mar-04        Alexander Nalobin
+    - added support for whois.nic.io server, thanx to Ivan Bessarabov
+
+1.13 2014-Mar-25        Alexander Nalobin
+    - fixed support of .jp domains
+
+1.14 2014-Apr-26        Alexander Nalobin
+    - removed stdout & stderr encoding
+
+1.15 2014-Apr-30        Alexander Nalobin
+    - test fixed
+
+1.16 2016-Oct-30        7ojo
+    - added FI whois changes
+
+1.17 2017-Feb-08        Andrey Voyshko
+    - support old and new date formats for TCI domains
+
+1.18 2017-Mar-07        Andrey Voyshko
+    - test fixed
+
+1.19 2017-Apr-05        Andrey Voyshko
+    - test fixed

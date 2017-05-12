@@ -1,0 +1,74 @@
+# This is a sample template file for rad-bulk-make. This creates a
+# number of RADIUS packet definitions.
+#
+# This definition was taken from numerous RADIUS dumps from a particular
+# BRAS, but were stripped so as to work for a number of devices out
+# there.
+#
+# See the corresponding .session and .port files for the actual
+# definitions of the variables.
+
+# This produces an authentication packet, at the beginning of a session.
+Authentication
+User-Name={ $p->{user} }
+User-Password=foobar
+NAS-IP-Address={ $p->{nasip} }
+Service-Type=Framed-User
+Framed-Protocol=PPP
+Framed-IP-Address={ $s->{framedip} }
+Calling-Station-Id={ $s->{mac} }
+NAS-Identifier={ $p->{nasid} }
+NAS-Port-Id={ $p->{ifid} }
+Acct-Session-Id={ $s->{sessid} }
+
+Start
+User-Name={ $p->{user} }
+NAS-IP-Address={ $p->{nasip} }
+Service-Type=Framed-User
+Framed-Protocol=PPP
+Framed-IP-Address={ $s->{framedip} }
+Calling-Station-Id={ $s->{mac} }
+NAS-Identifier={ $p->{nasid} }
+NAS-Port-Id={ $p->{ifid} }
+Acct-Session-Id={ $s->{sessid} }
+NAS-Port-Type=Ethernet
+Acct-Status-Type=Start
+
+Alive
+User-Name={ $p->{user} }
+NAS-IP-Address={ $p->{nasip} }
+Service-Type=Framed-User
+Framed-Protocol=PPP
+Framed-IP-Address={ $s->{framedip} }
+Calling-Station-Id={ $s->{mac} }
+NAS-Identifier={ $p->{nasid} }
+NAS-Port-Id={ $p->{ifid} }
+Acct-Session-Id={ $s->{sessid} }
+Acct-Delay-Time=0
+Acct-Input-String={ $s->{ioctets} }
+Acct-Output-String={ $s->{ooctets} }
+Acct-Input-Packets={ $s->{ipackets} }
+Acct-Output-Packets={ $s->{opackets} }
+Acct-Input-Gigawords=0
+Acct-Output-Gigawords=0
+Acct-Status-Type=Alive
+
+Stop
+User-Name={ $p->{user} }
+NAS-IP-Address={ $p->{nasip} }
+Service-Type=Framed-User
+Framed-Protocol=PPP
+Framed-IP-Address={ $s->{framedip} }
+Calling-Station-Id={ $s->{mac} }
+NAS-Identifier={ $p->{nasid} }
+NAS-Port-Id={ $p->{ifid} }
+Acct-Session-Id={ $s->{sessid} }
+Acct-Delay-Time=0
+Acct-Input-String={ $s->{ioctets} }
+Acct-Output-String={ $s->{ooctets} }
+Acct-Input-Packets={ $s->{ipackets} }
+Acct-Output-Packets={ $s->{opackets} }
+Acct-Input-Gigawords=0
+Acct-Output-Gigawords=0
+Acct-Status-Type=Stop
+

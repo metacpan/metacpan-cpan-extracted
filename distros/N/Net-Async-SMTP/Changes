@@ -1,0 +1,14 @@
+
+Revision history for Net-Async-SMTP
+
+0.002     2014-04-22 03:28:51+01:00 Europe/London
+	No new features.
+
+	Dependencies:
+	* IO::Async::Resolver::DNS is now required rather than recommended, since
+	it changes the behaviour of the core IO::Async::Loop resolver and the alternative
+	(doing this at runtime via 'require' instead of 'use') seems potentially risky
+
+0.001     2014-04-20 17:01:48+01:00 Europe/London
+	Initial CPAN release
+

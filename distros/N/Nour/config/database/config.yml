@@ -1,0 +1,16 @@
+---
+development:
+    dsn: dbi:mysql:database=myapp_development;host=10.0.1.101
+production:
+    dsn: dbi:mysql:database=myapp_production;host=10.0.1.101
+    option:
+        AutoCommit: 0
+default:
+    database: development
+    username: this_is_not_hidden
+    option:
+        AutoCommit: 1
+        RaiseError: 1
+        PrintError: 1
+        mysql_enable_utf8: 1
+        mysql_auto_reconnect: 1

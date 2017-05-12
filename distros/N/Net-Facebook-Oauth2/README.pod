@@ -1,0 +1,101 @@
+=head1 NAME
+
+Net::Facebook::Oauth2 - a simple Perl wrapper around Facebook OAuth v2.0 protocol
+
+=for html
+<a href="https://travis-ci.org/mamod/Net-Facebook-Oauth2"><img src="https://travis-ci.org/mamod/Net-Facebook-Oauth2.svg?branch=master"></a>
+
+=head1 SYNOPSIS
+
+Somewhere in your application's login process:
+
+    use Net::Facebook::Oauth2;
+
+    my $fb = Net::Facebook::Oauth2->new(
+        application_id     => 'your_application_id', 
+        application_secret => 'your_application_secret',
+        callback           => 'http://yourdomain.com/facebook/callback'
+    );
+
+    # get the authorization URL for your application
+    my $url = $fb->get_authorization_url(
+        scope   => [ 'public_profile', 'email', 'user_posts', 'manage_pages' ],
+        display => 'page'
+    );
+
+Now redirect the user to this C<$url>.
+
+Once the user authorizes your application, Facebook will send him/her back
+to your application, on the C<callback> link provided above.
+
+Inside that callback route, use the verifier code parameter that Facebook
+sends to get the access token:
+
+    # param() below is a bogus function. Use whatever your web framework
+    # provides (e.g. $c->req->param('code'), $cgi->param('code'), etc)
+    my $code = param('code');
+
+    my $access_token = $fb->get_access_token(code => $code);
+
+If you got so far, your user is logged! Save this access token in your
+database or session.
+
+Later on you can use it to communicate with Facebook on behalf of this user:
+
+    my $fb = Net::Facebook::Oauth2->new(
+        access_token => $access_token
+    );
+
+    my $info = $fb->get(
+        'https://graph.facebook.com/v2.8/me'   # Facebook API URL
+    );
+
+    print $info->as_json;
+
+=head1 DESCRIPTION
+
+Net::Facebook::Oauth2 gives you a way to simply access FaceBook Oauth 2.0 protocol
+
+For more information please see example folder shipped with this Module, or refer
+to the L<full documentation|https://metacpan.org/pod/Net::Facebook::Oauth2>.
+
+=head1 INSTALLATION
+
+    cpanm Net::Facebook::Oauth2
+
+Or the old-fashioned manual way:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+=head1 AUTHOR
+
+Mahmoud A. Mehyar, E<lt>mamod.mehyar@gmail.comE<gt>
+
+=head1 CONTRIBUTORS
+
+Big Thanks To
+
+=over 4
+
+=item * Takatsugu Shigeta L<@comewalk|https://github.com/comewalk>
+
+=item * Breno G. de Oliveira L<@garu|https://github.com/garu>
+
+=item * squinker L<@squinker|https://github.com/squinker>
+
+=item * Valcho Nedelchev L<@valchonedelchev|https://github.com/valchonedelchev>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012-2016 by Mahmoud A. Mehyar
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

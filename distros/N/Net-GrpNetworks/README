@@ -1,0 +1,28 @@
+Net::GrpNetworks.pm - Determine in which network group a IP belongs.
+
+
+I wrote Net::GrpNetworks to create network groups and allow researching
+for specific IPs, discovering in which network group each IP belongs to.
+It is quite easy to use and really very fast!
+
+This is an early draft and has not received exhaustive testing, but it
+seems to mostly work ok. There are many features that were not developed
+but could, and that would improve the code in many aspects. I will try
+to maintain compatibility with the public interface in case future 
+versions are developed.
+
+Installation: unzip and untar the distribution and move into its
+directory. Then the usual
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+
+Copyright (c) 1997 Andre Rodrigues Viegas. All rights reserved. This
+program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. 
+
+Andre R. Viegas, andre.viegas@writeme.com.br
+

@@ -1,0 +1,16 @@
+pod2text Nagios::Clientstatus.pm > README
+
+This module is for helping to write new Nagios-servicecheck-programs
+without hassle. It's all pure perl, should work everywhere.
+
+You can create it now by using the command shown above from this directory.
+
+At the very least you should be able to use this set of instructions
+to install the module...
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+t/Number-Compare.t
+lib/Number/Compare.pm
+META.yml                                 Module meta-data (added by MakeMaker)

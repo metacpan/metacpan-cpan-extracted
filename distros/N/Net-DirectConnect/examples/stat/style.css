@@ -1,0 +1,16 @@
+.tth {font-family:monospace, "Courier New";font-size:4px;} 
+.magnet-darr {font: bolder larger; text-decoration:none; color:green;}
+.magnet-darr:hover { color:lightgreen; background-color:#696;}
+.onetable { ZZborder:solid 1px gray; text-align:center; margin:10px; }
+.half {   display:inline-block;}
+.version {text-align:center; font-size:xx-small;}
+tr:nth-child(2n+0) {background-color:GhostWhite;}
+tr:nth-child(2n+1) {background-color:WhiteSmoke;}
+tr {background-color:WhiteSmoke;}
+tr:hover {background-color:Gainsboro;}
+/*.graph:hover {background-color:WhiteSmoke;}*/
+table {border:solid 1px Gainsboro; background-color:Gainsboro; margin:auto;}
+.main-top-info {text-align:center; background-color:LightSalmon;}
+table.graph {width:90%;}
+td.graph {width:40%; max-width:90%;}
+.onetable .rss {float:right;}

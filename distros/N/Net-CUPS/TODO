@@ -1,0 +1,8 @@
+Net::CUPS TODO List
+===================
+
+*) Finish adding methods to the Net::CUPS::IPP.
+*) Finish adding methods to the Net::CUPS::PPD.
+*) Determine the best way to handle all of the constants.
+*) Add more debugging and functionality to current example scripts.
+*) Add more example scripts.

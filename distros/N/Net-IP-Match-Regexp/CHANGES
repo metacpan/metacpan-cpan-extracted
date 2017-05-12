@@ -1,0 +1,42 @@
+Revision history for Perl module Net::IP::Match::Regexp
+
+1.01  03 Oct 2008
+      [ENHANCEMENTS]
+      - Support depth-first matching (i.e., match most specific IP range)
+      [INTERNALS]
+      - Perl::Critic 1.093 compliance
+
+1.00  05 Sep 2007
+      [FIXES]
+      - Default to /32 if an IP address lacks a mask in create_iprange_regexp
+        (thanks to Chris Snyder)
+      [INTERNALS]
+      - Changed author from CLOTHO to CDOLAN
+      - Perl::Critic update
+
+0.94  12 Feb 2006
+      [ENHANCEMENTS]
+      - Minor documentation fixes
+      [INTERNALS]
+      - Refactoring for current best practices
+
+0.93  28 Sep 2005
+      [ENHANCEMENTS]
+      - Performance enhancements (about 25% via qr//)
+      - Documentation
+      - Add benchmark utility
+      - Add more tests to get Devel::Cover to 100%
+      [FIXES]
+      - Fixed a couple of corner cases.
+
+0.92  20 Sep 2005
+      [ENHANCEMENTS]
+      - Clean up documentation and Build.PL
+      - Add pod tests
+      [FIXES]
+      - Detect bad arguments to match_ip()
+      [INTERNALS]
+      - Rename helper function
+
+0.91  12 Jul 2005
+      Initial version

@@ -1,0 +1,17 @@
+Changes
+lib/Net/Frame/Layer/Syslog.pm
+LICENSE
+LICENSE.Artistic
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-use.t
+t/02-pod-coverage.t
+t/03-test-pod.t
+t/04-syslog.t
+t/05-syslogsubs.t
+t/07-syslog.t
+t/08-syslogcompare.t
+t/10-syslogdecode.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

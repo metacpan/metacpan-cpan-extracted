@@ -1,0 +1,56 @@
+---
+abstract: 'simple S3 client support signature v4'
+author:
+  - 'Jan Seidl <seidl@avast.com>'
+build_requires:
+  Mock::Quick: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-AmazonS3-Simple
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::AmazonS3::Simple:
+    file: lib/Net/AmazonS3/Simple.pm
+    version: v0.1.3
+  Net::AmazonS3::Simple::HTTP:
+    file: lib/Net/AmazonS3/Simple/HTTP.pm
+  Net::AmazonS3::Simple::Object:
+    file: lib/Net/AmazonS3/Simple/Object.pm
+  Net::AmazonS3::Simple::Object::File:
+    file: lib/Net/AmazonS3/Simple/Object/File.pm
+  Net::AmazonS3::Simple::Object::Memory:
+    file: lib/Net/AmazonS3/Simple/Object/Memory.pm
+requires:
+  AWS::Signature4: '0'
+  Class::Tiny: '0'
+  HTTP::Request: '0'
+  LWP::UserAgent: '0'
+  Path::Tiny: '0.056'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/JaSei/Net-AmazonS3-Simple/issues
+  homepage: https://github.com/JaSei/Net-AmazonS3-Simple
+  repository: git://github.com/JaSei/Net-AmazonS3-Simple.git
+version: 0.1.3
+x_authority: cpan:JASEI
+x_contributors:
+  - 'Jan Seidl <janseidl@volny.cz>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

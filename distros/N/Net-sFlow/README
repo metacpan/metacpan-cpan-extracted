@@ -1,0 +1,43 @@
+
+sFlow 0.11
+
+  This is version 0.11 of sFlow.pm, a module decoding sFlow datagrams 
+  version 2, 3, 4 and 5. 
+
+  sFlow is an industry standard technology for monitoring high speed 
+  switched or routed networks. The technology is built into network 
+  equipment and gives complete visibility into network activity, 
+  enabling effective management and control of network resources.
+
+  You can find more about sFlow on sflow.org. The datastructure of sFlow 
+  v.4 is described in RFC 3176 (http://www.ietf.org/rfc/rfc3176.txt) and 
+  sFlow v.5 in a memo on sflow.org (http://sflow.org/sflow_version_5.txt). 
+
+  Also have a look at the format diagrams on the specification page 
+  (http://sflow.org/developers/specifications.php).
+
+  I am very interested to recieve bug reports, comments, or whatever you 
+  would like to share with me :)
+
+
+AUTHOR
+
+  Elisa Jasinska <elisa.jasinska@ams-ix.net>
+  2009/01/10
+
+
+CONTACT
+
+  Please send comments/bugs to <sflow@ams-ix.net>
+
+
+COPYRIGHT
+
+  Copyright (c) 2006 - 2009 AMS-IX B.V.
+
+  This package is free software and is provided "as is" without 
+  express or implied warranty.  It may be used, redistributed and/or 
+  modified under the terms of the Perl Artistic License (see
+  http://www.perl.com/perl/misc/Artistic.html)
+
+

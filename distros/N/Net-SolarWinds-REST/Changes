@@ -1,0 +1,77 @@
+Revision history for Perl extension SolarWinds.
+
+0.01  Thu Feb 11 14:50:24 2016
+	- original version; created by h2xs 1.23 with options
+		-AX SolarWinds
+0.02  Fri Feb 12 09:26:00 2016 
+       - Changed Name Space to Net::SolarWinds
+       - Added unit tests to the manifest
+0.03  Fri Feb 12
+       - Indexing fixups didn't work... 
+
+0.03  Fri Feb 12
+       - More indexing fixups
+
+0.04  Fi Feb 12
+       - More indexing fixups
+
+0.05  Fi Feb 12
+       - Pod clean ups
+       - added inital cook book
+       - Added support for overloading query statements
+       - Added extensive unit tests
+       - can now overloading UA and JSON getter methods actually does something!
+       - fixed Syntax error in method: GetNodePollers
+       - Added dep for unit tests IO::Scalar
+0.06
+     Feb 13 2016
+     - Spelling and grammer clean ups in pod.
+     - Now all queries have been moved to Helper.pm
+0.07
+     Feb 14 2016
+     - Bug fix in volume add
+0.08
+     Feb 14 2016
+     - More swql moves to Helper.pm
+     - Batch.pm  more add_volumes fixes..
+	Now works as documented!
+
+0.09 Feb 15 2016
+     - REST.pm getInterfacesOnNode fixed call to nonexistant function
+     - added unit test for REST.pm getInterfacesOnNode
+
+0.10 Feb 25 2016
+     - Fixed bug 112141	MYMETA must not be included
+     - More cookbook stuff added
+     - Pod clean ups
+
+0.11 March 04 2016
+     - Added Uri read/write interface
+
+1.12 March 10 2016
+     - Added BulkUpdate Interface
+     - Added BulkDelete Interface
+     - Added Named PlaceHolder support for the Query Method
+     - Pod additions/enhancements
+     - Code is ready for the 1.x release, its prety well documented 
+1.13
+     - added a method for creation of unmanaged noddes
+
+1.14
+  - bug fix for the method added in 1.13
+  - added a low level interface to manage and unmanage a node
+
+1.15
+  - Bug fix.. time stamp for end on UnManageNode is now actually 10 years in the fture
+  - pod clean ups
+  - added 2 user accessable/documented methods for unmanagement timestamps
+  - added constant for timestamp format.
+
+1.16
+  - Added missing module dep found in a cpan test report "Net::SSLeay     1.58"
+
+1.17
+  -  Added a lighter node creation interface ( more diy )
+
+1.18 
+  - Pod Clean ups

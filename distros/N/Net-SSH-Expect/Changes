@@ -1,0 +1,105 @@
+Revision history for Perl extension Net::SSH::Expect.
+
+1.09 2008/04/22
+	- fixed bug 35236, it's a documentation bug. There was no code change.
+
+1.08 2008/04/19
+	- fixed bug 35141 updating the login() method enabling it to receive the "Login:" and "Password:" prompt
+	patterns as parameters giving the user the ability to customize what prompts should be expected.
+	this change is backward compatible.
+	- updated documentation of method run_ssh() explaining how to use it to enable a public-key authenticated
+	ssh connection.
+
+1.07 2008/04/19
+	- fixed bug 30054 by removing the handler for the CHLD signal. I'm not sure if that handler was needed in fact. 
+	If you see any ssh process remaining as zombie after you run my module let me know.
+
+1.06 2008/04/18
+	- added the 'binary' setting that lets the user set the path to the ssh executable.
+	 The code used to implement this feature was sent by Garret Ellis, thanks Garret.
+
+1.05 2007/08/23
+	- Documentation improvement.
+
+1.04 2007/08/07
+	- Documentation improvement.
+	- Implementation improvements
+		- waitfor() now verifies that 'after' 'match' will have complient values after an unsuccessful 
+		expect() match.
+	- API changes
+		- after() and match() will return undef after an unsuccessfull waitfor() call.
+	- Renaming
+		- the no_ptty constructor parameter was renamed to no_terminal to avoid confusion with the
+		raw_pty paramenter (one uses pty and the other ptty for the same term: pseudo-tty).
+
+1.03 2007/08/06
+	- Bug fix:
+		- peek() now always calls expect($timeout). It won't make any test that could avoid
+		calling expect.
+	- API changes:
+		- the has_line() method was removed since it is unecessary. Also it was implemented incorrectly
+		since it removed the line from the input stream, while it was supposed to say if there is a line
+		without removing anything.
+		- read_line() now returns undef when there are no more lines on input stream. An empty string
+		is now a valid return string, this happens when a line contains only a 'terminator' character ("\n").
+		- added the constructor option 'restart_timeout_upon_receive' and get/setter method 
+		restart_timeout_upon_receive() to set the restart_timeout_upon_receive() method of the internal
+		Expect object.
+
+1.02 2007/08/03 
+	- API changes:
+		- waitfor() does not returns in list context anymore, it only returns boolean.
+		- created methods before(), match() and after() to get the info about the match
+		operation done by waitfor().
+		- waitfor() accepts the optional paramenters '-re' and '-ex' to say if string
+		must be matched as a pattern or literal string.
+		- created a run_ssh() method to configure Expect and run the ssh command.
+	- Bug fix:
+		- peek() now will run a new expect() if it detects that there is data on
+		$exp->after(). This wasn't done before. Without it peek() could print data that
+		is not in the expect accumulator anymore.
+	- Implementation improvements:
+		- created a _secExpect() method, stands for "secure expect". It replaces expect().
+		It croaks according to the errors it finds when it is reading from the input stream.
+		All the methods that used to run expect() directly now run _secExpect().
+		- the code of run_ssh() was removed from inside the login() method. Now it's possible to 
+		use this module without a password-based authentication.
+	- Documentation improvement.
+
+1.01 2007/08/03
+	- Documentation improvement.
+
+1.00 2007/08/02
+	- Implementing a total new API. Many old methods dissapeared and new methods appeared.
+	Some methods were kept but were rewritten.
+	This was to make the module more flexible and open to a broader range of usages as people
+	on the internet required.
+
+
+0.08 2007/07/09
+	- fixed the RemotePromptUnavailable in the connect() method using a fix in the prompt pattern
+	The fix was found sent by titetluc@gmail.com, thanks.
+	- added the "collect exit code" feature.
+	- added the last_exit_code() and the collect_exit_code() methods.
+	- added the collect_exit_code and collected_exit_code attributes.
+
+0.07 2007/07/06
+	- fixed the bug to set the remote prompt in the connect() method by putting the pattern
+	[\s\S]+ in the expect that swallows the remote prompt
+		while ($ssh->expect($timeout, '-re', qr/[\s\S]+/s)){
+				# First we swallow any output the SSH server put on the tty after the logon. This is
+				# usually the original remote prompt that we want to substitute.
+		}
+
+	- added the new constructor options that configure the Expect object:
+	exp_internal debug
+
+	- removed the 'verbose' attribute replacing it by two more specific attributes
+	verbose_ssh and log_stdout
+
+0.01  Tue Jun 26 15:27:49 2007
+	- original version; created by h2xs 1.23 with options
+		-XA -n Net::SSH::Expect
+
+
+

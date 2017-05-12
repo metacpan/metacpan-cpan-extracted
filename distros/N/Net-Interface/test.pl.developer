@@ -1,0 +1,142 @@
+# Before `make install' is performed this script should be runnable with
+# make test'. After `make install' it should work as `perl test.pl'
+
+######################### We start with some black magic to print on failure.
+
+# Change 1..1 below to 1..last_test_to_print .
+# (It may become useful if the test is moved to ./t subdirectory.)
+
+use Test::More qw(no_plan);
+#use diagnostics;
+
+# test 1
+BEGIN { use_ok( 'Net::Interface',qw(
+	:afs
+	:pfs
+	:ifs
+	_NI_AF_TEST
+	mask2cidr
+	cidr2mask
+	full_inet_ntop
+	net_symbols
+)); }
+my $loaded = 1;
+END {print "not ok 1\n" unless $loaded;}
+
+=pod
+
+  my $hvp = dtest Net::Interface();
+
+  foreach (keys %{*{$hvp}}) {
+    print "$_\t=> ${*{$hvp}}{$_}\n";
+  }
+
+  print 'the GV ',${*{$hvp}},"\n";
+  print 'the Ref ',ref $hvp,"\n";
+
+  print "arref ",ref ${*{$hvp}}{array},"\n";
+# can be expressed as ${*{$hvp}}{array}->[0] or as below
+  print "ARVAL ",*{$hvp}->{array}->[0],"\n";
+
+  use Devel::Peek;
+  Dump($hvp);
+print "\n\n";
+  Dump(${*{$hvp}}{array});
+
+=cut
+
+=pod
+
+use Devel::Peek;
+use Data::Dumper;
+
+my @ifaces = interfaces Net::Interface();
+
+foreach my $hvp (@ifaces) {
+  Dump($hvp);
+  print Dumper($hvp),"\n";
+}
+
+=cut
+
+=pod
+
+my $hvp = Net::Interface->interfaces();
+
+my $hvp = Net::Interface->dtest2();
+
+use Devel::Peek;
+use Data::Dumper;
+
+  print "HVP\n";
+
+  Dump($hvp);
+#  print "\nthe PV ptr\n";
+#  print Dump(\${*{$hvp}});
+#  print "\nthe PV itself\n";
+#  print Dump(${*{$hvp}});
+#  print "\nthe HASHref\n";
+#  print Dump(\%{*{$hvp}});
+#  print "\n";
+
+=cut
+
+=pod
+
+for(0..1000000) {
+  print $_,"\n" unless $_ % 1000;
+  my $hvp=  interfaces Net::Interface();
+# my $hvp = dtest Net::Interface();
+}
+
+=cut
+
+=pod
+
+use Devel::Peek;
+use Data::Dumper;
+
+my $hvp = new Net::Interface('eth0');
+
+Dump($hvp);
+print "\n\n";
+print Dumper($hvp),"\n";
+
+=cut
+
+=pod
+
+my @all = Net::Interface->interfaces();
+
+print $all[0]->name,"\n";
+
+my @allnames = "@all";
+print @allnames,"\n";
+
+=cut
+
+=pod
+
+use Data::Dumper;
+my $sym = net_symbols();
+print Dumper($sym);
+
+=cut
+
+#print "\nifr\n"; d_ni_ifreq Net::Interface();
+
+#print "\nlifr\n"; d_ni_lifreq Net::Interface();
+#print "\nglifr\n"; gifa_lifreq Net::Interface();
+
+#print "\nin6\n"; d_ni_in6_ifreq Net::Interface();
+#print "\ngin6\n"; gifa_in6_ifreq Net::Interface();
+
+#print "\nproc\n"; d_ni_linuxproc Net::Interface();
+#print "gproc\n"; gifa_linuxproc Net::Interface();
+
+#print "\nbase\n"; gifaddrs_base Net::Interface();
+
+# put interface name in the parens
+Net::Interface::macstuff();
+
+

@@ -1,0 +1,15 @@
+SUPL-AUTH-REQ DEFINITIONS AUTOMATIC TAGS ::= 
+BEGIN 
+ 
+EXPORTS SUPLAUTHREQ; 
+ 
+SUPLAUTHREQ ::= SEQUENCE { 
+  sETNonce      SETNonce, 
+  keyIdentity2  KeyIdentity2, 
+  ...} 
+ 
+SETNonce ::= BIT STRING(SIZE (128)) 
+ 
+KeyIdentity2 ::= BIT STRING(SIZE (128)) 
+ 
+END 

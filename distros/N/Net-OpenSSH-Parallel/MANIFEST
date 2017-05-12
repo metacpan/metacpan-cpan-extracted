@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-OpenSSH-Parallel.t
+t/pods.t
+lib/Net/OpenSSH/Parallel.pm
+lib/Net/OpenSSH/Parallel/Constants.pm
+sample/parallel_passwd.pl
+sample/sample.pl
+sample/reboot.pl
+sample/dynamic.pl
+sample/find-my-computers.pl
+sample/filter_output.pl
+sample/concheck.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

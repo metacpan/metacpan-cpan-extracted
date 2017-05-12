@@ -1,0 +1,10 @@
+.gitignore
+.git
+IDMETA
+TODO
+archive
+debian
+build-stamp
+install-stamp
+libnet-z3950-simpleserver-perl.spec
+

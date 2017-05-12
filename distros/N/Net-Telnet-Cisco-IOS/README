@@ -1,0 +1,27 @@
+Net-Telnet-Cisco-IOS version 0.4beta
+====================================
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Net::Telnet::Cisco
+
+Please note that "make test" is broken.  Please ignore any test errors you receive until I figure out what I'm talking about.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Aaron Conaway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

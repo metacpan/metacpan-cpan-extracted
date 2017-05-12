@@ -1,0 +1,32 @@
+Netscape::Cache Module
+
+Netscape::Cache provides access to the information stored in index.db of
+Netscape's cache directory. Only Netscape versions 2.x, 3.x and 4.x are
+supported (tell me if you want Netscape-1.x support).
+
+This module is inspired by Netscape::History by Neil Bowers and
+Richard Taylor.
+
+You need at least perl5.002 and DB_File to run this module. I have success
+reports for these platforms:
+- Linux-2.0.5
+- FreeBSD-2.2, 2.2.6 and 2.2.8
+- Solaris 2.6
+- MS-DOS/Windows3.1 using the $CPAN/ports/msdos/dosperl.zip port
+
+You also need the old Berkeley DB (e.g. 1.85), not the new version
+2.x.x. See the pod documentation for more information about this.
+
+To install, type
+
+	$ perl Makefile.PL
+	$ make
+	$ make install
+
+You may also want to test the module with
+
+	$ make test
+
+Example programs are included in the POD and in the examples directory.
+
+Send bug reports and comments to: Slaven Rezic <eserte@cs.tu-berlin.de>.

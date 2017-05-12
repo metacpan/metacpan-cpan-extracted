@@ -1,0 +1,58 @@
+NAME
+    Net::Flickr::Simile - base class for Net::Flickr::Simile packages
+
+SYNOPSIS
+     There is no synopsis.
+
+     There is only Net::Flickr::Simile::*.pm
+
+  Net::Flickr::Simile::Exhibit
+     use Getopt::Std;
+     use Config::Simple;
+     use Net::Flickr::Simile::Exhibit;
+
+     my %opts = ();
+     getopts('c:j:h:t:', \%opts);
+
+     my $cfg = Config::Simple->new($opts{'c'});
+
+     my %args = ('exhibit_json' => $opts{'j'},
+                 'exhibit_html' => $opts{'h'},
+                 'tags' => $opts{'t'});
+
+     my $fl = Net::Flickr::Simile::Exhibit->new($cfg);
+     $fl->search(\%args);
+ 
+     # So then you might do :
+     # perl ./myscript -c /my/flickr.cfg -h ./mystuff.html -j ./mystuff.js -t kittens
+
+DESCRIPTION
+    Base class for Net::Flickr::Simile packages
+
+VERSION
+    0.1
+
+AUTHOR
+    Aaron Straup Cope &lt;ascope@cpan.org&gt;
+
+EXAMPLES
+    <http://aaronland.info/perl/net/flickr/simile/exhibit.html>
+
+    <http://aaronland.info/perl/net/flickr/simile/exhibit.js>
+
+SEE ALSO
+    Net::Flickr::API
+
+    <http://simile.mit.edu/>
+
+    <http://simile.mit.edu/exhibit>
+
+BUGS
+    Please report all bugs via http://rt.cpan.org/
+
+LICENSE
+    Copyright (c) 2007 Aaron Straup Cope. All Rights Reserved.
+
+    This is free software. You may redistribute it and/or modify it under
+    the same terms as Perl itself.
+

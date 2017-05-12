@@ -1,0 +1,45 @@
+{
+   "abstract" : "start, stop and restart OpenVPN as a sub-process.",
+   "author" : [
+      "David Farrell <sillymoos@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-OpenVPN-Launcher",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.26",
+            "IPC::Cmd" : "0.84",
+            "Method::Signatures" : "20130505",
+            "Moo" : "1.003",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.12"
+}

@@ -1,0 +1,35 @@
+Net-Akismet version 0.01
+========================
+
+Net::Akismet is meant to provide perl interface to the Akismet web service.
+
+Akismet is blog comment and trackback spam blocker, free for personal use. More info on http://akismet.com/
+
+The module allows you to either check if an item is spam or report certain comment as spam/false postivie.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  libwww-perl
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2006 by Nikolay Bachiyski
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+$Id: README 15 2006-01-11 13:31:47Z humperdink $

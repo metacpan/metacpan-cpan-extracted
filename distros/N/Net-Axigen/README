@@ -1,0 +1,116 @@
+Net-Axigen version 0.11
+=======================
+
+Net::Axigen - Perl extension for Gecad Technologies Axigen Mail Server (www.axigen.com).
+This module use Axigen CLI interface.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Net::Telnet
+	Encode
+
+DESCRIPTION
+
+Module Net::Axigen is intended for creation and removal of domains, accounts, handle of quotas, 
+and also execution of other necessary operations on handle of a Gecad Technologies Axigen Mail Server.
+
+Operation with a mail server is carried out by means of Telnet protocol with Net::Telnet module usage.
+
+Note: Gecad Technologies do not offer support and should not be contacted for support regarding the Perl module Net::Axigen.
+Gecad Technologies and the author of the Net::Axigen module do not take full responsibility 
+in case of miss-usage of the Perl module or for any damage caused in this matter.
+
+SYNOPSIS
+
+	Connections
+
+	use Net::Axigen;
+	my $axi = Net::Axigen->new('127.0.0.1', 7000, 'admin', 'password', 10);
+	$axi->connect();
+	my $rc=$axi->close();
+
+	Axigen Mail Server and OS version
+
+	my ($version_major, $version_minor, $version_revision)=$axi->get_version();
+	my ($os_version_full, $os_name, $os_version_platform)=$axi->get_os_version();
+
+	Domains
+	
+	$axi->createDomain($domain, $postmaster_password, $maxFiles);
+	$axi->unregisterDomain('my-domain.com');
+	$axi->registerDomain('my-domain.com');
+
+	my $domain_list = $axi->listDomains();
+	foreach my $ptr(@$domain_list) { print "$ptr\n"; }
+
+	my $domain_info = $axi->listDomainsEx();
+	print "Domain \t\tUsed\tTotal\n";
+	foreach my $domain( sort keys %$domain_info) 
+	{
+	  print "$domain:\t".$domain_info->{ $domain }->{used}."\t".$domain_info->{ $domain }->{total}."\n"; 
+	}
+
+	Accounts
+	
+	my $account_list = $axi->listAccounts('my-domain.com');
+	foreach my $ptr(@$account_list) { print "$ptr\n"; }
+
+  my $account_list = $axi->listAccountsEx($domain);
+  print "Account \t\tFirst Name\tSecond Name\n";
+  foreach my $acc( sort keys %$account_list) 
+  {
+     print "$acc\t".$account_list->{ $acc }->{firstName}."\t".$account_list->{ $acc }->{lastName}."\n"; 
+  }
+	
+	$axi->addAccount($domain, $user, $password);
+	$axi->removeAccount($domain, $user);
+
+	$axi->setAccountContactData($domain, $user, $firstName, $lastName);
+	$axi->setQuotaLimitNotification($domain, $user, $firstName, $lastName);
+	$axi->setAccountPassword($domain, $user, $password);
+
+	Quotas
+
+	my $quota = 
+	{ 
+	  maxAccounts => 10, # admin limits
+	  maxAccountMessageSizeQuota => 200000, # admin limits
+	  maxPublicFolderMessageSizeQuota => 300000, # admin limits
+	  messageSize => 20000, # domain quota
+	  totalMessageSize => 200000 # domain quota
+	};
+	$axi->setDomainQuotas($domain, $quota);
+	
+	  $domain - the domain in which the account will be removed;
+	  $quota - quota hash ptr
+
+	Storage Files
+
+	$axi->compactAll($domain);
+	$axi->compactAllDomains();
+
+	
+AUTHOR
+  Alexandre frolov, <alexandre@frolov.pp.ru>.	
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Alexandre Frolov.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

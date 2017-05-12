@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Net-Oping
+version:             1.21
+abstract:            ICMP latency measurement module using the oping library.
+license:             ~
+author:              
+    - Florian Forster <octo@verplant.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

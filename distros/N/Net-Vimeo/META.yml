@@ -1,0 +1,39 @@
+---
+abstract: 'Make requests via OAuth to Vimeo Advanced API'
+author:
+  - 'Mirela Iclodean <imirela@cpan.org>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Vimeo
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Clone: '0'
+  Digest::SHA: '0'
+  Encode: '0'
+  HTTP::Request: '0'
+  HTTP::Request::Common: '0'
+  JSON: '2.9'
+  LWP::UserAgent: '0.32'
+  Moose: '0'
+  Moose::Role: '0'
+  Net::OAuth: '0.28'
+  Types::Standard: '0.044'
+  URI: '1.6'
+  URI::Escape: '3.31'
+  namespace::autoclean: '0'
+  perl: '5.006'
+version: '0.000004'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

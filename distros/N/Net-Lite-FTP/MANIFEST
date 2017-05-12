@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-Lite-FTP.t
+lib/Net/Lite/FTP.pm

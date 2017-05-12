@@ -1,0 +1,82 @@
+Name           DSLI  Description                                  Info
+-------------  ----  -------------------------------------------- -----
+Net::ICB       bdpO  ICB style chat server interface.             JMV
+
+# Net::ICB ver 1.6     10/7/98
+# John M Vinopal        banshee@resort.com
+#
+# Copyright (C) 1996-98, John M Vinopal, All Rights Reserved.
+# Permission is granted to copy and modify this program for
+# non-commercial purposes, so long as this copyright notice is
+# preserved.  This software is distributed without warranty.
+# Commercial users must contact the author for licensing terms.
+#
+
+DESCRIPTION
+-----------
+
+Net::ICB provides an object interface to a fnet/icb style chat server.
+
+FNET or ICB is an old chat protocol dating back to 1988.  The original
+code was written in fortran on some godforsaken machine at UKY by Sean
+Casey.  After the server was rewritten in C, servers sprung up and died
+over the years.  As of 1998, approximately 4 public servers run, the most
+popular of which peaks at ~150 people.  See http://www.icb.net/ for more
+information.
+
+PREREQUISITES
+-------------
+
+    * Perl 5.004 or greater.  (IO::Socket::Inet)
+
+    * Internet connection to ICB server.
+      The official web site for ICB is http://www.icb.net/.
+
+    * Client chat software (optional)
+      See ftp://ftp.abattoir.com/pub/fnet.pl-...
+
+BUILDING THE MODULE
+-------------------
+
+Net::ICB is all perl, no compilation.  Alter the $DEF_ variables
+to suit your site's needs.  Now build and test the module:
+
+    perl Makefile.PL
+    make
+    make test (requires a live internet connection)
+
+INSTALLATION
+------------
+
+    make install
+
+FEEDBACK
+--------
+
+How to report a problem with Net::ICB.
+
+To help me help you, I need of the following information:
+
+ 1. The version of Perl and the operating system name and version you
+    are running.  The command 'perl -V' should provide everything.
+
+ 2. The version of Net::ICB you have installed.  If you've installed
+    NET::Fnet, this one-liner will tell you:
+
+       perl -e 'use Net::ICB; print "ICB ver $Net::ICB::VERSION\n"'
+
+    Otherwise search ICB.pm for a line like this:
+
+       $VERSION = 'X.XX';
+
+ 3. The server you're connecting to (if you've gotten that far).
+
+ 4. Finally if this is a bug, a fix or a small example of the bug.
+
+CHANGES
+-------
+
+See the Changes file.
+
+John M Vinopal <banshee@resort.com>
+

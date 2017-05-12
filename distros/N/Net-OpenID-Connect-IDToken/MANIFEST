@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Net/OpenID/Connect/IDToken.pm
+lib/Net/OpenID/Connect/IDToken/Constants.pm
+lib/Net/OpenID/Connect/IDToken/Exception.pm
+t/000_compile.t
+t/001_encode.t
+t/002_decode.t
+t/100_spec_authorization_examples.t
+META.yml
+MANIFEST

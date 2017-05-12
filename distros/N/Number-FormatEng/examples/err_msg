@@ -1,0 +1,42 @@
+#!/usr/bin/env perl
+
+=pod
+
+Look at actual error messages.
+
+=cut
+
+use warnings;
+use strict;
+#use diagnostics;
+use Getopt::Long;
+use Number::FormatEng qw(:all);
+
+my @opts = 'a' .. 'z';
+my %opt;
+GetOptions(\%opt, @opts) or die "Error: 1 of these options required: @opts\n";
+%opt                     or die "Error: 1 of these options required: @opts\n";
+
+if (exists $opt{a}) { format_eng    (          ) }   # numeric input required
+if (exists $opt{b}) { format_eng    ( ' '      ) }   # not a number: die if input only has whitespace
+if (exists $opt{c}) { format_eng    ( 'foo777' ) }   # if input does not look like a number
+if (exists $opt{d}) { format_eng    ( [3]      ) }   # die if array ref
+if (exists $opt{e}) { format_eng    ( "\x22"   ) }   # die if control char
+if (exists $opt{f}) { format_eng    ( undef    ) }   # die if undef
+if (exists $opt{g}) { unformat_pref (          ) }   # die if no input
+if (exists $opt{h}) { unformat_pref ( ''       ) }   # die if no input
+if (exists $opt{i}) { unformat_pref ( undef    ) }   # die if undef
+if (exists $opt{j}) { unformat_pref ( '    '   ) }   # die if just spaces
+if (exists $opt{k}) { unformat_pref ( '123x'   ) }   # die if illegal string
+if (exists $opt{l}) { unformat_pref ( 'ok'     ) }   # die if illegal string
+if (exists $opt{m}) { unformat_pref ( [3]      ) }   # die if array ref
+if (exists $opt{n}) { unformat_pref ( "\x22"   ) }   # die if control char
+if (exists $opt{o}) { format_pref   (          ) }   # numeric input required
+if (exists $opt{p}) { format_pref   ( ' '      ) }   # not a number: die if input only has whitespace
+if (exists $opt{q}) { format_pref   ( 'foo777' ) }   # if input does not look like a number
+if (exists $opt{r}) { format_pref   ( [3]      ) }   # die if array ref
+if (exists $opt{s}) { format_pref   ( "\x22"   ) }   # die if control char
+if (exists $opt{t}) { format_pref   ( undef    ) }   # die if undef
+
+
+

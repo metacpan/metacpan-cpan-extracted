@@ -1,0 +1,38 @@
+---
+abstract: 'An Asynchronous and multi channel Perl AMQP client.'
+author:
+  - 'Masahito Ikuta <cooldaemon@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Exception: 0
+  Test::More: 0
+  version: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-RabbitFoot
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  AnyEvent::RabbitMQ: 0
+  Config::Any: 0
+  Coro: 0
+  Coro::AnyEvent: 0
+  JSON::XS: 0
+  List::MoreUtils: 0
+  Moose: 0
+  MooseX::App::Cmd: 0
+  MooseX::AttributeHelpers: 0
+  MooseX::ConfigFromFile: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.03

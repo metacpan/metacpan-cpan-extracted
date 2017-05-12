@@ -1,0 +1,19 @@
+Revision history for Net-Google-Analytics-MeasurementProtocol
+
+0.5 2016-04-01
+    - ensure ua_object is not sent in POST to Google Analytics (Olaf Alders)
+    - code improvements (Andy Jack)
+
+0.4 2016-03-28
+    - allow a user agent to be supplied to the constructor via ua_object (Olaf Alders)
+
+0.3 2015-05-28
+    - fixed errors in olders perls.
+
+0.2 2015-05-15
+    - fixed POD error.
+    - added minimum perl version (5.6).
+    - added badges for travis / coveralls
+
+0.1 2015-05-14
+    - First release.

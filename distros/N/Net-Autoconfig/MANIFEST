@@ -1,0 +1,20 @@
+Changes
+lib/Net/Autoconfig.pm
+lib/Net/Autoconfig/Device.pm
+lib/Net/Autoconfig/Device/Cisco.pm
+lib/Net/Autoconfig/Device/HP.pm
+lib/Net/Autoconfig/Device/HP4000.pm
+lib/Net/Autoconfig/Template.pm
+Makefile.PL
+MANIFEST
+README
+t/devices.cfg
+t/logging.conf
+t/Net-Autoconfig-Device-Cisco.t
+t/Net-Autoconfig-Device-HP.t
+t/Net-Autoconfig-Device-HP4000.t
+t/Net-Autoconfig-Device.t
+t/Net-Autoconfig-Template.t
+t/Net-Autoconfig.t
+t/template.cfg
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,84 @@
+Changelog for Net-Rendezvous-Publish-Backend-Avahi
+
+0.04 2012-06-27T01:22:06
+ [Ioan Rogers <ioanr@cpan.org>]
+ - Release
+
+ - perltidied
+
+ - New maintainer, use dist::zilla
+
+
+ [Jack Bates <jablko@cpan.org>]
+ - import Net-Rendezvous-Publish-Backend-Avahi 0.03 from CPAN
+   
+   * Add to documentation.
+   * Add step function.
+   
+   git-cpan-module:   Net-Rendezvous-Publish-Backend-Avahi
+   git-cpan-version:  0.03
+   git-cpan-authorid: JABLKO
+   git-cpan-file:    
+   authors/id/J/JA/JABLKO/Net-Rendezvous-Publish-Backend-Avahi-0.03.tar.gz
+
+ - import Net-Rendezvous-Publish-Backend-Avahi 0.02 from CPAN
+   
+   * Return EntryGroup objects from publish, Free EntryGroup objects in
+   pbulish_stop
+   * Successfully convert txt string to DBus aay [Daniel Berrange]
+   * Cleaned documentation a bit
+   
+   git-cpan-module:   Net-Rendezvous-Publish-Backend-Avahi
+   git-cpan-version:  0.02
+   git-cpan-authorid: JABLKO
+   git-cpan-file:    
+   authors/id/J/JA/JABLKO/Net-Rendezvous-Publish-Backend-Avahi-0.02.tar.gz
+
+ - initial import of Net-Rendezvous-Publish-Backend-Avahi 0.01 from CPAN
+   
+   git-cpan-module:   Net-Rendezvous-Publish-Backend-Avahi
+   git-cpan-version:  0.01
+   git-cpan-authorid: JABLKO
+   git-cpan-file:    
+   authors/id/J/JA/JABLKO/Net-Rendezvous-Publish-Backend-Avahi-0.01.tar.gz
+
+
+ [Malte S. Stretz <mss@cpan.org>]
+ - Handle text field, closes rt#63330
+   
+   Signed-off-by: Ioan Rogers <ioanr@cpan.org>
+
+
+0.03 2012-06-26T10:22:48
+ [Jack Bates <>]
+ - import Net-Rendezvous-Publish-Backend-Avahi 0.03 from CPAN
+   
+   git-cpan-module:   Net-Rendezvous-Publish-Backend-Avahi
+   git-cpan-version:  0.03
+   git-cpan-authorid: JABLKO
+   git-cpan-file:    
+   authors/id/J/JA/JABLKO/Net-Rendezvous-Publish-Backend-Avahi-0.03.tar.gz
+
+
+0.02 2012-06-26T10:22:46
+ [Jack Bates <>]
+ - import Net-Rendezvous-Publish-Backend-Avahi 0.02 from CPAN
+   
+   git-cpan-module:   Net-Rendezvous-Publish-Backend-Avahi
+   git-cpan-version:  0.02
+   git-cpan-authorid: JABLKO
+   git-cpan-file:    
+   authors/id/J/JA/JABLKO/Net-Rendezvous-Publish-Backend-Avahi-0.02.tar.gz
+
+
+0.01 2012-06-26T10:22:44
+ [Jack Bates <>]
+ - initial import of Net-Rendezvous-Publish-Backend-Avahi 0.01 from CPAN
+   
+   git-cpan-module:   Net-Rendezvous-Publish-Backend-Avahi
+   git-cpan-version:  0.01
+   git-cpan-authorid: JABLKO
+   git-cpan-file:    
+   authors/id/J/JA/JABLKO/Net-Rendezvous-Publish-Backend-Avahi-0.01.tar.gz
+
+

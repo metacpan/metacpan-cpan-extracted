@@ -1,0 +1,47 @@
+{
+   "abstract" : "A universal WHOIS data extractor.",
+   "author" : [
+      "Roman M. Parparov <roman@parparov.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Whois-IANA",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Socket" : 0,
+            "Net::CIDR" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Net::Whois::IANA" : {
+         "file" : "lib/Net/Whois/IANA.pm",
+         "version" : "0.41"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.41"
+}

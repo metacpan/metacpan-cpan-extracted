@@ -1,0 +1,12 @@
+#!/usr/bin/perl 
+
+use lib qw( lib ../lib ../../lib  ); #Just in case we are testing it in-place
+
+use Net::Lujoyglamour;
+
+my $dsn = shift || 'dbi:SQLite:dbname=lg.sqlite3';
+print "Deploying database with DSN $dsn\n";
+my $schema = Net::Lujoyglamour->connect($dsn);
+$schema->deploy({ add_drop_tables => 1});
+
+

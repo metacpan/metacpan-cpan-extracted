@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Net/Groonga/HTTP.pm
+lib/Net/Groonga/HTTP/Response.pm
+lib/Net/Groonga/Pager.pm
+t/00_compile.t
+t/01_simple.t
+t/Groonga.pm
+META.yml
+MANIFEST

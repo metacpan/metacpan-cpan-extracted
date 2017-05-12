@@ -1,0 +1,14 @@
+version 1.02 (2008/11/18):
+
+    - REST URLs are now customizable
+    - added missing params and removed warnings (thanks Ross Anderson)
+    - externalMetadata can now be provided
+
+version 1.01 (2008/10/24):
+
+    - new semanticproxy() method
+    - fixed test 03-podcoverage.t
+
+version 1.00 (2008/10/01):
+
+    - new

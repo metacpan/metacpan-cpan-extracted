@@ -1,0 +1,79 @@
+{
+   "abstract" : "Publish zeroconf data via Avahi",
+   "author" : [
+      "Ioan Rogers <ioanr@cpan.org>",
+      "Jack Bates <jablko@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Rendezvous-Publish-Backend-Avahi",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::DBus" : "0",
+            "Net::Rendezvous::Publish" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ioanrogers/Net-Rendezvous-Publish-Backend-Avahi/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ioanrogers/Net-Rendezvous-Publish-Backend-Avahi.git",
+         "web" : "https://github.com/ioanrogers/Net-Rendezvous-Publish-Backend-Avahi"
+      }
+   },
+   "version" : "0.04",
+   "x_BuiltWith" : {
+      "modules" : {
+         "File::Find" : "1.20",
+         "File::Temp" : "0.22",
+         "Module::Build" : "0.4",
+         "Net::DBus" : "1.0.0",
+         "Net::Rendezvous::Publish" : "0.04",
+         "Test::More" : "0.98",
+         "strict" : "1.07",
+         "warnings" : "1.13"
+      },
+      "perl" : {
+         "original" : "v5.16.0",
+         "qv" : 1,
+         "version" : [
+            5,
+            16,
+            0
+         ]
+      },
+      "platform" : "linux"
+   }
+}
+

@@ -1,0 +1,38 @@
+Revision history for Net-Rackspace-Notes
+
+1.0000  2011-06-05
+        * Notes are listed sorted by last modification date.
+        * Cmd line options are simpler: racknotes show 7, instead of
+          racknotes show --num=7
+        * Building with Dist::Zilla
+
+0.0200  2010-09-14
+        * Added the replace command.
+        * Added the method put_note.
+
+0.0103  2010-09-14
+        * Use Parallel::ForkManager.
+        * Fixed a bug where notes where generated in a different order between
+          subsequent commands.
+
+0.0102  2010-09-14
+        * Improving documentation.
+
+0.0101  2010-09-13
+        * Updated pod and README to correctly reflect the new usage.
+        * Users can now just provide their email and not their password in the
+          config file. Then they will only be prompted for their password when
+          they run racknotes.
+        * Config::General is no longer a dep.
+
+0.0100  2010-09-12
+        * Removed MooseX::Declare sugar.
+        * Prompt users to enter login info if ~/.racknotes is missing.
+        * Use App::Rad and treat first element in ARGV as a command.
+          - Now it's racknotes add --subject=foo instead of racknotes --add=foo
+
+0.0002  2010-09-11
+        * Minor change to Makefile.PL
+
+0.0001  2010-09-11
+        First version, released on an unsuspecting world.

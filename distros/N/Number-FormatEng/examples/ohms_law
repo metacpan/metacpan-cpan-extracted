@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+
+=pod
+
+Convert electrical current values -- formatted as strings
+with SI units -- into numerical values to be used to calculate
+voltage values.
+
+=cut
+
+use warnings;
+use strict;
+
+use Number::FormatEng qw(unformat_pref);
+
+my $resistance = 1000;  # ohms
+
+printf "%10s   %s\n", 'Current', 'Voltage';
+while (<DATA>) {
+    chomp;
+    printf "%10sA: %.3fV\n", $_, unformat_pref($_)*$resistance;
+}
+
+# Current (Amps)
+__DATA__
+1.34m
+0.27m
+10.3m
+100u

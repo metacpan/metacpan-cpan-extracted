@@ -1,0 +1,3 @@
+cd WMI
+nmake
+cd ..

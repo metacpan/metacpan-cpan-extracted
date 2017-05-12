@@ -1,0 +1,55 @@
+{
+   "abstract" : "Interface to ASPSMS services",
+   "author" : [
+      "Jacques Supciky <supcik@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-SMS-ASPSMS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Data::Dumper" : 0,
+            "Encode" : 0,
+            "Getopt::Long" : 0,
+            "LWP::UserAgent" : 0,
+            "List::Util" : 0,
+            "Pod::Usage" : 0,
+            "Test::More" : 0,
+            "XML::DOM" : 0,
+            "overload" : 0,
+            "perl" : "v5.8.7"
+         }
+      }
+   },
+   "provides" : {
+      "Net::SMS::ASPSMS" : {
+         "file" : "lib/Net/SMS/ASPSMS.pm",
+         "version" : "v0.1.6"
+      },
+      "Net::SMS::ASPSMS::XML" : {
+         "file" : "lib/Net/SMS/ASPSMS/XML.pm",
+         "version" : "v1.0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.1.6"
+}

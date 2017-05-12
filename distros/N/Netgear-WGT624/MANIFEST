@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Netgear-WGT624.t
+lib/Netgear/WGT624.pm
+bin/get-wgt624-status
+META.yml                                 Module meta-data (added by MakeMaker)

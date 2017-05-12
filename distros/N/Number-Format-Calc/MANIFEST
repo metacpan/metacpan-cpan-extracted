@@ -1,0 +1,11 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/Number/Format/Calc.pm
+t/t1.t
+t/t2.t
+t/t3.t
+t/t4.t
+Makefile.PL

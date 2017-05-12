@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/NetAddr-IP-Obfuscate.t
+lib/NetAddr/IP/Obfuscate.pm
+META.yml                                 Module meta-data (added by MakeMaker)

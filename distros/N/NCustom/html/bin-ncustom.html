@@ -1,0 +1,164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>ncustom - command line interface to NCustom</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#abstract">ABSTRACT</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>ncustom - command line interface to NCustom</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>ncustom [{-i|--initialise}]</p>
+<pre>
+        [{-n|--ncustom} ncustom_filename/url ]</pre>
+<pre>
+        [{-u|--undo}    transaction_dirname  ]</pre>
+<pre>
+        [{-b|--blat}]</pre>
+<pre>
+        [{-c|--config}  name=value  ]</pre>
+<p>Options:
+        --initialise    purges the transaction archive</p>
+<pre>
+        --undo          undoes the transactions specified</pre>
+<pre>
+        --ncustom       fetch and execute the ncustom scripts specified</pre>
+<pre>
+        --blat          blat personal configuration with global configuration</pre>
+<pre>
+        --config        edit settings in personal configuration file</pre>
+<p>
+</p>
+<hr />
+<h1><a name="abstract">ABSTRACT</a></h1>
+<p>A command line interface to the NCustom module.
+Currently invocation of only the simplest NCustom methods is supported, namely initialising the transaction archive, undoing transactions, and executing new NCustom scripts.</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>
+</p>
+<hr />
+<h1><a name="options">OPTIONS</a></h1>
+<dl>
+<dt><strong><a name="item__2di_2c__2d_2dinitialise"><strong>-i, --initialise</strong></a></strong><br />
+</dt>
+<dd>
+Initialises (purges) the transaction archive. The transactions will no longer be able to be undone.
+</dd>
+<p></p>
+<dt><strong><a name="item__2du_2c_2d_2dundo"><strong>-u,--undo</strong></a></strong><br />
+</dt>
+<pre>
+  $eg = &lt;&lt;'  end_eg';
+  
+  grep -c incomplete ~/file1 &gt;&gt; ~/log</pre>
+<pre>
+  ncustom -n test5.ncus ;
+  grep -c incomplete ~/file1 &gt;&gt; ~/log</pre>
+<pre>
+  ncustom -n test6.ncus ;
+  grep -c incomplete ~/file1 &gt;&gt; ~/log</pre>
+<pre>
+  ncustom -u test6.ncus ;
+  grep -c incomplete ~/file1 &gt;&gt; ~/log 
+  
+  cat ~/log # 7,3,1,3</pre>
+<pre>
+  end_eg</pre>
+<p>Undo is followed by one or more transaction names, transaction names are sub-directoy names within the transaction archive directory. 
+There is a sub-directoy ``all'' that contains the entire journal of transactions since the last initialise.
+Transaction names are created when using the NCusom module in NCustom scripts.
+They are generaly named after the basename of the NCustom script, and generaly the is a one to one relationship, but the NCustom script may override these behaviours.</p>
+<dt><strong><a name="item__2dn_2c_2d_2dncustom"><strong>-n,--ncustom</strong></a></strong><br />
+</dt>
+<pre>
+  $eg = &lt;&lt;'  end_eg';
+  
+  # default_dir contains test2.ncus 
+  # default_url contains test3.ncus 
+  
+  ncustom -n ~/dir20/test1.ncus -n test2.ncus ;
+  ncustom -n test3.ncus -n <a href="http://install/install/NCustom/test4.ncus">http://install/install/NCustom/test4.ncus</a> ;
+  
+  end_eg</pre>
+<p>Ncustom is followed by one or more filenames, either local filenames or URLs.
+The filenames are assumed to be NCustom scripts, are fetched, and executed.
+If the filename is not an NCustom script, then transactions will not be journalled, and will not be able to be undone.
+An unqualified NCustom script name will be searched for in the <code>loaction(s)</code> specified in NCustom::Config.
+Settings in NCustom::Config may be overridden using ~/.ncustom/NCustom/MyConfig.pm.</p>
+<dt><strong><a name="item__2db_2c__2d_2dblat"><strong>-b, --blat</strong></a></strong><br />
+</dt>
+<dd>
+Blat overwrites the personal configuration profile with the global conf iguration profile. The personal configuration profile is ``~/.ncustom/NCustom/MyConfig.pm''.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dc_2c_2d_2dconfig"><strong>-c,--config</strong></a></strong><br />
+</dt>
+<pre>
+  $eg2 = &lt;&lt;'  end_eg';</pre>
+<pre>
+  # modify existing values
+  ncustom -c src_fqdn=\&quot;install.baneharbinger.com\&quot; ;
+  ncustom -c test_url1=\&quot;install.baneharbinger.com/index.html\&quot; ;</pre>
+<pre>
+  # add new values
+  ncustom -c my_number=5 -c my_text=\&quot;blah\&quot; ;</pre>
+<pre>
+  # add new complex (eg hash) values
+  ncustom -c my_hosts='{ mew =&gt; &quot;192.168.0.10&quot;, pikachu =&gt; &quot;192.168.0.20&quot; }' ;</pre>
+<pre>
+  end_eg</pre>
+<p>Config is followed by name vaule pairs. If there is a corresponding name in the personal configuration file, then its vaule shall be updated. If there is no corresponding name then the name value shall be added to the end of the file.  If there is no file it shall be created. The personal configuration file is ``~/.ncustom/NCustom/MyConfig.pm''.</p>
+<p>If some configuration vlaues are defined in terms of other configuration values, then the order may be important.</p>
+<p>The current implementation is simplistic and erroneous in all but the simplest cases (eg the pre-existing name value assignment is only a one liner).</p>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>NCustom
+NCustom::Config
+ncustom</p>
+<p><a href="http://baneharbinger.com/NCustom">http://baneharbinger.com/NCustom</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Bane Harbinger, &lt;<a href="mailto:bane@baneharbinger.com">bane@baneharbinger.com</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright 2003 by Bane Harbinger</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

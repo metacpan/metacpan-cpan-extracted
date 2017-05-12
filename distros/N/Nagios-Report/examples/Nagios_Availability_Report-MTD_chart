@@ -1,0 +1,46 @@
+#!/usr/bin/perl
+
+
+use strict ;
+
+use Nagios::Report ;
+
+my $x = Nagios::Report->new(q<local_cgi Nagios_Server Auth_Nagios_User>, [qw(24x7)])
+  or die "Can't construct Nagios::Report object." ;
+
+$x->mkreport(
+		[ qw(
+			HOST_NAME
+			PERCENT_TOTAL_TIME_UP
+			TOTAL_TIME_DOWN
+			TOTAL_TIME_DOWN_HMS
+			TOTAL_TIME_UNREACHABLE
+			TOTAL_TIME_UNREACHABLE_HMS
+			AVAIL_URL
+			TREND_URL
+		   )
+	       ],
+
+		sub { my %F = @_; my $u = $F{PERCENT_TOTAL_TIME_UP}; $u =~ s/%//; $u < 99.5 },
+
+		&comp(alpha => 0 , ascend => 0, fields => [ qw(TOTAL_TIME_DOWN TOTAL_TIME_UNREACHABLE) ],),
+
+		sub {
+			my $F = shift @_ ;
+			my $d = $F->{TOTAL_TIME_DOWN} ;
+			my $u = $F->{TOTAL_TIME_UNREACHABLE} ;
+							# If the '%' suffices remain, the MS Excel Chart wizard
+							#  gets very confused.
+			$F->{PERCENT_TOTAL_TIME_UP} =~ s/%//;
+			$F->{TOTAL_TIME_DOWN_HMS}	= t2hms($d) ;
+			$F->{TOTAL_TIME_UNREACHABLE_HMS}= t2hms($d) ;
+			qw(TOTAL_TIME_DOWN_HMS TOTAL_TIME_UNREACHABLE_HMS)
+		}
+) ;
+
+my $chart_detail = {
+  template	=> 'chart01.bin',
+  link		=> q<'24x7'!$A$1:$B$15>
+} ;
+
+$x->excel_dump('hack_with_template.xls', $chart_detail) ;

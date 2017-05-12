@@ -1,0 +1,27 @@
+Build.PL
+Changes
+examples/example-bulkresult.pl
+examples/example-commandfile.pl
+examples/example-gearman.pl
+examples/example-resultpath.pl
+lib/Nagios/Passive.pm
+lib/Nagios/Passive/Base.pm
+lib/Nagios/Passive/BulkResult.pm
+lib/Nagios/Passive/CommandFile.pm
+lib/Nagios/Passive/Gearman.pm
+lib/Nagios/Passive/ResultPath.pm
+lib/Nagios/Passive/Role/Tempfile.pm
+MANIFEST			This list of files
+README
+t/00.load.t
+t/10.result_path.t
+t/11.command_file.t
+t/12.bulk_result.t
+t/13.gearman.t
+t/changes.t
+t/kwalitee.t
+t/perlcritic.t
+t/pod.t
+LICENSE
+META.yml
+META.json

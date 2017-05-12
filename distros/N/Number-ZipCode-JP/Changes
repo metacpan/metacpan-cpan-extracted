@@ -1,0 +1,219 @@
+Revision histories for Perl extension Number::ZipCode::JP
+
+0.20170428 Mon May  1 2017
+    - Update some table classes.
+
+0.20170331 Mon Apr  3 2017
+    - Update some table classes.
+
+0.20170228 Tue Feb 28 2017
+    - Update some table classes.
+
+0.20170131 Tue Jan 31 2017
+    - Update some table classes.
+
+0.20161228 Wed Dec 28 2016
+    - Update some table classes.
+
+0.20161122 Tue Nov 22 2016
+    - Update some table classes.
+
+0.20161031 Mon Oct 31 2016
+    - Update some table classes.
+
+0.20160930 Fri Sep 30 2016
+    - Update some table classes.
+
+0.20160831 Wed Aug 31 2016
+    - Update some table classes.
+
+0.20160729 Fri Jul 29 2016
+    - Update some table classes.
+
+0.20160630 Thu Jun 30 2016
+    - Update some table classes.
+
+0.20160531 Tue May 31 2016
+    - Update some table classes.
+
+0.20160428 Thu Apr 28 2016
+    - Update some table classes.
+
+0.20160331 Thu Mar 31 2016
+    - Update some table classes.
+
+0.20160229 Mon Feb 29 2016
+    - Update some table classes.
+
+0.20160129 Fri Jan 29 2016
+    - Update some table classes.
+
+0.20151228 Mon Dec 28 2015
+    - Update some table classes.
+
+0.20151130 Mon Nov 30 2015
+    - Update some table classes.
+
+0.20151030 Fri Oct 30 2015
+    - Update some table classes.
+
+0.20150930 Fri Oct  2 2015
+    - Update some table classes.
+
+0.20150831 Tue Sep  1 2015
+    - Update some table classes.
+
+0.20150731 Fri Jul 31 2015
+    - Update some table classes.
+
+0.20150630 Tue Jun 30 2015
+    - Update some table classes.
+
+0.20150529 Fri May 29 2015
+    - Update some table classes.
+
+0.20150430 Thu Apr 30 2015
+    - Update some table classes.
+
+0.20150331 Tue Mar 31 2015
+    - Update some table classes.
+
+0.20150227 Fri Feb 27 2015
+    - Update some table classes.
+
+0.20150130 Fri Jan 30 2015
+    - Update some table classes.
+
+0.20141226 Mon Dec 29 2014
+    - Update some table classes.
+
+0.20141128 Fri Nov 28 2014
+    - Update some table classes.
+
+0.20141031 Tue Nov  4 2014
+     - Update some table classes.
+
+0.20140930 Tue Sep 30 2014
+     - Update some table classes.
+
+0.20140829 Fri Aug 29 2014
+     - Update some table classes.
+
+0.20140731 Fri Aug  1 2014
+     - Update some table classes.
+
+0.20140630 Mon Jun 30 2014
+     - Update some table classes.
+
+0.20140531 Mon Jun  2 2014
+     - Bug fixed. Previous version breaks compatibility in regexp.
+       (?^...) construct can be used perl 5.14 or later.
+       It's too modern.
+
+0.20140530 Fri May 30 2014
+     - Update some table classes.
+
+0.20140430 Wed Apr 30 2014
+     - Update some table classes.
+
+0.20140328 Sat Mar 29 2014
+     - Update some table classes.
+
+0.20140228 Fri Feb 28 2014
+     - Update some table classes.
+
+0.20140131 Fri Jan 31 2014
+     - Update some table classes.
+
+0.20131227 Mon Jan  6 2014
+     - Update some table classes.
+
+0.20131129 Mon Dec  2 2013
+     - Update some table classes.
+
+0.20131031 Sat Nov  2 2013
+     - Update some table classes.
+
+0.20130930 Mon Sep 30 2013
+     - Update some table classes.
+
+0.20130830 Fri Aug 30 2013
+     - Update some table classes.
+
+0.20130731 Wed Jul 31 2013
+     - Update some table classes.
+
+0.20130628 Fri Jun 28 2013
+     - Update some table classes.
+
+0.20130531 Fri May 31 2013
+     - Update some table classes.
+
+0.20130430 Tue Apr 30 2013
+     - Update some table classes.
+
+0.20130329 Fri Mar 29 2013
+     - Update some table classes.
+
+0.20130228 Thu Feb 28 2013
+     - Update some table classes.
+
+0.20130131 Fri Feb  1 2013
+     - Update some table classes.
+
+0.20121228 Fri Dec 28 2012
+     - Update some table classes.
+
+0.20121130 Fri Nov 30 2012
+     - Update some table classes.
+
+0.20121031 Wed Oct 31 2012
+     - Update some table classes.
+
+0.20120928 Mon Oct  1 2012
+     - Update some table classes.
+
+0.20120831 Fri Aug 31 2012
+     - Update some table classes.
+
+0.20120731 Tue Jul 31 2012
+     - Update some table classes.
+
+0.20120629 Fri Jun 29 2012
+     - Update some table classes.
+
+0.20120531 Thu May 31 2012
+     - Update some table classes.
+
+0.20120427 Tue May  1 2012
+     - Update some table classes.
+
+0.20120330 Mon Apr  2 2012
+     - Update some table classes.
+
+0.20120229 Wed Feb 29 2012
+     - Update some table classes.
+
+0.20120131 Tue Jan 31 2012
+     - Update some table classes.
+
+0.20111228 Thu Dec 29 2011
+     - Update some table classes.
+
+0.20111130 Wed Nov 30 2011
+     - Update some table classes.
+
+0.20111031 Mon Oct 31 2011
+     - Update some table classes.
+
+0.20110930 Fri Sep 30 2011
+     - Update some table classes.
+
+0.20110831 Thu Sep  1 2011
+     - Update some table classes.
+
+0.20110729 Mon Aug  1 2011
+     - Update some table classes.
+
+0.20110630 Tue Jul  5 2011
+     - original version

@@ -1,0 +1,10 @@
+0.03	29th December, 2004
+	Tweak to the Module::Build extra_compiler_flags option due to a
+	change in behaviour.
+	Partially updated the code to the Howl 0.9.8 API.
+
+0.02	4th August, 2004
+	Fixups for publishing text blocks
+
+0.01	21st February, 2004
+	Initial CPAN release

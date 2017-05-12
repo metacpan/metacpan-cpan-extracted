@@ -1,0 +1,49 @@
+Revision history for Perl extension Net::OpenSSH::Compat.
+
+0.09  May 18, 2016
+        - In Net::OpenSSH::Compat::SSH2, add emulation for
+          hostkey_check method.
+
+0.08  May 18, 2016
+        - In Net::OpenSSH::Compat::Perl, make no strict host key
+          checking the default policy (bug report by Gagan S).
+        - Make Net::OpenSSH::Compat transparent for Net::OpenSSH
+          warnings so that they reference the calling code.
+
+0.07  Aug 31, 2015
+        - accept protocol argument (bug report by Bas van Sisseren)
+        - spelling error fixes
+        - pod fix (bug report by Florian Schlichting from Debian)
+        - add conditional_loading example
+
+0.06  Sep 28, 2011
+        - in SSH2:
+          - honor use_pty configuration flag from shell method
+        - in SSH:
+          - order or $reader, $writer arguments for sshopen3 was wrong
+
+0.05  Sep 10, 2011
+        - add use_ok tests for submodules
+        - in SSH2 :
+          - exit_status can be called from any state
+          - add support for eof and exit_signal methods
+          - more checks for out of order operations
+          - solve bug accessing parent object from channel
+          - close now sets eof
+          - syntax error bug solved (reported by Will Hawes)
+
+0.04  Aug 29, 2011
+        - add support for Net::SSH::Perl and Net::SSH
+        - import method was broken
+        - minor doc corrections
+
+0.02  May 29, 2011
+        - add support for auth_list
+        - add support for "Net::SSH2::method" method.
+        - add pointer to Github repository
+        - correct mispellings and some wording error in the docs
+
+0.01  Tue Apr 12 19:08:56 2011
+	- original version; created by h2xs 1.23 with options
+		-AXn Net::OpenSSH::Compat
+

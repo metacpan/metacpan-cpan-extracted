@@ -1,0 +1,40 @@
+NetSNMP::Sendmail
+=================
+
+This is a plugin for net-snmp that provides access to Sendmail statistics
+obtained by mailq and mailstats utilities.
+
+Installation
+============
+
+perl Makefile.PL
+make install
+
+The last command must be run as root.
+
+Usage
+=====
+
+To use, add the following line to your /etc/snmp/snmpd.conf:
+
+  perl use NetSNMP::Sendmail;
+
+The MIB for retrieving Sendmail statistics are shipped with the distribution
+in file SENDMAIL-STATS.txt.  This file is installed to the proper directory
+by make install.
+
+Documentation
+=============
+
+See NetSNMP::Sendmail(1) for a detailed description of the module and its
+configuration options.
+
+Copying
+=======
+This package is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+See http://www.gnu.org/licenses.
+

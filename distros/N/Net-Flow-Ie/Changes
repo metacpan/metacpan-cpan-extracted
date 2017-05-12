@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::Flow::Ie.
+
+0.01  Tue Apr  8 02:23:40 2008
+	- original version; created by h2xs 1.23 with options
+		-AX -n Net::Flow::Ie
+

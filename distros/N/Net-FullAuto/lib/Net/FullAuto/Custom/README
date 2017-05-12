@@ -1,0 +1,33 @@
+### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
+#
+#    Net::FullAuto - Distributed Workload Automation Software
+#    Copyright © 2000-2016  Brian M. Kelly
+#
+#    This program is free software: you can redistribute it and/or
+#    modify it under the terms of the GNU Affero General Public License
+#    as published by the Free Software Foundation, either version 3 of
+#    the License, or any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but **WITHOUT ANY WARRANTY**; without even the implied warranty
+#    of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public
+#    License along with this program.  If not, see:
+#    <http://www.gnu.org/licenses/agpl.html>.
+#
+#######################################################################
+
+This is the Custom directory for FullAuto. FullAuto looks in this directory
+for all configuration and user customized code. The Distro directory contains
+copies of the distribution version of these files. The same distrobution copies
+appear in this Custom directory when FullAuto is first installed. However,
+during future CPAN updates/upgrades of a pre-existing FullAuto installation,
+only the Distro directories will receive new files. Customized files in this
+directory will not be overwritten, and it is left to the user/FullAuto admin
+to migrate custom code to the new distro copies manually - should such migration
+be desired and/or necessary. If necessary, an individual performing an update/
+upgrade will be informed of this at the time the FullAuto installer (via CPAN
+or manually using Build.PL or Makefile.PL) is being run.
+

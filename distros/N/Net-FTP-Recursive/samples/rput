@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+# $Id: rput,v 1.8 2008/02/04 00:56:51 jdl Exp $
+
+=pod
+
+=head1 NAME
+
+rput - Sample script to show you how to use the rput function.
+
+=head1 SYNOPSIS
+
+    % rput [--help] <server> <user> <password> <remote_path> <local_path>
+           [rput function arguments to set to true]
+
+=head1 DESCRIPTION
+
+This script is an example script for users of the C<Net::FTP::Recursive>
+module to be able to see how to utilize the C<rput> method in a script.
+
+=head1 AUTHOR
+
+Jeremiah Lee <texasjdl_AT_yahoo_DOT_com>
+
+=cut
+
+use Net::FTP::Recursive;
+use Pod::Usage;
+use Getopt::Long;
+use strict;
+use warnings;
+
+GetOptions( 'help|?' => sub { pod2usage(); } );
+
+pod2usage() unless @ARGV >= 5;
+
+my $host        = shift;
+my $username    = shift;
+my $passwd      = shift;
+my $remote_path = shift; #where to put
+my $local_path  = shift; #where to grab dir structure on local box.
+
+chdir $local_path
+  or die "could not change dir to $local_path!";
+
+my $ftp = Net::FTP::Recursive->new($host, Debug => 1);
+
+$ftp->login($username, $passwd)
+  or die "Could not log in!";
+
+$ftp->binary();
+
+$ftp->cwd($remote_path);
+
+my $output = $ftp->rput( map {($_, 1)} @ARGV );
+
+$ftp->quit;
+
+print "\$output was:\n$output";

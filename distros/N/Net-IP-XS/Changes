@@ -1,0 +1,89 @@
+Revision history for Net-IP-XS
+
+0.19    5 November 2016
+        - Updated manifest.
+
+0.18    3 November 2016
+        - Fix strtol usage (RT #118605).
+        - Fix parsing problem in ip_normalize (RT #118593).
+
+0.17    22 March 2016
+        - Make IP::Authority an optional dependency, as in Net::IP.
+
+0.16    9 November 2015
+        - Set array size correctly in NI_ip_is_ipv6 (RT #108605).
+
+0.15    18 February 2015
+        - Improve the fixes done as part of 0.14.
+        - Fix a similar problem with the Net::IP::XS::N128 bindings.
+          This only affects tests, since the IPv6 functions use the
+          n128_t type directly.
+
+0.14    17 February 2015
+        - Update internal n128 handling so that IP objects can be used
+          in conjunction with threads.
+
+0.13    15 February 2014
+        - Updated manifest.
+
+0.12    15 February 2014
+        - Adjust ip_is_ipv6 so that it rejects truncated addresses.
+        - Handle '::' when it is used to shorten a single 16-bit
+          field. (Such an address is technically invalid (RFC 5952
+          [4.2.2]), but this change is in keeping with this module's
+          generally lax approach to parsing.)
+
+0.11    20 June 2013
+        - Fix IPv4 object size problem (if a range began at 0.0.0.0,
+          size() returned (1 << 32), regardless of the actual size of
+          the range).
+
+0.10    22 December 2012
+        - Minor text/makefile updates.
+
+0.09    16 May 2012
+        - Remove Tie::Hash::Sorted dependency. It was not strictly
+          necessary that the hash always be sorted, and it's more in
+          line with how Net::IP works for it to only sort when
+          NI_ip_iptype is called.
+        - Fix NI_ip_is_ipv4 and NI_ip_is_ipv6 problems (both were
+          writing past the end of an array in some cases).
+        - Add 128-bit integer tests.
+
+0.08    15 May 2012
+        - Remove GMP dependency.
+        - Fix NI_ip_aggregate memory error on invalid input.
+        - Change NI_ip_binadd's behaviour on invalid input (non-zeroes
+          treated as ones).
+        - NI_ip_bintoint will now return at most ((1 << 128) - 1).
+        - NI_ip_inttobin's result will now always be either 32 or 128
+          characters in length.
+
+0.07    18 August 2011
+        - NI_ip_compress_v4_prefix now matches the behaviour of the
+          version from Net::IP (it was returning incorrect results
+          when the prefix length was not on an octet boundary).
+
+0.06    11 March 2011
+        - Fixed 0.05 change (it led to a memory leak in NI_aggregate).
+        - Now compiles when using a C++ compiler (tested with gcc-g++).
+        - Miscellaneous problems (wrong types, unused variables).
+
+0.05    08 March 2011
+        - Missing 'return 0' statement on aggregation failure in the 
+          IPv6 aggregate object method.
+
+0.04    07 March 2011
+        - Use Devel::CheckLib when installing to see whether GMP 
+          is present.
+
+0.03    26 February 2011
+        - Modified NI_ip_compress_address so that it does not use '::' 
+          to shorten a single 16-bit 0 field (see RFC 5952).
+
+0.02    10 April 2010
+        - Added ip_add_num function and +/bool overloads.
+        - Added 'PROC' export tag.
+
+0.01    06 April 2010
+        - Initial release.

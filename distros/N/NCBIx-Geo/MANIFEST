@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/NCBIx/Geo.pm
+lib/NCBIx/Geo/Base.pm
+lib/NCBIx/Geo/Item.pm
+lib/NCBIx/Geo/Sample.pm
+scripts/geo.pp
+t/00.load.t

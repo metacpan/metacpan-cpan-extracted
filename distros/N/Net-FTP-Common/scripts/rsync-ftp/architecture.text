@@ -1,0 +1,7 @@
+- two programs
+
+- why?
+
+  can hand-modify. alter sequencing. separate processes (but no
+  pipelining). alter amount of files to send. partition amount of files
+  

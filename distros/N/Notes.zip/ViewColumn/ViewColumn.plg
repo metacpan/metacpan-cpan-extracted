@@ -1,0 +1,63 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: ViewColumn - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP88.tmp" with contents
+[
+/nologo /MLd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "W32" /Fp"Debug/ViewColumn.pch" /YX /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"C:\Perl\dev\Notes\ViewColumn\ViewColumn.c"
+]
+Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP88.tmp" 
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP89.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib notes0.obj notes.lib /nologo /subsystem:console /incremental:yes /pdb:"Debug/ViewColumn.pdb" /debug /machine:I386 /out:"Debug/ViewColumn.exe" /pdbtype:sept 
+.\Debug\ViewColumn.obj
+]
+Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP89.tmp"
+<h3>Output Window</h3>
+Compiling...
+ViewColumn.c
+ViewColumn.xs(32) : warning C4101: 'pTableFormat2' : unreferenced local variable
+ViewColumn.xs(37) : warning C4101: 'tableFormat2' : unreferenced local variable
+Linking...
+notes0.obj : error LNK2001: unresolved external symbol _NotesMain@8
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_stack_grow
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_Tstack_max_ptr
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_sv_bless
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_gv_stashpv
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_newRV
+ViewColumn.obj : error LNK2001: unresolved external symbol __imp__win32_free
+ViewColumn.obj : error LNK2001: unresolved external symbol __imp__win32_malloc
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_newSVpv
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_hv_store
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_newSViv
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_block_gimme
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_Top_ptr
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_sv_setiv
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_sv_2mortal
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_newHV
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_sv_2uv
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_Isv_undef_ptr
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_warn_nocontext
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_sv_isobject
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_croak
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_Tmarkstack_ptr_ptr
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_Tstack_base_ptr
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_Tstack_sp_ptr
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_get_context
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_Isv_yes_ptr
+ViewColumn.obj : error LNK2001: unresolved external symbol _Perl_newXS
+Debug/ViewColumn.exe : fatal error LNK1120: 27 unresolved externals
+Error executing link.exe.
+
+
+
+<h3>Results</h3>
+ViewColumn.exe - 28 error(s), 2 warning(s)
+</pre>
+</body>
+</html>

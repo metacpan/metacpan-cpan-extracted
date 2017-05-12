@@ -1,0 +1,13 @@
+ChangeLog
+MANIFEST			This file
+MANIFEST.SKIP
+Makefile.PL			Makefile generator
+README				Docs, extracted from Client.pm
+lib/Bundle/Net/Nessus.pm	A bundle for CPAN installation
+lib/Net/Nessus/Client.pm	The Nessus client
+lib/Net/Nessus/Message.pm	The NTP implementation
+nessusc.PL			Net::Nessus::Client frontend
+t/base.t			Base test (Loading Modules)
+t/client.t			Client test (Talking to the server)
+test.pl				Test script doing a Nessus scan
+META.yml                                 Module meta-data (added by MakeMaker)

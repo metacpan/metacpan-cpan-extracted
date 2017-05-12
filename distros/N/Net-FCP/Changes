@@ -1,0 +1,79 @@
+Revision history for Perl extension Net::FCP
+
+1.2  Thu May  1 17:28:52 CEST 2008
+	- clarify protocol version.
+        - many small updates to fmd.
+
+1.1  Sun Dec 23 16:39:38 CET 2007
+        - incompatible temporary filename change.
+	- removed workaround for Tk, expecting a timely fix :)
+        - made fmd use Coro::AIO for most I/O.
+        - converted fmd to EV.
+        - lots of minor changes.
+
+1.0  Thu Dec  1 23:05:47 CET 2005
+	- use AnyEvent, remove own Event interface.
+        - work around the many bugs in Tk wrt. event handling.
+
+0.8  Thu Mar  3 18:00:52 CET 2005
+	- use Array::Heap2, not Array::Heap.
+        - small fixes and improvements everywhere.
+        - change of contact address.
+
+0.7  Tue May 18 15:44:46 CEST 2004
+	- major restructuring.
+	- handle key_collision just like successful insert,
+          but set the atribute key_collision on the returned
+          attributes.
+        - added Net::FCP::Metadata module, for further improvements
+          with metadata handling.
+        - added Net::FCP::Key::SSK.
+        - many documentation fixes/improvements.
+
+0.6  Thu May 13 23:42:33 CEST 2004
+	- many bugfixes (most noteworthy: client_put works now).
+        - progress callback.
+        - added experimental Key::CHK.
+
+0.5  Tue Sep 23 22:46:48 CEST 2003
+	- some more IT'S HEX, STUPID-type of fixes.
+        - restructured fmd. works perfect and fast for me now.
+
+0.08  Tue Sep 16 09:01:05 CEST 2003
+	- added event model autodetection.
+        - event models supported: Coro, Event, Glib, Tk.
+        - added Net::FCP::Util.
+        - bugfixed the case when txn's sent data (when will I learn
+          to use HEX everywhere...)
+        - make fmd verify all blocks. or at least most blocks.
+
+0.07  Sun Sep 14 10:57:09 CEST 2003
+	- handle metadata that doesn't end in a newline.
+        - fixed txn names to be txn_* instead of *_txn, as per the docs.
+        - "fix" insert_private_key.
+        - fix endless loop problem on ClientGet.
+        - many, many other small fixes.
+        - added bin/fmd, the not-yet-functional freenet mass downloader.
+
+0.06  Wed Sep 10 07:13:41 CEST 2003
+	- various small bugfixes.
+
+0.05  Wed Sep 10 07:06:54 CEST 2003
+	- err, file downloads actually return the right data now.
+        - implemented non-blocking request writing.
+        - event model now looks "final" for filehandles.
+
+0.04  Tue Sep  9 08:12:59 CEST 2003
+	- pluggable event implementation. Just Event for now.
+
+0.03  Mon Sep  8 03:46:41 CEST 2003
+	- more bugfixes, metadataparsing.
+        - I'm going to bed now. really.
+
+0.02  Mon Sep  8 02:36:18 CEST 2003
+	- implemented client_get, and many much-needed
+          bugfixes.
+
+0.01  Sun Sep  7 21:40:05 CEST 2003
+	- original version; cp -rvp Crypt-Twofish2
+

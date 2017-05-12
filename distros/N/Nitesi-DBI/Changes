@@ -1,0 +1,225 @@
+Revision history for Nitesi::DBI
+
+0.0092 Sun Oct  6 12:26:49 2013 EDT
+
+    [ENHANCEMENTS]
+
+    * Use api_object function to fill search results with real objects.
+
+    [BUG FIXES]
+
+    * Reintroduce support for log_queries (GH #1, Marco Pessotto)
+
+    [DOCUMENTATION]
+
+    * Add template, language and alias fields to navigation table in database schema.
+    * Add description of attributes to Nitesi::Query::DBI.
+
+0.0091 Wed Aug 21 11:48:44 2013 CEST
+
+    [BUG FIXES]
+
+    * Avoid trying to load entities without key in DBI backend.
+    * Check whether there is a base role when handling subclasses for
+      assignments.
+       
+    [DOCUMENTATION]
+
+    * Add session_id to carts table in database schema.
+    * Get rid of "::character varying" as default value in the database schema.
+    * Fix mistakes in definition of carts table in database schema.
+
+0.0090 Thu Jun 20 09:22:36 2013 CEST
+
+    [API CHANGES]
+
+    * Use integer type for last_login field in users.
+
+    [ENHANCEMENTS]
+
+    * Replace Nitesi::Object with Moo.
+    * Add support for last_login to account provider.
+
+0.0082 Sun Jun 16 13:13:09 2013 CEST
+
+    [BUG FIXES]
+
+    * Exclude SQLite2 DBI driver from limit_offset and serial tests.
+
+0.0081 Tue Jun 11 17:35:19 2013 CEST
+
+    [ENHANCEMENTS]
+
+    * Add support for offset keyword in select queries (Grega Pompe).
+    * Add log_queries attribute to Dancer::Plugin::Nitesi::Backend::DBI.
+
+    [DOCUMENTATION]
+
+    * Add gtin and status columns to products table in the database schema.
+
+    [TESTS]
+
+    * Fix regular expression for tables to be cleared in query test script.
+
+0.0080 Sun May 26 11:26:16 2013 CEST
+
+    [ENHANCEMENTS]
+
+    * Add Git repository to Makefile.PL.
+
+    [BUG FIXES]
+
+    * Execute POD tests only during release testing.
+
+    [DOCUMENTATION]
+
+    * Increase size of username field to the size of the email field.
+    * Update schema in regards of transactions, orderline and 
+      payment_transactions.
+    * Add canonical_sku and uri column to products table in the database schema.
+
+    [TESTS]
+
+    * Fix detection of existing tables for PostgreSQL in the query test.
+
+0.0060 Sun Oct 28 18:20:49 2012 CET
+
+    [ENHANCEMENTS]
+
+    * Add DBI backend for Nitesi API.
+    * Add DBI backend class for Dancer.
+
+    [DOCUMENTATION]
+
+    * Improve documentation with more examples and explanations.
+      (Jure Kodžoman)
+    * Updates to draft on recommended database schema.
+
+0.0050 Wed Jul 11 14:10:27 2012 CEST
+
+    [ENHANCEMENTS]
+
+    * Let insert method try to return value of primary key. 
+      With mysql and Pg drivers that will work even with serial fields.
+    * Add load, create, delete and become method to account provider class.
+
+    [BUG FIXES]
+
+    * Fix bug in Nitesi::Query::DBI's delete method when called with named
+      parameters.
+
+    [TESTS]
+
+    * Add tests for Nitesi::Query::DBI's delete method.
+    * Remove existing tables from test database at the beginning of
+      the test cycle.
+
+    [DOCUMENTATION]
+
+    * Add draft documentation on Nitesi's default database schema.
+    * Add example for calling Nitesi::Query::DBI's delete method with named
+      parameters. 
+
+0.0040 Sun Nov 27 12:14:54 2011 CET
+
+    [ENHANCEMENTS]
+
+    * Add support for distinct in select queries to query engine.
+    * Add inactive setting for disabled users to account provider.
+    * Add log_queries attribute to Nitesi::Query::DBI class.
+
+    [BUG FIXES]
+
+    * Fix crash with select queries passed to SQL::Abstract::More without where parameter.
+    * Fix create and drop table statement
+
+    [TESTS]
+
+    * Add tests for select distinct queries.
+
+    [DOCUMENTATION]
+
+    * Add supported query types and examples for select queries with order, limit,
+      distinct and join to Nitesi::Query::DBI's POD.
+
+0.0032 Mon Nov  7 08:49:29 2011 CET
+
+    [BUG FIXES]
+
+    * Require SQL::Statement for query testing as DBI::SQL::Nano is
+      too limited for the statements produced by SQL::Abstract.
+
+0.0031 Sun Oct 30 10:38:40 2011 CET
+
+    [TESTS]
+
+    * Remove -T switch from simple query test.
+
+    [DOCUMENTATION]
+
+    * Add documentation for dbh and sqla accessors.
+
+0.0030 Sat Oct 29 13:21:28 2011 CEST
+
+    [BUG FIXES]
+
+    * Skip query tests when database handles aren't available.
+
+0.0020 Wed Oct 26 16:28:03 2011 CEST
+
+    [API CHANGES]
+
+    * Change semantic of roles account method to return role names
+      instead of role identifiers.
+
+    [ENHANCEMENTS]
+
+    * Extend value method of DBI account provider with setting account values.
+    * Wrap calls to SQL::Abstract(::More)'s select into an eval.
+
+    [BUG FIXES]
+
+    * Allow field as parameter to select_list_field query method analogous to select_field.
+
+    [DOCUMENTATION]
+
+    * Use =head1 for description in Nitesi::Query::DBI's POD.
+    * Add description to POD for DBI provider's exists method.
+
+    [TESTS]
+
+    * Add very basic test for Nitesi::Query::DBI.
+
+0.0010 Thu Oct 13 09:10:59 2011 EDT
+
+    [ENHANCEMENTS]
+
+    * Add exists and password method to account provider class.
+    * Add fields attribute to account provider class.
+
+    [BUG FIXES]
+
+    * Add dependency on Nitesi to Makefile.PL.
+
+    [DOCUMENTATION]
+
+    * Fix code example for select_field method.
+
+0.0003 Tue Oct  4 11:50:55 2011 EDT
+
+    [ENHANCEMENTS]
+
+    * Add limit parameter to select method.
+
+0.0002 Thu Sep 29 13:54:10 2011 CEST
+
+    [ENHANCEMENTS]
+
+    * Return all fields from a select query without fields parameter.
+    * Pass through order parameter for select queries.
+
+0.0001 Sat Sep 24 15:49:04 2011 CEST
+
+    * Initial release
+
+

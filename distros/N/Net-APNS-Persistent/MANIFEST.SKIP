@@ -1,0 +1,10 @@
+~$          # ignore emacs and vim backup files
+\.bak$       # ignore manual backups
+\#          # ignore CVS old revision files and emacs temp files
+^blib
+\.old$
+\.DS_Store$
+^pm_to_blib$
+^MANIFEST\.bak$
+^Makefile$
+^.git

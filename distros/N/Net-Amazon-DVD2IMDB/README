@@ -1,0 +1,31 @@
+Net/Amazon/DVD2IMDB version 0.03
+==================================
+
+This module is designed to convert DVD ASIN numbers to their associated IMDB tag. 
+This modules uses Net::Amazon to find the correct DVDs - but then is forced to 
+make web requests to the associated Amazon page to find the correct IMDB movie.
+
+See the POD documentation for more info.
+
+More information can also be found here:
+    http://ejohn.org/projects/dvd2imdb/
+
+INSTALLATION
+
+This module requires the Net::Amazon package, which in turn 
+requires Log::Log4perl, LWP::UserAgent, and XML::Simple 2.x
+
+Once all dependencies have been resolved, "Net::Amazon::DVD2IMDB" installs 
+with the typical sequence
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 John Resig
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

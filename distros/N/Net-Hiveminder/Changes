@@ -1,0 +1,44 @@
+Revision history for Net-Hiveminder
+
+0.08    Thu Jul 09 04:50:27 EST 2009
+        Add get_task_history (Nathan Vonnahme)
+        Further dependency and pod cleanups
+
+0.07    Mon Apr 20 15:22:52 CST 2009
+        Dependency cleanups, releng, pod coverage thanks to c9s++
+        Allow passing arguments from todo to display_tasks
+        Add a send_feedback method
+
+0.05    Mon Mar 17 08 13:22:32
+        todo, create_task and braindump now use filters so you can have .hm
+            files in your directories to have filters applied
+        Allow extra arguments in create_task to set fields (e.g. due) directly
+
+0.04    Thu Feb 07 08 21:17:59
+        Add new scripts: todo, create, done
+        Fix undef warning in download_text
+        Move scripts to hm-* and install them automatically
+        Fix comments_on to give all comments, not an arbitrary one
+        Add * to completed tasks in display_tasks
+        Add bulk_update and complete_tasks
+
+0.03    Mon Jan 21 08 01:50:38
+        Rename tasks2ids to loc2id
+        Add id2loc method
+        You can pass arguments to display_tasks. See its POD for how, and what
+        loc2id can now take task-hashes
+        You can pass arguments to braindump. The "tokens" argument must now be
+            passed in as a special option (tokens => 'foo')
+        Add comments_on(task) method
+        Add comment_on(task, msg) method
+
+0.02    Sat Jan 12 08 22:48:24
+        Remove canonicalize_priority, Hiveminder does it for us.
+        Add priority method
+        Add priority to display_tasks
+        Add done method
+        Add tasks2ids method
+
+0.01    Wed Nov 21 07 16:45:38 2007
+        First version, released on an unsuspecting world.
+

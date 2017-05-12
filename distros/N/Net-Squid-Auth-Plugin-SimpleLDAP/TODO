@@ -1,0 +1,22 @@
+TO-DO LIST
+==========
+
+Tests, tests, tests, more tests:
+
+* start an openldap server
+** load it with some ldif files
+** prepare some configuration files for Net::Squid::Auth::Engine
+** try to create and initialize SimpleLDAP
+*** more testing on params
+*** test connection
+*** test bind
+*** test search
+** stop the server
+
+* Try some public LDAP servers? (Create a dummy account there for this)
+** http://www.mail-archive.com/dev-tech-ldap@lists.mozilla.org/msg00121.html
+** http://www.emailman.com/ldap/public.html
+** http://www.keutel.de/directory/public_ldap_servers.html
+
+* allow Net::LDAP callbacks?
+

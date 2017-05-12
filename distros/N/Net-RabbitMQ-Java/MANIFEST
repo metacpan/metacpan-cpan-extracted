@@ -1,0 +1,26 @@
+Changelog
+inc/File/ShareDir/Install.pm
+lib/Net/RabbitMQ/Java.pm
+LICENSE
+LICENSE-APACHE2
+LICENSE-GPL2
+LICENSE-MPL-RabbitMQ
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+share/java/commons-io-1.2.jar
+share/java/Helper.java
+share/java/rabbitmq-client.jar
+t/01-use.t
+t/02-pod.t
+t/10-init.t
+t/11-exchangedeclare.t
+t/12-publish.t
+t/13-consume.t
+t/14-txreturn.t
+t/15-shutdown.t
+t/16-removeshutdown.t
+t/17-destroy.t
+t/18-exceptions.t
+META.yml                                 Module meta-data (added by MakeMaker)

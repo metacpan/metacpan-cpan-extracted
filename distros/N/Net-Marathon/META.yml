@@ -1,0 +1,57 @@
+---
+abstract: 'An object-oriented Mapper for the Marathon REST API, fork of Marathon module'
+author:
+  - 'Sebastian Geidies C<< <seb at geidi.es> >> (original Marathon module)'
+build_requires:
+  Test::CheckManifest: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Marathon
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::Marathon:
+    file: lib/Net/Marathon.pm
+    version: v0.1.0
+  Net::Marathon::App:
+    file: lib/Net/Marathon/App.pm
+  Net::Marathon::Deployment:
+    file: lib/Net/Marathon/Deployment.pm
+  Net::Marathon::Deployment::Step:
+    file: lib/Net/Marathon/Deployment.pm
+  Net::Marathon::Events:
+    file: lib/Net/Marathon/Events.pm
+  Net::Marathon::Group:
+    file: lib/Net/Marathon/Group.pm
+  Net::Marathon::Remote:
+    file: lib/Net/Marathon/Remote.pm
+requires:
+  AnyEvent: '0'
+  IO::All: '0'
+  JSON::XS: '3.01'
+  LWP::UserAgent: '6.13'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tynovsky/Net-Marathon/issues
+  homepage: https://github.com/tynovsky/Net-Marathon
+  repository: git://github.com/tynovsky/Net-Marathon.git
+version: 0.1.0
+x_authority: cpan:TYNOVSKY
+x_contributors:
+  - 'Miroslav Tynovsky <tynovsky@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

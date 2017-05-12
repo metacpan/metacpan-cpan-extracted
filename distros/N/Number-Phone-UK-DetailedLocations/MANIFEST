@@ -1,0 +1,13 @@
+lib/Number/Phone/UK/DetailedLocations.pm
+t/00_detailed_locations.t
+MANIFEST
+lib/Number/Phone/UK/DetailedLocations.pod
+Makefile.PL
+CHANGELOG
+README
+lib/Number/Phone/UK/DBM/Deep/Array.pm
+lib/Number/Phone/UK/DBM/Deep/Hash.pm
+lib/Number/Phone/UK/DBM/Deep.pm
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,10 @@
+Makefile.PL
+META.yml
+Build.PL
+Changes
+lib/Net/Rendezvous/Publish.pm
+lib/Net/Rendezvous/Publish/Service.pm
+lib/Net/Rendezvous/Publish/Backend/Null.pm
+MANIFEST
+MANIFEST.SKIP
+t/simple.t

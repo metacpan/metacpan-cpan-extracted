@@ -1,0 +1,15 @@
+REQMOD icap://icap-server.net/server?arg=87 ICAP/1.0
+Host: icap-server.net
+Date: Wed, 08 Nov 2000 16:02:10 GMT
+Encapsulated: req-hdr=0, req-body=147
+
+POST /origin-resource/form.pl HTTP/1.1
+Host: www.origin-server.com
+Accept: text/html, text/plain
+Accept-Encoding: compress
+Pragma: no-cache
+
+1e
+I am posting this information.
+0
+

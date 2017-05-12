@@ -1,0 +1,63 @@
+Net-Plurk
+
+This module can be treat like a wrapper of Plurk (www.plurk.com) OAuth API.
+User who use Net-Plurk are required to apply their own tokens.
+See http://www.plurk.com/API/2 for detailed information.
+
+The simplest usage:
+
+    use Net::Plurk;
+    my $p = Net::Plurk->new(consumer_key => $CONSUMER_KEY, consumer_secret => $CONSUMER_SECRET);
+    $p->authorize(token => $ACCESS_TOKEN, token_secret => $ACCESS_TOKEN_SECRET);
+    my $profile = $p->get_own_profile();
+    ...
+    # return raw output (JSON)
+    $p->raw_output(1);
+    my $json = $p->get_own_profile();
+    ...
+    # or call API directly
+    my $json = $p->callAPI( '/Polling/getUnreadCount', %args);
+    ...
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::Plurk
+
+You can also look for information at:
+
+    github issue tracker
+        http://github.com/clsung/net-plurk/issues
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Plurk
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-Plurk
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-Plurk
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-Plurk/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009~2011 Cheng-Lung Sung
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Net-TCP-PtyServer
+version:      1
+version_from: lib/Net/TCP/PtyServer.pm
+installdirs:  site
+requires:
+    IO::Pty:                       0
+    Net::TCP:                      0
+    POSIX:                         0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

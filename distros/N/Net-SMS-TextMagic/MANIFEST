@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+META.yml
+t/01_init.t
+t/96_critic.t
+t/97_pod.t
+t/98_pod_coverage.t
+t/99_kwalitee.t
+t/perlcriticrc
+lib/Net/SMS/TextMagic.pm

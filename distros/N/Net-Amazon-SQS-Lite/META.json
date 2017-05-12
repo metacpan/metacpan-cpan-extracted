@@ -1,0 +1,82 @@
+{
+   "abstract" : "Amazon SQS client",
+   "author" : [
+      "Kazuhiro Shibuya <stevenlabs@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.9",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Amazon-SQS-Lite",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Furl" : "3.07",
+            "HTTP::Message" : "6.10",
+            "Moo" : "2.000001",
+            "Pod::Markdown" : "2.002",
+            "WebService::Amazon::Signature" : "0.002",
+            "XML::Simple" : "2.20",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Amazon::SQS::Lite" : {
+         "file" : "lib/Net/Amazon/SQS/Lite.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ka2u/Net-Amazon-SQS-Lite/issues"
+      },
+      "homepage" : "https://github.com/ka2u/Net-Amazon-SQS-Lite",
+      "repository" : {
+         "url" : "git://github.com/ka2u/Net-Amazon-SQS-Lite.git",
+         "web" : "https://github.com/ka2u/Net-Amazon-SQS-Lite"
+      }
+   },
+   "version" : "0.04",
+   "x_authority" : "cpan:SHIBUYA",
+   "x_contributors" : [
+      "Kazuhiro Shibuya <shibuya@fout.jp>"
+   ]
+}

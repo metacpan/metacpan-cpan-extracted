@@ -1,0 +1,44 @@
+You should know the drill by now:
+
+1)   perl Makefile.PL
+
+You might have to answer some questions during this phase.
+
+If a previous version of Net::Ident is found on your system, the Makefile.PL
+will ask you if you want to install this version in a backward-compatible
+way. This might make it easier for existing scripts. See the Changes file
+or the pod documentation for more information on what exactly changed.
+
+If you want to force installing in a compatible way, add the "-c"
+switch to the Makefile.PL command line.
+
+If you have a mod_perl enabled apache server running on the current machine,
+and you have an identd daemon installed, you are offered the option to add
+a test that starts a separate apache process, in which some mod_perl tests
+are performed.
+
+If you are sure you have a mod_perl enabled apache somewhere, but it just
+doesn't happen to be running right now, add the "-a" switch to the Makefile.PL
+command line.
+
+2)   make
+
+Build it.
+
+3)   make test
+
+Test it. If you asked for a backward-compatible installation, it'll test
+t/compat, otherwise this test will be skipped.
+
+If you asked for the apache tests, the t/apache test will perform those,
+otherwise this test will be skipped.
+
+In other words: if you get skipped tests, do not worry about them.
+
+If, however, you asked for the apache test, and the test is skipped, then
+something is wrong with your apache setup, for example because apache
+couldn't be started properly.
+
+4)   make install
+
+Installs the module.

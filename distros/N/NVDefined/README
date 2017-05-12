@@ -1,0 +1,10 @@
+This is the README file for NVDefined
+
+NVDefined has been replaced by Hash::NoVivify. This module serves only
+as a wrapper for that.
+
+NVDefined requires perl5.004, and Hash::NoVivify 0.01, and is
+
+Copyright(c) 1999 Brent B. Powers. All rights reserved. This program
+is free software, you may redistribute it and/or modify it under the
+same terms as Perl itself.

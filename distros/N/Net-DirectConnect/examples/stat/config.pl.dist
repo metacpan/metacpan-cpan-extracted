@@ -1,0 +1,20 @@
+#copy me to config.pl and edit?
+#
+#$config{'sql'}{'driver'} = 'mysql'; #sqlite by default
+#$config{'sql'}{'driver'} = 'mysql4';
+#$config{'sql'}{'dbname'} = 'mydcstat';
+#$config{'sql'}{'dbname'} = '/tmp/mydcstat'; # for sqlite
+#$config{'sql'}{'pass'} = '1234';
+#
+#$config{'M'} = 'P'; #passive
+#
+#$config{'use_slow'} = 1; # for very small hub
+#
+#dev logs
+#$config{ 'log_' . $_ } = 1 for qw (dmp dcdmp dcdbg adcdev dev);
+#$config{'no_print'} = { map { $_ => 1 } qw(Quit Hello UserCommand) };    #SR Search MyINFO
+#
+#$config{'purge'}          = 7 * 86400;.# for big hub[s]
+#
+# $config{dc}{'share'} = [qw(/usr/ports/distfiles /usr/ports/packages c:\dist c:\distr c:\pub )];
+1;

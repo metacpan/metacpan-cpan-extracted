@@ -1,0 +1,25 @@
+This is version 1.0 of the Perl module to access to Hesiod library API,
+Net::Hesiod
+
+Installation instructions may be found in README.INSTALL
+
+Usage instructions are contained in POD form in the module, use
+perldoc -F Hesiod.pm 
+prior to installation or
+perldoc Net::Hesiod
+after installation.
+
+This code is copyright (c) 2001 by Tom Payerle <payerle@physics.umd.edu>.
+It is made available AS IS with no warranties, implicit or otherwise, nor
+and statement of its suitability for any purpose.  Use at your own risk.
+
+You are free to copy, redistribute, or modify this code under the same terms
+as Perl itself.  You may,  at your option, copy, redistribute, modify,
+etc. it under either the GNU GPL or The Artistic License, as detailed below.
+
+GNU GPL
+See the file GPL.TXT.  Also see http://www.gnu.org/copyleft/gpl.html
+
+The Artistic License
+See the file Artistic.txt.
+See also http://www.perl.com/language/misc/Artistic.html

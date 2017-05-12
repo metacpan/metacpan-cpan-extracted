@@ -1,0 +1,177 @@
+#!/usr/bin/env perl
+use 5.010001;
+use warnings;
+use strict;
+use utf8;
+
+our $VERSION = 'v2.3.7';
+
+use FindBin;
+use lib "$FindBin::Bin/../lib/perl5";
+use Narada;
+use Narada::Config qw( get_config_line get_db_config );
+use DBI;
+use Path::Tiny;
+
+use constant IS_NARADA      => Narada::detect() eq 'narada';
+use constant CONFIG_DIR     => IS_NARADA ? 'mysql'      : 'db';
+use constant SQL_DIR        => IS_NARADA ? 'var/mysql'  : 'var/sql';
+use constant SCHEME         => SQL_DIR.'/db.scheme.sql';
+
+
+main(@ARGV) if !caller;
+
+
+sub err { die "narada-setup-mysql: @_\n" }
+
+sub main {
+    die "Usage: narada-setup-mysql [--clean]\n"
+        if (@_ >  1)
+        || (@_ == 1 && $_[0] ne '--clean');
+
+    my $db = get_db_config() or return;
+    $::dbh = DBI->connect($db->{dsn_nodb}, $db->{login}, $db->{pass},
+        {RaiseError=>1}) or err DBI->errstr;
+
+    if (@_) {
+        path('var/use/mysql')->remove;
+        $::dbh->do('DROP DATABASE IF EXISTS `'.$db->{db}.q{`});
+    }
+    else {
+        if (IS_NARADA) {
+            path('var/use/mysql')->touch;
+        }
+        $::dbh->do('CREATE DATABASE IF NOT EXISTS `'.$db->{db}.q{`});
+        $::dbh->do('USE `'.$db->{db}.q{`});
+        if (0 < $::dbh->prepare('SHOW TABLES')->execute()) {
+            err 'SQL files not imported because database does not empty';
+        }
+        if (-f SCHEME) {
+            import_sql(SCHEME);
+            for (grep {-f && $_ ne SCHEME} glob SQL_DIR.'/*.sql') {
+                import_sql($_);
+            }
+        }
+    }
+
+    return;
+}
+
+sub import_sql {
+    my ($file) = @_;
+    warn "Importing $file...\n";
+    system("narada-mysql <\Q$file\E") == 0 or err 'Failed to import '.$file;
+    return;
+}
+
+
+1; # Magic true value required at end of module
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+narada-setup-mysql - initialize project database
+
+
+=head1 VERSION
+
+This document describes narada-setup-mysql version v2.3.7
+
+
+=head1 USAGE
+
+    narada-setup-mysql [--clean]
+
+
+=head1 DESCRIPTION
+
+Should be executed in project deploy directory (or Narada 1.x project root
+directory).
+
+Initialize/drop your Narada project's MySQL database.
+
+If "config/mysql/db" absent or empty do nothing.
+
+When executed without params will create database (if needed) and load sql dumps
+into database (if C<var/mysql/db.scheme.sql> exist).
+
+When executed with --clean option will drop project's database with all tables.
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+    config/mysql/db
+    config/mysql/login
+    config/mysql/pass
+    config/mysql/host
+    config/mysql/port
+    var/mysql/db.scheme.sql
+    var/mysql/*.sql
+    var/use/mysql
+
+Narada 1.x project use C<config/db/> instead of C<config/mysql/>,
+and C<var/sql/> instead of C<var/mysql/>.
+
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/powerman/Narada/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software. The code repository is available for
+public review and contribution under the terms of the license.
+Feel free to fork the repository and submit pull requests.
+
+L<https://github.com/powerman/Narada>
+
+    git clone https://github.com/powerman/Narada.git
+
+=head2 Resources
+
+=over
+
+=item * MetaCPAN Search
+
+L<https://metacpan.org/search?q=Narada>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/dist/Narada>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Narada>
+
+=item * CPAN Testers Matrix
+
+L<http://matrix.cpantesters.org/?dist=Narada>
+
+=item * CPANTS: A CPAN Testing Service (Kwalitee)
+
+L<http://cpants.cpanauthors.org/dist/Narada>
+
+=back
+
+
+=head1 AUTHOR
+
+Alex Efros E<lt>powerman@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2008- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+
+=cut

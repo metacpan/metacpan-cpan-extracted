@@ -1,0 +1,13 @@
+Reading database from /usr/home/james/perl/Net-TCPWrappers/trunk/cover_db
+
+
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+File                           stmt branch   cond    sub    pod   time  total
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+blib/lib/Net/TCPwrappers.pm   100.0  100.0    n/a  100.0    n/a  100.0  100.0
+Total                         100.0  100.0    n/a  100.0    n/a  100.0  100.0
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+
+
+Writing HTML output to /usr/home/james/perl/Net-TCPWrappers/trunk/cover_db/coverage.html ...
+done.

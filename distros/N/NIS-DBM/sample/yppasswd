@@ -1,0 +1,138 @@
+#! /opt/local/bin/perl
+
+# $Id: yppasswd,v 1.9 1999/09/24 19:18:36 jgsmith Exp $
+#
+# Copyright (c) 1999, Texas A&M University
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. Neither the name of the University nor the names of its contributors
+#    may be used to endorse or promote products derived from this software
+#    without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTERS ``AS IS''
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+use lib '../lib';
+use lib './yppasswd_private/blib/lib';
+use lib './yppasswd_private/blib/arch';
+
+use Data::Dumper;
+use yppasswd_private::Data;
+use yppasswd_private::Constants;
+use RPC::ONC;
+use NIS::DBM;
+use ErrorHandler;
+
+use vars (qw/$nopw $nogecos $noshell/);
+
+while(@ARGV) {
+  my $arg = shift @ARGV;
+  if($arg eq '-nopw') {
+    $nopw = 1;
+  } elsif($arg eq '-nogecos') {
+    $nogecos = 1;
+  } elsif($arg eq '-noshell') {
+    $noshell = 1;
+  } elsif($arg eq '-m') {
+    @ARGV = ();
+  } elsif($arg !~ /^-D/) {
+    die "`$arg' is not a valid argument\n";
+  }
+}
+
+die "yppasswdd does nothing if `-nogecos', `-nopw', and `-noshell' are given\n"
+  if($nogecos && $noshell && $nopwd);
+
+sub check_password {
+  my($oldpassword, $encpassword) = @_;
+
+  return 1 if crypt($oldpasswd, $oldinfo->{'password'}) 
+                eq $oldinfo->{'password'};
+
+  # still need to check against root's password...
+  my $rootpw = (getpwnam('root'))[1];
+  return 1 if crypt($oldpasswd, $rootpw) eq $rootpw;
+
+  return 0;
+}
+
+sub yppasswdproc_update_master_1_eval {
+  my($masterpasswd) = shift;
+  my($info) = $masterpasswd->newpw;
+  my($oldpasswd) = $masterpasswd->oldpass;
+
+  my(%userinfo);
+
+  $userinfo{password} = $info->pw_passwd unless $nopw;
+  $userinfo{gecos}    = $info->pw_age    unless $nogecos;
+  $userinfo{shell}    = $info->pw_gecos  unless $noshell;
+
+  my %nisinfo;
+
+  my $daemon = tie %nisinfo, 'NIS::DBM', 
+    { 'config_file' => '/etc/accounts.conf',
+      'sections' => [ 'yppasswd', ],
+    };
+  if(defined $daemon) {
+    my %error_opts;
+    foreach my $k ( qw/syslog_ident syslog_facility mail_to/,
+                    qw/mail_subject memory_byte_limit mail_on_over_limit/ 
+                  )
+    {
+      if($daemon->get_option($k) !~ /^\s*$/) {
+        $error_opts{$k} = $daemon->get_option($k);
+      }
+    }
+    my $error_handler = new ErrorHandler(%error_opts);
+    local $SIG{__WARN__} = sub { my $e = join($,,@_); $e =~ s/at\s+\S+\s+line\s+\d+\s*$//; $error_handler->warn($e); };
+    local $SIG{__DIE__} = sub { my $e = join($,,@_); $e =~ s/at\s+\S+\s+line\s+\d+\s*$//; $error_handler->error($e); };
+
+    $daemon->set_option(FLUSH => 1);
+    $daemon->set_option(CLOBBER => 1);
+    $daemon->set_option(PUSH => 1);
+    
+    my $oldinfo = $nisinfo{$info->pw_name};
+
+    # check passwords at this point...
+    unless(check_password($oldpassword, $oldinfo->{'password'})) {
+      die "Unauthorized attempt to change passord for $$oldinfo{'username'}";
+      return 1;
+    }
+
+    foreach my $k (keys %userinfo) {
+      $oldinfo->{$k} = $userinfo{$k};
+    }
+    $nisinfo{$info->pw_name} = $oldinfo;
+    return 0;
+  } 
+  return 1;
+}
+
+sub yppasswdproc_update_master_1 {
+  my($masterpasswd) = shift;
+
+  my $ret;
+  if(defined eval('$ret = yppasswdproc_update_master_1_eval($masterpasswd)')) {
+    return $ret;
+  }
+  return 1;
+}
+
+1;

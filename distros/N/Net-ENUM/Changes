@@ -1,0 +1,12 @@
+Revision history for Net::ENUM
+
+0.3 Tue Okt 19 2010
+    - add return value to 'translate_vanity'
+    - updated for better .pod file
+
+0.2 Tue Okt 19 2010
+    - add vanity translation
+    - the new(...) attributes must be references now
+
+0.1 Sun Okt 17 2010
+    - first public version

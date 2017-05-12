@@ -1,0 +1,15 @@
+Changes
+README
+MANIFEST
+Makefile.PL
+SMPP.pm
+test.pl
+smsc.pl
+esme.pl
+bind-hammer.pl
+esme-hammer.pl
+sendmessage.pl
+esme-rec.pl
+SMPP_Test/client.pl
+SMPP_Test/timeout.t
+META.yml                                 Module meta-data (added by MakeMaker)

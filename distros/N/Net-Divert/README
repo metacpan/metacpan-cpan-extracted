@@ -1,0 +1,16 @@
+
+Type:
+
+- perl Makefile.PL 
+- make 
+
+To install:
+- make install
+
+To test:
+- make test
+
+This module requires the IO::Select, IO::Socket and POSIX 
+module. 
+
+See perldoc Net::Divert after installing for more information.

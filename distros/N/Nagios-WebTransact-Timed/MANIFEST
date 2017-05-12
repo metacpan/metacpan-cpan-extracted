@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+Timed.pm
+README
+t/check_inter_perf.pl
+t/check_inter_perf.t

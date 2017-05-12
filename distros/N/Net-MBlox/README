@@ -1,0 +1,48 @@
+NAME
+    Net::MBlox - link to the MBlox api for sending SMS
+
+VERSION
+    version 0.004
+
+SYNOPSIS
+      use WWW::MBlox;
+
+      #new will fetch a token via oauth so you can make requests straight away.
+      my $mb = Net::Mblox->new(
+        consumer_key => 'key',
+        consumer_secret => 'secret',
+        app_id => 'xxxxxx',
+      );
+
+      $mb->query('sms/outbound/messages',{
+        message => "Test SMS",
+        destination => 44xxxxxxx,
+        originator => 44xxxxxxx,
+      });
+
+NAME
+    Net::MBlox - link to the mblox api for sending SMS
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/purge/net-mblox/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/purge/net-mblox>
+
+      git clone git://github.com/purge/net-mblox.git
+
+AUTHOR
+    Simon Elliott <simon@papercreatures.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Simon Elliott.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

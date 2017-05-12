@@ -1,0 +1,39 @@
+---
+abstract: 'Prefork SMTP Server'
+author:
+  - 'uchico <memememomo@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.4.9, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Server-Mail-SMTP-Prefork
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Net::Server::Mail::SMTP::Prefork:
+    file: lib/Net/Server/Mail/SMTP/Prefork.pm
+    version: 0.01
+requires:
+  Net::Server::Mail::SMTP: 0.18
+  Parallel::Prefork: 0.13
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/memememomo/p5-Net-Server-Mail-SMTP-Prefork/issues
+  homepage: https://github.com/memememomo/p5-Net-Server-Mail-SMTP-Prefork
+  repository: git://github.com/memememomo/p5-Net-Server-Mail-SMTP-Prefork.git
+version: 0.01

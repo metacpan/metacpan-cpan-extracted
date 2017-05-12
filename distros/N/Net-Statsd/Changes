@@ -1,0 +1,48 @@
+Change history for Net::Statsd
+
+0.12 - Fri Jan 15 09:39:00 CET  2016
+
+    Fixed RT#111204. There was a t/send-one.t script included in the
+    distribution that wasn't meant to be there. It was depending on perl 5.10,
+    so it caused Net::Statsd to fail tests under 5.8.
+    Thanks to nigelgregoire@gmail.com for reporting.
+
+0.11 - Thu Apr 23 16:27:58 CEST 2015
+
+    Fixed RT#103913, use note() instead of diag() in the test suite.
+    Thanks to Zefram for reporting it and sending a patch.
+
+    Implemented experimental multi-metric gauge sending.
+    Thanks to Ville Mattila for the initial patch.
+
+0.09 - Wed Jun 04 16:23:01 CEST 2014
+
+    Fixed RT#96097 (fsf address, thanks to David Dick for reporting)
+
+0.08 - Sat Aug 11 22:55:53 CEST 2012
+
+    Improved performance by a ~13x factor, optimizing the
+    send code and reusing the same socket instead of creating
+    a new one every time.
+
+    Added a benchmarking script, to measure Net::Statsd
+    throughput in msg/s.
+
+    Thanks to Tim Bunce for these great patches.
+
+0.07 - Fri Aug 10 09:16:20 CEST 2012
+
+    Fixed tests failure when an already existing statsd server
+    was already running on port 8125. The mock server will now
+    use any available unprivileged port instead of 8125.
+
+    Thanks to Joseph Crotty for reporting the problem and to
+    Jacob Rideout for providing a working patch.
+
+0.06 - Thu Jul 26 13:05:19 CEST 2012
+
+    Changed ordering of functions and POD documentation
+    to clarify public and private methods a bit more.
+    Thanks to Andreas Marienborg.
+
+0.05 and below, let's consider them initial release

@@ -1,0 +1,14 @@
+Revision history for Net-P0f
+
+0.02    2005.04.03
+        [BUGFIX] check input source in loop() (thanks to t/03diag.t)
+        [FEATURE] Added findalldevs() wrapper. 
+        [TESTS] Merged t/01basic.t and t/02new.t into t/01api.t
+        [TESTS] Renamed t/03methods into t/02accessors.t
+        [TESTS] Added t/03diag.t, t/09pcap.t, t/10lookupdev.t, t/11findalldevs.t
+        Added texts of the Artistic and GPL licenses.
+        [DOC] Documentation update. 
+
+0.01    2004.11.21
+        First version, released on an unsuspecting world.
+

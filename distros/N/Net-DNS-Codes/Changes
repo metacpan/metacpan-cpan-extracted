@@ -1,0 +1,68 @@
+Revision history for Perl extension Net::DNS::Codes
+
+0.12  Mon Jan 27 11:59:58 PST 2014
+        modify Makefile.PL to bypass missing 'pod2text'
+
+0.11  Mon Oct  3 18:43:31 PDT 2011
+	add new codes
+	APL             42      rfc3123
+	HIP             55      rfc5205
+	IPSECKEY        45      rfc4025
+	ISDN            20      rfc1183 see section 3.3 same as TXT or HINFO
+	SPF             99      rfc4408 inherits properties of TXT
+	SSHFP           44      rfc4255
+	unknown                 rfc3597 dealing with unknown types
+	RRSIG           46      rfc4034 same format as SIG
+	NSEC            47      rfc4034 same format as NXT
+	DNSKEY          48      rfc4034 same format as KEY
+	DHCID           49      rfc4701
+	NSEC3           50      rfc5155
+	NSEC3PARAM      51      rfc5155
+	        unassigned 52 - 54
+	NINFO           56              think it is same as TXT
+	RKEY            57      RKEY-draft-00
+	TALINK          58      TALINK-draft-02 -- 2 domain names like 2 'A's
+	CDS             59      CDS-draft-02
+		unassigned 60 - 98
+	UINFO           100             reserved
+	UID             101             reserved
+	GID             102             reserved
+	UNSPEC          103             reserved
+	        unassigned 104 - 248
+
+0.10  Fri Sep 23 23:41:45 PDT 2011
+	add RCODE_MASK and BITS_OPCODE_MASK
+
+0.09  Sun Sep 24 18:17:29 PDT 2006
+	added missing T_TKEY, mistakenly put in as T_KEY
+
+0.08  Thu Sep 25 11:13:22 PDT 2003
+	add Makefile constant MY_POD2TEXT
+
+0.07  Thu Jul 10 10:03:43 PDT 2003
+	added T_KEY resource record type
+	and document tree for RR's
+
+0.06  Tue Jun 24 19:34:26 PDT 2003
+	back ported test suite to perl 5.00503
+
+0.05  Sat Jun 21 13:49:28 PDT 2003
+	initial release
+
+	changed all DNS codes to direct constant calls
+	instead of subroutine arguments. 
+	NOT COMPATIBLE WITH PREVIOUS VERSIONS
+
+0.04  Sat Jun 21 10:26:28 PDT 2003
+	removed redundant names in
+	EXPORT_TAGS hash
+
+0.03  Tue Jun 17 14:42:24 PDT 2003
+	change 'use constant' to sub {...}
+	in most places
+
+0.02  Sat Jun 14 10:58:52 PDT 2003
+	add MBZ code to header
+
+0.01  Fri Jun 13 08:53:07 PDT 2003
+	alpha release

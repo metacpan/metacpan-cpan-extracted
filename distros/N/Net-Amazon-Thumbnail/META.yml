@@ -1,0 +1,29 @@
+---
+name: Net-Amazon-Thumbnail
+version: 0.06
+author:
+  - 'Ian Tyndall C<ityndall@cpan.org>'
+abstract: Use the Amazon Alexa Site Thumbnail web service
+license: perl
+requires:
+  Class::Accessor: 0
+  Digest::HMAC_SHA1: 0
+  File::Spec: 0
+  LWP::UserAgent: 0
+  Module::Build: 0
+  Test::Exception: 0.15
+  Test::More: 0.01
+  URI: 0
+  URI::QueryParam: 0
+  XML::XPath: 0
+  XML::XPath::XMLParser: 0
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Net::Amazon::Thumbnail:
+    file: lib/Net/Amazon/Thumbnail.pm
+    version: 0.06
+resources:
+  license: http://dev.perl.org/licenses/

@@ -1,0 +1,17 @@
+Revision history for Nginx-FastCGI-Cache
+0.010   2014/08/16
+        -Add meta link to GitHub
+
+0.009   2014/08/16
+        -Updated README
+        -Moved to Github for #cpanday
+
+0.008   2014/03/15
+        -Changed purge_file method to accept HTTP request types.
+        -Updated POD.
+
+0.007   2014/03/15
+        -Changed to croak on any failing file or directory test.
+
+0.006   2014/03/14
+        -First useful version.

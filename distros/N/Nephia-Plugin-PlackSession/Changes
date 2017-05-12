@@ -1,0 +1,14 @@
+Revision history for Perl extension Nephia-Plugin-PlackSession
+
+0.81 2013-12-18T02:35:14Z
+
+    - fixed cpanfie
+      (ytnobody)
+
+0.80 2013-11-22T06:28:12Z
+
+    - support to Nephia-0.80 or latter 
+
+0.01 2013-07-20T18:36:38Z
+
+    - original version

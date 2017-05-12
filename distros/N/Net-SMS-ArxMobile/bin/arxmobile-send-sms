@@ -1,0 +1,76 @@
+#!/usr/bin/env perl
+
+=pod
+
+=head1 NAME
+
+arxmobile-send-sms - Send an SMS message using the ArxMobile HTTP API
+
+=head1 SYNOPSIS
+
+  arxmobile-send-sms --auth_code <your-code-here> --to <mobile_number> --text <message>
+
+Example:
+
+  arxmobile-send-sms --auth_code 'blahblah' \
+    --to '18885551212' \
+    --text 'Hello. You there?'
+
+=head1 DESCRIPTION
+
+Sends an SMS message to a mobile phone number using the ArxMobile (www.arxmobile.com)
+HTTP API. If successful, returns the B<smsid>, an identifier that's useful to
+use in later queries (see C<arxmobile-query-smsid>).
+
+=head1 AUTHOR
+
+Cosimo Streppone, <cosimo@opera.com>
+
+=head1 COPYRIGHT
+
+This software is copyright (c) 2011 Opera Software ASA
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+use strict;
+use warnings;
+
+use Getopt::Long ();
+use Net::SMS::ArxMobile;
+use Pod::Usage ();
+
+Getopt::Long::GetOptions(
+    'auth_code|auth-code|code=s' => \my $code,
+    'to|recipient=s' => \my $to,
+    'message|text|body=s' => \my $text,
+);
+
+if (! defined $code || ! defined $to || ! defined $text) {
+    Pod::Usage::pod2usage(-verbose => 2);
+}
+
+my $sms = Net::SMS::ArxMobile->new(
+    _auth_code => $code,
+);
+
+if (! $sms) {
+    warn "Do you have a valid code? (--auth_code option)\n";
+    exit 1;
+}
+
+my $smsid = $sms->send_sms(
+    to => $to,
+    text => $text,
+);
+
+if (! $smsid) {
+    warn "SMS sending failed\n";
+    exit 1;
+}
+
+chomp $smsid;
+print $smsid, "\n";
+

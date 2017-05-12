@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<ItemLookupResponse xmlns="http://webservices.amazon.com/AWSECommerceService/2011-08-01">
+  <Items>
+    <Item>
+      <ASIN>B00007M84Q</ASIN>
+      <SalesRank>60843</SalesRank>
+      <ItemAttributes>
+        <Artist>Zwan</Artist>
+        <Binding>Audio CD</Binding>
+        <CatalogNumberList>
+          <CatalogNumberListElement>161</CatalogNumberListElement>
+          <CatalogNumberListElement>936248436-2</CatalogNumberListElement>
+          <CatalogNumberListElement>9362-48436-2</CatalogNumberListElement>
+        </CatalogNumberList>
+        <EAN>0093624843627</EAN>
+        <EANList>
+          <EANListElement>0093624843627</EANListElement>
+        </EANList>
+        <IsAdultProduct>0</IsAdultProduct>
+        <ItemDimensions>
+          <Weight Units="hundredths-pounds">21</Weight>
+        </ItemDimensions>
+        <Label>Reprise / Wea</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>1396</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$13.96</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Reprise / Wea</Manufacturer>
+        <MPN>9362-48436-2</MPN>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <PackageQuantity>1</PackageQuantity>
+        <PartNumber>9362-48436-2</PartNumber>
+        <ProductGroup>Music</ProductGroup>
+        <ProductTypeName>ABIS_MUSIC</ProductTypeName>
+        <PublicationDate>2003-02-07</PublicationDate>
+        <Publisher>Reprise / Wea</Publisher>
+        <ReleaseDate>2003-01-28</ReleaseDate>
+        <SKU>112172/10182653/10481862/00000002</SKU>
+        <Studio>Reprise / Wea</Studio>
+        <Title>Mary Star of the Sea</Title>
+        <UPC>093624843627</UPC>
+        <UPCList>
+          <UPCListElement>093624843627</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>175</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$1.75</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>1</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.01</FormattedPrice>
+        </LowestUsedPrice>
+        <LowestCollectiblePrice>
+          <Amount>999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$9.99</FormattedPrice>
+        </LowestCollectiblePrice>
+        <TotalNew>38</TotalNew>
+        <TotalUsed>156</TotalUsed>
+        <TotalCollectible>9</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B00007M84Q%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB00007M84Q</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>XLuoRq4Et%2FA81njR5kZuZO4Y5%2Ff036JkqPM4vEWz44eI6G6Zf8JjRX8OjSmCl2g7wr1yoUlQYbTf815%2FwkzYs1UjWvV2IiTdehH5R4YTwfY%3D</OfferListingId>
+            <Price>
+              <Amount>1124</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$11.24</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>272</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$2.72</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>19</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>24</MinimumHours>
+              <MaximumHours>24</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+      <Tracks>
+        <Disc Number="1">
+          <Track Number="1">Lyric</Track>
+          <Track Number="2">Settle Down</Track>
+          <Track Number="3">Declarations Of Faith</Track>
+          <Track Number="4">Honestly</Track>
+          <Track Number="5">El Sol</Track>
+          <Track Number="6">Of A Broken Heart</Track>
+          <Track Number="7">Ride A Black Swan</Track>
+          <Track Number="8">Heartsong</Track>
+          <Track Number="9">Endless Summer</Track>
+          <Track Number="10">Baby Let's Rock!</Track>
+          <Track Number="11">Yeah!</Track>
+          <Track Number="12">Desire</Track>
+          <Track Number="13">Jesus,I / Mary Star Of The Sea</Track>
+          <Track Number="14">Come With Me</Track>
+        </Disc>
+      </Tracks>
+    </Item>
+  </Items>
+</ItemLookupResponse>

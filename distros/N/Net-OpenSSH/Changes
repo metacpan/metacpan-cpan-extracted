@@ -1,0 +1,730 @@
+Revision history for Perl extension Net::OpenSSH.
+
+0.74  Feb 10, 2017
+        - Update list of options accepted by method "sftp" (bug report
+          by Mirror).
+
+0.73  Jun 10, 2016
+        - Some old perl versions doesn't like Errno constant subs
+          being called without parents. Add them.
+
+0.72  Jun 9, 2016
+        - Rerelease as stable.
+
+0.71_03  Mar 16, 2016
+        - Improve shell detection code.
+        - Use a timeout to kill external commands not returning
+          control.
+        - improve ksh version checking in tests (bug report by jtzako
+          via PerlMonks)
+
+0.71_02  Mar 11, 2016
+        - Lighten master socket checks in async mode in order to avoid
+          blocking and setting custom signal handlers which can
+          interfere with event-programming frameworks (bug report by
+          Doug Hoyte).
+
+0.71_01  Jan 20, 2016
+        - Add entry on the documentation about how to integrate the
+          module with event-oriented programming frameworks (bug
+          report by Doug Hoyte, #gh17)
+        - Use an adaptative delaying algorithm while waiting for the
+          multiplexing socket to pop up (bug report by Doug Hoyte,
+          #gh17).
+        - Improve SIGCHLD handling and interoperability with other
+          modules setting custom handlers (bug report by Doug Hoyte,
+          #gh16).
+
+0.70  Jan 20, 2016
+        - Re-release as stable.
+
+0.69_01  Jan 14, 2016
+        - Add fish.pm to MANIFEST (bug reported by Erik Ferguson).
+
+0.68  Dec 20, 2015
+        - Rerelease as stable.
+
+0.67_02  Dec 4, 2015
+        - Do not croak when a method gets an unknown argument as far
+          as its value is undef.
+
+0.67_01  Nov 7, 2015
+        - fix internal waitpid usage (bug report by Konrad
+          Bucheli, #rt108516)
+        - use strict and warnings in Net::OpenSSH::ConnectionCache
+          (bug report and fix by Mohammad S Anwar)
+
+0.66  Oct 11, 2015
+        - documentation fix (reported by Alex Kok)
+	- allow redirecting debug output to a custom file handle
+
+0.65_06  Aug 26, 2015
+        - accept IPv6 addresess with zone indexes (bug report by
+          Cserbák Márton)
+        - some documentation corrections (bug report and patch by
+          Florian Schlichting)
+
+0.65_05  Jul 13, 2015
+        - improve documentation
+
+0.65_04  Jul 13, 2015
+        - add support for Object::Remote framework integration
+        - be more explicit on errors about non matching host public
+          keys if possible (still unfinished, bug report by Ferenc
+          Erki)
+        - add support for connecting to remote unix sockets (requires
+          patch to OpenSSH)
+
+0.65_03  Jun 18, 2015
+        - remove defined-or operator usage in order to remain perl
+          5.8.x compatible
+
+0.65_02  Jun 17, 2015
+        - accept as targets URIs where the username contains the at
+          sign (bug report by Mark Rushing)
+
+0.65_01  Mar 12, 2015
+        - add disown_master method
+        - add sshfs_mount.pl sample
+
+0.64  Mar 12, 2015
+        WARNING: mayor internal changes have been introduced since
+                 last stable release!!!
+        - Rerelease as stable
+
+0.63_07  Jan 25, 2015
+        - umask is not thread safe, avoid it (bug report and fix by
+          Shaun Pankau)
+
+0.63_06  Jan 15, 2015
+        - DESTROY was overwritting $@
+
+0.63_05  Jan 8, 2015
+        WARNING, this is a mayor internal change!!!
+        it may introduce regression bugs!!!
+        ===============================================================
+        - completely revamp internal logic for master monitoring
+        ===============================================================
+        - add constructor option 'connect'
+        - add method 'any'
+        - add "contributing code" documentation section
+        - update TODO list
+
+0.63_04  Jan 4, 2015
+        - remove usage of defined-or operator in order to restore
+          support for perl 5.8
+
+0.63_03  Jan 3, 2015
+	- remove usage of defined-or operator in order to restore
+          support for perl 5.8
+
+0.63_02  Jan 2, 2015
+	- make module instalable on Windows and Cygwin
+        - fix error on regular expression inside quoting.t (bug report
+          by Slaven Rezic)
+        - documentation section about security added
+        - doc corrections (reported by Gregor Herrmann from Debian)
+        - AT&T ksh is broken, don't use it when testing quoting
+          functions (bug report by Greg Oldendick)
+
+0.63_01  Jun 14, 2014
+        - add clean_cache method to Net::OpenSSH::ConnectionCache (bug
+          report by Mithun Ayachit)
+
+0.62  Jun 14, 2014
+        - rerelease as stable
+
+0.61_18  May 6, 2014
+        - add passwd_prompt feature
+        - check for the password not being requested a second time
+          (bug report by leschm)
+	- more spelling errors corrected
+
+0.61_17  Apr 24, 2014
+        - lots of spelling errors corrected
+        - support code for master_setpgrp feature was not reseting the
+          terminal process group owner on failure (bug report by
+          Matthias Hofer)
+        - MSWin, MSCmd and Chain quoters where missing from the
+          MANIFEST and so not being distributed
+        - document MSWin and MSCmd quoters
+        - add dummy package Net::OpenSSH::SSH
+
+0.61_16  Apr 6, 2014
+        - add work around in quoting.t for Solaris csh 'fixing'
+          invalid UTF8 sequences
+
+0.61_15  Apr 2, 2014
+        - from OpenSSH version 6.5 UNKNOWN is not a valid
+          you-are-not-going-to-use-it-anyway hostname as it tries to
+          resolve; now we use 0.0.0.0 instead
+        - add support for master_setpgrp and setpgrp features
+        - scp does not accept setting bandwidth limit to 0
+
+0.61_14  Oct 30, 2013
+        - the way used in tests to detect when they are running in the
+          background was broken (bug report by Victor Efimov)
+
+0.61_13  Oct 28, 2013
+        - set bath_mode when test are being run on the background
+          (bug report by Victor Efimov)
+        - disable testing against custom ssh server as it is currently
+          broken
+
+0.61_12  Oct 10, 2013
+        - rsync_* was not replicating time attributes when copy_attrs
+          was set (bug report and fix by SUN Guonian)
+        - add chain quoter
+        - add quoters for MS Windows (MSWin, MSCmd)
+        - extended argument quoting was never triggered
+        - stream_encoding option was not accepted by capture2 method
+        - glob_quoting option was not accepted by most methods
+        - rename quote_style option as remote_shell
+
+0.61_11  Aug 29, 2013
+        - rsync_get method relied on a feature not available in old
+          but still widely used versions of rsync (bug report by
+          laiweiwei)
+
+0.61_10  Jul 29, 2013
+        - disable ControlPersist only when OpenSSH version >= 5.6 (bug
+          report by Philippe Bruhat)
+        - autodetect OpenSSH version during object creation
+
+0.61_09  Jul 19, 2013
+        - forcibly disable ControlPersist that may have been set from
+          ssh configuration files (bug report by Philippe Bruhat)
+
+0.61_08  Jul 19, 2013
+        - fix test errors on perl 5.8
+
+0.61_07  Jul 15, 2013
+        - capture methods were not hanling retriable errors correctly
+          (bug report by Victor Efimov)
+
+0.61_06  Jul 12, 2013
+        - another take into the shell_is_clean sanity check. Now we
+          mimic sshd close enough to fool bash and make it behave as
+          when really called by sshd
+
+0.61_05  Jul 11, 2013
+        - add shell_is_clean sanity check to test scripts to avoid
+          false negatives while testing (bug report by Karen
+          Etheridge)
+
+0.61_04  Jun 28, 2013
+        - print more informative error messages when loading an
+          optional module fail
+        - remove useless old fix for a nonexistent bug on
+          _fileno_dup_over (un-bug report by Tammy Rockvam)
+
+0.61_03  May 10, 2013
+        - when testing on AIX don't check mux socket permissions and
+          use correct ps arguments (bug report by mwatson)
+        - apply doc patch by Florian of Debian project
+        - add open3socket method
+        - open2socket and open2pty now return the socket and pty
+          respectively when called on scalar context
+        - methods returning several file objects now croak when called
+          on scalar context
+
+0.61_02  Apr 16, 2013
+        - add support for multiple shell quoting backends
+        - add support for X11 forwarding
+
+0.61_01  Mar 18, 2013
+        - remote shell detection code was broken in tests (bug report
+          by Neil Bowers)
+        - skip tests requiring a bourne shell when the remote shell is
+          csh or some derivative as tcsh
+
+0.60  Feb 15, 2013
+        - scp_put and rsync_put where not handling correctly the case
+          where glob was set but the given file patterns didn't match
+          any local file (bug report by Pavel Leity).
+        - $SIG{__DIE__} was not always localized before calling eval
+
+0.59  Jan 31, 2013
+        - release as stable
+        - fix some misspellings
+
+0.58_04  May 2, 2012
+        - solve some git merge mistakes
+
+0.58_03  May 1, 2012
+        - several misspellings corrected on the docs (bug report by
+          Florian Schlichting from Debian - I love these guys!)
+        - don't put square brackets around IPv6 addreses when passing
+          the hostname to ssh (bug report by Alexey ?)
+
+0.58_02  Apr 16, 2012
+        - strict_mode lets pass world-writable directories if they
+          have the restricted deletion flag set
+        - implement sshfs import and export methods
+        - add forward_agent feature
+        - do not disable ssh-agent when using password authentication
+        - some documentation improvements
+
+0.58_01  Jan 30, 2012
+        - add new documentation section about debugging
+        - new helper module Net::OpenSSH::OSTracer added
+        - ConnectionCache module was missing from MANIFEST
+        - correction on default_ssh_opts feature documentation
+          (reported by Yann Kerhervé)
+
+0.57  Dec 21, 2011
+        - quote equal sign
+        - do not quote commas
+
+0.56_01  Dec 8, 2011
+        - rsync methods were failing when user was defined (bug report
+          by black_fire)
+        - detect when the destructor is being called from a different
+          thread (bug report by troy99 at PerlMonks)
+        - support for Net::OpenSSH::Gateway added
+
+0.55  Dec 6, 2011
+        - solve regression from 0.53_03: rsync methods were broken
+          because the hostname was not being correctly removed from
+          the ssh command passed to rsync (bug report by Mithun
+          Ayachit)
+
+0.54  Dec 4, 2011
+        - release as stable
+
+0.53_05  Nov 23, 2011
+        - scp methods were broken when a user was given (bug report by
+          Andrew J. Slezak)
+        - add support for verbose option in scp methods
+        - implement parse_connections_opts
+        - solve bug related to expansion of HOST var when an IPv6
+          address was given
+        - move FACTORY docs to the right place
+        - add FAQ about running remote commands via sudo
+        - add sample for Net::Telnet integration
+        - add sample for sudo usage reading password from DATA
+
+0.53_04  Sep 2, 2011
+        - add default_ssh_opts feature
+        - getpwuid may fail, check $home is defined before using it
+        - add FAQ entry about MaxSessions limit reached
+        - move FACTORY docs to the right place
+
+0.53_03  Aug 18, 2011
+        - handling of default_std*_file was broken (bug report and
+          patch by Nic Sandfield)
+        - keep errors from opening default slave streams
+        - add Net::OpenSSH::ConnectionCache package
+        - add FACTORY hook
+        - place '--' in ssh command after host name
+        - add support for die_on_error
+        - add support for batch_mode feature
+        - typo in sample code corrected (reported by Fernando Sierra)
+        - using { stdin_data => [] } was generating warnings
+
+0.53_02  Jul 12, 2011
+        - add support for custom login handlers
+        - remove SIG{__WARN__} localizations
+
+0.53_01  May 15, 2011
+        - quoter and glob_quoter fully rewritten from scratch
+        - quoter was not handling "\n" correctly (bug report and work
+          around by Skeeve)
+        - minor doc improvements
+
+0.52  May 9, 2011
+        - release as stable
+        - skip bad passwd test when IO::Pty is not available
+
+0.51_12  May 2, 2011
+        - require version 2 of the SSH protocol (bug report by Jo
+          Rhett)
+        - remove harmless "my $foo = ... if ..." bug
+
+0.51_11  Apr 24, 2011
+        - encoding handling in sftp method was broken (bug report and
+          solution by Todd Rinaldo)
+        - sftp method was broken (regression)
+        - better support for sharing SSH connections with children
+        - more tests
+        - add sample for usage with Net::Telnet
+        - bad sample in documentation corrected
+
+0.51_10  Mar 29, 2011
+        - error status was not reset between calls (regression)
+        - remove internal line numbers from error messages
+        - encoding errors were not propageted in pipe_in and pipe_out
+          methods
+        - minor debuging cleanup
+        - better messages on bad encoding errors
+
+0.51_09  Mar 29, 2011
+        - add support for passphrase protected keys
+        - add support for passing the private key path as an explicit
+          constructor option
+        - bug solved on password handling
+        - bug solved in _fileno_dup_over
+        - remove redundant _check_master_and_clear_error
+        - more tests
+        - some doc improvements
+
+0.51_08  Mar 28, 2011
+        - pipe_in and pipe_out were not correctly setting error status
+          on failure
+	- support argument_encoding in pipe_in and pipe_out
+        - document how to set StrictHostKeyChecking=no
+        - replace @error_prefix arguments by a localized stack
+	- use _load_module for Encode loading
+	- remove no-encoding hack on _master_ctl 
+
+0.51_07  Mar 22, 2011
+        - add encoding support
+        - undef $SIG{CHLD} inside blocking methods
+
+0.51_06  Mar 16, 2011
+        - make hostname argument to constructor optional when
+          external_master is set
+        - better error handling in constructor
+        - s/reuse_master/external_master/. I never were happy with the
+          old option name.
+        - some minor doc corrections
+
+0.51_05  Mar 15, 2011
+        - implement reuse_master feature
+        - do not propagate extra arguments from wait_for_master to
+          _wait_for_master
+        - accept ssh_opts in make_remote_command
+
+0.51_04  Mar 10, 2011
+        - solve "Not enough arguments for grep" bug (reported by Tom
+          Wittbrodt)
+        - some documentation improvements
+
+0.51_03  Mar 9, 2011
+        - error message corrected
+        - troubleshooting guide improved
+        - add pointer to OpenSSH Wikibook
+        - add autosudo.pl sample
+        - implement stdintout_dpipe_is_parent feature
+
+0.51_02  Feb 10, 2011
+        - add support for test method
+        - add support for dpipe feature
+        - simplify _wait_for_master code
+        - remove spurious warnings generated when control command
+          failed to run (bug report by jaiieq from Perlmonks)
+	- timeout at object level where being ignored by _waitpid
+        - document how to run detached remote processes
+
+0.51_01  Feb 1, 2011
+        - add support for kill_ssh_on_timeout feature and better
+          timeout handling
+        - set ssh option ServerAliveInterval
+        - system could return -1 on error instead of false
+        - add change_password.pl sample
+	- some tests were failing when using csh as the remote shell
+          (bug report by Scott Davis)
+
+0.50  Nov 21, 2010
+        - shell_quote in t/1_run.t was escaping '_' (bug report by
+          Andreas J. König)
+	- some typos corrected
+        - initial implementation of scp_cat
+
+0.49  Aug 7, 2010
+	- do not kill master from forked processes (bug report by
+          scotchie at PerlMonks)
+
+0.48  Aug 2, 2010
+        - bug quoting escaped scalars as globs solved
+	- new faq for "can't change directory"
+	- support calling shell_quote and shell_quote_args as class
+          methods
+	- more tests
+	- minor doc corrections
+
+0.47  Apr 13, 2010
+	- document how to make it work under Solaris
+	- some docs reorganization and improvements
+
+0.46_02  Mar 29, 2010
+	- add suport for default_stdin_file, default_stdin_discard and
+          similar options
+        - add stdinout_socket feature and open2socket shortcut method
+        - rename some internal methods to more meaningfull names
+        - add open_tunnel and capture_tunnel methods
+	- add support for tunnel feature and docs
+	- document mod_perl/mod_perl2 integration
+	- document not-a-real-file-handle errors
+	- some minor doc updates
+	- run tests with StrictHostKeyChecking=no
+        - disable tty allocation for control commands
+        - better debugging for _io3
+
+0.46_01  Mar 25, 2010
+        - do not depend on STDIN, STDOUT and STDERR being file
+          descriptors 0, 1, and 2 respectively as it happens, for
+          instance, under mod_perl (bug report by eserte via
+          PerlMonks)
+        - use POSIX::dup2 to duplicate file descriptors, instead of
+          perl open builtin
+        - set stdin_discard when running control commands as it may be
+          closed or tied
+        - better debugging for waitpid and _io3
+        - error in example in documentation corrected (reported by
+          Slaven Rezic)
+
+0.45  Feb 17, 2010
+	- support for taint mode
+	- use better IPv6 regexp
+	- bug in glob_quoter incorrectly handling empty strings solved
+        - document how $SIG{CHLD} can break some methods and add FAQ
+        - some typos corrected
+	- update copyright notices
+
+0.44  Jan 26, 2010
+	- solve bug on rsync methods not correctly handling
+          pass-through options carrying an argument (bug report by
+          Daiju Kito)
+	- support several verbose levels in rsync methods
+	- document spurious warnings that appear when tty => 1 is
+          given and stdin is not attached to a tty
+
+0.43  Dec 14, 2009
+        - call ssh with -tt instead of -t to force remote tty
+          allocation even when stdin is not attached to one locally
+          (bug report by Todd E. Rinaldo)
+
+0.42  Dec 5, 2009
+        - add FAQ section
+	- add commercial support offering
+	- add pointer to my wishlist :-)
+
+0.41_03 Nov 16, 2009
+	- add testing known_hosts to MANIFEST
+	- some bits where missing from 0.40
+	- allow also keyboard-interactive authentication when password
+          is given (bug report by Todd E. Rinaldo)
+
+0.40  Nov 14, 2009
+        - DESTROY was clobbering $@ (bug report by Todd E. Rinaldo)
+	- when password authentication is requested add flags to ssh
+          master command to disable other auth. options
+	- document how to integrate Net::OpenSSH with Expect
+
+0.39  Oct 10, 2009
+	- use SIGTERM instead of SIGHUP to kill lazy SSH master
+	- on 1_run.t remote commands could be aliased bug (report and
+          patch by Danijel Tasov)
+	- add methods for external master PID handling
+	- add 'all' tag to Net::OpenSSH::Constants
+	- check SSH client version from Makefile.PL
+	- work around L<Foo::Bar> links in POD being rendered as "the
+          Foo::Bar manpage" by some POD backends.
+
+0.38  Sep 25, 2009
+        - remove alpha-status warning from docs!
+	- add debug support to master killing
+        - DESTROY was generating warnings when called before the
+          master connection had been established successfully
+        - add variable expansion feature
+	- minor doc corrections
+
+0.37  Sep 15, 2009
+        - add support for stdout_file, stderr_file and stdin_file
+          options
+
+0.36  Jul 8, 2009
+        - open2pty, open3 and open3pty where not handling transparent
+          options for open_ex, and other minor bugs
+	- pty handling in open_ex was broken
+	- expect sample added
+
+0.35  Jun 30, 2009
+	- strict_mode was not working (bug report by wardmw@perlmonks)
+	- documentation correction (error reported by Kevin
+          Mulholland)
+	- Document that the SSH client bundled with your operative
+          system may not be good enough (report by Arun Rajamari).
+	- Add pointer to SSH::Batch in the docs
+
+0.34  Mar 26, 2009
+        - pipe_out was broken (bug report by Matthew Merhar)
+
+0.33  Mar 24, 2009
+        - password obfuscation was failing on '%' (bug report by
+          Sawyer X)
+
+0.32  Mar 18, 2009
+        - async mode was not working in constructor (bug report by
+          Niels Larsen)
+
+0.31  Mar 3, 2009
+        - password authentication was not working on OS/X (bug report
+          by Niels Larsen)
+        - module loader was generating warnings on development
+          versions (bug report by Todd E. Rinaldo)
+
+0.30  Feb 13, 2009
+	- make sftp open_ex based and add support for stderr_fh and
+          stderr_discard
+	- croak on unaceptable sftp options
+	- delete SSH_ASKPASS and SSH_AUTH_SOCK from env. when password
+          authentication is requested
+
+0.29  Feb 12, 2009
+        - sftp method was broken, regression introduced on 0.11 (bug
+          report by Todd E. Rinaldo)
+
+0.28  Feb 11, 2009
+	- scp methods were broken, regression introduced on 0.24 (bug
+          report by Ryan Schumacher)
+	- doc chapter about 3rd party module integration
+
+0.27  Feb 5, 2009
+	- better tty feature handling in open_ex, now it defaults to
+          ssh default behaviour
+	- support for \ and \\ quoting escapes added
+	- minor doc corrections
+	- document ssh_opts (bug report by Graham Knop)
+
+0.26  Feb 3, 2009
+        - docs reorganized and simplified
+        - new std(in|out|err)_discard options added
+  	- new master_std(out|err)_(fh|discard) options added (feature
+          request by Michael Courtney)
+        - async support in system
+
+0.25  Feb 2, 2009
+        - remove obsolete FAQ
+
+0.24  Feb 2, 2009
+        WARNING!!! backward incompatible changes in this release:
+        ===============================================================
+	- system method now returns true on success and undef otherwise
+	- errors OSSH_SLAVE_SCP_FAILED and OSSH_SLAVE_RSYNC_FAILED
+          replaced by generic OSSH_SLAVE_CMD_FAILED
+	- multiplexing_socket_path method renamed to get_ctl_path
+        ===============================================================
+	- new make_remote_command method
+	- troubleshooting guide added
+	- ask for help in Perlmonks!
+	- check multiplexing socket before any command
+	- more robust waitpid used
+	- detect old OpenSSH versions of ssh (bug report and patch by
+          David Markham)
+
+0.23  Jan 25, 2009
+        - don't quote ~ when globing (bug report by Niels Larsen)
+        - IPv6 addresses are not required inside brackets (feature
+          request by Ryan Kruse)
+	- better IPv6 regexp from Regexp::IPv6
+        - some doc corrections
+
+0.22  Jan 22, 2009
+        - use better regexp for IPv6 addresses
+
+0.21  Jan 22, 2009
+        - recognize IPv6 addresses (bug report by Ryan Kruse)
+
+0.20  Jan 22, 2009
+	- default_stderr_fh was wrongly handled (bug report by Sawyer
+          X).
+	- add getters for user, host and port properties (feature
+          request by Niels Larsen)
+	- doc errors corrected
+
+0.19  Jan 20, 2009
+	- shell_quote_glob method added
+	- rsync has its own quoting rules (bug report by Niels Larsen)
+	- implement copy_attrs feature for rsync methods (bug report
+          by Niels Larsen)
+
+0.18  Jan 20, 2009
+	- several documentation corrections and improvements
+          contributed by Niels Larsen.
+	- add support for open_ex stdout_fh, stderr_fh and
+          stderr_to_stdout options to rsync methods (bug report by
+          Niels Larsen)
+	- example of asynchronous usage of scp added
+
+0.17  Jan 19, 2009
+        - localize $SIG{__DIE__}, $SIG{__WARN__} and $@ for evals (bug
+          report by Niels Larsen)
+        - quote empty arguments correctly
+	- add support for new constructor options
+          default_std(in|out|err)_fh
+	- some doc improvements
+
+0.16  Jan 11, 2009
+        - add support for bwlimit, copy_attrs, stderr_fh, stdout_fh
+          and stderr_to_stdout to scp methods
+	- correct bug in option checking for spawn and open2
+
+0.15  Jan 9, 2009
+        - do not escape dots when quoting args
+	- some shell quoting tests added
+	- better glob quoting
+	- informative rsync error messages
+	- doc improvements and typos
+
+0.14  Jan 9, 2009
+        - add experimental support for rsync file transfers
+	- rework scp implementation in order to share as much as
+          possible with rsync methods
+
+0.13  Jan 8, 2009
+        - when globing in scp_get, quote spaces only
+        - add quote_spaces_only feature to _quote_args method
+        - some scp_put and scp_get problems solved (bug report and
+          patch by Maxim Yemelyanov).
+	- _quote_args was returning wrong result in scalar context
+          (bug report and solution also by Maxim Yemelyanov).
+	- set umask when creating ctl_dir (bug report by Maxim
+          Yemelyanov).
+
+0.12  Jan 7, 2009
+        - support timeout option on capture methods (bug report by Pete
+          Emerson).
+        - remove broken perl 5.6.x workarounds
+
+0.11  Dec 24, 2008
+        - new shell_quote method
+	- add scp_get and scp_put methods
+        - add spawn method
+        - add support for ssh_opts in several methods
+        - _make_call_ex renamed to _make_call
+        - _make_call removed
+        - fix doc errors
+
+0.10  Dec 17, 2008
+	- require OpenSSH > 4.7 for alternative testing aproach
+	- use correct ps args when testing on Solaris
+	- new mux_socket_path method
+	- more tests
+
+0.09  Dec 10, 2008
+	- fallback testing method when ssh'ing to localhost is not enabled
+	- add support for master_opts constructor argument
+
+0.08  Dec 10, 2008
+	- require 5.8.x and remove compatibility hacks for older versions
+	- solve bug in open_ex when pty is requested
+	- perform sanity checks on child file handles on open_ex
+
+0.07  Dec 9, 2008
+        - remove >>& incompatibility for perl 5.6.x
+	- in tests, sort "ls" output, as it seems that it can change
+          between two consecutive runs in some OSs
+
+0.06  Dec 3, 2008
+        - open_ex API redesigned
+        - better bad options handling
+        - support for async connections
+        - shell metacharacter quoting
+        - improved debugging
+        - improved documentation
+
+0.01  Fri Nov 14 01:02:40 2008
+	- original version; created by h2xs 1.23 with options
+		-AXn Net::OpenSSH

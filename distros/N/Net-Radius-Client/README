@@ -1,0 +1,30 @@
+Net/Radius/Client version 0.03
+==============================
+
+The Net::Radius::Client package implements a single call, high-level
+RADIUS client.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Net::Radius::Packet
+  Net::Radius::Dictionary
+  IO::Socket::INET
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Ilya Etingof <ilya@glas.net>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

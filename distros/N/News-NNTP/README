@@ -1,0 +1,51 @@
+News::NNTP
+======================
+
+News::NNTP is an NNTP client module.
+
+This is a low-level interface, designed not to get in your way.  You don't
+need to constantly refer back to the documentation to find just the right
+invocation for the NNTP command you want; you just send NNTP commands and
+get back the responses.
+
+The module tries to handle dropped connections (from a server idle timeout,
+for example) by transparently re-establishing the connection and restoring
+any necessary state, including authentication.
+
+Large response bodies (LIST ACTIVE, or XOVER, for example) can be handled as
+they come off the wire, and without storing the entire response in-core if
+doing so isn't necessary for the application.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+TESTS
+
+A test script is included that is run by "make test".  However, it needs
+a news server to connect to.  You can add your information to the script
+itself (t/nntp.t) or pass it in the environment variables NNTPSERVER,
+NNTPUSER (if a username is required), NNTPPASS, and NNTPPORT (default
+is 119).
+
+  env NNTPSERVER=news.example.com make test
+
+DEPENDENCIES
+
+Requires a recent Perl 5.8.x.  Only tested back to 5.8.6.
+
+There are no non-core dependences.
+
+I developed this module on Mac OS X and have tested and deployed it
+on FreeBSD.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Jeremy Nixon
+
+Released under a BSD license.
+

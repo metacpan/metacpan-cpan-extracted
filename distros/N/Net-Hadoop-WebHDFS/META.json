@@ -1,0 +1,88 @@
+{
+   "abstract" : "Client library for Hadoop WebHDFS and HttpFs",
+   "author" : [
+      "TAGOMORI Satoshi <tagomoris {at} gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Hadoop-WebHDFS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36",
+            "Test::Deep" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Furl" : "0",
+            "JSON" : "0",
+            "JSON::XS" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "Try::Tiny" : "0",
+            "URI" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Hadoop::WebHDFS" : {
+         "file" : "lib/Net/Hadoop/WebHDFS.pm",
+         "version" : "0.8"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tagomoris/Net-Hadoop-WebHDFS/issues"
+      },
+      "homepage" : "https://github.com/tagomoris/Net-Hadoop-WebHDFS",
+      "repository" : {
+         "url" : "git://github.com/tagomoris/Net-Hadoop-WebHDFS.git",
+         "web" : "https://github.com/tagomoris/Net-Hadoop-WebHDFS"
+      }
+   },
+   "version" : "0.8",
+   "x_contributors" : [
+      "Syohei YOSHIDA <syohex@gmail.com>",
+      "TAGOMORI Satoshi <tagomoris@gmail.com>",
+      "Burak Gürsoy <burakgursoy@gmx.net>",
+      "Burak Gursoy <burak@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,54 @@
+#!/usr/bin/env perl
+
+use Modern::Perl;
+use Net::Discident;
+use Pod::Usage;
+use Getopt::Std;
+
+
+
+my %opt;
+getopts( 'jhu', \%opt );
+
+my $path = shift;
+pod2usage() if $opt{h} or !defined $path;
+
+my $ident = Net::Discident->new( $path );
+
+if ( $opt{'u'} ) {
+    say $ident->query_url();
+}
+elsif ( $opt{'j'} ) {
+    say $ident->query( undef, 1 );
+}
+else {
+    say $ident->ident();
+}
+
+__END__
+
+=head1 NAME 
+
+discident - fingerprint a DVD
+
+=head1 SYNOPSIS
+
+B<discident> [-u | -j] I<path>
+
+Returns the fingerprint of the DVD at I<path>.
+
+=head1 OPTIONS
+
+=over
+
+=item -u
+
+Return the discident.com URL
+
+=item -j
+
+Return the JSON response from querying discident.com 
+
+=back
+
+...

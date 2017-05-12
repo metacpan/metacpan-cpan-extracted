@@ -1,0 +1,18 @@
+0.05	Saturday 28th January, 2005
+	Add a stream_handler method that can be overriden (Tatsuhiko Miyagawa)
+
+0.04	Tuesday 22nd March, 2005
+	Fixup for serving DPAP to iPhoto 5 (Dieter Mücke)
+
+0.03	Thursday 19th August, 2004
+	Threw in some code to handle /update, for when things actually can
+        update (iTunes does, iPhoto doesn't)
+	Playlist support
+
+0.02	Wednesday 4th August, 2004
+	Advertise our database uuid via Rendezvous - this allows iTunes
+	to remember column layouts (Paul Mison)
+
+0.01	Tuesday 27th July, 2004
+	initial release
+

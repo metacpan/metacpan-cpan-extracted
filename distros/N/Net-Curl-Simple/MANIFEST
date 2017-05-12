@@ -1,0 +1,34 @@
+MANIFEST
+Makefile.PL
+README
+examples/download-accelerator.pl
+examples/irssi-cpan-search.pl
+inc/Test/HTTP/Server.pm
+lib/Net/Curl/Simple.pm
+lib/Net/Curl/Simple/Async.pm
+lib/Net/Curl/Simple/Async/AnyEvent.pm
+lib/Net/Curl/Simple/Async/EV.pm
+lib/Net/Curl/Simple/Async/CoroEV.pm
+lib/Net/Curl/Simple/Async/Irssi.pm
+lib/Net/Curl/Simple/Async/POE.pm
+lib/Net/Curl/Simple/Async/Select.pm
+lib/Net/Curl/Simple/Form.pm
+lib/Net/Curl/Simple/UserAgent.pm
+lib/Net/Curl/Simple/examples.pod
+t/01-use.t
+t/02-version.t
+t/10-simple.t
+t/20-async-perl.t
+t/21-async-anyevent.t
+t/22-async-poe.t
+t/23-async-ev.t
+t/24-async-any.t
+t/30-useragent-simple.t
+t/40-coro-any.t
+t/41-coro-ev.t
+t/42-coro-anyevent.t
+t/43-coro-select.t
+t/90-pod.t
+t/91-pod-coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

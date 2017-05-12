@@ -1,0 +1,19 @@
+Revision history for Net-DBus-Skype
+
+0.02    Now we use Moose.
+        Now we have a script/module configuration
+        We no longer use warn/exit, so no exit codes...
+        We no longer debug to stdout.
+        We no longer have a variable DEBUG but a ro accessor debug
+           which is set it new
+        We have totally restructured program to make sense
+        Seperated Skype init code from DBus find code
+        Renamed bus to dbus, call_skype, to raw_skype
+        Provide two scripts
+           skype-simple-dial - mandatory install
+           skype-action-handler - optional by prompt (same name as Skype official)
+
+
+0.01    Import from Philipp's script which is hosted at:
+        http://www.kolmann.at/philipp/linux/skype_action_handler/action_handler_0.9.2
+

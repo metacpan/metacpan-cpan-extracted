@@ -1,0 +1,23 @@
+---
+abstract: 'SinFP3 communication protocol'
+author:
+  - 'GomoR <gomor-cpan_at_gomor.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Frame-Layer-SinFP3
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Net::Frame: 0
+  perl: 5.006001
+version: 1.01

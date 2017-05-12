@@ -1,0 +1,8 @@
+Revision history for Perl extension Net::DHCPv6::DUID::Parser.
+
+1.00  Wed Dec  1 14:56:44 2010
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Net::DHCPv6::DUID::Parser -v 1.00
+
+1.01  Mon Dec  6 14:33:00 2010
+	- Updated documentation

@@ -1,0 +1,22 @@
+Changes
+lib/Number/Fraction.pm
+MANIFEST			This list of files
+Build.PL
+Makefile.PL
+README
+t/01_load.t
+t/02_create.t
+t/03_create.t
+t/04_add.t
+t/05_subtract.t
+t/06_multiply.t
+t/07_divide.t
+t/08_compare.t
+t/09_neg.t
+t/10_pod.t
+t/11_pod_coverage.t
+t/12_invalid.t
+t/13_exp.t
+t/14_abs.t
+META.yml
+META.json

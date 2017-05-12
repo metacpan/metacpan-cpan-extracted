@@ -1,0 +1,23 @@
+Revision history for Net-LDAP-HTMLWidget
+0.07    2008-01-01 07:39
+        Removing ._ files :p
+        
+0.06    2008-01-01 07:29
+        Making it possible to decode values from the ldap server before
+        filling the widget.
+        
+0.05    2007-08-16 12:48
+        Or so I thought, trying again
+        
+0.04    2007-08-14 08:01
+        Fixed the distro to not include ._ files
+        
+0.03    2007-08-08 12:39
+        Fixed a missing use Carp;
+        
+0.02    2007-07-17 14:39
+        Tuned in with later releases of HTML::Widget and the new API
+        
+0.01    2006-01-25 15:06
+        First version, released on an unsuspecting world.
+

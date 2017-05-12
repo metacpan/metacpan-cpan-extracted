@@ -1,0 +1,25 @@
+Revision history for Perl extension Net-WHMCS
+
+0.08    2014-10-21
+    - add deleteorder (by mschout)
+
+0.07    2013-02-10
+    - add closeclient
+
+0.06	2013-11-04
+	- add Order
+
+0.05	2013-11-04
+	- fix broken tests
+
+0.04 	2013-11-04
+	- add upgradeproduct and Miscellaneous API
+
+0.03	2013-11-04
+	- add more like updateclientproduct, validatelogin
+
+0.02	2013-10-22
+	- remove Dumper debug
+
+0.01    2013.07.11
+        a start

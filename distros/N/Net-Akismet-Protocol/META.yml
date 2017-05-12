@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Net-Akismet-Protocol
+version:             0.02
+abstract:            Perl interface to Akismet Protocol - comment and trackback spam fighter
+license:             ~
+author:              
+    - Marcus Ramberg <mramberg@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    LWP:                           5.09
+    Moose:                         0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

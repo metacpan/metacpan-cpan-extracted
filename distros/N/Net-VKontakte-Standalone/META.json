@@ -1,0 +1,44 @@
+{
+   "abstract" : "Perl extension for creating standalone Vkontakte API applications",
+   "author" : [
+      "Krylov Ivan <krylov.r00t@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-VKontakte-Standalone",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "JSON" : 0,
+            "URI" : 0,
+            "WWW::Mechanize" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.11"
+}

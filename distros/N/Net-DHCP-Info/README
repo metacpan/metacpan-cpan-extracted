@@ -1,0 +1,50 @@
+NAME
+    Net::DHCP::Info - Fast dhcpd.leases and dhcpd.conf parser
+
+NOTE
+  DEPRECATED
+    This module is not very flexible, and not maintained. Use
+    Net::ISC::DHCPd instead.
+
+VERSION
+    Version 0.11
+
+SYNOPSIS
+        use Net::DHCP::Info;
+
+        my $conf  = Net::DHCP::Info->new($path_to_dhcpd_conf);
+        my $lease = Net::DHCP::Info->new($path_to_dhcpd_leases);
+
+        while(my $net = $conf->fetch_subnet) {
+            # .. do stuff with $net
+        }
+
+        while(my $lease = $lease->fetch_lease) {
+            # .. do stuff with $lease
+        }
+
+  METHODS
+  new($file)
+    Object constructor. Takes one argument; a filename to parse. This can be
+    either a dhcpd.conf or dhcpd.leases file.
+
+  fetch_subnet
+    This method returns an object of the "Net::DHCP::Info::Obj" class.
+
+  fetch_lease
+    This method returns an object of the "Net::DHCP::Info::Obj" class.
+
+FUNCTIONS
+  fixmac
+    Takes a mac in various formats as an argument, and returns it as a 12
+    char string.
+
+AUTHOR
+    Jan Henning Thorsen, "<pm at flodhest.net>"
+
+COPYRIGHT & LICENSE
+    Copyright 2007 Jan Henning Thorsen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

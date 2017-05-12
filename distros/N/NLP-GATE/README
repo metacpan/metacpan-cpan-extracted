@@ -1,0 +1,48 @@
+NLP-GATE
+
+This is a module for manipulating the XML documents as 
+used by the NLP platform GATE (http://gate.ac.uk). 
+The package contains the modules NLP::GATE::Annotation,
+NLP::GATE::AnnotationSet and NLP::GATE::Document, to
+manipulate stand-off annotations, annotation sets, and
+documents containing text and sets of annotations. 
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc NLP::GATE
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=NLP-GATE
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/NLP-GATE
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/NLP-GATE
+
+    Search CPAN
+        http://search.cpan.org/dist/NLP-GATE/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Johann Petrak
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

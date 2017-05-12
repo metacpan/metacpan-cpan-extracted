@@ -1,0 +1,15 @@
+Net::WWD by John Baleshiski
+
+Quick install:
+
+
+	$ perl Makefile.PL
+	$ make
+
+Read INSTALL.APACHE if you want to integrate WWD into Apache.
+	$ ./finalize (user apache runs as)
+
+	$ make test
+	$ make install
+
+

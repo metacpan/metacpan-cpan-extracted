@@ -1,0 +1,26 @@
+---
+abstract: 'A Stringprep Profile for Internationalized Domain Names (RFC 3491)'
+author:
+  - 'Claus Färber <CFAERBER@cpan.org>'
+build_requires:
+  Test::More: '0'
+  Test::NoWarnings: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-IDN-Nameprep
+no_index:
+  directory:
+    - eg
+requires:
+  Unicode::Stringprep: '1.1'
+  perl: '5.008003'
+resources:
+  homepage: http://search.cpan.org/dist/Net-IDN-Encode
+  repository: http://github.com/cfaerber/Net-IDN-Encode
+version: '1.102'

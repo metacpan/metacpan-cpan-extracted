@@ -1,0 +1,43 @@
+0.17    2016-07-15
+- accept ->new({....}) in addition to ->new(....)
+  patch from Dagfinn Ilmari Mannsåker (from Nov 2014, sorry I forgot about it)
+- avoid error in case _socket is undef (e.g. never sent a metric before destroying)
+  patch from Matt Koscica
+
+0.16    2014-10-14
+- add return_connect_error param to ->new for if you don't want ->connect to die
+  patch from Petya Kohts
+
+0.15    2014-09-15
+- add path parameter to ->send
+  patch from Matt Koscica
+
+0.14    2013-12-16
+- added the Changes file to MANIFEST (noticed by Sawyer X)
+- patch from Ivan Kruglov to deal with interrupts during ->send
+
+0.13    2013-08-30  (hackathon at booking.com)
+- removed 'plaintext'; please use 'data' instead
+- added ability to pass arbitrary data structures to 'data' param of send,
+  along with a coderef for 'transformer' to turn it into plaintext;
+  also there's a default transformer for hashes
+
+0.12    2013-08-30  (hackathon at booking.com)
+- added 'plaintext' parameter to send,
+  for sending multi-line text instead of line-by-line
+
+0.11    2013-02-26
+- 'trace' option
+  patch from Rafael Garcia-Suarez
+- allow setting socket Proto and Timeout
+  patch from Herald van der Breggen
+- ->connect reconnects if not ->connected
+
+0.10    2012-07-30
+- added 'fire_and_forget' parameter to send to allow not dying on errors
+- send multiple lines of data on the same socket
+  (it'll keep the socket open; if you need to close it,
+   use the new ->close method, or let your $graphite object go out of scope)
+
+0.01    2012-06-17
+- initial release

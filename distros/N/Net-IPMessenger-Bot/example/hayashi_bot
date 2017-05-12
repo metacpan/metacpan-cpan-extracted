@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+use strict;
+use utf8;
+use Net::IPMessenger::Bot;
+use Sys::Hostname ();
+use Encode;
+
+my $bot = Net::IPMessenger::Bot->new(
+    configure => {
+        NickName  => 'hayashi_bot',
+        GroupName => 'bot',
+        UserName  => 'hayashi_bot',
+        HostName  => Sys::Hostname::hostname(),
+        Debug     => 1,
+    },
+    on_message => [
+        qr/いつやるの?/ => sub {
+            "いまでしょ";
+        },
+    ],
+);
+
+$bot->start;

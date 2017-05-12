@@ -1,0 +1,9 @@
+Revision history for Nagios-Plugins-Memcached
+
+0.02  2007-12-11 17:04
+  * Fixed for RT#31354 (http://rt.cpan.org//Ticket/Display.html?id=31354)
+  * Fixed for RT#29894 (http://rt.cpan.org/Public/Bug/Display.html?id=29894)
+
+0.01  2007-07-17 12:24
+  * First version
+

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ItemLookupResponse xmlns="http://webservices.amazon.com/AWSECommerceService/2007-01-15">
+  <Items>
+    <Request>
+      <IsValid>True</IsValid>
+      <ItemLookupRequest>
+        <IdType>EAN</IdType>
+        <ItemId>5035822647633</ItemId>
+        <ResponseGroup>Large</ResponseGroup>
+        <SearchIndex>DVD</SearchIndex>
+      </ItemLookupRequest>
+    </Request>
+    <Item>
+      <ASIN>B00004CXLB</ASIN>
+      <SalesRank>21838</SalesRank>
+      <SmallImage>
+        <URL>http://ec1.images-amazon.com/images/P/B00004CXLB.02._SCTHUMBZZZ_.jpg</URL>
+        <Height Units="pixels">60</Height>
+        <Width Units="pixels">42</Width>
+      </SmallImage>
+      <MediumImage>
+        <URL>http://ec1.images-amazon.com/images/P/B00004CXLB.02._SCMZZZZZZZ_.jpg</URL>
+        <Height Units="pixels">140</Height>
+        <Width Units="pixels">98</Width>
+      </MediumImage>
+      <LargeImage>
+        <URL>http://ec1.images-amazon.com/images/P/B00004CXLB.02._SCLZZZZZZZ_.jpg</URL>
+        <Height Units="pixels">475</Height>
+        <Width Units="pixels">334</Width>
+      </LargeImage>
+      <ImageSets>
+        <ImageSet Category="primary">
+          <SmallImage>
+            <URL>http://ec1.images-amazon.com/images/P/B00004CXLB.02._SCTHUMBZZZ_.jpg</URL>
+            <Height Units="pixels">60</Height>
+            <Width Units="pixels">42</Width>
+          </SmallImage>
+          <MediumImage>
+            <URL>http://ec1.images-amazon.com/images/P/B00004CXLB.02._SCMZZZZZZZ_.jpg</URL>
+            <Height Units="pixels">140</Height>
+            <Width Units="pixels">98</Width>
+          </MediumImage>
+          <LargeImage>
+            <URL>http://ec1.images-amazon.com/images/P/B00004CXLB.02._SCLZZZZZZZ_.jpg</URL>
+            <Height Units="pixels">475</Height>
+            <Width Units="pixels">334</Width>
+          </LargeImage>
+        </ImageSet>
+      </ImageSets>
+      <ItemAttributes>
+        <Actor>Sean Penn</Actor>
+        <Actor>Nick Nolte</Actor>
+        <Actor>Jennifer Lopez</Actor>
+        <Actor>Powers Boothe</Actor>
+        <Actor>Claire Danes</Actor>
+        <Actor>Joaquin Phoenix</Actor>
+        <Actor>Jon Voight</Actor>
+        <Actor>Billy Bob Thornton</Actor>
+        <Actor>Abraham Benrubi</Actor>
+        <Actor>Richard Rutowski</Actor>
+        <Actor>Aida Linares</Actor>
+        <Actor>Sean Stone</Actor>
+        <Actor>Ilia Volokh</Actor>
+        <Actor>Valeri Nikolayev</Actor>
+        <Actor>Brent Briscoe</Actor>
+        <AspectRatio>1.78:1</AspectRatio>
+        <AudienceRating>Suitable for 18 years and over</AudienceRating>
+        <Binding>DVD</Binding>
+        <Brand>SONY PICTURES HOME ENT. UK</Brand>
+        <Director>Oliver Stone</Director>
+        <EAN>5024165771907</EAN>
+        <Format>Anamorphic</Format>
+        <Format>Dubbed</Format>
+        <Format>PAL</Format>
+        <Format>Widescreen</Format>
+        <Label>Sony Pictures Home Ent. UK</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>Czech</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>Danish</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>Finnish</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>German</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>Greek</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>Hebrew</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>Hindi</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>Hungarian</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>Icelandic</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>Norwegian</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>Polish</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>Swedish</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>German</Name>
+            <Type>Dubbed</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>1299</Amount>
+          <CurrencyCode>GBP</CurrencyCode>
+          <FormattedPrice>£12.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Sony Pictures Home Ent. UK</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <OriginalReleaseDate>1998-04-24</OriginalReleaseDate>
+        <PackageDimensions>
+          <Height Units="hundredths-inches">58</Height>
+          <Length Units="hundredths-inches">710</Length>
+          <Weight Units="hundredths-pounds">18</Weight>
+          <Width Units="hundredths-inches">542</Width>
+        </PackageDimensions>
+        <ProductGroup>DVD</ProductGroup>
+        <ProductTypeName>ABIS_DVD</ProductTypeName>
+        <Publisher>Sony Pictures Home Ent. UK</Publisher>
+        <RegionCode>2</RegionCode>
+        <ReleaseDate>1998-12-14</ReleaseDate>
+        <RunningTime Units="minutes">119</RunningTime>
+        <Studio>Sony Pictures Home Ent. UK</Studio>
+        <TheatricalReleaseDate>1997-10-03</TheatricalReleaseDate>
+        <Title>U-Turn [1998]</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>609</Amount>
+          <CurrencyCode>GBP</CurrencyCode>
+          <FormattedPrice>£6.09</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>289</Amount>
+          <CurrencyCode>GBP</CurrencyCode>
+          <FormattedPrice>£2.89</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>4</TotalNew>
+        <TotalUsed>6</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+      </Offers>
+   </Item>
+  </Items>
+</ItemLookupResponse>

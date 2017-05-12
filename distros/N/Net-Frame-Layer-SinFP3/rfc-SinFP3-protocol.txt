@@ -1,0 +1,246 @@
+#
+# $Id: rfc-SinFP3-protocol.txt 4 2012-11-18 15:03:39Z gomor $
+#
+
+1. Scope and background
+
+The purpose of the SinFP3 protocol is  to  allow  programs  written  in  other
+languages  than  Perl  to  interface  with  the  SinFP3  active  and   passive
+fingerprinting engine. The protocol wants to be  minimalistic  to  reduce  the
+performance impact on parsing packets.
+
+It's a request/response protocol, comprised of a fixed 8 bytes header followed
+by a number of TLV (type, length, value) fields. The maximum packet size  will
+be 8 + 65535 in length. Reserved fields may be used in  the  future  to  allow
+request or responses to be greater than that size.
+
+This RFC describes version 1 of the protocol.
+
+2. Overview of the protocol
+
+8 bytes header, followed by Length bytes of TLV fields.
+
+2.1. Request packet format
+
+    0                   1                   2                   3   
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |    Version    |     Type      |            Flags              |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |     Code      |   TLV count   |            Length             |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                             TLVs                              |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+Version (protocol version):
+- 0x01: version 1
+
+Type (request type):
+- 0x01: Active request
+- 0x02: Passive request
+
+Flags (wanted result flags):
+- 0x0000: full
+- 0x0001: trusted
+- 0x0002: ipVersion
+- 0x0004: systemClass
+- 0x0008: vendor
+- 0x0010: os
+- 0x0020: osVersion
+- 0x0040: osVersionFamily
+- 0x0080: matchType
+- 0x0100: matchMask
+- 0x0200: matchScore
+- 0x0400: P1sig
+- 0x0800: P2sig
+- 0x1000: P3sig
+
+Code:
+- 1-byte: always 0 for requests.
+
+TLV count:
+- 1-byte: the number of TLVs in the request
+
+Length:
+- 2-bytes: total TLV length, in bytes
+
+2.2. Response packet format
+
+    0                   1                   2                   3   
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |    Version    |     Type      |            Flags              |   
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |     Code      |   TLV count   |            Length             |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                             TLVs                              |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+Version (protocol version):
+- 0x01: version 1
+
+Type (response type):
+- 0x03: Active response
+- 0x04: Passive response
+
+Flags (provided result flags):
+- 0x0000: full
+- 0x0001: trusted
+- 0x0002: ipVersion
+- 0x0004: systemClass
+- 0x0008: vendor
+- 0x0010: os
+- 0x0020: osVersion
+- 0x0040: osVersionFamily
+- 0x0080: matchType
+- 0x0100: matchMask
+- 0x0200: matchScore
+- 0x0400: P1sig
+- 0x0800: P2sig
+- 0x1000: P3sig
+
+Code (error codes):
+- 0x00: success with result unknown
+- 0x01: success with result found
+- 0x02: bad version
+- 0x03: bad type
+- 0x04: bad TLV count
+- 0x05: bad TLV
+
+TLV count (number of TLV per result):
+- 1-byte: the number of TLV per result, when code == 0x01. Total number of TLV
+otherwise.
+
+3. TLVs
+
+The number of TLV per result depends on flags. Each flag set gives  1  TLV  of
+result. 0x00 flag (full) means 13 in active mode,  and  11  in  passive  mode.
+Exception when unknown result is returned: only 1 TLV.
+
+3.1. Request TLVs
+
+0x01: Embedded frame(s) format:
+- length: 0x01
+- value:
+-- 0x01: Ethernet frame format
+-- 0x02: IPv4 frame format
+-- 0x03: IPv6 frame format
+-- 0x04: TCP frame format
+
+0x02: Embedded passive frame:
+0x03: Embedded active frame (P1):
+0x04: Embedded active frame (P2):
+0x05: Embedded active frame (P3):
+0x06: Embedded active frame (P1r):
+0x07: Embedded active frame (P2r):
+0x08: Embedded active frame (P3r):
+- length: length of packet as captured on the wire
+- value: packet raw data as captured on the wire
+0x09: P1 signature
+0x0a: P2 signature
+0x0b: P3 signature
+
+3.2. Response TLVs
+
+0x20: Trusted field:
+- length: 1
+- value: 0x00 or 0x01
+
+0x21: ipVersion field
+- length: 1
+- value: 4 or 6
+
+0x22: systemClass field
+0x23: vendor field
+0x24: os field
+0x25: osVersion field
+0x26: osVersionFamily field
+0x27: matchType field
+0x28: matchMask field
+- length: length of ASCII string
+- value: ASCII string
+
+0x29: matchScore field
+- length: 1
+- value: 1-100 (%)
+
+4. Example of a request/response exchange
+
+4.1. Request for a passive match
+
+    0                   1                   2                   3   
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | Version: 0x01 | Type: 0x02    | Flags: 0x0270                 |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | Code: 0x00    | TLVs: 0x02    | Length: 0x0031                |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | TLV1: 0x01 0x01 0x04                                          |
+   | TLV2: 0x02 0x0c TCP data                                      |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+Type (0x02):
+- passive request
+
+Flags (0x0010|0x0020|0x0040|0x0200):
+- wants results for os, osVersion, osVersionFamily and matchScore
+
+Code (0x00):
+- no used for request
+
+TLV (0x02):
+- total number of TLVs included
+
+Length: 49 bytes (0x0031)
+- TLV1:  3 bytes
+- TLV2: 46 bytes
+
+TLVs:
+- TLV1: 0x01 0x01 0x04: Give TCP packet.
+- TLV2: 0x02 0x0c TCP data: The TCP packet.
+
+TCP SYN packet length in bytes: 44 (20 bytes for TCP headers and 24 bytes  for
+options). Length in hex: 0x0c.
+
+4.2. Response with a passive match
+
+    0                   1                   2                   3   
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | Version: 0x01 | Type: 0x04    | Flags: 0x0270                 |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | Code: 0x01    | TLVs: 0x04    | Length: 0x0040                |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | TLV1 + TLV2 + TLV3 ... TLV12                                  |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+Type (0x04):
+- Passive response
+
+Flags (0x0010|0x0020|0x0040|0x0200):
+- have results for os, osVersion, osVersionFamily and matchScore
+
+Code (0x01):
+- success with result found
+
+TLV (count = 4, 0x04 per result)
+
+Length (64 bytes, 0x0040):
+- length of all included TLVs
+
+TLVs:
+Result1:
+- TLV1: 0x24 0x05 Linux  (os: Linux)
+- TLV2: 0x25 0x05 2.6.x  (osVersion: 2.6.x)
+- TLV3: 0x26 0x05 2.6.x  (osVersionFamily: 2.6.x)
+- TLV4: 0x29 0x01 0x64   (matchScore: 100%)
+Result2:
+- TLV5: 0x24 0x05 Linux  (os: Linux)
+- TLV6: 0x25 0x05 2.4.x  (osVersion: 2.4.x)
+- TLV7: 0x26 0x05 2.4.x  (osVersionFamily: 2.4.x)
+- TLV8: 0x29 0x01 0x64   (matchScore: 100%)
+Result3:
+- TLV9:  0x24 0x05 Windows (os: Windows)
+- TLV10: 0x25 0x05 7       (osVersion: 7)
+- TLV11: 0x26 0x05 7       (osVersionFamily: 7)
+- TLV12: 0x29 0x01 0x14    (matchScore: 20%)

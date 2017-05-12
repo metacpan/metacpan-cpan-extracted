@@ -1,0 +1,13 @@
+INSTALL
+Changes
+lib/Net/YAR.pm
+lib/Net/YAR/DomainCheck.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00_base.t
+t/10_client_user.t
+t/20_client_contact.t
+t/30_client_domain.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,27 @@
+{: NES 1.0 ('file_upload.pl') :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  Nes 1.03 by Skriptke
+  Copyright 2009 - 2010 Enrique Castanon
+  Licensed under the GNU GPL.
+
+  Sample:
+  http://nes.sourceforge.net/
+
+  CPAN:
+  http://search.cpan.org/dist/Nes/
+
+  Repository:
+  http://github.com/Skriptke/nes
+   
+  DOCUMENTATION:
+  perldoc Nes::Obj::file_upload
+ 
+  -----------------------------------------------------------------------------
+:}
+    {: @ uploads
+    {: @$ uploads.msg :} <input name="{: @$ uploads.field_name :}" size="{: @$ uploads.size :}" type="file" value="{: @$ uploads.filename :}" {: ~ ($field_id)id="{: @$ uploads.field_id :}" :}{: ~ ($field_class)class="{: @$ uploads.field_class :}" :}{: @$ fields.property :}/> 
+    <span  name="{: @$ uploads.field_name :}_span" id="{: @$ uploads.field_name :}_error">{: @$ uploads.error,yes_html :}</span><br>:}
+    {: $ error_max,yes_html :}{: ~ ($modal_loading){: include ('{: $ modal_loading :}') :}:}
+

@@ -1,0 +1,24 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Number/WithError.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00pod.t
+t/00podcover.t
+t/01compile.t
+t/02constructor.t
+t/03round.t
+t/04arith.t
+t/05functions.t
+t/06err.t
+t/07asarray.t
+t/regression.txt

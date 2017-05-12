@@ -1,0 +1,53 @@
+{
+   "abstract" : "The great new Net::PT!",
+   "author" : [
+      "Paul Taylor <pftylr@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.76, CPAN::Meta::Converter version 2.132510",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-PT-Test",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Signature" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "CryptX" : "0.017",
+            "ExtUtils::MakeMaker" : "0",
+            "JSON" : "0",
+            "MIME::Base64" : "3.11",
+            "Math::Random::Secure" : "0.05",
+            "Module::Signature" : "0",
+            "Mozilla::CA" : "0",
+            "REST::Client" : "0",
+            "Test::More" : "0",
+            "Time::HiRes" : "0",
+            "URI::Encode" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01"
+}

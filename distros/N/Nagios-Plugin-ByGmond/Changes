@@ -1,0 +1,7 @@
+Revision history for Nagios-Plugin-ByGmond
+
+0.04    support select host from hostgroup in the gmond output   
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Net::Parliament;
+use Data::Dumper;
+
+my $parl = Net::Parliament->new();
+
+if (0) {
+    my $members = $parl->Get_members();
+    for my $member (@$members) {
+        warn Dumper $member;
+        last;
+    }
+}
+
+for my $bill (@{ $parl->Get_bills(parl => 40, session => 2) }) {
+    warn Dumper $bill;
+}

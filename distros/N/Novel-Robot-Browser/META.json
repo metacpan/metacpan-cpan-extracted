@@ -1,0 +1,43 @@
+{
+   "abstract" : "get/post url, return unicode content, auto detect CJK charset\r",
+   "author" : [
+      "abbypan <abbypan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Novel-Robot-Browser",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode::Detect::CJK" : "0",
+            "HTTP::Tiny" : "0",
+            "IO::Uncompress::Gunzip" : "0",
+            "Parallel::Loops" : "0",
+            "Term::ProgressBar" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/abbypan/Novel-Robot-Browser.git",
+         "web" : "https://github.com/abbypan/Novel-Robot-Browser"
+      }
+   },
+   "version" : "0.20",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

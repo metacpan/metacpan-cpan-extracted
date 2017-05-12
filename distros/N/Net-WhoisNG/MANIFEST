@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-WhoisNG.t
+lib/Net/WhoisNG.pm
+lib/Net/WhoisNG/Person.pm
+META.yml                                 Module meta-data (added by MakeMaker)

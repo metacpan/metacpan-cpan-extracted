@@ -1,0 +1,35 @@
+Revision history for Perl extension Nagios::WebTransact
+
+0.01  Fri May 30 15:35:55 2003
+	- original version; created by h2xs 1.19
+
+0.02 Correct testing. Try and limp along with no understanding of
+      Test::Harness and make test. Rather unsuccessfull.
+
+0.03 Since make test runs 
+	- test.pl and
+	- t/* with verbose=0
+
+then the choices for prompting are either put all code in test.pl (Schwern says is bad) or
+what has been done here ie
+
+	- construct credentials cache with Makefile.PL and 
+	- put all the tests in t/
+
+0.04	Add PREREQ checking to Makefile.PL ..
+
+0.14	Nov 2003
+	- closure generated accessors 
+ 	- add download_images option
+
+0.15	Cache UserAgent in object making it possible to reuse the object ($x->urls([({Method =>,..})]))
+	with a different set of pages.
+
+	Obviously the object design is completely unsatisfactory: constructor should cache UserAgent;
+	check() should take the list of pages and check them.
+
+0.16	Mar 2004 XXXX
+	1 Unnecessary change to default AGENT value 
+	2 allow redirect for POST. This breaks the check_sap* clients.
+
+	==> backout and document the agent keyword of the check method.

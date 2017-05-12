@@ -1,0 +1,28 @@
+---
+abstract: AS2 Protocol implementation (RFC 4130) used in Electronic Data Exchange (EDI)
+author:
+  - 'Sam Wong <sam@hellosam.net>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112621'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-AS2
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Crypt::SMIME: 0
+  Digest::SHA1: 0
+  HTTP::Message: 0
+  LWP::UserAgent: 0
+  MIME::Base64: 0
+  MIME::Tools: 0
+version: 0.03

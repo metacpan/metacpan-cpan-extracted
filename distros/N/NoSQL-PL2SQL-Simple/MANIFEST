@@ -1,0 +1,12 @@
+Changes
+cksums.txt
+Makefile.PL
+MANIFEST
+README
+t/employees.xml
+t/mysql.t.0
+t/NoSQL-PL2SQL-Simple.t
+lib/NoSQL/PL2SQL/Simple.pm
+samples/MyData.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,22 @@
+Revision history for Net-OBEX
+
+0.006   2013-10-28
+        - Minor changes to comply with specs and Kwalitee game
+
+0.005   2009-07-27
+        - Added my links
+
+0.004   2008-03-20
+        - Added C<STATUS METHODS>, C<mtu()> and C<put()> functionality
+
+0.003   2008-03-05
+        - Fixed the bug where contents of End Of Body headers
+          were not appended to returns of get()
+
+0.002   2008-03-04
+        - Fixed the bug with set_path() where you weren't able
+          to set neither do_up nor no_create flags
+
+0.001   2008-03-03
+        - First version, released on an unsuspecting world.
+

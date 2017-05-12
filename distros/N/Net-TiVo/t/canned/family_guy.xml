@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TiVoContainer xmlns="http://www.tivo.com/developer/calypso-protocol-1.5/">
+  <Details>
+    <ContentType>x-tivo-container/folder</ContentType>
+    <SourceFormat>x-tivo-container/tivo-dvr</SourceFormat>
+    <Title>Family Guy</Title>
+    <LastChangeDate>0x44C9689C</LastChangeDate>
+    <TotalItems>3</TotalItems>
+  </Details>
+  <SortOrder>CaptureDate</SortOrder>
+  <GlobalSort>Yes</GlobalSort>
+  <ItemStart>0</ItemStart>
+  <ItemCount>3</ItemCount>
+  <Item>
+    <Details>
+      <ContentType>video/x-tivo-mpeg</ContentType>
+      <SourceFormat>video/x-tivo-mpeg</SourceFormat>
+      <Title>Family Guy</Title>
+      <SourceSize>648019968</SourceSize>
+      <Duration>1799000</Duration>
+      <CaptureDate>0x449F2A86</CaptureDate>
+      <EpisodeTitle>Peter's Got Woods</EpisodeTitle>
+      <Description>Brian's new relationship with Meg's teacher puts a strain on his friendship with Peter, so Peter finds a new friend, James Woods. Copyright Tribune Media Services, Inc.</Description>
+      <SourceChannel>13-0</SourceChannel>
+      <SourceStation>WFXT</SourceStation>
+      <ProgramId>EP2960010063</ProgramId>
+      <SeriesId>SH296001</SeriesId>
+      <EpisodeNumber>414</EpisodeNumber>
+    </Details>
+    <Links>
+      <Content>
+        <Url>http://tivo:80/download/Family%20Guy.TiVo?Container=%2FNowPlaying&amp;id=1862517</Url>
+        <ContentType>video/x-tivo-mpeg</ContentType>
+        <AcceptsParams>No</AcceptsParams>
+      </Content>
+      <CustomIcon>
+        <Url>urn:tivo:image:expired-recording</Url>
+        <ContentType>image/*</ContentType>
+        <AcceptsParams>No</AcceptsParams>
+      </CustomIcon>
+      <TiVoVideoDetails>
+        <Url>https://tivo:443/TiVoVideoDetails?id=1862517</Url>
+        <ContentType>text/xml</ContentType>
+        <AcceptsParams>No</AcceptsParams>
+      </TiVoVideoDetails>
+    </Links>
+  </Item>
+</TiVoContainer>

@@ -1,0 +1,87 @@
+Revision history for Net::Prober
+
+0.15 - Mon Mar 21 17:02:00 Europe/Oslo 2016
+
+    Fixed use of "scheme" and "port" arguments together in the same probe
+      request. Request would be made with the default for "port" attribute
+      (e.g. 80) even if scheme was set to "https" and port to 443.
+
+0.14 - Fri Sep 26 10:00:00 Europe/Oslo 2014
+
+    Fixed use of port number in Hostname header, as it was causing some HTTP
+      probe requests to fail with Tata CDN endpoints.
+
+0.12 - Mon Jan 13 11:27:00 Europe/Oslo 2014
+
+    Fixed t/http.t tests failing due to a change in the remote website being
+      tested (multiple cpan testers reports).
+
+0.11 - Tue Jan  7 09:35:00 Europe/Oslo 2014
+
+    Fixed t/tcp.t and t/port-names.t test failures on Windows platform:
+    http://www.cpantesters.org/cpan/report/bfda167b-6d80-1014-b726-584155012b15
+
+0.10 - Mon Jan  6 17:05:00 Europe/Oslo 2014
+
+    Added arbitrary HTTP method probing, with POST requests support,
+      including request body and HTTP headers.
+
+0.09 - Fri Nov 29 11:03:01 Europe/Oslo 2013
+
+    Added "up_status_re" option (regular expression) to HTTP probe class,
+      to allow custom regular expressions when matching against response HTTP
+      status to determine good health. F.ex. this allows for 404 responses to
+      be considered good health indicators (host up rather than down).
+
+    Added a "reason" value in the HTTP probe results, so you can consult it to
+      know why an HTTP probe failed. Note that this is only available for
+      HTTP probes for now.
+
+0.08 - Sat Mar  9 12:06:20 Europe/Oslo 2013
+
+    Disabled log to syslog by default by popular demand.
+      Seems a more sensible default.
+
+0.07 - Mon Aug  6 15:50:55 Europe/Oslo 2012
+
+    Net::Prober now requires perl 5.10.0, which was released in 2007.
+
+    Fixed icmp probing on Win32 when user has no admin powers.
+      Thanks to CPAN testers once again!
+
+0.06 - Tue Jul 17 09:22:19 Europe/Oslo 2012
+
+    Changed 'proto' to 'protocol' in the probe arguments (...)
+
+    Changed default ping protocol when you don't have
+      superuser privileges. tcp pings in most cases report
+      hosts down incorrectly.
+
+    IMAP probing through SSL doesn't work at the moment.
+
+0.05 - Wed Oct 26 16:10:36 Europe/Oslo 2011
+
+    Fixed a flapping test in t/http.t due to some changes
+      in the tested website content.
+
+0.04 - Sun Jul 31 09:49:44 Europe/Oslo 2011
+
+    Fixed a port name conversion test failure on Solaris.
+      Thanks to CPAN testers report by Jost Krieger:
+      http://www.cpantesters.org/cpan/report/4b4e759a-b8d9-11e0-90f5-ce1b785ebe45
+
+0.03 - Sat May 21 09:39:01 Australia/Melbourne 2011
+
+    Removed all '//' operator usage to make the
+      module work on perl < 5.10
+
+0.02 - Thu May 19 20:38:58 Australia/Melbourne 2011
+
+    Make sure probe_http() returns "ok" as "0" or "1"
+      and not blank. That happened for connection refused
+      errors for example.
+
+0.01 - Thu May 19 09:25:01 Australia/Melbourne 2011
+
+    First CPAN release
+

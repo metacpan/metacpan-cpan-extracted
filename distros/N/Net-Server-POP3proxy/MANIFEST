@@ -1,0 +1,5 @@
+MANIFEST
+README
+Makefile.PL
+lib/Net/Server/POP3proxy.pm
+t/01_load.t

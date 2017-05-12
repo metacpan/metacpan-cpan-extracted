@@ -1,0 +1,20 @@
+      #             (the shorter to type the more often used) with
+      #             reasonable _default_ behaviour for poor Notes admins
+      #         (b) _always_ returning at least one entry object that
+      #             allows further clever methods to be applied;
+      #             investigate what happens when in $a->b(...)->c(...)
+      #             $a->b(...) returns a list of suitable objects
+      #             for method c(...); Does c() get called with the
+      #             return list of b(...) provided the first list elem
+      #             is of correct type ? What about c( b( $a ) ???
+      #         (c) removing the add_entry(_with_no_access) methods,
+      #             as those are hardly needed, cause remove_entry
+      #             is mostly more appropriate in that situation
+      #         (d) morphing the methods into Perlish ones, i.e. make
+      #             them accept a variable number of arguments, e.g.
+      #             add_all_entries_and_full_manager_access(a,name,...)
+      #         (e) change the name of the "full_control"-methods to
+      #             e.g. add_entry_with_full_manager_access
+      #             as those are hardly needed            
+      #  
+      #             

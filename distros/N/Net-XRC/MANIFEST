@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-XRC.t
+lib/Net/XRC.pm
+lib/Net/XRC/Data.pm
+lib/Net/XRC/Response.pm
+lib/Net/XRC/Data/int.pm
+lib/Net/XRC/Data/string.pm
+lib/Net/XRC/Data/boolean.pm
+lib/Net/XRC/Data/bytes.pm
+lib/Net/XRC/Data/list.pm
+lib/Net/XRC/Data/complex.pm
+META.yml                                 Module meta-data (added by MakeMaker)

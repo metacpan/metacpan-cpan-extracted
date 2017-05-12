@@ -1,0 +1,989 @@
+==================================================
+Changes from 2014-04-12 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.80 at 2015-04-12 04:02:44 +0000
+-----------------------------------------
+
+  Change: 23ebe246719a53fdd3677ae6585ab0ea4e070c47
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2015-04-11 23:58:28 +0000
+
+    Add gitignore 
+
+  Change: 515a34059eefd3ad0eb4cf29aced7e5b07f4ed0a
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2015-04-11 23:55:09 +0000
+
+    Bump to version 0.80 for new CPAN release, change repo references.
+
+    Fix a few line endings and indentation problems. Change to generating
+    changelog from git. 
+
+  Change: 9301ac886269c1bbe3f9e3dba1ad6ce583212dc6
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-04-11 23:44:46 +0000
+
+    Fixed a bug in Etags validation 
+
+  Change: acc316c18401651dbced6297918b0d13f8f0ca46
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-11-04 00:14:12 +0000
+
+    Add get_callback and make copy key respect x-amz-metadata-directive.
+
+    get_callback retrieve a key to a callback, pass the function
+    reference as the second parameter.
+
+    If you'd rather key metadata is copied rather than replaced define
+    x-amz-metadata-directive when calling copy_key. 
+
+  Change: b2966b9742872328b70dcf1357e15a10fc748849
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-16 17:26:30 +0000
+
+    Fix typo 
+
+  Change: eea3098513cc03a6d6389be7c7c33f48933966e4
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-15 00:11:26 +0000
+
+    Merge branch 'iam_roles' into best-merge 
+
+  Change: 17f337c8648c61cc53022029f4601002a5c399fb
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-15 00:09:37 +0000
+
+    Add support for IAM roles.
+
+    Add a new option use_iam_role to use IAM role based temporary
+    credentials for all requests. No longer require access_key and
+    secret_key parameters. 
+
+  Change: edc14f9dfedb3ad2ce61d15e9706488cc5ffa4f1
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-09-28 23:21:00 +0000
+
+    Remove broken bucket as hostname detection code.
+
+    The code that detects if a bucket can be used as a hostname is non
+    optimal for SSL. All buckets can be accessed via an endpoint and a
+    bucketname, or via a hostname.
+
+    When using SSL accessing buckets that contain periods in their name
+    the wildcard validation does not match causing SSL errors.
+
+    Also accessing buckets via hostname causes connection caching to not
+    work as well, since there are different connections for every S3
+    bucket since they are connected to different hostnames.
+
+    This change does require the correct S3 endpoint to be specified for
+    a bucket if it is the US standard region.
+
+    Endpoints listed here:
+
+    http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region 
+
+  Change: 75e65d9c595fc6b2eca62bf09f2ed54e079067ad
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-06-16 14:37:40 +0000
+
+    Add support for retriving keys that are "0". Otherwise it would fail
+    with a bucket list. 
+
+  Change: 6772a9f636c100b3b382dd99e725974004a03852
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-06-04 23:27:32 +0000
+
+    Add support for delete_multi_object to handle more than 1000
+    requests.
+
+    Also allow it to handle string keys in the bucket along with
+    Net::S3::Client::Objects. 
+
+  Change: 0017a86e924788822522a81d1e7f8a4f880201c9
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-06-04 23:26:30 +0000
+
+    Revert "fix synopsis for s3cl sync_up"
+
+    Wrong changelog entry
+
+    This reverts commit 36fa3b1d658c88f6dfbe4485886b262bf95b5a31. 
+
+  Change: 36fa3b1d658c88f6dfbe4485886b262bf95b5a31
+  Author: perlpong <calyx238@gmail.com>
+  Date : 2014-06-04 23:20:13 +0000
+
+    fix synopsis for s3cl sync_up 
+
+  Change: 172e28e0b26ac8173acf8629481a8648ea68c342
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-06-04 22:33:36 +0000
+
+    Merge change to fix compatibility with perl 5.8 
+
+  Change: f8a2a4b45e9427f6ce9fd6b12f0cf96cc18b5362
+  Author: Panu Ervamaa <panu.ervamaa@frantic.com>
+  Date : 2014-03-24 14:48:59 +0000
+
+    Merge branch 'master' of github.com:gabiruh/net-amazon-s3
+
+    No actual changes, just marking it as merged. 
+
+  Change: ae2d9aa9cfdfe3e979c0bab4c19497d42f4a21a3
+  Author: Panu Ervamaa <panu.ervamaa@frantic.com>
+  Date : 2014-03-24 14:38:25 +0000
+
+    correct plan t/02client.t 
+
+  Change: 7835760d9b981a6c599c8ae9d34da281b3a009ac
+  Author: Panu Ervamaa <panu.ervamaa@frantic.com>
+  Date : 2014-03-24 14:23:09 +0000
+
+    fix bucket creation in t/02client.t
+
+    $client->bucket() creates just the local object, not on AWS. make
+    lc() precedence explicit and consistent with t/01api.t 
+
+  Change: 14afb92eb4219d3d120125bcba8239e5de505845
+  Author: Panu Ervamaa <panu.ervamaa@frantic.com>
+  Date : 2014-03-24 14:23:05 +0000
+
+    use LWP >= 6.03 to support proper 100-continue with content ref body
+
+    Obsolete and broken implementation of
+    _send_request_expect_nothing_probed() removed. The request path for
+    the HEAD request was incorrect: it didn't include the bucketname,
+    that has been moved to hostname prefix at earlier stage. 
+
+  Change: 01a0cd1ea2ff2d0b3e5b5a4b54d2f128494e5409
+  Author: Panu Ervamaa <panu.ervamaa@frantic.com>
+  Date : 2014-03-24 14:23:00 +0000
+
+    avoid 409 Conflict when running 01api.t
+
+    Using the same bucket name in another region after removing it from
+    another fails with "409 Conflict" status. Quote from the AWS official
+    support: "I strongly recommend against deleting a bucket that you
+    want to keep. Thereâs never any guarantee that you will be able to
+    create a new bucket with the same bucket name." 
+
+  Change: 686263d640a34e098506825edcca2c8eae2e3786
+  Author: Panu Ervamaa <panu.ervamaa@frantic.com>
+  Date : 2014-03-24 14:22:56 +0000
+
+    use README.md for tests 
+
+  Change: a35b0a28cc510ae2f76cb98c5a3b6eb86d9c99e5
+  Author: Panu Ervamaa <panu.ervamaa@frantic.com>
+  Date : 2014-03-24 14:19:46 +0000
+
+    add blank line after each package statement to satisfy
+    Dist::Zilla::Plugin::PkgVersion 
+
+  Change: 8636491890c3a889f7ce7aa18af6f334f4ed0e0b
+  Author: Panu Ervamaa <panu.ervamaa@frantic.com>
+  Date : 2014-03-24 14:19:36 +0000
+
+    Merge pull request #28 from github.com:toritori0318/net-amazon-s3
+    feature/cache-control2 
+
+  Change: aa912cfefd8f55d86c26023f607f3022443209bd
+  Author: Panu Ervamaa <panu.ervamaa@frantic.com>
+  Date : 2014-03-24 14:15:58 +0000
+
+    Merge pull request #24 from github.com:yuryu/net-amazon-s3
+    feature/server-side-encryption 
+
+  Change: 92415ff572c5087991bcf9169d8d53bfead60011
+  Author: Panu Ervamaa <panu.ervamaa@frantic.com>
+  Date : 2014-03-24 14:05:18 +0000
+
+    Merge pull requests #23, #31 and #33 from
+    github.com:rustyconover/net-amazon-s3 
+
+  Change: 8c00ff869614e83f526d4ca31a72528ec77bf7f6
+  Author: Panu Ervamaa <panu.ervamaa@frantic.com>
+  Date : 2014-03-24 14:05:18 +0000
+
+    Merge pull request #22 from github.com:NewsNow/net-amazon-s3 
+
+  Change: a8c699e78ce80d84770ca2404870989b6f4808e7
+  Author: Panu Ervamaa <panu.ervamaa@frantic.com>
+  Date : 2014-03-24 14:05:17 +0000
+
+    Merge pull request #21 from github.com:perlpong/net-amazon-s3 
+
+  Change: 848a9cefd80dc8401225fb8517b7eb3104511aa6
+  Author: Panu Ervamaa <panu.ervamaa@frantic.com>
+  Date : 2014-03-24 14:05:03 +0000
+
+    Merge pull request #6 from github.com:arc/net-amazon-s3 
+
+  Change: d5d51488987e61b744f29c2de3233f48be0293da
+  Author: Panu Ervamaa <panu.ervamaa@frantic.com>
+  Date : 2014-03-23 12:50:17 +0000
+
+    Merge pull request #3 from github.com:dylanwh/net-amazon-s3 
+
+  Change: 4dfc79db33fa11616f6afe2e64c126b36380c908
+  Author: Panu Ervamaa <panu.ervamaa@frantic.com>
+  Date : 2014-03-23 12:42:59 +0000
+
+    Merge pull request #1 from github.com:berler/net-amazon-s3 
+
+  Change: 4623411176cacb11dbf639fc3293cd05a93ce8e8
+  Author: Gabriel Andrade <gabriel@Zumba.local>
+  Date : 2014-02-17 09:56:55 +0000
+
+    Merge branch 'patch-3' of
+    https://github.com/renatoaware/net-amazon-s3 
+
+  Change: 20c292dfdccb1b3453e9d2a39c67632e9edda502
+  Author: Gabriel Andrade <gabriel@Zumba.local>
+  Date : 2014-02-17 09:56:37 +0000
+
+    Merge branch 'patch-1' of
+    https://github.com/renatoaware/net-amazon-s3 
+
+  Change: d9440e362cef9b30caf868efc8be6d78146bb391
+  Author: Renato Santos <renato@aware.com.br>
+  Date : 2014-02-17 09:14:31 +0000
+
+    Update Request.pm
+
+    The non-arrayref forms of enum and duck_type have been deprecated 
+
+  Change: 6b725babb202ca567ba85dee9fa01762a555f7fe
+  Author: Renato Santos <renato@aware.com.br>
+  Date : 2014-02-17 09:14:05 +0000
+
+    Update HTTPRequest.pm
+
+    The non-arrayref forms of enum and duck_type have been deprecated 
+
+  Change: 0fc0354a42f932e9d32fc4fa732ea2587bae6f43
+  Author: Renato Santos <renato@aware.com.br>
+  Date : 2014-02-17 09:13:14 +0000
+
+    Update Object.pm
+
+    The non-arrayref forms of enum and duck_type have been deprecated 
+
+  Change: 75486967f6e3efea9327f36425e19bcc15bfa980
+  Author: Gabriel Andrade <gabriel@Zumba.local>
+  Date : 2014-02-13 16:20:30 +0000
+
+    Merge branch 'abort_multipart_upload' 
+
+  Change: 2bbd0864910fea57da9e0e4a65ed542ded571dff
+  Author: Rusty Conover <rusty@parrotsnap.com>
+  Date : 2014-02-08 00:05:02 +0000
+
+    Fix some warnings about line endings from perl critic, add a missing
+    abstract to DeleteMultipleObjects. 
+
+  Change: 98d2aae91a1b6d69fc3ca84fda2311def5630eec
+  Author: Rusty Conover <rusty@parrotsnap.com>
+  Date : 2014-02-07 23:42:28 +0000
+
+    Merge remote-tracking branch 'origin/pr/31'
+
+    Merge fix for calculate of etags. 
+
+  Change: 229dc38935549a6ceeb7140bb5fa7087720c2410
+  Author: Rusty Conover <rusty@parrotsnap.com>
+  Date : 2014-02-07 23:40:46 +0000
+
+    Merge remote-tracking branch 'origin/pr/23'
+
+    Merge multipart upload aborting change. 
+
+  Change: 81bcd0b07c97fb6e11b9fddacd54b4719da540ae
+  Author: Rusty Conover <rusty@parrotsnap.com>
+  Date : 2014-02-07 23:33:22 +0000
+
+    Merge remote-tracking branch 'origin/pr/33'
+
+    Fixed for enums in recent versions of Moose. 
+
+  Change: 0cfa6b71817f36d5005dca1b95b54fe24329710e
+  Author: Rusty Conover <rusty@parrotsnap.com>
+  Date : 2014-02-07 23:24:50 +0000
+
+    Merge remote-tracking branch 'upstream/master' 
+
+  Change: 150d398f061272115e967bca0b568a9597a61024
+  Author: Tom Hukins <tom@eborcom.com>
+  Date : 2014-01-15 20:51:54 +0000
+
+    Moose enum fixes
+
+    Moose 2.1100 deprecates the non-arrayref form of enum. 
+
+  Change: b0e8df3b81ba87aba3d98a8d0cd2c2029e79f8d2
+  Author: Robert Ward <robert@rtward.com>
+  Date : 2013-12-06 11:15:11 +0000
+
+    Fixed the bug with listing multipart uploaded files 
+
+  Change: 6df67be5f4fcafb7d15d023c44d0dce4153f9d78
+  Author: Robert Ward <robert@rtward.com>
+  Date : 2013-12-06 11:13:07 +0000
+
+    Added a test case demonstrating how listing a bucket fails when
+    trying to list a multipart-uploaded file 
+
+  Change: 27eb6d704321b4758f2aa49f707503ba0f76702c
+  Author: Robert Ward <robert@rtward.com>
+  Date : 2013-12-06 11:08:32 +0000
+
+    Updated the client test to use README.md instead of README for a test
+    file 
+
+  Change: acc526fae9ada1042f52fc9ca676ad7a1ed652fa
+  Author: toritori0318 <toritori0318@gmail.com>
+  Date : 2013-10-02 17:04:50 +0000
+
+    Added support for cache-control header 
+
+  Change: 00956c12865027e77b81501e6e35272ccda091d8
+  Author: Haruka Iwao <haruka@fout.jp>
+  Date : 2013-08-27 19:47:33 +0000
+
+    Add documentation for server-side encryption 
+
+  Change: 0148c98300926e0806b4e76f3ddd61bc4b88fc06
+  Author: Haruka Iwao <haruka@fout.jp>
+  Date : 2013-08-27 15:13:34 +0000
+
+    Indent changes 
+
+  Change: 804d88e5c32e9873916ebd38f34d7501ba4b87d7
+  Author: Haruka Iwao <haruka@fout.jp>
+  Date : 2013-08-27 15:13:20 +0000
+
+    Modify a test to use AES256 encryption 
+
+  Change: 7eba87add514a8f56c1247c4684e044ad9b1b2c6
+  Author: Haruka Iwao <haruka@fout.jp>
+  Date : 2013-08-27 12:16:21 +0000
+
+    Support server side encryption 
+
+  Change: 41488fe57b0d5a3b97b678300e258bccd99aef17
+  Author: Gabriel Andrade <gabriel@zumba.home>
+  Date : 2013-06-25 15:33:30 +0000
+
+    - adding support for multipart upload aborting
+
+    Signed-off-by: Gabriel Andrade <gabriel@zumba.home> 
+
+  Change: 59d2deb250670acf70e00338087a29451b70d768
+  Author: Struan Bartlett <struan.bartlett@NewsNow.co.uk>
+  Date : 2013-06-18 23:03:38 +0000
+
+    Allow 'value' property to be ScalarRef 
+
+  Change: e73c19a34bf480932186c6a074ed358056db7d6a
+  Author: perlpong <calyx238@gmail.com>
+  Date : 2013-04-04 13:09:36 +0000
+
+    fix synopsis for s3cl sync_up 
+
+  Change: 698ef8ff7a7c2d04dd30f7878917b3ac608af7e0
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2013-03-16 09:42:14 +0000
+
+    Merge branch 'master' of github.com:pfig/net-amazon-s3 
+
+  Change: f0614f470b0a7040a1ec93c1a227c66271735292
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2013-03-16 09:41:42 +0000
+
+    Release 0.59 
+
+  Change: 9b0dc37b3cc7dbe298c0eec570fac8578798cfe0
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2013-03-16 09:38:10 +0000
+
+    Release 0.59 
+
+  Change: 7aa69a3d46330501a912f848703d19aae478b3b6
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2013-03-16 09:37:46 +0000
+
+    Updated change log 
+
+  Change: 3c246c5793d7e89043bc7e8c5867c231f040869a
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2013-03-16 02:33:42 +0000
+
+    Merge pull request #19 from pfig/feature/auth-token
+
+    Feature/auth token 
+
+  Change: 9cfa6e3460bb3b45ecba835c599422dce35994b7
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2013-03-16 09:31:07 +0000
+
+    Cosmetic, code style 
+
+  Change: 5ec314c0e67806f75315fbe066e813f985bf003e
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2013-03-13 12:13:46 +0000
+
+    Merging pull request #17 into feature/auth-token 
+
+  Change: 17404fbe4ec470118c28ad276cb69df55ba36b75
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2013-03-13 11:27:29 +0000
+
+    Merge branch 'develop' of github.com:pfig/net-amazon-s3 into develop 
+
+  Change: e6a922ecd2c8e8038297ccc495f543be75e01e7a
+  Author: Miquel Ruiz <mruiz@cpan.org>
+  Date : 2013-01-17 16:28:17 +0000
+
+    Support auth via AWS STS (Security Token) 
+
+  Change: 909f6c2b8d069ce72a4f9555eee6488248f29340
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2012-11-28 16:46:29 +0000
+
+    Removed the Git bundle for now 
+
+  Change: 34d6d071ac6ad73b417f91d62f221d6dab9a8f00
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2012-11-28 16:27:46 +0000
+
+    Merge tag '0.58' into develop
+
+    Release 0.58 
+
+  Change: 9c188bb57fe1c5a83085a9c5c2ad3df47a26c43d
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2012-11-28 16:27:28 +0000
+
+    Merge branch 'release/0.58' 
+
+  Change: 37c59a5f24b5e902b39f01038959be3736832665
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2012-11-28 16:27:08 +0000
+
+    Fixed synopsis code and Critic directives 
+
+  Change: d41bec133f6f8f19d35a7e686423eb39b4cca4c4
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2012-11-28 16:26:38 +0000
+
+    Version bump 
+
+  Change: 802aa4f9f40d1ecc7caa8d2abc7b15723859a060
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2012-11-28 15:48:24 +0000
+
+    Cosmetic (indentation) 
+
+  Change: 57f694c83a65b5cdac57e39dc87ada46eeff2a9f
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2012-11-28 07:44:52 +0000
+
+    Merge pull request #14 from pfig/feature/multipart-upload
+
+    Multi-part upload and multi-object delete. 
+
+  Change: c8d743bcfe0ff13c58893c815c4877e85e9dc31c
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2012-11-28 15:42:00 +0000
+
+    Making Perl::Critic happy 
+
+  Change: 853062f9458686fa6b909b8271aa6c482b42777a
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2012-11-28 15:26:27 +0000
+
+    Merge multipart upload patch
+    (https://github.com/pfig/net-amazon-s3/pull/13) 
+
+  Change: 241b19fe34b93b74a363be4864baa219d4b3ddb0
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2012-11-28 15:12:16 +0000
+
+    Fixed bungled changelog 
+
+  Change: afc7f33c71c793d74f8564679242148f611dd52e
+  Author: robert clarke <robert_clarke@trendmicro.co.uk>
+  Date : 2012-09-21 14:04:08 +0000
+
+    Move put_part content length calculation to
+    Net::Amazon::S3::ClientObject, tidy up handling of
+    intitiate_multipart_upload request 
+
+  Change: 602daa8d1bf984777288ab1fd99cf56919a86a81
+  Author: robert clarke <robert_clarke@trendmicro.co.uk>
+  Date : 2012-09-21 13:58:06 +0000
+
+    tidy up minor scruffiness 
+
+  Change: 13909a3113bf89fff186386014e7f73e67f4fb4e
+  Author: robert clarke <robert_clarke@trendmicro.co.uk>
+  Date : 2012-09-21 13:36:32 +0000
+
+    sort out messy comments 
+
+  Change: 72447f8514fb0bba27db485d2b4f13064dc1c9fa
+  Author: robert clarke <robert_clarke@trendmicro.co.uk>
+  Date : 2012-09-21 13:34:36 +0000
+
+    change tests to use File::Temp, rather than modify distribution files
+    in place 
+
+  Change: 868709fddf4537175c2244ce887fb8636de8ebca
+  Author: robert clarke <robert_clarke@trendmicro.co.uk>
+  Date : 2012-09-20 12:11:01 +0000
+
+    Implementation of multipart upload and multiobject delete 
+
+  Change: c1a8e50c5ee582ff9faf593ec33ab575072eb263
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2012-09-16 22:33:26 +0000
+
+    Merge tag '0.57' into develop
+
+    Release 0.57 
+
+  Change: 1b686746b5e3dfe059535685227d3c1d83dedfad
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2012-09-16 22:33:09 +0000
+
+    Merge branch 'release/0.57' 
+
+  Change: c5adb6c4a0507a4b492924f48a25157848699e82
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2012-09-16 22:30:34 +0000
+
+    Make Test::Synopsis happy 
+
+  Change: ebbea88aa78ca6384be93335e28cff0ab83ceb8a
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2012-09-16 22:30:16 +0000
+
+    Removing link checks and POD coverage tests for the moment 
+
+  Change: 7c018f12e63be162fc5897f51ea0c1f9873941d4
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2012-09-16 20:56:44 +0000
+
+    Updated dzil's configuration 
+
+  Change: 2897d9c437868f799c939f7c2f560c9bfa3371bf
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2012-09-16 20:56:14 +0000
+
+    Make Perl::Critic happy 
+
+  Change: 9a30f5090a12858062a9844e3ee42fcda7a3aaaa
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2012-09-16 20:13:31 +0000
+
+    Updated docs to include Content-Disposition 
+
+  Change: 7ffae2c5cac6fd508fb88667c2ce0d5bf083e444
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2012-09-16 11:01:49 +0000
+
+    Added Content-Disposition to put_filename() 
+
+  Change: 2bc8c48be031edbe96dbcdf9790855ce9578f506
+  Author: Pedro Figueiredo <pfig@89clouds.com>
+  Date : 2012-09-16 11:01:08 +0000
+
+    Changed client tests to work with Pedro's account 
+
+  Change: d792114a4740fbfaea0ba08700a0862afbaa1421
+  Author: Pedro Figueiredo <me+github@pedrofigueiredo.org>
+  Date : 2012-07-18 02:17:48 +0000
+
+    Merge pull request #10 from ranguard/master
+
+    Added sync_up to s3cl 
+
+  Change: b59f3be8a82105e38c69d8eaf6370116fe57e177
+  Author: Leo Lapworth <leo@cuckoo.org>
+  Date : 2012-06-04 11:37:38 +0000
+
+    Add sync_up option to s3cl 
+
+  Change: d88638866f5cb29f8b68c0e5451259abdd764ecd
+  Author: Rusty Conover <rusty_conover@me.com>
+  Date : 2012-05-26 13:04:15 +0000
+
+    Add support for multiple delete call at S3.
+
+    API allows deletion of 1,000 keys per call, which is very fast
+    compared to deleting one key per call. 
+
+  Change: 7950fbcd5123e609442a8286e3ecf3d3f11cd9fe
+  Author: Aaron Crane <arc@cpan.org>
+  Date : 2012-05-25 00:58:24 +0000
+
+    Support decoding Content-Encoding on GET 
+
+  Change: 7d0809661234c50038363ff6b8a8d7f70348b0c4
+  Author: Aaron Crane <arc@cpan.org>
+  Date : 2012-05-19 17:05:30 +0000
+
+    Support uploading and downloading user metadata 
+
+  Change: aa057978b6048c69222aaf169b85329b933f642d
+  Author: Aaron Crane <arc@cpan.org>
+  Date : 2012-05-19 17:05:30 +0000
+
+    Support reduced-redundancy storage 
+
+  Change: 354731025c227304dca65e26a3a3bf62b4132460
+  Author: Aaron Crane <arc@cpan.org>
+  Date : 2012-05-19 17:05:29 +0000
+
+    Factor out shared guts of put and put_filename
+
+    This should prevent future bugs like that affecting the
+    content_disposition option. 
+
+  Change: 934835557aa877a5f027bc02e7e9e5dc5d6179b6
+  Author: Aaron Crane <arc@cpan.org>
+  Date : 2012-05-19 17:05:29 +0000
+
+    Consistent error reporting for put and put_filename 
+
+  Change: d7f5a378e83798e6e67cebdb6fdb995423671088
+  Author: Aaron Crane <arc@cpan.org>
+  Date : 2012-05-19 17:05:29 +0000
+
+    Document content_disposition attribute 
+
+  Change: c4123f8a9711e3051a977d95cda0a6be88ee283c
+  Author: Aaron Crane <arc@cpan.org>
+  Date : 2012-05-19 14:31:10 +0000
+
+    Support Content-Disposition in put_filename 
+
+  Change: bef170b154db03b87af2a574898bfbd238a1ae20
+  Author: Pedro Figueiredo <me+github@pedrofigueiredo.org>
+  Date : 2012-04-28 08:17:24 +0000
+
+    Merge pull request #5 from lordarthas/master
+
+    Add support for Content-Disposition header 
+
+  Change: 1b9bbd79684ca605c6ca99b6bb543051653ef2b9
+  Author: Pedro Figueiredo <me@pedrofigueiredo.org>
+  Date : 2012-04-28 16:11:11 +0000
+
+    Moved script to bin, in order for the script to be installed 
+
+  Change: bc243b7a75e3a8fdccd3051030d4953ce8fd8cee
+  Author: Michele Beltrame <mb@cattlegrid.info>
+  Date : 2012-02-11 10:11:50 +0000
+
+    Support for Content-Disposition header 
+
+  Change: 104bd19aa30fd993a02a0080940d11b9d639ea31
+  Author: Pedro Figueiredo <me@pedrofigueiredo.org>
+  Date : 2011-12-25 17:53:44 +0000
+
+    Adding a README to please GitHub 
+
+  Change: 91a2d2be13b19d0025730589b5b4e0f6646e2456
+  Author: Pedro Figueiredo <me@pedrofigueiredo.org>
+  Date : 2011-12-24 15:16:17 +0000
+
+    Moved build system to Dist::Zilla 
+
+  Change: 0cdc34cbc58e8a3a461ba1b443f53040efeabda3
+  Author: Pedro Figueiredo <me@pedrofigueiredo.org>
+  Date : 2011-12-18 22:35:25 +0000
+
+    Extra file in MANIFEST *grumble* 
+
+  Change: db7f8d75a3e86768a1a44be45859e3ebe2a4c0cf
+  Author: Pedro Figueiredo <me@pedrofigueiredo.org>
+  Date : 2011-12-18 22:28:51 +0000
+
+    Release 0.56 
+
+  Change: 500975a1d24f7c13a3920113a3f88c74ad245b5f
+  Author: Pedro Figueiredo <me@pedrofigueiredo.org>
+  Date : 2011-12-18 11:46:06 +0000
+
+    Fixed spelling error (RT #69817, patch from Fabrizio Regalli) 
+
+  Change: e0a7eedf777449d1a41fc48dd3c46f6542487c02
+  Author: Pedro Figueiredo <me@pedrofigueiredo.org>
+  Date : 2011-12-16 21:15:33 +0000
+
+    Added use_ok tests (RT #72856) 
+
+  Change: 3fdd016c074dd54e72954b7e625ce2d3a07813a7
+  Author: Pedro Figueiredo <me@pedrofigueiredo.org>
+  Date : 2011-12-16 21:09:16 +0000
+
+    use URI::Escape (RT #72857) 
+
+  Change: 782897e7e3e2054280fa6e4d9cfa594d60e3e221
+  Author: Pedro Figueiredo <me@pedrofigueiredo.org>
+  Date : 2011-12-16 21:01:56 +0000
+
+    Bumped dependency on MooseX::StrictConstructor to 0.16 (RT #73229) 
+
+  Change: 14634ddd14cbb5b722b4aae8b9ddf1482d272ff5
+  Author: Pedro Figueiredo <me@pedrofigueiredo.org>
+  Date : 2011-12-12 21:08:13 +0000
+
+    RT #73193: enforce dependency versions 
+
+  Change: 1c51c9f3950aaa87531a61dd039e3c491b64fbcb
+  Author: Pedro Figueiredo <me@pedrofigueiredo.org>
+  Date : 2011-12-10 02:09:13 +0000
+
+    Release 0.55 
+
+  Change: 8e4270235a945c4876483ef3735b1f22b840bae5
+  Author: Pedro Figueiredo <me@pedrofigueiredo.org>
+  Date : 2011-12-10 02:08:03 +0000
+
+    Replaced dependency on MooseX::Types::DateTimeX with
+    MooseX::Types::DateTime::MoreCoercions 
+
+  Change: 4713f68ae1194c65a7ea61f16062060b7193a9c5
+  Author: Pedro Figueiredo <me@pedrofigueiredo.org>
+  Date : 2011-12-10 02:06:38 +0000
+
+    These tests were passing for Le'on but not for me :) 
+
+  Change: 59a03896365cd64eb03ba87bc441b9f5f6312481
+  Author: Pedro Figueiredo <me@pedrofigueiredo.org>
+  Date : 2011-12-10 02:04:24 +0000
+
+    META.yml is generated, shouldn't be under VC 
+
+  Change: 5398c5905434995e54208b9ba644b1a7236bb591
+  Author: Dylan William Hardison <dylan@hardison.net>
+  Date : 2011-10-14 22:04:16 +0000
+
+    allow for more easy subclassing of ::Client 
+
+  Change: 970d7fa50bff429827641fe08a158e3e9652fddc
+  Author: Steven Berler <steven.berler@dreamhost.com>
+  Date : 2011-09-08 17:43:51 +0000
+
+    optional 'host' parameter to use any S3-compatible host
+
+    Allows Net::Amazon::S3 to be used with any S3-compatible host by
+    setting the 'host' parameter when creating the Net::Amazon::S3
+    object. This allows you to override the default of
+    's3.amazonaws.com'.
+
+    Example: my $s3 = Net::Amazon::S3->new({
+
+    aws_access_key_id => $aws_access_key_id,
+
+    aws_secret_access_key => $aws_secret_access_key,
+
+    retry => 1,
+
+    host => 'my.s3.compatible.host.com', }); 
+
+  Change: c9f2e29efbeb2565b1f19d409593587b64e11a5e
+  Author: Pedro Figueiredo <me@pedrofigueiredo.org>
+  Date : 2011-07-10 08:43:27 +0000
+
+    Newer MakeMaker doesn't accept array refs for AUTHOR anymore 
+
+  Change: 349177c96bdc814820b5da79368c8935d6975ea1
+  Author: Pedro Figueiredo <me@pedrofigueiredo.org>
+  Date : 2011-07-10 08:29:51 +0000
+
+    Release 0.54 
+
+  Change: fe22ac0818cd66cc7d9b542dfa2a019a7c73f3c8
+  Author: Pedro Figueiredo <me@pedrofigueiredo.org>
+  Date : 2011-06-19 17:42:50 +0000
+
+    Patch by David Wheeler to eliminate a naked qw() warning 
+
+  Change: 2a18e7f5dfe061a824c7706c00f3343f082451c5
+  Author: Pedro Figueiredo <me@pedrofigueiredo.org>
+  Date : 2011-06-19 17:40:06 +0000
+
+    Removed Class::Accessor::Fast from dependency list 
+
+  Change: 93aaa2917088feecb9178b1471facf78ad23bf3a
+  Author: Pavel A. Karoukin <pkaroukin@microassist.com>
+  Date : 2011-05-25 14:17:54 +0000
+
+    Fix path issues 
+
+  Change: ec8ebc26a57e05d043e0c930d3162fedd940e82a
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2010-03-30 15:26:55 +0000
+
+    And release 0.53 
+
+  Change: 1383af2ec58fc7853a9451125a6a64c94f4581fd
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2010-03-30 14:45:34 +0000
+
+    update s3cl: You need to use the module before you use it, added the
+    mkbucket command, now you can run the help without your AWS secret
+    key, add docs about the env variables you need to run s3cl (patches
+    by Jesse Vincent) 
+
+  Change: 95b94e455f872eaff8de8214b3633dedce979d9c
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2010-03-30 11:24:19 +0000
+
+    add content_encoding to Net::Amazon::S3::Object (suggested by Egor
+    Korablev) 
+
+  Change: a51659b012a6ad37775db97378a3f52f865a7dab
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2010-03-30 11:13:01 +0000
+
+    fix max_keys when listing buckets (spotted by Andrew Bryan) 
+
+  Change: 44786d002a750631996b479f703f8dbf26d769dc
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2010-03-30 10:49:00 +0000
+
+    add an exists method to Net::Amazon::S3::Client (suggested by David
+    Golden) 
+
+  Change: 11e9f3d07072c968feefdf1230fbc61c633a6a86
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2010-03-30 10:31:15 +0000
+
+    tiny POD fix (patch by Frank Wiegand) 
+
+  Change: 6c0d303bc567c0b37a2a53dd95554d0eeac8014f
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2010-03-30 10:18:35 +0000
+
+    fix authenticated urls to work with EU buckets (patch by Edmund von
+    der Burg) 
+
+  Change: 35600941ac7cc4d144aa905fc3ca0fddc71a4350
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2009-07-02 09:17:48 +0000
+
+    and release 0.52 
+
+  Change: 12c6da242e871ebe362ca8ed6320358ff0cc88d8
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2009-07-02 09:17:08 +0000
+
+    increase version prerequisites for some modules so that they are
+    known to work 
+
+  Change: f9faa3759d6f22488beb0519243258cd224c7819
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2009-05-19 08:33:45 +0000
+
+    and release 0.51 
+
+  Change: 9289fc541d6ff4794919cfa9198fd687e6ef395a
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2009-05-19 08:31:44 +0000
+
+    use MooseX::Types::DateTimeX so that we work with latest Moose
+    (noticed by Ted Zlatanov) 
+
+  Change: dc38f262e76d156bc82bd07b8935e46f6d034cdc
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2009-01-21 10:43:33 +0000
+
+    and release 0.50 
+
+  Change: 868f1d0687ec508a3dc1bf37104eb5716eccfd01
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2009-01-21 10:41:49 +0000
+
+    add query_string_authentication_uri() to
+    Net::Amazon::S3::Client::Object, suggested by Meng Wong 
+
+  Change: b3ab3e022e58d06c95778fb47a4eb6052d7b4892
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2009-01-20 15:12:13 +0000
+
+    make all the classes immutable 
+
+  Change: 4a839e882c67bf8e48d1bcb09071c923b467a524
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2009-01-20 14:47:30 +0000
+
+    add support for an expires header when putting an object to
+    Net::Amazon::S3::Client::Object 
+
+  Change: 48a2105e9dfe99a4d030f9fcaa81d6e7da77f4e7
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2009-01-13 09:09:04 +0000
+
+    And release 0.49 
+
+  Change: 259c7c551e0f357507820051f482dfe6b2206bbd
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2009-01-12 10:15:58 +0000
+
+    minor typo 
+
+  Change: e751d9af3f669269cb01a996e024b3171d41e2d7
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2009-01-12 10:03:05 +0000
+
+    add support for listing a bucket with a prefix to
+    Net::Amazon::S3::Client::Bucket 
+
+  Change: 86abf322a7bd8530b0e28d0ceaa57d5c35932653
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2008-12-04 09:24:50 +0000
+
+    and release 0.48 
+
+  Change: b9ac4cb3f1dcc6609f47ed69dbf663b25dbe47f0
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2008-12-04 09:23:02 +0000
+
+    be slightly less strict about bucket names: they can contain
+    uppercase letters, Amazon just doesn't recommend it (noticed by Simon
+    Elliott, fixes Brackup) 
+
+  Change: ba254028be1d92f1d6a7ac280069d4073edd7d12
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2008-12-02 08:03:52 +0000
+
+    and release 
+
+  Change: 73e0563badce5fa3a43711e74b253ba220be271a
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2008-12-02 08:03:38 +0000
+
+    fix listing with a prefix (spotted by Nobuo Danjou) 
+
+  Change: af4f2958c92f1c580b5bda4a63fb2c2edf8b66eb
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2008-11-24 08:55:05 +0000
+
+    and release 
+
+  Change: ff4d8480878988f823989c42bc7472e9712220d1
+  Author: Leon Brocard <acme@astray.com>
+  Date : 2008-11-24 08:39:27 +0000
+
+    import 0.46-tobe from svn 
+
+================
+End of releases.
+================

@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Nginx-ReadBody.t
+lib/Nginx/ReadBody.pm
+lib/Nginx/ReadBody/Russian.pod
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,11 @@
+Changes
+lib/Net/Syndic8.pm
+lib/Net/Syndic8/Base.pm
+lib/Net/Syndic8/FeedObj.pm
+lib/Net/Syndic8/FeedsCollection.pm
+lib/Net/Syndic8/RPCXML.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/Net-Syndic8.t
+META.yml                                 Module meta-data (added by MakeMaker)

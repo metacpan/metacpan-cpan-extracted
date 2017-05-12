@@ -1,0 +1,35 @@
+NAME
+    nginx-perl - full-featured perl support for nginx
+
+DESCRIPTION
+    nginx-perl completes original embedded perl with asynchronous 
+    capabilities and a few useful functions.
+
+URL
+    <http://zzzcpan.github.com/nginx-perl/>
+
+FEATURES
+    - full official nginx perl API;
+    - asynchronous connections (ngx_connector, ngx_reader, ngx_writer);
+    - timer (ngx_timer);
+    - SSL (ngx_ssl_handshaker);
+    - resolver (ngx_resolver);
+    - access handlers (perl_access);
+    - app handlers (perl_app);
+    - configuration level eval (perl_eval);
+    - init_worker, exit_worker handlers (perl_init_worker, perl_exit_worker);
+    - logging functions (ngx_log_*);
+    - client connection takeover for websockets, etc;
+
+AUTHOR
+    Alexandr Gomoliako <zzz@zzz.org.ua>, Igor Sysoev
+
+COPYRIGHT AND LICENSE
+    Copyright (C) Igor Sysoev
+
+    Copyright 2011 Alexandr Gomoliako. All rights reserved.
+
+    nginx-perl is free software. It may be used, redistributed and/or
+    modified under the same terms as nginx itself. Take a look into LICENSE
+    for details.
+

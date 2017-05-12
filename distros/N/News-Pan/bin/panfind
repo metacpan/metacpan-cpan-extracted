@@ -1,0 +1,161 @@
+#!/usr/bin/perl -w
+use strict;
+use base 'LEOCHARRE::CLI';
+use warnings;
+use News::Pan::Server;
+
+
+
+my $default_server_dir = undef; 
+# set it to what you want, for example 
+# my $default_server_dir = '/home/myself/.pan/astraweb';
+# otherwise you have to keep providing -a arg
+# if you set it, you will still be able to override it with -a
+
+
+my $o = gopts('e:E:S:s:n:boa:');
+
+if (DEBUG){
+   $News::Pan::Server::DEBUG = 1;
+   $News::Pan::Server::Group::DEBUG = 1;
+   print STDERR "debug on.\n";
+}
+
+$o->{a} ||= $default_server_dir;
+$o->{a} or die("missing -a pan server dir");
+
+
+
+$o->{s} or $o->{S} or $o->{E} or $o->{e} die('must give subject match text arg -s, -e, -S or -E');
+
+
+
+my $s = new News::Pan::Server;
+$s->set_abs_path($o->{S}) or die('not a server dir for pan');
+
+
+
+
+
+
+
+# WHAT GROUPS TO SEARCH IN
+my $groups = $s->groups_subscribed;
+
+
+# only binaries?
+if ($o->{b}){
+   $groups = $s->groups_subscribed_binaries;
+}
+
+
+
+
+# filter group files??
+if ($o->{n}){   
+   @{$groups} = grep { /$$o{n}/ } @$groups;
+}
+
+
+
+
+
+GROUP: for (@$groups){
+
+   my $g = $s->group($_) or die;
+
+   my $results;
+
+   if ($o->{e}){   
+      $g->search_add_exact($o->{e});         
+   }
+
+   if ($o->{s}){      
+      $g->search_add($o->{s});
+   }
+   
+   if ($o->{S}){      
+      $g->search_negative($o->{S});
+   }
+   
+   if ($o->{E}){      
+      $g->search_negative_exact($o->{E});
+   }
+
+   
+   $g->search_count or next GROUP;
+
+   printf "%s : %s\n", $g->name, $g->search_count;
+
+   next GROUP if $o->{o};
+
+
+   for (@{$g->search_results}){
+      print " $_\n";
+   }
+   print "\n";
+   
+}
+
+
+
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+panfind - search pan cache for articles in newsgroups
+
+=head1 OPTIONS
+
+   -b only search binaries newsgroups 
+   -o only print the matching newsgroups and results counts, not the entire subject matches
+   -h help
+   -v print version and exit
+   -d debug
+   
+=head1 PARAMETERS
+
+   -a abs path to server dir holding pan newsgroup cache files
+   
+   -s positive match 
+   -e positive match, exact   
+   -S negative match
+   -E negative match, exact   
+   
+   -n newsgroup match string
+
+=head1 EXAMPLE USAGE
+
+find 'cookie' in all newsgroups matching cooking
+
+   panfind -a ~/.pan/astraweb -s 'cookie' -n 'cooking'
+
+If you leave out -n, searches all newsgroups.
+
+find 'boeing 747' in all newsgroups, only show matchine groups and match count:
+
+   panfind  -a ~/.pan/astraweb -s 'boeing 747' -o
+
+match exactly, show subjects:
+
+   panfind  -a ~/.pan/astraweb -e 'Boeing 747'
+
+=head1 SETTING DEFAULT SERVER DIR
+
+If you know you will aways be using /home/yourself/.pan/astraweb
+Then set it in the script.
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 SEE ALSO
+
+L<News::Pan>
+
+=cut
+

@@ -1,0 +1,36 @@
+Net-DNS-ZoneParse version 0.0101
+================================
+
+Net::DNS::ZoneParse can be used to parse or write BIND-compatible Zonefiles.
+The zone can be accessed as a array of Net::DNS::RR-objects or be handled via
+an object-oriented interface.
+
+The Module is built to make use of any RR known to the system - a corresponding
+Net::DNS::RR::xxx must be installed. Due to some differences between parsing a
+packet and a system's file, the parsing can be adjusted.
+
+The Parser as well as the Generator can be used in conjunction with any real
+Parser or Generator, as long as a suitable gluecode exist.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Net::DNS::RR to save the records
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Benjamin Tietz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Net-Bonjour
+version:             0.96
+abstract:            Module for DNS service discovery (Apple's Bonjour)
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Net::DNS:                      0.5
+    Socket:                        1.75
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - George Chlipala <george@walnutcs.com>

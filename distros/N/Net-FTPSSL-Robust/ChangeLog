@@ -1,0 +1,26 @@
+
+===== version history for Net::FTPSLL::Robust
+
+Alll changes made by Mark Overmeer, unless explicitly stated
+differently.
+
+version 0.05: Mon Aug 22 10:27:50 CEST 2011
+	- Net::FTP::SSL >= 0.18 supports restart.
+	  rt.cpan.org [Curtis Leach]
+	- move t/99pod.t to xt/ so we can remove dependency on Test::POD
+
+version 0.04: Mon Nov 16 21:42:35 CET 2009
+	- another fix :(  $ftp->nlst incompatible with Net::FTP
+
+version 0.03: Mon Nov 16 21:02:19 CET 2009
+	- change bin/ftpssl-get meaning for 'p' <-> 'P' to be
+	  compatible with bin/ftp-get.
+
+version 0.02: Fri Nov 13 23:42:02 CET 2009
+	- ftpssl-get change option flag abbreviation of "protection"
+	  from 'p' into 'd', because "port" used 'p' as well.
+	- And "password" abbreviation became capital 'P'.
+	- do not attempt to restart
+
+version 0.01: Fri Nov 13 17:02:09 CET 2009
+	- initial version

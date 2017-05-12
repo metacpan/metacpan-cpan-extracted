@@ -1,0 +1,8 @@
+Build.PL
+lib/Number/Compare/Date.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/01basic.t
+Makefile.PL
+META.yml
+CHANGES

@@ -1,0 +1,40 @@
+Random notes for working on the Net::OSCAR source:
+(*NOT* for people merely writing programs which *use* Net::OSCAR!)
+(This stuff is subject to change without notice.)
+
+-If an OSCAR/XML/Protocol.parsed-xml file is available, that will
+be used instead of Protocol.xml.  This is a parsed version of the XML
+file; I generate this when do a Net::OSCAR release by running the
+xmlcache script.  This way, the user doesn't need to have XML::Parser
+installed, or the whole expat library.  So, if you want to play with
+Protocol.xml, make sure to remove Protocol.parsed-xml :)
+
+-We work with TLVs as hashes which treat their keys as numbers.
+To get one of these magic hashrefs, call tlv to get a blank one
+or: tlv(1 => "data", 2 => "other data").  encode_tlv($tlv) before sending
+it out over the wire.
+
+-For things that should usually be a number but should be presented
+to the user as a string, use dualvar(num, "string").  A lot of the
+things in OSCAR/Common.pm are dualvars.
+
+-Things in OSCAR/Common.pm that are easy to forget to update:
+	EXPORT_TAGS
+		Add something to EXPORT_TAGS all if you add a new thing.
+		Things that should be visible to users of Net::OSCAR
+		also go in EXPORT_TAGS standard.  Be careful when
+		naming things that will go in standard, since they'll
+		be imported into the namespace of most programs which
+		use Net::OSCAR.
+	CONNTYPE_FOO
+		Add one of these if you add something that requires a
+		new connection type.  Also add it to svcmap in
+		OSCAR/Callbacks.pm.
+	OSCAR_TOOLDATA
+		This probably also needs to get updated if you
+		add a new connection type, or maybe even a new family.
+	BUDTYPES
+		If you're using a new type, in the BLInternal sense of
+		the word, put it in this ugly little array, padding
+		it with "unknown N" if necessary.
+

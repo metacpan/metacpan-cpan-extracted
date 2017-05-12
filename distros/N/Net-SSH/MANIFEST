@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+SSH.pm
+test.pl
+README

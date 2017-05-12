@@ -1,0 +1,47 @@
+0.61 Mon Dec 19 22:19:00 NZDT 2011
+    - Version bump to resync CPAN - previous upload forgot to bump $VERSION :-(
+
+0.60 Thu Dec  8 13:14:00 NZDT 2011
+    - Bug: Perform the same changes as last release but this time to writes within _send()
+
+0.59 Tue Dec  6 16:39:00 NZDT 2011
+    - Bug: Make changes performed in 0.57 more broad to cover connection closures during _read_buf()
+
+0.58 Mon Aug  8 23:01:00 NZST 2011
+    - Refactor: Reorganise module so use rather than inherit IO::Socket::SSL to permit socket reconnections when required
+
+0.57 Fri Aug  5 11:06:00 NZST 2011
+    - Feature: Transparently attempt to reconnect/retransmit upon Error 34 (Connection timed out) returns from APP
+
+0.56 Fri Jul 28 10:09:00 NZST 2011
+    - Feature: Debug() now supports a call-back method
+    - Feature: New package global $Last_Error to store last error encountered
+    - Bug: Make login() return 0 on failure and 1 on success
+
+0.55 Fri May 06 11:01:00 NZST 2011
+    - Bug: Change buffer code in _read_response to use Timeout based loop rather than a read-count.  Large responses were previously truncated.
+    - Bug: Response lines should not be parsed until the buffer is complete
+    - Bug: Increase default buffer read length
+    - Feature: Changing parsing related debug messages to require $Debug > 2
+
+0.54 Tue Apr 26 21:00:37 NZST 2011
+    - Feature: Add last_status call to return last OpenSRS status code and text
+
+0.53 Mon Apr 18 10:00:37 NZST 2011
+    - Bug: Implement missing calls: create_mailbox, change_mailbox, get_mailbox_allow_list, get_mailbox_block_list
+    - Bug: Add IO::Socket:SSL to MakeMaker PREREQ_PM to help cleanup more CPAN build failures
+    - Documentation: Alter documentation for {get,create,delete,change}_group_alias_mailbox calls. "Group Alias" in OpenSRS parlance is a Mailing List.
+    - Documentation: Fix last typo "and" vs "an" typo
+
+0.52 Thu Apr 14 11:17:00 NZST 2011
+    - Bug: Fixed a problem with Required_Optional parameter to _call_opensrs()
+    - Bug: Removed accept and accept_SSL empty subs to fix CPAN build failures
+    - Documentation: Fixed two typos in documentation for new() 
+    - Documentation: Add a note to set_domain_catch_all_mailbox highlighting deprecation of catch-all addresses
+    - Packaging: Shorten description in debian/control to avoid some packaging warnings
+
+0.51 Tue Apr 12 15:20:00 NZST 2011
+    - Include debian packaging files
+
+0.50 Tue Apr 12 14:00:00 NZST 2011
+    - Initial release to CPAN

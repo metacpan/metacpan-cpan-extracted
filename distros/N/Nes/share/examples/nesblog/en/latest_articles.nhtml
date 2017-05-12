@@ -1,0 +1,26 @@
+{: NES 1.0 ('../scripts/latest.cgi') :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  Nes 1.03 by Skriptke
+  Copyright 2009 - 2010 Enrique Castañón
+  Licensed under the GNU GPL.
+
+  Sample:
+  http://nes.sourceforge.net/
+
+  CPAN:
+  http://search.cpan.org/dist/Nes/
+
+  Repository:
+  http://github.com/Skriptke/nes
+
+  -----------------------------------------------------------------------------
+:}
+            <h3>Latest Articles</h3>
+            <ul>
+            {: @ (articles) 
+                <li><a href="./?action=item&item={: @$ articles.name :}">{: @$ articles.name :}</a></li>
+            :}
+            </ul> 
+            <br>

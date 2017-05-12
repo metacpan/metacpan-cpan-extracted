@@ -1,0 +1,84 @@
+-*-text-*-
+-------------------------------------------------------------------------------
+Version 0.2
+-------------------------------------------------------------------------------
+
+Lots of changes!  Be careful, or it will bite your butt. :-/
+
+The default for the Synchronous option is now 1.  This is a `good thing'(tm).
+
+Completely revamped the callback architecture.
+
+Added more documentation.
+
+Added URI::imap and URI::acap
+
+-[ xAP.pm ]--------------------------------------------------------------------
+
+Added ability to fork child process as an alternative to a network
+connection.  This is useful for UW-imapd.
+
+Added close_connection method, to tidy up situations where a command
+is issued on a closed connection.  The command method now returns
+undef if issued against a closed connection.
+
+The send_command method has been renamed to _send_command to reflect
+the fact that it's an internal command.
+
+Literals used to only work for last arg of a command - they now work
+for other arg positions.
+
+Added support for non-synchronizing literals.
+
+Added timestamp to debug_print method.
+
+The $xAP_* variables have been replaced with constants.  They'be also
+been renamed (s/\$xAP_//).  I don't like what I have to do to use them
+in the subclasses, but the 'use strict' is fighting me.  Let me know
+if you know how to fix it without losing the extra checking of things
+like 'use strict'.
+
+Added support for SASL.
+
+-[ IMAP.pm ]-------------------------------------------------------------------
+
+Added some regression tests.  They currently require uw-imapd.
+
+Added support for IMAP namespace extension defined in RFC2342.
+
+Added support for IMAP non-synchronizing extension defined in RFC2088.
+
+Started adding support for IMAP uidplus extension defined in RFC2359.
+
+Added support for AUTH=LOGIN, AUTH=CRAM-MD5, and AUTH=ANONYMOUS.
+
+Added support for mapping LF <-> CRLF
+
+Many changes to the internal data format.
+
+Added methods for accessing data received from the server.
+
+Added authtypes, has_authtypes, and capabilities methods for accessing
+server capability information.
+
+_valid_flag now down-cases its arg before checking its validity
+
+The _select_callback method no longer checks to see if the command
+succeeded to decide whether to populate the EXISTS, RECENT,
+UIDVALIDITY, etc data in the object.
+
+The _expunge_callback method updates the quantity of messages in the
+currently selected folder.
+
+The append method now does a cursory format check of the optional date
+value.  This is probably a good thing, since it's a slightly different
+format that most programmers would be slinging.
+
+Various bug fixes
+	+ auth= check in capability response in now case-insensitive
+	+ misc minor fixes and tweaks
+
+-------------------------------------------------------------------------------
+Version 0.1
+-------------------------------------------------------------------------------
+Initial alpha release.

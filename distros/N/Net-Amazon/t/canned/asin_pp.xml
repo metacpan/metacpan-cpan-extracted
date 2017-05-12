@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<ItemLookupResponse xmlns="http://webservices.amazon.com/AWSECommerceService/2011-08-01">
+  <Items>
+    <Item>
+      <ASIN>0201360683</ASIN>
+      <SalesRank>2831243</SalesRank>
+      <ItemAttributes>
+        <Author>Michael Schilli</Author>
+        <Binding>Paperback</Binding>
+        <CatalogNumberList>
+          <CatalogNumberListElement>AL07005145</CatalogNumberListElement>
+        </CatalogNumberList>
+        <EAN>9780201360684</EAN>
+        <EANList>
+          <EANListElement>9780201360684</EANListElement>
+        </EANList>
+        <ISBN>0201360683</ISBN>
+        <Label>Addison-Wesley Professional</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>3999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$39.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Addison-Wesley Professional</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>464</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>1998-12-16</PublicationDate>
+        <Publisher>Addison-Wesley Professional</Publisher>
+        <SKU>3_0201360683</SKU>
+        <Studio>Addison-Wesley Professional</Studio>
+        <Title>Perl Power!: A JumpStart Guide to Programming with Perl 5</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>200</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$2.00</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>80</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.80</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>11</TotalNew>
+        <TotalUsed>17</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+        <MoreOffersUrl>0</MoreOffersUrl>
+      </Offers>
+    </Item>
+  </Items>
+</ItemLookupResponse>

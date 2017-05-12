@@ -1,0 +1,12 @@
+Revision history for Perl module Net::IP::Route::Reject
+
+0.1 Sat Oct 25 23:54:03 2003
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+0.2 oops
+
+0.3 compiles/works
+
+0.4 How about the right name for the package...
+
+0.5 Fix Build.PL prereqs (IPC::Cmd not IPC::Run), add some sanity checking to module

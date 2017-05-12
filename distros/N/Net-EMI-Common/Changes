@@ -1,0 +1,11 @@
+Revision history for Perl extension Net::EMI::Common.
+
+1.00  23-Feb-2003
+	   - First release.
+
+1.01  30-Apr-2003
+      - Bugfix in the checksum() method. (Thanks, Rainer Thieringer)
+      - Handle that we're called without any input parameter in methods
+        checksum(), encode_7bit() and ia5_decode().
+      - Minor code cleanup.
+

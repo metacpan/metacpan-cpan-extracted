@@ -1,0 +1,15 @@
+POST https://wwwcie.ups.com/ups.app/xml/QVEvents
+
+<?xml version='1.0' standalone='yes'?>
+<QuantumViewRequest>
+  <Bookmark>UVZTUzFPdXRib3VuZDAyMDIwOF8xMzMyNDcwMDc=</Bookmark>
+  <Request>
+    <RequestAction>QVEvents</RequestAction>
+    <TransactionReference>
+      <CustomerContext>Net::Async::Webservice::UPS</CustomerContext>
+      <XpciVersion>0</XpciVersion>
+    </TransactionReference>
+  </Request>
+</QuantumViewRequest>
+
+<?xml version="1.0"?><QuantumViewResponse><Response><TransactionReference><CustomerContext>Net::Async::Webservice::UPS</CustomerContext><XpciVersion>0</XpciVersion></TransactionReference><ResponseStatusCode>0</ResponseStatusCode><ResponseStatusDescription>Failure</ResponseStatusDescription><Error><ErrorSeverity>Hard</ErrorSeverity><ErrorCode>330015</ErrorCode><ErrorDescription>Bookmark is invalid.</ErrorDescription></Error></Response></QuantumViewResponse>

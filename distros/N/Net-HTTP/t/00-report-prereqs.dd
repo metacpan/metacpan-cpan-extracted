@@ -1,0 +1,46 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      },
+                        'suggests' => {
+                                        'JSON::PP' => '2.27300'
+                                      }
+                      },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Compress::Raw::Zlib' => '0',
+                                      'IO::Socket::INET' => '0',
+                                      'IO::Uncompress::Gunzip' => '0',
+                                      'URI' => '0',
+                                      'base' => '0',
+                                      'perl' => '5.006002',
+                                      'strict' => '0',
+                                      'vars' => '0',
+                                      'warnings' => '0'
+                                    },
+                      'suggests' => {
+                                      'IO::Socket' => '0',
+                                      'IO::Socket::INET6' => '0',
+                                      'IO::Socket::IP' => '0',
+                                      'IO::Socket::SSL' => '1.38',
+                                      'Symbol' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Data::Dumper' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Select' => '0',
+                                   'Socket' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

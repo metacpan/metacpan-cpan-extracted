@@ -1,0 +1,22 @@
+Revision history for Perl extension Number::Phone::PT.
+
+0.05  Sep Thu 30 23:18:34 2004
+	- Perl required version is now 5.006 (was 5.008)
+	- added META.yml
+
+0.04  Mon May 19 15:08:34 2004
+	- corrected 262 and 263
+
+0.03  Mon May 11 14:06:34 2004
+	- updated documentation
+
+0.02  Mon May 11 17:56:34 2004
+	- changed the list of area codes (thanks to Jorge Silva :-) )
+
+0.01  Mon May 11 02:22:34 2004
+	- first release ready
+
+0.01  Mon May 10 21:16:34 2004
+	- original version; created by h2xs 1.22 with options
+		-XAn Number::Phone::PT
+

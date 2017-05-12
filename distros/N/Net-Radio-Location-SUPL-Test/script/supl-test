@@ -1,0 +1,252 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+use 5.010;
+
+use Carp qw/croak/;
+use File::ConfigDir qw(:ALL);
+use Config::Any;
+use File::Find::Rule;
+use Log::Any::Adapter;
+use Log::Any qw($log);
+use Params::Util qw(_ARRAY);
+
+require Net::Radio::Location::SUPL::MainLoop;
+require Net::Radio::Location::SUPL::DBusObject;
+
+sub get_config
+{
+    # find config file
+    my @cfg_dirs    = config_dirs();
+    my @cfg_pattern = map { "supl-test." . $_ } Config::Any->extensions();
+    my @cfg_files   = File::Find::Rule->file()->name(@cfg_pattern)->maxdepth(1)->in(@cfg_dirs);
+
+    # default config
+    my %cfg = (
+                "dbus-objects" => {
+                              "default"     => { "bus-name"    => "org.vfnet.supl", },
+                              "RecvPushMsg" => { "object-path" => "/org/vfnet/supl/PushConsumer", },
+                              "Translator"  => { "object-path" => "/org/vfnet/supl/Translator", },
+                                  }
+              );
+
+    if (@cfg_files)
+    {
+
+        # read config file
+        my $all_cfg = Config::Any->load_files(
+                                               {
+                                                 files           => [@cfg_files],
+                                                 use_ext         => 1,
+                                                 flatten_to_hash => 1,
+                                               }
+                                             );
+
+        foreach my $filename (@cfg_files)
+        {
+            defined( $all_cfg->{$filename} )
+              or next;    # file not found or not parsable ...
+            %cfg =
+              ( %cfg, %{ $all_cfg->{$filename} } )
+              ;           # merge into default and previous loaded config ...
+        }
+    }
+
+    return %cfg;
+}
+
+sub setup_log_Log4perl
+{
+    my %cfg = @_;
+
+    eval { require Log::Log4perl; } or croak($@);
+
+    Log::Log4perl->import();
+
+    if ( scalar( keys %cfg ) > 1 )
+    {
+        croak("Please choose exactly one initialization method");
+    }
+    elsif ( scalar( keys %cfg ) == 1 )
+    {
+        my $init_method = ( keys %cfg )[0];
+        my @init_params;
+        if ( defined( $cfg{$init_method} ) )
+        {
+            @init_params =
+              _ARRAY( $cfg{$init_method} ) ? @{ $cfg{$init_method} } : ( $cfg{$init_method} );
+        }
+        Log::Log4perl->$init_method(@init_params);
+    }
+    else
+    {
+        #avoid error message about $Log::Log4perl::WARN used only once
+        defined($Log::Log4perl::WARN)
+          and Log::Log4perl->easy_init($Log::Log4perl::WARN);
+    }
+
+    return;
+}
+
+sub setup_logging
+{
+    my %cfg = @_;
+
+    if ( defined( $cfg{"adapter"} ) )
+    {
+        my $log_adapter_setup = "setup_log_" . $cfg{"adapter"};
+        __PACKAGE__->can($log_adapter_setup)
+          or croak( "Don't know how to setup " . $cfg{"adapter"} );
+        &{ \&{$log_adapter_setup} }( %{ $cfg{ $cfg{"adapter"} } } );
+        Log::Any::Adapter->set( $cfg{"adapter"} );
+    }
+
+    return;
+}
+
+sub setup_dbus
+{
+    my %cfg = @_;
+
+    defined( $cfg{"default"} )
+      and Net::Radio::Location::SUPL::DBusObject::set_default_config( %{ $cfg{"default"} } );
+
+    my @dbusObjects = grep { $_ ne "default" } keys %cfg;
+    foreach my $dbusObj (@dbusObjects)
+    {
+        my $module = "Net::Radio::Location::SUPL::DBusObject::$dbusObj";
+        eval "require $module;";
+        $@ and die $@;
+        my $dbusIf = $module->new( %{ $cfg{$dbusObj} } );
+        $dbusIf or die "Can't initialize $module";
+    }
+
+    return;
+}
+
+sub setup
+{
+    my %cfg = get_config();
+
+    setup_logging( %{ $cfg{"logging"} } );
+    setup_dbus( %{ $cfg{"dbus-objects"} } );
+}
+
+setup();
+
+Net::Radio::Location::SUPL::MainLoop->run();
+
+__END__
+
+=pod
+
+=head1 NAME
+
+supl-test - starts a daemon to test SUPL sessions
+
+=head1 DESCRIPTION
+
+This script loads a configuration file using L<File::Find::Rule>,
+L<File::ConfigDir> and L<Config::Any> and initializes the D-Bus
+listeners.
+
+Currently implemented:
+
+=over 4
+
+=item *
+
+L<Net::Radio::Location::SUPL::DBusObject::RecvPushMsg>
+
+=item *
+
+L<Net::Radio::Location::SUPL::DBusObject::Translator>
+
+=back
+
+Finally, the d-bus main loop is started via L<Net::Radio::Location::SUPL::MainLoop>
+
+=head1 SYNOPSIS
+
+  $ supl-test
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-supl-test at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SUPL-Test>.
+I will be notified, and then you'll automatically be notified of progress
+on your bug as I make changes.
+
+If you think you've found a bug then please read "How to Report Bugs
+Effectively" by Simon Tatham:
+L<http://www.chiark.greenend.org.uk/~sgtatham/bugs.html>.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Net::Radio::Location::SUPL::Test
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=SUPL-Test>
+
+If you think you've found a bug then please read "How to Report Bugs
+Effectively" by Simon Tatham:
+L<http://www.chiark.greenend.org.uk/~sgtatham/bugs.html>.
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/SUPL-Test>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/SUPL-Test>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/SUPL-Test/>
+
+=back
+
+=head2 Where can I go for help with a concrete version?
+
+Bugs and feature requests are accepted against the latest version
+only. To get patches for earlier versions, you need to get an
+agreement with a developer of your choice - who may or not report the
+issue and a suggested fix upstream (depends on the license you have
+chosen).
+
+=head2 Business support and maintenance
+
+For business support you can contact Jens via his CPAN email
+address rehsackATcpan.org. Please keep in mind that business
+support is neither available for free nor are you eligible to
+receive any support based on the license distributed with this
+package.
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 AUTHOR
+
+Jens Rehsack, C<< <rehsack at cpan.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2012 Jens Rehsack.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

@@ -1,0 +1,6 @@
+Changes
+lib/Net/UCP/TransactionManager.pm
+Makefile.PL
+MANIFEST
+README
+t/Net-UCP-TransactionManager.t

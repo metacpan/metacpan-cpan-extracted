@@ -1,0 +1,41 @@
+---
+abstract: 'Perl SDK for the Public Media Platform'
+author:
+  - 'Peter Karman, C<< <karman at cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-PMP
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::Dump: 0
+  Data::Validate::URI: 0
+  JSON: 2
+  LWP::Protocol::https: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  MooseX::Getopt: 0
+  MooseX::SimpleConfig: 0
+  Test::More: 0
+  Try::Tiny: 0
+  URI: 0
+  URI::Template: 0
+  UUID::Tiny: 0
+  perl: 5.8.3
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-PMP
+  homepage: https://github.com/APMG/pmp-sdk-perl
+  license: http://opensource.org/licenses/mit-license.php
+  repository: http://github.com/APMG/pmp-sdk-perl
+version: '0.006'

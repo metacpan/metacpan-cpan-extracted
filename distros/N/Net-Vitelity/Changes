@@ -1,0 +1,16 @@
+Revision history for Net-Vitelity
+
+0.03    Mon Jun 25 18:00:38 PDT 2012
+        - Doc/copyright/MANIFEST/Makefile.PL updates.
+          Functionally unchanged from 0.02.
+
+0.02	unreleased
+	[Erik Levinson]
+	-fix URL, fix missing use LWP::UserAgent, fix regexp match of response
+	-implement "new"
+        [Ivan Kohler]
+        -fix POD so "make test" passes
+
+0.01    unreleased
+        First version, released on an unsuspecting world.
+

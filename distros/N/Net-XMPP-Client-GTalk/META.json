@@ -1,0 +1,43 @@
+{
+   "abstract" : "This module provides an easy to use wrapper around the Net::XMPP class of modules for specific access to GTalk ( Both on Gmail and Google Apps ). ",
+   "author" : [
+      "Harish Madabushi <harish.tmh@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-XMPP-Client-GTalk",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::XMPP" : 0,
+            "XML::Smart" : 0,
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01"
+}

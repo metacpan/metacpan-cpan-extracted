@@ -1,0 +1,207 @@
+Revision history for Perl5 Net::LDAPapi Module.
+3.0.4 Mon Nov 30 19:00:00 PST 2015
+	- Fix undef comparison
+	- Misc variable initializations to quiet warnings
+	- Fixed sasl mechanisms initializtion
+	- Examples cleanup
+	- LDAPv3 extended operation support
+	- New developer mode test suite
+	- Fixed quanah/net-ldapapi#3: ldap_set_rebind_proc XS being called with invalid arguments from set_rebind_proc
+	- Fixed quanah/net-ldapapi#6: ldap_sasl_bind has wrong prototype in LDAPapi.xs
+	- Fixed quanah/net-ldapapi#8: search_s() clobbers ATTRS parameter
+	- Fixed quanah/net-ldapapi#11: result() blocking when called with output from rename()
+	- Fixed quanah/net-ldapapi#20: ldap_result() doesn't honour passed timeout value
+	- Fixed quanah/net-ldapapi#21: ldap_set_option(LDAP_OPT_TIMEOUT, 1) on OpenLDAP returns -1
+	- Fixed quanah/net-ldapapi#28: Server control responses get eaten after a NULL character in the berval
+	- Fixed quanah/net-ldapapi#30: ldap_search_ext() and ldap_search_ext_s() segfault when used with timeout
+	- Fixed quanah/net-ldapapi#31: ldap_result() and ldap_url_search_st() timeout parameters have a granularity of 1 second
+	- Fixed quanah/net-ldapapi#40: Server control requests get eaten after a NULL character in the berval
+3.0.3 Wed Aug 20 12:23:00 PST 2008
+	- Add Convert::ASN1 requirement.
+	- Fix error code handling (CPAN bug#35910)
+3.0.2 Wed Jan 02 12:23:00 PST 2008
+	- Fix various variable initializations and scope issues
+	- Fix initialization of sasl parm
+	- Fix test unbind
+	- Add ldap_perror function
+3.0.1 Thu Aug 09 17:22:15 PDT 2007
+	- New 3.0.1 release, fixes sasl headers
+3.0.0 Thu Jul 12 12:13:00 PDT 2007
+	- New 3.0 release, using the LDAP V3 api
+2.01  Fri Feb 09 08:41:46 PST 2007
+	- Fix library linking
+2.00  Tue Feb 06 18:46:38 PST 2007
+	- Stripped out ISODE, UMich bits
+	- Updated to refer to Mozilla C SDK
+1.43  Sat Jun 13 02:39:15 CDT 1998
+	- Added replacement for strcasecmp that was more portable
+	- Fixed a few memory leaks caused by changes in 1.42 and
+	  tested these changes on both Netscape and UMICH SDKs.
+	- Changed the test.pl to be more intuitive and no longer require
+	  modifications.
+	- Made a few cosmetic changes to Makefile.PL
+1.42  Sat Apr 25 22:27:22 CDT 1998
+	- Added named arguments to all methods
+	- Got rid of a few old ber_free's that were causing problems
+	- Fixed the sort functions (Thanks to Miguel Marques)
+	- Added the ldap_url functions
+	- I was destroying error messages before I printed them in a few
+	  of the ldapwalk examples.  Whoops.  Fixed.
+	- Fixed problem with Out of Memory errors on some platforms with
+	  the get_all_values function.
+	- Fixed a multitude of problems with rebinding
+	- Resolved issue resulting in dumped core on modify where NULL
+	  values were passed.
+	- Much more extensive testing by the author against both Netscape
+	  and University of Michigan libraries.  Many small corrections.
+	- Added Makefile.PL options for Netscape LDAPv3 SDK.  No v3 calls
+	  added yet.
+1.40a Wed Jan 28 11:20:51 CST 1998
+	- sort_entries and multisort_entries have been added with the single
+	  arguments $attr and \@attr respectively.  Neither seem to work
+	  properly on my system when sorting anything besides DN (attr =
+	  non-null).  Please try this function on your system and let me
+	  know if it you can get it to work.  If so, I will finish adding
+	  this function with another argument to specify a perl based compare
+          function for the sort.
+	- Lots of changes from Hallvard B. Furuseth <h.b.furuseth@usit.uio.no>
+          Including:
+           o Got rid of extra checks in LDAPapi.pm where checks exist in
+	      XS or Perl.
+	   o Cleaned up ldap_<add/modify>[_s] with a few simple changes to
+	      hash2mod() function.  Also fixed bug in that function that
+	      causes problems when you supply an empty hash.
+	   o Small typos and bug fixes in test.pl fixed.
+	   o Error string is now retrieved when requested, rather than after
+	      every call (What was I thinking when I did this?  Who knows....)
+	   o Fixed some reverse logic in ldap_<set/get>_option in the XS file.
+	- Changed memory related calls to use 'New' and 'Safefree' macros,
+	  which seems to be what the perlguts document suggests.
+	- Got rid of the ber_free define in ldap_compat.h when using UMICH.
+	  This was causing core dumps on some platforms.
+	- Added ldap_mod_attr.pl to the examples.  A wonderful script from
+	  Andrew J Cosgriff <ajc@bing.wattle.id.au>.
+
+1.40 Wed Jan 21 11:12:24 CST 1998
+	- I never did include the new version of web500.pl that supports
+          Add functionality.  It did exist, and I've included it with this
+          release.
+	- There was a bug when adding or modifying a record where the value
+	  was set to be an integer.  The bug has probably existed since a very
+	  old version of the module.  It has now been fixed.
+	- Fix to internal rebind process for Netscape API users provided by
+	  Rob Weltman <rweltman@netscape.com> of Netscape.
+
+1.40beta Tue Jan 13 14:54:13 CST 1998
+	- Wow, what hasn't changed in this version...
+	- Removed the extra 'free' in ldap_get_dn that was submitted as
+	  a fix to a memory leak.  The fix seems to give inconsistent results
+	  on different platforms and APIs.
+	- Added Perl-OO methods for virtually all API calls.  The C style
+	  API calls still work, and will work in all future versions.
+	  Note that I haven't added named arguments yet, so argument order
+	  matters.  This should be in the next version.
+	- Manpages completely rewritten.  Please send me any errors or typos.
+	- All examples except the two web ones have been rewritten to run under
+	  'use Strict'.
+	- Test program and all examples except web500.pl have been rewritten
+	  to use Perl-OO methods.  Might need to clean-up comments and code
+	  after so many rewrites.
+	- Minor bugfixes to web500.pl
+
+1.39a Tue Nov 25 16:37:35 CST 1997
+        - Version 1.39 "overimproved" memory handling.  It seemed to dump
+          core, as it occasionally freed memory that Perl felt very inclined
+          to freeing on its own.  Whoops!  This is only a bugfix release
+          put out while I work on v1.40.
+        - In the process of debugging, also changed several scripts to run
+          under 'use strict' and 'perl -w'.
+
+1.39 Mon Oct 27 15:33:12 CST 1997
+        - Added Al Grimstead's memory leak fix for ldap_get_all_entries.
+        - Added Windows NT 4.0 Support (using Perl5.004, not ActiveState Perl)
+        - Added finished web500.pl Gateway
+        - Improved memory handling in Add/Modify Routine
+        - Included updatepw.pl in the examples directory.  This is a script
+          that can syncronize unix passwords into directories supporting
+          crypted passwords.
+
+1.36 Fri Aug 29 14:54:38 CDT 1997
+        - Added ldap_get_all_entries, which is not a C API command, but
+          useful anyway.  Thanks to Andreas Beck for some of the code to
+          make this possible.
+        - Included a few new examples (ldapwalk2.pl and web500.pl)
+
+1.35 Tue Aug 26 15:44:25 CDT 1997
+        - Added SSL Functions when using Netscape SDK
+        - Added the following functions for non-Netscape SDKs (and ensured
+          that they now work properly for Netscape SDK users):
+                ldap_get_lderrno (to get errno from LDAP struct)
+                ldap_set_lderrno (to set errno from LDAP struct)
+                ldap_msgid       (to obtain msgid from an LDAPMessage *)
+                ldap_msgtype     (to obtain msgtype from an LDAPMessage *)
+                ldap_set_option  (to set some LDAP * options)
+                ldap_get_option  (to get some LDAP * options)
+        - Added support for a rebind process.  Mostly untested, so let me know
+          how well this works for you.  You can set this to a PERL routine
+          using ldap_set_rebind_proc($ld,\&perl_function_name), then make
+          sure that this function returns DN, PASSWORD, and AUTHTYPE.
+        - Added more code and documentation fixes from Hallvard Furuseth
+        - Fixed documentation/code errors noted by Al Grimstad <alg@att.com>
+        - Added ldap_compat.h for non-Netscape SDK users.
+        - Added Credits file containing people who have provided feedback
+          and fixes.
+        - Added Todo file containing list of things I'm working on (or
+          would like to be working on).
+
+1.31 Tue Jul 29 17:25:54 CDT 1997
+        - Added function prototypes for internal functions so that some C
+          compilers don't complain.
+        - Fixed the ldap_*_option functions for Netscape SDK users.
+        - Implemented fixes from Hallvard Furuseth <h.b.furuseth@usit.uio.no>
+          for ISODE support and lots of code cleanup, including a very nice
+          script to autogenerate a constant.h file.  THANKS!
+
+1.30 Tue Jul 22 17:19:36 CDT 1997
+        - Fixes Makefile.PL to add Kerberos libraries if needed.  Also added
+          LDAP_AUTH_KRB* defines to LDAPapi.xs file.
+        - Changed all malloc to PERL5 safe versions.
+        - Now properly free all LDAPMod structures after ldap_add & ldap_modify
+        - Completely rewrote add and modify routines and added binary value
+          support to add and modify command
+        - Added ldap_get_values_len function to support retrieving binary
+          attributes.
+
+1.21 Fri Jul 18 08:53:11 CDT 1997
+        - Fixed the compile warnings with University of Michigan
+        - Changed www-ldap.pl to only submit changed items.
+        - Updated all files changing module name from LDAP to Net::LDAPapi
+
+1.20 Thu Jul 17 01:20:08 CDT 1997
+        - Changed LDAP.xs - added hash2add and hash2mod internal routines
+          and seriously cleaned up the add and modify routines.
+        - References to Arrays (\%) are now required as the third parameter
+          to ldap_add* and ldap_modify* functions.
+        - Updated README, Man Page in LDAP.pm, and other documentation
+          changes.
+
+1.11 Wed Jul 16 10:48:17 CDT 1997
+        - Changed LDAP.xs and Makefile.PL to make this module work with
+          University of Michigan LDAP SDK.  Tested on Solaris.
+        - 'ldap_init' call does not seem to work properly if compiled with
+          University of Michigan LDAP SDK.  Otherwise all OK.  Use ldap_open
+          as a temporary work-around.
+
+1.1  Tue Jul 15 17:54:27 CDT 1997
+        - Fixed a few simple bugs in ldap_modify* and ldap_add* commands.
+        - Included new www-ldap.pl CGI script
+
+1.0  Thu Jun 26 13:35:14 CDT 1997
+        - All Async and Sync Add, Modify, and Delete commands have been
+          added.  As have commands to manipulate DNs and other data.
+        - FIRST RELEASE VERSION
+        - See README for supported LDAP API calls
+
+0.5  Tue May  6 09:00:31 CDT 1997
+	- original version;  Original name: LDAP. Modify Routines Not Yet
+	  Available

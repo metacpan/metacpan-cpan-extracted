@@ -1,0 +1,25 @@
+---
+abstract: 'An observer/notification for perl'
+author:
+  - 'Robert Boone <rlb@cpan.org>'
+build_requires:
+  Bread::Board: 0
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.82'
+license: Perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Notification-Center
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 0
+  Set::Object: 0
+version: 0.0.5

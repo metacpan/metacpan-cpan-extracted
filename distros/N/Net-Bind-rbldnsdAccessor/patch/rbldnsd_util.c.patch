@@ -1,0 +1,29 @@
+char *emalloc(unsigned size) {
+  void *ptr = rblf_malloc(size);
+  if (ptr)
+    rblf_mtrack(ptr);  
+  else
+    oom();  
+  return ptr;
+}
+
+char *ezalloc(unsigned size) {
+  void *ptr = rblf_calloc(1, size);
+  if (ptr)
+    rblf_mtrack(ptr);
+  else
+    oom();
+  return ptr;
+}
+
+char *erealloc(void *ptr, unsigned size) {
+  void *nptr = rblf_realloc(ptr, size);
+  if (nptr) {
+    rblf_mtrack_forget(ptr);
+    rblf_mtrack(nptr);
+  }
+  else
+    oom();
+  return nptr;
+}
+

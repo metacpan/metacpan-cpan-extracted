@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:                Net-Connection-Sniffer
+version:             0.36
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Net::DNS::Codes:               0.09
+    Net::DNS::ToolKit:             0.42
+    Net::Interface:                1.009
+    Net::NBsocket:                 0.16
+    NetAddr::IP:                   4.026
+    Proc::PidUtil:                 0.08
+    Sys::Hostname::FQDN:           0.1
+    Sys::Sig:                      0.04
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

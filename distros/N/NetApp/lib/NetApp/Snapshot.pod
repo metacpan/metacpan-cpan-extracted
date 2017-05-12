@@ -1,0 +1,75 @@
+
+=head1 NAME
+
+NetApp::Snapshot -- OO class for creating and managing snapshots
+
+=head1 SYNOPSIS
+
+    use NetApp::Filer;
+    use NetApp::Snapshot;
+
+    my $filer 	= NetApp::Filer->new( .... );
+
+=head1 DESCRIPTION
+
+This class encapsulates a single NetApp snapshot, and provides methods
+for querying information about the snapshot, as well as methods for
+managing it.
+
+=head1 METHODS
+
+=head2 get_parent
+
+Returns the NetApp::Aggregate or NetApp::Volume object for the
+aggregate or volume for which object is a snapshot.
+
+=head2 get_name
+
+Returns a string representing the name of the snapshot.
+
+=head2 get_date
+
+Returns the date the snapshot was created.
+
+=head2 get_used
+
+Returns the percentage of space used by snapshot.
+
+=head2 get_total
+
+Returns the percentage of total space used by the snapshot.
+
+=head2 get_snapshot_deltas
+
+Returns an array of NetApp::Snapshot:Delta objects, each representing
+a single delta for this snapshot.
+
+=head2 get_reclaimable
+
+Returns the amount of reclaimable space, if the snapshot is deleted.
+Note that experimentally, this command has a lot of failure scenarios,
+most of which are reasonable (there are a lot of cases where you can't
+query this data).  Therefore, unlike most of the methods in this API,
+it doesn't raise a fatal exception if it can't query the information,
+it simply generates warnings.
+
+=head2 rename( $newname )
+
+Renames the snapshot to the specified name.
+
+=head2 restore( %args )
+
+This method is an interface to the "snap restore" command.  The
+argument syntax is:
+
+    $snapshot->restore(
+    	type		=> 'vol' | 'file', # Defaults to vol
+	from_path	=> $from_path,
+	to_path		=> $to_path,
+    );
+
+The 'type' argument maps to the -t CLI argument, and the 'to_path'
+argument maps to the -r CLI argument.  Refer to the na_snap(1) man
+page, and the "snap restore" documentation for further information.
+
+=cut

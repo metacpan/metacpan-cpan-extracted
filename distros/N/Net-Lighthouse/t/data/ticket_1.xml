@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ticket>
+  <assigned-user-id type="integer">67166</assigned-user-id>
+  <attachments-count type="integer">2</attachments-count>
+  <closed type="boolean">false</closed>
+  <created-at type="datetime">2009-08-21T11:15:50Z</created-at>
+  <creator-id type="integer">67166</creator-id>
+  <milestone-due-on type="datetime" nil="true"/>
+  <milestone-id type="integer" nil="true"/>
+  <number type="integer">1</number>
+  <permalink>first-ticket</permalink>
+  <priority type="integer">1</priority>
+  <project-id type="integer">35918</project-id>
+  <raw-data type="binary" nil="true" encoding="base64"/>
+  <state>new</state>
+  <tag>first</tag>
+  <title>first ticket</title>
+  <updated-at type="datetime">2009-08-21T11:15:53Z</updated-at>
+  <user-id type="integer">67166</user-id>
+  <user-name>sunnavy (at gmail)</user-name>
+  <creator-name>sunnavy (at gmail)</creator-name>
+  <assigned-user-name>sunnavy (at gmail)</assigned-user-name>
+  <url>http://sunnavy.lighthouseapp.com/projects/35918/tickets/1</url>
+  <latest-body>this's 1st description</latest-body>
+  <versions type="array">
+    <version type="Ticket::Version">
+      <assigned-user-id type="integer">67166</assigned-user-id>
+      <attachments-count type="integer">0</attachments-count>
+      <body>this's 1st description</body>
+      <body-html>&lt;div&gt;&lt;p&gt;this's 1st description&lt;/p&gt;&lt;/div&gt;</body-html>
+      <closed type="boolean">false</closed>
+      <created-at type="datetime">2009-08-21T11:15:50Z</created-at>
+      <creator-id type="integer">67166</creator-id>
+      <diffable-attributes type="yaml">--- {}
+
+</diffable-attributes>
+      <milestone-id type="integer" nil="true"/>
+      <number type="integer">1</number>
+      <permalink>first-ticket</permalink>
+      <project-id type="integer">35918</project-id>
+      <state>new</state>
+      <tag>first</tag>
+      <title>first ticket</title>
+      <updated-at type="datetime">2009-08-21T11:15:53Z</updated-at>
+      <user-id type="integer">67166</user-id>
+      <user-name>sunnavy (at gmail)</user-name>
+      <creator-name>sunnavy (at gmail)</creator-name>
+      <assigned-user-name>sunnavy (at gmail)</assigned-user-name>
+      <url>http://sunnavy.lighthouseapp.com/projects/35918/tickets/1</url>
+    </version>
+  </versions>
+  <attachments type="array">
+    <attachment type="Attachment">
+      <code>5ace4f26de37855e951eb13f5b07a1b1a0919466</code>
+      <content-type>application/octet-stream</content-type>
+      <created-at type="datetime">2009-08-21T11:15:51Z</created-at>
+      <filename>first</filename>
+      <height type="integer" nil="true"/>
+      <id type="integer">249828</id>
+      <size type="integer">24</size>
+      <uploader-id type="integer">67166</uploader-id>
+      <width type="integer" nil="true"/>
+      <url>http://sunnavy.lighthouseapp.com/attachments/249828/first</url>
+    </attachment>
+    <attachment-image type="Attachment">
+      <code>b5ed989a941beda06d677f23f59e15888765904b</code>
+      <content-type>image/jpeg</content-type>
+      <created-at type="datetime">2009-08-31T14:03:20+08:00</created-at>
+      <filename>simpsons_nelson_haha.jpg</filename>
+      <height type="integer">326</height>
+      <id type="integer">256710</id>
+      <size type="integer">65411</size>
+      <uploader-id type="integer">67166</uploader-id>
+      <width type="integer">350</width>
+      <url>http://sunnavy.lighthouseapp.com/attachments/256710/simpsons_nelson_haha.jpg</url>
+    </attachment-image>
+  </attachments>
+</ticket>

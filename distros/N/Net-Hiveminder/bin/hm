@@ -1,0 +1,136 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Net::Hiveminder;
+use Getopt::Long;
+use Pod::Usage;
+use File::Temp;
+
+our $CONFFILE = "$ENV{HOME}/.hiveminder";
+our $VERSION = 0.01;
+our %args;
+our @args;
+our $hm;
+our %config;
+
+our %unaccepted_query = (
+    complete_not => 1,
+    unaccepted   => 1,
+);
+
+our %requests_query = (
+    requestor    => "me",
+    owner_not    => "me",
+    complete_not => 1,
+);
+
+terminal();
+get_options();
+main();
+
+sub main {
+    my %commands = (
+        list       => \&list_tasks,
+        ls         => \&list_tasks,
+        todo       => \&list_tasks,
+        unaccepted => sub {list_tasks(%unaccepted_query)},
+        requests   => sub {list_tasks(%requests_query)},
+
+        add        => sub {$hm->create_task("@ARGV")},
+        bd         => \&braindump,
+        braindump  => \&braindump,
+
+#        do        => \&do_task,
+#        done      => \&do_task,
+#        del       => \&del_task,
+#        rm        => \&del_task,
+#        edit      => \&edit_task,
+#        tag       => \&tag_task,
+#        accept    => \&accept_task,
+#        decline   => \&decline_task,
+#        assign    => \&assign_task,
+#        hide      => \&hide_task,
+#        comment   => \&comment_task,
+#        dl        => \&download_textfile,
+#        download  => \&download_textfile,
+#        ul        => \&upload_textfile,
+#        upload    => \&upload_textfile,
+       );
+
+    my $command = shift @ARGV || "list";
+    $commands{$command} or pod2usage(-message => "Unknown command: $command", -exitval => 2);
+
+    # log in
+    $hm = Net::Hiveminder->new(use_config => 1, config_file => $CONFFILE);
+    %config = %{ $hm->config };
+    canonicalize_options();
+
+    $commands{$command}->();
+}
+
+sub terminal {
+    my $encoding = eval {
+        require Term::Encoding; Term::Encoding::get_encoding();
+    } || "utf-8";
+
+    binmode STDOUT, ":encoding($encoding)";
+}
+
+sub get_options {
+    GetOptions(\%args,
+               "tags=s",
+               "tag=s@", "group=s",
+               "priority|pri=s",
+               "due=s",
+               "hide=s",
+               "help",
+               "version",
+               "config=s",
+    ) or pod2usage(2);
+
+    $CONFFILE = $args{config} if $args{config};
+
+    pod2usage(0) if $args{help};
+    if ($args{version}) {
+        version();
+        exit();
+    }
+}
+
+sub canonicalize_options {
+    $args{priority} &&= $hm->canonicalize_priority($args{priority});
+
+    # the ; is here so Perl interprets it as a codeblock and not a hashref
+    @args = map { ; tag => $_ } split ' ', ($args{tags}||'');
+
+    for (qw/group priority due hide/) {
+        push @args, $_ => $args{$_}
+            if $args{$_};
+    }
+
+    return @args;
+}
+
+sub list_tasks {
+    # if there are any qualifiers, use the generic search instead of todo
+    my $method = @_ ? 'get_tasks' : 'todo_tasks';
+
+    push @_, @args;
+    print $hm->display_tasks( $hm->$method(@_) ) . "\n";
+}
+
+sub braindump {
+    my $editor = $ENV{EDITOR}
+        or pod2usage(-message => "Need to specify \$EDITOR.",
+                     -exitval => 1);
+
+    my $fh = File::Temp->new(UNLINK => 0);
+    my $fn = $fh->filename;
+    $fh->close;
+
+    # Call the editor with the file as the first arg
+    system($editor, $fn);
+    $hm->upload_file($fn);
+    unlink $fn;
+}
+

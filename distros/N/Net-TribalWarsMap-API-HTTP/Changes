@@ -1,0 +1,15 @@
+Release history for Net-TribalWarsMap-API-HTTP
+
+0.1.1 2013-07-16T03:27:21Z
+ [BugFix]
+ - Need recent Moo for builder => sub {}
+
+ [Dependencies::Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.7.3 → v1.7.4
+
+ [Dependencies::Changed / runtime requires]
+ - Moo 0 → 1.000008
+
+0.1.0 2013-06-13T17:55:19Z
+ - First version.
+

@@ -1,0 +1,242 @@
+#!/usr/bin/env perl
+use 5.010001;
+use warnings;
+use strict;
+use utf8;
+
+our $VERSION = 'v2.3.7';
+
+use FindBin;
+use lib "$FindBin::Bin/../lib/perl5";
+use Narada;
+use Narada::Config qw(get_config_line set_config);
+use File::Temp qw( tempdir );
+
+use constant WAIT2EXIT => 8;
+
+
+main(@ARGV) if !caller;
+
+
+sub err { die "narada-release: @_\n" };
+
+sub main {
+    Narada::detect('narada-1');
+
+    rename 'var/patch/prev', 'var/patch/.prev'; # compatibility with Narada <1.2.0
+
+    update_version();
+    system($ENV{EDITOR}, 'doc/ChangeLog') == 0  or err "system(\$EDITOR): $!";
+    update_changelog();
+
+    my ($v_old, $v_new) = get_versions();
+
+    my $dir4diff = tempdir( CLEANUP => 1 );
+    for my $subdir (qw(old old/doc old/config new new/doc new/config)) {
+        mkdir "$dir4diff/$subdir" or err "mkdir($subdir): $!";
+    }
+    chomp(my $pwd = `pwd`);
+    symlink "$pwd/config/version",                "$dir4diff/new/config/version" or err "symlink: $!";
+    symlink "$pwd/doc/ChangeLog",                 "$dir4diff/new/doc/ChangeLog"  or err "symlink: $!";
+    symlink "$pwd/var/patch/.prev/config/version","$dir4diff/old/config/version" or err "symlink: $!";
+    symlink "$pwd/var/patch/.prev/doc/ChangeLog", "$dir4diff/old/doc/ChangeLog"  or err "symlink: $!";
+    for my $pluginver (grep {-f && -f "var/patch/.prev/$_"} glob 'config/version.*') {
+        symlink "$pwd/$pluginver",                "$dir4diff/new/$pluginver" or err "symlink: $!";
+        symlink "$pwd/var/patch/.prev/$pluginver","$dir4diff/old/$pluginver" or err "symlink: $!";
+    }
+    my $patch = "$pwd/var/patch/\Q$v_new\E.\Q$ENV{USER}\E.99.patch";
+    system("cd \Q$dir4diff\E; LANG= diff -uNr old new > $patch") >> WAIT2EXIT!=2 or err "system(diff): $!";
+
+    for my $diff (grep {-f} glob 'var/patch/CURRENT.*') {
+        (my $ext = $diff) =~ s{\Avar/patch/CURRENT[.]}{}xms;
+        rename $diff, "var/patch/$v_new.$ENV{USER}.$ext" or err "rename($diff): $!";
+    }
+    for my $pending (grep {-f && -s} glob 'var/patch/PENDING.*') {
+        (my $ext = $pending) =~ s{\Avar/patch/PENDING[.]}{}xms;
+        if ($ext =~ /\A(?:10[.]sh|20[.]patch|30[.]tgz|40[.]sh|99[.]patch)\z/xms) {
+            warn "WARNING! PENDING file $pending may overwrite another file!\n";
+        }
+        rename $pending, "var/patch/$v_new.$ENV{USER}.$ext" or err "rename($pending): $!";
+        touch($pending);
+    }
+
+    return;
+}
+
+sub get_versions {
+    chdir 'var/patch/.prev'                 or err "chdir(var/patch/.prev): $!";
+    my $v_old = get_config_line('version');
+    chdir '../../..'                        or err "chdir(../../..): $!";
+    my $v_new = get_config_line('version');
+    $v_new =~ /\S/xms           or err 'Unable to detect version';
+    $v_new !~ m{/}xms           or err 'Version must not contain /';
+    $v_new !~ m{\s}xms          or err 'Version must not contain whitespaces';
+    return ($v_old, $v_new);
+}
+
+sub touch {
+    my ($f) = @_;
+    open my $fd, '>', $f or err "touch($f): $!"; ## no critic (RequireBriefOpen)
+    return;
+}
+
+sub read_file {
+    my ($file) = @_;
+    open my $f, '<', $file              or err "open($file): $!";
+    local $/ = undef;
+    my $val = <$f>;
+    close $f                            or err "close: $!";
+    return $val;
+}
+
+# Read (in update if needed) version.
+sub update_version {
+    my ($v_old, $v_new) = get_versions();
+    if ($v_old eq $v_new) {
+        $v_new =~ s/^(.*\D)?(\d+)/(my $v=$2)++; ($1||q{}) . $v/xmse
+            or err 'Version must contain number';
+        set_config('version', $v_new."\n");
+    }
+    return;
+}
+
+# Ensure ChangeLog has record for this version (if not - create empty) and
+# correct it header.
+sub update_changelog {
+    -f 'doc/ChangeLog'                          or err 'ChangeLog not found';
+    my $changelog_old   = read_file('var/patch/.prev/doc/ChangeLog');
+    my $changelog       = read_file('doc/ChangeLog');
+    my $modified        = $changelog_old ne $changelog;
+    if ($modified) {
+        $changelog =~ s/\A (?: \s* \n )* (?: \S[^\n]*\n (?: \s* \n )* )?//xms;
+    }
+    else {
+        warn "... you forget to update ChangeLog, adding fake record. :-(\n";
+    }
+    chomp(my $date = `LANG= date`);
+    open my $f, '>', "tmp/ChangeLog.$$"         or err "open(tmp/ChangeLog): $!";
+    printf {$f} "\t\n\n%-30s %-14s %s\n%s\n%s",
+        $date, $ENV{NARADA_USER} // $ENV{USER}, get_config_line('version'),
+        ($modified ? q{} : "\n\t???"),
+        $changelog;
+    close $f                                    or err "close: $!";
+    rename "tmp/ChangeLog.$$", 'doc/ChangeLog'  or err "rename(doc/ChangeLog): $!";
+    return;
+}
+
+
+1; # Magic true value required at end of module
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+narada-release - release current changes in Narada project
+
+
+=head1 VERSION
+
+This document describes narada-release version v2.3.7
+
+
+=head1 USAGE
+
+    narada-release
+
+
+=head1 DESCRIPTION
+
+Should be executed in Narada 1.x project root directory.
+
+Generate project update in files C<var/patch/VERSION.$USER.*> where
+VERSION is contents of C<config/version>. This update should be then
+applied locally on C<var/patch/.prev/> (just run C<narada-patch>) and
+can be applied on another installation of this project by uploading
+these files into C<var/patch/> of that installation and executing
+C<narada-patch>.
+
+=head2 Process of generating update files
+
+Increment version number in C<config/version> if this file wasn't modified
+manually since last update.
+
+Run C<$EDITOR doc/ChangeLog> to let you enter changes for this update.
+After you exit from editor will add/update header line in C<doc/ChangeLog>.
+
+Create C<var/patch/VERSION.$USER.99.patch> with changes for files
+C<config/version> and C<doc/ChangeLog>.
+
+Rename C<var/patch/CURRENT.*> to C<var/patch/VERSION.$USER.*>.
+
+Rename C<var/patch/PENDING.*> to C<var/patch/VERSION.$USER.*>.
+
+Create empty C<var/patch/PENDING.*> (just for convenience).
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+    $EDITOR
+    $USER
+
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/powerman/Narada/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software. The code repository is available for
+public review and contribution under the terms of the license.
+Feel free to fork the repository and submit pull requests.
+
+L<https://github.com/powerman/Narada>
+
+    git clone https://github.com/powerman/Narada.git
+
+=head2 Resources
+
+=over
+
+=item * MetaCPAN Search
+
+L<https://metacpan.org/search?q=Narada>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/dist/Narada>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Narada>
+
+=item * CPAN Testers Matrix
+
+L<http://matrix.cpantesters.org/?dist=Narada>
+
+=item * CPANTS: A CPAN Testing Service (Kwalitee)
+
+L<http://cpants.cpanauthors.org/dist/Narada>
+
+=back
+
+
+=head1 AUTHOR
+
+Alex Efros  E<lt>powerman@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2008- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+
+=cut

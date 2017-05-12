@@ -1,0 +1,99 @@
+NAME
+    Net::ClientServer - A client/server platform for IPC on localhost
+
+VERSION
+    version 0.0007
+
+SYNOPSIS
+    The minimum configuration (specify a port):
+
+        my $platform = Net::ClientServer->new( port => 8020 );
+
+        $platform->server_socket;
+
+        ...
+
+        if ( $platform->started ) { # Will attempt to connect to the listening socket
+            $platform->client_socket;
+        }
+
+    Save server state to disk:
+
+        $platform = Net::ClientServer->new( port => 8020, name => 'net-client-server' );
+        # Server pid will be stored in $HOME/.net-client-server/pid
+        # On daemonization, stderr will be outputted to $HOME/.net-client-server/stderr
+
+    With a basic startup & serve/accept routine:
+
+        my $port = 8020;
+        $platform = Net::ClientServer->new(
+            port => $port,
+            start => sub {
+                print STDERR "Server listening on $port\n";
+            },
+            serve => sub {
+                my $client = shift; # The client socket
+                $client->print( "Hello, World.\n" );
+            },
+        );
+
+        $platform->start;
+
+DESCRIPTION
+    Net::ClientServer is a tool for implementing a basic client/server
+    architecture using a single platform (particularly useful when doing IPC
+    on the localhost). It is easily configured for daemonizing and
+    maintaining state on disk (pidfile & stderr).
+
+    The minimum configuration is very simple, requiring only a port number:
+
+        my $platform = Net::ClientServer->new( port => 8020 );
+        $platform->server_socket;
+
+        ...
+
+        $platform->client_socket;
+
+USAGE
+  $platform = Net::ClientServer->new( ... )
+        port                The port to listen on/connect to
+
+        host                The host to listen on/connect to, 'localhost' by default
+
+        name                The name of the platform. If given without specifying the
+                            home parameter, then pidfile and stderr will be put in
+                            ~/.$name/
+
+        home                The home directory for the platform. The pidfile and stderr will be
+                            placed in this directory
+
+        pidfile             The name of the pidfile, 'pid' by default.
+
+        stderr              The name of file to output stderr to, 'stderr' by default
+
+    If neither "home" nor "name" are given, then a pidfile and stderr file
+    will not be generated
+
+  $platform->start
+    Start the server if it is not already running
+
+  $platform->started
+    Return true if the server is running. If a pidfile is available, then it
+    will check to see that the process is running. If a pidfile is
+    unavailable, or the process does not seem to be running, it will check
+    to see if it can connect to the server
+
+SEE ALSO
+    Net::Server
+
+    Daemon::Daemonize
+
+AUTHOR
+      Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

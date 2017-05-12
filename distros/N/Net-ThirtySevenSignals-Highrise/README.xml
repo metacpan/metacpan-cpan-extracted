@@ -1,0 +1,40 @@
+<README>
+<NAME>Net::ThirtySevenSignals::Highrise</NAME>
+
+<DESCRIPTION>
+<SUBSECTION>
+<TEXT>A Perl wrapper around the Highrise API</TEXT>
+</SUBSECTION>
+
+<SUBSECTION>
+<HEAD>INSTALLATION</HEAD>
+
+<TEXT>To install this module type the following:</TEXT>
+
+<CODE>   perl Makefile.PL
+   make
+   make test
+   make install
+</CODE>
+</SUBSECTION>
+
+<SUBSECTION>
+<HEAD>DEPENDENCIES</HEAD>
+
+<TEXT>This module depends on the LWP::UserAgent, HTTP::Request and
+XML::Simple modules. These modules are all available from CPAN
+(http://search.cpan.org/).</TEXT>
+</SUBSECTION>
+
+<SUBSECTION>
+<HEAD>COPYRIGHT AND LICENCE</HEAD>
+
+<TEXT>This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</TEXT>
+
+<TEXT>Copyright (C) 2005 Dave Cross, All rights reserved.
+additions by Danny Sadinoff, 2011
+</TEXT>
+</SUBSECTION>
+</DESCRIPTION>
+</README>

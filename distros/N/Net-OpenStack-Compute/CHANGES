@@ -1,0 +1,456 @@
+==================================================
+Changes from 2005-02-17 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version 1.1200 at 2015-02-15 06:21:47 +0000
+-------------------------------------------
+
+  Change: 1b3e8f46a239c78655a950d6f30bc9598dac33da
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-02-15 01:21:08 +0000
+
+    v1.1200 
+
+  Change: 4628d397bf0b4584dc67ed439a44121e4fa5e3f7
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-02-15 01:13:16 +0000
+
+    removed redundant calls to _check_res() 
+
+  Change: 5247bc2a5e28bb69238dd8919a8aa60c6b4f91e8
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-02-15 01:07:11 +0000
+
+    Merge pull request #11 from bmwiedemann/master
+
+    add get_vnc_console 
+
+  Change: be080110beccd6e7166a2b0e10378261d2389b66
+  Author: Bernhard M. Wiedemann <bwiedemann@suse.de>
+  Date : 2015-02-15 06:47:08 +0000
+
+    add get_vnc_console 
+
+-------------------------------------------
+version 1.1100 at 2014-08-13 17:21:23 +0000
+-------------------------------------------
+
+  Change: 7537ff30428dd6b006df6d5a7127ee73365a90b4
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-08-13 13:21:23 +0000
+
+    releasing v1.1100 
+
+  Change: 195aa1c934f5c24cea24e8df059dc83ffd898a48
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-08-13 13:15:48 +0000
+
+    Merge pull request #10 from exzz/network
+
+    list defined networks 
+
+  Change: 6439cd44807947ece3a6abc2f87034d75ef1ca79
+  Author: Nicolas Leclercq <nicolas.leclercq@cloudwatt.com>
+  Date : 2014-08-13 17:16:48 +0000
+
+    list defined networks 
+
+  Change: 1c1f85eda6cd0e858d8c4e4e91112649c9d04937
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-12-29 02:58:42 +0000
+
+    Added more POD documentation. Releasing v1.1003 
+
+  Change: a5389d9825110f8d31fb86474116d6b0a3a52f93
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-02-10 01:28:17 +0000
+
+    Revert "Replace _agent by a method and get_auth_info from
+    constructor"
+
+    This reverts commit 5264afb53397d8264f2ef84996560a986df0478b. 
+
+  Change: 35004b0888feb0250f50314a7dd6bd3a224cc213
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-02-07 15:17:11 +0000
+
+    Merge pull request #7 from vincent-k/thread_safe_version
+
+    A thread-safe version 
+
+  Change: 5264afb53397d8264f2ef84996560a986df0478b
+  Author: Vincent Kherbache <vincentkherbache@gmail.com>
+  Date : 2013-02-04 12:08:59 +0000
+
+    Replace _agent by a method and get_auth_info from constructor 
+
+-------------------------------------------
+version 1.1002 at 2012-07-02 04:13:50 +0000
+-------------------------------------------
+
+  Change: 65c0b6fb9121437582f7cddfef77377e8b6166f7
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-07-02 00:13:50 +0000
+
+    Tired of Moo breaking things. Switching to Moose. 
+
+  Change: c15de87cfff9cd93375a9c473856f7c523fc632a
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-03 01:31:43 +0000
+
+    Formatting tests 
+
+  Change: f22ad629918145d7003b8b4c33e40dac226eb7a2
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-02 21:56:33 +0000
+
+    Merge pull request #5 from letolabs/even_more_tests
+
+    Add even more instantiation tests and fix a small bug in auth_url
+    parsing 
+
+  Change: 6d1be44cab925acb463369f2f13c362e3c591ecb
+  Author: Jonathan "Duke" Leto <jonathan@leto.net>
+  Date : 2012-06-02 21:47:11 +0000
+
+    Add even more instantiation tests and fix a small bug in auth_url
+    parsing 
+
+  Change: f8d394cc15c0cc51e77f0bba52b8944f0c6a2f5e
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-05-26 14:13:02 +0000
+
+    Merge pull request #4 from letolabs/fix_example
+
+    Update example to the current create_server calling convention 
+
+  Change: d099f95fb9d6de2799336d054397532efc780776
+  Author: Jonathan "Duke" Leto <jonathan@leto.net>
+  Date : 2012-05-26 14:08:29 +0000
+
+    Update example to the current create_server calling convention 
+
+  Change: 3ad2ec869d7262a20e1fe830c09af98523940c30
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-05-26 16:06:54 +0000
+
+    Moo requires defaults for attributes be coderefs. 
+
+  Change: 3d02bba2334cc3ef3baebad92c93e15b341ce554
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-05-26 12:38:05 +0000
+
+    Merge pull request #2 from letolabs/tests
+
+    Some Basic Tests 
+
+  Change: e085bcf5ce6cd9e61fccb3b727293446c19b708a
+  Author: Jonathan "Duke" Leto <jonathan@leto.net>
+  Date : 2012-05-26 12:26:31 +0000
+
+    Add Test::Most as a dep; Not sure if this is the correct way to add a
+    test-only dep in dzil-land 
+
+  Change: e5693da3160d5ab424231fe5e4fbe90527e955f8
+  Author: Jonathan "Duke" Leto <jonathan@leto.net>
+  Date : 2012-05-26 12:21:21 +0000
+
+    Add more instantiation tests 
+
+  Change: c25ef6034548dbff4f0b130f7cea4d669e145b6e
+  Author: Jonathan "Duke" Leto <jonathan@leto.net>
+  Date : 2012-05-26 12:17:53 +0000
+
+    Add a basic instantiation test 
+
+-------------------------------------------
+version 1.1001 at 2012-05-26 07:55:58 +0000
+-------------------------------------------
+
+  Change: 0143e9bf2373fdabb101ad0445d58098b46fb0bc
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-05-26 03:55:58 +0000
+
+    version 1.1001 
+
+  Change: b3f6f3ded1cc771ff9bb43434cc71f4d341a1af6
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-05-26 00:41:14 +0000
+
+    Merge pull request #1 from letolabs/fix_around
+
+    Don't use an array ref with around, which Moo doesn't seem to like 
+
+  Change: 14be98906db9d9de4adf07166aa2b44106502ead
+  Author: Jonathan "Duke" Leto <jonathan@leto.net>
+  Date : 2012-05-26 00:14:17 +0000
+
+    Don't use an array ref with around, which Moo doesn't seem to like 
+
+-------------------------------------------
+version 1.1000 at 2012-04-12 20:42:08 +0000
+-------------------------------------------
+
+  Change: d93f1af1aa2561e31373c20c9a2db7e756460ea3
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-04-12 16:42:08 +0000
+
+    Added new_from_env constructor.
+
+    Also Refactored auth logic into a role and converted from Any::Moose
+    to Moo. 
+
+-------------------------------------------
+version 1.0900 at 2012-04-05 20:22:42 +0000
+-------------------------------------------
+
+  Change: 4f0c966cf8e3229678cedbf29cda7031555c5272
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-04-05 16:22:42 +0000
+
+    Added support for OSCOMPUTE_INSECURE option.
+
+    Also, DRY'ed up code by parsing pod contents for the help message. 
+
+-------------------------------------------
+version 1.0802 at 2012-03-16 18:57:29 +0000
+-------------------------------------------
+
+  Change: 7effab20384ddb3b62a72acba1eb4564f3be8a56
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-03-16 14:57:29 +0000
+
+    Stopped ignoring error responses for GETs. 
+
+-------------------------------------------
+version 1.0801 at 2012-03-16 02:27:00 +0000
+-------------------------------------------
+
+  Change: d6464c0e058c0748ccbc36ac4a1bdf70b4719026
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-03-15 22:27:00 +0000
+
+    Added --insecure and --query options 
+
+-------------------------------------------
+version 1.0700 at 2012-02-28 19:16:53 +0000
+-------------------------------------------
+
+  Change: d1a4d3dd451772af97ba57fa2fc38e364efd0169
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-02-28 14:16:53 +0000
+
+    Added support for server resize and reboot actions 
+
+  Change: b69954873de0664d3732ba8862b4e23fbbf732eb
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-02-28 12:32:49 +0000
+
+    Added AuthRole 
+
+  Change: 0ae63ae2faafd69eb9e1bb9f15ba9e1d2cee2e1f
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-02-28 12:21:38 +0000
+
+    Added support for RAX auth 
+
+-------------------------------------------
+version 1.0601 at 2012-02-13 22:35:58 +0000
+-------------------------------------------
+
+  Change: e4631043d823a54373820452ee1ee8f4226fdc9f
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-02-13 17:35:58 +0000
+
+    Unicode output no longer issues a warning. 
+
+-------------------------------------------
+version 1.0600 at 2012-01-27 22:36:17 +0000
+-------------------------------------------
+
+  Change: a71be9d1cbfbc4b738840da8747b16adec03b8b6
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-01-27 17:36:17 +0000
+
+    Added support for setting server's admin password.
+
+    Also added aliases for subcommands in oscompute. 
+
+  Change: 8b25439e0bb3dd91ce95008ce91f32107aefa5af
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-01-19 02:45:06 +0000
+
+    Added support for server rebuild. 
+
+-------------------------------------------
+version 1.0401 at 2012-01-17 20:55:48 +0000
+-------------------------------------------
+
+  Change: b6f63c8e2087f539329918d440b2b47e5f47b335
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-01-17 15:55:48 +0000
+
+    Fixing the parsing of the create image response. 
+
+  Change: 8f262e5e5b55f2249147b33e33ad705a5d7062ef
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-01-14 06:02:58 +0000
+
+    Can now show or delete a server by name in oscompute. 
+
+-------------------------------------------
+version 1.0302 at 2012-01-03 22:07:12 +0000
+-------------------------------------------
+
+  Change: d3c0d8ab599b7cabaa77574a7e3dd941f90b27fc
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-01-03 17:07:12 +0000
+
+    Added token() and base_url() methods. 
+
+  Change: 1352434414e696c60446a1b282d7916b6a4c0f8b
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-01-03 00:57:30 +0000
+
+    Forgot to add App::Rad::Plugin::MoreHelp dep. 
+
+-------------------------------------------
+version 1.0300 at 2012-01-03 04:44:54 +0000
+-------------------------------------------
+
+  Change: cec5abea209cd548831c30dee3f6d5d2d57143b4
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-01-02 23:44:54 +0000
+
+    Added single letter abbreviations for CLI commands. 
+
+-------------------------------------------
+version 1.0200 at 2011-12-29 10:57:43 +0000
+-------------------------------------------
+
+  Change: 5e70a4ad724a876117f14df5be6cb546073bfb53
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2011-12-29 05:57:43 +0000
+
+    Added support for flavors. 
+
+-------------------------------------------
+version 1.0102 at 2011-12-28 22:02:46 +0000
+-------------------------------------------
+
+  Change: 66663d93f906a4f8d9c225ebd5b7f45b50d29790
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2011-12-28 17:02:46 +0000
+
+    Dispaly private ip's if public ip's are missing 
+
+-------------------------------------------
+version 1.0101 at 2011-12-28 21:02:38 +0000
+-------------------------------------------
+
+  Change: b1b8f5ee8dc3834637c22dd14870b1090b71bcb0
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2011-12-28 16:02:38 +0000
+
+    Adding App::Rad dep 
+
+-------------------------------------------
+version 1.0100 at 2011-12-28 19:23:35 +0000
+-------------------------------------------
+
+  Change: d2dd41a6d846fbf9892d95120d8a3e1f0ddcc767
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2011-12-28 14:23:35 +0000
+
+    Adding support for images. Now project_id is required for auth. 
+
+  Change: 085dd08a6304f98cda5b62d525def2509079c60e
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2011-12-23 14:22:02 +0000
+
+    Chaning README to markdown 
+
+  Change: 51789ef7447d90c3309b1a457f22c005c11faa61
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2011-12-23 14:00:43 +0000
+
+    Update README.pod 
+
+  Change: 275af634d0cc25a148e5902a11d073697939b5bf
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2011-12-22 19:54:30 +0000
+
+    Minor POD update 
+
+  Change: 78655299d7cf55704724ed2d2ddabf48eabcd8c8
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2011-12-22 19:48:57 +0000
+
+    Fixing POD generation for oscompute. 
+
+-------------------------------------------
+version 1.0000 at 2011-12-22 23:02:34 +0000
+-------------------------------------------
+
+  Change: 29640bbdb0a4daf88e5ccab59994a5db48cf1603
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2011-12-22 18:02:34 +0000
+
+    Updating README.pod for github 
+
+  Change: 13ddbadf84d1fdf7906815a05a301326b4ecfd7c
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2011-12-22 17:53:27 +0000
+
+    Adding correct POD and other misc stuff 
+
+  Change: 8190bd39629d59c83d7d1b6f1f230b22a5608914
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2011-12-22 16:53:41 +0000
+
+    Updating deps 
+
+  Change: cdd21f79e68a0dedb850d64a5aaf2f427840e3f3
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2011-12-22 16:51:10 +0000
+
+    Major oscompute CLI changes. Added Auth module. 
+
+  Change: d3e819671b0f9ce81f1821f17352915ef7ea2f27
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2011-09-28 02:15:40 +0000
+
+    Adding README.pod to make github happy 
+
+-------------------------------------------
+version 0.0001 at 2011-09-28 06:04:44 +0000
+-------------------------------------------
+
+  Change: 44ee393a4a8365dfc14aa55da5082b25fc360370
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2011-09-28 02:04:44 +0000
+
+    fixing podweaver thing 
+
+  Change: 0eccfa071f3f212fa22bf29bb68c94249dc22731
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2011-09-28 02:01:06 +0000
+
+    Updating Changes file. 
+
+  Change: c94db015133d6b621cd6c2f0a0d2b4dabde93e64
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2011-09-28 01:38:01 +0000
+
+    Fixing abstract. Adding deps to dist.ini. 
+
+  Change: 0b525a9242358e06caedb952d43749bf05b97953
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2011-09-28 01:29:15 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

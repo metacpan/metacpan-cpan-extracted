@@ -1,0 +1,72 @@
+#!perl -w
+
+use strict;
+use Net::FS::Gmail;
+
+=head1 NAME
+
+gmailfs - simple program to store and retrieve programs on Gmail
+
+=head1 USAGE
+
+    gmailfs <username> <password> [ <store|delete|retrieve|remove> <filename> [as] ]
+
+=over 4
+
+=item username and password are your gmail username and password
+
+=item pass a command - either store, delete, retrieve or remove. If you just pass a username and password then a list of all files will be printed.
+
+=item filename is the path to store or retrieve on Gmail
+
+=item the optional 'as' indicates what to store the file as on GMail or save it as locally. If passed to delete or remove then it indicates a version of a file to retrieve.
+    
+=back
+
+=cut
+
+
+my $user  = shift; die "You must pass a user name\n"                 unless defined $user;
+my $pass  = shift; die "You must pass a password\n"                  unless defined $pass;
+
+my $fs = Net::FS::Gmail->new( username => $user, password => $pass ) || die "Couldn't log in\n";
+
+
+my $store = shift; 
+if (!defined $store) {
+    print join("\n",$fs->files)."\n";
+    exit;
+}
+
+my $file  = shift; die "You must pass a file\n"                      unless defined $file;
+my $as    = shift;
+
+
+if ($store eq 'delete') {
+    $fs->delete($file, $as);
+} elsif ($store eq 'remove') {
+    $fs->remove($file, $as);
+} elsif ($store eq 'store') {
+    $fs->store($file, $as);
+} elsif ($store eq 'retrieve') {
+    $as   = $file unless defined $as;
+    open (FILE, ">$as") || die "Couldn't open $as for writing: $\n";
+    binmode FILE;
+    print FILE $fs->retrieve($file);
+    close FILE;
+} else {
+    die "Unknown command '$store'\n";
+}
+    
+
+=head1 AUTHOR
+
+Simon Wistow <simon@thegestalt.org>
+
+=head1 COPYRIGHT
+
+Copyright 2006, Simon Wistow
+
+Released under the same terms as Perl itself
+
+=cut

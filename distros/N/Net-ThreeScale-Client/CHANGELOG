@@ -1,0 +1,41 @@
+2.1.5 -
+
+* Fix bug introduced by HTTP::Tiny change.
+
+2.1.4 -
+
+* Use HTTP::Tiny rather than LWP.
+* Drop dependency on Ref::Util.
+
+2.1.3 -
+
+* Packaging and documentation updates.
+
+2.1.2 -
+
+* reintroduced method _authorize_given_url
+* use Ref::Util
+
+2.1.1 -
+
+* Return application_plan.
+* Switch to Dist::Zilla.
+
+2.0.4 -
+
+* authrep now returns usage even (or especially useful) when the quota is exceeded
+
+2.0.2 -
+
+* implemented method 'authrep'
+
+2.0.0 -
+
+* updated for version 2.0 of the 3Scale API
+
+0.1.2 - 
+
+* updated error handling to reflect new error return codes
+* Modified all error exports to reflect changes to error codes
+* changed transaction parsing code to reflect changes in transaction code
+* updated tests

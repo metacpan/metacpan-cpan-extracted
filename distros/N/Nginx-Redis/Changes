@@ -1,0 +1,12 @@
+Revision history for Perl extension Nginx::Redis
+
+1.1.12.4  Sun Jan 22 05:41:01 EET 2012
+	- removed unneded check for parser;
+	- bump to make it work with new nginx-perl;
+
+1.1.12.3
+	- forbid indexing eg/;
+
+1.1.12.2  Sat Jan 21 00:00:51 EET 2012
+	- original version;
+

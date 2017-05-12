@@ -1,0 +1,24 @@
+Changes
+GPL-2
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+bin/pod2pdf
+bin/uddihd
+bin/z2uddi
+etc/config.yaml
+etc/pqf.properties
+etc/yazgfs.xml
+lib/Net/Z3950/UDDI.pm
+lib/Net/Z3950/UDDI/Config.pm
+lib/Net/Z3950/UDDI/Database.pm
+lib/Net/Z3950/UDDI/ResultSet.pm
+lib/Net/Z3950/UDDI/Session.pm
+lib/Net/Z3950/UDDI/plugins/soap.pm
+lib/Net/Z3950/UDDI/plugins/uddi.pm
+lib/UDDI/HalfDecent.pm
+lib/UDDI/HalfDecent/Record.pm
+lib/UDDI/HalfDecent/ResultSet.pm
+t/Net-Z3950-UDDI.t
+META.yml                                 Module meta-data (added by MakeMaker)

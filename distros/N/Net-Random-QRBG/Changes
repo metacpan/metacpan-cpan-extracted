@@ -1,0 +1,9 @@
+Revision history for Net-Random-QRBG
+
+0.02	May 27, 2009
+		Added more methods of returning values
+		It's still bad code, the tests are also horrible.
+
+0.01    May 27, 2009
+        First version, released on an unsuspecting world.
+

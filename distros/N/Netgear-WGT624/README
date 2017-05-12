@@ -1,0 +1,52 @@
+Netgear-WGT624 version 0.04
+===========================
+
+This project contains scripts and libraries that will parse the HTML
+output information from a Netgear 108 Mbps Wireless Firewall Router
+(model WGT624).  Basically, with these libraries you can output useful
+information, like the packet collisions or transmitted bits per second
+to a form that is useful for rrdtool or mrtg (in order to graph
+network utilization).
+
+After installing, you will have two options to use this program.
+First, you may use the pre-built perl script get-wgt624-status, which
+will allow you to query a Netgear 108 Mbps Wireless Firewall Router
+from the command line.  Secondly, you will have the library
+Netgear::WGT624 installed on your system, which allows a simple
+programming interface for querying WGT624 router statistics.
+
+For more information, consult the perldoc pages get-wgt624-status and
+Netgear::WGT624 on your system after installation, or on CPAN directory
+linked from this project's home page, http://justin.phq.org/netgear/.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	LWP
+	Getopt::Long
+	Pod::Usage
+
+Additionally, if you want to be prompted for your router password,
+rather than typing it on the command line (for the get-wgt624-status client)
+you must have Term::ReadKey.
+
+COPYRIGHT AND LICENCE
+
+This package is distributed under the Artistic license, details can be
+found at http://www.perl.com/lpt/a/language/misc/Artistic.html.
+
+Copyright (C) 2006 by Justin S. Leitgeb
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.

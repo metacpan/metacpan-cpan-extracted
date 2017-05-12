@@ -1,0 +1,31 @@
+Revision history for Perl extension Net-IP-Match
+
+1.101700  2010-06-19 11:01:25 Europe/Vienna
+    - converted tabs to spaces
+
+1.100860  2010-03-27 13:10:32 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.05  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+
+0.04  Thu, 29 May 2008 12:06:24 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - Converted Changes file to YAML style
+    - .shipit: added Twitter step
+    - Makefile.PL: added auto_install() and process_templates()
+    - lib/*: converted to template
+    - updated MANIFEST
+    - added t/perlcriticrc
+    - .shipit: fixed svk.tagpattern
+    - tags: NEWFEATURE
+
+0.03  Sun, 21 Oct 2007 13:14:42 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - Makefile.PL now requires Filter::Simple
+
+0.02  Thu, 18 Oct 2007 10:09:39 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - fixed version requirement of Test::More
+
+0.01  Wed, 10 Apr 2002 14:29:32 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

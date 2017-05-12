@@ -1,0 +1,6 @@
+load.t
+pod.t
+pod_coverage.t
+prereq.t
+00-scratch.t
+01-sanity.t

@@ -1,0 +1,101 @@
+NAME
+    Net::SNMP::Mixin::IpRouteTable - mixin class for the mib-II ipRouteTable
+
+VERSION
+    Version 0.04
+
+SYNOPSIS
+      use Net::SNMP;
+      use Net::SNMP::Mixin;
+
+      #...
+
+      my $session = Net::SNMP->session( -hostname => 'foo.bar.com' );
+
+      $session->mixer('Net::SNMP::Mixin::IpRouteTable');
+      $session->init_mixins;
+      snmp_dispatcher();
+      $session->init_ok();
+      die $session->errors if $session->errors;
+
+      my @routes = get_ip_route_table();
+
+      foreach my $route ( @routes ) {
+
+        my $dest      = $route->{ipRouteDest};
+        my $mask      = $route->{ipRouteMask};
+        my $nhop      = $route->{ipRouteNextHop};
+        my $proto_str = $route->{ipRouteProtoString};
+        my $type_str  = $route->{ipRouteTypeString};
+
+        print "$dest/$mask => $nhop $proto_str $type_str\n";
+      }
+
+DESCRIPTION
+    A Net::SNMP mixin class for mib-II ipRouteTable info.
+
+MIXIN METHODS
+  OBJ->get_ip_route_table()
+    Returns the mib-II ipRouteTable as a list. Every route entry is a
+    reference to a hash with the following fields and values:
+
+      {
+        ipRouteDest       => IpAddress,
+        ipRouteMask       => IpAddress,
+        ipRouteNextHop    => IpAddress,
+        ipRouteIfIndex    => INTEGER,
+        ipRouteMetric1    => INTEGER,
+        ipRouteMetric2    => INTEGER,
+        ipRouteMetric3    => INTEGER,
+        ipRouteMetric4    => INTEGER,
+        ipRouteMetric5    => INTEGER,
+        ipRouteType       => INTEGER,
+        ipRouteTypeString => String,   # resolved enum
+        ipRouteProto      => INTEGER,
+        ipRouteTypeProto  => String,   # resolved enum
+        ipRouteAge        => INTEGER,
+        ipRouteInfo       => OBJECT IDENTIFIER
+      }
+
+INITIALIZATION
+  OBJ->_init($reload)
+    Fetch the mib-II ipRouteTable from the host. Don't call this method
+    direct!
+
+PRIVATE METHODS
+    Only for developers or maintainers.
+
+  _fetch_ip_route_tbl($session)
+    Fetch the ipRouteTable once during object initialization.
+
+  _ip_route_tbl_cb($session)
+    The callback for _fetch_ip_route_tbl().
+
+SEE ALSO
+    Net::SNMP::Mixin
+
+REQUIREMENTS
+    Net::SNMP, Net::SNMP::Mixin
+
+BUGS, PATCHES & FIXES
+    There are no known bugs at the time of this release. However, if you
+    spot a bug or are experiencing difficulties that are not explained
+    within the POD documentation, please submit a bug to the RT system (see
+    link below). However, it would help greatly if you are able to pinpoint
+    problems or even supply a patch.
+
+    Fixes are dependant upon their severity and my availablity. Should a fix
+    not be forthcoming, please feel free to (politely) remind me by sending
+    an email to gaissmai@cpan.org .
+
+      RT: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-SNMP-Mixin-IpRouteTable
+
+AUTHOR
+    Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
+
+COPYRIGHT & LICENSE
+    Copyright 2008-2016 Karl Gaissmaier, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

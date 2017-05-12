@@ -1,0 +1,16 @@
+This is the Debian packaged version of the Perl module Net::FTPServer.
+The upstream authors are:
+	Richard Jones (rich@annexia.org),
+	Rob Brown (bbb@cpan.org),
+	Keith Turner (keitht at silvaco.com),
+	Azazel (azazel at azazel.net),
+and many others.
+
+Chip Salzenberg <chip@debian.org> created this Debian package using
+original Net::FTPServer sources, as found on the Comprehensive Perl
+Archive Network (CPAN) <URL:http://cpan.org/>.  The Debian Perl
+packaging tool "dh-make-perl" was of great help.
+
+libnet-ftpserver-perl is released under the GNU General Public
+License.  On a Debian GNU/Linux systems, the complete text of this
+license may be found in the file /usr/share/common-licenses/GPL.

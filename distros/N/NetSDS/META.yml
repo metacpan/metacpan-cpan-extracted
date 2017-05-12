@@ -1,0 +1,94 @@
+---
+name: NetSDS
+version: 1.301
+author:
+  - 'Net.Style Development Team <info@netstyle.com.ua>'
+abstract: Core Perl5 modules for NetSDS VAS development framework
+license: gpl
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+requires:
+  CGI: 3.29
+  CGI::Cookie: 0
+  CGI::Fast: 0
+  Class::Accessor: 0
+  Class::Accessor::Class: 0
+  Config::General: 0
+  DBD::Pg: 0
+  DBI: 1.600
+  Data::Structure::Util: 0
+  FCGI: 0.67
+  Getopt::Long: 0
+  HTML::Template::Pro: 0.81
+  JSON: 2.0
+  JSON::XS: 2.0
+  Locale::gettext: 1.00
+  POSIX: 0
+  Proc::Daemon: 0.03
+  Proc::PID::File: 0
+  Storable: 2.15
+  Unix::Syslog: 1.0
+  perl: 5.008
+  version: 0.700
+build_requires:
+  Module::Build: 0
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  NetSDS:
+    file: lib/NetSDS.pm
+    version: 1.301
+  NetSDS::App:
+    file: lib/NetSDS/App.pm
+    version: 1.301
+  NetSDS::App::FCGI:
+    file: lib/NetSDS/App/FCGI.pm
+    version: 1.301
+  NetSDS::App::JSRPC:
+    file: lib/NetSDS/App/JSRPC.pm
+    version: 1.301
+  NetSDS::App::SMTPD:
+    file: lib/NetSDS/App/SMTPD.pm
+  NetSDS::App::SMTPD::Client:
+    file: lib/NetSDS/App/SMTPD.pm
+  NetSDS::App::SMTPD::Socket:
+    file: lib/NetSDS/App/SMTPD.pm
+    version: 1.301
+  NetSDS::Class::Abstract:
+    file: lib/NetSDS/Class/Abstract.pm
+    version: 1.301
+  NetSDS::Conf:
+    file: lib/NetSDS/Conf.pm
+    version: 1.301
+  NetSDS::Const:
+    file: lib/NetSDS/Const.pm
+    version: 1.301
+  NetSDS::DBI:
+    file: lib/NetSDS/DBI.pm
+    version: 1.301
+  NetSDS::DBI::Table:
+    file: lib/NetSDS/DBI/Table.pm
+    version: 1.301
+  NetSDS::EDR:
+    file: lib/NetSDS/EDR.pm
+    version: 1.301
+  NetSDS::Feature:
+    file: lib/NetSDS/Feature.pm
+    version: 1.301
+  NetSDS::Logger:
+    file: lib/NetSDS/Logger.pm
+    version: 1.301
+  NetSDS::Session:
+    file: lib/NetSDS/Session.pm
+    version: 1.301
+  NetSDS::Template:
+    file: lib/NetSDS/Template.pm
+    version: 1.301
+  NetSDS::Translate:
+    file: lib/NetSDS/Translate.pm
+    version: 1.301
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

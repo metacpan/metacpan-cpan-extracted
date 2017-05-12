@@ -1,0 +1,35 @@
+Net::OpenMicroBlogging
+
+Net::OpenMicroBlogging is an implementation of the OpenMicroBlogging protocol.
+
+OpenMicroBlogging is:
+
+An open protocol to allow secure API authentication in a simple and standard
+method from desktop and web applications.
+
+http://oauth.net/
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+SUPPORT
+
+Please contact the author by email for support.
+
+TODOS
+
+* Needs docs
+* Needs more tests
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Keith Grennan
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

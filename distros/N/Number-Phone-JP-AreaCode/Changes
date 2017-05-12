@@ -1,0 +1,14 @@
+Revision history for Perl extension Number-Phone-JP-AreaCode
+
+20131201.2 2014-02-26T11:12:19Z
+
+    - Bind minimum version of Encode.pm
+
+20131201.1 2014-02-26T10:04:00Z
+
+    - Fix docs
+
+20131201 2014-02-26T09:58:40Z
+
+    - original version
+

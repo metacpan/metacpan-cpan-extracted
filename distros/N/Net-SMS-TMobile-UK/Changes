@@ -1,0 +1,13 @@
+Revision history for Net-SMS-TMobile-UK
+
+0.03	2009-06-19
+	Update to fix changed form and success page on the T-Mobile website.
+
+0.02	2008-06-14
+	New release to handle updated T-Mobile website. Added support
+	for additional debugging and delivery reports. Minor documentation
+	bugs fixed.
+
+0.01   	2007-05-07 
+        First release, works for me(tm).
+

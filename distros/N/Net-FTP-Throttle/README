@@ -1,0 +1,39 @@
+TITLE
+    Net::FTP::Throttle - Throttle FTP connections
+
+SYNOPSIS
+      my $ftp = Net::FTP::Throttle->new("some.host.name", MegabitsPerSecond => 2)
+        or die "Cannot connect: $@";
+
+      $ftp->login("username", 'password')
+        or die "Cannot login ", $ftp->message;
+
+      $ftp->cwd("/pub")
+        or die "Cannot change working directory ", $ftp->message;
+
+      $ftp->get("this.file")
+        or die "get failed ", $ftp->message;
+
+      $ftp->put("that.file")
+        or die "put failed ", $ftp->message;
+
+DESCRIPTION
+    Net::FTP is a module implementing a simple FTP client in Perl as
+    described in RFC959. Net::FTP::Throttle is a module which subclasses
+    Net::FTP to add a throttling option, which allows you to set the maximum
+    bandwidth used.
+
+    As shown in the synopsis, this is passed into the contructor as a value
+    in megabits per second.
+
+    Currently only get and put requests are throttled.
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 2005 Foxtons Ltd.
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

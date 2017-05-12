@@ -1,0 +1,33 @@
+Net::Dev::Tools::MIB::MIBLoadOrder version 1.0.1
+==============================================================================
+
+DESCRIPTION
+
+Module provides function that will scan a list of files
+and/or directories to find MIB files. Then parse each MIB file for the
+information required to determine a MIB Load Order for a NMS.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   None.
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2004 Scott Parsons
+
+All rights reserved.
+This program is free software; you may redistribute it 
+and/or modify it under the same terms as Perl itself.

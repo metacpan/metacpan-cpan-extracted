@@ -1,0 +1,57 @@
+{
+   "abstract" : "interface with Mollom web API",
+   "author" : [
+      "Michael Peters <mpeters@plusthree.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Mollom",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Exception::Class::TryCatch" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Any::Moose" : "0",
+            "DateTime" : "0",
+            "Digest::HMAC_SHA1" : "0",
+            "Exception::Class" : "0",
+            "MIME::Base64" : "0",
+            "Params::Validate" : "0",
+            "XML::RPC" : "0.9"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Mollom" : {
+         "file" : "lib/Net/Mollom.pm",
+         "version" : "0.09"
+      },
+      "Net::Mollom::ContentCheck" : {
+         "file" : "lib/Net/Mollom/ContentCheck.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.09"
+}

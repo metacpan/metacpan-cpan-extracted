@@ -1,0 +1,6 @@
+name = "Net-Amazon-SQS-Lite"
+# badges = ["travis"]
+authority="cpan:SHIBUYA"
+
+module_maker="ModuleBuildTiny"
+

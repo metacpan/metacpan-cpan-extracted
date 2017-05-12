@@ -1,0 +1,15 @@
+POST /foo/bar.pl HTTP/1.1
+Host: localhost:8001
+User-Agent: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.7) Gecko/20040624 Debian/1.7-2
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Connection: keep-alive
+Referer: http://localhost:8001/test.html
+Cookie: NETHTTPSERVERSESSION=ea209023f1f3908dd9a39c256be04e55
+Authorization: Digest username="foo", realm="Test", nonce="MTA4ODcxODkxMzo5YmE3MWZjN2EzOGIzOWM5YWJhZjFiM2RkNjkyNTU4MQ==", uri="/foo/bar.pl", algorithm=MD5, response="ecf1ef3fcc82d9cab6849fa986118311", qop=auth, nc=00000003, cnonce="2a1b2b1e0723ba9e"
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 102
+
+file1=%2Fhome%2Freatmon%2Fdevel%2Fdiff_test%2Ftest&file2=%2Fhome%2Freatmon%2Fdevel%2Fdiff_test%2Ftest2

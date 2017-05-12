@@ -1,0 +1,48 @@
+{
+   "abstract" : "Netflow parser (V9 only)",
+   "author" : [
+      "Alexei Pastuchov E<lt>palik at cpan dot orgE<gt>."
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Netflow-Parser",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "fields" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/p-alik/Netflow-Parser/issues"
+      },
+      "homepage" : "https://github.com/p-alik/Netflow-Parser",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/p-alik/Netflow-Parser"
+      }
+   },
+   "version" : "v0.06.002"
+}

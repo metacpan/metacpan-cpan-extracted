@@ -1,0 +1,7 @@
+Changes
+GPL
+HOWTO.RR_extensions
+MANIFEST
+Makefile.PL
+Template.pm
+t/Template.t

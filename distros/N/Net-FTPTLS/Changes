@@ -1,0 +1,111 @@
+Revision history for Perl extension Net::FTPTLS.
+
+0.84    - 0.83a,b   - allow for older Socket, more portable timeout L!L! (64-bit host)
+0.83    - mess with setsockopt stuff/constants, as imported from 'use Socket' 
+0.82    - allow for setting compression strategy
+0.81    - Allow for compression level configuration, decrease timeout to 160
+0.80    - add check sock
+0.79    - change timeout from 160s to 360s ( read - important for large transfers )
+0.78	- Z_FIXED prevents the use of dynamic Huffman codes, allowing for a simpler decoder for special applications. (preemptive transfer.pconnect.biz measure)
+0.77    - lower compression  (WindowsBits 15->8)
+0.76    - lower compression to level 1 ( from 5 ) to fix PMP/transfer.pconnect.biz disconnects.
+0.70    - fix Damn! undefined response (err:Resource temporarily unavailable) by checking EAGAIN
+0.68    - fix upload callback
+0.67    - download/upload with MDOE Z, switch to Compress::Raw::Zlib
+0.66    - starting to implement MODE Z
+0.65    - typo sock/socket in setsockopt
+0.64    - bin,ascii
+0.63    - ForcePASVIP rename
+0.62    - ForcePASSVIP,
+0.61    - hotfix - nlst vs list
+0.60    - try to support explicit ftps ( self->{FTPS}=1 )
+0.59    - setsockopt - set TOS LOWDELAY on control channel, and THROUGHPUT on data channel, set keepalive on control channel.
+0.57	- report read bytes in PutUpdateCallback (this still needs work)
+0.56	- report read bytes in GetUpdateCallback
+0.55	- mkdir, rmdir
+0.54	 - sub readln, fix for:
+	OPEN.Received: 220 xanax.wig.lublin.pl FTP server (Version 6.SRV Response: 220 xanax.wig.lublin.pl FTP server (Version 6.RECV: 220 xanax.wig.lublin.pl FTP server (Version 6.OPEN..Received: xanax.wig.lublin.pl FTP server (Version 6.Sending: USER anica
+	SRV Response: 00LS) ready.
+
+0.52     - cosmetic fix to size()
+0.51     - cosmetic fix to size()
+0.50     - oups, fix size()
+0.49     - if ($sth=0) instead of $sth==0 fixed.
+	continuations fixed.
+0.48     - fix size() ( previously lost fixes ), fix multiline broken in  0.47
+0.47     - fix response, fix size, introduce rawmessage
+0.46     - mdtm support
+0.45     - improved logging (damn undefined response)
+0.44	 - NLST processing, 1xx response means - data follows, 2xx means you can close the socket,
+		200 Series: The requested action has been successfully completed.
+		100 Series: The requested action is being initiated, expect another reply before proceeding with a new command.
+		4xx, 5xx - errors.
+0.43     - Meta.yml test
+0.42     - die ..
+0.41	 - putt error code in ErrMSG (this probably still needs fixing)
+	fix 0.40(double get), undef on error in reponse.
+0.40     - try to  fail when RETR fails - 
+	reported by Maria Ian, should fix RT#17847
+0.39     - try to  fail when STOR(APPE) fails - like
+	 put: Access failed: 550 cpuinfo: Overwrite permission denied
+0.37
+	- APPE - appe(), blatappe() support.
+0:36 
+	- rollback
+
+0:34    Wed Nov 30 09:43:41 CET 2005
+	- move PBSZ and PROT P until AFTER logged in..
+0.32	Tue Oct 11 20:03:12 CEST 2005
+	- complete datasocket conversion
+0.31    Tue Oct 11 19:53:38 CEST 2005
+	- PASV refactoring step 1 - datasocket method, 
+0.30	Thu Apr 14 22:23:11 CEST 2005
+	- DELE/rm/delete method, thanks to Edward Mann
+
+0.28 	Wed Mar 30 21:02:24 CEST 2005
+	-  new method $ftp->quit()
+	- callbacks Get|Put Update and (Get|Put)Done
+	- 0.28 is based on Daniel Akesson version, thanks.
+0.26
+	- another fix for multiline MOTD
+0.25
+	- Fix initial server line handling (support multiline MOTD)
+0.23    
+	- use IO::Handle
+0.22    
+	- use binmode for reading/writing files. TODO: let user use ASCII mode.
+0.21    
+	- Use \r\n instead of \n like RFC requires..
+
+0.20	Sat Feb 12 20:31:26 CET 2005
+	- relax 'use perl', we should work equally well on 5.6.0
+
+0.19 
+	- EncryptData=0 behaviour changed. We no longer send "PROT C", "PROT P" at every command.
+	- $ftp->message() command returns last response from FTP server.
+	- bug - pureftpd tends to return strange line as reply to 'PASV', we
+	 now die instead of hanging indefinitely. (TODO - rething error handling)
+
+0.17  Mon Jan 24 18:49:25 CET 2005
+	- use unique IO::Handle for every connection instead of 3 global globs.(BROWN PAPERBAG BUG!)
+	- cdup 
+	- slowly improving error handling...
+
+0.12  Tue Jan 18 19:48:52 CET 2005
+	- rename("from","to") introduced
+	- NLST and LIST fixed (thanx to Pablo Valenzuela)
+	- PBSZ and PROT no longer required in client code.
+	- SIZE implemented (thanx to Pablo Valenzuela)
+	- login ( user, pass )
+0.10  Tue Jan 18 09:19:53 CET 2005
+	- Debug, EncryptData properties. Documentation fixed.
+0.09  Fri Jan  7 20:41:03 CET 2005
+	- get and put are working, so are slurp and blat.
+0.06  Wed Jan  5 09:55:51 CET 2005
+	- NLST, GET, PUT
+0.02  Wed Jan  5 09:55:51 CET 2005
+	- hello world version
+0.01  Wed Jan  5 09:54:58 2005
+	- original version; created by h2xs 1.23 with options
+		-Xn Net::FTPTLS
+

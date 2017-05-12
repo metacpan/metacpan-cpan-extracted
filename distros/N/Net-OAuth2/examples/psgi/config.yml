@@ -1,0 +1,53 @@
+log: 'core'
+access_log: 1
+show_errors: 1
+sites:
+        37signals:
+                name: '37Signals'
+                client_id: ''
+                client_secret: ''
+                site: 'https://launchpad.37signals.com/'
+                authorize_path: '/authorization/new'
+                access_token_path: '/authorization/token'
+                protected_resource_path: '/authorization.xml'
+        facebook:
+                name: 'Facebook'
+                client_id: ''
+                client_secret: ''
+                site: 'https://graph.facebook.com'
+                protected_resource_path: '/me'
+        mixi:
+                name: 'mixi'
+                client_id: ''
+                client_secret: ''
+                site: 'https://mixi.jp'
+                authorize_url: 'https://mixi.jp/connect_authorize.pl'
+                access_token_url: 'https://secure.mixi-platform.com/2/token'
+        google:
+                name: 'Google Contacts'
+                client_id: ''
+                client_secret: ''
+                site: 'https://accounts.google.com'
+                authorize_path: '/o/oauth2/auth'
+                access_token_path: '/o/oauth2/token'
+                scope: 'openid profile email'
+                state: '1a2b3c'
+                protected_resource_url: 'https://www.googleapis.com/userinfo/v2/me'
+        yandex:
+                name: 'Yandex Direct'
+                client_id: ''
+                client_secret: ''
+                username: ''
+                password: ''
+                site: 'https://oauth.yandex.ru'
+                authorize_path: '/authorize'
+                access_token_path: '/token'
+                bearer_token_scheme: 'auth-header'
+                protected_resource_url: 'http://api-fotki.yandex.ru/api/me/'
+	instagram:
+		client_id: ''
+		client_secret: ''
+		site: 'https://api.instagram.com'
+		authorize_path: '/oauth/authorize'
+		access_token_path: '/oauth/access_token'
+		scope: 'comments relationships likes'

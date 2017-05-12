@@ -1,0 +1,25 @@
+---
+abstract: 'Fast FIX Checksum calculations from Perl'
+author:
+  - 'Thomas Guyot-Sionnest <tguyot@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Fix-Checksum-XS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  XSLoader: '0'
+resources:
+  repository: https://github.com/dermoth/Net-Fix-Checksum-XS.git
+version: '0.02'

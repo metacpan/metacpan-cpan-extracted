@@ -1,0 +1,9 @@
+#CRON: netgroup  @chelsea_working  NIGHTLY  50  job2
+#CRON: host  corona  NIGHTLY  60  job3
+#CRON: netgroup  @chelsea_working  NIGHTLY  40  job1
+
+#CRON: host  corona    * 0 * * 6 -1 -2 job7
+
+#CRON: netgroup  @chelsea_working    * 0 * * 6 -1 -2 job7
+
+#CRON: user  ckee

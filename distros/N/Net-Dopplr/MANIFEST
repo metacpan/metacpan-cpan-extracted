@@ -1,0 +1,10 @@
+Build.PL
+Changes
+bin/dopplr
+lib/Net/Dopplr.pm
+MANIFEST			This list of files
+t/00use.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml

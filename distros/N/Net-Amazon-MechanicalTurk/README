@@ -1,0 +1,270 @@
+Net-Amazon-MechanicalTurk
+-----------------------------------------------------------------------------
+
+Amazon Mechanical Turk SDK for Perl
+
+
+PREREQUISITES
+-----------------------------------------------------------------------------
+
+  * Perl 5.6.0+
+    Tested on Linux and Windows using cygwin and ActivePerl.
+
+  * Required Modules
+  *   LWP
+  *   MIME::Base64
+  *   Digest::HMAC_SHA1
+  *   URI::Escape
+  *   XML::Parser  (You may use XML::Parser::Lite as an alternative)
+
+  * Optional Modules
+  *   Test::More    - For running tests
+  *   Module::Build - For building, installing and testing
+  *                   (Highly reccomended for ActivePerl)
+  *   IO::String    - Used for templating.
+  *   DBI           - Used in one of the samples.
+  *   DBD::SQLite2  - Used in one of the samples.
+
+
+INSTALLATION
+-----------------------------------------------------------------------------
+
+NOTE: Below are four (4) different installation methods:
+  1. Interactive Intall
+  2. Windows ActivePerl Manual Installation
+  3. Traditional *nix Installation
+  4. HELP ME I'M NOT ROOT
+
+(1) and (2) should work on Windows. (1), (3), and (4) might work in *nix.
+Only one of these installation methods must be completed successfully.
+
+  * Interactive Install
+
+    Run the command "perl mturk_install.pl" to run the interactive
+    installer.  The installer will check module dependencies and
+    try to install them for you.  If you run this on ActivePerl it
+    will use the ppm command to install the modules.  On other systems
+    it will try to use CPAN.
+
+    The interactive installer is provided as a convenience.  It may not
+    work on all systems.  If the installer uses CPAN, the installation
+    script will be completely dependent on a working CPAN configuration.
+    Some dependent modules (e.g. Digest::HMAC_SHA1) may also require a
+    working C compiler and make utility.
+
+    Note on CPAN:
+    If you have not used CPAN before, you may be taken through CPAN
+    configuration which is lengthy.
+
+    Note on *nix:
+    You may have issues if you run the installation script as a non-root
+    user.  See HELP ME I'M NOT ROOT.
+
+  * Windows ActivePerl Manual Installation
+
+    1. Install the dependencies using the ppm command.
+
+        (Module::Build is required for an Windows ActivePerl install)
+
+        ppm install LWP
+        ppm install MIME::Base64
+        ppm install Digest::HMAC_SHA1
+        ppm install URI::Escape
+        ppm install XML::Parser
+        ppm install Module::Build
+        ppm install Test::More
+        ppm install IO::String
+        ppm install DBI
+        ppm install DBD::SQLite2
+
+    2. Unpack the distribution and go to the distribution directory in a
+       DOS command line.
+
+    3. Run the following commands:
+
+        perl Build.PL
+        Build
+        Build install
+
+    4. Run the following command to configure your MechanicalTurk access keys:
+
+        perl -MNet::Amazon::MechanicalTurk::Configurer -e configure
+
+       (This command will create a configuration file named mturk.properties
+        in your user home directory.)
+
+  * Traditional *nix Installation
+
+    * Using CPAN to install dependencies
+
+      1. Run the command "perl -MCPAN -e shell" to enter the CPAN shell.
+
+      2. Use the install command to install the dependencies.
+
+         (Example of installing Module::Build)
+         install Module::Build
+
+         Note: See the section Required Modules and Optional Modules
+               at the beginning of this document.
+               You can check to see if a module already exists on your
+               system by typing the command:
+
+                 perl -M<MODULENAME> -e 1
+
+      3. Build and install the MechanicalTurk module using 1 of the following
+         methods.
+
+		Using the traditional perl build process.
+		
+		    perl Makefile.PL
+		    make
+		    make test
+		    make install
+			
+		Alternatively, to install with Module::Build, you can use the
+        following commands:
+		
+		    perl Build.PL
+		    ./Build
+		    ./Build test
+		    ./Build install
+
+      4. Run the following command to configure your MechanicalTurk
+         access keys:
+
+        perl -MNet::Amazon::MechanicalTurk::Configurer -e configure
+
+       (This command will create a configuration file named mturk.properties
+        in your user home directory.)
+
+  * HELP ME I'M NOT ROOT
+
+    So you are on a *nix system and you are not root and you are having
+    problems installing perl modules.  You can build and install perl
+    modules into a local directory.  You can then set an environment
+    variable PERL5LIB to point to this directory, so your scripts pick
+    up the modules from there.
+
+    The following text shows the command it took on a particular system
+    to get the MechanicalTurk module working.  Some systems and/or
+    versions of perl may need more or less items installed.
+
+    These commands also reference specific versions of modules on CPAN.
+    These are not the required versions.  These were just the latest versions
+    present on CPAN at the time this document was originally written.
+
+    For any module download url listed, you may check the parent directory for
+    new versions on CPAN.
+
+    (Note: This install already had LWP, MIME::Base64,
+     URI::Escape, XML::Parser and DBI. These commands were
+     only for the modules missing.)
+
+    You can check to see if you have a module or not by typing the
+    command:
+
+      perl -M<MODULENAME> -e 1
+
+    Here are the commands that were needed to run:
+
+		mkdir -p $HOME/perl/lib
+		mkdir -p $HOME/perl/man/man1
+		mkdir -p $HOME/perl/man/man3
+		PERL5LIB=$HOME/perl/lib
+		export PERL5LIB
+		
+		wget http://www.cpan.org/modules/by-module/Digest/Digest-1.15.tar.gz
+		gunzip < Digest-1.15.tar.gz | tar xf -
+		cd Digest-1.15
+		perl Makefile.PL LIB=$HOME/perl/lib INSTALLMAN1DIR=$HOME/perl/man/man1 INSTALLMAN3DIR=$HOME/perl/man/man3
+		make
+		make test
+		make install
+		cd ..
+		
+		wget http://www.cpan.org/modules/by-module/Digest/Digest-SHA1-2.11.tar.gz
+		gunzip < Digest-SHA1-2.11.tar.gz | tar xf -
+		cd Digest-SHA1-2.11
+		perl Makefile.PL LIB=$HOME/perl/lib INSTALLMAN1DIR=$HOME/perl/man/man1 INSTALLMAN3DIR=$HOME/perl/man/man3
+		make
+		make test
+		make install
+		cd ..
+		
+		wget http://www.cpan.org/modules/by-module/IO/IO-String-1.08.tar.gz
+		gunzip < IO-String-1.08.tar.gz | tar xf -
+		cd IO-String-1.08
+		perl Makefile.PL LIB=$HOME/perl/lib INSTALLMAN1DIR=$HOME/perl/man/man1 INSTALLMAN3DIR=$HOME/perl/man/man3
+		make
+		make test
+		make install
+		cd ..
+		
+		wget http://www.cpan.org/modules/by-module/DBD/DBD-SQLite2-0.33.tar.gz
+		gunzip < DBD-SQLite2-0.33.tar.gz | tar xf -
+		cd DBD-SQLite2-0.33
+		perl Makefile.PL LIB=$HOME/perl/lib INSTALLMAN1DIR=$HOME/perl/man/man1 INSTALLMAN3DIR=$HOME/perl/man/man3
+		make
+		make test
+		make install
+		cd ..
+		
+		gunzip -c Net-Amazon-MechanicalTurk-0.01.tar.gz | tar xvf -
+		cd Net-Amazon-MechanicalTurk-0.01
+		perl Makefile.PL LIB=$HOME/perl/lib INSTALLMAN1DIR=$HOME/perl/man/man1 INSTALLMAN3DIR=$HOME/perl/man/man3
+		make
+		make test
+		make install
+		cd ..
+
+SAMPLES
+-----------------------------------------------------------------------------
+
+  The samples directory in this distribution has various scripts,
+  showing how to call the MechanicalTurk API, use the bulk loading features
+  and hooking up a database connection to the bulk loading API.
+
+  NOTE: Samples should be run from within their own directories.
+
+
+SUPPORT AND DOCUMENTATION
+-----------------------------------------------------------------------------
+
+  After installing, you can find documentation for this module with the
+  perldoc command.
+
+    perldoc Net::Amazon::MechanicalTurk
+
+  Please see the developer guide for an API reference:
+
+    http://docs.amazonwebservices.com/AWSMechanicalTurkRequester/2007-06-21/
+
+  You should also configure your access keys for authentication.
+  Run the following command to configure your access keys.
+
+    perl -MNet::Amazon::MechanicalTurk::Configurer -e configure
+
+  You can also look for information at:
+
+    http://requester.mturk.com/mturk/welcome
+    http://developer.amazonwebservices.com/connect/forum.jspa?forumID=11
+
+
+
+COPYRIGHT AND LICENCE
+-----------------------------------------------------------------------------
+
+  Copyright (c) 2007 Amazon Technologies, Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+

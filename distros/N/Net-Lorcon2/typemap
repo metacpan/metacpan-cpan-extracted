@@ -1,0 +1,10 @@
+TYPEMAP
+
+NetLorcon *         T_PTRREF
+NetLorconDriver *   T_PTRREF
+NetLorconPacket *   T_PTRREF
+
+const char *        T_PV
+u_char *            T_PV
+unsigned long int   T_U_LONG
+uint8_t             T_U_SHORT

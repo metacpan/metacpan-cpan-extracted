@@ -1,0 +1,23 @@
+#
+#       Valemount Networks Corporation specific radius attributes
+#       networks@valemount.com
+#
+#	$Id: dictionary.valemount 45 2006-11-14 17:45:00Z lem $
+#
+
+VENDOR	  ValemountNetworks	16313
+
+# Rates to give PPPoE customers, can be used in Authentication replies,
+# in bits/s
+ATTRIBUTE VNC-PPPoE-CBQ-RX		1	integer ValemountNetworks
+ATTRIBUTE VNC-PPPoE-CBQ-TX		2	integer ValemountNetworks
+
+# Fallback support for each direction. (1 / 0)
+ATTRIBUTE VNC-PPPoE-CBQ-RX-Fallback	3	integer ValemountNetworks
+ATTRIBUTE VNC-PPPoE-CBQ-TX-Fallback	4	integer ValemountNetworks
+
+ATTRIBUTE VNC-Splash			10	integer ValemountNetworks
+
+VALUE	VNC-Splash	Show		1
+VALUE	VNC-Splash	No-Show		0
+

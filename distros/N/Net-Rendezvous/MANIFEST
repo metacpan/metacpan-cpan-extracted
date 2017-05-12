@@ -1,0 +1,6 @@
+ChangeLog
+MANIFEST			This File
+Makefile.PL			Perl MakeMaker Makefile
+README
+Net/Rendezvous.pm
+Net/Rendezvous/Entry.pm

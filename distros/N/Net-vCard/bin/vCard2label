@@ -1,0 +1,126 @@
+#!/usr/bin/perl
+
+use Net::vCard;
+use PDF::API2;
+
+use strict;
+
+# Scaling factor 72 pts/inch
+our $scale=72;
+
+# Avery 8660 - measurements are in inches
+our %page=(
+
+    size => "LETTER",
+    height => 8.5,
+    width  => 8.5,
+	
+	offsetX => 0,
+	offsetY => -0.25,
+
+	rows => 10,
+	cols => 3,
+
+	marginLeft   => 0.25,
+	marginRight  => 0.25,
+	marginTop    => 0.5,
+	marginBottom => 0.5,
+	colSpace     => 0.25,
+	rowSpace     => 0,
+
+	padX         => 0.25,
+	padY         => 0.1,
+
+);
+
+sub labelWidth {
+	return ( $page{width} - $page{marginLeft} - $page{marginRight} - $page{colSpace} * ($page{cols} - 1) ) / $page{cols} * $scale;
+}
+
+sub labelHeight {
+	return ( $page{height} - $page{marginTop} - $page{marginBottom} - $page{rowSpace} * ($page{rows} - 1) ) / $page{rows} * $scale;
+}
+
+# Compute label's starting X position
+sub labelX {
+	my $col=shift;
+	$col--;
+	return $page{marginLeft} * $scale + ( (labelWidth() + $page{colSpace} * $scale) * $col + $page{offsetX} * $scale); 
+}
+
+# Compute label's starting Y position
+sub labelY {
+	my $row=shift;
+	return $page{marginTop} * $scale + $row * labelHeight() + $page{offsetY} * $scale;
+}
+
+# Draw a label at this position
+sub labelAt {
+
+	my $page=shift;
+	my $pdf =shift;
+	my $font=shift;
+
+	my $row=shift;
+	my $col=shift;
+	return if $row > $page{rows};
+	return if $col > $page{cols};
+
+	my $pad = $page{padding} * $scale;
+
+	my $text=$page->text;
+
+	$text->translate( labelX($col) + $page{padX} * $scale, labelY($row) - $page{padY} * $scale );
+	# NAME 
+	$text->font( $font->{'bold'}, 10);
+	$text->text( shift );
+
+	$text->font( $font->{'plain'}, 10);
+	while ( @_ ) {
+		$text->cr( -12 );
+		$text->text( shift );
+	}
+
+}
+
+
+use PDF::API2;
+
+my $pdf=PDF::API2->new;
+my %font;
+   $font{'plain'} = $pdf->corefont('Helvetica', 1);
+   $font{'bold'}  = $pdf->corefont('Helvetica-Bold', 1);
+
+my $cards=Net::vCard->loadFile(@ARGV);
+
+while (@$cards) {
+
+    my $page=$pdf->page();
+    # $page->mediabox( $page{width} * $scale, $page{height} * $scale );
+    $page->mediabox( $page{size} );
+
+    for my $row (1 .. $page{rows}) {
+
+        last unless @$cards;
+
+        for my $col (1 .. $page{cols}) {
+
+            last unless @$cards;
+            my $card = shift @$cards;
+
+            labelAt($page, $pdf, \%font, $row, $col, 
+                $card->FN,
+                ( split /[\n\r]+/, $card->ADR->address ), 
+                $card->ADR->city . ", " . $card->ADR->region . " " . $card->ADR->country,
+                $card->ADR->postalCode
+            );
+
+        }
+
+    }
+
+}
+
+open PDFOUT, ">export.pdf";
+print PDFOUT $pdf->stringify;
+$pdf->end;

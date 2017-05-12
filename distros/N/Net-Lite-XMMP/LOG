@@ -1,0 +1,87 @@
+Client sends:
+<?xml version='1.0'?>
+<stream:stream
+xmlns:stream="http://etherx.jabber.org/streams"
+to="localhost" xmlns="jabber:client">
+Server answers:
+<?xml version='1.0'?>
+<stream:stream xmlns='jabber:client'
+xmlns:stream='http://etherx.jabber.org/streams'
+id='3694886828' from='localhost'>
+
+
+
+Client send login informations:
+<iq type='set' id='auth'>
+<query xmlns='jabber:iq:auth'>
+<username>mremond</username>
+<password>azerty</password>
+<resource>TelnetClient</resource></query></iq>
+Server confirms login:
+<iq type='result' id='auth'/>
+
+
+<iq type='error' id='auth'>
+<query xmlns='jabber:iq:auth'>
+<username>mremond</username>
+<password>D</password>
+<resource>TelnetClient</resource></query>
+<error code='401' type='auth'>
+<not-authorized
+xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
+</error></iq>
+
+
+Client sends presence data
+<presence/>
+If applications in our client roster are online, our telnet client
+receives presence packets:
+<presence from='mremond5@localhost/tkabber'
+to='mremond@localhost/TelnetClient'>
+<priority>8</priority>
+</presence>
+
+
+
+Client sends a message to another user / application:
+<message to='mremond5@localhost'>
+<subject>Hello</subject>
+<body>I am chatting with a Telnet client !
+</body>
+</message>
+No answer from the server
+
+
+
+    
+10
+Example XMPP telnet session
+Step 5: Receiving a message
+We can receive messages from other clients:
+<message from='mremond5@localhost/tkabber'
+to='mremond@localhost/TelnetClient'
+type='chat'
+xml:lang='fr-FR'>
+<body>Answer from the other side</body>
+<x xmlns='jabber:x:event'>
+<offline/>
+<delivered/>
+<displayed/>
+<composing/>
+</x></message>
+
+
+
+<presence from='mremond5@localhost/tkabber'
+to='mremond@localhost/TelnetClient'
+type='unavailable'/>
+
+
+Client closes XML client stream tag (This end a valid XML
+document):
+</stream:stream>
+Server then closes XML stream tag and disconnect (This end the
+second XML document):
+</stream:stream>
+
+

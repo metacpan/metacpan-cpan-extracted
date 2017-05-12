@@ -1,0 +1,81 @@
+
+=head1 NAME
+
+NetApp::Snapmirror -- OO class for snapmirror relationships
+
+=head1 SYNOPSIS
+
+    use NetApp::Filer;
+    use NetApp::Snapmirror;
+
+    my $filer 	= NetApp::Filer->new( .... );
+
+    my @snapmirrors	= $filer->get_snapmirrors;
+
+    my $volume	= $filer->get_volume( .... );
+
+    my @snapmirrors	= $volume->get_snapmirrors;
+
+=head1 DESCRIPTION
+
+This class encapsulates a single snapmirror relationship, and provides
+methods for querying information about it, as well as methods for
+managing it.
+
+=head1 METHODS
+
+=head2 get_filer
+
+Returns the NetApp::Filer object for the filer on which this
+snapmirror relationship is defined.
+
+=head2 get_source
+
+Returns a NetApp::Snapmirror::Source object representing the source
+filer/volume for this snapmirror relationship.
+
+=head2 get_destination
+
+Returns a NetApp::Snapmirror::Destination object representing the source
+filer/volume for this snapmirror relationship.
+
+=head2 Miscellaneous get_* methods
+
+All of the following get methods return strings which match the values
+found for each of the obvious keywords in the output of "snapmirror status -l":
+
+=over
+
+=item get_status
+
+=item get_progress
+
+=item get_state
+
+=item get_lag
+
+=item get_mirror_timestamp
+
+=item get_base_snapshot
+
+=item get_current_transfer_type
+
+=item get_current_transfer_error
+
+=item get_contents
+
+=item get_last_transfer_type
+
+=item get_last_transfer_size
+
+=item get_last_transfer_duration
+
+=item get_last_transfer_from
+
+=back
+
+NOTE: In a future release, when snapshots are supported as a proper
+object, the return value of get_snapshot will almost certainly return
+such an object.
+
+=cut

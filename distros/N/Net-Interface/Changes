@@ -1,0 +1,218 @@
+Revision history for Perl extension Net::Interface.
+
+1.016  Fri Sep 23 11:11:25 PDT 2016
+	add PREREQUISITE section to Interface.pm documentation
+	add FATAL warning in Makefile.pl for missing /usr/include/sys files
+
+1.015  Wed Sep 21 16:56:55 PDT 2016
+	update copyright date in documentation
+
+1.014  Tue Sep 21 13:24:30 PDT 2016
+	Interface.xs	change MTU mask from 'ffff' to '1ffff'
+	to accomodate mtu = 65536
+	netsymbols.pl	add %unique and cleanslurp() to 'IFFs' processing
+		restructured to run internal code into subroutine
+
+1.013  not released
+see Makefile.PL
+--- Net-Interface-1.012/Makefile.PL Sun Mar 8 13:18:20 2009
++++ Makefile.PL Wed May 12 16:18:04 2010
+@@ -78,6 +78,11 @@
+unless ($oldstuff =~ m|$addflags{$_}|) {
+$oldstuff .= $addflags{$_};
+}
++# fix up issue with memcpy, bug 57413
++ if ($KEY eq 'CCFLAGS') {
++ $oldstuff .= ' ' if $oldstuff && $oldstuff !~ / $/;
++ $oldstuff .= '-D_FORTIFY_SOURCE=0';
++ }
+$cfgstrg .= qq|$KEY="$oldstuff" |
+
+1.012  Mon Mar  8 10:42:51 PST 2010
+	Interface.xs	add test for NULL interface value to skip invalids
+	thanks to Brian West <brian@freeswitch.org> for the fix
+
+	typo update in Developer.pm
+
+1.011  Mon Mar 23 13:55:58 PDT 2009
+	update inst/netsymbols.pl v0.09 to use $Config{perlpath}
+	instead of the default '/usr/bin/perl' when building 
+	lib/Net/Interface/NetSymbols.pm
+	This will make 'pkgsrc' happy
+
+1.010  Mon Mar  9 01:43:59 PDT 2009
+	in ni_linuxproc.c, #ifdef and #define some IFA_xxx 
+	symbols that appear to be missing in some linux/rtnetlink.h 
+	headers in some? linux distros 
+
+1.009  Sat Mar  7 13:28:54 PST 2009
+	As a work-around for broken Solaris headers in some distributions,
+	remove "C" initialization constructors and replace with a Perl call
+	during load to register various "flavors" of ifreq and ifaddr routines
+
+	add cppflags, ldflags, lddlflags to environment for pcap check
+
+1.008  Sun Mar  1 15:22:06 PST 2009
+	Add check for improperly truncated ifaddrs entry in 
+	Interfaces.xs / getheifs
+
+1.007  Sun Mar  1 10:47:44 PST 2009
+	Pause seems to think v1.006 is already there???
+	increment the serial number
+
+1.006  Sun Mar  1 10:11:01 PST 2009
+	update inst/netsymbols.pl to only keep and process
+	AF/PF family symbols needed for this distribution
+
+1.005  Fri Feb 27 13:17:53 PST 2009
+	Remove extradef's in inst/netsymbols.pl for 
+	AF_NS AF_ATM AF_NUTSS since they are not equivalent
+	
+	In Interface.xs, gethifs() initialize ifap to NULL 
+	and check its return value for non-null
+
+1.004  Wed Feb 25 15:46:20 PST 2009
+	Remove Makefile.pl generated "C" files from MANIFEST
+	Rename miniSocket so it is not deleted by make clean
+
+	Add configure test to check for MALLOC in stdlib so 
+	obsolete malloc.h file is not included
+
+	Correct definition of SA_LEN for systems that don't have it
+	Adjust code for changed definition.
+
+1.003  Tue Feb 24 15:16:54 PST 2009
+	replace definitions missing in MAC OSX with def's from local 
+	distro header file for ni_in6_ifreq.c
+
+1.002  Mon Feb 23 13:16:27 PST 2009
+	Updated documentation in Developer.pm
+
+	Add array to note and ignore troublesome unused symbols 
+	in inst/netsymbols.pl v0.06
+
+	For systems that do not support SIOCGIFINDEX, extract
+	interface index from AF_PACKET or AF_LINK record
+
+	Adjust constructor syntax for picky Sunos CC on certain systems
+
+1.001  Sat Feb 21 18:30:07 PST 2009
+	BETA 1 release.
+
+	correct symbol typo in ni_lifreq.c
+
+	add inet_aton for systems that don't have it like old Solaris
+
+	fixed bad cast for "flags" in multiple files, changed
+	from an 'int' to a 'short'
+
+	add SIOCGENADDR support for Solaris
+
+	removed KAME bits from 6adrs in Interface.xs af_common
+
+	in Interfaces.pm, change &AF_INET to AF_INET to accomodate 
+	broken Perl 5.8.4
+
+	in Interfaces.xs, check for LOOPBACK interface and bypass MAC
+	address processing if found
+
+	add file ni_fallbackhwaddr.c with lots of ways to get the MAC
+	address when it is not presented in a _DL or _LL record.
+	eliminate get_hwaddr in af_inetX.c and ni_linuxproc.c
+
+	corrected addr42txt call that requests array rather than scalar
+	return value from ->address(fam,index
+
+	added methods for update of flags, mtu, metric as well as 
+	refreshing the particular interface object 
+
+	updated inst/netsymbols.pl to accomodate value that exceed what
+	fits in an I32
+
+	make char, u_char casting adjustments for picky Solaris 'cc' compiler
+
+	added get_ifreqs and get_ifaddrs for Solaris, activated lifreq
+	developer interface.
+
+	Expanded "flags" to an NV (u_int64_t) to accomodate extended flags
+	on Solaris.
+
+	Add method to get "index" of the interface
+
+	Consolidate AF_family support into ni_af_common.c and change 
+	general SIOCxxxxx use to be ifreq family specific
+
+1.000 Sat Jan 31 14:43:16 PST 2009
+	updated documentation with more info about using symbols
+
+	added filter to always use numeric values of symbols
+	when doing $if->address($fam,$idx) type operations.
+
+	updated faceinfo.t to use (test) above syntax
+
+	updated version string to support 3 digits post decimal point
+
+0.90  Mon Jan 26 01:16:53 PST 2009
+	completed initial API and implementation of most read
+	in Interface.pm
+
+      Fri Jan 23 17:32:15 PST 2009
+	first working version of the re-written module including 
+	ipV6 support in Interface.xs
+
+0.15
+	development no release
+
+0.14  Mon Jan  5 16:26:27 PST 2009
+	development no release
+0.13
+	update config.h with autoconf
+
+0.12 not released
+	rework if.t again
+
+0.11  Mon Oct  6 16:23:36 PDT 2008
+	incorporate code into the build process to determine 
+	underlying OS's memory PAGE_SIZE
+
+	add checkfor SA_LEN
+
+	include various socket address checks from perl's Socket.xs
+
+	updated t/if.t to remove reference to interface 'lo and lo0'
+	and dependence on POSIX::EPERM
+
+0.10  Sat Sep 27 10:52:26 PDT 2008
+	ifreq patch in 0.09 revised to support additional platforms
+        patchs submitted by Jens Rehsack REHSACK@cpan.org
+        Thank you Jens
+
+0.09  Tue Aug 26 16:10:24 PDT 2008
+	In MAC os 10.5.4 it was noticed that  
+	*struct ifreq* is no longer a fixed width structure 
+
+	Thanks to "Keith Peters" keith@blekko.com for finding
+	this and submitting a patch to fix it up.
+
+0.08  September 11, 2006
+	update mac_bin2hex to use specific length in unpack
+	instead of H*
+
+0.07  Wed Mar 15 19:08:36 PST 2006
+	correct documentation error on interface names	michael@bizsysystems.com
+
+0.06  Mon Mar 13 17:05:33 PST 2006
+	- added 'constants' tags
+	- fixed array return for hardware address
+	- added more documentation to .pm file		michael@bizsystems.com
+
+0.05  Thu Mar  9 15:10:13 PST 2006	 unreleased 	michael@bizsystems.com
+	- fixed typos in EXPORT_OK array
+	- added documentation to .pm file
+
+0.04.1 Thu Mar 16 19:45:28 2000
+	- hacked in a fix for MAC address		jerrad@networkengines.com
+
+0.01  Sat Nov 29 10:32:23 1997
+	- original version; created by h2xs 1.18
+

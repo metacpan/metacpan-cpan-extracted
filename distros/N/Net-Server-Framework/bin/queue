@@ -1,0 +1,159 @@
+#!/usr/bin/perl -Ilib -w
+
+###----------------------------------------###
+###          queue server class            ###
+###----------------------------------------###
+#
+# the data format
+#
+# { ID => md5Hash, data => serialized hash, ts => timestamp }
+# commands: get, put, del, archive,
+
+use base qw/Net::Server::Framework/;
+use strict;
+use warnings;
+
+our ($VERSION) = '1.1';
+
+### run the server
+__PACKAGE__->run;
+exit;
+
+###----------------------------------------------------------------###
+
+### set up some server parameters
+sub configure_hook {
+    my $self = shift;
+
+    $self->{server_root}         = "/tmp";
+    $self->{server}->{conf_file} = 'etc/queue.conf';
+    $self->{dbh}                 = $self->_db_init();
+    return;
+}
+
+### process the request
+use Data::Dumper;
+use Time::HiRes qw(gettimeofday tv_interval);
+use Switch;
+
+# pre_loop_hook
+sub pre_loop_hook {
+    my $self = shift;
+    $self->{start} = time();
+    $self->{db}->{vacuum} = 0;
+
+    #print STDERR Dumper($self);
+    $self->register();
+    return;
+}
+
+sub pre_accept_hook {
+    my $self = shift;
+
+    # vacuum sqlite every day
+    if ( ( $self->{db}->{vacuum} - 86400 ) gt 0 ) {
+        $self->_db_vacuum();
+        $self->{db}->{vacuum} = time;
+    }
+}
+
+sub pre_server_close_hook {
+    my $self = shift;
+    $self->register('down');
+}
+
+sub process_request {
+    my $self = shift;
+    my $stack;
+    while (<STDIN>) {
+        $stack .= $_;
+    }
+    my $response = $self->ask( $self->decode($stack) );
+    print $self->encode($response);
+    return;
+}
+
+### do the dirty work
+sub ask {
+    my $self = shift;
+    my $hash = shift;
+    #print STDERR "################## QUEUE  #################\n";
+    #print STDERR Dumper($hash);
+    #print STDERR "################## /QUEUE #################\n";
+
+    switch ( $hash->{command} ) {
+        case /get/i     { return $self->_get($hash); }
+        case /virgin/i  { return $self->_virgin($hash); }
+        case /put/i     { return $self->_put($hash); }
+        case /mod/i     { return $self->_mod($hash); }
+        case /del/i     { return $self->_del($hash); }
+        case /archive/i { return $self->_archive($hash); }
+        default { return ( { error     => 1, message => 'Command not implemented' }); }
+    }
+
+    return;
+}
+
+sub _get {
+    my ( $self, $h ) = @_;
+    if ( defined $h->{ID} ) {
+        return Net::Server::Framework::DB::get(
+            { key => 'ID', term => $h->{ID}, dbh => $self->{dbh} } );
+    }
+}
+
+sub _virgin {
+    my ( $self, $h ) = @_;
+    if ( defined $h->{ID} ) {
+        return Net::Server::Framework::DB::get(
+            { key => 'virgin', term => $h->{ID}, dbh => $self->{dbh} } );
+    }
+}
+
+sub _put {
+    my ( $self, $h ) = @_;
+    my $id = Net::Server::Framework::Crypt::hash( $h->{user} . $h->{command} . time );
+    $h->{ID} = $id . q{@} . $self->{server}->{node_name}
+      unless defined $h->{ID};
+    my $data = {
+        ID     => $h->{ID},
+        status => 'virgin',
+        hash   => $self->encode($h),
+        ts     => time(),
+    };
+    Net::Server::Framework::DB::put( { table => 'spool', data => $data, dbh => $self->{dbh}, replace_into => 'true'} );
+    return $data->{ID};
+}
+
+sub _mod {
+    my ( $self, $h ) = @_;
+    my $data = {
+        ID     => $h->{ID},
+        status => $h->{status},
+        hash   => $self->encode($h),
+    };
+    Net::Server::Framework::DB::put( { table => 'spool', data => $data, dbh => $self->{dbh}, replace_into => 'true' } );
+    return $data->{ID};
+}
+
+sub _del {
+    my ( $self, $h ) = @_;
+    if ( defined $h->{ID} ) {
+        return Net::Server::Framework::DB::do(
+            { key => 'del', term => $h->{ID}, dbh => $self->{dbh} } );
+    }
+}
+
+sub _archive {
+    # TODO : write the record in a logfile and delete it from the DB
+}
+
+sub _db_vacuum {
+    my ( $self, $h ) = @_;
+    return Net::Server::Framework::DB::do( { key => 'vacuum', dbh => $self->{dbh} } );
+}
+
+sub _db_init {
+    my $self = shift;
+    return Net::Server::Framework::DB::dbconnect('spool');
+}

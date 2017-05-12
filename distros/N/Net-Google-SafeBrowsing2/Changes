@@ -1,0 +1,83 @@
+Revision history for Perl extension Net::Google::SafeBrowsing2.
+
+0.1  Wed Jul 21 2011 16:35:48 2010
+	- original version
+
+0.2 Fri Nov 05 2011 14:45:48 2010
+        - add support for MAC
+
+0.5 Mon Mar 07 2012 16:55:00 2011
+	- add MySQl back-end storage
+	- introduce base class Net::Google::SafeBrowsing2::DBI
+	- update documentation
+
+Tue Apr 05 2012 14:40:00 2011
+	- fix Net::Google::SafeBrowsing2::DBI to work with all database types
+
+0.6 Mon Jul 25 2012 13:21:00 2011
+	- Handle local database reset
+
+0.7 Mon Jul 25 2012 15:18:00 2011
+	- Add local_lookup to perform a lookup against the local database only for debugging purpose.
+	- Fix duplicate insert of add chunks and sub chunks.
+
+0.8 Tue Aug 02 2012 13:05:00 2011
+	- Fix chunk retrieval with MySQL backend (VARCHAR to VARBINARY)
+	- Reduce the number of full hashes requested 
+
+0.9 Tue Aug 09 2012 15:26:00 2011
+	- Fix bug with local whitelisting (sub chunks).
+	- Fix the parsing of full hashes.
+
+1.0 Wed Aug 10 2012 15:11:00
+	- Storage: add keep_all argument to keep expired full hashes in the database
+	- Separate the error output from debug output
+	- A lot of testing
+
+1.01 Wed Aug 26 2012 13:49:00
+	- Use String::HexConvert for faster hex_to_ascii
+
+1.02 Thu Nov 10 2012 10:00:00
+	- Fix uninitialized $self->{errors} variable
+
+1.03 Thu Nov 21 2012 17:24:00
+	- no code change
+	- source code available on github at https://github.com/juliensobrier/Net-Google-SafeBrowsing2
+	- minor documentation updates
+
+1.04 Wed Dec 07 2012 10:26:00
+	- add Net::Google::SafeBrowsing2::Lookup (http://code.google.com/apis/safebrowsing/lookup_guide.html)
+
+Wed Dec 07 2012 10:49:00
+	- Net::Google::SafeBrowsing2::Sqlite, index s_chunks_unique was created at the wrong place
+
+Tue Dec 12 2012 15:41:00
+	- Net::Google::SafeBrowsing2::Lookup 0.2: documentation update
+
+1.05 Thu Jan 12 2013  14:26:00
+	- No code change. Move C<local_lookup> to PRIVATE FUNCTIONS to avoid confusions.
+
+1.05 Mon May 07 2013 10:22:00
+	- Added Postgres storage from njohnston
+
+1.06 Sun Jun 03 2013 21:40:00
+	- Update DBI and MySQL back-end to keep empty sub chunks. Fix index for s_chunks table
+	- MySQL: truncate prefixes longer than 8 bytes
+	- Add a warning about the number of updates required with an empty database
+	- Storage: reset function is required
+
+1.07 Fri Jun 08 2013 18:38:00
+	- Import/Export feature for add chunks and sub chunks. Can be used to move from one back-end storage to another.
+
+1.08 Mon Apr 08 2013 07:48:00
+	- Fix Po documentation (contribution)
+
+1.09 Wed Jun 05 2013 20:29:00
+	- Use HTTPS to access safebrowsing.clients.google.com/.
+
+1.10 Tue Dec 31 2013 22:15:00
+	- Force IPv4 to solve bug on CentOS.
+
+1.11 Fri Jul 11 2014 21:41:00
+	- Add dependency on IO::Socket::SSL
+	- Remove dependency on Net::IPAddress

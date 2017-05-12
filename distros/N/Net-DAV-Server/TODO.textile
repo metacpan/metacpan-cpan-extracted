@@ -1,0 +1,39 @@
+h2. Functionality to be implemented by Net::DAV::Server
+
+h3. RFC 4918 Class 2 locking compliance
+
+* Enforce locking at the userland level, independent of any expensive, operating system-specific mechanisms like @flock()@
+** When evaluating an operation on a resource, determine the lock status based on absolute resource location and type
+* Identify a suitable, compact database storage mechanism to store the following information on any given lock:
+** Opaque lock token/UUID
+** Resolved local filesystem path (preferably as provided by @realpath()@)
+** Requestor (author)
+** Lock depth for collections (n, infinite)
+** Lock expiration
+
+h4. The @If:@ header
+
+* Ensure any locking-related operations are conditionally acted upon as long as the @If:@ header lists the opaque lock token for a given resource, as well as the root of any given inifinitely-locked directory, where applicable.
+
+h4. Supported clients
+
+# libneon
+#* cadaver
+#* gnome-vfs
+#* KDE WebDAV kioslave
+# Microsoft Web Folders
+#* Microsoft Office
+#* Microsoft Front Page
+# Adobe Dreamweaver
+# Bit Kinex
+
+h3. Other goals
+
+* Apache mod_perl integration
+* Attribute storage support (plugin)
+* Lock support (plugin)
+* Authentication support (plugin)
+* Avoid buffering entire files in memory
+* Full litmus test complience
+* Quota/"disk free" support (both Mac 512byte and standards-compliant)
+* Revisit owner/creater validation, this had to be opened up for cpdavd.

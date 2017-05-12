@@ -1,0 +1,47 @@
+---
+abstract: 'DynamoDB Client'
+author:
+  - 'Kazuhiro Shibuya <stevenlabs at gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Amazon-DynamoDB-Lite
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::Amazon::DynamoDB::Lite:
+    file: lib/Net/Amazon/DynamoDB/Lite.pm
+    version: '0.05'
+requires:
+  Furl: '3.07'
+  HTTP::Message: '6.06'
+  JSON: '2.90'
+  MIME::Base64: '3.15'
+  Moo: '2.000001'
+  Pod::Markdown: '2.002'
+  Scalar::Util: '1.42'
+  WebService::Amazon::Signature: '0.002'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/ka2u/Net-Amazon-DynamoDB-Lite/issues
+  homepage: https://github.com/ka2u/Net-Amazon-DynamoDB-Lite
+  repository: git://github.com/ka2u/Net-Amazon-DynamoDB-Lite.git
+version: '0.05'
+x_contributors:
+  - 'Eric Johnson <eric.git@iijo.org>'
+  - 'Kazuhiro Shibuya <shibuya@fout.jp>'

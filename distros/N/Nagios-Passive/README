@@ -1,0 +1,47 @@
+Nagios::Passive v0.2.2
+======================
+
+  Nagios::Passive can be used to submit passive check results
+  in various ways to nagios.
+
+INSTALLATION
+============
+
+  To install this module type the following:
+
+    perl Build.PL
+    perl Build install
+
+DEPENDENCIES
+============
+
+  * File::Temp
+  * Moose
+  * version
+  * Nagios::Plugin
+
+SYNOPSIS
+========
+
+  my $nw = Nagios::Passive->create(
+    checkresults_dir => $checkresultsdir,
+    service_description => $service_description,
+    check_name => $check_name,
+    host_name  => $hostname,
+    return_code => 0, # 1 2 3 
+    output => 'looks (good|bad|horrible) | performancedata'
+  );
+  $nw->submit;
+
+AUTHOR
+======
+
+Danijel Tašov <data@cpan.org>
+
+LICENSE
+=======
+
+Copyright (C) 2009 by Danijel Tašov
+
+This is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

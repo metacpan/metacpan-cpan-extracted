@@ -1,0 +1,33 @@
+Revision history for Net-HTTPS-Any
+
+0.12    Wed Aug  3 12:01:08 PDT 2016
+        - Get rid of the LWP codepath, now just a simple wrapper for
+          Business::OnlinePayment
+        - fix test failures (closes: CPAN#116405)
+
+0.11    Sat Jul 26 17:30:43 PDT 2014
+        - doc: update example in synopsis
+        - Depend on Net::SSLeay and test on it (and not Crypt::SSLeay), to
+          eliminate spurious test failures and increase installability.  Alas,
+          but the last four years have not provided OR relationships in CPAN
+          dependencies (closes: CPAN#73363)
+        - doc: spelling (closes: CPAN#88510)
+        - test: fix 404 test
+
+0.10    Sat May  1 13:39:39 PDT 2010
+        - Pull in changes from Business::OnlinePayment::HTTPS 0.09 from
+          Business::OnlinePayment 3.00
+        - Default Content-Type to application/x-www-form-urlencoded
+        - Added WHY THIS MODULE section to POD
+        - Updated tests for new world of not returning HTTP as part of the
+          response code
+        - Removed meaningless Content-Type handling from https_get
+        - Added/documented debugging option
+        - Updated servers used for testing in examples and tests
+        - Supress uninitialized value warnings from Net::SSLeay
+
+0.09    unrelesed
+        - First version numbered 0.09 (based on
+          Business::OnlinePayment::HTTPS 0.08 from
+          Business::OnlinePayment 3.00_08)
+

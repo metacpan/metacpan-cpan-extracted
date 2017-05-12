@@ -1,0 +1,20 @@
+---
+abstract: 'Communicate with local Dropbox daemon'
+author:
+  - 'sungo <sungo@sungo.us>'
+generated_by: 'Dist::Zilla::Plugin::MetaYAML version 1.091440'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Dropbox
+requires:
+  Encode: 0
+  File::HomeDir: 0
+  Moose: 0
+  MooseX::StrictConstructor: 0
+  Test::More: 0
+resources:
+  bugtracker: http://github.com/sungo/net-dropbox/issues
+  repository: git://github.com/sungo/net-dropbox.git
+version: 1.091510

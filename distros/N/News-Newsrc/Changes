@@ -1,0 +1,53 @@
+Revision history for Perl extension News::Newsrc
+
+1.11  2013 Apr 15
+        - unit test fix
+
+1.10  2013 Apr 04
+	- no use integer
+
+1.09  2007 Dec 09
+        - added create => 1 option to new()
+	- dropped dependencies on specific versions of Perl and Set::IntSpan
+	- cleaned up some warnings
+
+1.08  2001 Mar 16
+	- added PREREQ_PM key to Makefile.PL
+	- added $file parameter to new()
+
+1.07  1998 Dec 21
+	- added imort_rc and export_rc
+	- added VERSION_FROM, DISTNAME, ABSTRACT, AUTHOR, and dist 
+          keys to Makefile.PL
+
+1.06  Mon Jan 5 1998
+	- runs clean under Windows NT
+
+1.05  Mon Sept 22 1997
+	- run clean under 5.004_03
+
+1.04  Thu July 3 1997
+	- runs clean under 5.004
+	- documentation fixes
+
+1.03  Mon March 31 12:00:00 1997
+	- preserve newsgroup order
+	- added move_group()
+	- added %options to methods
+	- added num_groups()
+	- added get_articles() and set_articles()
+
+1.02  Mon Aug 26 12:00:00 1996
+	- ignore blank lines in newsrc files
+	- use MakeMaker
+	- runs clean under -w
+	- move test code to t/*.t
+	- documentation fixes
+
+1.01  Thu Feb 22 20:08:26 1996
+	- made Newsrc an Exporter
+	- documentation fixes
+
+0.01  Mon Jan 29 12:45:05 1996
+	- original version
+

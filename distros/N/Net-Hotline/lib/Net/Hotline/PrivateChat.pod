@@ -1,0 +1,65 @@
+=head1 NAME
+
+Net::Hotline::PrivateChat - Private chat object used internally by Net::Hotline::Client
+
+=head1 SYNOPSIS
+
+    use Net::Hotline::PrivateChat;
+
+    $pchat = new Net::Hotline::PrivateChat;
+
+    $pchat->subject("Issue 1: Monkey beards");
+    $pchat->reference(0x313337);
+    ...
+
+=head1 DESCRIPTION
+
+Net::Hotline::PrivateChat is a simple class for storing and retrieving private
+chat information,  You should never have to create your own
+Net::Hotline::PrivateChat objects when using Net::Hotline::Client.  Getting
+and (to a lesser extent) setting attributes is all that should be necessary.
+
+=head1 CONSTRUCTION
+
+=over 4
+
+=item new REF, USERLIST, SUBJECT
+
+Creates a new Net::Hotline::PrivateChat object with the reference REF,
+userlist USERLIST, and subject SUBJECT, where REF is a number, USERLIST is a
+reference to a hash of Net::Hotline::User objects keyed by socket number, and
+SUBJECT is a string.  Any missing arguments will be set to undef.
+
+=back
+
+=head1 METHODS
+
+All the Net::Hotline::PrivateChat methods are simple attribute get/set
+routines. If given an argument, they set an attribute.  In all cases, they
+return the current value of the attribute.
+
+=over 4
+
+=item reference NUM
+
+The private chat reference number.
+
+=item subject TEXT
+
+The subject of the private chat.
+
+=item userlist HASHREF
+
+The list of users in the private chat.
+
+=back
+
+=head1 AUTHOR
+
+John C. Siracusa (siracusa@mindspring.com)
+
+=head1 COPYRIGHT
+
+Copyright(c) 1999 by John Siracusa.  All rights reserved.  This program is
+free software; you can redistribute it and/or modify it under the same terms
+as Perl itself.

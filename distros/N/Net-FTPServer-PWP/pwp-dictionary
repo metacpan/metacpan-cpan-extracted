@@ -1,0 +1,61 @@
+#---------------------------------------------------------------------------
+#
+# Sample dictionary entries
+#
+#---------------------------------------------------------------------------
+#
+# This file is written in a format which is similar to the old Livingston
+# RADIUS dictionary file. You must add the vendor specific attributes
+# below to your RADIUS server, in order to authenticate users of the
+# Net::FTPServer::PWP FTP server.
+#
+# luismunoz@cpan.org / mpicone@cantv.net
+#
+
+# $Id
+
+#
+# These attributes are required to encode the basic request and
+# response. They should not be needed in your real RADIUS dictionary,
+# as they probably are already there.
+#
+ATTRIBUTE	User-Name		1	string
+ATTRIBUTE	User-Password		2	string
+
+##
+## VENDOR SPECIFIC ATTRIBUTES
+##
+
+# Custom Net::FTPServer::PWP vendor specific attributes. These must
+# be added to your real RADIUS dictionary. Note that we chosen 582
+# as the vendor id for this implementation. If your local config
+# clashes with this, you can use 'pwp radius vendor id' in the FTP
+# config file to use a different id. Don't forget to change this in
+# your dictionary too.
+
+# This one allows the RADIUS server to tell the FTP server what the
+# user's home directory is.
+
+VENDORATTR	582	homedir		1	string
+
+# This allows the FTP server to send the realm, with an ASCII NUL at the
+# end. This will make life easier for some RADIUS servers.
+
+VENDORATTR	582	realm		2	string
+
+# This allows the client to specify where the home dir hierarchy is 
+# mounted. You're most likely not going to need this.
+
+VENDORATTR	582	homeroot	3	string
+
+# This allows the client to specify the depth of the home dir hierarchy.
+# Most likely, you won't need this.
+
+VENDORATTR	582	hashdeep	4 	string
+
+# This allows the specification of the quota for the user, in megabytes
+# (as in 10E6).
+
+VENDORATTR	582	quota		5	integer
+
+

@@ -1,0 +1,29 @@
+Net::IMP
+IMP = Inspection and Modification Interface
+
+This library provides a way to add inspection and modifications plugins
+into existing data interceptors, e.g. proxies, intrusion detection
+systems...
+
+Contrary to ICAP (Internet Content Adaption Protocol, used mainly to add
+content filtering to HTTP or mail) it is streaming aware, e.g. no need
+to collect all data before inspection.
+
+It is also performant because it has the ability to skip uninteresting
+content or to pass a defined window of content before inspection, thus
+keeping latencies small.
+
+And it is callback driven, so no need to create a thread or process for
+each connection. Thus it fits nicely to AnyEvent, POE...
+
+Right now there are two sample users of the interface (see bin/ folder).
+Also the interface will be integrated into the genugate high security
+firewall (http://www.genua.de/produkte/genugate/index.en.html).
+
+
+This module is copyright by Steffen Ullrich.
+
+The module was developed while working on project Padiofire
+(http://padiofire.org) at genua mbh (http://www.genua.de).
+The padiofire project was partly funded by BMBF (German Federal Ministry
+of Education an Research).

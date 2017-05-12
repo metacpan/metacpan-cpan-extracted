@@ -1,0 +1,40 @@
+New::SMS::Web
+=============
+
+Description
+-----------
+
+Net::SMS::Web - a generic module for sending SMS messages using web2sms
+gateways. Two subclasses are included:
+    - Net::SMS::Mtnsms (http://www.mtnsms.com/)
+    - Net::SMS::Genie (http://www.genie.co.uk/)
+
+Prerequisites
+-------------
+
+This module requires the following perl modules:
+
+    Carp,
+    LWP::UserAgent (1.73+),
+    CGI::Enurl     (1.06+),
+    URI            (1.09+),
+    Term::ReadKey  (2.14+),
+
+It has been tested with perl v5.6.0.
+
+Installation
+------------
+
+The usual ...
+
+> perl Makefile.PL
+> make
+[ > make test ]
+> make install
+
+Copyright
+---------
+
+Copyright (c) 2001 Ave Wrigley. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms as Perl
+itself.

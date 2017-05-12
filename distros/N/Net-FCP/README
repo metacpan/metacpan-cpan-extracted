@@ -1,0 +1,269 @@
+NAME
+    Net::FCP - http://freenet.sf.net client protocol
+
+SYNOPSIS
+     use Net::FCP;
+
+     my $fcp = new Net::FCP;
+
+     my $ni = $fcp->txn_node_info->result;
+     my $ni = $fcp->node_info;
+
+DESCRIPTION
+    This module implements the first version of the freenet client protocol,
+    for use with freenet versions 0.5. For freenet protocol version 2.0
+    support (as used by freenet 0.7), see the AnyEvent::FCP module.
+
+    See <http://freenet.sourceforge.net/index.php?page=fcp> for a
+    description of what the messages do.
+
+    The module uses AnyEvent to find a suitable Event module.
+
+  IMPORT TAGS
+    Nothing much can be "imported" from this module right now.
+
+  FREENET BASICS
+    Ok, this section will not explain any freenet basics to you, just some
+    problems I found that you might want to avoid:
+
+    freenet URIs are _NOT_ URIs
+        Whenever a "uri" is required by the protocol, freenet expects a kind
+        of URI prefixed with the "freenet:" scheme, e.g. "freenet:CHK...".
+        However, these are not URIs, as freeent fails to parse them
+        correctly, that is, you must unescape an escaped characters ("%2c"
+        => ",") yourself. Maybe in the future this library will do it for
+        you, so watch out for this incompatible change.
+
+    Numbers are in HEX
+        Virtually every number in the FCP protocol is in hex. Be sure to use
+        "hex()" on all such numbers, as the module (currently) does nothing
+        to convert these for you.
+
+  THE Net::FCP CLASS
+    $fcp = new Net::FCP [host => $host][, port => $port][, progress => \&cb]
+        Create a new virtual FCP connection to the given host and port
+        (default 127.0.0.1:8481, or the environment variables "FREDHOST" and
+        "FREDPORT").
+
+        Connections are virtual because no persistent physical connection is
+        established.
+
+        You can install a progress callback that is being called with the
+        Net::FCP object, a txn object, the type of the transaction and the
+        attributes. Use it like this:
+
+           sub progress_cb {
+              my ($self, $txn, $type, $attr) = @_;
+
+              warn "progress<$txn,$type," . (join ":", %$attr) . ">\n";
+           }
+
+    $txn = $fcp->txn (type => attr => val,...)
+        The low-level interface to transactions. Don't use it unless you
+        have "special needs". Instead, use predefiend transactions like
+        this:
+
+        The blocking case, no (visible) transactions involved:
+
+           my $nodehello = $fcp->client_hello;
+
+        A transaction used in a blocking fashion:
+
+           my $txn = $fcp->txn_client_hello;
+           ...
+           my $nodehello = $txn->result;
+
+        Or shorter:
+
+           my $nodehello = $fcp->txn_client_hello->result;
+
+        Setting callbacks:
+
+           $fcp->txn_client_hello->cb(
+              sub { my $nodehello => $_[0]->result }
+           );
+
+    $txn = $fcp->txn_client_hello
+    $nodehello = $fcp->client_hello
+        Executes a ClientHello request and returns it's results.
+
+           {
+             max_file_size => "5f5e100",
+             node => "Fred,0.6,1.46,7050"
+             protocol => "1.2",
+           }
+
+    $txn = $fcp->txn_client_info
+    $nodeinfo = $fcp->client_info
+        Executes a ClientInfo request and returns it's results.
+
+           {
+             active_jobs => "1f",
+             allocated_memory => "bde0000",
+             architecture => "i386",
+             available_threads => 17,
+             datastore_free => "5ce03400",
+             datastore_max => "2540be400",
+             datastore_used => "1f72bb000",
+             estimated_load => 52,
+             free_memory => "5cc0148",
+             is_transient => "false",
+             java_name => "Java HotSpot(_T_M) Server VM",
+             java_vendor => "http://www.blackdown.org/",
+             java_version => "Blackdown-1.4.1-01",
+             least_recent_timestamp => "f41538b878",
+             max_file_size => "5f5e100",
+             most_recent_timestamp => "f77e2cc520"
+             node_address => "1.2.3.4",
+             node_port => 369,
+             operating_system => "Linux",
+             operating_system_version => "2.4.20",
+             routing_time => "a5",
+           }
+
+    $txn = $fcp->txn_generate_chk ($metadata, $data[, $cipher])
+    $uri = $fcp->generate_chk ($metadata, $data[, $cipher])
+        Calculates a CHK, given the metadata and data. $cipher is either
+        "Rijndael" or "Twofish", with the latter being the default.
+
+    $txn = $fcp->txn_generate_svk_pair
+    ($public, $private, $crypto) = @{ $fcp->generate_svk_pair }
+        Creates a new SVK pair. Returns an arrayref with the public key, the
+        private key and a crypto key, which is just additional entropy.
+
+           [
+             "acLx4dux9fvvABH15Gk6~d3I-yw",
+             "cPoDkDMXDGSMM32plaPZDhJDxSs",
+             "BH7LXCov0w51-y9i~BoB3g",
+           ]
+
+        A private key (for inserting) can be constructed like this:
+
+           SSK@<private_key>,<crypto_key>/<name>
+
+        It can be used to insert data. The corresponding public key looks
+        like this:
+
+           SSK@<public_key>PAgM,<crypto_key>/<name>
+
+        Watch out for the "PAgM"-part!
+
+    $txn = $fcp->txn_invert_private_key ($private)
+    $public = $fcp->invert_private_key ($private)
+        Inverts a private key (returns the public key). $private can be
+        either an insert URI (must start with "freenet:SSK@") or a raw
+        private key (i.e. the private value you get back from
+        "generate_svk_pair").
+
+        Returns the public key.
+
+    $txn = $fcp->txn_get_size ($uri)
+    $length = $fcp->get_size ($uri)
+        Finds and returns the size (rounded up to the nearest power of two)
+        of the given document.
+
+    $txn = $fcp->txn_client_get ($uri [, $htl = 15 [, $removelocal = 0]])
+    ($metadata, $data) = @{ $fcp->client_get ($uri, $htl, $removelocal)
+        Fetches a (small, as it should fit into memory) key content block
+        from freenet. $meta is a "Net::FCP::Metadata" object or "undef").
+
+        The $uri should begin with "freenet:", but the scheme is currently
+        added, if missing.
+
+          my ($meta, $data) = @{
+             $fcp->client_get (
+                "freenet:CHK@hdXaxkwZ9rA8-SidT0AN-bniQlgPAwI,XdCDmBuGsd-ulqbLnZ8v~w"
+             )
+          };
+
+    $txn = $fcp->txn_client_put ($uri, $metadata, $data, $htl, $removelocal)
+    my $uri = $fcp->client_put ($uri, $metadata, $data, $htl, $removelocal);
+        Insert a new key. If the client is inserting a CHK, the URI may be
+        abbreviated as just CHK@. In this case, the node will calculate the
+        CHK. If the key is a private SSK key, the node will calculcate the
+        public key and the resulting public URI.
+
+        $meta can be a hash reference (same format as returned by
+        "Net::FCP::parse_metadata") or a string.
+
+        The result is an arrayref with the keys "uri", "public_key" and
+        "private_key".
+
+  THE Net::FCP::Txn CLASS
+    All requests (or transactions) are executed in a asynchronous way. For
+    each request, a "Net::FCP::Txn" object is created (worse: a tcp
+    connection is created, too).
+
+    For each request there is actually a different subclass (and it's
+    possible to subclass these, although of course not documented).
+
+    The most interesting method is "result".
+
+    new arg => val,...
+        Creates a new "Net::FCP::Txn" object. Not normally used.
+
+    $txn = $txn->cb ($coderef)
+        Sets a callback to be called when the request is finished. The
+        coderef will be called with the txn as it's sole argument, so it has
+        to call "result" itself.
+
+        Returns the txn object, useful for chaining.
+
+        Example:
+
+           $fcp->txn_client_get ("freenet:CHK....")
+              ->userdata ("ehrm")
+              ->cb(sub {
+                 my $data = shift->result;
+              });
+
+    $txn = $txn->userdata ([$userdata])
+        Set user-specific data. This is useful in progress callbacks. The
+        data can be accessed using "$txn->{userdata}".
+
+        Returns the txn object, useful for chaining.
+
+    $txn->cancel (%attr)
+        Cancels the operation with a "cancel" exception and the given
+        attributes (consider at least giving the attribute "reason").
+
+        UNTESTED.
+
+    $result = $txn->result
+        Waits until a result is available and then returns it.
+
+        This waiting is (depending on your event model) not very efficient,
+        as it is done outside the "mainloop". The biggest problem, however,
+        is that it's blocking one thread of execution. Try to use the
+        callback mechanism, if possible, and call result from within the
+        callback (or after is has been run), as then no waiting is
+        necessary.
+
+  The Net::FCP::Exception CLASS
+    Any unexpected (non-standard) responses that make it impossible to
+    return the advertised result will result in an exception being thrown
+    when the "result" method is called.
+
+    These exceptions are represented by objects of this class.
+
+    $exc = new Net::FCP::Exception $type, \%attr
+        Create a new exception object of the given type (a string like
+        "route_not_found"), and a hashref containing additional attributes
+        (usually the attributes of the message causing the exception).
+
+    $exc->type([$type])
+        With no arguments, returns the exception type. Otherwise a boolean
+        indicating wether the exception is of the given type is returned.
+
+    $exc->attr([$attr])
+        With no arguments, returns the attributes. Otherwise the named
+        attribute value is returned.
+
+SEE ALSO
+    <http://freenet.sf.net>.
+
+BUGS
+AUTHOR
+     Marc Lehmann <schmorp@schmorp.de>
+     http://home.schmorp.de/
+

@@ -1,0 +1,22 @@
+0.006 2017-01-20
+  - allow closure types (thanks to plicease for all of these)
+
+0.005 2017-01-16
+  - allow Symbol attribute (thanks to plicease for all of these)
+  - require 5.16 because of attribute.pm bug
+  - strcmp not fmax for tests for better ubiquity
+
+0.004 2016-06-08
+  - add Changes
+  - add minimal test
+
+0.003 2016-05-23
+  - credit plicease
+  - remove debug from example
+  - avoid uninit warning
+
+0.002 2016-05-22
+  - credit Zoffix
+
+0.001 2016-05-22
+  - initial version

@@ -1,0 +1,40 @@
+Net::Jabber v2.0
+
+The Jabber Instant Messaging project is an Open Source project seeking
+to provide a complete cross protocol messaging solution.  The problem
+with current IM solutions is that they are all proprietary and cannot
+talk to each other.  Jabber seeks to get rid of those barriers by
+allowing a Jabber client to talk with an AOL user, or an IRC chat room,
+or any number of other programs.
+
+For more information about the Jabber project visit http://www.jabber.org.
+
+Net::Jabber is a collection of Perl modules that provide a Perl Developer
+access to the Jabber protocol.  Using OOP modules we provide a clean
+interface to writing anything from a full client to a simple protocol
+tester.
+
+Ryan Eatmon
+reatmon@jabber.org
+
+
+
+
+REQUIREMENTS
+  - Net::XMPP   - Provides all of the core logic.
+
+INSTALLATION
+
+  perl Makefile.PL
+  make
+  make install
+
+STATUS
+
+    Initial support for XMPP 1.0 (SASL, TLS, etc...).  This release may not be
+stable.  If you run into problems, downgrade to 1.29.
+
+    
+Please send any bug reports to reatmon@jabber.org.
+2004/08/22
+

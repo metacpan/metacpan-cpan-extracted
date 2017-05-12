@@ -1,0 +1,4 @@
+name = "Net-Azure-Authorization-SAS"
+badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

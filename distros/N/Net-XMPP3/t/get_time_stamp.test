@@ -1,0 +1,166 @@
+# OK I give up!
+# This test is disabled because it won't run on windows due to a bug in
+# XML::Stream
+# It should fail on Net::XMPP3 1.0.1 and earlier
+# and is the primary reason for bothering to release 1.0.2
+
+use Test::More tests=>25;
+#use Data::Dump qw(pp);
+
+use XML::Stream qw(Tree);
+
+BEGIN{ use_ok( "Net::XMPP3" ); }
+
+my $debug_level = 100;
+
+my $debug = new Net::XMPP3::Debug(setdefault=>1,
+                                 level=>$debug_level,
+                                 file=>"stdout",
+                                 header=>"test",
+                                );
+
+require "t/mytestlib.pl";
+
+my $message_node = new XML::Stream::Node("message");
+ok( defined($message_node), "new()");
+isa_ok( $message_node, "XML::Stream::Node" );
+
+$message_node->put_attrib(to=>"jer\@jabber.org",
+                          from=>"reatmon\@jabber.org",
+                          type=>'groupchat',
+                          'xml:lang'=>'en');
+my $body_node = $message_node->add_child("body");
+$body_node->add_cdata("body");
+
+my $html_node = $message_node->add_child("html");
+$html_node->put_attrib(xmlns=>"http://jabber.org/protocol/xhtml-im");
+
+my $html_node_body = $html_node->add_child("body");
+$html_node_body->put_attrib(
+	'xmlns'	=> "http://www.w3.org/1999/xhtml",
+);
+my $html_node_span = $html_node_body->add_child("span");
+
+$html_node_span->put_attrib(
+	'style'	=> "font-weight: normal; font-size: 10pt; color: #ff0000; font-style: normal; font-family: arial black",
+);
+$html_node_span->add_cdata("body");
+
+my $x0038_node = $message_node->add_child("x");
+$x0038_node->put_attrib(xmlns=>"jisp:x:jep-0038",
+                    );
+my $name_38_node = $x0038_node->add_child("name");
+$name_38_node->add_cdata("shinyicons");
+
+is( $message_node->GetXML(), "<message from='".'reatmon@jabber.org'."' to='".'jer@jabber.org'."' type='groupchat' xml:lang='en'><body>body</body><html xmlns='http://jabber.org/protocol/xhtml-im'><body xmlns='http://www.w3.org/1999/xhtml'><span style='font-weight: normal; font-size: 10pt; color: #ff0000; font-style: normal; font-family: arial black'>body</span></body></html><x xmlns='jisp:x:jep-0038'><name>shinyicons</name></x></message>", "GetXML()" );
+
+#diag "Message Node ". pp($message_node);
+
+my $message = new Net::XMPP3::Message($message_node);
+ok( defined($message), "new()" );
+isa_ok( $message, "Net::XMPP3::Message" );
+
+is( $message->GetTo(), "jer\@jabber.org", "GetTo");
+is( $message->GetFrom(), "reatmon\@jabber.org", "GetFrom");
+is( $message->GetBody(), "body", "GetBody");
+
+my @xdelays = $message->GetChild("jabber:x:delay");
+is( @xdelays, 0, "no delays");
+
+my $timestamp = $message->GetTimeStamp();
+
+ok($timestamp, "GetTimeStamp");
+
+#diag "Message ". pp($message);
+
+my $message_node2 = new XML::Stream::Node("message");
+ok( defined($message_node2), "new()");
+isa_ok( $message_node2, "XML::Stream::Node" );
+
+$message_node2->put_attrib(to=>"jer\@jabber.org",
+                          from=>"reatmon\@jabber.org",
+                          type=>'groupchat',
+                          'xml:lang'=>'en');
+my $body_node2 = $message_node2->add_child("body");
+$body_node2->add_cdata("body");
+
+my $html_node2 = $message_node2->add_child("html");
+$html_node2->put_attrib(xmlns=>"http://jabber.org/protocol/xhtml-im");
+
+my $html_node2_body = $html_node2->add_child("body");
+$html_node2_body->put_attrib(
+	'xmlns'	=> "http://www.w3.org/1999/xhtml",
+);
+my $html_node2_span = $html_node2_body->add_child("span");
+
+$html_node2_span->put_attrib(
+	'style'	=> "font-weight: normal; font-size: 10pt; color: #ff0000; font-style: normal; font-family: arial black",
+);
+$html_node2_span->add_cdata("body");
+
+my $x0038_node2 = $message_node2->add_child("x");
+$x0038_node2->put_attrib(xmlns=>"jisp:x:jep-0038",
+                    );
+my $name_38_node2 = $x0038_node2->add_child("name");
+$name_38_node2->add_cdata("shinyicons");
+
+#diag "Message Node2 ". $message_node2->GetXML;
+
+my $client = Net::XMPP3::Client->new(
+  		'debuglevel'	=> $debug_level,
+		'debugfile'		=> 'stderr',
+);
+
+my $stream = new XML::Stream(style=>"node",
+	'debug'		=>"stdout",
+	'debuglevel'=>$debug_level,
+);
+
+$stream->SetCallBacks(node=>\&noder);
+
+$stream->OpenFile("t/node1.xml");
+
+# What if there was a custom namespace
+$client->AddNamespace(
+			ns    => "tcli:request",
+            tag   => "tcli",
+            xpath => {
+            	'Version'	=> { 'path' => 'version/text()' },
+             	'Yaml'		=> { 'path' => 'yaml/text()' },
+             	'Request'	=> { 'type' => 'master'},
+	       }
+);
+
+$stream->OpenFile("t/node1.xml");
+
+# What if there was a custom namespace that's in the node
+$client->AddNamespace(
+			ns    => "jisp:x:jep-0038",
+            tag   => "x",
+            xpath => {
+            	'Name'		=> { 'path' => 'name/text()' },
+	       }
+);
+
+$stream->OpenFile("t/node1.xml");
+
+#$stream->OpenFile('./t/node2.xml');
+
+sub noder {
+	my ($sid,$node) = @_;
+
+#diag "Sid1 ".$sid." ".pp($node);
+
+is_deeply($node,$message_node2, " Nodes the same");
+
+
+my $message = $client->BuildObject("message",$node);
+ok( defined($message), "new()" );
+isa_ok( $message, "Net::XMPP3::Message" );
+
+my $timestamp = $message->GetTimeStamp();
+#diag "Message ". pp($message);
+
+ok($timestamp, "GetTimeStamp");
+
+}

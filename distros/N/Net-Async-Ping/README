@@ -1,0 +1,100 @@
+SYNOPSIS
+
+     use IO::Async::Loop;
+     use Net::Async::Ping;
+    
+     my $p = Net::Async::Ping->new;
+     my $loop = IO::Async::Loop->new;
+    
+     my $future = $p->ping($loop, 'myrealbox.com');
+    
+     $future->on_done(sub {
+        say "good job the host is running!"
+     });
+     $future->on_fail(sub {
+        say "the host is down!!!";
+     });
+    
+     # With a timer
+     my $timer;
+     $timer = IO::Async::Timer::Periodic->new(
+        interval => 1,
+        on_tick  => sub {
+            $timer->adopt_future(
+                $p->ping($loop, 'myrealbox.com')
+                    ->on_done(sub { say "good job the host is running!" })
+                    ->on_fail(sub { say "the host is down!!!" })
+                    ->else_done
+            );
+        },
+     );
+     $timer->start;
+    
+     $l->add( $timer );
+     $l->run;
+
+DESCRIPTION
+
+    This module's goal is to eventually be able to test remote hosts on a
+    network with a number of different socket types and protocols.
+    Currently it only supports TCP and ICMP, but UDP, and Syn are planned.
+    If you need one of those feel free to work up a patch.
+
+    This module was originally forked off of Net::Ping, so it shares some
+    of it's interface, but only where it makes sense.
+
+     my $p = Net::Async::Ping->new(
+       $proto, $def_timeout, $bytes, $device, $tos, $ttl,
+     );
+
+    All arguments to new are optional, but if you want to provide one in
+    the middle you must provide all the ones to the left of it. The default
+    protocol is tcp. The default timeout is 5 seconds. device is what host
+    to bind the socket to, ie what to ping from. bytes, tos and ttl do not
+    currently apply.
+
+    Alternately, you can use a new constructor:
+
+     my $p = Net::Async::Ping->new(
+       tcp => {
+          default_timeout => 10,
+          bind            => '192.168.1.1',
+          port_number     => 80,
+       },
+     );
+
+    All of the above arguments are optional. Bind is the same as device
+    from before.
+
+    See Net::Async::Ping::TCP and Net::Async::Ping::ICMP for module
+    specific options.
+
+     my $future = $p->ping($loop, $host, $timeout);
+
+    Returns a Future representing the ping. loop should be an
+    IO::Async::Loop, host is the host, and timeout is optional and defaults
+    to the default set above.
+
+    It's also possible to omit the $loop, and add the pinger to a loop
+    afterwards:
+
+     my $loop = IO::Async::Loop->new;
+     $p->ping($host);
+     $loop->add( $p );
+
+    The return value of the future depends on the protocol. See
+    Net::Async::Ping::TCP and Net::Async::Ping::ICMP.
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 45:
+
+      Unknown directive: =method
+
+    Around line 73:
+
+      Unknown directive: =method
+

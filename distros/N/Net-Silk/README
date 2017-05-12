@@ -1,0 +1,65 @@
+Net-Silk
+========
+
+Net::Silk is a perl binding to the SiLK library:
+
+  SiLK, the System for Internet-Level Knowledge, is a collection of
+  traffic analysis tools developed by the CERT Network Situational
+  Awareness Team (CERT NetSA) to facilitate security analysis of large
+  networks. The SiLK tool suite supports the efficient collection,
+  storage, and analysis of network flow data, enabling network security
+  analysts to rapidly query large historical traffic data sets. SiLK is
+  ideally suited for analyzing traffic on the backbone or border of a
+  large, distributed enterprise or mid-sized ISP.
+
+SiLK is available for download here:
+
+https://tools.netsa.cert.org/silk/
+
+This release was tested on SiLK version 3.11.0.1.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires the presence of libsilk.
+
+Additionally the following perl modules are required:
+
+  DateTime
+  Math::Int64
+  Math::Int128
+
+NOTE: The files perl_math_int64.c and perl_math_int64.h are from the
+Perl::Int164 project found here:
+
+    http://search.cpan.org/~salva/Math-Int64-0.32/
+
+NOTE: The files perl_math_int128.c and perl_math_int128.h are from the
+Perl::Int128 project found here:
+
+    http://search.cpan.org/~salva/Math-Int128-0.13/
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2011-2016 by Carnegie Mellon University
+
+Use of the Net-Silk library and related source code is subject to the
+terms of the following licenses:
+
+GNU Public License (GPL) Rights pursuant to Version 2, June 1991
+Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
+
+NO WARRANTY
+
+See GPL.txt and LICENSE.txt for more details.

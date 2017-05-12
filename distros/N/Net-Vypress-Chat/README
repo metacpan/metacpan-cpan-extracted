@@ -1,0 +1,27 @@
+Net/Vypress/Chat version 0.71
+=============================
+
+Net::Vypress::Chat provides API for using vypress chat functions 
+like sending messages, setting topics and so on. It is also 
+capable of recognising incoming UDP message type and returning 
+information from it.
+
+Project page is hosted at BerliOS. Thanks!
+http://developer.berlios.de/projects/pm-vycchat/
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Artūras Šlajus <x11@h2o.sky.lt>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

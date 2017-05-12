@@ -1,0 +1,23 @@
+---
+name: Net-Google-AuthSub
+version: 0.5
+author:
+  - 'Simon Wistow <simon@thegestalt.org>'
+abstract: interact with sites that implement Google style AuthSub
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  LWP::UserAgent: 0
+  Test::More: 0.62
+  URI: 0
+provides:
+  Net::Google::AuthSub:
+    file: lib/Net/Google/AuthSub.pm
+    version: 0.5
+  Net::Google::AuthSub::Response:
+    file: lib/Net/Google/AuthSub/Response.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

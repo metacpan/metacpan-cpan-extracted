@@ -1,0 +1,64 @@
+Revision history for Perl extension Net::MQTT::Simple.
+
+Incompatible changes are marked with "!!". Incompatibility with and changes in
+"undocumented features" are not always specifically mentioned here.
+
+1.21  Sat Sep 12 1:32 2015
+        - New: options --count, --message-only, --one in command line utility
+        - Bug fix: enable autoflush in utility, for better pipe compatibility
+
+1.20  Thu Feb 5 13:22 2015
+        - Bug fix: /# also matched any topic that matches + (tests were wrong)
+          (Reported by ral in #mqtt)
+        - Bug fix: Subscription topics weren't UTF8-encoded
+        - Improvement: tests for topics "" and "/"
+        - Code cleanups
+        - New: Support for unsubscribing
+
+1.16  Fri May 30 23:45 2014
+        - Bug fix: Clear buffer on reconnect to avoid garbage.
+        - New: Reconnect on ping timeout.
+
+1.15  Tue May 27 22:35 2014
+        - Bug fix: Client certificates now work.
+        - Improvement: Pattern tests now includes those from mosquitto.
+          (Suggested by karlp in #mqtt)
+
+1.14  Tue May 27 13:09 2014
+    !!  - Bug fix: Unlike topics, message payloads are binary data, not text
+          strings. This module no longer encodes or decodes them as UTF-8.
+          A warning will be emitted if you try to publish data that is not
+          binary compatbile. This change has no impact on 7 bit ASCII data.
+
+1.13  Tue May 27 02:39 2014
+        - New: SSL support
+        - New: --except option for mqtt-simple command line utility
+        - New: --raw option for mqtt-simple command line utility
+        - New: --no-color option for mqtt-simple command line utility
+        - Improvement: mqtt-simple enables color by default, for terminals
+        - Improvement: mqtt-simple filters ASCII control codes
+        - Improvement: filter_as_regex is exposed and documented
+
+1.12  Mon May 26 16:24 2014
+        - Bug fix: Update MANIFEST to include some new files
+          (Reported by foobar in #revspace)
+        - Bug fix: This file (Changes) mentioned the wrong distribution name
+          (Reported by foobar in #revspace)
+        - Improvement: Only try one reconnect per 5 seconds
+
+1.11  Mon May 26 03:37 2014
+        - Bug fix: Calculations for next ping were bad, resulting in ping flood
+        - Bug fix: Avoid some Perl warnings under perl -w
+        - Improvement: Emit warnings on stderr if connection failed
+        - Improvement: Prevent possible infinite recursion
+
+1.10  Mon May 26 02:11 2014
+        - New: Support for MQTT subscriptions, with per-subscription handlers
+        - New: Command line utility "mqtt-simple"
+        - Improvement: Force reconnection after failed write to socket
+
+1.01  Wed Apr 23 15:38 2014
+        - Bug fix: $\ is now ignored (e.g. under perl -l)
+
+1.00  Tue Apr 22 23:59 2014
+        - Initial release

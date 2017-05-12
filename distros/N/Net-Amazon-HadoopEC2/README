@@ -1,0 +1,94 @@
+NAME
+    Net::Amazon::HadoopEC2 - perl interface to work with Hadoop-EC2
+
+SYNOPSYS
+        my $hadoop = Net::Amazon::HadoopEC2->new(
+            {
+                aws_account_id => 'your_aws_account',
+                aws_access_key_id => 'your_key',
+                aws_secret_access_key => 'your_secret',
+            }
+        );
+
+        my $cluster = $hadoop->launch_cluster(
+            {
+                name           => 'hadoop',
+                image_id       => 'ami-b0fe1ad9',
+                slaves         => 2,
+            }
+        );
+
+        my $result = $cluster->execute({command => 'ls'});
+        warn $result->stdout;
+
+        $cluster->terminate_cluster;
+
+DESCRIPTION
+    This module is perl interface to work with Hadoop-EC2.
+
+METHODS
+  new($hashref)
+    Constructor. Arguments are:
+
+    aws_access_key_id (required)
+        Your aws access key.
+
+    aws_secret_access_key (required)
+        Your aws secret key.
+
+    aws_account_id (required)
+        Your aws account id.
+
+  launch_cluster($hashref)
+    launchs hadoop-ec2 cluster. Returns Net::Amazon::HadoopEC2::Cluster
+    instance if launch process succeeded. Arguments are:
+
+    name (required)
+        Name of the cluster.
+
+    image_id (required)
+        The image id (ami) of the cluster.
+
+    key_name (optional)
+        The key name to use when launching cluster. the default is
+        'gsg-keypair'.
+
+    key_file (required)
+        Location of the private key file associated with key_name.
+
+    slaves (optional)
+        The number of slaves. The default is 2.
+
+  find_cluster($hashref)
+    finds running cluster satisfying the conditions given by the arguments.
+    Returns Net::Amazon::HadoopEC2::Cluster instance if found. Arguments
+    are:
+
+    name (required)
+        Name of the cluster.
+
+    key_file (required)
+        Location of the private key file to login to the cluster instances.
+
+AUTHOR
+    Nobuo Danjou <nobuo.danjou@gmail.com>
+
+SEE ALSO
+    Net::Amazon::HadoopEC2
+
+    Net::Amazon::EC2
+
+    Hadoop - <http://hadoop.apache.org/>
+
+    Hadoop Wiki, AmazonEC2 <http://wiki.apache.org/hadoop/AmazonEC2>
+
+REPOSITORY
+      svn co http://svn.coderepos.org/share/lang/perl/Net-Amazon-HadoopEC2/trunk Net-Amazon-HadoopEC2
+
+    The svn repository of this module is hosted at
+    <http://coderepos.org/share/>. Patches and commits are welcome.
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

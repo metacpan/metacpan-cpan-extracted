@@ -1,0 +1,585 @@
+<?xml version="1.0"?>
+<ItemSearchResponse xmlns="http://webservices.amazon.com/AWSECommerceService/2011-08-01">
+  <Items>
+    <TotalResults>277</TotalResults>
+    <TotalPages>28</TotalPages>
+    <MoreSearchResultsUrl>http://www.amazon.com/gp/redirect.html?camp=2025&amp;creative=386001&amp;location=http%3A%2F%2Fwww.amazon.com%2Fgp%2Fsearch%3Fkeywords%3Dcagliostro%26url%3Dsearch-alias%253Dstripbooks&amp;linkCode=xm2&amp;tag=blogdivebombo-20&amp;SubscriptionId=1V5JRJ4JQCSHB3NGG902</MoreSearchResultsUrl>
+    <Item>
+      <ASIN>1905857829</ASIN>
+      <SalesRank>173824</SalesRank>
+      <ItemAttributes>
+        <Author>Philippa Faulks</Author>
+        <Author>Robert L D Cooper</Author>
+        <Binding>Hardcover</Binding>
+        <EAN>9781905857821</EAN>
+        <EANList>
+          <EANListElement>9781905857821</EANListElement>
+        </EANList>
+        <ISBN>1905857829</ISBN>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <Label>Watkins</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>2495</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$24.95</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Watkins</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>368</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2008-10-07</PublicationDate>
+        <Publisher>Watkins</Publisher>
+        <SKU>5946918-n</SKU>
+        <Studio>Watkins</Studio>
+        <Title>The Masonic Magician: The Life and Death of Count Cagliostro and His Egyptian Rite</Title>
+        <TradeInValue>
+          <Amount>274</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$2.74</FormattedPrice>
+        </TradeInValue>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>1380</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$13.80</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>1095</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$10.95</FormattedPrice>
+        </LowestUsedPrice>
+        <LowestCollectiblePrice>
+          <Amount>2500</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$25.00</FormattedPrice>
+        </LowestCollectiblePrice>
+        <TotalNew>24</TotalNew>
+        <TotalUsed>22</TotalUsed>
+        <TotalCollectible>1</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/1905857829%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D1905857829</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>BBX1cv0QIkEHTmiZ%2BTs8QE2%2FQKCIyInNA8RJwKtCvDIfAh0MKzp2bIxwQMinwA34rBtH3maS%2BDBsawVVtTJFDY%2FfBPQf6jnTKepnpig60Yk%3D</OfferListingId>
+            <Price>
+              <Amount>1663</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$16.63</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>832</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$8.32</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>33</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B004UO64ES</ASIN>
+      <ItemAttributes>
+        <Author>Heinrich Conrad</Author>
+        <Binding>Kindle Edition</Binding>
+        <Format>Kindle eBook</Format>
+        <Languages>
+          <Language>
+            <Name>German</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>0</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.00</FormattedPrice>
+        </ListPrice>
+        <NumberOfItems>1</NumberOfItems>
+        <ProductGroup>eBooks</ProductGroup>
+        <ProductTypeName>ABIS_EBOOKS</ProductTypeName>
+        <PublicationDate>2011-03-31</PublicationDate>
+        <ReleaseDate>2011-03-31</ReleaseDate>
+        <Title>Der Graf Cagliostro (German Edition)</Title>
+      </ItemAttributes>
+    </Item>
+    <Item>
+      <ASIN>B0006ARXZE</ASIN>
+      <SalesRank>1041960</SalesRank>
+      <ItemAttributes>
+        <Author>Harry C Schnur</Author>
+        <Binding>Hardcover</Binding>
+        <CatalogNumberList>
+          <CatalogNumberListElement>B0006ARXZE</CatalogNumberListElement>
+        </CatalogNumberList>
+        <Label>Beechhurst Press</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <Manufacturer>Beechhurst Press</Manufacturer>
+        <NumberOfPages>316</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>1949</PublicationDate>
+        <Publisher>Beechhurst Press</Publisher>
+        <SKU>NB-428584</SKU>
+        <Studio>Beechhurst Press</Studio>
+        <Title>Mystic rebels; Apollonius Tyaneus, Jan van Leyden, Sabbatai Zevi, Cagliostro</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestUsedPrice>
+          <Amount>695</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$6.95</FormattedPrice>
+        </LowestUsedPrice>
+        <LowestCollectiblePrice>
+          <Amount>2750</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$27.50</FormattedPrice>
+        </LowestCollectiblePrice>
+        <TotalNew>0</TotalNew>
+        <TotalUsed>14</TotalUsed>
+        <TotalCollectible>1</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+        <MoreOffersUrl>0</MoreOffersUrl>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B0007NLUU4</ASIN>
+      <SalesRank>982742</SalesRank>
+      <ItemAttributes>
+        <Author>Iain McCalman</Author>
+        <Binding>Hardcover</Binding>
+        <Edition>1st</Edition>
+        <Format>Bargain Price</Format>
+        <ListPrice>
+          <Amount>2595</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$25.95</FormattedPrice>
+        </ListPrice>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>288</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2003-06-01</PublicationDate>
+        <SKU>mon0000229382</SKU>
+        <Title>The Last Alchemist: Count Cagliostro, Master of Magic in the Age of Reason</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>1130</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$11.30</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>311</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$3.11</FormattedPrice>
+        </LowestUsedPrice>
+        <LowestCollectiblePrice>
+          <Amount>529</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$5.29</FormattedPrice>
+        </LowestCollectiblePrice>
+        <TotalNew>4</TotalNew>
+        <TotalUsed>8</TotalUsed>
+        <TotalCollectible>1</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+        <MoreOffersUrl>0</MoreOffersUrl>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B004WLCTZ2</ASIN>
+      <ItemAttributes>
+        <Author>Friedrich Oppeln-Bronikowski von</Author>
+        <Binding>Kindle Edition</Binding>
+        <Format>Kindle eBook</Format>
+        <Languages>
+          <Language>
+            <Name>German</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>0</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.00</FormattedPrice>
+        </ListPrice>
+        <NumberOfItems>1</NumberOfItems>
+        <ProductGroup>eBooks</ProductGroup>
+        <ProductTypeName>ABIS_EBOOKS</ProductTypeName>
+        <PublicationDate>2011-04-13</PublicationDate>
+        <ReleaseDate>2011-04-13</ReleaseDate>
+        <Title>Der Schwarzkünstler Cagliostro (German Edition)</Title>
+      </ItemAttributes>
+    </Item>
+    <Item>
+      <ASIN>B0007E456O</ASIN>
+      <SalesRank>2092653</SalesRank>
+      <ItemAttributes>
+        <Author>W. R. H Trowbridge</Author>
+        <Binding>Hardcover</Binding>
+        <CatalogNumberList>
+          <CatalogNumberListElement>B0007E456O</CatalogNumberListElement>
+        </CatalogNumberList>
+        <Label>University Books</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+        </Languages>
+        <Manufacturer>University Books</Manufacturer>
+        <NumberOfPages>312</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>1961</PublicationDate>
+        <Publisher>University Books</Publisher>
+        <SKU>B0007E456O-4-DEN-UI30701508</SKU>
+        <Studio>University Books</Studio>
+        <Title>Cagliostro; Savant or Scoundrel?: The true role of this splendid, tragic figure</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestUsedPrice>
+          <Amount>995</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$9.95</FormattedPrice>
+        </LowestUsedPrice>
+        <LowestCollectiblePrice>
+          <Amount>1188</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$11.88</FormattedPrice>
+        </LowestCollectiblePrice>
+        <TotalNew>0</TotalNew>
+        <TotalUsed>5</TotalUsed>
+        <TotalCollectible>2</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+        <MoreOffersUrl>0</MoreOffersUrl>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>1935558323</ASIN>
+      <SalesRank>134878</SalesRank>
+      <ItemAttributes>
+        <Author>Maurice Leblanc</Author>
+        <Binding>Paperback</Binding>
+        <Creator Role="Adapter">Jean-Marc Lofficier</Creator>
+        <Creator Role="Adapter">Randy Lofficier</Creator>
+        <EAN>9781935558323</EAN>
+        <EANList>
+          <EANListElement>9781935558323</EANListElement>
+        </EANList>
+        <ISBN>1935558323</ISBN>
+        <Label>Hollywood Comics</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>2295</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$22.95</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Hollywood Comics</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>336</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2010-05-31</PublicationDate>
+        <Publisher>Hollywood Comics</Publisher>
+        <SKU>I9781935558323</SKU>
+        <Studio>Hollywood Comics</Studio>
+        <Title>Arsene Lupin vs Countess Cagliostro</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>2086</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$20.86</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>2067</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$20.67</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>12</TotalNew>
+        <TotalUsed>1</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/1935558323%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D1935558323</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>IsHiUHo2f8SyXiQsbHLaIL2FnHTbkxoaimBCzeBPbTggi1RcmSOfzB6AjwG%2B3j9B2miLW%2BTXsa4Yx%2FdQzjmD%2FxmKlpnS8cx06ijZxr8Q%2BHHBPR3ECFmc3g%3D%3D</OfferListingId>
+            <Price>
+              <Amount>2295</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$22.95</FormattedPrice>
+            </Price>
+            <AvailabilityAttributes>
+              <AvailabilityType>futureDate</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>0913866709</ASIN>
+      <SalesRank>1804689</SalesRank>
+      <ItemAttributes>
+        <Author>Bruno Sigon</Author>
+        <Binding>Paperback</Binding>
+        <EAN>9780913866702</EAN>
+        <EANList>
+          <EANListElement>9780913866702</EANListElement>
+        </EANList>
+        <ISBN>0913866709</ISBN>
+        <Label>U.S. Games Systems</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>1800</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$18.00</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>U.S. Games Systems</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>78</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>1993-01</PublicationDate>
+        <Publisher>U.S. Games Systems</Publisher>
+        <SKU>3_0913866709</SKU>
+        <Studio>U.S. Games Systems</Studio>
+        <Title>Cagliostro Tarot Deck</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>10000</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$100.00</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>5820</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$58.20</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>8</TotalNew>
+        <TotalUsed>13</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+        <MoreOffersUrl>0</MoreOffersUrl>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>1593934769</ASIN>
+      <SalesRank>1536395</SalesRank>
+      <ItemAttributes>
+        <Author>Philip Riley</Author>
+        <Binding>Paperback</Binding>
+        <EAN>9781593934767</EAN>
+        <EANList>
+          <EANListElement>9781593934767</EANListElement>
+        </EANList>
+        <ISBN>1593934769</ISBN>
+        <Label>BearManor Media</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>2495</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$24.95</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>BearManor Media</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>160</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2009-11-02</PublicationDate>
+        <Publisher>BearManor Media</Publisher>
+        <SKU>M1593934769</SKU>
+        <Studio>BearManor Media</Studio>
+        <Title>Cagliostro</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>2195</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$21.95</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>2095</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$20.95</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>11</TotalNew>
+        <TotalUsed>2</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/1593934769%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D1593934769</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>tI7PBzWnH2io%2BnzxSNIgmEXHWtTS3RNbeg2nZeiDbrtDmLBufggHmA5OUeB3I1Mke1lupdq0%2BA8CX5BYodoKi6yuSPG%2BxATxHyJHCEGaFse5P3wE%2BXI90A%3D%3D</OfferListingId>
+            <Price>
+              <Amount>2495</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$24.95</FormattedPrice>
+            </Price>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B00085JNPA</ASIN>
+      <SalesRank>2488893</SalesRank>
+      <ItemAttributes>
+        <Author>Harry Stephen Keeler</Author>
+        <Binding>Hardcover</Binding>
+        <CatalogNumberList>
+          <CatalogNumberListElement>B00085JNPA</CatalogNumberListElement>
+        </CatalogNumberList>
+        <Edition>1ST</Edition>
+        <Label>E.P. Dutton &amp; Co</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <Manufacturer>E.P. Dutton &amp; Co</Manufacturer>
+        <NumberOfPages>384</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>1929</PublicationDate>
+        <Publisher>E.P. Dutton &amp; Co</Publisher>
+        <SKU>5142841310</SKU>
+        <Studio>E.P. Dutton &amp; Co</Studio>
+        <Title>The spectacles of Mr. Cagliostro</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestUsedPrice>
+          <Amount>2370</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$23.70</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>0</TotalNew>
+        <TotalUsed>4</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+        <MoreOffersUrl>0</MoreOffersUrl>
+      </Offers>
+    </Item>
+  </Items>
+</ItemSearchResponse>

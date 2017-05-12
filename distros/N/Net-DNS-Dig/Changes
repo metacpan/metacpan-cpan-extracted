@@ -1,0 +1,54 @@
+Revision history for Perl extension Net::DNS::Dig
+
+0.12  Sun Feb 16 20:25:52 PST 2014
+	changed TAB in =head1{TAB}NAME to space to receive
+	METACPAN parsing error. Thanks to NEILB@cpan.org
+	for spotting that error and reporting it.
+
+0.11  Mon Feb  3 15:40:23 PST 2014
+	modify select statements in Dig.pm to try and quell test error below
+
+0.10  Mon Jan 27 21:01:35 PST 2014
+	provide local @_ for test suite *CORE substitutions in
+	query_err.t
+	tcp_rw_timeout.t
+
+0.09  Mon Jan 27 11:59:58 PST 2014
+        modify Makefile.PL to bypass missing 'pod2text'
+
+0.08  Fri Jan 24 17:15:00 PST 2014
+	add Errno to the return object
+
+0.07  Sun Apr  7 14:16:12 PDT 2013
+	add application develpoer debug tools
+      QuesHead  => 0,           # default, print question header
+      QuesBody  => 0,           # default, print question body
+      RespHead  => 0,           # default, print response header
+      RespBody  => 0,           # default, print response body
+
+0.06  Tue Feb 28 18:27:02 PST 2012
+	default Recursion 'RD' bit in wrong place, corrected
+
+0.05  Fri Feb 24 16:46:52 PST 2012
+	fixed flawed test in proc_body.t that only fails on some platforms
+	fix typo in overidable.t
+
+0.04  Sat Nov  5 15:38:09 PDT 2011
+	remove most restrictions on resource record types
+
+0.03  Fri Nov  4 00:03:16 PDT 2011
+	require NetAddr::IP v4.056 to incorporate improved
+	inet_aton from InetBase.pm that compensates for broken
+	gethostbyname in NetBSD and OpenBSD
+
+	update _check4addr with tests for non-address characters in string
+
+	fix broken test that was looking at "real" network data
+	instead of test emulation
+
+0.02  Wed Oct 19 20:45:16 PDT 2011
+	documentation & examples
+	first release
+
+0.01  Wed Sep 21 09:25:17 PDT 2011
+	alpha not released

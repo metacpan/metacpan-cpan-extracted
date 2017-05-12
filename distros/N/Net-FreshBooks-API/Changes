@@ -1,0 +1,118 @@
+Revision history for Perl module Net::FreshBooks::API
+
+{{$NEXT}}
+    - Change the no_index rule in order to get PAUSE to remove OAuthDemo from
+      02packages
+    - Disable all live tests by default
+
+0.23 2011-10-20
+    - Silences warning which emitted a lot of XML outside of verbose mode
+    - Adds docs on how to paginate using an iterator
+
+0.22 2011-09-14
+    - Adds support for client contacts
+
+0.21 2011-04-05
+    - AutoBill details may now be deleted from Recurring Items
+
+0.20 2011-03-30
+    - Adds support for Language and Gateway
+    - Adds AutoBill to Recurring Items
+
+0.19 2011-01-17
+    - Removes warn statement left over from debugging
+    - Adds namespace::autoclean and B::Hooks::EndOfScope to prereqs to get
+      around "Undefined subroutine &namespace;::autoclean::on_scope_end"
+    - Adds "parent" to prereqs to fix another CPANTS error report
+    - Adds account_name to required fields for demo script
+    - Adds no_index to META for OAuthDemo, which should not be appearing in
+      search.cpan results
+    - Adds documentation, specifically for Moose roles
+
+0.18 2010-11-17
+    - API::oauth() method now returns a new object with each call
+    - Added API::account_name_ok() for name validation
+    - Added Net::FreshBooks::API::Error for exception handling
+
+0.17 2010-11-12
+    - Fixed bad test plan
+
+0.16 2010-11-11
+    - Updated documention for Estimate.pm
+    - folder is now marked as read-only for Estimate, Invoice and Client
+
+0.15 2010-11-10
+    - Estimate objects are now supported
+    - Moved some methods into Moose roles
+
+0.14 2010-10-07
+    - Fixed missing package versions which broke distro 0.13
+
+0.13 2010-10-07
+    - Fixed a bug where OAuth URL would not always use correct account_name
+      when being constructed
+    - Added many new API params
+    - Expanded documentation and shifted much off of API.pm and to the
+      subclasses
+
+0.12 2010-09-07
+    - Fixed some documentation errors
+    - Documented OAuth-specific methods
+    - Overriding more of Net::OAuth::Simple in order to get examples working
+
+0.11 2010-09-07
+    - Move distro management to Dist::Zilla
+    - Added OAuth support
+    - Moved a lot of the documentation from API.pm to sub-modules
+
+0.10 2009-11-23
+    - Iterator's next() method now returns cloned objects
+    - Added documentation for Invoice links() and list() functionality
+
+0.09 2009-11-19
+    - Added amount field to recurring items
+    - Added documentation for the lines() method
+
+0.08 2009-11-18
+    - Added explicit documentation for most available methods
+    - Calls to list() no longer perform lookups while iteration takes place.
+      This is no longer necessary after updates to the FreshBooks API in
+      August 2009.  This means that one call to list returns all of the data
+      for the requested page, so multiple API calls are no longer necessary.
+      Multiple API calls will still, of course, be necessary if fetching
+      multiple pages.
+
+0.07 2009-11-05
+    - Added return_uri field to Invoice and Recurring
+    - perltidied source
+
+0.06 2009-08-12
+    - Added XML::Simple and Test::Exception to dependencies
+    - Improved handling of error messages.  In many cases the returned message
+      had been blank
+    - Added test to confirm error messages are being correctly parsed
+    - "verbose" setting is now referred to in the documentation (if only
+      briefly)
+
+0.05 2009-07-16
+    - Added Crypt::SSLeay to dependencies to fix the following error:
+      "501 Protocol scheme 'https' is not supported (Crypt::SSLeay or
+      IO::Socket::SSL not installed)"
+    - Added Path::Class to dependencies
+
+0.04 2009-07-15
+    - Fixed failing test t/007_live_test.t "Can't call method "childNodes" on an
+      undefined value at /tmp/net-freshbooks-api/lib/Net/FreshBooks/API/Base.pm
+      line 174"
+
+0.03 2009-07-13
+    - Fixed file names in MANIFEST
+
+0.02 2009-07-10
+    - Added Net::FreshBooks::API::Recurring
+    - Created a new FreshBooks test account because the original account was
+      failing the ping method
+    - Added tests for recurring items
+    - Added a sample script: examples/create_recurring_item.pl
+    - Added some POD tests
+    - All modules now pass Perl::Critic severity 4

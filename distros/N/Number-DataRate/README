@@ -1,0 +1,36 @@
+NAME
+    Number::DataRate - Convert data rate to bits or bytes per second
+
+SYNOPSIS
+      # Bluetooth 2.0+EDR has a data rate of 3000 kbit/s, but what is that
+      # in bits and bytes per second?
+      use Number::DataRate;
+      my $data_rate = Number::DataRate->new;
+      my $bits_per_second = $data_rate->to_bits_per_second('3000 kbit/s');
+      my $bytes_per_second = $data_rate->to_bytes_per_second('3000 kbit/s');
+
+DESCRIPTION
+    This module convers data rate to bits or bytes per second. For far more
+    than you ever wanted to know about data rates, see Wikipedia:
+
+      http://en.wikipedia.org/wiki/Data_rate_units
+
+    This module accepts a wide range of formats, for example:
+
+      0.045 kbit/s
+      0.045 kbps
+      5.625Byte/s
+      24,576 kbit/s
+      54.0 Mbit/s
+      6.4 Gbit/s
+      1.28Tbit/s
+
+AUTHOR
+    Leon Brocard <acme@astray.com>.
+
+COPYRIGHT
+    Copyright (C) 2008, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

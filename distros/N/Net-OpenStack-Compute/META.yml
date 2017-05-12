@@ -1,0 +1,37 @@
+---
+abstract: 'Bindings for the OpenStack Compute API.'
+author:
+  - 'Naveed Massjouni <naveedm9@gmail.com>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-OpenStack-Compute
+requires:
+  App::Rad: 0
+  App::Rad::Plugin::MoreHelp: 0
+  Carp: 0
+  HTTP::Request: 0
+  JSON: 0
+  LWP: 0
+  Moose: 0
+  Moose::Role: 0
+  Pod::Select: 0
+  Test::Most: 0
+  perl: v5.10.0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://github.com/ironcamel/Net-OpenStack-Compute/issues
+  repository: git://github.com/ironcamel/Net-OpenStack-Compute.git
+version: 1.1200

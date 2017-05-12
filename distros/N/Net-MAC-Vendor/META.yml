@@ -1,0 +1,30 @@
+---
+abstract: 'look up the vendor for a MAC'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-MAC-Vendor
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Temp: '0'
+  Mojo::URL: '0'
+  Mojo::UserAgent: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/briandfoy/net-mac-vendor/issues
+  homepage: https://github.com/briandfoy/net-mac-vendor
+  repository: https://github.com/briandfoy/net-mac-vendor.git
+version: '1.26'

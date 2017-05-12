@@ -1,0 +1,389 @@
+<HTML><HEAD><TITLE>News Clipper User's Manual</TITLE>
+<BODY bgColor=#FFFFFF text=#000000>
+
+<H2>
+<CENTER>News Clipper User's Manual</CENTER></H2>
+<P><A 
+href="#quickstart">Quick Start</A><BR><A 
+href="#intro">Introduction</A><BR><A 
+href="#install">Installation</A><BR><A 
+href="#config">Configuration</A><BR><A 
+href="#running">Running News Clipper</A><BR><A 
+href="#works">How It Works</A><BR><A 
+href="#tags">The News Clipper Tag Language</A><BR>
+</P>
+
+<hr><A name=quickstart>
+
+<H2>Quick Start </H2></A>
+<P>
+<OL>
+<LI>Make sure you have Perl installed on your system. 
+<LI>Install News Clipper as described in the distribution's README file. 
+
+<LI>Make a copy of your favorite web page. (You might want to give it a 
+non-html extension.) 
+<LI>Edit the HTML, and insert the following text somewhere: <PRE>&lt;!--
+newsclipper
+&lt;input name=date&gt;
+--&gt;
+</PRE>
+<LI>Run <TT>NewsClipper.pl -i inputfile -o outputfile</TT>, where 
+<TT>inputfile</TT> is the file you just edited, and <TT>outputfile</TT> 
+is the file you want News Clipper to create. 
+<LI>When News Clipper asks you for permission to download the "date" 
+handler, answer yes. 
+<LI>After News Clipper is done, the output file will have the current 
+date inserted in place of the special tags you entered. 
+<LI>Visit the <A 
+href="http://www.newsclipper.edu/handlers.htm">handler 
+webpage</A> for more handlers and a description of handler options. 
+</LI></OL>
+<P></P>
+<hr><A 
+name=intro>
+<H2>Introduction </H2></A>
+<P>News Clipper is a Perl program that allows people to integrate dynamic 
+information their web page. This information might be something simple, 
+like the date, or complex, like a set of links to recent Usenet postings. 
+News Clipper allows the user to specify, using an HTML-like syntax, the 
+source of data, how that data should be filtered, and how that data should 
+be output. </P>
+<P>By separating acquisition of data, filtering of data, and output of 
+data, web designers are given more freedom to control the presentation of 
+data. For example, you can specify that all headlines from Yahoo Tech News 
+that have to do with Microsoft, Linux, or Y2K should be printed in three 
+column , with the word Linux highlighted. Here's how the HTML might look: <PRE>&lt;!--newsclipper
+&lt;input name=yahootopstories source=tech&gt;
+&lt;filter name=grep words="microsoft,linux,y2k"&gt;
+&lt;filter name=map filter=highlight words="microsoft,linux,y2k"&gt;
+&lt;output name=array numcols=3&gt;
+--&gt;
+</PRE>
+<P></P>
+<P>Originally News Clipper was designed for a single user (me), but some 
+effort has been spent to make it more generally useful. DOS/Windows 
+installation is supported, as is system installation as Perl modules, and 
+global HTML and image caches. Now timezones are supported for people whose 
+time zone doesn't correspond to the server's. </P>
+<hr><A 
+name=install>
+<H2>Installation </H2></A>
+<P>News Clipper is a Perl program. If you are on a Unix-derived operating 
+system, you should have it installed already. If you are on a DOS or 
+Windows system, you are likely to have more difficulties that average 
+users. If you are a Windows user and have never heard of Perl, you might 
+be in for even more difficulty. (i.e. Find someone who can help you.) </P>
+<P>Instructions: 
+<OL>
+<LI>Download the distribution. 
+<LI>Unzip and untar it. 
+<LI>Read the README for detailed installation instructions. 
+<LI>No really, read the README. 
+<LI>For a system-wide installation, do <TT>perl Makefile.PL</TT>, 
+<TT>make</TT>, <TT>make install</TT>. (You may need to use nmake or 
+dmake if you are on a Windows platform.) 
+<LI>Do "perldoc NewsClipper.pl" to see how to run the script, in 
+general. 
+<LI>Run "NewsClipper.pl -i template.txt -o output.html" to see the 
+script download the handlers and create the file output.html from 
+template.txt. 
+<LI>Visit the 
+<a href="http://www.newsclipper.com/handlers.htm">handlers</A> 
+webpage for more tags you can use. </LI></OL>
+<P></P>
+<P>Read the README for more detailed instructions. Also check the <A 
+href="http://www.newsclipper.com/techsup.htm">FAQ</A> 
+if you run into problems. </P>
+<P></P>
+<hr><A 
+name=config>
+<H2>Configuration </H2></A>
+<P>For a complete description of all configuration options, run "perldoc 
+NewsClipper.pl". Here are a few notes regarding the various configuration 
+parameters. More description can be found in the NewsClipper.cfg file 
+itself. </P>
+<P>When News Clipper is run with the -c switch, the specified file is used 
+as a configuration file. Otherwise, News Clipper looks for a configuration 
+file in ~user/.NewsClipper, then SYSCONFIGDIR, which is set in 
+NewsClipper.pl during installation time. </P>
+<P>On Windows systems, the TZ environment variable is set in the 
+configuration file during installation. </P>
+<P>For single user installations, the News Clipper modules will not be in 
+the standard Perl locations. In this case, modulepath in the configuration 
+file is set to point to them. (This means you don't have to change your 
+PERL5LIB environment variable or run perl with the -I flag.) </P>
+<P>Timeouts are used to prevent News Clipper from running too long, and to 
+prevent unresponsive remote servers from slowing things down. Set 
+sockettimeout to the maximum amount of time that you want News Clipper to 
+wait for a response from a server. Set scripttimeout to the maximum time 
+that you want News Clipper to run. (Note that scripttimeout should be 
+about equal to sockettimeout times the number of News Clipper tags in your 
+input files.) </P>
+<P>News Clipper can handle multiple input and output files. Be sure that 
+the number of input files equals the number of output files. </P>
+<P>News Clipper caches remote web pages internally. This means that an ISP 
+with 100 users using the "lycosweather" handler won't hit the Lycos server 
+100 times. Also, authors of handlers specify the times that data is 
+updated on remote servers, and News Clipper will only fetch data if it has 
+been updated since the last time it was fetched. This is useful for things 
+like comics, which only update once a day. </P>
+<P>The "cacheimages" handler caches remote images locally. When given a 
+bit of HTML with &lt;img src="URLx"&gt;, it caches the image pointed to by 
+URLx, and substitutes a local URLy in the place of URLx. cacheimages also 
+deletes old images from the cache after a specified time. These options 
+can be given default values in the configuration file, which lets system 
+maintainers provide a global image cache for all users. </P>
+<P>News Clipper also allows the user to specify the location where 
+handlers should be stored. System maintainers can point this value to a 
+globally accessible directory. Otherwise, it defaults to 
+~user/.NewsClipper/NewsClipper/Handler, where ~user is the user's home 
+directory. </P>
+<hr><A 
+name=running>
+<H2>Running News Clipper </H2></A>
+<P>There are different ways of using the script: 
+<UL>
+<LI>Probably the best way to run the script is from a cron job. To do 
+this, create a .crontab file with something similar to the 
+following:<BR><TT>0 7,10,13,16,19,22 * * * 
+/path/NewsClipper.pl</TT><BR>The first field 
+is the minute, and the second field is the hour(s). You have to specify 
+the complete path to the script. Then you can make the output file your 
+startup page in Netscape. 
+<LI>You could make cgiwrap call your startup page, but this would mean 
+having to wait for the script to execute (2 to 30 seconds, depending on 
+the staleness of the information). 
+<LI>And you could just run the script manually from the command line... 
+</LI></UL>
+<P></P>
+<P>If called as a CGI program, the output file is echoed to standard 
+output with the text "Content-type: text/html" preceding it. This allows 
+it to be called dynamically over the net via cgiwrap. For example:<BR>
+&lt;a 
+href="http://www.host.com/cgi-bin/cgiwrap?user=you&amp;script=NewsClipper.pl"&gt;</A>. 
+</P>
+<P>The first time you run the script each day, it may a half-minute or so 
+to collect the information (depending on network load and amount of data 
+to aquire). But after that, the script is very fast because is will only 
+pull data from the net if it needs to. </P>
+
+<hr><A 
+name=works>
+<H2>How It Works </H2></A>
+<P>NewsClipper.pl processes command line options, the configuration file, 
+and input and output files. Each input file is parsed, and when a comment 
+of the form &lt;!-- newsclipper...--&gt; is found, the comment is parsed 
+for commands to be executed. </P>
+<P>If there is only one command to be executed (an input command), 
+News Clipper determines the default filter and output handlers from the input 
+handler. The resulting (expanded) command list will be composed of an 
+input command, zero or more filter commands, and an output command. </P>
+<P>During input commands, the cache is checked to see if fresh data still 
+exists. If not, the data is grabbed from the net, stored in the cache, and 
+then used by the handler. </P>
+<P>Each command is executed, and the results are fed into the next 
+command. If anything goes wrong, News Clipper inserts a comment in the 
+output file describing the problem. </P>
+<P>If, at any time, a handler can not be found, News Clipper prompts the 
+user to download it. The -n flag can be used to tell News Clipper to check 
+for new versions of handlers, and the -a flag can be used to automatically 
+download them. </P>
+<hr><A 
+name=tags>
+<H2>The News Clipper Tag Language </H2></A>
+<P>With the release of News Clipper 7.0, users have much more flexibility 
+when it comes to choosing how data should be displayed on their web pages. 
+This is achieved by separating data acquisition, modification, and output 
+into distinct steps. </P>
+<P>A newsclipper tag is composed of three types of commands: <TT>&lt;input 
+name=...&gt;</TT>, <TT>&lt;filter name=...&gt;</TT>, and <TT>&lt;output 
+name=...&gt;</TT>;. The first part of the command tells News Clipper how 
+to execute the command. The name attribute tells News Clipper which 
+handler to use for the command. Additional attributes can also be 
+specified for the command, and are passed on to the handler. Each handler 
+has a set of default filter and output handler commands, so if you only 
+specify the input command, the defaults are used. </P>
+<P>First off, terminology: a <STRONG>string</STRONG> is a sequence of 
+characters, possibly containing newlines. Strings can be HTML or regular 
+text, and it doesn't matter to News Clipper. An <STRONG>array</STRONG> is 
+an ordered list of items. The items can be anything, even another array. A 
+<STRONG>hash</STRONG> is an unordered list with named entries. For 
+example, you might have 3 strings, each corresponding to the "author", 
+"URL", and "description". The names in a hash are called the 
+<STRONG>keys</STRONG>. </P>
+<P>One important thing to note is the type of data that is input and 
+output from each command. For example, if you use an input command that 
+generates a list of items, and you then try to filter this list with a 
+filter that expects a single string of data, an error will occur. The 
+input and output types are documented in the comments of the handler.pm 
+file located in your handlers directory, and also at the <A 
+href="http://www.newsclipper.com/handlers.htm">handler 
+webpage</A>. </P>
+<P>There are over 100 handlers that can be used in input commands. Some 
+handlers also perform filtering and output commands if the data that they 
+generate is very specific to the handler. The majority of handlers, 
+however, generate strings, lists, and hashes that can be manipulated using 
+generic filters and output using generic output handlers. </P>
+<P>Below is an example tag: <PRE>&lt;!-- newsclipper
+&lt;input name=slashdot type=articles&gt;
+&lt;filter name=slashdot type=LinksAndText&gt;
+&lt;filter name=limit number=4&gt;
+&lt;filter name=map filter=limit number=200 chars&gt;
+&lt;output name=array numcols=2 prefix="&lt;p&gt;--&amp;gt;" suffix="&lt;/p&gt;"&gt;
+--&gt;
+</PRE>
+<P></P>
+<P>This tag specifies nearly everything, including values that already 
+have defaults. The first command results in an array of hashes containing 
+information about the current Slashdot articles. The next command is a 
+filter, which uses one of the filters in the slashdot handler. The 
+slashdot filter returns an array of strings, which is then sent to the 
+generic "limit" filter to reduce the number of strings to four. </P>
+<P>At this point, we have an array of four (or less) strings containing 
+Slashdot links and text. The next command is a "map" filter, which applies 
+another filter to the contents of a data structure. In this case, the map 
+filter is applying the limit filter to the text in each item of our array. 
+("number=200 chars" tells the limit filter that we want to limit the 
+number of characters, not the number of lines, which is the default 
+behavior for strings.) </P>
+<P>The final step is to print the array of shortened strings, so we send 
+the data to the "array" handler, and tell it to print in two columns using 
+our own special bullets and spacing. </P>
+<P>The output might look something like this: 
+<TABLE width="100%">
+<TBODY>
+<TR>
+  <TD vAlign=top width="50%">
+    <P>-&gt;<A 
+    href="http://www.slashdot.org/articles/99/03/22/134259.shtml">Is Red 
+    Hat the Next Microsoft?</A><BR><A 
+    href="mailto:patdunn@dreamscape.com">Patrick Dunn</A> writes <I>"On 
+    ZDNET's Smart Reseller they have a story about <A 
+    href="http://www.zdnet.com/zdnn/stories/news/0,4586,2229091,00.html">Red 
+    Hat maybe being a mini-Microsoft</A> by it's business 
+    practices."</I> I'd guess that the 2 most common c...</P>
+    <P>-&gt;<A 
+    href="http://www.slashdot.org/articles/99/03/22/1016217.shtml">Mozill 
+    a M3 Release Available Now</A><BR><A 
+    href="mailto:makali@rocketmail.com">Makali</A> writes <I>"Just took 
+    a quick peek at the Sunsite FTP mirror of <A 
+    href="ftp://ftp.mozilla.org/pub/mozilla/releases/m3">ftp://ftp.mozilla.org/pub/mozilla/releases/m3</A> 
+    and <A 
+    href="ftp://sunsite.doc.ic.ac.uk/Mirrors/ftp.mozilla.org/pub/mozilla/releases/M3/">Sunsite.doc.ic.ac.uk</A> 
+    is up and contains tarballs for several platforms. Fetch! "</I> 
+    ...</P></TD>
+  <TD vAlign=top width="50%">
+    <P>-&gt;<A 
+    href="http://www.slashdot.org/articles/99/03/22/0950223.shtml">Wired 
+    on Kipling</A><BR><A href="mailto:dodger@2600.com">The Dodger</A> 
+    writes "The Kipling 'Hacker' luggage debacle gets coverage in <A 
+    href="http://www.wired.com/news/news/culture/story/18616.html">Wired</A>, 
+    along with slightly derogatory references to the Slashdotters' 
+    ability (or rather lack of it) to 'crack ...</P>
+    <P>-&gt;<A 
+    href="http://www.slashdot.org/articles/99/03/22/0934206.shtml">CeBIT 
+    Tidbits</A><BR><A href="mailto:madman3@imfamous.com">MadMan2</A> has 
+    sent us a report from <A href="http://www.messe.de/cb99">CeBIT</A>. 
+    Little bits about bigass Samsung Dimms, Not so upgradable Palm 
+    Pilots, SuSE, AOL-Scape and Applix. Hit the link below to read 
+    MadMan2's machine g...</P></TD></TR></TBODY></TABLE></P>
+<P>If all of this seems too complicated, you can just settle for the 
+default filters and output of the handlers. In the case of Slashdot, you 
+would do this: <PRE>&lt;!-- newsclipper
+&lt;input name=slashdot&gt;
+--&gt;
+</PRE>
+<P></P>
+<P>And the default output would look like this: 
+<TABLE width="100%">
+<TBODY>
+<TR>
+  <TD vAlign=top width="50%">
+    <UL>
+      <LI><A 
+      href="http://www.slashdot.org/articles/99/03/22/134259.shtml">Is 
+      Red Hat the Next Microsoft?</A> 
+      <LI><A 
+      href="http://www.slashdot.org/articles/99/03/22/1016217.shtml">Mozilla 
+      M3 Release Available Now</A> 
+      <LI><A 
+      href="http://www.slashdot.org/articles/99/03/22/0950223.shtml">Wired 
+      on Kipling</A> 
+      <LI><A 
+      href="http://www.slashdot.org/articles/99/03/22/0934206.shtml">CeBIT 
+      Tidbits</A> 
+      <LI><A 
+      href="http://www.slashdot.org/articles/99/03/22/0928207.shtml">The 
+      Anoraks' New Clothes</A> </LI></UL></TD>
+  <TD vAlign=top width="50%">
+    <UL>
+      <LI><A 
+      href="http://www.slashdot.org/articles/99/03/22/0916204.shtml">Bunny 
+      wins the Oscar</A> 
+      <LI><A 
+      href="http://www.slashdot.org/books/99/03/22/0826250.shtml">Review:<CITE>Developing 
+      Linux Applications with GTK+ and GDK</CITE></A> 
+      <LI><A 
+      href="http://www.slashdot.org/articles/99/03/21/1638230.shtml">Star 
+      Wars Retrospective in NY Times</A> 
+      <LI><A 
+      href="http://www.slashdot.org/articles/99/03/21/1459221.shtml">Yet 
+      Another GNOME Article</A> </LI></UL></TD></TR></TBODY></TABLE></P>
+<H3>Built-in Filter Handlers </H3>
+<P>Each of these filters comes pre-installed with News Clipper. They will 
+not be located in your .NewsClipper directory, but in the same location as 
+the other News Clipper modules. (This location depends on your system 
+configuration, and whether or not you did a site-wide installation.) </P>
+<P><STRONG>&lt;filter name=grep words=X invert&gt; </STRONG><BR>grep is 
+named after the Unix command for finding lines in a file that contain a 
+pattern. It takes a string, array, or hash, and returns the data that 
+contain one of a set of words. The "invert" attribute can be used to 
+return the data that does *not* contain the keyword. (Note that in the 
+case of the hash, it isn't the keys, but the values that are searched.) 
+</P>
+<P><STRONG>&lt;filter name=selectkeys keys=X invert&gt; </STRONG><BR>Takes 
+and returns a smaller hash with the given keys. "invert" returns the hash 
+that does not contain the keys. </P>
+<P><STRONG>&lt;filter name=highlight style=X words=Y&gt; 
+</STRONG><BR>Highlight surrounds the specified words with a HTML tags. The 
+style is "strong" by default. </P>
+<P><STRONG>&lt;filter name=limit number=X chars&gt; </STRONG><BR>Accepts a 
+string, array, or hash, and returns the same. This filter trims the number 
+of characters, lines, items, or keys to the number specified. "chars" must 
+be specified if you want to treat strings as sequences of characters 
+instead of lines. </P>
+<P><STRONG>&lt;filter name=hash2array order=X&gt; </STRONG><BR>hash2array 
+takes a hash and a given key ordering, and returns an array whose items 
+are the hash values in the specified order. </P>
+<P><STRONG>&lt;filter name=map depth=X filter=Y [...]&gt; 
+</STRONG><BR>Suppose you have an array of strings, and want to apply the 
+highlight filter to the strings. Unfortunately, highlight doesn't take 
+arrays of strings. That's what this filter is for. "depth" tells map how 
+many levels into your data structure to go before applying the filter 
+given by "filter". Any additional arguments are passed on to the filter. 
+</P>
+<P><STRONG>&lt;filter name=cacheimages maxage=X dir=Y url=Z&gt; 
+</STRONG><BR>Suppose you have an array of HTML image links, and you want 
+to cache them locally, and translate the links to point to the local 
+images. Give cacheimages the "dir" to store the images in, the "url" that 
+corresponds to that dir on the web, and it will download the images and 
+store them for you. "maxage" tells the filter that it can delete images 
+older than a certain number of seconds. </P>
+<H3>Built-in Output Handlers </H3>
+<P><STRONG>&lt;output name=string&gt; </STRONG><BR>Prints a string. </P>
+<P><STRONG>&lt;output name=table header=X border=Y&gt; </STRONG><BR>Takes 
+a two-dimensional array and outputs a table having a border size as given 
+by "border". "header" allows you to specify whether the top and/or left 
+sides of the table should be headers. </P>
+<P><STRONG>&lt;output name=array numcols=W prefix=X suffix=Y 
+separator=Z&gt; </STRONG><BR>Output an array of strings. "numcols" is the 
+number of columns. "prefix", "separator" and "suffix" are strings to print 
+before, between, and after each item. If prefix is "ul" or "ol", a 
+bulletted or numbered list is created. </P>
+<P><STRONG>&lt;output name=thread style=X&gt; </STRONG><BR>Takes a 
+"thread" data type, like you would see in discussion lists. Outputs using 
+numbered or unnumbered lists, depending on whether the style is "ol" or 
+"ul". See the handler's comments for a description of the thread data 
+type. </P>
+</BODY></HTML>

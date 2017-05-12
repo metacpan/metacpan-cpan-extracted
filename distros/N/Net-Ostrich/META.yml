@@ -1,0 +1,24 @@
+---
+abstract: 'Perl interface to Ostrich'
+author:
+  - 'Cory G Watson <gphat@cpan.org>'
+build_requires:
+  Test::More: 0
+  strict: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300001, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Ostrich
+requires:
+  JSON::XS: 0
+  LWP::UserAgent: 0
+  Moose: 0
+resources:
+  homepage: https://github.com/iinteractive/net-ostrich
+  repository: https://github.com/iinteractive/net-ostrich.git
+version: 0.01

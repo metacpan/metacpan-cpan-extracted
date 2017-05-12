@@ -1,0 +1,161 @@
+<h2><a href="#">La clase Singleton</a></h2>
+<h3>Descripción</h3>
+<p> 
+Es el único objeto que tendremos que instanciar en nuestro script Perl. Es un objeto
+de tipo <a href="http://es.wikipedia.org/wiki/Singleton">singleton</a> por lo
+que devuelve el objeto creado, o la dirección de éste si fue creado previamente:
+<pre>
+use Nes;
+my $nes = Nes::Singleton->new('template.nhtml');
+
+</pre>
+</p>
+<p> 
+Como parámetro se le pasa la plantilla <i>nhtml</i> cuando queremos ejecutar el
+script de esta forma:
+<pre>
+http://example.com/script.cgi
+
+</pre>
+</p>
+<p> 
+Pero no es necesario ningún parámetro (si existe es ignorado) si deseamos hacer esto:
+<pre>
+http://example.com/template.nhtml
+
+</pre>
+</p>
+<p> 
+La idea es (y se recomienda) que NES se ejecute siempre de la última forma, desde la plantilla, pero
+para debug nos vendría mejor poder hacer ejecutar el script de la primera forma o 
+en linea de comandos. De ahí que las dos formas sean posibles.
+</p>
+<p> 
+Por otra parte imaginemos que tenemos un script y dos plantillas, una para Inglés
+y otra para Español, ejecutando el script tendríamos que hacer algo como esto:
+<pre>
+http://example.com/script.cgi?lang=en
+
+</pre>
+He implementar en Perl el código correspondiente para presentar una u otra plantilla.
+Pero con Nes todo esto es innecesario y con un script podemos mostrar distintas plantillas
+sin que el script Perl se entere, sin escribir una sola linea de Perl:
+</p>
+<br><br>
+<strong>lucky.pl:</strong>
+<pre>   
+use Nes;
+my $nes = Nes::Singleton->new();
+
+my $nes_tags = {};
+$nes_tags->{'number'} = (int rand 10);
+
+$nes_tags->out(%$nes_tags);
+
+</pre>
+
+<strong>lucky.es.nhtml:</strong>
+<pre>
+    
+&#123;: NES 1.0 ('lucky.pl') :&#125;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Suerte&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    El número de la suerte es: &lt;b&gt;&#123;: $ number :&#125;&lt;/b&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+
+</pre>
+
+<strong>lucky.en.nhtml:</strong>
+<pre>
+    
+&#123;: NES 1.0 ('lucky.pl') :&#125;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Lucky&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    The lucky number is: &lt;b&gt;&#123;: $ number :&#125;&lt;/b&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+<p>
+Podemos incluir el mismo script Perl en distintas plantillas y después hacer:
+<pre>
+http://example.com/lucky.en.nhtml
+http://example.com/lucky.es.nhtml
+...
+</pre>
+</p>
+</pre>
+
+<p>
+También podemos crear index.nhtml con el objeto <i>go_language</i>
+<br>
+<strong>index.nhtml</strong>
+<pre>
+&#123;: NES 1.0 none :&#125;
+&#123;: include ( '&#123;: * cfg_obj_top_dir :&#125;/go_language.nhtml', 
+             'es: http://example.com/lucky.es.nhtml',
+             'en: http://example.com/lucky.en.nhtml',
+             ':   http://example.com/lucky.es.nhtml' &#123;: # por defecto :&#125;
+           )
+:&#125;
+</pre>
+</p>
+<p>
+Esto es posible por dos premisas simples:
+
+<ul id="mi">
+    <li>El script Perl no sabe donde van los datos.</li>
+    <li>Las plantillas no pueden modificar los datos del script.</li>
+</ul>
+<br>
+Ver: <a href="./?action=item&item=Paradigma Nes">Paradigma Nes</a>
+</p>
+<br><br>
+
+<h3>Métodos de Singleton</h3> 
+<p> 
+Intentamos hacer Nes lo más sencillo posible, por lo que Singleton tiene un único
+método, <i>out</i>:
+<pre>
+use Nes;
+my $nes = Nes::Singleton->new('template.nhtml');
+
+my $nes_tags = {};
+$nes_tags->{'var'} = 'Hello!';
+
+$nes->out(%$nes_tags);
+</pre>
+</p>
+
+<p> 
+Como parámetro pasamos <i>una copia</i> de un Arreglo Asociativo (%$hash) con los
+datos que queremos sustituir en la plantilla. Enviando una copia evitamos que la
+plantilla pueda modificar los datos del script.
+<pre>
+...
+my %nes_tags = {};
+$nes_tags->{'var'} = 'Hello!';
+
+# pasamos una copia y no la referencia
+$nes->out(%$nes_tags);
+....
+
+ó:
+
+...
+my %nes_tags;
+$nes_tags{'var'} = 'Hello!';
+
+$nes->out(%nes_tags);
+...
+
+</pre>
+</p>
+
+

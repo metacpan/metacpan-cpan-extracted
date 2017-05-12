@@ -1,0 +1,15 @@
+Revision history for Net-PMP-Profile
+
+0.101   05 May 2015
+ - add itags attribute to base Profile
+ - fix DateTime stringification in to_doc()
+ - fix POD tests
+
+0.100   01 Aug 2014
+ - version bump only, to fix CPAN
+
+0.002   01 Aug 2014
+ - add missing dependencies to Makefile.PL
+
+0.001   06 June 2014
+ - initial release

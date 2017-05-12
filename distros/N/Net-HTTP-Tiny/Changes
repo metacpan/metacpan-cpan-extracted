@@ -1,0 +1,8 @@
+version 0.001; 2012-03-20
+
+  * bugfix: correct parsing of URLs with IPv4 address literals (both as
+    original URL and as redirection target)
+
+version 0.000; 2012-02-20
+
+  * initial released version

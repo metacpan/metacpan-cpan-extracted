@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ticket>
+  <assigned-user-id type="integer" nil="true"/>
+  <attachments-count type="integer">0</attachments-count>
+  <closed type="boolean">false</closed>
+  <created-at type="datetime" nil="true"/>
+  <creator-id type="integer" nil="true"/>
+  <milestone-due-on type="datetime" nil="true"/>
+  <milestone-id type="integer" nil="true"/>
+  <number type="integer" nil="true"/>
+  <permalink nil="true"/>
+  <priority type="integer">0</priority>
+  <project-id type="integer">35918</project-id>
+  <raw-data type="binary" nil="true" encoding="base64"/>
+  <state nil="true"/>
+  <tag nil="true"/>
+  <title nil="true"/>
+  <updated-at type="datetime" nil="true"/>
+  <user-id type="integer" nil="true"/>
+  <url>http://sunnavy.lighthouseapp.com/projects/35918/tickets/</url>
+  <latest-body nil="true"/>
+</ticket>

@@ -1,0 +1,36 @@
+BODY {  background-color: #bbbbbb; }
+
+TD.grouplist_1 { 
+	background-color: lightgrey;
+}
+
+TD.grouplist_0 {
+ 	background-color: white;
+}
+
+TD.overview_1 { 
+	background-color: lightgrey;
+	font-family: monospace;
+}
+
+TD.overview_0 { 
+ 	background-color: white;
+	font-family: monospace;
+}
+
+A {
+	/* color:yellow; */
+}
+
+div.hierlist { 
+	display: table;
+	margin-left: auto;  margin-right: auto;
+	margin-bottom: 10px;
+	text-align: center;
+}
+
+div.hiername {
+ 	float: left; margin-right: 10px; text-align: center;
+}
+
+hr.clear { clear: both; width: 100%; }

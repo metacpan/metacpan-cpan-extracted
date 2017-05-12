@@ -1,0 +1,43 @@
+{
+   "abstract" : "Redis as back-end storage for the Google Safe Browsing v2 database.",
+   "author" : [
+      "Julien Sobrier <jsobrier@localdomain>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Google-SafeBrowsing2-Redis",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::Google::SafeBrowsing2" : "0",
+            "Net::Google::SafeBrowsing2::Storage" : "0.4",
+            "Redis::hiredis" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.7"
+}

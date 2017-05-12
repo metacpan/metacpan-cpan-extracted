@@ -1,0 +1,39 @@
+<h2><a href="#">&#123;: # comment :&#125;</a></h2>
+<h3>Descripción</h3>
+<p> 
+Comentario, se elimina el bloque y no se muestra en la salida HTML.
+</p>
+<h3>Ejemplo</h3>
+<p>
+<strong>template.nhtml:</strong>
+<pre>
+&#123;: NES 1.0 ('file.pl') :&#125;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Nes sample/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &#123;: # esto es un comentario :&#125;
+  &lt;/body&gt;
+&lt;/html&gt;
+
+</pre>
+
+<strong>file.pl:</strong>
+<pre>
+    
+use Nes;
+
+my $nes = Nes::Singleton->new('template.nhtml');
+
+$nes->out();
+
+</pre>
+
+<strong>Salida:</strong>
+<pre>   
+
+</pre>
+
+</p>
+<br>

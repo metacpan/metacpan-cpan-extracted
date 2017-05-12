@@ -1,0 +1,18 @@
+Revision history for Perl extension NetAddr::IP::Count.
+
+1.00  Fri Jan 14 13:51:33 2000
+	- original version; created by h2xs 1.19
+
+1.10  Fri Jan 14 18:10:33 2000
+	- Allow ->add of array references.
+
+1.20  Tue Jan 18 20:39:00 2000
+	- alvaro@cantv.net added the valcount method
+
+2.00  Wed Jul 05 11:28:00 2000
+	- Name changed to NetAddr::IP::Count to match the modulelist
+
+2.01  Mon Oct  8 10:07:00 2000
+	- Minor doc changes.
+	- Tested succesfully with NetAddr::IP v3.00 under various other OSes.
+

@@ -1,0 +1,4 @@
+Net::IMP::Remote
+connect to IMP plugins outside the process.
+While this adds overhead it offers ways to interface with plugins written in
+another language or with plugins on another machine to distribute load.

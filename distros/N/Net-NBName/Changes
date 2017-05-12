@@ -1,0 +1,58 @@
+Revision history for Net::NBName
+================================
+
+*** 0.26 2006-06-25
+
+Updated the Net::NBName::NodeStatus constructor to handle truncated node
+status responses without generating warning messages. Thanks to both
+Stuart Kendrick and Max Baker for reporting this. I've added Max Baker's
+sample response packet to the 'decode.t' tests.
+
+Changed the "nodescan.pl" script to check that a mask has been supplied
+before attempting to create a Net::Netmask object.
+
+*** 0.25 2004-02-08
+
+Added a timeout parameter to the node_status and name_query methods.
+Updated the documentation to describe the new parameter.
+
+Changed the example script "namequery.pl" to accept the - character
+in NetBIOS names.
+
+*** 0.24 2003-01-16
+
+Changed the names of the example scripts "nbtstat.pl" and "nbtscan.pl"
+to "nodestat.pl" and "nodescan.pl".
+
+*** 0.23 2002-12-22
+
+Changed the decoded Net::NBName::NameQuery flags to be 1 or 0,
+rather than just the masked value from the header word.
+
+Because the module is intended for querying NetBIOS hosts, a proper
+set of tests would require a known NetBIOS host. Unfortunately, there
+is no easy way of adding these to archives yet ;-) so I've added the
+'decode.t' tests to check that Net::NBName::NodeStatus and
+Net::NBName::NameQuery decode sample responses correctly.
+
+*** 0.22 2002-12-21
+
+Added the ->addresses accessor to Net::NBName::NameQuery and the
+->address accessor to Net::NBName::NameQuery::RR.
+
+Fixed bug in Net::NBName::NameQuery::RR incorrectly decoding name query
+response resource records by changing unpack "nA4" to unpack "na4".
+
+Included the three example scripts in the documentation for
+installation in the scripts directory.
+
+*** 0.21 2002-12-09
+
+Included a simple test so that 'make test' will work with this module.
+
+*** 0.20 2002-12-02
+
+Public release.
+
+---
+James Macfarlane

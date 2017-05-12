@@ -1,0 +1,83 @@
+Net-DHCP version 0.66
+=====================
+
+0. DOCS/ FILES WARNING
+----------------------
+
+Some files in the docs/ directory are copied from IANA.
+They may not be compatible with the Perl license. I have
+included them in the tar ball as-is for the sake of reference.
+Please remove them if needed for distribution packaging etc.
+
+Currently these files are:
+- docs/bootp-dhcp-parameters.txt
+
+All other files are licensed as described at the bottom of this file.
+
+You can fork and submit enhancements etc via https://github.com/djzort/Net-DHCP
+Sorry, I know github sucks but its popular.
+
+1. DESCRIPTION
+--------------
+
+Net::DHCP is a DHCP set of classes designed to handle basic DHCP
+handling. It can be used to develop either client, server or relays.
+It is composed of 100% pure Perl.
+
+The author invites feedback on Net::DHCP. If there's something you'd
+like to have added, please let me know.  If you find a bug, please
+send me the information described in the BUGS section below.
+
+The original version of this module was written by Francis van Dun,
+and has been deeply reorganized.
+
+2. PREREQUISITES
+----------------
+
+Net::DHCP requires Perl 5.8.0 or higher.
+
+Net::DHCP has been tested with the following:
+
+    Perl 5.8.5
+
+    Windows XP with cygwin
+    Windows XP with ActivePerl
+
+    RedHat Enterprise Linux 5.5 x86_64
+    CentOS Linux 5.5 x86_64
+    Debian Squeeze x86_64 (Perl 5.10.1)
+    Debian Wheezy x86_64 (Perl 5.14.2)
+
+    Plus CPAN testers
+
+3. INSTALLATION
+---------------
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+4. BUGS
+-------
+
+If you find a bug, please report it to the author along with the
+following information:
+
+    * version of Perl (output of 'perl -V' is best)
+    * version of Net::DHCP
+    * operating system type and version
+    * exact text of error message or description of problem
+    * the shortest possible program that exhibits the problem
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 by Francis van Dun.
+Copyright (C) 2005,2006 by Stephan Hadinger.
+Copyright (C) 2010-2015 by Dean Hamstead.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,103 @@
+# $Id: schema.mysql,v 1.1 2002/04/29 10:57:05 rob Exp $
+# This script creates the databases and tables used within mysql for DNS.
+# You should just be able to redirect this into mysql.
+# (e.g.: mysql -uroot -h localhost -p < schema.mysql )
+#
+# Copyright (c) 2002, Rob Brown <bbb@cpan.org>.
+# All rights reserved.
+#
+# Net::DNSServer is free software; you can redistribute
+# it and/or modify it under the same terms as Perl itself.
+#
+
+# Special table with access control
+USE mysql;
+
+# Add "named" user account to MySQL
+INSERT INTO user VALUES ('localhost','named',password('notbind'),'Y','Y','Y','Y','Y','N','N','N','N','N','N','N','N','Y');
+# (You must run "mysqladmin flush-privileges -uroot -p" to make this effective.)
+
+# Create new database "dns"
+CREATE DATABASE dns;
+
+# Switch to it
+USE dns;
+
+# Add "zone" table to "dns" database
+CREATE TABLE zone
+  (id int(10) unsigned NOT NULL auto_increment,
+   domain char(100) NOT NULL,         # %ZONE%        # Root domain name of template
+   address int(10) unsigned,          # %IPADDRESS%   # IP Address in Network binary format
+   destination char(100),             # %DESTINATION% # If destination is not an IP (i.e., CNAME or MX or PTR)
+   template_id int(10) unsigned NOT NULL,             # Template containing DNS entries for this zone
+   authority_id int(10) unsigned NOT NULL,            # Template containing SOA information
+   PRIMARY KEY (id),                                  # Autoincrement ID field for this zone
+   UNIQUE (domain),                                   # One template per zone entry
+   INDEX (address),                                   # Easy to search for zones pointing to an IP
+   INDEX (template_id)                                # Easy to search for zones using a given template
+   );
+
+# Add "template" table to "dns" database
+CREATE TABLE template
+  (id int(10) unsigned NOT NULL auto_increment,
+   opcode char(16),                                   # Magic word describing this template
+   skeleton TEXT,                                     # Contents of the template
+   PRIMARY KEY (id),
+   UNIQUE (opcode)
+   );
+
+# Add "soa" table to "dns" database
+CREATE TABLE soa
+  (id int(10) unsigned NOT NULL auto_increment,
+   email char(100) NOT NULL,                          # DNS Authority Email Contact (i.e., "root@localhost")
+   serial int(10) unsigned,                           # NULL means "now" (server calculates)
+   refresh int(10) unsigned NOT NULL,
+   retry int(10) unsigned NOT NULL,
+   expire int(10) unsigned NOT NULL,
+   minimum int(10) unsigned NOT NULL,
+   nslist char(255) NOT NULL,                         # Space delimited list of authoritative name servers
+   PRIMARY KEY (id)
+   );
+
+
+# Generic 'myself' SOA Header
+INSERT INTO soa (id,email,serial,refresh,retry,expire,minimum,nslist)
+  VALUES (1,"root@%NS%",NULL,10800,1800,604800,86400,"%NS%.");
+# SOA Header for localhost entries
+INSERT INTO soa (id,email,serial,refresh,retry,expire,minimum,nslist)
+  VALUES (2,"root@localhost",1,3600000,100000,7200000,3600000,"localhost.");
+# Hint servers used for the "Root" domain (No room for Server M :-)
+INSERT INTO soa (id,email,serial,refresh,retry,expire,minimum,nslist)
+  VALUES (3,"hostmaster@internic.net",NULL,1800,900,604800,86400,
+          "A.ROOT-SERVERS.NET. B.ROOT-SERVERS.NET. C.ROOT-SERVERS.NET. D.ROOT-SERVERS.NET. E.ROOT-SERVERS.NET. F.ROOT-SERVERS.NET. G.ROOT-SERVERS.NET. H.ROOT-SERVERS.NET. I.ROOT-SERVERS.NET. J.ROOT-SERVERS.NET. K.ROOT-SERVERS.NET. L.ROOT-SERVERS.NET.");
+
+
+# Simple forward lookup (A entry)
+INSERT INTO template (id,opcode,skeleton)
+  VALUES (1,"FORWARD", "     IN A %IPADDRESS%");
+# Simple reverse lookup (PTR entry)
+INSERT INTO template (id,opcode,skeleton)
+  VALUES (2,"REVERSE", "     IN PTR %DESTINATION%.");
+# Empty template for those entries with only authorities
+INSERT INTO template (id,opcode,skeleton)
+  VALUES (3,"BLANK",   "");
+
+### Practical Case
+INSERT INTO template (id,opcode,skeleton)
+  VALUES (4,"WITHEMAIL", '\n     IN A %IPADDRESS%\n     IN MX 10 mail.isp.com.\nwww  IN CNAME %ZONE%.');
+
+
+# localhost.  => 127.0.0.1 (FORWARD template)
+INSERT INTO zone (domain, address, template_id, authority_id)
+  VALUES ("localhost",2130706433,1,2);
+# 127.0.0.1  => localhost. (REVERSE template)
+INSERT INTO zone (domain, destination, template_id, authority_id)
+  VALUES ("1.0.0.127.in-addr.arpa","localhost",2,2);
+# Root (.) zone (BLANK template)
+INSERT INTO zone (domain, template_id, authority_id)
+  VALUES ("",3,3);
+
+### Practical Case (WITHEMAIL template)
+# test.com. => 192.168.1.100 with MX and WWW alias
+INSERT INTO zone (domain, address, template_id, authority_id)
+  VALUES ("test.com",3232235876,4,1);

@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-MirrorDir.t
+lib/Net/MirrorDir.pm
+TestA/TestB/TestC/Dir1/test1.txt
+TestA/TestB/TestC/Dir2/test2.txt
+TestA/TestB/TestC/Dir2/test2.subset
+TestA/TestB/TestC/Dir3/test3.txt
+TestA/TestB/TestC/Dir4/test4.txt
+TestA/TestB/TestC/Dir4/test4.exclusions
+TestA/TestB/TestC/Dir5/test5.txt
+META.yml                                 Module meta-data (added by MakeMaker)
+
+
+

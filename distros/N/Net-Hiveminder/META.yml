@@ -1,0 +1,32 @@
+---
+abstract: 'Perl interface to hiveminder.com'
+author:
+  - 'Shawn M Moore, C<< <sartak at bestpractical.com> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Hiveminder
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  Email::Simple: 0
+  Email::Simple::Creator: 0
+  Term::Encoding: 0
+requires:
+  DateTime: 0
+  Moose: 0
+  Net::Jifty: 0.06
+  Number::RecordLocator: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.08

@@ -1,0 +1,8 @@
+Revision history for perl module Net::RFC::Search
+
+0.02 2013-09-27
+ - Fixed Changes file to conform with CPAN::Changes::Spec
+ - Add t/changes.t test
+
+0.01 2013-09-17
+ - Initial release

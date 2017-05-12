@@ -1,0 +1,39 @@
+---
+abstract: "Implementation of AOL's OSCAR protocol for instant messaging (for interacting with AIM a.k.a. AOL IM a.k.a. AOL Instant Messenger - and ICQ, too!)"
+author:
+  - 'Matthew Sachs <matthewg@zevils.com>'
+build_requires:
+  File::Basename: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-OSCAR
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Digest::MD5: 0
+  Exporter: 0
+  Fcntl: 0
+  List::Util: 0
+  MIME::Base64: 0
+  Net::SOCKS: 0
+  POSIX: 0
+  Scalar::Util: 0
+  Socket: 0
+  Symbol: 0
+  Time::HiRes: 0
+  XML::Parser: 0
+  constant: 0
+  overload: 0
+  perl: 5.006_001
+  vars: 0
+resources:
+  homepage: http://github.com/toddr/net-oscar/tree
+  repository: git://github.com/toddr/net-oscar.git
+version: 1.928

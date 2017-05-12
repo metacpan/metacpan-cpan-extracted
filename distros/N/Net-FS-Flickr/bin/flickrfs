@@ -1,0 +1,104 @@
+#!perl -w
+
+use strict;
+use Net::FS::Flickr;
+
+=head1 NAME
+
+flickrfs - simple program to store and retrieve programs on Flickr
+
+=head1 USAGE
+
+    flickrfs <api key> <secret> [auth token]  [ <store|delete|retrieve|remove> <filename> [as] ]
+
+=over 4
+
+=item api key and secret are your api key from Flickr and the corresponding secret. Get them here http://www.flickr.com/services/api/key.gne
+
+=item auth token is the auth token for this application. If you run this app with just your key and secret then follow the instructions to get your token. Then include it in all subsequent attempts.
+
+=item pass a command - either store, delete, retrieve or remove. If you just pass a username and password then a list of all files will be printed.
+
+=item filename is the path to store or retrieve on Flickr
+
+=item the optional 'as' indicates what to store the file as on Flickr or save it as locally. If passed to delete or remove then it indicates a version of a file to retrieve.
+    
+=back
+
+=cut
+
+
+my $key     = shift; die "You must pass a an api key\n"                            unless defined $key;
+my $secret  = shift; die "You must pass the secret associated with your api key\n" unless defined $secret;
+
+
+my $fs = Net::FS::Flickr->new( key => $key, secret => $secret ) || die "Couldn't log in\n";
+
+my $auth    = shift;
+
+if (!defined $auth) {
+	my $frob = $fs->get_frob;
+	my $url  = $fs->request_auth_url('write', $frob) || die "Couldn't get an auth URL\n";
+    # 3. tell the user what to do with it
+    print "1. Enter the following URL into your browser\n\n",
+          "$url\n\n",
+          "2. Follow the instructions on the web page\n",
+          "3. Hit <Enter> when finished.\n\n";
+
+    # 4. wait for enter.
+    <STDIN>;
+
+    # 5. Get the token from the frob
+    $auth  = $fs->get_token( $frob );
+    die "Failed to get authentication token!" unless defined $auth;
+
+    # 6. Tell the user what they won.
+    print "You authentication token for this application is\n\t\t", $auth, "\n";
+}
+
+$fs->set_auth($auth);
+
+
+
+
+my $store = shift; 
+
+
+if (!defined $store) {
+    print join("\n",$fs->files)."\n";
+    exit;
+}
+
+
+my $file  = shift; die "You must pass a file\n"                      unless defined $file;
+my $as    = shift;
+
+
+if ($store eq 'delete') {
+    $fs->delete($file, $as);
+} elsif ($store eq 'remove') {
+    $fs->remove($file, $as);
+} elsif ($store eq 'store') {
+    $fs->store($file, $as);
+} elsif ($store eq 'retrieve') {
+    $as   = $file unless defined $as;
+    open (FILE, ">$as") || die "Couldn't open $as for writing: $\n";
+    binmode FILE;
+    print FILE $fs->retrieve($file);
+    close FILE;
+} else {
+    die "Unknown command '$store'\n";
+}
+    
+
+=head1 AUTHOR
+
+Simon Wistow <simon@thegestalt.org>
+
+=head1 COPYRIGHT
+
+Copyright 2006, Simon Wistow
+
+Released under the same terms as Perl itself
+
+=cut

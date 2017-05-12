@@ -1,0 +1,31 @@
+---
+abstract: 'Simplify Commerce Perl SDK'
+author:
+  - 'Simplify Commerce <info@simplify.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Simplify
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  CryptX: 0.017
+  JSON: 0
+  MIME::Base64: 3.11
+  Math::Random::Secure: 0.05
+  Mozilla::CA: 0
+  REST::Client: 0
+  Time::HiRes: 0
+  URI::Encode: 0
+  perl: 5.006
+version: v1.5.0

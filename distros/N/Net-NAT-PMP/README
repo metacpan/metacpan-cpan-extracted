@@ -1,0 +1,28 @@
+Net::NAT::PMP
+-------------
+
+Net::NAT::PMP is a client for the NAT Port Mapping Protocol (NAT-PMP),
+which is currently an RFC draft. NAT-PMP is designed so that you can
+have rich network applications that can still work even behind your
+home router's NAT.
+
+For full documentation, run:
+  perldoc lib/Net/NAT/PMP.pm
+
+Installation
+------------
+
+To build, test and install:
+
+ perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+License
+-------
+
+Copyright 2009 David Caldwell <david@porkrind.org>
+
+This perl module is free software; it may be redistributed
+and/or modified under the same terms as Perl itself.

@@ -1,0 +1,33 @@
+Revision history for Net::FileMaker
+0.064   2013-03-01
+        + Further documentation updates and fixes, switching to Dist::Zilla
+
+0.063   2011-02-11
+        + Various bugfixes and documentation modifications
+
+0.062   2010-04-07
+        + Minor Bugfixes
+        + Enhancements to the test suite
+
+0.06    2010-03-15
+        + Localised Error strings in English, Japanese and German
+        + Huge amounts of boilerplate removed
+
+0.05    2010-03-04
+        + Significant changes to the entire structure of the distrobution, and as such the interface has also changed,
+          So please check the documentation.
+        + XML::Simple has been dropped for XML::Twig
+        + Test suite has been restructured.
+        + More documentation.
+
+0.04    2010-02-15
+        Minor test bugfix
+
+0.03    2010-02-14
+        Methods renamed - see the deprecated section in the documentation, in addition basic tests are being put in.
+
+0.02    2010-01-24
+        Documentation and pre-requisites fixups.
+
+0.01    2010-01-22
+        This is the initial release CPANified from the existing codebase. The start of a long journey.

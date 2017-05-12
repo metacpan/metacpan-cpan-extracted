@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.pod
+dist.ini
+lib/Net/GraphSpace.pm
+lib/Net/GraphSpace/AttributesToJSON.pm
+lib/Net/GraphSpace/Edge.pm
+lib/Net/GraphSpace/Graph.pm
+lib/Net/GraphSpace/Node.pm
+lib/Net/GraphSpace/Types.pm
+t/00-load.t

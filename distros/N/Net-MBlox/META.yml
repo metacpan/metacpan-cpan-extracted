@@ -1,0 +1,48 @@
+---
+abstract: 'link to the MBlox api for sending SMS'
+author:
+  - 'Simon Elliott <simon@papercreatures.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Find: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  List::Util: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-MBlox
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Net::MBlox:
+    file: lib/Net/MBlox.pm
+    version: 0.004
+requires:
+  HTTP::Request: 0
+  HTTP::Request::Common: 0
+  JSON::XS: 0
+  LWP::Protocol::https: 0
+  MIME::Base64: 0
+  Moo: 0
+  WWW::Mechanize::GZip: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/purge/net-mblox/issues
+  homepage: https://metacpan.org/release/Net-MBlox
+  repository: git://github.com/purge/net-mblox.git
+version: 0.004

@@ -1,0 +1,21 @@
+---
+abstract: 'A Google Drive API interface'
+author:
+  - 'Brian Medley <freesoftware@bmedley.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300021, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-GoogleDrive
+requires:
+  HTTP::Request::Common: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Mouse: 0
+  URI: 0
+version: 0.02

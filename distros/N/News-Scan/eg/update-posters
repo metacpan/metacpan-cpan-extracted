@@ -1,0 +1,56 @@
+#! /usr/bin/perl -w
+
+use strict;
+
+use News::Scan;
+
+my %Posters;
+
+$0 =~ s!^.*/!!;
+
+## read in posters we know
+if (open OLD, "posters") {
+    while (<OLD>) {
+        chomp;
+        $Posters{$_}++;
+    }
+
+    close OLD;
+}
+
+for (@ARGV) {
+    unless (open SCAN, $_) {
+        warn "$0: failed open $_: $!\n";
+        next;
+    }
+
+    local $/;
+    my $data = <SCAN>;
+
+    my $VAR1;
+    eval $data;
+
+    if ($@) {
+        warn "$0: while evaluating $_: $@\n";
+        close SCAN;
+        next;
+    }
+
+    my $p = $VAR1->posters;
+    unless (ref $p) {
+        warn "$0: no posters in $_!\n";
+        close SCAN;
+        next;
+    }
+
+    for (keys %$p) {
+        $Posters{$_}++;
+    }
+
+    close SCAN;
+}
+
+open OUT, ">posters" or die "$0: failed open >posters: $!\n";
+for (sort keys %Posters) {
+    print OUT "$_\n";
+}

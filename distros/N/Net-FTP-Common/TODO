@@ -1,0 +1,8 @@
+-*- text -*-
+
+* check for call of dir() in array context. it returns a hash not an array.
+* support for logging via closure
+* support for persistent connections
+- not so easy. what if they change the host?
+* support for native Net::FTP methods
+* look at File::Listing module. It parses 'ls' output

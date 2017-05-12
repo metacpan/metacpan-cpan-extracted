@@ -1,0 +1,7 @@
+Revision history for Nagios-Plugin-POP3
+
+1.001     2010-11-06 00:31:11 America/New_York
+    * Updated to use Dist::Zilla
+
+0.01    Aug 3, 2009
+    * First version, released on an unsuspecting world.

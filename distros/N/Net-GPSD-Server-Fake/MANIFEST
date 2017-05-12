@@ -1,0 +1,17 @@
+bin/example-circle.pl
+bin/example-stationary-gpsd.pl
+bin/example-stationary.pl
+bin/example-track.pl
+CHANGES
+doc/gps.tle
+doc/track-circle.png
+lib/Net/GPSD/Server/Fake.pm
+lib/Net/GPSD/Server/Fake/Circle.pm
+lib/Net/GPSD/Server/Fake/Stationary.pm
+lib/Net/GPSD/Server/Fake/Track.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/base.t

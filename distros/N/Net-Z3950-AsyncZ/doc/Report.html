@@ -1,0 +1,681 @@
+<!-- 
+$Date: 2003/05/03 23:46:26 $
+$Id: Report.html,v 1.3 2003/05/03 23:46:26 tower Exp $
+$Revision: 1.3 $
+-->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Net::Z3950::AsyncZ::Report.pm - Perl extension for the Net::AsyncZ module</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#constructor_and_methods">Constructor and Methods</a></li>
+	<ul>
+
+		<li><a href="#constructor">Constructor</a></li>
+		<li><a href="#object_method">Object Method</a></li>
+		<li><a href="#class_methods">Class Methods</a></li>
+	</ul>
+
+	<li><a href="#record_data">Record Data</a></li>
+	<ul>
+
+		<li><a href="#record_format_types">Record Format Types</a></li>
+		<li><a href="#format_methods">Format Methods</a></li>
+		<li><a href="#marc_bibliographic_format">MARC Bibliographic Format</a></li>
+		<ul>
+
+			<li><a href="#the_marc_fields_hashes">The MARC Fields Hashes</a></li>
+			<li><a href="#references_to_marc_hashes">References to MARC Hashes</a></li>
+			<li><a href="#changing_%marc_fields">Changing %MARC_FIELDS</a></li>
+			<li><a href="#the__params_options">The <code>_params</code> Options</a></li>
+			<li><a href="#marc_fields_priority_sequence:">MARC fields priority sequence:</a></li>
+			<li><a href="#marc_examples">MARC Examples</a></li>
+			<li><a href="#some_useful_marc_web_links:">Some Useful MARC web links:</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<style = "text/css">
+code { font-family: sans-serif; }
+</style><p>
+</p>
+<hr />
+<h1><a name="name">NAME</a></h1>
+<p>Net::Z3950::AsyncZ::Report.pm - Perl extension for the Net::AsyncZ module</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+         my $report = Net::Z3950::AsyncZ::Report-&gt;new($rs, $options);
+         $report-&gt;reportResult();
+         $result = $report-&gt;{result};
+          
+         $rs:        Net::Z3950::ResultSet 
+         $options:   Net::Z3950::AsyncZ::Options::_param</pre>
+<pre>
+         $result:     reference to array of record data</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>In the general case, <code>Report.pm</code> retrieves records from the server,
+formats them one line at a time and pushes the formatted
+lines onto an array.  Each record is preceded by a set of headers, which
+mark the separation between records. It's this array which is returned to the callback function
+assigned in <code>AsyncZ::new</code> to the <code>cb</code> parameter. You can also supply your own formatting
+function, using the <code>format</code> parameter, to format the lines yourself.</p>
+<p>If you choose to get the record back as Raw data, no formatting is done.  
+In this case, you can do the formatting in the callback.  You might choose to take this route
+in the case of GRS-1 Records or Record Formats which Net::Z3950::AsyncZ::Report is not equipped
+to handle.</p>
+<p>Report.pm is integrated into the AsyncZ system, but it can be used independently
+as long as you pass it a Net::Z3950::AsyncZ::Options::_param object as the second parameter.
+It will return an array of record data formatted according to your specifications.</p>
+<p>
+</p>
+<hr />
+<h1><a name="constructor_and_methods">Constructor and Methods</a></h1>
+<p>
+</p>
+<h2><a name="constructor">Constructor</a></h2>
+<dl>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3areport%3a%3anew">Net::Z3950::AsyncZ::Report::new</a></strong><br />
+</dt>
+<dd>
+<pre>
+   $rpt = Net::Z3950::AsyncZ::Report-&gt;new( $rs, $options);</pre>
+</dd>
+<dl>
+<dt><strong><a name="item_params%3a">params:</a></strong><br />
+</dt>
+<dd>
+$rs:  Net::Z3950::ResultSet
+</dd>
+<dd>
+<p>$options:   Net::Z3950::AsyncZ::Options::_param:
+</p>
+</dd>
+<dd>
+<pre>
+
+      format =&gt; undef,       # reference to a callback function that formats each row of a record
+      raw =&gt; 0,              # (boolean) if true the raw record data is returned unformatted 
+      start =&gt; 1,            # number of the record with which to start report
+      num_to_fetch =&gt; 5,     # number of records to include in  a report
+      marc_fields =&gt; $std,   # $std = \%MARC_FIELDS_STD
+      marc_xcl =&gt; undef,     # reference to hash of MARC fields to exclude from report
+      marc_userdef =&gt; undef, # reference to user specified hash of MARC fields for report                       
+      marc_subst =&gt; undef    # reference to a hash which subtitutes field names for default names       
+      HTML =&gt;0          # (boolean) if true use default HTML formatting, 
+                        # if false format as plain text
+                        # if true each row will be formatted as follows:
+                        #    &quot;&lt;tr&gt;&lt;td&gt;field name&lt;td&gt;field data\n&quot;     
+                        # if false each row will be formatted as follows:
+                        #    &quot;MARC_field_number  field_name   field_data\n&quot;</pre>
+</dd>
+<p></p></dl>
+<p>For more detailed descriptions of these options see the Options documentation:
+Options.pod.</p>
+Or see the HTML Options documentation:  
+	<A href="Options.html#net::zgate::options::_params">Options.html</a><dt></dt>
+<dd>
+&nbsp;
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="object_method">Object Method</a></h2>
+<dl>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3areportresult">Net::Z3950::AsyncZ::reportResult</a></strong><br />
+</dt>
+<dd>
+There is no return value and no parameters for this method.  It is used as
+illustrated in the <strong>SYNOPSIS</strong> above:
+</dd>
+<dd>
+<pre>
+        my $report = Net::Z3950::AsyncZ::Report-&gt;new($rs, $options);
+        $report-&gt;reportResult();
+        $result = $report-&gt;{result};</pre>
+</dd>
+<dd>
+<p>[1] create a Report object,&nbsp;&nbsp;</p>
+</dd>
+<dd>
+<p>[2] implement the report with a call to <code>reportResult()</code>,
+&nbsp;&nbsp;</p>
+</dd>
+<dd>
+<p>[3] fetch the records array through the result field of the report object.</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="class_methods">Class Methods</a></h2>
+<dl>
+<dt><strong><a name="item_get_marc_pat">get_MARC_pat</a></strong><br />
+</dt>
+<dt><strong><a name="item_get_grs1_pat">get_GRS1_pat</a></strong><br />
+</dt>
+<dt><strong><a name="item_get_raw_pat">get_RAW_pat</a></strong><br />
+</dt>
+<dt><strong><a name="item_get_default_pat">get_DEFAULT_pat</a></strong><br />
+</dt>
+<dd>
+<pre>
+
+        $pat = get_TYPE_pat();</pre>
+</dd>
+<dl>
+<dt><strong><a name="item_returns">returns</a></strong><br />
+</dt>
+<dd>
+<code>$pat</code>:&nbsp;&nbsp;
+a regular expression that tests whether a header is of a particular type.
+With this you can test whether a line from the result array is a header and
+of what type.
+</dd>
+<dd>
+<p>For example, for the MARC record header it returns:</p>
+</dd>
+<dd>
+<pre>
+                \[MARC\s\d+\]</pre>
+</dd>
+<dd>
+<p>You can test for the MARC header as follows:</p>
+</dd>
+<dd>
+<pre>
+              $line =~ Net::Z3950::AsyncZ::Record::get_MARC_pat()</pre>
+</dd>
+<p></p></dl>
+<dt><strong><a name="item_get_pats">get_pats</a></strong><br />
+</dt>
+<dd>
+<pre>
+
+        $pat = get_pats();</pre>
+</dd>
+<dl>
+<dt><strong>returns</strong><br />
+</dt>
+<dd>
+<code>$pat</code>:&nbsp;&nbsp;a regular expression that matches any of the above types:
+</dd>
+<dd>
+<pre>
+        $line =~ Net::Z3950::AsyncZ::Record::get_pats()</pre>
+</dd>
+<dd>
+<p>This will return true if the line matches one of the header types.</p>
+</dd>
+<p></p></dl>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="record_data">Record Data</a></h1>
+<p><code>Net::Z3950::AsyncZ::Report</code> defaults to the MARC record structure, and uses the MARC record
+structure in parsing and formatting record data.  The GRS-1 structure is far
+more complex and difficult to deal with.  In so far as a GRS-1 record implements
+the MARC record tags, I make an attempt to read and parse it. But if AsyncZ ever becomes
+useful to programmers who need GRS-1, they will have to build far better GRS-1 support 
+into it.</p>
+<p>
+</p>
+<h2><a name="record_format_types">Record Format Types</a></h2>
+<dl>
+<dt></dt>
+<dd>
+When <code>Net::Z3950::AsyncZ::Report</code> gets back records from a server, it follows these steps:
+</dd>
+<dl>
+<dt></dt>
+<dd>
+[1] if <code>raw</code> is set to true, it does one of two things. If <code>_params-&gt;{render}</code> is set to true,
+which is the default, it returns an array
+derived from passing the raw data through Net::Z3950::Record::render().  If
+<code>_params-&gt;{render}</code> is set to false, it returns the raw record data
+unfiltered.  To extract records from the unfiltered data, two methods are provided:
+<code>Net::Z3950::AsyncZ::prep_Raw</code> and <code>Net::AsyncZ::get_ZRawRec</code>.  The default is <code>render=&gt;1</code>.
+</dd>
+<p></p>
+<dt></dt>
+<dd>
+[2] if <code>raw</code> is false, it checks to see whether the Record format is MARC or GRS-1 and,
+if it is one of these, processes it accordingly;
+</dd>
+<p></p>
+<dt></dt>
+<dd>
+[3] if none of the above are true, it processes the Record using its Default method
+</dd>
+<p></p></dl>
+<p><em>Note</em>: Each of the types described in this section has a corresponding Header.</p>
+<dt></dt>
+<dd>
+&nbsp;
+</dd>
+<p></p>
+<dt><strong><a name="item_the_types%3a">The Types:</a></strong><br />
+</dt>
+<dt></dt>
+<dd>
+&nbsp;
+</dd>
+<dl>
+<dt><strong><a name="item_marc">MARC</a></strong><br />
+</dt>
+<dd>
+In dealing with MARC records, <code>Net::Z3950::AsyncZ::Report</code> passes the MARC tag
+and the record data to one of the <a href="#format_methods">Format Methods</a>.  These check the
+tag against the <code>%MARC_FIELDS</code> hash and retrieve the descriptive identifier
+string for that field and produce rows consisting of <strong>tag</strong>, 
+<strong>identifier</strong>, <strong>data</strong>. The plaintext, DEFAULT, output looks like this:
+
+</dd>
+<dd>
+<pre>
+
+        100     author: James, Henry,1843-1916.Correspondence.Selections.
+        245     title:  Dear munificent friends</pre>
+</dd>
+<dd>
+<p>If HTML were specified then these elements would be put into table format:</p>
+</dd>
+<dd>
+<pre>
+        &lt;TD&gt;100&lt;TD&gt;author: &lt;TD&gt;James, Henry,1843-1916.Correspondence.Selections.</pre>
+</dd>
+<dd>
+<p>See the ``Format Callback'' section of AsyncZ.pod and the <a href="#marc_bibliographic_format">MARC Bibliographic Format</a></p>
+</dd>
+For HTML format, see <A href="AsyncZ.html#format_callback_(not_required)">Format Callback<a/> in AsyncZ.html.<p></p>
+<dt><strong><a name="item_grs%2d1">GRS-1</a></strong><br />
+</dt>
+<dd>
+In the case of GRS-1 Records, the GRS-1 method attempts to locate MARC Record tags; if none are
+found it passes the formatting function an empty string for the tag. 
+A data string still is passed into the function.See <a href="#item_marc"><code>MARC</code></a> and <a href="#format_methods">Format Methods</a>.
+</dd>
+<p></p>
+<dt><strong><a name="item_raw">RAW</a></strong><br />
+</dt>
+<dd>
+As stated in [1] above, the RAW method returns either an array derived from passing the raw
+data through Net::Z3950::Record::render() or entirely raw output--
+which depends on the value of the <code>render</code> option.
+In neither case does it make an attempt to parse or format
+the Record, and in keeping with this, you cannot assign a <code>format</code> callback for use 
+with RAW data. Presumably, you will read, parse, and format the record in the <code>cb</code> callback.
+</dd>
+<p></p>
+<dt><strong><a name="item_default">DEFAULT</a></strong><br />
+</dt>
+<dd>
+As in the case of GRS-1 Records, in the DEFAULT method an attempt is made to identify MARC tags;
+if none are found it passes the formatting function an empty string for the tag
+and passes in a data string.  See <a href="#item_marc"><code>MARC</code></a> and <a href="#item_grs%2d1"><code>GRS-1</code></a> above and <a href="#format_methods">Format Methods</a> below.
+</dd>
+<p></p></dl>
+</dl>
+<p>
+</p>
+<h2><a name="format_methods">Format Methods</a></h2>
+<p>Two default methods are provided for formatting lines of record data, <a href="#item_plain_text"><code>Plain Text</code></a> and <a href="#item_html"><code>HTML</code></a>.
+If you set <code>raw</code> to true, no formatting will be done.  You can also supply a method of
+your own to format record lines by assigning a callback function to the <code>format</code> parameter
+of the <code>_params</code> object.</p>
+<p>The formatting methods are passed two parameters in the form of a reference to a
+two element array:</p>
+<pre>
+           $ref-&gt;[0]&gt;: a MARC tag or the null string if there is no tag
+           $ref-&gt;[1]&gt;: the data string</pre>
+<p>See <a href="#item_marc">MARC</a> and the <a href="#marc_bibliographic_format">MARC Bibliographic Format</a>.</p>
+<p>A full discussion of the Format function will be found
+in the ``Format Callback'' section of AsyncZ.pod.</p>
+For the full discussion in HTML format,
+see <A href="AsyncZ.html#format_callback_(not_required)">Format Callback<a/> in AsyncZ.html.<dl>
+<dt><strong><a name="item_the_methods">The Methods</a></strong><br />
+</dt>
+<dl>
+<dt><strong><a name="item_html">HTML</a></strong><br />
+</dt>
+<dd>
+See <a href="#item_marc">MARC</a> for a brief sample of the output and furtherlinks.
+</dd>
+<p></p>
+<dt><strong><a name="item_plain_text">Plain Text</a></strong><br />
+</dt>
+<dd>
+See <a href="#item_marc">MARC</a> for a brief sample of the output and further links.
+</dd>
+<p></p>
+<dt><strong><a name="item_user_defined_formatting">User Defined Formatting</a></strong><br />
+</dt>
+<dd>
+See <a href="#item_marc">MARC</a> and the ``Format Callback'' section of AsyncZ.pod.
+</dd>
+For the discussion in HTML format,
+see <A href="AsyncZ.html#format_callback_(not_required)">Format Callback<a/> in AsyncZ.html.<p></p></dl>
+</dl>
+<p>
+</p>
+<h2><a name="marc_bibliographic_format">MARC Bibliographic Format</a></h2>
+<p><code>Net::Z3950::AsyncZ::Report</code> defaults to the MARC Bibliographic Format for Bibliographic Data when
+parsing and formatting records.  <code>Net::Z3950::AsyncZ::Report</code> uses a selection of the many fields
+in the MARC Format and divides this selection into three hashes.</p>
+<p>
+</p>
+<h3><a name="the_marc_fields_hashes">The MARC Fields Hashes</a></h3>
+<dl>
+<dt><strong><a name="item_%marc_fields_std">%MARC_FIELDS_STD</a></strong><br />
+</dt>
+<dd>
+<pre>
+         %MARC_FIELDS_STD = (
+                &quot;020&quot;=&gt;'ISBN',
+                &quot;050&quot;=&gt;&quot;LC call number&quot;, 
+                100=&gt;'author',
+                245=&gt;'title',
+                250=&gt;'edition',
+                260=&gt;'publication',
+                300=&gt;'description',
+                440=&gt;'series',
+                500=&gt;'note',
+                520=&gt;'annotation',
+                650=&gt;'subject',
+                700=&gt;'auth, illus, ed',
+        );</pre>
+</dd>
+<dt><strong><a name="item_%marc_fields_xtra">%MARC_FIELDS_XTRA</a></strong><br />
+</dt>
+<dd>
+<pre>
+        %MARC_FIELDS_XTRA = (
+          
+                &quot;082&quot;=&gt;'Dewey decimal number',
+                240=&gt;'Uniform title',
+                246=&gt;'alternate title',
+                130=&gt;'main entry',
+                306=&gt;'playing time',
+                504=&gt;'Bibliography', 
+                508=&gt;'creation/production credits',
+                510=&gt;'citation/references',
+                511=&gt;'participant or performer',
+                520=&gt;'Summary,note',
+                521=&gt;'target audience',
+                530=&gt;'physical form',
+                586=&gt;'awards'
+        );</pre>
+</dd>
+</dl>
+<p>These hashes are futher identified as follows:</p>
+<pre>
+        %MARC_FIELDS_ALL = (%MARC_FIELDS_STD, %MARC_FIELDS_XTRA);
+        %MARC_FIELDS = %MARC_FIELDS_STD;</pre>
+<p><code>%MARC_FIELDS</code> always points to the hash which is used in formatting records,
+and it defaults to <a href="#item_%marc_fields_std"><code>%MARC_FIELDS_STD</code></a>.</p>
+<p>These three hashes are not themselves in visible scope.  They are instead made
+available to the programmer by means of <a href="#references_to_marc_hashes">three references</a>.</p>
+<p>
+</p>
+<h3><a name="references_to_marc_hashes">References to MARC Hashes</a></h3>
+<p>The references are as follows:</p>
+<dl>
+<dt><strong><a name="item_%24std_%3d_%5c%25marc_fields_std">$std = <code>\%MARC_FIELDS_STD</code></a></strong><br />
+</dt>
+<dt><strong><a name="item_%24xtra_%3d_%5c%25marc_fields_xtra">$xtra = <code>\%MARC_FIELDS_XTRA</code></a></strong><br />
+</dt>
+<dt><strong><a name="item_%24all_%3d_%5c%25marc_fields_all">$all = <code>\%MARC_FIELDS_ALL</code></a></strong><br />
+</dt>
+</dl>
+<p>These references have the advantage of being brief.  Since <code>Net::Z3950::Report</code>
+does not export any names, it is simpler to write <code>$Net::Z3950::Report:std</code> than
+<code>%Net::Z3950::Report::MARC_FIELDS_STD</code>. In addition, they conform to the general
+use of references in the setting of options.</p>
+<p>
+</p>
+<h3><a name="changing_%marc_fields">Changing %MARC_FIELDS</a></h3>
+<p>The <code>_params</code> array provides a set of options which enables you to change the default
+entries of the <code>%MARC_FIELDS</code> hash.  Each of these options takes a reference to 
+another hash, the form of which must follow the structure of <a href="#item_%marc_fields_std"><code>%MARC_FIELDS_STD</code></a>
+and <a href="#item_%marc_fields_xtra"><code>%MARC_FIELDS_XTRA</code></a>.  The hash keys are the MARC tags, and the values are
+the descriptive identifiers. The tags are always three
+digit numbers.  If either one or both of the leading numbers is 0, then the tag
+must be quoted:</p>
+<pre>
+                &quot;020&quot;=&gt;'ISBN',
+                &quot;050&quot;=&gt;'LC call number'</pre>
+<p>There is great flexibility for handling the tags and the identifiers.  For one--you
+can subtitute your own hash for the default hashes by setting <a href="#item_marc_userdef"><code>marc_userdef</code></a>
+to your own. Or, you can use one or both of the default hashes and tailor them to your own needs
+with <a href="#item_marc_subst"><code>marc_subst</code></a> and <a href="#item_marc_xcl"><code>marc_xcl</code></a>.  The <a href="#item_marc_subst"><code>marc_subst</code></a> hash enables you to 
+subsitute your own identifiers for the default, and <a href="#item_marc_xcl"><code>marc_xcl</code></a> enables you to
+exclude tag entries from the default hashes.</p>
+<p>
+</p>
+<h3><a name="the__params_options">The <code>_params</code> Options</a></h3>
+<dl>
+<dt><strong><a name="item_marc_fields">marc_fields</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>marc_fields=&gt;\%Net::Z3950::AsyncZ::Report::STD</code>
+&nbsp;&nbsp;&nbsp;other possibilties are <code>\%Net::Z3950::AsyncZ::Report::ALL</code>
+and <code>\%Net::Z3950::AsyncZ::Report::XTRA</code>, which you can set by using either <code>set_marc_xtra()</code>
+or <code>set_marc_all()</code>.
+</dd>
+<p></p>
+<dt><strong><a name="item_marc_subst">marc_subst</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>marc_subst=&gt;undef</code>
+&nbsp;&nbsp;&nbsp;reference to user-defined hash of MARC fields in which
+you substitute your own field identifier strings for those which are
+pre-defined in the MARC fields hashes
+</dd>
+<p></p>
+<dt><strong><a name="item_marc_userdef">marc_userdef</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>marc_userdef=&gt;undef</code>  
+&nbsp;&nbsp;&nbsp;reference to user-defined hash of MARC fields to use in formatting
+records.  If this hash is defined, it will take the place of the default hash.
+</dd>
+<p></p>
+<dt><strong><a name="item_marc_xcl">marc_xcl</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>marc_xcl=&gt;undef</code>      
+&nbsp;&nbsp;&nbsp;reference to hash of MARC fields to exclude when formatting
+records.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h3><a name="marc_fields_priority_sequence:">MARC fields priority sequence:</a></h3>
+<dl>
+<dt><strong>marc_userdef -&gt; marc_fields -&gt; marc_xcl -&gt; marc_subst</strong><br />
+</dt>
+<dd>
+<pre>
+     This means that:</pre>
+</dd>
+<dd>
+<pre>
+             1. marc_userdef will replace marc_fields if marc_userdef exists
+             2. marc_xcl will be applied to the hash which results from operation 1
+             3. marc_subst will be applied to the hash resulting from 1 plus 2</pre>
+</dd>
+</dl>
+<p>
+</p>
+<h3><a name="marc_examples">MARC Examples</a></h3>
+<dl>
+<dt><strong><a name="item_example_1%3a">Example 1:</a></strong><br />
+</dt>
+<dd>
+This example assumes that you are using <a href="#item_%marc_fields_std"><code>%MARC_FIELDS_STD</code></a> as your base hash:
+</dd>
+<dd>
+<pre>
+         %MARC_FIELDS_STD = (
+                &quot;020&quot;=&gt;'ISBN',
+                &quot;050&quot;=&gt;&quot;LC call number&quot;, 
+                100=&gt;'author',
+                245=&gt;'title',
+                250=&gt;'edition',
+                260=&gt;'publication',
+                300=&gt;'description',
+                440=&gt;'series',
+                500=&gt;'note',
+                520=&gt;'annotation',
+                650=&gt;'subject',
+                700=&gt;'auth, illus, ed',
+        );</pre>
+</dd>
+<dd>
+<pre>
+        $xcl =    { &quot;020&quot;=&gt;undef,&quot;050&quot;=&gt;'', 500=&gt;undef, 520=&gt;&quot;&quot; };
+        $subst =  { 250=&gt;'ed.',260=&gt;'pub.',300=&gt;'desc.'};</pre>
+</dd>
+<dd>
+<pre>
+       $_pararms-&gt;set_marc_xcl($xcl);
+       $_pararms-&gt;set_marc_subst($subt);
+        
+The resulting hash would be:</pre>
+</dd>
+<dd>
+<pre>
+         %MARC_FIELDS_STD = (   
+                100=&gt;'author',
+                245=&gt;'title',
+                250=&gt;'ed.',
+                260=&gt;'pub.',
+                300=&gt;'desc.',
+                440=&gt;'series',
+                650=&gt;'subject',
+                700=&gt;'auth, illus, ed',
+        );</pre>
+</dd>
+<dd>
+<pre>
+
+A record using this hash and Plain Text formatting might look something like this:</pre>
+</dd>
+<dd>
+<pre>
+         100       author: Henry, James F.,1930-
+         245       title:  The manager's guide to resolving legal disputes
+         250       ed.     1st ed.
+         260       pub.:    New York :Harper &amp; Row,c1985.
+         300       desc.:    v, 162 p. ;22 cm.
+         650       subject:        Dispute resolution (Law)United States.
+         650       subject:        Negotiation.
+         700       auth, illus, ed:        Lieberman, Jethro Koller.</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_example_2%3a">Example 2:</a></strong><br />
+</dt>
+<dd>
+This example assumes that you want to expand the number of fields available, beyond those which are
+specified in <code>%MARC_FIELDS_ALL</code>.  You create a hash of additional fields and add them to
+<code>%MARC_FIELDS_ALL</code>.
+</dd>
+<dd>
+<pre>
+      my %my_MARC_fields = (
+        651 =&gt; &quot;location&quot;,
+        654 =&gt; &quot;terms&quot;,
+        655 =&gt; &quot;genre&quot;,
+        656 =&gt; &quot;occupation&quot;,
+        760 =&gt; &quot;main series entry&quot;,
+        762 =&gt; &quot;subseries entry&quot;,
+        765 =&gt; &quot;original language entry&quot;,
+        767 =&gt; &quot;translation entry&quot;,
+        770 =&gt; &quot;supplement/special issue entry&quot;,
+        772 =&gt; &quot;supplement parent entry&quot;,
+        773 =&gt; &quot;host item entry&quot;,
+        774 =&gt; &quot;constituent unit entry&quot;,
+        775 =&gt; &quot;other edition entry&quot;,
+        776 =&gt; &quot;additional physical form entry&quot;,
+        777 =&gt; &quot;issued with entry&quot;,
+        780 =&gt; &quot;preceding entry&quot;,
+        785 =&gt; &quot;succeeding entry&quot;,
+        786 =&gt; &quot;data source entry&quot;,
+        787 =&gt; &quot;nonspecific relationship entry&quot;,
+        800 =&gt; &quot;series added entry -- personal name&quot;,
+        810 =&gt; &quot;series added entry--corporate name&quot;,
+        811 =&gt; &quot;series added entry--meeting name&quot;,
+        830 =&gt; &quot;series added entry--uniform title&quot;
+        );</pre>
+</dd>
+<dd>
+<pre>
+        my %my_MARC_hash = (%$Net::Z3950::AsyncZ::Report::all, %my_MARC_fields);</pre>
+</dd>
+<dd>
+<pre>
+        $_pararms-&gt;marc_userdef(\%my_MARC_hash);</pre>
+</dd>
+<dd>
+<p>Note: we use the <code>$all</code> reference:</p>
+</dd>
+<dd>
+<pre>
+        $Net::Z3950::AsyncZ::Report::all</pre>
+</dd>
+<dd>
+<p>to access:</p>
+</dd>
+<dd>
+<pre>
+        %Net::Z3950::AsyncZ::Report::MARC_FIELDS_ALL</pre>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h3><a name="some_useful_marc_web_links:">Some Useful MARC web links:</a></h3>
+<pre>
+ Library of Congress Tutorial:  <a href="http://lcweb.loc.gov/marc/umb/">http://lcweb.loc.gov/marc/umb/</a> 
+ Library of Congress MARC Specification:  <a href="http://www.loc.gov/marc/bibliographic/ecbdhome.html">http://www.loc.gov/marc/bibliographic/ecbdhome.html</a></pre>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Myron Turner
+&lt;<a href="mailto:turnermm@shaw.ca">turnermm@shaw.ca</a>&gt;
+or &lt;<a href="mailto:mturner@ms.umanitoba.ca">mturner@ms.umanitoba.ca</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright 2003 by Myron Turner</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
+<br><br><br>
+</body>
+
+</html>

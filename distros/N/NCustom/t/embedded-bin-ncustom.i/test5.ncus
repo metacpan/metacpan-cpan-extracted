@@ -1,0 +1,6 @@
+#!/usr/bin/perl
+
+use NCustom qw(:all);
+edit_file(file => "~/file1", code => <<'  EOF');
+  s/incomplete until test5/customised by test5/g
+  EOF

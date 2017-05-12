@@ -1,0 +1,109 @@
+{
+   "abstract" : "Use the Amazon S3 - Simple Storage Service",
+   "author" : [
+      "Rusty Conover <rusty@luckydinosaur.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Amazon-S3",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Stream::Bulk::Callback" : "0",
+            "DateTime::Format::HTTP" : "0",
+            "Digest::HMAC_SHA1" : "0",
+            "Digest::MD5" : "0",
+            "Digest::MD5::File" : "0",
+            "File::Find::Rule" : "0",
+            "File::stat" : "0",
+            "Getopt::Long" : "0",
+            "HTTP::Date" : "0",
+            "HTTP::Status" : "0",
+            "IO::File" : "1.14",
+            "LWP" : "6.03",
+            "LWP::UserAgent::Determined" : "0",
+            "MIME::Base64" : "0",
+            "MIME::Types" : "0",
+            "Moose" : "0.85",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::StrictConstructor" : "0.16",
+            "MooseX::Types::DateTime::MoreCoercions" : "0.07",
+            "Path::Class" : "0",
+            "Pod::Usage" : "0",
+            "Regexp::Common" : "0",
+            "Term::Encoding" : "0",
+            "Term::ProgressBar::Simple" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0",
+            "URI::QueryParam" : "0",
+            "VM::EC2::Security::CredentialCache" : "0",
+            "XML::LibXML" : "0",
+            "XML::LibXML::XPathContext" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "LWP::Simple" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "lib" : "0",
+            "vars" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pfig/net-amazon-s3/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/Net-Amazon-S3/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pfig/net-amazon-s3.git",
+         "web" : "https://github.com/pfig/net-amazon-s3"
+      }
+   },
+   "version" : "0.80",
+   "x_contributors" : [
+      "Aaron Crane <arc@cpan.org>",
+      "Ali Anari <ali@anari.me>",
+      "Dylan William Hardison <dylan@hardison.net>",
+      "Gabriel Andrade <gabriel@zumba.home>",
+      "Haruka Iwao <haruka@fout.jp>",
+      "Leo Lapworth <leo@cuckoo.org>",
+      "Leon Brocard <acme@astray.com>",
+      "Michele Beltrame <mb@cattlegrid.info>",
+      "Miquel Ruiz <mruiz@cpan.org>",
+      "Panu Ervamaa <panu.ervamaa@frantic.com>",
+      "Pavel A. Karoukin <pkaroukin@microassist.com>",
+      "Pedro Figueiredo <me+github@pedrofigueiredo.org>",
+      "Pedro Figueiredo <me@pedrofigueiredo.org>",
+      "Pedro Figueiredo <pfig@89clouds.com>",
+      "perlpong <calyx238@gmail.com>",
+      "robert clarke <robert_clarke@trendmicro.co.uk>",
+      "Robert Ward <robert@rtward.com>",
+      "Rusty Conover <rusty_conover@me.com>",
+      "Rusty Conover <rusty@parrotsnap.com>",
+      "Steven Berler <steven.berler@dreamhost.com>",
+      "Struan Bartlett <struan.bartlett@NewsNow.co.uk>",
+      "Tom Hukins <tom@eborcom.com>",
+      "toritori0318 <toritori0318@gmail.com>"
+   ]
+}
+

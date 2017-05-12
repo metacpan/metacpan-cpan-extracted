@@ -1,0 +1,90 @@
+#! /usr/bin/perl -w
+
+# avg-addy - compute the average of a list of email addresses
+
+# Copyright (c) 1998. Greg Bacon. All Rights Reserved.
+# This program is free software.  You may distribute it or modify it
+# (perhaps both) under the terms of the Artistic License which comes
+# with the Perl Kit.
+
+use strict;
+use integer;
+
+my @name;
+my $namelen = 0;
+
+my @hname;
+my @hnamelens;
+
+my $total = 0;
+my $total_parts = 0;
+
+while (<>) {
+    chomp;
+
+    next unless /\S/;  ## blank lines suck
+    next unless /.@./;
+
+    my($i,$j);
+    $total++;
+
+    s/^(.*?)@//;
+    my $name = $1;
+    $namelen += length $name;
+
+    my @parts = split /\./, $_;
+    $total_parts += @parts;
+
+    $i = 0;
+    foreach my $ch (split //, $name) {
+        $name[$i] ||= 0;
+        $name[$i] += ord($ch);
+        $i++;
+    }
+
+    $i = 0;
+    foreach my $part (@parts) {
+        $hnamelens[$i] ||= 0;
+        $hnamelens[$i] += length $part;
+
+        $j = 0;
+        foreach my $ch (split //, $part) {
+            $hname[$i][$j] ||= 0;
+            $hname[$i][$j] += ord($ch);
+            $j++;
+        }
+
+        $i++;
+    }
+}
+
+my $avg = '';
+
+## cull what we don't need
+my $avg_name_len = $namelen / $total;
+splice @name, $avg_name_len;
+
+my $avg_num_parts = $total_parts / $total;
+splice @hname,     $avg_num_parts;
+splice @hnamelens, $avg_num_parts;
+
+foreach my $n (@name) {
+    $avg .= chr($n / $total);
+}
+
+$avg .= '@';
+
+for (my $i = 0; $i < @hname; $i++) {
+    my $avg_len = $hnamelens[$i] / $total;
+
+    splice @{$hname[$i]}, $avg_len;
+
+    foreach my $n (@{$hname[$i]}) {
+        $avg .= chr($n / $total);
+    }
+
+    $avg .= '.';
+}
+
+$avg =~ s/\.$//;
+print "Average address: $avg\n";

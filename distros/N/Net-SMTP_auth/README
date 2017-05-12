@@ -1,0 +1,76 @@
+Copyright (c) 2003, 2006 Alex Pleiner - zeitform Internet Dienste. 
+alex@zeitform.de - http://www.zeitform.de. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Note: This version requires Authen::SASL. If you want to want to go
+without, use version Net::SMTP_auth 0.05.
+
+FURTHER NOTE: Net::SMTP can do authentication by itself (with a 
+different Syntax)
+
+Can someone please provide me with a SMTP account on a 
+maschine using DIGEST-MD5 or NTLM for testing?
+
+--------
+Abstract
+--------
+
+Net::SMTP_auth is a small extension to G. Barr's Net::SMTP
+to authenticate to an SMTP server using one of the AUTH
+methods provided by Authen::SASL (see RFC2554 for details).
+This module can be expanded and is a very first implementation.
+
+------------
+Requirements
+------------
+
+This module requires:
+ 
+   - Net::SMTP (should be obvious)
+   - MIME::Base64
+   - Digest::HMAC_MD5
+   - Authen::SASL
+   - Authen::NTLM (optional for NTLM)
+
+The requirements are encoded in Makefile.PL.  
+
+------------------
+Basic Installation
+------------------
+
+Net::SMTP_auth may be installed through the CPAN shell in the
+usual CPAN shell manner.  This typically is:
+
+  $ perl -MCPAN -e 'install Net::SMTP_auth'
+
+You can also read this README from the CPAN shell:
+
+  $ perl -MCPAN -e shell
+  cpan> readme Net::SMTP_auth
+
+And you can install the component from the CPAN prompt as well:
+
+  cpan> install Net::SMTP_auth
+
+-------------------
+Manual Installation
+-------------------
+
+Net::SMTP_auth can also be installed manually.  
+
+Download the package from:
+http://alex.zeitform.de/smtp_auth/
+
+Downloading and unpacking the distribution are left as exercises for
+the reader.  To build and test it:
+
+  perl Makefile.PL
+  make test
+
+When you're ready to install the component:
+
+  make install
+
+It should now be ready to use.
+

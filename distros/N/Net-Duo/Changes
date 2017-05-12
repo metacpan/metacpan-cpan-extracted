@@ -1,0 +1,14 @@
+                      User-Visible Net::Duo Changes
+
+Net::Duo 1.01 (2015-08-16)
+
+    Adjust for an incompatible change in JSON::XS 3.0 that broke magical
+    interpretation of the strings "true" and "false" when encoding JSON.
+    Use JSON::true and JSON::false instead to ensure that the JSON is
+    created properly.
+
+Net::Duo 1.00 (2014-07-11)
+
+    Initial release with support for generic API calls (both with or
+    without JSON responses) and partial implementations of the Auth and
+    Admin APIs.

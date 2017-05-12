@@ -1,0 +1,72 @@
+---
+abstract: 'A perl interface to the Twitter API'
+author:
+  - 'Marc Mims <mmims@cpan.org>'
+build_requires:
+  Carp: '0'
+  File::Spec: '0'
+  HTTP::Response: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  LWP::UserAgent: '5.819'
+  Net::OAuth::Message: '0'
+  Test::Fatal: '0'
+  Test::More: '0.98'
+  Test::Warn: '0'
+  base: '0'
+  blib: '1.01'
+  lib: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.1101'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Twitter
+no_index:
+  directory:
+    - examples
+    - src
+requires:
+  Carp::Clan: '0'
+  Class::Load: '0'
+  Data::Visitor::Callback: '0'
+  DateTime: '0'
+  DateTime::Format::Strptime: '0'
+  Devel::StackTrace: '0'
+  Digest::SHA: '0'
+  Encode: '0'
+  HTML::Entities: '0'
+  HTTP::Request::Common: '0'
+  IO::Socket::SSL: '2.005'
+  JSON::MaybeXS: '0'
+  LWP::Protocol::https: '0'
+  List::Util: '0'
+  Moose: '0'
+  Moose::Exporter: '0'
+  Moose::Meta::Method: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::Role::Parameterized: '0'
+  Net::HTTP: '>= 0, != 6.04, != 6.05'
+  Net::Netrc: '0'
+  Net::OAuth: '0'
+  Scalar::Util: '0'
+  Time::HiRes: '0'
+  Try::Tiny: '0'
+  URI: '0'
+  URI::Escape: '0'
+  namespace::autoclean: '0'
+  overload: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: http://github.com/semifor/Net-Twitter/issues
+  homepage: https://github.com/semifor/Net-Twitter
+  repository: https://github.com/semifor/Net-Twitter.git
+version: '4.01042'
+x_serialization_backend: 'YAML::Tiny version 1.69'

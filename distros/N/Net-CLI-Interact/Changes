@@ -1,0 +1,239 @@
+2.200006  2016-09-30
+
+  * [#21] session debug is always output (arcanez)
+
+2.200005  2015-02-18
+
+  * POD typo fixes from Debian
+
+2.200004  2015-02-14
+
+  * Fixes to distribution
+
+2.200003  2015-02-13
+
+  * Fix Serial transport constructing params incompatible with cu (S. Kersley)
+  * Fix spelling mistake and POD syntax issues (G. Herrmann)
+
+2.200002  2015-02-22
+
+  * Fix MANIFEST (salva)
+
+2.200001  2015-01-06
+
+  * Add Net::OpenSSH transport (salva)
+  * Fix using barewords on filehandles (salva)
+
+2.200000  2015-01-06
+
+  * Update dist to migrate away from Dist::Zilla
+
+2.143070  2014-11-03 20:43:12 Europe/London
+
+  * [#14] Allow square brackets in bash prompts (M. Perry)
+  * [#15] Add phrasebook for Oracle VM Manager CLI (M. Perry)
+
+2.142720  2014-09-29 19:41:26 Europe/London
+
+  * [#13] Fix cmd in scalar context appends a newline
+
+2.142010  2014-07-20 21:16:26 Europe/London
+
+  * Resepct timeout in find_prompt (Jørgen Elgaard Larsen)
+
+2.141520  2014-06-01 16:33:00 Europe/London
+
+  * For some reason timeout not being set? Set on Net::Telnet::get.
+
+2.133420  2013-12-08 00:07:45 Europe/London
+
+  * Make command removal substitute params as well (M. Perry)
+
+2.131260  2013-05-06 20:29:38 Europe/London
+
+  * Fix for applying default timeout
+
+2.130880  2013-03-29 22:12:14 Europe/London
+
+  * Fix bug in debug log using native print instead of Logger (D. Thomas)
+  * Fix bug in setting of log_config after session instantiation (D. Thomas)
+
+2.123620  2012-12-27 22:52:55 Europe/London
+
+  * Change default_log_categories from an array to a class method.
+
+2.123612  2012-12-26 18:38:34 Europe/London
+
+  * More logging configuration, and some Cookbook details on how to log.
+
+2.123611  2012-12-26 15:23:41 Europe/London
+
+  * Remove redundant Net::Telnet->open() (closes #10, closes #11)
+
+2.123610  2012-12-26 15:04:44 Europe/London
+
+  * Time to release pending changes.
+
+2.123370_002 2012-12-02 00:24:38 Europe/London
+
+  * Change command remove to be less greedy with whitespace (C. Bennett)
+  * Fix loading of Data::Printer for last_actionset debug
+
+2.123300_001 2012-11-25 13:47:15 Europe/London
+
+  * Change command remove to be less greedy with whitespace (C. Bennett)
+
+2.123270  2012-11-22 20:50:30 Europe/London
+
+  * Bug fix for wrong type spec on log_config (A. Friedrich)
+
+2.122940  2012-10-20 12:39:46 Europe/London
+
+  * Bug fix for wrong type spec on log_at (wmdopple, closes #9)
+
+2.122730  2012-09-29 23:49:08 Europe/London
+
+  * IMPORTANT: the prompts named "prompt" are now called "generic"
+    If you have written macros depending on these, please update your phrasebooks.
+
+  * Make IO::Pty dependency based on compiler availability
+  * Refactor to provide unix IPC::Run support where there is no IO::Pty
+  * Add opts support to Serial Transport
+  * Fix phrasebook loading to use all library and add_library paths
+  * Support out of order entries in phrasebooks (macro/prompt refs)
+  * New phrasebook for Bash shell
+  * Improve documentation on how to create new phrasebooks
+  * Permit ASCII escape \033 in device output
+  * Added Loopback transport for testing
+  * find_prompt now stores a full ActionSet after success
+  * debug level logging will use Data::Printer on last_actionset if it can
+
+2.122630  2012-09-19 17:21:30 Europe/London
+
+  * Port from Moose to Moo
+
+1.122530  2012-09-09 15:52:07 Europe/London
+
+  * Alter log messages so that notice is a more useful default
+  * Delete SIGCHLD after close (rt.cpan#79450)
+
+1.122100  2012-07-29 00:33:51 Europe/London
+
+1.122020_002 2012-07-20 15:56:04 Europe/London
+
+  * change docs for wake_up to formalise integer
+  * Add macros for paging for HP (C. Tucker)
+
+1.122010  2012-07-19 20:52:28 Europe/London
+
+1.121990_002 2012-07-17 23:25:28 Europe/London
+
+  * Add Port number and generic Opts support to Telnet transport.
+
+1.121640  2012-06-12 23:22:19 Europe/London
+
+  * NCI library version number is logged at instatiation.
+  * New ignore_host_checks option for SSH to replace shkc. Note the following:
+
+  This option defaults to ENABLED meaning that openssh no longer checks host IDs.
+  See documentation in Net::CLI::Interact::Transport::SSH for details.
+
+1.121570  2012-06-05 19:37:11 Europe/London
+
+  * Fix Cisco prompt detection when containing [] characters (Alexander Hartmaier)
+  * Detect connection failures and die with buffered transport error
+
+1.120670  2012-03-07 20:20:06 Europe/London
+
+  * Fix IO::Pty dependency only to appear on non-Win32. This has required a
+    local hack to Dist::Zilla so please contact the author if you build from dist.ini.
+
+1.120560  2012-02-25 16:52:07 Europe/London
+
+  * fix typo (C. Vicente)
+  * fix Win32 path to locate plink.exe
+
+1.120042  2012-01-04 21:08:07 Europe/London
+
+  * test release process
+
+1.120040  2012-01-04 20:58:57 Europe/London
+
+  * ors attribute should be writeable (V. Magnin)
+
+1.113610  2011-12-27 00:51:35 Europe/London
+
+  * New implementation of output parser. Note the following:
+
+  For the cmd() and macro() methods: In scalar context all data is returned.
+  In list context the gathered response is returned as a list of lines. In both
+  cases your local platform's newline character will end all lines.
+
+1.113600  2011-12-26 16:35:32 Europe/London
+
+  * Add has_prompt and has_macro methods
+  * Add Foundry phrasebook (Vincent Magnin)
+
+1.112610  2011-09-18 10:41:37 Europe/London
+
+  * Escape embedded % in cmd() commands (B. Hogden)
+  * Apply POD typo fixes patch (V. Foitzik)
+
+1.112602  2011-09-17 23:45:50 Europe/London
+
+  * Newline only added if there was a new *line* in output
+
+1.112601  2011-09-17 18:32:55 Europe/London
+
+  * Fixes to handling of newlines in returned response.
+    Now aggressively remove control characters, and replace all newlines with \n
+
+1.112600  2011-09-17 14:17:44 Europe/London
+
+  * Set quotemeta when stripping command from returned output (V. Foitzik)
+
+1.112190  2011-08-07 21:33:07 Europe/London
+
+  * use_net_telnet_connection is checked even on Win32
+  * make add_library actually DTRT when you want both lib and add_lib
+
+1.111590  2011-06-08 23:26:09 Europe/London
+
+  * Support more SSH transport options, handle username
+
+1.111530  2011-06-02 23:44:29 Europe/London
+
+  * Support multi match in macros
+  * Remove is_lazy - always update the prompt
+  * Phrasebook fixes for Net::Appliance::Session
+
+1.111500  2011-05-30 16:00:03 Europe/London
+
+  * New cross platform backend (IPC::Run or Net::Telnet)
+
+1.111150  2011-04-25 19:55:40 Europe/London
+
+  * Cross platform support (i.e. Win32)
+  * More documentation
+  * Added a few minor support methods
+
+1.110911  2011-04-01 15:09:58 Europe/London
+
+  * Minor POD formatting typos fixed
+
+1.110910  2011-04-01 13:04:09 Europe/London
+
+  * Fix "private" packages scoping so that Dist::Zilla works
+  * Add tutorial and cookbook POD files
+
+1.110900  2011-03-31 14:41:17 Europe/London
+
+  * More POD
+
+1.110891  2011-03-30 13:16:46 Europe/London
+
+  * More POD
+
+1.110890  2011-03-30 13:13:48 Europe/London
+
+  * Initial release on an unsuspecting world.

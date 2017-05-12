@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/Net/Delicious/Export.pm
+lib/Net/Delicious/Export/Post.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/01-load.t

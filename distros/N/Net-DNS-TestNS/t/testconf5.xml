@@ -1,0 +1,118 @@
+<?xml version="1.0" standalone="no"?>
+
+
+<testns version="1.0">
+  <server ip="127.0.0.1" port="5354">
+    <qname name="bla.foo">
+      <qtype type="TXT" delay="1">
+	<header>
+	  <rcode value="NOERROR"/>
+	  <aa value="1"/>
+	  <ra value="0"/>
+	  <ad value="0"/>
+	  <qr value="0"/>
+	  <tc value="1"/>
+	  <id value="1234"/>
+	  <ancount value="1"/>
+	  <nscount value="1"/>
+	</header>
+	<ans>
+	  bla.foo.  3600 IN TXT "TEXT"
+	</ans>
+	<ans>
+	  bla.foo.		3600	IN	TXT	"Other text"  
+	</ans>
+
+      </qtype>
+    </qname>
+
+    <qname name="raw.foo">
+      <qtype type="TXT" delay="1">
+
+	<header>
+	  <rcode value="NOERROR"/>
+	  <aa value="1"/>
+	  <ra value="0"/>
+	  <ad value="0"/>
+	  <cd value="1"/>
+	  <qr value="0"/>
+	  <tc value="1"/>
+	  <id value="3456"/>
+	  <!-- These values are important when dealing with raw data -->
+	  <qdcount value="1"/> 	  
+	  <ancount value="1"/> 	  
+	</header>
+
+
+	<raw>
+	  <!-- QNAME -->
+  07 74726967676572   <!-- trigger -->
+  03 666f6f	      <!-- foo -->
+  00
+  <!-- QTYPE -->
+  00 01
+  <!-- QCLASS -->
+  00 01
+
+   <!-- Answer section -->
+
+  c0 0c                <!-- Points up -->
+  00 01                <!-- type A -->
+  00 01                <!-- class IN -->
+  00 00 00 05	       <!-- ttl 5 seconds  -->
+  00 04 	       <!-- RD length 4 octets -->
+  0a 00 00 01	       <!-- 10.0.0.1 -->
+
+
+	</raw>
+      </qtype>
+    </qname>
+
+
+
+
+
+
+    <qname name="opt.foo">
+      <qtype type="TXT" delay="1">
+	<header>
+	  <rcode value="NOERROR"/>
+	  <aa value="1"/>
+	  <ra value="0"/>
+	  <ad value="0"/>
+	  <qr value="0"/>
+	  <tc value="1"/>
+	  <id value="3456"/>
+	</header>
+	<ans>
+	  opt.foo.  3600 IN TXT "THE OPT FOO QUERY"
+	</ans>
+	<opt size="4059"><options do="1"/></opt>
+      </qtype>
+    </qname>
+
+
+
+    <qname name="opt2.foo">
+      <qtype type="TXT" delay="1">
+	<header>
+	  <rcode value="NOERROR"/>
+	  <aa value="1"/>
+	  <ra value="0"/>
+	  <ad value="0"/>
+	</header>
+	<ans>
+	  opt2.foo.  3600 IN TXT "THE OPT2 FOO QUERY"
+	</ans>
+	<opt size="1059"><flag value="0x12ab"/> </opt>
+      </qtype>
+    </qname>
+
+
+
+
+
+
+    
+  </server>
+</testns>

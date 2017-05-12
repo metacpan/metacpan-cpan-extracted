@@ -1,0 +1,7 @@
+Build.PL
+Changes
+lib/Net/BitTorrent/PeerPacket.pm
+MANIFEST			This list of files
+README
+t/peerpacket.t
+META.yml

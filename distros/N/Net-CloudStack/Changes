@@ -1,0 +1,46 @@
+Revision history for Net-CloudStack
+
+0.01005  2013/03/02
+         Allows arrays to be passed to the CloudStack API(Thanks, geordish and DaveBell)
+0.01004  2012/09/11
+         Add encode in json parse.
+0.01003  2012/06/10
+	 Add exception process.
+0.01002  2012/04/09
+         Revised for ssl option.
+0.01001  2012/04/08
+	 Revised explaination.
+0.00018  2012/04/07
+         Made simple.
+0.00014  2012/02/14
+         Fixed bug in processing with SSH public key.
+0.00013  2012/02/07
+         Fixed some bugs.
+0.00012  2012/01/29
+         Update document.
+0.00011  2012/01/29
+         Update document.
+0.00010  2012/01/29
+         Update document.
+0.00009  2012/01/27
+         Update document.
+0.00008  2011/12/29
+         Fixed some bugs.
+0.00007  2011/12/20
+         Fixed bugs.
+0.00006  2011/12/19
+         Change Module
+         -from Moose to Mouse
+         -from WWW::Mechanize to LWP::UserAgent
+0.00005  2011/12/05
+	 Add properties(url,response,send_request).
+         Delete property(url_response).
+0.00004  2011/11/29
+	 Changed the default value of url_response.
+0.00003	 2011/11/29
+         Fixed some bugs.
+0.00002	 2011/11/27
+         revised pod.
+0.00001	 2011/11/26
+         First version, released on an unsuspecting world.
+

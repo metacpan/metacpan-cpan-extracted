@@ -1,0 +1,23 @@
+---
+abstract: 'Net::MundiPagg - Documentation coming soon :)'
+author:
+  - 'Blabos de Blebe <blabos@cpan.org>'
+build_requires:
+  Test::Most: '0.34'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-MundiPagg
+requires:
+  File::ShareDir: '1.102'
+  Moo: '1.006001'
+  XML::Compile::WSDL11: '3.02'
+resources:
+  bugtracker: https://github.com/blabos/Net-MundiPagg/issues
+  repository: https://github.com/blabos/Net-MundiPagg
+version: '0.000003'

@@ -1,0 +1,10 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+changes
+dist.ini
+lib/Net/Surveymonkey.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t

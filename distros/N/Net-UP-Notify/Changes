@@ -1,0 +1,6 @@
+Revision history for Perl extension UP::Notify.
+
+1.00  Sat Nov  8 17:59:44 2003
+	- original version;
+1.01  Sun Mar  7 20:09:00 2004
+	- Fix to Makefile.PL to set dependency of LWP - thanks to slash@darkhaven.net for the heads up!;

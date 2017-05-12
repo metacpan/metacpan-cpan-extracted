@@ -1,0 +1,35 @@
+Revision history for Net-SNMP-Util
+
+1.04    2011/02/21
+    [ Common ]
+    - Correct program for BUG(#65537)
+    - Correct to stop circular references.
+    [ examples/snmpbulk.pl ]
+    - Correct program for M option bug.
+    [ Test ]
+    - Addition of checking arguments and return values for snmp functions.
+
+1.03    2011/02/12
+    [ Test ]
+    - Abolished using subtest at test.
+
+1.02    2011/02/10
+    [ Test ]
+    - Correct lack of calling done_testing() at subtest block.
+
+1.01    2011/01/21
+    [ Common ]
+    - Modified and corrected textes of POD. (English is too difficult...)
+    [ Makefile.PL ]
+    - Modify PREREQ_PM for lacking requiring modules.
+    [ Net/SNMP/Util.pm ]
+    - Dropping empty data is abolished, so empty result is let be empty
+      hash.
+    - Bugfix. Some hosts error makes next hosts process skip when
+      Blocking Mode.
+    [ examples/snmp*.pl ]
+    - Output error messages when they catch it.
+
+1.00    2011/01/21
+    First version, released on an unsuspecting world.
+

@@ -1,0 +1,200 @@
+Revision history for Perl extension Net::BGP.
+
+0.16    2015-01-03
+        Added by Joel Maslak <jmaslak@antelope.net>:
+        - Feature: 32 bit ASN support (both as an old and a new speaker)
+        - Bugfix: Lower four bits of path attribute flags were not being
+          ignored as they should have been (see RFC4271 4.3 which says,
+          "The lower-order four bits of the Attribute Flags octet are
+          unused. They MUST be zero when sent and MUST be ignored when
+          received."
+        - Bugfix: Options to Peer should only match if there are no
+          leading or trailing characters.
+        - Bugfix: ASPath->length() counted elements in AS_SETs, when
+          RFC says an AS_SET = 1 hop.  Also ensured AS_CONFED_* are counted
+          as 0 hops.
+        - Bugfix: Optional Transitive attributes can be expected to have
+          the partial flag bit set when passing through a router that does
+          not know what the attributes mean.  Added logic to handle
+          receiving these.
+        - Spelling: In Transport, _peer_announced_id is spelled right. Old
+          spelling is also retained for compatability.
+        - Bugfix: Documentation indicates Update->new() supports ASPaths in
+          array reference form, but code didn't.  Added support to code for
+          new ASPaths to be specified by array references (they create an
+          AS_SEGMENT now, as expected from docs).
+        - Bugfix: Support receipt of multiple capabilities in a single open
+          message (BIRD requires this).
+
+0.15    2014-12-18
+        - Add configuration for whether or not to send capability
+          announcements
+            Added by Joel Maslak <jmaslak@antelope.net>
+        - Bugfix - send route refresh optional parameter properly
+            Added by Joel Maslak <jmaslak@antelope.net>
+        - Send Cisco-style route refresh capability (capability code 128)
+            Added by Joel Maslak <jmaslak@antelope.net>
+        - Added ability to send MBGP information (only Unicast IPv4 now)
+          to allow interoperability with devices that won't support route
+          refresh without it.
+            Added by Joel Maslak <jmaslak@antelope.net>
+        - Renamed Refresh to AnnounceRefresh to more accurately reflect
+          what it does.  Kept "Refresh" as an alias.
+            Added by Joel Maslak <jmaslak@antelope.net>
+        - Add patch by Stuart Pearlman to fix bug that prevents
+          restarting a peer due to messages remaining in the front of
+          the message queue.  See
+          https://rt.cpan.org/Public/Ticket/Attachment/WithHeaders/570429
+        - Add support for callback upon transition to established state
+            Added by Joel Maslak <jmaslak@antelope.net>
+        - Mikrotik routers will send non-multihop SYN/SYNACK with different
+          TTLs than the actual OPEN message.  So it's possible to have, with
+          the right misconfiguration (multihop on Perl side, non-multihop on
+          Mikrotik side, more than one hop distance away from each other) to
+          a case where you try to _clone() something that is already _clone-ed.
+          This handles that case properly.
+            Added by Joel Maslak <jmaslak@antelope.net>
+        - Allow paths with > 255 ASes.  Note that there are still some limits
+          that will be hit, but now this should process AS_SEGMENTs longer
+          than 255 properly (without truncating/erroring on the attribute as
+          previous versions did).  This will split long paths into multiple
+          AS_SEGMENTs.
+            Added by Joel Maslak <jmaslak@antelope.net>
+
+0.14	2010-09-18
+	- Fix validation of path attribute flags containing extended
+          length attribute.
+	  Fixed by Simon van der Linden <simon.vanderlinden@uclouvain.be>
+
+0.13	2009-07-14
+	- Correctly handle update packets with only withdrawn routes.
+	  (RT #46496). Thanks to:
+		Skewell <olivier.montanuy@m4x.org>
+		Guillaume Lambert <guillaume.lambert-geek@laposte.net>
+		Elisa Jasinska <elisa.jasinska@ams-ix.net>
+
+0.12	2009-01-22
+	- fixed bogus signature in version 0.11
+
+0.11	2009-01-22
+	- fix for AGGREGATOR_ID (Christian Zeng <christian@zengl.net>, RT #42226)
+
+0.10
+	- permit sending attributes with length>255 [RT #36945],
+	  based on a patch submitted by Greg Skinner.
+
+	- "use bytes" so length() works correctly in multi-byte locale
+
+0.09  Thu Nov  8 17:31:40 UTC 2007
+
+	- Added "listenaddr" feature from Guillaume Lambert.
+
+0.08  2004-09-12
+	- Added a refresh callback
+
+0.07  Tue Oct 28 09:58:45 2003
+
+	- Fixed signature test to skip all if Test::Signature is
+	  not installed.
+
+0.06  Thu Oct 28 00:42:45 2003
+
+	- Fixed to buges reported by Robert (rt#4221):
+
+	- Syswrite returns undef handled incorrectly
+
+	- Receieving a partial BGP header failed
+
+	- Added test for pod and signature
+
+0.05  Fri Jul  4 00:36:26 2003
+
+	- Removed the RIB.pm object - Forgot in last version!
+
+	- Updated ASPath documentation (and some other documentation)
+
+	- Try to avoid dying on error - only cease the transport connection
+
+	- Net::BGP::Peer::is_established() added
+
+	- TCP connections none-blocking not only on connect
+
+0.04  Sun Jun  1 13:25:09 2003
+
+	- Martin Lorensen <lorensen@cpan.org> have pushed this release
+	  on behalf of the Stephen Scheck.
+
+	- Added code to configure and later remove a dummy $SIG{PIPE}
+	  handler if note is set to avoid a peer reset causes the server
+	  to stop.
+
+	- Split Update into Update and NLRI with is-a relation as
+	  preperation for a RIB/Router module.
+
+	- Split Peer into Peer and Transport with has-a relation
+	  to resolve the old issue of cloned peer objects.
+
+	- Fixed Process to handle peers with same IP local and/or remote.
+
+	- Fixed a rare raise condision if a peer connected while outside
+	  the Select statement
+
+	- Added support for optional parameters and optional capabilities.
+
+	- Added support for REFRESH messages.
+
+	- Added refresh_callback which are called on new sessions and
+	  when a REFRESH message is recieved.
+
+	- Added reset_callback which are called on connection reset of
+	  any kind.
+
+	- Added "renew" constructor to Peer objects to reclaim an object
+	  reference from the string representation of the same - Using
+	  weak references (Scalar::Util).
+
+	- Fixed SO_REUSEADDR - should be done BEFORE bind()
+
+	- Added a simple asstring method for the Peer object. NOTE: Format
+	  may change in the future!
+
+	- Some methods in Peer (and Transport) maid public.
+
+	- Added an ASPath object to handle complex ASPaths, including
+	  confederations.
+
+	- The new NLRI object is overloaded and has many new methods
+	  compared to the potion of code moved from Update
+
+	- A fairly large test suite added.
+
+	- The RIB.pm placeholder has been removed. This functionality
+	  will be implemented in a different module soon.
+
+0.03  Sun Mar 16 13:31:55 2003
+	- Added clone() method to Net::BGP::Update
+
+	- Removed warning when encoding empty AS_PATH which is
+		ok for IBGP peering sessions.
+
+	- Removed warnings for missing mandatory path attributes
+		for the case when no NLRI is present in an
+		UPDATE message.
+
+	- Fixed bug in _encode_prefix() in Net::BGP::Update
+		which could cause 0.0.0.0/0 to be encoded into
+		the prefix list when prefixes shorter than 32
+		bits (i.e. non-host routes) are specified with
+		all 4 octets (e.g. when 192.168/16 is given as
+		192.168.0.0/16).
+
+	Thanks to Martin Lorensen for identifying these problems.
+
+0.02  Sun Jan 26 16:32:15 2003
+	- Fixed symbolic method call syntax in _handle_event()
+		which is not recognized prior to perl 5.6.0.
+
+0.01  Fri Sep  6 16:09:32 2002
+	- original version; created by h2xs 1.21 with options
+		-A -X -n Net::BGP
+

@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name: Net-DAAP-Server
+version: 0.03
+author:
+  - Richard Clamp <richardc@unixbeard.net>
+abstract: Provide a DAAP Server
+license: perl
+requires:
+  Class::Accessor: 0
+  File::Find::Rule: 0
+  MP3::Info: 0
+  Net::DMAP::Server: 0
+  Perl6::Slurp: 0
+  perl: 5.006
+build_requires:
+  Net::DAAP::Client: 0.41
+  Test::More: 0
+provides:
+  Net::DAAP::Server:
+    file: lib/Net/DAAP/Server.pm
+    version: 0.03
+  Net::DAAP::Server::Track:
+    file: lib/Net/DAAP/Server/Track.pm
+generated_by: Module::Build version 0.25

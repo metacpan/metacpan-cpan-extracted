@@ -1,0 +1,20 @@
+# Legend:
+# --- = A new release
+#   x = Changed something significant, or removed a feature
+#   * = Fixed a bug
+#   + = Added a feature (in a backwards compatible way)
+
+--- 0.12 (2005-05-05 13:01)
+
+  * Added dependency on Error Perl module to Build.PL and Debian package
+    control files.
+
+--- 0.11 (2005-01-15 14:41)
+
+  * Made module actually work in all cases. (Explicitly specify a valid port
+    number when creating the UDP socket, otherwise the creation might fail.)
+
+--- 0.10 (initial release) (2005-01-15 00:00)
+
+# $Id: CHANGES,v 1.4 2005/05/05 13:05:11 julian Exp $
+# vim:tw=79

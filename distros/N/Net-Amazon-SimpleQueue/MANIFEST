@@ -1,0 +1,7 @@
+CHANGES
+Build.PL
+lib/Net/Amazon/SimpleQueue.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+META.yml

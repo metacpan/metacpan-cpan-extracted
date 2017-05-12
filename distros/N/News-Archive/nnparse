@@ -1,0 +1,62 @@
+#!/usr/local/bin/perl
+our $VERSION = 0.6;	
+# Parse 'nn' sentnews files and put them into a standard location for
+# later use with News::Archive.  Requires News::Archive::Mbox
+
+use Date::Parse;
+use News::Article;
+my $prefix = "invalid.notrealid";
+my $domain = "news.killfile.org";
+our $LOGDIR = "/home/tskirvin/news/posts/bymonth";
+
+use lib '/home/tskirvin/news-archive';
+use News::Article::Mbox;
+
+my (@lines, @from);
+while ( my $line = <STDIN>) { 
+  if ($line =~ /^From: .*/) { 
+    push @from, $line;
+  } elsif ($line =~ /^\s*$/) { 
+    push @lines, reverse @from if @from; @from = ();  
+    push @lines, $line;
+  } else { push @lines, $line; }
+}
+
+my @articles = News::Article::Mbox->read_mbox(\@lines);
+
+# Rewrites
+foreach my $article (@articles) { 	
+  my $timestamp = $$article{TIMESTAMP} || "";  
+  my $stamp = $timestamp;  $stamp =~ s/^From \S+\s*//; 
+
+  $article->add_message_id($prefix, $domain);  
+  if ($article->header('from') eq 'tskirvin') { 
+    $article->set_headers('from', 
+			'tskirvin@unknown.site.invalid (Tim Skirvin)');
+  }
+  my @body = $article->body;  
+  map { s/([Tt])umati/$1\*mati/g; } @body;
+  unless ($article->header('date')) {
+    $article->set_headers('date', $stamp);  
+  }
+  $article->set_body(@body);
+
+  # $article->write(\*STDOUT);  next;
+
+  my $posttime = str2time($article->header('date')) || str2time($stamp);
+  my $date = sprintf("%04d-%02d", 
+	(localtime($posttime))[5] + 1900, (localtime($posttime))[4] + 1);
+  $list{$date} ||= mkfh($date);
+  my $fh = $list{$date} or next;
+  print $fh "$timestamp\n";
+  $article->write($fh);
+  print $fh "\n";
+}
+
+exit (0);
+
+sub mkfh {
+  my ($file) = @_;
+  open (FH, ">> $LOGDIR/$file");
+  \*FH;
+}

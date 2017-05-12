@@ -1,0 +1,19 @@
+---
+name: Net-NAT-PMP
+version: 0.9.4
+author:
+  - 'David Caldwell <david@porkrind.org>'
+abstract: Poke holes in a router's NAT using the NAT-PMP protocol
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  IO::Socket::INET: 0
+provides:
+  Net::NAT::PMP:
+    file: lib/Net/NAT/PMP.pm
+    version: 0.9.4
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,65 @@
+Net::ICQ
+========
+
+This is a really unfinished module for communicating with an ICQ
+server.
+
+CHANGES
+=======
+
+See the Changes file.
+
+
+INSTALLING
+==========
+
+After unzipping and untarring the distribution directory, you install
+the library by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+CONTACTS
+========
+
+I can be contacted at <luke@petre.net>.
+
+The project is hosted at SourceForge, at http://neticq.sourceforge.net .
+
+
+MAILING LISTS
+=============
+
+The icq-dev mailing list is for all the ICQ clones being developed,
+see http://www.student.nada.kth.se/~d95-mih/icq/#icq-devel for
+details.
+
+Also, there is a Net-ICQ developers list hosted by SourceForge.  Go to
+the project homepage listed above, and follow the links to the mailing
+list area.
+
+
+CREDITS
+=======
+(Names in [...] are those used in the Changes file)
+
+(none yet)
+
+
+DISCLAIMERS
+===========
+I am in no way affiliated with Mirabilis!
+
+This program was made without any help from Mirabilis or their
+consent.  No reverse engineering or decompilation of any Mirabilis
+code took place to make this program.
+
+
+Copyright (c) 2000 Luke Petre . All rights reserved.
+Inspired by Net-ICQ 0.08a and previous, copyright Bek Oberin.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

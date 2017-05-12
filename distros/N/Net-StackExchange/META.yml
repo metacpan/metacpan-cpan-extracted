@@ -1,0 +1,31 @@
+---
+abstract: 'Access Stack Exchange API from Perl'
+author:
+  - 'Alan Haggai Alavi <alanhaggai@alanhaggai.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.31
+  Module::Build: 0.3601
+  Test::Differences: 0
+  Test::More: 0.94
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-StackExchange
+requires:
+  Carp: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  Moose::Role: 0
+  Moose::Util::TypeConstraints: 0
+  Scalar::Util: 0
+  URI::Escape: 0
+resources:
+  repository: http://github.com/alanhaggai/Net-StackExchange
+version: 0.102740

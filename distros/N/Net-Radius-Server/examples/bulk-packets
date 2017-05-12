@@ -1,0 +1,37 @@
+# This is a sample packet file for rad-bulk.
+
+# A simple auth packet
+Authentication
+User-Name=lem
+User-Password=Sikrit
+NAS-IP-Address=127.0.0.1
+Service-Type=PPP
+
+# When no password is supplied, a random one will be generated
+# for each run-time
+Authentication
+User-Name=foo
+NAS-IP-Address=127.0.0.1
+Service-Type=PPP
+
+Authentication
+User-Name=bar
+User-Password=cannotTellya
+NAS-IP-Address=127.0.0.3
+Service-Type=PPP
+
+# A simple accounting packet. Note that
+# Acct-Session-Id will be provided automatically
+Accounting
+User-Name=lem
+NAS-IP-Address=127.0.0.1
+
+Accounting
+# Note the username
+User-Name=foo
+NAS-IP-Address=127.0.0.2
+
+Accounting
+User-Name=bar
+NAS-IP-Address=127.0.0.3
+

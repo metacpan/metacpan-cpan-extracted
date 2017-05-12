@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+BEGIN:VEVENT
+UID:19970901T130000Z-123401@host.com
+ATTACH:CID:jsmith.part3.960817T083000.xyzMail@host1.com
+ATTACH;FMTTYPE=application/postscript:ftp://xyzCorp.com/pub/reports/r-960812.ps
+END:VEVENT
+BEGIN:VJOURNAL
+UID:19970901T130000Z-123401@host.com
+ATTACH:CID:jsmith.part3.960817T083000.xyzMail@host1.com
+ATTACH;FMTTYPE=application/postscript:ftp://xyzCorp.com/pub/reports/r-960812.ps
+END:VTODO
+BEGIN:VJOURNAL
+UID:19970901T130000Z-123401@host.com
+ATTACH:CID:jsmith.part3.960817T083000.xyzMail@host1.com
+ATTACH;FMTTYPE=application/postscript:ftp://xyzCorp.com/pub/reports/r-960812.ps
+END:VTODO
+END:VCALENDAR

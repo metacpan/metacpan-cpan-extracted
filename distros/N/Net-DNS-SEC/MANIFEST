@@ -1,0 +1,27 @@
+Changes
+Makefile.PL
+MANIFEST			This list of files
+README
+demo/getkeyset.pl
+demo/key2ds
+demo/make-signed-keyset
+lib/Net/DNS/SEC.pm
+lib/Net/DNS/SEC/Keyset.pm
+lib/Net/DNS/SEC/Private.pm
+lib/Net/DNS/SEC/DSA.pm
+lib/Net/DNS/SEC/ECDSA.pm
+lib/Net/DNS/SEC/ECCGOST.pm
+lib/Net/DNS/SEC/RSA.pm
+t/00-load.t
+t/00-pod.t
+t/10-keyset.t
+t/21-RSA-MD5.t
+t/22-RSA-SHA1.t
+t/23-RSA-SHA256.t
+t/24-RSA-SHA512.t
+t/31-DSA-SHA1.t
+t/41-ECC-GOST.t
+t/51-ECDSA-P256.t
+t/52-ECDSA-P384.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,37 @@
+---
+abstract: 'Higher level interface to Net::Amazon::DyamoDB::Lite'
+author:
+  - 'Eric Johnson <eric.git@iijo.org>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  Module::Build::Tiny: 0.035
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Amazon-DynamoDB-Table
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::Amazon::DynamoDB::Table:
+    file: lib/Net/Amazon/DynamoDB/Table.pm
+    version: 0.05
+requires:
+  Net::Amazon::DynamoDB::Lite: 0.05
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/kablamo/Net-Amazon-DynamoDB-Table/issues
+  homepage: https://github.com/kablamo/Net-Amazon-DynamoDB-Table
+  repository: git://github.com/kablamo/Net-Amazon-DynamoDB-Table.git
+version: 0.05

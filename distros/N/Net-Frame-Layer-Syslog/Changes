@@ -1,0 +1,26 @@
+Revision history for Perl extension Net::Frame::Layer::Syslog.
+
+1.05 Tue Dec 13 17:48:36 EST 2016
+   - Remove Socket dependence and make _getHost() return hostname.
+   - Change in print() to print facility and severity numbers and only names 
+     if they correspond to known values.
+   - Change in print() to check if not defined content() for short print.
+      - content(undef) in pack() to facilitate above.
+   - Makefile.PL removed Socket::GetAddrInfo dependency.
+
+1.04 Mon Nov 19 17:48:36 EST 2012
+   - Socket name lookups now Socket version independent.
+
+1.03 Mon Feb  3 17:48:36 EST 2012
+   - Socket / Socket6 woes with getaddrinfo Perl 5.12 vs 5.14
+
+1.02 Thu Jan 26 17:48:36 EST 2012
+   - Windows + CPAN = withoutworldwriteables
+
+1.01 Thu Jan 26 17:48:36 EST 2012
+   - t\02 ... dubious test number corrected
+   - 'use if' pragma Perl version < 5.014 for Socket6 in Syslog.pm
+
+1.00 Wed Jan 13 17:48:36 EST 2012
+   - first public release
+

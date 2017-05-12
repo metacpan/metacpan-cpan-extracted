@@ -1,0 +1,4 @@
+<Invoice>
+  <InvoiceID>[% guid %]</InvoiceID>
+  <Status>VOIDED</Status>
+</Invoice>

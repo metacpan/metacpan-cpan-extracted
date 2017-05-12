@@ -1,0 +1,19 @@
+INSTALL
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install (as root to install system-wide)
+
+To install to a different directory (if you're not root, for example),
+use the
+
+    --install_path lib=~/lib/perl
+
+and/or
+
+    --install_path libdoc=~/man/man3
+
+options to the install step.  The above paths are just examples.
+See the Module::Build documentation for more information.
+

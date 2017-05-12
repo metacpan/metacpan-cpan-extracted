@@ -1,0 +1,30 @@
+Revision history for Perl extension Net::Google::SafeBrowsing2::Redis.
+
+0.01  Fri Jun 08 17:57:33 2012
+	- original version
+
+0.02 Mon Jun 18 19:17:00
+	- improve performances
+
+0.2 Thu Jun 28 14:29:00
+	- ready for CPAN release
+
+0.3 Tue Jul 31 16:51:00
+	- Improve performances for updates and lookup
+	- Fix typo in sub chunk key
+	- Note: not backward compatible
+
+0.4 Wed Aug 01 16:35:00
+	- Remove unused keys
+	- Use smaller name for blacklists (120MB saved)
+	- new option backward_compatible 
+	- new option keep_all
+
+0.5 Fri Aug 03 09:49:00
+	- requires Net::Google::SafeBrowsing2
+
+0.6 Fri Nov 30 18:04:00
+	- some Redis keys were never deleted
+
+0.7 Mon Aug 05 21:06:00
+	- chunks were not deleted correctly.

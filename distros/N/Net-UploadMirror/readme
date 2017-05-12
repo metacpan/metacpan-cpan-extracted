@@ -1,0 +1,34 @@
+Net-UploadMirror version 0.13
+=============================
+
+This module is for mirroring a local directory to a remote location via FTP.
+For example websites, documentations or developmentstuff which ones were
+worked on locally. Remote files on the ftp-server will be overwritten,
+also in case they are newer. It is not developt for mirroring large archivs.
+But there are not in principle any limits.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ 	Net::MirrorDir 0.19
+ 	Storable
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 - 2008 by Torsten Knorr
+ create-soft@tiscali.de
+ http://freenet-homepage.de/torstenknorr/index.html
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.9.2 or,
+at your option, any later version of Perl 5 you may have available.

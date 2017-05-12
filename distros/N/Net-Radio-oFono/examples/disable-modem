@@ -1,0 +1,63 @@
+#!/usr/pkg/bin/perl -w
+
+use strict;
+use warnings;
+
+use Net::Radio::oFono;
+
+use Net::DBus qw(:typing);
+
+use Log::Any qw($log);
+use Log::Any::Adapter;
+use Log::Log4perl;
+Log::Log4perl->easy_init($Log::Log4perl::DEBUG);
+Log::Any::Adapter->set('Log4perl');
+
+use Net::DBus::Reactor;
+
+use Time::HiRes qw(sleep);
+
+sub on_modem_added
+{
+    my ( $ofono, $event, $modem_path ) = @_;
+
+    my $modem = $ofono->get_modem_interface( $modem_path, "Modem" );
+
+    if ( $modem->GetProperty("Powered") )
+    {
+        # disable before starting workflow to get a clean start ...
+        $modem->SetProperty( "Powered", dbus_boolean(0) );
+    }
+    else
+    {
+        Net::DBus::Reactor->main->shutdown();
+    }
+
+    return;
+}
+
+sub on_modem_power_changed
+{
+    my ( $ofono, $event, $info ) = @_;
+    my ( $modem_path, $power_state ) = @$info;
+
+    if ($power_state)
+    {
+        $ofono->get_modem_interface( $modem_path, "Modem" )
+          ->SetProperty( "Powered", dbus_boolean(0) );
+    }
+    else
+    {
+        Net::DBus::Reactor->main->shutdown();
+    }
+
+    return;
+}
+
+my $oFono = Net::Radio::oFono->new( "ON_MODEM_ADDED"                    => \&on_modem_added,
+                                    "ON_MODEM_PROPERTY_POWERED_CHANGED" => \&on_modem_power_changed,
+                                  );
+
+Net::DBus::Reactor->main->run();
+$log->debug("Leaving");
+undef $oFono; # force DESTROY

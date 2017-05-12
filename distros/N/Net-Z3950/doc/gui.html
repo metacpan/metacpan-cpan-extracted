@@ -1,0 +1,22 @@
+<HTML>
+ <HEAD>
+  <TITLE>GUIs for Perl/Net::Z3950 Applications</TITLE>
+ </HEAD>
+ <BODY>
+  <H1>GUIs for Perl/Net::Z3950 Applications</H1>
+  <P>
+  Because the Net::Z3950 code is driven by the standard generic event loop
+  (provided by the <TT>Event</TT> module), you might think it would be
+  easy to integrate it with with a GUI toolkit to achieve a GUI Z39.50
+  client.  Yes and no.  The two main GUI toolkits for perl are Tk and
+  Qt: the former does not integrate with Event, but the latter does -
+  although I've not done it myself.  See the file <TT>perlqt.t</TT> in
+  the Event distribution, which shows how to do it, but hints that it
+  will probably be necessary to rebuild Qt first :-(
+  <P>
+  Looks like I'm going to have to either learn Qt <I>&lt;sigh&gt;</I>
+  or wait until the Tk maintainers fulfil what's apparently a
+  long-standing intention to make it Event-friendly
+  <I>&lt;double-sigh&gt;</I>
+ </BODY>
+</HTML>

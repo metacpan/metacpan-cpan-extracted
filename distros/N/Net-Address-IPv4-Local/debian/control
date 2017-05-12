@@ -1,0 +1,14 @@
+Source: libnet-address-ipv4-local-perl
+Section: perl
+Priority: optional
+Maintainer: Julian Mehnle <julian@mehnle.net>
+Build-Depends-Indep: debhelper (>= 4.0.2), perl (>= 5.8.0-7), libmodule-build-perl, libtest-simple-perl
+Standards-Version: 3.6.1
+
+Package: libnet-address-ipv4-local-perl
+Architecture: all
+Depends: ${perl:Depends}, liberror-perl
+Description: A class for discovering the local system's IP address
+ Net::Address::IPv4::Local discovers the local system's IP address that would
+ be used as the source address when contacting "the internet" or a certain
+ specified remote IP address.

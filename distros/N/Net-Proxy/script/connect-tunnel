@@ -1,0 +1,268 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+use Net::Proxy;
+use Getopt::Long;
+use Pod::Usage;
+
+# die early if this module is not installed
+eval { require LWP::UserAgent; };
+die "LWP::UserAgent required to run connect-tunnel\n" if $@;
+
+# default configuration
+our %CONF = (
+    'proxy-authentication' => '',
+    'proxy'                => $ENV{HTTP_PROXY},
+    'user-agent'           => "connect-tunnel/$Net::Proxy::VERSION",
+    'verbose'              => 0,
+);
+
+#
+# get and check the options
+#
+GetOptions( \%CONF, "verbose|v+", "tunnel|T=s@", "proxy|P=s",
+    "proxy-authentication|A=s", "local-only|L", "user-agent|U=s" )
+   or pod2usage();
+
+# set up the verbosity level
+Net::Proxy->set_verbosity( $CONF{verbose} );
+
+# check for a proxy
+if ( $CONF{proxy} ) {
+    $CONF{proxy} .= ":8080" if not $CONF{proxy} =~ /:/;
+}
+
+die "--proxy <proxy:port> option required$/" if !$CONF{proxy};
+
+# create the tunnels entrances
+die "--tunnel <port:host:hostport> option required$/"
+  unless exists $CONF{tunnel};
+
+# split proxy-authentication
+{
+    my ( $user, $pass ) = split ':', $CONF{'proxy-authentication'}, 2;
+    $CONF{'proxy-authentication'} = $CONF{'proxy-authentication'}
+        ? [ proxy_user => $user, proxy_pass => $pass ]
+        : [];
+}
+
+for my $tunnel ( @{ $CONF{tunnel} } ) {
+    die "--tunnel <port:host:hostport> format required$/"
+      if $tunnel !~ /^\d+:[^:]+:\d+$/;
+    my ( $port, $host, $hostport ) = split ':', $tunnel;
+    my ( $proxy_host, $proxy_port) = split ':', $CONF{proxy};
+
+    my $proxy = Net::Proxy->new(
+        {   in => {
+                type  => 'tcp',
+                port  => $port,
+                host  => $CONF{'local-only'} ? 'localhost' : '0.0.0.0',
+            },
+            out => {
+                type        => 'connect',
+                host        => $host,
+                port        => $hostport,
+                proxy_host  => $proxy_host,
+                proxy_port  => $proxy_port,
+                proxy_agent => $CONF{'user-agent'},
+                @{ $CONF{'proxy-authentication'} },
+            },
+        }
+    );
+
+    $proxy->register();
+}
+
+# the main loop
+Net::Proxy->mainloop();
+
+__END__
+
+=head1 NAME
+
+connect-tunnel - Create CONNECT tunnels through HTTP proxies
+
+=head1 SYNOPSIS
+
+B<connect-tunnel> S<[ B<-Lv> ]> S<[ B<-A> I<user:pass> ]> S<[ B<-P> I<proxy:port> ]>
+               S<[ B<-C> I<controlport> ]> S<[ B<-T> I<port:host:hostport> ]>
+
+=head1 DESCRIPTION
+
+B<connect-tunnel> sets up tunneled connections to external hosts
+by redirecting connections to local ports towards thoses hosts/ports
+through a HTTP proxy.
+
+B<connect-tunnel> makes use of the HTTP C<CONNECT> method to ask the
+proxy to create a tunnel to an outside server. Be aware that some
+proxies are set up to deny outside tunnels (either to ports other
+than 443 or outside a specified set of outside hosts).
+
+=head1 OPTIONS
+
+The program follows the usual GNU command line syntax, with long
+options starting with two dashes.
+
+=over 4
+
+=item B<-A>, B<--proxy-authentication> I<user:password>
+
+Proxy authentication information.
+
+Please note that all the authentication schemes supported by
+C<LWP::UserAgent> are supported (we use an C<LWP::UserAgent> internally
+to contact the proxy).
+
+=item B<-C>, B<--control-port> I<controlport>
+
+The port to which one can connect to issue control commands to
+B<connect-tunnel>.
+
+See L<CONTROL CONNECTIONS> for more details about the available commands.
+
+=item B<-L>, B<--local-only>
+
+Create the tunnels so that they will only listen on C<localhost>.
+Thus, only connections originating from the machine that runs
+B<connect-tunnel> will be accepted.
+
+That was the default behaviour in B<connect-tunnel> version 0.02.
+
+=item B<-P>, B<--proxy> I<proxy>[I<:port>]
+
+The proxy is required to connect the tunnels.
+If no port is given, 8080 is used by default.
+
+See also L<ENVIRONMENT VARIABLES>.
+
+=item B<-T>, B<--tunnel> I<port:host:hostport>
+
+Specifies that the given I<port> on the local host is to be forwarded
+to the given I<host> and I<hostport> on the remote side. This works by
+allocating a socket to listen to I<port> on the local side, and whenever
+a connection is made to this I<port>, B<connect-tunnel> forwards it to
+the proxy (with the credentials, if required), which in turn forwards
+it to the final destination.
+
+Note that this does not imply the use of any cryptographic system
+(SSL or any other). This is a simple TCP redirection. The security
+if any, is the one provided by the protocol used to connect to the
+destination through B<connect-tunnel>.
+
+On Unix systems, only root can forward privileged ports.
+
+Note that you can setup tunnels to multiple destinations, by using
+the B<--tunnel> option several times.
+
+=item B<-U>, B<--user-agent> I<string>
+
+Specify User-Agent value to send in HTTP requests.
+The default is to send C<connect-tunnel/I<version>>.
+
+=item B<-v>, B<--verbose>
+
+Verbose output.
+
+This option can be used several times for more verbose output.
+
+=back
+
+=head1 EXAMPLES
+
+To connect to a SSH server running on C<ssh.example.com>, on port 443,
+through the proxy C<proxy.company.com>, running on port 8080, use the
+following command:
+
+    connect-tunnel -P proxy.company.com:8080 -T 22:ssh.example.com:443
+
+And now point your favorite ssh client to the machine running
+B<connect-tunnel>.
+
+You can also emulate a "standard" user-agent:
+
+    connect-tunnel -U "Mozilla/4.03 [en] (X11; I; Linux 2.1.89 i586)"
+                   -P proxy.company.com:8080 -T 22:ssh.example.com:443
+
+B<connect-tunnel> can easily use your proxy credentials to connect
+outside:
+
+    connect-tunnel -U "Mozilla/4.03 [en] (X11; I; Linux 2.1.89 i586)"
+                   -P proxy.company.com:8080 -T 22:ssh.example.com:443
+                   -A book:s3kr3t
+
+But if you don't want anybody else to connect to your tunnels
+and through the proxy with I<your> credentials, use the
+B<--local-only> option:
+
+ connect-tunnel -U "Mozilla/4.03 [en] (X11; I; Linux 2.1.89 i586)"
+                -P proxy.company.com:8080 -T 22:ssh.example.com:443
+                -A book:s3kr3t -L
+
+If you have several destinations, there is no need to run several
+instances of B<connect-tunnel>:
+
+ connect-tunnel -U "Mozilla/4.03 [en] (X11; I; Linux 2.1.89 i586)"
+                -P proxy.company.com:8080 -A book:s3kr3t -L
+                -T 22:ssh.example.com:443
+                -T 222:ssh2.example.com:443
+
+But naturally, you will need to correctly set up the ports in your clients.
+
+Mmm, such a long command line would perfectly fit in an alias or a F<.BAT>
+file. C<;-)>
+
+=head1 ENVIRONMENT VARIABLES
+
+The environment variable C<HTTP_PROXY> can be used to provide
+a proxy definition.
+
+The environment variable is overriden by the B<--proxy> option,
+if passed to B<connect-tunnel>.
+
+=head1 AUTHOR
+
+Philippe "BooK" Bruhat, C<< <book@cpan.org> >>.
+
+I seem to have re-invented a well-known wheel with that script, but at
+least, I hope I have added a few interesting options to it.
+
+=head1 SCRIPT HISTORY
+
+The first version of the script was a quick hack that let me go through
+a corporate proxy.
+
+Version 0.02 and version 0.03 were released on CPAN in 2003.
+
+Version 0.04 sits half-finished in a CVS repository at home: I couldn't
+decypher the spaghetti of my data structures any more. C<:-(>
+
+Version 0.05 (and higher) are based on C<Net::Proxy>, and included with
+the C<Net::Proxy> distribution.
+
+=head1 
+
+Even though it's not rocket science, B<connect-tunnel> has been cited
+in at least one academic works:
+
+=over 4
+
+=item * I<HTTP Tunnels Through Proxies>, Daniel Alman
+
+Available at SANS InfoSec Reading Room: Covert Channels
+L<http://www.sans.org/rr/whitepapers/covert/>
+
+Direct link: L<http://www.sans.org/rr/whitepapers/covert/1202.php>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright 2003-2007, Philippe Bruhat. All rights reserved.
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it or modify it under
+the same terms as Perl itself.
+
+=cut
+

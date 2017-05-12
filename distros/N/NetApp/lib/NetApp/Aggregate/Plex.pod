@@ -1,0 +1,42 @@
+
+=head1 NAME
+
+NetApp::Aggregate::Plex -- OO Class for representing NetApp plexes
+
+=head1 SYNOPSIS
+
+    use NetApp::Filer;
+    use NetApp::Aggregate;
+
+    my $aggregate 	= $filer->get_aggregate( $name );
+
+    my $plex		= $aggregate->get_plex;
+
+    my @raidgroups	= $plex->get_raidgroups;
+
+=head1 DESCRIPTION
+
+This class is used to encapsulate a NetApp plex, and provide access to
+the name and states of the plex.
+
+=head1 METHODS
+
+=head2 get_name
+
+Returns the name of the plex as a string.
+
+=head2 get_raidgroups
+
+Returns a list of NetApp::Aggregate::RAIDGroup objects, one for each
+RAIDGroup in the Plex.
+
+=head2 get_states
+
+Returns a list of strings, each of which represents a single state for
+the plex.
+
+=head2 get_state( $state )
+
+Returns true if the plex has the given state, false otherwise.
+
+=cut

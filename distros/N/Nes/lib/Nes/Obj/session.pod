@@ -1,0 +1,93 @@
+
+=head1 NAME
+
+Nes::Obj::session - manage users session
+
+=head1 SYNOPSIS
+
+    {: include ( '{: * cfg_obj_top_dir :}/session.nhtml',
+                  action,
+                  user,
+                  expire
+               )
+    :}
+
+=head1 DESCRIPTION
+
+Manage users session.
+
+=head1 PARAMETERS
+
+=over 2
+
+=item action
+
+Action can be 'get' for get session user_id, 'create' for create session 
+or 'del' for delete session.
+
+=item user
+
+The user_id.
+
+=item expire
+
+if action is create: expire time.
+
+Expire format:
+
+    suffix: s: seconds, m: minutes h: hours d: days, M: months, y: years
+    30s = 30 seconds
+    12h = 12 hours
+    2y  = 2 years
+
+=back
+
+=head1 AUTHOR
+
+Skriptke: Enrique Castañón
+
+=head1 VERSION
+
+Version 1.03 April 2010
+
+=head1 COPYRIGHT
+
+Copyright (c) Enrique F. Castanon Barbero. All rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms and conditions as
+GNU Public License (GPL).
+
+This means that you can, at your option, redistribute it and/or 
+modify it under either the terms the GNU Public License (GPL), 
+or under the Perl Artistic License.
+
+See http://dev.perl.org/licenses/
+
+=head1 DISCLAIMER
+
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE.
+
+Use of this software in any way or in any form, source or binary,
+is not allowed in any country which prohibits disclaimers of any
+implied warranties of merchantability or fitness for a particular
+purpose or any disclaimers of a similar nature.
+
+IN NO EVENT SHALL I BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL,  OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE
+USE OF THIS SOFTWARE AND ITS DOCUMENTATION (INCLUDING, BUT NOT
+LIMITED TO, LOST PROFITS) EVEN IF I HAVE BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE
+
+=head1 SEE ALSO
+
+L<Nes>, L<Nes::Tutorial>, L<Nes::Singleton>, L<Nes::nes.cfg>, 
+Sample to use Nes; L<http://nes.sourceforge.net/>
+
+=cut
+

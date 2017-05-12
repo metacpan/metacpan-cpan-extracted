@@ -1,0 +1,10 @@
+# $Id: MANIFEST,v 1.2 2007/05/31 14:55:38 asc Exp $
+Build.PL
+Changes
+lib/Net/Flickr/API.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t

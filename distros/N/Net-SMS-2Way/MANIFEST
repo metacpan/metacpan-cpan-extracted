@@ -1,0 +1,10 @@
+Changes
+contrib/send_sms.pl
+contrib/email2sms.pl
+contrib/sms.conf.SAMPLE
+lib/Net/SMS/2Way.pm
+Makefile.PL
+MANIFEST
+README
+t/Net-SMS-2Way.t
+META.yml                                 Module meta-data (added by MakeMaker)

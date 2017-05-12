@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Net-DPAP-Client
+version: 0.26
+author:
+  - Leon Brocard <acme@astray.com>
+abstract: Connect to iPhoto shares (DPAP)
+license: perl
+generated_by: Module::Build version 0.2612, without YAML.pm

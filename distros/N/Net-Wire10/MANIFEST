@@ -1,0 +1,11 @@
+#
+# This is just an automatically generated file that contains
+# a list of files inside the .tar.gz package it shipped with.
+#
+
+lib/Net/Wire10.pm
+t/00-load.t
+t/01-pod.t
+t/02-pod-coverage.t
+Build.PL
+MANIFEST

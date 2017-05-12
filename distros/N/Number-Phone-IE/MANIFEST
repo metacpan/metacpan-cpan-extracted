@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Number-Phone-IE.t
+lib/Number/Phone/IE.pm
+lib/Number/Phone/IE/Data.pm

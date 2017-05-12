@@ -1,0 +1,209 @@
+#!perl -w 
+
+use strict;
+use Net::FireEagle;
+use JSON::Any;
+
+my $CONFIG = $ENV{HOME}."/.fireeagle";
+
+=head1 NAME 
+
+fireeagle - simple FireEagle client 
+
+=head1 USAGE
+
+    # to get your user tokens
+    fireeagle consumer_key=<consumer key> consumer_secret=<consumer secret>
+
+    # to get your current location
+    fireeagle consumer_key=<consumer key> consumer_secret=<consumer secret> \
+              access_token=<access token> access_token_secret=<access token secret>
+
+    # to set your current location
+    fireeagle consumer_key=<consumer key> consumer_secret=<consumer secret> \
+              access_token=<access token> access_token_secret=<access token secret> \
+              update <location>
+
+or if there is a .fireeagle file in your home directory that looks like
+
+    consumer_key=<consumer key> 
+    consumer_secret=<consumer secret>
+    access_token=<access token> 
+    access_token_secret=<access token secret>
+
+then to get your current location
+
+    fireeagle
+
+and to set your current location
+
+    fireeagle update <location>
+
+or to search for a location
+
+    fireeagle lookup <location>
+
+or you can mix and match command line options and config file options
+(command line will always override config file).
+
+=head1 AUTHENTICATION AND USER TOKENS
+
+To use this script or the C<Net::FireEagle> module you'll need to 
+get an application key. This script will require a desktop type key.
+
+The C<Net::FireEagle> documentation has more information on this but, 
+in short, read this page
+
+    http://fireeagle.yahoo.net/developer/documentation/getting_started
+
+=head1 ABOUT
+
+Fire Eagle is a site that stores information about your location. With 
+your permission, other services and devices can either update that 
+information or access it. By helping applications respond to your 
+location, Fire Eagle is designed to make the world around you more 
+interesting! Use your location to power friend-finders, games, local 
+information services, blog badges and stuff like that...
+
+You can find out more about it here
+
+    https://fireeagle.yahoo.net/
+
+=cut
+
+binmode STDOUT, ":utf8";
+my %tokens = get_tokens();
+
+error("You must pass in a consumer key and secret")
+    unless (defined $tokens{consumer_key} && defined $tokens{consumer_secret});
+
+error("You can't just pass an access token and no access token secret") 
+    if (defined $tokens{access_token} && !defined $tokens{access_token_secret});
+
+error("You can't just pass an access token secret and no access token") 
+    if (!defined $tokens{access_token} && defined $tokens{access_token_secret});
+
+# create the FireEagle object
+my $fe = Net::FireEagle->new( %tokens );
+
+# we've got everything we need to interact
+if ($fe->authorized) {
+    my $method = lc(shift @ARGV);
+    if (defined $method && $method !~ m!^\s*$! && $method ne 'location') {
+        my $loc = shift @ARGV || die "You must pass a location to method $method\n";
+        if ($method eq 'lookup') {
+            lookup_location($fe, $loc);
+        } elsif ($method eq 'update') {
+            update_location($fe, $loc);
+        } else {
+            die "Unknown method $method\n";
+        }
+    }
+    print "Current location: ".get_location($fe)."\n";
+    exit 0;
+}
+
+# right, we need to get their access stuff
+print "STEP 1: REQUEST FIREEAGLE AUTHORIZATION FOR THIS APP\n";
+print "\tURL : ".$fe->get_authorization_url( callback => 'oob' )."\n";
+print "\n-- Please go to the above URL and authorize the app";
+print "\n-- It will give you a code. Please type it here: ";
+my $verifier = <STDIN>; print "\n";
+chomp($verifier);
+$fe->verifier($verifier);
+
+my ($access_token, $access_token_secret) = $fe->request_access_token;
+
+print "You have now authorized this app.\n";
+print "Your access token and secret are:\n\n";
+print "access_token=$access_token\n";
+print "access_token_secret=$access_token_secret\n";
+print "\n";
+if (-f $CONFIG) {
+    save_tokens($fe);
+    print "You should note these down but they have also been saved in $CONFIG\n\n";
+} else {
+    print "You should note these down or put them in $CONFIG with your consumer key and secret\n\n";
+}
+
+print "Current location: ".get_location($fe)."\n";
+
+
+
+sub get_tokens {
+    my @return;
+    # This also needs to try reading from a config file
+    my %tokens = Net::FireEagle->load_tokens($CONFIG);
+    while (@ARGV && $ARGV[0] =~ m!^(\w+)\=(\w+)$!) {
+        $tokens{$1} = $2;
+        shift @ARGV;
+    }
+    return %tokens;
+}
+
+sub save_tokens {
+    my $fe     = shift;
+    my %tokens = $fe->tokens;
+    Net::FireEagle->save_tokens($CONFIG, %tokens);
+}
+
+sub error {
+    my $msg = shift;
+    die "Usage: fireeagle consumer_key=<consumer key> consumer_secret=<consumer secret> [access_token=<access token>] [access_token_secret=<access token secret>] [command [opt[s]]\n";
+        "$msg\n"."\n\n".
+        "See man page for details: perldoc fireeagle or man fireeagle\n";
+}
+
+sub get_location {
+    my $fe   = shift;
+    my $json = $fe->location( format => 'json' );
+    my $obj  = parse_json($json);
+    my $what = $obj->{user}->{location_hierarchy}->[0];
+    return sprintf("%s (accuracy level: %s)", $what->{name}, $what->{level_name});
+}
+
+sub update_location {
+    my ($fe, $loc) = @_;
+    my $json = $fe->update_location($loc, format => 'json');
+    my $obj  = parse_json($json);
+    my $stat = $obj->{stat};
+    die "Couldn't update location" unless defined $stat;
+    die "Couldn't update location: $stat" unless lc($stat) eq 'ok';
+}
+
+sub parse_json {
+    my $json = shift;
+    die "Couldn't parse blank JSON" unless defined $json and $json !~ m!^\s*$!;
+    my $obj  = eval { JSON::Any->new->from_json($json) };
+    die $@ if $@;
+    die "Couldn't parse JSON for some reason" unless defined $obj;
+    return $obj;
+}    
+
+sub lookup_location {
+    my ($fe, $loc) = @_;
+    my $json = $fe->lookup_location($loc, format => 'json');
+    my $obj  = parse_json($json);
+    my $stat = $obj->{stat};
+    die "Couldn't lookup location" unless defined $stat;
+    die "Couldn't lookup location: $stat" unless lc($stat) eq 'ok';
+    print "Did you mean? - \n";
+    print join("\n", map { " ".$_->{name} } @{$obj->{locations}})."\n";
+    exit 0;
+}
+
+=head1 AUTHOR
+
+Simon Wistow <swistow@sixapart.com>
+
+=head1 COPYRIGHT
+
+Copyright 2008, Simon Wistow
+
+Distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Net::FireEagle>
+
+=cut

@@ -1,0 +1,56 @@
+#!/usr/local/bin/perl 
+use Getopt::Std;
+use Net::DSML;
+use Net::DSML::Filter;
+use Net::DSML::Control;
+
+# 
+# Be sure to set up the first line to point to your perl executable location.
+#
+# Fill in the server, dn, password and base variables with values that 
+# match your configuration.
+# Fill in the attr hash attribute and value variables with values that
+# match your configuration.
+#
+# 
+# This example addes an entry to the ldap directory.
+# 
+my $server = "http://dsml.yourcompany.com:8080/dsml";
+ 
+   #
+   #  We are going to do a Add entry request
+   #
+   # Also going to specify a specific batch requestID.
+   # HTTP Basic authenication.
+   #
+   $webdsml = Net::DSML->new(  { url => $server, 
+                        bid => "999", 
+                        dn => "xxx", 
+                        password => "xxx"} );
+
+   if (!($webdsml->add( { 
+       dn => "cn=Burning Man, ou=people, dc=yourcompany, dc=com",
+       attr => {
+       objectClass => ["top","person","organizationalPerson","inetOrgPerson"],
+       cn => "Burning Man",
+       sn => "Man",
+       givenName => "Fire",
+       telephoneNumber => ["214-972-4677","972-987-1234"]
+                  } } )))
+   {
+      print "Add entry error.\n";
+      print $webdsml->error, "\n";
+      exit;
+   }
+
+   if (!($webdsml->send()))
+   {
+      print "Add entry send request error.\n";
+      print $webdsml->error(),"\n";
+      exit;
+   }
+
+# get the return xml content, should be the status of the dsml request.
+$postData = $webdsml->content();
+print $postData, "\n";
+

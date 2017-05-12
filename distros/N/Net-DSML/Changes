@@ -1,0 +1,26 @@
+Revision history for Net-DSML
+
+0.001  Tue August  30 20:30:39 2007
+       Initial release.
+
+0.002  Mon September 3 20:50:00 2007 
+       Added documentation to all of the files in the Examples
+       directory.  
+       Changed permissions on all of the executable files in Examples
+       to 744.  
+       Corrected major code error in Examples/ModRDN.
+       Made minor code change to Examples/Compare.
+       Made documentation changes to Net::DSML, Net::DSML::Filter and
+       Net::DSML::Control pm files.
+       Made documentation changes to the README file.
+
+0.003  Sat September 8 22:00:00 2007
+       Added new tests to t/30.dsml.t.
+       Updated Net::DSML to version 0.003.
+       Updated pod documentation in Net::DSML to reflect changes in software.
+       Added id option to subroutines search,rootDSE,compare,add,modify,
+       modrdn and delete in the Net::DSML file.
+       Added base option to subroutine search in the Net::DSML file.
+       Corrected an execute permission problem on Examples/ModifyEntry file.
+      
+

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+perl -Ilib bin/flickrfs efe286838b28127e10271d239dec10bf 72e96d832e320272 570428-fb6bdf8f8ec27016 $@
+
+

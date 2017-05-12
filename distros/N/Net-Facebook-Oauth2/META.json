@@ -1,0 +1,63 @@
+{
+   "abstract" : "a simple Perl wrapper around Facebook OAuth v2.0 protocol",
+   "author" : [
+      "Mahmoud A. Mehyar <mamod.mehyar@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Facebook-Oauth2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Plack::Loader" : "0",
+            "Plack::Request" : "0",
+            "Test::Exception" : "0",
+            "Test::MockModule" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0.88",
+            "Test::Requires" : "0",
+            "Test::TCP" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "JSON::MaybeXS" : "0",
+            "LWP::UserAgent" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mamod/Net-Facebook-Oauth2/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/mamod/Net-Facebook-Oauth2"
+      }
+   },
+   "version" : "0.10"
+}

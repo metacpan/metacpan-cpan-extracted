@@ -1,0 +1,44 @@
+Revision history for Net-IRC2
+
+0.27	08/22/2005
+	Create Net::IRC2::Chan
+	add Event::polish_up
+	
+0.23    08/20/2005
+	Fix version number problem
+
+0.19    08/20/2005
+	Try to fix version number problem
+
+0.17    08/20/2005
+	Create Net::IRC2::Parser
+	add Connection::part
+	add Connection::whois
+
+0.13    08/18/2005
+	add Event::parent()
+	add Connection::parent()
+
+0.11	08/17/2005
+	add SIGNATURE file with Module::Signature
+	add Connection::notice 
+	add Event::from
+
+0.07	08/15/2005
+	add Net::IRC2::add_default_handler
+	fix Net::IRC2::Event::dump
+
+0.06	08/14/2005
+	add Connection::sl                 ( send raw command )
+	add Connection::do_one_loop 
+	add Event::to                ( alias to Event::Middle )
+	fix IRC grammar
+
+0.05    07/30/2005
+        
+0.02    07/28/2005
+        It Work !!!! please try and enjoy. I'am working on doc.
+        See DumBot file
+
+0.01    07/27/2005
+        First version, released on an unsuspecting world.

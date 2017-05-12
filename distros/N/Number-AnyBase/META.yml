@@ -1,0 +1,34 @@
+---
+abstract: 'Converts decimals to and from any alphabet of any size (for shortening IDs, URLs etc.)'
+author:
+  - 'Emanuele Zeppieri <emazep@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Scalar::Util: 0
+  Test::More: 0.94
+  constant: 0
+  perl: 5.004
+  utf8: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Number-AnyBase
+requires:
+  Carp: 0
+  Class::Accessor::Faster: 0
+  base: 0
+  integer: 0
+  perl: 5.008
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Number-AnyBase
+  homepage: http://search.cpan.org/dist/Number-AnyBase
+  repository: git://github.com/emazep/Number-AnyBase.git
+version: 1.60000

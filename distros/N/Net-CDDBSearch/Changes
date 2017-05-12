@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::CDDBSearch.
+
+0.01  Sat Jan  3 11:46:38 2004
+	- original version; created by h2xs 1.20 with options
+		-XA -n Net::CDDBSearch
+

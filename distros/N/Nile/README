@@ -1,0 +1,23 @@
+Nile - Android Like Visual Web App Framework Separating Code From Design Multi Lingual And Multi Theme.
+
+Module home page: https://metacpan.org/release/Nile
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014-2015 by Dr. Ahmed Amin Elsheshtawy mewsoft@cpan.org ,  support@mewsoft.com
+https://github.com/mewsoft/Nile , https://metacpan.org/release/Nile, http://www.mewsoft.com
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

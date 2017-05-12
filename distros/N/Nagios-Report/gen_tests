@@ -1,0 +1,496 @@
+#!/usr/bin/perl -w
+
+# $Id: gen_tests,v 1.6 2006-08-19 03:32:18+10 sh1517 Exp sh1517 $
+
+# $Log: gen_tests,v $
+# Revision 1.6  2006-08-19 03:32:18+10  sh1517
+# 1 Add some tests for the at style absolute times.
+#
+# Revision 1.5  2006-08-19 00:55:50+10  sh1517
+# 1 Add tests for thisyear, lastyear, thisweek, lastweek, last_n_foo.
+#
+# Revision 1.4  2006-08-18 12:56:54+10  sh1517
+# 1 Add tests for 'yesterday' and 'last31days'.
+#
+# Revision 1.3  2006-08-18 12:28:07+10  sh1517
+# 1 Add some more tests ...
+#
+# Revision 1.2  2006-08-18 09:13:11+10  sh1517
+# 1 Add tests for named month (MMM YYYY).
+#
+# Revision 1.1  2006-08-18 09:06:57+10  sh1517
+# Initial revision
+#
+
+use strict ;
+
+use Time::Local ;
+
+my (@tests, $plan) ;
+
+print <<END_PREAMBLE;
+
+use Test ;
+
+use Nagios::Report ;
+
+=for comment
+
+      July 2006
+Su Mo Tu We Th Fr Sa 
+                   1
+ 2  3  4  5  6  7  8
+ 9 10 11 12 13 14 15
+16 17 18 19 20 21 22
+23 24 25 26 27 28 29
+30 31
+
+     August 2006
+Su Mo Tu We Th Fr Sa 
+       1  2  3  4  5
+ 6  7  8  9 10 11 12
+13 14 15 16 17 18 19
+20 21 22 23 24 25 26
+27 28 29 30 31
+
+
+=cut
+
+END_PREAMBLE
+
+sub valid_date_range { localtime(timelocal(@{$_[0]}[0..5])) . '-' . localtime(timelocal(@{$_[1]}[0..5])) }
+
+@tests = (
+  # tag         arg1          arg2                        expected
+  [ 'last12hours','last12hours',      '[0, 0, 0, 18, 7, 106]',    valid_date_range([0, 0,12, 17, 7, 106], [0, 0, 0, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0, 1, 18, 7, 106]',    valid_date_range([0, 0,13, 17, 7, 106], [0, 0, 1, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0, 2, 18, 7, 106]',    valid_date_range([0, 0,14, 17, 7, 106], [0, 0, 2, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0, 3, 18, 7, 106]',    valid_date_range([0, 0,15, 17, 7, 106], [0, 0, 3, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0, 4, 18, 7, 106]',    valid_date_range([0, 0,16, 17, 7, 106], [0, 0, 4, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0, 5, 18, 7, 106]',    valid_date_range([0, 0,17, 17, 7, 106], [0, 0, 5, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0, 6, 18, 7, 106]',    valid_date_range([0, 0,18, 17, 7, 106], [0, 0, 6, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0, 7, 18, 7, 106]',    valid_date_range([0, 0,19, 17, 7, 106], [0, 0, 7, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0, 8, 18, 7, 106]',    valid_date_range([0, 0,20, 17, 7, 106], [0, 0, 8, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0, 9, 18, 7, 106]',    valid_date_range([0, 0,21, 17, 7, 106], [0, 0, 9, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0,10, 18, 7, 106]',    valid_date_range([0, 0,22, 17, 7, 106], [0, 0,10, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0,11, 18, 7, 106]',    valid_date_range([0, 0,23, 17, 7, 106], [0, 0,11, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0,12, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0,12, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0,13, 18, 7, 106]',    valid_date_range([0, 0, 1, 18, 7, 106], [0, 0,13, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0,14, 18, 7, 106]',    valid_date_range([0, 0, 2, 18, 7, 106], [0, 0,14, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0,15, 18, 7, 106]',    valid_date_range([0, 0, 3, 18, 7, 106], [0, 0,15, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0,16, 18, 7, 106]',    valid_date_range([0, 0, 4, 18, 7, 106], [0, 0,16, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0,17, 18, 7, 106]',    valid_date_range([0, 0, 5, 18, 7, 106], [0, 0,17, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0,18, 18, 7, 106]',    valid_date_range([0, 0, 6, 18, 7, 106], [0, 0,18, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0,19, 18, 7, 106]',    valid_date_range([0, 0, 7, 18, 7, 106], [0, 0,19, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0,20, 18, 7, 106]',    valid_date_range([0, 0, 8, 18, 7, 106], [0, 0,20, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0,21, 18, 7, 106]',    valid_date_range([0, 0, 9, 18, 7, 106], [0, 0,21, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0,22, 18, 7, 106]',    valid_date_range([0, 0,10, 18, 7, 106], [0, 0,22, 18, 7, 106]) ],
+  [ 'last12hours','last12hours',      '[0, 0,23, 18, 7, 106]',    valid_date_range([0, 0,11, 18, 7, 106], [0, 0,23, 18, 7, 106]) ],
+
+  [ 'last24hours','last24hours',      '[0, 0, 0, 18, 7, 106]',    valid_date_range([0, 0, 0, 17, 7, 106], [0, 0, 0, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0, 1, 18, 7, 106]',    valid_date_range([0, 0, 1, 17, 7, 106], [0, 0, 1, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0, 2, 18, 7, 106]',    valid_date_range([0, 0, 2, 17, 7, 106], [0, 0, 2, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0, 3, 18, 7, 106]',    valid_date_range([0, 0, 3, 17, 7, 106], [0, 0, 3, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0, 4, 18, 7, 106]',    valid_date_range([0, 0, 4, 17, 7, 106], [0, 0, 4, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0, 5, 18, 7, 106]',    valid_date_range([0, 0, 5, 17, 7, 106], [0, 0, 5, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0, 6, 18, 7, 106]',    valid_date_range([0, 0, 6, 17, 7, 106], [0, 0, 6, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0, 7, 18, 7, 106]',    valid_date_range([0, 0, 7, 17, 7, 106], [0, 0, 7, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0, 8, 18, 7, 106]',    valid_date_range([0, 0, 8, 17, 7, 106], [0, 0, 8, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0, 9, 18, 7, 106]',    valid_date_range([0, 0, 9, 17, 7, 106], [0, 0, 9, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0,10, 18, 7, 106]',    valid_date_range([0, 0,10, 17, 7, 106], [0, 0,10, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0,11, 18, 7, 106]',    valid_date_range([0, 0,11, 17, 7, 106], [0, 0,11, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0,12, 18, 7, 106]',    valid_date_range([0, 0,12, 17, 7, 106], [0, 0,12, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0,13, 18, 7, 106]',    valid_date_range([0, 0,13, 17, 7, 106], [0, 0,13, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0,14, 18, 7, 106]',    valid_date_range([0, 0,14, 17, 7, 106], [0, 0,14, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0,15, 18, 7, 106]',    valid_date_range([0, 0,15, 17, 7, 106], [0, 0,15, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0,16, 18, 7, 106]',    valid_date_range([0, 0,16, 17, 7, 106], [0, 0,16, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0,17, 18, 7, 106]',    valid_date_range([0, 0,17, 17, 7, 106], [0, 0,17, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0,18, 18, 7, 106]',    valid_date_range([0, 0,18, 17, 7, 106], [0, 0,18, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0,19, 18, 7, 106]',    valid_date_range([0, 0,19, 17, 7, 106], [0, 0,19, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0,20, 18, 7, 106]',    valid_date_range([0, 0,20, 17, 7, 106], [0, 0,20, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0,21, 18, 7, 106]',    valid_date_range([0, 0,21, 17, 7, 106], [0, 0,21, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0,22, 18, 7, 106]',    valid_date_range([0, 0,22, 17, 7, 106], [0, 0,22, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0, 0,23, 18, 7, 106]',    valid_date_range([0, 0,23, 17, 7, 106], [0, 0,23, 18, 7, 106]) ],
+
+  [ 'last24hours','last24hours',      '[0,45, 0, 18, 7, 106]',    valid_date_range([0,45, 0, 17, 7, 106], [0,45, 0, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45, 1, 18, 7, 106]',    valid_date_range([0,45, 1, 17, 7, 106], [0,45, 1, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45, 2, 18, 7, 106]',    valid_date_range([0,45, 2, 17, 7, 106], [0,45, 2, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45, 3, 18, 7, 106]',    valid_date_range([0,45, 3, 17, 7, 106], [0,45, 3, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45, 4, 18, 7, 106]',    valid_date_range([0,45, 4, 17, 7, 106], [0,45, 4, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45, 5, 18, 7, 106]',    valid_date_range([0,45, 5, 17, 7, 106], [0,45, 5, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45, 6, 18, 7, 106]',    valid_date_range([0,45, 6, 17, 7, 106], [0,45, 6, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45, 7, 18, 7, 106]',    valid_date_range([0,45, 7, 17, 7, 106], [0,45, 7, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45, 8, 18, 7, 106]',    valid_date_range([0,45, 8, 17, 7, 106], [0,45, 8, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45, 9, 18, 7, 106]',    valid_date_range([0,45, 9, 17, 7, 106], [0,45, 9, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45,10, 18, 7, 106]',    valid_date_range([0,45,10, 17, 7, 106], [0,45,10, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45,11, 18, 7, 106]',    valid_date_range([0,45,11, 17, 7, 106], [0,45,11, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45,12, 18, 7, 106]',    valid_date_range([0,45,12, 17, 7, 106], [0,45,12, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45,13, 18, 7, 106]',    valid_date_range([0,45,13, 17, 7, 106], [0,45,13, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45,14, 18, 7, 106]',    valid_date_range([0,45,14, 17, 7, 106], [0,45,14, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45,15, 18, 7, 106]',    valid_date_range([0,45,15, 17, 7, 106], [0,45,15, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45,16, 18, 7, 106]',    valid_date_range([0,45,16, 17, 7, 106], [0,45,16, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45,17, 18, 7, 106]',    valid_date_range([0,45,17, 17, 7, 106], [0,45,17, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45,18, 18, 7, 106]',    valid_date_range([0,45,18, 17, 7, 106], [0,45,18, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45,19, 18, 7, 106]',    valid_date_range([0,45,19, 17, 7, 106], [0,45,19, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45,20, 18, 7, 106]',    valid_date_range([0,45,20, 17, 7, 106], [0,45,20, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45,21, 18, 7, 106]',    valid_date_range([0,45,21, 17, 7, 106], [0,45,21, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45,22, 18, 7, 106]',    valid_date_range([0,45,22, 17, 7, 106], [0,45,22, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[0,45,23, 18, 7, 106]',    valid_date_range([0,45,23, 17, 7, 106], [0,45,23, 18, 7, 106]) ],
+
+  [ 'last24hours','last24hours',      '[30,45, 0, 18, 7, 106]',    valid_date_range([30,45, 0, 17, 7, 106], [30,45, 0, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45, 1, 18, 7, 106]',    valid_date_range([30,45, 1, 17, 7, 106], [30,45, 1, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45, 2, 18, 7, 106]',    valid_date_range([30,45, 2, 17, 7, 106], [30,45, 2, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45, 3, 18, 7, 106]',    valid_date_range([30,45, 3, 17, 7, 106], [30,45, 3, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45, 4, 18, 7, 106]',    valid_date_range([30,45, 4, 17, 7, 106], [30,45, 4, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45, 5, 18, 7, 106]',    valid_date_range([30,45, 5, 17, 7, 106], [30,45, 5, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45, 6, 18, 7, 106]',    valid_date_range([30,45, 6, 17, 7, 106], [30,45, 6, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45, 7, 18, 7, 106]',    valid_date_range([30,45, 7, 17, 7, 106], [30,45, 7, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45, 8, 18, 7, 106]',    valid_date_range([30,45, 8, 17, 7, 106], [30,45, 8, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45, 9, 18, 7, 106]',    valid_date_range([30,45, 9, 17, 7, 106], [30,45, 9, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45,10, 18, 7, 106]',    valid_date_range([30,45,10, 17, 7, 106], [30,45,10, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45,11, 18, 7, 106]',    valid_date_range([30,45,11, 17, 7, 106], [30,45,11, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45,12, 18, 7, 106]',    valid_date_range([30,45,12, 17, 7, 106], [30,45,12, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45,13, 18, 7, 106]',    valid_date_range([30,45,13, 17, 7, 106], [30,45,13, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45,14, 18, 7, 106]',    valid_date_range([30,45,14, 17, 7, 106], [30,45,14, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45,15, 18, 7, 106]',    valid_date_range([30,45,15, 17, 7, 106], [30,45,15, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45,16, 18, 7, 106]',    valid_date_range([30,45,16, 17, 7, 106], [30,45,16, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45,17, 18, 7, 106]',    valid_date_range([30,45,17, 17, 7, 106], [30,45,17, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45,18, 18, 7, 106]',    valid_date_range([30,45,18, 17, 7, 106], [30,45,18, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45,19, 18, 7, 106]',    valid_date_range([30,45,19, 17, 7, 106], [30,45,19, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45,20, 18, 7, 106]',    valid_date_range([30,45,20, 17, 7, 106], [30,45,20, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45,21, 18, 7, 106]',    valid_date_range([30,45,21, 17, 7, 106], [30,45,21, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45,22, 18, 7, 106]',    valid_date_range([30,45,22, 17, 7, 106], [30,45,22, 18, 7, 106]) ],
+  [ 'last24hours','last24hours',      '[30,45,23, 18, 7, 106]',    valid_date_range([30,45,23, 17, 7, 106], [30,45,23, 18, 7, 106]) ],
+
+  [ 'last7days','last7days',   '[0, 0, 0,  1, 7, 106]',   valid_date_range([0, 0, 0, 25, 6, 106], [0, 0, 0,  1, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0,  2, 7, 106]',   valid_date_range([0, 0, 0, 26, 6, 106], [0, 0, 0,  2, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0,  3, 7, 106]',   valid_date_range([0, 0, 0, 27, 6, 106], [0, 0, 0,  3, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0,  4, 7, 106]',   valid_date_range([0, 0, 0, 28, 6, 106], [0, 0, 0,  4, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0,  5, 7, 106]',   valid_date_range([0, 0, 0, 29, 6, 106], [0, 0, 0,  5, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0,  6, 7, 106]',   valid_date_range([0, 0, 0, 30, 6, 106], [0, 0, 0,  6, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0,  7, 7, 106]',   valid_date_range([0, 0, 0, 31, 6, 106], [0, 0, 0,  7, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0,  8, 7, 106]',   valid_date_range([0, 0, 0,  1, 7, 106], [0, 0, 0,  8, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0,  9, 7, 106]',   valid_date_range([0, 0, 0,  2, 7, 106], [0, 0, 0,  9, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0, 10, 7, 106]',   valid_date_range([0, 0, 0,  3, 7, 106], [0, 0, 0, 10, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0, 11, 7, 106]',   valid_date_range([0, 0, 0,  4, 7, 106], [0, 0, 0, 11, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0, 12, 7, 106]',   valid_date_range([0, 0, 0,  5, 7, 106], [0, 0, 0, 12, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0, 13, 7, 106]',   valid_date_range([0, 0, 0,  6, 7, 106], [0, 0, 0, 13, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0, 14, 7, 106]',   valid_date_range([0, 0, 0,  7, 7, 106], [0, 0, 0, 14, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0, 15, 7, 106]',   valid_date_range([0, 0, 0,  8, 7, 106], [0, 0, 0, 15, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0, 16, 7, 106]',   valid_date_range([0, 0, 0,  9, 7, 106], [0, 0, 0, 16, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0, 17, 7, 106]',   valid_date_range([0, 0, 0, 10, 7, 106], [0, 0, 0, 17, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0, 18, 7, 106]',   valid_date_range([0, 0, 0, 11, 7, 106], [0, 0, 0, 18, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0, 19, 7, 106]',   valid_date_range([0, 0, 0, 12, 7, 106], [0, 0, 0, 19, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0, 20, 7, 106]',   valid_date_range([0, 0, 0, 13, 7, 106], [0, 0, 0, 20, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0, 21, 7, 106]',   valid_date_range([0, 0, 0, 14, 7, 106], [0, 0, 0, 21, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0, 22, 7, 106]',   valid_date_range([0, 0, 0, 15, 7, 106], [0, 0, 0, 22, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0, 23, 7, 106]',   valid_date_range([0, 0, 0, 16, 7, 106], [0, 0, 0, 23, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0, 24, 7, 106]',   valid_date_range([0, 0, 0, 17, 7, 106], [0, 0, 0, 24, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0, 25, 7, 106]',   valid_date_range([0, 0, 0, 18, 7, 106], [0, 0, 0, 25, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0, 26, 7, 106]',   valid_date_range([0, 0, 0, 19, 7, 106], [0, 0, 0, 26, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0, 27, 7, 106]',   valid_date_range([0, 0, 0, 20, 7, 106], [0, 0, 0, 27, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0, 28, 7, 106]',   valid_date_range([0, 0, 0, 21, 7, 106], [0, 0, 0, 28, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0, 29, 7, 106]',   valid_date_range([0, 0, 0, 22, 7, 106], [0, 0, 0, 29, 7, 106]) ],
+  [ 'last7days','last7days',   '[0, 0, 0, 30, 7, 106]',   valid_date_range([0, 0, 0, 23, 7, 106], [0, 0, 0, 30, 7, 106]) ],
+
+  [ 'last31days','last31days', '[0, 0, 0,  1, 7, 106]',   valid_date_range([0, 0, 0,  1, 6, 106], [0, 0, 0,  1, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0,  2, 7, 106]',   valid_date_range([0, 0, 0,  2, 6, 106], [0, 0, 0,  2, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0,  3, 7, 106]',   valid_date_range([0, 0, 0,  3, 6, 106], [0, 0, 0,  3, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0,  4, 7, 106]',   valid_date_range([0, 0, 0,  4, 6, 106], [0, 0, 0,  4, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0,  5, 7, 106]',   valid_date_range([0, 0, 0,  5, 6, 106], [0, 0, 0,  5, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0,  6, 7, 106]',   valid_date_range([0, 0, 0,  6, 6, 106], [0, 0, 0,  6, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0,  7, 7, 106]',   valid_date_range([0, 0, 0,  7, 6, 106], [0, 0, 0,  7, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0,  8, 7, 106]',   valid_date_range([0, 0, 0,  8, 6, 106], [0, 0, 0,  8, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0,  9, 7, 106]',   valid_date_range([0, 0, 0,  9, 6, 106], [0, 0, 0,  9, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 10, 7, 106]',   valid_date_range([0, 0, 0, 10, 6, 106], [0, 0, 0, 10, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 11, 7, 106]',   valid_date_range([0, 0, 0, 11, 6, 106], [0, 0, 0, 11, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 12, 7, 106]',   valid_date_range([0, 0, 0, 12, 6, 106], [0, 0, 0, 12, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 13, 7, 106]',   valid_date_range([0, 0, 0, 13, 6, 106], [0, 0, 0, 13, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 14, 7, 106]',   valid_date_range([0, 0, 0, 14, 6, 106], [0, 0, 0, 14, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 15, 7, 106]',   valid_date_range([0, 0, 0, 15, 6, 106], [0, 0, 0, 15, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 16, 7, 106]',   valid_date_range([0, 0, 0, 16, 6, 106], [0, 0, 0, 16, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 17, 7, 106]',   valid_date_range([0, 0, 0, 17, 6, 106], [0, 0, 0, 17, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 18, 7, 106]',   valid_date_range([0, 0, 0, 18, 6, 106], [0, 0, 0, 18, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 19, 7, 106]',   valid_date_range([0, 0, 0, 19, 6, 106], [0, 0, 0, 19, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 20, 7, 106]',   valid_date_range([0, 0, 0, 20, 6, 106], [0, 0, 0, 20, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 21, 7, 106]',   valid_date_range([0, 0, 0, 21, 6, 106], [0, 0, 0, 21, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 22, 7, 106]',   valid_date_range([0, 0, 0, 22, 6, 106], [0, 0, 0, 22, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 23, 7, 106]',   valid_date_range([0, 0, 0, 23, 6, 106], [0, 0, 0, 23, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 24, 7, 106]',   valid_date_range([0, 0, 0, 24, 6, 106], [0, 0, 0, 24, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 25, 7, 106]',   valid_date_range([0, 0, 0, 25, 6, 106], [0, 0, 0, 25, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 26, 7, 106]',   valid_date_range([0, 0, 0, 26, 6, 106], [0, 0, 0, 26, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 27, 7, 106]',   valid_date_range([0, 0, 0, 27, 6, 106], [0, 0, 0, 27, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 28, 7, 106]',   valid_date_range([0, 0, 0, 28, 6, 106], [0, 0, 0, 28, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 29, 7, 106]',   valid_date_range([0, 0, 0, 29, 6, 106], [0, 0, 0, 29, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 30, 7, 106]',   valid_date_range([0, 0, 0, 30, 6, 106], [0, 0, 0, 30, 7, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 31, 7, 106]',   valid_date_range([0, 0, 0, 31, 6, 106], [0, 0, 0, 31, 7, 106]) ],
+
+  [ 'last31days','last31days', '[0, 0, 0,  1, 6, 106]',   valid_date_range([0, 0, 0, 31, 4, 106], [0, 0, 0,  1, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0,  2, 6, 106]',   valid_date_range([0, 0, 0,  1, 5, 106], [0, 0, 0,  2, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0,  3, 6, 106]',   valid_date_range([0, 0, 0,  2, 5, 106], [0, 0, 0,  3, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0,  4, 6, 106]',   valid_date_range([0, 0, 0,  3, 5, 106], [0, 0, 0,  4, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0,  5, 6, 106]',   valid_date_range([0, 0, 0,  4, 5, 106], [0, 0, 0,  5, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0,  6, 6, 106]',   valid_date_range([0, 0, 0,  5, 5, 106], [0, 0, 0,  6, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0,  7, 6, 106]',   valid_date_range([0, 0, 0,  6, 5, 106], [0, 0, 0,  7, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0,  8, 6, 106]',   valid_date_range([0, 0, 0,  7, 5, 106], [0, 0, 0,  8, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0,  9, 6, 106]',   valid_date_range([0, 0, 0,  8, 5, 106], [0, 0, 0,  9, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 10, 6, 106]',   valid_date_range([0, 0, 0,  9, 5, 106], [0, 0, 0, 10, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 11, 6, 106]',   valid_date_range([0, 0, 0, 10, 5, 106], [0, 0, 0, 11, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 12, 6, 106]',   valid_date_range([0, 0, 0, 11, 5, 106], [0, 0, 0, 12, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 13, 6, 106]',   valid_date_range([0, 0, 0, 12, 5, 106], [0, 0, 0, 13, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 14, 6, 106]',   valid_date_range([0, 0, 0, 13, 5, 106], [0, 0, 0, 14, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 15, 6, 106]',   valid_date_range([0, 0, 0, 14, 5, 106], [0, 0, 0, 15, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 16, 6, 106]',   valid_date_range([0, 0, 0, 15, 5, 106], [0, 0, 0, 16, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 17, 6, 106]',   valid_date_range([0, 0, 0, 16, 5, 106], [0, 0, 0, 17, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 18, 6, 106]',   valid_date_range([0, 0, 0, 17, 5, 106], [0, 0, 0, 18, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 19, 6, 106]',   valid_date_range([0, 0, 0, 18, 5, 106], [0, 0, 0, 19, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 20, 6, 106]',   valid_date_range([0, 0, 0, 19, 5, 106], [0, 0, 0, 20, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 21, 6, 106]',   valid_date_range([0, 0, 0, 20, 5, 106], [0, 0, 0, 21, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 22, 6, 106]',   valid_date_range([0, 0, 0, 21, 5, 106], [0, 0, 0, 22, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 23, 6, 106]',   valid_date_range([0, 0, 0, 22, 5, 106], [0, 0, 0, 23, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 24, 6, 106]',   valid_date_range([0, 0, 0, 23, 5, 106], [0, 0, 0, 24, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 25, 6, 106]',   valid_date_range([0, 0, 0, 24, 5, 106], [0, 0, 0, 25, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 26, 6, 106]',   valid_date_range([0, 0, 0, 25, 5, 106], [0, 0, 0, 26, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 27, 6, 106]',   valid_date_range([0, 0, 0, 26, 5, 106], [0, 0, 0, 27, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 28, 6, 106]',   valid_date_range([0, 0, 0, 27, 5, 106], [0, 0, 0, 28, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 29, 6, 106]',   valid_date_range([0, 0, 0, 28, 5, 106], [0, 0, 0, 29, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 30, 6, 106]',   valid_date_range([0, 0, 0, 29, 5, 106], [0, 0, 0, 30, 6, 106]) ],
+  [ 'last31days','last31days', '[0, 0, 0, 31, 6, 106]',   valid_date_range([0, 0, 0, 30, 5, 106], [0, 0, 0, 31, 6, 106]) ],
+
+  [ 'yesterday',  'yesterday', '[0, 0, 0,  1, 6, 106]',   valid_date_range([0, 0, 0, 30, 5, 106], [0, 0, 0,  1, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0,  2, 6, 106]',   valid_date_range([0, 0, 0,  1, 6, 106], [0, 0, 0,  2, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0,  3, 6, 106]',   valid_date_range([0, 0, 0,  2, 6, 106], [0, 0, 0,  3, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0,  4, 6, 106]',   valid_date_range([0, 0, 0,  3, 6, 106], [0, 0, 0,  4, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0,  5, 6, 106]',   valid_date_range([0, 0, 0,  4, 6, 106], [0, 0, 0,  5, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0,  6, 6, 106]',   valid_date_range([0, 0, 0,  5, 6, 106], [0, 0, 0,  6, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0,  7, 6, 106]',   valid_date_range([0, 0, 0,  6, 6, 106], [0, 0, 0,  7, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0,  8, 6, 106]',   valid_date_range([0, 0, 0,  7, 6, 106], [0, 0, 0,  8, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0,  9, 6, 106]',   valid_date_range([0, 0, 0,  8, 6, 106], [0, 0, 0,  9, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 10, 6, 106]',   valid_date_range([0, 0, 0,  9, 6, 106], [0, 0, 0, 10, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 11, 6, 106]',   valid_date_range([0, 0, 0, 10, 6, 106], [0, 0, 0, 11, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 12, 6, 106]',   valid_date_range([0, 0, 0, 11, 6, 106], [0, 0, 0, 12, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 13, 6, 106]',   valid_date_range([0, 0, 0, 12, 6, 106], [0, 0, 0, 13, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 14, 6, 106]',   valid_date_range([0, 0, 0, 13, 6, 106], [0, 0, 0, 14, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 15, 6, 106]',   valid_date_range([0, 0, 0, 14, 6, 106], [0, 0, 0, 15, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 16, 6, 106]',   valid_date_range([0, 0, 0, 15, 6, 106], [0, 0, 0, 16, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 17, 6, 106]',   valid_date_range([0, 0, 0, 16, 6, 106], [0, 0, 0, 17, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 18, 6, 106]',   valid_date_range([0, 0, 0, 17, 6, 106], [0, 0, 0, 18, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 19, 6, 106]',   valid_date_range([0, 0, 0, 18, 6, 106], [0, 0, 0, 19, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 20, 6, 106]',   valid_date_range([0, 0, 0, 19, 6, 106], [0, 0, 0, 20, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 21, 6, 106]',   valid_date_range([0, 0, 0, 20, 6, 106], [0, 0, 0, 21, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 22, 6, 106]',   valid_date_range([0, 0, 0, 21, 6, 106], [0, 0, 0, 22, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 23, 6, 106]',   valid_date_range([0, 0, 0, 22, 6, 106], [0, 0, 0, 23, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 24, 6, 106]',   valid_date_range([0, 0, 0, 23, 6, 106], [0, 0, 0, 24, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 25, 6, 106]',   valid_date_range([0, 0, 0, 24, 6, 106], [0, 0, 0, 25, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 26, 6, 106]',   valid_date_range([0, 0, 0, 25, 6, 106], [0, 0, 0, 26, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 27, 6, 106]',   valid_date_range([0, 0, 0, 26, 6, 106], [0, 0, 0, 27, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 28, 6, 106]',   valid_date_range([0, 0, 0, 27, 6, 106], [0, 0, 0, 28, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 29, 6, 106]',   valid_date_range([0, 0, 0, 28, 6, 106], [0, 0, 0, 29, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 30, 6, 106]',   valid_date_range([0, 0, 0, 29, 6, 106], [0, 0, 0, 30, 6, 106]) ],
+  [ 'yesterday',  'yesterday', '[0, 0, 0, 31, 6, 106]',   valid_date_range([0, 0, 0, 30, 6, 106], [0, 0, 0, 31, 6, 106]) ],
+
+  [ 'today',    'today',      '[0, 0, 0, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0, 0, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0, 1, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0, 1, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0, 2, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0, 2, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0, 3, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0, 3, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0, 4, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0, 4, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0, 5, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0, 5, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0, 6, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0, 6, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0, 7, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0, 7, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0, 8, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0, 8, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0, 9, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0, 9, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0,10, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0,10, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0,11, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0,11, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0,12, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0,12, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0,13, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0,13, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0,14, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0,14, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0,15, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0,15, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0,16, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0,16, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0,17, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0,17, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0,18, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0,18, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0,19, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0,19, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0,20, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0,20, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0,21, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0,21, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0,22, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0,22, 18, 7, 106]) ],
+  [ 'today',    'today',      '[0, 0,23, 18, 7, 106]',    valid_date_range([0, 0, 0, 18, 7, 106], [0, 0,23, 18, 7, 106]) ],
+
+  # XXX
+  # The week tags _must_ be supplied with a struct tm that includes a WDAY field (ie day of week) or they return nonsense.
+
+  [ 'lastweek', 'lastweek',  '[0, 0, 0,  1, 7, 106, 2]',     valid_date_range([0, 0, 0, 24, 6, 106], [59, 59, 23, 30, 6, 106]) ],
+  [ 'lastweek', 'lastweek',  '[0, 0, 0,  2, 7, 106, 3]',     valid_date_range([0, 0, 0, 24, 6, 106], [59, 59, 23, 30, 6, 106]) ],
+  [ 'lastweek', 'lastweek',  '[0, 0, 0,  3, 7, 106, 4]',     valid_date_range([0, 0, 0, 24, 6, 106], [59, 59, 23, 30, 6, 106]) ],
+  [ 'lastweek', 'lastweek',  '[0, 0, 0,  4, 7, 106, 5]',     valid_date_range([0, 0, 0, 24, 6, 106], [59, 59, 23, 30, 6, 106]) ],
+  [ 'lastweek', 'lastweek',  '[0, 0, 0,  5, 7, 106, 6]',     valid_date_range([0, 0, 0, 24, 6, 106], [59, 59, 23, 30, 6, 106]) ],
+  [ 'lastweek', 'lastweek',  '[0, 0, 0,  6, 7, 106, 0]',     valid_date_range([0, 0, 0, 31, 6, 106], [59, 59, 23,  6, 7, 106]) ],
+  [ 'lastweek', 'lastweek',  '[0, 0, 0,  7, 7, 106, 1]',     valid_date_range([0, 0, 0, 31, 6, 106], [59, 59, 23,  6, 7, 106]) ],
+  [ 'lastweek', 'lastweek',  '[0, 0, 0, 14, 7, 106, 1]',     valid_date_range([0, 0, 0,  7, 7, 106], [59, 59, 23, 13, 7, 106]) ],
+  [ 'lastweek', 'lastweek',  '[0, 0, 0, 21, 7, 106, 1]',     valid_date_range([0, 0, 0, 14, 7, 106], [59, 59, 23, 20, 7, 106]) ],
+  [ 'lastweek', 'lastweek',  '[0, 0, 0, 28, 7, 106, 1]',     valid_date_range([0, 0, 0, 21, 7, 106], [59, 59, 23, 27, 7, 106]) ],
+
+  [ 'thisweek', 'thisweek',  '[0, 0, 0,  7, 7, 106, 1]',     valid_date_range([0, 0, 0,  7, 7, 106], [0, 0, 0,  7, 7, 106]) ],
+  [ 'thisweek', 'thisweek',  '[0, 0, 0,  8, 7, 106, 2]',     valid_date_range([0, 0, 0,  7, 7, 106], [0, 0, 0,  8, 7, 106]) ],
+  [ 'thisweek', 'thisweek',  '[0, 0, 0,  9, 7, 106, 3]',     valid_date_range([0, 0, 0,  7, 7, 106], [0, 0, 0,  9, 7, 106]) ],
+  [ 'thisweek', 'thisweek',  '[0, 0, 0, 10, 7, 106, 4]',     valid_date_range([0, 0, 0,  7, 7, 106], [0, 0, 0, 10, 7, 106]) ],
+  [ 'thisweek', 'thisweek',  '[0, 0, 0, 11, 7, 106, 5]',     valid_date_range([0, 0, 0,  7, 7, 106], [0, 0, 0, 11, 7, 106]) ],
+  [ 'thisweek', 'thisweek',  '[0, 0, 0, 12, 7, 106, 6]',     valid_date_range([0, 0, 0,  7, 7, 106], [0, 0, 0, 12, 7, 106]) ],
+  [ 'thisweek', 'thisweek',  '[0, 0, 0, 13, 7, 106, 7]',     valid_date_range([0, 0, 0,  7, 7, 106], [0, 0, 0, 13, 7, 106]) ],
+
+  [ 'thismonth','thismonth', '[0, 0, 0,  7, 7, 106, 1]',     valid_date_range([0, 0, 0,  1, 7, 106], [0, 0, 0,  7, 7, 106]) ],
+  [ 'thismonth','thismonth', '[0, 0, 0,  1, 7, 106, 1]',     valid_date_range([0, 0, 0,  1, 7, 106], [0, 0, 0,  1, 7, 106]) ],
+  [ 'thismonth','thismonth', '[0, 0, 0, 31, 7, 106, 1]',     valid_date_range([0, 0, 0,  1, 7, 106], [0, 0, 0, 31, 7, 106]) ],
+
+  [ 'lastmonth','lastmonth', '[0, 0, 0,  1, 7, 106]',        valid_date_range([0, 0, 0,  1, 6, 106], [59,59,23, 31, 6, 106]) ],
+  [ 'lastmonth','lastmonth', '[0, 0, 0,  1, 6, 106]',        valid_date_range([0, 0, 0,  1, 5, 106], [59,59,23, 30, 5, 106]) ],
+  [ 'lastmonth','lastmonth', '[0, 0, 0,  1, 5, 106]',        valid_date_range([0, 0, 0,  1, 4, 106], [59,59,23, 31, 4, 106]) ],
+  [ 'lastmonth','lastmonth', '[0, 0, 0,  1, 4, 106]',        valid_date_range([0, 0, 0,  1, 3, 106], [59,59,23, 30, 3, 106]) ],
+  [ 'lastmonth','lastmonth', '[0, 0, 0,  1, 3, 106]',        valid_date_range([0, 0, 0,  1, 2, 106], [59,59,23, 31, 2, 106]) ],
+  [ 'lastmonth','lastmonth', '[0, 0, 0,  1, 2, 106]',        valid_date_range([0, 0, 0,  1, 1, 106], [59,59,23, 28, 1, 106]) ],
+
+  # XXX
+  # thisyear tag _must_ be supplied with a struct tm that includes a YDAY field (ie day of week) or they return nonsense.
+
+  [ 'thisyear', 'thisyear',  '[0, 0, 0, 19, 7, 106, 6, 230]',valid_date_range([0, 0, 0,  1, 0, 106], [0, 0, 0, 19, 7, 106]) ],
+
+  [ 'lastyear', 'lastyear',  '[0, 0, 0, 19, 7, 106]',        valid_date_range([0, 0, 0,  1, 0, 105], [59,59,23, 31,11, 105]) ],
+
+  # XXX
+  # For the last_n_foo tag, the first argument is the number of foos (mins, hours, days)
+
+  [ 'last_n_days', 0,        '[0, 0, 0,  1, 7, 106]',        valid_date_range([0, 0, 0,  1, 7, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ 'last_n_days', 1,        '[0, 0, 0,  1, 7, 106]',        valid_date_range([0, 0, 0, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ 'last_n_days',32,        '[0, 0, 0,  1, 7, 106]',        valid_date_range([0, 0, 0, 30, 5, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ 'last_n_days',62,        '[0, 0, 0,  1, 7, 106]',        valid_date_range([0, 0, 0, 31, 4, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ 'last_n_days',93,        '[0, 0, 0,  1, 7, 106]',        valid_date_range([0, 0, 0, 30, 3, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__','last0day','[0, 0, 0,  1, 7, 106]',        valid_date_range([0, 0, 0,  1, 7, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__','last1days','[0, 0, 0,  1, 7, 106]',       valid_date_range([0, 0, 0, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__','last32days','[0, 0, 0,  1, 7, 106]',      valid_date_range([0, 0, 0, 30, 5, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__','last62days','[0, 0, 0,  1, 7, 106]',      valid_date_range([0, 0, 0, 31, 4, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__','last93days','[0, 0, 0,  1, 7, 106]',      valid_date_range([0, 0, 0, 30, 3, 106], [0,  0,  0,  1, 7, 106]) ],
+  # XXX
+  # Fails for days > 100.
+  # [ 'last_n_days',123,       '[0, 0, 0,  1, 7, 106]',        valid_date_range([0, 0, 0, 31, 2, 106], [0,  0,  0,  1, 7, 106]) ],
+  # [ 'last_n_days',230,       '[0, 0, 0, 18, 7, 106]',        valid_date_range([0, 0, 0, 31,11, 105], [0,  0,  0, 18, 7, 106]) ],
+
+  [ 'last_n_hours', 1,       '[0, 0, 0,  1, 7, 106]',     valid_date_range([0, 0,23, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ 'last_n_hours', 2,       '[0, 0, 0,  1, 7, 106]',     valid_date_range([0, 0,22, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ 'last_n_hours', 3,       '[0, 0, 0,  1, 7, 106]',     valid_date_range([0, 0,21, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ 'last_n_hours', 4,       '[0, 0, 0,  1, 7, 106]',     valid_date_range([0, 0,20, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ 'last_n_hours', 5,       '[0, 0, 0,  1, 7, 106]',     valid_date_range([0, 0,19, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ 'last_n_hours', 6,       '[0, 0, 0,  1, 7, 106]',     valid_date_range([0, 0,18, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ 'last_n_hours', 7,       '[0, 0, 0,  1, 7, 106]',     valid_date_range([0, 0,17, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ 'last_n_hours', 8,       '[0, 0, 0,  1, 7, 106]',     valid_date_range([0, 0,16, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ 'last_n_hours', 9,       '[0, 0, 0,  1, 7, 106]',     valid_date_range([0, 0,15, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ 'last_n_hours',10,       '[0, 0, 0,  1, 7, 106]',     valid_date_range([0, 0,14, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ 'last_n_hours',11,       '[0, 0, 0,  1, 7, 106]',     valid_date_range([0, 0,13, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ 'last_n_hours',12,       '[0, 0, 0,  1, 7, 106]',     valid_date_range([0, 0,12, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ 'last_n_hours',23,       '[0, 0, 0,  1, 7, 106]',     valid_date_range([0, 0, 1, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ 'last_n_hours',24,       '[0, 0, 0,  1, 7, 106]',     valid_date_range([0, 0, 0, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ 'last_n_hours',25,       '[0, 0, 0,  1, 7, 106]',     valid_date_range([0, 0,23, 30, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ 'last_n_hours',168,      '[0, 0, 0,  1, 7, 106]',     valid_date_range([0, 0, 0, 25, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__', 'last1hour','[0, 0, 0,  1, 7, 106]',   valid_date_range([0, 0,23, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__', 'last2hours','[0, 0, 0,  1, 7, 106]',  valid_date_range([0, 0,22, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__', 'last3hours','[0, 0, 0,  1, 7, 106]',  valid_date_range([0, 0,21, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__', 'last4hours','[0, 0, 0,  1, 7, 106]',  valid_date_range([0, 0,20, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__', 'last5hours','[0, 0, 0,  1, 7, 106]',  valid_date_range([0, 0,19, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__', 'last6hours','[0, 0, 0,  1, 7, 106]',  valid_date_range([0, 0,18, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__', 'last7hours','[0, 0, 0,  1, 7, 106]',  valid_date_range([0, 0,17, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__', 'last8hours','[0, 0, 0,  1, 7, 106]',  valid_date_range([0, 0,16, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__', 'last9hours','[0, 0, 0,  1, 7, 106]',  valid_date_range([0, 0,15, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__','last10hours','[0, 0, 0,  1, 7, 106]',  valid_date_range([0, 0,14, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__','last11hours','[0, 0, 0,  1, 7, 106]',  valid_date_range([0, 0,13, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__','last12hours','[0, 0, 0,  1, 7, 106]',  valid_date_range([0, 0,12, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__','last23hours','[0, 0, 0,  1, 7, 106]',  valid_date_range([0, 0, 1, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__','last24hours','[0, 0, 0,  1, 7, 106]',  valid_date_range([0, 0, 0, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__','last25hours','[0, 0, 0,  1, 7, 106]',  valid_date_range([0, 0,23, 30, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__','last168hours','[0, 0, 0,  1, 7, 106]', valid_date_range([0, 0, 0, 25, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+
+  [ 'last_n_mins', 1,        '[0, 0, 0,  1, 7, 106]',     valid_date_range([0,59,23, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ 'last_n_mins',60,        '[0, 0, 0,  1, 7, 106]',     valid_date_range([0, 0,23, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ 'last_n_mins',24*60,     '[0, 0, 0,  1, 7, 106]',     valid_date_range([0, 0, 0, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__','last1min','[0, 0, 0,  1, 7, 106]',     valid_date_range([0,59,23, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__','last60mins','[0, 0, 0,  1, 7, 106]',   valid_date_range([0, 0,23, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+  [ '__DEFAULT__','last1440mins','[0, 0, 0,  1, 7, 106]', valid_date_range([0, 0, 0, 31, 6, 106], [0,  0,  0,  1, 7, 106]) ],
+
+  [ '__DEFAULT__','Jan 2006','[localtime]',               valid_date_range([0, 0, 0,  1, 0, 106], [59, 59, 23, 31, 0, 106]) ],
+  [ '__DEFAULT__','Feb 2006','[localtime]',               valid_date_range([0, 0, 0,  1, 1, 106], [59, 59, 23, 28, 1, 106]) ],
+  [ '__DEFAULT__','Mar 2006','[localtime]',               valid_date_range([0, 0, 0,  1, 2, 106], [59, 59, 23, 31, 2, 106]) ],
+  [ '__DEFAULT__','Apr 2006','[localtime]',               valid_date_range([0, 0, 0,  1, 3, 106], [59, 59, 23, 30, 3, 106]) ],
+  [ '__DEFAULT__','May 2006','[localtime]',               valid_date_range([0, 0, 0,  1, 4, 106], [59, 59, 23, 31, 4, 106]) ],
+  [ '__DEFAULT__','Jun 2006','[localtime]',               valid_date_range([0, 0, 0,  1, 5, 106], [59, 59, 23, 30, 5, 106]) ],
+  [ '__DEFAULT__','Jul 2006','[localtime]',               valid_date_range([0, 0, 0,  1, 6, 106], [59, 59, 23, 31, 6, 106]) ],
+  [ '__DEFAULT__','Aug 2006','[localtime]',               valid_date_range([0, 0, 0,  1, 7, 106], [59, 59, 23, 31, 7, 106]) ],
+  [ '__DEFAULT__','Sep 2006','[localtime]',               valid_date_range([0, 0, 0,  1, 8, 106], [59, 59, 23, 30, 8, 106]) ],
+  [ '__DEFAULT__','Oct 2006','[localtime]',               valid_date_range([0, 0, 0,  1, 9, 106], [59, 59, 23, 31, 9, 106]) ],
+  [ '__DEFAULT__','Nov 2006','[localtime]',               valid_date_range([0, 0, 0,  1,10, 106], [59, 59, 23, 30,10, 106]) ],
+  [ '__DEFAULT__','Dec 2006','[localtime]',               valid_date_range([0, 0, 0,  1,11, 106], [59, 59, 23, 31,11, 106]) ],
+
+  [ '__DEFAULT__','Jan 2000','[localtime]',               valid_date_range([0, 0, 0,  1, 0, 100], [59, 59, 23, 31, 0, 100]) ],
+  [ '__DEFAULT__','Feb 2000','[localtime]',               valid_date_range([0, 0, 0,  1, 1, 100], [59, 59, 23, 29, 1, 100]) ],
+  [ '__DEFAULT__','Mar 2000','[localtime]',               valid_date_range([0, 0, 0,  1, 2, 100], [59, 59, 23, 31, 2, 100]) ],
+  [ '__DEFAULT__','Apr 2000','[localtime]',               valid_date_range([0, 0, 0,  1, 3, 100], [59, 59, 23, 30, 3, 100]) ],
+  [ '__DEFAULT__','May 2000','[localtime]',               valid_date_range([0, 0, 0,  1, 4, 100], [59, 59, 23, 31, 4, 100]) ],
+  [ '__DEFAULT__','Jun 2000','[localtime]',               valid_date_range([0, 0, 0,  1, 5, 100], [59, 59, 23, 30, 5, 100]) ],
+  [ '__DEFAULT__','Jul 2000','[localtime]',               valid_date_range([0, 0, 0,  1, 6, 100], [59, 59, 23, 31, 6, 100]) ],
+  [ '__DEFAULT__','Aug 2000','[localtime]',               valid_date_range([0, 0, 0,  1, 7, 100], [59, 59, 23, 31, 7, 100]) ],
+  [ '__DEFAULT__','Sep 2000','[localtime]',               valid_date_range([0, 0, 0,  1, 8, 100], [59, 59, 23, 30, 8, 100]) ],
+  [ '__DEFAULT__','Oct 2000','[localtime]',               valid_date_range([0, 0, 0,  1, 9, 100], [59, 59, 23, 31, 9, 100]) ],
+  [ '__DEFAULT__','Nov 2000','[localtime]',               valid_date_range([0, 0, 0,  1,10, 100], [59, 59, 23, 30,10, 100]) ],
+  [ '__DEFAULT__','Dec 2000','[localtime]',               valid_date_range([0, 0, 0,  1,11, 100], [59, 59, 23, 31,11, 100]) ],
+
+  [ '__DEFAULT__','Jan 2004','[localtime]',               valid_date_range([0, 0, 0,  1, 0, 104], [59, 59, 23, 31, 0, 104]) ],
+  [ '__DEFAULT__','Feb 2004','[localtime]',               valid_date_range([0, 0, 0,  1, 1, 104], [59, 59, 23, 29, 1, 104]) ],
+  [ '__DEFAULT__','Mar 2004','[localtime]',               valid_date_range([0, 0, 0,  1, 2, 104], [59, 59, 23, 31, 2, 104]) ],
+  [ '__DEFAULT__','Apr 2004','[localtime]',               valid_date_range([0, 0, 0,  1, 3, 104], [59, 59, 23, 30, 3, 104]) ],
+  [ '__DEFAULT__','May 2004','[localtime]',               valid_date_range([0, 0, 0,  1, 4, 104], [59, 59, 23, 31, 4, 104]) ],
+  [ '__DEFAULT__','Jun 2004','[localtime]',               valid_date_range([0, 0, 0,  1, 5, 104], [59, 59, 23, 30, 5, 104]) ],
+  [ '__DEFAULT__','Jul 2004','[localtime]',               valid_date_range([0, 0, 0,  1, 6, 104], [59, 59, 23, 31, 6, 104]) ],
+  [ '__DEFAULT__','Aug 2004','[localtime]',               valid_date_range([0, 0, 0,  1, 7, 104], [59, 59, 23, 31, 7, 104]) ],
+  [ '__DEFAULT__','Sep 2004','[localtime]',               valid_date_range([0, 0, 0,  1, 8, 104], [59, 59, 23, 30, 8, 104]) ],
+  [ '__DEFAULT__','Oct 2004','[localtime]',               valid_date_range([0, 0, 0,  1, 9, 104], [59, 59, 23, 31, 9, 104]) ],
+  [ '__DEFAULT__','Nov 2004','[localtime]',               valid_date_range([0, 0, 0,  1,10, 104], [59, 59, 23, 30,10, 104]) ],
+  [ '__DEFAULT__','Dec 2004','[localtime]',               valid_date_range([0, 0, 0,  1,11, 104], [59, 59, 23, 31,11, 104]) ],
+
+# XXX
+# The 'time-stamp/at-format date' tags start _from_ the value of the selector tag (the time stamp or at-format date) and go 
+# _to_ the struct tm value ....
+# (Yes. It is sort of like the more common usage where the selector tag says where to start wrt the end time).
+
+  [ '__DEFAULT__','21:09',  '[59,59,23, 7, 7, 106]',       valid_date_range([0, 9,21,  7, 7, 106], [59, 59, 23,  7, 7, 106]) ],
+  [ '__DEFAULT__','2109',   '[59,59,23, 7, 7, 106]',       valid_date_range([0, 9,21,  7, 7, 106], [59, 59, 23,  7, 7, 106]) ],
+# XXX
+# Only the Nagios::Report constructor deals with time-stamp time periods by calling the __DEFAULT__ callback.
+
+#  [ '"21:09"',    '21:09',  '[59,59,23, 7, 7, 106]',       valid_date_range([0, 9,21,  7, 7, 106], [59, 59, 23,  7, 7, 106]) ],
+
+# XXX
+# Easy to get confused between printed dates (1.8.06) and struct tm months (7 in this case).
+  [ '__DEFAULT__','1.8.06',  '[59,59,23, 7, 7, 106]',       valid_date_range([0, 0, 0,  1, 7, 106], [59, 59, 23,  7, 7, 106]) ],
+  [ '__DEFAULT__','1.8.2006','[59,59,23, 7, 7, 106]',       valid_date_range([0, 0, 0,  1, 7, 106], [59, 59, 23,  7, 7, 106]) ],
+  [ '__DEFAULT__','21:09 1.8.06',  '[59,59,23, 7, 7, 106]', valid_date_range([0, 9,21,  1, 7, 106], [59, 59, 23,  7, 7, 106]) ],
+  [ '__DEFAULT__','2109  1.8.06',  '[59,59,23, 7, 7, 106]', valid_date_range([0, 9,21,  1, 7, 106], [59, 59, 23,  7, 7, 106]) ],
+  [ '__DEFAULT__','21:09 1.8.2006','[59,59,23, 7, 7, 106]', valid_date_range([0, 9,21,  1, 7, 106], [59, 59, 23,  7, 7, 106]) ],
+  [ '__DEFAULT__','2109  1.8.2006','[59,59,23, 7, 7, 106]', valid_date_range([0, 9,21,  1, 7, 106], [59, 59, 23,  7, 7, 106]) ],
+# I hope this makes someone happy apart from the author of 'at' and users of MS Excel. The common AU date format is dd/mm/yy.
+# The dates below are in August, not January.
+  [ '__DEFAULT__','8/1/06',  '[59,59,23, 7, 7, 106]',       valid_date_range([0, 0, 0,  1, 7, 106], [59, 59, 23,  7, 7, 106]) ],
+  [ '__DEFAULT__','8/1/2006','[59,59,23, 7, 7, 106]',       valid_date_range([0, 0, 0,  1, 7, 106], [59, 59, 23,  7, 7, 106]) ],
+  [ '__DEFAULT__','21:09 8/1/06',  '[59,59,23, 7, 7, 106]', valid_date_range([0, 9,21,  1, 7, 106], [59, 59, 23,  7, 7, 106]) ],
+  [ '__DEFAULT__','2109  8/1/06',  '[59,59,23, 7, 7, 106]', valid_date_range([0, 9,21,  1, 7, 106], [59, 59, 23,  7, 7, 106]) ],
+  [ '__DEFAULT__','21:09 8/1/2006','[59,59,23, 7, 7, 106]', valid_date_range([0, 9,21,  1, 7, 106], [59, 59, 23,  7, 7, 106]) ],
+  [ '__DEFAULT__','2109  8/1/2006','[59,59,23, 7, 7, 106]', valid_date_range([0, 9,21,  1, 7, 106], [59, 59, 23,  7, 7, 106]) ],
+) ;
+
+$plan = scalar @tests ;
+
+print <<MORE_PREAMBLE ;
+BEGIN { plan tests => $plan }
+
+MORE_PREAMBLE
+
+for my $t (@tests) {
+  print <<END_TEST;
+ok( join('-', map { scalar(localtime(\$_)) } \$st_et{$t->[0]}->( '$t->[1]', $t->[2] )), "$t->[3]" ) ;
+END_TEST
+
+}

@@ -1,0 +1,8 @@
+Changes for Net::DCCIf
+
+0.02
+    - Fix bug with no recipients
+
+0.01
+    - Initial development
+

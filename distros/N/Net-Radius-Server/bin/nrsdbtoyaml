@@ -1,0 +1,197 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+our $VERSION = do { sprintf " %0.03f", (q$Revision: 108 $ =~ /\d+/g) };
+
+use Pod::Usage;
+use YAML::Syck;
+use Getopt::Long;
+use Storable qw/thaw/;
+
+my %opt;
+GetOptions(\%opt, qw/
+	   delete
+	   all
+	   full
+	   frozen
+	   key=s@
+	   filter=s@
+	   help
+	   /);
+
+pod2usage(verbose => 2, exitval => 0) 
+    if $opt{help};
+
+pod2usage(verbose => 1, exitval => 1,
+	  message => '--all, --full or --key must be specified')
+    unless $opt{key} or $opt{all} or $opt{full};
+
+$|++;				# Send normal messages quickly...
+
+my (%hash,			# The soon-to-be tied hash
+    $db,			# The handle to the hash db
+    $ok,			# A post variable to find success
+    ) = ();
+
+my $class = shift @ARGV;
+eval "use $class;";
+eval { $db = tie %hash, $class, @ARGV; $ok = 42; };
+
+die "Failed to tie to database. Check the options: $!\n$@\n"
+    if $@;
+
+die "Tie somehow failed. Check the options: $!.\n"
+    unless $ok == 42;
+
+# Translate the possible filters into compiled regexen
+my @f = map { qr($_) } @{ $opt{filter} || [] };
+
+sub _dump
+{
+    my ($db, $rhash, $key) = @_;
+    my $data = undef;
+
+    $data = $rhash->{$key} if exists $rhash->{$key};
+
+    delete $rhash->{$key} if $opt{delete};
+    $db->db_sync() if $opt{sync} and $db->can('db_sync');
+
+    # Deserialize it
+    my $d_data = ($opt{frozen} ? thaw $data : $data);
+    
+    Dump($d_data);
+}
+
+if ($opt{key})
+{
+  T1:
+    for my $k (@{$opt{key}})
+    {
+	for my $r (@f) { next T1 unless $k =~ m/$r/; }
+	print _dump($db, \%hash, $k);
+    }
+}
+elsif ($opt{full})
+{
+    for my $k (keys %hash)
+    {
+	print "# $k\n";
+	print _dump($db, \%hash, $k);
+    }
+}
+else
+{
+  T2:
+    while (my ($k, $data) = each %hash)
+    {
+	for my $r (@f) { next T2 unless $k =~ m/$r/; }
+	print _dump($db, \%hash, $k);
+    }
+}
+
+# Always sync() at the end
+$db->db_sync() if $db->can('db_sync');
+
+__END__
+
+=head1 NAME
+
+nrsdbtoyaml - Extract records from Net::Radius::Server::DBStore
+
+=head1 SYNOPSIS
+
+    nrsdbtoyaml [--delete] [--sync] {--all|--key key|--full}
+    [--frozen] [--filter regexp] [--help] -- <BerkeleyDB params>
+
+    # or for more complicated scenarios...
+
+    perl -MMLDBM=DB_File,Storable /usr/bin/nrsdbtoyaml --full \\
+      -- MLDBM::Sync $DB_FILE
+
+=head1 DESCRIPTION
+
+B<nrsdbtoyaml> allows the extraction of either single records or
+complete dumps of databases created by
+Net::Radius::Server::DBStore(3). Its output can then be fed to billing
+or accounting processes that act on the collected information.
+
+The output is a YAML file, produced by YAML::Syck(3), thus YAML 1.0
+compliant, where each extracted record will be re-serialized as YAML.
+
+Note that you must feed configuration options that match whatever was
+used to generate the particular database being read.
+
+Note that this includes the name of the database file to read. Note
+also that you must separate B<nrsdbtoyaml> options from the underlying
+storage module options using C<-->, as explained in Getopt::Long(3).
+
+=over
+
+=item B<--delete>
+
+After dumping each tuple, delete it from the database.
+
+=item B<--sync>
+
+C<sync()> the database after each deletion. This trades in performance
+for correctness.
+
+=item B<--full>
+
+Do a complete dump of the database. Probably only good for debugging.
+
+=item B<--all>
+
+Dump all tuples stored in the database.
+
+=item B<--key key>
+
+Only the tuple corresponding to this key will be printed. Multiple
+keys can be specified.
+
+=item B<--filter regexp>
+
+If specified, treats C<regexp> as a Perl regular expression that must
+match the key in order for it to be processed. Multiple filters can be
+specified. In this case, all of them must match.
+
+=item B<--frozen>
+
+Whether to use C<thaw()> from Storable(3) on the recovered data or
+not.
+
+=item B<--help>
+
+Produces this documentation.
+
+=back
+
+The program will return a true value if no errors are
+found. Otherwise, an error code will be returned and a suitable error
+will be sent to C<STDERR>. The YAML output is sent to C<STDOUT>.
+
+Your local configuration might include Radius packets among the data
+to be stored in the database. B<nrsdbtoyaml> won't decode
+those. Instead, the packet will be returned as a string containing the
+packet data that was received.
+
+=head1 LICENSE AND WARRANTY
+
+This code and all accompanying software comes with NO WARRANTY. You
+use it at your own risk.
+
+This code and all accompanying software can be used freely under the
+same terms as Perl version 5.8.6 itself.
+
+=head1 AUTHOR
+
+Luis E. Muñoz E<lt>luismunoz@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+nrsd(1), perl(1), Getopt::Long(3), Net::Radius::Server(3),
+Net::Radius::Server::DBStore(3), YAML::Syck(3).
+
+=cut

@@ -1,0 +1,21 @@
+# primary types
+
+Net::Ncap::ncap          T_PTROBJ
+Net::Ncap::ncap_msg      T_PTROBJ
+
+# incidentals
+
+long int    T_IV
+int *       T_PV
+u_char *    T_PV
+
+
+#############################################################################
+
+INPUT
+
+# allow undef to become NULL
+T_PV
+    $var = SvOK($arg) ? ($type)SvPV_nolen($arg) : NULL; 
+
+#############################################################################

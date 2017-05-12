@@ -1,0 +1,20 @@
+Revision history for Net-MPD
+
+0.06  2016-09-05 08:44:37 PDT
+  - Escape curly braces in regex
+
+0.05  2014-04-21 15:52:23 MST
+  - Change to MIT License
+
+0.04  2014-04-13 07:38:34 MST
+  - Remove dependency on eatabrick radio for testing
+
+0.03  2013-06-28 14:08:04 MST
+  - Improve sticker API
+  - Improved result parsing
+
+0.02  2013-06-27 11:20:24 MST
+  - Fixed dependencies
+
+0.01  2013-06-27 11:17:15 MST
+  - Initial release

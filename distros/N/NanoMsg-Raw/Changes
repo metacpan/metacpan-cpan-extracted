@@ -1,0 +1,29 @@
+0.10 2016-12-28
+  - Add NAME sections to POD patched by gregor herrmann
+0.09 2016-11-03
+  - Do not test textual error messages reported by SREZIC
+  - Fix POD reported by gregoa
+0.07 2016-05-16
+  - Fix t/inproc.t, t/separation.t, t/timeo.t to work with libnanomsg 0.8 and
+above.
+0.06 2015-08-10
+  - t/survey.t works with libnanomsg-0.6
+0.05  2015-05-04
+  - Remove t/threads.t - The test sometimes fails for misterious reason.
+  - t/timeo.t accept timeouts between .1 and .12
+
+0.04  2015-01-28
+  - Make sure the nanomsg library and the headers are available
+
+0.03  2015-01-22
+  - Documentation improvements.
+  - Fix OS X tests
+  - Fix nn_getsockopt - An uninitialized variable results in unpredictable
+    effects like segfaults or out of memory errors.
+  - Fix rar segfault when using nn_recv.
+
+0.02  2013-08-27
+  - Documentation improvements.
+
+0.01  2013-08-24
+  - Initial release.

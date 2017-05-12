@@ -1,0 +1,7 @@
+
+RBLDNSDA_OBJS = $(RBLDNSD_SRCS:.c=.o) $(LIB_OBJS)
+
+$(NAME).a : $(RBLDNSDA_OBJS) rblf_mem.h
+	-rm -f $@
+	$(AR) $(ARFLAGS) $@ $(RBLDNSDA_OBJS)
+	$(RANLIB) $@

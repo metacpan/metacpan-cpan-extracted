@@ -1,0 +1,137 @@
+<?xml version="1.0"?>
+<ItemLookupResponse xmlns="http://webservices.amazon.com/AWSECommerceService/2011-08-01">
+  <Items>
+    <Item>
+      <ASIN>0201633612</ASIN>
+      <SalesRank>2230</SalesRank>
+      <ItemAttributes>
+        <Author>Erich Gamma</Author>
+        <Author>Richard Helm</Author>
+        <Author>Ralph Johnson</Author>
+        <Author>John Vlissides</Author>
+        <Binding>Hardcover</Binding>
+        <EAN>9780201633610</EAN>
+        <EANList>
+          <EANListElement>0785342633610</EANListElement>
+          <EANListElement>9780201633610</EANListElement>
+        </EANList>
+        <Edition>1</Edition>
+        <ISBN>0201633612</ISBN>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <ItemDimensions>
+          <Height Units="centimeters">2.37</Height>
+          <Weight Units="hundredths-pounds">2</Weight>
+          <Width Units="centimeters">1.87</Width>
+        </ItemDimensions>
+        <Label>Addison-Wesley Professional</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>5999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$59.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Addison-Wesley Professional</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>416</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>1994-11-10</PublicationDate>
+        <Publisher>Addison-Wesley Professional</Publisher>
+        <SKU>1MX3BH001N56</SKU>
+        <Studio>Addison-Wesley Professional</Studio>
+        <Title>Design Patterns: Elements of Reusable Object-Oriented Software</Title>
+        <TradeInValue>
+          <Amount>1800</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$18.00</FormattedPrice>
+        </TradeInValue>
+        <UPC>785342633610</UPC>
+        <UPCList>
+          <UPCListElement>785342633610</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>2497</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$24.97</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>1700</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$17.00</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>61</TotalNew>
+        <TotalUsed>98</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/0201633612%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D0201633612</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>KKQfloznSz9jtfoKy%2BmyuLsHMw4fCOLzT0g9%2B62Ok0wnnIJYp%2FzH1y8aEuiNxEFIXs2OCD2YGjdfToClC7fDx6slV7GElXIPjdauOkMpA%2FU%3D</OfferListingId>
+            <Price>
+              <Amount>3829</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$38.29</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>2170</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$21.70</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>36</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+      <Accessories>
+        <Accessory>
+          <ASIN>0131489062</ASIN>
+          <Title>Applying UML and Patterns: An Introduction to Object-Oriented Analysis and Design and Iterative Development (3rd Edition)</Title>
+        </Accessory>
+        <Accessory>
+          <ASIN>0321247140</ASIN>
+          <Title>Design Patterns Explained: A New Perspective on Object-Oriented Design (2nd Edition)</Title>
+        </Accessory>
+        <Accessory>
+          <ASIN>0201485672</ASIN>
+          <Title>Refactoring: Improving the Design of Existing Code</Title>
+        </Accessory>
+        <Accessory>
+          <ASIN>0136135161</ASIN>
+          <Title>SOA Design Patterns (The Prentice Hall Service-Oriented Computing Series from Thomas Erl)</Title>
+        </Accessory>
+        <Accessory>
+          <ASIN>0321509366</ASIN>
+          <Title>Emergent Design: The Evolutionary Nature of Professional Software Development</Title>
+        </Accessory>
+      </Accessories>
+    </Item>
+  </Items>
+</ItemLookupResponse>

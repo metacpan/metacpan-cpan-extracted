@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="urn:customer" xmlns:impl="urn:customer" xmlns:intf="urn:customer" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+<!--WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)-->
+ <wsdl:types>
+  <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:customer">
+   <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+   <complexType name="ArrayOf_xsd_int">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="xsd:int[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+   <complexType name="ArrayOf_xsd_string">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="xsd:string[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+   <complexType name="CustomerInfo">
+    <sequence>
+     <element name="address1" nillable="true" type="xsd:string"/>
+     <element name="address2" nillable="true" type="xsd:string"/>
+     <element name="city" nillable="true" type="xsd:string"/>
+     <element name="customerId" type="xsd:int"/>
+     <element name="customerName" nillable="true" type="xsd:string"/>
+     <element name="customerType" nillable="true" type="xsd:string"/>
+     <element name="elementIds" nillable="true" type="impl:ArrayOf_xsd_int"/>
+     <element name="email" nillable="true" type="xsd:string"/>
+     <element name="extraFieldNames" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="extraFieldValues" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="homePhone" nillable="true" type="xsd:string"/>
+     <element name="importId" nillable="true" type="xsd:string"/>
+     <element name="mobilePhone" nillable="true" type="xsd:string"/>
+     <element name="pager" nillable="true" type="xsd:string"/>
+     <element name="state" nillable="true" type="xsd:string"/>
+     <element name="workPhone" nillable="true" type="xsd:string"/>
+     <element name="zipCode" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOfCustomerInfo">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="impl:CustomerInfo[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+  </schema>
+ </wsdl:types>
+
+   <wsdl:message name="getCustomerByIdResponse">
+
+      <wsdl:part name="getCustomerByIdReturn" type="impl:CustomerInfo"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSearchFieldsRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="updateCustomerResponse">
+
+   </wsdl:message>
+
+   <wsdl:message name="deleteCustomerResponse">
+
+   </wsdl:message>
+
+   <wsdl:message name="addCustomerRequest">
+
+      <wsdl:part name="customer" type="impl:CustomerInfo"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="removeElementFromCustomerRequest">
+
+      <wsdl:part name="customerId" type="xsd:int"/>
+
+      <wsdl:part name="import_id" type="xsd:string"/>
+
+      <wsdl:part name="elementId" type="xsd:int"/>
+
+      <wsdl:part name="macAddress" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllCustomersRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="addElementToCustomerRequest">
+
+      <wsdl:part name="customerId" type="xsd:int"/>
+
+      <wsdl:part name="import_id" type="xsd:string"/>
+
+      <wsdl:part name="elementId" type="xsd:int"/>
+
+      <wsdl:part name="macAddress" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getCustomersResponse">
+
+      <wsdl:part name="getCustomersReturn" type="impl:ArrayOfCustomerInfo"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="addElementToCustomerResponse">
+
+   </wsdl:message>
+
+   <wsdl:message name="getCustomersForElementRequest">
+
+      <wsdl:part name="elementID" type="xsd:int"/>
+
+      <wsdl:part name="mac" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="importCustomerResponse">
+
+   </wsdl:message>
+
+   <wsdl:message name="updateCustomerRequest">
+
+      <wsdl:part name="customer" type="impl:CustomerInfo"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getCustomersForElementResponse">
+
+      <wsdl:part name="getCustomersForElementReturn" type="impl:ArrayOfCustomerInfo"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getCustomersRequest">
+
+      <wsdl:part name="fieldNames" type="impl:ArrayOf_xsd_string"/>
+
+      <wsdl:part name="fieldValues" type="impl:ArrayOf_xsd_string"/>
+
+      <wsdl:part name="operators" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getCustomerByIdRequest">
+
+      <wsdl:part name="id" type="xsd:int"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="importCustomerRequest">
+
+      <wsdl:part name="columnHeaders" type="xsd:string"/>
+
+      <wsdl:part name="values" type="xsd:string"/>
+
+      <wsdl:part name="delimiter" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllCustomersResponse">
+
+      <wsdl:part name="getAllCustomersReturn" type="impl:ArrayOfCustomerInfo"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="addCustomerResponse">
+
+      <wsdl:part name="addCustomerReturn" type="xsd:int"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="removeElementFromCustomerResponse">
+
+   </wsdl:message>
+
+   <wsdl:message name="getSearchFieldsResponse">
+
+      <wsdl:part name="getSearchFieldsReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="deleteCustomerRequest">
+
+      <wsdl:part name="customerId" type="xsd:int"/>
+
+   </wsdl:message>
+
+   <wsdl:portType name="CustomerIf">
+
+      <wsdl:operation name="getAllCustomers">
+
+         <wsdl:input name="getAllCustomersRequest" message="impl:getAllCustomersRequest"/>
+
+         <wsdl:output name="getAllCustomersResponse" message="impl:getAllCustomersResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSearchFields">
+
+         <wsdl:input name="getSearchFieldsRequest" message="impl:getSearchFieldsRequest"/>
+
+         <wsdl:output name="getSearchFieldsResponse" message="impl:getSearchFieldsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getCustomers" parameterOrder="fieldNames fieldValues operators">
+
+         <wsdl:input name="getCustomersRequest" message="impl:getCustomersRequest"/>
+
+         <wsdl:output name="getCustomersResponse" message="impl:getCustomersResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getCustomerById" parameterOrder="id">
+
+         <wsdl:input name="getCustomerByIdRequest" message="impl:getCustomerByIdRequest"/>
+
+         <wsdl:output name="getCustomerByIdResponse" message="impl:getCustomerByIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="addCustomer" parameterOrder="customer">
+
+         <wsdl:input name="addCustomerRequest" message="impl:addCustomerRequest"/>
+
+         <wsdl:output name="addCustomerResponse" message="impl:addCustomerResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="updateCustomer" parameterOrder="customer">
+
+         <wsdl:input name="updateCustomerRequest" message="impl:updateCustomerRequest"/>
+
+         <wsdl:output name="updateCustomerResponse" message="impl:updateCustomerResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="deleteCustomer" parameterOrder="customerId">
+
+         <wsdl:input name="deleteCustomerRequest" message="impl:deleteCustomerRequest"/>
+
+         <wsdl:output name="deleteCustomerResponse" message="impl:deleteCustomerResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="importCustomer" parameterOrder="columnHeaders values delimiter">
+
+         <wsdl:input name="importCustomerRequest" message="impl:importCustomerRequest"/>
+
+         <wsdl:output name="importCustomerResponse" message="impl:importCustomerResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="addElementToCustomer" parameterOrder="customerId import_id elementId macAddress">
+
+         <wsdl:input name="addElementToCustomerRequest" message="impl:addElementToCustomerRequest"/>
+
+         <wsdl:output name="addElementToCustomerResponse" message="impl:addElementToCustomerResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="removeElementFromCustomer" parameterOrder="customerId import_id elementId macAddress">
+
+         <wsdl:input name="removeElementFromCustomerRequest" message="impl:removeElementFromCustomerRequest"/>
+
+         <wsdl:output name="removeElementFromCustomerResponse" message="impl:removeElementFromCustomerResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getCustomersForElement" parameterOrder="elementID mac">
+
+         <wsdl:input name="getCustomersForElementRequest" message="impl:getCustomersForElementRequest"/>
+
+         <wsdl:output name="getCustomersForElementResponse" message="impl:getCustomersForElementResponse"/>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="CustomerIfServiceSoapBinding" type="impl:CustomerIf">
+
+      <wsdlsoap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="getAllCustomers">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getAllCustomersRequest">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getAllCustomersResponse">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSearchFields">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getSearchFieldsRequest">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getSearchFieldsResponse">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getCustomers">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getCustomersRequest">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getCustomersResponse">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getCustomerById">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getCustomerByIdRequest">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getCustomerByIdResponse">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="addCustomer">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="addCustomerRequest">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="addCustomerResponse">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="updateCustomer">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="updateCustomerRequest">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="updateCustomerResponse">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="deleteCustomer">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="deleteCustomerRequest">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="deleteCustomerResponse">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="importCustomer">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="importCustomerRequest">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="importCustomerResponse">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="addElementToCustomer">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="addElementToCustomerRequest">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="addElementToCustomerResponse">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="removeElementFromCustomer">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="removeElementFromCustomerRequest">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="removeElementFromCustomerResponse">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getCustomersForElement">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getCustomersForElementRequest">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getCustomersForElementResponse">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:customer"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="CustomerIfService">
+
+      <wsdl:port name="CustomerIfService" binding="impl:CustomerIfServiceSoapBinding">
+
+         <wsdlsoap:address location="http://localhost:80/prizm/nbi/CustomerIfService"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>

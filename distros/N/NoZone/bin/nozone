@@ -1,0 +1,123 @@
+#!/usr/bin/perl
+#
+# nozone: a Bind DNS zone file generator
+#
+# Copyright (C) 2013  Daniel P. Berrange <dan@berrange.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use Config::Record;
+use NoZone;
+
+my $cfgfile = "/etc/nozone.cfg";
+my $verbose = 0;
+my $help = 0;
+my $datadir = "/var/named/data";
+my $confdir = "/etc/named";
+my @masters = ();
+
+if (!GetOptions ("config|c=s" => \$cfgfile,
+		 "help|h" => \$help,
+		 "verbose|v"  => \$verbose,
+		 "datadir=s" => \$datadir,
+		 "confdir=s" => \$confdir,
+		 "master=s" => \@masters)) {
+    pod2usage(-exitval => 1,
+	      -verbose => 0);
+}
+if ($help) {
+    pod2usage(-exitval => 0,
+	      -verbose => 1);
+}
+
+my $cfg = Config::Record->new();
+$cfg->load($cfgfile);
+
+my $nozone = NoZone->new(datadir => $datadir,
+			 confdir => $confdir,
+			 masters => \@masters);
+$nozone->load_config($cfg);
+
+$nozone->generate_zones($verbose);
+
+=head1 NAME
+
+nozone - a Bind DNS zone file generator
+
+=head1 SYNOPSIS
+
+ nozone [OPTION]...
+
+=head1 DESCRIPTION
+
+C<nozone> will read a description of required DNS zones from the
+configuration file C</etc/nozone.cfg>. It will then generate a
+set of Bind DNS zone files.
+
+=head1 OPTIONS
+
+Valid command line options are
+
+=over 4
+
+=item -c CONFIGFILE, --config=CONFIGFILE
+
+Specify a different configuration file from the default (C</etc/nozone.cfg>)
+
+=item --datadir DIR
+
+Specify a different directory for bind zone data files from the
+default (C</var/named/data>)
+
+=item --confdir DIR
+
+Specify a different directory for bind zone conf files from the
+default (C</etc/named>)
+
+=item --master IPADDR
+
+Specify the IP address of the master DNS server. If set this causes
+generation of a slave zone config, and no zone data files. This can
+be repeated multiple times.
+
+=item -v, --verbose
+
+Print details about each file generated
+
+=item -h, --help
+
+Print this help message
+
+=back
+
+=head1 AUTHORS
+
+C<nozone> was written by Daniel P. Berrange <dan@berrange.com>
+
+=head1 LICENSE
+
+C<nozone> is distributed under the terms of the GNU GPL version 3
+or any later version. You should have received a copy of the GNU
+General Public License along with this program.  If not, see
+C<http://www.gnu.org/licenses/>.
+
+=head1 SEE ALSO
+
+C<Nozone::Zone>, C<named(8)>, C<named.conf(5)>

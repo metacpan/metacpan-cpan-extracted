@@ -1,0 +1,117 @@
+{: NES 1.0 none :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  Nes 1.03 by Skriptke
+  Copyright 2009 - 2010 Enrique Castañón
+  Licensed under the GNU GPL.
+
+  Sample:
+  http://nes.sourceforge.net/
+
+  CPAN:
+  http://search.cpan.org/dist/Nes/
+
+  Repository:
+  http://github.com/Skriptke/nes
+
+  -----------------------------------------------------------------------------
+:}
+
+        <h2><a href="#">Includes Samples</a></h2>
+        <h3>Description</h3>
+        <p>  
+        Can include almost any type of file, HTML, PHP, PERL, PYTHON, NSQL, 
+        NHTML, SH, TXT, etc.
+        </p>
+        <h3>Include PHP</h3>
+        <p>  
+        Many times we have to include in our pages, code from third parties, 
+        advertising, statistics, etc.. the more often they come in PHP. Nes is 
+        compatible and allows to include PHP files with just this:
+        <pre>
+        &#123;: include ('file.php') :&#125;
+        </pre>
+        </p>        
+        <p>
+        The following is a PHP script that displays a calendar:
+        <div id="cuadro">
+        {: include ../../scripts/examples/calendar.php :}
+        </div>
+        <br>
+        Nes Tags can include anywhere in the PHP file.
+        <br><br> 
+        Only support the GET method.
+        </p>
+        <br><br>
+        <h3>Include Perl</h3>
+        <p> 
+        Perl sample.
+        <pre>
+        &#123;: include ('file.pl') :&#125;
+        </pre>        
+        <div id="cuadro">
+        {: include ../../scripts/examples/perl.pl :}
+        </div>
+        </p>          
+        <br><br>      
+        <h3>Include Python</h3>
+        <p> 
+        Python sample.
+        <pre>
+        &#123;: include ('file.py') :&#125;
+        </pre>        
+        <div id="cuadro">
+        {: include ../../scripts/examples/python.py :}
+        </div>
+        </p>          
+        <br><br>   
+        <h3>Include SH</h3>
+        <p> 
+        We can also include shell files. The following is a script in SH 
+        showing the unix cal command:
+        <pre>
+        &#123;: include ('file.sh') :&#125;
+        </pre>        
+        <pre id="cuadro"><big><big>
+{: include ../../scripts/examples/cal.sh :}
+        </big></big></pre>
+        </p>        
+        <br><br>
+        <h3>Include nHTML</h3>
+        <p> 
+        nHTML sample.
+        <pre>
+        &#123;: include ('file.nhtml') :&#125;
+        </pre>        
+        <div id="cuadro">
+        {: include ../../scripts/examples/suerte.html :}
+        </div>
+        </p>          
+        <br><br>
+        <h3>Include HTML</h3>
+        <p> 
+        It can include any HTML file type text/html.
+        <pre>
+        &#123;: include ('file.html') :&#125;
+        </pre>        
+        <div id="cuadro">
+        {: include ../../scripts/examples/solo_html.html :}
+        </div>
+        </p>   
+        <br><br>
+        <h3>Include TXT</h3>
+        <p> 
+        Any plain text file (text/plain).
+        <pre>
+        &#123;: include ('file.txt') :&#125;
+        </pre>        
+        <div id="cuadro">
+        {: include ../../scripts/examples/archivo.txt :}
+        </div>
+        </p>  
+         <br>
+        (Use "<a href="./?{: $ link_source :}">View Source</a>" for more details)
+        <p>
+        </p>
+ 

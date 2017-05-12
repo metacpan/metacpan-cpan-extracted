@@ -1,0 +1,23 @@
+Changes
+eg/note-find
+eg/note-jpg-add
+lib/Net/Evernote/Simple.pm
+lib/Net/Evernote/Simple/EDAMErrors/Constants.pm
+lib/Net/Evernote/Simple/EDAMErrors/Types.pm
+lib/Net/Evernote/Simple/EDAMLimits/Constants.pm
+lib/Net/Evernote/Simple/EDAMLimits/Types.pm
+lib/Net/Evernote/Simple/EDAMNoteStore/Constants.pm
+lib/Net/Evernote/Simple/EDAMNoteStore/NoteStore.pm
+lib/Net/Evernote/Simple/EDAMNoteStore/Types.pm
+lib/Net/Evernote/Simple/EDAMTypes/Constants.pm
+lib/Net/Evernote/Simple/EDAMTypes/Types.pm
+lib/Net/Evernote/Simple/EDAMUserStore/Constants.pm
+lib/Net/Evernote/Simple/EDAMUserStore/Types.pm
+lib/Net/Evernote/Simple/EDAMUserStore/UserStore.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/001Basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

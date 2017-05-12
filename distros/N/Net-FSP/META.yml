@@ -1,0 +1,54 @@
+---
+name: Net-FSP
+version: 0.16
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+abstract: A client implementation of the File Service Protocol
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-FSP
+  license: http://dev.perl.org/licenses/
+requires:
+  perl: 5.006
+build_requires:
+  Test::More: 0
+recommends:
+  Socket6: 0
+provides:
+  Net::FSP:
+    file: lib/Net/FSP.pm
+    version: 0.16
+  Net::FSP::Dir:
+    file: lib/Net/FSP/Dir.pm
+    version: 0
+  Net::FSP::Entry:
+    file: lib/Net/FSP/Entry.pm
+    version: 0
+  Net::FSP::File:
+    file: lib/Net/FSP/File.pm
+    version: 0
+  Net::FSP::Handle:
+    file: lib/Net/FSP/Handle.pm
+    version: 0
+  Net::FSP::Handle::Read:
+    file: lib/Net/FSP/Handle/Read.pm
+    version: 0
+  Net::FSP::Handle::Write:
+    file: lib/Net/FSP/Handle/Write.pm
+    version: 0
+  Net::FSP::Util:
+    file: lib/Net/FSP/Util.pm
+    version: 0
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+keywords:
+  - FSP
+  - File service protocol
+  - File transfer
+no_index:
+  namespace:
+    - Net::FSP::Handle
+  package:
+    - Net::FSP::Handle

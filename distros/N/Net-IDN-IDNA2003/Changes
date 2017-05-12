@@ -1,0 +1,5 @@
+Revision history for Perl extension Net::IDN::IDNA2003
+
+1.000 (2012-01-01)
+	- initial version of Net::IDN::IDNA2003 
+	  (based on Net::IDN::Encode 1.102)

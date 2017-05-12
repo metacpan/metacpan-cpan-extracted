@@ -1,0 +1,22 @@
+---
+name: Net-DVBStreamer-Client
+version: 0.01
+author:
+  - 'Nicholas J Humfrey, njh@cpan.org'
+abstract: ~
+license: perl
+requires:
+  Getopt::Std: 0
+  IO::Socket: 0
+  Pod::Usage: 0
+  Term::ReadLine: 0
+  perl: 5.5.0
+recommends:
+  HTTP::Daemon: 0
+build_requires:
+  Module::Build: 0.20
+provides:
+  Net::DVBStreamer::Client:
+    file: lib/Net/DVBStreamer/Client.pm
+    version: 0.01
+generated_by: Module::Build version 0.26

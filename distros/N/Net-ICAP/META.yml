@@ -1,0 +1,27 @@
+---
+abstract: 'Internet Content Adapataion Protocol (rfc3507)'
+author:
+  - 'Arthur Corliss <corliss@digitalmages.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  IO::File: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.86, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-ICAP
+no_index:
+  directory:
+    - t
+    - inc
+recommends: {}
+requires:
+  Class::EHierarchy: 2
+  HTTP::Date: 0
+  Paranoid: 2.05
+  URI: 0
+version: 0.04

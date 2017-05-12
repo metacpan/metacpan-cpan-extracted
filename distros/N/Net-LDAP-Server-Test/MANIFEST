@@ -1,0 +1,18 @@
+Changes
+lib/Net/LDAP/Server/Test.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-ldap.t
+t/02-ad.t
+t/03-socket.t
+t/04attributes.t
+t/05-scope.t
+t/06-no-such-entry.t
+t/07-error-codes.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

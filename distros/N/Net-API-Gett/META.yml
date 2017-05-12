@@ -1,0 +1,50 @@
+---
+abstract: 'Perl bindings for Ge.tt API'
+author:
+  - 'Mark Allen <mrallen1@yahoo.com>'
+build_requires:
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-API-Gett
+provides:
+  Net::API::Gett:
+    file: lib/Net/API/Gett.pm
+    version: 1.06
+  Net::API::Gett::File:
+    file: lib/Net/API/Gett/File.pm
+    version: 1.06
+  Net::API::Gett::Request:
+    file: lib/Net/API/Gett/Request.pm
+    version: 1.06
+  Net::API::Gett::Share:
+    file: lib/Net/API/Gett/Share.pm
+    version: 1.06
+  Net::API::Gett::User:
+    file: lib/Net/API/Gett/User.pm
+    version: 1.06
+requires:
+  Array::Iterator: 0
+  File::Slurp: 0
+  JSON: 0
+  LWP: 0
+  LWP::Protocol::https: 0
+  Moo: 0.009013
+  MooX::Types::MooseLike: 0.02
+  Sub::Quote: 0
+  perl: 5.010
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/mrallen1/Net-API-Gett.git
+  x_KeyWords:
+    - 'file sharing'
+    - gett
+    - 'REST API client'
+version: 1.06

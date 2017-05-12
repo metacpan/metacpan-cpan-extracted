@@ -1,0 +1,18 @@
+0.04	Feb 26 2008	Sergey Kotenko
+	- Tests added.
+	- Updated documentation.
+
+0.05	Mar 08 2008	Sergey Kotenko
+	- Added %POSTPROCESS
+
+0.06	Mar 12 2008	Sergey Kotenko
+	- Minor bugfixes
+	
+0.07	Mar 12 2008	Sergey Kotenko
+	- ping() added
+
+0.08	Dec 18 2008	Walery Studennikov
+	- rewrite without using POE
+
+0.09	Jan 30 2008	Walery Studennikov
+	- timeouts introduced

@@ -1,0 +1,76 @@
+Revision history for Net::IP::Identifier
+
+0.111     2015-05-31 11:10:22-07:00 America/Los_Angeles
+    Fix joiners.  Add 'join' method.  Add test for IPv6 custom joiners.
+
+    Refactored overloading to be more robust across perl versions.
+
+    Remove all Hotmail netblocks (they belong to Microsoft now).
+
+
+0.110     2015-05-28 11:02:01-07:00 America/Los_Angeles
+    Fix how shift used in run method to satisfy certain versions of perl.
+
+    Minor fix to extra/check_plugin (skip '::' blocks).
+
+    Major changes/updates to a lot of POD.
+
+    Add _ENTITY_REGEX_ to many Plugin modules.
+
+
+0.106     2015-05-25 14:23:10-07:00 America/Los_Angeles
+    Significant improvements to extra/check_plugin:
+        add modules for parsing and caching WHOIS results.
+        each successful WHOIS fetch is cached into an SQLite database (file
+            is ~/.whois_cache.sqlite by default).  subsequent fetches of
+            the same netblock come from the cache instead of re-fetching.
+            cached entries are considered 'stale' after 30 days (default).
+        Net::IP::Identifier::WhoisCache is a 'modulino', so it can be used
+            as a standalone script.
+        much better handling of candidate netblocks.
+        improved reporting of netblocks that fail parsing or that don't
+            belong to the entity.
+        output in a format more suitable for including in the Plugin
+            module.
+        output chunks are combined into a single netblock when possible.
+
+    All plugins re-checked with improved check_plugin, leading to better,
+        more accurate coverage.
+
+    Add plugins for DigitalOcean, Koffi-vend, LeaseWeb, Centarra (Avante),
+        and ChinaNet (163data.com.cn).
+
+    Add a plugin for internal (non-routable) netblocks (such as 10.0.0.0
+        and 192.168.0.0).  The entity is 'internal'.
+
+
+0.086     2015-01-18 13:19:10-08:00 America/Los_Angeles
+    Add Plugins:
+        1and1
+        Amazon
+        Baidu
+        Fedex
+        Microsoft
+    Updated Plugins:
+        Akamai
+        Comcast
+    clean up many missing and incorrect netblocks in plugins
+    add support for range notation (N.N.N.N - M.M.M.M, IPv4 and IPv6))
+    add IPv6 support
+    significant changes/improvements to Binode:
+        remove descend method, replace with construct, follow and traverse methods
+        user now provides callbacks for follow and traverse
+    add deep recursion support to handle IPv6
+    use Binode to handle overlap and redundant checks
+    add Net::IP::Identifier::Regex.pm to store useful regular expressions
+        (some early perl distributions don't support Regexp::Common)
+    add bin/net_cidr_lite_merge.pl
+    add extra/check_plugin
+    change die to croak in most places
+    remove some debug stuff
+    add _ENTITY_REGEX_ in plugins to make name checking flexible
+    rename tests more logically
+
+0.054     2014-11-15
+    Original release.
+

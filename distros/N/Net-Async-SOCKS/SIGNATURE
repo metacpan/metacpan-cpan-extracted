@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e2fbfee305d55b40b91c9d6fba64060167964177 Changes
+SHA1 714d14811e3c65e348c8aa136e4e868fd8e7f56b INSTALL
+SHA1 6b50b30fa6f8d063d96e32c9a81f3f82328925f7 LICENSE
+SHA1 ae43a3a68ba87b9bae38d79fc05ebfe4ee9c9967 MANIFEST
+SHA1 ef42d724a67ce562817fa4e35b6931bf6dddf586 META.json
+SHA1 b545d544637b9193c8ed738cc3f69be5c83d03a3 META.yml
+SHA1 9523ba0d006a8fd8c081120d73e69b83cb10befd Makefile.PL
+SHA1 23680b2bb15d2addb4dabacd2b5a62c626cbbe59 README
+SHA1 de7c8feb3f02161aff7f721bae9ffa7a69ffbb6c cpanfile
+SHA1 32a2a195c164c2523da84c055c24795a3225164a dist.ini
+SHA1 807a48cf01f4251164191eebb85b5c2ec71a61c8 examples/socks-connect.pl
+SHA1 8993b2caa717d2029a0bc272e0021c8f3625e7e2 lib/Net/Async/SOCKS.pm
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 25921e4301c2177aa48a3c1d5a537f2b2fa1806a t/00-compile.t
+SHA1 017e2d0799413eefdba77fbce3acfbbf41ee2aba t/000-report-versions-tiny.t
+SHA1 9b232b6ecc26e9fadcb802e570212e13b485a2e2 t/protocol.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/release/synopsis.t
+SHA1 bbcd59d081d9940af5d43337ae85458075933829 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJUABMCAAoJEFKElMNpjtyDxeIH/3U/hhjXEMZOu3+jbHprOjCh
++lNCzAa9BpduD1zK8J+YcAg/IIVZIPrVf6aRiqfpP/69pnC6rmW0rNl5VnMp33sx
+F6GKTuy5li0CLvglOPlL2PMgodX/Ub94M8+fAXP6UB6Ek+ceLL1cNGoiShoZT9dI
+3qzrNRU/KmUj7GzVbzvin89i/0hYuwcwppwrb0fcAf6aCVqmf97ZPzetLyXl9xO0
+CEIcbxWTyQrDArs03Lr6M06jM4EshPjmkYSiqtPVrH2LWEUkV5NiqPwe9Y3bJpmB
+W8pxohjGx6zec/VTqgHx2CAhEC9atyWm7rUzjrbVEKfUyTGC3MoU+rrtmcmeKy8=
+=8DCj
+-----END PGP SIGNATURE-----

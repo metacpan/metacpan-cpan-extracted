@@ -1,0 +1,23 @@
+---
+name: Net-Delicious-Export
+version: 1.2
+author:
+  - Aaron Straup Cope <ascope@cpan.org>
+abstract: base class for exporting Net::Delicious thingies
+license: perl
+requires:
+  MD5: 0
+  XML::SAX: >= 0.12
+build_requires:
+  Test::Simple: >= 0.47
+provides:
+  Net::Delicious::Export:
+    file: lib/Net/Delicious/Export.pm
+    version: 1.2
+  Net::Delicious::Export::Post:
+    file: lib/Net/Delicious/Export/Post.pm
+    version: 1.1
+  Net::Delicious::Export::Post::Bookmarkid:
+    file: lib/Net/Delicious/Export/Post.pm
+    version: 1.1
+generated_by: Module::Build version 0.2611

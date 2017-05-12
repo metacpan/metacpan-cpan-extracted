@@ -1,0 +1,35 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.22.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3b7b06d2689b882e3b4f07943aed2ce553b91b35 Changes
+SHA1 92f0c71082d2a90ae6ae8ad0a7319ae9e4fd6cf2 MANIFEST
+SHA1 fee47330e8ddb8b2580b728a88ccb9a8f51559d8 Makefile.PL
+SHA1 d6ade1f9ac8f0fcf02962e5485d4b6a70d536898 README
+SHA1 3c1584eeafa5f0b5b7128371695173e08d1c8742 lib/Net/BGP/ContextRouter.pm
+SHA1 4fb8470fdcb50bc9b1eaae8812685ddc02ce6486 lib/Net/BGP/Policy.pm
+SHA1 6f1c048daaa983fc5be003374ee1cdf5309f0587 lib/Net/BGP/RIB.pm
+SHA1 7aae07a03861a4bbb707d72fdf08233c8c300f41 lib/Net/BGP/RIBEntry.pm
+SHA1 b69a713157128c3a5724d2d64ff1ccb9853fb3d3 lib/Net/BGP/Router.pm
+SHA1 04e4911e9aa4d1fee94ace393b20d79e1668964f t/00-Signature.t
+SHA1 514ca0d344b5a81923a20cfcf99e3ec2ce8a8e60 t/10-use.t
+SHA1 bc060f59a11841708770ad2ab9cf3233ae3d57d3 t/20-RIBEntry.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.2 (GNU/Linux)
+
+iD8DBQE+22bWXejZQ7TqiLoRAkPHAJ9z8YVjme8RfINCu5VPFDUPxwm4yACfX6iu
+HfjqDtJcSW7YzLTvAFSYdJI=
+=obiC
+-----END PGP SIGNATURE-----

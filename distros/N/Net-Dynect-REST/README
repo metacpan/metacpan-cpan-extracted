@@ -1,0 +1,92 @@
+Net-Dynect-REST version 0.09
+============================
+
+Dynect.net is a provider of hosted DNS services. They offer a /two/ 
+APIs for interacting with their service at this stage - REST and SOAP. 
+This set of modules attempts to implement (some of) the REST interface.
+
+BASE MODULES
+------------
+There are three base modules to use:
+  Net::Dynect::REST - will hold your session information (Auth Token)
+  Net::Dynect::REST::Request - will format a request and parameters
+  Net::Dynect::REST::Response - will decode the response
+
+To use these, instantiate the Net::Dynect::REST with your security 
+credentials. Then create a request object, and pass  it to the 
+Net::Dynect::REST->execute() method, and you should get a 
+return value of Net::Dynect::REST::Response.
+
+  my $dynect = Net::Dynect::REST->new(user_name => 'me', 
+				      customer_name => 'my_company', 
+				      password => 'my_secret');
+  my $request = Net::Dynect::REST::Request->new(..your params..);
+  my $response = $dynect->execute($request);
+  .. time passes... you do work...
+  $dynect->logout;
+
+
+
+ASBTRCTION
+----------
+Then there are a set of higher level abstractions modules:
+  Net::Dynect::REST::Zone - a DNS Zone
+  Net::Dynect::REST::ZoneChanges - the pending changes
+  Net::Dynect::REST::ARecord - an (IPv4) Address resource record
+  ....
+
+To use these, you need to:
+  1. Create your Net::Dynect::REST session as above.
+  2. Create your asbtration object, such as "Zone", and pass it your 
+     Net::Dynect::REST.
+  3. Use the methods on the abstraction object to do what you want 
+     (add/remove/delete).
+  4. If you're happy with all your changes, then you need to load your 
+     Zone (if you hadn't already) and use the 'publish' method.
+
+For example:
+  my $dynect = Net::Dynect::REST->new(user_name => 'me', 
+				      customer_name => 'my_company', 
+				      password => 'my_secret');
+  my $zone = Net::Dynect::REST::Zone->new(connection => $dynect,
+					  zone => 'example.com');
+  my @addresses = Net::Dynect::REST::ARecord->find(connection => $dynect,
+					zone => 'example.com',
+				        fqdn => 'foo.example.com');
+  foreach (@addresses) {
+    printf "foo.example.com = %s\n", $_->rdata->address;
+  }
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP - the Perl web library
+  Carp - for various wanrings, normally already in your base Perl
+  JSON - for encoding and decoding data
+
+THANKS
+
+This is only possible thanks to LWP, JSON, some inspiraction from DBI 
+(Tim Bunce), general inspiration over the years from Acme (Léon 
+Brocard), a random post from Mark Stosberg on the CGIAPP mailing list.
+Also, thanks to NetShelter and Dynect.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by James Bromberger
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

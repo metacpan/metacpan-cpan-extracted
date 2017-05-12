@@ -1,0 +1,75 @@
+<h2><a href="#">Nes 1.00 Release</a></h2>
+<h3>Nes can do for you</h3>
+<p>
+With Nes can do the same or more than any other template system, only much 
+faster and easier. Time is the most valuable resource.
+</p>
+<p>
+Some characteristics of Nes:
+</p>
+<h3>Simplicity</h3>
+<p> 
+Nes has <b>only ten Tags</b> to include in the HTML, and <b>a single object</b> 
+with <b>a single method</b> to instantiate in Perl. You can start working with 
+Nes in hours, not weeks or months as in other systems.
+</p> 
+
+<h3>Security</h3>
+<p> 
+Transparent management of <a href="./?action=item&item=Security">code injection and cross-site scripting</a>. Plugins for 
+creating secure forms, Forms and Captcha.
+</p> 
+
+<h3>Objects</h3>
+<p> 
+Object-oriented paradigm which enables you to reuse your code or use third-party 
+libraries. Objects are the main feature that makes Nes and different from other systems.
+</p> 
+
+<h3>HTML oriented</h3>
+<p> 
+Nes is oriented at HTML and not the Perl code. Nes exported very few Perl 
+functions, also to simplify, Nes Objects may also contain HTML, 
+Javascript, CSS, Ajax, etc.. even PHP, or trail mix.
+</p> 
+
+<h3>Wrapper</h3>
+<p> 
+Full support of PHP Wrapper. Nes as Wrapper can use to add functionality to 
+other types as HTML, or PHP to exchange information. 
+</p> 
+
+<h3>mod_perl</h3>
+<p> 
+Support for mod_perl.
+</p> 
+
+<h3>Sessions</h3>
+<p> 
+Creating and managing user sessions.
+</p> 
+
+<h3>Plugins</h3>
+<p> 
+You can add functionality using plugins to Nes, you can create your own or 
+use by third parties.
+</p> 
+
+<h3>PHP and other</h3>
+<p> 
+Insert parts of <a href="./?action=item&item=Include PHP and others">PHP</a> code in Nes only have to type a tag, Nes allow the inclusion 
+in your script templates in other languages other than Perl without writing a 
+single line of Perl code. Moreover, most of them can contain Tags Nes.
+</p> 
+
+<h3>SQL</h3>
+<p> 
+You can insert SQL SELECT statements in your templates directly.
+</p> 
+
+<h3>.nes.cfg configuration Files</h3>
+<p> 
+Nes provides configuration files to the style .htaccess you can also use for your script.
+</p> 
+
+

@@ -1,0 +1,15 @@
+$args =
+{
+ message_type => MQTT_PUBLISH,
+ qos => MQTT_QOS_EXACTLY_ONCE,
+ topic => 'testing',
+ message => 'test',
+ message_id => 1,
+ retain => 1,
+}
+
+35 0f 00 07  74 65 73 74    69 6e 67 00  01 74 65 73
+74
+
+Publish/exactly-once,retain testing/1 
+  74 65 73 74                                      test

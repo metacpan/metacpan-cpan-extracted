@@ -1,0 +1,33 @@
+0.05 2016-03-13
+  - Handle an incompatible API change of Crypt::ECB.
+    This module now works with pre- and post- 2.00 versions of Crypt::ECB.
+
+0.04 2015-06-29
+  - The "Old Perl versions & Strange systems Update"
+  - Replaced the operator "//" with something friendlier to old Perls.
+  - Probably fixed, once and for all, the damned "packet_sending.t" test.
+    There was a deadlock. Which apparently didn't show on some systems.
+  - Travis-CI integration.
+  - Small fixups to the code comments.
+
+0.03 2015-03-09
+  - Remove POSIX as a dependency, as it is no longer required.
+  - Update the email address in the documentation.
+  - Move $VERSION to a standalone variable. This fixes the module for older
+    versions of Perl.
+  - Support older versions of Net::Telnet.
+  - Add a delay in the packet sending test, hoping to fix an unknown issue
+    on some platforms.
+
+0.02 2015-03-08
+  - New option: packet_delay, which specifies the amount of time to wait after
+    sending the packet. Defaults to 0.30 seconds, and can be 0.
+  - Critical fix in Net::Telnet::Netgear: a missing parameter could have caused
+    an infinite loop.
+  - Every test is now working correctly, on every OS.
+  - More tests.
+  - gen_doc.pl was installed with the module. This is now fixed.
+  - Makefile.PL is no longer using tabs :-)
+
+0.01 2015-03-06
+  - First release.

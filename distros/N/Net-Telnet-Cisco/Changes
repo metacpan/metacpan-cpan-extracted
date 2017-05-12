@@ -1,0 +1,69 @@
+$Id: Changes,v 1.19 2002/06/18 16:37:02 jkeroes Exp $
+
+Revision history for Perl extension Net::Telnet::Cisco.
+
+1.0   Fri Jul 14 11:11:42 PDT 2000 
+	- Initial release
+
+1.01  Fri Jul 14 15:07:00 PDT 2000
+	- Fixed CPAN installation issues
+
+1.02  Mon Jul 24 16:22:11 PDT 2000
+	- enable() enables.
+	- Simplified disable().
+	- prompt() and is_enabled() handle prompts with '(enable)' in them.
+	- Added Windows installation tips to INSTALL.
+	- test.pl keeps a log (test.log) of the session if there were errors.
+
+1.03  Sun Jul 30 14:58:44 PDT 2000
+	- Found and fixed bug in enable(), hopefully forever.
+	- cmd() and waitfor() properly handle multiple args.
+	- waitfor() handles -Match args with m<delim>...<delim> notation.
+	- Fixed occasional bug where last_prompt would return a
+	  regex matching a prompt and not the prompt itself.
+	- Added enable() block to POD's Synopsis.
+	- Added "new" to the constructor in POD's Synopsis.
+	- Improved default prompt:
+	  Old: /[\w\s().-]*[\$#>]\s?(?:\(enable\))?\s*$/'
+	  New:   /[\w().-]*[\$#>]\s?(?:\(enable\))?\s*$/
+
+1.04  Thu Jan 25 15:49:57 PST 2001
+	- Aaron Racine submitted a patch for a prompt bug in enable() 
+	- Private release
+
+1.05  Wed Aug  8 17:57:56 PDT 2001
+	- enable() accepts -Name, -Password, -Passcode, and -Level args
+	- All args to login() are optional, including -Name
+	- Reworked internals of login() and enable()
+	- New EXAMPLES docs
+	- New PIX firewall "PIX Passwd: " prompt support
+	- New XTACACS/SecurID "PASSCODE: " prompt support
+	- Default cmd_prompt now anchored to beginning of line with (?m).
+	- New cmd_prompt, see docs.
+
+1.06  Mon Jan 14 09:42:20 PST 2002
+	- Turned on warnings, minor related changes
+	- Correctly return an error in waitfor()
+
+1.07  Tue Jan 15 12:41:36 PST 200
+	- Bugfix from Leonardo Cont - used wrong errmsg in enable()
+
+1.08  Wed Jan 30 15:49:26 PST 2002
+	- New feature: autopage()
+	- Fixed argument handling in new()
+	- Better internal prompt handling
+	- Better error reporting from invalid prompts
+	- Testing: Errmode set to \&Test::More::fail
+
+1.09  Wed Mar 13 12:45:33 PST 2002
+	- Autopage bugfix - 1st line of every page after the 1st was missing
+	- New method: normalize_cmd() - strips ^H, ^?, and ^U
+	- Defaults now listed in docs
+	- Project has a home: NetTelnetCisco.sourceforge.net
+	- New method: ios_break() - sends control-^
+	- Using ExtUtils::MakeMaker::prompt in test.pl for noninteractive installs
+
+1.10  Tue Jun 18 10:28:05 PDT 2002
+	- send_wakeup() written to help use module with Livingston Portmasters.
+	- warnings() and ignore_warnings() allow some error-strings to be ignored.
+	- fixed warning in prompt_append()

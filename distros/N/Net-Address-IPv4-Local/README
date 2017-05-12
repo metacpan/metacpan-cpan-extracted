@@ -1,0 +1,12 @@
+Net::Address::IPv4::Local 0.11
+A class for discovering the local system's IP address.
+(C) 2005 Julian Mehnle <julian@mehnle.net>
+<http://www.mehnle.net/software/net-address-ipv4-local>
+===============================================================================
+
+Net::Address::IPv4::Local discovers the local system's IP address that would be
+used as the source address when contacting "the internet" or a certain
+specified remote IP address.
+
+# $Id: README,v 1.4 2005/01/15 14:40:10 julian Exp $
+# vim:tw=79

@@ -1,0 +1,160 @@
+Net::LDAP::Express version 0.12
+===============================
+
+    Net::LDAP::Express is an alternative interface to the fantastic
+    Graham Barr's Net::LDAP, that simplifies the tasks of adding and
+    deleting multiple entries, renaming them, or searching entries
+    residing in a common subtree.
+
+    Net::LDAP is a great module for working with directory servers, but
+    it's a bit overkill when you want to do simple short scripts or have
+    big programs that always do the same job again and again, say: open
+    an authenticated connection to a directory server, search entries
+    against the same attributes each time and in the same way (e.g.:
+    approx search against the three attributes cn, uid and loginname).
+    With Net::LDAP this would mean:
+
+    *   connect to the directory server using new();
+
+    *   authenticate with bind() ;
+
+    *   compose a search filter, and pass it to search(), along with the
+        base subtree;
+
+    *   perform the search getting a Net::LDAP::Search object;
+
+    *   verify that the search was successful using the code() or
+        is_error() method on the search object;
+
+    *   if the search was successful, extract the entries from the
+        Search object, for example with entries or shift_entry.
+
+    With Net::LDAP::Express this is done with:
+
+    *   connect, authenticate, define default search subtree and
+        simple-search attributes with the new() method;
+
+    *   pass the simplesearch method a search string to be matched
+        against the attributes defined with searchattrs in new() and
+        check the return value: if it was successful you have a
+        reference to an array of Net::LDAP::Entry objects, if it was
+        unsuccessful you get undef, and you can check what the error was
+        with the error() method (or the error code with errcode) ;
+
+
+NOTES ABOUT THIS RELEASE
+
+This is a fix for a bug filed against release 0.11 by Dag-Erling Smørgrav.
+The fix itself is a one line change, so don't expect anything new.
+
+The code is now more than 10 years old and it could use more love than
+I can provide. If you're able and willing to improve the code, please
+do. One thing that this code is waiting for is switching to a cleaner
+delegation approach than the current subclassing.
+
+This module is not part of the perl-ldap distribution.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Note that make test will do nothing unless you set some environment
+variables -see TESTING THE SOURCE
+
+
+TESTING THE SOURCE
+
+This module's tests require that you have access to a directory server
+to test the functionalities. If you don't set some environment
+variables before running "make test", the tests will just check for a
+correct installation of the module and for the presence of some other
+modules that Net::LDAP::Express depends upon.
+
+To effectively run the tests just prepend to "make test" a sensible
+assignment to the TEST_HOST environment variable assignment, like in
+
+TEST_HOST='ldap.server.com' make test
+
+This will run the tests contacting the directory server at
+ldap.server.com. If the server runs on a non-standard port just add a
+TEST_PORT variable:
+
+TEST_HOST='ldap.server.com' TEST_PORT=1389 make test
+
+The scripts will try to use ou=simple,o=test as their base subtree
+(the ou=simple is there because the module was supposed to be called
+Net::LDAP::Simple in the beginning). If you want to change it, just
+use a TEST_BASE environment variable with the base subtree of your
+choice. The tree you use as TEST_BASE will be added a ou=test subtree
+and the tests will take place there. Feel free to get rid of it when
+the tests are finished.
+
+Some tests will try to create and modify entries on the directory
+server, and this requires some privileges. The test script will use
+cn=admin,o=test as bind DN and "secret" as password; again, if this
+isn't the case you can simply prepend an assignment to TEST_BINDDN and
+TEST_BINDPW.
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Net::LDAP and all the perl-ldap distribution by Graham Barr
+  Test::More for "make test"
+
+
+CREDITS
+
+I would like to thank all the people that helped me with their
+suggestions and opinions. Among them:
+
+* Dag-Erling Smørgrav for submitting bug #96007
+
+* submersible_toaster of perlmonks
+  (http://perlmonks.org/index.pl?node_id=195273), that first gave me
+  his encouragement to develop this module; 
+
+* Jim Harle, Christopher A. Bongaarts from the perl-ldap mailing list;
+
+* Ken Williams from the module-authors mailing list;
+
+* Frederik Uyttersprot from the comp.lang.perl.modules newsgroup;
+
+* Chris Ridd, William R. Ward for their feedback about the name;
+
+* Italian Perl Mongers, in particular Stefano Rodighiero (larsen),
+  TheHobbit and bepi for their suggestions and contribution;
+
+* my friend and brother Stefano Sanna;
+
+* John Woodell, that suggested me to add the "sort_by" feature;
+
+* Gordon Lack, for the "exact" search feature;
+
+* and, obviously, Graham Barr! 
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2014 Marco Marongiu
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.

@@ -1,0 +1,129 @@
+Revision history for Perl extension Net::Proxy
+
+0.13 Sun Nov 2 2014
+    [ENHANCEMENTS]
+    - dependency on perl 5.6 should be written as 5.006 (RT #36752, Andreas König)
+    - Make maximum buffer size user-configurable (RT #60751, Daniel Burr)
+    - Fix several bugs happening when a connection closes (RT #60641, Daniel Burr)
+    [DOCUMENTATION]
+    - reformat the documentation for better linkability
+    [SCRIPTS]
+    - connect-tunnel: Fix RT #42525 (Peter Oliver) by making the --tunnel regexp more liberal
+    - added the eg/forwarder.pl example script
+    [PACKAGING]
+    - the distribution is now packaged using Dist::Zilla
+    [TESTS]
+    - pod and compilation tests are now handled by Dist::Zilla plugins
+
+0.12 Thu Oct 18 00:49:42 CEST 2007
+    [ENHANCEMENTS]
+    - print a meaningful error message when the ssl connector can't listen
+    [SCRIPTS]
+    - connect-tunnel now dies early if LWP::UserAgent is not
+      installed (and t/90compile.t does pass as well)
+    [TESTS]
+    - prevent t/21connect.t to fail when a environment proxy is defined
+
+0.11 Mon Oct 15 03:44:30 CEST 2007
+    [ENHANCEMENTS]
+    - added an error() method, for messages that must always be shown
+    - better support for the cases where accept() fails
+    - better error message when accept() fails for a SSL socket
+    [DOCUMENTATION]
+    - added a tutorial about Net::Proxy, with code examples
+    [TESTS]
+    - prevent t/pod-coverage.t to fail on the upgrade_SSL method
+      mixed in Net::Proxy::Connector::connect_ssl
+
+0.10 Mon Oct  1 22:26:50 CEST 2007
+    [DOCUMENTATION]
+    - added information about the public SVN repository and the
+      mailing-list
+    [TESTS]
+    - prevent t/21connect.t, t/32tcp_connect.t, t/90compile.t to fail
+      when LWP::UserAgent is not installed
+
+0.09 Thu Sep 13 11:01:21 CEST 2007
+    [ENHANCEMENTS]
+    - the notice(), info() and debug() methods now have a timestamp
+    [TESTS]
+    - prevent the t/37connectssl_tcp.t test script to die when one
+      of the prerequisites is missing (thus removing many FAILs)
+
+0.08 Mon Apr 23 19:08:30 CEST 2007
+    [ENHANCEMENTS]
+    - the hook callback now receives the socket on which the data
+      was received, in addition to the connector
+    [NEW CONNECTOR]
+    - Net::Proxy::Connector::connect_ssl
+      (combines Net::Proxy::Connector::connect and
+      Net::Proxy::Connector::ssl in a single connector)
+    [TESTS]
+    - made tests more robust when connector prerequisites are missing
+    - test Net::Proxy::Connector::ssl as an "in" connector
+    - test the start_cleartext option of Net::Proxy::Connector::ssl
+
+0.07 Sat Sep  2 19:47:24 CEST 2006
+    [ENHANCEMENTS]
+    - added support for SSL proxies (ssl connector)
+    [NEW CONNECTOR]
+    - Net::Proxy::Connector::ssl
+    [TESTS]
+    - add support for NET_PROXY_VERBOSITY environnement variable
+      in the tests, to have more verbose tests if needed
+
+0.06 Thu Apr 20 21:27:00 CEST 2006
+    [ENHANCEMENTS]
+    - add support for "hooks" on received data, as proposed by Martin
+      Werthmöller (see http://www.cpanforum.com/threads/1991),
+      but with a different implementation
+
+0.05 Mon Apr 17 20:42:22 CEST 2006
+    [ENHANCEMENTS]
+    - added a debug() method (but all uses of it are commented out)
+    - better socket management algorithm:
+      + prevents deadlocks (as could occur when having a connection and
+        a tunneled connection within it both going through Net::Proxy)
+      + limits buffering (so as to avoid sucking a lot of memory
+        when one socket sends data faster than its peer can accept it)
+    [SCRIPTS]
+    - patched sslh so that it can listen not only on localhost.
+      (Thanks to Dieter Voegtli.)
+
+0.04 Tue Jan 17 14:47:20 CET 2006
+    [ENHANCEMENTS]
+    - added some basic information logging
+      (enable with Net::Proxy->set_verbosity( $level ))
+    [TESTS]
+    - test for several failure cases
+    - the test suite now covers more than 95% of the code
+    [SCRIPTS]
+    - patched sslh so that it works correctly, now
+
+0.03 Wed Jan 11 02:10:52 CET 2006
+    [DOCUMENTATION]
+    - Correct SYNOPSIS for Net::Proxy::Connector::tcp
+    - Added a SYNOPSIS for Net::Proxy::Connector::connect
+    [NEW CONNECTOR]
+    - Net::Proxy::Connector::dual
+    [SCRIPTS]
+    - previously unreleased sslh script ported to use Net::Proxy
+
+0.02 Tue Jan 10 09:43:23 CET 2006
+    [ENHANCEMENTS]
+    - added the README and Changes files
+    - added statistical methods to Net::Proxy
+    - mainloop($max) will refuse new connections after $max
+      connections have started
+    [NEW CONNECTOR]
+    - Net::Proxy::Connector::connect
+    [SCRIPTS]
+    - connect-tunnel ported to use Net::Proxy
+
+0.01 Fri Jan  6 03:32:46 CET 2006
+    [FEATURES]
+    - The proxy is fully functionnal, but lacks several types
+      of connectors
+    [CONNECTORS]
+    - Net::Proxy::Connector::tcp
+    - Net::Proxy::Connector::dummy

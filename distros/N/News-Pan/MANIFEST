@@ -1,0 +1,15 @@
+MANIFEST
+Makefile.PL
+t/.pan/astraweb/alt.binaries.indian.mp3
+t/.pan/astraweb/alt.binaries.sounds.mp3.celtic
+t/.pan/astraweb/comp.os.linux.development.apps
+t/00_Server.t
+t/03_Group.t
+t/05_Search.t
+lib/News/Pan.pm
+lib/News/Pan/Server.pm
+lib/News/Pan/Server/Group.pm
+lib/News/Pan/Server/Group/_Search.pm
+bin/panfind
+
+META.yml                                 Module meta-data (added by MakeMaker)

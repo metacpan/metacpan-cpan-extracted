@@ -1,0 +1,32 @@
+---
+abstract: 'MAC address functions and object'
+author:
+  - 'Dean Hamstead <dean@bytefoundry.com.au>'
+build_requires:
+  Test::Trap: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: NetAddr-MAC
+requires:
+  Carp: '0'
+  Exporter: '0'
+  List::Util: '0'
+  base: '0'
+  constant: '0'
+  perl: '5.004'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/djzort/NetAddr-MAC
+  repository: https://github.com/djzort/NetAddr-MAC.git
+version: '0.95'
+x_author_pledge:
+  version: 1
+x_serialization_backend: 'YAML::Tiny version 1.69'

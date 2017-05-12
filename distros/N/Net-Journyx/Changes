@@ -1,0 +1,46 @@
+Changes for Net-Journyx:
+
+0.12  Wed Jul 29 2009 17:57:53 EST
+    - Transparent reauthentication in case of session expiration
+
+0.11  Thu Jul 23 2009 14:01:55 EST
+    - Add "auto_logout" option for logout on Net::Journyx object DESTROY
+
+0.10  Thu Mar 12 2009 00:19:47 EST
+    - Add getCodeList, getSubcodeList, and getSubsubcodeList
+    - Allow callers to avoid loading created records if they don't need them
+
+0.09  Tue Mar 10 2009 21:41:39 EST
+    - Set namespace earlier to avoid an error with batching
+
+0.08  Fri Mar 6 2009 20:41:35 EST
+    - Use jxAPI batch for set_attributes
+    - Use keep_alive to reuse the same encrypted connection
+    - Cache templates for each record
+    - Cache WSDL file
+
+0.07  Fri Feb 27 2009 19:38:34 EST
+    - Factor out load_attribute
+    - Add a set_attributes method that will eventually become slimmer
+
+0.06  Tue Feb 24 2009 19:09:12
+    - Add an allows_utf8 option to Net::Journyx objects
+    - Net::Journyx::SOAP will downgrade non-ascii characters to ? if
+      allows_utf8 is disabled
+    - Fix a potential memory leak
+
+0.05  Fri Feb 20 2009 13:40:49
+    - Give Subcode and Subsubcode classes a jx_meta
+
+0.04  Fri Feb 20 2009 01:17:18
+    - Journyx returns CodeRecords when you try to create a Subcode!
+
+0.03  Thu Feb 19 2009 23:18:31
+    - Fix subsubcode package name.
+    - Clearer missing-attribute error messages.
+
+0.02  Tue Feb 10 2009 11:11:07
+    - When trying to get, set, or delete an attribute value on an attribute
+      that isn't loaded, throw a readable error instead of making Journyx
+      unhappy.
+

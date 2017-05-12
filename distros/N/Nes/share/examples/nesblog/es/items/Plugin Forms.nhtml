@@ -1,0 +1,442 @@
+{: NES 0.9 none :}
+{: #
+    ----------------------------------------------------------------------------
+    
+        NES 0.9 beta by - Skriptke
+        Copyright 2009 - 2010 Enrique F. Castañón
+        Licensed under the GNU GPL.
+        http://sourceforge.net/projects/nes/
+        
+        Sample to use Nes;
+        
+    ----------------------------------------------------------------------------
+:}
+<h2><a href="#">Plugin Forms</a></h2> 
+<h3>Descripción</h3>
+<p>
+Ofusca los campos de un formulario y añade otras opciones de seguridad que 
+dificultan que los robots accedan a los formularios.
+</p> 
+<h3>Cargar el Plugin</h3>
+<p>
+Para cargar cualquier Plugin debemos añadirlo a la lista de script de nuestro archivo <i>nhtml</i>:
+<pre>
+&#123;: NES 1.0 ('&#123;: * cfg_plugin_top_dir :&#125;/plugin.pl','my_file.pl') :&#125;
+
+</pre>
+El orden es importante, para <i>Forms</i> es necesario cargar primero:
+<pre>
+    
+&#123;: NES 1.0 ('&#123;: * cfg_plugin_top_dir :&#125;/forms.pl','my_file.pl') :&#125;
+
+</pre>
+Si se va a incluir un <i>Captcha</i> dentro de <i>Forms</i> es necesario cargar <i>forms_captcha.pl</i> en vez de <i>forms.pl</i>:
+<pre>
+    
+&#123;: NES 1.0 ('&#123;: * cfg_plugin_top_dir :&#125;/forms_captcha.pl','my_file.pl') :&#125;
+
+</pre>
+Que es lo mismo que hacer esto:
+<pre>
+    
+&#123;: NES 1.0 (
+             '&#123;: * cfg_plugin_top_dir :&#125;/captcha.pl',
+             '&#123;: * cfg_plugin_top_dir :&#125;/forms.pl',
+             'my_file.pl'
+           ) 
+:&#125;
+(*Hemos partido aquí ésta linea por razones de legibilidad, pero es un error
+ya que <a href="./?action=item&item=Tag NES ver (file)">NES</a> es el único Tags que no permite partir lineas) 
+
+</pre>
+Pero como hemos comentado el orden es importante, y en este caso sería necesario 
+cargar primero <i>captcha.pl</i> y después <i>forms.pl</i>, para no tener que recordar
+estos detalles y simplificar las cosas hemos creado <i>forms_captcha.pl</i> que básicamente 
+lo que hace es esto:
+<pre>
+
+...
+do "$dir_plugin/captcha.pl";
+do "$dir_plugin/forms.pl";
+...
+
+Ver: <a href="./?action=item&item=Plugins">Plugins</a>
+
+</pre>
+</p> 
+<h3>Ejemplo</h3>
+<p>
+<strong>archivo.nhtml:</strong>
+<pre>
+&#123;: NES 1.0 ('&#123;: * cfg_plugin_top_dir :&#125;/forms.pl','archivo.pl') :&#125;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Nes sample/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    ...
+    &#123;: & form (form1)
+        &#123;: & check ( 
+                    'user: 4,30', 
+                    'password: 4,20'           
+                   ) 
+        :&#125;
+        &lt;form id="form1" name="form1" method="post" action=""&gt;
+          User: &lt;input type="text" name="&#123;: & obfuscated user :&#125;" /&gt;
+          Password:&lt;input type="password" name="&#123;: & obfuscated password :&#125;" /&gt;
+        &lt;/form&gt;
+    :&#125;
+    ...
+  &lt;/body&gt;
+&lt;/html&gt;
+
+</pre>
+
+<strong>archivo.pl:</strong>
+<pre>   
+use Nes;
+
+my $nes = Nes::Singleton->new('archivo.nhtml');
+
+# Obtenemos la dirección de Forms
+my $form = nes_plugin->get('forms_plugin','form1');
+
+# Comprobamos que es correcto mediante is_ok
+if ( $form->{'is_ok'} ) {
+  ...
+} else  {
+  ...
+}
+
+$nes->out();
+
+</pre>
+</p>
+
+<h3>Formato</h3>
+<p>
+<pre>
+&#123;: & form (name,auto_submit,captcha_name,captcha_last,expire,expire_last,location,attempts,attempts_catpcha)
+        [&#123;: & check ( 'field: nin,max,type', ... ) :&#125;] 
+        [HTML]
+        &lt;input type="text" name="&#123;: & obfuscated field :&#125;" /&gt;
+        [HTML]
+:&#125
+</pre>
+<p>
+Sólo <b><i>name</i></b> es obligatorio, el resto de parámetros si no se indican 
+se leeran de archivo de configuración o tomarán sus valores por defecto.
+</p>
+<b>name:</b>
+<p>
+El nombre del formulario, debe conincidir con el valor de name en &lt;form&gt;
+<pre>
+ &#123;: & form (the_name)
+    ...
+    &lt;form name="the_name" method="post" action=""&gt;
+    ...
+    
+</pre>
+</p>
+
+<b>auto_submit:</b>
+<p>
+Los formularios de <i>Forms</i> se cargan en dos pasos, el último paso se carga
+solo (mediante javascript) si auto_submit es 1 que su valor por defecto. Cuando es
+0 hay que pulsar en el botón de enviar para terminar el formulario. Puede ser 
+necesario ponerlo a 0 en el caso de querer cargar un Captcha en el último paso.
+</p>
+
+<b>captcha_name:</b>
+<p>
+Si se incluye un Captcha dentro de Forms es necesario indicar su nombre. Por defecto
+captcha_name no tiene valor.
+<pre>
+&#123;: & form (name,,captcha_name)
+        ...
+        &#123;: & captcha (captcha_name,ascii)
+        ...
+        
+</pre>
+</p>
+
+<b>captcha_last:</b>
+<p>
+Si se incluye un Captcha dentro de Forms y se va a mostrar en el último paso. 
+Cualquier valor distinto de cero, por defecto captcha_last no tiene valor.
+</p>
+
+<b>expire:</b>
+<p>
+Tiempo de expiración del formulario a partir del cual ya no será válido. El tiempo se
+ indica con un sufijo;  s: segundos, m: minutos, h: horas, d: dias, M: meses, y: años, ej.:
+<pre>
+ 30s # 30 segundos
+ 5m  # 5 minutos
+ 1M  # 1 mes
+ 
+</pre>
+</p>
+
+<b>expire_last:</b>
+<p>
+En el último paso del formulario, expiración en el mismo formato que <i>expire</i>.
+Aumenta la seguridad del formulario, puesto que en el último paso el tiempo necesario
+para pulsar el botón o rellenar un Captcha es de unos segundos, la Cookie se puede
+hacer que caduque en esos segundos, en vez de en minutos como es necesario para 
+rellenar un formulario completo. El valor por defecto se toma del archivo de
+configuración.
+</p>
+
+<b>location:</b>
+<p>
+Página a la que se envía si el formulario da un error. Si se desea gestionar los
+errores de otra forma se puede indicar <i>none</i>. Por defecto es la misma
+página que lanza el formulario. Se envía en GET <i>error_forms</i> con el valor del error.
+</p>
+
+<b>attempts:</b>
+<p>
+En formato: <i>número de intentos / tiempo</i>. Es el máximo de intentos permitido, una 
+vez llegado al máximo, en cualquier tiempo, hay que esperar el tiempo indicado o
+dará error aunque los datos seán válidos. El valor por defecto se toma del archivo de
+configuración.
+<pre>
+ 10/5 # Después de 10 intentos hay que esperar 5 minutos
+ 
+</pre>
+<p>
+El tiempo de expiración se controla mediante la variable <i>forms_plugin_expire_attempts</i>
+del archivo de configuración .nes.cfg
+</p>
+</p>
+
+<h3>& obfuscated </h3> 
+<p>
+Ofusca el campo del formulario:
+<pre>
+&#123;: & form ...
+        [HTML]
+        &lt;input type="text" name="&#123;: & obfuscated field :&#125;" /&gt;
+        [HTML]
+:&#125
+
+</pre>
+El nombre del campo tendrá un valor distinto cada vez que se carge la página.
+</p>
+<br><br>
+<h3>& check</h3> 
+<p>
+Opcionalmente podemos chequear los campos del formulario antes de que estos sean
+enviados:
+<pre>
+&#123;: & form ...
+        &#123;: & check ( 
+                    'field: nin,max,type', ... 
+                   ) 
+        :&#125;
+        [HTML]
+        &lt;input type="text" name="&#123;: & obfuscated field :&#125;" /&gt;
+        [HTML]
+:&#125
+
+</pre>
+</p>
+
+<b>field:</b>
+<p>
+Nombre del campo de formulario a chequear. Despues hay que indicar dos puntos con
+las siguientes opciones:
+</p>
+
+<b>nin:</b>
+<p>
+Caracteres mínimos que debe tener el campo.
+</p>
+
+<b>max:</b>
+<p>
+Caracteres máximos que debe tener el campo.
+</p>
+
+<b>type:</b>
+<p>
+Puede ser <b><i>num</i></b> que comprueba que el campo contenga un número, 
+<i><b>email</b></i> y se comprueba que el contenido del campo sea una dirección email
+válida, o una expresión regular Perl encerrada entre barras: <i>/regex/</i>.
+</p>
+
+<h3>Añadir el Plugin Capcha a Forms</h3>
+<p>
+Cuando mezclamos los Plugins Forms y Captcha hay que tener en cuenta ciertas consideraciones:
+</p> 
+
+<b>El Captcha se va a mostrar a la vez que el resto campos</b>
+<p>
+Si el Captcha se muestra junto a los demás campos <i>captcha_last</i> debe se 0
+ó estar vacío, se debe encerrar el Capcha en una expresión con la variable de
+entorno <i>nes_forms_plugin_nameform_last_step</i>:
+<pre>
+&#123;: & form (form_name,,captcha_name)
+
+    &#123;: # si NO es el último paso mostrar el Captcha :&#125;
+    &#123;: ~ ( ! * nes_forms_plugin_form_name_last_step ) 
+        ...
+        &#123;: & captcha (captcha_name,ascii)
+        ...
+        
+</pre>
+</p>
+
+<b>El Captcha se va a mostrar en un segundo paso</b>
+<p>
+Si deseamos que el Captcha se muestre una vez rellenados todos los campos del
+formulario, en el último paso, el valor de <i>auto_submit</i> debe ser 0, <i>captcha_last</i>
+debe tener un valor distinto de 0 y se debe  encerrar el Capcha en una expresión
+con la variable de entorno <i>nes_forms_plugin_nameform_last_step</i>:    
+<pre>
+&#123;: & form (form_name,0,captcha_name,last)
+
+    &#123;: # si es el último paso mostrar el Captcha :&#125;
+    &#123;: ~ ( * nes_forms_plugin_form_name_last_step ) 
+        ...
+        &#123;: & captcha (captcha_name,ascii)
+        ...
+        
+</pre>
+</p>
+
+<b>Cargar el Plugin adecuado</b>
+<p>
+El Plugin a cargar para mezclar los Plugins Forms y Captcha es <i>forms_captcha.pl</i>
+<pre>
+&#123;: NES 1.0 ('&#123;: * cfg_plugin_top_dir :&#125;/forms_captcha.pl','my_file.pl') :&#125;
+
+</pre>
+</p>
+
+<h3>Variables de entorno</h3>
+<p>
+Último mensaje lanzado por Forms: (se incluye para depuración)
+<pre>
+&#123;: * nes_forms_plugin_(name_form)_error_last :&#125
+
+</pre>
+</p> 
+
+<p>
+Cuenta del número de intentos:
+<pre>
+&#123;: * nes_forms_plugin_(name_form)_attempts :&#125 
+
+</pre>
+</p> 
+
+<p>
+Será 1 si el formulario es correcto:
+<pre>
+&#123;: * nes_forms_plugin_(name_form)_is_ok :&#125 
+
+</pre>
+</p> 
+
+<p>
+Si existe un error en cualquier campo del formulario:
+<pre>
+&#123;: * nes_forms_plugin_(name_form)_error_field :&#125 
+
+</pre>
+</p> 
+
+<p>
+Si existe un error en un campo concreto del formulario:
+<pre>
+&#123;: * nes_forms_plugin_(name_form)_error_field_(name_fiend) :&#125 
+
+</pre>
+</p> 
+
+<p>
+Número de error de Forms, cualquier valor no 0 indica que el formulario no es válido:
+<pre>
+&#123;: * nes_forms_plugin_(name_form)_error_fatal :&#125 
+
+0: No hay error. (no supone que que el formulario sea correcto)
+1: La Cookie ha expirado o no existe.
+2: * Valor interno de la Cookie expirado, "posible" manipulacion.
+3: * La clave hash de la Cookie no conincide, "posible" manipulacion.
+4: No se ha defido la clave del formulario, ej. Javascript deshabilitado.
+5: Se ha alcanzado el máximo de intentos.
+6: * Se intenta usar una cookie válida ya usada.
+7: * No se ha defido la clave del formulario, "posible" manipulacion.
+
+* El botón "Back" del Navegador puede dar este tipo de errores.
+</pre>
+</p> 
+
+<p>
+Estas variables están disponibles desde Perl como:
+<pre>
+use Nes;
+my $nes = Nes::Singleton->new('archivo.nhtml');
+
+# Obtenemos la dirección Forms
+my $form = nes_plugin->get('forms_plugin','the_name');
+
+# &#123;: * nes_forms_plugin_(name_form)_error_last :&#125 
+$form->{'last_error'};
+
+# &#123;: * nes_forms_plugin_(name_form)_error_fatal :&#125 
+$form->{'fatal_error'};
+
+# &#123;: * nes_forms_plugin_(name_form)_attempts :&#125 
+$form->{'attempts'};
+
+# &#123;: * nes_forms_plugin_(name_form)_is_ok :&#125 
+$form->{'is_ok'};
+
+</pre>
+</p> 
+
+<h3>Configuración .nes.cfg</h3>
+<p>
+<pre>
+# tiempo suficiente para rellenar el formulario, 15m son 15 minutos
+# sufijo tiempo:  s: segundos, m: minutos, h: horas, d: dias, M: meses, y: años
+forms_plugin_expire         = 15m 
+
+# tiempo suficiente para pulsar ok o rellenar el captcha (y que carge la página)
+# sufijo tiempo:  s: segundos, m: minutos, h: horas, d: dias, M: meses, y: años
+forms_plugin_expire_last    = 30s
+
+# nombre de la variable que controla el formulario
+forms_plugin_start          = nes_secure_form_start
+
+# nombre de la variable que identifica el último paso del formulario
+forms_plugin_finish         = nes_secure_form_finish
+
+# sufijo del archivo temporal
+forms_plugin_suffix         = .forms_plugin_tmp
+
+# número maximo de intentos / minutos
+# 15/5 es 15 intentos cada 5 minutos, despues de 15 intentos tendrá
+# que esperar 5 minutos para volver a intentarlo o dará error
+forms_plugin_max_attempts   = 20/5
+
+# tiempo de expiración de los archivos temporales
+# guarda el valor de attempts durante el tiempo indicado aquí
+forms_plugin_expire_attempts = 1h
+
+</pre>
+</p> 
+
+<h3>Más ejemplos</h3>
+<br>
+{: include ('./Test Forms.nhtml') :}
+
+<p>
+</p>  
+
+<p>
+Puedes ver un ejemplo real: <a href="./?action=comment&item=Plugin Forms">comentario</a>
+</p>

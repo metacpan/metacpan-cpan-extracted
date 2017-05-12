@@ -1,0 +1,356 @@
+NAME
+
+    Net::Async::Matrix - use Matrix with IO::Async
+
+SYNOPSIS
+
+     use Net::Async::Matrix;
+     use IO::Async::Loop;
+    
+     my $loop = IO::Async::Loop->new;
+    
+     my $matrix = Net::Async::Matrix->new(
+        server => "my.home.server",
+     );
+    
+     $loop->add( $matrix );
+    
+     $matrix->login(
+        user_id  => '@my-user:home.server',
+        password => 'SeKr1t',
+     )->get;
+
+DESCRIPTION
+
+    Matrix is an new open standard for interoperable Instant Messaging and
+    VoIP, providing pragmatic HTTP APIs and open source reference
+    implementations for creating and running your own real-time
+    communication infrastructure.
+
+    This module allows an program to interact with a Matrix homeserver as a
+    connected user client.
+
+    http://matrix.org/
+
+EVENTS
+
+    The following events are invoked, either using subclass methods or CODE
+    references in parameters:
+
+ on_log $message
+
+    A request to write a debugging log message. This is provided
+    temporarily for development and debugging purposes, but will at some
+    point be removed when the code has reached a certain level of
+    stability.
+
+ on_presence $user, %changes
+
+    Invoked on receipt of a user presence change event from the homeserver.
+    %changes will map user state field names to 2-element ARRAY references,
+    each containing the old and new values of that field.
+
+ on_room_new $room
+
+    Invoked when a new room first becomes known about.
+
+    Passed an instance of Net::Async::Matrix::Room.
+
+ on_room_del $room
+
+    Invoked when the user has now left a room.
+
+ on_invite $event
+
+    Invoked on receipt of a room invite. The $event will contain the plain
+    Matrix event as received; with at least the keys inviter and room_id.
+
+ on_unknown_event $event
+
+    Invoked on receipt of any sort of event from the event stream, that is
+    not recognised by any of the other code. This can be used to handle new
+    kinds of incoming events.
+
+PARAMETERS
+
+    The following named parameters may be passed to new or configure. In
+    addition, CODE references for event handlers using the event names
+    listed above can also be given.
+
+ server => STRING
+
+    Hostname and port number to contact the homeserver at. Given in the
+    form
+
+     $hostname:$port
+
+    This string will be interpolated directly into HTTP request URLs.
+
+ SSL => BOOL
+
+    Whether to use SSL/TLS to communicate with the homeserver. Defaults
+    false.
+
+ SSL_* => ...
+
+    Any other parameters whose names begin SSL_ will be stored for passing
+    to the HTTP user agent. See IO::Socket::SSL for more detail.
+
+ path_prefix => STRING
+
+    Optional. Gives the path prefix to find the Matrix client API at.
+    Normally this should not need modification.
+
+ on_room_member, on_room_message => CODE
+
+    Optional. Sets default event handlers on new room objects.
+
+ enable_events => BOOL
+
+    Optional. Normally enabled, but if set to a defined-but-false value
+    (i.e. 0 or empty string) the event stream will be disabled. This will
+    cause none of the incoming event handlers to be invoked, because the
+    server will not be polled for events.
+
+    This may be useful in simple send-only cases where the client has no
+    interest in receiveing any events, and wishes to reduce the load on the
+    homeserver.
+
+ longpoll_timeout => NUM
+
+    Optional. Timeout in seconds for the /events longpoll operation.
+    Defaults to 30 seconds if not supplied.
+
+ first_sync_limit => NUM
+
+    Optional. Number of events per room to fetch on the first /sync request
+    on startup. Defaults to the server's builtin value if not defined,
+    which is likely to be 10.
+
+METHODS
+
+    The following methods documented with a trailing call to ->get return
+    Future instances.
+
+ login
+
+       $matrix->login( %params )->get
+
+    Performs the necessary steps required to authenticate with the
+    configured Home Server, actually obtain an access token and starting
+    the event stream (unless disabled by the enable_events option being
+    false). The returned Future will eventually yield the $matrix object
+    itself, so it can be easily chained.
+
+    There are various methods of logging in supported by Matrix; the
+    following sets of arguments determine which is used:
+
+    user_id, password
+
+      Log in via the m.login.password method.
+
+    user_id, access_token
+
+      Directly sets the user_id and access_token fields, bypassing the
+      usual login semantics. This presumes you already have an existing
+      access token to re-use, obtained by some other mechanism. This exists
+      largely for testing purposes.
+
+ register
+
+       $matrix->register( %params )->get
+
+    Performs the necessary steps required to create a new account on the
+    configured Home Server.
+
+ sync
+
+       $matrix->sync( %params )->get
+
+    Performs a single /sync request on the server, returning the raw
+    results directly.
+
+    Takes the following named parameters
+
+    since => STRING
+
+      Optional. Sync token from the previous request.
+
+ start
+
+       $f = $matrix->start
+
+    Performs the initial sync on the server, and starts the event stream to
+    begin receiving events.
+
+    While this method does return a Future it is not required that the
+    caller keep track of this; the object itself will store it. It will
+    complete when the initial sync has fininshed, and the event stream has
+    started.
+
+    If the initial sync has already been requested, this method simply
+    returns the future it returned the last time, ensuring that you can
+    await the client starting up simply by calling it; it will not start a
+    second time.
+
+ stop
+
+       $matrix->stop
+
+    Stops the event stream. After calling this you will need to use start
+    again to continue receiving events.
+
+ myself
+
+       $user = $matrix->myself
+
+    Returns the user object representing the connected user.
+
+ user
+
+       $user = $matrix->user( $user_id )
+
+    Returns the user object representing a user of the given ID, if
+    defined, or undef.
+
+ get_displayname
+
+ set_displayname
+
+       $name = $matrix->get_displayname->get
+    
+       $matrix->set_displayname( $name )->get
+
+    Accessor and mutator for the user account's "display name" profile
+    field.
+
+ get_presence
+
+ set_presence
+
+       ( $presence, $msg ) = $matrix->get_presence->get
+    
+       $matrix->set_presence( $presence, $msg )->get
+
+    Accessor and mutator for the user's current presence state and optional
+    status message string.
+
+ create_room
+
+       ( $room, $room_alias ) = $matrix->create_room( $alias_localpart )->get
+
+    Requests the creation of a new room and associates a new alias with the
+    given localpart on the server. The returned Future will return an
+    instance of Net::Async::Matrix::Room and a string containing the full
+    alias that was created.
+
+ join_room
+
+       $room = $matrix->join_room( $room_alias_or_id )->get
+
+    Requests to join an existing room with the given alias name or plain
+    room ID. If this room is already known by the $matrix object, this
+    method simply returns it.
+
+ add_alias
+
+ delete_alias
+
+       $matrix->add_alias( $alias, $room_id )->get
+    
+       $matrix->delete_alias( $alias )->get
+
+    Performs a directory server request to create the given room alias
+    name, to point at the room ID, or to remove it again.
+
+    Note that this is likely only to be supported for alias names scoped
+    within the homeserver the client is connected to, and that additionally
+    some form of permissions system may be in effect on the server to limit
+    access to the directory server.
+
+ upload
+
+       $content_uri = $matrix->upload( %params )->get
+
+    Performs a post to the server's media content repository, to upload a
+    new piece of content, returning the content URI that points to it.
+
+    The content can be specified in any of three ways, with the following
+    three mutually-exclusive arguments:
+
+    content => STRING
+
+      Gives the content directly as an immediate scalar value.
+
+    file => STRING
+
+      Gives the path to a readable file on the filesystem containing the
+      content.
+
+    fh => IO
+
+      Gives an opened IO handle the content can be read from.
+
+    The following additional arguments are also recognised:
+
+    content_type => STRING
+
+      Gives the MIME type of the content data.
+
+    content_length => INT
+
+      Optional. If the content is being delivered from an opened filehandle
+      (via the fh argument), this gives the total length in bytes. This is
+      required in cases such as reading from pipes, when the length of the
+      content isn't immediately available such as by stat()ing the
+      filehandle.
+
+ convert_mxc_url
+
+       $url = $matrix->convert_mxc_url( $mxc )
+
+    Given a plain string or URI instance containing a Matrix media URL (in
+    the mxc: scheme), returns an http: or https: URL in the form of an URI
+    instance pointing at the media repository on the user's local
+    homeserver where it can be downloaded from.
+
+USER STRUCTURES
+
+    Parameters documented as $user receive a user struct, which supports
+    the following methods:
+
+ $user_id = $user->user_id
+
+    User ID of the user.
+
+ $displayname = $user->displayname
+
+    Profile displayname of the user.
+
+ $presence = $user->presence
+
+    Presence state. One of offline, unavailable or online.
+
+ $last_active = $user->last_active
+
+    Epoch time that the user was last active.
+
+SUBCLASSING METHODS
+
+    The following methods are not normally required by users of this class,
+    but are provided for the convenience of subclasses to override.
+
+ $room = $matrix->make_room( %params )
+
+    Returns a new instance of Net::Async::Matrix::Room.
+
+SEE ALSO
+
+      * http://matrix.org/ - matrix.org home page
+
+      * https://github.com/matrix-org - matrix.org on github
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

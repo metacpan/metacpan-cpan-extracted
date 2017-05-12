@@ -1,0 +1,81 @@
+NAME
+    NetSDS::Queue - simple API to MemcacheQ powered queue
+
+SYNOPSIS
+            use NetSDS::Queue;
+            use Data::Dumper;
+
+            my $q = NetSDS::Queue->new( server => '10.0.0.5:18181' );
+
+            # Push messages to queue
+            $q->push('myq', { id => 1, text => 'one'});
+            $q->push('myq', { id => 2, text => 'two'});
+            $q->push('myq', { id => 3, text => 'three'});
+
+            # Fetch messages from queue
+            while ( my $data = $q->pull('myq') ) {
+                    print Dumper($data);
+            }
+
+DESCRIPTION
+    "NetSDS::Queue" module provides simple API to NetSDS queue.
+
+    Low level messaging is based on fast and reliable MemcacheQ server. It
+    use BerkeleyDB for persistance and Memchache protocol over TCP or Unix
+    sockets.
+
+    Every message is converted to JSON and then stored as Base64 string.
+
+CLASS API
+    new(%params) - class constructor
+        The following parameters accepted:
+
+        * server - address to MemcacheQ queue server (host:port)
+
+        * max_size - maximum size of message allowed (default is 4096 bytes)
+
+                my $queue = NetSDS::Queue->new(server => '192.168.0.1:12345');
+
+        Default server address is 127.0.0.1:22201
+
+    push($queue, $data) - push message to queue
+                $queue->push('msgq', $my_data);
+
+    pull($queue) - fetch message from queue
+                my $data = $queue->pull('msgq');
+
+EXAMPLES
+    See files in "samples" catalog.
+
+BUGS
+    Unknown yet
+
+SEE ALSO
+    http://memcachedb.org/memcacheq/ - MemcacheQ server
+
+    http://openhack.ru/Cache-Memcached-Fast - Perl XS API to Memcached
+    servers
+
+TODO
+    None
+
+AUTHOR
+    Michael Bochkaryov <misha@rattler.kiev.ua>
+
+LICENSE
+    Copyright (C) 2008-2009 Michael Bochkaryov
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+

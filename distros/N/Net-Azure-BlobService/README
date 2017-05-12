@@ -1,0 +1,52 @@
+NAME
+    Net::Azure::BlobService - Interface to Azure Blob Service
+
+SYNOPSIS
+      my $blobservice = Net::Azure::BlobService->new(
+          primary_access_key => $primary_access_key );
+
+      # Get Blob Service Properties
+      my $uri = URI->new("https://$account.blob.core.windows.net/");
+      $uri->query_form( [ restype => 'service', comp => 'properties' ] );
+      my $request = GET $uri;
+
+      my $response = $blobservice->make_http_request($request);
+
+DESCRIPTION
+    This module provides access to the REST interface to Windows Azure
+    Platform Blob Service for storing text and binary data:
+
+      http://msdn.microsoft.com/en-us/library/windowsazure/dd135733.aspx
+
+    You must sign up to a storage account and obtain a primary access key.
+    Create an HTTP request as per the page above and this module can sign
+    the request, make the request and return an HTTP::Response object.
+
+    See the examples/ directory for more examples on calling different Blob
+    Service operations.
+
+    This module intentionally does not interpret the response, but typically
+    it will have content type of 'application/xml' which you can parse with
+    your favourite XML parser.
+
+METHODS
+  make_http_request
+    Sign and make an HTTP request:
+
+      my $response = $blobservice->make_http_request($request);
+
+  sign_http_request
+    Sign an HTTP request:
+
+      my $signed_request = $blobservice->sign_http_request($request);
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 2012, Leon Brocard.
+
+LICENSE
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

@@ -1,0 +1,6 @@
+#CRON: host  corona     * 1 * * 1 -1 -2 job4
+
+#CRON: netgroup  @chelsea_servers       * 1 * * 1 -1 -2 job4a
+#CRON: netgroup  (@chelsea_servers -corona -miller)     * 1 * * 1 -1 -2 job4b
+
+#CRON: user  ckee

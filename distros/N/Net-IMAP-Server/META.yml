@@ -1,0 +1,44 @@
+---
+abstract: 'A single-threaded multiplexing IMAP server implementation, using L<Net::Server::Coro>.'
+author:
+  - 'Alex Vandiver <alexmv@bestpractical.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  IO::Socket::SSL: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-IMAP-Server
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  AnyEvent: 0
+  Class::Accessor: 0
+  Coro: 0
+  DateTime: 0
+  DateTime::Format::Mail: 0
+  DateTime::Format::Strptime: 1.3
+  Email::Address: 0
+  Email::MIME: 1.862
+  Email::MIME::ContentType: 0
+  Email::Simple: 1.999
+  Encode::IMAPUTF7: 0
+  MIME::Base64: 3.11
+  Net::SSLeay: 0
+  Net::Server::Coro: 0.6
+  Regexp::Common: 0
+  Test::More: 0
+  UNIVERSAL::require: 0
+  perl: 5.8.8
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bestpractical/net-imap-server/
+version: '1.39'

@@ -1,0 +1,21 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+generateDTDpod.pl
+t/00-pod.t
+t/00-version.t
+t/01.t
+t/02.t
+t/03.t
+t/testconf.xml
+t/testconf2.xml
+t/testconf3.xml
+t/testconf4.xml
+t/testconf5.xml
+TestNS.pm
+TestNS/Nameserver.pm
+TestNS/Packet.pm
+TestNS/DTD.pm
+transform-conf.xsl
+META.yml                                 Module meta-data (added by MakeMaker)

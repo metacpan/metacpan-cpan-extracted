@@ -1,0 +1,31 @@
+---
+abstract: 'use Gearman with L<IO::Async>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::Fatal: '0'
+  Test::HexString: '0'
+  Test::More: '0.88'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Async-Gearman
+provides:
+  Net::Async::Gearman:
+    file: lib/Net/Async/Gearman.pm
+    version: '0.01'
+  Net::Async::Gearman::Client:
+    file: lib/Net/Async/Gearman/Client.pm
+    version: '0.01'
+  Net::Async::Gearman::Worker:
+    file: lib/Net/Async/Gearman/Worker.pm
+    version: '0.01'
+requires:
+  IO::Async::Stream: '0'
+  Protocol::Gearman: '0.03'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'

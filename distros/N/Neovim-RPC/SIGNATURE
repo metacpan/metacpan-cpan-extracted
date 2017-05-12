@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9f0bb4288bdd0bf6cc3ecf82287999f5b192bbf1 AUTHOR_PLEDGE
+SHA1 49995296ce73e15b4c391ed802370cf4aadf465d CONTRIBUTORS
+SHA1 094f5c30e4133d50b1d5b6902f1cc3cc7b618e95 Changes
+SHA1 20acd1c8d2edc306404eb95a67387dc028fd0c4a INSTALL
+SHA1 5b807b764a3d24ce4f99fc96878cfe82bcc03288 LICENSE
+SHA1 54ad7d80049cfe9264ec2a7e9e2f133613309ac6 MANIFEST
+SHA1 8a44020f89f14645399bf6a857fe4bc3a0e2f4e2 META.json
+SHA1 10bdcf67412edbd1383fd35e1d4404ab7cc1e7be META.yml
+SHA1 0c0343e16a33e564aa567d87c3a147f1b2c991ee Makefile.PL
+SHA1 aac9e7c0953b84c12e12f7d34ebab888d43fbbab README.mkdn
+SHA1 b84cb735f744a40cdcf40f96b141022e3163800f cpanfile
+SHA1 6a3a86649aba6a1087cde80a30bb32aa629cfdb4 doap.xml
+SHA1 ec5086c8d6212a77735993634c21a60afcf144b6 examples/channel.pl
+SHA1 d5c482fbcb06e4ea753b1dd65feec0af0bf0b98b examples/dsl.pl
+SHA1 c2efb1c83e01f3ed9ceeddc27a6e7778c8958666 examples/load_plugins.pl
+SHA1 ae6003599d44ad34573ec210efd2334b911b23dc examples/neovimx.pl
+SHA1 ccbde89b7437bcf2acf2aa4cce35b75817b612ec examples/print_commands.pl
+SHA1 92d4310499b7a6a7fa6920d6febf116abe8aff51 examples/push-channel.pl
+SHA1 533d6632ed436e57e778d5bff7dee91b336922d6 examples/simple-1.pl
+SHA1 609143d8cde3ad3dd768e32b874bea935754d193 lib/Neovim/RPC.pm
+SHA1 fad79292d110227da3a95cae24c8542184029c34 lib/Neovim/RPC/API.pm
+SHA1 b1071bab216a5e45f69e72ab9c59745db7895f5e lib/Neovim/RPC/API/AutoDiscover.pm
+SHA1 6dcc4899cd98b80f2d49994f6172b276848d9542 lib/Neovim/RPC/API/Command.pm
+SHA1 f3a5f726b1be7b499ac1c6e5cbf486e37b6583fc lib/Neovim/RPC/Plugin.pm
+SHA1 78f323fceeaeb207b1182ace2f6c723b6dd890e7 lib/Neovim/RPC/Plugin/FileToPackageName.pm
+SHA1 86218cb6f63cccf91a94a1e0ebf5bedc797c24f4 lib/Neovim/RPC/Plugin/LoadPlugin.pm
+SHA1 ee9792a6fd8ac2543d15ca50cf7e1bc9ee919f7c t/00-compile.t
+SHA1 6c82f1f00e6f41d4548bf259a16e1e41cedc04e9 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 0b92d57bbf680c73871f530e7ed52ad9882c547f t/buffer.t
+SHA1 aed337ba99934f73e6be606abe5f8a91bc94985d t/lib/Test/Neovim.pm
+SHA1 acb6d7c3bb551b25c54cfc80c14139c733961990 t/testrunner.t
+SHA1 ba178ea742ff5e540013ad80e9f43d262006fe06 t/tests/TestsFor/Neovim/RPC.pm
+SHA1 a22acea2146e69324247e9e464559b171705a279 taskwarrior/taskw.pl
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAli4y+AACgkQ34Hwf+GwC4zf/ACgga822kH2IQUVxjdgQ0hb3mnx
+NS4AoNMNAqPXy2nVaDZBmLzjp/akALeE
+=8Izg
+-----END PGP SIGNATURE-----

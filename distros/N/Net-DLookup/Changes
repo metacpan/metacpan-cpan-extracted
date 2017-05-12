@@ -1,0 +1,14 @@
+Revision history for Perl extension Net::Domain.
+
+1.00  Wed Mar  1 12:12:21 2000
+	- original version; created by h2xs 1.18
+
+1.01  Wed May  1 11:51:21 2000
+	- added ad.jp tld
+      Wed May  15
+	- changed .nl TLD to whois.nic.nl
+      Thu June 8
+	- Added TLD verification before Sockets is attempted
+      Sat June 10
+	- Added LoadTLD(), DumpTLD() subroutines and updated lookups
+

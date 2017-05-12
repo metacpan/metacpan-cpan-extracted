@@ -1,0 +1,10 @@
+bin/mt
+bin/mt-upload
+Changes
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+MovableType.pm
+README
+t/basic.t
+META.yml                                Module meta-data (added by MakeMaker)

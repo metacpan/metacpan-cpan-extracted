@@ -1,0 +1,97 @@
+NAME
+    Net::Sendy::API - Perl SDK to sendy.co
+
+SYNOPSIS
+        use Net::Sendy::API;
+        my $sendy = Net::Sendy::API->new(
+            api_key => $api_key,
+            url     => 'http://www.example.com/sendy/'
+        );
+
+        my $r = $sendy->subscribe(email => 'example@example.com', list => 'e');
+
+        unless ( $r->is_success ) {
+            die "HTTP request failed" > $r->status_line;
+        }
+
+ABSTRACT
+    Perl extension to interact with a sendy.co instance.
+
+DESCRIPTION
+    This is an interface to http://www.sendy.co/api. As of this writing this
+    is the comlete implementation of the Sendy API.
+
+METHODS
+    new(api_key => $key, url => $url);
+        All the arguments are required. "api_key" is what you receive in the
+        email, after purchasing Sendy. "url" is the URL to the folder where
+        sendy is installed.
+
+        Returns a class instance. It not expected to fail.
+
+    subscribe(list => $list_id, email=>$email)
+    subscribe(list => $list_id, email => $email, custom_name =>
+    $custom_value,....)
+        Subscribes an e-mail address to a "list", where list is identified
+        by its, what is called, "an encrypted id". You can find this "id"
+        next to each list name in the listing
+
+        If your list has custom fields you can enter them by passing more
+        key/value pairs to the method.
+
+        Returns an instance of HTTP::Response. Example
+
+            my $r = $sendy->subscribe(list => 'b', email => 'sherzodr@cpan.org', birth_day => "2013-09-12");
+            unless ( $r->is_success ) {
+                die "HTTP request failed: " . $r->status_line;
+            }
+            my $message = $r->decoded_content;
+
+        $message, according to <http://www.sendy.co/api>, can be 1, "Some
+        fields are missing.", "Invalid email address.", "Invalid list ID.",
+        "Already subscribed.".
+
+    unsubscribe(list => $list_id, email => $email)
+        All the arguments are required. Unsubscribe an e-mail address from a
+        list. See "subscribe()" for the definition of the arguments. Returns
+        an instance of HTTP::Response. Example:
+
+            my $r = $sendy->unsubscribe(list => 'b', email => 'sherzodr@example.com');
+            unless ( $r->is_success ) {
+                die "HTTP request failed: " . $r->status_line;
+            }
+            my $message = $r->decoded_content;
+
+        $message, according to <http://www.sendy.co/api>, can be 1, "Some
+        fields are missing.", "Invalid email address."
+
+    subscription_status(list => $list_id, email => $email)
+        Returns an instance of HTTP::Response. Body of the response can
+        contain "Subscribed", "Unsubscribed", "Unconfirmed", "Bounced",
+        "Soft bounced", "Complained", "No data passed", "API key not
+        passed", "Invalid API key", "Email not passed", "List ID not
+        passed", "Email does not exist in list".
+
+        For details on getting the body of the response see above.
+
+    active_subscriber_cont(list=>$list_id)
+        Returns an instance of HTTP::Response. Body of the response should
+        contain an integer if the call succeeds. If not, it may contains "No
+        data passed", "API key not passed", "Invalid API key", "List ID not
+        passed", "List does not exist".
+
+        For details on getting the body of the response see above.
+
+SEE ALSO
+    LWP::UserAgent, HTTP::Response, <http://www.sendy.co/api>.
+
+AUTHOR
+    Sherzod B. Ruzmetov <sherzodr@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2013 by Talibro LLC <https://www.talibro.com/>.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.14.2 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,44 @@
+Net::SFTP::Foreign
+===================
+
+Net::SFTP::Foreign implements an SFTP client in Perl using the native
+SSH client application to establish the connection to the remote host.
+
+
+PREREQUISITES
+
+An external SSH2 client reachable from your PATH.
+
+Perl modules:
+
+	Test::More (mandatory)
+	File::Which (optional, only for testing)
+	Sort::Key (optional, for better performance)
+        IO::Pty and its dependencies (optional, only required if
+          password authentication is going to be used)
+
+If the sftp-server command is available it will be used to perform
+some tests, but it is not mandatory.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2005-2017 by Salvador Fandino
+
+Copyright (c) 2001 Benjamin Trott, Copyright (c) 2003 David Rolsky.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

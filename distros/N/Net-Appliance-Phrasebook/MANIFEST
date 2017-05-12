@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+examples/test.pl
+lib/Net/Appliance/Phrasebook.pm
+lib/Net/Appliance/Phrasebook/nas-pb.yml
+t/00load.t
+t/10builtin.t
+t/20external.t
+t/20external.yaml
+t/pod-coverage.t
+t/pod.t

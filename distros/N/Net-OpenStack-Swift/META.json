@@ -1,0 +1,108 @@
+{
+   "abstract" : "Perl Bindings for the OpenStack Object Storage API, known as Swift.",
+   "author" : [
+      "masakyst <masakyst.public@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-OpenStack-Swift",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Rad" : "0",
+            "Data::Validator" : "0",
+            "Furl" : "0",
+            "IO::Socket::SSL" : "0",
+            "JSON" : "0",
+            "Log::Minimal" : "0",
+            "Mouse" : "0",
+            "Parallel::Fork::BossWorkerAsync" : "0",
+            "Path::Tiny" : "0",
+            "Sys::CPU" : "0",
+            "Text::ASCIITable" : "0",
+            "URI::Escape" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.010_001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Section::Simple" : "0",
+            "Test::MockObject" : "0",
+            "Test::MockObject::Extends" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Net::OpenStack::Swift" : {
+         "file" : "lib/Net/OpenStack/Swift.pm",
+         "version" : "0.11"
+      },
+      "Net::OpenStack::Swift::InnerKeystone::Base" : {
+         "file" : "lib/Net/OpenStack/Swift/InnerKeystone.pm"
+      },
+      "Net::OpenStack::Swift::InnerKeystone::V1_0" : {
+         "file" : "lib/Net/OpenStack/Swift/InnerKeystone.pm"
+      },
+      "Net::OpenStack::Swift::InnerKeystone::V2_0" : {
+         "file" : "lib/Net/OpenStack/Swift/InnerKeystone.pm"
+      },
+      "Net::OpenStack::Swift::InnerKeystone::V3_0" : {
+         "file" : "lib/Net/OpenStack/Swift/InnerKeystone.pm"
+      },
+      "Net::OpenStack::Swift::Util" : {
+         "file" : "lib/Net/OpenStack/Swift/Util.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/masakyst/Net-OpenStack-Swift/issues"
+      },
+      "homepage" : "https://github.com/masakyst/Net-OpenStack-Swift",
+      "repository" : {
+         "url" : "git://github.com/masakyst/Net-OpenStack-Swift.git",
+         "web" : "https://github.com/masakyst/Net-OpenStack-Swift"
+      }
+   },
+   "version" : "0.11",
+   "x_contributors" : [
+      "RenatoCRON <renato.cron@gmail.com>",
+      "Masaaki Saito <masakyst.mobile@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

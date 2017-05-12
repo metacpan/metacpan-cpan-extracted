@@ -1,0 +1,112 @@
+Revision history for Net-Google-PicasaWeb
+
+0.12      2013-09-14 16:55:24 America/Chicago
+
+    * Fixed failing tests. (HT: shroeer)
+    * Added support for the timestamp attribute (HT: shroeer)
+    * Eliminate some Moose whineyness (HT: shroeer)
+
+0.11      2011-05-30 09:35:19 America/Chicago
+
+    * Album loading sometimes failed because certain Moose attributes were set
+      to be required when they shouldn't have been. (HT: Riccardo Mativi)
+    * Migrating it to use my regulate Dist::Zilla setup (mostly)
+    * Reorganized the project layout a little bit
+    * Cleaned up the code a bit
+    * Added calls to make_immutable to all classes, which should spead things up
+      slightly.
+    * Added some more attributes to control some of the previously hardcoded
+      bits (like Google's URL and which namespaces to map in the API).
+    * Added the xml_text() method to the base class to give "official" access to
+      the internals of certain elements passed back by Google, but haven't been
+      mapped to an attribute yet..
+
+0.10    August 28, 2010
+
+    * Updating to use the latest Dist::Zilla 4
+    * Correcting the code to handle thumbsize as described in the documentation.
+      (HT: Daniel Schröer)
+
+0.09    January 31, 2010
+
+    * Dropped the requirement for Test::Mock::LWP
+    * Added a requirement for Test::Able
+    * Added a requirement for Test::Able::Runner
+    * Major change to the testing framework to make it easier to work with
+    * DO THIS AT YOUR OWN RISK!!! Added online tests to check certain aspects of
+      the API against a live PicasaWeb account. Set
+      TEST_NET_GOOGLE_PICASAWEB_ONLINE=1 and TEST_NGP_USER and TEST_NGP_PWD to a
+      username/password to run these tests.  This will login to the given
+      account and list some albums and photos.
+    * Added the size attribute to Net::Google::PicasaWeb::Media to get the file
+      size of the photo from the API, when presented.
+    * Expanded POD to note base class inheritance and more attributes inherited
+      from base classes to make it easier to browser without having to navigate
+      multiple manual pages. (Thanks Terrence Brannon)
+    * Added geo-coding support to Net::Google::PicasaWeb::Album and
+      Net::Google::PicasaWeb::Photo. This adds latitude and longitude attributes
+      to these objects, when available. (Thanks Benjamin Thomas)
+
+0.08    January 20, 2010
+
+    * Correct a missing requirement for Test::Mock::LWP (Thanks CPAN Testers
+      and Terrence Brannon)
+    * Added the "featured" option to list_media_entries().
+    * Added the --featured option to the picasaweb-list script.
+
+0.07    January 17, 2010
+
+    * Adding height, width, and size to media entries (Thanks Benjamin Thomas)
+    * Adding height and width to media objects (Thanks Benjamin Thomas)
+    * Adding bytes_used and number_of_photos to albums
+    * Added the --long option to picasa-list
+    * Added the --human option to picasa-list
+    * Switched to Dist::Zilla for handling distribution
+
+0.06    November 23, 2009
+
+    * Corrected "weaken" typo in Moose declarations with weak_ref (thanks zoul)
+
+0.05    December 21, 2008
+
+    * Added MooseX::Role::Matcher to all item classes
+    * Added the --album-id option to the picasa-list script
+    * Added the --find option to the picasa-list script
+    * Added the --find-album option to the picasa-get script
+    * Added the --find-photo option to the picasa-get script
+
+0.04    December 14, 2008
+
+    * Forgot to add picasa and picasa-list as installed scripts
+
+0.03    December 14, 2008
+
+    * Nudging the required Pod::Coverage version to 0.19
+    * Adding the requirement for IO::Prompt
+    * Adding the missing import of Pod::Usage to picasa-get
+    * Adding a new picasa master command
+    * Adding a new picasa-list command
+    * Changed the --userid option to --user-id on picasa-get
+    * picasa-list and picasa-get will prompt for a password if --username is
+      used, but --password is not
+    * Adding get_album, get_media_entry, and get_comment to
+      Net::Google::PicasaWeb
+    * Fixed a bug where objects can fail to load when the media:group tag is not
+      used.
+    * [RT #39976] Fixing a bug where list_tags() and other methods fail to work
+      because gphoto:user is not given with the parent entry 
+      (thanks Nik Clayton)
+
+0.02    September 16, 2008
+
+    * Added the --update option to picasa-get
+    * picasa-get will resume after skipping files
+    * XML::Twig 3.30 or greater is required for the field() method (thanks to
+      http://nntp.x.perl.org/group/perl.cpan.testers/2226804)
+    * Added missing requirement for Moose
+
+0.01    September 14, 2008
+
+    * Initial implementation of the Google Picasa Web API
+    * Includes support for listing albums, photos, tags, and comments
+

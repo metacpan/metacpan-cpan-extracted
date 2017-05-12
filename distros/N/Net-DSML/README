@@ -1,0 +1,92 @@
+NAME
+
+    Net-DSML - A perl module that supplies methods for connecting to a LDAP 
+               Directory Services Markup Language (DSML) server.
+
+DESCRIPTION
+
+    This perl module provides support for accessing LDAP through a
+    Directory Services Markup Language (DSML) service.
+    Using this module a user can search, compare, modify, delete and 
+    add LDAP entries using DSML.
+
+    This module was built using the OASIS version 2 Directory Services 
+    Markup Language definitions.  This information can be found at the
+    following URL:  http://www.oasis-open.org/specs/index.php#dsmlv2
+       
+    Pod documentation is contained in the Net::DSML, Net::DSML::Filter and
+    Net::DSML::Control files.
+
+    Examples of using this module can be found in the module`s 
+    Examples directory.
+
+*******************************************************************************
+
+This code should be considered very much as work-in-progress.
+Any part of this release could be subject to change.  Since this is the
+first release of this module I am quite sure there will be changes as
+better ways are found of building the xml messages.
+
+*******************************************************************************
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+    Class::Std::Utils Version 0.0.2
+    LWP::UserAgent    Version 2.033
+    MIME::Base64      Version 3.050
+    Test::Simple      Version 0.70
+    version           version 0.680
+
+    If the user wishes to access the DSML server using the https protocol
+    then the Crypt-SSLeay-0.56 module must be installed.  This module
+    requires that openssl be install on the users system.
+
+ADDITIONAL INFORMATION
+
+This module has been tested against a Sun Java(TM) System Directory 
+Server 5.2 with DSML services enabled.
+This module has been tested against a Sun Java(TM) System Directory
+Server 6.0 with DSML services enabled.
+
+The module has been installed and tested on perl 5.8.7.
+The module has been installed and tested on perl 5.6.1.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Clif Harden  charden@pobox.com
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+

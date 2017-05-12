@@ -1,0 +1,560 @@
+<?xml version="1.0"?>
+<ItemSearchResponse xmlns="http://webservices.amazon.com/AWSECommerceService/2011-08-01">
+  <Items>
+    <TotalResults>104</TotalResults>
+    <TotalPages>11</TotalPages>
+    <MoreSearchResultsUrl>http://www.amazon.com/gp/redirect.html?camp=2025&amp;creative=386001&amp;location=http%3A%2F%2Fwww.amazon.com%2Fgp%2Fsearch%3Fkeywords%3DHand%2Bin%2BMy%2BPocket%26url%3Dsearch-alias%253Ddigital-music&amp;linkCode=xm2&amp;tag=blogdivebombo-20&amp;SubscriptionId=1V5JRJ4JQCSHB3NGG902</MoreSearchResultsUrl>
+    <Item>
+      <ASIN>B001OG3VSW</ASIN>
+      <SalesRank>2145</SalesRank>
+      <ItemAttributes>
+        <Binding>MP3 Download</Binding>
+        <Creator Role="Primary Contributor">Alanis Morissette</Creator>
+        <Genre>pop-music</Genre>
+        <Label>Maverick</Label>
+        <Manufacturer>Maverick</Manufacturer>
+        <ProductGroup>Digital Music Track</ProductGroup>
+        <ProductTypeName>DOWNLOADABLE_MUSIC_TRACK</ProductTypeName>
+        <Publisher>Maverick</Publisher>
+        <ReleaseDate>2008-12-23</ReleaseDate>
+        <RunningTime Units="seconds">221</RunningTime>
+        <Studio>Maverick</Studio>
+        <Title>Hand In My Pocket</Title>
+        <TrackSequence>4</TrackSequence>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>99</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.99</FormattedPrice>
+        </LowestNewPrice>
+        <TotalNew>1</TotalNew>
+        <TotalUsed>0</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B001OG3VSW%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB001OG3VSW</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>laDll7yWZf5nUuorVqBzt7Rxbb0deTA%2B06lO8hmkJjk%2BQ%2F4%2FZ55tgpThiRM5aJdb7%2F%2F1n8DjMhpwsLc7e9C%2BCn0PdBSQfEtw5fg8cilDC9zsIBd5pxar7CJ1KYHyNZX%2FRDnIGRWPGdCREfZXFGPKbpc5tKMW9WBa</OfferListingId>
+            <Price>
+              <Amount>99</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$0.99</FormattedPrice>
+            </Price>
+            <Availability>Usually ships in 1-2 business days</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>24</MinimumHours>
+              <MaximumHours>48</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>0</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B00122HP62</ASIN>
+      <SalesRank>13297</SalesRank>
+      <ItemAttributes>
+        <Binding>MP3 Download</Binding>
+        <Creator Role="Primary Contributor">Alanis Morissette</Creator>
+        <Genre>adult-alternative-pop-music</Genre>
+        <Label>Maverick</Label>
+        <Manufacturer>Maverick</Manufacturer>
+        <ProductGroup>Digital Music Track</ProductGroup>
+        <ProductTypeName>DOWNLOADABLE_MUSIC_TRACK</ProductTypeName>
+        <Publisher>Maverick</Publisher>
+        <ReleaseDate>2005-11-15</ReleaseDate>
+        <RunningTime Units="seconds">219</RunningTime>
+        <Studio>Maverick</Studio>
+        <Title>Hand In My Pocket</Title>
+        <TrackSequence>18</TrackSequence>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>99</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.99</FormattedPrice>
+        </LowestNewPrice>
+        <TotalNew>1</TotalNew>
+        <TotalUsed>0</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B00122HP62%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB00122HP62</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>6a96hBV7c5zwRcoob8pD8MxTUBeQ8ZfQZLPuqIg%2FGJswmKG5KE6C%2Fcm5X%2FBXSos%2F4ab7Hf6Oo%2B6f5wQb1aLsmlU7T%2FeUvIjkZIyyfMVQUnqm%2BuNo9kSeitk1%2BooHmwdMSPJ%2BgHZLOJUsVfVrPA2U9mfvdzD09dGJ</OfferListingId>
+            <Price>
+              <Amount>99</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$0.99</FormattedPrice>
+            </Price>
+            <Availability>Usually ships in 1-2 business days</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>24</MinimumHours>
+              <MaximumHours>48</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>0</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B00122KUY6</ASIN>
+      <SalesRank>166097</SalesRank>
+      <ItemAttributes>
+        <Binding>MP3 Download</Binding>
+        <Creator Role="Primary Contributor">Alanis Morissette</Creator>
+        <Genre>pop-music</Genre>
+        <Label>Maverick</Label>
+        <Manufacturer>Maverick</Manufacturer>
+        <ProductGroup>Digital Music Track</ProductGroup>
+        <ProductTypeName>DOWNLOADABLE_MUSIC_TRACK</ProductTypeName>
+        <PublicationDate>2005-07-23</PublicationDate>
+        <Publisher>Maverick</Publisher>
+        <ReleaseDate>2005-07-26</ReleaseDate>
+        <RunningTime Units="seconds">270</RunningTime>
+        <Studio>Maverick</Studio>
+        <Title>Hand In My Pocket (Acoustic Album Version)</Title>
+        <TrackSequence>4</TrackSequence>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>99</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.99</FormattedPrice>
+        </LowestNewPrice>
+        <TotalNew>1</TotalNew>
+        <TotalUsed>0</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B00122KUY6%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB00122KUY6</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>VT9S4sg5dFb57mXSZpFtTmMfsHVVj%2FsfWrUfzvbkE9ofGgU4ETih7n3rUvVXMZjI9kqqiec6Q0FiEpEhm6wYM15d0WC2rlTyVw5mctAqNivQa3jLKUDQC%2BBzH6tz0nfCZhbeJTsPsD5sHpgBPBrkZmuNy40%2FOxLM</OfferListingId>
+            <Price>
+              <Amount>99</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$0.99</FormattedPrice>
+            </Price>
+            <Availability>Usually ships in 1-2 business days</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>24</MinimumHours>
+              <MaximumHours>48</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>0</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B005FAJQ5U</ASIN>
+      <SalesRank>328840</SalesRank>
+      <ItemAttributes>
+        <Binding>MP3 Download</Binding>
+        <Creator Role="Primary Contributor">Sunfly Karaoke</Creator>
+        <Genre>alternative-music</Genre>
+        <Label>Sunfly Music Group</Label>
+        <Manufacturer>Sunfly Music Group</Manufacturer>
+        <ProductGroup>Digital Music Track</ProductGroup>
+        <ProductTypeName>DOWNLOADABLE_MUSIC_TRACK</ProductTypeName>
+        <Publisher>Sunfly Music Group</Publisher>
+        <ReleaseDate>2009-08-10</ReleaseDate>
+        <RunningTime Units="seconds">233</RunningTime>
+        <Studio>Sunfly Music Group</Studio>
+        <Title>Hand in My Pocket in the Style of Alanis Morissette</Title>
+        <TrackSequence>3</TrackSequence>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>99</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.99</FormattedPrice>
+        </LowestNewPrice>
+        <TotalNew>1</TotalNew>
+        <TotalUsed>0</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B005FAJQ5U%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB005FAJQ5U</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>bdG4uKWHIaQJ%2BIOy%2Fi%2FFwhzXlDU7QvHSQH%2FjklSPvh09%2FDUiiSKwtd2v8XQYctyeZrRf4Fe%2BDPwQ3Mlmzvwzp4y1kdF59sFE3TzVSxMxW4fnz%2Bm6c8iRqBd0EHBvgYyh%2BMEU7horJF3FKDSafMX21mieV3511tKw</OfferListingId>
+            <Price>
+              <Amount>99</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$0.99</FormattedPrice>
+            </Price>
+            <Availability>Usually ships in 1-2 business days</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>24</MinimumHours>
+              <MaximumHours>48</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>0</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B0032K3PPW</ASIN>
+      <SalesRank>1221198</SalesRank>
+      <ItemAttributes>
+        <Binding>MP3 Download</Binding>
+        <Creator Role="Primary Contributor">Mirrors</Creator>
+        <Genre>alternative-music</Genre>
+        <Label>Overground Records</Label>
+        <Manufacturer>Overground Records</Manufacturer>
+        <ProductGroup>Digital Music Track</ProductGroup>
+        <ProductTypeName>DOWNLOADABLE_MUSIC_TRACK</ProductTypeName>
+        <Publisher>Overground Records</Publisher>
+        <ReleaseDate>2007-08-06</ReleaseDate>
+        <RunningTime Units="seconds">138</RunningTime>
+        <Studio>Overground Records</Studio>
+        <Title>Hands In My Pockets</Title>
+        <TrackSequence>1</TrackSequence>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>89</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.89</FormattedPrice>
+        </LowestNewPrice>
+        <TotalNew>1</TotalNew>
+        <TotalUsed>0</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B0032K3PPW%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB0032K3PPW</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>AvNT4AwBRSR73TGvs1ek9WfBNvsIz5E%2FA5jm%2B9HQ%2FUO2rIWmIIBjfqc9%2FZMRXrOWvhhBleKILqJObBH1d0CTz1WtrViLjyWoJB4yAEnoUB98512xhOhGpOY%2BTXjJol7EUG3C8d3%2FJbY876PGC7%2BNij%2BzZcFTjORp</OfferListingId>
+            <Price>
+              <Amount>89</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$0.89</FormattedPrice>
+            </Price>
+            <Availability>Usually ships in 1-2 business days</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>24</MinimumHours>
+              <MaximumHours>48</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>0</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B0029B4OWS</ASIN>
+      <SalesRank>79679</SalesRank>
+      <ItemAttributes>
+        <Binding>MP3 Download</Binding>
+        <Creator Role="Primary Contributor">APM Karaoke</Creator>
+        <Genre>pop-music</Genre>
+        <Label>APM Music</Label>
+        <Manufacturer>APM Music</Manufacturer>
+        <ProductGroup>Digital Music Track</ProductGroup>
+        <ProductTypeName>DOWNLOADABLE_MUSIC_TRACK</ProductTypeName>
+        <Publisher>APM Music</Publisher>
+        <ReleaseDate>2008-05-01</ReleaseDate>
+        <RunningTime Units="seconds">221</RunningTime>
+        <Studio>APM Music</Studio>
+        <Title>Hand In My Pocket</Title>
+        <TrackSequence>3</TrackSequence>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>89</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.89</FormattedPrice>
+        </LowestNewPrice>
+        <TotalNew>1</TotalNew>
+        <TotalUsed>0</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B0029B4OWS%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB0029B4OWS</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>Uuu7g4tXtfRA9skIGlcpbMhBWcO8k7qlq%2F5Bofyxz7w1LouzjnqqpEdCH6JVsMzSs3Ac1R5zuRzBek9yjhiAiZjGOujDGBy7zEd22ak6bFQztvMSIAk3ri5oYQZpUeIK1jwupb%2Fs9z6ad2xTXLQjz1Rnn5eglKD2</OfferListingId>
+            <Price>
+              <Amount>89</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$0.89</FormattedPrice>
+            </Price>
+            <Availability>Usually ships in 1-2 business days</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>24</MinimumHours>
+              <MaximumHours>48</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>0</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B000SF06JM</ASIN>
+      <SalesRank>1219949</SalesRank>
+      <ItemAttributes>
+        <Binding>MP3 Download</Binding>
+        <Creator Role="Primary Contributor">Vitamin String Quartet</Creator>
+        <Genre>pop-music</Genre>
+        <Label>Vitamin Records</Label>
+        <Manufacturer>Vitamin Records</Manufacturer>
+        <ProductGroup>Digital Music Track</ProductGroup>
+        <ProductTypeName>DOWNLOADABLE_MUSIC_TRACK</ProductTypeName>
+        <Publisher>Vitamin Records</Publisher>
+        <ReleaseDate>2007-03-27</ReleaseDate>
+        <RunningTime Units="seconds">215</RunningTime>
+        <Studio>Vitamin Records</Studio>
+        <Title>Hand In My Pocket</Title>
+        <TrackSequence>4</TrackSequence>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>99</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.99</FormattedPrice>
+        </LowestNewPrice>
+        <TotalNew>1</TotalNew>
+        <TotalUsed>0</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B000SF06JM%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB000SF06JM</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>i8FB6HRDHjDQlfhCNJ6GpIK9pisLIu8TDKsJltbDh0F9sX9IwywH3kHqBmD4xgWbVM%2B5v8O3tQ2f1HcG4KcmzBMaz5DF2D7ZiFhF%2F0H%2FXT9IpgxHfSeBEnc6MYY02mvfNIcm4A9lN87vH162dc8ReQ3shKtgOlcL</OfferListingId>
+            <Price>
+              <Amount>99</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$0.99</FormattedPrice>
+            </Price>
+            <Availability>Usually ships in 1-2 business days</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>24</MinimumHours>
+              <MaximumHours>48</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>0</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B002STGO4C</ASIN>
+      <SalesRank>1277322</SalesRank>
+      <ItemAttributes>
+        <Binding>MP3 Download</Binding>
+        <Creator Role="Primary Contributor">Rolf Harris</Creator>
+        <Genre>pop-music</Genre>
+        <Label>CAROLINE WORLD SERVICE CATALOG</Label>
+        <Manufacturer>CAROLINE WORLD SERVICE CATALOG</Manufacturer>
+        <ProductGroup>Digital Music Track</ProductGroup>
+        <ProductTypeName>DOWNLOADABLE_MUSIC_TRACK</ProductTypeName>
+        <PublicationDate>2009-09-08</PublicationDate>
+        <Publisher>CAROLINE WORLD SERVICE CATALOG</Publisher>
+        <ReleaseDate>2009-11-03</ReleaseDate>
+        <RunningTime Units="seconds">291</RunningTime>
+        <Studio>CAROLINE WORLD SERVICE CATALOG</Studio>
+        <Title>One Hand In My Pocket</Title>
+        <TrackSequence>2</TrackSequence>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>99</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.99</FormattedPrice>
+        </LowestNewPrice>
+        <TotalNew>1</TotalNew>
+        <TotalUsed>0</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B002STGO4C%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB002STGO4C</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>ekmuQxQ6PyyP5ogjjaY2xWXRgpzsyKrmYci9Ay%2FvKbg3wqsOywkQkPqIg2vYT6GcJGEFKSDITg%2BTenF6OZZ%2FXTlk9ZbnqSPGoBBFXp3NIB%2FZioOhnsF%2FOF%2F63oHKqhHQk9uQzB9%2F9PkUNMmd0Ydq5Jw%2FXzbv7gIt</OfferListingId>
+            <Price>
+              <Amount>99</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$0.99</FormattedPrice>
+            </Price>
+            <Availability>Usually ships in 1-2 business days</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>24</MinimumHours>
+              <MaximumHours>48</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>0</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B004FXAH4M</ASIN>
+      <SalesRank>1934557</SalesRank>
+      <ItemAttributes>
+        <Binding>MP3 Download</Binding>
+        <Creator Role="Primary Contributor">The Karaoke Channel</Creator>
+        <Genre>pop-music</Genre>
+        <Label>Stingray Music (Karaoke)</Label>
+        <Manufacturer>Stingray Music (Karaoke)</Manufacturer>
+        <ProductGroup>Digital Music Track</ProductGroup>
+        <ProductTypeName>DOWNLOADABLE_MUSIC_TRACK</ProductTypeName>
+        <Publisher>Stingray Music (Karaoke)</Publisher>
+        <ReleaseDate>2010-12-03</ReleaseDate>
+        <RunningTime Units="seconds">215</RunningTime>
+        <Studio>Stingray Music (Karaoke)</Studio>
+        <Title>Hand In My Pocket (in the style of Alanis Morissette) (Karaoke Version)</Title>
+        <TrackSequence>3</TrackSequence>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>99</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.99</FormattedPrice>
+        </LowestNewPrice>
+        <TotalNew>1</TotalNew>
+        <TotalUsed>0</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B004FXAH4M%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB004FXAH4M</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>K%2Fvy2vSP8ucKkPwPLj%2FflHoDNJR2kg9dS5xpaPb8bsIe2WHoO3R4Uqq6xVJPKLzBN3Ih7Y0z9lLg8iUW0YTULwVUf06gSVAJTapjw%2FnTk2OylRanDr%2B0y7D9%2BUJt7r%2B8RTkBitv8PghMcXlK6E1IKYoZu6qJ4G2Z</OfferListingId>
+            <Price>
+              <Amount>99</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$0.99</FormattedPrice>
+            </Price>
+            <Availability>Usually ships in 1-2 business days</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>24</MinimumHours>
+              <MaximumHours>48</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>0</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B0026OHU88</ASIN>
+      <SalesRank>1441232</SalesRank>
+      <ItemAttributes>
+        <Binding>MP3 Download</Binding>
+        <Creator Role="Primary Contributor">Pictomusic Karaoke</Creator>
+        <Genre>pop-music</Genre>
+        <Label>Pictomusic</Label>
+        <Manufacturer>Pictomusic</Manufacturer>
+        <ProductGroup>Digital Music Track</ProductGroup>
+        <ProductTypeName>DOWNLOADABLE_MUSIC_TRACK</ProductTypeName>
+        <Publisher>Pictomusic</Publisher>
+        <ReleaseDate>2008-07-01</ReleaseDate>
+        <RunningTime Units="seconds">220</RunningTime>
+        <Studio>Pictomusic</Studio>
+        <Title>Hand In My Pocket (Instrumental Version) [Karaoke Version In The Style Of Alanis Morissette]</Title>
+        <TrackSequence>1</TrackSequence>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>89</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.89</FormattedPrice>
+        </LowestNewPrice>
+        <TotalNew>1</TotalNew>
+        <TotalUsed>0</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B0026OHU88%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB0026OHU88</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>ibbVzUx%2F0vzwK0SctRCzQ6rf13vqdHcKSgiQc3wk1RzaoEVGjqUpEXZFnwtRnUjt2DM%2FSlm3ZCER5Zjjn%2BEQbNzj89zsuzVJKu1g7FOVDB8PC2LvDg1jemega2MgAInIW%2FglbLxFt320vd0uywMDcqJDNblj91es</OfferListingId>
+            <Price>
+              <Amount>89</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$0.89</FormattedPrice>
+            </Price>
+            <Availability>Usually ships in 1-2 business days</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>24</MinimumHours>
+              <MaximumHours>48</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>0</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+  </Items>
+</ItemSearchResponse>

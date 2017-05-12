@@ -1,0 +1,23 @@
+itest -> Interactive Test
+
+Be sure to do perl Makefile.PL; make before starting this script.
+
+There are three test files that will the test program will attempt to copy to
+the remote host:
+
+small_file.test
+medium_file.test
+large_file.test
+
+The script will check their md5 sum on the remote side (if possible).
+
+These files will then be deleted and an attempt will be made to copy them
+back to your local filesystem.  If any of the tests fail, you may need to
+manually remove the files from the remote host.
+
+After this test has sucessfully finished I recommend deleting the .test files.
+
+NOTES
+=====
+This test can take quite a while, depending on your connection speed.  At home
+using my slow DSL connection (about 30k/s) it took about 45 minutes.

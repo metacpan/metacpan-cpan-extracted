@@ -1,0 +1,197 @@
+# NAME
+
+Net::Flowdock - Flowdock API
+
+# VERSION
+
+version 0.03
+
+# SYNOPSIS
+
+    use Net::Flowdock;
+
+    my $client = Net::Flowdock->new(key => 'find-your-own');
+
+    # Or, if you need to use authenticated methods
+    
+
+    my $client = Net::Flowdock->new(key => 'find-your-own', username => 'foo', password => 'bar');
+
+    $client->push_team_inbox({
+        source => 'CPAN',
+        from_address => 'gphat@cpan.org',
+        from_name => 'Cory Watson',
+        subject => 'Uploaded Net::Flowdock',
+        content => "Sho' nuff",
+        project => 'Open Source',
+        tags => 'wow,yeah,poop',
+        link => 'http://search.cpan.org'
+    });
+
+# DESCRIPTION
+
+Net::Flowdock is a simple client for using the [Flowdock API](https://www.flowdock.com/api).
+It specifically speaks to the [REST](https://www.flowdock.com/api/rest) and
+[Push](https://www.flowdock.com/api/push) APIs.
+
+# ATTRIBUTES
+
+## debug
+
+Set/Get the debug flag.
+
+## key
+
+Set/Get the key to use when connecting to Flowdock.
+
+To obtain the API Token go to Settings -> Team Inbox inside a flow. 
+
+## password
+
+Set/Get the password for authenticated request.
+
+## url
+
+Set/Get the URL for Flowdock. Defaults to https://api.flowdock.com.
+
+## username
+
+Set/Get the username for authenticated request.
+
+# METHODS
+
+## get_flow (organization => $org, flow => $flow)
+
+Get a single flow. Single flow information always includes user list of flow. Otherwise the data format is identical to the list.
+
+## get_flows
+
+Lists the flows that the authenticated user has access to.
+
+## send_message (organization => $org, flow => $flow, event => $event, content => $content, tags => $tags)
+
+Send a messge to a flow.
+
+- event
+
+One of the valid Flowdock message events. Determines the type of message being sent to Flowdock. See Message Types section below. Required.
+
+- content
+
+The actual message. The format of content depends on the event. Required. Types are message (normal chat), status, (status update), mail (team inbox).
+
+item tags
+
+List of tags to be added to the message. Can be either an array (JSON only) or a string with tags delimited with commas. User tags should start with '@'. Hashtags can optionally be prefixed with "#". Tags are case insensitive.
+
+Some examples:
+
+A status update:
+
+    $client->send_message({
+        organization => 'iinteractive',
+        flow => 'testing',
+        event => 'status',
+        content => 'Away for a bit',
+    });
+
+A message in chat:
+
+    $client->send_message({
+        organization => 'iinteractive',
+        flow => 'testing',
+        event => 'message',
+        content => 'I am a robot',
+        tags => 'foo, bar'
+    });
+
+XXX Todo: mail
+
+## push_team_inbox ({ source => $source, from_address => $email })
+
+Required fields:
+
+- source
+
+Human readable identifier of the application that uses the Flowdock API. Only alphanumeric characters, underscores and whitespace can be used. This identifier will be used as the primary method of categorization for the messages. 
+
+Example value: Awesome Issue Management App
+
+- from_address
+
+Email address of the message sender. The email address is used to show a avatar of the sender. You can customize the avatar by registering the address in
+
+Example value: john.doe@yourdomain.com
+
+- subject
+
+Subject line of the message, will be displayed as the title of Team Inbox message.
+
+- content
+
+Content of the message, will be displayed as the body of Team Inbox message. 
+
+Following HTML tags can be used: a abbr acronym address article aside b big blockquote br caption cite code dd del details dfn div dl dt em figcaption figure footer h1 h2 h3 h4 h5 h6 header hgroup hr i img ins kbd li nav ol p pre samp section small span strong sub summary sup table tbody td tfoot th thead tr tt ul var wb
+
+Optional fields:
+
+- from_name
+
+Name of the message sender.
+
+Example value: John Doe
+
+- project
+
+Human readable identifier for more detailed message categorization. Only alphanumeric characters, underscores and whitespace can be used. This identifier will be used as the secondary method of categorization for the messages.
+
+Example value: My Project
+
+- format
+
+Format of the message content, default value is "html". Only HTML is currently supported. 
+
+Example value: html
+
+- tags
+
+Tags of the message, separated by commas.
+
+Example value: cool,stuff
+
+- link
+
+Link associated with the message. This will be used to link the message subject in Team Inbox.
+
+Example value: http://www.flowdock.com/
+
+## push_chat ({ content => $content, external_user_name => $username })
+
+- content
+
+Content of the message. Tags will be automatically parsed from the message content. Required.
+
+- external_user_name
+
+Name of the "user" sending the message. Required.
+
+- tags
+
+Tags of the message, separated by commas. Optional.
+
+Example value: cool,stuff
+
+# AUTHENTICATED
+
+# ANONYMOUS
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Infinity Interactive, Inc.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

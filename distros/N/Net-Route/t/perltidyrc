@@ -1,0 +1,25 @@
+# Adapted from -pbp
+-l=120  # chars per line
+-i=4    # 4-space indents
+-ci=2   # Continuation indentation
+-vt=2   # Max vertical tightness (compact - PBP setting, let's see)
+-cti=0  # No extra indentation on data structure closing braces/..
+-pt=0   # Always spaces inside ()
+-bt=1   # Spaces between data {} if complex
+-sbt=1  # Same for []
+-bbt=0  # Always spaces inside block {}  
+-nsfs   # Do not add extra spaces around for(;;) semicolons
+-nolq   # Do not unindent long string lines to respect -l
+        # Break before these:
+-wbb="% + - * / x != == >= <= =~ !~ < > | & = **= += *= &= <<= &&= -= /= |= >>= ||= //= .= %= ^= x="
+
+# Own settings
+-lp     # Required by -vt
+-bl     # Code braces go on a new line
+-otr    # Do not break lines between a comma and an opening token
+-sot    # Compact multiple opening tokens on same line
+-sct    # Compact multiple cloising tokens on same line
+
+# IO
+-se     # Error to stderr instead of .ERR
+-w      # Enable warnings

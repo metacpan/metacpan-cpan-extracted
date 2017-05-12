@@ -1,0 +1,32 @@
+Makefile.PL
+MANIFEST
+
+Changes
+README
+
+lib/NOLookup.pm
+
+lib/NOLookup/Brreg/DataLookup.pm
+lib/NOLookup/Brreg/Entry.pm
+
+lib/NOLookup/BrregDifi/DataLookup.pm
+lib/NOLookup/BrregDifi/Entry.pm
+
+lib/NOLookup/Patent/DataLookup.pm
+lib/NOLookup/Patent/Entry.pm
+
+lib/NOLookup/DAS/DASLookup.pm
+
+lib/NOLookup/Whois/WhoisLookup.pm
+
+t/00_compile.t
+t/01test_pod.t
+t/02test_das.t
+
+bin/no_brreg.pl
+bin/no_brreg_difi.pl
+bin/no_patent.pl
+bin/no_das.pl
+bin/no_whois.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

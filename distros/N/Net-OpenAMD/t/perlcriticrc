@@ -1,0 +1,11 @@
+severity=1
+# we use Fatal qw(open close)
+#[-InputOutput::RequireCheckedOpen]
+#[-InputOutput::RequireCheckedClose]
+
+[Documentation::RequirePodSections]
+source   = module_starter_pbp_0_0_3
+language = en_US
+
+[Miscellanea::RequireRcsKeywords]
+keywords = AFresh1

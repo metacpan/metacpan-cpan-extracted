@@ -1,0 +1,24 @@
+#!/usr/bin/perl -w
+#
+#astool - example implementation of Net::ASN
+#
+use strict;
+use Net::ASN;
+
+my $inasn 	= $ARGV[0];
+my $asasdot 	= $ARGV[1] || undef;
+
+unless ($inasn) {
+	print "Usage: $0 <ASN> [-asdot]\n";
+	print "\nYou must specify an ASN , use the optional flag '-asdot'\n";
+	print "to force this ASN to be parsed in ASDOT format.\n\n";
+	exit 1;
+}
+
+my $asn = Net::ASN->new($inasn,$asasdot);
+print "type     : " . $asn->gettype	. "\n";
+print "asplain16: " . $asn->toasplain16 . "\n";
+print "asplain32: " . $asn->toasplain   . "\n";
+print "asdot    : " . $asn->toasdot     . "\n";
+print "asdotplus: " . $asn->toasdotplus . "\n";
+print "\n";

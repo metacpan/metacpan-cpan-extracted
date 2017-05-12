@@ -1,0 +1,204 @@
+ssh-broker-ctl(1)                                                                                                        General Commands Manual                                                                                                       ssh-broker-ctl(1)
+
+
+
+NAME
+       ssh-broker-ctl - Tectia Connection Broker control utility
+
+SYNOPSIS
+       ssh-broker-ctl command
+                      [options]...
+
+DESCRIPTION
+       ssh-broker-ctl is a control utility for Connection Broker (ssh-broker-g3).  It can be used, for example, to view the status of Connection Broker, to reconfigure or stop the Connection Broker, to manage keys and certificates, and to manage connections.
+
+OPTIONS
+       The following general options are available:
+
+       -a, --broker-address ADDRESS
+              Defines an address to a separate Tectia Connection Broker process to which a connection is made.
+
+              The same effect can be achieved by defining a Connection Broker address with environment variable SSH_SECSH_BROKER.
+              Tip
+
+              If  you  are  running  ssh-broker-ctl  using  a  userID other than that of the ssh-broker-g3 process owner, the -a option must be given so that ssh-broker-ctl knows where to connect. In this case, you must also run ssh-broker-ctl as a privileged user
+              (root).
+
+              For example, when user SSHBRKR owns the ssh-broker-g3 process, run the ssh-broker-ctl with commands:
+
+              # ssh-broker-ctl -a /tmp/ssh-SSHBRKR/ssh-broker status -s
+              # ssh-broker-ctl -a /tmp/ssh-SSHBRKR/ssh-broker status --pid
+              # ssh-broker-ctl -a /tmp/ssh-SSHBRKR/ssh-broker list-connections
+
+       -D, --debug STR
+              Defines the debug level.
+
+       -e, --charset=CS
+              Defines the character set to be used in the output.  The supported character sets are utf8, iso-8895-1, latin1, iso-8859-15, latin9, and ascii.
+
+       -q, --quiet
+              Defines that little or no output is to be displayed, depending on the command.
+
+       -s, --short
+              Defines that a shorter, more machine readable, output format is to be used.
+
+       --time-format=FMT
+              Defines the time format to be used in the output.  The default depends on the system locale settings.
+
+       -v, --verbose
+              Defines that more information, if available, is to be output.
+
+       -V, --version
+              Displays the version string.
+
+       -w, --wide
+              Defines that the output will not be truncated, even if it means long lines.
+
+       -h, --help
+              Displays a context-sensitive help text on command-line options.  Help is available also on specific commands. For example, to get help on the status command, run:
+
+              $ ssh-broker-ctl status --help
+
+COMMANDS
+              Note
+
+              For a detailed description of the command options, use the command-specific --help option.
+
+       ssh-broker-ctl accepts the following commands:
+
+       add-certificate [options] <certificate-file>
+              Adds the given X.509 sub-CA certificate to the Connection Broker certificate cache. The certificate can be used in certificate validations but it is not stored permanently. Restarting the Connection Broker will remove the certificate.
+
+       add-crl [options] <crl-file>
+              Adds the given X.509 CRL to the Connection Broker CRL cache. The CRL can be used in certificate validations but it is not stored permanently.  Restarting the Connection Broker will remove the CRL.
+
+       add-key filename
+              Adds a new private key from the given filename. The private key is not stored permanently in the configuration. Stopping the Connection Broker will remove the key.
+
+       add-provider type parameter
+              Registers a key provider to the Connection Broker. The type option is one of the supported provider types and the parameter option is a parameter string specific to the provider type.
+
+              For a list of the supported key provider types and the corresponding parameter formats, use the command-specific --help option.
+
+       auth-handler [options]
+              Registers itself as the default authentication form handler. All authentication prompts for clients that are unable to handle them (mostly SOCKS proxy and other tunnels) are directed to this client.
+
+              For a list of the supported key provider types and the corresponding parameter formats, use the command-specific --help option.
+
+       close-channel channel-id ...
+              Closes the defined channel. You can also enter multiple channel-IDs to close several channels.
+
+       close-connection connection-id ...
+              Closes the defined connection. You can also enter multiple connection-IDs to close several connections.
+
+       close-tunnel-listener tunnel-id ...
+              Closes open tunnel listener. Tunnel id is either the id number returned by ssh-broker-ctl list-tunnel-listeners command or a listen address and port pair separated by a colon. If the listen address is omitted, local listeners (127.0.0.1) are  select‐
+              ed. As an example, the following command closes the listener with id 7, and the ones listening at 168.192.0.15 port 1234 and 127.0.0.1 port 2112:
+
+              $ ssh-broker-ctl ctl 7 168.192.0.15:1234 :2112
+
+       config-value [options] path
+              Retrieves configuration values from the Connection Broker based on the defined path and displays them.
+
+       connection-status [--show-channels] [--write-hostkey= FILE] connection-id
+              Displays a detailed connection status for the connection ID (the numeric identifier shown by the list-connections) command.
+
+       connector [options] [ enable | disable ]
+              Enables and disables the Connector functionality in the Connection Broker. Without parameters prints the current state.
+
+       disconnect-client client-id
+              Disconnects a Connection Broker client process.
+
+       debug [--append] [--clear] [--log-file= file] [--monitor] [--protocol-dump] [debug-level]
+              Sets the Connection Broker debug level to the defined level. If no debug-level parameter is given here, the current debug level is not changed.
+
+       generate-key [options] [key-name]
+              Generates a private key using a key provider in the Connection Broker.  By default the private key will be stored as a software key into a file in the user's home directory. Key providers can offer other methods for private key storage.
+              Note
+
+              In FIPS mode, due to a FIPS regulation which forbids exporting unencrypted private keys out of the FIPS module, it is not possible to generate user keys without a passphrase.
+
+       keylog [--remove] [--all] [--update <key-id | key-hash>] [--init] [--uninit] [--close] [-v, --verbose] [key-id | key-hash | hostname ]
+              Keylog is used to manage uploaded public keys and to display a log of them. The Keylog does not store the public keys, it only stores information about the keys and the hosts where the keys have been uploaded to. The information can be used to manage
+              the keys at a later stage, for example, to track hosts where a key has been uploaded to. The keylog is not on by default, it must be enabled first.
+
+              Without the options, displays a list of the uploaded keys. If a key or a hostname is specified, only the selected keys are displayed.
+
+       key-passphrase [--all] [--clear] [--passphrase-file= filename] [--passphrase-string= passphrase] [ key-id | key-hash]
+              Prompts the user's private-key passphrase or PIN code.
+
+       key-upload [options] key [user@] server [#port]
+              Uploads the selected key (key can be a key ID number, a public key hash or a file name) into the authorized keys directory or file on the server, depending on the automatically detected upload method. After the operation, the key can be used in  pub‐
+              lic-key authencation to log in to the server without a password. If the keylog is enabled, the command prompts for a keylog passphrase (if needed), and information about the public keys is stored in the key upload log.
+
+       list-connections [-c, --show-channels] [-s, --short] [--client-pid= PID] [--disconnected]
+              Displays a list of the currently open connections together with connection parameters and traffic statistics. Displays also the connection ID which can used with other commands to identify the connection.
+
+       list-channels [-s, --short]
+              Displays a list of the currently open connection channels, together with channel type and traffic statistics. Displays also the channel ID which is used by other commands to identify the connection.
+
+       list-clients [-c, --show-channels] [-s, --short] [--all]
+              Displays a list of the currently connected client processes.
+
+       list-keys [-s, --short] [--extra certificates] [--provider= ID]
+              Displays  a  list of the user's private keys, together with the basic key attributes such as the key type, size, and possible file name or key provider information. Outputs also the fingerprint and the identifier of the key. The identifier is used by
+              other Connection Broker commands to identify the private key.
+
+       list-profiles [-s, --short] [-v, --verbose] [--groups] [ name ...]
+              Displays a list of connection profiles in the Connection Broker. Shows the profile name and basic connection settings, such as the host and the user name. If profile (or group) names are given, only those profiles (or groups) are listed.
+
+       list-providers [ provider ...]
+              Displays a list of the key providers in the Connection Broker. If one or more provider names or ID numbers are given, only those providers will be listed. The provider name can be either a full provider name or a prefix.
+
+       list-tunnel-listeners [options]
+              Displays a list of the currently active tunnel listeners (also called port forwards).
+
+       open-tunnel-listener [options] listen-port [user@] server [#port] [dst-host] [dst-port]
+              Opens a tunnel listener, similar to sshg3 -L and -R options. The difference is that ssh-broker-ctl will exit after the tunnel is opened. The tunnel status can be viewed with ssh-broker-ctl list-tunnel-listeners command and the tunnel  can  be  closed
+              with ssh-broker-ctl close-tunnel-listener command.
+
+              In  local mode (default), the listener is opened to localhost listen-port.  All connections will be tunneled through server and from there to the final destination address and port. Tunnel types socks and socks-proxy do not require destination infor‐
+              mation as it will be obtained from SOCKS client. Tunnel types tcp, ftp and local require destination information.
+
+       pkcs10-sign [options] key-id [subject-name]
+              Signs a PKCS#10 certificate request with the given key. The key-id can be either a key id or a key hash. The subject name parameter is required unless the template option is used. If the subject name is not a valid  distinguished  name,  it  will  be
+              wrapped automatically into a common name component. For example, a subject name string My Name will be converted to CN=My Name.
+
+       probe-key [options] address#port
+              Probes for a Secure Shell server hostkey. Connects to the given address and port (defaults to 22) and displays the server's public key or certificate.
+
+       reload Rereads the Connection Broker configuration file.
+
+       remove-key [options] key-id
+              Removes a private key permanently.
+
+       remove-provider [--all] provider-id
+              Removes a key provider from the Connection Broker.
+
+       start  Starts the Connection Broker in daemon mode if it is not already running.
+
+       start-gui
+              Starts the Connection Broker GUI process unless it is already running.
+
+       status [-s, --short] [-q, --quiet] [--pid] [--all]
+              Without parameters, displays short statistics and a configuration summary for the currently running Connection Broker process.
+
+       stop   Stops the Connection Broker.
+
+       validate-certificate [options] <certificate-file>
+              Validates the given X.509 certificate. If a host name is given, also checks if the certificate would be accepted as a host certificate for the host.
+
+       view-key [-s, --short] [-v, --verbose] [--clear] [--write-key= file] key-id
+              Displays information on the defined key. If the key has certificates, a short summary of them is also shown.
+
+AUTHORS
+       SSH Communications Security Corporation
+
+       For more information, see http://www.ssh.com.
+
+SEE ALSO
+       ssh-broker-g3(1), ssh-broker-config(5)
+
+
+
+                                                                                                                             21 January 2014                                                                                                           ssh-broker-ctl(1)

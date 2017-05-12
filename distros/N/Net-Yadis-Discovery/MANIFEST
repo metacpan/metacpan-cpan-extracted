@@ -1,0 +1,16 @@
+Changes
+lib/Net/Yadis/Discovery.pm
+lib/Net/Yadis/Discovery/Protocol/LID.pm
+lib/Net/Yadis/Discovery/Protocol/OpenID.pm
+lib/Net/Yadis/Discovery/Protocol/TypeKey.pm
+lib/Net/Yadis/Object.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+t/00_use.t
+t/01_object.t
+t/02_protocol.t
+t/03_discovery.t
+t/04_html_parse.t
+t/05_proposal.t
+t/lib/URI/Fetch.pm

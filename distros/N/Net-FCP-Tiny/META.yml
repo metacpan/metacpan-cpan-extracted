@@ -1,0 +1,30 @@
+---
+abstract: 'A Tiny and incomplete interface to the Freenet Client Protocol (FCPv2)'
+author:
+  - 'Ævar Arnfjörð Bjarmason <avar@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101612, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-FCP-Tiny
+no_index:
+  directory:
+    - t
+requires:
+  Exporter: 0
+  IO::Socket::INET: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-FCP-Tiny
+  homepage: http://search.cpan.org/dist/Net-FCP-Tiny/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/avar/net-fcp-tiny.git
+version: 0.03
+x_authority: cpan:AVAR

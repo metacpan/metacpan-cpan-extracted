@@ -1,0 +1,12 @@
+Revision history for Perl extension Net::Frame::Layer::NTP.
+
+1.02 Sun Jan 17 22:48:36 EST 2016
+   - Added codes and 'kiss' codes
+   - Updated API to match RFC naming
+
+1.01 Sat Jan 16 07:48:36 EST 2016
+   - Fixed test in t/05-ntpsubs.t
+
+1.00 Fri Jan 15 09:48:36 EST 2016
+   - first public release
+

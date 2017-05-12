@@ -1,0 +1,109 @@
+Revision history for Perl extension Net::OICQ.
+
+$Id: Changes,v 1.28 2007/06/15 15:28:36 tans Exp $
+
+0.01  Tue Oct  8 20:59:14 2002
+	- original version; created by h2xs 1.21 with options
+		-Oxan Net::OICQ oicq_blackbox.h
+
+0.2   Thu Nov  7
+	- got rid of unused sub in the assembly code
+	- modify definitions of src and command codes, each uses 2 bytes now
+	- new functions: add/del/ban contact, accept/reject contact
+
+0.3   Mon Nov 11
+	- commands for add/del/ban/accept/reject contact actually work now
+	- client will try randomly selected servers before connection
+	- /s command works on individual id now
+
+0.4   Sat Nov 17
+        - Use IO::Select in client, no more delay
+	- Log conversation by default, type /set LogChat 0 to turn off
+	- AutoReply mode, auto reply message
+
+0.5   Sat Feb 08
+	- got rid of assembly code, finally, thanks to Chen Peng in Singapore
+	- new C code tiny_crypt.c and tiny_crypt.h replaced assembly code
+	- re-write Net::OICQ::encrypt and Net::OICQ::decrypt
+	- new test.pl for testing the cipher
+	- test_tea.c provides main() for testing tiny_crypt in C only
+
+0.6   Sat April 12
+	- fixed a bug in get_online_friends
+	- figured out user attribute unkn21 is Avatar number
+	- added Message Precursor strings
+
+0.7   Sat June 28
+	- found a missing byte in sub c_login
+	- fixed build_login_packet
+	- invisible mode works now, replaced set_picture with set_mode
+	- massively rewrote to separate user interface codes from protocol
+	- improved login process to accept server redirect
+	- use ANSI colors in the text console client
+
+0.8   Sat October 18, 2003
+	- Separated cipher codes to module Crypt::OICQ
+	- added /eval command to TextConsole
+	- changed $oicq->{PWMD5} to $oicq->{PWKey} since v2000c 1230b uses
+	  double MD5 of passwd
+	- added plugin function for auto chat
+	- fixed time stamp bug in send/recv_msg
+	- use bytes on all modules
+	- get client version of srcid from recv_msg
+	- add new command usage: "/xxxxxxx message" will send message without
+	  set_dstid
+	- Net::OICQ::TextConsole::msg now display font name correctly
+
+0.9  Mon January 3, 2005
+	- accepted new message precursors
+	- get_msg moved from OICQ.pm to OICQ/ServerEvent.pm and uses new message precursors
+
+1.0  Tue August 8, 2006
+	rewrote all modules:
+	- OICQ: new login subroutine, TCP connect with HTTP proxy
+	- Event: new AUTOLOAD, parse, dump subroutines
+	- ServerEvent: removed all reference to UI, parsed packet info is
+	  stored as event attributes
+	- ClientEvent: eliminated decryption for client event
+	- TextConsole: no longer required
+	- new demo1 script shows how to use Net::OICQ without TextConsole
+
+1.1  Mon August 14, 2006
+	- added split_gb_msg to handle long message
+	- removed arbitray limitation on message length for send_msg and send_group_msg.
+	  NOTE: server may drop some trunk of message or screw up the order
+	- got rid of /g command, group messages are handled the same way as user messages
+	- /gwho actually works now
+	- moved chatbot code from ServerEvent to TextConsole
+	- added documentation
+	- fixed udp login problem
+	- made decrypt_login_response a little smarter
+	- added code for recognizing more recv_msg types
+
+1.2  Tue September 5, 2006
+	- checked string length for MsgType 0x09(0x0a) in ServerEvent::recv_msg,
+	  also skipped ack_msg for ignored messages.
+	- fixed home directory bug for ActiveState Perl on Windows
+	- disabled ANSIColor for Windows CMD prompt (TextConsole.pm)
+	- changed timeout value for can_read in TextConsole.pm to 60 seconds
+	- added sub ui_update_info
+
+1.3  Tue January 2, 2007
+	- changed builder to Module::Build
+	- got rid of the use of stty command by requiring Term::ReadKey module
+	- added win32qq for ActiveState perl users
+	- warn ActiveState Perl users that the console client is unable to accept user input.
+
+1.3001 Fri February 9, 2007
+	- fixed errors in Makefile.PL, which is still used by older version of CPAN
+	- fixed dump_event_queue bug in demo1
+
+1.3002 Fri February 16, 2007
+	- added support for zh_CN.UTF-8 locale in TextConsole.pm
+	- fixed group chat annoyance in win32qq 
+
+1.4    Thu June 7, 2007
+	- rewrite login procedure to deal with Tencent's massive protocol change
+
+1.4001 Thu June 15, 2007
+	- fixed a bug in login subroutine that mishandles login server redirect on error code 10

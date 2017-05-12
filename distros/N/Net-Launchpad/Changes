@@ -1,0 +1,123 @@
+==================================================
+Changes from 2013-11-01 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 2.101 at 2014-11-01 02:46:55 +0000
+------------------------------------------
+
+  Change: 7d868a82298162e4908fbb14bb9d2ed37d457520
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-31 22:46:49 +0000
+
+    merge client into main library
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+------------------------------------------
+version 2.100 at 2014-11-01 02:44:38 +0000
+------------------------------------------
+
+  Change: e0eaed3db4828be64b8fd4ad3fd5dd4ff1f90570
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-31 22:44:38 +0000
+
+    v2.100 
+
+  Change: 77e567801bdf973f525ef037d310ecee0cee65d9
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-31 22:44:01 +0000
+
+    merge n::l::c into launchpad
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: b2b1b726a5b771a9be673054240bbdae79b83810
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-21 19:07:36 +0000
+
+    v1.0.5 
+
+  Change: 40990230834f4c218497cc662e5fefc44adaf9d4
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-21 18:52:51 +0000
+
+    update authentication steps
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 5b54af72261bc419519190a2f602741a67c9c649
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-19 19:22:38 +0000
+
+    v1.0.4 
+
+  Change: 0aec28872d0e50f199e0fe252fda7638248fed83
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-19 19:22:17 +0000
+
+    No functional changes, documentation cleanup
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: da4f252508d1690b0b91a5410d999ee83d0a20aa
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-19 15:39:45 +0000
+
+    v1.0.3 
+
+  Change: 1add7788f16cca81e6def558961b7943a18539b8
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-19 15:39:24 +0000
+
+    Make use of Function::Parameters, test with latest mojo
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 2be3f246fc326cfba587640ed337b15bdf0f47ca
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-20 17:36:56 +0000
+
+    1.0.1 
+
+  Change: ae796af9d756f5c61ec6ee2299467a892c4c7db4
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-20 17:36:30 +0000
+
+    Fixes #1
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: c347d4a06b8d8ed3e5efe1e592d511b29a52796f
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-11 14:42:40 +0000
+
+    1.0.0 
+
+  Change: c72c52d4970445e63129b6843c156e1e7cf893fb
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-10 16:58:27 +0000
+
+    update workflow
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: d644624987cd6208a7aecc6bbfae32cb0f86e451
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-10 12:56:52 +0000
+
+    work on splitting out launchpad auth
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: b09c6f082e3cf78c079cd09be817c0fa577cf39f
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-10 12:28:40 +0000
+
+    initial
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+================
+End of releases.
+================

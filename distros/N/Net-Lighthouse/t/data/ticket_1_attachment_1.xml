@@ -1,0 +1,12 @@
+<attachment type="Attachment">
+  <code>5ace4f26de37855e951eb13f5b07a1b1a0919466</code>
+  <content-type>application/octet-stream</content-type>
+  <created-at type="datetime">2009-08-21T11:15:51Z</created-at>
+  <filename>first</filename>
+  <height type="integer" nil="true"/>
+  <id type="integer">249828</id>
+  <size type="integer">24</size>
+  <uploader-id type="integer">67166</uploader-id>
+  <width type="integer" nil="true"/>
+  <url>http://sunnavy.lighthouseapp.com/attachments/249828/first</url>
+</attachment>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: yazgfs.xml,v 1.1 2007-08-13 16:39:55 mike Exp $ -->
+<!--
+	This YAZ GFS configuration file can be used by simple2zoom
+	using the "-f etc/yazgfs.xml" command-line option, to enable
+	support for CCL query mapping
+-->
+<yazgfs>
+ <listen id="tcp9998">tcp:@:9998</listen>
+ <server id="main" listenref="tcp9998">
+  <ccl2rpn>../etc/ccl-qualifiers</ccl2rpn>
+ </server>
+</yazgfs>

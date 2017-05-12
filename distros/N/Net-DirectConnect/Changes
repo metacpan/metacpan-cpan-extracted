@@ -1,0 +1,53 @@
+# $Id: Changes 817 2011-07-04 16:12:36Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/Changes $
+0.10: 
+non blocking connect fixed
+
+kidding: sctp connects dev_sctp=1
+
+5.14 warnings, 5.15 errors fixed
+
+over 9000 bugs fixed
+
+0.09:
+full internal utf
+
+0.07:
+skip from sharing various temporary files
+stat.pl repaired
+
+
+0.05:
+
+bug fixes 
+
+modules
+
+better moduled sharing
+
+examples/share.pl now multihub
+
+examples/get.pl - auto get popular files
+
+
+0.04:
+
+initial sharing support see examples/share.pl
+
+passive mode autodetect by ips
+
+writefile -> file_write
+ openfile -> file_open
+
+adc
+
+adc hub
+
+new new
+
+tigerhash module
+
+file sharing with sendfile
+
+filelist create
+
+

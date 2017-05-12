@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::SynchroEdit::Service.
+
+0.01  Fri May 12 14:03:11 2006
+	- original version; created by h2xs 1.23 with options
+		-X -n Net::SynchroEdit::Service
+

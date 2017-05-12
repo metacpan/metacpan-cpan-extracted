@@ -1,0 +1,32 @@
+Revision history for Perl extension Net::Routing.
+
+0.44 Thu Nov 12 09:45:14 CET 2015
+   - bugfix: do not mess with PATH and LC_ALL environment variables
+
+0.43 Fri Feb 20 06:58:25 CET 2015
+   - update: add a check in Makefile.PL/Build.PL for supported OS
+   - bugfix: VERSION was not consistent in all modules
+
+0.42 Thu Feb 19 07:26:03 CET 2015
+   - bugfix: on cidrlookup: returns only routes matching the target IP in get()
+
+0.41 Mon Feb  9 21:44:37 CET 2015
+   - bugfix: FreeBSD netstat to use -f inet/inet6 so it is compatible with Darwin
+   - bugfix: FreeBSD to report all IPv6 routes (by striping interface name)
+   - bugfix: Linux new() to return undef on error
+
+0.40 Fri Feb  6 18:53:48 CET 2015
+   - new: routing for NetBSD
+   - new: routing for Darwin (same as FreeBSD 9.x)
+
+0.30 Wed Feb  4 17:20:11 CET 2015
+   - UPDATE: rewrote main methods in Net::Routing in a cleaner way
+   - new: use constants, and makes them exportable
+   - bugfix: makes route unique when duplicate found
+   - bugfix: route parsing for Linux/IPv6 and FreeBSD 9.x
+   - pod: added some documentation
+   - test: for netstat parsing checks
+
+0.20 Sat Jan 31 17:53:00 CET 2015
+   - first public release
+

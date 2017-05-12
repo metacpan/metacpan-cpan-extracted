@@ -1,0 +1,9 @@
+Changes
+=======
+
+1.01 - 23 Aug 2012
+    * Make sure to include a Content-Length: 0 to create_bucket()
+    * Add various checks to URLs passed to put_object() and delete_object()
+
+1.00 - 30 Nov 2011
+    * Initial release

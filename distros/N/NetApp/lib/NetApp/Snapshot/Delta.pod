@@ -1,0 +1,51 @@
+
+=head1 NAME
+
+NetApp::Snapshot::Delta -- OO class which represents a single snapshot delta
+
+=head1 SYNOPSIS
+
+    use NetApp::Filer;
+    use NetApp::Snapshot;
+
+    my $filer = NetApp::Filer->new({ .... });
+
+    my $volume = $filer->get_volume( $volname );
+
+    my @deltas = $volume->get_snapshot_deltas;
+
+    foreach my $snapshot ( $volume->get_snapshots ) {
+
+        my @deltas = $snapshot->get_snapshot_deltas;
+
+    }
+
+=head1 DESCRIPTION
+
+This class encapsulates a single snapshot delta.
+
+=head1 INSTANCE METHODS
+
+There are 5 key instance methods, each of this returns the data from
+the column of the same name in the snap delta table.
+
+=over
+
+=item get_from
+
+=item get_to
+
+=item get_changed
+
+=item get_time
+
+=item get_rate
+
+=back
+
+=head2 is_summary
+
+This method returns true of false, indicating that the delta was a
+summary, as opposed to an individual delta.
+
+=cut

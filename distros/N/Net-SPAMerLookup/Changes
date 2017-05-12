@@ -1,0 +1,8 @@
+Revision history for Perl extension .
+
+0.10  2009/01/26
+	- It divided into the RBL check of the IP base and the URI base.
+
+0.01  Mon Aug 25 00:23:26 2008
+	- original version; created by Egg::Helper::Build::Module v3.02
+	   with module name Net::SPAMerLookup

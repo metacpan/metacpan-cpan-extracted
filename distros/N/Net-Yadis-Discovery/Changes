@@ -1,0 +1,20 @@
+0.05:   * code_ref's arguments used in server method changes from including Net::Yadis::Discovery
+          object as first argument to not including it.
+
+0.04:   * Refactoring proposal API interface logic.
+        * Add almighty filtering results method: servers
+        * Add TypeKey support
+
+0.03:
+        * Automatically judge whether LWPx::ParanoidAgent could use or not.
+        * Export three constat values to handle the way of HTTP request method of fetching
+          Yadis URL.
+
+0.02:
+        * API interface change to proposal API interface, making two changes showing below:
+
+        * Change method name of parse_uri to discover.
+        * Add Plugin module to add openid_servers and lid_servers methods.
+
+0.01:
+	* first release

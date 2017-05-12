@@ -1,0 +1,68 @@
+Net-FTPTurboSync version 0.07
+=============================
+
+turbo-ftp-sync - a script moves changes of files and folders of a local
+machine to a remote one via FTP very fast with minimum network traffic.
+
+=head1 SYNOPSIS
+
+turbo-ftp-sync [ options ] [ <localdir> <remoteURL> ]
+
+=head1 DESCRIPTION
+
+The script synchronizes files and folder on an FTP server with local ones via
+usual FTP protocol. The advantage of this script over usual FTP client is it
+doesn't upload all data every time but only once. 
+
+Its secret is that it doesn't ask a FTP server about last modification date and
+current size of each file. These information is stored in local SQLite db.
+Therefore this program doesn't explore folder tree of a remote host. It acts
+blindly. You can interrupt a process of this program in any time and you will
+not lose changes which you already uploaded.
+
+The program can move changes only one direction from a local machine to remote
+one. If a file was changed on a remote machine and a local one then the program
+overwrite the remove version of the file by the local one.
+
+turbo-ftp-sync.pl is based on sources of ftpsync.pl program.
+Christoph Lechleitner is the initial author of ftpsync.pl (ftpsync@ibcl.at)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   'base' => 2.14
+   'Cwd' => 3.33
+   'DBI' => 1.611
+   'Exception::Class' => 1.32
+   'Exception::Class::Base' => 1.32
+   'Exception::Class::TryCatch' => 1.12
+   'ExtUtils::MakeMaker' => 6.55_02
+   'File::Find' => 1.14
+   'Net::FTP' => 2.77
+   'Net::Netrc' => 2.12
+   'strict' => 1.04
+   'Test::More' => 0.92
+   'warnings' => 1.06
+     
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2011 by Daneel
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

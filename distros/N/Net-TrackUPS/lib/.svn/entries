@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   name=""
+   url="https://svn.vonagenetworks.net/trunk/base/net/perl/P5-Net-TrackUPS/src/lib"
+   kind="dir"
+   repos="https://svn.vonagenetworks.net"
+   schedule="add"
+   revision="0"/>
+<entry
+   name="Net"
+   kind="dir"
+   schedule="add"/>
+</wc-entries>

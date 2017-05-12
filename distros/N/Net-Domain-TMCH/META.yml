@@ -1,0 +1,36 @@
+---
+abstract: 'Trademark Clearing House'
+author:
+  - 'Mark Overmeer'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Domain-TMCH
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Convert::X509: 0.3
+  Crypt::OpenSSL::VerifyX509: 0.10
+  Crypt::OpenSSL::X509: 1.803
+  Data::Dumper: 0
+  DateTime: 0
+  File::Basename: 0
+  File::Slurp: 0
+  Getopt::Long: 0
+  LWP::UserAgent: 0
+  MIME::Base64: 0
+  POSIX: 0
+  URI: 0
+  XML::Compile::WSS: 1.09
+  XML::Compile::WSS::Signature: 2.01
+  XML::LibXML: 0
+version: 0.18

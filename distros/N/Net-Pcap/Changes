@@ -1,0 +1,350 @@
+The revision history for Net-Pcap
+
+0.18 - 2016-05-15 - Sebastien Aperghis-Tramoni (SAPER)
+
+  [Bugfixes]
+  - CPAN RT #77807: Net::Pcap is no longer limited to one callback function,
+    thanks to a patch by James Rouzier.
+  - CPAN RT #55163: Typo in eg/pcapdump (Iain Arnell and Jose Pedro Oliveira).
+  - CPAN RT #83842: Typo in Net:Pcap (Xavier Guimard).
+
+  [API]
+  - Added pcap_offline_filter() (Martijn Lievaart).
+
+  [Code]
+  - use warnings (David Farrell).
+
+  [Documentation]
+  - Moved HISTORY from README to main documentation.
+  - Rewrote AUTHORS to acknowledge all contributors.
+  - Updated copyright years.
+
+  [Tests]
+  - Added timeouts to prevent tests from hanging (Patrice Auffret).
+  - t/17-lib_version.t: adjust regexp to match Apple builds (David Farrell).
+  - t/50-poe-component-pcap.t: small improvments.
+  - Added t/50-net-pcap-easy.t to test with Net::Pcap::Easy.
+  - Added t/50-anyevent-pcap.t to test with AnyEvent::Pcap.
+  - Make t/50-* pass with old versions of Test::More
+
+  [Distribution]
+  - Converted the Changes file to CPAN::Changes::Spec format.
+  - Makefile.PL: append CCFLAGS to $Config{ccflags} instead of overriding it.
+  - Makefile.PL: now dies when libpcap isn't found.
+  - Makefile.PL: declare minimum Perl version (David Farrell).
+
+
+0.17 - 2012-11-28 - Sebastien Aperghis-Tramoni (SAPER)
+
+  [Bugfixes]
+  - CPAN RT #43308: Net::Pcap no longer enables immediate (unsafe)
+    signals delivery.
+  - Fix allocated size in pcap_open(), pcap_createsrcstr() and
+    pcap_parsesrcstr().
+
+  [API]
+  - Now made the C-like API available by default. Added the
+    pcap_perl_settings() function and UNSAFE_SIGNALS pseudo-bloc.
+
+  [Code]
+  - Replaced all occurrences of safemalloc() with Newx().
+  - Silenced some warnings.
+
+  [Documentation]
+  - Added a long note about Net::Pcap and signals delivery.
+  - Improved README.
+  - Mention Net::Pcap::Easy.
+
+  [Tests]
+  - Fixed t/17-lib_version.t to handle two digits versions.
+  - CPAN RT #44448: Fixed t/17-lib_version.t to handle versions from CVS,
+    thanks to Craig Davison.
+  - Refactored t/01-api.t and added checks for the new API.
+  - Replaced the fragile error check in t/03-openlive.t by a simpler and
+    more robust one.
+
+
+0.16 - 2008-01-01 - Sebastien Aperghis-Tramoni (SAPER)
+
+  [Bugfixes]
+  - A typo prevented the new function names from working.
+
+  [Tests]
+  - Added new tests: 21-next_ex.t, 22-open.t, 23-srcstr.t,
+    50-poe-component-pcap.t
+  - Added support for user prefered device. See README.
+  - Improved small bits of the tests here and there.
+
+
+0.15 - 2007-12-02 - Sebastien Aperghis-Tramoni (SAPER)
+
+  [Bugfixes]
+  - CPAN RT #30745: Fix WinPcap support.
+  - CPAN RT #25076: Fix next_ex().
+
+  [API]
+  - Now providing "pcap_"-prefixed aliases for all functions.
+    Documentation was changed to use these names instead of the old ones.
+
+  [Commands]
+  - pcapinfo(1) no longer need IO::Interface.
+
+  [Documentation]
+  - CPAN RT #27369: Several documentation fixes.
+  - CPAN RT #31111: Document that pcap_stats() does not work on savefiles.
+
+  [Tests]
+  - CPAN RT #30903: Fix t/03-openlive.t failure on Linux.
+
+
+0.15_01 - 2006-09-11 - Sebastien Aperghis-Tramoni (SAPER)
+
+  [Documentation]
+  - Improved documentation.
+
+  [Tests]
+  - Fixed small typo in warning message from t/podcover.t. Thanks to "Ani"
+    on FreeNode.
+
+  [Distribution]
+  - Rewrote the functions detection code using DynaLoader.
+  - Added example script eg/pktdump.pl
+
+
+0.14 - 2006-09-05 - Sebastien Aperghis-Tramoni (SAPER)
+
+  [Tests]
+  - Bumped the required version of Test::Pod::Coverage up to 1.08.
+
+  [Distribution]
+  - CPAN RT #21219: Now use a default flag.
+
+
+0.13 - 2006-08-29 - Sebastien Aperghis-Tramoni (SAPER)
+
+  [Code]
+  - Cleaned the typemap. Thanks to "Ani" on FreeNode for pointing.
+
+  [Documentation]
+  - Fixed small typo in README. Thanks to "Ani" on FreeNode.
+  - Fixed small error in open_live() example. Thanks to Cindy Teel and
+    Doug Baker.
+
+  [Tests]
+  - Fixed 05-dump.t, 10-fileno.t. Thanks to "Ani" on FreeNode.
+
+  [Distribution]
+  - Fixed compile option to use -Wall only for gcc. Thanks to Wolf-Dietrich
+    Fromm for pointing.
+  - Detection code can now handle IBM compiler. Thanks to Wolf-Dietrich
+    Fromm for the help.
+
+
+0.12 - 2006-03-19 - Sebastien Aperghis-Tramoni (SAPER)
+
+  [Bugfixes]
+  - Fixed stub for pcap_list_datalinks().
+  - Merged Jean-Louis Morel patch for Win32 and Cygwin.
+
+  [Features]
+  - Added wrappers for compile_nopcap(), get_selectable_fd(), next_ex()
+  - Merged wrappers from Net::Pcap 0.04.02 for WinPcap functions
+    createsrcstr(), parsesrcstr(), getevent(), open(), sendpacket(),
+    sendqueue_alloc(), sendqueue_queue(), sendqueue_transmit(), setbuff(),
+    setmintocopy(), setmode().
+  - Added wrapper for WinPcap function setuserbuffer().
+
+  [Code]
+  - Added missing short names for compile(), set_filter(), freecode()
+
+  [Tests]
+  - Rewrote t/20-constants.t because future versions of ExtUtils::Constant
+    will prevent the constant() function from being directly called.
+  - Added t/22-open.t, t/23-strsrc.t
+  - Updated t/03-openlive.t with diagnostics for FreeBSD and OpenBSD.
+
+  [Distribution]
+  - Fixed Makefile.PL so that pcapinfo is installed.
+
+
+0.11 - 2005-11-28 - Sebastien Aperghis-Tramoni (SAPER)
+
+  [Commands]
+  - Added the pcapinfo command.
+
+  [Documentation]
+  - Corrected a few typos thanks to Test::Spelling.
+  - Small documentation nits.
+
+  [Tests]
+  - Improved the whole test suite to make it use the best device it can find
+    (was needed for Cygwin & Win32).
+
+  [Distribution]
+  - Cygwin installation was simplified and should now Just Work.
+
+
+0.10 - 2005.11.01 - Sebastien Aperghis-Tramoni (SAPER)
+
+  [Bugfixes]
+  - lookupnet() wasn't exported by :functions.
+  - Fixed findalldevs() emulation.
+  - Replaced several newSViv() with newSVuv() to respect the actual unsigned
+    nature of several fields.
+
+  [Tests]
+  - Fixed 03-openlive.t for Darwin/Mac OS X.
+  - CPAN RT #15342: lookupnet() fails if the device returned by lookupdev()
+    has no IP configured. Thanks to
+  - CPAN RT #15343: warnings when running t/14-datalink.t
+  - Fixed another corner case in t/02-lookup.t thanks to Rafael Garcia-Suarez.
+  - t/Utils.pm now sets the environment locale to C. Thanks to Karl Y. Pradene.
+
+
+0.09 - 2005-10-26 - Sebastien Aperghis-Tramoni (SAPER)
+
+  [Bugfixes]
+  - Restored compatibility with older versions of libpcap, namely the
+    traditional ones founds on BSD systems.
+
+  [Features]
+  - Added Microsoft Visual C++ 7 compatibility, thanks to Max Maischen
+    and Jean-Louis Morel.
+
+  [Code]
+  - Added new detection routines for looking which functions are actually
+    available on the host system.
+  - Upgraded to Devel::PPPort 3.06_03
+
+  [Tests]
+  - Renamed t/CheckAuth.pm to t/Utils.pm, added function is_available().
+  - Changed the way the test utility module is loaded.
+  - Updated several test files so they skip the tests that depend on a
+    function that may be unavailable.
+  - Fixes several corner cases thanks to the benevolent testing of
+    Philippe Bruhat, David Morel and Scott Lanning.
+
+
+0.08 - 2005-10-05 - Sebastien Aperghis-Tramoni (SAPER)
+
+  [Bugfixes]
+  - CPAN RT #6320: loop() conflicts with alarm(). Thanks to Rafaël Garcia-Suarez
+    for the patch. Also applied to dispatch() and next().
+  - setnonblock() and getnonblock() now checks that $err is a reference.
+  - Merged Jean-Louis Morel patch: modification of the detection code in
+    Makefile.PL for Win32; fixes for compiling with Microsoft compiler;
+    simplification of lookupdev().
+  - Restored compatibility with Perl 5.6, 5.5 and 5.4
+  - Fixed memory leak in lookupdev().
+  - Some XS wrappers (compile(), dispatch(), stats()) now resets the error
+    string before calling the underlying functions.
+
+  [Features]
+  - Now tries to use XSLoader if available, then falls back to DynaLoader.
+  - Improved findalldevs(). See documentation.
+  - Added wrapper for freecode(), dump_flush(), dump_file().
+
+  [Tests]
+  - Updated t/05-dump.t, t/12-next.t in order to increase code coverage (94%).
+    What remains uncovered is cargo-cult defensive, hence untestable, code.
+  - Updated t/01-api.t, t/05-dump.t, t/08-filter.t, t/10-fileno.t,
+    t/13-dispatch.t, t/16-setnonblock.t
+  - Updated all test scripts in order to suppress warnings.
+  - Moved the the check whether pcap can be used in t/CheckAuth.pm and
+    added Win32 specific code, supplied by Jean-Louis Morel.
+  - Added t/rt-6320.t for checking the bugfix of CPAN RT #6320.
+  - Added t/distchk.t
+
+  [Distribution]
+  - Improved detection code in Makefile.PL.
+
+
+0.07 - 2005-09-23 - Sebastien Aperghis-Tramoni (SAPER)
+
+  [Bugfixes]
+  - CPAN RT #7455: Memory corruption when using Net::Pcap::Compile()
+  - Merged Win32 fix to pcap_lookupdev() from JLM/0.04.02
+
+  [Features]
+  - Added wrappers for lib_version(), open_dead(), set_datalink(),
+    datalink_name_to_val(), datalink_val_to_name(), datalink_val_to_description()
+  - Added support for all DLT_*, MODE_*, PCAP_* and useful BPF_*
+    numeric macros using ExtUtils::Constant.
+  - Added const qualifiers when appropriate.
+  - Added ppport.h
+
+  [Tests]
+  - Fixed scripts t/10-fileno.t,
+  - Added t/17-lib_version.t, t/18-open_dead.t, 19-breakloop.t
+  - Updated t/14-datalink.t
+
+  [Documentation]
+  - Updated documentation.
+
+  [Distribution]
+  - Added libpcap detection using have_library() from XML::LibXML::Common
+
+
+0.06 - 2005-09-15 - Sebastien Aperghis-Tramoni (SAPER)
+
+  [Features]
+  - CPAN RT #7594: added pcap_setnonblock() and pcap_getnonblock(). Thanks
+    to Ernesto Domat for the patch.
+  - Changed the warning returned by stats() in order to be uniform with
+    other similar warnings
+
+  [Documentation]
+  - CPAN RT #7671: documentation typo
+  - Updated the documentation.
+
+  [Tests]
+  - Completely rewrote the tests suite using Test::More and better
+    (and portable) methods to skip tests when appropriate.
+  - Added t/podcover.t, t/pod.t, t/portfs.t
+  - Added t/15-is_swapped.t, t/16-setnonblock.t
+
+  [Distribution]
+  - Updated Makefile.PL
+
+
+0.04.02 - 2003-09-03 - Jean-Louis Morel (JLMOREL) [based on 0.04, not released on CPAN]
+
+  - includes fixes for WinPcap
+  - added wrappers for several new libpcap functions
+  - added several WinPcap specific functions
+
+
+0.05 - 2003-06-16 - Marco Carnut (KCARNUT)
+
+  - includes fixes for Cygwin and WinPcap (see http://winpcap.polito.it/
+    and install the SDK)
+  - added wrapper for findalldevs()
+  - lookupdev() returns the first item from findalldevs()
+  - tests now pass under Cygwin by disabling the root user check
+
+
+0.04 - 2000-05-17 - Tim Potter (TIMPOTTER)
+
+  - now compiles and works with Perl 5.6.0
+
+
+0.03 - 1999.03.24 - Tim Potter (TIMPOTTER)
+
+  - complete rewrite using XS
+  - all pcap library functions fully implemented
+  - packet header and statistical information passed as Perl hashes
+  - added Pod documentation
+
+
+0.02 - 1998.12.06 - Bo Adler (BOADLER) [NOT RELEASED ON CPAN]
+
+  - update to make it work with libpcap 0.4
+  - fixed problem in stats() method call
+  - changed the arguments of the loop()/dispatch() callback to include
+    the pcap_hdr struct
+
+
+0.01 - 1997.08.27 - Peter Lister (PLISTER)
+
+  - initial implementation using SWIG
+

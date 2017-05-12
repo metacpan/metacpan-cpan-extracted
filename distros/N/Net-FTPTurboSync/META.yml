@@ -1,0 +1,33 @@
+--- #YAML:1.0
+name:               Net-FTPTurboSync
+version:            0.07
+abstract:           Perl extension for turbo-ftp-sync script
+author:
+    - Daneel <rtfm.rtfm.rtfm@gmail.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    base:                 2.14
+    Cwd:                  3.33
+    DBI:                  1.611
+    Exception::Class:     1.32
+    Exception::Class::Base:  1.32
+    Exception::Class::TryCatch:  1.12
+    File::Find:           1.14
+    Net::FTP:             2.77
+    Net::Netrc:           2.12
+    strict:               1.04
+    Test::More:           0.92
+    warnings:             1.06
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

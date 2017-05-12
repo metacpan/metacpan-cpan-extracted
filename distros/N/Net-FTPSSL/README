@@ -1,0 +1,293 @@
+Net-FTPSSL version 0.38
+=======================
+
+Net::FTPSSL is an object oriented Perl module which implements a simple
+FTPS client over a Secure Socket Layer (SSL) or Transport Layer Security (TLS)
+connection written following the directives described in RFC959 and RFC2228
+
+
+INSTALLATION
+=====================================================================
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+NOTE: "make test" will prompt you to answer questions.  But if you want to
+skip those tests, you can do "make test < /dev/null" and it will just skip
+over any tests requiring human input.
+
+To install this module in an alternate location do:
+
+   location=<install-location>
+   perl Makefile.PL INSTALL_BASE=${location}
+   make
+   make test
+   make install
+
+Then set PERL5LIB to "${location}/lib/perl5".
+
+TESTING
+=====================================================================
+
+There are 3 different test suites that actually attempt to talk to a FTPS
+server.  But the default is to skip these tests.
+
+The reason they are skipped by default is that there are no good default answers
+to use for these test cases.  So the test cases are deferred in case you don't
+have a server to test against during the install of this module.  You can always
+run the tests again at a later time.  I'm not exposing a test server to the
+public, so I have nothing exposed for these tests to run against.  So you must
+provide your own FTPS server if you want to run these tests.
+
+Also if you can't connect to a server, it doesn't necessarily mean that this
+module isn't working.  Most likely the server you are testing against requires
+additional SSL options before it will accept any connections from the client.
+That the assumptions made by these test programs just don't match your server's
+configuration.
+
+The most common reasons for failure is that your server requires a FTPS client
+to use specific SSL options that are not turned on by default by the test cases.
+These missing SSL options could prevent you from connecting to a server or
+prevent you from creating a data channel for transfering data with the server.
+If you think that this is the reason, see "perldoc IO::Socket::SSL" to review
+what SSL options are available.
+
+If you are able to log in via the test cases, then the test cases makes it's
+best attempt to figure out what options are required and the individual test
+cases should work.  But I'd need to see the log files generated to figure out
+why individual tests may fail.
+
+The 1st two tests assume that your FTPS server doesn't require certificates,
+and the 3rd one assumes that your FTPS server does require certificates.  If
+certificates are required, you'll have to modify the 3rd test script to point
+to your client certificate, see ithe instructions for that below.
+
+In most cases you'll probably only need to do one of the test cases to verify
+functionality.  Also all 3 test cases ask the same questions.
+
+
+TEST # 1 (of 3)  [t/05-readonly.t]
+
+This is just a series of simple connectivity tests of read-only FTPS commands.
+It doesn't attempt a full test of the FTPS protocall.  It also doesn't attempt
+to use a client certificate.  So skip this test if your servers requirea client
+certificates to work.
+
+The log file for this test is: t/05-readonly.log.txt
+
+
+TEST # 2 (of 3)  [t/10-complex.t]
+
+Skip this test if your FTPS server requires client certificates!
+
+If you perform this "deeper test", it will generate a few log files to
+help with troubleshooting what is going on.  Debug is always turned on for
+this test and written to a log file.  All log files match the pattern "*_new.*".
+The 3 main generated files are:
+   ./t/10-complex.txt            - The FTPSSL Debug log of all FTPSSL actions
+   ./t/FTPSSL.pm_new.txt         - Test ascii file downloaded
+   ./t/test_file_new.tar.gz      - Test binary file downloaded.
+
+   - Another custom trace log is created that is named after some of your
+   - responses to the questions.  This allows for easy comparisons between the
+   - responses of different servers using different options.  Without having to
+   - remember to save a copy of the original file yourself.
+
+   ./t/10-complex_log_new.${server}-${cmd_channel_encrpt_mode}-${data_encrypt_mode}-${ssl_tls_mode}.txt
+
+It also generates a few other miscellanious logs that can be basically ignored.
+They just exist to prove multiple instances of Net::FTPSSL do write to separate
+log files.
+
+During installation, you should only have to run the test once to verify
+functionality.  The need for extra tests are for when you need to troubleshoot
+specific FTPS servers that are having issues with this module.  Since some FTPS
+servers take unexpected liberties with resolving ambiguities in the FTP
+specifications.  And of course there can be bugs in this code as well.
+
+This test does the most detailed testing of this module.
+
+
+TEST # 3 (of 3)  [t/20-certificate.t]
+
+Skip this test if your FTPS server doesn't require client certificates!
+It will safely quit if you haven't updated the script yet. (t/20-certificate.t)
+
+This 3rd "Certificate Test" doesn't work out of the box.  You have to modify
+t/20-certificate.t 1st.  You'll need to modify a few lines of code.
+
+The code to change are key/tag values in the "%certificate" initialization.
+You will see comments above & below this initialization telling you that
+you are updating the correct section of code!
+
+The 3 key values to modify are:  SSL_cert_file, SSL_key_file, and SSL_Passwd_cb.
+
+If the server has a self signed certificate, SSL_verify_mode probably must be
+set to VERIFY_NONE().  So try out using VERIFY_PEER() 1st.  If it doesn't
+work out, swap it back to VERIFY_NONE().  If VERIFY_NONE() is used, then
+the test will gather the fingerprint of the server's certificate and
+then attempt to reset it to VERIFY_PEER().  Or you could modify the callback
+function to accept the certificate anyways.
+
+Once you make these changes, this test should work for you!
+
+You are on your own in obtaining the needed Client Certificate!
+
+
+TROUBLESHOOTING
+=====================================================================
+
+While support is very limited, a copy of the log file showing the problem
+generated by the test would be needed to help analyze what went wrong with
+talking to your particular FTPS server.
+
+For test # 2, the desired log file is called:
+     ./t/test_trace_log_new.txt
+           or
+     ./t/test_trace_log_new.*.txt
+
+For test # 3, the desired log file is called:
+     ./t/test_certificate.txt
+
+If these tests pass and it's your program that's failing, then I'd need a copy
+of a simple test program to demonstrate the error with Debug turned on and it's
+corresponding trace log.  You can turn on logging with the following command:
+        Net::FTPSSL->new(server, ..., Debug => 1, DebugLogFile => "myLog.txt");
+
+Then call:   $ftpssl->trapWarn();
+
+This is so that any warnings generated will also show up in the log file.  This
+will provide context to any warnings.
+
+Just be aware that a particular FTPS command may fail if your FTPS server
+doesn't support that command or if your login doesn't have enough permissions
+to perform the desired command on the FTPS server.
+
+If you are submitting a patch for consideration, please also provide the above
+trace file in case I can't duplicate the issue against the FTPS servers I have
+available to me for testing.
+
+For new functionality, it may help if you could temporarily grant me a login
+that I can test against.  Otherwise I may ask your help in beta testing new
+code.  My servers can't always support all possible configurations or
+behaviours.
+
+
+ADVANCED TROUBLESHOOTING
+=====================================================================
+
+Sometimes the logs to Net::FTPSSL are just not enough.  Sometimes it would be
+very helpful to see the IO::Socket::SSL trace as well.  The logging can be
+turned on statically or dynamically.  But the easiest way for submitting
+a CPAN ticket is statically as shown in the 1st example:
+
+   use IO::Socket::SSL qw (debug3):   # Turns on verbose SSL loging.
+   use Net::FTPSSL;
+
+   open (STDERR, "> myLogfile.txt");  # Redirects STDERR to this file.
+   $ftps = Net::FTPSSL->new ($server, ..., Debug=>1);
+   $ftps->trapWarn ();
+   ...
+
+This will mix writting the SSL trace & FTPSSL logs together to STDERR which
+is also redirected to the requested file.  Providing more inforamtion on what
+is happening with the connection to the server.  Just don't write to STDERR
+yourself in your test program!  It will confuse the log generated.
+
+But if you prefer, and you have a new enough version of IO-Socket-SSL,
+you can also toggle it at any time by setting:
+    $IO::Socket::SSL::DEBUG = 3;   # Turn on Full Logging to STDERR.
+         or
+    $IO::Socket::SSL::DEBUG = 0;   # Turn logging off again!
+
+Too bad there seems to be no way to redirect the SSL logs to a file of your
+choice without the above hack.
+
+You can also dynamically do this via:
+    $Net::SSLeay::trace = 4;   # Turn on Full Logging to STDERR & Warnings.
+         or
+    $Net::SSLeay::trace = 0;   # Turn logging off again!
+
+The good news about SSLeay is that anything it writes out is done as a
+warning.  So Net::FTPSSL can trap those debug statements.
+
+So if I can ever figure out a way to redirect the SSL logs to a file without
+the above STDERR hack, I'll implement a dynamic solution as an option to new().
+
+
+DEPENDENCIES
+=====================================================================
+
+This module requires these other modules and libraries:
+
+ Net::SSLeay
+ IO::Socket::SSL
+ File::Basename
+ Time::Local
+ Sys::Hostname
+ File::Copy
+ IO::Socket::INET
+
+If you are going to have to tunnel through a proxy server, the following module
+is also required:
+
+ Net::HTTPTunnel
+
+
+SMOKE TESTER ENVIRONMENT VARIABLES
+=====================================================================
+
+The test scripts honor the smoke tester's special environment variable
+for setting useful defaults where you have no server to test against.
+
+export PERL_MM_USE_DEFAULT=1
+
+You can get the same results by doing
+     make test < /dev/null
+
+The Makefile.PL script also honors this enviornment variable for it's
+Net::HTTPTunnel check.
+
+
+SPECIAL ENVIRONMENT VARIABLES FOR RUNNING THE TEST SCRIPTS
+=====================================================================
+
+Running these tests over and over again and answering all the prompts gets old
+real quick.  So many prompts in the test scripts allow you to define custom
+defaults via environment variables.  These variables are: (Unix format)
+
+export FTPSSL_SERVER=<your server>
+export FTPSSL_USER=<your user name>
+export FTPSSL_PWD=<your password>
+export FTPSSL_DIR=<defaut dir on server>
+export FTPSSL_MODE=<defaut Encryption mode on server>
+
+These variables are used if Net::HTTPTunnel is present
+export FTPSSL_PROXY_HOST=<your proxy server>
+export FTPSSL_PROXY_PORT=<your proxy port>
+export FTPSSL_PROXY_USER_PWD_REQUIRED=<Y|N>
+export FTPSSL_PROXY_USER=<your user name on the proxy server>
+export FTPSSL_PROXY_PWD=<your password on the proxy server>
+
+To turn on even more detailed logs for the reponse, you can set the following
+environment variable:
+export FTPSSL_DEBUG_LEVEL=1
+
+To turn this extra level of debugging back off again do:
+unset FTPSSL_DEBUG_LEVEL
+
+
+COPYRIGHT AND LICENCE
+=====================================================================
+
+Copyright (C) 2005 by Marco Dalla Stella
+Copyright (C) 2009 - 2017 by Curtis Leach
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,41 @@
+Revision history for Perl extension Net::SFTP::Foreign::Backend::Net_SSH2.
+
+0.09  Apr 28, 2012
+      - support authentication keys protected by passphrase
+
+0.08  Apr 16, 2012
+      - explicitly closes SFTP channel on DESTROY
+      - load Net::SSH2 when module is loaded, not from new
+      - not all versions of Net::SSH2 support LIBSSH2_ERROR_EAGAIN
+      - queue_size default was using the wrong key name and so being
+        ignored
+
+0.07  Feb 19, 2011
+      - better debugging
+
+0.06  Sep 5, 2011
+      - workaround for EAGAIN errors in blocking session
+
+0.05  Jul 13, 2011
+      - key_path handling was broken
+      - use process user as login user when available
+      - increment default queue_size to 32
+
+0.04  Jul 2, 2011
+      - add _after_init method required by newer Net::SFTP::Foreign
+        versions
+      - infer publickey from privatekey
+      - accept key_path as an alias for privatekey
+
+0.03  Nov 2, 2010
+      - backend was not pipelining requests when called from put
+        method
+
+0.02  Sep 22, 2010
+        - _conn_lost was used but not implemented (bug report by
+          Philippe Vouters)
+
+0.01  Wed Dec  9 18:45:55 2009
+	- original version; created by h2xs 1.23 with options
+		-AXn Net::SFTP::Foreign::Backend::Net_SSH2
+

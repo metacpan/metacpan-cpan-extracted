@@ -1,0 +1,11 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/Net/Pager.pm
+lib/Net/Pager/Common.pm
+lib/Net/Pager/Request.pm
+lib/Net/Pager/Response.pm
+eg/servicelist.pl
+eg/checkstatus.pl
+eg/sendpage.pl

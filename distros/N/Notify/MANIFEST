@@ -1,0 +1,11 @@
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+Notify.pm
+Notify/Email.pm
+Notify/NoticePool.pm
+Notify/Notice.pm
+t/noticepool.t
+t/email.t
+mbox

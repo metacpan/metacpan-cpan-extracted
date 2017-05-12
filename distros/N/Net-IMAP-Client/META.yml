@@ -1,0 +1,28 @@
+---
+abstract: 'Not so simple IMAP client library'
+author:
+  - 'Mihai Bazon <mihai.bazon@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.140640'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-IMAP-Client
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: '0'
+  Encode::MIME::Header: '0'
+  IO::Socket::INET: '0'
+  IO::Socket::SSL: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Test::More: '0'
+version: '0.9505'

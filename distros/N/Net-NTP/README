@@ -1,0 +1,38 @@
+Net::NTP
+========
+
+This module will allow you to send a packet to an NTP server, get 
+a response back, and then parse out the results according to RFC1305 
+and RFC2030.
+
+There is a test script located in the eg directory for your use.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Time::HIRes
+    IO::Socket
+    Carp
+    Exporter
+
+COPYRIGHT AND LICENCE
+
+Copyright 2009 by Ask Bjørn Hansen
+
+Copyright 2004 by James G. Willmore
+
+Special thanks to Ralf D. Kloth E<lt>ralf (at) qrq.de<gt> 
+for the code to decode NTP packets.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

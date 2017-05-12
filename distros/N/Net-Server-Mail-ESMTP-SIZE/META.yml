@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Net-Server-Mail-ESMTP-SIZE
+version:             0.02
+abstract:            add support for the SIZE ESMTP extension to Net::Server::Mail
+license:             perl
+author:              
+    - Jose Luis Martinez (jlmartinez@capside.com)
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Net::Server::Mail:             0.13
+    Test::Simple:                  0.44
+    Test::SMTP:                    0.02
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,74 @@
+========== version history of Net::Domain::TMCH
+
+Work in progress:
+	- support writing of SMD information
+
+version 0.18: Wed 30 Dec 16:32:08 CET 2015
+
+	Fixes:
+	- remove unused dependency to Digest::SHA2
+	  rt.cpan.org#110582 [AEvar Arnfjord Bjarmason]
+
+	Changes:
+	- by default also produce WRITER capability
+
+	Improvements:
+	- changed documentation style
+
+version 0.17: Mon Jan 13 13:29:05 CET 2014
+	Fixes:
+	- test-scripts used external crl [cpantesters]
+
+	Improvements:
+	- add test examples of 2013/11/25 [Gilles Quenot]
+
+version 0.16: Thu Nov 14 11:22:03 CET 2013
+	Fixes:
+	- move ::SMD::File::smdID() into ::SMD [Mark Hofstetter]
+	- ::TMCH::CRL from uri error message [cpantesters]
+
+	Improvements
+	- add ::TMCH::CRL::fromString()  [Mark Hofstetter]
+
+version 0.15: Thu Nov  7 00:12:27 CET 2013
+
+	Fixes:
+	- pass SMD as string broke at isa() [Mark Hofstetter]
+	- pick correct certificate from SMD
+
+	Improvements:
+	- moved to test-set 2 Oct 2013
+	- bin/tmch new option --tmvrl 
+	- withdrawn TMV certs in pilot have other URI
+	- include current test-set as tar in test/
+	- add test/README
+	- removed docs/*pdf from the distribution
+
+version 0.14: Mon Oct 28 11:10:30 CET 2013
+	Improvements:
+	- move from(), until(), fromTime(), and untilTime() from ::SMD::File
+	  to its base-class ::SMD.
+
+version 0.13: Mon Oct 28 10:53:32 CET 2013
+	Changes:
+	- moved ::SMD into ::SMD::Schema
+
+	Improvements:
+	- a bit more documentation in SYNOPSIS
+	- extracted generic base-class ::SMD from ::SMD::File
+	- accept EPP and strings as source for ::SMD
+	- internal ::SMD::File::_dateTime() becomes ::SMD::dateTime,
+	  and returns a DateTime object.
+	- new ::SMD::File::fromDateTime() and untilDateTime()
+
+version 0.12: Mon Oct 14 09:55:04 CEST 2013
+	Improvements:
+	- a bit more documentation.
+	- better documentation footer.
+
+version 0.11: Fri Oct 11 16:02:33 CEST 2013
+	- new option $tmch->smd(trust_certificates)
+	- report error when file does not contain smd
+
+version 0.10: Sun Sep 22 23:05:26 CEST 2013
+	- initial

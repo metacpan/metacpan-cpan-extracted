@@ -1,0 +1,21 @@
+These patches find bugs or enhance the functionality of the
+Net::FTPServer package. Some or all of them might be included
+eventually in newer versions of Net::FTPServer.
+
+* DirHandle-rmdir-bug.patch
+
+This patch fixes a bug in some rmdir() calls, that choke with dirs
+ending in '/'. This has been observed in Mac OS X 10.1.5 but might be
+present in other OSes. This patch can be applied to
+lib/Net/FTPServer/Full/DirHandle.pm in the distribution for
+Net::FTPServer-1.111. It is expected that later versions include the
+patch.
+
+* FTPServer-chdir-rule.patch
+
+This patch adds a "chdir rule" to the config. This rule is invoked
+before CWD and CDUP, allowing finer control upon where a user is
+allowed to wander without resorting to permissions.
+
+$Id: README,v 1.3 2002/10/18 20:15:10 lem Exp $
+

@@ -1,0 +1,8 @@
+there's only one example at the moment:
+
+FileWriter
+----------
+Simply start it (after module-installation) with 'perl shoutcast_client.pl'.
+It receives some stations that are defined in the 'shoutcast_client.pl' file,
+and saves the mp3-data (with IDv1-Tags). 
+

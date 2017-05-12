@@ -1,0 +1,9 @@
+v1.0.0  2013-07-15
+        First release.
+v1.0.1  2013-12-09
+        Fixed some tests to work in cases where dogstatsd is not available.
+v1.0.2  2013-12-12
+        Updated to be backwards compatible with Perl v5.8.x.
+v1.0.3  2015-03-21
+        Updated 'negative sample rate' tests. Increased test coverage.
+        Cleaned up documentation.

@@ -1,0 +1,13 @@
+Revision history for Net-LDAP-posixGroup
+
+0.0.2	2011-07-01/04:20
+		-Add missing dependency in Makefile.PL.
+
+0.0.1	2009-09-02/10:30
+		-'create' no long errors if no members are to be added to the group.
+		-'create' no long creates it with a blank cn.
+		-'create' correct the object class.
+
+0.0.0   2008-09-30/19:50
+        First version, released on an unsuspecting world.
+

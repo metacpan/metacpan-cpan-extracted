@@ -1,0 +1,33 @@
+---
+abstract: unknown
+author:
+  - 'WATANABE Hiroaki <hwat@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-NicoVideo
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI::Simple: 0
+  Class::Accessor::Fast: 0
+  Encode: 0
+  HTML::Parser: 3.00
+  HTTP::Cookies: 0
+  HTTP::Request::Common: 0
+  JSON: 2.01
+  LWP::UserAgent: 0
+  Test::More: 0.32
+  XML::FeedPP: 0
+  XML::TreePP: 0
+  perl: 5.008001
+version: 0.28

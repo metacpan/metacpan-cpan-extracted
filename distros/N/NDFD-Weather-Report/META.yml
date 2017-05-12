@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                NDFD::Weather::Report
+version:             1.00
+abstract:            Interface to NDFD Web Services
+license:             ~
+author:              
+    - Mahesh Raghunath
+generated_by:  
+distribution_type:   module
+requires:     
+    SOAP::Lite:                     0.715
+    XML::Simple: 					2.18
+    LWP::Simple:					6.00
+    warnings:                       0
+	
+meta-spec:
+    url:     
+    version: 1.0

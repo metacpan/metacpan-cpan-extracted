@@ -1,0 +1,13 @@
+Revision history for Net-SSH-Tunnel
+
+0.04    2013/12/30
+        Updating POD per Uncle Bob's style
+
+0.03	2012/10/7
+		Refactored option handling
+
+0.02    2012/09/19
+        Added more info in the synopsis
+
+0.01    2012/09/17
+        Initial release

@@ -1,0 +1,16 @@
+Makefile.PL
+MANIFEST
+README
+TODO
+t/00-load.t
+pwp-dictionary
+bin/pwp-ftpd.pl
+ftpd-changes.conf
+lib/Net/FTPServer/PWP.pm
+lib/Net/FTPServer/PWP/Server.pm
+lib/Net/FTPServer/PWP/Handle.pm
+lib/Net/FTPServer/PWP/DirHandle.pm
+lib/Net/FTPServer/PWP/FileHandle.pm
+patches/README
+patches/DirHandle-rmdir-bug.patch
+patches/FTPServer-chdir-rule.patch

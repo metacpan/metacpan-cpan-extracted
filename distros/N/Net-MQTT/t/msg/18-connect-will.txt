@@ -1,0 +1,16 @@
+$args =
+{
+ message_type => MQTT_CONNECT,
+ client_id => 'mosquitto_sub_10888',
+ will_flag => 1,
+ will_qos => MQTT_QOS_AT_LEAST_ONCE,
+ will_retain => 1,
+ will_topic => 'topic',
+ will_message => 'msg',
+}
+
+10 2d 00 06  4d 51 49 73    64 70 03 2e  00 3c 00 13
+6d 6f 73 71  75 69 74 74    6f 5f 73 75  62 5f 31 30
+38 38 38 00  05 74 6f 70    69 63 00 03  6d 73 67
+
+Connect/at-most-once MQIsdp/3/mosquitto_sub_10888 will=topic,"msg",1,at-least-once 

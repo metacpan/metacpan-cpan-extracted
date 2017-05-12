@@ -1,0 +1,310 @@
+
+==> Request
+POST http://rwhois.domain-registry.nl/whois
+Connection: open
+Content-Type: text/xml; charset="utf-8"
+X-Net-Whois-SIDN: 0.95
+
+<?xml version="1.0" encoding="UTF-8"?>
+<whois-query xmlns="http://rxsd.domain-registry.nl/sidn-whois-drs50">
+  <lang>NL</lang>
+  <domain>sidn.nl</domain>
+</whois-query>
+
+--> Response
+HTTP/1.0 200 Document follows
+Connection: close
+Pragma: no-cache
+Server: whoisd-reg 5.0.10 app0i.sidn.local
+Content-Language: nl
+Content-Length: 4004
+Content-Type: text/xml; charset='utf-8'
+Client-Date: Thu, 26 Aug 2010 06:45:45 GMT
+Client-Peer: 94.198.154.139:80
+Client-Response-Num: 1
+
+<?xml version="1.0" encoding="UTF-8"?>
+<whois-response xmlns="http://rxsd.domain-registry.nl/sidn-whois-drs50">
+  <domain name="sidn.nl" view="isp">
+    <date>2010-08-26T06:45:45.31923Z</date>
+    <status>
+      <code>active</code>
+      <explain lang="nl-NL" format="plain">sidn.nl is actief</explain>
+    </status>
+    <registrar>Stichting Internet Domeinregistratie Nederland</registrar>
+    <contact role="admin">HAM003802-SIDN2</contact>
+    <contact role="tech">PIJ001675-SIDN2</contact>
+    <contact role="registrant">STI044010-SIDN2</contact>
+    <nameserver in-zone="true">ns1.sidn.nl</nameserver>
+    <nameserver in-zone="true">ns2.sidn.nl</nameserver>
+    <nameserver in-zone="false">open.nlnetlabs.nl</nameserver>
+    <registered>1999-11-18+01:00</registered>
+    <last-change>2010-01-19+01:00</last-change>
+  </domain>
+  <registrar>
+    <date>2010-08-26T06:45:45Z</date>
+    <name>Stichting Internet Domeinregistratie Nederland</name>
+    <address>
+      <street>Utrechtseweg 310</street>
+      <postal-code>6812AR</postal-code>
+      <city>ARNHEM</city>
+      <country-code>NL</country-code>
+      <country lang="nl-NL">Nederland</country>
+    </address>
+  </registrar>
+  <contact id="HAM003802-SIDN2" view="all">
+    <date>2010-08-26T06:45:45Z</date>
+    <name>G.J. van den Ham</name>
+    <email>support@sidn.nl</email>
+    <voice>+31.263525555</voice>
+  </contact>
+  <contact id="PIJ001675-SIDN2" view="all">
+    <date>2010-08-26T06:45:45Z</date>
+    <name>Jan van Pijkeren</name>
+    <email>support@sidn.nl</email>
+    <voice>+31.263525555</voice>
+    <address>
+      <street>Utrechtseweg 310</street>
+      <postal-code>6812AR</postal-code>
+      <city>ARNHEM</city>
+      <country-code>NL</country-code>
+      <country lang="nl-NL">Nederland</country>
+    </address>
+  </contact>
+  <contact id="STI044010-SIDN2" view="all">
+    <date>2010-08-26T06:45:45Z</date>
+    <name>Stichting Internet Domeinregistratie Nederland</name>
+    <email>support@sidn.nl</email>
+    <voice>+31.0263525555</voice>
+    <address>
+      <street>Utrechtseweg 310</street>
+      <postal-code>6812AR</postal-code>
+      <city>ARNHEM</city>
+      <country-code>NL</country-code>
+      <country lang="nl-NL">Nederland</country>
+    </address>
+  </contact>
+  <nameserver host="ns1.sidn.nl">
+    <date>2010-08-26T06:45:45Z</date>
+    <ipv6-address>2a00:d78:0:147:94:198:152:68</ipv6-address>
+    <ipv4-address>94.198.152.68</ipv4-address>
+  </nameserver>
+  <nameserver host="ns2.sidn.nl">
+    <date>2010-08-26T06:45:45Z</date>
+    <ipv4-address>194.171.17.5</ipv4-address>
+    <ipv6-address>2001:610:0:800d::5</ipv6-address>
+  </nameserver>
+  <nameserver host="open.nlnetlabs.nl">
+    <date>2010-08-26T06:45:45Z</date>
+    <ipv6-address>2001:7b8:206:1::53</ipv6-address>
+    <ipv4-address>213.154.224.1</ipv4-address>
+  </nameserver>
+  <signature>
+    <maintainer lang="nl-NL" format="plain">NL Domain Registry</maintainer>
+    <copyright lang="nl-NL" format="plain">Auteursrechtvoorbehoud
+Niets uit deze publicatie mag zonder voorafgaande uitdrukkelijke
+toestemming van SIDN worden verveelvoudigd, openbaar gemaakt, worden
+opgeslagen in een gegevensbestand of worden overgezonden, in welke
+vorm dan ook, elektronisch, mechanisch, door middel van opname of
+anderszins. Voor registrars geldt dit voorbehoud onverkort, behoudens
+redelijkerwijs noodzakelijke verveelvoudigingen of openbaarmakingen
+ten behoeve van de werkzaamheden van registrars, zoals vermeld in de
+'Algemene voorwaarden voor registrars'.
+
+Elk gebruik van deze informatie voor commerciele of reclamedoeleinden of
+soortgelijke activiteiten, is expliciet verboden en tegen overtreding van
+dat verbod zal worden opgetreden. Stichting Internet Domeinregistratie
+Nederland (SIDN) verzoekt te worden geinformeerd bij constatering van
+dergelijke activiteiten of enig vermoeden daarvan.
+Copyrights: Stichting Internet Domeinregistratie Nederland (SIDN)
+Auteurswet, geschriftenbescherming (art. 10 lid 1 sub 1).
+</copyright>
+  </signature>
+</whois-response>
+
+--> Perl structure
+$VAR1 = {
+  registrar => {
+    date => '2010-08-26T06:45:45Z',
+    name => 'Stichting Internet Domeinregistratie Nederland',
+    address => {
+      country => {
+        format => 'plain',
+        lang => 'nl-NL',
+        _ => 'Nederland'
+      },
+      city => 'ARNHEM',
+      format => 'plain',
+      postal_code => '6812AR',
+      country_code => 'NL',
+      street => [
+        'Utrechtseweg 310'
+      ]
+    }
+  },
+  domain => {
+    registered => '1999-11-18+01:00',
+    last_change => '2010-01-19+01:00',
+    status => {
+      explain => {
+        format => 'plain',
+        lang => 'nl-NL',
+        _ => 'sidn.nl is actief'
+      },
+      code => 'active'
+    },
+    date => '2010-08-26T06:45:45.31923Z',
+    name => 'sidn.nl',
+    contact => [
+      {
+        role => 'admin',
+        _ => 'HAM003802-SIDN2'
+      },
+      {
+        role => 'tech',
+        _ => 'PIJ001675-SIDN2'
+      },
+      {
+        role => 'registrant',
+        _ => 'STI044010-SIDN2'
+      }
+    ],
+    nameserver => [
+      {
+        in_zone => 1,
+        _ => 'ns1.sidn.nl'
+      },
+      {
+        in_zone => 1,
+        _ => 'ns2.sidn.nl'
+      },
+      {
+        in_zone => 0,
+        _ => 'open.nlnetlabs.nl'
+      }
+    ],
+    registrar => 'Stichting Internet Domeinregistratie Nederland',
+    view => 'isp'
+  },
+  signature => {
+    maintainer => {
+      format => 'plain',
+      lang => 'nl-NL',
+      _ => 'NL Domain Registry'
+    },
+    copyright => {
+      format => 'plain',
+      lang => 'nl-NL',
+      _ => 'Auteursrechtvoorbehoud
+Niets uit deze publicatie mag zonder voorafgaande uitdrukkelijke
+toestemming van SIDN worden verveelvoudigd, openbaar gemaakt, worden
+opgeslagen in een gegevensbestand of worden overgezonden, in welke
+vorm dan ook, elektronisch, mechanisch, door middel van opname of
+anderszins. Voor registrars geldt dit voorbehoud onverkort, behoudens
+redelijkerwijs noodzakelijke verveelvoudigingen of openbaarmakingen
+ten behoeve van de werkzaamheden van registrars, zoals vermeld in de
+\'Algemene voorwaarden voor registrars\'.
+
+Elk gebruik van deze informatie voor commerciele of reclamedoeleinden of
+soortgelijke activiteiten, is expliciet verboden en tegen overtreding van
+dat verbod zal worden opgetreden. Stichting Internet Domeinregistratie
+Nederland (SIDN) verzoekt te worden geinformeerd bij constatering van
+dergelijke activiteiten of enig vermoeden daarvan.
+Copyrights: Stichting Internet Domeinregistratie Nederland (SIDN)
+Auteurswet, geschriftenbescherming (art. 10 lid 1 sub 1).
+'
+    }
+  },
+  contact => [
+    {
+      voice => '+31.263525555',
+      email => 'support@sidn.nl',
+      view => 'all',
+      date => '2010-08-26T06:45:45Z',
+      name => 'G.J. van den Ham',
+      id => 'HAM003802-SIDN2'
+    },
+    {
+      voice => '+31.263525555',
+      email => 'support@sidn.nl',
+      view => 'all',
+      date => '2010-08-26T06:45:45Z',
+      name => 'Jan van Pijkeren',
+      id => 'PIJ001675-SIDN2',
+      address => {
+        country => {
+          format => 'plain',
+          lang => 'nl-NL',
+          _ => 'Nederland'
+        },
+        city => 'ARNHEM',
+        format => 'plain',
+        postal_code => '6812AR',
+        country_code => 'NL',
+        street => [
+          'Utrechtseweg 310'
+        ]
+      }
+    },
+    {
+      voice => '+31.0263525555',
+      email => 'support@sidn.nl',
+      view => 'all',
+      date => '2010-08-26T06:45:45Z',
+      name => 'Stichting Internet Domeinregistratie Nederland',
+      id => 'STI044010-SIDN2',
+      address => {
+        country => {
+          format => 'plain',
+          lang => 'nl-NL',
+          _ => 'Nederland'
+        },
+        city => 'ARNHEM',
+        format => 'plain',
+        postal_code => '6812AR',
+        country_code => 'NL',
+        street => [
+          'Utrechtseweg 310'
+        ]
+      }
+    }
+  ],
+  nameserver => [
+    {
+      cho_ipv4_address => [
+        {
+          ipv6_address => '2a00:d78:0:147:94:198:152:68'
+        },
+        {
+          ipv4_address => '94.198.152.68'
+        }
+      ],
+      date => '2010-08-26T06:45:45Z',
+      host => 'ns1.sidn.nl'
+    },
+    {
+      cho_ipv4_address => [
+        {
+          ipv4_address => '194.171.17.5'
+        },
+        {
+          ipv6_address => '2001:610:0:800d::5'
+        }
+      ],
+      date => '2010-08-26T06:45:45Z',
+      host => 'ns2.sidn.nl'
+    },
+    {
+      cho_ipv4_address => [
+        {
+          ipv6_address => '2001:7b8:206:1::53'
+        },
+        {
+          ipv4_address => '213.154.224.1'
+        }
+      ],
+      date => '2010-08-26T06:45:45Z',
+      host => 'open.nlnetlabs.nl'
+    }
+  ]
+};

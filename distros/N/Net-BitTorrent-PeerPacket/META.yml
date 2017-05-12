@@ -1,0 +1,14 @@
+---
+name: Net-BitTorrent-PeerPacket
+version: 1.2
+author:
+  - josh mcadams
+abstract: Peer packet parse and create implementation
+license: perl
+requires:
+  Carp: 0
+provides:
+  Net::BitTorrent::PeerPacket:
+    file: lib/Net/BitTorrent/PeerPacket.pm
+    version: 1.2
+generated_by: Module::Build version 0.2612

@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/NetStumbler-Speech.t
+lib/NetStumbler/Speech.pm
+META.yml
+Build.PL

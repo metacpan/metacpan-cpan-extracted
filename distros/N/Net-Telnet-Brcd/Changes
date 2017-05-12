@@ -1,0 +1,49 @@
+Revision history for Perl extension Net::Telnet::Brcd.
+
+1.12 Sat Jul  3 22:05:32 CEST 2010
+	- Add support of FabOS 6.3.1a and 5100 switch.
+
+0.19 Tue Aug 14 18:36:28 DFT 2007
+	- Debug cfgSave, change design of code to be easy portable
+	  for SSH. Net::Brcd content a wrapper for some Brocade
+	  command and Net::Telnet::Brcd command function for
+	  Telnet protocol. It could be possible to create module
+	  Net::SSH::Brcd with the same design as Net::Telnet::Brcd.
+	  I think I would use Net::SSH::Perl to code the Net::SSH::Brcd
+	  part.
+
+0.18 Mon Jun 11 18:37:55 DFT 2007
+	- Debug, switchShow for BROCADE 48000 (FC address)
+
+0.17  Wed May 16 22:08:59 DFT 2007
+	- Add new function getline to read interactive command
+	  I code this function for portperfshow command.
+
+0.16  Wed May 16 22:08:59 DFT 2007
+	- Change documentation
+
+0.15  Mon Apr  2 14:33:17 DFT 2007
+	- Add cfgsave function
+	- Use exception if errors. Need to use eval {}; block
+	  to ignore errors
+    - Add option -filter for zoneShow
+
+0.14  Fri Mar 30 23:16:29 DFT 2007
+	- Documentation improvment for cmd command
+	- Now, cmd automatically answer 'yes' to cfgsave or cfgenable 
+	  command. It could be dangerous but so usefull for scripts.
+
+0.13  Fri Mar 28 23:16:29 DFT 2007 
+    - Now, aliShow support multiple WWN for one alias name
+	- Documentation is know in English. Please help me.
+	- Module is now tested on :
+	  48000, 4100, 320B : FabOS 5.2.0a
+	  12000: FabOS 4.4.0e
+	  3800: FabOS 3.2
+	  AP7420: XPathOS 7.4
+	  Hard job for functions switchShow an fabricShow
+
+0.01  Tue Feb 28 09:04:15 2006
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Net::Telnet::Brcd
+

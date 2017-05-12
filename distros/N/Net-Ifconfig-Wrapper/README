@@ -1,0 +1,52 @@
+Net::IfConfig::Wrapper
+======================
+
+This module can be used to call the ifconfig command on different Unix systems
+and Windows NT systems.
+
+It provided a unified way to obtain info from ifconfig, create and delete
+the IP aliases on interfaces, etc.
+
+At certain times in the past, this module was tested (successfully) on the following OSes and versions:
+
+CentOS 7.1
+FreeBSD 4.7
+FreeBSD 4.8
+FreeBSD 5.3
+FreeBSD 6.2
+FreeBSD 7.2
+OpenBSD 3.1
+OS X 10.3 (aka Panther)
+OS X 10.4 (aka Tiger)
+OS X 10.5 (aka Leopard)
+RedHat 6.2
+RedHat 7.3
+RedHat 8.0
+Solaris 7
+Windows 2000 Pro
+Windows XP Pro
+Windows 7
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+POSIX
+Win32::API      (on Win32 or cygwin)
+Win32::WinError (on Win32 or cygwin)
+
+COPYRIGHT AND LICENCE
+
+Copyright: Daniel Podolsky <tpaba@cpan.org>, 2003
+Licence:   Same as perl itself
+
+21 Jan 2003, Daniel Podolsky <tpaba@cpan.org>

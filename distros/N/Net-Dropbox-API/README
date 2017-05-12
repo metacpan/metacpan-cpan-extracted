@@ -1,0 +1,64 @@
+Net::Dropbox::API
+=================
+
+Net::Dropbox::API is a perl interface to the Dropbox API. Find details about
+the Dropbox API on: https://www.dropbox.com/developers
+
+The Dropbox API is a OAuth based API. I try to abstract as much away as
+possible so you should not need to know too much about it.  This is how
+it works:
+
+   use Net::Dropbox::API;
+
+   my $box = Net::Dropbox::API->new({key => 'KEY', secret => 'SECRET'});
+   my $login_link = $box->login; # user needs to click this link and login
+   $box->auth;                   # oauth keys get exchanged
+   my $info = $box->info;        # and here we have our account info
+
+See the examples for a working Mojolicious web client using the Dropbox
+API.
+
+INSTALLATION
+------------
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+-------------------------
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::Dropbox
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Dropbox
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-Dropbox
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-Dropbox
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-Dropbox/
+
+
+COPYRIGHT AND LICENCE
+---------------------
+
+Copyright (C) 2010 Lenz Gschwendtner
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

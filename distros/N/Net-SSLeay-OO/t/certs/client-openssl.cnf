@@ -1,0 +1,26 @@
+# Configuration file
+
+RANDFILE               = $ENV::HOME/.rnd
+
+[ req ]
+default_bits           = 1024
+default_keyfile        = keyfile.pem
+distinguished_name     = req_distinguished_name
+attributes             = req_attributes
+prompt                 = no
+req_extensions = v3_req # Extensions to add to certificate request
+
+[ req_distinguished_name ]
+C                      = NZ
+ST                     = Test State or Province
+L                      = Test Locality
+O                      = Organization Name
+OU                     = Organizational Unit Name
+CN                     = Test Client
+#emailAddress           = client@example.com
+
+[ req_attributes ]
+challengePassword              = A challenge password
+
+ [ v3_req ]
+subjectAltName=DNS:www.example.com,DNS:www2.example.com

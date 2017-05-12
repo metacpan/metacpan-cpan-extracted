@@ -1,0 +1,34 @@
+0.007     2011-10-30 04:53:16 Europe/London
+	Just try to load and use Test::postgresql if we have it, and skip tests if it fails for
+	any reason - seems to be no guarantee that it will succeed in starting the PostgreSQL
+	server instance even if it is installed and passed all the tests.
+
+	No functional changes here (should perhaps just be a development release).
+
+0.006     2011-10-28 04:19:11 Europe/London
+	Set up local PostgreSQL instance via Test::postgresql so we can run proper tests against
+	a server rather than just checking method handling basics. Big thanks to Kazuho Oku for
+	providing the Test::postgresql module, and Matt Trout for directing me to it.
+
+	No functional changes here.
+
+0.005     2011-07-16 22:43:10 Europe/London
+	Support new event handling brought in by Protocol::PostgreSQL 0.008
+	Moved Protocol::PostgreSQL::Client into an attribute rather than an ancestor
+	of our class, so we now proxy most of the methods through including
+	->add_handler_for_event
+
+0.004     2011-06-11 17:44:06 Europe/London
+	Pass through service parameter so that we can connect to ports other than the default 5432.
+	Provide a ->terminate method for clean shutdown.
+
+0.003     2011-02-26 19:01:57 Europe/London
+	Update synopsis to use ->configure and increase minimum version requirement.
+
+0.002     2011-02-22 20:49:19 Europe/London
+	Fix a nasty packet-boundary bug and chuck in a synopsis.
+
+0.001     2011-02-12 12:44:52 Europe/London
+	Preliminary release to CPAN. Only supports the basic query interface and no type handling
+	yet, but allows basic queries and connection via plaintext or MD5.
+

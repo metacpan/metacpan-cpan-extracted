@@ -1,0 +1,131 @@
+NAME
+    Net::OpenAMD - Perl interface to the OpenAMD API
+
+VERSION
+    This document describes Net::OpenAMD version 0.0.3
+
+SYNOPSIS
+        use Net::OpenAMD;
+
+        my $amd = Net::OpenAMD->new();
+
+        my $location = $amd->location({ area => 'Engressia' });
+
+DESCRIPTION
+    This module is to make it easy to grab information from the OpenAMD
+    project at The Next Hope.
+
+    http://wiki.hope.net/Attendee_Meta-Data
+
+    http://amd.hope.net/
+
+    http://amd.hope.net/2010/05/openamd-api-released-v1-1-1/
+
+    http://travisgoodspeed.blogspot.com/2010/06/hacking-next-hope-badge.html
+
+INTERFACE
+  new
+    Create a new object for accessing the OpenAMD API.
+
+        my $amd = Net::OpenAMD->new( $options );
+
+    $options is a hashref with configuration options.
+
+    Current options are
+
+    base_uri
+        A URL to the API, currently defaults to https://api.hope.net/api/
+
+        Most likely it should end with a / to make URI happy, so notice that
+        if you are having 404 errors you don't expect.
+
+    ua  Should be a pre-configured LWP::UserAgent or similar that returns a
+        HTTP::Response object when its get method is called with a URI.
+
+  get
+    This is the main method, although probably never used. It has
+    better/easier ways to access the different actions of the API.
+
+        my $data = $amd->get( $action, $params );
+
+    $params are anything that are supported by URI->query, they will get
+    passed on the request.
+
+    Here $data is a the JSON returned by the API converted to Perl
+    reference.
+
+    Helper methods you can call as $amd->method($params) are:
+
+    interests
+    location
+    new
+    speakers
+    stats
+    talks
+    users
+
+    Unless specified, there is nothing different about any of the action
+    methods than just calling get($action) instead. Depending on API
+    changes, this may not always be the case.
+
+DIAGNOSTICS
+    All methods should croak when an error occurs. If the remote API returns
+    a successful response that contains valid JSON, that will be decoded and
+    returned.
+
+CONFIGURATION AND ENVIRONMENT
+    Net::OpenAMD requires no configuration files or environment variables.
+
+    Net::OpenAMD uses LWP::UserAgent for requests and environment for that
+    is not cleared.
+
+DEPENDENCIES
+   LWP::UserAgent
+   URI
+   Net::OAuth
+   JSON::Any
+INCOMPATIBILITIES
+    None reported.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Currently it does not support the OAuth that is required to log into the
+    API and get information.
+
+    Please report any bugs or feature requests to
+    "bug-net-openamd@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
+
+AUTHOR
+    Andrew Fresh "<andrew@cpan.org>"
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2010, Andrew Fresh "<andrew@cpan.org>". All rights
+    reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

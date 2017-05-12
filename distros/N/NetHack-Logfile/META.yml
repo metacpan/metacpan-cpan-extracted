@@ -1,0 +1,12 @@
+--- 
+abstract: Parse and create NetHack logfiles
+author: 
+  - Shawn M Moore <sartak@gmail.com>
+generated_by: Dist::Zilla::Plugin::MetaYaml version 1.004
+license: perl
+name: NetHack-Logfile
+requires: 
+  Moose: 0.78
+  MooseX::Attributes::Curried: 0.02
+  Sub::Exporter: 0.01
+version: 1.00

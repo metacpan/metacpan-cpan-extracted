@@ -1,0 +1,59 @@
+Revision history for Perl extension Net::ManageSieve.
+
+0.13	Mon Jan  4 11:44:52 CET 2016
+	-fix: Escape braces in regexp / Debian bug#809102 / CPAN bug #110664
+		Unescaped braces in regexp are deprecated and issue a warning when used in Perl 5.22.
+	-fix: typo CPAN bug #110668 Debian
+
+0.12	Thu Jan 12 16:22:42 CEST 2012
+	-fix: remove signature check causing too many failures of
+		automatic checks
+
+0.11	Fri Jul  8 15:45:42 CEST 2010
+	-fix: spelling CPAN bug #59225 Ansgar Burchardt
+	-fix: META.yml CPAN bug #62606 ANDK
+
+0.10	Fri Jul  8 15:45:42 CEST 2010
+	- fix: authentificate against Cyrus CPAN bug #58192 Rudy Gevaert
+		You can pass different user and authname to auth() now
+	- fix: added missed entry in Changes of v0.09
+	- fix: stall in select() CPAN bug #58235 Rudy Gevaert
+		When the SSL layer buffers data, select() does not return
+		true, hence, is not indicating that pending data. It seems
+		that select() queries the TCP stack only.
+		The now choosen maximal size in sysread() is larger than
+		the block size of Net::SSLeay at the current time of 32KB.
+
+0.09	Thu Sep 24 14:29:07 CEST 2009
+	- fix: CPAN bug#49333: bug in Mangesieve by Oliver Eales
+		base64 encoded password in fallback branch contains line feeds
+
+0.08	Tue Aug  4 13:56:26 CEST 2009
+	- chg: accept ucfirst options on new() constructor for all options
+		CPAN bug #48349 MDOM
+	- fix: documentation bug about to pass "tls" to IO::Socket
+
+0.07	Tue Aug  4 13:56:26 CEST 2009
+	- add: on_fail option for constructor
+		CPAN bug #48286 Mario Domgoergen
+	- fix: missing call to _set_error() when TLS fails
+
+0.06	Wed Oct 29 08:33:41 CET 2008
+	- fix: empty token is treated as error in _response()
+		CPAN bug #40456 Mario Domgoergen
+
+0.05	Tue Jun 10 17:08:11 2008
+	- add: t/pod.t & t/pod-coverage.t
+	- add: LICENSE
+	- fix: some POD errors in docu
+
+0.04	Fri Jun  6 10:04:30 2008
+	- fix test: skip STARTTLS with proper explanation
+	 if TLS already started by new() because of tls setting in config file
+	- add: encrypted()
+	- fix test: skip almost everything for automated test scripts
+	 ignoring README
+
+0.03  Tue Jun  3 10:54:16 2008
+	- original version
+

@@ -1,0 +1,12 @@
+Build.PL
+lib/Net/Google/Calendar/Server.pm
+lib/Net/Google/Calendar/Server/Auth.pm
+lib/Net/Google/Calendar/Server/Auth/Dummy.pm
+lib/Net/Google/Calendar/Server/Backend.pm
+lib/Net/Google/Calendar/Server/Backend/ICalendar.pm
+lib/Net/Google/Calendar/Server/Handler/Apache.pm
+lib/Net/Google/Calendar/Server/Handler/Apache2.pm
+MANIFEST			This list of files
+t/00use.t
+Makefile.PL
+META.yml

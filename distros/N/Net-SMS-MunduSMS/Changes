@@ -1,0 +1,7 @@
+Revision history for Perl extension Net::SMS::MunduSMS.
+
+0.01  Wed Sep 22 06:10:52 2010
+	- initial version
+
+0.02  Sat Oct 09 12:33:00 2010
+	- fix bug which caused _login to fail with some versions of WWW::Mechanize

@@ -1,0 +1,62 @@
+Net-OICQ
+
+This module implements OICQ protocol, used by the instant messaging service
+operated by Tencent Technology Limited, China.
+
+INSTALLATION
+
+To install this module, run the following commands in the source directory:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Or, you can use Makefile.PL if you have make command:
+
+    perl Makefile.PL
+    make test
+    make install
+
+A command-line QQ client named qq will be installed in /usr/bin or /usr/local/bin
+directory.  This program requires Term::ANSIColor and Term::ReadKey modules.
+
+
+NOTE
+
+If you have installed version 0.7 or earlier version of Net::OICQ, please
+uninstall the old version by running the following commands as root:
+
+   find /usr/lib/perl5/site_perl -name OICQ -exec rm -r \{\} \;
+
+or
+
+   find /usr/local/lib/perl5/site_perl -name OICQ -exec rm -r \{\} \;
+
+
+DEPENDENCIES
+
+This module requires Digest::MD5 perl module, which can be downloaded from CPAN
+if it is not already installed on your system.
+
+Net::OICQ also requires Crypt::OICQ, which used to be part of Net::OICQ and is
+a separate module since Version 0.8 of Net::OICQ.
+
+ACKNOWLEDGEMENT
+
+FreeOICQ developers reverse-engineered Tencent's Win32 client code and
+published their source codes on the Internet.  I would never be able to write
+Net::OICQ without access to FreeOICQ source codes.
+
+Chen Peng reverse-engineered the assembly codes created by FreeOICQ and kindly
+made available his C source codes for the cipher used in OICQ.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003 - 2007 Shufeng Tan.  All rights reserved.
+
+This package is free software and is provided "as is" without express
+or implied warranty.  It may be used, redistributed and/or modified
+under the terms of the Perl Artistic License (see
+http://www.perl.com/perl/misc/Artistic.html)
+

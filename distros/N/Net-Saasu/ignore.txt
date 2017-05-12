@@ -1,0 +1,15 @@
+blib*
+Makefile
+Makefile.old
+Build
+_build*
+pm_to_blib*
+*.tar.gz
+.lwpcookies
+cover_db
+.vimbk
+*.swp
+*.swo
+MANIFEST.SKIP
+.shipit
+client.pl

@@ -1,0 +1,41 @@
+		  What's New in Release $Revision: 1.8 $
+
+						$Author: tong $
+
+
+$Log: News-Search.news,v $
+Revision 1.8  2008/11/05 01:48:23  tong
+Release Module:News::Search revision:1.15 to the public.
+Changes since last release:
+
+- change the release directory structure
+- expose class attributes that can be tweaked
+- refactor the command line parameter handling from news-search into module,
+  simplified news-search.
+- wildcard (*) in group name now works.
+- introduce command line options to news-search to make it fully configurable.
+- dramatically enhanced the pod document.
+
+Revision 1.7  2008/11/01 15:04:40  tong
+- Amend the pod.
+
+Revision 1.6  2008/11/01 03:19:35  tong
+- remove the dependency on the Text::Search::Pattern module
+- bug fix: re-enable limit to number of posts to search
+
+Revision 1.5  2004/06/13 21:14:38  tong
+- able to handle ignore patterns
+- works fine now, remove debug outputs.
+
+Revision 1.4  2004/06/13 20:05:01  tong
+- move code into sub message_search
+  working entirely now. run & diff ok.
+
+Revision 1.3  2004/06/13 19:42:24  tong
+- fix nntp usage error. the number of message found is ok now.
+
+Revision 1.2  2003/10/08 01:58:21  tong
+- it works, although the usage of HtmlFormatText needs fixing.
+
+Revision 1.1  2003/04/02 02:42:07  tong
+- Initial revision

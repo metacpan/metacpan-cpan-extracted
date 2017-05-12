@@ -1,0 +1,49 @@
+{
+   "abstract" : "Perl client for the Easypost web service",
+   "author" : [
+      "Mark Allen <mrallen1@yahoo.com>, Hunter McMillen <mcmillhj@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Easypost",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Hash::Merge::Simple" : "0.051",
+            "IO::Socket::SSL" : "1.962",
+            "JSON" : "2.90",
+            "Mojolicious" : "4.66",
+            "Moo" : "1.004002",
+            "Types::Standard" : "0.040",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Net-Easypost@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Net-Easypost"
+      },
+      "homepage" : "https://metacpan.org/dist/Net-Easypost",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mcmillhj/Net-Easypost.git",
+         "web" : "https://github.com/mcmillhj/Net-Easypost"
+      }
+   },
+   "version" : "0.18"
+}
+

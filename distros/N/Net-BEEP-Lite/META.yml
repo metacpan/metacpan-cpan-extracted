@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Net-BEEP-Lite
+version:      0.06
+version_from: lib/Net/BEEP/Lite.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    IO::Socket:                    0
+    MIME::Base64:                  0
+    XML::LibXML:                   1.5
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

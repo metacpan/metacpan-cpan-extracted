@@ -1,0 +1,27 @@
+#
+# This module is generated with [% script_name %]
+# Do not modify.
+#
+
+package Net::FreeIPA::API::[% module_name %];
+
+use strict;
+use warnings;
+
+use version;
+our \$VERSION = version->new("v[% version %]");
+
+use Readonly;
+
+# Generated API data using Net::FreeIPA::API::cache
+# All commands are JSON encoded.
+
+Readonly our %API_DATA => {
+[% FILTER indent -%]
+[%-      FOREACH command IN commands.pairs %]
+[% command.key %] => '[% encode_json(command.value) %]',
+[%      END -%]
+[%- END %]
+};
+
+1;

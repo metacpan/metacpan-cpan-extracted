@@ -1,0 +1,14 @@
+Revision history for Net-CIDR-Set
+
+0.10  2009-01-29
+      - Initial release
+ 
+0.11  2009-01-29
+      - Remove broken cidrcalc
+
+0.12  2009-05-29
+      - Move to GitHub 
+
+0.13  2014-02-24
+      - Applied Brian Gottreu's fix for
+        https://rt.cpan.org/Public/Bug/Display.html?id=49632

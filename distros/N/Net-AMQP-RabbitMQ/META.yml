@@ -1,0 +1,43 @@
+---
+abstract: 'interact with RabbitMQ over AMQP using librabbitmq'
+author:
+  - 'Mark Ellis <markellis@cpan.org>, Michael Stemle, Jr. <mstemle@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Sys::Hostname: '0'
+  Test::More: '0'
+  Time::HiRes: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001'
+license: mozilla
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-AMQP-RabbitMQ
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Math::Int64: '0.34'
+  Scalar::Util: '0'
+  XSLoader: '0'
+resources:
+  bugtracker: https://github.com/net-amqp-rabbitmq/net-amqp-rabbitmq/issues
+  repository: git://github.com/net-amqp-rabbitmq/net-amqp-rabbitmq.git
+version: '2.30000'
+x_contributors:
+  - 'jesus - Theo Schlossnagle <jesus@omniti.com>'
+  - 'markellis - Mark Ellis <markellis@cpan.org>'
+  - 'mstemle - Michael Stemle, Jr. <mstemle@cpan.org>'
+  - 'drolsky - Dave Rolsky <autarch@urth.org>'
+  - 'srezic - Slaven Rezić <slaven@rezic.de>'
+  - 'armand - Armand Leclercq <marman.email@gmail.com>'
+  - 'dburke - Daniel W Burke <dburke@addictmud.org>'
+  - 'davsx - Dávid Kovács <davs@cpan.org>'
+  - 'iron-s - Alexey Sheynuk'
+  - 'ether - Karen Etheridge <ether@cpan.org>'
+  - 'FGA - Fabrice Gabolde <fga@cpan.org>'
+  - 'ikegami - Eric Brine <ikegami@cpan.org>'

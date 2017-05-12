@@ -1,0 +1,97 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Net::PMP::CLI;
+
+our $VERSION = $Net::PMP::CLI::VERSION;
+
+my $app = Net::PMP::CLI->new_with_options();
+$app->run();
+exit(0);
+
+__END__
+
+=head1 NAME
+
+pmpc - Net::PMP::CLI application
+
+=head1 SYNOPSIS
+
+ # create a config file to store id+secret
+ # Config::Any recognizes many config file formats by file extension.
+ % cat ~/.pmp.yaml
+ id: my-id-string
+ secret: my-secret-string
+
+ # list all users
+ % pmpc users 
+
+ # list all groups
+ % pmpc groups 
+
+ # create a group 
+ % pmpc create --profile group --title 'my group' 
+
+ # delete a group
+ % pmpc delete --guid iam-not-a-real-guid
+
+=head1 DESCRIPTION
+
+B<pmpc> is a command-line application using L<Net::PMP::CLI>.
+
+Type C<pmpc --help> for usage.
+
+=head1 AUTHOR
+
+Peter Karman, C<< <pkarman at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-net-pmp at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-PMP>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Net::PMP::Client
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-PMP>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Net-PMP>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Net-PMP>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Net-PMP/>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+American Public Media and the Public Media Platform sponsored the development of this module.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2013 American Public Media Group
+
+See the LICENSE file that accompanies this module.
+
+=cut

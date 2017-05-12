@@ -1,0 +1,78 @@
+Revision history for Perl extension Net::Ident.
+
+1.24 Sun Dec 14 2014
+    - RT 79165 - Fix for Strawberry Perl
+    - Tidy code base for conformity of future patches
+1.23 Sun Jun 13 2010
+    - Setting values for read only tied hash %! is illegal. removing code.
+1.22 Fri Jun 11 09:00:00 CST 2010
+    - Remove Apache (mod_perl) as a dep for this module
+1.21 Fri Jun 11 01:00:00 CST 2010
+    - Move sub around to fix prototyping bug.
+    - Remove broken ident hosts from list so tests don't break. Right now
+      i know of no working public ident hosts. Patches welcome!
+    - Update Makefile.PL with new options
+    - Add META.yml to module
+    - use %! to determine if error was EINPROGRESS to function in other languages
+
+1.20  Fri Aug 27 00:59:24 CEST 1999
+    - Public release
+    - Added a few more apache layouts to the Makefile.PL to autodetect.
+
+1.19  Mon Aug  2 22:50:21 CEST 1999
+    - Added the often asked for, long promised lookupFromInaddr method.
+    - No longer imports ident_lookup into package FileHandle by
+      default, unless you explicitly ask for it (or unless you
+      installed it that way during compile time for compatibility
+      reasons).
+    - Allow adding an ident_lookup method to the Apache::Connection
+      class, as a convenience for mod_perl script writers.
+    - Rewritten tests, included test for the Apache::Connection method
+      by actually launching apache and performing ident lookups from
+      within mod_perl.
+    - Moved selection of FileHandle/IO::Handle class out of the
+      Makefile.PL.  PAUSE/CPAN didn't really like modules that weren't
+      present in the distribution, and it didn't allow you to upgrade
+      your perl version underneath.
+
+1.11  Wed Jan 15 01:49:15 MET 1999
+    - Several bugfixes, and some slight interface changes:
+    - constructor now called `new' instead of `initconnect',
+      constructor now always succeeds, if something has gone
+      wrong in the constructor, all methods return undef (like
+      `getfh'), except for `geterror', which returns the error
+      message.
+    - The recommended exported function is now `ident_lookup'
+      instead of `lookup'
+    - Fixed a bug: now chooses O_NDELAY or O_NONBLOCK from
+      %Config, instead of hardcoding O_NDELAY (argh)
+    - Adding a method to FileHandle would break in perl5.004, it
+      should get added in IO::Handle. Added intelligence in
+      Makefile.PL to detect that and choose the appropriate
+      package.
+    - Miscellaneous pod fixes.
+    - Test script now actually tests multiple different things.
+
+
+1.10  Sat Jan 11 19:05:35 1997
+    - original version; created by h2xs 1.16. First release
+      as a perl5 module, complete rewrite for perl5, based
+      on rfc931.pl
+
+1.02  Fri Jan 20 18:20:32 1995
+    - Quite a big bugfix: "connection
+      refused" to the ident port would kill the perl process
+      with a SIGPIPE if the connect didn't immediately
+      signal it (ie. almost always on remote machines). Also
+      recognises the perl5 package separator :: now on fully
+      qualified descriptors. This is still perl4-compatible,
+      a perl5- only version would require a rewrite to make
+      it neater.  Fixed the constants normally found in .ph
+      files (but you shouldn't use those anyway).
+
+1.01  Some Novish evening 1994
+    - Removed a spurious perl5 -w complaint. First public release.
+      Has been tested against perl 5.000 and perl 4.036.
+
+1.00  Somewhere in 1994
+    - First neat collection of dusty routines put in a package.

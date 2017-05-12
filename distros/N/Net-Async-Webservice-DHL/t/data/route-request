@@ -1,0 +1,36 @@
+POST https://xmlpitest-ea.dhl.com/XMLShippingServlet
+
+<?xml version="1.0" encoding="utf-8"?>
+<x0:RouteRequest xmlns:x0="http://www.dhl.com" schemaVersion="1.0">
+  <Request>
+    <ServiceHeader>
+      <MessageTime>2014-09-16T14:54:30</MessageTime>
+      <MessageReference>                  1410879270</MessageReference>
+      <SiteID>testid</SiteID>
+      <Password>testpass</Password>
+    </ServiceHeader>
+  </Request>
+  <RegionCode>EU</RegionCode>
+  <RequestType>D</RequestType>
+  <PostalCode>SE7 7RU</PostalCode>
+  <City>London</City>
+  <CountryCode>GB</CountryCode>
+  <CountryName></CountryName>
+  <OriginCountryCode>GB</OriginCountryCode>
+</x0:RouteRequest>
+
+<?xml version="1.0" encoding="UTF-8"?><res:RouteResponse xmlns:res='http://www.dhl.com' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation= 'http://www.dhl.com routing-res.xsd'>
+    <Response>
+        <ServiceHeader>
+            <MessageTime>2014-09-16T16:54:30+01:00</MessageTime>
+            <MessageReference>1410879270</MessageReference>
+            <SiteID>testid</SiteID>
+        </ServiceHeader>
+    </Response>
+    <GMTNegativeIndicator>N</GMTNegativeIndicator>
+    <GMTOffset>01:00</GMTOffset>
+    <RegionCode>EU</RegionCode>
+    <ServiceArea>
+        <ServiceAreaCode>LCY</ServiceAreaCode>
+        <Description>LCY|0|GMT0:00|DOCKLANDS - UNITED KINGDOM|GB</Description>
+    </ServiceArea></res:RouteResponse>

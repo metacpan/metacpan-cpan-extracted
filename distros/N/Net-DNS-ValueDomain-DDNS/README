@@ -1,0 +1,73 @@
+NAME
+    Net::DNS::ValueDomain::DDNS - Update your Value-Domain
+    (https://www.value-domain.com/) DynamicDNS records.
+
+SYNOPSIS
+        use Net::DNS::ValueDomain::DDNS;
+    
+        # Normal usage
+        my $ddns = Net::DNS::ValueDomain::DDNS->new;
+    
+        $ddns->update(
+            domain   => 'example.com',
+            password => '1234',
+            host     => 'www',
+            ip       => '127.0.0.1',
+        );
+    
+        # Update multiple hosts on same IP
+        my $ddns = Net::DNS::ValueDomain::DDNS->new(
+            domain   => 'example.com',
+            password => '1234',
+            ip       => '127.0.0.1',
+        );
+    
+        for my $host (qw/www mail */) {
+            $ddns->update( host => $host ) or die $ddns->errstr;
+        }
+
+DESCRIPTION
+    This module help you to update your Value-Domain
+    (https://www.value-domain.com/) DynamicDNS record(s).
+
+METHODS
+  new( %config | \%config )
+    Create a new Object. All %config keys and values (except 'host' and
+    'domain') is kept and reused by update() function.
+
+  config( %config | \%config )
+    set config veriables
+
+  protocol
+    return used protocol name. 'http' or 'https'
+
+  update( %config | \%config )
+    Update your DynamicDNS record. %config parameters are:
+
+        "domain" - Domain name being updated. (Required)
+
+        "password" - Value-Domain Dynamic DNS Password. (Required)
+
+        "host" - Sub-domain name being updated. For example if your hostname
+        is "www.example.com" you should set "www" here. (Optional)
+
+        "ip" - The IP address to be updated. if empty, your current ip is
+        used. (Optional)
+
+    If something error has be occurred, return undef. Use errstr() method to
+    get error message.
+
+  errstr()
+    return last error.
+
+ACCESSORS
+  ua
+    LWP::UserAgent object.
+
+AUTHOR
+    Daisuke Murase, <typester@cpan.org>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,25 @@
+---
+abstract: 'Network Information Extractor'
+author:
+  - 'Nuno Martins <nuno.martins@caixamagica.pt>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.31'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.141170'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: NetInfoExtractor
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Getopt::Long: '0'
+  JSON: '0'
+  Moose: '0'
+  UUID::Tiny: '0'
+version: '0.1'

@@ -1,0 +1,52 @@
+Net-IPMessenger version 0.14
+
+ABOUT
+
+This module allows you to connect, get and send IP Messenger messages.
+What is IP Messenger ? IP Messenger is a UDP based simple text message protocol.
+See L<http://ipmsg.org/index.html.en> for details
+
+DEPENDENCIES
+
+The following perl modules are required:
+
+Class::Accessor::Fast
+
+The following perl modules are required for 'make test':
+
+Test::More
+
+The following perl modules are required for encryption support:
+
+Crypt::Blowfish
+Crypt::CBC
+Crypt::OpenSSL::Bignum
+Crypt::OpenSSL::RSA
+
+No other external programs are needed.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011, Masanori Hara
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

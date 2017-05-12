@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<ItemLookupResponse xmlns="http://webservices.amazon.com/AWSECommerceService/2011-08-01">
+  <Items>
+    <Request>
+      <IsValid>True</IsValid>
+      <ItemLookupRequest>
+        <IdType>ASIN</IdType>
+        <ItemId>123</ItemId>
+        <ResponseGroup>Large</ResponseGroup>
+        <VariationPage>All</VariationPage>
+      </ItemLookupRequest>
+      <Errors>
+        <Error>
+          <Code>AWS.InvalidParameterValue</Code>
+          <Message>123 is not a valid value for ItemId. Please change this value and retry your request.</Message>
+        </Error>
+      </Errors>
+    </Request>
+  </Items>
+</ItemLookupResponse>

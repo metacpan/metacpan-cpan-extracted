@@ -1,0 +1,58 @@
+{
+   "abstract" : "Lookup the username on the remote end of a TCP/IP connection",
+   "author" : [
+      "Jan-Pieter Cornet <johnpc@xs4all.nl>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Ident",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "IO::Socket" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config" : "0",
+            "Exporter" : "0",
+            "Fcntl" : "0",
+            "FileHandle" : "0",
+            "Socket" : "0",
+            "vars" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://wiki.github.com/toddr/Net-Ident/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/toddr/Net-Ident"
+      }
+   },
+   "version" : "1.24"
+}

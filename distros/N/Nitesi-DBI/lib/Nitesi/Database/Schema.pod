@@ -1,0 +1,845 @@
+=head1 NAME 
+
+Nitesi::Database::Schema - Database schema for Nitesi
+
+=head1 DESCRIPTION
+
+This document describes the proposed database schema for L<Nitesi>,
+the Open Source Shop Machine.
+
+The C<CREATE TABLE> statements are written for MySQL, but should
+work with small adjustments for PostgreSQL too.
+
+=head2 PRODUCTS
+
+Products are stored in the C<products> table.
+
+=head3 products table
+
+    CREATE TABLE products (
+      sku varchar(32) NOT NULL PRIMARY KEY,
+      name varchar(255) NOT NULL DEFAULT '',
+      short_description varchar(500) NOT NULL DEFAULT '',
+      description text NOT NULL DEFAULT '',
+      price decimal(10,2) NOT NULL DEFAULT 0,
+      uri varchar(255) NOT NULL DEFAULT '',
+      weight integer NOT NULL DEFAULT 0,
+      priority integer NOT NULL DEFAULT 0,
+      gtin varchar(32) NOT NULL DEFAULT '',
+      canonical_sku varchar(32) NOT NULL DEFAULT '',
+      status varchar(32) NOT NULL DEFAULT '',
+      inactive boolean NOT NULL DEFAULT FALSE
+    );
+
+=over 4
+
+=item sku
+
+Unique product identifier
+
+=item name
+
+Product name.
+
+=item short_description
+
+Short description of the product.
+
+=item description
+
+Full description of the product.
+
+=item price
+
+Product price.
+
+=item uri
+
+Link to product.
+
+=item weight
+
+Product weight in grams.
+
+=item priority
+
+The product priority is used for sorting products on
+search results and category listings.
+
+=item gtin
+
+Global trade item number (GTIN). ISBN, EAN and UPC
+numbers can be expressed as GTIN, see
+L<http://en.wikipedia.org/wiki/Global_Trade_Item_Number>.
+
+=item canonical_sku
+
+The canonical SKU is used for product variants, e.g.
+different size and color.
+
+=item status
+
+The product status. Possible values are:
+
+=over 4
+
+=item available
+
+Product can be delivered immediately.
+
+=item short wait
+
+Product can be delivered in a few days.
+
+=item long wait
+
+Product can be delivered, but it takes
+longer than a few days.
+
+=item unknown
+
+Product can be delivered, but we have no idea
+how long it takes.
+
+=item not available
+
+Product is sold out or discontinued.
+
+=back
+
+=item inactive
+
+Inactive products are excluded from search results and
+category listings.
+
+=back
+
+=head3 product_attributes table
+
+    CREATE TABLE product_attributes (
+      code serial NOT NULL PRIMARY KEY,
+      sku varchar(32) NOT NULL,
+      name varchar(32) NOT NULL,
+      value text NOT NULL default '',
+      original_sku varchar(32) NOT NULL default ''
+    ) CHARACTER SET utf8;
+
+    CREATE INDEX product_attributes_sku ON product_attributes (sku);
+
+=over 4
+
+=item sku
+
+Unique product identifier from C<products> table.
+
+=item name
+
+Name of the attribute, e.g. color.
+
+=item value
+
+Value of the attribute, e.g. red.
+
+=item original_sku
+
+Product identifier for the master attribute.
+
+=back
+
+=head3 inventory table
+
+    CREATE TABLE inventory (
+       sku varchar(32) NOT NULL PRIMARY KEY,
+       quantity integer NOT NULL DEFAULT 0,
+       in_stock boolean,
+    );
+
+=over 4
+
+=item sku
+
+Unique product identifier from C<products> table.
+
+=item quantity
+
+Available quantity.
+
+=item in_stock
+
+Whether to show item as in_stock or not. 
+
+=back
+
+=head2 NAVIGATION
+
+Menus and (product) categories are stored in the C<navigation> table.
+
+=head3 navigation table
+
+    CREATE TABLE navigation (
+      code serial NOT NULL,
+      uri varchar(255) NOT NULL DEFAULT '',
+      type varchar(32) NOT NULL DEFAULT '',
+      scope varchar(32) NOT NULL DEFAULT '',
+      name varchar(255) NOT NULL DEFAULT '',
+      description text NOT NULL DEFAULT '',
+      template varchar(255) NOT NULL DEFAULT '',
+      language varchar(8) NOT NULL DEFAULT '',
+      alias integer NOT NULL DEFAULT 0,
+      parent integer NOT NULL DEFAULT 0,
+      priority integer NOT NULL DEFAULT 0,
+      count integer NOT NULL DEFAULT 0,
+      inactive boolean NOT NULL default FALSE,
+      entered timestamp DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY(code),
+      UNIQUE(uri)
+    );
+
+=over 4
+
+=item uri
+
+URL for the link to the navigation element.
+Starts with the URL of the parent navigation element.
+
+E.g. for parent element "Europe" and child element "Germany" 
+you get as uri values:
+
+     Europe
+     Europe/Germany
+
+=item type
+
+Navigation type, e.g. menu or category.
+
+=item scope
+
+Scope related to type, menu name for menus
+or categorization (brand, star) for categories.
+
+=item template
+
+Template used for this navigation element. This is used usually
+in conjunction with menu elements.
+
+=item language
+
+Language for this navigation element.
+
+=item alias
+
+Pointer to the original navigation element.
+
+=item parent
+
+Pointer to the parent navigation element.
+
+=item count
+
+Number of active products belonging to this navigation
+entry.
+
+=back
+
+=head3 navigation_products table
+
+    CREATE TABLE navigation_products (
+      sku varchar(32) NOT NULL,
+      navigation integer NOT NULL,
+      type varchar(16) NOT NULL DEFAULT '',
+      key(sku,navigation)
+    );
+
+=head2 MEDIA
+
+Media are stored in the C<media> table.
+
+=head3 C<media> table
+
+   create table media (
+      code serial NOT NULL,
+      file varchar(255) NOT NULL DEFAULT '',
+      uri varchar(255) NOT NULL DEFAULT '',
+      mime_type varchar(255) NOT NULL DEFAULT '',
+      label varchar(255) NOT NULL DEFAULT '',
+      author integer NOT NULL DEFAULT 0,
+      created datetime NOT NULL,
+      modified datetime NOT NULL,
+      inactive boolean NOT NULL DEFAULT FALSE,
+      primary key(code)
+--      unique(file),
+--      unique(uri)
+   );
+
+=head3 C<media_types> table
+
+   create table media_types (
+      code serial NOT NULL,
+      type varchar(32) NOT NULL,
+      scope varchar(32) NOT NULL,
+      unique(type,scope)
+   );
+
+   insert into media_types (type,scope) values ('detail', 'store');
+   insert into media_types (type,scope) values ('thumb', 'store');
+   insert into media_types (type,scope) values ('cart', 'store');
+     
+=head3 C<media_products> table
+
+   create table media_products (
+      code serial NOT NULL,
+      media integer NOT NULL,
+      sku varchar(32) NOT NULL,
+      KEY (sku)
+   );
+
+=head3 C<media_display> table
+
+   create table media_display (
+      code serial NOT NULL,
+      media integer NOT NULL,
+      sku varchar(32) NOT NULL,
+      type integer NOT NULL,
+      KEY (sku)
+   );
+
+=head2 MERCHANDISING
+
+Merchandising tables.
+
+    CREATE TABLE merchandising_products (
+      code serial NOT NULL,
+      sku character varying(32) NOT NULL DEFAULT '',
+      sku_related character varying(32) NOT NULL DEFAULT '',
+      type character varying(32) NOT NULL DEFAULT '',
+      primary key(code)
+    );
+
+    CREATE TABLE merchandising_attributes (
+      code serial NOT NULL,
+      merchandising integer NOT NULL default 0,
+      name varchar(32) NOT NULL,
+      value text NOT NULL default '',
+      primary key(code)
+    );
+
+=head2 PRICING
+
+=head3 C<group_pricing> table
+
+    CREATE TABLE group_pricing (
+        code serial NOT NULL,
+        sku character varying(32) NOT NULL,
+        quantity integer NOT NULL DEFAULT 0,
+        rid integer NOT NULL DEFAULT 0,
+        price decimal(10,2) NOT NULL DEFAULT 0,
+        primary key(code),
+        key(sku)
+    );
+
+=head2 CARTS
+
+Carts are stored in the C<carts> and C<carts_products> table.
+
+=head3 C<carts> table
+
+    CREATE TABLE carts (
+      code serial NOT NULL,
+      name character varying(255) DEFAULT '' NOT NULL,
+      uid integer DEFAULT 0 NOT NULL,
+      session_id character varying(255) DEFAULT '' NOT NULL,
+      created integer DEFAULT 0 NOT NULL,
+      last_modified integer DEFAULT 0 NOT NULL,
+      type character varying(32) DEFAULT '' NOT NULL,
+      approved boolean,
+      status character varying(32) DEFAULT '' NOT NULL,
+      primary key(code)
+   );
+
+=head3 cart_products
+
+    CREATE TABLE cart_products (
+      cart integer NOT NULL,
+      sku character varying(32) NOT NULL,
+      "position" integer NOT NULL,
+      quantity integer DEFAULT 1 NOT NULL,
+      priority integer DEFAULT 0 NOT NULL
+    );
+
+=head2 USERS, ROLES, PERMISSIONS
+
+=head3 users
+
+    CREATE TABLE users (
+      uid serial primary key,
+      username varchar(255) NOT NULL,
+      email varchar(255) NOT NULL DEFAULT '',
+      password varchar(255) NOT NULL DEFAULT '',
+      first_name varchar(255) NOT NULL DEFAULT '',
+      last_name varchar(255) NOT NULL DEFAULT '',
+      last_login integer NOT NULL DEFAULT 0,
+      created datetime NOT NULL,
+      modified datetime NOT NULL,
+      inactive boolean NOT NULL DEFAULT FALSE
+    );
+
+=over 4
+
+=item uid
+
+Numeric primary key for users.
+
+=item username
+
+User name (usually lowercase of email).
+
+=item email
+
+Email address.
+
+=item password
+
+Encrypted password.
+
+=item last_login
+
+Time of last login
+
+=item created
+
+Time of account creation.
+
+=back
+
+=head3 user_attributes
+
+    CREATE TABLE user_attributes (
+      code serial NOT NULL,
+      uid integer NOT NULL,
+      name varchar(32) NOT NULL,
+      value text NOT NULL default '',
+      primary key(code),
+      key(uid)
+    );
+
+Attributes to be stored in user_attributes are:
+
+=over 4
+
+=item aid_shipping
+
+Default shipping address identifier.
+
+=item aid_billing
+
+Default billing address identifier.
+
+=back
+
+=head3 roles
+
+    CREATE TABLE roles (
+      rid serial primary key,
+      name varchar(32) NOT NULL,
+      label varchar(255) NOT NULL
+    );
+
+    INSERT INTO roles (rid,name,label) VALUES (1, 'anonymous', 'Anonymous Users');
+    INSERT INTO roles (rid,name,label) VALUES (2, 'authenticated', 'Authenticated Users');
+
+=over 4
+
+=item rid
+
+Numeric primary key for roles.
+
+=item name
+
+Role name.
+
+=item label
+
+Role label (for display only).
+
+=back
+
+=head3 user_roles
+
+    CREATE TABLE user_roles (
+      uid integer DEFAULT 0 NOT NULL,
+      rid integer DEFAULT 0 NOT NULL,
+      PRIMARY KEY (uid, rid)
+    );
+
+    CREATE INDEX idx_user_roles_rid ON user_roles (rid);
+
+=over 4
+
+=item uid
+
+Foreign key for user.
+
+=item rid
+
+Foreign key for role.
+
+=back
+
+=head3 permissions
+
+    CREATE TABLE permissions (
+      rid integer not null default 0,
+      uid integer not null default 0,
+      perm varchar(255) not null default ''
+    );
+
+    INSERT INTO permissions (rid,perm) VALUES (1,'anonymous');
+    INSERT INTO permissions (rid,perm) VALUES (2,'authenticated');
+
+Permissions are you usually granted to rules, but in somes
+cases you may want to grant a permission to a specific user.
+
+Please set either C<rid> or C<uid> and use 0 as value for the
+other in a single record.
+
+=over 4
+
+=item rid
+
+Foreign key for role.
+
+=item uid
+
+Foreign key for user.
+
+=item perm
+
+Permission, e.g. C<view_cart>, C<add_user>.
+
+=back
+
+=cut
+
+=head2 ADDRESSES
+
+=head3 addresses
+
+    CREATE TABLE addresses (
+      aid serial NOT NULL,
+      uid integer NOT NULL DEFAULT 0,
+      type varchar(16) NOT NULL DEFAULT '',
+      archived boolean NOT NULL DEFAULT FALSE,
+      first_name varchar(255) NOT NULL DEFAULT '',
+      last_name varchar(255) NOT NULL DEFAULT '',
+      company varchar(255) NOT NULL DEFAULT '',
+      street_address varchar(255) NOT NULL DEFAULT '',
+      zip varchar(255) NOT NULL DEFAULT '',
+      city varchar(255) NOT NULL DEFAULT '',
+      phone varchar(32) NOT NULL DEFAULT '',
+      state_code char(2) NOT NULL DEFAULT '',
+      country_code char(2) NOT NULL DEFAULT '',
+      created datetime NOT NULL,
+      modified datetime NOT NULL,
+      CONSTRAINT transactions_pkey PRIMARY KEY (aid)
+    );
+
+=over 4
+
+=item uid
+
+Foreign key for user, 0 for anonymous users.
+
+=item type
+
+Address type, e.g. shipping or billing.
+
+=item archived
+
+Set for addresses used in the past.
+
+=item first_name
+
+First name of person attached to this address.
+
+=item last_name
+
+Last name of person attached to this address.
+
+=item company
+
+Company name attached to this address.
+
+=item street_address
+
+Street address, including house number.
+
+=item zip
+
+Zip code.
+
+=item city
+
+City.
+
+=item state_code
+
+State code.
+
+=item country_code
+
+Country code.
+
+=back
+
+=head2 TRANSACTIONS
+
+=head3 transactions
+
+    create table transactions (
+      code serial not null,
+      order_number varchar(24) NOT NULL DEFAULT '',
+      order_date timestamp,
+      uid integer NOT NULL DEFAULT 0,
+      email varchar(255) NOT NULL DEFAULT '',
+      aid_shipping integer NOT NULL DEFAULT 0,
+      aid_billing integer NOT NULL DEFAULT 0,
+      weight integer NOT NULL DEFAULT 0,
+      payment_method varchar(255) NOT NULL DEFAULT '',
+      payment_code varchar(255) NOT NULL DEFAULT '',
+      payment_status varchar(255) NOT NULL DEFAULT '',
+      shipping_method varchar(255) NOT NULL DEFAULT '',
+      shipping_code varchar(255) NOT NULL DEFAULT '',
+      subtotal numeric(11,2) NOT NULL DEFAULT 0,
+      shipping numeric(11,2) NOT NULL DEFAULT 0,
+      handling numeric(11,2) NOT NULL DEFAULT 0,
+      salestax numeric(11,2) NOT NULL DEFAULT 0,
+      total_cost numeric(11,2) NOT NULL DEFAULT 0,
+      status varchar(24) NOT NULL DEFAULT '',
+      CONSTRAINT transactions_pkey PRIMARY KEY (code)
+    );
+
+=over 4
+
+=item payment_status
+
+Possible values are:
+
+=over 4
+
+=item pending
+
+Payment is pending.
+
+=item success
+
+Payment has been successful.
+
+=item failure
+
+Payment has been failed.
+
+=item canceled
+
+Payment has been canceled.
+
+=back
+
+=item shipping_method
+
+Shipping method for the order.
+
+=item shipping_code
+
+Shipping ID assigned by shipping company.
+
+=item subtotal
+
+Subtotal of the order (sum of product prices).
+
+=item shipping
+
+Shipping cost of the order.
+
+=item handling
+
+Other fees applied to the order.
+
+=item salestax
+
+Salestax for the order.
+
+=item total_cost
+
+Total amount of the order.
+
+=item status
+
+Status of the order.
+
+=back
+
+=head3 orderline
+
+    create table orderline (
+      code serial not null,
+      order_number varchar(24) NOT NULL DEFAULT '',
+      position integer NOT NULL DEFAULT 0,
+      sku varchar(32) NOT NULL PRIMARY KEY,
+      name varchar(255) NOT NULL DEFAULT '',
+      short_description varchar(500) NOT NULL DEFAULT '',
+      description text NOT NULL DEFAULT '',
+      weight integer NOT NULL DEFAULT 0,
+      quantity integer,
+      quantity_shipped integer,
+      shipping_method varchar(255) NOT NULL DEFAULT '',
+      shipping_code varchar(255) NOT NULL DEFAULT '',
+      price numeric(10,2) NOT NULL DEFAULT 0,
+      subtotal numeric(11,2) NOT NULL DEFAULT 0,
+      shipping numeric(11,2) NOT NULL DEFAULT 0,
+      handling numeric(11,2) NOT NULL DEFAULT 0,
+      salestax numeric(11,2) NOT NULL DEFAULT 0,
+      status varchar(24) NOT NULL DEFAULT ''
+    );
+
+The fields sku, name, short_description, description, price
+and weight are the values for the product at the time of
+order.
+
+=over 4
+
+=item order_number
+
+Reference to order number in C<transactions>.
+
+=item position
+
+Position of ordered item (1, ...).
+
+=item quantity
+
+Quantity of ordered item.
+
+=item quantity_shipped
+
+Shipped quantity of ordered item.
+
+=item shipping_method
+
+Shipping method for the ordered item.
+
+=item shipping_code
+
+Shipping ID assigned by shipping company.
+
+=item subtotal
+
+Subtotal of the ordered item (sum of product price).
+
+=item shipping
+
+Shipping cost of the ordered item.
+
+=item handling
+
+Other fees applied to the ordered item.
+
+=item salestax
+
+Salestax for the ordered item.
+
+=item status
+
+Status of the ordered item.
+
+=back
+
+=head3 payment_transactions
+
+    CREATE TABLE payment_transactions (
+      code serial NOT NULL PRIMARY KEY,
+      payment_mode varchar(32) NOT NULL default '',
+      payment_action varchar(32) NOT NULL default '',
+      payment_id varchar(32) NOT NULL default '',
+      auth_code varchar(255) NOT NULL default '',
+      session_id varchar(255) NOT NULL default '',
+      order_number varchar(24) NOT NULL default '',
+      amount numeric(11,2) NOT NULL DEFAULT 0,
+      status varchar(32) NOT NULL default '',
+      payment_session_id varchar(255) NOT NULL default '',
+      payment_error_code varchar(32) NOT NULL default '',
+      payment_error_message text NOT NULL default '',
+      created datetime default NULL,
+      last_modified datetime default NULL
+    );
+
+=over 4
+
+=item payment_mode
+
+Payment gateway.
+
+=item payment_id
+
+Payment id retrieved from payment server.
+
+=item auth_code
+
+Authentication code retrieved from payment server.
+
+=item session_id
+
+Session id used in the shop.
+
+=item order_number
+
+Order number from L<transactions> table.
+
+=item amount
+
+Amount passed to payment server.
+
+=item payment_session_id
+
+Session id retrieved from payment server, e.g. for
+IPayment gateway.
+
+=back
+
+=head2 SETTINGS
+
+Settings stored in the database, used to complement the
+settings retrieved from the web framework configuration,
+e.g. L<Dancer::Config>.
+
+=head3 settings
+
+    CREATE TABLE settings (
+      code serial primary key,
+      scope varchar(32) NOT NULL,
+      site varchar(32) NOT NULL default '',
+      name varchar(32) NOT NULL,
+      value text NOT NULL,
+      category varchar(32) NOT NULL default ''
+    );
+
+    CREATE INDEX settings_scope ON settings (scope);
+
+=head2 SESSIONS
+
+Sessions stored in the database (optional).
+
+=head3 sessions
+
+    CREATE TABLE sessions (
+      code varchar(255) not null primary key,
+      session_data text not null,
+      session_hash text not null,
+      created datetime not null,
+      modified timestamp not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    );
+
+=head2 OTHER
+
+=head3 path_redirect
+
+=cut

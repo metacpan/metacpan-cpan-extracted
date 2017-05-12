@@ -1,0 +1,270 @@
+NAME
+    Net::Cisco::ObjectGroup - Generate Cisco ACL object groups
+
+VERSION
+    This document refers to version 1.01 of Net::Cisco::ObjectGroup.
+
+SYNOPSIS
+     use Net::Cisco::ObjectGroup;
+     my $og = Net::Cisco::ObjectGroup->new({
+         type         => 'icmp'
+         name         => 'friendly_icmp',
+         description  => 'ICMP types we like', # optional
+         pretty_print => 1,                    # optional
+     });
+
+     $g->push({icmp_type => 8}); # this is an echo request
+     $g->push({group_object => $another_objectgroup_object});
+
+     print $g->dump, "\n";
+     # prints the object-group configuration commands to STDOUT, something like:
+ 
+     object-group icmp friendly_icmp
+       description ICMP types we like
+       icmp-object echo
+       group-object other_icmp_types
+
+DESCRIPTION
+    Use this module to manage the presentation of Cisco PIX or FWSM Object
+    Groups. Group entries are pushed into the object in a simple
+    parmaterized fashion, and you can then dump the content in a format that
+    is parsable by Cisco devices.
+
+IMPORTANT NOTE
+    This module's error checking is only concerned with syntactic
+    correctness. It makes no judgement of the *semantic correctness* of your
+    group entries.
+
+    For instance, newer FWSM systems use netmasks specified in terms of host
+    address network masks (e.g. 255.255.255.0), whereas older systems use
+    wildcard bits (e.g. 0.0.0.255). "Net::Cisco::ObjectGroup" will not check
+    that you use the correct type of mask, or even that your mask isn't
+    something completely inappropriate (e.g. "cabbages").
+
+METHODS
+  "Net::Cisco::ObjectGroup->new"
+    Each object group that you manage must be created through this method,
+    which takes at least two parameters: the "type" and the "name" of the
+    object group. The parameters must be provided in a single hash reference
+    argument, like so:
+
+     my $g = Net::Cisco::ObjectGroup->new({
+         type        => 'network',
+         name        => 'my_new_object_group',
+         description => 'used for something useful', # optional
+     });
+
+    Optionally you may also provide a description of the group. For details
+    of the types of object group available, and additional parameters to
+    this method that they accept, see "GROUP TYPES", below.
+
+    "Net::Cisco::ObjectGroup" is actually a factory class, and this method
+    returns an object of the type that you requested in the "type"
+    parameter. All objects inherit from "Net::Cisco::ObjectGroup::Base", and
+    on success this method will return an instance of one of the following:
+
+    *   Net::Cisco::ObjectGroup::ICMP
+
+    *   Net::Cisco::ObjectGroup::Network
+
+    *   Net::Cisco::ObjectGroup::Protocol
+
+    *   Net::Cisco::ObjectGroup::Service
+
+  "push"
+    Use this method to add an entry to the object group. Although according
+    to Cisco's documentation order of the content of an object group is not
+    significant, this module will preseve the order of pushed entries, with
+    new entries being added to the end of the list of items in the group.
+
+    Parameters are all passed within a single hash reference argument. Which
+    keys of that hash you populate will depend on the type of the object
+    group on which you are operating. Logic within the module should check
+    that you are syntactically correct, but for brevity of this
+    documentation you are referred to the many Cisco manuals containing
+    object group syntax usage guidelines.
+
+    See "GROUP TYPES", below, for parameter specifics.
+
+  "dump"
+    This method generates and returns the object group as it would look in a
+    Cisco configuration file.
+
+    The returned value is a scalar, with embedded newline characters and no
+    terminating newline, so you will need to append that as required. Note
+    that when submitting this to, for example, a Net::Appliance::Session
+    session via "cmd()", a newline will be automatically appended by that
+    method.
+
+    Fully compatible Cisco commands are produced on the fly from the data
+    stored in the "Net::Cisco::ObjectGroup" object, so you can "dump" and
+    "push" repeatedly to your heart's content.
+
+GROUP TYPES
+    Following Cisco configuration guidelines, there are four types of object
+    group available to you. Each of them implements a "push()" object method
+    to populate the group, with custom parameters as described below.
+
+  ICMP
+    The "new" method to "Net::Cisco::ObjectGroup" will also accept a
+    "pretty_print" parameter, which if set to a true value, enables the
+    substitution of some numeric ICMP types for their text aliases within
+    the output from "dump".
+
+    The "push" method for ICMP object groups accepts the following
+    parameters:
+
+    "icmp_type"
+        Fill this value in your parameter hash with an ICMP type. As
+        mentioned above, it is your responsibility to enter something that
+        the Cisco device will parse (e.g. a recognised ICMP type name or
+        IANA assigned number).
+
+    "group_object"
+        Use this parameter to refer to another ICMP object group in this
+        group entry.
+
+  Network
+    The "push" method for Network object groups accepts the following
+    parameters:
+
+    "net_addr", "netmask"
+        At a minimum, if configuring a network address, you must pass the
+        "net_addr" parameter. If "netmask" is omitted, then the "net_addr"
+        is assumed to be a host address (32 bit netmask). Otherwise, specify
+        a netmask in "netmask".
+
+    "group_object"
+        Use this parameter to refer to another Network object group in this
+        group entry.
+
+  Protocol
+    The "new" method to "Net::Cisco::ObjectGroup" will also accept a
+    "pretty_print" parameter, which if set to a true value, enables the
+    substitution of some protocol numbers for their text aliases within the
+    output from "dump".
+
+    The "push" method for Protocol object groups accepts the following
+    parameters:
+
+    "protocol"
+        Fill this value in your parameter hash with a protocol type. As
+        mentioned above, it is your responsibility to enter something that
+        the Cisco device will parse (e.g. a recognised protocol name or IANA
+        assigned number).
+
+    "group_object"
+        Use this parameter to refer to another Protocol object group in this
+        group entry.
+
+  Service
+    The "new" method to "Net::Cisco::ObjectGroup" will also accept a
+    "pretty_print" parameter, which if set to a true value, enables the
+    substitution of some port numbers for their corresponding service names
+    within the output from "dump".
+
+    The "new" method for Service object groups *requires* the following
+    additional parameter:
+
+    "protocol"
+        Service object groups must be specified with any of three possible
+        IP protocol groups, "tcp", "udp" or "tcp-udp" in this parameter.
+
+    The "push" method for Service object groups accepts the following
+    parameters:
+
+    "svc_op", "svc", "svc_hi"
+        If specifying one or more services (rather than a group, as below),
+        then at a minimum the "svc_op" and "svc" parameters must be
+        completed. "svc_op" may be either "eq" or "range", and if the latter
+        then "scv_hi" must also contain the corresponding service to make a
+        range.
+
+        As mentioned above, it is your responsibility to enter values for
+        "svc" and "svc_hi" that the Cisco device will parse (e.g. a
+        recognised service name or IANA assigned number).
+
+    "group_object"
+        Use this parameter to refer to another Service object group in this
+        group entry.
+
+    You may encounter the following diagnostic messages from Protocol
+    groups:
+
+    "missing parameter "protocol" when creating service group"
+        This is a required parameter to the "new()" class method when
+        specifying an object group type of "service" (or "port").
+
+    "unrecognized protocol type:"...
+        You have used an unrecognized value for the "protocol" parameter to
+        "new()".
+
+    "missing service operator"
+        The "svc_op" parameter is missing in your call to "push()".
+
+    "unrecognized service operator:"...
+        You have used an unrecognized value for the "svc_op" parameter to
+        "push()".
+
+DIAGNOSTICS
+    "must specify either group-object or"...
+        At a minimum please supply an object group or other required
+        parameter.
+
+    "cannot specify both group-object and"...
+        Likewise you should not specify *both* an object group and
+        type-specific paramters.
+
+    "bad group-object"
+        Referenced object groups must be of the same type as the group they
+        are referenced from.
+
+    "missing parameter "type""
+        You forgot to specify the "type" parameter to
+        "Net::Cisco::ObjectGroup->new".
+
+    "unrecognized object-group type:"...
+        The group type must be one of "icmp", "network", "protocol",
+        "service" or "port".
+
+    "missing parameter "name""
+        You forgot to specify the "name" parameter to
+        "Net::Cisco::ObjectGroup->new".
+
+    "bad object-group name:"...
+        Object group names must be between one and 64 characters comprising
+        only upper and lowercase letters, digits, underscore, period and
+        hyphen.
+
+    "bad description"
+        The length of the description must not exceed 200 characters.
+
+DEPENDENCIES
+    Other than the contents of the standard Perl distribution, you will need
+    the following:
+
+    *   UNIVERSAL::require
+
+    *   Class::Data::Inheritable
+
+    *   Class::Accessor >= 0.25
+
+BUGS
+    If you spot a bug or are experiencing difficulties that are not
+    explained within the documentation, please send an email to
+    oliver@cpan.org or submit a bug to the RT system (http://rt.cpan.org/).
+    It would help greatly if you are able to pinpoint problems or even
+    supply a patch.
+
+SEE ALSO
+    Net::Cisco::AccessList::Extended, Net::Appliance::Session
+
+AUTHOR
+    Oliver Gorwits "<oliver.gorwits@oucs.ox.ac.uk>"
+
+COPYRIGHT & LICENSE
+    Copyright (c) The University of Oxford 2008.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

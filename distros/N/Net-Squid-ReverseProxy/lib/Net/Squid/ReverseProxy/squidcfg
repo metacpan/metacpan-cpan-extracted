@@ -1,0 +1,42 @@
+# server listen
+http_port 80 accel vhost
+icp_port 0
+
+#-*- SITE BEGIN -*-
+#-*- SITE END -*-
+
+hierarchy_stoplist cgi-bin ?
+access_log none
+cache_store_log none
+cache_log /tmp/cache.log
+pid_filename /tmp/squid.pid
+
+#-*- ARG INPUT BEGIN -*-
+#-*- ARG INPUT END -*-
+
+# refresh pattern
+refresh_pattern ^ftp:           1440    20%     10080
+refresh_pattern ^gopher:        1440    0%      1440
+refresh_pattern (cgi-bin|\?)    0       0%      0
+refresh_pattern .               0       20%     4320
+
+# ACLs
+acl manager proto cache_object
+acl localhost src 127.0.0.1/32
+acl to_localhost dst 127.0.0.0/8
+acl SSL_ports port 443
+acl Safe_ports port 80
+acl CONNECT method CONNECT
+acl PURGE method PURGE
+
+# access control
+never_direct allow all
+http_access allow manager localhost
+http_access deny manager
+http_access deny !Safe_ports
+http_access deny CONNECT !SSL_ports
+http_access allow PURGE localhost
+http_access deny PURGE
+http_access allow all
+http_reply_access allow all
+

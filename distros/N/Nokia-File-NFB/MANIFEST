@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/test.nfb
+t/01-Basic.t
+t/02-File-Read.t
+t/03-File-Write.t
+lib/Nokia/File/NFB.pm
+lib/Nokia/File/NFB/Element.pm
+META.yml                                 Module meta-data (added by MakeMaker)

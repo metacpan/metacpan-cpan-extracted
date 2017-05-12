@@ -1,0 +1,55 @@
+{
+   "abstract" : "Keep track of numerical ranges quickly",
+   "author" : [
+      "Michael F. Covington <mfcovington@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4206",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Number-RangeTracker",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Getopt::Long" : "0",
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Pod::Markdown" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Mouse" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Number::RangeTracker" : {
+         "file" : "lib/Number/RangeTracker.pm",
+         "version" : "v0.6.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.6.1"
+}

@@ -1,0 +1,23 @@
+#! /usr/local/bin/perl -w
+
+use News::Scan;
+
+my $HOME = $ENV{HOME} || '/';
+my $scan = new News::Scan Group      => 'comp.lang.perl.misc',
+                          Spool      => "$HOME/spool/comp.lang.perl.misc",
+                          From       => 'nntp',
+                          NNTPServer => 'news.uah.edu';
+
+if (not defined $scan) {
+    die "Failed to create News::Group object\n";
+}
+elsif ($scan->error) {
+    die "Error: " . $scan->error . "\n";
+}
+
+$scan->collect;
+if ($scan->error) {
+    die "Error: " . $scan->error . "\n";
+}
+
+exit;

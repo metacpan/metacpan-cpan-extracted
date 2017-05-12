@@ -1,0 +1,27 @@
+---
+abstract: "search for RFC's and dump RFC's content either to a variable or to a file."
+author:
+  - 'Nikolay Aviltsev <navi@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.130880'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-RFC-Search
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  File::HomeDir: 0
+  File::Tempdir: 0
+  IO::File: 0
+  LWP::UserAgent: 0
+  perl: 5.006
+version: 0.02

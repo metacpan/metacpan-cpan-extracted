@@ -1,0 +1,4 @@
+name = "Number-Phone-JP-AreaCode"
+badges = ["travis"]
+[no_index]
+directory = ["t", "xt", "author", "eg"]

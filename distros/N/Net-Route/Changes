@@ -1,0 +1,50 @@
+Revision history for Net-Route
+
+0.02    2009-11-23
+        - Fixed a typo on MSWin32 that would render the module unusable
+        - Moved secondary dependencies to recommendations
+        - Documentation fixes
+
+0.01    2009-11-12
+        Version bump.
+
+0.00_11 2009-11-10
+        More CPANT-related changes.
+
+0.00_10 2009-10-30
+        Improved testing behavior for CPANT (thanks Andreas Koenig!)
+
+0.00_09 2009-10-29
+        Build process changes (CPANT reports, user-friendliness)
+
+0.00_08 2009-10-28
+        Proper IP parsing error management for Solaris CPANT report
+        investigation.
+
+0.00_07 2009-10-22
+        Solaris and regex fixes according to CPAN testers reports.
+
+0.00_06 2009-10-16
+        Fixed some tests, added Perl version requirements to keep
+        Perl::Critic::Pulp happy.
+
+0.00_05 2009-10-14
+        - Added diag output for unparsable system routes on some CPAN testers'
+          systems (we can't reproduce the issue here)
+        - Added Perl version requirement on each source file for Perl::Critic
+          correctness
+
+0.00_04 2009-10-08
+        Updated MANIFEST (oops.)
+
+0.00_03 2009-10-07
+        This alpha release adds support for solaris and more thorough tests.
+        Warning: the internal API changed as we are now using IPC::Run3.
+
+0.00_02 2009-10-02
+        This alpha release adds support for MSWin32.
+
+0.00_01 2009-09-22
+        First version, released on an unsuspecting world.
+        This alpha release supports Linux only, although there is a tentative
+        win32 implementation.

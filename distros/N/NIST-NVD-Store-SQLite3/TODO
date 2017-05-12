@@ -1,0 +1,2 @@
+* Get re-indexing working with updates again
+* re-factor most of the code out of bin/convert-nvdcve and into lib/

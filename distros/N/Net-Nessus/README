@@ -1,0 +1,171 @@
+NAME
+        Net::Nessus::Client - A Nessus client module
+
+SYNOPSIS
+        # Connect to the Nessus Server
+        require Net::Nessus::Client;
+        my $client = Net::Nessus::Client->new('host' => 'localhost',
+                                              'port' => '1241',
+                                              'user' => 'joe',
+                                              'password' => 'my_password');
+
+DESCRIPTION
+    The Nessus program is a Client/Server application offering a framework
+    for lots of security related scanners, so-called plugins. The idea is
+    not to create a separate scanner for any possible security hole, but to
+    reimplement only the most important parts and let the Nessus Server
+    (nessusd) do the most part of the work.
+
+    Clients are typically available as GUI applications, for example based
+    on the GTK (nessus), Java or Win32 applications. This module is another
+    Nessus client written in Perl, but without GUI.
+
+    You start using the module by opening a connection to a Nessus Server:
+    This will create a Nessus client object for you. This object offers
+    methods that you can later use, for example retrieving the list of
+    available plugins, start a scan, set preferences and so on.
+
+METHOD INTERFACE
+  Creating a client object
+      require Net::Nessus::Client;
+      my $client = Net::Nessus::Client->new(%attr);
+
+    (Class Method) The new method is the client constructor. It receives a
+    set of attributes that are required for opening the connection, for
+    example
+
+    A Perl exception is thrown in case of trouble.
+
+    host
+    port    Host name (or IP address) and port number of the Nessus servers
+            machine. The defaults are *localhost* and *1241*, as accepted by
+            the IO::Socket modules *new* constructor. You may as well use
+            other attributes of this constructor, for example *Timeout*.
+            IO::Socket.
+
+    user
+    password
+            User name and password to use for logging into the Nessus
+            server. There are no defaults, you must set these attributes.
+
+    ntp_proto
+            An optional version of the NTP protocol to run. Defaults to the
+            highest available number, 1.1 as of this writing.
+
+    Example: Log into the Nessus server running at machine
+    "gate.company.com", port 2367 as user "joe" with password
+    "what_password" and NTP version 1.0:
+
+      require Net::Nessus::Client;
+      my $client = Net::Nessus::Client->new('host' => 'gate.company.com',
+                                            'port' => 2367,
+                                            'user' => 'joe',
+                                            'password' => 'what_password',
+                                            'ntp_proto' => '1.0');
+
+  Reading the plugin list
+      my $plugins = $self->Plugins();
+      my $prefs = $self->Prefs();
+      my $rules = $self->Rules();
+
+    (Instance Methods) Read the plugin list, the current preferences or the
+    list of rules. The plugin list is an array of hash refs, each hash ref
+    with attributes *id*, *category* and so on. The prefs are a single hash
+    ref of name/value pairs and the rules are an array ref of strings.
+
+    When talking to an NTP/1.0 server, the Prefs() and Rules() methods will
+    return undef.
+
+    Examples:
+
+      my $plugins = $self->Plugins();
+      print("The first plugins ID is ", $plugins->[0]->{'id'}, "\n");
+      print("The second plugins description is ",
+            $plugins->[1]->{'description'}, "\n");
+      my $prefs = $self->Prefs();
+      print "\nThe current prefs are:\n";
+      while (my($var, $val) = each %$prefs) {
+        print "  $var = $val\n";
+      }
+      my $rules = $self->Rules();
+      print "\nThe current rules are:\n";
+      foreach my $rule (@$rules) {
+        print "  $rule\n";
+      }
+
+  Sending a message to the server
+      $client->Print($msg);
+
+    (Instance Method) The print method is used for sending a previously
+    created message to the server. Depending on the message type you should
+    continue calling the *GetMsg* method.
+
+    Example:
+
+      my $rules = ['n:*.fr;', 'y:*.my.de;'];
+      my $msg = Net::Nessus::Message::Rules($rules);
+      $client->print($msg);
+
+  Reading a message from the server
+      $msg = $client->GetMsg($type, $timeout);
+
+    (Instance method) The *GetMsg* method is reading a message from the
+    server. If the argument $type is undef, then any message is accepted,
+    otherwise any message other message type is treated as an error. Valid
+    message types are PLUGIN_LIST, PREFERENCES and so on.
+
+    If the argument $timeout is given, then an error will be triggered, if
+    the server is not sending any message for that much seconds. If no
+    timeout is given, then the default timeout will be used.
+
+  Launching an attack
+      my $messages = $client->Attack(@hosts);
+      $client->ShowSTATUS($msg);
+      $client->ShowPORT($msg);
+      $client->ShowHOLE($msg);
+      $client->ShowINFO($msg);
+      $client->ShowPLUGINS_ORDER($msg);
+      $client->ShowBYE($msg);
+      $client->ShowERROR($msg);
+
+    (Instance Methods) An attack can be launched by calling the clients
+    *Attack* method. While the attack is running, the Nessus server will
+    send PLUGINS_ORDER, STATUS, PORT, HOLE and INFO messages and finally a
+    BYE message. If the client receives such a message, he will call the
+    corresponding Show method, for example *ShowPLUGINS_ORDER* or
+    *ShowPORT*.
+
+    The default implementations of these messages will create a hash ref.
+    The hash refs keys are port numbers, a special key being the word
+    general. The hash refs values are hash refs again, the keys being the
+    words PORT, HOLE and INFO. The values are array refs of corresponding
+    messages. That is, you find all security holes (if any) of the targets
+    FTP port as follows:
+
+      my @ftp_holes = @{$messages->{'21'}->{'PORT'}};
+
+    Finally the hosts are used to build a top hash ref, the values being as
+    described above for the respective host.
+
+AUTHOR AND COPYRIGHT
+    The Net::Nessus package is
+
+      Copyright (C) 1998    Jochen Wiedmann
+                            Am Eisteich 9
+                            72555 Metzingen
+                            Germany
+
+                            Phone: +49 7123 14887
+                            Email: joe@ispsoft.de
+
+      Copyright (C) 2004    Tiago Stock
+                            Email: tstock@tiago.com
+
+      All rights reserved.
+
+    You may distribute under the terms of either the GNU General Public
+    License or the Artistic License, as specified in the Perl README file.
+
+SEE ALSO
+    Net::Nessus::Client(3)
+

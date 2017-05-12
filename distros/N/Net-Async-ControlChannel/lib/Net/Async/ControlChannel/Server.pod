@@ -1,0 +1,133 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::ControlChannel::Server
+at lib/Net/Async/ControlChannel/Server.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 NAME
+
+Net::Async::ControlChannel::Server - server implementation for L<Protocol::ControlChannel> using L<IO::Async>
+
+=head1 VERSION
+
+Version 0.005
+
+=head1 SYNOPSIS
+
+ use Net::Async::ControlChannel::Server;
+ use IO::Async::Loop;
+ my $loop = IO::Async::Loop->new;
+ my $server = Net::Async::ControlChannel::Server->new(
+  loop => $loop,
+ );
+ $server->subscribe_to_event(
+  message => sub {
+   my $ev = shift;
+   my ($k, $v, $from) = @_;
+   warn "Server: Had $k => $v from $from\n";
+  }
+ );
+ $server->start;
+ $loop->run;
+
+=head1 DESCRIPTION
+
+Provides the server half for a control channel connection.
+
+=head1 METHODS
+
+=head2 new
+
+Instantiates the server object. Will not establish the listener,
+but does expect to receive an L<IO::Async::Loop> as the C<loop> named
+parameter.
+
+=head1 ACCESSOR METHODS
+
+=head2 loop
+
+The L<IO::Async::Loop> instance we're (going to be) attached to.
+
+=head2 host
+
+Our host. Will be populated after L</start> has been called.
+
+=head2 port
+
+Our listening port. Will be populated after L</start> has been called.
+
+=head2 proto
+
+The L<Protocol::ControlChannel> instance. Mainly for internal use.
+
+=head2 clients
+
+All currently-connected clients, as a list.
+
+=head2 dispatch
+
+Sends a message to all clients.
+
+Expects two parameters:
+
+=over 4
+
+=item * $k - the key we're sending
+
+=item * $v - the content (can be a ref, in which case it will be encoded
+using whichever mechanism has been negotiated with the client)
+
+=back
+
+Returns a L<Future> which will resolve when we think we've delivered
+to all connected clients.
+
+=head2 start
+
+Start the listener. Will return a L<Future> which resolves with our
+instance once the listening socket is active.
+
+=head2 listening
+
+The L<Future> corresponding to the listening connection. Resolves with our
+instance.
+
+=head2 listen_active
+
+Called internally when the listen action is complete.
+
+=head2 listen_error
+
+Called when there's an error. Marks L</listening> as failed.
+
+=head2 incoming_stream
+
+Called internally for each incoming client.
+
+=head2 incoming_message
+
+Called internally when we have data from a client.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Mixin::Event::Dispatch>
+
+L<add_handler_for_event|Mixin::Event::Dispatch/add_handler_for_event>, L<clear_event_handlers|Mixin::Event::Dispatch/clear_event_handlers>, L<event_handlers|Mixin::Event::Dispatch/event_handlers>, L<invoke_event|Mixin::Event::Dispatch/invoke_event>, L<subscribe_to_event|Mixin::Event::Dispatch/subscribe_to_event>, L<unsubscribe_from_event|Mixin::Event::Dispatch/unsubscribe_from_event>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2012-2013. Licensed under the same terms as Perl itself.

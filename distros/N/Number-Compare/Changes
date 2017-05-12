@@ -1,0 +1,15 @@
+0.03    21st September, 2011
+        Generate a new tarball on linux.  Doing the C<make dist> on OSX 
+        generated a tarball that upset dumb tars
+        tar: Ignoring unknown extended header keyword `SCHILY.dev'
+        tar: Ignoring unknown extended header keyword `SCHILY.ino'
+        tar: Ignoring unknown extended header keyword `SCHILY.nlink'
+
+
+0.02    12th September, 2011
+        - apply warning-related fix -
+          https://rt.cpan.org/Public/Bug/Display.html?id=58466
+
+0.01	23rd October, 2002
+	- Refactored the code away from File::Find::Rule
+	- Initial release

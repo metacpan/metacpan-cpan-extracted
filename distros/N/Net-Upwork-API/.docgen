@@ -1,0 +1,1 @@
+perl -MPod::Simple::HTMLBatch -e Pod::Simple::HTMLBatch::go lib html

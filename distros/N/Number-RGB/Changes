@@ -1,0 +1,31 @@
+Revision history for Perl extension Number-RGB
+
+1.41 2015-09-26
+  - Remove unused hash_traversal_mask from tests (#2, RT#107357)
+
+1.4 2015-09-26
+  - reupload to follow original author's versioning scheme
+
+1.001001 2015-09-26
+  [Packaging]
+    - Zoffix Znet <cpan@zoffix.com> assigned as the maintainer of the module
+    - Switched to Dist::Zilla
+  [Bug fixes]
+    - Fixed hash randomization bug (#1)
+    - ->new_from_guess() for 0..255 now never assumes it's hex (#1)
+    - Fixed incompatibility with newer Attribute::Handlers (RT#41394)
+    - Fixed occasional warnings on passing '#fff' to ->new_from_guess
+    - Range overflows on math operations now adjust for the closest possible
+        value instead of dying
+    - Illegal math operations on colours no longer issue warnings
+  [Misc]
+    - Made error messages for failed guesses using :RGB() reference user's code
+    - Math operations now round the values instead of int()
+    - Added more comprehensive tests
+    - Minor documentation clarifications and formating improvements
+
+1.2 2004-03-06
+  - Doc typo in as_string()
+
+1.1 2004-03-06
+  - Initial Release

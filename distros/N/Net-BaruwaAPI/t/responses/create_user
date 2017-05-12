@@ -1,0 +1,20 @@
+{
+    "account_type": 3,
+     "active": true,
+     "addresses": [],
+     "created_on": "2014:10:07:06:35:48",
+     "domains": [{"id": 4, "name": "example.com"}],
+     "email": "rowdyrough@example.com",
+     "firstname": "Rowdy",
+     "high_score": 0.0,
+     "id": 5,
+     "last_login": "2014:10:11:22:38:11",
+     "lastname": "Rough",
+     "local": true,
+     "low_score": 0.0,
+     "organizations": [],
+     "send_report": false,
+     "spam_checks": false,
+     "timezone": "Africa/Johannesburg",
+     "username": "rowdyrough"
+ }

@@ -1,0 +1,38 @@
+February 22, 2001
+
+ANNEXIA.ORG (London, UK) announces immediate availability of
+Net::FTPServer version 1.0, a secure, extensible and featureful FTP
+server with a unique fully virtualisable filesystem
+architecture. Net::FTPServer is now in use by over 4m users worldwide.
+
+Net::FTPServer represents a radical departure from traditional FTP
+servers like wu-ftpd and ProFTPD. Being written in Perl, it is secure
+against buffer overflow and tainted data attacks, and can be easily
+extended by loading in simple scripts (written in Perl). The whole FTP
+server can be completely changed by loading in back-end
+"personalities" so that you can, for example, serve files directly out
+of a relational database or even from memory. The architecture is
+modelled after Apache modules.
+
+The server has been adopted by schoolmaster.net, the world's leading
+online education community, and by FreeServers.com, a free webspace
+provider, giving it over 4 million users worldwide.
+
+The Net::FTPServer code is a Bibliotech project.  This company has
+kindly donated the code to the community and has provided web space
+and resources to host the website.
+
+Net::FTPServer is available from http://ftpserver.annexia.org/ and
+from CPAN. It is distributed under the terms of the GNU General Public
+License (GPL).
+
+More information:
+
+    http://ftpserver.annexia.org/
+    http://www.bibliotech.net/
+    http://www.schoolmaster.net/
+    http://www.freeservers.com/
+
+Contact:
+
+    Richard Jones <rich@annexia.org> +44 20 7384 6917

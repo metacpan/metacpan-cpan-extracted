@@ -1,0 +1,40 @@
+1.11 2009-01-11 fixing some bugs in SMS contact handling
+
+1.10 2009-01-02 adding SMS support
+
+1.09 2008-07-18 mail.ru changed the protocol...again... reverse-engineered it.
+
+1.08 2008-04-16 mail.ru changed the protocol... reverse-engineered it.
+
+1.07 2008-03-04 fixed avatar link and improved overall responsiveness
+
+1.06 2008-01-23 added support for statuses (own and contacts), added Net::MRIM::Contact module, and some bugfixes
+
+1.05 2008-01-20 added new mail notification support
+
+1.04 2008-01-18 improved notification handling (especially AUTH REQUEST)
+
+1.03 2008-01-14 several bugfixes, and handling of some more messages
+
+1.02 2008-01-11 improving search user feature, and handling of some types of messages
+
+1.01 2008-01-05 adding search user feature
+
+1.0 2007-12-30 fixing bugs thanks to A. Ciornii. added mrimwx.pl as example. added more configuration
+
+0.9 2007-12-29 fixing some small bugs, added more doc
+
+0.8 2007-12-24 adding basic support to retrieve contact information.
+
+0.7 2007-07-07 some more bugfixes. especially when getting big messages and in getting contact list
+
+0.6 2007-06-30 some more bugfixes. the contact list managment now works
+
+0.5 2007-06-27 some bigger bugfixes. this version is really ok as for sending/receiving online messages
+
+0.4 2007-06-26 some small bugfixes. added mrim.pl as an example.
+
+0.3 2007-06-24 added contact list managment and other minor improvments
+
+0.2 2007-06-23 initial public release
+

@@ -1,0 +1,51 @@
+Net::HTTPServer
+
+This is a light weight HTTP server that serves files as well as attaching
+function calls to URL requests.  This allows you to do a lot of things:
+
+- embed the web server into your program and serve up
+  anything your program can do
+
+- make a file available for download that you created
+
+- just take you CGI program and turn it into a stand
+  alone HTTP server that you can run on any machine.
+
+- lots lots more
+
+Ryan Eatmon
+reatmon@mail.com
+
+
+REQUIREMENTS
+  - URI              - Handles all of the URL magic
+
+OPTIONAL
+  - IO::Socket::SSL  - Allows for a secure web server
+  - MIME::Base64     - Allows for Basic Authentication
+  - Digest::MD5      - Allows for Digest Autentication
+
+INSTALLATION
+
+  perl Makefile.PL
+  make
+  make install
+
+STATUS
+
+  This update contains a new OOP style interface for requests and replies.
+I also added support for PHP style server side sessions.
+
+  The result of moving to the OOP interface is that the calling and return
+structure for handlers has changed.  For those that want to upgrade to this
+version of the module but do not want to have to rewrite your handlers
+immediately there is a config option for the server.  'oldrequests'=>1 will
+put the entire server back into the pre-1.0 style of handlers.  Giving you
+a chance to install the module and play with it before undertaking the
+conversion.
+
+  Aplogies for the change.
+
+DATE
+  2004/07/03
+

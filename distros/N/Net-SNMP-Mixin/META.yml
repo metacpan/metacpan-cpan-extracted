@@ -1,0 +1,38 @@
+---
+abstract: 'mixin framework for Net::SNMP'
+author:
+  - 'Karl Gaissmaier <karl.gaissmaier (at) uni-ulm.de>'
+build_requires:
+  Module::Build: '0'
+  Net::SNMP: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-SNMP-Mixin
+provides:
+  Net::SNMP::Mixin:
+    file: lib/Net/SNMP/Mixin.pm
+    version: '0.14'
+  Net::SNMP::Mixin::System:
+    file: lib/Net/SNMP/Mixin/System.pm
+    version: '0.14'
+  Net::SNMP::Mixin::Util:
+    file: lib/Net/SNMP/Mixin/Util.pm
+    version: '0.14'
+requires:
+  Net::SNMP: '0'
+  Package::Generator: '0.102'
+  Package::Reaper: '0.102'
+  Scalar::Util: '1.18'
+  Sub::Exporter: '0.978'
+  perl: v5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.14'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

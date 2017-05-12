@@ -1,0 +1,624 @@
+NAME
+    Net::Digg - Quickly consume and interface with the Digg API.
+
+SYNOPSIS
+        use Net::Digg;
+
+        my $digg = Net::Digg->new();
+
+        # Print the user that submitted the latest upcoming story.
+
+        my $result = $digg->get_upcoming_stories();
+
+        print $result->{ 'stories' }[0]->{'title'};
+
+       # Print the titles of the twenty latest popular stories
+
+        my %params = ('count' => 20);
+
+        $result = $digg->get_popular_stories(\%params);
+
+        my $stories = $result->{'stories'};
+
+        foreach $story (@$stories) {
+
+            print $story->{'title'} . "\n";
+
+        }
+
+    See also FUNCTIONS, DESCRIPTION, and EXAMPLES below.
+
+INSTALLATION
+    The typical:
+
+    0 perl Makefile.PL
+    0 make test
+    0 make install
+
+FUNCTIONS
+  new()
+    Creates the Digg object.
+
+  get_stories (\%params)
+    Given
+
+    0 a map of optional API query arguments.
+
+    Get all stories.
+
+  get_popular_stories (\%params)
+    Given
+
+    0 a map of optional API query arguments.
+
+    Get all popular stories.
+
+  get_upcoming_stories (\%params)
+    Given
+
+    0 a map of optional API query arguments.
+
+    Get all popular stories.
+
+  get_top_stories (\%params)
+    Given
+
+    0 a map of optional API query arguments.
+
+    Get top stories.
+
+  get_hot_stories (\%params)
+    Given
+
+    0 a map of optional API query arguments.
+
+    Get hot stories.
+
+  get_stories_by_container ($container, \%params)
+    Given
+
+    0 the desired container
+    0 a map of optional API query arguments.
+
+    Get all stories from a given container.
+
+  get_popular_stories_by_container ($container, \%params)
+    Given
+
+    0 the desired container
+    0 a map of optional API query arguments.
+
+    Get all popular stories from a given container.
+
+  get_upcoming_stories_by_container ($container, \%params)
+    Given
+
+    0 the desired container
+    0 a map of optional API query arguments.
+
+    Get all upcoming stories from a given container.
+
+  get_top_stories_by_container ($container, \%params)
+    Given
+
+    0 the desired container
+    0 a map of optional API query arguments.
+
+    Get top stories from a given container.
+
+  get_hot_stories_by_container ($container, \%params)
+    Given
+
+    0 the desired container
+    0 a map of optional API query arguments.
+
+    Get hot stories from a given container.
+
+  get_stories_by_topic ($topic, \%params)
+    Given
+
+    0 the desired topic
+    0 a map of optional API query arguments.
+
+    Get all stories from a given topic.
+
+  get_popular_stories_by_topic ($topic, \%params)
+    Given
+
+    0 the desired topic
+    0 a map of optional API query arguments.
+
+    Get all popular stories from a given topic.
+
+  get_upcoming_stories_by_topic ($topic, \%params)
+    Given
+
+    0 the desired topic
+    0 a map of optional API query arguments.
+
+    Get all upcoming stories from a given topic.
+
+  get_top_stories_by_topic ($topic, \%params)
+    Given
+
+    0 the desired topic
+    0 a map of optional API query arguments.
+
+    Get top stories from a given topic.
+
+  get_hot_stories_by_topic ($topic, \%params)
+    Given
+
+    0 the desired topic
+    0 a map of optional API query arguments.
+
+    Get hot stories from a given topic.
+
+  get_story_by_id ($id, \%params)
+    Given
+
+    0 the story id
+    0 a map of optional API query arguments.
+
+    Get identified story.
+
+  get_stories_by_ids (@ids, \%params)
+    Given
+
+    0 list of ids
+    0 a map of optional API query arguments.
+
+    Get a list of stories with the given ids.
+
+  get_story_by_title ($title, \%params)
+    Given
+
+    0 story clean title
+    0 a map of optional API query arguments.
+
+    Get identified story.
+
+  get_stories_by_user ($user, \%params)
+    Given
+
+    0 user name
+    0 a map of optional API query arguments.
+
+    Get stories submitted by given user.
+
+  get_popular_stories_by_user ($user, \%params)
+    Given
+
+    0 user name
+    0 a map of optional API query arguments.
+
+    Get popular stories submitted by given user.
+
+  get_upcoming_stories_by_user ($user, \%params)
+    Given
+
+    0 user name
+    0 a map of optional API query arguments.
+
+    Get upcoming stories submitted by given user.
+
+  get_stories_dugg_by_user ($user, \%params)
+    Given
+
+    0 user name
+    0 a map of optional API query arguments.
+
+    Get stories dugg by given user.
+
+  get_stories_commented_by_user ($user, \%params)
+    Given
+
+    0 user name
+    0 a map of optional API query arguments.
+
+    Get stories commented by given user.
+
+  get_stories_by_friends ($user, \%params)
+    Given
+
+    0 user name
+    0 a map of optional API query arguments.
+
+    Get stories submitted by given user friends.
+
+  get_popular_stories_by_friends ($user, \%params)
+    Given
+
+    0 user name
+    0 a map of optional API query arguments.
+
+    Get popular stories submitted by given user friends.
+
+  get_upcoming_stories_by_friends ($user, \%params)
+    Given
+
+    0 user name
+    0 a map of optional API query arguments.
+
+    Get upcoming stories submitted by given user friends.
+
+  get_stories_dugg_by_friends ($user, \%params)
+    Given
+
+    0 user name
+    0 a map of optional API query arguments.
+
+    Get stories dugg by given user friends.
+
+  get_stories_commented_by_friends ($user, \%params)
+    Given
+
+    0 user name
+    0 a map of optional API query arguments.
+
+    Get stories commented by given user friends.
+
+  get_diggs (\%params)
+    Given
+
+    0 a map of optional API query arguments.
+
+    Get all diggs.
+
+  get_popular_diggs (\%params)
+    Given
+
+    0 a map of optional API query arguments.
+
+    Get all popular diggs.
+
+  get_upcoming_diggs (\%params)
+    Given
+
+    0 a map of optional API query arguments.
+
+    Get all upcoming diggs.
+
+  get_diggs_by_storyid ($storyid, \%params)
+    Given
+
+    0 story id
+    0 a map of optional API query arguments.
+
+    Get all diggs for a given story.
+
+  get_diggs_by_storyids (@storyids, \%params)
+    Given
+
+    0 story ids
+    0 a map of optional API query arguments.
+
+    Get all diggs for a list of stories with the given ids.
+
+  get_diggs_by_user ($user, \%params)
+    Given
+
+    0 user name
+    0 a map of optional API query arguments.
+
+    Get one user's diggs for all stories.
+
+  get_diggs_by_userids (@ids, \%params)
+    Given
+
+    0 user names
+    0 a map of optional API query arguments.
+
+    Get several users' diggs for all stories
+
+  get_user_digg_by_storyid ($id, $user, \%params)
+    Given
+
+    0 story id
+    0 user name
+    0 a map of optional API query arguments.
+
+    Get one user digg for a given story.
+
+  get_comments (\%params)
+    Given
+
+    0 a map of optional API query arguments.
+
+    Get all comments.
+
+  get_popular_comments (\%params)
+    Given
+
+    0 a map of optional API query arguments.
+
+    Get all comments on popular stories.
+
+  get_upcoming_comments (\%params)
+    Given
+
+    0 a map of optional API query arguments.
+
+    Get all comments on upcoming stories.
+
+  get_comments_by_ids (@ids, \%params)
+    Given
+
+    0 a list of story ids
+    0 a map of optional API query arguments.
+
+    Get all comments for a list of stories with the given ids.
+
+  get_comments_by_id ($id, \%params)
+    Given
+
+    0 a story id
+    0 a map of optional API query arguments.
+
+    Get top-level comments for a given story.
+
+  ($user, \%params)
+    Given
+
+    0 user name
+    0 a map of optional API query arguments.
+
+    Get one user's comments for all stories.
+
+  get_comments_by_users (@users, \%params)
+    Given
+
+    0 user names
+    0 a map of optional API query arguments.
+
+    Get several users' comments for all stories.
+
+  get_comment_by_storyid_commentid ($storyid, $commentid, \%params)
+    Given
+
+    0 storyid
+    0 commentid
+    0 a map of optional API query arguments.
+
+    Get one comment for a given story.
+
+  get_comment_by_storyid_commentid ($storyid, $commentid, \%params)
+    Given
+
+    0 storyid
+    0 commentid
+    0 a map of optional API query arguments.
+
+    Get one level of replies to one comment for a given story.
+
+  get_errors (\%params)
+    Given
+
+    0 a map of optional API query arguments.
+
+    Get a list of all error codes and messages.
+
+  get_error_code ($code, \%params)
+    Given
+
+    0 error code
+    0 a map of optional API query arguments.
+
+    Get the message for a specific error code.
+
+  get_topics (\%params)
+    Given
+
+    0 a map of optional API query arguments.
+
+    Get a list of all topics.
+
+  get_topic_by_name ($topic, \%params)
+    Given
+
+    0 a map of optional API query arguments.
+
+    Get the specified topic.
+
+  get_users (\%params)
+    Given
+
+    0 a map of optional API query arguments.
+
+    Get all users.
+
+  get_user_by_name ($name, \%params)
+    Given
+
+    0 user name
+    0 a map of optional API query arguments.
+
+    Get named user.
+
+  get_users_friends ($name, \%params)
+    Given
+
+    0 user name
+    0 a map of optional API query arguments.
+
+    Get named user's friends.
+
+  get_users_fans ($name, \%params)
+    Given
+
+    0 user name
+    0 a map of optional API query arguments.
+
+    Get users who count the named user as a friend.
+
+  get_user_by_name_fan_name ($name, $fanName, \%params)
+    Given
+
+    0 user name
+    0 fan name
+    0 a map of optional API query arguments.
+
+    Get named user's friend.
+
+  get_galleryphotos (\%params)
+    Given
+
+    0 a map of optional API query arguments.
+
+    Get all gallery photos.
+
+  get_galleryphotos_by_ids (@ids, \%params)
+    Given
+
+    0 gallery photo ids
+    0 a map of optional API query arguments.
+
+    Get a list of galleryphotos with the given ids
+
+  get_galleryphotos_by_id ($id, \%params)
+    Given
+
+    0 gallery photo id
+    0 a map of optional API query arguments.
+
+    Get a list of galleryphotos with the given ids
+
+  get_galleryphotos_comments ($id, \%params)
+    Given
+
+    0 a map of optional API query arguments.
+
+    Get all gallery photo comments.
+
+  get_galleryphotos_comments_by_ids (@ids, \%params)
+    Given
+
+    0 gallery photo ids
+    0 a map of optional API query arguments.
+
+    Get all gallery photo comments for given ids.
+
+  get_galleryphoto_comments_by_id ($id, \%params)
+    Given
+
+    0 gallery photo id
+    0 a map of optional API query arguments.
+
+    Get top-level comments for a given gallery photo.
+
+  get_galleryphoto_comment_by_photoid_commentid ($photoid, $commentid, \%params)
+    Given
+
+    0 gallery photo id
+    0 comment id
+    0 a map of optional API query arguments.
+
+    Get one comment for a given gallery photo.
+
+  get_galleryphoto_comment_replies_by_photoid_commentid ($photoid, $commentid, \%params)
+    Given
+
+    0 gallery photo id
+    0 comment id
+    0 a map of optional API query arguments.
+
+    Get one level of replies to one comment for a given gallery photo.
+
+  get_media (\%params)
+    Given
+
+    0 a map of optional API query arguments.
+
+    Get a list of all media.
+
+  get_media_by_name ($short_name, \%params)
+    Given
+
+    0 the medium short_name
+    0 a map of optional API query arguments.
+
+    Get a specified medium.
+
+  get_containers (\%params)
+    Given
+
+    0 a map of optional API query arguments.
+
+    Get a list of all containers.
+
+  get_container_by_name ($short_name, \%params)
+    Given
+
+    0 the container short_name
+    0 a map of optional API query arguments.
+
+    Get a specified container.
+
+  handle_args (\%params)
+    Given
+
+    0 a map of optional API query arguments.
+
+    Returns the query string for an API request.
+
+DESCRIPTION
+    This module allows developers to quickly consume and interface with the
+    Digg API as defined at <http://apidoc.digg.com>
+
+EXAMPLES
+    my $digg = Net::Digg->new();
+    # Print the user that submitted the latest upcoming story.
+    my $result = $digg->get_upcoming_stories();
+    print $result->{ 'stories' }[0]->{'title'};
+    # Print the titles of the twenty latest popular stories
+    my %params = ('count' => 20);
+    $result = $digg->get_popular_stories(\%params);
+    my $stories = $result->{'stories'};
+    foreach $story (@$stories) {
+    print $story->{'title'} . "\n";
+    }
+
+CONFIGURATION AND ENVIRONMENT
+    Net::Digg uses LWP internally. Any environment variables that LWP
+    supports should be supported by Net::Digg.
+
+DEPENDENCIES
+    LWP::UserAgent
+    JSON::Any
+
+BUGS AND LIMITATIONS
+    I decided to use JSON::Any to parse and convert the JSON returned from
+    the Digg API. The main reason for this is that other similar modules
+    seemed to be using this strategy. I should check to see if there is
+    easier or more desirable way to handle the returned data.
+
+    Please report any bugs or feature requests to
+    "bug-net-digg@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
+
+VERSION
+    This document describes Net::Digg version 0.11.
+
+AUTHOR
+     Kurt Wilms
+     wilms@cs.umn.edu
+     http://www.kurtwilms.com/
+
+     Hey, if you download this module, drop me an email! That's the fun
+     part of this whole open source thing.
+       
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    in the distribution and available in the CPAN listing for Net::Digg (see
+    www.cpan.org or search.cpan.org).
+
+DISCLAIMER
+    To the maximum extent permitted by applicable law, the author of this
+    module disclaims all warranties, either express or implied, including
+    but not limited to implied warranties of merchantability and fitness for
+    a particular purpose, with regard to the software and the accompanying
+    documentation.
+

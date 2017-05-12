@@ -1,0 +1,30 @@
+Revision history for Perl extension Net::Zemanta.
+
+0.7  31 March 2014
+
+        - Make tests pass on Pod::Checker 1.70
+
+0.6  30 March 2014
+
+	- Add missing prerequisites.
+
+0.5  27 October 2009
+
+	- Don't fail unit tests if Test::Pod::Coverage isn't installed.
+
+0.4  22 October 2009
+
+	- Support for new optional zemanta.suggest parameters.
+
+0.3  13 August 2008
+
+	- Support for zemanta.suggest_markup API call.
+
+0.2  8 August 2008
+
+	- Update for the August version of Zemanta API.
+	- Support for "freebase" parameter to zemanta.suggest call
+
+0.1  11 July 2008
+
+	- initial release

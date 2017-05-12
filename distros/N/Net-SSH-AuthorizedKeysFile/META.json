@@ -1,0 +1,52 @@
+{
+   "abstract" : "Read and modify ssh's authorized_keys files",
+   "author" : [
+      "Mike Schilli <m@perlmeister.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-SSH-AuthorizedKeysFile",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "File::Copy" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Log::Log4perl" : "1",
+            "Test::More" : "0",
+            "Text::ParseWords" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/mschilli/net-ssh-authorizedkeysfile-perl"
+      }
+   },
+   "version" : "0.18"
+}

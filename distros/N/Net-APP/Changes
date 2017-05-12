@@ -1,0 +1,11 @@
+Revision history for Perl extension Net::APP.
+
+0.2  Fri Nov  9 13:33:15 2001
+	- updated for APP version 3.3
+	- documentation on using stunnel instead of Safe Passage
+	- useful get_domain_mailboxes and get_mailbox_forward_only methods
+	  that return perl data structures instead of unparsed lines
+
+0.1  Sun Jun 20 23:15:58 1999
+	- original version; created by h2xs 1.19
+

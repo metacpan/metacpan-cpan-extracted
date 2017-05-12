@@ -1,0 +1,62 @@
+Net-SynchroEdit-Service version 0.039
+============================
+
+The Net::SynchroEdit::Service module is used to interact with and manipulate existing SynchroEdit servers.
+The module focuses on the core functionality, i.e. the ability to connect to/disconnect from existing response services, querying commands and fetching results, etc.
+
+The Net::SynchroEdit::Session module can be used to represent a session within a response service. The Net::SynchroEdit::Controller module can be used for additional functionality.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Note: 'make test' will fail horribly unless you have a running SynchroEdit server on the default port (7962) on localhost. If such a set up is impossible, simply ignore the test resuls or mod the test scripts.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  IO::Select
+  IO::Socket
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Alacrity Management Corp.
+
+Version: MPL 1.1/LGPL 2.1
+
+The contents of this library are subject to the Mozilla Public License Version
+1.1 (the "License"); you may not use this library except in compliance with
+the License. You may obtain a copy of the License at
+http://www.mozilla.org/MPL/
+
+Software distributed under the License is distributed on an "AS IS" basis,
+WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+for the specific language governing rights and limitations under the
+License.
+
+The Original Code is SynchroEdit (www.synchroedit.com).
+
+The Initial Developer of the Original Code is
+Kalle Alm (kalle@enrogue.com).
+Portions created by the Initial Developer are Copyright (C) 2006
+Alacrity Management Corporations. All Rights Reserved.
+
+Contributor(s):
+
+Alternatively, the contents of this file may be used under the terms of
+the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+in which case the provisions of the LGPL are applicable instead
+of those above. If you wish to allow use of your version of this file only
+under the terms of the LGPL, and not to allow others to
+use your version of this file under the terms of the MPL, indicate your
+decision by deleting the provisions above and replace them with the notice
+and other provisions required by the LGPL. If you do not delete
+the provisions above, a recipient may use your version of this file under
+the terms of any one of the MPL or the LGPL.

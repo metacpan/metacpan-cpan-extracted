@@ -1,0 +1,9 @@
+Changes
+inc/ExtUtils/AutoInstall.pm
+lib/Net/UCP/Client.pm
+Makefile.PL
+MANIFEST
+README
+samples/client.pl
+t/Net-UCP-Client.t
+META.yml                                 Module meta-data (added by MakeMaker)

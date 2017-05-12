@@ -1,0 +1,31 @@
+Functions and Features that still need to be implemented:
+
+MORE DOCUMENTATION
+ - Perldocs
+ - Example usage
+Test suite
+Recursive queries (Net::DNSServer::Recursion)
+TCP connections Xfer/Proxy
+Secondary/Slaving of zones
+Handle Dynamic Updates?
+
+The following need to be done before Alpha Release:
+
+Hint zone support
+Main configuration file parsing
+ - Compatible with bind, but more options
+ - Do the work of feeding into options and zone referenes
+ - Values of {} should return array ref
+Zone configuration file parsing
+ - Compatible with bind
+ - Use ";" as comments
+ - Handle $TTL, $ORIGIN, etc
+ - Zone "Templating" support
+Probably just utilize an external parsing
+module like one or more of the following:
+ - DNS::ZoneParse
+ - DNS::ZoneFile
+ - Net::DNS::ZoneFile
+ - Net::Bind
+ - BIND::Conf_Parser
+No weird hard coded files or at least better defaults.

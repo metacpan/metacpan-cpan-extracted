@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Net-SMS-Mollie
+version:             0.04
+abstract:            Send SMS messages via the mollie.nl service
+license:             ~
+author:              
+    - M. Blom (blom@cpan.org)
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    LWP::UserAgent:                0
+    Test::Simple:                  0.44
+    XML::Simple:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

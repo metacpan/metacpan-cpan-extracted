@@ -1,0 +1,6 @@
+1) send(), recv(), sendto(), recvfrom(), read(), write(), sctp_send(), and sctp_opt_info()
+2) test peeloff
+3) Regression test
+4) Better error management
+5) optional parameters for sendmsg and recvmsg
+6) Get & Set sock opt

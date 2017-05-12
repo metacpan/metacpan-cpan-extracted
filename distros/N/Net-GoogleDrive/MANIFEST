@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+eg/gdrive.pl
+lib/Net/GoogleDrive.pm
+t/gdrive.t

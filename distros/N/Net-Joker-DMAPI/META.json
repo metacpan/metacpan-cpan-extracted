@@ -1,0 +1,58 @@
+{
+   "abstract" : "interface to Joker's Domain Management API",
+   "author" : [
+      "David Precious <davidp@preshweb.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Joker-DMAPI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Censor" : "0",
+            "Data::Dump" : "0",
+            "DateTime" : "0",
+            "Hash::Merge" : "0",
+            "LWP::UserAgent" : "0",
+            "Moo" : "0",
+            "MooX::Types::MooseLike::Base" : "0",
+            "URI" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bigpresh/Net-Joker-DMAPI/issues"
+      },
+      "homepage" : "https://github.com/bigpresh/Net-Joker-DMAPI",
+      "repository" : {
+         "url" : "https://github.com/bigpresh/Net-Joker-DMAPI"
+      }
+   },
+   "version" : "0.09"
+}

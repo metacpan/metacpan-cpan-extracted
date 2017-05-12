@@ -1,0 +1,29 @@
+Revision history for Perl extension Net::Whois::ARIN.
+
+0.12    Sat Jun 11 07:52:36 2011
+        - fixed point-of-contact parsing bug
+        - updating synopsis 
+
+0.11    Thu Oct 12 12:05:49 2006
+	- required a specific version of Test::MockObject
+        - used Build.PL to generate Makefile.PL
+        - used Build.PL to generate META.yml
+
+0.10	Tue Oct 10 09:12:22 2006
+	- added t/00-pod.t and t/00-pod-coverage.t
+        - documented the query() method
+        - fixed email address in the readme
+        - added a Build.PL file for Module::Build support
+	- added an examples directory with an example
+
+0.09	Mon Oct  9 19:28:03 2006
+	- tests now mock whois queries
+        - updated contact email address
+        - fixed consistency problem with contact type support
+        - accessor/mutators with AUTOLOAD for whois data objects
+
+0.07    Fri May 14 15:24:50 2004
+        - removed duplication variable declaration in N::W::A->organization
+        - initializing _contacts attribute in all record object constructors
+        - cleaned up some initialized values warnings in ARIN.pm
+

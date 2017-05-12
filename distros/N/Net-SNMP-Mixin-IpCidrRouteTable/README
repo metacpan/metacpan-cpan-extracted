@@ -1,0 +1,105 @@
+NAME
+    Net::SNMP::Mixin::IpCidrRouteTable - mixin class for the mib-II
+    ipCidrRouteTable
+
+VERSION
+    Version 0.05
+
+SYNOPSIS
+      use Net::SNMP;
+      use Net::SNMP::Mixin;
+
+      #...
+
+      my $session = Net::SNMP->session( -hostname => 'foo.bar.com' );
+
+      $session->mixer('Net::SNMP::Mixin::IpCidrRouteTable');
+      $session->init_mixins;
+      snmp_dispatcher();
+      $session->init_ok();
+      die $session->errors if $session->errors;
+
+      my @routes = $session->get_ip_cidr_route_table();
+
+      foreach my $route (@routes) {
+          my $dest     = $route->{ipCidrRouteDest};
+          my $mask     = $route->{ipCidrRouteMask};
+          my $tos      = $route->{ipCidrRouteTos};
+          my $next_hop = $route->{ipCidrRouteNextHop};
+          my $if_index = $route->{ipCidrRouteIfIndex};
+
+          print "$dest/$mask/$tos/$next_hop => $if_index/$next_hop\n";
+      }
+
+DESCRIPTION
+    A Net::SNMP mixin class for mib-II ipCidrRouteTable info.
+
+MIXIN METHODS
+  OBJ->get_ip_cidr_route_table()
+    Returns a sorted list of mib-II ipCidrRouteTable entries. Every list
+    element (route entry) is a hashref with the following fields and values:
+
+        {
+            ipCidrRouteDest         => IpAddress,           # tbl index
+            ipCidrRouteMask         => IpAddress,           # tbl index
+            ipCidrRouteTos          => Integer32,           # tbl index
+            ipCidrRouteNextHop      => IpAddress,           # tbl index
+            ipCidrRouteIfIndex      => Integer32,
+            ipCidrRouteType         => INTEGER,
+            ipCidrRouteTypeString   => String,              # resolved enum
+            ipCidrRouteProto        => INTEGER,
+            ipCidrRouteProtoString  => String,              # resolved enum
+            ipCidrRouteAge          => Integer32,
+            ipCidrRouteInfo         => OBJECT IDENTIFIER,
+            ipCidrRouteNextHopAS    => Integer32,
+            ipCidrRouteMetric1      => Integer32,
+            ipCidrRouteMetric2      => Integer32,
+            ipCidrRouteMetric3      => Integer32,
+            ipCidrRouteMetric4      => Integer32,
+            ipCidrRouteMetric5      => Integer32,
+            ipCidrRouteStatus       => RowStatus,
+            ipCidrRouteStatusString => String,              # resolved enum
+        }
+
+INITIALIZATION
+  OBJ->_init($reload)
+    Fetch the mib-II ipCidrRouteTable from the host. Don't call this method
+    direct!
+
+PRIVATE METHODS
+    Only for developers or maintainers.
+
+  _fetch_ip_cidr_route_tbl($session)
+    Fetch the ipCidrRouteTable once during object initialization.
+
+  _ip_cidr_route_tbl_cb($session)
+    The callback for _fetch_ip_cidr_route_tbl().
+
+SEE ALSO
+    Net::SNMP::Mixin
+
+REQUIREMENTS
+    Net::SNMP, Net::SNMP::Mixin
+
+BUGS, PATCHES & FIXES
+    There are no known bugs at the time of this release. However, if you
+    spot a bug or are experiencing difficulties that are not explained
+    within the POD documentation, please submit a bug to the RT system (see
+    link below). However, it would help greatly if you are able to pinpoint
+    problems or even supply a patch.
+
+    Fixes are dependant upon their severity and my availablity. Should a fix
+    not be forthcoming, please feel free to (politely) remind me by sending
+    an email to gaissmai@cpan.org .
+
+      RT: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-SNMP-Mixin-IpCidrRouteTable
+
+AUTHOR
+    Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
+
+COPYRIGHT & LICENSE
+    Copyright 2011-2016 Karl Gaissmaier, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

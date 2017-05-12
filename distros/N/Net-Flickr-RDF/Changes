@@ -1,0 +1,298 @@
+# -*-n3-*-
+
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix doap:    <http://usefulinc.com/ns/doap#> .
+@prefix asc:     <http://aaronland.info/ns/changefile/> .
+
+<>
+        dc:identifier           "$Id: Changes,v 1.44 2010/12/19 19:06:12 asc Exp $" ;
+        dc:description          "Changes for Net::Flickr::RDF.pm" ;
+        dcterms:references      <http://aaronland.info/perl/net/flickr/rdf/> .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-RDF-2.2.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/rdf/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/rdf/Net-Flickr-RDF-2.1.tar.gz>;
+
+        doap:Version    [
+                        doap:revision     "2.2" ;
+                        doap:created      "2010-12-22" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Remove Trynt colorspace triples (the API appears to be gone)" ;
+			asc:update	  "TSIBLEY's patches https://github.com/straup/p5-Net-Flickr-RDF/pull/1" ;
+                        asc:bugfix        "Remove squirrely dependency strings in Build.PL" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-RDF-2.1.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/rdf/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/rdf/Net-Flickr-RDF-2.01.tar.gz>;
+
+        doap:Version    [
+                        doap:revision     "2.1" ;
+                        doap:created      "2008-02-24" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Capture Flickr Places information (old skool geo resources are linked via rdf:seeAlso)" ;
+                        asc:update        "Require Net::Flickr::API 1.68" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-RDF-2.01.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/rdf/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/rdf/Net-Flickr-RDF-2.0.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "2.01" ;
+                        doap:created      "2007-09-03" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Require N:F:API 1.67" ;
+                        ] . 
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-RDF-2.0.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/rdf/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/rdf/Net-Flickr-RDF-1.96.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "2.0" ;
+                        doap:created      "2007-06-02" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Record machine tags as properties of the photo with pointers to machinetags.org" ;
+                        asc:addition      "Record Flickr geo/place labels" ;
+                        asc:addition      "Record versioning information about the RDF document itself" ;
+                        asc:addition      "Added 'add_namespace' object method" ;
+                        asc:update        "Changed the pointer for geonames:Feature (in geo:Point) to use skos:broader - THIS CHANGE IS NOT BACKWARDS COMPATIBLE" ;
+                        asc:update        "Updated example RDF dump in POD" ;
+                        asc:update        "Require Net::Flickr::API 1.65" ;
+                        asc:bugfix        "Fix N3 in Changes file" ;
+                        ] .
+                                     
+<http://aaronland.info/perl/net/delicious/Net-Flickr-RDF-1.96.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/rdf/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/rdf/Net-Flickr-RDF-1.95.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.96" ;
+                        doap:created      "2006-11-19" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Replaced all calls to $xml->findvalue() with $xml->find()->string_value() to account for XML::XPath::Literal string overloading" ;
+                        asc:update        "Updated to N:F:A 1.63" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-RDF-1.95.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/rdf/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/rdf/Net-Flickr-RDF-1.94.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.95" ;
+                        doap:created      "2006-11-18" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Added the option to query the Trynt web service to extract clour information" ;
+                        asc:bugfix        "BLARGH! Fixed global tags URI (was /tags/TAG; is /tags/photos/TAG)" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-RDF-1.94.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/rdf/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/rdf/Net-Flickr-RDF-1.93.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.94" ;
+                        doap:created      "2006-10-19" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Query and store reverse geocoding and topo data for photos with lat/long information, using geonames.org" ;
+                        asc:update        "Require Net::Flickr::API 1.62" ;
+                        asc:update        "Use 'flickr' namespace for geo:Point/accuracy since Flickr measures accuracy differently than Y! Maps - this change is NOT BACKWARDS COMPATIBLE" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-RDF-1.93.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/rdf/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/rdf/Net-Flickr-RDF-1.92.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.93" ;
+                        doap:created      "2006-09-07" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Better error handling in 'collect_user_data_by_screenname'" ;
+                        asc:update        "Require Net::Flickr::API 1.61" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-RDF-1.92.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/rdf/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/rdf/Net-Flickr-RDF-1.91.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.92" ;
+                        doap:created      "2006-09-01" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Added support for geo data (and permission) in photos.getInfo";
+                        asc:update        "Require Net::Flickr::API 1.6" ;
+                        asc:update        "Geo data derived from tags is stored in a distinct geo:Point description - this change is NOT BACKWARDS COMPATIBLE" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-RDF-1.91.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/rdf/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/rdf/Net-Flickr-RDF-1.9.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.91" ;
+                        doap:created      "2006-08-23" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Require Net::Flickr::API 1.5 (sigh)";
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-RDF-1.9.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/rdf/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/rdf/Net-Flickr-RDF-1.8.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.9" ;
+                        doap:created      "2006-08-18" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Require Net::Flickr::API 1.4";
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-RDF-1.8.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/rdf/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/rdf/Net-Flickr-RDF-1.7.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.8" ;
+                        doap:created      "2006-06-23" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Call binmode as an object method, if possible; This is an IO::Scalar-ism to support storing RDF inline in Net::Flickr::Backup 2.7" ;
+                        asc:update        "Updated POD" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-RDF-1.7.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/rdf/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/rdf/Net-Flickr-RDF-1.6.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.7" ;
+                        doap:created      "2006-05-30" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Ensure that dateTimeOriginal/Digitized EXIF properties are W3CDTF, per RT report 18748" ;
+                        asc:update        "Moved the bulk of the EXIF data from the description of the photo page to an '...#exif' description (and added rdfs:seeAlso pointers where necessary), per RT report 18749." ;
+                        asc:update        "Updated POD" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-RDF-1.6.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/rdf/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/rdf/Net-Flickr-RDF-1.5.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.6" ;
+                        doap:created      "2006-03-13" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Add support for comments." ;
+                        asc:addition      "Add support for geotags by reading 'geo:lat' and 'geo:long' Flickr tags (experimental)." ;
+                        asc:addition      "Added 'build_photo_uri' package method." ;
+                        asc:update        "Updated POD." ;
+                        asc:update        "Updated Changes file to use RDF/N3." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-RDF-1.5.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/rdf/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/rdf/Net-Flickr-RDF-1.4.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.5" ;
+                        doap:created      "2005-12-17" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Fixed a bug looking for an element called 'descption' rather than 'description'." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-RDF-1.4.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/rdf/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/rdf/Net-Flickr-RDF-1.3.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.4" ;
+                        doap:created      "2005-12-17" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Require Net::Flickr::API 1.2." ;
+                        asc:bugfix        "Fixed to return 1 like all good modules do." ;
+                        asc:bugfix        "Fixed MANIFEST to, you know, point to the right files." ;
+                        asc:bugfix        "Fixed t/00-load.t to, you know, load the right package." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-RDF-1.3.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/rdf/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/rdf/Net-Flickr-RDF-1.2.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.3" ;
+                        doap:created      "2005-10-06" ;
+                        ];
+        asc:changes     [
+        	        asc:bugfix        "Fixed serialization methods to use STDOUT if no file handle is defined...just like the docs say." ;
+                        asc:addition      "'make_tag_triples'; 'make_photoset_triples'; 'make_group_triples'; 'make_grouppool_triples' object methods." ;
+	                asc:addition      "'serialise_triples' and 'serialize_triples' object methods; these replace the private '_describe' method which has been removed." ;
+                        asc:addition      "'build_photoset_uri'; 'build_group_uri'; 'build_grouppool_uri' package method." ;
+	                asc:addition      "'prune_triples' package method." ;
+	                asc:addition      "Caching for most 'collect_*_data' methods." ;
+                        asc:addition      "rdf:type SPO for global tag URLs." ;
+	                asc:update        "Changed all pre-existing 'build_*_uri' methods to be package methods instead of object methods; this should not affect backwards compatibility." ;
+	                asc:update        "'make_user_triples'; 'make_cc_triples' object methods to return a list if (wantarray)" ;
+	                asc:update        "POD" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-RDF-1.2.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/rdf/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/rdf/Net-Flickr-RDF-1.1.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.2" ;
+                        doap:created      "2005-10-05" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Make_user_triples; make_cc_triples object methods." ;
+                        asc:addition      "Proper CC RDF blobs. photos licensed under the CC now reference a cc:License triple; photo with no license will continue to use dc:license." ;
+                        asc:update        "Collect_user_data to set a 'user_id' key." ;
+                        asc:update        "Updated POD." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-RDF-1.1.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/rdf/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/rdf/Net-Flickr-RDF-1.0.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.1" ;
+                        doap:created      "2005-09-28" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix       "Fixed URI for (personal) tags." ;
+                        asc:bugfix       "Fixed POD." ;
+                        asc:update       "Updated POD." ;
+                        asc:update       "Updated uri_shortform to use 'namespaces' package method when package has been subclassed." ;
+                        asc:addition     "Build_user_uri; build_user_tag_uri; build_global_tag_uri" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-RDF-1.0.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/rdf/> ;
+
+        doap:Version    [
+                        doap:revision     "1.0" ;
+                        doap:created      "2005-09-22" ;
+                        ];
+        asc:changes     [
+                        asc:comment       "Initial release." ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/rdf/>
+        a doap:Project ;
+        doap:download-page      "http://search.cpan.org/dist/Net-Flickr-RDF/" ;
+        doap:download-mirror    "http://aaronland.info/perl/net/flickr/rdf/" .

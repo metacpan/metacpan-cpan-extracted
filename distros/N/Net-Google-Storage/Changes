@@ -1,0 +1,12 @@
+Revision history for Net-Google-Storage
+
+0.1.2     2012-11-19 19:09:21 Australia/Sydney
+    Test::Class is no longer a hard prerequisite (RT-81270).
+    Including the repository metadata.
+
+0.1.1     2012-09-18 11:37:58 Australia/Sydney
+    Added a basic test that anyone can run (live tests are more difficult).
+
+v0.1.0    2012-09-17 23:53:42 Australia/Sydney
+    First release. Not perfect, but usable.
+

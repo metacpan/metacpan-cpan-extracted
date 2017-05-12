@@ -1,0 +1,25 @@
+SYNOPSIS
+
+      # net-mqtt-sub /topic
+    
+      # net-mqtt-pub /topic message
+    
+      # net-mqtt-trace mqtt.tcp
+
+DESCRIPTION
+
+    Low level API for the MQTT protocol described at http://mqtt.org.
+
+    IMPORTANT: This is an early release and the API is still subject to
+    change.
+
+DISCLAIMER
+
+    This is not official IBM code. I work for IBM but I'm writing this in
+    my spare time (with permission) for fun.
+
+SEE ALSO
+
+    net-mqtt-sub(1), net-mqtt-pub(1), net-mqtt-trace(1),
+    Net::MQTT::Message(3)
+

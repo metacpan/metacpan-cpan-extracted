@@ -1,0 +1,27 @@
+---
+abstract: 'Perl interface to hadoop s3fs'
+author:
+  - 'Nobuo Danjou <nobuo.danjou@gmail.com>'
+build_requires:
+  File::Spec: 0
+  File::Temp: 0
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Amazon-HadoopEC2-S3fs
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::Basename: 0
+  Math::BigInt: 0
+  Moose: 0
+  Net::Amazon::S3: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

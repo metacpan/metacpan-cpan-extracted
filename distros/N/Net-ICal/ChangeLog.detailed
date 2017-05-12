@@ -1,0 +1,2022 @@
+2001-08-04 02:36  srl
+
+	* AUTHORS: added some nicks to the AUTHORS file at cogent's request
+
+2001-08-04 02:35  srl
+
+	* AUTHORS: Added Matt Cashner and David Hand to AUTHORS in the new
+	TESTERS section; they helped me verify the packaging on a release
+	candidate tarball.
+
+2001-08-04 01:55  srl
+
+	* Makefile.PL: Noted the dependency on the newest version of
+	Date::ICal (1.27).
+
+2001-08-04 01:53  srl
+
+	* ChangeLog, README, lib/Net/ICal.pm: Edited the README and
+	ChangeLog in preparation for the 0.15 release.	Version number
+	tweaks and minor updates to Net::ICal.pm.
+
+2001-08-04 01:43  srl
+
+	* lib/Net/ICal/: Daylight.pm, Standard.pm, Timezone.pm: Beefed up
+	the documentation for the timezone-support modules.
+
+2001-08-04 01:17  srl
+
+	* ChangeLog.detailed, Makefile.PL: Minor adjustment to Makefile.PL
+	to make the ChangeLog.detailed get made properly in the make dist
+	phase. Removed ChangeLog.detailed from CVS since we auto-generate
+	it in make dist, and since CVS logs are readily available.
+
+2001-08-04 01:07  srl
+
+	* Makefile.PL: Oops, Test::More has been rolled into Test::Simple
+	now. Minor fix to Makefile.PL.
+
+2001-08-04 00:59  srl
+
+	* Makefile.PL, lib/Net/ICal/Attendee.pm, lib/Net/ICal/Component.pm,
+	lib/Net/ICal/Daylight.pm, lib/Net/ICal/ETJ.pm,
+	lib/Net/ICal/Event.pm, lib/Net/ICal/Freebusy.pm,
+	lib/Net/ICal/FreebusyItem.pm, lib/Net/ICal/Period.pm,
+	lib/Net/ICal/Property.pm, lib/Net/ICal/Recurrence.pm,
+	lib/Net/ICal/Standard.pm, lib/Net/ICal/Time.pm,
+	lib/Net/ICal/Timezone.pm, lib/Net/ICal/Util.pm: Now that TODO tests
+	work in Test::More 0.10, I upgraded N::I's dependency on it and
+	converted a lot of the failing "write this test" tests to TODO
+	tests, which don't formally fail. I also did some bugfixes as I
+	went along to make failing tests work.
+
+2001-08-03 00:47  srl
+
+	* MANIFEST, examples/timezone_test.pl, lib/Net/ICal/Daylight.pm,
+	lib/Net/ICal/Standard.pm, lib/Net/ICal/Timezone.pm: Added
+	Daylight.pm, which gives support for DAYLIGHT sections in
+	VTIMEZONEs. It could use some refactoring, but I think it works. 
+	Now we need some better, more complete examples of the uses of
+	timezones, and we need to work the timezone support into the other
+	Net::ICal modules.
+	
+	Made minor docco cleanups, added skeleton tests. If someone wants
+	to earn karma, you can add some POD about timezones and edit the
+	documentation.
+
+2001-08-03 00:04  srl
+
+	* examples/timezone_test.pl, lib/Net/ICal/Component.pm,
+	lib/Net/ICal/Standard.pm, lib/Net/ICal/Timezone.pm: Woohoo! Basic
+	VTIMEZONE interpretation works now; see Net-ICal/examples/
+	timezone_test.pl.
+	
+	Added Timezone.pm and Standard.pm, which are the parsers for
+	VTIMEZONES and STANDARD sections; we need to add Daylight.pm, which
+	is like STANDARD but has a different interpretation.
+	
+	Made a minor adjustment in how Component.pm finds the name of a
+	BEGIN:FOO section.
+
+2001-08-02 00:39  srl
+
+	* MANIFEST, lib/Net/ICal/Time.pm: Fixed Net::ICal::Time embedded
+	tests 6 and 7; yes, this means that time math now works as far as I
+	can tell. Please prove me wrong by writing more tests to show the
+	holes.
+
+2001-08-01 23:50  rbowen
+
+	* MANIFEST: The embedded tests should not be listed in the
+	MANIFEST, since they are automatically regenerated, and so should
+	not go into the tarball.
+
+2001-08-01 23:41  rbowen
+
+	* lib/Net/ICal/Time.pm: The - needs to go before the number, not
+	after it.
+
+2001-07-26 02:04  srl
+
+	* MANIFEST: removed Changelog.bak from MANIFEST.
+
+2001-07-26 02:02  srl
+
+	* ChangeLog, INSTALL, README: Added notes in the appropriate places
+	about the fact that we require 5.6.x now.
+
+2001-07-26 01:57  srl
+
+	* BUGS, ChangeLog, ChangeLog.detailed, INSTALL, MANIFEST,
+	Makefile.PL, README, TODO, lib/Net/ICal.pm: Added the
+	Changelog.detailed for CVS-to-ChangeLog messages.  Updates to
+	packaging in preparation for 0.14, mostly; revised the TODO and put
+	Big Red Flags around the fact that tests will fail in the release.
+
+2001-07-26 01:51  srl
+
+	* lib/Net/ICal/: Period.pm, Util.pm: Minor fixes to Period.pm;
+	fixed a failing test there and in Util.pm, where there was a hack
+	into a bit of the Date::ICal internals that has changed.
+
+2001-07-25 21:45  srl
+
+	* lib/Net/ICal/Time.pm: Tweaked the second test in N::I::Time,
+	added some comments, and verified what works and what doesn't.
+	Alas, there's a roundoff error in Date::ICal that's causing the
+	math tests to fail by one second. :-/
+
+2001-07-24 23:23  srl
+
+	* examples/: README, test_alarm.pl, test_todo.pl: Added comments to
+	Net-ICal/examples/test_alarm.pl.  Made adjustments in test_todo.pl,
+	but it's still breaking all over the place, particularly on the
+	as_localtime method and on the fact that it can't see the organizer
+	as an Attendee. Can someone please take a look at this?
+
+2001-07-24 07:43  lotr
+
+	* examples/: cal2fb.pl, lunchtime.pl: sheesh. I removed those use
+	statements for a reason.
+
+2001-07-24 07:29  srl
+
+	* examples/README, examples/cal2fb.pl, examples/lunchtime.pl,
+	lib/Net/ICal/ETJ.pm, lib/Net/ICal/Period.pm,
+	lib/Net/ICal/Recurrence.pm: Tried to coerce some of the examples
+	into working. lunchtime.pl works now, at least as much as it will
+	until we get timezones fixed.  cal2fb.pl is somewhat less fixed.
+	Added some comments to the examples README to explain a few of the
+	examples, and put a TODO note on the usage of Date::Calc in
+	Recurrence.pm.
+
+2001-07-24 07:20  srl
+
+	* AUTHORS, Makefile.PL: Added in a patch from kebin@jibsheet.com---
+	Recurrence.pm still requires Date::Calc, and it shouldn't in the
+	future. Makefile.PL needs to know that we have to have Date::Calc
+	now though.
+	
+	updated the Date::ICal dependency to 1.18_01, which was released
+	yesterday.
+
+2001-07-23 22:28  srl
+
+	* lib/Net/ICal/Calendar.pm: Moved some documentation for internal
+	methods from comments to POD
+
+2001-07-23 13:36  lotr
+
+	* Makefile.PL: add some prerequisites
+
+2001-07-23 11:10  lotr
+
+	* examples/README: oops, forgot lunchtime.pl
+
+2001-07-23 11:09  lotr
+
+	* examples/: cal2fb.pl, freebusy_demo.pl, gtk_todo.pl,
+	html_calendar.pl, lunchtime.pl, recurrence_test.pl, test_alarm.pl,
+	test_todo.pl, testcal.pl: clean up use statements
+
+2001-07-23 11:06  lotr
+
+	* examples/README: put something semi-useful in README.
+
+2001-07-23 10:49  lotr
+
+	* t/rfc2445.t: fix up the test-filename info extracting RE
+
+2001-07-23 10:45  lotr
+
+	* test/: test_alarm.pl, test_duration.pl, test_journal.pl,
+	test_todo.pl, testcal.pl: these were moved to example/ so we should
+	actually delete them here.
+
+2001-07-19 01:34  srl
+
+	* Makefile.PL: Added a note to Makefile.PL about known broken tests
+	in preparation for an upcoming alpha/snapshot release.
+
+2001-07-19 01:20  srl
+
+	* TODO, lib/Net/ICal/Property.pm, lib/Net/ICal/Recurrence.pm: Added
+	tests to Property and Recurrence--- mostly stubs to flag places
+	that need better tests written.
+	
+	Reorganized Recurrence.pm to flow more logically, sort of.  Someone
+	with time on their hands should refactor it.
+	
+	updated the TODO.
+
+2001-07-19 00:50  srl
+
+	* lib/Net/: ICal.pm, ICal/Freebusy.pm, ICal/FreebusyItem.pm,
+	ICal/Period.pm: Added a bunch of tests, including failing tests to
+	mark where tests aren't written yet. Corrected some of Period.pm to
+	bring it up to date with the newer Time.pm and Duration.pm APIs.
+	
+	Freebusy.pm's tests are still failing to load for reasons I don't
+	understand, but FreebusyItem has some tests now.
+
+2001-07-18 23:54  srl
+
+	* lib/Net/ICal/Freebusy.pm: Added beginnings of tests to Freebusy.
+	However, its call to N::I::Util->create_uuid is failing because of
+	create_uuid's assumptions about how it gets called. The error I'm
+	getting is:
+	
+	Can't use string ("Net::ICal::Util") as a HASH ref while "strict
+	refs" in use at lib/Net/ICal/Util.pm line 67.
+	
+	Writing further tests for Freebusy would be great, but there's not
+	much to test until someone adds more validation routines.
+
+2001-07-18 23:32  srl
+
+	* lib/Net/ICal/: Alarm.pm, Calendar.pm, Event.pm: Added some basic
+	tests for Alarm, Calendar, and Event. Look particularly at the
+	Event module's last test for a way to test ical output.  Thanks to
+	Michael Schwern for suggesting that approach.
+
+2001-07-18 23:31  srl
+
+	* examples/: test_alarm.pl, test_duration.pl, test_journal.pl,
+	test_todo.pl, testcal.pl: Moved the files from Net-ICal/test to
+	Net-ICal/examples to make things less confusing.
+
+2001-07-16 10:37  lotr
+
+	* lib/Net/ICal/Util.pm: get the 'error domain' from caller()
+
+2001-07-15 11:45  lotr
+
+	* lib/Net/ICal/Component.pm: fix check for existance of the
+	property
+
+2001-07-15 11:44  lotr
+
+	* test-data/rfc2445/4/8/1/1/1-pass-correct.ics: add first test for
+	ATTACH
+
+2001-07-13 10:43  lotr
+
+	* lib/Net/ICal/Calendar.pm: Don't set default values for scalar
+	methods in the map now that we check for duplicates in _parse_lines
+
+2001-07-13 10:38  lotr
+
+	* lib/Net/ICal/Component.pm: Gah, stupid. add test to make sure I
+	don't get confused again
+
+2001-07-13 06:09  lotr
+
+	* lib/Net/ICal/: Calendar.pm, ETJ.pm: Don't set domain => '' as we
+	depend on it being undefined for simple scalar values.
+
+2001-07-12 08:11  lotr
+
+	* lib/Net/ICal/Component.pm: Embedded tests are nice, but it's
+	crazy for new_from_ical. That's what test-data/ is for.
+
+2001-07-12 08:09  lotr
+
+	* lib/Net/ICal/Component.pm: fail more gracefully on unknown
+	properties
+
+2001-07-11 18:52  lotr
+
+	* lib/Net/ICal/Component.pm: handle nonexisting components a little
+	more gracefully
+
+2001-07-11 18:51  lotr
+
+	* lib/Net/ICal.pm: add Util.pm
+
+2001-07-11 18:38  lotr
+
+	* t/rfc2445.t: yay. put back in File::Find. Now we autogenerate
+	both the number and a list of tests.  also reindented to 4-space
+
+2001-07-10 06:04  lotr
+
+	* t/rfc2445.t: add tests to rfc2445.t
+
+2001-07-10 05:58  lotr
+
+	* test-data/rfc2445/4/8/7/: 1/1-pass-correct.ics, 1/2-fail-utc.ics,
+	2/1-pass-correct.ics, 2/2-fail-utc.ics, 3/1-pass-correct.ics,
+	3/2-fail-utc.ics: tests for the validate checks in ETJ.pm
+
+2001-07-10 05:41  lotr
+
+	* lib/Net/ICal/ETJ.pm: add rfc section number comments to the
+	validation tests
+
+2001-07-09 16:52  lotr
+
+	* lib/Net/ICal/Todo.pm: * fix/comment out some more tests * add rfc
+	section comments to the tests in validate
+
+2001-07-09 16:32  lotr
+
+	* t/rfc2445.t: - add in the extra tests - have plan count @tests
+	instead of adjusting it manually - adjust the checks to see if a
+	test failed/passed to take into   account the errlog list
+
+2001-07-09 16:20  lotr
+
+	* test-data/rfc2445/4/8/2/: 1/1-pass-correct.ics, 1/2-fail-utc.ics,
+	3/1-pass-due-datetime.ics, 3/2-pass-due-date.ics,
+	3/3-fail-due-date.ics, 3/4-fail-invalid-due-time.ics: Add a few
+	more tests to the parsing test suite. Some are supposed to fail
+	since they uncover bugs :)
+
+2001-07-09 10:35  lotr
+
+	* lib/Net/ICal/: Attendee.pm, Component.pm, ETJ.pm, Event.pm,
+	Freebusy.pm, Journal.pm, Todo.pm: Big validation commit featuring:
+	* move of errlog list to Component * some validation code in the
+	_parse_lines callback * validate at the end of _parse_lines, and
+	move the list of parse	 errors to a listref in $@ if the
+	validation failed * use of Net::ICal::Util create_uuid for
+	generating the uid in ETJ and	Freebusy * an _init in ETJ to call
+	from new to do automatic setting of properties	 like uid and
+	dtstamp. This can't go in _create, since that gets called   from
+	new_from_ical too * cleanup of map definitions so the differences
+	between Event, Todo and   Journal are taken care of better *
+	validate running after _create, and working on the object instead
+	of   the args hash, so it can be called from new_from_ical too *
+	some vi modelines and a bit of indenting cleanup *
+	removed/commented out/modified some tests
+
+2001-07-09 08:37  lotr
+
+	* lib/Net/ICal/Util.pm: - add a Util.pm now there's some functions
+	that should be in it
+
+2001-07-09 08:19  lotr
+
+	* lib/Net/ICal/Time.pm: put back as_ical_value method that got lost
+	somewhere
+
+2001-07-09 08:17  lotr
+
+	* lib/Net/ICal/Property.pm: Remove unneccesary copying of argument
+
+2001-07-09 08:11  lotr
+
+	* lib/Net/ICal/Duration.pm: remove a few my's so we don't get a
+	warning about my'ing the same var twice in one scope
+
+2001-07-09 08:01  lotr
+
+	* lib/Net/ICal/Calendar.pm: - remove the errlog member here, so we
+	can put it in Component.pm to	use for validation
+
+2001-07-08 14:09  lotr
+
+	* lib/Net/ICal/Event.pm: - clean up indenting - clean up
+	TODO/FIXME/BUG formatting
+
+2001-07-08 03:04  srl
+
+	* lib/Net/ICal/Duration.pm: Added a bunch of tests to
+	Net::ICal::Duration. They all pass.
+	
+	Moved most of the _create() functions back into new().	Cleaned up
+	some crufty usage of the Class::MethodMapper variables;
+	$self->{nsecs}->{value} became $self->nsecs and such.
+	
+	There's still a lot of refactoring to be done, but this should help
+	some.
+
+2001-07-08 01:21  srl
+
+	* lib/Net/ICal/Time.pm: Added tests to Net::ICal::Time to verify
+	that we're wrappering Date::ICal properly. They don't verify the
+	arithmetic: D::I tests should be doing that.
+
+2001-07-07 22:04  srl
+
+	* lib/Net/ICal/: Duration.pm, Time.pm: Twiddled a few of the
+	N::I::Time tests.
+	
+	Started to untangle the mess of Duration.pm by adding tests and
+	cleaning up the _create function. OTOH, I'm not sure _create should
+	be there at all. We need to look at reworking this module
+	altogether.
+
+2001-07-04 03:17  uid28795
+
+	* lib/Net/ICal/Component.pm: change all my $foo = shift @_; to my
+	($foo) = @_; and add an empty line after that, so it's consistent
+	with the rest of the code.
+
+2001-07-03 21:53  srl
+
+	* lib/Net/ICal/Time.pm: Added a bunch of tests for N::I::Time.pm.
+	The tests die after number 3 though, because of something broken
+	about Date::ICal. Can someone take a look at this?
+
+2001-07-03 19:42  lotr
+
+	* lib/Net/ICal/Event.pm: remove unused 'use Carp'
+
+2001-07-03 19:41  lotr
+
+	* lib/Net/ICal/Component.pm: - clean up TODO/FIXME/BUG formatting -
+	substitute remaining x-props code with a ref to the bug - fix test
+	syntax - partly revert Skud's previous commit, so the callbacks are
+	sane   again - rename unfold to _unfold, as it's a private function
+	and add a   _fold equivalent
+
+2001-07-03 14:51  lotr
+
+	* .cvsignore: shut up cvs
+
+2001-07-03 14:47  lotr
+
+	* t/.cvsignore: shut up cvs
+
+2001-07-03 14:46  skud
+
+	* lib/Net/ICal/Component.pm: Oops, this is meant to be case
+	insensitive (RFC 2445, sect 4.1)
+
+2001-07-03 14:39  skud
+
+	* lib/Net/ICal/ETJ.pm: Minor modifications to tests.
+
+2001-07-03 14:39  skud
+
+	* lib/Net/ICal/Component.pm: Shuffled the order of subroutines
+	around so that all the internal-use-only ones are at the bottom and
+	the POD reads more cleanly.
+
+2001-07-03 14:27  skud
+
+	* lib/Net/ICal/Component.pm: Some tests, untested :)  Some will
+	definitely fail, and ones that still need writing are written as
+	ok(0, "need tests here");
+
+2001-07-03 14:01  skud
+
+	* lib/Net/ICal/Component.pm: I made a bunch of changes the other
+	day to clean up some of Component.pm.  Unfortuneately I forgot to
+	commit them :-/  So here they are, merged with LotR's recent
+	changes.  I'm expecting some breakage but I thought it was better
+	to commit them than not.
+
+2001-07-02 16:43  lotr
+
+	* t/time.t: fix for new Time.pm
+
+2001-06-30 16:44  lotr
+
+	* lib/Net/ICal/: Alarm.pm, Calendar.pm, Component.pm, Duration.pm,
+	Event.pm, Freebusy.pm, FreebusyItem.pm, Journal.pm, Period.pm,
+	Property.pm, Recurrence.pm, Time.pm, Todo.pm: - remove 'use
+	UNIVERSAL' where not used - remove the qw(isa) bit, and use
+	UNIVERSAL::isa ($foo, $class); instead
+
+2001-06-30 16:42  lotr
+
+	* lib/Net/ICal/: Attendee.pm, ETJ.pm, Trigger.pm: clean up existing
+	tests a bit and add first rudimentary tests for Trigger
+
+2001-06-30 15:14  lotr
+
+	* lib/Net/ICal/ETJ.pm: - cleaned up a bit (removed unused Carp and
+	Date::Calc uses) - reindent - make the FIXME/TODO/BUG style
+	consistent. I do it like this:
+	
+	#TODO: foo bar baz blah #      more on next line #BUG: SFnumber
+
+2001-06-30 15:08  lotr
+
+	* lib/Net/ICal/Component.pm: remove leftover debugging print
+
+2001-06-30 06:54  lotr
+
+	* lib/Net/ICal/: Attendee.pm, Component.pm: fix my stupidness in
+	both tests and the validation functions.
+
+2001-06-30 06:52  lotr
+
+	* lib/Net/ICal/Trigger.pm: fix for new Time.pm
+
+2001-06-29 14:12  lotr
+
+	* lib/Net/ICal/Time.pm: use use base instead of @ISA remove the
+	following functions, since they were just calling the super class's
+	equivalent, which we can let perl do for us:	new, hour, minute,
+	second, year, month, day, epoch, compare fix as_ical to include the
+	: as the old Time.pm did
+
+2001-06-29 14:08  lotr
+
+	* lib/Net/ICal/ETJ.pm: fix _create for new Time.pm so dtstamp and
+	uid get created correctly
+
+2001-06-29 14:06  lotr
+
+	* lib/Net/ICal/Component.pm: fixed syntax by my'ing appropriate
+	vars in has_only_one_of fix for new Time.pm fix comment typo
+
+2001-06-29 13:59  lotr
+
+	* lib/Net/ICal/Todo.pm: s/class/args/; # fix typo in validate
+
+2001-06-29 00:34  srl
+
+	* lib/Net/ICal/Time.pm, t/time.t: Fixed up Net::ICal::Time to play
+	nicely with the Date::ICal that's currently in CVS. Added tests to
+	N::I::Time, and test stubs for the routines I didn't write full
+	tests for. Test 3 is failing, though.
+	
+	Adjusted some of the test routines in t/time.t also.
+
+2001-06-27 12:21  lotr
+
+	* lib/Net/ICal/: Calendar.pm, Component.pm: Calendar.pm - add an
+	errlog list to the methodmap
+	
+	Component.pm - add validation utility functions (has_one_of,
+	has_required_property,	 has_illegal_property and has_only_one_of)
+	with rudimentary comments   and tests.
+
+2001-06-26 18:05  lotr
+
+	* lib/Net/ICal/Alarm.pm: - Add rfc section number comments to the
+	method map - add a vim modeline
+
+2001-06-25 00:57  skud
+
+	* lib/Net/ICal/Attendee.pm: Stub validation routine and a test for
+	it.
+
+2001-06-25 00:42  skud
+
+	* lib/Net/ICal/Attendee.pm: An oranizer with a nonsense email
+	address should fail (I guess).	Here's a test for it, but I haven't
+	written the code yet.
+
+2001-06-25 00:38  skud
+
+	* lib/Net/ICal/: ETJ.pm, Journal.pm: Hrm.  If we require a DTSTART
+	on ETJ.pm, it's inherited by Journal.pm.  Do we want that?
+
+2001-06-25 00:29  skud
+
+	* lib/Net/ICal/Attendee.pm: Simple Pod::Tests testing stub for
+	Attendee.pm
+
+2001-06-25 00:26  skud
+
+	* lib/Net/ICal/Journal.pm: Bugger, the tests are b0rked again. 
+	Well, I'm gonna see if I can get Attendee tests working, since this
+	sorta relies on them...
+
+2001-06-25 00:18  skud
+
+	* lib/Net/ICal/Journal.pm: Fixed use lib line
+
+2001-06-25 00:17  skud
+
+	* lib/Net/ICal/Journal.pm: I guess if we're going to call it
+	validate() I'd better make sure I'm consistent :)
+
+2001-06-25 00:11  skud
+
+	* lib/Net/ICal/Journal.pm: Now it actually passes its tests :)
+
+2001-06-24 23:15  skud
+
+	* Makefile.PL: Changed the test generation stuff, as per schwern's
+	advice.
+
+2001-06-24 13:36  skud
+
+	* Makefile.PL: Added a line to the Makefile to generate tests
+	automagically when you "make dist".
+
+2001-06-24 13:14  skud
+
+	* lib/Net/ICal/ETJ.pm: Added a check for DTSTART in validate() and
+	wrote a test for it
+
+2001-06-24 13:07  skud
+
+	* lib/Net/ICal/Journal.pm: Added perldoc for internal methods and
+	Pod::Tests testing stubs
+
+2001-06-24 12:59  skud
+
+	* lib/Net/ICal/Todo.pm: Added perldoc and Pod::Tests testing stubs
+
+2001-06-24 12:51  skud
+
+	* lib/Net/ICal/ETJ.pm: Added perldoc and vague Pod::Tests testing
+	sections
+
+2001-05-22 12:02  coral
+
+	* lib/Net/ICal/Time.pm: Reverting to 1.6 version but retaining
+	history.
+
+2001-05-22 02:54  coral
+
+	* lib/Net/ICal/Todo.pm: a Todo requires an organizer. Check added
+	to validate routine.
+
+2001-05-22 02:43  coral
+
+	* lib/Net/ICal/Freebusy.pm: When the GUID code was pasted from
+	ETJ.pm someone forgot a couple things ($count, $date). It's fixed.
+
+2001-05-22 02:29  coral
+
+	* lib/Net/ICal/Duration.pm: BUG #426149 Should be
+	$self->method($args), not $args->method($args). Oops. Thanks,
+	anonymous.
+
+2001-05-14 23:18  srl
+
+	* lib/Net/ICal/: Event.pm, Freebusy.pm: Added some more pointers to
+	sourceforge bugs.
+	
+	Added a UID generation routine to Freebusy.pm. There's a similar
+	one in ETJ.pm; they should probably both be pulled out to a utility
+	module somewhere.
+
+2001-05-14 22:51  srl
+
+	* lib/Net/ICal/: Attendee.pm, Calendar.pm, Component.pm,
+	Duration.pm, ETJ.pm: Added a bunch of references to Sourceforge bug
+	tracking numbers for TODO/FIXME items that I originated.
+
+2001-05-12 16:09  coral
+
+	* lib/Net/: ICal.pm, ICal/Alarm.pm, ICal/Calendar.pm,
+	ICal/Duration.pm, ICal/Freebusy.pm, ICal/FreebusyItem.pm,
+	ICal/Journal.pm, ICal/Period.pm, ICal/Recurrence.pm, ICal/Time.pm,
+	ICal/Trigger.pm: Ran podchecker on all files; all errors fixed, two
+	or three warnings of no concern to us remain (duplicate =items).
+
+2001-05-12 12:57  coral
+
+	* lib/Net/ICal/: Alarm.pm, Attendee.pm, Calendar.pm, Component.pm,
+	Duration.pm, ETJ.pm, Event.pm, Freebusy.pm, FreebusyItem.pm,
+	Journal.pm, Period.pm, Property.pm, Recurrence.pm, Time.pm,
+	Todo.pm, Trigger.pm: Switched over to 'use base' instead of
+	modifying @ISA; this also corrects bugs in two modules where they
+	changed @ISA but forgot to use the module that had just been put
+	into @ISA.
+
+2001-05-12 12:06  coral
+
+	* MANIFEST: Added 4.3 tests in test-data.
+
+2001-05-12 12:06  coral
+
+	* test-data/rfc2445/4/3/: 1-fail-invalid-time.ics,
+	2-pass-invalid-time.ics, README_rfc2445_4.3: Tests for invalid
+	times.
+
+2001-05-12 12:04  coral
+
+	* lib/Net/ICal/Component.pm, lib/Net/ICal/Time.pm, t/rfc2445.t,
+	test-data/rfc2445/4/1/1-fail-lines-longer-than-75-octets.ics,
+	test-data/rfc2445/4/1/2-pass-lines-exactly-75-octets.ics: date-time
+	requires seconds to be present if a time is specified. the
+	pass/fail examples in test-data/rfc2445/4/1 didn't follow that, so
+	they've been corrected. I'm adding 4.3 pass/fail examples to catch
+	the time error.
+
+2001-05-10 09:08  coral
+
+	* lib/Net/ICal/Duration.pm, t/duration.t: Fixed the 0H bug in
+	durations - the as_ical_value of '-P0DT0H0M1S' is now '-PT1S', with
+	W,D,H,M,S zero elements being removed.
+	
+	Note that if you pass it a zero duration, it will return 'PT0S'.  I
+	wasn't able to figure out the RFC enough to make sense of whether
+	'P' is a valid duration string - if it is, it should return 'P'
+	instead to represent no amount of time at all.	Put a few tests at
+	the end of duration.t to check for the PT0S return value (for
+	instance, when passed '-P0D').
+	
+	Updated various sections of duration.t that used to accomodate the
+	0H behaviour; I had planned to remove the expected 0H so that the
+	tests would fail again, but it seemed easier to fix the bug.
+
+2001-05-10 01:46  coral
+
+	* lib/Net/ICal/: ETJ.pm, Recurrence.pm: Extra # nitpick, added a
+	FIXME to a large comment of that topic.
+
+2001-05-09 09:09  coral
+
+	* lib/Net/ICal/: Alarm.pm, Attendee.pm, Calendar.pm, Component.pm,
+	Duration.pm, ETJ.pm, Event.pm, Freebusy.pm, FreebusyItem.pm,
+	Journal.pm, Period.pm, Property.pm, Recurrence.pm, Time.pm,
+	Todo.pm, Trigger.pm: Added L<Net::ICal> to the SEE ALSO sections; a
+	bit of removal of section 3 notation from L<Net::ICal(3)> links as
+	well.
+
+2001-05-09 08:36  coral
+
+	* lib/Net/ICal/: Alarm.pm, Attendee.pm, Calendar.pm: All the
+	examples use "email@address"; this isn't valid perl5 code.  Fixed.
+
+2001-05-09 08:27  coral
+
+	* FAQ: Changed URL to developer's guide from cs.smith.edu to
+	reefknot.sourceforge.net.
+
+2001-05-09 08:07  coral
+
+	* examples/showical.perl: Added copyright notice, open "or die"
+	fix.
+
+2001-05-09 08:06  coral
+
+	* examples/reply.perl: Added copyright, fixed sender/receiver bug.
+
+2001-05-09 08:06  coral
+
+	* examples/recurrence_test.pl: Updated copyright, whitespace nit,
+	changed organizer variable to $organizer
+
+2001-05-09 08:05  coral
+
+	* examples/html_calendar.pl: Added copyright, whitespace,
+	formatting nits.
+
+2001-05-09 08:05  coral
+
+	* examples/gtk_todo.pl: Updated copyright, whitespace nitpicks.
+
+2001-05-09 08:04  coral
+
+	* examples/freebusy_demo.pl: Added copyright notice, added # TODO:
+	[DOC] entry.
+
+2001-05-09 08:03  coral
+
+	* examples/cal2fb.pl: Added copyright notice, a bit of
+	clarification of code (commented "P60D").
+
+2001-05-09 08:02  coral
+
+	* t/rfc2445.t: Clarified comments, updated copyright, re-enabled
+	test disabled for 1.3 release:
+	
+	# FIXME: this is broken until N::I::Component returns undef on
+	bogus data #	    Commented out for N::I release so tests will
+	pass
+	
+	I've uncommented it.
+
+2001-05-09 08:00  coral
+
+	* t/: duration.t, time.t: Updated copyright notice.
+
+2001-05-09 07:58  coral
+
+	* TODO: Consistency nit; VTIMEZONE (not yet finished) points at
+	Time.pm and Date::ICal now.
+
+2001-05-09 07:57  coral
+
+	* README: Copyright notice update.
+
+2001-05-09 07:56  coral
+
+	* Makefile.PL: Whitespace nitpicks.
+
+2001-05-08 15:42  coral
+
+	* FAQ: Parenthetic nit.
+
+2001-05-05 21:48  srl
+
+	* AUTHORS: Added Coral to AUTHORS.
+
+2001-05-05 21:44  srl
+
+	* lib/Net/ICal/Trigger.pm: one more patch from coral:
+	
+	updated the licensing agreement
+	
+	- code changes
+	
+	added use UNIVERSAL qw(isa)
+	
+	- pod changes
+	
+	added rcs id
+
+2001-05-05 21:42  srl
+
+	* lib/Net/ICal/Todo.pm: more patches from coral:
+	
+	updated the licensing agreement
+	
+	- code changes
+	
+	rearrange the code for consistency
+	
+	- pod changes
+	
+	rearranged the pod for consistency
+
+2001-05-05 21:41  srl
+
+	* lib/Net/ICal/Time.pm: yet more patches from coral: updated the
+	licensing agreement
+	
+	- code changes
+	
+	rearrange the code for consistency
+	
+	- pod changes
+	
+	rearranged the pod for consistency
+
+2001-05-05 21:39  srl
+
+	* lib/Net/ICal/Recurrence.pm: patches from coral: updated the
+	licensing agreement
+	
+	- code changes
+	
+	rearranged the top of the file a bit moved some of the actual code
+	below the pod for consistency added UNIVERSAL qw(isa) removed
+	__END__
+	
+	- pod changes
+	
+	added an RCS id
+
+2001-05-05 21:37  srl
+
+	* lib/Net/ICal/Property.pm: more patches from coral:
+	
+	DID NOT update the licensing agreement - HA HA HA
+	
+	- code changes
+	
+	added UNIVERSAL qw(isa) removed __END__
+	
+	- pod changes
+	
+	moved SEE ALSO to the end rcs id is in there now
+
+2001-05-05 21:36  srl
+
+	* lib/Net/ICal/Period.pm: more patches from coral:
+	
+	updated the licensing agreement
+	
+	- code changes
+	
+	rearrange the code for consistency
+	
+	- pod changes
+	
+	rearranged the pod for consistency
+
+2001-05-05 21:35  srl
+
+	* lib/Net/ICal/Journal.pm: patches from coral: updated licensing
+	agreement
+	
+	- code changes
+	
+	rearrange the code for consistency
+	
+	- pod changes
+	
+	rearranged the pod for consistency
+
+2001-05-05 21:34  srl
+
+	* lib/Net/ICal/FreebusyItem.pm: Patches from coral to FreebusyItem:
+	updated the licensing agreement
+	
+	- code changes
+	
+	added use UNIVERSAL qw(isa)
+	
+	- pod changes
+	
+	changed the NAME slightly
+
+2001-05-05 21:32  srl
+
+	* lib/Net/ICal/ETJ.pm: More patches from coral to ETJ: updated the
+	licensing agreement
+	
+	- code changes
+	
+	moved a line of code below the pod where it seems to belong
+	
+	- pod changes
+	
+	moved things around to be consistent small example change - now
+	it's actually perl code
+
+2001-05-05 21:31  srl
+
+	* lib/Net/ICal/Freebusy.pm: patches from coral to Freebusy:
+	
+	updated the licensing agreement
+	
+	- code changes
+	
+	rearrange the code for consistency
+	
+	- pod changes
+	
+	rearranged the pod for consistency
+
+2001-05-05 21:29  srl
+
+	* lib/Net/ICal/Event.pm: patches from coral to Event:
+	
+	updated the licensing agreement
+	
+	- code changes
+	
+	rearrange the code for consistency
+	
+	- pod changes
+	
+	rearranged the pod for consistency
+
+2001-05-05 21:28  srl
+
+	* lib/Net/ICal/Duration.pm: More patches from coral to Duration.pm:
+	
+	updated the licensing agreement
+	
+	- code change
+	
+	add use UNIVERSAL qw(isa)
+	
+	- pod change
+	
+	moved the pod around to be more consistent with the rest of them
+
+2001-05-05 21:26  srl
+
+	* lib/Net/ICal/: Calendar.pm, Component.pm: more patches from
+	coral:
+	
+	in Calendar.pm: updated the licensing agreement
+	
+	- code changes
+	
+	added use UNIVERSAL qw(isa) for consistency moved the 1; to the end
+	of the file - more consistency removed the __END__ at the end -
+	even more consistency
+	
+	- pod changes
+	
+	moved the NAME section to the top of the file for consistency
+	
+	in Component.pm: updated the licensing agreement
+	
+	- pod changes
+	
+	now we have a rcs id whitespace nitpicking
+
+2001-05-05 21:23  srl
+
+	* lib/Net/ICal/Alarm.pm: Another patch from coral:
+	
+	updates the licensing information
+	
+	- code changes
+	
+	adds use UNIVERSAL qw(isa) to be consistent add validation for
+	duration/repeat - either both defined or undefined.
+	
+	- pod changes
+	
+	fix the indenting of the code example at the beginning clarifies
+	the NAME slightly punctuation nitpick clarifies the action method. 
+	typo fix in the trigger method, punctuation nitpick.  more
+	punctuation nitpick consistency updates to the description of the
+	actions document a todo mentioned by LotR even more punctuation
+	nitpick
+
+2001-05-05 20:30  srl
+
+	* MANIFEST, lib/Net/ICal.pm: Patches from coral
+	(reefknot@crystalflame.net):
+	
+	updates the MANIFEST to include files recently added to the
+	distribution.
+	
+	Net::ICal.pm: updated the licensing at the top of the file.
+	
+	corrected a typo in the pod.
+	
+	add L<> around two Net::ICal::Calendar references.
+
+2001-04-21 18:27  srl
+
+	* lib/Net/ICal/Duration.pm, t/duration.t: Fixed a bunch of bugs in
+	Duration that were causing "make test" to fail. Difficult to
+	enumerate them all, but many of them were caused by trying to do
+	too many things on one line.
+	
+	I updated the tests to work around some odd behaviors in the new
+	Duration.pm, which always outputs hours, minutes, and seconds even
+	if some of those values are 0.
+	
+	Some parts of this code came from a patch contributed by Paul Baker
+	<pbaker@where2getit.com>.
+
+2001-04-21 09:17  mtearle
+
+	* INSTALL, Makefile.PL: Update of INSTALL and Makefile.PL to note
+	dependency on Date::Calc
+
+2001-04-21 08:57  srl
+
+	* MANIFEST, test/regression.pl: Removed
+	Net-ICal/test/regression.pl, since it's no longer relevant. I'd
+	still love to see some regression tests, but those should really go
+	in t/.
+
+2001-04-20 22:14  srl
+
+	* lib/Net/ICal/Recurrence.pm: Fixed an occurrence of "our" which
+	was causing breakage under Perl 5.005.
+
+2001-04-20 13:35  shutton
+
+	* examples/cal2fb.pl: Simple calender->freebusy generator.
+
+2001-04-20 13:25  shutton
+
+	* examples/showical.perl: * Use ::Time's format() method to display
+	event times, rather than   deprecated as_localtime method.
+
+2001-04-20 13:22  shutton
+
+	* examples/recurrence_test.pl: Pruned this down a bit. 
+	Demonstrates occurrence() method.
+
+2001-04-20 13:21  shutton
+
+	* examples/lunchtime.pl: "lunchtime" example demonstrates ::Time's
+	time zone conversion and arithmetic capabilities.
+
+2001-04-20 13:17  shutton
+
+	* lib/Net/ICal/Component.pm: A hack to make sure that RRULE and
+	EXRULE entries get parsed as Recurrence objects.  This needs to be
+	unhacked.
+
+2001-04-20 13:17  shutton
+
+	* lib/Net/ICal/Recurrence.pm: 
+	Now implemented with _create like other ::Property children (the
+	parser was just storing the literal string).  new_from_ical() has
+	been overridden to properly separate the parts of the property
+	(e.g., BYDAY, COUNT, etc.)
+	
+	Minimal recurrence support.  I've been working from Outlook's
+	supported recurrence styles to get something useful out.  Outlook
+	styles below that begin with => work, and those beginning with +>
+	don't work yet, but are next on my list.
+	
+	  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	  Ending:
+	
+	    End after [N] occurrences
+	    => COUNT=[N]
+	    End by [DATE]
+	    => UNTIL=[DATE]
+	    No end date
+	    => <NOTHING>
+	
+	  Daily:
+	
+	    Every [N] days(s)
+	    => FREQ=DAILY,INTERVAL=[N]
+	    Every weekday
+	    => FREQ=DAILY,BYDAY=MO,TU,WE,TH,FR
+	    => FREQ=WEEKLY,BYDAY=MO,TU,WE,TH,FR
+	
+	  Weekly:
+	
+	    Recur every [N] weeks on: [WEEKDAY(S)]
+	    => FREQ=WEEKLY,INTERVAL=[N],BYDAY=[WEEKDAYS(S)]
+	
+	  Monthly:
+	
+	    Day [DN] of every [N] month(s)
+	    => FREQ=MONTHLY,INTERVAL=[N],BYDAY=[DN]
+	    The [ORDINAL] [WEEKDAY] of every [N] month(s)
+	    +> FREQ=MONTHLY,INTERVAL=[N],BYDAY=[ORDINAL][WEEKDAY]
+	
+	  Yearly:
+	
+	    Every [MONTH] [MONTHDAY]
+	    +> FREQ=YEARLY
+	    +> FREQ=MONTHLY,BYMONTH=[MONTH],BYDAY=[MONTHDAY]
+	    The [ORDINAL] [WEEKDAY] of [MONTH]
+	    +> FREQ=MONTH,BYMONTH=[MONTH],BYDAY=[ORDINAL][WEEKDAY]
+	    +> FREQ=YEARLY,BYMONTH=[MONTH],BYDAY=[ORDINAL][WEEKDAY]
+	  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	
+	There's some whacked-out code in there to deal with WKST.  Consider
+	it "thinking out loud"; it'll probably be removed, or bottled up
+	and moved in to ::Time later (so that ::Time objects can report how
+	far into the week they are given a specific week-start day [usually
+	SU or MO])
+
+2001-04-20 13:13  shutton
+
+	* lib/Net/ICal/Time.pm: Avoid warnings in arithmetic code when the
+	add()'d duration doesn't contain both calendar and absolute
+	portions -- default to zero rather than undef.
+
+2001-04-20 13:10  shutton
+
+	* lib/Net/ICal/Duration.pm: Major overhaul.  This includes the new
+	separate calendar/absolute time support, and is now implemented as
+	a ::Property.
+
+2001-04-20 13:04  shutton
+
+	* lib/Net/ICal/ETJ.pm: 
+	Minor changes to support the new ::Time module (no more use of
+	"broken" times (see Time.pm, below)
+	
+	Add fledgling support for recurrence in the form of an
+	occurrences() method (just repeatedly calls the occurrences()
+	method of each RRULE).	If no RRULEs are there, it returns the
+	simple event period provided it falls within the occurrence period.
+
+2001-04-20 13:00  shutton
+
+	* lib/Net/ICal/Time.pm: 
+	Massively overhauled, and now a ::Property.  Supports the three
+	"styles" of DATE-TIME in RFC 2445:
+	
+	  UTC Time
+	  Local Time
+	  "Floating" Time
+	
+	There are bits in there to support DATE and TIME, but consider them
+	untested.  Only DATE-TIME is known to be working right at the
+	moment (to the extent that I've tested it in my own applications).
+	
+	As for new/old functionality, it's a little more limited than
+	before, but should be simpler to use.  The constructor now takes
+	either an EPOCH int (with an optional timezone), or a DATE-TIME
+	string.  I think it was too flexible before, which added some
+	confusion on proper usage.  If there's enough demand, we *could*
+	put back the "broken time" style of creation, but I think the
+	constructor is already too flexible.
+	
+	OTOH, the time zone stuff is handled nicely now, though is
+	dependent on the POSIX mktime and TZ environment sensitivity
+	present in UNIX.  Works great on Linux, but someone's going to have
+	to work making this portable.  We need to design
+	Net::ICal::Timezone to specify VTIMEZONES, link the calculations to
+	that module rather than trusting that the Olson zones will be
+	present on the system.
+	
+	Note: If you're pulling numbers from strings and want them treated 
+	     as EPOCH int's, wrap them up with int() first.  Otherwise the 
+	     code that tries to distinguish between 987630687 (an EPOCH
+	int)	   and "20010418" (a simple DATE string) will get confused.
+	
+	Also Note: Day_of_week and day_of_year functions from prior CVS
+	revision	   were removed, but expect them to return shortly.
+	 I'd like      to revisit those, with consideration for integrating
+	with	   RECUR requirements (e.g., there should be
+	weekday_of_year       and weekday_of_month functions that return
+	the ordinal values	     for those days (e.g., weekday_of_month
+	for 2001-04-12 should		 return both 2 and -3, since it's
+	the second, and the third      from the last Thursday of the
+	month).  Also, considerations	  need to be made for WKST, since
+	that affects ordinals over	the year)
+
+2001-04-20 12:31  shutton
+
+	* lib/Net/ICal/Period.pm: 
+	Fix printing of periods specified as time+duration.  The separator
+	(:) was being printed before the DURATION, since the as_ical()
+	method was called rather than the as_ical_value() method.
+
+2001-04-20 11:45  ennui42
+
+	* lib/Net/ICal/Period.pm:    Fixed the compare method. I think this
+	broke when I fixed the Time::compare
+	   function it depends upon
+
+2001-04-05 04:29  ennui42
+
+	* lib/Net/ICal/: Period.pm, Time.pm: Time.pm:	* Changed localtime
+	to gmtime in normalize. This still needs to take account of the
+	timezone of the event, but definatly should not take account of the
+	timezone of the local machine	* Fixed Time->compare which didn't
+	work as stated	     * Added day_of_week, day_of_year,
+	start_of_week - not sure whether this is the best way to do these,
+	again timezones aren't taken into account :(
+	
+	Period.pm:	* Fixed compare and union now I understand the
+	proper definition of a period. Ie if a period starts when another
+	ends then they do not overlap.
+
+2001-04-02 10:28  lotr
+
+	* AUTHORS: i have a real email address
+
+2001-04-02 08:31  lotr
+
+	* lib/Net/ICal/Period.pm: add a missing } to Period.pm
+
+2001-04-01 17:18  srl
+
+	* lib/Net/ICal/Period.pm: Committed Mark Cheverton's code for
+	calculating overlap between Periods.  I think that it's probably a
+	fast solution, but I think we also may want something that
+	calculates the exact time overlap between two Periods.
+
+2001-04-01 03:40  srl
+
+	* AUTHORS, lib/Net/ICal/Period.pm: Committed a patch by Mark
+	Cheverton (ennui@morat.net) to determine whether a given Time is
+	within a Period. Added Mark to AUTHORS.
+
+2001-04-01 01:55  srl
+
+	* examples/: recurrence_test.pl, reply.perl, showical.perl: Cleaned
+	up some of the examples so that they: - have comments explaining
+	what they do - work properly out of the box.
+
+2001-04-01 00:44  srl
+
+	* BUGS, MANIFEST, lib/Net/ICal/Component.pm, lib/Net/ICal/ETJ.pm,
+	lib/Net/ICal/Freebusy.pm, lib/Net/ICal/Period.pm,
+	lib/Net/ICal/Property.pm, lib/Net/ICal/Recurrence.pm, t/rfc2445.t:
+	Made a bunch of changes to make Net::ICal's make/make test process
+	play nicely with Perl 5.00503. Notably:
+	
+	File::Find, which t/rfc2445.t was using, seems to behave
+	differently between 5.00503 and 5.6.0, so I changed the test to not
+	use it at all.
+	
+	Recurrence.pm as it was used "use warnings" and "method", which
+	seem to be 5.6isms. I removed them. Let's stick to 5.005
+	compatibility from here forward.
+
+2001-03-29 10:31  mtearle
+
+	* README: Added comment to README to refer to COPYING.xxx for
+	details of licenses.
+
+2001-03-29 10:29  mtearle
+
+	* COPYING.Artistic, COPYING.GPL, INSTALL: Added copies of the GPL
+	and Artistic Licenses to the distribution
+	
+	Added an INSTALL document
+
+2001-03-28 22:06  srl
+
+	* MANIFEST: Minor changes to MANIFEST
+
+2001-03-28 22:05  srl
+
+	* BUGS, FAQ, MANIFEST, README, TODO: Miscellaneous cleanups in
+	preparation for 0.13 release.
+
+2001-03-25 15:37  srl
+
+	* examples/freebusy_demo.pl, lib/Net/ICal/Freebusy.pm,
+	lib/Net/ICal/FreebusyItem.pm, lib/Net/ICal/Period.pm,
+	lib/Net/ICal/Property.pm: Fixed the Freebusy class to implement
+	FREEBUSY lines properly. There's a new module, FreebusyItem, which
+	is a Property that outputs lines like
+	FREEBUSY;FBTYPE=BUSY:19970101T120000/19970101T123000 . Freebusy.pm
+	handles VFREEBUSY objects. This is kind of a confusing naming
+	scheme, but all the other ways I could think of were equally bad.
+	
+	Modified some of the as_ical adhackery in Period so that Periods
+	will display properly on FREEBUSY (FreebusyItem) lines.
+	
+	TODO: The RFC specifies that FREEBUSY lines can contain multiple
+	periods separated by commas, like this:
+	FREEBUSY;FBTYPE=BUSY:19970101T120000/19970101T123000, 
+	19970101T190000/19970101T210000 I haven't yet understood how C::MM
+	works well enough to make this happen.
+
+2001-03-25 13:54  srl
+
+	* README, examples/README, lib/Net/ICal.pm,
+	lib/Net/ICal/Component.pm, lib/Net/ICal/Journal.pm, test/test.pl,
+	test/test_alarm.pl, test/test_duration.pl, test/test_journal.pl,
+	test/testcal.pl: More cleanups in preparation for the release of
+	Net::ICal 0.13.  This was mostly adjusting the license/credits
+	headers for consistency.  I also updated the README.
+	
+	Moved some files from examples/ to test/; added test_duration.pl.
+	
+	Documented N::I::Journal and added a test for basic Journal
+	read/write in test/test_journal.pl. Journal seems to work at a
+	basic level now; someone wanna write a more elaborate example?
+	
+	Discovered a bug in Component that was causing it to break lines in
+	the middle of words; fixed the bug.
+
+2001-03-25 03:57  srl
+
+	* examples/freebusy_demo.pl, lib/Net/ICal/Freebusy.pm: Added POD to
+	Freebusy and changed the call syntax for new() to take a hash of
+	parameters.
+	
+	There are still some fairly significant bugs in Freebusy; it
+	doesn't handle multiple FREEBUSY lines within a VFREEBUSY, and it
+	doesn't handle the properties on the FREEBUSY lines properly.  I
+	suspect we need a FreebusyItem class or similar. The basic code is
+	there, as is the POD, so that's half the battle.
+
+2001-03-25 01:33  srl
+
+	* examples/freebusy_demo.pl, lib/Net/ICal/Duration.pm,
+	lib/Net/ICal/ETJ.pm, lib/Net/ICal/Event.pm,
+	lib/Net/ICal/Freebusy.pm, lib/Net/ICal/Period.pm,
+	lib/Net/ICal/Property.pm, lib/Net/ICal/Time.pm: Miscellaneous
+	cleanups preparing for the upcoming release; some docco fixes; some
+	bugfixes. I'm still trying to standardize the headers.
+	
+	Why does Time->as_ical return strings with : at the beginning?
+	That's not quite right. I tossed some ad-hackery in here in various
+	places (particularly Duration and Period) that's pretty evil. It
+	works, but it's ugly.
+	
+	While poking through docco, I ran into the Freebusy module, which
+	was only vaguely sketched out in POD, but it was sketched out in a
+	way that didn't make sense to me. So I implemented it. There's no
+	POD yet, but I'll fix that soon.
+
+2001-03-24 19:15  srl
+
+	* lib/Net/ICal/Alarm.pm, lib/Net/ICal/Calendar.pm,
+	lib/Net/ICal/Component.pm, lib/Net/ICal/Duration.pm, t/duration.t:
+	Fixed a few bugs in Alarm.
+	
+	Updated Calendar to remove the "to be implemented" POD. because I
+	think much of the functionality described there won't be needed
+	until we start looking at CAP. Also, some of the functionality
+	there should really go in Reefknot::Filter I think. We can always
+	get the docco back from CVS if we want it.
+	
+	Fixed SF bug 410803, sort of; Duration's as_ical_value isn't
+	sufficient to make a Duration display as part of an event.
+	Duration's not currently implemented as a child class of Property,
+	so it was breaking. I added an as_ical method which produces the
+	right functionality, but it's a stopgap measure.
+	
+	We need to reimplement Duration as a child of Property to *really*
+	fix the bug.
+
+2001-03-24 10:32  lotr
+
+	* lib/Net/ICal/Alarm.pm: added/updated docco
+
+2001-03-24 08:53  srl
+
+	* lib/Net/ICal/ETJ.pm: Closed SF bug 410770:
+	
+	"You need to add options => [qw(altrep language)] to the summary
+	map in ETJ.pm for RFC2445 compliance."
+	
+	Done.
+
+2001-03-23 12:42  shutton
+
+	* MANIFEST, TODO, examples/recurrence_test.pl, lib/Net/ICal.pm,
+	lib/Net/ICal/Component.pm, lib/Net/ICal/ETJ.pm,
+	lib/Net/ICal/Event.pm, lib/Net/ICal/Recurrence.pm,
+	lib/Net/ICal/RecurrenceSet.pm, lib/Net/ICal/Todo.pm: 
+	* Nixed old RecurrenceSet code, on advice from Martijn.  Just
+	handle	 them as arrays of RRULE and EXRULE properties within a
+	component.    We'll add code to the Component or ETJ object later
+	to handle recurrence	computations.
+	
+	* Removed exception in as_ical output method for ::Recurrence --
+	it's   a Property now and should output properly as an array
+	member.
+	
+	* Update comments in ETJ.pm for rrule/exrule parameters
+	
+	* Update documentation in Event.pm
+	
+	* Add reworked Recurrence.pm:
+	
+	  - Now a proper Net::ICal::Property
+	  - Renamed 'endtime' to 'until'.
+	  - Added missing 'count'
+	  - Documented accessor methods
+	  - Documented, cleaned up and generalized validity checks
+	
+	* Updated recurrence_test example code
+
+2001-03-23 00:58  srl
+
+	* AUTHORS, examples/recurrence_test.pl, lib/Net/ICal.pm,
+	lib/Net/ICal/Component.pm, lib/Net/ICal/ETJ.pm,
+	lib/Net/ICal/Recurrence.pm, lib/Net/ICal/RecurrenceSet.pm: Rolled
+	in patches from Scott Hutton <shutton@hq.workspot.com> for
+	Net::ICal----
+	
+	- RecurrenceSet is now functional, as is Recurrence. See examples/
+	recurrence_test.pl for a demo.
+	
+	- Reorganized Scott's code so that the POD is interspersed with the
+	functions. Added comments and flagged what needs to be commented
+	more.  Look for strings like XXX, TODO, and FIXME to find what
+	needs doing.
+	
+	- Added Scott to AUTHORS.
+
+2001-03-21 00:01  srl
+
+	* MANIFEST, Makefile.PL: Made Net::ICal rely on Class::MethodMapper
+	1.0, which was released to CPAN recently.
+	
+	Adjusted Makefile.PL so that 'make dist' generates a BUGS file
+	using createBUGS.pl.
+	
+	Added a category filter to createBUGS.pl, though it needs some
+	fine-tuning to be really user-friendly.
+
+2001-03-20 23:36  srl
+
+	* BUGS: Made a new tools/ directory to hold things that are related
+	to all the modules; in this case, it's createBUGS.pl, which will
+	autogenerate a BUGS list with friendly text at the top for
+	Net::ICal.  You'll need the CVS version of  WWW::Sourceforge,
+	available at http://sourceforge.net/projects/sf-perl , to run it.
+	It's not perfect yet, but I thought I'd toss it in. Once
+	WWW::Sourceforge gets a little more robust, createBUGS will be
+	better.
+	
+	Updated the BUGS file as part of my testing of createBUGS.pl.
+
+2001-03-20 22:42  srl
+
+	* lib/Net/ICal/Attendee.pm: Part 2 of bug 410033; a minor
+	capitalization fix. oops.
+
+2001-03-20 22:37  srl
+
+	* lib/Net/ICal/Attendee.pm: Fixed SF bug 410033, which was a
+	complaint about the POD being wrong in N::I::Attendee. Updated the
+	POD and made it hopefully much clearer.
+	
+	We really should have a test suite for Attendee. Maybe someone
+	would like to make one? Look in Net-ICal/t to see how the others
+	are done.  Or maybe I'll make one after the docco is cleaned up
+	some more.
+
+2001-03-20 16:58  srl
+
+	* BUGS: Used Martijn's sf-bugs modules
+	(http://sourceforge.net/project/sf-perl) to autogenerate a BUGS
+	list. I just used the example code that's in CVS now. I'll think
+	about dropping a copy of that script in a tools/ directory later.
+
+2001-03-19 00:16  srl
+
+	* lib/Net/: ICal.pm, ICal/Alarm.pm, ICal/Attendee.pm,
+	ICal/Calendar.pm, ICal/Component.pm, ICal/Duration.pm, ICal/ETJ.pm:
+	Started cleaning up the N::I documentation and standardizing the
+	license/credits header. This is in preparation for the release of
+	Net::ICal 0.13 sometime in the next few days.
+
+2001-03-18 19:15  srl
+
+	* FAQ, lib/Net/ICal/Component.pm, t/rfc2445.t: Made a few syntax
+	cleanups so that the tests will run closer to correctly.  'make
+	test' still isn't quite right though. It's still returning an error
+	for me during the rfc2445.t test though: "Can't use string
+	("freebusys") as a HASH ref while "strict refs" in use at
+	/usr/local/lib/perl5/site_perl/5.6.0/Class/MethodMapper.pm line
+	166, <CALFILE> chunk 1."
+	
+	Added a reference to the SF bug tracker and the BUGS file in the
+	FAQ how-to-report-a-bug section.
+
+2001-03-18 10:03  srl
+
+	* Makefile.PL: Added a requirement for Class::MethodMapper 0.9 to
+	Makefile.PL.
+
+2001-03-17 13:36  lotr
+
+	* lib/: Class/MethodMapper.pm, Net/ICal/Component.pm,
+	Net/ICal/Duration.pm, Net/ICal/Property.pm, Net/ICal/Todo.pm: -
+	make all the set_map invokations pass a hash instead of a hash-ref 
+	 so it works with the released C:MM - change dashes to underscores
+	for methods in new_from_ical and vice versa   in as_ical. thanks to
+	Arno Aalto for catching this - put the uc($key) in as_ical in a
+	central place - remove MethodMapper now we have a release we can
+	use
+
+2001-03-16 15:14  srl
+
+	* BUGS, ChangeLog, FAQ, TODO: Adjustments for the upcoming release.
+	
+	Added a BUGS and FAQ file, which will need to be in any
+	actually-released Net::ICal.
+
+2001-03-15 14:40  srl
+
+	* lib/Net/ICal/Event.pm, lib/Net/ICal/Todo.pm, t/rfc2445.t: -
+	Edited some POD to remove the (wrong) =head3s and replaced them
+	with =head2s.
+	
+	- Fixed a bug in Net-ICal's t/2445.t, which wasn't running properly
+	from 'make test'. Apparently planning $numtests doesn't work, but
+	planning an integer of tests ('2') works. So, for now, we have to
+	hardcode how many iCal-conformance tests there are in
+	Net-ICal/test-data/rfc2445/ .  This sucks.
+
+2001-03-15 14:18  srl
+
+	* lib/Net/ICal/: Component.pm, ETJ.pm: Made some small portability
+	changes sugggested by Arno Aalto <arno.aalto@kolumbus.fi>:
+	
+	- replaced \r\n with \015?\012 in Component::new_from_ical
+	
+	- replaced \r\n with \015\012 in Component::as_ical
+	
+	- changed "hostname" to use Sys::Hostname, which is more portable
+
+2001-03-14 17:39  srl
+
+	* lib/Net/ICal/Component.pm, t/rfc2445.t,
+	test-data/rfc2445/4/1/1-fail-lines-longer-than-75-octets.ics,
+	test-data/rfc2445/4/1/2-pass-lines-exactly-75-octets.ics,
+	test-data/rfc2445/4/1/README_rfc2445_4.1: Added the beginnings of
+	the cross-platform iCal tests we talked about a week or so ago.
+	These are trivial cases; we can't go much farther than this right
+	now, as there's a bug in N::I::Component that makes it not return
+	undef when it receives bogus iCal.
+	
+	Modified Net::ICal so it loads all the modules we've got written so
+	far, I think. Noted the existence of the bug in N::I::Component as
+	a FIXME.
+	
+	Note: the cross-platform tests won't be able to test that Net-ICal
+	is reading the data in *properly*, just that it's passing or
+	failing the data. We should talk about this as a problem.
+
+2001-03-13 14:43  lotr
+
+	* lib/Net/ICal.pm: updated the use Module lines and commented out
+	those which we haven't looked at yet, so you can do
+	
+	use Net::ICal
+	
+	instead of including every module seperately.
+
+2001-03-09 14:29  srl
+
+	* examples/html_calendar.pl: Added a basic CGI to serve calendar
+	data through the web. LotR contributed the
+	HTML::CalendarMonthSimple portions of this code. This code lets us
+	view events and todos on a webpage, and we can download the
+	corresponding iCal that's displayed.
+	
+	POSSIBLE TO DO: - handle multiple months - handle events and todos
+	more robustly; make them clickable - handle journals - build
+	persistent data structures - add user support - allow users to add
+	events - come up with a standard URL for referring to the iCal for
+	a given month or day or week, so a calendar client can pick up
+	information about a given day, week, month.
+
+2001-03-06 19:21  lotr
+
+	* examples/reply.perl: adding my 'litany against meetings' script
+	for srl
+
+2001-02-27 17:11  lotr
+
+	* test/testcal.pl: - Duration.pm now does negative durations, so
+	use those - clean up some old FIXMEs
+
+2001-02-27 17:05  lotr
+
+	* t/time.t: Time.pm now sets $self->{ISUTC} when the timezone
+	argument is 'UTC', so make the test be in utc and specify the
+	timezone
+
+2001-02-27 17:03  lotr
+
+	* lib/Net/ICal/Time.pm: - set $self->{ISUTC} when the timezone
+	argument is 'UTC'   this allows test 19 to work correctly.  -
+	change confess into cluck (except for the non-implemented methods) 
+	 so we don't die on bad input - removed the test sub and the
+	#-------+ lines
+
+2001-02-27 16:58  lotr
+
+	* lib/Net/ICal/Duration.pm, t/duration.t: Adding Chad House's
+	Duration.pm and the tests that go with it from his mail:
+	
+	I think this implementation is cleaner, plus it handles negative
+	durations (possible in alarms), and adheres more closely to the
+	legal RFC2445 formats. For example, according to my reading of the
+	spec (section 4.3.6), a duration specified in weeks (e.g., 'P3W')
+	can't contain days or hour/min/sec, so something like 'P3W2D' or
+	'P3W2DT4H15M' is invalid.
+	
+	A few notes:
+	
+	  * 'as_ical_value' canonicalizes everything to days even if the
+	    duration represents a whole number of weeks
+	
+	  * the 'add' and 'subtract' routines are kinda dumb -- they'll
+	    happily let you create negative durations (although those are
+	    technically possible, and meetings with negative durations
+	might
+	    actually be welcomed by some)
+
+2001-02-25 15:09  lotr
+
+	* lib/Net/ICal/: Alarm.pm, Property.pm: - Added a few more bug
+	references - removed some sugar in Alarm's new, as that is now
+	handled in   _param_set in Component.pm. Methods with a param value
+	don't	need to pass a {content => $val} hash anymore. _param_set
+	will   create one on the fly if you just pass $val.
+
+2001-02-23 06:05  lotr
+
+	* lib/Net/ICal/Component.pm: - clean up some leftover FIXMEs -
+	added the bug # to the FIXMEs related to bug #133739 - added a
+	FIXME for folding
+
+2001-02-22 23:38  srl
+
+	* AUTHORS, t/time.t: Added Chad House's unit tests for
+	Net::ICal::Time, along with a bunch of comments for readability by
+	the rest of the developers.
+	
+	We should start building out a set of test cases for all the
+	Net::ICal modules like this. Ideally, all the coders should write
+	their own tests, and then we should review the tests to make sure
+	they catch all the possible boundary cases and bugs.
+
+2001-02-22 09:58  lotr
+
+	* examples/gtk_todo.pl: Date::Parse's str2time seems borked and
+	this is simpler too
+
+2001-02-22 09:43  lotr
+
+	* examples/gtk_todo.pl, lib/Net/ICal/Component.pm: - make sure we
+	end every line with \r\n - don't output empty lines ... and the
+	reading in of ics files works :)
+
+2001-02-21 22:39  srl
+
+	* examples/gtk_todo.pl: Made the todo editor much more robust and
+	featureful.
+	
+	- Major reworking of the control flow to remove global variables
+	and break most functionality out into subroutines. This should make
+	it more maintainable, I hope.
+	
+	- Uses a Gnome DateEdit widget to edit the start date now. Much
+	prettier.  Thanks to LotR for pointing this out.
+	
+	- Added a Save button to save the iCal objects out to a file. This
+	works almost perfectly, see below.
+	
+	- On startup, we now look for an iCal file we've saved out, and we
+	try to use it first before setting up some default calendar
+	objects. FIXME: For some reason, this routine isn't recognizing the
+	iCal we output to a file as valid iCalendar text.
+
+2001-02-21 19:56  srl
+
+	* examples/gtk_todo.pl: Added a few bugfixes:
+	
+	- put the button for the popup dialog into the action_area, where
+	it's supposed to go.  - added use of Date::Parse to fix the bug
+	with editing start dates.
+	
+	I'm going to start refining the date editing by using a Gnome
+	widget next. Thanks to LotR for pointing these bits out to me.
+
+2001-02-21 17:08  srl
+
+	* examples/gtk_todo.pl: Added a new example: a Todo editor written
+	with the Gtk widget set.  This is a good example of the kind of
+	tool we want people to be able to write trivially using Net::ICal
+	and Reefknot. I've commented places where I think the existing
+	Net::ICal usage is a bit clunky.
+	
+	It's got [at least] one serious bug: editing the text of the Todo's
+	start date will crash it, because Net::ICal::Time::new_from_string
+	isn't handling the string from the Entry box properly. I'll be
+	looking into that Real Soon Now.
+	
+	In the real world, I'd reimplement this with glade and/or clean up
+	the code a bit. There are lots of global vars here, for example.
+
+2001-02-21 09:40  lotr
+
+	* MANIFEST: keep MANIFEST up to date
+
+2001-02-21 09:39  lotr
+
+	* examples/showical.perl: check if there are attendees first. fixes
+	https://sourceforge.net/bugs/?func=detailbug&group_id=14603&bug_id=
+	133258
+
+2001-02-21 09:37  lotr
+
+	* test/: test_todo.pl, testcal.pl: stop manually creating uids
+
+2001-02-21 09:37  lotr
+
+	* lib/Net/ICal/: Component.pm, ETJ.pm, Event.pm, Todo.pm: - make
+	_param_set create a { comment => $val } hashref if $val is   not a
+	hashref - clean up the validation stuff a bit (removed ETJ's new) -
+	added a UID generator to ETJ.pm
+
+2001-02-21 09:33  lotr
+
+	* lib/Net/ICal/Alarm.pm: little pod fix
+
+2001-02-19 15:00  lotr
+
+	* examples/showical.perl: example script that displays (some of)
+	the information from an ical attachment in your mailer (if it uses
+	mailcap)
+	
+	put a line like:
+	
+	text/calendar; ~/bin/showical.perl '%s'; copiousoutput
+	
+	in your ~/.mailcap file, and at least mutt will show you the
+	events.
+
+2001-02-19 08:04  lotr
+
+	* lib/Net/ICal/ETJ.pm: duh, forgot ref->param
+
+2001-02-19 07:50  lotr
+
+	* lib/Net/ICal/: Component.pm, ETJ.pm: - fix _load_property to work
+	without a full classname - some fixes to ETJ's method map
+	(mtearle++ for uncovering this)
+
+2001-02-19 07:44  lotr
+
+	* lib/Net/ICal/Attendee.pm: method names in the method map must be
+	lower-case
+
+2001-02-12 13:50  srl
+
+	* lib/Net/ICal/ETJ.pm, lib/Net/ICal/Todo.pm, test/test_todo.pl: -
+	got Todo's DUE and PERCENT_COMPLETE fields working with LotR's
+	help; see Todo.pm for how to override/modify an ETJ object's map. 
+	- modified test_todo.pl to show off how these work.
+
+2001-02-10 20:48  srl
+
+	* lib/Net/ICal/ETJ.pm, test/test_todo.pl: - Bugfix on test_todo -
+	split out validation in ETJ into a validate() sub.
+
+2001-02-08 16:54  srl
+
+	* test/test_todo.pl: Hooray! Todos work now. test_todo.pl
+	demonstrates how to set a list of Todo items and access them.
+
+2001-02-08 16:43  srl
+
+	* lib/Net/ICal/: Calendar.pm, Event.pm, Todo.pm: [no log message]
+
+2001-02-08 14:25  lotr
+
+	* test/testcal.pl: can't have attendees in a DISPLAY alarm
+
+2001-02-08 13:54  lotr
+
+	* lib/Net/ICal/: Alarm.pm, Component.pm, Duration.pm, ETJ.pm,
+	Event.pm, Property.pm, Time.pm: Fix stuff so testcal.pl works  -
+	pass the actual class to _load_property instead of getting it from
+	the    ical line  - change as_ical to as_ical_value in Duration and
+	Time  - make Event.pm's _create call ETJ's _create instead of new,
+	so it works    with new_from_ical (unfortunately ETJ's new never
+	gets called now)  - make Property call as_ical_value for 'ref'
+	values
+
+2001-02-08 00:29  srl
+
+	* lib/Net/ICal/ETJ.pm, lib/Net/ICal/Event.pm, test/testcal.pl:
+	Documentation fixes, mostly.  -- Fixed up the POD for Event so that
+	it enumerates all the possible parameters. This brings Event one
+	step closer to usable.	- Clarified a few things in ETJ and asked a
+	few more questions. Set up dtstamp to default to localtime(). Not
+	quite right, but close.  - Added Eric's newer header to Event and
+	testcal.
+	
+	KNOWN BUG: - dtstamp and dtstart are showing up brokenly in
+	generated iCal.
+
+2001-02-07 17:35  srl
+
+	* TODO, lib/Net/ICal/ETJ.pm, test/testcal.pl: - Updated ETJ and
+	TODO to reflect that we need to generate a globally unique ID for
+	UID. That should be done soon, it's a small task.  - Modified
+	testcal so that it displays the event time intelligibly.  Thanks to
+	LotR for pointing this out to me.
+
+2001-02-07 17:14  srl
+
+	* TODO, lib/Net/ICal/ETJ.pm, test/testcal.pl: - Made it so that we
+	can attach alarms to events and todos.	- Built a working demo in
+	testcal.pl of how to access events and alarms in a calendar. Made
+	notes on how we should change modules to be more user- friendly.
+
+2001-02-07 15:14  lotr
+
+	* lib/Net/ICal/: ETJ.pm, Event.pm: - killed the old Component.pm
+	code in ETJ.pm - make ETJ.pm call its parent constructor - change
+	all 'class' domains in ETJ into 'ref', since C::MM now handles	
+	both the same way
+
+2001-02-07 12:34  srl
+
+	* lib/Net/ICal/Journal.pm: Built a skeleton for the Journal object
+	type.
+
+2001-02-07 11:55  srl
+
+	* lib/Net/ICal/Event.pm: cleaned up some old code that was lying
+	around; testing cvsmail.
+
+2001-02-07 11:52  srl
+
+	* lib/Net/ICal/ETJ.pm: Fixed some syntax errors.
+
+2001-02-06 13:44  lotr
+
+	* TODO, test/testcal.pl: added some TODO items and cleaned up
+	testcal.pl a bit
+
+2001-02-06 12:36  srl
+
+	* lib/Net/ICal/ETJ.pm, lib/Net/ICal/Event.pm,
+	lib/Net/ICal/Freebusy.pm, lib/Net/ICal/Todo.pm, test/testcal.pl:
+	Documented ETJ.pm more thoroughly with RFC sections and which
+	properties are required in which types of object. Started templates
+	for Event, Todo, and Freebusy, which are still very rough. 
+	Modified output in testcal.pl so that it says that VCALENDAR input
+	from ical is working now.
+
+2001-02-06 12:06  lotr
+
+	* lib/Net/ICal/: Alarm.pm, Component.pm, Duration.pm, Property.pm,
+	Trigger.pm: - fix indenting - add a reclass domain so alarming.pl
+	can work - added recursive component parsing - probably more, but I
+	forget
+
+2001-02-06 12:02  lotr
+
+	* lib/Class/MethodMapper.pm: - remove the 'class' domain (the ref
+	domain can handle that just fine)
+
+2001-02-05 09:04  srl
+
+	* lib/Net/ICal/ETJ.pm: Minor visual cleanups and documentation.
+
+2001-02-03 20:37  srl
+
+	* AUTHORS, TODO, lib/Net/ICal/Alarm.pm,
+	lib/Net/ICal/ArrayAccessor.pm, lib/Net/ICal/Attendee.pm,
+	lib/Net/ICal/Calendar.pm, lib/Net/ICal/Component.pm,
+	lib/Net/ICal/Parser.pm, lib/Net/ICal/Trigger.pm, test/testcal.pl:
+	Miscellaneous cleaning up and fixing on various files. Added an
+	AUTHORS file and documented a bunch of stuff.
+
+2001-02-03 16:09  srl
+
+	* lib/test.pl, lib/testcal.pl, test/test.pl, test/testcal.pl: Moved
+	test files from Net-ICal/lib to Net-ICal/test where they should be.
+
+2001-02-03 15:48  srl
+
+	* TODO: Updated the TODO with more tasks for beginning developers. 
+	CVi:
+	-------------------------------------------------------------------
+	---
+
+2001-02-03 15:12  srl
+
+	* lib/: testcal.pl, Net/ICal/Attendee.pm, Net/ICal/Calendar.pm,
+	Net/ICal/Component.pm, Net/ICal/ETJ.pm: Hooray! We have a
+	pseudo-working calendar object now. Revised Calendar.pm to work
+	using a map; added testcal.pl to demonstrate. There's a bug in how
+	something's handling arrayrefs in maps, but here's the first
+	version.  Miscellaneous docco fixes, also.
+
+2001-02-02 22:15  srl
+
+	* lib/Net/ICal/ETJ.pm: Added Martijn's first-version of ETJ.pm, a
+	base class to deal with Events, Todos, and Journals. We aren't sure
+	yet whether there will also be subclass modules for each of those
+	built, or what. But here's a first version.  I cleaned it up some
+	and documented it more clearly.
+
+2001-02-02 21:08  skud
+
+	* lib/test.pl: Added -w flag, use strict, and put the STDIN input
+	stuff into slurp mode.
+
+2001-02-02 21:07  skud
+
+	* lib/Net/ICal/: Duration.pm, Time.pm: Fixed these problems when
+	running test.pl under "use strict": "my" variable $d masks earlier
+	declaration in same scope at
+	/usr/local/lib/perl5/site_perl/5.6.0/Net/ICal/Duration.pm line 290.
+	 "my" variable $t masks earlier declaration in same scope at
+	/usr/local/lib/perl5/site_perl/5.6.0/Net/ICal/Time.pm line 628.  It
+	was only stuff in the test() functions breaking, so no big deal.
+
+2001-02-02 20:15  srl
+
+	* TODO: Added a TODO file for the developers.
+
+2001-02-02 16:13  srl
+
+	* lib/Net/ICal/Component.pm: A bugfix... silly me, i didn't test
+	before committing.
+
+2001-02-02 15:23  srl
+
+	* lib/Net/ICal/Component.pm: Added comments to Net::ICal::Component
+	to make it easier to understand.
+
+2001-02-02 12:41  srl
+
+	* lib/: test.pl, Class/MethodMapper.pm, Net/ICal/Alarm.pm,
+	Net/ICal/Attendee.pm, Net/ICal/Component.pm, Net/ICal/Property.pm,
+	Net/ICal/Trigger.pm: A patch from Martijn which adds a
+	Class::MethodMaker domain to Component.
+
+2001-02-02 01:33  srl
+
+	* lib/: test.pl, Class/MethodMapper.pm, Net/ICal/Alarm.pm,
+	Net/ICal/Attendee.pm, Net/ICal/Component.pm, Net/ICal/Property.pm,
+	Net/ICal/Trigger.pm: Added Martijn van Beers' changes, which
+	reimplement Component.pm to use Class::MethodMapper (which isn't in
+	CPAN yet, but will be soon.)
+
+2001-01-30 21:19  ebusboom
+
+	* MANIFEST, Makefile.PL: [no log message]
+
+2001-01-30 21:17  ebusboom
+
+	* ChangeLog, MANIFEST, MANIFEST.SKIP, README, lib/Net/ICal.pm,
+	lib/Net/ICal/Alarm.pm, lib/Net/ICal/ArrayAccessor.pm,
+	lib/Net/ICal/Attendee.pm, lib/Net/ICal/Calendar.pm,
+	lib/Net/ICal/Component.pm, lib/Net/ICal/Duration.pm,
+	lib/Net/ICal/Parser.pm, lib/Net/ICal/Period.pm,
+	lib/Net/ICal/RecurrenceSet.pm, lib/Net/ICal/Time.pm,
+	test/regression.pl, test-data/2446.mime, test-data/error,
+	test-data/mail-examples, test-data/no-error, test-data/rfc2445.ics,
+	test-data/rfc2446.ics, test-data/single-with-error: Initial
+	revision
+
+2001-01-30 21:17  ebusboom
+
+	* ChangeLog, MANIFEST, MANIFEST.SKIP, README, lib/Net/ICal.pm,
+	lib/Net/ICal/Alarm.pm, lib/Net/ICal/ArrayAccessor.pm,
+	lib/Net/ICal/Attendee.pm, lib/Net/ICal/Calendar.pm,
+	lib/Net/ICal/Component.pm, lib/Net/ICal/Duration.pm,
+	lib/Net/ICal/Parser.pm, lib/Net/ICal/Period.pm,
+	lib/Net/ICal/RecurrenceSet.pm, lib/Net/ICal/Time.pm,
+	test/regression.pl, test-data/2446.mime, test-data/error,
+	test-data/mail-examples, test-data/no-error, test-data/rfc2445.ics,
+	test-data/rfc2446.ics, test-data/single-with-error: Reimport of
+	Net-ICal
+

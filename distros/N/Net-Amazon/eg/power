@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+######################################################
+# Power Search
+# Martin Streicher <martin.streicher@apress.com>, 2003
+# Mike Schilli <na@perlmeister.com>, 2003
+######################################################
+use warnings;
+use strict;
+
+use Net::Amazon;
+use Net::Amazon::Property;
+use Net::Amazon::Request::Power;
+use Getopt::Std;
+
+#use Log::Log4perl qw(:easy);
+#Log::Log4perl->easy_init($DEBUG);
+
+my %opts        = ();   
+my $usage       = "usage: $0 [-s start] [-f finish] phrase [mode]\n".
+                  "(use 'subject: perl and author: schwartz' books ".
+		  "as an example)\n";
+
+getopts("s:f:", \%opts) || do {print $usage; exit 1};
+die $usage  
+    if ((!defined $ARGV[0]) || 
+        ((exists $opts{s} && exists $opts{f}) && ($opts{f} < $opts{s})));
+
+my $pagecnt     = $opts{s} || 1;
+my $limit       = $opts{f} || $opts{s} || 1;
+my $mode        = $ARGV[1] || "books";
+
+my $ua = Net::Amazon->new(
+    associate_tag => $ENV{AMAZON_ASSOCIATE_TAG},
+    token         => $ENV{AMAZON_TOKEN},
+    secret_key    => $ENV{AMAZON_SECRET_KEY},
+    max_pages   => 1,
+);
+
+while ($pagecnt <= $limit) {    
+    my $req = Net::Amazon::Request::Power->new(
+        power     => $ARGV[0],
+        mode      => $mode,
+        page      => $pagecnt++,
+        sort      => 'inverse-pricerank',
+ 	node      => 377602011,
+    );
+
+    # Response: Net::Amazon::Power::Response
+    my $resp = $ua->request($req);
+    die "Error" unless $resp->is_success();
+    last unless $resp->status();
+
+    for ($resp->properties) {
+       print $_->Asin(), " ",
+	     $_->title(), " [",
+	     $_->isbn(), "] ",
+	     $_->OurPrice(), "\n";
+    }
+}

@@ -1,0 +1,10 @@
+bin/gmailfs
+Build.PL
+INSTALL
+lib/Net/FS/Gmail.pm
+MANIFEST			This list of files
+README
+t/01use.t
+TODO
+META.yml
+Makefile.PL

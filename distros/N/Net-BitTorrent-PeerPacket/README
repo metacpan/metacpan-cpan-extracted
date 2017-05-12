@@ -1,0 +1,282 @@
+NAME
+      Net::BitTorrent::PeerPacket - Parse/Build Peer Packets from BitTorrent
+
+SYNOPSIS
+      # import everything
+      use Net::BitTorrent::PeerPacket qw(:all);
+
+      # or be more selective
+      use Net::BitTorrent::PeerPacket qw(bt_build_packet :constants);
+
+      # Encode a packet
+      my $binary_packet = bt_build_packet($key1, $value1, $key2, $value2);
+
+      # Decode a packet
+      my $parsed_packet = bt_parse_packet($binary_data);
+
+DESCRIPTION
+    "Net::BitTorrent::PeerPacket" handles parsing and building binary data
+    shared between BitTorrent peers. The module optionally exports a single
+    subroutine for building packets and another for parsing packets, as well
+    as, a constant for each packet type defined by BitTorrent.
+
+CONSTANTS
+    There are ten primary types of packets that are shared between peers on
+    a BitTorrent network. The following constants are how the type of packet
+    being build/parsed are represented within this module.
+
+    BT_HANDSHAKE
+        Used to start communication between peers.
+
+    BT_CHOKE
+        Tell a peer that it is choked.
+
+    BT_UNCHOKE
+        Tell a peer that it is unchoked.
+
+    BT_INTERESTED
+        Used to tell a peer that it has a piece that you need.
+
+    BT_UNINTERESTED
+        Used to tell a peer that it has no pieces that you need.
+
+    BT_HAVE
+        Used to tell a peer that you now have a specific piece.
+
+    BT_BITFIELD
+        Used right after a handshake, this tells a peer all of the pieces
+        that you have and don't have in one message.
+
+    BT_REQUEST
+        Used to request a block of data from a piece that a peer has.
+
+    BT_PIECE
+        Used to return a block of data that was requested.
+
+    BT_CANCEL
+        Used to tell a peer that you no longer need the piece that you were
+        downloading from them.
+
+SUBROUTINES
+  bt_build_packet
+    This subroutine is responsible for building all types of BitTorrent
+    packets. The arguments are passed into the subroutine as a list of
+    key-value pairs. The resultant packet is sent back as a scalar.
+
+    Depending on the requested packet type, the required arguments vary. One
+    argument that is common to all calls is the "bt_code". The "bt_code"
+    maps to a "BT_" constant exported by this module and determines the type
+    of packet that will be built.
+
+    What follows is a list of the different BT codes and the details of
+    calling this subroutine with those codes.
+
+   BT_HANDSHAKE
+    Passing the "BT_HANDSHAKE" code causes a handshake packet to be
+    generated. This type of packet is sent as soon as peers are connected
+    and requires two additional keys:
+
+    * info_hash
+        The hash found in the ".torrent" file that represents the download.
+
+    * peer_id
+        The peer ID for the local peer. This should be the same as what is
+        reported to the tracker for the swarm.
+
+   BT_CHOKE
+    Passing the "BT_CHOKE" code causes a choke packet to be generated. This
+    type of packet requires no additional data and therefore no additional
+    arguments.
+
+   BT_UNCHOKE
+    Passing the "BT_UNCHOKE" code causes an unchoke packet to be generated.
+    This type of packet requires no additional data and therefore no
+    additional arguments.
+
+   BT_INTERESTED
+    Passing the "BT_INTERESTED" code causes an interested packet to be
+    generated. This type of packet requires no additional data and therefore
+    no additional arguments.
+
+   BT_UNINTERESTED
+    Passing the "BT_UNINTERESTED" code causes an uninterested packet to be
+    generated. This type of packet requires no additional data and therefore
+    no additional arguments.
+
+   BT_HAVE
+    Passing the "BT_HAVE" code causes a have packet to be generated. This
+    type of packet requires a piece index in addition to the BT code.
+
+    piece_index
+        The piece index is the zero-based numeric index of a piece within a
+        torrent.
+
+   BT_BITFIELD
+    Passing the "BT_BITFIELD" code causes a bit field packet to be
+    generated. This type of packet requires the bit field be specified in
+    addition to the BT code.
+
+    bitfield_ref
+        The bit field is passed in as a reference to a scalar. The scalar
+        contains binary data representing the pieces that are present and
+        missing.
+
+   BT_REQUEST
+    Passing the "BT_REQUEST" code causes a request packet to be generated.
+    This type of packet requires the piece index along with block offset and
+    size in addition to the BT code.
+
+    piece_index
+        The piece index is the zero-based numeric index of a piece within a
+        torrent.
+
+    block_offset
+        The block offset is the zero-based byte offset of the requested data
+        within the specified piece.
+
+    block_size
+        The block size is the size of the data requested. Be sure not to set
+        this value too large, as some clients will end your connection if
+        your request is too big.
+
+   BT_PIECE
+    Passing the "BT_PIECE" code causes a piece packet to be generated. This
+    type of packet requires the piece index along with block offset and the
+    data to be transferred in addition to the BT code.
+
+    piece_index
+        The piece index is the zero-based numeric index of a piece within a
+        torrent.
+
+    block_offset
+        The block offset is the zero-based byte offset of the requested data
+        within the specified piece.
+
+    data_ref
+        The data reference is a reference to a scalar containing the data at
+        the specified block offset within the specified piece.
+
+   BT_CANCEL
+    Passing the "BT_CANCEL" code causes a cancel packet to be generated.
+    This type of packet requires the piece index along with block offset and
+    size in addition to the BT code.
+
+    piece_index
+        The piece index is the zero-based numeric index of a piece within a
+        torrent.
+
+    block_offset
+        The block offset is the zero-based byte offset of the requested data
+        within the specified piece.
+
+    block_size
+        The block size is the size of the data requested. Be sure not to set
+        this value too large, as some clients will end your connection if
+        your request is too big.
+
+  bt_parse_packet
+    This subroutine is responsible for parsing all types of BitTorrent
+    packets. It accepts a single argument, which is a reference to a scalar
+    that contains the raw packet data. It returns a hash reference
+    containing the parsed data.
+
+    Depending on the packet type, the keys in the returned hash vary. One
+    key that is common to all packets is the bt_code. The bt_code maps to a
+    BT_ constant exported by this module and reveals the type of packet that
+    was parsed.
+
+    What follows is a list of the different BT codes that might be returned
+    and the additional keys that will be packaged with each code.
+
+   BT_CHOKE
+    The resultant hash from a choke packet will only contain the "bt_code"
+    key.
+
+   BT_UNCHOKE
+    The resultant hash from an unchoke packet will only contain the
+    "bt_code" key.
+
+   BT_INTERESTED
+    The resultant hash from an interested packet will only contain the
+    "bt_code" key.
+
+   BT_UNINTERESTED
+    The resultant hash from an uninterested packet will only contain the
+    "bt_code" key.
+
+   BT_HAVE
+    The resultant hash from a have packet will only contain the "bt_code"
+    key and the following additional keys.
+
+    piece_index
+        The piece index is the zero-based numeric index of a piece within a
+        torrent.
+
+   BT_BITFIELD
+    The resultant hash from a bit field packet will only contain the
+    "bt_code" key and the following additional keys.
+
+    bitfield_ref
+        The bit field is passed in as a reference to a scalar. The scalar
+        contains binary data representing the pieces that are present and
+        missing.
+
+   BT_REQUEST
+    The resultant hash from a request packet will only contain the "bt_code"
+    key and the following additional keys.
+
+    piece_index
+        The piece index is the zero-based numeric index of a piece within a
+        torrent.
+
+    block_offset
+        The block offset is the zero-based byte offset of the requested data
+        within the specified piece.
+
+    block_size
+        The block size is the size of the data requested. Be sure not to set
+        this value too large, as some clients will end your connection if
+        your request is too big.
+
+   BT_PIECE
+    The resultant hash from a piece packet will only contain the "bt_code"
+    key and the following additional keys.
+
+    piece_index
+        The piece index is the zero-based numeric index of a piece within a
+        torrent.
+
+    block_offset
+        The block offset is the zero-based byte offset of the requested data
+        within the specified piece.
+
+    data_ref
+        The data reference is a reference to a scalar containing the data at
+        the specified block offset within the specified piece.
+
+   BT_CANCEL
+    The resultant hash from a cancel packet will only contain the "bt_code"
+    key and the following additional keys.
+
+    piece_index
+        The piece index is the zero-based numeric index of a piece within a
+        torrent.
+
+    block_offset
+        The block offset is the zero-based byte offset of the requested data
+        within the specified piece.
+
+    block_size
+        The block size is the size of the data requested. Be sure not to set
+        this value too large, as some clients will end your connection if
+        your request is too big.
+
+INSTALL
+      perl Build.PL
+      ./Build
+      ./Build test
+      ./Build install
+
+AUTHOR
+    Josh McAdams <joshua dot mcadams at gmail dot com>
+

@@ -1,0 +1,75 @@
+NoSQL-PL2SQL version 1.21
+=========================
+
+In a world full of oxymorons, NoSQL::PL2SQL requires both a relational 
+database and the DBI SQL interface.
+
+If your job is to sell software, then the underlying app is everything.  But 
+for developers, the interface is the only thing that counts.  NoSQL::PL2SQL 
+provides the best of both worlds:  A NoSQL interface that can take advantage 
+of millions of existing RDB installations.
+
+First, NoSQL::PL2SQL encapsulates the SQL and replaces it with... well, 
+nothing.  Second, although NoSQL::PL2SQL uses RDB, there are no data schema 
+definitions.  NoSQL::PL2SQL uses a "universal" schema, and a single table 
+can store heterogenous (different, arbitrary, and/or indeterminate) data 
+structures.  NoSQL is a somewhat vaguely defined technology.  But if these 
+features sound appealing, I'll describe them in more detail, or start the 
+installation and take the plunge.
+
+The NoSQL::PL2SQL interface consists of 4 essential methods, and a handful 
+of utilities.  The essentials are as follows:
+
+  ## Define a data source
+  $dsn = NoSQL::PL2SQL::DBI->new( $tablename ) ;
+  $dsn->connect( $datasource, $login ) ;
+
+  ## Create a new data source - run once during installation
+  $dsn->loadschema() ;
+
+  ## Tie an object to the datasource
+  my $self = MyArbitraryClass->SQLObject( $dsn, $arbitrarydata ) ;
+  my $id = $self->SQLObjectID() ;
+  my $self = MyArbitraryClass->SQLObject( $dsn, $id ) ;
+
+Once tied, any updates made to the $self object are automatically written 
+to the $dsn RDB.
+
+The "universal" table schema is predefined.  So there is no need to write 
+or maintain a data schema for each object.  Moreover, because the table 
+stores arbitrary data, a single table data source can be used to back 
+multiple classes.
+
+The distribution now includes a sample package:
+  samples/pl2sql/comments.pl
+
+This package defines the rudimentary BBS system that powers the pl2sql 
+website:  http://pl2sql.tqis.com/
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  NoSQL::PL2SQL requires a database application.  As a minimum, try DBD::SQLite
+  XML::Parser::Nodes
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2012 by Jim Schueler
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,19 @@
+Revision history for Perl extension Net::Rsh.
+===================================================
+0.05  Tue Jun 03 2008 - ASLETT (co-maintainer)
+        - Uploaded successfully!
+
+0.03  Wed Mar 14 18:24:23 CET 2007 - ASLETT (co-maintainer)
+	- Rsh.pm: Minor corrections for:
+		http://rt.cpan.org/Ticket/Display.html?id=23153
+		http://rt.cpan.org/Ticket/Display.html?id=22885
+        - test.pl updated
+        - META.yml added for package requirement
+
+0.02  Mon Dec 09 2002 - RIIKI (author)
+	- some code cleaning
+	
+0.01  Fri Jul 19 14:45:45 2002
+	- original version; created by h2xs 1.21 with options
+		-XA -n Net::Rsh
+

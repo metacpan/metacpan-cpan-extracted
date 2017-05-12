@@ -1,0 +1,184 @@
+Revision history for Net-Kubernetes
+
+1.03 Tue Jul 12 2016
+
+  - Bug fix for boolean values passed to kubernetes via json.
+
+1.02 Wed May 11 2016
+ 
+  - Update dependency on Test::Mock::Wrapper to avoid bug in perl 5.24
+
+1.01 Thu Apr 28 2016
+
+  - Resource factory now ensures 'kind' is populated
+
+1.0 Thu Apr 28 2016
+
+  - Resource->as_hashref now returns a clone of the data.
+
+0.23 Mon Apr 18 2016
+
+  - Remove "resource version" in as hashref to prevent update resource bug.
+
+0.22 Mon Feb 22 2016
+
+  - Add support for SSL client certificate based
+    authhenitcation.
+
+  - Minor documentation tweaks
+
+0.21 Mon Sep 14 2015
+
+ - Require Test::Mock::Wrapper v0.17 or better for tests
+   (https://rt.cpan.org/Public/Bug/Display.html?id=107091)
+
+0.20 Mon Sep 14 2015
+
+ - Update serialized version of endpoitn resource
+ 
+ - Update the UA string in http headers
+
+0.19 Mon Aug 10 2015
+
+ - Correct cirtical URL typo in list_endpoints
+
+0.18 Fri Aug 07 2015
+
+ - Add ServiceAccount resource, and list method to fetch it
+
+ - Add get_node method
+
+ - Add get_pods method to node object
+
+ - Refactor some tests to reduce code duplication
+
+0.17 Fri Jul 31 2015
+
+ - Remove errant debuging statement
+
+ - Add "scale" method to Replication Controller
+
+0.16 Fri Jul 31 2015
+
+ - Bug fix in get_pods to correctly AND together labels in the label selector
+
+ - Typo fix in POD
+
+0.15 Thu Jul 30 2015
+
+ - Update for compatibility with kubernetes v1 release
+
+0.14 Sat Jul 18 2015
+
+ - Added "logs" access to pod resource object.
+
+ - Added "Node" resource type and "list_nodes" method.
+
+ - Added "Endpoint" resource type and "list_endpoints" method.
+
+ - Fixed broken tests for win32 systems.
+
+0.13 Tue Jul 14 2015
+
+ - Housekeeping - Make sure contributors are credited in pod and readme correctly
+
+0.12 Tue Jul 14 2015
+
+ - New resource type "Event"
+
+ - New "list_events" methods
+
+ - Updated documentation on creating secrets
+
+0.11 Tue Jun 30 2015
+
+ - Lots of documentation additions and enhacement
+
+ - Added several sub types of the Net::Kubernetes::Exception
+   to allow for cleaner/easier exception handling.
+
+ - Update $kube to also delegate create and create_from file
+   to the default namespace.
+
+ - Added "build_secret" method to make creating secrets easier
+
+0.10 Sat Jun 27 2015
+
+ - Fixed circular dependency between Net::Kubernetes::Resource::Role::HasPods
+   and Net::Kubernetes::Role::ResourceFactory which caused bugs in get_pods
+
+ - Added automatic delegation from the top level $kube object
+   to default namespace for get_pod, get_secret, get_rc and
+   get_service
+
+0.09 Fri Jun 26 2015
+
+ - Standardize url construction (which also fixes a few bugs)
+
+ - Minor resource role refactor for clarity
+
+ - Added lots of unit tests for resource objects
+
+ - Adding travis-ci build status image to POD
+
+ - Added "get_pods" method to Service Resource
+
+ - Refactor docs to a more sane layout.
+
+0.08 Thu Jun 25 2015
+
+ - Added new method to resource controller to fetch its pods
+
+ - Added test cases, refactored some tests to re-use code
+
+ - Removed references to Data::Dumper that were only sued
+   for debugging.
+
+0.06 Tue Jun 23 2015
+
+ - Added a dzil plugin to handle making meta.yaml
+
+ - Added an abstract in the main module to clear
+   cpants kwalitee check
+
+ - Switched to use Cpanel::JSON::XS for stability
+
+ - Swtich to YAML::XS which appears to have better
+   handling for numbers read from a yaml file.
+
+ - Temporary fix for conversion problems
+   between YAML and JSON in resource creator.
+
+0.05 Sun Jun 21 2015
+
+ - Apparently cpan thinks 0.04.1 is less than 0.04
+
+0.04.1 Sun Jun 21 2015
+
+ - Fix bug causing resource and namespace urls to get a double /
+
+0.04 Sat Jun 20 2015
+
+ - Fix bug reading token in perl 5.18 reported by cpan testers
+
+ - Fix a bug in reading json from disk in create_from_file
+
+0.03 Fri Jun 19 2015
+
+ - New authentication option: "Token"
+      provide a token to use when authentication to the kubernetes apiserver
+      may be provided as a string, path to a file, or a ref to a file handle
+
+ - Resource method "update"
+      Any reosurce object may be modified (using the provided attributes).
+      after making changes, call $resource->update; to send those changes
+      to the api server to store.
+
+
+0.02 Sun Jun 07 2015
+
+ - Fixed typo in documentation
+ - Removed debug code from delete method
+ - Added refresh method for statefull resources.
+
+0.01 Sat Jun 06 2015

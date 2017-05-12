@@ -1,0 +1,55 @@
+Net-SMTP-Pipelining version 0.0.3
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+TEST AGAINST A LIVE MAIL SERVER
+
+You can test whether Net::SMTP::Pipelining works with your mail server by using
+one of the test scripts in this distributions t/ directory (02.optional.t). To
+enable this test, set the environment variable NSPipeliningInteractive to "yes"
+before running "make test" (consult your system documentation on how to do this,
+on *NIX with a bash shell you'd execute "export NSPipeliningInteractive=yes").
+The test script will then prompt you for the information needed to run the test.
+
+If you want to test this multiple times you can also create a file
+t/optional.config containing the mail server name, the sender address and the
+recipient address, each on a line. 02.optional.t will then no longer prompt you
+for the information and instead read it from this file (you still need to have
+the environment variable set for the test to run though).
+
+Please note that testing against a live mail server will send actual email
+through that server. Please make sure that you choose the settings so that
+no-one will feel harassed or spammed by these messages. Also make sure that
+your mail server will actually accept messages to/from the address you use,
+otherwise the test will fail.
+
+DEPENDENCIES
+
+version
+Net::Cmd
+Net::SMTP
+IO::Socket
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, Marc Beyer
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

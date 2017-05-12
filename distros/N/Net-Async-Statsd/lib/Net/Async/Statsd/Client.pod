@@ -1,0 +1,216 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::Statsd::Client
+at lib/Net/Async/Statsd/Client.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::Statsd::Client - asynchronous API for Etsy's statsd protocol
+
+=head1 VERSION
+
+version 0.004
+
+=head1 SYNOPSIS
+
+ use Future;
+ use IO::Async::Loop;
+ use Net::Async::Statsd::Client;
+ my $loop = IO::Async::Loop->new;
+ $loop->add(my $statsd = Net::Async::Statsd::Client->new(
+   host => 'localhost',
+   port => 3001,
+ ));
+ # Wait until the stats are written before proceeding
+ Future->needs_all(
+  $statsd->timing(
+   'some.task' => 133,
+  ),
+  $statsd->gauge(
+   'some.value' => 80,
+  )
+ )->get;
+ # Fire-and-forget stat, record 25% of the time:
+ $statsd->increment('startup', 0.25);
+
+=head1 DESCRIPTION
+
+Provides an asynchronous API for statsd.
+
+=head1 METHODS
+
+All public methods return a L<Future> indicating when the write has completed.
+Since writes are UDP packets, there is no guarantee that the remote will
+receive the value, so this is mostly intended as a way to detect when
+statsd writes are slow.
+
+=head2 timing
+
+Records timing information in milliseconds. Takes up to three parameters:
+
+=over 4
+
+=item * $k - the statsd key
+
+=item * $v - the elapsed time in milliseconds
+
+=item * $rate - optional sampling rate
+
+=back
+
+Only the integer part of the elapsed time will be sent.
+
+Example usage:
+
+ $statsd->timing('some.key' => $ms, 0.1); # record this 10% of the time
+
+Returns a L<Future> which will be resolved when the write completes.
+
+=head2 gauge
+
+Records a current value. Takes up to three parameters:
+
+=over 4
+
+=item * $k - the statsd key
+
+=item * $v - the new value
+
+=item * $rate - optional sampling rate
+
+=back
+
+Only the integer value will be sent.
+
+Example usage:
+
+ $statsd->timing('some.key' => 123);
+
+Returns a L<Future> which will be resolved when the write completes.
+
+=head2 delta
+
+Records changed value. Takes up to three parameters:
+
+=over 4
+
+=item * $k - the statsd key
+
+=item * $v - the change (positive or negative)
+
+=item * $rate - optional sampling rate
+
+=back
+
+Values are truncated to integers.
+
+Example usage:
+
+ $statsd->timing('some.key' => -12);
+
+Returns a L<Future> which will be resolved when the write completes.
+
+=head2 count
+
+Alias for L</delta>.
+
+=head2 increment
+
+Shortcut for L</delta> with a value of +1.
+
+=head2 decrement
+
+Shortcut for L</delta> with a value of -1.
+
+=head2 configure
+
+Standard L<IO::Async::Notifier> configuration - called on construction or
+manually when values need updating.
+
+Accepts the following named parameters:
+
+=over 4
+
+=item * host - the host we'll connect to
+
+=item * port - the UDP port to send messages to
+
+=item * default_rate - default sampling rate when none is provided for a given call
+
+=item * prefix - string to prepend to any stats we record
+
+=back
+
+=head1 INTERNAL METHODS
+
+These methods are used internally, and are documented
+for completeness. They may be of use when subclassing
+this module.
+
+=head2 queue_stat
+
+Queues a statistic for write.
+
+=head2 sample
+
+Applies sampling based on the given rate - returns true if
+we should record this, false otherwise.
+
+=head2 default_rate
+
+Default sampling rate. Currently 1 if not overidden in constructor or L</configure>.
+
+=head2 port
+
+Statsd UDP port.
+
+=head2 host
+
+Statsd host to connect to.
+
+=head2 connect
+
+Establishes the underlying UDP socket.
+
+=head2 on_socket
+
+Called when the socket is established.
+
+=head2 on_recv
+
+Called if we receive data.
+
+=head2 on_recv_error
+
+Called if we had an error while receiving.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Net::Statsd> - synchronous implementation
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2014-2016. Licensed under the same terms as Perl itself.

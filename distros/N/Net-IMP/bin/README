@@ -1,0 +1,13 @@
+imp-pcap-filter.pl 
+- uses Net::IMP to manipulate pcap stream, e.g. reads pcap data from file
+  and writes new pcap file
+- very useful for testing IMP modules with deterministic input
+- does not support IMP_TOSENDER result
+
+imp-relay.pl
+- relay (e.g. proxy, application level gateway...) with IMP module support
+- destination can be set fixed
+- can also work as a socks4 server to extract destinations
+- will probably work transparently too (not tested)
+- probably still enough bugs in it, so don't use it for anything else than testing:
+  might leak memory, keep connections open..

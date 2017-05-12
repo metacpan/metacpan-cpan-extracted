@@ -1,0 +1,43 @@
+Revision history for Perl extension Net::Bluetooth
+
+0.41  Mon Dec 01 10:20:00 2014
+    - Created repository on Bitbucket.
+    - Incorporated change from ticket #54014 (Benoit Peccatte)
+    - Pushing updated version
+
+0.32  Fri June 09 14:05:11 2006
+	- Initial creation
+
+0.34  Fri June 16 17:07:11 2006
+	- Added Windows support.
+	- Changed the API.
+
+0.35  Sat June 17 00:02:11 2006
+	- Fixed a sdp_search bug where a "0" service_id
+	  was not searching the public group.
+	- Fixed a bug in the sdp_search for Win where keys
+	  where being defined when there was no value.
+
+0.36  Tue June 20 02:07:10 2006
+	- Added localhost sdp_search for Windows.
+	- Added samples directory.
+	- Fixed a bug with undef searching and sdp_search().
+	- Set device name to [unknown] on Windows if it isn't defined.
+	- Updated documentation.
+	- Fixed bug where sdp_search was not looking at the name arg
+	  on Windows.
+
+0.37  Fri June 23 23:52:11 2006
+	- bind, listen, connect, were returning undef instead of a integer.
+	- Added GPS sample.
+	- String compares on Windows are now case-insensitive.
+
+0.38  Sun October 08 18:54:11 2006
+	- Just updated the README to include the ppd/ppm info for Windows.
+
+0.39  Sun January 14 16:42:11 2007
+	- Fixed a deallocation bug when creating a L2CAP service.
+
+0.40  Sat August 11 19:48:00 2007
+	- perlfh() now returns the filehandle by value instead of reference. This was causing
+	  problems with multiple clients.

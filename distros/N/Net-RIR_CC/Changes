@@ -1,0 +1,14 @@
+Revision history for Net-RIR_CC
+
+0.06    2013-01-14
+        Add more additional codes missing from the NRO page.
+
+0.05    2013-01-14
+        Add some additional codes missing from the NRO page.
+
+0.04    2013-01-14
+        Remove unused Data::Dump from tests.
+
+0.03    2013-01-11
+        Initial version, released on an unsuspecting world.
+

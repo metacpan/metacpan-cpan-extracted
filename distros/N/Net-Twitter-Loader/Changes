@@ -1,0 +1,17 @@
+Revision history for Net-Twitter-Loader
+
+0.04    2014/08/17
+        - No implementation change.
+        - Migrate to Module::Build::Prereqs::FromCPANfile.
+
+0.03    2014/07/06
+        - Fix stupid documentation error.
+
+0.02    2014/07/06
+        - add backend() method.
+        - documentation improvements.
+        - minor fix for xt/net.t
+
+0.01    2014/04/13
+        First version, released on an unsuspecting world.
+

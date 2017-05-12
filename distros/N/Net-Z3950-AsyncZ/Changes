@@ -1,0 +1,129 @@
+Revision history for Perl extension Net::Z3950::AsyncZ.
+0.10  Wed Jun  2 13:47:24 CDT 2004
+       -implmeneted what I hope is permanent fix for the swap check issue--added
+       a 1 sec sleep between each input from pipe in the loop reading from vmstat, in 
+       sub is_mem_left:
+           
+             while(VMSAT) {
+	       sleep(1)
+	        . . .
+	      }
+
+0.10  2004/5/29/ Saturday 6:24
+       -found that swap check failed under certain conditions and added temporary fix
+
+0.08  2004/3/25  Thursday 11:47
+      -add protection for overloaded data throughput to prevent excessive virtual memory swapping
+       and potential loos of data and disk thrashing.  This is accomplished through two new
+       options set in AsnyncZ->new:  'swap_check' and 'swap_attempts'. AsyncZ checks for unusual amounts
+       of swap activity and if found sleeps for 'swap_check' number of seconds and then re-checks 
+       up to 'swap_attempts' number of times, aftr which it exits if excessive swap activity continues.  
+
+0.07  2003/12/2  Tuesday  8:40:33
+      -Fixed utf8 implementation:  MARC:Charset was not installed when utf8=>1 was set as a parameter to
+      the _params object but only when the function form set_utf8(1) was called.  The reason for this is
+      that the function form is handled in Options::_params::AUTOLOAD, which calls AsyncZ::_setupUTF8().  I had
+      forgotten to implement a procedure for calling AsyncZ::_setupUTF8() when the parameter format was used.
+
+      2003/12/4  Thursday 23:27
+      -Fixed bug in handling of the output callback option to the _params object.  The
+       output callback function would come into play only when cb=>\&output_function was
+       passed as a parameter to Asynz::new(). But the callback failed when cb=>\&output_function
+       was passed to a _params object through Net::Z3950::AsyncZ::asyncZOptions() 
+       or set through $params_object->set_cb(). Now, it works as it was supposed to, i.e.it
+       is possible to set a different callback for each individual server. 
+
+0.06  2003/06/19 Thursday 12:02:52;
+     -Upgraded code for reaping zombies in AsyncZ::DESTROY--checking first to see if child process
+       is still running (kill=>0 $pid) and then adding a sleep at end of method to give
+       child handler a chance to reap oustanding killed prcoesses.        
+     -Added skeleton pod to ErrMsg.pm
+
+0.06 2003/7/11 Tursday 8:16:10
+     -Fixed error in logic in Report.pm that caused the space to be eliminated
+     between adjacent subject headings that occcur in subject fields with multiple entries
+     and also eliminated spaces between elements in LC numbers.
+ 
+0.05 Sunday May 31/2003 13:05
+    -fixed bug in Errors.pm so that the Message "No Records for this Query" is suppressed
+      when suppressErrors is in effect;
+    -included DB.txt and test_dbs.pl in the scripts directory, supplying over 1000 servers
+      with a script to query and test them
+    -fixed bug in AsyncZ.pm so that correct pid is found when getting the results from
+      a server, in _getresult(); this assures that the correct index is fed to the callback
+      function--this problem showed up only once we began to process large numbers of servers
+      in one session (with the test_dbs.pl script)
+    
+0.03 2003/05/05 Sunday 16:06:18
+	- AsyncZ.pm and _params.pm     
+	   Implemented utf8 support, using MARC::Charset
+           added utf8 option to _params.pm 
+           added _setupUTF8() and  _utf8() in AsyncZ.pm 
+ 
+0.03 2003/05/02 Friday 14:39:12
+  - Report.html/Report.pod
+  	explictly indicated that $all, $xtra, $std are references
+	   to the respective %MARC_ hashes-- which I had failed to do in
+	   earlier documentation
+       added an example of how to create a user defined MARC
+           hash which adds fields to the %MARC_FIELDS_ALL hash.
+ - Contents.html
+      updated index to reflect changes in Report.html
+
+0.02 Tuesday April 15 2003
+  - Converted Net::AsyncZ to Net::Z3950::AsyncZ
+ 
+  - AsyncZ.pm  
+        fixed bug which result in "Killed" being printed to STDERR at closed of scripts
+	which did not use a monitor process
+
+0.02 Sunday April 13 2003
+ - Added support for unrendered raw records with helper subroutines
+  - AsyncZ.pm
+	# params:  string or ref to string
+	#   	   boolean: true, then substitution uses 'g' modifier		
+	#	   substitution string
+	#              if subst string is not defined, empty string is substituted
+	# return:  either string or reference to string, depending on whether a reference or a string
+	#          was intially passed in paramter $_[0]		
+	sub delZ_header 
+	sub delZ_pid
+	sub delZ_serverName
+	sub _del_headers # internal function which implements the above
+
+	sub prep_Raw # prepares the unrendered raw data for get_ZRawRec();
+	# param:  ref to string of raw records
+	# return next record
+	sub get_ZRawRec
+  
+  - AsyncZ.pm
+     Fixed bug in:
+ 	sub isZ_MARC, sub isZ_GRS, sub isZ_RAW,isZ_DEFAULT  
+	pattern was not being checked only names (MARC, GRS1,RAW,DEFAULT);
+
+  - Report.pm
+	we now output unrendered raw and rendered raw records:
+	  printRaw, printRenderedRaw
+	added option to new: 
+	  rendered => 1 # default is true
+
+  - _params.pm	updated _params with support for rendered option
+
+
+
+0.02  Fri April 11 2003  
+ - AsyncZ.pm
+ - Added use sigtrap to handle signals not handled explcitly
+	purpose: to protect against failure to free shared memory and semaphores
+		 if a browser cut off contact with a script
+ - Added private parameter monitor_pid to new
+	purpose:  to give new and DESTROY access to the monitor's pid, so as to enable 
+	          one of these to kill the process in clean up, again to prevent
+		  failure to free IPC resources
+
+
+
+0.01  Mon Mar 31 20:45:10 2003
+	- original version; created by h2xs 1.22 with options
+		-X -A Net::Z3950::AsyncZ
+

@@ -1,0 +1,47 @@
+NCBIx-Geo version 1.0.0
+
+NCBIx::Geo uses a caching strategy to load meta-data and sample data from 
+the NCBI GEO database. The included script manages most of the features, 
+but the module is useful for a variety of scripts.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make install clean
+	rm -f Makefile.old
+	perl t/00.load.t
+
+To install the geo script, run the following commands:
+
+        cp scripts/geo.pp /usr/local/bin/geo
+	chmod 555 /usr/local/bin/geo
+
+To learn more about using geo, run the following command:
+
+        geo -h
+
+
+DEPENDENCIES
+
+NCBIx::Geo uses:
+
+  Class::Std
+  Class::Std::Utils
+  LWP::Simple
+  XML::Simple
+  Data::Dumper
+
+The geo script file uses:
+
+  NCBIx::Geo 
+  Getopt::Long
+
+
+COPYRIGHT AND LICENSE
+
+Copyleft (C) 2010, Roger A Hall
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

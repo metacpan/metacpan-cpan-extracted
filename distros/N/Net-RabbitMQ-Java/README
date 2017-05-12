@@ -1,0 +1,63 @@
+--------
+Abstract
+--------
+
+Net::RabbitMQ::Java provides full Perl bindings and OOP
+interface to the RabbitMQ AMQP client library.
+
+------------------
+Requirements
+------------------
+
+Net::RabbitMQ::Java depends on Inline::Java, which is usually
+not so difficult to install. You just need to have Java SDK 
+installed on your system (apt-get install openjdk-6-jdk for
+Ubuntu/Debian users).
+
+------------------
+Basic Installation
+------------------
+
+Net::RabbitMQ::Java may be installed through the CPAN shell in
+the usual manner.  Typically:
+
+  $ perl -MCPAN -e 'install Net::RabbitMQ::Java'
+
+You can also read this README from the CPAN shell:
+
+  $ perl -MCPAN -e shell
+  cpan> readme Net::RabbitMQ::Java
+
+And you can install the component from the CPAN prompt as well:
+
+  cpan> install Net::RabbitMQ::Java
+
+-------------------
+Manual Installation
+-------------------
+
+This module may also be installed manually.  Its distribution is
+available from the author's CPAN directory,
+<ftp://ftp.cpan.org/pub/CPAN/authors/id/A/AA/AAR/>, or a similarly
+named directory at your favorite CPAN mirror.
+
+Downloading and unpacking the distribution are left as exercises for
+the reader.  To build and test it:
+
+  perl Makefile.PL
+  make test
+
+To test against a specific server and/or port you can pass them as
+environment variables:
+
+  env MQHOST="localhost" MQPORT="5673" make test
+
+When you're ready to install the component:
+
+  make install
+
+It should now be ready to use.
+
+Thanks for reading!
+
+-- Alessandro Ranellucci / aar@cpan.org

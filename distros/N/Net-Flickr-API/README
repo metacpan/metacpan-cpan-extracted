@@ -1,0 +1,159 @@
+NAME
+    Net::Flickr::API - base API class for Net::Flickr::* libraries
+
+SYNOPSIS
+     package Net::Flickr::RDF;
+     use base qw (Net::Flickr::API);
+
+DESCRIPTION
+    Base API class for Net::Flickr::* libraries
+
+    Net::Flickr::API is a wrapper for Flickr::API that provides support for
+    throttling API calls (per second), retries if the API is disabled and
+    marshalling of API responses into XML::LibXML or XML::XPath objects.
+
+OPTIONS
+    Options are passed to Net::Flickr::Backup using a Config::Simple object
+    or a valid Config::Simple config file. Options are grouped by "block".
+
+  flick
+
+    * api_key
+        String. *required*
+
+        A valid Flickr API key.
+
+    * api_secret
+        String. *required*
+
+        A valid Flickr Auth API secret key.
+
+    * auth_token
+        String. *required*
+
+        A valid Flickr Auth API token.
+
+    * api_handler
+        String. *required*
+
+        The api_handler defines which XML/XPath handler to use to process
+        API responses.
+
+        * LibXML
+            Use XML::LibXML.
+
+        * XPath
+            Use XML::XPath.
+
+  reporting
+
+    * enabled
+        Boolean.
+
+        Default is false.
+
+    * handler
+        String.
+
+        The default handler is Screen, as in `Log::Dispatch::Screen'
+
+    * handler_args
+        For example, the following :
+
+         reporting_handler_args=name:foobar;min_level=info
+
+        Would be converted as :
+
+         (name      => "foobar",
+          min_level => "info");
+
+        The default name argument is "__report". The default min_level
+        argument is "info".
+
+PACKAGE METHODS
+  __PACKAGE__->new($cfg)
+
+    Where $cfg is either a valid *Config::Simple* object or the path to a
+    file that can be parsed by *Config::Simple*.
+
+    Returns a *Net::Flickr::API* object.
+
+OBJECT METHODS
+  $obj->api_call(\%args)
+
+    Valid args are :
+
+    * method
+        A string containing the name of the Flickr API method you are
+        calling.
+
+    * args
+        A hash ref containing the key value pairs you are passing to
+        *method*
+
+    If the method encounters any errors calling the API, receives an API
+    error or can not parse the response it will log an error event, via the
+    log method, and return undef.
+
+    Otherwise it will return a *XML::LibXML::Document* object (if
+    XML::LibXML is installed) or a *XML::XPath* object.
+
+  $obj->get_auth()
+
+    Return an XML *node* element containing the Flickr auth token
+    information for the current object.
+
+    Returns undef if no token information is present.
+
+  $obj->get_auth_nsid()
+
+    Return the Flickr NSID of the user associated with the Flickr auth token
+    information for the current object.
+
+    Returns undef if no token information is present.
+
+  $obj->upload(\%args)
+
+    This is a helper method that simply wraps calls to the *Flickr::Upload*
+    upload method. All the arguments are the same. For complete
+    documentation please consult:
+
+    http://search.cpan.org/dist/Flickr-Upload/Upload.pm#upload
+
+    (Note: There's no need to pass an auth_token argument as the wrapper
+    will take care of for you.)
+
+    Returns a photo ID (or a ticket ID if the call is asynchronous) on
+    success or false if there was a problem.
+
+  $obj->log()
+
+    Returns a *Log::Dispatch* object.
+
+VERSION
+    1.7
+
+DATE
+    $Date: 2009/08/02 17:16:12 $
+
+AUTHOR
+    Aaron Straup Cope <ascope@cpan.org>
+
+SEE ALSO
+    Config::Simple
+
+    Flickr::API
+
+    XML::XPath
+
+    XML::LibXML
+
+BUGS
+    Please report all bugs via http://rt.cpan.org/
+
+LICENSE
+    Copyright (c) 2005-2008 Aaron Straup Cope. All Rights Reserved.
+
+    This is free software. You may redistribute it and/or modify it under
+    the same terms as Perl itself.
+

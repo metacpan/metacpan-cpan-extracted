@@ -1,0 +1,33 @@
+{
+   "base_url" : "https://api.example.com/",
+   "version" : "0.1",
+   "formats" : [
+       "json"
+   ],
+   "headers": {
+       "Accept" : "application/vnd.example+json"
+   },
+   "methods" : {
+      "get_info" : {
+         "path" : "/users/:username",
+         "method" : "GET",
+         "required_params" : [
+            "username"
+         ]
+      },
+      "list_repos" : {
+         "path" : "/users/:username/repos",
+         "method" : "GET",
+         "required_params" : [
+            "username"
+         ]
+      }
+   },
+   "expected_status" : [ 200 ],
+   "name" : "Sample",
+   "authority" : "cpan:TEAM",
+   "meta" : {
+      "documentation" : "http://doc.example.com/"
+   }
+}
+

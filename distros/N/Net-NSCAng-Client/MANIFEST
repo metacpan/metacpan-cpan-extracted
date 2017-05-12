@@ -1,0 +1,18 @@
+Changes
+Client.xs
+LICENSE
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/001_load.t
+t/Net-NSCAng-Client.t
+t/manifest.t
+t/pod.t 
+lib/Net/NSCAng/Client.pm
+client.c
+client.h
+typemap
+uthash.h
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

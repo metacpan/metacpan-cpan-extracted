@@ -1,0 +1,10 @@
+Revision history for Perl extension Net::Amazon::DVD2IMDB
+
+0.03	Mar 19 2005
+	- Fixed problems with the distribution
+
+0.02	Mar 19 2005
+	- Added lots of documentation and made a proper installation package.
+
+alpha	May  8 2004
+	- Created the original module

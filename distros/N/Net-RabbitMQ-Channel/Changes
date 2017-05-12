@@ -1,0 +1,30 @@
+2011-06-07	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+Release 0.04
+
+Real (and working) timeouts
+Test for consumption on another node of cluster
+
+
+2010-12-25	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+Release 0.03
+
+Bubble sort for failed hosts, new configuration option
+
+
+2010-12-22	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+Release 0.02
+
+Internal
+
+API changes
+new methods for queue, exchange
+
+
+2010-12-15	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+Release 0.01
+
+Initial revision

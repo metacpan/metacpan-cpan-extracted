@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-DNS-Utility.t
+lib/Net-DNS-Utility.pm
+META.yml                                 Module meta-data (added by MakeMaker)

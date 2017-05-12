@@ -1,0 +1,67 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5ebf20e77850b956f9f03833932a7005ba59f0d9 COPYING.txt
+SHA1 ecd8e0fc9926089edc17f362c7993252901cb098 Changes.pod
+SHA1 db0af8c788e2aa2f2884b29bb267bf70f0fa4cc1 MANIFEST
+SHA1 308a3108e12c2bcbe8de82e3dc25f19b4027de58 META.yml
+SHA1 ceae6debb2daa11d61296bb8ea04b383b268c6ce Makefile.PL
+SHA1 b33dcb80a13bef185c17bf0bf40b794c1cdbea5d README
+SHA1 d5e3f20af230c4ce16e38e5c8254ad6fee01ae70 SubmittingPatches
+SHA1 991e7d26540effcdb217e0c84bf93109440ae4b9 examples/README
+SHA1 8166b2416ca6591af90f689e1a43812f5b4bd5c7 examples/cli-cert-old.pl
+SHA1 bce7bc630696dd3238eb1223c8b65265f1ac4442 examples/cli-cert.pl
+SHA1 414f85d74d8d4eccbfae8561cef0baec862ffd26 examples/req.conf
+SHA1 1aad5a7a6554f67733ff808ddeefdde32844ef6e examples/sslecho.pl
+SHA1 4d69908b6fb641f0a815ba7a055202be18254580 inc/Module/Install.pm
+SHA1 9d708b71021016d397301787145612635e427eb1 inc/Module/Install/Base.pm
+SHA1 f89a60f78fb54b8b196576ac0b0a3e3987f99e92 inc/Module/Install/Can.pm
+SHA1 4799af3d95b14d78d553bbc972b4d381776055ee inc/Module/Install/Fetch.pm
+SHA1 0d5d2f7da809f3f2a6dd55164fede247d6cd7cbc inc/Module/Install/Makefile.pm
+SHA1 e12bcb2589a3bc37d9ce3236023de7d122ccf1c7 inc/Module/Install/Metadata.pm
+SHA1 194dfef881034d358c4c88f027a3d0a5f5bab0af inc/Module/Install/Win32.pm
+SHA1 a3912b125510ff03fcedfef148dd199ca4459a63 inc/Module/Install/WriteAll.pm
+SHA1 16fbf929dacac5f1b19507fcc4af279a6eae385b lib/Net/SSLeay/OO.pm
+SHA1 5a4202422afbaebb44cf5ff6df597cb89e6c2658 lib/Net/SSLeay/OO/Constants.pm
+SHA1 043f5ef74d6dd6eb7836475b30052728d765f5b7 lib/Net/SSLeay/OO/Context.pm
+SHA1 db49625bb810fa55b8fb6add417d306f353ba9df lib/Net/SSLeay/OO/Error.pm
+SHA1 51656a14ddaf39de1a6d238a234a23eeb54504af lib/Net/SSLeay/OO/Functions.pm
+SHA1 6d7a743d6c1bf5e075759bbc53dd2017de528fbb lib/Net/SSLeay/OO/SSL.pm
+SHA1 3c51f60dff4ea256c0b0aeac620060c8f291a242 lib/Net/SSLeay/OO/Session.pm
+SHA1 42ad4c7c51272de1a3c11fbe42bcb53878891262 lib/Net/SSLeay/OO/X509.pm
+SHA1 fcc8a058455d115b7270d2c5acecd3afb7caa7ad lib/Net/SSLeay/OO/X509/Context.pm
+SHA1 122052105ff5d1bc609841edd40bd80b9ed02c6f lib/Net/SSLeay/OO/X509/Name.pm
+SHA1 2b922ac72195bf5dce184fe115df70106bf9d75f lib/Net/SSLeay/OO/X509/Store.pm
+SHA1 05ecdcb1694207f405714b0cc0dac8c27db358ba t/00-load.t
+SHA1 040aef584a54031caf6f77c0c794bbc030fb22be t/01-constants.t
+SHA1 95aceb83860a4e9559394816ae3eee4b625b62eb t/02-context.t
+SHA1 73d59cc01452673154ae1c25d67c036b7c42bd34 t/03-ssl.t
+SHA1 c2f853b795fbb46bbf1e225fd586c2b05df7d463 t/04-cli-cert.t
+SHA1 2a9ea5fda22ba067873f734a9957732594f1954c t/05-non-blocking.t
+SHA1 f46068f105c43b44b2cb5a0a83bc3cabf78d7c68 t/TestCerts.pm
+SHA1 ec1810ad56c59cbd5f8090aa7a75719b2046ebab t/certs/.gitignore
+SHA1 71a8f4aa6b0afa667e3c4f4be8ec32e06596bf05 t/certs/ca-openssl.cnf
+SHA1 55bcf386539e369ef8159daf530bcca03f8eaefc t/certs/client-openssl.cnf
+SHA1 c2591031d8e86c84772878611b996a9c21e9872e t/certs/make-test-certs.sh
+SHA1 de6cef326cc6529a10fdf6d68a5ed370334a442c t/certs/openssl.cnf
+SHA1 9d42b83283b5f8782be247e4c13c85077b9356b8 t/certs/server-openssl.cnf
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkrQQr8ACgkQ/AZAiGayWEPtTQCfUM+hwY0UIRa7JhMklkHUcyEx
+5n0AnA6Xaa6hk5r7sg0tPFmKnWEv7fid
+=mtv1
+-----END PGP SIGNATURE-----

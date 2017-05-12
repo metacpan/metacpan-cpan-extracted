@@ -1,0 +1,11 @@
+Changes
+lib/Net/Semantics3.pm
+lib/Net/Semantics3/Products.pm
+lib/Net/Semantics3/Error.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+LICENSE
+t/00-load.t
+t/manifest.t
+t/pod.t

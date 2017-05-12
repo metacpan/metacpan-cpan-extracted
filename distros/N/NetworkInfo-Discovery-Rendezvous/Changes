@@ -1,0 +1,27 @@
+Revision history for NetworkInfo-Discovery-Rendezvous
+
+0.06	2006.01.07
+        [BUGFIX] Net::Rendezvous API wasn't correctly used. 
+        [API] Added the get_services() method.
+
+0.05    2005.04.03
+        [TESTS] Updated t/20rendezvous.t
+        [TESTS] Corrected t/01api.t
+
+0.04    2004.12.30
+        [CODE] Updated to follow Net::Rendezvous 0.90 API. 
+        [TESTS] Added t/00prereq.t
+
+0.03    2004.11.16
+        [DOC] Wrote the README.
+        [TESTS] Added tests to t/00load.t
+
+0.02    2004.10.18
+        [DOC] Updated documentation with a link to Net::Rendezvous RT ticket. 
+        [TESTS] Improved t/20rendezvous.t so that it skips when not connected to the Internet. 
+        Added eg/rvdisc.pl
+        Added licenses texts. 
+
+0.01    2004.09.29
+        First version, released on an unsuspecting world.
+

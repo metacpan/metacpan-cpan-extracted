@@ -1,0 +1,30 @@
+System Requirements
+-------------------
+
+The following Perl version and packages are required for...
+
+...building Net::DNS::Resolver::Programmable:
+
+  Perl
+  Module-Build 0.2805
+  version
+
+...running Net::DNS::Resolver::Programmable:
+
+  Perl
+  version
+  Net-DNS
+
+Building and Installing
+-----------------------
+
+You can build and install Net::DNS::Resolver::Programmable automatically using
+the CPAN shell, or manually with the following commands:
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+# $Id: README 167 2005-01-17 18:26:45Z julian $
+# vim:tw=79

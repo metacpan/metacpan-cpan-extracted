@@ -1,0 +1,7 @@
+^\.git\/
+^\.gitignore
+Makefile$
+^blib
+^pm_to_blib
+^.*.bak
+^.*.old

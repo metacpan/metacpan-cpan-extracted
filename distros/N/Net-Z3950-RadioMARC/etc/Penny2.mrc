@@ -1,0 +1,1 @@
+00321nam  2200085Ia 45e0008004100000010001600041100003600057245008300093650005900176YYMMDD?DAT1    CNT           000 0 LNG d   a 010a-82931  a 100adwir, qrmn  d  100d-290610 a 245adiao dkwo alealkdffj   b  245bdaldk akdje c 245celrks ie qrmn 100adwir 0 a 650adielaelsdks  x 650xaeoewpexncb   z 650zqejigfh

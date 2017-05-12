@@ -1,0 +1,14 @@
+Revision history for Net-Squid-ReverseProxy
+
+0.0.1  2009-08-08
+       Initial release.
+
+0.0.2  2009-09-15
+       Fixup a config for squid-2.7
+
+0.0.3  2010-02-16 
+       Add the support for squid-3.1
+
+0.0.4  2010-05-09
+       Improvement for make test 
+

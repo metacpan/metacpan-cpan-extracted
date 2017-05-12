@@ -1,0 +1,29 @@
+Net/Server/Mail/ESMTP/AUTH version 0.2
+======================================
+
+This module is an extension to provide support for SMTP
+authentification with Net::Server::Mail::ESMTP module.
+
+Currently only LOGIN and PLAIN methods are supported.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Net::Server::Mail::SMTP
+  MIME::Base64
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004, 2016 Sylvain Cresto
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

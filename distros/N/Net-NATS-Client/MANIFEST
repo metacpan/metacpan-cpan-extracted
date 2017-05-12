@@ -1,0 +1,14 @@
+lib/Net/NATS/Client.pm
+lib/Net/NATS/ConnectInfo.pm
+lib/Net/NATS/Connection.pm
+lib/Net/NATS/Message.pm
+lib/Net/NATS/ServerInfo.pm
+lib/Net/NATS/Subscription.pm
+lib/URI/nats.pm
+LICENCE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+#
+#   Example mailer
+#
+#   The purpose of this program is passing an email to the spooler.
+#   The mailer is configured as follows:
+#
+#   In /etc/mail/sendmail.mc (or /etc/mail/redhat.mc or /etc/mail/linux.mc
+#   or whatever you have) add a
+#
+#	MAILER(fax)
+#
+#   and do a
+#
+#	m4 /etc/mail/sendmail.mc >/etc/sendmail.cf.new
+#
+#   Verify /etc/sendmail.cf.new. If it looks good, rename it:
+#
+#       mv /etc/sendmail.cf.new /etc/sendmail.cf
+#
+#   Now any mail being sent to
+#
+#	user@host.fax
+#
+#   will trigger a command
+#
+#	cat your_mail | /usr/local/bin/faxmail -d user@host from
+#
+#   Rename this file to /usr/local/bin/faxmail and start your server
+#   with the examples/mailspooler script.
+#
+
+my $UNIX_SOCKET = "/var/spooler/sock";
+
+
+use strict;
+use vars qw($opt_d $opt_s);
+use Getopt::Std();
+use Socket ();
+
+Getopt::Std::getopt('ds');
+die "Missing destination:" unless $opt_d;
+
+my $sock_path = $opt_s || $UNIX_SOCKET;
+socket(SOCK, Socket::PF_UNIX(), Socket::SOCK_STREAM(), 0)
+    || die "Cannot create socket: $!";
+connect(SOCK, Socket::sockaddr_un($UNIX_SOCKET))
+    || die "Cannot connect: $!";
+
+# Print the target as first line
+print SOCK "$opt_d\n"
+    || die "Failed to pass destination: $!";
+while (defined(my $line = <STDIN>)) {
+    print SOCK $line
+	|| die "Failed to write: $!";
+}
+close SOCK;
+
+
+
+
+

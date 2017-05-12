@@ -1,0 +1,24 @@
+META.yml
+typemap
+t/01_use.t
+t/02_cups.t
+const-c.inc
+Makefile.PL
+TODO
+Changes
+extra_t/03_destination.t
+MANIFEST
+README
+lib/Net/CUPS/Destination.pm
+lib/Net/CUPS/PPD.pm
+lib/Net/CUPS/IPP.pm
+lib/Net/CUPS.pm
+packer.c
+fallback/const-c.inc
+fallback/const-xs.inc
+examples/list_dests.pl
+examples/print_file.pl
+const-xs.inc
+CUPS.xs
+ppport.h
+META.json                                Module JSON meta-data (added by MakeMaker)

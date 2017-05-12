@@ -1,0 +1,84 @@
+Change log for Net::Curl. See the complete list of changes at:
+https://github.com/sparky/perl-Net-Curl/commits/master
+
+0.37 2015-02-01T09:25:00Z
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Synced symbols-in-versions from libcurl/7.40.0.
+
+0.36 2014-07-05T12:56:26Z
+ [Przemysław Iskra <sparky@pld-linux.org>]
+ - Fixed the tests for libcurl older than 7.21.2.
+
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Added MANIFEST.SKIP;
+ - Added Devel::Leak v0.04 special case to t/t/96-leak.t;
+ - Updated release tests.
+
+0.35 2014-06-03T08:54:00Z
+ [Przemysław Iskra <sparky@pld-linux.org>]
+ - Properly handle both UTF-8 and binary data within /(un)?escape/.
+
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Fixed the bugs introduced with the pipelining blacklist feature.
+
+0.34 2014-05-30T15:40:00Z
+ [Maksym Davydov <max@mdavydov.com>]
+ - Added support for CURLOPT_XFERINFOFUNCTION callback (and CURLOPT_XFERINFODATA option) to Net::Curl::Easy;
+ - Added functions escape() and unescape() to Net::Curl::Easy.
+
+ [Olaf Alders <olaf@wundersolutions.com>]
+ - Fixed typo in Makefile.PL error message.
+
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Synced symbols-in-versions from libcurl/7.37.0;
+ - Makefile.PL cleanup;
+ - Attempted to silence test noise under -DDEBUGGING;
+ - Attept to fix a test failing on MidnightBSD (and potentially others);
+ - CURLMOPT_PIPELINING_SERVER_BL/CURLMOPT_PIPELINING_SITE_BL support added.
+
+0.33 2014-01-17T10:38:11Z
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Fixed Net-Curl test failures on FreeBSD 9.2 (cookies related);
+ - Fixed slight versioning bug in Net::Curl + Net::Curl::Compat;
+ - Synced symbols-in-versions from libcurl/7.34.0.
+
+0.32 2013-10-15T09:48:06Z
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Silencing some noisy tests.
+
+0.31 2013-08-15T19:03:19Z
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Fixed compatibility with libcurl/7.32.0.
+
+0.30 2013-08-09T09:35:42Z
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Fixed compiling on 32-bit Debian Linux systems;
+ - More failing test fixes.
+
+0.29 2013-08-01T11:39:27Z
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Fixed compatibility down to libcurl/7.15.5 (7.15.4 is not compatible);
+ - Updated the Changes file to conform with the CPAN::Changes Kwalitee
+   Service;
+ - Synced symbols-in-versions from libcurl/7.31.0;
+ - Attempt to fix tests failing behind a proxy.
+
+0.28 2013-05-12T11:46:53Z
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Implemented curl_multi_wait() as Net::Curl::Multi::wait() method;
+ - META/documentation fixes.
+
+0.27 2013-05-11T12:54:58Z
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Net::Curl::Easy::reset() now works;
+ - Fixed the leak test for Perl >= 5.017;
+ - Few steps towards Modern Perl (checked with Perl::Critic, updated META,
+   added real change log);
+ - Minor cleanups.
+
+0.26 2013-05-05T23:20:46Z
+ [Stanislaw Pusep <stas@sysd.org>]
+ - Fixed "Attempt to free unreferenced scalar: SV 0xdeadbeef during global
+   destruction.";
+ - ExtUtils::PkgConfig now recognizes libcurl installed anywhere;
+ - Updated inc/symbols-in-versions from libcurl/7.30.0.

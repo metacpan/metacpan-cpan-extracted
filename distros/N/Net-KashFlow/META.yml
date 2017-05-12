@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Net-KashFlow
+version:             0.01
+abstract:            Interact with KashFlow accounting web service
+license:             perl
+author:              
+    - Simon Cozens <simon@simon-cozens.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    SOAP::Lite:                    0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

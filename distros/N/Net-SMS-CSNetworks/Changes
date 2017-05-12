@@ -1,0 +1,32 @@
+Revision history for Perl extension Net::SMS::CSNetworks
+
+0.07      2011-08-15 Oslo/Norway
+
+    - Added LWP::UserAgent in pre-requisites.
+
+0.06      2011-08-12 Oslo/Norway
+
+    - Added long decription on send_sms
+    - Added HTTP::Request::Common in pre-requisites.
+
+0.05      2011-08-05 Oslo/Norway
+
+    - Bah, typo
+
+0.04      2011-08-05 Oslo/Norway
+
+    - Added support to return the provider status message from send_sms
+
+0.03      2011-08-04 Oslo/Norway
+
+    - It should be better and support utf8
+
+0.02      2011-08-03 Oslo/Norway
+
+    - Removed some unnessesary dependencies in dist.ini
+
+0.01      2011-08-01 Oslo/Norway
+
+    - Initial CPAN release. Functional.
+
+

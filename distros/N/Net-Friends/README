@@ -1,0 +1,35 @@
+Net/Friends version 1.03
+========================
+
+Net::Friends allows for the reporting to and querying of GPSDrive-style
+friendsd servers.  The friendsd server used simple UDP messages to update and
+report the most recent known position, speed, and direction of people and
+things.
+
+CHANGES FROM 1.02 to 1.03
+
+Fixed remote query-only node filtering.  Added .yml data file.  See the
+'Changes' file for information on previous updates.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  IO::Socket::INET
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Ry4an Brase
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

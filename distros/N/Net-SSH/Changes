@@ -1,0 +1,36 @@
+Revision history for Perl extension Net::SSH.
+
+0.09  Wed May 14 11:42:46 PDT 2008
+        - Add links to the more current stuff on CPAN.
+        - Documentation patch about ssh-keygen from terrence brannon
+          <tbone@directsynergy.com>
+
+0.08  Thu Feb 12 16:44:36 2004
+	- replace ssh_cmd blocking read of STDOUT then STDERR with IO::Select
+
+0.07  Mon Aug 26 02:53:26 2002
+	- turn on -T to quiet pseudo-terminal warnings on OpenSSH v2 or later
+
+0.06  Wed Jul 3 07:52:15 2002
+	- patch from Anthony Awtrey <tony@awtrey.com> to use s/=/ / in -o
+	  options again if OpenSSH v1 is detected
+	- fix patch to detect at runtime, not compiletime
+	- update ssh_cmd to accept named params & stdin_string
+
+0.05  Fri Feb 15 15:46:00 2002
+	- brainfart mis-credit
+
+0.04  Fri Feb 15 14:05:06 2002
+	- added ssh_cmd from Martin Langhoff <martin@cwa.co.nz> with updates by
+	  Jeff Finucane <jeff@cmh.net>
+
+0.03  Wec Oct 24 03:49:06 2001
+	- current OpenSSH wants s/ /=/ in -o options
+	- more documentation updates
+
+0.02  Sat Nov 25 22:44:21 2000
+	- documentation updates
+
+0.01  Thu Aug 17 17:44:21 2000
+	- original version; created by h2xs 1.19
+

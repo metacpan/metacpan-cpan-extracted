@@ -1,0 +1,6 @@
+Makefile.PL
+ChangeLog
+MANIFEST
+lib/Net/OpenID/Consumer/Yadis.pm
+t/00-use.t
+META.yml                                 Module meta-data (added by MakeMaker)

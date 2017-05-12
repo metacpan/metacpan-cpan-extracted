@@ -1,0 +1,44 @@
+{
+   "abstract" : "This class represents a single line from the Nginx combined access log (the default access log format). It provides methods to extract information from the log entry, such as the browser, operating system, request type, ip address and more. If you want to gather statistics about an Nginx log, consider using L<Nginx::Log::Statistics> which uses this class.",
+   "author" : [
+      "David Farrell <davidnmfarrell@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Nginx-Log-Entry",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::BrowserDetect" : "1.55",
+            "Nginx::ParseLog" : "1.01",
+            "Time::Piece" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.05"
+}

@@ -1,0 +1,13 @@
+0.0.2 - 2012-09-27
+------------------
+
+* Allow non-standard ports to be speficied [dconlon]
+* Fixed headers in publish [dconlon]
+* Fixed a hard-coded username [dconlon]
+
+Initial Release
+
+0.0.1 - 2012-06-06
+------------------
+
+Initial Release

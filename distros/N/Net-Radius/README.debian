@@ -1,0 +1,11 @@
+
+On Debian systems, all the bundled dictionaries are placed in
+/usr/share/libnet-radius-perl/dicts.
+
+Documentation is placed in /usr/share/doc/libnet-radius-perl/ as per
+the Debian Policy.
+
+For other distributions or under manual installation, you may need to
+locate those files manually according to your needs.
+
+Luis E. Muñoz / 2009-08-25

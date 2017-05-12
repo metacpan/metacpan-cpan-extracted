@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+SMTP_auth.pm
+test.pl
+README
+eg/smtp-tester.pl
+

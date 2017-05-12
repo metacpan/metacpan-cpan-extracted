@@ -1,0 +1,9 @@
+[% USE YAML %]
+[% value = YAML.undumpfile('share/cidr.yaml') %]
+[% FOR carrier = value.keys %]
+# [% carrier %]
+[%- FOR cidr IN value.item(carrier) %]
+Allow from [% cidr -%]
+[% END %]
+[% END -%]
+

@@ -1,0 +1,8 @@
+This module allows for parsing of text for valid looking DNS Domain Names, and
+subsequent TLD, SLD, Domain and Hostname extraction.  Current status is pulling
+a list of TLDs from a mozilla source, but in the future this will likely be a
+manually maintained list with all known SLD names (co.uk for example).
+
+Contributing:  Please fork https://github.com/petermblair/Perl-CPAN and submit
+changes!  My email address is cpan@petermblair.com and the packages are located
+under http://search.cpan.org/~pblair/

@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ed2f1f58cb0787c333ed326219039fa71bff0cf5 Changes
+SHA1 014b1f8fac7471257990aa1bb6f735fd5cf43d02 INSTALL
+SHA1 1d431d36f36b6e6d6caf68e84e78806a6c83e85f LICENSE
+SHA1 7e4f619a968a0108ec5cf4220a2a9f40466dfe00 MANIFEST
+SHA1 da37a46cc619690ed5808aae36ba2facce7410ca META.json
+SHA1 437aa13503a18f9573b825c784e799eefa467d96 META.yml
+SHA1 5c52dc8d8d66c31bfdcc0ee407d0261bcdc6b74c Makefile.PL
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 README
+SHA1 8b8345340b85f6f32a89cc37bd4986903cc112b1 cpanfile
+SHA1 939257878d6f97da8010436b57c8e64f0486b407 dist.ini
+SHA1 6bf2ad578f059df09e5b9bb3c5bca549231265fb lib/Net/Async/Redis.pm
+SHA1 9c135ffa6191f38b5133a87ff8b402101e222532 lib/Net/Async/Redis.pod
+SHA1 947ca86c2bef5344eb858480d48451963933ae9d t/00-check-deps.t
+SHA1 5f2ce0bb6df58f50ee0dc537e7d3bb46ef2dd104 t/00-compile.t
+SHA1 3e9b0acd5456cc98a4afccba81943fa8e692194e t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 a34c03a10424bffb76edab71352ce14c8e7835ad t/basic.t
+SHA1 987a1b11df6f007a1f737bacf9f44a8e036f77f4 t/psubscribe.t
+SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
+SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
+SHA1 5598b706d9b813eafb74508a7575b391ccd30423 xt/author/test-version.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/release/synopsis.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJWR/kMAAoJEMUM364e+fE4RAQP/271fpxXdrMZlavwP5oyAu9F
+b5x/8rKtb/dooVYi4J4CrTxFBVku0XK4y9nZVBrpYQPxfo2OS3dINP5RWa4ftoK3
+vgq1eMp0TkMAEgVbAyMpcbahB+sgsr5VoBaqY2Vb2YUx6Um/TAhy2ky/uVxFfrtG
+UTKdXyqncIqYLvQoXrnF538g4y/pTSEEsVtrFfcW2VPcMAf7reGGUbdZ3DC/n6a8
+atnnzOEmqdTpRkn9zRGM3E21zdt777VZGTFQ18rVtr25zQwHlfe1py2XX8SBz/nC
+zYmF+VbEkdnVanOKJYFoWaCtYPPpsggE8+xIkOsx0huRUAyzWwRr1WG7rqF8hfed
+/qwW6We7f9m3SynBWOsGoZ44KzOv+rCPhNGxepoB2SUNDF/hmW1yUDmLuYLYMqdo
+aqKJYJYr1gTteeXNkVm5cDBi7gO8cKqm6a3M40XjlHflnc7YSXFIVr0qyrczCYXh
+fVwU6rUIeRUL9Gajmn4k5f1B0FvLZ/1UW4qc+RINL1U0L5M8IwN4mz9/gLlGN3Ih
+q9UmqczSbPOqD25Fg/Wyfrgi8oA/fYlb3cNIJh6qGfObbYbe+/2T2Z38/WDmAc9f
+kILLsXLQ4MdyQOWXwHBSnte2L1BequeWecMJ+xTs/cQrQiBj8PjAoTiVnnHEouDG
+glyHguQXwlkSnyQ6c156
+=hgI7
+-----END PGP SIGNATURE-----

@@ -1,0 +1,31 @@
+Revision history for Net-Pavatar
+
+1.01    Apr 28th, 2007
+        Updated 2 links in the documentation
+
+1.00    Apr 25th, 2007
+        First release version
+        Minor changes in documentation
+
+0.90    Apr 23rd, 2007
+        Improved discovery mechanism
+
+0.694   Apr 17th, 2007
+        Fixed a typo that would cause a fatal error in step 3.c ii
+
+0.693   Apr 15th, 2007
+        Improved discovery
+
+0.692   Apr 13th, 2007
+        Fixed dependencies so tests don't fail
+
+0.691   Apr 13th, 2007
+        Minor changes in documentation
+        Fixed tests
+
+0.69    Thu, Apr 12th, 2007
+        Minor fixes in documentation
+
+0.68    Wed, Apr 11th, 2007
+        First CPAN version
+

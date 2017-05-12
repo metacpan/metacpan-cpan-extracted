@@ -1,0 +1,299 @@
+#!/usr/bin/env perl
+use 5.010001;
+use warnings;
+use strict;
+use utf8;
+
+our $VERSION = 'v2.3.7';
+
+use FindBin;
+use lib "$FindBin::Bin/../lib/perl5";
+use File::Temp qw( tempfile );
+use Narada;
+use Narada::Config qw(get_config_line);
+
+## no critic (ProhibitEscapedCharacters)
+our $NORM   = "\033[0m";
+our $BOLD   = "\033[1m";
+our $BLINK  = "\033[5m";
+our $REV    = "\033[7m";
+our $BLACK  = "\033[30m";
+our $RED    = "\033[31m";
+our $GREEN  = "\033[32m";
+our $YELLOW = "\033[33m";
+our $BLUE   = "\033[34m";
+our $MAGENTA= "\033[35m";
+our $CYAN   = "\033[36m";
+our $WHITE  = "\033[37m";
+## use critic (ProhibitEscapedCharacters)
+
+# cleanup temp files
+local $SIG{HUP} = sub { exit 129 }; ## no critic (ProhibitMagicNumbers)
+local $SIG{INT} = sub { exit 130 }; ## no critic (ProhibitMagicNumbers)
+local $SIG{QUIT}= sub { exit 131 }; ## no critic (ProhibitMagicNumbers)
+local $SIG{TERM}= sub { exit 143 }; ## no critic (ProhibitMagicNumbers)
+
+
+main(@ARGV) if !caller;
+
+
+sub err { die "narada-patch: @_\n" };
+sub color_die {
+    my ($msg) = @_;
+    $msg =~ s/\A/$BOLD$RED/xms;
+    $msg =~ s/\Z/$NORM/xms;
+    err $msg;
+    return;
+}
+sub color_warn {
+    my ($msg) = @_;
+    $msg =~ s/\A/$BOLD$RED * $NORM/xms;
+    warn $msg;  ## no critic (RequireCarping)
+    return;
+}
+sub color_printf {
+    my ($fmt, @arg) = @_;
+    my $msg = sprintf $fmt, @arg;
+    $msg =~ s/\A/$BOLD$GREEN * $NORM/xms;
+    printf $msg;
+    return;
+}
+sub bold  { my ($s) = @_; return $BOLD.$WHITE.($s||q{}).$NORM }
+sub bold2 { my ($s) = @_; return $BOLD.$CYAN. ($s||q{}).$NORM }
+sub pause {
+    my ($s) = @_;
+    local $|=1;
+    print "\n",$BOLD,$YELLOW,$s,$NORM;
+    return scalar <STDIN>;
+}
+sub basename {
+    my ($file) = @_;
+    $file =~ s{.*/}{}xms;
+    return $file;
+}
+
+sub main {
+    Narada::detect('narada-1');
+    rename 'var/patch/prev', 'var/patch/.prev'; # compatibility with Narada <1.2.0
+    die "Usage: narada-patch\n"
+        if @_ > 1
+        || (@_ == 1 && $_[0] ne '--no-prev'); # compatibility with Narada <0.9.3
+    my %patches = get_patches('var/patch');
+    apply_patches(undef, q{.}, %patches);
+    if (-f 'var/patch/.prev/config/version') {
+        apply_patches(undef, 'var/patch/.prev', %patches);
+    }
+    for my $addon (map {m{/([^/]+)/\z}ms} glob 'var/patch/*/') {
+        %patches = get_patches("var/patch/$addon");
+        apply_patches($addon, q{.}, %patches);
+    }
+    return;
+}
+
+sub read_file {
+    my ($file) = @_;
+    open my $f, '<', $file              or err "open($file): $!";
+    local $/ = undef;
+    my $val = <$f>;
+    close $f                            or err "close: $!";
+    return $val;
+}
+
+sub replace_addon_patch {
+    my ($addon, $file) = @_;
+    my $patch = read_file($file);
+    my $rename= qr{(?:config/version|doc/ChangeLog)(?=\s)}ms;
+    $patch =~ s{^(diff [^\n]*/$rename)([^\n]*/$rename)}{$1.$addon$2.$addon}msg;
+    $patch =~ s{^((?:[+-]{3}) [^\n]*/$rename)}{$1.$addon}msg;
+    my ($fh, $tempfile) = tempfile(UNLINK=>1);
+    print {$fh} $patch;
+    close $fh                           or err "close: $!";
+    return $tempfile;
+}
+
+sub apply_patches {
+    my ($addon, $dir, %patch_for) = @_;
+    chomp(my $pwd = `pwd`);
+    chdir $dir or err "chdir: $!";
+    printf "\n";
+    color_printf "\n";
+    if (defined $addon) {
+        color_printf "Patching directory: %s (addon %s)\n", bold($dir), bold($addon);
+    } else {
+        color_printf "Patching directory: %s\n", bold($dir);
+    }
+    color_printf "\n";
+    my $v=get_config_line(defined $addon ? "version.$addon" : 'version');
+    while (exists $patch_for{$v}) {
+        printf "\n";
+        color_printf "Current version: %s\n", bold($v);
+        my $patch = $patch_for{$v};
+        my @files = sort glob "$patch.*";
+        for my $file (@files) {
+            color_printf "Applying %s ...\n", bold2(basename($file));
+            my ($ext) = $file =~ /.*[.](.*)/xms;
+            if ($ext eq 'patch') {
+                if (defined $addon && $file =~ /[.]99[.]patch\z/ms) {
+                    $file = replace_addon_patch($addon, $file);
+                }
+                color_printf "--- DRY RUN, NO FILES WILL BE MODIFIED ---\n";
+                my $status = system "patch -p1 --dry-run < \Q$file\E";
+                if ($status != 0) {
+                    pause('Press Enter to REALLY apply this file...');
+                }
+                color_printf "--- REAL RUN, MODIFYING FILES ---\n";
+                system "patch -p1 < \Q$file\E";
+            }
+            elsif ($ext eq 'tgz') {
+                my $TAR = (grep {-x "$_/gtar"} split /:/ms, $ENV{PATH}) ? 'gtar' : 'tar';
+                system "$TAR xzvf \Q$file\E";
+            }
+            elsif ($ext eq 'sql') {
+                system "narada-mysql < \Q$file\E";
+            }
+            elsif ($ext eq 'sh') {
+                system "bash -x \Q$file\E";
+            }
+            elsif ($ext eq 'pl') {
+                system "perl \Q$file\E";
+            }
+            else {
+                color_warn("Don't know how to apply: $file");
+            }
+        }
+        $v=get_config_line(defined $addon ? "version.$addon" : 'version');
+    }
+    chdir $pwd or err "chdir: $!";
+    return;
+}
+
+sub get_patches {
+    my ($dir) = @_;
+    my %patch_for;  # Found patches, key - version "from", value - file name
+    chomp(my $pwd = `pwd`);
+    printf "\n";
+    for my $file (glob "$pwd/$dir/*.99.patch") {
+        my $patch = read_file($file);
+        if ($patch !~ m{^diff\s+\S+\s+\S+config/version\s+[^\n]+\n
+                        ---         \s+[^\n]+\n
+                        [+][+][+]   \s+[^\n]+\n
+                        @[^\n]+\n
+                        (?:-   ([^\n]+)\n)?
+                        }xms) { ## no critic (ProhibitComplexRegexes)
+            color_warn "Unable to detect version in '$file', skipping...\n";
+        }
+        else {
+            my $ver = $1;
+            if (exists $patch_for{$ver}) {
+                color_die "Found two patches for same version!\n"
+                  . "\tVersion: $ver\n"
+                  . "\tPatch1: $patch_for{$ver}\n"
+                  . "\tPatch2: $file\n";
+            }
+            $file =~ s/[.]99[.]patch\z//xms;
+            $patch_for{$ver} = $file;
+        }
+    }
+    for (sort keys %patch_for) {
+        color_printf "Found patch: %-33s -> %s\n",
+            bold($_), basename($patch_for{$_});
+    }
+    return %patch_for;
+}
+
+
+1; # Magic true value required at end of module
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+narada-patch - apply pending patches on Narada project
+
+
+=head1 VERSION
+
+This document describes narada-patch version v2.3.7
+
+
+=head1 USAGE
+
+    narada-patch
+
+
+=head1 DESCRIPTION
+
+Should be executed in Narada 1.x project root directory.
+
+Apply updates found in C<var/patch/*> files on both Narada 1.x project root and
+C<var/patch/.prev/>. Then apply add-on updates in C<var/patch/*/*> files on
+project root. Automatically detect which updates should be applied.
+Update may include C<.sh>, C<.patch>, C<.tgz>, C<.sql> and C<.pl> files.
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+None.
+
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/powerman/Narada/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software. The code repository is available for
+public review and contribution under the terms of the license.
+Feel free to fork the repository and submit pull requests.
+
+L<https://github.com/powerman/Narada>
+
+    git clone https://github.com/powerman/Narada.git
+
+=head2 Resources
+
+=over
+
+=item * MetaCPAN Search
+
+L<https://metacpan.org/search?q=Narada>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/dist/Narada>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Narada>
+
+=item * CPAN Testers Matrix
+
+L<http://matrix.cpantesters.org/?dist=Narada>
+
+=item * CPANTS: A CPAN Testing Service (Kwalitee)
+
+L<http://cpants.cpanauthors.org/dist/Narada>
+
+=back
+
+
+=head1 AUTHOR
+
+Alex Efros  E<lt>powerman@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2008- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+
+=cut

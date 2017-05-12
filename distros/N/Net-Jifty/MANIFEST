@@ -1,0 +1,25 @@
+Changes
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Net/Jifty.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+SIGNATURE
+t/000-load.t
+t/001-login.t
+t/002-method.t
+t/003-crud.t
+t/004-search.t
+t/005-validate.t
+t/006-uploads.t
+t/lib/Net/Jifty/Test.pm

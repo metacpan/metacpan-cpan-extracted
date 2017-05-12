@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<ItemLookupResponse xmlns="http://webservices.amazon.com/AWSECommerceService/2011-08-01">
+  <Items>
+    <Item>
+      <ASIN>0201360683</ASIN>
+      <SalesRank>2831243</SalesRank>
+      <ItemAttributes>
+        <Author>Michael Schilli</Author>
+        <Binding>Paperback</Binding>
+        <CatalogNumberList>
+          <CatalogNumberListElement>AL07005145</CatalogNumberListElement>
+        </CatalogNumberList>
+        <EAN>9780201360684</EAN>
+        <EANList>
+          <EANListElement>9780201360684</EANListElement>
+        </EANList>
+        <ISBN>0201360683</ISBN>
+        <Label>Addison-Wesley Professional</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>3999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$39.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Addison-Wesley Professional</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>464</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>1998-12-16</PublicationDate>
+        <Publisher>Addison-Wesley Professional</Publisher>
+        <SKU>3_0201360683</SKU>
+        <Studio>Addison-Wesley Professional</Studio>
+        <Title>Perl Power!: A JumpStart Guide to Programming with Perl 5</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>200</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$2.00</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>80</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.80</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>11</TotalNew>
+        <TotalUsed>17</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+        <MoreOffersUrl>0</MoreOffersUrl>
+      </Offers>
+      <CustomerReviews>
+        <IFrameURL>http://www.amazon.com/reviews/iframe?akid=1V5JRJ4JQCSHB3NGG902&amp;alinkCode=xm2&amp;asin=0201360683&amp;atag=blogdivebombo-20&amp;exp=2011-10-30T00%3A37%3A16Z&amp;v=2&amp;sig=kdfQqupZecKkXIVIT5dux%2Befv6u5IFyIy%2Fb44YCs9zE%3D</IFrameURL>
+        <HasReviews>true</HasReviews>
+      </CustomerReviews>
+      <EditorialReviews>
+        <EditorialReview>
+          <Source>Product Description</Source>
+          <Content>If you are looking to bring the power of Perl to your workstation, this is the book for you. Now you can learn Perl basics and get up to speed with Internet and Object Oriented programming with just one book. Packed with hints and tips, solutions and exercises, Perl Power! is the perfect jumpstart guide to the hottest features of the latest Perl release.  Beginners and intermediate developers can use the introductory chapter to get up and running with Perl 5 fast, and a tutorial on object-oriented programming will supplement knowledge and help to fully exploit the power of Perl.  Internet users will learn how to automate repetitive tasks. Ready-to-go scripts show how to periodically check Web pages for changes, scan Newsgroups for interesting messages or send email. Perl Power! will enable you to write your own scripts to program-and-conquer the Internet!  System administrators will find ways to automate many tasks of their day to day work Software developers will gain advice on solving commonly occuring programming problems in short development cycles and unleashing the power of popular Perl modules.  The accompanying CD-ROM features all the programming examples from the book, together with a complete ready-to-use Perl distribution for Windows 95/NT, a free Apache Web Server and freely available modules which can be used to solve everyday programming problems.</Content>
+          <IsLinkSuppressed>0</IsLinkSuppressed>
+        </EditorialReview>
+      </EditorialReviews>
+    </Item>
+  </Items>
+</ItemLookupResponse>

@@ -1,0 +1,13 @@
+README.txt
+Changes
+MANIFEST
+LICENSE
+Makefile.PL
+test.pl
+Version.pm
+News/Web.pm
+News/Web/CookieAuth.pm
+news.cgi
+setcookie.cgi
+stylesheet.css
+defaults

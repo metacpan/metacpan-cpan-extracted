@@ -1,0 +1,9 @@
+Revision history for Perl extension Net::Protocol::Simple.
+
+1.00  Tue Apr 18 16:45:00 2006
+	- Doc's cleaned up and prep'd for release
+
+0.01  Tue Apr 18 16:38:59 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Net::Protocol::Simple --skip-exporter
+

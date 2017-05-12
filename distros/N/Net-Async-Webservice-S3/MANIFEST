@@ -1,0 +1,26 @@
+Build.PL
+Changes
+examples/s3-cat
+examples/s3-head
+examples/s3-ls
+examples/s3-rm
+examples/s3-uncat
+lib/Net/Async/Webservice/S3.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01auth.t
+t/10list_bucket.t
+t/11get_object.t
+t/12put_object.t
+t/13put_object-multipart.t
+t/14delete_object.t
+t/20retry.t
+t/21resume.t
+t/30multipart-concurrent.t
+t/99pod.t
+t/TestHTTP.pm

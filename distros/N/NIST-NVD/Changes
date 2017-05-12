@@ -1,0 +1,74 @@
+Revision history for NIST-NVD
+
+ 1.00.00 20120121T1602:23-0700 cjac@f5.com
+        - exercised in house
+				* works for me.  How about you?
+
+        - implemented features
+        * loading of nvd entries sourced from XML published by NIST
+          into DB_File database
+        * querying of nvd entries stored in database
+        * CRUD layer implemented using database agnostic API
+
+        - unimplemented features
+        * real-time CVE synchronization (need record merge tests)
+        * low hanging fruit in area of memory management love
+        * low hanging fruit in area of batch nvd entry processing
+        * CVE loading code from bin/ should be re-factored under
+          lib/NIST/NVD/
+        * NIST::NVD::Store::DB_File does not implemente cve or cwe API
+          completely - see NIST::NVD::Store::SQLite3
+
+0.14		20120522T22:31:26 -0700
+  this code has been exercised by F5 and seems to work.
+
+0.13		20120517T21:25:14 -0800
+	removed hard dep on DB_File from NIST::NVD::Query
+
+0.12		2012-05-16T0758 -0800
+  integrated work related to get_websec_by_cpe
+  removed DB_File dep
+
+0.11		2012-04-26T15:31 -0800
+  applied recommendations from Lowell
+	
+0.10		2012-03-30T10:36 -0800
+  fixed some pod
+  added explicit version numbers in Makefile.PL
+  stubbed out some code to fetch the recent vulnerabilities.  Incomplete.
+
+0.09		2012-02-25T18:43 -0800
+  Added some deps.  Tested with some in-house F5 Code.  Looks pretty
+  stable
+
+0.08		2012-02-20T21:50 -0800
+  made changes required by NIST::NVD::Store::SQLite3
+
+0.071		2012-02-16T19:21 -0800
+  fixed test as per nightly cpantesters.org run indicated
+
+0.07		2012-02-15T21:31 -0800
+  added dependency on Test::File
+  stubs in place for CWE
+  copyright/trademark updated to include (the MITRE Corp.)++
+
+0.06		2012-02-09T20:08 -0800
+  Minor changes, but this release will work with
+  NIST::NVD::Store::SQLite3
+
+0.05    2012-01-25 @ 15:47:32
+  separated convert-nvd and Query from the concrete storage class so
+  that it can be over-ridden
+
+0.03    2011/12/19 @ 06:59:30
+  Applying recommendations from Hafey
+  Added some more PODs
+  got tests from t/manifest.t passing
+  MANIFEST and ignore.txt are correct
+
+0.02	2011/12/15
+  Added some PODs
+  got rid of some unnecessary complexity in cve hash ref
+
+0.01    2011/12/13
+  Initial work completed

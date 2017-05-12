@@ -1,0 +1,20 @@
+Number::Phone::Normalize
+========================
+
+This module normalizes phone numbers.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+COPYRIGHT AND LICENCE
+
+Copyright © 2005-2009 Claus A. Färber
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. 

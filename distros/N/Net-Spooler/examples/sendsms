@@ -1,0 +1,75 @@
+#!/usr/bin/perl -w
+use strict;
+use vars qw($opt_d $opt_f $opt_v);
+use Getopt::Std();
+use Symbol();
+
+my $LOCK_FILE = "/var/spooler/sendsms.log";
+
+
+Getopt::Std::getopts('d:f:v');
+if (!$opt_d  ||  $opt_d !~ /^(\+49\d+)/) {
+    print("Status: REJECT\nMissing or illegal destination: ",
+	  defined($opt_d) ? $opt_d : "undef", "\n");
+    exit 1;
+}
+my $phone = $1;
+if (!$opt_f  ||  ! -f $opt_f) {
+    print("Status: REJECT\nMissing file name or file doesn't exist: ",
+	  defined($opt_f) ? $opt_f : "undef", "\n");
+    exit 1;
+}
+if (!open(FILE, "<$opt_f")) {
+    print("Status: ERROR\nFailed to open file $opt_f: $!");
+    exit 1;
+}
+my($line, $inBody);
+my $text = '';
+while (defined($line = <FILE>)) {
+    if (!$inBody) {
+	if ($line =~ /^subject:\s*(.*?)\s*$/i) {
+	    $text .= "$1\n";
+	} elsif ($line =~ /^$/) {
+	    $inBody = 1;
+	}
+    } else {
+	$text .= $line;
+    }
+    last if length $text > 160;
+}
+close(FILE);
+$text = substr($text, 0, 160);
+
+my $file = $opt_f;
+$file =~ s/\.dat$/\.sms/;
+print "Storing text in $file:\n$text\n" if $opt_v;
+END { unlink $file if defined $file };
+if (!open(FILE, ">$file")) {
+    print("Status: ERROR\nFailed to create temporary file $file: $!");
+    undef $file;
+    exit 1;
+}
+if (!(print FILE $text)  ||  !close(FILE)) {
+    print("Status: ERROR\nFailed to write temporary file $file: $!");
+    exit 1;
+}
+
+my $command = "gnokii --sendsms $phone +491722270000 <$file";
+print STDERR "Running $command\n" if $opt_v;
+my $output;
+{
+    my $fh = Symbol::gensym();
+    if (!open($fh, ">>$LOCK_FILE")) {
+	print("Status: ERROR\nFailed to create lock file $LOCK_FILE: $!\n");
+	exit 1;
+    }
+    if (!flock($fh, 2)) {
+	print("Status: ERROR\nFailed to lock lock file $LOCK_FILE: $!\n");
+    }
+    $output = `$command 2>&1`;
+}
+if ($output =~ /succeeded/) {
+    print("Status: OK\n");
+    exit 0;
+}
+print("Status: ERROR\n$output\n");

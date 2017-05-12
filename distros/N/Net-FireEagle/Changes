@@ -1,0 +1,38 @@
+v1.6 
+  Add support for OAuth 1.0a (thanks to Menno Blom)
+
+v1.5 Thu  7 May 2009 19:58:46 BST
+  Add support for general purpose tokens and
+  the within and recent methods (Sainath Adiraju)
+
+v1.4 Wed 18 Mar 2009 01:48:27 GMT
+  Fix somewhat spurious tests
+
+v1.3 Mon 16 Mar 2009 16:35:00 BST
+  Switch to using Net::OAuth::Simple 
+
+v1.2 Thu 14 Aug 2008 01:23:46 BST
+  Fix the accessors (Brendan O'Connor)
+
+v1.1 Wed 30 Apr 2008 16:04:55 BST
+  Make usage in bin/fireeagle be correct (Mark Fowler)
+
+v1.0 Mon 7 Apr 2008 19:33:59 BST
+  Doc bugs (Pedro Figueiredo)
+  Added request_token and request_token_secret for web apps (Pedro Figueiredo)
+  Require Carp and Net::SSLeay
+
+v0.9 Tue 25 Mar 2008 17:29:02 GMT
+  Fix some documentation errors
+  Fixed an error when POSTing
+
+v0.8 Tue 25 Mar 2008 00:49:04 GMT
+  CPANify (docs, tests, Build.PL etc etc)
+  Refactor and simplify code
+  Add example fireeagle script
+  Add lookup_location method
+  Allow ability to use complicated locations
+  Use a Mersenne Twister for the nonce where possible
+
+v0.06 Wed 05 Mar 2008 12:00:00 PST
+  Initial release from Yahoo! Brickhouse

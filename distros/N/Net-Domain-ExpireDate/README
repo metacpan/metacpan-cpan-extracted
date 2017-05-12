@@ -1,0 +1,69 @@
+NAME
+    Net::Domain::ExpireDate - obtain expiration date of domain names
+
+SYNOPSIS
+     use Net::Domain::ExpireDate;
+
+     $expiration_obj = expire_date( 'microsoft.com' );
+     $expiration_str  = expire_date( 'microsoft.com', '%Y-%m-%d' );
+     $expiration_obj = expdate_int( $whois_text, 'com' );
+     $expiration_str  = expdate_fmt( $whois_text, 'ru', '%Y-%m-%d' );
+
+     ($creation_obj, $expiration_obj) = domain_dates( 'microsoft.com' );
+     ($creation_str, $expiration_str) = domain_dates( 'microsoft.com', '%Y-%m-%d' );
+     ($creation_obj, $expiration_obj) = domdates_int( $whois_text, 'com' );
+
+DESCRIPTION
+    Net::Domain::ExpireDate gets WHOIS information of given domain using
+    Net::Whois::Raw and tries to obtain expiration date of domain.
+    Unfortunately there are too many different whois servers which provides
+    whois info in very different formats. Net::Domain::ExpireDate knows more
+    than 40 different formats of expiration date representation provided by
+    different servers (almost all gTLD registrars and some ccTLD registrars
+    are covered). Now obtaining of domain creation date is also supported.
+
+    "$date" in synopsis is an object of type Time::Piece.
+    
+    Note: some operations need a specific set of LC_TIME locale (en_US).
+
+FUNCTIONS
+    expire_date( DOMAIN [,FORMAT] )
+        Returns expiration date of "DOMAIN". Without "FORMAT" argument
+        returns Time::Piece object. With "FORMAT" argument returns date
+        formatted using "FORMAT" template. See strftime man page for
+        "FORMAT" specification.
+
+    expdate_int( WHOISTEXT [,TLD] )
+        Extracts expiration date of domain in TLD from "WHOISTEXT". If no
+        TLD is given 'com' is the default. There is no distinction between
+        'com' or 'net' TLDs in this function. Also 'org', 'biz', 'cz', 'info',
+        'us', 'uk', 'ru' and 'su' TLDs are supported. Returns Time::Piece
+        object.
+
+        With "FORMAT" argument returns date formatted using "FORMAT"
+        template (see strftime man page for "FORMAT" specification)
+
+    expdate_fmt( WHOISTEXT [,TLD [,FORMAT]] )
+        Similar to expdate_int except that output value is formatted date.
+        If no "FORMAT" specified, '%Y-%m-%d' is assumed. See strftime man
+        page for "FORMAT" specification.
+
+    domain_dates( DOMAIN [,FORMAT] )
+        Returns list of two values - creation and expiration date of
+        "DOMAIN". Without "FORMAT" argument returns Time::Piece objects.
+        With "FORMAT" argument dates are formatted using "FORMAT" template.
+        See strftime man page for "FORMAT" specification.
+
+    domdates_int( WHOISTEXT [,TLD] )
+        Returns list of two values - creation and expiration date of domain
+        extracted from "WHOISTEXT". If no TLD is given 'com' is the default.
+        There is no distinction between 'com' or 'net' TLDs in this
+        function. Also 'org', 'biz', 'cz', 'info', 'us', 'ru' and 'su' TLDs are
+        supported. Returns Time::Piece object.
+
+AUTHOR
+    Walery Studennikov, <despair@cpan.org>
+
+SEE ALSO
+    Net::Whois::Raw, Time::Piece.
+

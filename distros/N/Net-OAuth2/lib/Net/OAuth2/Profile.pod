@@ -1,0 +1,243 @@
+=encoding utf8
+
+=head1 NAME
+
+Net::OAuth2::Profile - OAuth2 access profiles
+
+=head1 INHERITANCE
+
+ Net::OAuth2::Profile is extended by
+   Net::OAuth2::Profile::Password
+   Net::OAuth2::Profile::WebServer
+
+=head1 SYNOPSIS
+
+  See Net::OAuth2::Profile::WebServer 
+  and Net::OAuth2::Profile::Password 
+
+=head1 DESCRIPTION
+
+Base class for OAuth `profiles'.  Currently implemented:
+
+=over 4
+
+=item * L<Net::OAuth2::Profile::WebServer|Net::OAuth2::Profile::WebServer>
+
+=item * L<Net::OAuth2::Profile::Password|Net::OAuth2::Profile::Password>
+
+=back
+
+You may want to use the
+L<OAuth2 documentation at Google|https://developers.google.com/accounts/docs/OAuth2WebServer>
+to understand the process and the parameters.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Net::OAuth2::Profile-E<gt>B<new>(%options)
+
+Next to the %options listed below, it is possible to provide settings
+for each of the <${commands}> C<access_token>, C<protected_resource>,
+C<authorize>, and C<refresh_token>.  For each command, you can set
+
+=over 4
+
+=item * ${command}_url => URI|STRING
+
+The absolute uri which needs to be used to be addressed to execute the
+C<$command>.  May be specified as URI object or STRING.
+
+=item * ${command}_path => PATH
+
+As previous, but relative to the C<site> option value.
+
+=item * ${command}_method => 'GET'|'POST'
+
+Which method to use for the call (by default POST).
+
+=item * ${command}_param  => []
+
+Additional parameters for the command.
+
+=back
+
+ -Option           --Default
+  client_id          <required>
+  client_secret      <required>
+  grant_type         <required>
+  scope              undef
+  secrets_in_params  <true>
+  site               undef
+  state              undef
+  token_scheme       'auth-header:Bearer'
+  user_agent         <created internally>
+
+=over 2
+
+=item client_id => STRING
+
+=item client_secret => STRING
+
+=item grant_type => STRING
+
+=item scope => STRING
+
+=item secrets_in_params => BOOLEAN
+
+The client secrets are passed both via an Authentication header, as via
+query parameters in the URI.  The former is required to be accepted by
+rfc6749, the latter is optional.  However: many servers use the query
+parameters only.
+
+QQ Catalyst, on the other hand, does refuse requests with these parameters
+in the query.  So, with this flag explicitly set to false, only the
+Auth header gets included.
+
+=item site => URI
+
+=item state => STRING
+
+=item token_scheme => SCHEME
+
+See L<add_token()|Net::OAuth2::Profile/"Helpers"> for the supported SCHEMEs.  Scheme C<auth-header> is
+probably the only sane default, because that works with any kind of http
+requests, where the other options have limited or possible disturbing
+application.
+
+Before [0.53], the default was 'auth-header:OAuth'.
+
+Specify the method to submit authenticated requests to the service. By
+default, add the access token as a header, such as: "Authorization:
+Bearer TOKEN".  Some services require that the header will be different,
+i.e. "Authorization: OAuth TOKEN", for which case specify token_scheme
+'auth-header:Oauth'.
+
+To add the access token as a uri-parameter: 'uri-query:oauth_token'
+(in this case, the parameter name will be oauth_token)
+Merge the access token inside a form body via 'form-body:oauth_token'
+
+=item user_agent => LWP::UserAgent object
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<bearer_token_scheme>()
+
+=item $obj-E<gt>B<grant_type>()
+
+=item $obj-E<gt>B<id>()
+
+=item $obj-E<gt>B<scope>()
+
+=item $obj-E<gt>B<secret>()
+
+=item $obj-E<gt>B<site>()
+
+=item $obj-E<gt>B<state>()
+
+=item $obj-E<gt>B<user_agent>()
+
+=back
+
+=head2 Actions
+
+=head3 HTTP
+
+=over 4
+
+=item $obj-E<gt>B<request>( $request, [$more] )
+
+Send the $request (a HTTP::Request object) to the server, calling
+LWP::UserAgent method C<request()>.  This method will NOT add
+security token information to the message.
+
+=item $obj-E<gt>B<request_auth>( $token, <$request | <$method, $uri, [$header, $content]>> )
+
+Send an authorized request: the $token information gets included in the
+request object.  Returns the answer (HTTP::Response).
+
+example: 
+
+  my $auth  = Net::OAuth2::Profile::WebServer->new(...);
+  my $token = $auth->get_access_token($code, ...);
+
+  # possible...
+  my $resp  = $auth->request_auth($token, GET => $uri, $header, $content);
+  my $resp  = $auth->request_auth($token, $request);
+
+  # nicer (?)
+  my $resp  = $token->get($uri, $header, $content);
+  my $resp  = $token->request($request);
+
+=back
+
+=head2 Helpers
+
+=over 4
+
+=item $obj-E<gt>B<add_token>($request, $token, $scheme)
+
+Merge information from the $token into the $request following the the
+bearer token $scheme.  Supported schemes:
+
+=over 4
+
+=item * auth-header or auth-header:REALM
+
+Adds an C<Authorization> header to requests.  The default REALM is C<OAuth>,
+but C<Bearer> and C<OAuth2> may work as well.
+
+=item * uri-query or uri-query:FIELD
+
+Adds the token to the query parameter list.
+The default FIELD name used is C<oauth_token>.
+
+=item * form-body or form-body:FIELD
+
+Adds the token to the www-form-urlencoded body of the request.
+The default FIELD name used is C<oauth_token>.
+
+=back
+
+=item $obj-E<gt>B<build_request>($method, $uri, $params)
+
+Returns a HTTP::Request object.  $params is an HASH or an ARRAY-of-PAIRS
+of query parameters.
+
+=item $obj-E<gt>B<params_from_response>($response, $reason)
+
+Decode information from the $response by the server (an HTTP::Response
+object). The $reason for this answer is used in error messages.
+
+=item $obj-E<gt>B<site_url>( <$uri|$path>, $params )
+
+Construct a URL to address the site.  When a full $uri is passed, it appends
+the $params as query parameters.  When a $path is provided, it is relative
+to L<new(site)|Net::OAuth2::Profile/"Constructors">.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Net-OAuth2 distribution version 0.63,
+built on January 18, 2016. Website: F<http://perl.overmeer.net>.
+
+=head1 COPYRIGHTS
+
+Copyrights 2013-2016 on the perl code and the related documentation
+ by [Mark Overmeer] for SURFnet bv, The Netherlands.  For other contributors see Changes.
+
+Copyrights 2011-12 by Keith Grennan.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

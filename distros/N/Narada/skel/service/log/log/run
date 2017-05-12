@@ -1,0 +1,2 @@
+#!/bin/sh
+exec svlogd -tt $(find ../../../var/log -type d) 2>&1

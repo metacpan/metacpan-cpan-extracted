@@ -1,0 +1,32 @@
+Net-Plesk version 0.02
+====================
+
+THis module implements a client interface to SWSOFT's Plesk XML RPC,
+enabling a perl application to talk to a Plesk server.
+
+This module is not sponsored or endorsed by SWSOFT.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP
+  Crypt::SSLeay
+  XML::Simple
+  XML::XPATH::XMLParser
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Jeff Finucane
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

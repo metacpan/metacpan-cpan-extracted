@@ -1,0 +1,55 @@
+{
+   "abstract" : "Asynchronous IMAP handling",
+   "author" : [
+      "Tom Molesworth <net-async-imap@entitymodel.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.005, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Async-IMAP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Async" : "0.54",
+            "IO::Async::SSL" : "0.12",
+            "Protocol::IMAP" : "0.004",
+            "Socket" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-net-async-imap at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Net-Async-IMAP"
+      },
+      "homepage" : "http://search.cpan.org/dist/Net-Async-IMAP/"
+   },
+   "version" : "0.004"
+}
+

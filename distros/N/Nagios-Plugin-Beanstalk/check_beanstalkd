@@ -1,0 +1,10 @@
+#!/usr/bin/env perl
+eval 'exec perl -S $0 ${1+"$@"}'
+  if 0; # not running under some shell
+
+use strict;
+use warnings;
+
+use Nagios::Plugin::Beanstalk;
+
+Nagios::Plugin::Beanstalk->new->run

@@ -1,0 +1,98 @@
+NAME
+    Nagios::Scrape - Scrapes and Parses the status.cgi page of a Nagios
+    installation
+
+VERSION
+    Version 0.02
+
+SYNOPSIS
+    This module uses LWP to retrieve the status.cgi page of a Nagios
+    installation, parses the data into a manageable format, and then makes
+    it accessible.
+
+    This is a more lightweight solution to Nagios installations where the
+    status.dat file can reach 1+mb in size.
+
+        use Nagios::Scrape;
+
+        my $foo = Nagios::Scrape->new(username => $username, password => $password, url => $url);
+        @service_alerts = $foo->get_service_status();
+        @host_alerts = $foo->get_host_status();
+
+SUBROUTINES/METHODS
+  new
+    Creates a new class given a username and password.
+
+        my $nagios = Nagios::Scrape->new(username => $username, password => $password, url => $url);
+
+  host_state
+    This method allows you to filter certain host states. The table is as
+    follows:
+
+    Hosts: 
+    PENDING         1 
+    UP              2 
+    DOWN            4 
+    UNREACHABLE     8
+
+    Add the number for each state that you want to see. For example, to see
+    DOWN and UNREACHABLE states, set this value to 12. (Default value).
+
+  service_state
+    This method allows you to filter certain service states. The table is as
+    follows:
+
+    Services: 
+    PENDING         1 
+    OK              2 
+    WARNING         4 
+    UNKNOWN         8
+    CRITICAL 16
+
+    Add the number for each state you would like to see. For example, to see
+    WARNING, UNKNOWN, and CRITICAL states, set the number to 28. (Default
+    value).
+
+  get_service_status
+    Connects to given URL and retrieves the requested service statuses
+
+  get_host_status
+    Connects to given url and retrieves host statuses
+
+  parse_service_content
+    Will parse the service status page into a manageable array of hashed
+    service details.
+
+  parse_host_content
+    Will parse the host status page into a manageable array of hashed
+    service details.
+
+AUTHOR
+    Joe Topjian, "<joe at terrarum.net>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-nagios-scrape at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Nagios-Scrape>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Nagios::Scrape
+
+ACKNOWLEDGEMENTS
+    Some of this code was taken from
+    www.nagios3book.com/nagios-3-enm/tts/nagios-ttsd.pl which is no longer
+    online.
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Joe Topjian.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

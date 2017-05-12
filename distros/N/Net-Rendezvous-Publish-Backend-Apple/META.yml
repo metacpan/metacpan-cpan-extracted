@@ -1,0 +1,17 @@
+---
+name: Net-Rendezvous-Publish-Backend-Apple
+version: 0.02
+author:
+  - Richard Clamp <richardc@unixbeard.net>
+abstract: interface to Apple's mDNS routines
+license: perl
+requires:
+  Class::Accessor::Lvalue: 0
+  Net::Rendezvous::Publish: 0
+build_requires:
+  Test::More: 0
+provides:
+  Net::Rendezvous::Publish::Backend::Apple:
+    file: lib/Net/Rendezvous/Publish/Backend/Apple.pm
+    version: 0.02
+generated_by: Module::Build version 0.261

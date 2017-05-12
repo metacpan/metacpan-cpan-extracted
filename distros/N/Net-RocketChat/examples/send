@@ -1,0 +1,31 @@
+#!/usr/bin/perl
+
+use Net::RocketChat;
+use Getopt::Long;
+use YAML;
+use strict;
+my ($username,$password,$server,$debug,$message,$room);
+GetOptions(
+   "username:s" => \$username,
+   "password:s" => \$password,
+   "server:s" => \$server,
+   "room:s" => \$room,
+   "debug" => \$debug,
+   "message:s" => \$message,
+);
+
+$room //= "general";
+
+my $chat = Net::RocketChat->new(username => $username, password => $password, server => $server, debug => $debug);
+eval {
+   $chat->login;
+   $chat->join(room => $room);
+   my $messages = $chat->messages(room => $room);
+   $chat->send(room => $room,message => $message);
+   $chat->leave(room => $room);
+};
+
+if ($@) {
+   print "caught error: $@\n";
+   print Dump($chat->response);
+}

@@ -1,0 +1,18 @@
+KNOWN BUGS
+----------
+
+TCP doesn't work.
+Very slow (Inherits some slowness from Net::DNS?).
+
+If you find a bug, please report it to me including
+the following information:
+
+  * version of Perl
+  * version of Net::DNSServer
+  * version of Net::Server
+  * version of Net::DNS
+  * version of IO
+  * operating system type and version
+  * exact text of error message or description of problem
+  * short program that exhibits this problem
+    and/or clear steps to duplicate it

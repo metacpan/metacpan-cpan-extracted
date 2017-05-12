@@ -1,0 +1,643 @@
+Revision history for Net::SSH::Perl
+
+2.09 2016.10.26
+    - Fix creation of keys in ecdsa, ed25519 key classes
+    - Update eg/pssh-keygen to create ecdsa, ed25519 keys
+    - Handle hostkeys-00@openssh.com global requests
+    - Add support for 'CheckHostIP' and 'UpdateHostKeys' config options
+    - Refactor handling of '+' syntax in options
+    - Key fingerprints now output sha256-base64 by default.
+      (md5 can be specified with FingerprintHash config option)
+    - Add id_ed25519, id_ecdsa to default identity files
+    - Documentation updates in Perl.pm to reflect new functionality in 2.XX
+
+2.08 2016.10.14
+    - Use sha512 instead of md5 in Net::SSH::Perl::Cipher->new_from_key_str()
+      to provide ChachaPoly with enough key material
+      Tests in t/05-cipher.t should now pass on all platforms [ CPAN bug #114077 ]
+    - Add AES128_CBC to cipher tests
+    - Info on using features not enabled by default added to README
+
+2.07 2016.10.13
+
+    - Fix blowfish compilation on SunOS [CPAN bug #116323]
+    - Fix bug in Packet [CPAN bug #118335]
+    - Add support for '+' syntax in MACs option
+    - Remove hmac-sha1 from default MACs. It can re-enabled 
+      by passing the option: 'MACs +hmac-sha1'
+
+2.06 2016.10.04
+
+    - Add support for additional fixed Diffie-Hellman 2K, 4K and 8K groups
+      from OpenSSH 7.3 (draft-ietf-curdle-ssh-kex-sha2-03)
+    - Kex defaults now updated to draft-ietf-curdle-ssh-kex-sha2-03
+      recommendations (diffie-hellman-group-exchange-sha1 removed)
+      It can re-enabled by passing the option:
+      'KexAlgorithms +diffie-hellman-group-exchange-sha1'
+
+2.05 2016.10.03
+
+    - Add support for '+' syntax in Ciphers, KexAlgorithms, HostKeyAlgorithms
+      options as in OpenSSH
+
+2.04 2016.05.11
+
+    - Add ECDSA key support
+    - Improve extract_public() in Key.pm inspired by
+      https://github.com/renormalist/Net-SSH-Perl/pull/12
+      but implement comment with backwards compat with RSA/DSA datafellows
+    - Fix XS from being loaded more than once (warnings from Net::SFTP)
+
+2.03 2016.05.06
+
+    - Fixes so that "make test" passes
+
+2.02 2016.05.04
+
+    - Use CryptX to further reduce module depedencies
+      This eliminates the need for:
+        Math::Pari
+        Crypt::DH
+        Crypt::RSA
+        Crypt::DSA
+        Crypt::DES
+        Crypt::Blowfish
+        MIME::Base64
+    - Add support for rsa-sha2-512,rsa-sha2-256 signing with RSA keys
+    - Implement HashKnownHosts, KexAlgorithms, MACs config directives
+    - Add XS code for Chacha20, BSD Blowfish, Ed25519 routines
+    - Properly handle and create known_hosts entries when port is specified
+    - Remove obsolete ciphers, MACs, Kex from default list to duplicate 
+      upcoming OpenSSH behavior
+    - Bug fixes
+
+2.01 2016.02.19
+
+    - Use CryptX to reduce module depedencies
+      This eliminates the need for:
+        BSD::arc4random
+        Digest::MD5
+        Digest::SHA
+        Digest::HMAC_MD5
+	Crypt::OpenSSL::AES
+
+2.00 2015.12.07
+
+    - Add Chacha20-Poly1305 cipher support for best security
+      (Requires Crypt::OpenSSH::ChachaPoly, see README)
+    - Add AES Cipher support in CTR mode (CBC mode supported in Ed25519
+      keys only)
+    - Add Group Exchange (RFC4523) Diffie-Hellman Key Exchange
+    - Add Curve25519 (curve25519-sha256@libssh.org) Key Exchange support
+      (Requires Crypt::Curve25519)
+    - Add hmac-sha2-256,hmac-sha2-512 MAC support
+    - Add hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com
+      Encrypt-then-MAC (ETM) MAC support
+    - Use BSD::arc4random for encrypted packet padding
+    - Add support for Ed25519 ssh/host keys (Requires Crypt::Ed25519)
+      Encrypted Ed25519 key support requires Crypt::OpenBSD::Blowfish
+      (See README for info)
+    - Default ciphers order is now chacha,aes,3des,blowfish,arcfour
+    - Default KEX order is now Curve25519, DHGEXSHA256, DHGEXSHA1, DH14, DH1
+    - Default MAC order is now hmac-sha2-512-etm@openssh.com,
+      hmac-sha2-256-etm@openssh.com, sha2-512, sha2-256, sha1, md5
+    - SSH Keys can now be in DOS format (no need to remove CR/LF)
+    - SOCKS proxy support via sub class Net::SSH:Perl::Proxy
+    - Now does not abort due to OpenSSH 6.8+ server
+      SSH2_MSG_GLOBAL_REQUEST messages for host key rotation
+
+1.42 2015.09.28
+    - Fix issue with long selects getting interrupted by signals and dying (Andrew Hoying)
+    - fix version cpan meta info
+
+1.41 2015.09.18
+    - use Errno constants in more portable way, see perldoc Errno
+
+1.40 2015.09.17
+    - declare new dependency to File::HomeDir in Makefile.PL
+
+1.39 2015.09.15
+
+    - RT #83978 - fix shell terminal width and height (lharey)
+    - RT #94574 - fix Algorithm negotiation issue in ::Kex.pm
+      (Brian Curnow, Michael Gray)
+    - RT #105728 - fix VERSION methods (reported by Karen Etheridge)
+    - code modernization (strict+warnings) (gh0stwizard)
+    - pass tests on Win32 (gh0stwizard)
+    - use Win32::LoginName on Windows (Michael Gray)
+    - use File::HomeDir to simplify handling (Michael Gray)
+
+1.38 2014.10.06
+
+    - RT #99284 - install valid SIGNATURE file (Greg Sabino Mullane)
+
+1.37 2014.03.17
+
+    - RT #91840 - enabled config option "StrictHostKeyChecking"
+                  (the corresponding code already existed)
+
+1.36 2013.08.09
+
+  Apply many bugfixes from RT discussions.
+
+    - RT #48338 - FIX race condition with SSHv2
+    - RT #55195 - FIX race condition in KEXINIT
+    - RT #67586 - FIX test '03-packet.t' hangs forever
+    - RT #64517 - enable PTY support in SSH2
+    - RT #23947 - Replacement for KeyboardInt.pm
+
+1.35 2012.12.03
+
+    - rt#76482 - apply patch to t/03-packet.t for 5.15+ (chisel++)
+
+1.34 2009.02.01
+
+    - Rekey properly after 1 GB of data (rt.cpan.org #25044). Patch by Peter Oliver.
+    - Don't try to process nonexistent or empty auth file (rt.cpan.org #41877).
+    - Fix typo in croak message (rt.cpan.org #42056), thanks to jamie at audible.transient.net.
+    - Move 'use base' call after Crypt module loading, per suggestion (rt.cpan.org #42051).
+    - Only apply stdin if defined in SSH1 - John Payne (rt.cpan.org #42583)
+
+1.33 2008.10.21
+
+    - Fix open() calls (rt.cpan.org #40020)
+    - Fix non-shell problem (rt.cpan.org #39980)
+    - Allow full agent forwarding (rt.cpan.org #32190)
+    - Handle hashed known_hosts files (Greg Sabino Mullane, rt.cpan.org #25175)
+
+1.32 2008.10.16
+
+    - Add IO::Handle to Perl.pm (rt.cpan.org #40057, #35985)
+    - Minor test cleanups.
+
+1.31 2008.10.02
+
+    - New co-maintainer, Greg Sabino Mullane (TURNSTEP).
+    - Prevent t/03-packet.t from hanging due to high file descriptor.
+      (altblue at n0i.net, rt.cpan.org #6101)
+    - Skip some tests if Math::GMP not installed (e.g. from choosing only 
+      protocol 2 in Makefile.PL) (Greg Sabino Mullane, reported in 
+      rt.cpan.org #25152)
+    - If ENV{HOME} is not set, use getpwuid. If both fail and the dir 
+      is needed, we croak. (Greg Sabino Mullane, expanded from patch 
+      by dgehl at inverse.ca in rt.cpan.org #25174)
+    - Fix incorrect logical/bitwise AND mixup (Peter.Haydon at uk.fujitsu.com, 
+      rt.cpan.org #31490)
+    - Allow empty stdin for SSH2 (rcp at rcable.co.uk, rt.cpan.org #32730)
+    - Adjust terminal dimensions dynamically if Term::ReadKey is available
+      (john at sackheads.org, rt.cpan.org #34874)
+
+1.30  2005.10.12
+    - Fix for local *READ/*WRITE tie problem in open2 function (Bas van
+      Sisseren).
+
+1.29  2005.10.08
+    - Require Digest::SHA1 2.10 or greater (fixed problem with BSD connection)
+      (Adam Callis).
+    - Add suppress_shell SSH2 option for SFTP (Sean McMillan).
+    - Use effective (not real) user-id to detect root (David Wheeler,
+      rt.cpan.org #13373).
+    - Make "ChallengeResponseAuthentication" configuration item boolean rather
+      than string (mark AT blackmans.org, rt.cpan.org #14549).
+
+1.28  2005.03.17
+    - Patch to skip warning messages emitted by F-Secure sshd before the SSH
+      signature (Neal Ley).
+    - Fix for "Can't locate object method "blocking" via package "IO::Handle""
+      error (rt.cpan.org #11674, Daniel C. Silverstein (dans AT pch.net)).
+
+1.27  2005.02.06
+    - Set socket to non-blocking in more portable manner (rt.cpan.org #6728).
+    - Default port to 22 in case service list is not available (rt.cpan.org
+      #5924, Gavin Brock).
+    - Allow Net::SSH::Ciphers::supported to take a protocol option to get
+      SSH2 ciphers (rt.cpan.org #4648, dan at midstream.com), and also change
+      Net::SSH::Perl::Kex to map SSH1 names to SSH2 names.
+    - Support BindAddress (bind to specific IP) (rt.cpan.org #6725, patch from
+      matt at katipo.co.nz).
+    - Have Makefile.PL only generate the prerequisites list, and not try to
+      install any (let the install shell handle it); this allows compatibility
+      with CPANPLUS and sudo installs (rt.cpan.org #6835, Michael Schwern).
+
+1.26  2005.01.18
+    - New co-maintainer, David Robins (DBROBINS).
+    - Fix Math::Pari large integer leak in Net::SSH::Perl::Util::SSH2MP bin2mp
+      function (has been brought to the attention of the Math::Pari maintainer
+      since it's probably a Math::Pari problem, but fixed here because it's a
+      big win for a small change and the same "fix" is already in mp2bin).
+    - Require perl 5.6 in Makefile.PL (was '5.0006' change to '5.006').
+
+1.25  2004.01.19
+    - Fix a bizarre test failure in 03-packet.t if String::CRC32 isn't
+      installed (the tests were testing SSH1 but we can't assume the
+      user selected this protocol).  Reported by Damien Clark.
+      rt.cpan.org ticket #4717.
+
+1.24  2003.11.14
+    - New (temporary) maintainer, Dave Rolsky.
+    - Fixed a number of circular references in the SSH2
+      implementation, which caused connections to be held open
+      indefinitely in a persistent environment like mod_perl.  This
+      uses weak references, so Perl 5.6.0+ is now required.  This work
+      was funded by Kineticode, Inc.
+    - Added a LICENSE file.
+
+1.23  2001.10.04
+    - Added --sdk option to Makefile.PL.
+    - Added Net::SSH::Perl::SSH2::select_class so that Net::SSH::W32Perl
+      can override it and reuse client_loop.
+
+1.22  2001.08.28
+    - Fixed bug with channel window sizes: Net::SSH::Perl in SSH-2 mode
+      was not respecting the server's channel window size, and was
+      sending data indiscriminately. It now buffers data to be sent and
+      sends it when the sshd has enough window space available. Thanks
+      to Megan Dorrah (and others) for the spot.
+    - Fix receiving STDERR in SSH-2 protocol. This was broken. Thanks to
+      Ulrich Scheid for the spot (and to Sagar Shah and Vicente J. Ruiz
+      Jurado for subsequent spots :).
+    - Added Channel::drain_outgoing, necessitated by the above fix to
+      window sizes; that fix meant that output buffers were not being
+      drained before EOF was sent on the channel. drain_outgoing must
+      now be called before EOF is sent; it continually sends outgoing
+      data, and checks for increased window sizes, until there is no more
+      data to send. This will be done automatically, of course.
+    - Display SSH-2 BANNER messages during authentication if the session
+      is interactive.
+    - Net::SSH::Perl::Packet now uses the third argument to syswrite
+      (LENGTH). This was necessary to make the module work in Perl
+      5.005_2, apparently. Thanks to Brian Carpenter for the spot.
+    - Added -2 and -1 options (SSH-2 and SSH-1, respectively) to
+      eg/pscp.
+
+1.21  2001.07.18
+    - Fixed Handle::SSH(?:1|2)::WRITE when sending large amounts of data,
+      ie. data larger than the max packet size. Now we break up data
+      into chunks of 32000 bytes, then send each in turn. Thanks to
+      Doug Wilson for the spot.
+    - Fixed SSH1::_start_interactive (SSH-1 client loop) so that we
+      break the client loop on EOF reads from the sshd socket. This
+      should fix some hangs when calling close on a tied open2 handle.
+    - Better detection of exit status in Handle::SSH1.
+    - Handle::SSH1::READ now looks to see if we have already hit EOF
+      (ie. we have received exit status packet); if so, returns 0.
+    - Added SSH1::send_data, which allows register_handler callbacks
+      to be written that will (hopefully) work for both SSH-1 and
+      SSH-2.
+
+1.20  2001.07.11
+    - A read on an open2 tied filehandle that indicates a closed connection
+      will now return 0 bytes instead of causing a fatal error. Thanks to
+      Anthony Ball for the reasoning and the fix.
+    - getpwuid is now called in an eval, so on systems that do not
+      support it, it will not cause a fatal error. Thanks to Shaun
+      Bramley for the spot.
+    - Bug with "BatchMode no" in a config file overriding interactive => 1
+      in the constructor is now fixed. Thanks to Doug Wilson for the spot.
+    - Tildes ('~') in IdentityFile config file directive were not being
+      expanded to $ENV{HOME} as they should have been. This is now
+      fixed. Thanks to Doug Wilson for the spot.
+    - Doug Wilson pointed out that it was impossible to use an open
+      SSH-1 and SSH-2 handle at the same time, because of the way
+      Buffer worked (setting method globs on import). This has now been
+      fixed throughout the distribution by using function pointers in
+      the object instead.
+    - You can now use 'stdout' and 'stderr' in SSH-1 register_handler,
+      as aliases for SSH_SMSG_STDOUT_DATA and SSH_SMSG_STDERR_DATA.
+      Thanks to Doug Wilson for the idea.
+
+1.19  2001.07.04
+    - open2 interface now works with a shell, not just with running a
+      remote command. This allows you to open up some sort of shell
+      (Unix or otherwise) and talk to it directly, programatically.
+      Thanks to Rob J for the idea.
+    - Added Auth::ChallengeResponse, a generic SSH-1 challenge
+      response authentication mechanism; this works for TIS, s/key,
+      and other such mechanisms. Thanks to Surya Koneru for the idea.
+
+1.18  2001.06.27
+    - Fixed bug with 'protocol' arg to Net::SSH::Perl constructor.
+      Protocol flag was not getting run through the Config object, which
+      meant it wasn't getting turned into a bitmask and staying as '1,2'.
+      Symptom was 'Protocol major versions differ: 1 vs. 1' or something
+      such. Thanks to Mark Ethan Trostler for the spot.
+    - Added key generation for RSA SSH-1 keys. Requires Crypt::RSA
+      to implement the actual generation of key data. Thanks to
+      Rob J for the idea.
+
+1.17  2001.06.26
+    - Added (experimental) open2 method, which returns 2 tied
+      filehandles for reading and writing to the sshd server (or
+      rather to the command executed on the remote server). Thanks
+      to Mark Ethan Trostler for the idea, suggestions on functionality,
+      code patches, and testing.
+
+1.16  2001.06.06
+    - Fixed bug in Net::SSH::Perl::Packet that caused client to
+      sometimes hang after receiving DEBUG packets.
+    - register_handler (for both SSH-1 and SSH-2) now takes any
+      'extra' arguments (other than packet type and code ref) and
+      will pass those arguments on to your callback function. This
+      allows callbacks access to otherwise private variable states.
+      Thanks to Mark Ethan Trostler for the idea and a patch.
+    - Didn't need @EXPORT_OK in Net::SSH::Perl::Util, so took it
+      out.
+
+1.15  2001.06.03
+    - Agent authentication is now supported for both SSH-1 and
+      SSH-2 (SSH-2 agent is compatible with OpenSSH ssh-agent).
+    - Added Net::SSH::Perl::Agent, which provides a client
+      interface to an authentication agent.
+    - Added IO::Socket as a prereq (for Net::SSH::Perl::Agent).
+    - Abstracted out authentication management for SSH-2 login
+      to Net::SSH::Perl::AuthMgr class. Holds authentication
+      context and state during authentication negotiation and
+      setup, and dispatches to appropriate functions based on
+      packet types.
+    - KeyboardInt auth now uses new AuthMgr::register_handler
+      method.
+    - pssh-keygen now changes permissions of private key file
+      to 0600 on key generation.
+    - Fixed bug where pssh-keygen RSA key generation was
+      incompatible with OpenSSL (ie. OpenSSH); Crypt::RSA uses
+      ipmq (inverse of p mod q), and OpenSSL uses iqmp
+      (inverse of q mod p). So we now explicitly force
+      generation of iqmp when writing private key files.
+    - Key::RSA::keygen no longer forces generation of CRT
+      (Chinese Remainder Theorem) members, because Crypt::RSA
+      now does this itself on key generation.
+    - Net::SSH::Perl::Packet::read_poll now handles IGNORE
+      messages, as well as handling DISCONNECT and DEBUG messages
+      more intelligently (depending on protocol version).
+
+1.14  2001.05.24
+    - Added keyboard-interactive authentication (only usable in
+      an interactive session).
+    - Fixed Net::SSH::Perl::Key, which was unconditionally pulling
+      in MIME::Base64, Digest::SHA1, and Digest::BubbleBabble. This
+      caused problems for users of SSH1 protocol, for which these
+      modules shouldn't be prereqs (thanks to Jason Tolsma for
+      the spot). These modules are now conditionally loaded.
+    - Fixed 5.005_03 syntax error in Key::RSA (calling variable
+      method w/o parens).
+    - Fixed Key::RSA so that it works with version 1.42 of
+      Crypt::RSA.
+
+1.13  2001.05.14
+    - Added Channel::check_window method to check the local "window"
+      size of a channel object. Channels manage how much data they
+      receive using the window, and the sshd refuses to send more
+      data than is available in the window. We need to send an
+      adjust message to increase the size of the window,
+      periodically. Found this bug through working with Net::SFTP
+      (thanks to Matt Good for the initial spot).
+
+1.12  2001.05.13
+    - Added ChannelMgr::register_handler to set handlers for
+      specific packet types for all channels. Moved default
+      handler initialization into init method.
+    - Abstracted quit_pending behavior into two methods,
+      break_client_loop and _quit_pending. The former can be
+      used by packet handlers, buffer handlers, etc. to force
+      breaking out of the client loop.
+    - Added length arg to mp2bin.
+
+1.11  2001.05.11
+    - Auto-detect SSH2 private key files as identity files and read
+      them accordingly. Thanks to Matt Good for the original idea
+      of reading SSH2 key files, as well as the patch.
+
+1.10  2001.05.11
+    - Added Key::RSA, an SSH2 key implementation, using Crypt::RSA;
+      this provides support for the 'ssh-rsa' public key
+      negotiation. Also supported by pssh-keygen (even for key
+      generation).
+    - Added HostKeyAlgorithms as a supported config option to set
+      server host key algorithms.
+    - Restructured DSA/publickey-auth implementation to allow for
+      multiple public key algorithms, not just DSA. Moved Auth/DSA
+      => Auth/Pubkey.
+    - Added support for determining PEM private key file types (eg.
+      RSA vs. DSA) from the first line of the PEM file.
+    - Fixed broken Rhosts-RSA support (SSH1).
+    - Added support for reading/writing comments from read_private
+      and write_private method for RSA1 SSH1 keys (-c option in
+      pssh-keygen).
+    - Renamed Key::RSA to Key::RSA1 to allow for Key::RSA as SSH2
+      RSA implementation.
+    - Changed Key::DSA::size to use Crypt::DSA::Key::size; removed
+      redundant Key initialization from Key::DSA::init.
+    - Kex::DH1 now works with any type of server public key, not
+      just DSA (ie. also works with ssh-rsa in addition to ssh-dss).
+
+1.06  2001.05.07
+    - Fixed bug with Blowfish cipher in SSH1 protocol; symptom would
+      be "Corrupted check bytes on input" after sending the
+      RSA-encrypted session key, and turning on encryption.
+      This was due to an incorrect key length when setting the
+      Blowfish key. Thanks to Dan Berger for the spot.
+
+1.05  2001.05.04
+    - Fixed bug when entering password at prompt; entering an
+      incorrect password more than three times would cause the
+      authentication to hang. Thanks to Matt Good for the spot and
+      a fix.
+
+1.04  2001.05.04
+    - Fixed bug in version/protocol exchange that was causing a DSA
+      signature verification error. I was cutting off just a newline,
+      and some versions of ssh2 were sending ctrl-M characters as
+      well that should be cut off. This caused errors like "DSA
+      verification failed for server host key" during key exchange.
+      Thanks to Matt Good for the spot.
+    - Fixed host wildcard matching in Net::SSH::Perl::Config so that
+      the directive 'Host foo' no longer matches the host 'foobar';
+      this was incorrect behavior and inconsistent with ssh.
+    - Added more documentation for Key::DSA and Key::RSA.
+
+1.03  2001.05.03
+    - Fixed error with Net::SSH::Perl::Key::DSA and MIME::Base64.
+    - Added better docs for Key classes.
+
+1.02  2001.05.03
+    - Fixed some doc errors, both syntax and content.
+    - Reworked Makefile.PL to give more feedback about what's
+      happening w/r/t testing prerequisite modules. Added
+      Digest::BubbleBabble as optional prereq, and made Convert::PEM
+      optional as well.
+    - Added support for bubble-babble fingerprints, both in
+      Key libraries (restructured to work with multiple types
+      of fingerprinting) and in pssh-keygen (-B option).
+
+1.01  2001.05.02
+    - Added SSH2 support.
+    - Added Channel, ChannelMgr classes to manage open SSH2
+      channels.
+    - Added Key and subclasses Key::DSA, Key::RSA; managed
+      access to keys and keyfiles.
+    - Split Util functions into sub-modules that are loaded
+      on demand. Added more utility functions for SSH2 bigints,
+      etc. Deprecated _load_private_key, _save_private_key,
+      _load_public_key, in favor of usage of Net::SSH::Perl::Key
+      classes.
+    - Changed Constants implementation; don't use 'constant'
+      module, just keep constants in hash, then export them
+      in custom import method.
+    - Added eg/pssh-keygen, which has *almost* all of the
+      functionality in the OpenSSH ssh-keygen.
+    - Added Mac classes for MAC packet integrity.
+    - Added Cipher/RC4, an arcfour implementation (only for
+      SSH2).
+    - Added Kex and subclass for Diffie-Hellman Group 1.
+    - Buffer now works for both SSH1 and SSH2; different
+      mp_int representations.
+    - SSH1 implementation: now uses Net::SSH::Perl::Comp for
+      compression; uses Net::SSH::Perl::Key::RSA to hold RSA
+      keys; now lives in Net::SSH::Perl::SSH1 and is loaded on
+      demand; etc.
+
+0.67  2001.04.20
+    - now use _mp_linearize in _rsa_private_decrypt.
+    - fixed bug with sending large STDIN packets. The symptom was
+      that, when trying to send STDIN packets larger than MAX_PACKET_SIZE,
+      you'd get an error and the packet wouldn't be sent. Thanks to
+      Chris Beatson for the spot and a patch.
+    - fixed odd bug with _mp_linearize. Aaron Paetznick
+      pointed this out, and I could only reproduce it on his system.
+      The symptoms were that encryption would not work, resulting in
+      "Corrupted check bytes on input" messages after encryption was
+      turned on. This was due to a problem generating the session ID.
+      Fixed by using a whole new version of _mp_linearize.
+
+0.66  2001.03.22
+    - fixed bug where calling 'cmd' more than once wouldn't get
+      anything in returned stdout, stderr, or exit status. Thanks
+      to John Tyrrell for the spot.
+
+0.65  2001.03.21
+    - fixed bug with "Cipher <name>" in config file or 'options'
+      param. This wasn't mapping ssh cipher names to Net::SSH::Perl
+      cipher names (ie. should map 'idea' => 'IDEA'). Thanks to
+      Edward Vopata for the spot and a patch.
+    - made it clearer that Net::SSH::Perl currently supports only
+      SSH1 protocol.
+    - better error checking for getservbyname lookup of ssh
+      service (to get default port).
+    - added eg/remoteinteract.pl, which demonstrates how to interact
+      with a remote (interactive) command.
+
+0.64  2001.03.13
+    - fixed bug in Net::SSH::Perl::Cipher::new_from_key_str;
+      empty key string (passphrase) was broken. This never
+      cropped up in regular usage, only in testing.
+    - added _save_private_key function to Net::SSH::Perl::Util,
+      used to save private key files.
+    - added cipher tests (05-cipher.t).
+    - PasswordPromptLogin and PasswordPromptHost config options
+      are now supported (on by default).
+    - added untainting code for all places where data is read
+      from external sources (ie. socket, key files, etc.),
+      which should fix the "Corrupted check bytes" errors when
+      using -T. It was breaking because substr replacement
+      doesn't work on tainted values. See this p5p thread:
+      http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2000-09/msg00799.html
+
+0.63  2001.03.09
+    - added documentation to pssh (eg/pssh), as well as a -V
+      option.
+    - fixed bug where User specified in config file would be
+      overridden by lack of user in login method.
+    - return value of buffer->dump method no longer contains
+      extra space at the end.
+
+0.62  2001.03.08
+    - fixed test bug with StringThing package by adding FILENO
+      method. Should fix problem with 5.6 test suite.
+    - added merge_directive method to Net::SSH::Perl::Config,
+      and 'options' arg to Net::SSH::Perl constructor.
+
+0.61  2001.03.07
+    - changed in_leftover implementation and name. The method
+      is now named incoming_data, and the implementation is
+      a Net::SSH::Perl::Buffer object.
+    - changed to using non-blocking sockets. Net::SSH::Perl::Packet
+      added a read_poll method, which doesn't block; read still
+      blocks (using select).
+    - added shell connection functionality, and abstracted out
+      interactive session code a bit better. Added pty support.
+      In the future 'shell' could conceivably be used to execute
+      multiple commands over the same ssh connection.
+    - added 3DES as fallback cipher if IDEA isn't supported.
+    - _check_host_in_hostfile now returns HOST_NEW if the hostfile
+      can't be opened, consistent with how ssh and openssh work.
+
+0.60  2001.03.02
+    - added compression support, along with Compression and
+      CompressionLevel config directives, and docs
+    - added ability to register handlers for specific packet
+      types read during the client loop
+
+0.53  2001.02.28
+    - added Net::SSH::Perl::Config; reads ssh config files
+      and merges constructor options with config options
+    - updated DESCRIPTION for Net::SSH::Perl
+
+0.52  2001.02.21
+    - added ability to specify RSA identity files; defaults
+      to "$ENV{HOME}/.ssh/identity"
+    - Blowfish cipher will try to use Crypt::Blowfish_PP if
+      it can't use Crypt::Blowfish
+    - added lots of POD
+    - fixed bug where unknown hosts wouldn't be added to
+      hostfile
+    - sorted out common sections between Net::SSH::Perl POD
+      and README
+
+0.51  2001.02.20
+    - Blowfish support has now been added.
+
+0.50  2001.02.19
+    - moved my Net::SSH libraries into the Net::SSH::Perl
+      namespace; hooked up the main Net::SSH interface lib.
+    - added ssh and issh wrappers around OO methods.
+    - added configure method to Net::SSH interface; used to
+      set up connection params when using procedural
+      interface.
+    - added RSA authentication.
+    - ripped out IO::Socket usage, replaced with manual
+      socket creation and connection so we can try to bind to
+      ports 1023 down through 512, if the user wants to
+      connect on a privileged port.
+    - added Rhosts-RSA and Rhosts authentication, with the
+      caveat that they only work when running as root
+      and on a privileged port.
+
+0.03  2001.01.19
+    - integrated modified CBC and CFB ciphers into distribution;
+      no more reliance on Crypt::CFB and Crypt::CBC
+    - improved cipher checking; added list of ciphers supported
+      by client, based on which cipher drivers can be loaded
+    - fixed rsa_private_decrypt bug (occurred when session key
+      int was 255 chars long as hex string, rather than 256).
+    - Chip Turner, author of Math::GMP, added my patch to his
+      distribution, thus making installation much easier. Thanks
+      Chip.
+    - added cipher support to installation process.
+    - abstracted the auth plugins into Auth modules; this will
+      allow the addition of other authentication modules in
+      the future.
+    - moved utility routines into Net::SSH::Util.
+    - changed Net::SSH::Constants to use Exporter.
+
+0.02  2001.01.18
+    - added DES and 3DES ciphers
+    - more host key support: adds new host keys to user host key file
+    - checked for unsupported Net::SSH::Buffer methods in AUTOLOAD
+    - added example script, eg/cmd.pl
+    - can now specify cipher via new method
+    - checks against server's supported cipher list
+
+0.01  2001.01.10
+    - original version; created by h2xs 1.19
+
+# vim:et

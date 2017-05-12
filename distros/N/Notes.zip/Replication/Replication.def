@@ -1,0 +1,5 @@
+LIBRARY "Replication"
+EXPORTS
+  boot_Notes__Replication
+  _boot_Notes__Replication = boot_Notes__Replication
+  

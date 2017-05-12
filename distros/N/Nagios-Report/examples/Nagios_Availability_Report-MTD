@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+use strict ;
+
+use Nagios::Report ;
+
+my $x = Nagios::Report->new(q<local_cgi Nagios_Server Auth_Nagios_User>, [qw(24x7 DEST_Optus_SLA_hours)])
+  or die "Can't construct Nagios::Report object." ;
+
+$x->mkreport(
+		[ qw(
+			HOST_NAME
+			PERCENT_TOTAL_TIME_UP
+			TOTAL_TIME_DOWN
+			TOTAL_TIME_DOWN_HMS
+			TOTAL_TIME_UNREACHABLE
+			TOTAL_TIME_UNREACHABLE_HMS
+			AVAIL_URL
+			TREND_URL
+		   )
+	       ],
+
+		sub { my %F = @_; my $u = $F{PERCENT_TOTAL_TIME_UP}; $u =~ s/%//; $u < 100 },
+
+		&comp(alpha => 0 , ascend => 0, fields => [ qw(TOTAL_TIME_DOWN TOTAL_TIME_UNREACHABLE) ],),
+
+		sub {
+			my $F = shift @_ ;
+			$F->{TOTAL_TIME_DOWN_HMS}	= t2hms($F->{TOTAL_TIME_DOWN}) ;
+			$F->{TOTAL_TIME_UNREACHABLE_HMS}= t2hms($F->{TOTAL_TIME_UNREACHABLE}) ;
+			qw(TOTAL_TIME_DOWN_HMS TOTAL_TIME_UNREACHABLE_HMS)
+		}
+#		sub {	$_ = shift @_; my %F = @_;
+#			my $d = $F{TOTAL_TIME_DOWN} ;
+#			my $u = $F{TOTAL_TIME_UNREACHABLE} ;
+#			push @$_, 
+#				&t2hms($d),
+#				&t2hms($u) ;
+#			qw(TOTAL_TIME_DOWN_HMS TOTAL_TIME_UNREACHABLE_HMS)
+#		}
+) ;
+
+$x->excel_dump('/mnt/dest_smb/coms/Comms Data/Availability-month_to_date.xls') ;

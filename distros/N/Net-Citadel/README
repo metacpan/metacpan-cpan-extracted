@@ -1,0 +1,34 @@
+Net-Citadel
+===========
+
+This package is a Perl extension to support the Citadel application
+protocol as defined in:
+
+  http://www.citadel.org/doku.php?id=documentation:appproto:app_proto
+
+At this stage the package supports only some basic functionality, but
+more can be added easily. Also the API is only a first (quick)
+shot. Of course, you can make it a bit more 'computer sciency'.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+# NOTE: Since I cannot rely on a Citadel installation to exist, the test
+# will silently (and successfully) terminate if no connection to a Citadel
+# server can be made. See test.yaml for configuration options and rerun
+# the test(s).
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2008 by Robert Barta
+Copyright (C) 2012-2016 by Robert James Clay
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

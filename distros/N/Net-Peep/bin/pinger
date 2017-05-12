@@ -1,0 +1,77 @@
+#!/usr/bin/perl
+
+require 5.00503;
+use Net::Peep::Client::Pinger;
+$pinger = new Net::Peep::Client::Pinger;
+$SIG{'INT'} = $SIG{'TERM'} = sub { $pinger->shutdown(); exit 0; };
+$pinger->Start();
+
+__END__
+
+=head1 NAME
+
+Pinger - Client application for Peep: The Network Auralizer.
+
+=head1 SYNOPSIS
+
+Pinger is a client for Peep which pings hosts and, if a host is
+unresponsive, initiates a broadcast to the Peep server, peepd, which
+then translates the event into an aural signal such as a chirping bird
+or laughing monkey.
+
+This application is a part of Peep and requires that the Peep Perl
+modules have been installed.
+
+=head1 OPTIONS
+
+pinger supports the following command-line options:
+
+    --interval=[SECONDS]  The number of seconds to wait between each attempted 
+                          ping of each host.
+
+    --hosts=[STRING]      A comma-delimited list of hosts which will be
+                          monitored.  Hosts can also be specified in
+                          the Peep configuration file, Any hosts
+                          specified by the hosts option will override
+                          any specified in the Peep configuration
+                          file.
+
+In addition, the following options are common to all Peep clients:
+
+    --config=[PATH]       Path to the configuration file to use
+    --debug=[NUMBER]      Enable debugging. (Def:  0)
+    --nodaemon            Do not run in daemon mode
+    --pidfile=[PATH]      The file to write the pid out to (Def: /var/run/pinger.pid)
+    --output=[PATH]       The file to log logparser output to (Def: stderr)
+    --noautodiscovery     Disables autodiscovery and enables the server and port options
+    --server=[HOST]       The host (or IP address) to connect to
+    --port=[PORT NO]      The port to use
+    --silent              Does not produce output.  To eliminate all output,
+                          either the debug option should be set to 0 or
+                          an output file should be specified.
+    --help                Prints a simple help message
+
+=head1 EXAMPLES
+
+  pinger 
+
+  pinger --help
+
+  pinger --nodaemon --noautodiscovery --server=localhost --port=2000
+
+  pinger --config=/usr/local/etc/peep.conf --debug=9
+
+  pinger --logfile=/var/log/messages --debug=9
+
+  pinger --output=/var/log/peepd/pinger.log --debug=7 
+
+=head1 AUTHOR
+
+Collin Starkweather <collin.starkweather@colorado.edu> Copyright (C) 2000
+
+=head1 SEE ALSO
+
+perl(1), peepd(1), Net::Peep::Client::Pinger, peepd.
+
+http://peep.sourceforge.net
+

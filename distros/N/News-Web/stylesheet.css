@@ -1,0 +1,25 @@
+/* Default stylesheet information */
+
+BODY {  background-color: #bbbbbb; }
+
+TD.grouplist_1 { 
+	background-color: lightgrey;
+}
+
+TD.grouplist_0 {
+ 	background-color: white;
+}
+
+TD.overview_1 { 
+	background-color: lightgrey;
+	font-family: monospace;
+}
+
+TD.overview_0 { 
+ 	background-color: white;
+	font-family: monospace;
+}
+
+A {
+	/* color:yellow; */
+}

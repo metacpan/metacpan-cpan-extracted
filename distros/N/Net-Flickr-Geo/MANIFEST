@@ -1,0 +1,26 @@
+# $Id: MANIFEST,v 1.8 2008/06/28 23:09:27 asc Exp $
+Build.PL
+Changes
+examples/modestmaps_mk_cluster_map
+examples/modestmaps_mk_cluster_maps_for_photoset
+examples/modestmaps_mk_historical_cluster_map
+examples/googlemaps_mk_pinwin_map
+examples/modestmaps_mk_pinwin_map
+examples/modestmaps_mk_pinwin_maps_for_photoset
+examples/modestmaps_mk_poster_map_for_photoset
+examples/modestmaps_upload_postermap_for_photoset
+examples/multimaps_mk_pinwin_map
+examples/yahoo_mk_pinwin_map
+examples/yahoo_mk_pinwin_maps_for_photoset
+lib/Net/Flickr/Geo.pm
+lib/Net/Flickr/Geo/GoogleMaps.pm
+lib/Net/Flickr/Geo/ModestMaps.pm
+lib/Net/Flickr/Geo/MultiMaps.pm
+lib/Net/Flickr/Geo/Pinwin.pm
+lib/Net/Flickr/Geo/YahooMaps.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t

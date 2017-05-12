@@ -1,0 +1,27 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Net-FTPServer
+version:      1.122
+version_from: lib/Net/FTPServer.pm
+installdirs:  site
+requires:
+    BSD::Resource:                 0
+    Carp:                          0
+    DynaLoader:                    0
+    Fcntl:                         0
+    Getopt::Long:                  0
+    IO::Dir:                       0
+    IO::File:                      0
+    IO::Handle:                    0
+    IO::Scalar:                    1.126
+    IO::Seekable:                  0
+    IO::Select:                    0
+    IO::Socket:                    0
+    IPC::Open2:                    0
+    POSIX:                         0
+    Socket:                        0
+    Sys::Hostname:                 0
+    Sys::Syslog:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

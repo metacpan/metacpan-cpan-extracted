@@ -1,0 +1,27 @@
+---
+abstract: 'use FTP with C<IO::Async>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  IO::Async::Test: '0'
+  Test::More: '0.88'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4204, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Async-FTP
+provides:
+  Net::Async::FTP:
+    file: lib/Net/Async/FTP.pm
+    version: '0.08'
+requires:
+  Exporter: '5.57'
+  File::Listing: '0'
+  IO::Async: '0.30'
+  IO::Async::OS: '0'
+  IO::Async::Stream: '0.59'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.08'

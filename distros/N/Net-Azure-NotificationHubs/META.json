@@ -1,0 +1,90 @@
+{
+   "abstract" : "A Client Class for Azure Notification Hubs ",
+   "author" : [
+      "ytnobody <ytnobody@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Azure-NotificationHubs",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor::Lite" : "0",
+            "HTTP::Message" : "0",
+            "HTTP::Request" : "0",
+            "JSON" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "Net::Azure::Authorization::SAS" : "0",
+            "Try::Tiny" : "0",
+            "URI" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Time" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Azure::NotificationHubs" : {
+         "file" : "lib/Net/Azure/NotificationHubs.pm",
+         "version" : "0.01"
+      },
+      "Net::Azure::NotificationHubs::Request" : {
+         "file" : "lib/Net/Azure/NotificationHubs/Request.pm"
+      },
+      "Net::Azure::NotificationHubs::Response" : {
+         "file" : "lib/Net/Azure/NotificationHubs/Response.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ytnobody/p5-Net-Azure-NotifcationHubs/issues"
+      },
+      "homepage" : "https://github.com/ytnobody/p5-Net-Azure-NotifcationHubs",
+      "repository" : {
+         "url" : "git://github.com/ytnobody/p5-Net-Azure-NotifcationHubs.git",
+         "web" : "https://github.com/ytnobody/p5-Net-Azure-NotifcationHubs"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:YTURTLE"
+}

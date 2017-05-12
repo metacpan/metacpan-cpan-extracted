@@ -1,0 +1,10 @@
+lib/Net/Goofey.pm
+MANIFEST
+README
+Makefile.PL
+test.pl
+perlgoofey
+docs/clients
+docs/goofey.c
+docs/goofey.man
+docs/protocol.man

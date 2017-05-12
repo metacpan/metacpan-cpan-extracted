@@ -1,0 +1,19 @@
+---
+abstract: 'NNexus autolinker'
+author:
+  - 'Deyan Ginev <d.ginev@jacobs-university.de>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.142690'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: NNexus
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  repository: https://github.com/dginev/nnexus.git
+version: v2.0.3

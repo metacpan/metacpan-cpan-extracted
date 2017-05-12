@@ -1,0 +1,7 @@
+o  Complete RIPE and other parser definitions. ( Sat Dec  5 05:18:01 IST 1998 ) 
+
+o  Optimize Regular Expressions.               ( Sat Dec 12 21:42:47 IST 1998 )
+
+o  Change ASSOC Structure.  Should also take regexes for figuring out the 
+   appropriate server.                         ( Sun Dec 13 04:47:11 IST 1998 )
+

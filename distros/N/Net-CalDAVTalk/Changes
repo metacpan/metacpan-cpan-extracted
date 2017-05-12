@@ -1,0 +1,36 @@
+Revision history for Net-CalDAVTalk
+
+0.10    Wed Feb 15 16:46 2017
+   - set the timezone on recurrences based on the top level timezone, not
+     the recurrence timezone
+
+0.09    Fri Oct 14 11:49 2016
+   - fix freebusy parsing for zero length events and updated stamp
+   - add JMAP_ALWAYS_FULL environment variable to suppress deep
+     diff creation
+
+0.08    Fri Oct 14 09:20 2016
+  - major rewrite to support the new TC-API from CalConnect which
+    will be part of the JMAP specification, including tests
+
+0.07    Tue Jun 28 11:48 2016
+  - uploaded bogus path, so just fix it with a new version
+
+0.06    Fri May 27 13:58 2016
+  - don't bail on incomplete ACL information
+
+0.05    Mon May  2 11:27 2016
+  - add UpdateAddressSet API
+
+0.04    Tue Mar  1 08:37 2016
+  - require MIME::Types
+  - Add support for 'timezone' property
+
+0.03    Mon Aug 17 10:08 2015
+  - Pull all documentation in, including doc for the TimeZones module
+
+0.02    Mon Aug 17 09:30 2015
+  - Initial release with POD coverage, but missing some commits
+
+0.01    never released
+

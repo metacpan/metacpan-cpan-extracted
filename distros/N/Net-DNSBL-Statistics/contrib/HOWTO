@@ -1,0 +1,61 @@
+
+Statistics HTML page HOWTO	version 1.02, 1-22-08
+
+These files and scripts do the following:
+
+dnsbl_compare.shtml	displays the explanation of how the data
+			is created and the historical files available
+
+
+contrib/stats2html.pl	converts the output of 'dnsblstat -w into a page
+contrib/stats2list.pl	converts the history directory into an htmlized list
+contrib/stats2page.sh	wraps the above two scripts
+contrib/stat2generic.pl	extract the 'GENERIC' criteria from statistics.conf
+			file and write an HTML page with the regexp's
+
+Each of the script files will generate a brief HELP 
+statement if executed without input arguments
+
+# # # # # # # # # # # # # # # # 
+
+This HOWTO assumes that you have installed Net::DNSBL::Statistics, properly
+edited the statistics.conf file and that you one or more source files
+containing IP addresses. It does not matter if their are duplicates, the
+'dnsblstat' script removes duplicates.
+
+*	Edit dnsbl_compare.shtml to replace the logo image with your own 
+	or if you don't have one with "&nbsp;"
+
+*	create the directory structure
+
+	/home/mydirectory/public_html/history
+	/home/mydirectory/scripts
+	/home/mydirectory/tmp
+
+*	place 'dnsbl_compare.shtml' in the public_html directory
+
+*	copy the script files to the 'scripts' directory
+
+This is the line from my 'cronfile' that is run weekly to produce the
+statistics page on the SpamCannibal web site at:
+
+	http://www.spamcannibal.org/dnsbl_compare.shtml
+
+# MIN HOUR DAY MONTH DAYOFWEEK   COMMAND
+20 0 0 * sun ./scripts/dnsblstat -t -w ./config/statistics.conf \
+	> tmp/stats.cache; \
+	./scripts/stats2page.sh tmp/stats.cache \
+	public_html/history \
+	public_html/archive.txt
+
+The script 'stats2list.pl' assumes that the web directory is named
+
+    public{something}
+
+and contains a regexp in the form:
+
+        s|public[^/]*/||
+
+You need to edit this regexp if your HTML web directory is NOT:
+
+        public{something}

@@ -1,0 +1,51 @@
+
+				  Net::Zemanta
+				  ============
+
+
+Net::Zemanta is a Perl interface to services provided by Zemanta.
+
+Zemanta is building a platform for assisted on-line content production.
+The system analyses the content and returns suggested images, smart links,
+keywords and relevant related stories from the Internet.
+
+See http://zemanta.com for more information.
+
+This module currently allows you to use the Suggest service and retrieve user
+configuration for the service.
+
+
+Installation
+============
+
+To install this module run the following commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+Dependencies
+============
+
+  libwww-perl
+  JSON
+
+
+Contact
+=======
+
+Please contact the author in case of bugs, patches, etc. at
+tomaz.solc@tablix.org
+
+
+License
+=======
+
+Copyright (C) 2008 by Zemanta ltd.
+Copyright (C) 2014 by Tomaz Solc
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself, either Perl version 5.8.7 or, at your option,
+any later version of Perl 5 you may have available.

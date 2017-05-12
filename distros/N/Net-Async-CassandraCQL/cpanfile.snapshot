@@ -1,0 +1,324 @@
+# carton snapshot format: version 1.0
+DISTRIBUTIONS
+  CPAN-Meta-2.143240
+    pathname: D/DA/DAGOLDEN/CPAN-Meta-2.143240.tar.gz
+    provides:
+      CPAN::Meta 2.143240
+      CPAN::Meta::Converter 2.143240
+      CPAN::Meta::Feature 2.143240
+      CPAN::Meta::History 2.143240
+      CPAN::Meta::Merge 2.143240
+      CPAN::Meta::Prereqs 2.143240
+      CPAN::Meta::Spec 2.143240
+      CPAN::Meta::Validator 2.143240
+    requirements:
+      CPAN::Meta::Requirements 2.121
+      CPAN::Meta::YAML 0.008
+      Carp 0
+      ExtUtils::MakeMaker 6.17
+      JSON::PP 2.27200
+      Parse::CPAN::Meta 1.4414
+      Scalar::Util 0
+      perl 5.008
+      strict 0
+      version 0.88
+      warnings 0
+  CPAN-Meta-YAML-0.012
+    pathname: D/DA/DAGOLDEN/CPAN-Meta-YAML-0.012.tar.gz
+    provides:
+      CPAN::Meta::YAML 0.012
+    requirements:
+      B 0
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.17
+      Fcntl 0
+      Scalar::Util 0
+      strict 0
+      warnings 0
+  Compress-Snappy-0.23
+    pathname: G/GR/GRAY/Compress-Snappy-0.23.tar.gz
+    provides:
+      Compress::Snappy 0.23
+    requirements:
+      Devel::CheckLib 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 6.52
+      Test::More 0.82
+      XSLoader 0
+  Devel-CheckLib-1.03
+    pathname: M/MA/MATTN/Devel-CheckLib-1.03.tar.gz
+    provides:
+      Devel::CheckLib 1.03
+    requirements:
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      File::Spec 0
+      File::Temp 0.16
+      IO::CaptureOutput 1.0801
+      Test::More 0.62
+      perl 5.00405
+  Devel-GlobalDestruction-0.13
+    pathname: H/HA/HAARG/Devel-GlobalDestruction-0.13.tar.gz
+    provides:
+      Devel::GlobalDestruction 0.13
+    requirements:
+      ExtUtils::CBuilder 0.27
+      ExtUtils::MakeMaker 0
+      Sub::Exporter::Progressive 0.001011
+      perl 5.006
+  Devel-Refcount-0.10
+    pathname: P/PE/PEVANS/Devel-Refcount-0.10.tar.gz
+    provides:
+      Devel::Refcount 0.10
+    requirements:
+      Exporter 5.57
+      ExtUtils::CBuilder 0
+      Module::Build 0
+      Test::Fatal 0
+      Test::More 0
+      XSLoader 0
+  Future-0.30
+    pathname: P/PE/PEVANS/Future-0.30.tar.gz
+    provides:
+      Future 0.30
+      Future::Utils 0.30
+      Test::Future 0.30
+    requirements:
+      Carp 1.25
+      Test::Builder::Module 0
+      Test::Fatal 0
+      Test::Identity 0
+      Test::More 0.88
+      Test::Refcount 0
+      Time::HiRes 0
+      perl 5.008
+  IO-Async-0.64
+    pathname: P/PE/PEVANS/IO-Async-0.64.tar.gz
+    provides:
+      IO::Async 0.64
+      IO::Async::Channel 0.64
+      IO::Async::ChildManager 0.64
+      IO::Async::File 0.64
+      IO::Async::FileStream 0.64
+      IO::Async::Function 0.64
+      IO::Async::Future 0.64
+      IO::Async::Handle 0.64
+      IO::Async::Listener 0.64
+      IO::Async::Loop 0.64
+      IO::Async::Loop::Poll 0.64
+      IO::Async::Loop::Select 0.64
+      IO::Async::LoopTests 0.64
+      IO::Async::MergePoint 0.64
+      IO::Async::Notifier 0.64
+      IO::Async::OS 0.64
+      IO::Async::OS::MSWin32 0.64
+      IO::Async::OS::cygwin 0.64
+      IO::Async::OS::linux 0.64
+      IO::Async::PID 0.64
+      IO::Async::Process 0.64
+      IO::Async::Protocol 0.64
+      IO::Async::Protocol::LineStream 0.64
+      IO::Async::Protocol::Stream 0.64
+      IO::Async::Resolver 0.64
+      IO::Async::Routine 0.64
+      IO::Async::Signal 0.64
+      IO::Async::Socket 0.64
+      IO::Async::Stream 0.64
+      IO::Async::Test 0.64
+      IO::Async::Timer 0.64
+      IO::Async::Timer::Absolute 0.64
+      IO::Async::Timer::Countdown 0.64
+      IO::Async::Timer::Periodic 0.64
+    requirements:
+      Exporter 5.57
+      File::Temp 0
+      File::stat 0
+      Future 0.22
+      Future::Utils 0.18
+      IO::Poll 0
+      Socket 2.007
+      Storable 0
+      Struct::Dumb 0
+      Test::Fatal 0
+      Test::Identity 0
+      Test::More 0.88
+      Test::Refcount 0
+      Time::HiRes 0
+      perl 5.010
+  IO-CaptureOutput-1.1104
+    pathname: D/DA/DAGOLDEN/IO-CaptureOutput-1.1104.tar.gz
+    provides:
+      IO::CaptureOutput 1.1104
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.17
+      File::Basename 0
+      File::Temp 0.16
+      Symbol 0
+      perl 5.006
+      strict 0
+      vars 0
+      warnings 0
+  IO-Socket-IP-0.36
+    pathname: P/PE/PEVANS/IO-Socket-IP-0.36.tar.gz
+    provides:
+      IO::Socket::IP 0.36
+    requirements:
+      IO::Socket 0
+      Socket 1.97
+      Test::More 0.88
+  Math-Int64-0.34
+    pathname: S/SA/SALVA/Math-Int64-0.34.tar.gz
+    provides:
+      Math::Int64 0.34
+      Math::Int64::die_on_overflow undef
+      Math::Int64::native_if_available undef
+      Math::UInt64 0.34
+    requirements:
+      ExtUtils::MakeMaker 0
+  Module-Build-0.4211
+    pathname: L/LE/LEONT/Module-Build-0.4211.tar.gz
+    provides:
+      Module::Build 0.4211
+      Module::Build::Base 0.4211
+      Module::Build::Compat 0.4211
+      Module::Build::Config 0.4211
+      Module::Build::Cookbook 0.4211
+      Module::Build::Dumper 0.4211
+      Module::Build::Notes 0.4211
+      Module::Build::PPMMaker 0.4211
+      Module::Build::Platform::Default 0.4211
+      Module::Build::Platform::MacOS 0.4211
+      Module::Build::Platform::Unix 0.4211
+      Module::Build::Platform::VMS 0.4211
+      Module::Build::Platform::VOS 0.4211
+      Module::Build::Platform::Windows 0.4211
+      Module::Build::Platform::aix 0.4211
+      Module::Build::Platform::cygwin 0.4211
+      Module::Build::Platform::darwin 0.4211
+      Module::Build::Platform::os2 0.4211
+      Module::Build::PodParser 0.4211
+    requirements:
+      CPAN::Meta 2.142060
+      CPAN::Meta::YAML 0.003
+      Cwd 0
+      Data::Dumper 0
+      ExtUtils::CBuilder 0.27
+      ExtUtils::Install 0
+      ExtUtils::Manifest 0
+      ExtUtils::Mkbootstrap 0
+      ExtUtils::ParseXS 2.21
+      File::Basename 0
+      File::Compare 0
+      File::Copy 0
+      File::Find 0
+      File::Path 0
+      File::Spec 0.82
+      File::Temp 0.15
+      Getopt::Long 0
+      Module::Metadata 1.000002
+      Parse::CPAN::Meta 1.4401
+      Perl::OSType 1
+      Pod::Man 2.17
+      Test::Harness 3.16
+      Test::More 0.49
+      Text::Abbrev 0
+      Text::ParseWords 0
+      perl 5.008000
+      version 0.87
+  Parse-CPAN-Meta-1.4414
+    pathname: D/DA/DAGOLDEN/Parse-CPAN-Meta-1.4414.tar.gz
+    provides:
+      Parse::CPAN::Meta 1.4414
+    requirements:
+      CPAN::Meta::YAML 0.011
+      Carp 0
+      Encode 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.30
+      File::Spec 0.80
+      JSON::PP 2.27200
+      strict 0
+  Protocol-CassandraCQL-0.12
+    pathname: P/PE/PEVANS/Protocol-CassandraCQL-0.12.tar.gz
+    provides:
+      Protocol::CassandraCQL 0.12
+      Protocol::CassandraCQL::Client 0.12
+      Protocol::CassandraCQL::ColumnMeta 0.12
+      Protocol::CassandraCQL::Frame 0.12
+      Protocol::CassandraCQL::Frames 0.12
+      Protocol::CassandraCQL::Result 0.12
+      Protocol::CassandraCQL::Type 0.12
+    requirements:
+      Compress::Snappy 0
+      Encode 0
+      IO::Socket::IP 0
+      Math::BigInt 0
+      Math::Int64 0
+      Module::Build 0.4004
+      Socket 1.82
+  Struct-Dumb-0.03
+    pathname: P/PE/PEVANS/Struct-Dumb-0.03.tar.gz
+    provides:
+      Struct::Dumb 0.03
+    requirements:
+      Test::Fatal 0
+      Test::More 0.88
+  Sub-Exporter-Progressive-0.001011
+    pathname: F/FR/FREW/Sub-Exporter-Progressive-0.001011.tar.gz
+    provides:
+      Sub::Exporter::Progressive 0.001011
+    requirements:
+      ExtUtils::MakeMaker 0
+      Test::More 0.88
+  Test-Fatal-0.014
+    pathname: R/RJ/RJBS/Test-Fatal-0.014.tar.gz
+    provides:
+      Test::Fatal 0.014
+    requirements:
+      Carp 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 0
+      Test::Builder 0
+      Try::Tiny 0.07
+      strict 0
+      warnings 0
+  Test-HexString-0.03
+    pathname: P/PE/PEVANS/Test-HexString-0.03.tar.gz
+    provides:
+      Test::HexString 0.03
+    requirements:
+      Test::Builder 0
+      Test::Builder::Tester 0
+      Test::More 0
+  Test-Identity-0.01
+    pathname: P/PE/PEVANS/Test-Identity-0.01.tar.gz
+    provides:
+      Test::Identity 0.01
+    requirements:
+      Scalar::Util 0
+      Test::Builder::Tester 0
+      Test::More 0
+  Test-Refcount-0.08
+    pathname: P/PE/PEVANS/Test-Refcount-0.08.tar.gz
+    provides:
+      Test::Refcount 0.08
+    requirements:
+      B 0
+      Scalar::Util 0
+      Test::Builder 0
+      Test::Builder::Tester 0
+      Test::More 0
+  Try-Tiny-0.22
+    pathname: D/DO/DOY/Try-Tiny-0.22.tar.gz
+    provides:
+      Try::Tiny 0.22
+    requirements:
+      Carp 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 6.30
+      constant 0
+      strict 0
+      warnings 0

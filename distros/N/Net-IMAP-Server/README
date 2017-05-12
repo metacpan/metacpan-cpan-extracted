@@ -1,0 +1,310 @@
+NAME
+    Net::IMAP::Server - A single-threaded multiplexing IMAP server
+    implementation, using Net::Server::Coro.
+
+SYNOPSIS
+      use Net::IMAP::Server;
+      Net::IMAP::Server->new(
+          port        => 193,
+          ssl_port    => 993,
+          auth_class  => "Your::Auth::Class",
+          model_class => "Your::Model::Class",
+          user        => "nobody",
+          group       => "nobody",
+      )->run;
+
+DESCRIPTION
+    This model provides a complete implementation of the "RFC 3501"
+    specification, along with several IMAP4rev1 extensions. It provides
+    separation of the mailbox and message store from the client interaction
+    loop.
+
+    Note that, following RFC suggestions, login is not allowed except under
+    either SSL or TLS. Thus, you are required to have a certs/ directory
+    under the current working directory, containing files server-cert.pem
+    and "server-key.pem". Failure to do so will cause the server to fail to
+    start. Note that if the default paths suit your needs, you can specify
+    different ones using the "server_cert" and "server_key" arguments to
+    "new".
+
+INTERFACE
+    The primary method of using this module is to supply your own model and
+    auth classes, which inherit from Net::IMAP::Server::DefaultModel and
+    Net::IMAP::Server::DefaultAuth. This allows you to back your messages
+    from arbitrary data sources, or provide your own authorization backend.
+    For the most part, the implementation of the IMAP components should be
+    opaque.
+
+METHODS
+  new PARAMHASH
+    Creates a new IMAP server object. This doesn't even bind to the sockets;
+    it merely initializes the object. It will "die" if it cannot find the
+    appropriate certificate files. Valid arguments to "new" include:
+
+    port
+        The port to bind to. Defaults to port 1430.
+
+    ssl_port
+        The port to open an SSL listener on; by default, this is disabled,
+        and any true value enables it.
+
+    auth_class
+        The name of the class which implements authentication. This must be
+        a subclass of Net::IMAP::Server::DefaultAuth.
+
+    model_class
+        The name of the class which implements the model backend. This must
+        be a subclass of Net::IMAP::Server::DefaultModel.
+
+    connection_class
+        On rare occasions, you may wish to subclass the connection class;
+        this class must be a subclass of Net::IMAP::Server::Connection.
+
+    poll_every
+        How often the current mailbox should be polled, in seconds; defaults
+        to 0, which means it will be polled after every client command.
+
+    unauth_commands
+        The number of commands before unauthenticated users are
+        disconnected. The default is 10; set to zero to disable.
+
+    unauth_idle
+        How long, in seconds, to wait before disconnecting idle connections
+        which have not authenticated yet. The default is 5 minutes; set to
+        zero to disable (which is not advised).
+
+    auth_idle
+        How long, in seconds, to wait before disconnecting authenticated
+        connections. By RFC specification, this must be longer than 30
+        minutes. The default is an hour; set to zero to disable.
+
+    server_cert
+        Path to the SSL certificate that the server should use. This can be
+        either a relative or absolute path.
+
+    server_key
+        Path to the SSL certificate key that the server should use. This can
+        be either a relative or absolute path.
+
+    It also accepts the following Net::Server arguments -- see its
+    documentation for details on their use.
+
+    "log_level" in Net::Server
+    "log_file" in Net::Server
+    "syslog_logsock" in Net::Server
+    "syslog_ident" in Net::Server
+    "syslog_logopt" in Net::Server
+    "syslog_facility" in Net::Server
+    "pid_file" in Net::Server
+    "chroot" in Net::Server
+    "user" in Net::Server
+    "group" in Net::Server
+    "reverse_lookups" in Net::Server
+    "allow" in Net::Server
+    "deny" in Net::Server
+    "cidr_allow" in Net::Server
+    "cidr_deny" in Net::Server
+
+  run
+    Starts the server; this method shouldn't be expected to return. Within
+    this method, $Net::IMAP::Server::Server is set to the object that this
+    was called on; thus, all IMAP objects have a way of referring to the
+    server -- and though "connection", whatever parts of the IMAP internals
+    they need.
+
+    Any arguments are passed through to "run" in Net::Server.
+
+  process_request
+    Accepts a client connection; this method is needed for the Net::Server
+    infrastructure.
+
+  DESTROY
+    On destruction, ensure that we close all client connections and
+    listening sockets.
+
+  connections
+    Returns an arrayref of Net::IMAP::Server::Connection objects which are
+    currently connected to the server.
+
+  connection
+    Returns the currently active Net::IMAP::Server::Connection object, if
+    there is one. This is determined by examining the current coroutine.
+
+  concurrent_mailbox_connections [MAILBOX]
+    This can be called as either a class method or an instance method; it
+    returns the set of connections which are concurrently connected to the
+    given mailbox object (which defaults to the current connection's
+    selected mailbox)
+
+  concurrent_user_connections [USER]
+    This can be called as either a class method or an instance method; it
+    returns the set of connections whose "user" in
+    Net::IMAP::Server::DefaultAuth is the same as the given USER (which
+    defaults to the current connection's user)
+
+  capability
+    Returns the "CAPABILITY" string for the server. This string my be
+    modified by the connection before being sent to the client (see
+    "capability" in Net::IMAP::Server::Connection).
+
+  id
+    Returns a hash of properties to be conveyed to the client, should they
+    ask the server's identity.
+
+  add_command NAME => PACKAGE
+    Adds the given command "NAME" to the server's list of known commands.
+    "PACKAGE" should be the name of a class which inherits from
+    Net::IMAP::Server::Command.
+
+  log SEVERITY, MESSAGE
+    By default, defers to "log" in Net::Server, which outputs to syslog, a
+    logfile, or STDERR, depending how it was configured. Net::Server's
+    default is to print to STDERR. If you have custom logging needs,
+    override this method, or "write_to_log_hook" in Net::Server.
+
+Object model
+    An ASCII model of the relationship between objects is below. In it,
+    single lines represent scalar values, and lines made of other characters
+    denote array references or relations.
+
+       +----------------------------------------------+
+       |                                              |
+       |                    Server                    |
+       |                                              |
+       +1-----2---------------------------------------+
+        #     |      ^         ^            ^        ^
+        #     |      |         |            |        |
+        #     v      |         |            |        |
+        #   +--------1-------+ |     +------1------+ |
+        ###>|   Connection   |<------2   Command   | |
+        #   +--4-----3------2+ |     +-------------+ |
+      ,-#------'     |      `--------------.         |
+      | #            v         |           v         |
+      | #   +----------------+ |     +-------------+ |
+      | #   |     Model      2------>|    Auth     | |
+      | #   +--------1-------+ |     +-------------+ |
+      | #            `---------------------------------.
+      | #                      |                     | |
+      | #                  ,---'                 ,---' |
+      | #   +--------------1-+       +-----------1-+   |
+      | ###>|   Connection   |<------2   Command   |   |
+      |     +--4-5---3------2+       +-------------+   |
+      | ,------' *   |      `--------------.           |
+      | | ********   v                     v           |
+      | | * +----------------+       +-------------+   |
+      | | * |     Model      2------>|    Auth     |   |
+      | | * +--------1-------+       +-------------+   |
+      | | *          |                                 |
+      | | *          |  ,------------------------------'
+      | | *          |  |           ^ SERVER
+     .|.|.*..........|..|................................
+      | | *          |  |           v MODEL
+      | | *          v  v
+      | '-*---->+-------------+<------------.
+      '---*---->|   Mailbox   |<----------. |
+          *     +-1------2-3--+<----.     | |
+          *       @   ^  $ %        |     | |
+          *       @   |  $$$$>+-----1---+ | |
+          *       @   |  $ %  |         | | |
+          *       @   |  $ %%>| Message | | |
+          *       @   |  $ %  |         | | |
+          ********@***|******>+---------+ | |
+          *       @   |  $ %              | |
+          *       @   |  $$$$>+---------+ | |
+          *       @   |    %  |         | | |
+          *       @   |    %%>| Message 1-' |
+          *       @   |       |         |   |
+          ********@***|******>+---------+   |
+          *       @   |                     |
+          *       @   |       +---------+   |
+          *       @   |       | Message 1---'
+          ********@***|******>+---------+
+                  @   |
+                  @  +4----------+
+                  @@>|  Mailbox  |
+                     +-----------+
+
+    The top half consists of the parts which implement the IMAP protocol
+    itself; the bottom contains the models for the backing store. Note that,
+    for the most part, the backing store is unaware of the framework of the
+    server itself.
+
+    Each model has references to others, as follows:
+
+    Server
+        Contains references to the set of "connections" (1). It also has a
+        sense of the *current* "connection" (2), based on the active Coro
+        thread.
+
+    Connection
+        Connections hold a reference to their "server" (1). If the
+        connection has authenticated, they hold a reference to the "auth"
+        object (2), and to their "model" (3). If a mailbox is "selected"
+        (4), they hold a pointer to that, as well. Infrequently, the
+        connection will need to temporarily store references to the set of
+        "temporary_messages" (5) which have been expunged in other
+        connections, but we have been unable to notify this connection of.
+
+    Command
+        Commands store their "server" (1) and "connection" (2).
+
+    Model
+        Models store a reference to the "root" (1) of their mailbox tree, as
+        well as to the "auth" (2) which gives them access to such.
+
+    Mailbox
+        Mailboxes store a list of "children" mailboxes (1), and "messages"
+        (2) contained within them, which are stored in sequence order. They
+        also contain a hash of "uids" (3) for fast UID retrieval of
+        messages. If they are not the root mailbox, they also store a
+        reference to their "parent" mailbox (4).
+
+    Message
+        Messages store the "mailbox" (1) in which they are contained.
+
+DEPENDENCIES
+    Coro, Net::Server::Coro
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to
+    "bug-net-imap-server@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
+
+    A low-traffic mailing list exists for discussion on how to (ab)use this
+    module, at
+    <http://lists.bestpractical.com/cgi-bin/mailman/listinfo/net-imap-server
+    >.
+
+AUTHOR
+    Alex Vandiver "<alexmv@bestpractical.com>"
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2010, Best Practical Solutions, LLC. All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

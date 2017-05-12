@@ -1,0 +1,33 @@
+Net-CIDR-ORTC version 0.02
+==========================
+
+This module implements Optimal Routing Table Compressor (ORTC) algorithm as
+described by Richard P. Draves, Christopher King, Srinivasan Venkatachary, and
+Brian N. Zill in MSR-TR-98-59 technical report.
+
+This module intended for off line data processing and can be used as
+preprocessor for various CIDR (ip prefix -> value) maps. For example it can be
+useful for decrease size of maps used via nginx geo module (http://nginx.org/r/geo).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module tested on perl5.10 and later and uses only modules bundled with
+perl5.10.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 Denis Pokataev
+Copyright (C) 2012-2013 by Anton Yuzhaninov
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.2 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,217 @@
+#!/usr/bin/perl
+#
+# psapd: Perl SAP Daemon
+# A Session Announcement Protocol Server
+#
+# Copyright (C) 2004 University of Southampton
+#
+# Nicholas Humfrey
+# njh@ecs.soton.ac.uk
+#
+
+use strict;
+use Net::SAP;
+use Getopt::Std;
+use Pod::Usage;
+
+our $VERSION = '0.1';
+
+
+# Unbuffer STDOUT
+$|=1;
+
+# Parse command line
+our($opt_h, $opt_g, $opt_p, $opt_q, $opt_V);
+Getopt::Std::getopts('Vhqg:p:');
+
+# Show version ?
+if ($opt_V) {
+	print "psapd version v$VERSION\n";
+	exit(0);
+}
+
+# Show help ?
+pod2usage(1) if ($opt_h or $#ARGV==-1);
+
+# Set Defaults
+$opt_g = 'ipv4' if (!defined $opt_g);
+$opt_p = 10 if (!defined $opt_p);
+
+
+
+# Create SAP socket
+my $sap = new Net::SAP( $opt_g );
+if (!$sap) {
+	die "Failed to create SAP socket.";
+}
+
+
+# Display some diagnostic information
+if (!$opt_q) {
+	print "SAP Multicast Group: $opt_g (".$sap->group().")\n";
+	print "Period between announcements: $opt_p secs\n";
+}
+
+
+# Create packet objects
+my @packets = create_packets( @ARGV );
+
+# Got any valid packets ?
+if (scalar(@packets) < 1) {
+	die "Aborting: havn't got any valid session descriptions to advertise.\n";
+}
+
+
+
+
+
+# Main Loop
+our $running = 1;
+while($running) {
+	foreach my $packet ( @packets ) {
+		$sap->send( $packet );
+		print "." unless ($opt_q);
+		sleep $opt_p;
+	}
+	print " " unless ($opt_q);
+}
+
+
+# Close the socket (and leave multicast group)
+$sap->close();
+
+
+
+
+
+
+#
+# Create a Net::SAP::Packet object for each of 
+# the files on the command line
+#
+sub create_packets {
+	my @packets = ();
+	
+	foreach my $file ( @_ ) {
+		my $sdp = read_sdp_file( $file );
+		
+		if (defined $sdp) {
+			my $sap = new Net::SAP::Packet();
+			
+			$sap->payload( $sdp );
+		
+			# If packet is more than 1k,
+			# then turn on compression
+			if (length($sdp) > 1024) {
+				$sap->compressed( 1 );
+			}
+		
+			push( @packets, $sap );
+
+			print "Announcing: $file (".length($sdp)." bytes)\n" unless ($opt_q);
+
+		}
+	
+	}
+
+	return @packets;
+}
+
+
+# 
+# Read in the contents of the SDP file
+#
+sub read_sdp_file {
+	my $file = shift;
+	
+	# Open file
+	if (!open(FILE, $file)) {
+		warn "Failed to open file ($file) : $!.\n";
+		return undef;
+	}
+
+	# Read in the first line
+	my $data = <FILE>;
+	if ($data !~ /^v=0/) {
+		warn "File ($file) doesn't look like an SDP file.\n";
+		close(FILE);
+		return undef;
+	}
+
+	# Read in the rest of the file
+	while( <FILE> ) { $data .= $_; }
+	
+	close(FILE);
+	
+	return $data;
+}
+
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+psapd - Perl SAP Daemon
+
+=head1 SYNOPSIS
+
+psapd [-hVq] [-p period] [-g group] file1.sdp [file2.sdp ...]
+
+=head1 DESCRIPTION
+
+A lightweight Session Announcement Protocol Server written in perl.
+
+=head2 OPTIONS
+
+=over 4
+
+=item B<-h>
+
+Displays psapd help / usage.
+
+=item B<-V>
+
+Displays psapd version.
+
+=item B<-g> <group>
+
+The multicast group to send the packets to:
+
+	ipv4
+	ipv6-node
+	ipv6-link
+	ipv6-site
+	ipv6-org
+	ipv6-global
+
+Default is to use ipv4.
+
+=item B<-p> <period>
+
+The delay (in seconds) be between sending packets.
+
+Default is 10 seconds.
+
+=item B<-q>
+
+Be Quiet. Disables informative messages.
+
+
+=back
+
+=head1 AUTHOR
+
+Nicholas Humfrey, njh@ecs.soton.ac.uk
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2004 University of Southampton
+
+This script is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.005 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

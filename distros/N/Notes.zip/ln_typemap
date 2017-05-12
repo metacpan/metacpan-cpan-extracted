@@ -1,0 +1,47 @@
+TYPEMAP
+
+# Typemaps specific for the Notes C API V5.0.11 work
+
+LN_Object *     	O_LN_OBJECT
+LN_Session *    	O_LN_OBJECT
+LN_Database *   	O_LN_OBJECT
+LN_View *       	O_LN_OBJECT
+LN_Document *       	O_LN_OBJECT
+LN_Replication *        O_LN_OBJECT
+LN_Acl *        	O_LN_OBJECT
+LN_AclEntry *   	O_LN_OBJECT
+
+LN_Name *               O_LN_HASH
+LN_ViewColumn *         O_LN_HASH
+
+#############################################################################
+OUTPUT
+O_LN_OBJECT
+      /* must NOT be used - ALWAYS use PPCODE-section for obj creation*/
+      /* enforce C compilation error to prevent unintentional use     */
+   ++**intentional_c_error; 
+   die( \"${Package}::$func_name() -- $arg , $var MUST use PPCODE\" );   
+O_LN_HASH
+      /* must NOT be used - ALWAYS use PPCODE-section for obj creation*/
+      /* enforce C compilation error to prevent unintentional use     */
+   ++**intentional_c_error; 
+   die( \"${Package}::$func_name() -- $arg , $var MUST use PPCODE\" );
+   
+#############################################################################
+INPUT
+O_LN_OBJECT
+   /* NOTE: ALL O_LN_OBJECT C-types MUST be typedef'ed to SV  */
+   if ( sv_isobject( $arg ) && ( SvTYPE( SvRV( $arg ) ) == SVt_PVMG) ) {
+      $var = ($type) $arg;
+   } else {
+     warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+     XSRETURN_UNDEF;
+   }   
+O_LN_HASH
+   /* NOTE: ALL O_LN_HASH C-types MUST be typedef'ed to HV  */
+   if ( sv_isobject( $arg ) && ( SvTYPE( SvRV( $arg ) ) == SVt_PVHV) ) {
+      $var = (HV*)SvRV((SV*)$arg);
+   } else {
+     warn( \"${Package}::$func_name() -- $var is not a blessed HV reference\" );
+     XSRETURN_UNDEF;
+   } 

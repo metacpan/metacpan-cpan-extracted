@@ -1,0 +1,36 @@
+---
+abstract: 'Identify IPs that fall within collections of network blocks'
+author:
+  - 'Reid Augustin <reid@hellosix.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-IP-Identifier
+requires:
+  Carp: '0'
+  DBI: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  IPC::Run: '0'
+  Math::BigInt: '0'
+  Module::Pluggable: '0'
+  Moo: '0'
+  Net::IP: '0'
+  Regexp::Common: '0'
+  Role::Tiny: '0'
+  Role::Tiny::With: '0'
+  Try::Tiny: '0'
+  namespace::clean: '0'
+  overload: '0'
+  parent: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+version: '0.111'

@@ -1,0 +1,18 @@
+Revision history for Perl extension Net::Amazon::S3::Tools.
+
+0.01  Thu Oct 11 16:02:39 2007
+	- original version; created by h2xs 1.23 with options
+		-XAn Net::Amazon::S3::Tools
+
+0.06  Fri Oct 12 01:15:00 2007
+	- MakeMaker configuration
+        - merged via hg with s3-tools v0.05
+	- license LGPLv2.1
+	- many doc fixes
+
+0.07  Mon Apr 28 14:28:14 PDT 2008
+	- remove dependecy on XML::Simple
+
+0.08  Wed Feb 25 21:37:17 EST 2009
+        - add s3rm
+	- convert to bzr and move to Launchpad

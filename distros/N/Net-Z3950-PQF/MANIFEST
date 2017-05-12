@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Net/Z3950/PQF.pm
+lib/Net/Z3950/PQF/Node.pm
+t/1-node.t
+t/2-parser.t
+t/3-simpleserver.t
+META.yml                                 Module meta-data (added by MakeMaker)

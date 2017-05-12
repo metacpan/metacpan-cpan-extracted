@@ -1,0 +1,38 @@
+Revision history for Perl extension ICB.
+
+1.0   11/20/96
+	- Basic idea with David Van Brink.
+	- Split into module FNET.pm
+
+1.3   8/28/97
+	- Redesigned to an OO interface.
+
+1.4   11/13/97
+	- Use IO::Socket::INET.pm
+	- Unpack packet within readit().
+	- First open release.
+
+1.5   Wed Oct  7 22:01:00 1998
+	- Initial revision from h2xs.
+	- Added hashed arguments to new.
+
+1.60  Fri Oct  9 22:01:00 1998
+	- Renamed readit() and sendit().
+	- Added default values.
+	- Added bounds checking in sendpacket(), 254 char string.
+	- Changed server to default.icb.net
+	- Built test.pl to do minor testing (requires live server)
+		login, private, cmd (beep), large string clipping.
+	- Renamed to ICB.pm
+	- Internalized methods use die() to return errors.
+	- Public methods use eval() to call internal methods.
+	- Added error()/clearerr() methods: {'errstr'} setting.
+	- Added sendpong() in readmsg() when a ping packet is received.
+		(put this in client instead?)
+	- Added debug() method: {'debug'} setting.
+	- Added die on bad parameters to instance methods.
+	- Nice documentation and some random example code.
+
+1.61  Tue Oct 20 23:32:49 PDT 1998
+	- Added close() method.
+	- Moved test.pl in t/test.t

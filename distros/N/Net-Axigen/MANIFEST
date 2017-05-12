@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-Axigen.t
+lib/Net/Axigen.pm
+samples/domain_create.pl
+samples/domain_unregister.pl
+samples/domain_register.pl
+samples/add_account.pl
+samples/remove_account.pl
+samples/compact_domains.pl
+samples/accounts_info.pl
+samples/io_exception_dbg.pl
+META.yml                                 Module meta-data (added by MakeMaker)

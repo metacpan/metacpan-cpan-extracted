@@ -1,0 +1,79 @@
+#!perl
+
+use Data::Dumper;
+
+system("pwd");
+
+$RESULT = "t/config";
+my %REQUIRED = 
+  (keyname => ["Name of shared secret", "omkey"],
+   keytype => ["Shared secret type", "hmac-md5"],
+   key => "Shared secret",
+   host => "Main server host",
+   'lease-addr-range' => "Range of addresses on which leases are sought",
+   'failover-name' => "Name of failover system",
+   'failover-hosts' => ["List of hosts on which to try failover testing",
+			[] ],
+  );
+
+my $OLD_OK = -e($RESULT) && do $RESULT;
+#my $res = do $RESULT;
+#{ my $r = defined($res) ? "<$res>" : "UNDEF";
+#  warn "do '$RESULT' => $r ($@)\n";
+#}
+#$OLD_OK &&= $res;
+if ($OLD_OK) { warn "Found old configuration file; loaded it.\n" }
+for my $k (keys %REQUIRED) {
+    next if $OLD_OK && defined $dhcpCONFIG{$k};
+    print "This is the configurator for the test suite.
+If you don't know what something is, type '?'.
+To take the default, type ENTER.
+\n" if $CHANGED++ == 0;
+    ask_about($k);
+}
+
+write_data() if $CHANGED;
+print "Hit ENTER to continue, or anything else to manually edit
+the configuration file.\n";
+chomp(my $resp = <STDIN>) ;
+exit 0 if $resp eq "";
+my $editor = $ENV{VISUAL} || $ENV{EDITOR} || "/bin/ed";
+system($editor, $RESULT);
+
+sub ask_about {
+    my $k = shift;
+    my $v = $REQUIRED{$k};
+    my ($explain, $default);
+    if (ref $v) {
+	($explain, $default) = @$v;
+    } else {
+	$explain = $v;
+    }
+  prompt: {
+	my $prompt = defined($default) ? "$k [$default]> " : "$k> ";
+	print $prompt;
+	chomp(my $resp = <STDIN>);
+	$resp =~ s/^\s+//;
+	$resp =~ s/\s+$//;
+
+	if ($resp eq "?") {
+	    print $explain, "\n";
+	    redo prompt;
+	} elsif ($resp eq "") {
+	    if (defined $default) {
+		$dhcpCONFIG{$k} = $default;
+	    }  else { 
+		redo prompt;
+	    }
+	} else {
+	    $dhcpCONFIG{$k} = $resp;
+	}
+    }
+}
+
+sub write_data {
+    open R, ">", $RESULT 
+      or die "Couldn't open config file '$RESULT' for writing: $!; aborting";
+    print R Data::Dumper->Dump([\%dhcpCONFIG], ["*dhcpCONFIG"]);
+    close R or die "Couldn't finish writing '$RESULT': $!; aborting";
+}

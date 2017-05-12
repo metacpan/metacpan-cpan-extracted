@@ -1,0 +1,77 @@
+NAME
+    Nitesi - Open Source Shop Machine
+
+VERSION
+    0.0094
+
+DESCRIPTION
+    Nitesi, the Open Source Shop Machine, is the Modern Perl ecosystem for
+    online business.
+
+    This module provides the following APIs:
+
+    Carts
+        Nitesi::Cart
+
+    Products
+        Nitesi::Product
+
+    Account Management
+        Nitesi::Account::Manager
+
+    To build your own business website, please take a look at our Dancer
+    plugin: Dancer::Plugin::Nitesi.
+
+BUNDLES
+    The following bundles are available for Nitesi:
+
+    DBI Nitesi::DBI
+
+CART
+    Nitesi supports multiple carts, automatic collapsing of similar items
+    and price caching.
+
+CAVEATS
+    Please anticipate API changes in this early state of development.
+
+AUTHOR
+    Stefan Hornburg (Racke), `racke@linuxia.de'
+
+BUGS
+    Please report any bugs or feature requests to `bug-nitesi at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Nitesi. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Nitesi
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Nitesi
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Nitesi
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Nitesi
+
+    * Search CPAN
+        http://search.cpan.org/dist/Nitesi/
+
+ACKNOWLEDGEMENTS
+    Marco Pessotto (patch fixing crash in logout)
+
+LICENSE AND COPYRIGHT
+    Copyright 2011-2013 Stefan Hornburg (Racke).
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

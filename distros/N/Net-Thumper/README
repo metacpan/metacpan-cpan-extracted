@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Net-Thumper,
+version 0.03:
+
+  a rudimentary Pure Perl AMQP client
+
+This software is copyright (c) 2013 by Sam Crawley.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

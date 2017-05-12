@@ -1,0 +1,122 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use NetHack::PriceID 'priceid';
+use Getopt::Euclid ':minimal_keys';
+# PODNAME: priceid
+# ABSTRACT: identify NetHack items using shopkeepers
+
+$\ = "\n";
+$| = 1;
+
+for (qw/buy sell base/) { $ARGV{in} = $_ if $ARGV{$_} }
+
+die "You must specify a charisma when buying.\n"
+    if $ARGV{in} && $ARGV{in} eq 'buy' && !defined($ARGV{charisma});
+
+my @results = priceid(%ARGV, out => 'both');
+
+if (!@results) { print "No matches." }
+elsif (!ref($results[0])) { print join ', ', @results }
+else
+{
+    for (@results)
+    {
+        my ($base, @items) = @$_;
+        print "$base: ", join ', ', @items;
+    }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+priceid - identify NetHack items using shopkeepers
+
+=head1 VERSION
+
+version 0.05
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+=item -t[ype] [:] <type>
+
+The item type that you're IDing, such as wand or ! (potion).
+
+=for Euclid: type.type: /([\"?+=!\/(\[]|amulet|scroll|spellbook|ring|potion|wand|tool|bag|lamp|flute|horn|armor|shirt|suit|cloak|helmet|gloves|shield|boots)/
+
+=item -a[mount] [:] <amount>
+
+The cost or price of the item(s).
+
+=for Euclid: amount.type: int > 0
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item -i[n] [:] <in>
+
+The type of operation (buy, sell, base). Default: base
+
+=for Euclid: in.type: /(b(uy)?|s(ell)?|base)/
+
+=item --buy
+
+Shortcut for -i buy
+
+=item --sell
+
+Shortcut for -i sell
+
+=item --base
+
+Shortcut for -i base
+
+=item -c[h[a[risma]]] [:] <charisma>
+
+Your character's charisma. Required only for buying.
+
+=for Euclid: charisma.type: int > 0
+
+=item --dunce
+
+Your character is wearing a dunce cap.
+
+=item --tourist
+
+Your character is a level 14 or less Tourist, OR are wearing an uncovered shirt.
+
+=item --angry
+
+The shopkeeper is angry with you (it's very obvious when this is true).
+
+=item -q[uan[tity]] [:] <quan>
+
+The number of items in the stack that you're buying/selling.
+
+=for Euclid: quan.type: int > 0
+    quan.default: 1
+
+=back
+
+=head1 AUTHOR
+
+Shawn M Moore <code@sartak.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Shawn M Moore.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,27 @@
+Revision history for Net-MessageBus
+
+0.01    2012-03-07
+        First version
+0.02    2012-03-08
+        Fixed problems when readin large ammounts of messages from the server
+        Added more tests
+        Better logging
+0.03    2012-03-09
+        Added missing tests to the test suite
+        Updated dependecies list
+        Added UTF8 tests
+0.04	2012-03-10
+		Added missing module dependecy to the Server module
+		More POD fixes
+0.05	2012-03-10
+		Added subscribe_all and unsubscribe functionality to the client
+		Small fixes to the tests
+0.06	2012-03-13
+		Implemented fix for the stop command on Windows systems
+0.07	2012-03-16
+		Implemented blocking flag and made the timeout for waiting messages from the server configurable
+		Fixed bug in Net::MessageBus::Server module
+0.08	2012-03-29
+        General improvements
+        Fixed blocking mode bug for client
+        Speed improvements

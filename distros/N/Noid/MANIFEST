@@ -1,0 +1,20 @@
+Changes
+lib/Noid.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+noid
+noid.pdf
+Noid.pdf
+README
+t/bind.t
+t/dbcreate.t
+t/noid1.t
+t/noid2.t
+t/noid3.t
+t/noid4.t
+t/noid5.t
+t/noid6.t
+t/noid7.t
+t/noid8.t
+VERSION

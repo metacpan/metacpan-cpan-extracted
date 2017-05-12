@@ -1,0 +1,102 @@
+Net::DNSServer - Perl Name Server
+=================================
+
+TABLE OF CONTENTS
+-----------------
+
+1.  Description
+2.  Files
+3.  Availability
+4.  Bugs
+5.  Copyright
+6.  Credits
+
+
+1. DESCRIPTION
+--------------
+
+Net::DNSServer is a secure and extensible name server.
+To read about the latest features, see the Changes file.
+To find out about known bugs and to see what's planned
+for future versions, see the BUGS and TODO files.
+
+Any suggestions, ideas, patches, etc are welcome.
+Let me know if you have questions or if you've found
+some bugs.  I'll implement what I feel is best, and
+I'll be sure to give you credit.
+
+WARNING:
+Net::DNSServer is still in PreAlpha phase.
+This module is still highly experimental.
+It is not meant for production use yet.
+
+2. FILES
+--------
+
+demo
+ - Demonstration scripts directory
+ - See demo/README
+conf/named.conf
+ - Copied from default caching-nameserver-7.0-6
+ - (May be removed in future versions.)
+conf/named.root
+ - ftp://ftp.rs.internic.net/domain/named.root
+lib/Net/DNSServer.pm
+ - Main name server engine
+lib/Net/DNSServer/ConfParser.pm
+ - Only subroutines for reading conf files.
+ - (May be removed in future versions.)
+lib/Net/DNSServer/*
+ - Various resolver modules
+
+3. AVAILABILITY
+---------------
+
+You can get the latest version of Net::DNSServer
+from CPAN or from the dnsserver homepage:
+
+  http://www.cpan.org./modules/by-module/Net/
+  http://freeware.roobik.com/dnsserver/
+
+See the INSTALL document for installation
+instructions.
+
+4. BUGS
+-------
+
+Net::DNSServer is still in PreAlpha phase.
+See the BUGS file for more information.
+
+5. COPYRIGHT
+------------
+
+Copyright (c) 2002 Rob Brown.  All rights reserved.
+Net::DNSServer is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+6. CREDITS
+-----------
+
+Rob Brown <bbb@cpan.org>
+ - http://freeware.roobik.com/dnsserver/
+ - Wrote the majority of code.
+
+Paul Seamons <paul@seamons.com>
+ - http://seamons.com/
+ - Net::Server made this project much easier.
+
+Michael Fuhr <mfuhr@dimensional.com>
+Chris Reinhardt <ctriv@dyndns.org>
+ - http://www.net-dns.org/
+ - Very large contributor (Net::DNS)
+
+Sam Tregar <sam@tregar.com>
+ - http://www.cpan.org/authors/id/S/SA/SAMTREGAR/
+ - IPC::SharedCache is perfect for holding the
+   DNS information with a TTL validate_hook for
+   Net::Server::PreFork servers.
+ - It is the guts of my SharedCache resolver.
+
+
+---------------------------
+$Id: README,v 1.8 2002/06/07 23:21:53 rob Exp $

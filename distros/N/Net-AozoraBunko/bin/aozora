@@ -1,0 +1,139 @@
+#!perl
+use strict;
+use warnings;
+use Getopt::Compact::WithCmd;
+use Net::AozoraBunko;
+use Encode qw//;
+
+my $opt = {};
+
+my $go = Getopt::Compact::WithCmd->new(
+    name          => 'aozora',
+    version       => $Net::AozoraBunko::VERSION,
+    command_struct => {
+        search => {
+            desc => 'search author by keyword',
+            command_struct => {
+                author => {
+                    args => 'keyword',
+                    desc => 'search an author by the keyword',
+                },
+                work => {
+                    options    => [
+                        [ [qw/i id/], "author's id", '=i', \my $id, { default => 0 } ],
+                        [ [qw/u url/], "author's url", '=s', \my $url, { default => '' } ],
+                    ],
+                    args => 'keyword',
+                    desc => 'search a work by the keyword',
+                },
+            },
+        },
+        download => {
+            desc => 'download the text and print it on the screen',
+            args => 'url',
+        },
+    },
+);
+
+my $opts = $go->opts;
+my $cmd  = $go->command or $go->show_usage;
+
+&main;
+exit;
+
+sub main {
+    __PACKAGE__->can($cmd)->(${$go->commands}[1]);
+}
+
+sub search {
+    my $keyword    = Encode::decode_utf8(shift @ARGV) or $go->show_usage;
+    my $second_cmd = shift;
+
+    if ($second_cmd eq 'author') {
+        search_author($keyword);
+    }
+    else {
+        search_work($keyword);
+    }
+}
+
+sub search_author {
+    my $keyword = shift;
+
+    my $results = Net::AozoraBunko->new->search_author($keyword);
+    my $num = @$results;
+    unless (@$results) {
+        out("sorry, [$keyword] did not match.");
+        return;
+    }
+    print "About $num results:\n";
+    for my $r (@$results) {
+        my ($id) = ($r->{url} =~ m!/person(\d+)\.!);
+        out("$r->{name}\t$id\t$r->{url}");
+    }
+}
+
+sub search_work {
+    my $keyword = shift;
+
+    if (!$id && !$url) {
+        out("Error: required id or url.");
+    }
+
+    my $results = Net::AozoraBunko->new->search_work($id || $url, $keyword);
+    my $num = @$results;
+    unless (@$results) {
+        out("sorry, [$keyword] did not match.");
+        return;
+    }
+    print "About $num results:\n";
+    for my $r (@$results) {
+        out("$r->{title}\t$r->{url}");
+    }
+
+}
+
+sub out {
+    my $str = shift || '';
+    print Encode::encode_utf8($str)."\n";
+}
+
+sub download {
+    my $url = shift @ARGV or $go->show_usage;
+
+    out(Net::AozoraBunko->new->get_text($url));
+}
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+aozora - the command line interface for Aozora Bunko <http://www.aozora.gr.jp/>
+
+
+=head1 SYNOPSIS
+
+show help:
+
+    $ aozora
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>
+
+
+=head1 SEE ALSO
+
+L<Net::AozoraBunko>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=cut

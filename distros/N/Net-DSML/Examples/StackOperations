@@ -1,0 +1,69 @@
+#!/usr/local/bin/perl 
+use Net::DSML;
+use Net::DSML::Filter;
+use Net::DSML::Control;
+        
+# 
+# Be sure to set up the first line to point to your perl executable location.
+#
+# Fill in the server and  base variables with values that
+# match your configuration.
+#
+# 
+# This examples shows how to stack several request into one batch request.
+# 
+my  $server = "http://dsml.yourcompany.com:8080/dsml";
+my  $base = "cn=Burning Man,ou=people,dc=yourcompany,dc=com";
+
+my $webdsml;
+
+   #
+   # Batch request.
+   #
+
+   $webdsml = Net::DSML->new(  { url => $server } );
+
+   #
+   #  We are going to do a root DSE data search now
+   #
+
+   $webdsml->setRequestId( { id => "12356" } );  # Set Batch request id.
+
+   @name = ();
+
+   push(@name,"namingContexts");
+   push(@name,"supportedLDAPversion");
+   push(@name,"vendorName");
+   push(@name,"vendorVersion");
+   push(@name,"supportedSASLMechanisms");
+
+   if (!($webdsml->rootDSE( { attributes => \@name } )))
+   {
+      print "RootDSE error.\n";
+      print $webdsml->error, "\n";
+      exit;
+   }
+
+   #
+   #  We are going to do a compare command now
+   #
+
+   if ( !( $webdsml->compare( { dn => $base, attribute => "cn", value => "Super Man" } ) ) )
+   {
+      print "Compare error.", "\n";
+      print $webdsml->error, "\n";
+      exit;
+    }
+
+   if (!($webdsml->send()))
+   {
+      print "RootDSE and Compare send request error.\n";
+      print $webdsml->error(),"\n";
+      exit;
+   }
+
+# get the return xml content, should be the status of the dsml request.
+# Should be several responses in this message.
+$postData = $webdsml->content();
+print $postData, "\n";
+

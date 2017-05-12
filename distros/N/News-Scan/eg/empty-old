@@ -1,0 +1,67 @@
+#! /usr/local/bin/perl -w
+
+use strict;
+
+use Date::Parse;
+
+sub usage {
+    "Usage: $0 age [dir]\n" .
+    "where:\n" .
+    "  - age is the age in days\n" .
+    "  - dir is the directory to scan (. by default)\n"
+}
+ 
+die usage unless @ARGV == 2 || @ARGV == 3;
+
+my $age   = shift;
+my $dir   = shift;
+
+unless ($age =~ /^\d+$/) {
+    die "$0: age must be an integer\n";
+}
+
+$dir = '.' unless defined $dir;
+
+opendir DIR, $dir or die "$0: opendir $dir: $!\n";
+
+open SEEN, ">>$dir/.seen" or die "$0: open >>$dir/.seen: $!\n";
+
+$/ = "";
+my $file;
+my $hdr;
+my $path;
+while ($file = readdir DIR) {
+    next if $file eq ".seen";
+
+    $path = "$dir/$file";
+
+    next unless -f $path;
+
+    if (-s _ == 0) {
+        print SEEN "$file\n" or warn "$0: print SEEN $file: $!\n";
+        unlink $path         or warn "$0: unlink $path: $!\n";
+
+        next;
+    }
+
+    unless (open ART, $path) {
+        warn "$0: open $path: $!\n";
+        next;
+    }
+
+    $hdr = <ART>;
+
+    unless ($hdr =~ /^Date:\s+(.+)$/mi) {
+        warn "$0: $path: weird header: `$hdr'\n";
+        next;
+    }
+
+    close ART;
+
+    my $time = str2time($1) || 0;
+
+    if ($^T - $time >= $age * 86400) {
+        print SEEN "$file\n" or warn "$0: print SEEN $file: $!\n";
+        unlink $path         or warn "$0: unlink $path: $!\n";
+    }
+}

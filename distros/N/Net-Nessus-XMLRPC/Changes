@@ -1,0 +1,30 @@
+Revision history for Net-Nessus-XMLRPC
+
+0.30	2010-05-15 10:37
+	Use hashref instead of hash
+	Report functions added	
+
+0.20	2010-04-04 08:52
+	Added ability to list, add, delete and change password
+	of users.
+
+0.10	2010-04-01 18:38
+	Added notice for SSL requirements for LWP
+	Added functions/methods for policy handling
+	Added support for importing the report
+	Added logoff function and support for it in destructor
+	Small fixes, debug support and small enhancements
+
+0.04    2010-03-19 23:27
+	Better default examples, added more examples, 
+	Added license and prerequisites to meta information. 
+
+0.03    2010-03-16 08:31
+	Fixes to documentation, added git repository
+
+0.02    2010-03-16 03:17
+	Corrected documentation, added meta merge
+
+0.01    2010-03-15 23:15
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,28 @@
+
+Net::PicApp -- a module for interacting with the PicApp web service.
+
+	Copyright (c) 2009 Byrne Reese. All rights reserved.
+	This program is free software; you can redistribute it and/or
+	modify it under the same terms as Perl itself.
+
+To install this module, please run:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+For more information on the module, please see the POD documentation
+inside PicApp.pm. ("perldoc Net::PicApp", once it is installed.)
+
+EXAMPLE 
+
+my $pa = Net::PicApp->new();
+my $results = $pa->search("cats");
+foreach my $img (@{$results->images}) {
+   print $img->imageTitle . "\n";
+}
+
+LICENSE
+
+This software is licensed under the same terms as Perl itself.

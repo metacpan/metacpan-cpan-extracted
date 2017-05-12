@@ -1,0 +1,5 @@
+TODO list for Perl module Number::Format::Calc
+
+- Patch Number::Format to allow numbers without thousand-separators
+
+

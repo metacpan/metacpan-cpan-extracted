@@ -1,0 +1,15 @@
+Revision history for Perl extension Net-Groonga-HTTP
+
+0.03 2013-04-25T23:18:41Z
+
+    - Added column_create, dump.
+    - Added test cases.
+
+0.02 2013-04-25T08:05:35Z
+
+    - Documentation enhancements.
+
+0.01 2013-04-25T07:38:23Z
+
+    - original version
+

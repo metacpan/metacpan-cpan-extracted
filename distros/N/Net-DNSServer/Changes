@@ -1,0 +1,71 @@
+Revision history for Perl extension Net::DNSServer.
+
+0.11  Wed Nov 13 13:00:00 2002
+ - Net::DNSServer::Proxy UDP timeout fix.
+ - Continue recv() until packet id matches.
+   Spot by zlevow@corp.virtupay.net (Zach Levow)
+
+0.10  Fri Jun 07 17:30:00 2002
+ - Net::DNSServer::DBMCache improvements:
+ - Remove expired entries.
+ - Change AnyDBM_File to GDBM_File.
+ - Fix validate_ttl usage in fetch_rrs routine.
+   Thanks bonnetain@acm.org (Pierre-Yves Bonnetain)
+
+0.09  Mon Apr 29 05:00:00 2002
+  - Net::DNSServer::Cache: Remove expired entries.
+  - Net::DNSServer::DBI resolver.
+  - demo/mysql: SQL backend working example.
+
+0.08  Tue Apr 17 17:00:00 2002
+  - Get demo/named.forwader to function again.
+  - Fixed "dig" syntax in t/110proxy.t.
+  - Moved commandline parsing operations
+    from configure_hook() to run() to override
+    the Net::Server functionality and allow
+    better bind(8) commandline compatibility.
+  - Removed Cache resolver's init method.
+  - Add spec file for rpm
+
+0.07  Mon Apr 08 01:00:00 2002
+  - Implement timeout feature for Proxy resolver
+    to account for UDP packet loss.
+  - Fix --port and --Pidfile feature.
+  - Add a few more tests and demos.
+
+0.06  Thu Jun 28 23:28:00 2001
+  - Combined hashes into one for Cache
+  - Actually do locking for DBMCache to avoid corruption
+  - Proxy automatically defaults from /etc/resolv.conf
+
+0.05  Mon May 28 21:00:00 2001
+  - Renamed MemCache.pm to SharedCache.pm to avoid confusion
+    between Cache.pm (which is in memory) and also to be
+    more consistent with IPC::SharedCache, which is how
+    I implemented it.
+  - Pass the response packet to the post() method of
+    the resolver to allow fixup style manipulation of
+    the response similar to how Apache works.
+  - Got Net::DNSServer::DBMCache working with freeze/thaw
+  - Added more perldoc.
+
+0.04  Thu May 26 10:00:00 2001
+  - Simpler Cache resolver for Net::Server::Single objects.
+  - Actually runs on old Perl 5.005 now too.
+  - Test suite within t/*.t
+  - Remove dependencies from my internal (non-CPAN) modules.
+  - Fixed some (root) caching bugs.
+  - Makefile.PL PREREQ_PM settings.
+  - Changed run() input syntax back to the old way.
+
+0.03  Thu May 24 09:00:00 2001
+  - Initial attempt at reading and parsing a config file.
+  - Created some functional example scripts.
+
+0.02  Wed May 23 20:00:00 2001
+  - Barely function enough to respond to a udp query.
+
+0.01  Tue May  1 22:01:35 2001
+  - original version created by h2xs
+
+$Id: Changes,v 1.19 2002/11/13 19:57:37 rob Exp $

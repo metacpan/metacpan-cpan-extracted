@@ -1,0 +1,338 @@
+#!/usr/bin/perl -w
+use strict;
+use Data::Dumper;
+use XML::XPath;
+use XML::XPath::XMLParser;
+use Storable qw(nfreeze thaw);
+use IO::Compress::Bzip2 qw(bzip2 $Bzip2Error);
+use IO::Uncompress::Bunzip2 qw(bunzip2 $Bunzip2Error);
+
+use NIST::NVD::Update;
+
+my $filename = $ARGV[0] || 'nvdcve-2.0-recent.xml';
+
+my $store    = $ARGV[1] || 'DB_File';
+
+my $db_file = 'nvdcve-2.0.db';
+
+my $NVD_Updater = NIST::NVD::Update->new(
+    store    => $store,
+    database => $db_file,
+);
+
+my %vuln_software;
+
+print("processing file: $filename...");
+
+my $nvdcve_fd;
+
+open( $nvdcve_fd, q{<}, $filename )
+  or die qq{couldn't open "$filename": $!};
+
+my $NVD_Entry_HASH = {};
+
+my $header;
+my $entry_body;
+my $footer = '</nvd>';
+
+my $content;
+
+my $iter = 0;
+$|++;
+while ( my $line = <$nvdcve_fd> ) {
+
+    if ( $line =~ /(^.*?)<entry/ ) {
+        my $tail = $1;
+        $content .= $tail;
+
+        if ($header) {
+            $entry_body = $content;
+            my $xml_string = $header . $entry_body . $footer;
+            print(".");
+            process_nvd($xml_string);
+            $iter++;
+        }
+        else {
+            $header = $content;
+        }
+
+        $line =~ s/^$tail//;
+        $content = $line;
+
+    }
+    else {
+        $content .= $line;
+    }
+}
+
+print " $iter entries\n";
+
+print "Writing CPE URNs to disk...";
+
+$NVD_Updater->put_cpe([ keys %vuln_software ]);
+
+print "Done.\n";
+
+print "Writing NVD entries to disk...";
+
+$NVD_Updater->put_nvd_entries($NVD_Entry_HASH);
+
+print " Done.\n";
+
+print "Writing CPE index to disk...";
+
+$NVD_Updater->put_cve_idx_cpe( \%vuln_software );
+
+print "Done.\n";
+
+sub process_nvd {
+    my ($xml) = @_;
+
+    my $xp = XML::XPath->new( xml => $xml );
+
+    my $nodeset = $xp->find('/nvd');
+
+    my @nvd_nodelist =
+      grep { $_->getName && $_->getName eq 'nvd' } $nodeset->get_nodelist;
+
+    foreach my $nvd (@nvd_nodelist) {
+        my @entry_nodelist =
+          grep { $_->getName && $_->getName eq 'entry' } $nvd->getChildNodes();
+
+        foreach my $entry_node (@entry_nodelist) {
+            my $entry = process_entry( $entry_node, $nvd );
+
+            my $cve_id = $entry->{'vuln:cve-id'};
+
+            foreach
+              my $cpe_urn ( @{ $entry->{'vuln:vulnerable-software-list'} } )
+            {
+                push( @{ $vuln_software{$cpe_urn} }, $cve_id );
+            }
+
+            $NVD_Entry_HASH->{$cve_id} = $entry;
+        }
+    }
+
+    #  $xp->dispose();
+}
+
+sub process_entry {
+    my ( $entry, $nvd ) = @_;
+
+    my $results = {};
+
+    foreach my $vuln ( $entry->getChildNodes() ) {
+        next unless $vuln->getName();
+        my $nodeName = $vuln->getName();
+
+        if ( $nodeName eq 'vuln:vulnerable-configuration' ) {
+            push( @{ $results->{$nodeName} }, process_vuln_config($vuln) );
+        }
+        elsif ( $nodeName eq 'vuln:vulnerable-software-list' ) {
+            $results->{$nodeName} = process_vuln_software_list($vuln);
+        }
+        elsif ( $nodeName eq 'vuln:cve-id' ) {
+            $results->{$nodeName} = $vuln->string_value();
+        }
+        elsif ( $nodeName eq 'vuln:discovered-datetime' ) {
+            $results->{$nodeName} = $vuln->string_value();
+        }
+        elsif ( $nodeName eq 'vuln:published-datetime' ) {
+            $results->{$nodeName} = $vuln->string_value();
+        }
+        elsif ( $nodeName eq 'vuln:last-modified-datetime' ) {
+            $results->{$nodeName} = $vuln->string_value();
+        }
+        elsif ( $nodeName eq 'vuln:cvss' ) {
+            $results->{$nodeName} = process_vuln_cvss($vuln);
+        }
+        elsif ( $nodeName eq 'vuln:cwe' ) {
+            push( @{ $results->{$nodeName} }, $vuln->getAttribute('id') );
+        }
+        elsif ( $nodeName eq 'vuln:references' ) {
+            push( @{ $results->{$nodeName} }, process_vuln_references($vuln) );
+        }
+        elsif ( $nodeName eq 'vuln:summary' ) {
+            $results->{$nodeName} = $vuln->string_value();
+        }
+        elsif ( $nodeName eq 'vuln:security-protection' ) {
+            $results->{$nodeName} = $vuln->string_value();
+        }
+        elsif ( $nodeName eq 'vuln:assessment_check' ) {
+            push(
+                @{ $results->{$nodeName} },
+                {
+                    map { $_->getName() => $_->getNodeValue() }
+                      ( $vuln->getAttributes() )
+                }
+            );
+        }
+        elsif ( $nodeName eq 'vuln:scanner' ) {
+            push( @{ $results->{$nodeName} }, process_vuln_scanner($vuln) );
+        }
+        else {
+            print(
+                "}elsif( \$vuln->getName() eq '" . $vuln->getName . "' ){\n" );
+            exit;
+        }
+    }
+
+    return $results;
+}
+
+sub process_vuln_config {
+    my ($vuln) = @_;
+
+    my $results = {};
+
+    foreach my $node ( $vuln->getChildNodes() ) {
+        next unless $node->getName();
+        my $nodeName = $node->getName();
+
+        die "}elsif( \$nodeName eq '$nodeName' ){\n"
+          unless ( $nodeName eq 'cpe-lang:logical-test' );
+
+        push( @{ $results->{$nodeName} }, process_cpe_logical_test($node) );
+    }
+
+    return $results;
+}
+
+sub process_cpe_logical_test {
+    my ($logical_test) = @_;
+    my $logTestName = $logical_test->getName();
+
+    my $results = {};
+
+    foreach my $attr ( $logical_test->getAttributes() ) {
+        $results->{attr}->{ $attr->getName() } = $attr->getNodeValue();
+    }
+
+    foreach my $node ( $logical_test->getChildNodes() ) {
+        my $nodeName = $node->getName();
+        next unless $nodeName;
+
+        if ( $nodeName eq 'cpe-lang:fact-ref' ) {
+            push( @{ $results->{$nodeName} }, $node->getAttribute('name') );
+        }
+        elsif ( $nodeName eq 'cpe-lang:logical-test' ) {
+            push( @{ $results->{$nodeName} }, process_cpe_logical_test($node) );
+        }
+        else {
+            die
+"this logical test element looks invalid.  This element is a(n) [$nodeName]";
+        }
+    }
+
+    return $results;
+}
+
+sub process_vuln_software_list {
+    my ($vuln) = @_;
+    my $vulnName = $vuln->getName();
+
+    my $results = [];
+
+    foreach my $node ( $vuln->getChildNodes() ) {
+        my $nodeName = $node->getName();
+        next unless $nodeName;
+
+        die qq[}elsif( \$nodeName eq '$nodeName' ){]
+          unless $nodeName eq 'vuln:product';
+
+        push( @$results, $node->string_value() );
+    }
+
+    return $results;
+}
+
+sub process_vuln_cvss {
+    my ($vuln) = @_;
+
+    my $vulnName = $vuln->getName();
+
+    my $results = {};
+
+    foreach my $attr ( $vuln->getAttribute() ) {
+        next unless $attr;
+        $results->{attr}->{ $attr->getName() } = $attr->getNodeValue();
+    }
+
+    foreach my $node ( $vuln->getChildNodes() ) {
+        my $nodeName = $node->getName();
+        next unless $nodeName;
+
+        if ( $nodeName eq 'cvss:base_metrics' ) {
+            $results->{$nodeName} = {};
+            foreach my $metric ( $node->getChildNodes() ) {
+                my $metricName = $metric->getName();
+                next unless $metricName;
+
+                $results->{$nodeName}->{$metricName} = $metric->string_value();
+            }
+        }
+        else {
+            die qq[}elsif( \$nodeName eq '$nodeName' ){];
+        }
+
+    }
+
+    return $results;
+}
+
+sub process_vuln_references {
+    my ($vuln) = @_;
+
+    my $vulnName = $vuln->getName();
+
+    my $results = {};
+
+    foreach my $attr ( $vuln->getAttributes() ) {
+        next unless $attr;
+        $results->{attr}->{ $attr->getName() } = $attr->getNodeValue();
+    }
+
+    foreach my $node ( $vuln->getChildNodes() ) {
+        my $nodeName = $node->getName();
+        next unless $nodeName;
+
+        if ( $nodeName eq 'vuln:reference' ) {
+            push( @{ $results->{$nodeName} }, process_vuln_references($node) );
+        }
+        elsif ( $nodeName eq 'vuln:source' ) {
+            $results->{$nodeName} = $node->string_value();
+        }
+        else {
+            die qq[}elsif( \$nodeName eq '$nodeName' ){];
+        }
+    }
+
+    return $results;
+}
+
+sub process_vuln_scanner {
+    my ($vuln) = @_;
+
+    my $vulnName = $vuln->getName();
+
+    my $results = {};
+
+    foreach my $node ( $vuln->getChildNodes() ) {
+        my $nodeName = $node->getName();
+        next unless $nodeName;
+
+        if ( $nodeName eq 'vuln:definition' ) {
+            foreach my $attr ( $node->getAttributes() ) {
+                next unless $attr;
+                $results->{$nodeName}->{ $attr->getName() } =
+                  $attr->getNodeValue();
+            }
+        }
+        else {
+            die qq[}elsif( \$nodeName eq '$nodeName' ){];
+        }
+    }
+
+    return $results;
+}

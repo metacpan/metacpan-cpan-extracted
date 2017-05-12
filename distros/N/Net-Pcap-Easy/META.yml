@@ -1,0 +1,37 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+keywords:
+  - pcap
+  - sniffer
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Pcap-Easy
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Slurp: '0'
+  Net::Netmask: '0'
+  Net::Pcap: '0'
+  NetPacket::ARP: '0'
+  NetPacket::Ethernet: '0'
+  NetPacket::ICMP: '0'
+  NetPacket::IP: '0'
+  NetPacket::TCP: '0'
+  NetPacket::UDP: '0'
+  Socket: '0'
+  perl: '5.006001'
+resources:
+  repository: http://github.com/jettero/net--pcap--easy/
+version: '1.4210'

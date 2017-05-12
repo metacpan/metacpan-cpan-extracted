@@ -1,0 +1,62 @@
+Revision history for Nes
+
+1.03    2010/04/14
+        fix can't locate object method "_burst_multipart_buffer"
+        added pseudo_ajax.nhtml object
+        added include_js.nhtml object
+        added dir share/cgi-bin/js
+        added 'js' and 'njs' Nes types
+        now is not necessary place in the template {: $ HTTP-headers :}
+        completely rewritten nesblog sample
+        new API for plugin 'register' 
+        fix cfg perl syntax in the value 
+        added share/cgi-bin/images
+        added multi_step object.
+        Nes support for double quotes on parameters
+        added tag inheritance to Nes.
+        added 'add' method to Singleton for add tags.
+        added Data::Dumper to debug info.
+        added dir share/cgi-bin/obj/Nes/form 
+        allows parameters to obfuscated
+        fix same cookie name in plugins forms and captcha.
+        fix add tag forms captcha.
+        fix add tag forms plugin.
+        fix expire last forms plugin.
+        added secure_login object.
+        Nes Tags, all param allows inclusion.
+        added attempts_for_captcha to forms plugin.
+        fix forms plugin count 2 attempts in autosubmit.
+        fix forms plugin clear attempts.
+        fix tmp_dir in tutorial.
+
+1.02    2010/03/03
+        add {: $ source :} to debub_info.
+        fix chomp source.
+        add tutorial to examples.
+        fix replace 0 as literal.
+        multiples documentation fixes.
+
+1.01    2010/02/28
+        documentation fixes.
+
+1.00    2010/02/28
+        1.00 Release, fisrt Release version of Nes.
+        documentation fixes.
+
+1.00_04 2010/02/27
+        documentation fixes.
+        add more instalation test. 
+
+1.00_03 2010/02/25
+        add -u option in set_nes_site for solves some Linux distributions 
+        are problems with symbolic in cgi-bin.
+
+1.00_02 2010/02/25 
+        Add iprefix option in set_nes_site.
+        Several install fixes.
+
+1.00_01 2010/02/23 
+        Multiples changes in structure of directory and others for CPAN
+        installation, not compatible with earlier versions.
+        
+

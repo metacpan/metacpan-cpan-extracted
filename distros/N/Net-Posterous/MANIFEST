@@ -1,0 +1,21 @@
+Build.PL
+Changes
+lib/Net/Posterous.pm
+lib/Net/Posterous/Comment.pm
+lib/Net/Posterous/Media.pm
+lib/Net/Posterous/Media/Audio.pm
+lib/Net/Posterous/Media/Image.pm
+lib/Net/Posterous/Media/Local.pm
+lib/Net/Posterous/Media/Video.pm
+lib/Net/Posterous/Object.pm
+lib/Net/Posterous/Post.pm
+lib/Net/Posterous/Site.pm
+lib/Net/Posterous/Tag.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00use.t
+t/pod.t
+t/pod-coverage.t
+TODO

@@ -1,0 +1,795 @@
+#!/usr/bin/env perl
+#
+# tkdict - a Perl/Tk DICT client, for accessing network dictionary servers
+#
+# Neil Bowers <neil@bowers.com>
+# Copyright (C) 2001-2002, Neil Bowers
+#
+
+use strict;
+use warnings;
+
+use Tk;
+use Tk::Dialog;
+use Net::Dict;
+use AppConfig::Std;
+
+use vars qw($PROGRAM $VERSION);
+$VERSION = sprintf("%d.%d", q$Revision: 1.1.1.1 $ =~ /(\d+)\.(\d+)/);
+
+my $warn_dialog;
+my $dict_server;
+my $word;
+my $text_window;
+my $bgcolor;
+my $mw;
+my $config;
+my $help;
+my ($info_top, $info_text, $info_title);
+my $ht;
+my %helpString;
+my $dict;
+my ($lookup_mode, $modeDisplay);
+my $mbDefine;
+my ($sframe, $strat_menu, $strategy, $strategyDisplay);
+my ($db_frame, $db_menu, $db, $dbDisplay);
+my $bar3;
+
+main();
+exit 0;
+
+
+#=======================================================================
+#
+# main()
+#
+# This is the main body of tkdict
+#
+#=======================================================================
+sub main
+{
+    initialise();
+    create_gui();
+    if ($config->host)
+    {
+        $dict_server = $config->host;
+        select_server();
+    }
+    $mw->protocol('WM_DELETE_WINDOW', \&tkdict_exit);
+    MainLoop();
+}
+
+#=======================================================================
+#
+# initialise()
+#
+# check config file and command-line
+#
+#=======================================================================
+sub initialise
+{
+    #-------------------------------------------------------------------
+    # Initialise misc global variables
+    #-------------------------------------------------------------------
+    $PROGRAM = "TkDict";
+    $lookup_mode = "define";
+
+    #-------------------------------------------------------------------
+    # Create AppConfig::Std, define parameters, and parse command-line
+    #-------------------------------------------------------------------
+    $config = AppConfig::Std->new()
+        || die "failed to create AppConfig::Std: $!\n";
+
+    $config->define('host',       { ARGCOUNT => 1, ALIAS => 'h' });
+    $config->define('port',       { ARGCOUNT => 1, ALIAS => 'p',
+                                    DEFAULT => 2628 });
+    $config->define('client',     { ARGCOUNT => 1, ALIAS => 'c',
+				    DEFAULT => "$PROGRAM $VERSION ".
+				"[using Net::Dict $Net::Dict::VERSION]",
+				  });
+
+    $config->args(\@ARGV)
+        || die "run \"$PROGRAM -help\" to see valid options\n";
+
+    #-------------------------------------------------------------------
+    # Consistency checking, ensure we have required options, etc.
+    #-------------------------------------------------------------------
+}
+
+#=======================================================================
+#
+# select_server()
+#
+# connect to the server, and get information needed to
+# configure the user interface.
+#
+#=======================================================================
+sub select_server
+{
+
+    if (not defined $dict_server || $dict_server eq '')
+    {
+	configure_dict_gui();
+	return;
+    }
+
+    $word = '';
+
+    #-------------------------------------------------------------------
+    # Create connection to DICT server
+    #-------------------------------------------------------------------
+    $dict = Net::Dict->new($dict_server,
+                           Port   => $config->port,
+                           Client => $config->client,
+			   Debug  => $config->debug,
+                          );
+    if (not defined $dict)
+    {
+	tkd_warn("Failed to connect to DICT server $dict_server");
+	configure_dict_gui();
+	return;
+    }
+
+    configure_dict_gui();
+}
+
+#=======================================================================
+#
+# configure_dict_gui()
+#
+# Configure the relevant bits of the GUI according to
+# the current DICT connection.
+#
+#=======================================================================
+sub configure_dict_gui
+{
+    my @dbs;
+    my %dbhash;
+    my @strats;
+    my %shash;
+
+    $text_window->delete('0.0', 'end');
+    if (not defined $dict)
+    {
+	$bar3->packForget();
+	$db_frame->packForget();
+    }
+    else
+    {
+	$bar3->pack(-side => 'top', -fill => 'x');
+
+	%dbhash = $dict->dbs();
+	@dbs = map { [$dbhash{$_}, $_] } sort keys %dbhash;
+	unshift(@dbs, ['search all databases', '*'],
+			['search all, stop after 1st match', '!']);
+	$db_menu->configure(-options => \@dbs);
+
+	%shash = $dict->strategies();
+	@strats = map { [$shash{$_}, $_] } sort keys %shash;
+	$strat_menu->configure(-options => \@strats);
+
+	$db_frame->pack(-side => 'left');
+    }
+}
+
+#=======================================================================
+#
+# create_gui()
+#
+# This procedure creates the widgets for the tkdict GUI
+#
+#=======================================================================
+sub create_gui
+{
+    my $bar2;
+    my $menu_bar;
+    my $mbFile;
+    my $mbView;
+    my $mbHelp;
+    my $server_entry;
+    my $word_entry;
+
+    $mw = MainWindow->new(-title => "$PROGRAM $VERSION");
+
+    $bgcolor = $mw->cget(-bg);
+
+    #---------------------------------------------------------------------
+    # menu bar
+    #---------------------------------------------------------------------
+    $menu_bar = $mw->Frame(-relief => 'raised', -bd => 2);
+    $menu_bar->pack(-side => 'top', -fill => 'x');
+
+    #---------------------------------------------------------------------
+    # Menu: File
+    #
+    # Create the File menu and the entries on the menu
+    #---------------------------------------------------------------------
+
+    $mbFile = $menu_bar->Menubutton(
+                       -text => 'File',
+                       -underline => 0,
+		       -tearoff => 0,
+		       -menuitems => [
+                                      '-',
+                                      ['command' => 'Exit',
+                                       -underline => 1,
+                                       -command => \&tkdict_exit]
+                                     ]);
+    $mbFile->pack(-side => 'left');
+
+    #---------------------------------------------------------------------
+    # Menu: View
+    #
+    # Create the View menu and the entries on the menu
+    #---------------------------------------------------------------------
+    $mbView = $menu_bar->Menubutton(
+			-text => 'View', -underline => 0,
+			-tearoff => 0,
+			-menuitems => [ ['command' => 'Server Information',
+					-command => [\&show_info, 'server']],
+					['command' => 'Database Information',
+					-command => [\&show_info, 'db']],
+					]);
+    $mbView->pack(-side => 'left');
+
+
+    #---------------------------------------------------------------------
+    # Menu: Help
+    #
+    # Create the Help menu and the entries on the menu
+    #---------------------------------------------------------------------
+    $mbHelp = $menu_bar->Menubutton(
+			-text      => 'Help',
+			-underline => 0,
+			-tearoff   => 0,
+			-menuitems => [
+				['command' => 'Overview',
+					-command => [\&show_help, 'overview']],
+				['command' => 'ToDo List',
+					-command => [\&show_help, 'todo']],
+				'-',
+				['command' => 'About TkDict ...',
+					-command => [\&show_help, 'about']],
+					]);
+    $mbHelp->pack(-side => 'right');
+
+    #---------------------------------------------------------------------
+    # bar which has the entries for specifying server and select a dict
+    #---------------------------------------------------------------------
+    $bar2 = $mw->Frame(-relief => 'raised', -bd => 2);
+    $bar2->pack(-side => 'top', -fill => 'x');
+
+    $bar2->Label(-text => 'Server: ')->pack(-side => 'left');
+    $server_entry = $bar2->Entry(-relief => 'sunken',
+			   -textvariable => \$dict_server,
+			   -width => 16)->pack(-side => 'left', -fill => 'x');
+    $server_entry->bind('<Return>', \&select_server);
+    $server_entry->bind('<FocusIn>',
+                        sub { $server_entry->configure(-bg => 'white'); });
+    $server_entry->bind('<FocusOut>',
+                        sub { $server_entry->configure(-bg => "$bgcolor"); });
+
+    $db_frame = $bar2->Frame();
+
+    $db_frame->Label(-text => 'Dictionary: ')->pack(-side => 'left');
+    $db_menu = $db_frame->Optionmenu(-variable => \$db,
+			-textvariable => \$dbDisplay,
+			-options => [],
+			    )->pack(-side => 'left');
+
+    #-------------------------------------------------------------------
+    # Bar which has the entry for entering the word to be defined
+    #-------------------------------------------------------------------
+    $bar3 = $mw->Frame(-relief => 'raised', -bd => 2);
+    $bar3->pack(-side => 'top', -fill => 'x');
+    # $bar3->Label(-text => 'Define word:')->pack(-side => 'left');
+    $mbDefine = $bar3->Optionmenu(
+			-textvariable => \$modeDisplay,
+			-variable => \$lookup_mode,
+			-command => \&set_mode,
+			-options => [ ['Define word', 'define'],
+					['Match pattern', 'match'],
+					],
+					);
+    $mbDefine->pack(-side => 'left');
+
+    $word_entry = $bar3->Entry(-relief => 'sunken',
+			   -textvariable => \$word,
+			   -width => 16)->pack(-side => 'left');
+    $word_entry->bind('<Return>', \&lookup_word);
+    $word_entry->bind('<FocusIn>',
+                      sub { $word_entry->configure(-bg => 'white'); });
+    $word_entry->bind('<FocusOut>',
+                      sub { $word_entry->configure(-bg => "$bgcolor"); });
+
+    $sframe = $bar3->Frame();
+    $sframe->Label(-text => 'Strategy')->pack(-side => 'left');
+    $strat_menu = $sframe->Optionmenu(-variable => \$strategy,
+			-textvariable => \$strategyDisplay,
+			-options => [],
+			    )->pack(-side => 'left');
+    $sframe->pack(-side => 'left');
+
+    $bar3->packForget();
+
+    #-------------------------------------------------------------------
+    # Bar which has the entry for entering the word to be defined
+    #-------------------------------------------------------------------
+    $text_window = $mw->Scrolled('Text',
+                                 -bg => 'white', -fg => 'black',
+                                 -width => 72, -height => 16,
+                                -scrollbars => 'osoe');
+    $text_window->pack(-side => 'bottom', -fill => 'both', -expand => 1);
+
+
+    #-- accelerators ---------------------------------------------
+    $mw->bind('<Control-x><Control-c>', \&tkdict_exit);
+
+    set_mode();
+
+    $mw->update;
+}
+
+#=======================================================================
+#
+# set_mode()
+#
+# Configure the GUI according to the lookup mode selected.
+# If 'match', then show the menu for selecting the match strategy.
+# If 'define', then hide the strategy selection menu.
+#
+#=======================================================================
+sub set_mode
+{
+
+    if ($lookup_mode eq 'match')
+    {
+	$sframe->pack();
+    }
+    else
+    {
+	$sframe->packForget();
+    }
+}
+
+#=======================================================================
+#
+# lookup_word()
+#
+# Look up the word entered by the user.
+# This will either be a match or a define operation.
+#
+#=======================================================================
+sub lookup_word
+{
+    my $string = '';
+    my $eref;
+
+    if (!defined($word) || length($word) == 0)
+    {
+	tkd_warn("You need to type something first!");
+	return;
+    }
+
+    #-------------------------------------------------------------------
+    # clear out any help text which might be displayed
+    #-------------------------------------------------------------------
+    $text_window->delete('0.0', 'end');
+
+    if ($lookup_mode eq 'define')
+    {
+        #---------------------------------------------------------------
+        # Word definitions requested. We get back a list ref:
+        #    [  [db,definition], [db,definition], ... ]
+        #---------------------------------------------------------------
+	$eref = $dict->define($word, $db);
+	if (@$eref == 0)
+	{
+	    $string = "no definition found for \"$word\"\n";
+	}
+	else
+	{
+	    foreach my $entry (@$eref)
+	    {
+		$string .= "--- ".$dict->dbTitle($entry->[0])." ---\n";
+                $string .= $entry->[1]."\n\n";
+	    }
+	}
+
+    }
+    else
+    {
+        #---------------------------------------------------------------
+        # List of matching words requested.
+        #---------------------------------------------------------------
+        my %dbwords;
+        my ($dbname, $match);
+
+        $eref = $dict->match($word, $strategy);
+        if (@$eref == 0)
+        {
+            $string = "no words matched :-(\n";
+        }
+        else
+        {
+            foreach my $entry (@$eref)
+            {
+                ($dbname, $match) = @$entry;
+                $dbwords{$dbname} = [] if not exists $dbwords{$dbname};
+                push(@{ $dbwords{$dbname }}, $match);
+            }
+            foreach $dbname (sort keys %dbwords)
+            {
+                my @words;
+                $string .= $dict->dbTitle($dbname).":\n";
+                $string .= join(', ', @{ $dbwords{$dbname}});
+                $string .= "\n\n";
+            }
+        }
+    }
+
+    #-------------------------------------------------------------------
+    # display the resulting string in the scrolling text window
+    #-------------------------------------------------------------------
+    $text_window->insert('end', $string);
+}
+
+
+#=======================================================================
+#
+# tkdict_exit()
+#
+# quit from TkDict. In the future there might be
+# more to do here, hence the function.
+#
+#=======================================================================
+sub tkdict_exit
+{
+    exit 0;
+}
+
+#=======================================================================
+#
+# show_info()
+#
+# Display information which is retrieved from the server.
+# An argument is passed to identify which piece of info:
+#
+#    server: information about the server
+#    db    : information about the selected DB (dictionary)
+#
+#=======================================================================
+sub show_info
+{
+    my $topic = shift;
+
+
+    if ($topic eq 'server' && !$dict_server)
+    {
+        tkd_warn("You have to connect to a server first!");
+        return;
+    }
+    if ($topic eq 'db' && (!$db || $db eq '*' || $db eq '!'))
+    {
+        tkd_warn("You must select a specific database first");
+        return;
+    }
+
+    if (not Exists($info_top))
+    {
+        $info_top = $mw->Toplevel(-class => 'TkDictInfo');
+        $info_top->title("$PROGRAM Info");
+        $info_title = $info_top->Label();
+        $info_title->pack(-side => 'top', -fill => 'x');
+
+        $info_text = $info_top->Scrolled('Text',
+                                 -bg => 'white', -fg => 'black',
+                              -width => 60, -height => 12,
+                              -scrollbars => 'osoe',
+                             )->pack(-side => 'top', -fill => 'both',
+                                     -expand => 1);
+
+        $info_top->Button(-text => "Close",
+                -command => sub {$info_top->withdraw})->pack(-side => 'bottom');
+    } else {
+        $info_top->deiconify();
+        $info_top->raise();
+    }
+
+    $info_text->delete('0.0', 'end');
+
+    if ($topic eq 'server')
+    {
+        $info_title->configure(-text => "Server: $dict_server");
+        $info_text->insert('end', $dict->serverInfo());
+    }
+    else
+    {
+        $info_title->configure(-text => "Database: ".$dict->dbTitle($db));
+        foreach my $line ($dict->dbInfo($db))
+        {
+            $info_text->insert('end', $line);
+        }
+    }
+}
+
+#=======================================================================
+# show_help() - display a selected help message
+#       $topic - the identifier for the topic to display
+#
+# This procedure is used to display a help message. An identifying
+# string is passed in, which is used to index the associative array
+# holding the help text.
+#=======================================================================
+sub show_help
+{
+    my $topic = shift;
+
+
+    #-- create the help display toplevel, if needed --------------
+    if (not Exists($help))
+    {
+	$help = $mw->Toplevel(-class => 'TkDictHelp');
+	$help->title("$PROGRAM Help");
+
+	$ht = $help->Scrolled('Text',
+                              -bg => 'white', -fg => 'black',
+			      -width => 60, -height => 12,
+			      -scrollbars => 'osoe',
+			     )->pack(-side => 'top', -fill => 'both',
+                                     -expand => 1);
+
+	$help->Button(-text => "Close",
+		-command => sub {$help->withdraw})->pack(-side => 'bottom');
+	initialise_help();
+    } else {
+	$help->deiconify();
+	$help->raise();
+    }
+
+    #-- clear out any help text which might be displayed ---------
+    $ht->delete('0.0', 'end');
+
+    #-- insert the selected help message in text widget ----------
+    $ht->insert('end', $helpString{$topic});
+}
+
+#=======================================================================
+#
+# tkd_warn()
+#
+# Display a warning message in a dialog, then wait for the
+# user to acknowledge it.
+#
+#=======================================================================
+sub tkd_warn
+{
+    my $message = shift;
+
+    my $choice;
+
+
+    if (not Exists($warn_dialog))
+    {
+	$warn_dialog = $mw->Dialog(
+				-title		=> "Warning",
+				-text		=> $message,
+				-bitmap		=> 'warning',
+				-default_button => "OK",
+			);
+    }
+    else
+    {
+	$warn_dialog->configure(-text => $message);
+    }
+
+    $choice = $warn_dialog->Show(-global);
+}
+
+
+#=======================================================================
+# initialise_help() - initialize the help strings
+#
+# This procedure initializes the global array helpString, which holds
+# the text for the different help messages. The array is indexed by
+# single word identifiers.
+#=======================================================================
+sub initialise_help
+{
+    $helpString{about} = <<EOFABOUT;
+
+                     $PROGRAM v$VERSION
+
+$PROGRAM is a DICT client, used to access network dictionary
+servers which support the protocol defined in RFC 2229.
+
+This client is using Perl module Net::Dict $Net::Dict::VERSION.
+
+Neil Bowers <neil\@bowers.com>
+Copyright (C) 2001-2002, Neil Bowers
+EOFABOUT
+
+    $helpString{overview} = <<EOFENTRY;
+
+              $PROGRAM $VERSION - Overview
+
+$PROGRAM is a simple Tk tool for looking up entries
+in dictionaries which are accessed using the DICT protocol.
+
+First you must specify a Server (and press RETURN).
+A good one to try is dict.org - it has a number of dictionaries.
+You should get a menu for selecting dictionaries,
+and a text box for entering a word.
+
+Enter a word and press return. By default $PROGRAM will check
+all dictionaries, so you might get a number of definitions.
+ 
+EOFENTRY
+ 
+    $helpString{todo} = <<EOFTODO;
+
+            $PROGRAM v$VERSION - ToDo List
+ 
+    *   better formatting of results
+    *   more user-oriented user interface
+    *   have the inline pod available on Help menu
+    *   show one definition at a time
+        with some sort of NEXT and PREV interface
+    *   option to specify whether to stay connect or not
+    *   haven't done anything to handle connnection timing out
+    *   status line at the bottom of the main window
+
+EOFTODO
+}
+
+
+#=======================================================================
+#
+# show_db_info()
+#
+# Query the server for information about the specified database,
+# and display the results.
+#
+# The information is typically several pages of text,
+# describing the contents of the dictionary, where it came from,
+# credits, etc.
+#
+#=======================================================================
+sub show_db_info
+{
+    my $db  = shift;
+    my %dbs = $dict->dbs();
+
+
+    if (not exists $dbs{$config->info})
+    {
+        print "  dictionary \"$db\" not known\n";
+        return;
+    }
+
+    print $dict->dbInfo($config->info);
+}
+
+__END__
+
+=head1 NAME
+
+tkdict - a perl client for accessing network dictionary servers
+
+=head1 SYNOPSIS
+
+tkdict [OPTIONS]
+
+=head1 DESCRIPTION
+
+B<tkdict> is a Perl/Tk client for the Dictionary server protocol (DICT),
+which is used to query natural dictionaries hosted on a remote machine.
+
+At the moment it's not very user oriented, since I've just been
+creating an interface to the protocol.
+
+There is more information available in the B<Help> menu
+when running B<tkdict>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h> I<server> or B<-host> I<server>
+
+The hostname for the DICT server.
+
+=item B<-p> I<port> or B<-port> I<port>
+
+Specify the port for connections (default is 2628, from RFC 2229).
+
+=item B<-c> I<string> or B<-client> I<string>
+
+Specify the CLIENT identification string sent to the DICT server.
+
+=item B<-help>
+
+Display a short help message including command-line options.
+
+=item B<-doc>
+
+Display the full documentation for B<tkdict>.
+
+=item B<-version>
+
+Display the version of B<tkdict>
+
+=item B<-verbose>
+
+Display verbose information as B<tkdict> runs.
+
+=item B<-debug>
+
+Display debugging information as B<tkdict> runs.
+Useful mainly for developers.
+
+=back
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+=over 4
+
+=item *
+
+B<tkdict> doesn't know how to handle firewalls.
+
+=item *
+
+The authentication aspects of RFC 2229 aren't currently supported.
+
+=item *
+
+See the B<ToDo> page under the B<Help> menu.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item www.dict.org
+
+The DICT home page, with all sorts of useful information.
+There are a number of other DICT clients available.
+
+=item dict
+
+The C dict client written by Rik Faith;
+the options are pretty much lifted from Rik's client.
+
+=item RFC 2229
+
+The document which defines the DICT network protocol.
+
+http://www.cis.ohio-state.edu/htbin/rfc/rfc2229.html
+
+=item Net::Dict
+
+The perl module which implements the client API for RFC 2229.
+It includes a command-line perl client, B<dict>,
+as well as B<tkdict>.
+
+=back
+
+=head1 VERSION
+
+$Revision: 1.1.1.1 $
+
+=head1 AUTHOR
+
+Neil Bowers <neil@bowers.com>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2002 Neil Bowers. All rights reserved.
+
+This script is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+

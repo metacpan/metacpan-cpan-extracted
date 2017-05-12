@@ -1,0 +1,157 @@
+Revision history for Perl extension Net::Server::Mail.
+
+0.23  Sun Jan 3 12:29:30 2016
+	- Add a LICENSE file (same as COPYING).
+	- CPANTS Kwalitee.
+	- Fix a bug in LMTP tests (thanks to Sawyer X)
+
+0.22  Wed Sep 9 13:41:23 2015
+	- Use Test::More in tests
+	- Many spelling mistakes corrected by David Steinbrunner
+	- Fix "LMTP server processes DATA callback multiple times"
+	  (thanks to Hatuka Nezumi). Closes: RT#106949
+
+0.21  Thu Sep 5 12:52:56 2013
+	- use weak references to point to parent object in XFORWARD and
+	  PIPELING ESMTP extensions
+	- perltidy
+
+0.20  Thu May 14 05:50:12 2013
+	- Update copyright
+
+0.19_02  Thu Mar 7 13:06:45 2013
+	DEV RELEASE
+	- Merge Dan Moore and Mytram versions of STARTTLS
+	- Include patch proposed by Georg Hoesch to reduce memory consumption
+
+0.19  Sun Mar 3 11:52:54 2013
+	- Add STARTTLS extension
+	- Fix spelling errors
+
+0.18  Sun May 13 12:04:25 2012
+	- Close bug #75360 : Net::Server::Mail incorrectly processes incomplete
+	  lines during SMTP session
+	- Close bug #71811 : Missing an email address corner case
+	  (thanks to David Darville)
+
+0.17  Mon Mar 17 15:36:10 2008
+	- duplicated leading dot (RFC 2821 not correctly implemented).
+	  Closes: #34099
+
+0.16  Tue Apr 10 22:00:06 2007
+	- Bug in LMTP tests
+	- documentation update: new repository
+	- Bug correction (closes #27154): When QUIT is sent without waiting server
+	  notification, QUIT can be found in string concatenated with body data
+	  (thanks to Raffaello Torraco, Sebastiano Piccoli & Valerio Paolini).
+
+0.15  Sat Apr 7 15:45:56 2007
+	- Little bug: XFORWARD does not depend from 5.008
+
+0.14  Mon Apr 2 7:15:45 2007
+	- New maintener: Xavier Guimard <guimard@cpan.org>
+	- Closes: #18955, #24038, #24280 / rt.cpan.org
+
+2006-01-10  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.14
+
+	* Removed confusing "Service ready" substring from EHLO response
+          (reported by Stas Bekman)
+
+2005-02-02  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.11
+
+	* Fix an infinit loop bug introduced in 0.09 release while
+          fixing the CPAN bug #9014
+
+2005-01-05  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.10
+
+	* Enable PIPELINING mode only in extended mode
+
+2005-01-05  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.9
+
+	* Fix CPAN bug #9014
+		
+2003-04-06  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.8
+
+	* Platform specific patch applied for win32 to work around its
+	lack of support for nonbocking IO. Thanks to Scotty Allen for his
+	investigation and his patch.
+
+	* Fix an RFC misunderstanding about the RSET command. Server no
+	longer expect to HELO again after an RSET. Thanks again and again
+	to Gerhard Zeiler.
+
+	* Change the double dot handling in DATA. Thanks to Gerhard
+	Zeiler for his patch.
+
+
+2003-03-14  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.7
+
+	* Fix a major bug in data-finished that prevent several recipients to be
+	proceed in the LMTP module
+
+	* Fix a minor bug in data-finished that prevent to reuse the session if the
+	DATA command was failed
+
+2003-02-06  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.6
+
+	* Fix a major bug in data-part, at the end of data detection that prevent
+        further command to be procced
+
+2003-01-27  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.5
+
+	* Fix a bug preventing compilation
+
+2003-01-25  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.4
+
+	* Fix a bug in constructor in handle class check
+
+	* Fix a dead loop in connection handling when client close the
+	connection before the end of transaction
+
+	* Fix a bug in DATA command that prevent to detect the end of data
+
+2003-01-01  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.03
+
+	* Fix a bug in constructor with handle_in and handle_out
+
+	* Fix a bug in POD documentation (thanks to Martin H. Sluka)
+
+	* Fix a misunderstanding of the RFC, DATA command reinitialize the
+	connection state (thanks to Martin H. Sluka)
+
+2002-12-05  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.02
+
+	* Fix bug in LMTP, protocol name not set
+
+	* Fix bug in LMTP, data_finished() method used to use the old data
+	handling mechanism (thanks to Andy Turner)
+
+2002-06-20  Olivier Poitrey  <rs@rhapsodyk.net>
+
+	* Release 0.01
+	
+	* Original version; created by h2xs 1.21 with options -n
+	Net::Server::Mail -X
+

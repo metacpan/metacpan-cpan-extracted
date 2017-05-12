@@ -1,0 +1,114 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::HTTP::DAV
+at lib/Net/Async/HTTP/DAV.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 NAME
+
+Net::Async::HTTP::DAV - support for WebDAV over L<Net::Async::HTTP>
+
+=head1 VERSION
+
+Version 0.001
+
+=head1 SYNOPSIS
+
+ use IO::Async::Loop;
+ use Net::Async::HTTP;
+ use Net::Async::HTTP::DAV;
+ use POSIX qw(strftime);
+ my $loop = IO::Async::Loop->new;
+ $loop->add(my $dav = Net::Async::HTTP::DAV->new(
+ 	host => 'cpan.perlsite.co.uk',
+ ));
+ $dav->propfind(
+ 	path => '/authors/id/T/TE/TEAM/',
+ 	on_item => sub {
+ 		my ($item) = @_;
+ 		printf "%-32.32s %-64.64s %12d\n", strftime("%Y-%m-%d %H:%M:%S", localtime $item->{modified}), $item->{displayname}, $item->{size};
+ 	},
+ )->get;
+
+=head1 DESCRIPTION
+
+Does some very basic WebDAV stuff.
+
+See L<http://www.webdav.org/specs/rfc2518.html>.
+
+Highly experimental, no documentation, see examples/ in source distribution.
+API is likely to change.
+
+=head1 METHODS
+
+=head2 configure
+
+Accepts configuration parameters (can also be passed to L</new>).
+
+=over 4
+
+=item * host - which host we're connecting to
+
+=item * path - base path for requests
+
+=item * user - optional username
+
+=item * pass - optional password, Basic auth
+
+=item * http - a pre-existing L<Net::Async::HTTP> instance
+
+=back
+
+=head2 http
+
+Accessor for the internal L<Net::Async::HTTP> instance.
+
+=head2 ua_factory
+
+Populates the L<Net::Async::HTTP> instance via factory or default settings.
+
+=head2 path
+
+Base path for requests.
+
+=head2 propfind
+
+Does a propfind request.
+
+Parameters are basically 'path' and on_item for a per-item callback.
+
+=head2 head
+
+Perform HEAD request on given path.
+
+=head2 get
+
+GET the given resource
+
+=head2 put
+
+Write data directly to the given resource.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@perlsite.co.uk>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2011-2014. Licensed under the same terms as Perl itself.

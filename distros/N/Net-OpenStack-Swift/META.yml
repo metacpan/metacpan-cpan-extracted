@@ -1,0 +1,66 @@
+---
+abstract: 'Perl Bindings for the OpenStack Object Storage API, known as Swift.'
+author:
+  - 'masakyst <masakyst.public@gmail.com>'
+build_requires:
+  Data::Section::Simple: '0'
+  Test::MockObject: '0'
+  Test::MockObject::Extends: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-OpenStack-Swift
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::OpenStack::Swift:
+    file: lib/Net/OpenStack/Swift.pm
+    version: '0.11'
+  Net::OpenStack::Swift::InnerKeystone::Base:
+    file: lib/Net/OpenStack/Swift/InnerKeystone.pm
+  Net::OpenStack::Swift::InnerKeystone::V1_0:
+    file: lib/Net/OpenStack/Swift/InnerKeystone.pm
+  Net::OpenStack::Swift::InnerKeystone::V2_0:
+    file: lib/Net/OpenStack/Swift/InnerKeystone.pm
+  Net::OpenStack::Swift::InnerKeystone::V3_0:
+    file: lib/Net/OpenStack/Swift/InnerKeystone.pm
+  Net::OpenStack::Swift::Util:
+    file: lib/Net/OpenStack/Swift/Util.pm
+requires:
+  App::Rad: '0'
+  Data::Validator: '0'
+  Furl: '0'
+  IO::Socket::SSL: '0'
+  JSON: '0'
+  Log::Minimal: '0'
+  Mouse: '0'
+  Parallel::Fork::BossWorkerAsync: '0'
+  Path::Tiny: '0'
+  Sys::CPU: '0'
+  Text::ASCIITable: '0'
+  URI::Escape: '0'
+  namespace::clean: '0'
+  perl: 5.010_001
+resources:
+  bugtracker: https://github.com/masakyst/Net-OpenStack-Swift/issues
+  homepage: https://github.com/masakyst/Net-OpenStack-Swift
+  repository: git://github.com/masakyst/Net-OpenStack-Swift.git
+version: '0.11'
+x_contributors:
+  - 'RenatoCRON <renato.cron@gmail.com>'
+  - 'Masaaki Saito <masakyst.mobile@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

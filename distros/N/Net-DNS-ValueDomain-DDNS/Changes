@@ -1,0 +1,9 @@
+Revision history for Perl extension Net::DNS::ValueDomain::DDNS.
+
+0.02  2006-01-28T02:47:12+09:00
+      - fixed wrong query parameter
+      - switched to Module::Build
+      - added tests
+
+0.01  2005-07-03
+      - Initial distribution.

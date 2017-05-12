@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name: Net-SMTP-Retryable
+version: 0.0.2
+author: ~
+abstract: Net::SMTP wrapper
+license: perl
+requires:
+  Class::Delegation: 0
+  Net::SMTP: 0
+  Time::HiRes: 0
+provides:
+  Net::SMTP:
+    file: lib/Net/SMTP/Retryable.pm
+    version: 0.0.2
+  Net::SMTP::Retryable:
+    file: lib/Net/SMTP/Retryable.pm
+    version: 0.0.2
+  Net::SMTP::Retryable::SimpleLog:
+    file: lib/Net/SMTP/Retryable.pm
+    version: 0.0.2
+generated_by: Module::Build version 0.261

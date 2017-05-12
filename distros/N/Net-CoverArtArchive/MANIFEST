@@ -1,0 +1,9 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Net/CoverArtArchive.pm
+lib/Net/CoverArtArchive/CoverArt.pm
+t/compile.t

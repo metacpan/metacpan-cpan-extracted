@@ -1,0 +1,92 @@
+<h2><a href="#">Hello World</a></h2>
+<p>
+<h3>NES directory installation .htaccess configuration</h3>
+<br>
+<pre>
+Options +ExecCGI
+AddHandler cgi-script .cgi .pl
+
+&lt;FilesMatch \.(nsql|nes.cfg)$&gt;
+  order deny,allow
+  deny from all
+&lt;/FilesMatch&gt; 
+</pre>    
+</p>
+<p>
+<h3>Each directory where NES templates are executed .htaccess configuration</h3>
+<br>
+<pre>
+AddHandler perl-nes .nhtml
+AddHandler perl-nes .nhtm
+
+# change for NES directory installation
+Action perl-nes /cgi-bin/nes/dispatch.cgi
+
+&lt;FilesMatch \.(nsql|nes.cfg)$&gt;
+  order deny,allow
+  deny from all
+&lt;/FilesMatch&gt; 
+
+</pre>   
+For the html/htm file add:
+<pre>
+    
+ AddHandler perl-nes .html
+ AddHandler perl-nes .htm
+ 
+</pre>
+
+With this configuration will run the script by: <br> 
+http://sitio.com/archivo.nhtml <br>
+<br>
+For: <br> 
+http://sitio.com/archivo.cgi <br>
+<br>
+Add:
+<pre>
+    
+Options +ExecCGI
+AddHandler cgi-script .cgi .pl
+</pre>    
+</p>
+<p>
+<h3>Archivos nhtml y cgi</h3>
+<br>
+<strong>hello.nhtml:</strong>
+<p>
+<pre>
+&#123;: NES 1.0 ('hello.cgi') :&#125;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Nes Hello World&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;b&gt;&#123;: $ var_hello :&#125;&lt;/b&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+
+</pre>
+</p>
+The file should contain <i>nhtml</i> in the first line, first character, the script 
+to be executed, or nothing, and will be displayed as a html file more.
+<br>
+<br>
+<strong>hello.cgi:</strong>
+<p>
+<pre>
+use Nes;
+# A <a href="./?item=La clase Singleton">Singleton</a> object
+my $nes = Nes::Singleton->new('hello.nhtml');
+
+# A variable which stores information to be displayed in html
+my $nes_tags = {};
+
+$nes_tags->{'var_hello'} = 'Hello World!';
+
+
+# Finally send the data to show
+$nes->out(%$nes_tags);
+</pre>
+</p>
+
+<br><br>

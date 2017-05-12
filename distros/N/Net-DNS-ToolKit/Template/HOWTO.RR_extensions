@@ -1,0 +1,67 @@
+
+
+		Resource Record Extension HOWTO
+
+To create an RR extension, there are several steps and mis-steps. First,
+don't edit the Template.pm file and associated files in this directory. They
+are part of the ToolKit distribution and are required for proper operation. 
+Template.pm contains the working code for RR A.pm which inherits its
+methods.
+
+The steps to generate a new RR extension for distribution are as follows:
+
+  cd ..../Template
+  perl Makefile.PL
+  make dist
+
+This will create the distribution file:
+
+  Net-DNS-ToolKit-RR-Template-0.XX.tar.gz
+
+Move this file to a work directory and un-tar it.
+
+  tar -xzvf Net-DNS-ToolKit-RR-Template-0.XX.tar.gz
+
+  Net-DNS-ToolKit-RR-Template-0.XX/
+  Net-DNS-ToolKit-RR-Template-0.XX/GPL
+  Net-DNS-ToolKit-RR-Template-0.XX/Makefile.PL
+  Net-DNS-ToolKit-RR-Template-0.XX/Changes
+  Net-DNS-ToolKit-RR-Template-0.XX/t/
+  Net-DNS-ToolKit-RR-Template-0.XX/t/Template.t
+  Net-DNS-ToolKit-RR-Template-0.XX/Artistic
+  Net-DNS-ToolKit-RR-Template-0.XX/Template.pm
+
+Let's call our new RR extension XYZ
+
+  mv Net-DNS-ToolKit-RR-Template-0.XX XYZ
+  cd XYZ
+  mv Template.pm XYZ.pm
+  mv t/Template.t test.pl
+  rm -r t	[we will create this again later]
+
+Edit Makefile.PL, MANIFEST, and Changes to reflect 
+the new module name.
+
+Tailor XYZ.pm to handle the attributes of the new target 
+RR type and update the documentation (in detail please).
+
+Generate a new 'test.pl' to check all the methods. 
+Once this is accomplished then....
+
+  mkdir t
+  mv test.pl t/XYZ.t
+
+See: t/Template.t in this distribution and t/NS.pm in the Net::DNS::ToolKit
+distribution for examples of simple and complex test routines including
+embedded debugging tools that are commented out.
+
+Test your distribution then submit it to CPAN to extend 
+Net::DNS::ToolKit:RR
+
+See some of the other modules in the ToolKit distribution 
+for ideas on how to implement yours.
+
+.../Net::DNS:ToolKit/lib/Net/DNS/ToolKit/RR/ ...modules.pm
+
+
+michael@bizsystems.com

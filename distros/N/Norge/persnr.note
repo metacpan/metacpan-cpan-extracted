@@ -1,0 +1,22 @@
+Date: Sun, 26 Sep 1999 21:28:45 +0200
+Message-Id: <199909261928.VAA02522@minerva.cc.uit.no>
+To: Gisle Aas <aas@sn.no>
+Subject: Mer om personnummer
+From: Petter Reinholdtsen <pere@hungry.com>
+Reply-to: pere@hungry.com
+
+
+Jeg kom ved en tilfeldighet over litt mer info om fødselsnummer.  En
+kopi av et ark med info om hvordan fødselsnummer sjekkes.  Der hevdes
+det at individsiffre 0-499 brukes for personer som er født senere enn
+31.12.1899, 500-749 for personer født før 1. januar 1900, og at
+750-999 foreløbig ikke er i bruk.  Hvis denne informasjonen stemmer,
+så er det feil i koden til No::PersonNr.  Kanskje det siden mitt ark
+ble skrevet er bestemt at 750-900 skal brukes i år 2000?  Jeg håper i
+allefall at 900-999 er satt av til genererte nummer. :-)
+
+Uansett, jeg tenkte du kanskje var interessert.
+
+Happy hacking,
+-- 
+##>  Petter Reinholdtsen  <##  |  pere@td.org.uit.no

@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::IPFromZip.
+
+0.01  Thu Jan 29 14:22:24 2015
+	- original version; created by h2xs 1.23 with options
+		-XAn Net::IPFromZip
+

@@ -1,0 +1,17 @@
+1.50	Wed Oct 08 2014 17:11:25 GMT+0400
+	+ Change limits: max node id 65535 => 16383, max inc id 32767 => 131071
+	+ Add LIMIT_MIN_NODE_ID = 1
+
+1.40	Wed Aug 06 2014 18:49:42 GMT+0400
+	+ Add function get_period_key_by_timestamp and get_period_key_by_datetime
+
+1.33	Wed Jul 30 2014 11:42:37 GMT+0400
+	+ Fix pod SYNOPSIS :)
+
+1.32	Wed Jul 30 2014 10:51:14 GMT+0400
+	+ Add function timestamp_to_datetime
+	+ Fix bugs
+
+1.31	Tue Jul 29 2014 23:04:20 GMT+0400
+	+ Release 1.31
+

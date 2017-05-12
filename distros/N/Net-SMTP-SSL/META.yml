@@ -1,0 +1,26 @@
+---
+abstract: 'SSL support for Net::SMTP'
+author:
+  - 'Casey West <casey@geeknest.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-SMTP-SSL
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::Socket::SSL: '0'
+  Net::SMTP: '0'
+  Test::More: '0.47'
+version: '1.04'
+x_deprecated: 1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

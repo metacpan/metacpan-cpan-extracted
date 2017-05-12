@@ -1,0 +1,89 @@
+Revision history for Number::Phone::FR.
+
+0.0815091    2015-04-02    DOLMEN (Olivier Mengué)
+	ARCEP data: 2015-04-01.
+
+0.0814210    2014-08-16    DOLMEN (Olivier Mengué)
+	Change data source input format, following changes by ARCEP since
+	  december 2013.
+	ARCEP data: 2014-07-29.
+	Release on "CPAN day". #cpanday
+
+0.0713196    2013-07-27    DOLMEN (Olivier Mengué)
+	ARCEP data: 2013-07-15.
+
+0.0712272    2012-10-14    DOLMEN (Olivier Mengué)
+	Fix perl 5.8 & 5.10 compatibility issues in regexps. Add regression
+	  testing (using Regexp::Parser) to avoid this later.
+	ARCEP data: 2012-09-28.
+
+0.0612272    2012-10-12    DOLMEN (Olivier Mengué)
+	ARCEP data: 2012-09-28.
+
+0.0612192    2012-08-17    DOLMEN (Olivier Mengué)
+	ARCEP data: 2012-07-10.
+
+0.0612174    2012-07-03    DOLMEN (Olivier Mengué)
+	ARCEP data: 2012-06-22.
+
+0.0612132    2012-05-12    DOLMEN (Olivier Mengué)
+	Fixes a 5.14 warning about qw() in Build.PL.
+	ARCEP data: 2012-05-11.
+	Never pushed to the CPAN.
+
+0.0612093    2012-04-11    DOLMEN (Olivier Mengué)
+	ARCEP data: 2012-04-02.
+
+0.0612083    2012-03-24    DOLMEN (Olivier Mengué)
+	ARCEP data: 2012-03-23.
+
+0.0612047    2012-02-24    DOLMEN (Olivier Mengué)
+	ARCEP data: 2012-02-16.
+
+0.0611350    2011-12-21    DOLMEN (Olivier Mengué)
+	ARCEP data: 2011-12-16.
+
+0.0611311    2011-11-13    DOLMEN (Olivier Mengué)
+	Fix loading of :Full and :Simple (loading was broken since a few
+	  releases, and the tests did not correctly test).
+	Fix ->operator in :Full (broken since a few releases).
+	Optimized ->operator: regexp is now a bit shorter, thanks to the sort
+	  of operators by descendant count of blocks handled.
+	Add "examples/format.pl" file.
+	Add "README" file.
+	ARCEP data: 2011-11-07.
+
+0.0511217    2011-09-03    DOLMEN (Olivier Mengué)
+        Use \A and \z instead of ^ and $ in regexps.
+        ARCEP data: 2011-08-05.
+
+0.0411185    2011-08-03    DOLMEN (Olivier Mengué)
+        Forgot to update MANIFEST in 0.03, so french documentation was not
+          bundled :(
+        Renamed repository on Github to p5-Number-Phone-FR.
+        ARCEP data: 2011-07-04.
+
+0.0311185    2011-08-03    DOLMEN (Olivier Mengué)
+        Minor rework of the documentation.
+        Added documentation in french.
+        ARCEP data: 2011-07-04.
+
+0.0211185    2011-07-09    DOLMEN (Olivier Mengué)
+        ARCEP data: 2011-07-04.
+
+0.0211172    2011-06-24    DOLMEN (Olivier Mengué)
+        The French Perl Workshop release. See the slides of my presentation
+          about N::P::FR internals: http://o.mengue.free.fr/presentations/2011-fpw/Number-Phone-FR_implementation.pdf
+        ARCEP data: 2011-06-21.
+
+0.0211140    2011-05-29    DOLMEN (Olivier Mengué)
+	ARCEP data: 2011-05-20.
+
+0.0211122    2011-05-07    DOLMEN (Olivier Mengué)
+	Full.pm: Fixed regexp anchoring in operator lookup.
+	More release tests.
+	ARCEP data: 2011-05-02.
+
+0.0111101    2011-04-30    DOLMEN (Olivier Mengué)
+	First CPAN release.
+	ARCEP data: 2011-04-11.

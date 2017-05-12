@@ -1,0 +1,47 @@
+{
+   "abstract" : "Kestrel Client for Perl",
+   "author" : [
+      "Cory G Watson <gphat@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300005, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Kestrel",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Socket" : 0,
+            "Moose" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : 0,
+            "Test::More" : 0,
+            "strict" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/gphat/net-kestrel",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gphat/net-kestrel.git",
+         "web" : "https://github.com/gphat/net-kestrel"
+      }
+   },
+   "version" : "0.08"
+}
+

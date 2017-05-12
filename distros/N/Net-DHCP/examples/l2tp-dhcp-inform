@@ -1,0 +1,108 @@
+#!/usr/bin/perl
+
+# TODO
+# * use syslog
+# * runit - as also invalid DHCP packets cause library to croak()
+# * error checking
+
+use strict;
+use warnings;
+
+use Sys::Hostname;
+use IO::Socket::INET;
+use Net::DHCP::Constants qw/:dho_codes :dhcp_message :bootp_codes :htype_codes :dhcp_other/;
+use Net::DHCP::Packet;
+
+# populated in BEGIN
+my %addOption;
+my $domainnameservers = '192.0.1.2 192.0.1.50';
+# Mac OS X 10.7 seems to accept space seperated entries here (no idea if others do too)
+my $domainname = 'domain.foo';
+my @subnets;
+for (<DATA>) {
+	next if (/^(#|$)/);
+
+	chomp;
+	push @subnets, $_;
+}
+
+my $sock = IO::Socket::INET->new(
+	Proto		=> 'udp',
+	LocalPort	=> 67,
+);
+unless ($sock) {
+	print STDERR "unable to open socket: $@\n";
+	exit 1;
+}
+
+my $buf;
+while (my $src = $sock->recv($buf, DHCP_MAX_MTU - DHCP_UDP_OVERHEAD)) {
+	my $sport = $sock->peerport;
+	next unless ($sport == 68);
+
+	# add padding to stop the library complaining
+	# as the packets are typically 262 bytes long
+	$buf .= "\x00" x (BOOTP_MIN_LEN() - length($buf))
+		if (length($buf) < BOOTP_MIN_LEN());
+
+	my $pac = Net::DHCP::Packet->new($buf);
+	next unless ($pac->isDhcp
+		&& $pac->op == BOOTREQUEST()
+		&& $pac->htype == HTYPE_FDDI()
+		&& $pac->getOptionValue(DHO_DHCP_MESSAGE_TYPE()) == DHCPINFORM());
+
+	my $res = Net::DHCP::Packet->new(
+		Op			=> BOOTREPLY(),
+		Htype			=> $pac->htype,
+		Xid			=> $pac->xid,
+		Ciaddr			=> $sock->peerhost,
+		Chaddr			=> $pac->chaddr,
+		Sname			=> hostname,
+
+		DHO_DHCP_MESSAGE_TYPE()	=> DHCPACK(),
+	);
+
+	foreach (split / /, $pac->getOptionValue(DHO_DHCP_PARAMETER_REQUEST_LIST())) {
+		&{$addOption{$_}}($res, $_)
+			if (defined($addOption{$_}));
+	}
+
+	$sock->send($res->serialize);
+}
+
+exit 0;
+
+BEGIN {
+	sub OptionSubnetMask {
+		my ($res, $opt) = @_;
+
+		$res->addOptionValue(DHO_SUBNET_MASK(), '255.255.255.255');
+	}
+	$addOption{DHO_SUBNET_MASK()} = \&OptionSubnetMask;
+
+	sub OptionDomainName {
+		my ($res, $opt) = @_;
+
+		$res->addOptionValue(DHO_DOMAIN_NAME(), $domainname);
+	}
+	$addOption{DHO_DOMAIN_NAME()} = \&OptionDomainName;
+
+	sub OptionDomainNameServers {
+		my ($res, $opt) = @_;
+
+		$res->addOptionValue(DHO_DOMAIN_NAME_SERVERS(), $domainnameservers);
+	}
+	$addOption{DHO_DOMAIN_NAME_SERVERS()} = \&OptionDomainNameServers;
+
+	sub OptionClasslessStaticRoutes {
+		my ($res, $opt) = @_;
+
+		$res->addOptionValue($opt, [ map { [$_, '0.0.0.0'] } @subnets ]);
+	}
+	$addOption{121} = \&OptionClasslessStaticRoutes;
+	$addOption{249} = \&OptionClasslessStaticRoutes;
+}
+
+__DATA__
+10.0.0.0/8
+192.168.0.0/16

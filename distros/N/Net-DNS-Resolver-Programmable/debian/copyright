@@ -1,0 +1,15 @@
+This is the Debian package for the Net-DNS-Resolver-Programmable CPAN
+distribution, which is available from <http://search.cpan.org/dist/Net-DNS-
+Resolver-Programmable>.
+
+(C) 2006-2007 Julian Mehnle <julian@mehnle.net>.  Julian Mehnle is the upstream
+author as well as the maintainer of the Debian package.
+
+This is free software.  You may use, modify, and distribute it under the same
+terms as Perl itself, that is under the terms of either the GNU General Public
+License (version 2 or later) or the Artistic License.
+
+On Debian GNU/Linux systems, the complete text of these licenses can be found
+in these files:
+  /usr/share/common-licenses/GPL-2
+  /usr/share/common-licenses/Artistic

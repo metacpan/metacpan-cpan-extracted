@@ -1,0 +1,10 @@
+[
+    {
+        "factor": "Phone Call",
+        "integration": "adminapi",
+        "ip": "192.168.0.1",
+        "result": "SUCCESS",
+        "timestamp": 1346172697,
+        "username": "jsmith"
+    }
+]

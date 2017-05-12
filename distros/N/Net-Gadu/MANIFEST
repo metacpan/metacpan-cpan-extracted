@@ -1,0 +1,11 @@
+Changes
+Gadu.pm
+Gadu.xs
+Makefile.PL
+MANIFEST
+README
+test.pl
+ex/ex1
+contrib/irssi_gg.pl
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

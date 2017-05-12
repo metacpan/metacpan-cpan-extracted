@@ -1,0 +1,77 @@
+---
+abstract: 'OOP for the del.icio.us API'
+author:
+  - 'Aaron Straup Cope <ascope@cpan.org>'
+build_requires:
+  Test::Simple: 0.47
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Delicious
+provides:
+  Net::Delicious:
+    file: lib/Net/Delicious.pm
+    version: 1.14
+  Net::Delicious::Bundle:
+    file: lib/Net/Delicious/Bundle.pm
+    version: 1.14
+  Net::Delicious::Config:
+    file: lib/Net/Delicious/Config.pm
+    version: 1.14
+  Net::Delicious::Constants:
+    file: lib/Net/Delicious/Constants.pm
+    version: 1.14
+  Net::Delicious::Constants::Config:
+    file: lib/Net/Delicious/Constants/Config.pm
+    version: 1.14
+  Net::Delicious::Constants::Pause:
+    file: lib/Net/Delicious/Constants/Pause.pm
+    version: 1.14
+  Net::Delicious::Constants::Response:
+    file: lib/Net/Delicious/Constants/Response.pm
+    version: 1.14
+  Net::Delicious::Constants::Uri:
+    file: lib/Net/Delicious/Constants/Uri.pm
+    version: 1.14
+  Net::Delicious::Date:
+    file: lib/Net/Delicious/Date.pm
+    version: 1.14
+  Net::Delicious::Iterator:
+    file: lib/Net/Delicious/Iterator.pm
+    version: 1.14
+  Net::Delicious::Object:
+    file: lib/Net/Delicious/Object.pm
+    version: 1.14
+  Net::Delicious::Post:
+    file: lib/Net/Delicious/Post.pm
+    version: 1.14
+  Net::Delicious::Subscription:
+    file: lib/Net/Delicious/Subscription.pm
+    version: 1.14
+  Net::Delicious::Tag:
+    file: lib/Net/Delicious/Tag.pm
+    version: 1.14
+  Net::Delicious::User:
+    file: lib/Net/Delicious/User.pm
+    version: 1.14
+requires:
+  Config::Simple: 2
+  Crypt::SSLeay: 0
+  Date::Parse: 2.27
+  File::Spec: 0.8
+  FileHandle: 2
+  HTTP::Request: ''
+  IO::AtomicFile: 2.1
+  LWP::UserAgent: ''
+  Log::Dispatch: 2
+  Time::HiRes: 1.65
+  URI: ''
+  XML::Simple: 2
+  YAML: 0.35
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.14

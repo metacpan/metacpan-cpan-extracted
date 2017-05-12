@@ -1,0 +1,15 @@
+Version 1.0
+===========
+* First release
+
+Version 1.2
+===========
+* Many bug fixes and performance enhancements
+* Add delta processing using Cache::Memcache (optional).  Delta processing
+  allows you to insert your own delta processing logic easily; the module
+  comes with a very simplistic built in delta processing routine as well.
+* Add cluster aware polling.  If you know one of N servers will have
+  a certain OID, you can specify alternate servers that the plugin
+  should try if it cannot reach the primary server specified with
+  -H or --hostname using multiple -A or --alt-server options
+

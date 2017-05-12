@@ -1,0 +1,27 @@
+2009-09-03  Terrence Brannon  <schemelab@li2-168.members.linode.com>
+
+	* add MIT License for use by Symantec
+
+2002-03-17  Terrence Brannon  <metaperl@localhost>
+
+	* added STDERR => $file hash constructor configuration option so
+	that debug output from Net::FTP(::Common)? can be saved to a
+	file. 
+
+2002-01-15  Terrence Brannon  <metaperl@localhost>
+
+	* v2.8 renamed dir() to ls() will add kevin evans implementation
+	of dir in v2.9
+
+2001-12-11  Terrence Brannon  <metaperl@localhost>
+
+	* Changed Dir option to RemoteDir to avoid confusion (v2.6)
+
+Revision history for Perl extension Net::FTP::Common.
+
+
+
+0.01  Tue Oct 10 09:15:32 2000
+	- original version; created by h2xs 1.20 with options
+		-A -X -n Net::FTP::Common
+

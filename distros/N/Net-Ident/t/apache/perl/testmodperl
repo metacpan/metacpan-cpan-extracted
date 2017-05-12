@@ -1,0 +1,14 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Apache;
+use Apache::Constants qw(:common);
+
+my $r = Apache->request;
+
+$r->content_type('text/plain');
+$r->send_http_header;
+
+$r->print("mod_perl OK\n");
+
+OK;

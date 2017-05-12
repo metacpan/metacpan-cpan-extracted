@@ -1,0 +1,34 @@
+Revision history for Perl extension Net::Autoconfig.
+
+1.13.1 Fri May 15 4:25:00 2009
+    - Fixing unbuffered console server timeout bug
+    - Adding new "<same_as [device]>" template command.
+      Permits using the same set of commands for different
+      device classes without having to copy and paste.
+    - Updating cisco device classifications.  It turns out
+      that the c3560/3560G  use a different image than the 3560E
+    - Adding logging/debugging for expect commands
+    - Adding new method to check for invalid cmd evals.
+
+1.12.2 Thu Jan 29 11:39:53 2009
+    - Changing versioning method
+    - Now requires perl >= 5.10.0
+    - Fixing device.cfg parsing issues
+    - Fixing incorrect device discoveries
+
+1.11  Thu Jan 08 16:24:27 2009
+    - Adding HP4000.pm
+    - Fixing bugs in most modules
+
+1.10  Mon Nov 24 16:29:44 2008
+    - Changing logging initilization methods
+    - Actually using configurable options instead of
+        just using the default values.
+
+1.01  Tue Nov 25 8:06:38 2008
+    - Fixing style/formatting issues
+
+1.00  Tue Sep 23 16:05:28 2008
+	- original version; created by h2xs 1.23 with options
+		-X -n Net::Autoconfig
+

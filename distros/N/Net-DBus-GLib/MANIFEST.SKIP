@@ -1,0 +1,16 @@
+pm_to_blib
+GLib\.o
+GLib\.c
+GLib\.bs
+.*.old
+blib
+.*\.bak
+CVS
+.cvsignore
+.*~
+.#.*
+#.*
+.hg
+^Makefile$
+^cover_db/
+Net-DBus-GLib-.*.tar.gz

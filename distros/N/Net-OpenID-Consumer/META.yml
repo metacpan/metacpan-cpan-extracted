@@ -1,0 +1,32 @@
+---
+abstract: 'Library for consumers of OpenID identities'
+author:
+  - 'Robert Norris <rob@eatenbyagrue.org>'
+  - 'Roger Crew <crew@cs.stanford.edu>'
+build_requires:
+  CGI: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-OpenID-Consumer
+requires:
+  Digest::SHA: '0'
+  HTTP::Request: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  MIME::Base64: '0'
+  Net::OpenID::Common: '1.19'
+  Storable: '0'
+  Time::Local: '0'
+  URI: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-OpenID-Consumer
+  homepage: http://groups.google.com/group/openid-perl
+  repository: git://github.com/wrog/Net-OpenID-Consumer.git
+version: '1.18'

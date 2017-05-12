@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/NCBIx/eUtils/GeneAliases.pm
+scripts/eutils_example.pl
+scripts/get_aliases.pp
+t/00.load.t

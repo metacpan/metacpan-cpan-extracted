@@ -1,0 +1,72 @@
+NAME
+    Net::Domain::ES::ccTLD - Lookup for country names given the TLD code
+    (¡en Español!)
+
+VERSION
+    Version 0.01. ¡Se habla Español!
+
+SYNOPSIS
+    Lookup for a country name given the country code (ccTLD)... in Spanish.
+
+      use Net::Domain::ES::ccTLD;
+
+      my $country = find_name_by_cctld('mx')        # $country is 'México'
+        or die "Couldn't find name.";
+
+      my $neighbor = find_name_by_cctld('us');      # $neighbor is 'Estados Unidos'
+
+EXPORT
+  find_name_by_cctld
+    It returns the Spanish name of the country code or undef if it can't
+    find it.
+
+DESCRIPTION
+    This module is similar to Locales::Country::es in purpose, but this one
+    does work (I tried that one and it was busted), I actively maintain it
+    (because I use it for my work), the encoding is not messed up and it's
+    based on the names under:
+
+     http://es.wikipedia.org/wiki/Dominio_de_nivel_superior_geogr%C3%A1fico
+
+    You've been warned :)
+
+AUTHOR
+    David Moreno, "<david at axiombox.com>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-net-domain-es-cctld
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Domain-ES-ccTLD>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+      perldoc Net::Domain::ES::ccTLD
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Domain-ES-ccTLD>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Net-Domain-ES-ccTLD>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Net-Domain-ES-ccTLD>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Net-Domain-ES-ccTLD/>
+
+COPYRIGHT & LICENSE
+    Copyright 2009-2012 David Moreno.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

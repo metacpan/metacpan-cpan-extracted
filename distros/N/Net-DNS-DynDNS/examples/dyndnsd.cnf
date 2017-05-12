@@ -1,0 +1,25 @@
+#
+# example crontab line
+#
+# 0,20,40 * * * * /usr/local/bin/dyndns_agent.pl --config=/etc/dyndns_agent.cnf
+#
+
+Hosts test.dyndns.org
+
+# System dyndns
+# IPAddress 216.239.63.104
+# Wildcard OFF
+# Mx test.homeip.net
+# BackMx No
+# Offline NO
+# Protocol https
+# Dns_server members.dyndns.org
+# Server dyndns.org
+# Check_ip checkip.dyndns.org
+
+User test
+Password test
+
+Syslog On
+# SyslogSock unix
+# SyslogFacility user

@@ -1,0 +1,8 @@
+Poisson_solver_multigrid.pl 10 10 1 test-up-from-cb >test-up-from-cb
+diff test-up-from-cb-ok test-up-from-cb
+Poisson_solver_multigrid.pl 10 10 1 test-down-to-cb >test-down-to-cb
+diff test-down-to-cb test-down-to-cb-ok
+Poisson_solver_multigrid.pl 10 10 1 test-down-from-cb >test-down-from-cb
+diff -wb test-down-from-cb-ok test-down-from-cb
+Poisson_solver_multigrid.pl 10 10 1 test-up-to-cb >test-up-to-cb
+diff -wb test-up-to-cb-ok test-up-to-cb

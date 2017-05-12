@@ -1,0 +1,37 @@
+#!/usr/bin/perl -w
+
+# $Id: zipcode,v 1.1 2005/09/06 06:04:33 sherzodr Exp $
+
+use strict;
+use Net::UPS;
+use Config::Simple;
+use File::Spec;
+
+my @zipcodes = @ARGV;
+
+unless ( @zipcodes ) {
+    while (defined(my $line = <STDIN>) ) {
+        chomp($line);
+        push @zipcodes, split (/\s+/, $line);
+    }
+}
+
+my %config = ();
+Config::Simple->import_from( File::Spec->catfile($ENV{HOME}, '.upsrc'), \%config );
+
+my $ups = Net::UPS->new($config{UserId}, $config{Password}, $config{AccessKey});
+
+while (my $zip = shift @zipcodes ) {
+    my $addresses = $ups->validate_address( $zip, {tolerance=>.05});
+    unless ( defined $addresses ) {
+        printf("%s:    %s\n", $zip, $ups->errstr);
+        next;
+    }
+    unless ( @$addresses ) {
+        printf("%s:    NO MATCH\n", $zip);
+    }
+
+    while (my $address = shift @$addresses ) {
+        printf("%s:    %s, %s %s\n", $zip, $address->city, $address->state, $address->postal_code);
+    }
+}

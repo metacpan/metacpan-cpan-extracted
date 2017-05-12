@@ -1,0 +1,35 @@
+---
+name: NetSDS-Kannel
+version: 1.300
+author:
+  - 'Net.Style Development Team <info@netstyle.com.ua>'
+abstract: Kannel API for NetSDS VAS platform
+license: gpl
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+requires:
+  LWP::UserAgent: 0
+  NetSDS::Class::Abstract: 1.000
+  NetSDS::Util::Convert: 1.000
+  NetSDS::Util::String: 1.000
+  NetSDS::Util::Types: 1.000
+  URI::Escape: 0
+  XML::LibXML: 1.60
+  perl: 5.008
+  version: 0.50
+build_requires:
+  Module::Build: 0.2805
+  Test::More: 0.62
+  Test::Pod: 1.26
+  Test::Pod::Coverage: 1.08
+provides:
+  NetSDS::Feature::Kannel:
+    file: lib/NetSDS/Feature/Kannel.pm
+    version: 1.300
+  NetSDS::Kannel:
+    file: lib/NetSDS/Kannel.pm
+    version: 1.300
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,171 @@
+NAME
+    Net::Whois::Raw - Get Whois information for domains
+ 
+SYNOPSIS
+      use Net::Whois::Raw;
+      
+  $dominfo = whois('perl.com');
+      ($dominfo, $whois_server) = whois('funet.fi');
+      $reginfo = whois('REGRU-REG-RIPN', 'whois.ripn.net');
+
+      $arrayref = get_whois('yahoo.co.uk', undef, 'QRY_ALL');
+      $text = get_whois('yahoo.co.uk', undef, 'QRY_LAST');
+      ($text, $srv) = get_whois('yahoo.co.uk', undef, 'QRY_FIRST');
+
+      $Net::Whois::Raw::OMIT_MSG = 1;
+            # This will attempt to strip several known copyright
+            # messages and disclaimers sorted by servers.
+            # Default is to give the whole response.
+
+      $Net::Whois::Raw::CHECK_FAIL = 1;
+            # This will return undef if the response matches
+            # one of the known patterns for a failed search,
+            # sorted by servers.
+            # Default is to give the textual response.
+
+      $Net::Whois::Raw::CHECK_EXCEED = 1;
+            # When this option is set, "die" will be called
+            # if connection rate to specific whois server have been
+            # exceeded
+
+      $Net::Whois::Raw::CACHE_DIR = "/var/spool/pwhois/";
+            # Whois information will be
+            # cached in this directory. Default is no cache.
+
+      $Net::Whois::Raw::CACHE_TIME = 60;
+            # Cache files will be cleared after not accessed
+            # for a specific number of minutes. Documents will not be
+            # cleared if they keep get requested for, independent
+            # of disk space.
+
+      $Net::Whois::Raw::TIMEOUT = 10;
+            # Cancel the request if connection is not made within
+            # a specific number of seconds.
+
+      @Net::Whois::Raw::SRC_IPS = (11.22.33.44);
+            # List of local IP addresses to
+            # use for WHOIS queries. Addresses will be used used
+            # successively in the successive queries
+
+      $Net::Whois::Raw::POSTPROCESS{whois.crsnic.net} = \&my_func;
+            # Call to a user-defined subroutine on whois result,
+            # depending on whois-server.
+            # Above is equil to:
+            # ($text, $srv) = whois('example.com');
+            # $text = my_func($text) if $srv eq 'whois.crsnic.net';
+
+DESCRIPTION
+    Net::Whois::Raw queries WHOIS servers about domains. The module supports
+    recursive WHOIS queries. Also queries via HTTP is supported for some
+    TLDs.
+
+    Setting the variables $OMIT_MSG and $CHECK_FAIL will match the results
+    against a set of known patterns. The first flag will try to omit the
+    copyright message/disclaimer, the second will attempt to determine if
+    the search failed and return undef in such a case.
+
+    IMPORTANT: these checks merely use pattern matching; they will work on
+    several servers but certainly not on all of them.
+
+FUNCTIONS
+    whois( DOMAIN [, SRV [, WHICH_WHOIS]] )
+       Returns Whois information for "DOMAIN". Without "SRV" argument
+       default Whois server for specified domain name zone will be used. Use
+       'www_whois' as server name to force WHOIS querying via HTTP (only few
+       TLDs are supported in HTTP queries). Caching is supported: if
+       $CACHE_DIR variable is set and there is cached entry for that domain
+       - information from the cache will be used. "WHICH_WHOIS" argument -
+       look get_whois docs below.
+
+    get_whois( DOMAIN [, SRV [, WHICH_WHOIS]] )
+       Lower-level function to query Whois information for "DOMAIN". Caching
+       IS NOT supported (caching is implemented only in higher-level "whois"
+       function). Without "SRV" argument default Whois server for specified
+       domain name zone will be used. "WHICH_WHOIS" argument is used to
+       access a results if recursive queries; possible values:
+
+       'QRY_FIRST' - returns results of the first query. Non't make
+       recursive queries. In scalar context returns just whois text. In list
+       context returns two values: whois text and whois server which was
+       used to make query).
+
+       'QRY_LAST' - returns results of the last query. In scalar context
+       returns just whois text. In list context returns two values: whois
+       text and whois server which was used to make query). This is the
+       default option.
+
+       'QRY_ALL' - returns results of the all queries of the recursive
+       chain. Reference to array of references to hashes is returned. Hash
+       keys: "text" - result of whois query, "srv" - whois server which was
+       used to make query.
+
+USER DEFINED FUNCTIONS
+    whois_query_sockparams( DOMAIN, SRV )
+       You can set your own IO::Socket::INET params like this:
+
+           *Net::Whois::Raw::whois_query_sockparams = sub {
+               my $class  = shift;
+               my $domain = shift;
+               my $name   = shift;
+
+               return (
+                   PeerAddr => $name,
+                   PeerPort => 43,
+                   # LocalHost => ,
+                   # LocalPort =>
+               );
+           };
+
+    whois_query_socket( DOMAIN, SRV )
+       You can set your own IO::Socket::INET like this:
+
+           *Net::Whois::Raw::whois_query_socket = sub {
+               my $class  = shift;
+               my $domain = shift;
+               my $name   = shift;
+
+               $name .= ':43';
+               return IO::Socket::INET->new();
+           };
+
+    whois_query_ua( DOMAIN, SRV )
+       You can set your own LWP::UserAgent like this:
+
+           *Net::Whois::Raw::whois_query_ua = sub {
+               my $class  = shift;
+               my $domain = shift;
+
+               return LWP::UserAgent->new();
+           };
+
+AUTHOR
+    Original author Ariel Brosh schop@cpan.org, Inspired by jwhois.pl
+    available on the net.
+
+    Since Ariel has passed away in September 2002:
+
+    Past maintainers Gabor Szabo gabor@perl.org.il, Corris Randall
+    corris@cpan.org, Walery Studennikov <despair@cpan.org>.
+
+    Current Maintainer (since 2014): Alexander Nalobin <nalobin@cpan.org>
+
+NOTE
+    Some users complained that the die statements in the module make their
+    CGI scripts crash. Please consult the entries on eval and die on
+    perlfunc about exception handling in Perl.
+
+COPYRIGHT
+    Copyright 2000--2002 Ariel Brosh.
+    Copyright 2003--2003 Gabor Szabo.
+    Copyright 2003--2003 Corris Randall.
+    Copyright 2003--2014 Walery Studennikov.
+
+    This package is free software. You may redistribute it or modify it
+    under the same terms as Perl itself.
+
+    I apologize for any misunderstandings caused by the lack of a clear
+    licence in previous versions.
+
+SEE ALSO
+    pwhois, whois.
+

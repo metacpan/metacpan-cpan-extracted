@@ -1,0 +1,60 @@
+{
+   "abstract" : "Interface com o gateway de pagamentos Moip",
+   "author" : [
+      "Breno G. de Oliveira <garu@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Moip",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Furl" : "0",
+            "IO::Socket::SSL" : "0",
+            "MIME::Base64" : "0",
+            "Moo" : "0",
+            "String::CamelCase" : "0",
+            "Test::More" : "0.88",
+            "XML::Generator::PerlData" : "0.93",
+            "XML::SAX::Writer" : "0.56",
+            "autovivification" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/garu/Net-Moip/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/garu/Net-Moip"
+      }
+   },
+   "version" : 0.05
+}

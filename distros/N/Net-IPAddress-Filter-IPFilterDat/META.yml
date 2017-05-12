@@ -1,0 +1,27 @@
+---
+abstract: 'A fast IP address filter from ipfilter.dat'
+author:
+  - 'Dave Webb <Net-IPAddress-Filter-IPFilterDat@d5ve.com>'
+build_requires:
+  English: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-IPAddress-Filter-IPFilterDat
+requires:
+  Net::IPAddress::Filter: 20121117
+  Scalar::Util: 0
+  base: 0
+  constant: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-IPAddress-Filter-IPFilterDat
+  repository: https://github.com/d5ve/p5-Net-IPAddress-Filter-IPFilterDat.git
+version: 20121119.02

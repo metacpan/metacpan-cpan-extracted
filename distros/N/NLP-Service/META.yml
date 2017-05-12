@@ -1,0 +1,41 @@
+---
+name: NLP-Service
+version: 0.02
+author:
+  - 'Vikas Naresh Kumar <vikas@cpan.org>'
+abstract: A RESTful NLP Service
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Dancer::Test: 0
+  LWP::UserAgent: 0
+  Test::Moose: 0
+  Test::More: 0
+  URI::Escape: 0
+  YAML: 0
+requires:
+  Carp: 0
+  Dancer: 1.3051
+  Dancer::Plugin::REST: 0.06
+  Getopt::Long: 0
+  Inline::Java: 0.53
+  Module::Refresh: 0
+  Moose: 0
+  Pod::Usage: 0
+  common::sense: 0
+  namespace::autoclean: 0
+  perl: v5.10.0
+configure_requires:
+  Module::Build: 0.340201
+provides:
+  NLP::Service:
+    file: lib/NLP/Service.pm
+    version: 0.02
+  NLP::StanfordParser:
+    file: lib/NLP/StanfordParser.pm
+    version: 0.02
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

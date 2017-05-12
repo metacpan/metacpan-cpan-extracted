@@ -1,0 +1,62 @@
+Frequently Asked Questions about Net::ICal and the Reefknot project
+
+--------------------------------------------------------------------------
+Q. What is the Reefknot project?
+
+A. Reefknot aims to produce Perl tools for building RFC-compatible 
+shared calendaring systems. We hope to eventually produce tools that
+make it easy to build standards-compatible calendaring clients and
+servers.
+
+For more information, see:
+
+  http://reefknot.sourceforge.net
+ 
+For a developers' roadmap of what we plan to do in the future, see:
+
+  http://reefknot.sourceforge.net/developer_roadmap/t1.html
+
+--------------------------------------------------------------------------
+Q. I found a bug. Where should I send the bug report?
+
+A. First, check the BUGS file in this archive. Then, check the Sourceforge
+bug tracker at 
+
+  http://sourceforge.net/tracker/index.php?group_id=14603&atid=114603
+ 
+If your bug isn't on either of those lists, mail it to 
+reefknot-devel@sourceforge.net, the developers' list, or submit it to
+the sourceforge bug tracker.  We encourage you to join the 
+reefknot-devel list if you're interested in seeing Net::ICal get better. 
+
+
+--------------------------------------------------------------------------
+Q. Libical, a C library, already provides good RFC compliance. Why isn't
+Reefknot using it? Why are you reimplementing the RFC in Perl?
+
+A. 
+
+1> XS is nonintuitive for many of the Reefknot programmers. Our team's
+going to work faster in pure Perl than we would if we had to think about
+XS; in terms of getting a working Perl implementation of iCal out the
+door.
+
+2> From a module-user perspective, Perl wrappers for libical end up
+being non-intuitive if you've worked a lot in Perl. You wouldn't want to
+write (or use) Lisp wrappers for libical either.
+
+3> The Perl community will benefit from seeing how a good iCal
+implementation works, and they'll understand pure Perl more easily. This
+will mean that it's easier for new developers on N::I to get up to
+speed. 
+
+4> Since Perl is commonly used as a glue language, a good Perlish
+implementation of iCal will lead to many diverse calendaring tools being
+created. This is good, because it means more people will understand how
+calendaring works. 
+
+(There now exists in the standard libical distribution a
+Net::ICal::Libical, which is taking the wrapper approach. It's just not
+what we're doing. If you're working on Net::ICal::Libical, more power to
+you though. We'd love to see it. The more standards-compatible tools,
+the better.)

@@ -1,0 +1,80 @@
+{
+   "abstract" : "A Token Generator of Shared Access Signature Autorization for Microsoft Azure ",
+   "author" : [
+      "ytnobody <ytnobody@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Azure-Authorization-SAS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor::Lite" : "0",
+            "Digest::SHA" : "0",
+            "MIME::Base64" : "0",
+            "String::CamelCase" : "0",
+            "URI" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.98",
+            "Test::Time" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Azure::Authorization::SAS" : {
+         "file" : "lib/Net/Azure/Authorization/SAS.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ytnobody/p5-Net-Azure-Authorization-SAS/issues"
+      },
+      "homepage" : "https://github.com/ytnobody/p5-Net-Azure-Authorization-SAS",
+      "repository" : {
+         "url" : "git://github.com/ytnobody/p5-Net-Azure-Authorization-SAS.git",
+         "web" : "https://github.com/ytnobody/p5-Net-Azure-Authorization-SAS"
+      }
+   },
+   "version" : "0.02"
+}

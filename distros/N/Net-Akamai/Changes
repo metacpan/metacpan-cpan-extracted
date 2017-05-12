@@ -1,0 +1,19 @@
+0.15    2014-01-24
+        - Fix for changed syntax of enum declarations in Moose types
+
+0.14    2010-12-22
+        - Fix coercion to work with newest Moose
+
+0.13    2010-02-01
+		- Do not print response status as part of purge().
+		- New methods in the response object for easier handling.
+
+0.12	2008-05-29 
+		- redist due to Makefile.PL corruption in 0.11
+
+0.11	2008-05-27 
+		- Updated MX::AH to play nice with new Moose version
+		- Updated docs
+
+0.10	2008-05-19 
+		- Initial release.

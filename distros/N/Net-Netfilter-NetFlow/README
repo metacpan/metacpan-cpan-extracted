@@ -1,0 +1,301 @@
+NAME
+    nfflowd - App to generate Cisco NetFlow from Linux netfilter
+
+VERSION
+    version 1.113260
+
+PURPOSE
+    If you run a Linux based firewall, the "nfflowd" application in this
+    distribution will generate a stream of Cisco NetFlow logging data for
+    all TCP, UDP and ICMP connections passing through.
+
+    What makes this different from other solutions is that it uses Linux
+    netfilter's own connection tracking data, rather than observing a
+    traffic capture. This is more efficient for your CPU, and allows
+    tracking of NAT which would otherwise not be possible.
+
+    No reconfiguration of the firewall ruleset or network is required.
+
+SYNOPSIS
+    Make sure you have the "conntrack" and "flow-tools" packages installed
+    on your Linux firewall system.
+
+     write a small configuration describing your NetFlow collector:
+     ~# cat > /etc/nfflowd.conf
+     <flow_send>
+         # source interface on this server
+         args 172.16.1.1
+         # netflow collector address
+         args 192.168.0.1
+         # netflow collector port number
+         args 65001
+     </flow_send>
+     ^D
+ 
+     to start the logger as a daemon:
+     ~# nfflowd start
+ 
+     to specify a custom configuration other than /etc/nfflowd.conf:
+     ~# nfflowd -c /other/config/file.ini
+
+DESCRIPTION
+    The application "nfflowd" included in this distribution is designed to
+    run as a daemon (background) process on a Linux based firewall running
+    IPtables.
+
+    Its purpose is to capture data from the Linux netfilter subsystem about
+    each tracked data connection passing through the firewall, and log this
+    in Cisco NetFlow format to a remote NetFlow collector server. We
+    recommend the Argus 3 software for that collector
+    (<http://www.qosient.com/argus/>). With the default configuration you
+    will also receive a local copy of the same data via "syslog", under the
+    "local6" facility.
+
+    "nfflowd" was written for NAT environments where you have a requirement
+    to trace the IP address on the "private" side which made a particular
+    connection or flow to a port/destination on the "public" (Internet)
+    side. The NetFlow streams logged will allow you to trace back to that
+    private IP.
+
+    The daemon requires no reconfiguration of your firewall ruleset or
+    network, but you may need to install one or two additional helper
+    programs. These are commonly available in most Linux distributions - see
+    "DEPENDENCIES", below.
+
+    "nfflowd" is also efficient and accurate, as it uses Linux netfilter's
+    own connection logging and tracking data. This is preferable to
+    observing a promiscuous traffic capture, which may be CPU intensive and
+    certainly cannot track NAT connections.
+
+  What's special about NAT?
+    An issue that's specific to NAT (rather than general Netflow from a
+    Linux router) is that you really need a good and accurate record of the
+    IP and port number translation. So there are *two* traffic flows, one
+    before and one after the NAT. Both need logging, together with a way to
+    correlate them.
+
+    Traditionally such things are attempted using two instances of
+    "softflowd" or "argus", one each side of the NAT. With accurate
+    timestamping the two flows (pre and post-NAT) can be correlated and then
+    the IP and port translation deduced.
+
+    However this doesn't work for very long running flows, or where there
+    are numerous flows to a destination, some of which are legitimate and
+    some not. There exist cases where it is impossible to be sure that you
+    are correlating the correct two flow records. Seeing as netfilter is
+    already accurately tracking every connection, with NAT information, we
+    can make use of that data.
+
+LIMITATIONS
+    *   It's assumed that Source IP NAT is taking place. If not, you may
+        receive additional unecessary log lines, sorry.
+
+    *   Currently only TCP, UDP and ICMP traffic is logged.
+
+    *   The tool supports only IPv4 tracking. Is there a "conntrack" for
+        IPv6?
+
+USAGE
+    The "nfflowd" application included in this distribution is designed to
+    run as a daemon (background) process. It also supports running in the
+    foreground. You will need to provide a small amount of configuration,
+    and otherwise there are sane defaults for all options.
+
+    Here is the help text for the current version of "nfflowd":
+
+     Usage: nfflowd [ -c file ] [ -f ] { start | stop | restart | install | check | help | version } 
+      -c file     Specify configuration file (instead of /etc/nfflowd.conf)
+      -f          Run in the foreground (don't detach)
+      start       Starts a new nfflowd if there isn't one running already
+      stop        Stops a running nfflowd
+      restart     Stops a running nfflowd if one is running.  Starts a new one.
+      install     Setup nfflowd to run automatically after reboot
+      check       Check the configuration file and report the daemon state
+      help        Display this usage info
+      version     Display the version of nfflowd
+
+    Although the "reload" option is also available, it currently has no
+    effect. Please note that the "install" option has not been tested by the
+    author.
+
+  Flow Output
+    For each flow observed by "conntrack", three flow records are output by
+    this tool. As explained below, three records are required to correlate
+    the NAT operation which took place. The assumption of source IP NAT will
+    be relaxed in a future release of this software.
+
+    Here's an example of the three records generated by an HTTP requesst,
+    which we'll walk through:
+
+     1248952480,737235000,279737,172.16.1.1,720,38052,136315,279737,10.0.195.106,74.125.6.225,0.0.0.0,0,0,62380,80,6,0,0
+     1248952480,737235000,279737,172.16.1.1,720,38052,136315,279737,192.76.7.154,74.125.6.225,0.0.0.0,0,0,62380,80,6,0,0
+     1248952480,737235000,279737,172.16.1.1,1432,2027040,136315,279737,74.125.6.225,192.76.7.154,0.0.0.0,0,0,80,62380,6,0,0
+
+    The format of these lines is "flow-tools" CSV for NetFlow version 5. Of
+    course your NetFlow collector receives a proper UDP NetFlow payload, but
+    here we are looking at the default Syslog output. The fields are listed
+    in order in the table below:
+
+       1248952480 UNIX_SECS  - Current count of seconds since 0000 UTC 1970
+        737235000 UNIX_NSECS - Residual nanoseconds since 0000 UTC 1970
+           279737 SYSUPTIME  - Current time in milliseconds since the export device booted
+       172.16.1.1 EXADDR     - Export device IP address
+              720 DPKTS      - Packets in the flow
+            38052 DOCTETS    - Total number of Layer 3 bytes in the packets of the flow
+           136315 FIRST      - SysUptime at start of flow
+           279737 LAST       - SysUptime at the time the last packet of the flow was received
+     10.0.195.106 SRCADDR    - Source IP address
+     74.125.6.225 DSTADDR    - Destination IP address
+          0.0.0.0 NEXTHOP    - IP address of next hop router
+                0 INPUT      - SNMP index of input interface
+                0 OUTPUT     - SNMP index of output interface
+            62380 SRCPORT    - TCP/UDP source port number or equivalent
+               80 DSTPORT    - TCP/UDP destination port number or equivalent
+                6 PROT       - IP protocol type (for example, TCP = 6; UDP = 17)
+                0 TOS        - IP type of service (ToS)
+                0 TCP_FLAGS  - Cumulative OR of TCP flags
+
+    The first line of the flow triplet describes the connection (IP/port)
+    source and desination from the perspective of the originating host on
+    the "private" side (or behind) your NAT.
+
+    The second line describes how the source NAT was applied by netfilter.
+    In this case the original host's source IP was translated from
+    10.0.195.106 to 192.76.7.154, and the source port stayed the same
+    (62380).
+
+    The final line describes the return flow from that connection, so you
+    can see how much traffic passed in each direction (NetFlow flows are
+    unidirectional, so you do always get two flows for each connection
+    anyway). We only log the public (post-NAT) IPs and port numbers, as
+    that's enough data to complete the correlation.
+
+    So in this example, host 10.0.195.106 make a TCP connection on port 80
+    to 74.125.6.225, sending 38052 bytes and receiving 2027040 bytes back.
+
+CONFIGURATION
+    At minimum you need to provide a small configuration to let "nfflowd"
+    know where your NetFlow collector server is. This by default can be
+    located at "/etc/nfflowd.conf" although you can specify an alternate
+    location using the "-c" command line option. The format of the file can
+    be anything supported by Config::Any (i.e. YAML, JSON, etc), although we
+    recommend using Config::General format, as in the examples below.
+
+    The required configuration is the source IP on your firewall from which
+    NetFlow packets are sent, and the IP/port numbers of the NetFlow
+    collector server:
+
+     <flow_send>
+         # source interface on this server
+         args 172.16.1.1
+         # netflow collector address
+         args 192.168.0.1
+         # netflow collector port number
+         args 65001
+     </flow_send>
+
+    These three options must appear *in the exact order given above*.
+
+    The other thing you might want to configure is whether and how a local
+    copy of the NetFlow data is stored on the Linux firewall itself, via
+    Syslog. The application uses Log::Dispatch and by default will log to
+    Syslog facility "local6" with priority <info>.
+
+    Below is the default configuration, which you can override in your local
+    "nfflowd" configuration file, but be warned! You *must* retain the
+    "screen" dispatcher and configuration section, otherwise the application
+    will stop working. You have the option to remove, change, or add to the
+    "syslog" dispatcher only:
+
+     <ptee>
+         <conf>
+             dispatchers screen
+             dispatchers syslog
+             <screen>
+                 stderr    0
+                 class     Log::Dispatch::Screen
+                 min_level debug
+             </screen>
+             <syslog>
+                 class     Log::Dispatch::Syslog
+                 ident     nfflowd
+                 min_level debug
+                 facility  local6
+             </syslog>
+         </conf>
+     </ptee>
+
+    "nfflowd" records the start and end of each connection reported by
+    netfilter. To preserve memory, the application clears up its records of
+    "unfinished" connections which are older than a set TTL. This defaults
+    to one week, but can be changed by setting a seconds value using the
+    following configuration:
+
+     <ct2ft>
+         ttl  604800
+     </ct2ft>
+
+    In addition, you can control how each of the helper applications are
+    loaded and configured. You would generally not need to do this, but here
+    are the config options anyway:
+
+     <conntrack>
+         progname    conntrack
+         init_format -L
+         format      -E -e NEW,DESTROY -o timestamp -n
+     </conntrack>
+     <flow_import>
+         progname flow-import
+         format   -z0 -f2 -V5 -m0xFF31EF
+     </flow_import>
+     <flow_send>
+         progname flow-send
+         format   -V5 -s %s/%s/%s
+     </flow_send>
+
+DEPENDENCIES
+    Other than the standard contents of a Perl 5.8 distribution, you will
+    need:
+
+    *   conntrack at <http://conntrack-tools.netfilter.org/>
+
+    *   flow-tools at <http://www.splintered.net/sw/flow-tools/>
+
+    *   Log::Dispatch::Configurator::Any version 1.0005 or later
+
+    *   Daemon::Generic
+
+    *   File::Slurp version 9999.06 or later
+
+    *   IPC::Run
+
+    *   Config::General
+
+    *   Config::Any version 0.15 or later
+
+SEE ALSO
+    "pfflowd" at <http://www.mindrot.org/projects/pfflowd/>
+        This is the BSD pf equivalent of this tool.
+
+    "softflowd" at <http://www.mindrot.org/projects/softflowd/>
+        From the "pfflowd" stable, this tool requires a promiscuous traffic
+        capture to generate data. It is therefore not fully stateful and
+        cannot track NAT.
+
+    http://www.cisco.com/en/US/tech/tk812/tsd_technology_support_protocol_ho
+    me.html
+        Cisco homepage for their NetFlow technology.
+
+THANKS
+    David Ford of the University of Oxford's OxCERT team provided valuable
+    input and testing infrastructure, many thanks.
+
+AUTHOR
+    Oliver Gorwits <oliver@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by University of Oxford.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,38 @@
+---
+abstract: 'a simple client library for google code'
+author:
+  - 'sunnavy <sunnavy@bestpractical.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Slurp: 0
+  Test::Mock::LWP: 0
+  Test::MockModule: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Google-Code
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Any::Moose: 0
+  DateTime: 0
+  File::MMagic: 0
+  HTML::TreeBuilder: 0
+  JSON: 0
+  MIME::Types: 0
+  Params::Validate: 0
+  URI::Escape: 0
+  WWW::Mechanize::Link: 0
+  XML::FeedPP: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.18

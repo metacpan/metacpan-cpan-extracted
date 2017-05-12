@@ -1,0 +1,64 @@
+<html>
+<!-- version 1.03 2-12-08 -->
+<head>
+<title>DNSBLs Compared</title>
+<link rel="shortcut icon" type="image/ico" href="/favicon.ico" />
+</head>
+<body bgcolor="#ffffff">
+
+<table cellspacing=0 cellpadding=5 border=0 width=100%>
+<tr valign=middle width=100%>
+<td align=center width=163><!-- PUT YOUR LOGO IMAGE HERE --><img src=images/spamcan1.gif width=163></td>
+<td nowrap><font size=+2>DNSBL's Compared</font></td><td align=right width=100%><font size=+1><a href="/">HOME</a></font>&nbsp;&nbsp;</td></tr>
+</table>
+<table cellspacing=0 cellpadding=5 border=0>
+<tr valign=top><td align=center width=163><!--#include virtual="archive.txt" --></td>
+<td>
+<b>&lt;</b>&nbsp;<font size=+1>Latest Report</font>
+<p>
+These reports show the lookup results for the DNSBLs used by our mail hosts to
+screen incoming port 25 mail connections. For a similar more comprehensive
+comparison
+of all public DNSBLs, see Jeff Makey's <nobr><a
+href="http://www.sdsc.edu/~jeff/spam/Blacklists_Compared.html">Blacklists
+Compared</a></nobr> pages.
+<p>
+<font size=+1>Source Data</font>
+<p>
+The IP addresses used for lookup are the set of addresses that have
+sucessfully connected to port 25 on our mail hosts or spam traps in the week
+ending at midnight each Saturday.
+<p>
+It should be noted that a permanent IP entry is NOT made in the SpamCannibal
+zone file if the IP address is found in one of the DNSBLs used by the mail
+host. Thus, the survey results for SpamCannibal represent IP addresses that
+were not found elsewhere at the time of initial lookup
+<p>
+Our mail hosts run the <a
+href="http://www.spamcannibal.org/">SpamCannibal</a> daemon. The
+SpamCannibal database maintains a semi-permanent cache of IP's which have a
+positive DNSBL lookup outcome. SpamCannibal also maintains a permanent
+record of locally detected spam sources for export in its zone file. Once a
+host IP is recognized as a spam source one way or the other, it can never
+again connect at the TCPIP transport layer and will not again appear in the
+set of connecting IP addresses used for these comparisons. .
+<p>
+In simple terms, the dataset used each week for these charts consists of all
+NEW IP's every week except for those host IP's from which valid email is
+routinely received. To put this in perspective, we receive at most a few
+hundred valid emails a day, mostly from large ISP's. An estimate of the
+number of non-spam, repeating IP's in the data set is probably under a
+hundred. 
+<p>
+<font size=+1>Methodology</font>
+<p>
+The comparison and report generation is done using the Perl module <a 
+href="http://search.cpan.org/search?query=Net%3A%3ADNSBL%3A%3AStatistics&mode=all">Net::DNSBL::Statistics</a>
+which provides a script that accepts one or more lists of IP addresses and
+can perform the DNSBL interrogations in parallel. In addition, it perform
+checks for missing PTR records and detects matches to GENERIC reverse host
+name patterns.
+</td></tr>
+</table>
+</body>
+</html>

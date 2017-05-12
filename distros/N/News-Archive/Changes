@@ -1,0 +1,25 @@
+Revision history for Perl extension News::Archive
+
+0.14		Tue May 25 14:38:31 CDT 2004 
+	- 'use warnings' through many modules.  Fixes to CGIs and various
+	  scripts.  Changed write-out behaviour of News::Active and
+	  News::GroupInfo.
+
+0.13		Tue May 25 12:42:19 CDT 2004
+	- Added 'readonly' bits; it'll tide us over until we've got 
+	  file locking done.
+
+0.12		Thu Apr 29 13:50:07 CDT 2004
+	- Populated kibozerc.pod
+	- Minor bugfixes.
+
+0.11		Thu Apr 29 12:07:34 CDT 2004 
+	- News::Article::Mbox - falls back if the message wasn't a valid
+	  mbox to just looking at it as a single message.
+        - News::Archive - added some close functions.
+	- mbox2news.pl - now works on mboxes with just one message (or non-
+	  mboxes, as the case may be).  Got rid of newsarchive.pl accordingly.
+	- Added newsrecurse.pl.
+
+0.10		Wed Apr 28 17:00:44 CDT 2004 
+	- First releasable version; I'm far from releasing it though.

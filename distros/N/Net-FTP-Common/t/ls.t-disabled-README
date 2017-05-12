@@ -1,0 +1,12 @@
+Perl 5.8.7 does not support shared sub refs and this test (which
+worked prior to 5.8.7)  barfs like so:
+
+Invalid value for shared scalar at /System/Library/Perl/5.8.6/Test/Builder.pm line 319.
+WHOA!  Somehow you got a different number of results than tests ran!
+This should never happen!  Please contact the author immediately!
+END failed--call queue aborted.
+t/ls.........dubious
+
+
+And so until this is fixed in Perl, I have to stop doing this test!
+

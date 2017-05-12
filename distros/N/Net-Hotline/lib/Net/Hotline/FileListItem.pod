@@ -1,0 +1,69 @@
+=head1 NAME
+
+Net::Hotline::FileListItem - File object used internally by Net::Hotline::Client
+
+=head1 SYNOPSIS
+
+    use Net::Hotline::FileListItem;
+
+    $file = new Net::Hotline::FileListItem;
+
+    $file->name("foo.txt");
+    $file->type("TEXT");
+    ...
+
+=head1 DESCRIPTION
+
+Net::Hotline::FileListItem is a simple class for storing and retrieving file
+information,  You should never have to create your own
+Net::Hotline::FileListItem objects when using Net::Hotline::Client.  Getting and (to
+a lesser extent) setting attributes is all that should be necessary.
+
+=head1 CONSTRUCTION
+
+=over 4
+
+=item new
+
+Creates a new Net::Hotline::FileListItem object with all attributes set to undef
+(or zero for numeric attributes).
+
+=back
+
+=head1 METHODS
+
+All the Net::Hotline::FileListItem methods are simple attribute get/set routines.
+If given an argument, they set an attribute.  In all cases, they
+return the current value of the attribute.
+
+=over 4
+
+=item creator TEXT
+
+The file creator, given as a four-letter Mac OS creator code ("TTXT", "SIT!",
+etc.)
+
+=item name TEXT
+
+The file name.
+
+=item size NUM
+
+The size of the file in bytes.
+
+=item type TEXT
+
+The file type, given as a four-letter Mac OS type code ("TEXT", "PICT", etc.)
+or Net::Hotline::Constants::HTLC_FOLDER_TYPE for folders.
+
+=back
+
+=head1 AUTHOR
+
+John C. Siracusa (siracusa@mindspring.com)
+
+=head1 COPYRIGHT
+
+Copyright(c) 1999 by John Siracusa.  All rights reserved.  This program is
+free software; you can redistribute it and/or modify it under the same terms
+as Perl itself.

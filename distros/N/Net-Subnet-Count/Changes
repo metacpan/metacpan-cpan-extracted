@@ -1,0 +1,12 @@
+Revision history for Perl extension Net::Subnet::Count.
+
+1.00  Fri Jan 14 13:51:33 2000
+	- original version; created by h2xs 1.19
+
+1.10  Fri Jan 14 18:10:33 2000
+	- Allow ->add of array references.
+
+1.20  Tue Jan 18 20:39:00 2000
+	- alvaro@cantv.net added the valcount method
+
+

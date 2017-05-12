@@ -1,0 +1,44 @@
+
+=head1 NAME
+
+NetApp::Filer::License -- OO Class for representing NetApp Filer licenses
+
+=head1 SYNOPSIS
+
+    use NetApp::Filer;
+
+    my $filer = NetApp::Filer->new({ ... });
+
+    my @licenses	= $filer->get_licenses;
+
+    $filer->add_license( $code );
+
+    $filer->delete_license( 'cifs' );
+
+    my $license		= $filer->get_license( 'nfs' );
+
+=head1 DESCRIPTION
+
+This class is used to encapsulate the NetApp Filer license information.
+
+=head1 METHODS
+
+=head2 get_service
+
+Returns the name of the service for the license.
+
+=head2 get_type
+
+Returns either 'site' or 'node', depending on whether or not the
+license was in fact a site license.
+
+=head2 get_code
+
+Returns the code for the license
+
+=head2 get_expired
+
+Returns a false value if the license is not expired, and if it is
+expired, it returns the data the license expired, for example: "26 Jun 2008"
+
+=cut

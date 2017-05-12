@@ -1,0 +1,18 @@
+Revision history for Perl extension Net::Frame::Layer::8021Q.
+
+1.03 Tue Jan 20 19:40:10 CET 2015
+   - update: copyright notice
+   - update: Kwalitee
+
+1.02 Thu Jun  3 14:34:40 CEST 2010
+   - bugfix: Bit::Vector is PREREQ
+   - update: copyright notice
+
+1.01 Sun May 31 16:51:12 CEST 2009
+   - new: support for MPLS and LLTD layers
+   - update: copyright notice
+   - update: mailing list URL
+
+1.00 Fri Dec 22 13:10:19 CET 2006
+   - first public release
+

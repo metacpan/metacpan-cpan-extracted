@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Net-Domain-Info
+version:            0.02
+abstract:           ~
+author:
+    - Ivan Baktsheev <dot.and.thing@gmail.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Class::Easy:          0
+    Net::Domain::ExpireDate:  0
+    Net::Whois::Raw:      0
+    Unicode::Stringprep:  1
+    WWW::Google::PageRank:  0
+    WWW::Yahoo::InboundLinks:  0
+    WWW::Yandex::TIC:     0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

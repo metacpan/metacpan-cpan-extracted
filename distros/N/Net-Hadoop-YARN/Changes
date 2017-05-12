@@ -1,0 +1,20 @@
+Revision history for Net-Hadoop-YARN
+
+0.202 2016-11-08 BURAK
+    - Patch for the CDH5.8.2 RM redirect bugfix.
+
+0.201 2016-09-26 BURAK
+    - Document active_rm()
+    - JMX helpers + User apps interface for RM.
+    - Fix the Appmaster error message to display the mismatching pattern.
+
+0.100 2016-07-22 BURAK
+    - Collect and return the targeted REST host in the stats.
+    - New method active_rm() to locate the active Resource Manager in HA-pairs
+
+0.004 2016-06-06 BURAK
+    - Minor fixes.
+
+0.002 2015-05-31 DMOR
+
+0.001 2015-05-18 DMOR

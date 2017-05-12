@@ -1,0 +1,8 @@
+# This is README file for Net::TrackUPS distribution.
+
+Net::TrackUPS is a simple wrapper around UPS's web services.
+
+To build:
+    perl Makefile.PL
+    make
+

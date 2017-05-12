@@ -1,0 +1,14 @@
+---
+abstract: 'Number::Misc - handy utilities for numbers'
+author:
+    - "Miko O'Sullivan <miko@idocs.com>"
+generated_by: home grown
+license: perl
+name: Number-Misc
+provides:
+    Number::Misc:
+        file: lib/Number/Misc.pm
+        version: 1.2
+requires:
+    perl: 5.003
+version: 1.2

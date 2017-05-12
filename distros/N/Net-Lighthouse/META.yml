@@ -1,0 +1,35 @@
+---
+abstract: 'Perl interface to lighthouseapp.com'
+author:
+  - 'sunnavy <sunnavy@bestpractical.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Mock::LWP: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.92'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Lighthouse
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Any::Moose: 0
+  DateTime: 0
+  LWP: 0
+  MIME::Base64: 0
+  Params::Validate: 0
+  URI::Escape: 0
+  XML::TreePP: 0
+  YAML::Syck: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/bestpractical/net-lighthouse.git
+version: 0.06

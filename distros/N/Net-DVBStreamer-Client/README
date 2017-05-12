@@ -1,0 +1,43 @@
+Net::DVBStreamer::Client
+========================
+
+Net::DVBStreamer::Client is a perl module for talking to DVBStreamer servers.
+
+
+
+For more information about DVBStreamer visit its homepage:
+http://dvbstreamer.sourceforge.net/
+
+
+
+INSTALLATION
+
+	I use Module::Build to build and install this module.
+	To install this module type the following:
+	
+		perl Build.PL
+		./Build
+		./Build test
+		
+	And then as root:
+	
+		./Build install
+
+	Module::Build is available in the debian package:
+
+		libmodule-build-perl
+
+
+AUTHOR
+
+	Nicholas J Humfrey, njh@cpan.org
+
+
+COPYRIGHT AND LICENSE
+
+	Copyright (C) 2007 Nicholas J Humfrey
+
+	This library is free software; you can redistribute it and/or modify it
+	under the same terms as Perl itself, either Perl version 5.005 or, at
+	your option, any later version of Perl 5 you may have available.
+

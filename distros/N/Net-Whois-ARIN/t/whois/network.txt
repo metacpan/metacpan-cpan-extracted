@@ -1,0 +1,31 @@
+
+OrgName:    Internet Assigned Numbers Authority
+OrgID:      IANA
+Address:    4676 Admiralty Way, Suite 330
+City:       Marina del Rey
+StateProv:  CA
+PostalCode: 90292-6695
+Country:    US
+
+NetRange:   127.0.0.0 - 127.255.255.255
+CIDR:       127.0.0.0/8
+NetName:    LOOPBACK
+NetHandle:  NET-127-0-0-0-1
+Parent:
+NetType:    IANA Special Use
+Comment:    Please see RFC 3330 for additional information.
+RegDate:
+Updated:    2002-10-14
+
+OrgAbuseHandle: JBLOW-ARIN
+OrgAbuseName:   Blow, Joe
+OrgAbusePhone:  +1-800-555-8080
+OrgAbuseEmail:  jblow@foobar.com
+
+OrgTechHandle: JBLOW-ARIN
+OrgTechName:   Blow, Joe
+OrgTechPhone:  +1-800-555-8080
+OrgTechEmail:  jblow@foobar.com
+
+# ARIN WHOIS database, last updated 2006-10-08 19:10
+# Enter ? for additional hints on searching ARIN's WHOIS database.

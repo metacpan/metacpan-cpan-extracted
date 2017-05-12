@@ -1,0 +1,92 @@
+1.05 2014-12-22
+====
+  - Update CHANGES file
+
+1.04 2014-12-22
+====
+  - Increase XML::Stream dependency to 1.24
+
+1.03 2014-12-22
+====
+  - Roll-up of all 1.02_* changes
+  - Update bug tracker location
+  - RT#94649 use Digest::SHA (from Debian package maintainers)
+  - RT#94650 spelling corrections (from Debian package maintainers)
+
+1.02_05 2014-12-17
+====
+  - Correct incorrectly tagged 1.02_04 (errantly tagged as 1.23_04)
+  - Remove extraneous tag 1.02_1 (1.02_01 points to the same content)
+
+1.02_04 2011-07-19
+===
+  - Remove outdated Test::More/Test::Builder (szabgab)
+  - Address more memory leaks in Net::XMPP::Connection, Net::XMPP::Protocol and Net::XMPP::Roster (szabgab)
+  - Fix crash connecting to Google Talk (szabgab)
+  - Add Google Talk-specific test (szabgab)
+  - Add memory leak tests (szabgab)
+  - Correct behavior of Net::XMPP::Debug when level >= 0 (szabgab)
+  - Correct documentation with regard to debug settings (szabgab)
+  - Correct required version of Perl (szabgab)
+  - Removed specific XML::Stream version require (szabgab)
+
+1.02_03 2011-06-23
+===
+  - RT#61611 Correct comparison operator
+  - Fixed memory leak in Net::XMPP::Connection (szabgab)
+  - RT#52549 unindented POD so that it reformats properly (szabgab)
+  - Replace indirect object notation with direct invocation notation (szabgab)
+
+1.02_02 2010-09-24
+===
+  - Increase XML::Stream dependency to 1.23_04
+
+1.02_01 2010-09-22
+===
+  - New maintainer: DAPATRICK
+  - RT#15736 Replace print statements to debug logging 
+  - RT#51156 Correct typo in documentation
+  - RT#54521 Note dependency on XML::Stream 1.23
+  - RT#37129, RT#18539 Support for virtual domains 
+  - RT#57887 Use each required module explicitly
+  - RT#61453 Pass ssl_verify and ssl_ca_path
+  - RT#61453 Improve undef/null ssl param handling 
+  - RT#61144 Appropriately handle non-object jid 
+  - RT#37030 Clarify license as LGPL 2.1 
+  - RT#58333 Check definedness of hash key before use 
+
+1.0.2 $Id: CHANGES 28 2007-03-29 12:39:48Z hacker $
+===
+  - Fix bug in Stanza::_xpath_defined causing defined to pass when it shouldn't
+    which broke GetTimeStamp
+  - Added test get_time_stamps.test, disabled due to XML::Stream bug
+    on Windows.
+  - Copied *X subs from Net::Jabber::Message to Net::XMPP::Message
+  - added debugging in some Protocol subs that didn't have it, but not all
+  - disabled CODE checking in Protocol-Callback subs to be POE compatable
+    Should be put into registration, not on callback, but didn't do that yet
+  - changed mytestlib.pl to output more concise test names
+
+1.0.1
+===
+  - Fixed bug in Execute() where it would not reconnect correctly.
+    Thanks to bianchi.
+  - Fixed bad xpath in iq:register.  Thanks to Julian Yon.
+  - Fixed minor bug in tests thanks to Alexey Tourbin.
+    to dsanot.
+  - Fixed bug in default callbacks.  The inheritance model I was using
+    was completely screwed up.
+
+1.0
+===
+  - Should be stable enough for a 1.0 release.
+  - More merges from Net::Jabber to make this stable.
+
+0.1
+===
+  - Initial port from Net::Jabber.  This will ultimatly end up being
+    an inheritable base for doing XMPP connections.  Net::Jabber will
+    be re-written to use Net::XMPP for base connections and simply
+    provide the Jabber extensions that the Jabber Software Foundation
+    is managing.
+

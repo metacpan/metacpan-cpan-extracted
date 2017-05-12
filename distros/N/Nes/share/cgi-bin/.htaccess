@@ -1,0 +1,35 @@
+
+# ---------- Nes configuration --------------
+# exec cgis
+Options +ExecCGI
+AddHandler cgi-script .cgi .pl
+
+# Nes nhtml files
+AddHandler perl-nes .nhtml
+AddHandler perl-nes .nhtm
+
+# Nes nJS files
+AddHandler perl-nes .njs
+
+## uncomment for ModPerl2 and Apache Prefork:
+#<Files ~ "\.(pl|cgi)$">
+#    SetHandler perl-script
+#    PerlHandler ModPerl::RegistryPrefork
+#    PerlOptions +ParseHeaders
+#</Files>
+  
+# nes dispatcher
+Action perl-nes /cgi-bin/nes/dispatch.cgi
+
+# protected Nes configuration and other files
+<FilesMatch \.(nsql|nes.cfg|pm)$>
+  order deny,allow
+  deny from all
+</FilesMatch>
+#---------------------------------------------
+  
+
+
+
+
+  

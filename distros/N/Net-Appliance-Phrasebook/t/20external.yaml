@@ -1,0 +1,16 @@
+---
+# this is a test YAML stream for Net::Appliance::Phrasebook
+one:
+    cat: dog
+    dog: cat
+three:
+    cat: meoww
+    dog: woof
+    god: 'burning bush'
+five:
+    cabbage: raw
+    sprout: raw
+    cat: four
+four:
+    kidney_bean: cooked
+    cabbage: cooked

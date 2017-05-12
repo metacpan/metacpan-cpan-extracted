@@ -1,0 +1,41 @@
+Net-YASA
+
+This module extracting terms and their freqency from YASA (Yet Another Suffix Array)
+Web Service (REST).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Net::YASA
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-YASA
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-YASA
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Net-YASA
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Net-YASA
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2009 Cheng-Lung Sung
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

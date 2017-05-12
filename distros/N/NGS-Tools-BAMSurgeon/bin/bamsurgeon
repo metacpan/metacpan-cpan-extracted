@@ -1,0 +1,165 @@
+#! /usr/bin/env perl
+
+use strict;
+use warnings;
+use Carp;
+use NGS::Tools::BAMSurgeon;
+use FindBin qw($Bin);
+use YAML qw(LoadFile);
+use Getopt::Long;
+use Pod::Usage;
+use File::ShareDir ':ALL';
+use File::Copy;
+
+my ($opt_help, $opt_version, $opt_make, $opt_config);
+
+GetOptions(
+	"help!" => \$opt_help,
+	"version" => \$opt_version,
+	'make_yaml:s' => \$opt_make,
+	'config:s' => \$opt_config
+	);
+
+
+sub print_usage {
+	my $status = shift;
+	print("\nOptions:\n\t--help|-h\tPrint this help\n\t--version|-v\tPrint the version of NGS::Tools::BAMSurgeon\n\t--config|-c\tSpecify the path to the YAML config file\n");
+	exit($status);
+	}
+
+sub print_version {
+	print("\nNGS::Tools::BAMSurgeon v1.0.0\n");
+	exit(0);
+	}
+
+sub make_yaml {
+	copy(dist_file('NGS-Tools-BAMSurgeon',  'config.yaml'), $opt_make) or croak ("Could not YAML to the specified file: $!");
+	exit(0);
+	}
+
+print_usage(0) if $opt_help;
+print_version() if $opt_version;
+make_yaml() if $opt_make;
+
+if (!defined($opt_config)) {
+	print("\nPlease specify a YAML config file.\n");
+	print_usage(1);
+	}
+
+my $config = LoadFile($opt_config) or croak("Could not load YAML config file: $!");
+
+my $bamsurgeon = NGS::Tools::BAMSurgeon->new(
+	working_dir => $config->{working_dir},
+	config => $opt_config,
+	somatic_profile => $config->{somatic_profile},
+	germline_profile => $config->{germline_profile},
+	bam => $config->{bam},
+	tumour_name => $config->{tumour_name},
+	sex => $config->{sex},
+	gpercent => $config->{gpercent},
+	seed => $config->{seed},
+	minvaf => $config->{minvaf},
+	maxvaf => $config->{maxvaf},
+	vafbeta1 => $config->{vafbeta1},
+	vafbeta2 => $config->{vafbeta2},
+	indel_minlen => $config->{indel_minlen},
+	indel_maxlen => $config->{indel_maxlen},
+	indel_types => $config->{indel_types},
+	sv_minlen => $config->{sv_minlen},
+	sv_maxlen => $config->{sv_maxlen},
+	sv_types => $config->{sv_types},
+	phasing => $config->{phasing},
+	redochrs => $config->{redochrs}
+	);
+
+$bamsurgeon->run(
+	splitbam => $config->{stages}->{splitbam},
+	preparef => $config->{stages}->{preparef},
+	pickgermmut => $config->{stages}->{pickgermmut},
+	germsim => $config->{stages}->{germsim},
+	generatecallable => $config->{stages}->{generatecallable},
+	picksomaticmut => $config->{stages}->{picksomaticmut},
+	picktrinucleotides => $config->{stages}->{picktrinucleotides},
+	splitsubclones => $config->{stages}->{splitsubclones},
+	somaticsim => $config->{stages}->{somaticsim},
+	makevcf => $config->{stages}->{makevcf},
+	extractleafs => $config->{stages}->{extractleafs},
+	mergephases => $config->{stages}->{mergephases},
+	mergechromosomes => $config->{stages}->{mergechromosomes},
+	mergefinal => $config->{stages}->{mergefinal},
+	allelecount => $config->{stages}->{allelecount}
+	);
+
+__END__
+
+=head1 NAME
+
+bamsurgeon
+
+=head1 SYNOPSIS
+
+B<bamsurgeon> [options]
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--help>
+
+Print a brief help message and exit.
+
+=item B<--version>
+
+Print the version number.
+
+=item B<--config>
+
+Configuration file in YAML format that contains the signatures information. Sample format:
+
+---
+signature_file: ../t/signatures.txt
+cancer_file: ../t/cancer_signatures.yaml
+vcf_file:
+signatures:
+    Signature 5: 0.75
+    Signature 1A: 0.25
+cancer: 
+
+=item B<--make_yaml>
+
+Generate a skeleton YAML config file with all fields for the user to fill in.
+
+=back
+
+=head1 DESCRIPTION
+
+This script initiates NGS::Tools::BAMSurgeon, which is a pipeline wrapper for BAMSurgeon (https://github.com/adamewing/bamsurgeon) and provides additional functionality for the simulation of copy number abberations in the tumour.
+
+=head1 EXAMPLE
+
+Typical usage:
+
+bamsurgeon --config /path/to/config.yaml
+
+=head1 AUTHORS
+
+Christopher Lalansingh - Boutros Lab
+
+Shadrielle Melijah G. Espiritu - Boutros Lab
+
+=head1 ACKNOWLEDGEMENTS
+
+Paul Boutros, Phd, PI - Boutros Lab
+
+Lydia Liu - Boutros Lab
+
+Takafumi Yamaguchi - Boutros Lab
+
+Srinivasan Sivanandan - Boutros Lab
+
+Adam D. Ewing - BAMSurgeon author
+
+The Ontario Institute for Cancer Research
+
+=cut
+

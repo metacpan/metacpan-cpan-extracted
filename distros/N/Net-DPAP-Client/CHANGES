@@ -1,0 +1,14 @@
+CHANGES file for Net::DPAP::Client
+
+0.26 Sun Oct  1 20:22:00 BST 2006
+  - add pod coverage test
+
+0.25 Wed Mar  9 18:15:58 EST 2005
+  - work with iPhoto 5 (thanks to Jack/ms419)
+
+0.24 Mon Jul 19 19:18:01 CEST 2004
+  - more documentation (as requested by Mark Fowler)
+  - added a test to check the Pod
+
+0.22 Mon Jul 12 14:54:28 IST 2004
+  - first release

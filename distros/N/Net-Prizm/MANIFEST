@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Net/Prizm.pm
+lib/Net/Prizm/wsdls/CustomerIfService.wsdl
+lib/Net/Prizm/wsdls/LogEventIfService.wsdl
+lib/Net/Prizm/wsdls/NetworkIfService.wsdl
+t/Net-Prizm.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,22 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+TODO
+lib/Net/Lujoyglamour.pm
+lib/Net/Lujoyglamour/WebApp.pm
+lib/Net/Lujoyglamour/Result/Url.pm
+t/00.load.t
+t/01-deploy.t
+t/02-webapp.t
+t/02-webapp-run.t
+t/form.html
+t/geturl.html
+t/redirect.html
+t/Lujoyglamournet.pdf
+app/lg-deploy
+app/lg.cgi
+app/form.html
+app/geturl.html
+app/redirect.html
+META.yml                                 Module meta-data (added by MakeMaker)

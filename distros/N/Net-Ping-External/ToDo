@@ -1,0 +1,6 @@
+Linux distro detection:
+http://perlmonks.org/?node_id=578430
+http://perlmonks.org/?node_id=578445
+#cat /proc/version
+
+This task will be handled by Linux::Distribution

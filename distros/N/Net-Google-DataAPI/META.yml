@@ -1,0 +1,50 @@
+---
+abstract: 'Base implementations for modules to negotiate with Google Data APIs'
+author:
+  - 'Nobuo Danjou <danjou@soffritto.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Exception: 0
+  Test::MockModule: 0
+  Test::MockObject: 0
+  Test::More: '0.88'
+  Test::Warn: 0
+  UNIVERSAL::can: 0
+  UNIVERSAL::isa: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.08'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Google-DataAPI
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  Moose: '0.56'
+requires:
+  Any::Moose: 0.04
+  Carp: 0
+  Digest::SHA1: 0
+  LWP::Protocol::https: 0
+  LWP::UserAgent: 0
+  Lingua::EN::Inflect::Number: 0
+  Mouse: '0.51'
+  Net::Google::AuthSub: '0.5'
+  Net::OAuth: 0
+  Net::OAuth2: '0.60'
+  Text::Glob: 0
+  URI: 0
+  XML::Atom: 0
+  XML::LibXML: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://lopnor.github.com/lopnor/Net-Google-DataAPI.git
+version: '0.2805'

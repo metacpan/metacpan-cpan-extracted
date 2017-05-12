@@ -1,0 +1,25 @@
+Revision history for NIST-NVD-Store-SQLite3
+
+1.00.00 cjac@f5.com 20120718T155922
+				* exercised code in-house
+				* tests are now all green on debian wheezy amd64
+
+0.07		Looks like websec results are working as expected.
+				Peer review would be nice.
+				Tests haven't been run thoroughly.  They're probably failing.
+
+0.05		created websec index
+
+0.04		added some deps
+				removed some other stuff
+				Let's see if the nightly tests pass yet...
+
+0.03		indexing CWEs and publishing an interface to query them
+
+0.02		missed a dependency.  oops.
+
+0.01    Tue Jan 31 21:30:18 PST 2012 cjac@f5.com
+        Initial go at it
+
+
+

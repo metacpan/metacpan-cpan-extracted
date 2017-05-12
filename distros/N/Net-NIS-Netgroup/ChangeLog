@@ -1,0 +1,12 @@
+Change log for Net::NIS::Netgroup
+
+20100812	[ 1.1 ]
+	- New function "listnetgr" to iterate over a net group.
+	  Thanks to Alf Wachsmann for patch.
+	- Doc updates
+
+20100308	[ 1.0.1 ]
+	- Don't try to build on Windows platform
+	- Don't fail tests if run as non-root (but skip setting)
+	- Don't fail tests that check netgroups only known to author
+	- Use gzip instead of bzip2 for compressing distribution

@@ -1,0 +1,15 @@
+Revision history for Net-SMS-Optimus
+
+0.05    Fri Jan 9/23:00:00
+        Optimus portal has changed. Fixed the code to reflect the changes.
+        Also fixes RT bug #38621
+
+0.03    Tue Mar 6/17:34:32
+        Add a missing depedency
+
+0.02    Mon Mar 5/14:27:52
+        Forgot to put sms_optimus on manifest
+
+0.01    Sun Mar 4/23:13:25
+        First version, released on an unsuspecting world.
+

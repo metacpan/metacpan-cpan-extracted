@@ -1,0 +1,15 @@
+#
+#	Allegedly for ProFTPd.
+#
+#	$Id: dictionary.unix 45 2006-11-14 17:45:00Z lem $
+#
+
+VENDOR		Unix	4
+
+ATTRIBUTE	Unix-FTP-UID		10	integer Unix
+ATTRIBUTE	Unix-FTP-GID		11	integer Unix
+ATTRIBUTE	Unix-FTP-Home		12	string Unix
+ATTRIBUTE	Unix-FTP-Shell		13	string Unix
+ATTRIBUTE	Unix-FTP-Group-Names	14	string Unix
+ATTRIBUTE	Unix-FTP-Group-Ids	15	string Unix
+

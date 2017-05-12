@@ -1,0 +1,156 @@
+---
+counts:
+    SNV: 700
+    Indel: 200
+    SV: 60
+rates:
+    SNV: 1.225629213e-07
+    Indel: 3.537086e-08
+    SV: 1.064376e-08
+root:
+    percent: 1
+    children:
+      - percent: 0.67
+        SNV: 553
+        Indel: 55
+        SV: 35
+        children:
+          - percent: 0.6269
+            SNV: 446
+            Indel: 45
+            SV: 15
+            children:
+              - percent: 0.4524
+                SNV: 359
+                Indel: 36
+                SV: 10
+              - percent: 0.1190
+                SNV: 524
+                Indel: 52
+                SV: 20
+              - percent: 0.4286
+          - percent: 0.3731
+      - percent: 0.33
+templates:
+    template0:
+        chrs: 1,2,3,4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,X,Y
+        root: 
+            children: 
+              - mut_type:
+                  - snv_a 1
+                  - indel_a 1
+                  - sv_a 1
+                  - snv_b 1
+                  - indel_b 1
+                  - sv_b 1
+                mut_indx:
+                  - 0
+                  - 0
+                  - 0
+                  - 0
+                  - 0
+                  - 0
+                children: 
+                  - mut_type:
+                      - snv_a 1
+                      - indel_a 1
+                      - sv_a 1
+                      - snv_b 1
+                      - indel_b 1
+                      - sv_b 1
+                    mut_indx:
+                      - 0
+                      - 0
+                      - 0
+                      - 0
+                      - 0
+                      - 0
+                    children:
+                      - mut_type:
+                          - snv_a 1
+                          - indel_a 1
+                          - sv_a 1
+                          - snv_b 1
+                          - indel_b 1
+                          - sv_b 1
+                        mut_indx:
+                          - 0
+                          - 0
+                          - 0
+                          - 0
+                          - 0
+                          - 0
+                      - mut_type:
+                          - snv_a 1
+                          - indel_a 1
+                          - sv_a 1
+                          - snv_b 1
+                          - indel_b 1
+                          - sv_b 1
+                        mut_indx:
+                          - 0
+                          - 0
+                          - 0
+                          - 0
+                          - 0
+                          - 0
+                      - mut_type:
+                        mut_indx:
+                  - mut_type:
+                    mut_indx:
+              - mut_type:
+                mut_indx:
+    template1:
+        chrs: 13
+        root: 
+            children: 
+              - mut_type:
+                  - snv_a 1
+                  - indel_a 1
+                  - sv_a 1
+                  - snv_b 1
+                  - indel_b 1
+                  - sv_b 1
+                  - del_b 1
+                mut_indx:
+                  - 0
+                  - 0
+                  - 0
+                  - 0
+                  - 0
+                  - 0
+                  - 0
+                children: 
+                  - mut_type:
+                      - snv_a 1
+                      - indel_a 1
+                      - sv_a 1
+                    mut_indx:
+                      - 0
+                      - 0
+                      - 0
+                    children:
+                      - mut_type:
+                          - snv_a 1
+                          - indel_a 1
+                          - sv_a 1
+                        mut_indx:
+                          - 0
+                          - 0
+                          - 0
+                      - mut_type:
+                          - snv_a 1
+                          - indel_a 1
+                          - sv_a 1
+                          - del_a 1
+                        mut_indx:
+                          - 0
+                          - 0
+                          - 0
+                          - 0
+                      - mut_type:
+                        mut_indx:
+                  - mut_type:
+                    mut_indx:
+              - mut_type:
+                mut_indx:

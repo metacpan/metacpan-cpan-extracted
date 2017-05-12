@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+
+# configuration file for leafmail -- sets up global variables
+#
+# To configure leafmail, go through this file inserting the information
+# the comments tell you to!
+#
+#----------------------------------------------------------------------
+#
+# EDIT THE FOLLOWING FIELDS
+#
+#----------------------------------------------------------------------
+#
+# hosts allowed to connect: this should contain localhost, plus the 
+# fully qualified domain name of the machine running leafmail, and any
+# aliases by which it is known.
+
+my @hosts_allowed_to_connect = (qw(
+         localhost
+         pc.antipope.org
+         pc
+));
+
+# hosts refused permission: this should contain perl regular expressions
+# that match anyone who you specifically want to refuse connection permission
+# to. When the "hosts allowed to connect" option contains anything at all,
+# all hosts not in it are refused permission, so you can safely leave this
+# blank.
+
+my @hosts_refused_permission_to_connect = (qw(
+));
+
+# myhost: name of this computer. By default, localhost -- this is only used
+# when stamping Received: lines on messages and announcing our name to the
+# upstream smarthost. You'd better make it something your smarthost 
+# recognizes!
+
+my $myhost = "pc.antipope.org";
+
+# relay: the name of your smart mail relay. For example, post.demon.co.uk
+# relays mail for machines using Demon Internet. This is where _all_ mail
+# is sent when deliver is called.
+
+my $relay = "public.antipope.org";
+
+# spooldir: where mail waiting to be sent is spooled. This can be somewhere
+# like /var/spool/mqueue or /usr/spool/leafmail -- it's up to you, but it
+# must be a real directory and it must be read/write/executable to the
+# leafmail process (but hopefully not to J. Random User!)
+
+my $spooldir = "/var/spool/leafmail";
+
+# port: leave this pointing to 25, unless you are doing something 
+# _really_ strange!
+
+$MAIN::port = 25; # smtp well-known port
+
+# bindhost: host name to bind this server to. Usually localhost, so only
+# connections from localhost will get through to it. To listen for connections
+# from anywhere, set $bindhost = "".
+
+$MAIN::bindhost = "";
+
+#----------------------------------------------------------------------
+#
+# DO NOT EDIT BELOW THIS LINE!
+#
+#----------------------------------------------------------------------
+
+%MAIN::leafmail_param = (
+        "allowed"  => [ @hosts_allowed_to_connect ],
+        "denied"   => [ @hosts_refused_permission_to_connect ],
+        "myhost"   => $myhost,
+        "relay"    => $relay,
+        "spooldir" => $spooldir
+      );

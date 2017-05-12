@@ -1,0 +1,14 @@
+Installing this program is done in good old fashioned Perl style:
+
+* Get the archive (looks like you have it...)
+
+tar -xzf HL7-<version>.tar.gz
+
+cd HL7-<version>
+perl Makefile.PL
+make
+make install
+
+(Sorry, no tests yet...)
+
+That's all folks!

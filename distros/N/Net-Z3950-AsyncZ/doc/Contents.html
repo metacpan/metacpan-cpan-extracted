@@ -1,0 +1,338 @@
+<!-- 
+$Date: 2004/03/25 19:27:59 $
+$Revision: 1.5 $
+-->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Contents</title>
+<link rev="made" href="mailto:tower@sundial.cg.shawcable.net" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#net::asyncz">Net::Z3950::AsyncZ</a></li>
+	<ul>
+
+		<li><a href="#intro">Intro</a></li>
+		<li><a href="#documentation">Documentation</a></li>
+		<li><a href="#the_modules">The Modules</a></li>
+		<ul>
+
+			<li><a href="#here_are_the_modules:">Here are the modules:</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#index">INDEX</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<style = "text/css">
+code { font-family: sans-serif; font-weight:bold; }
+</style><p>
+</p>
+<hr />
+<h1><a name="net::asyncz">Net::Z3950::AsyncZ</a></h1>
+<p>
+</p>
+<h2><a name="intro">Intro</a></h2>
+<p>Net::Z3950::AsyncZ adds an additional layer of asynchronous support for the Z3950 module through the use
+of multiple forked processes. I hope that users will also find that it provides a convenient 
+front end to <code>Net::Z3950</code>.  My initial idea was to write something that
+would provide a convenient means of processing and formatting Z39.50 records--which I
+did, using the <code>Z3950</code> synchronous code.  But I also wanted something that could
+handle queries to large numbers of servers at one session. Working on this part of my
+project, I found that I had trouble with the <code>Z3950</code> asynchronous features
+and so ended up with what I have here.</p>
+I give a more detailed account in the <A href="AsyncZ.html#apologia"><B>DESCRIPTION</b></a>
+section of <code>AsyncZ.html</code>.<p></p>
+<p>
+</p>
+<h2><a name="documentation">Documentation</a></h2>
+<p></p>
+<UL>
+<LI>
+ <A href="AsyncZ.html">AsyncZ.html</a>
+    	<br>This is the starting point--it gives an overview of the AsyncZ module,
+describes the basic mechanics of its asynchronous workings, and details
+the particulars of the objects and methods.  But see
+<a href="#examples">Examples</a> for detailed explanations of the sample
+scripts which come with the <code>Net::Z3950::AsyncZ</code> distribution.<LI>
+ <A href="Options.html">Options.html</a>
+	<br> This document details the various options that can be set to modify
+the behavior of <code>AsyncZ</code><LI>
+ <A href="Report.html">Report.html</a>
+        <br><Code>Report.html</code> deals with how records are treated line by line
+and how you can affect the apearance of a record's line by line output<LI><A name = "examples"></a>
+ <A href="Examples.html">Examples.html</a>
+This document goes through the sample scripts that come with the
+<code>Net::Z3950::AsyncZ</code> distribution and annotates them
+in a line-by-line fashion.  It's a basic HOW-TO.</UL><p>
+</p>
+<h2><a name="the_modules">The Modules</a></h2>
+<p></p>
+There are more modules than there is documentation. The reason for this
+is that the only module you have full and complete access to is
+<code>Net::Z3950::AsyncZ</code>.  The other modules are either internal to <code>Net::AsyncZ</code>
+or accessed indirectly or in part indirectly.<p>
+</p>
+<h3><a name="here_are_the_modules:">Here are the modules:</a></h3>
+<dl>
+<dt><strong><a name="item_net%3a%3aasyncz">Net::Z3950::AsyncZ</a></strong><br />
+</dt>
+<dd>
+The main module: direct access --documented in
+<code>AsyncZ</code> and <code>Options</code> documentation
+</dd>
+<p></p>
+<dt><strong><a name="item_net%3a%3aasyncz%3a%3aerrmsg">Net::Z3950::AsyncZ::ErrMsg</a></strong><br />
+</dt>
+<dd>
+User error message handling: indirect access  -- documented in
+<code>AsyncZ</code> documentation
+</dd>
+<p></p>
+<dt><strong><a name="item_net%3a%3aasyncz%3a%3aerrors">Net::Z3950::AsyncZ::Errors</a></strong><br />
+</dt>
+<dd>
+Error handling for debugging: limited access -- documented in
+<code>AsyncZ</code> documentation
+</dd>
+<p></p>
+<dt><strong><a name="item_net%3a%3aasyncz%3a%3areport">Net::Z3950::AsyncZ::Report</a></strong><br />
+</dt>
+<dd>
+Module reponsible for fetching and formatting records: limited access -- documented
+</dd>
+<p></p>
+<dt><strong><a name="item_net%3a%3aasyncz%3a%3azloop">Net::Z3950::AsyncZ::ZLoop</a></strong><br />
+</dt>
+<dd>
+Event loop for child processes: no access -- not documented
+</dd>
+<p></p>
+<dt><strong><a name="item_net%3a%3aasyncz%3a%3azsend">Net::Z3950::AsyncZ::ZSend</a></strong><br />
+</dt>
+<dd>
+Connection details for child processes: no access -- not documented
+</dd>
+<p></p>
+<dt><strong><a name="item_net%3a%3aasyncz%3a%3aoptions%3a%3a_params">Net::Z3950::AsyncZ::Options::_params</a></strong><br />
+</dt>
+<dd>
+Options for child processes: direct and indirect access -- documented
+in <code>Options</code> and <code>AsyncZ</code> documentation
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="index">INDEX</a></h1>
+<a href ="Examples.html#item_%5b9%5d_%2d_%5b11%5d"><code> - [11]</code></a><br>
+<a href ="Report.html#item_%24all_%3d_%5c%25marc_fields_all"><code>$all =</code></a><br>
+<a href ="Report.html#item_%24std_%3d_%5c%25marc_fields_std"><code>$std =</code></a><br>
+<a href ="Report.html#item_%24xtra_%3d_%5c%25marc_fields_xtra"><code>$xtr=</code></a><br>
+<a href ="Report.html#item_%marc_fields_std"><code>%MARC_FIELDS_STD</code></a><br>
+<a href ="Report.html#item_%marc_fields_xtra"><code>%MARC_FIELDS_XTRA</code></a><br>
+<a href ="Examples.html#item_%5b6%5d%2c_%5b8%5d"><code>, [8]</code></a><br>
+<a href ="AsyncZ.html#item_%40export"><code>@EXPORT</code></a><br>
+<a href ="AsyncZ.html#item_%40export_ok"><code>@EXPORT_OK</code></a><br>
+<a href ="AsyncZ.html#item_abort"><code>abort</code></a><br>
+<a href ="AsyncZ.html#abstract"><code>ABSTRACT</code></a><br>
+<a href ="AsyncZ.html#apologia"><code>Apologia</code></a><br>
+<a href ="Report.html#author"><code>AUTHOR</code></a><br>
+<a href ="AsyncZ.html#the_basic_mechanisms_of_net::z3950::asyncz"><code>Basic Mechanisms of Net::Z3950::AsyncZ</code></a><br>
+<a href ="AsyncZ.html#the_basic_script"><code>Basic Script</code></a><br>
+<a href ="Examples.html#basic.pl"><code>basic.pl</code></a><br>
+<a href ="Examples.html#item_basic_pretty_error%2dhandling_function"><code>basic_pretty error-handling function</code></a><br>
+<a href ="Examples.html#item_basic_pretty_output_function"><code>basic_pretty output function</code></a><br>
+<a href ="Examples.html#basic_pretty.pl"><code>basic_pretty.pl</code></a><br>
+<a href ="AsyncZ.html#output_callback_(required)"><code>callback</code></a><br>
+<a href ="AsyncZ.html#callback_functions"><code>Callback Functions</code></a><br>
+<a href ="Options.html#item_cb"><code>cb</code></a><br>
+<a href ="Report.html#changing_%marc_fields"><code>Changing %MARC_FIELDS</code></a><br>
+<a href ="Report.html#class_methods"><code>Class Methods</code></a><br>
+<a href ="Report.html#constructor"><code>Constructor</code></a><br>
+<a href ="Report.html#constructor_and_methods"><code>Constructor and Methods</code></a><br>
+<a href ="AsyncZ.html#constructor,_methods,_and_exports"><code>Constructor, Methods, and Exports</code></a><br>
+<a href ="Report.html#copyright_and_license"><code>COPYRIGHT AND LICENSE</code></a><br>
+<a href ="AsyncZ.html#dealing_with_headers_in_the_callback_function"><code>Dealing with Headers in the Callback Function</code></a><br>
+<a href ="Report.html#item_default"><code>DEFAULT</code></a><br>
+<a href ="Report.html#description"><code>DESCRIPTION</code></a><br>
+<a href ="AsyncZ.html#item_doabort"><code>doAbort</code></a><br>
+<a href ="AsyncZ.html#item_doretry"><code>doRetry</code></a><br>
+<a href ="AsyncZ.html#item_errno"><code>errno</code></a><br>
+<a href ="Examples.html#item_the_error%2dhandling_function"><code>error-handling function</code></a><br>
+<a href ="AsyncZ.html#errors"><code>Errors</code></a><br>
+<a href ="AsyncZ.html#item_example_1"><code>Example 1</code></a><br>
+<a href ="Report.html#item_example_1%3a"><code>Example 1:</code></a><br>
+<a href ="AsyncZ.html#item_example_2"><code>Example 2</code></a><br>
+<a href ="Report.html#item_example_2%3a"><code>Example 2:</code></a><br>
+<a href ="AsyncZ.html#item_example_3"><code>Example 3</code></a><br>
+<a href ="AsyncZ.html#examples_of_net::z3950::asyncz::errmsg_error_handling"><code>Examples of Net::Z3950::AsyncZ::ErrMsg Error Handling</code></a><br>
+<a href ="AsyncZ.html#exported_names"><code>Exported Names</code></a><br>
+<a href ="AsyncZ.html#exports_from_net::z3950::asyncz"><code>Exports from Net::Z3950::AsyncZ</code></a><br>
+<a href ="AsyncZ.html#exports_from_net::z3950::asyncz::errmsg"><code>Exports from Net::Z3950::AsyncZ::ErrMsg</code></a><br>
+<a href ="AsyncZ.html#exports_from_net::z3950::asyncz::errors"><code>Exports from Net::Z3950::AsyncZ::Errors</code></a><br>
+<a href ="AsyncZ.html#item_for_example%3a"><code>For example:</code></a><br>
+<a href ="Options.html#item_format"><code>format</code></a><br>
+<a href ="Options.html#format_callback__not_required_"><code>Format Callback</code></a><br>
+<a href ="AsyncZ.html#format_callback_(not_required)"><code>Format Callback (not required)</code></a><br>
+<a href ="AsyncZ.html#item_the_format_function%3a"><code>format function:</code></a><br>
+<a href ="Report.html#format_methods"><code>Format Methods</code></a><br>
+<a href ="Options.html#get_set_methods"><code>get/set methods</code></a><br>
+<a href ="Report.html#item_get_default_pat"><code>get_DEFAULT_pat</code></a><br>
+<a href ="Report.html#item_get_grs1_pat"><code>get_GRS1_pat</code></a><br>
+<a href ="Report.html#item_get_marc_pat"><code>get_MARC_pat</code></a><br>
+<a href ="Report.html#item_get_pats"><code>get_pats</code></a><br>
+<a href ="Report.html#item_get_raw_pat"><code>get_RAW_pat</code></a><br>
+<a href ="AsyncZ.html#item_geterrors"><code>getErrors</code></a><br>
+<a href ="AsyncZ.html#item_getmaxerrors"><code>getMaxErrors</code></a><br>
+<a href ="AsyncZ.html#item_getz_recnum"><code>getZ_RecNum</code></a><br>
+<a href ="AsyncZ.html#item_getz_recsize"><code>getZ_RecSize</code></a><br>
+<a href ="Report.html#item_grs%2d1"><code>GRS-1</code></a><br>
+<a href ="AsyncZ.html#item_%3aheader"><code>header</code></a><br>
+<a href ="AsyncZ.html#headers"><code>Headers</code></a><br>
+<a href ="Report.html#item_html"><code>HTML</code></a><br>
+<a href ="Options.html#item_interval"><code>interval</code></a><br>
+<a href ="Examples.html#introduction"><code>Introduction</code></a><br>
+<a href ="AsyncZ.html#item_isnetwork"><code>isNetwork</code></a><br>
+<a href ="AsyncZ.html#item_issuccess"><code>isSuccess</code></a><br>
+<a href ="AsyncZ.html#item_issystem"><code>isSystem</code></a><br>
+<a href ="AsyncZ.html#item_istryagain"><code>isTryAgain</code></a><br>
+<a href ="AsyncZ.html#item_isunspecified"><code>isUnspecified</code></a><br>
+<a href ="AsyncZ.html#item_isz3950"><code>isZ3950</code></a><br>
+<a href ="AsyncZ.html#item_isz_error"><code>isZ_Error</code></a><br>
+<a href ="AsyncZ.html#item_isz_header"><code>isZ_Header</code></a><br>
+<a href ="AsyncZ.html#item_isz_info"><code>isZ_Info</code></a><br>
+<a href ="AsyncZ.html#item_isz_nonretryable"><code>isZ_nonRetryable</code></a><br>
+<a href ="AsyncZ.html#item_isz_servername"><code>isZ_ServerName</code></a><br>
+<a href ="Options.html#item_log"><code>log</code></a><br>
+<a href ="Examples.html#main_routine"><code>Main Routine</code></a><br>
+<a href ="Report.html#item_marc"><code>MARC</code></a><br>
+<a href ="Report.html#marc_bibliographic_format"><code>MARC Bibliographic Format</code></a><br>
+<a href ="Report.html#marc_examples"><code>MARC Examples</code></a><br>
+<a href ="Report.html#the_marc_fields_hashes"><code>MARC Fields Hashes</code></a><br>
+<a href ="Report.html#marc_fields_priority_sequence:"><code>MARC fields priority sequence:</code></a><br>
+<a href ="Report.html#item_marc_fields"><code>marc_fields</code></a><br>
+<a href ="Examples.html#marc_html.pl"><code>MARC_HTML.pl</code></a><br>
+<a href ="Report.html#item_marc_subst"><code>marc_subst</code></a><br>
+<a href ="Report.html#item_marc_userdef"><code>marc_userdef</code></a><br>
+<a href ="Report.html#item_marc_xcl"><code>marc_xcl</code></a><br>
+<a href ="Options.html#item_maxpipes"><code>maxpipes</code></a><br>
+<a href ="Report.html#item_the_methods"><code>Methods</code></a><br>
+<a href ="Options.html#methods_for_setting__params_options"><code>Methods for Setting _params Options</code></a><br>
+<a href ="AsyncZ.html#item_%5b2%5d_methods_to_deal_with_errors_and_error_mess"><code>Methods to deal with errors and error messages</code></a><br>
+<a href ="AsyncZ.html#item_%5b3%5d_methods_to_handle_several_types_of_headers"><code>Methods to handle several types of headers which AsyncZ attaches to records</code></a><br>
+<a href ="AsyncZ.html#item_%5b1%5d_methods_to_set_options_for_net%3a%3az3950%"><code>Methods to set options for Net::Z3950::AsyncZ::Options::_params objects</code></a><br>
+<a href ="Options.html#item_monitor"><code>monitor</code></a><br>
+<a href ="Examples.html#the_more_pretty_format_function"><code>more_pretty format function</code></a><br>
+<a href ="Examples.html#the_more_pretty_main_routine"><code>more_pretty Main Routine</code></a><br>
+<a href ="Examples.html#more_pretty.pl"><code>more_pretty.pl</code></a><br>
+<a href ="AsyncZ.html#item_msg"><code>msg</code></a><br>
+<a href ="Report.html#name"><code>NAME</code></a><br>
+<a href ="Examples.html#net::z3950::asyncz_by_example"><code>Net::Z3950::AsyncZ By Example</code></a><br>
+<a href ="AsyncZ.html#net::z3950::asyncz_methods_for_errmsg_handling"><code>Net::Z3950::AsyncZ methods for ErrMsg handling</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3a_printerror"><code>Net::Z3950::AsyncZ::_printError</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3aasynczoptions"><code>Net::Z3950::AsyncZ::asyncZOptions</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3adelz_header"><code>Net::Z3950::AsyncZ::delZ_header</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3adelz_pid"><code>Net::Z3950::AsyncZ::delZ_pid</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3adelz_servername"><code>Net::Z3950::AsyncZ::delZ_serverName</code></a><br>
+<a href ="AsyncZ.html#net::z3950::asyncz::errmsg"><code>Net::Z3950::AsyncZ::ErrMsg</code></a><br>
+<a href ="AsyncZ.html#net::z3950::asyncz::errmsg_methods_for_errmsg_handling"><code>Net::Z3950::AsyncZ::ErrMsg methods for ErrMsg Handling</code></a><br>
+<a href ="AsyncZ.html#net::z3950::asyncz::errmsg_object"><code>Net::Z3950::AsyncZ::ErrMsg Object</code></a><br>
+<a href ="AsyncZ.html#net::z3950::asyncz::errors"><code>Net::Z3950::AsyncZ::Errors</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3aget_zrawrec"><code>Net::Z3950::AsyncZ::get_ZRawRec</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3ageterrors"><code>Net::Z3950::AsyncZ::getErrors</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3agetmaxerrors"><code>Net::Z3950::AsyncZ::getMaxErrors</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3agetz_recnum"><code>Net::Z3950::AsyncZ::getZ_RecNum</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_default"><code>Net::Z3950::AsyncZ::isZ_DEFAULT</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_error"><code>Net::Z3950::AsyncZ::isZ_Error</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_grs"><code>Net::Z3950::AsyncZ::isZ_GRS</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_header"><code>Net::Z3950::AsyncZ::isZ_Header</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_info"><code>Net::Z3950::AsyncZ::isZ_Info</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_marc"><code>Net::Z3950::AsyncZ::isZ_MARC</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_nonretryable"><code>Net::Z3950::AsyncZ::isZ_nonRetryable</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_pid"><code>Net::Z3950::AsyncZ::isZ_PID</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_raw"><code>Net::Z3950::AsyncZ::isZ_RAW</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_servername"><code>Net::Z3950::AsyncZ::isZ_ServerName</code></a><br>
+<a href ="Options.html#net__z3950__asyncz__new"><code>Net::Z3950::AsyncZ::new</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3anoz_response"><code>Net::Z3950::AsyncZ::noZ_Response</code></a><br>
+<a href ="Options.html#net__z3950__asyncz__option___params__invalidoption"><code>Net::Z3950::AsyncZ::Option::_params::invalidOption</code></a><br>
+<a href ="Options.html#net__z3950__asyncz__option___params__option"><code>Net::Z3950::AsyncZ::Option::_params::option</code></a><br>
+<a href ="Options.html#net__z3950__asyncz__option___params__test"><code>Net::Z3950::AsyncZ::Option::_params::test</code></a><br>
+<a href ="Options.html#net__z3950__asyncz__option___params__validoption"><code>Net::Z3950::AsyncZ::Option::_params::validOption</code></a><br>
+<a href ="Options.html#net__z3950__asyncz__options___params"><code>Net::Z3950::AsyncZ::Options::_params</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3aprep_raw"><code>Net::Z3950::AsyncZ::prep_Raw</code></a><br>
+<a href ="Report.html#item_net%3a%3az3950%3a%3aasyncz%3a%3areport%3a%3anew"><code>Net::Z3950::AsyncZ::Report::new</code></a><br>
+<a href ="Report.html#item_net%3a%3az3950%3a%3aasyncz%3a%3areportresult"><code>Net::Z3950::AsyncZ::reportResult</code></a><br>
+<a href ="AsyncZ.html#item_net%3a%3az3950%3a%3aasyncz%3a%3az_servername"><code>Net::Z3950::AsyncZ::Z_ServerName</code></a><br>
+<a href ="Options.html#item_note_3a"><code>Note:</code></a><br>
+<a href ="AsyncZ.html#item_noz_response"><code>noZ_Response</code></a><br>
+<a href ="Options.html#item_num_to_fetch"><code>num_to_fetch</code></a><br>
+<a href ="Report.html#object_method"><code>Object Method</code></a><br>
+<a href ="AsyncZ.html#object_methods"><code>Object Methods</code></a><br>
+<a href ="AsyncZ.html#optional_parameters_for_constructor"><code>Optional Parameters for Constructor</code></a><br>
+<a href ="Options.html#item_options"><code>options</code></a><br>
+<a href ="Examples.html#options.pl"><code>options.pl</code></a><br>
+<a href ="AsyncZ.html#item_or%3a"><code>or:</code></a><br>
+<a href ="Options.html#output_callback__required_"><code>Output Callback</code></a><br>
+<a href ="AsyncZ.html#output_callback_(required)"><code>Output Callback (required)</code></a><br>
+<a href ="Examples.html#item_the_output_function"><code>output function</code></a><br>
+<a href ="AsyncZ.html#item_outputs_an_error_string_of_the_following_format%3a"><code>outputs an error string of the following format:</code></a><br>
+<a href ="AsyncZ.html#item_overview"><code>Overview</code></a><br>
+<a href ="AsyncZ.html#item_param%3a"><code>param:</code></a><br>
+<a href ="AsyncZ.html#item_parameters%3a"><code>parameters:</code></a><br>
+<a href ="Report.html#item_params%3a"><code>params:</code></a><br>
+<a href ="Options.html#item_pipetimeout"><code>pipetimeout</code></a><br>
+<a href ="Report.html#item_plain_text"><code>Plain Text</code></a><br>
+<a href ="Options.html#item_preferredrecordsyntax"><code>preferredRecordSyntax</code></a><br>
+<a href ="Options.html#item_query"><code>query</code></a><br>
+<a href ="Options.html#item_querytype"><code>querytype</code></a><br>
+<a href ="Report.html#item_raw"><code>RAW</code></a><br>
+<a href ="Examples.html#raw.pl"><code>raw.pl</code></a><br>
+<a href ="AsyncZ.html#item_%3arecord"><code>record</code></a><br>
+<a href ="Report.html#record_data"><code>Record Data</code></a><br>
+<a href ="Report.html#record_format_types"><code>Record Format Types</code></a><br>
+<a href ="Report.html#references_to_marc_hashes"><code>References to MARC Hashes</code></a><br>
+<a href ="Options.html#item_render"><code>render</code></a><br>
+<a href ="AsyncZ.html#required_parameters_for_constructor"><code>Required Parameters for Constructor</code></a><br>
+<a href ="AsyncZ.html#item_retry"><code>retry</code></a><br>
+<a href ="AsyncZ.html#item_return_value%3a"><code>return value:</code></a><br>
+<a href ="AsyncZ.html#item_return%3a"><code>return:</code></a><br>
+<a href ="Report.html#item_returns"><code>returns</code></a><br>
+<a href ="AsyncZ.html#item_returns%3a"><code>returns:</code></a><br>
+<a href ="Options.html#row_formatting_priorities"><code>Row Formatting Priorities</code></a><br>
+<a href ="Options.html#item_servers"><code>servers</code></a><br>
+<a href ="Options.html#setting_options"><code>Setting Options</code></a><br>
+<a href ="Report.html#some_useful_marc_web_links:"><code>Some Useful MARC web links:</code></a><br>
+<a href ="Options.html#item_startrec"><code>startrec</code></a><br>
+<a href ="Examples.html#subroutines"><code>Subroutines</code></a><br>
+<a href ="Options.html#item_swap_attempts"><code>swap_attempts</code></a><br>
+<a href ="Options.html#item_swap_check"><code>swap_check</code></a><br>
+<a href ="Report.html#synopsis"><code>SYNOPSIS</code></a><br>
+<a href ="Report.html#references_to_marc_hashes"><code>three references</code></a><br>
+<a href ="Options.html#item_timeout"><code>timeout</code></a><br>
+<a href ="Options.html#item_timeout_min"><code>timeout_min</code></a><br>
+<a href ="AsyncZ.html#item_type"><code>type</code></a><br>
+<a href ="AsyncZ.html#item_the_type_of_record%3a"><code>type of record:</code></a><br>
+<a href ="AsyncZ.html#types_of_headers"><code>Types of Headers</code></a><br>
+<a href ="Options.html#types_of_options"><code>Types of Options</code></a><br>
+<a href ="Report.html#item_the_types%3a"><code>Types:</code></a><br>
+<a href ="Report.html#item_user_defined_formatting"><code>User Defined Formatting</code></a><br>
+<a href ="AsyncZ.html#item_using_the_%24index"><code>Using the</code></a><br>
+<a href ="Options.html#item_utf8"><code>utf8</code></a><br>
+<a href ="AsyncZ.html#a_word_about_parameters_and_options"><code>Word about Parameters and Options</code></a><br>
+<a href ="Options.html#item_z3950_options"><code>Z3950_options</code></a><br>
+<a href ="AsyncZ.html#item_z_servername"><code>Z_ServerName</code></a><br>
+
+</body>
+</html>

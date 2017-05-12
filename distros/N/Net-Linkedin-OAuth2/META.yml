@@ -1,0 +1,27 @@
+---
+abstract: 'An easy way to authenticate users via LinkedIn'
+author:
+  - 'Asaf Klibansky <discobeta@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '6.42'
+configure_requires:
+  ExtUtils::MakeMaker: '6.42'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Linkedin-OAuth2
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Digest::MD5: '0'
+  JSON::Any: '0'
+  LWP::UserAgent: '0'
+  XML::Hash: '0'
+version: '0.32'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

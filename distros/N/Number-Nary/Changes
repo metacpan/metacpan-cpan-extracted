@@ -1,0 +1,51 @@
+Revision history for Number-Nary
+
+1.100312  2013-10-06 22:53:10 America/New_York
+          yet further packaging fixes (repo, bugtracker)
+
+1.100311  2010-01-31 15:55:15 America/New_York
+          further packaging fixes
+
+1.100310  2010-01-31 15:13:19 America/New_York
+        rebuild distribution using Dist::Zilla
+
+0.108   2009-11-22
+        finally require UDCode, which MJD graciously wrote for us to use
+        mention Math::BaseCalc in docs
+
+0.107   2009-11-22
+        do not skip postencode on unary encode
+
+0.106   2009-11-22
+        support unary
+        decode the empty string to 0
+
+0.105   2008-04-18
+        add a "postencode" argument and an example (in t/google.t) of use for
+        Google Chart API extended encoding
+
+0.104   2008-04-07
+        repackage without all the resource fork files; thanks, OS X!
+
+0.103   2008-02-21
+        add support for (some) unambiguous of variable-length digits (thanks to
+        MJD and WONKO for advice)
+
+0.102   2007-01-03
+        add predecode argument, originally requested by NUFFIN
+        add recloc.t
+
+0.100   2006-05-11
+        clean up documents
+        wide digit support
+
+0.05    2006-03-13
+        oops, added main tests to manifest
+        switch to Sub::Exporter to offer curried subs for export
+
+0.02    2005-10-01, five minutes later
+        added prereq listings
+        improved documentation
+
+0.01    2005-10-01
+        First version, released on an unsuspecting world, inspired by JESSE.

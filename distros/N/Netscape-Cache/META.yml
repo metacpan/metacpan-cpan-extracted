@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Netscape-Cache
+version:             0.46
+abstract:            object class for accessing Netscape cache files
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    DB_File:                       0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Slaven Rezic (eserte@cs.tu-berlin.de)

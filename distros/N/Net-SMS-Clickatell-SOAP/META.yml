@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Net-SMS-Clickatell-SOAP
+version:            0.01.001
+abstract:           SOAP interface to the Clickatell SMS service
+author:
+    - Peter Farr <Peter.Farr@LPI-Solutions.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    SOAP::Lite:  0.710.08
+    version:     0.85
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

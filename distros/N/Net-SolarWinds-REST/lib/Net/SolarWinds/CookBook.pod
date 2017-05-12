@@ -1,0 +1,233 @@
+package Net::SolarWinds::CookBook;
+
+=head1 NAME
+
+Net::SolarWinds::CookBook - General User Documentation
+
+=head1 DESCRIPTION
+
+This is a general go to guide on how to use the Net::SolarWinds modules.  Most of the heavy lifting is done by the Net::SolarWinds::REST::Batch module.  
+
+=head1 HowTo(s)
+
+=over 4
+
+=item * How to manage Objects
+
+The v3 broker service manages objects via individual 'URL'.  Often times an object will contain a url field when it is returned.  The Url field can most of the time be used to update the object or make changes to it.
+
+Example
+
+  use Net::SolarWinds::REST::Batch;
+
+  my $rest=new Net::SolarWinds::REST::Batch;
+
+  # Read Mode: $result->get_data contains the details of the node
+  my $result=$rest->UpdateUri('swis://localhost/Orion/Orion.Nodes/NodeID=16956');
+
+  # Write mode: Update the caption:
+  my $result=$rest->UpdateUri('swis://localhost/Orion/Orion.Nodes/NodeID=16956',{Caption=>'NewCaption'});
+
+  # Bulk Update example:
+  my $result=$self->BulkUpdate({
+    uris=>[
+      "swis://dev-che-mjag-01./Orion/Orion.Nodes/NodeID=4/Volumes/VolumeID=1",
+      "swis://dev-che-mjag-01./Orion/Orion.Nodes/NodeID=4/Volumes/VolumeID=2",
+      "swis://dev-che-mjag-01./Orion/Orion.Nodes/NodeID=4/Volumes/VolumeID=3"
+    ],
+    properties=>{
+      "NextPoll"=>"7/1/2014 9:06:19 AM",
+      "NextRediscovery"=>"7/1/2014 2:59:09 PM"
+    }
+  });
+
+  # delete can be handled via the BulkDelete Interfaces
+  my $result=$self->BulkDelete({
+    uris=>[
+      "swis://dev-che-mjag-01./Orion/Orion.Nodes/NodeID=4/Volumes/VolumeID=1",
+      "swis://dev-che-mjag-01./Orion/Orion.Nodes/NodeID=4/Volumes/VolumeID=2",
+      "swis://dev-che-mjag-01./Orion/Orion.Nodes/NodeID=4/Volumes/VolumeID=3"
+    ]
+  });
+
+=item * How to enable logging
+
+  use Net::SolarWinds::REST::Batch;
+  use Net::SolarWinds::Log;
+
+  my $log=new Net::SolarWinds::Log('/var/log/script.log');
+  my $rest=new Net::SolarWinds::REST::Batch(log=>$log);
+
+  # To change the log level to warn
+  $log->set_loglevel($log->LOG_WARN);
+
+  # To change the log level to error
+  $log->set_loglevel($log->LOG_ERROR);
+
+  # To change the log level to DEBUG
+  # this will dump out actual raw http requests
+  $log->set_loglevel($log->LOG_DEBUG);
+
+=item * How to find a node
+
+  use Net::SolarWinds::REST::Batch;
+  use Data::Dumper;
+
+  my $rest=new Net::SolarWinds::REST::Batch;
+
+  # use the hostname method
+  my $result=$rest->get_node("hostname");
+  if($result) {
+    my $data=$result->get_data;
+    print Dumper($data);
+  } else {
+    print "Error Fetching: hostname, error was: $result\n";
+  }
+
+  # use the id method method
+  my $result=$rest->get_node(212);
+  if($result) {
+    my $data=$result->get_data;
+    print Dumper($data);
+  } else {
+    print "Error Fetching node by id: 212, error was: $result\n";
+  }
+
+  # use the ip address method
+  my $result=$rest->get_node("192.168.1.74");
+  if($result) {
+    my $data=$result->get_data;
+    print Dumper($data);
+  } else {
+    print "Error Fetching: 192.168.1.74, error was: $result\n";
+  }
+
+=item * Adding an interface
+
+To add an interface, you will need to do a number of things.  1. Get the NodeID, 2. Poll the interfaces on the device, 3. Add the interface.  Note: The pollers added by SolarWinds are inconsistent, you may want to audit and add any missing pollers. 
+
+So here is how to add an interface
+
+  use Net::SolarWinds::REST::Batch;
+  use Net::SolarWinds::Log;
+
+  # its always best to enable logging!
+  my $log=new Net::SolarWinds::Log('/var/log/script.log');
+  my $rest=new Net::SolarWinds::REST::Batch(log=>$log);
+
+  # Node id
+  my $nodeid=212;
+
+  # fetch our best guess when it comes to default poller maps
+  my $pm={};
+  if(my $result=$rest->getPollerInterfaceMap($nodeid)) {
+    $pm=$result->get_data;
+  } else {
+    $log->log_warn("Failed to get poller map for $nodeid");
+  }
+
+  # discover the interfaces
+  my $result=$rest->DiscoverInterfacesOnNode($nodeid);
+  my $ifname='eth0';
+  
+  if($result) {
+    foreach my $int (@{$result->get_data->{DiscoveredInterfaces}}) {
+
+      # never try to add an interface that all ready exists!
+      next if $int->{InterfaceID}!=0;
+
+      next unless $int->{Manageable};
+
+      # The actual name may never be literal, so we fix that here
+      my $caption=$int->{Caption};
+      # clean up the returned data
+      $caption=~ s/\s\x{b7}.*$//s;
+      my ($desc,$ifname)=split /\s-\s/,$caption;
+      my $matched;
+
+      # one of the above strings will contain our literal interface name
+      foreach my $string ($caption,$desc,$ifname) {
+        next unless defined($string);
+	if($string eq $ifname) {
+	  $matched=$string;
+	  last;
+	}
+      }
+
+      next unless defined($matched);
+      my $result=$rest->NodeInterfaceAddDefaultPollers($nodeid,[$int]);
+      if($result) {
+        my $intid=$result->get_data->{DiscoveredInterfaces}->[0]->{InterfaceID};
+	my $result=$rest->NodeInterfaceCustomProperties($nodeid,$intid,{Some=>"Custom Property"});
+	$log->log_error("Failed to set custom property for $ifname") unless $result;
+
+	# now we add any pollers that were missed by default
+
+	# fetch the interface map
+	my $result=$result=$rest->get_poller_map($intid,'I');
+	my $map=$result->get_data;
+
+	if(exists $pm->{$int->{ifType}}) {
+	  my $list=$pm->{$int->{ifType}};
+	  foreach my $poller (@{$list}) {
+	    next if exists $map->{$poller};
+	    my $result=$rest->add_poller($intid,'I',$poller);
+	    $log->log_error("Failed to add $poller to interface: $intid error was $result") unless $result;
+	  }
+	}
+      } else {
+        $log->log_error("Failed to add $ifname error was: $result");
+      }
+    }
+  }
+
+=item * Adding a node based on on existing node
+
+The Net::SolarWinds::REST::Batch module offers a very high level interface that allows for reverse engineering existing node configurations: pollers, file systems, templates, interfaces, etc.  These reverse engired templates can be used to build new device configurations.
+
+The process itself is broken out into 4 steps.  1. Clone the config, 2. Save the config to a file, 3. Edit the options for the new node, 4. Create the new node.
+
+
+  use Storable qw(dclone store retrieve);
+  use Net::SolarWinds::REST::Batch;
+
+  my $rest=new Net::SolarWinds::REST::Batch();
+
+  my $node='192.168.1.182';
+
+
+  my $config;
+  my $config_file='config.storable';
+
+  # cache the config on disk( save it any way you want )
+  if(-e $config_file) {
+    $config=retrieve($config_file);
+  } else {
+    my $result=$rest->get_management_config($node);
+    die "Could not get config for: $node error was: $result" unless $result;
+    $config=$result->get_data;
+    store $config,$config_file;
+  }
+
+  # get a copy of our config ( in case we want to apply this to multiple nodes and change more things! )
+  my $new_config=dclone($config);
+
+  # adjust your config here
+  # depending on the version of NPM you may need to delete some of the node columns
+  delete @{$new_config->{"node"}}{qw(EngineID Caption)};
+
+  $new_config->{"node"}->{"IPAddress"}="192.168.101.38";
+  $new_config->{"node"}->{"Caption"}="192.168.101.38";
+
+  # now we create our new node!
+  my $result=$rest->manage_node($new_config);
+
+
+=back
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=cut
+

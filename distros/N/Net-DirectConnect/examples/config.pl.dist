@@ -1,0 +1,14 @@
+use strict;
+our %config;
+# $config{dc}{'share'} = [qw(/usr/ports/distfiles /usr/ports/packages c:\dist c:\distr c:\pub )];
+# $config{dc}{host} = ['myhub.net', 'adc://otherhub.com'];
+# $config{dc}{file_min}          = 100_000;                 #skip files  smaller
+# $config{dc}{filelist_scan}     = 86400;              #every seconds, 0 to disable
+# $config{dc}{filelist_reload}   = 600;               #check and load filelist if new, every seconds
+# $config{dc}{skip_hidden}       = 0;
+# $config{dc}{skip_symlink}      = 1;
+# $config{debug} = 1;
+# $config{ 'log_' . $_ } = 1 for qw (dmp dcdmp dcdbg adcdev dev);
+# $config{dc}{dev_http} = 1;
+# $config{auto_get_best} = 1; #for dcget : download all popular files
+1;

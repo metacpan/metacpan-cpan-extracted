@@ -1,0 +1,16 @@
+$Id: Changes,v 1.2 2002/07/18 10:45:12 marcus Exp $
+
+Revision history for Perl extension Net::Telnet::Netscreen.
+
+1.2  2008-04-06 16:30:00
+    - Clean up distribution
+    - Use Test::More for tests
+1.1   Thu Jul 18 13:30:00
+	- Fixed so more prompts work
+	- Fixed so HA mode works
+	- Lazy saving - only saves after set/unsets.
+	  big speed increase here ;)
+1.0.1 Thu Oct 18 08:46:00
+	- Changed name from Ns1000 to Netscreen
+1.0   Fri Jun 27 13:06:42 PDT 2001 
+	- Initial release

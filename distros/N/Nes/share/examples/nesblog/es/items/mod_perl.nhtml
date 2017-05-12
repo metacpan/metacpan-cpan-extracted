@@ -1,0 +1,34 @@
+<h2><a href="#">mod perl</a></h2>
+<h3>Compatibilidad con mod_perl</h3>
+<p> 
+Con mod_perl requiere que se carge "PerlModule ModPerl::RegistryPrefork" puesto
+que NES utiliza <i>chdir</i>.
+</p>
+<p> 
+Además requiere el instalar el módulo <a href="http://search.cpan.org/~adamk/IPC-Run-0.84/">IPC::Run</a>
+ya que mod_perl es incompatible con IPC::Open2.
+</p>
+<h3>Configuración Apache</h3>
+<pre>
+
+      SetHandler perl-script
+      PerlHandler ModPerl::RegistryPrefork
+      PerlOptions +ParseHeaders
+
+
+</pre>
+
+<h3>PHP con mod_perl</h3>
+<p> 
+Puedes incluir PHP con <a href="./?action=item&item=Incluir%20PHP%20y%20otros">include</a> en tus
+plantillas Nes. Pero usar Nes como Wrapper PHP con mod_perl no está totalmente 
+soportado. Es posible que algunos script PHP funcionen, 
+que lo hagan con ligeras modificaciones, o que sencillamente no funcionen.
+</p>
+<p> 
+En nuestras pruebas la mayoría funcionan, pero se considera experimental PHP Wrapper
+con mod_perl.
+</p>
+
+
+

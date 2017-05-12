@@ -1,0 +1,67 @@
+libnet-ftpserver-perl (1.120-1) unstable; urgency=low
+
+  * New upstream release:
+    > Includes an ftp proxy (experimental).
+    > Suggests libnet-perl (already in perl-modules >= 5.8).
+  * Depend on libio-stringy-perl instead of only recommending it.
+
+ -- Chip Salzenberg <chip@debian.org>  Thu, 26 Feb 2004 11:03:00 -0500
+
+libnet-ftpserver-perl (1.118-2) unstable; urgency=high
+
+  * Fix Build-Depends by deleting my hacked dpkg-source.
+
+ -- Chip Salzenberg <chip@debian.org>  Sun,  5 Oct 2003 21:45:56 -0400
+
+libnet-ftpserver-perl (1.118-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Chip Salzenberg <chip@debian.org>  Fri,  3 Oct 2003 19:19:37 -0400
+
+libnet-ftpserver-perl (1.116-1) unstable; urgency=low
+
+  * New upstream release.  (closes: 193446)
+
+ -- Chip Salzenberg <chip@debian.org>  Thu, 24 Jul 2003 17:47:25 -0400
+
+libnet-ftpserver-perl (1.112-1) unstable; urgency=low
+
+  * New upstream version.
+  * Given Perl 5.8.0 with safe signals, no XS, so arch is 'all'.
+
+ -- Chip Salzenberg <chip@debian.org>  Wed, 12 Feb 2003 20:41:10 -0500
+
+libnet-ftpserver-perl (1.111-2) unstable; urgency=low
+
+  * Move some info to debian/copyright.  (closes: #157523)
+
+ -- Chip Salzenberg <chip@debian.org>  Fri, 20 Sep 2002 11:14:51 -0400
+
+libnet-ftpserver-perl (1.111-1) unstable; urgency=low
+
+  * New upstream version.
+  * Rebuild for Perl 5.8.
+
+ -- Chip Salzenberg <chip@debian.org>  Sun,  1 Sep 2002 03:59:38 -0400
+
+libnet-ftpserver-perl (1.103-1) unstable; urgency=low
+
+  * New upstream version.
+  * More docs and more examples.
+
+ -- Chip Salzenberg <chip@debian.org>  Mon,  7 Jan 2002 15:57:47 -0800
+
+libnet-ftpserver-perl (1.100-2) unstable; urgency=low
+
+  * Add many Perl modules to Build-Depends.  Original patch
+    by LaMont Jones <lamont@debian.org>.  (closes: #113578)
+
+ -- Chip Salzenberg <chip@debian.org>  Wed, 26 Dec 2001 21:04:04 -0800
+
+libnet-ftpserver-perl (1.100-1) unstable; urgency=low
+
+  * Initial Release.  (closes: #112847)
+
+ -- Chip Salzenberg <chip@debian.org>  Wed, 19 Sep 2001 16:00:00 -0700
+

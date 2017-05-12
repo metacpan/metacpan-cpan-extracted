@@ -1,0 +1,13 @@
+ADNS.xs
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Net-ADNS.t
+t/pods.t
+lib/Net/ADNS.pm
+genconstants
+constants.data
+typemap
+META.yml

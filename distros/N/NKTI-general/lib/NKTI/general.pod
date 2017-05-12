@@ -1,0 +1,333 @@
+=head1 NAME
+
+NKTI::general - The Part of NKTIweb The Simple Web Framework
+
+=head1 SYNOPSIS
+
+The "synopsis" just example to use subroutine in this module. If you want
+used subroutine for application, you can following or reading in section "explain".
+
+    use NKTI::general
+
+    # Use subroutine os_server_info()
+    my $os_server_info = NKTI::general->os_server_info();
+
+    # Use subroutine os_info()
+    my $os_info = NKTI::general->os_info();
+
+    # Use subroutine browser_info()
+    my $browser_info = NKTI::general->browser_info();
+
+    # Use subroutine delimiter_dir()
+    my $delimiter_dir = NKTI::general->delimiter_dir();
+
+    # Use subroutine get_dbconfig()
+    my $db_config = NKTI::general->get_dbconfig($dirloc, $fileloc);
+
+    # Use subroutine time_event_mysql()
+    # This module used if you can get time even MySQL from 1Y, 1M, 1W, 1D
+    my $time_even_mysql = NKTI::general->time_even_mysql($time_char);
+
+    # Use subroutine datetime_mysql()
+    # This module convert UNIX TimeStamp.
+    my $datetime_mysql = NKTI::general->datetime_mysql($timestamp, $timezone);
+
+    # Use subrotuine cetak()
+    # This module just replace "print".
+    cetak $your_string_print;
+    # or
+    cetak($your_string_print);
+
+    # Use subroutine cetak_r()
+    # This module just replace "print Dumper".
+    cetak_r \@your_array;
+    # or
+    cetak_r(\@your_array);
+
+    # Use subroutine cetak_pre()
+    # This module "print Dumper" and add html tag "<pre></pre>".
+    cetak_pre \@your_array;
+    # or
+    cetak_pre(\@your_array);
+
+=head1 DESCRIPTION
+
+This module only contains several subroutine to give problem solving
+about Perl for web.
+
+=head1 EXPLAIN SUBROUTINE os_server_info()
+
+    Description Subroutine :
+    ----------------------------------------
+    This subroutine can give OS Server information from file CGI.
+
+    Parameter Subroutine :
+    ----------------------------------------
+    No parmeter subroutine.
+
+=head1 EXPLAIN SUBROUTINE os_info()
+
+    Description subroutine os_info() :
+    ----------------------------------------
+    This subroutine can give OS Client information from Client HTTP Request.
+
+    Parameter Subroutine os_info() :
+    ----------------------------------------
+    No parmeter subroutine.
+
+=head1 EXPLAIN SUBROUTINE browser_info()
+
+    Description subroutine browser_info() :
+    ----------------------------------------
+    This subroutine can identification Browser which in uses client from Client HTTP Request.
+
+    Parameter Subroutine :
+    ----------------------------------------
+    No Parameter Subroutine.
+
+=head1 EXPLAIN SUBROUTINE delimiter_dir()
+
+    Description Subroutine :
+    ----------------------------------------
+    This subroutine can identify a delimiter based operating system
+    on the system used to run the current perl.
+
+    Parameter Subroutine :
+    ----------------------------------------
+    No Parameter Subroutine.
+
+=head1 EXPLAIN SUBROUTINE get_dbconfig_php()
+
+    Description subroutine get_dbconfig_php() :
+    ---------------------------------------------
+    This subroutine can read file database config PHP.
+    And output of subroutine in JSON Format and can used as
+    parameter database config in module L<NKTI::general::dbconnect>.
+
+    Parameter Subroutine :
+    ---------------------------------------------
+    $filename       =>  Location of file database config.
+    $dirloc         =>  Location of directory database config.
+
+    Contain File Database confi Format :
+    ---------------------------------------------
+    <?php
+    $db_config = array(
+        'db_user' => 'your_user',
+        'db_pass' => 'your_pass',
+        'db_name' => 'your_db_name',
+        'db_host' => 'localhost',
+    );
+    ?>
+
+=head2 Example to used subroutine get_dbconfig_php() :
+
+    use NKTI::general;
+
+    # Location file and dir database config
+    my $filename = 'your_filename.php';
+    my $dirloc = 'your/path/database/config/';
+
+    # Run Subroutine :
+    my $db_config = NKTI::general->get_dbconfig_php();
+
+    # Print :
+    cetak $db_config
+
+    # ------------------------------------------------
+    # Output :
+    # ------------------------------------------------
+    # {"db_user" : "root", "db_pass" : "your_pass", "db_name" : "your_db_name", "db_host" : "localhost"}
+
+=head1 EXPLAIN SUBROUTINE get_protocol()
+
+    Description subroutine get_protocol() :
+    ----------------------------------------
+    This subroutine can identify a protocol which used. Like "http" or "https".
+
+    Parameter subroutine get_protocol() :
+    ----------------------------------------
+    No parameter Subroutine.
+
+=head2 Example to used subroutine get_protocol() :
+
+    use NKTI::general;
+
+    # Run Subroutine :
+    my $get_protocol = NKTI::general->get_protocol();
+
+    # ------------------------------------------------
+    # Output in string data type :
+    # ------------------------------------------------
+    # IF http :
+    # output: http:
+    # IF https :
+    # output: https:
+
+=head1 EXPLAIN SUBROUTINE try_module()
+
+    Description Subroutine :
+    ----------------------------------------
+    This subroutine can used to check module is exists in system or module already to load.
+
+    Parameter Subroutine :
+    ----------------------------------------
+    $module_name    =>  Your module name.
+
+    Output of subroutine :
+    ----------------------------------------
+    True or false. OR 1 or 0.
+
+=head1 EXPLAIN SUBROUTINE time_event_mysql()
+
+    Description subroutine time_event_mysql() :
+    ---------------------------------------------
+    This subroutine is function for convert character time
+    to format Time Event MySQL.
+
+    Parameter subroutine time_event_mysql() :
+    ---------------------------------------------
+    $time   =>  Character time.
+                Ex: "1Y" => "tahun",
+                    "1M" => "bulan",
+                    "1W" => "minggu",
+                    "1D" => "Hari",
+                    "1H" => "Jam",
+                    "1m" => "menit",
+                    "1d" => "detik"
+
+=head2 Example to used subroutine time_event_mysql() :
+
+    use NKTI::general;
+
+    # Run subroutine :
+    my $time_event = NKTI::general->time_event_mysql('1Y');
+
+    # ------------------------------------------------
+    # Output in hasref data type :
+    # ------------------------------------------------
+    # {
+    #   'event' => '(CURRENT_TIMESTAMP + INTERVAL 1 YEAR)',
+    #   'time' => '1',
+    #   'unit' => 'YEAR'
+    # };
+
+=head1 EXPLAIN SUBROUTINE datetime_mysql()
+
+    Description subroutine datetime_mysql() :
+    ----------------------------------------
+    This subroutine is function for convert UNIX Timestamp
+    in to MySQL Datetime format. This subroutine must used
+    with give parameter UNIX timestamp and name of time zone.
+    This subroutine using moduel "L<DateTime>".
+
+    Parameter subroutine datetime_mysql() :
+    ----------------------------------------
+    $timestamp          =>  The UNIX Timestamp format.
+    $timezone           =>  You name timezone. e.g. Asia/Makassar
+
+head2 Example to used subroutine datetime_mysql() :
+
+    use NKTI::general;
+
+    # scalar for timestamp and timezone :
+    my $timestamp = 1493547692;
+    my $timezone = 'Asia/Makassar';
+
+    # Run Subroutine :
+    my $datetime = NKTI::general->datetime_mysql($timestamp, $timezone);
+
+    # ------------------------------------------------
+    # Output in string data type :
+    # ------------------------------------------------
+    # 2017-04-30 18:21:32
+
+=head1 EXPLAIN SUBROUITNE cetak(), cetak_r(), cetak_pre
+
+    Description subroutine
+    ----------------------------------------
+    -   This subroutine cetak() only replaced "print" function.
+    -   This subroutine cetak_r() only replaced "print Dumper" function.
+        Subroutine cetak_r() can to used for data type, string, array, arrayref, hashref.
+    -   This subroutine cetak_pre() only replaced "print Dumper" and add html tag "<pre></pre>".
+        Subroutine cetak_pre() same function subroutine cetak_r().
+
+    Parameter subroutine cetak() :
+    ----------------------------------------
+    $data           =>  string to will be printed.
+
+=head2 Example to used subroutine cetak() :
+
+    use NKTI::general;
+
+    # scalar for string :
+    my $example_string = 'My string';
+
+    # To use subroutine :
+    cetak $example_string;
+
+    # ------------------------------------------------
+    # Output in string data type :
+    # ------------------------------------------------
+    # My string
+
+=head2 Example to used subroutine cetak_r() :
+
+This subroutine can used for array, arrayref, hash, hashref, and string.
+same function "print Dumper".
+
+    use NKTI::general;
+
+    # scalar for string :
+    my @example_arr = (1, 2, 3, 4);
+
+    # To use subroutine :
+    cetak_r \@example_arr;
+
+    # ------------------------------------------------
+    # Output in arrayref data type :
+    # ------------------------------------------------
+    # $VAR1 = [
+    #      1,
+    #      2,
+    #      3,
+    #      4
+    #    ];
+
+
+=head2 Example to used subroutine cetak_pre() :
+
+This subroutine can used for array, arrayref, hash, hashref, and string.
+same function "print Dumper".
+
+    use NKTI::general;
+
+    # scalar for string :
+    my @example_arr = (1, 2, 3, 4);
+
+    # To use subroutine :
+    cetak_pre \@example_arr;
+
+    # ---------------------------------------------------------------
+    # Output in arrayref data type with html tag "<pre></pre>" :
+    # ---------------------------------------------------------------
+    # <pre>$VAR1 = [
+    #      1,
+    #      2,
+    #      3,
+    #      4
+    #    ];</pre>
+
+=head1 AUTHOR
+
+Achmad Yusri Afandi, (yusrideb@cpan.org).
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2017, Achmad Yusri Afandi, All Rights reserved.
+
+This is free software, licensed under:
+
+    The Artistic License 2.0 (GPL Compatible)
+
+=cut

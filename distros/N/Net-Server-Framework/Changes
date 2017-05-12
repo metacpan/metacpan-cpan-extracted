@@ -1,0 +1,13 @@
+Revision history for Net-Server-Framework
+
+1.2     2009-01-13
+        Fixed the packet definition and cleaned up the POD a bit
+
+1.1     2009-01-13
+        The first usable version. Fixed dependencies, wrote some
+        documentation and fixed some bugs. This is still more a code
+        sample than a usable framework.
+
+1.0     2009-01-06
+        First version, released on an unsuspecting world.
+

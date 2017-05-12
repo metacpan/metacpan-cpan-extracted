@@ -1,0 +1,286 @@
+=encoding utf8
+
+=head1 NAME
+
+  Net::OAuth2::AccessToken - OAuth2 bearer token
+
+=head1 SYNOPSIS
+
+  my $auth    = Net::OAuth2::Profile::WebServer->new(...);
+
+  my $session = $auth->get_access_token($code, ...);
+  # $session is a Net::OAuth2::AccessToken object
+  if($session->error)
+  {   print $session->error_description;
+  }
+
+  my $response = $session->get($request);
+  my $response = $session->get($header, $content);
+  print $session->to_string;  # JSON
+
+  # probably better to set new(auto_refresh), but you may do:
+  $session->refresh if $session->expired;
+
+=head1 DESCRIPTION
+
+This object represents a received (bearer) token, and offers ways to use it
+and maintain it.  A better name for this module would include B<client
+or session>.
+
+A "bearer token" is an abstract proof of your existence: different
+services or potentially different physical servers are able to exchange
+information about your session based on this, for instance whether
+someone logged-in while showing the token.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Net::OAuth2::AccessToken-E<gt>B<new>(%options)
+
+ -Option           --Default
+  access_token       undef
+  auto_refresh       <false>
+  changed            <false>
+  error              undef
+  error_description  <value of error>
+  error_uri          undef
+  expires_at         undef
+  expires_in         undef
+  profile            <required>
+  refresh_always     BOOLEAN
+  refresh_token      false
+  scope              undef
+  token_type         undef
+
+=over 2
+
+=item access_token => STRING
+
+=item auto_refresh => BOOLEAN
+
+Refresh the token when expired.
+
+=item changed => BOOLEAN
+
+[0.52] The token (session) needs to be saved.
+
+=item error => STRING
+
+Set when an error has occured, the token is not valid.  This is not
+numerical.
+
+=item error_description => STRING
+
+A humanly readible explanation on the error.  This defaults to the
+string set with the C<error> option, which is not nice to read.
+
+=item error_uri => URI
+
+Where to find more details about the error.
+
+=item expires_at => TIMESTAMP
+
+Expire this token after TIMESTAMP (as produced by the time() function)
+
+=item expires_in => SECONDS
+
+Expire the token SECONDS after the initiation of this object.
+
+=item profile => L<Net::OAuth2::Profile|Net::OAuth2::Profile> object
+
+=item refresh_always => BOOLEAN
+
+[0.53] Auto-refresh the token at each use.
+
+=item refresh_token => STRING
+
+[0.53] Token which can be used to refresh the token, after it has
+expired or earlier.
+
+=item scope => URL
+
+=item token_type => TYPE
+
+=back
+
+=item Net::OAuth2::AccessToken-E<gt>B<session_thaw>($session, %options)
+
+Pass in the output of a L<session_freeze()|Net::OAuth2::AccessToken/"Actions"> call in the past (maybe even
+for an older version of this module) and get the token object revived. This
+$session is a HASH.
+
+You may pass any of the parameters for L<new()|Net::OAuth2::AccessToken/"Constructors"> as %options, to overrule
+the values inside the $session.
+
+ -Option --Default
+  profile  <required>
+
+=over 2
+
+=item profile => L<Net::OAuth2::Profile|Net::OAuth2::Profile> object
+
+=back
+
+example: 
+
+  my $auth    = Net::OAuth2::Profile::WebServer->new(...);
+  my $token   = $auth->get_access_token(...);
+  my $session = $token->freeze_session;
+  # now save $session in database or file
+  ...
+  # restore session
+  my $auth    = Net::OAuth2::Profile::WebServer->new(...);
+  my $token   = Net::OAuth2::AccessToken->session_thaw($session
+    , profile => $auth);
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<access_token>()
+
+Returns the (base64 encoded version of the) access token.  The token
+will get updated first, if it has expired and refresh_token is enabled,
+or when L<new(auto_refresh)|Net::OAuth2::AccessToken/"Constructors"> is set.
+
+It does not matter that the token is base64 encoded or not: it will
+always need to be base64 encoded during transport.
+
+=item $obj-E<gt>B<attribute>(NAME)
+
+[0.58] Sometimes, the token gets attributes which are not standard; they
+have no official accessor (yet?).  You can get them with this generic
+accessor.
+
+=item $obj-E<gt>B<changed>( [BOOLEAN] )
+
+[0.52] The session (token) needs to be saved, because any of the crucial
+parameters have been modified and C<auto_save> is not defined by
+the profile.
+
+=item $obj-E<gt>B<profile>()
+
+=item $obj-E<gt>B<scope>()
+
+=item $obj-E<gt>B<state>()
+
+=item $obj-E<gt>B<token_type>()
+
+=back
+
+=head3 errors
+
+When the token is received (hence this object created) it be the
+result of an error.  It is the way the original code was designed...
+
+=over 4
+
+=item $obj-E<gt>B<error>()
+
+=item $obj-E<gt>B<error_description>()
+
+=item $obj-E<gt>B<error_uri>()
+
+=back
+
+=head3 Expiration
+
+=over 4
+
+=item $obj-E<gt>B<auto_refresh>()
+
+=item $obj-E<gt>B<expired>( [$after] )
+
+Returns true when the token has an expiration set and that time has
+passed.  We use this token $after this check: to avoid the token to
+timeout inbetween, we take (by default 15 seconds) margin.
+
+=item $obj-E<gt>B<expires_at>( [$timestamp] )
+
+Returns the expiration timestamp of this token (true) or C<undef> (false)
+when it is not set.
+
+=item $obj-E<gt>B<expires_in>()
+
+Returns the number of seconds left, before the token is expired.  That
+may be negative.
+
+=item $obj-E<gt>B<refresh_always>()
+
+=item $obj-E<gt>B<refresh_token>()
+
+=item $obj-E<gt>B<update_token>( $token, $tokentype, $expires_at, [$refresh_token] )
+
+Change the token.
+
+=back
+
+=head2 Actions
+
+=over 4
+
+=item $obj-E<gt>B<refresh>()
+
+Refresh the token, even if it has not expired yet.  Returned is the
+new access_token value, which may be undef on failure.
+
+=item $obj-E<gt>B<session_freeze>(%options)
+
+This returns a SESSION (a flat HASH) containing all token parameters which
+needs to be saved to be able to restore this token later.  This SESSION
+can be passed to L<session_thaw()|Net::OAuth2::AccessToken/"Constructors"> to get revived.
+
+The C<changed> flag will be cleared by this method.
+
+Be sure that your storage is character-set aware.  For instance, you
+probably want to set 'mysql_enable_utf8' when you store this in a
+MySQL database.  Perl's JSON module will output utf8 by default.
+
+=item $obj-E<gt>B<to_json>()
+
+Freeze this object into JSON.  The JSON syntax is also used by the OAuth2
+protocol, so a logical choice to provide.  However, generically, the
+L<session_freeze()|Net::OAuth2::AccessToken/"Actions"> method provided.
+
+=back
+
+=head3 HTTP
+
+The token can be encoded in transport protocol in different ways. Using
+these method will add the token to the HTTP messages sent.
+
+=over 4
+
+=item $obj-E<gt>B<delete>( $uri, [$header, [$content]] )
+
+=item $obj-E<gt>B<get>( $uri, [$header, [$content]] )
+
+=item $obj-E<gt>B<post>( $uri, [$header, [$content]] )
+
+=item $obj-E<gt>B<put>( $uri, [$header, [$content]] )
+
+=item $obj-E<gt>B<request>($request)
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Net-OAuth2 distribution version 0.63,
+built on January 18, 2016. Website: F<http://perl.overmeer.net>.
+
+=head1 COPYRIGHTS
+
+Copyrights 2013-2016 on the perl code and the related documentation
+ by [Mark Overmeer] for SURFnet bv, The Netherlands.  For other contributors see Changes.
+
+Copyrights 2011-12 by Keith Grennan.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

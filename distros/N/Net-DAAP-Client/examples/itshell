@@ -1,0 +1,295 @@
+#!/usr/bin/perl -w
+# itshell--itunes shell
+
+=head1 NAME
+
+  itshell - a shell for searching and downloading from an itunes server
+
+=head1 SYNOPSIS
+
+  itshell [servername [serverport]]
+
+=head1 DESCRIPTION
+
+This program connects to an iTunes server and lets you search the
+playlists and songs and download the music files to your local
+filesystem.
+
+The following commands are valid from within the shell:
+
+  db                   view possible databases
+  db id                select a database
+  playlist             view possible playlists
+  playlist id          select a playlist
+  find keyword         search song title/album/artist for keyword
+  dir                  show where files will be saved
+  dir /new/dir         set new location for files to be saved
+  findget keyword      search for and immediately get title/album/artist
+  get id ...           download a song
+  url id ...           view persistent URL for a song or playlist
+  dump filename        dump databases to the filename
+  quit                 leave this shell
+
+=head1 AUTHOR
+
+Nathan Torkington.  Send patches to C<< <dapple AT torkington.com >>.
+Mail C<< daap-dev-subscribe AT develooper.com >> to join the DAAP
+developers mailing list.
+
+=cut
+
+use Net::DAAP::Client;
+
+# standard modules
+
+use sigtrap;
+use Carp;
+use strict;
+use Text::ParseWords;
+use Data::Dumper;
+use Term::ReadLine;
+
+my $Server_host = shift || 'localhost';
+my $Server_port = shift || 3689;
+my $Password    = shift || '';
+
+my $daap = Net::DAAP::Client->new(SERVER_HOST => $Server_host,
+                                  SERVER_PORT => $Server_port,
+                                  PASSWORD    => $Password,
+                                  DEBUG       => 1);
+push @{ $daap->{SONG_ATTRIBUTES} },
+  qw( daap.songbitrate daap.songsamplerate
+      daap.songstarttime daap.songstoptime
+      daap.songtime );
+$daap->connect() or die "Can't connect: ".$daap->error();
+
+
+my $dbs = $daap->databases;
+
+my $term = new Term::ReadLine qw(iTunesHell);
+my $line;
+my $prompt = 'iTunes';
+my $save_dir = '.';
+$| = 1;
+
+while (defined ($line = $term->readline("$prompt>"))) {
+    my ($cmd, @arg) = parse_line(qr{\s+}, 0, $line);
+    if ($cmd eq 'db') {
+        db_cmd(@arg);
+    } elsif ($cmd eq 'playlist') {
+        playlist_cmd(@arg);
+    } elsif ($cmd eq 'find') {
+        find_cmd(@arg);
+    } elsif ($cmd eq 'findget') {
+        findget_cmd(@arg);
+    } elsif ($cmd eq 'get') {
+        get_cmd(@arg);
+    } elsif ($cmd eq 'url') {
+        url_cmd(@arg);
+    } elsif ($cmd eq 'dir') {
+        dir_cmd(@arg);
+    } elsif ($cmd eq 'dump') {
+        dump_cmd(@arg);
+    } elsif (($cmd eq 'quit') || ($cmd eq 'exit')) {
+        last;
+    } else {
+        warn <<EOF ;
+Commands:
+  db                   view possible databases
+  db id                select a database
+  playlist             view possible playlists
+  playlist id          select a playlist
+  find keyword         search song title/album/artist for keyword
+  dir                  show where files will be saved
+  dir /new/dir         set new location for files to be saved
+  findget keyword      search for and immediately get title/album/artist
+  get id ...           download a song
+  url id ...           view persistent URL for a song or playlist
+  dump filename        dump databases to the filename
+  quit                 leave this shell
+EOF
+    }
+}
+
+$daap->disconnect();
+
+sub song_as_text {
+    my $song = shift;
+    return sprintf("%d : %s, %s (%s)\n",
+                   $song->{"dmap.itemid"},
+                   $song->{"dmap.itemname"},
+                   $song->{"daap.songartist"},
+                   $song->{"daap.songalbum"});
+}
+
+sub dir_cmd {
+    my @arg = @_;
+
+    if (@_) {
+        if (! -d $arg[0]) {
+            print "$arg[0] isn't a directory!\n";
+        } else {
+            $save_dir = $arg[0];
+        }
+    } else {
+        print "Files will be saved to $save_dir\n";
+    }
+}
+
+sub dump_cmd {
+    my @arg = @_;
+    if (@arg) {
+        my $filename = shift @arg;
+        open my $fh, ">$filename" or warn("Can't open $filename: $!"),return;
+        print $fh Dumper($dbs);
+        if ($daap->songs) {
+            print $fh "\n\n";
+            print $fh Dumper($daap->songs);
+        }
+        close $fh;
+    } else {
+        warn("usage: dump filename\n");
+    }
+}
+
+sub db_cmd {
+    my @arg = @_;
+    if (@arg) {
+        my $db_id = $arg[0];
+        $daap->db($db_id);
+        if (! $daap->error) {
+            printf "Loading database %s (may take a moment)\n", $daap->databases->{$db_id}{'dmap.itemname'};
+        } else {
+            warn "Database ID $arg[0] not found\n";
+        }
+    } else {
+        my $dbs = $daap->databases;
+        foreach my $id (sort { $a <=> $b } keys %$dbs) {
+            printf("%d : %s\n", $id, $dbs->{$id}{"dmap.itemname"});
+        }
+    }
+}
+
+sub playlist_cmd {
+    my @arg = @_;
+
+    if (! $daap->db) {
+        warn "Select a database with db first\n";
+        return;
+    }
+
+    if (@arg) {
+        my $playlist_id = $arg[0];
+        my $songs = $daap->playlist($arg[0]);
+        if (! $daap->error) {
+            foreach my $playlist_song (@$songs) {
+                my $songs = $daap->songs;
+                my $song = $daap->songs->{$playlist_song->{"dmap.itemid"}};
+                if (defined($song)) {
+                    # deleted items are evidentally left on the main playlist
+                    print song_as_text($song);
+                }
+            }
+        } else {
+            warn "Playlist ID $arg[0] not found\n";
+        }
+    } else {
+        my $playlists = $daap->playlists;
+        foreach my $id (sort { $a <=> $b } keys %$playlists) {
+            printf("%d : %s\n", $id, $playlists->{$id}{"dmap.itemname"});
+        }
+    }
+}
+
+sub findget_cmd {
+    my @arg = @_;
+
+    if (! $daap->db) {
+        warn "Select a database with db first\n";
+        return;
+    }
+
+    my @songs = search_through_songs(@arg);
+    foreach my $song (@songs) {
+        print "$save_dir/$song->{'dmap.itemid'}.$song->{'daap.songformat'} ($song->{'dmap.itemname'}) ... ";
+        $daap->save($save_dir, $song->{'dmap.itemid'});
+        print $daap->error ? "failed" : "done";
+        print "\n";
+    }
+}
+
+sub search_through_songs {
+    my $word = shift;
+    my @hits = ();
+
+    foreach my $song (values %{$daap->songs}) {
+        my (@f) = map { lc } (
+                              $song->{"dmap.itemname"},
+                              $song->{"daap.songartist"},
+                              $song->{"daap.songalbum"}
+                              );
+        my $to_find = lc($word);
+        if (grep { index(lc($_), $to_find) != -1 } @f) {
+            push @hits, $song;
+        }
+    }
+
+    return @hits;
+}
+
+sub find_cmd {
+    my @arg = @_;
+
+    if (! $daap->db) {
+        warn "Select a database with db first\n";
+        return;
+    }
+
+    if (@arg) {
+        my @songs = search_through_songs(@arg);
+        foreach my $song (@songs) {
+            print song_as_text($song);
+        }
+    } else {
+        warn "usage: find [string]\n";
+    }
+}
+
+sub get_cmd {
+    my @arg = @_;
+    my $songs = $daap->songs;
+
+    foreach my $song_id (@arg) {
+        my $song = $songs->{$song_id};
+        if (defined $song) {
+            print "Fetching ", song_as_text($song);
+            $daap->save($save_dir, $song_id);
+            if ($daap->error) {
+                print "Failed: ", $daap->error, "\n";
+            }
+        } else {
+            print "Skipping bogus song number $song_id\n";
+        }
+    }
+}
+
+sub url_cmd {
+  my @arg = @_;
+  my @skipped;
+
+  foreach my $id (@arg) {
+    my $url = $daap->url($id);
+      if ($url) {
+        print "$url\n";
+      } else {
+        push @skipped, $url;
+      }
+  }
+
+  if (@skipped) {
+    print "Skipped: ", join(", ", @skipped), ".\n";
+  }
+}
+
+exit;
+

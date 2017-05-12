@@ -1,0 +1,58 @@
+Revision history for Net-Elexol-EtherIO24
+
+0.01	2005-10-03 [chrisy]
+	First version, just for fun.
+
+0.10	2006-10-28 [chrisy]
+	- Various small tweaks
+	- Fixed a timing bug that only presented itself when _not_ debugging!
+
+0.11	2006-11-03 [chrisy]
+	- Same timing bug. Disabled a section of code that seems to be the root
+	  cause.
+	- Added clarification to documentation about the need for threads and
+	  threading support.
+
+0.13	2006-11-05 [chrisy]
+	- Some documentation tweaks
+
+0.15	2008-01-28 [chrisy]
+	- Documentation tweaks
+	- Add "indirect" updates - ie, perform updates in background,
+	  so that successive line writes cause less packet data, etc.
+	- Add "indirect" reads - this causes it to cache values retrieved from
+	  the Elexol device for a short interval
+	- Add hexdummps of packets in debug mode
+	- Fix some thread shutdown issues
+	- Split up the "status" and "recv" functions in service_loop into individual
+	  threads.
+	- Overhauled debugging output. Now centralised, and with a specifyable "prefix".
+
+0.17	2008-02-01 [chrisy]
+	- Fix module dependencies.
+	- Add 'read_before_write' feature.
+	- Add 'flush_writes_at_close' tweakable.
+	- Add 'clear_cache' method.
+	- Make threaded=>1 the default. (instead of 0)
+
+0.18	2008-02-01 [chrisy]
+	- Fix stupid MANIFEST mistake.
+
+0.19	2008-02-05 [chrisy]
+	- Work on the implementation of set_autoscan_addr
+	- Add some eeprom-related methods (read_eeprom, write_eeprom,
+	  eeprom_write_enable)
+	- eeprom_read "retries" if a read attempt timesout.
+	- Tweak dump_packet slightly
+
+0.20	2009-08-03 [chrisy]
+	- Add linestatus example utility
+	- Fix debugging errors that break operation
+
+0.21	2009-08-10 [chrisy]
+	- Fix reasonably serious thread-separation issue
+
+0.22	2009-08-11 [chrisy]
+	- Fix deadlock introduced in close upon DESTROY, which may also fix other
+	  issues caused by calling close in DESTROY when not the parent thread
+

@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Net-Analysis
+version:            0.41
+abstract:           Modules for analysing network traffic
+author:
+    - A. B. Worrall <worrall@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    LWP:               0
+    Net::Pcap:         0
+    NetPacket:         0
+    Params::Validate:  0
+    Test::MockObject:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

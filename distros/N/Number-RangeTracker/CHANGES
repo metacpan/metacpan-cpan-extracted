@@ -1,0 +1,50 @@
+Revision history for Perl module Number::RangeTracker
+
+0.6.0 2014-08-16
+
+  - Rename methods to be more concise
+  - Distinguish range size from range length with new size() method
+  - Enable more range formats: [ start, end ] and 'start..end'
+  - If there are ranges to remove, collapse before adding new ranges
+  - Allow setting of universe range for complement( start, end ); defaults: '-inf', '+inf'
+  - Substantially improve documentation (including speed comparison)
+  - Bug fixes
+  - Happy Birthday CPAN!
+
+0.5.0 2014-08-04
+
+  - Change namespace to Number::RangeTracker
+  - Add inverse() method
+  - Remove non-object-oriented interface and rename methods
+
+0.4.0 2013-07-04
+
+  - Add/remove multiple ranges at once
+
+0.3.0 2013-07-02
+
+  - Object-oriented implementation of all functions
+
+0.2.2 2013-07-02
+
+  - Speed increase
+  - Bug fix for range removal
+
+0.2.1 2013-06-28
+
+  - Remove outdated scripts
+
+0.2.0 2013-06-28
+
+  - Add functions to remove ranges and output ranges (as string or hash)
+
+0.1.1 2013-06-25
+
+  - Remove unused code (v. modest speed increase)
+
+0.1.0 2013-06-25
+
+  - Add ranges
+  - Collapse/optimize ranges
+  - Get range total length
+  - Check whether a value is within a range

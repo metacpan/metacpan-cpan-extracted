@@ -1,0 +1,606 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+ <script type="text/javascript">
+ 
+ 
+ 
+ var codesite_token = null;
+ 
+ 
+ var logged_in_user_email = null;
+ 
+ </script>
+ <title>Issue 487 - 
+ k9mail -
+ 
+ Can´t get K9 to work with Exchange Account - Google Code</title>
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
+ 
+ <link type="text/css" rel="stylesheet" href="http://www.gstatic.com/codesite/ph/17483318614223697365/css/ph_core.css">
+ 
+ <link type="text/css" rel="stylesheet" href="http://www.gstatic.com/codesite/ph/17483318614223697365/css/ph_detail.css" >
+ 
+ 
+ 
+ 
+<!--[if IE]>
+ <link type="text/css" rel="stylesheet" href="http://www.gstatic.com/codesite/ph/17483318614223697365/css/d_ie.css" >
+<![endif]-->
+</head>
+<body class="t3">
+ <div id="gaia">
+ 
+ <span>
+ 
+ 
+ <a href="#" id="projects-dropdown" onclick="return false;">My favorites</a>
+ 
+ | <a href="https://www.google.com/accounts/ServiceLogin?service=code&ltmpl=phosting&continue=http%3A%2F%2Fcode.google.com%2Fp%2Fk9mail%2Fissues%2Fdetail%3Fid%3D487&amp;followup=http%3A%2F%2Fcode.google.com%2Fp%2Fk9mail%2Fissues%2Fdetail%3Fid%3D487" onclick="_CS_click('/gb/ph/signin');">Sign in</a>
+ 
+ </span>
+
+ </div>
+ <div class="gbh" style="left: 0pt;"></div>
+ <div class="gbh" style="right: 0pt;"></div>
+ 
+ 
+ <div style="height: 1px"></div>
+ <table style="padding:0px; margin: 20px 0px 0px 0px; width:100%" cellpadding="0" cellspacing="0">
+ <tr style="height: 58px;">
+ <td style="width: 55px; text-align:center;">
+ <a href="/p/k9mail/">
+ 
+ 
+ 
+ <img src="/p/k9mail/logo?logo_id=1243021536" alt="Logo">
+ 
+ 
+ </a>
+ </td>
+ <td style="padding-left: 0.8em">
+ 
+ <div id="pname" style="margin: 0px 0px -3px 0px">
+ <a href="/p/k9mail/" style="text-decoration:none; color:#000">k9mail</a>
+ </div>
+ <div id="psum">
+ <i><a id="project_summary_link" href="/p/k9mail/" style="text-decoration:none; color:#000">K-9 is an Android Mutt</a></i>
+ </div>
+ 
+ </td>
+ <td style="white-space:nowrap; text-align:right">
+ 
+ <form action="/hosting/search">
+ <input size="30" name="q" value="">
+ <input type="submit" name="projectsearch" value="Search projects" >
+ </form>
+ 
+ </tr>
+ </table>
+
+
+<table id="mt" cellspacing="0" cellpadding="0" width="100%" border="0">
+ <tr>
+ <th onclick="if (!cancelBubble) _go('/p/k9mail/');">
+ <div class="tab inactive">
+ <div class="round4"></div>
+ <div class="round2"></div>
+ <div class="round1"></div>
+ <div class="box-inner">
+ <a onclick="cancelBubble=true;" href="/p/k9mail/">Project&nbsp;Home</a>
+ </div>
+ </div>
+ </th><td>&nbsp;&nbsp;</td>
+ 
+ 
+ 
+ 
+ <th onclick="if (!cancelBubble) _go('/p/k9mail/downloads/list');">
+ <div class="tab inactive">
+ <div class="round4"></div>
+ <div class="round2"></div>
+ <div class="round1"></div>
+ <div class="box-inner">
+ <a onclick="cancelBubble=true;" href="/p/k9mail/downloads/list">Downloads</a>
+ </div>
+ </div>
+ </th><td>&nbsp;&nbsp;</td>
+ 
+ 
+ 
+ 
+ 
+ <th onclick="if (!cancelBubble) _go('/p/k9mail/w/list');">
+ <div class="tab inactive">
+ <div class="round4"></div>
+ <div class="round2"></div>
+ <div class="round1"></div>
+ <div class="box-inner">
+ <a onclick="cancelBubble=true;" href="/p/k9mail/w/list">Wiki</a>
+ </div>
+ </div>
+ </th><td>&nbsp;&nbsp;</td>
+ 
+ 
+ 
+ 
+ 
+ <th onclick="if (!cancelBubble) _go('/p/k9mail/issues/list');">
+ <div class="tab active">
+ <div class="round4"></div>
+ <div class="round2"></div>
+ <div class="round1"></div>
+ <div class="box-inner">
+ <a onclick="cancelBubble=true;" href="/p/k9mail/issues/list">Issues</a>
+ </div>
+ </div>
+ </th><td>&nbsp;&nbsp;</td>
+ 
+ 
+ 
+ 
+ 
+ <th onclick="if (!cancelBubble) _go('/p/k9mail/source/checkout');">
+ <div class="tab inactive">
+ <div class="round4"></div>
+ <div class="round2"></div>
+ <div class="round1"></div>
+ <div class="box-inner">
+ <a onclick="cancelBubble=true;" href="/p/k9mail/source/checkout">Source</a>
+ </div>
+ </div>
+ </th><td>&nbsp;&nbsp;</td>
+ 
+ 
+ <td width="100%">&nbsp;</td>
+ </tr>
+</table>
+<table cellspacing="0" cellpadding="0" width="100%" align="center" border="0" class="st">
+ <tr>
+ 
+ 
+ 
+ 
+ 
+ <td>
+ <div class="issueDetail">
+<div class="isf">
+ 
+ 
+ <span class="inIssueEntry">
+ <a href="entry">New issue</a>
+ </span> |
+ 
+ <span class="inIssueList">
+ <span>Search</span>
+ <form action="list" method="GET" style="display:inline">
+ <select id="can" name="can" style="font-size:92%">
+ 
+<option disabled="disabled">Search within:</option>
+<option value="1" >&nbsp;All issues</option>
+<option value="2" selected=selected>&nbsp;Open issues</option>
+
+<option value="6" >&nbsp;New issues</option>
+<option value="7" >&nbsp;Issues to verify</option>
+
+ </select>
+ <span>for</span>
+ <span id="qq"><input type="text" size="32" id="q" name="q" value="" style="font-size:92%" ></span>
+ 
+ <span id="search_colspec"><input type="hidden" name="colspec" value="ID Product Type Status Priority Milestone Owner Summary" ></span>
+ 
+ 
+ 
+ <input type="hidden" name="cells" value="tiles" >
+ <input type="submit" value="Search" style="font-size:92%" >
+ </form>
+ </span> |
+ <span class="inIssueAdvSearch">
+ <a href="advsearch">Advanced search</a>
+ </span> |
+ <span class="inIssueSearchTips">
+ <a href="searchtips">Search tips</a>
+ </span>
+</div>
+</div>
+
+ </td>
+ 
+ 
+ 
+ 
+ 
+ 
+ <td height="4" align="right" valign="top" class="bevel-right">
+ <div class="round4"></div>
+ <div class="round2"></div>
+ <div class="round1"></div>
+ </td>
+ </tr>
+</table>
+<script type="text/javascript">
+ var cancelBubble = false;
+ function _go(url) { document.location = url; }
+</script>
+
+<div id="maincol"
+ 
+>
+
+ 
+<!-- IE -->
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+<style type="text/css">
+ .attachments { width:33%; border-top:2px solid #999; padding-top: 3px; margin-left: .7em;}
+ .attachments table { margin-bottom: 0.75em; }
+ .attachments table tr td { padding: 0; margin: 0; font-size: 95%; }
+ .label { white-space: nowrap; }
+ .derived { font-style:italic }
+ tr.cursor_on .author {
+ 
+ background: #fff url(http://code.google.com/images/show-arrow.gif) no-repeat 2px;
+ }
+</style>
+<div id="issueheader">
+<table cellpadding="0" cellspacing="0" width="100%"><tbody>
+ <tr>
+ <td class="vt h3" nowrap="nowrap" style="padding:0 5px">
+ 
+ 
+ Issue <a href="detail?id=487">487</a>:
+ </td>
+ <td width="90%" class="vt">
+ <span class="h3" >Can´t get K9 to work with Exchange Account</span>
+ </td>
+ <td>
+ 
+ <div class="pagination">
+ <a href="detail?id=486" title="Prev">&lsaquo; Prev</a>
+ 190 of 208
+ <a href="detail?id=490" title="Next">Next &rsaquo;</a>
+ </div>
+ </td>
+ </tr>
+ <tr>
+ <td></td>
+ <td nowrap="nowrap">
+ 
+ 
+ 2 people starred this issue and may be notified of changes.
+ 
+ 
+ </td>
+ <td align="center" nowrap="nowrap">
+ 
+ <a href="http://code.google.com/p/k9mail/issues/list">Back to list</a>
+ 
+ </td>
+ </tr>
+</tbody></table>
+</div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" class="issuepage" id="issuemeta-container">
+<tbody id="cursorarea" class="collapse"> 
+ <tr class="cursor_off">
+ <td id="issuemeta" rowspan="1000"> 
+ <div id="issuemeta-float">
+ <table cellspacing="0" cellpadding="0">
+ <tr><th align="left">Status:&nbsp;</th>
+ <td width="100%">
+ 
+ New
+ 
+ </td>
+ </tr>
+ 
+ 
+ 
+ <tr><th align="left">Owner:&nbsp;</th><td>
+ 
+ 
+ ----
+ 
+ 
+ </td>
+ </tr>
+ 
+ 
+ 
+ 
+ <tr><td colspan="2">
+ <a href="list?q=label:Type-Defect"
+ title=""
+ class="label"><b>Type-</b>Defect</a>
+ </td></tr>
+ 
+ 
+ 
+ <tr><td colspan="2">
+ <a href="list?q=label:Priority-Medium"
+ title=""
+ class="label"><b>Priority-</b>Medium</a>
+ </td></tr>
+ 
+ 
+ 
+ <tr><td colspan="2">
+ <a href="list?q=label:Product-k9mail"
+ title=""
+ class="label"><b>Product-</b>k9mail</a>
+ </td></tr>
+ 
+ 
+ 
+ 
+ 
+ </table>
+ <br><br>
+ 
+ 
+ 
+ <div style="white-space:nowrap"><a href="https://www.google.com/accounts/ServiceLogin?service=code&ltmpl=phosting&continue=http%3A%2F%2Fcode.google.com%2Fp%2Fk9mail%2Fissues%2Fdetail%3Fid%3D487&amp;followup=http%3A%2F%2Fcode.google.com%2Fp%2Fk9mail%2Fissues%2Fdetail%3Fid%3D487"
+ >Sign in</a> to add a comment</div>
+ 
+ 
+ 
+ 
+ <br>
+ 
+ 
+ 
+  
+ 
+ 
+ </div>&nbsp;
+ </td>
+ <td class="vt issuedescription" width="100%">
+ <div class="author">
+ Reported by <a style="white-space: nowrap" href="/u/ro.hammerl/">ro.hammerl</a>,
+ <span class="date" title="Wed Jun 10 06:15:59 2009">Jun 10, 2009</span>
+ </div>
+<pre>
+<b>What steps will reproduce the problem?</b>
+1. Start K9
+2. Enter account details for my Exchange Account
+3. K9 tries to sync, stops without any visible error
+
+<b>What is the expected output? What do you see instead?</b>
+
+Expected Output is a list of my email. I see a blank page as K9 tries to
+connect/sync with my exchange server, but it does not work
+
+<b>What version of K-9 are you using?</b>
+
+0.114
+
+<b>Is your email account a POP account or an IMAP account?</b>
+
+Exchange Account. 
+
+<b>Does this problem also occur on the built in 'Email' client?</b>
+
+No, has no exchange support. The account works with Touchdown and Moxier Mail.
+
+<b>Please provide any additional information below.</b>
+
+I already use Touchdown for the company exchange account. Now I need a
+second software for a second exchange account. I enter username, Passwort
+and Adress of OWA in the settings. I do not know what to enter at the other
+settings (mailbox path, ...)
+
+I enter the Details and afterwards it tries to connect and sync (see right
+top corner a ring moving for loading). Nothing happens - no emails and no
+error message.
+
+I tried both accounts where I know they work with other software on Android.
+
+Is there a tutorial for Exchange Support? What am I doing wrong?
+
+</pre>
+
+
+ </td>
+ </tr>
+ 
+ 
+ <tr class="cursor_off">
+ <td class="vt issuecomment">
+ 
+ 
+ 
+ <span class="author">Comment <a name="c1"
+ href="#c1">1</a>
+ by
+ <a style="white-space: nowrap" href="/u/danapple0/">danapple0</a></span>,
+ <span class="date" title="Wed Jun 10 06:48:01 2009">Jun 10, 2009</span>
+<pre>
+Please look in the K9mail-errors folder, if there is one.  If so, please extract the
+message there and add it to this issue.
+
+</pre>
+ 
+ 
+ </td>
+ </tr>
+ 
+ 
+ 
+ <tr class="cursor_off">
+ <td class="vt issuecomment">
+ 
+ 
+ 
+ <span class="author">Comment <a name="c2"
+ href="#c2">2</a>
+ by
+ <a style="white-space: nowrap" href="/u/bwbrown/">bwbrown</a></span>,
+ <span class="date" title="Wed Jun 10 12:08:56 2009">Jun 10, 2009</span>
+<pre>
+There is no tutorial as far as I know.  I have a similar issue (#483) and I am
+waiting for an answer too.  It would be great if there was a tutorial or someone just
+said hey it doesn't work with exchange. Either way then we would know what to do. 
+</pre>
+ 
+ 
+ </td>
+ </tr>
+ 
+ 
+ 
+ <tr class="cursor_off">
+ <td class="vt issuecomment">
+ 
+ 
+ 
+ <span class="author">Comment <a name="c3"
+ href="#c3">3</a>
+ by
+ <a style="white-space: nowrap" href="/u/ro.hammerl/">ro.hammerl</a></span>,
+ <span class="date" title="Fri Jun 12 01:39:54 2009">Jun 12, 2009</span>
+<pre>
+Hi, Unfortunately there is no errors-folder :(
+</pre>
+ 
+ 
+ </td>
+ </tr>
+ 
+ 
+
+
+ 
+ <tr>
+ <td class="vt issuecomment">
+ <img width="10" height="12" src="http://www.gstatic.com/codesite/ph/images/triangle.gif"><a href="https://www.google.com/accounts/ServiceLogin?service=code&ltmpl=phosting&continue=http%3A%2F%2Fcode.google.com%2Fp%2Fk9mail%2Fissues%2Fdetail%3Fid%3D487&amp;followup=http%3A%2F%2Fcode.google.com%2Fp%2Fk9mail%2Fissues%2Fdetail%3Fid%3D487"
+ >Sign in</a> to add a comment
+ </td>
+ </tr>
+ 
+
+
+</tbody>
+</table>
+<br>
+<script type="text/javascript" src="http://www.gstatic.com/codesite/ph/17483318614223697365/js/dit_scripts_20081013.js"></script>
+
+
+
+
+
+ 
+
+
+<form name="delcom" action="delComment.do?q=&amp;can=2&amp;sort=&amp;colspec=ID+Product+Type+Status+Priority+Milestone+Owner+Summary" method="POST">
+ <input type="hidden" name="sequence_num" value="">
+ <input type="hidden" name="mode" value="">
+ <input type="hidden" name="id" value="487">
+ <input type="hidden" name="token" value="">
+</form>
+<div id="helparea"></div>
+<script type="text/javascript">
+ _onload();
+ function delComment(sequence_num, delete_mode) {
+ var f = document.forms["delcom"];
+ f.sequence_num.value = sequence_num;
+ f.mode.value = delete_mode;
+ 
+ f.submit();
+ return false;
+ }
+ var el = document.getElementById('issuemeta-float');
+ var container = document.getElementById('issuemeta-container');
+ if (window.attachEvent) {
+ window.attachEvent('onscroll', function() {
+ _floatVertically(el, container);
+ });
+ } else if (window.addEventListener) {
+ window.addEventListener('scroll', function() {
+ _floatVertically(el, container);
+ }, false);
+ }
+</script>
+<script type="text/javascript" src="http://kibbles.googlecode.com/files/kibbles-1.3.1.comp.js"></script>
+<script type="text/javascript">
+ _setupKibblesOnDetailPage(
+ 'http://code.google.com/p/k9mail/issues/list',
+ '/p/k9mail/issues/entry',
+ 'detail?id\x3d486',
+ 'detail?id\x3d490',
+ 'k9mail', 487,
+ false, false);
+</script>
+ 
+ <script type="text/javascript" src="http://www.gstatic.com/codesite/ph/17483318614223697365/js/core_scripts_20081103.js"></script>
+ <script type="text/javascript" src="/js/codesite_product_dictionary_ph.pack.04102009.js"></script>
+ 
+ 
+ 
+ 
+ 
+ </div>
+<div id="footer" dir="ltr">
+ 
+ <div class="text">
+ 
+ &copy;2009 Google -
+ <a href="/">Code Home</a> -
+ <a href="/tos.html">Terms of Service</a> -
+ <a href="http://www.google.com/privacy.html">Privacy Policy</a> -
+ <a href="/more/">Site Directory</a> -
+ <a href="/p/support/">Project Hosting Help</a>
+ 
+ </div>
+</div>
+<script type="text/javascript">
+/**
+ * Reports analytics.
+ * It checks for the analytics functionality (window._gat) every 100ms
+ * until the analytics script is fully loaded in order to invoke siteTracker.
+ */
+function _CS_reportAnalytics() {
+ window.setTimeout(function() {
+ if (window._gat) {
+ try {
+ siteTracker = _gat._getTracker(CS_ANALYTICS_ACCOUNT);
+ siteTracker._trackPageview();
+ } catch (e) {}
+ var projectTracker = _gat._getTracker("UA-937849-5");
+projectTracker._initData();
+projectTracker._trackPageview();
+ } else {
+ _CS_reportAnalytics();
+ }
+ }, 100);
+}
+</script>
+
+ 
+ 
+ <div class="hostedBy" style="margin-top: -20px;">
+ <span style="vertical-align: top;">Hosted by</span>
+ <a href="/hosting/">
+ <img src="http://www.gstatic.com/codesite/ph/images/google_code_tiny.png" width="107" height="24" alt="Google Code">
+ </a>
+ </div>
+ 
+ 
+ 
+ 
+
+
+ 
+ </body>
+</html>
+

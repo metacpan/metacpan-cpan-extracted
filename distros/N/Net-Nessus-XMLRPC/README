@@ -1,0 +1,81 @@
+Net-Nessus-XMLRPC
+
+This is Perl interface for communication with Nessus scanner over XMLRPC.
+You can start, stop, pause and resume scan. Watch progress and status of 
+scan, download report, etc.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+EXAMPLE
+
+	use Net::Nessus::XMLRPC;
+
+	# '' is same as https://localhost:8834/
+	my $n = Net::Nessus::XMLRPC->new ('','user','pass');
+
+	die "Cannot login to: ".$n->nurl."\n" unless ($n->logged_in);
+
+	print "Logged in\n";
+	my $polid=$n->policy_get_first;
+	print "Using policy ID: $polid ";
+	my $polname=$n->policy_get_name($polid);
+	print "with name: $polname\n";
+	my $scanid=$n->scan_new($polid,"perl-test","127.0.0.1");
+
+	while (not $n->scan_finished($scanid)) {
+		print "$scanid: ".$n->scan_status($scanid)."\n";	
+		sleep 15;
+	}
+	print "$scanid: ".$n->scan_status($scanid)."\n";	
+	my $reportcont=$n->report_file_download($scanid);
+	my $reportfile="report.xml";
+	open (FILE,">$reportfile") or die "Cannot open file $reportfile: $!";
+	print FILE $reportcont;
+	close (FILE);
+
+NOTICE
+
+This CPAN module uses LWP for communicating with Nessus over XMLRPC via https.
+Therefore, make sure that you have Net::SSL (provided by Crypt::SSLeay):
+http://search.cpan.org/perldoc?Crypt::SSLeay
+or IO::Socket::SSL:
+http://search.cpan.org/perldoc?IO::Socket::SSL
+
+If you think you have login problems, check this first!
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::Nessus::XMLRPC
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Nessus-XMLRPC
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-Nessus-XMLRPC
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-Nessus-XMLRPC
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-Nessus-XMLRPC
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Vlatko Kosturjak
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

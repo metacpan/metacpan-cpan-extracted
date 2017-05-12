@@ -1,0 +1,20 @@
+Revision history for NCBIx-BigFetch
+
+0.5.0  Tue Feb 17 14:18:20 2009
+       Initial release.
+
+0.5.1  Wed Feb 18 16:42:00 2009
+       Test fixes for Perl::Critic and POD::Coverage.
+
+0.5.5  Thu Feb 19 07:46:00 2009
+       Removed Perl::Critic and POD::Coverage tests
+       Expanded $config into multiple properties
+       Added get/set property methods to _save() and _load()
+       Change get_missing() from single $config property
+
+0.5.6  Thu Feb 19 22:33:00 2009
+       Reorganized POD 
+       Removed "sequence cleaning" from this module
+       Fixed half-efforts from 0.55
+       Added file_test() method used in t/01.test.t to test new() method
+

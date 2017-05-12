@@ -1,0 +1,8 @@
+# This is README file for Net::TrackIT distribution.
+
+Net::TrackIT is a simple wrapper around DHL's TrackIT web services.
+
+To build:
+    perl Makefile.PL
+    make
+

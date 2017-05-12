@@ -1,0 +1,87 @@
+
+Net::EPP::Registry::Nominet version 0.03
+
+Released: 6th November 2015
+
+
+INSTALLATION
+------------
+
+To install this module you can follow the usual procedure which is:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Note that most of the tests will be skipped unless you provide a tag and
+a password for connection to the Nominet EPP Testbed. See
+http://registrars.nominet.org.uk/registration-and-domain-management/registrar-systems/epp/testbed
+for details of how to register for the testbed. Before running "make
+test", set up the environment variables NOMTAG and NOMPASS like so:
+
+	export NOMTAG=MYTAG NOMPASS=mypass
+
+If you have the CPAN module installed then you can install the module
+from the command line like so:
+
+	$ cpan Net::EPP::Registry::Nominet
+
+
+DESCRIPTION
+-----------
+
+Net::EPP::Registry::Nominet is designed to allow synchronous management
+of .uk domains.
+
+This module extends Net::EPP::Simple to cope with the unorthodox EPP
+implementation currently in use by Nominet, the registry with
+responsibility for the .uk namespace. It is intended to have a
+compatible interface to Net::EPP::Simple so far as is practical.
+
+
+NEW SINCE LAST PUBLIC VERSION
+-----------------------------
+
+Better documentation.
+BUG FIX: newer versions of Net::EPP caused the hello() method to
+      emit warnings.
+Improved test coverage and some functionality.
+Minimum perl version is now 5.8.0.
+Test::Warn now required for tests.
+BUG FIX: use of note() required more recent version of Test::More.
+      Replaced note() with diag() throughout. Thanks to Nick Lindsell
+      for reporting this. (issue 107430)
+Minumum version of Test::More specified.
+Minor doc fixes.
+Removed code for obsolete first-bill, recur-bill.
+Improved renewal/unrenewal and query tests.
+Added renew-not-required functionality.
+Workaround for address treatment in Net::EPP::Simple.
+secDNS schemas, specs and tests added.
+Removed @ISA.
+
+See the Changes file for a complete history.
+
+
+DOCUMENTATION
+-------------
+
+All of the documentation is in POD format in the module source. Once the
+module has been installed you can use
+
+	perldoc Net::EPP::Registry::Nominet
+
+to read it. Alternatively, you can view the man page with
+
+	man Net::EPP::Registry::Nominet
+
+
+COPYRIGHT
+---------
+
+This software is copyright (c) 2013-2015 by Pete Houston. It is released
+under the Artistic Licence (version 2) and the GNU General Public Licence
+(version 2).
+
+$Id: README,v 1.11 2015/11/06 14:40:16 pete Exp $

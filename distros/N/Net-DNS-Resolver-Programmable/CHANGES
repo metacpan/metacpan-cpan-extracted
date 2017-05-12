@@ -1,0 +1,39 @@
+# Legend:
+# --- = A new release
+#   + = Added a feature (in a backwards compatible way)
+#   ! = Changed something significant, or removed a feature
+#   * = Fixed a bug, or made a minor improvement
+
+--- 0.003 (2007-05-30 22:00)
+
+  Miscellaneous:
+  ! Build-require Module::Build >= 0.2805, hopefully fixing a version.pm/
+    CPAN.pm compatibility issue (see rt.cpan.org #26784).
+    (Debian packaging is not affected because it does not rely on META.yml.)
+  * Added LICENSE file explicitly including the verbatim license texts.
+
+  Debian:
+  * Depends: libnet-dns-perl
+  * Dropped build dependency on libtest-simple-perl for now.  There are
+    currently no tests.
+
+--- 0.002.2 (2007-01-09 13:00)
+
+  * Explicitly mention license in README file.
+
+--- 0.002.1 (2006-11-15 15:30)
+
+  ! Requires version package.
+  * Correctly handle undefined result code returned by custom resolver code.
+
+--- 0.002 (2006-11-15 03:45)
+
+  + Support non-RCODE strings to be returned by custom resolver code, which is
+    then taken as the resolver's error string.
+  * Do not fold identical returned RRs into a single RR.
+  * Minor documentation fixes.
+
+--- 0.001 (initial release) (2006-10-23 00:00)
+
+# $Id: CHANGES 13 2007-05-30 22:12:35Z julian $
+# vim:sts=2 sw=2 et tw=79

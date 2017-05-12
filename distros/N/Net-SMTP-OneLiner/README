@@ -1,0 +1,27 @@
+Net::SMTP::OneLiner
+=======================
+
+BLURB
+
+A friend of mine was telling me that ruby, or python, or php or
+something had an easier one line send mail function; and that
+Net::SMTP was "too hard" to use in practice.
+
+I chortled and cranked this out.  In truth, a single function
+mail send function sounded just peachy.  I even use this myself
+-- unless I want to do something phancy with Net::SMTP.
+
+Then again, using modules you wrote for yourself and a friend
+comes naturally.
+
+Whatever, 
+
+-Paul
+
+(Let me know if you use this.)
+
+EXAMPLES:
+
+send_mail($to, $from, $subject, $msg);
+send_mail('me@domain', 'you@domain', "heyya there", "supz!?!?");
+send_mail(\@your_group_list, $from, $subject, $msg, $cc, $bcc);

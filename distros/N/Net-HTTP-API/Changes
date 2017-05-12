@@ -1,0 +1,52 @@
+Revision history for Perl extension Net::HTTP::API
+
+0.14    Mon 26 Jul 2010 09:15:44 AM CEST
+        - remove coerce on UriPath
+        - use new Moose::Util::MetaRole
+
+0.13    Sun 18 Jul 2010 09:00:57 AM CEST
+        - rename from MooseX::Net::API to Net::HTTP::API
+        - remove http-console (now at net-http-console)
+        - various fix
+
+0.12    Sun 18 Jul 2010 09:00:52 AM CEST
+        - MooseX::Net::API is now deprecated (renamed to Net::HTTP::API)
+
+0.11    Thu June  3 2010
+        - http-console : REST shell to make request
+        - move most of the code to Roles
+        - use with_meta instead of with_caller
+        - rewrite all the metaclass
+
+0.10    Mon 11 Jan 2010 01:30:25 PM CET
+        - stringify error
+
+0.09    Thu 07 Jan 2010 12:07:03 PM CET
+        - update tests and add new tests
+        - return content and http_response
+
+0.08    Mon 04 Jan 2010 05:58:56 PM CET
+        - api_base_url is not read-only
+
+0.07    Mon 04 Jan 2010 11:50:22 AM CET
+        - fix error reporting
+
+0.06    Sun 20 Dec 2009 05:17:49 PM CET
+        - mainly cleaning and POD
+
+0.05    Wed 09 Dec 2009 11:01:54 AM CET
+        - missing try::tiny
+
+0.04    Wed 09 Dec 2009 10:58:04 AM CET
+        - some cleaning in roles
+
+0.03    Tue 08 Dec 2009 04:22:45 PM CET
+        - move some code in roles
+        - add code to use catalyst in tests
+
+0.02    Tue 08 Dec 2009 10:36:03 AM CET
+        - api_base_url is optional
+        - add tests to play with catalyst
+
+0.01    Mon Nov 23 14:54:25 2009
+        - original version

@@ -1,0 +1,31 @@
+Changes
+lib/Net/BGP.pm
+lib/Net/BGP/ASPath.pm
+lib/Net/BGP/ASPath/AS.pm
+lib/Net/BGP/ASPath/AS_CONFED_SEQUENCE.pm
+lib/Net/BGP/ASPath/AS_CONFED_SET.pm
+lib/Net/BGP/ASPath/AS_SEQUENCE.pm
+lib/Net/BGP/ASPath/AS_SET.pm
+lib/Net/BGP/NLRI.pm
+lib/Net/BGP/Notification.pm
+lib/Net/BGP/Peer.pm
+lib/Net/BGP/Process.pm
+lib/Net/BGP/Refresh.pm
+lib/Net/BGP/Transport.pm
+lib/Net/BGP/Update.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-Signature.t
+t/01-pod.t
+t/10-ASPathSegment.t
+t/11-ASPath.t
+t/20-NLRI.t
+t/30-Update.t
+t/31-Refresh.t
+t/32-Open.t
+t/50-BGP.t
+t/51-BGP-AS4.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

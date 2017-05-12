@@ -1,0 +1,64 @@
+{
+   "abstract" : "use Cassandra databases with L<IO::Async> using CQL",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Async-CassandraCQL",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::Async::Test" : "0",
+            "Test::Fatal" : "0",
+            "Test::HexString" : "0",
+            "Test::Identity" : "0",
+            "Test::More" : "0.88",
+            "Test::Refcount" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Compress::LZ4" : "0",
+            "Compress::Snappy" : "0"
+         },
+         "requires" : {
+            "Devel::GlobalDestruction" : "0",
+            "Devel::Refcount" : "0",
+            "Future" : "0.17",
+            "IO::Async::Loop" : "0.54",
+            "IO::Async::Stream" : "0.59",
+            "IO::Socket::IP" : "0",
+            "Protocol::CassandraCQL" : "0.11"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Async::CassandraCQL" : {
+         "file" : "lib/Net/Async/CassandraCQL.pm",
+         "version" : "0.12"
+      },
+      "Net::Async::CassandraCQL::Connection" : {
+         "file" : "lib/Net/Async/CassandraCQL/Connection.pm",
+         "version" : "0.12"
+      },
+      "Net::Async::CassandraCQL::Query" : {
+         "file" : "lib/Net/Async/CassandraCQL/Query.pm",
+         "version" : "0.12"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.12"
+}

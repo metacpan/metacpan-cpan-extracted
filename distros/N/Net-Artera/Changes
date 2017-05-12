@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::Artera.
+
+0.01  Thu Oct 14 22:43:25 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -n Net::Artera -b 5.5.0
+

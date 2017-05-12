@@ -1,0 +1,101 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+use Net::Async::Tangence::Client;
+
+use IO::Async::Loop 0.16;
+
+use Data::Dump;
+
+# We want to mangle the way Data::Dump prints our object proxies
+# While we're at it, lets build a generic delegated printing system
+
+{
+   my $_dump = \&Data::Dump::_dump;
+
+   my %dump_delegations;
+
+   no warnings 'redefine';
+   *Data::Dump::_dump = sub {
+      if( exists $dump_delegations{ref $_[0]} ) {
+         return $dump_delegations{ref $_[0]}->( @_ );
+      }
+      else {
+         return $_dump->( @_ );
+      }
+   };
+
+   sub register_dump_delegation
+   {
+      my ( $class, $cb ) = @_;
+      $dump_delegations{$class} = $cb;
+   }
+}
+
+register_dump_delegation( "Tangence::ObjectProxy" => sub {
+      my ( $obj ) = @_;
+      return "OBJPROXY( id=$obj->{id}, props=" . Data::Dump::dump($obj->{props}) . " )";
+} );
+
+my $loop = IO::Async::Loop->new();
+
+my $URL = shift @ARGV or die "Need URL as argv[1]\n";
+
+my $conn = Net::Async::Tangence::Client->new(
+   on_closed => sub {
+      print STDERR "Connection closed\n";
+      exit(0);
+   },
+   on_error => sub {
+      my ( $message ) = @_;
+      print STDERR "Error: $message\n";
+      $loop->loop_stop;
+   },
+);
+
+$loop->add( $conn );
+
+$conn->connect_url( $URL )->get;
+
+my $registry;
+$loop->loop_once until $registry = $conn->registry;
+
+if( !@ARGV ) {
+   my $objshash = $registry->get_property( "objects" )->get;
+
+   foreach my $id ( sort { $a <=> $b } keys %$objshash ) {
+      my $desc = $objshash->{$id};
+
+      printf "%-6d: %s\n", $id, $desc;
+   }
+}
+elsif( $ARGV[0] eq "-i" ) {
+   shift @ARGV; # eat -i
+   my $objid = shift @ARGV;
+
+   my $obj = $registry->call_method( "get_by_id", $objid )->get;
+
+   print "Object is a " . $obj->classname . "\n";
+   my $class = $obj->class;
+
+   print "Class supports:\n";
+   print "  method $_\n" for keys %{ $class->methods };
+   print "  event $_\n" for keys %{ $class->events };
+   print "  property $_\n" for keys %{ $class->properties };
+}
+elsif( $ARGV[0] eq "-p" ) {
+   shift @ARGV; # eat -p
+   my $objid    = shift @ARGV;
+   my $property = shift @ARGV;
+
+   my $obj = $registry->call_method( "get_by_id", $objid )->get;
+
+   my $value = $obj->get_property( $property )->get;
+
+   print Data::Dump::dump( $value ) . "\n";
+}
+else {
+   die "Unrecognised operation $ARGV[0]\n";
+}

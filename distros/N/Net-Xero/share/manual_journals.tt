@@ -1,0 +1,19 @@
+<ManualJournal>
+  <Narration>[% narration %]</Narration>
+  <Date>[% date %]</Date>
+  <JournalLines>
+  [%- FOREACH line IN journallines %]
+    <JournalLine>
+      <Description>[% line.desc %]</Description>
+      <LineAmount>[% line.amount %]</LineAmount>
+      <AccountCode>[% line.account %]</AccountCode>
+      [%- IF line.tracking %]
+      <Tracking>[% line.tracking %]</Tracking>
+      [% END %]
+      [%- IF line.tax_type %]
+      <TaxType>[% line.tax_type %]</TaxType>
+      [% END %]
+    </JournalLine>
+  [%- END %]
+  </JournalLines>
+</ManualJournal>

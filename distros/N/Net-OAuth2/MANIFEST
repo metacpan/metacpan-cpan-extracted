@@ -1,0 +1,27 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+examples/.htaccess
+examples/psgi/app.psgi
+examples/psgi/config.yml
+examples/psgi/dispatch.cgi
+lib/Net/OAuth2.pm
+lib/Net/OAuth2.pod
+lib/Net/OAuth2/AccessToken.pm
+lib/Net/OAuth2/AccessToken.pod
+lib/Net/OAuth2/Client.pm
+lib/Net/OAuth2/Client.pod
+lib/Net/OAuth2/Profile.pm
+lib/Net/OAuth2/Profile.pod
+lib/Net/OAuth2/Profile/Password.pm
+lib/Net/OAuth2/Profile/Password.pod
+lib/Net/OAuth2/Profile/WebServer.pm
+lib/Net/OAuth2/Profile/WebServer.pod
+t/01use.t
+t/10web.t
+t/20req.t
+t/30refresh.t
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

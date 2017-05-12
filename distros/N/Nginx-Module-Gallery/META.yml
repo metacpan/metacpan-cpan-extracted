@@ -1,0 +1,34 @@
+--- #YAML:1.0
+name:               Nginx-Module-Gallery
+version:            0.3.0
+abstract:           Gallery perl module for nginx. Like simple file index
+author:
+    - Dmitry E. Oboukhov <unera@debian.org>,
+    - Roman V. Nikolaev <rshadow@rambler.ru>
+license:            GPLv3
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Digest::MD5:     0
+    File::Basename:  0
+    File::Find:      0
+    File::Path:      0
+    File::Spec:      0
+    File::Temp:      0
+    Image::Magick:   0
+    MIME::Base64:    0
+    MIME::Types:     0
+    Mojo::Template:  0
+    nginx:           
+    URI::Escape:     0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

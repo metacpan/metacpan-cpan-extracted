@@ -1,0 +1,446 @@
+Revision history for Perl extension Net::Amazon:
+0.62 (01/26/2013)
+   (dc) Add support for HTTP compression where available, enabled by default.
+   (cb) Add support for EAN to the US locale, as reported by Jacob Turino.
+   (cb) Add Spain and Italy locales, as implemented by Menno Blom.
+   (cb) Add some new departments in Amazon.co.jp, as implemented Naoya Ito.
+
+0.61 (10/28/2011)
+   (cb) rt 71937; Amazon now requires an Associate Tag, so enforce usage.
+   (cb) The ListLookup operation has been removed from the WSDL (from 2010!),
+        scrub all of the wishlist operations as a result.
+   (cb) Update to the latest WSDL - 2011-08-01.
+
+0.60 (08/01/2011)
+   (cb) Fix the page and max_pages parameter to correctly fetch the specified
+        number of pages, and start at the correct offset.  Reported as rt 69201.
+   (cb) Add a method to get similar products.  Patch submitted by Jennifer.
+   (cb) Push from cpanservice: Small dist maintenance. Please use latest 
+        ExtUtils::MakeMaker for release.
+
+0.59 (11/02/2009)
+   (cb) DigitalMusicTrack.pm was not included, reported by Matt 
+        Okeson-Harlow.
+
+0.58 (11/01/2009)
+   (cb) Update the Keywords library in Validate - reported by Dave
+        Hodgkinson.
+   (cb) Added customer_location and customer_name accessors to review
+        results for Scott Weisman.
+   (cb) Nathan Handler re-re-reported a man page issue, rt 46708.
+
+0.57 (09/08/2009)
+   (cb) David Raab reported an incomplete kit via rt.cpan.org.  Re-run
+        make manifest to address my mistake.
+
+0.56 (09/07/2009)
+   (cb) Add support for searching MP3 downloads as requsted by Dave 
+        Hodgkinson.
+   (cb) Required for MP3 Downloads, and inspired by Vince Veselosky's 
+        fix, update aws4-itemsearch.
+   (cb) secret_key is now a required parameter.  Update all of the example
+        scripts with the secret_key parameter.
+
+0.55 (07/20/2009)
+   (cb) Yuichi Tateno implemented support for the SearchIndex all.
+   (cb) Vince Veselosky fixed adm/aws4-types script, and as a result
+        updated classes in Validate/Type.
+   (cb) Update to WSDL 2009-07-16.
+
+0.54 (06/17/2009)
+   (cb) Alfons Wittmann reported that signing requests broke caching due
+        to the current time being incorporated into every signed URL 
+	submitted.
+
+0.53 (06/13/2009)
+   (cb) Nathan Handler re-reported a man page issue on Ubuntu, rt 46708.  
+        I managed to fix 197 issues, except for the specific one he called 
+        out in the bug.
+
+0.52 (06/09/2009)
+   (cb) Nathan Handler reported a man page issue on Ubuntu, rt 46708.
+
+0.51 (06/05/2009)
+   (cb) Vince Veselosky submitted a patch to support request signing, a
+        feature that is required for accessing AWS after 2009-08-15.
+        Upgrading is recommended.
+   (cb) Complete the upgrade to WSDL 2009-03-31 that was started by
+        Vince Veselosky.
+   (cb) Clean-up POD issues found by pod checker.
+   (cb) Indicate the code has moved to github.com.
+   (cb) Update the README to reflect the actual date of the WSDL.
+
+0.50 (07/29/2008)
+   (cb) Michael Hendricks submitted a patch to guarantee that error 
+        messages are stored as an arrayref.
+
+0.49 (04/24/2008)
+   (cb) Make an effort to return the price of an item.  Check for the
+        price of an item in the following order: Amazon's price, third
+        party new, and then third party used.  This issue was reported
+        by a least two different people via Mike Schilli.
+
+0.48 (01/13/2008)
+   (cb) Fix from MATSUU Takuto for ReleaseDate, and Title.  These methods 
+        have been moved to the base class.  The theatrical release date
+        is now separate from the release date function.
+
+0.47 (12/16/2007)
+   (cb) Fix an issue on Darwin with Perl 5.10.  Yet another issue found
+        by CPAN testers - thanks!
+   (cb) Aethon ?? (aethon@gmail.com) pointed out that OurPrice() was not
+        returning the correct price information.  This has been an issue
+        since the cutover to AWS4, and is a great catch.
+
+0.46 (11/16/2007)
+   (cb) Serge Dubrouski <sergeyfd@gmail.com> submitted a patch for returning
+        the width and height of the small, medium, and large images.
+
+0.45 (11/11/2007)
+   (cb) Gregor Hermann <gregor+debian@comodo.priv.at> submitted a patch to
+        prevent canned tests from contacting the Amazon.com.
+   (cb) Jochen Cichon <joschi@vfnet.de> reported a bug when specifying 
+        multiple ResponseGroups.
+   (cb) Update to the latest WSDL, version 2007-10-29.
+
+0.44 (11/03/2007)
+   (cb) Patch by Carl Franks <fireartist@gmail.com> to add support for 
+        returning the currency code, and unformatted price.
+   (cb) Patch by Carl Franks <fireartist@gmail.com> to address the confusion
+        between release date, and publication date.  Prior to version 0.44
+        release date was the publication date.  Now release date is the
+        release date, and a function to return the publication date has been
+        added.
+
+0.43 (06/20/2007)
+   (cb) Simon Wistow <simon@thegestalt.org> found an bug with wishlist
+        processing, which would cause Net::Amazon to give up prematurely.
+   (cb) Be more graceful when dealing with Small ResponseGroups by trying
+        to avoid Perl warnings.
+   (cb) Added a gross hack to deal with Amazon's wishlist handling to ensure
+        the wishlist test can actually pass.
+
+0.42 (06/18/2007)
+   (cb) Add scripts to automatically generate the canned test data.
+   (cb) Serge Dubrouski <sergeyfd@gmail.com> noted an inconsistency in the 
+        documentation for ImageUrl{Small,Medium,Large}.  When I converted to 
+        AWS4 I renamed these functions accidently.  Add back the old function 
+        names, and keep the new functions around.
+
+0.41 (04/10/2007)
+   (cb) Tümer Garip <tgarip@neu.edu.tr> found a long standing bug for the
+        Music properties whereby track data were not correctly captured, and
+        returned.
+   (cb) Fix the Artist test to account for this lapse in the future, and add 
+        more tests as well.
+
+0.40 (03/12/2007)
+   (cb) UPC accepts a search index, so process it.
+   (cb) Fix the documentation for ProductName.  
+   (cb) Make ProductName an alias for [Tt]itle, both ProductName suggestions 
+        were from Frank Tobia <frank.tobia@gmail.com>.
+   (cb) Add searches for director and title, contributed by Carl Franks
+        <fireartist@gmail.com>.
+
+0.39 (02/18/2007)
+   (cb) Update documentation, 10-digit vs. 13-digit ISBN was incorrect.
+   (cb) Add support for searching by EAN.  This is only valid for 
+        non-US locations.  Suggested by Nick Faarvang.
+   (cb) Remove UPC ItemSearch'es for non-US locales, it is invalid.
+   (cb) Fix a long standing bug when validating search against non-US
+        locales.
+
+0.38 (01/24/2007)
+   (cb) Update documentation, dewey_decimal_number is for non-fiction 
+        only.
+   (cb) Add support for searching by ISBN.
+   (cb) UPC is an ItemLookup, not an ItemSearch.
+
+0.37 (01/23/2007)
+   (cb) Update to WSDL 01-17-2007.
+   (cb) Update index.html to indicate a differences between AWS3 and
+        AWS4 releases.
+   (cb) Add POD for all types of item searches.
+   (cb) Add actor, and author to the SEARCH_TYPE_CLASS_MAP.
+   (cb) README is generated from Amazon.pm, update Amazon.pm with the
+        changes made to README, and regenerate README. 
+   (cb) Mike Schilli found a bug with non-US locales for Reviews where
+        TotalVotes was always zero.  This caused a bogus warning.
+
+0.36 (01/09/2007)
+   (cb) Christopher Boumenot is taking over has maintainer of Net::Amazon.
+   (cb) Update the library to use AWS4 from AWS3.  The changes involved
+        are quite deep.  While I have strived to keep interfaces the same
+        that was not always possible.  I am sure there are still bugs
+        to be had that need to be fixed.
+   (cb) Add searching by Author, Actor, MusicLabel, and Publisher.  
+   (cb) Add the property functions numpages(), dewey_decimal(), and
+        SuperSaverShipping().
+   (cb) Add new property classes for CE (consumer electronics), Software,
+        and VideoGames.
+   (cb) Restrucure the fetch code to reduce the need to directly poke
+        the XML where applicable.  There is still cleanup that needs to
+        be done.
+   (cb) Remove the need to explicitly specify mode parameters.
+   (cb) Autogenerate libraries based on data from Amazon's ECS specs to
+        determine a default mode for the user.
+   (cb) Autogenerate libraries based on data form Amazon's ECS specs to
+        determine the search types available for a given.  This 
+        information is also locale specific.
+   (cb) Cleanup locale support, and add support for France, and Canada.
+        Locale support needs more testing.
+   (cb) Add support for the different search response types in AWS4: 
+        small, medium, large, similarities, reviews, etc.  The search 
+        response type is automatically determined based on search mode.
+
+0.35 (02/04/2006)
+   (ms) Took starring() out of eg/asin_dvd, looks like it is no longer
+        supported by amzn (reported by Joseph Ronie).
+
+0.34 (07/11/2005)
+   (ms) Added similar_asins() to Net::Amazon::Property
+   (ms) Steven Alyari reported a caching problem on v5.8.1-RC3/darwin,
+        where perl's hashes are stored differently between invocations
+        of the same program, confusing Net::Amazon's URL-based caching
+        algorithm. Applied his fix, which sorts the query arguments.
+
+0.33 (02/23/2005)
+   (ms) Makefile.PL prerequisite changed from undef to '0'.
+   (ms) Greg McCann <greg@cambria.com> added ThirdPartyProductInfo.
+   (ms) Added Exchange requests with help by Greg McCann <greg@cambria.com>.
+
+0.32 (10/16/2004)
+   (ms) Greg McCann <greg@cambria.com> added CollectiblePrice, 
+        CollectibleCount, NumberOfOfferings, UsedCount, ThirdPartyNewPrice,
+        ThirdPartyNewCount as default properties. To get (*Count, 
+        NumberOfOfferings), specify "offer" => "All" in the request.
+
+0.31 (09/22/2004)
+   (ms) Lance P Cleveland <lance@lancecleveland.com> noticed that somewhere
+        between 0.26 and 0.30 the properties() method lost the ability to 
+        be called in scalar context and return only the first result. Added
+        logic to re-enable it.
+
+0.30 (09/14/2004)
+   (ms) Lance Cleveland <lancec@proactivewm.com> provided a patch to
+        fix a typo which caused N::A::Request::Similar to fail. Added more
+        documentation on request classes and test cases for all constructors.
+
+0.29 (08/12/2004)
+   (ms) Brian <brianbrian@gmail.com> contributed code for querying sellers.
+        Added docs and test cases. Added a new hierarchy N::A::Result/*
+        to deal with responses containing results which aren't Amazon items.
+   (ms) fixed bug in _convert_option: Override target option only if
+        it doesn't exist already.
+
+0.28 (08/04/2004)
+   (ms) ASIN search can now process several asin numbers with one request.
+        Dan Kreft <dan@kreft.net> cleaned up the implementation of 
+        Request.pm, ASIN.pm and a bunch of other files.
+   (ms) Tatsuhiko Miyagawa <miyagawa@livedoor.jp> provided a patch for
+        load errors on search(blended => ...), a fix for a bug with
+        single/multiple ProductLine(s), and a suggestion for using
+        ForceArray which XML::Simple. Added test cases for this patch.
+   (ms) Added xml_parse() method to Net::Amazon::Response which Net::Amazon
+        now calls to parse the returned XML. This enables the response
+        class (which can override it) to creatively interpret the 
+        response XML to form the response data structure.
+   (ms) Added strict warnings to each and every module
+   (ms) Added dump_responses() for easier response canning.
+
+0.27 (07/27/2004)
+   (ms) Richard Giliam <nirosys@nirostasis.net> added the isbn()
+        method to the Book.pm property.
+   (ms) Andy Grundman <andy@hybridized.org> provided a patch to 
+        enforce Amazon's no-more-than-1-request-per-second rule. 
+        A new parameter 'strict' has been added to the Net::Amazon 
+        constructor, which will limit the number of requests if 
+        set to 1. Defaults to 1.
+
+0.26 (07/07/2004)
+   (ms) Added ProductDescription to Properties.pm
+   (ms) Applied patch by Robert Rothenberg <wlkngowl@i-2000.com> for 
+        Media and NumMedia properties.
+
+0.25 (06/19/2004)
+   (ms) Applied patch by Robert Rothenberg <wlkngowl@i-2000.com> to
+        Properties.pm that returns the browse_nodes (categories) for 
+        a result.
+   (ms) Dave Holland <dave@biff.org.uk> suggested to provide access
+        to the user agent's proxy settings. Now, proxy settings via
+        environment variables are supported (env_proxy()) as well as
+        passing Net::Amazon->new(); a prepped LWP::UserAgent instance
+        via the 'ua' parameter (see docs).
+   (ms) Accessors are no longer created in the constructors, but on the
+        package level. Thanks to tony@tmtm.com who reported this to the
+        CPAN bug tracker.
+   
+0.24 (06/10/2004)
+   (ms) Fixed test bug in 007Manufacturer.t
+   (ms) Applied patch by Steve Rushe <steve@deeden.co.uk> for book->binding()
+
+0.23 (06/06/2004)
+   (ms) Evaldas Imbrasas <evaldas@wolfram.com> suggested to add SalesRank
+        to Properties.pm -- added field and test case.
+   (ms) Added eg/dejazz, a sample program to retrieve the 10 best-selling
+        jazz CDs in Germany, as presented by an article in iX magazine.
+
+0.22 (05/09/2004)
+   (ms) fixed warnings during make test (backwards-compatible without
+        tracks())
+   (ms) Batara Kesuma <bkesuma@gaijinweb.com> sent in a patch to 
+        access TotalPages (now available as $resp->total_pages()).
+
+0.21 (03/21/2004)
+   (ms) Tatsuhiko Miyagawa <miyagawa@livedoor.jp> provided a patch to
+        adapt N:A for Amazon's change of "locale=jp" requests, which 
+        should be sent to xml.amazon.co.jp, instead of xml.amazon.com:
+        http://forums.prospero.com/n/mb/message.asp?webtag=am-assocdevxml&msg=4629.1&ctx=4096
+   (ms) added tracks() to N:A::Properties::Music to list track titles of CDs
+
+0.20 (03/08/2004)
+   (ms) rayg <rayg@varchars.com> added textstream search and support
+        for sorting results.
+   (ms) added directors(), director() and starring() to DVD.pm
+
+0.19 (02/13/2004)
+   (ms) Michael Coulter <mjc@bitz.ca> noticed that eg/review had the
+        wrong path to Review.pm.
+   (ms) Sam Smith <s@msmith.net> noticed that the dependency on
+        LWP::UserAgent was missing from the documentation.
+   (ms) Bill Fitzpatrick provided a patch implementing and testing
+        Manufacturer searches.
+
+0.18 (12/22/2003)
+   (ms) Brian Hirt <bhirt@mobygames.com> provided a patch for
+        multiple error messages returned by some requests to AMZN.
+        There's two accessors now, Response->messages() returning
+        a ref to an array of error messages, and Response->message()
+        returning them stringed together for backwards compatibility.
+   (ms) Padraic Renaghan <padraic@renaghan.com> provided a patch
+        for access to upc/media/nummedia fields in Music.pm
+   (ms) Fixed test suite warnings with perl 5.8.2 in N::A::Property::Book.
+
+0.17 (11/18/2003)
+   (ms) Robert Graff <rgraff@workingdemo.com> provided a patch for 
+        'blended' searches.
+
+0.16 (10/10/2003)
+   (ms) Replaced 'legacy call' onca/xml2 by onca/xml3, according to 
+        the AWS newsletter.
+   (ms) Martin Streicher <martin.streicher@apress.com> enhanced the
+        "power" search script (in /eg) to limit searches to page
+        ranges if so requested.
+
+0.15 (08/24/2003)
+   (ms) Martin Streicher <martin.streicher@apress.com> provided support
+        for Amazon's "Power Search". Added documentation and test case.
+   (ms) Jackie Hamilton <kira@cgi101.com> provided a patch plus
+        documentation for Browse Nodes. Added test case.
+
+0.14 (08/12/2003)
+   (ms) Mike Evron <evronm@dtcinc.net> suggested to implement caching
+        for responses. Added a Cache::File-based implementation.
+
+0.13 (08/07/2003)
+   (ms) Added customer reviews for all properties. Changed default
+        request mode to 'heavy' for that. Now all properties have a
+        review_set() method returning a
+        Net::Amazon::Attribute::ReviewSet object, which in turn offers
+        a reviews() method delivering a list of
+        Net::Amazon::Attribute::Review objects. Check the man pages
+        for details. eg/review shows an example.
+
+0.12 (07/24/2003)
+   (ms) Mike Evron <evronm@dtcinc.net> noticed that the SYNOPSIS code
+        on the main documentation page had the wrong "search" syntax 
+        -- thanks, Mike!
+   (ms) Changed all tests to process canned data, live tests turned out
+        to be too unreliable, due to Amazon's "best effort" responses.
+        If you want the test suite to process live data, you need to
+        set the environment variable NET_AMAZON_LIVE_TESTS.
+        
+0.11 (07/14/2003)
+   (ms) Added 'Similar Searches' API
+   (ms) Adapted for new amazon.de and amazon.co.uk searches
+
+0.10 (06/28/2003)
+   (ms) Adapted wishlist test case for change in AMZN's catalog
+   (ms) Added docs for new Net::Amazon homepage at net-amazon.sourceforge.net
+        and mailing list
+   (ms) Helper in place to assist XML::Simple in choosing the right parser,
+        to avoid install problems due to XML::SAX::RTF.
+
+0.09 (06/24/2003)
+   (ms) Tony Bowden <tony@kasei.com> suggested to have a $ua->search
+        method, abstracting the usage of the different request objects.
+        Implemented that.
+   (ms) Resolved warnings and strict errors in test cases
+
+0.08 (06/22/2003)
+   (ms) Changed dependencies to 5.006, XML::Simple and LWP::UserAgent
+
+0.07 (06/10/2003)
+   (ms) fixed bug with single-item-wishlists
+   (ms) Lists printed as strings now have numbered bullets
+   (ms) Tests are using new wishlist 1XL5DWOUFMFVJ (Net::Amazon)
+   (ms) Added tests with canned reponses
+
+0.06 (06/07/2003)
+   (ms) applied workaround for AMZN's wishlist bug: If a wishlist
+     is longer than 10 items, AMZN returns the first 10 items with
+     no indication if there's any followup pages. The workaround
+     just tries to fetch another batch in case there's exactly 10 and 
+     hides eventually encountered errors. 
+
+   Dan Sully <daniel@electricrain.com> provided a patch
+     to suppress a warning in case a music item isn't returning a 'year'
+     field
+
+   Barnaby Claydon <bclaydon@perseus.com> reported a couple of problems
+   with wishlists, they're fixed by the following patches:
+
+   (ms) Added new property Net::Amazon::Property::DVD
+
+   (ms) Changed as_string() of default Net::Amazon::Property (used if
+     we come across a 'Toy' or 'Video Game' category) to return
+     a more human-readable format.
+
+   (ms) Implemented retry strategy on Amazon's temporary errors, if we
+     encounter one, we'll sleep for 1 sec and then retry at most
+     twice.
+
+   (ms) Accessors have been changed to return an empty string if 
+     a value hasn't been specified in XML. Products without price and
+     other anomalies won't cause perl warnings anymore.
+
+0.05 (05/31/2003)
+   Martha Greenberg <marthag@mit.edu> provided bug reports 
+   and patches for
+       * 'music' parameter for UPC searches (fixed in doc)
+       * Net::Amazon::Property::Music now deals correctly with
+         CDs by multiple artists.
+       * missing documentation of 'locale' parameter
+
+   (ms) Net::Amazon now takes the 'locale' parameter also in
+   the main Net::Amazon object's constructor.
+
+0.04 (05/29/2003)
+   Dan Sully <daniel@electricrain.com> provided a patch
+   to check if a response indeed contains the {Details} hash.
+
+0.03 (05/06/2003)
+   (ms) properties returns empty list on failure now
+
+   Martha Greenberg <marthag@mit.edu> provided patch for 
+       * the now mandatory associates-id in the query
+       * two documentation bugs
+
+   Konstantin Gredeskoul <kig@get.topica.com> also provided an almost
+       identical patch to the problem :).
+
+0.02
+   (ms) documentation updated
+
+0.01
+   (ms) where it all started

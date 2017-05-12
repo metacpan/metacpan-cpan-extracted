@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+#
+# sample listener
+#
+
+# required modules
+
+use strict;
+use warnings;
+use Net::STOMP::Client;
+use Time::HiRes qw(time);
+
+# global variables
+
+our(%Option, $Conn, $Count, $Start, $Run);
+
+# options setting
+
+$Option{user} = $ENV{STOMP_USER} || "admin";
+$Option{password} = $ENV{STOMP_PASSWORD} || "password";
+$Option{host} = $ENV{STOMP_HOST} || "localhost";
+$Option{port} = $ENV{STOMP_PORT} || 61613;
+$Option{destination} = $ENV{STOMP_DESTINATION} || "/topic/event";
+
+# message callback
+
+sub callback ($$) {
+    my($self, $frame) = @_;
+
+    $Start = time() unless $Count++;
+    $Run = 0 if $frame->body() eq "SHUTDOWN";
+}
+
+# connection
+
+$Conn = Net::STOMP::Client->new(
+    host => $Option{host},
+    port => $Option{port},
+);
+$Conn->connect(
+    login    => $Option{user},
+    passcode => $Option{password},
+);
+printf("connected to %s:%d using STOMP %s\n",
+       $Conn->peer()->addr(), $Conn->peer()->port(), $Conn->version());
+
+# listener setup
+
+$Conn->message_callback(\&callback);
+$Conn->subscribe(
+    destination => $Option{destination},
+    id          => 0,
+    ack         => "auto",
+);
+printf("subscribed to %s\n", $Option{destination});
+
+# process received messages
+
+$Count = 0;
+$Run = 1;
+$Conn->wait_for_frames() while $Run;
+printf("received %d messages in %.3f seconds\n", $Count, time()-$Start);
+
+# disconnection
+
+$Conn->disconnect();

@@ -1,0 +1,9 @@
+Title:    ${title}${subTitle}-X
+Genre:    $genre
+Author:   ${     author     }
+Missing1: ${missing1}
+Escaped:  $\{\}
+Escaped2: $\\{\}
+Kid-1:    ${family.kid}
+Kid-2:    ${family.kid.2}
+Wife:     ${family.1.wife}

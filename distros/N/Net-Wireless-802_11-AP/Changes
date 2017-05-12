@@ -1,0 +1,13 @@
+Revision history for Net-Wireless-802_11-AP
+
+0.1.1	 2011-08-19/08:45
+		 -Correct a mis-spelled instance of define.
+
+0.1.0	 2011-08-17/21:45
+		 -Add the methods below.
+		 	  listValidKeys
+			  listWPAkeys
+
+0.0.0	 2011-08-16/02:30
+		 -Initial release.
+

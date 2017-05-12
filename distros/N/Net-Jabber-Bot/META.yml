@@ -1,0 +1,45 @@
+--- #YAML:1.0
+name:               Net-Jabber-Bot
+version:            2.1.5
+abstract:           Automated Bot creation with safeties
+author:
+    - Todd E Rinaldo <perl-net-jabber-bot@googlegroups.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+    FindBin:              0
+    lib:                  0
+    Test::More:           0
+    Test::NoWarnings:     0
+requires:
+    FindBin:           0
+    lib:               0
+    Log::Log4perl:     0
+    Moose:             0.82
+    MooseX::Types:     0.12
+    Net::Jabber:       2
+    Sys::Hostname:     0
+    Test::More:        0
+    Test::NoWarnings:  0
+    Time::HiRes:       0
+    version:           0
+resources:
+    bugtracker:   http://code.google.com/p/perl-net-jabber-bot/issues/list
+    homepage:     http://wiki.github.com/toddr/perl-net-jabber-bot
+    license:      http://dev.perl.org/licenses/
+    MailingList:  http://groups.google.com/group/perl-net-jabber-bot
+    repository:   http://github.com/toddr/perl-net-jabber-bot/tree/master
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+recommends:
+    Test::Pod:            1.14
+    Test::Pod::Coverage:  1.04

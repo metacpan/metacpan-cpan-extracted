@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/arxmobile-query-smsid
+bin/arxmobile-send-sms
+dist.ini
+lib/Net/SMS/ArxMobile.pm
+t/000-load.t
+t/xml.t

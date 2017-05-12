@@ -1,0 +1,39 @@
+---
+abstract: 'Object-oriented interface to OpenXchange groupware'
+author:
+  - 'Maximilian Gass <maximilian.gass@credativ.de>'
+build_requires:
+  English: 0
+  Test::Moose: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-OpenXchange
+requires:
+  Carp: 0
+  Data::Dump: 0
+  HTTP::Request::Common: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Modern::Perl: 0
+  Module::Pluggable: 0
+  Moose: 0
+  Moose::Role: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::Types: 0
+  MooseX::Types::Email: 0
+  MooseX::Types::Moose: 0
+  Readonly: 0
+  Throwable::Error: 0
+  Try::Tiny: 0
+  URI: 0
+  namespace::autoclean: 0
+resources:
+  repository: git://github.com/mxey/Net-OpenXchange.git
+version: 0.001

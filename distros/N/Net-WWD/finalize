@@ -1,0 +1,20 @@
+if [ ! -n "$1" ]
+then
+	echo
+        echo " Usage: ./finalize (user apache runs as)"
+        echo
+        echo " Example: ./finalize apache"
+        echo
+        exit
+fi
+
+mkdir /usr/share/wwd
+chown $1:$1 /usr/share/wwd
+mkdir /usr/share/wwd/data-store
+mkdir /usr/share/wwd/data
+touch /usr/share/wwd/users
+chown $1:$1 /usr/share/wwd/* -R
+chmod 700 /usr/share/wwd/* -R
+echo $1 > /usr/share/wwd/web-user
+cp wwd-users /usr/local/bin
+chmod 755 /usr/local/bin/wwd-users

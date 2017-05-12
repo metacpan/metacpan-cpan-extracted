@@ -1,0 +1,29 @@
+Dette er en Perl-modul som parser og prøver å gjøre noe fornuftig med
+filene man vil få fra Bankenes Betalingssentral hvis man oppretter en
+såkalt OCR-avtale. Dette er noe man må ha hvis man skal bruke
+KID-numre for betalinger man får inn. Det er litt rart at man blander
+inn OCR i dette, fordi det er ingenting som må skannes og OCRes for
+alle som bruker nettbank, men sånn er det. 
+
+Iallfall, når du har en OCR-avtale, er denne modulen noe du trenger. 
+
+For øvrig dokumentasjon, se PODen som følger programmet. 
+
+Eh, ja... 
+
+Dette er min aller først Perl-modul, så tilgi meg om fila ikke
+inneholder alt du venter i en slik modul. 
+
+Men, det skal være bare å gjøre:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+eller bruke CPAN-verktøy, e.l. Det er ikke klart for meg hvilken
+Perl-versjon du må ha, men iallfall trenges versjon 5. 
+
+Modulen er fri programvare og kan redistribueres og modifiseres etter samme
+betingelser som gjelder for Perl forøvrig.
+

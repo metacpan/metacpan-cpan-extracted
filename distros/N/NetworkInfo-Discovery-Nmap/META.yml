@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name: NetworkInfo-Discovery-Nmap
+version: 0.02
+author:
+  - |-
+    Sébastien Aperghis-Tramoni <sebastien@aperghis.net>
+abstract: NetworkInfo::Discovery extension using Nmap
+license: perl
+requires:
+  Carp: 0
+  NetworkInfo::Discovery: 0.12
+  Nmap::Scanner: 0.7
+  Sys::Hostname: 0
+  Test::More: 0
+provides:
+  NetworkInfo::Discovery::Nmap:
+    file: lib/NetworkInfo/Discovery/Nmap.pm
+    version: 0.02
+generated_by: Module::Build version 0.2607

@@ -1,0 +1,25 @@
+---
+abstract: 'Send SMS messages via the ArXMobile HTTP API'
+author:
+  - 'Cosimo Streppone <cosimo@opera.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102343, CPAN::Meta::Converter version 2.102400'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-SMS-ArxMobile
+requires:
+  Data::Dumper: 0
+  HTTP::Request: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Pod::Usage: 0
+  XML::Simple: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-SMS-ArxMobile
+  repository: git://github.com/cosimo/perl5-net-sms-arxmobile.git
+version: 0.01

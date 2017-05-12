@@ -1,0 +1,22 @@
+---
+abstract: 'Gmail specific support for Net::IMAP::Simple'
+author:
+  - 'James Powell <jamespo@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300005, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-IMAP-Simple-Gmail
+requires:
+  Net::IMAP::Simple::SSL: 0
+  Text::ParseWords: 0
+  base: 0
+  strict: 0
+  vars: 0
+version: 0.21

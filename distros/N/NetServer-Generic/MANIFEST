@@ -1,0 +1,12 @@
+Changes
+Generic.pm
+MANIFEST
+Makefile.PL
+test.pl
+testguts-fork.pl
+testguts-prefork.pl
+examples/elizad
+examples/shttpd
+examples/preforked-shttpd
+README
+LICENSE

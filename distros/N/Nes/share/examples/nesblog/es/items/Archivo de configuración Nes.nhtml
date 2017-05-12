@@ -1,0 +1,204 @@
+<h2><a href="#">Archivo de configuración</a></h2>
+<h3>Setting.pm</h3>
+<p>
+Este archivo se encarga de cargar la configuración de Nes. Se recomienda no 
+cambiar sus valores y hacerlo en el archivo <i><b>.nes.cfg</b></i>. Especialmente el
+valor de <i><b>private_key</b></i> que se utiliza para encriptar datos, si no
+se cambia el script lanzará un aviso cada vez que se ejecute Nes.
+</p>
+<h3>Variables</h3>
+<p>
+<pre>
+tmp_dir        # Directorio temporal
+tmp_suffix     # Sufijo de los archivos temporales
+tmp_clear      # Si borra los archivos temporales ó 0 y
+               # no los borra nunca. sufijo tiempo: s: segundos, 
+               # m: minutos, h: horas, d: dias, M: meses, y: años
+               # 24h es 24 horas
+top_dir        # Directorio raiz del espacio Web
+nes_dir        # Directorio de Nes
+nes_top_dir    # ruta absoluta el directorio de instalación de Nes
+plugin_dir     # Directorio de los plugin, relativo a top_dir
+obj_dir        # Directorio de los objetos Nes, relativo a top_dir
+plugin_top_dir # Directorio de los plugin, ruta absoluta
+obj_top_dir    # Directorio de los objetos Nes, ruta absoluta
+time_zone      # sin implementar # zona horaria
+locale         # locale, ej.: es_ES.utf8
+session_prefix # nombre que se utiliza para la sesión de usuario
+private_key    # Clave privada que se usa para encriptar datos
+DB_base        # Nombre de la base de datos           
+DB_user        # Usuario de la base de datos
+DB_pass        # Password de la base de datos
+DB_driver      # Driver de la base de datos, 'mysql' por defecto 
+DB_host        # Host de la base de datos, 'localhost' por defecto
+DB_port        # Puerto de la base de datos '3306', por defecto 
+php_cline      # linea de comando para PHP CLI
+php_cgi_cline  # linea de comando para PHP CGI
+perl_cline     # linea de comando para Perl
+shell_cline    # linea de comando para Shell
+python_cline   # linea de comando para Python
+max_post       # max kB. tamaño máximo de los POST
+max_upload     # max kB. tamaño máximo de los los upload, 0 ninguno
+tmp_upload     # en upload de gran tamaño el consumo de memoria
+               # es elevado, con esta variable definimos a partir 
+               # de que kB. se usa un archivo temporal en los upload
+               # evitando que estos se cargen en memoria.
+
+# Lista de Plugins separados por comas a cargar al inicio sólo
+# para el archivo en la URL, en todos los nhtml del directorio, ej.:
+# auto_load_plugin_top_first = &#123;: * cfg_plugin_top_dir :&#125;/cache.pl,./my_script.pl
+auto_load_plugin_top_first
+
+# Lista de Plugins separados por comas a cargar al inicio para 
+# todos los archivos incluidos, en todos los nhtml del directorio, ej.:
+# auto_load_plugin_all_first = &#123;: * cfg_plugin_top_dir :&#125;/plugin.pl
+auto_load_plugin_all_first
+
+# Lista de Plugins separados por comas a cargar al final sólo
+# para el archivo en la URL, en todos los nhtml del directorio, ej.:
+# auto_load_plugin_top_last = &#123;: * cfg_plugin_top_dir :&#125;/filter.pl,./my_script.pl
+auto_load_plugin_top_last
+
+# Lista de Plugins separados por comas a cargar al final para 
+# todos los archivos incluidos, en todos los nhtml del directorio, ej.:
+# auto_load_plugin_all_last = &#123;: * cfg_plugin_top_dir :&#125;/plugin.pl
+auto_load_plugin_all_last
+
+</pre>
+</p>
+<h3>.nes.cfg</h3>
+<p>
+El archivo <i>.nes.cfg</i> se coloca en el directorio donde tengas instalados tus archivos <i>nhtml</i>, sobreescribe la configuración de <i>Setting</i> y la de los plugins.
+</p>
+<p>
+Nes buscará éste archivo en el directorio del <i>nhtml</i> ejecutado e irá subiendo de directorio hasta el directorio <b>raiz de la Web</b> para leer los <i>.nes.cfg</i>
+</p>
+<h3>Ejemplo</h3>
+<pre>    
+/html/nhtml/.nes.cfg
+    private_key = pass1
+    mi_var1     = 10
+    mi_var2     = 20
+    
+/html/.nes.cfg
+    private_key = pass2
+    mi_var2     = 30 
+    mi_var3     = 40   
+    
+/.nes.cfg
+    private_key = pass3
+    mi_var1     = 50
+    mi_var2     = 60  
+    mi_var3     = 70
+    
+El valor de las variables para los archivos ejecutados en:     
+
+/html/nhtml/file.nhtml
+    private_key = pass1  # prevalecen los valores de éste nivel
+    mi_var1     = 10     # prevalecen los valores de éste nivel
+    mi_var2     = 20     # prevalecen los valores de éste nivel
+    mi_var3     = 40     # definida en /html/.nes.cfg
+                         # se ignora mi_var3 de /.nes.cfg 
+    
+/html/file.nhtml
+    private_key = pass2  # prevalecen los valores de éste nivel
+    mi_var1     = 50     # definida en /.nes.cfg
+    mi_var2     = 30     # prevalecen los valores de éste nivel
+    mi_var3     = 40     # prevalecen los valores de éste nivel
+    
+/file.nhtml
+    private_key = pass3  # prevalecen los valores de éste nivel
+    mi_var1     = 50     # prevalecen los valores de éste nivel
+    mi_var2     = 60     # prevalecen los valores de éste nivel
+    mi_var3     = 70     # prevalecen los valores de éste nivel
+     
+</pre> 
+<p>
+<h3>Otros usos</h3>
+
+Puedes utilizar <i>.nes.cfg</i> para añadir variables de configuración a tu script. Se recomienda usar una notación que distinga claramente de las variables de Nes, por ejemplo utilizando como prefijo el nombre de tu aplicación:
+<pre>    
+.nes.cfg
+    private_key = pass3
+    myscript_var1 = 50
+    myscript_var2 = 60  
+    myscript_var3 = 70
+
+</pre> 
+Puedes acceder a éstas variables desde el archivo <i>nhtml</i> como:
+<pre>    
+ &#123;: * cfg_myscript_var1 :&#125;
+
+</pre> 
+Y desde Perl:
+<pre>    
+use Nes;
+my $nes = Nes::Singleton->new();
+
+my $config = $nes->{'CFG'};
+my $var1   = $config->{'myscript_var1'};
+</pre> 
+</p>  
+<p>
+<h3>Sintaxis Perl en el valor</h3>
+
+En las variables predefinidas, Nes detecta el tipo de datos automáticamente:
+<pre>    
+# Es un scalar
+tmp_dir = /tmp/nes
+
+# Es una array, separación por comas
+auto_load_plugin_top_first = plugin1.pl, plugin1.pl
+
+</pre> 
+Si deseamos definir nuestras propias variables con un tipo de dato concreto:
+<pre>    
+# Scalar, usar sintaxis Perl en el valor.
+myscript_var1 $= 'scalar'
+
+# Hash
+myscript_var2 %= ( 'name' => 'Jason', 'email' => 'jason\@example.com' )
+
+# Array
+myscript_var3 @= ( 'one', 'two', 'three' )
+
+</pre> 
+También podemos usar sintaxis Perl en el valor para variables predefinidas,
+teniendo cuidado de no cambiar el tipo:
+<pre>    
+# scalar
+tmp_dir $= '/tmp/nes'
+
+# Es un scalar, ERROR
+tmp_dir %= '/tmp/nes'
+
+# Array, separación por comas
+auto_load_plugin_top_first = plugin1.pl, plugin2.pl
+
+# Array, sintaxis Perl
+auto_load_plugin_top_first @= ( 'plugin1.pl', 'plugin2.pl' )
+
+</pre> 
+En las variables predefinidas, todas son Scalar salvo las que admiten separación
+por comas que son Arrays. En caso de los arrays nos puede ser útil si uno de 
+los valores tiene una coma, o en los scalar para definir un espacio:
+<pre>
+    
+# no podemos dar como valor un espacio así:
+myscript_var1 = ' '  <- error, el valor sería el literal ' ' incluidas comillas
+myscript_var1 =      <- error, sin valor
+
+# para dar como valor un espacio lo podemos hacer así:
+myscript_var1 $= ' ' 
+
+# Array, el nombre incluye una coma
+auto_load_plugin_top_first = plugin,1.pl, plugin,2.pl <- error
+
+# Array, sintaxis Perl el nombre incluye una coma
+auto_load_plugin_top_first @= ( 'plugin,1.pl', 'plugin,2.pl' )
+</pre>
+</p>
+
+<p>
+Hay que tener en cuenta que cada variable sólo puede ocupar una linea.
+</p>

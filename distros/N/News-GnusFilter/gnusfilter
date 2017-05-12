@@ -1,0 +1,32 @@
+#!/usr/bin/perl -wT
+# sample ~/.gnusfilter script
+# $Id: gnusfilter,v 1.1 2001/08/19 19:20:37 joe Exp $
+
+use News::GnusFilter qw/:params :tests groan newsgroups references/;
+use strict;
+
+*_ = News::GnusFilter->set_score( {
+			 rethreaded     => 80,
+			 context        => 60,
+			}
+		      );
+missing_headers;
+bogus_address;
+annoying_subject;
+cross_post;
+
+mimes;
+misattribution if newsgroups;
+lines_too_long;
+control_characters;
+miswrapped;
+check_quotes; # runs multiple tests and returns number of quoted lines
+if (newsgroups and jeopardy_quoted and not references) {
+  $_{rethreaded} = groan "Callously rethreaded";
+}
+
+if (newsgroups and references and not check_quotes) {
+  $_{context} = groan "Missing context";
+}
+
+bad_signature;

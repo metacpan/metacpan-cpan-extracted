@@ -1,0 +1,121 @@
+$Header: /home/cvsroot/NetZ3950/README,v 1.14 2006/05/08 10:54:56 mike Exp $
+
+Do Not Use This Module!
+-----------------------
+
+Unless you need the Net::Z3950 API for backwards compatibility
+(i.e. you're building it because it's a prerequisite for an existing
+application) you should instead use the newer and better ZOOM-Perl
+module:
+	http://search.cpan.org/~mirk/Net-Z3950-ZOOM/
+Its functionality is a strict superset of this module's, but it
+provides many additional features, including record-format
+translation, character-set handling and a properly documented
+asynchronous API.  Because it is based on ZOOM-C, the ZOOM-Perl model
+inherits functionality from that module, and will continue to benefit
+from its further development.  Finally, the ZOOM-C dependency allows
+the ZOOM-Perl code to be much shorter than Net::Z3950, and therefore
+easier to support: "The cheapest, fastest, most reliable components of
+a computer system are those that are not there" -- Gordon Bell.
+
+If despite all this, you really do want Net::Z3950 rather than
+ZOOM-Perl, then read on ...
+
+
+
+Net::Z3950.pm -- What Is It?
+----------------------------
+
+This module provides a Perl interface to the Z39.50 information
+retrieval protocol (aka. ISO 23950), a mature and powerful protocol
+used in application domains as diverse as bibliographic information,
+geo-spatial mapping, museums and other cultural heritage information,
+and structured vocabulary navigation.
+
+Up to date information on this module can be found at
+	http://perl.z3950.org/
+
+The Net::Z3950 module is free software, as described at
+	http://www.fsf.org/philosophy/free-sw.html
+It is made available under the GNU General Public Licence, version 2:
+see the file COPYING for details.  (This is made explicit as of
+release 0.33, but it was always the intention.)
+
+Net::Z3950.pm is an implementation of the Perl binding for ZOOM, the
+Z39.50 Object Orientation Model.  Bindings for the same abstract API
+are available in other languages including C, C++, Java, Tcl, Visual
+Basic, Python and Scheme.  There's more about ZOOM, including the
+specification, at
+	http://zoom.z3950.org/
+
+
+Building and Installation
+-------------------------
+
+There are two (or three, depending on how you count them)
+prerequisites to building the Net::Z3950 module:
+
+    1.	You'll need the Event module (a generic event loop).  I've
+	tested only with version 0.77 of Event, but later versions
+	will most likely be fine; in fact, earlier version probably
+	will be too, since I don't do anything clever with it.
+
+    2.	You'll also need version 1.8 or later of Index Data's Yaz
+	toolkit, a set of C routines for manipulating, sending and
+	receiving the Z39.50 data structures.  You can find it at
+	http://indexdata.dk/yaz/
+
+    3.	The third dependency is an optional one, on the MARC::Record
+	module.  This is required by the Net::Z3950::Record::MARC
+	class's render() method, but if you're not going to call that,
+	you don't need the MARC::Record module, so it's not listed as
+	a prerequisite in the Makefile.PL.
+
+After installing any prerequisites, you know the drill:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+Now What?
+---------
+
+All of the documentation except this file is in the "doc"
+subdirectory.  Run "make" there to regenerate the HTML versions of the
+POD documents, and start reading at doc/index.html.
+
+
+Support
+-------
+
+Informal support is available directly from the author (see below) but
+since ``you get what you pay for'' and I'm doing it for free, there
+are of course no guarantees!
+
+In general a better option is to join the Net::Z3950 mailing list at
+	http://www.indexdata.dk/mailman/listinfo/net-z3950
+and discuss in that forum any problems you may encounter.  I read this
+list, so I will see your messages; but you may get better help from
+others who have run into similar difficulties.
+
+For those who require it, it's possible to buy professional,
+commercial support for this module, with well-defined support levels
+and response times, from Index Data, in collaboration with whom I
+wrote this module.  See
+	http://perl.z3950.org/support/contract.html
+or email <info@indexdata.dk> for details.
+
+
+Author
+------
+
+Mike Taylor <mike@perl.z3950.org>
+	http://www.miketaylor.org.uk/
+
+With lots of help, encouragement, design input, etc. from
+
+Sebastian Hammer <quinn@indexdata.dk> and
+Adam Dickmeiss <adam@indexdata.dk>
+	http://indexdata.dk/

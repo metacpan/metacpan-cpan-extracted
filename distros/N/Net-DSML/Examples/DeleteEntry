@@ -1,0 +1,49 @@
+#!/usr/local/bin/perl 
+use Getopt::Std;
+use Net::DSML;
+use Net::DSML::Filter;
+use Net::DSML::Control;
+#use XML::XSLT;
+        
+# 
+# Be sure to set up the first line to point to your perl executable location.
+#
+# Fill in the server, base, dn and password variables with values that
+# match your configuration.
+#
+# Make sure the base variable does not point to your authenication DN.
+# 
+# This examples shows how to delete an entry.
+# 
+my $server = "http://dsml.yourcompany.com:8080/dsml";
+my $base = "uid=toot,ou=people,dc=yourcompany,dc=com";
+
+   #
+   # HTTP Basic authenication.
+   # 
+   $webdsml = Net::DSML->new(  { url => $server,
+                                 dn => "abc",
+                                 password => "xyz" } );
+   #
+   #  We are going to do a entry delete now
+   #
+   #
+   #
+   if ( !( $webdsml->delete( { dn => $base } )))
+   {
+      print "Delete error.", "\n";
+      print $webdsml->error, "\n";
+      exit;
+    }
+
+   if (!($webdsml->send()))
+   {
+      print "Delete send request error.\n";
+      print $webdsml->error(),"\n";
+      exit;
+   }
+
+# get the return xml content, there may not be any.
+$postData = $webdsml->content();
+print $postData, "\n"; # print the xml data.
+

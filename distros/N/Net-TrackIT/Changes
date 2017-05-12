@@ -1,0 +1,8 @@
+# $Id: Changes,v 1.1.1.1 2006/11/28 22:09:18 dtikhonov Exp $
+
+Revision history for Perl module Net::TrackIT
+
+0.01    Tue Nov 28 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
+  Initial release.
+
+# vim:sts=2:sw=2:et:ft=changelog:

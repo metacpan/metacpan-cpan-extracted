@@ -1,0 +1,71 @@
+{
+   "abstract" : "Twitter Authorizer",
+   "author" : [
+      "ytnobody <ytnobody@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.6.3",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "NephiaX-Auth-Twitter",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Nephia" : "0",
+            "Net::Twitter::Lite::WithAPIv1_1" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "NephiaX::Auth::Twitter" : {
+         "file" : "lib/NephiaX/Auth/Twitter.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nephia/NephiaX-Auth-Twitter/issues"
+      },
+      "homepage" : "https://github.com/nephia/NephiaX-Auth-Twitter",
+      "repository" : {
+         "url" : "git://github.com/nephia/NephiaX-Auth-Twitter.git",
+         "web" : "https://github.com/nephia/NephiaX-Auth-Twitter"
+      }
+   },
+   "version" : "0.01"
+}

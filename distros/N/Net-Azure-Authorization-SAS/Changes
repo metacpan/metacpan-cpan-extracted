@@ -1,0 +1,10 @@
+Revision history for Perl extension Net-Azure-Authorization-SAS
+
+0.02 2016-11-11T09:19:12Z
+
+    - add Test::Exception as deps
+
+0.01 2016-11-01T03:56:33Z
+
+    - original version
+

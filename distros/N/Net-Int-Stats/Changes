@@ -1,0 +1,75 @@
+Revision history for Perl extension Net::Int::Stats.
+
+1.00  Sat Jun 27 01:51:53 2009
+	- original version; created by h2xs 1.23 with options
+		-XAn Net::Int::Stats
+
+# versions 1.01 and 1.02 were documentation typo corrections
+
+1.03 Tues Jul 07 12:28:00 2009
+	- added operating system check for make test
+
+2.0  Tues Sep 22 11:30:00 2009
+	- major code revision
+	- still performs the same purpose
+	- one method now replaces the previous twelve
+	- the user now has to supply two arguments instead of one
+	- not quite as user friendly as before with the extra 
+	- argument but the code has been tightened up considerably
+	- the extracting of values has been refactored
+
+2.01 Thurs Sep 24 13:38:00 2009
+	- minor administrative changes
+	- updated version in README to 2.0
+	- fixed indenting in code
+	- small change in pod doc methods section
+
+2.02 Sat Sep 26 15:04:00 2009
+	- no functionality changes
+	- prior code indentation fix didn't work
+	- could have left as is but it's not great for readability
+	- used spaces instead of tabs to overcome different tab defaults
+	- between vi configs
+
+2.03 Fri Apr 16 16:20:44 PDT 2010
+	- no functionality changes
+	- fixed typo in synopsis
+	- updated version in README
+
+2.04 Sat Jul  2 16:05:38 PDT 2011
+	- no functionality changes
+	- added more comments
+	- refactored part of code that generates the values data
+	- placed in it's own subroutine: data()
+
+2.05 Sun Jul  3 18:02:40 PDT 2011
+	- no functionality changes
+	- fixed pesky space/tab issue formatting in code and comments
+	- doesn't affect anything other than readability
+
+2.06 Fri Jul  8 13:57:07 PDT 2011
+	- fixed a bug introduced in v2.04
+	- the new data() subroutine added to the value() method was
+	- being called after the validate() subroutine causing validation
+	- against an empty list
+	- fixed by calling data() before validate()
+
+2.07 Mon Aug  1 14:19:08 PDT 2011
+	- no functionality changes
+	- there are FAIL reports for the unsupported operating systems
+	- even though install properly bails out during make test for the
+	- unsupported operating systems
+	- to try to get N/A reports instead of FAIL the bail out text in
+	- the test file has been changed to 'OS unsupported' as per
+	- suggestion in CPAN Testers Wiki
+
+2.1 Wed May 16 16:14:22 PDT 2012
+	- enhancements requests from user bzero
+	- report more values from ifconfig output
+	- new values added: interface IPv4 address
+	- RX and TX bytes
+	- added new method interfaces() to list all
+	- available interfaces
+	- TO DO for next release: redesign and refactor 
+	- code for better efficiency 
+

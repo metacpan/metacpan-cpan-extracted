@@ -1,0 +1,25 @@
+Number-Range version 0.12
+=========================
+
+Number::Range is an object-oriented interface to test if a number exists in a
+given range, and to be able to manipulate the range.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Nothing that is outside of the core Perl modules.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-14 by Larry Shatzer, Jr.
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

@@ -1,0 +1,9 @@
+Changes
+lib/Net/Stomp/Receipt.pm
+Makefile.PL
+MANIFEST
+README
+SIGNATURE
+t/01-preload.t
+t/02-load.t
+META.yml                                 Module meta-data (added by MakeMaker)

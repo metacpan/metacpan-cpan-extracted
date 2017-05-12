@@ -1,0 +1,34 @@
+Revision history for Perl extension Net::LibNIDS.
+
+0.14  Fri Mar 21 23:00:00 2014 (EDECA)
+	- Update bundled Devel::CheckLib for Perl 5.18 (fixes cpan #94096)
+
+0.13  Thu Mar 20 14:30:00 2014 (EDECA)
+	- Update Meta.yml to be compliant with spec v1.4
+
+0.12  Wed Mar 19 11:00:00 2014 (EDECA)
+	- Add checksum_off(), fixes cpan #82871 (patch by github/midenok)
+
+0.11  Fri Jan 18 18:30:00 2013 (EDECA)
+	- Allow user to call nids_discard from within TCP callback
+
+0.1   Mon Jun 28 15:55:00 2010 (EDECA)
+	- updated now that libnids exports last_hdr by default in v1.19, some tidy up
+	- changed the way the callback is set, fixing a bug with parsing multiple pcap files
+	- add two new libnids return codes
+	- fixes for libnids 1.24 (reading more than one pcap file)
+	- more fixes for library dependencies in Makefile.PL
+
+0.04  Sun Feb 07 14:55:00 2010
+	- Fix the broken attempt to use Devel::CheckLib (EDECA)
+
+0.03  Sat Feb 06 13:55:00 2010
+        - Small update to use Devel::CheckLib so that I can monitor cpan testers better (EDECA)
+
+0.02  Sat Feb 06 12:55:00 2010
+        - Updated by David Cannings (EDECA) with fix for cpan bug #52879
+
+0.01  Sat Jun 12 12:13:38 2004
+	- original version; created by h2xs 1.22 with options
+		-a -a --name=Lib::nids --use-new-tests --skip-exporter --skip-autoloader /Users/sky/Documents/Projects/perlnids/include/nids.h
+

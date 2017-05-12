@@ -1,0 +1,80 @@
+Revision history for Perl extension Net::NBsocket
+
+0.24  Mon Jan 27 11:59:58 PST 2014
+        modify Makefile.PL to bypass missing 'pod2text'
+
+0.23  Tue May 21 14:41:34 PDT 2013
+	remove getprotobyname which causes a 
+	segfault with Apache mod_perl, replace
+	with the integer values for TCP, UDP
+
+0.22  Tue Apr 30 17:12:38 PDT 2013
+	removed spurious 'bless' statement in open_UDP
+
+0.21  Mon Oct 17 23:45:21 PDT 2011
+	add support for IPv6 - many changes
+
+0.20  not released
+
+0.19  Thu Sep 29 17:56:36 PDT 2011
+	use Symbol::gensym for socket globs everywhere
+
+	modify accept_xxx to return scalar or array
+	depending on calling context
+
+0.18  Sun Sep 25 17:41:07 PDT 2011
+	this time "really" fix the type in dyn_bind documentation
+
+0.17  Sun Sep 25 17:29:13 PDT 2011
+	fix typo in dyn_bind documentation
+
+0.16  Sun Sep 25 16:07:42 PDT 2011
+	add function and test for dyn_bind
+
+0.15  Sat Jul 11 12:03:08 PDT 2009
+	remove "goto"s as work-around for broken perl 5.80 - 5.85
+
+0.14  Sun Oct 12 17:24:32 PDT 2008
+	support missing F_GETFL and F_SETFL in windows
+
+0.13  Thu Sep  7 16:27:41 PDT 2006
+   perl 5.053 updates for backward compatibility
+
+0.12  Thu Feb  2 16:55:10 PST 2006
+	oops! forgot to comment out #use diagnostics;
+
+0.11  Fri Jan 13 21:59:02 PST 2006
+	DEPRECATE bind2pp()
+
+0.10  Wed Jan 11 20:14:54 PST 2006
+	sigh... function missing from EXPORT_OK array
+
+0.09  Wed Jan 11 14:08:33 PST 2006
+	!&8%$#  forgot to turn the autoloader on in 0.08
+
+0.08  Wed Jan 11 12:26:19 PST 2006
+	added complimentary blocking functions for all NB functions
+
+	export_OK inet_aton, inet_ntoa from Socket
+
+0.07  unreleased
+	correct typo in docs. ITEM said set_sockBN, should say set_NB
+
+0.06  Thu May  5 15:48:23 PDT 2005
+	change internal variable from glob to scalar for $TCP, $UDP
+
+0.05  Fri Feb  4 20:09:55 PST 2005
+	correct DESCRIPTION for this package
+
+0.04  Sat May  1 11:46:10 PDT 2004
+	socket open calls return immediately on error
+
+0.03  Wed Mar 31 22:05:56 PST 2004
+	add set_so_linger
+
+0.02  Fri Mar 19 12:54:20 PST 2004
+	add capability to open_listenNB to specify
+	the bind address or default to INADDR_ANY
+
+0.01  Tue Mar  9 12:42:10 PST 2004
+	initial release

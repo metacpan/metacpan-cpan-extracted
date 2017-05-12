@@ -1,0 +1,18 @@
+--[ Version 1.2 / 2010-06-08 / MAJA ]----------------------------------------
+
+* Added DBI to the list of dependencies.
+
+---[ Version 1.1 / 2009-11-16 / MAJA ]---------------------------------------
+
++ added argument 'nameservers' which allows to specify a list of DNS
+  forwarders instead of using the nameservers defined in /etc/resolv.conf
+
++ added nameservers_port option, which lets you specify the remote nameservers
+  port.
+
++ added uid/gid and nameserver commandline argument to dns-proxy.pl
+
+---[ Version 1.0 / 2009-11-15 / MAJA ]---------------------------------------
+
++ Initial Release
+

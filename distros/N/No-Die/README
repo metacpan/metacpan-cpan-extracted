@@ -1,0 +1,41 @@
+This is the README file for No::Die; Only let modules die when you 
+say it's OK.
+
+Please type "perldoc No::Die" after installation to see the module
+usage information.
+
+#####################################################################
+
+* Description
+
+No::Die
+    Tired of using eval as a straightjacket on modules that have as 
+    much interest in life as chronically depressed lemmings? Now 
+    there's a 24 hour suicide watch in L<No::Die>. Only modules you 
+    permit to die may - the rest will just have to live with it. Their
+    distress wil be noted in an error variable and undef will be 
+    returned. The ultimate decision of life and death will be left to 
+    your application.  
+
+#####################################################################
+
+* Installation
+
+No::Die uses the standard perl module install process:
+
+perl Makefile.PL
+make
+make test
+make install
+
+######################################################################
+
+AUTHOR
+    This module by Jos Boumans <kane@cpan.org>.
+
+COPYRIGHT
+    This module is copyright (c) 2002 Jos Boumans <kane@cpan.org>. All
+    rights reserved.
+
+    This library is free software; you may redistribute and/or modify it
+    under the same terms as Perl itself.

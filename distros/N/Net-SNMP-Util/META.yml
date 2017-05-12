@@ -1,0 +1,38 @@
+--- #YAML:1.0
+name:               Net-SNMP-Util
+version:            1.04
+abstract:           Utility functions for Net::SNMP
+author:
+    - t.onodera <ong :: garakuta.net>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+    Test::More:           0
+requires:
+    Exporter:             0
+    Carp:                 0
+    List::Util:           0
+    Scalar::Util:         0
+    Net::SNMP:            0
+    perl:                 5.006
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+provides:
+  Net::SNMP::Util:
+    file: lib/Net/SNMP/Util.pm
+    version: 1.02
+  Net::SNMP::Util::OID.pm:
+    file: lib/Net/SNMP/Util/OID.pm
+    version: 1.02
+  Net::SNMP::Util::TC.pm:
+    file: lib/Net/SNMP/Util/TC.pm
+    version: 1.02

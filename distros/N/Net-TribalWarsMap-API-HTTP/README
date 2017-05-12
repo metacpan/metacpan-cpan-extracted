@@ -1,0 +1,66 @@
+NAME
+    Net::TribalWarsMap::API::HTTP - HTTP User Agent For "TribalWarsMap.com"
+    <http://tribalwarsmap.com>
+
+VERSION
+    version 0.1.1
+
+SYNOPSIS
+    This module is mostly a common shared component for a bunch of
+    "TribalWarsMap.com" <http://tribalwarsmap.com> "API" Modules.
+
+    Its just a huge glue layer gluing together
+
+    *   "WWW::Mechanize::Cached"
+
+    *   "HTTP::Tiny::Mech"
+
+    *   "CHI"
+
+    *   "Path::Tiny"
+
+    *   "File::Spec"
+
+    In order to produce
+
+    *   A Cached HTTP User Agent
+
+    *   With a shared cache in "/tmp/perl-Net-TribalWarsMap-API.cache/"
+
+    *   With a per instance key set for
+        "/tmp/perl-Net-TribalWarsMap-API.cache/*"
+
+    Usage:
+
+        use Net::TribalWarsMap::API::HTTP;
+
+        my $ua = Net::TribalWarsMap::API::HTTP->new(
+            # /tmp/perl-Net-TribalWarsMap-API.cache/foo
+            cache_name => 'foo'
+        );
+
+METHODS
+  "get"
+        my $result = $ua->get( $url );
+
+    See "HTTP::Tiny" and "HTTP::Tiny::Mech" for details
+
+ATTRIBUTES
+  "tmp_root"
+  "tw_suffix"
+  "tw_root"
+  "cache_name"
+  "chi"
+  "agent"
+  "mech"
+  "ht_tiny"
+AUTHOR
+    Kent Fredric <kentfredric@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Kent Fredric
+    <kentfredric@gmail.com>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

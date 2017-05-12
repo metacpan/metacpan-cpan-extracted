@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Nagios::Plugin::LDAP;
+
+Nagios::Plugin::LDAP->new->run

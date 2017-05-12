@@ -1,0 +1,13 @@
+Revision history for Perl module Net::LastFM:
+
+0.34 Tue Apr 21 08:04:54 BST 2009
+     - expose create_http_request and create_http_request_signed
+       methods for integrating into other HTTP frameworks
+       (suggested by Anatoly Sharifulin)
+     - add POD coverage test
+
+0.33 Sun Dec 14 15:33:26 GMT 2008
+     - switch to using the JSON version of the API
+
+0.32 Mon Dec  1 21:31:28 GMT 2008
+     - initial release

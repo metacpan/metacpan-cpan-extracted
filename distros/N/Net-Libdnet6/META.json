@@ -1,0 +1,43 @@
+{
+   "abstract" : "adds IPv6 support to Net::Libdnet",
+   "author" : [
+      "GomoR <gomor_at_cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Libdnet6",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::IPv6Addr" : "0",
+            "Net::Libdnet" : "0",
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Libdnet6" : {
+         "file" : "lib/Net/Libdnet6.pm",
+         "version" : "0.27"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license.php"
+      ]
+   },
+   "version" : "0.27"
+}

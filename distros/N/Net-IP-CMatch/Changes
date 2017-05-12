@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::IP::CMatch.
+
+0.02  Tue Dec 21 06:33:43 2004
+	- original version; created by h2xs 1.23 with options
+		-A -b 5.6.1 Net::IP::CMatch
+

@@ -1,0 +1,4 @@
+TYPEMAP
+SLPError		T_IV
+SLPHandle  		T_PTR
+SLPBoolean		T_IV

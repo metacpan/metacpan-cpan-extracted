@@ -1,0 +1,70 @@
+v2.2.1 Wed 8 May 2013
+
+* Added Test::Exception dependency correctly.
+
+v2.2.0 Tue 16 Apr 2013
+
+* Added support for single sign on (http://www.campaignmonitor.com/api/account/#single_sign_on) which allows initiation of external login sessions to Campaign Monitor.
+
+v2.1.2 Mon 15 Apr 2013
+  - Fixed a bug in sub client_listsforemail which was causing an incorrect API call to be made.
+
+v2.1.1 Tue 2 Apr 2013
+  - Fixed URL encoding bug.
+
+v2.1.0 Mon 25 Mar 2013
+  - Added support for authenticating using OAuth.
+
+v2.0.2 Fri 15 Mar 2013
+  - Fixed package.pl script to ensure that Mac OS X tar doesn't include ._* files when creating an archive.
+
+v2.0.1 Thu 17 Jan 2013
+  - Support flat hashed arguments to constructor.
+  - Response headers fixed. Response processing refactored into _build_results().
+
+v2.0.0 Tue 11 Dec 2012
+  - Added the ability to update a custom field name and preference visibility. 
+  - Added support for retrieving spam complaints for a campaign.
+  - Added support for retrieving unconfirmed subscribers for a list.
+  - Added support for getting campaign email client usage.
+  - Added support for creating a campaign from a template.
+  - Added support for unsuppressing an email address.
+  - Added support for suppressing email addresses.
+  - Added support for UnsubscribeSetting field when creating and updating a list.
+  - Added support for including AddUnsubscribesToSuppList and ScrubActiveWithSuppList fields when updating a list.
+  - Added support for getting all client lists to which a subscriber with a specific email address belongs.
+  - Added support for updating a subscriber.
+  - Added usage of the Clear option when importing subscribers.
+  - Added support for QueueSubscriptionBasedAutoResponders and RestartSubscriptionBasedAutoresponders where possible.
+  - Added support for deleting subscribers.
+  - Added support for getting deleted subscribers for a list.
+  - Added support for unscheduling campaigns.
+  - Added support for getting a client's scheduled campaigns.
+  - Added support for getting account billing details.
+  - Added support for transferring credits to/from a client.
+  - Removed client_setaccess, as it is no longer supported in the API.
+
+v1.21.0 Thu 26 Nov 2012
+  - User-Agent header is now perl-createsend-{version}
+
+v1.20.1 Thu 22 Nov 2012
+  - Moved to dotted decimal version number.
+
+1.02 Fri 16 Nov 2012
+  - Added support to manage members (ie. Administrators, People)
+
+0.05 Wed 19 October 2011
+  - Fixed an error with the HTTP realm and other issues associated with this change.
+
+0.04 Fri 04 March 2011
+  - Modified the tests to require the user to enter the API key.
+
+0.03 Fri 04 March 2011
+  - Added comment to the POD regarding test failure due to CM API limits.
+  - Removed apikey test.
+
+0.02 Wed 02 March 2011
+  - Corrected some errors in the POD.
+
+0.01 Tue 01 Mar 2011
+  - Creating initial implementation.

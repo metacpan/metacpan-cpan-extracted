@@ -1,0 +1,41 @@
+
+TODO
+====
+
+- audit fatal error handling, currently fatal errors can dissapear
+  under best_effort and other similar conditions
+
+- port to OpenVMS
+
+- add support for later protocol versions
+
+- add support for encodings
+
+- add support for process filters on put/get operations
+
+- implement save_status methods as a wrapper like best_effort
+
+- reimplement autodie in a saner way
+
+- allow per-method enabling/disabling autodie
+
+DONE
+==== 
+
+- add support for capture_stderr option in constructor
+
+- add support for new extension methods available from late OpenSSH
+  SFTP server (http://www.sfr-fresh.com/unix/misc/openssh-5.1.tar.gz:a/ssh/PROTOCOL)
+
+- add support for unix2dos and dos2unix transformations on the fly for get and put.
+
+- add support for restarting transfers in put, get and derived methods.
+
+- improve password login, remove Expect dependency and try to backport
+  as much as possible fron Net::OpenSSH
+
+- detect unknown host key checking
+
+- make setstat failures optionally non fatal inside put method
+  (relaxed)
+

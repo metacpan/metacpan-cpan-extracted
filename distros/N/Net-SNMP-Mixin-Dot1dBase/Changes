@@ -1,0 +1,22 @@
+Revision history for Net-SNMP-Mixin-Dot1dBase
+
+0.06	Wed, 22 Jun 2016 16:34:17 +0200
+	bump version, new tests
+
+0.05	Sun, 03 May 2015 18:42:35 +0200
+	allow check for partial initialization
+
+0.04	Fr 25. Apr 19:39:21 CEST 2008
+	no interface change
+	internal optimization
+
+0.03	Mo 21. Apr 17:52:38 CEST 2008
+	changed tests from 0.0.0.0 to 127.0.0.1
+
+0.02	Mon Apr 14 23:10:34 CEST 2008
+	minor pod corrections
+	fixed wrong test skip count
+
+0.01_01 Mon Apr 14 14:13:36 CEST 2008
+        First developer release.
+

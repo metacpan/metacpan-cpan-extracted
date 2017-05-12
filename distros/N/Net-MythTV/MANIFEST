@@ -1,0 +1,10 @@
+CHANGES
+lib/Net/MythTV.pm
+lib/Net/MythTV/Connection.pm
+lib/Net/MythTV/Recording.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/pod.t
+t/pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

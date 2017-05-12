@@ -1,0 +1,110 @@
+NAME
+    Net::Whois::ARIN - ARIN whois client
+
+SYNOPSIS
+      use Net::Whois::ARIN;
+
+      my $w = Net::Whois::ARIN->new(
+                  host    => 'whois.arin.net',
+                  port    => 43,
+                  timeout => 30,
+              );
+
+      #  fetch raw whois output as a list
+      my $result = $w->query( '207.173.0.0' );
+
+      #  fetch raw whois output as a scalar
+      my @results = $w->query( 'NET-207-173-0-0-1' );
+
+      #  get Net::Whois::ARIN::Network records
+      my @output = $w->network( '207.173.0.0' );
+      foreach my $net (@output) {
+          printf(
+              "%s\t(%s)\t%s\n",
+              $net->OrgName,
+              $net->NetHandle,
+              $net->NetRange,
+          );
+      }
+
+      my($asn) = $w->asn( 5650 );
+      printf "AS5650 was assigned to %s\n", $asn->OrgName;
+      printf "The email address for AS5650's technical point of contact is %s\n", $asn->TechEmail;
+
+      my @contact = $w->contact('DM2339-ARIN');
+
+      my @contact_records = $w->domain('eli.net');
+
+      my @org = $w->organization('ELIX');
+
+      my @customers = $w->customer('ELIX');
+
+DESCRIPTION
+    This module provides a Perl interface to the ARIN Whois server. The
+    module takes care of connecting to an ARIN whois server, sending your
+    whois requests, and parsing the whois output. The whois records are
+    returned as lists of Net::Whois::ARIN::* instances.
+
+METHODS
+    In the calling conventions below "[]"'s represent optional parameters.
+
+    new - create a Net::Whois::ARIN object
+          my $o = Net::Whois::ARIN->new(
+            [-hostname=> 'whois.arin.net',]
+            [-port    => 43,]
+            [-timeout => 45,]
+            [-retries => 3,]
+          );
+
+        This is the constuctor for Net::Whois::ARIN. The object returned can
+        be used to query the whois database.
+
+    query - make a raw query to the whois server
+          my @output = $o->query('207.173.112.0');
+
+    network - request a network record
+          my @records = $o->network('207.173.112.0');
+
+        This method requires a single argument. The argument indicates the
+        network to use in the whois lookup. The method returns a list of
+        Net::Whois::ARIN::Network records that matched your search criteria.
+
+    asn - request an ASN record
+          my @record = $o->asn(5650);
+
+        This method requires a single argument. The argument indicates the
+        autonomous system number to use in the whois lookup. The method
+        returns a list of Net::Whois::ARIN::AS objects.
+
+    organization - request an organization record
+          my @record = $w->org('ELIX');
+
+    customer - request a customer record
+          my @records = $w->customer('ELIX');
+
+    contact - request a point-of-contact record
+          my @record = $w->contact('DM2339-ARIN');
+
+    domain - request all records from a given domain
+          @output = $w->domain('eli.net');
+
+SEE ALSO
+    Net::Whois::ARIN::AS
+
+    Net::Whois::ARIN::Network
+
+    Net::Whois::ARIN::Contact
+
+    Net::Whois::ARIN::Organization
+
+    Net::Whois::ARIN::Customer
+
+AUTHOR
+    Todd Caine <todd.caine at gmail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2006 Todd Caine. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,159 @@
+      # Note: the following ideas could provide could starting
+      #       points for future work:
+      #       + change add_entry(a, name) to add_entries(a, name, ... )
+      #         and accept any number of entry name arguments
+      #       + return the following from add_entries(a, name, ... ):
+      #         (a) all entry objects in case of success
+      #         (b) in case of partial success or partial failure:
+      #             - a shortened entry object list, with all entries
+      #               that could be retrieved successfully
+      #         (c) in case of complete failure, i.e. if zero entry
+      #             objects get returned,
+      #             return XSRETURN_NOT_OK to honor Perl's contexts 
+      #       + pondering about Perl's strengths in accepting and
+      #         returning lists from object methods (and functions),
+      #         we found the following first ansatz to expand our
+      #         concept of object (error) state
+      #         (a) lists are a ordered collection of many things
+      #             and so in the Perlish spirit of getting things
+      #             done it _does_ make good sense to allow not only
+      #             success or failure, but also partial succes or
+      #             partial failure for object methods on _container_
+      #             objects when _returning_ lists of things
+      #         (b) partial success or partial failure is 
+      #             defined in the following "fuzzy logic" sense:
+      #             (i)   success is the ratio of successfully
+      #                   returned objects divided by the number
+      #                   of all requested objects
+      #             (ii)  failure is 1 - success
+      #             (iii) a container object method returning a list
+      #                   should contain one of the words
+      #                   "all", "full" or "complete" in its name,
+      #                   when it does not support partial success,
+      #                   i.e. it returns only all objects or no objects
+      #             (iv)  to deal with partial success via
+      #                   postprocessing, the object state of such
+      #                   container objects should be expanded to keep
+      #                   - the number of "failed" returned objects
+      #                   - the number of all requested objects if
+      #                     known prior to processing (e.g. thru input)
+      #                     otherwise the total number of processed
+      #                     objects for finite lists
+      #                   - the index      of the first failed object
+      #                   - the error code of the first failed object
+      #                   - the index      of the last  failed object
+      #                   - the error code of the last  failed object
+      #             (v)   common sense dictates, that the concept of
+      #                   partial success and a postprocessing or maybe
+      #                   "post-fetch" error recovery strategy _must_
+      #                   be accompanied by a 80/20 rule or some such;
+      #                   together with that rule, it makes even
+      #                   sense to expand (iv) to unordered lists
+      #                   and especially Perl's hashes by keeping the
+      #                   key instead of the index of the first and the
+      #                   last failed object
+      #             (vi)  if the exspected number of result objects
+      #                   is not a priori known (a database query comes
+      #                   to mind) it is probably wise to revert to
+      #                   full failure, if, after a reading a minimum
+      #                   number of of objects we have already got 20%
+      #                   or more of "failed" objects;
+      #                   such minimum numbers could be:
+      #                   -   5 for a  80/20 rule
+      #                   -   7 for a  85/15 rule
+      #                   -  10 for a  90/10 rule
+      #                   -  20 for a  95/5  rule
+      #                   -  50 for a  98/2  rule
+      #                   - 100 for a  99/1  rule
+      #                   - and so forth
+      #                   (note: scaling follows roughly the 7+-2 rule)
+      #             (vii) the whole discussion is applicable, when
+      #                   - the iterator of the collection object can
+      #                     easily recover from reading "failed" objects
+      #                   - also partial results are allowed and
+      #                     can be further processed 
+      #                   - maintaining the more complex partial
+      #                     success object state gives substantial
+      #                     benefit in error recovery postprocessing
+      #                     (e.g. saves expensive read operations)
+      #                   - we deal with a large quantity of objects
+      #                     (large is more than 10 or 20 or any
+      #                      quantity, that cannot be dealt with
+      #                      manually any more)
+      #                     that are expensive to access in their
+      #                     container object (either expensive to
+      #                     compute - e.g. encrypted or complex query -
+      #                     or slow to fetch - e.g. slow unreliable net)
+      #                   - implementing a multi-processing/client-
+      #                     server/multithreading application with
+      #                     queueing at hand as this allows for
+      #                     easy asynchronous processing of several
+      #                     chunks of data coming from one or more
+      #                     attempts of error recovery postprocessing
+      #             (viii)do not forget that
+      #                   + this might be a design pattern
+      #                   + the strategy pattern is probably involved
+      #                   + a first implementation could restrict itself
+      #                     to the index of the first failed object and
+      #                     the number of failed objects
+      #                     (to be kept in the SvCUR and SvLEN slots
+      #                      of our objects)
+      #                   + in perl we do not need to keep the number
+      #                     of successfully returned objects in a first
+      #                     implementation, as the length of the
+      #                     returned list gives that number easily
+      #                     or even the length of the input list
+      #                     is available for that purpose, i.e.
+      #                     scalar @out == scalar @in and success()
+      #                     scalar @out <  scalar @in and part_success()
+      #                     scalar @out == 0          and failure()
+      #       + think about modifying the interface to ACLs/entries by
+      #         (a) pondering _heavily_ about short method names
+      #             for the convenience methods implemented below
+      #             (the shorter to type the more often used) with
+      #             reasonable _default_ behaviour for poor Notes admins
+      #         (b) _always_ returning at least one entry object that
+      #             allows further clever methods to be applied;
+      #             investigate what happens when in $a->b(...)->c(...)
+      #             $a->b(...) returns a list of suitable objects
+      #             for method c(...); Does c() get called with the
+      #             return list of b(...) provided the first list elem
+      #             is of correct type ? What about c( b( $a ) ???
+      #         (c) removing the add_entry(_with_no_access) methods,
+      #             as those are hardly needed, cause remove_entry
+      #             is mostly more appropriate in that situation
+      #         (d) morphing the methods into Perlish ones, i.e. make
+      #             them accept a variable number of arguments, e.g.
+      #             add_all_entries_and_full_manager_access(a,name,...)
+      #         (e) change the name of the "full_control"-methods to
+      #             e.g. add_entry_with_full_manager_access
+      #             as those are hardly needed            
+      #  
+      #             
+
+15.05.1999:
+  1) add a function all_entries() to Notes::Acl
+     similar in spirit to     all_entrynames(),
+     but returning Notes::AclEntrys
+  2) upgrade        add_with_fullaccess() to
+     set _all_ available roles in the Acl, too
+     - otherwise it does _not_ what the name implies
+     (see item 4 below for possibly easier ways of implementation)
+  3) rework design of Acl.xs and introduce a utility C-function,
+     that builds up a fixed sized array of MAXPRIVCOUNT structs,
+     where each struct holds the role bit number in the first element
+     and the role name (without parentheses or brackets)
+     in the second element 
+  4) experiment wether AclSetPrivBit() and alike
+     require the existence of an attached role name or not
+     and wether setting or resetting all 80 bits corrupts the
+     ACL or does just what is convenient
+     - namely setting/resetting all existing roles,
+       even if less than 80;
+     check out, wether saving and reopening the ACL after the
+     above operation gives a role bit mask with only the really
+     existing role bits set or just a corrupt ACL
+  5) try to find out the Acl flag values for person groups and
+     server groups and add corresponding XS functions in Acl.xs
+     
+     

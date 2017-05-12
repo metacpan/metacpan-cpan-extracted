@@ -1,0 +1,12 @@
+
+int 
+rblf_addrr_soa(struct dnspacket *pkt, const struct zone *zone, int auth)
+{
+  return (addrr_soa(pkt,zone,auth));
+}
+
+int 
+rblf_addrr_ns(struct dnspacket *pkt, const struct zone *zone, int auth)
+{
+  return (addrr_ns(pkt,zone,auth));
+}

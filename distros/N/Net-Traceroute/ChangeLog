@@ -1,0 +1,185 @@
+2014-03-24  Daniel Hagerty  <hag@linnaean.org>
+	* Traceroute.pm:
+	** Bump to version 1.15 for release.
+	** Fix parsing of names when traceroute has been used w/o -n,
+	reported by Graham Ollis.
+
+2012-08-08  Daniel Hagerty  <hag@linnaean.org>
+
+	* Traceroute.pm:
+	** Bump to version 1.14 for release.
+
+2012-08-04  Daniel Hagerty  <hag@linnaean.org>
+
+	* Traceroute.pm:
+	** Integrate patches from Gerald HERMANT <ghermant@astrel.fr>:
+	*** Pass -t, -T to traceroute via tos, use_tcp (respectively)
+	    options.
+	*** argv: new public routine, capturing traceroute argument
+	    calculation.
+
+2011-02-19  Daniel Hagerty  <hag@linnaean.org>
+
+	* Traceroute.pm:
+	** Integrate cisco IOS support:
+	*** Add a few status codes.
+	*** Keep track of which chunk of traceroute input was most
+	    recently seen for parsing purposes.
+	*** Lots of regexp tweaks.
+	*** Doc changes.
+	** Random documentation updates.
+	** Use anonymous filehanles when suitable.
+	** Bump to version 1.13 for release.
+	* t/4*.t:
+	** New cisco tests.
+
+2011-02-18  Daniel Hagerty  <hag@linnaean.org>
+
+	* Traceroute.pm:
+	** Improve some error messages.
+	** Cleanup mess from icmp_map doing v4 and v6 together.
+
+2011-02-16  Daniel Hagerty  <hag@linnaean.org>
+
+	* Traceroute.pm:
+	** Convert operations involving $& to s//.
+	   $& is considered harmful.
+	** Select the translation between !A-type icmp flags based on what
+	   we're parsing, rather than assuming all is LBL ipv4.
+	* t/33-parse-6flags.t
+	** Unmark TODO tests; they pass now thanks to above.
+
+2011-02-06  Daniel Hagerty  <hag@linnaean.org>
+
+	* t/21-parse-4timeouts.t:
+	** More test cases, especially targetting an issue seen on cisco
+	   development branch.
+	* t/33-parse-6flags.t
+	** New test.
+
+2011-02-05  Daniel Hagerty  <hag@linnaean.org>
+
+	* t/95-sys-traceroute.t:
+	** Specifically search for a traceroute executable on the system.
+	   If we can't find one, skip the test in an obvious way.
+	* Renamed:
+	** t/50-parse-6basic.t -> t/30-parse-6basic.t
+	** t/60-parse-6wierd.t -> t/34-parse-6wierd.t
+
+2011-01-02  Daniel Hagerty  <hag@linnaean.org>
+
+	* Traceroute.pm:
+	** Bump version number for release.
+
+2010-12-31  Daniel Hagerty  <hag@linnaean.org>
+
+	* t/95-sys-traceroute.t:
+	** New file: Recreate our original test.pl's most useful test.
+
+2010-12-29  Daniel Hagerty  <hag@linnaean.org>
+
+	* Traceroute.pm:
+	** Prevent waitpid() on pipe close.
+	* t/waitroute:
+	** Unbuffer output.
+	* t/80-tracelie.t, t/81-timeout.t:
+	** Explicitly use "." in paths to test helper programs.
+	* t/81-timeout.t:
+	** Unmark TODO test; fixed by above.
+	* Makefile.PL:
+	** Re-enable installing on windows.
+
+2010-12-13  Daniel Hagerty  <hag@linnaean.org>
+
+	* Traceroute.pm:
+	** Use a better (but still sleazy) IPv6 regexp.
+	* t/60-parse-6wierd.t
+	** Actually parse the traceroute.
+	** Remove TODO markers.
+	** Fix bug in data from hand editing.
+
+2010-12-12  Daniel Hagerty  <hag@linnaean.org>
+
+	* t/*.t:
+	** New testing code.
+	* t/testlib.pl:
+	** Shared code for *.t files.
+	* t/tracelie:
+	** Provides a static traceroute for a fixture.
+	* t/waitroute:
+	** Provides a static traceroute and causes a timeout
+	   for another fixture.
+	* test.pl:
+	** Removed; superseded by new test code.
+
+2010-10-31  Daniel Hagerty  <hag@linnaean.org>
+
+	* Traceroute.pm:
+	** Rename some text_accumulator related names,
+	   exposing it to the user.
+	** Document how the text interface works.
+
+2007-01-09  Daniel Hagerty  <hag@linnaean.org>
+
+	* Traceroute.pm:
+	** Version number bump.
+	** Add fix for Redhat FC5's newest random patches from Keven Nolish.
+	** Fix for timeout problems:
+	*** Use sysread, not read.
+	*** Remove call to eof immediately after pipe creation -- plays
+	    badly with nonblocking & sysread.  Check performed elsehow.
+
+2006-11-04  Daniel Hagerty  <hag@linnaean.org>
+
+	* Traceroute.pm:
+	** Start towards fixing timeout issues -- mark socket non-blocking
+	   (duh); actually accumulate text rather than smashing the buffer.
+
+2005-07-09  Daniel Hagerty  <hag@linnaean.org>
+
+	* Traceroute.pm:
+	** Fix regexp bug in how numeric icmp output codes were handled.
+	** Document use_icmp.
+	* TODO: update for current issues
+
+2005-07-07  Daniel Hagerty  <hag@linnaean.org>
+
+	* Traceroute.pm:
+	** Add request use_icmp option (needs documentation).
+	** Skip MPLS label stack information (for now).
+	** Bump version for next release.
+
+2004-05-24  Daniel Hagerty  <hag@linnaean.org>
+	* Traceroute.pm:
+	** Update parser to deal with traceroute on current linux.
+	   Apparently some bozo thought some extra spacing here and there
+	   would be cute.
+	** Version bump to 1.08.
+	* TODO:
+	** New file.
+
+2000-11-17  Daniel Hagerty  <hag@linnaean.org>
+
+	* Traceroute.pm:
+	** Added a default value to debug instance variable, to avoid
+	perl warning
+	** Incremented version number to 1.03.
+	* test.pl:
+	** Turned on perl warnings.
+
+2000-08-15  Daniel Hagerty  <hag@linnaean.org>
+
+	* Traceroute.pm:
+	** Added error checking around our use of IO::Pipe.
+	** Incremented version number for release
+
+1999-11-28  Daniel Hagerty  <hag@linnaean.org>
+
+	* First ChangeLog entry.
+	* Traceroute.pm:
+	** Bumped version to 1.01
+	** Changed Net::Inet to Socket.  Only needed inet_aton and inet_ntoa.
+	** host(): Wrapped inet_aton in an eval.
+	* test.pl: Rewrote test 3 to be slightly more general, as too
+	many operating systems have restrictions on what you can trace
+	to.  Ask user if test is difficult.

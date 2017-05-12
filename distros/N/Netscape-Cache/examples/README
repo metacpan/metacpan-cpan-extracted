@@ -1,0 +1,157 @@
+README --- examples directory
+-----------------------------
+
+This document describes some example scripts which might be useful when
+dealing with the netscape cache. The scripts are
+
+* grepcache.pl - a grep-like tool for searching content or URL names
+* delcache.pl  - delete files from the cache
+* nscache      - an offline reader for use as a CGI
+* mkhier.pl    - create an URL hierarchie on the filesystem
+* nsindex.pl   - create an cache index file as HTML
+
+
+grepcache.pl
+------------
+Command line tool for searching URLs with perl regular expresions. Returns
+the cache file names of matching URLs. With the -r option, you can get
+the correspoding URL for a cache file.
+
+Usage:
+	grepcache.pl [-ilv] [-r] URLs
+-i: search case insensitive
+-l: print the full pathname of found cachefiles
+-v: show more information (content size, last modified time etc.)
+-r: reverse search (search for cachefiles)
+-d cachedir: netscape cache directory (also: environment variable NSCACHE)
+
+Examples:
+	$ ./grepcache.pl freebsd
+	http://www.de.freebsd.org/newsflash.html: 01/cache33BAF2210010702.html
+	$ lynx ~/.netscape/cache/01/cache33BAF2210010702.html
+
+	$ ./grepcache.pl -r 01/cache33BAF2210010702.html
+	http://www.de.freebsd.org/newsflash.html: 01/cache33BAF2210010702.html
+
+	$ ./grepcache.pl -l freebsd
+	/home/e/eserte/.netscape/cache//01/cache33BAF2210010702.html
+
+
+delcache.pl
+-----------
+Delete cache files and their db entries. Matching is done with perl regular
+expressions.
+
+Usage:
+	delcache.pl [-d cachedir] [-f] [-q] [-i] URLs
+-q: quiet
+-i: case insensitive
+-f: force deletion if netscape's lock file exists
+-d cachedir: netscape cache directory (also: environment variable NSCACHE)
+
+Example:
+	$ ./delcache.pl http://localhost/ http://127.0.0.1
+
+Remove index entries without a matching cache file:
+
+	delcache.pl -clean
+
+
+nscache
+-------
+This is an example for a small frame based offline reader. If you have
+CGI.pm (standard in perl5.004) or CGI::Request from
+CGI-modules-2.74.tar.gz, you can sort URLs by name, date, type and
+size and restrict display of URLs to images, text or html.
+
+INSTALLATION
+
+nscache is meant to be run as a cgi script. Therefore, you need a
+httpd running on your system (If you don't have httpd, you may execute
+"perl nscache > mycache.html" in a shell and load the generated file
+directly from the Navigator). To make the script a cgi script you have
+following options:
+
+* Copy nscache to a public cgi directory. Make sure the path pointing to
+  nscache in cache.html and cache-control.html is correct.
+
+* Append a ".cgi" to nscache. This works for Apache.
+
+* Use the suEXEC feature of Apache 1.2 (see
+.../htdocs/manual/suexec.html of your Apache documentation).
+
+Copy the files cache.html, cache-control.html and blank-page to a
+directory which may be read by your httpd (e.g. ~/public_html, but
+preferably to the same location as the nscache script).
+
+Since ~/.netscape/cache is usually read-only, you have to run the
+script as a setuid program, unless you use the suEXEC feature. So, you
+have to do a "chmod u+s nscache.cgi". If you have to run the script as
+a setuid program, you have to replace the line
+		#!/usr/local/bin/perl
+in nscache with
+		#!/usr/local/bin/suidperl
+(or what else your path to perl is).
+
+WARNING
+
+Running nscache as a cgi script implies that everybody with access to
+your httpd may run this script and use your cache information. If you
+are on a stand-alone system, you won't bother, but otherwise you
+should add .htaccess (or similar) protection.
+
+USAGE
+
+cache.html generates a frameset with three frames. The left frame
+contains the list of the cached documents. The bottom frame is meant
+as a control bar (cache-control.html). You may change the sorting (by
+name, by date ...) or restrict URLs to a given MIME type (html, image
+...). To generate a new list click on the submit button. The largest
+frame contains the actual document.
+
+There are two types for accessing the cached documents: you can access
+the cached files under their real URL. If you want to use this type
+and browse offline via Netscape, you have to set Options->Network
+Preferences->Verify Document to Never. The second type is direct access,
+which accesses the cached files directly from the cache dir.
+
+
+mkhier.pl
+---------
+Create an URL hierarchie on the filesystem.
+
+Usage:
+	mkhier.pl [-l] [-d cachedir] -dest directory url-regex
+
+-l:        create symbolic links instead of copying files
+-dest:     destination directory (required option)
+-d cachedir: netscape cache directory (also: environment variable NSCACHE)
+url-regex: regular expression for the URLs to be created as files or links
+
+
+nsindex.pl
+----------
+Create an cache index file as HTML.
+
+Usage: nsindex.pl [options] [file ...]
+    -cache XXX          cache directory, e.g. $HOME/.netscape/ns_cache
+    -output XXX         select output (site, date or both)
+    -help               this message
+    -ident              show identification
+    -verbose            verbose information
+
+nsindex.pl is contributed by Johan Vromans <JVromans@VRI.net>.
+
+----------------------------------------------------------------------
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGE.

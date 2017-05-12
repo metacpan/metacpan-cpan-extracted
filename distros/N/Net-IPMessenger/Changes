@@ -1,0 +1,56 @@
+Revision history for Net-IPMessenger
+
+0.01   Thu Jun 15 17:38:23 2006
+       Initial release.
+
+0.02   Fri Jun 16 11:11:38 2006
+       Changed recv buffer size on Net::IPMessenger::recv().
+       Fixed bug on Net::IPMessenger::CommandLine::by_addr().
+
+0.03   Sun Jun 18 02:29:25 2006
+       Added Test::Perl::Critic to PREREQ_PM of Makefile.PL.
+       Added Test::Perl::Critic to requires of Build.PL.
+
+0.04   Mon Oct  2 01:21:06 2006
+       Added Net::IPMessenger::flush_sending() method for retrying SENDMSG.
+       Added SendRetry argument to Net::IPMessenger::new().
+       Net::IPMessenger::send() arguments style changed.
+
+0.05   Tue Oct 10 00:32:39 2006
+       Deleted argument 'broadcast' from Net::IPMessenger::send() and
+       send() checks command's broadcast flag.
+       Added Net::IPMessenger::add_broadcast().
+
+0.06   Fri Oct 13 23:31:44 2006
+       Added Net::IPMessenger::update_userlist(). And update_userlist() does not
+       add new user who sends SENDMSG with NOADDLIST opt, into user list.
+       Added Net::IPMessenger::RecvEventHandler::READMSG().
+       It replies ANSREADMSG when READCHECK flag is on.
+
+0.07   Mon Nov 12 01:24:11 2007
+       Added package Net::IPMessenger::Encrypt, Net::IPMessenger::EncryptOption
+       to support RSA + Blowfish/CBC encryption.
+
+0.08   Tue May 11 23:43:49 2010
+       Removed Test::Perl::Critic from Makefile.PL.
+       changed perlcritic.t, pod-coverage.t not to run tests by default.
+
+0.09   Sun Sep 26 23:09:39 2010
+       Deleted BR_EXIT event from RecvEventHandler.pm
+
+0.10   Mon Oct 18 15:53:53 2010
+       Deleted required Test::Perl::Critic from Build.PL
+
+0.11   Tue Oct 19 10:28:03 2010
+       Added Encode.pm to required module
+
+0.12   Wed Oct 20 14:44:49 2010
+       change version in POD
+       change URL to English one
+
+0.13   Fri Sep  9 16:00:22 2011
+       add attach param to ClientData.pm
+       add t/01.network.t for network test
+
+0.14   Thu Sep 15 02:15:53 2011
+       add metrics.t for Test::Perl::Metrics::Simple test

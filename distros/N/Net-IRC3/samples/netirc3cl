@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+use strict;
+use Event;
+use Net::IRC3::Client::Connection;
+$Net::IRC3::Client::Connection::DEBUG = 1;
+
+my $c = AnyEvent->condvar;
+
+my $pc = Net::IRC3::Client::Connection->new;
+
+$pc->connect ("irc.plan9.de", 6667);
+
+$pc->reg_cb (
+   irc_privmsg => sub {
+      my ($self, $msg) = @_;
+      if ($msg->{trailing} =~ m/net_irc3:\s*(.*)/) {
+         $pc->send_chan ("#test", "PRIVMSG", "yes?", "#test");
+      }
+   }
+);
+
+$pc->reg_cb (
+   channel_add => sub {
+      my ($self, $chan, @nicks) = @_;
+      my $nick = join ",", @nicks;
+
+      print "$chan += $nick\n";
+      print "chans: " . (join ";", keys %{$self->channel_list}) ."\n";
+      print "nicks: " . (join ";", keys %{$self->channel_list ()->{$chan}}) ."\n";
+   },
+   channel_remove => sub {
+      my ($self, $chan, @nicks) = @_;
+      my $nick = join ",", @nicks;
+
+      print "$chan -= $nick\n";
+      print "chans: " . (join ";", keys %{$self->channel_list}) ."\n";
+      print "nicks: " . (join ";", keys %{$self->channel_list ()->{$chan}}) ."\n";
+   }
+);
+
+$pc->reg_cb (
+   registered => sub {
+      my ($self) = @_;
+      print "registered!\n";
+      $pc->enable_ping (2);
+   },
+   disconnect => sub {
+      print "DISCOPNNECT ($_[1])!!!\n";
+   }
+);
+
+# these commands will queue until the connection
+# is completly registered and has a valid nick etc.
+$pc->send_srv ("JOIN", undef, "#test");
+$pc->send_chan ("#test", "PRIVMSG", "hi, i'm a bot!", "#test");
+
+$pc->register ("net_irc3", "net_irc3", "test bot");
+
+$c->wait;

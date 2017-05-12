@@ -1,0 +1,330 @@
+#!/usr/bin/perl
+#===============================================================================
+#      PODNAME:  check_plugin
+#     ABSTRACT:  check Net::IP::Identifier::Plugin::* plugins
+#
+#       AUTHOR:  Reid Augustin
+#        EMAIL:  reid@LucidPort.com
+#      CREATED:  10/12/2014 05:53:55 PM
+#===============================================================================
+
+use 5.008;
+use strict;
+use warnings;
+use utf8;
+
+{
+    package Local::Payload; # a Binode payload
+    use Moo;
+
+    has requested_net => (  # from file or cmd line, not validated yet
+        is => 'rw',
+    );
+    has node_net => (       # gleaned from WHOIS, validated CIDR
+        is => 'rw',
+    );
+    has whois_rec => (      # WHOIS record (from WhoisCache)
+        is => 'rw',
+    );
+}
+
+package main;
+
+use open qw( :utf8 :std );  # UTF8 for all files and STDIO
+use File::Spec;
+use Getopt::Long qw(:config pass_through);  # for GetOptions(...)
+use Net::IP;   # for IP_IDENTICAL, etc
+use Net::IP::Identifier::Regex;
+use Net::IP::Identifier::Binode;
+use Net::IP::Identifier::WhoisCache;
+
+# VERSION
+
+my (undef, undef, $myName) = File::Spec->splitpath($0);
+
+my $file;
+my $verbose = 0;
+my $entity;
+my $vv;
+
+exit 0 if (not
+    GetOptions(
+        'file=s'   => \$file,
+        'entity=s' => \$entity,
+        'v+'       => \$verbose,
+        'vv'       => \$vv,
+    )
+);
+
+$verbose = 1 if $vv;
+$vv = 1 if ($verbose > 1);    # very verbose
+
+if (@ARGV and
+    not $file) {
+    $file = shift @ARGV;
+}
+
+my $fh;
+if ($file) {
+    open $fh, '<', $file or die "failed to open $file for reading: $!\n";
+}
+elsif (@ARGV) {
+    # feed input loop from string constructed from cmd line instead of real file handle
+    $fh = cmd_line_to_fh();
+}
+else {
+    $fh = *STDIN;
+}
+
+# make a cache so we don't feel bad about running whois many times
+my $whois_cache = Net::IP::Identifier::WhoisCache->new(
+    verbose => $vv,
+);
+
+# create tree of Whois objects from netblocks found in the input file
+# each node of the tree represents a CIDR
+# we won't actually call whois on them just yet...
+my $root_v6 = Net::IP::Identifier::Binode->new;
+# Place the IPv4 block in the IPv6 tree (IPv4 mapped IPv6)
+my $root_v4 = $root_v6->construct(Net::IP::Identifier::Net->new('::ffff:0:0/96')->masked_ip);
+my (@whois_parse_failed, @no_entity);  # nets with problems
+my $prev_covered_by = '';
+
+build_tree($fh);   # build the Binode tree from src_strs from $fh
+
+#$DB::deep = 280;    # IPv6 needs 128 * 2 plus some headroom
+
+my ($print_net, @absorbed);   # globals used when printing netblocks
+my $netblock_count = 0;
+
+# condense adjacent netblocks, notate absorbed blocks, print results
+print "\n# Results:\n";
+$root_v6->traverse_width_first(\&print_netblocks);
+if ($print_net) {
+    print_netblock();  # print last completed netblock
+}
+
+print "        # $netblock_count Network Blocks\n";
+
+if (@whois_parse_failed) {
+    print
+        "# WHOIS RESULT PARSING FAILED (nets were not included):\n",
+        (map { "#    $_\n" } @whois_parse_failed),
+        "#    \n";
+}
+if (@no_entity) {
+    print
+        "# $entity NOT FOUND IN WHOIS RESULT (nets were not included):\n",
+        (map { "#    $_\n" } @no_entity),
+}
+
+exit(0);
+
+###############################
+#                             #
+#          Subroutines        #
+#                             #
+###############################
+
+sub cmd_line_to_fh {
+    require IO::String;
+    my @args;
+    for my $ii (0 .. $#ARGV) {
+        my $arg = $ARGV[$ii];
+        if (($arg eq '-' or $arg eq '+')    # allow two types of net range with spaces
+            and @args
+            and $ii < @ARGV) {
+            $args[-1] .= "$arg$ARGV[++$ii]";
+        }
+        else {
+            push @args, $arg;
+        }
+    }
+    return IO::String->new(join "\n", @args);
+}
+
+# parse input lines for netblocks, adding them to Binode tree as we go
+sub build_tree {
+    my ($fh) = @_;
+
+    # regex for IPv4/6 range, plus, cidr or individual IP
+    my $regexes = Net::IP::Identifier::Regex->new;
+    my $ip_any = $regexes->IP_any;
+
+    my @nets;   # Net::IP::Identifier::Net objects of found strings
+    while (my $line = $fh->getline) {
+        last if not defined $line;
+
+        next if ($line =~ m/\b_SKIP_\b/);
+        if ($line =~ m/\b_ENTITY_REGEX_\s+(.+)\s*#?/) {
+            $entity = $1 if (not $entity);
+        }
+        if ($line =~ m/^package .*::(\w+)/) {
+            $entity = $1 if (not $entity);
+        }
+        my @matches = $line =~ m/\b($ip_any)\b/g;
+        for my $ip_str (@matches) {
+            next if ($ip_str eq '::');  # skip 0::
+            my $range = Net::IP::Identifier::Net->new($ip_str);
+            push @nets, $range->range_to_cidrs;  # each net is now a CIDR
+        }
+    }
+
+    if ($file and not $entity) {  # last chance, take it from the filename
+        ($entity) = $file =~ m/.*?([^\/]*)$/;   # skip over any directory parts
+    }
+    die "Please define an entity regular expression\n" if not $entity;
+
+    # sort the matches by IP and block size, add them to the tree
+    vprint('# Sort ', scalar @nets, " nets\n");
+    @nets = sort cmp_ips @nets;
+    vprint('# Add ', scalar @nets, " nodes\n");
+    map { add_nodes($_) } @nets;
+}
+
+sub cmp_ips {
+    if ($a->intip == $b->intip) {   # blocks start at same IP?
+        # sort larger blocks first (descending)
+        return ($b->last_int - $b->intip) <=> ($a->last_int - $a->intip);
+    }
+    return $a->intip <=> $b->intip; # order by ascending first IP in range
+}
+
+# add nodes to the Binode tree:
+#   we are starting from an invalidated, questionable net.  they have been
+#   sorted, so we'll get them in IP order, biggest blocks first.  if block
+#   has already been handled, skip it. otherwise, get a WHOIS object for
+#   the block.  insert the validated WHOIS result into the tree.
+my %already_added;
+sub add_nodes {
+    my ($requested_net) = @_;
+
+    # skip if requested net has already been seen here
+    return if ($already_added{$requested_net->print});
+    $already_added{$requested_net->print} = 1;
+
+    # skip if this netblock (or a parent block) is already in the tree.
+    my $root = ($requested_net->version eq '6') ? $root_v6 : $root_v4;
+    my $already;
+    $root->follow($requested_net->masked_ip, sub {
+        if ($_[0]->payload) {   # $requested already covered by a node?
+            $already = $_[0]->payload;
+            my $covered_str = payload_net_str($already);
+            if ($prev_covered_by ne $covered_str) {
+                vprint("# Skip nets covered by $covered_str\n");
+                $prev_covered_by = $covered_str;
+            }
+            vprint("#   ", $requested_net->src_str, "\n");
+        }
+        return $already;
+    });
+    return if ($already);
+
+    # get the whois record
+    vprint("# Getting WHOIS info for ", $requested_net->src_str, "\n");
+    my $whois_rec = $whois_cache->get_whois($requested_net);
+    if ($whois_cache->parse_failed) {
+        push @whois_parse_failed, "$requested_net " . $whois_cache->parse_failed;
+        return;
+    }
+    if (not $whois_rec->result =~ m/$entity/io) {
+        push @no_entity, $requested_net;
+        return;
+    }
+
+    # Insert the WHOIS info into the tree.
+    # the WHOIS block may require multiple CIDRs (and therefor multiple
+    # tree nodes) to represent it.  Split and add each CIDR.
+    my @ranges = Net::IP::Identifier::Net->new($whois_rec->range_str)->range_to_cidrs;
+    for my $node_net (@ranges) {
+        # add to tree
+        my $node = $root->construct($node_net->masked_ip);
+        $node->payload(
+            Local::Payload->new(
+                requested_net => $requested_net,
+                node_net      => $node_net,
+                whois_rec     => $whois_rec,
+            ),
+        );
+        vprint ('# Add ', payload_net_str($node->payload), "\n");
+    }
+}
+
+sub payload_net_str {
+    my ($payload) = @_;
+
+    my $r_net = $payload->requested_net;
+    my $n_net = $payload->node_net;
+    if ($r_net->overlaps($n_net) != $IP_IDENTICAL) {
+        return $n_net->src_str . ' (from ' . $r_net->src_str . ')';
+    }
+    return $n_net->src_str;
+}
+
+# print the results, condensing adjacent netblocks
+# this is run as a callback from the tree traversal method.
+sub print_netblocks {
+    my ($self, $level, @extra) = @_;
+
+    return if (not $self->payload); # continue
+
+    my $node_net = $self->payload->node_net; # validated nets only
+
+    if (defined $print_net) {    # first/last defined after first pass through
+        my $last_int = $print_net->last_int;    # last IP of existing net
+        if ($last_int + 1 == $node_net->intip) {    # right next to next net?
+            vprint ("        # extending $print_net to include $node_net\n");
+            # extend the netblock
+            $print_net->set($print_net->ip . '-' . $node_net->last_ip);
+            push (@absorbed, $self->zero) if ($self->zero);
+            $self->zero(undef);
+            push (@absorbed, $self->one ) if ($self->one );
+            $self->one(undef);
+            return 1;   # Don't continue - any children are sub-nets
+        }
+        #  my $path = $Net::IP::Identifier::Binode::path->copy;
+        #  $path <<= 32 - $level;
+        #  $path = $net->int_to_ip($path);
+        #  vprint ("# $path: ");
+        print_netblock();  # print completed netblock
+    }
+
+    # start new block
+    $print_net = $node_net;
+    push (@absorbed, $self->zero) if ($self->zero);
+    $self->zero(undef);
+    push (@absorbed, $self->one ) if ($self->one );
+    $self->one(undef);
+    return 1;   # Don't continue - any children are sub-nets
+}
+
+sub print_netblock {
+    my ($level, @extra) = @_;
+
+    print "        '$print_net',\n"; # complete previous block
+    $netblock_count++;
+    if (@absorbed) {
+        vprint ("        # absorbs:\n");
+        for my $node (@absorbed) {
+            $node->traverse_width_first(
+                sub {
+                    my ($node, $level, $extra) = @_;
+
+                    if ($node->payload) {
+                        my $str = payload_net_str($node->payload);
+                        vprint ("        #    $str\n");
+                    }
+                    return;
+                }
+            );
+        }
+        @absorbed = ();
+    }
+}
+
+sub vprint {
+    print @_ if ($verbose);
+}
+
+__END__
+

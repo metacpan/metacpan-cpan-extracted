@@ -1,0 +1,70 @@
+---
+abstract: 'Basic, Protocol-level BitTorrent Utilities'
+author:
+  - 'Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/'
+build_requires:
+  Test::More: '0.98'
+  perl: '5.010000'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-BitTorrent-Protocol
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::BitTorrent::Protocol:
+    file: lib/Net/BitTorrent/Protocol.pm
+    version: v1.5.3
+  Net::BitTorrent::Protocol::BEP03:
+    file: lib/Net/BitTorrent/Protocol/BEP03.pm
+    version: v1.5.3
+  Net::BitTorrent::Protocol::BEP03::Bencode:
+    file: lib/Net/BitTorrent/Protocol/BEP03/Bencode.pm
+    version: v1.5.3
+  Net::BitTorrent::Protocol::BEP05:
+    file: lib/Net/BitTorrent/Protocol/BEP05.pm
+    version: v1.5.3
+  Net::BitTorrent::Protocol::BEP06:
+    file: lib/Net/BitTorrent/Protocol/BEP06.pm
+    version: v1.5.3
+  Net::BitTorrent::Protocol::BEP07:
+    file: lib/Net/BitTorrent/Protocol/BEP07.pm
+    version: v1.5.3
+  Net::BitTorrent::Protocol::BEP09:
+    file: lib/Net/BitTorrent/Protocol/BEP09.pm
+    version: v1.5.3
+  Net::BitTorrent::Protocol::BEP10:
+    file: lib/Net/BitTorrent/Protocol/BEP10.pm
+    version: v1.5.3
+  Net::BitTorrent::Protocol::BEP15:
+    file: lib/Net/BitTorrent/Protocol/BEP15.pm
+    version: v1.5.3
+  Net::BitTorrent::Protocol::BEP23:
+    file: lib/Net/BitTorrent/Protocol/BEP23.pm
+    version: v1.5.3
+  Net::BitTorrent::Protocol::BEP44:
+    file: lib/Net/BitTorrent/Protocol/BEP44.pm
+    version: v1.5.0
+requires:
+  Digest::SHA: '0'
+  Type::Tiny: '0'
+  perl: '5.016000'
+resources:
+  bugtracker: https://github.com/sanko/net-bittorrent-protocol/issues
+  homepage: https://github.com/sanko/net-bittorrent-protocol
+  repository: git://github.com/sanko/net-bittorrent-protocol.git
+version: 1.5.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

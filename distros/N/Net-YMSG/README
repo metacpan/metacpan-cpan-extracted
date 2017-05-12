@@ -1,0 +1,58 @@
+
+Console-Yahoo Messenger 
+Requirements: 
+~~~~~~~~~~~~
+*** Digest::MD5 module [ execute 'man Digest::MD5' to find if it exists ]
+* [tested with]perl 5.6.0 or higher
+* [tested with]gmake 3.79 or higher 
+
+NOTE: Presence of Digest::MD5 module is essential. 
+
+Installation : 
+~~~~~~~~~~~~
+
+@~> perl Makefile.PL
+@~> gmake
+@~> gmake install
+@~> cd examples
+@~> perl yahoo.pl 
+
+Features: 
+* Yahoo Instant Messaging
+* Custom status message
+* Invisible mode
+* Complete offline messaging
+* Store offline messages
+* Buddy add message (Someone added you)
+* Add new buddy (You add someone)
+* All Chat rooms supported
+* Easy installation
+* Works on *unix, windows[Active-perl],Mac-OS 
+
+Thanks to: 
+~~~~~~~~~
+*Hiroyuki for YMSG IM base. 
+
+Author : 
+~~~~~~~
+Varun Kacholia 
+
+Note: Currently you will be logged in Linux room(by default) , You can change it
+by changing the $chatroom and $chatroomid in the executable "yahoo";
+Refer to  Yahoo Chat Protocol for chatroom names and id. 
+
+Common Problems: 
+~~~~~~~~~~~~~~~
+1. On executing yahoo, you get the error 'bad interpretor'
+> Change the first line of file yahoo, to point wherever your perl
+> executable is. The first 2 lines should look like: 
+#!path-to-perl
+use lib qw(/path-to-the-current-directory/Yahoo/YMSG_libs/ ); 
+(Sometimes the char '\n' is present, replace it by the 'return-character') 
+
+2. User '' message box is full.  will have to login and clear out their message
+box before any more messages can be stored. Please try sending your message 
+later.
+> You did not enter a valid 'receiver' ID [ or did not enter any id].
+> Set the 'receiver' ID using '/id YAHOO-ID' or '/num message'. 
+> Type /h for help. 

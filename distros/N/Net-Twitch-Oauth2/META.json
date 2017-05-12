@@ -1,0 +1,53 @@
+{
+   "abstract" : "Net::Twitch::Oauth2 wrapper for Twitch.tv OAuth2",
+   "author" : [
+      "Ronald Reed <rjreed67@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Twitch-Oauth2",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::MockModule" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0.10"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "JSON::Any" : "0",
+            "LWP::UserAgent" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Twitch::Oauth2" : {
+         "file" : "lib/Net/Twitch/Oauth2.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.06"
+}

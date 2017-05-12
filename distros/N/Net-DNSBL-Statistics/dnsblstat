@@ -1,0 +1,163 @@
+#!/usr/bin/perl
+#
+# dnsblstat
+#
+# version 1.05, 11-16-08
+#
+# Copyright 2008, Michael Robinton <michael@bizsystems.com>
+   
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+   
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+   
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+
+use strict;
+#use diagnostics;
+#use lib qw(blib/lib blib/arch);
+
+use Net::DNSBL::Utilities qw(
+	doINCLUDE
+);
+use Net::NBsocket qw(
+	open_udpNB
+	sockaddr_in
+);
+use Net::DNS::ToolKit qw(
+	get_ns
+);
+use Proc::PidUtil qw(
+	if_run_exit
+	zap_pidfile
+);
+use Net::DNSBL::Statistics qw(
+	run
+	plaintxt
+	htmltxt
+);
+
+sub usage {
+  print STDERR $_[0],"\n\n" if $_[0];
+  print STDERR qq|
+Syntax:	$0 path/to/config.file
+    or
+	$0 -t path/to/config.file
+	$0 -w path/to/config.file
+
+Normally $0 prints a sorted list (by count)
+of the DNSBL's interrogated with their reply count,
+percentage of the total count, and any comments from
+the DNSBL's 'comment' key field in the config file.
+The 'comment' field may contain html markup text.
+
+  i.e.
+  44 100.0%  TOTAL IP's interrogated
+  41  93.2%  UNION of all results
+  34  77.3%  dnsbl.sorbs.net comment
+  ........
+
+The -t switch will print a start and stop time.
+
+  i.e.
+  # start: Fri Jan  4 17:46:44 2008
+  # stop : Fri Jan  4 17:58:21 2008
+
+The -w switch will put the output into an HTML table
+without the <table> statement </table>., a commment as above
+and with an <a href="...">dnsbl name</a> statement replacing
+the dnsbl name if the 'url' key is present in the config file.
+
+  i.e.
+  A one line example corresponding to the text line above:
+
+  34  77.3% dnsbl.sorbs.net 
+
+  with a 'comment' key of: 127.0.0.2,5,7,8,9,10,12
+  and a 'url' key of:      http://www.au.sorbs.net/using.shtml
+
+  <tr class=dnsbl><td align=right>34</td>
+    <td align=right>77.3%</td>
+    <td align=left><a
+     href="http://www.au.sorbs.net/using.shtml">dnsbl.sorbs.net</a></td>
+    <td align=left>127.0.0.2,5,7,8,9,10,12</td>
+  </tr>
+
+|;
+  exit 1;
+}
+
+$| = 1;
+my $WEB;
+my $TIME;
+my($config,@ckys);
+
+while ($_ = shift @ARGV) {
+  if ($_ eq '-w') {
+    $WEB = 1;
+    next;
+  }
+  elsif ($_ eq '-t') {
+    $TIME = time;
+    next;
+  }
+  $config = $_;
+}
+
+usage() unless $config;
+my $Conf = doINCLUDE($config);
+usage("could not load config file: $config")
+	unless $Conf;
+usage("corrupted config file: $config")
+	unless (@ckys = keys %$Conf);
+
+if (exists $Conf->{IMPORT} && (my $sconf = $Conf->{IMPORT}->{FILE})) {
+  my $Sconf = doINCLUDE($sconf);
+  usage("could not load spamcannibal config file: $sconf")
+	unless $Sconf;
+  usage("corrupted spamcannibal config file: $sconf")
+	unless (@_ = keys %$Sconf);
+
+  my $keyexp = $Conf->{IMPORT}->{KEYexp};
+  my @skys = grep ($_ =~ /$keyexp/o,@_);
+  @{$Conf}{@skys} = @{$Sconf}{@skys};
+}
+
+if_run_exit($Conf->{PIDdir},'already running');
+
+if ($TIME) {
+  if ($WEB) {
+    print '<!-- start: ', scalar localtime($TIME), " -->\n";
+  } else {
+    print 'start: ', scalar localtime($TIME), "\n";
+  }
+}
+
+my $sock = open_udpNB();
+my $sockaddr_in = sockaddr_in(53, scalar get_ns());
+my %dnsbls = run($Conf,$sock,$sockaddr_in);
+
+if ($TIME) {
+  my $now = time;
+  if ($WEB) {
+    print '<!-- stop : ', scalar localtime($now), sprintf("\n     total: %1.1f minutes -->\n",($now - $TIME)/60);
+  } else {
+    print 'stop : ', scalar localtime($now), sprintf("\ntotal: %1.1f minutes\n",($now - $TIME)/60);;
+  }
+}
+
+if ($WEB) {
+  print htmltxt($Conf,\%dnsbls);
+} else {
+  print plaintxt($Conf,\%dnsbls);
+}
+
+zap_pidfile($Conf->{PIDdir});

@@ -1,0 +1,21 @@
+POST https://wwwcie.ups.com/ups.app/xml/AV
+
+<?xml version='1.0' standalone='yes'?>
+<AddressValidationRequest>
+  <Address>
+    <City>East Lansing</City>
+    <CountryCode>US</CountryCode>
+    <PostalCode>48823</PostalCode>
+    <ResidentialAddressIndicator></ResidentialAddressIndicator>
+    <StateProvinceCode>MI</StateProvinceCode>
+  </Address>
+  <Request>
+    <RequestAction>AV</RequestAction>
+    <TransactionReference>
+      <CustomerContext>Net::Async::Webservice::UPS</CustomerContext>
+      <XpciVersion>0</XpciVersion>
+    </TransactionReference>
+  </Request>
+</AddressValidationRequest>
+
+<?xml version="1.0"?><AddressValidationResponse><Response><TransactionReference><CustomerContext>Net::Async::Webservice::UPS</CustomerContext><XpciVersion>0</XpciVersion></TransactionReference><ResponseStatusCode>1</ResponseStatusCode><ResponseStatusDescription>Success</ResponseStatusDescription></Response><AddressValidationResult><Rank>1</Rank><Quality>1.0</Quality><Address><City>EAST LANSING</City><StateProvinceCode>MI</StateProvinceCode></Address><PostalCodeLowEnd>48823</PostalCodeLowEnd><PostalCodeHighEnd>48826</PostalCodeHighEnd></AddressValidationResult></AddressValidationResponse>

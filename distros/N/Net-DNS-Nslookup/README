@@ -1,0 +1,24 @@
+Net::DNS::Nslookup version 0.03
+==================================
+
+  Nslookup module provides simple way to resolve DNS name to 
+  IP address(es) on a local system (Linux, Win*, Solaris).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires "nslookup" binary.
+
+COPYRIGHT AND LICENCE
+
+  Copyright (c) 2011 Paul Greenberg. All rights reserved.
+  This program is free software; you can redistribute it
+  and/or modify it under the same terms as Perl itself.

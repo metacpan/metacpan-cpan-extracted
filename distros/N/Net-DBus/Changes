@@ -1,0 +1,288 @@
+Revision history for perl module Net::DBus
+
+1.1.0 2015-03-16
+
+ - Support customizable timeouts on method calls
+ - Fix invocation of properties
+ - Fix example in object export tutorial
+ - Introduce a new Net::DBus:ProxyObject providing an alternative
+   approach for exporting objects
+ - Cache objects when casting to interfaces
+ - Treat NoReply as fatal when introspecting
+ - Add UNIX file descriptor passing
+ - Fix misc mistakes in POD docs
+ - Fix error when when requesting bus names
+ - Fix encoding of dict & variant types
+ - Fix decoding of signatures with nested arrays
+ - Update README to point to gitlab.com instead of gitorious.org
+ - Fix handling of select() return value
+ - Fix toggling of timeouts in reactor
+ - Add 'strict_exceptions' annotation
+ - Document missing constructor parameters.
+
+1.0.0 2011-06-30
+
+ - Updated to require minimum dbus >= 1.0.0
+ - Automatically track change in ownership of bus names
+   for signal handlers
+ - Strict validation of method invocation against introspection
+   data on exported objects
+ - Improved error messages for invalid interfaces
+ - Add API for disconnecting an object from a signal
+ - Implement GetAll methods on properties interface
+ - Allow leading _ in interface names
+ - Other minor fixes
+
+0.33.6 2008-02-20
+
+ - Fix introspection XML handling when exporting objects with child
+   objects
+
+ - Improve output of Net::DBus::Dumper
+
+ - Add support for providing parameter & return value names in
+   introspection XML
+
+ - Fixes to marshalling of variants
+
+ - Fix handling of compound data types within object properties
+
+ - Remove non-portable makefile rules
+
+ - Fix ref counting bugs in error path.
+
+0.33.5 2007-07-18
+
+ - Added support for getting private bus connections for apps which
+   don't want to deal with a shared bus
+
+ - Fix test case to use a private connection
+
+ - On Perl builds where integers are 32-bits, the DBus 64 bit integer
+   types will be serialized to/from the Perl String type instead of
+   calling 'die'.
+
+ - Fix signature when marshalling dicts on newer DBus builds
+
+ - Fix calling of disconnect wrt to newer DBus semantics
+
+ - Make introspection much more tolerant of missing information
+   about methods/properties/signals.
+
+ - Fix use of magic values & added tests
+
+ - Export the Net::DBus::Dumper methods correctly.
+
+0.33.4 2006-11-04
+
+ - Fixed service owner used for org.freedesktop.DBus object
+   to make signal handling on the bus work again
+
+ - Pass return value for signal handling callbacks all the
+   way back to DBus
+
+ - Fix multiple problems with marshalling of variant data
+   types
+
+ - Replace use of dbus_connection_disconnect with _close
+   when compiling against dbus >= 0.90
+
+ - Call dbus_connection_unref in the DESTROY method of
+   connection object
+
+ - Fix reference counting in connection & pending call
+   objects
+
+ - Added example of galago desktop notifications
+
+ - Fix test suite errors
+
+ - Added missing import statement
+
+ - Throw Net::DBus::Error if an async call fails
+
+0.33.3 2006-07-05
+
+ - Fixed parsing of introspection data if there are processing
+   instructions, or other non-data nodes before the root element.
+
+ - Replace use of XML::Grove with XML::Twig when parsing the 
+   introspection XML documents, since the former has not had any
+   updates / bug fixes since 1999(!), and several people have 
+   reported problems using it on Perl 5.8.x 
+
+ - Made all Perl scripts / modules / tests use 'strict' and
+   'warnings' pragmas
+
+ - Turn Net::DBus::Error into fully fledged object which services
+   can sub-class to allow explicit error handling by clients.
+
+ - In _dispatch method of Net::DBus::Object ensure that any 
+   instances of Net::DBus::Error thrown by the method call
+   are explicitly serialized into DBus errors, rather than 
+   a generic 'org.freedesktop.DBus.Failed'.
+
+ - Change re-distribution license from GPL, to GPL / Perl Artistic,
+   matching the terms of Perl itself.
+
+ - Add support for registering a callback on Net::DBus::ASyncReply
+   objects to allow notification of completion for asynchronous
+   method calls
+
+0.33.2 2006-06-03
+
+ - Fixed handling of variants in introspection data
+
+ - Added binding for the DBusPendingCall C object
+
+ - Added some missing RPM dependancies on XML libs, and on minimum
+   required dbus version
+
+ - Added support for doing asynchronous method calls, and fire-and-
+   forgot calls for methods whose return status is not desired. Use
+   the constants in Net::DBus::Annotation module to indicate desired
+   call mode. Default is to do synchronous blocking calls.
+
+ - Added support for the 16-bit integer, signature and object path
+   data types
+
+ - Made introspection of root objects compliant with upsteam spec,
+   by calling introspect on the root object, "/", rather than a 
+   Perl specific magic object path.
+
+0.33.1 2006-02-03
+
+ - Constructor for Net::DBus::Object allows another Net::DBus::Object
+   to be passed instead of the Net::DBus::Service, to create child
+   objects specifying only a relative path.
+
+ - Updated minimum required DBus version to be 0.33 to gain access
+   to the unregister_object_path API
+
+ - Add a disconnect() method to Net::DBus::Object to make it possible 
+   to unregister object from the bus & thus make it possible to destroy 
+   objects which are no longer required / relevant.
+
+ - Unregister all child objects if we are unregistered ourselves
+
+ - Fix numerous POD errors identified by Test::Pod and podchecker
+
+ - Increase POD documentation to get 100% coverage of all APIs,
+   verified by Test::Pod::Coverage
+
+0.32.3 2005-12-05
+
+ - Introspection data is used only as hint, so if an object
+   exports many methods, but only provides partial introspection
+   data, remote calls fallback to regular typing rules
+
+ - Re-add dbus_XXX convenience methods to Net::DBus to allow
+   clients to do explicit type casting. Must be requested at
+   export time, using 'Net::DBus qw(:typing)'.
+
+ - Update all example programs to run against session bus,
+   since there are no security rules to enable them to work
+   on system bus.
+
+ - Print out warning upon use, if a method, signal, or property
+   is annotated with the 'org.freedesktop.DBus.Deprecated' flag.
+
+ - Do not wait for a method reply if the method is annotated
+   with the 'org.freedesktop.DBus.Method.NoReply' flag.
+
+ - Extend Net::DBus::Exporter to enable methods, signals, and
+   properties to be annotated.
+
+ - Add support for 'org.freedesktop.DBus.Method.NoReply' and
+   'org.freedesktop.DBus.Deprecated' annotations when exporting
+   objects
+
+ - Add a pure in-memory bus implementation for facilitating
+   creation of unit tests which would otherwise require making
+   a connection to a 'live' message bus. Can be accessed via:
+ 
+      Net::DBus->test
+
+ - Add an *EXPERIMENTAL* mock object to faciltate creation of
+   unit tests which need to communicate with other objects on
+   the bus. See Net::DBus::Test::MockObject for further info.
+
+0.32.2 2005-10-23
+
+ - Fix unit tests broken in previous build
+
+ - Added patch to avoid leaking memory when throwing dbus
+   errors from the XS layer
+
+ - Added support for org.freedesktop.DBus.Properties
+   in exported & remote objects.
+
+ - Added support for getting the unique name of the client's
+   connection to the bus
+
+ - Added support for getting the unique name of the client
+   owning a service on the bus
+
+ - RemoteService object constructor gains an extra parameter
+   for the owner of the service at the time it was aquired to
+   deal with issues where a service is replaced.
+
+ - Cache RemoteService objects to avoid creating multiple
+   instances for the same service name.
+
+ - Fix caching of objects by the service to avoid caching
+   objects cast to a specific interface
+
+ - Make add_signal_receiver method on Net::DBus private
+
+ - Use introspection data for hinting only, not absolute truth
+   since Python bindings don't provide complete data.
+
+ - Adding correct handling for (de)marshalling variant data
+   type to fix interaction with python bindings
+
+ - Added magic 'caller' and 'serial' data types for requesting
+   that data about method caller be passed into a method
+
+ - Lots more POD documentation
+
+ - Added 'lshal.pl' demo script for listing HAL devices
+
+ - Made example scripts interoperate correctly with example
+   scripts from Python & GLib bindings
+
+0.32.1 2005-09-29
+
+ - The order of 'service_name' and 'bus' parameter to the
+   Net::DBus::Service constructor is reversed to match
+   that of Net::DBus::RemoteService
+
+ - The order of 'service' and 'object_path' parameter to the
+   Net::DBus::Object constructor is reversed to match
+   that of Net::DBus::RemoteObject
+
+ - No longer neccessary to construct an explicit Net::DBus::Service
+   object - one is constructed & returned by the 'export_service'
+   method on Net::DBus
+
+ - The 'find' method on Net::DBus will search for & attach to
+   a suitable bus, so no longer neccessary to hard code either
+   system or session bus
+
+ - Introspection data is no longer provided via the
+   Net::DBus::Object constructor. Consult the manual pages
+   for Net::DBus::OBject and Net::DBus::Exporter for details
+   of new approach to defining introspection data.
+
+ - The Net::DBus::Introspector class is no longer for public
+   use.
+
+ - The Net::DBus::Dumper class can be used to display a dump
+   of an object's exported API cf examples/dump-object.pl
+
+ - Signal handler callbacks now get the actual signal params
+   passed in, rather than low level bind info
+
+ - The Net::DBus objects are automatically registered with
+   the default reactor mainloop, unless 'nomainloop => 1'
+   is passed into constructor

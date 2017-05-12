@@ -1,0 +1,7 @@
+Revision history for Perl extension NgxQueue
+
+0.02 2013-03-13T16:40:00+09:00
+     - Added PP implementation (Songmu)
+
+0.01 2013-03-13T11:25:18+09:00
+     - initial version

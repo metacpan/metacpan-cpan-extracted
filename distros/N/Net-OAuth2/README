@@ -1,0 +1,25 @@
+=== README for Net-OAuth2 version 0.62
+=   Generated on Wed Nov 11 12:29:45 2015 by OODoc 2.02
+
+There are various ways to install this module:
+
+ (1) if you have a command-line, you can do:
+       perl -MCPAN -e 'install <any package from this distribution>'
+
+ (2) if you use Windows, have a look at http://ppm.activestate.com/
+
+ (3) if you have downloaded this module manually (as root/administrator)
+       gzip -d Net-OAuth2-0.62.tar.gz
+       tar -xf Net-OAuth2-0.62.tar
+       cd Net-OAuth2-0.62
+       perl Makefile.PL
+       make          # optional
+       make test     # optional
+       make install
+
+For usage, see the included manual-pages or
+    http://search.cpan.org/dist/Net-OAuth2-0.62/
+
+Please report problems to
+    http://rt.cpan.org/Dist/Display.html?Queue=Net-OAuth2
+

@@ -1,0 +1,27 @@
+---
+abstract: 'Access isohunt.com from Perl'
+author:
+  - 'Alan Haggai Alavi <alanhaggai@alanhaggai.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.31
+  Module::Build: 0.3601
+  Test::More: 0.94
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-isoHunt
+requires:
+  JSON: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  URI: 0
+resources:
+  repository: git://github.com/alanhaggai/Net-isoHunt.git
+version: 0.102770

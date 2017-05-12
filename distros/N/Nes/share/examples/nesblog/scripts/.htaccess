@@ -1,0 +1,18 @@
+
+Options +ExecCGI 
+AddHandler cgi-script .cgi .pl
+ 
+<FilesMatch \.(nsql|nes.cfg)$>
+  order deny,allow
+  deny from all
+</FilesMatch>
+
+
+
+
+  
+
+
+
+
+  

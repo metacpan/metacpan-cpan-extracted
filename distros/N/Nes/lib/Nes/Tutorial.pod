@@ -1,0 +1,680 @@
+
+=head1 NAME
+
+Nes::Tutorial - Step by Step Nes Tutorial.
+
+=head1 Install Nes
+
+See: README file
+
+=head1 Create Work Space for Tutorial
+
+We assume you already have installed and enabled Nes for cgi-bin.
+
+According to its distribution its web root directory could be in 
+/var/www/html, /var/www/htdocs, etc.
+
+For this tutorial we will assume that your web root directory is
+/var/www, change it throughout the tutorial if needed.
+
+Create a working directory on your web root directory with the 
+name nes_tutorial
+
+    mkdir /var/www/nes_tutorial
+
+The next step is to set this directory to make it possible executing 
+Nes templates, is done with the shell command:
+
+    set_nes_site
+
+Configured:
+
+    set_nes_site --dir_cfg=/var/www/nes_tutorial
+
+With this we have created a file .htaccess with the configuration
+because Nes templates can execute in this directory.
+
+The .nes.cfg file serve to configure Nes and also for your own
+Perl script or application. There is a value that needs to be changed,
+otherwise Nes release a warning:
+
+    private_key
+
+It is a password used to encrypt data such as cookies, so it is very 
+important to give a value to private_key.
+
+Create a file in /var/www/nes_tutorial with the name .nes.cfg, with the
+following content.
+
+/var/www/nes_tutorial/.nes.cfg:
+
+    private_key      = ChangeIt
+    nes_tutorial_var = test variable
+
+Change 'changeit' with the password you want. And with this 
+nes_tutorial is ready to work.
+
+=head1 Create first Nes Template
+
+Nes templates have the extension .nhtml, any file with this extension, 
+in nes_tutorial directory, will be treated as a Nes template.
+
+Create a file named 'nes_01.nhtml' in 'nes_tutorial' with following 
+contents:
+
+    <html>
+      <head>
+        <title>Nes Tutorial</title>
+      </head>
+      <body>
+      <b>Hello Nes Tutorial</b>
+      </body>
+    </html>
+
+To show it works:
+
+    http://yousite/nes_tutorial/nes_01.nhtml
+
+* Change 'yousite' with your domain or 'localhost'
+
+'nes_01.nhtml' has no special feature, is only HTML. To include dynamic
+content, must tell Nes to run a script for this template.
+
+We therefore need a Perl script. Creates a file named 'script_02.pl' 
+in 'nes_tutorial' with the following contents:
+
+    #!/usr/bin/perl
+
+    use Nes;
+    my $nes = Nes::Singleton->new();
+
+    $nes->out();
+
+    1; 
+
+It is very important that Nes scripts returns 1, or displays an error. 
+Another feature is that you do not need permission of execution to run
+the script, unless you want run the script and not the template.
+
+Now we tell the template that our script is 'script_02.pl' with
+the Tag '{: NES 1.0 ( 'script_02.pl' ) :}'
+
+Therefore we create a new template with the name 'nes_02.nhtml' and
+the following contents:
+
+    {: NES 1.0 ( 'script_02.pl' ) :}
+    <html>
+      <head>
+        <title>Nes Tutorial</title>
+      </head>
+      <body>
+      <b>Hello Nes Tutorial</b>
+      </body>
+    </html>
+
+When we do:
+
+    http://yousite/nes_tutorial/nes_02.nhtml
+
+Nes load and run script_02.pl
+
+But our template continues without doing anything special, we will create
+another script with the name 'script_03.pl' with the following contents:
+
+    #!/usr/bin/perl
+
+    use Nes;
+    my $nes = Nes::Singleton->new();
+
+    my %tags;
+    $tags{'var_hello'} = 'Hello Nes Tutorial';
+
+    $nes->out(%tags);
+
+    1;
+
+And a new template with the name 'nes_03.nhtml' with the following 
+content:
+
+    {: NES 1.0 ( 'script_03.pl' ) :}
+    <html>
+      <head>
+        <title>Nes Tutorial</title>
+      </head>
+      <body>
+      <b>{: $ var_hello :}</b>
+      </body>
+    </html>
+
+To show it works:
+
+    http://yousite/nes_tutorial/nes_03.nhtml
+
+In 'script_03.pl' we have defined the hash variable '%tags', with the 
+name of variable for the template 'var_hello' and value 
+'Hello Nes Tutorial'. So when we included the Tag '{: $ var_hello :}' 
+this has been replaced by the value 'Hello Nes Tutorial'
+
+=head1 Includes and Object
+
+The objects are a fundamental feature of Nes. With them we avoid 
+rewrite the same code, even create Web applications without writing 
+anything or very little Perl code.
+
+Let's create an Nes Object. Create a file in 'nes_tutorial' with 
+the name 'lucky_01.nhtml' and the following content:
+
+    {: NES 1.0 ( 'lucky_01.pl' ) :}
+    <html>
+      <head>
+        <title>Lucky</title>
+      </head>
+      <body>
+        The lucky number is: <b>{: $ number :}</b>
+      </body>
+    </html>
+
+And a script named 'lucky_01.pl' and the following content:
+
+    #!/usr/bin/perl
+
+    use Nes;
+    my $nes = Nes::Singleton->new();
+
+    my %nes_tags;
+    $nes_tags{'number'} = int(rand(10));
+
+    $nes->out(%nes_tags);
+
+    1;
+
+To show it works:
+
+    http://yousite/nes_tutorial/lucky_01.nhtml
+
+But this is nothing more than a template. We create an object so 
+that every time we want a 'lucky number' in a Web not have to 
+rewrite everything.
+
+We created a template with the name 'lucky_02.nhtml' and the 
+following content:
+
+    {: NES 1.0 ( 'lucky_01.pl' ) :}
+    {: $ number :}
+
+To show it works create a template with the name 'lucky_test.nhtml' 
+and the following content:
+
+    {: NES 1.0 none :}
+    <html>
+      <head>
+        <title>Lucky</title>
+      </head>
+      <body>
+        The lucky number is: <b>{: include ('lucky_02.nhtml') :}</b>
+      </body>
+    </html>
+
+To show it works:
+
+    http://yousite/nes_tutorial/lucky_test.nhtml
+
+Also this works:
+
+    http://yousite/nes_tutorial/lucky_02.nhtml
+
+From that moment every time we want a 'lucky number' only we must 
+included in our templates '{: include ( 'lucky_02.nhtml' ) :}'
+
+The first line of the template 'lucky_test.nhtml' is {: NES 1.0 none :}
+means we have no Perl script to this template, but we want 
+to use the Nes Tags.
+
+But this is just a 'include' like any other, not Object might call, 
+if not support parameters.
+
+Let's create our final Object with the name 'lucky.nhtml'
+and the following content:
+
+    {: NES 1.0 ( 'lucky.pl' ) :}
+    {: # 
+
+        lucky.nhtml
+
+        Description:
+           Shows a random number between min and max.
+
+        Usage:
+            {: include ( 'lucky.nhtml',
+                          min,    {: # optional, default 0 :}
+                          max     {: # optional, defautl 9 :}
+                       )
+            :}
+
+        Example, random number between 1 and 5: 
+
+            {: include ( 'lucky.nhtml',1,5 ) :}
+
+    :}
+    {: $ number :}
+
+We've added a comment documenting their use.
+
+And now the Perl script named 'lucky.pl' and content:
+
+    #!/usr/bin/perl
+
+    use Nes;
+    my $nes = Nes::Singleton->new('lucky.nhtml');
+    my $q   = $nes->{'query'}->{'q'};
+    my $min = $q->{'lucky_param_1'} || 0;
+    my $max = $q->{'lucky_param_2'} || 9;
+
+    my %nes_tags;
+    $nes_tags{'number'} = $min + int(rand($max+1-$min));
+
+    $nes->out(%nes_tags);
+
+    1;
+
+With $nes->{'query'} we get the query object, $nes->{'query'}->{'q'} is 
+equivalent to do:
+
+    my $q = CGI->new;
+
+In addition to GET or POST with Nes::Singleton->{'query'} we pick 
+parameters of objects in the following format:
+
+    objectname_param_number
+
+For our example the name of the object is lucky.nhtml, the extension 
+is ignored, then the first parameter:
+
+    Nes::Singleton->{'query'}->{'q'}{'lucky_param_1'}
+
+Now create a template to include and prove lucky, with the name 
+'template.nhtml' and the following content:
+
+    {: NES 1.0 none :}
+    <html>
+      <head>
+        <title>Template</title>
+      </head>
+      <body>
+        The lucky number is: <b>{: include ('lucky.nhtml',10,20 ) :}</b>
+      </body>
+    </html>
+
+To show it works:
+
+    http://yousite/nes_tutorial/template.nhtml
+
+You can include lucky object in any Nes template, since he accepts 
+parameters, you will not need modification.
+
+In this example it is just a random number, but we can do object, from 
+modules from CPAN, JavaScript, forms, Ajax, etc. and once created 
+the object you can simply:
+
+    {: include ( object, [parameter] ) :}
+
+=head1 Nes Environment Variables
+
+Now let's create a template to see the operation of Nes Environment 
+Variables.
+
+Create a file named 'nes_05.nhtml' in 'nes_tutorial' with following 
+contents:
+
+    {: NES 1.0 none :}
+    <html>
+      <head>
+        <title>Nes Tutorial</title>
+      </head>
+      <body>
+      <pre>
+      Nes Version     : {: * nes_ver :}
+      This Template   : {: * nes_this_file :}
+      var in .nes.cfg : {: * cfg_nes_tutorial_var :} 
+      HTTP_HOST       : {: * env_HTTP_HOST :}
+      QUERY_STRING    : {: * env_QUERY_STRING :}
+      name in GET     : {: * q_name :}
+      </pre>
+      </body>
+    </html>
+
+To show it works:
+
+    http://yousite/nes_tutorial/nes_05.nhtml?name=value
+
+=head1 Conditional Replacement
+
+We can use expressions to the replacement condicial.
+
+Create a file named 'nes_06.nhtml' in 'nes_tutorial' with following 
+contents:
+
+    {: NES 1.0 none :}
+    <html>
+      <head>
+        <title>Nes Tutorial</title>
+      </head>
+      <body>
+      {: ~ ( * q_var eq 'Hello' ) <b>Hello Tutorial</b> :}
+      {: ~ ( * q_var == 1 )       <b>var is 1</b> :}
+      {: ~ ( * q_var =~ /^N/ )    <b>{: * q_var :} begins with N</b> :}
+      {: ~ ( * q_var =~ /lucky/ )
+          {: include ('lucky.nhtml',1,10 ) :}
+      :}
+      </body>
+    </html>
+
+To show it works:
+
+    http://yousite/nes_tutorial/nes_06.nhtml?var=Nes
+    http://yousite/nes_tutorial/nes_06.nhtml?var=Hello
+    http://yousite/nes_tutorial/nes_06.nhtml?var=1
+    http://yousite/nes_tutorial/nes_06.nhtml?var=lucky
+
+=head1 Data Tables
+
+We can show the data tables.
+
+Create a file named 'nes_07.nhtml' in 'nes_tutorial' with following 
+contents:
+
+    {: NES 1.0 ( 'script_07.pl' ) :}
+    <html>
+      <head>
+        <title>Nes Tutorial</title>
+      </head>
+      <body>
+        <table border="1">
+        {: @ users
+          <tr>
+            <td> {: @$ users.name  :} </td>
+            <td> {: @$ users.email :} </td>
+          </tr>
+        :}
+        </table>
+      </body>
+    </html>
+
+And create a file named 'script_07.pl' in 'nes_tutorial' with following 
+contents:
+
+    use Nes;
+    my $nes = Nes::Singleton->new();
+
+    my %tags;
+    my $table = [ 
+                    { 
+                      name   => 'One',
+                      email  => 'one@example.com',
+                    },
+                    { 
+                      name   => 'Two',
+                      email  => 'two@example.com',
+                    },
+                    { 
+                      name   => 'Three',
+                      email  => 'three@example.com',
+                    }                                    
+                ];
+
+    $tags{'users'} = $table;
+
+    $nes->out(%tags);
+
+    1; 
+
+To show it works:
+
+    http://yousite/nes_tutorial/nes_07.nhtml
+
+=head1 Plugins
+
+You can add functionality using plugins to Nes, you can create your own 
+or use by third parties. 
+
+Here we see how to use plugins.
+
+The plugin can be executed before or after your script, depending on 
+the requirements of the plugin.
+
+Create a file named 'nes_08.nhtml' in 'nes_tutorial' with following 
+contents:
+
+    {: NES 1.0 ( 'none', '{: * cfg_plugin_top_dir :}/filter_demo.pl' ) :}
+    <html>
+      <head>
+        <title>Nes Tutorial</title>
+      </head>
+      <body>
+        Nes blink
+      </body>
+    </html>
+
+To show it works:
+
+    http://yousite/nes_tutorial/nes_08.nhtml
+
+This plugin is a filter demonstration, simply replace the word 'Nes' 
+for '<blink>Nes</blink>'
+
+As it is a filter should be the end, as our template does not require 
+script we put 'none'.
+
+=head1 Forms
+
+Create a file named 'nes_09.nhtml' in 'nes_tutorial' with following 
+contents:
+
+    {: NES 1.0 none :}
+    <html>
+      <head>
+        <title>Nes Tutorial</title>
+      </head>
+      <body>
+        <form method="POST" name="test0" action="">
+            <table  border="0">
+              <tr>
+                <td align="right">
+                User:
+                </td>
+                <td align="left">
+                <input name="user" type="text"  
+                size="12" value="{: * q_user :}"/>
+                </td>
+              </tr>
+              <tr>
+                <td align="right">
+                Password:
+                </td>
+                <td align="left">
+                <input name="password" type="password"  
+                size="12" value="{: * q_password :}"/>
+                </td>
+              </tr>        
+            </table>
+            <input name="send" type="submit" value="Send" />
+        </form> 
+      </body>
+    </html>
+
+To show it works:
+
+    http://yousite/nes_tutorial/nes_09.nhtml
+
+The form recalls the value of the fields, because we have put field 
+value in  "value" 'value="{: * q_user :}"'
+
+We will now add a captcha to the form.
+
+Create a file named 'nes_10.nhtml' in 'nes_tutorial' with following 
+contents: (this is big, copy/paste :-) no problem)
+
+    {: NES 1.0 ('{: * cfg_plugin_top_dir :}/captcha.pl','none') :}
+    <html>
+      <head>
+        <meta http-equiv="content-type" 
+        content="text/html;charset=utf-8" />
+        <title>Nes Tutorial</title>
+      </head>
+      <body>
+      <form method="POST" name="test1" action="">
+        {: # captcha parameters:
+            name,type,digits,noise,size,sig,spc,expire,attempts 
+        :}
+        {: & captcha (test1,ascii,4,2,2,,,3m,5/1) 
+         <table width="100%" border="0">
+          <tr>
+            <td align="right">User:</td>
+            <td width="20%">
+            <input name="user" type="text"  
+            size="12" value="{: * q_user :}"/>
+            </td>
+            <td width="60%" rowspan="3">
+    <pre>
+    nes_captcha_plugin_test1_error_last : {: * nes_captcha_plugin_test1_error_last :} 
+    nes_captcha_plugin_test1_error_fatal: {: * nes_captcha_plugin_test1_error_fatal :} 
+    nes_captcha_plugin_test1_attempts   : {: * nes_captcha_plugin_test1_attempts :}
+    nes_captcha_plugin_test1_is_ok      : {: * nes_captcha_plugin_test1_is_ok :}
+    </pre>        
+            </td>
+          </tr>
+          <tr>
+            <td align="right">Password:</td>
+            <td width="20%">
+            <input name="password" type="password"  
+            size="12" value="{: * q_password :}"/>        
+            </td>
+          </tr>
+          <tr>
+            <td align="right">{: & captcha_code :}</td>
+            <td width="20%">
+            Security code:<br>
+            <input type="text" name="test1" size="8" /> 
+            {: ~ *nes_captcha_plugin_test1_error_fatal 
+               <blink>&#10038;</blink> <br> 
+               <small>Incorrect code</small>
+            :}        
+            </td>
+          </tr>
+          <tr>
+            <td align="right"></td>
+            <td width="20%">
+            <input name="send" type="submit" value="Send" />        
+            </td>
+          </tr>      
+         </table>
+        :}
+      </form> 
+      </body>
+    </html>
+
+To show it works:
+
+    http://yousite/nes_tutorial/nes_10.nhtml
+
+The Captcha Plugin required to be loaded before the script, 
+that we've put before 'none'.
+
+Captcha is a type 'ascii', to prevent some characters deform the 
+captcha, we have 'meta' 'charset = utf-8'.
+
+The captcha define some environment variables 'nes_captcha_plugin *',
+we've posted to the right, so you can check its value.
+
+We have put a comment with the parameters of the captcha, you can try 
+to change them and see the result.
+
+The meaning of the parameters:
+
+    name    : should be like the 'input' to the value of the Captcha
+    type    : ascii
+    digits  : digit number that shows the captcha
+    noise   : noise level 0-9
+    size    : font size
+    sig     : foreground caracter
+    spc     : background caracter
+    expire  : expire time
+    attempts: max attempts/time, 5/1 is 5 attempts in 1 minute
+
+Where we want to show the captcha '{: & captcha_code :}'
+
+Keep in mind that the variables 'nes_captcha_plugin *' have a 
+block scope:
+
+    {: * nes_captcha_plugin_test1_is_ok :}     <- ERROR, no value here
+    {: & captcha (test1)
+        ...
+        {: * nes_captcha_plugin_test1_is_ok :} <- Ok
+    :}
+
+Since Perl, can verify Captcha:
+
+    use Nes;
+    my $captcha = nes_plugin->get( 'captcha_plugin', 'test1' );
+    if ( $captcha->{'is_ok'} ) {
+    ...
+
+* nes_plugin is obsolete since version 1.03, the new plugin API
+is 'register' see: L<Nes::Plugin::API>
+
+=head1 Install Tutorial
+
+You can install this tutorial with the following command:
+
+    set_nes_site --from_exam=tutorial --to_exam=/full-path-to/root-www/Tutorial
+
+* Change /full-path-to... for you particular path
+
+=head1 AUTHOR
+
+Skriptke: Enrique F. Castanon
+
+=head1 VERSION
+
+Version 1.03 April 2010
+
+=head1 COPYRIGHT
+
+Copyright (c) Enrique F. Castanon Barbero. All rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms and conditions as
+GNU Public License (GPL).
+
+This means that you can, at your option, redistribute it and/or 
+modify it under either the terms the GNU Public License (GPL), 
+or under the Perl Artistic License.
+
+See http://dev.perl.org/licenses/
+
+=head1 DISCLAIMER
+
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE.
+
+Use of this software in any way or in any form, source or binary,
+is not allowed in any country which prohibits disclaimers of any
+implied warranties of merchantability or fitness for a particular
+purpose or any disclaimers of a similar nature.
+
+IN NO EVENT SHALL I BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL,  OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE
+USE OF THIS SOFTWARE AND ITS DOCUMENTATION (INCLUDING, BUT NOT
+LIMITED TO, LOST PROFITS) EVEN IF I HAVE BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE
+
+=head1 SEE ALSO
+
+L<Nes>, L<Nes::Singleton>, L<Nes::nes.cfg>, 
+Sample to use Nes; L<http://nes.sourceforge.net/>
+
+=cut

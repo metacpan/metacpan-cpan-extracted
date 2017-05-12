@@ -1,0 +1,447 @@
+Net-Azure-StorageClient version 0.5
+====================================
+
+Net-Azure-StorageClient is Windows Azure Storage Client.
+Net-Azure-StorageClient-Blob is Interface to Windows Azure Blob Service.
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+ABOUT Net::Azure::StorageClient
+
+  SYNOPSIS
+
+    my $StorageClient = Net::Azure::StorageClient->new(
+                                      type => 'Blob',
+                                      account_name => $you_account_name,
+                                      primary_access_key => $your_primary_access_key,
+                                      [ protocol => 'https', ]
+                                      [ api_version => '2012-02-12', ] );
+
+  METHODS
+
+    sign
+
+      Specifying the authorization header to HTTP::Request object.
+      http://msdn.microsoft.com/en-us/library/dd179428.aspx
+
+          my $req = new HTTP::Request( 'GET', $url );
+          $req = $StorageClient->sign( $req, $params );
+
+    request
+
+      Specifying the authorization header and send request.
+
+          # Specifying $url or $path, Send GET request.
+
+          my $api = '/path/to/api?foo=bar';
+          my $type = $blobService->{ type }; # 'blob'
+          my $account = $blobService->{ account_name };
+          my $protocol = $blobService->{ protocol };
+          my $url = "${protocol}://${account}.${type}.core.windows.net/${api}";
+          my $res = $StorageClient->request( 'GET', $url );
+
+          # Request with custom http headers and request body. Send POST request.
+          my $params = { 
+                         headers => { 'x-ms-foo' => 'bar', },
+                         body => $request_body,
+                       };
+          my $res = $StorageClient->request( 'PUT', $url, $params );
+
+          # return HTTP::Response object.
+
+    get
+
+      Specifying the authorization header and send 'GET' request.
+
+    put
+
+      Specifying the authorization header and send 'PUT' request.
+
+    head
+
+      Specifying the authorization header and send 'HEAD' request.
+
+    delete
+
+      Specifying the authorization header and send 'DELETE' request.
+
+    post
+
+      Specifying the authorization header and send 'POST' request.
+
+
+ABOUT Net::Azure::StorageClient::Blob
+
+  SYNOPSIS
+
+    my $blobService = Net::Azure::StorageClient::Blob->new(
+                                      account_name => $you_account_name,
+                                      primary_access_key => $your_primary_access_key,
+                                      [ container_name => $container_name, ]
+                                      [ protocol => 'https', ] );
+    my $path = 'path/to/blob';
+    my $res = $blobService->get_blob( $path );
+
+    # Request with custom http headers and query.
+    my $params = { headers => { 'x-ms-foo' => 'bar' },
+                   options => 'timeout=90' };
+    my $res = $blobService->set_metadata( $path, $params );
+
+    # return HTTP::Response object(s)
+
+    Operation on the Account(Blob Service)
+
+      list_containers
+
+        The List Containers operation returns a list of the containers under the
+        specified account.
+        http://msdn.microsoft.com/en-us/library/windowsazure/dd179352.aspx
+
+        my $res = $blobService->list_containers( $params );
+
+      set_blob_service_properties
+
+        The Set Blob Service Properties operation sets the properties of a
+        storage account's Blob service, including Windows Azure Storage
+        Analytics. You can also use this operation to set the default request
+        version for all incoming requests that do not have a version specified.
+        http://msdn.microsoft.com/en-us/library/windowsazure/hh452235.aspx
+
+        my $params = { StorageServicePropertie => { Logging => { Read => 'true' }, ... } };
+        my $res = $blobService->set_blob_service_properties( $params );
+
+      get_blob_service_properties
+
+        The Get Blob Service Properties operation gets the properties of a
+        storage account's Blob service, including Windows Azure Storage
+        Analytics.
+        http://msdn.microsoft.com/en-us/library/windowsazure/hh452239.aspx
+
+        my $res = $blobService->get_blob_service_properties( $params );
+
+    Operation on Containers
+
+      create_container
+
+        The Create Container operation creates a new container under the
+        specified account. If the container with the same name already exists,
+        the operation fails.
+        http://msdn.microsoft.com/en-us/library/windowsazure/dd179468.aspx
+
+        my $res = $blobService->create_container( $container_name );
+
+        # Create container and set container's permission.
+        my $params = { public_access => 'blob' }; # or container
+        my $res = $blobService->create_container( $container_name, $params );
+
+      get_container_properties
+
+        The Get Container Properties operation returns all user-defined metadata
+        and system properties for the specified container. The data returned
+        does not include the container's list of blobs.
+        http://msdn.microsoft.com/en-us/library/windowsazure/dd179370.aspx
+
+        my $res = $blobService->get_container_properties( $container_name );
+
+      get_container_metadata
+
+        The Get Container Metadata operation returns all user-defined metadata
+        for the container.
+        http://msdn.microsoft.com/en-us/library/windowsazure/ee691976.aspx
+
+        my $res = $blobService->get_container_metadata( $container_name );
+
+      set_container_metadata
+
+        The Set Container Metadata operation sets one or more user-defined
+        name-value pairs for the specified container.
+        http://msdn.microsoft.com/en-us/library/windowsazure/dd179362.aspx
+
+        my $res = $blobService->set_container_metadata( $container_name, { metadata => { 'foo' => 'bar' } } );
+        # x-ms-meta-foo: bar
+
+      get_container_acl
+
+        The Get Container ACL operation gets the permissions for the specified
+        container. The permissions indicate whether container data may be
+        accessed publicly.
+        http://msdn.microsoft.com/en-us/library/windowsazure/dd179469.aspx
+
+        my $res = $blobService->get_container_acl( $container_name );
+
+      set_container_acl
+
+        The Set Container ACL operation sets the permissions for the specified
+        container. The permissions indicate whether blobs in a container may be
+        accessed publicly.
+        http://msdn.microsoft.com/en-us/library/windowsazure/dd179391.aspx
+
+        my $res = $blobService->set_container_acl( $container_name, { public_access => 'blob' } );
+                                                                                   # or container
+
+      delete_container
+
+        The Delete Container operation marks the specified container for
+        deletion. The container and any blobs contained within it are later
+        deleted during garbage collection.
+        http://msdn.microsoft.com/en-us/library/windowsazure/dd179408.aspx
+
+        my $res = $blobService->delete_container( $container_name );
+
+      lease_container
+
+        The Lease Container operation establishes and manages a lock on a
+        container for delete operations. The lock duration can be 15 to 60
+        seconds, or can be infinite.
+        http://msdn.microsoft.com/en-us/library/windowsazure/jj159103.aspx
+
+        my $params = { lease_parameters => { 'lease-action' => 'acquire', ... } };
+        my $res = $blobService->lease_container( $container_name, $params );
+
+      list_blobs
+
+        The List Blobs operation enumerates the list of blobs under the
+        specified container.
+        http://msdn.microsoft.com/en-us/library/windowsazure/dd135734.aspx
+
+        my $res = $blobService->list_blobs( $container_name );
+
+      download_container
+
+        Download all blobs of container to local directory.
+
+        my $res = $blobService->list_blobs( $container_name, $dirname );
+
+        # Download updated blobs only.
+        my $perms = { conditional => 1 };
+        my $res = $blobService->list_blobs( $container_name, $dirname, $perms );
+
+        # Download updated blobs and delete deleted files of local directory.
+        my $perms = { conditional => 1, sync => 1 };
+        my $res = $blobService->list_blobs( $container_name, $dirname, $perms );
+
+    Operation on Blobs
+
+      put_blob
+
+        The Put Blob operation creates a new block blob or page blob, or updates
+        the content of an existing block blob.
+        http://msdn.microsoft.com/en-us/library/windowsazure/dd179451.aspx
+
+        my $res = $blobService->put_blob( $path, $data );
+
+        # Upload local file to blob.
+        my $params = { filename => '/path/to/filename' };
+        my $res = $blobService->put_blob( $path, $params );
+
+      get_blob
+
+        The Get Blob operation reads or downloads a blob from the system,
+        including its metadata and properties. You can also call Get Blob to
+        read a snapshot.
+        http://msdn.microsoft.com/en-us/library/windowsazure/dd179440.aspx
+
+        my $res = $blobService->get_blob( $path );
+
+        # Download blob to local file.
+        my $params = { filename => '/path/to/filename' };
+        my $res = $blobService->get_blob( $path, $params );
+
+      get_blob_properties
+
+        The Get Blob Properties operation returns all user-defined metadata,
+        standard HTTP properties, and system properties for the blob. It does
+        not return the content of the blob.
+        http://msdn.microsoft.com/en-us/library/windowsazure/dd179394.aspx
+
+        my $res = $blobService->get_blob_properties( $path );
+
+      set_blob_properties
+
+        The Set Blob Properties operation sets system properties on the blob.
+        http://msdn.microsoft.com/en-us/library/windowsazure/ee691966.aspx
+
+        my $params = { properties => { 'content-length' => 1024, ... } };
+        my $res = $blobService->set_blob_properties( $path, $params );
+
+      get_blob_metadata
+
+        The Get Blob Metadata operation returns all user-defined metadata for
+        the specified blob
+        http://msdn.microsoft.com/en-us/library/windowsazure/dd179350.aspx
+
+        my $res = $blobService->get_metadata( $path );
+
+      set_blob_metadata
+
+        The Set Blob Metadata operation sets user-defined metadata for the
+        specified blob as one or more name-value pairs.
+        http://msdn.microsoft.com/en-us/library/windowsazure/dd179414.aspx
+
+        # Set x-ms-meta-category and x-ms-meta-author metadata.
+        my $params = { metadata => { category => 'image'
+                                     author => $author_name } };
+        my $res = $blobService->set_blob_metadata( $path, $params );
+
+      lease_blob
+
+        The Lease Blob operation establishes and manages a lock on a blob for
+        write and delete operations.
+        http://msdn.microsoft.com/en-us/library/windowsazure/ee691972.aspx
+
+        my $params = { lease_parameters => { 'lease-action' => 'acquire', ... } };
+        my $res = $blobService->lease_blob( $path, $params );
+
+      snapshot_blob
+
+        The Snapshot Blob operation creates a read-only snapshot of a blob.
+        http://msdn.microsoft.com/en-us/library/windowsazure/ee691971.aspx
+
+        my $res = $blobService->snapshot_blob( $path );
+
+      copy_blob
+
+        The Copy Blob operation copies a blob to a destination within the
+        storage account.
+        http://msdn.microsoft.com/en-us/library/windowsazure/dd894037.aspx
+
+        my $res = $blobService->copy_blob( $source_blob, $new_blob );
+
+      abort_copy_blob
+
+        The Abort Copy Blob operation aborts a pending Copy Blob operation, and
+        leaves a destination blob with zero length and full metadata.
+        http://msdn.microsoft.com/en-us/library/windowsazure/jj159098.aspx
+
+        my $params = { copyid => $copyid };
+        my $res = $blobService->abort_copy_blob( $path, $params );
+
+      delete_blob
+
+        The Delete Blob operation marks the specified blob or snapshot for
+        deletion. The blob is later deleted during garbage collection. Note that
+        in order to delete a blob, you must delete all of its snapshots. You can
+        delete both at the same time with the Delete Blob operation.
+        http://msdn.microsoft.com/en-us/library/windowsazure/dd179413.aspx
+
+        my $res = $blobService->delete_blob( $path );
+
+      rename_blob
+
+        Copy blob and delete copy source blob.
+        http://msdn.microsoft.com/en-us/library/windowsazure/dd894037.aspx
+        http://msdn.microsoft.com/en-us/library/windowsazure/dd179413.aspx
+        my $res = $blobService->rename_blob( $source_blob, $new_blob );
+
+    Operation on Block Blobs
+
+      put_block
+
+        The Put Block operation creates a new block to be committed as part of a
+        blob. http://msdn.microsoft.com/en-us/library/windowsazure/dd135726.aspx
+
+        my $params = { options => "blockid=${blockid}" };
+        my $res = $blobService->put_block( $path, $params );
+
+      put_block_list
+
+        The Put Block List operation writes a blob by specifying the list of
+        block IDs that make up the blob. In order to be written as part of a
+        blob, a block must have been successfully written to the server in a
+        prior Put Block (REST API) operation.
+        http://msdn.microsoft.com/en-us/library/windowsazure/dd179467.aspx
+
+        my $params = { BlockList => { Latest => 'foo' } };
+        my $res = $blobService->put_block_list( $path, $params );
+
+      get_block_list
+
+        The Get Block List operation retrieves the list of blocks that have been
+        uploaded as part of a block blob.
+        http://msdn.microsoft.com/en-us/library/windowsazure/dd179400.aspx
+
+        my $res = $blobService->get_block_list( $path, $params );
+
+    Operation on Page Blobs
+
+      put_page
+
+        The Put Page operation writes a range of pages to a page blob.
+        http://msdn.microsoft.com/en-us/library/windowsazure/ee691975.aspx
+
+        my $params = { 'page-write' => 'update', 'range' => 'bytes=0-65535' };
+        my $res = $blobService->put_page( $path, $params );
+
+      get_page_ranges
+
+        The Get Page Ranges operation returns the list of valid page ranges for
+        a page blob or snapshot of a page blob.
+        http://msdn.microsoft.com/en-us/library/windowsazure/ee691973.aspx
+
+        my $res = $blobService->get_page_ranges( $path );
+
+    Other Operations
+
+      download
+
+        Download a blob(or directory or container) and save to local file(s).
+
+        my $res = $blobService->download( $path, $filename );
+
+        # Download files of directory(Updated files only).
+        my $perms = { conditional => 1 };
+        my $res = $blobService->download( $path, $directory, $perms );
+
+        # Download files of directory(updated files only) and delete deleted files.
+        my $perms = { conditional => 1, sync => 1 };
+        my $res = $blobService->download( $path, $directory, $perms );
+
+        # Using multi-thread.
+        my $params = { conditional => 1, sync => 1, use_thread => n(Count of thread) };
+        my $res = $blobService->download( $path, $directory, $params );
+
+      upload
+
+        Upload blob(s) from local file(s).
+
+        my $res = $blobService->upload( $path, $filename );
+
+        # Upload files of directory(updated files only).
+        my $perms = { conditional => 1 };
+        my $res = $blobService->upload( $path, $directory, $perms );
+
+        # Upload files of directory(updated files only) and delete deleted blobs.
+        my $perms = { conditional => 1, sync => 1 };
+        my $res = $blobService->upload( $path, $directory, $perms );
+
+        # Using multi-thread.
+        my $params = { conditional => 1, sync => 1, use_thread => n(Count of thread) };
+        my $res = $blobService->upload( $path, $directory, $params );
+
+      sync
+
+        Synchronize between the directory of blob storage and the local directory.
+
+        my $params = { direction => 'upload' [, include_invisible => 1 ] };
+        my $res = $blobService->sync( $path, $directory, $params );
+
+        # Using multi-thread.
+        my $params = { direction => 'upload', use_thread => n(Count of thread) };
+        my $res = $blobService->upload( $path, $directory, $params );
+
+AUTHOR
+  Junnama Noda <junnama@alfasado.jp>
+
+COPYRIGHT
+  Copyright (C) 2013, Junnama Noda.
+
+LICENSE
+  This program is free software; you can redistribute it and modify it
+  under the same terms as Perl itself.

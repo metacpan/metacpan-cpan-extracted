@@ -1,0 +1,22 @@
+---
+abstract: 'Flowdock API'
+author:
+  - 'Cory G Watson <gphat@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Flowdock
+requires:
+  Moose: 0
+  Net::HTTP::Spore: 0
+resources:
+  homepage: https://github.com/gphat/net-flowdock
+  repository: https://github.com/gphat/net-flowdock.git
+version: 0.03

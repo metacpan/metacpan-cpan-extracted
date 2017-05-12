@@ -1,0 +1,38 @@
+TODO list for Perl module Net::Server::POP3 and associated modules
+
+These are in roughly the order they need to be done in.
+
+[done] Get basic framework setup
+[done] Implement a simple test server
+[    ] Implement every MUST from RFC 1939.  Check the list twice.
+[done] Implement a real working mail proxy using Mail::POP3Client and Net::Server::POP3
+[    ] Test with several mail clients
+[done] Put Net::Server::POP3 up on CPAN
+[done] Get Net::Server::POP3 in the modules list  (I think this is done.)
+[    ] Solicit help.
+[done] Make servertype work
+[done] Pass the client's IP address to the authenticate callback.
+[    ] Fix that known bug
+[    ] Add a test in t/ that actually tests the module by using Mail::POP3Client.
+[    ] Implement response codes from RFC 2449
+[    ] Implement storage and continual retrieval in the sample proxy
+[    ] Implement as many SHOULDs as possible from RFC 1939
+[    ] Implement as much as possible of RFC 2449
+[    ] Implement filtering stuff in the sample proxy
+[    ] Get wider testing
+[    ] Implement stopserver() and restartserver()
+[    ] Give the sample proxy a control script to stop and restart it.
+[    ] Implement APOP authentication
+[    ] Maybe implement SASL auth?
+[    ] Implement any other extensions that seem useful.
+[    ] Consider the issue of thread safety.
+[    ] Stabilize these modules and put them in maintenance mode, especially Net::Server::POP3
+[    ] Implement Net::Server::IMAP if someone hasn't already done so.
+[    ] Integrate Net::Server::IMAP into the proxy.
+[    ] Work on better filtering/sorting plugins for the proxy.
+[    ] Port it all over to Perl6 when the time comes.
+[    ] Get involved with the design of Perl7.
+[    ] Implement an operating system entirely in pure Perl, complete
+       with filesystem, GUI, standard widgets, window manager, et cetera.
+[    ] Develop an architecture that embeds the Perl engine in hardware.
+[    ] Smack upside the head anyone who reads this far down the list.

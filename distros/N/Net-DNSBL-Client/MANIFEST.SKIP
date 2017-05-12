@@ -1,0 +1,7 @@
+^\.git
+^blib
+^Makefile$
+.*\.bak$
+^pm_to_blib$
+^Net-DNSBL-Client-.*\.tar\.gz$
+.*~$

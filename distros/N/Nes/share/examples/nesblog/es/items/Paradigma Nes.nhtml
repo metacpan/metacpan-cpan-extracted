@@ -1,0 +1,93 @@
+{: NES 0.9 ('none') :}
+{: #
+    ----------------------------------------------------------------------------
+    
+        NES 0.9 beta by - Skriptke
+        Copyright 2009 - 2010 Enrique F. Castañón
+        Licensed under the GNU GPL.
+        http://sourceforge.net/projects/nes/
+        
+        Sample to use Nes;
+        
+    ----------------------------------------------------------------------------
+:}
+<h2><a href="#">Paradigma NES</a></h2>
+<p>
+<h3>Metodolog&iacute;a de programaci&oacute;n en Nes</h3>
+<br>
+Nes es m&aacute;s una metodolog&iacute;a de programaci&oacute;n que un conjunto de funciones a incluir
+ en los script Perl, es m&aacute;s, Nes est&aacute; orientado al c&oacute;digo <i>HTML</i>, por lo que apenas 
+ existen funciones a incluir en los script Perl.
+</p>
+<p>
+La diferencia fundamental de una aplicaci&oacute;n que <i>&ldquo;use Nes;&rdquo;</i> es que en vez 
+ de hacer print &ldquo;&lt;html&gt; lo que sea...&rdquo; definimos una variable en nuestro 
+ script Perl y la mostramos en el <i>HTML</i> mediante el <i>Tag</i> &#123;: $ var :&#125;
+</p>
+<p>
+<h3>Lo que se trata de evitar:</h3>
+<br>
+Que los script Perl env&iacute;en directamente a la salida HTML. 
+<br>
+Que archivos HTML modifiquen los datos del script Perl.
+</p>
+<p>
+<h3>Encapsular objetos</h3>
+<br>
+Nes se ha escrito usando programaci&oacute;n orientada a objetos, esto no significa nada,
+ y tampoco significa que los script que usen Nes deban usar una metodolog&iacute;a de 
+ programaci&oacute;n concreta. Puedes escribir tus script como est&eacute;s acostumbrado y 
+ usar tus m&oacute;dulos Perl como hasta ahora...
+</p>
+<p>
+<h3>...pero la vocaci&oacute;n de Nes es <a href="http://es.wikipedia.org/wiki/Encapsulamiento_%28inform%C3%A1tica%29">encapsular</a> objetos:</h3>
+<br>
+<pre>
+&#123;: <a href="./?action=item&item=Tag include (file)">include</a> menu.html :&#125;
+</pre>
+</p>
+<p>
+El archivo menu.html contendr&iacute;a el script Perl encargado de manejar el men&uacute; y
+ dependiendo del nivel de <a href="http://es.wikipedia.org/wiki/Abstracci%C3%B3n_%28inform%C3%A1tica%29" >abstracci&oacute;n</a> 
+ que tenga este <a href="http://es.wikipedia.org/wiki/Programaci%C3%B3n_orientada_a_objetos">objeto</a> 
+ podr&aacute; servirnos para toda la aplicaci&oacute;n o para todas las aplicaciones que hagamos.
+</p>
+<p>
+Como ejemplo hemos incluido un "<i>objeto</i>" (/nes/obj/date_time.html):
+</p>
+<pre>
+&#123;: include ( '&#123;: * cfg_obj_top_dir :&#125;/date_time.html', 
+             'gmt',                  &#123;: # local o gmt :&#125;
+             '%A %e %B %Y %H:%M:%S'  &#123;: # ( POSIX strftime format date and time ) :&#125;
+           ) 
+:&#125;
+
+<b>Salida:</b> {: include ( '{: * cfg_obj_top_dir :}/date_time.html',
+                            'gmt',
+                            '%A %e %B %Y %H:%M:%S'
+                          )
+:}
+                 
+</pre>
+A partir de &eacute;ste momento, con incluir date_time.html obtendremos la fecha en el
+ formato deseado sin volver a escribir una sola linea de c&oacute;digo Perl.
+</p>
+<p>
+Adem&aacute;s de con <a href="./?action=item&item=Tag include (file)">include</a> podemos llamar a
+ date_time de las siguientes maneras:
+<pre>
+Para su uso con Ajax, por ejemplo:    
+http://example.con/nes/obj/date_time.html?local_gmt=gmt
+http://example.con/nes/obj/date_time.pl?local_gmt=gmt
+
+Linea de comando:
+user@host:~ ./date_time.pl gmt
+</pre>
+</p>
+<p>
+Se pueden crear librerias de objetos, <i>html</i>, <i>ajax</i>, etc. El paradigma
+ Nes facilita la creaci&oacute;n de c&oacute;digo reutilizable, que es uno de sus objetivos fundamentales. 
+</p>
+Ver: <a href="./?action=item&item=Objetos">Objetos Nes</a>
+<br>
+

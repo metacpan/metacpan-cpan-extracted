@@ -1,0 +1,106 @@
+Revision history for Net-OAuth
+
+0.01    Sun, 30 Sep 2007 13:35:06 UTC
+        First version, released on an unsuspecting world.
+
+0.02    Tue, 02 Oct 2007 07:35:17 UTC
+        Added RSA-SHA1 support
+
+0.03    Mon, 15 Oct 2007 01:35:17 UTC
+        Fixed header parsing
+
+0.04    Fri, 19 Oct 2007 16:45:03 UTC
+        Integrated patch from SARTAK, fixing signature for RequestTokenRequest with HMAC-SHA1
+
+0.05    Mon, 19 Nov 2007 03:30:05 UTC
+        Integrated patch from Nobuo Danjou, for Draft 6 spec compliance
+
+0.06    Sat, 08 Mar 2008 00:57:40 UTC
+        Removed live test that stopped working
+
+0.07    Sun, 01 Jun 2008 16:04:26 UTC
+        Added a factory class, Net::OAuth
+        Added several 'Response' classes
+        Added UserAuthRequest and UserAuthResponse
+        Created a Message base class from which Request and Response inherit
+        Added some introductory documentation
+        Added more tests
+        Phew!
+
+0.08   	Mon, 02 Jun 2008 17:41:52 UTC
+  	Fixed test failures found in 0.07.
+        More docs.
+        Added more deserialization methods.
+        Changed factory invocation from message('foo') to message('foo')->new(), to allow
+        deserialization methods to be used instead of new().
+
+0.09    Tue, 03 Jun 2008 03:46:32 UTC
+	Fixed another annoying test failure
+
+0.1     Wed, 04 Jun 2008 16:27:50 UTC
+        Added demo, fixed docs
+
+0.11    Wed, 04 Jun 2008 16:50:14 UTC
+	Doc edits
+                                
+0.12    Fri, 04 Jul 2008 22:58:23 UTC
+	Added support for extensions - Net::OpenMicroBlogging in particular
+
+0.13    Thu, 13 Nov 2008 22:45:46 UTC
+	Added support for Consumer Request (token-less / two-legged) message type
+
+0.14    Sat, 13 Dec 2008 17:29:36 UTC
+	Add POD for consumer requests
+
+0.15    Fri, 05 Jun 2009 00:48:07 UTC
+	Added Twitter demo consumer
+	Warn if message parameter is already UTF-8 that it will be double-encoded; see I18N section of Net::OAuth manpage
+	Better handling of missing 'realm' parameter in Authorization header methods
+	Better handling of request_url parameter; see REQUEST_URL PARAMETER section of Net::OAuth manpage
+	Fixed http://rt.cpan.org/Public/Bug/Display.html?id=44699 - encode spaces to %20 rather than + in $message->to_url()
+
+0.16   Mon, 15 Jun 2009 18:36:17 UTC
+  Added support for OAuth 1.0A - see POD section 'OAUTH 1.0A' for details - Net::OAuth still defaults to 1.0 for now
+
+0.17   Thu, 25 Jun 2009 16:59:50 UTC
+  Fixed https://rt.cpan.org/Public/Bug/Display.html?id=47293 - Message->from_hash was validating using the incorrect class, causing a 'Parameter X not valid for a message of type Y' message on V1.0a messages.  Thanks Jeff Dairiki!
+
+0.18   Thu, 25 Jun 2009 17:18:04 UTC
+  Fixed accidental (though probably harmless) regression in 0.17
+
+0.19   Fri, 26 Jun 2009 17:30:06 UTC
+  Fixed https://rt.cpan.org/Ticket/Display.html?id=47369 - Don't automatically set oauth_version parameter when message is created via from_hash (or from_url, from_post_body, etc).  Thanks COSIMO!
+
+0.20   Fri, 13 Nov 2009 18:56:55 UTC
+  Fixed http://rt.cpan.org/Public/Bug/Display.html?id=48867 - error in synopsis - thanks Adam Taylor!
+  Removed UTF8 double-encoding warning.  Now Net::OAuth::Message::encode() uses Encode::is_utf8() to determine if the input is already UTF-8 encoded.  If so, it runs decode_utf8() on it before sending it to uri_escape_utf8().  Thanks Hector Garcia Alvarez!
+  Potentially fixed an issue found by Marc Mims, where HMAC_SHA1 was failing to load, breaking some CPAN tests.  Build.PL now explicitly requires Digest::SHA1 and Encode.  Hopefully that fixes it.
+
+0.21   Wed, 10 Mar 2010 22:20:49 UTC
+  Added xAuth support with xAuthAccessTokenRequest (thanks Masayoshi Sekimura and Simon Wistow)
+  Added performance patch to decrease stat() system calls when requiring modules (thanks Brad Whitaker)
+
+0.22   Thu, 11 Mar 2010 00:21:26 UTC
+  Renamed xAuthAccessTokenRequest to XauthAccessTokenRequest for CamelCaseConsistency
+  Added a couple tests for XauthAccessTokenRequest
+    
+0.23   Thu, 18 Mar 2010 17:23:36 UTC
+  Removed UNIVERSAL::require dependency
+  Net::OAuth->request constructor now dies if module fails to load (thanks Mike Schleif)
+  Fixed https://rt.cpan.org/Ticket/Display.html?id=55635 Incorrect dependencies (thanks Jens Rehsack)
+  Replaced die() with croak()
+  
+0.24   Sun, 21 Mar 2010 03:39:40 UTC
+  Fix test breakage in 0.23
+
+0.25   Sun, 21 Mar 2010 03:50:40 UTC
+  Gah, $VERSION lameness
+
+0.26   Wed, 16 Jun 2010 19:59:04 UTC
+  Message::encode no longer tries fix potential 'double-encoding' (in any case it appeared to be doing it wrong).  Now it just complains if you try to pass in undecoded strings. (thanks Daisuke Maki and KATOU Akira)
+  
+0.27   Wed, 16 Jun 2010 20:39:59 UTC
+    Added class for Yahoo! access token refresh request (thanks Marc Mims)
+
+0.28   Fri, 06 Jan 2012 05:51:04 UTC
+    Added HMAC-SHA256 support

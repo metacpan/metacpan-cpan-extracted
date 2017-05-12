@@ -1,0 +1,31 @@
+Revision history for NetHack-Menu
+
+0.08    2013-07-08
+        $menu->selected_items
+        Avoid sending spurious ^
+        dzilify
+
+0.07    Sun Jun 30 2013
+        Complete refactor.
+            Your code will have to adjust for NetHack::Menu::Item instances
+
+0.06    Mon Jan 26 11:01:02 2009
+        Add select_quantity method.
+
+0.05    Sun Mar 23 15:16:05 2008
+        Drop support for no-select menus, after MUCH PAIN.
+
+0.04    Wed Jan  9 22:15:50 2008
+        Add support for single- and no-select menus.
+        Add support for #enhance by relaxing some things.
+        Distinguish between "this page has no items" and "this page has never been parsed."
+
+0.03    Mon Jan  7 21:19:05 2008
+        Kill some spurious warnings.
+
+0.02    Tue Jan  1 21:26:01 2008
+        Added has_menu method.
+
+0.01    Sun Dec 16 02:28:22 2007
+        First version, released on an unsuspecting world.
+

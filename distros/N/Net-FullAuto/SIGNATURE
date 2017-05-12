@@ -1,0 +1,142 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d75c9e2492e8c1f72f11a9b2d5f3714c84dc73e6 ChangeLog
+SHA1 62647027745e394450492878f8d8730548d83fa2 LICENSE
+SHA1 53906d20be482b148d30570d171ef001c2ff62fd MANIFEST
+SHA1 e12547b5dcce19228ce82903a81c256f9642039b META.yml
+SHA1 65e7802d70a4005bac80f4e5b01fe8ace310fdf1 Makefile.PL
+SHA1 d78ed6f21f203e2054419369d111efa325a97d1b README
+SHA1 ecb089134bba590f02aa974be5a6e86d72cdb0dc UNINSTALL_CYGWIN
+SHA1 0da04817f80ed6c542780dffe674926c1bf7b3de api/Docker_is.py
+SHA1 1f2be6b39915aaf89529328c859ff8ddc11980cd api/South-Shore-Food-Market-Ghost-sign_with_FA_1_faded_1024.jpg
+SHA1 e7bd3d54671a60daaeb201a38051bf9fb4382a27 api/automates_everything.jpg
+SHA1 6379975efa1486c284caa639f219b7a86d3bc006 api/automationapi.jpg
+SHA1 f9b0943ddf441ffcbe54730666ea393e538658df api/fullauto_com.jpg
+SHA1 da9cb66e16963e58cd67e270ab02a946e859cde2 api/fullautoapi
+SHA1 63d4749cec41f563066809beb91a226fc1364295 api/memcached
+SHA1 63fb51652aebb73c1fb5532bbc193db2073ed8a7 api/nginx.png
+SHA1 6810b95d570f570b75ca138306c204493b401ec1 api/wrapper.tt2
+SHA1 46aaa80f9cd1d058f12338cf239f4ceeb84635f2 api/zeromq.jpg
+SHA1 6fbe4718f185856fec0876b07c927e1bc754bc3b bin/fullauto.pl
+SHA1 967864161cdddec872e6ea5fc18c37776cb1641a bin/install_mozrepl_plugin.exe
+SHA1 d7f05f3c29deb4f29dd9291d5076899b3f92cd20 dependencies/FIGlet_fonts/3-d.flf
+SHA1 8238eb029ef0be3083cd5982100b4000bd8aacb8 dependencies/FIGlet_fonts/4x4_offr.flf
+SHA1 f3223bb52e36d14098e1ed1f7790593a09230d68 dependencies/FIGlet_fonts/5lineoblique.flf
+SHA1 a33e8431871a3cc1a14313629bed73bbe7f918aa dependencies/FIGlet_fonts/6x9.flf
+SHA1 0bad38566e91924d1ce8aebf0346d3cb3b14ef78 dependencies/FIGlet_fonts/LICENSE
+SHA1 68a7ef257f8eda36864bce2156fa352497564a7a dependencies/FIGlet_fonts/advenger.flf
+SHA1 b5858ae72496bd87b20f6d646321cf99e69dcfd1 dependencies/FIGlet_fonts/alphabet.flf
+SHA1 aa0f18b15bbf02f7784867a34bf57e1a29b7c3b9 dependencies/FIGlet_fonts/amc3line.flf
+SHA1 04816cb85176e23a953e8ca576d1dce872753fda dependencies/FIGlet_fonts/aquaplan.flf
+SHA1 b25c91c13cb90dd4fb4650cdc7907962579dfbd8 dependencies/FIGlet_fonts/ascii___.flf
+SHA1 f004e3bbf0ec14dc8d3ab64074d0e7adfc92fa62 dependencies/FIGlet_fonts/avatar.flf
+SHA1 300b3b07fa0592b2cac5640df5e65fe08fe2342b dependencies/FIGlet_fonts/banner3-D.flf
+SHA1 f73c8281be239bbb47cc2e7b6de0974eb33a50d5 dependencies/FIGlet_fonts/bear.flf
+SHA1 44ff316cc39226f77752bc45bd7eed8a65fce1ce dependencies/FIGlet_fonts/briteb.flf
+SHA1 bc7fe3b87c0dfdf383576938d741e0917664732d dependencies/FIGlet_fonts/broadway_kb.flf
+SHA1 ec1a00c0a9f6f20a4fcb2acea4b918e81522c69d dependencies/FIGlet_fonts/c_consen.flf
+SHA1 98ee8f15b141e8b1f3d3b03defcb9c4b40a3bc6f dependencies/FIGlet_fonts/cards.flf
+SHA1 81be6d36eb8c409ba4f26077f7a854908bd993e0 dependencies/FIGlet_fonts/chunky.flf
+SHA1 9c498320bee53a4b9289a38fb5bc5123f3b4c28b dependencies/FIGlet_fonts/clr5x6.flf
+SHA1 806730022c56bb28edf7ae17eeb35a2876026495 dependencies/FIGlet_fonts/coil_cop.flf
+SHA1 468b65effc36da6c5d936a4b94d82c9975a488d7 dependencies/FIGlet_fonts/computer.flf
+SHA1 30568565126b5a8a67a23776b4e2e31ca2803c94 dependencies/FIGlet_fonts/contrast.flf
+SHA1 694d03168372960f26dea82e2e6e980056f8ce34 dependencies/FIGlet_fonts/cursive.flf
+SHA1 2aa3de7f3277e66c4c747e2797629d2bf7acff64 dependencies/FIGlet_fonts/cyberlarge.flf
+SHA1 1d386b1776947c95d97366359542b4f1549b3f2d dependencies/FIGlet_fonts/cybermedium.flf
+SHA1 d1f4adcd9b6548c8cc85cb999dc97badcc846efd dependencies/FIGlet_fonts/deep_str.flf
+SHA1 544b03473f8248885ce8086edae96d5e90803fa4 dependencies/FIGlet_fonts/doom.flf
+SHA1 c68b4d0b1389ff4dcc2f747e433f3277de21ac21 dependencies/FIGlet_fonts/doubleshorts.flf
+SHA1 832b01aae57295f51ff9fe45d038b6683e3275b5 dependencies/FIGlet_fonts/drpepper.flf
+SHA1 9d3b2104a620fbaa1e5291400cb14385b205c8da inc/Module/AutoInstall.pm
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 93283b6d98078acdd04b242b3e994258821f4fe5 inc/Module/Install/AutoInstall.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 3e43ac0f1912c7d202dc102f6c31ad96fbf3a044 inc/Module/Install/Include.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 01978a56e76a58399af3bd4d022aa990b9669bee inc/Module/Install/Scripts.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 b22ba7621255c01a5624686bc2b9ac88543c9201 install_mozrepl_plugin.ahk
+SHA1 d14a37b7ae1204718dd4acaad10d88a3f2103552 installer/FA.ico
+SHA1 dde817a2ab53a92b64e1a447702ebc75c365f837 installer/GRAPHIC_LICENSE
+SHA1 8b586cfc9c3b4079f95cd024d0b7aaaa9dfc7468 installer/PAR_CMD.txt
+SHA1 65a4795d060c8a835b07d132f6674db805055e1e installer/Scratched_Steel_Texture_by_AaronDesign.jpg
+SHA1 41231b90a9e55c80ff5f2ea9c066fce518a6316b installer/cmds.template
+SHA1 ef8897e0224cafc016e1974bd926f82fff982ea8 installer/cmds_saved.template
+SHA1 a17733be4a5f58ae551cdd0f064e3c2c2849b2c9 installer/engine.exe
+SHA1 c83ead52e816184e37d1d583b755ace7ce53eb28 installer/engine.pl
+SHA1 54ff8db1da323292972f3e1a6ff1131367955c24 installer/engineroom.jpg
+SHA1 9c508f086ff878e399e31ee2692d7e94c4ec7e39 installer/fa_installer.pl
+SHA1 7e09591010cf83081acb6be760bf8ec8674b1992 installer/fakey.png
+SHA1 978a110403c59d4ae293f336d2fef433df690c76 installer/fullauto_clickable_image.png
+SHA1 a4655f7e4e7f369d71db3a7b1e8d2c02d44b617b installer/fullautogreenbannerpower.png
+SHA1 8ff410acf26cc0574bf4227d4b31724ca93ebf86 installer/notready.jpg
+SHA1 720d2d35a65b0eeb055c44671ebebedd0549ef76 installer/presshere.jpg
+SHA1 2910a64913ccc33e156c39fe0d66940dfdb5677f installer/pscp.exe
+SHA1 a390c71509f8b942f53453bfe5d1449125812c57 installer/putty.exe
+SHA1 4e7fd1dca2e28f4831b7aaa8bfb68fb7f94f1ff9 installer/puttycfg.ahk
+SHA1 5614adf5a3c9d6f439ea55850f86cc9c379f9387 installer/puttycfg.exe
+SHA1 9d33133df918ae386b9071cacafd6c776375ad46 installer/puttygen.exe
+SHA1 b8441f0b4abfdd7110a001ca716a54f2d5bb3427 installer/puttykey.ahk
+SHA1 bbe246655c78c884cfc72ff1f5c919eec04be523 installer/puttykey.exe
+SHA1 c14d703bb9c02f525c84a1bf9be234a88f9e0780 installer/puttyyes.ahk
+SHA1 9076b1206a1900e7a42fc114ead8ef8781669031 installer/puttyyes.exe
+SHA1 acb1a0daeae8b6c0cfd3ce4ee899204052d40855 installer/runputty.ahk
+SHA1 2887d192d7c656080bab522cf64354975b77a915 installer/runputty.exe
+SHA1 784955e0e44b132341668db4efa407569dd71189 installer/standup.gif
+SHA1 6c3adc63eb0e790491af15178fabb88f9508bf50 lbbroker_zmqv4.pl
+SHA1 965618ff5a1bd51994b0a1afaa9d496c40af6c9a lib/Net/FullAuto.pm
+SHA1 a73fa03896208dc550b292954f51722d7b139c24 lib/Net/FullAuto/Cloud/fa_amazon.pm
+SHA1 71928e8ed46e6c63d2effda32c2ceba413ab3976 lib/Net/FullAuto/Cloud/fa_azure.pm
+SHA1 2d1d4af82b485a801bd146f5c079418f4bd56dd2 lib/Net/FullAuto/Cloud/fa_google.pm
+SHA1 b69ac9cb64c8792744abcad7654c03a7f93767d0 lib/Net/FullAuto/Cloud/fa_local.pm
+SHA1 bfc92aa6e0da21099245757be0da95bf1da57666 lib/Net/FullAuto/Custom/BackUp/README
+SHA1 9d6177d2a4464692b9d379e98288d95e14847459 lib/Net/FullAuto/Custom/README
+SHA1 4940b090ae7409b673617855abdb33e1f3da36c6 lib/Net/FullAuto/Distro/fa_code.pm
+SHA1 2eda49621ef20e3d0a1f13c48f3860ea99e34c0b lib/Net/FullAuto/Distro/fa_code_demo.pm
+SHA1 3779d40d393cde85866436c3c533fdd8740d53c9 lib/Net/FullAuto/Distro/fa_conf.pm
+SHA1 5c037b9dab607eda4180c9a0a4fb45b5d8623a6e lib/Net/FullAuto/Distro/fa_host.pm
+SHA1 6202a9521a72073183056b8624f4c45f29760b37 lib/Net/FullAuto/Distro/fa_menu.pm
+SHA1 4aec48b3910d5e0ea241342b1e081ffbde8ba689 lib/Net/FullAuto/Distro/fa_menu_demo.pm
+SHA1 c61c03f9beda14559fdf07e569e813a2bd553a53 lib/Net/FullAuto/Distro/fullautologo.jpg
+SHA1 27d080ace52809aac2744c7634a0ff110bd21e9d lib/Net/FullAuto/FA_Core.pm
+SHA1 64b95f216f3697cdbbcc99e2743fdf8259111268 lib/Net/FullAuto/ISets/Amazon/Catalyst_is.pm
+SHA1 03fcc64c771c95461171243b1c0aa71bed35b95b lib/Net/FullAuto/ISets/Amazon/Chaining_is.pm
+SHA1 18418dea6918c8ef2b951b624652b166705d6607 lib/Net/FullAuto/ISets/Amazon/Chef_is.pm
+SHA1 203d593521ca10cca5c91afdaed2c26ce0ba4988 lib/Net/FullAuto/ISets/Amazon/ClipBucket_is.pm
+SHA1 ae5b0b2e9009e22a4be0782f69258cfe76af8bba lib/Net/FullAuto/ISets/Amazon/GNUSocial_is.pm
+SHA1 2bd12d254d582ee0e918d31298940e65ef6b209b lib/Net/FullAuto/ISets/Amazon/Hadoop_is.pm
+SHA1 a4d5e6f009042ecde8701230f3b31d1a66236279 lib/Net/FullAuto/ISets/Amazon/KaliLinux_is.pm
+SHA1 ddb48cea930f376830b4b3c5a80f29826e231bad lib/Net/FullAuto/ISets/Amazon/Liferay_is.pm
+SHA1 4708044b661f8aa812d1d9dc2d61496509ba72d8 lib/Net/FullAuto/ISets/Amazon/OpenLDAP_is.pm
+SHA1 994f83018bc3d6f367007eafe8c8039deed071d3 lib/Net/FullAuto/ISets/Local/FullAutoAPI_is.pm
+SHA1 7f2e13f5f6a798d52ea897d24d07b49af4039341 t/0-signature.t
+SHA1 6fac6b17647d05b71441ac3783ceec38b9b71fa6 t/test.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJY/ibwAAoJEBa/9Pad787EDrUH/1CUk6cWUtmJ8LyDtwejI/nB
+NmxTa8I6JTZjMrqmWvk/AsGDQWHUJXlX7bfcPRcT2ZoY9eEuGAVfhbZdLewo4gzR
+e7h9AqQckpNpUCzmCGVUxQjfEYqng+d4+JRRXpY8+9EsmolfF62uU6Dn/Y2CUvkZ
+sQ8FO1lRvB/XK8Q0Junz9eOTznImA5d+FaptOI/jGk/EZ+l6RxpliDNvw8+fxOiM
+d76gG3V++1SNJfa6Xm6GLU85I3RXxPTOqDDGOJYSZCPFNF/DlBdzLBjyKDAodYWf
+KIfcevpCVxflyDyaU5I0eWsDJK1pEubQt5MYbGOs7HhX3NFbDxZtelbwUjcDNgE=
+=HIjd
+-----END PGP SIGNATURE-----

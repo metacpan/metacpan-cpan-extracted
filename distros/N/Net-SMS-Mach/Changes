@@ -1,0 +1,12 @@
+Revision history for Perl extension Net::SMS::Mach
+
+
+0.02      2011-08-15 Oslo/Norway
+
+    - Added LWP::UserAgent, Encode in pre-requisites.
+
+0.01      2011-08-12 Oslo/Norway
+
+    - Initial CPAN release. Functional.
+
+

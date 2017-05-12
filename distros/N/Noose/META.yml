@@ -1,0 +1,35 @@
+---
+abstract: 'just enough object orientation to hang yourself'
+author:
+  - 'Mike Doherty <doherty@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::More: 0.96
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300032, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Noose
+no_index:
+  directory:
+    - corpus
+    - inc
+    - examples
+requires:
+  Acme::Damn: 0
+  Scalar::Util: 0
+  Storable: 0
+  Sub::Name: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/doherty/Noose/issues
+  repository: git://github.com/doherty/Noose.git
+version: 0.001

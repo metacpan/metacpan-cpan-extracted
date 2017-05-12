@@ -1,0 +1,118 @@
+######################################################################
+    Net::SSH::AuthorizedKeysFile 0.18
+######################################################################
+
+NAME
+    Net::SSH::AuthorizedKeysFile - Read and modify ssh's authorized_keys
+    files
+
+SYNOPSIS
+        use Net::SSH::AuthorizedKeysFile;
+
+            # Reads $HOME/.ssh/authorized_keys by default
+        my $akf = Net::SSH::AuthorizedKeysFile->new();
+
+        $akf->read("authorized_keys");
+
+            # Iterate over entries
+        for my $key ($akf->keys()) {
+            print $key->as_string(), "\n";
+        }
+
+            # Modify entries:
+        for my $key ($akf->keys()) {
+            $key->option("from", 'quack@quack.com');
+            $key->keylen(1025);
+        }
+            # Save changes back to $HOME/.ssh/authorized_keys
+        $akf->save() or die "Cannot save";
+
+DESCRIPTION
+    Net::SSH::AuthorizedKeysFile reads and modifies "authorized_keys" files.
+    "authorized_keys" files contain public keys and meta information to be
+    used by "ssh" on the remote host to let users in without having to type
+    their password.
+
+METHODS
+    "new"
+        Creates a new Net::SSH::AuthorizedKeysFile object and reads in the
+        authorized_keys file. The filename defaults to
+        "$HOME/.ssh/authorized_keys" unless overridden with
+
+            Net::SSH::AuthorizedKeysFile->new( file => "/path/other_authkeys_file" );
+
+        Normally, the "read" method described below will just silently
+        ignore faulty lines and only gobble up keys that either one of the
+        two parsers accepts. If you want it to be stricter, set
+
+            Net::SSH::AuthorizedKeysFile->new( file   => "authkeys_file",
+                                               abort_on_error => 1 );
+
+        and read will immediately abort after the first faulty line. Also,
+        the key parsers are fairly lenient in default mode. Adding
+
+            strict => 1
+
+        adds sanity checks before a key is accepted.
+
+    "read"
+        Reads in the file defined by new(). By default, strict mode is off
+        and read() will silently ignore faulty lines. If it's on (see new()
+        above), read() will immediately abort after the first faulty line. A
+        textual description of the last error will be available via error().
+
+    "content"
+        Contains the original file content, read by "read()" earlier. Can be
+        used to set arbitrary content:
+
+            $keysfile->content( "some\nrandom\nlines\n" );
+
+        and have "parse()" operate on a string instead of an actual file
+        this way.
+
+    "keys"
+        Returns a list of Net::SSH::AuthorizedKey objects. Methods are
+        described in Net::SSH::AuthorizedKey.
+
+    "as_string"
+        String representation of all keys, ultimately the content that gets
+        written out when calling the "save()" method. Note that comments
+        from the original file are lost.
+
+    "save"
+        Write changes back to the authorized_keys file using the as_string()
+        method described above. Note that comments from the original file
+        are lost. Optionally takes a file name parameter, so calling
+        "$akf->save("foo.txt")" will save the data in the file "foo.txt"
+        instead of the file the data was read from originally. Returns 1 if
+        successful, and undef on error. In case of an error, error()
+        contains a textual error description.
+
+    "sanity_check"
+        Run a sanity check on the currently selected authorized_keys file.
+        If it contains insanely long lines, then parsing with read() (and
+        potential crashes because of out-of-memory errors) should be
+        avoided.
+
+    "ssh_dir( [$user] )"
+        Locate the .ssh dir of a given user. If no user name is given,
+        ssh_dir will look up the .ssh dir of the effective user. Typically
+        returns something like "/home/gonzo/.ssh".
+
+    "path_locate( [$user] )"
+        Locate the authorized_keys file of a given user. Typically returns
+        something like "/home/gonzo/.ssh/authorized_keys". See "ssh_dir()"
+        for how the containing directory is located with and without a given
+        user name.
+
+    "error"
+        Description of last error that occurred.
+
+LEGALESE
+    Copyright 2005-2009 by Mike Schilli, all rights reserved. This program
+    is free software, you can redistribute it and/or modify it under the
+    same terms as Perl itself.
+
+AUTHOR
+    2005, Mike Schilli <m@perlmeister.com>
+

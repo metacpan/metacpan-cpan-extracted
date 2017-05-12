@@ -1,0 +1,47 @@
+# -*-cperl-*-
+# $Id: modestmaps_mk_cluster_maps_for_photoset,v 1.6 2008/08/03 17:08:39 asc Exp $
+
+use strict;
+
+use Config::Simple;
+use Getopt::Std;
+
+use Log::Dispatch::Screen;
+use Net::Flickr::Geo::ModestMaps;
+
+use File::Basename;
+use File::Copy;
+
+{
+        &main();
+        exit;
+}
+
+sub main {
+        
+        my %opts = ();
+        getopts('c:s:', \%opts);
+
+        my $cfg = Config::Simple->new($opts{'c'});
+
+        $cfg->param("modestmaps.filter", "atkinson");
+        $cfg->param("modestmaps.zoom", 17);
+        $cfg->param("modestmaps.bleed", 1);
+        $cfg->param("modestmaps.adjust", .1);
+        $cfg->param("modestmaps.provider", "MICROSOFT_AERIAL");
+        $cfg->param("modestmaps.method", "bbox");
+        $cfg->param("pinwin.upload", 1);
+        $cfg->param("modestmaps.timeout", (30 * 60));
+        $cfg->param("clustermap.radius", 1);
+
+        my $fl = Net::Flickr::Geo::ModestMaps->new($cfg);
+        $fl->log()->add(Log::Dispatch::Screen->new('name' => 'scr', min_level => 'debug'));
+
+        my $map = $fl->mk_cluster_maps_for_photoset($opts{'s'});
+
+        foreach my $data (@$map){
+                $fl->log()->info("wrote image/map to $data->[0]");
+        }
+
+        return 1;
+}

@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:                Net-Z3950-UDDI
+version:             0.04
+abstract:            Perl extension for querying UDDI services using Z39.50
+license:             ~
+author:              
+    - Mike Taylor <mike@miketaylor.org.uk>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Data::Dumper:                  2.121
+    Exception::Class:              1.23
+    HTML::Entities:                1.35
+    LWP::UserAgent:                2.033
+    Net::Z3950::SimpleServer:      1.07
+    Net::Z3950::ZOOM:              1.2
+    SOAP::Lite:                    0.69
+    XML::LibXML:                   1.59
+    XML::LibXML::XPathContext:     0.07
+    YAML:                          0.62
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

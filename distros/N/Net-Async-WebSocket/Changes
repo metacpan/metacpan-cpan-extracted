@@ -1,0 +1,48 @@
+Revision history for Net-Async-WebSocket
+
+0.10    2015/11/18 16:23:44
+        [BUGFIXES]
+         * Declare dependency on URI (RT103073)
+
+0.09    2015/03/03 21:54:03
+        [CHANGES]
+         * Infer the host/service to connect to from the url string
+         * Updated SYNOPSIS examples for modern style
+         * Updated Future-returning method documentation
+
+        [BUGFIXES]
+         * Make sure not to confuse SUPER::connect() with an on_connected
+           continuation not intended for it
+
+0.08    2014/03/27 16:43:22
+        [CHANGES]
+         * First-class support for Futures
+         * Subclass IO::Async::Stream directly; avoid IaProtocol::Stream
+
+        [BUGFIXES]
+         * Only pull out ->configure arguments that actually exist
+         * Handle defined-but-false frames (RT92477)
+
+0.07    CHANGES:
+         * ->socketpair now comes from IO::Async::OS, not the underlying loop
+
+0.06    CHANGES:
+         * Added on_handshake test/continuation for early-aborting connections
+           if required (patch by David Leadbeater) (RT#83436)
+
+0.05    CHANGES:
+         * Pass all arguments from send_frame into Protocol::WebSocket::Frame
+           constructor (RT79202)
+
+0.04    CHANGES:
+         * Updated for Protocol::WebSocket 0.009 - s/to_string/to_bytes/
+
+0.03    CHANGES:
+         * Use IO::Async::Protocol->connect from 0.34
+
+0.02    CHANGES:
+         * Bugfixes for getaddrinfo that isn't on Linux
+         * Created some example scripts and SYNOPSIS code samples
+
+0.01    First version, released on an unsuspecting world.
+

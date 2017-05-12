@@ -1,0 +1,21 @@
+Revision history for Perl extension News::Web
+
+0.51		Thu Apr 22 14:12:46 CDT 2004 
+	- Code cleanup.
+
+0.50.04		Sun Mar 28 23:52:23 CST 2004 
+	- Small fixes in printing article info in html_makearticle().
+
+0.50.03		Fri Nov 07 15:44:46 CST 2003 
+	- Gets information out of 'subscriptions' if there's no PATTERN passed
+	  html_grouplist()
+
+0.50.02		Mon Oct 13 19:29:56 CDT 2003 
+	- Wasn't offering 'post a new article' if the group was empty.  Fixed.
+
+v0.50.01	Mon Oct 13 17:32:30 CDT 2003 
+	- 'Articles in xxx:' weren't getting the group from the right place.  
+
+0.50 	Sun Oct 12 18:53:49 CDT 2003 
+	- Initial Release.  The module documentation is essentially done, 
+	  but not the CGI documentation.  Still, it works...

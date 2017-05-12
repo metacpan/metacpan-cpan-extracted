@@ -1,0 +1,16 @@
+Revision history for Perl extension Net::Friends.
+
+1.02  Sun Jan 11 20:51:03 2004
+	- fixed remote query node filtering
+	- added .yml file
+
+1.02  Sun Jan 11 17:09:51 2004
+	- fixed a packaging error
+
+1.01  Sun Jan 11 15:58:30 2004
+	- fixed an internal method invocation that was missing an underscore
+
+1.00  Sat Jan 10 19:29:28 2004
+	- original version; created by h2xs 1.22 with options
+		-AX -n Net::Friends
+

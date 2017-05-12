@@ -1,0 +1,27 @@
+NAME
+       Net::MacMap - a module used to determine the vendor of an
+       interface based on the MAC address.
+
+SYNOPSIS
+        my $vendor = Net::MacMap::vendor('00:D0:BA:01:49:B6');
+        # $vendor is 'CISCO SYSTEMS, INC.'
+
+
+DESCRIPTION
+       This module determines the vendor name for a particular
+       MAC address prefix.  There is only one function in this
+       module, vendor(), which takes a scalar argument of the MAC
+       address prefix represented as a base16 string.  Only the
+       first 24 bits of the MAC address are needed and any
+       remaining bits will be ignored.  Colons or hyphens are
+       allowed in the MAC address.
+
+SEE ALSO
+         http://standards.ieee.org/regauth/oui/oui.txt
+
+
+COPYRIGHT
+       Copyright 2003 Clinton Wong
+
+       This program is free software; you can redistribute it
+       and/or modify it under the same terms as Perl itself.

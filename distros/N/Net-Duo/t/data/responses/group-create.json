@@ -1,0 +1,9 @@
+{
+    "desc": "This is an example group",
+    "group_id": "DGXXXXXXXXXXXXXXXXXX",
+    "name": "Example Group",
+    "push_enabled": true,
+    "sms_enabled": false,
+    "status": "active",
+    "voice_enabled": true
+}

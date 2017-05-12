@@ -1,0 +1,20 @@
+The two scripts in this directory are meant to demonstrate the two modes of
+operation present in Net::Hotline::Client.  They haven't been very well
+tested, so don't expect stellar reliability.
+
+1. "hlftp.pl" is a simple command line FTP-like Hotline client included
+   to demonstrate Net::Hotline::Client's "blocking task mode" (read the
+   documentation for an explanation).  Its operation should be familiar
+   to anyone who's used ncftp or the regular Unix ftp client.
+
+   The version of "hlftp.pl" included here may be out of date by the
+   time you read this.  Please check the following URL for the latest
+   version:
+
+           http://siracusa.home.mindspring.com/Perl/
+
+2. "hibot.pl" is a very simple Hotline "bot" included to demonstrate
+   Net::Hotline::Client's "event loop mode" (again, RTFM).  It works a
+   lot like hlftp.pl in terms of connecting to servers.  Log the bot
+   onto your local Hotline server an message it with the text "help"
+   for more information.

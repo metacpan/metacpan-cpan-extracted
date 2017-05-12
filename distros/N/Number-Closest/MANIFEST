@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Number/Closest.pm
+t/00-load.t
+t/01-closest.t
+t/boilerplate.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

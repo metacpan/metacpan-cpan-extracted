@@ -1,0 +1,39 @@
+README for Net::PcapUtils 0.01
+==============================
+
+This module provides some code to abstract away some of the messier
+parts of using the Net::Pcap library.  The idea is to be able to write
+"one-liner" type scripts for packet capture without getting bogged
+down in the initialisation code.  This makes it possible to write very
+compact Perl scripts involving packet capture.
+
+To use Net::PcapUtils, the latest version of the Net::Pcap module is
+required (at the time of writing, this was version 0.03).
+
+Net::PcapUtils provides three functions that are described below:
+
+	- Net::PcapUtils::loop(\&callback_fn, [optional args]);
+
+		Capture packets and execute callback function for evey
+		packet received.
+
+	- Net::PcapUtils::next($pcap_t);
+
+		Return the next packet and packet header from an open
+ 		network interface.
+
+	- Net::PcapUtils::open([optional args]);
+
+		Open a network interface for packet capture and return
+		a packet capture descriptor.
+
+If none of the optional arguments are declared, then a reasonable set
+of defaults are assumed.  See the Net::PcapUtils manpage for more
+details.
+
+I hope you enjoy Net::PcapUtils.
+
+
+8/4/99
+Tim Potter
+tpot@acsys.anu.edu.au

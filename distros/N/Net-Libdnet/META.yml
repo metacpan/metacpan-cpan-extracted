@@ -1,0 +1,23 @@
+---
+abstract: "binding for Dug Song's libdnet"
+author:
+  - 'GomoR <gomor-cpan_at_gomor.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Libdnet
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Gomor: 0
+  perl: 5.006001
+version: 0.98

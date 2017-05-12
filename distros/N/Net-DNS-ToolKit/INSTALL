@@ -1,0 +1,33 @@
+To install the Perl and C libraries, simply run:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+This distribution has been tested on linux version 2.4.19, 
+perl 5.006 with gcc version 2.95.3 20010315 (release).
+
+Linux version 2.2.16, perl 5.00503 with
+gcc version egcs-2.91.66 19990314/Linux (egcs-1.1.2 release)
+
+If you have older versions of gcc, don't bother,
+gcc version 2.7.2.3 does not work with this distribution.
+
+On systems with older gcc versions, you may get linker errors such as:
+
+  ld: cannot open -lresolv: No such file or directory
+
+This indicates that while the resolver library /lib/libresolv.so.2, 
+was found, the linker could not use it because the file does not
+have the required file name. ld wants files of the form .../libresolv.a
+
+More recent versions of gcc / ld do not have this problem. 
+There are two solutions.
+
+1) install a newer version of gcc
+2) provide a soft link of the correct name
+
+  i.e.	cd /usr/lib
+	ln -s /lib/resolv.so.2 libresolv.a
+

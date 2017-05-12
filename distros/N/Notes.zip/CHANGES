@@ -1,0 +1,43 @@
+Revision history for Perl extension Notes::API.
+
+0.24	- Original Proof-Of-Concept code from Martin Brech.
+		- Contained:
+			Notes::Object
+			Notes::Session
+			Notes::Acl
+			Notes::AclEntry
+			Notes::Database
+			
+0.25	- Takeover by Christian Cloutier with precious help/tips from Martin Brech.
+		- Modification:
+		        - Modification of original code to get around an apparent crash,
+		          get in the right mindset and make it more like my coding style.
+			- Moved related functions / properties from Notes::Database
+			  to a new class: Notes::Replication.
+			- Added missing functionality in Notes::Replication.
+			- Added functions/properties to Notes::Session:
+				effective_user_name()
+				address_books()
+				notes_version()
+				notes_build_version()
+				server_name()
+				get_environment_value()
+				get_environment_string()
+				set_environment_var()
+			- Added functions/properties to Notes::Database:
+				categories()
+				design_template_name()
+				filename()
+				filepath()
+				is_private_address_book()
+				is_personal_address_book()
+				replication_info()
+				template_name()
+				title()
+				compact()
+				create()
+				create_copy()
+				create_from_template()
+				create_replica()
+			- Added a new Notes::Name class (almost complete)
+			

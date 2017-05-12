@@ -1,0 +1,11 @@
+This module allows you to more easily use map{}s within map{}s by making
+inner maps' idea of what $_ is visible to outer maps by way of a stack.
+
+To install, do the usual:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+You may use, modify and distribute this code under the same terms as you
+may use, modify and distribute perl itself.

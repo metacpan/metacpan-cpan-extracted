@@ -1,0 +1,34 @@
+Net-BobrDobr version 0.04
+=========================
+
+This is a perl implementation of BobrDobr.ru-service.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+For testing you must obtain api key and secret key from bobrdobr.ru
+adminstration (see http://bobrdobr.ru/api.html).
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  XML::Simple, LWP::UserAgent
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2008 by Artur Penttinen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

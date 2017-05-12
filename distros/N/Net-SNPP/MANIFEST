@@ -1,0 +1,12 @@
+lib/Net/SNPP.pm
+lib/Net/SNPP/Server.pm
+lib/Net/SNPP/HylaFAX.pm
+Makefile.PL
+README
+MANIFEST
+t/use.t
+t/server.t
+META.yml                                 Module meta-data (added by MakeMaker)
+bin/snppd.pl
+bin/check_two_way.pl
+bin/send_two_way.pl

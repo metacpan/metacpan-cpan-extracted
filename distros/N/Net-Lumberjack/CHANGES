@@ -1,0 +1,67 @@
+==================================================
+Changes from 2015-12-05 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.02 at 2016-12-04 11:15:37 +0000
+-----------------------------------------
+
+  Change: ef516249189a8c1193131de087a25ca5712f5ea2
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-12-04 12:13:41 +0000
+
+    Add missing Test::POD dependency 
+
+  Change: bf9933cf3d4d41dc336f59e2916dea837383ed08
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-12-04 12:03:50 +0000
+
+    Fix EOF for ssl and non-ssl connections 
+
+-----------------------------------------
+version 1.01 at 2016-11-13 10:50:32 +0000
+-----------------------------------------
+
+  Change: 3baca704c7465803f2d9410c9f3803d4d18efadb
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-11-13 11:50:32 +0000
+
+    Fix ssl_cert_file -> ssl_cert in docs 
+
+  Change: c67dcdbbcc9e56c6340b004864022f52ff0613a8
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-11-13 11:50:13 +0000
+
+    Add a file for namespace Net::Lumberjack 
+
+-----------------------------------------
+version 1.00 at 2016-11-13 10:27:19 +0000
+-----------------------------------------
+
+  Change: 80e5cda3da57a71c5ca789b930ebda8958d042b7
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-11-13 11:27:19 +0000
+
+    Add .gitignore file 
+
+  Change: 973afb052b0b1bf1008e675aa8e082718b62b3ac
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-11-13 11:25:08 +0000
+
+    Add basic CPAN infrastructure and docs 
+
+  Change: 2efe66cde20970ec29c8b819a1bcb51086419235
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-11-13 10:47:07 +0000
+
+    Add more basic features and options 
+
+  Change: 59d8e146dcea67eb2314af1e4f50428489293ca4
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-11-08 07:02:42 +0000
+
+    Initial checkin 
+
+================
+End of releases.
+================

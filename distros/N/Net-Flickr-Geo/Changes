@@ -1,0 +1,164 @@
+# -*-n3-*-
+
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix doap:    <http://usefulinc.com/ns/doap#> .
+@prefix asc:     <http://aaronland.info/ns/changefile/> .
+                                     
+<>
+        dc:identifier           "$Id: Changes,v 1.19 2008/08/03 17:08:39 asc Exp $" ;
+        dc:description          "Changes for Net::Flickr::Geo.pm" ;
+        dcterms:references      <http://aaronland.info/perl/net/flickr/geo/> .
+
+<http://aaronland.info/perl/net/flickr/geo/Net-Flickr-Geo-0.72.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/geo/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/geo/Net-Flickr-Geo-0.711.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.72" ;
+                        doap:created      "2008-08-03" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "require Net::ModestMaps 1.1" ;
+                        asc:update        "updated examples" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/geo/Net-Flickr-Geo-0.711.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/geo/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/geo/Net-Flickr-Geo-0.71.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.711" ;
+                        doap:created      "2008-07-05" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "It's Net::ModestMaps->host not ->endpoint" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/geo/Net-Flickr-Geo-0.71.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/geo/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/geo/Net-Flickr-Geo-0.7.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.71" ;
+                        doap:created      "2008-07-05" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Require Net::ModestMaps" ;
+                	asc:update        "Tweaked stacking code (in N:F:G::ModestMaps) to better fill in a pinwin" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/geo/Net-Flickr-Geo-0.7.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/geo/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/geo/Net-Flickr-Geo-0.65.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.7" ;
+                        doap:created      "2008-06-29" ;
+                        ];
+        asc:changes     [
+        		asc:addition      "Added Modestmaps->mk_cluster_map_for_photo" ;
+        		asc:addition      "Added Modestmaps->mk_historical_cluster_map_for_photo" ;
+        		asc:addition      "Added Modestmaps->mk_cluster_maps_for_photoset" ;
+                        asc:addition      "Added Geo->ensure_geo_perms" ;
+                        asc:bugfix        "Test for an arguments definedness (rather than boolean truth) in Geo->divine_option" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/geo/Net-Flickr-Geo-0.65.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/geo/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/geo/Net-Flickr-Geo-0.6.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.65" ;
+                        doap:created      "2008-03-17" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Added the option to 'ensure_tags' or 'skip_tags' when collecting photos for a set" ;  
+                        asc:bugfix        "Fixed/updated POD" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/geo/Net-Flickr-Geo-0.6.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/geo/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/geo/Net-Flickr-Geo-0.5.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.6" ;
+                        doap:created      "2008-02-24" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Added N:F:G::MultiMap provider" ;  
+                        asc:addition      "Added N:F:G::GoogleMaps provider" ;  
+        	        asc:update        "Moved 'modify_map' in to N:F:Geo" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/geo/Net-Flickr-Geo-0.5.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/geo/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/geo/Net-Flickr-Geo-0.4.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.5" ;
+                        doap:created      "2008-01-27" ;
+                        ];
+        asc:changes     [
+                        asc:comment       "THIS VERSION IS FOR ALL INTENTS AND PURPOSES NOT BACKWARDS COMPATIBLE. SORRY. IT SHOULDN'T HAPPEN AGAIN" ;
+                        asc:update        "Move code in to service specific packages" ;
+                        asc:update        "Update ModestMaps (MM) provider to use MM 1.0 tools" ;
+                        asc:update        "Replace all (but one) calls to imagemagick CLI scripts with GD or Imager" ;
+                        asc:update        "Move pinwin function(s) into N:F:G::Pinwin" ;
+                        asc:addition      "Add mk_poster_map_for_photoset; upload_poster_map; crop_poster_map methods for MM provider" ;  
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/geo/Net-Flickr-Geo-0.4.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/geo/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/geo/Net-Flickr-Geo-0.3.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.4" ;
+                        doap:created      "2007-08-25" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Replace system calls to the Modest Maps compose script with Hooks to use ModestMaps ws-compose.py web service to fetch maps tiles" ;
+                        asc:comment       "If you were using the ModestMaps hooks in version 0.3 you will need to update your code" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/geo/Net-Flickr-Geo-0.3.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/geo/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/geo/Net-Flickr-Geo-0.2.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.3" ;
+                        doap:created      "2007-07-02" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Hooks to use ModestMaps compose.py to fetch maps tiles" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/geo/Net-Flickr-Geo-0.2.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/geo/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/geo/Net-Flickr-Geo-0.1.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.2" ;
+                        doap:created      "2007-06-08" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Allow user defined map dimensions" ;
+                        asc:update        "Allow user defined map radius; set zoom level based on photo accuracy" ;
+                        asc:bugfix        "Fixed errors in Changes files." ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/geo/Net-Flickr-Geo-0.1.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/geo/> ;
+
+        doap:Version    [
+                        doap:revision     "0.1" ;
+                        doap:created      "2007-06-07" ;
+                        ];
+        asc:changes     [
+                        asc:comment       "Initial release." ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/geo/>
+        a doap:Project ;
+        doap:download-page      "http://search.cpan.org/dist/Net-Flickr-Geo/" ;
+        doap:download-mirror    "http://aaronland.info/perl/net/flickr/geo/" .

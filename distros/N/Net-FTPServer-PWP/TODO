@@ -1,0 +1,14 @@
+This -*- indented-text -*- file lists interesting features or
+additions that will eventually make it into this module.
+
+- Automatically create the user's home directory if succesfully
+  authenticated. Possibly moving in files from some template location.
+
+- A way to insure that a RADIUS Access-Accept actually comes from
+  our servers.
+
+- A quota that controls how many files can be created by the
+  user. This should be tracked in the same quota file we use today.
+
+$Id: TODO,v 1.8 2002/11/01 20:06:12 lem Exp $
+

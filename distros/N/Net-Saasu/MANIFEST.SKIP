@@ -1,0 +1,7 @@
+inc/
+t/.vimbk/
+.git/
+.gitignore
+.shipit
+.vimbk/
+client.pl

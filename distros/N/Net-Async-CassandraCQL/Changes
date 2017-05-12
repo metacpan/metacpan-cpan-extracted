@@ -1,0 +1,103 @@
+Revision history for Net-Async-CassandraCQL
+
+0.12    2015/02/12 16:00:00
+        [BUGFIXES]
+         * Fix queries hanging on current node close.
+
+0.11_4  2015/02/06 13:00:00
+        [CHANGES]
+         * Support service/port configuration per host.
+
+0.11_3  2015/01/28 18:00:00
+        [BUGFIXES]
+         * Fix refcount dependency
+
+0.11_2  2015/01/28 09:00:00
+        [BUGFIXES]
+         * Fix query cache keeping loop alive for 60 seconds after it should be removed
+
+0.11_1  2015/01/25 14:00:00
+        [BUGFIXES]
+         * Fix eventwatch failure not propogating, and losing sequence Futures
+         * Fix requests over pending threshold getting responses from other requests
+
+
+0.11    2014/06/01 12:35:56
+        [CHANGES]
+         * Optionally use LZ4 compression when using CQLv2
+
+        [BUGFIXES]
+         * Avoid relying on strong forward references in Future, by creating
+           intentional cycles on pending Futures. Workaround for bugfix in
+           upcoming Future release.
+
+0.10    2014/02/07 22:28:24
+        [CHANGES]
+         * Allow a list of initial seed hosts for connect reliability
+         * Use TOPOLOGY_CHANGE events to keep the nodelist updated
+         * Support CQLv2
+         * Make Snappy compression optional
+
+0.09    2013/09/25 18:31:37
+        [CHANGES]
+         * Allow unreferenced prepared queries to live for a few more
+           minutes before expiring them, in case of re-prepare
+
+0.08    2013/09/24 23:08:45
+        [CHANGES]
+         * When a preferred node comes UP, switch to it if we have a
+           connection to non-preferred node
+         * Cache query objects by CQL string; return identical objects
+           immediately rather than re-preparing duplicate queries
+
+0.07    2013/09/18 18:20:45
+        [CHANGES]
+         * Allow connecting to multiple nodes, optionally with a preference
+           on which data center to pick nodes from
+         * Watch for STATUS_CHANGE events to keep node list updated on which
+           nodes are up or down
+         * Derive directly from IO::Async::Stream, not IaProtocol::Stream
+         * Added some IaNotifier ->debug_printf calls
+
+0.06    2013/09/12 17:39:26
+        [CHANGES]
+         * First attempt at clustering support - NaCassandraCQL object now
+           represents the cluster as a whole, with individual connections
+         * Query the system.peers table at connect time, and fail-over to
+           another node if the connection fails
+
+0.05    2013/09/03 17:08:58
+        [CHANGES]
+         * Support password-based authentication
+         * Support registering interest in server events, and invoking a
+           callback then they arrive
+
+0.04    CHANGES:
+         * Moved Protocol::CassandraCQL to its own distribution
+         * Added ->query_rows, ->quote, ->quote_identifier
+         * Added some convenience methods to query schema metadata
+           (schema_keyspaces, schema_columnfamilies, schema_columns)
+
+0.03    CHANGES:
+         * Allow setting a default consistency level to avoid needing one at
+           every call to ->query or ->execute
+         * Validate perl data being passed to ->execute bind parameters
+         * Added $result->rowmap_array and ->rowmap_hash
+         * Implement INET type
+         * Moved more parsing/building code into Protocol::CassandraCQL to
+           prepare for distribution split
+
+0.02    CHANGES:
+         * Added $result->rows_array and ->rows_hash
+         * Represent types as firstclass objects
+         * Implement collection types (LIST, SET, MAP)
+         * Implement UUID and TIMEUUID types
+         * Updated documentation
+
+        BUGFIXES:
+         * Account for inexactness of DOUBLE result printing in unit tests
+         * Abort build if no 64bit pack format support
+         * Make Protocol::CassandraCQL::Frame perl 5.8.8-clean
+
+0.01    First version, released on an unsuspecting world.
+

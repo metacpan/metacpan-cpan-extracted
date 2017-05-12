@@ -1,0 +1,24 @@
+Net-OpenID-Consumer
+===================
+This is a set of Perl modules for implementing 
+a Relying Party for OpenID (versions 1.1 or 2.0)
+
+There are two companion distributions:
+
+   Net-OpenID-Server -- implements an OpenID Provider
+   Net-OpenID-Common -- prerequisites for -Server and -Consumer
+
+INSTALL has the usual installation instructions.
+
+Changes has the change log (surprise).
+
+ - - -
+
+If you are upgrading from Consumer 1.03 or earlier,
+please be aware of API changes with respect to 
+
+  $consumer->args(CODEREF)
+  $consumer->handle_server_response / user_setup_url
+
+see 'Changes' and the Consumer.pm podfile for details.
+

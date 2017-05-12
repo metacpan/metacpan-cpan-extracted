@@ -1,0 +1,14 @@
+Number::Bytes::Human 0.11
+
+* we need a real README
+* finish docs
+* include memoizing
+* write a benchmark: unmemoized vs. memoized vs. object
+* add test cases for rounding
+
+What I update when releasing 
+* Human.pm $VERSION
+* README first line
+* META.yml version
+* add new entries to Changes
+

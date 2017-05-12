@@ -1,0 +1,25 @@
+---
+abstract: lib/NanoB2B/NER.pm
+author:
+  - 'Megan Charity <charityml@vcu.edu, Bridget McInnes <btmcinnes@vcu.edu'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: NanoB2B-NER
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Path: 0
+  List::MoreUtils: 0
+  MetaMap::DataStructures: 0.03
+  Term::ANSIColor: 0
+version: 0.01

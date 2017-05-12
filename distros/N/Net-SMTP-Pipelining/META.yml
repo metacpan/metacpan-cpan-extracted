@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Net-SMTP-Pipelining
+version:            0.0.4
+abstract:           Send email using ESMTP PIPELINING extension
+author:
+    - Marc Beyer <japh@tirwhan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    IO::Socket:  0
+    Net::Cmd:    0
+    Net::SMTP:   0
+    Test::More:  0
+    version:     0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

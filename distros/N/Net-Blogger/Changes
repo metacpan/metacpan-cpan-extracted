@@ -1,0 +1,359 @@
+Revision history for Perl extension Net::Blogger.
+
+1.02 Mon Sep 25 19:08:45 2006
+    - Fixed META.yml to make CPANTS happy.
+
+1.01 Fri Dec 2 18:10:35 2005
+    - Added pod coverages, spelling, and syntex tests
+    - Added MANIFEST.SKIP
+    - Added META.yml to MANIFEST
+    - Added metaWeblog.getRecentPosts to Userland::metaWeblog API
+
+1.0	 - Fri Dec 02, 2005
+
+	 - The Nothing Special release - it's just been 4 years
+	   and Blogger is finally doing the 2.0/Atom thing for
+	   real :
+
+	    http://code.blogspot.com/archives/atom-docs.html
+
+	   I think we can call it 1.0, don't you?
+
+	 - Respect $ENV{http_proxy} (RT ticket 8580)
+
+	 - Updated POD
+
+	 - Replace ExtUtils::MakeMaker with Module::Build
+
+         - Pass maintainership on to CLACO
+
+0.87	 - Tue Feb 10, 2004
+
+	 - Added NOTES concerning content-negotiation (RT bug
+	   #2615) and the Atom API
+
+	 - Updated POD
+
+0.86	 - Tue Jul 15 2003
+
+	 - Blessed as 0.86
+
+	 - Wondered whether to bless it as 1.0 now that Pyra/Google
+	   has said they're no longer actively developing the API.
+	   Time enough for that, I guess...
+
+0.86_02	 - Mon Jul 14 2003
+
+	 - Added support for the getRecentPostTitles() and
+           publishPost() methods in ::Engine::Movabletype::mt.pm
+
+	 - Added fix to regex(p) in ::Engine::Base.pm used to
+	   determine parent API engine to make 'warnings' shut
+	   up. (thanks andi!)
+
+	 - Added more error reporting to t/00-basic.t
+
+	 - Updated POD
+
+0.86_01	 - Wed May 22 2003
+
+	 - Updated POD in ::Userland::metaWeblog to indicated
+	   required 'postid' for editPost()
+
+	 - Fixed typo in ::Engine::Base.pm
+
+	 - Added [y/n] to ask_yesno() prompt in 00-basic.t
+
+	 - (props to Morbus Iff for pointing most of these things
+	   out to me)
+
+0.85	 - Wed Feb 05 2003
+
+	 - Fixed struct/hash bugs in ::metaWeblog.pm when passing
+	   arguments to SOAP::Lite (props to mystery rt.cpan user
+	   for the bug report)
+
+	 - Updated methods to accept hash references where appropriate
+
+	 - Removed CHANGES from individual POD files because it was
+	   just a pain in the ass to keep track of that kind of thing
+	   in more than one place.
+
+	 - Replaced test.pl with t/00-basic.t
+
+	 - Updated POD (and sure everything returns OK w/ podchecker)
+
+0.8.4	 - Fri Jan 10 2003
+
+	 - Added support for the metaWeblog.newMediaObject method
+
+	 - Updated POD
+
+0.8.3	 - Mon Sep 23 2002
+
+	 - Updated docs and POD (props to a nice person name 'rho'
+	   who was good enough to carefully read the docs and submit
+	   bug reports)
+
+0.8.2	 - Mon Sep 02 2002
+
+	 - Added support for the metaWeblog API to the Manila engine
+
+	 - Modified Net::Blogger::Engine::Blogger to allow
+	   user-defined Proxy URI
+
+	 - Updated Net::Blogger::Engine::Base to undef _client only
+	   when a new Proxy is defined
+
+	 - Updated Net::Blogger::Engine::Userland to undef _client
+	   when a new Proxy is defined
+
+	 - Moved $pkg->metaWeblog from Net::Blogger::Engine::Radio.pm
+	   into ::Engine::Userland.pm
+
+	 - Updated POD
+
+0.8.1	 - Thu Jun 17 2002
+
+	 - Added support for the mt.getTrackbackPings method in
+	   Net::Blogger::Engine::Movabletype::mt.pm
+
+0.8	 - Fri May 31 2002
+
+	 - Added Net::Blogger::Engine::Slash and
+	   Net::Blogger::Engine::Slash::slashcode
+
+	 - Added check_* methods to Net::Blogger::API::Core
+
+	 - Added calls to check_* methods, to Engine::* files where
+	   necessary
+
+	 - Removed left-over deletePost method from Blogger.pm (gah!)
+
+	 - Added modules required by slashcode.pm to Makefile.PL
+
+	 - Added &Net::Blogger::Engine::Userland::BlogId to ensure
+	   that blogid contains a trailing slash.
+
+	 - Updated POD
+
+0.7	 - Sat May 04 2002
+
+	 - Added hooks to Net::Blogger::Engine::Base::_Type to deal with
+	   arrays and hashes correctly
+
+	 - Updated POD in Net::Blogger::Engine::Movabletype::mt
+
+0.7_b1	 - Sat May 04 2002
+
+	 - Added support for the metaWeblog API in the MovableType
+	   engine
+
+	 - Added support for the mt (MovableType) API in the MovableType
+	   engine
+
+	 - Added hooks in Net::Blogger::Base to filter changes to login
+	   data in a parent engine to child APIs
+
+	 - Added hooks in Net::Blogger::Engine::Userland::metaWeblog to
+	   catch calls to methods not supported by the Movabletype engine.
+	   Ugh.
+
+	 - Added quotes to $VERSION in all packages.
+
+	 - Updated POD in Movabletype.pm
+
+	 - Upped version requirement for SOAP::Lite to 0.55
+
+0.6.3	 - Mon Apr 15 2002
+
+	 - Went through all the packages and fixed POD errors (ugh.)
+
+0.6.2.2	 - Sun Apr 14 2002
+
+	 - No changes. But, since I uploaded the current codebase
+	   to the CPAN as v 0.6.1.2, I decided to upload a new
+	   version with a new version number just to keep everyone
+           on first.
+
+0.6.2.1
+
+
+   Updated POD
+
+0.6.2
+
+
+   Added support for the UserLand metaWeblog API in
+   the RadioUserLand engine
+
+0.6.1
+
+
+   Bugs fixes in Blogger::Engine::Base
+
+0.6
+
+
+   Moved most of the code in to Blogger::API::Core,
+   Blogger::API::Extended, Blogger::Engine::Base and
+   Blogger::Engine::Blogger
+
+   Replaced use of Frontier::Client with XMLRPC::Lite
+   (in Blogger::Engine::Base)
+
+   Updated POD
+
+0.5.1
+
+
+   Modified internals to load implementation specific
+   subclass based on the engine argument passed to
+   the constructor. Props to Simon Kittles for the
+   smack upside the head about the right way to do
+   this :-)
+
+   Updated POD.
+
+0.5
+
+
+   Added Blogger API getPost method.
+
+   Updated POD.
+
+0.4.6.1
+
+
+   Added Blogger.pm BLOGGER_PROXY constant.
+
+   Added Blogger.pm Proxy and MaxPostPostLength
+   accessors for corresponding constants. Previously,
+   these values were either read from a scalar
+   constant or an AUTOLOAD method. The change allows
+   [insert blogger-mimicking interface here]
+   subclasses to override the methods and specify an
+   approriate value.
+
+   Updated POD
+
+0.4.5
+
+
+    Added Blogger API getRecentPosts method.
+
+    Updated POD
+
+0.4.4.1
+
+
+   Clarified a few error messages;
+
+   Fixed remaining instances of
+   "Error::Simple->record() and return0. in
+   &AUTOLOAD
+
+
+
+0.4.4
+
+
+    Added use of Error.pm
+
+    Added Blogger.pm LastError method.
+
+
+    Wrapped Frontier::Client method calls in eval
+    statements to prevent unnecessary die-ing.
+
+    Added stub function and methods calls for Blogger.pm
+    private _TrimPostBody method.
+
+    Changed return value of Blogger.pm PostFromFile to
+    (boolean, array)
+
+    Updated POD.
+
+0.4.3
+
+
+    Made sure all Blogger.pm methods begin with title
+    case.
+
+0.4.2
+
+
+
+    Added private Blogger.pm _Encode method. Code courtesy of
+    Matt Sergeant's rssmirror.pl script. Someone, give this
+    guy a YAS grant.
+
+
+    Added --tail flag to Blogger.pm PostFromFile method.
+
+
+    Fixed a bug in Blogger.pm _PostInChunks method where I
+    would end up subscripting outside of the string.
+
+0.4.1
+
+
+     Added idiot-level escaping of entities in Blogger.pm
+     newPost and editPost methods. Duh.
+
+0.4
+
+
+     Switched to named-based pair arguments.
+
+     Added Blogger API deletePost method.
+
+     Added the Blogger.pm PostFromFile method. Experimental
+
+     Changed Blogger.pm MAX_POSTLENGTH constant.
+
+     Updated POD
+
+0.3.1
+
+
+     Updated POD
+
+
+0.3
+
+
+     Added the Blogger API getTemplate and setTemplate
+     methods.
+
+     Added the Blogger.pm _PostInChunks method.
+
+     Changed the order in which parameters are passed to
+     editPost.
+
+     Changed the return value of both the Blogger API
+     newPost and editPost methods.
+
+0.2
+
+
+     Added the Blogger API getUsersBlogs and editPost
+     methods.
+
+     Adde the Blogger.pm GetBlogId method.
+
+     Removed the Blogger.pm Publish method.
+
+     Modifed the Blogger API newPost method to accept the
+     option to publish.
+
+0.1
+
+
+     Initial setup.
+
+     Added the constructor methods.
+
+     Added the Blogger API newPost method.
+
+     Added the Blogger.pm Publish method.

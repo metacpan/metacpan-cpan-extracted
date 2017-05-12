@@ -1,0 +1,70 @@
+NAME
+    Net::Connection::Simple - Perl extension handling simple connection info
+    within an application
+
+SYNOPSIS
+      use Net::Connection::Simple;
+      my $c = Net::Connection::Simple->new(seenFirst => (time()-1800), seenLast => time());
+
+      $c->protocols(Net::Protocol::Simple->new(protocol => tcp, layer => 4));
+      $c->protocols(Net::Protocol::Simple->new(protocol => 'ip', layer => 3));
+      $c->protocols(Net::Protocol::Simple->new(protocol => 'irc', layer => 7));
+
+      $c->protocols({
+            1 => Net::Protocol::Simple->new(protocol => 6, layer => 4),
+            2 => Net::Protocol::Simple->new(protocol => 'ip', layer => 3),
+            3 => Net::Protocol::Simple->new(protocol => 'irc', layer => 7),
+      });
+
+      $c->protocols([
+            Net::Protocol::Simple->new(protocol => 6, layer => 4),
+            Net::Protocol::Simple->new(protocol => 'ip', layer => 3),
+            Net::Protocol::Simple->new(protocol => 'irc', layer => 7),
+      ]);
+
+DESCRIPTION
+      This module created to handle simple information about connections.
+
+OBJECT METHODS
+  new
+    Constructs the Connection object
+
+    Accepts:
+
+            protocols => [ARRAY|HASHREF|Net::Protocol::Simple]
+
+  protocols
+    Returns a HASHREF of the protocols composing the connection [See
+    Net::Protocol::Simple] keyed by layer
+
+    Accepts:
+
+            HASHREF:
+                    { $key    => Net::Protocol::Simple(...),
+                      $key++  => Net::Protocol::Simple(...),
+                      $key++  => Net::Protocol::Simple(...),
+                    }
+
+            ARRAY:
+                    [
+                      Net::Protocol::Simple->new(...),
+                      Net::Protocol::Simple->new(...),
+                      Net::Protocol::Simple->new(...),
+                    ]
+
+            Net::Protocol::Simple:
+                    Net::Protocol::Simple->new(protocol => 6, layer => 4)
+
+SEE ALSO
+    Net::Protocol::Simple, Time::Timestamp
+
+AUTHOR
+    Wes Young, <saxguard9-cpan@yahoo.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Wes Young
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.7 or, at
+    your option, any later version of Perl 5 you may have available.
+

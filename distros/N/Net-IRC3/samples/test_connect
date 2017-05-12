@@ -1,0 +1,15 @@
+#!perl
+use AnyEvent;
+use Net::IRC3::Connection;
+
+my $c = AnyEvent->condvar;
+
+my $con = new Net::IRC3::Connection;
+
+$con->connect ("localhost", 6667);
+
+$con->reg_cb (irc_001 => sub { print "$_[1]->{prefix} says i'm in the IRC: $_[1]->{trailing}!\n"; $c->broadcast });
+$con->send_msg (undef, NICK => undef, "testbot");
+$con->send_msg (undef, USER => 'testbot', "testbot", '*', '0');
+
+$c->wait;

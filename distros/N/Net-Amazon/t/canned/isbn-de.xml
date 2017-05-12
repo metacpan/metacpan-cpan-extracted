@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ItemLookupResponse xmlns="http://webservices.amazon.com/AWSECommerceService/2007-01-15">
+  <Items>
+    <Item>
+      <ASIN>357000922X</ASIN>
+      <SalesRank>183814</SalesRank>
+      <ItemAttributes>
+        <Author>Renate Dorrestein</Author>
+        <Binding>Gebundene Ausgabe</Binding>
+        <Creator Role="Übersetzer">Hanni Ehlers</Creator>
+        <EAN>9783570009222</EAN>
+        <ISBN>357000922X</ISBN>
+        <Label>Bertelsmann, München</Label>
+        <Manufacturer>Bertelsmann, München</Manufacturer>
+        <NumberOfPages>314</NumberOfPages>
+        <PackageDimensions>
+          <Weight Units="grams">529</Weight>
+        </PackageDimensions>
+        <ProductGroup>Book</ProductGroup>
+        <PublicationDate>2006-08</PublicationDate>
+        <Publisher>Bertelsmann, München</Publisher>
+        <Studio>Bertelsmann, München</Studio>
+        <Title>Der Ausflug</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>1995</Amount>
+          <CurrencyCode>EUR</CurrencyCode>
+          <FormattedPrice>EUR 19,95</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>995</Amount>
+          <CurrencyCode>EUR</CurrencyCode>
+          <FormattedPrice>EUR 9,95</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>39</TotalNew>
+        <TotalUsed>4</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+    </Item>
+  </Items>
+</ItemLookupResponse>

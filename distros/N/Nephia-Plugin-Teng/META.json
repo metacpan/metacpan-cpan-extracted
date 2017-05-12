@@ -1,0 +1,85 @@
+{
+   "abstract" : "Simple ORMapper Plugin For Nephia",
+   "author" : [
+      "mackee <macopy123[attttt]gmai.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.7.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Nephia-Plugin-Teng",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Nephia" : "0.80",
+            "Teng" : "0.18",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "HTTP::Request::Common" : "0",
+            "JSON" : "0",
+            "Nephia::Plugin::Dispatch" : "0",
+            "Nephia::Plugin::JSON" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Nephia::Plugin::Teng" : {
+         "file" : "lib/Nephia/Plugin/Teng.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mackee/Nephia-Plugin-Teng/issues"
+      },
+      "homepage" : "https://github.com/mackee/Nephia-Plugin-Teng",
+      "repository" : {
+         "url" : "git://github.com/mackee/Nephia-Plugin-Teng.git",
+         "web" : "https://github.com/mackee/Nephia-Plugin-Teng"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [
+      "ichigotake <k.wisiiy@gmail.com>",
+      "mackee <macopy123@gmail.com>"
+   ]
+}

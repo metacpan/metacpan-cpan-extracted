@@ -1,0 +1,18 @@
+* Implement sign requests - needed by 15 August 2009.
+
+* Moose?
+
+* Examples to show the user how take better advantage of the AWS4.
+
+* The sort values are not auto-generated, or validated, and some of the sort
+  terms have changed with the move to AWS4.  There doesn't seem to be much rhyme
+  or reason to these terms.  I need to add code to fix this.
+
+* Code cleanup for Request, and Amazon.
+
+* More searches!  Orchestra, Restaurant, ...
+  * By Request: CustomerContentSearch, CustomerContentLookup, ListSearch
+
+* More properties! Apparel, ...
+
+* Investigate the use of WADL to automate the majority of Net::Amazon.

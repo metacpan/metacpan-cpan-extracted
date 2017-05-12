@@ -1,0 +1,9 @@
+Changes
+lib/Number/Phone/CountryCode.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/basic.t
+t/codes.t
+META.yml                                 Module meta-data (added by MakeMaker)

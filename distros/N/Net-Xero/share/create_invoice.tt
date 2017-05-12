@@ -1,0 +1,88 @@
+<Invoice>
+  <Reference>[% reference %]</Reference>
+  <Type>[%- IF type == 'pay' %]ACCPAY[%- ELSE %]ACCREC[%- END %]</Type>
+  <Status>[% status || 'DRAFT' %]</Status>
+  [%- IF currency %]<CurrencyCode>[% currency %]</CurrencyCode>[%- END %]
+
+  <Contact>
+    <ContactNumber><![CDATA[[% contact.id %]]]></ContactNumber>
+    <ContactStatus>ACTIVE</ContactStatus>
+    <EmailAddress><![CDATA[[% contact.email %]]]></EmailAddress>
+    <Name><![CDATA[[% contact.first_name %] [% contact.last_name %]]]></Name>
+    <Title>[% contact.title %]</Title>
+    <FirstName><![CDATA[[% contact.first_name %]]]></FirstName>
+    <LastName><![CDATA[[% contact.last_name %]]]></LastName>
+    <DefaultCurrency>GBP</DefaultCurrency>
+    <Addresses>
+      <Address>
+        <AddressType>STREET</AddressType>
+        <AttentionTo><![CDATA[[% contact.first_name %] [% contact.last_name %]]]></AttentionTo>
+        <AddressLine1><![CDATA[[% contact.address_line_1 %]]]></AddressLine1>
+        <AddressLine2><![CDATA[[% contact.address_line_2 %]]]></AddressLine2>
+        <AddressLine3><![CDATA[[% contact.address_line_3 %]]]></AddressLine3>
+        <City><![CDATA[[% contact.town_city %]]]></City>
+        <Region><![CDATA[[% contact.county %]]]></Region>
+        <PostalCode><![CDATA[[% contact.postcode %]]]></PostalCode>
+        <Country><![CDATA[[% contact.country %]]]></Country>
+      </Address>
+    </Addresses>
+    <Phones>
+      <Phone>
+        <PhoneType>DEFAULT</PhoneType>
+        <PhoneNumber><![CDATA[[% contact.phone %]]]></PhoneNumber>
+        <PhoneAreaCode></PhoneAreaCode>
+        <PhoneCountryCode></PhoneCountryCode>
+      </Phone>
+    </Phones>
+    [%- IF type == 'pay' %]
+    <IsSupplier>true</IsSupplier>
+    [%- ELSE %]
+    <IsCustomer>true</IsCustomer>
+    [%- END %]
+  </Contact>
+  <Date>[% date %]</Date>
+  <DueDate>[% duedate %]</DueDate>
+  <LineAmountTypes>[% lineamounttypes %]</LineAmountTypes>
+  <LineItems>
+  [%- FOREACH line IN lineitems %]
+    <LineItem>
+      <Description><![CDATA[[[% line.desc %]]]></Description>
+      <Quantity>[% line.quantity %]</Quantity>
+      <UnitAmount>[% line.amount %]</UnitAmount>
+      [% IF line.account %]<AccountCode>[% line.account %]</AccountCode>[% END %]
+      [% IF line.itemcode %]<ItemCode>[% line.itemcode %]</ItemCode>[% END %]
+      [% IF line.taxcode %]<TaxType>[% line.taxcode %]</TaxType>[% END %]
+      [%- IF line.tracking %]
+      <Tracking>
+      [%- FOREACH track in line.tracking %]
+      <TrackingCategory>
+        <Name>[% track.category %]</Name>
+        <Option>[% track.option %]</Option>
+      </TrackingCategory>
+      [%- END %]
+      </Tracking>
+      [%- END %]
+      [%- IF line.tax_type %]<TaxType>[% line.tax_type %]</TaxType>[% END %]
+    </LineItem>
+  [%- END %]
+  </LineItems>
+  [% IF payments %]
+  <Payments>
+    [%- FOREACH pay IN payments %]
+    <Payment>
+      <Account>
+        <Code>[% pay.account %]</Code>
+      </Account>
+      <Date>[% pay.date %]</Date>
+      <Amount>[% pay.amount %]</Amount>
+      <Description><![CDATA[[% pay.description %]]]></Description>
+    </Payment>
+    [% END %]
+  </Payments>
+  [% END %]
+  [%- IF tax %]
+  <TotalTax>[% tax %]</TotalTax>
+  <SubTotal>[% net %]</SubTotal>
+  [%- END %]
+  [%- IF total %]<Total>[% total %]</Total>[%- END %]
+</Invoice>

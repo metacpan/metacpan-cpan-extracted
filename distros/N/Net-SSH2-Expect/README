@@ -1,0 +1,38 @@
+Net::SSH2::Expect - Simple Expect-Like Module for Net::SSH2
+===========================================================
+
+With Net::SSH2::Expect you have an Expect like module to control the execution of a process.
+
+INSTALLATION
+
+To install Net::SSH2::Expect type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules, libraries and programs:
+
+   Net::SSH2
+
+BUGS/FEATURE REQUESTS
+
+Please report bugs and request features on the GitHub Issue System (https://github.com/krimdomu/net-ssh2-expect).
+
+HACKING
+
+The module is kept in a GitHub (https://github.com/krimdomu/net-ssh2-expect)
+repository.
+
+If you are interested in making a change/fix, just do a pull request.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Jan Gehring; all rights reserved.
+
+Net::SSH2::Expect is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.
+

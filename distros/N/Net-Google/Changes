@@ -1,0 +1,234 @@
+# Revision history for Perl extension Net::Google.
+# $Id: Changes,v 1.23 2005/04/02 21:51:16 asc Exp $
+
+1.0      Fri Dec 02, 2005
+
+	 - The "Nothing Special" release. It's just been almost
+	   three years. I think we can call it 1.0, don't you?
+
+	 - Added 'queries_exhausted' methods to indicate whether
+	   Google API query limit has been reached (RT ticket
+	   12001)
+
+	 - Fixed POD errors in Net::Google::Response (RT ticket
+	   8735)
+
+	 - Updated t/002-spelling.t (RT ticket 11386/11458)
+
+	 - Updated POD
+
+	 - Replace ExtUtils::MakeMaker with Module::Build
+
+         - Pass maintainership to Bill Stillwell
+
+0.62	 Wed Jun 02, 2004
+
+	 - Fixed POD in N:G:Response (RT bug #5351)
+
+	 - Updated spel(l)ings in t/002-spelling.t
+	   (RT bug #6183)
+
+	 - Updated N:G:Search to account to weirdness
+	   in the way SOAP::Lite handles booleans. Not
+	   clear that this is necessarily a problem in
+           SOAP::Lite but the patch fixes a reported bug
+	   and doesn't seem to break anything else so...
+	   (RT bug #6167)
+
+	 - Added explicit call to $search->filter(1)
+	   in t/001-search.t (RT bug #6167)
+
+0.61	 Mon Feb 09, 2004
+
+	 - Fixed bug in N:G:Search.pm that would cause
+	   an infinite loop when a user enters an invalid
+	   API key (RT bug #4208)
+
+	 - Fixed bug passing boolean for safe/filters
+	   (RT bug #2737)
+
+	 - Removed the N:G:Search->ie and N:G:Search->oe
+	   methods after reading the docs a little more
+	   carefully and seeing "The parameters <ie> and 
+	   <oe> are required in client requests but their 
+	   values are ignored." Gah! (RT bug #4393)
+
+	 - Fixed typo in method name in ::Response.pm
+	   (thanks to mystery rt.cpan user!)
+
+	 - Removed use of CPAN::MakeMaker
+
+	 - Updated POD
+
+0.60	 Mon Mar 10 2003
+
+	 - Blessed Net::Google as 0.60
+
+	 - Blessed Net::Google::tool as 1.0
+
+	 - Updated POD and added comments
+
+0.60_02	 Mon Mar 10 2003
+
+	 - Tweaked ::Google.pm to override 'http_proxy' method
+	   to store url for later use since it doesn't have a
+	   service thingy to update...duh.
+
+	 - Tweaked ::tool.pm 'http_proxy' method to store and 
+	   return url
+
+0.60_01	 Sun Mar 09 2003
+
+	 - Updated global and service-related constructors to 
+	   watch for an HTTP proxy argument.
+
+	 - Added 'http_proxy' and 'key' (where necessary) methods
+	   to global and service-related packages.
+
+         - Updated hooks to allow 'debug' argument to (optionally)
+	   be a reference to a subroutine.
+
+	 - Service related packages are loaded at run-time rather
+	   than compile-time.
+
+	 - Updated ::Service.pm to set HTTP proxy, if necessary.
+
+	 - Added Net::Google::tool as base class for most others.
+
+	 - Update Makefile.PL to check for LWP::Protocol::file
+
+	 - Updated Service.pm to set SOAP::Lite debugging via
+	   SOAP::Trace rather than deprecated 'on_debug' method.
+
+	 - Updated POD.
+
+0.53	 Sat Feb 22 2003
+
+	 - Checked for '__state'-ness before comparing it in
+           ::Search.pm; would raise a warning when undefined and
+           -w flag was in effect (thanks to Sherzod Ruzmetov for 
+	   the heads up)
+	   
+	 - Updated POD
+
+0.52	 Sat Nov 02 2002
+
+	 - Removed old code from ::Google.pm (duh)
+
+	 - Updated POD
+
+0.52_1	 Fri Nov 01 2002
+
+	 - Added Net::Google::Service, which isn't anything new but
+	   just an abstracting of the code to return SOAP widgets
+
+	 - Added leading '&' to constants so that they'll play nicely
+	   with Perl 5.005_02 (see note in ::Service.pm - props to 
+	   Martin Ebert for pointing this out.)
+
+	 - Updated to use CPAN::MakeMaker
+
+	 - Fussed with .t files (mostly just so that they work correctly
+	   when I call them from the command line)
+
+	 - Updated POD
+
+0.51	 Sat Oct 26 2002
+
+	 - Updated ::Search.pm to watch '__endIndex' key and have it take 
+	   precedence over max_results method if the former is less than 
+	   the latter. (Props to Bjoern Hoehrmann for the fix.)
+
+	 - Added return_estimatedTotal() method to do the same thing but
+	   comparing against '__estimatedTotalResultsCount'
+
+	 - Replaced test.pl with t/*.t files
+
+	 - Updated POD
+
+0.5	 Wed May 03 2002
+	 
+	 - Contributed patch by Marc Hedlund <marc@precipice.org>.
+	   Thanks!
+
+	 - Put single quotes around all $VERSION numbers in order to
+           match MakeMaker's expected format (see ExtUtils::MakeMaker
+           perldoc, Using Attributes and Parameters: VERSION_FROM).
+           Fixes make install errors with perl-5.6.1.
+
+	 - Created a new Net::Google::Response object to hold more
+           information from the search response.
+
+	 - Updated Net::Google::Search to use Net::Google::Response.
+
+	 - Added Net::Google::Search::_state and introduced some degree
+	   of memoization to response/result objects
+
+	 - Moved most of the code in Net::Google::Search::results into
+	   Net::Google::Search::response
+
+	 - Updated test.pl to be a bit more verbose (Thanks to Lee Goddard 
+	   and the CPAN-testers.)
+
+	 - Updated POD
+	 
+0.4.2	 Wed Apr 17 2002
+
+	 - No changes to actual codebase. Fixed errors in MANIFEST 
+	   so that the dist will make and install properly. Oh the
+	   duh-ness...it hurts.
+
+0.4.1	 Mon Apr 15 2002
+
+	 - Went through all the packages and fixed POD errors (ugh.)
+
+0.4	 Sun Apr 14 2002
+
+	 - Added Google::Spelling package and Google::spelling method
+
+	 - Added Google::Cache package and Google::cache method
+
+	 - Added Perl license to Google::Search.pm
+
+	 - Updated POD in Google.pm and Google::Search.pm
+
+0.3.1	 Sun Apr 14 2002
+
+	 - Fixed error handling in ::Google::_soap
+
+0.3	 Sat Apr 13 2002
+
+	 - Fixed bugs in ::Search::results and ::Search::_results
+
+	 - Added hooks to Search.pm constructor for setting values
+
+	 - Added ::Google::_service to locate service descriptions via @INC
+
+	 - Added ::Search::restrict and made ::Search::(lr|ie|oe) store values, internally, as array references
+
+	 - ::Search::lr no longer returns data separated by pipe character
+
+	 - Fixed ::Search::key to store values
+
+	 - Fixed a bunch of instances where internal array references were not being flushed properly
+
+	 - Removed sanity checking on arguments passed to search methods for the time being
+
+	 - Fixed bug where parent debug flags wasn't being passed to child search objects
+
+	 - Updated POD
+
+0.2	 Fri Apr 12 2002
+
+	 - Moved search related functions into Search.pm
+
+	 - Added ability to return more than 10 results at a time
+
+	 - Added most of the methods for setting search options
+
+	 - Updated POD
+
+0.1	 Thu Apr 11 2002
+
+	 - Intial revision
+

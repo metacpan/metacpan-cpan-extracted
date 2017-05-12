@@ -1,0 +1,26 @@
+---
+name: Net-Flickr-Simile
+version: 0.1
+author:
+  - Aaron Straup Cope &lt;ascope@cpan.org&gt;
+abstract: base class for Net::Flickr::Simile packages
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  IO::AtomicFile: 0
+  JSON::Any: 1.08
+  Net::Flickr::API: '>= 1.67'
+build_requires:
+  Test::Simple: '>= 0.47'
+provides:
+  Net::Flickr::Simile:
+    file: lib/Net/Flickr/Simile.pm
+    version: 0.1
+  Net::Flickr::Simile::Exhibit:
+    file: lib/Net/Flickr/Simile/Exhibit.pm
+    version: 0.1
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

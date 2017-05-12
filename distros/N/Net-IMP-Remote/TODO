@@ -1,0 +1,5 @@
+
+- close active analyzers if connection breaks
+- reconnect after connection broke
+- maybe alternative serializers
+- better documentation and tests

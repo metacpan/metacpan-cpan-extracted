@@ -1,0 +1,55 @@
+{
+   "abstract" : "A Bind DNS zone file generator",
+   "author" : [
+      "Daniel P. Berrange <dan.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "NoZone",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Record" : "v1.1.2",
+            "File::Spec::Functions" : "0",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "NoZone" : {
+         "file" : "lib/NoZone.pm",
+         "version" : "1.0"
+      },
+      "NoZone::Zone" : {
+         "file" : "lib/NoZone/Zone.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+      ]
+   },
+   "version" : "1.0"
+}

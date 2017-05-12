@@ -1,0 +1,241 @@
+=head1 NAME
+
+Net::NIS - Interface to Sun's Network Information Service
+
+=head1	SYNOPSIS
+
+  use Net::NIS;
+  tie %hash, 'Net::NIS', $mapname [, $domainname];
+  $value = $hash{$key};
+
+or
+
+  ($status, $value) = Net::NIS::yp_match
+                          (Net::NIS::yp_get_default_domain(),
+                          $mapname, $key);
+
+=head1 DESCRIPTION
+
+The Net::NIS interface comes in three parts:
+
+=over 4
+
+=item 1. raw
+
+The first part is the raw implementation of the NIS API.
+
+=item 2. OO
+
+The second is the object interface, described in L<Net::NIS::Table>.
+
+=item 3. Tie
+
+The third is a new 'Tied' interface, allowing simple access to NIS maps
+using Perl hashes.
+
+=back
+
+This document describes the NIS API implementation and the 'Tied' mechanism.
+
+=head2	Tied Implementation
+
+NIS maps are simple key/value pairs, perfectly suited for Perl
+hashes.  B<Net::NIS> allows any given NIS map to be treated as a
+hash (read-only).  Usage is:
+
+    tie %hash, 'Net::NIS', $mapname [, $domainname];
+
+I<$mapname> must be specified, and be a valid map in the given
+domain.  If the file F</var/yp/nicknames> exists, it is used to
+obtain a list of acceptable shortcut names, such as C<aliases>
+for C<mail.aliases>.  Otherwise, a hardcoded set of the "usual
+suspects" is consulted.
+
+If I<$domainname> is not given, the C<yp_get_default_domain>
+function is used to determine the current NIS domain.  This
+is usually the same as will be displayed by the C<domainname>
+command.
+
+If B<Net::NIS> cannot tie to a given I<map>, it returns C<undef>,
+with an appropriate error value in the variable B<$yperr>.  See
+L</ERRORS>.
+
+To look up an entry in a YP map, simply use the entry name as
+a key in the tied hash.  B<Net::NIS> returns a string if the
+key exists in the map, or C<undef> if it is not found.
+For any errors other than YPERR_KEY, B<Net::NIS> raises a fatal
+exception through C<croak>.
+
+B<Example>
+
+  tie %alias, 'Net::NIS', 'mail.aliases'
+    or die "Cannot tie to mail.aliases YP map: $yperr\n";
+  print "postmaster is ", $alias{postmaster} || "<unknown>", "\n";
+
+As a special case, the magic map B<__YPMASTER> can be used as
+an equivalent to 'ypwhich -m':
+
+  tie %ypmaster, 'Net::NIS', '__YPMASTER' or die ...;
+  printf "ypmaster(passwd) = %s\n", $ypmaster{'passwd.byname'};
+
+  print  $_, "\n"    for sort keys %ypmaster;	# Only works on Linux!
+
+Note that keys() only works on Linux, because Linux includes
+a helpful yp_maplist() function.  On Linux, you can get a list
+of existing YP maps.  On other OSes, you can't -- but given
+the name of an existing map, $ypmaster{$map} will work as expected.
+
+
+=head2	NIS API Implementation
+
+The NIS package implements all functions described in the L<ypclnt(3N)>
+manual page.
+
+The following commands have been implemented:
+
+=over 5
+
+=item yp_bind($domain)
+
+Bind the process to a NIS server for the domain $domain.  This
+function is rarely needed.  See L<yp_bind(3N)>.
+
+=item yp_unbind($domain)
+
+Unbind the process from the specified $domain.  This function is also
+rarely required.  See L<yp_unbind(3N)>.
+
+=item $domain = yp_get_default_domain()
+
+Return the host's local domain.  (The same as the L<domainname>
+program).  See L<yp_get_default_domain(3N)>.
+
+=item ($status, $value) = yp_match($domain, $map, $key)
+
+Return the $value for the given $key in the $map for the domain
+$domain.  The $key must be an exact match for an item in the map (I<i.e.>
+yp_match does no partial matching.  The $value is only valid if
+$status is equal to YPERR_SUCCESS.
+
+If called in scalar context, yp_match returns only $value, and it
+is up to the user to check $yperr.
+
+=item ($status, $key, $value) = yp_first($domain, $map)
+
+Return the first key-value pair from $map in $domain.  As the NIS maps
+are stored in a DBM table, the order of the returned values is
+not obvious.
+
+=item ($status, $key, $value) = yp_next($domain, $map, $key)
+
+Return the next key-value pair from $map in $domain.  The $key must be
+provided from the previous L<yp_first> or L<yp_next>.  The
+L<yp_first>/L<yp_next> method is not recommended, as under some
+circumstances, entries can be skipped or returned twice.  L<yp_all> is
+a better interface to use.
+
+=item ($status, \%values) = yp_all($domain, $map)
+
+The L<yp_all> call returns an entire map in the %values associative
+array.
+
+=item ($status, $order) = yp_order($domain, $map)
+
+This function returns the order number for $domain.  Whatever that is.
+It mustn't be very important, since it's not implemented on NIS+
+servers running in "YP-compatibility mode".  I put it in for
+completeness.
+
+=item ($status, $name) = yp_master($domain, $map)
+
+Returns the machine name of the master server for a map.
+
+=item $error = yperr_string($status) B<[DEPRECATED, use $yperr]>
+
+Returns a string representation of the error code passed in $status.
+
+=item $status = ypprot_err($code) B<[DEPRECATED]>
+
+Translates a NIS name service protocol error code to a ypclnt layer
+error code.  Only used for the C version of L<yp_all>, and it is only
+implemented here for completeness.
+
+=back
+
+=head1 EXPORT
+
+The magic variable B<$yperr> is exported by default (see L</ERRORS>).
+
+=head2 Exportable constants
+
+The following error status constants can be imported individually, or
+by using the ':all' symbol:
+
+    YPERR_SUCCESS       There is no error
+    YPERR_BADARGS       Args to function are bad
+    YPERR_RPC           RPC failure
+    YPERR_DOMAIN        Can't bind to a server with this domain
+    YPERR_MAP           No such map in server's domain
+    YPERR_KEY           No such key in map
+    YPERR_YPERR         Internal yp server or client error
+    YPERR_RESRC         Local resource allocation failure
+    YPERR_NOMORE        No more records in map database
+    YPERR_PMAP          Can't communicate with portmapper
+    YPERR_YPBIND        Can't communicate with ypbind
+    YPERR_YPSERV        Can't communicate with ypserv
+    YPERR_NODOM         Local domain name not set
+    YPERR_BADDB         yp data base is bad
+    YPERR_VERS          YP version mismatch
+    YPERR_ACCESS        Access violation
+    YPERR_BUSY          Database is busy
+
+
+=head1	ERRORS
+
+Instead of having 'tie' succeed and the first access fail,
+TIEHASH() (the function executed when performing a B<tie>) performs
+some sanity checks: it ensures the validity of the domain and
+map names.  On failure, 'tie' returns C<undef>, with an appropriate
+error value in B<$yperr> :
+
+    tie %myhash, 'Net::NIS', 'foo-bar'
+      or die "Unable to access foo-bar map: $yperr\n"
+
+Note that the B<$yperr> variable is magic, like Perl's B<$!>.
+If accessed in a string context, it returns a human-friendly
+string obtained from the C<yperr_string> library function.
+In a numeric context, B<$yperr> returns the numeric status
+code returned from the last YP function.  This can be compared
+against the error constants above, if you so desire.
+
+=head2	Other Errors
+
+    Your vendor has not defined Net::NIS macro YPERR_xxxx
+
+This indicates that one of the standard YPERR_xxx constants is
+not defined in your host's E<lt>rpcsct/ypclnt.hE<gt> file.  You
+might see this during S<make test> on an old system, perhaps.
+
+    Unable to find 'KEY' in 'MAP'.  Reason: ...
+
+If an attempt to access a tied variable fails for any reason
+other than 'no such key in map', FETCH() raises this fatal
+exception.  It probably indicates that YP has gone down, or
+there is some other fatal error.  This can be caught with eval{},
+but I'm not sure what you can do about it...
+
+
+=head1 AUTHOR
+
+Copyright (c) 1995, 2002 Rik Harris (B<rik.harris@fulcrum.com.au>),
+2002-2014 Ed Santiago. All
+rights reserved.  This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+Net::NIS is currently maintained by Ed Santiago <esm@cpan.org>.
+
+The Network Information Service (NIS) was formerly known as Sun Yellow
+Pages (YP). The functionality of the two remains the same; only the
+name has changed.  The name Yellow Pages is a registered trademark in
+the United Kingdom of British Telecommunications plc, and may not be
+used without permission.

@@ -1,0 +1,54 @@
+{
+   "abstract" : "Network appliance command-line phrasebook",
+   "author" : [
+      "Oliver Gorwits <oliver@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Appliance-Phrasebook",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Class::Data::Inheritable" : 0,
+            "Data::Phrasebook" : 0,
+            "Data::Phrasebook::Loader::YAML" : 0,
+            "File::Basename" : 0,
+            "List::MoreUtils" : 0,
+            "List::Util" : 0,
+            "Symbol" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Net-Appliance-Phrasebook"
+      },
+      "homepage" : "https://github.com/ollyg/Net-Appliance-Phrasebook/wiki",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ollyg/Net-Appliance-Phrasebook.git",
+         "web" : "https://github.com/ollyg/Net-Appliance-Phrasebook"
+      }
+   },
+   "version" : "2.103642"
+}
+

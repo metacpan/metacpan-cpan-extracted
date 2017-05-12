@@ -1,0 +1,20 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Tester;Testy;;;
+FN:Testy Tester
+ORG:Test Inc.;
+TITLE:Testing export
+EMAIL;type=WORK;type=pref:testy@test.com
+TEL;type=WORK;type=pref:555-1212
+TEL;type=CELL:666-2121
+ADR;type=HOME;type=pref:;;123 Disk Dr.\nSuite 101 \ side door;Ottawa;Ontario;K1Y 2E9;Canada
+ADR;type=WORK:;;74 Bayswater Ave;Ottawa;ON;K1Y 2E9;Canada
+NOTE:Notes about Testy the Tester. He is a very nice guy.\n\nHowever I don't think I like him that much.
+URL:http://www.test.com
+BDAY;value=date:1970-02-08
+X-AIM;type=HOME;type=pref:12345678
+X-JABBER;type=WORK;type=pref:jabbernumber
+X-MSN;type=WORK;type=pref:msnnumber
+X-YAHOO;type=WORK;type=pref:yahoonumber
+X-ICQ;type=WORK;type=pref:987654321
+END:VCARD

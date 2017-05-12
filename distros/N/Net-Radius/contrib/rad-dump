@@ -1,0 +1,154 @@
+#!/usr/bin/perl
+
+no utf8;
+use strict;
+use warnings;
+
+our $VERSION = do { sprintf "%0.03f", (q$Revision: 94 $ =~ /\d+/g) };
+
+use IO::File;
+use Pod::Usage;
+use Data::Dumper;
+use Getopt::Long;
+use Net::Radius::Packet;
+use Net::Radius::Dictionary;
+
+use UNIVERSAL qw/isa/;
+
+my %opt;
+GetOptions(\%opt, qw/
+	   dictionary=s@
+	   secret=s
+	   help
+	   /);
+
+my %data = ();
+
+pod2usage(verbose => 2, exitval => 0) 
+    if $opt{help};
+
+pod2usage(verbose => 1, exitval => 1,
+	  message => 'Missing dictionary specification')
+    unless $opt{dictionary} and @{$opt{dictionary}};
+
+# Format general warnings
+local $SIG{__WARN__} = sub { warn "rad-dump: ", @_ };
+
+# Further processing will need us to read and parse a dictioary file -
+# Let's do this.
+
+my $d = new Net::Radius::Dictionary;
+
+foreach (@{$opt{dictionary}})
+{
+    die "Dictionary $_ unreadable: ", ($!||'Check permissions'), "\n" 
+	unless -r $_;
+    $d->readfile($_);
+}
+
+# Attempt to parse the packet, to auto-guess information and provide a
+# packet dump
+
+my $packet_data = join('', <>);
+
+pod2usage(verbose => 1, exitval => 1,
+	  message => "Failed to read packet data: $!")
+    unless $packet_data;
+
+warn length($packet_data), " octets read\n";
+
+my $p;
+
+eval 
+{ 
+    local $SIG{__WARN__} = sub {warn "bin2packet (during decode): ", @_ }; 
+    $p = new Net::Radius::Packet $d, $packet_data; 
+};
+
+warn "(Decoding error) $_\n" for split(/\n/, $@);
+
+if ($p and isa($p, 'Net::Radius::Packet'))
+{
+    warn "Packet decoded\n";
+    
+    if($opt{secret})
+    {
+	if (auth_acct_verify($packet_data, $opt{secret}))
+	{
+	    print "Packet authenticator is correct\n";
+	}
+	else
+	{
+	    print "Packet authenticator does NOT match\n";
+	}
+    }
+    else
+    {
+	print "No secret specified. Authenticator not checked.\n";
+    }
+
+    print $p->dump;
+    exit 0;
+}
+else
+{
+    warn "Failed to decode packet\n";
+    exit 255;
+}
+
+__END__
+
+=head1 NAME
+
+rad-dump - Dump a RADIUS packet payload into a human readable form
+
+=head1 SYNOPSIS
+
+    rad-dump --dictionary dictfile [--secret secret] dump-file
+
+=head1 DESCRIPTION
+
+This tool is used to convert the payload of a RADIUS packet stored in
+B<dump-file> into a human readable form, suitable for simple
+inspections.
+
+The following options are supported (Options can be shortened - See
+Getopt::Long(3)):
+
+=over
+
+=item B<--dictionary dictfile...>
+
+Specifies one or more dictionary files to use for decoding the
+supplied packet. Those dictionaries may be required for derived tests
+to work properly (ie, match the expected attribute names and/or
+values).
+
+=item B<--secret secret>
+
+If a secret is given, the packet authenticator is verified.
+
+=item B<--help>
+
+Shows this documentation, then exits.
+
+=back
+
+=head1 LICENSE AND WARRANTY
+
+This code and all accompanying software comes with NO WARRANTY. You
+use it at your own risk.
+
+This code and all accompanying software can be used freely under the
+same terms as Perl version 5.8.6 itself.
+
+=head1 AUTHOR
+
+Luis E. Muñoz E<lt>luismunoz@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+perl(1), Getopt::Long(3), Net::Radius::Packet(3),
+Net::Radius::Dictionary(3).
+
+=cut

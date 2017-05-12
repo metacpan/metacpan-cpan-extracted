@@ -1,0 +1,12 @@
+Revision history for Net-Async-SPORE
+
+0.003     2014-08-24 03:02:07+01:00 Europe/London
+	No new features.
+
+	Dependency fixes:
+	* Include Dir::Self for tests
+
+0.002     2014-08-24 02:54:05+01:00 Europe/London
+
+0.001     2014-08-23 15:52:18+01:00 Europe/London
+	Initial CPAN release

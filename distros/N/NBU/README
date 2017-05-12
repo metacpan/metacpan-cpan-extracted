@@ -1,0 +1,34 @@
+Hello dear reader,
+
+You have stumbled across yet another set of Perl modules to inspect (mostly) and
+sometimes manipulate Veritas NetBackup environments.  This set however is
+different than any the author saw at the time in that it is truly an object-
+oriented approach to the problem of asking questions of a NetBackup setup.  Thus
+you will find Perl modules corresponding to each of the major concepts in
+NetBackup:
+	NBU::Job.pm
+
+	NBU::Pool
+	NBU::Media
+	NBU::Image
+	NBU::Fragment
+
+	NBU::Class (aka Policy)
+	NBU::Schedule
+
+	NBU::StorageUnit
+	NBU::Robot
+	NBU::Drive
+
+	NBU::License
+
+	NBU::Host
+
+and a over-arching class simply called NBU to help hide local environmental
+matters as much as possible, allowing you to write your scripts in as neutral
+a way as possible.
+
+All these modules are automatically made available to your script when you 'use
+NBU' the top level module.  Please take a look at the examples directory to get
+a flavor for what these abstractions can do for you.  The bin directory
+contains some scripts that are usually helpful right out of the box.

@@ -1,0 +1,31 @@
+Revision history for Net-GraphSpace
+
+0.0009  2011-12-07
+        Added support for Node size 'auto'.
+
+0.0008  2011-11-26
+        Added get_graphs method.
+        Simplified Net::GraphSpace constructor.
+
+0.0007  2011-11-21
+        Removed MooseX::Method::Signatures dep + misc stuff.
+
+0.0006  2011-11-17
+        Updating to support the new GraphSpace resource hierarchy.
+
+0.0005  2011-11-06
+        Updating pod docs with links to http://graphspace.org.
+
+0.0004  2011-11-04
+        Net::GraphSpace now has host and port attributes in place of server.
+
+0.0003  2011-11-04
+        Updating pod docs with examples of non int id's.
+
+0.0002  2011-10-31
+        Fixed mistake in pod docs:
+            Net::GraphSpace does not have a name attribute.
+        Probably lots more of these to come.
+
+0.0001  2011-10-31
+        First version, released on an unsuspecting world.

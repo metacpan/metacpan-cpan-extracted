@@ -1,0 +1,24 @@
+Net::Nessus::REST
+=================
+
+DESCRIPTION
+-----------
+
+This module provides a Perl object-oriented interface over Nessus REST API,
+available since version 6.
+
+NSTALLATION
+------------
+
+To install this module type the following:
+
+tar xvzf Net-Nessus-REST-X.Y.tar.gz
+cd Net-Nessus-REST-X.Y
+perl Makefile.PL
+make
+make test
+make install
+
+AUTHORS
+-------
+Guillaume Rousse <guillomovitch@gmail.com>

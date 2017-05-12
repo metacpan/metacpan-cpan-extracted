@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+VERSION="v2.3.7"
+
+warn()  { echo "$@" >&2;        }
+die()   { warn "$@"; exit 1;    }
+
+DETECT=$(perl -MNarada -E 'say Narada::detect(@ARGV)') || exit 1
+
+rm -f var/use/services
+
+if test "$DETECT" = 'narada-1'; then
+	type='runit'
+elif test -f config/service/type; then
+	type="$(< config/service/type)"
+else
+	type=''
+fi
+if test "$type" = 'runit'; then
+	pid="$(fuser -v . 2>&1 | grep runsvdir | awk '{print$2}')"
+	if test -n "$pid"; then
+		kill -HUP "$pid"
+	fi
+	while fuser -v . 2>&1 | grep -q runsvdir; do
+		sleep 0.1
+	done
+elif test -n "$type"; then
+	die "Unknown type of services: '$type'"
+fi
+
+
+: <<'=cut'
+
+=encoding utf8
+
+=head1 NAME
+
+narada-shutdown-services - kill services and their supervisors
+
+
+=head1 VERSION
+
+This document describes narada-shutdown-services version v2.3.7
+
+
+=head1 USAGE
+
+    narada-shutdown-services
+
+
+=head1 DESCRIPTION
+
+Should be executed in project deploy directory (or Narada 1.x project root
+directory).
+
+Service supervisors usually started by cron, and may continue working
+even after project directory will be removed - with undefined result.
+
+So, if you want to stop and/or delete project you should run this command
+after C<narada-setup-cron --clean> to make sure all project services are
+not running anymore and won't start again.
+
+Type of services should be in C<config/service/type>.
+Currently supported types are: C<runit>.
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+  config/service/type
+
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/powerman/Narada/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software. The code repository is available for
+public review and contribution under the terms of the license.
+Feel free to fork the repository and submit pull requests.
+
+L<https://github.com/powerman/Narada>
+
+    git clone https://github.com/powerman/Narada.git
+
+=head2 Resources
+
+=over
+
+=item * MetaCPAN Search
+
+L<https://metacpan.org/search?q=Narada>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/dist/Narada>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Narada>
+
+=item * CPAN Testers Matrix
+
+L<http://matrix.cpantesters.org/?dist=Narada>
+
+=item * CPANTS: A CPAN Testing Service (Kwalitee)
+
+L<http://cpants.cpanauthors.org/dist/Narada>
+
+=back
+
+
+=head1 AUTHOR
+
+Alex Efros E<lt>powerman@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2008- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

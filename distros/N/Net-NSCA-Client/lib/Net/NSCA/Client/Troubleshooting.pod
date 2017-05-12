@@ -1,0 +1,64 @@
+=head1 NAME
+
+Net::NSCA::Client::Troubleshooting - Troubleshooting information
+
+=head1 COMMON SERVER ERROR MESSAGES
+
+=head2 Dropping packet with invalid CRC32
+
+When a packet is sent to the NSCA server and the following errror appears
+in the server log:
+
+  Dropping packet with invalid CRC32 - possibly due to client using wrong password or crypto algorithm?
+
+This can be cause by a number of reasons, as NSCA provides this as a
+catch-all error message.
+
+=head3 Wrong C<encryption_type> set
+
+It is possible the client is not sending the packet using the correct
+encryption type. Currently this module only support no encryption or the
+"XOR" encryption. If the server is expecting something different, this is
+not going to work.
+
+=head3 Wrong C<encryption_password> set
+
+It is possible that the client is not using the current encryption
+password. Please double-check that the client and the server are using the
+same password.
+
+=head3 NSCA server compiled using custom constants
+
+It is possible that the NSCA server was compiled with the constants
+relating to the packet changed. If you changed the constants when compiling
+NSCA, you will need to setup the client to use the same constant values.
+See L<Net::NSCA::Client::ServerConfig|Net::NSCA::Client::ServerConfig> on
+how to change these constants for the client.
+
+=head2 Data sent from client was too short
+
+This message indicates that the data packet the client is sending to the
+server is too small. Unless there was a connection issue, the only reason
+this would occur is if the NSCA's data packet constants where changed and
+the client needs L<Net::NSCA::Client::ServerConfig|Net::NSCA::Client::ServerConfig>
+to be set to the current values.
+
+=head2 Received invalid packet type/version from client
+
+This client will always send version 3 packets. If the server is expecting
+version 3 packets and you get this message, the wrong C<encryption_type>
+or C<encryption_password> is set.
+
+=head2 Dropping packet with future timestamp
+
+The time stamp that is sent with the data packet is checked on the NSCA
+server to be sure it is not in the future. The time stamps are sent as the
+number of non-leap seconds since January 1, 1970 in UTC. This indicates
+that either the server's time is falling behind or the client's time is set
+too far ahead.
+
+=head2 Dropping packet with stale timestamp
+
+Check the C<max_packet_age> variable in the server configuration. Either
+the packet really is exceeding this age (getting stuck in the network) or
+the server and/or client times are not set correctly.

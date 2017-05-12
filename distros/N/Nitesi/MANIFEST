@@ -1,0 +1,31 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+lib/Nitesi.pm
+lib/Nitesi/Account/Manager.pm
+lib/Nitesi/Account/Password.pm
+lib/Nitesi/Account/Provider/Test.pm
+lib/Nitesi/Address.pm
+lib/Nitesi/Cart.pm
+lib/Nitesi/Class.pm
+lib/Nitesi/Core/Types.pm
+lib/Nitesi/Core/Role/Account.pm
+lib/Nitesi/Inventory.pm
+lib/Nitesi/Navigation.pm
+lib/Nitesi/Product.pm
+lib/Nitesi/Provider/Object.pm
+lib/Nitesi/Provider/Role.pm
+lib/Nitesi/Transaction.pm
+Makefile.PL
+README
+t/001_base.t
+t/003_cart.t
+t/004_cost.t
+t/101_password.t
+t/account-manager.t
+t/manifest.t
+t/pod.t
+t/pod-coverage.t
+t/provider.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

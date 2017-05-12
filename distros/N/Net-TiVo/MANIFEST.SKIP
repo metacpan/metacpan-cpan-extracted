@@ -1,0 +1,6 @@
+^Makefile$
+^.hg.*
+.*\.txt$
+.*\.old$
+.*\.bak$
+.*~$

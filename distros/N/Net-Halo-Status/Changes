@@ -1,0 +1,11 @@
+Revision history for Perl extension Net::Halo::Status.
+
+0.02  Sun Jan 27 18:25:00 2008
+  - Renamed to Net::Halo::Status.
+  - Retarget Module::Build, but keep ExtUtils::MakeMaker for compatibility.
+  - Release to CPAN.
+
+0.01  Wed Jul 26 11:38:12 2006
+	- original version; created by h2xs 1.23 with options
+		-AX --use-new-tests --name=Net::Halo
+

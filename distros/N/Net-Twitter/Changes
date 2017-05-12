@@ -1,0 +1,459 @@
+4.01042 2017-02-06
+    - deprecated contributors/contributees
+    - Fixed: follow_suggestions and follow_suggestions_for were reversed
+    - fix "overwriting a accessor" warnings under Moose 2.2004 #70
+    - build changes: keep dist.ini, create Makefile.PL (ether)
+
+4.01041 2016-11-19
+    - hack dist.ini to get POD and README back into the distribution O_o
+
+4.01040 2016-11-19
+    - added trait WrapResult (returns both the HTTP response, with rate limit
+      accessors, and the decoded JSON response)
+    - rename placeholder :category to :slug with backwards compatibility to
+      match Twitter's documentation
+    - add attachment_url parameter to update method
+    - add links to Twitter API docs
+
+4.01030 2016-11-18
+    - cleaned up Net::Twitter::Error and documented stack_trace and stack_frame
+      methods
+    - Add method upload_status (ghathwar on Github)
+
+4.01020 2016-04-03
+    - Add create_media_metadata endpoint endpoint (AnnMary Mathew)
+    - Use JSON::MaybeXS (Olaf Alders)
+
+4.01010 2015-03-25
+    - Replace missing POD file
+
+4.01009 2015-03-24
+    - Added Application-Only Authentication via trait AppAuth
+
+4.01008 2015-01-19
+    - Added REST API mithods muting, create_mute, destroy_mute (Ashley Willis)
+
+4.01007 2015-01-07
+    - Added REST API method lookup_statuses (thanks SocialFlow)
+    - Typo fixes (thanks Zaki Mughal)
+    - Bumped IO::Socket::SSL requirement to 2.005; recent versions seem to fix
+      an issue with stalled connections.
+
+4.01006 2014-11-17
+    - Default `ssl => 1`
+    - Added `mutes` (@pjcj on Github)
+
+4.01005 2014-08-12
+    - Added upload_media for multi-image support (@ghathwar)
+
+4.01004 2014-04-11
+    - PUT requires paramters in the message body, now (Samuel Kaufman)
+
+4.01003 2014-03-12
+    - Net::Twitter::Error's twitter_error_text excludes stack trace line number
+
+4.01002 2014-01-16
+    - Fix POD bugs
+
+4.01001 2014-01-16
+    - Warn if ssl option to new is not passed (deprecation cycle)
+
+4.01000 2013-11-19
+    - Add API method retweeters_ids
+    - Fix update_with_media with utf8 status (RT#72814)
+    - Expand Carp::Clan list (should resolve RT#77306)
+    - Remove reliance on MooseX::Aliases (issue #35)
+    - Use Class::Load to replace deprecated Class::Mop method (issue #35)
+    - Add missing dependency: LWP::Protocol::https (issue #25)
+    - Fix OAuth failure for UTF8 params (issue #21)
+
+4.00007 2013-08-12
+    - Support for HTTP method PUT (sartak)
+    - example improvements (clmh)
+
+4.00006 2013-05-30
+    - Spelling error fixed (spazm@github)
+    - Added path_suffix parameter to twitter_api_method (sartak)
+    - tidy + pod fix (sartak)
+
+4.00005 2013-04-25
+    - Added list_ownerships (eleniS no Github)
+    - Removed Makefile.PL (cruft - using Module::Build, now)
+
+4.00004
+    - Dependecy Net::HTTP fixed in 6.06 (30 second timeout in OAuth requests)
+
+4.00003
+    - Fixed URI argument encoding (v1.1 is more stringent)
+
+4.00002 2013-02-23
+    - Removed Test::NoWarnings to accommodate HTTP::Request::Common 6.03
+    - Added method twitter_error_code to Net::Twitter::Error
+
+4.00001 2013-02-21
+    - First general release with Twitter API v1.1 support
+    - Twitter::Manual::MigratingToV1_1
+
+4.00000_03 2013-02-19
+    - Fixed: needed skip directives for dzil's AutoPrereqs plugin
+    - Stripped version numbers---let dzil put them in
+
+4.00000_02 2013-02-19
+    - use Dist::Zilla instead of Module::Install
+
+4.00000_01 2013-01-28
+    - Added Twitter API version 1.1 support
+
+3.18004 2012-10-15
+    - Allow extra parameters to get_auth*_url methods (this accommodates
+      Twitter's optional force_login and screen_name parameters to those
+      endpoints.
+
+3.18003 2012-06-27
+    - Use path statuses/mentions, not statuses/replies
+
+3.18002 2012-04-24
+    - added API method subscriptions; list_subscriptions is now
+      all_subscriptions with alias list_subscriptions
+    - deprecated TwitterVision API support
+    - added API method members_destroy_all with alias remove_list_members
+    - added deprecation warning for 'trends'; calls trends_location(1), instead
+
+3.18001 2011-09-29
+    - fixed: AutoCursor:
+        - no behavior change when user passes "cursor" arg
+        - work with InflateObjects trait
+    - synthetic ags use (-) prefix: -authenticate, -since, -legacy_lists_api
+    - Replaced JSON::Any with JSON
+    - documented new arguments for friendship_exists
+
+3.18000_01 2011-09-21
+    - added update_with_media (Allen Haim)
+    - added get_privacy_policy and get_tos API methods
+    - added get_languages and get_settings API methods
+    - added contributors and contributees API methods
+    - added geo_search, geo_search, similar_places, and add_place API methods
+    - friends/followers API methods deprecated
+    - implemented the *new* Lists API in the API::REST trait
+    - replaced MX:MultiInitArg::Trait with MX:Aliases (Justin Hunter)
+    - fixed bad whatis entry (patch from debian, closes RT #67203)
+    - use Digest::SHA instead of Digest::SHA1 (patch from debian, closes RT #67202)
+
+3.17001 2011-03-31
+    - fixed intermittent bug in AutoCursor (result of Class::MOP anon class caching)
+
+3.17000 2011-03-29
+    - production release with new AutoCursor trait
+
+3.16000_1 2011-03-27
+    - Added AutoCursor trait
+
+3.16000 2011-03-26
+    - Moved trends methods to API::REST; added warning to API::Search::Trends
+    - Added no_retweet_ids method
+    - modify searchapiurl for identica option
+    - added deprecation notice to Net::Identica with Net::Twitter examples
+    - replaced Test::Exception with Test::Fatal in tests
+
+3.15000 2011-02-25
+    - added Lists API method members_create_all (alias add_list_members)
+    - added tests dependency: Test::Exception (closes RT #65786)
+
+3.14003 2011-02-07
+    - Fixed: trends_location (closes RT #65506)
+    - Added parameters trim_user, include_entities, include_rts (frank cuny, closes RT #62542)
+
+3.14002 2010-11-02
+   - Fixed: use File::Spec tests that failed in Win32 (turugina)
+
+3.14001 2010-10-19
+    - Make Crypt::SSLeay a hard requirement (really no longer practical without it)
+
+3.14000 2010-10-19
+    - Added #newtwitter API methods (account_totals, account_settings,
+      suggestion_categories, user_suggestions, show_direct_message,
+      retweeted_to_user, retweeted_by_user, lookup_friendships,
+      update_friendship, all_lists, related_results)
+    - fixed: memory leak in RateLimit trait
+
+3.13009 2010-09-17
+    - use Athorization header for OAuth token requests rather than query params
+    - "identica => 1" sets OAuth URLs (assist from barbie)
+    - updated Synopsis with OAuth (closes RT#61273)
+
+3.13008_02 2010-09-04
+    - fixed stack frame filter
+    - fixed missing dependency
+    - detect Twitter's errors array as an error object
+
+3.13008_01 2010-08-31
+    - extract error from the various disparate error formats
+
+3.13008 2010-08-26
+    - use HTTPS for all OAuth token negotiation steps
+
+3.13007 2010-07-06
+    - decode_html_entities now decodes all fields (incl source in search results)
+    - Role::OAuth doc patch by Doug Bell <doug@plainblack.com>
+    - fixed: incompatibility between "since" and InflateObjects
+
+3.13006 2010-06-18
+    - test fix: bump the skip count for a new test in t/unicode.t for optional module
+
+3.13005 2010-06-18
+    - fixed: since (synthetic arg) filtering
+    - fixed: don't use args for OAuth signature on multi-part mime posts
+
+3.13004 2010-06-18
+    - fixed: OAuth signature error with unicode args (RT#58493)
+
+3.13003 2010-05-21
+    - production release with Lists API refactor and OAuth changes
+
+3.13002_03 2010-05-13
+    - fixed: generate new OAuth authorization hearder on retry (RetryOnError trait)
+
+3.13002_02 2010-05-12
+    - fixed: removed redundant alias declarations
+
+3.13002_01 2010-05-12
+    - Refactored the Lists API to use Net::Twitter::API
+
+3.13001 2010-11
+    - use POST with Authorization header for XAuth (per Twitter documentation)
+    - replace homegrown XAuth support with Net::OAuth's native support
+    - accommodate 2 base URLs for API::Search (search and trends* methods use different base URLs)
+    - enable SSL support for API::Search
+
+3.13000 2010-05-09
+    - added support and documentation for optional timeline parameter skip_user
+    - fixed tests: plan was called twice when LWP was too old
+    - added friends_incoming and friendships_outgoing methods
+
+3.12000 2010-03-19
+    - added new API methods: retweeted_by and retweeted_by_ids
+    - fixed: t/51_since.t was actually connecting to twitter
+
+3.11012 2010-03-13
+    - fixed: added fallback since Test::More 0.95_01 does not stringify in "is" (tokuhirom)
+
+3.11011 2010-03-11
+    - fixed documentation to include lookup_users
+
+3.11010 2010-03-11
+    - Added lookup_users API method
+
+3.11009 2010-03-10
+    - Added RetryOnError trait (see perldoc Net::Twitter::Role::RetryOnError)
+    - Import Sclar::Util::blessed in the POD Synopsis to make it clear callers need to do so (RT#55283)
+    - Use newly documented "preferred" oauth endpoints: http://api.twitter.com/oauth/*
+    - Added SimulateCursors trait for Identi.ca compatibility
+
+3.11008 2010-03-02
+    - Added support for new api methods: reverse_geocode, geo_id
+    - Updated method "update" with new parameters: place_id, display_coordinates
+
+3.11007 2010-02-27
+    - xAuth implemented and tested
+
+3.11006_01 2010-02-26
+    - xAuth implemented: @oauth = $nt->xauth($username, $password);
+
+3.11006 2010-02-25
+    - Fixed: unicode.t skip needed number of tests to skip (miyagawa)
+
+3.11005 2010-02-25
+    - Fixed: image updates accept a single array ref argument (RT#54422)
+    - Fixed: "since" synthetic arg with InflateObjects role (RT#54901)
+    - Fixed: utf8 encoding error for latin1 using Basic Authentication
+    - Allow a pre-created user agent object as argument to new (ua => $ua)
+    - FAQ: How do I get Twitter to display something other than "from Perl Net::Twitter"?
+
+3.11004 2010-02-09
+    - Removed an extraneous tar ball from the distribution (no code changes)
+
+3.11003 2010-01-29
+    - Renamed "retweeted_of_me" REST API call to the correct "retweets_of_me" (Dan Moore @mgrdcm)
+    - Back the Moose requirement down to 0.09 (earliest version with native traits)
+
+3.11002 2010-01-28
+    - Use Moose 0.94 with native traits (resolves CPAN testers failing reports)
+
+3.11001 2010-01-28
+    - Honor synthetic args (authenticate and since) for Lists API calls
+
+3.11000 2010-01-27
+    - Lists API overhaul; bug fixes, added parameters, documentation
+    - Create meaninful names for anonymous classes; better error context
+    - Added "Paging and Cursors" documentation section
+
+3.10003 2009-12-15
+    - Oops! Fixed bug in new test in t/10_net-twitter-regression.t (oh, the irony!)
+
+3.10002 2009-12-15
+    - Added netrc_machine option to new with default 'api.twitter.com'
+    - Fixed: netrc failed without trait API::REST
+    - Fixed: retweeted_{to,of}_me API URLs (RT#52784)
+
+3.10001 2009-11-26
+    - Fixed: new t/51_rate_limit.t needs to skip tests unless LWP >= 5.819
+
+3.10000 2009-11-24
+    - Fixed: ssl not applied when both Lists and REST api used
+    - Added Role::RateLimit
+    - Added trends_available and trends_location methods to the REST API
+    - Documented the lat and long parameters to update
+
+3.09000 2009-11-17
+    - Bumped Net::OAuth requirement to 0.20 (hopefully resolves CPAN Testers failures)
+    - Added users_search/find_people API method
+    - Updated default apiurl: http://api.twitter.com/1
+    - Deprecated apihost option to new
+    - Fixed ssl handling for Lists API
+
+3.08000 2009-11-02
+    - return user_id and screen_name from request_access_token (Roberto Etcheverry)
+
+3.07999_01 2009-10-23
+    - Added experimental Lists API support
+
+3.07004 2009-10-22
+    - Fixed: cached request_token results in a stale authentication/authorization urls
+
+3.07003 2009-10-13
+    - Added new API method: report_spam
+
+3.07002 2009-10-05
+    - Documented the cursor parameter for friends, followers, friends_ids, and
+      followers_ids.
+    - Fixed: synthetic since parameter (could fail with multiple API traits defined)
+    - Added support for since in YYYY-MM-DD format
+
+3.07001 2009-09-28
+    - Added specific versions for DateTime and DateTime::Format::Strptime (closes RT#50069)
+    - better deps (Alexandr Ciornii)
+
+3.07000 2009-09-22
+    - added 'retweets' REST API method
+    - added synthetic 'since' parameter
+    - fixed: object inflation for Search API returns (different timestamp format!)
+
+3.06000 2009-09-16
+    - support for multipart/from-data posts, used by update_profile_image and
+      update_profile_background_image
+    - bumped version requirement on namespace::autoclean to avoid deprecation notice
+
+3.05003 2009-09-10
+    - URI 1.35 breaks unicode support; require 1.40 (thanks to Dan Boger, @zigdon)
+    - Removed deprecated is_authorized from examples in pod (thanks to Nigel Metheringham)
+
+3.05002 2009-08-27
+    - Work around perl bug requiring encoded hash keys when client uses "use utf8"
+
+3.05001 2009-08-21
+    - Added get_authentication_url for "Sign in with Twitter" authentication flow
+    - Updated "source" option documentation (closes RT 48786)
+
+3.05000  2009-08-14
+    - Added new API methods: home_timeline, retweet, retweed_{by,of,to}_me
+    - Removed JSON::DWIW from supported handlers (lacks support for JSON::Any's uft8 option)
+
+3.04006  2009-07-29
+    - Silence Net::OAuth double encoding error (false positives)
+    - Fixed: infrequent OAuth signature failures
+
+3.04005  2009-07-28
+    - Fix: OAuth / unicode conflict
+
+3.04004  2009-07-28
+    - Bug fix: OAuth signatures on POST requests (Galen Huntington)
+
+3.04003  2009-07-23
+    - properly utf-8 encode output to twitter (should provide full unicode support, now)
+
+3.04002  2009-07-21
+    - Optionally decode HTML entities in status text
+
+3.04001  2009-07-17
+    - Set JSON::Any option utf8 for consistent unicode support
+    - Added ssl and netrc options (from Net::Twitter::Lite)
+
+3.04000 2009-07-07
+    - Added inflation of Twitter return HASH refs to Moose objects
+
+3.03003 2009-07-07
+    - Fixed a typo in Makefile.PL
+
+3.03002 2009-07-04
+    - Updated documentation to include callback parameter to get_authorization_url
+    - Different OAuth nonce algorithm avoids duplicates in forked processes
+    - Bumped JSON version dependencies for better JSON boolean handling
+
+3.03001 2009-06-29
+    - Updated to Moose 0.85
+    - Properly subclassed top level Net::Twitter modules
+
+3.03000 2009-06-25
+    - Twitter API update:
+        - Added screen_name and user_id parameters to new_direct_message
+        - Added show_friendship method (friendships/show.json)
+
+    - Made Net::Twitter safe for subclassing
+
+    - Added "authenticate" parameter handling. By default REST API methods
+      inclued an Authorization header; Search API methods do not. Can be
+      overridden with "authenticate => 0|1".  This finally allows getting
+      rate_limit_status by user (the default), or by IP address, with
+      ->rate_limit_status({ authenticate => 0 }).
+
+    - Added FAQ section to pod
+
+3.02000 2009-06-21
+    - Added OAuth 1.0a support
+    - Added init_args user/pass for compat with NT 2.12
+
+3.01000_01 2009-06-12
+    - Updated OAuth support for desktop app PIN numbers (oauth_verifier)
+
+3.01000 2009-06-07
+    - Added support for the saved_search API methods.
+
+3.00004 2009-06-06
+    - Fixed: accept extra args as a hashref (search behaved this way in 2.12)
+
+3.00003 2009-06-03
+    - Added a workaround for JSON backends that don't handle booleans properly
+
+3.00002 2009-06-01
+    - Updated version requirements in Makefile.PL
+
+3.00001 2009-05-30
+    - Provided version numbers for modules that already existed on CPAN
+
+3.00000 2009-05-30
+    - upgrade get/put parms so Latin-1 can be handled as UTF-8
+
+2.99000_05 2009-05-27
+    - Restructured module hierarchy: all roles/traits moved to Net/Twitter/Role/
+    - Itegrated Tatsuhiko Miyagawa's OAuth support as a trait
+    - Identica fixes: strings '"true"' and '"false"' to bools; mentions => replies
+    - Fixed useragent_args type. (Christopher Biggs)
+    - Store HTTP::Response even on success in WrapError for legacy support (Christopher Biggs)
+
+2.99000_04 2009-05-25
+    - Moved Net::Twitter to Net::Twitter::Core; Net::Twitter provides new -> new_with_traits
+    - Added legacy => [0|1] shortcut option
+
+2.99000_03 2009-05-22
+    - Broke MANIFEST on the prior dist (fixed)
+
+2.99000_02 2009-05-22
+    - Corrected POD NAME sections and module naming
+    - Temporarily removed lib/Net/Twitter/Search.pm from MANIFEST
+
+2.99000_01 2009-05-22
+    - Initial dev release of 3.00 candidate
+    - Moose based replacement for Net::Twitter
+
+This is a complete rewrite of Net::Twitter. For earlier versions, see:
+http://cpansearch.perl.org/src/CTHOM/Net-Twitter-2.12/Changes

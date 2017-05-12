@@ -1,0 +1,113 @@
+0.16 Sat Apr 02 13:00:00 EDT 2011
+
+* initial cf fields support and tests -- sunnavy@bestpractical.com,
+  Jacek Pasternak (6af5742, f55d5a, b061eca)
+* add default arrayref for ticket attachments -- plobsinger@gmail.com (c3bd330)
+* stick to the update api: trac doesn't support directly update status and
+  resolution since 0.11.7 -- sunnavy@bestpractical.com (4bd778c, 08492c3)
+
+0.15 Mon Jan 18 11:58:06 PST 2010
+
+* Module::Install bump 
+
+
+0.14 Wed Jun 10 10:06:36 EDT 2009
+
+* Use keepalives for slightly better trac performance -- <jesse@bestpractical.com> (3abd840)
+* Fixes for our awful html history parsing heuristics -- <jesse@bestpractical.com> (4484ea2)
+* content_type test for attachment -- <sunnavy@bestpractical.com> (605ac65)
+* let _load return content and content_type so default values can use them -- <sunnavy@bestpractical.com> (980f388)
+* added attachment attr and parse it too for TicketHistoryEntry -- <sunnavy@bestpractical.com> (c3d23c5)
+* pod update for Attachment -- <sunnavy@bestpractical.com> (7e524cb)
+* added content and content_type attrs for Attachment -- <sunnavy@bestpractical.com> (4c6998c)
+* update attachment parse part to satisify individual attachment page need -- <sunnavy@bestpractical.com> (1891837)
+
+
+0.13 Tue May  5 18:38:27 EDT 2009
+
+* Added create transactions to ticket history
+* Added a flag for "this history entry is a create"
+* Add a ticket accessor on ticket history entries
+
+0.12 Mon Apr 20 14:20:04 CST 2009
+
+* Better support for running against trac servers you don't have a write access to
+
+0.10 Thu Feb 26 18:42:47 EST 2009
+
+ * [rt.cpan.org #43642] Server didn't start up on slow box  ANDK++
+
+0.09 Sat Feb 21 21:22:42 EST 2009
+
+ * Loosen our DateTime regex
+
+0.08 Sat Feb 21 20:18:30 EST 2009
+ 
+ * Start using Text::CSV to parse Trac TSV format
+ * Rather than regex dates and then use DateTime::Format::ISO8601, just build a DateTime
+ * Don't fetch ticket update info on ticket load
+
+
+0.07 Thu Feb 19 18:48:21 EST 2009
+
+ * Removed unnecessary use of heavy CPAN modules
+
+
+0.06 Mon Feb  9 13:44:37 EST 2009
+
+BUGFIX
+======
+
+ * parsing improvements to deal with issues discovered parsing parrot
+   trac - jesse
+
+FEATURE
+=======
+
+ * Support login with Trac's cookie auth - jesse
+
+ * Skip transaction history types we don't know how to deal with - jesse
+
+INSTALL
+=======
+
+ * Remove coerce - jesse
+
+ * Removing MooseX::ClassAttribute - jesse
+
+ * Switch to Any::Moose, so we can use Mouse for memory and cpu
+   savings! - jesse
+
+ * Starting to work on removing MooseX::ClassAccessor Working on props
+   parsing - jesse
+
+PERFORMANCE
+===========
+
+ * Better caching of ticket history. Properish handling of the keywords
+   filed - jesse
+
+ * Improve performance of ticket ops by caching static data Improve detection
+   of ticket update/create forms when the user doesn't have the right to set
+   the requestor - jesse
+
+TESTING
+=======
+
+ * added tests for keywords - jesse
+
+
+0.05 Thu Jan 22 12:11:45 EST 2009
+
+Don't hurt cpan-testers build boxes by trying to kill process undef.
+
+0.04 Wed Jan 21 19:26:56 EST 2009
+
+* Able to log into trac instances which use cookie auth
+* Able to work with trac instances that don't let all users set the ticket requestor
+
+
+0.03 Wed Jan 21 15:01:56 EST 2009
+
+First largely API-complete release
+

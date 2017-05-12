@@ -1,0 +1,12 @@
+Revision history for Net-LibAsyncNS
+
+0.02    2014/03/28 14:50:30
+        [CHANGES]
+         * Requires ExtUtils::CChecker >= 0.05 to work around a bug in 0.04
+
+        [BUGFIXES]
+         * Some libc implementations of getaddrinfo() will return two results
+           for 'localhost'/AF_INET - don't count this as a failure in testing
+
+0.01    First version, released on an unsuspecting world.
+

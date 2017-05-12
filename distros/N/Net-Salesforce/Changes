@@ -1,0 +1,221 @@
+==================================================
+Changes from 2013-10-26 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.101 at 2014-10-26 19:53:01 +0000
+------------------------------------------
+
+  Change: f36c7e46975712c01bb4e4154814bd201bd6e220
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-26 15:52:57 +0000
+
+    fix documentation
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+------------------------------------------
+version 1.100 at 2014-10-24 14:55:09 +0000
+------------------------------------------
+
+  Change: 44167a8d0bce94512e3d8e4566398412d54d392e
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-24 10:55:09 +0000
+
+    v1.100 
+
+  Change: cbc6217d1b3d5fcd73b4a04cc2d6ea729334bec9
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-24 10:54:57 +0000
+
+    Update build dist
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: fd64ca1b1b196745b5a518b7d03a699e23fe05bd
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-11 14:44:08 +0000
+
+    1.0.0 
+
+  Change: 553b3ad244d9e22a0ee583c9e50be055abe364ad
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-11 14:43:58 +0000
+
+    prep for release
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 3587f71616ca97f7e1a65e39c354273229205963
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-09 16:11:58 +0000
+
+    fix meta verison
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 14e542e5483a2f88d6b6b373187faed47ec3580c
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-08 18:48:05 +0000
+
+    bump meta version
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: e3d7c75329e329f17e60fea24469127684158e22
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-08 17:10:18 +0000
+
+    update readme
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 0e75e9fcb9a14a2c453ea42fe15ce624c7ba787d
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-08 16:56:59 +0000
+
+    update attribute to use api_host and keep api_url as method
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 2a24279a9697a31d64351c8641c639ebd02dd3fa
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-08 16:40:33 +0000
+
+    add support for different api paths, na15, test, etc
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 38b832efcd57dbb2061e9a0b78c83e148d92f287
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-08 11:09:54 +0000
+
+    update meta
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 873c960ad9b4ba0fddb0452d76d1ba21af31c36b
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-08 11:03:32 +0000
+
+    add refresh_token and example
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 230097364a4af51b3b77ef71495b59f63b969711
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-08 00:42:43 +0000
+
+    0.03 
+
+  Change: 5f920642fedc49833080cd116c3167afa2e52905
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-08 00:42:33 +0000
+
+    update changes
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 646964e4439c63a0bb7ec26975f7fabe34b8e13b
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-08 00:41:51 +0000
+
+    update install doc
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 3cf31e65d552812463678949f0e02d9c0feed3db
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-07 23:33:00 +0000
+
+    print access token in example
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 5d386aaf69b0138a254da50a235d5be466635606
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-07 23:25:38 +0000
+
+    0.02 
+
+  Change: 17feba722aa7d1a9f8bb0e1814509511324165b8
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-07 23:25:28 +0000
+
+    prep for release
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 7dfe9d557312c4d1c0d7e117e0e30bc8d76b9e19
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-07 20:18:06 +0000
+
+    fix code authorization
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 82fcca6a766a57e9b9dc9a1f30e4b06e4f836335
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-07 16:51:19 +0000
+
+    update synopsis
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 0dc445c4e5bd7869d730bfd158a10636251627a3
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-07 16:30:38 +0000
+
+    0.01 
+
+  Change: 034a772c60cc7c6d3fbbe5d705fbbc5a35656076
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-07 16:29:44 +0000
+
+    pre for release
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: dd05a8175f1967edd126d378436ac52e746998fc
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-07 14:05:35 +0000
+
+    work on ssl server for callback
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 2afea21b210d670e9790a0fa1260ab7d8c01919c
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-07 13:24:36 +0000
+
+    first run of authorizing, need ssl server for test
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: ee45b2432025df210a8550469ffcf77ae87fc12e
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-07 12:43:14 +0000
+
+    outline salesforce oauth2 flow
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: f6c404da02d5d58adb21ba095ab641d9a89cc1f2
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-06 22:43:10 +0000
+
+    update readme
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 1574cd5becea892fc25c1b3436b1dabd3c76cce8
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-01-06 22:40:28 +0000
+
+    Initial
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+================
+End of releases.
+================

@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+#
+# example02.pl - Example of Net::TcpDumpLog. Prints out ethernet headers.
+#
+# 11-Oct-2003	Brendan Gregg	Created this
+
+use Net::TcpDumpLog;
+
+$log = Net::TcpDumpLog->new(32);	# Don't copy the "32"! This is only
+$log->read("tcpdumplog");		#  used here because our sample file
+					#  has 32-bit timestamps. use new().
+
+@Indexes = $log->indexes;
+
+printf "%5s  %12s    %12s  %4s  %s\n","Frame","Source","Dest","Type","Length";
+
+foreach $index (@Indexes) {
+	$data = $log->data($index);
+
+	### Process Ethernet header
+	($ether_dest,$ether_src,$ether_type,$ether_data) = 
+	 unpack('H12H12H4a*',$data);
+	$length = length($ether_data);
+
+	printf "%5d  %12s -> %12s  %4s  %s\n",$index,$ether_src,$ether_dest,
+	 $ether_type,$length;
+
+}
+

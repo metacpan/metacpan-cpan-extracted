@@ -1,0 +1,37 @@
+---
+abstract: 'Perl Interface to the Domain Name System'
+author:
+  - 'Olaf Kolkman et al'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-DNS
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  Digest::BubbleBabble: '0.01'
+  Digest::GOST: '0.06'
+  IO::Socket::IP: '0.32'
+  Net::LibIDN: '0.12'
+  Scalar::Util: '1.25'
+requires:
+  Digest::HMAC: '1.03'
+  Digest::MD5: '2.13'
+  Digest::SHA: '5.23'
+  File::Spec: '0.86'
+  IO::Socket: '1.16'
+  MIME::Base64: '2.11'
+  Test::More: '0.52'
+  Time::Local: '1.19'
+  perl: '5.006'
+version: '1.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

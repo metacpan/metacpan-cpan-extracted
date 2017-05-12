@@ -1,0 +1,133 @@
+#!/usr/bin/perl
+#$Id: make-signed-keyset 1295 2015-01-08 13:14:03Z willem $
+
+#
+# takes a bind public key file and creates a self-signed keyset
+#
+
+use Getopt::Std;
+use Net::DNS::SEC;
+use Net::DNS::Keyset;
+use Net::DNS::ZoneFile;
+use File::Basename;
+
+# global variables
+$VERSION  = "0.2";
+$verbose  = 0;
+$printds  = 0;
+$progname = basename($0);
+chomp($progname);
+
+# main program
+getopts('dvhVf:n:');
+
+if ( defined($opt_d) ) {
+	$printds = 1;
+}
+if ( defined($opt_v) ) {
+	$verbose = 1;
+}
+if ( defined($opt_h) ) {
+	&usage();
+}
+if ( defined($opt_V) ) {
+	&version();
+}
+if ( $#ARGV < 0 ) {
+	&usage();
+}
+
+# silent some compiler warnings until i figure them out
+$opt_d = 0;
+$opt_v = 0;
+$opt_h = 0;
+$opt_V = 0;
+&make_keyset(@ARGV);
+exit(0);
+
+# print the usage and exit
+sub usage {
+	print("usage: $progname [-vhV] file\n");
+	print("Options:\n");
+	print("	      -d    Print the DS record for each key in the keyset.\n");
+	print("	      -v    Be verbose.\n");
+	print("	      -h    Print this usage message.\n");
+	print("	      -V    Print version information.\n");
+	print("	      file  BIND public key file.\n");
+	exit(0);
+}
+
+# print version information
+sub version {
+	print( "$progname v$VERSION using Net::DNS v", Net::DNS->version, "\n" );
+	exit(0);
+}
+
+sub make_keyset {
+	my $source    = new Net::DNS::ZoneFile(shift);
+	my $file      = $source->name;
+	my $directory = dirname($file);
+	print("Processing file: $file\n");
+
+	my @keys;
+	while ( my $keyrr = $source->read ) {
+		next unless $keyrr->isa('Net::DNS::RR::DNSKEY');
+		print("Read DNSKEY RR\n") if $verbose;
+		push @keys, $keyrr;
+	}
+
+	print("Creating keyset\n") if $verbose;
+
+	my $keyset = Net::DNS::Keyset->new( \@keys, "$directory" )
+			or die("$progname: unable to create keyset. $Net::DNS::Keyset::keyset_err.\n");
+
+	print("Verifying keyset\n") if $verbose;
+	$keyset->verify()
+			or die("$progname: unable to verify keyset. $Net::DNS::Keyset::keyset_err.\n");
+
+	if ($verbose) {
+		print("Keyset:\n");
+		$keyset->print();
+		print("Writing keyset\n");
+	}
+	$keyset->writekeyset("signed-")
+			or die("$progname: unable to write keyset. $Net::DNS::Keyset::keyset_err.\n");
+
+	if ($printds) {
+		print("Extracting DS RR\n") if $verbose;
+		my @ds = $keyset->extract_ds();
+		foreach $ds (@ds) {
+			$ds->print();
+		}
+	}
+}
+
+
+=head1 NAME
+
+make-signed-keyset - create a self-signed keyset
+
+=head1 SYNOPSIS
+
+make-signed-keyset [-v] file
+
+=head1 DESCRIPTION
+
+make-signed-keyset is a program that creates a self-signed keyset from
+a BIND public key file specified on the command line.
+
+The options are as follows:
+
+=over
+
+=item -v Be verbose.
+
+=item -d Print the DS record for each key in the keyset.
+
+=back
+
+=head1 AUTHOR
+
+Contributed by Wes Griffin <wgriffin@jtan.com>
+
+=cut

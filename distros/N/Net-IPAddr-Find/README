@@ -1,0 +1,20 @@
+NAME
+    Net::IPAddr::Find - Find IP addresses in plain text
+
+SYNOPSIS
+    THIS MODULE IS DEPRECATED
+
+    Use NetAddr::IP::Find instead.
+
+DESCRIPTION
+    This is a module for finding IP addresses in plain text.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the NetAddr::IP::Find manpage.
+

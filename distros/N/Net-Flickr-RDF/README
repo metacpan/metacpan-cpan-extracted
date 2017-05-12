@@ -1,0 +1,706 @@
+NAME
+    Net::Flickr::RDF - a.k.a RDF::Describes::Flickr
+
+SYNOPSIS
+     use Net::Flickr::RDF;
+     use Config::Simple;
+     use IO::AtomicFile;
+
+     my $cfg = Config::Simple->new("/path/to/my.cfg");
+     my $rdf = Net::Flickr::RDF->new($cfg);
+
+     my $fh  = IO::AtomicFile->open("/foo/bar.rdf","w");
+
+     $rdf->describe_photo({photo_id => 123,
+                           secret   => 567,
+                           fh       => \*$fh});
+
+     $fh->close();
+
+DESCRIPTION
+    Describe Flickr photos as RDF.
+
+    This package inherits from *Net::Flickr::API*.
+
+OPTIONS
+    Options are passed to Net::Flickr::Backup using a Config::Simple object
+    or a valid Config::Simple config file. Options are grouped by "block".
+
+  flickr
+
+    * api_key
+        String. *required*
+
+        A valid Flickr API key.
+
+    * api_secret
+        String. *required*
+
+        A valid Flickr Auth API secret key.
+
+    * auth_token
+        String. *required*
+
+        A valid Flickr Auth API token.
+
+  rdf
+
+    * query_geonames
+        Boolean.
+
+        If true and a photo has geodata (latitude, longitude) associated
+        with it, then the geonames.org database will be queried for a
+        corresponding match. Data will be added as properties of the photo's
+        geo:Point description. For example :
+
+         <geo:Point rdf:about="http://www.flickr.com/photos/35034348999@N01/272880469#location">
+            <geo:long>-122.025151</geo:long>
+            <flickr:accuracy>16</ymaps:flickr>
+            <acl:access>visbility</acl:access>
+            <geo:lat>37.417839</geo:lat>
+            <acl:accessor>public</acl:accessor>
+            <geoname:Feature rdf:resource="http://ws.geonames.org/rdf?geonameId=5409655"/>
+         </geo:Point>
+
+         <geoname:Feature rdf:about="http://ws.geonames.org/rdf?geonameId=5409655">
+            <geoname:featureCode>PPLX</geoname:featureCode>
+            <geoname:countryCode>US</geoname:countryCode>
+            <geoname:regionCode>CA</geoname:regionCode>
+            <geoname:region>California</geoname:region>
+            <geoname:city>Santa Clara</geoname:city>
+            <geoname:gtopo30>2</geoname:gtopo30>
+         </geoname:Feature>
+
+        Default is false.
+
+PACKAGE METHODS
+  __PACKAGE__->new($cfg)
+
+    Where $cfg is either a valid *Config::Simple* object or the path to a
+    file that can be parsed by *Config::Simple*.
+
+    Returns a *Net::Flickr::RDF* object.
+
+PACKAGE METHODS YOU MAY CARE ABOUT
+  __PACKAGE__->build_photo_uri(\%data)
+
+    Returns a URL as a string.
+
+  __PACKAGE__->build_geo_uri(\%data)
+
+  __PACKAGE__->build_user_tag_uri(\@data)
+
+    Returns a URL as a string.
+
+  __PACKAGE__->build_global_tag_uri(\@data)
+
+    Returns a URL as a string.
+
+  __PACKAGE__->build_machinetag_uri(\@data)
+
+    Returns a URL as a string.
+
+  __PACKAGE__->build_user_uri($user_id)
+
+    Returns a URL as a string.
+
+  __PACKAGE__->build_group_uri($group_id)
+
+    Returns a URL as a string.
+
+  __PACKAGE__->build_grouppool_uri($group_id)
+
+    Returns a URL as a string.
+
+  __PACKAGE__->build_photoset_uri(\%set_data)
+
+    Returns a URL as a string.
+
+  __PACKAGE__->prune_triples(\@triples)
+
+    Removes duplicate triples from *@triples*. Returns an array reference.
+
+OBJECT METHODS YOU SHOULD CARE ABOUT
+  $obj->describe_photo(\%args)
+
+    Valid arguments are :
+
+    * photo_id
+        Int. *required*
+
+    * secret
+        String.
+
+    * fh
+        File-handle.
+
+        Default is STDOUT.
+
+    Returns true or false.
+
+OBJECT METHODS YOU MAY CARE ABOUT
+  $obj->collect_photo_data($photo_id,$secret)
+
+    Returns a hash ref of the meta data associated with a photo.
+
+    If any errors are unencounter an error is recorded via the log method
+    and the method returns undef.
+
+  $obj->collect_group_data($group_id)
+
+    Returns a hash ref of the meta data associated with a group.
+
+    If any errors are unencounter an error is recorded via the log method
+    and the method returns undef.
+
+  $obj->collect_user_data($user_id)
+
+    Returns a hash ref of the meta data associated with a user.
+
+    If any errors are unencounter an error is recorded via the log method
+    and the method returns undef.
+
+  $obj->collect_photoset_data($photoset_id)
+
+    Returns a hash ref of the meta data associated with a photoset.
+
+    If any errors are unencounter an error is recorded via the log method
+    and the method returns undef.
+
+  $obj->collect_cc_data()
+
+    Returns a hash ref of the Creative Commons licenses used by Flickr.
+
+    If any errors are unencounter an error is recorded via the log method
+    and the method returns undef.
+
+  $obj->collect_comment_data()
+
+    Returns a hash ref of comments made about a photo.
+
+  $obj->make_photo_triples(\%data)
+
+    Returns an array ref (or alist in a wantarray context) of array refs of
+    the meta data associated with a photo (*%data*).
+
+  $obj->make_user_triples(\%user_data)
+
+    Returns an array ref (or list in a wantarray context) of array refs of
+    the meta data associated with a user (*%user_data*).
+
+  $obj->make_tag_triples(\@tag_data)
+
+    Returns an array ref (or list in a wantarray context) of array refs of
+    the meta data associated with a tag (*@tag_data*).
+
+  $pkg->make_photoset_triples(\%set_data)
+
+    Returns an array ref (or list in a wantarray context) of array refs of
+    the meta data associated with a photoset (*%set_data*).
+
+  $obj->make_geo_triples(\%geo_data)
+
+  $obj->make_flickr_places_triples(\%geo_data)
+
+  $obj->make_geonames_triples(\%geo_data)
+
+  $obj->make_group_triples(\%group_data)
+
+    Returns an array ref (or list in a wantarray context) of array refs of
+    the meta data associated with a group (*%group_data*).
+
+  $obj->make_grouppool_triples(\%group_data)
+
+    Returns an array ref (or list in a wantarray context) of array refs of
+    the meta data associated with a group pool (*%group_data*).
+
+  $obj->make_cc_triples($url)
+
+    Returns an array ref (or list in a wantarray context) of array refs of
+    the meta data associated with a Creative Commons license (*$url*).
+
+  $obj->make_comment_triples(\%data)
+
+    Returns an array ref (or alist in a wantarray context) of array refs of
+    the meta data associated with a photo comment (*%data*).
+
+  $obj->geodata_from_tags(\%data)
+
+    Try to parse out geolocative data from a collection of tag data.
+
+    Returns a hash ref (containing 'lat' and 'long' keys) on success or
+    undef if there were no matches.
+
+  $obj->namespaces()
+
+    Returns a hash ref of the prefixes and namespaces used by
+    *Net::Flickr::RDF*
+
+    The default key/value pairs are :
+
+    a   http://www.w3.org/2000/10/annotation-ns
+
+    acl http://www.w3.org/2001/02/acls#
+
+    atom
+        http://www.w3.org/2005/Atom/
+
+    cc  http://web.resource.org/cc/
+
+    dc  http://purl.org/dc/elements/1.1/
+
+    dcterms
+        http://purl.org/dc/terms/
+
+    exif
+        http://nwalsh.com/rdf/exif#
+
+    exifi
+        http://nwalsh.com/rdf/exif-intrinsic#
+
+    flickr
+        x-urn:flickr:
+
+    foaf
+        http://xmlns.com/foaf/0.1/#
+
+    geo http://www.w3.org/2003/01/geo/wgs84_pos#
+
+    geoname
+        http://www.geonames.org/onto#
+
+    i   http://www.w3.org/2004/02/image-regions#
+
+    rdf http://www.w3.org/1999/02/22-rdf-syntax-ns#
+
+    rdfs
+        http://www.w3.org/2000/01/rdf-schema#
+
+    skos
+        http://www.w3.org/2004/02/skos/core#
+
+    ymaps
+        urn:yahoo:maps
+
+  $obj->add_namespace($prefix, $namespace)
+
+    Add a prefix and namespace URI to the list of known namespaces.
+
+    This method returns a string containing the prefix you should use for
+    the namespace URI passed. If the prefix passed to the method is already
+    reserved for another namespace the method will return the following
+    string:
+
+     "nfr_" + I<the prefix passed to the method>
+
+  $obj->namespace_prefix($uri)
+
+    Return the namespace prefix for *$uri*
+
+  $obj->uri_shortform($prefix,$name)
+
+    Returns a string in the form of *prefix*:*property*. The property is the
+    value of $name. The prefix passed may or may be the same as the prefix
+    returned depending on whether or not the user has defined or redefined
+    their own list of namespaces.
+
+    Unless this package is subclassed the prefix passed to the method is
+    assumed to be one of prefixes in the default list of namespaces.
+
+  $obj->api_call(\%args)
+
+    Valid args are :
+
+    * method
+        A string containing the name of the Flickr API method you are
+        calling.
+
+    * args
+        A hash ref containing the key value pairs you are passing to
+        *method*
+
+    If the method encounters any errors calling the API, receives an API
+    error or can not parse the response it will log an error event, via the
+    log method, and return undef.
+
+    Otherwise it will return a *XML::LibXML::Document* object (if
+    XML::LibXML is installed) or a *XML::XPath* object.
+
+  $obj->log()
+
+    Returns a *Log::Dispatch* object.
+
+  $obj->serialise_triples(\@triples,\*$fh)
+
+    Print *@triples* as RDF/XML to a filehandle (*$fh*). If no filehandle is
+    defined, prints to STDOUT.
+
+  $obj->serialize_triples(\@triples,\*$fh)
+
+    An alias for *serialise_triples*
+
+VERSION
+    2.2
+
+DATE
+    $Date: 2010/12/19 19:06:12 $
+
+AUTHOR
+    Aaron Straup Cope <ascope@cpan.org>
+
+CONTRIBUTORS
+    Thomas Sibley <tsibley@cpan.org>
+
+EXAMPLES
+  CONFIG FILES
+
+    This is an example of a Config::Simple file used to collect RDF data
+    from Flickr
+
+     [flickr]
+     api_key=asd6234kjhdmbzcxi6e323
+     api_secret=s00p3rs3k3t
+     auth_token=123-omgwtf4u
+
+  RDF
+
+    This is an example of an RDF dump for a photograph backed up from Flickr
+    :
+
+     http://flickr.com/photos/straup/2269291707/
+
+     <?xml version='1.0'?>    
+     <rdf:RDF
+      xmlns:geoname="http://www.geonames.org/onto#"
+      xmlns:a="http://www.w3.org/2000/10/annotation-ns"
+      xmlns:filtr="http://www.machinetags.org/wiki/filtr#process"
+      xmlns:ph="http://www.machinetags.org/wiki/ph#camera"
+      xmlns:exif="http://nwalsh.com/rdf/exif#"
+      xmlns:mt="x-urn:flickr:machinetag:"
+      xmlns:exifi="http://nwalsh.com/rdf/exif-intrinsic#"
+      xmlns:geonames="http://www.machinetags.org/wiki/geonames#locality"
+      xmlns:dcterms="http://purl.org/dc/terms/"
+      xmlns:places="http://www.flickr.com/places/"
+      xmlns:dc="http://purl.org/dc/elements/1.1/"
+      xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+      xmlns:acl="http://www.w3.org/2001/02/acls#"
+      xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+      xmlns:foaf="http://xmlns.com/foaf/0.1/"
+      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      xmlns:computer="x-urn:freebsd:"
+      xmlns:flickr="x-urn:flickr:"
+     >
+
+     <rdf:Description rdf:about="file:///home/asc/photos/2008/02/16/20080216-2269291707-ambient_pork_m.jpg">
+        <dcterms:created>2008-02-17T10:36:02Z</dcterms:created>
+        <dc:creator rdf:resource="x-urn:no#asc"/>
+        <rdfs:seeAlso rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707"/>
+     </rdf:Description>
+
+     <flickr:photoset rdf:about="http://www.flickr.com/photos/35034348999@N01/sets/72157603613223494">
+        <dc:description></dc:description>
+        <dc:title>Untitled Set #2008</dc:title>
+        <dc:creator rdf:resource="http://www.flickr.com/people/35034348999@N01"/>
+     </flickr:photoset>
+
+     <flickr:tag rdf:about="http://www.flickr.com/photos/35034348999@N01/tags/filtr:process=filtr">
+        <skos:altLabel>filtr</skos:altLabel>
+        <dc:creator rdf:resource="http://www.flickr.com/people/35034348999@N01"/>
+        <skos:broader rdf:resource="http://www.flickr.com/photos/tags/filtr:process=filtr"/>
+        <skos:prefLabel rdf:resource="filtr:process=filtr"/>
+     </flickr:tag>
+
+     <dcterms:StillImage rdf:about="http://farm3.static.flickr.com/2326/2269291707_bc16eb038a.jpg">
+        <dcterms:relation>Medium</dcterms:relation>
+        <exifi:height>375</exifi:height>
+        <exifi:width>500</exifi:width>
+        <dcterms:isVersionOf rdf:resource="http://farm3.static.flickr.com/2326/2269291707_2ec279037a_o.jpg"/>
+        <rdfs:seeAlso rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707"/>
+        <rdfs:seeAlso rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707#exif"/>
+     </dcterms:StillImage>
+
+     <flickr:place rdf:about="http://www.flickr.com/places/United+States/California/San+Francisco">
+        <places:locality>San Francisco</places:locality>
+        <places:region>California</places:region>
+        <places:county>San Francisco</places:county>
+        <places:id>kH8dLOubBZRvX_YZ</places:id>
+        <places:country>United States</places:country>
+        <dc:isReferencedBy rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707"/>
+     </flickr:place>
+
+     <dcterms:StillImage rdf:about="http://farm3.static.flickr.com/2326/2269291707_2ec279037a_o.jpg">
+        <dcterms:relation>Original</dcterms:relation>
+        <exifi:height>1944</exifi:height>
+        <exifi:width>2592</exifi:width>
+        <rdfs:seeAlso rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707"/>
+        <rdfs:seeAlso rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707#exif"/>
+     </dcterms:StillImage>
+
+     <flickr:tag rdf:about="http://www.flickr.com/photos/tags/cameraphone">
+        <skos:prefLabel>cameraphone</skos:prefLabel>
+     </flickr:tag>
+
+     <flickr:tag rdf:about="http://www.flickr.com/photos/35034348999@N01/tags/filtr">
+        <skos:prefLabel>filtr</skos:prefLabel>
+        <dc:creator rdf:resource="http://www.flickr.com/people/35034348999@N01"/>
+        <skos:broader rdf:resource="http://www.flickr.com/photos/tags/filtr"/>
+     </flickr:tag>
+
+     <rdf:Description rdf:about="x-urn:flickr:tag">
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+     </rdf:Description>
+
+     <rdf:Description rdf:about="x-urn:freebsd:user">
+        <rdfs:subClassOf rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+     </rdf:Description>
+
+     <flickr:tag rdf:about="http://www.flickr.com/photos/35034348999@N01/tags/sanfrancisco">
+        <skos:prefLabel>sanfrancisco</skos:prefLabel>
+        <dc:creator rdf:resource="http://www.flickr.com/people/35034348999@N01"/>
+        <skos:broader rdf:resource="http://www.flickr.com/photos/tags/sanfrancisco"/>
+     </flickr:tag>
+
+     <flickr:tag rdf:about="http://www.flickr.com/photos/tags/sanfrancisco">
+        <skos:prefLabel>sanfrancisco</skos:prefLabel>
+     </flickr:tag>
+
+     <flickr:user rdf:about="http://www.flickr.com/people/32373682187@N01">
+        <foaf:mbox_sha1sum></foaf:mbox_sha1sum>
+        <foaf:name>heather powazek champ</foaf:name>
+        <foaf:nick>heather</foaf:nick>
+     </flickr:user>
+
+     <rdf:Description rdf:about="http://www.flickr.com/photos/35034348999@N01/2269291707#location">
+        <skos:broader rdf:resource="http://ws.geonames.org/rdf?geonameId=5326012"/>
+        <skos:broader rdf:resource="http://www.flickr.com/places/United+States/California/San+Francisco"/>
+     </rdf:Description>
+
+     <dcterms:StillImage rdf:about="http://farm3.static.flickr.com/2326/2269291707_bc16eb038a_s.jpg">
+        <dcterms:relation>Square</dcterms:relation>
+        <exifi:height>75</exifi:height>
+        <exifi:width>75</exifi:width>
+        <dcterms:isVersionOf rdf:resource="http://farm3.static.flickr.com/2326/2269291707_2ec279037a_o.jpg"/>
+        <rdfs:seeAlso rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707"/>
+        <rdfs:seeAlso rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707#exif"/>
+     </dcterms:StillImage>
+
+     <dcterms:StillImage rdf:about="http://farm3.static.flickr.com/2326/2269291707_bc16eb038a_t.jpg">
+        <dcterms:relation>Thumbnail</dcterms:relation>
+        <exifi:height>75</exifi:height>
+        <exifi:width>100</exifi:width>
+        <dcterms:isVersionOf rdf:resource="http://farm3.static.flickr.com/2326/2269291707_2ec279037a_o.jpg"/>
+        <rdfs:seeAlso rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707"/>
+        <rdfs:seeAlso rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707#exif"/>
+     </dcterms:StillImage>
+
+     <rdf:Description rdf:about="http://www.flickr.com/photos/35034348999@N01/2269291707#exif">
+        <exif:flash>Flash did not fire, auto mode</exif:flash>
+        <exif:digitalZoomRatio>100/100</exif:digitalZoomRatio>
+        <exif:isoSpeedRatings>100</exif:isoSpeedRatings>
+        <exif:pixelXDimension>2592</exif:pixelXDimension>
+        <exif:apertureValue>297/100</exif:apertureValue>
+        <exif:pixelYDimension>1944</exif:pixelYDimension>
+        <exif:focalLength>5.6 mm</exif:focalLength>
+        <exif:dateTimeDigitized>2008-02-16T14:22:32PST</exif:dateTimeDigitized>
+        <exif:colorSpace>sRGB</exif:colorSpace>
+        <exif:fNumber>f/2.8</exif:fNumber>
+        <exif:dateTimeOriginal>2008-02-16T14:22:32PST</exif:dateTimeOriginal>
+        <exif:shutterSpeedValue>7643/1000</exif:shutterSpeedValue>
+        <exif:exposureTime>0.005 sec (1/200)</exif:exposureTime>
+     </rdf:Description>
+
+     <flickr:tag rdf:about="http://www.flickr.com/photos/35034348999@N01/tags/cameraphone">
+        <skos:prefLabel>cameraphone</skos:prefLabel>
+        <dc:creator rdf:resource="http://www.flickr.com/people/35034348999@N01"/>
+        <skos:broader rdf:resource="http://www.flickr.com/photos/tags/cameraphone"/>
+     </flickr:tag>
+
+     <flickr:user rdf:about="http://www.flickr.com/people/35034348999@N01">
+        <foaf:mbox_sha1sum>b0571f7ec59c0b59e19a3f054f78d953cb32b071</foaf:mbox_sha1sum>
+        <foaf:name>Aaron Straup Cope</foaf:name>
+        <foaf:nick>straup</foaf:nick>
+     </flickr:user>
+
+     <rdf:Description rdf:about="x-urn:flickr:comment">
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/10/annotation-nsAnnotation"/>
+     </rdf:Description>
+
+     <dcterms:StillImage rdf:about="http://farm3.static.flickr.com/2326/2269291707_bc16eb038a_m.jpg">
+        <dcterms:relation>Small</dcterms:relation>
+        <exifi:height>180</exifi:height>
+        <exifi:width>240</exifi:width>
+        <dcterms:isVersionOf rdf:resource="http://farm3.static.flickr.com/2326/2269291707_2ec279037a_o.jpg"/>
+        <rdfs:seeAlso rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707"/>
+        <rdfs:seeAlso rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707#exif"/>
+     </dcterms:StillImage>
+
+     <flickr:machinetag rdf:about="http://www.machinetags.org/wiki/filtr#process">
+        <mt:predicate>process</mt:predicate>
+        <mt:namespace>filtr</mt:namespace>
+        <dc:isReferencedBy rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707"/>
+     </flickr:machinetag>
+
+     <rdf:Description rdf:about="x-urn:flickr:machinetag">
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+     </rdf:Description>
+
+     <flickr:machinetag rdf:about="http://www.machinetags.org/wiki/geonames#locality">
+        <mt:predicate>locality</mt:predicate>
+        <mt:namespace>geonames</mt:namespace>
+        <dc:isReferencedBy rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707"/>
+     </flickr:machinetag>
+
+     <flickr:tag rdf:about="http://www.flickr.com/photos/tags/geonames:locality=5391959">
+        <skos:altLabel>5391959</skos:altLabel>
+        <skos:broader rdf:resource="http://www.machinetags.org/wiki/geonames#locality"/>
+        <skos:prefLabel rdf:resource="geonames:locality=5391959"/>
+     </flickr:tag>
+
+     <rdf:Description rdf:about="file:///home/asc/photos/2008/02/16/20080216-2269291707-ambient_pork.jpg">
+        <dcterms:created>2008-02-17T10:36:02Z</dcterms:created>
+        <dc:creator rdf:resource="x-urn:no#asc"/>
+        <rdfs:seeAlso rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707"/>
+     </rdf:Description>
+
+     <flickr:tag rdf:about="http://www.flickr.com/photos/tags/filtr:process=filtr">
+        <skos:altLabel>filtr</skos:altLabel>
+        <skos:broader rdf:resource="http://www.machinetags.org/wiki/filtr#process"/>
+        <skos:prefLabel rdf:resource="filtr:process=filtr"/>
+     </flickr:tag>
+
+     <flickr:photo rdf:about="http://www.flickr.com/photos/35034348999@N01/2269291707">
+        <filtr:process>filtr</filtr:process>
+        <acl:access>visbility</acl:access>
+        <dc:title>Ambient Pork</dc:title>
+        <ph:camera>n82</ph:camera>
+        <dc:rights>All rights reserved.</dc:rights>
+        <acl:accessor>public</acl:accessor>
+        <dc:description></dc:description>
+        <geonames:locality>5391959</geonames:locality>
+        <dc:created>2008-02-16T14:22:32-0800</dc:created>
+        <dc:dateSubmitted>2008-02-16T14:32:59-0800</dc:dateSubmitted>
+        <dc:creator rdf:resource="http://www.flickr.com/people/35034348999@N01"/>
+        <dc:subject rdf:resource="http://www.flickr.com/photos/35034348999@N01/tags/cameraphone"/>
+        <dc:subject rdf:resource="http://www.flickr.com/photos/35034348999@N01/tags/filtr:process=filtr"/>
+        <dc:subject rdf:resource="http://www.flickr.com/photos/35034348999@N01/tags/filtr"/>
+        <dc:subject rdf:resource="http://www.flickr.com/photos/35034348999@N01/tags/sanfrancisco"/>
+        <dc:subject rdf:resource="http://www.flickr.com/photos/35034348999@N01/tags/ph:camera=n82"/>
+        <dc:subject rdf:resource="http://www.flickr.com/photos/35034348999@N01/tags/geonames:locality=5391959"/>
+        <dcterms:isPartOf rdf:resource="http://www.flickr.com/photos/35034348999@N01/sets/72157603613223494"/>
+        <a:hasAnnotation rdf:resource="http://www.flickr.com/photos/straup/2269291707/#comment72157603921497994"/>
+        <geo:Point rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707#location"/>
+     </flickr:photo>
+
+     <computer:user rdf:about="x-urn:no#asc">
+        <foaf:name>Aaron Straup Cope</foaf:name>
+        <foaf:nick>asc</foaf:nick>
+     </computer:user>
+
+     <rdf:Description rdf:about="#">
+        <dcterms:hasVersion>2.1:1203244560</dcterms:hasVersion>
+        <dc:created>2008-02-17T02:36:00-0800</dc:created>
+        <dc:creator rdf:resource="http://search.cpan.org/dist/Net-Flickr-RDF-2.1"/>
+        <a:annotates rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707"/>
+     </rdf:Description>
+
+     <flickr:tag rdf:about="http://www.flickr.com/photos/tags/filtr">
+        <skos:prefLabel>filtr</skos:prefLabel>
+     </flickr:tag>
+
+     <rdf:Description rdf:about="x-urn:flickr:user">
+        <rdfs:subClassOf rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+     </rdf:Description>
+
+     <rdf:Description rdf:about="http://www.flickr.com/places/kH8dLOubBZRvX_YZ">
+        <rdfs:seeAlso rdf:resource="http://www.flickr.com/places/United+States/California/San+Francisco"/>
+     </rdf:Description>
+
+     <flickr:machinetag rdf:about="http://www.machinetags.org/wiki/ph#camera">
+        <mt:predicate>camera</mt:predicate>
+        <mt:namespace>ph</mt:namespace>
+        <dc:isReferencedBy rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707"/>
+     </flickr:machinetag>
+
+     <flickr:comment rdf:about="http://www.flickr.com/photos/straup/2269291707/#comment72157603921497994">
+        <dc:identifier>6065-2269291707-72157603921497994</dc:identifier>
+        <dc:created>2008-02-16T16:39:31</dc:created>
+        <a:body>best. title. ever.</a:body>
+        <dc:creator rdf:resource="http://www.flickr.com/people/32373682187@N01"/>
+        <a:annotates rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707"/>
+     </flickr:comment>
+
+     <flickr:tag rdf:about="http://www.flickr.com/photos/35034348999@N01/tags/geonames:locality=5391959">
+        <skos:altLabel>5391959</skos:altLabel>
+        <dc:creator rdf:resource="http://www.flickr.com/people/35034348999@N01"/>
+        <skos:broader rdf:resource="http://www.flickr.com/photos/tags/geonames:locality=5391959"/>
+        <skos:prefLabel rdf:resource="geonames:locality=5391959"/>
+     </flickr:tag>
+
+     <flickr:tag rdf:about="http://www.flickr.com/photos/tags/ph:camera=n82">
+        <skos:altLabel>n82</skos:altLabel>
+        <skos:broader rdf:resource="http://www.machinetags.org/wiki/ph#camera"/>
+        <skos:prefLabel rdf:resource="ph:camera=n82"/>
+     </flickr:tag>
+
+     <geoname:Feature rdf:about="http://ws.geonames.org/rdf?geonameId=5326012">
+        <geoname:featureCode>PPLX</geoname:featureCode>
+        <geoname:countryCode>US</geoname:countryCode>
+        <geoname:regionCode>CA</geoname:regionCode>
+        <geoname:gtopo30>23</geoname:gtopo30>
+        <geoname:region>California</geoname:region>
+        <geoname:city>San Francisco County</geoname:city>
+        <dc:isReferencedBy rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707"/>
+     </geoname:Feature>
+
+     <flickr:tag rdf:about="http://www.flickr.com/photos/35034348999@N01/tags/ph:camera=n82">
+        <skos:altLabel>n82</skos:altLabel>
+        <dc:creator rdf:resource="http://www.flickr.com/people/35034348999@N01"/>
+        <skos:broader rdf:resource="http://www.flickr.com/photos/tags/ph:camera=n82"/>
+        <skos:prefLabel rdf:resource="ph:camera=n82"/>
+     </flickr:tag>
+
+     <rdf:Description rdf:about="http://www.flickr.com/geo/United%20States/California/San%20Francisco/San%20Francisco">
+        <rdfs:seeAlso rdf:resource="http://www.flickr.com/places/United+States/California/San+Francisco"/>
+     </rdf:Description>
+
+     <dcterms:StillImage rdf:about="http://farm3.static.flickr.com/2326/2269291707_bc16eb038a_b.jpg">
+        <dcterms:relation>Large</dcterms:relation>
+        <exifi:height>768</exifi:height>
+        <exifi:width>1024</exifi:width>
+        <dcterms:isVersionOf rdf:resource="http://farm3.static.flickr.com/2326/2269291707_2ec279037a_o.jpg"/>
+        <rdfs:seeAlso rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707"/>
+        <rdfs:seeAlso rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707#exif"/>
+     </dcterms:StillImage>
+
+     <rdf:Description rdf:about="file:///home/asc/photos/2008/02/16/20080216-2269291707-ambient_pork_s.jpg">
+        <dcterms:created>2008-02-17T10:36:02Z</dcterms:created>
+        <dc:creator rdf:resource="x-urn:no#asc"/>
+        <rdfs:seeAlso rdf:resource="http://www.flickr.com/photos/35034348999@N01/2269291707"/>
+     </rdf:Description>
+
+    </rdf:RDF>
+
+SEE ALSO
+    Net::Flickr::API
+
+    RDF::Simple
+
+TO DO
+    *   Methods for describing more than just a photo; groups, tags, etc.
+
+    *   Update bounding boxes to be relative to individual images
+
+    *   Proper tests
+
+    Patches are welcome.
+
+BUGS
+    Please report all bugs via http://rt.cpan.org/
+
+LICENSE
+    Copyright (c) 2005-2008 Aaron Straup Cope. All Rights Reserved.
+
+    This is free software. You may redistribute it and/or modify it under
+    the same terms as Perl itself.
+

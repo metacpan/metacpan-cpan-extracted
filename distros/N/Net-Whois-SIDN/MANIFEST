@@ -1,0 +1,16 @@
+ChangeLog
+Makefile.PL
+README.todo
+MANIFEST
+lib/Net/Whois/SIDN.pm
+lib/Net/Whois/SIDN/Util.pm
+lib/Net/Whois/SIDN/xsd/whois-drs50.xsd
+examples/is-output.txt
+examples/is.pl
+examples/whois-output.txt
+examples/whois.pl
+doc/whois-en.pdf
+doc/whois-nl.pdf
+t/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,46 @@
+Revision history for Net-Telnet-Trango
+
+0.05    2009.07.31
+        * no longer store config in a shared %PRIVATE hash, 
+          now do it the same way as Net::Telnet and store it 
+          as part of the object.  When using more than one object 
+          (say an AP and and SU) the config would be shared.
+        * Add several new commands useful for managing SU
+          - reset
+          - set_baseid
+          - set_suid
+          - set_defaultopmode
+          - freq
+          - freq_writescan
+          - freq_scantable
+          - ipconfig
+        * new commands don't have tests yet, but it is in the TODO
+
+0.04    2009.07.13
+        * Fix a mistake I made in the match for sudb_view. I should probably
+          get a test environment set up.  Hopefully that is the last problem
+          Steven has to work around for a while.
+
+0.03    2009.07.09
+        * Match the su2su field in sudb_view, it is in hex, so \d didn't match
+          sometimes.  Thanks again to "Steven N. Severinghaus"
+        * More tests that are probably non-functional because I didn't set up
+          a test environment.
+
+0.02    2009.07.08
+        * Perltidy and some Perl Critic
+        * Changed the prompt to include $> not just #>
+        * Changed the banner match to support more types of hardware
+        * Lots of tests
+        * Added stuff to the TODO
+        * Support for the TrangoLink 45
+        * Additional features in the su.cgi
+        * Add commands arq and linktest
+        * Fix a problem in sudb_add where $new_mac wasn't completely
+          stripped of special characters.
+          From: "Steven N. Severinghaus" <steve@volo.net> 
+
+0.01    2007.02.05
+        * First version, released on an unsuspecting world.
+
+$RedRiver: Changes,v 1.7 2009/07/31 21:44:33 andrew Exp $

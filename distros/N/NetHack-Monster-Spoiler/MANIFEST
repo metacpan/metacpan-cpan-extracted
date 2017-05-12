@@ -1,0 +1,21 @@
+bin/extract-monst
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/NetHack/Monster/Spoiler.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/000-load.t
+t/002-load-spoiler.t
+t/003-lookup-spoiler.t
+t/004-spoiler-predicate.t
+t/005-parse-description.t
+t/006-spoiler-corpse.t

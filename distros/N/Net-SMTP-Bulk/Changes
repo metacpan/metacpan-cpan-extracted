@@ -1,0 +1,126 @@
+Revision history for Perl module Net::SMTP::Bulk
+
+0.23 2016-09-07
+    - Fixed new line issue in body Net::SMTP::Bulk::AnyEvent
+
+0.22 2016-09-03
+    - Added SMTP Pipelining modes 1 and 2 in Net::SMTP::Bulk::AnyEvent
+    - Added read callback for Net::SMTP::Bulk::AnyEvent
+
+0.21 2015-01-29
+    - DebugPath now creates the folder path automatically if it is missing
+    - DebugPath now includes date/time params such as [YYYY]-[MM]-[DD]
+    - Debug ID can now be passed to the quit function in Net::SMTP::Bulk::AnyEvent
+    - Authen::SASL now also handles AUTH in Net::SMTP::Bulk::AnyEvent
+    - Fixed optionality of mechanism in auth function for Net::SMTP::Bulk::AnyEvent
+    - Added Auth parameter to Net::SMTP::Bulk::AnyEvent
+
+0.20 2015-01-26
+    - Moved Debug for Hang and Fail to Level 7 in Net::SMTP::Bulk::AnyEvent and added details on last step.
+    - Introduced sleep timer before reconnect on hang and on fail Net::SMTP::Bulk::AnyEvent via Sleep=>{ Hang=>?, Fail=>? } (Note: Sleep timer may be off by up to 1 second)
+    - Fixed issue in scenario where AUTH is not needed due to SMTP authentication bypass in Net::SMTP::Bulk::AnyEvent
+    - added 'complete' and 'end_thread' events to Net::SMTP::Bulk::AnyEvent
+    - updated documentation
+
+
+0.19 2014-12-16
+    - Added STARTTLS support.
+    - Close Debug FH when done for Net::SMTP::Bulk::AnyEvent.
+    - Net::SMTP::Bulk::Coro is now partly converted to new debug format (Debug 1 - 10). **THIS BREAKS COMPATIBILITY WITH PREVIOUS VERSIONS**
+    - Fixed improper header issue in Net::SMTP::Bulk::Coro (Fixed in 0.19 but not included in the changelog)
+
+0.18 2014-11-07
+    - Added debug email counter and timestamp to Net::SMTP::Bulk::AnyEvent.
+    - Updated some hangs to be quicker to Net::SMTP::Bulk::AnyEvent.
+    - Fixed freeze if no email is sent on quit command on Net::SMTP::Bulk::AnyEvent.
+    - Fixed proper disconnect on quit command on Net::SMTP::Bulk::AnyEvent.
+    - Fixed reconnect to actually work properly on Net::SMTP::Bulk::AnyEvent.
+    - Added retry attempts for hang (default: 1), fail (default: 0), global hang (default: 1) to Net::SMTP::Bulk::AnyEvent.
+
+0.17 2014-11-03
+
+    - Fixed issue of handles not being closed correctly in Net::SMTP::Bulk::AnyEvent and fixed some session errors.
+    - Fixed improper header issue in Net::SMTP::Bulk::AnyEvent.
+    - Added Encode to require list.
+    - Added timeout (set to 60 seconds by default), timeout handles and global timeout (set to 120 seconds by default) and global timeout handle.
+    - Removed Debug=1 and Debug=2 for Net::SMTP::Bulk::AnyEvent
+    - Added Debug 1 - 10 for controlling details of debugging. DebugPath will force writing to filehandle, without setting DebugPath it will print to STDOUT. Setting DebugPath to 'default' will use default path and format. (This breaks compatibility between Net::SMTP::Bulk::AnyEvent and Net::SMTP::Bulk::Coro debugging for now)
+
+
+0.16 2014-01-29
+
+    - Added new mode for using AnyEvent only.
+    - Moved library to Net::SMTP::Bulk::Coro.
+    - Added library Net::SMTP::Bulk::AnyEvent
+
+0.15 2013-10-17
+
+    - Fixed warnings when Encode is not used
+
+0.14 2013-10-08
+
+    - Added Encode socket to utf8 option
+    - Added Encode write log file to utf8 and set to default
+
+0.13 2013-09-20
+
+    - Fixed order repeat on restart 
+
+0.12 2013-09-19
+
+    - Prevent multiple restarts on multiple fails 
+
+0.11 2013-09-19
+
+    - Changed 102 to be delayed reconnect callback response, 202 for reconnect now
+    - Added delayed restart callback response 103, 203 for restart now (restart will close all connections and restart)
+    - Fixed remove thread to function correctly and added 104, remove thread temporarily
+
+0.10 2013-09-19
+
+    - Added parallel ssl connect 
+
+0.09 2013-09-18
+
+    - Added parallel connect 
+
+0.08 2013-09-18
+
+    - Fixed auto remove thread issue
+    - Added Debug=2 and DebugPath for writing debug data to files
+    - added missing reconnect_pass callback response
+
+0.07 2013-09-12
+
+    - Made it work faster(especially on longer response servers) and more efficient by removing coro sleep in favor of readable on the handle
+
+0.06 2013-09-10
+
+    - Fixed to work with Perl 5.10 and below
+
+0.05 2013-09-08
+
+    - Fixed default callbacks to being 1
+
+0.04 2013-09-08
+
+    - Fixed removal of incorrect thread
+    - Changed callback status codes to be 3 digits,
+      made 1 to be default callback from 0
+    - Adjusted reconnect to skip current
+
+0.03 2013-09-08
+
+    - Fixed 220 response causing removal of thread
+    - Fixed a few documentation issues
+
+0.02 2013-09-08
+
+    - Fixed <CR><LF>.<CR><LF>
+    - Fixed Remove Thread
+    - Fixed pass callbacks
+
+0.01 2013-09-07
+
+    - First version, released on an unsuspecting world.
+

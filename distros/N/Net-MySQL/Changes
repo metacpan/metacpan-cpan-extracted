@@ -1,0 +1,72 @@
+Revision history for Perl extension Net::MySQL.
+
+0.11
+	- RT#41721 is completely fixed. (sorry, I updated only Makefile.PL and forgot to update META.yml)
+    - remove SUPPORT OPERATING SYSTEM in POD because description is too old.
+    - fix typo in POD (reported in RT#63121: Misprint in documentation)
+
+0.10
+	- add missing dependency for Digest::SHA1 (reported in RT#41721)
+	- fix RT#36646
+
+0.09 Fri Mar 31 22:45:37 JST 2006
+	- Refine packet dump.
+	- Support 4.1 authenticaiton protocol.
+	- Over 252 affected rows support.
+	- Thanks Hotel "DAN".
+
+0.08 Fri Jan 24 19:33:08 JST 2003
+	- Bugfix _get_field_length(). to platform independent.
+	  (Thanks to Aigars Grins, http://rt.cpan.org/NoAuth/Bug.html?id=1980)
+
+0.07 Mon Jul 22 11:50:57 JST 2002
+	- Fixed the problem which cannot acquire the field with a length
+	  of 16 bits or more.
+	  (Thanks to "hanif" <hanif@noormohamed.co.uk>)
+	- Fixed some uncanny typoes. Purified the devil ;-)
+	  (Thanks to "Lucas Saud" <lucas.marinho@uol.com.br>
+	   and "jdavidb" and "vsergu" <http://use.perl.org/~jdavidb/journal/6308>)
+
+0.06 Wed Jul 10 19:11:40 JST 2002
+	- When old Perl was used, the problem which cannot encode a
+	  password correctly was corrected.
+	  (Thanks to Michael P. Soulier <msoulier@nortelnetworks.com>)
+	- UNIX Socket connection support.
+	- OS tested as use is possible is added.
+	   * Linux with perl 5.005_03 built for ppc-linux
+	   * Linux with perl 5.6.0 bult for i386-linux
+	   * Solaris 2.6 with perl 5.6.1 built for sun4-solaris
+	   * Solaris 2.6 with perl 5.004_04 built for sun4-solaris
+	- The version of Perl to demand was lowered to 5.004.
+
+0.05 Fri Jun 28 15:46:35 JST 2002
+	- Independent from Math::BigInt module.
+	  Calculation of password hash became high-speed by this
+	  correction.
+
+0.04  Tue May  7 16:10:09 JST 2002
+	- The problem was in the state where SQL longer than 256 bytes
+	  cannot be used in the present condition.
+	  It was corrected by change of a _execute_command() method.
+	  (Thanks to Bob Swarz <rswarz@mitre.org>
+	   and <Corey.Holzer@jwt.com>)
+	- Some typoes on a document were corrected.
+
+0.03  Mon Apr 15 19:05:17 JST 2002
+	- The problem which is not connectable with MySQL daemon of
+	  some versions (ver 3.23.28 gamma) was corrected.
+	  (Thanks to Kawai Takanori <GCD00051@nifty.ne.jp>
+	   and Tatsuhiko Miyagawa <miyagawa@edge.co.jp>)
+	- Refactoring of '_send_command()' method.
+	- Add create_database() method.
+	- Add drop_database() method.
+
+0.02  The Apr  2 21:59:36 JST 2002
+	- Even if insert_id exceeded 255, the purser was cured so that
+	  it might operate correctly.
+	- The data structure was corrected so that Column names might
+	  be acquired correctly.
+
+0.01  Tue Mar 26 16:09:57 JST 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n Net::MySQL

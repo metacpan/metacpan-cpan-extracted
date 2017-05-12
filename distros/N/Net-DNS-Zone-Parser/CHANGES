@@ -1,0 +1,48 @@
+Revision history for Perl extension Net::DNS::ZONE::Parser
+------------------------------------------------------------
+
+
+31 December 2008 Version 0.02
+
+FIX:      Ability to deal with a root zone too (parse the "." zone)
+FIX:      Minor typos in documentation
+FEATURE:  Use named-compilezone as that provides a cleaner interface.
+	  This also changes the errormessages returned somewhat
+FIX:	  
+
+July 26   2005 Version 0.01
+
+
+FEAT:     make use of "named-checkzone -D" to do all the parsing. 
+          named-checkzone does more checks on the data and is faster.
+
+FEAT:     imported in subversion,
+
+FIX:      STRIP_NSEC will just like STRIP_RRSIG remove both the NSECs and 
+          the associated sigs.
+	  BUMP_SOA will also strip the RRSIG over the SOA record.
+
+
+FIX:      Net::DNS::SEC 0.12_01 fixed a typo in a method and an
+          attribute name. It also carps on the occurance of NXTs.
+          The tests were adapted to deal with this and other 
+          minor bugs were fixed. 
+
+          The test suite is now incompatible with pre 0.12_02 versions
+          or Net::DNS::SEC.
+
+FEAT:     Added the "o" flag to regular expressions that do not need
+          recompilation.
+
+July 22, 2004 Version 0.0002  first CPAN release
+
+2003-2004 Version 0.0001_* where internal snapshots used during the 
+	  development of the Net::DNS::Zone class. 
+
+
+
+
+
+
+------------------------------------------------------------
+$Id: CHANGES 780 2008-12-30 17:23:57Z olaf $

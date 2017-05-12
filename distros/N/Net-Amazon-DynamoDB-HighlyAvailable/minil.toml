@@ -1,0 +1,4 @@
+name = "Net-Amazon-DynamoDB-HighlyAvailable"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

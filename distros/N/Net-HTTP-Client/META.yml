@@ -1,0 +1,31 @@
+---
+abstract: 'A Not-quite-so-low-level HTTP connection (client)'
+author:
+  - 'Ashley Willis <ashley+perl@gitable.org>'
+build_requires:
+  Limper: 0
+  POSIX: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-HTTP-Client
+provides:
+  Net::HTTP::Client:
+    file: lib/Net/HTTP/Client.pm
+    version: 0.012
+requires:
+  HTTP::Response: 0
+  Net::HTTP: 0
+  parent: 0
+  perl: v5.10.0
+  strict: 0
+  warnings: 0
+resources:
+  repository: https://gitable.org/ashley/net-http-client.git
+version: 0.012

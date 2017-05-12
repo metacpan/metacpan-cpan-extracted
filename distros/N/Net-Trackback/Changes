@@ -1,0 +1,50 @@
+Revision history for Perl extension Net::Trackback.
+(formerly XML::TrackBack and Net::TrackBack)
+
+1.01  Dec 24 2004
+    - Fixed cut-and-paste sloppiness in Ping where the package was defined
+      as Client
+    - Added versions numbers to prerequisites in Makefile.
+1.0   Dec 24 2004
+    - BREAK: Net::Trackback::Ping::parse returns a Ping object or
+      undefined. Previous 0.99 release would return 
+      Net::Trackback::Message in the event of an error.
+    - Added proxy support to client.
+    - Added charset property and HTTP header to client.
+    - All modules are a subclass of Class::ErrorHandler.
+    - Deprecated is_data, is_message and is_ping in Net::Trackback.
+    - encode_xml and decode_xml in Net::Trackback are exportable.
+    - Fixed bug in Data module where an unitialized value warning 
+      was posted if the dc:identifier was missing. (Ben Trott)
+    - Fixed bug in Data were a "subroutine exited via next" warning
+      was generated if the dc:identifier didn't match the permalink
+      URI, or if the dc:identifier was empty. (Ben Trott)
+    - In Data, if the TrackBack RDF contains invalid (misspelled, even)
+      DC elements, Net::Trackback::Data was croaking. Now issue a 
+      warning. (Ben Trott)
+    
+0.992 Apr 22 2004
+    - Fixed 'blog_name' field and method incorrectly named
+      'blogname' in Ping. (Yann Kerhervé)
+
+0.991 Mar 20 2004
+    - Snagged by the lowercase B. Fixed the test script that was
+      failing because of the difference in case.
+
+0.99  Mar 20 2004
+    - Complete refactoring of the interface and code. Too many
+      changes to list. 
+    - Change module name to reflect the official capitalization
+      lowercase B. [UPDATE: I was right the first time, but I'm not 
+      changing it back.]
+
+0.21  Mar 19 2003
+	- Initial release into CPAN.
+	- Moved module in heirarchy from XML::TrackBack to more
+	  appropriate Net::TrackBack.
+
+0.2  Jan 16 2003
+	- Added discover subroutine.
+
+0.1  Jan 01 2003
+    - Original version.

@@ -1,0 +1,52 @@
+Revision history for Net-ILO
+
+0.54   07/1/2011
+        - constructor now accepts either hash or hashref
+        - added configurable privileges for non-admin users to add_user() (thanks to Chris Sarginson)
+        - added ability to read 'Caution' and 'Critical' thresholds from temperature sensors (thanks to Matthew Stier)
+        - better error checking for invalid port (as well as an additional unit test)
+        - documented 'debug' parameter in new()
+        - fixed several typos in comments
+        - whitespace cleanup
+
+0.53   11/18/2010
+        - added ability to activate advanced license from Net::ILO
+        - removed username/password checking cruft from https_port() and network()
+
+0.52   09/27/2010
+        - fix for older versions (<=5.8.0) of perl (thanks to Darko Pejakov)
+
+0.51   08/16/2010
+        - if mac01 is set and mac03/04 aren't, calling mac04 or mac04 returns immediately rather than sending iLO request
+        - renamed fw_version to get_fw_version for consistency
+        - fixed bug in get_fw_version() where error condition wasn't propagated
+        - fixed test in t/04-generate_cmd to work with iLO 3 changes
+
+0.50   08/13/2010
+        - BETA support for iLO 3
+        - added methods for mac03 and mac04
+        - _populate_host_data no longer depends on the order of data returned
+        - _send formats XML nicely, without leading / trailing spaces
+
+0.43   07/28/2010
+        - moved XML header and footer generation to its own function [wrap()]
+        - added new methods for gathering server health:
+            - fans()
+            - power_supplies()
+            - temperatures()
+        - alphabetized commands in _generate_cmd()
+
+0.42   07/26/2010
+        - Removed bad test from t/03-serialize.t
+
+0.41   07/21/2010
+        - Fixed bug in del_user() so it behaves as documented
+        - Fixed bug in _serialize() so it doesn't barf if passed null data
+        - Removed POD tests as they were interfering with build environments
+        - Added several dozen unit tests
+        - Removed .git directory from CPAN distribution (argh!)
+        - MANIFEST is now complete
+
+0.40   07/19/2010
+        - First release version
+

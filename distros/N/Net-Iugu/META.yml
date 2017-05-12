@@ -1,0 +1,29 @@
+---
+abstract: 'Perl modules for integration with Iugu payment web services'
+author:
+  - 'Blabos de Blebe <blabos@cpan.org>'
+build_requires:
+  Sub::Override: '0.09'
+  Test::Most: '0.34'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Iugu
+requires:
+  File::LibMagic: '1.10'
+  File::Slurp: '9999.19'
+  HTTP::Message: '6.06'
+  JSON: '2.90'
+  LWP::UserAgent: '6.06'
+  MIME::Base64: '3.15'
+  Moo: '1.007000'
+  String::CamelCase: '0.02'
+resources:
+  bugtracker: https://github.com/blabos/Net-Iugu/issues
+  repository: https://github.com/blabos/Net-Iugu
+version: '0.000002'

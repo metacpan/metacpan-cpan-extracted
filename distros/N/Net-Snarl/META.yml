@@ -1,0 +1,33 @@
+---
+abstract: 'Snarl network protocol'
+author:
+  - 'Alan Berndt, C<< <alan@eatabrick.org> >>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build::Tiny: 0.035
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.4, Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.120921'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Snarl
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Carp: 0
+  IO::Socket: 0
+  Readonly: 0
+  perl: 5.008
+resources:
+  bugtracker: https://github.com/bentglasstube/Net-Snarl/issues
+  homepage: https://github.com/bentglasstube/Net-Snarl
+  repository: https://github.com/bentglasstube/Net-Snarl.git
+version: 1.1

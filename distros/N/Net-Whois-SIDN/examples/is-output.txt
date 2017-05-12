@@ -1,0 +1,49 @@
+
+==> Request
+POST http://rwhois.domain-registry.nl/is
+Connection: open
+Content-Type: text/xml; charset="utf-8"
+X-Net-Whois-SIDN: 0.95
+
+<?xml version="1.0" encoding="UTF-8"?>
+<is-query xmlns="http://rxsd.domain-registry.nl/sidn-whois-drs50">
+  <lang>NL</lang>
+  <domain>craneveer.nl</domain>
+</is-query>
+
+--> Response
+HTTP/1.0 200 Document follows
+Connection: close
+Pragma: no-cache
+Server: whoisd-reg 5.0.10 app0i.sidn.local
+Content-Language: nl
+Content-Length: 350
+Content-Type: text/xml; charset='utf-8'
+Client-Date: Thu, 26 Aug 2010 06:45:19 GMT
+Client-Peer: 94.198.154.139:80
+Client-Response-Num: 1
+
+<?xml version="1.0" encoding="UTF-8"?>
+<is-response xmlns="http://rxsd.domain-registry.nl/sidn-whois-drs50">
+  <is-status domain="craneveer.nl">
+    <date>2010-08-26T06:45:19.95917Z</date>
+    <available>false</available>
+    <code>active</code>
+    <explain lang="nl-NL" format="plain">craneveer.nl is actief</explain>
+  </is-status>
+</is-response>
+
+--> Perl structure
+$VAR1 = {
+  is_status => {
+    domain => 'craneveer.nl',
+    date => '2010-08-26T06:45:19.95917Z',
+    explain => {
+      format => 'plain',
+      lang => 'nl-NL',
+      _ => 'craneveer.nl is actief'
+    },
+    code => 'active',
+    available => 0
+  }
+};

@@ -1,0 +1,8 @@
+Revision history for Perl module Number::FormatEng
+
+
+0.02  Jul 30 2015
+      - attempt to fix failing CPANTesters on 5.23.1/solaris
+
+0.01  Nov 11 2009
+      - original version of module 'Number::FormatEng'

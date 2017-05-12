@@ -1,0 +1,4 @@
+#!/usr/bin/perl
+use lib '../lib';
+use Nagios::Plugin::ByGmond;
+Nagios::Plugin::ByGmond->new->run;

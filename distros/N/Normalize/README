@@ -1,0 +1,45 @@
+Normalize
+
+This module gives you the ability to normalize score result sets.
+Sometimes a larger score is better and sometimes a smaller score is better.
+In order to compare the results from different methods? You need a way to 
+normalize them: that is, to get them all within the same range and direction.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Normalize
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Normalize
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Normalize
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Normalize
+
+    Search CPAN
+        http://search.cpan.org/dist/Normalize/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Konstantin Kapitanov
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

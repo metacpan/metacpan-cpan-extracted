@@ -1,0 +1,122 @@
+What it is:
+
+	Modules Net::Gen, Net::Inet, Net::TCP, Net::UDP, Net::UNIX,
+	Net::TCP::Server, and Net::UNIX::Server.
+	Net::Gen is not a good name, I know that, but what's in it
+	really belongs in Socket, I think.  In any case, I'm open to
+	votes for a better name.  Well, I would be, but it's appeared in
+	a Perl Resource Kit from O'Reilly & Associates, so maybe it's
+	pretty well cast in stone after all now.  C'est la guerre.
+
+What's different from other offerings:
+
+	Layering keeps PF_INET things in Inet, and only socket-generic
+	stuff is in Gen.
+
+	Friendly {g,s}etsockopt.
+
+	A TIESCALAR interface for really simple socket communications.
+
+	Properly handles connects to hosts with multiple addresses as
+	long as gethostbyname() returns more than one address.  (See RFC
+	1123.)
+
+	Has had testing on threaded perls, and works as well with threads
+	as perl itself (which isn't saying much, yet, given the experimental
+	status of threads in Perl, but that's the limit of resolution for
+	the testing).
+
+What's still missing:
+
+	Support for non-blocking sockets is under-tested at best.  The
+	select, fhvec, ioctl, and fcntl methods aren't necessarily all
+	one would wish.
+
+	A proper set of regression & verification tests [partial].
+
+	Proper handling of timeout options [partial].  Timed connect() and
+	accept() seem to be working now, but there's no direct support
+	for, say, sending as much of a block of data as possible in a
+	given timeout period.
+
+	Configuration testing to get the include files right on more
+	systems, and to manage to find the constants which at least some
+	Linux systems have as enums rather than as #defines.  (I think I
+	have this one covered now, but that isn't proved yet.)  Other
+	UNIX variants may need tweaking, and I've no idea whether it'll
+	work on Win32 Perl.  Also, the non-blocking/timed connect() support
+	won't work with SOCKSified perl.
+
+	Better support (besides the plethora of protocol constants) for
+	raw socket communications (required for the ICMP values to be
+	useful).
+
+	Probably several other things I won't have missed (yet).
+
+
+The .pm files themselves are pod-ified (somewhat), with a catalogue of
+the methods.
+
+I'm not a technical writer, nor do I usually play one on the net.
+The documentation could still use a lot of work, I'm sure.
+
+Making it all work requires perl 5.004_04 or later.  (There are features
+which are new to 5.004_05 and even 5.005 which are used, but there
+are backward compatibility hooks to keep it working with 5.004_04.)
+
+A simple test script:
+
+	#!/usr/bin/perl
+
+	use Net::TCP;
+
+	$f = new Net::TCP 0, 'finger';
+	die "Can't establish finger socket: $!\n" unless $f;
+
+	put $f "-s\015\012";
+	$f->shutdown(1);
+	print $line while defined($line = getline $f);
+	undef $f;
+
+	die "Can't tie to finger socket: $!\n" unless
+		tie $f,'Net::TCP',0,'finger';
+
+	$f = "-s\n";
+	print $line while defined($line=$f);
+	untie $f;
+
+Should be the same (on most BSD-ish systems, anyway) as
+	finger ; finger
+to the shell.
+
+
+Anyway, bug reports & feature requests to me (spidb@cpan.org).
+HOWEVER, if you have compilation difficulties, check the Makefile.PL
+file again, especially near "my @hfiles".  The list of required system
+include files is almost entirely tester-contributed.  If it doesn't
+build (yet) on your system/configuration/version, see if you can figure
+out why, following the guidelines just above "my @hfiles" there.  Future
+users will thank you, too.
+
+If you do need to send a bug report, be sure to include the output from
+a `perl -V' command.  If the failure is during the test suite, also include
+the output from `make test TEST_VERBOSE=1'.
+
+Finally, previous releases of this code had a significantly different
+internal implementation, which was slower (but worked in earlier versions
+of perl5 than this code ever could have).  If you were using the internals
+of the implementation rather than sticking to the documented interfaces,
+you will have some work to do before your derived classes will work again.
+
+# Copyright 1995,2002 Spider Boardman.
+# All rights reserved.
+#
+# Automatic licensing for this software is available.  This software
+# can be copied and used under the terms of the GNU Public License,
+# version 1 or (at your option) any later version, or under the
+# terms of the Artistic license.  Both of these can be found with
+# the Perl distribution, which this software is intended to augment.
+#
+# THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+# WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

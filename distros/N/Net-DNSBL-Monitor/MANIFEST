@@ -1,0 +1,29 @@
+MANIFEST
+INSTALL
+README
+Makefile.PL
+Monitor.pm
+Changes
+GPL
+dnsblmon
+recurse2txt
+monitor.conf.example
+contrib/mon2html.pl
+contrib/mon2list.pl
+contrib/dnsbl_monitor.shtml
+contrib/mon2page.sh
+contrib/mon2generic.pl
+contrib/HOWTO
+local/tf.txt
+local/iplist.txt
+local/snglips.txt
+local/tf1.txt
+local/test.conf
+t/_find_resolver.t t
+t/dnsbls.t
+t/ipfiles.t
+t/resp.t
+t/riptrs.t
+t/run.t
+t/text.t
+META.yml                                 Module meta-data (added by MakeMaker)

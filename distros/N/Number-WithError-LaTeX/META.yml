@@ -1,0 +1,21 @@
+abstract: LaTeX output for Number::WithError
+author: Steffen Mueller <modules at steffen-mueller dot net>, L<http://steffen-mueller.net/>
+build_requires: 
+  Test::LectroTest: 0
+  Test::More: 0.47
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Number-WithError-LaTeX
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Math::BigFloat: 0
+  Number::WithError: 0.08
+  Params::Util: 0.10
+  TeX::Encode: 0.4
+  perl: 5.8.0
+  prefork: 1.00
+version: 0.06

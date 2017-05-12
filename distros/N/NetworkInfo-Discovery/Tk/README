@@ -1,0 +1,11 @@
+Keep in mind this is very alpha code. 
+
+This project is my first atempt to make a GUI drawing of a graph.  It
+uses perl-Tk to display the graph and conenctions, as well as a bit of
+information about the hosts on the network.  It needs to be modified to
+know the location of your network xml file.  
+
+In the future I would like to expand on this, so if anyone out there
+does Tk programming, feel free to add more depth here.
+
+-Tom Scanlan

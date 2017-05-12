@@ -1,0 +1,21 @@
+# ---------- Nes configuration --------------
+# exec cgis
+Options +ExecCGI
+AddHandler cgi-script .cgi .pl
+
+# Nes nhtml files
+AddHandler perl-nes .nhtml
+AddHandler perl-nes .nhtm
+
+# HTML Wrapper
+AddHandler perl-nes .html
+AddHandler perl-nes .htm
+
+# nes dispatcher
+Action perl-nes /cgi-bin/nes/dispatch.cgi
+
+# protected Nes configuration and other files
+order deny,allow
+deny from all
+#---------------------------------------------
+

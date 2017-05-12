@@ -1,0 +1,165 @@
+#!/bin/bash
+#
+# fullautoapi		Start up the FullAuto API server
+#
+# chkconfig: 2345 95 05
+# description: The FullAuto API server is a RESTful service server. \
+#              This service starts up the FullAuto API server.
+#
+# processname: perl-fcgi-pm [FullAutoAPI]
+# pidfile: /var/run/fullautoapi.pid
+
+### BEGIN INIT INFO
+# Provides: fullautoapi
+# Required-Start: $local_fs $network $syslog
+# Required-Stop: $local_fs $syslog
+# Should-Start: $syslog
+# Should-Stop: $network $syslog
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Start up the FullAuto API server daemon
+# Description:       The FullAuto API server is a RESTful web services server.
+#                    This service starts up the FullAuto API server daemon.
+### END INIT INFO
+
+# source function library
+. /etc/rc.d/init.d/functions
+
+USER=ec2-user
+RETVAL=0
+prog="fullautoapi"
+lockfile=/var/lock/subsys/$prog
+
+# Some functions to make the below more readable
+FULLAUTOAPI=/home/ec2-user/FullAutoAPI/script/fullautoapi_fastcgi.pl
+PID_FILE=/var/run/fullautoapi.pid
+
+runlevel=$(set -- $(runlevel); eval "echo \$$#" )
+
+start()
+{
+	[ -x $FULLAUTOAPI ] || exit 5
+        [ -x /var/run/memcached.pid ] || service memcached start \
+           || (failure && exit)
+
+	echo -n $"Starting $prog: "
+	(nohup $FULLAUTOAPI -l localhost:3003 -e -p \
+           /var/run/fullautoapi.pid > /var/log/fullautoapi.log &)\
+           && success || failure
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && touch $lockfile
+	echo
+	return $RETVAL
+}
+
+stop()
+{
+	if [ ! -f "$PID_FILE" ]; then
+		# not running; per LSB standards this is "ok"
+		action $"Stopping $prog: " /bin/true
+		return 0
+	fi
+	PID=`cat "$PID_FILE"`
+	if [ -n "$PID" ]; then
+		/bin/kill "$PID" >/dev/null 2>&1
+		RETVAL=$?
+		if [ $RETVAL -ne 0 ]; then
+			RETVAL=1
+			action $"Stopping $prog: " /bin/false
+		else
+			action $"Stopping $prog: " /bin/true
+		fi
+	else
+		 # failed to read pidfile
+		action $"Stopping $prog: " /bin/false
+		RETVAL=4
+	fi
+	# if we are in halt or reboot runlevel kill all running sessions
+	# so the TCP connections are closed cleanly
+	if [ "x$runlevel" = x0 -o "x$runlevel" = x6 ] ; then
+	    trap '' TERM
+	    killall $prog 2>/dev/null
+	    trap TERM
+	fi
+	[ $RETVAL -eq 0 ] && rm -f $lockfile
+	rm -f "$PID_FILE"
+        return $RETVAL
+}
+
+reload()
+{
+	echo -n $"Reloading $prog: "
+	if [ -n "`pidfileofproc $FULLAUTOAPI`" ] ; then
+	    killproc $FULLAUTOAPI -HUP
+	else
+	    failure $"Reloading $prog"
+	fi
+	RETVAL=$?
+	echo
+}
+
+restart() {
+	stop
+	start
+}
+
+force_reload() {
+	restart
+}
+
+rh_status() {
+	status -p $PID_FILE openssh-daemon
+}
+
+rh_status_q() {
+	rh_status >/dev/null 2>&1
+}
+
+case "$1" in
+	start)
+		rh_status_q && exit 0
+		start
+		;;
+	stop)
+		if ! rh_status_q; then
+			rm -f $lockfile
+			exit 0
+		fi
+		stop
+		;;
+	restart)
+		restart
+		;;
+	reload)
+		rh_status_q || exit 7
+		reload
+		;;
+	force-reload)
+		force_reload
+		;;
+	condrestart|try-restart)
+		rh_status_q || exit 0
+		if [ -f $lockfile ] ; then
+			do_restart_sanity_check
+			if [ $RETVAL -eq 0 ] ; then
+				stop
+				# avoid race
+				sleep 3
+				start
+			else
+				RETVAL=6
+			fi
+		fi
+		;;
+	status)
+		rh_status
+		RETVAL=$?
+		if [ $RETVAL -eq 3 -a -f $lockfile ] ; then
+			RETVAL=2
+		fi
+		;;
+	*)
+		echo $"Usage: $0 {start|stop|restart|reload|force-reload|condrestart|try-restart|status}"
+		RETVAL=2
+esac
+exit $RETVAL

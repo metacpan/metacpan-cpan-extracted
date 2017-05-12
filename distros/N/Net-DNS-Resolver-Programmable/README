@@ -1,0 +1,29 @@
+Net::DNS::Resolver::Programmable 0.003
+A Net::DNS::Resolver descendant class for offline emulation of DNS
+(C) 2006-2007 Julian Mehnle <julian@mehnle.net>
+<http://search.cpan.org/dist/Net-DNS-Resolver-Programmable>
+==============================================================================
+
+Net::DNS::Resolver::Programmable is a Net::DNS::Resolver descendant class that
+allows a virtual DNS to be emulated instead of querying the real DNS.  A set of
+static DNS records may be supplied, or arbitrary code may be specified as a
+means for retrieving DNS records, or even generating them on the fly.
+
+Reporting Bugs
+--------------
+
+Please report bugs in Net::DNS::Resolver::Programmable to the CPAN bug tracker:
+<http://rt.cpan.org/Public/Dist/Display.html?Name=Net-DNS-Resolver-Programmable>
+
+License
+-------
+
+Net::DNS::Resolver::Programmable is free software.  You may use, modify, and
+distribute it under the same terms as Perl itself, that is under the terms of
+either the GNU General Public License (version 2 or later) or the Artistic
+License.
+
+The complete text of these licenses can be found in the LICENSE file.
+
+# $Id: README 13 2007-05-30 22:12:35Z julian $
+# vim:tw=79

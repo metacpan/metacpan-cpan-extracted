@@ -1,0 +1,26 @@
+--- 
+abstract: Perl interface to the Pandorabots.com AIML server
+author: 
+  - Chris Prather  C<< <cpan@prather.org> >>
+build_requires: 
+  Test::Compile: 0
+  Test::More: 0
+  UNIVERSAL::require: 0
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Net-AIML
+no_index: 
+  directory: 
+    - examples
+    - inc
+    - t
+requires: 
+  HTTP::Request::Common: 1.26
+  LWP::Simple: 1.41
+  LWP::UserAgent: 2.033
+  XML::Smart: 1.006009
+version: 0.0.5

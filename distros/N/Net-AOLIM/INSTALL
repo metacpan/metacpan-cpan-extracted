@@ -1,0 +1,37 @@
+Net::AOLIM Installation Instructions
+
+To install the Net::AOLIM module, you should execute the following
+commands:
+
+perl Makefile.PL
+make
+make test
+make install
+
+This will install the module into your standard perl path so that
+
+use Net::AOLIM;
+
+will work properly.
+
+In addition, you may want to copy the file TOC.7 into your man7
+directory.  Generally, this will be
+
+/usr/man/man7
+
+or
+
+/usr/local/man/man7
+
+TOC.7 includes information on the TOC protocol, and is the reference
+upon which this implementation is based.
+
+The file example.pl is a text-based script that I hacked up to serve
+as an example of (one way of) using the module.  Peruse to your
+heart's content; it's not well documented, but you should be able to
+understand what I'm doing.
+
+If you have any problems, let me know!
+
+Riad Wahby
+rsw@jfet.org

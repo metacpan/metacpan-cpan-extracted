@@ -1,0 +1,19 @@
+Revision history for Perl extension Net::Canopy::BAM.
+
+0.04 Fri Oct 21 23:46:00 2010
+ - Changed unknown-45 and unknown-46 to reflect their
+   use as verification and confirmation packets
+
+0.03 Mon May 03 11:34:52 2010
+ - Forgot to specify required libraries in Makefile.PL.
+   This triggered warnings from CPAN autotester.
+
+0.02  Mon May 03 00:36:32 2010
+  - Fixed improper formatting of sequence number as decimal
+    instead of hex number. Thanks to newkirk.us for 
+    spotting this bug and providing the fix.
+
+0.01  Fri Jul 18 23:21:44 2008
+	- original version; created by h2xs 1.23 with options
+		-X Net::Canopy::BAM
+

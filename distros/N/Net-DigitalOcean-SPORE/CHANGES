@@ -1,0 +1,87 @@
+==================================================
+Changes from 2012-10-21 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2013-10-21 04:34:03 +0000
+------------------------------------------
+
+  Change: b14af600e52fba462e763111915fcefe6c80edf3
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-21 04:33:35 +0000
+
+    Add client_id, api_key as base attributes 
+
+  Change: e1e6549309c5a165f8b434fd7e9c588bc6309ebe
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-21 04:17:53 +0000
+
+    Update json with validated json 
+
+------------------------------------------
+version 0.001 at 2013-10-21 03:16:36 +0000
+------------------------------------------
+
+  Change: e9bf5afd92cd701d8cbb78998571a73ff0386ac9
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-21 03:16:36 +0000
+
+    Add make_immutable 
+
+  Change: b5bed93b8aca69cdec4c1b296c7f11720284bb96
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-21 03:15:52 +0000
+
+    Add pod, no functional changes 
+
+  Change: f66050eec93e3f2bf11e228b5acc43070c4aa559
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-21 03:15:01 +0000
+
+    Add type for spore client attribute 
+
+  Change: 5de9cf918f4c2786ec0c7861392e5f3a5fa6ddfa
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-21 03:02:21 +0000
+
+    Fix up pod, no functional changes 
+
+  Change: 74df0e7e00df4e8176188c8f258e809bb4c8d733
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-21 03:00:25 +0000
+
+    Add correct dir path 
+
+  Change: 056e8ebcbc1f82a47b23a796f4dded7ed51a6c14
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 16:54:22 +0000
+
+    Add build packages to gitignore 
+
+  Change: 8c04216e118d15f1c79d96c6529ff9d7e3a4d5f2
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 16:52:09 +0000
+
+    Add dzil config 
+
+  Change: f90acb3c9f1caf8daca70062af740b936027cb4c
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 16:35:18 +0000
+
+    Add full SPORE spec 
+
+  Change: c88145a5b77997417609a2402b2a7beeca9130fc
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 16:34:57 +0000
+
+    Add spore client 
+
+  Change: d7d6274fc9bfd87ac77f42c7eb3749233ba38ad3
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-18 04:31:06 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

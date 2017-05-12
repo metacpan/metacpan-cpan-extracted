@@ -1,0 +1,216 @@
+{: NES 1.0 none :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  NES 1.0 by Skriptke
+  Copyright 2009 - 2010 Enrique F. Castañón
+  Licensed under the GNU GPL.
+  http://nes.sourceforge.net/
+        
+  -----------------------------------------------------------------------------
+:}
+<h2><a href="#">Objetos Nes</a></h2>
+<h3>Descripción</h3>
+<p> 
+Los Objetos Nes son partes de código, NES, HTML, JavaScript, Perl... o una mezcla. Hemos incluido algún
+objeto de demostración ( directorio <i>/nes/obj</i> ) hasta que la librería de objetos nes crezca.
+</p>
+<p> 
+Cualquier script puede convertirse en un Objeto Nes, de forma que no sea necesario
+volver a escribir el código. Podemos llamar a un Objeto con include:
+<pre>
+&#123;: <a href="./?action=item&item=Tag include (file)">include</a> ( '&#123;: * cfg_obj_top_dir :&#125;/objeto.nhtml', 
+              [ lista de parámetros ]
+           ) 
+:&#125;
+
+</pre>
+Los objetos pueden residir en cualquier directorio, Nes viene con una librería de
+objetos en el direcctorio /nes/obj.
+</p>
+<p> 
+Un ejemplo sencillo es el objeto <i>location.nhtml</i> que redirecciona a otra página:
+</p>
+<pre>
+ &#123;: <a href="./?action=item&item=Tag include (file)">include</a> ( '&#123;: * cfg_obj_top_dir :&#125;/location.nhtml', 
+              'http://example.com/page.nhtml',
+              '301 Moved Permanently'
+            ) 
+ :&#125;  
+     
+</pre>
+
+<h3>Crear Objetos</h3>
+<p> 
+Con Nes no puedes crear objetos, con Nes puedes invocar/incluir los objetos en tus
+plantillas, pero el objeto tiene que estar creado en Perl, HTML, JavaScript, etc.
+o una mezcla de todos o algunos con una plantilla Nes o no. Aunque parezca una 
+limitación, no lo es, parte de la potencia de Nes se basa en lo que no deja 
+hacer más que en lo que te permite hacer. No nos cansamos en insistir en las dos
+premisas básicas de Nes:
+
+<ul id="mi">
+    <li>El script Perl no escribe directamente en la salida.</li>
+    <li>Las plantillas no pueden modificar los datos del script.</li>
+</ul>
+<br>
+</p>
+<p> 
+Los script Perl para la Web tienen que trabajar como funciones, devuelven un valor
+pero desconocen como se va tratar ese valor, como o donde se va a mostrar.
+</p>
+<p> 
+Y sobre todo, las plantillas <b>jamás deben modificar los datos</b> del Script, 
+o trabajar emulando o directamente como un lenguaje de programación.
+</p>
+
+<p> 
+Como ejemplo hemos encapsulado parte de <a href="http://search.cpan.org/search?query=LWP">LWP</a>
+en un Objeto Nes:
+</p>
+<pre>
+&#123;: include ('&#123;: * cfg_obj_top_dir :&#125;/lwp.nhtml',
+           URL,
+           extrac,  &#123;: # default: content      |
+                                  status       |
+                                  Content-Type |
+                                  title        |
+                                  head         |
+                                  body         |
+                                  star:-:end   | 
+                                  :-:star:-:end:-:
+                     :&#125;
+           method,   &#123;: # default: GET | POST :&#125;
+           query,    &#123;: # query: 'name=Jose&email=jose@sample.com' :&#125;
+           charset,  &#123;: # default: no change | ISO | UTF-8 :&#125;
+           useragent &#123;: # default: Nes/0.8  :&#125;
+           email     &#123;: # user agent email. default: $ENV{'SERVER_ADMIN'} :&#125;
+         ) 
+:&#125;
+
+extrac:
+&lt;tag&gt;:-:&lt;/tag&gt;       Return title tag content without tags: '&lt;tag&gt;&lt;/tag&gt;'
+:-:&lt;tag&gt;:-:&lt;/tag&gt;:-: Return title tag and include tags: '&lt;tag&gt;&lt;/tag&gt;'
+
+Defined:
+&#123;: $ status :&#125;        # Status response
+&#123;: $ request :&#125;       # request send
+&#123;: $ Content-Type :&#125;  # Content type
+&#123;: $ content :&#125;       # All HTML content
+&#123;: $ title :&#125;         # Title Tag content
+&#123;: $ head :&#125;          # Head Tag content
+&#123;: $ body :&#125;          # Body Tag content
+&#123;: $ extrac :&#125;        # extrac return value
+
+</pre>        
+<p> 
+Para probar nuestro Objeto hemos creado una página <a href="./test_page.html">test_page.html</a>
+de la que podemos extraer el "Título" así:
+<pre>
+&#123;:  include ('&#123;: * cfg_obj_top_dir :&#125;/lwp.nhtml',
+             'http://nes.sourceforge.net/miniblog/es/test_page.html',
+             title
+            ) 
+:&#125;
+
+<b>Salida:</b>
+Test Page - Sample to use Nes;   
+</pre>
+</p>
+
+<p> 
+Hemos creado nuestro Objeto de forma que podemos llamar directamente al script
+Perl, sin la plantilla nhtml:
+<pre>
+&#123;:  include ('&#123;: * cfg_obj_top_dir :&#125;/lwp.pl',
+             'http://nes.sourceforge.net/miniblog/es/test_page.html',
+             title
+            ) 
+:&#125;
+
+<b>Salida:</b>
+Test Page - Sample to use Nes;   
+            
+</pre>
+</p>
+<p> 
+Además podemos crear una nueva plantilla para éste script Perl. lwp.pl define
+los siguientes Tags Nes:
+<pre>
+&#123;: $ status :&#125;        # Status response
+&#123;: $ request :&#125;       # request send
+&#123;: $ Content-Type :&#125;  # Content type
+&#123;: $ content :&#125;       # All HTML content
+&#123;: $ title :&#125;         # Title Tag content
+&#123;: $ head :&#125;          # Head Tag content
+&#123;: $ body :&#125;          # Body Tag content
+&#123;: $ extrac :&#125;        # extrac return value
+
+</pre>
+</p>
+<p> 
+Entonces para crear un pequeño informe de una página:
+<pre>
+&#123;: NES 1.0 ('./lwp.pl') :&#125;
+Status:&lt;br&gt;
+&#123;: $ status :&#125;&lt;br&gt;
+Title:&lt;br&gt;
+&#123;: $ title :&#125;&lt;br&gt;
+Content type:&lt;br&gt;
+&#123;: $ Content-Type :&#125;&lt;br&gt;
+Head:&lt;br&gt;
+&#123;: $ head :&#125;&lt;br&gt;
+Extrac:&lt;br&gt;
+&#123;: $ extrac,yes_html :&#125;
+
+</pre>
+La nombramos como lwp_custom.nhtml, por ejemplo, la guardamos en el directorio obj,
+y finalmente la podemos invocar así:
+<pre>
+    
+&#123;: include ('&#123;: * cfg_obj_top_dir :&#125;/lwp_custom.nhtml',
+            'http://nes.sourceforge.net/es/test_page.html'
+            'body'
+           ) 
+:&#125;   
+
+</pre>
+<b>Salida:</b><br>
+-----------------------------------------------------------<br>
+Status:<br>
+200 OK
+Title:<br>
+Test Page - Sample to use Nes;<br>
+Content type:<br>
+text/html<br>
+Head:<br>
+&lt;meta http-equiv="content-type" content="text/html;charset=ISO-8859-1" /&gt;
+&lt;title&gt;Test Page - Sample to use Nes;&lt;/title&gt;<br>
+Extrac:<br>
+<h2>Lorem ipsum</h2>
+<p>
+    Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Praesent aliquam, justo convallis luctus rutrum, erat nulla fermentum diam, at nonummy quam ante ac quam. Maecenas urna purus, fermentum id, molestie in, commodo porttitor, felis. Nam blandit quam ut lacus. 
+</p>
+
+<!-- link start -->
+<p>
+<a href="http://nes.sourceforge.net/">Sample to use Nes;</a>
+</p>
+<!-- link end -->
+<!-- query start -->
+<p>
+    query: <br> 
+    q_name: 
+</p>
+
+<!-- query end -->
+</p>
+-----------------------------------------------------------<br>
+<p>
+Como vemos los Objetos Nes ofrecen multiples posibilidades de reutilización de 
+código. La idea es que Nes disponga de una gran librería de Objetos, de forma
+que sólo tengamos que escribir el código de los casos particulares, disponiendo
+de Objetos de uso general para el login, sesiones, etc. practicante el trabajo
+para crear una Web con Nes será montar las plantillas y el diseño Web.
+</p>
+

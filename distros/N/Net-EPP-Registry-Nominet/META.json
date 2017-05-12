@@ -1,0 +1,44 @@
+{
+   "abstract" : "EPP client code for Nominet",
+   "author" : [
+      "Pete Houston (cpan@openstrike.co.uk)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-EPP-Registry-Nominet",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.41",
+            "Test::Warn" : "0.09"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Net::EPP" : "0.19",
+            "perl" : "5.008000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.03"
+}

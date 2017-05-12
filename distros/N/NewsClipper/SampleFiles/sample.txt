@@ -1,0 +1,120 @@
+<html>
+<head>
+<title>News Clipper -- Sample Page</title>
+</head>
+
+<BODY>
+
+<h1>News Clipper -- Sample Page</h1>
+
+<p>
+This page shows off some of the tags.  It has been made boring to
+make it more clear what it being done by News Clipper.
+</p>
+
+<p>
+To try out other tags, first visit the <a
+href="http://www.newsclipper.com/handlers.htm">handlers</a>
+page. When you find one you like, put the tag in your input file, and run
+News Clipper once manually. The script will ask you to allow it to download
+the handler, which will then be installed and available for later.
+</p>
+
+<p>
+
+<h3>Associated Press News</h3>
+
+<p>
+<pre>
+&lt;!--newsclipper
+  &lt;input name=yahootopstories source=ap&gt;
+  &lt;filter name=map filter=hash2string 
+           format='&lt;a href="%{url}"&gt;%{headline}&lt;/a&gt;'&gt;
+  &lt;filter name=limit number=10&gt;
+  &lt;output name=array numcols=1&gt;
+--&gt;
+</pre>
+<!--newsclipper
+  <input name=yahootopstories source=ap>
+  <filter name=map filter=hash2string 
+           format='<a href="%{url}">%{headline}</a>'>
+  <filter name=limit number=10>
+  <output name=array numcols=1>
+-->
+</p>
+
+<h3>Yahoo Stock Market Indices</h3>
+
+<p>
+<pre>
+&lt;!--newsclipper
+  &lt;input name=yahoostockindices&gt;
+--&gt;
+</pre>
+<!--newsclipper
+  <input name=yahoostockindices>
+-->
+</p>
+
+<h3>Slashdot Headlines</h3>
+
+<p>
+<pre>
+&lt;!-- newsclipper
+  &lt;input name=slashdot type=articles&gt;
+  &lt;filter name=slashdot type=LinksAndText&gt;
+  &lt;filter name=limit number=4&gt;
+  &lt;filter name=map filter=limit number=200 chars&gt;
+  &lt;output name=array numcols=2 prefix="&lt;p&gt;-&amp;gt;" suffix="&lt;/p&gt;"&gt;
+--&gt;
+</pre>
+<!-- newsclipper
+ <input name=slashdot type=articles>
+ <filter name=slashdot type=LinksAndText>
+ <filter name=limit number=4>
+ <filter name=map filter=limit number=200 chars>
+ <output name=array numcols=2 prefix="<p>-&gt;" suffix="</p>">
+-->
+</p>
+
+<h3>Dilbert Comic</h3>
+
+<p>
+<pre>
+&lt;!--newsclipper
+  &lt;input name=dilbert&gt;
+--&gt;
+</pre>
+<!--newsclipper
+  <input name=dilbert>
+-->
+</p>
+
+<h3>Freshmeat Headlines</h3>
+
+<p>
+<pre>
+&lt;!--newsclipper
+  &lt;input name=freshmeat&gt;
+--&gt;
+</pre>
+<!--newsclipper
+  <input name=freshmeat>
+-->
+</p>
+
+<h3>Charlottesville Weather</h3>
+
+<p>
+<pre>
+&lt;!--newsclipper
+  &lt;input name=weather city=charlottesville&gt;
+--&gt;
+</pre>
+<!--newsclipper
+  <input name=weather city=charlottesville>
+-->
+</p>
+
+</body>
+</html>

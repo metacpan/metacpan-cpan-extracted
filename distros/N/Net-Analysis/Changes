@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::Analysis.
+
+0.01  Tue Jul  5 21:34:42 2005
+	- original version; created by h2xs 1.23 with options
+		-XA -n Net::Analysis
+

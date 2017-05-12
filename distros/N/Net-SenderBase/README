@@ -1,0 +1,7 @@
+Net::SenderBase
+===============
+
+This module allows you to query the SenderBase service [1] via
+either DNS or HTTP and get the results in a perl object.
+
+[1] See http://www.senderbase.org/

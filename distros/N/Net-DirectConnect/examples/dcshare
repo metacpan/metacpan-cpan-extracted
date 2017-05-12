@@ -1,0 +1,119 @@
+#!/usr/bin/perl
+#$Id: dcshare 793 2011-06-17 16:51:17Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/examples/dcshare $
+
+=head1 NAME
+
+run dc client with file sharing
+
+=head1 SYNOPSIS
+
+ dcshare dchub://hub.net hub.com adc://hub.edu dir /dir/dir ...
+
+ unix adc:
+ dcshare adc://dc.hub.com:412 /share
+ win nmdc:
+ dcshare dc.hub.com c:/pub c:/distr
+
+ manual build filelist:
+ dcshare /share /sharemore
+
+=head1 INSTALL
+
+recommended module: Sys::Sendfile
+
+=head1 CONFIGURE
+
+ create config.pl and fill with your sharedir, hubs and other options:
+  cp config.pl config.pl.dist 
+
+ config with sharedirs:
+  $config{dc}{'share'} = [qw(/usr/ports/distfiles c:\distr c:\pub\ )];
+
+ predefined dc hubs:
+  $config{dc}{host} = ['myhub.net', 'adc://otherhub.com'];
+
+ if hubs and shares defined in config you can use simple
+  dcshare
+
+ full list of options available in ../lib/Net/DirectConnect/filelist.pm:
+  $self->{file_min} in filelist.pm must be written as 
+  $config{dc}{file_min} = 1_000_000; #skip files smaller 1MB 
+
+=head1 TUNING
+
+freebsd:
+speedup: sysctl net.inet.tcp.sendspace=200000
+or: sysctl kern.ipc.maxsockbuf=8388608 net.inet.tcp.sendspace=3217968 
+
+=head1 TODO
+
+filelist xml escape chars
+
+=head1 windows install:
+get perl from http://strawberryperl.com/ and install and run
+C:\strawberry\perl\bin\cpan.bat Net::DirectConnect
+C:\strawberry\perl\site\bin\dcshare.bat
+or with config:
+get tar.gz from http://search.cpan.org/dist/Net-DirectConnect/
+unpack, 
+cd examples
+cp config.pl.dist config.pl
+edit config.pl
+perl dcshare
+
+=cut
+use 5.10.0;
+use strict;
+use Data::Dumper;
+$Data::Dumper::Sortkeys = $Data::Dumper::Useqq = $Data::Dumper::Indent = 1;
+use Time::HiRes qw(time sleep);
+use Encode;
+use lib::abs '../lib';
+use Net::DirectConnect::pslib::psmisc;
+psmisc->import(qw(:log));
+our (%config);    #, $db
+use Net::DirectConnect;
+use Net::DirectConnect::filelist;
+$config{ 'log_' . $_ } //= 0 for qw (dmp dcdmp dcdbg adcdev);
+$config{'log_pid'} //= 1;
+psmisc::configure();
+psmisc::lib_init();    #for die handler
+psmisc::printlog("usage: $1 [adc|dchub://]host[:port] [dir ...]\n"), exit if !$ARGV[0] and !$config{dc}{host};
+psmisc::printlog( 'info', 'started:', $^X, $0, join ' ', @ARGV );
+my $log = sub (@) {
+  my $dc = ref $_[0] ? shift : {};
+  psmisc::printlog shift(), "[$dc->{'number'}]", @_,;
+};
+$SIG{PIPE} = sub { printlog( 'sig', 'PIPE' ) };
+my @dirs = grep { -d } @ARGV;
+#printlog('dev', 'started', @ARGV),
+my $filelist = shift @ARGV if $ARGV[0] ~~ 'filelist';
+@ARGV = grep { !-d } @ARGV;
+my @hosts = grep { m{^\w+://} } @ARGV;
+Net::DirectConnect::filelist->new( log => $log, %{ $config{dc} || {} } )->filelist_make(@dirs), exit
+  if ( $filelist and !caller )
+  or ( !@hosts and !$config{dc}{host} );
+my @dc;
+@dc = map {
+  Net::DirectConnect->new(
+    modules            => ['filelist'],
+    share              => \@dirs,
+    'filelist_builder' => ( join ' ', $^X, $0, 'filelist' ),
+    'log'              => $log,
+    auto_connect       => 1,
+    #auto_work    => 1,
+    auto_say => 1,
+    worker   => sub {
+      my $dc = shift;
+    },
+    %{ $config{dc} || {} },
+    'host' => $_,
+    )
+  } (
+  grep {
+    $_
+    } @hosts ? @hosts : psmisc::array( $config{dc}{host} ),
+  );
+while ( @dc = grep { $_ and $_->active() } @dc ) {
+  $_->work() for @dc;
+}

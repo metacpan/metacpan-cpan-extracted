@@ -1,0 +1,57 @@
+--------
+Abstract
+--------
+
+Net::LDAP::Server provides the protocol handling for an LDAP server. 
+You can subclass it and implement the methods you need. Then you just 
+instantiate your subclass and call its C<handle> method to establish a 
+connection with the client.
+
+------------
+Requirements
+------------
+
+Net::LDAP::Server requires Net::LDAP and Convert::ASN1.
+
+------------------
+Basic Installation
+------------------
+
+Net::LDAP::Server may be installed through the CPAN shell in
+the usual manner.  Typically:
+
+  $ perl -MCPAN -e 'install Net::LDAP::Server'
+
+You can also read this README from the CPAN shell:
+
+  $ perl -MCPAN -e shell
+  cpan> readme Net::LDAP::Server
+
+And you can install the component from the CPAN prompt as well:
+
+  cpan> install Net::LDAP::Server
+
+-------------------
+Manual Installation
+-------------------
+
+This module may also be installed manually.  Its distribution is
+available from the author's CPAN directory,
+<ftp://ftp.cpan.org/pub/CPAN/authors/id/A/AA/AAR/>, or a similarly
+named directory at your favorite CPAN mirror.
+
+Downloading and unpacking the distribution are left as exercises for
+the reader.  To build and test it:
+
+  perl Makefile.PL
+  make test
+
+When you're ready to install the component:
+
+  make install
+
+It should now be ready to use.
+
+Thanks for reading!
+
+-- Alessandro Ranellucci / aar@cpan.org / http://alex.primafila.net

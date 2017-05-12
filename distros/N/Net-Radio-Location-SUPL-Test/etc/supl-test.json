@@ -1,0 +1,69 @@
+{
+    "logging" : {
+	"adapter" : "Log4perl",
+	"Log4perl" : {
+	    "init" : "etc/log4perl.conf"
+	}
+    },
+    "dbus-objects" : {
+	"default" : {
+	    "bus-name" : "org.vfnet.supl",
+	},
+	"RecvPushMsg" : {
+	    "object-path" : "/org/vfnet/supl/PushConsumer",
+	    "test-setup" : {
+		"modem-api" : {
+		    "adapter" : "oFono",
+		    "params" : {
+			"dbus_main_runs" : 1,
+		    },
+		    "match" : {
+			"IMSI" : "262020459000147"
+		    }
+		},
+		"connect" : {
+		    "target" : {
+			"host" : "supl.vodafone.com",
+			"supl_port" : 7275,
+			"ulp_port" : 7276,
+			"domain" : "IPv4",
+		    },
+		    "ssl" : 1,
+		},
+		"mocked-location" : {
+		    "latitude" : "51.221195",
+		    "longitude" : "6.768034",
+		    "altitude" : 3,
+		    "uncertainty altitude" : 1,
+		    "uncertainty semi-major" : 1,
+		    "uncertainty semi-minor" : 1,
+		    "orientation of major axis" : 0,
+		    "confidence" : 99
+		    #"uncertainty" : "3"
+		},
+		"SUPLINIT" : {
+		    "action" : "reply",
+		    "modes" : ["proxy"],
+		},
+		"SUPLPOSINIT" : {
+		#    "request-assistant-data" : {
+		#	"almanacRequested" : 1,
+		#	"utcModelRequested" : 1,
+		#	"ionosphericModelRequested" : 1,
+		#	"dgpsCorrectionsRequested" : 1,
+		#	"referenceLocationRequested" : 1,
+		#	"referenceTimeRequested" : 1,
+		#	"acquisitionAssistanceRequested" : 1,
+		#	"realTimeIntegrityRequested" : 1
+		#    },
+		    "estimated-location" : 1
+		},
+		"SUPLPOS" : {
+		}
+	    }
+	},
+	"Translator" : {
+	    "object-path" : "/org/vfnet/supl/Translator"
+	}
+    },
+}

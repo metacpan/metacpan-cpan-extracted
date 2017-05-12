@@ -1,0 +1,48 @@
+Revision history for Net-Hacky-Detect-IP
+
+0.023   08/05/2017 14:11
+        A few optimisations for which commands are executed, likely RELEASE
+
+0.022   08/05/2017 12:01
+        Improved port binding action to use '0' to select the first availible.
+
+0.021   08/05/2017 11:54
+        Improved IPv4 succesful detection method based on IPv6 method.
+        Swapped to using IO::Socket::IP over IO::Socket::INET[4|6]
+
+0.020   08/05/2017 05:54
+        Tweaked IPv6 detection even more, discovered a bug in IO::Socket::INET6
+
+0.019   08/05/2017 00:59
+        Fixed yet more bugs with IPv6 detection
+
+0.018   08/05/2017 00:46
+        Improved IPv6 validity detection
+
+0.017   07/05/2017 15:22
+        Made it possible to search for either v6, v4 or both.
+
+0.016   07/05/2017 14:16
+        Corrected minor if/if to if/elsif
+        Corrected minor documentation errors
+
+0.015   07/05/2017 14:10
+        Correct possiblity for an impossible port to be generated
+        Added IPv6 detection code
+
+0.014   07/05/2017 12:56
+        Detection of IPv4 works on windows.
+
+0.013   07/05/2017 12:30
+        Updated SYNOPSIS to make sense.
+
+0.012   07/05/2017 12:20
+        Update Makefile.PL so IO::Socket::INET will not fail on older perl versions than 5.24
+
+0.011   07/05/2017 12:10
+        Correct Documentation a little
+        Changed versioning system to be more standard.
+        Correct invokation of 'ip'
+
+0.01    07/05/2017 12:00
+        First version, ipv4 only and probably only linux and BSD.

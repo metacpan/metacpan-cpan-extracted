@@ -1,0 +1,104 @@
+# The format of this file is documented in the dhcpd.leases(5) manual page.
+# This lease file was written by isc-dhcp-V3.1.1
+
+lease 10.19.83.199 {
+  starts 0 2008/07/13 19:42:32;
+  ends 1 2008/07/14 19:42:32;
+  tstp 1 2008/07/14 19:42:32;
+  binding state free;
+  hardware ethernet 00:15:58:2f:83:bc;
+  set leasetime = "\000\001Q\200";
+  set hwAddr = "\000\025X/\203\274";
+}
+lease 10.19.83.198 {
+  starts 5 2008/08/15 21:40:31;
+  ends 6 2008/08/16 05:44:51;
+  tstp 6 2008/08/16 05:44:51;
+  binding state free;
+  hardware ethernet 00:12:f0:50:06:48;
+  uid "\001\000\022\360P\006H";
+}
+lease 10.19.83.151 {
+  starts 1 2009/04/20 22:09:40;
+  ends 2 2009/04/21 22:09:40;
+  tstp 2 2009/04/21 22:09:40;
+  cltt 1 2009/04/20 22:09:40;
+  binding state free;
+  hardware ethernet 00:1b:77:8e:f2:c5;
+  uid "\001\000\033w\216\362\305";
+  set hw_addr = "\000\033w\216\362\305";
+  set leasetime = "\000\001Q\200";
+}
+lease 10.19.83.153 {
+  starts 1 2009/04/20 22:51:23;
+  ends 2 2009/04/21 22:51:23;
+  tstp 2 2009/04/21 22:51:23;
+  cltt 1 2009/04/20 22:51:23;
+  binding state free;
+  hardware ethernet 00:15:af:bc:c0:ff;
+  set hw_addr = "\000\025\257\274\300\377";
+  set leasetime = "\000\001Q\200";
+}
+lease 10.19.83.154 {
+  starts 2 2009/04/21 06:17:23;
+  ends 3 2009/04/22 06:17:23;
+  tstp 3 2009/04/22 06:17:23;
+  cltt 2 2009/04/21 06:17:23;
+  binding state free;
+  hardware ethernet 00:23:12:b1:d7:3a;
+  uid "\001\000#\022\261\327:";
+  set hw_addr = "\000#\022\261\327:";
+  set leasetime = "\000\001Q\200";
+}
+lease 10.19.83.152 {
+  starts 2 2009/04/21 06:21:35;
+  ends 3 2009/04/22 06:21:35;
+  tstp 3 2009/04/22 06:21:35;
+  cltt 2 2009/04/21 06:21:35;
+  binding state free;
+  hardware ethernet 00:1b:63:05:a1:8e;
+  uid "\001\000\033c\005\241\216";
+  set hw_addr = "\000\033c\005\241\216";
+  set leasetime = "\000\001Q\200";
+}
+lease 10.19.83.150 {
+  starts 5 2009/07/17 03:45:59;
+  ends 5 2009/07/17 03:46:03;
+  tstp 5 2009/07/17 03:46:03;
+  cltt 5 2009/07/17 03:45:59;
+  binding state free;
+  hardware ethernet 00:24:7c:02:c1:e4;
+  uid "\001\000$|\002\301\344";
+}
+lease 10.19.83.156 {
+  starts 4 2009/07/16 22:59:02;
+  ends 5 2009/07/17 22:59:02;
+  tstp 5 2009/07/17 22:59:02;
+  cltt 4 2009/07/16 22:59:02;
+  binding state free;
+  hardware ethernet 00:26:08:df:03:58;
+  uid "\001\000&\010\337\003X";
+  set hw_addr = "\000&\010\337\003X";
+  set leasetime = "\000\001Q\200";
+}
+lease 10.19.83.200 {
+  starts 5 2009/07/17 06:46:57;
+  ends 6 2009/07/18 06:46:57;
+  tstp 6 2009/07/18 06:46:57;
+  cltt 5 2009/07/17 06:46:57;
+  binding state free;
+  hardware ethernet 00:13:02:b8:a9:1b;
+  set hw_addr = "\000\023\002\270\251\033";
+  set leasetime = "\000\001Q\200";
+}
+lease 10.19.83.155 {
+  starts 5 2009/07/17 08:18:59;
+  ends 6 2009/07/18 08:18:59;
+  tstp 6 2009/07/18 08:18:59;
+  cltt 5 2009/07/17 08:18:59;
+  binding state free;
+  hardware ethernet 00:1e:c2:ce:9b:8d;
+  uid "\001\000\036\302\316\233\215";
+  set hw_addr = "\000\036\302\316\233\215";
+  set leasetime = "\000\001Q\200";
+}

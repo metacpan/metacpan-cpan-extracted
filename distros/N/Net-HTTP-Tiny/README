@@ -1,0 +1,33 @@
+NAME
+
+Net::HTTP::Tiny - minimal HTTP client
+
+DESCRIPTION
+
+This module provides an easy interface to retrieve files using the HTTP
+protocol.  The location of a file to retrieve is specified using a URL.
+The module conforms to HTTP/1.1, and follows redirections (up to a limit
+of five chained redirections).  Content-MD5 is checked, if the optional
+module Digest::MD5 is installed.  IPv6 is supported, if the optional
+module IO::Socket::IP is installed.  Only retrieval is supported, not
+posting or anything more exotic.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2012 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

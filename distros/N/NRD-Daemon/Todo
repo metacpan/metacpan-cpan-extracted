@@ -1,0 +1,9 @@
+TODO list for Perl module NRD::Daemon
+
+- Streaming lots of results
+
+nsca deficiencies
+ - the length of the packet is limited
+ - no support for multline plugin output
+nsca curiosities
+ - the client uses the timestamp from the server

@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+############################################################
+# actor actor_name
+# Christopher Boumenot <boumenot@gmail.com>, 2006
+############################################################
+
+use strict;
+use warnings;
+
+use Net::Amazon;
+use Net::Amazon::Request::Actor;
+
+#use Log::Log4perl qw(:easy);
+#Log::Log4perl->easy_init($DEBUG);
+
+die "usage: $0 actor\n(use Sandler as an example)\n" unless defined $ARGV[0];
+
+my $ua = Net::Amazon->new(
+    associate_tag => $ENV{AMAZON_ASSOCIATE_TAG},
+    token         => $ENV{AMAZON_TOKEN},
+    secret_key    => $ENV{AMAZON_SECRET_KEY},
+);
+
+my $req = Net::Amazon::Request::Actor->new(
+    actor  => $ARGV[0],
+);
+
+# Response is of type Net::Amazon::Actor::Response
+my $resp = $ua->request($req);
+
+if($resp->is_success()) {
+    print $resp->as_string, "\n";
+} else {
+    print $resp->message, "\n";
+}

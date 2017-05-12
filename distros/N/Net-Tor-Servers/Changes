@@ -1,0 +1,8 @@
+Revision history for Perl extension Net::Tor::Servers.
+
+0.01  Sat Dec  6 08:54:19 2008
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Net::Tor::Servers
+
+0.02  Sat Dec  6 11:22:00 2008
+	- Updated documentation to specify custom directory server

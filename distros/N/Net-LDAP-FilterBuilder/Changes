@@ -1,0 +1,31 @@
+1.200000  2016-09-05 
+
+  * Fix typos (D. Hargreaves, Debian Project)
+
+1.103620  2010-12-28 10:49:25 Europe/London
+
+  * Port to Dist::Zilla.
+
+libnet-ldap-filterbuilder (1.0004-1) UNRELEASED; urgency=low
+
+  * Fix for new Test::Simple which does not like stringification 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Fri, 11 Jun 2010 15:36:46 +0100
+
+libnet-ldap-filterbuilder (1.0003-1) UNRELEASED; urgency=low
+
+  * Add docs patch from Tom Jones to expose as_str and other methods.
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Tue, 20 Oct 2009 08:21:49 +0100
+
+libnet-ldap-filterbuilder (1.0002-1) UNRELEASED; urgency=low
+
+  * Add example and pod tests 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sat,  8 Nov 2008 17:32:57 +0000
+
+libnet-ldap-filterbuilder (1.0001-1) UNRELEASED; urgency=low
+
+  * Initial release on an unsuspecting world.
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Thu,  2 Oct 2008 13:58:08 +0100

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<response status="ok">
+    <client>
+        <client_id>13</client_id>
+        <first_name>Jane</first_name>
+        <last_name>Doe</last_name>
+        <organization>ABC Corp</organization>
+        <email>janedoe@freshbooks.com</email>
+        <username>janedoe</username>
+        <work_phone>(555) 123-4567</work_phone>
+        <home_phone>(555) 234-5678</home_phone>
+        <mobile/>
+        <fax/>
+        <credit>123.45</credit>
+        <notes/>
+        <p_street1>123 Fake St.</p_street1>
+        <p_street2>Unit 555</p_street2>
+        <p_city>New York</p_city>
+        <p_state>New York</p_state>
+        <p_country>United States</p_country>
+        <p_code>553132</p_code>
+        <s_street1/>
+        <s_street2/>
+        <s_city/>
+        <s_state/>
+        <s_country/>
+        <s_code/>
+        <url deprecated="true">https://sample.freshbooks.com/client/12345-1-98969</url>
+        <auth_url deprecated="true">https://sample.freshbooks.com/client/12345-1-98969-z</auth_url>
+        <links>
+            <client_view>https://sample.freshbooks.com/client/12345-1-98969</client_view>
+            <view>https://sample.freshbooks.com/client/12345-1-98969-z</view>
+        </links>
+    </client>
+</response>

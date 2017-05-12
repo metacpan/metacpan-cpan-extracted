@@ -1,0 +1,54 @@
+{
+   "abstract" : "A client implementation of the ICAP (RFC 3507) protocol",
+   "author" : [
+      "David Dick <ddick@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-ICAP-Client",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "HTTP::Headers" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "English" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Response" : "0",
+            "IO::Socket::INET" : "0",
+            "IO::Socket::SSL" : "0",
+            "POSIX" : "0",
+            "URI" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

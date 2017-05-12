@@ -1,0 +1,13 @@
+#!/usr/bin/perl -s
+
+use lib qw(lib/ ../lib);
+use Net::XWhois; 
+
+my $whois = new Net::XWhois Domain => shift,
+                            Server => $h;
+
+if ( $e ) { my @emails = $whois->contact_emails; $" = ", "; print "Contacts: @emails\n";  exit }
+if ( $n ) { my @emails = $whois->nameservers; $" = ", "; print "Nameservers: @emails\n";  exit }
+if ( $r ) { my @emails = $whois->registrants; $" = ", "; print "Registrants: @emails\n";  exit }
+print $whois->response;
+

@@ -1,0 +1,12 @@
+#!/bin/bash -x
+
+dzil clean
+dzil build || exit 1
+cd Net-* || exit 1
+perl Makefile.PL || exit 1
+
+# Devel::Cover
+cover -test | tee ../devel-cover.txt
+
+# Perl::Metrics::Simple
+countperl lib/ | tee ../perl-metrics-simple.txt

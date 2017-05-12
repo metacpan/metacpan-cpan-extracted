@@ -1,0 +1,89 @@
+#
+# $Id: dictionary.unisphere 45 2006-11-14 17:45:00Z lem $
+#
+# reference:
+#	'unisphere5-3.dct' file from Juniper Networks
+#          http://www.juniper.net/techpubs/software/erx/junose53/unisphere5-3.dct
+#
+
+Vendor Unisphere 4878
+
+ATTRIBUTE Unisphere-Virtual-Router                 1  string  	Unisphere
+ATTRIBUTE Unisphere-Local-Address-Pool             2  string  	Unisphere
+ATTRIBUTE Unisphere-Local-Interface                3  string  	Unisphere
+ATTRIBUTE Unisphere-Primary-Dns                    4  ipaddr  	Unisphere
+ATTRIBUTE Unisphere-Secondary-Dns                  5  ipaddr  	Unisphere
+ATTRIBUTE Unisphere-Primary-Wins                   6  ipaddr  	Unisphere
+ATTRIBUTE Unisphere-Secondary-Wins                 7  ipaddr  	Unisphere
+ATTRIBUTE Unisphere-Tunnel-Virtual-Router          8  string	Unisphere
+ATTRIBUTE Unisphere-Tunnel-Password                9  string	Unisphere
+ATTRIBUTE Unisphere-Ingress-Policy-Name            10  string  	Unisphere
+ATTRIBUTE Unisphere-Egress-Policy-Name             11  string  	Unisphere
+ATTRIBUTE Unisphere-Ingress-Statistics             12  integer	Unisphere
+ATTRIBUTE Unisphere-Egress-Statistics              13  integer  Unisphere
+ATTRIBUTE Unisphere-Service-Category              14  integer	Unisphere
+ATTRIBUTE Unisphere-pcr                            15  integer	Unisphere
+ATTRIBUTE Unisphere-scr                            16  integer	Unisphere
+ATTRIBUTE Unisphere-mbs                            17  integer	Unisphere
+ATTRIBUTE Unisphere-Init-CLI-Access-Level          18  string	Unisphere
+ATTRIBUTE Unisphere-Allow-All-VR-Access            19  integer  Unisphere
+ATTRIBUTE Unisphere-Alt-CLI-Access-Level           20  string	Unisphere
+ATTRIBUTE Unisphere-Alt-CLI-VRouter-Name           21  string	Unisphere
+ATTRIBUTE Unisphere-SA-Validate                    22  integer  Unisphere
+ATTRIBUTE Unisphere-Igmp-enable                    23  integer  Unisphere
+ATTRIBUTE Unisphere-Pppoe-Description              24  string	Unisphere
+ATTRIBUTE Unisphere-Redirect-VRouter-Name          25  string	Unisphere
+ATTRIBUTE Unisphere-Qos-Profile-Name               26  string	Unisphere
+ATTRIBUTE Unisphere-PppoE-Url                      28  string	Unisphere
+ATTRIBUTE Unisphere-Service-Bundle                 31  string	Unisphere
+ATTRIBUTE Unisphere-Tunnel-Max-Sessions            33  integer	Unisphere
+ATTRIBUTE Unisphere-Framed-Ip-Route-Tag            34  integer	Unisphere
+ATTRIBUTE Unisphere-Tunnel-Dialout-Number          35  string	Unisphere
+ATTRIBUTE Unisphere-Ppp-Username                   36  string 	Unisphere
+ATTRIBUTE Unisphere-Ppp-Password                   37  string	Unisphere
+ATTRIBUTE Unisphere-Ppp-Protocol                   38  integer	Unisphere
+ATTRIBUTE Unisphere-Tunnel-Min-Bps                 39  integer  Unisphere
+ATTRIBUTE Unisphere-Tunnel-Max-Bps                 40  integer  Unisphere
+ATTRIBUTE Unisphere-Tunnel-Bearer-Type             41  integer  Unisphere
+ATTRIBUTE Unisphere-Input-Gigapackets              42  integer  Unisphere
+ATTRIBUTE Unisphere-Output-Gigapackets             43  integer  Unisphere
+ATTRIBUTE Unisphere-Tunnel-Interface-Id            44  string	Unisphere
+ATTRIBUTE Unisphere-IpV6-Virtual-Router            45  string	Unisphere
+ATTRIBUTE Unisphere-IpV6-Local-Interface           46  string	Unisphere
+ATTRIBUTE Unisphere-Ipv6-Primary-Dns               47  string Unisphere
+ATTRIBUTE Unisphere-Ipv6-Secondary-Dns             48  string Unisphere
+ATTRIBUTE Unisphere-Disconnect-Cause               51  octets  	Unisphere
+ATTRIBUTE Unisphere-Service-Description            53  string  	Unisphere
+ATTRIBUTE Unisphere-Dhcp-Options                   55  octets  	Unisphere
+ATTRIBUTE Unisphere-Dhcp-Mac-Addr                  56  string  	Unisphere
+ATTRIBUTE Unisphere-Dhcp-Gi-Address                57  ipaddr  	Unisphere
+
+VALUE     Unisphere-Ingress-Statistics             disable 0
+VALUE     Unisphere-Ingress-Statistics             enable  1
+
+VALUE     Unisphere-Egress-Statistics              disable 0
+VALUE     Unisphere-Egress-Statistics              enable  1
+
+VALUE     Unisphere-Service-Category              UBR               1
+VALUE     Unisphere-Service-Category              UBRPCR            2
+VALUE     Unisphere-Service-Category              nrtVBR            3
+VALUE     Unisphere-Service-Category              CBR               4
+
+VALUE     Unisphere-Allow-All-VR-Access            disable 0
+VALUE     Unisphere-Allow-All-VR-Access            enable  1
+
+VALUE     Unisphere-SA-Validate                    disable 0
+VALUE     Unisphere-SA-Validate                    enable  1
+
+VALUE     Unisphere-Igmp-enable                    disable 0
+VALUE     Unisphere-Igmp-enable                    enable  1
+
+VALUE     Unisphere-Ppp-Protocol                   none     0
+VALUE     Unisphere-Ppp-Protocol                   pap      1
+VALUE     Unisphere-Ppp-Protocol                   chap     2
+VALUE     Unisphere-Ppp-Protocol                   pap-chap 3
+VALUE     Unisphere-Ppp-Protocol                   chap-pap 4
+
+VALUE     Unisphere-Tunnel-Bearer-Type             none    0
+VALUE     Unisphere-Tunnel-Bearer-Type             analog  1
+VALUE     Unisphere-Tunnel-Bearer-Type             digital 2

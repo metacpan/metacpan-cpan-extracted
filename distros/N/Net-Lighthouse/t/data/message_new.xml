@@ -1,0 +1,13 @@
+<message>
+  <attachments-count type="integer">0</attachments-count>
+  <body></body>
+  <body-html></body-html>
+  <comments-count type="integer">0</comments-count>
+  <created-at type="datetime"></created-at>
+  <parent-id type="integer"></parent-id>
+  <permalink></permalink>
+  <project-id type="integer"></project-id>
+  <title></title>
+  <updated-at type="datetime"></updated-at>
+  <user-id type="integer"></user-id>
+</message>

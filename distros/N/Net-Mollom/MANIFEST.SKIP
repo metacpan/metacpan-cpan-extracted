@@ -1,0 +1,9 @@
+\.swp$
+\.swo$
+_build
+^Build$
+\.bak$
+\.git
+blib
+^MYMETA.yml$
+^MYMETA\.json$

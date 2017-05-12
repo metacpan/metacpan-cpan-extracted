@@ -1,0 +1,28 @@
+Revision history for Net-SNMP-Mixin-IfInfo
+
+0.07	Wed, 22 Jun 2016 17:40:21 +0200
+	bump version
+	newer tests, minor changes
+
+0.06	Fri, 01 May 2015 21:47:37 +0200
+	allow check for partial initialization
+
+0.05	Thu Jun 26 08:12:57 MEST 2008
+	newer requirement for Net::SNMP::Mixin due to push_error()
+
+0.04	Thu Jun 26 00:37:47 MEST 2008
+	get_entries is buggy when fetching from different
+	tables, like ifTable and ifXTable
+
+	use push_error
+
+0.03	Fr 25. Apr 19:17:10 CEST 2008
+	new return values processing
+	no interface change
+
+0.02	Fr 18. Apr 15:18:00 CEST 2008
+	minor change in param handling
+
+0.01_01 Mon Apr 14 23:22:43 CEST 2008
+        First developer release.
+

@@ -1,0 +1,3 @@
+TYPEMAP
+Request_info *	T_PTROBJ
+

@@ -1,0 +1,13 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Net::Signalet::script;
+
+&main;
+
+sub main {
+    my $signalet = Net::Signalet::script->new;
+    $signalet->parse_options(@ARGV);
+    $signalet->do or exit(1);
+}

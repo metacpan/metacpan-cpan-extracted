@@ -1,0 +1,306 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>NCustom - Perl extension for customising system configurations.</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#abstract">ABSTRACT</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#export">EXPORT</a></li>
+		<li><a href="#api">API</a></li>
+	</ul>
+
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>NCustom - Perl extension for customising system configurations.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  NCUSTOM_SCRIPT
+  use NCustom;
+  # do stuff in your script using NCustom routines</pre>
+<pre>
+  KICKSTART POST SECTION
+  # install package management tool that is used in NCUSTOM_SCRIPT
+  rpm -i <a href="http://install/install/rpm/apt-0.5.5cnc6-fr1.i386.rpm">http://install/install/rpm/apt-0.5.5cnc6-fr1.i386.rpm</a> ;
+  echo 'rpm <a href="http://install/">http://install/</a> install/rh90_apt os extras' &gt; /etc/apt/sources.list;
+  apt-get update ;</pre>
+<pre>
+  # install and use NCustom
+  apt-get -q -y install perl-NCustom ;
+  ncustom -i ;
+  ncustom -c src_fqdn=install.example.com ;
+  ncustom -n NCUSTOM_SCRIPT
+  ncustom -n smb_ldap_pdc-0.4-rh90.ncus ;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="abstract">ABSTRACT</a></h1>
+<p>NCustom provides some file editting routines and some package management hooks to assit in system configuration.</p>
+<p>File editting:
+The file editing routines include features such as transactions, and undo by transaction. The original files are archived within a directory tree structure.</p>
+<p>Package management:
+You may specify packages (and minumum/maximum/exact versions) that you require to be installed, and a routine to be called if they are not installed. Your routine may use simple ``rpm'' commands (or whatever you want), or you may use the provided routine that uses ``apt''. In-built support for other package management tools is on the todo list.</p>
+<p>System configuration:
+A commandline interface provides for initialisation, configuration, and invocation (including invocation across the network). This enables NCustom to be used from the post section of Kickstart script. It may also be used stand alone on an already built system.</p>
+<p>If system configuration tweaking is minor, then scripts (even in the post section of a kickstart configuration) may be more useful. If the system configuration tweaking is related to only one rpm, then re-rolling the rpm with a new post section may be more useful. If there are several packages that need inter-related configuration (eg building a Samba, PDC, LDAP server), then NCustom may improve the speed of development of automated system configuration.</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>File editting:
+Files are saved into a directory structure within the users home directory. This location may be configured. A file will be saved within a directory structure named after the current transaction name, and also under the ``all'' directory. Because of this ``all'' changes, or only changes relating to a ``transaciton'' may be reversed.</p>
+<p>Package management:
+When a package requirement is not met, a routine that you may provide shall be called.</p>
+<p>System configuration:</p>
+<p>
+</p>
+<h2><a name="export">EXPORT</a></h2>
+<p>None by default.</p>
+<p>
+</p>
+<h2><a name="api">API</a></h2>
+<dl>
+<dt><strong><a name="item_transaction"><code>transaction</code></a></strong><br />
+</dt>
+<dd>
+<pre>
+
+  trasaction(&quot;tx1&quot;);</pre>
+</dd>
+<dd>
+<p>Set the current trasaction. If not set it defaults to basename($0). Using the default is normally good enough.</p>
+</dd>
+<dt><strong><a name="item_save_files"><code>save_files</code></a></strong><br />
+</dt>
+<pre>
+
+  save_files(&quot;~/dir2/file1&quot;);</pre>
+<pre>
+
+  save_files(&lt;&lt;'    EOF');
+    ~/dir2/file2
+    ~/dir3/*
+    EOF</pre>
+<p>There is not much point to this - the customise works or not.
+But it helps while developing the customisation.
+Note: changes effected by using NCustom functions are saved automatically.</p>
+<dt><strong><a name="item_initialise"><code>initialise</code></a></strong><br />
+</dt>
+<pre>
+
+  initialise();</pre>
+<p>Initialise the archive of saved files. As this deletes files this is not done automatically.</p>
+<dt><strong><a name="item_overwrite_file"><code>overwrite_file</code></a></strong><br />
+</dt>
+<pre>
+
+  overwrite_file(file =&gt; &quot;~/dir6/file1&quot;, text =&gt; ' some content');</pre>
+<pre>
+
+  overwrite_file(file =&gt; &quot;~/dir6/file2&quot;,
+                strip =&gt; '^\s{4}',
+                text  =&gt; &lt;&lt;'    EOF');
+    This will be line 1 of the new content of the file.
+    This will be line 2 of the new content of the file.
+      This, line3, will still be indented. As will line 4.
+      I bet there will be a dollar sign and two single quotes on the next line.
+    'I told you so ! Now you owe me $20', I would then say.
+    This will be the last line.
+    EOF</pre>
+<p>Overwrite file overwrites $file with $text.</p>
+<p>So that you can have pretty indentation when using here documents, the pattern $strip is stripped out prior to processing.</p>
+<p>More clearly, overwrite file is equivalent to:
+</p>
+<pre>
+
+    open(FILE,&quot;&gt;$file&quot;); 
+    $text =~ s/$strip//;
+    print FILE $text;</pre>
+<dt><strong><a name="item_append_file"><code>append_file</code></a></strong><br />
+</dt>
+<pre>
+
+  append_file(file =&gt; &quot;~/dir7/file1&quot;, text =&gt; 'an extra line');</pre>
+<pre>
+
+  append_file(file =&gt; &quot;~/dir7/file2&quot;,
+             strip =&gt; '^\s{4}',
+             text  =&gt; &lt;&lt;'    EOF');
+    An extra line to add on to the file.
+      This line, will be indented. 
+    The last last line with some special chars *!@$%.'&quot;
+    EOF</pre>
+<p>Append file is the same as overwrite file, except it behaves as ``&gt;&gt;'' instead of ``&gt;''.</p>
+<dt><strong><a name="item_prepend_file"><code>prepend_file</code></a></strong><br />
+</dt>
+<pre>
+
+  prepend_file(file =&gt; &quot;~/dir8/file1&quot;, text =&gt; 'an extra line');</pre>
+<pre>
+
+  prepend_file(file =&gt; &quot;~/dir8/file2&quot;,
+             strip =&gt; '^\s{4}',
+             text  =&gt; &lt;&lt;'    EOF');
+    An extra line at the start of the file.
+      This line, will be indented. 
+    Some special chars *!@$%.'&quot;
+    The last extra line added to the start of the file.
+    EOF</pre>
+<p>Prepend behaves the same as append, except the text is added to the start instead of the end.</p>
+<dt><strong><a name="item_edit_file"><code>edit_file</code></a></strong><br />
+</dt>
+<pre>
+
+  edit_file(file =&gt; &quot;~/dir9/file1&quot;, code =&gt; 's/file/FILE/g;');</pre>
+<pre>
+
+  edit_file(file  =&gt; &quot;~/dir9/file2&quot;,
+            strip =&gt; '^\s{4}',
+            code  =&gt; &lt;&lt;'    EOF');
+    s/my\.example\.com/whatever\.com/g;
+    s/^$/replace all blank lines with these three lines
+        two of three, with 4 leading spaces
+        and three of three/ ;
+    s/might/WILL/g;
+    EOF</pre>
+<pre>
+
+  edit_file(file =&gt; &lt;&lt;'    EOF', strip =&gt; '^\s{6}', code =&gt; &lt;&lt;'    EOF');
+      ~/dir9/file3
+      ~/dir10/*
+    EOF
+      s/file/FILE/g;
+      s/least/LEASTWAYS/g;
+    EOF</pre>
+<p>Edit file is similar to:
+</p>
+<pre>
+
+    perl -i -e &quot;$code&quot; $file</pre>
+<p>With edit file, $file must exist. 
+As with the other routines, $code has the pattern $strip stripped out.</p>
+<p>You can also provide multiple filenames to be editted. This holds true for the other routines too.</p>
+<dt><strong><a name="item_undo_files"><code>undo_files</code></a></strong><br />
+</dt>
+<pre>
+
+  undo_files(&quot;tx1&quot;);</pre>
+<pre>
+  undo_files(&quot;~/.ncustom/save/tx2&quot;);</pre>
+<pre>
+  undo_files(&quot;tx3 tx4&quot;);</pre>
+<pre>
+  undo_files(&lt;&lt;'  EOF');
+    tx5
+    ~/.ncustom/save/tx6
+  EOF</pre>
+<p>Undo transaction will restore the files from a given transaction archive directory. That includes removing any new files that were created. For any directories that it cannot find, it will try looking in $Config{'save_dir'}.
+Undo does not: restore files that were edited by non-NCustom function if they were not first saved using NCuston::save_files; delete new directories that were created (yet).
+Again: this is only a development aid.</p>
+<dt><strong><a name="item_required_packages"><code>required_packages</code></a></strong><br />
+</dt>
+<pre>
+  sub handler{
+    my ($reqref, $url, $file) = @_;
+    print &quot;As $$reqref{'match'} version $$reqref{'version'} of &quot;;
+    print &quot;$$reqref{'pkg'} was $$reqref{'result'} - &quot;;
+    print &quot;we are going to fetch $file from $url and execute it.\n&quot;;
+    print &quot;This should set things right.\n&quot;;
+    return 1;
+  }</pre>
+<pre>
+  required_packages(&lt;&lt;'  EOF');
+    EXACTLY;   9.9.9;   acme;   handler($req, &quot;URL&quot;, &quot;FILE&quot;)
+    NOTWANT;   0.0.0;   perl;   print &quot;Dont be stupid\n&quot;
+    #MAXIMUM;  9.9.9;   perl;   carp(&quot;Warning: untested with this perl&quot;)
+    #MINIMUM;  9.9.9;   perl;   apt_fix()
+    NOTWANT;   0.0.0;   perl;   for($i = 0; $i &lt; 10; $i++){$s=&quot;Hello&quot;; print &quot;${s}${i}\n&quot;}
+  EOF</pre>
+<p>Required packages take a multi-line argument list, where each line is of the format: requirement, version, package, handler code.</p>
+<p>Required packages will invoke the handler if the package is (or isnt) installed as per the requirement and version.</p>
+<p>Valid requirements are: MINUMUM, MAXUMUM, EXACTLY, and NOTWANT.</p>
+<p>Input lines will be ignored if the first non-whitespace character is the '#' character.</p>
+<p>The handler code is eval'd, and it may make use of the hashref ``req''. The hash has the keys: match, version, and package; which correspond to the original arguments. The hash also contains result, which is the answer as to whether the requirements was met or not. Possible values of result (each referring to the package or it's version in relation to the requuirements) are: MISSING, ABOVE, BELOW, or UNWELCOME.</p>
+<p>A handler ``apt_fix'' is provided that will simply attempt to remove UNWELCOME packages, and do an install for all other scenarios - so you might get the verion you want or not, depending upon your apt repository.</p>
+<dt><strong><a name="item_blat_myconfig"><code>blat_myconfig</code></a></strong><br />
+</dt>
+<pre>
+  blat_myconfig();</pre>
+<p>Blat_myconfig overwrites the personal configuration profile with the global configuration profile. The personal configuration profile is ``~/.ncustom/NCustom/MyConfig.pm''.</p>
+<dt><strong><a name="item_config_edit"><code>config_edit</code></a></strong><br />
+</dt>
+<pre>
+  config_edit((src_fqdn  =&gt; '&quot;install.baneharbinger.com&quot;',
+               test_url1 =&gt; '&quot;install.baneharbinger.com/index.html&quot;'));</pre>
+<p>Config_edit is followed by name vaule pairs. If there is a corresponding name in the personal configuration file, then its vaule shall be updated. If there is no corresponding name then the name value shall be added to the end of the file. If there is no file it shall be created. The personal configuration file is ``~/.ncustom/NCustom/MyConfig.pm''.</p>
+<p>If some configuration vlaues are defined in terms of other configuration values, then the order may be important.</p>
+<dt><strong><a name="item_ncustom"><code>ncustom</code></a></strong><br />
+</dt>
+<pre>
+  ncustom(&lt;&lt;'  EOF');
+    ~/test1.ncus
+    test2.ncus
+  EOF</pre>
+<p>Ncustom is passed one or more filenames, either local filenames or URLs.
+The filenames are assumed to be NCustom scripts, are fetched, and executed.
+If the filename is not an NCustom script, then transactions will not be journalled, and will not be able to be undone.
+An unqualified NCustom script name will be searched for in pwd and the <code>location(s)</code> specified in NCustom::Config.
+URLs will be fetched using the get_url subrouting in NCustom::Config.</p>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>NCustom
+NCustom::Config
+ncustom
+
+</p>
+<p><a href="http://baneharbinger.com/NCustom">http://baneharbinger.com/NCustom</a>
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Bane Harbinger, &lt;<a href="mailto:bane@baneharbinger.com">bane@baneharbinger.com</a>&gt;
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright 2003 by Bane Harbinger
+
+</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+</p>
+
+</body>
+
+</html>

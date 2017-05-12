@@ -1,0 +1,231 @@
+#!/usr/bin/perl 
+#$Revision: 1.3 $$Date: 2007-11-11 20:26:22 $$Author: boumenot $
+#######################################################################
+# FIXME: this script screen scapes the web to build classes to validate
+# ResponseGroups.  Unfortunately, this breaks too frequently.  A
+# better way needs to be found.
+#######################################################################
+
+require 5.008_001;
+
+use Getopt::Long;
+use IO::File;
+use Pod::Usage;
+use LWP::Simple;
+use Text::Template;
+use HTML::TreeBuilder::XPath;
+use Data::Dumper;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Net::Amazon ();
+
+use strict;
+use warnings;
+
+
+sub AWS4_BASE_URL {
+    'http://docs.amazonwebservices.com/AWSECommerceService/'.$Net::Amazon::WSDL_DATE.'/DG/';
+}
+sub AWS4_ONLINE_HTML {
+    AWS4_BASE_URL . 'CHAP_ResponseGroupsList.html';
+}
+
+my $Opt_Debug = 0;
+my $Opt_Dest = "$FindBin::Bin/../lib/Net/Amazon/Validate/Type";
+my $Opt_Overwrite = 0;
+
+unless (&GetOptions (
+		     "help|h"	  => \&usage,
+		     "version|V"  => \&version,
+		     "debug|D"    => \$Opt_Debug,
+             "dest=s"     => \$Opt_Dest,
+		     "overwrite"  => \$Opt_Overwrite,
+		     "<>"		  => \&parameter,
+		     )) {
+    usage();
+}
+
+## main #########################################
+
+unless (-d $Opt_Dest) {
+    die "The directory $Opt_Dest does not exist!\n";
+}
+
+
+# Get a list of valid Operations, for checking our work later
+my $tree = HTML::TreeBuilder::XPath->new;
+$tree->parse(get(AWS4_BASE_URL . 'CHAP_OperationListAlphabetical.html'));
+$tree->eof();
+my @valid_ops = map { $_->as_text } $tree->findnodes('//div[@class="informaltable"]//a');
+print "Valid Operations: @valid_ops\n\n" if $Opt_Debug;
+$tree = undef;
+
+# Get the list of possible ResponseGroups
+$tree = HTML::TreeBuilder::XPath->new;
+$tree->parse(get(AWS4_ONLINE_HTML));
+$tree->eof();
+my %response_groups = map { $_->as_text, $_->attr('href') }
+                        $tree->findnodes('//div[@class="informaltable"]//a');
+$tree = undef;
+
+print Dumper(\%response_groups) if $Opt_Debug;
+
+# Each ResponseGroup page lists the Operations for which it is valid.
+# We reverse map these so we can look up valid ResponseGroups for an Operation.
+my %operation_to_rg_map;
+for my $rg (keys %response_groups) {
+    my $link = AWS4_BASE_URL . $response_groups{$rg};
+    print "fetching $link ...\n" if $Opt_Debug;
+    $tree = HTML::TreeBuilder::XPath->new;
+    $tree->parse(get($link));
+    $tree->eof();
+    # There are a couple of pages where the HTML is structured wrong, and this
+    # selects some response elements in addition to the ops. We'll check each 
+    # one later to ensure it is really an Operation. Also, there are a few
+    # pages that don't have "A" tags around the Operation names, so we select
+    # the enclosing paragraphs instead. as_text() yields the same result. -VV
+    my @ops = map { $_->as_text } $tree->findnodes(
+        '//h2[contains(text(),"Operations")]/ancestor::div[@class="section"][1]//ul/li/p'
+        );
+    print "$rg has no operations\n" unless @ops; # 404 on one page :(
+    for my $op (@ops) {
+        $op =~ s/(^\s+)|(\s+$)//g;
+        # Special case, always included so never needs to be requested
+        next if $rg eq 'Request'; 
+        # One page has a sentence explaining that it is only valid under 
+        # certain conditions. We don't check the conditions, let Amazon 
+        # do it. -VV
+        if ($op =~ /^(ItemSearch|ItemLookup).*when/) {
+            $op = $1;
+        }
+        # If it still has spaces, this is some new case that should be looked
+        # at manually.
+        if ($op =~ /\s/) {
+            print("- $rg Operation contains spaces: $op\n");
+            next;
+        }
+        # Don't add it to Operation list unless it's REALLY an Operation
+        unless (grep /$op/, @valid_ops) {
+            print "- Parsed invalid operation \"$op\" for $rg, probably broken HTML, skipping.\n"
+                if $Opt_Debug;
+            next;
+        }
+        push @{$operation_to_rg_map{$op}}, $rg;
+    }
+}
+
+print Dumper(\%operation_to_rg_map) if $Opt_Debug;
+
+for my $op (keys %operation_to_rg_map) {
+    my $fn = "$Opt_Dest/$op.pm";
+
+    print "templating $fn ...\n" if $Opt_Debug;
+
+    unless (-d "$Opt_Dest") {
+        mkdir "$Opt_Dest" or
+            die "Failed to create '$Opt_Dest'!\n";
+    }
+
+    if (-f $fn && !$Opt_Overwrite) {
+        warn "The file $fn already exists, skipping!\n";
+        next;
+    }
+
+    my $template = Text::Template->new(TYPE       => 'FILE',
+            SOURCE     => "$FindBin::Bin/aws4-types.tmpl",
+            DELIMITERS => [ '[%--', '--%]', ],
+            );
+
+    my $hash = {'MODULE_NAME' => $op,
+        'groups'      => $operation_to_rg_map{$op},
+    };
+
+    my $text = $template->fill_in(HASH => $hash);
+    unless ($text) {
+        die "Failed to fill in the text template for $op!\n";
+    }
+
+    my $fouth = IO::File->new(">$fn") or
+        die "$! '$fn'!\n";
+
+    print $fouth $text;
+
+    $fouth->close();
+}
+
+
+## subs #########################################
+
+sub usage {
+    print '$Revision: 1.3 $$Date: 2007-11-11 20:26:22 $$Author: boumenot $ ', "\n";
+    pod2usage(-verbose=>2, -exitval => 2);
+    exit (1);
+}
+
+sub version{
+    print '$Revision: 1.3 $$Date: 2007-11-11 20:26:22 $$Author: boumenot $ ', "\n";
+    exit (1);
+}
+
+sub parameter {
+    my $param = shift;
+    die "%Error: Unknown parameter: $param\n";
+}
+
+##################################################
+__END__
+
+=pod
+
+=head1 asw4-types
+
+B<asw4-types> - convert Amazon's HTML data to Perl libraries.
+
+=head1 SYNOPSIS
+
+B<asw4-types> - [I<OPTION>]... [I<FILE>]...
+
+=head1 DESCRIPTION
+
+B<asw4-types> converts the data stored in Amazon's HTML pages for ASW4 into
+Perl libraries.  These libraries are used by Net::Amazon to validate user
+input.
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item -h, --help
+
+Displays this message and program version and exits.
+
+=item -V, --version
+
+Displays the program's version and exits.
+
+=item -D, --debug
+
+Prints debug information.
+
+=item --overwrite
+
+Overwrite any libraries if they already exist.
+
+=item --dest E<lt>directoryE<gt>
+
+Specify the destination where the files should be written.
+
+=back
+
+=head1 AUTHORS
+
+Written by Christopher Boumenot.
+
+=head1 REPORTING BUGS
+
+Report bugs to <boumenot@gmail.com>.
+
+=head1 SEE ALSO
+
+=cut
+

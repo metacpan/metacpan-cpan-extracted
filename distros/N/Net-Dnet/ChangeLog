@@ -1,0 +1,245 @@
+Turned loose as version 0.73 (still pre-alpha, but needed to supersede the
+version in net-ext-a8 on CPAN when releasing Net-ext-0.74.)
+
+Sat Mar 29 00:08:09 1997  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* README: Updated.
+
+	* Dnet.pm: Go farther toward having some working code, based on
+	the changes in Net-ext.
+
+	* Dnet.xs: Generate XS entries for the `constants'.  Still to do:
+	figure out how to mark them as constant.  Start work on some of
+	the actual routines (pack_sockaddr_dn done so far).
+
+	* Makefile.PL: Restructure distribution layout to be friendly to
+        CPAN.pm.  This also splits out Net::Dnet into a separate
+	distribution from the Net-ext-* package.
+
+This was 'released' as version 0.72 (a.k.a alpha 8).
+
+Sun Dec 22 09:58:02 1996  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* Snapshot work-in-progress, even though should be updated
+	for 5.003_13, since I'll be away for a while.
+
+Wed Jul 24 03:29:13 1996  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* Dnet/Dnet.pm: Clean up some {'word'} and {'key'=>val} stuff.
+
+	* TCP/TCP.pm: Clean up some {'word'} and {'key'=>val} stuff.
+
+	* Inet/Inet.pm: Clean up some {'word'} and {'key'=>val} stuff.
+
+	* Gen/Gen.pm: Clean up some {'word'} and {'key'=>val} stuff.
+
+Tue Jul 23 10:52:38 1996  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* Contents: Remove pad_lexicals patch, since that fix is obsolete
+        with 5.003.
+
+Sun Jul 21 02:48:39 1996  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* Gen/Gen.pm: Fix old bug with OOB messages and 'lastFrom'
+        handling with respect to recv.
+
+Sat Jul 20 19:32:15 1996  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* Gen/Gen.pm: Begin updating for 5.003 language features (like
+        SUPER:: and anonymous globs.)
+
+	* UNIX/UNIX.pm: Begin updating for 5.003 language features (like
+        SUPER:: and anonymous globs.)
+
+	* Dnet/Dnet.pm: Begin updating for 5.003 language features (like
+        SUPER:: and anonymous globs.)
+
+	* Inet/Inet.pm: Begin updating for 5.003 language features (like
+        SUPER:: and anonymous globs.)
+
+	* UDP/UDP.pm: Begin updating for 5.003 language features (like
+        SUPER:: and anonymous globs.)
+
+Sun Jul 14 14:33:07 1996  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* TCP/TCP.pm: Fixed bug formerly patched in private testing kits
+        which prevented passing parameters to Net::TCP::Server::new and
+        having them take effect.
+	Begin updating for 5.003 language features (like SUPER:: and
+        anonymous globs.)
+
+	* Dnet/Makefile.PL: Upgraded to MakeMaker 5.34.
+
+	* UNIX/Makefile.PL: Upgraded to MakeMaker 5.34.
+
+	* UDP/Makefile.PL: Upgraded to MakeMaker 5.34.
+
+	* TCP/Makefile.PL: Upgraded to MakeMaker 5.34.
+
+	* Inet/Makefile.PL: Upgraded to MakeMaker 5.34.
+
+	* Gen/Makefile.PL: Upgraded to MakeMaker 5.34.
+
+Thu Jun  1 03:38:49 1995  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* Inet/Inet.xs: Added _inet_aton() for performance.
+
+	* Inet/Inet.pm: Moved some of inet_aton() into XSUB for
+	  performance.
+
+	* TCP/TCP.pm: Worked up Net::TCP::Server sub-module for easier
+	  server creation.
+
+Sun May 28 18:35:42 1995  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* Gen/Gen.pm: -w fixup in getline for (undef $/) case.
+	  Add aliases for registerOptions and similar mixed-case methods
+	  to allow names like "register_options" for those who prefer that.
+	  Updated the pod for the alias methods and a discussion of the use
+	  of the fileno method and/or the embedded filehandle.
+	  Added new_from_fh method and pod info.
+
+Sat May 27 02:30:46 1995  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* TCP/TCP.pm: 'use strict' fix for select() in accept method.
+
+Mon Apr 17 02:58:40 1995  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* version 0.51-alpha released.
+
+Mon Apr 10 17:45:29 1995  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* Contents: Changed to unpack into Net/ rather than ext/Net/, to
+	  be friendlier to people who are building this stuff as loadable
+	  pieces separate from the Perl distribution.
+
+	* Gen/Gen.pm: More -w fixups (missed by perl -wc).
+
+Sat Apr  8 11:26:48 1995  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* UDP/Makefile.PL: Hack up to be in the same directory tree,
+	  even though it doesn't have a .xs file.
+
+	* UDP/UDP.pm: Make ready for exposure to the world.
+
+	* Inet/Inet.pm: Add wrapper for pack_sockaddr_in to make
+	  the 'family' argument optional.
+
+	* Inet/Inet.xs: Fix constant() to be U32 rather than double.
+	  Privatize pack_sockaddr_in() to allow for optional sin_family.
+
+	* TCP/TCP.xs: Fix constant() to be U32 rather than double.
+
+Wed Apr  5 14:55:54 1995  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* TCP/TCP.pm: Remove TIESCALAR workaround, as either my
+	  pad-lexicals patch fixed it or I'm no longer exercising the bug.
+
+	* Inet/Inet.pm: Fix glitches with -w stuff.  Fix inet_aton not to
+	  'use integer', as it loses the high-order bit.
+
+	* Gen/Gen.pm: Fix glitches in the 'use strict' and -w stuff.
+
+Mon Apr  3 02:22:21 1995  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* Version 0.50-alpha released.
+
+Mon Apr  3 02:00:25 1995  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* README: Updated to reflect the need for a patched 5.001.
+
+	* Contents: add pad-lexicals-patch for making 5.001 work for me.
+
+	* TCP/TCP.pm: Undocument ``setdebug''.  It's a botch that's only
+	  there because it helped me in figuring out where things were
+	  dying while looking for bugs in perl itself.  It's not a
+	  desirable feature for the modules.  Debug options should be
+	  per-object if they exist.
+
+	* Gen/Gen.pm: Finish fixing up for ``use strict'' where possible
+	  after my posted patches for bugs found along the way.  Enough of
+	  this now depends on working lexicals that it now requires 5.001
+	  (with patches) to work.
+
+Sat Apr  1 01:07:35 1995  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* Gen/Gen.pm: Clean up for ``use strict'' and ``-w'' stuff.
+
+	* Inet/Inet.pm: Clean up for ``use strict'' stuff.
+
+	* TCP/TCP.pm: Clean up to make 'use strict qw(subs refs)' work.
+	  Add 'use strict;' after AUTOLOAD.
+
+Thu Mar 30 02:04:14 1995  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* TCP/TCP.pm: Clean up -w warnings resulting from @ISA conflicts
+	  between DynaLoader and AutoLoader.
+
+	* Inet/Inet.pm: Clean up -w warnings resulting from @ISA conflicts
+	  between DynaLoader and AutoLoader.
+
+	* Gen/Gen.pm: Cleaned up a lot of warnings (-w).  Most of them
+	  were "cleaned up" by being suppressed, since the overhead of
+	  checking things in setparams to satisfy -w isn't really worth
+	  it.  However, some of them were real, and worth fixing.
+
+Mon Mar 27 01:51:58 1995  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* Gen/Gen.pm: Fixed the pod a bit.
+
+	* Inet/Inet.pm: Fixed format_addr to allow static-style calls as
+	  per its documentation.
+
+	* TCP/TCP.pm: Fixed a warning-causing typo, and fixed the pod a
+	  bit.  Added _addrinfo hack for format_addr.
+
+Sat Mar 25 11:34:26 1995  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* Version 0.3-alpha released.
+
+Sat Mar 25 11:34:26 1995  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* Inet/Inet.pm: Moved IPVERSION to @EXPORT_OK.  Added format_addr.
+	  Cleaned up some sign-extension problems.
+	  Added keys {lcl,rem}{host,addr,service,port} and augmented
+	  getsockinfo method to fill in the values.
+	  Added key IPproto to store the name of protocol in use, and
+	  made keys IPproto and proto inter-dependent.
+
+	* Gen/Gen.pm: Don't allow getline's stashed buffer to interfere
+	  with recv's involving MSG_OOB.  Clean up another eval to be more
+	  efficient (compiled, not purely interpreted).  Clean up some
+	  sign-extension problems.
+
+	  Added format_addr, format_local_addr, format_remote_addr
+	  methods.
+
+Fri Mar 24 02:19:09 1995  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* Gen/Gen.pm: Avoided some excessive warnings.
+	  Added some error-checking to select and fhvec methods.
+
+	* Inet/Inet.pm: Cleaned up some excess evals.
+
+	* Inet/Inet.xs: Made {un,}pack_sockaddr_in more robust by using
+	  SV* arguments and range-checking their lengths.
+
+Tue Mar 21 16:25:33 1995  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* Version 0.2-alpha released.
+
+Tue Mar 21 16:25:33 1995  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* Gen/Gen.pm: Added methods fhvec, select, ioctl, fcntl.
+
+Sun Mar 19 18:31:28 1995  Spider Boardman  <spider@Orb.Nashua.NH.US>
+
+	* TCP/TCP.pm: Fix workaround for TIESCALAR on first ->new() to
+	  include v5.001.
+	  Fix constant() handling to avoid the 'has args' problem.
+
+	* Inet/Inet.pm: Fix to include & on calls to our own constants,
+	  since they're not known as subroutines in our own module.
+	  Fix constant() handling to avoid the 'has args' problem.
+
+Revision history prior to 0.1-alpha is lost.

@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               Nagios-Monitoring-Plugin
+version:            0.51
+abstract:           A family of perl modules to streamline writing Nagios 
+author:
+    - Nagios Plugin Development Team <nagiosplug-devel@lists.sourceforge.net>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:               0
+    Class::Accessor:    0
+    Config::Tiny:       0
+    File::Basename:     0
+    File::Spec:         0
+    IO::File:           0
+    Math::Calc::Units:  0
+    Params::Validate:   0
+    Test::More:         0.62
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

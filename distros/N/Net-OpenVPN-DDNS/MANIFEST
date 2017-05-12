@@ -1,0 +1,12 @@
+Makefile.PL
+update
+DDNS.pm
+DDNS/Env.pm
+DDNS/Lease.pm
+DDNS/Local.pm
+MANIFEST
+AUTHORS
+COPYING
+LGPL-2.1
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,24 @@
+TYPEMAP
+
+adns_state      T_PTROBJ_MAGIC
+adns_query      T_PTROBJ_MAGIC
+adns_answer *   T_ADNS_ANSWER
+
+adns_initflags  T_IV
+adns_rrtype     T_IV
+adns_queryflags T_IV
+
+INPUT
+
+T_PTROBJ_MAGIC
+	$var = ($type)_sv2obj(aTHX_ $arg, \"${type}\", 1);
+
+
+OUTPUT
+
+T_PTROBJ_MAGIC
+	$arg = _obj2sv(aTHX_ $var, ST(0), "$type");
+
+T_ADNS_ANSWER
+        $arg = _adns_answer2sv(aTHX_ $var);
+        free($var);

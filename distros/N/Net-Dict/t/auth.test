@@ -1,0 +1,211 @@
+#!./perl
+#
+# auth.test - Net::Dict testsuite for auth method
+#
+# this is not called auth.t because we don't want
+# it run automatically when you run "make test".
+# This testsuite requires a server configured
+# correctly - ie like my test server here, which
+# isn't publicly accessible.
+#
+
+use Net::Dict;
+
+$^W = 1;
+
+my $HOST = 'dalek';
+my $PORT = 2628;
+
+my $WARNING;
+my %TESTDATA;
+my $section;
+my $string;
+my $dbinfo;
+
+print "1..9\n";
+
+$SIG{__WARN__} = sub { $WARNING = join('', @_); };
+
+#-----------------------------------------------------------------------
+# Build the hash of test data from after the __DATA__ symbol
+# at the end of this file
+#-----------------------------------------------------------------------
+while (<DATA>)
+{
+    if (/^==== END ====$/)
+    {
+	$section = undef;
+	next;
+    }
+
+    if (/^==== (\S+) ====$/)
+    {
+        $section = $1;
+        $TESTDATA{$section} = '';
+        next;
+    }
+
+    next unless defined $section;
+
+    $TESTDATA{$section} .= $_;
+}
+
+#-----------------------------------------------------------------------
+# Make sure we have HOST and PORT specified
+#-----------------------------------------------------------------------
+if (defined($HOST) && defined($PORT))
+{
+    print "ok 1\n";
+}
+else
+{
+    print "not ok 1\n";
+}
+
+#-----------------------------------------------------------------------
+# connect to server
+#-----------------------------------------------------------------------
+eval { $dict = Net::Dict->new($HOST, Port => $PORT); };
+if (!$@ && defined $dict)
+{
+    print "ok 2\n";
+}
+else
+{
+    print "not ok 2\n";
+}
+
+#-----------------------------------------------------------------------
+# call dbs() with an argument - it doesn't take any, and should die
+#-----------------------------------------------------------------------
+eval { %dbhash = $dict->dbs('foo'); };
+if ($@ && $@ =~ /takes no arguments/)
+{
+    print "ok 3\n";
+}
+else
+{
+    print "not ok 3\n";
+}
+
+#-----------------------------------------------------------------------
+# METHOD: dbs
+# get a list of database, render into a string, match to expected
+#-----------------------------------------------------------------------
+$string = '';
+eval { %dbhash = $dict->dbs(); };
+if (!$@
+    && defined %dbhash
+    && do { foreach my $db (sort keys %dbhash) { $string .= "${db}:$dbhash{$db}\n"; }; 1; }
+    && $string eq $TESTDATA{dblist})
+{
+    print "ok 4\n";
+}
+else
+{
+    print "not ok 4\n";
+}
+
+#-----------------------------------------------------------------------
+# METHOD: auth
+# call with no arguments - should croak()
+#-----------------------------------------------------------------------
+if ($dict->can('auth')
+    && do { eval { $dict->auth(); }; 1;}
+    && $@
+    && $@ =~ /takes two arguments/
+   )
+{
+    print "ok 5\n";
+}
+else
+{
+    print "not ok 5\n";
+}
+
+#-----------------------------------------------------------------------
+# METHOD: auth
+# call with only one argument - should croak()
+#-----------------------------------------------------------------------
+if ($dict->can('auth')
+    && do { eval { $dict->auth('testuser'); }; 1;}
+    && $@
+    && $@ =~ /takes two arguments/
+   )
+{
+    print "ok 6\n";
+}
+else
+{
+    print "not ok 6\n";
+}
+
+#-----------------------------------------------------------------------
+# METHOD: auth
+# call with three arguments - should croak()
+#-----------------------------------------------------------------------
+$string = '';
+if ($dict->can('auth')
+    && do { eval { $dict->auth('testuser', 'open sesame', 'foobar'); }; 1;}
+    && $@
+    && $@ =~ /takes two arguments/
+   )
+{
+    print "ok 7\n";
+}
+else
+{
+    print "not ok 7\n";
+}
+
+#-----------------------------------------------------------------------
+# METHOD: auth
+# call with two valid arguments - should work ok
+#-----------------------------------------------------------------------
+$string = '';
+if ($dict->can('auth')
+    && do { eval { $dict->auth('testuser', 'open sesame'); }; 1;}
+    && !$@
+   )
+{
+    print "ok 8\n";
+}
+else
+{
+    print "not ok 8\n";
+}
+
+#-----------------------------------------------------------------------
+# METHOD: dbs
+# get a list of database, render into a string, match to expected
+#-----------------------------------------------------------------------
+$string = '';
+eval { %dbhash = $dict->dbs(); };
+if (!$@
+    && defined %dbhash
+    && do { foreach my $db (sort keys %dbhash) { $string .= "${db}:$dbhash{$db}\n"; }; 1; }
+    && $string eq $TESTDATA{'auth-dblist'})
+{
+    print "ok 9\n";
+}
+else
+{
+    print STDERR "AUTH test 9\n",
+        "expected \"", $TESTDATA{'auth-dblist'}, "\", got\n\"$string\"\n";
+    print "not ok 9\n";
+}
+
+
+exit 0;
+
+__DATA__
+==== dblist ====
+elements:Elements database 20001107
+foldoc:The Free On-line Dictionary of Computing (13 Mar 01)
+jargon:Jargon File (4.2.3, 23 NOV 2000)
+==== auth-dblist ====
+devils:THE DEVIL'S DICTIONARY ((C)1911 Released April 15 1993)
+elements:Elements database 20001107
+foldoc:The Free On-line Dictionary of Computing (13 Mar 01)
+jargon:Jargon File (4.2.3, 23 NOV 2000)
+==== END ====

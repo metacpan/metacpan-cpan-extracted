@@ -1,0 +1,197 @@
+Revision history for Perl extension RADIUS.
+
+1.56	Fri Jun  8 09:55:35 VET 2007
+
+	* Yaroslav Bogomolov reported a problem when packing VSAs with
+	  dictionaries with no VENDOR definitions (numeric VIDs). his
+	  was fixed while preserving the intended behavior of having
+	  ->vendor_num return undef on this case. Thanks Yaroslav!
+	  Added a reg test for this.
+
+
+1.55	Thu Apr 26 16:21:46 VET 2007
+	* Darrian Hale reported that $p->unset_attr('Attribute',
+	  $packet->attr('Attribute')) was b0rken due to the attribute
+	  lookup using the "escaped" value instead of the raw value
+	  returned by ->attr. Escaping was removed and a test was
+	  added
+
+	* Versions bumped to 1.55 as prior fixes were confirmed to
+          work - Release to CPAN
+
+	Sun Apr 22 16:54:03 VET 2007
+	* Fixed the VSA packer to accept a vendor-id and a vendor
+	  name. This will help if similar bugs are still lurking
+	  around. This was pointed to by Pedro as well
+
+	Sat Apr 21 14:04:35 VET 2007
+	* Fixed VSA packing bug pointed out by Pedro Cavaca. Parts of
+	  Packet.pm expected to receive a numeric vendor id, others
+	  expected the string name
+
+
+1.54	Tue Jan 30 11:13:42 VET 2007
+	* Added missing packet file to MANIFEST
+	* Fixed an innocuous warn() during make test
+
+1.53	Tue Jan 30 06:25:33 VET 2007
+	* Packets with VSAs that couldn't be decoded caused an endless
+	  loop. This has now been fixed by skipping over the b0rked
+	  attribute, thus parsing as much of the packet as possible. A
+	  warn() is issued
+	* The packet tests now fail if the decode causes a warn() -
+	  This may be helpful in the future for catching subtle
+	  errors, specially in the decoding of packets
+	* Added a new test packet for Cisco VPN 3000 - Thanks Luis
+
+1.52    Mon Jan  8 15:47:38 VET 2007
+	* Added patch by Freman (consistend ->set_vsattr and
+	  ->unset_vsattr) - Thanks Freman
+	* ->attr_slot deprecated. ->attr_slot_name and ->attr_slot_val
+	  introduced
+	* Added documentation for those methods
+	* Added tests to verify correct operation of the overwrite and
+	  slots functionality
+	* Multiple attributes (ie, multiple Proxy-State attributes)
+	  are now correctly handled
+	* Include (untested) patch from j7 (Thanks) which allows for
+	  multiple VSAs. We need some testing for this...
+
+	Tue Jan  9 15:52:06 VET 2007
+	* Added support for the packet decoding tests as well as
+	  samples of common packets in a live production environment
+	* dictionary.base now replaces dictionary.orig
+
+	Sun Jan 14 14:54:25 VET 2007
+	* Added BroadSoft VSA dictionary supplied by j7 - Fixed typo
+	within it
+	* Extracted binary packet from the sample provided by j7 and
+	added standard packet decoding test	
+
+1.51	Mon Nov 13 21:08:28 VET 2006
+	* Improve the ->dump() and ->str_dump() in ::Packet
+	* Add the ->auth_*_verify() methods and tests
+	* Dictionaries can now use the vendor name everywhere
+	* Added all the dictionaries from Ethereal for completeness
+	* Shipped dictionaries were cleaned up. IMPORTANT: Legacy,
+	  obsolete entries have been commented. Please review the
+	  dictionary files or keep the ones currently in production
+	  before installing.
+	* Added pseudo-support for ipv6addr, ifid and date types
+	* Limit the packet authenticator to 16 bytes
+	* Tagged attribue support is broken/incomplete - Need examples
+	  to properly write tests and fill in missing functionality
+	* ->password() now accepts an optional attribute to work with
+	  instead of the default 'User-Password'
+
+1.50	Mon Oct 23 15:43:20 VET 2006
+	Applied patch by Chris that adds support for tagged
+	attributes.
+	Applied patch from Flavio, adding this:
+	* [Dictionary.pm] accept a new keyword in dictionary file, namely
+	  "PACKET", that allows to define packet types
+	* [Dictionary.pm] these packet types default to the current
+	  state-of-the-art according to 
+	  http://www.iana.org/assignments/radius-types
+	* [Dictionary.pm] the packet types can be accessed via ad-hoc
+          methods
+	* [Dictionary.pm] the constructor has been extended to accept
+	  a list of dictionary files to load upon creation (instead of
+	  a single one)
+	* [Packet.pm] hardcoded mapping hashes in pack() and unpack()
+	  methods are now loaded from the dictionary
+	Bumped version to 1.50 in the .pm files.
+
+1.49	Wed Aug  9 11:57:52 VET 2006
+	- Making dictionaries case-insensitive seems to breaks old
+	code in hard to debug ways. This decision was officially
+	reversed
+	- set_password now accepts an optional attribute argmuent, to
+	tell the code where to store the encripted password. Still
+	defaults to 'User-Password'
+
+1.46	Mon Jul 31 17:28:16 VET 2006
+	- Dictionaries now can be merged with each other, as suggested
+	by Kevin Steves
+	- Accessors for dictionary entries now use lc() to match what
+	is done at parse time
+	- Dictionaries are now officially case-insensitive
+	- Various documentation improvements and updates
+	- Added code against bug in Alcatel 5620 SAM Release 3.0
+	(Improper attribute type). Possibly helpful in other cases as
+	well
+
+1.45	Thu Oct 16 10:45:02 VET 2003
+	- Added support for "octets" as requested by Alex Chen
+	- Improved / added tests. This now requires Test::More
+	- Understands the VENDOR syntax for FreeRadius
+
+1.44	Tue Jan  7 23:06:12 VET 2003
+	- By default, tuples not in the dictionary are now ignored.
+	- Added ->show_unknown_entries() to issue warn()s for each unknown
+	  tuple found in the packets.
+
+1.43	Thu Dec 20 15:36:42 GMT 2001
+	Changes by Tony Mountifield <tony@mountifield.org>
+	- added set_password method to generate client password correctly
+	- added unset_attr method to remove an attribute from a Packet
+	- added example-client.pl to demonstrate auth and acct
+	- Added User-Password (as per RFC 2138) both in the code and
+	in the dictionaries [There's some (broken) software that insists
+	in 'Password', so this is used unless 'User-Password' is present -lem]
+	- corrected syntax of the "Welcome, Larry" reply message example.
+
+1.42    Fri Jul  6 12:22:36 VET 2001
+	- Fixed sobe warnings in the packet dump code. (Thanks to Kevin Payne).
+
+1.41	Fri May 11 10:54:19 EDT 2001
+	Changes by Jim Harle <harle@usna.edu> (Thanks Jim! -lem)
+	- added 3com dictionary
+	- added example radius<->ldap server
+	- fixed examples to show correct module name
+	- made Digest::MD5 a prerequisite in Makefile.PL
+	Dictionary.pm changes
+	- allow hex and octal constants in dictionary file
+	- give more details about unknown vendors
+	Packet.pm changes
+	- use Digest::MD5 instead of MD5 (newer)
+	- distinguishes between garbled and unknown VSAs
+	- individual garbled/unknown VSAs only printed once
+	- make sure empty passwords don't cause undefined if run with -w
+	- cleaned up password length issues when running with Authen::Radius
+	- made indenting in code regular
+	Changes by lem
+	- Minor edits here and there
+	- Errors produced by Net::Radius::Packet are not print'ed but warn'ed 
+	so that they can be catched with $SIG{__WARN__}.
+	- Added examples/tutorial.pl to show how to use some basic
+	functions.
+	- Added ->str_dump to provide the output of a packet dump in
+	 a string.
+	
+1.31    Tue 20 Feb 21:05:00 VET 2001
+	- Fixed test.pl so that make test works
+	- Added mods suggested by Quan Choi regarding the packing
+	of VSAs with 3Com VSAs
+
+1.20	Tue 09 Nov 17:09:00 VET 1999
+	- Added modifications sent by Ian Smith <iansmith@ncinter.net>
+	to the VSA code. This allows VSAs to be sent and understood
+	properly by the USR/3COM Total Control family. This has not
+	been individually tested.
+
+1.10	Sat 23 Jan 19:52:00 VET 1999
+	- VSAs now can appear multiple times in a packet. This changes
+	slightly the interface of the VSAs accessors
+
+1.10	Fri 22 Jan 12:31:00 VET 1999
+	- Added 'date' attribute type. This is used by certain 
+	dictionaries
+	- Garbled packets no longer attempt to call an undef
+	code reference in unpack()
+	- Added some suport for Vendor-Specific attributes
+
+1.00  Fri 22 Aug 09:22:16 EDT 1997
+	- first released version
+
+

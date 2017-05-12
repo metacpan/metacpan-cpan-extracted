@@ -1,0 +1,50 @@
+Revision history for Net-HTTP-Methods-Patch-LogRequest
+
+0.09    2015-08-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.08    2012-11-29 (SHARYANTO)
+
+        - Adjust $Log::Log4perl::caller_depth.
+
+
+0.07    2012-08-09 (SHARYANTO)
+
+        - Rename module
+          Net::HTTP::Methods::{patch::log_request,Patch::LogRequest}.
+
+
+0.06    2012-08-03 (SHARYANTO)
+
+        - No functional changes. Adjust to Module::Patch 0.10 (v=3).
+
+
+0.05    2012-07-17 (SHARYANTO)
+
+        - No functional changes. Adjust to Module::Patch 0.07 (v=2).
+
+
+0.04    2012-07-13 (SHARYANTO)
+
+        - No functional changes. Tweak log message (add proto).
+
+
+0.03    2012-07-13 (SHARYANTO)
+
+        - No functional changes. Update Synopsis to reflect improvements in
+          Module::Patch 0.06.
+
+
+0.02    2012-07-13 (SHARYANTO)
+
+        - No functional changes. Tweak log message (add request length).
+          Update/fix POD.
+
+
+0.01    2012-07-13 (SHARYANTO)
+
+        - First release.

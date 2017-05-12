@@ -1,0 +1,27 @@
+---
+abstract: 'Login to a web page as a user and get data as a Nagios plugin'
+author:
+  - 'Ton Voon, <ton.voon@opsera.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.88'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Nagios-Plugin-WWW-Mechanize
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Nagios::Plugin: 0
+  Time::HiRes: 0
+  WWW::Mechanize: 0
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.12

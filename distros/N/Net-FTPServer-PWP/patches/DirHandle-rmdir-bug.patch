@@ -1,0 +1,26 @@
+*** DirHandle.pm        Wed Oct 24 10:40:06 2001
+--- DirHandle.pm-lem    Wed Oct 16 01:12:46 2002
+***************
+*** 305,311 ****
+    {
+      my $self = shift;
+  
+!     rmdir $self->{_pathname} or return -1;
+  
+      return 0;
+    }
+--- 305,318 ----
+    {
+      my $self = shift;
+  
+!                               # XXX - It looks like rmdir() with a
+!                               # trailing slash, makes some OSes sick
+! 
+!     unless (rmdir $self->{_pathname}) {
+!       my $path = $self->{_pathname};
+!       $path =~ s!/+$!!;
+!       length $path && rmdir $path or return -1;
+!     }
+  
+      return 0;
+    }

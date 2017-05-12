@@ -1,0 +1,45 @@
+
+$ORIGIN com.
+example	60	IN	SOA	soa-mname.example soa-rname.example (
+					12345	; Serial
+					7200	; Refresh
+					3600	; Retry
+					2592000	; Expire
+					86400 )	; Minimum TTL
+
+example.com.	60	IN	AFSDB	1 afsdb-hostname.example
+
+
+$ORIGIN example.com.
+
+	60	IN	NS	ns-nsdname
+
+
+foo	60	IN	CNAME	cname-cname
+
+bla	60	IN	DNAME	dname
+
+example.com.	60	IN	MB	mb-madname
+
+
+	60	IN	MG	mg-mgmname
+	60	IN	MINFO	minfo-rmailbx minfo-emailbx
+	60	IN	MR	mr-newname
+	60	IN	MX	10 mx-exchange
+	60	IN	NAPTR	100 10 "naptr-flags" "naptr-service" "naptr-regexp" naptr-replacement
+
+	60	IN	PTR	ptr-ptrdname
+	60	IN	PX	10 px-map822 px-mapx400
+	60	IN	RP	rp-mbox rp-txtdname
+	60	IN	RT	10 rt-intermediate
+	60	IN	SRV	1 2 3 srv-target
+example.com.	60	IN	SIG	AAAA  5  3  3600  20040101000010 (
+			20030101123000 12345  bla
+			Ym9ndXMgc2lnIGRhdGEK )
+	60	IN	RRSIG	AAAA  5  3  3600  20040101000010 (
+			20030101123000 12345  bLa
+			Ym9ndXMgc2lnIGRhdGEK )
+
+	60	IN	NSEC	AAAA  A AAAA LOC  ; This is uggly.. the first AAAA will need to be expanded
+
+

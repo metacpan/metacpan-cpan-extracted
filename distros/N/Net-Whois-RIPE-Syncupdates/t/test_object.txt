@@ -1,0 +1,27 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+person:       Peter Banik
+address:      Singel 258
+address:      1016 AB Amsterdam
+address:      The Netherlands
+phone:        +31 20 535 4336
+nic-hdl:      PB6-TEST
+notify:       peter@ripe.net
+source:       TEST
+remarks:      Added mnt-by
+mnt-by:       PB7-TEST-MNT
+remarks:      **************************
+remarks:      Make love not war
+remarks:      **************************
+changed:      peter@ripe.net 20020724
+changed:      peter@ripe.net 20020724
+changed:      peter@ripe.net 20020807
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.1 (GNU/Linux)
+
+iD8DBQE+et8V8boihhQ0vQYRAorRAJwPAeBoZc8P9Hpz7G8kEMZgHYGw5gCeNP+A
+lEfwpQZZ0Tf1fksYu5Lsn5s=
+=MLHB
+-----END PGP SIGNATURE-----
+

@@ -1,0 +1,13 @@
+Revision history for Perl extension Net::Stomp::Receipt.
+
+0.36  Wed Jun 17 18:42:24 CLST 2009
+    - fixed unnecessary perl 5.10 requisite.
+
+0.35  Sun Jan  4 23:39:43 CLST 2009
+    - typo in POD.
+      Solves bug #42111 reported by JLAVALLEE.
+
+0.34  Fri Jul  4 11:55:54 2008
+	- original version; created by h2xs 1.23 with options
+		-X -n Net::Stomp::Receipt
+

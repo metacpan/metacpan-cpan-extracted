@@ -1,0 +1,46 @@
+Net/Amazon/RemoteCart version 0.02
+==================================
+
+RemoteCart is an interface to Amazon Web Services Remote Cart API,
+built on Mike Schilli's Net::Amazon package.
+
+RemoteCart is an attempt at a consistent and easy to use interface to
+the Amazon remote cart API. I've tried to make it work as closely as 
+is practical to how someone (Ok, by someone I mean ME) would expect a 
+shopping cart to work. It has methods to add, remove, fetch items, 
+and modify their quantities based on the product's ASIN. 
+
+See the POD documentation for more info.
+
+INSTALLATION
+
+This module requires the Net::Amazon package, which in turn 
+requires Log::Log4perl, LWP::UserAgent, and XML::Simple 2.x
+
+Once all dependencies have been resolved, "Net::Amazon::RemoteCart" installs 
+with the typical sequence
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+LIVE TESTING 
+    
+(This works the same as for the main Net::Amazon package)
+Results returned by Amazon can be incomplete or simply wrong at times,
+due to their "best effort" design of the service. This is why the test
+suite that comes with this module has been changed to perform its test
+cases against canned data. If you want to perform the tests against the
+live Amazon servers instead, just set the environment variable
+
+    NET_AMAZON_LIVE_TESTS=1
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 David Emery
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

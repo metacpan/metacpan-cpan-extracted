@@ -1,0 +1,23 @@
+# NAME
+
+Neovim::RPC - RPC client for Neovim
+
+# VERSION
+
+version 0.2.0
+
+# SEE ALSO
+
+- [http://neovim.io](http://neovim.io) - Neovim site
+- [http://techblog.babyl.ca/entry/neovim-way-to-go](http://techblog.babyl.ca/entry/neovim-way-to-go) - blog entry introducing Neovim-RPC to the world.
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

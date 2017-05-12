@@ -1,0 +1,6 @@
+#!/bin/sh
+
+echo "CRITICAL - Error"
+
+exit 2
+

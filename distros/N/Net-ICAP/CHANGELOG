@@ -1,0 +1,30 @@
+CHANGELOG
+
+v0.04 (2017/04/26)
+==================
+--Ported to new Class::EHierarchy API
+--Ported to new Paranoid API
+--Fixed encapsulation offset bug (andreas.a.lamprecht@atos.net)
+--Fixed mangling of binary date (mark-cpan@carnildo.com)
+
+v0.03 (2014/01/11)
+==================
+--Minor improvements to cookie_monster.pl sample server
+--Minor fixes to comply with RFC Errata
+--Added status code 418/description
+--No longer produces parsing error for missing Encapsulated header
+
+v0.02 (2014/01/11)
+==================
+--Added new dependencies (URI & HTTP::Date)
+--Added default port constant
+--Added automatic Date header generation if it's missing
+--Added URI parsing convenience functions for Request objects
+--Added automatic Host header generation for Requests
+--Added Server implementation
+--Added sample script using the Server module
+--Updated tests to account for Date headers and new modules
+
+v0.01 (2014/01/09)
+==================
+--Initial revision

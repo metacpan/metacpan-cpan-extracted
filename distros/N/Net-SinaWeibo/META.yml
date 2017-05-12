@@ -1,0 +1,23 @@
+---
+abstract: 'A simple and lightweight OAuth api for SinaWeibo'
+author:
+  - 'Pan Fan(nightsailer) <nightsailer@gmail.com>'
+build_requires:
+  Test::More: 0.9
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102345, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-SinaWeibo
+requires:
+  HTTP::Request::Common: 0
+  JSON: 0
+  OAuth::Lite: 1.27
+resources:
+  bugtracker: http://github.com/nightsailer/net-sinaweibo/issues
+  repository: git://github.com/nightsailer/net-sinaweibo.git
+version: 0.003

@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Net/RabbitMQ/Management/API.pm
+lib/Net/RabbitMQ/Management/API/Result.pm
+t/api.t
+t/basic.t
+t/lib/Net/RabbitMQ/Test.pm
+t/lib/Net/RabbitMQ/Test/UA.pm
+t/live/api.t
+t/live/basic.t
+t/release-pod-syntax.t

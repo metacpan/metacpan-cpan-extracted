@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::FreeDB2::Site.
+
+0.01  Wed Sep 25 17:48:08 2002
+	- original version; created by h2xs 1.20 with options
+		-X Net::FreeDB2::Site
+

@@ -1,0 +1,11 @@
+{
+    "enroll_policy": "enroll",
+    "greeting": "",
+    "groups_allowed": [],
+    "integration_key": "DIRWIH0ZZPV4G88B37VQ",
+    "name": "Integration for the web server",
+    "notes": "",
+    "secret_key": "QO4ZLqQVRIOZYkHfdPDORfcNf8LeXIbCWwHazY7o",
+    "type": "websdk",
+    "visual_style": "default"
+}

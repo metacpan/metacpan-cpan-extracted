@@ -1,0 +1,7 @@
+^pm_to_blib$
+^Makefile(.old)?$
+~$
+^blib/
+^tmp/
+\bCVS\b
+^Net-Spooler-\d+\.\d+\.tar\.gz$

@@ -1,0 +1,79 @@
+{
+   "abstract" : "Perl bindings for Ge.tt API",
+   "author" : [
+      "Mark Allen <mrallen1@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-API-Gett",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Array::Iterator" : "0",
+            "File::Slurp" : "0",
+            "JSON" : "0",
+            "LWP" : "0",
+            "LWP::Protocol::https" : "0",
+            "Moo" : "0.009013",
+            "MooX::Types::MooseLike" : "0.02",
+            "Sub::Quote" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Net::API::Gett" : {
+         "file" : "lib/Net/API/Gett.pm",
+         "version" : "1.06"
+      },
+      "Net::API::Gett::File" : {
+         "file" : "lib/Net/API/Gett/File.pm",
+         "version" : "1.06"
+      },
+      "Net::API::Gett::Request" : {
+         "file" : "lib/Net/API/Gett/Request.pm",
+         "version" : "1.06"
+      },
+      "Net::API::Gett::Share" : {
+         "file" : "lib/Net/API/Gett/Share.pm",
+         "version" : "1.06"
+      },
+      "Net::API::Gett::User" : {
+         "file" : "lib/Net/API/Gett/User.pm",
+         "version" : "1.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/mrallen1/Net-API-Gett.git"
+      },
+      "x_KeyWords" : [
+         "file sharing",
+         "gett",
+         "REST API client"
+      ]
+   },
+   "version" : "1.06"
+}

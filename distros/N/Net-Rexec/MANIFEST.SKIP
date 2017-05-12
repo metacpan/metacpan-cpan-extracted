@@ -1,0 +1,7 @@
+^[mM]akefile$
+\.bak$
+\.o$
+\.old$
+^CVS$
+^RCS$
+~$

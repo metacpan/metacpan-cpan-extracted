@@ -1,0 +1,14 @@
+reenable logging in some sane manner
+
+get next page as needed in iterator
+
+prep for CPAN (prereqs)
+
+add docs
+
+
+LATER:
+
+create smart cross links - so that you can create a payment for a particular invoice directly from that invoice. Also get all payments for a client directly off the client object.
+
+create auto test suite by adding in pl files to test_data and having the test script be smart about which ones to run.

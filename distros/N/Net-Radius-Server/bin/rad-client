@@ -1,0 +1,409 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+our $VERSION = do { sprintf "%0.3f", 1+(q$Revision: 88 $ =~ /\d+/g)[0]/1000};
+
+use IO::File;
+use IO::Prompt;
+use IO::Select;
+use Pod::Usage;
+use Getopt::Long;
+use File::Basename;
+use IO::Socket::INET;
+use Net::Radius::Packet;
+use Net::Radius::Dictionary;
+use Digest::MD5 qw/md5_hex/;
+
+my %opt;
+GetOptions(\%opt, qw/
+	   attempts=i
+	   prompt:s@
+	   timeout=i
+	   secret=s
+	   server=s
+	   dictionary=s@
+	   port=i
+	   code=s
+	   authenticator=s
+	   identifier=i
+	   attributes=s
+	   nowait
+	   dump-request
+	   quiet
+	   help
+	   /);
+
+pod2usage(verbose => 2, exitval => 0) 
+    if $opt{help};
+
+$opt{$_} ||= 3 for qw/attempts timeout/;
+$opt{port} ||= 1812;
+$opt{code} ||= 'Access-Request';
+
+# These Packet Codes require specific encoding methods...
+
+our @pass_codes = qw/Access-Request/;
+
+# XXX - Not secure! Use is ok for testing only. A proper authenticator
+# needs to be much more stronger. It is ok for what we intend to use it
+# anyway.
+
+$opt{authenticator} ||= substr(md5_hex($$ . rand(4096)), 0, 16);
+$opt{identifier} = int rand(256) unless defined $opt{identifier};
+
+pod2usage(verbose => 1, exitval => 1,
+	  message => 'One or more mandatory options are missing')
+    unless $opt{secret} and $opt{server} and $opt{dictionary} and 
+    @{$opt{dictionary}};
+
+$|++;				# Send normal messages quickly...
+
+my $d = new Net::Radius::Dictionary;
+
+foreach (@{$opt{dictionary}})
+{
+    die "Dictionary $_ unreadable: ", ($!||'Check permissions'), "\n" 
+	unless -r $_;
+    $d->readfile($_);
+}
+
+# Build the RADIUS packet we will be sending, using the dictionary we
+# just loaded
+
+my $p = new Net::Radius::Packet $d;
+$p->set_code($opt{code});
+$p->set_identifier($opt{identifier});
+$p->set_authenticator($opt{authenticator});
+
+# Read in any attribute file.
+
+my @attr = ();
+
+# Read in any attribute file requested
+if (defined $opt{attributes})
+{
+    my $fh;
+    if ($opt{attributes} eq '-')
+    {
+	$fh = \*STDIN;
+    }
+    else
+    {
+	$fh = new IO::File $opt{attributes}, "r";
+	die "Failed to open $opt{attributes}: $!\n" unless $fh;
+    }
+    
+    while (my $line = $fh->getline)
+    {
+	chomp $line;
+	$line =~ s/#.*$//;
+	$line =~ s/^\s+//;
+	next if $line =~ m/^\s*$/;
+	push @attr, $line;
+    }
+}
+
+push @attr, @ARGV;		# Add in any command-line attributes
+
+# Add attributes and VSAs to the current packet
+for my $s (@attr)
+{
+    my ($a, $val) = split(m/=/, $s, 2);
+    my $vendor = undef;
+    if ($a =~ m/\./)
+    {
+	($vendor, $a) = split(m/\./, $a, 2);
+    }
+    if ($vendor)
+    {
+	$p->set_vsattr($vendor, $a => $val);
+    }
+    else
+    {
+	$p->set_attr($a => $val);
+    }
+}
+
+# Special processing for the password attribute - Attribute number 2
+my $pattr = $d->attr_name(2);
+
+for my $a (@{$opt{prompt}})
+{
+    my $v = prompt(($a||$pattr) . ": ", -tty, -e => '*');
+    $p->set_password($v, $opt{secret}, $a||$pattr);
+}
+
+if (grep { $p->code eq $_ } @pass_codes)
+{
+    unless (grep { $_ eq $pattr || $_ eq ''} @{$opt{prompt}})
+    {
+	if (defined $pattr and grep {$_ eq $pattr} $p->attributes)
+	{
+	    print basename($0), 
+	    ": Encoding attribute 2 ($pattr)\n" unless $opt{quiet};
+	    $p->set_password($p->attr($pattr), $opt{secret}, $pattr);
+	}
+	else
+	{
+	    warn basename($0), 
+	    ": Dictionary does not define attribute 2 or not specified\n";
+	}
+    }
+}
+
+# Dump the request if asked to do so
+if ($opt{'dump-request'})
+{
+    my $dump = $p->str_dump;
+    $dump =~ s/(?m)^/| /g;
+    print basename($0), ": About to send this packet\n$dump";
+}
+
+# Send the request we just crafted
+my $data = $p->pack;
+
+unless (grep { $p->code eq $_ } @pass_codes)
+{
+    $data = auth_resp($data, $opt{secret}, 1);
+}
+
+# We'll need a socket to send our packet, so let's take care of it
+my $sock = IO::Socket::INET->new
+    (
+     PeerAddr	=> $opt{server},
+     PeerPort	=> $opt{port},
+     Proto	=> 'udp',
+     );
+
+die basename($0) . ": Cannot create socket: $!\n" unless $sock;
+
+# Send the packet
+if ($opt{nowait})
+{
+    print basename($0) . ": Sending RADIUS packet\n" unless $opt{quiet};
+    die basename($0) . ": Failed to send packet: $!\n"
+	unless $sock->send($data);
+}
+else
+{
+    # Build an IO::Select to take care of any responses
+    my $select = new IO::Select $sock
+	or die basename($0) . ": Failed to create IO::Select object\n";
+    
+    my $tries = 0;
+    my $reply = '';
+    while ($tries < $opt{attempts})
+    {
+	print basename($0) . ": Sending RADIUS packet...\n" unless $opt{quiet};
+	if ($sock->send($data))
+	{
+	    print basename($0) . ": Waiting for response...\n" 
+		unless $opt{quiet};
+	    if ($select->can_read($opt{timeout}))
+	    {
+		warn basename($0) . ": Failed to recv(): $!\n"
+		    unless $sock->recv($reply, 8192);
+		last;
+	    }
+	    else
+	    {
+		warn basename($0) . ": Timeout waiting for response\n";
+		sleep 1;
+	    }
+	}
+	else
+	{
+	    warn basename($0) . ": Failed to send packet: $!\n";
+	    sleep 1;
+	}
+	++ $tries;
+    }
+
+    if ($reply)
+    {
+	my $r;
+	
+	warn basename($0) . ": Failed to decode reply\n"
+	    unless eval { $r = new Net::Radius::Packet $d, $reply };
+	warn basename($0) . ": Decoding errors: $@\n" 
+	    if $@;
+
+	if ($r and ref($r))
+	{
+	    my $dump = $r->str_dump;
+	    $dump =~ s/(?m)^/@ /g;
+	    print basename($0), ": Reply received\n$dump";
+	}
+	else
+	{
+	    print basename($0) . ": No response to dump\n";
+	}
+    }
+}
+
+__END__
+
+=head1 NAME
+
+rad-client - A command line RADIUS client
+
+=head1 SYNOPSIS
+
+    rad-client --secret secret --server server --dictionary dictfile ... 
+    [--attempts n] [--timeout t] [--port port] [--code packet-code] 
+    [--authenticator packet-authenticator] [--identifier id] [--prompt]
+    [--attributes file] [--nowait] [--dump-request] [--quiet] [--help]
+    attributes...
+
+=head1 DESCRIPTION
+
+C<rad-client> is a command-line RADIUS client that is expected to be
+flexible enough so as to allow for testing of servers and automating
+monitoring scripts. This script ships as part of
+Net::Radius::Server(3).
+
+Basically, this script will craft a RADIUS packet, send it to the
+specified server and wait for a response (unless B<--nowait> is
+specified, see below).
+
+The following options are supported (Options can be shortened - See
+Getopt::Long(3)):
+
+=over
+
+=item B<--attempts n>
+
+Specify the number of attempts to send the RADIUS packet to the
+server. This defaults to the magical number, 3. Retransmissions are
+reported to C<STDERR> unless B<--quiet> is specified.
+
+=item B<--timeout t>
+
+How much to wait for an answer before retrying, in seconds. Defaults
+to 3 seconds. Timeouts are reported to C<STDERR> unless B<--quiet> is
+specified.
+
+
+=item B<--nowait>
+
+Causes C<rad-client> to forego waiting for the response. This may be
+useful for some test scenarios. No retransmissions occur when this
+option is specified, so only one packet is sent.
+
+=item B<--server server>
+
+Surprisingly, the server address to which to send the RADIUS packets.
+
+=item B<--port port>
+
+Correct. This is the server port where RADIUS packets should be
+sent. Defaults to 1812.
+
+=item B<--secret secret>
+
+The RADIUS shared secret used for packet authentication.
+
+=item B<--prompt [attribute]>
+
+Prompt the user and add a password-encoded RADIUS attribute to the
+request. By default, this works in the RADIUS attribute 2.
+
+=item B<--dictionary dictfile...>
+
+Specifies one or more dictionary files to use for crafting the RADIUS
+packet and for decoding the eventual response. Multiple files can be
+specified, causing the dictionaries to be loaded in order.
+
+=item B<--code code>
+
+The RADIUS packet code. Defaults to 'Access-Request'.
+
+=item B<--authenticator auth>
+
+Specifies the RADIUS packet authenticator. The authenticator defaults
+to a semi-random string composed of printable characters, which seems
+nice in the packet dumps.
+
+Note that a great deal of the (limited) security of RADIUS depends on
+the use of strong authenticator strings, which should be random and
+unrelated to the request they're protecting. The implementation used
+in this script is B<NOT> secure, as there is little randomness.
+
+=item B<--identifier id>
+
+Specifies the RADIUS packet identifier. This defaults to a random
+number between 1 and 255.
+
+=item B<--attributes file>
+
+Parse attributes from the given file, where they must be specified one
+per line. Comments following Perl syntax are allowed in said
+file. Additional attributes can be specified in the command line.
+
+The special file "-" means, as expected, to read C<STDIN>.
+
+=item B<--dump-request>
+
+Causes the packet that C<rad-client> crafted to be dumped to C<STDOUT>
+before sending it.
+
+=item B<--quiet>
+
+Supress warnings and indications.
+
+=item B<--help>
+
+Shows this documentation, then exits.
+
+=back
+
+RADIUS attributes are specified either in the command line or in the
+file specified with the B<--attributes> option, as follows:
+
+  [vendor.]attribute=value
+
+Where B<vendor> and B<attribute> are the labels specified in the
+dictionary.
+
+If the packet code is 'Access-Request' (or another packet code
+requiring a password attribute), the special attributes 'Password' and
+'User-Password' (with no vendor), will be encoded with the shared
+secret before sending the packet, as expected.
+
+Any received packets will be dumped to C<STDOUT> using
+C<Net::Radius::Packet-E<gt>dump>.
+
+=head1 HISTORY
+
+    $Log$
+    Revision 1.3  2006/11/15 00:08:46  lem
+    rad-client can now prompt for attribute values...
+
+    Revision 1.2  2006/11/09 16:24:05  lem
+
+    Only encode User-Password on packet codes other than Access-Request
+
+    Revision 1.1  2006/11/09 10:28:47  lem
+
+    Added rad-client to the distribution
+
+
+=head1 LICENSE AND WARRANTY
+
+This code and all accompanying software comes with NO WARRANTY. You
+use it at your own risk.
+
+This code and all accompanying software can be used freely under the
+same terms as Perl version 5.8.6 itself.
+
+=head1 AUTHOR
+
+Luis E. Muñoz E<lt>luismunoz@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+perl(1), Getopt::Long(3), Net::Radius::Server(3).
+
+=cut

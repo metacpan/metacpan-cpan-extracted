@@ -1,0 +1,29 @@
+---
+name: NetSDS-SMPP
+version: 1.204
+author:
+  - 'Net.Style Development Team <info@netstyle.com.ua>'
+abstract: NetSDS VAS platform SMPP subsystem
+license: gpl
+resources:
+  license: http://www.opensource.org/licenses/gpl-license.php
+requires:
+  Net::SMPP: 1.10
+  NetSDS: 1.000
+  NetSDS::Queue: 0.030
+  NetSDS::Util::Convert: 1.000
+  perl: 5.008
+  version: 0.50
+build_requires:
+  Module::Build: 0.2805
+  Test::More: 0.62
+  Test::Pod: 1.26
+  Test::Pod::Coverage: 1.08
+provides:
+  NetSDS::App::SMPP:
+    file: lib/NetSDS/App/SMPP.pm
+    version: 1.200
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

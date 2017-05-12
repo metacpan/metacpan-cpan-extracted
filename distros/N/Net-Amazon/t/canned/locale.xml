@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<ItemLookupResponse xmlns="http://webservices.amazon.com/AWSECommerceService/2011-08-01">
+  <Items>
+    <Item>
+      <ASIN>3827313783</ASIN>
+      <SalesRank>797694</SalesRank>
+      <ItemAttributes>
+        <Author>Michael Schilli</Author>
+        <Binding>Gebundene Ausgabe</Binding>
+        <EAN>9783827313782</EAN>
+        <EANList>
+          <EANListElement>9783827313782</EANListElement>
+        </EANList>
+        <Edition>4. Aufl.</Edition>
+        <ISBN>3827313783</ISBN>
+        <Label>Addison-Wesley</Label>
+        <Languages>
+          <Language>
+            <Name>Deutsch</Name>
+            <Type>Unbekannt</Type>
+          </Language>
+          <Language>
+            <Name>Deutsch</Name>
+            <Type>Original</Type>
+          </Language>
+          <Language>
+            <Name>Deutsch</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>3495</Amount>
+          <CurrencyCode>EUR</CurrencyCode>
+          <FormattedPrice>EUR 34,95</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Addison-Wesley</Manufacturer>
+        <NumberOfPages>488</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>1998-06-15</PublicationDate>
+        <Publisher>Addison-Wesley</Publisher>
+        <SKU>MAK_MNT_9783827313782</SKU>
+        <Studio>Addison-Wesley</Studio>
+        <Title>Go To Perl 5 .</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestUsedPrice>
+          <Amount>239</Amount>
+          <CurrencyCode>EUR</CurrencyCode>
+          <FormattedPrice>EUR 2,39</FormattedPrice>
+        </LowestUsedPrice>
+        <LowestCollectiblePrice>
+          <Amount>2999</Amount>
+          <CurrencyCode>EUR</CurrencyCode>
+          <FormattedPrice>EUR 29,99</FormattedPrice>
+        </LowestCollectiblePrice>
+        <TotalNew>0</TotalNew>
+        <TotalUsed>10</TotalUsed>
+        <TotalCollectible>1</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+        <MoreOffersUrl>0</MoreOffersUrl>
+      </Offers>
+    </Item>
+  </Items>
+</ItemLookupResponse>

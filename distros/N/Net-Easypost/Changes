@@ -1,0 +1,60 @@
+Change history for Net-Easypost
+
+0.18        2016-01-05
+            - Add JSON as dependency in dist.ini
+0.17        2016-01-05
+            - Remove Mojo::UserAgent in favor of HTTP::Tiny
+            
+0.16        2015-12-29
+            - Minor changes, mostly formatting and build configuration
+            - Now have an explicit cpanfile and Makefile.PL in the release in case some don't want to use Dist::Zilla
+0.15        2015-03-18
+
+0.14        2015-03-04
+
+0.13        2014-05-27
+
+0.12        2014-05-22
+
+0.11        2014-05-21
+
+0.09        2013-07-31
+            Don't be so clever when passed a hashref in get_rates
+            (Fixes RT#87493)
+            Fix failing tests in t/01-basic.t
+            Add test for RT#87493
+            Add CPANfile to dist.ini
+
+0.08        2013-05-19
+            Seriously. Fix rate number test.
+
+0.07        2013-05-16
+            Check carriers against a regex
+            For reals, make IO::Socket::SSL 
+                a dependency
+
+0.06        2013-05-15
+            Make IO::Socket::SSL a prereq
+            Check rate against regex
+
+0.05        2013-05-14
+            Fix post request method due to 
+                Mojo deprecation warnings
+
+0.04        2013-05-13
+            Changed abstract
+            Fixed dependency (Thanks Graham Knop)
+            Fixed t/01-basic.t
+
+0.03        2013-01-19
+            Update URLs in POD
+            Removed Data::Printer
+            Return actual endpoint error codes 
+            instead of inspecting JSON.
+
+0.02        2013-01-13
+            New endpoint
+            Updated test suite
+
+0.01        2012-12-04
+            Initial release

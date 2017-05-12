@@ -1,0 +1,131 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Number::Phone::FR - Informations sur les numéros de téléphone en France (+33)
+
+=head1 SYNOPSIS
+
+Utilisation de C<Number::Phone::FR> via L<Number::Phone>E<nbsp>:
+
+    use Number::Phone;
+    my $num = Number::Phone->new('+33148901515');
+
+Sélection d'une implémentation particulière pour ce packageE<nbsp>:
+
+    use Number::Phone::FR 'Full';
+    my $num = Number::Phone->new('+33148901515');
+
+    use Number::Phone::FR 'Simple';
+    my $num = Number::Phone->new('+33148901515');
+
+Uni-lignesE<nbsp>:
+
+    perl -MNumber::Phone "-Esay Number::Phone->new(q!+33148901515!)->format"
+    perl -MNumber::Phone::FR=Full "-Esay Number::Phone->new(q!+33148901515!)->operator"
+    perl -MNumber::Phone::FR=Full "-Esay Number::Phone::FR->new(q!3949!)->operator"
+
+=head1 DESCRIPTION
+
+Ce module est un greffon pour L<Number::Phone> qui founit les informations sur
+le plan de numérotation de téléphone en France tel que publié par l'ARCEP
+(Autorité de Régulation des Communications électroniques et des Postes).
+
+Deux implémentations différentes sont fourniesE<nbsp>:
+
+=over 4
+
+=item *
+
+C<Simple>E<nbsp>: basique, mais efficace. Pas de vérification des blocs de
+numéros, pas d'information sur l'opérateur.
+
+=item *
+
+C<Full>E<nbsp>: la plus complète. Vérification complète des numéros
+par rapport au bloc auquel ils appartiennent, selon les données fournies par
+l'ARCEP embarquées dans cette distribution. Le nom de l'opérateur (méthode C<operator>) est retourné. Notez que seules les informations statiques sont connues
+et que en raison de la portabilité des numéros, la fiabilité est relative.
+
+=back
+
+=head1 SOURCES DE DONNÉES
+
+L<http://www.arcep.fr/index.php?id=8992>
+
+Il semble que l'ARCEP publie des mises à jour environ toutes les deux semaines.
+
+Les outils pour reconstruire cette distribution avec les données les plus à jour
+sont inclus dans la distributionE<nbsp>:
+
+    perl Build.PL
+    ./Build update
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build dist
+
+=head1 VERSIONS
+
+La distribution C<Number-Phone-FR> est versionnée ainsiE<nbsp>:
+
+=over 4
+
+=item *
+
+C<L<Number::Phone::FR>>E<nbsp>: C<m.nn> (I<majeur> C<.> I<mineur>)
+
+=item *
+
+C<L<Number::Phone::FR::Full>>E<nbsp>: C<m.nnaajjj> (I<majeur> C<.> I<mineur>
+I<année> I<jour-dans-l'année>)
+
+=back
+
+C<m.nn> est la version du code. Commune pour les deux packages.
+
+C<aajjj> est la version des données de l'ARCEP (fichier F<WOPNUM.XLS>).
+
+En conséquence pour obtenir la dernière version du CPAN nécessaire à la
+réalisation d'une tâche, requêtez le CPAN avec l'un ou l'autre module selon
+que vous utilisez ou pas les données étendues de C<Number::Phone::FR::Full>.
+
+=head1 VOIR AUSSI
+
+=over 4
+
+=item *
+
+L<http://fr.wikipedia.org/wiki/Plan_de_num%C3%A9rotation_t%C3%A9l%C3%A9phonique_en_France>
+
+=item *
+
+L<Number::Phone>
+
+=back
+
+=head1 SUPPORT
+
+Signalez les bogues ou vos demandes d'évolution en français ou en anglais sur ce
+formulaireE<nbsp>:
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Number-Phone-FR>
+
+Le dernier source disponible (travail en cours) est publié sur GitHubE<nbsp>:
+L<https://github.com/dolmen/p5-Number-Phone-FR>
+
+=head1 AUTEUR
+
+Olivier MenguE<eacute>, C<<<dolmen@cpan.org>>>
+
+=head1 COPYRIGHT ET LICENCE
+
+Copyright E<copy> 2010-2011 Olivier MenguE<eacute>.
+
+Cette bibliothèque est un logiciel libreE<nbsp>; vous pouvez la redistribuer
+et/ou la modifier selon les mêmes termes que Perl 5.
+
+=cut
+

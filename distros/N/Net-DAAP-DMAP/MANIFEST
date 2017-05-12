@@ -1,0 +1,14 @@
+Makefile.PL
+META.yml
+Changes
+lib/Net/DAAP/DMAP.pm
+MANIFEST
+MANIFEST.SKIP
+t/basic.t
+t/content-codes.dmap
+t/databases.dmap
+t/databases_35_containers.dmap
+t/databases_35_items.dmap
+t/login.dmap
+t/server-info.dmap
+t/update.dmap

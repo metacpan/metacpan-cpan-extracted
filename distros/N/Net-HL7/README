@@ -1,0 +1,135 @@
+###############################################################################
+#
+# HL7 API: README
+#
+###############################################################################
+
+Contents
+--------
+
+1.0 Introduction
+2.0 Usage
+2.1 Creating messages
+2.2 Sending/receiving
+2.3 Other modules and this API
+
+
+1.0 Introduction
+----------------
+
+This is the Perl HL7 API. It is a very simple, but rather flexible API
+for use in Perl applications (or even in C applications, see for
+example http://zwebit.sourceforge.net/). The API is not fixed yet, but
+has been used in production environments and has evolved in the
+process, into a useful level of abstraction.
+
+The focus of this API is on providing functionality for the
+composition, manipulation and decomposition of HL7 messages, not
+providing hundreds of prefab HL7 messages. In HL7 terms: this API
+focuses on the HL7 syntax, not the semantics. This makes the API
+support all versions that use the classic HL7 syntax, that is,
+versions untill 3.x. This API does not do XML!
+
+Please refer to the POD documentation for detailed examples and the
+full API documentation, or consult the generated manual pages on
+http://hl7toolkit.sourceforge.net/. The POD man pages will be auto
+generated after installation of the package. Use 'man
+Net::HL7::Message' for instance, to get the document on the Message
+class.
+
+You might also be interested in the hl7d and hl7qd packages, found on
+the same site. The hl7d is a a pluggable, forking HL7 server that can
+be used to dispatch HL7 messages to for instance database tables,
+files, etc. The hl7qd is a queueing daemon that manages HL7 message
+queues. This daemon can accept messages on the filesystem, from a
+database, etc.
+
+
+2.0 Usage
+---------
+
+2.1 Creating messages
+---------------------
+
+The main focus of the HL7 API is on the Net::HL7::Message class,
+assuming this class is the one you will most likely use. You can
+create HL7 messages in roughly two ways:
+
+1. creating an empty message with the Net::HL7::Message class, adding
+   segements as you go;
+2. creating a message based on a string representation of a HL7 
+   message.
+
+An basic example of the first way is:
+
+	use Net::HL7::Message;
+	use Net::HL7::Segment;
+	use Net::HL7::Segments::MSH;
+
+	my $msg = new Net::HL7::Message();
+
+and set some segments and fields like:
+
+	my $msh = new Net::HL7::Segments::MSH();
+	my $pid = new Net::HL7::Segment("PID");
+
+	$pid->setField(3, "1231313");
+	
+	$msg->addSegment($msh);
+	$msg->addSegment($pid);
+
+The second method goes like:
+
+	use Net::HL7::Message;
+
+	my $str = "MSH|^~\\&|||MyApp||20040202145837|||20040202145837.66528|P|2.4|||AL|NE\r";
+	$str .= "QRD|20040202|fld3|||||fld2|fld1";
+
+	my $msg = new Net::HL7::Message($str);
+
+To check whether this yields the desired message, do:
+
+	print $msg->toString(1);
+
+
+2.2 Sending/receiving
+---------------------
+
+When a message has been created, the obvious thing to do with it would
+be to send it off to some HL7 server, and handle the result.  This can
+be achieved with the Net::HL7::Connection class. A simple example is
+this:
+
+	use Net::HL7::Connection;
+
+	... create a message
+
+	my $conn = new Net::HL7::Connection("hl7server.somedomain.org", 12011);
+
+	$conn || die "Couldn't connect";
+
+	my $resp = $conn->send($msg);
+
+	$resp || die "No response";
+
+	my $msh = $resp->getSegmentByIndex(0);
+
+	... etc
+
+but consult the man page of the Net::HL7::Connection (and even the
+Net::HL7::Daemon) for details.
+
+
+2.3 Other modules and this API
+------------------------------
+
+When building some HL7 Perl module, you might want to require a
+specific version of this package. You can simply say:
+
+	'PREREQ_PM' => { 'Net::HL7' => 0.66 }
+
+in the Makefile.PL of your Perl thingy that requires this version.
+
+For more detailed usage of every class, please consult the API
+documentation on http://hl7toolkit.sourceforge.net/ or generate the
+POD's yourself (man perlpod).

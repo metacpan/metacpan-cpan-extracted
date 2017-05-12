@@ -1,0 +1,24 @@
+benchmark/simple.pl
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/ReadmeFromPod.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Net/DNS/Lite.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+MYMETA.json
+MYMETA.yml
+README
+t/00base.t
+t/01no_response.t
+t/02inet_aton.t
+t/03cache.t
+t/04resolv_conf.t
+t/05mx.t

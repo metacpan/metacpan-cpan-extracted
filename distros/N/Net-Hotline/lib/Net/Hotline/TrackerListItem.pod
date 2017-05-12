@@ -1,0 +1,73 @@
+=head1 NAME
+
+Net::Hotline::TrackerListItem - File object used internally by Net::Hotline::Client
+
+=head1 SYNOPSIS
+
+    use Net::Hotline::TrackerListItem;
+
+    $file = new Net::Hotline::TrackerListItem;
+
+    $file->address("hotline.foo.com");
+    $file->port(5500);
+    ...
+
+=head1 DESCRIPTION
+
+Net::Hotline::TrackerListItem is a simple class for storing and retrieving tracked
+server information,  You should never have to create your own
+Net::Hotline::TrackerListItem objects when using Net::Hotline::Client.  Getting and (to
+a lesser extent) setting attributes is all that should be necessary.
+
+=head1 CONSTRUCTION
+
+=over 4
+
+=item new ADDRESS, PORT, NUM_USERS, NAME, DESCRIPTION
+
+With exactly five arguments, creates a new Net::Hotline::TrackerListItem
+object with all attributes set.  With no arguments, creates a new
+Net::Hotline::TrackerListItem object with all attributes set to undef.
+
+=back
+
+=head1 METHODS
+
+All the Net::Hotline::TrackerListItem methods are simple attribute get/set routines.
+If given an argument, they set an attribute.  In all cases, they
+return the current value of the attribute.
+
+=over 4
+
+=item address TEXT
+
+The IP address of the server.
+
+=item port NUM
+
+The port the server is running on.
+
+=item num_users NUM
+
+The (claimed) number of users connected to the server.
+
+=item name TEXT
+
+The server name, as set by the server administrator (i.e. "Ambrosia Software"
+or "Myth Central")
+
+=item description TEXT
+
+The server description, as set by the server administrator.
+
+=back
+
+=head1 AUTHOR
+
+John C. Siracusa (siracusa@mindspring.com)
+
+=head1 COPYRIGHT
+
+Copyright(c) 1999 by John Siracusa.  All rights reserved.  This program is
+free software; you can redistribute it and/or modify it under the same terms
+as Perl itself.

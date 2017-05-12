@@ -1,0 +1,162 @@
+=encoding utf8
+
+=head1 NAME
+
+Net::Domain::TMCH - ICANN TradeMark Clearing House
+
+=head1 INHERITANCE
+
+ Net::Domain::TMCH
+   is a Exporter
+
+=head1 SYNOPSIS
+
+  my $tmch  = Net::Domain::TMCH->new(%options);
+
+  my $smd   = $tmch->smd($filename);
+
+=head1 DESCRIPTION
+
+Draft RFC L<http://tools.ietf.org/html/draft-lozano-tmch-func-08>
+specifies a way for TLD (top-level domain registries) to exchange
+information about trademark rights, brand registrations between
+domain-name registries.
+
+This module manages the verification process of "SMD" information,
+each containing a crypto-signed XML structure of information related to
+a single trademark claim.  SMD can come in separate files, inside EPP
+messages, and more.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Net::Domain::TMCH-E<gt>B<new>(%options)
+
+ -Option          --Default
+  auto_datetime     <false>
+  cert_revocations  <according to rfc>
+  is_pilot          <false>
+  smd_admin         <generated internally>
+  smd_revocations   []
+  tmch_certificate  <included>
+  tmv_certificate   undef
+
+=over 2
+
+=item auto_datetime => BOOLEAN
+
+Read dates from the XML are automatically converted into DateTime objects.
+
+=item cert_revocations => FILENAME|URI|OBJECT
+
+The CRL for invalidated TMV certificates.  You may also provide an
+L<Net::Domain::TMCH::CRL|Net::Domain::TMCH::CRL> object.
+
+=item is_pilot => BOOLEAN
+
+=item smd_admin => L<Net::Domain::SMD::Schema|Net::Domain::SMD::Schema>-object
+
+=item smd_revocations => FILENAME|URI|ARRAY
+
+=item tmch_certificate => FILENAME
+
+This must be a PEM file which contains the certificate on top of all
+TMCH certificates.
+
+=item tmv_certificate => CERTIFICATE
+
+[0.18] The CERTIFICATE can be a filename or a Crypt::OpenSSL::X509 object.
+When specified, you can create and sign your own SMD structures.
+
+=back
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<certRevocations>()
+
+=item $obj-E<gt>B<isPilot>()
+
+=item $obj-E<gt>B<smdAdmin>()
+
+=item $obj-E<gt>B<smdRevocations>()
+
+=item $obj-E<gt>B<tmchCA>()
+
+=item $obj-E<gt>B<tmchCertficate>()
+
+=back
+
+=head2 Actions
+
+=over 4
+
+=item $obj-E<gt>B<createSignedMark>($document, $data, %options)
+
+Returns an XML::LibXML::Element containing the $data (passed as HASH)
+about one 'mark' structure.  This needs to get encapsulated into an XML
+document.
+
+The $document is the XML::LibXML::Document in which the produced XML
+will get included.
+
+=item $obj-E<gt>B<smd>( <$filename|$element|STRING>, %options )
+
+The first argument can be either a $filename (in which case an
+L<Net::Domain::SMD::File|Net::Domain::SMD::File> object is returned, or an XML::LibXML::Element
+or a STRING (bother returning an L<Net::Domain::SMD|Net::Domain::SMD> object).  In either
+case, the returned object reflects what is kept inside the XML.
+
+C<undef> is returned when the data is invalid, for instance because it
+has expired.
+
+ -Option            --Default
+  accept_expired      <false>
+  trust_certificates  <false>
+
+=over 2
+
+=item accept_expired => BOOLEAN
+
+When true, you will be able to access expired SMD files.  This is
+especially useful in regression tests, or when you process ancient
+SMD files.
+
+=item trust_certificates => BOOLEAN
+
+Do not check the certificates inside the SMD file for validity.
+
+=back
+
+example: 
+
+   my $smd = $tmch->smd($fh)
+       or die "cannot use $fn: $@";
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Net-Domain-TMCH distribution version 0.18,
+built on December 30, 2015.  Development was supported by NIC.at, the Austrian
+Domainname Registry.
+
+ Website: F<http://perl.overmeer.net/net-domain-tmch/>
+
+The documentation and interface style is consistent with a large set of
+modules, belonging to the L<XML::Compile> suite.
+
+=head1 LICENSE
+
+Copyrights 2013-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,37 @@
+Changes
+LICENSE
+MANIFEST
+README.md
+lib/Net/AMQP/RabbitMQ/PP.pm
+share/amqp0-9-1.extended.xml
+t/000_changes.t
+t/000_kwalitee.t
+t/001_declare_exchange.t
+t/001_load.t
+t/002_publish.t
+t/003_consume.t
+t/004_selfconsume.t
+t/005_noack.t
+t/006_txn.t
+t/007_get.t
+t/008_queue_declare.t
+t/009_no_route.t
+t/010_qos.t
+t/011_hearbeat.t
+t/012_timeout.t
+t/013_headers.t
+t/014_bind_with_headers.t
+t/015_declare_queue_with_headers.t
+t/016_reject.t
+t/017_queue_delete.t
+t/018_cancel.t
+t/019_consumer_cancel.t
+t/020_bad_credentials.t
+t/021_read_timeout.t
+t/022_close.t
+t/023_keepalive.t
+t/024_exclusive_consume.t
+t/Net/AMQP/RabbitMQ/PP/Test.pm
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

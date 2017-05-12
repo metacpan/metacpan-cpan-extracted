@@ -1,0 +1,103 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 5fcf46ce1f00fbe7ac4f4cab86ea32aabf54c1fb Changes
+SHA1 78d00cafaa16819731b7d3a78ac2339856d6d446 MANIFEST
+SHA1 4e2417602894584ec8920a5b9ac11cb5a4d0c6cd META.yml
+SHA1 d8f0a10455ed27ff5e122d3a33c52e5c2fdf6854 Makefile.PL
+SHA1 0e8d2f5e88952bb15a0043829ce4e9a5b5d0a98f README
+SHA1 9697a36f4420842b5bb48432ac9101984eecddf8 certs/server-cert.pem
+SHA1 e4b88ae14bd5e2386a06315492cdfa66ceb6b774 certs/server-key.pem
+SHA1 4dff4d838079dad5d13fa4e91db21e3a3e038c4e ex/trivial-server.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 9e886864978e9f9b9988e412a75a908070b54fbf inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 dcd32b0b5d57f4f4c7a72f7b2210e8665920a474 lib/Net/IMAP/Server.pm
+SHA1 ac5060c7ab18a94e375131e611c20404262c23d9 lib/Net/IMAP/Server/Command.pm
+SHA1 4528753566f748a9b5525fa51ae22d7cc9fdc6b3 lib/Net/IMAP/Server/Command/Append.pm
+SHA1 d1976ad0d92b1ea13672bf6895091ee84e908bf1 lib/Net/IMAP/Server/Command/Authenticate.pm
+SHA1 70f2aeb901dde845183ef6b70f56b4d777641a5d lib/Net/IMAP/Server/Command/Capability.pm
+SHA1 de6607dec53f35b3b3fd41ad12191a83c59ae21b lib/Net/IMAP/Server/Command/Check.pm
+SHA1 514b741e13d400a6c44215ab9bd66b77a16ef18c lib/Net/IMAP/Server/Command/Close.pm
+SHA1 aad751646a2cc7699e8074208e0d4f9ea5949b7a lib/Net/IMAP/Server/Command/Copy.pm
+SHA1 0dfd09358ae82388b5b460f09374bdb765269162 lib/Net/IMAP/Server/Command/Create.pm
+SHA1 bd311ced21dd8438852b07460c4329a089090716 lib/Net/IMAP/Server/Command/Delete.pm
+SHA1 02746080dc893a9673d3ddd3b9d4bbca503b1203 lib/Net/IMAP/Server/Command/Examine.pm
+SHA1 e2a53e75f10e35e4935b807c202a10753c34ce4d lib/Net/IMAP/Server/Command/Expunge.pm
+SHA1 6a67ad9f670e46f459ac4686bdbe9430b86b61f7 lib/Net/IMAP/Server/Command/Fetch.pm
+SHA1 fddb82fad844966a68d38270277c1c7acdb4e998 lib/Net/IMAP/Server/Command/Id.pm
+SHA1 1245aee6244630a9b5ed573347ef7f5c95cb9dc5 lib/Net/IMAP/Server/Command/List.pm
+SHA1 c8ccac73712174a8675a98c5f70a5eeced774e8f lib/Net/IMAP/Server/Command/Login.pm
+SHA1 30579885dfc9b80c2c7873bb283e4105d3c74f2a lib/Net/IMAP/Server/Command/Logout.pm
+SHA1 757faacdf957afddd0b0ff659258b8b0e09a0e4b lib/Net/IMAP/Server/Command/Lsub.pm
+SHA1 9184f034fb9e0ba9c504bd0954f3e02283c61b18 lib/Net/IMAP/Server/Command/Namespace.pm
+SHA1 78902aa13c8e79d5abc95fc6de637c1af8783ce2 lib/Net/IMAP/Server/Command/Noop.pm
+SHA1 fedd6e6b96cb0b6583e67e214d6669db65a72367 lib/Net/IMAP/Server/Command/Rename.pm
+SHA1 6451457dfba59b54833429175307140b7754ab84 lib/Net/IMAP/Server/Command/Search.pm
+SHA1 de564799c0cbb219f060e5ee34f98ad9fb408b19 lib/Net/IMAP/Server/Command/Select.pm
+SHA1 ffe0dddf90fa8ff02815431e1e2a72ed3f85daf4 lib/Net/IMAP/Server/Command/Starttls.pm
+SHA1 46d29fc4c67ee0e90ddf0a8d018bb8d1545856ed lib/Net/IMAP/Server/Command/Status.pm
+SHA1 5a71e10cec65fe7f933354b0323b026de92df9ce lib/Net/IMAP/Server/Command/Store.pm
+SHA1 3fbb8ce46e696eeb62a97264cb564924a7ccfb57 lib/Net/IMAP/Server/Command/Subscribe.pm
+SHA1 d6993c8ad9b65501d3e878a6400a6ca77b43925d lib/Net/IMAP/Server/Command/Uid.pm
+SHA1 4591be8d501ea8877f3b4d4418620cce094256ab lib/Net/IMAP/Server/Command/Unsubscribe.pm
+SHA1 67655d3e7575a301a210b28207d4fefb888840c3 lib/Net/IMAP/Server/Connection.pm
+SHA1 3d57329808a2c9c656dd3ea9184c58e1fa863406 lib/Net/IMAP/Server/DefaultAuth.pm
+SHA1 035fbedbfa85c6dcf04740083b2fcfcd46ae77cd lib/Net/IMAP/Server/DefaultModel.pm
+SHA1 688651b7e624fe1d4bf29e320b05d0872fb54dd0 lib/Net/IMAP/Server/Error.pm
+SHA1 3b3b1db8b227f1698870a4916d2a3737f3501c5e lib/Net/IMAP/Server/Mailbox.pm
+SHA1 40253dbf44247f869ebf2eedda8d87ff6639808f lib/Net/IMAP/Server/Message.pm
+SHA1 2e67e318edc490da7367ebcc789d35d0810e00e6 t/00.load.t
+SHA1 fd24a4a3ac43bfbd98c3cca72d26f38af7b4c533 t/01-connect.t
+SHA1 92639c875dbef6afe4431562fcee9baf3f927b9f t/lib/Net/IMAP/Server/Test.pm
+SHA1 2f55d5c59bafec029c3e450185e17a6225eede59 t/lib/Net/IMAP/Server/Test/Auth.pm
+SHA1 d0a930ff8a15e59ecc9810136b1991211c1f68a8 t/lib/Net/IMAP/Server/Test/Server.pm
+SHA1 ec035a09e3f370620874e9c706d6c8ae4bdfa6a1 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+SHA1 51b3c572d078ba0cdb15f08ec3e0fb59630938fb t/rfc-6.1.1-capability.t
+SHA1 c5252db579bce8d13061201d75d8a1aab81a9f99 t/rfc-6.1.2-noop.t
+SHA1 a740444758c68838a8e8a4734604987e20cd4ea7 t/rfc-6.1.3-logout.t
+SHA1 74b2514b72437c33909e8883606e910b9c295200 t/rfc-6.2.1-starttls.t
+SHA1 6b0eb113c254410e882a08ee5ef1c11f5b4d5a0f t/rfc-6.2.2-authenticate.t
+SHA1 d36bdc220d322cb4cdcf465140df4e7223b1c5fa t/rfc-6.2.3-login.t
+SHA1 74c5f43316fffb99560addf29d3554d13155df8d t/rfc-6.3.1-select.t
+SHA1 ec68ddd0a68e41ab7c6628024865119aabef54c8 t/rfc-6.3.10-status.t
+SHA1 111f381b2d28337e4a7683104838121f05d23186 t/rfc-6.3.3-create.t
+SHA1 d92f07dd21632fb8975d9771fb81c46c9860bb86 t/rfc-6.3.4-delete.t
+SHA1 fb48a77a25da2dc2ea821e9c0a79877e845cf974 t/rfc-6.3.5-rename.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJXJbU9AAoJEJHs6NvKxcMFZiEP/01fwsCeO2qZrhq4ovFvzfaX
+FhXvyh93jUnyR2007Obvfjo7O7FL6npxB5PaIJr4LZvyq03cd0w/y0Dy2Ov4ODwE
+tAZbuBI8IQAJN55Eg0FsNL1yEqrz74xNT1XhKCsgSzG3fiWWj1mur6oZ/IKnpBJ9
+yNhFFlZjHg9y91S2Mhcs6kUUfoHZSS2cg5I0HTtNQsxGyOpqA/YBWxYXkauYO5az
+RYa6w/5wOSf7hhNJRZi2BbLqk9+YHwu2W68TN44vI4FBJ2OSUnUruFT7XCBIX4qT
+SFLpTK5P1uyF27nHaNnOVjhNooYZ9Z8FebIE1RBcvin45vN4QhT/6A5ICCr0QbIt
+YI6cnWuNWyo2ttewa2qM2E5Oo2Se2NqcHVhVw8DAxXlPOcWbKpbAFPaEtAMPigtk
+Bd2Mq2n18TpM51oKrm9UXDaNgs8gGHrsDjLjrwAfqcK5qyRyp9OueWOSkWC4O032
+h0/whyKz2GARTsNCi+OLMRBdgt5mjkUlIhrpjuGK0c3qtfYSRsa2zU+VqmmHzXyC
+6qqZR7kocHrK7ZUY4M4qCU3jZArGCBhFxjoto11prvTTPQ3Qv+v9T80JB8U88qGn
+enTzflRxsvzVIfHdDsU829CJSFkz0QjbOu+sqI6kUm1zXK1r60U1mTFrRMitNlqS
+RPfEx+g3+WV4cFQeS7b4
+=IjuK
+-----END PGP SIGNATURE-----

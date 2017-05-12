@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+$! = 2;
+
+my %argv = ( cf => 0, lf => 0, pf => 0, int => 'eth0' );
+my $tmp = '';
+
+if($ARGV[0] eq '-t') {
+    if($ARGV[1] eq '-cf') {
+        die "Invalid config file: $!" unless -e $ARGV[2];
+        exit 0;
+    }
+    elsif($ARGV[1] eq '-lf') {
+        die "Invalid leases file: $!" unless -e $ARGV[2];
+        exit 0;
+    }
+}
+elsif(@ARGV) {
+    $argv{'int'} = pop @ARGV if($ARGV[-1] =~ /eth/);
+
+    # -f -d -cf $config_file -lf $leases_file -pf $pid_file $interface
+    for(@ARGV) {
+        $argv{$tmp} = $_ || 1 if($tmp =~ s/^-//);
+        $tmp = $_;
+    }
+
+    unless($argv{'pf'}) {
+        die "-pf required";
+    }
+    unless($argv{'f'}) {
+        if(my $pid = fork) {
+            _write_pid($pid) and exit 0;
+        }
+        elsif(!defined $pid) {
+            die $!;
+        }
+    }
+
+    _write_pid($$);
+
+    print STDERR "config file=$argv{'cf'}\n";
+    print STDERR "leases file=$argv{'lf'}\n";
+    print STDERR "pid file=$argv{'pf'}\n";
+    print STDERR "interface=$argv{'int'}\n";
+    print STDERR "\n";
+
+    sleep 5;
+    exit 0;
+}
+else {
+    exit 254;
+}
+
+sub _write_pid {
+    die "need PID" unless($_[0]);
+    open my $PID, '>', $argv{'pf'} or die $!;
+    print $PID $_[0];
+    close $PID;
+}

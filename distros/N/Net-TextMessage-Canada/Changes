@@ -1,0 +1,5 @@
+0.02 - 2009-10-29
+ * Much improved Makefile.PL thanks to http://github.com/chorny
+
+0.01 - 2009-08-31
+ * Initial release

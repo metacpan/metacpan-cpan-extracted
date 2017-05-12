@@ -1,0 +1,30 @@
+Revision history for perl Net::Proxmox::VE
+
+0.32 2016-02-18
+- Update things for Dist::Zilla
+- Big version jump to satiate CPAN
+
+0.0093 2016-02-17
+- Fixed bug
+
+0.0092 2015-05-12
+- Contributions via GitHub
+- Changes to Pod and dist.ini
+
+0.004 2012-07-08
+- Finished up Access.pm (dean)
+- Added TODO, which is actually just stuff to be revisited (dean)
+
+0.003 2012-07-07
+- Finished up Storage.pm (dean)
+- Moved lots of stuff around (dean)
+
+0.002 2012-06-16
+
+- Finished up Pools.pm (dean)
+- Fiddled with Dist::Zilla plugins (dean)
+
+0.001 2012-06-17
+
+- Initial release based on PHP api (brendan)
+- Lots of fiddling around (dean)

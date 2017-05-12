@@ -1,0 +1,28 @@
+Revision history for Perl extension Nagios::Report.
+
+0.001  Wed Oct 26 19:41:05 2005
+	- original version; created by h2xs 1.19
+
+0.002 Fri Mar 17 14:44:36 EST 2006
+	- fix bug in mkreport() processing of MUNGE_CALLBACK (would not change report values).
+
+	*** This entailed a change _non_ backward compatible change in the MUNGE_CALLBACK interface.
+	*** Client code that calls the alter->() callback _requires_ changing.
+	*** The alter callback is now called with one parm, a ref to a hash of the field values
+	*** indexed by field name. See examples/ for scripts that have been changed.
+ 
+	- added to_dbh() method to allow DBD::AnyData provided use of SQL (simple) on report data
+	- added primitive support for chart templates to excel_dump. The workbook written by
+	Spreadsheet::WriteExcel can contain _one_ (1) chart of the avail data.
+
+0.003 Wed Aug 23 14:31:56 EST 2006
+	. fix bug in handling US style dates (Don Collins)
+	. allow use 'Mar 20006' (to select an arbitrary month) in constructor
+	. add some tests of the named Month facility (t/st_et.t)
+    . refactor the __DEFAULT__ handler of the %stime_etime despatch table to use
+      ternary (what C calls 'conditional') statements instead of cascaded if-then-else
+    . allow time selectors to have an optional argument of a datetime. This allows
+      tests to be pre-genned with known dates rather than having to dynamically cope with
+      whatever time the test is called at (see gen_tests, which generates t/st_et_2.t).
+	. modify examples/host_down_report to accept named Months as time option.
+

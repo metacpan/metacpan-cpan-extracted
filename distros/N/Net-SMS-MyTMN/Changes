@@ -1,0 +1,20 @@
+Revision history for Net-SMS-MyTMN
+
+0.01    20-05-2007 21:04:35 WEST
+        First version, released on an unsuspecting world.
+0.02    21-05-2007 15:15:20 WEST
+        Added WWW::Mechanize to Makefile.PL
+0.03    21-05-2007 20:54:10 WEST
+        Corrected version number
+0.04    21-05-2007 22:53:12 WEST
+        Added Crypt::SSLeay to the Makefile.PL as this module is required by
+		WWW::Mechanize to deal with https pages
+0.05    24-07-2007 11:53:12 WEST
+        Modified to reflect the changes introduced by TMN on July 2007
+0.06    18-10-2009 01:07:10 WEST
+        Added function check_mytmn() to get how many free sms are left for the
+0.07    12-12-2010 20:21:43 WEST
+        Wrong!
+0.08    12-12-2010 20:21:43 WEST
+        Updated regular expression to match the characters in the password
+		(thank you Vasco Santos)

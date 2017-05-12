@@ -1,0 +1,47 @@
+POST https://xmlpitest-ea.dhl.com/XMLShippingServlet
+
+<?xml version="1.0" encoding="utf-8"?>
+<x0:RouteRequest xmlns:x0="http://www.dhl.com" schemaVersion="1.0">
+  <Request>
+    <ServiceHeader>
+      <MessageTime>2014-09-16T14:54:31</MessageTime>
+      <MessageReference>                  1410879271</MessageReference>
+      <SiteID>testid</SiteID>
+      <Password>testpass</Password>
+    </ServiceHeader>
+  </Request>
+  <RegionCode>EU</RegionCode>
+  <RequestType>D</RequestType>
+  <PostalCode>XX1 2YY</PostalCode>
+  <City>London</City>
+  <CountryCode>GB</CountryCode>
+  <CountryName></CountryName>
+  <OriginCountryCode>GB</OriginCountryCode>
+</x0:RouteRequest>
+
+<?xml version="1.0" encoding="UTF-8"?><res:RoutingErrorResponse xmlns:res='http://www.dhl.com' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation= 'http://www.dhl.com routing-err-res.xsd'>
+    <Response>
+        <ServiceHeader>
+            <MessageTime>2014-09-16T16:54:31+01:00</MessageTime>
+            <MessageReference>1410879271</MessageReference>
+            <SiteID>testid</SiteID>
+        </ServiceHeader>
+        <Status>
+            <ActionStatus/>
+            <Condition>
+                <ConditionCode>RT0007</ConditionCode>
+                <ConditionData> The postal code provided by the user
+                    does not exist in the country.</ConditionData>
+            </Condition>
+            <Condition>
+                <ConditionCode>RT0010</ConditionCode>
+                <ConditionData> More than one service areas are found in
+                    the city.</ConditionData>
+            </Condition>
+            <Condition>
+                <ConditionCode>RT0004</ConditionCode>
+                <ConditionData> The search for the service area
+                    information has failed.</ConditionData>
+            </Condition>
+        </Status>
+    </Response></res:RoutingErrorResponse>

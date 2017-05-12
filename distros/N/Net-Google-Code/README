@@ -1,0 +1,23 @@
+Net-Google-Code version 0.01
+
+Net::Google::Code is a simple client library for projects hosted in Google Code.
+
+Patches would be gratefully appreciated.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2008-2010 Best Practical Solutions.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

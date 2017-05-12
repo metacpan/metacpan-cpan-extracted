@@ -1,0 +1,40 @@
+---
+name: Net-OpenMicroBlogging
+version: 0.01
+author:
+  - 'Keith Grennan <kgrennan@cpan.org>'
+abstract: An implementation of the OpenMicroBlogging protocol
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  NEXT: 0.60
+  Net::OAuth: 0.12
+provides:
+  Net::OpenMicroBlogging:
+    file: lib/Net/OpenMicroBlogging.pm
+    version: 0.01
+  Net::OpenMicroBlogging::AccessTokenRequest:
+    file: lib/Net/OpenMicroBlogging/AccessTokenRequest.pm
+  Net::OpenMicroBlogging::AccessTokenResponse:
+    file: lib/Net/OpenMicroBlogging/AccessTokenResponse.pm
+  Net::OpenMicroBlogging::Message:
+    file: lib/Net/OpenMicroBlogging/Message.pm
+  Net::OpenMicroBlogging::PostNoticeRequest:
+    file: lib/Net/OpenMicroBlogging/PostNoticeRequest.pm
+  Net::OpenMicroBlogging::ProtectedResourceRequest:
+    file: lib/Net/OpenMicroBlogging/ProtectedResourceRequest.pm
+  Net::OpenMicroBlogging::RequestTokenRequest:
+    file: lib/Net/OpenMicroBlogging/RequestTokenRequest.pm
+  Net::OpenMicroBlogging::RequestTokenResponse:
+    file: lib/Net/OpenMicroBlogging/RequestTokenResponse.pm
+  Net::OpenMicroBlogging::UpdateProfileRequest:
+    file: lib/Net/OpenMicroBlogging/UpdateProfileRequest.pm
+  Net::OpenMicroBlogging::UserAuthRequest:
+    file: lib/Net/OpenMicroBlogging/UserAuthRequest.pm
+  Net::OpenMicroBlogging::UserAuthResponse:
+    file: lib/Net/OpenMicroBlogging/UserAuthResponse.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

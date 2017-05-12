@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7d6a06d13d744b027d833697022a6f83ae299fb2 Build.PL
+SHA1 7bb0264a89f00931daa042c21f24fef6f67a10ce Changes
+SHA1 444a38044a39c48decf964c571c408a338f3f44c LICENSE
+SHA1 4fea10d93746b06513ad5d234a0f577be1904b64 MANIFEST
+SHA1 5d69d3643a38b08d410532295cefb8f8e3c31b0e META.yml
+SHA1 1ab93eee2c2aba73b3a05761b246fc711abbcc8b README
+SHA1 7bc72462a9fa936808443b643c64078567731f93 lib/Number/Phone/Normalize.pm
+SHA1 316f2b15951cd642905da6da8a105a0026741627 t/00base-use.t
+SHA1 056063d18c3f48338620bbff698f81f91f2ea4d0 t/05pod_check.t
+SHA1 b0c66bcb572f82e4401fee07b5342d09f6918c87 t/06pod_coverage.t
+SHA1 c183362fccd9b49080fd92436e0f403793ce9ef2 t/10obj__intl.t
+SHA1 69964d2dc756857eb72aee2a2a336413005727f0 t/15obj__local.t
+SHA1 53d6f1fdff96a11edb358d1207261fad2f6e6807 t/16obj__l_ld.t
+SHA1 b5b632ab63bcb7718f1357508b2f2a57f11ba72f t/17obj__l_nocc.t
+SHA1 fa23566a6d234434b3c7f9b014588be87cd95ab6 t/18obj__l_noac.t
+SHA1 e71bdc19fabaff817708c0368f982de3225345f7 t/20phone_intl.t
+SHA1 808aeb2a5f26d6eabb6c34eaf4674cebd56934e2 t/25phone_local.t
+SHA1 30dfb714d8ae14d869d2ac8db62166be95d2edac t/26phone_l_ld.t
+SHA1 6f74d7d0ea86ad815af5b71561140ee18a5a2192 t/27phone_l_nocc.t
+SHA1 6175e3e315fc8545f81e7a4d6e0d0b1ddee87f39 t/28phone_l_noac.t
+SHA1 902d6c3649c99438b9f6ff6693eb4608279ed24c t/30intl_cc_ac.t
+SHA1 9a168a7f58e854677a4067509e8d6eb57699b1a9 t/31local_cc.t
+SHA1 6ef163e8021710a97e660e8fd4a005c158812d18 t/32local_ac.t
+SHA1 40bfa80dbb19bc8bac6bd5823ad3621c1ac66cad t/33local_ac_ld.t
+SHA1 20b8e3b29fb1a3eaf69da6a5f9bdee94a5dee9f1 t/34local_ac_nocc.t
+SHA1 973d202ce80acfdd95170fa2fe43680f3af015fb t/40vanity_cvrt.t
+SHA1 0682c67776f71da5d4de9455e4d4651ca261e9e0 t/41vanity_ok.t
+SHA1 14af86c63d1309e573d1a45dc0fe77c422634e9e t/42vanity_ac.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (Darwin)
+
+iEYEARECAAYFAktW7bsACgkQSKUOY2OWgPD/sgCguZlMASPRB0Ed5zBXIsApV2vm
+RqYAoKU4F/FovN1m5y3QZVBlB1HBNaqu
+=vRq5
+-----END PGP SIGNATURE-----

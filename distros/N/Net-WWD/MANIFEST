@@ -1,0 +1,14 @@
+Changes
+finalize
+INSTALL
+INSTALL.APACHE
+lib/Net/WWD/Client.pm
+lib/Net/WWD/Functions.pm
+lib/Net/WWD/Interface.pm
+lib/Net/WWD/Parser.pm
+lib/Net/WWD.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/Net-WWD-Client.t

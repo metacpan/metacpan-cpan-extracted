@@ -1,0 +1,296 @@
+{: NES 0.9 none :}
+{: #
+    ----------------------------------------------------------------------------
+    
+        NES 0.9 beta by - Skriptke
+        Copyright 2009 - 2010 Enrique F. Castañón
+        Licensed under the GNU GPL.
+        http://sourceforge.net/projects/nes/
+        
+        Sample to use Nes;
+        
+    ----------------------------------------------------------------------------
+:}
+<h2><a href="#">Plugin Captcha</a></h2>
+<h3>Descripción</h3> 
+<p>
+Muestra un Captcha. 
+</p>
+
+<h3>Cargar el Plugin</h3>
+<p>
+Para cargar cualquier Plugin debemos añadirlo a la lista de script de nuestro archivo <i>nhtml</i>:
+<pre>
+&#123;: NES 1.0 ('&#123;: * cfg_plugin_top_dir :&#125;/plugin.pl','my_file.pl') :&#125;
+
+</pre>
+El orden es importante, para <i>Captcha</i> es necesario cargar primero:
+<pre>
+    
+&#123;: NES 1.0 ('&#123;: * cfg_plugin_top_dir :&#125;/captcha.pl','my_file.pl') :&#125;
+
+</pre>
+Si se va a incluir <i>Captcha</i> dentro de <i>Forms</i> es necesario cargar <i>forms_captcha.pl</i> en vez de <i>forms.pl</i>:
+<pre>
+    
+&#123;: NES 1.0 ('&#123;: * cfg_plugin_top_dir :&#125;/forms_captcha.pl','my_file.pl') :&#125;
+
+Ver: <a href="./?action=item&item=Plugin Forms">Plugin Froms</a>, <a href="./?action=item&item=Plugins">Plugins</a>
+
+</pre>
+
+<h3>Ejemplo</h3>
+<p>
+<strong>archivo.nhtml:</strong>
+<pre>
+&#123;: NES 1.0 ('&#123;: * cfg_plugin_top_dir :&#125;/captcha.pl','archivo.pl') :&#125;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Nes sample/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    ...
+    &#123;: & captcha (the_name,ascii) 
+        ...
+        &#123;: & captcha_code :&#125
+        &lt;input type="text" name="the_name"  size="8" /&gt
+        ...
+        &#123;: ~ ( * nes_captcha_plugin_fatal_error_the_name )
+            &lt;b&gt;Código incorrecto&lt;/b&gt; 
+        :&#125;
+        ...
+    :&#125
+    ...
+  &lt;/body&gt;
+&lt;/html&gt;
+
+</pre>
+
+<strong>archivo.pl:</strong>
+<pre>   
+use Nes;
+
+my $nes = Nes::Singleton->new('archivo.nhtml');
+
+# Obtenemos la dirección del Captcha
+my $captcha = nes_plugin->get('captcha_plugin','the_name');
+
+# Comprobamos que es correcto mediante la variable {'is_ok'}
+if ( $captcha->{'is_ok'} ) {
+  ...
+} else  {
+  ...
+}
+
+$nes->out();
+
+</pre>
+</p>
+
+<h3>Formato</h3>
+<p>
+<pre>
+&#123;: & captcha (name,type,digits,noise,size,sig,spc,expire,attempts) 
+        [HTML]
+        &#123;: & captcha_code :&#125
+        [HTML]
+:&#125
+</pre>
+<p>
+Sólo <b><i>name</i></b> y <i><b>type</b></i> son obligatorios, el resto de parámetros
+si no se indican se leeran de archivo de configuración o tomarán sus valores por defecto.
+</p>
+<b>name:</b>
+<p>
+El nombre del Captcha, debe conincidir con el del campo input con el valor del Captcha:
+<pre>
+ &#123;: & captcha (the_name,ascii)
+    ...
+    &lt;input type="text" name="the_name"  size="8" /&gt;
+    ...
+    
+</pre>
+</p>
+
+<b>type:</b>
+<p>
+El tipo de Captcha. En ésta versión únicamente está disponible el tipo <i>ascii</i>.
+</p>
+
+<b>digits:</b>
+<p>
+Número de dígitos que mostrará el Captcha. Por defecto mostrará un número
+ aleatorio de entre 5 y 7 dígitos.
+</p>
+
+<b>noise:</b>
+<p>
+Cantidad de ruido, entre 0 y 9, 0 es sin ruido y 9 el máximo. Dificulta su
+ detección por robots. Por defecto el nivel de ruido es de 2.
+</p>
+
+<b>size:</b>
+<p>
+Tamaño de la fuente del Captcha. El tamaño por defecto es 2. Si size es
+ <i>none</i> el Captcha se mostrará sin formato.
+</p>
+
+<b>sig:</b>
+<p>
+Símbolo que se utiliza como relleno. Por defecto el Captcha mostrará un caracter al azar.
+</p>
+
+<b>spc:</b>
+<p>
+Símbolo que se utiliza como fondo. Por defecto el Captcha mostrará un caracter al azar.
+</p>
+
+<b>expire:</b>
+<p>
+Tiempo de expiración del Captcha a partir del cual ya no será válido. El tiempo se
+ indica con un sufijo;  s: segundos, m: minutos, h: horas, d: dias, M: meses, y: años, ej.:
+<pre>
+ 30s # 30 segundos
+ 5m  # 5 minutos
+ 1M  # 1 mes
+ 
+</pre>
+</p>
+
+<b>* expire dentro del Plugin Forms</b>
+<p>
+Cuando el Captcha va dentro del <a href="./?action=item&item=Plugin Forms">Plugin Forms</a>,
+ los valores de expiración se deben hacer coincidir con <a href="./?action=item&item=Plugin Forms">Forms</a>.
+</p>
+
+<b>attempts:</b>
+<p>
+En formato: <i>número de intentos / tiempo</i>. Es el máximo de intentos permitido, una 
+vez llegado al máximo, en cualquier tiempo, hay que esperar el tiempo indicado o
+dará error aunque los datos seán válidos.
+<pre>
+ 10/5 # Después de 10 intentos hay que esperar 5 minutos
+</pre>
+<p>
+El tiempo de expiración se controla mediante la variable <i>forms_plugin_expire_attempts</i>
+del archivo de configuración .nes.cfg
+</p>
+</p>
+
+<b>&#123;: & captcha_code :&#125;</b>
+<p>
+Lo colocaremos donde se desee que aparezca la imagen del Captcha:
+<pre>
+    ...
+    &lt;td &gt;
+    &#123;: & captcha_code :&#125; 
+    &lt;/td&gt;
+    ...
+    
+</pre>
+</p
+
+</p> 
+<h3>Variables de entorno</h3>
+<p>
+Último mensaje lanzado por el Captcha: (se incluye para depuración)
+<pre>
+&#123;: * nes_captcha_plugin_(name_catpcha)_error_last :&#125
+
+</pre>
+</p> 
+
+<p>
+Cuenta del número de intentos:
+<pre>
+&#123;: * nes_captcha_plugin_(name_catpcha)_attempts :&#125 
+
+</pre>
+</p> 
+
+<p>
+Será 1 si el Captcha es correcto:
+<pre>
+&#123;: * nes_captcha_plugin_(name_catpcha)_is_ok :&#125 
+
+</pre>
+</p> 
+
+<p>
+Número de error del Captcha, cualquier valor no 0 indica que el Captcha no es válido:
+<pre>
+&#123;: * nes_captcha_plugin_(name_catpcha)_error_fatal :&#125 
+
+0: No hay error. (no supone que que el Captcha sea correcto)
+1: La Cookie ha expirado o no existe.
+2: Se ha enviado el campo sin valor.
+3: Se ha alcanzado el máximo de intentos.
+4: * Se ha intentado usar una Cookie ya usada.
+5: No coninciden la clave del campo con la del Captcha.
+
+* El botón "Back" del Navegador puede dar este tipo de errores.
+</pre>
+</p> 
+
+<p>
+Estas variables están disponibles desde Perl como:
+<pre>
+use Nes;
+my = Nes::Singleton:Singleton->new('archivo.nhtml');
+
+# Obtenemos la dirección del Captcha
+my $captcha = nes_plugin->get('captcha_plugin','the_name');
+
+# &#123;: * nes_captcha_plugin_(name_catpcha)_error_last :&#125 
+$captcha->{'last_error'};
+
+# &#123;: * nes_captcha_plugin_(name_catpcha)_error_fatal :&#125 
+$captcha->{'fatal_error'};
+
+# &#123;: * nes_captcha_plugin_(name_catpcha)_attempts :&#125 
+$captcha->{'attempts'};
+
+# &#123;: * nes_captcha_plugin_(name_catpcha)_is_ok :&#125 
+$captcha->{'is_ok'};
+
+</pre>
+</p> 
+
+<h3>Configuración .nes.cfg</h3>
+<p>
+<pre>
+# Nombre del campo input del formulario que controla el Captcha
+captcha_plugin_start           = nes_captcha_start
+
+# tiempo suficiente para rellenar el formulario, 15m son 15 minutos
+# sufijo tiempo:  s: segundos, m: minutos, h: horas, d: dias, M: meses, y: años
+captcha_plugin_expire          = 15m
+
+captcha_plugin_digits          = 0
+captcha_plugin_noise           = 2
+captcha_plugin_size            = 2
+captcha_plugin_sig             = 
+captcha_plugin_spc             = 
+
+# sufijo del archivo temporal
+captcha_plugin_suffix          = .captcha_plugin_tmp
+
+# número maximo de intentos / minutos
+# 10/5 es 10 intentos en cualquier tiempo, despues de 10 intentos tendrá
+# que esperar 5 minutos para volver a intentarlo o dará error
+captcha_plugin_max_attempts    = 10/5
+
+# tiempo de expiración de los archivos temporales
+# guarda el valor de attempts durante el tiempo indicado aquí
+captcha_plugin_expire_attempts = 1h
+
+</pre>
+</p> 
+<h3>Más ejemplos</h3>
+<br>
+
+{: include ('./Test Captcha.nhtml') :}
+
+<p>
+Puedes ver un ejemplo real: <a href="./?action=comment&item=Plugin Captcha">comentario</a>
+</p>

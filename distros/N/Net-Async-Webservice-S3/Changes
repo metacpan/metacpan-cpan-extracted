@@ -1,0 +1,101 @@
+Revision history for Net-Async-Webservice-S3
+
+0.18    2014/01/23 01:33:53
+        [CHANGES]
+         * Allow fetching byte ranges
+         * Wrap the If-Match HTTP header
+         * Repair stall_timeout by using a ranged GET
+
+0.17    2013/11/25 19:07:21
+        [CHANGES]
+         * Support multiple concurrent uploads of parts in ->put_object
+         * Allow (part) value to be a Future returning a CODE/size pair
+
+        [BUGFIXES]
+         * Avoid die()ing with an entire content string interpolated into $@
+
+0.16    2013/11/12 00:48:18
+        [BUGFIXES]
+         * Bugfixes to head_then_get for non-200 responses, and cancellation
+
+0.15    2013/10/20 17:23:42
+        [CHANGES]
+         * Support ->head_then_get_object->cancel
+         * Neaten up failure results in line with IO::Async standard
+
+0.14    2013/10/12 03:09:11
+        [CHANGES]
+         * Added ->head_then_get_object method
+
+0.13    2013/09/26 21:02:25
+        [CHANGES]
+         * Added 'on_write' callback parameter to ->put_object
+         * Pass 'stall_timeout' to ->do_request rather than ->configure'ing it
+           on the NaHTTP object; reducing the API surface
+         * Yield total generated content length from ->put_object result
+
+        [BUGFIXES]
+         * Ensure that a 'multipart' put of no parts creates an empty object
+           instead of failing
+
+0.12    2013/09/14 00:03:53
+        [CHANGES]
+         * Use Net::Async::HTTP 0.28 so the stall_timeout logic works during
+           write; can avoid having custom handling for it now
+
+0.11    2013/09/05 16:29:07
+        [CHANGES]
+         * Configurable hostname for S3 service - allows use of other service
+           providers
+         * More succinct documentation of Future-returning methods to include
+           the Future yield values in the =head2 line itself
+
+0.10    CHANGES:
+         * Much improved timeout logic, including stall timer for PUT
+         * Don't retry on HTTP 4xx errors, they should fail immediately
+
+0.09    CHANGES:
+         * Add a small delay after failures before retrying, to let HTTP
+           connections properly reset/recover
+         * Pass through timeout and stall_timeout to underlying NaHTTP object
+
+0.08    CHANGES:
+         * Optionally support SSL
+         * Sanity-check bucket names that are used as DNS names
+         * Added SYNOPSIS example code
+
+0.07    BUGFIXES:
+         * length(undef) on pre 5.14 perl causes undef warnings
+         * lc() MD5sum hashes before comparison, for extra robustness
+
+0.06    CHANGES:
+         * Added ->head_object
+         * Support setting and retrieving S3 metadata on keys
+         * Allow ->configure keys to be set back to undef
+         * Deleted now-deprecated legacy 'multipart_chunk_size' configure key
+
+0.05    CHANGES:
+         * Completely rewritten (multipart) PUT logic - can now use plain
+           strings, Futures, or CODE generator functions.
+         * Better detection of when multipart is or isn't required
+         * Created some little example scripts that perform simple
+           list/get/put/delete operations
+
+0.04    CHANGES:
+         * New 'gen_parts' multipart generator to replace 'gen_value'
+         * Support generating parts from Futures
+         * Renamed 'multipart_chunk_size' to 'part_size'
+
+0.03    CHANGES:
+         * Allow storing an optional bucket name and key name prefix
+         * List in batches of 1000 by default, rather than 100
+         * Declare explicit dependency on Future 0.13
+
+0.02    CHANGES:
+         * Initial implementation of multipart upload
+         * Changed gen_value callback API to pass in position/length
+         * Changed put_object future return value to yield ETag directly
+         * Declare that we need NaHTTP at least 0.19
+
+0.01    First version, released on an unsuspecting world.
+

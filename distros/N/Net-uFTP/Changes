@@ -1,0 +1,27 @@
+Revision history for Perl extension Net::uFTP.
+
+0.16 Fri, 25 Jun 2010 23:55:38 +0200
+	- Fixed bug in get method. Thanks to Ryan Gorsuch.
+
+0.15  Fri Dec 26 21:38:11 CEST 2008
+	- Some fixes.
+
+0.14  Fri Jun 27 20:35:15 CEST 2008
+	- Flag 'blocking' is set to 1 by default.
+
+0.13  Fri Jun 27 20:22:30 CEST 2008
+	- Fixed recursive upload.
+
+0.12  Thu Jun 18 23:54:11 CEST 2008
+	- Changes in authentication method in SFTP environment.
+
+0.112  Wed Jun 18 12:54:11 CEST 2008
+	- Fixed little bug in pwd() in SFTP environment.
+	- Added method change_root() in SFTP environment.
+
+0.111  Thr May 15 22:40:39 CEST 2008
+	- Fixed cwd() in SFTP environment.
+	- Fixed ls() in SFTP environment.
+
+0.1  Mon Apr 21 18:25:07 CEST 2008
+	- First release.

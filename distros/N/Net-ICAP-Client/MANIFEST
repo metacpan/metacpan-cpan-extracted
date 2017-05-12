@@ -1,0 +1,15 @@
+Changes
+lib/Net/ICAP/Client.pm
+lib/URI/icap.pm
+lib/URI/icaps.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+LICENSE
+t/00-load.t
+t/01-mcafee_web_gateway.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

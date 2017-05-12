@@ -1,0 +1,19 @@
+--- #YAML:1.0
+ name: Net-Shoutcast-Admin
+ abstract: Fetch information from a Shoutcast streaming audio server
+ version: 0.02
+ author:
+   - David Precious <davidp@preshweb.co.uk>
+ license: perl
+ distribution_type: module
+ requires:
+   perl: 5.005
+   LWP::UserAgent: 0
+   XML::Simple: 0
+   URI::Escape: 0
+ build_requires:
+   Test: 0
+ meta-spec:
+   version: 1.3
+   url: http://module-build.sourceforge.net/META-spec-v1.3.html
+ generated_by: hand

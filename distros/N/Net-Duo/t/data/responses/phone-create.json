@@ -1,0 +1,17 @@
+{
+    "phone_id": "DPFZRS9FB0D46QFTM899",
+    "number": "+15555550100",
+    "name": "", 
+    "extension": "",
+    "postdelay": null,
+    "predelay": null,
+    "type": "Mobile",
+    "capabilities": [
+        "sms",
+        "phone",
+        "push"
+    ],
+    "platform": "Apple iOS",
+    "activated": false,
+    "sms_passcodes_sent": false
+}

@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 2117f22407956977ff9e65e8482f255980b7e0e8 Build.PL
+SHA1 7091814cea95850b9909186b11f8a371d9bf893f Changes
+SHA1 641680f445150aaf7e62bb00f75519e52da8120c LICENSE
+SHA1 f10833d5260d5c49da6a9b2c36e01a3bd961c029 MANIFEST
+SHA1 5e9b91f08530e53c48e427c94cfefe4c9563031f META.json
+SHA1 254ae2dac46ecbfcdeee881884ee878c728e4797 README.mkdn
+SHA1 f54ea683d13a983df818d1a69a58403cd8c50fc8 dist.ini
+SHA1 1ab2e513900e4a4bf7208c704ffd3d233d36b7f7 lib/Net/Rendezvous/Publish/Backend/Avahi.pm
+SHA1 3cbe905b92fbc69d59a06031d5ce6c837b352aa2 t/00-compile.t
+SHA1 6132f2ce91f64d423eef1eab20961cb01d8c4661 weaver.ini
+SHA1 5bd500053b03b9a17b570fb39ca2e5ee959540dc xt/author/critic.t
+SHA1 6f846f7ede312098a614207bcea6fdb2207b8030 xt/author/test-eol.t
+SHA1 28ef20a73b7cf9b85585e2b7db6fc80424289134 xt/release/cpan-changes.t
+SHA1 cbc5b72710fb645c559b78c8ac8b879f62aff326 xt/release/dist-manifest.t
+SHA1 c6cd63148d20bda841ee21381cd6e9a62b7e6863 xt/release/kwalitee.t
+SHA1 7b52b909acf6cd52733f8f226f92147ed76a2717 xt/release/meta-json.t
+SHA1 bae663945a4380ca95a6ba5d8f5e42d2946e0629 xt/release/minimum-version.t
+SHA1 63e17b62b8b3654a7582221867e8dc72fac39678 xt/release/mojibake.t
+SHA1 c769b078112da535475284c9fe0cf6b1c047dbdd xt/release/no-tabs.t
+SHA1 4c599e8a4ebb7a899f90ee3c235a64fdbc7e2c06 xt/release/pod-coverage.t
+SHA1 4146b75714ac972231d12d4fb93e764817a5eb0b xt/release/pod-linkcheck.t
+SHA1 fae7a9531fdd000d4075a378b828a7aa2508491d xt/release/pod-no404s.t
+SHA1 9934d36e45e1143c1a54658bc48872e0591af41b xt/release/pod-syntax.t
+SHA1 b767be32091c57bdfd5e07be64edcb82176774e5 xt/release/portability.t
+SHA1 7737dadb6441d9eaddc571caf03e6c114cd4a643 xt/release/synopsis.t
+SHA1 bbcd59d081d9940af5d43337ae85458075933829 xt/release/test-version.t
+SHA1 ec3f84bfd7a9ce3246e7592f4134100c6b5ce02b xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBCgAGBQJP6mA/AAoJEOpmRc2kYGBPs3QP/069L7DQuWJLYqNyBYkAPCYL
+Exe64aMLwD8dPXuRUylenl4gD4kxXcbCPRNqV4V8yPXnz11uLJura5RmE67MqzNF
+fmOa/E82x7NhWe2qIrJPEkjLXOA5daRyi4hDBv31ItKPZkjriA2PbGKgDurtPu2i
+yV7tcbzK0n7EwkbsHietfXpts3/cYVaC0lm/cs3OlOmDk8g6fwyo78Zx3MlMNg52
+Ph36wUu9NPFB3au1r/Z+fdvPdIM5k0KUM3x/+kBcrf5XUaPtNhYBBU8U08HB0sQ9
+M8tpwdvgyMj1fUV4ZBfg7rGfKdeaJ/HWDAL1RcUXt9iLZ0JuwkTKuR0aAbI3J30z
+gx4o3TtDpiN/OerW287BsLF3izAVi0Gou4Eeuss+nVX4LCVVtBriXoyc9k2ejocz
+AU54iFwUHDDJDPfPdFxPhrUUpQqsym5YGpA9ZSCGG2TVDGLOs4GkdtQnOasIILXv
+SVF7hRbE5pKJH+VUkqddlY34niAcPfQE4ug7zeM8+WrsspWBqJ40UefD9iFa+u1o
+nmejxGeHSIuBU/54xDRqQ8DN4qL8ZV8bxJGZjgkF0nqtvUBVPMi3kXvw7HjDLMTh
+BwJrEMolsOFsct4iBY+6s0Caj2CcnOMTPjxDQuziY3LYxoGthTE3uWFbo+7/sQ4i
+rI4Ev83KVvb30B3oInQ6
+=h/au
+-----END PGP SIGNATURE-----

@@ -1,0 +1,13 @@
+Revision history for Perl extension NetHack::NAOdash.
+
+0.003 2015-12-26T23:34+03:00
+ - Support filtering by version
+
+0.002 2015-08-22T22:42+03:00
+ - Improve accessibility for colorblind users by using underlines in
+   addition to colors
+ - Add caching
+ - Add a index page to the web interface
+
+0.001 2015-07-02T13:16+03:00
+ - Initial release

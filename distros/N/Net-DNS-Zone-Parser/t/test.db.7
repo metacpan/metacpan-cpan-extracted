@@ -1,0 +1,39 @@
+; File written on Tue Nov  5 16:21:45 2002
+; dnssec_signzone version 9.3.0s20020722
+$TTL 1500
+
+@		900	IN SOA	ns.example.net. olaf.example.net. (
+					2002102601 ; serial
+					43200      ; refresh (12 hours)
+					14400      ; retry (4 hours)
+					1209600    ; expire (2 weeks)
+					7200       ; minimum (2 hours)
+					)
+
+              900     IN      TXT     "REALLY (SICK) use of " "bla" (
+						"Parenthesis but allowed..." )
+
+
+              900     IN      TXT     "Another" ( "TEST" 
+	)( "TEST2"
+	"TEST3" "SICKENING ) Parenthesis parsing test" ) 
+
+              900     IN      TXT     "What about a ; inside a txt"	
+		900	NS	ns.example.net.
+			900	NS	ns.example.com.
+
+			900	MX	50 bert.example.org.
+			900	MX	350 toybox.example.org.
+			900	TXT	" Olaf's toy domain "
+			900	LOC	52 19 38.800 N 4 52 59.700 E 0.00m 100m 100m 100m
+bert		900	IN CNAME bert.example.org.
+bommes		IN A	193.0.3.30
+
+
+$GENERATE	1-10	$	A	10.0.1.$
+$GENERATE	1-10/2	bla$	A	10.0.3.$
+
+
+$GENERATE	1-10	$	PTR	10.0.1.$.in-addr.arpa.
+
+

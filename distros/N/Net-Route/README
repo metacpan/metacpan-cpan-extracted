@@ -1,0 +1,48 @@
+Net-Route
+
+Every OS provides its custom interface to the routing table: Linux'
+"route" utility is different from BSD's "route show", from Windows'
+"route print", etc. Parsing all these different output styles in an
+(otherwise portable) script can quickly become inconvenient.
+
+Net::Route abstracts the system specifics and provides a single,
+portable interface.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::Route
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Route
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-Route
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-Route
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-Route
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Straton IT.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

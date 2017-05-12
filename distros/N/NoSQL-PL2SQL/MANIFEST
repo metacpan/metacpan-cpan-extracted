@@ -1,0 +1,21 @@
+Changes
+cksums.txt
+Makefile.PL
+MANIFEST
+PL2SQL.xs
+ppport.h
+README
+t/NoSQL-PL2SQL.t
+t/sqlite.t
+t/mysql.t.0
+lib/NoSQL/PL2SQL/Node.pm
+lib/NoSQL/PL2SQL/DBI/SQLite.pm
+lib/NoSQL/PL2SQL/DBI/MySQL.pm
+lib/NoSQL/PL2SQL/DBI.pm
+lib/NoSQL/PL2SQL/Perldata.pm
+lib/NoSQL/PL2SQL/Object.pm
+lib/NoSQL/PL2SQL.pm
+samples/pl2sql/comments.pl
+samples/pl2sql/deadlock.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

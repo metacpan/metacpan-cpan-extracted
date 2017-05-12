@@ -1,0 +1,110 @@
+NAME
+    Net::IPAddress::Filter::IPFilterDat - A fast IP address filter from
+    ipfilter.dat
+
+VERSION
+    version 20121119.02
+
+SYNOPSIS
+        use Net::IPAddress::Filter::IPFilterDat;
+
+        my $filter = Net::IPAddress::Filter::IPFilterDat->new();
+
+        $filter->load_file('/tmp/ipfilter.dat');
+        # Or
+        $filter->load_file($FILEHANDLE);
+        # Or
+        $filter->add_rule("000.000.000.000 - 000.255.255.255 , 000 , invalid ip");
+
+        print "BLOCKED\n" if $filter->in_filter('192.168.1.20');
+
+DESCRIPTION
+    An ipfilter.dat file holds a list of IP address ranges, and is often
+    used by p2p clients such as eMule or various bittorrent clients to block
+    connections to or from the listed addresses.
+
+    Net::IPAddress::Filter::IPFilterDat can read in these files and provides
+    a fast (greater than 100k lookups per second) way of seeing if an IP
+    address should be filtered/blocked.
+
+    There is a dependency on the XS module Set::IntervalTree so a c++
+    compiler is required. The XS data structure is the reason for the small
+    RAM usage and high performance of the IP address filter.
+
+METHODS
+  load_file( )
+    Fetches rows from an ipfilter.dat-formatted file and adds the ranges to
+    the filter. Can be called with a filename, or with an opened filehandle.
+    The filehandle is closed after reading.
+
+    Expects:
+
+        $file - Either a filename, or a filehandle.
+
+    Returns:
+
+        Number of rules added from the file.
+
+  add_rule( )
+    Given a line from an ipfilter.dat file, add the rule to the filter.
+
+    Expects:
+
+        $rule - A string containing an ipfilter.dat rule.
+
+    Returns:
+
+        1 if rule was parsable and added to the filter.
+
+        0 otherwise.
+
+FUNCTIONS
+  _parse_rule( )
+    Given a line from an ipfilter.dat file, try to parse out the fields.
+
+    Expects:
+
+        $rule - A string containing an ipfilter.dat rule.
+
+    Returns:
+
+        A hashref of the fields if parsable.
+
+        Otherwise undef.
+
+TODO
+    *   Support for reading zipped or gzipped ipfilter.dat files.
+
+    *   Support for the score field in ipfilter.dat.
+
+SEE ALSO
+    *   Net::IPAddress::Filter - The parent class of this module. All
+        methods of
+
+        the parent can also be used.
+
+    *   NET::IPFilter - Pure Perl extension for Accessing eMule / Bittorrent
+
+        IPFilter.dat Files and checking a given IP against this ipfilter.dat
+        IP Range.
+
+BUGS OR FEATURE REQUESTS
+    See
+    https://rt.cpan.org/Public/Dist/Display.html?Name=Net-IPAddress-Filter-I
+    PFilterDat to report and view bugs, or to request features.
+
+    Alternatively, email bug-Net-IPAddress-Filter-IPFilterDat@rt.cpan.org
+
+REPOSITORY
+    Net::IPAddress::Filter::IPFilterDat is hosted on github at
+    https://github.com/d5ve/p5-Net-IPAddress-Filter-IPFilterDat.git
+
+AUTHOR
+    Dave Webb <Net-IPAddress-Filter-IPFilterDat@d5ve.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Dave Webb.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

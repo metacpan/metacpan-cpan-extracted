@@ -1,0 +1,47 @@
+Net-FSP
+
+FSP is a very lightweight UDP based protocol for transferring files. FSP has
+many benefits over FTP, mainly for running anonymous archives. FSP protocol is
+valuable in all kinds of environments because it is one of the few protocols
+that is not aggressive about bandwidth while at the same time being
+sufficiently fault tolerant. Net::FSP is a class implementing the client side of
+FSP.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::FSP
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-FSP
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-FSP
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-FSP
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-FSP
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, 2008 Leon Timmermans
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

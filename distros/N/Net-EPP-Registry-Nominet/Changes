@@ -1,0 +1,70 @@
+0.03 2015-11-06
+
+    - Documentation updates.
+    - Test of domain deletion fixed. (Regression in 0.02_04)
+
+0.02_04 2015-11-04
+
+    - BUG FIX: newer versions of Net::EPP caused the hello() method to
+      emit warnings.
+    - Improved test coverage and some functionality.
+    - Minimum perl version is now 5.8.0.
+    - Test::Warn now required for tests.
+
+0.02_03 2015-10-02
+
+    - BUG FIX: use of note() required more recent version of Test::More.
+      Replaced note() with diag() throughout. Thanks to Nick Lindsell
+      for reporting this. (issue 107430)
+
+0.02_02 2015-08-24
+
+    - Minumum version of Test::More specified.
+    - Minor doc fixes.
+    - Removed code for obsolete first-bill, recur-bill.
+    - Improved renewal/unrenewal and query tests.
+    - Added renew-not-required functionality.
+    - Workaround for address treatment in Net::EPP::Simple.
+
+0.02_01 2014-10-31
+
+    - secDNS schemas, specs and tests added.
+    - removed @ISA.
+
+0.02 2014-08-16
+
+    - Makefile.PL updated to include MIN_PERL_VERSION
+
+0.01_02 2014-08-04
+
+    - check_domain now returns a third item which is the rights holder 
+      in the case of checking a SLD.
+    - Removed use of Exporter.
+    - Added the same SSL checking functionality as in Net::EPP::Simple.
+    - Updated test suite to adhere to more restrictive conditions imposed
+      by Nominet and to test new second-level registrations.
+    - Test suite updated to match changes in Nominet's testbed data set.
+
+0.01_01 2013-12-09
+
+    - Fixed bug whereby low RAM machines might exhaust memory parsing
+      Nominet's broken error message. Requires newest Net::EPP from svn.
+      See https://rt.cpan.org/Public/Bug/Display.html?id=90776
+
+0.01 2013-11-06
+
+    - Minor documentation fixes from 0.00_02.
+
+0.00_02 2013-10-30
+
+    - Improved documentation in POD.
+    - Removed old, commented-out code.
+
+0.00_01 2013-10-29
+
+    - Better exception handling in the tests if the client IP address is not
+      registered to use the testbed.
+
+0.00 2013-10-18
+
+    - Initial Release

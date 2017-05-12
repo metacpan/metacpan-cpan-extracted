@@ -1,0 +1,13 @@
+abstract: Encodes integers into a short and easy to read and pronounce "locator string"
+author: Jesse Vincent <jesse@bestpractical.com>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Number-RecordLocator
+no_index: 
+  directory: 
+    - inc
+    - t
+version: 0.003

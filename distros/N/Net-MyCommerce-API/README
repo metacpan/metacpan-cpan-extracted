@@ -1,0 +1,75 @@
+Net-MyCommerce-API
+
+This module provides sample code to access the Digital River MyCommerce Platform REST API.
+
+More information about these APIs are available at url:
+http://help.mycommerce.com/index.php/mycommerce-apis
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Encode
+  JSON::Parse
+  JSON::XS
+  MIME::Base64
+  REST::Client
+  Try::Tiny
+  URI::Escape
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+  perldoc Net::MyCommerce::API
+
+Online documentation for the Digital River MyCommerce APIs is available at
+  
+  http://help.mycommerce.com/index.php/mycommerce-apis
+
+You can also look for information at:
+
+  RT, CPAN's request tracker
+    http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-MyCommerce-API
+
+  AnnoCPAN, Annotated CPAN documentation
+    http://annocpan.org/dist/Net-MyCommerce-API
+
+  CPAN Ratings
+    http://cpanratings.perl.org/d/Net-MyCommerce-API
+
+  Search CPAN
+    http://search.cpan.org/dist/Net-MyCommerce-API/
+
+EXAMPLES
+
+/examples subdirectory include a few sample scripts.
+You will need to have a MyCommerce vendor ID and appropriately scoped API secrets.
+Also some scripts require one or two product IDs.
+
+LICENSE AND COPYRIGHT
+
+   Copyright 2013 Digital River, Inc.
+ 
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+ 
+       http://www.apache.org/licenses/LICENSE-2.0
+ 
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+

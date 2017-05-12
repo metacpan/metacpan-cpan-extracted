@@ -1,0 +1,18 @@
+---
+abstract: 'Enables User/Password Authentication to L<Net::MQTT::Simple> Client'
+author:
+  - 'Manuel Krenzke'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: restrictive
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-MQTT-Simple-Auth
+requires:
+  Net::MQTT::Simple: 1.21
+version: 0.002
+x_serialization_backend: 'YAML::Tiny version 1.51'

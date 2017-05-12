@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 68cfd1373ada6de9d90587d2f1f34ed2afb729fb Changes
+SHA1 648da4c723f2d39ec49e7af2dc60dcf212066238 INSTALL
+SHA1 6b50b30fa6f8d063d96e32c9a81f3f82328925f7 LICENSE
+SHA1 7f895c181aa45152dd0ed2bfc34dddc31ad8e3c6 MANIFEST
+SHA1 9456494115d697040931b5bd5f22f36c27315ee5 META.json
+SHA1 ff3a6bb8c6ca7bbb749c6ce185fc643c74f41051 META.yml
+SHA1 4440cde7329f373e397d01af742f6496f4cad58b Makefile.PL
+SHA1 e7a67287fc282fa654e20cfdace375de09d439d2 README
+SHA1 6e4cc7101fdc49e5ca8b716d484a2b9befe3a28a cpanfile
+SHA1 67ca0be44c9745d2bde9800146d4e39ce4499c5a dist.ini
+SHA1 68690c03000b950f5ba67ebbb81f608c8fa0dd8e examples/bot.pl
+SHA1 34d3197ff39a3728bf91eebe6b42264459ab3fcf examples/client.pl
+SHA1 5c2de512438a55ec9a60a5bcb5ef24896eced60f examples/demo.pl
+SHA1 4052ee8cf4f648f951591f03acdadc806a2d36e0 examples/echotest.pl
+SHA1 42003acf977d0ab186c943afdda30ec2dc81827c examples/fire-and-forget.pl
+SHA1 527d487cd4416d2196e9cff5e20b5ded4febccd1 lib/Net/Async/XMPP.pm
+SHA1 1ab5772f6293e34cc52ffb4a0206316e75b4d835 lib/Net/Async/XMPP/Client.pm
+SHA1 76839ce7df7e85bec9345fb552c92398a8807216 lib/Net/Async/XMPP/Client.pod
+SHA1 67598af48226ca44c1aad7ea5ba8264f32faba1b lib/Net/Async/XMPP/Protocol.pm
+SHA1 f59c738508dfeb1a3c5a61f1d55e947ea4b6a1d0 lib/Net/Async/XMPP/Protocol.pod
+SHA1 a8854dd3f12769917ce3886aa885b6a4c48e68e7 lib/Net/Async/XMPP/Server.pm
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 a97b69aade7b5fcc0868f099c10be733726412e4 t/00-compile.t
+SHA1 451f038f24d1814a3958a4b4e6222e8508f1e54b t/000-report-versions-tiny.t
+SHA1 f242e380d897f0430a668ea3f2938df75c0bef55 xt/author/test-eol.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/release/synopsis.t
+SHA1 bbcd59d081d9940af5d43337ae85458075933829 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJT39CtAAoJEFKElMNpjtyDlMIH/jOieYoS4Bm+S5y/wi57ZYdT
+VTSfRsdbDpesvEvxLY+V76wHTkACU6MoaJCtqaKW8LeBCdw9oEYbtHliPxZwNniH
+P2ankTdFodYMmUtlFnSqoWnnEMFUfPta/NhH3qs3G98xXHKxxk0E/pFL2P28B30S
+EWNArZBVES1Iv4yVFX/7EUu7tQ9/BfHwNs3WNY8SkVYASkrYOUBzG6rLvDIiiwj3
+a71SROWuPWD+v/j4rBThP4ipBkP/q+oMsOGCJY7epAEyjILhSbmZHxorIEQsJuZZ
+0KrnXJ4F5xwJ6qXJwrChFUpyEUFT/fmDAYmetyeZh4uxx8RkrxuWCiJ0HEopa0o=
+=MG8M
+-----END PGP SIGNATURE-----

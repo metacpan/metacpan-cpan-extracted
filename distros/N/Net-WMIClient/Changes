@@ -1,0 +1,21 @@
+Revision history for Perl extension Net::WMIClient.
+
+0.62  Fri Sep 21 2012
+	- Remove excess -l calls from LIBS - libasync_wmi_lib.so will handle the extra
+	  libraries
+	- Change the name to Net::WMIClient
+	- Change the licence to GPLv2+ only
+	- Add Timeout => parameter to short-circuit WMI calls
+0.61  Fri Aug 31 2012
+	- Reduce version requirement to Perl 5.8
+0.60  Wed Aug 29 2012
+	- Write POD docs.
+	- Change license to specify the WMIClient.xs is GPLv2+
+0.50  Tue Aug 28 2012
+	- Add parameter hashref handling
+	- Move all code not in libasync_wmi_lib.so.0 into the XS file to eliminate
+	  the need for patching the wmi code
+	- Require the WMI_SOURCE=<path to WMI/Samba/source> parameter to perl Makefile.PL
+0.10  Tue Aug 21 2012
+	- original version
+

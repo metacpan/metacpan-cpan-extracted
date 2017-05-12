@@ -1,0 +1,22 @@
+---
+abstract: 'Calculate vanity score of a NANP phone number'
+author:
+  - 'Roman F. <romanf@cpan.org>'
+build_requires:
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Number-Phone-NANP-Vanity
+requires:
+  Locale::Maketext::Simple: 0
+  Moose: 0
+  true: 0
+version: 0.06

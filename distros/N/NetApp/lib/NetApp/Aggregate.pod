@@ -1,0 +1,269 @@
+
+=head1 NAME
+
+NetApp::Aggregate -- OO class for creating and managing NetApp filer aggregates
+
+=head1 SYNOPSIS
+
+    use NetApp::Filer;
+    use NetApp::Aggregate;
+
+    my $filer = NetApp::Filer->new({ .... });
+
+    my @aggregate_names	= $filer->get_aggregate_names;
+
+    my @aggregates	= $filer->get_aggregates;
+
+    my $aggregate	= $filer->get_aggregate( 'aggr01' );
+
+=head1 DESCRIPTION
+
+This class encapsulates a single NetApp filer aggregate, and provides
+methods for querying information about the aggregate and it's
+sub-objects (eg. volumes), as well as methods for managing the
+aggregate itself.
+
+=head1 INSTANCE METHODS
+
+=head2 General Instance Methods
+
+=head3 get_filer
+
+Returns the NetApp::Filer object representing the filer on which the
+aggregate exists.
+
+=head3 get_name
+
+Returns the name of the aggregate as a string.
+
+=head3 get_states, get_statuses, get_options
+
+Each of these methods returns a list of strings, each of which
+represents a single state, status, or option for the aggregate.
+
+    NOTE: All you English grammar pluralization rules fanatics can
+    give up trying to convince the author to call that one method
+    get_stati.
+
+=head3 get_state( $state ), get_status( $status ), get_option( $option )
+
+Each of these methods returns the value for the specified state,
+status or option.  If that particular key wasn't present, then this
+method will return undef.  This makes it easy to tell the difference
+between a key that doesn't exist, and one that has a false value.
+
+=head3 get_plex
+
+Returns the NetApp::Aggregate::Plex object representing the plex on
+which the aggregate lives.
+
+=head2 Volume Specific Methods
+
+=head3 get_volume_names
+
+Returns a list of the volume names which are contained within this
+aggregate.
+
+=head3 get_volumes
+
+Returns a list of NetApp::Volume objects, each of which represents one
+of the volumes in the aggregate.
+
+=head3 get_volume( $name )
+
+Returns a single NetApp::Volume object representing the specified
+volume.  If that volume doesn't exist on the aggregate, then a fatal
+exception is raised.
+
+=head3 create_volume( %args )
+
+This method creates a flexible volume in the aggregate, and returns
+the NetApp::Volume object representing the new volume.  The arguments
+are as follows.  All values are simple strings, unless otherwise
+noted.
+
+    $aggregate->create_volume(
+	# Required arguments
+	name		=> $name,
+	size		=> $size,
+	# Optional arguments
+	space		=> 'none' | 'file' | 'volume',
+	language	=> $language,
+	source_filer	=> $source_filer,
+	source_volume	=> $source_volume,
+    );
+
+Both the source_filer and source_volume arguments must be given when
+creating a flexcache volume.
+
+The space and language arguments may not be specified with the
+source_filer/source_volume arguments.
+
+=head3 destroy_volume( %args )
+
+Destroys the specified volume.  Note that since this API is not
+designed to be used interactively, the -f (force) argument is always
+used.  Be sure you really want to destroy the volume, programatically.
+
+    $aggregate->destroy_volume(
+	# Required argument
+	name		=> $name,
+    );
+
+The $name must be a string, and it must be one of the volumes in the
+$aggregate.
+
+=head2 Qtree Specific Methods
+
+=head3 get_qtree_names
+
+Returns a list of strings, each of which is the name of a qtree on the
+aggregate.
+
+=head3 get_qtrees
+
+Returns a list of NetApp::Qtree objects, each of which represents a
+single qtree on the aggregate.
+
+=head3 get_qtree( $name )
+
+Returns a single NetApp::Qtree object for the specified qtree
+name. The name must in the form of a pathname, for example:
+
+    /vol/volume_name/qtree_name
+
+The qtree_name is optional if querying the object for a volume's
+qtree.  This method simply returns nothing if the specified qtree
+doesn't exist on the aggregate.
+
+=head2 Snapshot Specific Methods
+
+=head3 get_snapshots
+
+Returns a list of NetApp::Snapshot objects for each of the snapshots
+of the aggregate.
+
+=head3 get_snapshot( $name )
+
+Returns a single NetApp::Snapshot object matching the specified name,
+if it exists for the aggregate.
+
+=head3 create_snapshot( $name )
+
+Creates a snapshot of the aggregate with the specified name.
+
+=head3 delete_snapshot( $name )
+
+Deletes a snapshot of the aggregate with the specified name.
+
+=head3 get_snapshot_deltas
+
+Returns a list of NetApp::Snapshot::Delta objects for each snapshot
+delta for the aggregate.
+
+=head3 get_snapshot_reserved
+
+Returns a string representing the amount of reserved space, as a
+percentage.  This string does NOT include the % sign.
+
+=head3 set_snapshot_reserved( $percentage )
+
+Sets the snapshot reserved space to the specified percentage, which
+should also NOT include the % sign.
+
+=head3 get_snapshot_schedule
+
+Returns a NetApp::Snapshot::Schedule object representing the snapshot
+schedule for the aggregate.
+
+=head3 set_snapshot_schedule( %args )
+
+Sets the snapshot schedule for the aggregate based on the arguments
+passed.  The argument syntax is:
+
+    $aggregate->set_snapshot_schedule(
+        weekly		=> $weekly,
+        daily		=> $daily,
+        hourly		=> $hourly,
+	hourlist	=> [
+	    $hour1, $hour2, $hour3, ....
+        ],
+    );
+
+=head1 TO BE IMPLEMENTED
+
+NOTE: Currently, all of the following methods have yet to be
+implemented, but will be soon.  This documentation serves as a
+guideline for how to implement the perl API for each associates CLI
+function.
+
+=head2 NetApp::Aggregate->create( ... )
+
+    my $aggregate	= NetApp::Aggregate->create(
+	# Required arguments
+        filer		=> $filer,	# NetApp::Filer object
+	name		=> $aggregate_name,
+	# Required but mutually exclusive arguments
+	# Either 'disks' OR 'diskcount and/or disksize'
+	disks		=> [
+ 			     [ $disk1, $disk2, .... ],
+ 			     [ $diskn, $diskn+1, .... ],
+			   ],
+	diskcount	=> $diskcount,
+	disksize	=> $disksize,
+	# Optional arguments
+	raidtype	=> 'raid0' | 'raid4' | 'raid-dp',
+	raidsize	=> $raidsize,
+	disktype	=> 'ATA' | 'FCAL' | 'LUN' | 'SAS' | 'SATA' | 'SCSI',
+	rpm		=> $rpm,
+	mirrored	=> $boolean,
+    );
+
+=head2 $aggregate->add( ... )
+
+    $aggregate->add(
+	# Required arguments
+	name		=> $aggregate_name,
+	# Required but mutually exclusive arguments
+	# Either 'disks' OR 'diskcount and/or disksize'
+	disks		=> [
+ 			     [ $disk1, $disk2, .... ],
+ 			     [ $diskn, $diskn+1, .... ],
+			   ],
+	diskcount	=> $diskcount,
+	disksize	=> $disksize,
+	# Optional arguments
+	raidgroup	=> $raidgroup,
+	force		=> 1,
+    );
+
+=head2 $aggregate->destroy()
+
+NOTE: This always uses the -force option, since this API is not
+interactive.
+
+=head2 $aggregate->offline()
+
+    $aggregate->offline(
+	# Optional arguments
+	cifsdelaytime	=> $cifsdelaytime,
+    );
+
+=head2 $aggregate->online()
+
+NOTE: It is unclear whether or not we should always imply -f (force =>
+1), or whether we should treat the prompted scenario as an error, and
+raise an exception.  Since forcing an aggregate online can result in
+data loss when -f is used, perhaps we should force that state to be
+cleaned up first.
+
+=head2 $aggregate->rename( $newname )
+
+=head2 $aggregate->restrict( ... )
+
+    $aggregate->restrict(
+	# Optional arguments
+	cifsdelaytime	=> $cifsdelaytime,
+    );
+
+=cut

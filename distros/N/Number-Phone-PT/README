@@ -1,0 +1,43 @@
+Number/Phone/PT version 0.05
+============================
+
+Validate Portuguese phone numbers
+
+  use Number::Phone::PT;
+
+  $number = 258374162;
+
+  print "$number is valid" if is_valid($number);
+
+  print "$number belongs to a home" if is_residential($number);
+
+  print "$number is a celular phone" if is_mobile($number);
+
+  print "$number belongs to someone" if is_personal($number);
+  # same thing as ( is_residential($number) or is_mobile($number) )
+
+  print "$number is from " . area_of($number) if is_residential($number);
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+No dependencies
+
+SEE ALSO
+
+The POD documentation in PT.pm
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Jose Alves de Castro
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

@@ -1,0 +1,22 @@
+use Net::Bluetooth;
+
+	#### Create a RFCOMM client
+
+	#### Create a new socket object, this is basically calling
+	#### the systems socket() call and setting some variable.
+	#### The argument can be either "RFCOMM" or "L2CAP".
+	my $obj = Net::Bluetooth->newsocket("RFCOMM");
+	die "Socket could not be created!" unless(defined($obj));
+
+	#### Connect to server. You can see how to obtain the port and 
+	#### address in the service sample file.
+	if($obj->connect($addr, $port) != 0) {
+		die "connect error: $!";
+	}
+                                                                                                                   
+	#### Create a Perl filehandle for reading and writing
+	#### The filehandle should work with any Perl call that
+	#### does not use the sockaddr struct.
+	*SERVER = $obj->perlfh();
+	$amount = read(SERVER, $buf, 256);
+	close(SERVER);

@@ -1,0 +1,25 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.74, CPAN::Meta::Converter version 2.132140'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Patricia
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Net::CIDR::Lite: 0.20
+  Socket6: 0
+  Test::More: 0.88
+  version: 0
+version: 1.22

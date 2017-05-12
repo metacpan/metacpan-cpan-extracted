@@ -1,0 +1,724 @@
+Revision history for Perl extension Net::FTPSSL.
+
+TODO:
+  - Implement a "find" function similar to Unix's find command.
+  - Support IPv6 as well as IPv4.  (started) [I don't have access to a IPv6
+    network to test with.]
+  - Fix so Trace isn't so verbose.  Such as making freqency a function of file
+    size & block size.
+  - Fix to support MLSD & MLST commands.
+
+Version - YYYY/MM/DD
+--------------------
+0.38 2017/03/30 08:30:00
+  - Bug Id: 120802.  PreserveTimestamp bugs with _mfmt() & _mdtm().  I pulled
+    the arguments off the stack in the wrong order.  Corrected this.
+  - Added instructions on how to install this module in an alternate location
+    to the README file.
+
+0.37 2017/03/27 08:30:00
+  - Found an issue with size() function when it gets the file size via "STAT".
+    Found a server where "STAT" returned the results in a different format.
+  - Removed duplicate setting of {help_cmds_no_syntax_available} key in _help().
+  - Bug Id: 120623.  Missed the 2nd half of the ticket.  When Croak=>1 is turned
+    on to not treat the failure of "SITE HELP" as a fatal error!
+
+0.36 2017/03/20 08:30:00
+  - Updated the copyright & version number.
+  - Added additional module versions to the logs in BEGIN.
+  - Bug Id: 120341.  Turns out the latest release of IO-Socket-SSL broke
+    this module.  (v2.046 broken, v2.012 worked)  Looks like the start_SSL()
+    call is removing my "_FTPSSL_arguments" hash entry.
+  - Bug Id: 120623.  The OverrideHELP option had issues.  Shouldn't have called
+    _feat() or _site_help() for =>1 or =>\@lst.  So removed in _help()!
+  - Bug Id: 120621.  Request for a new feature of allowing objects that inherit
+    from IO::Handle wherever it asks for a GLOB!  put/get/DebugLogFile/etc ...
+    Implemented via new helper function _isa_glob().  Also updated POD.
+  - Updated README section on using client certificates.
+  - Updated t/20-certificate.t to use a callback & updated the %certificate
+    hash.
+
+0.35 2016/11/03 08:30:00
+  - Minor POD updates.
+  - Bug Id: 118418.  Added catastrophic failure protection to _croak_or_return()
+    by adding:  local $SIG{PIPE} = "IGNORE"; before connection termination
+    logic.  Limits the scope to just this one code block.
+
+0.34 2016/07/27 08:30:00
+  - BEHAVIOR CHANGE - Added fix_supported() as a way to make corrections to
+    supported().  Editing the returned hash reference of _help() no longer
+    works!  This new method does both additions & removals.
+  - BEHAVIOUR CHANGE - Modified _mfmt() & _mdtm() to be able to handle localtime
+    vs gmtime based on changes to how PreserveTimestamp work.  As an alternate
+    way, the behavior can be overriden by a new $local_flag option.  The
+    default behavior is still GMT time.  See the POD for a description of how
+    PreserveTimestamp now works.
+  - Made POD clarification & other comment updates.
+  - Increased TRACE_MOD from 5 to 10 blocks.
+  - Added BEGIN block to detect if IPv6 support is possible.  It does this by
+    asking IO::Socket::SSL instead of reinventing the wheel.
+  - Moved the generation of the Debug log header info for CPAN support to BEGIN
+    as well so that this info gets centralized instead of repeated.
+  - Added Domain/Family as a new option for choosing IPv4 vs IPv6.
+  - Added OverrideHELP => -1 option to use FEAT instead, when HELP is broken!
+  - Updated quot() to recognize that MLSD also requires a data channel.
+    Also improved the disable HELP logic used here.
+  - Broke up _feat() into _feat() & feat().  Also added feat() to the POD.
+    Done since under some circumstances the feature list can be dynamic!
+    Also changed logic on how to tell if OPTS is supported or not.
+    Finally drops HELP from the list of FEAT commands returned if OverrideHELP
+    was used.
+  - Rewrote _help() to make it less confusing.  Adding OverrideHELP=>-1 made it
+    clear it was too messy to support ongoing.  Much more understandable now.
+    Also made it more reliable to get the list of site commands supported.
+  - Fixed PreserveTimestamp bug in transfer() & xtransfer().
+  - Added new option xWait for use by xput() & xtransfer().  Some servers won't
+    honor the rename of the scratch file to it's final name without instituting
+    a delay.  So this option allows you to specify one.
+  - README - Added more notes about turning on/off SSL logging.  Newer
+    versions allow for dynamic turning on/off.  Also updated comments on the
+    naming of the trace logs.
+  - t/10-complex.t - Changes to the main test script!
+    * Now uses fix_supported() in it's is_file() tests since these test cases
+      hit some lies told by some servers!
+    * Fixed so it's main logs are named after this test program like the other
+      test cases do.
+    * Added new test to verify if the MDTM command correctly uses GMT time
+      instead of local time.  (Assumes MFMT will use the same time zone!) Did
+      this test early enough so that the last connection used the correct
+      PreserveTimestamp settings for tests depending on it!
+    * Added xWait of 1 second to deal with problem FTP/S servers that require
+      a wait for the xput & xtransfer tests to work.
+  - t/05-readonly.t - Renamed 05-simple to 05-readonly to more acurately
+    describe the types of tests this test script does!  Updated in MANIFEST &
+    README as well.
+
+0.33 2016/07/06 08:30:00
+  - BEHAVIOUR CHANGE - Since many openssl libraries are tightening their
+    security, I'm adding a new option to preserve backwards compatibility.
+    By default this module now reuses the context of the command channel
+    when opening a data channel.  If you need to revert back to the previous
+    default of not reusing the context for data channels, you must now use
+    option "DisableContext => 1" to do so.  But hopefully the need for this
+    option will be rare.  See the POD for more details.
+  - BEHAVIOUR CHANGE - Added support for SNI in the SSL handshake.  Always
+    does it if supported.
+  - Changed logic on how to detect if a default "SSL_verify_mode" value needed
+    to be set to VERIFY_NONE() for the caller in new().  Now checks for specific
+    SSL_* options before setting.
+  - Can now pass SSL options directly to new().  You no longer need to use the
+    "SSL_Client_Certificate" option to pass the hash reference of SSL options.
+    Currently only recognises IO::Socket::SSL options that start with SSL_.
+    If any start with something else, I'll address in a future release.
+  - Clarified some POD information on a few methods.
+  - Enhanced "size" function to use STAT if SIZE wasn't available!
+  - Fixed case where sometimes the login account used wasn't being masked in
+    the response in the logs.
+  - Now prints the INET version in the log file.
+  - Resets $ERRSTR to default in new() in case previous call had errors!
+  - Fixed t/10-complex.t func run_stat_test() to test the "is_file" & "is_dir()"
+    functions.  Some tests disable the "SIZE" command so it can test the new
+    alternate size logic as well.
+  - New test program t/05-simple.t that does a simple read only test against
+    the FTPS server.  Added so that you can run a simple test against servers
+    you don't want to upload anything to during the tests.  These tests are
+    not as robust as the t/10-complex.t tests so failures here are not as
+    meaningfull.  So run t/10-complex if you encounter any issues for more
+    analysis.
+  - Added t/05-simple.t to the MANIFEST.
+  - Updated the Copyright in the README file.  And reworded a few sections.
+  - Updated all t/*.t files to add a retry the 1st time they try to connect
+    to a server via new().  Added a hard coded "SSL_cipher_list" value if
+    the defaults don't work.  This kludge might not work for everyone.
+  - Modified t/20-certificate.t to be a bit more robust.
+  NOTE: Found a server where supported() doesn't completely work.  That server
+        fails to put a "*" after some of the commands it didn't implement.  So
+        had to hack a couple of test cases that hit this issue.
+
+0.32 2016/06/14 08:30:00
+  - Clarified some POD information on a few methods.
+  - Bug ID: 115296 - Changed the use_ssl test when providing custom SSL_Version
+    settings via the SSL_Client_Certificate option.  Now does a positive test
+    for SSL instead of a negative test.
+  - Modified t/10-complex.t to do a better uput test.  Put into its own test
+    function so that I could also validate the filename returned instead of just
+    assuming it was correct!
+  - Added additional test cases for files with spaces in their names.
+  - Added run_stat_test() for future tests for "is_..." functions.
+
+0.31 2016/03/30 08:30:00
+  - Updated the Copyright.
+  - Fixed issue where "uput" cmd generated "Invalid number of parameters" error.
+    Fix is to call STOU a 2nd time with no file name.  But if this happens and
+    the server doesn't return the file name, uput now returns "?" instead of
+    making what it knows is a very flawed guess! (since it doesn't use the hint)
+  - Implemented mdtm() server bug fix.  Some rare servers do (19xxx) instead of
+    (20xx) for the year part of the timestamp returned.  So implemented
+    autodetection & fix for this server issue!
+  - Added undocumented Debug value to supress printing out the HELP information
+    during login.  It got in the way of debugging via add-hock perl scripts.
+  - Added is_file() to validate if the given name is a regular file!
+  - Added is_dir() to validate if the given name is a directory!
+  - Fixed bug in t/10-complex.t that made it look like "make test" succeeded
+    when in fact it encountered a fatal error forcing it to skip over all the
+    other deeper tests.  Affected call to config func: check_for_pasv_issue()
+  - Fixed some undef warnings in "uput() test" in t/10-complex.t when talking
+    to buggy windows FTPS servers that says it supports "uput" but handles it
+    really strangely or not at all.  Now also handles new "?" return value in
+    the strange case.
+  - Fixed bug in t/10-complex.t in test_log_redirection() failing a EPSV test
+    when the destination server didn't support this functionality.
+  - Modified t/10-complex.t to print the "OK" results to the log file.
+    Makes it a bit easier to associate failures to what's in the log file!
+  - Fixed some typoes in the POD.
+
+0.30 2015/08/13 08:30:00
+  - INCOMPATIBILITY WARNING!  If you've been hacking internal undocumented
+    variables referenced by my module, your code is most likely broken with this
+    release!  If you've been doing "$ftps = new (...);  $x = ${*$ftps}{abc};",
+    it's now "$x = ${*$ftps}{_FTPSSL_arguments}->{abc};" for a lot of them.
+    This change was made to make it less likely I'll accidentaly step on a
+    IO::Socket::SSL variable in a future release of either module.  It also
+    helps me with error log traces & some future plans if they ever happen.
+  - Changed t/00-basic.t so it no longer needs to call uc().  Also now uses
+    __PACKAGE__ keyword instead of hard coded text.
+  - Fixed error message bug in _get_data_channel().  Got SSL_version from wrong
+    hash.
+  - Reorganized the order of some functions in the POD.
+  - Fixed minor bug in the masking of the user id when writing to a log file!
+  - Looks like the sysread() call in response() is sometimes spurriously setting
+    the special variable "$!" for Perl 5.10.1 on AIX 7.1.  So if the command
+    looks complete I'm going to ignore the error message returned in "$!".
+    I'm probably going to have to figure out a better test for this later on!
+  ######
+  - EXPERIMENTAL: Added 2 new functions set_dc_from_hash() and copy_cc_to_dc().
+    They provide two different ways to micro manage the SSL options used to
+    manage the Data Channel without the need to hack the code base.  There are
+    more SSL options than I know what to do with so hopefully this will help
+    with managing the data channel.
+
+0.29 2015/07/06 08:30:00
+  - Fixed typo that broke reuse session.  Bug was overwriting key value!
+  - Fixed uc() warning in t/00-basic.t for Perl 12 & above.
+
+0.28 2015/07/01 08:30:00
+  - Updated README file with info on how to turn on SSL tracing so that I can
+    more easily find that information again.
+  - Fixed log display issue if there was no username and/or password passed
+    to login().
+  - In quot() fixed pattern match bug when setting $cmd2.  (\S* to \S+)
+  - Added LICENSE file to my package (+ Manifest).   Kwaltiee Experimental # 3.
+  - Rewrote Makefile.PL to support optional parameters so I could add
+    conditional Kwaltiee Score variables.
+  - Added MIN_PERL_VERSION tag to Makefile.PL   Extra Kwaltiee Metric # 1.
+    Enforced Ver. 5.6.1, since that is the earliest perl my module was tested
+    against by the smoke testers.  But it was last tested that way with v0.11.
+    Version 5.8.8 is the oldest version of Perl I test against regularly.
+  - Added LICENSE tag to Makefile.PL            Extra Kwaltiee Metric # 2.
+  - Added Net::SSLeay as a fake dependancy to Makefile.PL & as a test case in
+    t/00-basic.t for the benifit of some Smoke Testers who fail my module due
+    to this indirect dependancy not working.  I don't use this module, but it's
+    obviously a dependancy of IO::Socket::SSL.  But it looks like it might
+    not be a declared dependancy since it's failing to load for a smoke tester
+    while he's testing my module.
+  - Fixed _print_LOG() to support multiple arguments.  So no longer have to
+    concatinate everything before using.
+  - Rewrote _debug_print_hash() to be able to handle hashes of any depth.
+    It's now recursive with infinite loop detection.
+  - Added logic to support reusing the session instead of just the context.
+    This is via the new option "ReuseSession=>1".
+    Thanks Forrest Tiffany for your patch!  (Bug Ids 76108 & 104407)
+
+0.27 2015/03/28 08:30:00
+  - Fixed Bug Id # 102680.  Bad "supported" test in xput/xtransfer with
+    regard to OverrideHELP=>1.  (All other OverrideHELP options worked fine.)
+  - Added "all_supported()" to assist fixing the above bug & put into the POD.
+  - Some minor POD corrections.
+  - Added check to quot("HELP") to see if HELP was overriden.  Required
+    a minor change in new() to support this logic.  We know help is broken if
+    OverrideHELP was used!
+  - Added the INTERPRETING THE LOGS section in the POD text.
+
+0.26 2015/02/10 08:30:00
+  - The deprecialted SSL_Advanced option now causes new() to call croak.
+    I'll remove any remaining reference to it in v0.27 or v0.28. (2016 earliest)
+  - The POD text no longer mentions the SSL_Advanced option at all.
+  - Added to README the new environment variable created for the test scripts
+    in the previous release.
+  - The RFC links in the SEE ALSO section had all expired.  Located replacement
+    links for all referenced documents.  Looks like they were just moved to
+    another location on the same web site.  A victim of web-site remodeling.
+  - Enhanced _debug_print_hash().  It originally worked with just GLOBs, but
+    now works with regular hashes as well.  Also fixed to follow SCALAR
+    references.
+  - Now dumps to the log file the contents of the SSL_Client_Certificate
+    hash if provided.  Was difficult to debug logic when it wasn't logged.
+  - Bug Id # 101388, reusing SSL_Client_Certificate options on the data channel.
+    Added additional options to go with SSL_reuse_ctx to resolve this issue.
+    I checked the IO-Socket-SSL docs & all variables in the bug id are by
+    default part of SSL_reuse_ctx.  So some low level code isn't resolving
+    the context correctly.  This is a work arround.  (Certificates were not
+    being used here.  Just using the context for strict hostname verification.)
+    May be a case that when certificates are not used, the context isn't
+    fully used either.
+
+0.25 2014/09/05 08:30:00
+  WARNING: This is a major upgrade & may not be 100% backwards compatible with
+           existing code.  Also the response() redesign may not work for all
+           FTPS servers!  It's a work in progress!  So comments are welcome!
+  - Upgraded the minimum version of IO-Socket-SSL required from v1.08 to v1.26
+    so that I could remove the warnings in the POD for ccc().  But it should
+    still work with the earlier versions if you hack the code.  But don't rely
+    on this in future releases.  (minus the ccc command)
+  - Modified the Synopsis to use Croak since no one was reading my comments
+    about using it too closely anyway.
+  - Added a new pattern for uput() to check for file names with.
+    Also fixed to guarentee it will never return any path info, just the
+    base file name itself.  [ This change may break existing programs. ]
+  - Another hack to recover from a garbled CCC response.  This hack just
+    prevents unnecessary warnings.
+  - Hit a weird FTP server that requiers me to flip flop the binary/ASCII
+    settings on the server/client.  See mixedModeAI() & mixedModeIA().
+  - Added a way to print Perl warnings to the log file. (trapWarn)  It will
+    chain things if warnings were already trapped.  Even between multiple open
+    Net::FTPSSL object logs.  This is only usefull as a debugging tool when
+    reporting on errors via CPAN.  It helps provide context to the warnings
+    that affect this code base.
+  - Added get_log_filehandle() to allow someone to gain access to the open
+    filehandle used to write to the log file generated when Debug is turned on
+    and you specified a log file via DebugLogFile.
+  - Now allows DebugLogFile to be an open file handle (GLOB).
+  - Fixed quot() to echo the command if it's one of those dissallowed.
+    Also now strips off any leading spaces from the command before using it.
+  - Found out use "sub DESTROY" rather than "sub END" for objects. (Just a FYI)
+    Surprise, Surprise!  Sometimes END is called before DESTROY is!
+  - Moved some logic out of quit() into the new DESTROY() method.  No longer
+    need to hack object termination logic via quit().
+  - Added END to handle final clean up for trapWarn().
+  - Fixed warnings in function _feat() caused by strange server returns.
+  - Fixed warnings in function _help() caused by strange server returns.
+  - Fixed 20-certificate.t bug where $ENV{HOME} is not defined for all OS.
+  - Fixed 10-complex.t to use the new warning logic.
+  - Fixed 20-certificate.t to use the new warning logic.
+  - Fixed t/10-complex.t & t/20-certificate.t to use a 30 second Timeout
+    instead of using the default 2 minutes.
+  - Reworked response() with regard to Bug # 97608. (related to Bug # 73115)
+    Had to redesign how this method worked.  It was getting too convoluted
+    to patch any further.  Was the only way to properly fix _help & _feat.
+  - Second issue for Bug # 9706 was an issue with very long login messsages
+    hit an unexpected Timeout issue (last release enhancement).  Turns out the
+    Timeout logic in response() didn't always work properly if you didn't read
+    in the entire response via a single call to sysread().  Had two options,
+    make the buffer huge for the login response or make the logic more complex,
+    to only check for Timeouts on the command channel for new commands.  Turns
+    out select() & sysread() don't actually compare notes.  Hense another reason
+    to redesign how things worked.
+  - This rewrite of response() broke the ccc() hack.  So had to redesign how
+    this hack worked as well.  [May break existing programs using CCC!]
+  - Added special case Debug=>99 for more detailed logging for debugging
+    the new response code base in the future.
+  - Added new environment variable (FTPSSL_DEBUG_LEVEL) to t/10-complex.t to
+    enable low level debugging of the new response() code.  There is no prompt
+    to turn on this feature.  Added more as a reminder that it can be done!
+  - Updated the SSL_Advanced depreciated warning that it will soon be removed
+    in a future release.  It was depreciated in v0.18 way back in 2011, so I
+    feel it's about time to have it removed.  Just giving fair warning here!
+    I'll remove it in v0.26 or v0.27.
+
+0.24 2014/06/30 08:30:00
+  - Makefile.PL fix, only asks question if Net::HTTPTunel isn't present!
+    Also now defaults to "N" instead of "Y" if module not present.
+  - Fixed bug in supported().  Unsupported commands are followed with "*"
+    in help.  Most do "CMD*", but found some servers doing "CMD *" instead.
+  - Fixed bug in 20-certificate.t where we were getting a false failure
+    on nlst().  Fixed to explicitly check the response code instead of
+    assuming an error when nothing was found.  Fixed list() as well.
+  - Same fix in 10-complex.t, even though tests designed to always return
+    something.
+  - Added transfer() to transfer files from one system to another system
+    without the need to make a local copy of the file on your file system.
+  - Added xtransfer() as well.
+  - Added transfer & xtransfer validation to 10-complex.t to test things out.
+  - Added a new environment variable default for *.t prompts.
+  - Bug # 95411 - Patch provided by ian@iansramblings.com.  Fixes hang issue
+    when the command channel unexpectedly drops.  Does this by implementing
+    a timeout in response().
+    #-------  (Should I do this for the many data channel sysreads as well?)
+
+0.23 2013/08/01 08:30:00
+  - Added clarification to use of SSL_Client_Certificate option in pod text.
+  - Added Bug Id 82094 to support tunneling through a proxy server via the
+    ProxyArgs option.  Supports both proxy servers that require a password as
+    well as those that don't.  This option requires Net::HTTPTunnel to use.
+    But this new module isn't required if you don't use tunneling.
+    (perl Makefile.PL will ask.)
+  - Added optional proxy server questions if Net::HTTPTunnel is installed for
+    the test scripts (t/*.t).  It warns you if it's missing during the test.
+  - Fixed bug in login() so the call to help() only happens if the login is
+    successfull.
+  - Bug Id 84376 uncoverd bug in IO-Socket-SSL versions 1.79 to 1.85 when
+    using Certificats for the Data Channel & getting a Man-In-The-Middle (MITM)
+    warning that didn't apply.  So skip those releases.
+  - Bug Id 85420 same MITM warning as the other bug, but this time without using
+    Certificates in the command channel.  This required a code change in new()
+    to fix.
+  - Fixed masking issue when writing to the log file when the value that needed
+    to be masked contained regex special chars.
+  - Added clarification that any warnings printed below the 10-complex.t tests
+    are just that.  Warnings, not errors preventing things from working.  They
+    are collected so the developer can be notified about them for fixing in
+    furture releases.  They are also written to the end of the log now as well.
+
+0.22 2012/05/21 08:30:00
+  - Bug # 77072 requested to autodetect the need for using the PRET command.
+    The old test in t/10-complex.t was different & doesn't interfere.  The docs
+    in the POD now mark the Pret option as optional for cases where auto-detect
+    doesn't work!
+  - Fixed issue with ccc that the server sometimes responds to a successful NOOP
+    twice, resulting in command/responses getting out of sync.  (Another hack)
+  - Fixed quot() bug introduced with Bug # 74025 uc() fix in the last release.
+    Accidently shifted off the arguments a 2nd time during the uc() call.
+  - Fixed the return code in restart() to always be 1 instead of undef, since
+    it never fails.  Also moved its description towards the end of the POD text.
+
+0.21 2012/02/15 08:30:00
+  - Fixed bad call to _croak_or_return () in _get_data_channel() when dealing
+    with failed certificates for data connections.
+  - Bug # 74547, a request to support ftp PRET command for distributed FTP data
+    channel transfers.  New option to execute PRET before all PASV calls.
+  - updated t/10-complex.t to dynamically check if PRET is needed.
+  - Bug # 74035, as of Perl 5.12, uc($x) gives warning if $x is undef.  Added
+    checks to avoid these warnings.  Did via [ uc($x||""); ]
+  - Fixed both test cases to no longer send Port as undefined to get rid of
+    warnings in log file. (Passing undef wasn't realistic, was just convenient.)
+  - t/10-complex.t now explicity checks if any warnings are generated and does
+    a request for feadback instead of as an error if any are found.  Should help
+    considerably with debugging any code changes in the future.
+  - Added new internal method _feat() to get additional commands to be
+    recognized by supported().
+  - Enhanced _help() in parsing it's response from the server & other significnt
+    enhancements.  Major rewrite of this one method.
+  - Above rewite uncovered bug in t/10-complex.t to fix in a supported() test.
+  - Did some tweaking to the workings of the OverrideHELP option due to changes
+    in _help() & supported().
+  - Updated POD for supported() to describe changes to functionality.
+
+0.20 2012/01/01 08:30:00
+  - Fixed bug # 73115 where it looks like the response() had unexpected breaks
+    in it.  Instead of returning "xyz message" the FTPS server was returning
+    "x" on one line and "yz message" on another line.  And the code was
+    treating "x" as the entire response (since there was no "-" after it.)
+    Fixed so that if a response starts with a number that's less than 3
+    digits with nothing else following it, to assume we hit this bug.
+    The risk to this fix is that we might try to read past the response
+    on some other server and cause things to hang.  So that's an issue to
+    keep an eye out for after this release.
+  - Fixed minor issue with "HELP" not supported on some boxes.  If this happens
+    supported() will now always return false unless you use OverrideHELP.
+  - Now prints the hash values chosen for new() to the logs.
+  - Fixed so scrubbing out sensitive info from the logs is only done when debug
+    is turned on instead of doing it all the time.
+  - Reorganized the options to new() in the POD to put the less useful and
+    special case options to new() last.
+  - Other minor POD corrections and additions.
+
+0.19 2011/09/26 08:30:00
+  - If you use SSL_Advanced, it now writes to STDERR that you are using a
+    depreciated feature.
+  - Modified 10-complex.t & 20-certificate.t to honor the PERL_MM_USE_DEFAULT
+    envionment variable for the smoke testers to always use defaults, which
+    skips executing these 2 scripts.  BUG # 69982.
+    (Same thing now happens for "make test < /dev/null" as well.)
+    Couldn't use ExtUtils::MakeMaker::prompt() per request since "make test"
+    wouldn't display the questions it was asking & it looked like it hung in
+    interactive mode for normal users!  So based my solution on that function
+    using diag() instead of print.
+  - Fixed Typos in POD text Bug # 70438 & some misleading comments.
+  - Updated the README file to include comments on t/20-certificate.t and what
+    changes are required before you can use it.
+  - Updated t/20-certificate.t to highlight the section of code that the README
+    file is talking about and the initial prompt to remind the user to see the
+    the README file for the needed modifications before running the test!
+
+0.18 2011/07/29 08:30:00
+  - Added SSL_Client_Certificate to support client certificates on the data
+    channel as well as the command channel. Bug ID: 69327.
+  - Depreciated SSL_Advanced in favor of SSL_Client_Certificate.  SSL_Advanced
+    is now just an alias for SSL_Client_Certificate for backwards compatibility.
+    I just feel the new name better describes what we are trying to do with it
+    now that this feature is supported.
+  - More fixes/clarifications to the POD text.
+  - Fixed minor wild card issue with LIST & NLST if "+" was in the file name.
+  - Added restart() function to be compatable with Net::FTP for restarts.
+  - Added ability to restart downloads/get() where previous attempt left off.
+  - Added ability to restart uploads/put() where the previous attempt left off.
+  - Added append() command [APPE], it also uses OFFSET, but doesn't send the
+    REST command to the server.
+  - Added LocalAddr option to new().  Works against both the command channel
+    and the data channel.
+  - Masks out the user name used when generating a log file.  Similar to how
+    this is already done for the password.  Except it must also hide it in the
+    response to USER & PASS.  Only masked when written to the log, message()
+    and last_message() still returns the user name unmasked in any response
+    string!
+  - Fixed a bug in t/10-complex.t and added optional environment variables
+    for some of the connection values to make it easier for me to quickly
+    rerun tests during development without having to key in ansers to questions
+    with no good default values over & over again.
+  - Wrote t/20-certificate.t to test certificates out.  But this and
+    t/10-complex.t are probably incompatable in most settings.  Anyone else
+    trying to use this test case will have to modify this code to point to their
+    certificate and provide it's password, since I'm not going to publish my
+    test client certificate.
+  - Calls to command() now return a reference to this class so that you can
+    code something like: "if ($ftps->command("NOOP")->response() == CMD_OK)".
+    This should be compatible since it shouldn't be called externally, and
+    you should always be calling response() afterwards anyway.  It still calls
+    die if "Croak=>1" is used.  Response() will return CMD_ERROR should
+    command() have issues to avoid hangs.
+  - Modifed Net::FTPSSL to use the new command()->response() format internally.
+
+0.17 2011/01/03 08:30:00
+  - Fixed a subtle bug in response(), now tests if a parse succeeded instead
+    of assuming it.  Allowed me to simplify this messy code quite a bit.
+  - Reordered the methods in the POD to put some of the more relevant FTP
+    commands closer to the top & the more obscure at the bottom to make
+    for easier reading of the documentation.
+  - Reworked t/10-complex.t quite a bit.  Made sure croak was always turned
+    off immediately after a successful login.  Also now using the same hash
+    for all the connection attempts.  I really need to take the time to do
+    further redesign this script to make it easier to troubleshoot.
+  - Fixed the smoke tester failures.  (They always answer NO to the deeper test)
+  - t/10-complex.t now checks if OverridePASV or OverrideHELP are needed against
+    the test server & dynamically adds it for the test cases if needed.
+    Net::FTPSSL still can't dynamically figure this out for itself.
+  - Added PASV/EPSV prompt to t/10-complex.t script instead of assuming PASV.
+
+0.16 2010/11/30 08:30:00
+  - Used Perl's special variables to write the Perl verion and OS to the logs
+    to make support easier when trouble shooting tickets.
+  - Fixes for Bug Id 61432.
+  - On systems like "Connect:Enterprise UNIX", it incorrectly sends the
+    response to HELP partially in clear text and partially encrypted on the
+    command channel.  This causes this class to barf and never recover once it
+    hits the clear text.  So a new "OverrideHELP" option was created to bypass
+    calls to HELP if your server has this strange behavior.  This is needed
+    since HELP is called internally by the Net::FTPSSL class via supported()!
+    ** Maybe in the future I'll figure out a way to dynamically handle this. **
+  - On some systems the server administrator won't configure their servers
+    correctly to use the correct IP Address in the PASV response through a
+    firewall when establishing a new Data Channel Connection.  To get arround
+    this, a new "OverridePASV" option was created to force the use of the
+    Specified Server Name instead of the invalid IP Address returned in the
+    PASV response!
+    ** Maybe in the future I'll figure out a way to dynamically handle this. **
+  - Added "OverridePASV" & "OverrideHELP" test cases to t/10-complex.t
+  - Added EPSV support.  Required the reorginization of some internal
+    undocumented methods that no one should be using.
+  - Added EPSV test to t/10-complex.t
+
+0.15 2010/04/27 08:30:00
+  - Fixes for Bug Id 53719.  Requested all internal calls to "ALLO" be
+    conditional since some server connections die when it receives an "ALLO"
+    command.
+  - Fixing the above bug uncovered an infinite loop if Croak was also turned on.
+    Now _croak_or_return() doesn't try to close the connection if called by
+    command() or response() or if recursion was detected.
+  - Fixed quot() to no longer upshift the command to upper case.  Discovered
+    case where lower case was required.  So it's now up the the caller to
+    put in upper case if it's required!  Also no longer checks if the command
+    is valid according to HELP.  Some servers attempt to be sneeky by not
+    advertising all available commands.
+
+0.14 2010/01/04 08:30:00
+  - Added minimum requirement of IO::Socket::SSL v1.08, since I just got word
+    that v0.97 caused Net-FTPSSL to hang!  And v1.08 was the release I
+    originally developed Net::FTPSSL with & is easily available for Windows
+    users as a pre-built release. But that release is still pretty old.
+    (IO::Socket::SSL is currently at v1.31 as of this writting.)
+  - Fixed bug in _common_put() where it didn't actually test the final status
+    message when closing the data connection.  So missed a rare failure case.
+  - Fixed similar bugs in list() & get() as well.
+  - Caught more list() & nlst() error conditions that returned undef instead of
+    the empty list as documented.
+  - Added the Server/Port to start of trace file after the version # since not
+    all servers returned this info in their log messagse.
+
+0.13 2009/11/01 08:30:00
+  - Decided to skip unlucky release # 13!
+
+0.12 2009/09/29 08:30:00
+  - Made some POD changes.
+  - Fixed so each class instance has it's own file hande so multiple instances
+    won't write to the log file of the last Net::FTPSSL->new() call made with
+    Debug turned on.  Also fixed t/10-complex.t to use multiple connections so
+    we can manually verify this is finally corrected.
+  - Made sure the version of FTPSSL used always gets written out when Debug is
+    turned on.  So removed this code from t/10-complex.t as no longer needed.
+  - Fixed "quit" to close the DebugLogFile, will write to STDERR if anything
+    else is improperly called after "quit" is called!
+  - Fixed "put" tie file handle problem from Tkt # 49378.
+  - Added mdtm() & mfmt() to follow FTP specs & exposed _mdtm() & _mfmt() in
+    the POD text, which uses timestamps instead.  Per request # 49376.  The
+    underscore versions are more user friendly.
+  - Added size() per request # 49377.
+  - Minor fixes to 10-complex.t to support new functionality.
+  - Reorged some older code to make it easier to maintain.  Making some blocks
+    of code much smaller and less awkward.
+  - Fixed xput & xget to delete the dest file before renaming the scratch file.
+    Avoids rare file permission issues when the dest file already exists and the
+    file recognizer is down.
+
+0.11 2009/07/19 08:30:00
+  - Added ccc() to end of 10-complex.t test script.
+  - Updated the ccc() docs on issues with older IO::Socket::SSL versions.
+  - Provided solution to Tkt # 47659, problems with CCC - RFC 4217 Section 12.3.
+    Where CCC behaves differently for different FTPS servers.
+  - Added Debug option to allow writing to DebugLogFile in append mode instead
+    of creating a new log file every time.  So can use same log file when
+    serially making FTPS connections.
+  - Now allows overriding of the IMP_CRYPT port 990 to something else.  Found a
+    server that allowed me to change the implicit port # for this. Tkt # 46851.
+
+0.10 2009/06/30 08:30:00
+  - Updated the Port vs IMP_CRYPT documentation to state you can't override
+    port 990 for IMP_CRYPT.  Where before this was just assumed.
+  - Added option DebugLogFile to allow you to write your Debug info to a
+    file of your choice instead of STDERR.  This way multiple FTPS connections
+    can be traced separately of each other.  Also keeps other writes to STDERR
+    separate.
+
+0.09 2009/05/13 08:30:00
+  - Fixed some typos in the documentation.
+  - Fixed so list() & nlst() no longer return undef on some errors instead of
+    the empty list as documented.
+  - Fixed bug # 45710 where nlst() has issues returning zero rows.
+  - Fixed xput() so the scratch file is guaranteed to appear in the same
+    directory as the final file unless the prefix overrides it with a directory
+    of it's own.  Fixes issue where the remote file wasn't being written to the
+    current directory on the remote server and we couldn't write to the current
+    directory on that server for the scratch file.
+  - Added xget() as the complement to xput().  Where the file recognizer is on
+    the client side.
+  - Added ccc() for finally supporting the CCC command. (Clear Command Channel)
+  - Improved get() logic for removing zero byte files if it can't download the
+    requested file.  Still leaves behind partially downloaded files on purpose.
+  - Enhanced t/10-complex.t to test new functionality. (But not CCC due to
+    security concerns.)
+  - Added last_status_code() to return the 1 digit status returned by message()
+    so your code can branch on particular issues instead of just pass/fail.
+
+0.08 2009/03/23 08:30:00
+  - Fixed new() to also accept a hash reference.  So can do either way now!
+    Pass the hash by reference or pass the hash by value.
+  - Fixed command() & response() undefined function bug when called by a
+    socket data type in new() and a fatal error was encountered.  Solved by
+    not calling the member function in the normal way.
+  - Added $Net::FTPSSL::ERRSTR to give you access to the error messages
+    generated when you couldn't create a Net::FTPSSL object via new().  Also
+    set when Croak is called even though you had the special perl variable $@
+    for this. It is also printed to STDERR when Debug is turned on.
+  - Fixed response() case where the ending message had CR's in it and it was
+    being truncated.
+  - Fixed response() to detect unexpected EOF: Bug # 43670.
+  - Now passes Timeout to start_SSL() calls in new().
+  - Added plain old FTP as option CLR_CRYPT.  Just avoids encrypting the
+    command channel.  Still doesn't support the CCC command.
+  - Fixed implicit problem.  Turned out to be a bug in choosing the "default"
+    port as well as reading the response to soon. Bug # 28914.
+  - Exposed all the FTP CMD status constants for public use.
+  - Added unsupported option SSL_Advanced for Enhancement Request # 44042.
+    Use at your own risk!  It's not supported by the developer of Net::FTPSSL.
+  - Enhanced t/10-complex.t to print the version of Net-FTPSSL being tested and
+    support/test the new functionality.  Also now generates a backup copy of
+    the trace log named after the options selected to ease testing of multiple
+    configurations.
+  - Added xput for avoiding file recognizer issues on the FTPS server side
+    during file transfers.  IE the file recognizer picks the file up before the
+    transfer completes.  After the rename the file recognizer can safely assume
+    the file transfer has completed without issues.
+  - Added option in new() to support preserving the timestamps on files
+    transfered between the client & server via get(), put(), uput() & xput().
+    Works providing the FTPS server supports this functionality.
+  - Fixed response() timing bug where sysread() sometimes read the results of
+    multiple commands.  Ex: the 150 INFO msg for opening the data connection and
+    the 226 transfer complete message.  This bug caused FTPSSL to randomly hang
+    when connected to some servers.
+  - Fixed bug where nlst() hung if it returned zero rows on some servers.
+  - Removed total from list() since it wasn't always present for all servers
+    and it was the total block size, not the total # of files or bytes returned.
+  - Fixed list() & nlst() to allow wildcard filters similar to unix "ls" cmd.
+    The only wildcards being "*" or "?".
+
+0.07 2009/02/24 08:30:00
+  - Corrected some typos in the documentation.
+  - Implemented call back functionality for all data channel functions.
+  - Fixed uput() to return the file name used on success instead of just
+    true/false.   Will still return "undef" on failure.  Needed in order to
+    figure out what the other server actually called the file we sent it.
+  - Exposed the DataProtLevel constants for public use.
+  - Added callback feature for all data channel FTP functions.
+  - Now uses caller() extensively to combine multiple similar functions together
+    and for callback support.
+  - Another fix to the get() bug introduced by the Bug 17537 fix.  The previous
+    attempt in v0.06 didn't fully fix the problem!  So took different approach.
+  - Enhanced t/10-complex.t & t/00-basic.t
+
+  The following changes may break some existing code ...
+  - Added new option 'Croak' to cause all failures to call croak() instead of
+    returning undef.  This caused some minor incompatabilities on error handling
+    if your code depended on some old croak() calls.  But the new code is now
+    consistant in error handling in either always returning failure or always
+    calling croak!  It no longer does a combination of both.
+  - Added set_croak() to help mitigate above issue, by being able to turn the
+    croak feature on & off.  t/10-complex.t uses this logic while initializing
+    the connection.
+  - user() & password() have been renamed since internal functions.
+
+0.06 2009/02/03 08:30:00
+  - Added new() DataProtLevel option to allow selecting the Data Channel
+    Protection.
+  - Fixed _help() so supported() works for some new servers.
+  - new() now allows you to select SSL over TLS for connections via useSSL.
+  - Fixed get() bug that sometimes added extra \015 to ASCII files downloaded.
+    Introduced when Bug 17537 was fixed.
+  - Enhanced t/10-complex.t
+
+0.05 2009/01/05 08:30:00
+  - Fixed resonse() to properly get the entire response instead of just the 1st
+    line of it.  This change fixes many of the reported bugs reported against
+    this module.
+  - Fixed command() & response() to also log socket() calls in debug mode with
+    "SKT >>>" & "SKT <<<" prefixes.
+  - Added supported(), quot(), & _help()
+  - All response calls in new() are now tested & added debug flag to socket
+    object.
+  - Enhanced t/10-complex.t
+  - Other minor fixes.
+  - Bugs Fixed: 41665, 31720, 16751, 30359, 24136, 17537, 17538, 34818
+
+
+Version - DD/MM/YYYY -- The Marco Dalla Stella releases.
+---------------------------------------------------------
+
+0.04 23/11/2005 11:58:34
+  - Corrected some typos on the documentation.
+
+0.03 05/09/2005 15.01.52 
+  - cdup(), mkdir() and rmdir() added
+  - A better sysread() and syswrite() use on list(), nlst(), get(), put() and
+    uput() methods
+  - Added autoflush on list(), nlst(), get(), put() and uput() methods
+  - A better interactive test, (the previous one sucked, this one is a little
+    better! ^_^)
+  - Other minor fixes
+
+0.02 01/08/2005 22:12:34
+  - Change the returning data of list() and nlst()
+  - Fix ALLO command call in put() and uput() methods
+  - Correct the PASV parsing regexp (thanks to sfr)
+  - Makefile no longer require Perl 5.8.4
+
+0.01 21/05/2005 20:55:58
+  - original version; created by h2xs 1.23 with options -AX Net::FTPSSL
+

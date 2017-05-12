@@ -1,0 +1,119 @@
+GENERAL TRACE INFORMATION
+Filename,t/sample_input/sample.tsh,Unknown
+Duration,0.937457
+Records,1000
+Interfaces,2
+
+INTERFACE INFORMATION
+Interface Number,2
+Duration,0.9365
+Records,327
+
+INTERFACE TRAFFIC DENSITY
+,Pkts/s,Bytes/Pkt,b/s
+IP Total,349,616,1720132
+TCP Total,302,690,1668989
+
+IP STATISTICS (PACKETS)
+,,Fragmentation,,Explicit Congestion Notification,,Differentiated Services,,,,IP Options
+,Total,DF,MF,ECT,CE,Normal,Class Selector,AF PHB,EF PHB,No IP Options,IP Options
+IP,327,314,0,0,0,327,0,0,0,327,0
+ICMP,3,0,0,0,0,3,0,0,0,3,0
+TCP,283,282,0,0,0,283,0,0,0,283,0
+UDP,41,32,0,0,0,41,0,0,0,41,0
+
+IP STATISTICS (BYTES)
+,,Fragmentation,,Explicit Congestion Notification,,Differentiated Services,,,,IP Options
+,Total,DF,MF,ECT,CE,Normal,Class Selector,AF PHB,EF PHB,No IP Options,IP Options
+IP,201363,199575,0,0,0,201363,0,0,0,201363,0
+ICMP,168,0,0,0,0,168,0,0,0,168,0
+TCP,195376,195324,0,0,0,195376,0,0,0,195376,0
+UDP,5819,4251,0,0,0,5819,0,0,0,5819,0
+
+TCP ACKNOWLEDGEMENTS
+Total ACKs,274
+Cumulative ACKs,253
+Pure ACKs,69
+Options ACKs,21
+
+RECEIVER ADVERTISED WINDOW
+Size (Bytes),Soft Count,Hard Count
+24616,3,0
+24820,5,0
+49640,1,0
+64240,1,0
+
+TCP OPTIONS NEGOTIATION
+TCP Header Length (Bytes),SYN,SYN/ACK
+28,7,
+44,0,3
+SYN/Payload,
+
+TCP OPTIONS ACK USAGE
+TCP Header Length (Bytes),Count
+32,18
+44,3
+
+PACKET SIZE DISTRIBUTION
+Bytes,IP,ICMP,TCP,UDP
+38,1,0,0,1
+39,1,0,0,1
+40,73,0,71,2
+41,3,0,3,0
+46,1,0,1,0
+48,7,0,7,0
+52,11,0,11,0
+56,4,3,0,1
+63,1,0,1,0
+64,4,0,3,1
+65,1,0,0,1
+66,1,0,0,1
+70,2,0,0,2
+71,2,0,0,2
+74,7,0,0,7
+75,6,0,0,6
+78,1,0,0,1
+82,1,0,0,1
+84,2,0,2,0
+86,1,0,1,0
+90,1,0,1,0
+96,1,0,1,0
+98,1,0,1,0
+101,1,0,1,0
+102,1,0,1,0
+108,1,0,1,0
+110,1,0,1,0
+113,1,0,1,0
+139,1,0,1,0
+168,1,0,1,0
+186,1,0,1,0
+195,1,0,0,1
+199,3,0,0,3
+211,3,0,0,3
+217,1,0,0,1
+263,1,0,0,1
+325,1,0,0,1
+341,1,0,0,1
+354,1,0,0,1
+377,1,0,1,0
+472,1,0,1,0
+488,1,0,1,0
+504,1,0,1,0
+538,2,0,0,2
+632,1,0,1,0
+660,28,0,28,0
+680,1,0,1,0
+706,21,0,21,0
+712,1,0,1,0
+728,19,0,19,0
+920,1,0,1,0
+952,1,0,1,0
+1000,1,0,1,0
+1039,2,0,2,0
+1048,1,0,1,0
+1400,18,0,18,0
+1420,12,0,12,0
+1454,21,0,21,0
+1480,6,0,6,0
+1492,2,0,2,0
+1500,32,0,32,0

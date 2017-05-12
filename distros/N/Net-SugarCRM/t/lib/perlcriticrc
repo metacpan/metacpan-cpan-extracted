@@ -1,0 +1,20 @@
+severity=3
+exclude=ClassHierarchies::ProhibitAutoloading
+
+[TestingAndDebugging::ProhibitNoWarnings]
+allow = exec
+
+[Subroutines::RequireArgUnpacking]
+short_subroutine_statements = 6
+
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 30
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about=20
+
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+allow = _buildUa _buildDbh
+
+[Subroutines::ProhibitManyArgs]
+max_arguments = 6

@@ -1,0 +1,68 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 6a48b37f9b1b1496d3c4a1585af4cbecfe87aa47 Build.PL
+SHA1 56c7388e42db7c81a0b0fc91e90bd054178d58e1 Changes
+SHA1 a809c6971c66430d9e95ae5adb7d2ca76fa5b875 LICENSE
+SHA1 48179d273cb17b2069560e5604495591a2078945 MANIFEST
+SHA1 25374deef7e5c8e43ac3292102e2afbfef2d582d META.json
+SHA1 32774af2a7d8013f9895f99072f28a68b8d17b05 META.yml
+SHA1 6cf9983c8276ba78518d05f738a5b4fd1ebf0a7f README
+SHA1 705ef2954530010a1c595dce068dccebe9ba3cdc bin/send_nsca
+SHA1 8029b3cc8e61c11074e14b7107564311e13ce75a lib/Net/NSCA/Client.pm
+SHA1 8bcfd32c5d953e4fb884835b2a6a46cb58e0840d lib/Net/NSCA/Client/Connection.pm
+SHA1 b788771cf65638e5065bf47bb9519eb7a32b67b9 lib/Net/NSCA/Client/Connection/TLS.pm
+SHA1 344b8cc57d92d13b2746b0ad7fc75db13a86d3bd lib/Net/NSCA/Client/DataPacket.pm
+SHA1 b822a4a897cc8e2e25541e089aeabff7e1904a9e lib/Net/NSCA/Client/InitialPacket.pm
+SHA1 e21d75cd25cc6ddd56c7a38e005893472764efcb lib/Net/NSCA/Client/Library.pm
+SHA1 9f839cf570d2b2423e5ba19824e83ee008a255e4 lib/Net/NSCA/Client/ServerConfig.pm
+SHA1 c14222122c1df3eb538fbc64a4c604b6711a855d lib/Net/NSCA/Client/Troubleshooting.pod
+SHA1 14730c6e211fdb318506d6aef69a15414eb42698 lib/Net/NSCA/Client/Utils.pm
+SHA1 d6966bb79264ca7bba1987e8b1db09daa1ab040f t/00-load.t
+SHA1 f439ed87c8d7d4c54e9bb248c83461e1ba5d42e3 t/live_server.t
+SHA1 8e97b73d24521fc341d1e0c56e8380efbc43007f t/run.t
+SHA1 64527851d5cece080bacdbfcc7bed0418a4a41b9 t/send_nsca.t
+SHA1 05c5f452595881a225d21d3d114db69832d7cd76 t/tests/MyTest/Class.pm
+SHA1 6e94cf782c305b07587d9238d0624f23c5c60ac3 t/tests/MyTest/Net/NSCA/Client.pm
+SHA1 4d16d6f818e5a1efa147d6b22362c5f9c6cfe3f0 t/tests/MyTest/Net/NSCA/Client/DataPacket.pm
+SHA1 c89338138d00110edac5cd82c86b73b25d1127ed t/tests/MyTest/Net/NSCA/Client/InitialPacket.pm
+SHA1 7d3fd891956e609a335eba9bda087e637897c8f5 xt/clean-namespaces.t
+SHA1 38d8ce1e4de7d0c87cfb912fd4bb5a8357ca7811 xt/consistent-version.t
+SHA1 ae3e0ea9990bc5e2559df4ccef877daa5e23cffb xt/critic-scripts.t
+SHA1 7fc7058f9d184127c41cb8e7540f30ececfa5edf xt/critic.t
+SHA1 a1db6b35567196f75f782a9699e869742ead2564 xt/kwalitee.t
+SHA1 60a5b83e839e66bc7f52f0da3d9aef4d891ddecb xt/manifest.t
+SHA1 8b5d8044ee7a0d61865d4e8e0181aad51cee80d3 xt/perl-version.t
+SHA1 3de82c7b1021baf979be61c5211d2d02cfbcdb4d xt/perlcriticrc
+SHA1 39389b5ad48260f67ab578ad615a27bfac720215 xt/pod-coverage.t
+SHA1 7db1fcc4c42b28c02de9dc9b421e973dcef0f8f1 xt/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAEBAgAGBQJOpOz+AAoJEGN8PvITkwmbBOoQALm2N8tY5tYWquqDq4Jn62vp
+Tj3L/rpgPkw5m3n3ICjQA91r6/PLVJaiwqGqmxGuJCpeESB3J5T4xkUA3cIwehGd
+p0z7gbUxqEG4FeckD1lcsmINDqIsUTbdsy656savNhKXObPrCyMATUbDco6bou0y
+DfMxCszXohzXvRfwfRfNUz5+4SMtwTflF2ocX/2vwCgM+sbRkN38kqk02UiqorWS
+AcH2nst30ZSfbS1z5I/ExbWSNaUpuhrgsjF1hBXFiYBhH7/pD+T8BRGjjWGcB/qL
+aqhfaJKZ5ZO/ummIznPlthESGPPvoHVsjyi0BGwzmWEFelgtPZ96xbOIpVtI8gJa
+sxZkK9euq8eUaE9f9o1AMcBKBCHvs9Krl1lDgIUQ8edcl1FV13CY4YuyTIaVXRfE
+GVwbYER9I4a4cN8f4oePMEla6y478Rd8WhxuHpCY9ioIYlD6H+hzVgFhNRGxwxK5
+X5vPJAIAcgC3Ty9wxCpNHyffwA7bZDKEoSkZITXe23hp5vqUbTWN5VeR4NcEVHXM
+nkm1Kq5iECwVNzRGi+E9Re9OLpuk8kNvV/cjq59mmgQGLwKnld3bbVzCK2nh0ewA
+2uKOz57rbk2hjGqBpZNB0nemrXtb6Y0RbvPeNJ4dJ862Bmt4dw+M/2Wlu11AXw8O
++EHoBicArFDsvYW+G7xX
+=yeWx
+-----END PGP SIGNATURE-----

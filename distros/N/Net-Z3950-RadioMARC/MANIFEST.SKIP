@@ -1,0 +1,11 @@
+.cvsignore
+CVS
+etc/CVS
+etc/boolean.marc
+etc/trunc.marc
+lib/CVS
+lib/Net/CVS
+lib/Net/Z3950/CVS
+private
+releases
+t/CVS

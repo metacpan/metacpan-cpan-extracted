@@ -1,0 +1,35 @@
+The first release (0.01) of Net::Bind has been posted to CPAN under my
+author id (KJOHNSON) and name (Kevin_Johnson).
+
+Net::Bind provides a perl interfaces to various files related to the
+bind DNS daemon.  For this alpha release, there is only an interface
+for /etc/resolv.conf data.  Future releases will include interfaces
+for named.boot files, zone files, bind dump files, and the new
+named.conf file (ala bind-8.x).  I expect to provide these other
+interfaces before it goes to beta release.
+
+If you are interested in the future capabilities of this module,
+please take a look at the current minimal implementation provide
+feedback.
+
+The module is in alpha release.  Think twice about using it to modify
+important data.
+
+The method interface is currently in an evaluation phase.  I expect to
+make interface changes that are not backward compatible before it goes
+to beta release.  I'm providing it now to get input on the interface.
+
+The current version has been tested against 5.003_24.
+
+Refer to the provided README file for additional information.
+
+I am keenly interested in feedback from folks regarding the method
+interface.  I want to make sure it's workable before I start chomping
+on the other larger file interfaces.
+
+Please report any bugs/suggestions to <kjj@pobox.com>.
+
+Copyright (c) 1997 Kevin Johnson <kjj@pobox.com>
+
+All rights reserved.  This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.

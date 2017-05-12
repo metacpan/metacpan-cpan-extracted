@@ -1,0 +1,94 @@
+#!/usr/bin/perl
+#
+#   Copyright 2007 Daniel Born
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+=head1 NAME
+
+blocklist_updater - Update the local copy of a Google SafeBrowsing API
+blocklist.
+
+=head1 SYNOPSIS
+
+blocklist_updater --apikey=<arg> --dbfile=<arg> --blocklist=<arg>
+[--updatefile=<arg>] [--keysfile=<args>]
+
+=head1 ARGUMENTS
+
+=over
+
+=item B<--apikey>
+
+Google SafeBrowsing API key.
+
+=item B<--dbfile>
+
+Path to database where blocklist is stored. Needs to be an absolute path.
+
+=item B<--blocklist>
+
+Name of blocklist.
+
+=item B<--updatefile>
+
+If specified, gives a file to read the update data from. Otherwise, the update
+is downloaded from Google.
+
+=item B<--keysfile>
+
+If specified, gives a file to read the getkey data from. Otherwise, a /getkey
+request is sent to Google.
+
+=item B<--skip_mac>
+
+If given, disable MAC verification.
+
+=back
+
+=cut
+
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use File::Copy;
+use Net::Google::SafeBrowsing::UpdateRequest;
+
+sub usage {
+  pod2usage(-exitstatus => 2, -verbose => 2);
+}
+
+{
+  my ($apikey, $dbfile, $blocklist, $updatefile, $keysfile, $skip_mac);
+  GetOptions('apikey=s' => \$apikey, 'dbfile=s' => \$dbfile,
+             'blocklist=s' => \$blocklist, 'updatefile=s' => \$updatefile,
+             'keysfile=s' => \$keysfile, 'skip_mac' => \$skip_mac)
+    or usage();
+  if (not ($apikey and $dbfile and $blocklist)) {
+    usage();
+  }
+  my $tmpdbfile = $dbfile . '.updater_tmp';
+  File::Copy::copy($dbfile, $tmpdbfile);
+  my $u = Net::Google::SafeBrowsing::UpdateRequest->new(
+    $apikey, $tmpdbfile, $blocklist, $updatefile, $keysfile, $skip_mac);
+  if ($u->update) {
+    $u->close or die "Failed to close updater";
+    rename($tmpdbfile, $dbfile) or die "rename($tmpdbfile, $dbfile): $!\n";
+  } else {
+    $u->close;
+    die "Update failed\n";
+  }
+}
+

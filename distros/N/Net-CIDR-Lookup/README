@@ -1,0 +1,46 @@
+Net-CIDR-Lookup
+
+This module provides a pure-Perl implementation of a lookup table based on CIDR
+net blocks. It installs like most other modules (see generic instructions below)
+and depends only on Test::Class for the unit tests (which you can skip if you
+like).
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::CIDR::Lookup
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CIDR-Lookup
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/CIDR-Lookup
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/CIDR-Lookup
+
+    Search CPAN
+        http://search.cpan.org/dist/CIDR-Lookup/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, 2012 Matthias Bethke <matthias@towiski.de>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

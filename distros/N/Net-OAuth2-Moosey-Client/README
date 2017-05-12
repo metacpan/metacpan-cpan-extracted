@@ -1,0 +1,19 @@
+Net-OAuth2-Moosey-Client
+
+A Moosey Perl wrapper for the OAuth 2.0 specification.
+
+INSTALLATION
+
+$ cpan
+cpan> install Net::OAuth2::Moosey::Client
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Robin Clarke
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,48 @@
+{
+   "abstract" : "Hash-like lookup table based on CIDR blocks",
+   "author" : [
+      "Matthias Bethke <matthias@towiski.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-CIDR-Lookup",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Class::Data::Inheritable" : "0",
+            "Test::Class" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bit::Vector" : "0",
+            "Socket" : "1.94",
+            "parent" : "0",
+            "perl" : "5.008008",
+            "version" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.0.0",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

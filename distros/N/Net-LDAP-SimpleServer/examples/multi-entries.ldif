@@ -1,0 +1,43 @@
+version: 1
+
+dn: CN=John Doe,OU=Marketing,DC=Company,DC=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: user
+cn: John Doe
+description: Consultant - Company.com
+displayName: Joe Doe
+distinguishedName: CN=John Doe,OU=Marketing,DC=Company,DC=com
+givenName: John
+manager: CN=Jack Puppetmeister,OU=Marketing,DC=Company,DC=com
+name: John Doe
+sn: Doe
+
+dn: CN=Sarah Lee,OU=Marketing,DC=Company,DC=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: user
+cn: Sarah Lee
+description: Consultant - Company.com
+displayName: Sarah Lee
+distinguishedName: CN=Sarah Lee,OU=Marketing,DC=Company,DC=com
+givenName: Sarah
+manager: CN=Jack Puppetmeister,OU=Marketing,DC=Company,DC=com
+name: Sarah Lee
+sn: Lee
+
+dn: CN=Robert Sponge,OU=Marketing,DC=Company,DC=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: user
+cn: Robert Sponge
+description: Consultant - Company.com
+displayName: Bob Sponge
+distinguishedName: CN=Robert Sponge,OU=Marketing,DC=Company,DC=com
+givenName: Robert
+manager: CN=John Doe,OU=Marketing,DC=Company,DC=com
+name: Robert Sponge
+sn: Sponge

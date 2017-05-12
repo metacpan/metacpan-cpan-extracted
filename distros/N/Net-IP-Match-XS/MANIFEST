@@ -1,0 +1,9 @@
+Changes
+XS.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Net-IP-Match-XS.t
+lib/Net/IP/Match/XS.pm
+META.yml                                 Module meta-data (added by MakeMaker)

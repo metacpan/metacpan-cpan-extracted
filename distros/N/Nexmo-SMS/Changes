@@ -1,0 +1,46 @@
+Revision history for Nexmo-SMS
+==============================
+
+0.09    2016-02-06
+
+        [MISC]
+        + 0.08 wasn't indexed properly, so re-release
+
+0.08    2016-01-26
+
+        [MISC]
+        + Nexmo will deactivate the http API, so the default server url is for https
+
+0.07    2015-01-18 
+
+        [MISC]
+        + add metaresources to dist.ini
+        + update format of Changes file
+
+0.06    2011-12-26
+
+        + changed handling of unicode messages
+        + replaced dummy server url with real server url
+
+0.05    2011-11-30
+
+        + forget to mention the "type" attribute in UnicodeMessage
+
+0.04    2011-11-25
+
+        + add support for unicode messages (thanks Jui-Nan Lin)
+        + fix linefeeds
+
+0.03    2011-08-28
+
+        + add support for get_balance()
+
+0.02    2011-08-28
+
+        + Support WAPPush and Binary messages
+        + more tests
+
+0.01    2011-08-17
+
+        First version, released on an unsuspecting world.
+

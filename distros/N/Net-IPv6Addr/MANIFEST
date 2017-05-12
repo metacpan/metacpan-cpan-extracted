@@ -1,0 +1,17 @@
+ChangeLog
+IPv6Addr.pm
+MANIFEST
+Makefile.PL
+README
+t/base85.t
+t/chkip.t
+t/compressed.t
+t/ipv4.t
+t/ipv4comp.t
+t/new.t
+t/parse.t
+t/preferred.t
+t/string.t
+rfc1886.txt
+rfc1924.txt
+rfc2373.txt

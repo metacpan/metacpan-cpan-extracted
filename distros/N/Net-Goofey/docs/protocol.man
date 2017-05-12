@@ -1,0 +1,327 @@
+.TH "GOOFEY PROTOCOL" 5 "May 6 1994"
+.SH INTRODUCTION
+
+.I goofey
+is a distributed message passing and utility service developed by a
+number of people at Monash University, Australia as a useful tool
+for communication (somewhere between 
+.I mail(1)
+and
+.I talk(1)
+and much better than
+.I write(1)).
+
+The goofey protocol has developed since 1991 when 
+.I goofey
+was first used to talk back to the 
+.I "clock," 
+which has since been separated out into the
+.I mickey
+client. It has undergone many changes, all retaining the original
+basic structure.
+
+.SH BASIC
+
+A request has the following structure:
+
+.B "#cX.XX,[extended options]user,password,[/fake_host,]port,tty[,command]"
+
+The different parts are:
+
+.TP
+.BI c
+This is the client type. This gives some default values for the extendend
+client options discussed later. Used values at this time are
+.B G
+for goofey clients,
+.B X
+for X clients, and
+.B D
+for server clients (originally for
+.I Donald.
+)
+
+Server clients (or
+.I bots
+or any non-user client) must have type
+.B D
+and be approved by the administrator of pluto.
+
+.TP
+.BI X.XX
+This is the version number of the client. It has been used in the past to
+decide what features the client had but is mostly ignored in the server now.
+
+.TP
+.BI "extended options"
+Will be discussed later.
+.TP
+.BI user
+This is the username. It may be translated in the server using system
+aliases. The server forces all "standard user" names into all lower case
+and server clients into lowercase with the first character uppercase.
+.TP
+.BI password
+This is the 10 character string issued by the server upon registration of
+a client.
+.TP
+.BI fake\_host
+This is a hostname to display with the -l command. This is only allowed for
+particular clients (specified in pluto). -lt will display the "actual" host.
+.TP
+.BI port
+This is the port on the clients machine which will accept connections for
+server requests. If the client does not intend to receive requests then
+the 
+.B port 
+value may be 0.
+.TP
+.BI tty
+This is the tty of the client. It is used to prevent multiple resident
+clients on the same tty and also for identification purposes with the
+.B "-x"
+and 
+.B "-d"
+commands.
+.TP
+.BI command
+Client commands are discussed in a later section.
+
+.SH "Extended Options"
+Various extended options have been added to the protocol to allow client
+selection of features without commands being added to pluto and having to
+be stored with a user's information. This also allows simple selection of
+these options on a per-user basis.
+
+Extended options are currently:
+
+.B "[@c,][|cols,][&message&,][#session_pwd,]"
+
+.B cols
+allows selection of the maximum width of a line. This is used to
+format incoming messages (those from pluto to the client) and also outgoing
+messages if the appropriate option below is set. If
+.B cols 
+is less than 20 or greater than 255 it is treated as 0, in which case no
+formatting is done.
+
+.B message
+is a message that will appear after your idle time in
+.I \-l
+listings. It must not contain the character '&' or newlines or
+non-printing characters.
+
+.B session_pwd
+is a string of characters which the server will send to the client after
+the command (eg Z). The client should use this to authenticate the server.
+
+.B @
+introduces a series of characters (which may appear in any order). These
+are:
+.TP
+.BI "B"
+(No blat.)
+Pluto will not send you a blat message at all if you use this option.
+[Only useful for resident clients]. Saves server clients from having to
+strip out a blat message.
+
+.TP
+.BI "1"
+(Only 1.)
+Pluto will only send one message per connection. This is useful if you want
+to handle messages separately. If you
+do not use this option and pluto has 2 or more requests for you then the
+requests will be joined together into a single request.
+
+.TP
+.BI "R"
+(Return response.)
+Pluto will send the response returned by goofey to the goofey that is paging
+you. This is what is used by Donald and other server clients to reply to
+the caller rather then by sending another page, thus saving a lot of server
+time and making server clients a lot cleaner.
+
+.TP
+.BI "I"
+(Inform replace.)
+Pluto will emit a GOOFED IN message when your client is replaced, even if you
+don't GOOF OUT. Not really of much use except for server clients if you want
+to keep your friends.
+
+.TP
+.BI "F"
+(Forget fail.)
+Pluto will not buffer any messages that do not get through to the callee.
+This might be useful if you want to send a message but don't want to bother
+the recipient if they are not around.
+
+.TP
+.BI "T"
+(Tag success.)
+Pluto will add a single character to the end of its' response to page requests
+letting you know if things succeeded or not. "*" is added for a successful
+request, '#' is added for failed message due to the user being quiet and
+nothing is added is the user is not on.
+
+.TP
+.BI f
+(Format outgoing.)
+Pluto will reformat the messages you send through it using your width/columns
+setting.
+
+.TP
+.BI "S"
+(Shutdown broken.)
+Change the protocol slightly to allow conversations with pluto when the
+shutdown(2) system call does not work. This is useful on machines with buggy
+tcp or in strange situations where the connection is shutdown completely when
+you do a half-shutdown.
+
+Clients normally send their request and then shutdown the connection to pluto
+so nothing more can be sent. Pluto then detects an end of file and handles
+the request. If shutdown does not work, you will need to use the 
+.I "multi-request protocol"
+(discussed later) in order to receive any response from pluto.
+
+.TP
+.BI W
+(Watch always.)
+Pluto will always inform this client of people goofing in or out regardless
+of the user's quiet status.
+
+
+.TP
+.BI E
+(Ignore alias)
+Pluto will not use a user's aliases (useful for the reply script).
+
+.TP
+.BI P
+(Use session password)
+Pluto will send the client's session_pwd (if defined) every time it 
+communicates with the client. This secures the connection somewhat.
+
+.TP
+Type
+.B D
+clients which do not use the extended options will be assumed to have given
+the option string:
+.B "@RIB1FT"
+
+.SH "MULTI-REQUEST PROTOCOL"
+Sometimes server clients want to send multiple requests rapidly. In order to
+make this more efficient, a multi request protocol was added. This is also
+used when shutdown is broken.
+
+A request now becomes:
+
+.B "[!xxx<Standard request>]*!000"
+
+.B xxx
+is the length of 
+.B "<Standard request>"
+(as defined above, including any command) in hex.
+
+Responses pluto returns will be separated by NULL characters.
+
+.B "!000"
+terminates the request and will cause pluto to close the connection
+once it has responded to all requests in full.
+
+.SH CLIENT COMMANDS
+If the client command section is empty then the client is registered
+as a resident client. Any other clients on the same machine and tty
+owned by the user will be killed (using the server commands discussed
+below). If a client with the same port number, machine and tty is 
+already registered then no action will be taken.
+
+If the command starts with a
+.B *,
+then the rest of the command will be treated as a normal pluto command
+(as defined in the goofey documentation).
+
+If the command is an integer then the idle time will be updated for that
+client if it is registered. If the time is negative the client will be
+de-registered (GOOFED OUT).
+
+.SH SERVER COMMANDS
+Pluto doesn't expect much of it's clients. They must support the following
+commands:
+
+.TP
+.BI E
+Exit. Die gracefully. Leave. Go away. You get the idea.
+.TP
+.BI W
+Return idle time. This should be negative if the client is about to die.
+Server clients can return whatever they want. The value 200000000 should
+be returned if the client wants to return an "I don't know" idletime.
+.TP
+.BI Zmsg
+.B msg
+is a message from someone. If the client has selected the
+.I "return-response"
+option then anything written back on the socket will be sent to the
+client which initiated the message. If the
+.I "return-response"
+option is not selected then the idle time should be returned. A negative
+idle time will indicate that the message was not delivered and the client
+is about to die.
+
+If the client has a session password, then the server will return that
+password immediately after the command.
+
+.SH OTHER STUFF
+
+If you are going to write you own client, please do it nicely. Talk to
+the author(s) of other recognised clients (e.g. goofey, mickey, Daisey,
+minnie, Donald, Et). If you find you want some wonderful new feature it
+doesn't hurt to ask... many of the features now in pluto have come from
+suggestions from outside the core development group.
+
+Make sure you fully understand what is already available... this document
+and the goofey man page are a good start. The goofey source is also worth
+perusing, as is the source for any other clients if you can get your hands
+on it (politely of course).
+
+.SH AUTHORS
+
+This document was written by Tim MacKenzie after being beaten over the
+head with too many stupid server clients around May 1994.
+
+Apart from that we have:
+.TP
+.BI "Tim MacKenzie <tym@cs.monash.edu.au>"
+Most protocol extensions
+.br
+Most of pluto
+.br
+Most of goofey
+.br
+Mickey (clock/fortune client)
+.br
+Daisey (extended X client (in Tk/Tcl))
+.br
+minnie (original Tk/Tcl X client)
+.br
+Documentation (argh!)
+.br
+pluto administration (there are too many stupid people out there)
+.br
+pluto distribution cleanup project
+.TP
+.BI "Darren Platt <darrenp@cs.monash.edu.au>"
+pluto maintenance
+.br
+Et (phonelist server client)
+.br
+goofey
+.br
+pluto administration
+.br
+pluto distribution cleanup project
+.TP
+.BI "Kevin Lentin <kevinl@cs.monash.edu.au>"
+Donald (calender server client++)
+.br
+Pluto enhancement suggestions (too many ;)

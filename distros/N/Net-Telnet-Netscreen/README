@@ -1,0 +1,74 @@
+NAME
+    Net::Telnet::Ns1000 - interact with a Netscreen-1000 firewall
+
+SYNOPSIS
+    use Net::Telnet::Ns1000;
+
+    my $fw = new Net::Telnet::Ns1000(host=>'62.65.31.108');
+    $fw->login('admin','password') or die $fw->error;
+    $fw->enter_vsys('norway.com'); print "We are now in:
+    ".$fw->current_vsys."\n"; my %vsys=$fw->get_vsys; foreach $key (sort
+    (keys %vsys)) { print $key,'=', $vsys{$key},"\n"; } print @results;
+
+DESCRIPTION
+    Net::Telnet::Ns1000 is mostly a pure rippoff of Net::Telnet::Cisco, with
+    adaptations to make it work on the Netscreen 1000 firewalls. It also has
+    some additional commands, but for basic functionality, see Net::Telnet
+    and Net::Telnet::Cisco documentation.
+
+FIRST
+    Before you use Net::Telnet::Ns1000, you should probably have a good
+    understanding of Net::Telnet, so perldoc Net::Telnet first, and then
+    come back to Net::Telnet::Ns1000 to see where the improvements are.
+
+    Some things are easier to accomplish with Net::SNMP. SNMP has three
+    advantages: it's faster, handles errors better, and doesn't use any vtys
+    on the router. SNMP does have some limitations, so for anything you
+    can't accomplish with SNMP, there's Net::Telnet::Ns1000.
+
+METHODS
+    New methods not found in Net::Telnet follow:
+
+    enter_vsys - enter a virtual system
+        Enter a virtual system in the firewall. parameter is system you want
+        to enter .. You may enter another vsys even if you are in a vsys..
+        Note that we will save your changes for you if you do.
+
+    enter_vsys - exit from the level you are on
+        exit from the vsys you are in, or from the system if you are on the
+        top. takes one parameter... if you should save any changes or not...
+
+    current_vsys - show current vsys returns blank if you're not in a vsys.
+    get_vsys - return vsys.
+        returns a hash of all the virtual systems on your system, with
+        system id's for values
+
+    ping - ping a system. Returns percentage of success (0/100).
+          $sucess=$fw->ping('192.168.1.1');
+
+    exit - Exit system
+        use this command to exit system, or exit current vsys
+
+    getValue - Set a value from the box. Will return a value from the
+    firewall, or from the vsys you are in, if you aren't in root.
+    setValue - Set a Value in the box. Set a value in the box, returns true
+    if set successfully. (guess what it returns if you fuck up? ;)
+
+ISSUES
+    Note that on slow boxes, you might have to increase the Timeout 
+    parameter to avoid the box timing out on quit (Saving takes a *long*
+    time on our ns1000)
+
+AUTHOR
+    The basic functionality was ripped from Joshua_Keroes@eli.net $Date:
+    2000/07/30 22:16:51 $ Modifications and additions to suit Netscreen was
+    done by Marcus.Ramberg@songnetworks.no $Date: 2002/07/18 10:45:12 $
+
+SEE ALSO
+    Net::Telnet, Net::SNMP
+
+COPYRIGHT
+    Copyright (c) 2001 Marcus Ramberg, Song Networks Norway. All rights
+    reserved. This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+

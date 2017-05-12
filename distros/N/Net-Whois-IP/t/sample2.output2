@@ -1,0 +1,1630 @@
+205.244.106.226
+|Address| 
+3417 Kingsport Highway|
+|CIDR| 
+205.244.96.0/20 |
+|City| 
+Johnson City|
+|Comment| 
+ |
+|Country| 
+US|
+|NetHandle| 
+NET-205-244-96-0-1|
+|NetName| 
+SPRINT-CDF46F|
+|NetRange| 
+205.244.96.0 - 205.244.111.255 |
+|NetType| 
+Reallocated|
+|OrgAbuseEmail| 
+abuse@sprintnetops.net|
+|OrgAbuseHandle| 
+ROLEA5-ARIN|
+|OrgAbuseName| 
+Role Account |
+|OrgAbusePhone| 
++1-800-603-8044|
+|OrgID| 
+SMAT|
+|OrgName| 
+Sprint Midatlantic Telecom |
+|OrgTechEmail| 
+ipsupport@sprintnetops.net|
+|OrgTechHandle| 
+SAN6-ORG-ARIN|
+|OrgTechName| 
+IP Administrator |
+|OrgTechPhone| 
++1-407-741-0500|
+|Parent| 
+NET-205-240-0-0-1|
+|PostalCode| 
+37601|
+|RegDate| 
+1995-06-19|
+|StateProv| 
+TN|
+|TechEmail| 
+tim@tsimkins.pdial.interpath.net |
+|TechHandle| 
+TS402-ARIN|
+|TechName| 
+Simkins, Tim |
+|TechPhone| 
++1-919-554-5151|
+|Updated| 
+2002-08-08|
+------------------------
+
+12.251.44.253
+|Address| 
+1500 Market Street|
+|CIDR| 
+12.251.0.0/18 |
+|City| 
+Philadelphia|
+|Comment| 
+ |
+|Country| 
+US|
+|CustName| 
+Comcast Corporation|
+|NetHandle| 
+NET-12-251-0-0-1|
+|NetName| 
+COMCAST-12-251-0-0-ELMHURST|
+|NetRange| 
+12.251.0.0 - 12.251.63.255 |
+|NetType| 
+Reassigned|
+|OrgAbuseEmail| 
+abuse@att.net|
+|OrgAbuseHandle| 
+ATTAB-ARIN|
+|OrgAbuseName| 
+ATT Abuse |
+|OrgAbusePhone| 
++1-919-319-8130|
+|OrgTechEmail| 
+qhoang@att.com|swipid@nipaweb.vip.att.net|
+|OrgTechHandle| 
+ICC-ARIN|IPSWI-ARIN|
+|OrgTechName| 
+IP Customer Care |IP SWIP |
+|OrgTechPhone| 
++1-888-613-6330|+1-888-613-6330|
+|Parent| 
+NET-12-0-0-0-1|
+|PostalCode| 
+19102|
+|RegDate| 
+2003-10-11|2003-10-11|
+|StateProv| 
+PA|
+|TechEmail| 
+help@ip.att.net |
+|TechHandle| 
+DK71-ARIN|
+|TechName| 
+Kostick, Deirdre |
+|TechPhone| 
++1-919-319-8249|
+|Updated| 
+2003-10-11|2003-10-11|
+------------------------
+
+24.221.143.246
+|Address| 
+6450 Sprint Parkway - KSOPKB0901|
+|CIDR| 
+24.221.0.0/16 |
+|City| 
+Overland Park|
+|Comment| 
+ |
+|Country| 
+US|
+|NameServer| 
+NS1.AZ.SPRINTBBD.NET|NS1.MI.SPRINTBBD.NET|
+|NetHandle| 
+NET-24-221-0-0-1|
+|NetName| 
+SPRINTBWG-BLK1|
+|NetRange| 
+24.221.0.0 - 24.221.255.255 |
+|NetType| 
+Direct Allocation|
+|OrgID| 
+SPWG|
+|OrgName| 
+Sprint BWG |
+|Parent| 
+NET-24-0-0-0-0|
+|PostalCode| 
+66212|
+|RegDate| 
+ |
+|StateProv| 
+KS|
+|TechEmail| 
+abuse@sprintbbd.net |
+|TechHandle| 
+ZS232-ARIN|
+|TechName| 
+Sprint Broadband Direct |
+|TechPhone| 
++1-888-996-0001|
+|Updated| 
+2002-05-31|
+------------------------
+
+68.85.43.153
+|Address| 
+3 Executive Campus|5th Floor|
+|CIDR| 
+68.85.32.0/19 |
+|City| 
+Cherry Hill|
+|Comment| 
+NONE|
+|Country| 
+US|
+|CustName| 
+Comcast Cable Communications, Inc.|
+|NetHandle| 
+NET-68-85-32-0-1|
+|NetName| 
+NJ-NORTH-13|
+|NetRange| 
+68.85.32.0 - 68.85.63.255 |
+|NetType| 
+Reassigned|
+|OrgAbuseEmail| 
+abuse@comcast.net|
+|OrgAbuseHandle| 
+NAPO-ARIN|
+|OrgAbuseName| 
+Network Abuse and Policy Observance |
+|OrgAbusePhone| 
++1-856-317-7272|
+|OrgTechEmail| 
+cips_ip-registration@cable.comcast.com|
+|OrgTechHandle| 
+IC161-ARIN|
+|OrgTechName| 
+Comcast Cable Communications Inc |
+|OrgTechPhone| 
++1-856-317-7200|
+|Parent| 
+NET-68-80-0-0-1|
+|PostalCode| 
+08002|
+|RegDate| 
+2003-03-19|2003-03-19|
+|StateProv| 
+NJ|
+|TechEmail| 
+cips_ip-registration@cable.comcast.com |
+|TechHandle| 
+IC161-ARIN|
+|TechName| 
+Comcast Cable Communications Inc |
+|TechPhone| 
++1-856-317-7200|
+|Updated| 
+2003-03-19|2003-03-19|
+------------------------
+
+64.18.175.143
+|Address| 
+400, Nolin|
+|CIDR| 
+64.18.160.0/20 |
+|City| 
+Vanier|
+|Comment| 
+ADDRESSES WITHIN THIS BLOCK ARE NON-PORTABLE|
+|Country| 
+CA|
+|NameServer| 
+DNS.ORICOM.CA|DNS2.ORICOM.CA|
+|NetHandle| 
+NET-64-18-160-0-1|
+|NetName| 
+ORICOM-BLK-1|
+|NetRange| 
+64.18.160.0 - 64.18.175.255 |
+|NetType| 
+Direct Allocation|
+|OrgID| 
+ORIC|
+|OrgName| 
+Oricom Internet |
+|OrgTechEmail| 
+arin-admin@oricom.ca|
+|OrgTechHandle| 
+TECHN102-ARIN|
+|OrgTechName| 
+Technical |
+|OrgTechPhone| 
++1-418-683-4557|
+|Parent| 
+NET-64-0-0-0-0|
+|PostalCode| 
+G1M-1E7|
+|RegDate| 
+2002-05-13|
+|StateProv| 
+QC|
+|TechEmail| 
+abergeron@oricom.ca |
+|TechHandle| 
+AB716-ARIN|
+|TechName| 
+BERGERON, ALAIN |
+|TechPhone| 
++1-418-683-4557|
+|Updated| 
+2002-08-12|
+------------------------
+
+64.171.251.103
+|Address| 
+268 Bush St. #5000|
+|CIDR| 
+64.171.251.96/27 |
+|City| 
+San Francisco|
+|Comment| 
+ |
+|Country| 
+US|
+|CustName| 
+Millenium Design|
+|NetHandle| 
+NET-64-171-251-96-1|
+|NetName| 
+SBCIS-101430-154539|
+|NetRange| 
+64.171.251.96 - 64.171.251.127 |
+|NetType| 
+Reassigned|
+|OrgAbuseEmail| 
+abuse@pacbell.net|
+|OrgAbuseHandle| 
+APB2-ARIN|
+|OrgAbuseName| 
+Abuse - Pacific Bell |
+|OrgAbusePhone| 
++1-888-212-5411|
+|OrgNOCEmail| 
+support@pacbell.net|
+|OrgNOCHandle| 
+SPBI-ARIN|
+|OrgNOCName| 
+Support - Pacific Bell Internet |
+|OrgNOCPhone| 
++1-888-212-5411|
+|OrgTechEmail| 
+IPAdmin-PBI@sbis.sbc.com|
+|OrgTechHandle| 
+PIA2-ORG-ARIN|
+|OrgTechName| 
+IPAdmin-PBI |
+|OrgTechPhone| 
++1-888-212-5411|
+|Parent| 
+NET-64-160-0-0-1|
+|PostalCode| 
+94104|
+|RegDate| 
+2001-05-01|2001-05-01|
+|StateProv| 
+CA|
+|TechEmail| 
+IPAdmin-PBI@sbis.sbc.com |
+|TechHandle| 
+PIA2-ORG-ARIN|
+|TechName| 
+IPAdmin-PBI |
+|TechPhone| 
++1-888-212-5411|
+|Updated| 
+2001-05-01|2001-05-01|
+------------------------
+
+64.230.11.87
+|Address| 
+76 Adelaide Street West|
+|CIDR| 
+64.230.0.0/18 |
+|City| 
+Toronto|
+|Comment| 
+ |
+|Country| 
+CA|
+|CustName| 
+Nexxia HSE|
+|NetHandle| 
+NET-64-230-0-0-1|
+|NetName| 
+HSEN20-CA|
+|NetRange| 
+64.230.0.0 - 64.230.63.255 |
+|NetType| 
+Reassigned|
+|OrgTechEmail| 
+ip_prov@bellglobal.com|
+|OrgTechHandle| 
+SYSAD1-ARIN|
+|OrgTechName| 
+Sys Admin |
+|OrgTechPhone| 
++1-613-785-0886|
+|Parent| 
+NET-64-228-0-0-1|
+|PostalCode| 
+M5H 1P6|
+|RegDate| 
+2000-11-23|2000-11-23|
+|StateProv| 
+Ontario|
+|TechEmail| 
+noc@in.bell.ca |
+|TechHandle| 
+PD135-ARIN|
+|TechName| 
+Daoust, Philippe |
+|TechPhone| 
++1-800-450-7771|
+|Updated| 
+2000-11-23|2000-11-23|
+------------------------
+
+68.49.235.25
+|Address| 
+3 Executive Campus|5th Floor|
+|CIDR| 
+68.48.0.0/15 |
+|City| 
+Cherry Hill|
+|Comment| 
+NONE|
+|Country| 
+US|
+|CustName| 
+Comcast Cable Communications, Inc.|
+|NetHandle| 
+NET-68-48-0-0-1|
+|NetName| 
+DC-3|
+|NetRange| 
+68.48.0.0 - 68.49.255.255 |
+|NetType| 
+Reassigned|
+|OrgAbuseEmail| 
+abuse@comcast.net|
+|OrgAbuseHandle| 
+NAPO-ARIN|
+|OrgAbuseName| 
+Network Abuse and Policy Observance |
+|OrgAbusePhone| 
++1-856-317-7272|
+|OrgTechEmail| 
+cips_ip-registration@cable.comcast.com|
+|OrgTechHandle| 
+IC161-ARIN|
+|OrgTechName| 
+Comcast Cable Communications Inc |
+|OrgTechPhone| 
++1-856-317-7200|
+|Parent| 
+NET-68-32-0-0-1|
+|PostalCode| 
+08002|
+|RegDate| 
+2003-03-19|2003-03-19|
+|StateProv| 
+NJ|
+|TechEmail| 
+cips_ip-registration@cable.comcast.com |
+|TechHandle| 
+IC161-ARIN|
+|TechName| 
+Comcast Cable Communications Inc |
+|TechPhone| 
++1-856-317-7200|
+|Updated| 
+2003-03-19|2003-03-19|
+------------------------
+
+12.234.103.152
+|Address| 
+1500 Market Street|
+|CIDR| 
+12.234.0.0/17 |
+|City| 
+Philadelphia|
+|Comment| 
+ |
+|Country| 
+US|
+|CustName| 
+Comcast Corporation|
+|NetHandle| 
+NET-12-234-0-0-1|
+|NetName| 
+COMCAST-12-234-0-0-SAN-JOSE|
+|NetRange| 
+12.234.0.0 - 12.234.127.255 |
+|NetType| 
+Reassigned|
+|OrgAbuseEmail| 
+abuse@att.net|
+|OrgAbuseHandle| 
+ATTAB-ARIN|
+|OrgAbuseName| 
+ATT Abuse |
+|OrgAbusePhone| 
++1-919-319-8130|
+|OrgTechEmail| 
+qhoang@att.com|swipid@nipaweb.vip.att.net|
+|OrgTechHandle| 
+ICC-ARIN|IPSWI-ARIN|
+|OrgTechName| 
+IP Customer Care |IP SWIP |
+|OrgTechPhone| 
++1-888-613-6330|+1-888-613-6330|
+|Parent| 
+NET-12-0-0-0-1|
+|PostalCode| 
+19102|
+|RegDate| 
+2003-10-10|2003-10-10|
+|StateProv| 
+PA|
+|TechEmail| 
+help@ip.att.net |
+|TechHandle| 
+DK71-ARIN|
+|TechName| 
+Kostick, Deirdre |
+|TechPhone| 
++1-919-319-8249|
+|Updated| 
+2003-10-10|2003-10-10|
+------------------------
+
+211.51.66.225
+|address| 
+11F, KTF B/D, 1321-11, Seocho2-Dong, Seocho-Gu,|Seoul, Korea, 137-857|
+|admin-c| 
+HM127-AP|PY13370-KR|
+|changed| 
+hostmaster@apnic.net 19991118|hostmaster@apnic.net 20010606|hostmaster@nic.or.kr 20020507|hostmaster@nic.or.kr 20040112|hostmaster@nic.or.kr 20040112|hostmaster@nic.or.kr 20040112|
+|country| 
+KR|KR|KR|KR|KR|
+|descr| 
+KRNIC|Korea Network Information Center|Korea Telecom|206 Jungja-dong, Bundang-gu, Sungnam city, Gyunggi-do, Korea, 463-711|GYUNGGI|463-711|Korea Telecom|206 Jungja-dong, Bundang-gu, Sungnam city, Gyunggi-do, Korea, 463-711|GYUNGGI|463-711|Korea Telecom|206 Jungja-dong, Bundang-gu, Sungnam city, Gyunggi-do, Korea, 463-711|GYUNGGI|463-711|
+|e-mail| 
+hostmaster@nic.or.kr|ip@ns.kornet.net|ip@ns.kornet.net|
+|fax-no| 
++82-2-2186-4496|+82-2-747-8701|+82-2-747-8701|
+|inetnum| 
+211.42.0.0 - 211.51.255.255|211.51.66.0 - 211.51.66.255|
+|mnt-by| 
+APNIC-HM|MNT-KRNIC-AP|MNT-KRNIC-AP|MNT-KRNIC-AP|MNT-KRNIC-AP|
+|mnt-lower| 
+MNT-KRNIC-AP|
+|netname| 
+KRNIC-KR|KORNET-INFRA000001-KR|
+|nic-hdl| 
+HM127-AP|PY13370-KR|KJ13870-KR|
+|person| 
+Host Master|Park YungGil|Kim JinWon|
+|phone| 
++82-2-2186-4500|+82-2-3674-5708|+82-2-3674-5708|
+|remarks| 
+******************************************|KRNIC is the National Internet Registry|in Korea under APNIC. If you would like to|find assignment information in detail|please refer to the KRNIC Whois DB|http://whois.nic.or.kr/english/index.html|******************************************|This IP address space has been allocated to KRNIC.|For more information, using KRNIC Whois Database|whois -h whois.nic.or.kr|This information has been partially mirrored by APNIC from|KRNIC. To obtain more specific information, please use the|KRNIC whois server at whois.krnic.net.|This information has been partially mirrored by APNIC from|KRNIC. To obtain more specific information, please use the|KRNIC whois server at whois.krnic.net.|This information has been partially mirrored by APNIC from|KRNIC. To obtain more specific information, please use the|KRNIC whois server at whois.krnic.net.|
+|source| 
+APNIC|APNIC|KRNIC|KRNIC|KRNIC|
+|status| 
+ALLOCATED PORTABLE|
+|tech-c| 
+HM127-AP|KJ13870-KR|
+------------------------
+
+67.10.35.101
+|Address| 
+13241 Woodland Park Road|
+|CIDR| 
+67.8.0.0/14 |
+|City| 
+Herndon|
+|Comment| 
+ADDRESSES WITHIN THIS BLOCK ARE NON-PORTABLE|
+|Country| 
+US|
+|NameServer| 
+DNS1.RR.COM|DNS2.RR.COM|DNS3.RR.COM|DNS4.RR.COM|
+|NetHandle| 
+NET-67-8-0-0-1|
+|NetName| 
+RR-SOUTHEAST-BLK2|
+|NetRange| 
+67.8.0.0 - 67.11.255.255 |
+|NetType| 
+Direct Allocation|
+|OrgAbuseEmail| 
+abuse@rr.com|
+|OrgAbuseHandle| 
+ABUSE10-ARIN|
+|OrgAbuseName| 
+Abuse |
+|OrgAbusePhone| 
++1-703-345-3416|
+|OrgID| 
+RRSW|
+|OrgName| 
+Road Runner |
+|OrgTechEmail| 
+abuse@rr.com|
+|OrgTechHandle| 
+IPTEC-ARIN|
+|OrgTechName| 
+IP Tech |
+|OrgTechPhone| 
++1-703-345-3416|
+|Parent| 
+NET-67-0-0-0-0|
+|PostalCode| 
+20171|
+|ReferralServer| 
+rwhois://ipmt.rr.com:4321|
+|RegDate| 
+2001-08-14|
+|StateProv| 
+VA|
+|TechEmail| 
+abuse@rr.com |
+|TechHandle| 
+ZS30-ARIN|
+|TechName| 
+ServiceCo LLC |
+|TechPhone| 
++1-703-345-3416|
+|Updated| 
+2003-01-31|
+------------------------
+
+12.218.56.238
+|Address| 
+100 Crystal Run Road|
+|CIDR| 
+12.218.56.0/22 |
+|City| 
+Middletown|
+|Comment| 
+ |
+|Country| 
+US|
+|CustName| 
+Mediacom Communications Corp|
+|NetHandle| 
+NET-12-218-56-0-1|
+|NetName| 
+MEDIACOMCC-12-218-56-0-EMMETSBURG-IA|
+|NetRange| 
+12.218.56.0 - 12.218.59.255 |
+|NetType| 
+Reassigned|
+|OrgAbuseEmail| 
+abuse@att.net|
+|OrgAbuseHandle| 
+ATTAB-ARIN|
+|OrgAbuseName| 
+ATT Abuse |
+|OrgAbusePhone| 
++1-919-319-8130|
+|OrgTechEmail| 
+qhoang@att.com|swipid@nipaweb.vip.att.net|
+|OrgTechHandle| 
+ICC-ARIN|IPSWI-ARIN|
+|OrgTechName| 
+IP Customer Care |IP SWIP |
+|OrgTechPhone| 
++1-888-613-6330|+1-888-613-6330|
+|Parent| 
+NET-12-0-0-0-1|
+|PostalCode| 
+10941|
+|RegDate| 
+2003-10-10|2003-10-10|
+|StateProv| 
+NY|
+|TechEmail| 
+help@ip.att.net |
+|TechHandle| 
+DK71-ARIN|
+|TechName| 
+Kostick, Deirdre |
+|TechPhone| 
++1-919-319-8249|
+|Updated| 
+2003-10-10|2003-10-10|
+------------------------
+
+211.138.156.157
+|address| 
+China Mobile Communications Corporation|29, Jinrong Ave., Xicheng District, Beijing, 100032|29,Jinrong Ave., Xicheng  District, Beijing,|100032 China|
+|admin-c| 
+JS686-AP|
+|changed| 
+hm-changed@apnic.net 20000818|hm-changed@apnic.net 20030923|hostmaster@chinamobile.com 20030130|hostmaster@chinamobile.com 20030122|
+|country| 
+CN|CN|CN|
+|descr| 
+China Mobile Communications Corporation|Mobile Communications Network Operator in China|Internet Service Provider in China|
+|e-mail| 
+sunjinxia@chinamobile.com|weichenguang@chinamobile.com|
+|fax-no| 
++86-10-66006012|+86 10 66006187|
+|inetnum| 
+211.136.0.0 - 211.143.255.255|
+|mnt-by| 
+APNIC-HM|MAINT-CN-CMCC|MAINT-CN-CMCC|
+|mnt-lower| 
+MAINT-CN-CMCC|
+|netname| 
+CMNET|
+|nic-hdl| 
+JS686-AP|CW265-AP|
+|person| 
+Jinxia Sun|chenguang wei|
+|phone| 
++86-10-66006688-1755|+86 10 66006688-1306|
+|remarks| 
+------------------------------|Please send abuse e-mail to|abuse@chinamobile.com|Please send probe e-mail to|security@chinamobile.com|-------------------------------|------------------------------|Please send abuse e-mail to|abuse@chinamobile.com|Please send probe e-mail to|security@chinamobile.com|-------------------------------|------------------------------|Please send abuse e-mail to|abuse@chinamobile.com|Please send probe e-mail to|security@chinamobile.com|-------------------------------|
+|source| 
+APNIC|APNIC|APNIC|
+|status| 
+ALLOCATED PORTABLE|
+|tech-c| 
+CW265-AP|
+------------------------
+
+204.71.72.149
+|Address| 
+3300 Regency Pkwy|
+|CIDR| 
+204.71.0.0/16 |
+|City| 
+Cary|
+|Comment| 
+ |
+|Country| 
+US|
+|NameServer| 
+NS.CW.NET|NS2.CW.NET|NS3.CW.NET|NS4.CW.NET|NS5.CW.NET|
+|NetHandle| 
+NET-204-71-0-0-1|
+|NetName| 
+CW-PROVIDER|
+|NetRange| 
+204.71.0.0 - 204.71.255.255 |
+|NetType| 
+Direct Allocation|
+|OrgAbuseEmail| 
+abuse@cw.net|
+|OrgAbuseHandle| 
+SPAMC-ARIN|
+|OrgAbuseName| 
+SPAM COMPLAINTS |
+|OrgAbusePhone| 
++1-800-977-4662|
+|OrgID| 
+CWUS|
+|OrgNOCEmail| 
+trouble@cw.net|
+|OrgNOCHandle| 
+NOC99-ARIN|
+|OrgNOCName| 
+Network Operations Center |
+|OrgNOCPhone| 
++1-800-977-4662|
+|OrgName| 
+Cable & Wireless |
+|OrgTechEmail| 
+ip@gnoc.cw.net|ipadmin@clp.cw.net|
+|OrgTechHandle| 
+GIAA-ARIN|UIAA-ARIN|
+|OrgTechName| 
+Global IP Address Administration |US IP Address Administration |
+|OrgTechPhone| 
++1-919-465-4096|+1-800-977-4662|
+|Parent| 
+NET-204-0-0-0-0|
+|PostalCode| 
+27511|
+|RegDate| 
+1994-06-22|
+|StateProv| 
+NC|
+|TechEmail| 
+ip@clp.cw.net |
+|TechHandle| 
+IA3-ORG-ARIN|
+|TechName| 
+Cable and Wireless US |
+|TechPhone| 
++1-800-977-4662|
+|Updated| 
+2002-10-23|
+------------------------
+
+211.8.215.105
+|address| 
+Kokusai-Kougyou-Kanda Bldg 6F, 2-3-4 Uchi-Kanda|Chiyoda-ku, Tokyo 101-0047, Japan|
+|admin-c| 
+JNIC1-AP|SS13-AP|TA2585JP|
+|changed| 
+hostmaster@apnic.net 19991122|apnic-ftp@nic.ad.jp 19990629|ip-staff@nic.ad.jp 20030806|apnic-ftp@nic.ad.jp 20010129|apnic-ftp@nic.ad.jp 20040225|
+|country| 
+JP|JP|JP|
+|descr| 
+Japan Network Information Center|City Telecom Kanagawa Inc.|
+|e-mail| 
+hostmaster@nic.ad.jp|
+|fax-no| 
++81-3-5297-2312|
+|inetnum| 
+211.8.0.0 - 211.19.255.255|211.8.212.0 - 211.8.215.255|
+|mnt-by| 
+APNIC-HM|MAINT-JPNIC|
+|mnt-lower| 
+MAINT-JPNIC|
+|netname| 
+JPNIC-NET-JP|CTK-NET|
+|nic-hdl| 
+JNIC1-AP|
+|phone| 
++81-3-5297-2311|
+|remarks| 
+JPNIC Allocation Block|Authoritative information regarding assignments and|allocations made from within this block can also be|queried at whois.nic.ad.jp. To obtain an English|output query whois -h whois.nic.ad.jp x.x.x.x/e|This information has been partially mirrored by APNIC from|JPNIC. To obtain more specific information, please use the|JPNIC whois server at whois.nic.ad.jp. (This defaults to|Japanese output, use the /e switch for English output)|This information has been partially mirrored by APNIC from|JPNIC. To obtain more specific information, please use the|JPNIC whois server at whois.nic.ad.jp. (This defaults to|Japanese output, use the /e switch for English output)|
+|rev-srv| 
+ns1.nic.ad.jp|ns.wide.ad.jp|ns0.iij.ad.jp|dns0.spin.ad.jp|ns-jp.sinet.ad.jp|
+|role| 
+Japan Network Information Center|
+|source| 
+APNIC|APNIC|JPNIC|
+|status| 
+ALLOCATED PORTABLE|
+|tech-c| 
+JNIC1-AP|SY7-AP|MW882JP|
+------------------------
+
+68.67.168.35
+|Address| 
+1 North Main Street|
+|CIDR| 
+68.67.128.0/18 |
+|City| 
+Coudersport|
+|Comment| 
+ |
+|Country| 
+US|
+|CustName| 
+Adelphia|
+|NetHandle| 
+NET-68-67-128-0-1|
+|NetName| 
+68671280-Z7|
+|NetRange| 
+68.67.128.0 - 68.67.191.255 |
+|NetType| 
+Reassigned|
+|OrgAbuseEmail| 
+abuse@adelphia.net|
+|OrgAbuseHandle| 
+IPE-ARIN|
+|OrgAbuseName| 
+Internet Policy Enforcement |
+|OrgAbusePhone| 
++1-866-473-2909|
+|OrgTechEmail| 
+arin@adelphiacom.net|
+|OrgTechHandle| 
+CKI8-ARIN|
+|OrgTechName| 
+Kio, Carolyn |
+|OrgTechPhone| 
++1-888-512-5111|
+|Parent| 
+NET-68-64-0-0-1|
+|PostalCode| 
+16915|
+|RegDate| 
+2002-10-25|2002-10-25|
+|StateProv| 
+PA|
+|TechEmail| 
+ipadmin@adelphia.net |
+|TechHandle| 
+AH102-ARIN|
+|TechName| 
+Adelphia Hostmaster |
+|TechPhone| 
++1-814-274-0638|
+|Updated| 
+2002-10-25|2002-10-25|
+------------------------
+
+24.192.234.150
+|Address| 
+1 Mount Pleasant Road|
+|CIDR| 
+24.192.234.128/25 |
+|City| 
+Toronto|
+|Comment| 
+ |
+|Country| 
+CA|
+|CustName| 
+Rogers Cable Inc. Pr|
+|NetHandle| 
+NET-24-192-234-128-1|
+|NetName| 
+DOC-1-7-1-0-PR-4|
+|NetRange| 
+24.192.234.128 - 24.192.234.255 |
+|NetType| 
+Reassigned|
+|OrgAbuseEmail| 
+abuse@rogers.com|
+|OrgAbuseHandle| 
+RHI9-ARIN|
+|OrgAbuseName| 
+Rogers High-Speed Internet |
+|OrgAbusePhone| 
++1-416-935-4729|
+|OrgTechEmail| 
+abuse@rogers.com|
+|OrgTechHandle| 
+RHI9-ARIN|
+|OrgTechName| 
+Rogers High-Speed Internet |
+|OrgTechPhone| 
++1-416-935-4729|
+|Parent| 
+NET-24-192-0-0-1|
+|PostalCode| 
+M4Y-2Y5|
+|RegDate| 
+2003-09-25|2003-09-25|
+|StateProv| 
+ON|
+|Updated| 
+2003-09-25|2003-09-25|
+------------------------
+
+24.162.242.191
+|Address| 
+13241 Woodland Park Road|
+|CIDR| 
+24.160.0.0/13, 24.168.0.0/15, 24.170.0.0/17 |
+|City| 
+Herndon|
+|Comment| 
+ |
+|Country| 
+US|
+|NameServer| 
+DNS1.RR.COM|DNS2.RR.COM|DNS3.RR.COM|DNS4.RR.COM|
+|NetHandle| 
+NET-24-160-0-0-1|
+|NetName| 
+ROAD-RUNNER-5|
+|NetRange| 
+24.160.0.0 - 24.170.127.255 |
+|NetType| 
+Direct Allocation|
+|OrgAbuseEmail| 
+abuse@rr.com|
+|OrgAbuseHandle| 
+ABUSE10-ARIN|
+|OrgAbuseName| 
+Abuse |
+|OrgAbusePhone| 
++1-703-345-3416|
+|OrgID| 
+RRMA|
+|OrgName| 
+Road Runner |
+|OrgTechEmail| 
+abuse@rr.com|
+|OrgTechHandle| 
+IPTEC-ARIN|
+|OrgTechName| 
+IP Tech |
+|OrgTechPhone| 
++1-703-345-3416|
+|Parent| 
+NET-24-0-0-0-0|
+|PostalCode| 
+20171|
+|ReferralServer| 
+rwhois://ipmt.rr.com:4321|
+|RegDate| 
+2000-06-09|
+|StateProv| 
+VA|
+|TechEmail| 
+abuse@rr.com |
+|TechHandle| 
+ZS30-ARIN|
+|TechName| 
+ServiceCo LLC |
+|TechPhone| 
++1-703-345-3416|
+|Updated| 
+2002-08-22|
+------------------------
+
+12.230.252.103
+|Address| 
+1500 Market Street|
+|CIDR| 
+12.230.224.0/19 |
+|City| 
+Philadelphia|
+|Comment| 
+ |
+|Country| 
+US|
+|CustName| 
+Comcast Corporation|
+|NetHandle| 
+NET-12-230-224-0-1|
+|NetName| 
+COMCAST-12-230-224-0-WASHINGTON|
+|NetRange| 
+12.230.224.0 - 12.230.255.255 |
+|NetType| 
+Reassigned|
+|OrgAbuseEmail| 
+abuse@att.net|
+|OrgAbuseHandle| 
+ATTAB-ARIN|
+|OrgAbuseName| 
+ATT Abuse |
+|OrgAbusePhone| 
++1-919-319-8130|
+|OrgTechEmail| 
+qhoang@att.com|swipid@nipaweb.vip.att.net|
+|OrgTechHandle| 
+ICC-ARIN|IPSWI-ARIN|
+|OrgTechName| 
+IP Customer Care |IP SWIP |
+|OrgTechPhone| 
++1-888-613-6330|+1-888-613-6330|
+|Parent| 
+NET-12-0-0-0-1|
+|PostalCode| 
+19102|
+|RegDate| 
+2003-10-10|2003-10-10|
+|StateProv| 
+PA|
+|TechEmail| 
+help@ip.att.net |
+|TechHandle| 
+DK71-ARIN|
+|TechName| 
+Kostick, Deirdre |
+|TechPhone| 
++1-919-319-8249|
+|Updated| 
+2003-10-10|2003-10-10|
+------------------------
+
+12.235.36.44
+|Address| 
+1500 Market Street|
+|CIDR| 
+12.235.32.0/20 |
+|City| 
+Philadelphia|
+|Comment| 
+ |
+|Country| 
+US|
+|CustName| 
+Comcast Corporation|
+|NetHandle| 
+NET-12-235-32-0-1|
+|NetName| 
+COMCAST-12-235-32-0-SAN-JOSE|
+|NetRange| 
+12.235.32.0 - 12.235.47.255 |
+|NetType| 
+Reassigned|
+|OrgAbuseEmail| 
+abuse@att.net|
+|OrgAbuseHandle| 
+ATTAB-ARIN|
+|OrgAbuseName| 
+ATT Abuse |
+|OrgAbusePhone| 
++1-919-319-8130|
+|OrgTechEmail| 
+qhoang@att.com|swipid@nipaweb.vip.att.net|
+|OrgTechHandle| 
+ICC-ARIN|IPSWI-ARIN|
+|OrgTechName| 
+IP Customer Care |IP SWIP |
+|OrgTechPhone| 
++1-888-613-6330|+1-888-613-6330|
+|Parent| 
+NET-12-0-0-0-1|
+|PostalCode| 
+19102|
+|RegDate| 
+2003-10-10|2003-10-10|
+|StateProv| 
+PA|
+|TechEmail| 
+help@ip.att.net |
+|TechHandle| 
+DK71-ARIN|
+|TechName| 
+Kostick, Deirdre |
+|TechPhone| 
++1-919-319-8249|
+|Updated| 
+2003-10-10|2003-10-10|
+------------------------
+
+66.134.15.204
+|AbuseEmail| 
+abuse-isp@covad.com |
+|AbuseHandle| 
+CART-ARIN|
+|AbuseName| 
+Covad abuse reporting team |
+|AbusePhone| 
++1-703-376-2830|
+|Address| 
+2510 Zanker Rd|
+|CIDR| 
+66.134.0.0/16 |
+|City| 
+San Jose|
+|Comment| 
+ADDRESSES WITHIN THIS BLOCK ARE NON-PORTABLE| |for abuse issues, please contact abuse-isp@covad.com|Reassignment information for this block of addresses can be found at rwhois://rwhois.laserlink.net:4321/|
+|Country| 
+US|
+|NameServer| 
+NS1.COVAD.NET|NS2.COVAD.NET|
+|NetHandle| 
+NET-66-134-0-0-1|
+|NetName| 
+COVAD-IP-2-NET|
+|NetRange| 
+66.134.0.0 - 66.134.255.255 |
+|NetType| 
+Direct Allocation|
+|OrgAbuseEmail| 
+abuse-isp@covad.com|
+|OrgAbuseHandle| 
+CART-ARIN|
+|OrgAbuseName| 
+Covad abuse reporting team |
+|OrgAbusePhone| 
++1-703-376-2830|
+|OrgID| 
+CVAD|
+|OrgNOCEmail| 
+noc-ipservices@covad.com|
+|OrgNOCHandle| 
+CIN-ARIN|
+|OrgNOCName| 
+COVAD IP NOC |
+|OrgNOCPhone| 
++1-888-801-6285|
+|OrgName| 
+Covad Communications |
+|OrgTechEmail| 
+pnicoll@covad.com|sancha@covad.com|
+|OrgTechHandle| 
+PRN-ARIN|SMA52-ARIN|
+|OrgTechName| 
+Nicoll, Peter R|Ancha, Scott M|
+|OrgTechPhone| 
++1-408-434-2108|+1-408-434-2112|
+|Parent| 
+NET-66-0-0-0-0|
+|PostalCode| 
+95131-1127|
+|ReferralServer| 
+rwhois://rwhois.laserlink.net:4321/|
+|RegDate| 
+2001-07-13|
+|StateProv| 
+CA|
+|TechEmail| 
+ip_admin@covad.com |
+|TechHandle| 
+ZC178-ARIN|
+|TechName| 
+Covad IP Admin |
+|TechPhone| 
++1-408-434-2108|
+|Updated| 
+2003-05-13|
+------------------------
+
+216.146.15.8
+|Address| 
+606 N. Carancahua|Suite 506|
+|CIDR| 
+216.146.0.0/19 |
+|City| 
+Corpus Christi|
+|Comment| 
+ADDRESSES WITHIN THIS BLOCK ARE NON-PORTABLE|
+|Country| 
+US|
+|NameServer| 
+DNS1.DAVLIN.NET|DNS2.DAVLIN.NET|
+|NetHandle| 
+NET-216-146-0-0-1|
+|NetName| 
+COMPUBASIX|
+|NetRange| 
+216.146.0.0 - 216.146.31.255 |
+|NetType| 
+Direct Allocation|
+|OrgID| 
+CBAX|
+|OrgName| 
+COMPUBASIX INC |
+|OrgTechEmail| 
+drouth@davlin.net|
+|OrgTechHandle| 
+DR482-ARIN|
+|OrgTechName| 
+Routh, David |
+|OrgTechPhone| 
++1-361-906-0111|
+|Parent| 
+NET-216-0-0-0-0|
+|PostalCode| 
+78476|
+|RegDate| 
+1998-12-15|
+|StateProv| 
+TX|
+|Updated| 
+2003-08-26|
+------------------------
+
+24.148.52.16
+|Address| 
+105 Carnegie Center|
+|CIDR| 
+24.148.0.0/18, 24.148.64.0/19 |
+|City| 
+Princeton|
+|Comment| 
+ADDRESSES WITHIN THIS BLOCK ARE NON-PORTABLE|
+|Country| 
+US|
+|NameServer| 
+AUTH1.DNS.RCN.NET|AUTH2.DNS.RCN.NET|AUTH3.DNS.RCN.NET|AUTH4.DNS.RCN.NET|
+|NetHandle| 
+NET-24-148-0-0-1|
+|NetName| 
+RCN-BLK-25|
+|NetRange| 
+24.148.0.0 - 24.148.95.255 |
+|NetType| 
+Direct Allocation|
+|OrgAbuseEmail| 
+abuse@rcn.com|
+|OrgAbuseHandle| 
+RAD75-ARIN|
+|OrgAbuseName| 
+RCN Abuse Department |
+|OrgAbusePhone| 
++1-888-972-6622|
+|OrgID| 
+RCN|
+|OrgNOCEmail| 
+noc@rcn.com|
+|OrgNOCHandle| 
+ZR40-ARIN|
+|OrgNOCName| 
+RCN Corporation |
+|OrgNOCPhone| 
++1-888-972-6622|
+|OrgName| 
+RCN Corporation |
+|OrgTechEmail| 
+noc@rcn.com|
+|OrgTechHandle| 
+ZR40-ARIN|
+|OrgTechName| 
+RCN Corporation |
+|OrgTechPhone| 
++1-888-972-6622|
+|Parent| 
+NET-24-0-0-0-0|
+|PostalCode| 
+08540|
+|RegDate| 
+ |
+|StateProv| 
+NJ|
+|TechEmail| 
+noc@rcn.com |
+|TechHandle| 
+ZR40-ARIN|
+|TechName| 
+RCN Corporation |
+|TechPhone| 
++1-888-972-6622|
+|Updated| 
+2003-01-20|
+------------------------
+
+65.70.165.9
+|Address| 
+2701 W 15th St PMB 236|
+|CIDR| 
+65.64.0.0/13 |
+|City| 
+Plano|
+|Comment| 
+ADDRESSES WITHIN THIS BLOCK ARE NON-PORTABLE|please send all abuse issue e-mails to abuse@swbell.net|
+|Country| 
+US|
+|NameServer| 
+NS1.SWBELL.NET|NS2.SWBELL.NET|
+|NetHandle| 
+NET-65-64-0-0-1|
+|NetName| 
+SBIS-5BLK|
+|NetRange| 
+65.64.0.0 - 65.71.255.255 |
+|NetType| 
+Direct Allocation|
+|OrgAbuseEmail| 
+abuse@swbell.net|
+|OrgAbuseHandle| 
+ABUSE6-ARIN|
+|OrgAbuseName| 
+Abuse - Southwestern Bell Internet |
+|OrgAbusePhone| 
++1-877-722-3755|
+|OrgID| 
+SBIS|
+|OrgNOCEmail| 
+support@swbell.net|
+|OrgNOCHandle| 
+SUPPO-ARIN|
+|OrgNOCName| 
+Support - Southwestern Bell Internet Services |
+|OrgNOCPhone| 
++1-888-212-5411|
+|OrgName| 
+SBC Internet Services - Southwest |
+|OrgTechEmail| 
+IPAdmin-SBIS@sbis.sbc.com|
+|OrgTechHandle| 
+IPADM2-ARIN|
+|OrgTechName| 
+IPAdmin-SBIS |
+|OrgTechPhone| 
++1-888-212-5411|
+|Parent| 
+NET-65-0-0-0-0|
+|PostalCode| 
+75075|
+|RegDate| 
+2000-10-03|
+|StateProv| 
+TX|
+|TechEmail| 
+IPAdmin-SBIS@sbcis.sbc.com |
+|TechHandle| 
+ZS44-ARIN|
+|TechName| 
+IPAdmin-SBIS |
+|TechPhone| 
++1-888-212-5411|
+|Updated| 
+2002-08-08|
+------------------------
+
+24.245.34.47
+|Address| 
+1800 Bishops Gate Blvd|
+|CIDR| 
+24.245.0.0/18, 24.245.64.0/20 |
+|City| 
+Mt Laurel|
+|Comment| 
+ |
+|Country| 
+US|
+|NameServer| 
+NS4.ATTBB.NET|NS5.ATTBB.NET|NS6.ATTBB.NET|
+|NetHandle| 
+NET-24-245-0-0-1|
+|NetName| 
+CCCH3-12|
+|NetRange| 
+24.245.0.0 - 24.245.79.255 |
+|NetType| 
+Direct Allocation|
+|OrgAbuseEmail| 
+abuse@comcast.net|
+|OrgAbuseHandle| 
+NAPO-ARIN|
+|OrgAbuseName| 
+Network Abuse and Policy Observance |
+|OrgAbusePhone| 
++1-856-317-7272|
+|OrgID| 
+CCCH-3|
+|OrgName| 
+Comcast Cable Communications Holdings, Inc |
+|OrgTechEmail| 
+cips_ip-registration@cable.comcast.com|
+|OrgTechHandle| 
+IC161-ARIN|
+|OrgTechName| 
+Comcast Cable Communications Inc |
+|OrgTechPhone| 
++1-856-317-7200|
+|Parent| 
+NET-24-0-0-0-0|
+|PostalCode| 
+08054|
+|RegDate| 
+ |
+|StateProv| 
+NJ|
+|Updated| 
+2003-08-19|
+------------------------
+
+64.171.131.146
+|Address| 
+208 Bush St. #5000|
+|CIDR| 
+64.160.0.0/12 |
+|City| 
+San Ramon|
+|Comment| 
+ADDRESSES WITHIN THIS BLOCK ARE NON-PORTABLE|please send all abuse issue e-mails to abuse@pbi.net|
+|Country| 
+US|
+|NameServer| 
+NS1.PBI.NET|NS2.PBI.NET|
+|NetHandle| 
+NET-64-160-0-0-1|
+|NetName| 
+PBI-NET-8|
+|NetRange| 
+64.160.0.0 - 64.175.255.255 |
+|NetType| 
+Direct Allocation|
+|OrgAbuseEmail| 
+abuse@pacbell.net|
+|OrgAbuseHandle| 
+APB2-ARIN|
+|OrgAbuseName| 
+Abuse - Pacific Bell |
+|OrgAbusePhone| 
++1-888-212-5411|
+|OrgID| 
+PACB|
+|OrgNOCEmail| 
+support@pacbell.net|
+|OrgNOCHandle| 
+SPBI-ARIN|
+|OrgNOCName| 
+Support - Pacific Bell Internet |
+|OrgNOCPhone| 
++1-888-212-5411|
+|OrgName| 
+Pac Bell Internet Services |
+|OrgTechEmail| 
+IPAdmin-PBI@sbis.sbc.com|
+|OrgTechHandle| 
+PIA2-ORG-ARIN|
+|OrgTechName| 
+IPAdmin-PBI |
+|OrgTechPhone| 
++1-888-212-5411|
+|Parent| 
+NET-64-0-0-0-0|
+|PostalCode| 
+94104|
+|RegDate| 
+2000-06-02|
+|StateProv| 
+CA|
+|TechEmail| 
+IPAdmin-PBI@sbis.sbc.com |
+|TechHandle| 
+PIA2-ORG-ARIN|
+|TechName| 
+IPAdmin-PBI |
+|TechPhone| 
++1-888-212-5411|
+|Updated| 
+2001-09-26|
+------------------------
+
+64.229.129.200
+|Address| 
+78 O'Connor|
+|CIDR| 
+64.229.128.0/19 |
+|City| 
+Ottawa|
+|Comment| 
+ |
+|Country| 
+CA|
+|CustName| 
+HSE|
+|NetHandle| 
+NET-64-229-128-0-1|
+|NetName| 
+HSE8921-CA|
+|NetRange| 
+64.229.128.0 - 64.229.159.255 |
+|NetType| 
+Reassigned|
+|OrgTechEmail| 
+ip_prov@bellglobal.com|
+|OrgTechHandle| 
+SYSAD1-ARIN|
+|OrgTechName| 
+Sys Admin |
+|OrgTechPhone| 
++1-613-785-0886|
+|Parent| 
+NET-64-228-0-0-1|
+|PostalCode| 
+K1P 5M7|
+|RegDate| 
+2000-09-22|2000-09-22|
+|StateProv| 
+Ontario|
+|TechEmail| 
+noc@in.bell.ca |
+|TechHandle| 
+PD135-ARIN|
+|TechName| 
+Daoust, Philippe |
+|TechPhone| 
++1-800-450-7771|
+|Updated| 
+2000-09-22|2000-09-22|
+------------------------
+
+12.226.172.234
+|Address| 
+1500 Market Street|
+|CIDR| 
+12.226.160.0/20 |
+|City| 
+Philadelphia|
+|Comment| 
+ |
+|Country| 
+US|
+|CustName| 
+Comcast Corporation|
+|NetHandle| 
+NET-12-226-160-0-1|
+|NetName| 
+COMCAST-12-226-160-0-PENNSYLVANIA|
+|NetRange| 
+12.226.160.0 - 12.226.175.255 |
+|NetType| 
+Reassigned|
+|OrgAbuseEmail| 
+abuse@att.net|
+|OrgAbuseHandle| 
+ATTAB-ARIN|
+|OrgAbuseName| 
+ATT Abuse |
+|OrgAbusePhone| 
++1-919-319-8130|
+|OrgTechEmail| 
+qhoang@att.com|swipid@nipaweb.vip.att.net|
+|OrgTechHandle| 
+ICC-ARIN|IPSWI-ARIN|
+|OrgTechName| 
+IP Customer Care |IP SWIP |
+|OrgTechPhone| 
++1-888-613-6330|+1-888-613-6330|
+|Parent| 
+NET-12-0-0-0-1|
+|PostalCode| 
+19102|
+|RegDate| 
+2003-10-10|2003-10-10|
+|StateProv| 
+PA|
+|TechEmail| 
+help@ip.att.net |
+|TechHandle| 
+DK71-ARIN|
+|TechName| 
+Kostick, Deirdre |
+|TechPhone| 
++1-919-319-8249|
+|Updated| 
+2003-10-10|2003-10-10|
+------------------------
+
+66.130.203.77
+|Address| 
+300 Viger Est|
+|CIDR| 
+66.130.203.0/24 |
+|City| 
+Montreal|
+|Comment| 
+ |
+|Country| 
+CA|
+|CustName| 
+Le Groupe Videotron Ltee|
+|NetHandle| 
+NET-66-130-203-0-1|
+|NetName| 
+VL-D-QN-4282CB00|
+|NetRange| 
+66.130.203.0 - 66.130.203.255 |
+|NetType| 
+Reassigned|
+|OrgAbuseEmail| 
+ABUSE@videotron.com|
+|OrgAbuseHandle| 
+ABUSE263-ARIN|
+|OrgAbuseName| 
+Abuse Team |
+|OrgAbusePhone| 
++1-514-281-8537|
+|OrgTechEmail| 
+SRIP@videotron.com|
+|OrgTechHandle| 
+NOC1226-ARIN|
+|OrgTechName| 
+Network Operations Center |
+|OrgTechPhone| 
++1-514-380-7100|
+|Parent| 
+NET-66-130-0-0-1|
+|PostalCode| 
+H2X-3W4|
+|RegDate| 
+2003-04-15|2003-04-15|
+|StateProv| 
+QC|
+|Updated| 
+2003-04-15|2003-04-15|
+------------------------
+
+65.71.64.184

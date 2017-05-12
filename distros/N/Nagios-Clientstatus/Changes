@@ -1,0 +1,13 @@
+Revision history for Perl module Nagios::Clientstatus
+
+0.06 Sun Jun 25 21:05:00 2006
+    Can supply and query optional args to the
+    called program with optional_args in sub new
+0.05 Tue Feb 28 11:41:00 2006
+    Mike Schili told me how to use Getopt::Long the right
+    way. Most warnings in the tests are gone.
+0.04 Sun Feb 12 18:30:17 2006
+    First version ready to upload for CPAN
+0.01 Sun Feb 12 12:30:17 2006
+    - original version; created by ExtUtils::ModuleMaker 0.44
+

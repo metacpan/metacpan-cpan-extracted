@@ -1,0 +1,107 @@
+Revision history for Perl module Net::MAC::Vendor
+
+1.26 2015-11-23T04:38:00Z
+	* Bump to stable release
+
+1.25_01 2015-11-18T04:55:45Z
+	* If the tests can't connect to the fragile IEEE service,
+	don't freak out.
+
+1.25 2015-09-08T08:25:40Z
+	* Bump to user version
+	* CPAN Testers is down, so I hope this works.
+
+1.24_04 2015-09-05T06:24:15Z
+	* Migrate to Mojolicious for network stuff
+	* Start an abstraction of the cache so others can override it
+	* load_cache no longer falls back. If your source isn't there,
+	it fails.
+
+1.24_02 2015-08-08T07:51:40Z
+	* Update for new IEEE URLs. Again.
+
+1.24_01 - Sun Jan 11 07:03:57 2015
+	* Fix RT #101011: Line endings are now CRLF
+
+1.23 - 2014-11-13
+	* IEEE now uses https (fixed by Frank071)
+	* Cache in a file instead of a db (added by Frank071)
+
+1.21 - 2014-01-03
+	* Get rid of MYMETA
+
+1.20 - 2013-10-03
+	* Bump to release version
+
+1.19_03 - 2013-10-01
+	* Fix a test for a change in the OUI data: RT #89110
+
+1.19_02 - 2012-11-20
+	* Remove bad line from MANIFEST
+	* Add encodingto Pod
+
+1.1901 - 2012-09-03
+	* Get rid of DBM::Deep. Do your own persistence. This is a
+	big speedup.
+	* Fix some odd parsing cases with PRIVATE records
+	(RT 79369)
+
+1.18 - 2007-10-27
+	* distro cleanups after moving from CVS to SVN
+
+1.17 - 2007-01-09
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+1.16 - 2006-11-17
+	* Fixed case-typo in docs s/Mac/MAC/. That's important to some
+	operating systems. :)
+	* No code updates.
+
+1.15 - 2006-06-25
+	* Fixed up missing dependency, error in fetch_oui.t that
+	should have been a conditional test
+
+1.13 - 2006-06-23
+	* Improved caching that uses DBM::Deep if available
+	* Added fetch_oui_from_cache, so you can avoid the network
+	if you really don't want to use it
+	* Added fetch_oui_from_ieee, if you only want to fetch it
+	from the network (and not from cache)
+	* fetch_oui now comprises those two functions, trying the
+	cache first
+
+1.11 - 2006-06-16
+	* Load any oui.txt source that you like (another URL or local
+	file://)
+
+1.01 - 2006-05-25
+	* The last release forgot to bump the version number. There's no
+	need to upgrade since this only fixes a missing MANIFEST.
+
+0.24 - 2006-05-25
+	* MANIFEST was missing from diff. I've fixed that.
+
+0.24 - 2006-05-20
+	* Minor distro updates, kwalitee cleanups, and typo squashing.
+	No need to upgrade.
+
+0.23 - 2006-04-06
+	* Added Changes to MANIFEST so you can see this file.
+	* There's no need to upgrade.
+
+0.22 - 2005-03-11
+	* Added POD coverage tests and fixed problems it found
+	* No code updates, so no need to upgrade
+
+0.21 - 2004-09-07
+	* added README to dist
+	* no need to upgrade
+
+0.1 - 2004-09-01
+	* first pass: there is still a lot of work to do and a lot of
+	tests to write
+
+0.1 - 2004-08-31
+	* first pass, a bit of a monster that grew out of a simple
+	script.

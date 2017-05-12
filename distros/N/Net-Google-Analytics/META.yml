@@ -1,0 +1,23 @@
+---
+abstract: 'Simple interface to the Google Analytics Core Reporting API'
+author:
+  - 'Nick Wellnhofer <wellnhofer@aevum.de>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Google-Analytics
+requires:
+  Class::XSAccessor: '1.05'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  URI: '0'
+  perl: '5.008'
+resources:
+  repository: http://github.com/nwellnhof/Net-Google-Analytics
+version: '3.05'

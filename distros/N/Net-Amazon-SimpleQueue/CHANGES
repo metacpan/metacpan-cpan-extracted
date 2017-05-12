@@ -1,0 +1,7 @@
+Revision history for Perl module Net::Amazon::SimpleQueue:
+
+0.30 Mon Jan  4 09:37:48 GMT 2010
+     - deprecated, use Amazon::SQS::Simple instead
+
+0.29 Sat Jan 22 16:05:56 GMT 2005
+     - initial release

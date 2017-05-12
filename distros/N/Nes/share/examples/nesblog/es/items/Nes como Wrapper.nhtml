@@ -1,0 +1,118 @@
+<h2><a href="#">Wrapper</a></h2>
+<h3>Wrapper Vs Include</h3>
+<p>
+Podemos incluir con <a href="./?action=item&item=Tag include (file)">include</a> casi cualquier
+tipo de archivo en nuestras plantillas, <i>otra cosa distinta</i> es hacer esto:
+<pre>
+http://example.com/file.html
+ó
+http://example.com/file.php
+
+</pre>
+Y que el archivo sea tratado como una plantilla NHTML <b>además</b> de como HTML o PHP.
+A eso no referimos cuando decimos "usar Nes como Wrapper".
+</p> 
+<br><br>
+<p>
+Tanto con include como con Wrapper cuando el archivo lleva al inicio el Tag 
+&#123;: NES 1.0 ('file.pl') :&#125; es tratado como una plantilla nhtml, esto es, puede 
+contener Tags Nes aunque sea un HTML o PHP, si no incluye este Tag el archivo
+no será tratado como plantilla y aunque incluya Tags estos no serán sustituidos.
+Para forzar la sustitución aunque no tengamos script Perl podemos incluir "none"
+&#123;: NES 1.0 none :&#125;
+</p> 
+
+<p>
+Para usar <i>include</i> no es necesaria ninguna configuración Apache, para <i>Wrapper</i> sí.
+</p> 
+
+<h3>HTML Wrapper</h3>
+<p>
+Podemos usar Nes para cargar otros tipos de archivos y añadirles la funcionalidad 
+de Nes. En el caso de los HTML debemos añadir la extensión <i>html</i> al tipo 
+<i>perl-nes</i> en nuestro archivo .htaccess:
+<pre>
+# Plantillas Nes nhtml
+AddHandler perl-nes .nhtml
+AddHandler perl-nes .nhtm
+
+# HTML wrapper
+AddHandler perl-nes .htm
+AddHandler perl-nes .html
+
+# Acción para el tipo perl-nes de Nes
+Action perl-nes /cgi-bin/nes/dispatch.cgi
+
+</pre>
+A partir de este momento los archivos HTML funcionaran igual que los NHTML.
+Si contiene el Tag &#123;: NES 1.0 ('file.pl') :&#125; será tratado como
+plantilla Nes, de lo contrario como cualquier HTML más.
+</p> 
+<br><br>
+<h3>PHP Wrapper</h3>
+<p>
+La siguiente configuración .haccess es necesaria para usar Nes como PHP Wrapper:
+<pre>
+# Plantillas Nes nhtml
+AddHandler perl-nes .nhtml
+AddHandler perl-nes .nhtm
+
+# PHP Wrapper
+AddHandler perl-nes .php
+
+# Acción para el tipo perl-nes de Nes
+Action perl-nes /cgi-bin/nes/dispatch.cgi
+
+</pre>
+</p> 
+<p>
+A partir de este momento los archivos PHP funcionaran igual que los NHTML.
+Si contiene el Tag &#123;: NES 1.0 ('file.pl') :&#125; será tratado como
+plantilla Nes, de lo contrario como cualquier PHP más. Pero existe una
+particularidad con el <a href="./?action=item&item=Tag NES ver (file)">Tag NES</a> en 
+PHP Wrapper, ha de incluirse así:
+<pre>
+&lt;?php /*&#123;: NES 1.0 ('file.pl') :&#125;*/ ?&gt;
+&lt;?php
+    ...
+    
+</pre>
+Esto es debido a que lo primero que se ejecuta es el script PHP y PHP dará un
+error si encuentra una linea como esta: &#123;: NES 1.0 ('file.pl') :&#125;
+dentro del código PHP.   
+</p> 
+<p>
+Por el mismo motivo no es posible inclir Tag Nes dentro del código PHP cuando
+utilizamos Nes como Wrapper:
+<pre>
+&lt;?php
+    define('PHPVAR',&#123;: $ var :&#125;); <- ERROR
+    ...
+?&gt; 
+   
+</pre>
+Esto es, sólo podemos poner Tag Nes en el HTML y no en el código PHP. No ocurre
+lo mismo cuando incluimos PHP con <i>include</i> que podemos incluir Tags Nes en
+cualquier parte y el <a href="./?action=item&item=Tag NES ver (file)">Tag NES</a> como en 
+el resto de las plantillas <i>nhtml</i>.
+</p>
+<br><br>
+<h3>.nes.cfg</h3>
+<p>
+Existen dos programas distintos para lanzar script PHP: php-cli y php-cgi, el
+primero para la linea de comandos y el segundo para CGI. Para <i>include</i> 
+necesitamos php-cli y para PHP Wrapper php-cgi, si tu instalación no dispone de 
+alguno de los dos deberás instalarlos e incluir su ruta en el archivo .nes.cfg que
+por defecto tiene estos valores:
+<pre>
+# linea de comando para PHP CLI:
+php_cline     = /usr/bin/php
+
+# linea de comando para PHP CGI  
+php_cgi_cline = /usr/bin/php-cgi
+
+
+</pre>
+</p>
+
+

@@ -1,0 +1,10 @@
+HDC             T_IV
+HGDIOBJ         T_IV
+HFONT           T_IV
+COLORREF        T_IV
+HPEN            T_IV
+HBRUSH          T_IV
+HENHMETAFILE    T_IV
+BOOL            T_IV
+
+

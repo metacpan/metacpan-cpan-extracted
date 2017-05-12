@@ -1,0 +1,16 @@
+\.git*
+tmp.*
+.*\.o
+\..*sw?
+\.bak
+_build
+^Build$
+blib/*
+.*\.data
+.*core
+foo*
+.*\.gz
+^tags
+Net-Topsy-\d+\..*
+.prove
+spec/*

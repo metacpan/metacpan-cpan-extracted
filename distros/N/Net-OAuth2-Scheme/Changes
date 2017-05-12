@@ -1,0 +1,18 @@
+0.03      Jan 11 2012
+
+    * fixed unparenthesized qw(...) instances
+    * remove unnecessary 'd' modifier from decode_base64url
+    * use w/a* instead of w/a for 5.8
+    * better test labels
+
+0.02      Jan 05 2012
+
+    * documentation tweaks; first actual release
+    * fix thread export bug
+    * fix 5.8 pseudo-hash failure
+    * fixed prerequisites
+    * default RNG is now Math::Random::MT::Auto
+
+0.010001_001 Jan 01 2012
+
+    * initial version

@@ -1,0 +1,678 @@
+NAME
+
+    Net::IANA::Services - Makes working with named ip services easier
+
+VERSION
+
+    version 0.004000
+
+SYNOPSIS
+
+        #  Load the module
+        use Net::IANA::Services (
+            #  Import the regular expressions to test for services/ports
+            ':regexes',
+    
+            #  Import the hashes to test for services/ports or get info for a service/protocol
+            ':hashes',
+    
+            #  Import the subroutines to test for services/ports or get info for a service/protocol
+            ':subs',
+    
+            #  Alternatively this loads everything
+            #  ':all',
+        );
+    
+    
+        #  Declare some strings to test
+        my $service = 'https';
+        my $port    = 22;
+    
+    
+        #  How the regexes work
+        $service =~ $IANA_REGEX_SERVICES;      # 1
+        $service =~ $IANA_REGEX_SERVICES_UDP;  # 1
+        $port    =~ $IANA_REGEX_PORTS;         # 1
+        $port    =~ $IANA_REGEX_PORTS_TCP;     # 1
+    
+    
+        #  Demonstration of the service hashes
+        $IANA_HASH_INFO_FOR_SERVICE-> { $service }{ tcp }{ 443 }; # { name => 'https', desc => 'http protocol over TLS/SSL', note => '' }
+        $IANA_HASH_PORTS_FOR_SERVICE->{ $service };               # [qw/ 443 /]  --  List of all the services that use that port
+    
+        #  Demonstration  of the port hashes
+        $IANA_HASH_SERVICES_FOR_PORT      ->{ $port }     ;  # [qw/ ssh /]  --  List of all the services that use that port
+        $IANA_HASH_SERVICES_FOR_PORT_PROTO->{ $port }{tcp};  # [qw/ ssh /]  --  Hash of all the protocol/services that use that port
+    
+    
+        #  Demonstration of the service/port checker subroutines
+        iana_has_service( $service        );  # 1
+        iana_has_service( $service, 'tcp' );  # 1
+        iana_has_service( $service, 'bla' );  # 0
+        iana_has_port   ( $port           );  # 1
+    
+        #  Demonstration of the service/port info subroutines
+        iana_info_for_service( $service        );  # Returns a hash of the different protocol definitions
+        iana_info_for_service( $service, 'tcp' );  # Returns a hash of the info for https over tcp
+        iana_info_for_port   ( $port           );  # Returns a list all services that go over that port (regardless of the protocol)
+        iana_info_for_port   ( $port, 'tcp'    );  # Returns a list all services that go over that port on tcp
+
+DESCRIPTION
+
+    Working with named services can be a pain when you want to go back and
+    forth between the port and its real name. This module helps alleviate
+    some of those pain points by defining some helping hashes, functions,
+    and regular expressions.
+
+CONSTANTS
+
+ $IANA_REGEX_PORTS
+
+    Regular expression to match any port, irregardless of which protocol it
+    goes over.
+
+    While this is a highly optimized regex, you should consider using the
+    hashes or subroutines instead as they are much better. This is merely
+    for your convenience.
+
+    Case is ignored and the protocol must match on a word boundary!
+
+  Examples
+
+        # Matches
+        $port =~ $IANA_REGEX_PORTS;
+    
+        # Won't match
+        $non_port =~ $IANA_REGEX_PORTS;
+
+ $IANA_REGEX_SERVICES
+
+    Regular expression to match any service, irregardless of which protocol
+    it goes over.
+
+    While this is a highly optimized regex, you should consider using the
+    hashes or subroutines instead as they are much better. This is merely
+    for your convenience.
+
+    Case is ignored and the protocol must match on a word boundary!
+
+  Examples
+
+        # Matches
+        $service =~ $IANA_REGEX_SERVICES;
+    
+        # Won't match
+        $non_service =~ $IANA_REGEX_SERVICES;
+
+ $IANA_REGEX_PORTS_DCCP
+
+    Regular expression to match any port that is known to work over dccp.
+
+    While this is a highly optimized regex, you should consider using the
+    hashes or subroutines instead as they are much better. This is merely
+    for your convenience.
+
+    Case is ignored and the protocol must match on a word boundary!
+
+  Examples
+
+        # Matches
+        $port_dccp =~ $IANA_REGEX_PORTS_DCCP;
+    
+        # Won't match
+        $non_port_dccp =~ $IANA_REGEX_PORTS_DCCP;
+
+ $IANA_REGEX_PORTS_SCTP
+
+    Regular expression to match any port that is known to work over sctp.
+
+    While this is a highly optimized regex, you should consider using the
+    hashes or subroutines instead as they are much better. This is merely
+    for your convenience.
+
+    Case is ignored and the protocol must match on a word boundary!
+
+  Examples
+
+        # Matches
+        $port_sctp =~ $IANA_REGEX_PORTS_SCTP;
+    
+        # Won't match
+        $non_port_sctp =~ $IANA_REGEX_PORTS_SCTP;
+
+ $IANA_REGEX_PORTS_TCP
+
+    Regular expression to match any port that is known to work over tcp.
+
+    While this is a highly optimized regex, you should consider using the
+    hashes or subroutines instead as they are much better. This is merely
+    for your convenience.
+
+    Case is ignored and the protocol must match on a word boundary!
+
+  Examples
+
+        # Matches
+        $port_tcp =~ $IANA_REGEX_PORTS_TCP;
+    
+        # Won't match
+        $non_port_tcp =~ $IANA_REGEX_PORTS_TCP;
+
+ $IANA_REGEX_PORTS_UDP
+
+    Regular expression to match any port that is known to work over udp.
+
+    While this is a highly optimized regex, you should consider using the
+    hashes or subroutines instead as they are much better. This is merely
+    for your convenience.
+
+    Case is ignored and the protocol must match on a word boundary!
+
+  Examples
+
+        # Matches
+        $port_udp =~ $IANA_REGEX_PORTS_UDP;
+    
+        # Won't match
+        $non_port_udp =~ $IANA_REGEX_PORTS_UDP;
+
+ $IANA_REGEX_SERVICES_DCCP
+
+    Regular expression to match any service that is known to work over
+    dccp.
+
+    While this is a highly optimized regex, you should consider using the
+    hashes or subroutines instead as they are much better. This is merely
+    for your convenience.
+
+    Case is ignored and the protocol must match on a word boundary!
+
+  Examples
+
+        # Matches
+        $service_dccp =~ $IANA_REGEX_SERVICES_DCCP;
+    
+        # Won't match
+        $non_service_dccp =~ $IANA_REGEX_SERVICES_DCCP;
+
+ $IANA_REGEX_SERVICES_SCTP
+
+    Regular expression to match any service that is known to work over
+    sctp.
+
+    While this is a highly optimized regex, you should consider using the
+    hashes or subroutines instead as they are much better. This is merely
+    for your convenience.
+
+    Case is ignored and the protocol must match on a word boundary!
+
+  Examples
+
+        # Matches
+        $service_sctp =~ $IANA_REGEX_SERVICES_SCTP;
+    
+        # Won't match
+        $non_service_sctp =~ $IANA_REGEX_SERVICES_SCTP;
+
+ $IANA_REGEX_SERVICES_TCP
+
+    Regular expression to match any service that is known to work over tcp.
+
+    While this is a highly optimized regex, you should consider using the
+    hashes or subroutines instead as they are much better. This is merely
+    for your convenience.
+
+    Case is ignored and the protocol must match on a word boundary!
+
+  Examples
+
+        # Matches
+        $service_tcp =~ $IANA_REGEX_SERVICES_TCP;
+    
+        # Won't match
+        $non_service_tcp =~ $IANA_REGEX_SERVICES_TCP;
+
+ $IANA_REGEX_SERVICES_UDP
+
+    Regular expression to match any service that is known to work over udp.
+
+    While this is a highly optimized regex, you should consider using the
+    hashes or subroutines instead as they are much better. This is merely
+    for your convenience.
+
+    Case is ignored and the protocol must match on a word boundary!
+
+  Examples
+
+        # Matches
+        $service_udp =~ $IANA_REGEX_SERVICES_UDP;
+    
+        # Won't match
+        $non_service_udp =~ $IANA_REGEX_SERVICES_UDP;
+
+ $IANA_HASH_INFO_FOR_SERVICE
+
+    This maps a service and a protocol to the information provided to us by
+    IANA.
+
+  Examples
+
+        #  Get info for ssh over tcp
+        $ssh_tcp_info = $IANA_HASH_INFO_FOR_SERVICE->{ ssh }{ tcp };
+    
+        Dumper $ssh_tcp_info;
+        #   22 => {
+        #      desc => 'The Secure Shell (SSH) Protocol'
+        #      name => 'ssh'
+        #      note => 'Defined TXT keys: u=<username> p=<password>'
+        #   }
+    
+    
+        #  Get info for http over any protocol
+        $http_info = $IANA_HASH_INFO_FOR_SERVICE->{ http };
+    
+        Dumper $http_info;
+        #   sctp => {
+        #       '80' => {
+        #           desc => 'HTTP',
+        #           name => 'http',
+        #           note => 'Defined TXT keys: u=<username> p=<password> path=<path to document>',
+        #       },
+        #   },
+        #   tcp => {
+        #       '80' => {
+        #           desc => 'World Wide Web HTTP',
+        #           name => 'http',
+        #           note => 'Defined TXT keys: u=<username> p=<password> path=<path to document>',
+        #       },
+        #   },
+        #   udp => {
+        #       '80' => {
+        #           desc => 'World Wide Web HTTP',
+        #           name => 'http',
+        #           note => 'Defined TXT keys: u=<username> p=<password> path=<path to document>',
+        #       },
+        #   },
+
+ $IANA_HASH_SERVICES_FOR_PORT
+
+    This lists all of the services for the given port, irregardless of the
+    protocol.
+
+    An empty list will be returned if nothing is found. This respects
+    wantarray>
+
+  Examples
+
+        my $port_22 = $IANA_HASH_SERVICES_FOR_PORT->{ 22 };
+        Dumper $port_22;
+        # [qw/ ssh /]
+    
+        my $port_1110 = $IANA_HASH_SERVICES_FOR_PORT->{ 1110 };
+        Dumper $port_1110;
+        # [qw/ nfsd-keepalive  webadmstart /]
+
+ $IANA_HASH_SERVICES_FOR_PORT_PROTO
+
+    This lists all of the services for the given port and protocol.
+
+  Examples
+
+        my $port_22 = $IANA_HASH_SERVICES_FOR_PORT_PROTO->{ 22 }{ tcp };
+        Dumper $port_22;
+        # [qw/ ssh /]
+    
+        my $port_tcp_1110 = $IANA_HASH_SERVICES_FOR_PORT_PROTO->{ 1110 }{ tcp };
+        Dumper $port_tcp_1110;
+        # [qw/ webadmstart /]
+    
+        my $port_udp_1110 = $IANA_HASH_SERVICES_FOR_PORT_PROTO->{ 1110 }{ udp };
+        Dumper $port_udp_1110;
+        # [qw/ nfsd-keepalive /]
+
+ $IANA_HASH_PORTS_FOR_SERVICE
+
+    This lists all of the ports for the given service, irregardless of the
+    protocol.
+
+  Example
+
+        my $service_http_alt = $IANA_HASH_PORTS_FOR_SERVICE->{ 'http-alt' };
+        Dumper $service_http_alt;
+        # [qw/ 591  8008  8080 /];
+
+METHODS
+
+ iana_has_port
+
+    Helper function to check if the given port (and optional protocol) is
+    defined by IANA.
+
+    If only the port is given, then it will be checked across all protocols
+    while restricting the search to just the provided protocol if one is
+    given.
+
+  Arguments
+
+      1. Port
+
+	* Required
+
+	* Port (int)
+
+	* Port you want looked up
+
+      2. Protocol
+
+	* Optional
+
+	* String
+
+	* Limit the search to only this protocol if specified
+
+  Returns
+
+      1. Search results
+
+	* Boolean
+
+	* 1 if the match was found, 0 otherwise
+
+  Examples
+
+        iana_has_port( 22 );    # 1
+        iana_has_port( 34221 ); # 0
+    
+        iana_has_port( 271, 'tcp' );  # 1
+        iana_has_port( 271, 'udp' );  # 0
+
+ iana_has_service
+
+    Helper function to check if the given service (and optional protocol)
+    is defined by IANA.
+
+    If only the service name is given, then it will be checked across all
+    protocols while restricting the search to just the provided protocol if
+    one is given.
+
+  Arguments
+
+      1. Service Name
+
+	* Required
+
+	* String
+
+	* Service name you want looked up
+
+      2. Protocol
+
+	* Optional
+
+	* String
+
+	* Limit the search to only this protocol if specified
+
+  Returns
+
+      1. Search results
+
+	* Boolean
+
+	* 1 if the match was found, 0 otherwise
+
+  Examples
+
+        iana_has_service( 'ssh' );    # 1
+        iana_has_service( 'not-ss' ); # 0
+    
+        iana_has_service( 'xmpp-server', 'tcp' );  # 1
+        iana_has_service( 'xmpp-server', 'udp' );  # 0
+
+ iana_info_for_port
+
+    Helper function to get the known services for the given port and
+    optional protocol, as defined by IANA.
+
+    If only the port is given, then you will get back an array ref
+    containing all of the services that are defined by IANA. If a protocol
+    is specified, then the returned prtocols will be limited to those
+    running over that type.
+
+  Arguments
+
+      1. Port
+
+	* Required
+
+	* Port (int)
+
+	* Port you want looked up
+
+      2. Protocol
+
+	* Optional
+
+	* String
+
+	* Limit the search to only this protocol if specified
+
+  Returns
+
+      1. Search results
+
+	* Array
+
+	* The list of protocols running over the specified info (arrayref
+	if in scalar context)
+
+	* Undefined if the searched was unsuccessful!
+
+  Examples
+
+        iana_info_for_port( 22 );    # [qw/ ssh /]
+        iana_info_for_port( 34221 ); # undef
+    
+        iana_info_for_port( 271, 'tcp' );  # [qw/ pt-tls /]
+        iana_info_for_port( 271, 'udp' );  # undef
+
+ iana_info_for_service
+
+    Helper function to get the known information for the given service and
+    optional protocol, as defined by IANA.
+
+    If only the service is given, then you will get back a hash ref
+    containing the normal return information hash for each defined protocol
+    for that service.
+
+  Arguments
+
+      1. Service Name
+
+	* Required
+
+	* String
+
+	* Service name you want looked up
+
+      2. Protocol
+
+	* Optional
+
+	* String
+
+	* Limit the search to only this protocol if specified
+
+  Returns
+
+      1. Service information (for a provided protocol)
+
+	* Hash
+
+	* Undefined if the searched was unsuccessful!
+
+      The returned hash contains the following pieces of information (keys
+      are lower case):
+
+      Name
+
+	The full name (with proper capitalization) for the requested
+	service
+
+      Desc
+
+	A short synopsis of the service, usually a sentence or two long
+
+      Note
+
+	Any additional information they wanted to provided that users
+	should be aware of
+
+  Examples
+
+        iana_info_for_service( 'xribs' );  # { udp => { 2025 => { desc => '', name => 'xribs', note => '' } } }
+        iana_info_for_service( 'not-ss' ); # undef
+    
+        iana_info_for_service( 'xribs', 'tcp' );  # undef
+        iana_info_for_service( 'xribs', 'udp' );  # { 2025 => { desc => '', name => 'xribs', note => '' } }
+
+INSTALLATION
+
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+AUTHOR
+
+    Adam Lesperance <lespea@gmail.com>
+
+SUPPORT
+
+ Perldoc
+
+    You can find documentation for this module with the perldoc command.
+
+      perldoc Net::IANA::Services
+
+ Websites
+
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+      * MetaCPAN
+
+      A modern, open-source CPAN search engine, useful to view POD in HTML
+      format.
+
+      http://metacpan.org/release/Net-IANA-Services
+
+      * Search CPAN
+
+      The default CPAN search engine, useful to view POD in HTML format.
+
+      http://search.cpan.org/dist/Net-IANA-Services
+
+      * RT: CPAN's Bug Tracker
+
+      The RT ( Request Tracker ) website is the default bug/issue tracking
+      system for CPAN.
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-IANA-Services
+
+      * AnnoCPAN
+
+      The AnnoCPAN is a website that allows community annotations of Perl
+      module documentation.
+
+      http://annocpan.org/dist/Net-IANA-Services
+
+      * CPAN Ratings
+
+      The CPAN Ratings is a website that allows community ratings and
+      reviews of Perl modules.
+
+      http://cpanratings.perl.org/d/Net-IANA-Services
+
+      * CPAN Forum
+
+      The CPAN Forum is a web forum for discussing Perl modules.
+
+      http://cpanforum.com/dist/Net-IANA-Services
+
+      * CPANTS
+
+      The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+      of a distribution.
+
+      http://cpants.perl.org/dist/overview/Net-IANA-Services
+
+      * CPAN Testers
+
+      The CPAN Testers is a network of smokers who run automated tests on
+      uploaded CPAN distributions.
+
+      http://www.cpantesters.org/distro/N/Net-IANA-Services
+
+      * CPAN Testers Matrix
+
+      The CPAN Testers Matrix is a website that provides a visual overview
+      of the test results for a distribution on various Perls/platforms.
+
+      http://matrix.cpantesters.org/?dist=Net-IANA-Services
+
+      * CPAN Testers Dependencies
+
+      The CPAN Testers Dependencies is a website that shows a chart of the
+      test results of all dependencies for a distribution.
+
+      http://deps.cpantesters.org/?module=Net::IANA::Services
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests by email to
+    bug-net-iana-services at rt.cpan.org, or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-IANA-Services. You
+    will be automatically notified of any progress on the request by the
+    system.
+
+ Source Code
+
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    https://github.com/lespea/net-iana-services
+
+      git clone git://github.com/lespea/net-iana-services.git
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Adam Lesperance.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTY
+
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT
+    WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER
+    PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND,
+    EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

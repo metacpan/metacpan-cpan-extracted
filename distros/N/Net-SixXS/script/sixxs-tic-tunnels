@@ -1,0 +1,197 @@
+#!/usr/bin/perl
+
+use v5.010;
+use strict;
+use warnings;
+
+use Getopt::Std;
+use POSIX qw/:sys_wait_h/;
+
+use Net::SixXS;
+use Net::SixXS::TIC::Client;
+use Net::SixXS::Diag::MainDebug;
+
+my $debug = 0;
+my $version = '0.1.0_dev190';
+
+sub debug($);
+sub usage($);
+sub version();
+
+sub read_config($ $);
+
+MAIN:
+{
+	my ($fname);
+	my %opts;
+
+	getopts('f:hs:Vv', \%opts) or usage 1;
+	version if $opts{V};
+	usage 0 if $opts{h};
+	exit 0 if $opts{V} || $opts{h};
+	$debug = $opts{v};
+
+	if (!defined $opts{f}) {
+		warn "No configuration file specified\n";
+		usage 1;
+	}
+
+	usage 1 if @ARGV;
+
+	Net::SixXS::diag(Net::SixXS::Diag::MainDebug->new());
+
+	my $cfg = read_config $opts{f}, [qw/username password/];
+	my $tic = Net::SixXS::TIC::Client->new(
+	    username => $cfg->{username},
+	    password => $cfg->{password}) or
+	    die "Could not create the TIC client object\n";
+	$tic->client_name($tic->client_name.'-tic-tunnels');
+	$tic->client_version($version);
+	$tic->server($opts{s} // 'localhost');
+
+	debug "About to connect to TIC server ".$tic->server.
+	    " as ".$tic->username;
+	$tic->connect;
+	my $tunnels = $tic->tunnels;
+	debug "Got some tunnels: ".join ' ', sort keys %{$tunnels};
+	for my $t (sort keys %{$tunnels}) {
+		debug "Requesting info for tunnel $t";
+		say $tic->tunnel_info($t)->to_text;
+	}
+	debug "Done, it seems.";
+}
+
+sub usage($)
+{
+	my ($err) = @_;
+	my $s = <<EOUSAGE
+Usage:	sixxs-tic-tunnels [-v] [-s server] -f configfile
+	sixxs-tic-tunnels -V | -h
+
+	-f	specify the name of the authentication configuration file
+	-h	display program usage information and exit
+	-s	specify the address of the TIC server (default: localhost)
+	-V	display program version information and exit
+	-v	verbose operation; display diagnostic output
+EOUSAGE
+	;
+
+	if ($err) {
+		die $s;
+	} else {
+		print "$s";
+	}
+}
+
+sub version()
+{
+	say "sixxs-tic-tunnels $version";
+}
+
+sub debug($)
+{
+	say STDERR "RDBG $_[0]" if $debug;
+}
+
+sub read_config($ $)
+{
+	my ($fname, $needed) = @_;
+
+	open my $f, '<', $fname or
+	    die "Could not open $fname: $!\n";
+	my %need = map { ($_, 1) } @{$needed};
+	my %cfg;
+	while (<$f>) {
+		s/[\r\n]*$//;
+		next if /^\s*(#|$)/;
+		if (!/^\s*(\S+)\s+(\S+)\s*$/) {
+			die "Invalid configuration line: $_\n";
+		}
+		my ($k, $v) = ($1, $2);
+		if (exists $cfg{$k}) {
+			die "Duplicate key $k in config file $fname\n";
+		}
+		$cfg{$k} = $v;
+		delete $need{$k};
+	}
+	close $f or
+	    die "Could not close $fname: $!\n";
+
+	if (%need) {
+		die "Missing configuration in $fname: ".
+		    join(', ', sort keys %need)."\n";
+	}
+	return \%cfg;
+}
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+sixxs-tic-tunnels - fetch information about TIC tunnels
+
+=head1 SYNOPSIS
+
+  sixxs-tic-tunnels [-v] [-s server] -f configfile
+  sixxs-tic-tunnels -V | -h
+
+=head1 DESCRIPTION
+
+The C<sixxs-tic-tunnels> tool is a sample client for the TIC protocol
+for configuring IPv6-over-IPv4 tunnels running the "Anything-In-Anything"
+(AYIYA) protocol as used by SixXS.  It reads a configuration file in
+the format used by the L<aiccu> SixXS client to obtain the username and
+password for authentication, then it connects to a TIC server and obtains
+information about the tunnels managed by the authenticated user account.
+The C<sixxs-tic-tunnels> tool's output may be used by L<sixxs-tic-server>,
+the sample TIC server in the L<Net-SixXS> distribution, as well as other
+software using the L<Net::SixXS::Data::Tunnel> module.
+
+The C<sixxs-tic-tunnels> tool accepts the following command-line options:
+
+=over 4
+
+=item B<-f>
+
+Specify the name of the authentication configuration file.
+
+=item B<-h>
+
+Display program usage information and exit.
+
+=item B<-s>
+
+Specify the address of the TIC server to connect to; defaults to
+"localhost" for safety reasons - repeated attempts to authenticate
+and query the SixXS servers may be mistaken for a denial of service
+attempt.
+
+=item B<-V>
+
+Display program version information and exit.
+
+=item B<-v>
+
+Verbose operation; display diagnostic output.
+
+=back
+
+=head1 SEE ALSO
+
+L<Net::SixXS>, L<Net::SixXS::TIC::Data::Tunnel>,
+L<Net::SixXS::TIC::Client>,
+L<sixxs-tic-server>
+
+=head1 LICENSE
+
+Copyright (C) 2015  Peter Pentchev E<lt>roam@ringlet.netE<gt>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Peter Pentchev E<lt>roam@ringlet.netE<gt>
+
+=cut

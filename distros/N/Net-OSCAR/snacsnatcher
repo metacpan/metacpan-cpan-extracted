@@ -1,0 +1,310 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Socket;
+use lib "./blib/lib";
+use Net::OSCAR qw(:all);
+use Net::OSCAR::XML;
+use Net::OSCAR::Utility qw(hexdump);
+use Net::OSCAR::Constants;
+use Net::Pcap;
+
+our $session = Net::OSCAR->new();
+our $init_time = undef;
+
+sub BEGIN {
+	eval {
+		require "net/bpf.ph";
+	};
+	die "Couldn't find net/bpf.ph.\nPlease create it by doing cd /usr/include ; h2ph net/bpf.h\n$@\n" if $@;
+}
+
+my $file = shift or die "Usage: snacsnatcher pcapfile\n";
+
+# Quick and dirty protocol analyzer
+
+use vars qw($packet %buffer %bufflen %snacbuff %ft_states %seqnos $datalink @blarray);
+$packet = 0;
+
+sub ssdump_scalar($$);
+sub ssdump_list($$);
+sub ssdump_hash($$);
+
+sub ssdump_scalar($$) {
+	my($val, $depth) = @_;
+
+	my $hex = hexdump($val);
+	if($hex and $hex ne $val) {
+		print join("\n",
+			map {
+				("\t" x $depth) . $_
+			} split(/\n/,
+				$hex
+			)
+		), "\n";
+	} else {
+		$val ||= "";
+		print "$val\n";
+	}
+}
+
+sub ssdump_list($$) {
+	my($val, $depth) = @_;
+
+	print "\t" x $depth;
+	foreach (@$val) {
+		print "[\n";
+
+		if(!ref($_)) {
+			print "\t" x ($depth+1);
+			ssdump_scalar($_, $depth);
+		} elsif(ref($_) eq "HASH") {
+			ssdump_hash($_, $depth+1);
+		} elsif(ref($_) eq "ARRAY") {
+			ssdump_list($_, $depth+1);
+		} elsif(ref($_) eq "SCALAR") {
+			print "\t" x ($depth+1);
+			ssdump_scalar($$_, $depth+1);
+		} else {
+			die "Unknown reftype: " . ref($_) . "\n";
+		}
+
+		print "\t" x $depth;
+		print "],";
+	}
+	print "\n";
+}
+
+sub ssdump_hash($$) {
+	my($struct, $depth) = @_;
+
+	foreach my $key (sort keys %$struct) {
+		my $val = $struct->{$key};
+
+		print "\t" x $depth;
+		print $key, " => ";
+
+		if(!ref($val)) {
+			if($key =~ /ip$/ and $val =~ /^\d+$/) {
+				my($q1, $q2, $q3, $q4) = (
+					($val >> 24),
+					(($val >> 16) & 0xFF),
+					(($val >> 8) & 0xFF),
+					($val & 0xFF)
+				);
+				$val = "$q1.$q2.$q3.$q4";
+			} elsif($key eq "capability") {
+				$val = OSCAR_CAPS_INVERSE()->{$val} if exists(OSCAR_CAPS_INVERSE()->{$val});
+			}
+
+			ssdump_scalar($val, $depth);
+		} elsif(ref($val) eq "HASH") {
+			print "\n";
+			ssdump_hash($val, $depth+1);
+		} elsif(ref($val) eq "ARRAY") {
+			print "\n";
+
+			if($key eq "capabilities") {
+				@$val = map {
+					exists(OSCAR_CAPS_INVERSE()->{$_}) ?
+					OSCAR_CAPS_INVERSE()->{$_} :
+					$_
+				} @$val;
+			} elsif($key eq "shortcaps") {
+				@$val = map {
+					exists(OSCAR_CAPS_SHORT_INVERSE()->{$_}) ?
+					OSCAR_CAPS_SHORT_INVERSE()->{$_} :
+					$_
+				} @$val;
+			}
+
+			ssdump_list($val, $depth);
+		} elsif(ref($val) eq "SCALAR") {
+
+			ssdump_scalar($$val, $depth);
+		} else {
+			die "Unknown reftype: " . ref($val) . "\n";
+		}
+	}
+}
+
+sub got_packet($$$) {
+	my($user, $hdr, $pkt) = @_;
+	my($inaddr, $outaddr);
+	my $tlv;
+
+	my $time = $hdr->{tv_sec} . "." . $hdr->{tv_usec};
+	$init_time ||= $time;
+	$time -= $init_time;
+	$time = sprintf("%0.3f", $time);
+
+	$packet++;
+	# This removes the datalink-level headers from a packet.
+	# You may need to adjust this - this is a very Q&D hack.
+	# Only ethernet (DLT_EN10MB) is tested.
+	#
+	# These are taken from tcpdump.
+	#
+	if($datalink == DLT_NULL or $datalink == DLT_LOOP) {
+		substr($pkt, 0, 4) = "";
+	} elsif($datalink == DLT_EN10MB or $datalink == DLT_IEEE802) {
+		substr($pkt, 0, 14) = "";
+	} elsif($datalink == DLT_SLIP) {
+		substr($pkt, 0, 16) = "";
+	} elsif($datalink == DLT_PPP) {
+		substr($pkt, 0, 4) = "";
+	} elsif($datalink == DLT_LINUX_SLL) {
+		substr($pkt, 0, 16) = "";
+	} else {
+		die "Unsupported datalink $datalink\n";
+	}
+
+	my($iplen) = unpack("C", $pkt);
+	$iplen = ($iplen&0xF) * 4;
+	my $src = substr($pkt, 12, 4);
+	my $dst = substr($pkt, 16, 4);
+	substr($pkt, 0, $iplen) = ""; #Get rid of IP headers
+	$src = inet_ntoa($src);
+	$dst = inet_ntoa($dst);
+
+	my($src_port, $dst_port, $seqno, $ack_seq, $tcplen, $flags) = 
+		unpack("nnNNCC", $pkt);
+	$tcplen = ($tcplen>>4)*4;
+	substr($pkt, 0, $tcplen) = "";
+
+	return if $flags & 0x2; # SYN
+	return unless $flags & 0x8; # PSH
+
+	my $conn_key = "$src:$src_port -> $dst:$dst_port";
+	$buffer{$conn_key} ||= "";
+	$bufflen{$conn_key} ||= 0;
+
+
+	# Ignore retransmissions
+	$seqnos{$conn_key} ||= [undef, undef, undef, undef, undef, undef, undef, undef, undef, undef];
+	return if grep {defined($_) and $_ eq $seqno} @{$seqnos{$conn_key}};
+	shift @{$seqnos{$conn_key}};
+	push @{$seqnos{$conn_key}}, $seqno;	
+
+	PACKET: while($pkt) {
+		if($buffer{$conn_key}) {
+			$pkt = $buffer{$conn_key} . $pkt;
+			$buffer{$conn_key} = "";
+		}
+
+		if($bufflen{$conn_key}) {
+			if(length($pkt) < $bufflen{$conn_key}) {
+				$buffer{$conn_key} = $pkt;
+				return;
+			} else {
+				$bufflen{$conn_key} = 0;
+			}
+		} else {
+			if(length($pkt) < $tcplen) {
+				$buffer{$conn_key} = $pkt;
+				$bufflen{$conn_key} = $tcplen;
+				return;
+			}
+		}
+
+		if($snacbuff{$conn_key}) {
+			$pkt = $snacbuff{$conn_key} . $pkt;
+			$snacbuff{$conn_key} = "";
+		}
+
+		if(substr($pkt, 0, 4) eq "OFT2") {
+			process_xfer($time, \$pkt, $conn_key);
+		} elsif(substr($pkt, 0, 1) eq "*") {
+			process_snac($time, \$pkt, $conn_key);
+		} else {
+			if($ft_states{$conn_key}) {
+				print "$time: $conn_key: " . length($pkt) . " bytes of FT data\n";
+				#print hexdump($pkt), "\n";
+			}
+
+			$pkt = "";		
+		}
+	}
+}
+
+sub process_xfer {
+	my($time, $pkt, $conn_key) = @_;
+
+	print "$time: $conn_key\n";
+	$ft_states{$conn_key} = 1;
+
+	my %ft_data = protoparse($session, "file_transfer_header")->unpack($$pkt);
+	printf "\t[type=%04X] [encrypt=%d] [compress=%d] [files=%d/%d] [parts=%d/%d] [bytes=%d/%d]\n",
+		delete @ft_data{qw(type encrypt compress files_left file_count parts_left part_count bytes_left byte_count)};
+
+	print "\tHEADER IS NOT 256 BYTES!!\n" unless $ft_data{header_length} == 256;
+	substr($$pkt, 0, $ft_data{header_length} + 4) = "";
+
+	ssdump_hash(\%ft_data, 1);
+	print "\n";
+}
+
+sub process_snac {
+	my($time, $pkt, $conn_key) = @_;
+
+	my($chan, $seqno, $len) = unpack("xCnn", substr($$pkt, 0, 6, ""));
+	if(length($$pkt) < $len) {
+		$snacbuff{$conn_key} = pack("CCnn", 42, $chan, $seqno, $len);
+		$snacbuff{$conn_key} .= $$pkt;
+		return;
+	}
+	my $snac = substr($$pkt, 0, $len, "");
+
+	print "$time: $conn_key";
+	printf " ch=%02X", $chan;
+
+	my %snac_data = protoparse($session, "snac")->unpack($snac);
+	printf " fl=%02X/%02X", $snac_data{flags1} || 0, $snac_data{flags2} || 0;
+	printf " [%04X/%04X]", $snac_data{family} || 0, $snac_data{subtype} || 0;
+
+	my $protobit = snac_to_protobit(%snac_data);
+	if(!$protobit) {
+		print " == UNKNOWN";
+		print hexdump($snac_data{data}, 1);
+		print "\n";
+	} else {
+		print " == $protobit\n";
+		my %data = protoparse($session, $protobit)->unpack($snac_data{data});
+		if($protobit =~ /^buddylist_(add|modify|delete)$/) {
+			%data = protoparse($session, "buddylist_change")->unpack($snac_data{data});
+		}
+
+		if($protobit =~ /^(incoming|outgoing)_IM$/) {
+			my $channel_data;
+
+			if($data{channel} == 1) {
+				$channel_data = {protoparse($session, "standard_IM_footer")->unpack($data{message_body})};
+			} elsif($data{channel} == 2) {
+				$channel_data = {protoparse($session, "rendezvous_IM")->unpack($data{message_body})};
+				my $type = OSCAR_CAPS_INVERSE()->{$channel_data->{capability}};
+
+				if($type eq "chat") {
+					$channel_data->{svcdata} = {protoparse($session, "chat_invite_rendezvous_data")->unpack($channel_data->{svcdata})};
+				} elsif($type eq "filexfer") {
+					$channel_data->{svcdata} = {protoparse($session, "file_transfer_rendezvous_data")->unpack($channel_data->{svcdata})};
+				} elsif($type eq "sendlist") {
+					$channel_data->{svcdata} = {protoparse($session, "buddy_list_transfer_rendezvous_data")->unpack($channel_data->{svcdata})};
+				}
+			} else {
+				$channel_data = $data{message_body};
+			}
+
+			$data{message_body} = $channel_data;
+		}
+
+		ssdump_hash(\%data, 1);
+	}
+
+	print "\n";
+}
+
+my $pcap = Net::Pcap::open_offline($file, \$!) or die "Couldn't open $file: $!\n";
+$datalink = Net::Pcap::datalink($pcap);
+Net::Pcap::dispatch($pcap, 0, \&got_packet, undef);
+Net::Pcap::close($pcap);

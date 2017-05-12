@@ -1,0 +1,10 @@
+Revision history for Net-StackExchange2
+
+0.01_1    Date/time
+          First version released after some tiny namespace goof-ups.
+
+0.01_2    Date/time
+          Fixed POD and added some documented.
+
+0.05      Date/time
+          Fixed a major OO design bug.  

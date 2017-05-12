@@ -1,0 +1,45 @@
+1.113260  2011-11-22 22:22:23 Europe/London
+
+  * Port to Dist::Zilla
+
+libnet-netfilter-netflow-perl (0.07) UNRELEASED; urgency=low
+
+  * Add more POD about the NetFlow output format 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Thu, 30 Jul 2009 13:36:07 +0100
+
+libnet-netfilter-netflow-perl (0.06) UNRELEASED; urgency=low
+
+  * Add POD 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Wed, 29 Jul 2009 14:43:37 +0100
+
+libnet-netfilter-netflow-perl (0.05) UNRELEASED; urgency=low
+
+  * Fixes to Daemon::Generic interfering with STDOUT/STDERR and upsetting IPC::Run
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Tue, 28 Jul 2009 20:49:27 +0100
+
+libnet-netfilter-netflow-perl (0.04) UNRELEASED; urgency=low
+
+  * Fix bugs in use of Config::General with File::Slurp 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Tue, 28 Jul 2009 19:06:20 +0100
+
+libnet-netfilter-netflow-perl (0.03) UNRELEASED; urgency=low
+
+  * Change from File::ShareDir to useing <DATA> beacuse of PAR troubles
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Tue, 28 Jul 2009 18:44:14 +0100
+
+libnet-netfilter-netflow-perl (0.02) UNRELEASED; urgency=low
+
+  * Switch to Daemon::Generic to manage background running
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Tue, 28 Jul 2009 17:11:21 +0100
+
+libnet-netfilter-netflow-perl (0.01) UNRELEASED; urgency=low
+
+  * Initial release.
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Tue, 28 Jul 2009 12:55:21 +0100

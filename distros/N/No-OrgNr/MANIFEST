@@ -1,0 +1,19 @@
+.travis.yml
+Build.PL
+Changes
+lib/No/OrgNr.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+README.md
+t/00load.t
+t/01load-all.t
+t/02usage.t
+t/03pod.t
+t/04domain2orgnr.t
+t/05num_domains.t
+t/06orgnr_ok.t
+t/07orgnr2domains.t
+t/08external.t

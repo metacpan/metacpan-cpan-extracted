@@ -1,0 +1,85 @@
+#!/usr/bin/perl
+
+
+use strict ;
+
+use Nagios::Report ;
+use Getopt::Std ;
+
+use vars qw($opt_t) ;
+
+getopt 't' ;
+
+my $usage = <<USAGE ;
+
+$0 -t <timeperiod>
+
+Displays those hosts with less than 100% total time up during the timeperiod.
+
+timeperiod ::= today     | yesterday   |
+	       thisweek  | lastweek    |
+	       thismonth | lastmonth   |
+	       thisyear  | lastyear    |
+               last12hours | last24hours | last7days | last31days |
+	       HHMM      | HH::MM      |
+	       DD.MM.YY  | DD.MM.YYYY  | MM/DD/YY | MM/DD/YYYY    |
+	       24hourtime date
+
+eg $0 -t 07:00 01.12.2005
+
+USAGE
+
+die $usage
+  unless $opt_t ;
+
+die $usage
+  unless $opt_t =~ m#^(?:
+			today										|
+			yesterday									|
+			this (?:week|month|year)							|
+			last (?:week|month|year|24hours|12hours|7days|31days|\d+days?|\d+hours?) 	|
+			(?: \d\d :? \d\d  \s+  \d\d? [\./] \d\d? [\./] \d\d (?:\d\d)?)			|
+			(?: \d\d :? \d\d)								|
+			(?: \d\d? [\./] \d\d? [\./] \d\d (?:\d\d)?)
+		     )$#x ;
+
+
+my $x = Nagios::Report->new(
+							# Data source
+				q<local_cgi Nagios_Server Auth_Nagios_User>,
+							# Report period
+				[ qw(24x7) ],
+							# Time period
+				$opt_t,
+							# Service report
+				1,
+							# Pre-filter 
+				sub { my %F = @_; my $u = $F{PERCENT_TOTAL_TIME_OK}; $u =~ s/%//; $u < 100 }
+			   )
+  or die "Can't construct Nagios::Report object." ;
+
+$x->mkreport(
+		[
+		qw(
+		    HOST_NAME
+		    SERVICE_DESCRIPTION
+		    DOWN
+		    UP
+		    OUTAGE
+		  )
+		],
+
+		sub { my %F = @_; my $u = $F{PERCENT_TOTAL_TIME_OK}; $u =~ s/%//; $u < 100 },
+
+		undef,
+
+		undef,
+
+		1,
+
+) ;
+
+
+$x->debug_dump(30, 6) ;
+							# 240 chars is needed for the _host_ URLs.
+							# service URLS are bigger

@@ -1,0 +1,7 @@
+ChangeLog
+Makefile.PL
+MANIFEST
+README
+t/single_locking.t
+lib/NL/File/Lock.pm
+META.yml                                 Module meta-data (added by MakeMaker)

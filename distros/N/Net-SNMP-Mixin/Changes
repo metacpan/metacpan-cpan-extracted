@@ -1,0 +1,73 @@
+Revision history for Net-SNMP-Mixin
+
+0.14	Tue, 21 Jun 2016 14:46:43 +0200
+	bump version, new tests, minor changes
+
+0.13	Fri, 01 May 2015 18:22:15 +0200
+	new method init_ok(), check for partial initialization
+
+0.12	Tue Jun 24 11:34:31 MEST 2008
+	changed idx2val, some SNMP agents are really buggy, sigh
+
+0.11	Sun Jun 22 10:55:37 MEST 2008
+	addet errors() method to record all errors
+	Net::SNMP::error has only one slot, that's not helpful
+	for nonblocking sessions
+
+	removed fast exit in init_mixins, now handled better
+	with the errors() method
+
+0.10	Do 19. Jun 12:54:47 CEST 2008
+	fast exit in init_mixins if one mixin intialization
+	goes wrong in order not to clobber the Net::SNMP
+	session message
+
+	initialization order now follows the argument list
+	in the mixer() call
+
+0.09	Fr 25. Apr 19:05:18 CEST 2008
+	better return values in System.pm
+	removed Bundle::Net::SNMP::Mixin
+
+0.08	Fr 25. Apr 15:04:27 CEST 2008
+	production ready
+
+0.07_01 Fr 25. Apr 14:31:54 CEST 2008
+	more documentation
+	changed tests from 0.0.0.0 => 127.0.0.1
+	added Bundle::Net::SNMP::Mixin
+	changed eval "" to eval {} in init_mixins
+
+0.07    Mon Apr 14 00:27:57 CEST 2008
+	no interface change
+	minor pod changes
+	LICENSE and kwalitee
+
+0.06    Sun Apr 13 16:15:56 CEST 2008
+	fixed check for Test::Warn missing
+
+0.05    Sat Apr 12 22:52:21 CEST 2008
+	no interface change
+	refined pod
+	better error handling
+	more tests
+	more kwalitee
+
+0.04    Fri Apr 11 19:44:14 CEST 2008
+	added build_requires in Build.PL
+	no interface change
+
+0.03    Mi 9. Apr 23:16:09 CEST 2008
+	Minor change in a test
+
+0.02    Di 8. Apr 23:40:43 CEST 2008
+	Minor fixes
+
+0.01_02 Di 8. Apr 11:30:27 CEST 2008
+	Minor POD corrections.
+	More tests
+	Minor fixes
+
+0.01_01 Mo 7. Apr 22:33:49 CEST 2008
+        First developer version.
+

@@ -1,0 +1,61 @@
+Revision history for Net::Gandi
+
+1.122180  2012-08-05 14:40:38 Europe/Paris
+
+    Add statement to specified the minimal version of Perl
+    Add a new class Domain to manage domain name.
+    Return if the object attribute is not a reference (Closes #8)
+
+1.122080  2012-07-26 21:24:54 Europe/Paris
+    Optimise  add make_immutable and no Moose, and be more use namespace::autoclean
+    Rename method call_rpc to api_call, to have more generic name
+
+1.121851  2012-07-04 00:44:50 Europe/Paris
+
+    Fix typo in the documentation, support part.
+
+1.121850  2012-07-03 23:29:12 Europe/Paris
+
+    New architecture
+    Add validation
+    Multiple support protocol
+    Use Dist::Zilla
+    Use DateTime::Format::HTTP to transform a string date to DateTime object
+    Move operation class in right place
+
+0.12 19/10/2011
+     Clean code, add several attributes useragent err and errstr, change the manner to manage error of api, add validation fix and add documentation.
+
+0.11 20/06/11
+     I forgot update MANIFEST file. Again.
+
+0.10 20/06/11
+     Add a new class types.
+
+0.9 26/02/11
+    Fix link in documenation.
+    Add a new object attribute, api_url and date_object.
+
+0.8 06/12/10
+    Convert dates as string to dates as objects.
+
+0.7 02/11/10
+    I forgot update MANIFEST file.
+
+0.6 02/11/10
+    Fix indent and encoding pod, add class Datacenter and Operation.
+
+0.5 29/10/10
+    Remove methods prefix in class Disk for disk_attach and detach, add also disk_attach     and disk_detach in a VM, and fix typo.
+
+0.4 29/10/10
+    Move disk_attach and disk_detach in class Disk.
+
+0.3 29/10/10
+    Remove methods prefix.
+
+0.2 28/10/10
+    Fix perldoc, and few typo.
+
+0.1 28/10/10
+    Initial version developed.

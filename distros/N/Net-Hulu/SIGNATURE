@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 41f609716f76cd4a36ecdf33d752403e1cbaeb27 Changes
+SHA1 b92c89666521dec9542daa5ee4e78f9d40b4d2e8 Debian_CPANTS.txt
+SHA1 b66220006b500576af5f1f324c1c2371a7da8a57 LICENSE
+SHA1 760d42ea778faca18fa64817ca6611460325e4b0 MANIFEST
+SHA1 071a8e5f837224d983ab0ec581b5bf26d2bffd76 META.yml
+SHA1 c6e9213e91fa621aeef101f40cb723f39d2d574f Makefile.PL
+SHA1 d2d2cdd4289583902750bf8218d7a3eab9d334c7 README
+SHA1 6418ad16eb6e70ed4f3f82124a5a7b8338a71ded docs/Hulu.html
+SHA1 8a7823636d522b9dab5e9eddd909e6b0a5b5f26e docs/Hulu.man
+SHA1 1619c27f2a71e47d78011d7a0384b9086fe4456d docs/Hulu.tex
+SHA1 045c3977427dc2ed60de94f9eba7e33ccf5224db docs/Hulu.txt
+SHA1 fd5f3c4f0418efee3b9b16cf8c3902e8374909df inc/Module/Install.pm
+SHA1 7cd7c349afdf3f012e475507b1017bdfa796bfbd inc/Module/Install/Base.pm
+SHA1 ba186541bbf6439111f01fc70769cf24d22869bf inc/Module/Install/Can.pm
+SHA1 aaa50eca0d7751db7a4d953fac9bc72c6294e238 inc/Module/Install/Fetch.pm
+SHA1 3e83972921d54198d1246f7278f08664006cd65d inc/Module/Install/Makefile.pm
+SHA1 12bf1867955480d47d5171a9e9c6a96fabe0b58f inc/Module/Install/Metadata.pm
+SHA1 f7ee667e878bd2faf22ee9358a7b5a2cc8e91ba4 inc/Module/Install/Win32.pm
+SHA1 8ed29d6cf217e0977469575d788599cbfb53a5ca inc/Module/Install/WriteAll.pm
+SHA1 ffea49aa8b1bb0bfadcb7f8f2a9409aa160579bf lib/Net/Hulu.pm
+SHA1 f9a0b74fcab6140236671e2f80ebae961fc23feb lib/Net/Hulu.pod
+SHA1 f6f1b0334450b87c003f2fa41581518e8db98abb t/0-signature.t
+SHA1 7c1cc96b5e772ae1d267625b8d34eab65f8523e7 t/Net-Hulu.t
+SHA1 553d1338cde8ed509e82c2b7ddb88060eed111ff t/critic.t
+SHA1 e4c137413591664c95e5e073dd5e7492af9504bc t/distribution.t
+SHA1 dca809ff0fc62b34d9e61e667d75e476cf8e2115 t/kwalitee.t
+SHA1 72ef850d7c104dc00c8a98aef639b26a7ac405a7 t/perlcriticrc
+SHA1 17fd53a9ad796a962d31c0afbf380038a2a443cc t/pod-coverage.t
+SHA1 f2af107fad878ae1029f4cee741f23e3caca31b0 t/pod.t
+SHA1 d6eaf2b479bc933650e393e68097ca172744eecc t/strict.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAktM+mgACgkQKGs15SJZSGg7cACfWfVd4D/ZT5DTBeSyZwQuxdGB
+0QIAnAmqwbTt/9UQNfihsCNbhXGwRdM/
+=jx8c
+-----END PGP SIGNATURE-----

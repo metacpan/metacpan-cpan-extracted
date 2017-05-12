@@ -1,0 +1,10 @@
+Revision history for Perl extension Net::Amazon::RemoteCart.
+
+0.01  Mon Mar 22 2004
+	- original version; 
+
+0.02  Tue Mar 23 2004
+	- a few documentation fixes; 
+
+0.03 Tues April 13 2004
+	- fix version in Makefile.PL

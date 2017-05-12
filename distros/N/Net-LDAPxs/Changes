@@ -1,0 +1,35 @@
+Revision history for Perl extension Net::LDAPxs.
+
+0.01 Thu Sep 24 13:46:29 2009
+	- original version; created by h2xs 1.23 with options
+		-O -n Net::LDAPxs ./Net-LDAPxs/xslib/ldapxs.h
+0.02 Sat Nov 28 2009
+	- add new functions
+	- fix bugs
+	- update document
+	- improve error detection
+0.03 Sun Nov 29 2009
+	- add function delete
+	- fix bugs
+	- update document
+0.04 Wed Dec 21 2009
+	- add control function
+		server side sorting countrol
+	- fix bugs
+	- update document
+0.05 Wed Dec 30 2009
+	- modify function
+	- moddn function
+1.20 Tue Jul 13 2010
+	- Fundamentally changed the underlying mechanism
+	- Added a new module Net::LDAPxs::Exception
+	- Improved the typemap
+	- Improved exceptions handling system
+	- Fixed a number of bugs
+1.30 Fri Sep 3 2010
+	- Fixed the problem in server side sorting countrol
+	- Modified the user interface for 'modify function'
+	- Fixed a bug in Net::LDAPxs::Entry
+	- Fixed some bugs in XS code
+	- Updated the POD
+

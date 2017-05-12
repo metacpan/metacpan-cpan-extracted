@@ -1,0 +1,7 @@
+See the Net::iTMS and related modules' documentation for more
+information:
+
+        perldoc Net::iTMS
+    or  http://search.cpan.org/~tsibley/Net-iTMS/lib/Net/iTMS.pm
+
+Read INSTALL for how to install this package.

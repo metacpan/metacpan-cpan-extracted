@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Net/Bot/IRC/Message.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/test.t
+META.yml                                 Module meta-data (added by MakeMaker)

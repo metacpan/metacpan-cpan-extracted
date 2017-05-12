@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Net-DSML
+version:      0.003
+version_from: lib/Net/DSML.pm
+installdirs:  site
+requires:
+    Class::Std::Utils:             0.0.2
+    LWP::UserAgent:                2.033
+    MIME::Base64:                  3.050
+    Test::Simple:                  0.7
+    version:                       0.680
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

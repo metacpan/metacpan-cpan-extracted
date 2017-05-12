@@ -1,0 +1,21 @@
+2006-02-27  toni  <toni@irational.org> (1.53)
+
+	* Removed Net::Radius::Dictionary from the package. Of course,
+	Net::Radius::Dictionary belongs to different package, hence no
+	permissions to write to it on CPAN. Added dependency to
+	Net::Radius::Dictionary.
+
+2006-02-27  toni  <toni@irational.org> (1.52)
+
+	* added Net::Radius::Dictionary to the package. Needed to use
+	PackerOrdered.
+
+2006-02-15  toni  <toni@irational.org> (1.51)
+
+	* package didn't contain files necessary (inc/Module/) for use of
+	Module::Install for installation.
+
+2006-02-14  toni  <toni@irational.org> (1.5)
+
+	* first release
+

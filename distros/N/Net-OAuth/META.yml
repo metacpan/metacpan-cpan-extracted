@@ -1,0 +1,78 @@
+---
+abstract: 'An implementation of the OAuth protocol'
+author:
+  - 'Keith Grennan <kgrennan@cpan.org>'
+build_requires:
+  Test::More: 0.66
+  Test::Warn: 0.21
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-OAuth
+provides:
+  Net::OAuth:
+    file: lib/Net/OAuth.pm
+    version: 0.28
+  Net::OAuth::AccessToken:
+    file: lib/Net/OAuth/AccessToken.pm
+  Net::OAuth::AccessTokenRequest:
+    file: lib/Net/OAuth/AccessTokenRequest.pm
+  Net::OAuth::AccessTokenResponse:
+    file: lib/Net/OAuth/AccessTokenResponse.pm
+  Net::OAuth::Client:
+    file: lib/Net/OAuth/Client.pm
+  Net::OAuth::ConsumerRequest:
+    file: lib/Net/OAuth/ConsumerRequest.pm
+  Net::OAuth::Message:
+    file: lib/Net/OAuth/Message.pm
+  Net::OAuth::ProtectedResourceRequest:
+    file: lib/Net/OAuth/ProtectedResourceRequest.pm
+  Net::OAuth::Request:
+    file: lib/Net/OAuth/Request.pm
+    version: 0.28
+  Net::OAuth::RequestTokenRequest:
+    file: lib/Net/OAuth/RequestTokenRequest.pm
+  Net::OAuth::RequestTokenResponse:
+    file: lib/Net/OAuth/RequestTokenResponse.pm
+  Net::OAuth::Response:
+    file: lib/Net/OAuth/Response.pm
+  Net::OAuth::SignatureMethod::HMAC_SHA1:
+    file: lib/Net/OAuth/SignatureMethod/HMAC_SHA1.pm
+  Net::OAuth::SignatureMethod::HMAC_SHA256:
+    file: lib/Net/OAuth/SignatureMethod/HMAC_SHA256.pm
+  Net::OAuth::SignatureMethod::PLAINTEXT:
+    file: lib/Net/OAuth/SignatureMethod/PLAINTEXT.pm
+  Net::OAuth::SignatureMethod::RSA_SHA1:
+    file: lib/Net/OAuth/SignatureMethod/RSA_SHA1.pm
+  Net::OAuth::UserAuthRequest:
+    file: lib/Net/OAuth/UserAuthRequest.pm
+  Net::OAuth::UserAuthResponse:
+    file: lib/Net/OAuth/UserAuthResponse.pm
+  Net::OAuth::V1_0A::AccessTokenRequest:
+    file: lib/Net/OAuth/V1_0A/AccessTokenRequest.pm
+  Net::OAuth::V1_0A::RequestTokenRequest:
+    file: lib/Net/OAuth/V1_0A/RequestTokenRequest.pm
+  Net::OAuth::V1_0A::RequestTokenResponse:
+    file: lib/Net/OAuth/V1_0A/RequestTokenResponse.pm
+  Net::OAuth::V1_0A::UserAuthResponse:
+    file: lib/Net/OAuth/V1_0A/UserAuthResponse.pm
+  Net::OAuth::XauthAccessTokenRequest:
+    file: lib/Net/OAuth/XauthAccessTokenRequest.pm
+  Net::OAuth::YahooAccessTokenRefreshRequest:
+    file: lib/Net/OAuth/YahooAccessTokenRefreshRequest.pm
+requires:
+  Class::Accessor: 0.31
+  Class::Data::Inheritable: 0.06
+  Digest::HMAC_SHA1: 1.01
+  Digest::SHA: 5.47
+  Digest::SHA1: 2.12
+  Encode: 2.35
+  LWP::UserAgent: 1
+  URI::Escape: 3.28
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.28

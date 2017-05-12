@@ -1,0 +1,61 @@
+2.004     2015-01-26 16:17:57+00:00 Europe/London
+- actually reconnect if sending fails (requires Net::Stomp 0.51 which
+  fixes the return values of the various sending methods)
+
+2.003     2015-01-26 14:14:43+00:00 Europe/London
+ - allow using arbitrary send_ methods instead of just 'send' and
+   'send_transactional'
+
+2.002     2014-07-29 10:43:25+01:00 Europe/London
+ - use SingleEncoding (thanks sergeyromanov)
+
+2.001     2014-07-14 17:17:45+01:00 Europe/London
+ - require newer Net::Stomp::MooseHelpers for nicer reconnect handling
+
+2.000     2014-01-13 14:54:10 Europe/London
+ - replace Class::Load with Module::Runtime
+
+1.9       2013-10-09 12:10:59 Europe/London
+ - allow calling send_transactional instead of send on the STOMP
+   connection
+ - bump dependency on Net::Stomp::MooseHelpers to avoid problems with
+   send_transactional and TraceOnly
+ - clarify relationship between send_transactional and
+   Net::Stomp::Producer::Transactional
+
+1.8       2013-01-07 16:36:32 Europe/London
+ - Net::Stomp::Producer::Transactional for transaction-like behaviour
+   (begin/commit/rollback, fully re-entrant)
+
+1.7       2012-12-06 10:02:52 Europe/London
+ - fix tests under perl 5.18
+
+1.6       2012-10-24 15:32:49 Europe/London
+ - prevent transformers from easily clobbering ->transformer_args
+
+1.5       2012-10-19 17:02:22 Europe/London
+ - avoid localising $@, this may have been the cause of "false
+   exception caught" on some testers machines
+
+1.4       2012-09-05 12:52:12 Europe/London
+ - make validation actually work
+
+1.3       2012-09-03 11:36:18 Europe/London
+ - compatibility with Net::Stomp::MooseHelpers 1.3
+
+1.2       2012-08-02 15:37:01 Europe/London
+ - allow splitting transforming from sending
+
+1.1       2012-07-10 12:31:10 Europe/London
+ - use the new ReconnectOnFailure role from Net::Stomp::MooseHelpers
+ - calling ->connect() does not warn anymore, it's just a silent no-op
+
+1.001     2012-03-28 12:37:38 Europe/London
+ - fix failing tests due to exception handling on perl < 5.14
+
+1.0       2012-03-27 12:36:33 Europe/London
+ - first non-devel release
+
+0.1_01    2012-03-14 12:05:49 Europe/London
+ - Initial release
+

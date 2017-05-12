@@ -1,0 +1,58 @@
+---
+abstract: "Perl interface to Janrain's RPX service"
+author:
+  - 'Scott McWhirter <konobi@cpan.org>'
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Data::Dump: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  mocked: '0'
+  perl: '5.006'
+  unmocked: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-API-RPX
+provides:
+  Net::API::RPX:
+    file: lib/Net/API/RPX.pm
+    version: '1.000001'
+  Net::API::RPX::Exception:
+    file: lib/Net/API/RPX/Exception.pm
+    version: '1.000001'
+  Net::API::RPX::Exception::Network:
+    file: lib/Net/API/RPX/Exception/Network.pm
+    version: '1.000001'
+  Net::API::RPX::Exception::Service:
+    file: lib/Net/API/RPX/Exception/Service.pm
+    version: '1.000001'
+  Net::API::RPX::Exception::Usage:
+    file: lib/Net/API/RPX/Exception/Usage.pm
+    version: '1.000001'
+recommends:
+  Moose: '2.000'
+requires:
+  JSON::MaybeXS: '0'
+  LWP::UserAgent: '0'
+  Moose: '0'
+  Throwable::Error: '0'
+  Throwable::X: '0'
+  URI: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Net-API-RPX/issues
+  homepage: https://github.com/kentnl/Net-API-RPX
+  repository: https://github.com/kentnl/Net-API-RPX.git
+version: '1.000001'

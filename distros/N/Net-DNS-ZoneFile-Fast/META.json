@@ -1,0 +1,31 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-DNS-ZoneFile-Fast",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "svn",
+         "url" : "https://dnssec-tools.org/svn/dnssec-tools/",
+         "web" : "https://dnssec-tools.org/svn/dnssec-tools/"
+      }
+   },
+   "version" : "1.24"
+}

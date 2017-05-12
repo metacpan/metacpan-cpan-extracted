@@ -1,0 +1,9 @@
+--- #YAML:1.0
+name: NetStumbler-Mappoint
+version: 0.02
+author: |-
+  Salvatore E. ScottoDiLuzio <lt>washu@olypmus.net<gt>
+abstract: Module to manipulate MapPoint vi COM
+license: perl
+provides: {}
+generated_by: Module::Build version 0.25

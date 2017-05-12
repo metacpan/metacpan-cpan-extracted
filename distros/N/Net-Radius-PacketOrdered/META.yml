@@ -1,0 +1,14 @@
+abstract: Interface to RADIUS packets with proxy states
+author: 'Toni Prug <toni@irational.org>'
+distribution_type: module
+generated_by: Module::Install version 0.56
+license: perl
+name: Net-Radius-PacketOrdered
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Digest::MD5: 0
+  Net::Radius::Dictionary: 1.43
+version: 1.53

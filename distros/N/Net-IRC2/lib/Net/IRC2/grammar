@@ -1,0 +1,60 @@
+{
+    use Net::IRC2::Event    ;
+    my $Event = undef       ;
+    use vars qw( $VERSION ) ;
+    $VERSION =              '0.23' ;
+}
+
+message: 
+       { $Event = new Net::IRC2::Event( 'orig' => $text ) }
+       prefix(?) command middle(s?) (':')(?) trailing(?)
+       {
+	   $Event->prefix(   $item{ 'prefix(?)' }[0] ) ;
+	   $Event->command(  $item{  'command'  }    ) ;
+	   $Event->middle(   $item{'middle(s?)' }    ) ;
+	   $Event->trailing( $item{'trailing(?)'}    ) ;
+	   $return = $Event;
+        }
+prefix: ':' <commit> from
+        { 
+	    $return = $Event->from( ':' . $item{'from'} ) }
+
+from: servername
+        { 
+	    $return = $Event->servername( $item[1] ) }
+      | nick ('!' user)(?) ('@' host)(?) 
+	{ 
+	    $Event->nick( $item[1]    );
+	    $Event->user( $item[2][0] );
+	    $Event->host( $item[3][0] );
+	    $return =     $item[1]                                 .
+		      ( ( $item[2][0] ) ? '!' . $item[2][0] : '' ) .
+		      ( ( $item[3][0] ) ? '@' . $item[3][0] : '' ) ;
+	}
+servername: /[\w\.\-]+ /
+       {
+	   chop $item[1] ;
+	   $return = $item[1] ;
+       }
+command: /\d{3}/ 
+         | /[a-z]+/i
+           {
+               $Event->com_str( $item[1] );
+	   }
+middle: /[^\:\s\x00\x20\x0A\x0D]+/
+trailing: /[^\x00\x0A\x0D]+/
+target: to(s /,/) 
+to: channel 
+  | ( user '@' servername )
+  | nick
+  | mask
+channel: ( '#' | '&' ) chstring
+host: /[\w\-\.]+/
+nick: /[\w\-\\\[\]\`\{\}\^\|]+/
+mask: ('#' | '$') chstring
+chstring: /^[^\s ,\x00 \x0A \x0D \x07]+/ 
+user: /^~?[\.\w\-]+/
+special: /^[\\\-\[\]\`\^\{\}]/
+nonwhite: /^[^\x20 \x00 \x0D \x0A]/
+
+

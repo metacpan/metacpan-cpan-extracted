@@ -1,0 +1,32 @@
+{: NES 1.0 none :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  Nes 1.03 by Skriptke
+  Copyright 2009 - 2010 Enrique Castañón
+  Licensed under the GNU GPL.
+
+  Sample:
+  http://nes.sourceforge.net/
+
+  CPAN:
+  http://search.cpan.org/dist/Nes/
+
+  Repository:
+  http://github.com/Skriptke/nes
+
+  -----------------------------------------------------------------------------
+:}
+  {: sql (
+          'SELECT * FROM `users` 
+                    WHERE 1
+                    ORDER BY date DESC
+                    LIMIT 100;'
+         )
+    <div id="cuadro2">
+    <b>{: @$users.name :}</b> uses {: @$users.script :};<br>
+    <br>
+    {: @$users.message :}<br>
+    </div>
+    <br>
+:}

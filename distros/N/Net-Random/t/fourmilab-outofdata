@@ -1,0 +1,20 @@
+<html>
+<head>
+<title>HotBits Error</title>
+</head>
+<body>
+<h1>Error Generating HotBits</h1>
+<hr>
+<p>
+The following error:
+<p>
+<blockquote>
+<b>You have exceeded your 24-hour quota for HotBits.</b>
+</blockquote>
+<p>
+occurred while processing your HotBits request.  The server may be
+temporarily down; please try again in a few hours.
+<p>
+<h2><a href="/hotbits/"">Back to HotBits</a></h2>
+</body>
+</html>

@@ -1,0 +1,119 @@
+liblo perl binding
+==================
+
+Perl binding for the liblo library.
+
+LibLO library version 0.23 or higher is required.
+http://liblo.sourceforge.net/
+
+Pkg-config version 0.11 or higher is required:
+http://pkgconfig.freedesktop.org/
+
+
+INSTALLATION
+------------
+
+	I use Module::Build to build and install the module.
+	To install this module type the following:
+	
+		perl Build.PL
+		./Build
+		./Build test
+		
+	And then as root:
+	
+		./Build install
+
+
+API Overview
+------------
+
+	Items marked * have not been implemented in this release.
+
+	Net::LibLO::Address
+		- new(url)
+		- new(host, port)
+		- get_hostname
+		- get_port
+		- get_url
+		- errno
+		- errstr
+		- DESTROY
+	
+	Net::LibLO::Message
+		- new
+		- new(typespec, args)
+		- add_int32
+		- add_float
+		- add_string
+		- add_double
+		- add_symbol
+		- add_char
+		- add_true
+		- add_false
+		- add_nil
+		- add_infinitum
+		- length
+		- pretty_print
+	*	- serialise
+		- get_source
+		- DESTROY
+		
+	Net::LibLO::Bundle
+		- new
+		- new(sec, frac)
+		- add_message(path, message)
+		- add_message(path, typespec, args )
+		- length 
+	*	- serialise
+		- DESTROY
+		
+	Net::LibLO( port_string )
+		- new([port], [protocol])
+		- send(dest, bundle)
+		- send(dest, path, message)
+		- send(dest, path, typespec, @params)
+	*	- send_timestamped( dest, timetag, path, message )
+	*	- send_timestamped( dest, timetag, path, typespec, @params )
+		- recv
+		- recv_noblock( [timeout] )
+		- add_method( path, typespec, handler, userdata )
+	*	- del_method( path, typespec )
+		- get_port
+		- get_url
+	*	- events_pending
+	*	- next_event_delay
+		- DESTROY
+	
+		
+	handler( serv, mesg, path, typespec, userdata, @params )
+
+
+KNOWN BUGS
+----------
+	
+	- Not all OSC types are supported
+	- You cannot remove methods
+	- Possible memory leaks when freeing Net::LibLO objects
+	
+
+AUTHOR
+------
+
+	Nicholas J. Humfrey, njh@aelius.com
+
+
+COPYRIGHT
+---------
+
+	Copyright (C) 2005 Nicholas J. Humfrey
+
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.

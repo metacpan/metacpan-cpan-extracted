@@ -1,0 +1,41 @@
+$Id: README,v 1.6 2005/01/18 17:57:17 autarch Exp $
+
+This is Net::SFTP, a module implementing a client for the Secure
+File Transfer Protocol.
+
+PREREQUISITES
+
+    * Net::SSH::Perl (1.24 or greater)
+
+In particular, Net::SFTP requires the SSH2 support in Net::SSH::Perl;
+thus, during Net::SSH::Perl installation, you should choose that
+you wish to use SSH2 support (and SSH1 support as well, if you want
+that).
+
+INSTALLATION
+
+Net::SFTP installation is straightforward. If your cpan shell
+is set up, you should just be able to do
+
+    % perl -MCPAN -e 'install Net::SFTP'
+
+If you don't like that, you can download the distribution; the
+latest version on CPAN can be found in
+
+    ftp://ftp.cpan.org/pub/CPAN/authors/id/D/DB/DBROBINS/
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+SAMPLES
+
+Take a look at eg/psftp, an interactive SFTP shell using Net::SFTP,
+for some examples on using Net::SFTP and its various methods.
+
+David Robins / dbrobins@cpan.org

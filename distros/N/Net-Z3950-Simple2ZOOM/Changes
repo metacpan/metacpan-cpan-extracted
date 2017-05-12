@@ -1,0 +1,129 @@
+$Id: Changes,v 1.40 2009-06-08 15:34:37 mike Exp $
+
+Revision history for Perl extension Net::Z3950::Simple2ZOOM.
+
+1.04  Mon Jun  8 16:31:57 BST 2009
+	- Fix off-by-one in Present handler, as suggested by Simon
+	  Jacob of the National Library of Australia.
+
+1.03  Mon Apr 14 11:35:24 BST 2008
+	Improvements to _format_grs1(), provided by Simon Jacob of the
+	National Library of Australia <sjacob@nla.gov.au>:
+	- The namespace prefix "x" is made available for GRS-1 record
+	  configuration to refer to the top-level namespace.
+	- Multiple occurrences of the same XML element are now
+	  translated into separate occurrences of the corresponding
+	  GRS-1 element rather than being concatenated into a single
+	  value.
+	Also:
+	- Reporting of exception-handling is now requested by setting
+	  the S2Z_EXCEPTION_DEBUG environment variable to 1 (or 2 for
+	  extra verbosity).
+
+1.02  Fri Nov 23 12:10:35 GMT 2007
+	- Use the present handler to optimise situations in which the
+	  client is requesting multiple records in a single bite:
+	  previously, the server would be hit once for each record.
+
+1.01  Wed Sep 26 13:18:47 BST 2007
+	- Use Time::HiRes to instrument where time is spent.
+	  Operation timings are emitted if the module-global $TIME is
+	  set (so at present the only way to turn this on and off is
+	  by tweaking the boolean in the source code).
+
+1.00  Fri Sep 21 15:44:50 BST 2007
+	- Add new "gsafd" database to test.xml.  This is an OCLC SRU
+	  server that correctly implements result-set IDs and RSID
+	  searching.
+	- Otherwise identical to v0.94 (which was really the last of
+	  the 1.0-prerelease versions).  With this version, the
+	  software is ready for public release.
+
+0.94  Fri Sep 14 15:42:48 BST 2007
+	- Corrected handling of queries that include result-set
+	  references.
+	- Result-set reference handling is now configurable to use
+	  either a corresponding result-set reference at the back end
+	  or a re-executed query.
+	- Documentation of the above.
+
+0.93  Wed Sep 12 11:04:10 BST 2007
+	- Correct handling of record-surrogate diagnostics provided by
+	  ZOOM-C (when YAZ version 3.0.12 or better is available).
+
+0.92  Mon Sep 10 18:43:59 BST 2007
+	- Pass username/password tokens through into ZOOM-C.
+	- Support for translating result-set IDs in Type-1 queries.
+	- Initial searches do not fetch any records (presentChunk is
+	  set to 0) so that subsequent records fetches, when the
+	  client's fetch request has arrived and so the required
+	  schema is known, do not get bad cache-hits.
+	- Request MARCXML schema if client wants USMARC records.
+	- Correct handling of completeness attributes.
+	- Handle BIB-1 relation attributes.
+	- Correctly generate and recognise cql.resultSetId for
+	  result-set references, rather than cql.resultSet as before.
+	- Detect, parse, translate and report surrogate diagnostic
+	  records.
+	- Configurable schema handling: each database may nominate a
+	  set of Z39.50 schema OIDs which, if requested, cause a
+	  particular SRU schema to be requested from the back-end, and
+	  the resulting records translated into the appropriate MARC
+	  format.  NOTE that in its current form this only works for
+	  the specific though common combination of Z39.50 front-end,
+	  SRU back-end and MARC record syntax.
+
+0.91  Sat Sep  1 10:38:21 BST 2007
+	- Support for CCL queries added to the YAZ GFS, therefore to
+	  SimpleServer, therefore to Simple2ZOOM.  Requires YAZ
+	  version 3.0.9 or later.
+	- Added new files to etc directory to configure CCL support:
+	  yazgfs.xml is a YAZ GFS configuration file, and
+	  ccl-qualifiers maps qualifiers to BIB-1 attributes.
+	- Support for the Scan service.
+	- Support translation of truncation attributes 101 (process #
+	  in search term) and 104 (Z39.58) into CQL.  (Only partial in
+	  the latter case since CQL wildcards have no equivalent of
+	  /ana?4titan/.)
+	- Support for the Delete Result Set service -- sort of.  Since
+	  SRU in fact has no analogous service, all the gateway can do
+	  is accept Delete requests and quietly no-op.
+	- Configurable HTTP-based authentication.
+	- Add a trivial sample authenticator script, etc/sru-auth
+	- Add etc/README to describe the increasing number of files in
+	  that directory.
+	- Support for the Sort service, subject to several provisos,
+	  the most important being that due to limitations in ZOOM-C
+	  (as of YAZ 3.0.10), sorting no-ops against SRU 1.1
+	  back-ends.  It works correctly against both Z39.50 and SRU
+	  1.2 back-ends.
+	- Support for the SUTRS record syntax.
+	- Support for the MARC record syntax.
+	- Simple support for the GRS-1 record syntax.
+
+0.90  Fri Aug 10 23:26:00 BST 2007
+      (INITIAL RELEASE of 10th August 2007 -- 1.0 pre-release)
+	  Basic Z39.50/SRU Gateway implementing connection management
+	  and the Init, Search and Present services, including Type-1
+	  to CQL query translation, and XML to Z39.50 response record
+	  translation.  NOT INCLUDED IN THIS RELEASE although is was
+	  scheduled to be: handling CCL queries by translation into
+	  CQL.
+
+0.10  Fri Jul  6 16:59:47 BST 2007
+	- Functionally equivalent to the old code, but now packaged in
+	  a CPAN-friendly way.  Version number bumped to 0.10 in this
+	  initial "null release" to match the version number 0.1 in
+	  the pre-framework code, which has been distributed to some
+	  customers, since the functionality is identical.
+
+0.01  Fri Jul  6 16:12:13 2007
+	- original version; created by h2xs 1.23 with options
+		-X --name=Net::Z3950::Simple2ZOOM --compat-version=5.8.0 --omit-constant --skip-exporter --skip-ppport
+
+	  (The core code is rather older than this, and goes back at
+	  least to Seb's CVS revision 1.1 of the main script, checked
+	  in on 31st March 2006.  The date above marks the first
+	  version to be Perl-module packaged, as a step towards making
+	  a public release.)
+

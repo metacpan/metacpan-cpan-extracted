@@ -1,0 +1,43 @@
+No-Worries
+
+The modules in this package ease coding by providing consistent
+convenient functions to perform frequently used programming tasks.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc No::Worries
+    perldoc No::Worries::Date
+    perldoc No::Worries::Die
+    perldoc No::Worries::Dir
+    perldoc No::Worries::DN
+    perldoc No::Worries::Export
+    perldoc No::Worries::File
+    perldoc No::Worries::Log
+    perldoc No::Worries::PidFile
+    perldoc No::Worries::Proc
+    perldoc No::Worries::Stat
+    perldoc No::Worries::String
+    perldoc No::Worries::Syslog
+    perldoc No::Worries::Warn
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) CERN 2012-2016
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

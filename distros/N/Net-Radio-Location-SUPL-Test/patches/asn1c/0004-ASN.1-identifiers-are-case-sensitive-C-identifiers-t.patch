@@ -1,0 +1,26 @@
+From 4140715cbd070f55d929158eb2d5b9f6ae64e07d Mon Sep 17 00:00:00 2001
+From: Jens Rehsack <sno@NetBSD.org>
+Date: Mon, 2 Jul 2012 10:15:56 +0200
+Subject: [PATCH 4/4] ASN.1 identifiers are case sensitive, C identifiers, too
+ - why using strcasecmp?
+
+---
+ libasn1fix/asn1fix_misc.c |    2 +-
+ 1 Datei geändert, 1 Zeile hinzugefügt(+), 1 Zeile entfernt(-)
+
+diff --git a/libasn1fix/asn1fix_misc.c b/libasn1fix/asn1fix_misc.c
+index 69d08bd..d2c9e5c 100644
+--- a/libasn1fix/asn1fix_misc.c
++++ b/libasn1fix/asn1fix_misc.c
+@@ -289,7 +289,7 @@ asn1f_check_unique_expr_child(arg_t *arg, asn1p_expr_t *child,
+ 			if(expr->Identifier == NULL
+ 			|| expr->expr_type == A1TC_EXTENSIBLE)
+ 				continue;
+-			ret = strcasecmp(expr->Identifier, child->Identifier);
++			ret = strcmp(expr->Identifier, child->Identifier);
+ 		}
+ 
+ 		if(ret == 0) {
+-- 
+1.7.10.5
+

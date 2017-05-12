@@ -1,0 +1,62 @@
+{
+   "abstract" : "Perl client to Datadog's dogstatsd metrics collector.",
+   "author" : [
+      "Jennifer Pinkham <jpinkham@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Dogstatsd",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "Storable" : "0",
+            "Test::FailWarnings" : "0",
+            "Test::Most" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Data::Validate::Type" : "0",
+            "LWP::UserAgent" : "0",
+            "Net::Telnet" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Dogstatsd" : {
+         "file" : "lib/Net/Dogstatsd.pm",
+         "version" : "v1.0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jpinkham/net-dogstatsd/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Net-Dogstatsd",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ],
+      "repository" : {
+         "url" : "https://github.com/jpinkham/net-dogstatsd"
+      }
+   },
+   "version" : "v1.0.3"
+}

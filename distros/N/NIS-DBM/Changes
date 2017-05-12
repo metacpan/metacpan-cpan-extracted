@@ -1,0 +1,10 @@
+Revision history for Perl extension NIS::DBM.
+
+0.02  Fri Sep 24 14:19:07 1999
+        - better file consistancy checks
+        - rpc.yppasswdd replacement script in sample directory
+        - patch for IniConf 0.92
+
+0.01  Fri Jul 23 09:31:52 1999
+	- original version; created by h2xs 1.19
+

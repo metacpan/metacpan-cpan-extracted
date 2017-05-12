@@ -1,0 +1,272 @@
+Revision history for perl module Net::AMQP::RabbitMQ
+
+2.30000 - 2016-10-18
+    - Fixed segfault on cancel fail
+    - Fixed build issue on OSX
+    - Stopped using parts of private api
+
+2.20002 - 2016-10-14
+    - Fix test SSL cert
+
+2.20001 - 2016-09-07
+    - Tidy up documentation, add simple examples for illustration (CTrabant)
+    - Added declare queue in synopsis (oylenshpeegul)
+
+2.20000 - 2016-06-16
+    - Fixed memory leak in recv/get
+
+2.100001 - 2016-05-07
+    - Added method to check for ssl support
+
+2.100000 - 2016-05-02
+    - Fixed precision problem when consuming a message with a float64 in the header when using a perl built with -Duselongdouble
+
+2.000000 - 2016-05-02
+    - Release new amqp_consume code (ikegami)
+    - Fixed code to match docs for `ssl_verify_host` (markellis)
+    - Fixed freebsd test fails (markellis)
+    - Added MQSSLHOST MQSSLUSERNAME MQSSLPASSWORD MQSSLPORT env vars for ssl test (markellis)
+
+
+2.000000_002 - 2016-04-12
+    - Fix for compatibility with Perl 5.8 (ikegami)
+
+1.600000 - 2016-04-27
+    - added env varMQSKIPSSL to skip t/030_ssl.t (fgabolde)
+    - Update docs to accurately reprsente exchange_declare's default for auto_delete (ikegami)
+    - Allow publishing with headers=>undef. Would previously SEGFAULT (ikegami)
+    - Speed up internal_recv by preallocating a string or the correct size for the body (ikegami)
+    - Switch from hv_store/hv_fetch + strlen to more efficient and less error-prone hv_stores/hv_fetchs when possible. (ikegami)
+    - Use MUTABLE_* to avoid casting constness away accidentally (ikegami)
+    - Fix error when skipping tests requiring JSON (ikegami)
+    - Fix the spelling in the documentation of the key for extra headers to include in a published message (ikegami)
+
+2.000000_001 - 2016-04-12
+    - fixed #106 - recv doesn't detect exceptions (ikegami)
+    - more consistent error messages. (ikegami)
+    - Channel now included in frames returned by recv(). (ikegami)
+    - This fixes some memory leaks that occur when an exception is thrown. (ikegami)
+    - fixed #33 - replaced internal_recv (ikegami)
+    - fixed #108 - Allow publishing with headers=>undef. (ikegami)
+    - fixed #96 - Fix the spelling in the documentation of the key for extra headers to include in a published message (ikegami)
+
+1.500000 - 2016-02-04
+    - handle magic scalar SVt_PVMG (Dávid Kovács)
+
+1.400000 - 2015-11-04
+    - ssl support
+    - fixed reconnection issue if there is data in the buffer
+
+1.300000 - 2015-10-19
+    - fill in missing runtime and test prereqs, with graceful backcompat (ether)
+    - mark the distribution as not having dynamically configured prereqs (ether)
+    - drop unneeded use of FindBin -- $cwd must be "." to build the distribution (ether)
+    - ensure contributor names are not mojibaked (ether)
+    - Added server and client properties (manchicken)
+    - Implementing `nack()` (manchicken)
+    - Cleaning up the tests (manchicken)
+
+1.200000 - 2015-10-17
+    - added exchange-to-exchange binding (manchicken)
+
+1.100000 - 2015-10-16
+    - upgraded rabbitmq-c to 0.7.1 (manchicken)
+    - optional force utf8 on strings in headers (manchicken)
+    - Added a bunch of socket safety checks (manchicken)
+    - Adding test for get_sockfd and get_channel_max() (manchicken)
+    - increase test coverage (manchicken)
+    - Added tests for `no_ack` on `get()` (manchicken)
+
+1.001000 - 2015-10-01
+    - Add support for immediate return in recv() (marmand)
+
+1.000000 - 2015-09-30
+    - Fix a memory leak when setting headers on publish
+    - Made transaction commit safer (it probably had a potential use after free error)
+    - Free connection memory as soon as we can
+
+0.900000 - 2015-06-17
+    - Fix receive with timeout - tv_usec is microsecods, not milliseconds (iron-s)
+
+0.310000 - 2015-04-12
+    - V0.6.0+exchange declare support (manchicken)
+
+0.300000 - 2015-03-12
+    - Fixing an issue with queue-declare assuming things were byte arrays when we really wanted them to be UTF-8, per constraints within RabbitMQ. (manchicken)
+
+0.100000 - 2015-03-09
+    - Support for 64-bit delivery tags via Math::Int64 (manchicken)
+
+0.010000 - 2015-01-14
+    - Addded support for decoding boolean header values - Slaven Rezić
+    - Updated Contributors
+
+0.009000 - 2015-01-14
+    - Added support for specifying an optional timeout for `recv()`.
+
+0.008000 - 2015-01-13
+    - Added the `redelivered` key to the message hashref returned by the `recv()` method (Dave Rolsky)
+    - Added a `cancel()` method to cancel an existing consumer tag, as provided to or returned by the `consume()` method. (Dave Rolsky)
+
+0.007001 - 2014-11-09
+    - Added timestamp types to the supported types, they are converted to unsigned 64-bit integers.
+    - Added the `manual_tests` directory for some manual testing I did for development.
+    - Added some documentation about headers to the `get()` method.
+
+0.007000 - 2014-11-03
+    - Major re-factoring done to how Perl-to-C type inferences are done
+    - Most AMQP header data types from AMQP into Perl should be supported.
+    - Upgraded the librabbitmq-c version to the latest stable v0.5.2
+    - Nested headers are now working
+
+0.006002 - 2014-09-19
+    - Add MANIFEST to dist
+
+0.006001 - 2014-09-19
+    - Doc fixes (autarch)
+
+0.006000 - 2014-09-19
+    - Fixed assigning an uint64_t to an int32_t value #12 (manchicken)
+    - Fixed hashes and arrays aren't properly handled when sent in as headers #18 (manchicken)
+
+0.005007 - 2014-07-03
+    - Fixed a reported memory leak
+    - Fixed a problem with failed assertions on channel_close() on a not-at-all-connected instance.
+
+0.005006 - 2014-06-24
+    - Added some additional handling for UTF-8 going into Perl strings (manchicken)
+    - Added a simple test to demonstrate UTF-8 safety. (manchicken)
+
+0.005005 - 2014-06-17
+    - Changed timeout test to use seconds rather than sub seconds, as it was failing on bsds
+
+0.005004 - 2014-06-12
+    - Updated POD to include the new is_connected() method.
+    - Added socket error detection and disconnection logic into the die_on_* methods, and updated calls to those functions accordingly.
+
+0.005003 - 2014-06-10
+    - Fixed an issue where the disconnect from the server was causing the publish() to fail without resetting file descriptor... which made it impossible to detect connection issues encountered during publish. Also updated the recv() to handle the socket error status as well. (manchicken)
+
+0.005002 - 2014-06-07
+    - Fixed an issue where a disconnect from the server may have occurred during an internal_recv() call, but we weren't detecting and disconnecting accordingly. Now we disconnect in a way that allows is_connected() to realize that we're no longer connected so that we can then re-connect (manchicken)
+
+0.005001 - 2014-06-07
+    - changed tests to use unique queue/exchange names
+
+0.005000 - 2014-06-07
+    - removed no_wait from purge documentation as it doesn't do anything
+    - Added queue_delete method
+
+0.004002 - 2014-04-02
+    - Added Net::AMQP::RabbitMQ::is_connected() to determine whether or not you have a live connection. (manchicken)
+    - Added a call to Net::AMQP::RabbitMQ::disconnect() to close the socket connection as well. (manchicken)
+    - Added a test to verify the is_connected() functionality. (manchicken)
+
+0.004001 - 2014-02-22
+    - changed github repo url
+
+0.004000 - 2014-01-12
+    - fixed a memory leak when using transactions
+
+0.003001 - 2014-01-12
+    - updated Makefile.PL to fix a compile issue on Debian Wheezy
+
+0.003 - 2013-12-22
+    - forked from Net::RabbitMQ as Net::AMQP::RabbitMQ since changes not accepted upstream
+    - use librabbitmq 0.4.1
+    - amqp protocol 0.9.1 support only rabbitmq 2+
+    - removed basic_return method, since standard version of librabbitmq is used, not custom fork
+    - Changes file changed to suppot CPAN::Changes
+    - client send a heartbeat back whenever it receives one.
+
+v0.2.6 - 2012-07-13
+    - make the heartbeat test a bit more tolerant (neophenix)
+
+v0.2.5 - 2012-07-12
+    - wish CPAN versioning made sense.
+
+v0.2.4 - 2012-07-12
+    - add basic reject (jpfrigerio)
+    - conditional variable::magic tests (mfowler)
+
+v0.2.3 - 2011-09-12
+    - fix a few documentation typos
+    - support binding to an exchange with headers (RabbitMQ feature)
+
+v0.2.2 - 2011-08-29
+    - note https://github.com/omniti-labs/Net--RabbitMQ as the
+        authoritative repository.
+    - set and get header proporties from Aaron Schrab and Andy Wick
+
+v0.2.1 - 2011-05-18
+    - fixed up tests.
+
+v0.2.0 - 2011-04-19
+    - fixed memory leak in amqp_table
+    - add a connect timeout that both times out connect() calls and
+        sets SO_{SND.RCV}TIMEO on the socket
+    - add a heartbeat method
+    - a hearbeat frame can be received in the internal_recv function
+        causing an unexpected failure consuming; these are now ignored.
+    - make queue_declare return message and consumer counts (additionally)
+        when called in array context.
+
+v0.1.9 - 2011-02-14
+    - add a basic return callback registration point
+    - add basic qos support
+
+v0.1.8 - 2010-10-09
+    - missed a gratuitous memory leak somehow
+
+v0.1.7 - 2010-10-09
+    - amqp_exchange_delete prototype
+    - memory leak fix from Trevor Little
+
+v0.1.6 - 2010-07-18
+    - fix for uninitialized exchange when no options are passed.
+    - add consumer tags and docs
+    - add delete_exchange from Richard Wallman
+    - enhance delete_exchange with if_unused and nowait options
+        from Brian Clapper
+
+v0.1.5 - 2010-04-22
+    - support for properties from Bob Goldstein < bobg at uic dot edu >
+    - retarded and seemingly futile attempt to compensate for no pack Q
+
+v0.1.4 - 2010-04-08
+    - another attempt at getting CPAN testers is_deeply to accept truth
+    - memory leak with basic consume
+
+v0.1.3 - 2010-03-30
+    - allow support for overriding OPTIMIZE.
+        Sun C 5.10 SunOS_i386 2009/06/03 requires -xO1 in my tests.
+    - fix MANIFEST file.
+
+v0.1.2 - 2010-03-30
+    - use perl's USE_ITHREADS as a define to enable thread safety or not.
+    - Fix some macro use that was certainly wrong yet gcc silently allowed.
+
+v0.1.1 - 2010-02-22
+    - [rt.cpan.org #53800] make distclean removes files needed for build
+    - manually encode the 64bit delivery_tag to work croass platform for poorly
+        configured perls (no 64bit ints)
+    - add a get method (amqp_basic_get)
+
+v0.1.0 - 2010-01-17
+    - Update test suite to use dev.rabbitmq.com by default; still overridden with MQHOST environment variable.
+    - Bumped minor release number as things seem happy and stable.
+
+v0.0.4 - 2009-12-29
+    - make the tests use pack 'LL' instead of 'Q' for those that compile there perls incorrectly or cannot afford enough bits to make Q happen.
+
+v0.0.3 - 2009-12-25
+    - added tests for the txn support
+    - fixed file descriptor leak
+
+v0.0.2 - 2009-12-19
+    - Thread safety added.
+    - txn support from Joshua Kronengold
+    - some docs bugs.
+
+v0.0.0.1 - 2009-11-12
+    - Initial release

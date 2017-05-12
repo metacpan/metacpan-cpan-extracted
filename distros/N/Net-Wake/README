@@ -1,0 +1,36 @@
+NAME
+    Net::Wake - A package to send packets to power on computers.
+
+SYNOPSIS
+    To send a wake-on-lan packet via UDP:
+    Net::Wake::by_udp('255.255.255.255', '00:00:87:A0:8A:D2');
+
+    Or directly from the command line:
+    perl -MNet::Wake -e "Net::Wake::by_udp(undef,'00:00:87:A0:8A:D2')"
+
+DESCRIPTION
+    This package sends wake-on-lan (AKA magic) packets to turn on machines
+    that are wake-on-lan capable.
+
+    For now there is only one function in this package:
+    Net::Wake::by_udp([$host], $mac_address, [$port]);
+
+    You can omit the colons in the $mac_address, but not leading zeros.
+
+    Generally speaking, you should use a broadcast address for $host. Using
+    the host's last known IP address is usually not sufficient since the IP
+    address may no longer be in the ARP cache. A $host value of
+    '255.255.255.255' is implied if $host is undef. If you wish to send a
+    magic packet to a remote subnet, you can use a variation of
+    '192.168.0.255', given that you know the subnet mask to generate the
+    proper broadcast address.
+
+SEE ALSO
+      http://gsd.di.uminho.pt/jpo/software/wakeonlan/mini-howto/
+
+COPYRIGHT
+    Copyright 1999-2003 Clinton Wong
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,1182 @@
+=head1 NAME
+
+Net::Curl::examples - sample modules and test code for Net::Curl
+
+=head1 Curl::Transport
+
+=head4 I<Extracted from C<examples/01-curl-transport.pl>>
+
+This module shows:
+
+=over
+
+=item buildtime version check
+
+Required features will be missing if libcurl was too old at Net::Curl
+compilation.
+
+=item basic inheritance
+
+Use Net::Curl::* as base for your modules.
+
+=item exception handling
+
+Most methods die() with a dualvar exception on error. You can compare them
+numerically, or display as part of a message.
+
+=back
+
+=head2 Motivation
+
+recv() and send() methods use non-blocking transfer, this may be very annoying
+in simple scripts. This wrapper implements blocking send() wrapper, and two
+recv() wrappers called read() and readline().
+
+=head2 MODULE CODE
+
+ package Curl::Transport;
+
+ use strict;
+ use warnings;
+ use Net::Curl::Easy qw(/^CURLE_/);
+ use base qw(Net::Curl::Easy);
+
+ BEGIN {
+     if ( Net::Curl::LIBCURL_VERSION_NUM() < 0x071202 ) {
+         my $ver = Net::Curl::LIBCURL_VERSION();
+         die "curl $ver does not support send() and recv()";
+     }
+     # alternatively you can write:
+     if ( not Net::Curl::Easy->can( "send" )
+             or not Net::Curl::Easy->can( "recv" ) ) {
+         die "Net::Curl is missing send() and recv()\n"
+     }
+ }
+
+ use constant {
+     B_URI => 0,
+     B_SOCKET => 1,
+     B_VEC => 2,
+     B_READBUF => 3,
+ };
+
+
+ # new( URL ) -- get new object
+ sub new
+ {
+     my $class = shift;
+     my $uri = shift;
+
+     # use an array as our object base
+     my $base = [ $uri, undef, undef, '' ];
+
+     my $self = $class->SUPER::new( $base );
+
+     $self->setopt( Net::Curl::Easy::CURLOPT_URL, $uri );
+     $self->setopt( Net::Curl::Easy::CURLOPT_CONNECT_ONLY, 1 );
+
+     # will die if fails
+     $self->perform();
+
+     $self->[ B_SOCKET ] = $self->getinfo(
+         Net::Curl::Easy::CURLINFO_LASTSOCKET
+     );
+
+     # prepare select vector
+     my $vec = '';
+     vec( $vec, $self->[ B_SOCKET ], 1 ) = 1;
+     $self->[ B_VEC ] = $vec;
+
+     return $self;
+ }
+
+ # send( DATA ) -- send some data, wait for socket availability
+ # if it cannot be sent all at once
+ sub send($$)
+ {
+     my $self = shift;
+     my $data = shift;
+
+     while ( length $data ) {
+         # copy, because select overwrites those values
+         my $w = $self->[ B_VEC ];
+
+         # wait for write
+         select undef, $w, undef, 0;
+
+         # make sure some write bit is set
+         next unless vec( $w, $self->[ B_SOCKET ], 1 );
+
+         # actually send the data
+         my $sent = $self->SUPER::send( $data );
+
+         # remove from buffer what we sent
+         substr $data, 0, $sent, '';
+     };
+ }
+
+ # read( SIZE ) -- read SIZE bytes, wait for more data if there
+ # wasn't enough
+ sub read($$)
+ {
+     my $self = shift;
+     my $size = shift;
+
+     return '' unless $size > 0;
+
+     while ( length $self->[ B_READBUF ] < $size ) {
+         my $r = $self->[ B_VEC ];
+
+         # wait for data
+         select $r, undef, undef, 0;
+
+         # make sure some read bit is set
+         redo unless vec( $r, $self->[ B_SOCKET ], 1 );
+
+         eval {
+             my $l = $self->SUPER::recv( $self->[ B_READBUF ],
+                 $size - length $self->[ B_READBUF ] );
+         };
+         if ( $@ ) {
+             if ( $@ == CURLE_UNSUPPORTED_PROTOCOL ) {
+                 my $uri = $self->[ B_URI ];
+                 warn "Connection to $uri closed: $@\n";
+                 last;
+             } elsif ( $@ == CURLE_AGAIN ) {
+                 warn "nothing to read, this should not happen";
+             } else {
+                 die $@;
+             }
+         }
+     }
+
+     return substr $self->[ B_READBUF ], 0, $size, '';
+ }
+
+ # readline() -- read until $/
+ sub readline($)
+ {
+     my $self = shift;
+
+     # we allow changing $/, but we don't support $/ = undef.
+     local $/;
+     $/ = "\n" unless defined $/;
+
+     my $idx;
+     until ( ( $idx = index $self->[ B_READBUF ], $/ ) >= 0 ) {
+         my $r = $self->[ B_VEC ];
+
+         # wait for data
+         select $r, undef, undef, 0;
+
+         # make sure some read bit is set
+         next unless vec( $r, $self->[ B_SOCKET ], 1 );
+
+         # read 256 bytes, should be enough in most cases
+         eval {
+             $self->SUPER::recv( $self->[ B_READBUF ], 256 );
+         };
+         if ( $@ ) {
+             if ( $@ == CURLE_UNSUPPORTED_PROTOCOL ) {
+                 my $uri = $self->[ B_URI ];
+                 warn "Connection to $uri closed: $@\n";
+                 last;
+             } elsif ( $@ == CURLE_AGAIN ) {
+                 warn "nothing to read, this should not happen";
+             } else {
+                 die $@;
+             }
+         }
+     }
+
+     return substr $self->[ B_READBUF ], 0, ($idx + length $/), '';
+ }
+
+ 1;
+
+=head2 TEST APPLICATION
+
+Sample application using this module could look like this:
+
+ #!perl
+ use strict;
+ use warnings;
+ use Curl::Transport;
+
+ my $host = shift @ARGV || "example.com";
+
+ my $t = Curl::Transport->new( "http://$host" );
+ $t->send( "GET / HTTP/1.0\r\n" );
+ $t->send( "User-Agent: Curl::Transport test\r\n" );
+ $t->send( "Accept: */*\r\n" );
+ $t->send( "Host: $host\r\n" );
+ $t->send( "Connection: Close\r\n" );
+ $t->send( "\r\n" );
+
+ my $length;
+ {
+     local $/ = "\r\n";
+     local $_;
+     do {
+         $_ = $t->readline();
+         $length = 0 | $1 if /Content-Length:\s*(\d+)/;
+         chomp;
+         print "HEADER: $_\n";
+     } while ( length $_ );
+ }
+
+ if ( defined $length ) {
+     print "Reading $length bytes of data:\n";
+     print $t->read( $length );
+
+     print "\nTrying to read one more byte, should fail:\n";
+     print $t->read( 1 );
+     print "\n";
+ } else {
+     print "Don't know how much to read\n";
+     while ( $_ = $t->readline() ) {
+         print;
+     }
+ }
+
+ printf "Last error: %s\n", $t->error();
+
+=cut
+=head1 Multi::Simple
+
+=head4 I<Extracted from C<examples/02-multi-simple.pl>>
+
+This module shows how to use Net::Curl::Multi interface correctly in its
+simpliest form. Uses perl builtin select(). A more advanced code would use
+callbacks and some event library instead.
+
+=head2 Motivation
+
+Writing a proper multi wrapper code requires a rather good understainding
+of libcurl multi interface. This code provides a recipie for those who just
+need something that "simply works".
+
+=head2 MODULE CODE
+
+ package Multi::Simple;
+
+ use strict;
+ use warnings;
+ use Net::Curl::Multi;
+ use base qw(Net::Curl::Multi);
+
+ # make new object, preset the data
+ sub new
+ {
+     my $class = shift;
+     my $active = 0;
+     return $class->SUPER::new( \$active );
+ }
+
+ # add one handle and count it
+ sub add_handle($$)
+ {
+     my $self = shift;
+     my $easy = shift;
+
+     $$self++;
+     $self->SUPER::add_handle( $easy );
+ }
+
+ # perform until some handle finishes, does all the magic needed
+ # to make it efficient (check as soon as there is some data)
+ # without overusing the cpu.
+ sub get_one($)
+ {
+     my $self = shift;
+
+     if ( my @result = $self->info_read() ) {
+         $self->remove_handle( $result[ 1 ] );
+         return @result;
+     }
+
+     while ( $$self ) {
+         my $t = $self->timeout;
+         if ( $t != 0 ) {
+             $t = 10000 if $t < 0;
+             my ( $r, $w, $e ) = $self->fdset;
+
+             select $r, $w, $e, $t / 1000;
+         }
+
+         my $ret = $self->perform();
+         if ( $$self != $ret ) {
+             $$self = $ret;
+             if ( my @result = $self->info_read() ) {
+                 $self->remove_handle( $result[ 1 ] );
+                 return @result;
+             }
+         }
+     };
+
+     return ();
+ }
+
+ 1;
+
+=head2 TEST APPLICATION
+
+Sample application using this module looks like this:
+
+ #!perl
+ use strict;
+ use warnings;
+ use Multi::Simple;
+ use Net::Curl::Share qw(:constants);
+
+
+ sub easy
+ {
+     my $uri = shift;
+     my $share = shift;
+
+     require Net::Curl::Easy;
+
+     my $easy = Net::Curl::Easy->new( { uri => $uri, body => '' } );
+     $easy->setopt( Net::Curl::Easy::CURLOPT_VERBOSE(), 1 );
+     $easy->setopt( Net::Curl::Easy::CURLOPT_URL(), $uri );
+     $easy->setopt( Net::Curl::Easy::CURLOPT_WRITEHEADER(),
+         \$easy->{headers} );
+     $easy->setopt( Net::Curl::Easy::CURLOPT_FILE(),
+         \$easy->{body} );
+     $easy->setopt( Net::Curl::Easy::CURLOPT_SHARE(), $share );
+     return $easy;
+ }
+
+ my $multi = Multi::Simple->new();
+
+ my @uri = (
+     "http://www.google.com/search?q=perl",
+     "http://www.google.com/search?q=curl",
+     "http://www.google.com/search?q=perl+curl",
+ );
+
+ {
+     # share cookies between all handles
+     my $share = Net::Curl::Share->new();
+     $share->setopt( CURLSHOPT_SHARE, CURL_LOCK_DATA_COOKIE );
+     $multi->add_handle( easy( shift ( @uri ), $share ) );
+ }
+
+ my $ret = 0;
+ while ( my ( $msg, $easy, $result ) = $multi->get_one() ) {
+     print "\nFinished downloading $easy->{uri}: $result:\n";
+     printf "Body is %d bytes long\n", length $easy->{body};
+     print "=" x 80 . "\n";
+
+     $ret = 1 if $result;
+
+     $multi->add_handle( easy( shift ( @uri ), $easy->share ) )
+         if @uri;
+ }
+
+ exit $ret;
+
+=cut
+=head1 Multi::Event
+
+=head4 I<Extracted from C<examples/03-multi-event.pl>>
+
+This module shows how to use Net::Curl::Multi interface with an event
+library, AnyEvent in this case.
+
+=head2 Motivation
+
+This is the most efficient method for using Net::Curl::Multi interface,
+but it requires a really good understanding of it. This code tries to show
+the quirks found when using event-based programming.
+
+=head2 MODULE CODE
+
+ package Multi::Event;
+
+ use strict;
+ use warnings;
+ use AnyEvent;
+ use Net::Curl::Multi qw(/^CURL_POLL_/ /^CURL_CSELECT_/);
+ use base qw(Net::Curl::Multi);
+
+ BEGIN {
+     if ( not Net::Curl::Multi->can( 'CURLMOPT_TIMERFUNCTION' ) ) {
+         die "Net::Curl::Multi is missing timer callback,\n" .
+             "rebuild Net::Curl with libcurl 7.16.0 or newer\n";
+     }
+ }
+
+ sub new
+ {
+     my $class = shift;
+
+     # no base object this time
+     # we'll use the default hash
+
+     my $multi = $class->SUPER::new();
+
+     $multi->setopt( Net::Curl::Multi::CURLMOPT_SOCKETFUNCTION,
+         \&_cb_socket );
+     $multi->setopt( Net::Curl::Multi::CURLMOPT_TIMERFUNCTION,
+         \&_cb_timer );
+
+     $multi->{active} = -1;
+
+     return $multi;
+ }
+
+
+ # socket callback: will be called by curl any time events on some
+ # socket must be updated
+ sub _cb_socket
+ {
+     my ( $multi, $easy, $socket, $poll ) = @_;
+     #warn "on_socket( $socket => $poll )\n";
+
+     # Right now $socket belongs to that $easy, but it can be
+     # shared with another easy handle if server supports persistent
+     # connections.
+     # This is why we register socket events inside multi object
+     # and not $easy.
+
+     # deregister old io events
+     delete $multi->{ "r$socket" };
+     delete $multi->{ "w$socket" };
+
+     # AnyEvent does not support registering a socket for both
+     # reading and writing. This is rarely used so there is no
+     # harm in separating the events.
+
+     # register read event
+     if ( $poll == CURL_POLL_IN or $poll == CURL_POLL_INOUT ) {
+         $multi->{ "r$socket" } = AE::io $socket, 0, sub {
+             $multi->socket_action( $socket, CURL_CSELECT_IN );
+         };
+     }
+
+     # register write event
+     if ( $poll == CURL_POLL_OUT or $poll == CURL_POLL_INOUT ) {
+         $multi->{ "w$socket" } = AE::io $socket, 1, sub {
+             $multi->socket_action( $socket, CURL_CSELECT_OUT );
+         };
+     }
+
+     return 1;
+ }
+
+
+ # timer callback: It triggers timeout update. Timeout value tells
+ # us how soon socket_action must be called if there were no actions
+ # on sockets. This will allow curl to trigger timeout events.
+ sub _cb_timer
+ {
+     my ( $multi, $timeout_ms ) = @_;
+     #warn "on_timer( $timeout_ms )\n";
+
+     # deregister old timer
+     delete $multi->{timer};
+
+     my $cb = sub {
+         $multi->socket_action(
+             Net::Curl::Multi::CURL_SOCKET_TIMEOUT
+         );
+     };
+
+     if ( $timeout_ms < 0 ) {
+         # Negative timeout means there is no timeout at all.
+         # Normally happens if there are no handles anymore.
+         #
+         # However, curl_multi_timeout(3) says:
+         #
+         # Note: if libcurl returns a -1 timeout here, it just means
+         # that libcurl currently has no stored timeout value. You
+         # must not wait too long (more than a few seconds perhaps)
+         # before you call curl_multi_perform() again.
+
+         if ( $multi->handles ) {
+             $multi->{timer} = AE::timer 10, 10, $cb;
+         }
+     } else {
+         # This will trigger timeouts if there are any.
+         $multi->{timer} = AE::timer $timeout_ms / 1000, 0, $cb;
+     }
+
+     return 1;
+ }
+
+ # add one handle and kickstart download
+ sub add_handle($$)
+ {
+     my $multi = shift;
+     my $easy = shift;
+
+     die "easy cannot finish()\n"
+         unless $easy->can( 'finish' );
+
+     # Calling socket_action with default arguments will trigger
+     # socket callback and register IO events.
+     #
+     # It _must_ be called _after_ add_handle(); AE will take care
+     # of that.
+     #
+     # We are delaying the call because in some cases socket_action
+     # may finish inmediatelly (i.e. there was some error or we used
+     # persistent connections and server returned data right away)
+     # and it could confuse our application -- it would appear to
+     # have finished before it started.
+     AE::timer 0, 0, sub {
+         $multi->socket_action();
+     };
+
+     $multi->SUPER::add_handle( $easy );
+ }
+
+ # perform and call any callbacks that have finished
+ sub socket_action
+ {
+     my $multi = shift;
+
+     my $active = $multi->SUPER::socket_action( @_ );
+     return if $multi->{active} == $active;
+
+     $multi->{active} = $active;
+
+     while ( my ( $msg, $easy, $result ) = $multi->info_read() ) {
+         if ( $msg == Net::Curl::Multi::CURLMSG_DONE ) {
+             $multi->remove_handle( $easy );
+             $easy->finish( $result );
+         } else {
+             die "I don't know what to do with message $msg.\n";
+         }
+     }
+ }
+
+ 1;
+
+=head2 TEST Easy package
+
+Multi::Event requires Easy object to provide finish() method.
+
+ package Easy::Event;
+ use strict;
+ use warnings;
+ use Net::Curl::Easy qw(/^CURLOPT_/);
+ use base qw(Net::Curl::Easy);
+
+ sub new
+ {
+     my $class = shift;
+     my $uri = shift;
+     my $cb = shift;
+
+     my $easy = $class->SUPER::new(
+         { uri => $uri, body => '', cb => $cb }
+     );
+     $easy->setopt( CURLOPT_URL, $uri );
+     $easy->setopt( CURLOPT_WRITEHEADER, \$easy->{headers} );
+     $easy->setopt( CURLOPT_FILE, \$easy->{body} );
+
+     return $easy;
+ }
+
+ sub finish
+ {
+     my ( $easy, $result ) = @_;
+
+     printf "\nFinished downloading %s: %s: %d bytes\n",
+         $easy->{uri}, $result, length $easy->{body};
+
+     $easy->{cb}->( $easy->{body} );
+ }
+
+ 1;
+
+=head2 TEST APPLICATION
+
+ #!perl
+ use strict;
+ use warnings;
+ use Easy::Event;
+ use Multi::Event;
+ use AnyEvent;
+
+ my $multi = Multi::Event->new();
+ my $cv = AE::cv;
+
+
+ my @uris = (
+     "http://www.google.com/search?q=perl",
+     "http://www.google.com/search?q=curl",
+     "http://www.google.com/search?q=perl+curl",
+ );
+
+
+ my $i = scalar @uris;
+ sub done
+ {
+     my $body = shift;
+
+     # process...
+
+     unless ( --$i ) {
+         $cv->send;
+     }
+ }
+
+ my $timer;
+ $timer = AE::timer 0, 0.1, sub {
+     my $uri = shift @uris;
+     $multi->add_handle( Easy::Event->new( $uri, \&done ) );
+
+     unless ( @uris ) {
+         undef $timer;
+     }
+ };
+
+ $cv->recv;
+
+ exit 0;
+
+=cut
+=head1 Share::Threads
+
+=head4 I<Extracted from C<examples/04-share-threads.pl>>
+
+This module shows how one can share http cookies and dns cache between multiple
+threads.
+
+=head2 Motivation
+
+Threads are evil, but some people think they are not. I want to make them a
+favor and show how bad threads really are.
+
+=head2 Limitations
+
+=over
+
+=item *
+
+Net::Curl::Share is the only package that allows sharing between threads.
+Others (Easy, Multi, Form) are usable only in their creating thread.
+
+=item *
+
+Share internals are always shared between threads, but you must mark your
+base object as shared if you want to use the data elsewhere.
+
+=item *
+
+Shared Net::Curl::Share does not support lock and unlock callbacks.
+However, locking is done internally, so no worries about corruption.
+
+=item *
+
+If we want to share the data, we cannot trigger all downloads at the same
+time, because there would be no data to share at the time. This solution opts
+to lock other downloads until headers from the server are fully received. It
+assures cache coherency, but slows down overall application.
+
+=item *
+
+This method does not reuse persistent connections, it would be much faster
+to get those 6 requests one after another than to doing all 6 in parallel.
+
+=item *
+
+If you share dns cache all connections for one domain will go to the same IP,
+even if domain name resolves to multiple adresses.
+
+=back
+
+=head2 MODULE CODE
+
+ package Share::Threads;
+ use threads;
+ use threads::shared;
+ use Thread::Semaphore;
+ use Net::Curl::Share qw(:constants);
+ use base qw(Net::Curl::Share);
+
+
+ sub new
+ {
+     my $class = shift;
+
+     # we want our private data to be shareable
+     my %base :shared;
+
+     # create a shared share object
+     my $self :shared = $class->SUPER::new( \%base );
+
+     # share both cookies and dns
+     $self->setopt( CURLSHOPT_SHARE, CURL_LOCK_DATA_COOKIE );
+     $self->setopt( CURLSHOPT_SHARE, CURL_LOCK_DATA_DNS );
+
+     # Net::Curl::Share locks each datum automatically, this will
+     # prevent memory corruption.
+     #
+     # we use semaphore to lock share completely
+     $self->{sem} = Thread::Semaphore->new();
+
+     return $self;
+ }
+
+ # this locks way too much, but works as expected
+ sub lock
+ {
+     my $share = shift;
+     $share->{sem}->down();
+     $share->{blocker} = threads->tid();
+ }
+
+ sub unlock
+ {
+     my $share = shift;
+     unless ( exists $share->{blocker} ) {
+         warn "Tried to unlock share that wasn't locked\n";
+         return;
+     }
+     unless ( $share->{blocker} == threads->tid() ) {
+         warn "Tried to unlock share from another thread\n";
+         return;
+     }
+     delete $share->{blocker};
+     $share->{sem}->up();
+ }
+
+ 1;
+
+=head2 TEST Easy package
+
+This Easy::Threads object will block whole share object for duration of dns
+name resolution and until headers are completely received.
+
+ package Easy::Threads;
+ use strict;
+ use warnings;
+ use Net::Curl::Easy qw(/^CURLOPT_.*/);
+ use base qw(Net::Curl::Easy);
+
+ sub new
+ {
+     my $class = shift;
+     my $share = shift;
+
+     my $easy = $class->SUPER::new( { body => '', head => '' } );
+     $easy->setopt( CURLOPT_VERBOSE, 1 );
+     $easy->setopt( CURLOPT_WRITEHEADER, \$easy->{head} );
+     $easy->setopt( CURLOPT_FILE, \$easy->{body} );
+     $easy->setopt( CURLOPT_HEADERFUNCTION, \&cb_header );
+     $easy->setopt( CURLOPT_SHARE, $share );
+
+     return $easy;
+ }
+
+ sub cb_header {
+     my ( $easy, $data, $uservar ) = @_;
+
+     if ( $data eq "\r\n" ) {
+         # we have all the headers now, allow other threads to run
+         $easy->share->unlock()
+             unless $easy->{unlocked};
+
+         $easy->{unlocked} = 1;
+     }
+
+     $$uservar .= $data;
+
+     return length $data;
+ }
+
+ sub get
+ {
+     my $easy = shift;
+     my $uri = shift;
+
+     $easy->setopt( CURLOPT_URL, $uri );
+     $easy->{uri} = $uri;
+     $easy->{body} = '';
+     $easy->{head} = '';
+     delete $easy->{unlocked};
+
+     # lock share
+     $easy->share->lock();
+
+     # ok, now we can request
+     eval {
+         $easy->perform();
+     };
+
+     # There may have been some problem, make sure we unlock the share.
+     # This should issue a warning, check $easy->{unlocked} to see
+     # whether we really need to unlock.
+     $easy->share->unlock();
+
+     # return something
+     return $easy->{body};
+ }
+
+ 1;
+
+=head2 TEST APPLICATION
+
+Sample application using this module looks like this:
+
+ #!perl
+ use threads;
+ use threads::shared;
+ use strict;
+ use warnings;
+ use Share::Threads;
+ use Easy::Threads;
+
+ my $share :shared = Share::Threads->new();
+
+ my @uri = (
+     "http://www.google.com/search?q=perl",
+     "http://www.google.com/search?q=curl",
+     "http://www.google.com/search?q=perl+curl",
+     "http://www.google.com/search?q=perl+threads",
+     "http://www.google.com/search?q=curl+threads",
+     "http://www.google.com/search?q=perl+curl+threads",
+ );
+
+ sub getone
+ {
+     my $uri = shift;
+
+     my $easy = Easy::Threads->new( $share );
+     return $easy->get( $uri );
+ }
+
+ # start all threads
+ my @threads;
+ foreach my $uri ( @uri ) {
+     push @threads, threads->create( \&getone, $uri );
+     threads->yield();
+ }
+
+ # reap all threads
+ foreach my $t ( @threads ) {
+     my $body = $t->join();
+     my $len = length $body;
+     print "DONE: [[[ $len ]]]\n";
+ }
+
+
+=cut
+=head1 Irssi async downloader
+
+=head4 I<Extracted from C<examples/05-irssi-downloader.pl>>
+
+This module implements asynchronous file fetcher for Irssi.
+
+=head2 Motivation
+
+Irssi provides a set of nice io and timer handlers, but using them may be
+painful sometimes. This code provides a working downloader solution.
+
+=head2 Instalation
+
+Save it in your C<~/.irssi/scripts> directory as C<downloader.pl> for instance.
+Make sure module is loaded before any script that may use it.
+
+=head2 MODULE CODE
+
+
+ # Irssi will provide a package name and it must be left unchanged
+ #package Irssi::Script::downloader;
+
+ use strict;
+ use Irssi ();
+ use Net::Curl::Multi qw(/^CURL_POLL_/ /^CURL_CSELECT_/);
+ use base qw(Net::Curl::Multi);
+
+ BEGIN {
+     if ( not Net::Curl::Multi->can( 'CURLMOPT_TIMERFUNCTION' ) ) {
+         die "Net::Curl::Multi is missing timer callback,\n" .
+             "rebuild Net::Curl with libcurl 7.16.0 or newer\n";
+     }
+ }
+
+ sub new
+ {
+     my $class = shift;
+
+     my $multi = $class->SUPER::new();
+
+     $multi->setopt( Net::Curl::Multi::CURLMOPT_SOCKETFUNCTION,
+         \&_cb_socket );
+     $multi->setopt( Net::Curl::Multi::CURLMOPT_TIMERFUNCTION,
+         \&_cb_timer );
+
+     $multi->{active} = -1;
+
+     return $multi;
+ }
+
+
+ sub _cb_socket
+ {
+     my ( $multi, $easy, $socket, $poll ) = @_;
+
+     # deregister old io events
+     if ( exists $multi->{ "io$socket" } ) {
+         Irssi::input_remove( delete $multi->{ "io$socket" } );
+     }
+
+     my $cond = 0;
+     my $action = 0;
+     if ( $poll == CURL_POLL_IN ) {
+         $cond = Irssi::INPUT_READ();
+         $action = CURL_CSELECT_IN;
+     } elsif ( $poll == CURL_POLL_OUT ) {
+         $cond = Irssi::INPUT_WRITE();
+         $action = CURL_CSELECT_OUT;
+     } elsif ( $poll == CURL_POLL_INOUT ) {
+         $cond = Irssi::INPUT_READ() | Irssi::INPUT_WRITE();
+         # we don't know whether it can read or write,
+         # so let libcurl figure it out
+         $action = 0;
+     } else {
+         return 1;
+     }
+
+     $multi->{ "io$socket" } = Irssi::input_add( $socket, $cond,
+         sub { $multi->socket_action( $socket, $action ); },
+         '' );
+
+     return 1;
+ }
+
+
+ sub _cb_timer
+ {
+     my ( $multi, $timeout_ms ) = @_;
+
+     # deregister old timer
+     if ( exists $multi->{timer} ) {
+         Irssi::timeout_remove( delete $multi->{timer} );
+     }
+
+     my $cb = sub {
+         $multi->socket_action(
+             Net::Curl::Multi::CURL_SOCKET_TIMEOUT
+         );
+     };
+
+     if ( $timeout_ms < 0 ) {
+         if ( $multi->handles ) {
+             # we don't know what the timeout is
+             $multi->{timer} = Irssi::timeout_add( 10000, $cb, '' );
+         }
+     } else {
+         # Irssi won't allow smaller timeouts
+         $timeout_ms = 10 if $timeout_ms < 10;
+         $multi->{timer} = Irssi::timeout_add_once(
+             $timeout_ms, $cb, ''
+         );
+     }
+
+     return 1;
+ }
+
+ sub add_handle($$)
+ {
+     my $multi = shift;
+     my $easy = shift;
+
+     die "easy cannot finish()\n"
+         unless $easy->can( 'finish' );
+
+     # Irssi won't allow timeout smaller than 10ms
+     Irssi::timeout_add_once( 10, sub {
+         $multi->socket_action();
+     }, '' );
+
+     $multi->{active} = -1;
+     $multi->SUPER::add_handle( $easy );
+ }
+
+ # perform and call any callbacks that have finished
+ sub socket_action
+ {
+     my $multi = shift;
+
+     my $active = $multi->SUPER::socket_action( @_ );
+     return if $multi->{active} == $active;
+
+     $multi->{active} = $active;
+
+     while ( my ( $msg, $easy, $result ) = $multi->info_read() ) {
+         if ( $msg == Net::Curl::Multi::CURLMSG_DONE ) {
+             $multi->remove_handle( $easy );
+             $easy->finish( $result );
+         } else {
+             die "I don't know what to do with message $msg.\n";
+         }
+     }
+ }
+
+
+ # we use just one global multi object
+ my $multi;
+
+ # put the add() function in some package we know
+ sub Net::Curl::Multi::add($)
+ {
+     unless ( $multi ) {
+         $multi = __PACKAGE__->new();
+     }
+     $multi->add_handle( shift );
+ }
+
+
+ package Irssi::Curl::Easy;
+ use strict;
+ use warnings;
+ use Net::Curl;
+ use Net::Curl::Easy qw(/^CURLOPT_/);
+ use base qw(Net::Curl::Easy);
+
+ my $has_zlib = ( Net::Curl::version_info()->{features}
+     & Net::Curl::CURL_VERSION_LIBZ ) != 0;
+
+ sub new
+ {
+     my $class = shift;
+     my $uri = shift;
+     my $cb = shift;
+
+     my $easy = $class->SUPER::new(
+         { body => '', headers => '' }
+     );
+     # some sane defaults
+     $easy->setopt( CURLOPT_WRITEHEADER, \$easy->{headers} );
+     $easy->setopt( CURLOPT_FILE, \$easy->{body} );
+     $easy->setopt( CURLOPT_TIMEOUT, 300 );
+     $easy->setopt( CURLOPT_CONNECTTIMEOUT, 60 );
+     $easy->setopt( CURLOPT_MAXREDIRS, 20 );
+     $easy->setopt( CURLOPT_FOLLOWLOCATION, 1 );
+     $easy->setopt( CURLOPT_ENCODING, 'gzip,deflate' ) if $has_zlib;
+     $easy->setopt( CURLOPT_SSL_VERIFYPEER, 0 );
+     $easy->setopt( CURLOPT_COOKIEFILE, '' );
+     $easy->setopt( CURLOPT_USERAGENT, 'Irssi + Net::Curl' );
+
+     return $easy;
+ }
+
+ sub finish
+ {
+     my ( $easy, $result ) = @_;
+     $easy->{referer} = $easy->getinfo(
+         Net::Curl::Easy::CURLINFO_EFFECTIVE_URL
+     );
+
+     my $cb = $easy->{cb};
+     $cb->( $easy, $result );
+ }
+
+ sub _common_add
+ {
+     my ( $easy, $uri, $cb ) = @_;
+     if ( $easy->{referer} ) {
+         $easy->setopt( CURLOPT_REFERER, $easy->{referer} );
+     }
+     $easy->setopt( CURLOPT_URL, $uri );
+     $easy->{uri} = $uri;
+     $easy->{cb} = $cb;
+     $easy->{body} = '';
+     $easy->{headers} = '';
+     Net::Curl::Multi::add( $easy );
+ }
+
+ # get some uri
+ sub get
+ {
+     my ( $easy, $uri, $cb ) = @_;
+     $easy->setopt( CURLOPT_HTTPGET, 1 );
+     $easy->_common_add( $uri, $cb );
+ }
+
+ # request head on some uri
+ sub head
+ {
+     my ( $easy, $uri, $cb ) = @_;
+     $easy->setopt( CURLOPT_NOBODY, 1 );
+     $easy->_common_add( $uri, $cb );
+ }
+
+ # post data to some uri
+ sub post
+ {
+     my ( $easy, $uri, $cb, $post ) = @_;
+     $easy->setopt( CURLOPT_POST, 1 );
+     $easy->setopt( CURLOPT_POSTFIELDS, $post );
+     $easy->setopt( CURLOPT_POSTFIELDSIZE, length $post );
+     $easy->_common_add( $uri, $cb );
+ }
+
+ # get new downloader object
+ sub Irssi::downloader
+ {
+     return __PACKAGE__->new();
+ }
+
+=head2 EXAMPLE SCRIPT
+
+This script will load downloader module automatically, if it has been
+named C<downloader.pl>.
+
+ use strict;
+ use warnings;
+ use Irssi;
+ use IO::File;
+ use URI::Escape;
+
+ Irssi::command( '/script load downloader.pl' );
+
+ sub got_body
+ {
+     my ( $window, $easy, $result ) = @_;
+     if ( $result ) {
+         warn "Could not download $easy->{uri}: $result\n";
+         return;
+     }
+
+     my @found;
+     while ( $easy->{body} =~ s#<h2\s+class=sr><a\s+href="(.*?)">
+             <b>(.*?)</b></a></h2>##x ) {
+         my $uri = $1;
+         $_ = $2;
+         s/&#(\d+);/chr $1/eg;
+         chomp;
+         push @found, $_;
+     }
+     @found = "no results" unless @found;
+     my $msg = "CPAN search %9$easy->{args}%n: "
+         . (join "%9;%n ", @found);
+     if ( $window ) {
+         $window->print( $msg );
+     } else {
+         Irssi::print( $msg );
+     }
+ }
+
+ sub cpan_search
+ {
+     my ( $args, $server, $window ) = @_;
+
+     my $query = uri_escape( $args );
+     my $uri = "http://search.cpan.org/search?query=${query}&mode=all";
+     my $easy = Irssi::downloader();
+     $easy->{args} = $args;
+     $easy->get( $uri, sub { got_body( $window, @_ ) } );
+ }
+
+ Irssi::command_bind( 'cpan', \&cpan_search );
+
+
+=cut

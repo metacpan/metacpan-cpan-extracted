@@ -1,0 +1,25 @@
+=pod
+
+Nexus::REST - Thin wrapper around Sonatype's Nexus REST API
+
+CAUTION - THIS IS STILL ALPHA CODE
+
+L<Nexus|http://www.sonatype.org/nexus/> is an artifact repository manager
+from L<Sonatype|http://www.sonatype.com/>.
+
+This module is a thin wrapper around Nexus's REST API:
+
+=over
+
+=item * L<Core API|https://repository.sonatype.org/nexus-restlet1x-plugin/default/docs/index.html>
+
+=item * L<Indexer Lucene Plugin|https://repository.sonatype.org/nexus-indexer-lucene-plugin/default/docs/index.html>
+
+=back
+
+Copyright (c) 2014 by CPqD (http://www.cpqd.com.br/)
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

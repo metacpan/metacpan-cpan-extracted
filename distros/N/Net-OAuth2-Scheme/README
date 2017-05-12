@@ -1,0 +1,27 @@
+
+
+This archive contains the distribution Net-OAuth2-Scheme,
+
+  Token scheme definition framework for OAuth 2.0
+
+This is a token/token-scheme description framework to be shared
+amongst clients, authorization servers, and resource servers.  It
+specifies the transport/formatting/encoding and the secret-sharing
+protocol -- basically everything you need in order to be able to
+create, use, and validate tokens, i.e., beyond what's actually 
+spelled out in the OAuth2 spec itself.
+
+Build/install in the usual way
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+See Net::OAuth2::Scheme and Net::OAuth2::Scheme::Factory
+for actual documentation.
+
+This software is copyright (c) 2012 by Roger Crew.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

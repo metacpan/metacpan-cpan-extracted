@@ -1,0 +1,6 @@
+Revision history for Perl extension NCAR.
+
+0.01  Sat Apr  5 09:55:12 2003
+	- original version; created by h2xs 1.20 with options
+		-A -n NCAR
+

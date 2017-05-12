@@ -1,0 +1,51 @@
+Net-CSTAv3-Client version 0.01
+==============================
+
+DESCRIPTION
+
+This module implements (a part of) the Computer Supported Telecommunications
+Applications (CSTA) protocol. It enables you to write perl programs which can
+communicate with your Private Branch eXchange device (PBX) to, for example,
+monitor calls to and from your own network.
+
+Even though the CSTA protocol is defined in ECMA standards, vendors seem to
+implement customized versions of it. This module was developed for a Siemens
+HiPath PBX, most of the specification was obtained from the documentation of
+the "Siemens HiPath OpenOffice" unit - available at
+L<http://wiki.siemens-enterprise.com/index.php/HiPath_OpenOffice_ME_Offene_Schnittstellen>.
+
+For now this module only implements a small subset of the functionality offered
+by CSTA / Siemens' CSTA implementation - expect it to grow in future versions. :-)
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp
+  Convert::ASN1::asn1c
+
+Of course to make use of this module you will need to have access to a PBX
+which implements the CSTA phase 3 protocol. This module was developed for /
+only tested with a Siemens HiPath PBX, so your results may vary.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Timo Schneider
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

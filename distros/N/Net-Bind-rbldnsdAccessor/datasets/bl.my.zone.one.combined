@@ -1,0 +1,24 @@
+$DATASET ip4set @
+:127.0.0.2:blocked, See: http://www.my.zone.one/lookup.cgi?page=lookup&lookup=$
+#$TTL 600
+#$SOA 600 bl.my.zone.one. sysadm.my.zone.one. 1160938802 43200 900 172800 43200
+#$TTL 43200
+4.5.57.14
+4.17.80.0-255
+4.17.81.0-255
+4.17.107.0-255
+4.18.153.144
+4.18.247.50
+4.22.201.169
+4.23.173.99
+4.24.85.142
+4.26.109.213
+4.26.116.6
+4.26.174.0-255
+127.0.0.2:127.0.0.2:blocked, See: http://www.my.zone.one/lookup.cgi?page=lookup&lookup=$
+127.0.0.3:127.0.0.3:valid response for remote DNSBL additions
+235.223.81.0-255
+#$NS 43200 bl.my.zone.one. ns1.nameserver.net. ns4.nameserver.net.
+$DATASET generic @
+@ 43200 A 10.6.112.224
+@ 43200 A 10.6.112.226

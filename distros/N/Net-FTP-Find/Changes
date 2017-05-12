@@ -1,0 +1,39 @@
+Revision history for Perl extension Net::FTP::Find
+
+0.041   Sun Mar 24 11:56:11 JST 2013
+		- Revised tests.
+		- Document is updated.
+
+0.040   Sun Mar 24 10:52:42 JST 2013
+        - Use "MLSD" to retrieve entries if a server is supporting.
+        - Enabled to use with "Net::FTPSSL".
+		- Document is updated.
+		- Fix some minor bugs.
+		
+0.034   Thu Mar 21 08:42:25 JST 2013
+        - Return empty list from "find" and "finddepth" if getting error.
+		
+0.033   Thu Mar 21 05:47:51 JST 2013
+        - Add "/" when calling Net::FTP::dir for some servers.
+		
+0.032   Wed Mar 20 14:17:35 JST 2013
+        - Revised parseing filelist fall back routine.
+
+0.031   Wed Mar 20 10:51:20 JST 2013
+        - Enabled to parse filelist that has month suffix.
+		
+0.03    Wed Mar 20 10:04:20 JST 2013
+        - Parse filelist by File::Listing.
+		  Enabled to traverse directory in IIS FTP server by this change.
+		- Fix some minor bugs.
+
+0.02    Tue Mar 19 18:02:15 JST 2013
+        - Enabled to specify relative path to a target.
+        - Enabled to traverse directory in some FTP server that is not returning
+		  an information about ".".
+
+0.011   Sun Jan  3 15:24:41 JST 2010
+        - Specified the required version for test.
+
+0.01    Sun Dec 27 06:23:10 2009
+        - original version

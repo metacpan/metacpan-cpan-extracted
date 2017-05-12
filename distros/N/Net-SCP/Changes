@@ -1,0 +1,43 @@
+Revision history for Perl extension Net::SCP.
+
+0.08  Fri Oct 26 16:23:30 PDT 2007
+	- Fix mkdir error message and extraneous warning, patch from Ofer Nave
+	  <onave@bizrate.com>, thanks!
+        - Remove quit from the SYNOPSIS, and add a no-op quit method anyway,
+          for the sake of being an easier Net::FTP replacement.  Thanks to
+          Zak Zebrowski <zakzebrowski@yahoo.com>, tvilliers at Lastminute.com,
+          Joe Smith <joe@inwap.com> and others for the pointer.
+          Closes: CPAN #14803
+        - Fix unused "interactive" option in new method.  Huh.  Thanks to
+          John L. Utz III <utz@singingfish.com>.
+        - Document need to log into boxes once first.
+        - Add links to the more current stuff on CPAN.
+        - Patch to prevent an active CHLD reaper from picking up our ssh
+          process from from peterspeltz@yahoo.com.  Closes: CPAN#19189
+        - Documentation patch about ssh-keygen from terrence brannon
+          <tbone@directsynergy.com>
+
+0.07  Wed Mar  3 00:38:25 2004
+	- get and put methods use OO-style scp to avoid clobbering errstr,
+	  thanks to paguerlais@airfrance.fr
+	- remove extraneous warn
+
+0.06  Sat Apr 13 15:16:56 2002
+	- mkdir method added by Anthony Awtrey <tony@awtrey.com>
+
+0.05  Wed Oct 24 03:49:06 2001
+	- documentation update
+
+0.04  Wed Feb 07 10:26:11 2000
+        - fixed silly scp problem, thanks to Dan McCormick <danmcc@metro.net>
+
+0.03  Mon Feb 05 07:02:34 2000
+	- fixed documentation errors and iscp/issh problems from merge
+
+0.02  Fri Dec 08 16:03:00 2000
+	- applied patch from Anthony Deaver; cleanups & better error checking
+	- applied patch from Jon Gunnip; fixes size() method
+
+0.01  Tue Aug  8 20:34:28 2000
+	- original version; created by h2xs 1.19
+

@@ -1,0 +1,38 @@
+---
+abstract: 'Twitter Authorizer'
+author:
+  - 'ytnobody <ytnobody@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.6.3, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: NephiaX-Auth-Twitter
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  NephiaX::Auth::Twitter:
+    file: lib/NephiaX/Auth/Twitter.pm
+    version: 0.01
+requires:
+  Nephia: 0
+  Net::Twitter::Lite::WithAPIv1_1: 0
+resources:
+  bugtracker: https://github.com/nephia/NephiaX-Auth-Twitter/issues
+  homepage: https://github.com/nephia/NephiaX-Auth-Twitter
+  repository: git://github.com/nephia/NephiaX-Auth-Twitter.git
+version: 0.01

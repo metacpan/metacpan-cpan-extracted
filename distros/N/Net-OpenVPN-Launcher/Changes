@@ -1,0 +1,58 @@
+Revision history for Net-OpenVPN-Launcher
+
+0.12    2013/11/17
+        - Updated POD.
+
+0.11    24/8/2013
+        - Corrected SKIP block in t/Launcher.t.
+
+0.1     21/8/2013
+        - Added skip block to Launcher.t.
+
+0.09    14/8/2013
+        - Changed IPC::Cmd run_forked as it was leaving zombie processes.
+
+0.08    14/8/2013
+        - Changed exec to IPC::Cmd run_forked.
+        - Updated POD in Launcher.pm.
+
+0.07    13/8/2013
+        - Added use warnings.
+        - Changed from 'forking open' to fork and exec to fix pid issue.
+
+0.06    11/8/2013
+        - Added "can_run" check to check that openvpn is installed.
+        - Updated makefile dependencies.
+
+0.05    4/8/2013
+        - Renamed module from Net::OpenVPN::ProxyManager to Net::OpenVPN::Launcher.
+        - Added Method::Signatures dependency and converted start, stop and restart methods.
+        - Updated test file Launcher.t.
+
+
+0.04    3/8/2013
+        - Fixed connect and disconnect methods to avoid zombie processes.
+        - Removed ProxyManager::HMA and ProxyManager::Config objects.
+        - Removed unnecessary methods _test_openvpn, create_config.
+        - Updated connect to use filepath to an openvpn config file.
+        - Converted from Moose to Moo.
+        - Changed to make maker from Module::Build.
+        - Removed Capture::Tiny dependency.
+
+0.031   24/2/2013
+        - Updated POD.
+
+0.03    23/2/2013
+        - Added DEMOLISH method to ensure the closing of child processes (e.g. openvpn connections) before object destruction. 
+        - Updated the connect method to check for an existing connection and disconnect from it if required. Updated dependency metadata. 
+
+0.02    16/2/2013
+        - Added a disconnect() method.
+        - Changed the connect/disconnect model to a forking approach to allow multiple connections to be established and dropped by a single Perl program.
+
+0.011   16/2/2013
+        - Added hyperlinks to documentation.
+        - Renamed BUILD.PL to Build.PL as per CPAN installation bug-fix.
+
+0.01    3/2/2013
+        - ProxyManager class with test_openvpn, create_config, connect methods. 

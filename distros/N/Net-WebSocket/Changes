@@ -1,0 +1,56 @@
+Revision history for Perl module Net::WebSocket
+
+0.01 Wed Mar 22 2017
+- Initial release
+
+0.02 Thu Mar 23 2017
+- Add this Changes file. :)
+
+- BREAKING: Rename Endpoint “timeout” method to “check_heartbeat”.
+
+- Fix missing Call::Context dependency.
+
+0.021 Thu Mar 23 2017
+- Remove stray Call::Always usage in tests
+
+0.03
+- BREAKING: Endpoint’s “out” parameter must now be an instance of
+  IO::Framed::Write (or implement the same behavior).
+
+- BREAKING: Parse’s parameter must now implement IO::Framed::Read.
+
+- BREAKING: Because we now farm the I/O out to IO::Framed
+  (or whatever replacement class you may prefer), some of the thrown
+  exceptions are changed:
+
+    Net::WebSocket::X::ReadFilehandle is gone. If you use IO::Framed,
+    you’ll now receive IO::Framed::X::ReadError
+
+    Net::WebSocket::X::EmptyRead is gone. If you use IO::Framed,
+    you’ll now receive IO::Framed::X::EmptyRead.
+
+- BREAKING: I’ve removed the before_send_control_frame() handler.
+
+- Net::WebSocket::Parser now instantiates the “target” frame class object,
+  not the base Net::WebSocket::Frame class.
+
+- Removed the Bytes::Random::Secure::Tiny dependency. It doesn’t seem we
+  really need cryptographically strong random numbers for masking or
+  handshakes.
+
+- Frame I/O logic is now distributed separately as IO::Framed. It’s not
+  a strict dependency of this library, but you’re probably going to want
+  it nonetheless, unless you want to reimplement that logic yourself.
+
+- EINTR-trapping logic is now distributed separatedly as IO::SigGuard.
+  (… which is used in IO::Framed)
+
+- Added documentation for Net::WebSocket::Streamer
+
+- Refactor ping handling behavior into its own module. It could be
+  reusable potentially?
+
+- Demos now favor IO::Events.
+
+- Shell server demo now included. Hook it up to a nice JavaScript terminal
+  emulator like xterm.js, and impress all your friends. :)

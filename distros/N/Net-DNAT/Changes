@@ -1,0 +1,83 @@
+Changes
+=======
+
+0.13  Sat Apr 12 13:00 2003
+	- Allow numbers in domains for host_switch_table.
+	- Newer Net::Ping avoids this rare but fatal crash:
+	  "tcp connect error - Network is unreachable"
+
+0.12  Tue Apr 01 13:00 2003
+	- Allow "-" in domains for host_switch_table.
+
+0.11  Web Mar 06 19:00 2003
+	- Add Net::Ping periodic pool port prober to reduce
+	  chances of connecting to a down or offline node.
+	- Thanks to earl@cpan.org (Earl Cahill).
+	- Allow special case for a single pool destination
+	  to be passed for the pools setting.
+	- When there is only one pool, assume that is the
+	  default_pool if none is specified.
+
+0.10  Tue Feb 25 21:00 2003
+	- A few compatibility fixes for Apache::DNAT
+	  under Apache 2.x (mod_perl 1.99).
+
+0.09  Wed Jan 29 20:00 2003
+	- Fix this fatal crash introduced in 0.08:
+	  Can't locate object method "close" via package
+	  "Net::Server::Multiplex::MUX"
+
+0.08  Sat Jan 25 23:00 2003
+	- More gracefully deal with the condition when
+	  one side of the tunnel is dropped while data
+	  is still being shoved down the other side.
+	- Small documentation improvements.
+
+0.07  Mon Sep 30 12:00:00 2002
+	- Add Net::Apache::Unport fixup handler
+	  to correct the UseCanonicalName effects
+	  of self-referencing URL contruction
+	  for servers on non-standard ports.
+	- Fixed the problem when directory
+	  requests without the trailing '/'
+	  location bounce to the wrong URL.
+	- Spot by earl@cpan.org (Earl Cahill).
+
+0.06  Thu May 23 12:00:00 2002
+	- Add INSTALL doc for better help.
+	- Add mod_perl prereq hint in Makefile.PL
+	- Avoid crashing server when a pool drops,
+	  but still log when it occurs.
+
+0.05  Wed May 22 12:00:00 2002
+	- Remove VERSION from Apache::DNAT.
+	- Removing heavy forced debugging.
+	- Requires more robust Net::Server release.
+	- More helpful demo configurations.
+	- More general noarch RPM.
+
+0.04  Thu Apr 12 10:00:00 2002
+	- Fix CPAN magic VERSION setting.
+	- Ignore leading blank lines of request
+	  to behave more like Apache does.
+	- Use default_pool for unrecognized requests.
+	- Only HTTP (1.0 and 1.1) protocol
+	  browsers supported at this time.
+
+0.03  Thu Apr 11 17:00:00 2002
+	- Trim down Apache::DNAT to avoid
+	  bloating apache memory too much.
+	- Added more examples.
+	- Improve spec for rpm.
+	- (not released)
+
+0.02  Sat Apr 06 20:00:00 2002
+	- Highly experimental release
+	- Barely functional for HTTP protocol
+	- Force all HTTP/1.1 to HTTP/1.0
+	- Apache::DNAT to UnNATify the source
+	  port and IP for CGIs and logging
+
+0.01  Sun Jan 27 19:04:21 2002
+	- original version; created by h2xs 1.20 with options
+		-X Net::DNAT

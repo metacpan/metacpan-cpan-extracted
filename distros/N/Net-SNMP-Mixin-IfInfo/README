@@ -1,0 +1,108 @@
+NAME
+    Net::SNMP::Mixin::IfInfo - mixin class for interface related infos
+
+VERSION
+    Version 0.07
+
+SYNOPSIS
+      use Net::SNMP;
+      use Net::SNMP::Mixin;
+
+      my $session = Net::SNMP->session( -hostname => 'foo.bar.com' );
+
+      $session->mixer('Net::SNMP::Mixin::IfInfo');
+      $session->init_mixins;
+      snmp_dispatcher();
+      $session->init_ok();
+      die $session->errors if $session->errors;
+
+      my $if_entries = $session->get_if_entries;
+      foreach my $if_index ( sort { $a <=> $b } keys %$if_entries ) {
+        my $ifAdminStatus = $if_entries->{$if_index}->{ifAdminStatus} || 0;
+        my $ifOperStatus  = $if_entries->{$if_index}->{ifOperStatus}  || 0;
+        my $ifType        = $if_entries->{$if_index}->{ifType}        || 0;
+        my $ifName        = $if_entries->{$if_index}->{ifName}        || '';
+        my $ifDescr       = $if_entries->{$if_index}->{ifDescr}       || '';
+        my $ifAlias       = $if_entries->{$if_index}->{ifAlias}       || '';
+
+        printf "%5d  %1d/%1d  %-10.10s %-25.25s %-26.26s\n",
+          $if_index, $ifAdminStatus, $ifOperStatus,
+          $ifName,   $ifDescr,       $ifAlias;
+      }
+
+DESCRIPTION
+    A mixin class for basic interface related infos from the ifTable and
+    ifXTable.
+
+    This mixin supports the quasi static information from both tables
+    together in one hash, see below.
+
+MIXIN METHODS
+  OBJ->get_if_entries
+    Returns parts ot the ifTable and ifXTable as a hash reference. The key
+    is the common ifIndex into the ifTable and ifXtable:
+
+      {
+        INTEGER => {    # ifIndex as key
+
+          ifName        => DisplayString,    # an ifXTable entry
+          ifAlias       => DisplayString,    # an ifXTable entry
+
+          ifDescr       => DisplayString,    # an ifTable entry
+          ifType        => IANAifType,       # an ifTable entry
+          ifAdminStatus => INTEGER,          # an ifTable entry
+          ifOperStatus  => INTEGER,          # an ifTable entry
+        }
+
+        ... ,
+      }
+
+INITIALIZATION
+  OBJ->_init($reload)
+    Fetch basic interface related snmp values from the host. Don't call this
+    method direct!
+
+PRIVATE METHODS
+    Only for developers or maintainers.
+
+  _fetch_if_table_entries($session)
+    Get some MIB values from the ifTable needed by all other modules.
+
+  _if_table_entries_cb($session)
+    The callback for _fetch_if_table_entries
+
+  _fetch_if_x_table_entries($session)
+    Get some MIB values from the ifXTable needed by all other modules.
+
+  _if_x_table_entries_cb($session)
+    The callback for _fetch_if_x_table_entries
+
+SEE ALSO
+    Net::SNMP::Mixin::Dot1dBase for a mapping between ifIndexes and
+    dot1dBasePorts.
+
+REQUIREMENTS
+    Net::SNMP, Net::SNMP::Mixin
+
+BUGS, PATCHES & FIXES
+    There are no known bugs at the time of this release. However, if you
+    spot a bug or are experiencing difficulties that are not explained
+    within the POD documentation, please submit a bug to the RT system (see
+    link below). However, it would help greatly if you are able to pinpoint
+    problems or even supply a patch.
+
+    Fixes are dependant upon their severity and my availablity. Should a fix
+    not be forthcoming, please feel free to (politely) remind me by sending
+    an email to gaissmai@cpan.org .
+
+      RT: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-SNMP-Mixin-IfInfo
+
+AUTHOR
+    Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
+
+COPYRIGHT & LICENSE
+    Copyright 2008-2016 Karl Gaissmaier, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

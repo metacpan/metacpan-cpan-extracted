@@ -1,0 +1,26 @@
+---
+abstract: 'Adapter to use oFono controlled modems from Net::Radio::Modem'
+author:
+  - 'Jens Rehsack <rehsack@cpan.org>'
+build_requires:
+  Test::More: 0.9
+configure_requires:
+  Module::Build: 0.4
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Radio-Modem-Adapter-oFono
+provides:
+  Net::Radio::Modem::Adapter::oFono:
+    file: lib/Net/Radio/Modem/Adapter/oFono.pm
+    version: 0.001
+requires:
+  Net::Radio::Modem: 0.001
+  Net::Radio::oFono: 0.001
+  perl: 5.01
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.001

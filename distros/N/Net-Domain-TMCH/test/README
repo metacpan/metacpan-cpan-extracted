@@ -1,0 +1,16 @@
+
+2013-11-07 Mark Overmeer
+
+If you want to run these tests, then
+
+  1. cd test
+     tar xf testset-*.tar
+     cd ..
+
+  2.
+     for f in test/testset-*/tmv-cert-revoked/*
+     do
+        bin/tmch --smdrl test/testset-*/smd-revocation-en.csv \
+                 --pilot check $f
+     done
+

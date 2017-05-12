@@ -1,0 +1,30 @@
+Revision history for Net-Async-Statsd
+
+0.004     2016-12-27 20:34:39+08:00 Asia/Kuala_Lumpur
+	New features:
+	* Server protocol accepts (and ignores) extra information on a line, such as
+	tags or comments
+
+0.004     2014-08-29 06:16:01+01:00 Europe/London
+	New features:
+	* Support for prefix option in client
+
+0.003     2014-08-27 03:50:57+01:00 Europe/London
+	No new features
+
+	Bugs fixed:
+	* Retain the queue_stat Future to avoid ->then in void context,
+	as a precaution for when UDP ->send gains the ability to resolve the
+	future on completion
+
+	Dependency fixes:
+	* sum0 is a relatively new addition to List::Util
+
+0.002     2014-08-09 18:25:21+01:00 Europe/London
+	No new features
+
+	Dependency fixes:
+	* Added IO::Socket::IP to cpanfile
+
+0.001     2014-08-04 15:44:06+01:00 Europe/London
+	Initial CPAN release

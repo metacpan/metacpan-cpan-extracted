@@ -1,0 +1,46 @@
+Net-NSCA-Client 0.009002
+========================
+
+INSTALLATION
+------------
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+SCRIPTS
+-------
+
+This distribution comes with useful scripts in the `bin/` directory which
+you may want to use.
+
+SUPPORT AND DOCUMENTATION
+-------------------------
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::NSCA::Client
+
+You can also look for information at:
+
+*   [RT, CPAN's request tracker](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-NSCA-Client)
+
+*   [CPAN Ratings](http://cpanratings.perl.org/d/Net-NSCA-Client)
+
+*   [Search CPAN](http://search.cpan.org/dist/Net-NSCA-Client)
+
+COPYRIGHT AND LICENCE
+---------------------
+
+Copyright 2009 Douglas Christopher Wilson.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of either:
+
+*   the GNU General Public License as published by the Free Software Foundation;
+    either version 1, or (at your option) any later version, or
+*   the Artistic License version 2.0.

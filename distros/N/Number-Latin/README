@@ -1,0 +1,150 @@
+README for Number::Latin
+                                        Time-stamp: "2001-02-22 16:13:10 MST"
+
+			    Number::Latin
+
+[Partially excerpted from the POD.]
+NAME
+     Number::Latin -- convert to/from the number system "a,b,...z,aa,ab..."
+
+SYNOPSIS
+       use Number::Latin;
+       print join(' ', map int2latin($_), 1 .. 30), "\n";
+        #
+        # Prints:
+        #  a b c d e f g h i j k l m n o p q r s t u v w x y z aa ab ac ad
+
+DESCRIPTION
+     Some applications, notably the numbering of points in
+     outlines, use a scheme that starts with the letter "a", goes
+     to "z", and then starts over with "aa" thru "az", then "ba",
+     and so on.  (The W3C refers to this numbering system as
+     "lower-latin"/"upper-latin" or "lower alpha"/"upper alpha",
+     in discussions of HTML/CSS options for rendering of list
+     elements (OL/LI).)
+
+     This module provides functions that deal with that numbering
+     system, converting between it and integer values.
+
+     FUNCTIONS
+
+     This module exports four functions, int2latin, int2Latin,
+     int2LATIN, and latin2int:
+
+     $latin = int2latin( INTEGER )
+          This returns the INTEGERth item in the sequence ('a' ..
+          'z', 'aa', 'ab', etc).  For example, int2latin(1) is
+          "a", int2latin(2) is "b", int2latin(26) is "z",
+          int2latin(30) is "ad", and so for any nonzero integer.
+
+     $latin = int2Latin( INTEGER )
+          This is just like int2latin, except that the return
+          value is has an initial capital.  E.g., int2Latin(30)
+          is "Ad".
+
+     $latin = int2LATIN( INTEGER )
+          This is just like int2latin, except that the return
+          value is in all uppercase.  E.g., int2LATIN(30) is
+          "AD".
+
+     $latin = latin2int( INTEGER )
+          This converts back from latin number notation
+          (regardless of capitalization!) to an integer value.
+          E.g., latin2int("ad") is 30.
+
+NOTES
+     The latin numbering system is not to be confused with Roman
+     numerals, in spite of their names.
+
+     The latin numbering system isn't a normal base-N number
+     system (thus making this module necessary), as evidenced by
+     the fact that the item after "z" is "aa".  If you considered
+     this to be a base-26 numbering system (running from a-z for
+     0-25), then after "z" would be "ba"; if you considered it a
+     base-27 numbering system (running from a-z for 1-26), then
+     after "z" would be "a" followed by some sort of placeholder
+     zero.  But it's neither.
+
+     I vaguely remember reading, years ago, of some languages (in
+     New Guinea?) with count-number systems that work like the
+     latin number system -- i.e., where either the number after
+     "nine" is "one-MULT one", or the number after "ten" is
+     "one-MULT one".  However, I haven't been able to find a
+     reference for exactly what language(s) those were number
+     system; I welcome email on the subject.
+
+COPYRIGHT
+     Copyright (c) 1997- by Abigail, and 2001- Sean M. Burke.
+     All rights reserved.
+
+     This library is free software; you can redistribute it
+     and/or modify it under the same terms as Perl itself.
+
+SEE ALSO
+     the Roman manpage
+
+     http://www.w3.org/TR/REC-CSS2/generate.html#lists
+
+     http://people.netscape.com/ftang/i18n.html
+
+     http://people.netscape.com/ftang/number/draft.html
+
+AUTHOR
+     Initial implementation in a comp.lang.perl.misc post by
+     Abigail (abigail@foad.org) in 1997.  Documentation, further
+     doings, and current maintenance by Sean M. Burke,
+     sburke@cpan.org
+
+[End of POD excerpt]
+
+PREREQUISITES
+
+This suite requires Perl 5; I've only used it under Perl 5.004 and
+higher, so for anything lower, you're on your own.
+
+Number::Latin doesn't use any nonstandard modules.
+
+
+INSTALLATION
+
+You install Number::Latin, as you would install any perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of Number::Latin in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL LIB=~/perl
+
+Or see perldoc perlmodinstall
+
+
+DOCUMENTATION
+
+POD-format documentation is included in Latin.pm.  POD is readable
+with the 'perldoc' utility.  See ChangeLog for recent changes.
+
+
+MACPERL INSTALLATION NOTES
+
+You needn't bother with the makefiles.  Just make a Number directory
+in your MacPerl site_lib or lib directory, and move Latin.pm into
+there.
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+Number::Latin should just be sent to me at sburke@cpan.org
+
+
+AVAILABILITY
+
+The latest version of Number::Latin is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN/> to find a CPAN site near you.

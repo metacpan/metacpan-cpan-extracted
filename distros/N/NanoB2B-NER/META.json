@@ -1,0 +1,44 @@
+{
+   "abstract" : "lib/NanoB2B/NER.pm",
+   "author" : [
+      "Megan Charity <charityml@vcu.edu, Bridget McInnes <btmcinnes@vcu.edu"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "NanoB2B-NER",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Path" : "0",
+            "List::MoreUtils" : "0",
+            "MetaMap::DataStructures" : "0.03",
+            "Term::ANSIColor" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01"
+}

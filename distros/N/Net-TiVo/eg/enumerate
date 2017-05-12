@@ -1,0 +1,22 @@
+#!/usr/bin/perl 
+# $Id: enumerate 56 2007-01-10 14:41:53Z boumenot $
+# Christopher Boumenot <boumenot@gmail.com>
+
+use Net::TiVo;
+use Net::TiVo::Show;
+use Net::TiVo::Folder;
+#use Log::Log4perl;
+#Log::Log4perl->easy_init($DEBUG);
+
+my $tivo = Net::TiVo->new(host => $ENV{TIVO_HOST},
+                          mac  => $ENV{TIVO_MAC});
+
+my $bullet = 1;
+for my $f ($tivo->folders()) {
+    for my $s ($f->shows()) {
+        my $bullet_string = sprintf("[%d]%s",
+                $bullet, (" " x (4-length($bullet))));
+        print $bullet_string, $s->as_string(),"\n";
+        $bullet++;
+    }
+}

@@ -1,0 +1,21 @@
+Revision history for NetHack-PriceID
+
+0.05  2014-07-22
+        Fix HiSPeed's NetHack Helper link
+
+0.04    Fri Jun 5 00:19:27 2009
+        Modernize the dist
+        Add tools and armor to the type doc
+        Add ordinary helmets
+
+0.03    Mon Sep 24 21:40:58 2007
+        Add tools (subtypes: lamp, bag, flute, horn)
+        Add armor (subtypes: cloak, helmet, gloves, boots)
+
+0.02    Sun Sep 23 13:57:46 2007
+        Now includes a priceid script.
+        Apparently 5.10 doesn't automatically load Carp for you.
+
+0.01    Sat Sep 23 00:56:41 2007
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,12 @@
+Revision history for Perl extension Number::Phone:Normalize.
+
+0.220 (2010-01-20)
+	- release 
+
+0.21_20091221 Mon Dec 21 00:00::00 2009
+	- switch to Module::Build
+	- no non-ASCII chars in POD
+	- POD tests
+
+0.20 Sun Sep 14 00:00:00 2008
+	- first release version

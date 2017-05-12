@@ -1,0 +1,30 @@
+I have released version 0.02 of Net::Traceroute6 to CPAN and my home
+page.  My home page is currently http://www.dante.org.uk/~janos/ .  
+I hope you find the module useful.
+
+This traceroute6 module works by parsing your vendor's traceroute or 
+traceroute6 command.  
+On some system is known to work:
+*BSD (FreeBSD 4.0 or later, NetBSD 1.5 or later. OpenBSD 2.8 and later) 
+	+ any KAME patched BSD
+Solaris 8 or later
+
+Patches to support your favorite OS are welcome.
+
+Janos Mohacsi
+janos.mohacsi@dante.org.uk
+
+Example:
+	   use Net::Traceroute6;
+	   $tr = Net::Traceroute6->new(host=> "www.kame.net", debug => 1);
+	   if($tr->found) {
+	       my $hops = $tr->hops;
+	       print "Number of hops:" . $hops . "\n";
+	       for (my $i=1; $i<=$hops ;$i++) {
+		for (my $ii=1; $ii<4; $ii++) {
+		  if ( $tr->hop_query_stat($i, $ii)==TRACEROUTE_OK ){
+		   print "Router was" . $tr->hop_query_host( $i, $ii) . " \n";
+		  }
+		}
+	       }
+	   }

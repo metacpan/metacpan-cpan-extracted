@@ -1,0 +1,60 @@
+{
+   "abstract" : "Generate and send Netgear Telnet-enable packets through Net::Telnet",
+   "author" : [
+      "Roberto Frenna <robertof@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Telnet-Netgear",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Crypt::Blowfish" : "0",
+            "Crypt::ECB" : "0",
+            "Digest::MD5" : "0",
+            "IO::Socket::INET" : "0",
+            "MIME::Base64" : "0",
+            "Net::Telnet" : "0",
+            "Scalar::Util" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Robertof/perl-net-telnet-netgear/issues"
+      },
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/Robertof/perl-net-telnet-netgear"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

@@ -1,0 +1,24 @@
+---
+abstract: 'LDAP filter to SQL clause transformer'
+author:
+  - 'Tim Esselens <tim.esselens@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-LDAP-Filter-SQL
+requires:
+  Net::LDAP::Filter: 0
+  Test::Deep: 0
+  Test::Most: 0
+  parent: 0
+resources:
+  homepage: https://github.com/timesselens/net-ldap-filter-sql
+  repository: https://github.com/timesselens/net-ldap-filter-sql.git
+version: 0.03
+x_authority: cpan:ESSELENS

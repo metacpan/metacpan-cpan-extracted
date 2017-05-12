@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+Msmgr.pm
+Msmgr/Command.pm
+Msmgr/Session.pm
+Msmgr/Object.pm
+Msmgr/Connection.pm
+Msmgr/Conversation.pm
+Msmgr/Switchboard.pm
+Msmgr/User.pm
+README
+test.pl

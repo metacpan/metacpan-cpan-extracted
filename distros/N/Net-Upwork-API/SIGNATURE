@@ -1,0 +1,152 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 66d349d8b7336f7a70b74f933d22ec6812a4ee09 .docgen
+SHA1 e95b3ca25991c76d90791ce64e5fa48c5d99c453 .tests
+SHA1 ef0006650536e16662d2ebd25a4357fc1d15c783 .travis.yml
+SHA1 abd6caeaad191cef2acb03850d0212509209af82 Build.PL
+SHA1 aaa2a7777628ad69605640a49dee001f7af53eee CHANGES.md
+SHA1 a6a5418b4d67d9f3a33cbf184b25ac7f9fa87d33 LICENSE
+SHA1 841a6ad6ced6bad0dccb8092b1e782d10881a46e MANIFEST
+SHA1 fb0696a134379d9b70a35ab25b5e22f100000063 META.json
+SHA1 b9104528d4e672dd936193104e6d7691aaae6da6 META.yml
+SHA1 68846a040dee9ee5ed3cde51f0170b0fb2722c0b Makefile.PL
+SHA1 87ed6279096cd2771d7828ae6f45132ae6ca3dc8 README.md
+SHA1 f2f4ee24e294ff650023cc3ed6ac5a8377a575db example/myapp.pl
+SHA1 a7c5ebb7fd5b2d3f1d97125364914665236b1f3f html/Net/Upwork/API.html
+SHA1 5d76eda13767c1d332eb2a2c40e62a064d3ab86d html/Net/Upwork/API/Client.html
+SHA1 2da4f520075d7aef85586853af92864ccd7c2316 html/Net/Upwork/API/Config.html
+SHA1 f315c8a8178c1cf8578d15e1da59f070f3f7cc84 html/Net/Upwork/API/Routers/Activities/Engagement.html
+SHA1 c929fe9e9668abdb23c641dcdeae2a0ccbd5ced4 html/Net/Upwork/API/Routers/Activities/Team.html
+SHA1 611132b5ecb5eb92bb2a3fe0a40b13053257f557 html/Net/Upwork/API/Routers/Auth.html
+SHA1 fc66c3de9b34e98749feb695ef5c74e5c8829a62 html/Net/Upwork/API/Routers/Freelancers/Profile.html
+SHA1 2655c065bbcb5ca99c2a8f68dd4e329518fd5dca html/Net/Upwork/API/Routers/Freelancers/Search.html
+SHA1 4aed7a909993aeca7a443b206c960798784ca20d html/Net/Upwork/API/Routers/Hr/Clients/Applications.html
+SHA1 57ecc5f86e9fd738023febc588acf58090924281 html/Net/Upwork/API/Routers/Hr/Clients/Offers.html
+SHA1 55217fd5aa833452c2d1349b3c04c3feaeebdf23 html/Net/Upwork/API/Routers/Hr/Contracts.html
+SHA1 1a409b22141606d371e2a9d1ed495afbbfc1bc79 html/Net/Upwork/API/Routers/Hr/Engagements.html
+SHA1 4aed7a909993aeca7a443b206c960798784ca20d html/Net/Upwork/API/Routers/Hr/Freelancers/Applications.html
+SHA1 c994e7ecd4aa43146167dbb251b9c1c2e1b4383b html/Net/Upwork/API/Routers/Hr/Freelancers/Offers.html
+SHA1 044ccc458e8b9f4a061e2bd4b18011f95f657020 html/Net/Upwork/API/Routers/Hr/Interviews.html
+SHA1 c5487028008207953c3c6a32bf0a58f2489314b1 html/Net/Upwork/API/Routers/Hr/Jobs.html
+SHA1 4a8c5c401ca3c68dee5e66276c8e95605dcfabfc html/Net/Upwork/API/Routers/Hr/Milestones.html
+SHA1 0d255bbba7c92b19bc49742ce8f466ba9cca5c07 html/Net/Upwork/API/Routers/Hr/Roles.html
+SHA1 065144af55a7ca229b190a366a04806835570885 html/Net/Upwork/API/Routers/Hr/Submissions.html
+SHA1 2da32b43bbf9d9a6ece394a0cea23afac4c9c9f6 html/Net/Upwork/API/Routers/Jobs/Profile.html
+SHA1 2655c065bbcb5ca99c2a8f68dd4e329518fd5dca html/Net/Upwork/API/Routers/Jobs/Search.html
+SHA1 698b46cfdba9969ad9becaac3cace2801537149e html/Net/Upwork/API/Routers/Messages.html
+SHA1 c43493c688c60ab0aa58533eaf0abc9844a0dd0d html/Net/Upwork/API/Routers/Metadata.html
+SHA1 a683b5b401492b383becf1c2b2fedd6456e03ba5 html/Net/Upwork/API/Routers/Organization/Companies.html
+SHA1 ba45c11b7e46e1f3d987a87d3a35baff6075db93 html/Net/Upwork/API/Routers/Organization/Teams.html
+SHA1 c0ca0ee70716f1a871ac35831540200a0ec99d24 html/Net/Upwork/API/Routers/Organization/Users.html
+SHA1 90b34aa02aa4f55db033649ce259e2b8d31b97cf html/Net/Upwork/API/Routers/Payments.html
+SHA1 894100f26d866e5dc0fdf1310ddc462fc009f94d html/Net/Upwork/API/Routers/Reports/Finance/Accounts.html
+SHA1 cb13478643006242d5708c11dfbfbd371b9379e9 html/Net/Upwork/API/Routers/Reports/Finance/Billings.html
+SHA1 9af93d4b03c664a5fd5b1790691f0bd0241f8aed html/Net/Upwork/API/Routers/Reports/Finance/Earnings.html
+SHA1 ed10ea389a57f8f78d66284073297465daa6b4b9 html/Net/Upwork/API/Routers/Reports/Time.html
+SHA1 990356b38f338cf8cc67b5363a3cbebf5718d636 html/Net/Upwork/API/Routers/Snapshot.html
+SHA1 90608da55c633facb14383fb7c573feeda39d57b html/Net/Upwork/API/Routers/Workdays.html
+SHA1 d657d8803ab757f08174dd33c57d01cfc80083be html/Net/Upwork/API/Routers/Workdiary.html
+SHA1 18533718985ae8095a1ef7e6a46a3ca165f6b89c html/_blkbluw.css
+SHA1 0588e6a6a41165688820f1c79576bd7a5a67a820 html/_blkcynw.css
+SHA1 cf395b99c47f2506c385d875222e639a890c6839 html/_blkgrng.css
+SHA1 1b789cb2c5a25412a5b64a1397526c0642b498e7 html/_blkmagw.css
+SHA1 953a02203b4faf36b21eb2ed6e1af263af69e8fa html/_grygrnk.css
+SHA1 ab18df9c10ecbdf870c42cf1f26aabe0460e0aaf html/_grygrnw.css
+SHA1 c777bcd4f97d4f5a8b36850aadd40c7c77e74aff html/_podly.js
+SHA1 31da5fdcce3568d9c2899881148022c1eddc573d html/_whtgrng.css
+SHA1 d8485d5398cc15d1d51fee1fc8c0a63c18b5e70e html/_whtnavk.css
+SHA1 6657c1d178f869cabd7d3a3629dac4369c4da2a9 html/_whtprpk.css
+SHA1 b2b51b2190cd5d87f4145ae9588367166d01ff48 html/_whtpurk.css
+SHA1 d4361adff7e0cd9d59790ae1e6d2f4633d8a6869 html/index.html
+SHA1 1f11b90fda95285782a07d51f6fe1955d5e098d1 lib/Net/Upwork/API.pm
+SHA1 288e56c2c2af65868e85afcd2c492437e8e7bd73 lib/Net/Upwork/API/Client.pm
+SHA1 92e474dd2fe16042ed4133edbbf198b3d41152d8 lib/Net/Upwork/API/Config.pm
+SHA1 1b418008e61e42458f58b259efd8ef32e45ed883 lib/Net/Upwork/API/Routers/Activities/Engagement.pm
+SHA1 07e077a1bfe3093813b63db77dc93eb005eebb4c lib/Net/Upwork/API/Routers/Activities/Team.pm
+SHA1 c0415470f1ec8cb687a4fb8c587dab7cb7297359 lib/Net/Upwork/API/Routers/Auth.pm
+SHA1 1a7e78c541dea6f74bbaaf48082bfd1beb39519e lib/Net/Upwork/API/Routers/Freelancers/Profile.pm
+SHA1 24cca53a56977e6bc8254e37cae48e8add7b1eb8 lib/Net/Upwork/API/Routers/Freelancers/Search.pm
+SHA1 578ce5d69b130714a6e75ab5afcce45824981d55 lib/Net/Upwork/API/Routers/Hr/Clients/Applications.pm
+SHA1 583871c9640d8eae6e1f6ff84723c761048a2268 lib/Net/Upwork/API/Routers/Hr/Clients/Offers.pm
+SHA1 830c8d3f1f0ca2a50266fbfc0a9929aacf9d6db2 lib/Net/Upwork/API/Routers/Hr/Contracts.pm
+SHA1 bc93f3f3281929349d825d0f06af5fe4f301618b lib/Net/Upwork/API/Routers/Hr/Engagements.pm
+SHA1 2bdf22a047131f1506d76379a9743eb88f7319e6 lib/Net/Upwork/API/Routers/Hr/Freelancers/Applications.pm
+SHA1 93fdbdcf1ea250e1ef905866fb7d7633b855b7ef lib/Net/Upwork/API/Routers/Hr/Freelancers/Offers.pm
+SHA1 aca7e5664d11846ff206bd3d88c111c3d4d74842 lib/Net/Upwork/API/Routers/Hr/Interviews.pm
+SHA1 2ab8b811635e3e3f2a8ba4a3ade4b0ff79493a53 lib/Net/Upwork/API/Routers/Hr/Jobs.pm
+SHA1 a72612da081cfdfa47b9881cfee5527d811acdb7 lib/Net/Upwork/API/Routers/Hr/Milestones.pm
+SHA1 cc963fed23f6e75a1c3923a08e43e0a1581e34ef lib/Net/Upwork/API/Routers/Hr/Roles.pm
+SHA1 b3ee506427b10c5eed9dd7ed103df82b8fa48657 lib/Net/Upwork/API/Routers/Hr/Submissions.pm
+SHA1 96096e69f28d052dd15626ca2143592c84565846 lib/Net/Upwork/API/Routers/Jobs/Profile.pm
+SHA1 a86bfd1e4bf3bd9278c9eb70bf8f8fe9eac495c9 lib/Net/Upwork/API/Routers/Jobs/Search.pm
+SHA1 82b44a24d3d709d405c1960a8dc639da9abce397 lib/Net/Upwork/API/Routers/Messages.pm
+SHA1 0dbbaa82cfef5ce43dc5030328371d4c9162f75a lib/Net/Upwork/API/Routers/Metadata.pm
+SHA1 a5a63309919b4049bda22c6a4558408606d42c88 lib/Net/Upwork/API/Routers/Organization/Companies.pm
+SHA1 f7050ca82f5c768faadcafd2c38adb1bac9fb49d lib/Net/Upwork/API/Routers/Organization/Teams.pm
+SHA1 325830b04c0fae316c3b82e4e82bb32733c9a76d lib/Net/Upwork/API/Routers/Organization/Users.pm
+SHA1 550487efa9a9f51ff36816a4a3fb4b0f177a8895 lib/Net/Upwork/API/Routers/Payments.pm
+SHA1 f677be535feb19911b49ed39fde219935be2a20b lib/Net/Upwork/API/Routers/Reports/Finance/Accounts.pm
+SHA1 6fd7f98f96181027020547dbb2784bfabf492134 lib/Net/Upwork/API/Routers/Reports/Finance/Billings.pm
+SHA1 54d273e37ec245b034f929f23b9298b3d2899953 lib/Net/Upwork/API/Routers/Reports/Finance/Earnings.pm
+SHA1 7901c4457e42ed0f4223a12f924b241870b0b1fe lib/Net/Upwork/API/Routers/Reports/Time.pm
+SHA1 6a79ffa3fbfbd1a28e5cc338edf21fcfc0e8ed77 lib/Net/Upwork/API/Routers/Snapshot.pm
+SHA1 3dbe4ba3c421271b74f14dd7397cbc40c9975466 lib/Net/Upwork/API/Routers/Workdays.pm
+SHA1 9b7681553f12854d718b8f47212878a2a4da9b5d lib/Net/Upwork/API/Routers/Workdiary.pm
+SHA1 85a9bc369d0094bb0df9f2e0d5b0012d66fda606 t/0-signature.t
+SHA1 8b8eda0106e08575e70d80dc8ff7eb03738ec961 t/00.load.t
+SHA1 873e57c70bf63b78b0f728c56b5afab52534fdb2 t/01.core_packages.t
+SHA1 a6ced4a4a6b586e7a0c821c4f59901fd5eb3d789 t/02.routers_auth.t
+SHA1 e683f42d44640d88ef1205f3ffde2c5984f8cfd2 t/03.routers_messages.t
+SHA1 3ab3af570d0940cea67d8aa91d1631c896f10930 t/04.routers_snapshot.t
+SHA1 525a150b3ea68176da25a2f31c9942a4acc12191 t/05.routers_metadata.t
+SHA1 f6f570e6a2e90f65e26633764068c145808a8103 t/06.routers_payments.t
+SHA1 3ed91dedcd2722e2a7bc3edc370a530e6a9885ef t/07.routers_workdays.t
+SHA1 5626464c780f67f6ceeee5eb4a3ef1c42225a151 t/08.routers_workdiary.t
+SHA1 e8d20792a5c6f666ef342986a59c5060f2ffe77e t/09.routers_activities_engagement.t
+SHA1 d8f9e4ffb9c9dce9b110149c713116bd4d467c7b t/10.routers_activities_team.t
+SHA1 aecd0582129f15cd71f4892ddd61e088dbcc2d5a t/11.routers_freelancers_profile.t
+SHA1 8955b74cdbe9f864942def5b04596acc3b0a5d44 t/12.routers_freelancers_search.t
+SHA1 3f614cf372015646a5e15153138c284ae850423f t/13.routers_jobs_profile.t
+SHA1 82e027cb21111b75484f0f4ca45755173b9b1da1 t/14.routers_jobs_search.t
+SHA1 cac60bf429ee00ad37eae439a4963b4a48886d38 t/15.routers_organization_companies.t
+SHA1 d9cc2f79dd4692c2b40dcf946ea8d4847f65721f t/16.routers_organization_teams.t
+SHA1 d48756e1bd5e4ef13078d3b63b173b4151e22260 t/17.routers_organization_users.t
+SHA1 7c755d4f939bc963c36611b8f65a9be8939e78d3 t/18.routers_hr_contracts.t
+SHA1 f81ffe38b3126c278d47dcb171c85c8a6ec0c73f t/19.routers_hr_engagements.t
+SHA1 f69b8d68f88b21726121779a1a41f85b35ca8324 t/20.routers_hr_interviews.t
+SHA1 60aba44f172a877af22801f7aef9832d5ea5b8fc t/21.routers_hr_jobs.t
+SHA1 a1b3b64a6dadbb2cdfdd8823e84bba99621739af t/22.routers_hr_milestones.t
+SHA1 4ab6060a22a959cfe5afbee6a7cb0ad7562a2835 t/23.routers_hr_submissions.t
+SHA1 d29787e14a6b5ee7d1b528c10d220080fc112ed3 t/24.routers_hr_clients_applications.t
+SHA1 a091f845749ab52c9338e883a71b3f6b26a1c619 t/25.routers_hr_clients_offers.t
+SHA1 1cb478b466cc1d45fa3087bf30681d3e62e0fa2f t/26.routers_hr_freelancers_offers.t
+SHA1 4d2c1a1da8b0fed4f844749cd086c09acd4eacee t/27.routers_hr_freelancers_applications.t
+SHA1 73005808cc1d264a145a0bd0348f3472ac2ad252 t/28.routers_reports_time.t
+SHA1 4449c9791f193bf09dc8598623be4e40e47dc86d t/29.routers_reports_finance_accounts.t
+SHA1 ef41c13b4ce47e304e4dac7c8519647043d1cfdd t/30.routers_reports_finance_billings.t
+SHA1 c784db6b3d3e190211e691fcd2d15633e3970922 t/31.routers_reports_finance_earnings.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJYpEuXAAoJEB+IuYkPuHrnVVYH/3tG5zCUygHTwBdopZR0oJy2
+eEXXGpB+ohVkNhu12AGYnVgbD5DCPjKOw/PpO4/oqn4nuo1Vz8nMEIL75uF5n/vC
+ObnrhbYCkaJ6hb+J169FQarmmalchLkfledD4yBOj/0aE4ivpUqn7BJJm9HNGoNO
+jjk4uZrsuSwmR+fGyzJH4y0kI4UYk9/f2Wqao3A6AQUx0legLnhf6aKDndcMzZT3
+VsJJaLh1LsVlyVtJ4WCzJiL116EC6cT73ii2YL9AGCH+42IOwpKZTroWJWFCgngF
+LdAStWq/S4BOVRsSgLyW2IxaNMiwgPgLAydfXAptIi/ev2aTotAldLy1x3IxPJE=
+=QW2x
+-----END PGP SIGNATURE-----

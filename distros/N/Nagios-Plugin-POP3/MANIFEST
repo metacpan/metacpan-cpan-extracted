@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+bin/nagios_plugin_pop3
+dist.ini
+lib/Nagios/Plugin/POP3.pm
+t/00-compile.t
+t/00-load.t
+t/release-eol.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/release-portability.t

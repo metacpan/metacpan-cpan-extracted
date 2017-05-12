@@ -1,0 +1,15 @@
+Changes
+lib/Net/DAAP/Client.pm
+lib/Net/DAAP/Client/v2.pm
+lib/Net/DAAP/Client/v3.pm
+Build.PL
+Makefile.PL
+MANIFEST
+README
+AUTHORS
+META.yml
+t/compile.t
+LEGAL
+TODO
+examples/dmap.dumper
+examples/itshell

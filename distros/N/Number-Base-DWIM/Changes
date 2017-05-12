@@ -1,0 +1,49 @@
+commit b7fb36849c05a23836381535c27617585ab9c395
+Author: Clayton O'Neill <coneill@jezebel.oneill.net>
+Date:   Sun Feb 24 19:04:02 2008 -0500
+
+    Release: 0.04
+
+commit 9c87ca3cfc64f002b720073cc219a57b04226b35
+Author: Clayton O'Neill <coneill@jezebel.oneill.net>
+Date:   Sun Feb 24 19:01:27 2008 -0500
+
+    Added: kwalitee tests and README and Changes files to make it happy
+
+commit cdfd6a0a72703565ac8a98ed8518aaada97a780e
+Author: Clayton O'Neill <coneill@jezebel.oneill.net>
+Date:   Sun Feb 24 18:56:04 2008 -0500
+
+    Added: pod and podccoverage tests
+
+commit d12c2ba548290a48b1a03823d583c706740eb50c
+Author: Clayton O'Neill <coneill@jezebel.oneill.net>
+Date:   Sun Feb 24 18:50:50 2008 -0500
+
+    Added: perlcritic, along with one change to make perl critic happy
+
+commit 2376d2a7b3477c97767a17027f18453a3baaa97f
+Author: Clayton O'Neill <coneill@jezebel.oneill.net>
+Date:   Sun Feb 24 18:49:19 2008 -0500
+
+    Added: .gitignore file
+    
+    Added: MANIFEST.SKIP,  removed MANIFEST since it can be generated now
+
+commit 6cf6d6bccc2a5a15096409633520f263b00c1003
+Author: Clayton O'Neill <coneill@jezebel.oneill.net>
+Date:   Sun Feb 24 18:47:10 2008 -0500
+
+    Changed: Makefile.PL converted to Module::Install
+
+commit 859261c7346ba862983d4f35e22148003ba31b2b
+Author: Clayton O'Neill <coneill@jezebel.oneill.net>
+Date:   Sun Feb 24 18:39:42 2008 -0500
+
+    Release: 0.03
+
+commit 229a7e7f22adbeed556149c3ab87a88766c88f55
+Author: Clayton O'Neill <coneill@jezebel.oneill.net>
+Date:   Sun Feb 24 18:29:14 2008 -0500
+
+    Release: 0.02

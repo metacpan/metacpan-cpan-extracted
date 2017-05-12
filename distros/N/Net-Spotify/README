@@ -1,0 +1,57 @@
+Net-Spotify
+
+This module provides a simple interface to the Spotify Metadata API
+<https://developer.spotify.com/technologies/web-api/>.
+
+The API allows to explore Spotify's music catalogue.
+It is possible to lookup a specific Spotify URI and retrieve various
+information about the resource it represents, and search for artists,
+albums and tracks.
+
+The output is in XML format.
+
+Enjoy! :)
+
+
+VERSION
+
+This is version 0.03.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::Spotify
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Spotify
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-Spotify
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-Spotify
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-Spotify/
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 Edoardo Sabadelli
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

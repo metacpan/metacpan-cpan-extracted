@@ -1,0 +1,1392 @@
+ssh-broker-config(5)                                                                                                       File Formats Manual                                                                                                      ssh-broker-config(5)
+
+
+
+NAME
+       ssh-broker-config - Tectia Connection Broker configuration file format
+
+       The Connection Broker configuration file ssh-broker-config.xml is used by Tectia Client, ConnectSecure, and Tectia MFT Events on Unix and Windows, and additionally by the Tectia client tools on IBM z/OS and Linux for IBM System z. The Connection Broker con‐
+       figuration file must be a valid XML file that follows the ssh-broker-ng-config-1.dtd document type definition.
+
+CONNECTION BROKER FILES
+       The Connection Broker reads three configuration files (if all are available):
+
+       1.  The ssh-broker-config-default.xml file is read first. It holds the factory default settings. It is not recommended to edit the file, but you can use it to view the default settings.
+
+           This file must be available and correctly formatted for the Connection Broker to start.
+
+       2.  Next, the Connection Broker reads the global configuration file.  The settings in the global configuration file override the default settings.
+
+           If the global configuration file is missing or malformed, the Connection Broker will start normally, and will read the user-specific configuration file, instead.  A malformed global configuration file is ignored and the default settings or user-specific
+           settings, if they exist, are used instead.
+
+       3.  Last, the Connection Broker reads the user-specific configuration file, if it is available. The settings in the user-specific configuration file override the settings in the global configuration file, with the following exceptions:
+
+           · The following settings from the user-specific configuration are combined with the settings of the global configuration file:
+
+             · In general element, the key-stores, cert-validation and file-access-control settings
+
+             · In profiles element, all settings
+
+             · In static-tunnels element, all settings.
+
+           · If a connection profile with the same name has been defined in both the global configuration file and user-specific configuration file, the latter one is used.
+
+       If the user-specific configuration file is missing, the Connection Broker will start using the previously read configuration files. However, if a user-specific configuration exists but is malformed, the Connection Broker will not start at all.
+
+       On Unix, the default configuration file locations are as follows:
+
+       · the default configuration:
+
+         /opt/tectia/share/auxdata/ssh-broker-ng/ssh-broker-config-default.xml
+
+       · the global configuration: /etc/ssh2/ssh-broker-config.xml
+
+       · the user-specific configuration: $HOME/.ssh2/ssh-broker-config.xml
+
+       · the XML DTD:
+
+         /opt/tectia/share/auxdata/ssh-broker-ng/ssh-broker-ng-config-1.dtd
+
+       The following sections describe the options available in the Connection Broker configuration file.  For more information on the syntax of the configuration file, see the Connection Broker XML DTD.
+
+ENVIRONMENT VARIABLES
+       Two  kinds  of  environment  variables can be used in the Connection Broker configuration file. In addition to the system-level environment variables, you can use special variables that are Tectia specific. The environment variables take precedence over the
+       special variables. So if an environment variable and a special variable have the same name, the environment variable will be used.
+
+       All alphanumeric characters and the underscore '_' sign are allowed in environment variables. The variable name ends to the first character that is not allowed.
+
+       You can define for example file or directory paths with environment variables, and they will be expanded to their values as explained below.
+
+       %VARIABLENAME%
+              Replaced with the value of the environment variable if one has been defined. The variable is matched case-insensitively. If the variable is not defined, the string '%VARIABLENAME%' is the result.
+
+       $VARIABLENAME
+              Replaced with the value of the environment variable if one has been defined. The variable is matched case-sensitively on Unix and case-insensitively on Windows. If the variable is not defined, it is replaced with an empty string.
+
+       ${VARIABLENAME}text
+              Replaced with the value defined for '$VARIABLENAME' with the 'text' appended to it.
+
+       ${VARIABLENAME:-default_value}
+              Replaced with the value defined for '$VARIABLENAME', or replaced with the 'default_value' if the variable is not set.
+
+       The Tectia specific special variables are:
+
+       %U or %username%
+              Replaced with the currently logged in user name.
+
+       %username-without-domain%
+              Replaced with the currently logged in user name in short format, i.e. without the domain part. Available on Windows.
+
+       %G or %groupname%
+              Replaced with the group name of the currently logged in user.
+
+       %D or %homedir%
+              Replaced with the home directory defined for the currently logged in user.
+
+       %IU or %userid%
+              Replaced with the user identifier defined for the currently logged in user.
+
+       %IG or %groupid%
+              Replaced with the group identifier defined for the currently logged in user.
+
+       The special variables can also be entered using the Unix format, for example, $username.
+
+DOCUMENT TYPE DECLARATION AND THE ROOT ELEMENT
+       The broker configuration file is a valid XML file and starts with the Document Type Declaration.
+
+       The root element in the configuration file is secsh-broker.  It can include general, default-settings, profiles, static-tunnels, gui, and logging elements.
+
+       An example of an empty configuration file is shown below:
+
+       <!DOCTYPE secsh-broker SYSTEM "ssh-broker-ng-config-1.dtd">
+       <secsh-broker version="1.0">
+         <general />
+         <default-settings />
+         <profiles />
+         <static-tunnels />
+         <gui />
+         <logging />
+
+       </secsh-broker>
+
+THE general ELEMENT
+       The general element contains settings such as the cryptographic library and the key stores to be used.
+
+       The general element can contain zero or one instance of the following elements: crypto-lib, cert-validation, key-stores, user-config-directory, protocol-parameters; and multiple known-hosts elements.
+
+       crypto-lib
+              This element selects the cryptographic library mode to be used.  Either the standard version (standard) or the FIPS 140-2 certified version (fips) of the cryptographic library can be used. The library name is given as a value of the  mode  attribute.
+              By default, standard cryptographic libraries are used. The OpenSSL cryptographic library is used in the FIPS mode.
+
+              FIPS mode will be used if it is so specified either in the global or the user configuration file (or both).
+
+              <crypto-lib mode="standard" />
+
+              In  the  FIPS  mode, the cryptographic operations are performed according to the rules of the FIPS 140-2 standard. The FIPS library includes the 3des-cbc, aes128-cbc, aes128-ctr, aes192-cbc, aes192-ctr, aes256-cbc, and aes256-ctr ciphers, and all the
+              supported hmac-sha1 and hmac-sha2 variants of MAC.
+
+              For a list of platforms on which the FIPS library has been validated or tested, see Tectia Client/Server Product Description.
+
+       cert-validation
+              This element defines public-key infrastructure (PKI) settings used for validating remote server authentication certificates. The element can have the following attributes: end-point-identity-check, default-domain, http-proxy-url, socks-server-url and
+              max-path-length.
+
+              The  end-point-identity-check  attribute  specifies  whether the client will verify the server's host name or IP address against the Subject Name or Subject Alternative Name (DNS Address) specified in the server host certificate. The default value is
+              yes.  If set to no, the fields in the server host certificate are not verified and the certificate is accepted based on the validity period and CRL check only.
+              Caution
+
+              Setting end-point-identity-check="no" is a security risk. Then anyone with a certificate issued by the same trusted certification authority (CA) that issues the server host certificates can perform a man-in-the-middle attack on the server.
+
+       Alternatively, if set to ask, the user can decide to either cancel and continue establishing the connection in case that the server's host name does not match the one in the certificate.
+
+       The default-domain attribute can be used when the end-point identity check is enabled. It specifies the default domain part of the remote system name and it is used if only the base part of the system name is available. The default-domain is appended to the
+       system name if it does not contain a dot (.).
+
+       If the default domain is not specified, the end-point identity check fails, for example, when a user tries to connect to a host "rock" giving only the short host name and the certificate contains the full DNS address "rock.example.com".
+
+       The http-proxy-url attribute defines an HTTP proxy and the socks-server-url attribute defines a SOCKS server for making LDAP or OCSP queries for certificate validity.
+
+       The  address of the server is given as the value of the attribute. The format of the address is socks://username@socks_server:port/network/netmask,network/netmask ... (with a SOCKS server) or http://username@proxy_server:port/network/netmask,network/netmask
+       ... (with an HTTP proxy).
+
+       For example, to make the SOCKS server use host socks.ssh.com and port 1080 for connections outside of networks 192.196.0.0 (16-bit domain) and 10.100.23.0 (8-bit domain), and to get these networks connected directly, set socks-server-url as follows:
+
+       "socks://mylogin@socks.ssh.com:1080/192.196.0.0/16,10.100.23.0/24"
+
+       The max-path-length attribute limits the length of the certification paths when validating certificates. It can be used to safeguard the paths or to optimize against the paths getting too long in a deeply hierarchical PKI or when the PKI is  heavily  cross-
+       certified with other PKIs. Using the attributes requires knowing the upper limit of the paths used in certificate validation. For example:
+
+       <cert-validation max-path-length="6">
+         <ldap-server address="ldap://myldap.com" port="389" />
+         <dod-pki enable="yes" />
+         <ca-certificate name="CA 1" file="ca-certificate1.crt" />
+       </cert-validation>
+
+       In  the  example, the path is limited to six certificates, including the end-entity and root CA certificates. If not specified, the default value is 10. Decrease the value to optimize the validation if the maximum length of the encountered paths in the cer‐
+       tificate validation is known.
+
+       The cert-validation element can contain multiple ldap-server, ocsp-responder, crl-prefetch elements, one dod-pki element, and multiple ca-certificate and key-store elements.  The elements have to be in the listed order.
+
+              ldap-server
+                     This element specifies an LDAP server address and port used for fetching CRLs and/or subordinate CA certificates based on the issuer name of the certificate being validated. Several LDAP servers can be specified by  using  several  ldap-server
+                     elements.
+
+                     CRLs are automatically retrieved from the CRL distribution point defined in the certificate to be verified if the point exists.
+
+                     The default value for port is 389.
+
+              ocsp-responder
+                     This element specifies an OCSP (Online Certificate Status Protocol) responder service address in URL format with attribute url. Several OCSP responders can be specified by using several ocsp-responder elements.
+
+                     If  the certificate has a valid Authority Info Access extension with an OCSP Responder URL, it will be used instead of this setting.  Note that for the OCSP validation to succeed, both the end-entity certificate and the OCSP Responder certifi‐
+                     cate must be issued by the same CA.
+
+                     The validity-period (in seconds) can be optionally defined. During this time, new OCSP queries for the same certificate are not made but the old result is used. The default validity period is 0 (a new query is made every time).
+
+              crl-prefetch
+                     This element instructs Tectia Client/Server to periodically download a CRL from the specified URL. The url value can be an LDAP or HTTP URL, or it can refer to a local file. The file format must be either binary DER or base64, PEM is not  sup‐
+                     ported.
+
+                     To download CRLs from the local file system, define the file URL in this format:
+
+                     file:///absolute/path/name
+
+                     To download CRLs from an LDAP server, define the LDAP URL in this format:
+
+                     ldap://ldap.server.com:389/CN=Root%20CA,OU=certification
+                         %20authorities,DC=company,DC=com?certificaterevocationlist
+
+                     Use the interval attribute to specify how often the CRL is downloaded. The default is 3600 seconds.
+
+              dod-pki
+                     This  element  defines whether the certificates are required to be compliant with the US Department of Defense Public-Key Infrastructure (DoD PKI). In practise, this means that the Digital Signature bit must be set in the Key Usage of the cer‐
+                     tificate. The enable attribute can have a value of yes or no. The default is no.
+
+              ca-certificate
+                     This element defines a certification authority (CA) used in server authentication. It can have four attributes: name, file, disable-crls, and use-expired-crls.
+
+                     The name attribute must contain the name of the CA.
+
+                     The element must either contain the path to the X.509 CA certificate file as a value of the file attribute, or include the certificate as a base64-encoded ASCII block.
+
+                     CRL checking can be disabled by setting the disable-crls attribute to yes. The default is no.
+
+                     Expired CRLs can be used by setting a numeric value (in seconds) for the use-expired-crls attribute. The default is 0 (do not use expired CRLs).
+
+              key-store
+                     This element defines CA certificates stored in an external key store for server authentication. Currently it is used only on z/OS for CA certificates stored in System Authorization Facility (SAF).
+
+                     CRL checking can be disabled by setting the disable-crls attribute to yes. The default is no.
+
+                     Expired CRLs can be used by setting a numeric value (in seconds) for the use-expired-crls attribute. The default is 0 (do not use expired CRLs).
+
+       An example of a certificate validation configuration is shown below:
+
+       <cert-validation end-point-identity-check="yes"
+                        default-domain="example.com"
+                        http-proxy-url="http://proxy.example.com:8080">
+         <ldap-server address="ldap://ldap.example.com:389" />
+         <ocsp-responder url="http://ocsp.example.com:8090" validity-period="0" />
+         <crl-prefetch url="file:///full.path.to.crlfile" interval="1800" />
+         <dod-pki enable="no" />
+         <ca-certificate name="ssh_ca1"
+                         file="ssh_ca1.crt"
+                         disable-crls="no"
+                         use-expired-crls="100" />
+       </cert-validation>
+
+       key-stores
+              This element defines settings for user public-key and certificate authentication.
+
+              Under the <general> element, there can be one <key-stores> instance which in turn can have any number of <key-store>, <user-keys>, and <identification> elements, and the order of the elements is free.
+
+              Special variables and environment variables can be used when defining the values for the elements. The following variables can be used and they will be expanded as follows:
+
+              · %U = %USERNAME% = user name
+
+              · %USERNAME-WITHOUT-DOMAIN% = user name without the domain part
+
+              · %IU = %USERID% = user ID
+
+              · %IG = %GROUPID% = user group ID
+
+              · %D = %HOMEDIR% = the user's home directory
+
+              · %G = %GROUPNAME% = the name of the user's default group
+
+       Also environment variables are replaced with their current values.  For example it is possible to use strings $HOME or %HOME% to expand to user's home directory (if environment variable HOME is set).
+              Note
+
+              Short alias names (for example, %U) are case-sensitive and long alias names (for example, %USERNAME%) are case-insensitive.
+
+              key-store
+                     Each of the key-store elements configures one key store provider. The key-stores/key-store element can take the following attributes: type and init.
+
+                     The type attribute is the key store type.  The currently supported types are "entrust", "mscapi", "pkcs11", "software", and "zos-saf".  Entrust is supported on Windows, only.
+
+                     The init attribute is the initialization info specific to the key-store-provider. The initialization string can contain special strings explained above in key-stores, see ssh-broker-config(5).
+
+                     For key store configuration examples, see the key-stores description above.
+
+                     See also Key Store Configuration Examples below.
+
+              user-keys
+                     The user-keys element can be used to override the default directory for the user keys. The user-keys element can take the following attributes:
+
+                     The directory attribute defines the directory where the user private keys are stored. Enter the full path.
+
+                     The passphrase-timeout attribute defines the time (in seconds) after which the passphrase-protected private key will time out, and the user must enter the passphrase again. The default is 0, meaning that the passphrase does not time  out.  The
+                     value of this element should be longer than the passphrase-idle-timeout value.
+
+                     By  default, the Connection Broker keeps the passphrase-protected private keys open once the user has entered the passphrase successfully. This can be changed with the passphrase timeout options. When passphrase-timeout is set, the private key
+                     stays open (usable without further passphrase prompts) until the timeout expires. The passphrase-timeout attribute sets the hard timeout, that is set only once when the key is opened and will not be reset even  if  the  key  is  used  multiple
+                     times.
+
+                     The  passphrase-idle-timeout  attribute defines the time (in seconds) after which the passphrase-protected private key will time out unless the user accesses or uses the key. The passphrase-idle-timeout is reset every time the key is accessed.
+                     The default is 0, meaning that the passphrase never times out.
+
+                     Both of the timeout options can be set simultaneously, but notice that if the idle timeout is set longer than the hard timeout, the idle timeout has no effect.
+
+              identification
+                     The identification element can be used to override the default location of the identification file that defines the user keys.  The identification element can take the following attributes:
+
+                     The file attribute specifies the location of the identification file. Enter the full path.
+
+                     The base-path attribute defines the directory where the identification file expects the user private keys to be stored. This element can be used to override the default relative path interpretation of the identification file (paths relative to
+                     the identification file directory).
+
+                     The passphrase-timeout attribute defines the time (in seconds) after which the user must enter the passphrase again.  The default is 0, meaning that the passphrase is not re-requested.
+
+                     The passphrase-idle-timeout attribute defines a time (in seconds) after which the passphrase times out if there are no user actions. The default is 0, meaning that the passphrase does not time out.
+
+                     The timeout settings affect only those private keys that are listed in the identification file.
+
+       strict-host-key-checking
+              Note
+
+              This element is deprecated starting from Tectia Client/Server version 6.1.4.
+
+       This element is supported in configuration for backwards compatibility and used only if the policy attribute of the server-authentication-methods/auth-server-publickey element under default-settings or profiles/profile is not defined. In this case, the host
+       key policy is interpreted based on the values of this option and the host-key-always-ask and accept-unknown-host-keys options.  See The default-settings Element below for details.
+
+       host-key-always-ask
+              Note
+
+              This element is deprecated starting from Tectia Client/Server version 6.1.4.
+
+       This element is supported in configuration for backwards compatibility and used only if the policy attribute of the server-authentication-methods/auth-server-publickey element under default-settings or profiles/profile is not defined. In this case, the host
+       key policy is interpreted based on the values of this option and the strict-host-key-checking and accept-unknown-host-keys options.  See The default-settings Element below for details.
+
+       accept-unknown-host-keys
+              Note
+
+              This element is deprecated starting from Tectia Client/Server version 6.1.4.
+
+       This element is supported in configuration for backwards compatibility and used only if the policy attribute of the server-authentication-methods/auth-server-publickey element under default-settings or profiles/profile is not defined. In this case, the host
+       key policy is interpreted based on the values of this option and the strict-host-key-checking and host-key-always-ask options.  See The default-settings Element below for details.
+              Caution
+
+              Consider carefully before enabling this option.  Disabling the host-key checks makes you vulnerable to man-in-the-middle attacks.
+
+       user-config-directory
+              This element can be used to change the storage location of the user-specific configuration files away from the default which is $HOME/.ssh2/ on Unix, and "%APPDATA%\SSH" on Windows. It can be used for example, if you want  to  store  all  client-side
+              configurations to a centralized location.
+
+              When this element is added to the global configuration file, the Connection Broker reads the following user-specific files in the defined location:
+
+              · user's key file
+
+              · user's own configuration files
+
+              · user's known host keys
+
+              · user's random_seed file
+
+              · Windows GUI profile files: 1.ssh2, 2.ssh2
+
+              · SSH_SFTP_BATCH_FILE variable of the sftpg3 client
+
+              · In Tectia MFT Events, the events logging database and journaling file (/home/.ssh2/smtf/)
+              Note
+
+              Stop all existing SSH applications before modifying the user-config-directory setting in the Connection Broker configuration.
+
+              The user-config-directory setting affects all Tectia products running on the same host, for example Tectia Client, Tectia ConnectSecure and Tectia MFT Events.
+
+       The user-config-directory option takes an attribute path, whose value can be either a directory path or one of the following variables:
+
+              · %U: The user name.
+
+              · %username%: The user name.
+
+              · %username-without-domain%: The user name without domain definition.
+
+              · %D: The user's home directory.
+
+              · %homedir%: The user's home directory.
+
+              · %USER_CONFIG_DIRECTORY%: The user-specific configuration directory.
+
+              · %IU: The user's ID, on Unix only
+
+              · %userid%: The user's ID, on Unix only
+
+              · %IG: The group ID, on Unix only
+
+              · %groupid%: The group ID, on Unix only
+
+       The default is %USER_CONFIG_DIRECTORY%. This variable refers to the user-specific configuration directory: $HOME/.ssh2 on Unix, and %APPDATA%\SSH on Windows.  The %USER_CONFIG_DIRECTORY% variable cannot be used in other settings.
+
+       file-access-control
+              On Unix, this element can be used to enable checking of file access permissions defined for the global and user-specific configuration files, and for the private keys files. If the permissions are not as expected, the Connection Broker will refuse to
+              start, or to use certain private keys.
+
+              By default this setting is disabled. On Windows, this element has no effect.
+
+              The file permissions are checked differently, if the file-access-control element is set in both the global and user configuration files, or just in one of them.
+
+              Setting in:      |Checks the file permissions for:
+                               |
+              Global   User    | Global   User     Private
+              config   config  | config   config   key files
+              -----------------|--------------------------------
+              yes      yes     |   X        X        X
+              yes      -       |   X        X        X
+              -        yes     |   -        X        X
+              yes      no      |   X        X        -
+              no       yes     |   -        X        X
+              no / -   no / -  |   -        -        -
+
+              In the table: No means file-access-control enable="no".  Sign - means that the setting is not included in the file at all.
+
+              When the file access permissions are checked, the controls are applied as follows:
+
+              · Expected permissions for the global configuration file: read rights for all, write rights only for the user and group.  If the permissions are any wider, the Connection Broker will not start.
+
+              · Expected permissions for the user configuration file: only the user has read and write rights. If the permissions are any wider, the Connection Broker will not start.
+
+              · Expected permissions for the private key files: only the user has read and write rights. If the permissions are any wider, keys that do not pass the check will be ignored.
+
+       protocol-parameters
+              This element contains protocol-specific values that can be used to tune the performance. It should be used only in very specific environments.  In normal situations the default values should be used.
+
+              The threads attribute can be used to define the number of threads the protocol library uses (fast path dispatcher threads).  This attribute can be used to allow more concurrent cryptographic transforms in the protocol on systems with more  than  four
+              CPUs. If the value is set to zero, the default value is used.
+
+              Example of the threads attribute:
+
+              <protocol-parameters threads="8" />
+
+       known-hosts
+              This element can be used to specify locations for storing the host keys of known server hosts, and to define the storage format of the host key files. If no known-hosts directories are specified, the known host keys are stored to the default directo‐
+              ries. On z/OS (only), this element can contain key-store elements.
+
+              This element can be used:
+
+              · To specify non-default directories that contain the public-key data or public-key files of known server hosts.
+
+              · To specify a non-default location for OpenSSH-style known_hosts files that contain the public-key data of known server hosts.
+
+              · (On z/OS) To specify a SAF key store that contains the certificates of known server hosts.
+
+       The server host keys are searched in the known-hosts paths in the order they are specified in the configuration. The settings of the last defined known-hosts element are used when storing new host keys.
+
+       If you define any known-hosts file settings, the default OpenSSH files will be overridden. So if you wish to make the Connection Broker use both the default OpenSSH locations and other locations specified in the configuration, you need to  specify  all  the
+       locations separately.
+
+       You can define several known-hosts elements, and each of them can contain one or several attributes: path, directory, file and filename-format.
+
+       The path attribute requires a full path to the known-hosts file or directory as the value. For example:
+
+       <known-hosts path="/u/username/.ssh/known_hosts" />
+       <known-hosts path="/etc/ssh2/hostkeys" />
+       <known-hosts path="/u/username/.ssh2/hostkeys" />
+       <known-hosts path="/h/username/hostkeys" filename-format="plain" />
+
+       The directory attribute is used to define that known host keys are saved to a non-default directory. Enter the complete path to the directory as the value. If the defined directory does not exist, it will be created during the first connection attempt. If a
+       file is found in its place, the connection will be made but the host key will not be stored, and the user gets a warning about it. The filename-format attribute can be used together with the directory setting to define in which format  the  host  key  files
+       will be stored. Example of the directory attribute:
+
+       <known-hosts directory="<path_to_dir>/MyKEYS"
+                    filename-format="plain" />
+
+       The  path  or  directory  (whichever  is  present) defined in the last known-hosts element in the configuration file will be used when storing new known host keys. If both attributes are present in the last known-hosts element, the location specified in the
+       directory attribute will be used.
+
+       The file attribute is used to point to an OpenSSH-style known_hosts file. Enter the complete path to the file as the value. If a directory is found in its place, it is considered an error, and the connection attempt will fail. In case the  known-hosts  ele‐
+       ment only contains the file attribute, and the defined OpenSSH known_hosts file exists, the received host keys are searched first in the defined file, and if not found there, the search continues in the default Tectia-specific locations.
+
+       Example of the file attribute:
+
+       <known-hosts file="<path_to_file>/.ssh2/openSSH_keys" />
+
+       An empty file or path attribute will disable the handling of the OpenSSH known_hosts file:
+
+       <known-hosts file="" />
+       or
+       <known-hosts path="" />
+
+       The filename-format attribute defines the format in which new host key files are stored. The filename-format attribute is only relevant for the last specified known-hosts element and for the default directory.
+
+       The filename-format attribute takes the values: hash (default), plain, and default (equals to hash).
+
+       With value hash, the host key files will be stored in format: keys_<hash>, for example "keys_182166d2efe5a134d3fb948646e0b48f780bff6c".
+
+       With value plain, the file name format will be key_<port>_<hostname>.pub, where <port> is the port the Secure Shell server is running on and <hostname> is the host name you use when connecting to the server; for example "key_22_my.example.com.pub".
+
+       Setting <known-hosts filename-format="plain" /> changes the storage format of host key files for the next known-hosts elements or for the default storage location if no other known-hosts elements are present.
+
+       The filename-format="default" alternative can be used as the last option when the same known-hosts element is used to define several locations for the host keys some of which store the keys in plain format.
+
+       See also the Key Store Configuration Examples below.
+
+              key-store
+                     This element defines an external key store for certificates of known server hosts. Currently it is used only on z/OS for server certificates stored in System Authorization Facility (SAF).
+
+       extended
+              This element is reserved for future use.
+
+   KEY STORE CONFIGURATION EXAMPLES
+       Example with Software Provider
+
+       The software provider handles key pairs stored on disk in standard Secure Shell v2 or legacy OpenSSH formats and X.509 certificates stored in native X.509, PKCS #7, and PKCS #12 formats.
+
+       To add a single key file (for example, /u/exa/keys/enigma and /etc/my_key), specify both the private key file and the public key file:
+
+       <key-stores>
+         <key-store type="software"
+                    init="key_files(/u/exa/keys/enigma.pub,/u/exa/keys/enigma)" />
+         <key-store type="software"
+                    init="key_files(/etc/my_key.pub,/etc/my_key)" />
+       </key-stores>
+
+       To add all keys from a specific directory (for example all keys from /u/exa/keys and /etc/keys):
+
+       <key-stores>
+         <key-store type="software"
+                    init="directory(path(/u/exa/keys))" />
+         <key-store type="software"
+                    init="directory(path(/etc/keys))" />
+       </key-stores>
+
+       Example with PKCS #11 Provider
+
+       The PKCS #11 provider handles keys and certificates stored in PKCS #11 tokens (for example, smart cards or USB tokens).
+
+       Specify the dynamic library path for the PKCS provider and all or a specific slot. For example, with all slots:
+
+       <key-stores>
+         <key-store type="pkcs11" init="dll(/usr/lib/pkcs.so),slots(all)" />
+       </key-stores>
+
+       For example, with one slot named sesam:
+
+       <key-stores>
+         <key-store type="pkcs11" init="dll(/usr/local/lib/pkcs.so),slots(sesam)" />
+       </key-stores>
+
+THE default-settings ELEMENT
+       The default-settings element defines the default connection-related settings. Profile-specific settings can override these settings.
+
+       The  default-settings  element  can  contain  zero  or  one  instance of the following elements in the listed order: ciphers, macs, kexs, hostkey-algorithms, rekey, authentication-methods, hostbased-default-domain, compression, proxy, idle-timeout, tcp-con‐
+       nect-timeout, keepalive-interval, exclusive-connection, server-banners, forwards, extended,  remote-environment,  server-authentication-methods,  authentication-success-message,  sftpg3-mode,  terminal-selection,  terminal-bell,  close-window-on-disconnect,
+       quiet-mode, checksum, and address-family.
+
+       The default-settings element can take one attribute:
+
+       The user attribute can be used to define a default user name to be used when connecting to remote servers. The value of the user attribute can be one of the following:
+
+       · A generic user name that will be used in connections unless another user name is specified in the connection profile settings or in the connection attempt. Note that the user name is treated case sensitively.
+
+       · "%USERNAME%" can be used to apply the user name of the currently logged in user.
+
+       · In case this option is used but left empty, the Connection Broker will prompt the user for a user name.
+
+       The default-settings element can contain the following elements:
+
+       ciphers
+              This element defines the ciphers that the client will propose to the server. The ciphers element can contain multiple cipher elements.
+
+              The ciphers are tried in the order they are specified.
+
+              With Tectia Server for Linux on IBM System z, the client tools will automatically use hardware acceleration (CPACF), if it is available, on cryptographic operations with the 3DES and AES algorithms.
+
+              cipher This element selects a cipher name that the client requests for data encryption.
+
+                     The  supported  ciphers are 3des-cbc, aes128-cbc, aes192-cbc, aes256-cbc, aes128-ctr, aes192-ctr, aes256-ctr, arcfour, blowfish-cbc, twofish-cbc, twofish128-cbc, twofish192-cbc, twofish256-cbc, crypticore128@ssh.com, seed-cbc@ssh.com, and none
+                     (no encryption).
+
+                     The default ciphers used by the Connection Broker are, in order: crypticore128@ssh.com (on Windows and Linux x86), aes128-cbc, aes128-ctr, aes192-cbc, aes192-ctr, aes256-cbc, aes256-ctr, and 3des-cbc.
+
+                     The ciphers that can operate in the FIPS mode are 3des-cbc, aes128-cbc, aes128-ctr, aes192-cbc, aes192-ctr, aes256-cbc, and aes256-ctr.
+
+       <ciphers>
+         <cipher name="aes128-cbc" />
+         <cipher name="3des-cbc" />
+       </ciphers>
+
+       macs   This element defines the MACs that the client will propose to the server. The macs element can contain multiple mac elements.
+
+              With Tectia Server for Linux on IBM System z, the client tools will automatically use hardware acceleration (CPACF), if it is available, on cryptographic operations with the HMAC-SHA1 algorithms.
+
+              The MACs are tried in the order they are specified.
+
+              mac    This element selects a MAC name that the client requests for data integrity verification.
+
+                     The supported MAC algorithms are hmac-md5, hmac-md5-96, hmac-sha1, hmac-sha1-96, hmac-sha256-2@ssh.com, hmac-sha224@ssh.com, hmac-sha256@ssh.com, hmac-sha384@ssh.com, hmac-sha512@ssh.com, crypticore-mac@ssh.com, and  none  (no  data  integrity
+                     verification).
+
+                     The  default  MACs  used  by  the  Connection  Broker  are,  in  order:  crypticore-mac@ssh.com  (on  Windows  and  Linux  x86), hmac-sha1, hmac-sha1-96, hmac-sha256-2@ssh.com, hmac-sha224@ssh.com, hmac-sha256@ssh.com, hmac-sha384@ssh.com, and
+                     hmac-sha512@ssh.com.
+
+                     The hmac-sha algorithm variants can operate in the FIPS mode.
+
+       <macs>
+         <mac name="hmac-sha1" />
+       </macs>
+
+       kexs   This element defines the key exchange methods (KEXs) that the client will propose to the server. The kexs element can contain multiple kex elements.
+
+              The KEXs are tried in the order they are specified.
+
+              kex    This element selects a KEX name that the client requests for the key exchange method.
+
+                     The supported KEX methods are diffie-hellman-group1-sha1, diffie-hellman-group14-sha1, diffie-hellman-group14-sha224@ssh.com, diffie-hellman-group14-sha256@ssh.com, diffie-hellman-group15-sha256@ssh.com,  diffie-hellman-group15-sha384@ssh.com,
+                     diffie-hellman-group16-sha384@ssh.com,  diffie-hellman-group16-sha512@ssh.com,  diffie-hellman-group18-sha512@ssh.com  ,  diffie-hellman-group-exchange-sha1,  diffie-hellman-group-exchange-sha256,  diffie-hellman-group-exchange-sha224@ssh.com,
+                     diffie-hellman-group-exchange-sha384@ssh.com, diffie-hellman-group-exchange-sha512@ssh.com.
+
+                     The default KEX methods used by the Connection Broker are, in order: diffie-hellman-group1-sha1, diffie-hellman-group14-sha1, diffie-hellman-group14-sha256@ssh.com , diffie-hellman-group-exchange-sha1, and diffie-hellman-group-exchange-sha256.
+
+                     Due to issues in OpenSSL, the following KEXs cannot operate in the FIPS mode: diffie-hellman-group15-sha256@ssh.com and diffie-hellman-group15-sha384@ssh.com.
+
+       <kexs>
+          <kex name="diffie-hellman-group1-sha1" />
+          <kex name="diffie-hellman-group14-sha256@ssh.com" />
+       </kexs>
+
+       hostkey-algorithms
+              This element defines the host key signature algorithms used for server authentication. The algorithms to be used are configured in both the Connection Broker and Tectia Server configuration files. The algorithms that will be used are those  that  are
+              defined in both Tectia Server and Connection Broker configuration files. This way the use of only certain algorithms, such as SHA-2, can be enforced by the server. The hostkey-algorithms element can contain multiple hostkey-algorithm elements.
+
+              The hostkey algorithms are tried in the order they are specified. Exception: If a host key of a server already exists in the host key store of the client, its algorithm is preferred.
+
+              hostkey-algorithm
+                     This element selects a host key signature algorithm name to be used in server authentication with host keys or certificates.
+
+                     The  supported  host  key  signature  algorithms  are  ssh-dss,  ssh-dss-sha224@ssh.com,  ssh-dss-sha256@ssh.com,  ssh-dss-sha384@ssh.com, ssh-dss-sha512@ssh.com, ssh-rsa, ssh-rsa-sha224@ssh.com, ssh-rsa-sha256@ssh.com, ssh-rsa-sha384@ssh.com,
+                     ssh-rsa-sha512@ssh.com,    x509v3-sign-dss,    x509v3-sign-dss-sha224@ssh.com,     x509v3-sign-dss-sha256@ssh.com,     x509v3-sign-dss-sha384@ssh.com,     x509v3-sign-dss-sha512@ssh.com,     x509v3-sign-rsa,     x509v3-sign-rsa-sha224@ssh.com,
+                     x509v3-sign-rsa-sha256@ssh.com, x509v3-sign-rsa-sha384@ssh.com, and x509v3-sign-rsa-sha512@ssh.com.
+
+                     The  default  host  key  signature  algorithms  used  by  the  Connection  Broker  are,  in  order:  ssh-dss,  ssh-rsa,  ssh-dss-sha256@ssh.com,  ssh-rsa-sha256@ssh.com,  x509v3-sign-dss,  x509v3-sign-rsa,  x509v3-sign-dss-sha256@ssh.com,  and
+                     x509v3-sign-rsa-sha256@ssh.com.
+
+       <hostkey-algorithms>
+          <hostkey-algorithm name="ssh-dss-sha512@ssh.com" />
+          <hostkey-algorithm name="ssh-rsa-sha224@ssh.com" />
+       </hostkey-algorithms>
+
+       rekey  This element specifies the number of transferred bytes after which the key exchange is done again. The value "0" turns rekey requests off. This does not prevent the server from requesting rekeys, however. The default is 1000000000 (1 GB).
+
+              <rekey bytes="1000000000" />
+
+       authentication-methods
+              This element specifies the authentication methods that are requested by the client-side components. The authentication-methods element can contain one of each: auth-hostbased, auth-password, auth-publickey, auth-gssapi, and auth-keyboard-interactive.
+              Alternatively, you can specify multiple authentication-method elements. The order of these elements is free.
+
+              The authentication methods are tried in the order the auth-* or authentication-method elements are listed. This means that the least interactive methods should be placed first.
+
+              When several interactive authentication methods are defined as allowed, Tectia Client/Server will alternate between the methods and offers each of them in turn to the server in case the previous method failed.
+
+              authentication-method
+                     This element specifies an authentication method name.  It is included for backwards compatibility. Use the auth-* elements instead.
+
+                     The allowed authentication method names are: gssapi-with-mic, publickey, keyboard-interactive, password, and hostbased.
+
+                     <authentication-methods>
+                       <authentication-method name="hostbased" />
+                       <authentication-method name="gssapi-with-mic" />
+                       <authentication-method name="publickey" />
+                       <authentication-method name="keyboard-interactive" />
+                       <authentication-method name="password" />
+                     </authentication-methods>
+
+              auth-hostbased
+                     This element specifies that host-based authentication will be used.
+
+                     The auth-hostbased element can include a local-hostname element.
+
+                     local-hostname
+                            This element specifies the local host name, as the value of the name attribute, that is advertised to the remote server during host-based authentication.
+
+                            The  remote  server  can use the client host name as a hint when locating the public key for the client host. This information is not significant to the authentication result, but makes it faster to find the relevant client host key, if
+                            the server has such a big storage of host identities, that trying them all would be infeasible.
+
+              auth-password
+                     This element specifies that password authentication will be used.
+
+              auth-publickey
+                     This element specifies that public-key authentication will be used.
+
+                     The auth-publickey element can include a key-selection element.
+
+                     The auth-publickey element can include a signature-algorithms attribute. The attribute defines the public-key signature algorithms used for client authentication. The algorithms to be used are configured in both the Connection Broker and  Tec‐
+                     tia  Server  configuration  files.  The algorithms that will be used are those that are defined in both Tectia Server and Connection Broker configuration files. This way the use of only certain algorithms, such as SHA-2, can be enforced. For a
+                     list of the supported algorithms, see descriptions of hostkey-algorithms above.
+
+                     <authentication-methods>
+                            <auth-publickey signature-algorithms="ssh-rsa-sha224@ssh.com"/>
+                            <auth-publickey signature-algorithms="ssh-dss-sha512@ssh.com"/>
+                        </authentication-methods>
+
+
+                     key-selection
+                            This element specifies the key selection policy the client uses when proposing user public keys to the server. The policy attribute can take the values automatic (default) and interactive-shy.
+
+                            In the automatic mode, the client tries keys in the following order:
+
+                            1.  Keys with public key available and private key without a passphrase (no user interaction)
+
+                            2.  Keys with public key available but private key behind a passphrase (one passphrase query)
+
+                            3.  Keys that need a passphrase to get the public key but private key without passphrase (one user query for each key which is considered and proposed to server, but no user interaction for actual public-key login)
+
+                            4.  The rest of the keys, that is, keys that need a passphrase to get the public key and also to get the private key
+
+                     In the interactive-shy mode, the client does not try any keys automatically, but it prompts the user to select the key from a list of available keys. If the authentication with the selected key fails, the client will  prompt  the  user  again,
+                     removing the already tried key(s) from the list. If there is only one key candidate available, the key will be tried automatically without asking the user.
+
+                     The key-selection element can include the public-key and issuer-name elements.
+
+                            public-key
+                                   This  element can be used to specify that only plain public keys or only certificates are tried during public-key authentication. The type attribute can take the values plain and certificate. The default is to try both plain pub‐
+                                   lic keys and certificates.
+
+                            issuer-name
+                                   This element can be used to filter the user certificates that will be included in the list presented to the user. The client-side user certificates can be filtered according to the issuer name that is compared to the  certificate
+                                   issuers  requested  or  accepted  by  the server.  The match-server-certificate attribute takes values yes and no. With value yes, Connection Broker tries matching the user certificate issuer name to the server certificate issuer
+                                   name.  Option no means that the issuer names are not used as a filter.  By default, the filtering is not done.
+
+                                   The issuer-name is useful when a user has several certificates with different access rights to the same server, for example for a testing role and for an administrator role. The Connection Broker chooses the relevant certificates
+                                   that are applicable on the remote host, and the user can choose the correct certificate from the short-listed ones.
+
+              auth-keyboard-interactive
+                     This element specifies that keyboard-interactive methods will be used in authentication.
+
+              auth-gssapi
+                     This element specifies that GSSAPI will be used in authentication.
+
+                     The auth-gssapi element can take the following attributes:
+
+                     The dll-path attribute specifies where the necessary GSSAPI libraries are located. If this attribute is not specified, the libraries are searched for in a number of common locations. The full path to the libraries should be given, for example,
+                     "/usr/lib/libkrb5.so,/usr/lib/libgssapi_krb5.so".
+
+                     On AIX, the dll-path should include the archive file, if applicable, for example, "<path>/libgssapi_krb5.a(libgssapi_krb5.a.so)".  The archive(shared_object) syntax is not necessary if the library is a shared object or has been extracted  from
+                     the shared object.
+
+                     The allow-ticket-forwarding attribute defines whether Tectia Client/Server allows forwarding the Kerberos ticket over several connections. The attribute can have a value of yes or no. The default is no.
+
+       An example of authentication-methods configuration is shown below:
+
+       <authentication-methods>
+         <auth-hostbased>
+           <local-hostname name="host.example.com" />
+         </auth-hostbased>
+         <auth-gssapi allow-ticket-forwarding="yes"/>
+         <auth-publickey>
+           <key-selection policy="interactive-shy">
+             <public-key type="plain" />
+           </key-selection>
+         </auth-publickey>
+         <auth-keyboard-interactive />
+         <auth-password>
+           <password file="/path/filename" />
+         </auth-password>
+       </authentication-methods>
+
+       hostbased-default-domain
+              This element specifies the host's default domain name (as name). This element is used to make sure the fully qualified domain name (FQDN) of the client host is transmitted to the server when using host-based user authentication.
+
+              The default domain name is appended to the short host name before transmitting it to the server. This is needed because some platforms (Solaris for instance) use the short format of the host name, and with that the signature cannot be created.
+
+              The allowed formats of the default domain names are: .example.com and example.com (without the leading dot). For example:
+
+              <hostbased-default-domain name=".example.com" />
+
+       compression
+              This element specifies whether the client sends the data compressed (PUT operation). When activated, compression is applied on-the-fly to all data sent out through the connection and on all channels in it.
+
+              The name of the compression algorithm and the compression level can be given as attributes. The name attribute can be defined as none (compression not used) or zlib, currently the only supported algorithm. By default, compression is not used.
+
+              The level attribute can be given an integer from 0 to 9. The default compression level is 6, when compression is activated but no level is given.
+
+              Example: to activate maximum level compression of sent data, make the following setting:
+
+              <compression name="zlib" level="9" />
+
+              Note that this compression setting does not affect received data (GET operations), but their compression is defined on the Secure Shell server. Tectia Server always uses compression level 6.
+
+       proxy  This element defines rules for HTTP proxy or SOCKS servers the client will use for connections. It has a single attribute: ruleset.
+
+              The  format of the attribute value is a sequence of rules delimited by semicolons (;). Each rule has a format that resembles the URL format. In a rule, the connection type is given first. The type can be direct, socks, socks4, socks5, or http-connect
+              (socks is a synonym for socks4). This is followed by the server address and port. If the port is not given, the default ports 1080 for SOCKS and 80 for HTTP are used.
+
+              After the address, zero or more conditions delimited by commas (,) are given. The conditions can specify IP addresses or DNS names.
+
+              direct:///[cond[,cond]...]
+              socks://server/[cond[,cond]...]
+              socks4://server/[cond[,cond]...]
+              socks5://server/[cond[,cond]...]
+              http-connect://server/[cond[,cond]...]
+
+              The IP address/port conditions have an address pattern and an optional port range:
+
+              ip_pattern[:port_range]
+
+              The ip_pattern may have one of the following forms:
+
+              · a single IP address x.x.x.x
+
+              · an IP address range of the form x.x.x.x-y.y.y.y
+
+              · an IP sub-network mask of the form x.x.x.x/y
+
+       The DNS name conditions consist of a host name which may be a regular expression containing the characters "*" and "?" and a port range:
+
+       name_pattern[:port_range]
+
+       An example proxy element is shown below. It causes the server to access the callback address and the ssh.com domain directly, access *.example with HTTP CONNECT, and all other destinations with SOCKS4.
+
+       <proxy ruleset="direct:///127.0.0.0/8,*.ssh.com;
+                       http-connect://http-proxy.ssh.com:8080/*.example;
+                       socks://fw.ssh.com:1080/" />
+
+       idle-timeout
+              This element specifies how long idle time (after all connection channels are closed) is allowed for a connection before automatically closing the connection. The time is given in seconds. The type is always connection.
+
+              The default setting is 5 seconds. Setting a longer time allows the connection to the server to remain open even after a session (for example, sshg3) is closed. During this time, a new session to the server can be initiated without  re-authentication.
+              Setting the time to 0 (zero) terminates the connection immediately when the last channel to the server is closed.
+
+              <idle-timeout time="5" />
+
+       tcp-connect-timeout
+              This  element specifies a timeout for the TCP connection. When this setting is made, connection attempts to an Secure Shell server are stopped after the defined time if the remote host is down or unreachable. This timeout overrides the default system
+              TCP timeout, and this timeout setting can be overridden by defining a tcp-connect-timeout setting per connection profile (in the profiles settings) or per connection (on command line).
+
+              The time is given in seconds. The factory default is 5 seconds. Value 0 (zero) disables this feature and the default system TCP timeout will be used.
+
+              <tcp-connect-timeout time="5" />
+
+       keepalive-interval
+              This element specifies an interval for sending keepalive messages to the Secure Shell server. The time value is given in seconds.  The default setting is 0, meaning that the keepalive messages are disabled.
+
+              <keepalive-interval time="0" />
+
+       exclusive-connection
+              The exclusive-connection element can be used to specify that a new connection is opened for each new channel.  This setting takes one attribute enable, with value yes or no. The default is no, meaning that open connections are reused for new channels
+              requested by a client.
+
+       server-banners
+              This element defines whether the server banner message file (if it exists) is visible to the user before login. The word yes or no is given as the value of the visible attribute. The default is yes.
+
+              To eliminate server banners:
+
+              <server-banners visible="no" />
+
+       forwards
+              This element contains forward elements that define whether X11 or agent forwarding (tunneling) are allowed on the client side.
+
+              forward
+                     This element defines X11 or agent forwarding settings.
+
+                     The type attribute defines the forwarding type (either x11 or agent). The state attribute sets the forwarding on, off, or denied. If the forwarding is set as denied, the user cannot enable it on the command-line.
+
+       An example forward configuration, which denies X11 forwarding and allows agent forwarding globally, is shown below:
+
+       <forwards>
+         <forward type="x11" state="denied" />
+         <forward type="agent" state="on" />
+       </forwards>
+
+       extended
+              This element is reserved for future use.
+
+       remote-environment
+              This element contains environment elements which define the environment variables to be passed to the server from the client side.  The environment variables are then set on the server when requesting a command, shell or subsystem.
+
+              Note that the server can restrict the setting of environment variables.
+
+              environment
+                     This element defines the name and value of the environment variables, and whether the Connection Broker should process the value. Possible attributes are name, value, and format.
+
+                     An example remote environment configuration:
+
+                     <remote-environment>
+                       <environment name="FOO" value="bar" />
+                       <environment name="QUX" value="%Ubaz" format="yes" />
+                       <environment name="ZAPPA" value="%Ubaz" />
+                     </remote-environment>
+
+                     You can use %U in the value to indicate a user name. When format="yes" is also defined, the Connection Broker processes the %U into the actual user name before sending it to the server.
+
+                     Let's assume the user name is joedoe in this example.  The example configuration results in the following environment variables on the server side, provided that the server allows setting the environment variables:
+
+                     FOO=bar
+                     QUX=joedoebaz
+                     ZAPPA=%Ubaz
+
+       You can override the remote environment settings made in the configuration file if you use the sshg3 command with the following arguments on the command-line client: --remote-environment or --remote-environment-format
+
+       For information on the command-line options, see the sshg3(1) man page.
+
+       server-authentication-methods
+              This  server-authentication-methods  element can be used to force the Connection Broker to use only certain methods in server authentication. This element can contain auth-server-publickey and auth-server-certificate elements (one of each).  Alterna‐
+              tively, you can specify up to two authentication-method elements. The order of these elements is free.
+
+              If only auth-server-certificate is specified, server certificate is needed. If no server certificate is received, connection fails.
+
+              If only auth-server-publickey is specified, (plain) server public key is needed. If no server public key is received, connection fails.
+
+              If both auth-server-certificate and auth-server-publickey are specified, server certificate is used if present. Otherwise server public key is used.
+
+              auth-server-certificate
+                     The auth-server-certificate element specifies that certificates are used for server authentication.
+
+              auth-server-publickey
+                     The auth-server-publickey element specifies that public host keys are used for server authentication.
+                     Note
+
+                     The host key policy settings have changed in version 6.1.4 and are now defined in the auth-server-publickey element.
+
+              The element takes attribute policy that defines how unknown server host keys are handled. It can have the following values:
+
+                     · strict: Connect to the server only if the host key is found from the host key store and matches.
+
+                       If the policy is set to strict, the Connection Broker never adds host keys to the user's .ssh2/hostkeys directory upon connection, and refuses to connect to hosts whose key has changed. This provides maximum  protection  against  man-in-the-
+                       middle attacks. However, it also means you must always obtain host keys via out-of-band means, which can be troublesome if you frequently connect to new hosts.
+
+                     · ask  (default): If the server host key is not found from the host key store, the user will be asked if he wants to accept the host key. If the host key has changed, the user is warned about it and asked how to proceed. If the client applica‐
+                       tion is not able to ask the user (for example, sftpg3 in batch mode, -B), the connection will be disconnected.
+
+                     · trust-on-first-use or tofu: If the server host key is not found, it is stored to the user's .ssh2/hostkeys directory. If the host key has changed, the connection will be disconnected.
+
+                     · advisory: Use of this setting effectively disables server authentication, which makes the connection vulnerable to active attackers.
+
+                       If the server host key is not found in the host key store, it will be added to the user's .ssh2/hostkeys directory without user interaction. If the host key has changed, the connection will be continued without user interaction. The incident
+                       will be audited if logging is enabled.
+
+                       When the policy is set to advisory, the keys from new hosts are automatically accepted and stored to the host key database without prompting acceptance from the user. However, changed host keys (from hosts whose keys are already in the data‐
+                       base) are not stored, but they are accepted for that connection only.
+
+                       This setting should be used only if logging is enabled for the Connection Broker (by default, logging is enabled only if the Broker is run by the Tectia MFT Events service).
+                       Caution
+
+                       Consider carefully before setting the policy to advisory.  Disabling the host-key checks makes you vulnerable to man-in-the-middle attacks.
+
+              In policy modes other than strict, if logging is enabled for the Connection Broker, Tectia Client/Server will log information about changed and new host public keys with their fingerprints in the syslog (on Unix) or Event Viewer (on Windows).
+                     Note
+
+                     When FTP-SFTP conversion is used, accepting the host key cannot be prompted from the user. Either the policy must be set to tofu or the host keys of the Secure Shell tunneling and SFTP servers must be obtained beforehand and  stored  based  on
+                     the IP addresses of the servers.
+
+              If the policy attribute is not defined, the host key policy is interpreted based on the values of the old strict-host-key-checking, host-key-always-ask, and accept-unknown-host-keys options.
+                     Note
+
+                     In version 6.1.4 and later, the host key policy setting in the user-specific configuration file always takes precedence over the setting in the global configuration file.
+
+              Interpretation of the old host key policy (used in Tectia Client/Server 5.0.0-6.1.3) to the new host key policy (Tectia Client/Server 6.1.4 and later) is done as follows:
+
+              Old settings:                                | New
+              strict-host-   accept-unknown-   host-key-   | host key
+              key-checking   host-keys         always-ask  | policy
+              ---------------------------------------------|---------------------
+               -               -                -          |  ask (default)
+               enabled         -                -          |  strict
+               enabled         enabled          -          |  strict
+               enabled         enabled          enabled    |  ask
+               enabled         -                enabled    |  ask
+               -               enabled          -          |  trust on first use
+               -               enabled          enabled    |  ask
+               -               -                enabled    |  ask
+
+              authentication-method
+                     The server-authentication-methods/authentication-method element specifies an authentication method name. This element is included for backwards compatibility. Use the auth-server-* elements instead.
+
+                     <server-authentication-methods>
+                       <authentication-method name="publickey" />
+                       <authentication-method name="certificate" />
+                     </server-authentication-methods>
+
+       An example server-authentication-methods element is shown below:
+
+       <server-authentication-methods>
+         <auth-server-publickey policy="ask" />
+         <auth-server-certificate />
+       </server-authentication-methods>
+
+       authentication-success-message
+              This setting defines whether the AuthenticationSuccessMsg messages are output. The authentication-success-message element takes attribute enable with value yes or no. The default is yes, meaning that the messages are output and logged.
+
+       terminal-selection
+              This element defines how the Tectia terminal behaves when the user selects text with double-clicks. The element takes one attribute: selection-type, whose value can be:
+
+              select-words - double-clicking selects one word at a time, space and all punctuation characters are used as delimiters.  This is the default.
+
+              select-paths - selects strings of characters between spaces, meaning a selection is extended over characters \/.-_, so that for example a path to a file can be selected by double-clicking anywhere in the path.
+
+       terminal-bell
+              This element defines whether Tectia terminal repeats audible notifications from the destination server. This option is only applied to connections with Unix servers. The element takes one attribute, bell-style, whose value can be:
+
+              none - no audible notifications are used
+
+              pc-speaker - the user's PC speakers beep when an audible notification is indicated by the destination server
+
+              system-default - the Tectia terminal sounds the default alerts defined in the system on the destination server. This is the default.
+
+       close-window-on-disconnect
+              This  element  defines  that  also  the  Tectia terminal window is to be closed while disconnecting from a server session by pressing CTRL+D. The element takes one attribute, enable, whose value can be yes or no. The default is no meaning that CTRL+D
+              closes only the server connection but the Tectia terminal window remains open.
+
+       quiet-mode
+              This setting defines whether the command line clients should suppress warnings, error messages and authentication success messages.  The quiet-mode element takes attribute enable with value yes or no. The default is no, meaning that  the  errors  and
+              messages are output and logged.
+
+              The  quiet-mode  element  affects  command line tools scpg3, sshg3, and sftpg3.  Enabling the quiet mode here with setting quiet-mode enable="yes" is the same as running these clients with option -q.  Note that the -q command line parameter will take
+              priority over the quiet-mode element set in this configuration file.
+
+       checksum
+              The checksum element can be used to define a default setting for comparing checksums. This default overwrites the factory setting that checksums are not checked for files smaller than 32kB.
+
+              The checksum element takes attribute type, whose value can be:
+
+              yes|YES - MD5 checksums are checked on files larger than 32kB.
+
+              no|NO - checksums are not used.
+
+              md5|MD5 - only MD5 checksums are checked on files larger than 32kB. When the --fips parameter is set with the command line clients scpg3 and sftpg3, this hash is not used.
+
+              sha1|SHA1 - only SHA1 checksums are checked on files larger than 32kB. When the --fips parameter is set with the command line clients scpg3 and sftpg3, this hash is used.
+
+              md5-force|MD5-FORCE - MD5 checksums are forced, except when the --fips parameter is set with the command line tools scpg3 and sftpg3.
+
+              sha1-force|SHA1-FORCE - SHA1 checksums are forced on all files.
+
+              checkpoint|CHECKPOINT - checkpointing is forced on large files that are transferred one by one.
+              Note
+
+              If the Connection Broker is started in FIPS mode and the md5 attribute is defined in the configuration file, but scpg3 or sftpg3 are not started with the --fips parameter, then md5 is used.
+
+       Note that checksums can also be defined with the command line clients scpg3 and sftpg3, or with environment variables. The order of priority of the three checksum settings (in case they are different) is as follows, the later one always overwrites the  pre‐
+       vious value:
+
+              · checksum setting in the configuration file
+
+              · environment value
+
+              · command line arguments.
+
+       address-family
+              The address-family element defines the IP address family for this profile. The broker will operate using IPv4 (inet) addressing, IPv6 (inet6), or both (any). The default is any.
+
+THE profiles ELEMENT
+       The  profiles  element defines the connection profiles for connecting to the specified servers. Element profiles can contain multiple profile elements. Each profile defines the connection rules to one server. The settings in the profile element override the
+       default connection settings.
+
+       When a profile is used for the connection, the settings in the profile override the default settings.
+
+       profile
+              The profile element defines a connection profile. It has the following attributes: id, name, host, port, protocol, host-type, connect-on-startup, user, and gateway-profile.
+
+              The profile id must be a unique identifier that does not change during the lifetime of the profile.
+
+              An additional name can be given to the profile. This is a free-form text string. The name can be used for connecting with the profile on the command line, so define a unique name for each profile.
+
+              The host attribute defines the address of the Secure Shell server host and it is a mandatory setting. The address can be either an IP address or a domain name. The value host="*" can be used to prompt the user to enter the host address when  starting
+              the session.
+
+              The port is a mandatory setting. It defines the port number of the Secure Shell server listener.  The default port is 22.
+
+              The protocol is a mandatory setting. It defines the used communications protocol.  Currently the only allowed value is secsh2.
+
+              If  you  want  to  make the connection specified by the profile automatically when the Connection Broker is started, set the value of the connect-on-startup attribute to yes. In this case, give also the user attribute (the user name the connection is
+              made with). You also need to set up some form of non-interactive authentication for the connection.
+
+              The host-type attribute sets the server type for ASCII file transfer. This specifies the newline convention that is used for ASCII (text) files. The default value is default. Other possible values are windows (for Windows server host) and  unix  (for
+              Unix server host). Define the value if you are using any other server than Tectia Server.
+
+              For FTP-SFTP conversion, set the server type here according to your target FTP server to transfer ASCII text files with correct newline convention.
+
+              The  user  attribute  specifies the user name for opening the connection. The value "%USERNAME%" can be used to apply the user name of the currently logged in user. The value user="*" can be used to prompt the user to enter the user name when logging
+              in. When the user attribute is not defined, the user name defined in the default connection settings will be used.
+
+              An empty value user="" can be used when the profile is used with FTP-SFTP conversion and the user name is taken from the application (filter-engine/rule[@username-from-app="yes"]).  See the rule element below for details.
+
+              hostkey
+                     This element gives the path to the remote server host public key file as a value of the file attribute.
+
+                     Alternatively, the public key can be included as a base64-encoded ASCII block.
+
+              ciphers
+                     This element defines the ciphers used with this profile.  See The default-settings Element above for details.
+
+              macs   This element defines the MACs used with this profile.  See The default-settings Element above for details.
+
+              kexs   This element defines the KEXs used with this profile.  See The default-settings Element above for details.
+
+              hostkey-algorithms
+                     This element defines the hostkey signature algorithms used with this profile.  See The default-settings Element above for details.
+
+              rekey  This element defines the rekeying settings used with this profile.  See The default-settings Element above for details.
+
+              authentication-methods
+                     This element defines the authentication methods used with this profile.  See The default-settings Element above for details.
+
+              user-identities
+                     This element specifies the identities used in user public-key authentication. In contrast to the key-stores element that specifies all the keys that are available for the Connection Broker, this element can be used to control the keys that are
+                     attempted in authentication when this connection profile is used and to specify the order in which they are attempted.
+
+                     The user-identities element can contain multiple identity elements. When multiple identity elements are used, they are tried out in the order they are listed.
+
+                     The identity element has the following attributes: identity-file, file, hash, id, and data.
+
+                     The identity-file attribute specifies that the user identity is read in the identification file used with public-key authentication. Enter the full path to the file if it is located somewhere else than the default identification file directory
+                     which is $HOME/.ssh2. See also ssh-broker-g3(1).
+
+                     The file attribute specifies the path to the public-key file (primarily) or to a certificate. Enter the full path and file name as the value.
+
+                     The hash attribute is used to enter the hash of the public key that will be used to identify the related private key. The key must be available for the Connection Broker The public key hashes of the available keys can be listed with  the  ssh-
+                     broker-ctl tool. See also ssh-broker-ctl(1).
+
+                     The id attribute is reserved for future use.
+
+                     The data attribute is reserved for future use.
+
+                     An example user-identities element is shown below:
+
+                     <user-identities>
+                       <identity identity-file="C:\\ mykey" />
+                       <identity file="$HOME/user/.ssh2/id_dsa_2048_a" />
+                       <identity file="C:\\private_keys\id_dsa_2048_a" />
+                       <identity hash="#a8edd3845005931aaa658b5573609e7d31e23afd" />
+                     </user-identities>
+
+              compression
+                     This element defines the compression settings used with this profile.  See The default-settings Element above for details.
+
+              proxy  This element defines the HTTP proxy and SOCKS server settings used with this profile.  See The default-settings Element above for details.
+
+                     If gateway-profile has been defined for this profile, the proxy setting is ignored and the default proxy setting or the proxy setting of the gateway profile is used instead.
+
+              idle-timeout
+                     This element defines the idle timeout settings used with this profile.  See The default-settings Element above for details.
+
+              tcp-connect-timeout
+                     This  element  defines  the  TCP connection timeout for this profile.  The timeout is used to terminate connection attempts to Secure Shell servers that are down or unreachable. The default value is 5 seconds.  See The default-settings Element
+                     above for details.
+
+              keepalive-interval
+                     This element defines an interval for sending keepalive messages to the Secure Shell server. The setting applies to this profile. The default value is 0, meaning that no keepalive messages are sent.  See The default-settings Element  above  for
+                     details.
+
+              exclusive-connection
+                     This  element  defines  whether  a  new  connection is opened for each new channel when a connection is made with this profile. This setting takes one attribute enable, with value yes or no. The default is no, meaning that open connections are
+                     reused for new channels requested by a client.  See also The default-settings Element above.
+
+              server-banners
+                     This element defines the server banner setting used with this profile.  See The default-settings Element above for details.
+
+              forwards
+                     This element defines the forwards allowed with this profile.  See The default-settings Element above for details.
+
+              extended
+                     This element is reserved for future use.
+
+              remote-environment
+                     This element defines the remote environment settings used with this profile. Within the remote-environment element, define an environment element for each environment variable to be passed to the server.  See The default-settings Element above
+                     for details.
+
+              server-authentication-methods
+                     This element defines the server authentication methods allowed with this profile.  See The default-settings Element above for details.
+
+              password
+                     This element can be used to specify a user password that the client will send as a response to password authentication.
+
+                     The password can be given directly in the string attribute, or a path to a file containing the password can be given in the file attribute, or a path to a program or a script that outputs the password can be given in the command attribute.
+
+                     When  using  the  command  option  to  refer to a shell script, make sure the script also defines the user's shell, and outputs the actual password. Otherwise the executed program fails, because it does not know what shell to use for the shell
+                     script. For example, if the password string is defined in a file named my_password.txt, and you want to use the bash shell, include these lines in the script:
+
+                     #!/usr/bash
+                     cat /full/pathname/to/my_password.txt
+                     Caution
+
+                     If the password is given using this option, it is extremely important that the ssh-broker-config.xml file, the password file, or the program are not accessible by anyone else than the intended user.
+                     Note
+
+                     Any password given with the command-line options will override this setting.
+
+       An example connection profile is shown below:
+
+       <profile name="rock"
+                id="id1"
+                host="rock.example.com"
+                port="22"
+                connect-on-startup="no"
+                user="doct">
+
+         <hostkey file="key_22_rock.pub">
+         </hostkey>
+
+         <authentication-methods>
+           <auth-publickey />
+           <auth-password />
+         </authentication-methods>
+
+         <server-authentication-methods>
+           <auth-server-publickey policy="strict" />
+         </server-authentication-methods>
+
+         <server-banners visible="yes" />
+
+         <forwards>
+           <forward type="agent" state="on" />
+           <forward type="x11" state="on" />
+         </forwards>
+
+         <tunnels>
+           <local-tunnel type="tcp"
+                         listen-port="143"
+                         dst-host="imap.example.com"
+                         dst-port="143"
+                         allow-relay="no" />
+         </tunnels>
+
+         <remote-environment>
+           <environment name="FOO" value="bar" />
+           <environment name="QUX" value="%Ubaz" format="yes" />
+           <environment name="ZAPPA" value="%Ubaz" />
+         </remote-environment>
+
+       </profile>
+
+THE filter-engine ELEMENT
+       The filter-engine element defines the filter rules for FTP-SFTP conversion, transparent FTP tunneling, and transparent TCP tunneling. The filter-engine element is used only by Tectia ConnectSecure.
+              Note
+
+              The filter-engine element is read from the global configuration file (/etc/ssh2/ssh-broker-config.xml), if such a file is available (Tectia Client/ConnectSecure is controlled by Tectia Manager). Only when the global configuration file does  not  con‐
+              tain the filter-engine element, this element is read from the user-specific configuration file.
+
+       The top level element is filter-engine. It has three attributes: ip-generate-start, ip6-generate-start and ftp-filter-at-signs (used with Tectia ConnectSecure, only).
+
+       The ip-generate-start attribute defines the start address of the pseudo IPv4 address space. Pseudo IPs are generated by the Connection Broker when applications do the DNS query through the SSH connection capture component.
+
+       The ip6-generate-start attribute is similar to ip-generate-start, but it defines the start address of the pseudo IPv6 address space.
+
+       With Tectia ConnectSecure, the ftp-filter-at-signs attribute can be used with FTP-SFTP conversion when scripts are used to open a connection directly from the FTP/SFTP client to the SFTP server, bypassing any proxies. This attribute defines that Tectia Con‐
+       nectSecure uses the FTP user name, FTP server name, and FTP server password specified in the FTP script.
+
+       The FTP script is expected to specify the user name in format ftp-user@proxy-user@ftp-server and the password in format ftp-password@proxy-password. The @ sign is used to extract the relevant data from the strings.
+
+       The ftp-filter-at-signs takes yes and no as values, no is the default.
+
+       When ftp-filter-at-signs="yes", Tectia ConnectSecure cuts the user name string at the first @ sign to extract the ftp-user and at the last @ sign to extract the ftp-server, and the rest of the string is ignored. Likewise, the passwords string is cut at  the
+       last @ sign and the first part is used as the password on the SFTP server.
+              Note
+
+              Under the filter-engine element there can be any amount of elements network, dns, filter, or rule.  The order of the elements is important, because the filter engine uses the elements in the order they were specified in the configuration file.
+
+       network
+              The  network  element  specifies  a  "location"  where Tectia Client/ConnectSecure is running. By using the network element, you can implement location-awareness for Tectia Client/ConnectSecure.  It has five attributes: id, address, domain, ip-gener‐
+              ate-start and ip6-generate-start.
+
+              The id attribute specifies a unique identifier for the network element. The address attribute specifies the address of the network. It can be missing or empty, in which case it is not used. The domain attribute contains the domain name  of  the  com‐
+              puter.  It  can  also be missing or empty, in which case it is not used. The ip-generate-start attribute defines the start address of the pseudo IPv4 space. If it is defined here, it overrides the ip-generate-start attribute of the filter-engine ele‐
+              ment. The ip6-generate-start attribute is similar to ip-generate-start, but it defines the start address of the pseudo IPv6 address space.
+
+       dns
+              Note
+
+              The dns element exists for backward-compatibility reasons.  Currently the rule element is used for the same settings.
+
+       The dns element creates a DNS rule for the filter engine. It has six attributes: id, network-id, application, host, ip-address, and pseudo-ip.  For their descriptions, see the rule element below.
+
+       filter
+              Note
+
+              The filter element exists for backward-compatibility reasons.  Currently the rule element is used for the same settings.
+
+       The filter element specifies an action for a connection. It has the following attributes: dns-id, ports, action, profile-id, destination, destination-port, fallback-to-plain.
+
+       The dns-id attribute is a reference to a dns element.
+
+       For the descriptions of the other attributes, see the rule element below.
+
+       rule   The rule element specifies how a filtered connection will be handled. It has the following attributes: application, host, ip-address, pseudo-ip, ports, action, profile-id, destination, destination-port, username, hostname-from-app, username-from-app,
+              fallback-to-plain, show-sftp-server-banner.
+
+              The application attribute can be used to specify one or more applications to which the rule is applied. This can be a regular expression using the egrep syntax.
+
+              The host attribute specifies a target host name. It can be a regular expression using the egrep syntax.
+
+              The ip-address attribute specifies the target host IP address. It can be a regular expression using the egrep syntax.  If both the host name and the IP address are defined, the host attribute takes precedence and the ip-address attribute is ignored.
+
+              The pseudo-ip setting has the following effects when the ip-address is left empty and the host matches:
+
+              · When  pseudo-ip="yes",  the  Connection  Broker assigns a pseudo IP address for the target host and Tectia Server resolves the real IP address. The pseudo IP addresses should be used when accessing an internal network from the outside, because name
+                resolution for the machines in the internal network is not available from the outside.
+
+              · When pseudo-ip="no", a normal DNS query is made for the target host name. The default value is no.
+
+       The ports attribute can be a single port or a range.  A range is specified with a hyphen between two integers (for example "21-25").
+              Note
+
+              For FTP-SFTP conversion, always specify the port unambiguously if fallback mode is set. Do not use an asterisk (*), because it causes problems in passive mode file transfer when connected to a plaintext FTP server.
+
+       The action attribute specifies the action to be done when a filter matches. Its value can be DIRECT, BLOCK, TUNNEL, FTP-TUNNEL, or FTP-PROXY.
+
+              · DIRECT causes the connection to be made directly as plaintext without tunneling or FTP-SFTP conversion.
+
+              · BLOCK causes the connection to be blocked.
+
+              · FTP-TUNNEL activates transparent FTP tunneling (only on Tectia ConnectSecure)
+
+              · FTP-PROXY causes the FTP-SFTP conversion to start and a connection to be made to the Secure Shell SFTP server.
+
+       The profile-id attribute can be used to specify the connection profile that defines the connection settings.
+
+       If the profile-id attribute is left empty and hostname-from-app="yes" is specified, the Secure Shell connection is made to the server specified by the client application using default settings. If a profile-id is specified and  also  hostname-from-app="yes"
+       is specified, or the referred profile has * (an asterisk) or empty as the value of the host attribute, the Secure Shell connection is made to the server specified by the client application using the profile settings.
+
+       The destination and destination-port attributes can be used to define a static destination address and port number that will be used as the end point of the connection instead of the original address and port given by the application.
+
+       The username attribute can be used to define the user name used for connecting to the Secure Shell server, or you can define the path from where the Connection Broker should retrieve the user name.
+
+       The hostname-from-app attribute defines whether the Connection Broker should extract the Secure Shell server's host name from data sent by the application, or use a Secure Shell server defined by the connection profile in profile-id. The value is yes or no,
+       and the default is no.
+
+       When hostname-from-app="no", the tunnel or FTP-SFTP conversion will be created to the Secure Shell server specified in the connection profile referred in the profile-id attribute. Note that with transparent tunneling, the connection from  the  Secure  Shell
+       server to the final destination application will be unsecured and in plaintext. To achieve end-to-end security, the Secure Shell server should reside on the same host as the application.
+
+       When  hostname-from-app="yes",  the tunnel or FTP-SFTP conversion will be created to the destination server specified by the application.  This setting can be used with both FTP and TCP tunneling and FTP-SFTP conversion.  When using hostname-from-app="yes",
+       it is no longer necessary to create a separate connection profile for each destination host. Note that this requires that a Secure Shell server is installed to each destination server (or that fallback-to-plain is enabled  to  allow  direct  connections  to
+       those servers that do not have Secure Shell installed).
+
+       The username-from-app attribute defines whether the FTP tunneling or FTP-SFTP conversion extracts the user name from data sent by the FTP application. The value is yes or no. The default is no.
+
+       When  username-from-app="yes",  the user name received from the FTP client application is used. This setting can be used with FTP tunneling and FTP-SFTP conversion. This setting will override any user name settings made in a related connection profile. When
+       username-from-app="no", the user name is taken from the connection profile defined with the profile-id attribute.
+
+       The fallback-to-plain attribute can be used to define whether a direct (unsecured) connection is used if creating the tunnel fails or the connection to the Secure Shell server fails.  The default value is no.  Normally, when  the  secured  connection  fails
+       when applying a filter rule, the Connection Broker will return a "host not reachable" error.
+              Note
+
+              Do not enable the fallback-to-plain and pseudo-ip options at the same time. If they both are enabled, and a secure connection fails, the application will try a direct connection with the pseudo IP, which will not work.
+
+       In  FTP-SFTP  conversion,  if  the  target  SFTP  server  is  configured to send a banner to the client, the show-sftp-server-banner attribute can be used to make the Connection Broker forward the SFTP server banner to the FTP client. The allowed values for
+       show-sftp-server-banner are yes and no. The default value is no (the SFTP server banner is not forwarded to the FTP client).
+              Note
+
+              If you have made changes to the Connection Broker default configuration, make sure that showing the server banner is enabled (server-banners visible="yes") in the default-settings or in profiles.
+              Note
+
+              Sending the SFTP server banner to the FTP client will cause an extra connection opening to the target SFTP server for retrieving the banner message.
+
+       In case of a failure in retrieving the banner message from the target SFTP server, the banner that Connection Broker forwards to the FTP client includes an error description, a default banner, and the following text:
+
+       Can't fetch banner from SFTP Server
+
+THE logging ELEMENT
+       The logging element changes the logging settings that define the log event severities and logging facilities. The element contains one or more log-target and log-events elements.
+
+       log-target
+              This element specifies the log target for auditing. By default, the broker does not log anything. This element can be used to direct log data to a file or syslog.
+
+              The log-target element can have file and type as attributes.
+
+              The type attribute specifies the logging facility where the audit data is output to. The value can be file, syslog or discard.
+
+              The file attribute sets the file system path where the audit data is written to. If the type attribute has syslog or discard set, the file attribute is not allowed.
+
+       log-events
+              This element sets the severity and facility of different logging events. The events have reasonable default values, which are used if no explicit logging settings are made. This setting allows customizing the default values.
+
+              The element can also contain one or more log-target elements. When defined here, the log-target element will override the definition given in the logging/log-target.
+
+              For the events, facility and severity can be set as attributes. The events itself should be listed inside the log-events element.
+
+              The facility can be normal, daemon, user, auth, local0, local1, local2, local3, local4, local5, local6, local7, or discard. Setting the facility to discard causes the server to ignore the specified log events.
+
+              The severity can be informational, notice, warning, error, critical, security-success, or security-failure.
+
+              Any events that are not specifically defined in the configuration file will use the default values. The defaults can be overridden for all remaining events by giving an empty log-events element after all other definitions and by  setting  a  severity
+              value for it.
+
+              In the names of log events, the characters '*' and '?' can be used as wildcards.
+
+       An example logging configuration that logs all events, which are programmed to be logged by default, both to /tmp/foo and to syslog.
+
+       <logging>
+         <log-target file="/tmp/foo" />
+         <log-target type="syslog" />
+       </logging>
+
+       An example logging configuratin in which events are logged to /tmp/foo, except those whose event name matches "Key_store_*", which will be discarded.
+
+       <logging>
+         <log-target file="/tmp/foo" />
+         <log-events facility="discard">
+           Key_store_*
+         </log-events>
+       </logging>
+
+AUTHORS
+       SSH Communications Security Corporation.
+
+       For more information, see http://www.ssh.com.
+
+SEE ALSO
+       ssh-broker-g3(1), ssh-broker-ctl(1), sshg3(1), scpg3(1), sftpg3(1), ssh-server-config(5)
+
+
+
+                                                                                                                             21 January 2014                                                                                                        ssh-broker-config(5)

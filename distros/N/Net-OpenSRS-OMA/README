@@ -1,0 +1,179 @@
+Net-OpenSRS-OMA Version 0.02
+============================
+
+INSTALLATION
+  To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   sudo make install
+
+NAME
+    Net::OpenSRS::OMA - Client library for the OpenSRS Mail API
+
+SYNOPSIS
+      use Data::Dumper;
+      use Net::OpenSRS::OMA;
+
+      my $oma = new Net::OpenSRS::OMA(
+        uri => 'https://admin.a.hostedemail.com/api',
+        user => 'admin@domain.adm',
+        client => 'my client 0.1',
+        password => 'abc123',
+      );
+    
+      my $response = $oma->get_user(
+        user => 'user@domain.com'
+      );
+
+      if ($response->is_success)
+      {
+        print Dumper $response->content;
+      }
+      elsif ($response->error)
+      {
+        print "Request didn't work at OMA level: " . $response->error . "\n";
+      }
+      else
+      {
+        print "Request didn't work at HTTP level: " . $response->http_status;
+      }
+
+DEPENDENCIES
+    This module requires these modules.
+
+    LWP::UserAgent
+    LWP::Protocol::https
+    JSON
+
+CAVEAT
+    This API is still under development and thus the method calls, arguments
+    and functions are subject to change.
+
+    Consult the API documentation for up to date information.
+
+METHODS
+  new
+    Create and return a new Net::OpenSRS::OMA object.
+
+    Takes the following arguments (in a single hash argument)
+
+      uri - base uri for the api: http://example.com/api/
+      user - username  for authentication
+      password - password for authentication
+      token - token for authentication
+      client - client identification string
+
+    uri, user and either password or token are required.
+
+  uri
+    Get the API address this object is using
+
+  user
+    Get the username this object is using
+
+  client
+    Get the client identifier string this object is using
+
+  API Methods
+    API methods are called as object methods. All methods take a hash
+    argument, that hash has a credentials hashref added, is converted to
+    JSON and sent to the API. Method calls return a
+    Net::OpenSRS::OMA::Response object containing the response from the
+    server.
+
+    Consult the API documentation for the arguments and response formats for
+    each method.
+
+    The callable methods are:
+
+    add_role
+    authenticate
+    change_company
+    change_company_bulletin
+    change_domain
+    change_domain_bulletin
+    change_user
+    change_brand
+    create_workgroup
+    delete_company
+    delete_domain
+    delete_user
+    delete_workgroup
+    echo
+    generate_token
+    get_company
+    get_company_bulletin
+    get_company_changes
+    get_deleted_contacts
+    get_deleted_messages
+    get_domain
+    get_domain_bulletin
+    get_domain_changes
+    get_user
+    get_user_attribute_history
+    get_user_changes
+    get_user_folders
+    get_user_messages
+    get_valid_languages
+    get_valid_timezones
+    logout_user
+    migration_add
+    migration_jobs
+    migration_status
+    migration_threads
+    migration_trace
+    move_user_messages
+    post_domain_bulletin
+    post_company_bulletin
+    remove_role
+    rename_user
+    restore_deleted_contacts
+    restore_deleted_messages
+    restore_domain
+    restore_user
+    search_brand_members
+    search_brands
+    search_companies
+    search_domains
+    search_users
+    search_workgroups
+    set_role
+    stats_summary
+    stats_list
+    stats_snapshot
+
+RESPONSE OBJECT METHODS
+  is_success
+    Returns true if the HTTP status of the request was 200, the response had
+    valid JSON content, and the 'success' field of the response is true.
+
+  content
+    Returns a hashref, the decoded JSON content of the response, or undef if
+    there is no content.
+
+  raw_content
+    Returns a scalar, string, the raw response fromt he server, or undef if
+    there is no content
+
+  http_status
+    Returns a scalar, the HTTP status of the request, from the LWP module.
+
+  error_number
+    Returns a scalar, the error number from the JSON content of the
+    response, or undef if no error number.
+
+  error
+    Returns a scalar, the error string from the JSON content of the
+    response, or undef if no error string.
+
+AUTHOR
+    Richard Platel <rplatel@opensrs.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2012 Richard Platel <rplatel@opensrs.org>
+
+    This program is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+

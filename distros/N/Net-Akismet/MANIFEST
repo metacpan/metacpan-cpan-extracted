@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-Akismet.t
+t/Net-Akismet-podcheck.t
+t/Net-Akismet-coverage.t
+lib/Net/Akismet.pm
+META.yml                                 Module meta-data (added by MakeMaker)

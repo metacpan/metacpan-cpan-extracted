@@ -1,0 +1,27 @@
+NAME
+    Net::OpenStack::Attack - Tools for stress testing an OpenStack
+    deployment.
+
+VERSION
+    version 1.0500
+
+DESCRIPTION
+    This class provides methods for making parallel, asynchronous requests
+    to the OpenStack API. This distribution comes with a command line tool
+    stackattack which heavily uses this class.
+
+SEE ALSO
+    stackattack
+    Net::OpenStack::Compute
+
+AUTHORS
+    *   William Wolf <throughnothing@gmail.com>
+
+    *   Naveed Massjouni <naveedm9@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Naveed Massjouni.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,128 @@
+<h2><a href="#">Empezemos por el principo</a></h2>
+<h3>Qué No es Nes</h3>
+<p>
+No es una biblioteca de funciones para Perl. (Aunque pueda usarse como tal)
+<br>
+No es un lenguaje de programación. (Aunque lo parezca)
+</p>
+<h3>Qué es Nes</h3>
+<p>
+Un sistema de plantillas, o de variables de reemplazo para la Web y Perl. Contemplando
+ los componentes de la Web;  páginas, URLs, elementos gráficos, tag HTML, como objetos.
+</p>
+<p>
+Un sistema para la separación del código ejecutable Perl y la representación de los
+ datos generados en HTML mediante Tags HTML que son reemplazados por variables creadas en Perl.
+</p>
+<h3>Objetivos</h3>
+<p>
+Separación clara del código Perl del HTML.
+</p>
+<p>
+Simplicidad, que no haya que aprenderse decenas de funciones Perl. Nes tiene 
+<b><a href="./?action=item&item=Nes Tags">únicamente diez Tags</a></b> para incluir en el HTML,
+y <b><a href="./?action=item&item=La clase Singleton">un sólo objeto</a></b> con 
+<b><a href="./?action=item&item=La clase Singleton">un único método</a></b> que instanciar 
+en Perl. Puedes aprender a usar Nes en horas.
+</p>
+<p>
+Reutilización, encapsulando partes de HTML con su código Perl.
+</p>
+<h3>Cómo funciona</h3>
+<p>
+CGI distingue los script ejecutables en el Servidor de los que son ejecutados en el
+ Cliente. Esto es, para un servidor Web no es lo mismo un "archivo.cgi" que un "archivo.html"
+</p>
+<p>
+Esta distinción sirve para un Servidor Web, pero no para el usuario de la Web, que felizmente ignora tal cosa.
+</p>
+<p>
+La idea es que Nes se ejecute desde la plantilla y no desde el script:
+<pre>
+http://dominio.com/archivo.html
+
+y no:
+
+http://dominio.com/archivo.cgi
+
+</pre>
+</p>
+<p>
+Mediante unas sencillas instrucciones en el archivo htaccess podemos crear un
+ “Action” para ejecutar nuestros script Perl con la extensión que deseemos.
+</p>
+<p>
+Para Nes hemos creado la extensión “<i>nhtml</i>” como forma de  distinguir los 
+HTML de las plantillas de Nes, así quedaría nuestra configuración htaccess:
+</p>
+<pre>
+AddHandler perl-nes .nhtml
+AddHandler perl-nes .nhtm
+Action perl-nes /cgi-bin/nes/dispatch.cgi
+
+</pre>
+<p>
+Bien, ¿pero como sabemos que script Perl se tiene que ejecutar para 
+una plantilla concreta?
+</p>
+<p>
+Nes define el siguiente Tag para incluir en la primera linea del archivo HTML:
+<pre>
+&#123;: NES 1.0 ('archivo.pl') :&#125;
+&lt;html&gt;
+  &lt;head&gt;
+  ... 
+</pre>
+</p>
+<p>
+De esta forma "dispatch.cgi" lanzará "archivo.pl", pero...
+</p>
+<p>
+¿Que hay que poner en mi "archivo.pl" para que salgan cosas en el "archivo.nhtml"?
+</p>
+<p>
+Lo mínimo que hay que poner es... nada, y funcionará,  pero en la mayoría 
+de los casos bastará con sólo cinco lineas de código Perl:
+<pre>
+# fundamental :-)
+use Nes;
+
+# Crear un objeto de la clase <a href="./?action=item&item=La clase Singleton">Singleton</a>.
+my $nes = Nes::Singleton->new('archivo.nhtml');
+
+# Una variable para guardar los datos que vamos a mostrar en HTML
+my $nes_tags = {};
+
+# Los datos que queremos enviar a la salida HTML
+$nes_tags->{'variable'} = 'Cosas que decirle al mundo';
+
+# el envío de los datos a la salida HTML
+$nes->out(%$nes_tags);
+
+</pre>
+</p>
+<p>
+¿Cómo mostramos ahora esa variable en el archivo.nhtml?
+</p>
+<p>
+Con el siguiente Tag Nes:
+<pre>
+&#123;: NES 1.0 ('archivo.pl') :&#125;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Nes sample/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+   &#123;: $ variable :&#125;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+<p>
+Haciendo <i>http://dominio.com/archivo.nhtml</i> obtendremos la siguiente salida:
+</p>
+<pre>
+Cosas que decirle al mundo
+</pre>
+<br>
+<br>
+

@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Net-Async-PostgreSQL,
+version 0.007:
+
+  PostgreSQL database support for IO::Async
+
+This software is copyright (c) 2011 by Tom Molesworth.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

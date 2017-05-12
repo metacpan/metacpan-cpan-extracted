@@ -1,0 +1,28 @@
+---
+abstract: 'Implementation of a set of utilities to help in developing Amazon web service modules in Perl.'
+author:
+  - 'Gonzalo Barco <gbarco uy at gmail com, no spaces>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98'
+license: 'gpl, artistic'
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Amazon-Utils
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  HTTP::Message: 0
+  LWP::Protocol::https: 0
+  LWP::UserAgent: 0
+  XML::Simple: 0
+  perl: 5.010000
+version: 0.21

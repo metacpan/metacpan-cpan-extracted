@@ -1,0 +1,36 @@
+#
+# Map C types to Perl types
+#
+
+pcap_t *                T_PTROBJ
+pcap_dumper_t *         T_PTROBJ
+struct bpf_program *    T_PTROBJ
+pcap_bpf_program_t *    T_PTROBJ
+pcap_send_queue *       T_PTROBJ
+bpf_u_int32             T_UV
+u_int                   T_UV
+u_char *                T_PV
+const char *            T_PV
+
+#
+# Input conversions
+#
+
+INPUT
+
+T_PTROBJ
+        if (sv_derived_from($arg, \"${ntype}\")) {
+            IV tmp = SvIV((SV*)SvRV($arg));
+            $var = ($type) tmp;
+        }
+        else
+            croak(\"$var is not of type ${ntype}\")
+
+#
+# Output conversions
+#
+
+OUTPUT
+
+T_PTROBJ
+        sv_setref_pv($arg, \"${ntype}\", (void*)$var);

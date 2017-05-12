@@ -1,0 +1,38 @@
+NAME
+    Net::Protocol::Simple - Perl extension for handling simple generic
+    protocol layers within applications
+
+SYNOPSIS
+      use Net::Protocol::Simple;
+      my $p = Net::Protocol::Simple->new(protocol => 6, layer => 4);
+
+      $p->protocol(); Gives us 'TCP'
+      $p->int(); Gives us 6;
+
+      my $p = Net::Protocol::Simple->new(protocol = 'udp', layer => 4);
+      $p->protocol(); Gives us 'UDP';
+      $p->int(); Gives us 17;
+
+DESCRIPTION
+    This module is intended to be used in conjunction with
+    Net::Connection::Simple. Some applications such as snort and other IDS's
+    log their alert data as simple connections. This module will allow you
+    to read in their protocol data as an int or a string. The backend stores
+    it as a string (TCP,UDP,ICMP). Natively it will handle these three
+    protocols, but it will scale to any other layer and protocol as a simple
+    handler. Using Net::Connection::Simple, you can use these to populate
+    the multiple layers of the connection.
+
+SEE ALSO
+    Net::Packet,Net::Connection,Snort::Rule
+
+AUTHOR
+    Wes Young, <saxguard9-cpan@yahoo.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Wes Young
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.7 or, at
+    your option, any later version of Perl 5 you may have available.
+

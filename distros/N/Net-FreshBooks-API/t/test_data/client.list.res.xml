@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<response status="ok">
+    <clients page="1" per_page="15" pages="1" total="2">
+        <client>
+            <client_id>13</client_id>
+            <organization>ABC Corp</organization>
+            <username>janedoe</username>
+            <first_name>Jane</first_name>
+            <last_name>Doe</last_name>
+            <email>janedoe@freshbooks.com</email>
+        </client>
+        <client>
+            <client_id>14</client_id>
+            <organization>ABC Corp2</organization>
+            <username>janedoe2</username>
+            <first_name>Jane2</first_name>
+            <last_name>Doe2</last_name>
+            <email>janedoe2@freshbooks.com</email>
+        </client>
+    </clients>
+</response>

@@ -1,0 +1,10 @@
+#
+#	 Cisco Building Broadband Service Manager Dictionary 
+#
+#	http://www.cisco.com/univercd/cc/td/doc/product/access/acs_soft/csacs4nt/csnt30/user/ad.htm
+#
+#	$Id: dictionary.cisco.bbsm 45 2006-11-14 17:45:00Z lem $
+#
+VENDOR		Cisco-BBSM	5263
+
+ATTRIBUTE CBBSM-Bandwidth	1 integer Cisco-BBSM

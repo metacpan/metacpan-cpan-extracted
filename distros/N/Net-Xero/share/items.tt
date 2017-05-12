@@ -1,0 +1,10 @@
+<Item>
+  <Code>[% item_id %]</Code>
+  <Description>[% description %]</Description>
+  [% IF account_code %]
+  <SalesDetails>
+    <UnitPrice>[% unit_price %]</UnitPrice>
+    <AccountCode>[% account_code %]</AccountCode>
+  </SalesDetails>
+  [% END %]
+</Item>

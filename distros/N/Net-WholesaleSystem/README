@@ -1,0 +1,184 @@
+NAME
+    Net::WholesaleSystem - VentraIP Wholesale SSL API
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+        use Net::WholesaleSystem;
+
+        my $WholesaleSystem = Net::WholesaleSystem->new(
+            resellerID => $resellerID,
+            apiKey     => $apiKey
+        );
+    
+        # get balance
+        my $balance = $WholesaleSystem->balanceQuery or die $WholesaleSystem->errstr;
+        print $balance;
+
+  DESCRIPTION
+    VentraIP Wholesale SSL API
+
+   new
+        my $WholesaleSystem = Net::WholesaleSystem->new(
+            resellerID => $resellerID,
+            apiKey     => $apiKey
+        );
+
+    *   "resellerID" (required)
+
+    *   "apiKey" (required)
+
+        resellerID & apiKey, provided by VentraIP Wholesale
+
+    *   "is_ote"
+
+        if "is_ote" is set to 1, we use
+        https://api-ote.wholesalesystem.com.au/?wsdl instead of
+        https://api.wholesalesystem.com.au/?wsdl
+
+    *   "debug"
+
+        enable SOAP::Trace->import('all')
+
+   balanceQuery
+        my $balance = $WholesaleSystem->balanceQuery or die $WholesaleSystem->errstr;
+
+    Account Balance Query allows you to obtain the account balance.
+
+   getSSLCertificate
+        my $cert = $WholesaleSystem->getSSLCertificate($certID);
+
+    to obtain information for a SSL certificate you?ve recently purchased
+
+   getCertSimpleStatus
+        my $cert = $WholesaleSystem->getCertSimpleStatus($certID);
+
+   decodeCSR
+        my $data = $WholesaleSystem->decodeCSR($csr);
+
+    decode the certificate signing request (CSR) you have provided to ensure
+    all the details are correct before purchasing the SSL.
+
+   generateCSR
+        my $data = $WholesaleSystem->generateCSR(
+            'numOfYears' => '3',
+            'country' => 'AU',
+            'state'   => 'VIC',
+            'city'    => 'Melbourne',
+            'organisation' => 'VentraIP',
+            'organisationUnit' => 'Systems Admin',
+            'commonName' => 'forums.ventraip.com.au',
+            'emailAddress' => 'webmaster@ventraip.com.au'
+        );
+
+    generate the user a Private Key of 2048 bits in size, a Self Signed
+    Certificate and a CSR request.
+
+   purchaseSSLCertificate
+        my $cert = $WholesaleSystem->purchaseSSLCertificate(
+            csr => $csr,
+            productID => 55,
+            firstName => 'John',
+            lastName  => 'Doe',
+            emailAddress => 'john@doe.com',
+            address => 'PO Box 119',
+            city => 'Beaconsfield',
+            state => 'VIC',
+            postCode => '3807',
+            country => 'AU',
+            phone => '+61.390245343',
+            fax => '+61.380806481',
+        ) or die $WholesaleSystem->errstr;
+
+    purchase an SSL certificate
+
+   reissueCertificate
+        my $output = $WholesaleSystem->reissueCertificate($certID, $newCSR);
+
+    re-issue the SSL certificate using a new certificate signing request
+    (CSR)
+
+   cancelSSLCertificate
+        my $output = $WholesaleSystem->cancelSSLCertificate($certID);
+
+    cancel an SSL certificate that has not been processed (eg. still pending
+    approval).
+
+   renewSSLCertificate
+        my $output = $WholesaleSystem->renewSSLCertificate(
+            certID => $certID,
+            firstName => 'John',
+            lastName  => 'Doe',
+            emailAddress => 'john@doe.com',
+            address => 'PO Box 119',
+            city => 'Beaconsfield',
+            state => 'VIC',
+            postCode => '3807',
+            country => 'AU',
+            phone => '+61.390245343',
+            fax => '+61.380806481',
+        ) or die $WholesaleSystem->errstr;
+
+    renew an SSL certificate
+
+   resendDVEmail
+        my $output = $WholesaleSystem->resendDVEmail($certID);
+
+    resend the approval email for an SSL certificate
+
+   resendIssuedCertificateEmail
+        my $output = $WholesaleSystem->resendIssuedCertificateEmail($certID);
+
+    resend the original completed certificate email to the customer. This is
+    helpful should your customer loose the details of their SSL and you need
+    to provide the information again.
+
+   listAllCerts
+        my @certs = $WholesaleSystem->listAllCerts;
+
+    obtain a list of all SSL certificates related to your account
+
+   getDomainBeacon
+        my $output = $WholesaleSystem->getDomainBeacon($certID, $domain);
+
+    obtain a list of all SSL certificates related to your account
+
+    The domain beacon is used for verification of premium SSL certificates
+    to prove ownership of the domain and ensure the requester has access to
+    the domain in question. The domain beacon file must be saved as the
+    filename returned from the API request and the 'beacon' saved in the
+    file.
+
+   checkDomainBeacon
+        my $output = $WholesaleSystem->checkDomainBeacon($certID, $domain);
+
+    Upon requesting the domain beacon from 'SSL_getDomainBeacon' this
+    function will then process the SSL for validation against the
+    certificate ID supplied.
+
+   Certificate Product IDs
+        55 Trustwave Domain Validated SSL - 1 Year
+        56 Trustwave Domain Validated SSL - 2 Year
+        57 Trustwave Domain Validated SSL - 3 Year
+        58 Trustwave Premium SSL - 1 year
+        59 Trustwave Premium SSL - 2 year
+        60 Trustwave Premium SSL - 3 year
+        61 Trustwave Enterprise SSL - 1 Year
+        62 Trustwave Enterprise SSL - 2 Year
+        63 Trustwave Enterprise SSL - 3 Year
+        64 Trustwave Premium Wildcard SSL - 1 Year
+        65 Trustwave Premium Wildcard SSL - 2 Year
+        66 Trustwave Premium Wildcard SSL - 3 Year
+        67 Trustwave Premium EV SSL - 1 Year
+        68 Trustwave Premium EV SSL - 2 Year
+
+AUTHOR
+    VentraIP Wholesale <customercare@ventraipwholesale.com.au>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by VentraIP Wholesale.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

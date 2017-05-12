@@ -1,0 +1,103 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::ControlChannel::Client
+at lib/Net/Async/ControlChannel/Client.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 NAME
+
+Net::Async::ControlChannel::Client - L<IO::Async> support for L<Protocol::ControlChannel>.
+
+=head1 VERSION
+
+Version 0.005
+
+=head1 DESCRIPTION
+
+Provides the client half for a control channel connection.
+
+=head1 METHODS
+
+=head2 new
+
+Instantiate a new client object.
+
+Expects the following named parameters:
+
+=over 4
+
+=item * loop - the L<IO::Async::Loop> we will attach to
+
+=item * host - which host we're connecting to
+
+=item * port - the port to connect to
+
+=back
+
+Returns the instance.
+
+=head2 loop
+
+The L<IO::Async::Loop> object. Used internally.
+
+=head2 proto
+
+The L<Protocol::ControlChannel> instance. Used internally.
+
+=head2 connection
+
+A L<Future> which resolves when the connection is established.
+
+=head2 start
+
+Connects to the target host, returning a L<Future> which will
+resolve once the connection is ready (this L<Future> is also
+available via L</connection>).
+
+=head2 incoming_message
+
+Called internally when we have data from the server.
+
+=head2 dispatch
+
+Dispatches the given key, value pair to the remote.
+
+Expects two parameters:
+
+=over 4
+
+=item * $k - a Perl string representing the key we're sending over. Typically
+this will be 'some.dotted.string'.
+
+=item * $v - the value to send over, either a reference or a byte string.
+
+=back
+
+Unicode characters are allowed for the key, but if you want to send non-ASCII
+text data in the content, it should be encoded explicitly:
+
+ $cc->dispatch("utf₈.is.fine" => Encode::encode('UTF-8' => "ƃuıpoɔuǝ spǝǝu"));
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Mixin::Event::Dispatch>
+
+L<add_handler_for_event|Mixin::Event::Dispatch/add_handler_for_event>, L<clear_event_handlers|Mixin::Event::Dispatch/clear_event_handlers>, L<event_handlers|Mixin::Event::Dispatch/event_handlers>, L<invoke_event|Mixin::Event::Dispatch/invoke_event>, L<subscribe_to_event|Mixin::Event::Dispatch/subscribe_to_event>, L<unsubscribe_from_event|Mixin::Event::Dispatch/unsubscribe_from_event>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2012-2014. Licensed under the same terms as Perl itself.

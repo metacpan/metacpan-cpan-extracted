@@ -1,0 +1,52 @@
+{
+   "abstract" : "multiplexing SNMP query engine client using AnyEvent",
+   "author" : [
+      "Anton Berezin, C<< <tobez at tobez.org> >>",
+      "Anton Berezin <tobez@tobez.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.08, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-SNMP-QueryEngine-AnyEvent",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::Handle" : "0",
+            "Data::MessagePack" : "0",
+            "Data::MessagePack::Stream" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/bsd-license.php"
+      ]
+   },
+   "version" : "0.06"
+}

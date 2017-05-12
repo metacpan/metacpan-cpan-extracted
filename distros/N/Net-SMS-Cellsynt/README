@@ -1,0 +1,36 @@
+Net::SMS::Cellsynt lets you send SMS through Cellsynt's
+SMS gateway, from within your Perl script/application.
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+  Net::SMS::Cellsynt depends on WWW::Curl.
+
+STATUS
+
+  The API allows for some features that isn't implemented in
+  this module (binary SMS, unicode SMS, and more). Patches are
+  welcome.
+
+VERSION NUMBERING
+
+  The version numbers should be read as a floating point value,
+  where 0.9 is higher than 0.89.
+
+AVAILABILITY
+
+  Latest stable version is available on CPAN. Current development
+  version is available on https://github.com/olof/Net-SMS-Cellsynt.
+
+COPYRIGHT 
+ 
+  Copyright (c) 2009-2011,  Olof 'zibri' Johansson <olof@cpan.org>
+  All rights reserved.
+
+  This program is free software; you can redistribute it and/or 
+  modify it under the same terms as Perl itself.
+

@@ -1,0 +1,13 @@
+ANNOUNCE
+BUGS
+CREDITS
+MANIFEST
+Makefile.PL
+NEWS
+Net/IMAP.pm
+Net/xAP.pm
+README
+TODO
+examples/imap.pl
+examples/imap2.pl
+t/01_imap_base.t

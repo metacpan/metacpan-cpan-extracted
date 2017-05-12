@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Net-Bot-IRC-Message
+version:            0.01
+abstract:           An IRC protocol message class.
+author:
+    - Mark Caudill <mcaudill@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Params::Validate:  0.95
+    Test::More:        0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

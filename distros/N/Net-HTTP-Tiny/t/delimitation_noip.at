@@ -1,0 +1,7 @@
+use warnings;
+use strict;
+
+do "t/setup_noip.pl" or die $@ || $!;
+do "t/delimitation.at" or die $@ || $!;
+
+1;

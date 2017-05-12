@@ -1,0 +1,7 @@
+TYPEMAP
+lo_address	T_PTROBJ
+lo_blob		T_PTROBJ
+lo_bundle	T_PTROBJ
+lo_message	T_PTROBJ
+lo_method	T_PTROBJ
+lo_server	T_PTROBJ

@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               Net-IPInfoDB
+version:            3.0
+abstract:           ~
+author:
+    - Darren Chamberlain <darren@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    LWP::Simple:  5.0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

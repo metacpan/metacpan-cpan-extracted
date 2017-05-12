@@ -1,0 +1,13 @@
+XML::Stream: new: hostname = (glaucon.vudu.net)
+XML::Stream: SetCallBacks: tag(node) func(CODE(0x354bcc8))
+XMPP3::Conn: xmppCallbackInit: start
+XMPP3::Conn: SetCallBacks: tag(message) func(CODE(0x354beb4))
+XMPP3::Conn: SetCallBacks: tag(presence) func(CODE(0x354be54))
+XMPP3::Conn: SetCallBacks: tag(iq) func(CODE(0x354bdf4))
+XMPP3::Conn: SetPresenceCallBacks: type(subscribe) func(CODE(0x354be48))
+XMPP3::Conn: SetPresenceCallBacks: type(subscribed) func(CODE(0x354c028))
+XMPP3::Conn: SetPresenceCallBacks: type(unsubscribe) func(CODE(0x354bfc8))
+XMPP3::Conn: SetPresenceCallBacks: type(unsubscribed) func(CODE(0x354c088))
+XMPP3::Conn: SetDirectXPathCallBacks: xpath(/[@xmlns="urn:ietf:params:xml:ns:xmpp-tls"]) func(CODE(0x354c148))
+XMPP3::Conn: SetDirectXPathCallBacks: xpath(/[@xmlns="urn:ietf:params:xml:ns:xmpp-sasl"]) func(CODE(0x354c25c))
+XMPP3::Conn: xmppCallbackInit: stop

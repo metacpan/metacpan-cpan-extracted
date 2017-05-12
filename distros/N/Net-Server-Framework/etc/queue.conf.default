@@ -1,0 +1,23 @@
+# user / group
+user                USER
+group               GROUP
+
+# host / port
+port                var/run/queue.sock
+proto               unix
+
+# process control
+min_servers         5
+min_spare_servers   2
+max_spare_servers   5
+max_servers         20
+max_requests        100
+setsid              1
+pid_file            var/run/queue.pid
+
+# logging
+log_file            var/log/server.log
+log_level           4
+
+daemon_name          queue
+node_name            HOSTNAME

@@ -1,0 +1,12 @@
+GET /perl-logo.jpg HTTP/1.1
+Host: localhost:8001
+User-Agent: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.7) Gecko/20040624 Debian/1.7-2
+Accept: image/png,*/*;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Connection: keep-alive
+Referer: http://localhost:8001/
+Authorization: Digest username="foo", realm="Test", nonce="MTA4ODcxNzc1Njo5YjNjMDA2NmYzZjVjMGU5OGEwOTg0YTk2YzBiZmFkMA==", uri="/perl-logo.jpg", algorithm=MD5, response="3f0d34d8e103b2a57b3f86a74cbea3cc", qop=auth, nc=00000001, cnonce="bd25b487957ed9a2"
+
+

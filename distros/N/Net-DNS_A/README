@@ -1,0 +1,32 @@
+Net-DNS_A version 0.02
+======================
+
+Net::DNS_A - First attempt at asynchronous dns resoloving with gettaddrinfo_a
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+SYNOPSIS
+
+    use Net::DNS_A;
+
+    Net::DNS_A::lookup("google.com");
+    sleep(1);
+
+    my @output = Net::DNS_A::retrieve();
+    print("output[0]: $output[0]\n");
+    print("output[1]: $output[1]\n");
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Brian Medley
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.1 or,
+at your option, any later version of Perl 5 you may have available.

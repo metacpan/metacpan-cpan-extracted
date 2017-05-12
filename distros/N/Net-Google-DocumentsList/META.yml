@@ -1,0 +1,42 @@
+---
+abstract: 'Perl interface to Google Documents List Data API'
+author:
+  - 'Noubo Danjou <danjou@soffritto.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  File::BOM: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Google-DocumentsList
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  Moose: 0.56
+requires:
+  Any::Moose: 0.04
+  DateTime::Format::Atom: 0
+  File::Slurp: 0
+  File::stat: 0
+  MIME::Types: 0
+  Mouse: 0.51
+  Net::Google::DataAPI: 0.2802
+  String::CamelCase: 0.02
+  URI: 0
+  URI::Escape: 0
+  XML::Atom: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/lopnor/Net-Google-DocumentsList.git
+version: 0.09

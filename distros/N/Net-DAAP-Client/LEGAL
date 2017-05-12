@@ -1,0 +1,38 @@
+As far as I know, Apple has never said "you can release code based on
+reverse-engineering the iTunes DAAP implementation."  Here's a message
+I sent to the daap-dev list (mail <daap-dev-subscribe@develooper.com>
+to join).
+
+  From: Nathan Torkington <gnat@oreilly.com>
+  To: daap-dev@develooper.com
+  Subject: Apple
+  Date: Wed, 14 May 2003 12:35:48 -0600
+
+  I spoke to my contact at Apple.  As is usual with Apple, there's no
+  clear "yes" or "no" yet.  The big concern for them is that they don't
+  want to promise that the protocol used in iTunes 4 will be the
+  protocol used in iTunes 5--they don't want people to build software
+  around unpublished protocols or APIs and then complain when they
+  change.  They want the freedom to keep improving.
+
+  That said, there's a ton of history of people doing this.  The haxies
+  are a case in point--kernel tweaks using undocumented APIs.  People
+  use 'em, Apple does not feel hamstrung by them, and the developers
+  have to play catch-up if and when Apple changes those APIs.
+
+  The contact said that a week was sufficient time to wait for a
+  response, after which I can conclude that they won't respond to that
+  question.  He's also going to chase down whoever's responsible for
+  DAAP and see whether there's anything that can be communicated.
+
+  If I don't hear anything after a week, go ahead and release the code.
+  Apple doesn't sue.  If they disapprove legally, they'll send a cease
+  and desist letter.  If they disapprove technically, you'll probably
+  get email from a developer :-)
+
+  So, short answer:
+
+    If I haven't heard anything by Saturday, it's tacit approval to
+    publish the source code.
+
+  Nat

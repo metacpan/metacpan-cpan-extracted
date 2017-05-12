@@ -1,0 +1,34 @@
+---
+name: Net-Topsy
+version: 0.03
+author:
+  - 'Jonathan Leto <jonathan@leto.net>'
+abstract: Perl Interface to the Otter API to Topsy
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/leto/net-topsy/tree/master
+build_requires:
+  Test::Exception: 0.21
+  Test::More: 0
+requires:
+  JSON::Any: 1.19
+  LWP::UserAgent: 2.032
+  Moose: 0.78
+  MooseX::Declare: 0.3
+  MooseX::Iterator: 0.11
+  URI::Escape: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Net::Topsy:
+    file: lib/Net/Topsy.pm
+    version: 0.03
+  Net::Topsy::Result:
+    file: lib/Net/Topsy/Result.pm
+  Net::Topsy::Role::API:
+    file: lib/Net/Topsy/Role/API.pm
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

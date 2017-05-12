@@ -1,0 +1,48 @@
+---
+abstract: 'set of helper roles and types to deal with Net::Stomp'
+author:
+  - 'Gianni Ceccarelli <gianni.ceccarelli@net-a-porter.com>'
+build_requires:
+  Data::Printer: '0'
+  File::Find: '0'
+  Test::Deep: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Stomp-MooseHelpers
+no_index:
+  directory:
+    - t/lib
+requires:
+  Carp: '0'
+  File::Temp: '0'
+  List::Util: '1.33'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util: '0'
+  MooseX::Role::WithOverloading: '0'
+  MooseX::Types: '0'
+  MooseX::Types::Common::Numeric: '0'
+  MooseX::Types::Moose: '0'
+  MooseX::Types::Path::Class: '0'
+  MooseX::Types::Structured: '0'
+  Net::Stomp: '0.51'
+  Net::Stomp::Frame: '0'
+  Path::Class: '0'
+  Throwable: '0'
+  Time::HiRes: '0'
+  Try::Tiny: '0'
+  namespace::autoclean: '0'
+  overload: '0'
+resources:
+  repository: git://github.com/dakkar/Net-Stomp-MooseHelpers.git
+version: '2.9'

@@ -1,0 +1,35 @@
+Revision history for Net-Async-FTP
+
+0.08    2014/03/27 23:48:45
+        [BUGFIXES]
+         * Avoid relying on strong forward references in Future, by creating
+           intentional cycles on pending Futures. Workaround for bugfix in
+           upcoming Future release.
+
+0.07    2013/10/12 22:08:03
+        [CHANGES]
+         * Base on IO::Async::Stream rather than IO::Async::Protocol::Stream
+         * Return Futures from all methods; make callbacks optional
+
+0.06    CHANGES:
+         * ->socketpair now comes from IO::Async::OS
+         * use strict, use warnings, done_testing in unit tests
+
+0.05    CHANGES:
+         * Use Protocol->connect of IO::Async 0.34
+
+0.04    CHANGES:
+         * use Exporter 'import' instead of use base 'Exporter'
+         * base on IO::Async::Protocol::Stream
+
+0.03    CHANGES:
+         * Added 'use warnings'
+         * Added an example test client
+         * Various small updates to keep CPANTS happy
+
+0.02    BUGFIXES:
+         * Force TZ=GMT during tests so that File::Listing timestamps are
+           repeatable
+
+0.01    First version, released on an unsuspecting world.
+

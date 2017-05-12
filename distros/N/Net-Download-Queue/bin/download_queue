@@ -1,0 +1,152 @@
+#!/usr/bin/perl -w
+$|++;
+use strict;
+
+use Getopt::Long;
+use Pod::Usage;
+use File::Basename;
+use File::Path;
+use File::Find;
+use Path::Class;
+use Time::HiRes qw(sleep);
+use Time::Progress;
+
+use lib "../lib";
+use Net::Download::Queue;
+
+
+use Net::Download::Queue::Download;
+
+
+
+main();
+
+
+
+sub main {
+    GetOptions(
+        "process" => \( my $process = 0 ),
+        "list" => \( my $list = 0 ),
+        "status" => \( my $status = 0 ),
+        "empty" => \( my $empty = 0 ),
+        "requeue" => \( my $requeue = 0 ),
+        
+        "url:s" => \( my $url = "" ),
+        "url_referer:s" => \( my $urlReferer = "" ),
+        "dir:s" => \( my $dirDownload = "." ),
+        "file:s" => \( my $fileDownload = "" ),
+        );
+    $process || $list || $url || $empty || $requeue || $status or syntax("Please specify either --url, --list, --empty, or --process");
+    
+    $fileDownload ||= basename($url);
+    $fileDownload ||= "index.html";
+
+    my $oQueue = Net::Download::Queue->new() or die("Could not create Queue object\n");
+
+    
+    if($empty) {
+        $oQueue->rebuildDatabase();
+    }
+
+    if($requeue) {
+        $oQueue->requeueDownloading();
+    }
+
+    if($url) {
+        
+        my $oDownload = $oQueue->oDownloadAdd(
+            $url,
+            $dirDownload,
+            $fileDownload,
+            $urlReferer,
+        ) or die("Could not add url ($url)\n");
+        
+        print "Added url ($url) to queue (" . $oDownload->id . ")\n";
+    }
+
+    if($list) {
+        for my $oDownload (Net::Download::Queue::Download->retrieve_current) {
+            printf("%3d: %-50s %s\n",  $oDownload->id, $oDownload->url, $oDownload->downloadStatusId->name);
+        }
+    }
+    
+    if($process) {
+        while(1) {
+            eval {
+                if(my $oDownload = $oQueue->oDownloadDequeue()) {
+                    printf("%d: %s\n",  $oDownload->id, $oDownload->url);
+                    my $oProgress = Time::Progress->new();
+                    $oDownload->download(
+                        sub {
+                            my ($bytesContent) = @_;
+                            $oProgress->attr(max => $bytesContent);
+                        },
+                        sub {
+                            my ($bytesReceivedTotal) = @_;
+                            print $oProgress->report( "%L: %E min, %40b %p\r", $bytesReceivedTotal );
+                        },
+                        
+                    );
+                    print "\n  done\n\n";
+                } else {
+                    sleep(1);
+                }
+            };
+            $@ and warn($@);
+        }
+    }
+    
+    if($status) {
+        my $oProgress = Time::Progress->new();
+        $oProgress->attr(max => 100);
+        while(1) {
+            eval {
+                print $oProgress->report( "Capacity: %40b %p\r", $oQueue->percentComplete);
+                sleep(1);                
+            };
+            $@ and warn($@);
+        }
+    }
+    
+    return(1);
+}
+
+
+
+
+
+sub syntax {
+    my ($message) = @_;
+    print "Error: $message\n\n";    #pod2usage -msg doesn't do this for me... :(
+    pod2usage(-verbose => 2);
+}
+
+
+
+
+
+__END__
+
+=head1 NAME
+
+download_queue
+
+
+=head1 OPTIONS
+
+download_queue [--url=URL [--dir=.] [--file=FILE]] [--list] [--process]
+
+  --url       Download url
+  --dir       Download to dir
+  --file      Store url contents in file
+
+  --list      List queue
+
+  --status    Show status
+
+  --process   Process queue (never end)
+
+  --requeue   Put all "downloading" downloads back into "queued" state.
+              Useful if a download was cancelled.
+
+  --empty     Empty all queue contents

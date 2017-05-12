@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::DNS::LivedoorDomain::DDNS.
+
+0.01  Tue Nov  7 00:45:43 2006
+	- original version; created by h2xs 1.23 with options
+		-AX -n Net::DNS::LivedoorDomain::DDNS
+

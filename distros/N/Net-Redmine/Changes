@@ -1,0 +1,37 @@
+0.09:
+  - load the authors of ticket histories
+  - fix assert_login for login pages without a search form.
+
+0.08:
+  - load ticket author as an Net::Redmine::User object
+
+0.07:
+  - Crawl 'date' of ticket histories.
+  - improve the way handling login
+  - let the 0th history entries means the "creation of this ticket"
+  - ticket creation time is now loaded
+
+0.06:
+  - Improve search function.
+
+0.05:
+  - Implement ticket identity mapping in Ticket class now.
+  - Loading the same ticket id multiple times with the same connection object should return identical objects.
+  - fix memory leaking of ticket objects.
+
+0.04:
+  - Implement ticket deletion
+  - Implement ticket refresh method
+  - Implement ticket search
+  - The ticket class methods are changed and it is incompatible with previous versions.
+
+0.03:
+  - Implement ticket status changes
+  - Implement ticket history
+
+0.02:
+  - Implement a top-level Net::Redmine API
+  - Implement ticket identity mapping using Net::Redmine APIs
+
+0.01:
+  _ Implement Ticket creating and loading.

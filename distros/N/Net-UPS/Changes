@@ -1,0 +1,20 @@
+Revision history for Perl extension Net::UPS.
+==============================================
+
+1.00 Thursday, November 10, 2005
+
+    * NEW: support for configuration file
+    * NEW: Address objects can be validated directly
+
+0.02 Sunday, September 11, 2005
+
+    * NEW: results can now be cached with the help of 'cache_life' object attribute
+    * NEW: live() class method and 'live' compile-time switch introduced
+    * NEW: 'limit_to' and 'exclude' options supported by shop_for_rates()
+    * NEW: shop_for_rates() return is sorted by total_charges() in ascending order
+
+
+0.01  Tue May  4 17:51:08 2004
+    - original version; created by h2xs 1.21 with options
+        -A -X -n Net::UPS
+

@@ -1,0 +1,56 @@
+0.11 (04/23/2008)
+    (cmb) Improve the kwalitee.
+    (cmb) Add a method to expose the InProgress flag, suggested by
+          Brian O'Quinn.
+
+0.10 (12/10/2007)
+    (cmb) David Steele reported that Net::TiVo does not depend on 
+          Crypt::SSLeay, and it should.
+
+0.09 (10/27/2007)
+    (cmb) Artem Belevich emailed me with another MIME type for his TiVo 
+          HD.
+
+0.08 (10/10/2007)
+    (cmb) Michael Lindner was getting 500 errors, and eventually tracked
+          it down to LWP and Net::SSLeay.  Once he switched to 
+          Crypt::SSLeay the 500 errors went away.
+    (cmb) David Steele reported an issue with an empty suggestions folder
+          that caused Net-TiVo to die unnecessarily.
+    (cmb) David Steele reported the the MIME has changed from
+          video/x-tivo-mpeg to video/x-tivo-raw-pes.
+    (cmb) Add the method high_definition for the Show object.
+    (cmb) Add canned data for the new schema, and update the shows test.
+
+0.07 (01/12/2007)
+    (cmb) Steven Schubiger clarified the documentation for folders().
+          Added his suggestion about using L<> for the SEE ALSO section.
+    (cmb) Added documentation about downloading shows from TiVo using 
+          LWP, wget, or curl.
+    (cmb) Added documentation about using a cache.
+    (cmb) Updated the README, and changed the format slightly of Changes.
+
+0.06 (01/10/2007)
+    (cmb) David Steele noticed a problem when using the example in the 
+          documentation.  The documentation was wrong, it has now been
+          fixed
+    (cmb) Fix the wording, and grammar for some of the documentation, 
+          and comments.
+    (cmb) Update the copyright of the library.
+
+0.05 (12/30/2006)
+    (cmb) Patch by Kevin Brintnall to clarify the return of the 
+          folders function.
+
+0.04 (12/29/2006)
+    (cmb) Patch by Richard G. Harman Jr., skip folders that have no 
+          shows.
+
+0.03 (08/02/2006)
+    (cmb) Ahhh!  I wasn't including Makefile.PL in the distribution.
+
+0.02 (07/29/2006)
+    (cmb) Fix the POD
+
+0.01 (07/29/2006)
+    (cmb) Initial release

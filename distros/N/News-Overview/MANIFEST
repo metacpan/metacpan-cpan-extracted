@@ -1,0 +1,9 @@
+README.txt
+Changes
+MANIFEST
+LICENSE
+Makefile.PL
+test.pl
+Version.pm
+News/Overview.pm
+News/Overview/Entry.pm

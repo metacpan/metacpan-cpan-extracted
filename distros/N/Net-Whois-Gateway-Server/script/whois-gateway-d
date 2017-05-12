@@ -1,0 +1,112 @@
+#!/usr/bin/perl -w
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+################################################################################
+#
+#         FILE:  whois-gateway-d
+#
+#        USAGE:  ./whois-gateway-d [OPTIONS] start|stop
+#
+#  DESCRIPTION:  Starts/stops Whois-Gateway daemon.
+#
+#      OPTIONS:  
+#          --port port_number | -p port_number
+#                Specify port number to start on, defaul: 54321
+#
+#          --ip /path/to/file.txt | -ip /path/to/file.txt
+#                Specify file with lisy of local IPs to use.
+#                By default use all external interfaces IPs.
+#
+#      AUTHORS:  Sergey Kotenko (kot), <graykot@gmail.com>
+#
+#      VERSION:  0.03
+################################################################################
+
+use strict;
+use warnings;
+
+use Proc::Daemon;
+use Net::Whois::Gateway::Server;
+use Net::Ifconfig::Wrapper;
+use Proc::PID::File;
+use Getopt::Long;
+
+my $port = 54321;
+my $ips_file;
+
+GetOptions(
+    '--port|p=i' => \$port,
+    '--ip|i=s'   => \$ips_file,
+);
+
+autoflush STDOUT 1;
+
+our $DEBUG = 1;
+
+if ($ARGV[0] && $ARGV[0] eq "start") {
+    
+    print "Starting whois-gateway-d on port $port\n";
+    
+    # run as application if DEBUG    
+    Proc::Daemon::Init() unless $DEBUG;
+    die "whois-gateway-d already running" if !$DEBUG && Proc::PID::File->running( dir => '/tmp');
+    my @ips;
+    if ($ips_file) {
+        @ips = get_ip_from_file();
+    } else {
+        @ips = get_external_interfaces_ips();
+    }
+    $Net::Whois::Gateway::Server::DEBUG = $DEBUG;
+    Net::Whois::Gateway::Server::start(
+        port      => $port,
+        local_ips => \@ips,
+    );
+    
+} elsif ($ARGV[0] && $ARGV[0] eq "stop") {    
+    Proc::Daemon::Init() unless $DEBUG;
+    my $pid = Proc::PID::File->running( dir => '/tmp');    
+    die "whois-gateway-d not running" unless ($pid);    
+    print "stop signal sent\n";
+    kill(9, $pid);
+} else {
+    print "Wrong arguments!\n\n" if @ARGV;
+    print <<EOF
+Whois Gateway daemon
+Usage: whois-gateway-d [--port port_number --ip /path/ti/file.txt] [start|stop] 
+
+start  - start daemon
+stop   - stop daemon 
+
+EOF
+
+}
+
+sub get_ip_from_file {
+    my @ips = ();
+    open my $fh, "<", $ips_file
+        or return;
+
+    while (<$fh>) {
+        chomp; s/^\s+//; s/\s+$//;
+        next if m/^$/;
+        next if m/^#/;
+        push @ips, $_;
+    }
+    close $fh;
+
+    print "Using IPs: ".join(", ", @ips)."\n";
+    return @ips;
+}
+
+sub get_external_interfaces_ips {
+    my @ips;
+    my $ifaces = Net::Ifconfig::Wrapper::Ifconfig('list', '', '', '');
+    foreach my $iface_name (keys %$ifaces) {
+        foreach my $ip (keys %{$ifaces->{$iface_name}->{inet}}) {
+            push @ips, $ip
+                if $ip &&  $ip !~ /^127\./ && $ip !~ /^192\.168\./ && $ip !~ /^10\./;
+        }
+    }
+    return @ips;
+}

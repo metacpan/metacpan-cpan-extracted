@@ -1,0 +1,94 @@
+{
+   "abstract" : "XMPP Support Library",
+   "author" : [
+      "Darian Anthony Patrick <dapatrick@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-XMPP",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "LWP::Online" : "1.07",
+            "Test::More" : "0.92",
+            "YAML::Tiny" : "1.41"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.360300"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::SASL" : "2.12",
+            "Digest::SHA" : "0",
+            "Scalar::Util" : "0",
+            "XML::Stream" : "1.24",
+            "perl" : "v5.8.0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::XMPP" : {
+         "file" : "lib/Net/XMPP.pm",
+         "version" : "1.05"
+      },
+      "Net::XMPP::Client" : {
+         "file" : "lib/Net/XMPP/Client.pm"
+      },
+      "Net::XMPP::Connection" : {
+         "file" : "lib/Net/XMPP/Connection.pm"
+      },
+      "Net::XMPP::Debug" : {
+         "file" : "lib/Net/XMPP/Debug.pm"
+      },
+      "Net::XMPP::IQ" : {
+         "file" : "lib/Net/XMPP/IQ.pm"
+      },
+      "Net::XMPP::JID" : {
+         "file" : "lib/Net/XMPP/JID.pm"
+      },
+      "Net::XMPP::Message" : {
+         "file" : "lib/Net/XMPP/Message.pm"
+      },
+      "Net::XMPP::Namespaces" : {
+         "file" : "lib/Net/XMPP/Namespaces.pm"
+      },
+      "Net::XMPP::Presence" : {
+         "file" : "lib/Net/XMPP/Presence.pm"
+      },
+      "Net::XMPP::PrivacyLists" : {
+         "file" : "lib/Net/XMPP/PrivacyLists.pm"
+      },
+      "Net::XMPP::Protocol" : {
+         "file" : "lib/Net/XMPP/Protocol.pm"
+      },
+      "Net::XMPP::Roster" : {
+         "file" : "lib/Net/XMPP/Roster.pm"
+      },
+      "Net::XMPP::Stanza" : {
+         "file" : "lib/Net/XMPP/Stanza.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dap/Net-XMPP/issues"
+      },
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt"
+      ],
+      "repository" : {
+         "url" : "https://github.com/dap/Net-XMPP"
+      }
+   },
+   "version" : "1.05"
+}

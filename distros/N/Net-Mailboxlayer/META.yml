@@ -1,0 +1,26 @@
+---
+abstract: "Implements mailboxlayer.com's REST API, which a simple REST API measuring email deliverability and quality."
+author:
+  - 'Tom Heady <cpan@punch.net>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Mailboxlayer
+requires:
+  ExtUtils::MakeMaker: '0'
+  JSON::MaybeXS: '0'
+  LWP::UserAgent: '0'
+  Scalar::Util: '0'
+  URI::URL: '0'
+version: '0.001'
+x_serialization_backend: 'YAML::Tiny version 1.64'

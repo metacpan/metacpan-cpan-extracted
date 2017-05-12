@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                Net-DNSBL-Monitor
+version:             0.12
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Net::DNS::Codes:               0.09
+    Net::DNS::ToolKit:             0.41
+    Net::DNSBL::MultiDaemon:       0.26
+    Net::NBsocket:                 0.14
+    NetAddr::IP:                   4.015
+    Proc::PidUtil:                 0.08
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

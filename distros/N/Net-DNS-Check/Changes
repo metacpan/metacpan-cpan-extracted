@@ -1,0 +1,21 @@
+Revision history for Perl extension Net::DNS::Check.
+
+0.45  Mon Jul 15 2005
+	- Some updates and fixes of documentation
+0.44  Mon Jun 06 2005
+	- First public release on CPAN
+	- Written the perldoc in english of Net::DNS::Check 
+	and Net::DNS::Check::Config and something about the other modules 
+0.43  Mon Sep 13 2004
+	- Fixed a problem in test_summary method in Net::DNS::Check class
+	- Added Net::DNS::Check::test_list() function
+	- Added Net::DNS::Check::test_object() function
+	- Added Net::DNS::Check::test_status() function
+	- Added Net::DNS::Check::test_detail() function
+	- Removed Net::DNS::Check::test_obj_status() function
+0.42  Tue Sep 8 2004
+	- Written perldoc documentation about Net::DNS::Check class 
+	(at present only Italian version)
+0.41  Tue Sep 7 2004
+	- original publib available version of Net::DNS::Check
+

@@ -1,0 +1,16 @@
+<!-- 
+config for actions
+mm & amp
+-->
+<config>
+<probe> <typ>ftp</typ> <cmd>probes/ftpls.sh $IP:$PORT</cmd> <trigger>.*ftp.*</trigger>
+</probe>
+<probe> <typ>www</typ> <cmd>curl $IP:$PORT</cmd> <trigger>.*www.*</trigger>
+</probe>
+<probe> <typ>samba</typ> <cmd>smbclient -L $IP -N</cmd> <trigger>.*(smb|netbios).*</trigger>
+</probe>
+<probe> <typ>ldap</typ> <cmd>probes/ldapdump.pl -x -h $IP</cmd> <trigger>.*ldap.*</trigger>
+</probe>
+    
+</config>
+

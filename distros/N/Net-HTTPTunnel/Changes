@@ -1,0 +1,20 @@
+    0.1 Initial Release
+
+    0.2 Fixed two bugs, one which included an additional carriage return
+    with proxy authorization, and one which prevented the http-ver option
+    from being recognized.
+
+    0.3 Fixed the capitalization of the "Proxy-Authorization" header in case
+    a fascist proxy did case-sensitive header matching. Also, fixed some
+    mistakes in which \n\r was sent instead of \r\n.
+
+    0.4 Fixed a bug that would cause an instance of the module to assume
+    success on all subsequent connections once it had gotten its first
+    successful connection.
+
+    0.5 Changed the success test regexp so that "200 OK" is accepted as a
+    successful reply from the proxy, since some report this instead of
+    "200 Connection established".  Thanks to JoNO for pointing out this
+    discrepancy.
+
+    0.51 D'oh.  Broken regexp.

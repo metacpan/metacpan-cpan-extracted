@@ -1,0 +1,303 @@
+
+=head1 NAME
+
+Net::SIP::Util - utility functions used by all of L<Net::SIP>
+
+=head1 SYNOPSIS
+
+  use Net::SIP::Util qw( create_rtp_sockets );
+  my ($port,@socks) = create_rtp_sockets( '192.168.0.10' ) or die;
+
+=head1 DESCRIPTION
+
+This package implements various utility function used within various
+L<Net::SIP> packages and partly usable for the user of L<Net::SIP> too.
+
+Each of this functions is exportable, but none is exported per default.
+All functions can be exported at once with the import flag C<:all>.
+
+=head1 SUBROUTINES
+
+=over 4
+
+=item invoke_callback ( CALLBACK, @ARGS )
+
+Invokes callback CALLBACK with additional args @ARGS.
+CALLBACK can be:
+
+=over 8
+
+=item A code reference
+
+In this case it will be called as C<< $CALLBACK->(@ARGS) >>
+and return the return value of this call.
+
+=item A reference to a scalar
+
+In this case the scalar will be set to C<< $ARGS[0] >> and
+the rest of @ARGS will be ignored. If no @ARGS are given the
+scalar will be set to TRUE.
+It will return with the value of the scalar.
+
+=item An object which has a method B<run>
+
+In this case it will call C<< $CALLBACK->run(@ARGS) >>
+and return with the return value of this call.
+
+=item A reference to an array
+
+The first element of the array will be interpreted as code reference,
+while the rest as args, e.g. it will do:
+
+  my ($coderef,@cb_args) = @$CALLBACK;
+  return $coderef->( @cb_args, @ARGS );
+
+=item A regular expression
+
+In this case it will try to match all @ARGS against the regex.
+If anything matches it will return TRUE, else FALSE.
+
+=back
+
+=item laddr4dst(DST) -> SRC
+
+This will try to find out which local IP address B<SRC> is used for
+connections to target B<DST>. This will be done by creating a connected UDP
+socket to the target and using B<getsockname> to get the local IP address of
+this socket.
+
+=item create_socket_to ( ADDR, [ PROTO ] )
+
+Creates socket with protocol PROTO (default 'udp').
+It will use C<laddr4dst> to find the appropriate local source IP address.
+
+It will try to bind the socket to port 5060 (default SIP port).
+If this fails it will try port 5062..5100 and if it cannot bind
+to any of these ports it will just use any port which gets assigned
+by the OS.
+
+For multihomed hosts where several addresses are bound to the same
+interface it will just use one of these addresses. If you need more
+control about the address the socket is bound to (and which will
+be used as the local IP in outgoing packets) you need to create the
+socket yourself.
+
+In scalar context it just returns the newly created socket.
+In array context it will return the socket and the C<< "ip:port" >>
+the created socket is bound to.
+If the creation of the socket fails it will return C<()> and set C<$!>.
+
+Example:
+
+  my ($sock,$ip_port) = create_socket_to ( '192.168.0.1' )
+	or die $!;
+
+
+=item create_rtp_sockets ( LADDR, [ RANGE, MINPORT, MAXPORT, TRIES ] )
+
+This tries to allocate sockets for RTP. RTP consists usually of a data
+socket on an even port number and a control socket (RTCP) and the following
+port. It will try to create these sockets. MINPORT is the minimal
+port number to use (default 2000), MAXPORT the highest port (default
+MINPORT+10000), TRIES is the number of attempts it makes to create such
+socket pairs and defaults to 1000.
+
+RANGE is the number of consecutive ports it needs to allocate and
+defaults to 2 (e.g. data and control socket).
+
+Allocation will be done by choosing a random even number between MINPORT
+and MAXPORT and then trying to allocate all the sockets on this and
+the following port numbers.
+
+If the allocation fails after TRIES attempts were made it will return C<()>,
+otherwise it will return an array with at first the starting port number
+followed by all the allocated sockets.
+
+Example:
+
+  my ($port,$rtp_sock,$rtcp_sock) = create_rtp_sockets( '192.168.0.10' )
+	or die "allocation failed";
+
+
+=item sip_hdrval2parts ( KEY, VALUE )
+
+Interprets VALUE as a value for the SIP header field KEY and splits
+it into the parts (prefix, parameter). Because for most keys the
+delimiter is C<;>, but for some keys C<,> the field name KEY need to
+be known.
+
+KEY needs to be normalized already (lower case, no abbreviation).
+
+Returns array with initial data (up to first delimiter) and
+the parameters as hash.
+
+Example for key 'to':
+
+  '"Silver; John" <silver@example.com>; tag=...; protocol=TCP'
+  -> ( '"Silver; John" <silver@example.com>', { tag => ..., protocol => 'TCP' } )
+
+Example for key 'www-authenticate':
+
+  'Digest method="md5", qop="auth"'
+  -> ( 'Digest', { method => 'md5', qop => 'auth' } )
+
+=item sip_parts2hdrval ( KEY, PREFIX, \%PARAMETER )
+
+Inverse function to B<sip_hdrval2parts>, e.g constructs header value for KEY from
+PREFIX and %PARAMETER and returns value.
+
+=item sip_uri2parts(URI) -> (DOMAIN, USER, PROTO, DATA, PARAM) | DOMAIN
+
+Returns parts from URI. If called in scalar context it returns only the domain
+part. In array context it returns an array with the following values:
+
+=over 4
+
+=item DOMAIN
+
+The lower cased domain part as given in the URI, i.e. C<host>, C<host:port>,
+C<[ipv6]:port> etc.
+
+=item USER
+
+The optional user part of the SIP address.
+
+=item PROTO
+
+The protocol, e.g. C<sip> or C<sips>.
+If not explicitly given it will default to C<sip>.
+
+=item DATA
+
+The original full part before any parameter, i.e. the part containing the
+domain, optional user and optional proto.
+
+=item PARAM
+
+A hash reference to any parameters following C<data> as returned by
+B<sip_hdrval2parts>.
+
+=back
+
+=item sip_parts2uri(DOMAIN, USER, PROTO, PARAM) -> URI
+
+Returns URI from parts, i.e. the reverse to B<sip_uri2parts>.
+For the meaning of the parameters see there.
+
+=item sip_uri2sockinfo(URI; OPAQUE) -> (PROTO, HOST, PORT, FAMILY)
+
+This extracts information from B<URI> which are needed for creating the socket:
+B<HOST> is the IP address or host name, B<PORT> the port (undef if not given)
+and B<FAMILY> the family, i.e. AF_INET, AF_INET6 or undef if B<HOST> is not an
+IP address.
+B<PROTO> will be set based on the SIP protocol and parameters, i.e. C<tls> for
+C<sips> URI, C<tcp> or C<udp> for C<sip> URI with explicit C<transport>
+parameter and C<undef> otherwise.
+
+If B<OPAQUE> the host name is not required to be a valid name.
+See B<OPAQUE> in C<ip_string2parts> for more information.
+
+=item sip_sockinfo2uri(PROTO, HOST, PORT, FAMILY) -> URI
+
+This is the reverse to B<sip_uri2sockinfo>. See there for the meaning of the
+parameters.
+
+If the first argument is a hash ref it will expected to provided the arguments
+in the keys C<proto>, C<host>, C<port> and C<family>.
+
+=item sip_uri_eq ( URI1, URI2 )
+
+Returns true if both URIs point to the same SIP address.
+This compares user part case sensitive, domain part case insensitive (does
+no DNS resolution) protocol and ports in domain (assumes default ports
+for protocol if no port is given).
+
+=item ip_string2parts(STR;OPAQUE) -> (HOST, PORT, FAMILY) | \%HASH
+
+This will parse the given string STR and split it into the parts as follows:
+
+  IPv4, [IPv4]               -> (IPv4, undef, AF_INET)
+  IPv4:port, [IPv4]:port     -> (IPv4, port,  AF_INET)
+  IPv6, [IPv6]               -> (IPv6, undef, AF_INET6)
+  [IPv6]:port                -> (IPv6, port,  AF_INET6)
+  host, [host]               -> (host, undef, undef)
+  host:port, [host]:port     -> (host, port,  undef)
+
+The IP address and host will be returned in a canonicalized way.
+
+If this function is used to parse strings where the host part is not a real
+hostname but some identifier with more allowed characters than a hostname then
+OPAQUE should be set and in this way no strict checking and no canonicalization
+is done.
+
+If the function is called with a scalar context it will return the result as
+a hash ref with the keys C<host>, C<addr>, C<port>, C<family> where C<addr> is
+only set if it is IP address.
+
+=item ip_parts2string(HOST, [ PORT, FAMILY, IPv6_BRCKT]) -> STR
+
+This is the reverse to ip_string2parts. If family is not given it will be
+determined by checking if ip_or_host contains ':' (i.e IPv6 address):
+
+  (ip_or_host)              -> ip_or_host
+  (ipv4_or_host,port)       -> ipv4_or_host:port
+  (ipv6,port)               -> [ipv6]:port
+  (ipv6,undef,*,true)       -> [ipv6]
+
+If the first argument is a hash ref it will be treated as a hash ref as returned
+by B<ip_string2parts>. In this case also C<use_host> can be given which prefers
+C<host> to C<addr> for stringification. Also, C<default_port> can be used to
+give a port number which will be treated as default and omitted from string.
+
+=item ip_sockaddr2parts(SOCKADDR, [FAMILY]) -> (IP, PORT, FAMILY)
+
+This will return the IP, PORT and FAMILY from a sockaddr_in or sockaddr_in6.
+If FAMILY is not given it will be determined based on the size of SOCKADDR.
+
+If the function is called with a scalar context it will return the result as a
+hash ref as described for B<ip_string2parts>.
+
+=item ip_parts2sockaddr(IP, PORT, [FAMILY]) -> SOCKADDR
+
+This will create a sockaddr_in or sockaddr_in6 from IP and PORT. FAMILY will be
+determined by checking the IP if not given.
+
+If the first argument is a hash ref it will be treated as a hash ref as returned
+by B<ip_sockaddr2parts>.
+
+=item ip_sockaddr2string(SOCKADDR, [FAMILY]) -> STR
+
+This will return the STR from a sockaddr_in or sockaddr_in6, i.e. like combining
+C<ip_sockaddr2parts> with C<ip_parts2string>.
+If FAMILY is not given it will be determined based on the size of SOCKADDR.
+
+=item ip_ptr(IP, [FAMILY]) -> PTR_NAME
+
+This will create the hostname used in reverse lookup of an IP address, i.e.
+C<*.in-addr.arpa> or C<*.ip6.arpa>.
+If FAMILY is not given it will be determined based on the syntax of IP.
+
+=item ip_canonical(IP, [FAMILY]) -> IP
+
+This will convert the given IP address into a canonical form suitable for
+comparison.
+
+=item hostname2ip(host, [FAMILY]) -> @IP
+
+This will lookup the given name using getaddrinfo and return the IP addresses.
+If FAMILY is given only addresses matching the family will be returned.
+
+=item ip_is_v4(IP) -> true|false
+
+This checks if the given IP address is a valid IPv4 address.
+
+=item ip_is_v6(IP) -> true|false
+
+This checks if the given IP address is a valid IPv6 address.
+
+=item ip_is_v46(IP) -> AF_INET|AF_INET6|undef
+
+This checks if the given IP address is a valid IPv4 or IPv6 address and
+returns the address family if this is an IP address.
+
+=back

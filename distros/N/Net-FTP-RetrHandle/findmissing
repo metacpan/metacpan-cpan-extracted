@@ -1,0 +1,63 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use HomeSearch::DB::Reader;
+use HomeSearch::MLS::Named::Search::SQL;
+
+use constant IMAGEDIR => '/home/flinthomes/incoming/mirealsource/images/';
+use constant SERVERLIST => 'photos.txt';
+
+# First see what's in the database
+our %indb;
+use vars qw($dbh);
+$dbh = HomeSearch::DB::Reader->connect()
+    or die "Error opening up database: ".HomeSearch::DB::Writer->errstr($dbh)."\n";
+foreach my $db ('MIRealSource','MIRealSource_Vacant')
+{
+  my $searcher = HomeSearch::MLS::Named::Search::SQL->new($db,
+							  DBI => $dbh,
+							  WantFields => [ qw(mls_num) ],
+							  )
+      or die "Couldn't create new Search::SQL object for $db\n";
+  
+  $searcher->parsequery;
+  while (my $home = $searcher->nextrow)
+  {
+    $indb{$home->{mls_num}} = 1;
+  }
+}
+
+warn "Found ",scalar(keys %indb)," homes in DB.\n";
+# Now see what we already have
+our %haveimg;
+opendir(D,IMAGEDIR)
+    or die "Couldn't open dir @{[ IMAGEDIR ]}: $!\n";
+while (my $f = readdir(D))
+{
+  next if ($f =~ /^\./);
+  $haveimg{$f}=1;
+}
+closedir(D)
+    or die "Couldn't close dir @{[ IMAGEDIR ]}: $!\n";
+
+warn "Found ",scalar(keys %haveimg)," images in @{[ IMAGEDIR ]}\n";
+
+# Now see what's missing
+open(F,'<',SERVERLIST)
+    or die "Couldn't open @{[ SERVERLIST ]}: $!\n";
+while (<F>)
+{
+  chomp;
+  next unless (/^(\d+)/);
+  my $mls = $1;
+#  warn "Considering '$_' ($mls)\n";
+  next unless $indb{$mls};
+  next if $haveimg{$_};
+  print $_,"\n";
+}
+close(F)
+    or die "Couldn't close @{[ SERVERLIST ]}: $!\n";
+
+exit(0);

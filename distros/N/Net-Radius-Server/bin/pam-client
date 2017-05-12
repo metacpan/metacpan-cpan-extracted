@@ -1,0 +1,176 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+our $VERSION = do { sprintf " %d.%03d", (q$Revision: 77 $ =~ /\d+/g) };
+
+use IO::Prompt;
+use Pod::Usage;
+use Authen::PAM;
+use Getopt::Long;
+
+my %opt;
+GetOptions(\%opt, qw/
+	   service=s
+	   login=s
+	   password=s
+	   help
+	   /);
+
+pod2usage(verbose => 2, exitval => 0) 
+    if $opt{help};
+
+$opt{service} ||= 'test';
+
+pod2usage(verbose => 1, exitval => 1,
+	  message => 'One or more mandatory options are missing')
+    unless $opt{login};
+
+$|++;				# Send normal messages quickly...
+
+sub my_conv_f
+{
+    print "\n(Entering conversation function)\n";
+    my @res;
+    while ( @_ ) {
+	my $msg_type = shift;
+	my $msg = shift;
+	
+	if ($opt{password})
+	{
+	    print "$msg_type -> $msg [Entering password from command line]\n";
+	    push @res, (0, $opt{password});
+	}
+	else
+	{
+	    push @res, (0, prompt ("$msg_type -> $msg ", -tty, -e => '*'));
+	}
+    }
+    push @res, PAM_SUCCESS();
+    print "(Leaving conversation function)\n";
+    return @res;
+}
+
+# Attempt to start a PAM session using the given service name
+
+print "Initializing PAM... ";
+my $pamh = new Authen::PAM ($opt{service}, $opt{login}, \&my_conv_f);
+die "Error $pamh initializing PAM: svc $opt{service}, user $opt{login}\n" 
+    unless ref($pamh);
+print "Done\n";
+
+print "Authenticating... ";
+my $res = $pamh->pam_authenticate(0x0);
+if ($res == PAM_SUCCESS)
+{
+    print "Done - PAM_SUCCESS\n";
+}
+else
+{
+    die "Failed: code $res\n";
+}
+
+print "Validating... ";
+$res = $pamh->pam_acct_mgmt(0x0);
+if ($res == PAM_SUCCESS)
+{
+    print "Done - PAM_SUCCESS\n";
+}
+else
+{
+    die "Failed: code $res\n";
+}
+
+if (HAVE_PAM_ENV_FUNCTIONS())
+{
+    print "PAM environment dump\n";
+    my %env = $pamh->pam_getenvlist();
+    while (my ($k, $v) = each %env)
+    {
+	print "  $k -> $v\n";
+    }
+    print "End of PAM environment dump\n";
+}
+else
+{
+    print "No env support is available\n";
+}
+
+
+__END__
+
+=head1 NAME
+
+pam-client - A command line PAM client
+
+=head1 SYNOPSIS
+
+    pam-client [--help] --login login [--password password] [--service svc]
+
+=head1 DESCRIPTION
+
+C<pam-client> is a simple command line utility useful for testing the
+PAM configuration for use with Net::Radius::Server(3) to authenticate
+remote users. C<pam-client> allows for the display and enumeration of
+all the PAM-specific information available to
+Net::Radius::Server::PAM(3) match and set methods.
+
+The following options are recognized (See Getopt::Long(3) for
+information on how to specify them in the command line):
+
+=over
+
+=item B<--help>
+
+Produces this documentation.
+
+=item B<--login login>
+
+The login or username for which authentication and authorization with
+PAM will be attempted.
+
+=item B<--password password>
+
+The password associated to the username. It will be prompted if not
+specified.
+
+=item B<--service svc>
+
+The service identifier to use for the PAM interaction. Defaults to
+B<test>.
+
+=back
+
+C<pam-client> goes through each phase of the authentication and
+authorization process as specified by PAM, sending to C<STDOUT> the
+relevant diagnostics.
+
+=head1 HISTORY
+
+    $Log$
+    Revision 1.1  2006/11/13 17:45:45  lem
+    Add initial version of the pam-client utility
+
+
+=head1 LICENSE AND WARRANTY
+
+This code and all accompanying software comes with NO WARRANTY. You
+use it at your own risk.
+
+This code and all accompanying software can be used freely under the
+same terms as Perl version 5.8.6 itself.
+
+=head1 AUTHOR
+
+Luis E. Muñoz E<lt>luismunoz@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+The Linux-PAM Guides for System Administrators and Application
+Developers, for guidance in how does PAM work in your system.
+
+perl(1), Net::Radius::Server(3), Net::Radius::Server::PAM(3),
+Authen::PAM(3), Getopt::Long(3), pam(8).
+
+=cut

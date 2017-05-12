@@ -1,0 +1,10 @@
+Makefile.PL
+Build.PL
+lib/Net/IChat.pm
+lib/Net/IChat/Client.pm
+lib/Net/IChat/Conversation.pm
+lib/Net/IChat/Message/File.pm
+lib/Net/IChat/Message/Text.pm
+MANIFEST			This list of files
+t/clients.t
+TODO

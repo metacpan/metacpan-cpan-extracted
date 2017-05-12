@@ -1,0 +1,24 @@
+---
+abstract: 'Generic Route Encapsulation layer object'
+author:
+  - 'GomoR <gomor_at_cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Frame-Layer-GRE
+provides:
+  Net::Frame::Layer::GRE:
+    file: lib/Net/Frame/Layer/GRE.pm
+    version: '1.05'
+requires:
+  Net::Frame: '0'
+  perl: v5.6.1
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+version: '1.05'

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<request method="invoice.get">
+    <invoice_id>2</invoice_id>
+</request>

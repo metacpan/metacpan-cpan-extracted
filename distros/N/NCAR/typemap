@@ -1,0 +1,24 @@
+TYPEMAP
+const char*    T_PV
+char*          T_PV
+string         T_PV
+float          T_NV
+int1D*         T_INT1DP
+int2D*         T_INT2DP
+float1D*       T_FLOAT1DP
+float2D*       T_FLOAT2DP
+string1D*      T_STRING1DP
+FUNCTION_NAME  T_IV
+COMMON_NAME    T_IV
+
+INPUT
+T_INT1DP
+        $var = ($type)pack1D( $arg, 'i', (long*)0 )
+T_INT2DP
+        $var = ($type)pack2D( $arg, 'i', (long*)0 )
+T_FLOAT1DP
+        $var = ($type)pack1D( $arg, 'f', (long*)0 )
+T_FLOAT2DP
+        $var = ($type)pack2D( $arg, 'f', (long*)0 )
+T_STRING1DP
+        $var = ($type)pack1D( $arg, 'c', &${var}_len )

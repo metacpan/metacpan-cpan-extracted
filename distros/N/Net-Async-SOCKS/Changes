@@ -1,0 +1,10 @@
+Revision history for Net-Async-SOCKS
+
+0.002     2014-08-29 06:43:15+01:00 Europe/London
+	No new features.
+
+	Dependency fixes:
+	* Test::HexString
+
+0.001     2014-08-23 20:03:39+01:00 Europe/London
+	Initial CPAN release

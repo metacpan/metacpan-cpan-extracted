@@ -1,0 +1,90 @@
+## ----------------------------------------------------------------------------------------------
+## Net::Telnet::Wrapper
+##
+## $Id: README 40 2007-07-11 14:32:51Z mwallraf $
+## $Author: mwallraf $
+## $Date: 2007-07-11 16:32:51 +0200 (Wed, 11 Jul 2007) $
+##
+## This program is free software; you can redistribute it and/or
+## modify it under the same terms as Perl itself.
+## ----------------------------------------------------------------------------------------------
+
+
+
+INSTALLATION
+
+    Net::Telnet::Wrapper is pure perl but has following requirements 
+
+    Net::Telnet - this is required
+    
+    Net::Telnet::Cisco - only required if you're connecting to Cisco or Nortel devices
+
+    To install:
+
+      perl Makefile.PL
+      make
+      make install
+
+
+
+SYNOPSIS
+
+    use Net::Telnet::Wrapper;
+
+    ## connect to Cisco router and execute show version + show clock
+    my $w = Net::Telnet::Wrapper->new('device_class' => 'Cisco::IOS', -host => 'routerA');
+    eval {
+    	$w->login( 'name' => "mwallraf", 'passwd' => "<mypass>", 'Passcode' => "<mypass>");
+    	$w->enable( 'name' => "mwallraf", 'passwd' => "<mypass>", 'Passcode' => "<mypass>");
+    	$w->cmd('show version');
+    	$w->cmd('show clock');
+    };
+    die $@ if ($@);
+    print join("\n", @{$w->GetOutput()} );
+
+
+    ## check if we're logged in to the router in enable mode
+    print "We are connected to the router in ", $w->get_mode(), " mode\n";
+    
+
+    ## check if www.google.com is working
+    my $w = Net::Telnet::Wrapper->new('device_class' => 'TCP::HTTP', -host => 'www.google.com');
+    eval {
+    #	print $w->cmd("GET /index.html HTTP/1.0\n\n");
+    #	or
+    	print $w->test_url("/index.html");
+    };
+    die $@ if ($@);
+
+
+
+
+DESCRIPTION
+
+A wrapper or extension for Net::Telnet and Net::Telnet::Cisco that adds some
+default procedures like multiple login attempts as well as output formatting, error checking etc.
+
+The wrapper has templates or device classes defined for many devices like Cisco routers, switches, 
+firewalls but also Nortel, Packeteer, Unix etc.  
+It's possible to add templates for almost any application that listens on a TCP port.
+All templates can be found in the Device folder.
+
+Net::Telnet::Wrapper is not a replacement for Net::Telnet(::Cisco) and has to be used exactly
+the same way with the same parameters etc. It does have a few additional parameters and procedures.
+
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Maarten Wallraf
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+
+
+CONTACT
+
+info@2nms.com

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Soma.pm
+t/Net-Soma.t
+META.yml                                 Module meta-data (added by MakeMaker)

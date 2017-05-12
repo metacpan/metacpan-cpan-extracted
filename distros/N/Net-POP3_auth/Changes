@@ -1,0 +1,18 @@
+Revision history for Perl extension Net::POP3_auth.
+
+0.04  Mon Nov  9 16:09:13 CET 2009
+        - service should be "pop" not "pop3" according to RFC 5034
+          (reported by Yasuhiro Hiraishi)
+
+0.03  Fre Jul 11 21:33:39 CEST 2003
+	- changed MIME::Base64 function calls
+        - changed authentication to use Authen::SASL instead of
+          selfmade routines. I currently tested only CRAM-MD5.
+          Can someone please provide me with a POP3 account on a 
+          maschine using DIGEST-MD5 or NTLM?
+        - added better response handling
+
+0.02  Thu Jul 10 11:03:48 2003
+	- original version; created by h2xs 1.20 with options
+		-AXc -n Net::POP3_auth
+

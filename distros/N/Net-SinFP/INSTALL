@@ -1,0 +1,69 @@
+Under Linux/FreeBSD/OpenBSD/NetBSD and related:
+
+1. Use CPAN:
+
+  prompt# cpan Net::SinFP
+
+2. Use SourceForge:
+
+  http://sourceforge.net/projects/sinfp
+  tar zxvf SinFP-X.XX-X.tar.gz
+  cd SinFP-X.XX-X/
+  make
+  make install
+
+  sinfp.pl will be in /usr/local/sinfp/bin .
+
+
+Under Windows:
+
+  First, install WinPcap 3.1: http://www.winpcap.org .
+
+  The following procedure was tested with ActivePerl 5.8.8.819, 
+  with PPM v4.0.
+
+  # If you are behind a proxy:
+  C:\> set http_proxy=http://username:password@proxy:port
+
+  # Add gomor repository
+  C:\> ppm repo add gomor http://www.gomor.org/files/ppm/repo-8xx
+
+1. Use PPM, installs SinFP in default site area
+
+  # Disable all other repo, if you have many. Or only ActiveState repo
+  # by default
+  C:\> ppm repo 1 off
+  C:\> ppm install Net-SinFP
+
+  # Re-enable all other repo
+  C:\> ppm repo 1 on
+
+  sinfp.pl will be in C:\perl\site\bin.
+
+2. Use PPM, in own SinFP area
+
+  # Create an area for SinFP
+  C:\> mkdir C:\perl\sinfp
+  C:\> set PERL5LIB=%PERL5LIB%;C:\perl\sinfp
+
+  C:\> ppm gui
+  # In the GUI, select Edit/Preference, and check sinfp, answer OK, then check 
+  # site area, or any other default area you use
+
+  # Disable all other repo, if you have many. Or only ActiveState repo
+  # by default
+  C:\> ppm repo 1 off
+  C:\> ppm install --area sinfp Net-SinFP
+
+  # Re-enable all other repo
+  C:\> ppm repo 1 on
+
+  sinfp.pl will be in C:\perl\sinfp\bin.
+
+3. If you have error messages loading some SinFP related DLLs
+
+  Go to www.microsoft.com, then in the search field, type in:
+  vcredist_x86.exe
+
+  Download it, install it.
+

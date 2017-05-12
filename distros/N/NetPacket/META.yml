@@ -1,0 +1,77 @@
+---
+abstract: 'assemble/disassemble network packets at the protocol level'
+author:
+  - 'Tim Potter <tpot@samba.org>'
+  - 'Stephanie Wehner <atrak@itsx.com>'
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: NetPacket
+provides:
+  NetPacket:
+    file: lib/NetPacket.pm
+    version: v1.6.0
+  NetPacket::ARP:
+    file: lib/NetPacket/ARP.pm
+    version: v1.6.0
+  NetPacket::Ethernet:
+    file: lib/NetPacket/Ethernet.pm
+    version: v1.6.0
+  NetPacket::ICMP:
+    file: lib/NetPacket/ICMP.pm
+    version: v1.6.0
+  NetPacket::IGMP:
+    file: lib/NetPacket/IGMP.pm
+    version: v1.6.0
+  NetPacket::IP:
+    file: lib/NetPacket/IP.pm
+    version: v1.6.0
+  NetPacket::IPX:
+    file: lib/NetPacket/IPX.pm
+    version: v1.6.0
+  NetPacket::TCP:
+    file: lib/NetPacket/TCP.pm
+    version: v1.6.0
+  NetPacket::UDP:
+    file: lib/NetPacket/UDP.pm
+    version: v1.6.0
+  NetPacket::USBMon:
+    file: lib/NetPacket/USBMon.pm
+    version: v1.6.0
+requires:
+  Carp: '0'
+  Exporter: '0'
+  constant: '0'
+  parent: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/netpacket/issues
+  homepage: https://github.com/yanick/netpacket
+  repository: https://github.com/yanick/netpacket.git
+version: 1.6.0
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Andreas Schwab <schwab@suse.de>'
+  - 'Ben Magistro <koncept1@gmail.com>'
+  - 'Daniel Collins <solemnwarning@solemnwarning.net>'
+  - 'Dinar Valeev <dvaleev@suse.de>'
+  - 'Lubomir Rintel <lkundrak@v3.sk>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Robin Lee <cheeselee@fedoraproject.org>'
+  - 'Stan Schwertly <stan@linode.com>'
+  - 'Stephanie Wehner <atrak@cpan.org>'
+  - 'Tim Potter <timpotter@cpan.org>'
+  - 'fschlich <fsfs@debian.org>'

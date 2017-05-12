@@ -1,0 +1,59 @@
+---
+abstract: 'client library for interacting with the Fastly web acceleration service'
+author:
+  - '- Fastly Inc'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Fastly
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+recommends:
+  Term::ANSIColor: '0'
+  Term::ShellUI: '0'
+requires:
+  Class::Accessor::Fast: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Socket::SSL: '!= 1.38'
+  JSON::XS: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '5.813'
+  Test::More: '0'
+  URI: '0'
+  URI::Escape: '0'
+  YAML: '0'
+resources:
+  bugtracker: https://github.com/fastly/fastly-perl/issues
+  homepage: https://github.com/fastly/fastly-perl
+  repository: https://github.com/fastly/fastly-perl.git
+version: '1.09'
+x_contributors:
+  - 'Artur Bergman <sky@crucially.net>'
+  - 'Eric Hodel <drbrain@segment7.net>'
+  - 'Gabor Szabo <szabgab@gmail.com>'
+  - 'Geoffrey Schorkopf <gschorkopf@gmail.com>'
+  - 'Leon Brocard <lbrocard@fastly.com>'
+  - 'Matthew Wodrich <matthew.wodrich@dreamhost.com>'
+  - 'Michael May <michael@fastly.com>'
+  - 'Michael May <mmay@users.noreply.github.com>'
+  - 'Simon Wistow <simon@fastly.com>'
+  - 'Simon Wistow <simon@thegestalt.org>'
+  - 'Steve Ivy <steveivy@gmail.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Tatsuhiko Miyagawa <miyagawa@gmail.com>'
+  - 'Thom Mahoney <mahoneyt@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

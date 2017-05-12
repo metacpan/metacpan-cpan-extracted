@@ -1,0 +1,35 @@
+# $Id: boolean.hrm,v 1.1 2004/12/22 13:31:51 mike Exp $
+#
+# See the comment at the head of "trunc.hrm"
+#
+
+LDR 00366nam  22001698a 4500
+001     IDbRadMARC001
+250    _a foo
+583    _a RadMARC
+       _b indexdata.com/RadMARC/boolean/001
+       _d 1
+       _e QFT
+       _i boolean
+       _x This is a specially created record for the RadioMARC project.  It exists to test the functionality of servers as regards boolean queries.  Created by Mike Taylor <mike@indexdata.com>
+
+LDR 00366nam  22001698a 4500
+001     IDbRadMARC002
+250    _a foo bar
+583    _a RadMARC
+       _b indexdata.com/RadMARC/boolean/002
+       _d 1
+       _e QFT
+       _i boolean
+       _x This is a specially created record for the RadioMARC project.  It exists to test the functionality of servers as regards boolean queries.  Created by Mike Taylor <mike@indexdata.com>
+
+LDR 00366nam  22001698a 4500
+001     IDbRadMARC003
+250    _a bar
+583    _a RadMARC
+       _b indexdata.com/RadMARC/boolean/003
+       _d 1
+       _e QFT
+       _i boolean
+       _x This is a specially created record for the RadioMARC project.  It exists to test the functionality of servers as regards boolean queries.  Created by Mike Taylor <mike@indexdata.com>
+

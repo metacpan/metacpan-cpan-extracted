@@ -1,0 +1,11 @@
+{: NES 1.0 ('./lwp.pl') :}
+Status:<br>
+{: $ status :}<br>
+Title:<br>
+{: $ title :}<br>
+Content type:<br>
+{: $ Content-Type :}<br>
+Head:<br>
+{: $ head :}<br>
+Extrac:<br>
+{: $ extrac,yes_html :}

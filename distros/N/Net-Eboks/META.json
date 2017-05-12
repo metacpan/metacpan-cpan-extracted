@@ -1,0 +1,53 @@
+{
+   "abstract" : "perl API for http://eboks.dk/",
+   "author" : [
+      "Dmitry Karasik <dmitry@karasik.eu.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Eboks",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "Digest::SHA" : "0",
+            "Getopt::Long" : "0",
+            "IO::Lambda" : "1.26",
+            "LWP" : "0",
+            "MIME::Entity" : "0",
+            "XML::Simple" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/dk/Net-Eboks"
+      }
+   },
+   "version" : "0.04"
+}

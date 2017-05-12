@@ -1,0 +1,126 @@
+Copyright (c) 2003-2004 AirWave Wireless, Inc.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+   1. Redistributions of source code must retain the above
+   copyright notice, this list of conditions and the following
+   disclaimer.
+   2. Redistributions in binary form must reproduce the above
+   copyright notice, this list of conditions and the following
+   disclaimer in the documentation and/or other materials provided
+   with the distribution.
+   3. The name of the author may not be used to endorse or
+   promote products derived from this software without specific
+   prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+Top-level stuff:
+- before an initial release
+  D in order to test the following SNMP::Simple features, I need an 
+      SNMP agent implementation
+    M although it doesn't need to support getNext, 
+    D it does need to support get
+    D and it does need to support set
+    D what else does it need to make the existing tests use it?
+      D community string handling
+  D SNMP::Simple needs to walk
+    D so now the agent needs getNext
+  D SNMP::Simple needs to cope with other data types somehow
+    D get integers
+    D get other integer-like data types
+  D SNMP::Simple needs to use distinct request-IDs
+  D SNMP::Simple needs to ignore packets received with the wrong request-ID
+  D and SNMP::Simple needs to handle ports other than 161
+  D SNMP->decode needs to cope with random data without dying
+  D document error codes
+    D document error codes for hostname lookup failure and timeout
+  D document encode_oid, decode_oid
+  D encode long-form things correctly
+  - decide on name; rename things
+  - need to package it up with a Makefile.pl
+    - mostly done, needs name
+  D maybe benchmark speed without accessor methods?
+    D done, not helpful: would save 15 uS out of 1100
+  D proof docs
+  D add copyright notices
+    D everything has 'copyright notice here' in it now.  need only substitute.
+  - release: AirWave web site, at least
+- SNMP->decode needs some way to report decoding errors
+- set integers etc. by getting them first to find their type
+- handle mangled varbindlists in otherwise good packets without
+  crashing in user code
+D find out if you have to export and import constants to get them inlined
+  - no
+- find out if my constant->import thing needs to be in a BEGIN block
+  - doesn't matter for other modules that use SNMP; may matter for
+    SNMP.pm itself.
+- other pieces of an SNMP implementation:
+  D some friendlier APIs (SNMP::Simple, in progress)
+    D an interface to get and set in a blocking fashion (in progress)
+    D walk
+  D better documentation
+  - reformat code to make it more readable
+  - something you can use for nonblocking sets
+  - a Net::SNMP-compatible interface
+  - handling of MIBs
+    - enumeration
+    D matching an OID against a bunch of OID prefixes efficiently
+    - name-to-OID translation
+    - encoding and decoding of enumerated values
+  D the (implementation of the) powerful get-next operation
+  - a POE component to get and set in a nonblocking fashion
+  - an actual SNMP agent
+    - support for the things Net::SNMP gives us
+      - system table
+      - in particular the things Jason wants
+        - load average
+        - memory free
+        - interface byte counts
+        - disk space free
+  
+
+From source files:
+./BERdecode.pm:  # XXX only handles up to 32 bits
+./BERdecode.pm:  # XXX mishandles negative numbers represented briefly
+./SNMP.pm:  } else {  # XXX need a test for this
+./SNMP.pm:sub _decode_oid {  # XXX need a test for this
+./SNMP.pm:    my $pdu_start = pack 'ac/a* a*C a*C',   # XXX give error on long req IDs
+./SNMP.pm:      OCTET_STRING, $community,  # XXX cope with long community strings
+./SNMP/Mapper.pm:# XXX note this interface is really bug-prone in scalar context
+./SNMP/Simple.pm:# XXX refactor this a little more
+./SNMP/Simple.pm:  $socket ||= IO::Socket::INET->new(Proto => 'udp');  # XXX error check
+./SNMP/Simple.pm:  my $port = 161;  # XXX test
+./SNMP/Simple.pm:      scalar Socket::sockaddr_in($port, $iaddr); # XXX err handling: bad port?
+./SNMP/Simple.pm:      $socket->recv($response, 65536, 0); # XXX error handling?
+./SNMP/Simple.pm:  SNMP::Counter32 => \&encode_int,  # XXX test
+./SNMP/Simple.pm:  SNMP::TimeTicks => \&encode_int,  # XXX test
+./SNMP/Simple.pm:  SNMP::OBJECT_IDENTIFIER => sub { SNMP->encode_oid($_[0]) },  # XXX test
+./SNMP/Simple.t:  # default get timeout: 5 (XXX: this test sucks!)
+./SNMP/Simple.t:  # XXX opaque, NsapAddress
+./SNMP/Simple.t:# TODO ensure port defaults to 161
+./SNMP/Simple.t:# TODO tie
+./SNMP/Simple.t:# TODO negative timeticks
+./SNMP/Agent.pm:    error_index => 1, # XXX
+./SNMP/Agent.pm:    varbindlist => [$dr->varbindlist], # XXX?
+./SNMP/Agent.pm:sub _badValue {  # XXX test this
+./SNMP/Agent.pm:    error_index => 1, # XXX
+./SNMP/Agent.pm:    varbindlist => [$dr->varbindlist], # XXX??
+./SNMP/Agent.pm:    # XXX damn, I thought I could avoid decoding this OID:
+./SNMP/Agent.t:# TODO: handling of multiple types
+./SNMP/Agent.t:# TODO: handling of multiple varbinds
+./SNMP/Agent.t:# TODO: handling of different OID spellings
+./cico:Updated TODO.

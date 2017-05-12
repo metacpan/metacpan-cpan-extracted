@@ -1,0 +1,368 @@
+# -*-n3-*-
+# 
+# 1.14    2010-12-16
+#         fix up Build.PL to install properly
+#
+#         sorry about this weird Changelog; I have no idea what it's supposed
+#         to really look like -- rjbs, 2010-12-16
+
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix doap:    <http://usefulinc.com/ns/doap#> .
+@prefix asc:     <http://aaronland.info/ns/changefile/> .
+                                     
+<>
+        dc:identifier           "$Id: Changes,v 1.41 2008/03/03 16:55:04 asc Exp $" ;
+        dc:description          "Changes for Net::Delicious.pm" ;
+        dcterms:references      <http://aaronland.info/perl/net/delicious/> .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-1.13.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-1.13.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "1.13" ;
+                        doap:created      "2008-03-03" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Fixed my $root redeclaration - http://rt.cpan.org/Public/Bug/Display.html?id=25760" ;
+                        asc:updat         "Updated POD" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-1.12.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-1.11.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "1.12" ;
+                        doap:created      "2007-07-05" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Fixed missing 'my' declaration" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-1.11.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-1.1.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "1.11" ;
+                        doap:created      "2007-03-25" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Fixed bug setting private __updates variable; http://rt.cpan.org/Ticket/Display.html?id=25760" ;
+                        asc:update        "Updated POD" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-1.1.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-1.01.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "1.1" ;
+                        doap:created      "2006-10-23" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "env_proxy not proxy_env...guh" ;
+                        asc:bugfix        "Remove N:D:Config::Api from tests" ;
+                        asc:bugfix        "Add Config::Simple to dependency list in Build.PL" ;
+                        asc:bugfix        "Ensure that $type exists before testing it (in _validateinput)" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-1.01.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-1.0.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "1.01" ;
+                        doap:created      "2006-06-21" ;
+                        ];
+        asc:changes     [
+
+                        asc:addition      "Added 'user_agent' helper method per RT ticket #12981" ;
+                        asc:update        "Updated POD" ;
+                        ] .                               
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-1.0.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-0.99.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "1.0" ;
+                        doap:created      "2006-06-19" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Noted dependency on Crypt::SSLeay" ;
+                        asc:bugfix        "Fixed sloppy typo calling _mk_no" ;
+                        asc:addition      "Added new configs and the ability to update them on the fly" ;
+                        asc:addition      "Added the option to specify XML parser and the ability to force return of XML parser-ed objects" ;
+                        asc:update        "Removed deprecated 'inbox' methods" ;
+                        asc:update        "removed N:D:Constants::Api" ;
+                        asc:update        "Updated POD" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-0.99.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-0.96.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.99" ;
+                        doap:created      "2006-06-05" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Use 'v1' endpoint" ;
+                        asc:addition      "Added code/methods to account for private bookmarks" ;
+                        asc:update        "Updated POD" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-0.96.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-0.95.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.96" ;
+                        doap:created      "2006-01-10" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Applied to patch to use URI.pm when building URIs (thanks to Daniel Westermann-Clark)" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-0.95.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-0.95_01.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.95" ;
+                        doap:created      "2005-12-30" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Blessed for release." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-0.95_01.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-0.94.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.95_01" ;
+                        doap:created      "2005-12-28" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Ensure that the '__updates' key points to a real live directory." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-0.94.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-0.93.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.94" ;
+                        doap:created      "2005-12-13" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Added Net::Delicious 'all_posts_for_url' helper method." ;
+                        asc:addition      "Added 'as_hashref' method for safely serializing (and re-blessing) objects. Added Net::Delicious::Object base class." ;
+                        asc:update        "All the inbox related methods now return an error as they are no longer part of the del.cio.us API. Eventually they will be removed from the package altogether." ;
+                        asc:update        "Updated 'posts'method to accept 'url' parameter." ;
+                        asc:update        "Updated VERSION numbers for all Net::Delicious::* packages to match Net::Delicious.pm" ;
+                        asc:update        "Updated t/01-load.t to load all packages." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-0.93.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-0.92.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.93" ;
+                        doap:created      "2005-12-11" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Added bundle related methods and Net::Delicious::Bundle package." ;
+                        asc:addition      "Added MANIFEST.SKIP." ;
+                        asc:update        "Updated '_isdone' method to account for RESPONSE_OK." ;
+                        asc:update        "Updated POD." ;
+                        asc:update        "Updated 'Changes' file to use N3 format." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-0.92.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-0.91.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.92" ;
+                        doap:created      "2004-12-10" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Added 'update' method and corresponding constants in N:D:C:Api.";
+                        asc:update        "Replaced Extutils::MakeMaker with Module::Build." ;
+                        asc:update        "Updated 'all_posts' to account for last updated. (Note to self : What the hell does that *mean* ?!)" ;
+                        asc:update        "Updated POD." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-0.91.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-0.9.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.91" ;
+                        doap:created      "2004-10-08" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Fixed bug in N:D:P constructor that was ignoring tags when invoked in a 'recent_posts' context." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-0.9.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-0.8.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.9" ;
+                        doap:created      "2004-10-06" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Fixed a syntax error in error logging." ;
+                        asc:addition      "Added 'delete_post' method." ;
+                        asc:update        "Pass version number as part of User-Agent string." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-0.8.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-0.71.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.8" ;
+                        doap:created      "2004-10-06" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Added 'all_posts' and updated 'recent_posts' per changes to the API : <http://lists.burri.to/pipermail/delicious-discuss/2004-September/001112.html>." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-0.71.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-0.7.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.71" ;
+                        doap:created      "2004-09-20" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Fixed tag(s) method in N:D:P." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-0.7.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-0.6.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.7" ;
+                        doap:created      "2004-09-17" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Added hooks to pause between requests and back-off when service returns 503." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-0.6.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-0.5.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.6" ;
+                        doap:created      "2004-07-08" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Fixed bug where get/recent posts were all mixed up - d'oh! (RT ticket # 6890.)" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-0.5.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-0.4.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.5" ;
+                        doap:created      "2004-03-08" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Check wantarray to return empty list or undef in API methods that return stuff." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-0.4.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-0.4_01.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.4" ;
+                        doap:created      "2004-03-04" ;
+                        ];
+        asc:changes     [
+                        asc:comment       "Blessed as version 0.4." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-0.4_01.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-0.3.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.4_01" ;
+                        doap:created      "2004-03-08" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Fixed broken 'tag' method in N:D:T (gah!)" ;
+                        asc:bugfix        "Fixed bug in 'tags' and 'inbox_subscriptions' methods where '_getresults' wasn't being called at all." ;
+                        asc:addition      "Added N:D:User package." ;
+                        asc:addition      "Added 'user' method to N:D:Post" ;
+                        asc:update        "Replaced all instances of '_request' with '_sendrequest'" ;
+                        asc:update        "Updated POD" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-0.3.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-0.2.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.3" ;
+                        doap:created      "2004-02-09" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Updated N:D:Post to export an 'extended' object method." ;
+                        asc:update        "Replaced use Data::Denter with YAML and made sure to require it in Makefile.PL" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-0.2.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-0.1.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.2" ;
+                        doap:created      "2004-02-01" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Updated POD" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-0.1.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Delicious-0.1_01.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "0.1" ;
+                        doap:created      "2004-01-30" ;
+                        ];
+        asc:changes     [
+                        asc:comment       "Hey look, the methods actually return useful stuff now!" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Delicious-0.1_01.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/delicious/> ;
+
+        doap:Version    [
+                        doap:revision     "0.1_01" ;
+                        doap:created      "2004-01-26" ;
+                        ];
+        asc:changes     [
+                        asc:comment       "Initial release." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/>
+        a doap:Project ;
+        doap:download-page      "http://search.cpan.org/dist/Net-Delicious/" ;
+        doap:download-mirror    "http://aaronland.info/perl/net/delicious/" .

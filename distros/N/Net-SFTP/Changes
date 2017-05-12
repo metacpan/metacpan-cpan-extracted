@@ -1,0 +1,90 @@
+Revision history for Net::SFTP
+
+0.10  2005.10.08
+    - Add example for ssh_args option (rt.cpan.org #5899, Mark Fuller).
+    - Fix from Jim Herring: don't treat legal "0" handle from server as error
+			(rt.cpan.org #14405).
+    - Suppress shell in SSH2 invocation (if Net::SSH::Perl 1.29+ available)
+      (Sean McMillan).
+
+0.09  2005.01.18
+    - New co-maintainer, David Robins (DBROBINS).
+    - Adds a 'warn' argument to the constructor to allow supression or
+      redirection of warnings.
+    - Allows the 'ssh_args' constructor argument to be either a hash ref or an
+      array ref.
+    - Adds a 'status' method which returns the last SSH2_FX_* status value, or
+      (status value, text) in list context (only useful after last failure).
+    - Adds brief summary comments to some methods.
+    - Returns failure if the remote open fails for 'get' (previous code ignored
+      it); also moves the remote open before the local open so that we don't
+      create empty local files if the remote file can't be opened.
+    - Changes 'ls' to return an array reference in scalar context.
+    - Documents: the fact that we die on protocol/local errors; the new option
+      and method; changes to 'get'/'put' (formerly 'put' didn't return anything
+      useful, and 'get's actual return values are the same, just better
+      documented).
+    - Adds a comprehensive remote test, but to use it one has to manually go in
+      and configure a server a certain way, so it defaults to skipping
+      everything; I'm including it as a base since there are currently no remote
+      tests at all.
+
+0.08  2003.12.12
+    - Net::SFTP::Buffer was passing an invalid option when loading
+      Net::SSH::Perl::Buffer.
+    - Add SUPPORT section to the docs.
+
+0.07  2003.11.14
+    - Require Net::SSH::Perl 1.24, which also includes circular
+      reference fixes.
+
+0.06  2003.11.14
+    - New maintainer, Dave Rolsky.
+    - Fixed a circular reference which caused connections to be held
+      open indefinitely in a persistent environment like mod_perl.
+      This uses weak references, so Perl 5.6.0+ is now required.  This
+      work was funded by Kineticode, Inc.
+    - Added a LICENSE file.
+
+0.05  2001.05.24
+    - Added help ('h' or '?') command to psftp. Moved all shell
+      functionality into Net::SFTP::Shell.
+    - Net::SFTP::Util needed to 'use Exporter'.
+
+0.04  2001.05.16
+    - Fixed bug in put method when running fsetstat command; it
+      was trying to set the UID/GID on the remote file, which
+      was giving a permission denied message. Should not try to
+      set UID/GID, so had to adjust flags.
+    - Added eg/psftp, a working SFTP shell.
+    - Moved READ and WRITE commands into their own methods
+      (do_read and do_write, respectively).
+    - Changed semantics of get method. Returning the contents of
+      the remote file is no longer connected to whether a local
+      file is passed as an argument; it is instead based on the
+      calling context of 'get'. Updated docs to reflect this.
+
+0.03  2001.05.15
+    - Documentation for all extra classes: Attributes, Buffer,
+      Constants, and Util.
+    - Documentation for command methods in Net::SFTP.
+    - Added binmode when reading/writing from local files.
+    - Added methods for all remaining commands in SFTP protocol
+      version 3 (eg. remove, rmdir, mkdir, realpath, etc.).
+    - Added callbacks to get and put, eg. for status messages,
+      etc.
+    - Fixed typo in Net::SFTP::Buffer::get_int64 that was breaking
+      reading 64-bit ints.
+
+0.02  2001.05.14
+    - Fixed bug with SSH2 server not sending one message per
+      packet, ie. multiple packets have to be retrieved to make
+      up one SFTP message. This would show up as a "Message length
+      too long" error. Thanks to Matt Good for the spot.
+    - Fixed bug with OpenSSH and SSH2 SFTP servers where after
+      a certain amount of bytes the connection would hang. This
+      was a bug in Net::SSH::Perl (channel window sizes) that is
+      fixed in version 1.13.
+
+0.01  2001.05.13
+    - original version; created by h2xs 1.19

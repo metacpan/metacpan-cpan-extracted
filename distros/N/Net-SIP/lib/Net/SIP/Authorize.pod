@@ -1,0 +1,151 @@
+
+=head1 NAME
+
+Net::SIP::Authorize - enforce authorization of packets
+
+=head1 SYNOPSIS
+
+  my $auth = Net::SIP::Authorize->new(
+	dispatcher => $dispatcher,
+	realm      => 'net-sip.example.com',
+	user2pass  => \&give_pass_for_user,
+	i_am_proxy => 1,
+  );
+  my $proxy = Net::SIP::StatelessProxy->new...
+  my $chain = Net::SIP::ReceiveChain->new(
+	# all requests for proxy need to be authorized
+	[ $auth,$proxy ]
+  );
+
+=head1 DESCRIPTION
+
+This package is used inside a L<Net::SIP::ReceiveChain> to make sure,
+that requests are authorized before they get handled by the next
+receiver in the chain.
+
+=head1 CONSTRUCTOR
+
+=over 4
+
+=item new ( %ARGS )
+
+This creates a new registar object, %ARGS can have the following keys:
+
+=over 8
+
+=item dispatcher
+
+L<Net::SIP::Dispatcher> object manging the registar. Mandatory.
+
+=item realm
+
+The realm for the authentication request. Defaults to 'p5-net-sip'.
+
+=item opaque
+
+Optional value for C<opaque> parameter for the authentication request.
+If none is given no C<opaque> parameter will be used.
+
+=item user2a1
+
+Either hash reference with C<user,a1_hex> mapping or callback, which gives
+C<a1_hex> if called with C<user,realm>.
+For the meaning of C<a1_hex> see RFC 2617.
+
+=item user2pass
+
+Either hash reference with C<user,password> mapping or callback,
+which gives C<password> if called with C<user>.
+This parameter will only be used if C<user2a1> does not result in
+a defined C<a1_hex> for C<user>.
+
+=item i_am_proxy
+
+Flag if the object behind works as a proxy (e.g. L<Net::SIP::StatelessProxy>)
+and sends C<Proxy-Authenticate> or if it is an endpoint
+(e.g. L<Net::SIP::Endpoint>, L<Net::SIP::Registrar>) which sends
+C<WWW-Authenticate>.
+
+=item filter
+
+Additional filter for authorization, e.g. if authorization based on
+username and passwort succeeded it might still fail because of these
+filters. Filter is a hash with the method as key.
+
+The value can be an additional authorization (in which case it
+must succeed), a list of authorizations (all of them must succeed),
+or a list with a list of authorizations (at least one of the inner
+lists must succeed).
+
+The additional authorization can be a name of a L<Net::SIP::Authorize>
+subclass (e.g. C<ToIsFrom> means C<Net::SIP::Authorize::ToIsFrom>)
+which has a C<verify> function or a C<[\&callback]>.
+
+The verify function or callback will be called with
+C<($packet,$leg,$addr,$auth_user,$auth_realm)> where C<$packet> is
+the request, C<$leg> the L<Net::SIP::Leg> object where the packet
+came in, C<$addr> the senders address, C<$auth_user> the
+username from the authorized user and C<$auth_realm> the realm
+which was used for authorization.
+Success for verification means that the function must return true.
+
+The following authorization subclasses are defined:
+
+=over 4
+
+=item FromIsRealm
+
+Succeeds if the senders domain is the realm or a subdomain of the realm.
+
+=item FromIsAuthUser
+
+Succeeds if the username of the sender equals the username used for
+authorization.
+
+=item ToIsFrom
+
+Succeeds if To header equals From header. This can be used to make sure, that a
+user can only call REGISTER for itself.
+
+=back
+
+Example:
+
+  filter => {
+    REGISTER => [
+      # all of these must succeed
+      [ 'ToIsFrom','FromIsRealm','FromIsAuthUser' ],
+      # or this
+      [ \&callback ],
+    ],
+    INVITE => 'FromIsRealm',
+  }
+
+=back
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item receive ( PACKET,LEG,FROM )
+
+PACKET is the incoming packet,
+LEG is the L<Net::SIP::Leg> where the packet arrived and FROM
+is the C<< "ip:port" >> of the sender. Responses will be send
+back to the sender through the same leg.
+
+Called from the managing L<Net::SIP::Dispatcher> object if a new
+packet arrives.
+
+Returns TRUE if the packet was fully handled by this object which
+is the case, if the packet was not authorized so that a C<401>
+or C<407> (if C<i_am_proxy>) response was send back.
+
+Returns FALSE if packet was authorized and should be handled
+be the next object in the L<Net::SIP::ReceiveChain>.
+In this case it usually changes the packet to remove the local
+authorization information.
+
+=back

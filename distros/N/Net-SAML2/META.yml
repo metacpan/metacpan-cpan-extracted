@@ -1,0 +1,54 @@
+---
+abstract: 'SAML bindings and protocol implementation'
+author:
+  - 'Chris Andrews <chrisandrews@venda.com>'
+build_requires:
+  Dancer: 1.2000
+  ExtUtils::MakeMaker: 6.56
+  Test::More: 0.88
+  WWW::Mechanize: 1.66
+  YAML: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.56
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.04'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-SAML2
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Accessor: 0
+  Crypt::OpenSSL::Bignum: 0
+  Crypt::OpenSSL::DSA: 0
+  Crypt::OpenSSL::RSA: 0
+  Crypt::OpenSSL::Random: 0
+  Crypt::OpenSSL::VerifyX509: 0
+  Crypt::OpenSSL::X509: 0
+  DateTime::Format::XSD: 0
+  Digest::SHA1: 0
+  File::Slurp: 0
+  IO::Compress::RawDeflate: 0
+  IO::Uncompress::RawInflate: 0
+  LWP::UserAgent: 0
+  MIME::Base64: 0
+  Moose: 0
+  MooseX::Types: 0
+  MooseX::Types::Common: 0
+  MooseX::Types::DateTime: 0
+  MooseX::Types::URI: 0
+  URI: 0
+  XML::CanonicalizeXML: 0
+  XML::Generator: 0
+  XML::XPath: 0
+  perl: 5.8.1
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-SAML2
+  license: http://dev.perl.org/licenses
+  repository: http://github.com/chrisa/perl-Net-SAML2
+version: 0.17

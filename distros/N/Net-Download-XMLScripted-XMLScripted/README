@@ -1,0 +1,56 @@
+Net-Download-XMLScripted-XMLScripted version 0.01
+=================================================
+
+NAME
+       Net::Download::XMLScripted::XMLScripted - Perl based XML scripted download program.
+
+SYNOPSIS
+         use Net::Download::XMLScripted::XMLScripted;
+
+         To Run from Command Line:
+
+         (1) perl XMLScripted.pm -inXMLFileName xmlFileName [-verbose]
+
+         (2) perl XMLScripted.pm -inXMLFileName xmlFileName -beginDate YYYY-MM-DD [-endDate YYYY-MM-DD]
+
+         (3) perl XMLScripted.pm -generateSampleXMLFile sampleXMLFileName
+
+         (4) perl XMLScripted.pm -showTranslationRules
+
+         (5) perl XMLScripted.pm -version
+
+DESCRIPTION
+       This is a daily download program. The input is an XML file that has
+       information about URLs that need to be downloaded. It uses specific
+       translation rules to generate URL names that contain dates. It creates
+       directories specified in the input XML file and downloads the URLs.
+       This module is ideal for cron jobs.
+
+INSTALLATION
+	   To install this module type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+
+SEE ALSO
+       Perl
+       LWP::UserAgent 
+       HTTP::Request 
+       HTTP::Response 
+       URI::Heuristic
+       XML::Parser
+
+AUTHOR
+       Singh T. Junior, "<singhtjunior@gmail.com>"
+
+COPYRIGHT & LICENSE
+       Copyright (C) 2006 by Singh T. Junior, All Rights Reserved.
+
+       This library is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself, either Perl version 5.8.6 or, at
+       your option, any later version of Perl 5 you may have available.
+
+

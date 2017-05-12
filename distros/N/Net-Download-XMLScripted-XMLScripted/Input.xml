@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!DOCTYPE xmlscripted [
+<!ELEMENT xmlscripted (downLoadPathName, downLoadDirName, statusReportFileName, entry+)>
+<!ELEMENT downLoadPathName (#PCDATA)>
+<!ELEMENT downLoadDirName  (#PCDATA)>
+<!ELEMENT statusReportFileName (#PCDATA)>
+<!ELEMENT entry (url, dirName, fileName)>
+<!ELEMENT url (#PCDATA)>
+<!ELEMENT dirName (#PCDATA)>
+<!ELEMENT fileName (#PCDATA)>
+]>
+<!-- SAMPLE INPUT FILE FOR DAILY DOWNLOAD PROGRAM -->
+<!-- Convention:
+#
+# Translator for URLs and path names according to the Singh T. Junior's rules
+# 
+# 
+# Convention:
+#
+#     YYYY   - Year, Ex: 2006
+#     YY     - Year, Ex: 1, 2, ...., 99
+#     MM     - Month, 1, ..., 12
+#     DD     - Day, 1, ..., 31
+#     
+#     YY_2   - Year with at 2 digits, 01, 02, ..., 99
+#     MM_2   - Month (always 2 digits), 01, 02, ..., 12
+#     DD_2   - Day   (always 2 digits), 01, 02, ..., 31
+#     
+#     DayOfWeek - Monday, Tuesday, ..., Sunday
+#     DAYOFWEEK - MONDAY, TUESDAY, ..., SUNDAY
+#     dayofweek - monday, tuesday, ..., sunday
+#     DayOfWeek_Abr - Mon, Tue, ..., Sun
+#     DAYOFWEEK_ABR - MON, TUE, ..., SUN
+#     dayofweek_abr - mon, tue, ..., sun
+#     WD     - Day of the week, 1, 2, 3, 4, 5, 6, 7
+#     
+#     MonthOfYear - January, February, ..., December
+#     MONTHOFYEAR - JANUARY, FEBRUARY, ..., DECEMBER
+#     monthofyear - january, february, ..., december
+#     MonthOfYear_Abr - Jan, Feb, Mar, Apr, ..., Dec
+#     MONTHOFYEAR_ABR - JAN, FEB, MAR, APR, ..., DEC
+#     monthofyear_abr - jan, feb, mar, apr, ..., dec 
+#
+#     DayOfYear - 1, 2, 3, ....., 365
+#     DayOfYear_2 - DayOfYear with at least 2 digits, 01, 02, ..., 365
+#     DayOfYear_3 - DayOfYear with at least 3 digits, 001, 002, ..., 365
+#     
+#     HH24 - Hour,   1, 2, 3, ..., 24
+#     HH12 - Hour,   1, 2, 3, ..., 12
+#     HH24_2 - Hour with at least 2 digits, 01, 02, ..., 24
+#     HH12_2 - Hour with at least 2 digits, 01, 02, ..., 12
+#     mm - minutes, 0, 1, 2, ..., 59
+#     mm_2 - minutes with at least 2 digits, 01, 02, ..., 59
+#     ss  - seconds, 0, 1, 2, ..., 59
+#     ss_2 - seconds with at least 2 digits, 01, 02, ..., 59
+#     
+#     AMPM - AM or PM
+#     ampm - am  or pm
+#   
+-->
+
+
+<xmlscripted>
+
+<!-- Download Path Name -->
+<downLoadPathName>/tmp/download.dir/</downLoadPathName>
+
+<!-- Download Directory Name -->
+<downLoadDirName>[YYYY]-[MM_2]-[DD_2].dir</downLoadDirName>
+
+<!-- Status Report HTML File Name -->
+<statusReportFileName>Status.html</statusReportFileName>
+
+<!-- Entry -->
+<entry>
+<url>http://www.suntimes.com/cgi-bin/print.cgi?getReferrer=http://www.suntimes.com/output/horoscopes/cst-nws-holly[MM][DD].html</url>
+<dirName>horoscope</dirName>
+<fileName>horoscope.html</fileName>
+</entry>
+
+<!-- Entry -->
+<entry>
+<url>http://www.suntimes.com/cgi-bin/print.cgi?getReferrer=http://www.suntimes.com/output/lottery/cst-nws-lot[DD_2].html</url>
+<dirName>lottery</dirName>
+<fileName>lottery.html</fileName>
+</entry>
+
+<!-- Entry -->
+<entry>
+<url>http://transcripts.cnn.com/TRANSCRIPTS/[YYYY].[MM_2].[DD_2].html</url>
+<dirName>news</dirName>
+<fileName>news.html</fileName>
+</entry>
+
+</xmlscripted>

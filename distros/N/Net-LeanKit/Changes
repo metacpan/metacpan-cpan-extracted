@@ -1,0 +1,293 @@
+==================================================
+Changes from 2013-10-24 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 2.001 at 2014-10-24 02:24:17 +0000
+------------------------------------------
+
+  Change: 6fec81886fd5f049230129ebe9550a5e4fb257be
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-23 22:24:14 +0000
+
+    remove Data::Dumper::Concise
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+------------------------------------------
+version 2.000 at 2014-10-24 02:15:55 +0000
+------------------------------------------
+
+  Change: e1cfbe76354000834699f2ceb2d27cede62b551e
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-23 22:15:55 +0000
+
+    v2.000 
+
+  Change: bf14c66395bf0ed10fd799b046e338045d3a3292
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-23 22:15:26 +0000
+
+    Provide { code, content, status } returned from LK response
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: a4d3af20caa5cc94946117a0244afbd7664a5247
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-23 21:38:55 +0000
+
+    v1.0.2 
+
+  Change: 4fad6738b0bd686ca131b4df8a7598b6f4ba5c90
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-23 21:38:30 +0000
+
+    Return hash from POST responses
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 3d95dc46930537b1c129fd577dbaa6f3740f5802
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-21 21:48:16 +0000
+
+    remove unused attrs
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 835b6ed38da3314d2fe8bea80201975be449ef3f
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-21 21:46:25 +0000
+
+    don't document get/post
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 370b0b1921dfd4eb4f253bf26d51adb8e1f44838
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-21 21:45:14 +0000
+
+    fix synopsis
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 841214cd727c5dae1730f4c8db752cfb07cef0c1
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-21 21:39:41 +0000
+
+    v1.0.1 
+
+  Change: 7e2d51badfadb09bef89b1faa507ff3c18f8af88
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-21 21:39:06 +0000
+
+    use Mojo::UA
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 0b385fc72f70ec8ff5fc349178f79fd2560f976e
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-16 00:02:10 +0000
+
+    update meta
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 78bdc22c6f52b7947da427eea1df4f0d97ccb185
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-14 11:54:04 +0000
+
+    v1.0.0 
+
+  Change: c8241c5446cb6726468ada19cc229143dd896bdd
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-14 11:53:31 +0000
+
+    cleanup signatures add downloading attachments
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 0.6 at 2014-10-08 00:24:14 +0000
+----------------------------------------
+
+  Change: a9cf391ac48bda8286ad00ebfaed0e151f1a2566
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-07 20:24:14 +0000
+
+    v0.6 
+
+  Change: 70c842c821b6d2e0d6616b476046af6fccf962fc
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-07 20:23:54 +0000
+
+    bump rel
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 9a8cfd84cd8c2188e8242f6fde42fb0cfcabf22f
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-07 20:22:45 +0000
+
+    Merge branch 'master' of github.com:battlemidget/p5-leankit
+
+    Conflicts:
+
+    Changes
+
+    META.yml
+
+    Makefile.PL
+
+    cpanfile
+
+    t/02-cards.t 
+
+  Change: f36495b3cef0a332e7b688091f7184dfca07324a
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-07 20:20:11 +0000
+
+    split tests into their own category
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: e3b6bf6776c1109dce152dfe3c102cc188704de5
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-07 16:30:55 +0000
+
+    split tests into their own category
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 0.5 at 2014-10-07 15:49:50 +0000
+----------------------------------------
+
+  Change: 5cc642487d74aa40d5793fa61ae447529785517b
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-07 11:49:50 +0000
+
+    v0.5 
+
+  Change: 53d80230614b23c1cf6db846aa4a1dd4a973150e
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-07 11:49:33 +0000
+
+    More tests
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 903af05a18824691cd3acf7bdb46350d0e868889
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-07 09:00:43 +0000
+
+    syntax
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 8547e965bd9f8fba86c9765edbb3b88402cd6801
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-07 01:15:45 +0000
+
+    no mojo
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 0.4 at 2014-10-07 05:15:25 +0000
+----------------------------------------
+
+  Change: 1562d1579070c0008c15d6305a11e985aca42d6c
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-07 01:15:25 +0000
+
+    v0.4 
+
+  Change: b0c8dcad944083e1e54c19e47d2540c96d38af6d
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-07 01:14:39 +0000
+
+    complete api spec
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 0.3 at 2014-10-06 20:40:03 +0000
+----------------------------------------
+
+  Change: 1dfde7a47fbafb74994873fe3d885cfbbb4c3e36
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-06 16:40:03 +0000
+
+    v0.3 
+
+  Change: 8d0c15d37585e83aeb28e651140fd5ebe6eb4d6b
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-06 16:37:37 +0000
+
+    start POST methods
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 0.2 at 2014-10-06 19:43:17 +0000
+----------------------------------------
+
+  Change: 3be275d38ee36cbbfba97124e1da1f7a1b808971
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-06 15:43:17 +0000
+
+    v0.2 
+
+  Change: 3572a34dd67c97bedcc36f8b4db7ea934527b378
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-06 15:42:21 +0000
+
+    add rest of GET api
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 0.1 at 2014-10-06 19:10:21 +0000
+----------------------------------------
+
+  Change: 68f6b8ac263e7c4647b630594c38d9d4aa11c878
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-06 15:10:21 +0000
+
+    v0.1 
+
+  Change: 18dc6dba4673e9c52bca517cc432556b6019f579
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-06 15:10:08 +0000
+
+    tests Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com>
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 2802abbd10857f80b893164945168f52882efcc0
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-06 14:17:21 +0000
+
+    tests
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 7616ff441fac385c8ef029477761137990f85f2f
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-06 12:53:34 +0000
+
+    start api work
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 6237a5ceceeddcf5c6879a4380d3bc77b4c54929
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-06 12:23:24 +0000
+
+    init
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+================
+End of releases.
+================

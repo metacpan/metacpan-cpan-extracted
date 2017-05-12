@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-Rovio.t
+lib/Net/Rovio.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,28 @@
+---
+abstract: 'interface to the WHMCS billing and support system'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-WHMCS
+requires:
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Moo: '0'
+resources:
+  repository: git://github.com/fayland/perl-Net-WHMCS.git
+version: '0.08'
+x_contributors:
+  - 'Michael Schout <mschout@gkg.net>'
+  - 'Neil Bowers <neil@bowers.com>'

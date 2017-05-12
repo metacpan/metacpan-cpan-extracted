@@ -1,0 +1,16 @@
+Revision history for Net-SMTP-TLS
+
+0.10    Dec 28th, 2005
+        First version, released on an unsuspecting world.
+	Lots of stuff that could be done for future versions, such as better
+	tests, and better documentation.
+
+0.11	Jan 5th, 2006
+	POD tests are a nuisance, removed. Also, per Michal Ludwig's
+	suggestion, TLS is not forced, but is now turned on/off by a flag.
+
+0.12	Jan 17th, 2006
+	Tomek Zielinski kindly submitted patches to improve RFC compliance
+	as well as adhere more closely to Net::SMTP's interface. Having spoken
+	to the author of Net::SMTP, I'm planning to go back to the plan of
+	inheriting from there once some changes have been made to Net::CMD.

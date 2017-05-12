@@ -1,0 +1,13 @@
+Revision history for Perl extension Net::Tshark.
+
+0.01  Sat Sept  8 22:00:00 2012
+	- original version
+
+0.02  Sun Sept  9 22:00:00 2012
+	- small changes, including adding META.yml and some more POD documentation.
+
+0.03  Sun Sept  23 22:00:00 2012
+	- small changes to improve Kwalitee
+
+0.04  Mon Sept  24 22:00:00 2012
+	- small changes to improve Kwalitee and changed the email address listed in the sample script

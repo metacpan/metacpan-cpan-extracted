@@ -1,0 +1,6 @@
+NODE *	T_PV
+LIST *	T_PTROBJ
+IPLIST * T_PTROBJ
+INIT *	T_PTROBJ
+NODE **	T_PV
+unsigned long int T_UV

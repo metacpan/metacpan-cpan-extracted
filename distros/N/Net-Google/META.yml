@@ -1,0 +1,38 @@
+--- #YAML:1.0
+name: Net-Google
+version: 1.0
+author: ~
+abstract: simple OOP-ish interface to the Google SOAP API
+license: perl
+requires:
+  Carp: '>= 0'
+  LWP::Protocol: '>= 1.42'
+  SOAP::Lite: '>= 0.55'
+build_requires:
+  Test::Simple: '>= 0.47'
+provides:
+  Net::Google:
+    file: lib/Net/Google.pm
+    version: 1.0
+  Net::Google::Cache:
+    file: lib/Net/Google/Cache.pm
+    version: 1.0
+  Net::Google::Response:
+    file: lib/Net/Google/Response.pm
+    version: 1.0
+  Net::Google::Search:
+    file: lib/Net/Google/Search.pm
+    version: 1.0
+  Net::Google::Service:
+    file: lib/Net/Google/Service.pm
+    version: 1.0
+  Net::Google::Spelling:
+    file: lib/Net/Google/Spelling.pm
+    version: 1.0
+  Net::Google::tool:
+    file: lib/Net/Google/tool.pm
+    version: 1.1
+  Result:
+    file: lib/Net/Google/Response.pm
+    version: 1.0
+generated_by: Module::Build version 0.2604

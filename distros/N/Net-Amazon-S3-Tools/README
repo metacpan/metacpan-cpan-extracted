@@ -1,0 +1,59 @@
+Net-Amazon-S3-Tools version 0.01
+================================
+
+Command line tools for Amazon AWS S3
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+- Pod::Usage
+- Getopt::Long
+- Getopt::ArgvFile
+- File::HomeDir
+- Net::Amazon::S3
+- Net::Amazon::S3::Bucket
+- XML::Writer
+
+- You must have an Amazon Web Service (AWS) account with the Simple
+  Storage Service (S3) enabled.
+
+- You will need your "AWS Access Key ID" and your "AWS Secret Access Key"
+  for that account.
+
+
+
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2007,2008,2009 by Mark Atwood
+
+    Many thanks to Wotan LLC <http://wotanllc.com>,
+    for supporting the development of these S3 tools.
+
+    This module is not an official Amazon product or service.  Information
+    used to create this module was obtained only from publicly available
+    information, mainly from the published Amazon documentation.
+
+    This module is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, either version 2.1 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    and the GNU Lesser General Public License along with this program.
+    If not, see <http://www.gnu.org/licenses/>.
+

@@ -1,0 +1,54 @@
+Revision history for Perl extension Net::Dev::Tools::MIB::MIBLoadOrder.
+
+1.1.0 8/26/2004
+      - do not error when DEFINITION found in multiple files
+        just do warning, keep first file
+      - account for multiple BEGIN/END blocks within DEFINITION
+      - allow for no extensions with  'noExt'
+
+
+1.0.1 8/11/2004
+       - changed MIB filehandle to be $MIB, reason being install failure
+         on some platforms, MIB filehandle treated as bareword
+
+
+
+1.0.0 8/9/2004
+       - Consider first release
+       - Changed the DEFINITION and IMPORT parser
+          - grab DEF and IMPORT as chunks, then parse the chunck
+       - Eliminated -singlefile option
+          - if a DEF is found in more than one file, function errors out
+
+
+
+0.9.2  9/3/2003
+       - Third Beta post
+       - yet more doc changes, doc was not referencing full package name
+         MIBLoadOrder replaced with  Net::Dev::Tools::MIB::MIBLoadOrder
+         where needed.
+
+
+
+0.9.1  9/2/2003
+       - Second Beta Post
+       - modified parsings for IMPORTS, was failing from finding
+         IMPORTS string in a description
+       - minor doc changes
+
+       diffs
+       16c16
+       <    our $VERSION = '0.9.1';
+       ---
+       >    our $VERSION = '0.9.0';
+       355c355
+       <       if (/^IMPORTS/) {
+       ---
+       >       if (/IMPORTS/) {
+       730c730
+
+
+
+0.9.0  8/29/2003
+       - First Beta Post
+

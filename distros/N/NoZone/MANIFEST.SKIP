@@ -1,0 +1,10 @@
+.*~$
+^\.git
+^MYMETA\.yml$
+^MYMETA\.json$
+^Build$
+^_build
+^MANIFEST\.bak$
+.*\.tar\.gz
+blib
+NoZone-.*/

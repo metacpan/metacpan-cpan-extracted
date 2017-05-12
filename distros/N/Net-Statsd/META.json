@@ -1,0 +1,47 @@
+{
+   "abstract" : "Perl client for Etsy's statsd daemon",
+   "author" : [
+      "Cosimo Streppone <cosimo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Statsd",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Socket" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-net-statsd@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Statsd"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/cosimo/perl5-net-statsd.git",
+         "web" : "http://github.com/cosimo/perl5-net-statsd"
+      }
+   },
+   "version" : "0.12"
+}
+

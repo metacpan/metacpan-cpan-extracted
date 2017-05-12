@@ -1,0 +1,20 @@
+LDAPMessage *	T_PTR
+LDAPMessage **	T_PTR
+BerElement *	T_PTR
+LDAPMod***		T_PTR
+
+
+LDAP *			T_PTROBJ_LDAP
+
+INPUT
+T_PTROBJ_LDAP
+	if (sv_derived_from($arg, \"Net::LDAPxs\")) {
+		IV tmp = SvIV((SV*)SvRV($arg));
+		$var = INT2PTR($type,tmp);
+	} else
+		Perl_croak(aTHX_ \"$var is not of type Net::LDAPxs\")
+
+OUTPUT
+T_PTROBJ_LDAP
+	sv_setref_pv($arg, \"Net::LDAPxs\", (void*)$var);
+

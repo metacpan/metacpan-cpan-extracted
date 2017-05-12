@@ -1,0 +1,29 @@
+
+Release 2.002
+
+        After stagnating for several years, I have once again taken
+        over responsibility for this module, and expect to be
+        enhancing it in the coming months.
+
+        The version syntax has been changed, to move away from
+        v-strings, and Build.PL converted to Makefile.PL.
+
+        Otherwise, the code is identical to 1.1.2
+
+Release 1.1.2
+
+        CPAN-friendly changes.  The test suite will work if you don't
+        configure it, instead of imploding.  This will mean we get
+        some minimally useful results from CPAN testers.  We will at
+        least get results for the parsing code.
+
+        Added the dependency on Test::Exception I missed.
+
+        Added this CHANGES file, and ripped out the .svn directories I
+        mistakenly distributed with 1.1.1.  (Oops...)
+
+        Fixed a parsing typo in NetApp::Volume->get_language
+
+Release 1.1.1
+
+        This was the first version released to CPAN.

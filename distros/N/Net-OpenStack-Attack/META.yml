@@ -1,0 +1,28 @@
+---
+abstract: 'Tools for stress testing an OpenStack deployment.'
+author:
+  - 'William Wolf <throughnothing@gmail.com>'
+  - 'Naveed Massjouni <naveedm9@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-OpenStack-Attack
+requires:
+  Any::Moose: 0
+  App::Rad: 0
+  HTTP::Async: 0.10
+  HTTP::Request: 0
+  JSON: 0
+  Net::HTTPS::NB: 0
+  Net::OpenStack::Compute: 1.0401
+  Time::SoFar: 0
+resources:
+  bugtracker: http://github.com/ironcamel/Net-OpenStack-Attack/issues
+  repository: git://github.com/ironcamel/Net-OpenStack-Attack.git
+version: 1.0500

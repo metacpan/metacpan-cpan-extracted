@@ -1,0 +1,52 @@
+Net::SNPP was previously part of the libnet distribution. But has now
+been separated out to a distribution of its own.
+
+As of October 2, 2003, maintainership of this module has been taken over
+by Al Tobey <tobeya@tobert.org>.
+
+NEWS
+
+I will be working to make Net::SNPP cover the complete rfc1861 specification
+while adding tests for all of it.
+
+I need feedback from people who use this to see what the impact of interface
+changes would be.  I also would appreciate some test scenarios or code
+snippets that you use so that I can try not to break things for you.  If
+anything breaks in >=1.15 releases, you can blame me and be sure to send
+all of your flames to me.
+
+CHANGES
+
+April 9, 2004: The message_response method in SNPP.pm was fixed to return server
+codes properly.  Also, a few things in Server.pm were fixed up and documented
+better.
+
+Oct 2, 2003: Added bin/ directory with an snppd for testing, and two utilites
+for sending and checking SNPP messages.  Added methods to SNPP.pm for more
+RFC-compliant sending/checking of 2-way (level 3) messages.
+
+INSTALLATION
+
+Installation is the same as any other MakeMaker packaged distribution
+from CPAN.
+
+   perl Makefile.PL
+   make
+   make install
+
+If you are on a machine where Makemaker does not run, or you do
+not have a copy of make, then you can simply copy the contents of
+the lib directory into your perl installation library directory.
+However you will need to have Net::Cmd from libnet installed
+
+COPYRIGHT
+
+  © 1995-2001 Graham Barr. All rights reserved.
+  © 2001-2003 Derek J. Balling. All rights reserved.
+  © 2003-2004 Al Tobey. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Share and Enjoy!
+

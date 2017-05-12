@@ -1,0 +1,50 @@
+---
+abstract: 'Normal setup of Nephia'
+author:
+  - 'ytnobody <ytnobody@gmail.com>'
+build_requires:
+  Cache::Cache: 0
+  Guard: 0
+  IPC::ShareLite: 0
+  Nephia::Plugin::Dispatch: 0
+  Nephia::Plugin::ResponseHandler: 0
+  Plack::Middleware::CSRFBlock: 0
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.6.5, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Nephia-Setup-Plugin-Normal
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Nephia::Setup::Plugin::Normal:
+    file: lib/Nephia/Setup/Plugin/Normal.pm
+    version: 0.04
+requires:
+  Cache::Cache: 0
+  Nephia: 0.80
+  Nephia::Setup::Plugin::Assets::Bootstrap: 0
+  Nephia::Setup::Plugin::Assets::JQuery: 0
+  Plack::Middleware::CSRFBlock: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/nephia/Nephia-Setup-Plugin-Normal/issues
+  homepage: https://github.com/nephia/Nephia-Setup-Plugin-Normal
+  repository: git://github.com/nephia/Nephia-Setup-Plugin-Normal
+version: 0.04
+x_contributors:
+  - 'mackee <macopy123@gmail.com>'

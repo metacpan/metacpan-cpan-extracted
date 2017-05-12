@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b328c1d4dcba6c8eaf60eaa8bb35d3df8ac77591 CONTRIBUTORS
+SHA1 b5711aae4b29b265b2ce5030aa8d12fad34bc286 Changes
+SHA1 22643dd228ff270ad67242430ba0bba9ffc586d1 INSTALL
+SHA1 a0625be5d75db5d72e1da2c26761ae183b979256 LICENSE
+SHA1 c5e2fb4953a3ad0ab2165dcd886a05c0da3c8519 MANIFEST
+SHA1 8c6af5d1cc212ef3a8f427381c2ef7c54776d18f META.json
+SHA1 5955929eb6733adc98be05c79ef2a6eec41ec5f4 META.yml
+SHA1 a4a14aaf1f43b5fdc9c20e1796331a28d0b76d90 Makefile.PL
+SHA1 9d2d8fa3ad5e508f2ad6ea13111fe26770bae601 README
+SHA1 a174c08cf4d3d0c578816356e6ad99c895a0fa6d README.mkdn
+SHA1 cacf05c2caa3b7881a884c8ebe7a77fd61b1d80c cpanfile
+SHA1 fd9cf70f79a463cbad663fececff5efb3ef83406 doap.xml
+SHA1 d7cb617776568de81e20245ec142b2e803a04036 lib/NetPacket.pm
+SHA1 5d12f1f920955deb83efdcad571742474183819f lib/NetPacket/ARP.pm
+SHA1 5629c01d7556a93f8ebb1b1fe7c75f95fc9562de lib/NetPacket/Ethernet.pm
+SHA1 598aca685fb3299f177066213a3a7ca316bf6e9e lib/NetPacket/ICMP.pm
+SHA1 15db0f4bf3eb9d5084d4ed72b3a85cfd5562433f lib/NetPacket/IGMP.pm
+SHA1 c52c165a3ac22959e231fb36377794e8282f535e lib/NetPacket/IP.pm
+SHA1 8ba7aa9902fe620be228152954516ec1c89090ee lib/NetPacket/IPX.pm
+SHA1 ee0e8dcd3b2fb81ac00d814a454d1886b8337ea8 lib/NetPacket/TCP.pm
+SHA1 f22a352b8d2040d0063babd8a27f3042b57bd001 lib/NetPacket/UDP.pm
+SHA1 4a83c2c0eb37788660e91883a2ccd3436bdc8003 lib/NetPacket/USBMon.pm
+SHA1 163eac3a409bbae6f7fe58e35264569a931ba849 t/00-compile.t
+SHA1 567c6f225e54db7f954297742646d94674e4a0a2 t/000-report-versions-tiny.t
+SHA1 2f95a288a42eed0173859c5bb9d37caee7e4b26b t/bug-37931.t
+SHA1 721a206d861139f8f73081b8d337bfcdce4247e5 t/checksum.t
+SHA1 45f23540d419a608363a53ed11b81c589866406e t/ethernet.t
+SHA1 382d9d077e64a0ea5ee3263579cbc03df0e5a003 t/general.t
+SHA1 58f7294a0c74eedb982f75b1c8e8bc9fa5395288 t/icmp.t
+SHA1 a22909fb4a8ce8621107618ef50c6f92a7a6d36a t/ip_encode.t
+SHA1 1d4a9e2b54461f15aab9557a081db42eaef2c4b0 t/ip_trailing.t
+SHA1 7f4638ca19b3a50f751e10a533579d6f81e6a52f t/ipx.t
+SHA1 bb7498ea4eba6a9df548038c1ad77960ee1633fb t/tcp.t
+SHA1 540bff42594ee78beb63a7316a4478bc58d7e37b t/udp-checksum.t
+SHA1 35bfbabbd32ddf83a0ac49db63f69de9ff6eadb2 t/udp.t
+SHA1 86e62e4a5bceec942b536d2b29f7910f883c6387 t/usbmon.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlUDYpQACgkQ34Hwf+GwC4zdhACeK2vUR0GYNeIVrickcw/QNur6
+xD8Ani1pFswUcFCN68FyDPAWarShUW+k
+=mNa0
+-----END PGP SIGNATURE-----

@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+###########################################
+# maxauthors keyword
+# Search books by keyword and select those
+# with the highest number of authors.
+# Mike Schilli <mschilli1@aol.com>, 2003
+###########################################
+
+use strict;
+use warnings;
+
+use Net::Amazon;
+use Net::Amazon::Property;
+use Net::Amazon::Request::Keyword;
+
+die "usage: $0 keyword" unless 
+    defined $ARGV[0];
+
+my $ua = Net::Amazon->new(
+    associate_tag => $ENV{AMAZON_ASSOCIATE_TAG},
+    token         => $ENV{AMAZON_TOKEN},
+    secret_key    => $ENV{AMAZON_SECRET_KEY},
+    max_pages   => 10,
+);
+
+my $req = Net::Amazon::Request::Keyword->new(
+    keyword   => $ARGV[0],
+    mode      => "books"
+);
+
+ # Response: Net::Amazon::Keyword::Response
+my $resp = $ua->request($req);
+
+my $max_authors = 0;
+my @books = sort { 
+    scalar $b->authors() <=>
+    scalar $a->authors() }
+   grep { $_->title() =~ /$ARGV[0]/i }
+    $resp->properties;
+
+for(0..4) {
+    print scalar $books[$_]->authors,
+          " ", $books[$_]->as_string, "\n\n";
+}

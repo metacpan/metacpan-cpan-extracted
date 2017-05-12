@@ -1,0 +1,56 @@
+NAME
+      Net::Domain::TLD - Work with TLD names
+
+SYNOPSIS
+      use Net::Domain::TLD qw(tlds tld_exists);
+      my @ccTLDs = tlds('cc');
+      print "TLD ok\n" if tld_exists('ac','cc');
+
+DESCRIPTION
+      The purpose of this module is to provide user with current list of 
+      available top level domain names including new ICANN additions and ccTLDs
+      Currently TLD definitions have been acquired from the following sources:
+
+      http://www.icann.org/tlds/
+      http://www.dnso.org/constituency/gtld/gtld.html
+      http://www.iana.org/cctld/cctld-whois.htm
+      https://www.iana.org/domains/root/db
+
+PUBLIC METHODS
+      Each public function/method is described here.
+      These are how you should interact with this module.
+
+   "tlds"
+      This routine returns the tlds requested.
+
+      my @all_tlds = tlds; #array of tlds
+      my $all_tlds = tlds; #hashref of tlds and their descriptions
+
+      my @cc_tlds = tlds('cc'); #array of just 'cc' type tlds
+      my $cc_tlds = tlds('cc'); #hashref of just 'cc' type tlds and their descriptions
+
+      Valid types are:
+        cc                 - country code domains
+        ccidn              - internationalized country code top-level domain 
+        gtld_open          - generic domains that anyone can register
+        gtld_restricted    - generic restricted registration domains
+        gtld_new           - new gTLDs
+        new_open           - recently added generic domains
+        new_restricted     - new restricted registration domains
+        reserved           - RFC2606 restricted names, not returned by tlds
+
+   "tld_exists"
+      This routine returns true if the given domain exists and false otherwise.
+
+      die "no such domain" unless tld_exists($tld); #call without tld type 
+      die "no such domain" unless tld_exists($tld, 'new_open'); #call with tld type
+
+COPYRIGHT
+      Copyright (c) 2003-2016 Alex Pavlovic, all rights reserved.  This program
+      is free software; you can redistribute it and/or modify it under the same terms
+      as Perl itself.
+
+AUTHORS
+      Alexander Pavlovic <alex.pavlovic@devradius.com>
+      Ricardo SIGNES <rjbs@cpan.org>
+

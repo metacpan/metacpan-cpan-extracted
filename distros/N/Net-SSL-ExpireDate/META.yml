@@ -1,0 +1,36 @@
+---
+abstract: 'obtain expiration date of certificate'
+author:
+  - 'HIROSE Masaaki <hirose31 _at_ gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.17'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-SSL-ExpireDate
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Class::Accessor: 0
+  Crypt::OpenSSL::X509: 0
+  Date::Parse: 0
+  DateTime: 0
+  DateTime::Duration: 0
+  Filter::Util::Call: 0
+  IO::Socket: 0
+  Time::Duration::Parse: 0
+  UNIVERSAL::require: 0
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hirose31/Net-SSL-ExpireDate.git
+version: 1.20

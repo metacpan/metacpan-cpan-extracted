@@ -1,0 +1,6 @@
+### copy to t/sas.conf and replace following values
+{
+    connection_string => 'Endpoint=...',
+    hub_name          => 'your_hub',
+    apns_expiry       => 'YYYY-mm-ddTHH:MM+09:00',
+};

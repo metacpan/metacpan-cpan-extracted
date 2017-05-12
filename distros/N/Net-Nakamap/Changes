@@ -1,0 +1,11 @@
+Revision history for Perl extension Net::Nakamap
+
+0.03 (2013-04-09)
+	- fix required modules
+
+0.02 (2013-02-19)
+	- first release
+
+0.01 (2013-01-18)
+	- original version; created by dim
+	  at Fri Jan 18 11:37:57 2013.

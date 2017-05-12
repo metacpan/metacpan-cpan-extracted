@@ -1,0 +1,17 @@
+README
+Changes
+Build.PL
+Makefile.PL
+MANIFEST
+lib/Net/IDN/IDNA2003.pm
+t/00use.t
+t/10pod.t
+t/11pod_cover.t
+t/encode_bytes.t
+t/encode_utf8.t
+t/to_ascii.t
+t/to_unicode.t
+LICENSE
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

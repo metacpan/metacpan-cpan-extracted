@@ -1,0 +1,32 @@
+---
+name: Net-IRC2
+version: 0.27
+author:
+  - Karl Y. Pradene <knotty@cpan.org>
+abstract: Client interface to the Internet Relay Chat protocol
+license: gpl
+requires:
+  IO::Socket::INET: ''
+  Parse::RecDescent: ''
+  Test::More: ''
+  perl: ''
+provides:
+  Net::IRC2:
+    file: lib/Net/IRC2.pm
+    version: 0.27
+  Net::IRC2::Chan:
+    file: lib/Net/IRC2/Chan.pm
+    version: 0.27
+  Net::IRC2::Connection:
+    file: lib/Net/IRC2/Connection.pm
+    version: 0.23
+  Net::IRC2::Event:
+    file: lib/Net/IRC2/Event.pm
+    version: 0.27
+  Net::IRC2::Parser:
+    file: lib/Net/IRC2/Parser.pm
+    version: 0.23
+  Parse::RecDescent::Net::IRC2::Parser:
+    file: lib/Net/IRC2/Parser.pm
+    version: 0.23
+generated_by: Module::Build version 0.2611

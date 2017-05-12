@@ -1,0 +1,46 @@
+---
+abstract: 'APNS Perl implementation'
+author:
+  - 'Tooru Tsurukawa <rockbone.g at gmail.com>'
+build_requires:
+  File::Basename: '0'
+  File::Spec: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-APNS-Simple
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::APNS::Simple:
+    file: lib/Net/APNS/Simple.pm
+    version: '0.03'
+requires:
+  Crypt::JWT: '0.018'
+  IO::Socket::SSL: '2.038'
+  JSON: '0'
+  Moo: '0'
+  Protocol::HTTP2: '1.08'
+  URI: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/rockbone/p5-Net-APNS-Simple/issues
+  homepage: https://github.com/rockbone/p5-Net-APNS-Simple
+  repository: git://github.com/rockbone/p5-Net-APNS-Simple.git
+version: '0.03'
+x_contributors:
+  - 'Tooru Tsurukawa <rockbone.g@gmail.com>'

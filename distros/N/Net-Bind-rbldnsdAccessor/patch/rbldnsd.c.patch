@@ -1,0 +1,11 @@
+
+int
+rblf_do_reload(void)
+{
+  return (do_reload(0));
+}
+
+struct zone **fetchzonelist(void)
+{
+  return (&zonelist);	/*	pointer to zonelist pointer	*/
+}

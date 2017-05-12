@@ -1,0 +1,125 @@
+#!/usr/bin/perl
+#
+# recurse2txt routines
+#
+# version 1.03, 5-19-06, michael@bizsystems.com
+#
+#use strict;
+#use diagnostics;
+use overload;
+
+# generate a unique signature for a particular hash
+#
+# Data::Dumper actually does much more than this, however, it
+# does not stringify hash's in a consistent manner. i.e. no SORT
+#
+# The routine below, while not covering recursion loops, non ascii
+# characters, etc.... does produce text that can be eval'd and is 
+# consistent with each rendering.
+#
+sub Dumper {
+  return "undef\n" unless defined $_[0];
+  my $ref = ref $_[0];
+  return "not a reference\n" unless $ref;
+  unless ($ref eq 'HASH' or $ref eq 'ARRAY') {
+    ($ref) = (overload::StrVal($_[0]) =~ /^(?:.*\=)?([^=]*)\(/);
+  }
+  my $p = {
+	depth		=> 0,
+	elements	=> 0,
+  };
+  bless $p,__PACKAGE__;
+  my $data;
+  if ($ref eq 'HASH') {
+    $data = $p->hash_recurse($_[0],"\n");
+  }
+  elsif ($ref eq 'ARRAY') {
+    $data = $p->array_recurse($_[0]);
+  } else {
+  return $ref ." unsupported\n";
+  }
+  $data =~ s/,\n$/;\n/;
+  return $p->{elements} ."\t= ". $data;
+}
+  
+# input:	pointer to hash, terminator
+# returns:	data
+#
+sub hash_recurse {
+  my($p,$ptr,$n) = @_;
+  $n = '' unless $n;
+  my $data = "{\n";
+  foreach my $key (sort keys %$ptr) {
+    $data .= "\t'". $key ."'\t=> ";
+    $data .= _dump($p,$ptr->{$key},"\n");
+  }
+  $data .= '},'.$n;
+}
+
+# generate a unique signature for a particular array
+#
+# input:	pointer to array, terminator
+# returns:	data
+sub array_recurse {
+  my($p,$ptr,$n) = @_;
+  $n = '' unless $n;
+  my $data = '[';
+  foreach my $item (@$ptr) {
+    $data .= _dump($p,$item);
+  }
+  $data .= "],\n";
+}
+
+# input:	self, item, append
+# return:	data
+#
+sub _dump {
+  my($p,$item,$n) = @_;
+  $p->{elements}++;
+  $n = '' unless $n;
+  my $ref = ref $item;
+  if ($ref eq 'HASH') {
+    return tabout($p->hash_recurse($item,"\n"));
+  }
+  elsif($ref eq 'ARRAY') {
+    return $p->array_recurse($item,$n);
+  }
+  elsif($ref eq 'SCALAR') {
+    return q|\$SCALAR,|.$n;
+  }
+  elsif ($ref eq 'GLOB') {
+    my $g = *{$item};
+    return  "\\$g" .','.$n;
+  }
+  elsif(do {my $g = \$item; ref $g eq 'GLOB'}) {
+    return "$item" .','.$n;
+  }
+  elsif($ref eq 'CODE') {
+    return q|sub {'DUMMY'},|.$n;
+  }
+  elsif (defined $item) {
+    return wrap_data($item) .','.$n;
+  }
+  else {
+    return 'undef,'.$n;
+  }
+}
+
+sub tabout {
+  my @data = split(/\n/,shift);
+  my $data = shift @data;
+  $data .= "\n";
+  foreach(@data) {
+    $data .= "\t$_\n";
+  }
+  $data;
+}
+
+sub wrap_data {
+  my $data = shift;
+  return ($data =~ /\D/ || $data =~ /^$/)
+	? q|'|. $data .q|'|
+	: $data;
+}
+
+1;

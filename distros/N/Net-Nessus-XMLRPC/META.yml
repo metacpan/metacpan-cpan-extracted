@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               Net-Nessus-XMLRPC
+version:            0.30
+abstract:           Communicate with Nessus scanner(v4.2+) via XMLRPC
+author:
+    - Vlatko Kosturjak <kost@linux.hr>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    HTTP::Request::Common:  0
+    LWP::UserAgent:       0
+    Test::More:           0
+    XML::Simple:          0
+resources:
+    bugtracker:  https://rt.cpan.org/Public/Bug/Report.html?Queue=Net-Nessus-XMLRPC
+    repository:  http://github.com/kost/nessus-xmlrpc-perl
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

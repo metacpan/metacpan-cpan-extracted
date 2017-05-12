@@ -1,0 +1,130 @@
+NAME
+    NetSDS::Message - common mobile message (SMS, MMS, IM)
+
+SYNOPSIS
+            use NetSDS::Message;
+
+            ...
+
+            $msg = NetSDS::Message->new(
+                    src_addr => '1234@mtsgw',
+                    dst_addr => '380441234567@mtsgw',
+                    body => $content,
+            );
+
+DESCRIPTION
+    "NetSDS::Message" is a superclass for other modules implementing API to
+    exact structure of some messaging data (i.e. CPA2, SMS, MMS, etc).
+
+    This module implemented to avoid duplication of code providing common
+    functionality for all message types like managing addresses, headers,
+    preparing reply message and so on.
+
+CLASS API
+    new([...]) - class constructor
+            my $object = NetSDS::SomeClass->new(%options);
+
+    message_id([$value]) - set/get message id
+                $msg_id = $msg->message_id();
+
+    src_addr() - set/get source address
+                $msg->src_addr('380121234567@operatorgw');
+
+    src_addr_native() - get native form of source address
+                # Set address
+                $msg->src_addr('380121234567@operatorgw');
+
+                # Get native form of address
+                $phone = $msg->src_addr_native(); # return '380121234567'
+
+    dst_addr() - set/get destination address
+                $dst_addr = $msg->dst_addr();
+
+    dst_addr_native() - get native form of destination address
+                if ($mo_msg->dst_addr_native() eq '1234') {
+                        print "Received SMS to 1234";
+                }
+
+    subject() - set/get message subject
+                $msg->subject('Hello there');
+
+    media() - set/get message media
+        Paramters: new media if set or none if get
+
+        Supported media types: 'sms', 'mms', 'ussd'. In fact media types
+        processing is not responsibility of this module and implemented in
+        other modules.
+
+    header($name[, $value]) - set/get header
+        Paramters: header name, new header value
+
+        Returns: header value
+
+        Message headers implemented as hash reference and contains
+        supplementary information about message. All header name characters
+        are lowercased and all '-' replaced with '_'.
+
+                # Set header
+                $msg->header('X-Beer', 'Guinness');
+
+                # Get this header
+                $beer = $msg->header('x_beer');
+
+    format() - get/set message format
+        Paramters: new format name
+
+        Returns: format name
+
+        Message format provides is related to transport layer code and
+        describe data structure of message body.
+
+        Supported formats:
+
+        sms - generic SMS data for ETSI GSM 03.40 compliant implementations.
+        See NetSDS::Message::SMS for details.
+
+        cpa2 - CPA2 compatible structure. See NetSDS::Message::CPA2 for
+        details.
+
+    reply() - make reply message
+        This message allows to make reply to current one. Source and
+        destination message are exchanged, media left the same.
+
+INTERNAL METHODS
+    _make_id($system_name) - generate message id
+        This method implements automatic generation of message id using
+        make_uuid() routine. System name is set to 'netsds.generic' if not
+        given in arguments.
+
+EXAMPLES
+    See "samples" directory for examples.
+
+BUGS
+    Unknown yet
+
+SEE ALSO
+    None
+
+TODO
+    None
+
+AUTHOR
+    Michael Bochkaryov <misha@rattler.kiev.ua>
+
+LICENSE
+    Copyright (C) 2008 Michael Bochkaryov
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+

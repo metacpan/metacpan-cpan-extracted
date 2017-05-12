@@ -1,0 +1,37 @@
+Changes
+COPYRIGHT
+lib/Net/Inspect.pm
+lib/Net/Inspect/Connection.pm
+lib/Net/Inspect/Debug.pm
+lib/Net/Inspect/Flow.pm
+lib/Net/Inspect/L2/Pcap.pm
+lib/Net/Inspect/L3/IP.pm
+lib/Net/Inspect/L4/TCP.pm
+lib/Net/Inspect/L4/UDP.pm
+lib/Net/Inspect/L5/GuessProtocol.pm
+lib/Net/Inspect/L5/NoData.pm
+lib/Net/Inspect/L5/Socks.pm
+lib/Net/Inspect/L5/Unknown.pm
+lib/Net/Inspect/L7/HTTP.pm
+lib/Net/Inspect/L7/HTTP/Request/InspectChain.pm
+lib/Net/Inspect/L7/HTTP/Request/Simple.pm
+lib/Net/Inspect/L7/HTTP/WebSocket.pm
+lib/Net/Inspect/L7/SMTP.pm
+Makefile.PL
+MANIFEST
+README
+t/01_load.t
+t/02_l7http.t
+tools/httpflow.pl
+tools/httpflow/privFileCache.pm
+tools/httpflow/privHTTPConn.pm
+tools/httpflow/privHTTPRequest.pm
+tools/multiflow.pl
+tools/tcpudpflow.pl
+tools/rtpxtract.pl
+tools/live-http-headers.pl
+tools/unsocksify-pcap.pl
+tools/smtp2mbox.pl
+tools/README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

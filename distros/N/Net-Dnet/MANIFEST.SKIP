@@ -1,0 +1,16 @@
+(^|/)(RCS|CVS|SCCS)$
+\,v$
+^[M]akefile$
+^[M]akefile\.aperl$
+^blib/
+\~$
+\#$
+^core$
+/core$
+\.orig$
+\.ORIG$
+\.[Dd][Ii][Ss][Tt]$
+\.bak$
+\.old$
+\.tar\.gz$
+\.tgz$

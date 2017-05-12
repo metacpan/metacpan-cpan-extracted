@@ -1,0 +1,65 @@
+Net-Server-Framework
+
+Net::Server::Framework is the result of many iterations of backend
+daemon programming. I use the Net::Server::PreFork code for some years
+now and wrote some libs around it. This is an attempt to take those libs
+and release them. The challenge for me is to isolate all the additions,
+clean them up and pack them into one framework that installs nicely.
+
+The purpose of this framework is an easy to use event driven and
+scalable infrastructure that you can use to run multiple daemons doing
+specific things. There are some key parts in this setup.
+
+The central registry is used to register each daemon with its connection
+info (UNIX socket or IP/port). The client library resolves daemon names
+with this registry to connection information. The client lib supports
+both, synchronous and asynchronous connection handling via a cache
+daemon.
+
+This version uses SQLite as the standard DB. Most parameters in the
+system (including the database type) are configurable via INI style
+config files.
+
+This framework is used in some quite busy environments and some things
+might look strange but are the result of optimization or problems we ran
+into when scaling. One such thing is the DB abstraction which is tuned
+for the least possible overhead (memory and cpu wise).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::Server::Framework
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Server-Framework
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-Server-Framework
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-Server-Framework
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-Server-Framework
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Lenz Gschwendtner
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

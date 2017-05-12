@@ -1,0 +1,95 @@
+HTTP/1.1 200 OK
+Content-Type: application/xml
+
+
+<projects expand="projects">
+  <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/project" />
+  <projects expand="project" size="4" max-result="4" start-index="0">
+    <project name="Fruit Kiwi" key="FRTKIWI" expand="plans">
+      <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/project/FRTKIWI" />
+      <plans expand="plan" size="2" max-result="2" start-index="0">
+        <plan enabled="true" type="chain" shortKey="DEFAULT" shortName="Master" name="Fruit Kiwi - Master" key="FRTKIWI-DEFAULT" expand="actions,stages">
+          <projectKey>FRTKIWI</projectKey>
+          <projectName>Fruit Kiwi</projectName>
+          <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/plan/FRTKIWI-DEFAULT" />
+          <isFavourite>false</isFavourite>
+          <isActive>false</isActive>
+          <isBuilding>false</isBuilding>
+          <averageBuildTimeInSeconds>416.0</averageBuildTimeInSeconds>
+          <actions size="7" max-result="7" start-index="0" />
+          <stages size="3" max-result="3" start-index="0" />
+        </plan>
+        <plan enabled="true" type="chain" shortKey="RELEASE" shortName="Release Branch" name="Fruit Kiwi - Release Branch" key="FRTKIWI-RELEASE" expand="actions,stages">
+          <projectKey>FRTKIWI</projectKey>
+          <projectName>Fruit Kiwi</projectName>
+          <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/plan/FRTKIWI-RELEASE" />
+          <isFavourite>false</isFavourite>
+          <isActive>false</isActive>
+          <isBuilding>false</isBuilding>
+          <averageBuildTimeInSeconds>172.0</averageBuildTimeInSeconds>
+          <actions size="7" max-result="7" start-index="0" />
+          <stages size="4" max-result="4" start-index="0" />
+        </plan>
+      </plans>
+    </project>
+    <project name="Fruit Banana" key="FRTBANANA" expand="plans">
+      <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/project/FRTBANANA" />
+      <plans expand="plan" size="1" max-result="1" start-index="0">
+        <plan enabled="true" type="chain" shortKey="DEFAULT" shortName="Default" name="Fruit Banana - Default" key="FRTBANANA-DEFAULT" expand="actions,stages">
+          <projectKey>FRTBANANA</projectKey>
+          <projectName>Fruit Banana</projectName>
+          <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/plan/FRTBANANA-DEFAULT" />
+          <isFavourite>false</isFavourite>
+          <isActive>false</isActive>
+          <isBuilding>false</isBuilding>
+          <averageBuildTimeInSeconds>11.0</averageBuildTimeInSeconds>
+          <actions size="7" max-result="7" start-index="0" />
+          <stages size="1" max-result="1" start-index="0" />
+        </plan>
+      </plans>
+    </project>
+    <project name="Fruit Orange" key="FRTORANGE" expand="plans">
+      <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/project/FRTORANGE" />
+      <plans expand="plan" size="2" max-result="2" start-index="0">
+        <plan enabled="true" type="chain" shortKey="DEFAULT" shortName="Master" name="Fruit Orange - Master" key="FRTORANGE-DEFAULT" expand="actions,stages">
+          <projectKey>FRTORANGE</projectKey>
+          <projectName>Fruit Orange</projectName>
+          <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/plan/FRTORANGE-DEFAULT" />
+          <isFavourite>false</isFavourite>
+          <isActive>false</isActive>
+          <isBuilding>false</isBuilding>
+          <averageBuildTimeInSeconds>391.0</averageBuildTimeInSeconds>
+          <actions size="7" max-result="7" start-index="0" />
+          <stages size="3" max-result="3" start-index="0" />
+        </plan>
+        <plan enabled="true" type="chain" shortKey="RELEASE" shortName="Release Branch" name="Fruit Orange - Release Branch" key="FRTORANGE-RELEASE" expand="actions,stages">
+          <projectKey>FRTORANGE</projectKey>
+          <projectName>Fruit Orange</projectName>
+          <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/plan/FRTORANGE-RELEASE" />
+          <isFavourite>false</isFavourite>
+          <isActive>false</isActive>
+          <isBuilding>false</isBuilding>
+          <averageBuildTimeInSeconds>263.0</averageBuildTimeInSeconds>
+          <actions size="7" max-result="7" start-index="0" />
+          <stages size="4" max-result="4" start-index="0" />
+        </plan>
+      </plans>
+    </project>
+    <project name="Cantaloupe" key="CANTALOUPE" expand="plans">
+      <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/project/CANTALOUPE" />
+      <plans expand="plan" size="1" max-result="1" start-index="0">
+        <plan enabled="true" type="chain" shortKey="DEFAULT" shortName="Default" name="Cantaloupe - Default" key="CANTALOUPE-DEFAULT" expand="actions,stages">
+          <projectKey>CANTALOUPE</projectKey>
+          <projectName>Cantaloupe</projectName>
+          <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/plan/CANTALOUPE-DEFAULT" />
+          <isFavourite>false</isFavourite>
+          <isActive>false</isActive>
+          <isBuilding>false</isBuilding>
+          <averageBuildTimeInSeconds>73.0</averageBuildTimeInSeconds>
+          <actions size="7" max-result="7" start-index="0" />
+          <stages size="2" max-result="2" start-index="0" />
+        </plan>
+      </plans>
+    </project>
+  </projects>
+</projects>

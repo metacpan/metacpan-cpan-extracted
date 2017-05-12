@@ -1,0 +1,117 @@
+$Id: README,v 1.23 2008/10/02 18:53:54 turnstep Exp $
+
+This is Net::SSH::Perl. It contains implementations of
+both the SSH1 and SSH2 protocols.
+
+PREREQUISITES
+
+Protocol 1
+
+    * Math::GMP (1.04 or greater)
+    * String::CRC32 (1.2 or greater)
+    * Digest::MD5
+    * IO::Socket
+    * Crypt::IDEA
+
+Protocol 2
+
+    * CryptX (0.032 or greater)
+    * Crypt::Curve25519 (0.05 or greater)
+    * IO::Socket
+
+It optionally requires Digest::BubbleBabble for
+generating bubble babble fingerprints.
+
+INSTALLATION
+
+Net::SSH::Perl installation is relatively straightforward. If
+your CPAN shell is set up, you should just be able to do
+
+    % perl -MCPAN -e 'install Net::SSH::Perl'
+
+If you don't like that, you can download the distribution; the
+latest version on CPAN can be found at
+
+	http://search.cpan.org/dist/Net-SSH-Perl/
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+USAGE NOTES
+
+The goal for V2 was to implement the latest SSH features while
+providing very secure defaults.
+
+The following Ciphers are available but not enabled by default
+for SSH2 connections:
+  - Legacy ciphers arcfour, blowfish, DES, DES3, IDEA, RC4
+    (All considered obsolete and insecure)
+  - AES in CBC mode
+
+To enable AES256 in CBC mode, for example, pass the option:
+'Ciphers +aes256-cbc' to Net::SSH::Perl->new().
+
+The following Key Exchange (KEX) mechanisms are disabled by
+default:
+  - diffie-hellman-group1-sha1
+  - diffie-hellman-group14-sha1
+  - diffie-hellman-group-exchange-sha1
+
+One can enable via the "KexAlgorithms" option.  For example:
+'KexAlgorithms +diffie-hellman-group1-sha1'
+
+The following MACs are disabled by default:
+  - hmac-md5
+  - hmac-sha1
+
+One can enable via the "MACs" option.  For example:
+'MACs +hmac-sha1'
+
+SAMPLES/TUTORIALS
+
+Take a look at the scripts in eg/ for help and examples of
+using Net::SSH::Perl.
+
+* eg/cmd.pl is just a simple example of some of the
+functionality in the module;
+
+# eg/pssh is an ssh-like client for running commands on
+remote servers and connecting to a shell on remote servers;
+
+* eg/pscp is a very simple scp-like script;
+
+* eg/pssh-keygen is, as you might guess, an implementation of
+ssh-keygen in Perl, using the Net::SSH::Perl key libraries.
+It contains almost all of the functionality in the OpenSSH
+version of ssh-keygen.
+
+* eg/remoteinteract.pl is an example of using register_handler
+to interact with a remote (interactive) command.
+
+Both pssh and pscp support a subset of the command line options
+that the actual tools support; obviously, only those options
+supported by Net::SSH::Perl are supported by the two scripts.
+
+David Robins / dbrobins@cpan.org
+
+Support for the following features by:
+Lance Kinley / lkinley@loyaltymethods.com
+
+Diffie-Hellman Group 14, 16, and 18 Key Exchange
+Diffie-Hellman Group Exchange
+Curve25519 Key Exchange (curve25519-sha256@libssh.org)
+AES Cipher support (aes256-ctr,aes192-ctr,aes128-ctr)
+Chacha20-Poly1305 cipher support (chacha20-poly1305@openssh.com)
+hmac-sha2-256,hmac-sha2-512 MAC support
+hmac-sha2-256-etm@openssh.com, hmac-sha2-512-etm@openssh.com
+  Encrypt-then-MAC (ETM) MAC support
+Ed25519 key support, including encrypted keys that are enciphered
+  with supported crypto algorithms
+ECDSA Elliptical Curve DSA key support: ecdsa-sha2-nistp256,
+  ecdsa-sha2-nistp384, ecdsa-sha2-nistp521

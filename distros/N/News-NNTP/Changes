@@ -1,0 +1,30 @@
+0.3
+
+* "\n" is the system-native line terminator, and some wacky systems
+  don't use LF.  Duh.  Specify CR and LF explicitely on the wire,
+  and when removing line ending LFs that came off the wire.
+
+* It's illegal for a news article to contain a bare CR, but it does
+  happen.  We now leave them in, instead of blindly assuming any CR
+  is part of a CRLF pair and stripping it.
+
+* Fix sending QUIT on disconnect.
+
+* Documentation tweaks.
+
+0.2   2008-01-28
+
+* Fix failure mode when automatic authentication fails - clear out old
+  response data if the command would have generate new data, and don't
+  incorrectly proceed to try to read data.
+
+* Tweak test script to fail more gracefully if a news server is provided
+  that requires authentication, but no login is supplied; and when the
+  server connection fails.  This was causing CPAN auto-test failures.
+  These will still be failures, but won't be as ugly and should be
+  self-explanatory to those who view the test logs.  This could probably
+  be improved further to not actually fail out of Test::More.
+
+
+0.1
+FIRST RELEASE

@@ -1,0 +1,77 @@
+
+Description
+-----------
+
+This is the Perl 5 News-Scan distribution.  It requires perl version 5.004
+or later.
+
+This distribution provides a mechanism for collecting articles from a
+set of Usenet newsgroups and then creating statistical reports about
+those groups.
+
+IMPORTANT!!!  IMPORTANT!!!  IMPORTANT!!!  IMPORTANT!!!  IMPORTANT!!!
+IMPORTANT!!!  IMPORTANT!!!  IMPORTANT!!!  IMPORTANT!!!  IMPORTANT!!!
+
+This release of News-Scan is incompatible with prior releases.  This
+should be considered alpha-quality software, so the internal
+implementation is subject to change without notice, although I will
+only make incompatible changes only when absolutely necessary.
+
+Prerequisites
+-------------
+
+To use NewsScan, you need to have installed the following packages:
+
+    TimeDate-#.##
+    MailTools#.##
+    IO-#.##
+
+If you want to collect articles from an NNTP server, you'll also need
+to install
+
+    libnet-#.##
+
+Installation
+------------
+
+Install NewsScan by running the following commands:
+
+    perl Makefile.PL
+    make
+    make install
+
+Examples
+--------
+
+Please see the eg/ directory after you have unpacked the distribution
+for examples of using this library to gather and report statistics for
+Usenet newsgroups.
+
+Bugs, Problems, Suggestions
+---------------------------
+
+Please send any suggestions, bug reports, complaints, et cetera to
+Greg Bacon <gbacon@hiwaay.net>.
+
+Acknowledgements
+----------------
+
+This software is based on Mike Lee's <mikey@ontek.com> posters
+distribution and also on software posted to comp.lang.perl.misc
+by Christian Murphy <cpm@muc.de>.
+
+Many, many thanks are also in order to Gary Niemcewicz <gniemcew@dti.net>
+for all his helpful thoughts, comments, and bug reports.
+
+Chaim Frenkel <chaimf@cris.com> has also contributed immensely with his
+extremely helpful comments, suggestions, and questions.
+
+Thanks to Henrik Gemal, Gerrit P. Haase, and Oyvind Gronnesby for
+helpful suggestions and bug reports.
+
+Copyright
+---------
+
+Copyright (c) 1997-2002 Greg Bacon.
+This library is free software; you can distribute and/or modify it under
+the same terms as Perl itself.

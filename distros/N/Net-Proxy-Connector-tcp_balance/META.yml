@@ -1,0 +1,32 @@
+---
+abstract: 'A Net::Proxy connector for outbound tcp balancing and failover'
+author:
+  - 'Jesse Thompson <zjt@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Proxy-Connector-tcp_balance
+requires:
+  Net::Proxy::Connector::tcp: '0'
+  base: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-Proxy-Connector-tcp_balance
+  homepage: https://github.com/zjt/Net-Proxy-Connector-tcp_balance/wiki
+  repository: git://github.com/zjt/Net-Proxy-Connector-tcp_balance.git
+version: '0.005'

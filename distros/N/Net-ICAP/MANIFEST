@@ -1,0 +1,36 @@
+Makefile.PL
+README
+INSTALL
+LICENSE
+MANIFEST
+CHANGELOG
+doc/rfc3507.txt
+doc/rfc3507-errata.txt
+doc/rfc2616.txt
+sample/cookie_monster.pl
+lib/Net/ICAP.pm
+lib/Net/ICAP/Common.pm
+lib/Net/ICAP/Message.pm
+lib/Net/ICAP/Request.pm
+lib/Net/ICAP/Response.pm
+lib/Net/ICAP/Server.pm
+t/01_init_core.t
+t/02_message.t
+t/03_request.t
+t/04_response.t
+t/98_pod_coverage.t
+t/99_pod.t
+t/sample-icap/options-request
+t/sample-icap/options-response
+t/sample-icap/reqmod-error-request
+t/sample-icap/reqmod-error-response
+t/sample-icap/reqmod-get-request
+t/sample-icap/reqmod-get-response
+t/sample-icap/reqmod-post-request
+t/sample-icap/reqmod-post-response
+t/sample-icap/respmod-get-request
+t/sample-icap/respmod-get-response
+t/sample-icap/respmod-trailer-request
+t/sample-icap/respmod-trailer-response
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

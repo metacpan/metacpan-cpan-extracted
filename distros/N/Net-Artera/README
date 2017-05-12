@@ -1,0 +1,34 @@
+Net::Artera version 0.01
+=======================
+
+This is a Perl module which speaks the Artera XML API.
+See <http://www.arteraturbo.com>.  Artera Resellers can use this module
+to access some features of the API.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP (libwww-perl)
+  Crypt::SSLeay
+  XML::Simple
+  Data::Dumper
+  Locale::Country
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Ivan Kohler
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

@@ -1,0 +1,205 @@
+#!/usr/bin/env perl 
+#===============================================================================
+#
+#         FILE:  smppqproc
+#
+#        USAGE:  ./smppqproc
+#
+#  DESCRIPTION:  NetSDS SMPP Server MO queue processor
+#
+#        NOTES:  ---
+#       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
+#      COMPANY:  Net.Style
+#      VERSION:  1.0
+#      CREATED:  12.07.2009 15:15:03 UTC
+#===============================================================================
+
+use 5.8.0;
+use strict;
+use warnings;
+
+SMPPQproc->run(
+	daemon   => 1,
+	verbose  => 0,
+	infinite => 1,
+	use_pidfile => 1,
+);
+
+1;
+
+package SMPPQproc;
+
+use 5.8.0;
+use strict;
+use warnings;
+
+use base qw(NetSDS::App);
+
+use NetSDS::Util::Convert;
+use NetSDS::Queue;
+use IO::Socket::INET;
+use IPC::ShareLite;
+use JSON;
+use IO::Select;
+
+use Time::HiRes qw(usleep);
+
+use Data::Dumper;
+
+sub main_loop {
+
+	my ( $this, %params ) = @_;
+
+	$SIG{PIPE} = sub {
+		$this->speak("Caught SIGPIPE - restart daemon");
+		$this->{restart} = 1;
+	};
+
+	$SIG{INT} = sub {
+		$this->speak("Caught SIGTERM - stop daemon");
+		$this->{to_finalize} = 1;
+	};
+
+	while ( !$this->{to_finalize} ) {
+
+		$this->{restart} = 0;
+		# Start listening socket
+		$this->start();
+
+		# Process queue until restart needed
+		while ( !$this->{restart} and !$this->{to_finalize} ) {
+			$this->process();
+		}
+
+		$this->speak("Going to restart");
+	}
+
+	$this->stop();
+
+} ## end sub main_loop
+
+sub start {
+
+	my ($this) = @_;
+
+	$this->mk_accessors('listener');
+	$this->mk_accessors('sock');
+
+	# Create listening socket
+	if ( !$this->{listener} ) {
+		$this->{listener} = IO::Socket::INET->new(
+			LocalAddr => '127.0.0.1',
+			LocalPort => '9999',
+			Proto     => 'tcp',
+			Listen    => 5,
+		);
+	};
+
+	my $sock = $this->listener->accept();
+
+	$this->sock($sock);
+
+	# Create SHM handler
+	my $shm = IPC::ShareLite->new(
+		-key     => $this->conf->{shm}->{segment},
+		-create  => 'yes',
+		-destroy => 'no',
+	);
+	$this->mk_accessors('shm');
+	$this->shm($shm);
+
+	# Create queue handler
+	my $queue = NetSDS::Queue->new();
+	$this->mk_accessors('queue');
+	$this->queue($queue);
+
+	$this->{wait_keepalive} = 1000;
+
+} ## end sub start
+
+sub process {
+
+	my ($this) = @_;
+
+	# Send marker (keepalive)
+	if ( $this->sock ) {
+		$this->{wait_keepalive}--;
+		if ($this->{wait_keepalive} lt 1) {
+			$this->speak("Send keepalive to SMPP server");
+			$this->sock->print("-MARK-\n");
+			$this->{wait_keepalive} = 1000;
+		}
+	} else {
+		return undef;
+	}
+
+	# If we have problem, then restart
+	if ( !$this->sock->connected() ) {
+		$this->speak("Disconnected socket to SMPP server");
+		$this->{restart} = 1;
+		return undef;
+	}
+
+	# Get active ESME list from shared memory
+	my $shm_data = $this->shm->fetch();
+	if ($shm_data) {
+		$shm_data = decode_json($shm_data);
+	} else {
+		usleep(1000);
+		return 1;
+	}
+
+	# Loop through ESME list and fetch messages and DLRs
+	foreach my $system_id ( keys %{$shm_data} ) {
+		if ( my $data = $this->queue->pull( "q_mo_" . $system_id ) ) {
+			$this->speak("Found MO event - send to socket");
+			$this->sock->print( conv_str_base64( encode_json($data) ) . "\n" );
+		}
+	}
+	usleep(1000);
+
+} ## end sub process
+
+sub stop {
+
+	my ($this) = @_;
+
+	$this->listener->close();
+	$this->listener(undef);
+
+}
+1;
+#===============================================================================
+
+__END__
+
+=head1 NAME
+
+smppqproc
+
+=head1 SYNOPSIS
+
+smppqproc
+
+=head1 DESCRIPTION
+
+FIXME
+
+=head1 EXAMPLES
+
+FIXME
+
+=head1 BUGS
+
+Unknown.
+
+=head1 TODO
+
+Empty.
+
+=head1 AUTHOR
+
+Michael Bochkaryov <misha@rattler.kiev.ua>
+
+=cut
+

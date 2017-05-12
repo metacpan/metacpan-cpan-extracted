@@ -1,0 +1,185 @@
+Revision history for Net::Hotline
+
+0.82 (11.27.2002) - John Siracusa <siracusa@mindspring.com>
+
+    * Clarified ambiguous call to rename() in Client.pm
+
+0.82 (06.10.2002) - John Siracusa <siracusa@mindspring.com>
+
+    * Fixed bug if 455 (http://rt.cpan.org/NoAuth/Bug.html?id=455)
+      by improving error handling when users don't check return values.
+
+0.81 (05.29.2002) - John Siracusa <siracusa@mindspring.com>
+
+    * Fixed resume bug when downloading files from the root directory.
+    * Added (trivial) test file.
+    * Stopped mechanically updating version numbers in every .pm file
+      every time there's an update.
+
+0.80 (07.22.2001) - John Siracusa <siracusa@mindspring.com>
+
+    * Fixed recursion bugs in kick() and ban() in Client.pm
+      Patch provided by Ragnar Hojland Espinosa.
+
+0.79 (03.17.2001) - John Siracusa <siracusa@mindspring.com>
+
+    * Minor fixes to make -w happier, courtesy of Rodney Gordon II.
+
+0.78 (02.12.2000) - John Siracusa <siracusa@mindspring.com>
+
+    * Fixed port number when uploading to servers on non-standard
+      (i.e. not 5500) ports.  Should have been fixed in 0.77.  Duh.
+
+0.77 (02.06.2000) - John Siracusa <siracusa@mindspring.com>
+
+    * Applied band-aid to private message reply bug when on 1.7.x
+      servers, thanks to <jna@retina.net>
+
+    * Fixed port number when downloading from servers on non-standard
+      (i.e. not 5500) ports.
+
+0.76 (01.03.2000) - John Siracusa <siracusa@mindspring.com>
+
+    * Removed redundant timeout parameter in IO::Socket call,
+      thanks to Les Brown <Les@hotlinecentral.com>
+
+0.75 (11.09.1999) - John Siracusa <siracusa@mindspring.com>
+
+    * Bug fix in tracker_list() thanks to Les Brown <Les@hotlinecentral.com>
+
+0.74 (09.06.1999) - John Siracusa <siracusa@mindspring.com>
+
+    * Fixed download of files greater than 31 characters in Mac OS.
+
+0.73 (03.27.1999) - John Siracusa <siracusa@mindspring.com>
+
+    * Changed signal handline and eval {} blocks slightly.
+
+    * Fixed a few miscellaneous bugs in hlftp.pl
+
+0.72 (02.27.1999) - John Siracusa <siracusa@mindspring.com>
+
+    * Shortened internal functions name to satisfy AutoLoader on Mac OS.
+
+0.71 (02.05.1999) - John Siracusa <siracusa@mindspring.com>
+
+    * Added the ban() method, ban task-type constant, and ban_handler()
+      method.
+
+0.70 (11.26.1998) - John Siracusa <siracusa@mindspring.com>
+
+    * Fixed a bug in the recv_file() method: changed the mode from "r"
+      to "w" in a call to fdopen()...which usually helps when you're
+      trying to create a new file.  Yeesh.
+
+0.69 (11.14.1998) - John Siracusa <siracusa@mindspring.com>
+
+    * Fixed bugs in the the pack() formats in the macbinary() method.
+
+0.68 (10.21.1998) - John Siracusa <siracusa@mindspring.com>
+
+    * Changed return values in the get_filelist() and get_news() methods
+      to distinguish between error return values and "empty" return
+      values (i.e. empty directories).  See the Net::Hotline::Client
+      documentation for details.
+
+    * Combined multiple pack() calls for efficiency.
+
+0.67 (09.30.1998) - John Siracusa <siracusa@mindspring.com>
+
+    * Agreement text is now saved correctly in the client object.
+
+0.66 (09.23.1998) - John Siracusa <siracusa@mindspring.com>
+
+    * Fixed a typo in one of the pack() templates (yikes!)
+
+    * Changed behavior of the leave_handler() slightly: users are now
+      deleted from the internal user list data strcture *before* your
+      handler gets called.
+
+0.65 (09.16.1998) - John Siracusa <siracusa@mindspring.com>
+
+    * Added private chat features.
+
+0.64 (09.11.1998) - John Siracusa <siracusa@mindspring.com>
+
+    * Using the macbinary() method to convert files with no data fork to
+      MacBinary II format now works correctly.
+
+    * Miscellaneous code style changes, mostly involving variable scope
+      and importing.
+
+    * Fixed a path translation bug in the "mput" command in "hlftp.pl"
+
+0.63 (09.09.1998) - John Siracusa <siracusa@mindspring.com>
+
+    * Added tracker() and tracker_list() methods.
+
+    * Fixed connection timeouts and tweaked a few error messages.
+
+    * Fixed failure return value in several functions: changed
+      return(undef) to return to ensure correctness regardless
+      of scalar or array context.
+
+    * Squashed minor bugs in hlftp.pl.
+
+0.62 (08.01.1998) - John Siracusa <siracusa@mindspring.com>
+
+    * Fixed a bug in the network write routine that caused it to croak
+      during large transfers.
+
+    * Added an "mput" command (and miscellaneous bug fixes) to "hlftp.pl"
+
+    * Changed the Mac OS installation instructions in the REAMDE file to
+      avoid problems with AutoLoader in MacPerl.
+
+0.61 (07.21.1998) - John Siracusa <siracusa@mindspring.com>
+
+    * Fixed missing argument to substr() in User.pm (doh!)
+
+0.60 (07.20.1998) - John Siracusa <siracusa@mindspring.com>
+
+    * Added file upload.
+
+    * Enabled real dual-forked Mac file creation when downloading on
+      Mac OS systems.
+
+    * Blocking task mode introduced, along with a handful of blocking
+      methods.
+
+    * Overhauled error handling to work with the new blocking task mode.
+
+    * Changed the network i/o (again).
+
+    * Kludged up a bunch of function names to prevent AutoLoader from
+      complaining about non-unique 8-letter(!) names.
+
+    * Made a few modules less intrusive with their exporting.
+
+    * Fixed a bug that caused CPAN.pm and other modules that use ExtUtils
+      to find version numbers to die with an eval() error.
+
+    * Changed the README to prevent hapless Mac OS users from overwriting
+      MacPerl's lib/Net/ directory.
+
+    * Included two example scripts: hlftp.pl and hibot.pl
+
+    * In case you're wondering, I don't expect the API to completely
+      stabilize until version 1.0.
+
+0.51 (07.04.1998) - John Siracusa <siracusa@mindspring.com>
+
+    * Added file download and MacBinary II conversion.
+
+    * News handler routines now make sense.
+
+    * Client.pm grew large enough for me to start autoloading stuff.
+
+    * Overhauled network reading routines to handle disconnects more
+      gracefully and be robust enough to do file transfers.
+
+    * Renamed a bunch of constants in Net::Hotline::Constants.
+
+0.50 (06.23.1998) - John Siracusa <siracusa@mindspring.com>
+
+    * Initial release.

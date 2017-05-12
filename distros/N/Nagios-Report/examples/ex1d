@@ -1,0 +1,80 @@
+#!/usr/bin/perl
+
+
+use strict ;
+
+use Nagios::Report ;
+
+my $hostname_re = shift @ARGV ;
+$hostname_re
+  or die <<USAGE;
+$0 <hostname | hostname_pattern>
+
+Extracts Nagios Availability report data for host(s) matching the regex argument.
+eg $0 ^Alb
+USAGE
+
+my $host_re = qr/$hostname_re/ 
+  or die "Can't compile hostname regex '$hostname_re'." ;
+
+my $x = Nagios::Report->new(q<dev_debug from_data_handle>, [q<Test>])
+  or die "Can't construct Nagios::Report object." ;
+
+							# Only display these fields in this order.
+my @these_fields = qw(
+  HOST_NAME
+  TOTAL_TIME_DOWN
+  PERCENT_TOTAL_TIME_DOWN
+  PERCENT_TOTAL_TIME_UP
+  TREND_URL
+) ;
+
+$x->mkreport(
+							# Display these fields only (in the order of the list)
+
+
+		\@these_fields,
+							# Record selector
+
+
+		sub { my %F = @_; my $h = $F{HOST_NAME}; $h =~ /$host_re/ },
+
+							# Sort order
+
+		sub { my %f = @_; package Nagios::Report; $a->[$f{HOST_NAME}] cmp $b->[$f{HOST_NAME}] }
+) ;
+
+$x->debug_dump(15, 5) ;
+
+{ 
+  my $data ; 
+
+  sub from_data_handle {
+
+    my $rep_period = shift @_ ;
+
+    my @avail_rep = () ;
+
+    local $/ = undef ;
+    $data = <DATA> 
+      unless $data ;
+
+    my ($r) = $data =~ /^# $rep_period\n(.*?)^END_OF_FILE_MARKER/sm ;
+  
+    @avail_rep = split /\n/, $r ;
+
+    @avail_rep ;
+
+  }
+}
+
+__DATA__
+# Test
+HOST_NAME, TIME_UP_SCHEDULED, PERCENT_TIME_UP_SCHEDULED, PERCENT_KNOWN_TIME_UP_SCHEDULED, TIME_UP_UNSCHEDULED, PERCENT_TIME_UP_UNSCHEDULED, PERCENT_KNOWN_TIME_UP_UNSCHEDULED, TOTAL_TIME_UP, PERCENT_TOTAL_TIME_UP, PERCENT_KNOWN_TIME_UP, TIME_DOWN_SCHEDULED, PERCENT_TIME_DOWN_SCHEDULED, PERCENT_KNOWN_TIME_DOWN_SCHEDULED, TIME_DOWN_UNSCHEDULED, PERCENT_TIME_DOWN_UNSCHEDULED, PERCENT_KNOWN_TIME_DOWN_UNSCHEDULED, TOTAL_TIME_DOWN, PERCENT_TOTAL_TIME_DOWN, PERCENT_KNOWN_TIME_DOWN, TIME_UNREACHABLE_SCHEDULED, PERCENT_TIME_UNREACHABLE_SCHEDULED, PERCENT_KNOWN_TIME_UNREACHABLE_SCHEDULED, TIME_UNREACHABLE_UNSCHEDULED, PERCENT_TIME_UNREACHABLE_UNSCHEDULED, PERCENT_KNOWN_TIME_UNREACHABLE_UNSCHEDULED, TOTAL_TIME_UNREACHABLE, PERCENT_TOTAL_TIME_UNREACHABLE, PERCENT_KNOWN_TIME_UNREACHABLE, TIME_UNDETERMINED_NOT_RUNNING, PERCENT_TIME_UNDETERMINED_NOT_RUNNING, TIME_UNDETERMINED_NO_DATA, PERCENT_TIME_UNDETERMINED_NO_DATA, TOTAL_TIME_UNDETERMINED, PERCENT_TOTAL_TIME_UNDETERMINED
+"16_Mort_St_Optus_router_PE_interface", 0, 0.000%, 0.000%, 2045127, 100.000%, 100.000%, 2045127, 100.000%, 100.000%, 0, 0.000%, 0.000%, 0, 0.000%, 0.000%, 0, 0.000%, 0.000%, 0, 0.000%, 0.000%, 0, 0.000%, 0.000%, 0, 0.000%, 0.000%, 0, 0.000%, 0, 0.000%, 0, 0.000%
+"Adelaide_State_Office_DEST_router", 0, 0.000%, 0.000%, 2045127, 100.000%, 100.000%, 2045127, 100.000%, 100.000%, 0, 0.000%, 0.000%, 0, 0.000%, 0.000%, 0, 0.000%, 0.000%, 0, 0.000%, 0.000%, 0, 0.000%, 0.000%, 0, 0.000%, 0.000%, 0, 0.000%, 0, 0.000%, 0, 0.000%
+"Adelaide_State_Office_Optus_router_PE_interface", 0, 0.000%, 0.000%, 2045127, 100.000%, 100.000%, 2045127, 100.000%, 100.000%, 0, 0.000%, 0.000%, 0, 0.000%, 0.000%, 0, 0.000%, 0.000%, 0, 0.000%, 0.000%, 0, 0.000%, 0.000%, 0, 0.000%, 0.000%, 0, 0.000%, 0, 0.000%, 0, 0.000%
+"Albany_DEST_router", 0, 0.000%, 0.000%, 2039937, 99.746%, 99.746%, 2039937, 99.746%, 99.746%, 0, 0.000%, 0.000%, 290, 0.014%, 0.014%, 290, 0.014%, 0.014%, 0, 0.000%, 0.000%, 4900, 0.240%, 0.240%, 4900, 0.240%, 0.240%, 0, 0.000%, 0, 0.000%, 0, 0.000%
+END_OF_FILE_MARKER
+
+

@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+#
+# example01.pl - Example of Net::SnoopLog. Prints out frame arrival times.
+#
+# 11-Oct-2003	Brendan Gregg	Created this
+
+use Net::SnoopLog;
+
+$log = Net::SnoopLog->new;
+$log->read("snooplog");
+
+$count = $log->maxindex + 1;
+@Indexes = $log->indexes;
+
+print "Snoop version: ",$log->version,"\n";
+print "Datalink type: ",$log->datalink,"\n";
+print "Packet count : $count\n\n";
+
+printf "%5s  %25s  %7s %5s  %s\n","Frame","Arrival time","+ MSecs","Drops",
+ "Length";
+
+foreach $index (@Indexes) {
+	($length_orig,$length_incl,$drops,$secs,$msecs) = $log->header($index);
+	$data = $log->data($index);
+
+	### Convert arrival time into text
+	$time = localtime($secs);
+
+	$msecs = $msecs / 1000000;
+	$length = length($data);
+
+	printf "%5d  %25s  %7.5f %5d  %d\n",$index,$time,$msecs,$drops,$length;
+}
+

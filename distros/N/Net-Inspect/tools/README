@@ -1,0 +1,39 @@
+==== httpflow
+
+httpflow -r file.pcap -D dir
+- extraxt all http requests + responses into dir as separate files.
+- transfer-encoding of chunked and content-encodings of gzip/deflate will be
+  removed.
+- prints information about content-types, encodings, timings.. to stdout
+
+the created files have the form
+00054.001-1310640666-http-192.168.178.3.38885-195.71.11.67.80-0
+ |     |   |- starttime    |-srcip.port        |-dstip.port   |-dir(0|1)
+ |     |- request-id
+ |- tcp-flow-id
+the dir (last part of file) is 0 for requests and 1 for response
+
+
+==== tcpudpflow
+
+similar to httpflow, but for TCP/UDP-streams 
+
+==== rtpxtract
+
+extracts RTP streams from SIP calls
+
+==== http_inspection_proxy.pl
+
+simple web proxy using the Netflow library to inspect and modify requests and
+responses. Can unchunk, uncompress data before inspecting/modifying them.
+Can modify requests using Net::IMP filters.
+
+==== live-http-headers.pl
+
+small tool to demonstrate how to capture live http requests and show
+the headers
+
+==== unsocksify-pcap.pl
+
+finds socks4 connection in source pcap, and extracts them unsocksified into
+new pcap

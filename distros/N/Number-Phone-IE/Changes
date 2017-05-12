@@ -1,0 +1,8 @@
+Revision history for Perl extension Number::Phone::IE.
+
+0.1  Thu Apr  7 12:24:07 2005
+	- original version; created by h2xs 1.23 with options
+		-AX -n Number::Phone::IE
+
+0.2  Fri Apr  8 09:30:00 2005
+	- Removed unintended dependence on a particular version of perl

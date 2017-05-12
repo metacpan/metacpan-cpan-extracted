@@ -1,0 +1,31 @@
+#!/usr/bin/perl -w
+use strict;
+use Net::DAAP::DMAP qw(dmap_to_xml dmap_unpack dmap_flatten);
+
+use Getopt::Std;
+use Data::Dumper; 
+
+my %opts;
+getopts('fx', \%opts);
+
+my $tags_hash;
+my $tags_array;
+
+foreach my $f (@ARGV) {
+  open my $fh, "<:bytes", $f or die "$0: Can't open $f for reading: $!\n";
+  local $/;
+  my $data = <$fh>;
+  close $fh;
+
+  my $aref = dmap_unpack($data);
+
+  if ($opts{f}) {
+      print Dumper(dmap_flatten($aref));
+  } elsif ($opts{x}) {
+      print dmap_to_xml($data);
+  } else {
+      print Dumper($aref);
+  }
+}
+
+

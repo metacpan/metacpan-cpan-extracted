@@ -1,0 +1,8 @@
+Changes
+SMTP.pm
+MANIFEST
+Makefile.PL
+examples/leafmail
+examples/leafmail.cf
+README
+LICENSE

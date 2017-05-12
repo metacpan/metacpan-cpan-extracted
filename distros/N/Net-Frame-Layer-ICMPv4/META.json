@@ -1,0 +1,63 @@
+{
+   "abstract" : "Internet Control Message Protocol v4 layer object",
+   "author" : [
+      "GomoR <gomor_at_cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Frame-Layer-ICMPv4",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::Frame" : "0",
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Frame::Layer::ICMPv4" : {
+         "file" : "lib/Net/Frame/Layer/ICMPv4.pm",
+         "version" : "1.05"
+      },
+      "Net::Frame::Layer::ICMPv4::AddressMask" : {
+         "file" : "lib/Net/Frame/Layer/ICMPv4/AddressMask.pm"
+      },
+      "Net::Frame::Layer::ICMPv4::DestUnreach" : {
+         "file" : "lib/Net/Frame/Layer/ICMPv4/DestUnreach.pm"
+      },
+      "Net::Frame::Layer::ICMPv4::Echo" : {
+         "file" : "lib/Net/Frame/Layer/ICMPv4/Echo.pm"
+      },
+      "Net::Frame::Layer::ICMPv4::Information" : {
+         "file" : "lib/Net/Frame/Layer/ICMPv4/Information.pm"
+      },
+      "Net::Frame::Layer::ICMPv4::Redirect" : {
+         "file" : "lib/Net/Frame/Layer/ICMPv4/Redirect.pm"
+      },
+      "Net::Frame::Layer::ICMPv4::TimeExceed" : {
+         "file" : "lib/Net/Frame/Layer/ICMPv4/TimeExceed.pm"
+      },
+      "Net::Frame::Layer::ICMPv4::Timestamp" : {
+         "file" : "lib/Net/Frame/Layer/ICMPv4/Timestamp.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license.php"
+      ]
+   },
+   "version" : "1.05"
+}

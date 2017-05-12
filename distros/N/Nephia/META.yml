@@ -1,0 +1,77 @@
+---
+abstract: 'A microcore architecture WAF'
+author:
+  - 'ytnobody <ytnobody@gmail.com>'
+build_requires:
+  Capture::Tiny: 0
+  File::Temp: 0
+  Test::Exception: 0
+  Test::More: 0.98
+  Test::WWW::Mechanize::PSGI: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.6.5, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Nephia
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Nephia:
+    file: lib/Nephia.pm
+    version: 0.87
+  Nephia::Chain:
+    file: lib/Nephia/Chain.pm
+  Nephia::Context:
+    file: lib/Nephia/Context.pm
+  Nephia::Core:
+    file: lib/Nephia/Core.pm
+  Nephia::Incognito:
+    file: lib/Nephia/Incognito.pm
+  Nephia::MetaTemplate:
+    file: lib/Nephia/MetaTemplate.pm
+  Nephia::Plugin:
+    file: lib/Nephia/Plugin.pm
+  Nephia::Plugin::Basic:
+    file: lib/Nephia/Plugin/Basic.pm
+  Nephia::Plugin::Cookie:
+    file: lib/Nephia/Plugin/Cookie.pm
+  Nephia::Request:
+    file: lib/Nephia/Request.pm
+  Nephia::Response:
+    file: lib/Nephia/Response.pm
+  Nephia::Setup:
+    file: lib/Nephia/Setup.pm
+  Nephia::Setup::Plugin:
+    file: lib/Nephia/Setup/Plugin.pm
+  Nephia::Setup::Plugin::Minimal:
+    file: lib/Nephia/Setup/Plugin/Minimal.pm
+requires:
+  Archive::Extract: 0
+  Class::Accessor::Lite: 0
+  Data::Section::Simple: 0
+  File::Fetch: 0
+  Module::Load: 0
+  Plack: 0
+  Plack::Request::WithEncoding: 0
+  URL::Encode: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/nephia/Nephia/issues
+  homepage: https://github.com/nephia/Nephia
+  repository: git://github.com/nephia/Nephia.git
+version: 0.87
+x_contributors:
+  - 'papix <mail@papix.net>'

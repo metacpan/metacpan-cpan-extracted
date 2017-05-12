@@ -1,0 +1,33 @@
+---
+abstract: 'IPMessenger-Bot building framework'
+author:
+  - 'hayajo <hayajo@cpan.org>'
+build_requires:
+  Net::EmptyPort: 0
+  Test::More: 0.88
+configure_requires:
+  Module::Build::Tiny: 0.021
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.2, Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131490'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-IPMessenger-Bot
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Net::IPMessenger: 0.14
+  Term::ANSIColor: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/hayajo/p5-Net-IPMessenger-Bot/issues
+  homepage: https://github.com/hayajo/p5-Net-IPMessenger-Bot
+  repository: https://github.com/hayajo/p5-Net-IPMessenger-Bot.git
+version: 0.05

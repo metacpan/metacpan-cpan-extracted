@@ -1,0 +1,32 @@
+OUI				Organization
+company_id			Organization
+				Address
+00-00-6B   (hex)		SILICON GRAPHICS INC./MIPS
+00006B     (base 16)		SILICON GRAPHICS INC./MIPS
+				2011 NORTH SHORELINE BLVD.
+				P.O. BOX 7311 -  BLDG. #10
+				MOUNTAIN VIEW CA 94039-7311
+				UNITED STATES
+
+00-00-6C   (hex)		PRIVATE
+00006C     (base 16)		 
+				 
+00-00-6D   (hex)		CRAY COMMUNICATIONS, LTD.
+00006D     (base 16)		CRAY COMMUNICATIONS, LTD.
+				P.O. BOX 254, CAXTON WAY
+				WATFORD BUSINESS PARK WATFORD HERTS  WD1
+				UNITED KINGDOM
+				UNITED KINGDOM
+
+00-00-6E   (hex)		ARTISOFT, INC.
+00006E     (base 16)		ARTISOFT, INC.
+				691 EAST RIVER ROAD
+				TUCSON AZ 85704
+				UNITED STATES
+
+00-00-6F   (hex)		Madge Ltd.
+00006F     (base 16)		Madge Ltd.
+				Madge House
+				Priors Way
+				Maindenhead Berkshire SL6 2HP
+				UNITED KINGDOM

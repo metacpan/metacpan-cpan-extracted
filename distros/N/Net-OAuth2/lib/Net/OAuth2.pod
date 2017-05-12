@@ -1,0 +1,49 @@
+=encoding utf8
+
+=head1 NAME
+
+Net::OAuth2 - OAuth 2.0 implementation
+
+=head1 SYNOPSIS
+
+  See Net::OAuth2::Profile::WebServer->new
+
+=head1 DESCRIPTION
+
+OAuth version 2.0 is a follow-up on OAuth 1.0, which is not supported by
+this module.  The specification for version 2.0 can be found in
+
+=over 4
+
+=item . RFC6749, Authorization framework: L<http://tools.ietf.org/html/rfc6749>
+
+=item . RFC6750, Bearer token usage: L<http://tools.ietf.org/html/rfc6750>
+
+=back
+
+Start with one these modules:
+
+=over 4
+
+=item . L<Net::OAuth2::Profile::WebServer|Net::OAuth2::Profile::WebServer>
+
+=item . L<Net::OAuth2::Profile::Password|Net::OAuth2::Profile::Password>
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Net-OAuth2 distribution version 0.63,
+built on January 18, 2016. Website: F<http://perl.overmeer.net>.
+
+=head1 COPYRIGHTS
+
+Copyrights 2013-2016 on the perl code and the related documentation
+ by [Mark Overmeer] for SURFnet bv, The Netherlands.  For other contributors see Changes.
+
+Copyrights 2011-12 by Keith Grennan.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

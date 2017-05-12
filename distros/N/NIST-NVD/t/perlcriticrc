@@ -1,0 +1,3 @@
+[-ValuesAndExpressions::ProhibitConstantPragma]
+[-Subroutines::RequireArgUnpacking]
+[-BuiltinFunctions::ProhibitStringyEval]

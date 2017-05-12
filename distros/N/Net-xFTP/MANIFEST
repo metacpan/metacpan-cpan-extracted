@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Net/xFTP.pm
+lib/Net/xFTP_Foreign.pm
+lib/Net/xFTP_FSP.pm
+lib/Net/xFTP_FTP.pm
+lib/Net/xFTP_LOCAL.pm
+lib/Net/xFTP_OpenSSH.pm
+lib/Net/xFTP_SFTP.pm
+lib/Net/xFTP_SSH2.pm
+lib/Net/xFTP_FTPSSL.pm
+t/00-load.t
+t/pod-coverage.t
+META.json                                Module JSON meta-data (added by MakeMaker)

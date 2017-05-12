@@ -1,0 +1,5 @@
+LIBRARY "ViewColumn"
+EXPORTS
+  boot_Notes__ViewColumn
+  _boot_Notes__ViewColumn = boot_Notes__ViewColumn
+  

@@ -1,0 +1,18 @@
+Revision history for News-Pictures
+
+0.01    4/3/2009
+        First version, released on an unsuspecting world.
+0.02    11/3/2009
+        various modifications to return the distibution correspondent to the cpan
+0.03	16/3/2009 
+	we remove "use strict;"
+0.05    26/3/2009
+        Modifications of tests of package
+0.06    27/3/2009
+        Modifications of tests of package
+0.07    28/3/2009
+        new structure of project. Creation of dataset Pictures
+0.13    30/3/2009
+        Display of record's number
+0.14    26/04/2009
+        Calibration of width and height of image

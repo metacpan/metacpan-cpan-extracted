@@ -1,0 +1,104 @@
+NAME
+    Number::Natural::SetTheory - set-theoretic definition of natural numbers
+
+SYNOPSIS
+     use Number::Natural::SetTheory qw/:all/;
+     my $three = number_to_set(3);
+     say (scalar @$three);   # says '3'
+ 
+     # says '0', '1', and '2'
+     foreach my $member (@$three)
+     {
+       say (scalar @$member);
+     }
+ 
+     # says '{{},{{}},{{},{{}}}}'
+     say set_to_string($three);
+
+DESCRIPTION
+    For years mathematicians struggled to answer what numbers exactly are. A
+    satisfactory answer came out of the world of set theory. Because Perl
+    doesn't have sets as a first class data type, we use arrays instead. The
+    set theory notation for the set of the letters A, B and C is:
+
+      { A, B, C }
+
+    The Perlish notation is:
+
+      [ 'A', 'B', 'C' ]
+
+    For the rest of this documentation, we'll use Perlish notation unless
+    otherwise stated. Also, it's worth noting that sets are unordered, while
+    arrays are ordered. This module works around that difference by simply
+    ignoring the order of array elements.
+
+    Anyway, so what are numbers? We define zero as the empty set:
+
+     our $zero = [];
+
+    Further natural numbers are defined as the set containing all smaller
+    natural numbers:
+
+     our $one    = [$zero];
+     our $two    = [$zero, $one];
+     our $three  = [$zero, $one, $two];
+     # etc
+
+    This has a nice property:
+
+      scalar @$three == 3
+
+    Note that:
+
+      our $not_three = [$zero, $zero, 'Chuck Norris'];
+      scalar @$three == 3;   # true
+
+    In the case above, the set $not_three does not represent a number at all.
+
+    This module offers a number of functions for converting between Perl
+    non-negative integers and the sets representing the natural numbers.
+
+  set_is_number($set, $number)
+    Returns true (see boolean) iff the set represents the number. Also has the
+    property that if $set is an actual Perl scalar integer, it returns true
+    iff the two numbers are equal.
+
+  number_to_set($number)
+    Returns the set that represents a number, given a Perl scalar integer. If
+    $number is not a number, then returns `undef`.
+
+  set_to_number($set)
+    Converts a set to a Perl scalar integer. Returns `undef` if the set does
+    not represent a number at all. This is the reverse of $number_to_set.
+
+  set_to_string($set)
+    Returns the set as a string, using number theory notation (curly
+    brackets).
+
+BUGS
+    These functions are very recursive. I wouldn't recommend using them with
+    numbers greater than ten.
+
+    This module doesn't really have any use cases.
+
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Number-Natural-SetTheory>.
+
+SEE ALSO
+    <http://en.wikipedia.org/wiki/Set-theoretic_definition_of_natural_numbers>
+    .
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2011-2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

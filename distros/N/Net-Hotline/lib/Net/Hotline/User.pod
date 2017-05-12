@@ -1,0 +1,84 @@
+=head1 NAME
+
+Net::Hotline::User - User object used internally by Net::Hotline::Client
+
+=head1 SYNOPSIS
+
+    use Net::Hotline::User;
+
+    $user = new Net::Hotline::User;
+    $user->nick("joe blow");
+    $user->icon(128);
+
+    print "Nick: ", $user->nick(), "\n";
+    ...
+
+=head1 DESCRIPTION
+
+Net::Hotline::User is a simple class for storing and retrieving user
+information,  You should never have to create your own Net::Hotline::User
+objects when using Net::Hotline::Client.  Getting and setting attributes is all
+that should be necessary.
+
+=head1 CONSTRUCTION
+
+=over 4
+
+=item new SOCKET, NICK, LOGIN, ICON, COLOR
+
+With no arguments, creates a new Net::Hotline::User object with all attributes
+set to undef. The other option is to supply exactly 5 arguments as listed
+above.
+
+=back
+
+=head1 METHODS
+
+All the Net::Hotline::User methods are simple attribute get/set routines.
+If given an argument, they set an attribute.  In all cases, they
+return the current value of the attribute.
+
+=over 4
+
+=item color NUMBER
+
+The color of the user in the userlist.  Values are numbers from 0 to 3. The
+hash HTLC_COLORS defined in Net::Hotline::Constants contains number to name
+color mappings (i.e. $HTLC_COLORS{2} is "red").  Example:
+
+	use Net::Hotline::Constants qw(HTLC_COLORS);
+	...
+	print $user->nick(), " is ", $HTLC_COLORS{$user->color()}, "\n";
+
+=item icon NUMBER
+
+The user's icon number.  Negative values are accepted.
+
+=item info TEXT
+
+User information as a block of "pretty-formatted" text.
+
+=item login TEXT
+
+The user's login name.
+
+=item nick TEXT
+
+The user's nickname in the userlist.
+
+=item socket NUMBER
+
+The user's unique socket number.  User's are assigned a socket number
+whenthey connect to a Hotline server.
+
+=back
+
+=head1 AUTHOR
+
+John C. Siracusa (siracusa@mindspring.com)
+
+=head1 COPYRIGHT
+
+Copyright(c) 1999 by John Siracusa.  All rights reserved.  This program is
+free software; you can redistribute it and/or modify it under the same terms
+as Perl itself.

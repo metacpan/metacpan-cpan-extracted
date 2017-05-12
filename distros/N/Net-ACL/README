@@ -1,0 +1,69 @@
+$Id: README,v 1.12 2003/06/06 18:45:02 unimlo Exp $
+
+**** NOTE: This is pre-alpha code!!!
+****	- Interface is not final yet!
+****    - Still lots of bugs! Need more testing!
+
+Net::ACL version 0.06
+=====================
+
+The Net::ACL module allows a Perl program to do complex filtering and
+manipulation of data in the same way as routers does with access-lists
+and route-maps.
+
+The access and control lists are general and can handle any data that
+perl can handle. The bundled matching and modification modules however
+have been focused on data like IP addresses and data found in the BGP
+protocol. Later other router data types may be added.
+
+However adding simple matching rules or modification rules for other
+complex data types are simple.
+
+Any comments and feedback are more then welcome!
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Scalar::Util
+  Net::Netmask
+  Cisco::Reconfig
+  IO::String
+  Scalar::Util
+
+For testing to be fully operational:
+
+  Test::More
+  Test::Harness
+  Test::Signature
+
+To have the BGP features functioning you also need:
+
+  Net::BGP version 0.04 or newer.
+
+All modules can be found on CPAN. Installing using the CPAN(+) enviroment
+is recommended for easy dependency resolution.
+
+
+SIGNATURE
+
+Fingerprint of my public key used to sign this module can be found on
+my homepage: http://www.martin.lorensen.dk/gpg.html
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Martin Lorensen, All rights reserved.  This program is free
+software; you can redistribute it and/or modify it under the same terms as
+Perl itself.

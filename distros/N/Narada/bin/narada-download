@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+VERSION='v2.3.7' # based on remote-2.0.2
+
+warn()  { echo "$@" >&2;        }
+die()   { warn "$@"; exit 1;    }
+
+perl -MNarada -E 'Narada::detect(@ARGV)' || exit 1
+
+if ! [ -f config/remote -a -s config/remote ]; then
+    die "Configure config/remote first"
+fi
+host=$(sed 's,:.*,,'     < config/remote);
+path=$(sed 's,^[^:]*:,,' < config/remote);
+if [ "$host" == "" ]; then
+    die "File config/remote should contain: [user@]host:[path/to/dir/]"
+fi
+if [ $# -lt 1 ]; then
+    die "Usage: $(basename $0) file_or_dir_for_upload_here ..."
+fi
+for dst in "$@"; do
+    src=$(dirname "$dst")"/"
+    if [ -d "$dst" ]; then dir="-r"; else dir=""; fi
+    target="$host:$path$dst"
+    echo scp -r "$target" "$src"
+    scp -r "${target// /\ }" "$src"
+done
+
+
+: <<'=cut'
+
+=encoding utf8
+
+=head1 NAME
+
+narada-download - use scp to download project files from remote host
+
+
+=head1 VERSION
+
+This document describes narada-download version v2.3.7
+
+
+=head1 USAGE
+
+    narada-download relative/path/file …
+
+
+=head1 DESCRIPTION
+
+Should be executed in project deploy directory (or Narada 1.x project root
+directory).
+
+Before using set C<config/remote> to remote address in ssh format:
+
+    [user@]host:[path/to/dir/]
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+config/remote
+
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/powerman/Narada/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software. The code repository is available for
+public review and contribution under the terms of the license.
+Feel free to fork the repository and submit pull requests.
+
+L<https://github.com/powerman/Narada>
+
+    git clone https://github.com/powerman/Narada.git
+
+=head2 Resources
+
+=over
+
+=item * MetaCPAN Search
+
+L<https://metacpan.org/search?q=Narada>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/dist/Narada>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Narada>
+
+=item * CPAN Testers Matrix
+
+L<http://matrix.cpantesters.org/?dist=Narada>
+
+=item * CPANTS: A CPAN Testing Service (Kwalitee)
+
+L<http://cpants.cpanauthors.org/dist/Narada>
+
+=back
+
+
+=head1 AUTHOR
+
+Alex Efros E<lt>powerman@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2008- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+
+=cut

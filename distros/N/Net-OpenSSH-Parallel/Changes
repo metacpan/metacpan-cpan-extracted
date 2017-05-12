@@ -1,0 +1,60 @@
+Revision history for Perl extension Net::OpenSSH::Parallel.
+
+0.14  Dec 4, 2015
+      - add support for "connect" action
+      - add git repository as metadata (patch by David Steinbrunner)
+      - fix lots of spelling errors
+      - depend on latest Net::OpenSSH 0.60. 'batch_mode' was being
+        used but not available from the version of Net::OpenSSH that
+        was being requested (bug report by Alexey Baikov)
+
+0.12  May 4, 2012
+      - ignoring errors was broken
+      - enable batch mode by default on the slave Net::OpenSSH objects
+      - allow to set reconnections option per task
+      - add reboot.pl and parallel_passwd.pl samples
+      - document how to run remote commands via sudo
+      - minor documentation improvements and corrections
+
+0.11  May 9, 2011
+      - new or_goto feature
+      - new actions here, goto, stop
+      - new get_errors method
+      - new all method
+      - pointer to OpenSSH donations page, use it!!!
+
+0.10  Jan 13, 2011
+      - *** parsub backward incompatible API changes ***
+      - improved parsub support
+
+0.09  Jan 12, 2011
+      - add support for parsub action
+      - solve bugs on sub action
+      - remove early release note from docs
+
+0.08  Oct 26, 2010
+      - add support for rsync operations
+
+0.07  Jul 23, 2010
+      - document join operation
+      - some minor bugs corrected on push method
+
+0.06 Feb 19, 2010
+      - CPAN upload for 0.05 failed leaving the package unavailable.
+
+0.05 Feb 19, 2010
+      - command option passing to Net::OpenSSH was broken (bug report
+        by Sawyer X).
+      - copyright years updated
+      - add pointer to my wishlist :-)
+
+0.03  Oct 18, 2009
+      - add Constants.pm file to MANIFEST
+
+0.02  Oct 18, 2009
+      - initial CPAN release
+
+0.01  Wed Sep 16 08:50:43 2009
+      - original version; created by h2xs 1.23 with options
+		-AXn Net::OpenSSH::Parallel
+

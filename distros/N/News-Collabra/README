@@ -1,0 +1,66 @@
+News::Collabra - Administrate an iPlanet Collabra news server
+
+COPYRIGHT:
+    Copyright (c) 1999-2002 Nathan Bailey.  All rights reserved.
+ 
+LICENSE:
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation; either version 1, or (at
+    your option) any later version.
+
+LIMITATIONS:
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+*******************************************************************************
+STATUS:
+    This code should be considered very much as work-in-progress.  Any
+    part of this release could be subject to change.  'Modules list'
+    status is as follows:
+Name           DSLIP  Description                                  Info
+-------------  -----  -------------------------------------------- -----
+News::Collabra bdpOg  iPlanet Collabra administrative functions    NATE
+
+INSTALLATION:
+    News::Collabra uses the following modules/distributions.
+
+	LWP::UserAgent	 - required, for communication with the admin server
+	URI::Escape      - required, needed for URL encoding
+	IO::Socket       - required, needed for server status
+	News::NNTPClient - optional, needed for deleting articles in a ng
+
+    First ensure the above modules/distributions are installed (perhaps
+    by using a command such as 'perl -e "use LWP::UserAgent; use \
+    IO::Socket; use URI::Escape; use News::NNTPClient;"') then
+    build/test/install News::Collabra by doing:
+
+*******************************************************************************
+*** NOTE!!! This isn't done yet.  Will be done for the next version.
+*******************************************************************************
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+    This module contains documentation on the object and its methods.
+    Once installed you can use the 'perldoc News::Collabra' command to
+    obtain the documentation.  This package also includes several
+    test scripts with example code.
+
+*******************************************************************************
+COMPATIBILITY:
+    This module was developed on Solaris 2.6 with Collabra 3.52.
+
+TODO:
+    Make a makefile [Done]
+    Complete refactoring of communications code [Done]
+    Complete migration of communications code from sockets to lwp agents [Done]
+    Better support for ACL creation, modification and removal [80% there]
+    Improved return values
+    Improved robustness (handling unexpected input/output)
+
+BUGS:
+    Bug reports can be sent to the author via his CPAN address.

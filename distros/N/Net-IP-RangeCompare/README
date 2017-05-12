@@ -1,0 +1,35 @@
+Net-IP-RangeCompare
+===============================
+
+Fast Scalable ip range aggregation and summary tool kit.
+
+Similar in functionality to Net::Netmask and NetAddr::IP, 
+Net::IP::RangeCompare is a completely range driven ip management and 
+evaluation tool, allowing more flexabilty and scalability when 
+dealing with the some what organic nature of IP-Ranges.
+
+If you have a large number of ipv4 ranges and need to inventory lists 
+of ranges for overlaps, this is the Module for you!
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+     Data::Range::Compare >=     1.022
+     Data::IPV4::Range::Parse >= .03
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Michael Shipper
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+

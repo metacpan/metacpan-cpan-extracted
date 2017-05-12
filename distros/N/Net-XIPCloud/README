@@ -1,0 +1,133 @@
+NAME
+    Net::XIPCloud - Perl extension for interacting with Internap's XIPCloud
+    storage platform
+
+SYNOPSIS
+    use Net::XIPCloud;
+
+    my $xip = Net::XIPCloud->new( username => 'myusername', password =>
+    'mypassword );
+
+    $xip->connect();
+
+    $xip->cp("fromcontainer","fromobject","tocontainer","toobject");
+
+    $xip->mv("fromcontainer","fromobject","tocontainer","toobject");
+
+    $xip->file("somecontainer","someobject");
+
+    $xip->file("somecontainer/some/pseudo/path/to/object");
+
+    $xip->ls();
+
+    $xip->ls("mycontainer");
+
+    $xip->ls("mycontainer/some/pseudo/path/");
+
+    $xip->mkdir("newcontainer");
+
+    $xip->mkdir("newcontainer/some/pseudo/path/");
+
+    $xip->rmdir("somecontainer");
+
+    $xip->du();
+
+    $xip->du("somecontainer");
+
+    my $data = $xip->get_value("somecontainer","someobject");
+
+    $xip->get_file("somecontainer","someobject","/tmp/someobject");
+
+    $xip->put_value("somecontainer","someobject",$data,"text/html");
+
+    $xip->put_file("somecontainer","someobject","/tmp/someobject","text/html
+    ");
+
+    $xip->get_fhstream("somecontainer","someobject",*STDOUT);
+
+    $xip->rm("somecontainer","someobject");
+
+    $xip->create_manifest("somecontainer","someobject");
+
+DESCRIPTION
+    This perl module creates an XIPCloud object, which allows direct
+    manipulation of objects and containers within Internap's XIPCloud
+    storage.
+
+    A valid XIPCloud account is required to use this module
+
+  new( username => 'username', password => 'password');
+    Returns a reference to a new XIPCloud object. This method requires
+    passing of a valid username and password.
+
+  connect()
+    Connects to XIPCloud using the username and password provids in the
+    new() call.
+
+    Method returns 1 for success and undef for failure.
+
+  ls([CONTAINER])
+    Depending on the calling arguments, this method returns the list of
+    containers or list of objects within a single container as an array
+    reference.
+
+    Limit and marker values may be provided (see API documentation) for
+    pagination.
+
+  file("somecontainer","someobject")
+    This call returns metadata about a specific object.
+
+  cp("fromcontainer","fromobject",'tocontainer","toobject");
+    Copy the contents of one object to another
+
+  mv("fromcontainer","fromobject",'tocontainer","toobject");
+    Rename an object, clobbering any existing object
+
+  mkdir("somecontainer")
+    This method creates a new container. It returns 1 for success and undef
+    for failure.
+
+  rmdir("somecontainer")
+    This method removes a container and its contents. It returns 1 for
+    success and undef for failure.
+
+  du([CONTAINER])
+    Depending on calling arguments, this method returns account or
+    container-level statistics as a hash reference.
+
+  get_value("somecontainer","someobject")
+    This method returns a scalar value, containing the body of the requested
+    object.
+
+  put_value("somecontainer","someobject","..data..","text/html")
+    This method places the contents of a passed scalar into the specified
+    container and object.
+
+    Content-type may be specified, but is optional. It defaults to
+    "text/plain"
+
+  get_file("somecontainer","someobject","/tmp/destfile")
+    This method places the contents of the requested object in a target
+    location of the filesystem.
+
+  put_file("somecontainer","someobject","/tmp/sourcefile","text/html")
+    This method places the contents of a specified source file into an
+    object.
+
+  get_fhstream("somecontainer","someobject",*FILE)
+    This method takes a container, object and open file handle as arguments.
+    It retrieves the object in chunks, which it writes to *FILE as they are
+    received.
+
+  rm("somecontainer","someobject")
+    This method removes an object.
+
+  create_manifest("somecontainer","someobject")
+    This method creates a manifest for large-object support
+
+AUTHOR
+    Dennis Opacki, dopacki@internap.com
+
+SEE ALSO
+    perl(1).
+

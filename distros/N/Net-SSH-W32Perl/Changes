@@ -1,0 +1,24 @@
+Revision history for Perl extension Net::SSH::W32Perl.
+
+0.05  Thu Apr 18 09:16:00 am
+	- Updated installation procedures in README to 
+	  mention the ppds available at soulcage.net
+
+0.04  Fri Apr 12 14:02:00 2002
+	- Removed PC Line-Endings for CPAN
+
+0.03  Tue Oct  9 09:00:00 2001
+	- Implemented override of Net::SSH::Perl's new
+	  protocol_class()
+	- SSH2 is now the default
+	
+0.02  Fri Oct  5 09:51:01 2001
+	- Removed duplicated Net::SSH::Perl code 
+	- Implemented override of Net::SSH::Perl's new 
+	  select_class() - thanks Ben!
+	- IS_WIN32 is now calculated at compile time
+
+0.01  Mon Oct  1 11:26:01 2001
+	- original version; created by h2xs 1.21 with options
+		-AX -n Net::SSH::W32Perl
+

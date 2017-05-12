@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<xsd:schema targetNamespace="http://www.dhl.com" xmlns:dhl="http://www.dhl.com/datatypes_global" xmlns="http://www.dhl.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified">
+<xsd:import namespace="http://www.dhl.com/datatypes_global" schemaLocation="./xsd/datatypes_global.xsd"/>
+	<xsd:element name="RouteRequest">
+		<xsd:annotation>
+			<xsd:documentation>Root element of Routing (Origin/Destination) request</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Request" type="dhl:Request"/>
+				<xsd:element name="RegionCode" type="dhl:RegionCode" />
+				<xsd:element name="RequestType">
+				    <xsd:annotation>
+			            <xsd:documentation>Defines the type of routing to be done (O: Origin D: Destination)</xsd:documentation>
+		            </xsd:annotation>
+		            <xsd:simpleType>
+		            <xsd:restriction base="xsd:string">
+		                <xsd:length value="1"/>
+			            <xsd:enumeration value="O"/>
+			            <xsd:enumeration value="D"/>
+		            </xsd:restriction>
+		            </xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="Address1" type="dhl:AddressLine" minOccurs="0"/>
+				<xsd:element name="Address2" type="dhl:AddressLine" minOccurs="0"/>
+				<xsd:element name="Address3" type="dhl:AddressLine" minOccurs="0"/>
+				<xsd:element name="PostalCode" type="dhl:PostalCode" minOccurs="0"/>
+				<xsd:element name="City" type="dhl:City"/>
+				<xsd:element name="Division" type="dhl:Division" minOccurs="0"/>
+				<xsd:element name="CountryCode" type="dhl:CountryCode"/>
+				<xsd:element name="CountryName" type="dhl:CountryName"/>
+				<xsd:element name="OriginCountryCode" type="dhl:CountryCode"/>
+				
+			</xsd:sequence>
+			<xsd:attribute name="schemaVersion" type="xsd:decimal" use="required" fixed="1.0"/>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

@@ -1,0 +1,104 @@
+{
+   "abstract" : "Object Orientated Dynamic DNS Interface to CloudFlare DNS",
+   "author" : [
+      "Peter Roberts <me+dev@peter-r.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-DNS-CloudFlare-DDNS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::CleanNamespaces" : "0.15",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Synopsis" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "CloudFlare::Client" : "0",
+            "List::Util" : "0",
+            "Modern::Perl" : "0",
+            "Moose" : "0",
+            "MooseX::StrictConstructor" : "0",
+            "Readonly" : "0",
+            "TryCatch" : "0",
+            "Type::Library" : "0",
+            "Type::Utils" : "0.039_12",
+            "Types::Standard" : "0",
+            "autodie" : "0",
+            "indirect" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.008",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "IPC::System::Simple" : "0",
+            "Test::CPAN::Meta::JSON" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Try::Tiny" : "0",
+            "blib" : "1.01",
+            "perl" : "5.008",
+            "strict" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::DNS::CloudFlare::DDNS" : {
+         "file" : "lib/Net/DNS/CloudFlare/DDNS.pm",
+         "version" : "v0.63.1"
+      },
+      "Net::DNS::CloudFlare::DDNS::Types" : {
+         "file" : "lib/Net/DNS/CloudFlare/DDNS/Types.pm",
+         "version" : "v0.63.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pwr22/Net-DNS-CloudFlare-DDNS/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Net::DNS::CloudFlare::DDNS",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pwr22/Net-DNS-CloudFlare-DDNS.git",
+         "web" : "https://github.com/pwr22/Net-DNS-CloudFlare-DDNS"
+      }
+   },
+   "version" : "v0.63.1",
+   "x_contributors" : [
+      "Peter Roberts <me@peter-r.co.uk>"
+   ]
+}
+

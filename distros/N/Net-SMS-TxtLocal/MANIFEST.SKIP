@@ -1,0 +1,9 @@
+t/set_env.bash
+.git
+.gitignore
+^blib
+^Makefile$
+^pm_to_blib
+.bak$
+~$
+.old$

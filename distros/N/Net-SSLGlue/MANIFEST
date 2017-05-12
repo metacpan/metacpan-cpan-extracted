@@ -1,0 +1,26 @@
+Changes
+COPYRIGHT
+examples/ftps-direct.pl
+examples/ftps-starttls.pl
+examples/ftps-tests.pl
+examples/lwp.pl
+examples/lwp_post.pl
+examples/send-ssl-mail.pl
+examples/send-starttls-mail.pl
+lib/Net/SSLGlue.pm
+lib/Net/SSLGlue/FTP.pm
+lib/Net/SSLGlue/LDAP.pm
+lib/Net/SSLGlue/LWP.pm
+lib/Net/SSLGlue/POP3.pm
+lib/Net/SSLGlue/SMTP.pm
+lib/Net/SSLGlue/Socket.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01_load.t
+t/external/02_smtp.t
+t/external/03_lwp.t
+t/external/04_pop3.t
+t/external/05_ftp.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,7 @@
+- document 'Invalid Boolean' error
+- normalize $state_requested
+- test cases
+    - basic getters/setters
+    - mock connection
+- include every method in POD SYNOPSIS
+

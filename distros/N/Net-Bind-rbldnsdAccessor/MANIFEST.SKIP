@@ -1,0 +1,15 @@
+librbldnsdaccessor.a
+rbldnsdaccessor.h
+rbldnsdAccessor.c
+^Net-Bind-rbldnsdAccessor
+pm_to_blib
+.sources
+^rbldnsd/
+~$
+^blib
+Makefile$
+Makefile.old
+\.o$
+\.bs$
+\.tmp$
+tmp/

@@ -1,0 +1,52 @@
+{
+   "abstract" : "Verify BrowserID assertions.",
+   "author" : [
+      "Andrew Chilton <andychilton@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300005, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-BrowserID-Verify",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "HTTP::Request::Common" : "0",
+            "JSON::Any" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "Mouse" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/chilts/Net-BrowserID-Verify",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/chilts/Net-BrowserID-Verify.git",
+         "web" : "https://github.com/chilts/Net-BrowserID-Verify"
+      }
+   },
+   "version" : "0.003"
+}
+

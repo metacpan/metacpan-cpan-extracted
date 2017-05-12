@@ -1,0 +1,9 @@
+{: NES 1.0 none :}
+<html>
+  <head>
+    <title>Template</title>
+  </head>
+  <body>
+    The lucky number is: <b>{: include ('lucky.nhtml',10,20 ) :}</b>
+  </body>
+</html>

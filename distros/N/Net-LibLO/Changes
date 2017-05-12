@@ -1,0 +1,27 @@
+Revision history for liblo perl bindings
+
+0.06  Fri Mar  9 20:57:01 GMT 2007
+	Added POD documentation test
+
+0.05  Fri May 19 16:56:01 BST 2006
+	Better checking for pkg-config / LibLO
+
+0.04  Fri Apr 21 22:54:49 BST 2006
+	Added Makefile.PL
+
+0.03  Fri Dec 16 00:36:41 GMT 2005
+	Changed namespace to Net::LibLO
+	Merged client and server into single parent object.
+	Added Bundle and Address classes
+
+0.02  Tue Jun 30 16:43:56 BST 2005
+	Unreleased
+	Added LibLO::Server
+
+0.01  Tue Jun 21 12:18:04 BST 2005
+	First release
+
+0.02 Tue Jun 28 14:55:03 BST 2005
+	Documentation and build changes
+
+	

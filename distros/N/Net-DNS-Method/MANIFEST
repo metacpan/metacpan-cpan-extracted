@@ -1,0 +1,16 @@
+TODO
+README
+MANIFEST
+Makefile.PL
+t/b-hash.t
+t/b-pool.t
+t/b-const.t
+t/b-regex.t
+t/b-status.t
+t/00-load.t
+lib/Net/DNS/Method.pm
+lib/Net/DNS/Method/Hash.pm
+lib/Net/DNS/Method/Pool.pm
+lib/Net/DNS/Method/Regexp.pm
+lib/Net/DNS/Method/Status.pm
+lib/Net/DNS/Method/Constant.pm

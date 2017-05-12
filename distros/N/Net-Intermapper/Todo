@@ -1,0 +1,7 @@
+TODO list for Perl module Net::Intermapper
+
+- Filtering should be added (match= keyword in Intermapper documentation)
+- XML input and output needs to be completed!
+- $ERROR variable needs to actually contain error message!
+
+

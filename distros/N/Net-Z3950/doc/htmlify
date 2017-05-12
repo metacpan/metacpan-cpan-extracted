@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# HTMLify -- trivial wrapper to pod2html making output acceptable.
+# $Header: /home/cvsroot/NetZ3950/doc/htmlify,v 1.1 2001/10/12 15:17:51 mike Exp $
+
+pod2html ${@+"$@"} |
+	sed 's@^</HEAD>$@<LINK rel="stylesheet" type="text/css" href="style.css">&@; s/<HR>//'

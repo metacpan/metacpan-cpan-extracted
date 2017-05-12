@@ -1,0 +1,1192 @@
+#!/usr/bin/perl -w
+use strict;
+use Data::Dumper;
+use XML::XPath;
+use XML::XPath::XMLParser;
+use Storable qw(nfreeze thaw);
+use IO::Compress::Bzip2 qw(bzip2 $Bzip2Error);
+use IO::Uncompress::Bunzip2 qw(bunzip2 $Bunzip2Error);
+use Carp;
+
+use Getopt::Long;
+
+my $decimal_re = qr/^\d+$/;
+
+my ( $nvd, $store, $cwe );
+
+my %done             = ();
+my %category_handler = ();
+
+my %rating = (
+    'Very High'         => 1,
+    'High to Very High' => 2,
+    'High'              => 3,
+    'Medium to High'    => 4,
+    'Medium'            => 5,
+    'Low to Medium'     => 6,
+    'Low'               => 7,
+    'Very Low'          => 8,
+);
+
+my $result = GetOptions(
+    "nvd=s"   => \$nvd,
+    "cwe=s"   => \$cwe,
+    "store=s" => \$store,
+);
+
+use NIST::NVD::Update;
+
+$nvd ||= 'nvdcve-2.0-recent.xml';
+
+$store ||= 'DB_File';
+
+print STDERR "using store [$store]\n";
+
+my $db_file = 'nvdcve-2.0.db';
+
+my $NVD_Updater = NIST::NVD::Update->new(
+    store    => $store,
+    database => $db_file,
+);
+
+my %important_fields;
+
+$important_fields{$_}++ foreach $NVD_Updater->{store}->_important_fields();
+
+my $cwe_ids = $NVD_Updater->get_cwe_ids();
+
+my %vuln_software;
+my %weaknesses;
+
+my %close_regex = (
+    Views             => qr:</Views>:,
+    Categories        => qr:</Categories>:,
+    Weaknesses        => qr:</Weaknesses>:,
+    Compound_Elements => qr:</Compound_Elements>:,
+);
+my %open_regex = (
+    Views             => qr:<Views>:,
+    Categories        => qr:<Categories>:,
+    Weaknesses        => qr:<Weaknesses>:,
+    Compound_Elements => qr:<Compound_Elements>:,
+);
+
+$|++;
+
+print("reading NVDs from file: $nvd...");
+
+my $nvd_entries = process_nvd_file($nvd);
+
+print "Done.\n";
+
+printf( "read \%i nvd entries\n", int keys $nvd_entries );
+
+print "Writing CPE URNs to disk...";
+
+$NVD_Updater->put_cpe( [ keys %vuln_software ] );
+
+print "Done.\n";
+
+print "Writing NVD entries to disk...";
+
+$NVD_Updater->put_nvd_entries($nvd_entries);
+
+print " Done.\n";
+
+my $cwe_data;
+
+if( -f $cwe ){
+	print "Processing CWE file...";
+
+	$cwe_data = process_cwe_file($cwe);
+
+	print "\nDone processing CWE file.\n";
+
+
+	printf( "read \%i cwe Categories\n", int keys $cwe_data->{Category} );
+	printf( "read \%i cwe Weaknesses\n", int keys $cwe_data->{Weakness} );
+	printf( "read \%i cwe Views\n",      int keys $cwe_data->{View} );
+
+}
+
+print "Writing CPE index to disk...";
+
+$NVD_Updater->put_cve_idx_cpe( \%vuln_software );
+
+print "Done.\n";
+
+if( -f $cwe ){
+
+	print "Writing CWE data to disk...";
+
+	$NVD_Updater->put_cwe_data($cwe_data);
+
+	print " Done.\n";
+
+	print "Writing CWE index to disk...";
+
+	$NVD_Updater->put_cwe_idx_cve($nvd_entries);
+	$NVD_Updater->put_cwe_idx_cpe( \%weaknesses );
+
+	print "Done.\n";
+
+	print "Writing websec index to disk...";
+
+	$NVD_Updater->update_websec_idx_cpe( \%weaknesses );
+
+	print "Done\n";
+}
+
+sub process_nvd_file {
+
+    my ($filename) = @_;
+
+    my $NVD_Entry_HASH = {};
+
+    my $content;
+
+    my $header;
+    my $entry_body;
+    my $footer = '</nvd>';
+
+    my $nvdcve_fd;
+
+    open( $nvdcve_fd, q{<}, $filename )
+        or die qq{couldn't open "$filename": $!};
+
+    my $entry_count = 0;
+
+    while ( my $line = <$nvdcve_fd> ) {
+
+        if ( $line =~ /(^.*?)<entry/ ) {
+            my $tail = $1;
+            $content .= $tail;
+
+            if ($header) {
+                $entry_body = $content;
+                my $xml_string = $header . $entry_body . $footer;
+                print '.' if ++$entry_count % 100 == 0;
+                my %entry = process_nvd($xml_string);
+
+                while ( my ( $cve_id, $entry ) = each %entry ) {
+                    $NVD_Entry_HASH->{$cve_id} = $entry;
+                }
+
+            } else {
+                $header = $content;
+            }
+
+            $line =~ s/^$tail//;
+            $content = $line;
+
+        } else {
+            $content .= $line;
+        }
+    }
+
+    return $NVD_Entry_HASH;
+
+}
+
+sub process_nvd {
+    my ($xml) = @_;
+
+    my $xp = XML::XPath->new( xml => $xml );
+
+    my $nodeset = $xp->find('/nvd');
+
+    my @nvd_nodelist
+        = grep { $_->getName && $_->getName eq 'nvd' } $nodeset->get_nodelist;
+
+    my %entry = ();
+
+    foreach my $nvd (@nvd_nodelist) {
+        my @entry_nodelist = grep { $_->getName && $_->getName eq 'entry' }
+            $nvd->getChildNodes();
+
+        foreach my $entry_node (@entry_nodelist) {
+            my $entry = process_entry( $entry_node, $nvd );
+
+            my $cve_id = $entry->{'vuln:cve-id'};
+
+            foreach
+                my $cpe_urn ( @{ $entry->{'vuln:vulnerable-software-list'} } )
+            {
+                push( @{ $vuln_software{$cpe_urn} }, $cve_id );
+
+                foreach my $cwe_id ( @{ $entry->{'vuln:cwe'} } ) {
+                    next unless $cwe_id;
+                    push( @{ $weaknesses{$cpe_urn} }, $cwe_id );
+                }
+            }
+
+            $entry{$cve_id} = $entry;
+        }
+    }
+
+    return (%entry);
+
+    #$xp->dispose();
+}
+
+sub process_entry {
+    my ( $entry, $nvd ) = @_;
+
+    my $results = {};
+
+    foreach my $vuln ( $entry->getChildNodes() ) {
+        next unless $vuln->getName();
+
+        my $nodeName = $vuln->getName();
+
+        # skip the dull bits
+        next unless exists $important_fields{$nodeName};
+
+        if ( $nodeName eq 'vuln:vulnerable-configuration' ) {
+            push( @{ $results->{$nodeName} }, process_vuln_config($vuln) );
+        } elsif ( $nodeName eq 'vuln:vulnerable-software-list' ) {
+            $results->{$nodeName} = process_vuln_software_list($vuln);
+        } elsif ( $nodeName eq 'vuln:cve-id' ) {
+            $results->{$nodeName} = $vuln->string_value();
+        } elsif ( $nodeName eq 'vuln:discovered-datetime' ) {
+            $results->{$nodeName} = $vuln->string_value();
+        } elsif ( $nodeName eq 'vuln:published-datetime' ) {
+            $results->{$nodeName} = $vuln->string_value();
+        } elsif ( $nodeName eq 'vuln:last-modified-datetime' ) {
+            $results->{$nodeName} = $vuln->string_value();
+        } elsif ( $nodeName eq 'vuln:cvss' ) {
+            $results->{$nodeName} = process_vuln_cvss($vuln);
+        } elsif ( $nodeName eq 'vuln:cwe' ) {
+            my $cwe_id = $vuln->getAttribute('id');
+            push( @{ $results->{$nodeName} }, $cwe_id );
+        } elsif ( $nodeName eq 'vuln:references' ) {
+            push( @{ $results->{$nodeName} },
+                process_vuln_references($vuln) );
+        } elsif ( $nodeName eq 'vuln:summary' ) {
+            $results->{$nodeName} = $vuln->string_value();
+        } elsif ( $nodeName eq 'vuln:security-protection' ) {
+            $results->{$nodeName} = $vuln->string_value();
+        } elsif ( $nodeName eq 'vuln:assessment_check' ) {
+            push(
+                @{ $results->{$nodeName} },
+                {   map { $_->getName() => $_->getNodeValue() }
+                        ( $vuln->getAttributes() )
+                }
+            );
+        } elsif ( $nodeName eq 'vuln:scanner' ) {
+            push( @{ $results->{$nodeName} }, process_vuln_scanner($vuln) );
+        } else {
+            print(    "}elsif( \$vuln->getName() eq '"
+                    . $vuln->getName
+                    . "' ){\n" );
+            exit;
+        }
+    }
+
+    return $results;
+}
+
+sub process_vuln_config {
+    my ($vuln) = @_;
+
+    my $results = {};
+
+    foreach my $node ( $vuln->getChildNodes() ) {
+        next unless $node->getName();
+        my $nodeName = $node->getName();
+
+        die "\n}elsif( \$nodeName eq '$nodeName' ){\n"
+            unless ( $nodeName eq 'cpe-lang:logical-test' );
+
+        push( @{ $results->{$nodeName} }, process_cpe_logical_test($node) );
+    }
+
+    return $results;
+}
+
+sub process_cpe_logical_test {
+    my ($logical_test) = @_;
+    my $logTestName = $logical_test->getName();
+
+    my $results = {};
+
+    foreach my $attr ( $logical_test->getAttributes() ) {
+        $results->{attr}->{ $attr->getName() } = $attr->getNodeValue();
+    }
+
+    foreach my $node ( $logical_test->getChildNodes() ) {
+        my $nodeName = $node->getName();
+        next unless $nodeName;
+
+        if ( $nodeName eq 'cpe-lang:fact-ref' ) {
+            push( @{ $results->{$nodeName} }, $node->getAttribute('name') );
+        } elsif ( $nodeName eq 'cpe-lang:logical-test' ) {
+            push(
+                @{ $results->{$nodeName} },
+                process_cpe_logical_test($node)
+            );
+        } else {
+            die
+                "this logical test element looks invalid.  This element is a(n) [$nodeName]";
+        }
+    }
+
+    return $results;
+}
+
+sub process_vuln_software_list {
+    my ($vuln) = @_;
+    my $vulnName = $vuln->getName();
+
+    my $results = [];
+
+    foreach my $node ( $vuln->getChildNodes() ) {
+        my $nodeName = $node->getName();
+        next unless $nodeName;
+
+        die qq[\n}elsif( \$nodeName eq '$nodeName' ){]
+            unless $nodeName eq 'vuln:product';
+
+        push( @$results, $node->string_value() );
+    }
+
+    return $results;
+}
+
+sub process_vuln_cvss {
+    my ($vuln) = @_;
+
+    my $vulnName = $vuln->getName();
+
+    my $results = {};
+
+    foreach my $attr ( $vuln->getAttribute() ) {
+        next unless $attr;
+        $results->{attr}->{ $attr->getName() } = $attr->getNodeValue();
+    }
+
+    foreach my $node ( $vuln->getChildNodes() ) {
+        my $nodeName = $node->getName();
+        next unless $nodeName;
+
+        if ( $nodeName eq 'cvss:base_metrics' ) {
+            $results->{$nodeName} = {};
+            foreach my $metric ( $node->getChildNodes() ) {
+                my $metricName = $metric->getName();
+                next unless $metricName;
+
+                $results->{$nodeName}->{$metricName}
+                    = $metric->string_value();
+            }
+        } else {
+            die qq[\n}elsif( \$nodeName eq '$nodeName' ){];
+        }
+
+    }
+
+    return $results;
+}
+
+sub process_vuln_references {
+    my ($vuln) = @_;
+
+    my $vulnName = $vuln->getName();
+
+    my $results = {};
+
+    foreach my $attr ( $vuln->getAttributes() ) {
+        next unless $attr;
+        $results->{attr}->{ $attr->getName() } = $attr->getNodeValue();
+    }
+
+    foreach my $node ( $vuln->getChildNodes() ) {
+        my $nodeName = $node->getName();
+        next unless $nodeName;
+
+        if ( $nodeName eq 'vuln:reference' ) {
+            push( @{ $results->{$nodeName} },
+                process_vuln_references($node) );
+        } elsif ( $nodeName eq 'vuln:source' ) {
+            $results->{$nodeName} = $node->string_value();
+        } else {
+            die qq[}elsif( \$nodeName eq '$nodeName' ){];
+        }
+    }
+
+    return $results;
+}
+
+sub process_vuln_scanner {
+    my ($vuln) = @_;
+
+    my $vulnName = $vuln->getName();
+
+    my $results = {};
+
+    foreach my $node ( $vuln->getChildNodes() ) {
+        my $nodeName = $node->getName();
+        next unless $nodeName;
+
+        if ( $nodeName eq 'vuln:definition' ) {
+            foreach my $attr ( $node->getAttributes() ) {
+                next unless $attr;
+                $results->{$nodeName}->{ $attr->getName() }
+                    = $attr->getNodeValue();
+            }
+        } else {
+            die qq[}elsif( \$nodeName eq '$nodeName' ){];
+        }
+    }
+
+    return $results;
+}
+
+sub process_cwe_file {
+
+    my ($filename) = @_;
+
+    my $CWE_Entry_HASH = {};
+
+    my $iter = 0;
+
+    my $element_body;
+
+    my $cwe_fd;
+
+    open( $cwe_fd, q{<}, $filename )
+        or die qq{couldn't open "$filename": $!};
+
+    my $content;
+    {
+        open( $cwe_fd, q{<}, $filename )
+            or die qq{couldn't open "$filename": $!};
+        my $oldslash = $/;
+        local undef $/;
+        $content = <$cwe_fd>;
+        $/       = $oldslash;
+    };
+
+    my ($header) = ( $content =~ /^(.*?<Weakness_Catalog[^>]+>)/msg );
+    my $footer = '</Weakness_Catalog>';
+
+    $content = "";
+
+    open( $cwe_fd, q{<}, $filename )
+        or die qq{couldn't open "$filename": $!};
+
+    my $current_element;
+    my $function;
+
+    my %parent_element = (
+        View             => 'Views',
+        Category         => 'Categories',
+        Weakness         => 'Weaknesses',
+        Compound_Element => 'Compound_Elements',
+    );
+
+    my $weakness_count = 0;
+
+    while ( my $line = <$cwe_fd> ) {
+        if (   $line =~ /(^.*?)<(View|Category|Weakness|Compound_Element)[> ]/
+            || $line =~ m:(^.*?)</Weakness_Catalog>:    # last entry
+            )
+        {
+            my $tail         = $1;
+            my $next_element = $2;
+            my $lcelement    = lc $next_element if $next_element;
+            my $funcname;
+            if ( !$current_element ) {
+                $current_element = $next_element;
+                $funcname        = "process_$lcelement";
+                print STDERR "\nfunction: [$funcname]\n";
+                $function = \&$funcname;
+                $line =~ s/^$tail//;
+                $content = $line;
+
+                next;
+            } elsif ( !$next_element ) {
+            } elsif ( $current_element ne $next_element ) {
+
+                my $cl_re = $close_regex{ $parent_element{$current_element} };
+                my $op_re = $open_regex{ $parent_element{$next_element} };
+
+                $content =~ s:$cl_re::;
+                $content =~ s:$op_re::;
+            }
+
+            $content .= $tail;
+
+            $element_body = $content;
+
+            my $xml_string
+                = (   "$header\n"
+                    . "<$parent_element{$current_element}>\n"
+                    . "$element_body\n"
+                    . "</$parent_element{$current_element}>\n"
+                    . "$footer\n" );
+
+            die $current_element
+                unless ( $current_element eq 'View'
+                || $current_element eq 'Category'
+                || $current_element eq 'Weakness'
+                || $current_element eq 'Compound_Element' );
+
+            print 'w'
+                if $current_element eq 'Weakness'
+                    && ++$weakness_count % 100 == 0;
+
+            my ( $id, $element ) = $function->($xml_string);
+
+            my $cwe_id;
+
+            if ( $id =~ $decimal_re ) {
+                $cwe_id = sprintf( 'CWE-%d', $id );
+            } elsif ( $id =~ /^CWE-\d+$/ ) {
+                $cwe_id = $id;
+            } elsif ( $id eq 'compound_id' ) {
+
+                # not yet implemented
+                next;
+            } else {
+                die "id [$id] is unrecognized";
+            }
+
+            $CWE_Entry_HASH->{$current_element}->{$cwe_id} = $element;
+
+            if ( exists( $cwe_ids->{$cwe_id} ) ) {
+
+                # TODO: Update
+            } else {
+                my $frozen = nfreeze($element);
+
+                $NVD_Updater->put_cwe(
+                    cwe_id        => $id,
+                    cwe_dump      => nfreeze($element),
+                    transactional => 1,
+                );
+
+            }
+
+            $iter++;
+
+            $line =~ s/^$tail//;
+            $content = $line;
+
+            if ( $next_element && $current_element ne $next_element ) {
+                $current_element = $next_element;
+                $funcname        = "process_$lcelement";
+                print STDERR "\nfunction: [$funcname]\n";
+
+                $function = \&$funcname;
+            }
+
+        } else {
+            $content .= $line;
+        }
+
+    }
+
+    $NVD_Updater->{store}->_commit('put_cwe_insert');
+
+    return $CWE_Entry_HASH;
+}
+
+sub process_weakness {
+    my ($weakness_xml) = @_;
+
+    my $results = {};
+
+    my $xp = eval { XML::XPath->new( xml => $weakness_xml ) };
+    croak "couldn't parse xml:\n" . $weakness_xml . "\n\n" . $@ if $@;
+
+    my $nodeset = $xp->find('/Weakness_Catalog/Weaknesses/Weakness');
+
+    my @weaknesses = $nodeset->get_nodelist();
+
+    die("multiple Weaknesses!  Help!") unless int(@weaknesses) == 1;
+
+    my $weakness = $weaknesses[0];
+
+    foreach my $attr ( $weakness->getAttributes() ) {
+        next unless $attr;
+
+        my $attrName  = $attr->getName();
+        my $attrValue = $attr->getNodeValue();
+
+        if ( lc $attrName eq 'id'
+            && $attrValue =~ /^\d+$/ )
+        {
+            $attrValue = sprintf( 'CWE-%d', $attrValue );
+        }
+
+        $results->{$attrName} = $attrValue;
+    }
+
+    foreach my $element ( $weakness->getChildNodes() ) {
+        my $nodeName = $element->getName();
+        next unless $nodeName;
+
+        $results->{$nodeName} = {};
+        my $data = $results->{$nodeName};
+
+        if ( $nodeName eq 'Description' ) {
+            foreach my $child ( $element->getChildNodes() ) {
+                my $_nodeName = $child->getName();
+                next unless $_nodeName;
+
+                if ( $_nodeName eq 'Description_Summary' ) {
+                    $data->{$_nodeName} = $child->string_value;
+                } elsif ( $_nodeName eq 'Extended_Description' ) {
+                    $data->{$_nodeName}
+                        = process_extended_description($child);
+                } else {
+                    die "no handler for Description child named [$_nodeName]";
+                }
+            }
+        } elsif ( $nodeName eq 'Relationships' ) {
+
+            #$data->{$nodeName} = process_relationships($element);
+        } elsif ( $nodeName eq 'Common_Consequences' ) {
+            $data->{$nodeName} = process_common_consequences($element);
+        } elsif ( $nodeName eq 'Weakness_Ordinalities' ) {
+        } elsif ( $nodeName eq 'Applicable_Platforms' ) {
+        } elsif ( $nodeName eq 'Time_of_Introduction' ) {
+        } elsif ( $nodeName eq 'Potential_Mitigations' ) {
+        } elsif ( $nodeName eq 'Causal_Nature' ) {
+        } elsif ( $nodeName eq 'Demonstrative_Examples' ) {
+        } elsif ( $nodeName eq 'Taxonomy_Mappings' ) {
+        } elsif ( $nodeName eq 'Content_History' ) {
+        } elsif ( $nodeName eq 'Relationship_Notes' ) {
+        } elsif ( $nodeName eq 'Maintenance_Notes' ) {
+        } elsif ( $nodeName eq 'Background_Details' ) {
+        } elsif ( $nodeName eq 'Other_Notes' ) {
+        } elsif ( $nodeName eq 'References' ) {
+        } elsif ( $nodeName eq 'Related_Attack_Patterns' ) {
+        } elsif ( $nodeName eq 'Observed_Examples' ) {
+        } elsif ( $nodeName eq 'Theoretical_Notes' ) {
+        } elsif ( $nodeName eq 'Affected_Resources' ) {
+        } elsif ( $nodeName eq 'Research_Gaps' ) {
+        } elsif ( $nodeName eq 'Alternate_Terms' ) {
+        } elsif ( $nodeName eq 'Terminology_Notes' ) {
+        } elsif ( $nodeName eq 'Likelihood_of_Exploit' ) {
+
+            my $likelihood = $element->string_value;
+            my $value;
+
+            print "likelihood value '$likelihood' not accounted for\n"
+                unless exists $rating{$likelihood};
+
+            $data->{$nodeName} = $rating{$likelihood};
+
+        } elsif ( $nodeName eq 'Detection_Methods' ) {
+        } elsif ( $nodeName eq 'Functional_Areas' ) {
+        } elsif ( $nodeName eq 'White_Box_Definitions' ) {
+        } elsif ( $nodeName eq 'Modes_of_Introduction' ) {
+        } elsif ( $nodeName eq 'Relevant_Properties' ) {
+        } elsif ( $nodeName eq 'Enabling_Factors_for_Exploitation' ) {
+        } else {
+            print "\n} elsif ( \$nodeName eq '$nodeName' ) {\n"
+                unless exists $done{$nodeName};
+
+            $done{$nodeName}++;
+
+        }
+    }
+
+    return ( $results->{ID} => $results );
+}
+
+sub process_extended_description {
+    my ($element) = @_;
+
+    my $results = [];
+
+    foreach my $child ( $element->getChildNodes() ) {
+        my $nodeName = $child->getName() or next;
+
+        if ( $nodeName eq 'Text' ) {
+            push( @$results, $child->string_value() );
+        } elsif ( $nodeName eq 'Block' ) {
+            my $block = [];
+            push( @$results, $block );
+            my $title = '';
+            foreach my $blockchild ( $child->getChildNodes() ) {
+                my $_nodeName = $blockchild->getName() or next;
+                if ( $_nodeName eq 'Text' ) {
+                    if ($title) {
+                        push(
+                            @$block,
+                            {   title => $title,
+                                text  => $blockchild->string_value()
+                            }
+                        );
+                        undef $title;
+                    } else {
+                        push( @$block, $blockchild->string_value() );
+                    }
+                } elsif ( $_nodeName eq 'Text_Title' ) {
+                    $title = $blockchild->string_value();
+                } else {
+                    die "no handler for block child named [$_nodeName]";
+                }
+            }
+        }
+    }
+}
+
+sub process_relationships {
+
+}
+
+sub process_common_consequences {
+    my ($element) = @_;
+
+    my $result = [];
+    foreach my $consequence ( $element->getChildNodes() ) {
+        my $con = {};
+        push( @$result, $con );
+        foreach my $child ( $consequence->getChildNodes() ) {
+            my $nodeName = $child->getName();
+            next unless $nodeName;
+            if ( $nodeName eq 'Consequence_Scope' ) {
+                push( @{ $con->{scope} }, $child->string_value() );
+            } elsif ( $nodeName eq 'Consequence_Technical_Impact' ) {
+                push( @{ $con->{technical_impact} }, $child->string_value() );
+            } elsif ( $nodeName eq 'Consequence_Note' ) {
+                foreach my $note ( $child->getChildNodes() ) {
+                    my $_nodeName = $note->getName();
+                    next unless $_nodeName;
+
+                    if ( $_nodeName eq 'Text' ) {
+                        push( @{ $con->{note} }, $note->string_value );
+                    } elsif ( $_nodeName eq 'Block' ) {
+                        my $block = {};
+
+                        foreach my $attr ( $note->getAttributes() ) {
+                            if ( $attr->getName() eq 'Block_Nature' ) {
+                                my $attrVal = $attr->getNodeValue();
+                                if ( $attrVal eq 'List' ) {
+                                    $block = [];
+                                    foreach my $txt ( $note->getChildNodes() )
+                                    {
+                                        my $nm = $txt->getName();
+                                        next unless $nm;
+                                        die
+                                            "element type [$nm] not accounted for"
+                                            unless $nm eq 'Text';
+                                        push( @$block, $txt->string_value() );
+                                    }
+                                } else {
+                                    print
+                                        "\n} elsif ( \$attrVal eq '$attrVal' ) {\n";
+                                }
+                            }
+                        }
+                        push( @{ $con->{note} }, $block );
+                    } else {
+                        print "\n} elsif ( \$_nodeName eq '$_nodeName' ) {\n"
+                            unless
+                            exists $done{"consequence note $_nodeName"};
+                        $done{"consequence note $_nodeName"}++;
+
+                    }
+                }
+            } else {
+                print "\n} elsif ( \$nodeName eq '$nodeName' ) {\n"
+                    unless exists $done{"consequences $nodeName"};
+
+                $done{"consequences $nodeName"}++;
+            }
+        }
+    }
+    return $result;
+}
+
+sub process_view {
+    my ($view_xml) = @_;
+
+    print "v";
+
+    my $results = {};
+
+    my $xp = eval { XML::XPath->new( xml => $view_xml ) };
+    croak "couldn't parse xml:\n" . $view_xml . "\n\n" . $@ if $@;
+
+    my $class = 'XML::XPath';
+
+    croak "XP is not a [$class]: " . Data::Dumper::Dumper($xp)
+        unless ref $xp eq $class;
+
+    my $nodeset = $xp->find('/Weakness_Catalog/Views/View');
+
+    my @view_nodelist = grep { $_->getName && $_->getName eq 'View' }
+        $nodeset->get_nodelist;
+
+    croak("there should be one and only one node") if int @view_nodelist != 1;
+
+    my $view = $view_nodelist[0];
+
+    foreach my $attr ( $view->getAttributes() ) {
+        next unless $attr;
+
+        my $attrName  = $attr->getName();
+        my $attrValue = $attr->getNodeValue();
+
+        if ( lc $attrName eq 'id'
+            && $attrValue =~ /^\d+$/ )
+        {
+            $attrValue = sprintf( 'CWE-%d', $attrValue );
+        }
+
+        $results->{$attrName} = $attrValue;
+    }
+
+    foreach my $element ( $view->getChildNodes() ) {
+        my $type = ref $element;
+
+        my $nodeName = $element->getName() if $element->can('getName');
+
+        my $str = $element->string_value();
+
+        if ( $type eq 'XML::XPath::Node::Text' ) {
+            next if $str =~ /^\s*$/;
+        } elsif ( $type eq 'XML::XPath::Node::Element' ) {
+        } else {
+            die "\n"
+                . "type: [$type]\n"
+                . "name: [$nodeName]" . "\n"
+                . "value: [$str]" . "\n";
+        }
+
+        if ( $nodeName eq 'View_Structure' ) {
+            $results->{$nodeName} = $element->string_value();
+        } elsif ( $nodeName eq 'View_Objective' ) {
+            my $text = $element->find('/Text');
+            foreach my $text_node ( $text->get_nodelist ) {
+                print "t";
+                push( @{ $results->{$nodeName} },
+                    $text_node->string_value() );
+            }
+
+        }
+    }
+
+    return ( $results->{ID} => $results );
+}
+
+sub process_category {
+    my ($category_xml) = @_;
+
+    my $results = {};
+
+    my $xp = eval { XML::XPath->new( xml => $category_xml ) };
+    croak "couldn't parse xml:\n" . $category_xml . "\n\n" . $@ if $@;
+
+    my $class = 'XML::XPath';
+
+    croak "XP is not a [$class]: " . Data::Dumper::Dumper($xp)
+        unless ref $xp eq $class;
+
+    my $nodeset = $xp->find('/Weakness_Catalog/Categories/Category');
+
+    my @category_nodelist = grep { $_->getName && $_->getName eq 'Category' }
+        $nodeset->get_nodelist;
+
+    croak("there should be one and only one node")
+        if int @category_nodelist != 1;
+
+    my $category = $category_nodelist[0];
+
+    foreach my $attr ( $category->getAttributes() ) {
+        next unless $attr;
+
+        my $attrName  = $attr->getName();
+        my $attrValue = $attr->getNodeValue();
+
+        if ( lc $attrName eq 'id'
+            && $attrValue =~ /^\d+$/ )
+        {
+            $attrValue = sprintf( 'CWE-%d', $attrValue );
+        }
+
+        $results->{$attrName} = $attrValue;
+    }
+
+    my $category_id = $results->{ID};
+
+    foreach my $element ( $category->getChildNodes() ) {
+
+        my $type     = ref $element;
+        my $nodeName = $element->getName() if $element->can('getName');
+        my $str      = $element->string_value();
+
+        if ( $type eq 'XML::XPath::Node::Text' ) {
+            next if $str =~ /^\s*$/;
+        } elsif ( $type eq 'XML::XPath::Node::Element' ) {
+        } else {
+            die "\n"
+                . "type: [$type]\n"
+                . "name: [$nodeName]" . "\n"
+                . "value: [$str]" . "\n";
+        }
+
+        if ( $nodeName eq 'Description' ) {
+            $results->{$nodeName} = process_category_description($element);
+            print "D";
+        } elsif ( $nodeName eq 'Likelihood_of_Exploit' ) {
+            if ( exists $rating{$str} ) {
+                $results->{$nodeName} = $rating{$str};
+            } else {
+                print "\n} elsif ( \$str eq '$str' ) {\n\n";
+            }
+            print "L";
+        } elsif ( $nodeName eq 'Time_of_Introduction' ) {
+
+            foreach my $int_node ( $element->getChildNodes ) {
+                my $int_type = ref $int_node;
+                my $int_name = undef;
+                my $int_str  = undef;
+
+                $int_str = $int_node->string_value()
+                    if $int_node->can('string_value');
+
+                $int_name = $int_node->getName()
+                    if $int_node->can('getName');
+
+                if ( $int_type eq 'XML::XPath::Node::Text' ) {
+                    next unless defined $int_str;
+                    next if $int_str =~ /^\s*$/;
+                    die $int_str;
+                } elsif ( $int_name eq 'Introductory_Phase' ) {
+                    push( @{ $results->{$nodeName} }, $int_str );
+                } elsif ($int_name) {
+                    print "\n} elsif ( \$int_name eq '$int_name' ) {\n\n";
+                }
+            }
+            print "T";
+        } elsif ( $nodeName eq 'Affected_Resources' ) {
+
+            foreach my $aff_node ( $element->getChildNodes ) {
+                my $aff_type = ref $aff_node;
+                my $aff_name = undef;
+                my $aff_str  = undef;
+
+                $aff_str = $aff_node->string_value()
+                    if $aff_node->can('string_value');
+
+                $aff_name = $aff_node->getName()
+                    if $aff_node->can('getName');
+
+                if ( $aff_type eq 'XML::XPath::Node::Text' ) {
+                    next unless defined $aff_str;
+                    next if $aff_str =~ /^\s*$/;
+                    die $aff_str;
+                } elsif ( $aff_name eq 'Affected_Resource' ) {
+                    if ( $aff_str eq 'File/Directory' ) {
+                        push( @{ $results->{$nodeName} }, $aff_str );
+                    } elsif ( $aff_str eq 'Memory' ) {
+                        push( @{ $results->{$nodeName} }, $aff_str );
+                    } elsif ( $aff_str eq 'System Process' ) {
+                        push( @{ $results->{$nodeName} }, $aff_str );
+                    } else {
+                        print "\n} elsif ( \$aff_str eq '$aff_str' ) {\n\n";
+                    }
+                } elsif ($aff_name) {
+                    print "\n} elsif ( \$aff_name eq '$aff_name' ) {\n\n";
+                }
+            }
+            print "A";
+
+        } elsif ( $nodeName eq 'Applicable_Platforms' ) {
+
+            foreach my $app_node ( $element->getChildNodes ) {
+                my $app_type = ref $app_node;
+                my $app_name = undef;
+                my $app_str  = undef;
+
+                $app_str = $app_node->string_value()
+                    if $app_node->can('string_value');
+
+                $app_name = $app_node->getName()
+                    if $app_node->can('getName');
+
+                if ( $app_type eq 'XML::XPath::Node::Text' ) {
+                    next unless defined $app_str;
+                    next if $app_str =~ /^\s*$/;
+                    die $app_str;
+                } elsif ( $app_name eq 'Languages' ) {
+
+                    my $language = {};
+                    push( @{ $results->{$app_name} }, $language );
+
+                    foreach my $lang_node ( $app_node->getChildNodes ) {
+                        my $lang_type = ref $lang_node;
+                        my $lang_name = undef;
+                        my $lang_str  = undef;
+
+                        $lang_str = $lang_node->string_value()
+                            if $lang_node->can('string_value');
+
+                        $lang_name = $lang_node->getName()
+                            if $lang_node->can('getName');
+
+                        if ( $lang_type eq 'XML::XPath::Node::Text' ) {
+                            next unless defined $lang_str;
+                            next if $lang_str =~ /^\s*$/;
+                            die $lang_str;
+
+                        } elsif ( $lang_name eq 'Language_Class'
+                            || $lang_name eq 'Language' )
+                        {
+                            foreach
+                                my $lang_attr ( $lang_node->getAttributes() )
+                            {
+                                next unless $lang_attr;
+                                $language->{$lang_name}
+                                    ->{ $lang_attr->getName() }
+                                    = $lang_attr->getNodeValue();
+                            }
+                        } else {
+                            print
+                                "\n} elsif ( \$lang_name eq '$lang_name' ) {\n\n"
+                                unless $category_handler{
+                                        "$nodeName $lang_name $lang_name"};
+                            $category_handler{
+                                "$nodeName $lang_name $lang_name"}++;
+                        }
+                    }
+
+                } elsif ( $app_name eq 'Operating_Systems' ) {
+                    my $os = {};
+                    push( @{ $results->{$app_name} }, $os );
+
+                    foreach my $os_node ( $app_node->getChildNodes ) {
+                        my $os_type = ref $os_node;
+                        my $os_name = undef;
+                        my $os_str  = undef;
+
+                        $os_str = $os_node->string_value()
+                            if $os_node->can('string_value');
+
+                        $os_name = $os_node->getName()
+                            if $os_node->can('getName');
+
+                        if ( $os_type eq 'XML::XPath::Node::Text' ) {
+                            next unless defined $os_str;
+                            next if $os_str =~ /^\s*$/;
+                            die $os_str;
+
+                        } elsif ( $os_name eq 'Operating_System_Class' ) {
+                            foreach my $os_attr ( $os_node->getAttributes() )
+                            {
+                                next
+                                    unless $os_attr;
+                                $os->{$os_name}->{ $os_attr->getName() }
+                                    = $os_attr->getNodeValue();
+                            }
+                        } else {
+                            print
+                                "\n} elsif ( \$os_name eq '$os_name' ) {\n\n"
+                                unless $category_handler{
+                                        "$nodeName $os_name $os_name"};
+                            $category_handler{
+                                "$nodeName $os_name $os_name"}++;
+                        }
+                    }
+                } elsif ($app_name) {
+                    print "\n} elsif ( \$app_name eq '$app_name' ) {\n\n";
+                }
+            }
+            print "P";
+
+        } elsif ( $nodeName eq 'Content_History' ) {
+        } elsif ( $nodeName eq 'Relationships' ) {
+        } elsif ( $nodeName eq 'Taxonomy_Mappings' ) {
+        } elsif ( $nodeName eq 'Related_Attack_Patterns' ) {
+        } elsif ( $nodeName eq 'Other_Notes' ) {
+        } elsif ( $nodeName eq 'Potential_Mitigations' ) {
+        } elsif ( $nodeName eq 'References' ) {
+        } elsif ( $nodeName eq 'Maintenance_Notes' ) {
+        } elsif ( $nodeName eq 'Common_Consequences' ) {
+        } elsif ( $nodeName eq 'Demonstrative_Examples' ) {
+        } elsif ( $nodeName eq 'White_Box_Definitions' ) {
+        } elsif ( $nodeName eq 'Relationship_Notes' ) {
+        } elsif ( $nodeName eq 'Theoretical_Notes' ) {
+        } elsif ( $nodeName eq 'Research_Gaps' ) {
+        } elsif ( $nodeName eq 'Functional_Areas' ) {
+        } elsif ( $nodeName eq 'Background_Details' ) {
+        } elsif ( $nodeName eq 'Observed_Examples' ) {
+        } elsif ( $nodeName eq 'Weakness_Ordinalities' ) {
+
+        } else {
+            print "\n} elsif ( \$nodeName eq '$nodeName' ) {\n\n"
+                unless $category_handler{$nodeName};
+            $category_handler{$nodeName}++;
+        }
+    }
+    print "c";
+    return ( $category_id => $results );
+}
+
+sub process_category_description {
+    my ($element) = @_;
+
+    my $result = [];
+    foreach my $description_node ( $element->getChildNodes ) {
+        my $node_type = ref $description_node;
+        my $node_name = undef;
+        $node_name = $description_node->getName()
+            if $description_node->can('getName');
+
+        if ( $node_type eq 'XML::XPath::Node::Text' ) {
+            my $description_str = $description_node->string_value()
+                if $description_node->can('string_value');
+            next if $description_str =~ /^\s*$/;
+        } elsif ( $node_name eq 'Description_Summary' ) {
+            push( @$result, process_description_summary($description_node) );
+        } elsif ( $node_name eq 'Extended_Description' ) {
+        } elsif ($node_name) {
+            print "} elsif ( \$node_name eq '$node_name' ) {\n\n";
+        } else {
+            print "} elsif ( \$node_type eq '$node_type' ) {\n\n";
+        }
+    }
+
+    return $result;
+}
+
+sub process_description_summary {
+
+    my ($description_node) = @_;
+
+    my $result = [];
+
+    foreach my $summary_node ( $description_node->getChildNodes ) {
+        my $s_node_type = ref $summary_node;
+        my $s_node_name = $summary_node->getName()
+            if $summary_node->can('getName');
+        my $s_node_str = $summary_node->string_value()
+            if $summary_node->can('string_value');
+
+        next unless $s_node_str;
+
+        next if $s_node_str =~ /^\s*$/s;
+
+        if ( $s_node_type ne 'XML::XPath::Node::Text' ) {
+            die "\n"
+                . "type: [$s_node_type]\n"
+                . "name: [$s_node_name]" . "\n"
+                . "value: [$s_node_str]" . "\n";
+        }
+
+        push( @$result, $s_node_str );
+    }
+
+    return @$result;
+
+}
+
+sub process_compound_element {
+    print "e";
+    return ( 'compound_id' => {} );
+}

@@ -1,0 +1,50 @@
+{
+   "abstract" : "Interface to talk to DAV servers",
+   "author" : [
+      "Bron Gondwana <brong@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-DAVTalk",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime::Format::ISO8601" : "0",
+            "HTTP::Tiny" : "0.016",
+            "JSON" : "0",
+            "JSON::XS" : "0",
+            "Tie::DataUUID" : "1.02",
+            "URI" : "1.60",
+            "XML::Fast" : "0.11",
+            "XML::Spice" : "0.03",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.14",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

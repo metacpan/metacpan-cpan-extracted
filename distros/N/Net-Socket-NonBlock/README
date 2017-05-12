@@ -1,0 +1,33 @@
+Net/Socket/NonBlock version 0.15
+================================
+
+This module could be used for easy creation multi-socket
+single-thread applications, especially non-forking TCP servers.
+
+Module was tested on FreeBSD 4.7 and Win2000.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+    Carp
+    POSIX
+    IO::Select
+    IO::Socket
+
+COPYRIGHT AND LICENCE
+
+Copyright: Daniel Podolsky <tpaba@cpan.org>, 2003
+Licence:   Same as perl itself
+
+06 Jul 2002, Daniel Podolsky <tpaba@cpan.org>
+

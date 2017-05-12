@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Net-SC
+version:             1.21
+abstract:            ~
+license:             ~
+author:              
+    - Igor Okunev <igor@prv.mts-nn.ru>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    MIME::Base64:                  
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

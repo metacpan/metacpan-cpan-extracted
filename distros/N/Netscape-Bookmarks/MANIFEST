@@ -1,0 +1,42 @@
+bookmark_files/Bookmarks.html
+bookmark_files/Bookmarks4.7.html
+bookmark_files/Bookmarks_tmp.xml
+bookmark_files/Favorites.html
+bookmark_files/iCab.Hotlist.html
+bookmark_files/mozilla.html
+Changes
+examples/check_links.pl
+examples/print_titles.pl
+examples/remove_aliases.pl
+examples/sort_ascending.pl
+examples/sort_descending.pl
+examples/Visitor.pm
+INSTALL.SKIP
+lib/Netscape/Bookmarks.pm
+lib/Netscape/Bookmarks/AcceptVisitor.pm
+lib/Netscape/Bookmarks/Alias.pm
+lib/Netscape/Bookmarks/Category.pm
+lib/Netscape/Bookmarks/Isa.pm
+lib/Netscape/Bookmarks/Link.pm
+lib/Netscape/Bookmarks/Separator.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+t/alias.t
+t/bookmarks.t
+t/category.t
+t/isa.t
+t/link.t
+t/load.t
+t/mozilla.t
+t/pod.t
+t/pod_coverage.t
+t/separator.t
+t/test_manifest
+t/visitor.t
+TO_DO
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

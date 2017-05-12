@@ -1,0 +1,30 @@
+#!perl
+use AnyEvent;
+use Net::IRC3::Client::Connection;
+
+my $c = AnyEvent->condvar;
+
+my $timer;
+my $con = new Net::IRC3::Client::Connection;
+
+$con->reg_cb (registered => sub { print "I'm in!\n"; 0 });
+$con->reg_cb (disconnect => sub { print "I'm out!\n"; 0 });
+$con->reg_cb (
+   sent => sub {
+      if ($_[2] eq 'PRIVMSG') {
+         print "Sent message!\n";
+         $timer = AnyEvent->timer (after => 1, cb => sub { $c->broadcast });
+      }
+      1
+   }
+);
+
+$con->send_srv (PRIVMSG => "Hello there i'm the cool Net::IRC3 test script!", 'elmex');
+
+$con->connect ("localhost", 6667);
+$con->register (qw/testbot testbot testbot/);
+
+$c->wait;
+undef $timer;
+
+$con->disconnect;

@@ -1,0 +1,17 @@
+<html>
+  <head>
+    <title>Get short URL via Net::Lujoyglamour</title>
+  </head>
+  <body>
+     <h1>Get short URL via Net::Lujoyglamour</h1>
+
+<p><TMPL_IF NAME=msg>"There was an error: <TMPL_VAR NAME=msg>. Please <a href='/'>try
+      again</a>";  
+<TMPL_ELSE>You can use
+now <a href='http://<TMPL_VAR NAME=short>'>http://<TMPL_VAR NAME=short></a>
+for <a href='http://<TMPL_VAR NAME=long>'>http://<TMPL_VAR NAME=long></a>
+or <a href='/'>get another one</a>
+</TMPL_IF></p>
+
+  </body>
+</html>

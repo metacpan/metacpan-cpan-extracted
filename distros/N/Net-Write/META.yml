@@ -1,0 +1,35 @@
+---
+abstract: 'a portable interface to open and send raw data to network'
+author:
+  - 'GomoR <gomor_at_cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Write
+provides:
+  Net::Write:
+    file: lib/Net/Write.pm
+    version: '1.10'
+  Net::Write::Layer:
+    file: lib/Net/Write/Layer.pm
+  Net::Write::Layer2:
+    file: lib/Net/Write/Layer2.pm
+  Net::Write::Layer3:
+    file: lib/Net/Write/Layer3.pm
+  Net::Write::Layer4:
+    file: lib/Net/Write/Layer4.pm
+requires:
+  Class::Gomor: '0'
+  Net::Pcap: '0.12'
+  Socket: '0'
+  Socket::GetAddrInfo: '0'
+  perl: v5.6.1
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+version: '1.10'

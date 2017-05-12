@@ -1,0 +1,29 @@
+Net-IP-LPM version 0.02
+==========================
+
+Perl implementation of Longest Prefix Match algorithm. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module do not requires fllowing modules:
+ 
+   Socket6
+   DB_File
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Tomas Podermanski, Brno University of Technology
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

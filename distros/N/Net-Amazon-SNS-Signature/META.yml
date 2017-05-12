@@ -1,0 +1,24 @@
+---
+abstract: 'For the verification of Amazon SNS messages'
+author:
+  - 'Patrick Mooney <pm2@live.co.uk>'
+build_requires:
+  Path::Class: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Amazon-SNS-Signature
+requires:
+  Crypt::OpenSSL::RSA: '0'
+  Crypt::OpenSSL::X509: '0'
+  LWP::UserAgent: '0'
+resources:
+  homepage: https://github.com/patmooney/p5-net-amazon-sns-signature
+  repository: https://github.com/patmooney/p5-net-amazon-sns-signature.git
+version: '0.006'

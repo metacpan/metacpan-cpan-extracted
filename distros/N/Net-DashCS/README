@@ -1,0 +1,22 @@
+Net-DashCS version 0.01
+=======================
+
+This modules implements a client to Dash Carrier Services SOAP API.  It
+is neither sponsored nor endorsed by Dash Carrier Services.
+
+INSTALLATION
+
+To install this module, type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+DEPENDENCIES
+
+This modules requires the following modules and libraries:
+
+  SOAP::WSDL
+  SOAP::Lite
+

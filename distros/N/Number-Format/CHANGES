@@ -1,0 +1,226 @@
+Changes for version 1.75 (June 25, 2015)
+------------------------
+  - Export only necessary from POSIX (RT#99970, thanks Alexandr Ciornii)
+  - Upgrade Makefile.PL (thanks Alexandr Ciornii)
+  - Fix testing issue with missing locales (RT 97607, 97766, thanks to KHW)
+    (thanks David Solimano)
+  - Fix testing issue with bad Russian data on some platforms (RT 92666)
+    (thanks David Solimano)
+  - Add t/bigfloat.t (thanks Paul Miller / Alexandr Ciornii)
+
+Changes for version 1.74 (April 19, 2011)
+------------------------
+  - Only Perl 5.10.0 and newer supported
+  - Allow multi-character (e.g. "&nbsp;" for thousands_sep) (thanks
+    Nick Patch; RT 65489)
+  - Strip out illegal negative values returned by localeconv(),
+    observed on Windows - see @IGNORE_NEGATIVE (thanks Adam Kennedy;
+    RT 56802)
+  - Manage warnings when undef is passed to methods (RT 48038)
+  - Fix round() for Math::BigFloat objects (RT 62059)
+
+Changes for version 1.73 (September 25, 2009)
+------------------------
+  - Fix locale.t for RUR/RUB distinction (thanks Kevin Phair; RT 46660/45833)
+  - Skip locale.t for BSD (thanks Zak B. Elep; RT 48481/46367)
+  - In _get_self add UNIVERSAL::isa check on ref (thanks Jordan Macdonald)
+
+Changes for version 1.72 (May 5, 2009)
+------------------------
+  - Use Makefile.PL based on suggestion in RT 38020
+  - Add 'use strict' & 'use warnings'
+  - Add MAX_INT constant for detecting overflows
+  - Add helper sub _get_multipliers for getting kilo/mega/giga mult values
+  - Add test in round() for overflow from large of a precision value (RT 40126)
+  - Add .5 + 1e-14 to rounded value instead of .5000001 (RT 20298)
+  - Fix undef $pic_prefix (RT 43029)
+  - Add support for giga and base option in unformat_number (RT 40455)
+  - Fix Russian locale issues, esp. in unformat_number (RT 40859)
+  - Remove variables from error messages (XSS risk) and standardize errors
+  - Remove requirement that decimal_point & thousands_sep be 1 char (for ru_RU)
+  - Add Russian and unformat_number tests in locale.t
+  - Add compare_numbers to test with an allowable error of 1e-10 in round.t
+
+Changes for version 1.71 (May 3, 2009)
+------------------------
+  - Changes to tests t/format_price.t, t/locale.t, and t/round.t to
+    fix cpan tester errors
+  - No change to Format.pm itself
+
+Changes for version 1.70 (Feb 13, 2009)
+------------------------
+  - Add support for IEC60027 (Ki, Mi, Gi prefixes) with mode option
+  - Use hard coded hex values for base multiplier when base is 1024
+  - Use mon_ settings in format_number when called from format_price
+
+Changes for version 1.63 (Feb 10, 2009)
+------------------------
+  - Minor tweak to format_bytes test for German locales
+
+Changes for version 1.62 (Feb 9, 2009)
+------------------------
+  - Change format_bytes to fully specify all formatting options, not
+    rely on locale at all as it was causing too many CPAN tester errors.
+
+Changes for version 1.61 (Dec 29, 2008)
+------------------------
+  - Fix bugs in locale operations for format_price (thanks Moritz Onken)
+  - Fix documentation in format_bytes (rt # 42036)
+  - Enable warning when format_bytes called with numeric precision not hash
+
+Changes for version 1.60 (Jul 2, 2008)
+------------------------
+  - Rewrite new() and format_price() to use mon_* POSIX Locale values
+  - Add all missing POSIX Locale variables
+    (Thanks to Kevin Ryde for help identifying the problem)
+
+Changes for version 1.52 (Sep 21, 2006)
+------------------------
+  - Patch to t/format_price.t supplied by jonasbn addressing failling 
+    tests in 1.51, tests 2-6, the regex formatting the currency code did 
+    not take 0 occurrences of white space into account
+	Patch: rt #21382
+	Resolves: rt #18964
+    (The same issue/patch was also reported by Cosimo Streppone, Randy
+    W. Sims, J. R. Taisto)
+
+Changes for version 1.51 (Apr 26, 2006)
+------------------------
+  - Patch to t/format_price.t supplied by Cosimo Streppone to allow it
+    to work with non-US locales
+
+Changes for version 1.5 (Feb 14, 2005)
+------------------------
+  - Require Perl 5.8 - was 5.003 before
+  - Require POSIX.pm - was optional before
+  - If C<THOUSANDS_SEP> is set to the empty string, format_number will
+    not insert any separators.
+  - Replace "use vars" with "our"
+  - Support scientific notation - skip formatting
+  - Change format_bytes to support options (precision, unit, and base)
+    instead of precision number
+
+Changes for version 1.45 (Aug 8, 2002)
+------------------------
+  - No code change; only change is to test suite.
+  - Replace all tab characters with spaces
+
+Changes for version 1.44 (Dec 11, 2001)
+------------------------
+  - Add support for GIGA_SUFFIX.  Can't do TERA because of integer overflow.
+  - Detect decimal part correctly in Perl 5.6 and up
+
+Changes for version 1.43 (Dec 10, 2001)
+------------------------
+
+  - Fix bug in format_price that caused an extra space to be inserted
+    in some situations, and no space in others, between the currency
+    string and the number.
+  - Add support for gigabytes (formerly only kilo and mega) to
+    format_bytes.  (Thanks to Oeyvind Flaam <flaam@flaam.priv.no>)
+
+Changes for version 1.42 (May 17, 2000)
+------------------------
+
+  - Fixed bug in format_picture that was causing subsequent calls to
+    return the previous result and the current one concatenated
+    together.  This is actually due to a bug in Perl, but a workaround
+    was implemented.  To avoid this problem in your own code, don't
+    use code like this: "my VARIABLE = EXPRESSION if CONDITION"
+    because if the CONDITION is false, the previous value of VARIABLE
+    will still be there, even if it had gone out of scope!  This bug
+    was pointed out by Buddy Burden <buddy@barefoot.net> on 21 Mar
+    1999, Frank Tobin <ftobin@uiuc.edu> on 11 Jun 1999, Mark
+    William Rostron <mrostron@us.oracle.com> on 12 Dec 1999, and Ben
+    Tilly <ben_tilly@hotmail.com> on 16 May 2000.  Fix suggested by
+    Buddy Burden, Mark William Rostron, and Ben Tilly.
+  - Fixed bug in round() that was causing e.g. round(1.005, 2) to return
+    1 instead of 1.01.  This is due to the vagaries of floating point
+    arithmetic.  I changed .5 to .5000001 in the rounding formula and
+    added a check for this in the test suite.  That seems to fix it
+    but please let me know if you experience any weird results.  This
+    bug was reported by Kentaro Takatomi <kentaro.takatomi@msdw.com>
+    on 25 May 1999.
+  - Fixed several points in the code where 'use of uninitialized
+    value' warnings were generated.  Reported by Frank Tobin
+    <ftobin@uiuc.edu> on 11 Jun 1999.
+  - In format_picture, replaced the use of $_ with a locally scoped
+    variable ($char).  This should reduce interference between this
+    routine and any use of $_ by the calling program.  Bug report and
+    suggested fix by Mark William Rostron <mrostron@us.oracle.com> on
+    29 Dec 1999.
+
+Changes for version 1.41 (Nov 30, 1998)
+------------------------
+
+  - Fix 'undefined value' warnings in format_picture
+  - Fix bug in format_picture to show decimal point if and only if it
+    is present in the picture string (bug reported by Michael Scoltock
+    <scoltock@ictp.trieste.it>)
+  - Fix bug in format_price that would suppress currency symbol if no
+    decimal digits (bug reported by Michael Scoltock
+    <scoltock@ictp.trieste.it>)
+
+Changes for version 1.40 (Nov 27, 1998)
+------------------------
+
+  - Add new function format_bytes() to display '1K' for '1024', etc.
+    (suggested by Curt Tilmes <curt@ltpmail.gsfc.nasa.gov>)
+  - Fix bugs in round() and format_picture() when dealing with negative
+    numbers.  NOTE: format_picture() now includes at least one extra
+    space in its output for positive numbers.  This may present a minor
+    incompatibility issue in some obscure cases.
+  - Minor documentation updates.
+
+Changes for version 1.30 (Oct 31, 1998)
+------------------------
+
+  - Fix several major bugs, including the POSIX-not-required issue, as
+    well as better support for negative values.
+  - Add setting for default size of decimal area so you don't have to
+    specify the number of digits if it's other than 2.
+  - Add setting and function to display negative numbers in different
+    formats.
+  - Add setting to force trailing 0's in the decimal portion to fill out
+    the number of digits required.
+  - Fix problem where 0's inside format_picture()'s output were being
+    replaced with spaces.
+  - Add 0 before decimal point if number is between -1 and 1.
+  - Fix errors with supposedly-optional POSIX
+  - From: Yair Lenga <yair@bpa1.sbi.com>
+    Suggested adding controls to pad out result of format_number with
+    zeroes as well as the ability to present negative numbers with
+    parentheses.  Provided a patch which was useful in constructing a
+    solution.
+  - Add test for defined() from patch by IMAZU Hideyo <himazu@ms.com>
+  - From: "Joseph Norton" <namaste1_@hotmail.com>
+    Bugs in format_number(): processed negative numbers incorrectly,
+    and lacked the zero before the decimal point if number is between
+    0 and 1.
+
+Changes for version 1.20 (Aug 31, 1998)
+------------------------
+
+  - Make POSIX no longer required (users on MicroSoft systems sometimes
+    don't have it); uses US defaults if no POSIX.pm found.
+  - Add new optional third argument to format_number() to add trailing
+    zeroes.
+
+Changes for version 1.12
+------------------------
+
+  - Remove 'use of undefined value' warnings when used with perl -w
+
+Changes for version 1.10 (Nov 21, 1997)
+------------------------
+
+  - Add Locale support to set the default values for $THOUSANDS_SEP,
+    $DECIMAL_SEP, and $CURRENCY based on the user's locale.
+  - Add object oriented interface.
+  - NOTE: Some aspects of the API have changed.  Please reread the
+    documentation carefully if you used 1.0 previously!!!
+
+Initial version 1.00
+--------------------
+
+  - Limited release beta version.

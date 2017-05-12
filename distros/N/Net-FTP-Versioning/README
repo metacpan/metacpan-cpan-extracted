@@ -1,0 +1,32 @@
+Net/FTP/Versioning version 0.01
+===============================
+
+Net::FTP::Versioning inherits all methods from Net::FTP and 
+can be used in substitution of it. Extends the get() and put()
+methods to add versioning support to them. 
+A new transferTime() method was added to report the file transfer
+time in seconds.
+
+I use it to perform remote backups, and I enable versioning to rotate
+the files previously backed up. This is better than simply overriding 
+them each time a new transfer is made.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+Net::FTP
+
+COPYRIGHT AND LICENCE
+
+Copyright 2005 by Bruno Negrão
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

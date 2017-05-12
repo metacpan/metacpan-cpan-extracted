@@ -1,0 +1,16 @@
+{: NES 1.0 none :}
+<html>
+  <head>
+    <title>Nes Tutorial</title>
+  </head>
+  <body>
+  <pre>
+  Nes Version     : {: * nes_ver :}
+  This Template   : {: * nes_this_file :}
+  var in .nes.cfg : {: * cfg_nes_tutorial_var :} 
+  HTTP_HOST       : {: * env_HTTP_HOST :}
+  QUERY_STRING    : {: * env_QUERY_STRING :}
+  name in GET     : {: * q_name :}
+  </pre>
+  </body>
+</html>

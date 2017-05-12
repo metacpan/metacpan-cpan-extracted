@@ -1,0 +1,10 @@
+Changes			History of this package
+README			The Instructions
+MANIFEST		This file
+Makefile.PL		Will create 'Makefile' to build this extention
+Client.pm	        Bootstrap & documentation
+Client.xs	        XS glue
+t/000_create.t          Base test file
+typemap			
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

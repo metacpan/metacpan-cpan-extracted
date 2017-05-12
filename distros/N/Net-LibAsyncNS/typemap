@@ -1,0 +1,26 @@
+Net::LibAsyncNS		T_PTROBJ
+Net::LibAsyncNS::Query	Net__LibAsyncNS__Query
+SysRet			T_SYSRET
+
+INPUT
+T_SYSRET
+	$var NOT IMPLEMENTED
+
+Net__LibAsyncNS__Query
+	if (SvROK($arg) && sv_derived_from($arg, \"${ntype}\")) {
+	    $var = query_from_sv($arg);
+	}
+	else
+	    Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+			\"$var\", \"$ntype\")
+
+OUTPUT
+T_SYSRET
+	if ($var != -1) {
+	    if ($var == 0)
+		sv_setpvn($arg, "0 but true", 10);
+	    else
+		sv_setiv($arg, (IV)$var);
+	}
+

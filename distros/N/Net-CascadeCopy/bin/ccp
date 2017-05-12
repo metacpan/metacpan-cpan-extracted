@@ -1,0 +1,405 @@
+#!/usr/bin/perl -w
+use strict;
+
+# VERSION
+
+use Data::Dumper;
+use Getopt::Long qw[ :config gnu_getopt ];
+use Log::Log4perl qw(:easy);
+use Pod::Usage;
+
+use Net::CascadeCopy;
+
+$| = 1;
+
+#
+#_* Command-line options processing
+#
+use vars qw( $opt_path      $opt_target_path
+             $opt_command   $opt_args        @opt_group
+             $opt_rsync     $opt_scp         $opt_ssh    $opt_log
+             $opt_sshargs   $opt_failures    $opt_forks  $opt_stdout
+             $opt_help      $opt_verbose     $opt_debug
+          );
+
+pod2usage( -exitval => 1, -verbose => 0 ) unless @ARGV;
+
+unless ( GetOptions ( '-f|path:s'    => \$opt_path,
+                      '-t|target:s'  => \$opt_target_path,
+                      '-g|group=s'   => \@opt_group,
+                      '-c|command=s' => \$opt_command,
+                      '-a|args=s'    => \$opt_args,
+                      '-o|stdout'    => \$opt_stdout,
+                      '-l|log'       => \$opt_log,
+                      '-r|rsync'     => \$opt_rsync,
+                      '-failures=i'  => \$opt_failures,
+                      '-forks=i'     => \$opt_forks,
+                      '-s|scp'       => \$opt_scp,
+                      '-ssh=s'       => \$opt_ssh,
+                      '-ssh-flags=s' => \$opt_sshargs,
+                      '-v|verbose!'  => \$opt_verbose,
+                      '-d|debug!'    => \$opt_debug,
+                      '-h|help|?'    => \$opt_help,
+    )
+) { pod2usage( -exitval => 1, -verbose => 1 ) }
+
+if ( $opt_help ) {
+    pod2usage( -exitval => 0, -verbose => 2 );
+}
+
+#
+#_* Log4perl
+#
+
+my $log_level = "INFO";
+if ( $opt_debug ) {
+    $log_level = "DEBUG";
+}
+
+my $conf =<<END_LOG4PERLCONF;
+# Screen output at INFO level
+log4perl.rootLogger=DEBUG, SCREEN
+
+# Info to screen and logfile
+log4perl.appender.SCREEN.Threshold=$log_level
+log4perl.appender.SCREEN=Log::Log4perl::Appender::ScreenColoredLevels
+log4perl.appender.SCREEN.layout=PatternLayout
+log4perl.appender.SCREEN.layout.ConversionPattern=%d %m%n
+log4perl.appender.SCREEN.stderr=0
+
+END_LOG4PERLCONF
+
+Log::Log4perl::init( \$conf );
+
+my $logger = get_logger( 'default' );
+
+#
+#_* Main
+#
+
+my $options;
+
+if ( $opt_stdout ) {
+    $options->{output} = "stdout";
+}
+elsif ( $opt_log ) {
+    $options->{output} = "log";
+}
+
+# determine command and arguments
+if ( $opt_command ) {
+    $options->{command}      = $opt_command;
+}
+elsif ( $opt_scp ) {
+    $options->{command}      = "scp";
+    $options->{command_args} = "-p";
+}
+elsif ( $opt_rsync ) {
+    $options->{command}      = "rsync";
+    $options->{command_args} = "-ravu";
+}
+else {
+    die "Nothing to do!  No command, scp, or rsync options specified\n";
+}
+
+if ( $opt_args ) {
+    $options->{command_args} = $opt_args;
+}
+
+
+# source path
+unless ( $opt_path ) {
+    die "Error: source path not specified";
+}
+unless ( -r $opt_path ) {
+    die "Error: source path not found: $opt_path";
+}
+$options->{source_path} = $opt_path;
+
+# target path
+if ( $opt_target_path ) {
+    $options->{target_path} = $opt_target_path;
+}
+else {
+    $options->{target_path} = $opt_path;
+}
+
+if ( $opt_ssh      ) { $options->{ssh}       = $opt_ssh         }
+if ( $opt_sshargs  ) { $options->{ssh_flags} = $opt_sshargs     }
+if ( $opt_failures ) { $options->{max_failures} = $opt_failures }
+if ( $opt_forks    ) { $options->{max_forks}    = $opt_forks    }
+
+my $ccp = Net::CascadeCopy->new( $options );
+
+unless ( scalar @opt_group ) {
+    die "Error: no server groups specified\n";
+}
+
+for my $group ( @opt_group ) {
+    my ( $groupname, $members ) = split /:/, $group;
+    unless ( $groupname && $members ) {
+        die "Error: format of group param is group:server1,server2,...\n";
+    }
+    my @servers = split /[,\s]/, $members;
+    $ccp->add_group( $groupname, \@servers );
+}
+
+
+$ccp->transfer();
+
+
+
+__END__
+
+
+=head1 NAME
+
+ ccp - cascading copy
+
+
+=head1 SYNOPSIS
+
+  # cascade copy file.gz using scp to four servers
+  ccp -s -f /local/file.gz -g production:server1,server2,server3,server4
+
+  # rsync /some/directory to a total of 10 servers in two datacenters
+  ccp -r -f /some/directory -g dc1:s1,s2,s3,s4,s5 -g dc2:s6,s7,s8,s9,s10
+
+  # log output of each child to ccp.sourcehost.targethost.log
+  ccp -s -l -f /local/file.gz -g production:server1,server2,server3,server4
+
+  # custom rsync options
+  ccp -c "/path/to/rsync" -a "-rav --checksum --delete" -f /some/directory -g prod:srv1,srv2,srv3,srv4
+
+  # sync to 10 servers, use shell brace expansion to build server names
+  ccp -s -f /local/file.gz -g "production:`echo server{1,2,3,4,5,6,7,8,9,10}`"
+
+  # similar to previous, but with zsh brace expansion shortcut
+  ccp -s -f /local/file.gz -g "production:`echo server{01..10}`"
+
+  # help
+  ccp
+  ccp --help
+
+=head1 DESCRIPTION
+
+Rapidly copy (rsync/scp/...) files to many servers servers in
+multiple locations using Net::CascadeCopy.
+
+=head2 taken from Net::CascadeCopy:
+
+=over 2
+
+This module implements a scalable method of propagating files to a
+large number of servers in one or more locations via rsync or scp.
+
+A frequent solution to distributing a file or directory to a large
+number of servers is to copy it from a central file server to all
+other servers.  To speed this up, multiple file servers may be used,
+or files may be copied in parallel until the inevitable bottleneck in
+network/disk/cpu is reached.  These approaches run in O(n) time.
+
+This module and the included script, ccp, take a much more efficient
+approach that is O(log n).  Once the file(s) are been copied to a
+remote server, that server will be promoted to be used as source
+server for copying to remaining servers.  Thus, the rate of transfer
+increases exponentially rather than linearly.  Needless to say, when
+transferring files to a large number of remote servers (e.g. over 40),
+this can make a ginormous difference.
+
+Servers can be specified in groups (e.g. datacenter) to prevent
+copying across groups.  This maximizes the number of transfers done
+over a local high-speed connection (LAN) while minimizing the number
+of transfers over the WAN.
+
+=back
+
+
+=head2 ARGUMENTS
+
+The following options are supported by this command:
+
+=over 8
+
+=item -f|--path [ /path ]
+
+Specifies the path of the file to be transferrred.
+
+=item -t|--target [ /target/path ]
+
+Specified that the file should be copied to an alternate location on
+the remote host.  Defaults to the same value as -path.
+
+=item -g|--group groupname:server1,server2,server3
+
+Add a group of servers named groupname containing three servers.
+Multiple groups may be specified.  All copying will be performed
+within each defined group--no copying will be performed across groups.
+
+Servers may not be listed in more than one group.  Any number of groups may
+be specified.
+
+On startup, an initial transfer will be forked on the current host to
+the first server in every group.  After that, transfers will be
+performed in order by available servers.
+
+=item -s|--scp
+
+Use scp with default option, -p.
+
+=item -r|--rsync
+
+Use rsync with default options, -ravu.
+
+=item -c|--command [ "/path/to/command" ]
+
+Specify the command that will be executed to copy the file, e.g. scp
+or rsync.
+
+=item -a|--args [ "-option1 -option2" ]
+
+Specify the arguments to be passed to the command specified.  For
+example, "-p" might be used with scp to preserve permissions.
+
+=item -l|--log
+
+Specify that stdout/stderr of each child process should be written to
+a log file named ccp.hostname.log.
+
+=item --failures [ n ]
+
+Specify how many times to allow a failed transfer to each target
+box. In the event of a failure, the failed target will be added back
+to the end of the list.  Most likely each copy will be attempted from
+a different source machine.  The default is 3.
+
+=item --forks [ n ]
+
+Specify how many child processes should be spawned for each available
+source machine.  The default is 2.
+
+=item --ssh [ /path/to/ssh ]
+
+Specify how to invoke the ssh command locally if it can't be found in
+your path.  ssh is used to log in to source servers to initiate copies
+to target servers.
+
+=item --ssh-flags [ "-options" ]
+
+Specify flags to be sent to ssh processes.
+
+=item -v|--verbose
+
+Verbose output.
+
+=item -h|--help
+
+Display usage.  Displays full manual when combined with -v.
+
+=item -o|--stdout
+
+Display stdout from all child processes as it is received.  This can
+get a bit crazy and is only recommended for debugging.
+
+=back
+
+=head1 DIAGNOSTICS
+
+A list of every error and warning message that the module can generate
+(even the ones that will "never happen"), with a full explanation of each
+problem, one or more likely causes, and any suggested remedies.
+(See also "Documenting Errors" in Chapter 13.)
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+A full explanation of any configuration system(s) used by the module,
+including the names and locations of any configuration files, and the
+meaning of any environment variables or properties that can be set. These
+descriptions must also include details of any configuration language used.
+(See also "Configuration Files" in Chapter 19.)
+
+
+
+=head1 DEPENDENCIES
+
+A list of all the other modules that this module relies upon, including any
+restrictions on versions, and an indication of whether these required modules are
+part of the standard Perl distribution, part of the module's distribution,
+or must be installed separately.
+
+
+
+=head1 INCOMPATIBILITIES
+
+A list of any modules that this module cannot be used in conjunction with.
+This may be due to name conflicts in the interface, or competition for
+system or program resources, or due to internal limitations of Perl
+(for example, many modules that use source code filters are mutually
+incompatible).
+
+
+
+=head1 BUGS AND LIMITATIONS
+
+A list of known problems with the module, together with some indication of
+whether they are likely to be fixed in an upcoming release.
+
+Also a list of restrictions on the features the module does provide:
+data types that cannot be handled, performance issues and the circumstances
+in which they may arise, practical limitations on the size of data sets,
+special cases that are not (yet) handled, etc.
+
+There are no known bugs in this module. Please report problems to
+VVu@geekfarm.org
+
+Patches are welcome.
+
+=head1 SEE ALSO
+
+  http://www.geekfarm.org/wu/muse/CascadeCopy.html
+
+
+=head1 AUTHOR
+
+VVu@geekfarm.org
+
+Thanks to Russ and Robert for coming up with the idea of cascading
+deployments!
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2006, VVu@geekfarm.org
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+- Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+
+- Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+
+- Neither the name of the geekfarm.org nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+
+
+

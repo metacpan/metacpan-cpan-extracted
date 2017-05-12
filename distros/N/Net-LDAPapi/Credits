@@ -1,0 +1,46 @@
+###############################################
+#  Net::LDAPapi - Credits List                #
+###############################################
+
+Special thanks to the following people
+for providing useful fixes and suggestions.
+
+Hallvard B. Furuseth <h.b.furuseth@usit.uio.no> (Various Fixes/Suggestions)
+   - Most of the fixes and suggestions implemeted in 1.40a were from Hallvard.
+   - Many of fixes made in 1.21 were also suggested by Hallvard.
+Andreas Beck <beck@sdm.de>
+   - Supplied much of the code and the idea for ldap_get_all_entries
+Douglas Gray Stephens <gray@austin.sar.slb.com>
+   - Various fixes, both to the CGIs and other things...
+Al Grimstad <alg@att.com>
+   - Helped debug lderrno/etc and helped fix a number of memory leaks
+Christian Murphy <r28874@ismuc.sps.mot.com>
+   - Small fix for AIX Library Name in Makefile
+Jauder Ho <jauderho@transmeta.com>
+   - Redhat Linux Makefile Fix and useful bug reports
+Bill Dixon <billd@firstsolutions.com>
+   - His example isolated the bug w/ integer modifys
+Rob Weltman <rweltman@netscape.com>
+   - Supplied fix for rebinding when using Netscape SDK
+Andrew J Cosgriff <ajc@bing.wattle.id.au>
+   - The wonderful ldap_mod_attr.pl script
+   - Various Useful Bug Reports
+Dmitri Priimak <priimak@stanford.edu>
+   - For doing the majority of the Net::LDAPapi 3.0 work
+Howard Chu <hyc@symas.com>
+   - For getting this project started again
+Marcus Watts
+   - For submitting patches to the new code line
+Phillip O'Donnell <podonnell@cpan.org>
+   - Extended operation support
+   - Behaviour driven development test suite
+   - Bugfixes
+--
+Quanah Gibson-Mount
+quanah.gibsonmount@gmail.com
+CPAN: /by-authors/id/M/MI/MISHIKAL/
+--
+Clayton Donley
+donley@wwa.com
+http://www.wwa.com/~donley/
+CPAN: /authors/id/CDONLEY

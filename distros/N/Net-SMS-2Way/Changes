@@ -1,0 +1,11 @@
+Revision history for Perl extension Net::SMS::2Way.
+
+0.01  Mon Aug 13 11:11:59 2007
+	- original version; created by h2xs 1.23 with options
+		-XA -n Net::SMS::2Way
+
+0.05 Sun Aug 03 12:10:00 2008
+	- Fixed get_inbox() method and added relevent documentation
+	- Refactored some logic send_sms()
+
+0.06 

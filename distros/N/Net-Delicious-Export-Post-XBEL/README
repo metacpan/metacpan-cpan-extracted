@@ -1,0 +1,106 @@
+NAME
+    Net::Delicious::Export::Post::XBEL - export your del.icio.us posts as
+    XBEL SAX events
+
+SYNOPSIS
+     use Net::Delicious;
+     use Net::Delicious::Export::Post::XBEL;
+
+     use IO::AtomicFile;
+     use XML::SAX::Writer;
+
+     my $fh     = IO::AtomicFile->open("/my/posts.xbel","w");
+     my $writer = XML::SAX::Writer->new(Output=>$fh);
+
+     my $del = Net::Delicious->new({...});
+     my $exp = Net::Delicious::Export::Post::XBEL->new(Handler=>$writer);
+
+     my $it = $del->posts();
+     $exp->by_date($it);
+
+DESCRIPTION
+    Export your del.icio.us posts as XBEL SAX events.
+
+    This package subclasses *Net::Delicious::Export*.
+
+PACKAGE METHODS
+  __PACKAGE__->new(\%args)
+    Valid arguments are :
+
+    *   Handler
+
+        A valid handler for *Net::Delicious::Export*, which is really just a
+        thin wrapper around *XML::SAX::Base*
+
+    Returns a *Net::Delicious::Export::Post::XBEL* object. Woot!
+
+OBJECT METHODS
+  $obj->by_date(\%args)
+    Valid args are
+
+    *   posts *required*
+
+        A *Net::Delicios::Iterator* object containing the posts you want to
+        export.
+
+    *   title
+
+        String.
+
+    Returns whatever the handler passed to the object contructor sends back.
+
+  $obj->by_tag(\%args)
+    Valid args are
+
+    *   posts *required*
+
+        A *Net::Delicios::Iterator* object containing the posts you want to
+        export.
+
+    *   title
+
+        String.
+
+    *   sort
+
+        Code reference, used as an argument for passing to Perl's *sort*
+        function.
+
+        The default behaviour is to sort tags alphabetically.
+
+    Bookmarks with multiple tags will be added once; subsequent instances of
+    the same bookmark will use XBEL's <alias> element to refer back to the
+    first URL.
+
+    Bookmarks for any given tag set will be ordered by their timestamp.
+
+    Tags which use del.icio.us' "hierarchical tag" structure will be
+    rendered as nested <folder> elements.
+
+    Multiple tags for a bookmark will be ordered alphabetically or using the
+    same *sort* argument passed to the method.
+
+    Returns whatever the handler passed to the object contructor sends back.
+
+VERSION
+    1.4
+
+DATE
+    $Date: 2005/12/11 19:17:00 $
+
+AUTHOR
+    Aaron Straup Cope <ascope@cpan.org>
+
+SEE AlSO
+    Net::Delicious
+
+    Net::Delicious::Export
+
+    http://pyxml.sourceforge.net/topics/xbel/
+
+LICENSE
+    Copyright (c) 2004 Aaron Straup Cope. All Rights Reserved.
+
+    This is free software, you may use it and distribute it under the same
+    terms as Perl itself.
+

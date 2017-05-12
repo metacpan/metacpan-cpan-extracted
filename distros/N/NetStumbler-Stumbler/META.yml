@@ -1,0 +1,12 @@
+--- #YAML:1.0
+name: NetStumbler-Stumbler
+version: 0.07
+author:
+  - |-
+    Salvatore E. ScottoDiLuzio <lt>washu@olypmus.net<gt>
+abstract: Module to parse netstumbler files
+license: perl
+requires:
+  NetStumbler::Wap: 0.07
+provides: {}
+generated_by: Module::Build version 0.24

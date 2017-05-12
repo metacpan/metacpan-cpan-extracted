@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Net-Zemanta
+version:            0.7
+abstract:           Perl bindings for services provided by Zemanta
+author:
+    - Tomaz Solc <tomaz@zemanta.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Encode:        0
+    JSON:          2.00
+    LWP:           5.09
+    Pod::Checker:  1.19
+    Test::More:    0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

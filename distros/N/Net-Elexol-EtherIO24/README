@@ -1,0 +1,50 @@
+Net-Elexol-EtherIO24
+
+INTRODUCTION
+
+The Ether I/O 24 manufactured by Elexol is an inexpensive and simple to
+use/operate device designed for remote control or remote sensing.
+It has 24 lines that are each programmable for input or output and a
+variety of other things.
+
+The control protocol is relatively simplistic and UDP based. This Perl
+module attempts to abstract this protocol and add other features
+along the way.
+
+It is thread savvy and will use threads if told to. It should perform
+adequately without threads, but various functionality is reduced as
+a result. In particular, the module functions in a nice asynchronous
+way when it can use threads. Threads supoprt requires Perl 5.8, and
+this module may not function correctly, or even compile, with an older Perl.
+
+
+NOTE
+
+The author is not in any way affiliated with Elexol, the manufacturer of 
+the device this Perl module is designed to operate. This module has 
+been developed using only data available in the public domain.
+
+
+SEE ALSO
+
+    http://www.elexol.com/
+    http://www.elexol.com/Downloads/EtherIO24UM11.pdf
+    http://www.flirble.org/chrisy/elexol/
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Chris Luke
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

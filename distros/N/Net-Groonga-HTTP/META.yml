@@ -1,0 +1,50 @@
+---
+abstract: 'Client library for Groonga httpd.'
+author:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+build_requires:
+  File::Temp: 0
+  File::Which: 0
+  Scalar::Util: 0
+  Test::More: 0.98
+  Test::TCP: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.0.56, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Groonga-HTTP
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Net::Groonga::HTTP:
+    file: lib/Net/Groonga/HTTP.pm
+    version: 0.03
+  Net::Groonga::HTTP::Response:
+    file: lib/Net/Groonga/HTTP/Response.pm
+  Net::Groonga::Pager:
+    file: lib/Net/Groonga/Pager.pm
+requires:
+  Data::Page: 0
+  Furl: 0
+  JSON::XS: 0
+  Mouse: 0
+  URI: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/tokuhirom/Net-Groonga-HTTP/issues
+  homepage: https://github.com/tokuhirom/Net-Groonga-HTTP
+  repository: git://github.com/tokuhirom/Net-Groonga-HTTP.git
+version: 0.03

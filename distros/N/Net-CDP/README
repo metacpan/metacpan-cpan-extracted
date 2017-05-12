@@ -1,0 +1,93 @@
+Net-CDP
+=======
+
+The Net::CDP module implements an advertiser/listener for the Cisco
+Discovery Protocol (CDP).
+
+CDP is a proprietary Cisco protocol for discovering devices on a network.
+A typical CDP implementation sends periodic CDP packets on every network
+port and listens for advertisements sent by neighboring devices.
+
+Prerequisites
+-------------
+
+- Libnet 1.1.0 or later (http://www.packetfactory.net/Projects/Libnet/)
+  To use a loopback device (for testing, for instance) you will need
+  version 1.1.1 or later.
+- libpcap 0.6 or later
+- Carp::Clan
+- Time::HiRes
+
+For testing, you will also require Test::More, and (optionally) Test::Pod.
+
+Installation
+------------
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+'make test' will test most features if run by an unprivileged user. Some
+features will be skipped, however, unless it is run by a superuser.
+
+The C portions of this module are built using GNU Autoconf rather than
+MakeMaker. This makes it easier to add various portability checks (but arguably
+decreases the portability of the module as a whole). To pass options to the
+'configure' process, use the CONFIGURE_ARGS option, eg:
+
+   perl Makefile.PL CONFIGURE_ARGS=--disable-multicast
+
+Usage
+-----
+
+CDP packets can be sent and received over a single network port by using
+the Net::CDP package ('perldoc Net::CDP' for complete usage instructions).
+
+The Net::CDP::Manager module provides a simple interface to manage multiple
+ports simultaneously. For example, the following is a simple CDP
+advertiser/listener script:
+
+  use Net::CDP::Manager;
+
+  # Callback to process each packet.
+  sub callback {
+    my ($packet, $port) = @_;
+    print "Received packet on $port from ", $packet->device, "\n";
+  }
+
+  # Manage all available ports.
+  cdp_manage(cdp_ports);
+
+  # Send a packet every minute. Pass received packets to callback.
+  while (1) {
+    cdp_send;
+    cdp_loop(\&callback, 60);
+  }
+
+Upgrading from Previous Versions
+--------------------------------
+
+Net::CDP version 0.07 introduces the use of named arguments instead of flag
+bitmaps in some functions. Support for the old-style flag bitmaps will be
+removed soon. 'perldoc Net::CDP' for more details.
+
+Contacting the Author
+---------------------
+
+Please direct questions and comments to <cpan@very.puzzling.org>. I don't
+read comp.lang.perl.modules much, so if you leave a question there I might
+miss it.
+
+Copyright and License
+---------------------
+
+Copyright (C) 2005 by Michael Chapman
+
+libcdp is released under the terms and conditions of the GNU Library General
+Public License version 2. Net::CDP may be redistributed and/or modified under
+the same terms as Perl itself.
+
+$Id: README,v 1.7 2005/06/27 12:59:03 mchapman Exp $

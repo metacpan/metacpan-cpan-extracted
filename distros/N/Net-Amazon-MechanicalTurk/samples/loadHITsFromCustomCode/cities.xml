@@ -1,0 +1,5 @@
+<cities>
+    <city name="Seattle"     state="WA"/>
+    <city name="Los Angeles" state="CA"/>
+    <city name="New York"    state="NY"/>
+</cities>

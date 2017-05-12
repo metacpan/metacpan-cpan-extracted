@@ -1,0 +1,8 @@
+=head1 INSTALLATION
+
+    sudo cpan Net::GraphSpace
+
+=head1 DOCUMENTATION
+
+see L<Net::GraphSpace>
+

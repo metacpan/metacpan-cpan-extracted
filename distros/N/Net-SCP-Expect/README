@@ -1,0 +1,226 @@
+NAME
+    Net::SCP::Expect - Wrapper for scp that allows passwords via Expect.
+
+SYNOPSIS
+    Example 1 - uses login method, longhand scp:
+
+     my $scpe = Net::SCP::Expect->new;
+     $scpe->login('user name', 'password');
+     $scpe->scp('file','host:/some/dir');
+
+    Example 2 - uses constructor, shorthand scp:
+
+     my $scpe = Net::SCP::Expect->new(host=>'host', user=>'user', password=>'xxxx');
+     $scpe->scp('file','/some/dir'); # 'file' copied to 'host' at '/some/dir'
+
+    Example 3 - copying from remote machine to local host
+
+     my $scpe = Net::SCP::Expect->new(user=>'user',password=>'xxxx');
+     $scpe->scp('host:/some/dir/filename','newfilename');
+
+    See the scp() method for more information on valid syntax.
+
+PREREQUISITES
+    Expect 1.14. May work with earlier versions, but was tested with 1.14
+    (and now 1.15) only.
+
+    Term::ReadPassword 0.01 is required if you want to execute the
+    interactive test script.
+
+DESCRIPTION
+    This module is simply a wrapper around the scp call. The primary
+    difference between this module and *Net::SCP* is that you may send a
+    password programmatically, instead of being forced to deal with
+    interactive sessions.
+
+USAGE
+  Net::SCP::Expect->new(*option=>val*, ...)
+    Creates a new object and optionally takes a series of options (see
+    "OPTIONS" below). All "OBJECT METHODS" apply to this constructor.
+
+OBJECT METHODS
+  auto_yes
+    Set this to 1 if you want to automatically pass a 'yes' string to any
+    yes or no questions that you may encounter before actually being asked
+    for a password, e.g. "Are you sure you want to continue connecting
+    (yes/no)?" for first time connections, etc.
+
+  error_handler(*sub ref*)
+    This sets up an error handler to catch any problems with a call to
+    'scp()'. If you do not define an error handler, then a simple 'croak()'
+    call will occur, with the last line sent to the terminal added as part
+    of the error message.
+
+    The method will immediately return with a void value after your error
+    handler has been called.
+
+  host(*host*)
+    Sets the host for the current object
+
+  login(*login, password*)
+    If the login and password are not passed as options to the constructor,
+    they must be passed with this method (or set individually - see 'user'
+    and 'password' methods). If they were already set, this method will
+    overwrite them with the new values.
+
+  password(*password*)
+    Sets the password for the current user, or the passphrase for the
+    identify file if identity_file option is specified in the constructor
+
+  user(*user*)
+    Sets the user for the current object
+
+  scp()
+    Copies the file from source to destination. If no host is specified, you
+    will be using 'scp' as an expensive form of 'cp'.
+
+    There are several valid ways to use this method
+
+   Local to Remote
+    scp(*source, user@host:destination*);
+
+    scp(*source, host:destination*); # User already defined
+
+    scp(*source, :destination*); # User and host already defined
+
+    scp(*source, destination*); # Same as previous
+
+   Remote to Local
+    scp(*user@host:source, destination*);
+
+    scp(*host:source, destination*);
+
+    scp(*:source, destination*);
+
+OPTIONS
+    auto_quote - Auto-encapsulate all option values and scp from/to
+    arguments in single-quotes to insure that special characters, such as
+    spaces in file names, do not cause inadvertant shell exceptions. Default
+    is enabled. Note: Be aware that this feature may break backward
+    compatibility with scripts that manually quoted input arguments to work
+    around unquoted argument limitations in 0.12 or earlier of this module;
+    in such cases, try disabling it or update your script to take advantage
+    of the auto_quote feature.
+
+    auto_yes - Set this to 1 if you want to automatically pass a 'yes'
+    string to any yes or no questions that you may encounter before actually
+    being asked for a password, e.g. "Are you sure you want to continue
+    connecting (yes/no)?" for first time connections, etc.
+
+    cipher - Selects the cipher to use for encrypting the data transfer.
+
+    host - Specify the host name. This is now useful for both
+    local-to-remote and remote-to-local transfers.
+
+    identity_file - Specify the identify file to use.
+
+    no_check - Set this to 1 if you want to turn off error checking. Use
+    this if you're absolutely positive you won't encounter any errors and
+    you want to speed up your scp calls - up to 2 seconds per call (based on
+    the defaults).
+
+    option - Specify options from the config file. This is the equivalent of
+    -o.
+
+    password - The password for the given login. If not specified, then
+    identity_file must be specified or an error will occur on login. If both
+    identity_file and password are specified, the password will be treated
+    as the passphrase for the identity file.
+
+    port - Use the specified port.
+
+    preserve - Preserves modification times, access times, and modes from
+    the original file.
+
+    protocol - Specify the ssh protocol to use for scp. The default is
+    undef, which simply means scp will use whatever it normally would use.
+
+    recursive - Set to 1 if you want to recursively copy entire directories.
+
+    scp_path - The path for the scp binary to use, i.e.: /usr/bin/scp,
+    defaults to use the first scp on your $PATH variable.
+
+    subsystem - Specify a subsystem to invoke on the remote system. This
+    option is only valid with ssh2 and openssh afaik.
+
+    terminator - Set the string terminator that is attached to the end of
+    the password. The default is a newline.
+
+    timeout - Sets the timeout value for your scp operation. The default is
+    10 seconds.
+
+    timeout_auto - Sets the timeout for the 'auto_yes' option. I separated
+    this from the standard timeout because generally you won't need nearly
+    as much time as you would for a standard timeout, otherwise your script
+    will drag considerably. The default is 1 second (which should be
+    plenty).
+
+    timeout_err - Sets the timeout for the additional error checking that
+    the module does. Because errors come back almost instantaneously, I
+    thought it best to make this a separate option for the same reasons as
+    the 'timeout_auto' option above. The default is 'undef'.
+
+    Setting it to any integer value means that your program will exit after
+    that many seconds *whether or not the operation has completed*. Caveat
+    programmor.
+
+    user - The login name you wish to use.
+
+    verbose - Set to 1 if you want verbose output sent to STDOUT. Note that
+    this disables some error checking (ala no_check) because the verbose
+    output could otherwise be picked up by expect itself.
+
+NOTES
+    The -q option (disable progress meter) is automatically passed to scp.
+
+    The -B option may NOT be set. If you don't plan to send passwords or use
+    identity files (with passphrases), consider using *Net::SCP* instead.
+
+    In the event a new version of *Net::SSH::Perl* is released that supports
+    scp, I recommend using that instead. Why? First, it should be a more
+    secure way to perform scp. Second, this module is not the fastest, even
+    with error checking turned off. Both reasons have to do with TTY
+    interaction.
+
+    Also, please see the Net::SFTP module from Dave Rolsky. If this suits
+    your needs, use it instead.
+
+FUTURE PLANS
+    There are a few options I haven't implemented. If you *really* want to
+    see them added, let me know and I'll see what I can do.
+
+    Add exception handling tests to the interactive test suite.
+
+KNOWN ISSUES
+    At least one user has reported warnings related to POD parsing with Perl
+    5.00503. These can be safely ignored. They do not appear in Perl 5.6 or
+    later.
+
+    Probably not thread safe. See RT bug #7567 from Adam Ruck.
+
+THANKS
+    Thanks to Roland Giersig (and Austin Schutz) for the Expect module. Very
+    handy.
+
+    Thanks also go out to all those who have submitted bug reports and/or
+    patches. See the CHANGES file for specifics.
+
+LICENSE
+    Net::SCP::Expect is licensed under the same terms as Perl itself.
+
+COPYRIGHT
+    2005-2008 Eric Rybski <rybskej@yahoo.com>, 2003-2004 Daniel J. Berger.
+
+CURRENT AUTHOR AND MAINTAINER
+    Eric Rybski <rybskej@yahoo.com>. Please send all module inquries to me.
+
+ORIGINAL AUTHOR
+    Daniel Berger
+
+    djberg96 at yahoo dot com
+
+    imperator on IRC
+
+SEE ALSO
+    Net::SCP, Net::SFTP, Net::SSH::Perl, Net::SSH2
+

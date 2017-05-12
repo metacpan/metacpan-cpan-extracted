@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/graylog
+create_swagger_api
+dist.ini
+lib/Net/Graylog/API.pm
+lib/Net/Graylog/API.pm.old
+lib/Net/Graylog/Client.pm
+lib/Net/Graylog/pod2htmd.tmp
+pod2htmd.tmp
+t/api.t
+t/client.t.off_temp

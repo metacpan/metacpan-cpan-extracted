@@ -1,0 +1,3 @@
+#!/bin/bash
+pod2text lib/Net/Server/POP3.pm > README
+pod2html lib/Net/Server/POP3.pm readme.html

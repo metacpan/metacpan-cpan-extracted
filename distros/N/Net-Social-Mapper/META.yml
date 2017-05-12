@@ -1,0 +1,41 @@
+---
+abstract: 'Utilities for dealing with internet personas'
+author:
+  - 'Simon Wistow <swistow@sixapart.com>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Social-Mapper
+provides:
+  Net::Social::Mapper:
+    file: lib/Net/Social/Mapper.pm
+    version: 0.5
+  Net::Social::Mapper::Persona:
+    file: lib/Net/Social/Mapper/Persona.pm
+  Net::Social::Mapper::Persona::Email:
+    file: lib/Net/Social/Mapper/Persona/Email.pm
+  Net::Social::Mapper::Persona::Flickr:
+    file: lib/Net/Social/Mapper/Persona/Flickr.pm
+  Net::Social::Mapper::Persona::Generic:
+    file: lib/Net/Social/Mapper/Persona/Generic.pm
+  Net::Social::Mapper::Persona::Myspace:
+    file: lib/Net/Social/Mapper/Persona/Myspace.pm
+  Net::Social::Mapper::Persona::Website:
+    file: lib/Net/Social/Mapper/Persona/Website.pm
+  Net::Social::Mapper::SiteMap:
+    file: lib/Net/Social/Mapper/SiteMap.pm
+requires:
+  Email::Address: 0
+  Email::Valid: 0
+  Feed::Find: 0
+  JSON::Any: 0
+  LWP::UserAgent: 0
+  Test::More: 0
+  URI: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.5

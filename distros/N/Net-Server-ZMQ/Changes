@@ -1,0 +1,7 @@
+Revision history for Net-Server-ZMQ
+
+0.001001  2015-02-10 00:19:01+02:00 Asia/Jerusalem
+	- Removed "use local::lib" accidentally left behind
+
+0.001000  2015-02-09 23:23:09+02:00 Asia/Jerusalem
+	- First public release

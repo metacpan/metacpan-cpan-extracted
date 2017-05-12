@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::ChooseFName.
+
+0.01  Tue Jan 11 20:16:26 2005
+	- original version; created by h2xs 1.23 with options
+		-b 5.5.0 --use-new-tests --skip-autoloader -AXfn Net::ChooseFName
+

@@ -1,0 +1,66 @@
+libnet-opensrs-email-app-perl (0.61) oneiric; urgency=low
+
+  * New upstream release
+
+ -- Mark Goldfinch <mark.goldfinch@modicagroup.com>  Mon, 19 Dec 2011 22:19:00 +1300
+
+libnet-opensrs-email-app-perl (0.60) oneiric; urgency=low
+
+  * New upstream release
+
+ -- Mark Goldfinch <mark.goldfinch@modicagroup.com>  Mon, 19 Dec 2011 22:09:00 +1300
+
+libnet-opensrs-email-app-perl (0.59) oneiric; urgency=low
+
+  * New upstream release
+
+ -- Mark Goldfinch <mark.goldfinch@modicagroup.com>  Tue, 06 Dec 2011 16:42:45 +1300
+
+libnet-opensrs-email-app-perl (0.58) natty; urgency=low
+
+  * New upstream release
+
+ -- Mark Goldfinch <mark.goldfinch@modicagroup.com>  Fri, 08 Aug 2011 23:03:45 +1200
+
+libnet-opensrs-email-app-perl (0.57) natty; urgency=low
+
+  * New upstream release
+
+ -- Mark Goldfinch <mark.goldfinch@modicagroup.com>  Fri, 05 Aug 2011 11:15:22 +1200
+
+libnet-opensrs-email-app-perl (0.56) natty; urgency=low
+
+  * New upstream release
+  * Include upstream Changes file in packaged documentation
+
+ -- Mark Goldfinch <mark.goldfinch@modicagroup.com>  Thu, 28 Jul 2011 10:08:22 +1200
+
+libnet-opensrs-email-app-perl (0.55) unstable; urgency=low
+
+  * New upstream release
+
+ -- Mark Goldfinch <mark.goldfinch@modicagroup.com>  Fri, 06 May 2011 11:03:37 +1200
+
+libnet-opensrs-email-app-perl (0.54-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Mark Goldfinch <mark.goldfinch@modicagroup.com>  Tue, 26 Apr 2011 21:06:37 +1200
+
+libnet-opensrs-email-app-perl (0.53-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Mark Goldfinch <mark.goldfinch@modicagroup.com>  Mon, 18 Apr 2011 10:00:37 +1200
+
+libnet-opensrs-email-app-perl (0.52-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Mark Goldfinch <mark.goldfinch@modicagroup.com>  Thu, 14 Apr 2011 11:12:37 +1200
+
+libnet-opensrs-email-app-perl (0.51-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Mark Goldfinch <mark.goldfinch@modicagroup.com>  Tue, 12 Apr 2011 15:20:35 +1200

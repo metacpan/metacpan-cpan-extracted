@@ -1,0 +1,18 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Net/Plesk.pm
+lib/Net/Plesk/Method.pm
+lib/Net/Plesk/Response.pm
+lib/Net/Plesk/Method/client_add.pm
+lib/Net/Plesk/Method/client_get.pm
+lib/Net/Plesk/Method/client_ippool_add_ip.pm
+lib/Net/Plesk/Method/domain_add.pm
+lib/Net/Plesk/Method/domain_del.pm
+lib/Net/Plesk/Method/domain_get.pm
+lib/Net/Plesk/Method/mail_add.pm
+lib/Net/Plesk/Method/mail_remove.pm
+lib/Net/Plesk/Method/mail_set.pm
+t/Net-Plesk.t
+META.yml                                 Module meta-data (added by MakeMaker)

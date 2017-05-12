@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entry xmlns="http://www.w3.org/2005/Atom" xmlns:georss="http://www.georss.org/georss" xmlns:gml="http://www.opengis.net/gml" xmlns:gphoto="http://schemas.google.com/photos/2007" xmlns:media="http://search.yahoo.com/mrss/">
+  <id>http://picasaweb.google.com/data/entry/api/user/andy.shevchenko/albumid/5632941380050677889</id>
+  <published>2006-07-07T07:00:00.000Z</published>
+  <updated>2011-07-24T15:29:27.102Z</updated>
+  <category scheme="http://schemas.google.com/g/2005#kind" term="http://schemas.google.com/photos/2007#album"/>
+  <title type="text">Net::PicasaWeb test</title>
+  <summary type="text">Summary of the album</summary>
+  <rights type="text">private</rights>
+  <link href="http://picasaweb.google.com/data/feed/api/user/andy.shevchenko/albumid/5632941380050677889" rel="http://schemas.google.com/g/2005#feed" type="application/atom+xml"/>
+  <link href="https://picasaweb.google.com/andy.shevchenko/NetPicasaWebTest" rel="alternate" type="text/html"/>
+  <link href="http://picasaweb.google.com/data/entry/api/user/andy.shevchenko/albumid/5632941380050677889" rel="self" type="application/atom+xml"/>
+  <link href="http://picasaweb.google.com/data/entry/api/user/andy.shevchenko/albumid/5632941380050677889/1" rel="edit" type="application/atom+xml"/>
+  <link href="http://picasaweb.google.com/data/entry/api/user/andy.shevchenko/albumid/5632941380050677889/acl" rel="http://schemas.google.com/acl/2007#accessControlList" type="application/atom+xml"/>
+  <author>
+    <name>Andy Shevchenko</name>
+    <uri>https://picasaweb.google.com/andy.shevchenko</uri>
+  </author>
+  <gphoto:id>5632941380050677889</gphoto:id>
+  <gphoto:name>NetPicasaWebTest</gphoto:name>
+  <gphoto:location>Finland</gphoto:location>
+  <gphoto:access>private</gphoto:access>
+  <gphoto:timestamp>1152255600000</gphoto:timestamp>
+  <gphoto:numphotos>0</gphoto:numphotos>
+  <gphoto:numphotosremaining>1000</gphoto:numphotosremaining>
+  <gphoto:bytesUsed>0</gphoto:bytesUsed>
+  <gphoto:user>andy.shevchenko</gphoto:user>
+  <gphoto:nickname>Andy Shevchenko</gphoto:nickname>
+  <gphoto:commentingEnabled>true</gphoto:commentingEnabled>
+  <gphoto:commentCount>0</gphoto:commentCount>
+  <media:group>
+    <media:content medium="image" type="image/jpeg" url="http://lh3.ggpht.com/-NNn-snyeFYk/Tiw6Vy6E8IE/AAAAAAAAJXI/2lAmmsqutbk/NetPicasaWebTest.jpg"/>
+    <media:credit>Andy Shevchenko</media:credit>
+    <media:description type="plain">Summary of the album</media:description>
+    <media:keywords/>
+    <media:thumbnail height="160" url="http://lh3.ggpht.com/-NNn-snyeFYk/Tiw6Vy6E8IE/AAAAAAAAJXI/2lAmmsqutbk/s160-c/NetPicasaWebTest.jpg" width="160"/>
+    <media:title type="plain">Net::PicasaWeb test</media:title>
+  </media:group>
+  <georss:where>
+    <gml:Envelope>
+      <gml:lowerCorner>56.7215633 19.559401</gml:lowerCorner>
+      <gml:upperCorner>67.1266565 31.936901</gml:upperCorner>
+    </gml:Envelope>
+    <gml:Point>
+      <gml:pos>61.9241099 25.748151</gml:pos>
+    </gml:Point>
+  </georss:where>
+</entry>

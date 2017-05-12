@@ -1,0 +1,21 @@
+Revision history for Perl Module Net::Dev:Tools::Syslog.
+
+
+Mar 16 2004
+   Net::Dev::Tools::Syslog  v 0.8.0
+   Initial CPAN posting.
+   Module still under development for tweaks and features.
+
+
+Dec 21 2006
+   Net::Dev::Tools::Syslog  v 1.0.0
+   Modified the parser to give more user control over parsing.
+   Added forwarding to listener.
+   Accounted for syslog messages without HOSTNAME.
+   Allow sender and listener to use user defined port, unix root
+   user check only for ports below 1024.
+   Providing example for each mode (send,listen,parse), example
+   are in the doc and in the distribution.
+
+
+

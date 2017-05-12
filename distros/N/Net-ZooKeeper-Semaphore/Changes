@@ -1,0 +1,9 @@
+Revision history for Perl module Net::ZooKeeper::Semaphore
+
+0.02 2013-09-12
+    - fixed N::ZK::Lock dependency
+    - reformatted Changes
+
+0.01 2013-07-02
+    initial release
+

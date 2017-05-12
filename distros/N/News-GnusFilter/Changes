@@ -1,0 +1,6 @@
+Version history for Perl extension News::GnusFilter.
+
+0.5  Sat Aug 18 14:33:19 2001
+	- original version; created by h2xs 1.21 with options
+		-cfn News::GnusFilter
+        - prepped for CPAN (wrote README, test.pl, ./gnusfilter)

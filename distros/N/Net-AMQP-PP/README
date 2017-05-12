@@ -1,0 +1,31 @@
+NAME
+    Net::AMQP::PP - Nasty hack for when you want pure perl
+    AnyEvent::RabbitMQ
+
+SYNOPSIS
+        use Net::AMQP::PP;
+        use AnyEvent::RabbitMQ; # Note - order is important!
+
+DESCRIPTION
+    This module horribly monkeypatches NET::AMQP to avoid it's need to load
+    XML::LibXML.
+
+    This code does disgusting things, and should be considered alpha
+    quality.
+
+    It uses the flavour of the AMQP spec inlined into AnyEvent::RabbitMQ to
+    be compatible with that module.
+
+    Note that this module depends on Net::AMQP, which cannot be installed
+    without XML::LibXML, and therefore is only useful when you're trying to
+    make something with App::FatPacker.
+
+AUTHOR
+    Tomas Doran (t0m) "<bobtfish@bobtfish.net>".
+
+COPYRIGHT
+    The above author
+
+LICENSE
+    Perl licensed.
+

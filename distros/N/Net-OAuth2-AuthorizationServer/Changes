@@ -1,0 +1,45 @@
+Revision history for Net-OAuth2-AuthorizationServer
+
+0.14     2017-03-03
+        - Additions and changes for handling modification of scopes, many
+          thanks to Martin Renvoize for patches and assistance with this
+        - Add scopes to returned information from from verify_client (GH #5)
+          this will allow modification of requested scopes, which can be then
+          passed back through other callbacks
+        - Add document response_type in verify_client (GH #5)
+        - Fix catch missing client_id in _verify_client callback
+
+0.13     2016-10-15
+        - Remove undocumented legacy_args flag
+
+0.12     2016-10-15
+        - Deprecate undocumented legacy_args flag
+
+0.11     2016-09-16
+        - Add more documentation to Net::OAuth2::AuthorizationServer::Manual
+
+0.10     2016-09-15
+        - Add Net::OAuth2::AuthorizationServer::ClientCredentialsGrant
+        - Add more documentation to Net::OAuth2::AuthorizationServer::Manual
+
+0.09     2016-08-31
+        - Fix clients with a client_secret must use Authorization Code
+          flow and not Implicit Grant flow
+        - Fix pass redirect_uri and response_type to verify_client cb
+          so correct validation can be done for above fix
+
+0.08     2016-08-31
+        - Add Net::OAuth2::AuthorizationServer::ImplicitGrant
+
+0.07     2016-05-12
+        - Transfer repo from G3S to Humanstate
+
+0.06     2016-04-17
+        - Add Net::OAuth2::AuthorizationServer::PasswordGrant
+        - Add Net::OAuth2::AuthorizationServer::Manual
+
+0.03     2016-04-11
+        - First release, broken out of Mojolicious::Plugin::OAuth2::Server
+          for better abstraction and decoupling from the Mojolicious framework.
+          Should also allow tidying up of method args and easier additions of
+          other OAtuth2 grant types

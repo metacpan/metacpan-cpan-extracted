@@ -1,0 +1,7 @@
+0.021 Mon Aug 31 21:26:35 EEST 2009
+- text() method for easy creation of text SM
+- create_long_sm() exported function
+
+0.020 Fri Aug 28 12:24:51 EEST 2009
+- use version.pm in all modules
+- fix warning with empty UDH concatenation

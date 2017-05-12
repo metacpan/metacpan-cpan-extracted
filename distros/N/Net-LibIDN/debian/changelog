@@ -1,0 +1,71 @@
+libnet-libidn-perl (0.12-0.1) unstable; urgency=low
+
+  * New upstream OS compatibility fixes 
+
+ -- Thomas Jacob <jacob@internet24.de>  Thu, 26 Feb 2009 13:48:25 +0100
+
+libnet-libidn-perl (0.11-0.1) unstable; urgency=low
+
+  * Non-maintainer upload
+  * Improve Libidn detection capabilities
+
+ -- Thomas Jacob <jacob@internet24.de>  Tue, 26 Aug 2008 19:51:06 +0200
+
+libnet-libidn-perl (0.10-0.1) unstable; urgency=low
+
+  * Non-maintainer upload
+  * Shut up CPAN testers
+  * Correct some lintian problem
+
+ --  <jacob@internet24.de>  Thu, 13 Dec 2007 00:02:55 +0100
+
+libnet-libidn-perl (0.09-1) unstable; urgency=low
+
+  * Minor doc changes 
+
+ --  <jacob@internet24.de>  Mon,  7 Aug 2006 19:15:23 +0200
+
+libnet-libidn-perl (0.08-1) unstable; urgency=low
+
+  * Improved portability, shouldn't affect Debian package
+  * Lower case letter starts off pkg descr in control
+
+ --  <jacob@internet24.de>  Mon, 17 Jan 2005 15:11:20 +0100
+
+libnet-libidn-perl (0.07-1) unstable; urgency=low
+
+  * Improved debianization, Makefile generation and portability
+
+ --  <jacob@internet24.de>  Mon, 26 Apr 2004 11:45:14 +0200
+
+libnet-libidn-perl (0.06-1) unstable; urgency=low
+
+  * Doc changes, improved debianization
+  * Submit to Debian. Closes: #240437.
+
+ --  <jacob@internet24.de>  Mon, 29 Mar 2004 19:31:37 +0200
+
+libnet-libidn-perl (0.05-2) unstable; urgency=low
+
+  * minor packaging issues
+
+ -- Matthias Urlichs <smurf@debian.org>  Sat, 27 Mar 2004 11:35:33 +0100
+
+libnet-libidn-perl (0.05-1) unstable; urgency=low
+
+  * Minor fixes and optimizations
+
+ --  <jacob@internet24.de>  Thu, 18 Mar 2004 16:13:50 +0100
+
+libnet-libidn-perl (0.04-1) unstable; urgency=low
+
+  * Update for real release of Libidn 0.4.0
+
+ --  <jacob@internet24.de>  Sun, 29 Feb 2004 16:33:41 +0100
+
+libnet-libidn-perl (0.03-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Thomas Jacob <jacob@internet24.de>  Sat, 14 Feb 2004 01:04:56 +0100
+

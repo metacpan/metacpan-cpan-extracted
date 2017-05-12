@@ -1,0 +1,42 @@
+{
+   "abstract" : "Simple Network Management Protocol layer object",
+   "author" : [
+      "Michael Vincent <vin at vinsworld dot com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Frame-Layer-SNMP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Convert::ASN1" : "0.26",
+            "Net::Frame" : "1.09"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.02"
+}

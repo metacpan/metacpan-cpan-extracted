@@ -1,0 +1,37 @@
+# -*-cperl-*-
+# $Id: modestmaps_mk_pinwin_maps_for_photoset,v 1.1 2008/01/27 21:33:42 asc Exp $
+
+use strict;
+
+use Config::Simple;
+use Getopt::Std;
+
+use Log::Dispatch::Screen;
+use Net::Flickr::Geo::ModestMaps;
+
+{
+        &main();
+        exit;
+}
+
+sub main {
+        
+        my %opts = ();
+        getopts('c:s:', \%opts);
+
+        my $cfg = Config::Simple->new($opts{'c'});
+
+        $cfg->param("pinwin.photo_size", "Square");
+        $cfg->param("zoom", 15);
+
+        my $fl = Net::Flickr::Geo::ModestMaps->new($cfg);
+        $fl->log()->add(Log::Dispatch::Screen->new('name' => 'scr', min_level => 'debug'));
+
+        my $map = $fl->mk_pinwin_maps_for_photoset($opts{'s'});
+
+        foreach my $data (@$map){
+                $fl->log()->info("wrote image/map to $data->[0]");
+        }
+
+        return 1;
+}

@@ -1,0 +1,59 @@
+Revision history for Perl extension Netscape::Cache.
+
+0.46
+	- test fix for older Test.pm
+	- moved test file to t/* directory
+	- added missing PREREQ_PM
+
+0.45
+	- minor bug fixes
+	- skip tests if no cache db available
+
+0.44
+	- cosmetic fixes
+	- added ABSTRACT_FROM and AUTHOR to Makefile.PL
+	- added compatibility fix for Netscape 4.5
+
+0.43
+	- POD: added description of index.db
+	- COMPLETE_URL
+
+0.42	Wed Feb 11 15:35:18 CET 1998
+	- new funtion: convert_185_2xx
+	- option -clean for delcache.pl
+	- warning fixes
+
+0.41	Fri Nov 28 19:47:45 CET 1997
+	- option -index for constructor
+	- better support for dos/win
+	- fixed netscape 4.0 warnings
+	- tree option for nscache 
+
+0.40
+	- fixed endian problem
+	- new methods get_object_by_cachefile and get_url_by_cachefile
+
+0.32
+	- some bug fixes for older perl versions
+
+0.31
+	- support for netscape 4.0 (preferences.js)
+
+0.30
+	- TIEHASH interface
+	- support for Windows Netscape (not tested)
+	- changed some global variable names (they weren't documented anyway)
+	- some bug fixes
+
+0.22
+	- some bug fixes
+	- slightly improved documentation
+	- nscache: option "Cache direct" added
+
+0.21
+	- some examples
+	- bug fixes
+
+0.1
+	- original version
+

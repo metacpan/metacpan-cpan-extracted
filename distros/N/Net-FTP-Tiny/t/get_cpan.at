@@ -1,0 +1,38 @@
+use warnings;
+use strict;
+
+use Test::More tests => 8;
+
+BEGIN { use_ok "Net::FTP::Tiny", qw(ftp_get); }
+
+eval { ftp_get("ftp://ftp.funet.fi/pub/CPAN/indices/_does_not_exist_") };
+my $file = __FILE__; my $line = __LINE__-1;
+like $@, qr/\AFTP error: 550 [ -~]* at \Q$file\E line \Q$line\E\.?\n\z/;
+
+my $ts = eval { ftp_get("ftp://ftp.funet.fi/pub/CPAN/indices/timestamp.txt") };
+is $@, "";
+ok defined($ts) && ref($ts) eq "";
+like $ts, qr/\A[0-9]{10,} [ -~]*\n\z/;
+
+{
+	package Net::FTP::Tiny;
+	no warnings "redefine";
+	# This will turn the "PASV" command into something invalid,
+	# which should cause fallback to active mode.
+	my $original_send_cmd = \&_send_cmd;
+	*_send_cmd = sub ($$) {
+		if($_[1] =~ /\A(?:PASV|EPSV)\z/) {
+			my $newcmd = "X".$_[1];
+			pop @_;
+			push @_, $newcmd;
+		}
+		goto &$original_send_cmd;
+	};
+}
+
+$ts = eval { ftp_get("ftp://ftp.funet.fi/pub/CPAN/indices/timestamp.txt") };
+is $@, "";
+ok defined($ts) && ref($ts) eq "";
+like $ts, qr/\A[0-9]{10,} [ -~]*\n\z/;
+
+1;

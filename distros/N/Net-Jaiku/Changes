@@ -1,0 +1,39 @@
+Revision history for Perl extension Net::Jaiku.
+
+0.05.01  2007-09-28
+	* Documentation changes only. Trying to get '>' to appear on
+	  search.cpan.org's documentation view
+	* Added a test for Pod if you have Test::Pod installed. Skips
+	  nicely otherwise
+
+0.05.00  2007-09-28
+	* Checked to see if icon, location and generated are set before we
+	  try and tidy them up in setPresence
+	  - Thanks Christiaan Vertonghen
+	* Fixed a test that assumed everything in a presence had an id.
+	  Comments don't, they only have a comment_id.
+
+0.04.00  2007-09-16
+	* Added docs for setPresence and validation.
+	* Now requires Params::Validate
+	* Added a 'timeout' parameter to the contructor
+
+0.03.00  2007-05-21
+	* Added getContactsFeed
+	* Fixed some tests
+
+0.02.00  2007-05-19
+	* Fixed auth parameters
+	* Added icons
+	* get*Presence now calls /presence/last/json
+	* Added reverse icon lookups and groupings
+
+0.01.00  2007-04-15
+	- original version released to CPAN
+
+0.02.00  2007-05-19
+	* Fixed auth parameters
+	* Added icons
+	* get*Presence now calls /presence/last/json
+	* Added reverse icon lookups and groupings
+

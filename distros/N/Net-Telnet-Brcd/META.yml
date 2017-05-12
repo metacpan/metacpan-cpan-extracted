@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Net-Telnet-Brcd
+version:             1.13
+abstract:            Contact BROCADE switch with TELNET
+license:             ~
+author:              
+    - Laurent Bendavid <bendavid.laurent@free.fr>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Net::Telnet:                   3
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

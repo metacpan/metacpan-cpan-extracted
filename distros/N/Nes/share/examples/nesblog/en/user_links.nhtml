@@ -1,0 +1,40 @@
+{: NES 1.0 none :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  Nes 1.03 by Skriptke
+  Copyright 2009 - 2010 Enrique Castañón
+  Licensed under the GNU GPL.
+
+  Sample:
+  http://nes.sourceforge.net/
+
+  CPAN:
+  http://search.cpan.org/dist/Nes/
+
+  Repository:
+  http://github.com/Skriptke/nes
+
+  -----------------------------------------------------------------------------
+:}
+{: ~ ( !*nes_session_ok )
+            <h3>User</h3>
+            <ul>
+                <li><a href="?action=login">Login</a></li>
+                <li><a href="?action=register">Register</a></li>
+                <li><a href="?action=comment&item={: $ item_name :}">Add Comment</a></li>
+                <li><a href="?action=users">Users List</a></li>
+                <li><a href="?action=remember">Remember User/Password</a></li>
+            </ul>      
+:}
+{: ~ (  *nes_session_ok )
+            <small>{: include ( '{: * cfg_obj_top_dir :}/date_time.html', 'gmt', '%A %e %B %Y' ) :}</small>
+            <hr><br>
+            <h3>{: * nes_session_user :} is logged</h3>
+            <ul>
+                <li><a href="?action=profile">Profile</a></li>
+                <li><a href="?action=comment&item={: $ item_name :}">Add Comment</a></li>
+                <li><a href="?action=users">Users List</a></li>
+                <li><a href="?action=logout">Logout</a></li>
+            </ul>   
+:}

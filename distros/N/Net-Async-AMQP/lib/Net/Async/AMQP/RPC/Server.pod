@@ -1,0 +1,85 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::AMQP::RPC::Server
+at lib/Net/Async/AMQP/RPC/Server.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::AMQP::RPC::Server - server RPC handling
+
+=head1 VERSION
+
+version 2.000
+
+=head1 DESCRIPTION
+
+Provides a basic server implementation for RPC handling.
+
+=over 4
+
+=item * Declare a queue
+
+=item * Declare the RPC exchange
+
+=item * Bind our queue to the exchange
+
+=item * Start a consumer on the queue
+
+=item * For each message, process via subclass-defined handlers and send a reply to the default ('') exchange with the reply_to as the routing key
+
+=back
+
+=head2 queue
+
+Returns the server L<Net::Async::AMQP::Queue> instance.
+
+=head2 json
+
+Returns a L<JSON::MaybeXS> object, for ->encode and ->decode support. This will load L<JSON::MaybeXS> on first call.
+
+=head2 process_message
+
+Called when there is a message to process. Receives several named parameters:
+
+=head2 configure
+
+Applies configuration:
+
+=over 4
+
+=item * json_handler - defines the JSON handlers for each type
+
+=item * handler - defines default handlers
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Net::Async::AMQP::RPC::Base>
+
+L<active|Net::Async::AMQP::RPC::Base/active>, L<client_queue|Net::Async::AMQP::RPC::Base/client_queue>, L<connected|Net::Async::AMQP::RPC::Base/connected>, L<consumer|Net::Async::AMQP::RPC::Base/consumer>, L<consumer_channel|Net::Async::AMQP::RPC::Base/consumer_channel>, L<exchange|Net::Async::AMQP::RPC::Base/exchange>, L<future|Net::Async::AMQP::RPC::Base/future>, L<mq|Net::Async::AMQP::RPC::Base/mq>, L<on_message|Net::Async::AMQP::RPC::Base/on_message>, L<publisher_channel|Net::Async::AMQP::RPC::Base/publisher_channel>, L<queue_name|Net::Async::AMQP::RPC::Base/queue_name>, L<reply|Net::Async::AMQP::RPC::Base/reply>, L<routing_key|Net::Async::AMQP::RPC::Base/routing_key>, L<server_queue|Net::Async::AMQP::RPC::Base/server_queue>
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Licensed under the same terms as Perl itself, with additional licensing
+terms for the MQ spec to be found in C<share/amqp0-9-1.extended.xml>
+('a worldwide, perpetual, royalty-free, nontransferable, nonexclusive
+license to (i) copy, display, distribute and implement the Advanced
+Messaging Queue Protocol ("AMQP") Specification').

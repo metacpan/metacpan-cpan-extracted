@@ -1,0 +1,51 @@
+{
+   "abstract" : "mixin class for the mib-II ipRouteTable",
+   "author" : [
+      "Karl Gaissmaier <karl.gaissmaier (at) uni-ulm.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-SNMP-Mixin-IpRouteTable",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::SNMP" : "0",
+            "Net::SNMP::Mixin" : "0.13",
+            "Sub::Exporter" : "0.978",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::SNMP::Mixin::IpRouteTable" : {
+         "file" : "lib/Net/SNMP/Mixin/IpRouteTable.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

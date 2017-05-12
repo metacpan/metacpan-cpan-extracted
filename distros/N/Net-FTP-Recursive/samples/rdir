@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+# $Id: rdir,v 1.4 2008/02/04 00:56:51 jdl Exp $
+
+=pod
+
+=head1 NAME
+
+rdir - Sample script to show you how to use the rdir function.
+
+=head1 SYNOPSIS
+
+    % rdir [--help] <server> <user> <password> <remote_path> <local_path>
+
+=head1 DESCRIPTION
+
+This script is an example script for users of the C<Net::FTP::Recursive>
+module to be able to see how to utilize the C<rdir> method in a script.
+
+=head1 AUTHOR
+
+Jeremiah Lee <texasjdl_AT_yahoo_DOT_com>
+
+=cut
+
+use Net::FTP::Recursive;
+use Getopt::Long;
+use FileHandle;
+use Pod::Usage;
+use strict;
+use warnings;
+
+GetOptions( 'help|?' => sub { pod2usage(); } );
+
+pod2usage() unless @ARGV == 5;
+
+my $host = shift;
+my $username = shift;
+my $passwd = shift;
+my $remote_path = shift; #where to grab from
+my $filename = shift;
+
+my $fh = new FileHandle;
+$fh->open(">$filename");
+
+select $fh;
+$| = 1;
+
+select STDOUT;
+
+my $ftp = Net::FTP::Recursive->new($host, ); #Debug => 1);
+
+$ftp->login($username, $passwd) or die "Could not log in!";
+$ftp->binary();
+
+$ftp->cwd($remote_path);
+
+$ftp->rdir( FilenameOnly => 1, Filehandle => $fh, PrintType => 1 );
+
+$fh->close;
+
+$ftp->quit;

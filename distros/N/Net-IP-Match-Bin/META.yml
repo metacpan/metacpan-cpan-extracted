@@ -1,0 +1,21 @@
+---
+abstract: 'Perl extension for match IP addresses against Net ranges'
+author:
+  - 'Tomo <tomo_at_cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.120351'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-IP-Match-Bin
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+version: 0.14

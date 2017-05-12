@@ -1,0 +1,86 @@
+NAME
+    NetAddr::IP::Count - Count hosts in named subnets
+
+SYNOPSIS
+      use NetAddr::IP::Count;
+      use NetAddr::IP;
+
+      my $counter = new NetAddr::IP::Count;
+
+      $counter->add('subnet-00', new NetAddr::IP("10.0.0.0/24"));
+      $counter->add('other', @array_of_ip_addresses);
+      $counter->add('other', @another_array_of_ip_addresses);
+
+      $counter->cache(10);
+
+      $counter->count(new NetAddr::IP("10.0.3.17"));
+      $counter->count(@array_of_ip_addresses);
+
+      $counter->valcount(new NetAddr::IP("10.0.3.17"), 23);
+      @array_of_ipaddr_and_values = (new NetAddr::IP("10.0.3.17"), 23,
+                                    new NetAddr::IP("101.0.23.107"), 2);
+      $counter->valcount(@array_of_ipaddr_and_values);
+
+      my $r_count = $counter->result;
+
+      foreach my $subnet (keys %{$r_count}) {
+          print "Subnet $subnet had ", $r_count->{$subnet}, " visits.\n";
+      }
+
+DESCRIPTION
+    This module implements a symplistic way to match individual IP Addresses
+    to subnets. It can be used to, among other things, help analyze HTTPD
+    logs.
+
+    The following methods are implemented.
+
+    `->new'
+        Creates a new counter. This method can be called passing as argument
+        a hash where the keys are the name of the subnet group and the
+        values are references to arrays of `NetAddr::IP' objects referencing
+        each specific subnet. This is probably ok for static
+        initializations.
+
+    `->add'
+        Adds a subnet group. The first parameter is the name of the group
+        being added. If it's a new name, a new entry will be created. Else
+        the given subnets are added to the existing ones, like in the
+        example above.
+
+    `->count'
+        Verifies if the `NetAddr::IP'es are contained in any of the given
+        subnets. If this is the case, the corresponding totals are updated.
+
+    `->valcount'
+        The same as `->count' but the argument is an array consisting of
+        `NetAddr::IP'es and value pairs.
+
+    `->result'
+        Returns a reference to a hash containing the respective totals for
+        each subnet group. The key to the hash is the subnet name given with
+        `->add', the value is how many `NetAddr::IP' objects have been found
+        to match that subnet group.
+
+    `->cache'
+        Since in usual applications `NetAddr::IPes' from the same subnet
+        will tend to be grouped in clusters like in the case of HTTPD logs
+        some caching is attempted to speed things up. The caching consists
+        in storing the last few entries matched in an LRU list which is
+        checked before going through all the stored subnets.
+
+        This can improve response times if tuned sensibly, however consider
+        that every miss will cause every entry in the cache to be checked
+        twice, one in the cache and one in the normal process so it's
+        important to tune the cache.
+
+        The default cache size is 5, which can be changed by calling the
+        `->cache' method as in the example. The old value of the cache size
+        is returned.
+
+AUTHOR
+    Luis E. Munoz <lem@cantv.net>. Alvaro Carvajal <alvaro@cantv.net>
+    contributed the valcount method.
+
+SEE ALSO
+    perl(1), NetAddr::IP(1).
+

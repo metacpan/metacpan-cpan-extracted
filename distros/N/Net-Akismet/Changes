@@ -1,0 +1,21 @@
+Revision history for Perl extension Net::Akismet.
+
+0.05
+	- mention in the docs about the host/version feature
+
+0.04  Thu Jun  5 19:58:41 EEST 2008
+	- allow service host and version to be changed from the constructor
+	- SYNOPSIS fixes by John Belmonte	
+
+0.03  Mon Aug 27 10:28:28 EEST 2007
+	- proper user agent handling, patch by John Belmonte, rt bug #28939
+
+0.02  Sun Jul 2 23:12:27 2006
+	- fixed install problems with perl <5.8.4
+	- some new test added (thanks to Peter Pentchev)
+
+0.01  Wed Jan 11 13:31:42 2006
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Net::Akismet
+
+$Id: Changes 38 2008-06-05 17:15:12Z humperdink $

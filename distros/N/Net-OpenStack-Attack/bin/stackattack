@@ -1,0 +1,177 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use v5.10;
+use App::Rad;
+use Net::OpenStack::Attack;
+use Net::OpenStack::Compute;
+use Time::SoFar qw(runtime);
+
+App::Rad->run();
+
+sub setup {
+    my $c = shift;
+    $c->register_commands({
+        bad     => 'send invalid requests',
+        servers => 'send get /servers requests [--detail]',
+        images  => 'send get /images requests [--detail]',
+        flavors => 'send get /flavors requests [--detail]',
+        create  => 'create servers [--image|-i]',
+        delete  =>
+            'delete all stackattack servers [--all|-a] (deletes ALL servers)',
+        rebuild =>
+            'rebuild all stackattack servers [--all|-a] [--image|-i]',
+    });
+}
+
+sub pre_process {
+    my $c = shift;
+    my $cmd = $c->cmd;
+    return if $cmd eq 'help' or !$c->is_command($cmd);
+
+    my $msg = "%s env var is missing. Did you forget to source novarc?\n";
+    die sprintf($msg, 'NOVA_URL or OS_AUTH_URL')
+        unless $ENV{NOVA_URL} || $ENV{OS_AUTH_URL};
+    die sprintf($msg, 'NOVA_USERNAME or OS_USERNAME')
+        unless $ENV{NOVA_USERNAME} || $ENV{OS_USERNAME};
+    die sprintf($msg, 'NOVA_PASSWORD or NOVA_API_KEY or OS_PASSWORD')
+        unless $ENV{NOVA_PASSWORD} || $ENV{NOVA_API_KEY} || $ENV{OS_PASSWORD};
+    my $compute = Net::OpenStack::Compute->new(
+        auth_url     => $ENV{NOVA_URL}         || $ENV{OS_AUTH_URL},
+        user         => $ENV{NOVA_USERNAME}    || $ENV{OS_USERNAME},
+        password     => $ENV{NOVA_PASSWORD}    || $ENV{NOVA_API_KEY}
+                                               || $ENV{OS_PASSWORD},
+        project_id   => $ENV{NOVA_PROJECT_ID}  || $ENV{OS_TENANT_NAME},
+        region       => $ENV{NOVA_REGION_NAME} || $ENV{OS_AUTH_REGION},
+        service_name => $ENV{NOVA_SERVICE_NAME},
+        is_rax_auth  => $ENV{NOVA_RAX_AUTH},
+        verify_ssl   => 0,
+    );
+    $c->stash->{attack} = Net::OpenStack::Attack->new(compute => $compute);
+    $c->getopt('all|a', 'detail') or die "See help for valid options\n";
+    $c->stash->{num_runs} = $c->argv->[0] || 1;
+}
+
+sub create {
+    my $c = shift;
+    $c->getopt('image|i=s');
+    my $num_runs = $c->argv->[0] || 1;
+    my $attack = $c->stash->{attack};
+    my $image = $c->options->{image};
+    say "Creating $num_runs servers ...";
+    return _msg($attack->create_servers($num_runs, $image));
+}
+
+sub delete {
+    my $c = shift;
+    my $attack = $c->stash->{attack};
+    my $servers = _filter_servers($c);
+    say "Deleting " . @$servers . " servers ...";
+    return _msg($attack->delete_servers($servers));
+}
+
+sub rebuild {
+    my $c = shift;
+    my $attack = $c->stash->{attack};
+    my $servers = _filter_servers($c);
+    say "Rebuilding " . @$servers . " servers ...";
+    return _msg($attack->rebuild_servers($servers));
+}
+
+sub bad     { _get(shift, '/bad')     }
+sub servers { _get(shift, '/servers') }
+sub images  { _get(shift, '/images')  }
+sub flavors { _get(shift, '/flavors') }
+
+sub _get {
+    my ($c, $url) = @_;
+    $url .= '/detail' if $c->options->{detail};
+    my $num_runs = $c->stash->{num_runs};
+    my $attack = $c->stash->{attack};
+    say "Sending $num_runs $url requests ...";
+    return _msg($attack->attack(GET => $url, $num_runs));
+}
+
+sub _msg {
+    my $data = shift;
+    return sprintf "Successes: %s Failures: %s Time: %s ",
+        $data->{successes}, $data->{failures}, runtime();
+}
+
+sub _filter_servers {
+    my $c = shift;
+    my $attack = $c->stash->{attack};
+    my $servers = $attack->compute->get_servers(detail => 0);
+    return $servers if $c->options->{all};
+    return [ grep { $_->{name} eq 'stackattack' } @$servers ];
+}
+
+# PODNAME: stackattack
+
+
+__END__
+=pod
+
+=head1 NAME
+
+stackattack
+
+=head1 VERSION
+
+version 1.0500
+
+=head1 SYNOPSIS
+
+    Usage: stackattack command [arguments]
+
+    Available Commands:
+        bad         send invalid requests
+        create      create servers [--image|-i]
+        delete      delete all stackattack servers [--all|-a] (deletes ALL servers)
+        get         send get servers requests
+        get-images  send image list requests
+        help        show syntax and available commands
+        rebuild     rebuild all stackattack servers [--all|-a] [--image|-i]
+
+    Examples:
+
+    # Create a server
+    $ stackattack create
+
+    # Create 10 servers in parallel
+    $ stackattack create 10
+
+    # Create 10 servers with an explicit image id
+    $ stackattack create -i b79cf9f9-cea9-44c7-a3ac-74a6668eb78b 10
+
+    # Delete all servers
+    $ stackattack delete -a
+
+=head1 DESCRIPTION
+
+This is a command line utility for stress testing an OpenStack deployment.
+All http requests are run in parallel using L<HTTP::Async>.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+William Wolf <throughnothing@gmail.com>
+
+=item *
+
+Naveed Massjouni <naveedm9@gmail.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Naveed Massjouni.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

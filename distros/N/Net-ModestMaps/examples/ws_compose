@@ -1,0 +1,36 @@
+# -*-cperl-*-
+
+use strict;
+use Net::ModestMaps;
+use Data::Dumper;
+
+{
+        &main();
+        exit;
+}
+
+sub main {
+
+        my %args = (
+                    'provider' => 'MICROSOFT_ROAD',
+                    'method' => 'center',
+                    'latitude' => '45.521375561025756',
+                    'longitude' => '-73.57049345970154',
+                    'zoom' => 15,
+                    'height' => 500,
+                    'width' => 500
+                   );
+
+        my $mm = Net::ModestMaps->new();
+        $mm->host('http://127.0.0.1:9998');
+
+        my $data = $mm->draw(\%args);
+
+        if (my $err = $data->{'error'}){
+                warn $err->{'message'};
+                return 0;
+        }
+
+        print $data->{'path'} . "\n";
+        return 1;
+}

@@ -1,0 +1,94 @@
+---
+abstract: 'Perl API to oFono'
+author:
+  - 'Jens Rehsack <rehsack@cpan.org>'
+build_requires:
+  Test::More: 0.90
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Radio-oFono
+no_index:
+  namespace:
+    - Net::Radio::oFono::Helpers
+provides:
+  Net::Radio::oFono:
+    file: lib/Net/Radio/oFono.pm
+    version: 0.001
+  Net::Radio::oFono::CellBroadcast:
+    file: lib/Net/Radio/oFono/CellBroadcast.pm
+    version: 0.001
+  Net::Radio::oFono::ConnectionContext:
+    file: lib/Net/Radio/oFono/ConnectionContext.pm
+    version: 0.001
+  Net::Radio::oFono::ConnectionManager:
+    file: lib/Net/Radio/oFono/ConnectionManager.pm
+    version: 0.001
+  Net::Radio::oFono::Helpers::Container:
+    file: lib/Net/Radio/oFono/Helpers/Container.pm
+    version: 0
+  Net::Radio::oFono::Helpers::EventMgr:
+    file: lib/Net/Radio/oFono/Helpers/EventMgr.pm
+    version: 0
+  Net::Radio::oFono::Helpers::EventMgr::Container:
+    file: lib/Net/Radio/oFono/Helpers/EventMgr.pm
+    version: 0
+  Net::Radio::oFono::Helpers::IteratableContainer:
+    file: lib/Net/Radio/oFono/Helpers/IteratableContainer.pm
+    version: 0
+  Net::Radio::oFono::Manager:
+    file: lib/Net/Radio/oFono/Manager.pm
+    version: 0.001
+  Net::Radio::oFono::Message:
+    file: lib/Net/Radio/oFono/Message.pm
+    version: 0.001
+  Net::Radio::oFono::MessageManager:
+    file: lib/Net/Radio/oFono/MessageManager.pm
+    version: 0
+  Net::Radio::oFono::MessageWaiting:
+    file: lib/Net/Radio/oFono/MessageWaiting.pm
+    version: 0.001
+  Net::Radio::oFono::Modem:
+    file: lib/Net/Radio/oFono/Modem.pm
+    version: 0.001
+  Net::Radio::oFono::NetworkOperator:
+    file: lib/Net/Radio/oFono/NetworkOperator.pm
+    version: 0.001
+  Net::Radio::oFono::NetworkRegistration:
+    file: lib/Net/Radio/oFono/NetworkRegistration.pm
+    version: 0.001
+  Net::Radio::oFono::RadioSettings:
+    file: lib/Net/Radio/oFono/RadioSettings.pm
+    version: 0.001
+  Net::Radio::oFono::Roles::Manager:
+    file: lib/Net/Radio/oFono/Roles/Manager.pm
+    version: 0.001
+  Net::Radio::oFono::Roles::Properties:
+    file: lib/Net/Radio/oFono/Roles/Properties.pm
+    version: 0.001
+  Net::Radio::oFono::Roles::RemoteObj:
+    file: lib/Net/Radio/oFono/Roles/RemoteObj.pm
+    version: 0.001
+  Net::Radio::oFono::SimManager:
+    file: lib/Net/Radio/oFono/SimManager.pm
+    version: 0.001
+requires:
+  Carp::Assert: 0.18
+  Hash::MoreUtils: 0.02
+  List::MoreUtils: 0.22
+  List::Util: 0
+  Log::Any: 0.10
+  Log::Any::Adapter: 0
+  Net::DBus: 1.000000
+  Params::Util: 0.37
+  Scalar::Util: 0
+  perl: 5.01
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://repo.or.cz/
+version: 0.001

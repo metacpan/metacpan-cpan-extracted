@@ -1,0 +1,68 @@
+Revision history for Perl extension Net::SMPP.
+
+0.01  Mon Mar 12 15:37:10 2001
+	- original version; created by h2xs 1.20 with options
+		-A -n Net::SMPP
+
+0.91  28.9.2001
+	- released to CPAN
+
+0.92	- internal release
+
+0.93  11.12.2001
+	fixed encode_deliver_v4 to encode_deliver_sm_v4, bug reported
+        by Cristina Del Amo (Cristina.delAmo@vodafone-us.com)
+
+0.95  10.1.2002
+       applied big patch by Lars Thegler <lars@@thegler_.dk> to
+       make pack and unpack templates perl5.005_03 compatible.
+       Caught bugs in decode_outbind_v34(), encode_query_sm(),
+       encode_query_sm_resp() and replace_sm() --Sampo
+
+0.96  11.2.2002
+      applied enquiry to enquire fix from Ismael Briones <ismael@el-mundo.net>
+1.01  3.4.2002
+      Added more error reporting from Cris
+1.02  7.12.2002
+      Applied some patched by Luis Munoz <lem@@cantv.net> --Sampo
+1.03  8.12.2002
+      Another iteration pf patches from Luis Munoz --Sampo
+1.04  29.4.2005
+      * patch from Kristian Nielsen <kn_@@sifira..dk> --Sampo
+      * SImilar patch was submitted by Maxim.Burenko@kyivstar..net
+1.05  xx.x.2005
+      * never publicly distributed
+      * patch from Igor Ivolov to permit binding to specific interface
+1.10  21.4.2006
+      * sysread patch from Dziugas.Baltrunas@bite..lt. This patch improves
+        select compatibility of Net::SMPP. Similar patch was also
+        proposed by Felix Gaehtgens <felix@symlabs..com>. I conseder
+        both addressed now. --Sampo
+1.11  17.7.2007
+      * enquire_link patch from Matthias Meyser <Meyser@xenet.,de>
+      * Documented message encoding
+1.12  15.12.2008
+
+1.13  3.3.2010
+      * Fixed numerical value case in encode_optional_params()
+
+1.14  24.6.2010
+      * upgraded to support more recent perls, probably breaking 5.005 and earlier
+
+1.16  22.10.2010
+      * more patches to support more recent perls from Zeus Panchenko
+
+1.17  1.11.2010
+      * Added check for connect failure in new_transciever()
+
+1.18  10.11.2010
+      * Improved connect failure check per patch from Zeus Panchenko
+      * Added multipart message example from Zeus Panchenko
+      * Typo fix from Boris Shomodjvarac
+
+1.19  29.5.2011
+      * Improved signal handling in read_hard(), patch from Clemens Dorner
+
+Note: exact change logs are kept in git
+
+(See Interested-Readers)

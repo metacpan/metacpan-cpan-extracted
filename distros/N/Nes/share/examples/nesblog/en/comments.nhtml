@@ -1,0 +1,48 @@
+{: NES 1.0 ('../scripts/comments.cgi') :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  Nes 1.03 by Skriptke
+  Copyright 2009 - 2010 Enrique Castañón
+  Licensed under the GNU GPL.
+
+  Sample:
+  http://nes.sourceforge.net/
+
+  CPAN:
+  http://search.cpan.org/dist/Nes/
+
+  Repository:
+  http://github.com/Skriptke/nes
+
+  -----------------------------------------------------------------------------
+:}
+            <a name="comments" id="comments"></a>
+            <div id="comment">
+            <b><center><a href="./?action=comment&item={: $ item_name :}">Comments:</a></center></b>
+            </div>  
+            <br>
+            {: sql (
+                      'SELECT * FROM `comments` 
+                                WHERE ((article LIKE {: $ item_name :} OR article LIKE \'\')
+                                        AND lang LIKE {: $ lang :})
+                                ORDER BY date DESC
+                                LIMIT 100;'
+                    )
+            <div id="comment">
+                <p><b>{: @$ comments.name :}</b></p>
+                <p>{: @$ comments.comment :}</p>
+                <p><small>{: @$ comments.date :}</small></p>
+            </div>  
+            <br>
+            :}
+            {: ~ ( * DBnes_error_last_error )
+                <p>
+                Filas afectadas (mysql): {: * DBnes_rows :}<br>
+                Último error (mysql): {: * DBnes_error_last_error :}<br>
+                </p>
+            :}
+            <div id="comment">
+            <b><center><a href="./?action=comment&item={: $ item_name :}">Add Comment</a></center></b>
+            </div> 
+            

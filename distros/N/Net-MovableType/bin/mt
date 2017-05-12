@@ -1,0 +1,243 @@
+#!/usr/bin/perl -w
+
+# mt,v 1.3 2003/07/31 06:17:26 sherzodr Exp
+
+use strict;
+
+use File::Temp ('tempfile');
+use Net::MovableType;
+
+
+#
+# Turning STDOUT buffering off
+#
+$| = 1;
+
+
+#
+# defining variables
+#
+my %config = (); # <-- keeps the configuration file contents
+my %entry  = (); # <-- keeps entry contents
+my %cats   = (); # <-- list of all the categories of a web log
+my $pcat   = ""; # <-- primary category id of an entry
+my $postid = ""; # <-- ID of the new post, if any
+
+#
+# initializing configuration file
+#
+init_config(\%config);
+
+
+#
+# initializing default entry settings from the configuration file
+#
+$entry{mt_allow_comments} = $config{allow_comments};
+$entry{mt_allow_pings}    = $config{allow_ings};
+$entry{mt_convert_breaks} = $config{convert_breaks};
+
+
+
+#
+# creating MT object
+#
+my $mt = new MT( $config{Proxy}, $config{User}, $config{Password} );
+unless ( defined $mt ) {
+    die MT->errstr
+}
+
+
+#
+# getting entry's title
+#
+while ( !$entry{title} ) {
+    $entry{title} = prompt("Entry Title")
+}
+
+
+#
+# launching an editor session to get the main entry body
+#
+while ( !$entry{description} ) {
+    $entry{description} = editor_session("Main Entry Body", \%entry)
+}
+
+
+#
+# launching and editor session to get optional excerpt
+$entry{mt_excerpt} = editor_session("Excerpt (optional)", \%entry);
+
+
+
+
+#
+# saving the entry, but not publishing it yet
+#
+$postid = $mt->newPost(\%entry, 0);
+unless ( $postid ) {
+    die $mt->errstr
+}
+
+#
+# displaying entry categories
+#
+for my $c ( @{ $mt->getCategoryList } ) {
+    $cats{$c->{categoryId}} = $c->{categoryName};
+    printf("[%d] - %s\n", $c->{categoryId}, $c->{categoryName})
+}
+
+if ( keys %cats ) {
+    $pcat = prompt("Choose a category id");
+}
+
+
+#
+# if category was defined, we are setting a primary category for the post
+#
+if ( $pcat ) {
+    $mt->setPostCategories($postid, $cats{$pcat})
+}
+
+#
+# should we publish the post now?
+#
+if ( prompt("Publish the post $postid?", "no") =~ m/^y/i ) {
+    print "Publishing the post...", 
+            $mt->publishPost($postid) ? "Done" : $mt->errstr;
+    print "\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+#-------------------------------------------------------------------#
+#               -- utility functions follow --                      #
+#-------------------------------------------------------------------#
+
+
+
+
+sub editor_session {
+    my ($note, $entry) = @_;
+
+    #
+    # we first create a temporary file
+    #
+    my ($fh, $filename) = tempfile();
+
+    #
+    # putting some stuff into the template to help the user fill home
+    #
+    
+    print $fh "\n\n#", "-" x 72 , "\n";
+    print $fh "# $note. Lines starting with '#' are ignored\n";
+    print $fh "# \n";
+    print $fh "# Entry title: $entry->{title}\n";
+    print $fh "# \n";
+    if ( $entry->{description} ) {
+        my @lines = split /\n/, $entry->{description};
+        print $fh "# Entry Body:\n";
+        print $fh "# ", join ("\n# ", @lines), "\n";
+    }
+    print $fh "# ", "-" x 72, "\n";
+    close($fh) or die $!;
+
+    #
+    # statting the file before it was modified
+    #
+    my $before = stat($filename) or die "No file: $!";
+
+    #
+    # now we need to open and editor session
+    #
+    system("$ENV{EDITOR} $filename") && die $!;
+
+    #
+    # statting the file again, after it was presumably modified
+    #
+    my $after = stat($filename) or die "No file: $!";
+
+    #
+    # now opening the file again, this time for readin
+    #
+    open(FH, $filename) or die "couldn't open $filename: $!";
+    my $text = "";
+    while ( <FH> ) {
+        /^\#/ and next;
+        $text .= $_;
+    }
+    close(FH);
+
+    #
+    # if text has nothing but whitespace, we consider it empty entry
+    #
+    unless ( $text =~ m/\S/ ) {
+        return "";
+    }
+
+    #
+    # if we can't unlink the temporary file, we simply issue warning
+    #
+    unless ( unlink ($filename) ) {
+        warn "couldn't unlink '$filename': $!"
+    }
+
+    return $text
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub prompt {
+    my ($prompt, $default) = @_;
+    
+    $default ||= "";
+
+    printf("%s [%s]: ", $prompt, $default);
+    chomp( my $answer = <STDIN> );
+    $answer ||= $default;
+    return $answer
+}
+    
+    
+
+
+
+
+
+
+
+sub init_config {
+    my $config = shift;
+
+    #
+    # we require values of HOME and EDITOR varaibles set
+    #
+    unless ( $ENV{HOME} && $ENV{EDITOR} ) {
+        die "'HOME' and 'EDITOR' environmental variables are not yet\n"
+    }
+
+    require Config::Simple;
+    require File::Spec;
+
+    my $cfg_file = File::Spec->catfile($ENV{HOME}, '.mt.cfg');
+    Config::Simple->import_from($cfg_file, $config)
+}
+

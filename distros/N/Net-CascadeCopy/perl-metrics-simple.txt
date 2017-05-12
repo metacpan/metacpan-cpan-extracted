@@ -1,0 +1,62 @@
+
+Perl files found:                1
+
+Counts
+------
+total code lines:        366
+lines of non-sub code:   27
+packages found:          1
+subs/methods:            24
+
+Subroutine/Method Size
+----------------------
+min:                  4 lines
+max:                  54 lines
+mean:                 14.12 lines
+std. deviation:       11.62
+median:               10.50
+
+McCabe Complexity
+-----------------
+Code not in any subroutine::
+min:                  1
+max                   1
+mean:                 1.00
+std. deviation:       0.00
+median:               1.00
+
+Subroutines/Methods:
+min:                  1
+max:                  15
+mean:                 4.04
+std. deviation:       3.54
+median:               3.00
+
+Tab-delimited list of subroutines, with most complex at top
+-----------------------------------------------------------
+complexity	sub	path	size
+15	_start_process	lib/Net/CascadeCopy.pm	54
+10	_print_status	lib/Net/CascadeCopy.pm	36
+9	_transfer_loop	lib/Net/CascadeCopy.pm	30
+7	transfer	lib/Net/CascadeCopy.pm	18
+7	_check_for_completed_processes	lib/Net/CascadeCopy.pm	16
+7	_get_available_servers	lib/Net/CascadeCopy.pm	13
+6	new	lib/Net/CascadeCopy.pm	10
+5	_human_friendly_time	lib/Net/CascadeCopy.pm	19
+4	_reserve_remaining_server	lib/Net/CascadeCopy.pm	17
+4	_mark_available	lib/Net/CascadeCopy.pm	14
+3	_failed_process	lib/Net/CascadeCopy.pm	20
+3	_get_remaining_servers	lib/Net/CascadeCopy.pm	7
+3	_get_remaining_groups	lib/Net/CascadeCopy.pm	7
+2	set_command	lib/Net/CascadeCopy.pm	6
+2	add_group	lib/Net/CascadeCopy.pm	11
+2	_reserve_available_server	lib/Net/CascadeCopy.pm	10
+1	_get_data	lib/Net/CascadeCopy.pm	4
+1	set_source_path	lib/Net/CascadeCopy.pm	4
+1	set_target_path	lib/Net/CascadeCopy.pm	4
+1	_succeeded_process	lib/Net/CascadeCopy.pm	17
+1	_mark_remaining	lib/Net/CascadeCopy.pm	5
+1	_mark_completed	lib/Net/CascadeCopy.pm	5
+1	_mark_failed	lib/Net/CascadeCopy.pm	8
+1	get_transfer_map	lib/Net/CascadeCopy.pm	4
+1	{code not in named subroutines}	lib/Net/CascadeCopy.pm	27

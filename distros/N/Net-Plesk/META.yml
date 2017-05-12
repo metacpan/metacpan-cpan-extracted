@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Net-Plesk
+version:      0.03
+version_from: lib/Net/Plesk.pm
+installdirs:  site
+requires:
+    LWP:                           0
+    XML::Simple:                   0
+    XML::XPath:                    0
+    XML::XPath::XMLParser:         0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,130 @@
+Revision history for Perl extension Net::Traces::TSH.
+
+0.16 Wed Nov 17 2004
+   - Minor code modifications and cleanup
+
+0.15 Mon Oct 4 2004
+   - TCP segments with header lengths smaller than 20 bytes are no
+     longer included in the tally for 'Total ACKs'.  In general,
+     it may be interesting to count the number of TCP segments with
+     header lengths smaller than the required minimum (20 bytes).
+     However, in a recent study I noticed that out of 22,592,477,487
+     segments with the ACK bit set, only 158 had a header smaller than
+     20 bytes.  It is not clear whether these segments belonged to
+     protocols masquerading as TCP, or if they where erroneous
+     TCP segments.  Anyhow, by now ignoring such segments, the
+     following equation is always true:
+
+               Total ACKs = Cumulative ACKs + Options ACKs
+
+   - Minor code modifications and cleanup
+   - Distribution cleanup based on suggestions from "Writing Perl
+     Modules for CPAN" by Sam Tregar (Apress 2002)
+   - POD updates and editorial changes
+
+0.14 Tue Aug 31 2004
+   - Data structure %Trace and %Interface refactoring
+   - converters/tsh2ns2.pl ver. 0.01 released
+   - Updated applications/tsh2tcpdump.pl
+   - POD updates and editorial changes
+
+0.13 Mon Aug 30 2004
+   - Added configure() to ease configuration setting
+   - process_trace() can now convert a TSH trace to tcpdump and ns2
+     formats (see module documentation) in addition to collecting
+     per-interface and aggregate protocol usage statistics. The
+     parameters passed to process_trace() has been reduced to one: the
+     TSH trace filename to be processed.
+   - Updated applications/tsh2tcpdump.pl
+   - Additional tests released
+
+0.12 Sat Aug 21 2004
+   - Code updates and minor fixes.  Use autouse for Carp.
+   - POD updates and editorial changes
+   - Added get_interfaces_list()
+   - Updated documentation/sample-summary.pod
+   - Additional tests released
+
+0.11 Sun Jun 13 2004
+   - Application tsh2tcpdump.pl 0.01 released
+
+0.10 Thu Jun 10 2004
+   - Code reorganization and simplification
+   - Added get_interfaces_href() and write_interface_summaries(). One
+     can now get statistics on per-interface basis in a way similar to
+     get_trace_summary_href()  and write_trace_summary(), respectively
+   - Added write_summary(), an internal, non-exportable utility function.
+   - Additional tests released
+
+0.09 Mon Jun 7 2004
+   - Module can now provide summary statistics on a per-interface
+     basis in addition to the aggregate statistics. (POD to be added.)
+   - POD editorial changes
+   - Renamed %Trace_Summary to %Trace
+   - Updated __DATA__ section with the latest IANA Protocol Numbers
+     published (May 12, 2004); allowed for more multi-word protocol
+     names
+
+0.08 Tue May 4 2004
+   - Code simplifications in date_of() and process_trace()
+   - POD updates and editorial changes
+   - Additional tests released
+
+0.07 Sun Apr 25 2004
+   - Same code as in 0.06, with minor editorial POD changes
+   - Distribution fix: CPAN testers reported that ver. 0.07 fails to
+     pass its own tests on MSWin platforms (see comments below,
+     ver. 0.06).  Since this may lead users to believe that the code
+     does not work correctly, I decided to skip context diffs between
+     the distribution-bundled sample output files (t/sample.csv and
+     t/sample.tcpdump) and the locally generated ones on MSWin
+     platforms for now, and continue searching for an alternative
+
+0.06 Sat Apr 17 2004
+   - Distribution fix: The tarball comes with sample output files
+     generated on the development platform (perl v5.8.0 built for
+     i386-linux-thread-multi).  These files are used by the module
+     tests to validate that the code works correctly regardless of
+     platform.  For example, t/process_trace.t processes t/sample.tsh
+     and generates t/sample.tcpdump.  When a user installs
+     Net::Traces::TSH on another machine, the module tests verify that
+     given the same input (t/sample.tsh) the code produces the same
+     output (t/sample.tcpdump).
+       Testing this on Linux and UNIX systems is very easy: simply use
+     _diff_.  On systems that lack diff, the tests fail (ver. 0.04 and
+     0.05).  I'd prefer to use a standard "Perl way" to do this, thus
+     avoiding to rely on external programs.  Unfortunately, at this
+     time Algorithm::Diff is not a core module so I cannot rely on
+     that either.  Currently I employ 30 tests to check that the code
+     does produce the same results, so users of all platforms have
+     assurance that the code works correctly, but a context diff would
+     make most of them redundant.  If the platform has diff, it is
+     used as well (31st test).
+   - Added t/sample.csv
+   - Added documentation/sample-summary.pod, an annotated version of
+     t/sample.csv
+   - Additional tests released
+
+0.05 Wed Mar 31 2004
+   - Distribution fixes: META.yml, t/sample.tcpdump
+
+0.04 Tue Mar 30 2004
+   - Minor updates in the process_trace()/tcpdump text generation
+   - Code and POD updates
+   - Added t/sample.tcpdump
+   - Added META.yml
+   - Additional tests released
+
+0.03 Sat Mar 20 2004
+   - Code and POD updates
+   - pt.pl 0.03 released
+   - Added t/sample.tsh trace
+   - Additional tests released
+
+0.02 Wed Mar 10 2004
+   - Application pt.pl 0.01 released
+   - Additional tests released
+   - POD editorial changes
+
+0.01 Mon Mar  1 2004
+   - Original public release

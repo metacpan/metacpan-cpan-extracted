@@ -1,0 +1,8 @@
+
+
+0.02
+  Fixes:
+    - Fixed Makefile.PL added Test::Deep to dependency list
+
+0.01
+ - Fist Release

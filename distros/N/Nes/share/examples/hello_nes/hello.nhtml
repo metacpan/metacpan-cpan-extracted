@@ -1,0 +1,21 @@
+{: NES 1.0 ./hello.cgi :}
+{: #
+  ----------------------------------------------------------------------
+    
+  NES 1.0 by Skriptke
+  Copyright 2009 - 2010 Enrique F. Castañón
+  Licensed under the GNU GPL.
+  http://nes.sourceforge.net/
+        
+  hello.nhtml
+
+  ----------------------------------------------------------------------
+:}
+<html>
+  <head>
+    <title>Nes Hello World</title>
+  </head>
+  <body>
+    <b>{: $ hello :}</b>
+  </body>
+</html>

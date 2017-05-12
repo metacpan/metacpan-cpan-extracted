@@ -1,0 +1,7 @@
+Nagios::WebTransact::Timed a class to help construct Nagios service checks 
+of web server performance (for testing service provider performance etc).
+
+perl Makefile.PL	# provide Proxy parms. Press enter at all prompts otherwise.
+make
+make test
+make install

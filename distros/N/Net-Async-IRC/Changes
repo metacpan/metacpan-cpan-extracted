@@ -1,0 +1,69 @@
+Revision history for Net-Async-IRC
+
+0.11    2017/03/04 11:14:11
+        [CHANGES]
+         * Protocol::IRC is now moved to its own distribution
+         * Expanded documentation, including the start of an introduction
+           tutorial
+
+0.10    2014/06/12 02:02:58
+        [CHANGES]
+         * Ignore received blank lines
+         * Allow capture of IRC parse errors as custom error handling
+
+        [BUGFIXES]
+         * Ensure that connection close during login counts as a failure for
+           pending login futures
+
+0.09    2014/01/21 12:21:41
+        [CHANGES]
+         * Removed now-dead NaIRC::Message subclass
+
+        [BUGFIXES]
+         * Ensure that handled gated commands don't appear as unhnandled to
+           the default 'on_message' handler
+         * Fix return EXPR and EXPR operator precedence (RT87260)
+         * Correctly set internal nick state when logging in after an
+           ERR_NICKINUSE error (RT90487)
+         * MSWin32 lacks a getpwnam() - use Win32::LoginName() instead
+
+0.08    2014/01/20 01:52:18
+        [CHANGES]
+         * Directly subclass IO::Async::Stream instead of IO::Async::Protocol
+         * Implement IRCv3.1 CAP negotiation
+         * Much improved handling of command/response gating
+         * Implement 'whois' message gate
+         * Futures-first documentation and testing
+
+0.07    CHANGES:
+         * Much splitting of non-async logic out of NaIRC into Protocol::IRC
+           tree
+         * Added name aliases for server numerics
+         * Dispatch message handler methods for numerics to names first,
+           before raw numbers
+
+0.06    CHANGES:
+         * Renamed Net::Async::IRC::Message to Protocol::IRC::Message, as the
+           first step of the split to Protocol::IRC
+         * Implement IRCv3 message tags
+
+0.05    CHANGES:
+         * Bugfix for ->connect() with service => undef
+         * Some more numerics
+         * New model for storing numerics in source code
+
+0.04    CHANGES:
+         * Split lower-level code into new Net::Async::IRC::Protocol module
+         * Use IO::Async::Protocol->connect from 0.34
+
+0.03    BUGFIXES:
+         * Fix failures due to IO::Async::Test or ::Loop no longer loading
+           IO::Async::Stream; load it explicitly where needed
+
+0.02    CHANGES:
+         * Some more numerics
+         * Capture named args from more WHOIS numerics
+         * base on IO::Async::Protocol::Stream
+
+0.01    First version, released on an unsuspecting world.
+

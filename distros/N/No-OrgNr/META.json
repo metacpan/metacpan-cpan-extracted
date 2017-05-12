@@ -1,0 +1,51 @@
+{
+   "abstract" : "Utility functions for Norwegian organizations' ID numbers",
+   "author" : [
+      "Geir Myklebust <geirmy@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "No-OrgNr",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::Whois::Norid" : "0",
+            "Net::Whois::Raw" : "2.76",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "provides" : {
+      "No::OrgNr" : {
+         "file" : "lib/No/OrgNr.pm",
+         "version" : "v0.9.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/geirmyk/No-OrgNr/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/No::OrgNr",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/geirmyk/No-OrgNr"
+      }
+   },
+   "version" : "v0.9.3",
+   "x_serialization_backend" : "JSON::PP version 2.27202"
+}

@@ -1,0 +1,378 @@
+#define BLOCK Perl_BLOCK
+
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+#include "notessession.h"
+
+
+MODULE = Notes::Session		PACKAGE = Notes::Session
+
+
+void
+new( CLASS )
+      char * CLASS;
+   PREINIT:
+      int    ln_stat_save;
+      char * ln_warning;
+      int    ln_rc;
+      d_LN_XSVARS;
+   PPCODE:
+      LN_PUSH_NEW_OBJ(CLASS, &PL_sv_undef);
+      ln_global_session_count += 1;      /* NOT threadsafe ! */
+      LN_SET_NVX(ln_obj, 0);
+      LN_SET_OK(ln_obj);
+
+      if(ln_global_session_count > 1)
+      {
+      	XSRETURN(1);
+      }
+      else if(ln_global_session_count == 1)
+      {
+		ln_rc = session_new();
+      	LN_SET_IVX(ln_obj, (IV)ln_rc);
+      }
+
+      if(LN_IS_OK(ln_obj) && ln_global_session_count > 0)
+      {
+      	XSRETURN(1);
+      }
+
+      /* If we get here, we encountered errors; so handle them */
+      /* Undo things from above for new session object s 	   */
+
+	   ln_stat_save             = LN_IVX( ln_obj );
+	   ln_global_session_count -= 1; /* NOT threadsafe !       */
+	   POPs;                         /* pop new (invalid) object
+	   							        ln_obj from stack      */
+
+	   Newz(1, ln_warning, LN_WARNING_LENGTH_NO_NEW_SESSION, char);
+	   if(ln_warning == (char *) NULL)
+	   {
+		   DEBUG(("Notes::Session object returning memory error (Newz()) at line %d", ln_rc, __LINE__));
+		   XSRETURN_NOT_OK;
+	   }
+
+	   {  /* try to emit some warning for the errors from above;     */
+	      /* a new C-block, because we had C-syntax probs thru dSP;  */
+		   dSP;
+	       ENTER;
+	       SAVETMPS;
+	       PUSHMARK(sp);
+	       sprintf(ln_warning, "%s 0x%08X/0x%08X",
+	           LN_WARNING_NO_NEW_SESSION,
+	           ln_stat_save,
+	           ln_global_session_count           /* NOT threadsafe!  */
+	       );
+	       XPUSHs( sv_2mortal( newSVpv(
+	          ln_warning, strlen( ln_warning )
+	       )));
+	       PUTBACK;
+	       perl_call_pv( "Carp::carp", G_DISCARD );
+	       SPAGAIN;
+	       PUTBACK;           /* was G_DISCARD, so nothing to pop off */
+	       FREETMPS;
+	       LEAVE;
+	       Safefree( ln_warning );
+	   }
+	   XSRETURN_NOT_OK;
+
+
+
+void
+DESTROY( s )
+      LN_Session *   s;
+   PREINIT:
+      d_LN_XSVARS;
+   PPCODE:
+      ln_global_session_count -= 1;   /* NOT threadsafe ! */
+
+      if(ln_global_session_count > 0) /* NOT threadsafe ! */
+      {
+      	LN_SET_OK(s);
+      }
+      else
+      {
+      	session_destroy();
+      }
+
+      XSRETURN( 0 );
+
+
+void
+session_count( s )
+      LN_Session * s;
+   PPCODE:
+      XSRETURN_IV((long) ln_global_session_count);
+
+
+void
+set_session_count( s, ln_session_count )
+      LN_Session * s;
+      int          ln_session_count;
+   PREINIT:
+      d_LN_XSVARS;
+   PPCODE:
+      ln_global_session_count = ln_session_count;
+      XSRETURN(0);
+
+void
+effective_user_name ( s )
+	  LN_Session * s;
+   PREINIT:
+	  char		   szUserName[MAXUSERNAME+1];
+	  STATUS	   ln_rc = NOERROR;
+   PPCODE:
+	  if (ln_rc = SECKFMGetUserName (szUserName))
+	  {
+		DEBUG(("Notes::Session object returning error %d at line %d", ln_rc, __LINE__));
+	  	XSRETURN_NOT_OK;
+      }
+      else
+      	XPUSHs( sv_2mortal( newSVpv( szUserName, 0 )));
+
+void
+data_directory ( s )
+      LN_Session * s;
+   PREINIT:
+      char   szPathname[MAXPATH];
+   ALIAS:
+   	  data_directory = 0
+   	  exec_directory = 1
+   PPCODE:
+   	  if ( LN_IS_OK(s) )
+      {
+  	 	  switch( ix )
+  	 	  {
+			  case 0:    OSGetDataDirectory(szPathname);
+			             break;
+			  case 1:    OSGetExecutableDirectory(szPathname);
+			  		     break;
+			  default:   XSRETURN_NOT_OK;
+			  			 break;
+  		  }
+		  XPUSHs( sv_2mortal( newSVpv( szPathname, 0 )));
+		  XSRETURN( 1 );
+      }
+      else
+      	XSRETURN_NOT_OK;
+
+void
+get_environment_value ( s, ln_name )
+      LN_Session *    s;
+      char       *    ln_name;
+   PREINIT:
+      long ln_value;
+      char ln_str_value[MAXENVVALUE];
+   ALIAS:
+     get_environment_value  = 0
+   	 get_environment_string = 1
+   PPCODE:
+     if(ln_name != NULL)
+     {
+         switch(ix)
+         {
+		     case 0:    ln_value = OSGetEnvironmentLong(ln_name);
+		     			if(ln_value)
+		     			{
+		     				XPUSHs( sv_2mortal( newSViv( ln_value )));
+					    }
+		     			else
+		     			{
+		     				XSRETURN_NOT_OK;
+					    }
+		                break;
+			 case 1:    if(OSGetEnvironmentString(ln_name, ln_str_value, MAXENVVALUE - 1))
+			 			{
+			 				XPUSHs( sv_2mortal( newSVpv( ln_str_value, 0 )));
+					    }
+			   			else
+			   			{
+			   				XSRETURN_NOT_OK;
+						}
+		                break;
+			 default:   XSRETURN_NOT_OK;
+			 		    break;
+         }
+     }
+     XSRETURN( 1 );
+
+void
+set_environment_var ( s, ln_name, ln_value )
+      LN_Session *    s;
+      char       *    ln_name;
+      char       *    ln_value;
+   PPCODE:
+      if (ln_name != NULL && ln_value != NULL)
+      {
+      	OSSetEnvironmentVariable(ln_name, ln_value);
+      	XSRETURN_YES;
+      }
+      else
+      {
+      	XSRETURN_NOT_OK;
+      }
+
+void
+address_books ( s, ln_server )
+      LN_Session *    s;
+      char       *    ln_server
+   PREINIT:
+      STATUS   ln_rc = NOERROR;
+      WORD     wCount;
+      WORD     wLength;
+      WORD     wEntry;
+      WORD     wEntryLen;
+
+      HANDLE   hReturn;
+      char   * pszReturn;
+
+      char     achServer[MAXPATH];
+      char     achPort[MAXPATH];
+      char     achFile[MAXPATH];
+   PPCODE:
+      if(ln_rc = NAMEGetAddressBooks(ln_server,
+                                  0,
+                                  &wCount,
+                                  &wLength,
+                                  &hReturn))
+      {
+		 DEBUG(("Notes::Session object returning error %d at line %d", ln_rc, __LINE__));
+         LN_SET_IVX(s, ln_rc);
+         XSRETURN_NOT_OK;
+      }
+      if (!wCount)
+       	 XSRETURN_UNDEF;
+
+      pszReturn = OSLock(char, hReturn);
+
+      for (wEntry = 0; wEntry < wCount; wEntry++)
+      {
+         wEntryLen = strlen(pszReturn);
+
+         OSPathNetParse(pszReturn, achPort, achServer, achFile);
+
+         // if (wOption & NAME_GET_AB_TITLES) {
+         // *   * Advance to title. *
+         // *   pszReturn += wEntryLen + 1;
+         // *   wEntryLen = strlen(pszReturn);
+         // * }
+         //
+
+         XPUSHs(sv_2mortal(newSVpv(achFile, 0)));
+         XPUSHs(sv_2mortal(newSVpv(achServer, 0)));
+         XPUSHs(sv_2mortal(newSVpv(achPort, 0)));
+
+         pszReturn += wEntryLen+1;
+      }
+      OSUnlock(hReturn);
+      OSMemFree(hReturn);
+
+void
+notes_api_version( s )
+      LN_Session *    s;
+   PPCODE:
+   	  XPUSHs(sv_2mortal(newSVpv(NOTESAPI_VERSION, 0)));
+   	  XSRETURN( 1 );
+
+void
+notes_build_version( s )
+      LN_Session *    s;
+   PREINIT:
+      STATUS   ln_rc   = NOERROR;
+      DBHANDLE hdb     = NULLHANDLE;
+      WORD     wbuild;
+   PPCODE:
+      if(ln_rc = NSFDbOpen("names.nsf", &hdb))
+      {
+		DEBUG(("Notes::Session object returning error %d at line %d", ln_rc, __LINE__));
+		LN_SET_IVX(s, ln_rc);
+      	XSRETURN_NOT_OK;
+  	  }
+      if(ln_rc = NSFDbGetBuildVersion(hdb, &wbuild))
+      {
+		DEBUG(("Notes::Session object returning error %d at line %d", ln_rc, __LINE__));
+		NSFDbClose(hdb);
+		LN_SET_IVX(s, ln_rc);
+      	XSRETURN_NOT_OK;
+      }
+      else
+      	if(wbuild >= 1 && wbuild <= 81)
+      	{
+			XPUSHs(sv_2mortal(newSVpv("Domino or Notes Release 1.0", 0)));
+	    }
+	    else if(wbuild >= 82 && wbuild <= 93)
+	    {
+			XPUSHs(sv_2mortal(newSVpv("Domino or Notes Release 2.0", 0)));
+	    }
+	    else if(wbuild >= 94 && wbuild <= 118)
+			    {
+			XPUSHs(sv_2mortal(newSVpv("Domino or Notes Release 3.0", 0)));
+	    }
+	    else if(wbuild >= 119 && wbuild <= 136)
+		{
+			XPUSHs(sv_2mortal(newSVpv("Domino or Notes Release 4.0", 0)));
+	    }
+	    else if(wbuild == 138)
+		{
+			XPUSHs(sv_2mortal(newSVpv("Domino or Notes Release 4.1", 0)));
+	    }
+	    else if(wbuild >= 140 && wbuild <= 145)
+		{
+			XPUSHs(sv_2mortal(newSVpv("Domino or Notes Release 4.5", 0)));
+	    }
+	    else if(wbuild >= 140 && wbuild <= 145)
+		{
+			XPUSHs(sv_2mortal(newSVpv("Domino or Notes Release 4.5", 0)));
+	    }
+	    else if(wbuild == 147)
+		{
+			XPUSHs(sv_2mortal(newSVpv("Domino or Notes Release 4.6", 0)));
+	    }
+	    else if(wbuild == 161)
+		{
+			XPUSHs(sv_2mortal(newSVpv("Domino or Notes Release 5.0 Beta 1", 0)));
+	    }
+	    else if(wbuild == 163)
+		{
+			XPUSHs(sv_2mortal(newSVpv("Domino or Notes Release 5.0 Beta 2", 0)));
+	    }
+	    else if(wbuild == 166)
+		{
+			XPUSHs(sv_2mortal(newSVpv("Domino or Notes Release 5.0 - 5.0.11", 0)));
+	    }
+	    else if(wbuild == 173)
+		{
+			XPUSHs(sv_2mortal(newSVpv("Domino or Notes Release Rnext Beta 1", 0)));
+	    }
+	    else if(wbuild == 176)
+		{
+			XPUSHs(sv_2mortal(newSVpv("Domino or Notes Release Rnext Beta 2", 0)));
+	    }
+	    else if(wbuild == 178)
+		{
+			XPUSHs(sv_2mortal(newSVpv("Domino or Notes Release Rnext Beta 3", 0)));
+	    }
+	    else if(wbuild == 179)
+		{
+			XPUSHs(sv_2mortal(newSVpv("Domino or Notes Release Rnext Beta 4", 0)));
+	    }
+	    else if(wbuild == 183)
+		{
+			XPUSHs(sv_2mortal(newSVpv("Domino or Notes 6 Pre-release 1", 0)));
+	    }
+	    else if(wbuild == 185)
+		{
+			XPUSHs(sv_2mortal(newSVpv("Domino or Notes 6 Pre-release 2", 0)));
+	    }
+	    else if(wbuild == 190)
+		{
+			XPUSHs(sv_2mortal(newSVpv("Domino or Notes Release 6", 0)));
+	    }
+		else
+		{
+			XSRETURN_UNDEF;
+		}
+      NSFDbClose(hdb);
+      XSRETURN( 1 );

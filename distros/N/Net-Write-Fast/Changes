@@ -1,0 +1,41 @@
+Revision history for Perl extension Net::Write::Fast.
+
+0.18 Thu Feb  4 07:27:46 CET 2016
+   - bugfix: removed Build.PL, no well suited to build XS code
+   - bugfix: added "OS unsupported" string in Makefile.PL OS check for cpantesters compliance
+     => https://rt.cpan.org/Public/Bug/Display.html?id=111734
+
+0.17 Wed Feb  3 18:35:13 CET 2016
+   - bugfix: fixed a memory leak on allocating a struct addrinfo.
+     It is already done by getaddrinfo.
+
+0.16 Sat Feb 21 11:31:03 CET 2015
+   - bugfix: Time::Interval is a dependance
+
+0.15 Fri Feb 20 07:13:13 CET 2015
+   - new: add an optional argument to display warnings from XS code (like sendto warnings)
+   - bugfix: write struct addrinfo in a more portable way
+   => Read: Mac OS X is now supported
+   - bugfix: don't free addrinfo struct in for loop (was coredumping)
+   - update: setsockopt for BROADCAST option
+   - update: check for ENOBUFS and retry sending
+   - update: copyright notice
+
+0.14 Sun Nov 11 11:48:59 CET 2012
+   - bugfix: on pod regression
+   - bugfix: an endif was badly splaced, and Fast.xs refused to compile when
+             DEBUG was off
+   - update: turned off debug mode
+
+0.13 Sat Nov 10 17:33:18 CET 2012
+   - bugfix: send algorithm, was limited at 500 pps (due to lack of Q&A)
+   - new: can set source IP address when sending
+   - obsolete: l4_send_tcp_syn()
+   - pod: regression from version 0.12
+
+0.12 Sat Sep  8 10:13:35 CEST 2012
+   - pod: documentation written
+
+0.11 Sun Sep  2 18:48:38 CEST 2012
+   - First release
+

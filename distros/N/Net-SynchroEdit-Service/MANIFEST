@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-SynchroEdit-Service.t
+lib/Net/SynchroEdit/Service.pm
+META.yml                                 Module meta-data (added by MakeMaker)

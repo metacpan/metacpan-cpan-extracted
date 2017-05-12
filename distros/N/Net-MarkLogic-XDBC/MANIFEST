@@ -1,0 +1,11 @@
+Changes
+lib/Net/MarkLogic/XDBC.pm
+lib/Net/MarkLogic/XDBC/Result.pm
+lib/Net/MarkLogic/XDBC/Result/Item.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/001_load.t
+Todo

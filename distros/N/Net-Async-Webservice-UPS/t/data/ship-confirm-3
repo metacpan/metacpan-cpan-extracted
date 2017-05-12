@@ -1,0 +1,97 @@
+POST https://wwwcie.ups.com/ups.app/xml/ShipConfirm
+
+<?xml version='1.0' standalone='yes'?>
+<ShipmentConfirmRequest>
+  <LabelSpecification>
+    <LabelPrintMethod>
+      <Code>EPL</Code>
+    </LabelPrintMethod>
+    <LabelStockSize>
+      <Height>4</Height>
+      <Width>6</Width>
+    </LabelStockSize>
+  </LabelSpecification>
+  <Request>
+    <RequestAction>ShipConfirm</RequestAction>
+    <RequestOption>validate</RequestOption>
+    <TransactionReference>
+      <CustomerContext>Net::Async::Webservice::UPS</CustomerContext>
+      <XpciVersion>0</XpciVersion>
+    </TransactionReference>
+  </Request>
+  <Shipment>
+    <Description>Testing 1 package return</Description>
+    <Package>
+      <Description>some stuff</Description>
+      <Dimensions>
+        <Height>1.5</Height>
+        <Length>34</Length>
+        <UnitOfMeasurement>
+          <Code>IN</Code>
+        </UnitOfMeasurement>
+        <Width>24</Width>
+      </Dimensions>
+      <OversizePackage>1</OversizePackage>
+      <PackageWeight>
+        <UnitOfMeasurement>
+          <Code>LBS</Code>
+        </UnitOfMeasurement>
+        <Weight>10</Weight>
+      </PackageWeight>
+      <PackagingType>
+        <Code>02</Code>
+      </PackagingType>
+    </Package>
+    <PaymentInformation>
+      <Prepaid>
+        <BillShipper>
+          <AccountNumber>abcdef</AccountNumber>
+        </BillShipper>
+      </Prepaid>
+    </PaymentInformation>
+    <ReturnService>
+      <Code>9</Code>
+    </ReturnService>
+    <Service>
+      <Code>03</Code>
+    </Service>
+    <ShipFrom>
+      <Address>
+        <AddressLine1>233 W 49th St</AddressLine1>
+        <City>New York</City>
+        <CountryCode>US</CountryCode>
+        <PostalCode>10019</PostalCode>
+        <StateProvinceCode>NY</StateProvinceCode>
+      </Address>
+      <CompanyName>Test Contact Company</CompanyName>
+      <Name>Test Contact</Name>
+    </ShipFrom>
+    <ShipTo>
+      <Address>
+        <AddressLine1>2231 E State Route 78</AddressLine1>
+        <City>East Lansing</City>
+        <CountryCode>US</CountryCode>
+        <PostalCode>48823</PostalCode>
+        <StateProvinceCode>MI</StateProvinceCode>
+      </Address>
+      <CompanyName>Test Shipper Company</CompanyName>
+      <Name>Test Shipper</Name>
+      <ShipperNumber>abcdef</ShipperNumber>
+    </ShipTo>
+    <Shipper>
+      <Address>
+        <AddressLine1>2231 E State Route 78</AddressLine1>
+        <City>East Lansing</City>
+        <CountryCode>US</CountryCode>
+        <PostalCode>48823</PostalCode>
+        <StateProvinceCode>MI</StateProvinceCode>
+      </Address>
+      <CompanyName>Test Shipper Company</CompanyName>
+      <Name>Test Shipper</Name>
+      <ShipperNumber>abcdef</ShipperNumber>
+    </Shipper>
+  </Shipment>
+</ShipmentConfirmRequest>
+
+<?xml version="1.0"?>
+<ShipmentConfirmResponse><Response><TransactionReference><CustomerContext>Net::Async::Webservice::UPS</CustomerContext><XpciVersion>0</XpciVersion></TransactionReference><ResponseStatusCode>1</ResponseStatusCode><ResponseStatusDescription>Success</ResponseStatusDescription></Response><ShipmentCharges><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>7.35</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.50</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>7.85</MonetaryValue></TotalCharges></ShipmentCharges><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>10.0</Weight></BillingWeight><ShipmentIdentificationNumber>12345</ShipmentIdentificationNumber><ShipmentDigest>somedigest</ShipmentDigest></ShipmentConfirmResponse>

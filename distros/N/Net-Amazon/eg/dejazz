@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+######################################################
+# Mike Schilli, 2004
+# Print out the 10 best-selling german Jazz CDs
+# (Perl implementation of the Java program presented 
+#  in iX 06/2004, "Handelspartner", p. 125, 
+#  by Ingo Macherius).
+######################################################
+use warnings;
+use strict;
+
+use Net::Amazon;
+
+my $ua = Net::Amazon->new(
+  associate_tag => $ENV{AMAZON_ASSOCIATE_TAG},
+  token         => $ENV{AMAZON_TOKEN},
+  secret_key    => $ENV{AMAZON_SECRET_KEY},
+  locale     => 'de',
+  max_pages  => 1,
+);
+
+my $resp = $ua->search(
+  browsenode => '255919',
+  mode       => 'pop-music-de',
+  sort       => '+salesrank',
+);
+
+for ($resp->properties) {
+  print $_->artist(), ": ", 
+        $_->album(), " (",
+        $_->OurPrice(), ")\n";
+}

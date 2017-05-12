@@ -1,0 +1,8 @@
+# Legend:
+# --- = A new release
+#   + = Add a feature (in a backwards compatible way)
+#   ! = Change something significant, or remove a feature
+#   * = Fix a bug, or make a minor improvement
+
+# $Id: TODO 2 2006-10-22 23:20:28Z julian $
+# vim:sts=2 sw=2 et tw=79

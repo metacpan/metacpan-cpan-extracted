@@ -1,0 +1,24 @@
+Revision history for Perl extension Net::Frame::Layer::GRE.
+
+1.05 Tue Jan 20 19:46:59 CET 2015
+   - update: copyright notice update
+   - update: Kwalitee
+
+1.04 Sun May 31 16:56:08 CEST 2009
+   - update: added link to a MPLS layer
+   - update: copyright notice update
+
+1.03 Sun Apr 22 16:02:30 CEST 2007
+   - bugfix: in pod SYNOPSIS, need to call unpack() after new() with raw attr
+   - new: support for LLTD layer within GRE
+   - update: mailing list link
+
+1.02 Fri Dec 22 14:06:21 CET 2006
+   - bugfix: encapsulated layers naming scheme
+
+1.01 Sun Dec 17 18:01:22 CET 2006
+   - UPDATE: all layers moved to Net::Frame::Layer::* namespace
+
+1.00 Sat Dec 16 16:45:03 CET 2006
+   - first public release
+

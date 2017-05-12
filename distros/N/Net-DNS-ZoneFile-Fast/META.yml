@@ -1,0 +1,19 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-DNS-ZoneFile-Fast
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  repository: https://dnssec-tools.org/svn/dnssec-tools/
+version: 1.24

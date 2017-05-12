@@ -1,0 +1,12 @@
+Revision history for Perl extension Net::Radius::SSG.
+
+0.01  Mon Mar  8 11:13:20 2004
+	- original version; created by h2xs 1.22 with options
+		-X -n Net::Radius::SSG
+
+0.02  Thu Jun 24 14:08:00 2004
+	- Fixed bug that cause problems when multiple requests were sent out
+	  using the same Net::Radius::SSG object.
+
+0.03  Thu Jun 9 14:33:00 2005
+	- "new" method will now die if the dictionary cannot be read.

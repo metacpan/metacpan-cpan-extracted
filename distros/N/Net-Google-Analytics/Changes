@@ -1,0 +1,70 @@
+Revision history for Perl module Net::Google::Analytics 
+
+3.05  2016-03-21
+        - Improve and update documentation.
+        - Improve the "Getting Started" section.
+          (Thanks to Breno G. de Oliveira for the pull request)
+        - Cache row classes generated at runtime. This also fixes a
+          memory leak.
+        - Fix conversion from camel case. Handle names starting with
+          uppercase letters and names with consecutive uppercase
+          letters.
+          (Thanks to Sachin Sebastian for the report)
+
+3.04  2015-09-15
+        - Support samplingLevel request parameter
+          (Thanks to Sachin Sebastian for the pull request)
+
+3.03  2015-03-18
+        - Add support for the Realtime Analytics API
+          (Thanks to Andy (yacomink) for the initial patch)
+
+3.02  2014-01-07
+        - Add $response->num_rows method
+        - Make $response->project return a new response object
+        - Allow additional parameters to authorize_url
+          (Thanks to Masakazu Ohtsuka for the patch)
+
+3.01  2012-08-09
+        - RT #78789: Fixes for retrieve_paged
+          Thanks to Jon Schutz for the report
+        - Documentation fixes
+
+3.00  2012-02-26
+        - Major rewrite implementing the version 3 API
+
+0.11003
+        - Don't require 'dimensions' parameter in data feed requests
+          (Thanks to Simon Cavalletto for the report)
+
+0.11002
+        - Add back package version
+
+0.11001
+        - Dist::Zilla related changes
+        - Add accessor for title of account feed entries
+          (Thanks to Andy McFarland for the patch)
+
+0.11000
+        - Check required data feed parameters
+        - Documentation fixes
+        - Fix ->uri and ->retrieve_xml
+
+0.10002
+        - Backwards compatibility for XML::LibXML::XPathContext
+        - Interactive authentication
+        - Don't die in case of an HTTP error
+        - Expose HTTP error via is_success, code, message
+        - Add tests and comments for project method
+
+0.10001
+        - Use weak ref instead of finish method
+
+0.10000
+        - Enhance API
+        - Add link to Github repository
+        - Smaller fixes
+
+0.09999_01
+        - Initial test version
+

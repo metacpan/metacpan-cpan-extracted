@@ -1,0 +1,27 @@
+---
+abstract: 'Interface to RackSpace CloudServers via API'
+author:
+  - 'Marco Fontani'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-RackSpace-CloudServers
+requires:
+  Any::Moose: '0.10'
+  Crypt::SSLeay: '0'
+  HTTP::Request: '0'
+  JSON: '0'
+  LWP::ConnCache::MaxKeepAliveRequests: '0'
+  LWP::UserAgent::Determined: '0'
+  YAML: '0'
+  perl: 5.008_008
+resources:
+  bugtracker: https://github.com/mfontani/Net-RackSpace-CloudServers/issues
+  repository: git://github.com/mfontani/Net-RackSpace-CloudServers.git
+version: '0.15'

@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+.project
+t/Net-DDDS.t
+lib/Net/DDDS.pm
+META.yml                                 Module meta-data (added by MakeMaker)

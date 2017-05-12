@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.38.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7faa8bcfcc94893f6b07442a96653055c5bf4e08 Changes
+SHA1 4409534469337a4237e68bef4ed6f24a7669022a MANIFEST
+SHA1 535787529052b4ec1fb5e6781eed851056447d15 MANIFEST.SKIP
+SHA1 69649beed89c81d7c70df9b47d68e83fa8bbcd1d META.yml
+SHA1 602a37fcdcfee1f9160a2af5edab808fb26f351e Makefile.PL
+SHA1 b26544ee1bbeca2cc22c014a46b8c75c431d865c README
+SHA1 309250dfb606a4d545426a546598a3eaec57e59b lib/No/Giro.pm
+SHA1 938aa7c53a5e3d412dec0f97f31fc87f7acd1e5d t/No-Giro.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iD8DBQFBJoJAlE/Gp2pqC7wRAjE9AJwPkMNSQvW2KHe6S8QrxJmXOaBB7gCdF7LX
+Vl42m4JSfDjsSvNr4f10i2Y=
+=mf6j
+-----END PGP SIGNATURE-----

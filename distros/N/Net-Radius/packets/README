@@ -1,0 +1,17 @@
+-*- text -*-
+
+This directory contains RADIUS packets that have been processed by the
+bin2packet script included in the contrib/ directory of this
+distribution.
+
+Packets can be added to this directory simply, by issuing the
+following command:
+
+  $ cd packets
+  $ bin2packet dump
+
+Where 'dump' is a file containing a RADIUS packet (payload), as
+extracted by ethereal.
+
+
+

@@ -1,0 +1,9 @@
+/*
+ * style.css -- HTML style-sheet for Net::Z3950 documentation
+ * $Header: /home/cvsroot/NetZ3950/doc/style.css,v 1.2 2001/10/19 15:40:25 mike Exp $
+ */
+body { color: #000040; background: white }
+h1 { color: #ffffa0; background: #a00000; margin-top: 20px;
+	padding: 5px 10px; border: 1px transparent }
+h2,h3,h4,h5,h6 { color: #600000 }
+.warning { color: #ff0000; background: #ffff80 }

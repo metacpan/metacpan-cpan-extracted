@@ -1,0 +1,266 @@
+Roadmap for the version 1.2 release
+-----------------------------------
+
+Changes marked with (*) would be incompatible with current back-ends
+and could require a degree of rewriting.
+
+Bug fixing
+----------
+
+See the TODO file for a list of current bugs which need to be fixed.
+
+Max users and classes of users (wu-ftpd)
+----------------------------------------
+
+Add support for classes of users, and allow the maximum number of
+users to be set globally (as now) and per-class. Add a flag which
+stops a particular user from logging in more than once (again, per
+user, per class or globally).
+
+[Implementation complete]
+
+The current "max clients" configuration option will be preserved
+and extended so that you can also specify the maximum number of
+clients in a class or for a particular user:
+
+max clients: 100		  # global max. clients
+max clients: 10 class anonymous	  # only 10 anonymous clients allowed
+max clients: 1 each class users   # each person in "users" can log in
+				  # only once (no limit on max users, however)
+max clients: 2 user pete,rich     # pete and rich can only log in twice
+
+In all cases, the most restrictive rule is the one which wins (ie.
+each rule is checked, and all must be OK before a person is allowed
+to log in).
+
+The user's current class name will be available in the
+$ftps->{class} variable, and will also be made available
+to the appropriate access control rules.
+
+The actual implementation will need to use a shared file to
+store the state of each connection. The file is stored on local
+disk, and will be locked using the POSIX fcntl interface [BSD?].
+The same shared file can also store quotas, credits, etc.
+
+A "SITE WHO" command can be added, compatible with glftpd, which
+lists all users logged in. It will be worthwhile restricting this
+command to just a specific class or classes of users by using
+advanced command filters (see below).
+
+[ => See sharedstate.txt ]
+
+Upload and download quotas and credits (glftpd)
+-----------------------------------------------
+
+Implement a system of quotas and credits for users, classes.
+
+Implementation:
+
+XXXXXXXXX
+
+
+
+
+
+
+
+Bandwidth throttling (glftpd)
+-----------------------------
+
+Allow upload & download bandwidth to be throttled, per user, per class
+and/or globally.
+
+Implementation:
+
+Because of the complexity of implementation, it will not be
+possible to throttle traffic across several FTP connections.
+ie. If you apply a 10 kbps limit to class "users", then each
+user will be able to use up to 10 kbps EACH, NOT all people in
+class "users" will together be limited to 10 kbps across
+all connections.
+
+Also, throttling will only affect the Data connection, not
+the Control connection.
+
+A new "throttle bandwidth" configuration option will be added:
+
+throttle bandwidth: 20 kbps user rich    # "rich" can use 20 kbps
+throttle bandwidth: 10 kbps class users  # each user throttled to 10 kbps
+throttle bandwidth: 100 kbps             # no user is allowed > 100 kbps
+
+The rules are evaluated in order until one matches. That is the
+rule which is used.
+
+NB. bps == bits/second; Bps == Bytes/second; kbps == 1024 bits/second;
+KBps == 1024 Bytes/second == 8192 bits/second; mbps == 1048576
+bits/second; MBps == 8388608 bits/second.
+
+The implementation is fairly simple: just a few more modifications
+to _RETR_command and _store, and some careful timing.
+
+
+
+XXX Perl evaluation ???
+
+
+
+
+Hooks, scripts, delegation and modules (*)
+--------------------------------------
+
+The current system for implementing the VFS through object inheritance
+is good and will stay.
+
+However, there are some hooks which it would be nice to override
+without having to create an entire personality. I'm thinking of things
+like pre_configuration_hook, quit_hook and so on. It would also be
+nice to be able to trigger the running of an external script in places
+(perhaps an external shell script, or a Perl script evaluated inside
+the server itself). Furthermore it would be nice to be able to chain
+hooks so that several independent actions could be performed on, say,
+a quit event.
+
+It seems that for these hooks, the current system of using object
+inheritance isn't the best method. Instead I would like to replace it
+with some form of loadable modules. It would work something like this:
+
+<configuration file>
+
+quit hook: /usr/lib/scripts/quit.pl
+
+[or]
+
+quit hook: { perl code ... }
+
+[or]
+
+load module: /usr/lib/modules/feature.pl
+
+</configuration file>
+
+(A module could override several hooks, and you could load several
+modules and each would be called in turn for a particular hook).
+
+This is the current complete list of hooks:
+
+  pre_configuration_hook
+  options_hook
+  post_configuration_hook
+  post_bind_hook
+  pre_accept_hook
+  post_accept_hook
+  access_control_hook
+  process_limits_hook
+  authentication_hook
+  user_login_hook
+  root_directory_hook
+  pre_command_hook
+  command_filter_hook
+  transfer_hook        [*]
+  post_command_hook
+  pre_store_hook       [*]
+  post_store_hook      [*]
+  pre_retrieve_hook    [*]
+  post_retrieve_hook   [*]
+  system_error_hook
+  quit_hook
+
+[ => modules.txt ]
+
+Upload and download hooks
+-------------------------
+
+Add hooks which are called when a complete file has been uploaded or
+downloaded. You could use this hook, for example, to email the
+administrator after a file has been uploaded, or to check the MD5 sum
+of an uploaded file to ensure it isn't corrupt.
+
+Sort out log files and xferlogs
+-------------------------------
+
+Currently we have several different and competing forms of logging.
+In some places, we log the same event to no fewer than 3 different
+places! This needs to be sorted out.
+
+Make error logs required rather than optional.
+
+Global exit function, END block
+-------------------------------
+
+Replace direct calls to CORE::exit with calls to $self->exit which
+allows meaningful action to be taken in all cases where the server
+exits. This might be implemented instead (or in addition) with a
+global END block in the core server.
+
+Advanced command filters
+------------------------
+
+Current "command filter" is fairly useless for several reasons.
+I suggest that we keep it for backwards compatibility, but
+deprecate it. In its place, add an advanced filtering
+functionality based on classes and users.
+
+Implementation:
+
+restrict command: "SITE WHO" $class eq "users" || $user eq "rich"
+
+... would allow for everyone in class "users" plus user "rich", but
+deny for everyone else.
+
+restrict command: "SITE EXEC" $class eq "staff"
+
+... would allow for only "staff", and deny for everyone else.
+
+Command names are matched case insensitively, with a single
+space matching any number of whitespace characters.
+
+The default for all commands is to allow for all.
+
+[Implementation complete.]
+
+Archive mode
+------------
+
+Complete this feature, including support for Tar-format downloads.
+
+Archive filters and generators can be implemented as loadable modules.
+
+Add PGP encryption filters for downloads, and, if possible, uploads.
+I don't have the resources to do a full SSL implementation, and this
+should satisfy most requirements.
+
+Better handling of symbolic links
+---------------------------------
+
+Symbolic links are not handled very well at the moment. The code
+has a lot of places which does stuff like this:
+
+ my ($type) = $fileh->status;
+ if ($type eq 'f') { do something }
+ elsif ($type eq 'd') { do something else }
+ else { don't really know what to do ... }
+
+There is also a lot of confusion over stat vs. lstat.
+
+Symbolic links should be recognized as a separate type equal in
+importance to files and directories.
+
+[ Long listings now work correctly. However there is still a lot of
+code to review to fix the above problem.]
+
+License, (C) copyright changes
+------------------------------
+
+The core server, and the personalities and modules distributed with it
+will remain GPL.
+
+However, I would like to modify the license slightly to make it clear
+that people may implement their own personalities, and those may
+remain closed source, if they wish. The same would apply to modules
+that people might want to write. Currently, this is implied, but not
+stated anywhere.
+
+The copyright of the server will be broadened to include all current
+and former contributors explicitly. This will ensure the continued
+freedom of the code by making it harder for one company to retake
+ownership of the code.

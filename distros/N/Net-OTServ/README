@@ -1,0 +1,44 @@
+NAME
+
+    Net::OTServ - Retrieve status information about Open Tibia Servers
+
+SYNOPSIS
+
+        use Net::OTServ;
+    
+        my $status = Net::OTServ::status("127.0.0.1", 7171);
+        print "We got $status->{players}{online} players online!\n"
+
+DESCRIPTION
+
+    Open Tibia servers offer a XML interface to query online count, client
+    version and other information.
+
+METHODS AND ARGUMENTS
+
+    status($ip [, $port])
+
+      Retrieves the status of specified OTServ as a hash reference. If
+      $port is omitted, the default 7171 is assumed.
+
+GIT REPOSITORY
+
+    http://github.com/athreef/Net-OTServ
+
+SEE ALSO
+
+    Game::Tibia::Packet
+
+    https://github.com/opentibia/server
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2017 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,3 @@
+- More TACACS support.
+- Start a telnet session to a router from within an existing telnet session.
+- Add scripts for common tasks. Got any? Please send them to the website, I'd like to catalog them.

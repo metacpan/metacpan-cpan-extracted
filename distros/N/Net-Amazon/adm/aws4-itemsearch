@@ -1,0 +1,254 @@
+#!/usr/bin/perl 
+#$Revision: 1.4 $$Date: 2007-11-11 20:26:22 $$Author: boumenot $
+#######################################################################
+# FIXME: this script screen scapes the web to build the ItemSearch
+# validate classes.  Unfortunately, this breaks too frequently.  A
+# better way needs to be found.
+#######################################################################
+
+package main;
+require 5.008_001;
+
+use Getopt::Long;
+use IO::File;
+use Pod::Usage;
+use LWP::Simple;
+use Text::Template;
+use Data::Dumper;
+use File::Path;
+use lib "$FindBin::Bin/../lib";
+use HTML::TreeBuilder::XPath;
+use Net::Amazon ();
+
+use strict;
+use warnings;
+
+sub AWS4_ONLINE_HTML {
+    'http://docs.amazonwebservices.com/AWSECommerceService/'.$Net::Amazon::WSDL_DATE.'/DG/';
+}
+
+use constant AWS4_LOCALE_HTML => {
+    'us' => 'USSearchIndexParamForItemsearch.html',
+#     'de' => 'DESearchIndexParamForItemsearch.html',
+#     'es' => 'ESSearchIndexParamForItemsearch.html',
+#     'jp' => 'JPSearchIndexParamForItemsearch.html',
+#     'it' => 'ITSearchIndexParamForItemsearch.html',
+#     'uk' => 'UKSearchIndexParamForItemsearch.html',
+#     'fr' => 'FRSearchIndexParamForItemsearch.html',
+#     'ca' => 'CASearchIndexParamForItemsearch.html',
+};
+
+my $Opt_Debug = 0;
+my $Opt_Dest = "../lib/Net/Amazon/Validate/ItemSearch";
+my $Opt_Overwrite = 0;
+
+unless (&GetOptions (
+		     "help|h"	 => \&usage,
+		     "version|V" => \&version,
+		     "debug|D"   => \$Opt_Debug,
+                     "dest=s"    => \$Opt_Dest,
+		     "overwrite" => \$Opt_Overwrite,
+		     "<>"	 => \&parameter,
+		     )) {
+    usage();
+}
+
+## main #########################################
+
+unless (-d $Opt_Dest) {
+    die "The directory $Opt_Dest does not exist!\n";
+}
+
+
+for my $locale (keys %{(AWS4_LOCALE_HTML)}) {
+    my $link =  AWS4_ONLINE_HTML.AWS4_LOCALE_HTML->{$locale};
+    print "fetching $link ...\n" if $Opt_Debug;
+
+    my $tree = HTML::TreeBuilder::XPath->new();
+    $tree->parse(get($link));
+    $tree->eof();
+
+    my @search_indicies = map { $_->as_text } $tree->findnodes("//div[\@class=\"section\"]//h2");
+    my %depts;
+    my %upc;
+    my %keywords;
+
+    for my $search_index (@search_indicies) {
+
+	(my $search_index_name) = $search_index =~ /SearchIndex:\s+(\w+)/;
+	next if $search_index_name eq 'All';
+
+	print $search_index_name."\n";
+	$upc{$search_index_name}++;
+
+	my @parameters = map { $_->as_text } $tree->findnodes("//div[\@class=\"section\"]//h2[contains(text(),\"$search_index\")]/../../../..//li/p");
+
+	for my $parameter (@parameters) {
+	    print "  -> $parameter\n";
+	    push @{$depts{$search_index_name}}, $parameter;
+            $keywords{$locale}{$search_index_name}++ if $parameter eq "Keywords";
+	}
+
+    }
+
+    for my $dept (keys %depts) {
+	dump_library($depts{$dept}, $locale, $dept);
+	upc_add(\%upc, $depts{$dept});
+    }
+
+    for my $locale (keys %keywords) {
+        my @a = keys %{$keywords{$locale}};
+        dump_library(\@a, $locale, "Keywords");
+    }
+
+    my @a = keys %upc;
+    my $type = ($locale eq 'us') ? 'UPC' : 'EAN';
+    dump_library(\@a, $locale, $type);
+}
+
+## subs #########################################
+
+sub usage {
+    print '$Revision: 1.4 $$Date: 2007-11-11 20:26:22 $$Author: boumenot $ ', "\n";
+    pod2usage(-verbose=>2, -exitval => 2);
+    exit (1);
+}
+
+sub version {
+    print '$Revision: 1.4 $$Date: 2007-11-11 20:26:22 $$Author: boumenot $ ', "\n";
+    exit (1);
+}
+
+sub parameter {
+    my $param = shift;
+    die "%Error: Unknown parameter: $param\n";
+}
+
+##################################################
+
+# Attempt to pick a "favored" default for the different types of
+# ItemSearch'es.  The favored list is returned in order of preference.
+# The most preferred is Books because that was the default for AWS3.
+# As Books is not available for all types of ItemSearch'es use other
+# "favored" defaults.  They are Music, DVD, Software, etc. in that
+# order.  If none of those are a possible default then use the first
+# item in the list of acceptable values.
+
+sub select_default {
+    my $aref = shift;
+
+    my %hash = map { $_ => 1 } @$aref;
+
+    for my $favored_default (qw(Books Music DVD Software Title Keyword Keywords)) {
+	return $favored_default if defined $hash{$favored_default};
+    }
+
+    return $aref->[0];
+}
+
+sub upc_add {
+    my ($href, $aref) = @_;
+    $href->{$_}++ for @$aref;
+}
+
+sub dump_library {
+    my ($aref, $locale, $dept) = @_;
+
+    my $fn = "$Opt_Dest/$locale/$dept.pm";
+    my $dn = "$Opt_Dest/$locale";
+
+    unless (-d $dn) {
+        mkpath $dn or die "Failed to create '$dn'!\n";
+    }
+
+    if (-f $fn && !$Opt_Overwrite) {
+        warn "The file $fn already exists, skipping!\n";
+        return;
+    }
+
+    my $template = Text::Template->new(
+            TYPE       => 'FILE',
+            SOURCE     => 'aws4-itemsearch.tmpl',
+            DELIMITERS => [ '[%--', '--%]', ],
+    );
+
+    my $hash = {'MODULE_NAME'    => "$locale".'::'."$dept",
+                'DEFAULT_OPTION' => select_default(\@$aref),
+                'LOCALE'         => $locale,
+                'ITEM_SEARCH'    => $dept,
+                'options'        => \@$aref,
+    };
+
+    my $text = $template->fill_in(HASH => $hash);
+    unless ($text) {
+        die "Failed to fill in the text template for $locale/$dept!\n";
+    }
+
+    my $fouth = IO::File->new(">$fn") or
+        die "$! '$fn'!\n";
+
+    print $fouth $text;
+
+    $fouth->close();
+}
+
+
+##################################################
+__END__
+
+=pod
+
+=head1 asw4-itemsearch
+
+B<asw4-types> - convert Amazon's HTML data to Perl libraries to pick ItemSearch
+defaults.
+
+=head1 SYNOPSIS
+
+B<asw4-itemsearch> - [I<OPTION>]... [I<FILE>]...
+
+=head1 DESCRIPTION
+
+B<asw4-itemsearch> converts the data stored in Amazon's HTML pages for
+ASW4 into Perl libraries.  These libraries are used by Net::Amazon to
+validate user input, and select default entries for ItemSearch
+operations.
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item -h, --help
+
+Displays this message and program version and exits.
+
+=item -V, --version
+
+Displays the program's version and exits.
+
+=item -D, --debug
+
+Prints debug information.
+
+=item --overwrite
+
+Overwrite any libraries if they already exist.
+
+=item --dest E<lt>directoryE<gt>
+
+Specify the destination where the files should be written.
+
+=back
+
+=head1 AUTHORS
+
+Written by Christopher Boumenot.
+
+=head1 REPORTING BUGS
+
+Report bugs to <boumenot@gmail.com>.
+
+=head1 SEE ALSO
+
+=cut
+

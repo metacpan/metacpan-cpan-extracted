@@ -1,0 +1,12 @@
+Changes
+doc/example.pl
+lib/Net/SMS/Cellsynt.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/distribution.t
+t/input.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

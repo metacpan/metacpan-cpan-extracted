@@ -1,0 +1,6 @@
+name = "Net-Airbrake"
+badges = ["travis"]
+authority="cpan:SIXAPART"
+
+module_maker="ModuleBuildTiny"
+

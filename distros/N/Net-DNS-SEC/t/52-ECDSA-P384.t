@@ -1,0 +1,80 @@
+# $Id: 52-ECDSA-P384.t 1494 2016-08-22 09:34:07Z willem $	-*-perl-*-
+#
+
+use Test::More;
+
+my %prerequisite = (
+	Crypt::OpenSSL::Bignum	=> 0,
+	Crypt::OpenSSL::EC	=> 0.5,
+	Crypt::OpenSSL::ECDSA	=> 0.05,
+	Digest::SHA		=> 0,
+	Net::DNS		=> 1.01,
+	Net::DNS::SEC::Private	=> 0,
+	);
+
+foreach my $package ( sort keys %prerequisite ) {
+	my @revision = grep $_, $prerequisite{$package};
+	eval "use $package @revision";
+	next unless $@;
+	plan skip_all => "missing prerequisite $package @revision";
+	exit;
+}
+
+plan tests => 7;
+
+
+my %filename;
+
+END {
+	foreach ( values %filename ) {
+		unlink($_) if -e $_;
+	}
+}
+
+
+use_ok('Net::DNS');
+use_ok('Net::DNS::SEC::Private');
+use_ok('Net::DNS::SEC::ECDSA');
+
+
+my $key = new Net::DNS::RR <<'END';
+ECDSAP384SHA384.example.	IN	DNSKEY	256 3 14 (
+	K4t0AhWiJcLZ25BlpvfxCi2KMlkBr14zECH3Y2imMYOzn5zcMpOh0iPbI9Hnfep8L+BBzQrRFNmc
+	5r3r0l0y+snHIc/npdK/1Ks0ZG/aMB5r/PfJGeB5MLdtcanFir2S ; Key ID = 25812
+	)
+END
+
+ok( $key, 'set up ECDSA public key' );
+
+
+my $keyfile = $filename{keyfile} = $key->privatekeyname;
+
+open( KEY, ">$keyfile" ) or die "$keyfile $!";
+print KEY <<'END';
+Private-key-format: v1.3
+Algorithm: 14 (ECDSAP384SHA384)
+PrivateKey: mvuhyr+QDMqo4bpeREFRM2w8qZsBiLiCouR0sihdinvpRA3zA/dByohgH4CLI7Kr
+Created: 20141209021155
+Publish: 20141209021155
+Activate: 20141209021155
+END
+close(KEY);
+
+my $private = new Net::DNS::SEC::Private($keyfile);
+ok( $private, 'set up ECDSA private key' );
+
+
+my $sigdata = 'arbitrary data';
+
+my $signature = Net::DNS::SEC::ECDSA->sign( $sigdata, $private );
+ok( $signature, 'signature created using private key' );
+
+
+my $validated = Net::DNS::SEC::ECDSA->verify( $sigdata, $key, $signature );
+ok( $validated, 'signature validated using public key' );
+
+
+exit;
+
+__END__
+

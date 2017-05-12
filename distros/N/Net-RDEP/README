@@ -1,0 +1,38 @@
+Net-RDEP version 0.02
+=====================
+
+This module really consists of two packages, Net::RDEP and XML::Idiom.  The
+Net::RDEP module handles the protocol exchange between the RDEP client and
+server and the XML::Idiom module processes the document retrieved from the 
+server.
+
+The XML::Idiom implementation is pretty basic, so you may want to enhance or
+expand it with your own version, depending on what you're trying to do.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+The Net::RDEP module requires: MIME::Base64 and LWP::UserAgent.  You'll also want
+Crypt-SSLeay if you want to use SSL in your communication between client/server.
+
+XML::Idiom requires only XML::Simple.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2004 by Joe Minieri and OpenService (www.open.com)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,25 @@
+Build.PL
+Changes
+examples/client.pl
+examples/intro-01-helloworld.pl
+examples/intro-02-whatsyourname.pl
+examples/SYNOPSIS.pl
+lib/Net/Async/IRC.pm
+lib/Net/Async/IRC/Introduction.pod
+lib/Net/Async/IRC/Protocol.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/30client-connect.t
+t/31client-cap.t
+t/32client-encoding.t
+t/33client-nick.t
+t/40methods-basic.t
+t/50client-pingpong.t
+t/99pod.t
+t/privkey.pem
+t/server.pem

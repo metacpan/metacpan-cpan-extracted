@@ -1,0 +1,77 @@
+POST https://wwwcie.ups.com/ups.app/xml/Rate
+
+<?xml version='1.0' standalone='yes'?>
+<RatingServiceSelectionRequest>
+  <PickupType>
+    <Code>06</Code>
+  </PickupType>
+  <Request>
+    <RequestAction>Rate</RequestAction>
+    <RequestOption>shop</RequestOption>
+    <TransactionReference>
+      <CustomerContext>Net::Async::Webservice::UPS</CustomerContext>
+      <XpciVersion>0</XpciVersion>
+    </TransactionReference>
+  </Request>
+  <Shipment>
+    <Package>
+      <Description>some stuff</Description>
+      <Dimensions>
+        <Height>1.5</Height>
+        <Length>34</Length>
+        <UnitOfMeasurement>
+          <Code>IN</Code>
+        </UnitOfMeasurement>
+        <Width>24</Width>
+      </Dimensions>
+      <OversizePackage>1</OversizePackage>
+      <PackageWeight>
+        <UnitOfMeasurement>
+          <Code>LBS</Code>
+        </UnitOfMeasurement>
+        <Weight>10</Weight>
+      </PackageWeight>
+      <PackagingType>
+        <Code>02</Code>
+      </PackagingType>
+    </Package>
+    <Package>
+      <Dimensions>
+        <Height>1.5</Height>
+        <Length>34</Length>
+        <UnitOfMeasurement>
+          <Code>IN</Code>
+        </UnitOfMeasurement>
+        <Width>24</Width>
+      </Dimensions>
+      <OversizePackage>1</OversizePackage>
+      <PackageWeight>
+        <UnitOfMeasurement>
+          <Code>LBS</Code>
+        </UnitOfMeasurement>
+        <Weight>20</Weight>
+      </PackageWeight>
+      <PackagingType>
+        <Code>02</Code>
+      </PackagingType>
+    </Package>
+    <Service>
+      <Code>03</Code>
+    </Service>
+    <ShipTo>
+      <Address>
+        <CountryCode>US</CountryCode>
+        <PostalCode>48823</PostalCode>
+      </Address>
+    </ShipTo>
+    <Shipper>
+      <Address>
+        <CountryCode>US</CountryCode>
+        <PostalCode>15241</PostalCode>
+      </Address>
+    </Shipper>
+  </Shipment>
+</RatingServiceSelectionRequest>
+
+<?xml version="1.0"?>
+<RatingServiceSelectionResponse><Response><TransactionReference><CustomerContext>Net::Async::Webservice::UPS</CustomerContext><XpciVersion>0</XpciVersion></TransactionReference><ResponseStatusCode>1</ResponseStatusCode><ResponseStatusDescription>Success</ResponseStatusDescription></Response><RatedShipment><Service><Code>03</Code></Service><RatedShipmentWarning>Your invoice may vary from the displayed reference rates</RatedShipmentWarning><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>3.0</Weight></BillingWeight><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>18.80</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.00</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>18.80</MonetaryValue></TotalCharges><GuaranteedDaysToDelivery/><ScheduledDeliveryTime/><RatedPackage><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>9.10</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.00</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>9.10</MonetaryValue></TotalCharges><Weight>10.0</Weight><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>10.0</Weight></BillingWeight></RatedPackage><RatedPackage><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>9.70</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.00</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>9.70</MonetaryValue></TotalCharges><Weight>20.0</Weight><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>20.0</Weight></BillingWeight></RatedPackage></RatedShipment><RatedShipment><Service><Code>12</Code></Service><RatedShipmentWarning>Your invoice may vary from the displayed reference rates</RatedShipmentWarning><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>20.0</Weight></BillingWeight><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>44.34</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.00</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>44.34</MonetaryValue></TotalCharges><GuaranteedDaysToDelivery>3</GuaranteedDaysToDelivery><ScheduledDeliveryTime/><RatedPackage><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>22.17</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.00</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>22.17</MonetaryValue></TotalCharges><Weight>10.0</Weight><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>10.0</Weight></BillingWeight></RatedPackage><RatedPackage><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>22.17</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.00</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>22.17</MonetaryValue></TotalCharges><Weight>20.0</Weight><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>10.0</Weight></BillingWeight></RatedPackage></RatedShipment><RatedShipment><Service><Code>59</Code></Service><RatedShipmentWarning>Your invoice may vary from the displayed reference rates</RatedShipmentWarning><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>20.0</Weight></BillingWeight><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>61.72</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.00</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>61.72</MonetaryValue></TotalCharges><GuaranteedDaysToDelivery>2</GuaranteedDaysToDelivery><ScheduledDeliveryTime>10:30 A.M.</ScheduledDeliveryTime><RatedPackage><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>30.86</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.00</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>30.86</MonetaryValue></TotalCharges><Weight>10.0</Weight><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>10.0</Weight></BillingWeight></RatedPackage><RatedPackage><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>30.86</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.00</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>30.86</MonetaryValue></TotalCharges><Weight>20.0</Weight><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>10.0</Weight></BillingWeight></RatedPackage></RatedShipment><RatedShipment><Service><Code>02</Code></Service><RatedShipmentWarning>Your invoice may vary from the displayed reference rates</RatedShipmentWarning><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>20.0</Weight></BillingWeight><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>53.68</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.00</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>53.68</MonetaryValue></TotalCharges><GuaranteedDaysToDelivery>2</GuaranteedDaysToDelivery><ScheduledDeliveryTime/><RatedPackage><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>26.84</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.00</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>26.84</MonetaryValue></TotalCharges><Weight>10.0</Weight><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>10.0</Weight></BillingWeight></RatedPackage><RatedPackage><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>26.84</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.00</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>26.84</MonetaryValue></TotalCharges><Weight>20.0</Weight><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>10.0</Weight></BillingWeight></RatedPackage></RatedShipment><RatedShipment><Service><Code>13</Code></Service><RatedShipmentWarning>Your invoice may vary from the displayed reference rates</RatedShipmentWarning><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>20.0</Weight></BillingWeight><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>106.16</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.00</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>106.16</MonetaryValue></TotalCharges><GuaranteedDaysToDelivery>1</GuaranteedDaysToDelivery><ScheduledDeliveryTime>3:00 P.M.</ScheduledDeliveryTime><RatedPackage><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>53.08</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.00</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>53.08</MonetaryValue></TotalCharges><Weight>10.0</Weight><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>10.0</Weight></BillingWeight></RatedPackage><RatedPackage><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>53.08</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.00</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>53.08</MonetaryValue></TotalCharges><Weight>20.0</Weight><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>10.0</Weight></BillingWeight></RatedPackage></RatedShipment><RatedShipment><Service><Code>14</Code></Service><RatedShipmentWarning>Your invoice may vary from the displayed reference rates</RatedShipmentWarning><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>20.0</Weight></BillingWeight><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>184.04</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.00</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>184.04</MonetaryValue></TotalCharges><GuaranteedDaysToDelivery>1</GuaranteedDaysToDelivery><ScheduledDeliveryTime>8:00 A.M.</ScheduledDeliveryTime><RatedPackage><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>92.02</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.00</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>92.02</MonetaryValue></TotalCharges><Weight>10.0</Weight><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>10.0</Weight></BillingWeight></RatedPackage><RatedPackage><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>92.02</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.00</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>92.02</MonetaryValue></TotalCharges><Weight>20.0</Weight><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>10.0</Weight></BillingWeight></RatedPackage></RatedShipment><RatedShipment><Service><Code>01</Code></Service><RatedShipmentWarning>Your invoice may vary from the displayed reference rates</RatedShipmentWarning><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>20.0</Weight></BillingWeight><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>118.04</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.00</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>118.04</MonetaryValue></TotalCharges><GuaranteedDaysToDelivery>1</GuaranteedDaysToDelivery><ScheduledDeliveryTime>10:30 A.M.</ScheduledDeliveryTime><RatedPackage><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>59.02</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.00</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>59.02</MonetaryValue></TotalCharges><Weight>10.0</Weight><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>10.0</Weight></BillingWeight></RatedPackage><RatedPackage><TransportationCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>59.02</MonetaryValue></TransportationCharges><ServiceOptionsCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>0.00</MonetaryValue></ServiceOptionsCharges><TotalCharges><CurrencyCode>USD</CurrencyCode><MonetaryValue>59.02</MonetaryValue></TotalCharges><Weight>20.0</Weight><BillingWeight><UnitOfMeasurement><Code>LBS</Code></UnitOfMeasurement><Weight>10.0</Weight></BillingWeight></RatedPackage></RatedShipment></RatingServiceSelectionResponse>

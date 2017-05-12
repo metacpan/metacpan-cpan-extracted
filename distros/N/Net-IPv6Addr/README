@@ -1,0 +1,35 @@
+=========================
+Net::IPv6Addr Version 0.1
+=========================
+
+Net::IPv6Addr provides functions for parsing IPv6 addresses in all
+formats described by RFC1884.  If Math::Base85 is installed, formats
+described in RFC1924 are also valid.  It will generate "IP6.INT."
+strings (as described in RFC1886) if you are inclined to play with
+DNS records.
+
+This module needs Net::IPv4Addr to function properly.
+
+The usual installation instructions apply:
+
+    /path/to/perl Makefile.PL
+    make
+    make test
+    make install
+
+Documentation is included in pod format.
+
+Please send bug reports and suggestions to the author at
+<tmonroe plus perl at nog dot net>.
+
+---------------------
+Copyright and License
+---------------------
+
+This distribution (with the exception of included RFC's) is copyright
+(c) 2001-2002 Tony Monroe.  All rights reserved.  This software is
+distributed under the same license terms as Perl itself.  This
+software comes with NO WARRANTIES WHATSOEVER, express, implied, or
+otherwise.
+
+$Id: README,v 1.5 2002/08/06 21:35:26 tony Exp $

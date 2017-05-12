@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Net-Appliance-Logical
+version:             0.01
+abstract:            Base Class for interacting various network appliances
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Class::Data::Inheritable:      0
+    Class::Date:                   0
+    LWP::UserAgent:                0
+    Net::SNMP:                     0
+    Regexp::Common:                0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Christopher Heschong <chris@wiw.org>

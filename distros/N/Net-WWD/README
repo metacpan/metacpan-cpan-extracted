@@ -1,0 +1,67 @@
+Net-WWD version 1.00
+====================
+
+Net::WWD is the client and server modules for WWD, the World Wide
+Database (tm). It's a powerful new method of manipulating data that is
+both fairly static as well as extremely dynamic. By standardizing a
+cross-platform method of dealing with data, new possibilities emerge.
+
+It is not possibly to tightly bind an application and it's dataset. Take
+a monitoring program as an example. Let's say you have 2 computers you want
+to monitor an ever changing list of computers. Create the data set as a WWD 
+object, then reference those objects in your application. Copy it from one 
+server to another, and the data stays the same. You could in theory copy 
+your application to millions of computers. From there, you can administer 
+your data from one central location. When the object expires, each computer
+(all 1,000,000+ of them) will then retrieve the "lastest version." As you
+are probably realizing, this can make your life much easier.
+
+Objects can return 3 different types of data.
+	- static data (plain text)
+	- a redirect to another object
+	- dynamic perl, or mini web-apps. easily embeddable into
+	  html/xml/javascript and a potentially unlimited number
+	  places such as your email client, and office suite.
+
+Net::WWD::Client is the WWD (World Wide Database) client software.  
+Applications can use this module to retrieve WWD objects from any 
+Internet connected system. WWD is a static method for retrieving 
+dynamic data.  The data can be atomic data, redirected data, or an 
+application that sits behind an object. Objects can retrieve other 
+objects and produce their output based on other objects.
+
+Net::WWD::Parser process .wwd and .wjs files before delivering them
+to Apache, allowing you to embed WWD Objects and Dynamic Perl (dperl)
+into html/xml and other text documents. 
+
+Net::WWD::Interface provides an http and https interface to
+manipulating WWD objects by linking in directly to Apache via mod-perl.
+
+A WWD object can be shared with the world, or only to a certain user,
+IP address or domain name. Temporary passwords can be assigned (good 
+for X seconds, or X reads). Objects can also be restricted to users 
+who provide the proper read password. 
+
+
+For more information, visit http://idserver.org/wwd
+
+
+DEPENDENCIES
+
+Net::WWD::Interface depends on the following:
+mod_perl
+XML::LibXML
+Time::Local
+
+The other modules have no dependencies.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2000-2005 by John Baleshiski
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

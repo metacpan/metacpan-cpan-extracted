@@ -1,0 +1,19 @@
+app.psgi
+Changes
+lib/App/NAOdash.pm
+lib/App/Web/NAOdash.pm
+lib/NetHack/NAOdash.pm
+Makefile.PL
+MANIFEST
+naodash
+README
+t/NetHack-NAOdash.t
+t/perlcriticrc
+t/perlcritic.t
+t/xlogfile
+web/dash.css
+web/dash.html
+web/index.html
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

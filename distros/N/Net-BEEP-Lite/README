@@ -1,0 +1,55 @@
+Net::BEEP::Lite version 0.05
+============================
+
+Net::BEEP::Lite is a lightweight implementation of a BEEP (RFC 3080,
+RFC 3081) client/server framework.  This package is intended for
+implementing fairly simple BEEP clients and servers.  It does not
+attempt to be the last word on using BEEP in Perl.  Or to put this
+another way, this package does not make an attempt to support every
+feature or mode of operation possible within the BEEP specification.
+
+It does not use threading, and thus cannot directly handle multiple
+ansynchronous channels.  It does not directly support peer-to-peer
+operations.  Or at least not yet.
+
+See the included POD documentation and the DESIGN_NOTES for help in
+using this package.  Also, there is a sample client and server in the
+testing directory (test_echo_server.pl and test_echo_client.pl). They
+do not exercise the entire API, but they may be helpful in getting
+started.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  XML::LibXML
+  MIME::Base64
+
+It uses:
+
+  IO::Lines
+  IO::Scalar
+
+in the test suite.
+
+AUTHOR
+
+Send questions, comments, suggestions, bugs to
+davidb@verisignlabs.com.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003, 2004 VeriSign, Inc.
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU LESSER GENERAL PUBLIC LICENSE.
+

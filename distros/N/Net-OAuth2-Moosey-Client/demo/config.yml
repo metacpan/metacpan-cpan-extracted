@@ -1,0 +1,42 @@
+log: 'core'
+access_log: 1
+show_errors: 1
+sites:
+        37signals:
+                name: '37Signals'
+                client_id: '123'
+                client_secret: 'my_secret'
+                access_code: 'no_real_code'
+                refresh_token: '11_refresh_token_11'
+                site_url_base: 'https://launchpad.37signals.com/'
+                authorize_path: '/authorization/new'
+                access_token_path: '/authorization/token'
+                protected_resource_path: '/authorization.xml'
+        facebook:
+                name: 'Facebook'
+                client_id: '123'
+                client_secret: 'my_secret'
+                access_code: 'no_real_code'
+                refresh_token: '11_refresh_token_11'
+                site_url_base: 'https://graph.facebook.com'
+                protected_resource_path: '/me'
+        mixi:
+                name: 'mixi'
+                client_id: '123'
+                client_secret: 'my_secret'
+                access_code: 'no_real_code'
+                refresh_token: '11_refresh_token_11'
+                site_url_base: 'https://mixi.jp'
+                authorize_url_base: 'https://mixi.jp/connect_authorize.pl'
+                access_token_url_base: 'https://secure.mixi-platform.com/2/token'
+        google:
+                name: 'Google Contacts'
+                client_id: '123'
+                client_secret: 'my_secret'
+                access_code: 'no_real_code'
+                site_url_base: 'https://accounts.google.com'
+                authorize_path: '/o/oauth2/auth'
+                refresh_token: '11_refresh_token_11'
+                access_token_path: '/o/oauth2/token'
+                scope: 'https://www.google.com/m8/feeds/'
+                protected_resource_url: 'https://www.google.com/m8/feeds/contacts/default/full'

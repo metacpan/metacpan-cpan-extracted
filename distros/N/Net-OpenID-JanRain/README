@@ -1,0 +1,36 @@
+Perl JanRain OpenID Library 1.1.0
+=================================
+To use this library, put the contents of the lib directory into your
+perl path. Currently only the consumer is implemented. Extensive POD
+documentation exists in the two modules,
+Net/OpenID/JanRain/Consumer.pm and Net/OpenID/JanRain/Server.pm
+You will also need a store from Net/OpenID/JanRain/Stores , which
+all have PODs too.  We now offer a flat file store and three
+different SQL database stores, SQLite, MySQL, and PostgreSQL.
+
+Dependencies:
+Net::Yadis
+Digest::HMAC_SHA1
+MIME::Base64
+LWPx::ParanoidAgent
+or LWP::UserAgent (not as secure)
+URI
+CGI
+Crypt::DH
+Math::BigInt
+
+It is strongly recommended that you have perl bindings for GMP
+installed, or Diffie Hellman exchanges will be unbearably slow
+(~10 seconds per step on my 3GHz P4).
+
+/dev/urandom is also required for the library to be secure, although
+you may comment out the "die" line if you are okay with running
+the consumer insecurely. 
+
+To Contact the Developers
+-------------------------
+Web Forums on www.openidenabled.com
+IRC: FreeNode #openid
+Mailing List: dev@openidenabled.com 
+(sign up at lists.openidenabled.com)
+

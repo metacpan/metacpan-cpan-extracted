@@ -1,0 +1,33 @@
+{: NES 1.0 ('{: * cfg_plugin_top_dir :}/register_captcha.pl',none,'{: * cfg_plugin_top_dir :}/unregister_captcha.pl') :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  Nes 1.03 by Skriptke
+  Copyright 2009 - 2010 Enrique Castanon
+  Licensed under the GNU GPL.
+
+  Sample:
+  http://nes.sourceforge.net/
+
+  CPAN:
+  http://search.cpan.org/dist/Nes/
+
+  Repository:
+  http://github.com/Skriptke/nes
+   
+  DOCUMENTATION:
+  perldoc Nes::Obj::multi_step
+ 
+  -----------------------------------------------------------------------------
+:}{: & captcha ('{: $ captcha_name :}','{: $ captcha_type :}','{: $ captcha_digits :}','{: $ captcha_noise :}','{: $ captcha_size :}','{: $ captcha_sig :}','{: $ captcha_spc :}','{: $ captcha_expire :}','{: $ captcha_atempts :}')
+                <tr>
+                    <tr><td colspan="2">{: $ txt_captcha,yes_html :}</td></tr>
+                    <td align="right">{: $ captcha_tag_start,yes_html :}{: & captcha_code :}{: $ captcha_tag_end,yes_html :}</td>
+                    <td align="left">
+                        {: $ captcha_begin,yes_html :}
+                        &nbsp;{: $ msg_captcha :}<br>
+                        &nbsp;<input type="text" name="{: $ captcha_name :}" size="{: $ captcha_digits :}" />
+                        {: ~ $captcha_error {: $ msg_error_captcha,yes_html :} :}
+                        {: $ captcha_end,yes_html :}
+                    </td>
+                </tr>:} 

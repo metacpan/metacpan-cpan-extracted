@@ -1,0 +1,32 @@
+=== To Do
+
+NetPacket::IP:
+  * Ignores IP length, so does not strip ethernet padding (see EventLoop:22)
+
+TCPSession.pm:
+  * Handle seq numbers wrapping to zero at MAX_INT
+  * Handle overlapping packets (if this happens ?)
+  * Handle any nasty cases related to future-packets triggering flipping etc.
+  * Handle TIME_WAIT; after sesh is closed, handle late stray packets for it
+  * process_packet will fail to return 'ESTABLISHED_SESSION' if the session is
+     established via a stored from-the-future packet ...
+
+Dispatcher.pm:
+  * Nested emit()s may be confusing:
+      1. TCP.pm accepts tcp_packet
+      2. It processes it, and emits tcp_session_end
+      3. Dispatcher passes tcp_session_end to (say) HTTP.pm
+      4. TCP.pm finishes with tcp_packet
+      5. Dispatcher then emits tcp_packet to (say) HTTP.pm
+    Thus HTTP.pm gets tcp_packet *after* any events that the packet triggered
+
+Consider some new core events, that would be emitted fromboth CORBA and from
+HTTP / XML:
+ rpc_request
+ rpc_response
+
+Also a generic event
+ content_payload
+
+that we could then listen for with ContentGrepXPath ?
+

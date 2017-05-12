@@ -1,0 +1,40 @@
+NCBIx-BigFetch version 0.5.6
+
+This module is useful for downloading very large result sets of sequences 
+from NCBI given a text query. It uses a YAML configuration 
+file to maintain project state in case network or server issues interrupts 
+execution, in which case it may be easily restarted after the last batch. 
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+	make clean
+
+Copy the fetch-*.pp scripts from the distribution scripts directory to a reasonable 
+directory for your work.
+
+DEPENDENCIES
+
+Class::Std
+Class::Std::Utils
+LWP::Simple
+YAML
+Time::HiRes
+
+AUTHORS
+
+	Roger Hall (roger@iosea.com), (rahall2@ualr.edu)
+	Michael Bauer (mbkodos@gmail.com), (mabauer@ualr.edu) 
+	Kamakshi Duvvuru (kduvvuru@gmail.com) 
+
+COPYRIGHT AND LICENSE
+
+Copyleft (C) 2009 the Authors
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

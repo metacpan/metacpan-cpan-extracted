@@ -1,0 +1,104 @@
+0.1702 Wed 20 Mar 2013 12:03:47 GMT
+    - Add support for object meta data (Adam Lounds)
+0.1701 Fri  1 Mar 2013 13:03:44 GMT
+    - Add support for secondary indexes (Theo bot)
+    - Remove deprecations for 0.17 release (Robin Edwards)
+0.1700 Mon 18 Feb 2013 13:06:57 GMT
+    - Add ssl support (Theo bot)
+0.1600 Thu Mar 15 15:30:47 GMT 2012
+    - catch errors in reading sockets (Damien Krotkine)
+    - added Riak search (Germain Maurice)
+    - fixed package name (David Hull)
+    - various documentation updates
+
+0.1502 Thu Jun 23 15:39:10 BST 2011
+    - added status line to REST response (Robin Edwards)
+
+0.1501 Thu May 19 12:07:51 BST 2011
+    - fix pod error in Net/Riak.pm
+    - fix GH-12 in Map/Reduce operations (franck cuny)
+
+0.15 Wed 20 Apr 2011 14:52:22 BST 
+    - fixed link encoding (Simon Wistow)
+    - added stats method for REST
+    - added server_info method for PBC
+    - added list bucket support for both protocols (0.14+ for REST)
+    - added PBC support
+    - added Test::Riak for running tests on both protocols
+    - added disable_return_body flag, in REST mode prevents body being returned on store
+    - create new object without keys (SymKat <symkat@symkat.com>) (REST only)
+
+    DEPRECATIONS
+    - $object->status please call $object->client->status (for REST only)
+    - $object->count_links, added ->has_links and ->all_links
+    - disable_return_body will become the default in 0.17
+    - support for providing multiple hosts when connecting (only supported by REST)
+      all load balancing code to be moved out of Net::Riak by 0.17.
+
+0.14 Mon Mar 14 08:59:10 GMT 2011
+    - fixed delete link (Simon Wistow)
+
+0.13 Tue, 08 Feb 2011 16:40:07 GMT
+    - Enviroment variable for riak when running tests (Robin Edwards)
+    - Connection caching (Andrew Sayers)
+    - Automatic key generation support (Simon Wistow)
+
+0.12
+    - fix _build_link method (reported by gphat)
+    - added useragent timeout parameter (Robin Edwards)
+    - added expected status message (Robin Edwards)
+    - added delete_object method to Net::Riak::Bucket (Robin Edwards)
+    - support for adding bucket as objects in add method (Robin Edwards)
+
+0.11 Wed 03 Nov 2010 03:01:10 PM CET  
+    - update POD (franck cuny)
+    - fix wrong clearer name (_clear_siblings instead of _clear_links)
+
+0.10 Tue 02 Nov 2010 03:34:16 PM CET  
+    - add support of array arguments in Net::Riak::MapReduce->add() (Germain Maurice)
+    - add 204 to Object::store expected status codes (Gavin Carr)
+    - refactor build link logic (Ben Hengst)
+    - requests and responses now stored for debugging (Robin Edwards)
+    - documentation updated (Robin Edwards)
+
+0.09 Tue 05 Oct 2010 12:03:59 PM CEST  
+    - typo
+    - when executing a map/reduce, if the timeout of the map/reduce is higher
+      than the value for the useragent's timeout, change for this query the
+      value of the useragent timeout to be the same as the one for the job.
+    - add key callbacks to Bucket get_properties/get_keys stream mode 
+      (Gavin Carr)
+
+0.08 Mon 06 Sep 2010 10:52:15 AM CEST  
+    - allow to store non-json object (Gavin Carr)
+    - increase LWP's MaxLineLength (Gavin Carr)
+    - better error reporting in Buckets (Gavin Carr)
+
+0.07 Tue 10 Aug 2010 10:32:32 AM CEST
+    - test shouldn't be run by user
+
+0.06 Tue 10 Aug 2010 10:18:59 AM CEST
+    - fix bug in links retriving (thanks to Al Tobey)
+
+0.05 Wed 30 Jun 2010 10:54:52 AM CEST
+    - fix vlock
+
+0.04 Wed June 16 2010
+    - add get_keys to bucket to get the list of existing keys in a
+      bucket
+    - add map/reduce examples
+    - accept multiple hosts
+    - use json::{false,true} in allow_mult
+
+0.03 Mon 14 Jun 2010 05:58:48 PM CEST
+    - add roles to generate attributes (mx::r::parameterized)
+
+0.02 Mon 14 Jun 2010 03:48:43 PM CEST
+    - links_to_header is now private
+    - add some handles
+    - client is moved to a class
+    - client is now a N::R::Client
+    - add tests for bucket, client, object, links
+
+0.01 Mon 14 Jun 2010 01:08:52 PM CEST
+    - initial release (port of the python client)

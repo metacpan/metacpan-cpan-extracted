@@ -1,0 +1,25 @@
+                           Net::Duo To-Do List
+
+APIs:
+
+ * Add support for modifying groups, integrations, and tokens via the
+   Admin API.
+
+ * Add calls for the administrators, settings, and account info portions
+   of the Admin API.
+
+ * Flesh out the rest of the Auth API, particularly including support for
+   preauthentication.
+
+ * Add support for the Verify API.
+
+ * Add support for the Accounts API.
+
+Test suite:
+
+ * Test::RRA::Duo should dynamically discover the fields that can compared
+   with simple comparisons, and the fields that can be compared with
+   is_deeply, by analyzing the return of _fields in the relevant class.
+
+ * Add additional tests for all the error handling cases and then check
+   test coverage.

@@ -1,0 +1,22 @@
+This module will allow to quickly and easily deploy Net::Curl modules.
+
+TODO:
+- think what else to do
+- write some nice examples
+- and more documentation
+
+Simple:
+- maybe add delete() -- CURLOPT_CUSTOMREQUEST
+- allow CODE in post()
+- test ftp and other protocols
+- think what to do with "httpheader" option and others that expect an array
+
+UserAgent:
+- ?
+
+Async:
+- add IO_Async
+- add Glib
+
+Form:
+- add input method for quickly adding <input>s from html

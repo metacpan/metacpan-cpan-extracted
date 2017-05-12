@@ -1,0 +1,98 @@
+NAME
+    Net::TiVo - Perl interface to TiVo.
+
+INSTALLATION
+    % perl Makefile.PL 
+    % make
+    % make test
+    % make install
+
+REQUIREMENTS
+    XML::Simple
+    Log::Log4perl
+    LWP::UserAgent
+
+PLATFORMS
+    I have tested it on the following platforms, but it should work on any platform
+    that runs Perl, and meets the above requirements.
+    
+    FreeBSD v6.1
+
+SYNOPSIS
+        use Net::TiVo;
+
+        my $tivo = Net::TiVo->new(
+            host => '192.168.1.25', 
+            mac  => 'MEDIA_ACCESS_KEY'
+        );
+
+        for ($tivo->folders()) {
+            print $_->as_string(), "\n";
+        }   
+
+ABSTRACT
+    "Net::TiVo" provides an object-oriented interface to TiVo's REST
+    interface. This makes it possible to enumerate the folders and shows,
+    and dump their meta-data.
+
+DESCRIPTION
+    "Net::TiVo" has a very simple interface, and currently only supports the
+    enumeration of folder and shows using the REST interface. The main
+    purpose of this module was to provide access to the TiVo
+    programmatically to automate the process of downloading shows from a
+    TiVo.
+
+    "Net::TiVo" does not provide support for downloading from TiVo. There
+    are several options available, including LWP, wget, and curl. Note: I
+    have used wget version >= 1.10 with success. wget version 1.09 appeared
+    to have an issue with TiVo's cookie.
+
+CACHING
+    "Net::TiVo" is slow due to the amount of time it takes to fetch data
+    from TiVo. This is greatly sped up by using a cache. "Net::TiVo"'s "new"
+    method accepts a reference to a "Cache" object. Any type of caching
+    object may be supported as long as it meets the requirements below.
+    There are several cache implementations available on CPAN, such as
+    "Cache::Cache".
+
+    The following example creates a cache that lasts for 600 seconds.
+
+        use Cache::FileCache;
+    
+        my $cache = Cache::FileCache->new(
+             namespace          => 'TiVo',
+             default_expires_in => 600,
+        }
+
+        my $tivo = Net::TiVo->new(
+             host  => '192.168.1.25',
+             mac   => 'MEDIA_ACCESS_KEY',
+             cache => $cache,
+        }
+
+    "Net::TiVo" uses *positive* caching, errors are not stored in the cache.
+
+    Any "Cache" class may be used as long as it supports the following
+    method signatures.
+
+        # Set a cache value
+        $cache->set($key, $value);
+
+        # Get a cache value
+        $cache->get($key);
+
+  METHODS
+    folders()
+        Returns an array in list context or array reference in scalar
+        context containing a list of Net::TiVo::Folder objects.
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.
+
+SEE ALSO
+    Net::TiVo::Folder, Net::TiVo::Show
+
+AUTHOR
+    Christopher Boumenot, <boumenot@gmail.com>
+

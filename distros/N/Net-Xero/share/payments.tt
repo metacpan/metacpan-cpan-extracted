@@ -1,0 +1,22 @@
+<Payments>
+  <Payment>
+    <Invoice>
+      <InvoiceNumber>[% invoice %]</InvoiceNumber>
+    </Invoice>
+    [% IF account %]
+    <Account>
+      <Code>[% account %]</Code>
+    </Account>
+    [% END %]
+    <Date>[% date %]</Date>
+    <Amount>[% amount %]</Amount>
+    <Description><![CDATA[[% description %]]]></Description>
+    [% IF currency %]
+    <CurrencyCode>[% currency %]</CurrencyCode>
+    [% END %]
+    [% IF reference %]
+    <Reference>[% reference %]</Reference>
+    [% END %]
+  </Payment>
+</Payments>
+

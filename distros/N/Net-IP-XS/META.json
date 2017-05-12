@@ -1,0 +1,50 @@
+{
+   "abstract" : "IPv4/IPv6 address library",
+   "author" : [
+      "Tom Harrison <tomhrr@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-IP-XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Capture::Stderr" : "0",
+            "Math::BigInt" : "0",
+            "Test::More" : "0",
+            "Tie::Simple" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/tomhrr/p5-Net-IP-XS"
+      }
+   },
+   "version" : "0.19",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

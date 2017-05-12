@@ -1,0 +1,28 @@
+Net::Address::IP::Local 0.1.2
+A class for discovering the local system's IP address.
+(C) 2005-2009 Julian Mehnle <julian@mehnle.net>
+<http://www.mehnle.net/software/net-address-ip-local-perl>
+===============================================================================
+
+Net::Address::IP::Local discovers the local system's IP address that would be
+used as the source address when contacting "the internet" or a certain
+specified remote IP address.
+
+Net::Address::IP::Local supersedes the IPv6-impaired Net::Address::IPv4::Local.
+
+Reporting Bugs
+--------------
+
+Please report bugs in Net::Address::IP::Local to the CPAN bug tracker:
+
+    http://rt.cpan.org/Public/Dist/Display.html?Name=Net-Address-IP-Local
+
+License
+-------
+
+Net::Address::IP::Local is free software.  You may use, modify, and distribute
+it under the same terms as Perl itself, i.e. under the GNU GPL (version 2 or
+later) or the Artistic License.  See LICENSE for the license texts.
+
+# $Id: README 24 2009-01-14 21:23:40Z julian $
+# vim:tw=79

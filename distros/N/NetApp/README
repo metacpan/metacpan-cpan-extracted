@@ -1,0 +1,108 @@
+
+INTRODUCTION
+
+This package provides a suite of modules for managing NetApp's NAS
+devices, commonly referred to as "filers".
+
+Although I consider the code to be very stable, the API should be
+considered experimental.  The convention I will be following regarding
+non-compatible API changes is as follows.  I'm using a major.minor
+release naming convention, and I will promise to NOT make
+non-backwards compatible changes between patches to a given
+major.minor release.
+
+However, in order to allow the API to evolve, it is entirely possible
+that non-backwards compatible changes will be made between minor
+releases.  There is no guarantee that 2.003 will be 100% backwards
+compatible with 2.002, although such changes will be made only when
+justified.  The author does not believe in infinite backwards
+compatibility.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SSH vs TELNET
+
+This module is designed to be used with a password-free ssh
+configuration, which means you must have configured your filers with
+an ssh key such that you can run remote commands using:
+
+   ssh [ ssh options ] $hostname $command
+
+without entering a password.  In order to configure this, you need to
+install the public half of your ssh key on the filers directly.
+
+You can use this module with telnet, but this is less secure, since
+you have to find a way to access the plain text password from your
+code, and that usually means either embedding the password in the
+source code (the worst idea) or embedding it into a file somewhere.
+In addition, the error checking with telnet is far less robust, and
+there can only be one concurrent telnet session to a filer, so we
+recommend against using telnet for anything other than installing the
+ssh key.
+
+In a future release, the author hopes to provide a utility to automate
+the installation of the ssh key, using the telnet protocol, as both an
+example of using the API, and a means of helping others wean
+themselves from the use of telnet.
+
+TESTING
+
+The test suite is broken down into two separate sections: 10_passive
+and 20_active.  The passive tests will change absolutely nothing on
+the filers.  The goal of the passive tests is to run the query methods
+and the parsing code through as much input as possible, and these
+tests will walk through every aggregate, volume and qtree, among other
+object types, on each filer that has been configured for testing.  As
+a result, they can be somewhat time consuming, depending on the number
+of filers, and the size of their configuration.
+
+The active tests, which are not yet implemented, will be destructive,
+and will test creating, modifying and destroying objects such as
+aggregates, volumes, qtrees, etc.  The author expects to start adding
+active tests in one of the upcoming releases of this API.
+
+The tests are configured by specifying one or more filers to query in
+the file:
+
+    ./t/lib/NetApp/Test.pm
+
+Please see that file for examples and documentation on how to
+customize the configuration.  To summarize, you can either hack that
+file, or you can export a number of environment variables to control
+the test externally (this is what the author does, for example).
+
+DEPENDENCIES
+
+A bunch...  See Makefile.PL, which will tell you about them anyway
+when it doesn't find them.
+
+Note that if you want to use the caching feature of the NetApp::Filer
+objects, this requires a patched version of Memoize::Expire.  I have
+tried to get the owner of that code to accept a patch, but have been
+unable to get a response from him.  Email me directly, and I'll be
+happy to provide the code.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, Phillip Moore <w.phillip.moore@gmail.com>
+All rights reserved.
+
+This code is released under the same license as perl itself.
+
+CREDITS
+
+The following people helped to make this release happen:
+
+Baldwin Sung <baldwinsung@me.com>
+Chibo Qian <c_qian@ml.com>
+Ugur Tigli <ugur_tigli@ml.com>
+Ed Dabagian-Paul <Ed_Dabagian@ml.com>
+Robert Benoit <Robert.Benoit@netapp.com>
+

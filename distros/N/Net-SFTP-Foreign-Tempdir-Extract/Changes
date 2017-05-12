@@ -1,0 +1,41 @@
+Revision history for Perl module Net::SFTP::Foreign::Tempdir::Extract
+
+0.10 2015-06-08
+  - Updated documentation
+  - Update match default to qr//
+
+0.09 2015-05-09
+  - Updated SFTP connection error message
+  - Updated backup method documentation
+
+0.08 2014-10-26
+  - Updated File->export method to support all archive formats supported by Archive::Extract
+
+0.07 2014-10-17
+  - Added options property defaulting to ssh -q option to suppress server banner
+  - Updated many double quotes to single quotes for performance
+
+0.06 2014-09-08
+  - Documentation
+
+0.05 2014-08-27
+  - Fixed requirement for Archive::Zip
+  - Added example scripts to distribution
+  
+0.04 2014-08-21
+  - File Object
+    - Refactured to drop use of chdir to support relative zip file names
+    - Added tmp dir for each extracted file to support fine grained cleanup
+  - Updated Documentation
+
+0.03 2014-05-29
+  - Extract Object
+    - Added backup and delete options
+
+0.02 2014-05-29
+  - Fixed namespace issues
+  - Added tests
+  - Added File->export method
+
+0.01 2014-05-29
+  - original version; created by ExtUtils::ModuleMaker 0.51

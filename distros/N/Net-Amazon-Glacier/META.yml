@@ -1,0 +1,33 @@
+---
+abstract: 'An implementation of the full Amazon Glacier RESTful 2012-06-01 API.'
+author:
+  - 'Tim Nordenfur <tim@gurka.se>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.3002
+distribution_type: module
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98'
+license: 'gpl, artistic'
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Amazon-Glacier
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Digest::SHA: 0
+  File::Slurp: 9999.19
+  HTTP::Request: 0
+  JSON: 2.61
+  LWP::Protocol::https: 0
+  LWP::UserAgent: 0
+  Net::Amazon::Signature::V4: 0
+  Net::Amazon::TreeHash: 0
+  POSIX: 0
+  perl: 5.010000
+version: 0.15

@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 88df0d7b863c6bb6a100dabc1f0997f023cbe6e4 Changes
+SHA1 c85c0fa10effdb4d9e333a9df5057c1e6efc033f MANIFEST
+SHA1 421cf2a8a92b617012f97c0d56528734b1a127ce META.yml
+SHA1 802e9398cb781700e9acb6343feaf8ad3002836c Makefile.PL
+SHA1 053eac69ed3cb793881ada775a13862e92700564 bin/hm
+SHA1 c2d28957665c0c4436f4985af8d486b36bb75f1a bin/hm-braindump
+SHA1 6786f1492f1fc5937ed7b0d4555ace37075c14d1 bin/hm-create
+SHA1 729dd6a8a5b75ed46b6cde6776e5f73f7ee28a87 bin/hm-done
+SHA1 e06b801a037fb365d9367a907d920057ad8e01cc bin/hm-sync
+SHA1 966dcedaa4412d460902936b63cdf1b5ec945324 bin/hm-todo
+SHA1 e5fb92ac217988bfc7a6af739b0459627020a27e inc/Module/AutoInstall.pm
+SHA1 fd5f3c4f0418efee3b9b16cf8c3902e8374909df inc/Module/Install.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 5c529e96420d964b192f011b121283a4916f7331 inc/Module/Install/AutoInstall.pm
+SHA1 7cd7c349afdf3f012e475507b1017bdfa796bfbd inc/Module/Install/Base.pm
+SHA1 ba186541bbf6439111f01fc70769cf24d22869bf inc/Module/Install/Can.pm
+SHA1 aaa50eca0d7751db7a4d953fac9bc72c6294e238 inc/Module/Install/Fetch.pm
+SHA1 219da5a95c290312a81477b226f005997d97dcfd inc/Module/Install/Include.pm
+SHA1 3e83972921d54198d1246f7278f08664006cd65d inc/Module/Install/Makefile.pm
+SHA1 12bf1867955480d47d5171a9e9c6a96fabe0b58f inc/Module/Install/Metadata.pm
+SHA1 3406c9015148c75406903e7382f8182613b5022a inc/Module/Install/Scripts.pm
+SHA1 f7ee667e878bd2faf22ee9358a7b5a2cc8e91ba4 inc/Module/Install/Win32.pm
+SHA1 8ed29d6cf217e0977469575d788599cbfb53a5ca inc/Module/Install/WriteAll.pm
+SHA1 0ea518bb14e2956339ad2a15cc063d1427edc6c3 lib/Net/Hiveminder.pm
+SHA1 16552e29fc20df41ae80fbd70289ca803d3121c0 t/000-load.t
+SHA1 f15245f1b4f2534ebcd5aa5c04628005a096186d xt/01-dependencies.t
+SHA1 46e94e5661ab8739a0b455d6c2c9ed4cba488f6d xt/99-pod-coverage.t
+SHA1 bb0da54f2b3f2d7955baa41ee458cb3d1887f475 xt/99-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFKVa+lsxfQtHhyRPoRAmAgAJkB7sc8xLrEvsqZjjywCZ1LqCgVqACePZ+w
+8ctTNTyM2qgI5NdMPNGTXek=
+=XGKb
+-----END PGP SIGNATURE-----

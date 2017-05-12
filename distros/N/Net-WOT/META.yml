@@ -1,0 +1,27 @@
+---
+abstract: 'Access Web of Trust (WOT) API'
+author:
+  - 'Sawyer X <xsawyerx@cpan.org>'
+build_requires:
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101831, CPAN::Meta::Converter version 2.101610'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-WOT
+requires:
+  Carp: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  XML::Twig: 0
+  namespace::autoclean: 0
+version: 0.02

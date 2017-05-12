@@ -1,0 +1,30 @@
+0.523 2014/12/09
+- move SaveResponse and LogFormData to Example
+- fix smartmatch warnings
+- fix MANIFEST
+0.521 2013/06/28
+- support for IMP_FATAL, added with Net::IMP 0.617
+0.52 2013/03/03
+- new plugin Example::BlockContentType
+- reworked FlipIMG
+  use Image::Magick instead of Graphics::Magick (because of crash of Graphics::Magick)
+0.51 2013/02/19
+- adapted FlipImg to send pass with maxoffset after replacement at end of body
+- make load of SaveResponse in t/01_load.t depend on File::Path version
+- skip t/05_logformdata.t if we cannot load LogFormData
+0.5 2013/01/22
+- new plugin SaveResponse
+- use Data::Dumper::Sortkeys in tests to make comparing results more reliable
+0.4 2013/01/17
+- fix test t/05_logformdata.t in case neither YAML nor YAML::Tiny is installed
+0.3 2013/01/15
+- Example::FlipImg as another sample plugin
+0.2 2013/01/15
+- move Net::IMP::HTTP_AddXFooHeader to Net::IMP::HTTP::Example::AddXFooHeader
+- move App::HTTP_Proxy_IMP::LogFormData to Net::IMP::HTTP::LogFormData
+- add tests for both
+- make Net::IMP::HTTP::Connection support not only http and stream, but also
+  httprq interface
+- various fixes to Net::IMP::HTTP::Connection
+0.1 2013/01/11
+- initial alpha release

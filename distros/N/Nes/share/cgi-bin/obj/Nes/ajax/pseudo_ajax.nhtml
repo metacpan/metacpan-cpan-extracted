@@ -1,0 +1,43 @@
+{: NES 1.0 ('pseudo_ajax.pl') :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  Nes 1.03 by Skriptke
+  Copyright 2009 - 2010 Enrique Castanon
+  Licensed under the GNU GPL.
+
+  Sample:
+  http://nes.sourceforge.net/
+
+  CPAN:
+  http://search.cpan.org/dist/Nes/
+
+  Repository:
+  http://github.com/Skriptke/nes
+   
+  DOCUMENTATION:
+  perldoc Nes::Obj::pseudo_ajax
+ 
+  -----------------------------------------------------------------------------
+:}
+
+    
+    <script type="text/javascript">{: @ events 
+    {: ~ ( '{: @$ events.by :}' =~ /^field/i )el_{: @$ events.idname :} = document.getElementsByName('{: @$ events.idname :}')[0]; :}{:#
+  :}{: ~ ( '{: @$ events.by :}' =~ /^name/i  )el_{: @$ events.idname :} = document.getElementsByName('{: @$ events.idname :}'); :}{:#
+  :}{: ~ ( '{: @$ events.by :}' =~ /^tag/i   )el_{: @$ events.idname :} = document.getElementsByTagName('{: @$ events.idname :}')[0]; :}{:#
+  :}{: ~ ( '{: @$ events.by :}' =~ /^id/i    )el_{: @$ events.idname :} = document.getElementById('{: @$ events.idname :}'); :}
+    var ev = el_{: @$ events.idname :}.getAttribute("{: @$ events.event :}");
+    el_{: @$ events.idname :}.setAttribute("{: @$ events.event :}", "{: @$ events.idname :}_go();"+ev, 0);
+    function {: @$ events.idname :}_go() {
+        js_{: @$ events.idname :} = document.createElement("script");
+        js_{: @$ events.idname :}.type = "text/javascript";               
+        js_{: @$ events.idname :}.src = "{: $ js_file :}?{: $ params :}{: @$ events.params :}";
+        js_{: @$ events.idname :}.onload = function () { {: @$ events.afterload,yes_html :}; };
+        js_{: @$ events.idname :}.onreadystatechange = function () { if (js_{: @$ events.idname :}.readyState == 'loaded' || js_{: @$ events.idname :}.readyState == 'complete' ) { {: @$ events.afterload,yes_html :}; } }
+        {: @$ events.preload,yes_html :};document.getElementsByTagName('head')[0].appendChild(js_{: @$ events.idname :});
+    }
+   :}{: $ script,yes_html :}{: ~ ( $ script_tpl  ) {: include ('{: $ script_tpl :}')  :}  :}
+   </script>    
+
+

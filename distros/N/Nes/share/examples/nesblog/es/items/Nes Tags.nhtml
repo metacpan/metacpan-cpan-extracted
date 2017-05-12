@@ -1,0 +1,50 @@
+<h2><a href="#">Resumen Tags de Nes</a></h2>
+<h3>Índice Tags</h3>
+<p>
+<table width="100%" border="0" align="center">
+  <tr align="center">
+    <td colspan="2"><strong></strong></td>
+  </tr>
+  <tr>
+    <td width="40%" valign="top"><a href="./?action=item&item=Tag NES ver (file)">&#123;: NES ver (file) :&#125;</a></td>
+    <td width="60%" valign="top">Se coloca principio del archivo nhtml y "file" es el script a ejecutar<br><br></td>
+  </tr>
+  <tr>
+    <td width="40%" valign="top"><a href="./?action=item&item=Tag comentario">&#123;: # comment :&#125;</a></td>
+    <td width="60%" valign="top">Comentario, se elimina<br><br></td>
+  </tr>
+  <tr>
+    <td width="40%" valign="top"><a href="./?action=item&item=Tag $ (variable)">&#123;: $ variable :&#125;</a></td>
+    <td width="60%" valign="top">Se sustituye por el valor de &quot;variable&quot;<br><br></td>
+  </tr>
+  <tr>
+    <td width="40%" valign="top"><a href="./?action=item&item=Tag * (environment_variable)">&#123;: * environment_variable :&#125;</a></td>
+    <td width="60%" valign="top">Se sustituye por el valor de &quot;environment_variable&quot;<br><br></td>
+  </tr>
+  <tr>
+    <td width="40%" valign="top"><a href="./?action=item&item=Tag ~ (expresión)">&#123;: ~ (expresión) <strong>HTML</strong> :&#125;</a></td>
+    <td width="60%" valign="top">Se muestra el bloque HTML si expresión resulta cierto<br><br></td>
+  </tr>
+  <tr>
+    <td width="40%" valign="top"><a href="./?action=item&item=Tag sql (SQL SELECT)">&#123;: sql (SQL SELECT) <strong>HTML</strong> :&#125;</a></td>
+    <td width="60%" valign="top">Se repite el bloque HTML tantas veces como registros tenga "table"<br><br></td>
+  </tr  
+  <tr>
+    <td width="40%" valign="top"><a href="./?action=item&item=Tag @ (table)">&#123;: @ (table) <strong>HTML</strong> :&#125;</a></td>
+    <td width="60%" valign="top">Se repite el bloque HTML tantas veces como registros tenga "table"<br><br></td>
+  </tr>
+  <tr>
+    <td width="40%" valign="top"><a href="./?action=item&item=Tag @ (table)">&#123;: @$ table.field :&#125;</a></td>
+    <td width="60%" valign="top">Se sustituye por el campo "field" de "table"<br><br></td>
+  </tr>
+  <tr>
+    <td width="40%" valign="top"><a href="./?action=item&item=Tag include (file)">&#123;: include (file) :&#125;</a></td>
+    <td width="60%" valign="top">Se sustituye por el archivo "file", file puede ser un nhtml, html, php, sh, text, etc.<br><br></td>
+  </tr>
+  <tr>
+    <td width="40%" valign="top"><a href="./?action=item&item=Plugins">&#123;: & tag (param...) :&#125;</a></td>
+    <td width="60%" valign="top">Resevado para el uso por plugins<br><br></td>
+  </tr>
+</table>
+</p> 
+<br>

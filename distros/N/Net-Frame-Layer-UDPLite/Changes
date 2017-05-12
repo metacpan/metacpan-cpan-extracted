@@ -1,0 +1,8 @@
+Revision history for Perl extension Net::Frame::Layer::UDPLite.
+
+1.01 Fri Jan 23 07:26:17 CET 2015
+   - update: copyright notice
+   - update: Kwalitee
+
+1.00 Sat May 23 15:56:21 CEST 2009
+   - first public release

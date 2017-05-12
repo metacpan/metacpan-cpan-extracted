@@ -1,0 +1,8 @@
+Revision history for Perl module Net::Server::Mail::ESMTP::SIZE
+
+0.01 Mon Apr 21 00:10:23 2008
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+0.01 Tue May 27 23:50:00 2009
+    - left out tests in last dist
+    - license specified in dist

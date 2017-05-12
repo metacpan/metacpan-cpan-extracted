@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+
+
+use strict ;
+
+use Nagios::Report ;
+
+my $x = Nagios::Report->new(q<local_cgi Nagios_Server Auth_Nagios_User>)
+  or die "Can't construct Nagios::Report object." ;
+
+sub by_down_time { 
+  my %f = @_ ;
+  my $d = $f{TOTAL_TIME_DOWN} ;
+  my $u = $f{TOTAL_TIME_UNREACHABLE} ;
+							# $a, $b are package globals (in same package as sort call)
+							# ==> if the callback refers to $a and $b in the default
+							# package (main::), they will have null values in the
+							# package where the sort takes place.
+  package Nagios::Report ;
+  my $x = $a->[$d] >= $a->[$u] ? $a->[$d] : $a->[$u] ;
+  my $y = $b->[$d] >= $b->[$u] ? $b->[$d] : $b->[$u] ;
+  $y <=> $x ;
+}
+
+$x->mkreport(
+		[ qw(HOST_NAME PERCENT_TOTAL_TIME_UP TOTAL_TIME_DOWN TOTAL_TIME_UNREACHABLE AVAIL_URL) ],
+
+		sub {
+			my %F = @_;
+			my $u = $F{PERCENT_TOTAL_TIME_UP}; $u =~ s/%//;
+			$u < 98 && $F{HOST_NAME} !~ /^Bend/
+		    },
+
+		\&by_down_time,
+
+		sub {
+			my $F = shift @_ ;
+			$F->{TIME_DOWN_HHMMSS}		= t2hms($F->{TOTAL_TIME_DOWN}) ;
+			$F->{TIME_UNREACH_HHMMSS}	= t2hms($F->{TOTAL_TIME_UNREACHABLE}}) ;
+			qw(TIME_DOWN_HHMMSS TIME_UNREACH_HHMMSS)
+		}
+
+#		sub {	$_ = shift @_; my %F = @_;
+#			my $d = $F{TOTAL_TIME_DOWN} ;
+#			my $u = $F{TOTAL_TIME_UNREACHABLE} ;
+#			push @$_, 
+#				&Nagios::Report::time2ddhhmmss($d),
+#				&Nagios::Report::time2ddhhmmss($u) ;
+#			qw(TIME_DOWN_HHMMSS TIME_UNREACH_HHMMSS)
+#		}
+) ;
+
+
+
+$x->excel_dump ;

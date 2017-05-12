@@ -1,0 +1,84 @@
+1.1.4     2015-02-03 19:12:53+00:00 Europe/London
+ - fix version number in main module
+
+1.1.3     2015-02-03 18:01:42+00:00 Europe/London
+ - default ssl_options now include the root certificate used to sign
+   UPS's servers certificate
+
+1.1.2     2014-10-13 10:44:50+01:00 Europe/London
+ - drop mistaken "use NAP::policy" from a module
+
+1.1.1     2014-10-07 10:34:29+01:00 Europe/London
+ - add DateTime::Format::ISO8601 prereq that was not auto-detected
+
+1.1.0     2014-10-06 17:21:38+01:00 Europe/London
+ - add support for retrieving Quantum View events (the 'manifest' part
+   of the response is still not supported)
+
+1.0.7     2014-09-17 11:42:50+01:00 Europe/London
+ - fix parsing receipt image for ship_accept calls on return shipments
+ - packages now have a 'description' field, which is required for
+   return shipments
+ - better error messages when constructing credit cards and services
+   with just the code or just the label / type, and an invalid value
+   is passed
+ - add 'customer_context' to all response objects
+
+1.0.6     2014-09-16 17:37:39+01:00 Europe/London
+ - fix RT #98933, you can now book a shipment with 1 package
+ - nicer fix for RT #98219
+
+1.0.5     2014-09-08 16:09:04+01:00 Europe/London
+ - the ::Response::PackageResult objects in a
+   ::Response::ShipmentAccept now link back to the ::Package objects
+   they relate to
+ - ::Package now has separate linear_unit and weight_unit attributes;
+   measurement_system is now a shortcut in the constructor
+   parameters. Note that using kilograms/inches or pounds/centimetres
+   will currently result in an error message from UPS
+ - the 'id' attribute of ::Package is now a string; it's no longer
+   used internally, so it's now a generic user-side identifier
+
+1.0.4     2014-09-02 09:54:21+01:00 Europe/London
+ - bump requirement of Types::Standard to get fix for RT #98362; it
+   caused spurious parameter checking failures
+
+1.0.3     2014-09-01 13:57:30+01:00 Europe/London
+ - incorporate patch from RT #98219, in case AddressKeyFormat is
+   returned multiple times
+ - fix exception reporting for invalid street-level addresses
+
+1.0.2     2014-08-07 13:22:45+01:00 Europe/London
+ - implement ship_confirm and ship_accent (API in flux, useful
+   features probably missing, but it's a start)
+
+1.0.1     2014-07-29 11:22:31+01:00 Europe/London
+ - use SingleEncoding (thanks sergeyromanov)
+
+1.0.0     2014-06-25 11:18:00+01:00 Europe/London
+ - first non-dev release
+
+0.09_6 2014-06-17
+ - migrate to Net::Async::Webservice::Common (not yet released, so
+   it's temporarily included in t/lib)
+
+0.09_5 2014-06-10
+ - exception class UPSError now has methods to look inside the error data
+
+0.09_4 2014-06-10
+ - do not swallow non-HTTP exceptions
+
+0.09_3 2014-06-09
+ - failed Futures now have a 'ups' string as second element, as
+   recommended by PEVANS
+ - fixed Perl version specification
+
+0.09_2 2014-06-05
+ - correctly handle connection failures
+
+0.09_1 2014-06-04
+ - first release
+ - all functionality (and most of the API) copied from Net::UPS 0.12
+ - requires Perl 5.10
+ - will work with IO::Async and Net::Async::HTTP, or with plain
+   LWP::UserAgent

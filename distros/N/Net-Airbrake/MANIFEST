@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Net/Airbrake.pm
+lib/Net/Airbrake/Error.pm
+lib/Net/Airbrake/Request.pm
+minil.toml
+t/00_compile.t
+t/core.t
+t/error.t
+t/request.t
+xt/request.t
+META.yml
+MANIFEST

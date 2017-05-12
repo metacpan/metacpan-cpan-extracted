@@ -1,0 +1,379 @@
+#!/usr/misc/bin/perl5 -w
+#
+#  constants.gen - h.b.furuseth@usit.uio.no
+#     some OpenLDAP constants added by hyc@symas.com
+#     some OpenLDAP constants added by priimak@stanford.edu
+
+sub SYM
+{
+    my($name,$ret) = @_;
+    $ret = $name unless defined $ret;
+
+    return qq(if (strEQ(name, "$name"))
+#ifdef $name
+           return $ret;
+#else
+           goto not_there;
+#endif);
+}
+
+while (<DATA>)
+{
+   s%\b(SYM)\(([^()]*)\)%&SYM(split(/,\s*/,$2))%ge;
+   print;
+}
+__END__
+
+/* This file is generated from constants.gen.  Changes here will be lost! */
+
+#ifndef LDAP_CONTROL_SYNC
+#define LDAP_CONTROL_SYNC "1.3.6.1.4.1.4203.1.9.1.1"
+#endif
+
+#ifndef LDAP_CONTROL_SYNC_STATE
+#define LDAP_CONTROL_SYNC_STATE "1.3.6.1.4.1.4203.1.9.1.2"
+#endif
+
+#ifndef LDAP_CONTROL_SYNC_DONE
+#define LDAP_CONTROL_SYNC_DONE "1.3.6.1.4.1.4203.1.9.1.3"
+#endif
+
+#ifndef LDAP_SYNC_INFO
+#define LDAP_SYNC_INFO "1.3.6.1.4.1.4203.1.9.1.2"
+#endif
+
+#ifndef LDAP_RES_INTERMEDIATE
+#define LDAP_RES_INTERMEDIATE ((ber_tag_t) 0x79U) /* V3+: application + constructed */
+#endif
+
+static char *
+constant_s(name)
+char *name;
+{
+    errno = 0;
+
+    if (name[0] == 'L' &&
+        name[1] == 'D' &&
+        name[2] == 'A' &&
+        name[3] == 'P' &&
+        name[4] == '_' )
+    switch (name[5])
+    {
+        case 'S':
+            SYM(LDAP_SASL_NULL)
+            SYM(LDAP_SASL_SIMPLE)
+            SYM(LDAP_SYNC_INFO)
+            break;
+
+        case 'C':
+            SYM(LDAP_CONTROL_MANAGEDSAIT)
+            SYM(LDAP_CONTROL_PROXY_AUTHZ)
+            SYM(LDAP_CONTROL_SUBENTRIES)
+            SYM(LDAP_CONTROL_VALUESRETURNFILTER)
+            SYM(LDAP_CONTROL_X_VALUESRETURNFILTER)
+            SYM(LDAP_CONTROL_ASSERT)
+            SYM(LDAP_CONTROL_PRE_READ)
+            SYM(LDAP_CONTROL_POST_READ)
+            SYM(LDAP_CONTROL_SORTREQUEST)
+            SYM(LDAP_CONTROL_SORTRESPONSE)
+            SYM(LDAP_CONTROL_PAGEDRESULTS)
+            SYM(LDAP_CONTROL_PASSWORDPOLICYREQUEST)
+            SYM(LDAP_CONTROL_PASSWORDPOLICYRESPONSE)
+            SYM(LDAP_CONTROL_NOOP)
+            SYM(LDAP_CONTROL_NO_SUBORDINATES)
+            SYM(LDAP_CONTROL_MANAGEDIT)
+            SYM(LDAP_CONTROL_SLURP)
+            SYM(LDAP_CONTROL_VALSORT)
+            SYM(LDAP_CONTROL_SYNC)
+            SYM(LDAP_CONTROL_SYNC_STATE)
+            SYM(LDAP_CONTROL_SYNC_DONE)
+            SYM(LDAP_CONTROL_X_CHAINING_BEHAVIOR)
+            SYM(LDAP_CONTROL_X_INCREMENTAL_VALUES)
+            SYM(LDAP_CONTROL_X_DOMAIN_SCOPE)
+            SYM(LDAP_CONTROL_X_PERMISSIVE_MODIFY)
+            SYM(LDAP_CONTROL_X_SEARCH_OPTIONS)
+            SYM(LDAP_CONTROL_X_TREE_DELETE)
+            SYM(LDAP_CONTROL_X_EXTENDED_DN)
+            SYM(LDAP_CONTROL_DUPENT_REQUEST)
+            SYM(LDAP_CONTROL_DUPENT_RESPONSE)
+            SYM(LDAP_CONTROL_DUPENT_ENTRY)
+            SYM(LDAP_CONTROL_DUPENT)
+            SYM(LDAP_CONTROL_PERSIST_REQUEST)
+            SYM(LDAP_CONTROL_PERSIST_ENTRY_CHANGE_NOTICE)
+            SYM(LDAP_CONTROL_VLVREQUEST)
+            SYM(LDAP_CONTROL_VLVRESPONSE)
+            SYM(LDAP_CONTROL_GROUPING)
+            break;
+    }
+    errno = EINVAL;
+    return NULL;
+
+not_there:
+    errno = ENOENT;
+    return NULL;
+
+}
+
+static double
+constant(name, arg)
+char *name;
+int arg;
+{
+    errno = 0;
+
+    if (name[0] != 'L')
+    {
+       SYM(FD_SETSIZE)
+       SYM(NBBY)
+       SYM(NFDBITS)
+    }
+    else if (name[1] && name[2] && name[3] && name[4]) switch (name[5])
+    {
+    case 'A':
+       SYM(LDAP_ADMIN_LIMIT_EXCEEDED)
+       SYM(LDAP_AFFECTS_MULTIPLE_DSAS)
+       SYM(LDAP_ALIAS_DEREF_PROBLEM)
+       SYM(LDAP_ALIAS_PROBLEM)
+       SYM(LDAP_ALREADY_EXISTS)
+       SYM(LDAP_AUTH_KRBV4)
+       SYM(LDAP_AUTH_KRBV41)
+       SYM(LDAP_AUTH_KRBV42)
+       SYM(LDAP_AUTH_KRBV41_30)
+       SYM(LDAP_AUTH_KRBV42_30)
+       SYM(LDAP_AUTH_NONE)
+       SYM(LDAP_AUTH_SASL)
+       SYM(LDAP_AUTH_SIMPLE)
+       SYM(LDAP_AUTH_UNKNOWN)
+       break;
+
+    case 'B':
+       SYM(LDAP_BUSY)
+       break;
+
+    case 'C':
+       SYM(LDAP_CACHE_CHECK)
+       SYM(LDAP_CACHE_LOCALDB)
+       SYM(LDAP_CACHE_POPULATE)
+       SYM(LDAP_COMPARE_FALSE)
+       SYM(LDAP_COMPARE_TRUE)
+       SYM(LDAP_CONNECT_ERROR)
+       SYM(LDAP_CONSTRAINT_VIOLATION)
+       break;
+
+    case 'D':
+       SYM(LDAP_DECODING_ERROR)
+       SYM(LDAP_DEREF_ALWAYS)
+       SYM(LDAP_DEREF_FINDING)
+       SYM(LDAP_DEREF_NEVER)
+       SYM(LDAP_DEREF_SEARCHING)
+       break;
+
+    case 'E':
+       SYM(LDAP_ENCODING_ERROR)
+       break;
+
+    case 'F':
+       SYM(LDAP_FILTER_ERROR)
+       SYM(LDAP_FILT_MAXSIZ)
+       break;
+
+    case 'I':
+       SYM(LDAP_INAPPROPRIATE_AUTH)
+       SYM(LDAP_INAPPROPRIATE_MATCHING)
+       SYM(LDAP_INSUFFICIENT_ACCESS)
+       SYM(LDAP_INVALID_CREDENTIALS)
+       SYM(LDAP_INVALID_DN_SYNTAX)
+       SYM(LDAP_INVALID_SYNTAX)
+       SYM(LDAP_IS_LEAF)
+       break;
+
+    case 'L':
+       SYM(LDAP_LOCAL_ERROR)
+       SYM(LDAP_LOOP_DETECT)
+       break;
+
+    case 'M':
+       SYM(LDAP_MOD_ADD)
+       SYM(LDAP_MOD_BVALUES)
+       SYM(LDAP_MOD_DELETE)
+       SYM(LDAP_MOD_REPLACE)
+       break;
+
+    case 'N':
+       SYM(LDAP_NAMING_VIOLATION)
+       SYM(LDAP_NOT_ALLOWED_ON_NONLEAF)
+       SYM(LDAP_NOT_ALLOWED_ON_RDN)
+       SYM(LDAP_NO_LIMIT)
+       SYM(LDAP_NO_MEMORY)
+       SYM(LDAP_NO_OBJECT_CLASS_MODS)
+       SYM(LDAP_NO_SUCH_ATTRIBUTE)
+       SYM(LDAP_NO_SUCH_OBJECT)
+       break;
+
+    case 'O':
+       SYM(LDAP_OBJECT_CLASS_VIOLATION)
+       SYM(LDAP_OPERATIONS_ERROR)
+       SYM(LDAP_OPT_API_INFO)
+       SYM(LDAP_OPT_API_FEATURE_INFO)
+       SYM(LDAP_OPT_CACHE_ENABLE)
+       SYM(LDAP_OPT_CACHE_FN_PTRS)
+       SYM(LDAP_OPT_CACHE_STRATEGY)
+       SYM(LDAP_OPT_CLIENT_CONTROLS)
+       SYM(LDAP_OPT_DEBUG_LEVEL)
+       SYM(LDAP_OPT_DEREF)
+       SYM(LDAP_OPT_DESC)
+       SYM(LDAP_OPT_DNS)
+       SYM(LDAP_OPT_HOST_NAME)
+       SYM(LDAP_OPT_IO_FN_PTRS)
+       SYM(LDAP_OPT_NETWORK_TIMEOUT)
+       SYM(LDAP_OPT_OFF,               0)
+       SYM(LDAP_OPT_ON,                1)
+       SYM(LDAP_OPT_PROTOCOL_VERSION)
+       SYM(LDAP_OPT_REBIND_ARG)
+       SYM(LDAP_OPT_REBIND_FN)
+       SYM(LDAP_OPT_REFERRALS)
+       SYM(LDAP_OPT_REFERRAL_HOP_LIMIT)
+       SYM(LDAP_OPT_REFERRAL_URLS)
+       SYM(LDAP_OPT_REFHOPLIMIT)
+       SYM(LDAP_OPT_RESTART)
+       SYM(LDAP_OPT_SIZELIMIT)
+       SYM(LDAP_OPT_SERVER_CONTROLS)
+       SYM(LDAP_OPT_SSL)
+       SYM(LDAP_OPT_THREAD_FN_PTRS)
+       SYM(LDAP_OPT_TIMELIMIT)
+       SYM(LDAP_OPT_TIMEOUT)
+       SYM(LDAP_OPT_URI)
+       SYM(LDAP_OPT_X_SASL)
+       SYM(LDAP_OPT_X_SASL_AUTHCID)
+       SYM(LDAP_OPT_X_SASL_AUTHZID)
+       SYM(LDAP_OPT_X_SASL_MAXBUFSIZE)
+       SYM(LDAP_OPT_X_SASL_MECH)
+       SYM(LDAP_OPT_X_SASL_REALM)
+       SYM(LDAP_OPT_X_SASL_SECPROPS)
+       SYM(LDAP_OPT_X_SASL_SSF)
+       SYM(LDAP_OPT_X_SASL_SSF_EXTERNAL)
+       SYM(LDAP_OPT_X_SASL_SSF_MIN)
+       SYM(LDAP_OPT_X_SASL_SSF_MAX)
+       SYM(LDAP_OPT_X_TLS)
+       SYM(LDAP_OPT_X_TLS_CTX)
+       SYM(LDAP_OPT_X_TLS_CACERTFILE)
+       SYM(LDAP_OPT_X_TLS_CACERTDIR)
+       SYM(LDAP_OPT_X_TLS_CERTFILE)
+       SYM(LDAP_OPT_X_TLS_KEYFILE)
+       SYM(LDAP_OPT_X_TLS_REQUIRE_CERT)
+       SYM(LDAP_OPT_X_TLS_CIPHER_SUITE)
+       SYM(LDAP_OPT_X_TLS_RANDOM_FILE)
+       SYM(LDAP_OPT_X_TLS_SSL_CTX)
+       SYM(LDAP_OPT_X_TLS_NEVER)
+       SYM(LDAP_OPT_X_TLS_HARD)
+       SYM(LDAP_OPT_X_TLS_DEMAND)
+       SYM(LDAP_OPT_X_TLS_ALLOW)
+       SYM(LDAP_OPT_X_TLS_TRY)
+       SYM(LDAP_OTHER)
+       break;
+
+    case 'P':
+       SYM(LDAP_PARAM_ERROR)
+       SYM(LDAP_PARTIAL_RESULTS)
+       SYM(LDAP_PORT)
+       SYM(LDAP_PORT_MAX)
+       SYM(LDAP_PROTOCOL_ERROR)
+       break;
+
+    case 'R':
+       SYM(LDAP_REFERRAL)
+       SYM(LDAP_RESULTS_TOO_LARGE)
+       SYM(LDAP_RES_BIND)
+       SYM(LDAP_RES_SEARCH_ENTRY)
+       SYM(LDAP_RES_SEARCH_REFERENCE)
+       SYM(LDAP_RES_SEARCH_RESULT)
+       SYM(LDAP_RES_MODIFY)
+       SYM(LDAP_RES_ADD)
+       SYM(LDAP_RES_DELETE)
+       SYM(LDAP_RES_MODDN)
+       SYM(LDAP_RES_COMPARE)
+       SYM(LDAP_RES_EXTENDED)
+       SYM(LDAP_RES_INTERMEDIATE)
+       SYM(LDAP_RES_ANY)
+       SYM(LDAP_RES_UNSOLICITED)
+       break;
+
+    case 'S':
+       SYM(LDAP_SASL_AUTOMATIC)
+       SYM(LDAP_SASL_INTERACTIVE)
+       SYM(LDAP_SASL_QUIET)
+       SYM(LDAP_SCOPE_BASE)
+       SYM(LDAP_SCOPE_ONELEVEL)
+       SYM(LDAP_SCOPE_SUBTREE)
+       SYM(LDAP_SECURITY_NONE)
+       SYM(LDAP_SERVER_DOWN)
+       SYM(LDAP_SIZELIMIT_EXCEEDED)
+       SYM(LDAP_STRONG_AUTH_NOT_SUPPORTED)
+       SYM(LDAP_STRONG_AUTH_REQUIRED)
+       SYM(LDAP_SUCCESS)
+       break;
+
+    case 'T':
+       SYM(LDAP_TAG_SYNC_NEW_COOKIE)
+       SYM(LDAP_TAG_SYNC_REFRESH_DELETE)
+       SYM(LDAP_TAG_SYNC_REFRESH_PRESENT)
+       SYM(LDAP_TAG_SYNC_ID_SET)
+       SYM(LDAP_TAG_SYNC_COOKIE)
+       SYM(LDAP_TAG_REFRESHDELETES)
+       SYM(LDAP_TAG_REFRESHDONE)
+       SYM(LDAP_TAG_RELOAD_HINT)
+       SYM(LDAP_TAG_EXOP_MODIFY_PASSWD_ID)
+       SYM(LDAP_TAG_EXOP_MODIFY_PASSWD_OLD)
+       SYM(LDAP_TAG_EXOP_MODIFY_PASSWD_NEW)
+       SYM(LDAP_TAG_EXOP_MODIFY_PASSWD_GEN)
+       SYM(LDAP_TAG_MESSAGE)
+       SYM(LDAP_TAG_MSGID)
+       SYM(LDAP_TAG_LDAPDN)
+       SYM(LDAP_TAG_LDAPCRED)
+       SYM(LDAP_TAG_CONTROLS)
+       SYM(LDAP_TAG_REFERRAL)
+       SYM(LDAP_TAG_NEWSUPERIOR)
+       SYM(LDAP_TAG_EXOP_REQ_OID)
+       SYM(LDAP_TAG_EXOP_REQ_VALUE)
+       SYM(LDAP_TAG_EXOP_RES_OID)
+       SYM(LDAP_TAG_EXOP_RES_VALUE)
+       SYM(LDAP_TAG_IM_RES_OID)
+       SYM(LDAP_TAG_IM_RES_VALUE)
+       SYM(LDAP_TAG_SASL_RES_CREDS)
+       SYM(LDAP_TIMELIMIT_EXCEEDED)
+       SYM(LDAP_TIMEOUT)
+       SYM(LDAP_TYPE_OR_VALUE_EXISTS)
+       break;
+
+    case 'U':
+       SYM(LDAP_UNAVAILABLE)
+       SYM(LDAP_UNAVAILABLE_CRITICAL_EXTN)
+       SYM(LDAP_UNDEFINED_TYPE)
+       SYM(LDAP_UNWILLING_TO_PERFORM)
+       SYM(LDAP_URL_ERR_BADSCOPE)
+       SYM(LDAP_URL_ERR_MEM)
+       SYM(LDAP_URL_ERR_NODN)
+       SYM(LDAP_URL_ERR_NOTLDAP)
+       SYM(LDAP_URL_ERR_PARAM)
+       SYM(LDAP_URL_OPT_SECURE)
+       SYM(LDAP_USER_CANCELLED)
+       break;
+
+    case 'V':
+       SYM(LDAP_VERSION)
+       SYM(LDAP_VERSION1)
+       SYM(LDAP_VERSION2)
+       SYM(LDAP_VERSION3)
+       break;
+
+    case '_':
+       SYM(LDAPS_PORT)
+       break;
+    }
+    errno = EINVAL;
+    return 0;
+
+not_there:
+    errno = ENOENT;
+    return 0;
+}

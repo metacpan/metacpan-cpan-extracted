@@ -1,0 +1,44 @@
+Net-OpenVPN-TrayIcon
+
+A simple tray icon for OpenVPN.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build installdeps
+	./Build test
+	./Build install
+
+After the installation the programm can be started with
+
+    ovpntray.pl
+
+If it is the first start a config directory including icons and a config
+file will be created in ~/.ovpntray/.
+
+Most likely the start_cmnd and the stop_cmnd have to be set accordingly.
+
+As start and stop command will be run by sudo at the moment make sure
+they are added in /etc/sudoers for your user or a group your user is
+member of.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::OpenVPN::TrayIcon
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Mugen Kenichi
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

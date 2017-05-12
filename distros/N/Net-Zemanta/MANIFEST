@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-Zemanta-coverage.t
+t/Net-Zemanta.t
+t/Net-Zemanta-podcheck.t
+lib/Net/Zemanta/Method.pm
+lib/Net/Zemanta/Suggest.pm
+lib/Net/Zemanta/Preferences.pm
+META.yml                                 Module meta-data (added by MakeMaker)

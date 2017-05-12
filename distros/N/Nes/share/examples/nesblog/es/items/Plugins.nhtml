@@ -1,0 +1,76 @@
+<h2><a href="#">Plugins NES</a></h2>
+<h3>Descripción</h3>
+<p>
+Nes permite incorporar o modificar funcionalidades mediante Plugin. Por ejemplo
+los formularios seguros y el captcha están implementados mediante Plugins.
+</p> 
+<p>
+Se ha reservado un Tag (<i><b>&</b></i>) para el caso en que el Plugin tenga que definir uno:
+<pre>
+&#123;: & tag (param...) :&#125;
+
+</pre>
+Como ejemplo en el <a href="./?action=item&item=Plugin Captcha">Plugin Captcha</a> el tag es:
+<pre>
+    
+&#123;: & captcha  (param...) :&#125;
+
+</pre>
+Y en el <a href="./?action=item&item=Plugin Forms">Plugin Forms</a> el tag es:
+<pre>
+    
+&#123;: & form  (param...) :&#125;
+
+</pre>
+</p> 
+<h3>Carga del Plugin</h3>
+<p>
+Los Plugin se cargan en el <a href="./?action=item&item=Tag NES ver (file)">Tag NES</a> antes o después de tu 
+script Perl según los requerimientos del Plugin:
+<pre>
+&#123;: NES 1.0 ('&#123;: * cfg_plugin_top_dir :&#125;/plugin.pl','my_file.pl') :&#125;
+
+</pre>
+El orden de carga es muy importante, supongamos un hipotético <i>Plugin Cache</i> que 
+lee las páginas Web del cache para aliviar de carga al servidor, perdería toda 
+su gracia si se cargase al final, después de haber hecho todo el trabajo. O otro 
+hipotético <i>Plugin Filter</i> que filtra direcciones email o spam de nuestras páginas, 
+obviamente debería cargarse al final, cuando todo el contenido está preparado para la salida: 
+<pre>
+    
+&#123;: NES 1.0 (
+             '&#123;: * cfg_plugin_top_dir :&#125;/cache.pl',
+             'my_file.pl',
+             '&#123;: * cfg_plugin_top_dir :&#125;/filter.pl'
+           ) 
+:&#125;
+
+(*Hemos partido aquí esta linea por razones de legibilidad, pero es un error
+ya que <a href="./?action=item&item=Tag NES ver (file)">NES</a> es el único Tags que no permite partir lineas) 
+</pre>
+</p> 
+<p>
+También se pueden cargar automáticamente en el archivo de configuración <b>para todos</b>
+los archivos <i>nhtml</i> del directorio actual:
+<pre>
+.nes.cfg
+
+# Cargar Plugins al inicio, sólo para el nhtml de la URL
+auto_load_plugin_top_first = &#123;: * cfg_plugin_top_dir :&#125;/cache.pl,./my_script.pl
+
+# Cargar Plugins al inicio, para todos los archivos incluidos
+auto_load_plugin_all_first = &#123;: * cfg_plugin_top_dir :&#125;/plugin.pl, ...
+
+# Cargar Plugins al final, sólo para el nhtml de la URL
+auto_load_plugin_top_last = &#123;: * cfg_plugin_top_dir :&#125;/filter.pl, ...
+
+# Cargar Plugins al final, para todos los archivos incluidos
+auto_load_plugin_all_last = &#123;: * cfg_plugin_top_dir :&#125;/plugin.pl, ...
+
+</pre>
+</p>
+<h3>Creación de Plugin</h3>
+<p>
+El API para la creación de Plugin está en desarrollo.
+</p> 
+<br>

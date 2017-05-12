@@ -1,0 +1,68 @@
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+use Net::Evernote::Simple 0.07;
+
+my( $pattern ) = @ARGV;
+die "usage: $0 pattern" 
+  if !defined $pattern;
+
+my $en = Net::Evernote::Simple->new();
+
+if( ! $en->version_check() ) {
+  die "Evernote API version out of date!";
+}
+
+my $note_store = $en->note_store() or
+   die "getting notestore failed: $@";
+
+my $filter = $en->sdk(
+  "EDAMNoteStore::NoteFilter" )->new(
+    { words => $pattern } );
+
+my $offset    = 0;
+my $max_notes = 100;
+
+my $result = $note_store->findNotes(
+    $en->{ dev_token },
+    $filter,
+    $offset,
+    $max_notes
+);
+
+for my $hit ( @{ $result->{ notes } } ) {
+  my $note = $note_store->getNote( 
+   $en->{ dev_token }, $hit->{ guid }, 1 );
+  print $note->{ content };
+}
+
+__END__
+
+=head1 NAME
+
+    note-find - Find notes by keyword and print their content
+
+=head1 SYNOPSIS
+
+    note-find "foo bar baz"
+
+=head1 DESCRIPTION
+
+This test script searches for notes matching the pattern specified
+as a command line argument. Make sure to limit the number of hits by
+narrowing down the query, potentially by using quotes like
+
+    note-find '"foo bar baz"'
+
+which finds only notes with the literal string "foo bar baz" and not
+just any document containing "foo", "bar", and "baz" anywhere.
+
+=head1 LEGALESE
+
+Copyright 2016 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2016, Mike Schilli <cpan@perlmeister.com>

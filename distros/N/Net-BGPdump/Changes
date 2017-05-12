@@ -1,0 +1,22 @@
+Revision history for Net::BGPdump
+
+2.03  Fri Feb 19 15:24:41 EST 2016
+    - eliminated extraneous filter options
+    - renamed from* to peer* and to* to dest*
+
+2.02  Tue May  5 16:21:17 EDT 2015
+    - fixed ipv6 filter on BGPDUMP_TYPE_TABLE_DUMP_V2
+
+2.01  Fri May  1 16:04:21 EDT 2015
+    - various optimizations
+    - added read_msg()
+    - split out type/subtype labels
+    - added BUGS section
+
+2.00  Fri Apr 24 13:27:28 EDT 2015
+    - merged Net::BGPdump::IO into Net::BGPdump
+    - added BGPDUMP_TYPE_MRTD_BGP support
+    - added route uptime to mrtd
+
+1.00  Wed Apr  1 16:21:48 EDT 2015
+    - initial release

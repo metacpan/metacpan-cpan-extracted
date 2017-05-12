@@ -1,0 +1,232 @@
+#!/usr/bin/env perl
+use 5.010001;
+use warnings;
+use strict;
+use utf8;
+
+our $VERSION = 'v2.3.7';
+
+use FindBin;
+use lib "$FindBin::Bin/../lib/perl5";
+use MIME::Base64;
+
+
+main(@ARGV) if !caller;
+
+
+sub err { die "narada-new-1: @_\n" };
+
+sub main {
+    die "Usage: narada-new-1 [/path/to/project]\n" if @_ > 1;
+    my $dst = @_ ? $_[0] : q{.};
+
+    # Prepare empty destination directory.
+    if (!-e $dst) {
+        mkdir $dst                      or err "mkdir: $!";
+    }
+    else {
+        -d $dst                         or err "Not a directory: $dst";
+        opendir my $d, $dst             or err "opendir: $!";
+        (my @tmp = readdir $d) == 2     or err "Directory not empty: $dst";
+        closedir $d                     or err "closedir: $!";
+    }
+
+    # Unpack project skeleton from DATA.
+    local $/;
+    my $skel = <DATA>;
+    local $SIG{PIPE} = 'IGNORE';
+    my $TAR = (grep {-x "$_/gtar"} split /:/ms, $ENV{PATH}) ? 'gtar' : 'tar';
+    open my $unpack, q{|-}, "$TAR xpf - -C \Q$dst\E"
+                                        or err 'Unpack failed';
+    print {$unpack} decode_base64($skel);
+    close $unpack                       or err 'Unpack failed';
+
+    # Enter project.
+    chdir $dst                          or err "chdir: $!";
+
+    require Narada::Config;
+    Narada::Config->import(qw( set_config ));
+
+    # Setup project version.
+    my ($project) = `pwd` =~ m{([^/]+?)\n\z}xms
+                                        or err 'Unable to detect project name';
+    my $version = "$project-0.0.000";
+    set_config('version', "$version\n");
+
+    if (exists $ENV{NARADA_USER}) {
+        set_config("patch/send/$ENV{USER}", $ENV{NARADA_USER});
+    }
+
+    # Initialize patch system.
+    system $TAR.' cf - ./ --exclude var/patch/.prev | tar xpf - -C var/patch/.prev/';
+
+    # Make initial archive for installing this project elsewhere.
+    system 'narada-backup';
+    rename 'var/backup/full.tar', "var/patch/$version.tar" or err "rename: $!";
+
+    return;
+}
+
+
+1; # Magic true value required at end of module
+## no critic (RequirePodAtEnd)
+
+=encoding utf8
+
+=head1 NAME
+
+narada-new-1 - creates a skeleton project based on Narada framework v1.x
+
+
+=head1 VERSION
+
+This document describes narada-new-1 version v2.3.7
+
+
+=head1 USAGE
+
+    narada-new-1 [/path/to/project]
+
+
+=head1 DESCRIPTION
+
+B<WARNING:> This script shouldn't be used for new projects, use narada-new
+instead. This script provided only for testing compatibility with Narada
+v1.x projects.
+
+This script help you create skeleton project directory for using Narada
+framework.
+
+Target directory shouldn't exists or must be empty.
+
+If target directory doesn't exists - it will be created (parent
+directory must exists).
+
+If executed without param will create skeleton
+project in current directory, which must be empty.
+
+Target directory become "project root directory", and all other `narada-*`
+scripts must be executed in this directory.
+
+=head2 INITIAL SETUP
+
+File C<config/version> will be initialized with value "PROJECTNAME-0.0.000",
+where PROJECTNAME is target directory name.
+
+Will create C<var/patch/PROJECTNAME-0.0.000.tar> with backup of current
+project. This backup should be used when installing this project elsewhere:
+
+    unpack backup in empty project root
+    (if needed) unpack backup in var/patch/.prev/
+    put all updates into var/patch/
+    run narada-patch
+    setup config/* as needed for this installation
+
+
+=head1 DIAGNOSTICS
+
+=over
+
+=item C<< narada-new-1: mkdir: %s >>
+
+Target directory wasn't exists and mkdir failed (probably parent directory
+doesn't exist or have wrong permissions).
+
+=item C<< narada-new-1: not a directory: %s >>
+
+Script's param point to existing file.
+
+=item C<< narada-new-1: opendir: %s >>
+
+Target directory exists, but can't be read (probably have wrong permissions).
+
+=item C<< narada-new-1: directory not empty: %s >>
+
+Target directory exists, but not empty.
+
+=item C<< narada-new-1: unpack failed >>
+
+Script failed to unpack skeleton directory. Most likely reason - target
+directory doesn't writable. While unpacking it use `tar`, so maybe there
+some issue with it. Or this script was damaged (reinstall recommended).
+
+=item C<< narada-new-1: unable to detect project name >>
+
+Failed to setup 'config/version' file using project directory name as
+default project name. Probably some issue with `pwd` command or unusual
+symbols in project directory name (\n for example).
+
+=item C<< narada-new-1: closedir: %s >>
+
+=item C<< narada-new-1: chdir: %s >>
+
+Internal error.
+
+=back
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+narada-new-1 requires no configuration files or environment variables.
+
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/powerman/Narada/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software. The code repository is available for
+public review and contribution under the terms of the license.
+Feel free to fork the repository and submit pull requests.
+
+L<https://github.com/powerman/Narada>
+
+    git clone https://github.com/powerman/Narada.git
+
+=head2 Resources
+
+=over
+
+=item * MetaCPAN Search
+
+L<https://metacpan.org/search?q=Narada>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/dist/Narada>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Narada>
+
+=item * CPAN Testers Matrix
+
+L<http://matrix.cpantesters.org/?dist=Narada>
+
+=item * CPANTS: A CPAN Testing Service (Kwalitee)
+
+L<http://cpants.cpanauthors.org/dist/Narada>
+
+=back
+
+
+=head1 AUTHOR
+
+Alex Efros  E<lt>powerman@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2008- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+
+=cut

@@ -1,0 +1,2 @@
+Add fake tests for ranges that aren't whole bytes
+Add fake tests for when the pool empties

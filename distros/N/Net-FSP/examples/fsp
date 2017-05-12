@@ -1,0 +1,293 @@
+#! /usr/bin/perl
+use strict;
+use warnings;
+
+use POSIX qw/strftime/;
+use Fcntl;
+use Term::ReadLine;
+use Sys::Hostname;
+use lib 'lib';
+
+use Net::FSP;
+use Net::FSP::Util qw/get_envs get_host/;
+
+sub init_readline {
+	if (-t *STDIN && -t *STDOUT) { ## no critic interactive
+		my $rl = Term::ReadLine->new('FSP Browser');
+		my $PS1 = sprintf "%s@%s:", getlogin, hostname;
+
+		my $filename = (getpwnam getlogin)[7].'/.fsp_history';
+		my $history;
+		open $history, '<', $filename and do {
+			while (<$history>){
+				chomp;
+				$rl->addhistory($_);
+			}
+			close $history or die "Could not close history file!?\n";
+		};
+		open $history, '>>', $filename or die "Could not open history file\n";
+
+		print "FSP Browser\n(C) Leon Timmermans 2005, 2008\n\n";
+
+		return sub {
+			my $arg = shift;
+			my $tmp = $rl->readline("$PS1$arg ");
+			$rl->addhistory($tmp);
+			print {$history} "$tmp\n";
+			return $tmp;
+		}
+	} else {
+		return sub {
+			return scalar readline STDIN;
+		}
+	}
+}
+
+my %help_for = (
+	bye      => 'bye',
+	cat      => 'cat file1 [file2]...',
+	cd       => 'cd [dirname]',
+	'chmod'  => 'chmod +-cdgmlr dirname1 [dirname2]...',
+	config   => 'config',
+	download => 'download remote_file [local_file]',
+	help     => 'help [command]',
+	less     => 'less filename',
+	ls       => 'ls -l [dir1]...',
+	lsmod    => 'lsmod dirname1 [dirname2]...',
+	'mkdir'  => 'mkdir dirname1, [dirname2]...',
+	mv       => 'mv oldname newname',
+	pwd      => 'pwd',
+	quit     => 'quit',
+	readme   => 'readme [dirname]',
+	rm       => 'rm filename1 [filename 2]...',
+	'rmdir'  => 'rmdir dirname1 [dirname2]...',
+	upload   => 'upload local_file [remote_file]',
+	version  => 'version',
+	view     => 'view filename',
+);
+
+my $generation;
+
+sub _edit {
+	my ($fsp, $remote_name, $write, @command) = @_;
+	my $local_name;
+	eval {
+		local $SIG{__DIE__};
+		my $short_name = $remote_name;
+		$short_name =~ s{ ^ [^\n]* /}{}x;
+		$local_name = "/tmp/$$-".$generation++."-$short_name";
+		sysopen my $fh, $local_name, O_RDWR|O_CREAT|O_EXCL, oct 600 or die "Could not open localfile: $!\n";
+		$fsp->download_file($remote_name, $fh);
+
+		my $time = -M $local_name;
+		system @command, $local_name and die "Couldn't execute: $@\n";
+		if ($write and $time != -M $local_name){
+			seek $fh, 0, 0;
+			$fsp->upload_file($remote_name, $fh)
+		}
+	};
+	unlink $local_name;
+	die $@ if $@;
+	return;
+}
+
+my %sub_for = (
+	ls => sub {
+		my $fsp = shift;
+		my @args = @_;
+		@args = '' if not @args;
+		if ($args[0] eq '-l') {
+			shift @args;
+			@args = '' if not @args;
+			for my $dirname (@args) {
+				my $arg = $fsp->stat_file($dirname);
+				if($arg->type eq 'dir') {
+					for my $entry ($arg->list) {
+						printf "%s%s%s\t%d\t%s\n",
+							$entry->short_name, ($entry->type eq 'dir' ? '/' : ''), (defined $entry->link ? ' -> '.$entry->link : ''),
+							$entry->size, strftime('%Y-%m-%d %H:%M:%S', localtime $entry->time);
+					}
+				}
+				elsif ($arg->type eq 'file') {
+					printf "%s\t%d\t%s\n", $dirname, $arg->size, strftime('%Y-%m-%d %H:%M:%S', localtime $arg->time);
+				}
+				else {
+					print STDERR "file '$dirname' doesn't exist\n";
+				}
+			}
+		}
+		else {
+			for my $name (@args) {
+				my ($time, $size, $type) = $fsp->stat_file($name);
+				if ($type eq 'dir') {
+					my @entries = $fsp->list_dir($name);
+					for my $entry (@entries) {
+						printf "%s%s\n", $entry->short_name, $entry->type eq 'dir' ? '/' : '';
+					}
+				}
+				elsif ($type eq 'file') {
+					printf "$name\n";
+				}
+				else {
+					print STDERR "file '$name' doesn't exist\n";
+				}
+			}
+		}
+	},
+	cat => sub {
+		die "No filename given\n" if @_ < 2;
+		my ($fsp, @filenames) = @_;
+		for my $filename (@filenames) {
+			$fsp->download_file($filename, \*STDOUT);
+		}
+	},
+	download => sub {
+		die "No filename given\n" if @_ < 2;
+		my ($fsp, $remote_filename) = splice @_, 0, 2;
+		my $local_filename = @_ ? shift : $remote_filename;
+		$fsp->download_file($remote_filename, $local_filename);
+	},
+	bye => sub {
+		my $fsp = shift;
+		$fsp->say_bye;
+	},
+	version => sub {
+		my $fsp = shift;
+		my $version = $fsp->server_version;
+		print "$version\n";
+	},
+	config => sub {
+		my $fsp = shift;
+		my $info = $fsp->server_config;
+		for my $key (qw/logging read-only reverse-lookup private-mode throughput-control extra-data/) {
+			printf "%s: %s\n", $key, $info->{$key} ? 'yes' : 'no';
+		}
+	},
+	help => sub {
+		my $fsp = shift;
+		if (@_) {
+			print "$help_for{$_[0]}\n";
+		}
+		else {
+			for my $command (sort keys %help_for) {
+				printf "%-9s %s\n", $command, $help_for{$command};
+			}
+		}
+	},
+	cd => sub {
+		my $fsp = shift;
+		my $dir = shift || '/';
+		$fsp->change_dir($dir);
+	},
+	pwd => sub {
+		my $fsp = shift;
+		printf "%s\n", $fsp->current_dir;
+	},
+	upload => sub {
+		die "No filename given\n" if @_ < 2;
+		my ($fsp, $local_filename) = splice @_, 0, 2;
+		my $remote_filename = @_ ? shift : $local_filename;
+		my $timestamp = (stat $local_filename)[9];
+		$fsp->upload_file($remote_filename, $local_filename, $timestamp);
+	},
+	rm => sub {
+		die "No filename given\n" if @_ < 2;
+		my ($fsp, @filenames) = @_;
+		for my $filename (@filenames) {
+			$fsp->remove_file($filename);
+		}
+	},
+	'rmdir' => sub {
+		die "No dirname given\n" if @_ < 2;
+		my ($fsp, $dirname) = @_;
+		$fsp->remove_dir($dirname);
+	},
+	lsmod => sub {
+		my ($fsp, @dirnames) = @_;
+		@dirnames = $fsp->current_dir if not @dirnames;
+		for my $dirname (@dirnames) {
+			my $prot = $fsp->get_protection($dirname);
+			printf "%s\n%s.\n", $dirname, join ' ', map { "$_ " . ( $prot->{$_} ? 'Y' : 'N') } qw/owner delete create mkdir get list rename/;
+		}
+	},
+	readme => sub {
+		my ($fsp, $dirname) = @_;
+		$dirname ||= '/';
+		my $readme = $fsp->get_readme($dirname);
+		print "$readme\n";
+	},
+	'chmod' => sub {
+		my ($fsp, $raw_mod, @filenames) = @_;
+		@filenames = $fsp->current_dir if not @filenames;
+		die "Invalid mod\n" unless $raw_mod =~ / \A ([+-]) ([cdgmlr]+) \z /msx;
+		my @mods = map { "$1$_" } split //x, $2;
+		for my $filename (@filenames) {
+			for my $mod (@mods) {
+				$fsp->set_protection($filename, $mod);
+			}
+		}
+	},
+	'mkdir' => sub {
+		die "No dirname given\n" if @_ < 2;
+		my ($fsp, @dirnames) = @_;
+		for my $dirname (@dirnames) {
+			$fsp->make_dir($dirname);
+		}
+	},
+	mv => sub {
+		die "Missing filenames\n" if @_ < 3;
+		my ($fsp, $old_name, $new_name) = @_;
+		$fsp->move_file($old_name, $new_name);
+	},
+	vi => sub {
+		_edit(@_[0,1], 1, 'vim', '-n');
+	},
+	nano => sub {
+		_edit(@_[0,1], 1, 'nano');
+	},
+	view => sub {
+		_edit(@_[0,1], 0, 'view', '-n');
+	},
+	less => sub {
+		_edit(@_[0,1], 0, 'less');
+	},
+	restart => sub {
+		my $fsp = shift;
+		$fsp->say_bye;
+		exec $0, @ARGV;
+	}
+);
+
+my $hostname = $ARGV[0] || get_host() || die "No host specified\n";
+
+my $fsp = Net::FSP->new($hostname, { get_envs() } );
+local $| = 1;
+
+my $rl = init_readline;
+
+while ( defined(my $line = $rl->('/'.$fsp->current_dir)) ) {
+	chomp $line;
+	$line =~ s/ \A \s+ //xms;
+	$line =~ s/ \s+ \z //xms;
+	next if length $line == 0;
+	my @args;
+	while ($line =~ m/ ( [^\s"]+ ) /gcx or $line =~ / " ( (?:[^"] | \")+ ) "/gcx) {
+		push @args, $1;
+	}
+	my $command = shift @args;
+	last if $command =~ / \A q ( | uit ) /xms;
+	eval {
+		if (my $sub = $sub_for{$command}) {
+			$sub->($fsp, @args);
+		}
+		else {
+			warn "Command '$command' doesn't exist\n";
+		}
+	};
+	if ($@) {
+		$@ =~ s/ at .*? line \d+$//;
+		warn $@;
+	}
+}
+
+END { close STDOUT or die "Could not close STDOUT: $!\n" }

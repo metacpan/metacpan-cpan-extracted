@@ -1,0 +1,9 @@
+lib/Net/Amazon/ATS.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/pod.t
+t/pod_coverage.t
+t/simple.t

@@ -1,0 +1,22 @@
+#!/usr/bin/perl -I../
+
+use Net::XWhois; 
+use Data::Dumper; 
+
+my $w = new Net::XWhois; 
+
+$w->register_parser ( Name   => 'INTERNIC',
+                      Retain => 1, 
+                      Parser => { 
+                      	creation_time => 'Record created on (\S*?)\.\n',
+				      } ); 
+
+
+my $domain = shift; 
+my $whois = new Net::XWhois Domain => $domain; 
+print "$domain --\n"; 
+print "Registrant: ", $whois->registrant ();
+print "\nCreation Time of $domain: ", $whois->creation_time (); 
+print "\n";
+
+print Dumper $w;

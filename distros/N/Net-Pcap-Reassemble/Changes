@@ -1,0 +1,42 @@
+Revision history for Perl extension Net::Pcap::Reassemble.
+$Id: Changes,v 1.5 2010/05/14 10:24:33 james Exp $
+
+0.05 Fri 14 May 2010 11:24:10 IST
+	Fix bug when reading padded ethernet frames.
+
+	Fix bug with missing Carp module.
+
+	Support DLT_LINUX_SLL linktypes for `cooked' Linux captures.
+
+	Some code cleanups and POD additions.
+	
+0.04 Tue 21 Jul 2009 17:21:00 IST
+	Add option to eliminate the L2 header from the packet that's given to
+	the callback sub.
+
+	Fix IPv6 layer 2 headr handling bug.
+
+	Some code/POD cleanups.
+
+0.03 Mon  9 Jun 2008 14:49:48 IST
+	Support DLT_LOOP and DLT_NULL linktypes for loopback captures (in
+	addition to DLT_EN10MB).
+
+	Minor code/POD cleanups.
+
+0.02 Thu 14 Sep 2006 22:43:05 IST
+	Fix IPv6 handling to update the `Next Header' field of the header
+	preceeding the fragmentable part of an IPv6 datagram to account for
+	the removal of the Fragment Header.
+
+	Fix IPv4 packet handling to properly account for header
+	options+padding.
+
+	Add a flush() function to release memory used by incomplete
+	datagrams.
+
+	Better OOness, and some efficiency improvements (which are probably
+	outweighed by the extra OO glue).
+
+0.01  Tue 12 Sep 2006 11:34:13 IST
+	First release.

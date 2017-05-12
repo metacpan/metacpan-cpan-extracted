@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                Net-DNS-Dig
+version:             0.12
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Digest::MD5:                   2.16
+    Net::DNS::Codes:               0.11
+    Net::DNS::ToolKit:             0.46
+    Net::NBsocket:                 0.21
+    NetAddr::IP:                   4.056
+    Sys::Hostname::FQDN:           0.1
+    Sys::Sig:                      0.04
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

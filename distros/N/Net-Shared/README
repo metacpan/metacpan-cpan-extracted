@@ -1,0 +1,4 @@
+Net/Shared version 0.30
+=======================
+
+Net::Shared gives the ability to share variables across processes both local and remote.  Net::Shared and Net::Shared::Remote objects are created and interfaced with a Net::Shared object.  Please see the documentation and the examples for more info.

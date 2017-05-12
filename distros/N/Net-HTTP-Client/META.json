@@ -1,0 +1,62 @@
+{
+   "abstract" : "A Not-quite-so-low-level HTTP connection (client)",
+   "author" : [
+      "Ashley Willis <ashley+perl@gitable.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-HTTP-Client",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Response" : "0",
+            "Net::HTTP" : "0",
+            "parent" : "0",
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Limper" : "0",
+            "POSIX" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::HTTP::Client" : {
+         "file" : "lib/Net/HTTP/Client.pm",
+         "version" : "0.012"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://gitable.org/ashley/net-http-client.git",
+         "web" : "https://gitable.org/ashley/net-http-client.git"
+      }
+   },
+   "version" : "0.012"
+}
+

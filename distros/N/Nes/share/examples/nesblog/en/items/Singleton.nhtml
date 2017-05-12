@@ -1,0 +1,551 @@
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+    <li><a href="#name">NAME</a></li>
+    <li><a href="#synopsis">SYNOPSIS</a></li>
+    <li><a href="#description">DESCRIPTION</a></li>
+    <li><a href="#nes__singleton_schema">Nes::Singleton Schema</a></li>
+    <li><a href="#methods">Methods</a></li>
+    <ul>
+
+        <li><a href="#new">new</a></li>
+        <li><a href="#out">out</a></li>
+        <li><a href="#add">add</a></li>
+    </ul>
+
+    <li><a href="#_nes_cfg">.nes.cfg</a></li>
+    <li><a href="#session">Session</a></li>
+    <li><a href="#query">Query</a></li>
+    <ul>
+
+        <li><a href="#query_methods">Query Methods</a></li>
+    </ul>
+
+    <li><a href="#author">AUTHOR</a></li>
+    <li><a href="#version">VERSION</a></li>
+    <li><a href="#copyright">COPYRIGHT</a></li>
+    <li><a href="#license">LICENSE</a></li>
+    <li><a href="#disclaimer">DISCLAIMER</a></li>
+    <li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h2><a name="name">NAME</a></h2>
+<p>Nes::Singleton - Single access interface to Nes.</p>
+<p>
+</p>
+<hr />
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<pre>
+    use Nes;
+    my $nes = Nes::Singleton-&gt;new('template.nhtml');
+
+    my $config        = $nes-&gt;{'CFG'};
+    my $cookies       = $nes-&gt;{'cookies'};
+    my $session       = $nes-&gt;{'session'};
+    my $query         = $nes-&gt;{'query'};
+    my $top_container = $nes-&gt;{'top_container'};
+    my $container     = $nes-&gt;{'container'};
+    my $register      = $nes-&gt;{'register'};
+
+    my $nes_tags = {};
+    $nes_tags-&gt;{'var_hello'} = 'Hello World!';
+
+    $nes-&gt;out(%$nes_tag);
+
+</pre>
+<p>
+</p>
+<hr />
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>Is a class for a single access interface to Nes. It aims to simplify the 
+use of Nes, through a single instance to access the template that is 
+running. Create all the necessary objects and returns an instance of this.</p>
+<p>It also allows the template to be executed in different ways, calling 
+the Perl script, calling to template or command line.</p>
+<p>Nes should be run by calling the template, other methods are 
+implemented to facilitate debugging.</p>
+<p>It is an object of type singleton:</p>
+<pre>
+    Nes::Singleton-&gt;new('template.nhtml'); # returns a new instance
+    Nes::Singleton-&gt;new('other.nhtml');    # returns same instance
+    Nes::Singleton-&gt;new();                 # returns same instance
+
+</pre>
+<p>In most cases you just need to do this:</p>
+<pre>
+    use Nes;
+    my $nes = Nes::Singleton-&gt;new('template.nhtml');
+    my %tags;
+
+    # the things that make your script...
+    ...
+    # set variables for output
+    $tags{'var_hello'} = 'Hello World!';
+
+    # the things that make your script...
+    ...
+    # send variables to Nes
+    $nes-&gt;out(%tags);
+    
+</pre>
+<p>
+</p>
+<hr />
+<h2><a name="nes__singleton_schema">Nes::Singleton Schema</a></h2>
+<p>Nes::Singleton represents the Web page and its elements. Access to the various 
+elements is through instances created by Nes::Singleton:</p>
+<pre>
+    +--------------------------------------+
+    |           Nes::Singleton             |-&gt;Nes::Singleton-&gt;{'top_container'}
+    |  http://example.com/template.nhtml   |  
+    |+----------------------------------+  |  
+    ||HTTP HEADER:                      |  |  
+    ||  POST and GET ------------------------&gt;Nes::Singleton-&gt;{'query'}
+    ||  Cookie ------------------------------&gt;Nes::Singleton-&gt;{'cookies'}
+    |+----------------------------------+  |
+    |+----------------------------------+  |
+    ||HTML CONTENT:                     |----&gt;Nes::Singleton-&gt;{'container'}
+    ||&lt;html&gt;                            |  |  
+    ||...                               |  | 
+    || +-----------------------------+  |  |
+    || |&#123;: include ('obj1.nhtml') :&#125; |  |  |  
+    || |                             |-------&gt;Nes::Singleton-&gt;{'container'}
+    || |                             |  |  | 
+    || +-----------------------------+  |  |
+    ||...                               |  | 
+    || +-----------------------------+  |  |
+    || |&#123;: include ('obj2.nhtml') :&#125; |  |  |
+    || |                             |-------&gt;Nes::Singleton-&gt;{'container'}
+    || |                             |  |  |  
+    || +-----------------------------+  |  |  
+    ||...                               |  |  
+    ||&lt;/html&gt;                           |  |
+    |+----------------------------------+  |
+    +--------------------------------------+
+    
+</pre>
+<dl>
+<dt><strong><a name="nes_singleton_top_container" class="item">Nes::Singleton-&gt;{'top_container'}</a></strong></dt>
+
+<dd>
+<p>Represents the Web page and all content. It creates a higher level container
+for other elements.</p>
+</dd>
+<dt><strong><a name="nes_singleton_container" class="item">Nes::Singleton-&gt;{'container'}</a></strong></dt>
+
+<dd>
+<p>Represents the HTML, PHP, TXT, etc. content, or other files included in
+the template.</p>
+</dd>
+<dt><strong><a name="nes_singleton_query" class="item">Nes::Singleton-&gt;{'query'}</a></strong></dt>
+
+<dd>
+<p>make:</p>
+<pre>
+    use Nes;
+    my $nes = Nes::Singleton-&gt;new;
+    my $q   = $nes-&gt;{'query'}-&gt;{'q'};
+
+</pre>
+<p>is equivalent to do:</p>
+<pre>
+    use CGI;
+    my $q = CGI-&gt;new;
+
+</pre>
+</dd>
+<dt><strong><a name="nes_singleton_cookies" class="item">Nes::Singleton-&gt;{'cookies'}</a></strong></dt>
+
+<dd>
+<p>Represents the cookies.</p>
+</dd>
+<dt><strong><a name="nes_singleton_session" class="item">Nes::Singleton-&gt;{'session'}</a></strong></dt>
+
+<dd>
+<p>Represents the user session.</p>
+</dd>
+<dt><strong><a name="nes_singleton_cfg" class="item">Nes::Singleton-&gt;{'CFG'}</a></strong></dt>
+
+<dd>
+<p>Represents the settings for the directory containing the Top Container.</p>
+</dd>
+<dt><strong><a name="nes_singleton_register" class="item">Nes::Singleton-&gt;{'register'}</a></strong></dt>
+
+<dd>
+<p>Represents access to plugins.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h2><a name="methods">Methods</a></h2>
+<p>
+</p>
+<h3><a name="new">new</a></h3>
+<pre>
+    use Nes;
+    my $nes = Nes::Singleton-&gt;new('template.nhtml');
+
+</pre>
+<p>Only require parameter if Nes is executed by CGI.</p>
+<pre>
+    http://example.con/perl.cgi
+    
+</pre>
+<p>Or command line:</p>
+<pre>
+    ./perl.cgi
+
+</pre>
+<p>The parameter is ignored if executed Nes by template.</p>
+<pre>
+    http://example.con/template.nhtml
+
+</pre>
+<p>Nes should be run by calling the template, other methods are 
+implemented to facilitate debugging.</p>
+<p>
+</p>
+<h3><a name="out">out</a></h3>
+<p>In the parameter we pass a copy of hash (%$hash) with the data we want
+to replace in the template.</p>
+<pre>
+    my $nes_tags = {};
+    $nes_tags-&gt;{'hello'} = 'Hello World!';
+    $nes-&gt;out(%$nes_tag);
+
+    ./.
+
+    my %nes_tags;
+    $nes_tags{'hello'} = 'Hello World!';
+    $nes-&gt;out(%nes_tag);
+    
+</pre>
+<p>The method 'out' does not exit script or immediately print values, 
+your script can continue after call to out, but for clarity it is 
+recommended to include at the end of script.</p>
+<p>This will work:</p>
+<pre>
+    ...
+    $nes-&gt;out(%$nes_tag);
+    &amp;foo($bar);
+    ...
+
+</pre>
+<p>For clarity use this:</p>
+<pre>
+    ...
+    &amp;foo($bar);
+    $nes-&gt;out(%$nes_tag);
+    ...
+    
+</pre>
+<p>
+</p>
+<h3><a name="add">add</a></h3>
+<p>Added Tags without sending out. If you template:</p>
+<pre>
+    &#123;: NES 1.0 ('myscript1.pl','myscript2.pl') :&#125;
+    
+</pre>
+<p>If myscript1 and myscript2 defined Tags, mysqcript1 should have:</p>
+<pre>
+    $nes-&gt;add(%tags);
+    
+</pre>
+<p>And myscript2:</p>
+<pre>
+    $nes-&gt;out(%tags);
+    
+</pre>
+<p>If you call to out method in myscript1, the tags of myscript2 never be replaced. 
+If you not call to out method in last script, the Tags never be replaced.</p>
+<p>The routine use of the add method is in creating plugin.</p>
+<p>
+</p>
+<hr />
+<h2><a name="_nes_cfg">.nes.cfg</a></h2>
+<p>You .nes.cfg contains:</p>
+<pre>
+    private_key   = pass3
+    myscript_var1 = 50
+    
+</pre>
+<p>Then you can access:</p>
+<pre>
+    use Nes;
+    my $nes    = Nes::Singleton-&gt;new('template.nhtml');
+    my $config = $nes-&gt;{'CFG'};
+
+    my $var  = $nes-&gt;{'myscript_var1'};
+    my $pkey = $nes-&gt;{'private_key'};
+
+    # Global configuration
+    my $pdir = $nes-&gt;{'plugin_top_dir'};
+    
+</pre>
+<hr />
+<h2><a name="session">Session</a></h2>
+<pre>
+    my $nes     = Nes::Singleton-&gt;new();
+    my $session = $nes-&gt;{'session'};
+
+    # Create session:
+    $session-&gt;create($user, $expire);
+
+    # Get session:
+    $user = $session-&gt;{'user'};
+
+    # Delete session:
+    $session-&gt;del;
+    
+</pre>
+<p>
+</p>
+<hr />
+<h2><a name="query">Query</a></h2>
+<pre>
+    use Nes;
+    my $nes   = Nes::Singleton-&gt;new('template.nhtml');
+    my $query = $nes-&gt;{'query'};
+    my $q     = $query-&gt;{'q'};
+    
+</pre>
+<p>Nes::Singleton-&gt;{'query'}-&gt;{'q'} is equivalent to do:</p>
+<pre>
+    use CGI;
+    my $q = CGI-&gt;new;
+    
+</pre>
+<p>In addition to GET or POST with Nes::Singleton-&gt;{'query'} we pick 
+parameters of Nes Objects in the following format:</p>
+<pre>
+    objectname_param_number
+    
+</pre>
+<p>For our example the name of the object is lucky.nhtml, the extension 
+is ignored, then the first parameter:</p>
+<pre>
+    Nes::Singleton-&gt;{'query'}-&gt;{'q'}{'lucky_param_1'}
+    
+</pre>
+<p>The object name is:</p>
+<pre>
+    my $obj = Nes::Singleton-&gt;{'query'}-&gt;{'q'}{'obj_param_0'};
+    my $par = Nes::Singleton-&gt;{'query'}-&gt;{'q'}{$obj.'_param_1'};
+    
+</pre>
+<p>The following variables are available in .nes.cfg for POST control:</p>
+<pre>
+
+    max_post   = 512  # Max kB. maximum size of POST.
+    max_upload = 2048 # Max kB. maximum size of the upload, 0 none
+    tmp_upload = 512  # In big upload, memory consumption is high,
+                      # this defined from that kB. using a temporary
+                      # file in the upload, preventing these are 
+                      # loaded into memory. 
+                      # * If tmp_upload is 0 or is greater than max_post, 
+                      # max_upload limit will be equal to max_post. Therefore, 
+                      # max_upload to take value, tmp_upload to be equal to or 
+                      # less than max_post.
+                      
+</pre>
+<p>For disable uploads, put this in you .nes.cfg:</p>
+<pre>
+    max_upload = 0
+    
+</pre>
+<p>
+</p>
+<h3><a name="query_methods">Query Methods</a></h3>
+<p>Access to query is via a patched version of CGI::Minimal (ver. 1.29). Most 
+of the methods are accessible by creating an instance of CGI. No need to 
+create a CGI object with new method, it automatically creates by Nes:</p>
+<pre>
+    use Nes;
+    my $nes = Nes::Singleton-&gt;new;
+    my $cgi = $nes-&gt;{'query'}-&gt;{'CGI'};
+    
+</pre>
+<p>In this way we can access the methods of CGI::Minimal:</p>
+<pre>
+    ...
+    $param = $cgi-&gt;param('param');
+    ...
+    
+</pre>
+<p>See: <a href="http://search.cpan.org/perldoc?CGI::Minimal">http://search.cpan.org/perldoc?CGI::Minimal</a></p>
+<p>Our patched version includes temporary files and other modifications and 
+define new methods and access to the most common:</p>
+<dl>
+<dt><strong><a name="param" class="item">param;</a></strong></dt>
+
+<dd>
+<p>Called without arguments, it returns the list of all defined form fields in 
+the same order they appear in the data from the user agent.</p>
+<p>If you include as parameter the name of the field, it returns the value 
+(or an array, if you have multiple). If there is more than one value, the 
+values are returned in the same order they appeared in the data from user agent.</p>
+<p>Same as CGI::Minimal-&gt;param. See: <a href="http://search.cpan.org/perldoc?CGI::Minimal">http://search.cpan.org/perldoc?CGI::Minimal</a></p>
+</dd>
+<dt><strong><a name="get_upload_buffer" class="item">get_upload_buffer</a></strong></dt>
+
+<dd>
+<p>Get te upload content by buffer:</p>
+<pre>
+    use Nes;
+    my $nes = Nes::Singleton-&gt;new;
+    my $query = $nes-&gt;{'query'};
+    ...
+    while ( $query-&gt;get_upload_buffer('field_name',\$buffer) ) {
+        print $fh $buffer;
+    }
+    ...
+    
+</pre>
+</dd>
+<dt><strong><a name="get_upload_name" class="item">get_upload_name</a></strong></dt>
+
+<dd>
+<p>Get the file name of upload by the field:</p>
+<pre>
+    use Nes;
+    my $nes = Nes::Singleton-&gt;new;
+    my $query = $nes-&gt;{'query'};
+    ...
+    $file_name = $query-&gt;get_upload_name('field_name');
+    
+</pre>
+</dd>
+<dt><strong><a name="get_upload_fh" class="item">get_upload_fh</a></strong></dt>
+
+<dd>
+<p>Get the file handle of upload:</p>
+<pre>
+    use Nes;
+    my $nes = Nes::Singleton-&gt;new;
+    my $query = $nes-&gt;{'query'};
+    ...
+    $fh = $query-&gt;get_upload_fh('field_name');
+    
+</pre>
+</dd>
+<dt><strong><a name="upload_is_tmp" class="item">upload_is_tmp</a></strong></dt>
+
+<dd>
+<p>Return true if upload is in tmp file:</p>
+<pre>
+    $in_tmp_file = $query-&gt;upload_is_tmp('field_name');
+    
+</pre>
+<p>Depending on your max_post, tmp_upload and max_upload. The upload can be in 
+a temporary file or memory.</p>
+<p>This will always work, although the upload is in memory:</p>
+<pre>
+    $fh = $query-&gt;get_upload_fh('field_name');
+or:
+    $query-&gt;get_upload_buffer('field_name',\$buffer)
+    
+</pre>
+<p>A little faster:</p>
+<pre>
+    if ( ! $query-&gt;upload_is_tmp('field_name') ) {
+        $content_upload = $query-&gt;{'q'}{'field_name'};
+    }
+    
+</pre>
+<p>If the upload is in memory:</p>
+<pre>
+    $file_name = $query-&gt;{'q'}{'field_name'};
+    
+</pre>
+<p>else:</p>
+<pre>
+    $content_upload = $query-&gt;{'q'}{'field_name'};
+    
+</pre>
+</dd>
+<dt><strong><a name="upload_max_size" class="item">upload_max_size</a></strong></dt>
+
+<dd>
+<p>Return true if it has exceeded the maximum limit of max_upload .nes.cfg var.</p>
+</dd>
+<dt><strong><a name="post_max_size" class="item">post_max_size</a></strong></dt>
+
+<dd>
+<p>Return true if it has exceeded the maximum limit of max_post .nes.cfg var.</p>
+</dd>
+<dt><strong><a name="get_buffer_raw" class="item">get_buffer_raw</a></strong></dt>
+
+<dd>
+<p>Returns a copy of the raw form data to max_post:</p>
+<pre>
+    $post_data_raw = $query-&gt;get_buffer;
+    
+</pre>
+</dd>
+<dt><strong><a name="get_buffer" class="item">get_buffer</a></strong></dt>
+
+<dd>
+<p>Returns a copy of the raw form data, including temporary files:</p>
+<pre>
+    while ( my $buffer = $query-&gt;get_buffer ) {
+        $post_data_raw .= $buffer;
+    }
+    
+</pre>
+</dd>
+<dt><strong><a name="get" class="item">get</a></strong></dt>
+
+<dd>
+<p>Get a field:</p>
+<pre>
+    $field = $query-&gt;{'q'}{'field_name'}
+Same:
+    $field = $query-&gt;get('field_name');
+    
+</pre>
+</dd>
+<dt><strong><a name="set" class="item">set</a></strong></dt>
+
+<dd>
+<p>Set a field:</p>
+<pre>
+    $query-&gt;{'q'}{'field_name'} = 'value';
+Same:
+    $query-&gt;set('field_name', 'value');
+    
+</pre>
+</dd>
+<dt><strong><a name="del" class="item">del</a></strong></dt>
+
+<dd>
+<p>Undef field:</p>
+<pre>
+    $query-&gt;del('field_name');
+    
+</pre>
+</dd>
+<dt><strong><a name="url_encode" class="item">url_encode</a></strong></dt>
+
+<dd>
+<p>Returns URL encoding of input string.</p>
+</dd>
+<dt><strong><a name="url_decode" class="item">url_decode</a></strong></dt>
+
+<dd>
+<p>Returns URL decoding of input string.</p>
+</dd>
+</dl>
+<p>
+</p>
+

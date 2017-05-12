@@ -1,0 +1,33 @@
+---
+abstract: 'perl interface to work with Hadoop-EC2'
+author:
+  - 'Nobuo Danjou <nobuo.danjou@gmail.com>'
+build_requires:
+  Digest::MD5: 0
+  File::Temp: 0
+  Test::Exception: 0
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Amazon-HadoopEC2
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  File::Basename: 0
+  File::Spec: 0
+  MIME::Base64: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  Net::Amazon::EC2: 0
+  Net::SSH::Perl: 0
+  Path::Class::File: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

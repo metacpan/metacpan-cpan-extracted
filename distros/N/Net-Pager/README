@@ -1,0 +1,202 @@
+
+                        Net::Pager, version 2.00
+
+Copyright (c) 2000 SimpleWire. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms
+as Perl itself.
+
+Written By: Joe Lauer <joelauer@simplewire.com>
+
+For further documentation and support, please check out
+www.simplewire.com
+
+
+  Description
+  -----------
+
+    Net::Pager is a pure perl, global numeric and alphanumeric paging interface
+    via the Internet. We're bringing you the first and only way to
+    interface any brand or type of pager through one consistent
+    protocol without using the telephone network. Our purpose is to
+    define a paging standard and make numerous tools available for
+    developer's use so paging technology can be better utilized.
+
+    The module interacts with SimpleWire's Remote Procedure Calls.
+    This new standard, and subsequently this Perl module, has a
+    great deal of development energy behind it and will have full
+    development support through an online support forum. Pager has
+    built-in redundancy to create a fail-safe system.
+
+    For futher support or questions, you should visit Pager's
+    website at *www.simplewire.com* where you can visit our
+    developer support forum, faq, or download the most recent
+    documentation. SimpleWire's site has more example code and perl
+    client tools.
+
+
+  New Features in 2.00
+  --------------------
+
+    * The module was totally re-written since XML has been introduced
+      as the language for all client/server communication between this
+      client tool and the SimpleWire network.
+    * Support for asynchronous sending of pages has been added.  This
+      means that network delays are now handled by the SimpleWire servers
+      rather than the client tools. This has eliminated any timeout
+      bugs that might occur, since SimpleWire can now respond immediately.
+    * Object oriented design following the HTTP::Response and
+      HTTP::Request methodology.  Clients now construct Net::Pager::Request
+      objects, submit various requests through this object, and use
+      the Net::Pager::Response object to analyze the response from the
+      SimpleWire servers.  This resulted in three more objects:
+      Net::Pager::Common, Net::Pager::Request, and Net::Pager::Response.
+    * SimpleWire now captures more error messages from each paging service.
+      A good example is the attempt to send pages to Sprint PCS phones
+      even though text messaging costs extra and most users don't have
+      it.  SimpleWire now catches this kind of error.
+    * Added new services: Verizon, VoiceStream/OmniPoint
+      Bell Mobility, and Weblink Wireless Two-Way.
+	* Introduction of a ticket system where a TICKET ID is assigned
+      to every sendpage transaction.  This allows clients to check on
+      the status of pages sent asynchronously or to check up on older
+      pages sent through our system.
+    * Added support for sending a page to a simplewire alias.  This
+      means clients can now send pages to an alias instead of a pin
+      and service id, provided that the alias is setup and registered
+      on the SimpleWire network.
+    * Improved documentation on error codes and tapping into our
+      protocol.  Please refer to www.simplewire.com to download these
+      helpful documents.
+	* Fixed small issue with clients entering pins that contain a dash
+	  or a period.  Our servers will now filter out this garbage to
+      ensure proper formatting of the pin.
+    * Added support for Subscriber IDs and Subscriber passwords.
+    * Added an optional delimiter parameter to be passed along with a page
+      so that client tools can override our default delimiter to
+      seperate the from, callback, and text fields in messages.
+    * Fixed timeout bugs by using LWP::UserAgent instead of our own
+      networking code.
+    * SimpleWire can now support proxy servers via the LWP::UserAgent
+      module.  However, this will take custom tweaking of our
+	  Net::Pager moduele until native support is added.
+    * Revised the system for remotely retrieving our service list.  Many new
+      options have been added so that the list comes back sorted or
+      filtered in whatever way you like.
+    * Improved functions to use with the service list.  New functions
+      include DBI-like interface for retrieval and looping.  Such
+      functions are fetchrow_service, fetchall_services, and fetchrow_rewind.
+    * Fixed small bug that was related to timeouts where 2 or 3 duplicated
+      pages would be sent off.  This was solved via LWP and smarter
+      error checking before moving onto the next simplewire server.
+
+
+  Archive Location
+  ----------------
+
+    .  The newest release/extensive help/faq/exaples on www.simplewire.com
+
+    .  In the CPAN directory: modules/by-module/Net/
+
+    .  To find a CPAN site near you see http://cpan.perl.org/SITES.html
+
+
+  Prerequisites
+  -------------
+
+    .  Perl Version 5.002 or later
+
+    .  A Windows 95/NT machine requires Perl version 5.003_07 or later
+
+
+
+  Documentation
+  -------------
+
+    User documentation in POD format is contained within the module
+    source (i.e. the .pm file).  Installing using "make install"
+    places this documentation in a man page in the perl library under
+    the directory "man/man3".  However, the best documentation is
+    the example code in the /eg directory form the tar.gz file or
+    on www.simplewire.com.
+
+
+  Installation
+  ------------
+
+    These notes work on Unix based systems and there are some changes
+    if you are using Windows NT/95/98.  See the special notes below.
+
+	To install, cd to the directory containing the unpacked
+    distribution and do one of the following:
+
+	a.  Create a makefile by running Makefile.PL using the perl
+        program into whose library you want to install and then run
+        make three times:
+
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+    b.  To install into a private library, for example your home
+        directory:
+
+            perl Makefile.PL INSTALLSITELIB=$HOME/lib INSTALLMAN3DIR=$HOME/man
+            make
+            make test
+            make pure_install
+
+    c.  Alternatively, you can just copy or move Pager.pm
+        from the distribution into a directory named Net/ in the Perl
+        library.  You can then manually build the documentation using
+        pod2man or pod2html.
+
+    d.  At the time of printing this, there should be more ways to install
+        Net::Pager.  Please go to www.simplewire.com and visit our
+        Developers section for the easiest ways.  There should be a CPAN
+        install and a ppm install.
+
+    Windows NT/95/98 Installation
+    -----------------------------
+    
+	Windows does not come with the make program.  Instead, you will have to
+	use a similar program called 'nmake'.  If you have happened to install
+    Microsoft's Visual Studio then 'nmake' is already installed on your
+    computer and you can fun the following instructions.  If you don't have
+    'nmake' then please visit
+		
+		http://www.simplewire.com/clienttools/perl.epl
+
+    for instructions on how to get 'nmake'.
+
+    Once you have 'nmake.exe' then you can replicate the instructions laid
+    out in the previous a, b, and c subpoint above except replace the 'make'
+    command with 'nmake'.  So (a) would be now
+
+          perl Makefile.PL
+          nmake
+          nmake test
+          nmake install
+
+
+    Some Common Problems
+    --------------------
+
+    You most likely have to logged in as root on any machine to be able to
+    successfully install either module.  If you cannot log in as root then
+    follow choice c. above and just make a directory called Net where your
+    programs will run and then copy Pager.pm into it.
+
+    If you have any other questions please visit SimpleWire's FAQ or online
+	support forum for anwers.
+
+------------
+SimpleWire
+743 Beaubien
+Suite 300
+Detroit, MI 48226
+313.961.4407
+
+Released: 08/28/2000
+Coded By: Joe Lauer <joelauer@rootlevel.com>
+Contact:  John Lauer <jlauer@rootlevel.com>

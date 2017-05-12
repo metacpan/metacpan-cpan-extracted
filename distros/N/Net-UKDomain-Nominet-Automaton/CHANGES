@@ -1,0 +1,43 @@
+Revision history for Perl module Net::UKDomain::Nominet::Automaton
+
+1.08	20 October 2007
+	- Corrections to previous release as below...
+	- Added more fields that Nominet had failed to mention in the fields documentation, yet appear in other parts
+	- Added more depreciated fields that Nominet depreciated but did not mention in the fields documentation.
+	- Fixed error messages style to be more consistent
+	- Better error checking on fields
+	- Rewritten some of the documentation, in-line with the changes, and to correct some typos
+	- Better passing of variables to the subroutines
+	- Fixed/Improved the Registrar TAG validation
+	- All above work done by James Wade with a couple of small corrections by Jason
+
+1.07	17 October 2007
+	- Added support for all available operations and fields (and corrected wrong ones)
+	- Module now maps old fields to new
+	- No longer uses Mail::CheckUser module
+	- synopsis corrected (use smtpserver not smtp)
+	- method for calling errstr
+	- cleared up some errors
+	- All above work done by James Wade with a couple of small corrections by Jason
+
+1.06	19 July 2007
+	- Add support for new automaton fields
+	- update url checked to verify TAG during release operation
+
+1.05	27 August 2006
+	- Allow space in name server fields for those setting glue details
+
+1.04	9 August 2006
+	- Correct typo on new field reg-ref
+
+1.03	8 August 2006
+	- added fields as per today's Nominet announcement
+
+1.02	7 July 2006
+	- fix renew, release, delete query and modify subs
+
+1.01	5th July 2006
+	- fix: name servers were not registered with domain
+
+1.00	23 June 2006
+	- Initial Release

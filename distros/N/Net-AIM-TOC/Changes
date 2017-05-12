@@ -1,0 +1,11 @@
+Revision history for Net::AIM::TOC module.
+
+0.94    2002.05.22
+        - Add config module
+
+0.93    2002.05.22
+        - updates to documentation
+
+0.9	    2002.05.19
+        - initial public release
+

@@ -1,0 +1,48 @@
+Revision history for Perl extension Net-OpenStack-Swift
+
+0.11 2016-04-04T05:10:19Z
+    - Implemented full listing
+    - Fixed Use of uninitialized value in length warning #21
+
+0.10 2016-03-17T05:40:37Z
+    - Fixed a bug default content_type
+
+0.09 2016-03-17T03:11:51Z
+    - Implemented post metadata
+    - Add .swift.pl.conf os_* auth parameters
+    - Add support recursively delete
+    - Modify parallel requests
+
+0.08 2016-03-11T07:59:10Z
+    - Add config loader (~/.swift.pl.conf)
+    - Multi CPU support by default (swift.pl)
+    - Fixed a bug empty OS_ environments (swift.pl)
+
+0.07 2016-03-11T03:00:48Z
+    - Add support pseudo hierarchical folders and directories
+    - Add support (beta) parallel downloads and uploads (OS_SWIFT_ASYNC=1)
+
+0.06 2016-03-04T08:53:13Z
+    - Add command-line script (swift.pl)
+    - Add support OS_* environments (OS_AUTH_URL,OS_TENANT_NAME,OS_USERNAME,OS_PASSWORD)
+
+0.05 2016-03-01T06:31:56Z
+    - Enable to set Http Client timeout, user_agent options
+
+0.04 2015-05-14T06:49:31Z
+    - Add support for 1.0 auth. (enatocron)
+
+0.03 2015-03-26T14:38:35Z
+    - InnerKeystone->service_catalog_url_for support region
+    - rename InnerKeystone V3_0
+    - get_object: support write FileHandle
+    - put_object: support parameters etag, query_string
+    - fix documents
+
+0.02 2015-03-23T08:19:40Z
+    - put_object: support FileHandle content
+    
+0.01 2015-03-19T05:24:22Z
+
+    - original version
+

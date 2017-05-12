@@ -1,0 +1,6 @@
+^blib/
+~$
+\bCVS/
+^Makefile$
+^pm_to_blib$
+^.status$

@@ -1,0 +1,2 @@
+ssh-dss AAAAAlkj2lkjalsdfkjlaskdfj234 foo@bar.com
+ssh-dss AAAAAlkj2lkjalsdfkjlaskdfj234 bar@foo.com

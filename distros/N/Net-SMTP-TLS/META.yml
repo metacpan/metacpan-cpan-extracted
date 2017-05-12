@@ -1,0 +1,15 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Net-SMTP-TLS
+version:      0.12
+version_from: lib/Net/SMTP/TLS.pm
+installdirs:  site
+requires:
+    IO::Socket::SSL:               0
+    Digest::HMAC_MD5:              0
+    MIME::Base64:                  0
+    IO::Socket::INET:              0
+    Net::SSLeay:                   0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

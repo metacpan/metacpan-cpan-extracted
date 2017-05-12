@@ -1,0 +1,111 @@
+Changes for Net::ICQ
+====================
+
+
+0.10
+====
+
+- Complete rewrite started.  Project is now being maintained by Luke
+  Petre <luke@petre.net> and Jeremy Muhlich <jmuhlich@acm.jhu.edu>.
+- Initial interface laid out. (event-driven style)
+- Can log in to a server.
+
+
+0.12
+====
+
+oops, didn't keep track.  check cvs if you care.  :)  we can pull the
+cvs log entries in here in the future...
+
+
+0.13
+====
+
+fixed status code length in CMD_USER_ONLINE (from 2 bytes to 4); implemented
+Tyler Goen's code for SRV_STATUS_UPDATE with the correct 4 byte status
+
+removed @_hex_table since it's not needed anymore
+
+Squashed bug (minor) in _do_acks
+
+enabled contact list send and receive
+
+added debug print for add_handler, cleaned up other debug prints, fixed
+do_multis so it removes multis from the queue after processing them
+
+added perl 5.6 check to Makefile.PL
+
+
+0.14
+====
+
+fixed stupid syntax error in ICQ.pm (did that go into a release...?)
+and updated test.pl to be more clear and enlightening
+
+fixed dumb Makefile.PL error, wasn't actually checking for Time::Local before
+
+made cmd_codes and srv_codes public
+
+wrote the CLIENT EVENTS section in pod
+
+added test2.pl
+
+
+0.15
+====
+
+Set status in the CMD_LOGIN packet to ONLINE instead of 0x200
+
+Modified behavior when a bad session id or uin is found in a server
+packet: now _connected is set to 0, and it won't croak(). (thanks Banda)
+
+Applied Bek Oberin's fix to SRV_RECV_MESSAGE to calculate the month
+correctly.
+
+Fixed an undefined value issue in _str_to_bytes (thanks again to Bek for
+noticing).
+
+Changed SRV_RECV_MESSAGE code to call SRV_SYS_DELIVERED_MESSAGE for the
+bulk of the processing, instead of cut-and-pasting its code.
+
+added %status_codes
+
+Implemented Germain Malenfant's fix for CMD_SEARCH_UIN.
+
+Implemented Dimitar Peikov's fix to make _bytes_to_str correctly handle
+strings containing a '0' character. (boy was that a dumb bug on my part :)
+
+Modified debug output of incoming packets to also display the command
+number in <> brackets, after the dump of the param bytes.
+
+Fixed add_handler debug statement
+
+Added Nezar Nielsen's code to handle web-pager and email-pager messages.
+
+Applied Nezar Nielsen's fixes to make SRV_FOUND_USER work right, as well
+as make SRV_INFO_REPLY and SRV_EXT_INFO_REPLY work in the first place.
+
+Fixed problem with the same event being sent multiple times by the server
+because of lagged acks.
+
+
+0.16
+====
+
+Implemented Nezar Nielsen's META_USER patch, with some additions.
+
+Added Net::ICQ object as first param when calling handlers.
+(IMPORTANT - this will break your existing handlers!)
+
+Applied Robin Fisher's patch for SRV_INFO_FAIL (300) and splitting off the
+privacy flags from 'status' into a new field 'privacy'.  Moved privacy flags
+into %privacy_codes .
+
+Added connect().  Now new() does not connect on its own.
+
+Applied Robin Fisher's fix for the weird case where we get V3 packets from
+the server.
+
+Fixed debug output of packets inside multis, so the event's code number is
+printed.
+

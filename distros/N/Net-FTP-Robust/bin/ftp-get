@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use Net::FTP::Robust;
+use Getopt::Long qw/:config gnu_getopt/;
+use Log::Report;
+
+my (%new_opt, %get_opt);
+my $mode = 0;
+
+GetOptions
+    # Net::FTP::new options
+    'host|h=s'     => \$new_opt{Host}
+  , 'port|P=i'     => \$new_opt{Port}
+  , 'timeout|t=i'  => \$new_opt{Timeout}
+  , 'passive!'     => \$new_opt{Passive}
+
+    # Net::FTP::login options
+  , 'user|u=s'     => \$new_opt{user}
+  , 'password|p=s' => \$new_opt{password}
+
+    # Flow control
+  , 'retries|r=i'  => \$new_opt{retries}
+
+    # Log::Report
+  , 'verbose|v+'   => \$mode
+  , 'mode=s'       => \$mode
+    or exit 1;
+
+@ARGV==1 || @ARGV==2
+    or die "Usage: $0 NAME [TO]\n";
+
+my ($from, $to) = @ARGV;
+
+dispatcher mode => $mode, 'ALL';
+my $ftp = Net::FTP::Robust->new(%new_opt);
+
+$ftp->get($from, $to, %get_opt);

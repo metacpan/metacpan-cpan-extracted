@@ -1,0 +1,62 @@
+NAME
+    Number::Format::Metric - Format number with metric prefix
+
+VERSION
+    This document describes version 0.60 of Number::Format::Metric (from
+    Perl distribution Number-Format-Metric), released on 2014-12-05.
+
+SYNOPSIS
+     use Number::Format::Metric qw(format_metric);
+
+     format_metric(14     , {base=>10});               # => "14"
+     format_metric(12000  , {base=> 2, precision=>1}); # => "11.7K"
+     format_metric(12000  , {base=>10, precision=>1}); # => "11.7Ki"
+     format_metric(-0.0017, {base=>10});               # => "1.7m"
+
+FUNCTIONS
+    None exported by default but all of them exportable.
+
+  format_metric($num, \%opts) => STR
+    Format $num using metric prefix. Locale settings are respected (this
+    module uses locale). Might produce non-Latin Unicode characters (e.g. μ
+    for 1e-6 prefix). Known options:
+
+    *   base => INT (either 2 or 10, default: 2)
+
+    *   precision => INT
+
+    *   i_mark => BOOL (default: 1)
+
+        Give "i" suffix to prefixes when in base 10 for K, M, G, T, and so
+        on.
+
+SEE ALSO
+    Other number formatting modules: Number::Format, Format::Human::Bytes,
+    Number::Bytes::Human.
+
+    <https://en.wikipedia.org/wiki/Metric_prefix>
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Number-Format-Metric>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Number-Format-Metric>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Number-Format-Metric>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

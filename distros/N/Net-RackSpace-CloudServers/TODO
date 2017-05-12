@@ -1,0 +1,296 @@
+Create new server
+  Using POST to /servers, sample JSON from docs:
+  {
+    "server" : {
+        "name" : "new-server-test",
+        "imageId" : 2,
+        "flavorId" : 1,
+        "metadata" : {
+            "My Server Name" : "Apache1"
+        },
+        "personality" : [
+            {
+                 "path" : "/etc/banner.txt",
+                 "contents" :
+"ICAgICAgDQoiQSBjbG91ZCBkb2VzIG5vdCBrbm93IHdoeSBpdCBtb3ZlcyBpbiBqdXN0IHN1Y2
+ggYSBkaXJlY3Rpb24gYW5kIGF0IHN1Y2ggYSBzcGVlZC4uLkl0IGZlZWxzIGFuIGltcHVsc2lvb
+i4uLnRoaXMgaXMgdGhlIHBsYWNlIHRvIGdvIG5vdy4gQnV0IHRoZSBza3kga25vd3MgdGhlIHJl
+YXNvbnMgYW5kIHRoZSBwYXR0ZXJucyBiZWhpbmQgYWxsIGNsb3VkcywgYW5kIHlvdSB3aWxsIGt
+ub3csIHRvbywgd2hlbiB5b3UgbGlmdCB5b3Vyc2VsZiBoaWdoIGVub3VnaCB0byBzZWUgYmV5b2
+5kIGhvcml6b25zLiINCg0KLVJpY2hhcmQgQmFjaA=="
+            }
+        ]
+    }
+  }
+
+  # Note from docs:
+  # The max size of the file path data is 255 bytes while the max size
+  # of the file contents is 10KB
+  # the file contents should be encoded as a Base64 string and the 10KB
+  # limit refers to the number of bytes in the decoded data not the
+  # number of characters in the encoded data.
+
+  # Nice to have:
+  # Servers in the same shared IP group can share public IPs for various
+  # high availability and load balancing configurations. To launch an HA
+  # server, include the optional sharedIpGroupId element and the server
+  # will be launched into that shared IP group.
+  # sharedIpGroupId is an optional parameter and for optimal performance,
+  # should ONLY be specified when intending to share IPs between servers.
+
+Update server info
+  Using POST to /servers/id to change admin password:
+  { "server" :
+    {
+      "name" : "new-server-test",
+      "adminPass" : "newPassword"
+    }
+  }
+  # NOTE: no response is provided
+
+Delete server
+  Using DELETE to /servers/id => normal response 202, no response.
+
+List servers' IPs:
+  Using GET to /servers/id/ips
+  {
+    "addresses" : {
+      "public" : [
+        "67.23.10.132",
+        "67.23.10.131"
+      ],
+      "private" : [
+        "10.176.42.16"
+      ]
+    }
+  }
+
+List servers' PUBLIC IPs:
+  using GET to /servers/id/ips/public
+  {
+    "public" : [
+      "67.23.10.132",
+      "67.23.10.131"
+    ]
+  }
+
+List servers' PRIVATE IPs:
+  using GET to /servers/id/ips/private
+  {
+    "private" : [
+      "  10.176.42.16"
+    ]
+  }
+
+Reboot server: (SOFT/HARD)
+  Using POST to /servers/id/action
+  { "reboot": { "type": "HARD" } } # power button
+  { "reboot": { "type": "SOFT" } } # restarts
+  No response returned
+
+List flavors
+ GET /flavors # ID and name only
+ GET /flavors/detail # all info
+ {
+   "flavors" : [
+      {
+          "id" : 1,
+          "name" : "256 MB Server",
+        "ram" : 256,
+        "disk" : 10
+      },
+      {
+          "id" : 2,
+         "name" : "512 MB Server",
+        "ram" : 512,
+        "disk" : 20
+      }
+  ]
+ }
+ GET /flavors/id # all info
+ {
+   "flavor" : {
+     "id" : 1,
+     "name" : "256 MB Server",
+     "ram" : 256,
+     "disk" : 10
+   }
+ }
+
+List images:
+  GET /images # ID and name only
+  GET /images/deatil # all info
+  {
+    "images" : [
+      {
+        "id" : 2,
+        "name" : "CentOS 5.2",
+        "updated" : "2010-10-10T12:00:00Z",
+        "created" : "2010-08-10T12:00:00Z",
+        "status" : "ACTIVE"
+      },
+      {
+        "id" : 743,
+        "name" : "My Server Backup",
+        "serverId" : 12,
+        "updated" : "2010-10-10T12:00:00Z",
+         "created" : "2010-08-10T12:00:00Z",
+        "status" : "SAVING",
+        "progress" : 80
+      }
+    ]
+  }
+
+Get image details
+  GET /images/id
+  {
+   "image" : {
+     "id" : 2,
+     "name" : "CentOS 5.2",
+     "serverId" : 12,
+     "updated" : "2010-10-10T12:00:00Z",
+     "created" : "2010-08-10T12:00:00Z",
+     "status" : "SAVING",
+     "progress" : 80
+   }
+  }
+
+Nice to have:
+Share an IP address to the specified server
+  Using PUT to /servers/id/ips/public/address
+  JSON:
+  {
+    "shareIp" : {
+      "sharedIpGroupId" : 1234,
+      "configureServer" : true
+    }
+  }
+Unshare IP address with specified server
+  Using DELETE to /servers/id/ips/public/address
+  No parameters, no response (normal 202)
+
+Rebuild server:
+  Using POST to /servers/id/action
+  { "rebuild": { "imageId": 2 } }
+
+Resize server:
+  Using POST to /servers/id/action
+  { "resize": { "flavorId": 3 } }
+
+Confirm pending resize:
+  Using POST to /servers/id/action
+  { "confirmResize": null }
+
+Revert pending resize:
+  Using POST to /servers/id/action
+  { "revertResize": null }
+
+Create image:
+  POST to /images 
+  {
+    "image" : {
+      "serverId" : 12,
+      "name" : "Just in case"
+    }
+  }
+ response:
+ {
+   "image" : {
+      "id" : 22,
+      "serverId" : 12,
+      "name" : "Just in case",
+      "created" : "2010-10-10T12:00:00Z",
+      "status" : "SAVING",
+      "progress" : 0
+   }
+ }
+
+Get Backup schedules
+ GET /servers/id/backup_schedule
+  {
+    "backupSchedule" : {
+      "enabled" : true,
+      "weekly" : "THURSDAY",
+      "daily" : "H_0400_0600"
+    }
+  }
+
+Create/Update Backup schedule
+ POST /servers/id/backup_schedule
+Delete Backup schedule
+ POST /servers/id/backup_schedule
+
+Shared IP groups
+
+Rate Limits
+ Verb       URI             RegEx         Default
+ POST       *               .*            10/min
+ POST       */servers       ^/servers     50/day
+ PUT        *               .*            10/min
+ GET        *changes-since* changes-since 3/min
+ DELETE     *               .*            100/min
+
+Absolute Limits
+                      Limit                   Default
+Maximum total amount of RAM (GB)                50
+Maximum number of shared IP groups              25
+Maximum number of members per shared IP group   25
+
+GET /limits
+ {
+   "limits" : {
+     "rate" : [
+       {
+	 "verb" : "POST",
+	 "URI" : "*",
+         "regex" : ".*",
+         "value" : 10,
+         "remaining" : 2,
+	 "unit" : "MINUTE",
+	 "resetTime" : 1244425439
+       },
+       {
+	 "verb" : "POST",
+         "URI" : "*/servers",
+	 "regex" : "^/servers",
+	 "value" : 50,
+	 "remaining" : 49,
+	 "unit" : "DAY",
+	 "resetTime" : 1244511839
+       },
+       {
+	 "verb" : "PUT",
+	 "URI" : "*",
+	 "regex" : ".*",
+	 "value" : 10,
+	 "remaining" : 2,
+	 "unit" : "MINUTE",
+	 "resetTime" : 1244425439
+       },
+       {
+	 "verb" : "GET",
+	 "URI" : "*changes-since*",
+	 "regex" : "changes-since",
+	 "value" : 3,
+	 "remaining" : 3,
+	 "unit" : "MINUTE",
+	 "resetTime" : 1244425439
+       },
+       {
+	 "verb" : "DELETE",
+	 "URI" : "*",
+	 "regex" : ".*",
+	 "value" : 100,
+	 "remaining" : 100,
+	 "unit" : "MINUTE",
+	 "resetTime" : 1244425439
+       }
+     ],
+     "absolute" : {
+       "maxTotalRAMSize" : 51200,
+       "maxIPGroups" : 50,
+       "maxIPGroupMembers" : 25
+     }
+   }
+ }
+

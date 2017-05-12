@@ -1,0 +1,27 @@
+Revision history for Perl extension Net::POP3S.
+
+0.01  Fri Feb 15 07:52:20 2013
+	- original version; created by h2xs 1.23 with options
+		-AXn Net::POP3S
+
+0.02  Fri Feb 15 16:01:20 2013
+	- Fix ssl_start() typo
+
+0.03  Fri Mar 25 18:00:00 2013
+	- Fix new() for multiple call
+
+0.04  Fri May 29 11:25:00 2013
+	- Fix new() for STLS initiation bug.
+		(Thanks Tanaka Daisuke <dtanaka sannet.ad.jp>)
+
+0.05  Fri Oct 24 18:25:00 2014
+	- Fix new() for Net::SMTPS bug Ticket #99743 resemblance.
+		(thanks <alexz opmantek.com>)
+
+0.06  Thu Feb 16 10:00:00 2017
+    - fix auth() for Net::SMTPS Ticket #120261 "When passing in Authen::SASL, mechanism should not be
+       (thanks, <peter .. dragonstaff ..>)
+
+0.07  Thu Apr 08 20:00:00 2017
+    - fix on Ticket #121006 "Timeout option doesn't work"
+       (thanks, <emanuele.tomasi .. aruba.it>)

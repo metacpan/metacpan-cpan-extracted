@@ -1,0 +1,77 @@
+==================================================
+Changes from 2012-07-08 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.1 at 2013-07-08 08:46:18 +0000
+----------------------------------------
+
+  Change: 5366c045b861c9386ca3ca25b06c1687c71a778d
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-07-08 10:45:39 +0000
+
+    satisfied perl::Critic severity 4 
+
+  Change: bc7ec858a896339c008c5e7410f36c5371a01794
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-07-08 00:30:57 +0000
+
+    satisfied perl::Critic severity 4 
+
+  Change: 0a8b78cadc13c831ce5131fb4d1ab11e47906840
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-07-08 00:29:30 +0000
+
+    satisfied perl::Critic severity 4 
+
+  Change: e508a31941c8b0010e8f17bc52054eeb53380127
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-07-08 00:28:50 +0000
+
+    satisfied perl::Critic severity 4 
+
+  Change: e1f1f062b60cb588ba2db5d70a44fb5dfc8dae03
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-07-08 00:27:33 +0000
+
+    satisfied perl::Critic severity 4 
+
+  Change: 1db0eb53314538ad0ca812da0d8838151f3a5870
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-07-08 00:24:33 +0000
+
+    satisfied perl::Critic severity 4 
+
+  Change: af288e0fbe33900ffd113866f6f95d7d1f74e624
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-07-08 00:23:39 +0000
+
+    satisfied perl::Critic severity 4 
+
+  Change: ae82db3b226c4ffaa567907a3d2daa29620bbc10
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-07-08 00:22:11 +0000
+
+    satisfied perl::Critic severity 4 
+
+  Change: be9b4245cfd9ef15fb5697689ea0f24f77bccc23
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-07-08 00:06:28 +0000
+
+    added missing module under different license 
+
+  Change: 8187691af4247f8699ed2b5c6b6fd8333526ceba
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-07-07 23:52:51 +0000
+
+    initial version 
+
+  Change: 56bab8e3452792371407c936ce9b027c000f195b
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-07-07 21:49:24 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

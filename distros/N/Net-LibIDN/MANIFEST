@@ -1,0 +1,14 @@
+Changes
+_LibIDN.pm
+LibIDN.xs
+Makefile.PL
+MANIFEST
+README
+_test.pl
+Artistic
+META.yml                                 Module meta-data (added by MakeMaker)
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/rules

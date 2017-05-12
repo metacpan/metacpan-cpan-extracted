@@ -1,0 +1,6 @@
+2011-01-13 00:01:58 (main)  | NcFTPd 2.8.3/615 Sep 04 2006 for linux-x86.
+2011-01-13 00:01:58 (main)  | /etc/ftpusers: No such file or directory.
+2011-01-13 00:03:04 #u1     | Password wrong for user sshaw from localhost.
+2011-01-13 00:03:32 (main)  | Caught signal 2 (Interrupt), exiting.
+2011-01-13 00:03:32 #u3     | Caught signal 15 (Terminated), exiting.
+2011-01-13 00:03:34 (main)  | Exiting.

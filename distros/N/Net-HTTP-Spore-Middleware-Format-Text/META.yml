@@ -1,0 +1,26 @@
+---
+abstract: 'middleware for Text format'
+author:
+  - 'Daniel Gempesaw <gempesaw@gmail.com>'
+build_requires:
+  Net::HTTP::Spore: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-HTTP-Spore-Middleware-Format-Text
+requires:
+  Moose: '0'
+  Net::HTTP::Spore::Middleware::Format: '0'
+resources:
+  bugtracker: https://github.com/gempesaw/Net-HTTP-Spore-Middleware-Format-Text/issues
+  homepage: https://github.com/gempesaw/Net-HTTP-Spore-Middleware-Format-Text
+  repository: https://github.com/gempesaw/Net-HTTP-Spore-Middleware-Format-Text.git
+version: '0.01'

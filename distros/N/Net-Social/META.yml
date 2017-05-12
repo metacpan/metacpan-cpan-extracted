@@ -1,0 +1,20 @@
+---
+name: Net-Social
+version: 0.4
+author:
+  - 'Simon Wistow <simon@thegestalt.org>'
+abstract: abstracted interface for social networks
+license: unknown
+requires:
+  Module::Pluggable: 3.0
+  Test::More: 0.62
+provides:
+  Net::Social:
+    file: lib/Net/Social.pm
+    version: 0.4
+  Net::Social::Service:
+    file: lib/Net/Social/Service.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

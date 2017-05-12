@@ -1,0 +1,71 @@
+#!/usr/bin/perl -w
+
+#$::DEBUG = 1;
+
+use lib "./blib/lib";
+use Net::OSCAR;
+use Data::Dumper;
+use Devel::Size qw(total_size);
+use Devel::Size::Report qw(report_size);
+use Test::Memory::Cycle tests => 1;
+use Devel::Symdump;
+
+use vars qw($oscar);
+sub signon_done($);
+
+my($screenname, $password);
+
+print "Screenname: ";
+$screenname = <STDIN>;
+chomp $screenname;
+
+print "Password: ";
+system("stty -echo");
+$password = <STDIN>;
+system("stty echo");
+print "\n";
+chomp $password;
+
+
+$oscar = Net::OSCAR->new(capabilities => [qw(typing_status extended_status buddy_icons file_transfer)]);
+$oscar->set_callback_signon_done(\&signon_done);
+$oscar->signon(screenname => $screenname, password => $password);
+
+while(1) { $oscar->do_one_loop(); }
+
+sub signon_done($) {
+	memory_cycle_ok($oscar);
+	my $size = total_size($oscar);
+	my $cachesize = total_size(\%Net::OSCAR::XML::PROTOCACHE);
+	print "\$oscar has size $size, protocache $cachesize\n";
+
+	print "*main::\n";
+	ShowVars(undef, "\t");
+	print "*Net::OSCAR::\n";
+	ShowPackages();
+	exit;
+}
+
+sub ShowPackages {
+	my($pkg, $prefix) = @_;
+
+	my $obj = Devel::Symdump->rnew();
+	foreach my $pkg ($obj->packages()) {
+		print "$pkg\n";
+		ShowVars($pkg);
+	}
+}
+
+sub ShowVars {
+	my($pkg) = @_;
+
+	my $obj = Devel::Symdump->new($pkg);
+	foreach my $method ([\&Devel::Symdump::scalars, '$'], [\&Devel::Symdump::arrays, '@'], [\&Devel::Symdump::hashes, '%'], [\&Devel::Symdump::functions, '&'], [\&Devel::Symdump::ios, '*'], [\&Devel::Symdump::unknowns, '?']) {
+		foreach my $varname ($method->[0]->($obj)) {
+			my $var = eval("\\" . $method->[1] . $varname);
+			print "\t", $method->[1], $varname, ":\n";
+			print join("\n", map {"\t\t$_"} split(/\n/, report_size($var))), "\n";
+			print "===========\n";
+		}
+	}
+}

@@ -1,0 +1,47 @@
+Net/LibIDN2 version 0.03
+========================
+
+This module provides Perl bindings for GNU Libidn2 by Simon Josefsson
+(http://www.gnu.org/software/libidn/) and closely follows
+the original C API of that library.
+
+Please note that as of Jan 5th 2013, libidn2 doesn't appear to be fully 
+functional yet (see IDN2_ALABEL_ROUNDTRIP regression test), so please
+consider this a development release with a potentially unstable API.
+
+Developed against pre-release git tree of libidn2 (internal
+version 0.9).
+
+Devel-CheckLib-0.98 in directory inc, by Yasuhiro Matsumoto, is
+included as is to facilitate cpantesters.org build testing.
+
+INSTALLATION
+
+perl Build.PL
+./Build
+./Build test
+./Build install
+
+If your local version of GNU Libidn2 is installed in a non-standard
+location, try the following instead of "perl Build.PL":
+
+perl Build.PL --extra_compiler_flags=-I/path/include --extra_linker_flags="-L/path/lib -lidn2"
+
+Should your runtime library search path not contain libidn2, you probably will
+have to set LD_LIBRARY_PATH or compile the absolute library path into
+the module like follows:
+
+LD_LIBRARY_PATH=/path/lib perl Build.PL --extra_compiler_flags=-I/path/include --extra_linker_flags="-L/path/lib -lidn2"
+
+or
+
+LD_LIBRARY_PATH=/path/lib perl Build.PL --extra_compiler_flags=-I/path/include --extra_linker_flags="-L/path/lib -lidn2 -Wl,-rpath=/path/lib"
+
+Setting LD_LIBRARY_PATH *and* rpath might be necessary to make Devel::CheckLib detect the
+presence of libidn2 correctly.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  GNU Libidn2 >=0.8

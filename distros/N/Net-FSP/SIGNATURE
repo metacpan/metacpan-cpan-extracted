@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 46ad5ed9ff8c5192bc4497663f724c2f7ed3b5e7 Build.PL
+SHA1 8dde5a9e5296ee723627854fa52d1cb0a593eae9 COPYING
+SHA1 51ac1ed06416828653bba2e006385da9e4bd63d6 Changes
+SHA1 1625c7428ca995c461f7820c9a129f01fbf606a7 MANIFEST
+SHA1 737c0e86c87c2128467899be56531cbfb7cb9648 META.yml
+SHA1 cfa0c360ee0c1d802b0188ec5efba276c238a50b Makefile.PL
+SHA1 1f63ecca745c6d488b8a9c432eff17cf603baf5c README
+SHA1 2ad013e44c0adf5f344b6ac25c7a1958ed10f169 TODO
+SHA1 c7df4def31274dc2b1a9254d83689125c157301c examples/fsp
+SHA1 b3b414e6bdb95ff7143aa9d82521d6f04ec11582 examples/reader.pl
+SHA1 90de514fea763ef521bec90fbdde0e428c280852 examples/writer.pl
+SHA1 82b702ac27f66c331d622014121388041c10bfd2 lib/Net/FSP.pm
+SHA1 44e89604db497e5cf3aedbc66a0c916fd0cbfb39 lib/Net/FSP/Dir.pm
+SHA1 66492b42f003a63bcda0f2cd51e00f712cb572ee lib/Net/FSP/Entry.pm
+SHA1 57142d8e8dca1c1ac6a37de96a0d2a5a5260130f lib/Net/FSP/File.pm
+SHA1 8850ffdb4e178db7ce2c413ca1ef6e93669483d2 lib/Net/FSP/Handle.pm
+SHA1 a3790f08e0d44bd1aa9d27789ccb75da67b0fb16 lib/Net/FSP/Handle/Read.pm
+SHA1 eafac6641f24b1f7ea495283cf20fd81dc85559c lib/Net/FSP/Handle/Write.pm
+SHA1 9eadff484f6f53cbcec64c93cd090f213c3f1bf2 lib/Net/FSP/Util.pm
+SHA1 676ddc36f4edef3b8c9834f6e43af3da3837e775 t/00-load.t
+SHA1 07d32278b07861fb6bd477a11a93320722035715 t/boilerplate.t
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkl8kkgACgkQTd+EWiaICwpkYQCgsFEkeFK3bA+sH/jufZRPExSA
+SWAAnibOiZfxtW8/OuWhidAXhDpypWoa
+=j2s/
+-----END PGP SIGNATURE-----

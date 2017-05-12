@@ -1,0 +1,60 @@
+{
+   "abstract" : "Expands DNS SPF records, so you don't have to.",
+   "author" : [
+      "Amiri Barksdale <amiri@campusexplorer.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-DNS-SPF-Expander",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::All" : "0",
+            "List::AllUtils" : "0",
+            "Moose" : "0",
+            "MooseX::Getopt" : "0",
+            "MooseX::Types::IO::All" : "0",
+            "Net::DNS::Resolver" : "0",
+            "Net::DNS::ZoneFile" : "0",
+            "Scalar::Util" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Printer" : "0",
+            "Test::Differences" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/amiri/Net-DNS-SPF-Expander/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/amiri/Net-DNS-SPF-Expander.git",
+         "web" : "http://github.com/amiri/Net-DNS-SPF-Expander"
+      }
+   },
+   "version" : "0.018",
+   "x_serialization_backend" : "JSON::XS version 3.01"
+}
+

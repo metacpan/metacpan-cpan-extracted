@@ -1,0 +1,27 @@
+Changes
+lib/Net/Telnet/Wrapper.pm
+lib/Net/Telnet/Wrapper/Device.pm
+lib/Net/Telnet/Wrapper/Device/Cisco/ACNS.pm
+lib/Net/Telnet/Wrapper/Device/Cisco/ASA.pm
+lib/Net/Telnet/Wrapper/Device/Cisco/CATOS.pm
+lib/Net/Telnet/Wrapper/Device/Cisco/IOS.pm
+lib/Net/Telnet/Wrapper/Device/Nortel/Contivity.pm
+lib/Net/Telnet/Wrapper/Device/Packeteer/PacketShaper.pm
+lib/Net/Telnet/Wrapper/Device/TCP/General.pm
+lib/Net/Telnet/Wrapper/Device/TCP/HTTP.pm
+lib/Net/Telnet/Wrapper/Device/TCP/POP.pm
+lib/Net/Telnet/Wrapper/Device/Template/New.pm
+lib/Net/Telnet/Wrapper/Device/Unix/General.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/asa_test.pl
+t/catos_test.pl
+t/http_test.pl
+t/ios_test.pl
+t/nortel_test.pl
+t/packeteer_test.pl
+t/pop_test.pl
+t/tcp_general_test.pl
+t/unix_test.pl

@@ -1,0 +1,26 @@
+
+This is cool:
+
+
+#pod     $parent = path("foo/bar/baz")->parent(2); # foo
+
+
+sub parent {
+    my ( $self, $level ) = @_;
+    return $level == 1 ? $parent : $parent->parent( $level - 1 );
+}
+
+
+
+__PACKAGE__->create_children inflates the shit out of anything.. we could make
+it do this on package need, but then we would need to be able to figure out
+child regexes without loading the modules.. :(
+
+
+
+we need to get rid of add_method.  We can use Package::Variant as an
+alternative.
+
+http://shadow.cat/blog/matt-s-trout/classy-code-generation/
+
+

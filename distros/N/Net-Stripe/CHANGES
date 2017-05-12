@@ -1,0 +1,1463 @@
+==================================================
+Changes from 2016-04-29 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.32 at 2017-04-29 13:59:37 +0000
+-----------------------------------------
+
+  Change: df6b654759e4ec7943466223cfeaae105f69e9c6
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2017-04-29 14:57:34 +0000
+
+    documentation updated by dzil 
+
+  Change: a1f7081e23537a8e0bb69522cf353ee15fba2b14
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2017-04-29 14:49:41 +0000
+
+    Merge pull request #79 from andrewsolomon/master
+
+    Issue #78 - fix get_cards 
+
+  Change: b83a71f8e868ae011b8cac02a1459c7a4d7a2233
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2017-04-29 12:36:07 +0000
+
+    Issue #78 - fix get_cards 
+
+  Change: 48626a2575f2d2b775051f074d2e65c32a6609dc
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2017-04-23 14:56:08 +0000
+
+    fix versioning in dist.ini 
+
+  Change: 2e9069db1b22cd1ac96b655321a2df240857ba69
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2017-04-23 14:09:27 +0000
+
+    Merge pull request #66 from manwar/manwar-github-pr-challenge
+
+    Manwar GitHub pr challenge 
+
+  Change: 0f06ebc0b58ea4ff779d40a54f397c14722756e4
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2017-04-23 14:03:06 +0000
+
+    Merge pull request #61 from paultcochrane/pr/doc_fixups
+
+    Doc fixups 
+
+  Change: aa28e7d377537ddc04b527c77a51b22970dcd0d4
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2017-01-27 21:25:46 +0000
+
+    Merge pull request #77 from andrewsolomon/geekuni-master
+
+    fix Problem with get_customer #76 
+
+  Change: fba00b688a02688473bd6a33fc1d660a7f83cf60
+  Author: Andrew Solomon <andrew@illywhacker.net>
+  Date : 2017-01-27 18:40:17 +0000
+
+    fix Problem with get_customer #76 
+
+  Change: aaaf27b06fb5049a7f64974884a9db5b08d7dac4
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2015-11-25 14:33:21 +0000
+
+    - Updated pod document for Net::Stripe with regard to the method
+    refund_charge
+
+    as the link to API is broken. It is actually called create_refund.
+
+    https://stripe.com/docs/api#create_refund 
+
+  Change: d40c390ee9fa499e3134d8e101f6c2989b3fcea7
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2015-11-25 14:21:09 +0000
+
+    - Changed permission mode from 755 to 644 for the following packages:
+
+    - Net::Stripe
+
+    - Net::Stripe::Card
+
+    - Net::Stripe::Refund 
+
+  Change: a2ff005af41f01c26a1a90432e08e7b32d88d059
+  Author: Paul Cochrane <paul@liekut.de>
+  Date : 2015-04-27 15:07:43 +0000
+
+    Use full-stops at the ends of sentences 
+
+  Change: 212834a0aeca7d851630f74136b6e16c2a5b1225
+  Author: Paul Cochrane <paul@liekut.de>
+  Date : 2015-04-27 15:02:55 +0000
+
+    Make method description consistent with rest of docs
+
+    - use lower case letters
+
+    - use the active voice; not the present continuous form 
+
+  Change: 4394902136dff763fab17fcb859ccdbdfd3cf2b5
+  Author: Paul Cochrane <paul@liekut.de>
+  Date : 2015-04-27 15:01:02 +0000
+
+    Correct a genitive. 
+
+  Change: fcec7171eb29243696ea86c6d2ad99e1903ea5e6
+  Author: Paul Cochrane <paul@liekut.de>
+  Date : 2015-04-27 14:55:08 +0000
+
+    Consistently capitalise "API" 
+
+  Change: eb6fc48e65a9124c0b210b9aa7edb9240e7df1e9
+  Author: Paul Cochrane <paul@liekut.de>
+  Date : 2015-04-27 14:54:03 +0000
+
+    Correct minor capitalisation issue 
+
+  Change: 7822692d9a0546a7faba9db0046fec2df8673b4a
+  Author: Paul Cochrane <paul@liekut.de>
+  Date : 2015-04-27 14:52:42 +0000
+
+    Correct spelling of "retrieve" 
+
+  Change: eaaf378701416d5e30f03b6609da9abb1df32fe6
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2015-04-26 00:30:29 +0000
+
+    Merge pull request #59 from paultcochrane/pr/bump_version_number
+
+    Update version number 
+
+  Change: b55b9fba2bb9394cdffd13800a2fc4eebd18f1e7
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2015-04-26 00:30:20 +0000
+
+    Merge pull request #58 from paultcochrane/pr/add_travis_config
+
+    Add Travis-CI configuration 
+
+  Change: c4d760ff4649d75e1ced58d797a5c948b63ae116
+  Author: Paul Cochrane <paul@liekut.de>
+  Date : 2015-04-12 23:19:48 +0000
+
+    Update version number
+
+    This now matches that displayed on MetaCPAN 
+
+  Change: c8c1865c502f6ee2bcf90d39a15b54bb644b70ea
+  Author: Paul Cochrane <paul@liekut.de>
+  Date : 2015-04-12 23:17:51 +0000
+
+    Add Travis-CI configuration
+
+    This builds and tests successfully for the given Perl versions. Perl
+    versions 5.12 and lower seem to have issues with installing some of
+    the dependencies, hence these are not tested here. 
+
+  Change: b64c828425aa34916653a4d2307b14b73d170454
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2015-04-12 16:55:04 +0000
+
+    Merge pull request #57 from paultcochrane/pr/update_dist_ini
+
+    Update dist ini 
+
+  Change: d48559aa8fd02558eca5882c3317137014638dbc
+  Author: Paul Cochrane <paul@liekut.de>
+  Date : 2015-04-12 22:44:42 +0000
+
+    Add Pod::Weaver author deps
+
+    Dist::Zilla can't find and install Pod::Weaver plugins used in
+    weaver.ini, thus it is necessary to append these implicit author
+    dependencies to dist.ini as (effectively) a comment so that they are
+    also installed as part of the `dzil authordeps --missing | cpanm`
+    installation step. 
+
+  Change: 0f961f2a7796e843b8ee66ec181f08bd7da101aa
+  Author: Paul Cochrane <paul@liekut.de>
+  Date : 2015-04-12 22:41:46 +0000
+
+    Update copyright year
+
+    The latest release is from this year, so the copyright year should be
+    updated to reflect this. 
+
+  Change: f1fd14cddae098dbb0d362e0da02ca8ca234bac8
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2015-04-11 23:36:42 +0000
+
+    Merge pull request #50 from NacreData/master
+
+    Implement "invoice" property on Charge objects. 
+
+  Change: 4442f8bb4df54adb44ad86efe8d5540552f5adf4
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2015-04-11 23:36:26 +0000
+
+    Merge pull request #52 from
+    paultcochrane/pr/remove_trailing_whitespace
+
+    Remove trailing whitespace 
+
+  Change: ecef81bd7a35cf0879b811b7f3f0ae17487d444e
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2015-04-11 23:36:19 +0000
+
+    Merge pull request #51 from paultcochrane/pr/replace_contrib_from_git
+
+    Replace ContributorsFromGit with Git::Contributors 
+
+  Change: e2cafc1f6797a43796cb2d87a50f4ac655e92d3e
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2015-04-11 23:36:08 +0000
+
+    Merge pull request #53 from paultcochrane/pr/dos_to_unix_encoding
+
+    Convert text from dos to unix line endings 
+
+  Change: 0f6badb3114614238d54e5b29256a118134b0ea9
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2015-04-11 23:35:59 +0000
+
+    Merge pull request #54 from paultcochrane/pr/ignore_dot_build
+
+    Ignore dzil-generated .build directory 
+
+  Change: b4d1356b635bf35bbacd7428d1e84b6fbca06c03
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2015-04-11 23:35:30 +0000
+
+    Merge pull request #55 from paultcochrane/pr/add_missing_abstract
+
+    Add missing ABSTRACT 
+
+  Change: e51fba910b3c4630f1726133c0b3e35e34b34ea0
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2015-04-11 23:35:16 +0000
+
+    Merge pull request #56 from paultcochrane/pr/fix_kwalitee_fails
+
+    Fix kwalitee fails 
+
+  Change: f53b5511860a5efcf0291d1b8e1a5df2c5c68bb1
+  Author: Paul Cochrane <paul@liekut.de>
+  Date : 2015-04-11 22:36:06 +0000
+
+    Automatically generate META.yml provides section
+
+    This addresses the "meta yml has provides" experimental kwalitee
+    metric. See http://cpants.cpanauthors.org/dist/Net-Stripe for more
+    details. 
+
+  Change: ea0b54546dadb26e05b413c98e56eb5592a3df9a
+  Author: Paul Cochrane <paul@liekut.de>
+  Date : 2015-04-11 22:33:32 +0000
+
+    Detect minimum required Perl version
+
+    This addresses "meta yml declares perl version" extra metric on the
+    CPANTS kwalitee page (http://cpants.cpanauthors.org/dist/Net-Stripe) 
+
+  Change: 2f0adada63b8bb98830bf84a65272aa46d9e3d38
+  Author: Paul Cochrane <paul@liekut.de>
+  Date : 2015-04-11 22:13:15 +0000
+
+    Add missing ABSTRACT 
+
+  Change: ee5075fadcdcb20c5e0bbb55454d692bf1c2742a
+  Author: Paul Cochrane <paul@liekut.de>
+  Date : 2015-04-03 00:12:11 +0000
+
+    Ignore dzil-generated .build directory
+
+    This stops the automatically generated .build directory (created via
+    dzil) from appearing in `git status`. 
+
+  Change: 54d5084362cc0ee5743f18e87dece07cd275fdda
+  Author: Paul Cochrane <paul@liekut.de>
+  Date : 2015-04-02 16:26:01 +0000
+
+    Convert text from dos to unix line endings
+
+    This is to be consistent with the rest of the project, which uses
+    unix-style line endings. 
+
+  Change: a1f940e94aed575cc0120983e030860af88b92c3
+  Author: Paul Cochrane <paul@liekut.de>
+  Date : 2015-04-02 16:13:48 +0000
+
+    [t] remove trailing whitespace 
+
+  Change: 38f88eebcb5073946fbdf9b0eafbda2704142532
+  Author: Paul Cochrane <paul@liekut.de>
+  Date : 2015-04-02 16:09:36 +0000
+
+    [lib] remove trailing whitespace 
+
+  Change: ce52b8955b43271dd835fecdf6e050a71a80f568
+  Author: Paul Cochrane <paul@liekut.de>
+  Date : 2015-04-01 21:30:13 +0000
+
+    Replace ContributorsFromGit with Git::Contributors
+
+    This is because ContributorsFromGit isn't as well maintained and
+    ETHER created Git::Contributors out of frustration to fix this issue
+    (see
+    https://github.com/RsrchBoy/Dist-Zilla-Plugin-ContributorsFromGit/iss
+    ues/19). This has the same functionality and builds and tests
+    properly and should be considered a better alternative. 
+
+  Change: ea3ba4f95400fc88366000c8b382e9e50ca6586c
+  Author: Devin M. Ceartas <devin@nacredata.com>
+  Date : 2015-02-16 21:18:07 +0000
+
+    Implement "invoice" property on Charge objects. 
+
+  Change: b2d9eb9072805e3995ee2cb9e654db4e9e36af66
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2015-02-04 18:15:35 +0000
+
+    Merge pull request #48 from NacreData/master
+
+    Implement metadata in Charge object 
+
+  Change: 64043dbfcf827c32ab3e8aaf93bcee742148611e
+  Author: Devin M. Ceartas <devin@nacredata.com>
+  Date : 2015-02-04 16:00:28 +0000
+
+    Implement metadata in Charge object, add tests for metadata in charge
+    & customer 
+
+  Change: a32e36cd82bf52fc5d7776ecbce30f2188eb37b8
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2015-01-21 21:22:42 +0000
+
+    Merge pull request #47 from rustyconover/master
+
+    Changes for 0.27 
+
+  Change: 890c3e59d5884eb3cd8e6d6decfc3a02a5c3bf9a
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2015-01-21 21:18:50 +0000
+
+    Fix Abstract for Net::Stripe::Refund 
+
+  Change: 30cdad1cd710202ba2325a65d701f6b5a960a725
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2015-01-20 10:52:13 +0000
+
+    Remove unnecessary version line 
+
+  Change: a364a15639878a56347462094a2ec715d90927a3
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2015-01-20 10:51:13 +0000
+
+    Merge branch 'yahermann-master' 
+
+  Change: 2569fa6c56d04cdc1696f1181fcb20ae214d447d
+  Author: Hermann Calabria <hermann@ivouch.com>
+  Date : 2015-01-19 17:16:06 +0000
+
+    fixed documentation for refund_charge() and upped version # to 0.26 
+
+  Change: 19e78b64aa55c96f02bcaf2e6530867722f77740
+  Author: Hermann Calabria <hermann@ivouch.com>
+  Date : 2015-01-19 15:40:48 +0000
+
+    refund_charge(): added reason, refund_application_fee, and metadata.
+    added tests for refund. also fixed card->type, should be card->brand,
+    and fixed test. all tests pass now. 
+
+  Change: a27cc9cdd75f0f8143168a009cd02bba864deea6
+  Author: Hermann Calabria <hermann@ivouch.com>
+  Date : 2015-01-19 13:29:28 +0000
+
+    added working charge->refund_charge() 
+
+  Change: 9c10781f99906cd7310a3c107e8edb0b1201f00e
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2014-12-15 00:36:12 +0000
+
+    Merge pull request #43 from rustyconover/master
+
+    0.25 - Fixes for dealing with invoices. 
+
+  Change: 369fa14866f4f7e1020f43abca1a336944149794
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-12-15 00:13:45 +0000
+
+    Fix some bugs dealing with invoices. 
+
+  Change: 8464bb68dbfb30fdc4c4a980791f86706d48e572
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-12-11 01:08:56 +0000
+
+    Add cancel_at_period end 
+
+  Change: 6568aefa57e4ff51b2c7e1eeccce6e02e923ab13
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2014-12-10 20:32:29 +0000
+
+    Merge pull request #42 from rustyconover/master
+
+    Sync 0.23 to lukec/stripe-perl 
+
+  Change: 3e7f91b004116148834ffc4c3192f5c50a7c0ab2
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-12-10 20:27:01 +0000
+
+    Add prorate option to post_subscription.
+
+    Add quantity and account_balance fields to customer
+    Net::Stripe::Customer. 
+
+  Change: 62bb29cae76c879f35f33ca0edf59621f74a4e26
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-13 23:36:45 +0000
+
+    Release 0.22
+
+    application_fee was being passed to the Charge object from Stripe.pm,
+    but there was no corresponding parameter defined, so it wasn't
+    actually getting passed on in the request - Devin Ceartas 
+
+  Change: 15d19490ea0fbb776623570d82ae822c6ee10a26
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-13 23:32:29 +0000
+
+    Merge branch 'master' of github.com:lukec/stripe-perl 
+
+  Change: 3049dd9cf9420e6278d1a164b9a012cd2282cb2c
+  Author: Devin Ceartas <devin@nacredata.com>
+  Date : 2014-10-14 03:31:47 +0000
+
+    Merge pull request #41 from NacreData/master
+
+    application_fee in Net::Stripe::Charge for Stripe Connect to work 
+
+  Change: 76164b2c422d5adfb0d25c5954fec40a5d4564b8
+  Author: Devin M. Ceartas <devin@nacredata.com>
+  Date : 2014-10-13 23:27:54 +0000
+
+    application_fee in Net::Stripe::Charge for Stripe Connect to work 
+
+  Change: 003909470184ce13b787c67a70875dd0b2d52693
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-09-25 19:15:45 +0000
+
+    Release 0.20
+
+    Deleting a customer wide discount from andrewsolomon 
+
+  Change: ad777bd2428db4d5b732cc4c9605136dbef07299
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-09-25 19:14:49 +0000
+
+    Merge branch 'master' of github.com:lukec/stripe-perl 
+
+  Change: 81ecbc5f17e2db1ee4698568d36f85752177cba8
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2014-09-25 19:02:10 +0000
+
+    Merge pull request #40 from andrewsolomon/master
+
+    Deleting a Customer-wide Discount 
+
+  Change: 26d4fa699a74977c06041c7196c1f821361ca53d
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-09-20 21:19:54 +0000
+
+    Release 0.19 
+
+  Change: 2fc58fcfa6880ad4d6b3b482daef4100c7b14524
+  Author: Andrew Solomon <andrew@illywhacker.net>
+  Date : 2014-09-13 17:04:23 +0000
+
+    Deleting a Customer-wide Discount 
+
+  Change: 5b103edcbb95b99c52da532dad4eb574a87817f0
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2014-08-10 16:13:55 +0000
+
+    Merge pull request #37 from andrewsolomon/master
+
+    Provide access to customer->discount->start 
+
+  Change: 2d0e4af85dcd66d62ac3cb731be63a0f5c948ab5
+  Author: Andrew Solomon <andrew@illywhacker.net>
+  Date : 2014-08-10 18:29:41 +0000
+
+    Provide access to customer->discount->start 
+
+  Change: d963e45be808ac0a67f6a95d49b2712dfb6c56ca
+  Author: Devin Ceartas <devin@nacredata.com>
+  Date : 2014-06-25 14:13:25 +0000
+
+    Merge pull request #34 from NacreData/master
+
+    Fix list_subscriptions method, add tests for list_subscriptions 
+
+  Change: 17bd35f831b32fbeaa0acc4a206b8f35165390ca
+  Author: Devin M. Ceartas <devin@nacredata.com>
+  Date : 2014-06-25 10:10:01 +0000
+
+    Fix list_subscriptions method, add tests for list_subscriptions 
+
+  Change: 716a38645cd4cb8bcd73c4d0425d412dc9ab6604
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2014-06-01 12:22:56 +0000
+
+    Merge pull request #31 from rustyconover/master
+
+    Allow trial_end to be both an integer and a string. Support trials
+    ending now. Release 0.18. 
+
+  Change: 78868ad306fb9f4473ab6286574c939d81a53595
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-06-01 12:21:23 +0000
+
+    Allow trial_end to be both an integer and a string. Support trials
+    ending "now".
+
+    Bump to 0.18 
+
+  Change: 4d691c1f27e3527e6c8357b6adf3fe3b8c7dff55
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2014-05-29 11:44:16 +0000
+
+    Merge pull request #29 from rustyconover/master
+
+    Version 0.17 
+
+  Change: cb4cccbeeeb84c95661afb405df94fbdd6c25a54
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-05-29 11:43:07 +0000
+
+    Change version string in access log 
+
+  Change: deaf5d4da578a7b052a1bb0fd5881e390fd4ea8a
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-05-29 11:40:11 +0000
+
+    Bump to version 0.17 start using PkgVersion plugin 
+
+  Change: a6ab0dd81f63639e8f2a64a8b4c0126b83d5ab78
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-05-29 11:30:27 +0000
+
+    Add documentation of pay_invoice. 
+
+  Change: c081f4218fffe1de5e34bb2124bed2e426f7f874
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-05-26 19:54:38 +0000
+
+    Add pay_invoice and allow new card with post_card.
+
+    Add new pay_invoice method, and fix a bug with post_card not
+    recognizing a new credit card rather than an update. 
+
+  Change: 43de0ec4f312b0708c5e2d42ee62f9ed3ee9a143
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2014-05-21 15:50:34 +0000
+
+    Merge pull request #27 from rustyconover/master
+
+    Version 0.16 
+
+  Change: 240790ef93bd38c16a32bacf238393904d19e51e
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-05-21 15:49:22 +0000
+
+    Bump to 0.16 
+
+  Change: 538116528ca1b9f7d8de15097ffc7705ba6e5129
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-05-21 15:43:55 +0000
+
+    Move from MooseX::Method::Signatures to Kavorka 
+
+  Change: 95edaa21f9025c84145a51e98c0075507f9e89a1
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-05-11 11:53:09 +0000
+
+    Bump version to 0.15.
+
+    Add keep alive to user agent. 
+
+  Change: 95c2d6051bfca97a472f638eac0cdf896e2a4754
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-27 20:02:34 +0000
+
+    Fixes and cleanups.
+
+    Add default card parameter to post_customer().
+
+    Fix _post to handle objects being included in argument, convert them
+    to form fields if they are nested inside of a posted argument hash.
+
+    Add id to the Card object.
+
+    Add cards to the Customer object as a Net::Stripe::List. 
+
+  Change: 773c89f1afe19441adee43557358576506d660c9
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2014-04-26 23:26:44 +0000
+
+    Merge pull request #25 from rustyconover/master
+
+    Change to Net::Stripe::List for all lists. Add documentation to
+    object classes. 
+
+  Change: 739412308f32119442636f383963f487c0c3e058
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-26 23:24:51 +0000
+
+    Bump version to 0.14 
+
+  Change: f0095fd94abab5b03269447f0d1aa2679f7a9589
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-26 19:14:18 +0000
+
+    More docs on attributes 
+
+  Change: e79ee64373938bd3fc487e82219495c7acb025cc
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-26 19:08:17 +0000
+
+    Add some boolean type checking to hash_to_object. 
+
+  Change: ac4b97380a5f10ee201f6ac571e85b37d8256877
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-26 18:46:23 +0000
+
+    Add ClassMopper to weaver.ini for documentation of our objects. 
+
+  Change: 8bf02e492f08cb4e9fade4c9ba1534deec826e3d
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-26 18:08:31 +0000
+
+    Remove some Moose subtypes and just specify the allowed objects. 
+
+  Change: 75befc30001710fa4a24ddb596dc18d0a380e8fd
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-26 17:48:50 +0000
+
+    Remove unnecessary use of Data::Dumper 
+
+  Change: e07052a53b72d4c637f40b86c8cc96882da591b9
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-26 17:46:46 +0000
+
+    Add Net::Stripe::List for correct and proper list handling.
+
+    Add Net::Stripe::LineItem to contain information about line items
+    from an invoice. 
+
+  Change: 99ffd3eaec8c05eca01c4e374eef92199d14e50e
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-26 12:09:42 +0000
+
+    POD changes 
+
+  Change: 17a0e3d1cb812df5d5ac5339fa86965cb763478c
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-26 11:42:28 +0000
+
+    Change list handling to use Net::Stripe::List.
+
+    Add Net::Stripe::List to handle all returned lists from Stripe. Adds
+    suppor for the has_more flag, so the user can page through results.
+
+    Change live.t to use new list structure. Remove
+    Net::Stripe::SubscriptionList. 
+
+  Change: 24a5c2516b0bad5ad828df17a9f69a3b23ad6f06
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2014-04-25 22:37:59 +0000
+
+    Merge pull request #24 from rustyconover/master
+
+    Add documentation, change to named parameters to all functions,
+    update tests and add example code.
+
+    Changed all functions to use named parameters to follow the Stripe
+    API. This will break some existing code that relied on positional
+    parameters. See the documentation for changes and new examples of
+    calling functions. One example get_invoice() you now must pass
+    get_invoice(invoice_id => $id) where you previously called
+    get_invoice($id). I think named parameters allow more flexibility and
+    expressiveness.
+
+    Added documentation of each function along with an example call of
+    that function to the POD documentation.
+
+    Described all method's accepted parameters and types.
+
+    Changed to using MooseX::Method::Signatures rather than method module
+    to remove some older dependencies and add better type checking to
+    parameters.
+
+    Reworked live.t to reflect the API changes. 
+
+  Change: 89f8ca48009ff0b364f8ec18a9e875c251652ec6
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-25 22:28:56 +0000
+
+    More example and documentation fixes 
+
+  Change: c30780c0e51cb67aea3f906e4288ac3454299833
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-25 22:25:28 +0000
+
+    Add more examples and fix up POD documentation 
+
+  Change: 5eb0aa11865360ff408a360f515df73b794339ac
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-25 18:36:50 +0000
+
+    Add more examples 
+
+  Change: c2310e92cc4fcc79488b6b7f9c01dae619c80302
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-25 18:25:01 +0000
+
+    Add some initial examples of calling functions 
+
+  Change: 80d6a93d7241eb80cca49e4b3dfdca977f83cb91
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-25 18:19:51 +0000
+
+    Fix pod weaver bug with balance transaction functions. 
+
+  Change: 296f14fea3d5ba746fd84bf4769f51b3055babfe
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-25 18:13:42 +0000
+
+    Bump version number 
+
+  Change: f8092e06daddfc453d3719ab3407e9af05709b81
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-25 18:11:55 +0000
+
+    Change all methods to use named parameters and proper signatures.
+
+    Add documentation to all methods.
+
+    Change tests as appropriate to match the new method signatures. 
+
+  Change: 9c6dd9331807054bd2ee47be8dd541ae60723738
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-25 00:46:16 +0000
+
+    Remove use of methods module, replace with
+    MooseX::Method::Signatures.
+
+    Fixes a problem with methods module prereqs on some platforms while
+    retaining all functionality.
+
+    Bump version 
+
+  Change: 5d49548425af494e7751062ecbca8d7192f74bd7
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-22 21:15:09 +0000
+
+    A few POD fixes and 0.11 release. 
+
+  Change: 1d57a2b75acc847a18136576a03b748451fd9714
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-22 21:10:26 +0000
+
+    Add README.pod which is generated from Dist::Zilla. 
+
+  Change: 36a402bd11adb738473f34964264135ef5f0974c
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-22 21:07:43 +0000
+
+    Fix documentation, add abstracts to all modules.
+
+    Finish moving to Pod::Weaver. 
+
+  Change: ea3d1afd4707c0ee458a126f2796bfc2b341998f
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2014-04-22 16:30:16 +0000
+
+    Merge pull request #23 from andrewsolomon/master
+
+    add $customer->discount->coupon attributes 
+
+  Change: b0a1b43a193969140b76ee84257cbb0de9e4ec90
+  Author: Andrew Solomon <andrew@illywhacker.net>
+  Date : 2014-04-22 20:27:16 +0000
+
+    add $customer->discount->coupon attributes 
+
+  Change: e2e82db114e891e1557128d8b22f1fa1458df23d
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-22 08:33:16 +0000
+
+    Remove duplicated trial end. Allow it to be an int or string, because
+    of the special "now" value. 
+
+  Change: 64481e09794bb46b99f9941a36a91e1288f4ad3b
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-22 07:53:29 +0000
+
+    Merge branch 'master' of github.com:lukec/stripe-perl 
+
+  Change: 48942b0ab47e9a47055b1bb3c86ea59425bc27f9
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-22 07:51:12 +0000
+
+    Fix a problem with JSON::PP::Boolean usage.
+
+    Change any type constraint that expects a Bool into Bool|Object
+    because of a difference in how JSON::PP maps booleans.
+
+    Change some code to map both JSON::XS::Boolean and JSON::PP::Boolean
+    to one and zero. 
+
+  Change: c8606398de3b947e8b95b02b51106f01bed39a20
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2014-04-21 23:54:50 +0000
+
+    Merge pull request #21 from rustyconover/master
+
+    Change to using Dist::Zilla and start with provisionary version 0.009 
+
+  Change: 47b98c1cfd6925446cf1378a1549bafa2a3953bb
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-21 23:53:13 +0000
+
+    Change to using Dist::Zilla and start with provisionary version 0.009
+
+    Pull changes and contributors from Github. 
+
+  Change: b32477769aa6e4eecb037708c131f330de0e9631
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2014-04-21 23:17:33 +0000
+
+    Merge pull request #20 from rustyconover/master
+
+    Work on Invoices, metadata, error handling, and a bug fix with
+    customer's trial_end. 
+
+  Change: 5ba493a377176e58990436d1ab3a486fc4856e1e
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-21 23:15:03 +0000
+
+    Merge remote-tracking branch 'lukec/master' 
+
+  Change: 5bb5a8ebe6a550b2c1c09c4110b5e4152a784bc1
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-21 23:09:28 +0000
+
+    Change post_invoice() to accept a Net::Stripe::Invoice object.
+
+    Handle a HTTP 500 error more directly in make_request.
+
+    Allow "now" as a trial end value when creating a Customer object with
+    a subscription plan.
+
+    Add support for metadata and a description on the Invoice object.
+
+    Refactor the metadata form fields code into
+    form_fields_for_metadata()
+
+    Add custom code to the closed parameter on the Invoice object, to
+    only post it back to Stripe if the value has changed.
+
+    Add form_fields_for_metadata in Net::Stripe::Resource since it is
+    used by Customers and Invoices. 
+
+  Change: 88764afb97c99c77446dd9fdff930967809d749c
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2014-04-21 23:05:53 +0000
+
+    Merge pull request #19 from NacreData/master
+
+    Charges attributes; new BalanceTransaction; etc. 
+
+  Change: 388fc3545682361b7e9fc300a9fa848b4e7ee6dd
+  Author: Devin M. Ceartas <devin@nacredata.com>
+  Date : 2014-04-21 22:45:42 +0000
+
+    * new BalanceTransfer Object (contains Stripe fee) * allow passing of
+    "created" hashref to _get_collections,
+
+    used for instance to get Charges constrained by dates * teach
+    hash_to_object() to convert Stripe's underscore_words
+
+    to module's UpperCamelCase * additional attributes in Charge object 
+
+  Change: 26afeb856761b6c0e8c32e22892ede73535b4827
+  Author: Devin M. Ceartas <devin@nacredata.com>
+  Date : 2014-04-21 22:06:19 +0000
+
+    Merge branch 'master' of github.com:rustyconover/Net-Stripe 
+
+  Change: 09a3359130ce2bd7580ac1e47090877c70ecc2ae
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2014-04-21 09:14:54 +0000
+
+    Merge pull request #15 from sachinjsk/master
+
+    fixed typo 
+
+  Change: ee37f01bfdc4bf3483a54820b97c708842f26689
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2014-04-21 09:14:28 +0000
+
+    Merge pull request #12 from oalders/repository-url
+
+    Adds repository URL to META resources. 
+
+  Change: 592d47fc63e2768bbce4ed397ef15f4aee7e0301
+  Author: Rusty Conover <rustyconover@users.noreply.github.com>
+  Date : 2014-04-21 09:12:46 +0000
+
+    Merge pull request #18 from rustyconover/master
+
+    Initial pull of work on github to recent release. 
+
+  Change: 348d404ce3b1c294f26275d35bcc311938d243d8
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-19 16:20:39 +0000
+
+    Add post_invoice and add invoice parameter to Invoiceitem.pm to allow
+    invoice items to be added to an open invoice. 
+
+  Change: d5d0317549cbdbf1f08be30fc19a7d60416418e6
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-17 19:14:32 +0000
+
+    Add methods for dealing with Cards and additional fields to the Card
+    object. 
+
+  Change: 8a307dd7ca045ffff474f8db00002cb45b0fa352
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-04-17 15:40:06 +0000
+
+    Allow undefined statement descriptions for plans. 
+
+  Change: 665deed7c73b1e40c90fd08b4de56a6f480375ee
+  Author: Devin M. Ceartas <devin@nacredata.com>
+  Date : 2014-04-17 11:18:10 +0000
+
+    Note removal of "count" attribute in recent Stripe update to Lists 
+
+  Change: 55c9f445185bc4b663d6c03b0d1775adce9b9a5d
+  Author: Devin M. Ceartas <devin@nacredata.com>
+  Date : 2014-04-15 17:43:47 +0000
+
+    Note removal of "count" attribute in recent Stripe update to Lists 
+
+  Change: af89dedc17bd2341aaca3fb03e69243631f737af
+  Author: Devin Ceartas <devin@nacredata.com>
+  Date : 2014-04-15 21:07:21 +0000
+
+    Merge pull request #1 from rustyconover/master
+
+    Latest work on fixing up the module 
+
+  Change: aae5aed5f27443a2c0fcd0cd7e0586455e4f1603
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-03-15 00:07:45 +0000
+
+    Add support for statement_description in plans. 
+
+  Change: d52aa3d39866b48fe0413a1f2f11542321dc210d
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-03-14 23:54:52 +0000
+
+    Add interval_count to plans.
+
+    Add interval_count to Net::Stripe::Plan.
+
+    Fix missing module. 
+
+  Change: 74fb3562eacb47f91b8bb3e9d2d962259eea7326
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-03-14 23:49:05 +0000
+
+    Add flag debug_network
+
+    Add debug_network flag which allows the HTTPS request and response
+    data to be shown for debugging purposes. 
+
+  Change: 63f7f14ef57ce7a923ad54e7ebbeab272ded71ea
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-03-14 22:43:38 +0000
+
+    Finish supporting multiple subscriptions 
+
+  Change: 4953c21764883e540e07ed1ea9fe4bf1061df3bc
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-03-14 22:42:30 +0000
+
+    Support multiple subscriptions
+
+    Change Customer object to contain subscriptions and subscription
+    since customers can now have multiple subscriptions.
+
+    Change test to use subscription id for delete_subscription calls. 
+
+  Change: f741f7843a90f2d23e085c46846dc592ca7d8f06
+  Author: Devin M. Ceartas <devin@nacredata.com>
+  Date : 2014-03-09 17:02:53 +0000
+
+    Multiple subscriptions are now possible, updating is different from
+    creating, there is a list subscription method 
+
+  Change: d5a33c2cbdd79833f0c9064707709e6d752d52f7
+  Author: Devin M. Ceartas <devin@nacredata.com>
+  Date : 2014-03-05 14:21:15 +0000
+
+    Add ability to add "metadata" hashref to Customer object creation. 
+
+  Change: e3bab9d371ffdb4f843249b86b2f6a8ec3e43ff0
+  Author: Devin M. Ceartas <devin@nacredata.com>
+  Date : 2014-03-05 11:33:45 +0000
+
+    test for 1, not "true"; swallow an exected warning to /dev/null...
+    All existing tests now pass! 
+
+  Change: f1b4133bbf03270da05ef0d3b7a2e8db46d4ea3e
+  Author: Devin M. Ceartas <devin@nacredata.com>
+  Date : 2014-03-05 11:30:10 +0000
+
+    Yet another test needing Customer->active_card changed to
+    Customer->default_card 
+
+  Change: 32e2e52a78019b60a9e44d311c3ea8d4e9ba5d38
+  Author: Devin M. Ceartas <devin@nacredata.com>
+  Date : 2014-03-05 11:23:00 +0000
+
+    Correct Test: if cancelled with "at_period_end", a subscription will
+    not yet have "ended_at" set. Test 114 passes now. 
+
+  Change: e64c833ec05e25d63710d677ef37712adf8ac489
+  Author: Devin M. Ceartas <devin@nacredata.com>
+  Date : 2014-03-05 11:12:51 +0000
+
+    Another test needing Customer->active_card changed to
+    Customer->default_card 
+
+  Change: 8c1c99ce1423b8eaa8eed6172eeb4e036d5dfd59
+  Author: Devin M. Ceartas <devin@nacredata.com>
+  Date : 2014-03-05 11:04:35 +0000
+
+    Customer has a "default_card" not an "active_card", and this
+    "default_card" is a card id, not a Stripe Card object. Test 94 now
+    passes. 
+
+  Change: 10e75ec296b1176a4855769340ed094cfe676cd7
+  Author: Devin M. Ceartas <devin@nacredata.com>
+  Date : 2014-03-05 10:16:46 +0000
+
+    Hide expected warnings; Fix invalid currency test. 
+
+  Change: d680cb2c91914c5f1d9644dcf754827b683283fd
+  Author: Devin M. Ceartas <devin@nacredata.com>
+  Date : 2014-03-05 10:01:52 +0000
+
+    "fee" was removed from the returned Charge object by Stripe, see
+    2013-12-03 changes at https://stripe.com/docs/upgrades 
+
+  Change: b16bbe8068fa9e2a1bf4199255ec8145d6540c31
+  Author: Devin M. Ceartas <devin@nacredata.com>
+  Date : 2014-03-05 09:49:35 +0000
+
+    Clean up test output by hiding expected warnings 
+
+  Change: c37f0b7362c4d36d86d5a2399c57c08d9fc33a9a
+  Author: Devin M. Ceartas <devin@nacredata.com>
+  Date : 2014-03-05 09:23:26 +0000
+
+    return array ref of objects from _make_request() if a list is
+    returned, rather than trying to instantiate non-existent
+    Net::Stripe::List class: fixes test #20 
+
+  Change: 50c32c9b40662060fa87e832eeef50fad61c2510
+  Author: Devin M. Ceartas <devin@nacredata.com>
+  Date : 2014-03-04 16:54:45 +0000
+
+    patch from sachinjsk
+    https://github.com/sachinjsk/stripe-perl/commit/1e57e9667797206f27356
+    b3664f37a190b4f26eb 
+
+  Change: 8ca8bccd66fdc406f4270242d67b4c1fbeef0d22
+  Author: Devin M. Ceartas <devin@nacredata.com>
+  Date : 2014-03-04 16:52:11 +0000
+
+    Patch from oalders
+    https://github.com/oalders/stripe-perl/commit/eaaf1a442654da5f7eb9098
+    c7f0668b446aa8cae 
+
+  Change: 1e57e9667797206f27356b3664f37a190b4f26eb
+  Author: Sachin Sebastian <sachinjsk@users.noreply.github.com>
+  Date : 2014-01-12 19:41:12 +0000
+
+    fixed typo 
+
+  Change: c7e06c6f22ddbc0886b5675b6ca4390c98c28453
+  Author: Luke Closs <me@luk.ec>
+  Date : 2013-10-07 02:46:03 +0000
+
+    Update code to work with newer API 
+
+  Change: f56e45f7687f876e25fac589b046d53c8cdb736d
+  Author: Luke Closs <me@luk.ec>
+  Date : 2013-10-07 02:45:45 +0000
+
+    Allow posting hashes directly 
+
+  Change: 4573df5d7a60470e2db93201491dc68ec06117fc
+  Author: Luke Closs <me@luk.ec>
+  Date : 2013-10-07 02:45:30 +0000
+
+    Add post_customer_subscription() 
+
+  Change: 6c38ded4352b4ee1fdca457b840b9170c818d8ad
+  Author: Luke Closs <me@luk.ec>
+  Date : 2013-10-05 01:36:46 +0000
+
+    Bump version 
+
+  Change: f36369ad0c56eff3d6659ed504d8b47c47a213d5
+  Author: Luke Closs <me@luk.ec>
+  Date : 2013-10-05 01:25:40 +0000
+
+    Try allowing plans to be read/write 
+
+  Change: cec16d2bfffd434602121c74a2388604cee84a66
+  Author: Olaf Alders <olaf@wundersolutions.com>
+  Date : 2013-08-14 00:36:28 +0000
+
+    Adds repository URL to META resources. 
+
+  Change: f2a4b3771f318554041999683109d056c6b11cb1
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2012-10-23 09:43:23 +0000
+
+    Add missing dependency on namespace::clean 
+
+  Change: 0a6e418f2a655fcb57f3a35f36b6436ceb736589
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2012-10-23 09:41:28 +0000
+
+    update docs 
+
+  Change: 4f3727b5d9602b3eee4e312b0e35a1c39a3da655
+  Author: Luke Closs <github@5thplane.com>
+  Date : 2012-06-25 22:29:14 +0000
+
+    Merge pull request #10 from dpetrov/master
+
+    Updating Invoiceitem should not update currency 
+
+  Change: 6f40686c55e737235cf32b3dc884f72190c83e7c
+  Author: Dimitar Petrov <mitakaa@gmail.com>
+  Date : 2012-06-24 20:45:48 +0000
+
+    Pass the copied object to post_invoiceitems 
+
+  Change: 880782b601d98551199b586d505e7aa295a33583
+  Author: Dimitar Petrov <mitakaa@gmail.com>
+  Date : 2012-06-24 20:42:18 +0000
+
+    Updating Invoiceitem should not update currency 
+
+  Change: cc3a2d8bc730d66ed4e8845d53ebb4e2fd1758f0
+  Author: Luke Closs <gravatar@5thplane.com>
+  Date : 2012-06-01 12:40:19 +0000
+
+    Merge pull request #8 from letolabs/synopsis
+
+    Make the code in the Net::Stripe synopsis copy+paste friendly ... 
+
+  Change: f42bfac875bd71196327c15f05f4738c30b510ed
+  Author: Jonathan "Duke" Leto <jonathan@leto.net>
+  Date : 2012-06-01 12:38:29 +0000
+
+    Make the code in the Net::Stripe synopsis copy+paste friendly and
+    give examples of looking at the card associated with a charge and
+    looking up charges by id 
+
+  Change: 5969168f2a44ccde83369d2a14a6876ec7361a1a
+  Author: Luke Closs <gravatar@5thplane.com>
+  Date : 2012-06-01 12:02:53 +0000
+
+    Merge pull request #7 from letolabs/update_moose_dep
+
+    Update moose dep to a known-good version 
+
+  Change: df053bdfd86a2929b8906be48b021ede7aa9ceb2
+  Author: Jonathan "Duke" Leto <jonathan@leto.net>
+  Date : 2012-06-01 12:01:42 +0000
+
+    Update moose dep to a known-good version 
+
+  Change: aea985642d50ee2646673b2d9af6eb8a9428a369
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2012-05-30 09:16:29 +0000
+
+    get customer on a deleted customer returns a hash instead of an
+    object 
+
+  Change: cfad6b6c740e00be208fdf1c7041bbefb8901d15
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2012-05-03 11:45:24 +0000
+
+    add a missing note to the changelog 
+
+  Change: 673052507335122264cb874b4cb1b153dceaeb4e
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2012-04-27 16:25:18 +0000
+
+    add date 
+
+  Change: f197ec6fb15e612e075a01e67e6255700ee8189f
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2012-04-27 16:24:55 +0000
+
+    Add more fields to invoices 
+
+  Change: fec51c307da7d475a286bc6b63eafe01087cf195
+  Author: Luke Closs <gravatar@5thplane.com>
+  Date : 2012-04-24 11:20:18 +0000
+
+    Merge pull request #4 from briancollins/master
+
+    Allow null attributes in API responses 
+
+  Change: 113469fa4043c9d84b1a2146eea382fb6c932ceb
+  Author: Brian Collins <bricollins@gmail.com>
+  Date : 2012-04-24 19:15:16 +0000
+
+    Handle null response attributes
+
+    The Stripe API now returns all attributes of objects, whether they
+    are null or not. 
+
+  Change: 493acbbbe0555004de311b660217363b2efe03aa
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2012-02-02 09:21:26 +0000
+
+    Bump to 0.06 and fix MANIFEST so Invoiceitem.pm is shipped 
+
+  Change: 82680adfb0a4e7d532e0ffa2fe60fa0903b36a05
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2012-02-01 13:03:12 +0000
+
+    add a date so i can release this 
+
+  Change: 3b1e46051d5b05c6725e0c8617f51c4240a33811
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2012-01-02 23:16:52 +0000
+
+    Bump version and update Changes 
+
+  Change: 2ea787464e0998f114df9ca82989bc67da5f3278
+  Author: Luke Closs <gravatar@5thplane.com>
+  Date : 2012-01-02 23:14:17 +0000
+
+    Merge pull request #3 from tomeliaz/master
+
+    Add support for partial refunds via second parameter on refund_charge
+    call. 
+
+  Change: b9f1436a8dc1be3cecca7ee533be995d1075f5c4
+  Author: Tom Eliaz <tom@tomeliaz.com>
+  Date : 2012-01-02 22:59:30 +0000
+
+    Add support for partial refunds via second parameter on refund_charge
+    call.
+
+    Add optional second parameter to redund_charge which is an amount in
+    cents to refund. Add amount_refunded field to Charge which is filled
+    by the API on return from a
+
+    partial refund API call. Add live test of partial and total (no
+    amount specified) refund. 
+
+  Change: b8a291bbf31cfca51601503914da70101ef9e6a0
+  Author: Luke Closs <gravatar@5thplane.com>
+  Date : 2011-11-27 22:13:05 +0000
+
+    Merge pull request #2 from dreinhold/master
+
+    Perl Stripe Update 
+
+  Change: c97f3c68b45eb348c89a5c10c23f5dfee0bdd11a
+  Author: Dylan Reinhold <dylan@gasdasoftware.com>
+  Date : 2011-11-27 22:08:30 +0000
+
+    Add a .gitignore into repo 
+
+  Change: cf0cfa54805661c60c8b26a0758bf2116c819df3
+  Author: Dylan Reinhold <dylan@gasdasoftware.com>
+  Date : 2011-11-27 22:07:29 +0000
+
+    Updated dependency list in alphabetical order 
+
+  Change: 67cd30e471f74d279619914a6377139444cd3d2a
+  Author: Dylan Reinhold <dylan@gasdasoftware.com>
+  Date : 2011-11-27 21:17:49 +0000
+
+    Added 2 required modules to Makefile.PL
+
+    The module requires
+
+    Test::Exception
+
+    DateTime 
+
+  Change: 80e457903463043741196164898eb0694857a8c4
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2011-11-23 10:50:20 +0000
+
+    Fix Invoiceitem package name 
+
+  Change: 776f8bde0ee221088ff49c4d145126d4526613ef
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2011-11-14 12:31:58 +0000
+
+    Add missing LWP::Protocol::https dep 
+
+  Change: a8a9c05dacd117eff96e80bfe3784e52b696b25b
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2011-11-03 19:21:47 +0000
+
+    Prepare for 0.02 release 
+
+  Change: 8011941a07fb51f218ec32923a730542178aaf37
+  Author: Luke Closs <gravatar@5thplane.com>
+  Date : 2011-11-03 19:20:04 +0000
+
+    Merge pull request #1 from tomeliaz/master
+
+    Throwable needed for Error.pm 
+
+  Change: a610d33901f1fdd7ba3d8ccd7133bf1e671fd212
+  Author: Tom Eliaz <tom@tomeliaz.com>
+  Date : 2011-11-03 17:28:49 +0000
+
+    Error requires Throwable to be installed 
+
+  Change: fc34c2ee76db1b3a0bde7c5da0c2d0326f890507
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2011-11-01 15:47:21 +0000
+
+    clean up noise in this test 
+
+  Change: fb81c6b575d9cda01bea50a78a3279337851ecd2
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2011-11-01 15:45:07 +0000
+
+    add a warning 
+
+  Change: 72a54b00fcc9f50d423264e8a812c9d2f508a01c
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2011-11-01 15:39:57 +0000
+
+    Add POD and some packaging 
+
+  Change: a120be83c25fd804be3c29c459276bf4fe5098bc
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2011-11-01 14:32:44 +0000
+
+    Add coupons and the Invoice.pm 
+
+  Change: d27158bbbce780ff8dc54101f6f4826b60c22939
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2011-11-01 14:15:25 +0000
+
+    Add Invoices 
+
+  Change: 80f325eb96ab17e9f6284214d3b30254db265947
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2011-11-01 12:57:33 +0000
+
+    Add invoiceitems to the API 
+
+  Change: d00d550f9b152659e8e2cd2ed06906e433db78fe
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2011-11-01 09:24:12 +0000
+
+    Add customer subscription apis 
+
+  Change: 8600e978be3cba0f08041a9c6e0adab75a89bb81
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2011-10-29 15:19:00 +0000
+
+    Make most things read-only 
+
+  Change: 04211f639c6a736616c4b1c7f4241196e3013723
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2011-10-28 21:08:50 +0000
+
+    Uh, i think I wrote this in Perl, not Ruby. :) 
+
+  Change: f85bc9ecd662f5d2b0c847fa4b25051acd7a31e5
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2011-10-28 21:08:20 +0000
+
+    add a readme 
+
+  Change: f3a33cea2275ba369fc813e7aaf0664cf9b9d779
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2011-10-28 21:05:42 +0000
+
+    Add Coupons and subscriptions and more tests 
+
+  Change: a1eb2c51dad15b0d335db8d6a0f31da80c807470
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2011-10-28 20:21:18 +0000
+
+    Add plans and basic plan tests 
+
+  Change: 58ad0cea7fc515f6a759cd9d31bb6f8a91c7df81
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2011-10-28 19:52:16 +0000
+
+    Add and fix tests 
+
+  Change: 9cc1ef58343393add8f5eb7ce67c7bec7b69796e
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2011-10-28 19:52:09 +0000
+
+    stringify the errors nicely 
+
+  Change: 4a4fbd0c68c7253b4e5b430b12bc96d29fe80daf
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2011-10-28 19:51:47 +0000
+
+    no need to worry about this, their api does it 
+
+  Change: e77457656d7224fdcf666aefa344c6fd59a6ee4c
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2011-10-28 17:32:57 +0000
+
+    Add tokens to charge & customer requests 
+
+  Change: c369379fd706de821637c3ebbb882da846f8fe75
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2011-10-28 17:07:47 +0000
+
+    Add Tokens and Customers 
+
+  Change: 7c1306bfdd5309988a460af36165c0c6049bf3a1
+  Author: Luke Closs <luke@5thplane.com>
+  Date : 2011-10-28 14:15:17 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

@@ -1,0 +1,22 @@
+Net::UPS
+=============================================================================
+
+INSTALLATION
+-----
+
+To run the test scripts make sure to create a file ".upsrc" in your home
+directory with at least the following content:
+
+UPSUserID   yourUserId
+UPSPassword yourPassword
+UPSAccessKey yourAccessKey
+
+Once that's done, run the following sequence of commands:
+
+    % perl Makefile.PL
+    % make
+    % make test
+    % make install
+
+If you prefer not to run the tests, you can skip "make test" in the above sequence.
+

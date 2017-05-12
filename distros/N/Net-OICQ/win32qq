@@ -1,0 +1,408 @@
+#!/usr/bin/perl
+
+package Net::OICQ::Win32Client;
+use strict;
+use warnings;
+use Net::OICQ::TextConsole;
+use Win32::GUI ();
+use Data::Dumper;
+
+our @ISA = qw(Net::OICQ::TextConsole);
+
+our $ModInfo = "Net::OICQ v$Net::OICQ::VERSION Crypt::OICQ v$Crypt::OICQ::VERSION";
+
+sub new {
+	my ($class, $oicq) = @_;
+	defined $oicq or $oicq = new Net::OICQ;
+	my $main = create_main(600, 600);
+	my $self = {
+		OICQ => $oicq,
+		Main => $main,
+		ChatWindow => {},
+	};
+	#print Data::Dumper->Dump([$main]);
+	return bless($self, $class);
+}
+
+sub create_main {
+	my ($gui_w, $gui_h) = @_;
+
+	my $gui = Win32::GUI::Window->new(-name => 'Main', -title => $ModInfo,
+		-size => [$gui_w, $gui_h]);
+
+	$gui->AddLabel(-name => "MyInfo", -title => "", -pos => [0, 0], -size => [$gui_w -8, 20]);
+
+	$gui->AddTextfield(-name => "Input", -readonly => 0, -default => 1,
+			-pos => [0, $gui_h - 80], -size => [$gui_w - 8, 80],
+			-multiline => 1, -autohscroll => 1, -autovscroll => 1);
+
+	$gui->AddTextfield(-name => "Output", -readonly => 1,
+			-pos => [0, 20], -size => [$gui_w - 8, $gui_h - 100],
+			-multiline => 1, -autohscroll => 1, -autovscroll => 1);
+
+	$gui->{Input}->SetFocus();
+	$gui->Center();
+	return $gui;
+}
+
+sub set_myinfo {
+	my ($self, $text) = @_;
+	$self->{Main}->{MyInfo}->Text($text);
+}
+
+sub get_chat_window {
+	my ($self, $qq, $group) = @_;
+	die "Bad arg for get_chat_window: $qq\n" unless $qq =~ /^\d+$/;
+	my $cw = $self->{ChatWindow};
+	my $winid = $group ? $group : $qq;
+	return $cw->{$winid} if exists $cw->{$winid};
+
+	my $dt = Win32::GUI::GetDesktopWindow();
+	my $dtw = Win32::GUI::Width($dt);
+	my $dth = Win32::GUI::Height($dt);
+	my $win_l = sprintf '%.0f', (($winid % 2) ? $dtw/2 : 0) + rand(50);
+	my $win_t = sprintf '%.0f', (length($winid)-5)*10+rand(10);
+	my $oicq = $self->{OICQ};
+	my $myid = $oicq->{Id};
+	my ($width, $height) = (500, 500);
+	# Note: the word "group" in the window title will be used to check whether it is
+	# a chat window for a group
+	my $chatwin = Win32::GUI::Window->new(-name => 'Chat',
+		-title => $group ? "$myid chat in group $group" : "$myid chat with $qq",
+		-pos => [$win_l, $win_t], -size => [$width, $height]);
+	$chatwin->AddLabel(-name => "ChatInfo",
+		-title => $group ? "$myid -> group $group" : "$myid -> $qq",
+	       	-pos => [0, 0], -size => [$width -8, 20]);
+	$chatwin->AddTextfield(-name => "ChatOutput", -readonly => 1,
+		-pos => [0, 20], -size => [$width - 8, $height -120],
+		-multiline => 1, -autohscroll => 1, -autovscroll => 1);
+
+	$chatwin->AddTextfield(-name => "ChatInput", -readonly => 0, -default => 1,
+		-pos => [0, $height - 100], -size => [$width - 50, 80],
+		-multiline => 1, -autohscroll => 1, -autovscroll => 1);
+
+	$chatwin->AddButton(-name => "ChatCancelButton", -title => 'Cancel', -cancel => 1,
+		-pos => [$width - 48, $height - 80], -size => [40, 20]);
+
+	$cw->{$winid} = $chatwin;
+	return $chatwin;
+}
+
+sub info {
+	my ($self, @text) = @_;
+	my $output = $self->{Main}->{Output};
+	$output->Append(join('', map {s/([^\r]?)\n/$1\r\n/g; $_} @text));
+}
+
+sub warn {
+	my ($self, @text) = @_;
+	$self->info("Warning:\n", @text);
+}
+
+sub error {
+	my ($self, @text) = @_;
+	$self->info("Error:\n", @text);
+}
+
+sub mesg {
+	my ($self, $time, $group, $srcid, $text, $font) = @_;
+	my $win = $self->get_chat_window($srcid, $group);
+	return 0 unless defined $win;
+	$win->{ChatInput}->SetFocus();
+	$win->Show();
+	my $output = $win->{ChatOutput};
+	unless (defined $time) {
+		$output->Append(substr(localtime, 11, 9) . "$srcid\r\n$text\r\n");
+		if ($font) {
+			$output->Append("$font\r\n");
+		}
+		return;
+	}
+	my $oicq = $self->{OICQ};
+	my $nick = $oicq->get_nickname($srcid);
+	my $id_color = $self->id_color($srcid);
+
+	my $srcinfo = $oicq->{Info}->{$srcid};
+	my $addr = $srcinfo->{Addr} || 'unknown';
+	my $ver  = defined $srcinfo->{Client} ? "0x$srcinfo->{Client}" : 'unknown';
+
+	$output->Append(substr(localtime($time), 11, 9) . ($group ? "Group $group " : " ") .
+		"$nick($srcid, IP $addr, version $ver)\r\n$text\r\n");
+	if ($font) {
+		$output->Append("$font\r\n");
+	}
+	return;
+}
+
+sub prompt {}
+
+sub loop {
+	my ($self) = @_;
+	my $oicq = $self->{OICQ};
+	my $select = new IO::Select($oicq->{Socket});
+	my $select_t = 0.1;
+	my $noack = 0;
+  LOOP: while(1) { #Win32::GUI::DoEvents != -1) {
+	  	$oicq->keepalive if time - $oicq->{LastKeepaliveTime} >= 60;
+		if (time - $oicq->{LastSvrAck} > 120) {
+			unless ($noack) {
+				$self->warn(substr(localtime(), 11, 9) . "no response from server for > 2 minutes\r\n");
+				$noack = 1;
+			}
+		} else {
+			if ($noack) {
+				$noack = 0;
+				$self->info(substr(localtime(), 11, 9) . "got server response\r\n");
+			}
+		}
+		Win32::GUI::DoEvents();
+		my ($socket) = $select->can_read($select_t);
+		next LOOP unless defined $socket;
+		my $packet;
+		$socket->recv($packet, 0x4000);
+		foreach my $data ($oicq->get_data($packet)) {
+			my $event = new Net::OICQ::ServerEvent($data, $oicq);
+			next unless defined($event) && defined($event->{Data});
+			$event->parse;
+			my $cmd = "ui_".$event->cmd;
+			eval {$self->$cmd($event)};
+			if ($@) {
+				$self->error($@);
+			}
+		}
+	}
+}
+
+sub ui_keep_alive {
+	my ($self, $event) = @_;
+	$self->info(substr(localtime(), 11, 9) .join(', ', @{$event->{ServerInfo}}) . "\r\n");
+}
+
+# Handle key stroke event for Textfield input
+# Do something for two consecutive ENTER keys
+
+sub text_input_handler {
+	my ($self, $input, $key, $callback, @cb_args) = @_;
+	return 1 unless $key == 0x0d;
+	my $line0 = $input->GetLine(0);
+	return 0 if !defined($line0) or $line0 eq "";
+	my $line_count = $input->GetLineCount();
+	return 1 unless $line_count > 2;
+	my $last_input = $input->GetLine($line_count - 2);
+	#print "line_count=$line_count   last line len=", length($last_input), "\n";
+	if (!defined($last_input) or length($last_input) == 0) {
+		my $text = "";
+		for (my $i = 0; $i < $line_count; $i++) {
+			my $line = $input->GetLine($i);
+			next unless defined $line;
+			$text .= $line . "\r\n";
+		}
+		return 1 unless $text =~ /\S/s;
+		$input->SelectAll();
+		$input->ReplaceSel('');
+		return $callback->($self, $text, @cb_args);
+	} else {
+		return 1;
+	}
+}
+
+
+
+
+
+
+package main;
+import Net::OICQ::Win32Client;
+
+my ($QQ, $PW, $Mode, $Proto, $Proxy);
+my $Login = create_login_window();
+Win32::GUI::Dialog();
+
+my $GUI = new Net::OICQ::Win32Client;
+$GUI->set_myinfo("Not logged in.");
+$GUI->{Main}->Show();
+
+our $oicq = $GUI->{OICQ};
+
+if ($QQ and $PW) {
+	$oicq->{Debug} = 9;
+	if ($oicq->login($QQ, $PW, $Mode, $Proto, $Proxy)) {
+		$GUI->set_myinfo("QQ $QQ $Mode mode, $Proto connection, " . ($Proxy ? "Proxy $Proxy" : "no proxy"));
+		$oicq->get_friends_list;
+		$oicq->get_online_friends;
+		$oicq->get_user_info($QQ);
+	}
+	$GUI->loop;
+} else {
+	Win32::GUI::Dialog();
+}
+
+exit;
+
+sub create_login_window {
+	use integer;
+	my ($login_w, $login_h) = (360, 210);
+
+	my $login = Win32::GUI::DialogBox->new(-name => 'Login',
+		-title => "$Net::OICQ::Win32Client::ModInfo login",
+		-size => [$login_w, $login_h]);
+	my ($x, $y) = (10, 20);
+	$login->AddLabel(-name => "QQLabel", -title => 'QQ:', -align => 'right',
+			-pos => [$x, $y], -size => [100, 20]);
+	$login->AddTextfield(-name => "QQ", -readonly => 0, -number => 1,
+			-pos => [$x + 100, $y], -size => [100, 20], -tabstop => 1);
+	$y += 30;
+	$login->AddLabel(-name => "PWLabel", -title => 'PW:', -align => 'right',
+			-pos => [$x, $y], -size => [100, 20]);
+	$login->AddTextfield(-name => "PW", -readonly => 0, -password => 1,
+			-pos => [$x + 100, $y], -size => [100, 20], -tabstop => 1);
+	$y += 30;
+	$login->AddLabel(-name => "InvLabel", -title => 'Invisible:', -align => 'right',
+			-pos => [$x, $y], -size => [100, 20]);
+	$login->AddCheckbox(-name => "Inv", -pos => [$x + 100, $y], -size => [10, 10], -tabstop => 1);
+	$login->AddLabel(-name => "UDLabel", -title => 'UDP:', -align => 'right',
+			-pos => [$x + 150, $y], -size => [50, 20]);
+	$login->AddCheckbox(-name => "UDP", -pos => [$x + 200, $y], -size => [10, 10], -tabstop => 1);
+	$y += 20;
+	$login->AddLabel(-name => "ProxyLabel", -title => 'Proxy:', -align => 'right',
+			-pos => [$x, $y], -size => [100, 20]);
+	$login->AddTextfield(-name => "Proxy", -readonly => 0,
+			-pos => [$x + 100, $y], -size => [150, 20], -tabstop => 1);
+	$y += 40;
+	$login->AddButton(-name => "LoginButton", -title => 'Login', -default => 1, -ok => 1,
+			-pos => [$x + 100, $y], -size => [40, 20], -tabstop => 1);
+	$login->AddButton(-name => "CancelButton", -title => 'Hide', -cancel => 1,
+			-pos => [$x + 200, $y], -size => [40, 20], -tabstop => 1);
+	$login->Center();
+	$login->{Inv}->Click();
+	$login->{QQ}->SetFocus();
+	$login->Show();
+	return $login;
+}
+
+sub UDP_Click {
+	if ($Login->{UDP}->Checked) {
+		$Login->{Proxy}->Disable;
+	} else {
+		$Login->{Proxy}->Enable;
+	}
+	return 1;
+}
+
+sub LoginButton_Click {
+	my $qq = $Login->{QQ}->GetLine(0);
+       	my $pw = $Login->{PW}->GetLine(0);
+	if (defined($qq) and defined($pw) and $qq =~ /^\d{5,10}$/ and $pw) {
+		$QQ = $qq;
+		$PW = $pw;
+		$Mode = $Login->{Inv}->Checked() ? 'Invisible' : 'Normal';
+		if ($Login->{UDP}->Checked()) {
+			$Proto = 'udp';
+			$Proxy = '';
+		} else {
+			$Proto = 'tcp';
+			$Proxy = $Login->{Proxy}->GetLine(0);
+			$Proxy = '' unless defined $Proxy;
+		}
+		print "Mode: $Mode Proto: $Proto Proxy: $Proxy\n";
+		$Login->Hide();
+		return -1;
+	}
+	return 0;
+}
+
+sub CancelButton_Click {
+	$QQ = undef;
+	$PW = undef;
+	$Login->Hide;
+	return -1;
+}
+
+sub ChatCancelButton_Click {
+	my ($qq, $win) = get_active_chat_window();
+	my $chatwin = $GUI->{ChatWindow};
+	return 0 unless defined($qq) and exists($chatwin->{$qq});
+	$chatwin->{$qq} = undef;
+	delete($chatwin->{$qq});
+	$GUI->info("Chat window $qq deleted\r\n");
+	return 1;
+}
+
+sub Input_KeyUp {
+	my ($time, $key) = @_;
+	#print "$key\n";
+	return $GUI->text_input_handler($GUI->{Main}->{Input}, $key,
+		sub {
+			my ($gui, $text) = @_;
+			exit if $text =~ /^\s*(:?exit|quit)\s*$/;
+			if ($text =~ /^(\d{4,10})\s*$/) {
+				my $qq = $1;
+				my $win = $gui->get_chat_window($qq);
+				$win->Show() if defined $win;
+				return 1;
+			}
+			my $text2 = $text;
+			$text2 =~ s/^\s+//s;
+			$text2 =~ s/\s+$//s;
+			my ($cmd, @args) = split(/\s+/, $text2);
+			$cmd =~ s/\W//;
+			my $cmd_info = $gui->kb_cmd($cmd);
+			if (defined($cmd_info)) {
+				if (@args < $cmd_info->[1]) {
+					$gui->error("Not enough argument for command $cmd\r\n");
+				} else {
+					eval { $cmd_info->[0]->($gui, @args) };
+					$@ && $gui->error("$@");
+				}
+			} else {
+				my $output = $gui->{Main}->{Output};
+				$output->Append("eval $text\r\n");
+				my $res = eval $text;
+				$@ && $gui->error("$@\r\n");
+				if ($res) {$res =~ s/\n/\r\n/sg; $gui->info("$res\r\n")}
+			}
+			return 1;
+		});
+}
+
+sub ChatInput_KeyUp {
+	my ($time, $key) = @_;
+	return 1 unless $key == 0x0d;
+	my ($winid, $win) = get_active_chat_window();
+	return 1 unless defined $win;
+	my $input = $win->{ChatInput};
+	return $GUI->text_input_handler($input, $key,
+		sub {my ($gui, $text, $winid, $win) = @_;
+			my $oicq = $gui->{OICQ};
+			my $output = $win->{ChatOutput};
+			my $nick = $oicq->get_nickname($oicq->{Id});
+			$output->Append(substr(localtime, 11, 9) . "$nick\r\n$text\r\n");
+			if ($win->Text =~ /group/) {
+				$oicq->send_group_msg($winid, $text);
+			} else {
+				$oicq->send_msg($winid, $text);
+			}
+			return 1;
+		},
+		$winid, $win);
+}
+
+sub get_active_chat_window {
+	my $handle = Win32::GUI->GetActiveWindow();
+	my $chatwin = $GUI->{ChatWindow};
+	foreach my $winid (keys %$chatwin) {
+		if ($chatwin->{$winid}->{'-handle'} eq $handle) {
+			return ($winid, $chatwin->{$winid});
+		}
+	}
+	return;
+}
+
+sub Login_Terminate {
+	return -1;
+}
+
+sub Chat_Terminate {
+	ChatCancelButton_Click();
+	return 1;
+}

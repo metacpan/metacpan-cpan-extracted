@@ -1,0 +1,125 @@
+Revision history for Net-IMAP-Client
+
+0.95    Apr 9, 2011
+
+        - fix #48163 error after logout
+        - add examine() method (identical to select(); keyword differs)
+
+0.94    Dec 22, 2010
+
+        - fix #56647 rfc822 attachment mishandling
+        - fix #43046 Does not strip \r from error messages
+        - fix #59462, #43047 creation of non-modifiable array attempted
+        - fix #43049 append() method's documentation
+        - fix status(): avoid returning data from undef key
+
+0.93    
+        - add namespace() method
+        - modify get_summaries() to always return array ref
+
+0.92    Feb 28, 2009
+
+        - Doc updates
+
+0.91    Feb 27, 2009
+
+	Fixed get_summary to correctly identify the attachment filenames
+	with GMail's IMAP (GMail sends some headers in uppercase).
+
+0.10    * unreleased *
+
+	get_summaries now supports fetching additional headers.  They are
+	available (unparsed) via the $summary->headers method (where
+	$summary is a Net::IMAP::Client::MsgSummary object).
+
+	Minor cleanups and speed improvement.
+
+0.9     Jan 25, 2009
+
+        - more fixes for cyrus imap server: get_flags and get_summaries
+
+0.8     Jan 20, 2009
+
+        - updated dependencies (Encode isn't core in Perl 5.6)
+
+        - fixed status() on uw-imap (server can return "NO CLIENT BUG
+	  DETECTED ..." when called on the selected mailbox).  Thanks Max
+	  Maischein (corion.net).
+
+0.7     Jan 13, 2009
+
+        - fixed get_flags (thanks Peter Pilsl for the report)
+
+0.6     Nov 09, 2008
+
+        - better reconnect support (check that value of getline is undef
+	  and force reconnect if so)
+
+0.5     Oct 31, 2008
+
+        - added new methods: create_folder, delete_folder, copy, get_flags,
+	  get_threads, fetch
+
+        - fixed some bugs with append
+
+0.4     Sep 22, 2008
+
+        - added append / expunge
+
+        - added store, add_flags, del_flags, delete_message
+
+        - heavily modified _send_cmd() to support literals
+
+        - try to reconnect when connection is lost
+
+        Fixes:
+
+        - subtle bug related to using syswrite / sysread (now using only
+	  buffered I/O)
+
+        - return proper notifications from get_part_body and
+	  get_parts_bodies (sometimes the \Seen flag becomes set, this must
+	  be reported.)
+
+        - return references in get_parts_bodies
+
+        - _parse_tokens now interprets BODY[*] as an atom
+
+        - fixed BODYSTRUCTURE parser in MsgSummary.pm (sometimes the server
+	  would include additional extension data which we don't support
+	  and must be properly discarded)
+
+0.3     Sep 08, 2008
+
+        Fix for http://rt.cpan.org/Ticket/Display.html?id=39078 - return
+	undef from constructor when connection failed.
+
+0.2     Sep 02, 2008
+
+        There are some disruptive changes, I hope no one took this module
+	seriously yet. :-p
+
+        - some support for server notifications.  N/I/C will try to keep up
+	  with notifications involving \Deleted or \Seen
+	  flags (i.e. updating $imap->{FOLDERS}{$current_folder}) and it
+	  also can report an array of notifications after some commands.
+	  See the notifications() method.
+
+        - new methods: folders_more(), noop(), get_parts_bodies(),
+	  capability(), seq_to_uid()
+
+        - got rid of wantarray for most methods (the exception is
+	  folders())
+
+        - status() now returns a hashref instead of an array; needed since
+	  the IMAP STATUS command might actually fail for some folders.
+
+        - most methods in Net::IMAP::Client::MsgAddress and
+	  Net::IMAP::Client::MsgSummary will now decode the data
+          (previously it left it "MIME-Word"-encoded).
+
+        - fixed dependencies in Makefile.PL -- hopefully
+
+0.1     Aug 23, 2008
+
+        First public release.

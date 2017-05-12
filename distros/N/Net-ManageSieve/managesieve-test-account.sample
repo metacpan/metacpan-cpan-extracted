@@ -1,0 +1,9 @@
+host = localhost
+port = 2000
+#user = name
+#password = pwd
+# next setting allows explicit STARTTLS test
+#tls = require | yes/auto | no
+# use next setting to skip TLS test at all
+#tls = skip
+#debug = 1

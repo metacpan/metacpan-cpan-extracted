@@ -1,0 +1,49 @@
+Net/Arping version 0.02
+=======================
+
+The module contains function for testing remote host reachability                                                                                             
+by sending ARP packets. The program must be run as root or be setuid                                                                                                                  
+to root.
+
+For compiling the module you need:
+
+- libnet library (http://www.packetfactory.net/libnet/dist/libnet.tar.gz), 
+- pcap library (http://www.tcpdump.org/daily/libpcap-current.tar.gz).  
+
+I used this module on linux boxes (with ALT Linux Master, 
+KSI LInux Manticore), also I tested the module on FreeBSD 4.6 
+- everything works fine.
+
+It would be very great if somebody tried to use the module on 
+other OSes and reported me about the results and bugs.
+ 
+INSTALLATION
+
+If your pcap (or libnet) header files are installed somewhere 
+strange, create the Makefile using the INC and/or LIBS option.
+Something like this                                      
+                                                                                
+# perl Makefile.PL INC="-I/somewhere/far/pcap -I/somewhere/far/libnet"
+			 
+
+To compile the Arping.xs and to install this module type as usual:
+
+# make
+# make test
+# make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+- libnet (http://www.packetfactory.net/libnet/dist/libnet.tar.gz),
+- pcap (http://www.tcpdump.org/daily/libpcap-current.tar.gz).
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Oleg Prokopyev (e-mail: riiki@gu.net)
+All rights reserved.
+It's a free software. You can redistribute it and/or modify it under 
+the same terms as Perl itself.
+ 
+

@@ -1,0 +1,25 @@
+Net-IRC2 - Client interface to the Internet Relay Chat protocol
+===============================================================
+
+AUTOMAGIC INSTALLATION
+----------------------
+
+    This require CPANPLUS module
+
+    $ cpanp i Net-IRC2  (as root)
+
+
+MANUAL INSTALLATION
+-------------------
+
+    $ perl Build.PL
+    $ ./Build
+    $ ./Build test
+    $ ./Build install
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 Karl Y. Pradene
+
+This program is released under the following license: GNU General Public License, version 2.

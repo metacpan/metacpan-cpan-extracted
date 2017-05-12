@@ -1,0 +1,34 @@
+2.103622  2010-12-28 21:00:37 Europe/London
+
+        - Fix for converting between two as_ formats,
+            the delimiter discovery is a bit more relaxed
+
+2.103621  2010-12-28 14:36:42 Europe/London
+
+        - Add custom format support (rt.cpan #63017)
+
+1.103620  2010-12-28 12:55:41 Europe/London
+
+        - Port to Dist::Zilla
+
+1.6     2010-06-02 10:49 GMT
+        - Fix test for changes to Test::Simple (RT.cpan#57867)
+
+1.5     2008-11-08 17:42 GMT
+        - Move to Module::Install
+        - Add basic pod test
+
+1.4     2008-05-01 14:53 GMT+1
+        - Fix rt.cpan#34680
+          Unspecified delimiter to convert() when bit_group() is not 48
+
+1.3     2008-03-30 19:12 GMT+1
+        - Added Changes file.
+        - Added INSTALL file.
+        - POD fixes.
+        - Remove TAB chars in source and run through perltidy -pbp
+        - Merged bugfix patch from Kevin Brintnall (RT.cpan#34476)
+        (maintainer release: Oliver Gorwits)
+
+1.2     2007-09-08
+        - Checkpoint for Changes file; undocumented.

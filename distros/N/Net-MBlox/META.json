@@ -1,0 +1,86 @@
+{
+   "abstract" : "link to the MBlox api for sending SMS",
+   "author" : [
+      "Simon Elliott <simon@papercreatures.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-MBlox",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Request" : "0",
+            "HTTP::Request::Common" : "0",
+            "JSON::XS" : "0",
+            "LWP::Protocol::https" : "0",
+            "MIME::Base64" : "0",
+            "Moo" : "0",
+            "WWW::Mechanize::GZip" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Find" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "List::Util" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::MBlox" : {
+         "file" : "lib/Net/MBlox.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/purge/net-mblox/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Net-MBlox",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/purge/net-mblox.git",
+         "web" : "https://github.com/purge/net-mblox"
+      }
+   },
+   "version" : "0.004"
+}
+

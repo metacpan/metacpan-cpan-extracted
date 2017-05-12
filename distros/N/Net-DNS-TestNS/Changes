@@ -1,0 +1,52 @@
+Version 1.10 31 December 2008
+
+   Removed sensitivity to spaces in the IP attribute.
+   Minor bug fixes in tests.
+
+Version 1.09 8 June 2005
+
+   Fixed portability issue with Makefile.PL. 
+
+   Corrected a problem with the DTD for "Version 0" (needed for
+   backward portability). 
+
+Version 1.08 public release, 3 June 2005
+
+Version 1.07 
+
+  Rewrite and extention addition of many features.
+
+  The DTD for the configuration file has changed. Although this 
+  module still reads the old configuration XML you are adviced to 
+  change the XML by running 
+    xsltproc transform-conf.xsl oldconf.xml > newconf.xml
+
+  perldoc Net::DNS::TestNS::DTD contains the commentend type
+  definition.
+
+  (for xsltproc see the libxslt home page: http://xmlsoft.org/XSLT/ )
+
+
+
+Version 1.04 26 Feb 2004:
+  
+ Added the delay attribute to the <qtype> element.
+
+  Note that you have to make sure that element is defined in the DTD
+  if you want to use it.
+
+
+Version 1.05 27 Feb 2004:
+
+  Added <!-- include="filepath"--> feature.
+
+
+Version 1.06 27 Feb 2004:
+
+  Added runtime verbose setting
+  Fixed MANIFEST
+  Return 0 on failure and sets $NCC::DNS::TestNS::errorcondition 
+
+
+-------
+$Id: Changes 771 2008-12-30 16:47:31Z olaf $

@@ -1,0 +1,35 @@
+Net-MirrorDir version 0.20
+==========================
+
+ This module is written as base class for Net::UploadMirror and Net::DownloadMirror.
+ However, it can be used, also for themselves alone.
+ It can compare local-directories and remote-directories with each other.
+ To find which files where in which directory available.
+ The FTP-server should return the following format as response of the LIST command:
+ 	-r--r--r--   1 ftpuser  ftpusers       576 Feb 23 09:23 file.txt
+	drwxrwxr-x   2 ftpuser  ftpusers       512 Feb 21 13:54 Dir1
+ Directory- or filenames should not contain any white space.
+ 
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Net::FTP
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 - 2009 by Torsten Knorr
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.9.2 or,
+at your option, any later version of Perl 5 you may have available.
+

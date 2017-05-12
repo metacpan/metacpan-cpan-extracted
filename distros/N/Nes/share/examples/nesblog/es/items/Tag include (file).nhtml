@@ -1,0 +1,100 @@
+<h2><a href="#">&#123;: include (file) :&#125;</a></h2>
+<h3>Descripción</h3>
+<p>  
+El bloque se sustituye por el archivo "<i>file</i>", <i>file</i> puede ser un 
+ <i>nhtml</i>, <i>nsql</i>, <i>html</i>, <i>php</i>, <i>sh</i>, <i>text</i>, <i>perl</i>, etc. 
+</p>
+<p>
+Si <i>file</i> es un archivo Nes (<i>nhtml</i>) éste ejecutara su script Perl. 
+ En proximas versiones con include se podrá incluir todo tipo de archivos,
+ tanto ejecutables como html o texto plano. 
+<br>
+</p>
+</p>
+<h3>Envio de parámetros</h3> 
+<p> 
+Se pueden enviar parámetros al archivo incluido:
+<pre>
+&#123;: include ('thefile.nhtml','parámetro1', ... ) :&#125;
+
+</pre>
+Estos se recibirán en el archivo <i>nhtml</i> en variables de entorno como:
+<pre>
+    
+q_nombre-archivo-sin-extensión_param_número-de-orden-parámetro
+    
+&#123;: * q_thefile_param_1 :&#125; 
+
+</pre>
+Y en el script Perl con similar notación, excluyendo '<i>q_</i>', en el objeto <i>query</i>:
+<pre>
+    
+use Nes;
+my $nes = Nes::Singleton->new('thefile.nhtml');
+
+my $q = $nes->{'query'}->{'q'};
+my $param = $q->{'thefile_param_1'};
+
+</pre>
+</p>
+
+<h3>Inclusión y anidamiento</h3> 
+<p> 
+Los parámetros permiten la inclusión:
+<pre>
+&#123;: include ( '&#123;: $ file :&#125;' ) :&#125; <- Ok
+
+</pre>
+No se permite el anidamiento ni la inclusión de bloques:
+<pre> 
+&#123;: include ('file.html' ) &#123;: include ('file.html' ) :&#125; :&#125; <- ERROR
+
+</pre>
+</p>
+
+<h3>Ejemplo</h3>
+<p>
+<strong>file.nhtml:</strong>
+<pre>
+&#123;: NES 1.0 ('file.pl') :&#125;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Nes sample/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &#123;: include ('hello.html') :&#125;
+  &lt;/body&gt;
+&lt;/html&gt;
+
+</pre>
+
+<strong>hello.html:</strong>
+<pre>
+    
+&lt;b&gt;Hello!&lt;/b&gt;
+
+</pre>
+
+<strong>file.pl:</strong>
+<pre>   
+use Nes;
+
+my = Nes::Singleton:Singleton->new('file.nhtml');
+
+$nes->out();
+
+</pre>
+
+<strong>Salida:</strong>
+<br>
+<pre>
+    
+<b>Hello!</b>
+
+</pre>
+</p>
+Más ejemplos de: <a href="./?item=Incluir PHP y otros">include</a>
+<br>
+<br>
+
+<br>

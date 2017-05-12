@@ -1,0 +1,16 @@
+Changes
+LESMEG
+MANIFEST
+Makefile.PL
+No/Dato.pm
+No/KontoNr.pm
+No/PersonNr.pm
+No/Sort.pm
+README
+eg/ppplog
+persnr.note
+t/dato.t
+t/kontonr.t
+t/personnr.t
+t/sort.t
+

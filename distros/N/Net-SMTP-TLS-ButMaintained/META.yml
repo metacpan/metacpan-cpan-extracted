@@ -1,0 +1,30 @@
+---
+abstract: 'An SMTP client supporting TLS and AUTH (DEPRECATED, use Net::SMTPS instead)'
+author:
+  - 'Alexander Christian Westholm <awestholm at verizon dawt net>'
+  - 'Fayland Lam <fayland@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300033, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-SMTP-TLS-ButMaintained
+requires:
+  Digest::HMAC_MD5: 0
+  IO::Socket::INET: 0
+  IO::Socket::SSL: 1.76
+  MIME::Base64: 0
+  Net::Cmd: 0
+  Net::SSLeay: 0
+resources:
+  repository: git://github.com/fayland/Net-SMTP-TLS.git
+version: 0.24
+x_contributors:
+  - 'Alexander Christian Westholm <awestholm@verizon.net>'
+  - 'Matt Simerson <matt@tnpi.net>'
+  - 'Nick S. Knutov <nick@knutov.com>'
+  - 'fayland <fayland@gmail.com>'

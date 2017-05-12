@@ -1,0 +1,34 @@
+
+;
+; $Id: test.db 454 2005-07-06 13:38:31Z olaf $ 
+; Test.db to test parser functionality.
+
+
+
+$TTL 1500
+
+foo.test.		3600	IN	SOA	ns1.foo.test. root.localhost. 2002021201 450 600 345600 300
+
+
+		3600	IN	NS	ns1.foo.test.
+		3600	IN	NS	ns2.foo.test.
+				NS      belowdelegation.Something.VEry.Cased  
+
+		3600	IN	MX	100 bert.test.
+foo.test.		3600	IN	TXT	"Test domain"
+a.b.c.d			TXT  "Full MATCH"
+z.x.c.d			TXT  ( "Multiple line f.nny"
+	                        "<xml> typed </xml"
+				"text resource record"
+				)
+
+                        SIG     AAAA  1  3  172800  20011028163938 (
+                                20010928163938 39250  bla
+                                AeYY2IgScHDWq6zRfyzCdimqA3de9Sb/Ivw7PoMcvJr7f
+                                7gtqF9IWpTdH7KNd1tPAHbiIAfjmsXIgOOAL0TChQ== )
+                        NXT     www  NXT SIG AAAA A
+                        RRSIG     AAAA  1  3  172800  20011028163938 (
+                                20010928163938 39250  bla
+                                AeYY2IgScHDWq6zRfyzCdimqA3de9Sb/Ivw7PoMcvJr7f
+                                7gtqF9IWpTdH7KNd1tPAHbiIAfjmsXIgOOAL0TChQ== )
+                        NSEC     www.  NXT SIG AAAA A

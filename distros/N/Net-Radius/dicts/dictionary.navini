@@ -1,0 +1,15 @@
+#
+# dictionary.navini
+#
+#               By
+#               "Paul Shields" <pshields@navini.com>
+#
+# Version:      $Id: dictionary.navini 45 2006-11-14 17:45:00Z lem $
+#
+
+VENDOR          Navini          6504
+
+#
+#       Standard attribute
+#
+ATTRIBUTE       Navini-AVPair           1       string          Navini

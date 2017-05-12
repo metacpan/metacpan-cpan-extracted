@@ -1,0 +1,70 @@
+NAME
+    Number::Rangify - Optimize a list of values into ranges
+
+VERSION
+    version 1.100860
+
+SYNOPSIS
+        use Number::Rangify 'rangify';
+
+        my @list = (1, 2, 3, 5, 7, 9, 10, 11, 15);
+        my @ranges = rangify(@list);
+        for my $range (@ranges) {
+            printf "%s-%s\n", $range->Size;
+        }
+
+DESCRIPTION
+    This module provides a function that can optimize a list of values into
+    range objects.
+
+FUNCTIONS
+  rangify
+    Takes a list of values and makes them into ranges.
+
+    For example:
+
+        rangify(1, 2, 3, 5, 7, 9, 10, 11, 15);
+
+    returns the following ranges:
+
+        1-3
+        5-5
+        7-7
+        9-11
+        15-15
+
+    It returns a list (in list context) or an array reference (in scalar
+    context) of Set::IntRange objects.
+
+    Duplicate values in the input list are ignored.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Number-Rangify>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Number-Rangify/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Number-Rangify/>. Instead of sending
+    patches, please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2007 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

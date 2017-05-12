@@ -1,0 +1,77 @@
+=head1 NAME
+
+Nginx::FastCGI::Cache - Conveniently manage the nginx fastcgi cache
+
+=head1 VERSION
+
+version 0.010
+
+=head1 SYNOPSIS
+
+    use Nginx::FastCGI::Cache;
+
+    # location is mandatory, rest are optional, these are the default values
+    my $nginx_cache
+        = Nginx::FastCGI::Cache->new({
+            fastcgi_cache_key => [qw/scheme request_method host request_uri/],
+            location          => '/var/nginx/cache',
+            levels            => [ 1, 2 ],
+    });
+
+    # delete all cached files
+    $nginx->purge_cache;
+
+    # delete the cached file for this url only
+    $nginx->purge_file('http://perltricks.com/');
+
+=head1 METHODS
+
+=head2 new
+
+Returns a new Nginx::FastCGI::Cache object. Location is the only mandatory
+argument, and the directory must exist and be executable (aka readable) by the
+Perl process in order to be valid. The other two arguments accepted are levels
+and fastcgi_cache_key. These default to the standard nginx settings (see the
+L<nginx fastcgi
+documentation|http://nginx.org/en/docs/http/ngx_http_fastcgi_module.html>).
+
+=head2 purge_file
+
+Deletes the nginx cached file for a particular URL - requires a URL as an
+argument, and optionally, the HTTP request method:
+
+    $nginx_cache->purge_file('http://perltricks.com/'); #assumes GET
+    $nginx_cache->purge_file('http://perltricks.com/', 'POST');
+    $nginx_cache->purge_file('http://perltricks.com/', 'HEAD');
+
+=head2 purge_cache
+
+Deletes all nginx cached files in the nginx cache directory.
+
+=head1 BUGS / LIMITATIONS
+
+=over 4
+
+=item *
+
+The fastcgi_cache_key only acccepts: scheme, request_method, host, and
+request_uri as keys. This shouldn't be an issue as it's the recommended
+convention, but let me know if further variables would be useful.
+
+=back
+
+=head1 REPOSITORY
+
+L<https://github.com/sillymoose/nginx-fast-cgi>
+
+=head1 AUTHOR
+
+David Farrell <sillymoos@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by David Farrell.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:               Net-SMTP-Receive
+version:            0.301
+abstract:           Receive mail via SMTP
+author:
+    - David Muir Sharnoff <cpan@dave.sharnoff.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    File::Flock:  101.051801
+    File::Slurp:  96.042202
+    File::Sync:   0.09
+    Net::Ident:   1.2
+    Storable:     0.611
+    Time::CTime:  99.062201
+resources:
+    repository:  http://github.com/muir/Net-SMTP-Receive
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

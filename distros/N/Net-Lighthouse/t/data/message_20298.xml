@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<message>
+  <all-attachments-count type="integer">1</all-attachments-count>
+  <attachments-count type="integer">0</attachments-count>
+  <body>ha-ha ha-ha</body>
+  <body-html>&lt;div&gt;&lt;p&gt;ha-ha ha-ha&lt;/p&gt;&lt;/div&gt;</body-html>
+  <comments-count type="integer">3</comments-count>
+  <created-at type="datetime">2009-08-27T07:29:05Z</created-at>
+  <id type="integer">20298</id>
+  <parent-id type="integer" nil="true"/>
+  <permalink>1st-message</permalink>
+  <project-id type="integer">35918</project-id>
+  <title>1st message lala</title>
+  <updated-at type="datetime">2009-08-27T07:44:33Z</updated-at>
+  <user-id type="integer">67166</user-id>
+  <user-name>sunnavy (at gmail)</user-name>
+  <url>http://sunnavy.lighthouseapp.com/projects/35918/messages/20298</url>
+  <comments type="array">
+    <comment type="Message">
+      <all-attachments-count type="integer">1</all-attachments-count>
+      <attachments-count type="integer">0</attachments-count>
+      <body>nelson-nelson</body>
+      <body-html>&lt;div&gt;&lt;p&gt;nelson-nelson&lt;/p&gt;&lt;/div&gt;</body-html>
+      <comments-count type="integer">0</comments-count>
+      <created-at type="datetime">2009-08-27T07:36:11Z</created-at>
+      <id type="integer">20299</id>
+      <parent-id type="integer">20298</parent-id>
+      <permalink>1st-message</permalink>
+      <project-id type="integer">35918</project-id>
+      <title>1st message lala</title>
+      <updated-at type="datetime">2009-08-27T07:36:11Z</updated-at>
+      <user-id type="integer">67166</user-id>
+      <user-name>sunnavy (at gmail)</user-name>
+      <url>http://sunnavy.lighthouseapp.com/projects/35918/messages/20298</url>
+    </comment>
+    <comment type="Message">
+      <all-attachments-count type="integer">1</all-attachments-count>
+      <attachments-count type="integer">0</attachments-count>
+      <body>nelson-2</body>
+      <body-html>&lt;div&gt;&lt;p&gt;nelson-2&lt;/p&gt;&lt;/div&gt;</body-html>
+      <comments-count type="integer">0</comments-count>
+      <created-at type="datetime">2009-08-27T07:38:51Z</created-at>
+      <id type="integer">20300</id>
+      <parent-id type="integer">20298</parent-id>
+      <permalink>1st-message</permalink>
+      <project-id type="integer">35918</project-id>
+      <title>1st message lala</title>
+      <updated-at type="datetime">2009-08-27T07:38:51Z</updated-at>
+      <user-id type="integer">67166</user-id>
+      <user-name>sunnavy (at gmail)</user-name>
+      <url>http://sunnavy.lighthouseapp.com/projects/35918/messages/20298</url>
+    </comment>
+    <comment type="Message">
+      <all-attachments-count type="integer">1</all-attachments-count>
+      <attachments-count type="integer">1</attachments-count>
+      <body>test att</body>
+      <body-html>&lt;div&gt;&lt;p&gt;test att&lt;/p&gt;&lt;/div&gt;</body-html>
+      <comments-count type="integer">0</comments-count>
+      <created-at type="datetime">2009-08-27T07:42:31Z</created-at>
+      <id type="integer">20301</id>
+      <parent-id type="integer">20298</parent-id>
+      <permalink>1st-message</permalink>
+      <project-id type="integer">35918</project-id>
+      <title>1st message lala</title>
+      <updated-at type="datetime">2009-08-27T07:42:31Z</updated-at>
+      <user-id type="integer">67166</user-id>
+      <user-name>sunnavy (at gmail)</user-name>
+      <url>http://sunnavy.lighthouseapp.com/projects/35918/messages/20298</url>
+    </comment>
+  </comments>
+</message>

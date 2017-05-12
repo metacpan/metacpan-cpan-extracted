@@ -1,0 +1,15 @@
+Revision history for Net-Vimeo
+
+0.000004    Sun Feb 08 15:40 2016
+            Improved POD from isync<o.zucker@web.de>
+
+0.000003    Mon Jun 23 16:30 2014
+            Added missing module from prereq
+            Changed logical definded-OR operator with the logical OR operator
+
+0.000002    Thu Jun 20 18:30 2014
+            Added files to MANIFEST
+
+0.000001    Thu Jun 19 12:10 2014
+            First version of Vimeo Advanced API Perl interface
+

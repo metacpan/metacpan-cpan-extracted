@@ -1,0 +1,39 @@
+# -*-n3-*-
+
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix doap:    <http://usefulinc.com/ns/doap#> .
+@prefix asc:     <http://aaronland.info/ns/changefile/> .
+                                     
+<>
+        dc:identifier           "$Id: Changes,v 1.5 2008/07/24 06:05:16 asc Exp $" ;
+        dc:description          "Changes for Net::ModestMaps.pm" ;
+        dcterms:references      <http://aaronland.info/perl/net/modestmaps/> .
+
+<http://aaronland.info/perl/net/flickr/modestmaps/Net-ModestMaps-1.1.tar.gz>
+        dcterms:replaces <http://aaronland.info/perl/net/flickr/modestmaps/Net-ModestMaps-1.0.tar.gz> ;
+        dcterms:isVersionOf <http://aaronland.info/perl/net/modestmaps/> ;
+
+        doap:Version    [
+                        doap:revision     "1.1" ;
+                        doap:created      "2008-07-24" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Ensure that there is an array (reference) of markers when doing the max headers dance" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/modestmaps/Net-ModestMaps-1.0.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/modestmaps/> ;
+
+        doap:Version    [
+                        doap:revision     "1.0" ;
+                        doap:created      "2008-07-05" ;
+                        ];
+        asc:changes     [
+                        asc:comment       "Initial release." ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/modestmaps/>
+        a doap:Project ;
+        doap:download-page      "http://search.cpan.org/dist/Net-ModestMaps/" ;
+        doap:download-mirror    "http://aaronland.info/perl/net/modestmaps/" .

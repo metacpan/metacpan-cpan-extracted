@@ -1,0 +1,41 @@
+Net-FTPTLS version 0.84
+=========================
+
+Usage:
+ my $tlsftp=Net::FTPTLS->new();
+ $tlsftp->open("ftp.tls.pl","21");
+ $tlsftp->user("user");
+ $tlsftp->pass("password");
+ $tlsftp->cwd("pub");
+ my $files=$tlsftp->nlist("*.exe");
+ foreach $f (@$files) {
+	 $tlsftp->get($f);
+ };
+
+
+
+It seems that Net::FTPSSL is a much more comprehensive solution.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Net::SSLeay::Handle
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Dariush Pietrzak
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+

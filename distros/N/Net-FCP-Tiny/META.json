@@ -1,0 +1,60 @@
+{
+   "abstract" : "A Tiny and incomplete interface to the Freenet Client Protocol (FCPv2)",
+   "author" : [
+      "\u00c3\u0086var Arnfj\u00c3\u00b6r\u00c3\u00b0 Bjarmason <avar@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.101612, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-FCP-Tiny",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : 0,
+            "IO::Socket::INET" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Net-FCP-Tiny@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Net-FCP-Tiny"
+      },
+      "homepage" : "http://search.cpan.org/dist/Net-FCP-Tiny/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/avar/net-fcp-tiny.git",
+         "web" : "http://github.com/avar/net-fcp-tiny"
+      }
+   },
+   "version" : "0.03",
+   "x_authority" : "cpan:AVAR"
+}
+

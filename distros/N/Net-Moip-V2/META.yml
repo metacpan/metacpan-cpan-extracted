@@ -1,0 +1,46 @@
+---
+abstract: 'Perl SDK for the Moip (Money over IP) v2 API.'
+author:
+  - 'Carlos Fernando Avila Gratz <cafe@kreato.com.br>'
+build_requires:
+  Test2::Bundle::Extended: '0'
+  Test::Mock::Furl: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Moip-V2
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::Moip::V2:
+    file: lib/Net/Moip/V2.pm
+    version: '0.06'
+  Net::Moip::V2::Endpoint:
+    file: lib/Net/Moip/V2/Endpoint.pm
+requires:
+  Furl: '0'
+  IO::Socket::SSL: '0'
+  JSON::MaybeXS: '0'
+  MIME::Base64: '0'
+  Moo: '0'
+  URI: '0'
+resources:
+  bugtracker: https://github.com/cafe01/Net-Moip-V2/issues
+  homepage: https://github.com/cafe01/Net-Moip-V2
+  repository: git://github.com/cafe01/Net-Moip-V2.git
+version: '0.06'
+x_authority: cpan:CAFEGRATZ
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

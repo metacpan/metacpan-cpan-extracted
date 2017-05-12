@@ -1,0 +1,15 @@
+Cache.pm
+Changes
+MANIFEST
+Makefile.PL
+README
+t/netscape-cache.t
+examples/README
+examples/blank-page
+examples/cache-control.html
+examples/cache.html
+examples/nscache
+examples/grepcache.pl
+examples/delcache.pl
+examples/nsindex.pl
+examples/mkhier.pl

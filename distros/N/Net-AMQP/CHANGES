@@ -1,0 +1,35 @@
+0.06  Wed May  1 19:37:50 PDT 2013
+    - Require Perl 5.006 to get pack 'q' for quads.  C'mon, it's been over a decade now.
+    - Support packing and unpacking of full range of signed and unsigned integer values,
+        though broker differences may make their use problematic.
+    - Fix signedness of integer packing and unpacking (signed were treated as unsigned).
+    - Introduce Net::AMQP::Value::* classes to control packing of table values.
+    - In tables, pack and unpack undefs as void and values from the "boolean" class as bools.
+    - Support decoding the Heartbeat frame type.
+    - Include AMQP 0-9-1 spec.
+    - Document that AMQP 0-9, 0-9-1, and 0-10 specs can be used, though support is not complete.
+    - New co-maintainer Chip Salzenberg.
+
+0.05  Sun Sep 16 12:08:14 EDT 2012
+    - Pack/unpack 't' field type from Brad Barden
+    - Support AMQP 0-9 from Chip Salzenberg [https://github.com/chipdude]
+
+0.04  Mon, 21 May 2012 12:20:13 -0400
+    - More performance optimizations from José Micó [https://github.com/ewaters/net-amqp/pull/4]
+    - Pack unit values as unit in tables and arrays from Dan Conlon [https://github.com/ewaters/net-amqp/pull/5]
+
+0.03  Mon, 09 Apr 2012 12:36:02 -0400
+    - Performance optimizations for frame deserialization [https://github.com/ewaters/net-amqp/pull/3]
+
+0.02  Fri, 11 Nov 2011 07:16:09 -0700
+    - note File::Temp version requirement [https://github.com/joodie]
+    - additional field 'content' from spec [https://github.com/teftin]
+    - Ignore partial frames until they're complete; inspired by Steve Fink [https://github.com/chipdude]
+    - Support field type "A" - field array [https://github.com/chipdude]
+
+0.01.1  Wed, 05 Aug 2009 09:33:09 -0600
+    - Fixed typo in t/02_ruby_protocol_doc.t for detecting skip
+    - Added version requirement for Test::More to support done_testing()
+
+0.01  Wed, 15 Jul 2009 14:33:48 -0600
+    - First working version released to CPAN

@@ -1,0 +1,271 @@
+#!/usr/local/bin/perl
+
+# Copyright (C) 2007 by Mark Atwood <mark@fallenpegasus.com>.
+# 
+# This module is not an official Amazon product or service.  Information
+# used to create this module was obtained only from publicly available
+# information, mainly from the published Amazon documentation.
+#
+# This module is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published
+# by the Free Software Foundation, either version 2.1 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# and the GNU Lesser General Public License along with this program.
+# If not, see <http://www.gnu.org/licenses/>.
+
+use warnings;
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use Net::Amazon::S3;
+use Net::Amazon::S3::Bucket;
+use Getopt::ArgvFile qw/argvFile/;
+use File::HomeDir;
+
+use vars qw/$OWNER_ID $OWNER_DISPLAYNAME/;
+
+my $aws_access_key_id = $ENV{AWS_ACCESS_KEY_ID};
+my $aws_secret_access_key = $ENV{AWS_ACCESS_KEY_SECRET};
+my $opt_verbose =0;
+my $opt_help =0;
+my $opt_man =0;
+my $opt_acl_short = undef;
+my $opt_secure =0;
+
+# get the options from users ~/.s3-tools file, if it exists
+my $users_config = File::HomeDir->my_home() . '/.s3-tools';
+if (-e $users_config) {
+    unshift @ARGV, '@' . $users_config;
+}
+argvFile();
+
+GetOptions('help|?' => \$opt_help, 'man' => \$opt_man,
+	   'verbose+' => \$opt_verbose,
+	   'access-key=s' => \$aws_access_key_id,
+	   'secret-key=s' => \$aws_secret_access_key,
+	   'acl-short=s' => \$opt_acl_short,
+	   'secure' => \$opt_secure
+	   )
+    or pod2usage(2);
+pod2usage(1) if $opt_help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $opt_man;
+ 
+my $s3p = { aws_access_key_id => $aws_access_key_id,
+	    aws_secret_access_key => $aws_secret_access_key };
+$s3p->{secure} = $opt_secure
+    if ($opt_secure);
+my $s3 = Net::Amazon::S3->new($s3p);
+($s3) or die("$0: fail Net::Amazon::S3: $!, stopped");
+
+my %bkt;
+foreach my $bktn (@ARGV) {
+    my $p = { bucket => $bktn };
+    $p->{acl_short} = $opt_acl_short
+	if ($opt_acl_short);
+
+    eval { $bkt{$bktn} = $s3->add_bucket($p); };
+
+    if ($bkt{$bktn}) {
+	print STDERR "$0: created bucket \"$bktn\"\n"
+	    if $opt_verbose;
+    } else {
+	print STDERR "$0: cannot create bucket \"$bktn\": "
+	    . $s3->err . ": " . $s3->errstr . "\n";
+    }
+}
+
+__END__
+
+=head1 NAME
+
+s3mkbucket - Create Amazon AWS S3 buckets
+
+=head1 SYNOPSIS
+
+s3mkbucket [options] [bucket ...]
+
+ Options:
+   --access-key    AWS Access Key ID
+   --secret-key    AWS Secret Access Key
+   --acl-short     private|public-read|public-read-write|authenticated-read
+ Environment:
+   AWS_ACCESS_KEY_ID
+   AWS_ACCESS_KEY_SECRET
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=item B<--verbose>
+
+Print a message for each created bucket.
+
+=item B<--access-key> and B<--secret-key>
+
+Specify the "AWS Access Key Identifiers" for the AWS account.
+B<--access-key> is the "Access Key ID", and B<--secret-key> is
+the "Secret Access Key".  These are effectively the "username" and
+"password" to the AWS account, and should be kept confidential.
+
+The access keys MUST be specified, either via these command line
+parameters, or via the B<AWS_ACCESS_KEY_ID> and
+B<AWS_ACCESS_KEY_SECRET> environment variables.
+
+Specifying them on the command line overrides the environment
+variables.
+
+=item B<--secure>
+
+Uses SSL/TLS HTTPS to communicate with the AWS service, instead of
+HTTP.
+
+=item B<--acl-short>
+
+Apply a "canned ACL" to the bucket when it is created.  To set a more
+complex ACL, use the C<s3acl> tool after the bucket is created.
+
+The following canned ACLs are currently defined by S3:
+
+=over 8
+
+=item B<private>
+
+Owner gets C<FULL_CONTROL>. No one else has any access rights. This is
+the default.
+
+=item B<public-read>
+
+Owner gets C<FULL_CONTROL>.
+The anonymous principal is granted C<READ> access.
+
+=item B<public-read-write>
+
+Owner gets C<FULL_CONTROL>.
+The anonymous principal is granted C<READ> and C<WRITE> access.
+This is a useful policy to apply to a bucket, if you intend for any
+anonymous user to PUT objects into the bucket.
+
+=item B<authenticated-read>
+
+Owner gets C<FULL_CONTROL> .
+Any principal authenticated as a registered Amazon S3 user is granted
+C<READ> access.
+
+=back
+
+=item B<bucket>
+
+One or more bucket names.  As many as possible will be created.
+
+A user may have no more than 100 buckets.
+
+Bucket names must be between 3 and 255 characters long, and can only
+contain alphanumeric characters, underscore, period, and dash.  Bucket
+names are case sensitive.  Buckets with names containing uppercase
+characters or underscores are not accessible using the virtual hosting
+method.
+
+Buckets are unique in a global namespace.  That means if someone has
+created a bucket with a given name, someone else cannot create another
+bucket with the same name.
+
+If a bucket name begins with one or more dashes, it might be mistaken
+for a command line option.  If this is the case, separate the command
+line options from the bucket names with two dashes, like so:
+
+  s3mkbucket --verbose -- --bucketname
+
+
+=back
+
+=head1 ENVIRONMENT VARIABLES
+
+=over 8
+
+=item B<AWS_ACCESS_KEY_ID> and B<AWS_ACCESS_KEY_SECRET>
+
+Specify the "AWS Access Key Identifiers" for the AWS account.
+B<AWS_ACCESS_KEY_ID> contains the "Access Key ID", and
+B<AWS_ACCESS_KEY_SECRET> contains the "Secret Access Key".  These are
+effectively the "username" and "password" to the AWS service, and
+should be kept confidential.
+
+The access keys MUST be specified, either via these environment
+variables, or via the B<--access-key> and B<--secret-key> command line
+parameters.
+
+If the command line parameters are set, they override these
+environment variables.
+
+=back
+
+=head1 CONFIGURATION FILE
+
+The configuration options will be read from the file C<~/.s3-tools> if it
+exists.  The format is the same as the command line options with one option
+per line.  For example, the file could contain:
+
+    --access-key <AWS access key>
+    --secret-key <AWS secret key>
+    --secure
+
+This example configuration file would specify the AWS access keys and that a
+secure connection using HTTPS should be used for all communications.
+
+=head1 DESCRIPTION
+
+Create buckets in the Amazon Simple Storage Service (S3).
+
+=head1 BUGS
+
+Report bugs to Mark Atwood L<mark@fallenpegasus.com>.
+
+Making a bucket that already exists and is owned by the user
+does not fail.  It is unclear whether this is a bug or not.
+
+Occasionally the S3 service will randomly fail for no externally
+apparent reason.  When that happens, this tool should retry, with a
+delay and a backoff.
+
+Access to the S3 service can be authenticated with a X.509
+certificate, instead of via the "AWS Access Key Identifiers".  This
+tool should support that.
+
+It might be useful to be able to specify the "AWS Access Key
+Identifiers" in the user's C<~/.netrc> file.  This tool should support
+that.
+
+Errors and warnings are very "Perl-ish", and can be confusing.
+
+=head1 AUTHOR
+
+Written by Mark Atwood L<mark@fallenpegasus.com>.
+
+Many thanks to Wotan LLC L<http://wotanllc.com>, for supporting the
+development of these S3 tools.
+
+Many thanks to the Amazon AWS engineers for developing S3.
+
+=head1 SEE ALSO
+
+These tools use the L<Net::Amazon:S3> Perl module.
+
+The Amazon Simple Storage Service (S3) is documented at
+L<http://aws.amazon.com/s3>.
+
+=cut

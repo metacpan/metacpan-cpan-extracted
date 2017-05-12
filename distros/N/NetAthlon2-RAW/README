@@ -1,0 +1,164 @@
+NAME
+    NetAthlon2::RAW - Perl extension to parse NetAthlon2 RAW performance
+    data files.
+
+SYNOPSIS
+     use NetAthlon2::RAW;
+
+     my $t = NetAthlon2::RAW->new ();
+     my $d = $t->parse('Bike2009-07-02 5-54pm.RAW');
+
+DESCRIPTION
+    A perl module to parse the NetAthlon RAW file format. parse() will
+    return a hash reference to the resultant data structure.
+
+METHODS
+    new()
+        Creates a new NetAthlon2::RAW object. new() accepts the following
+        options at this time.
+
+        debug
+            Enable debugging statements.
+
+    parse($file)
+        Returns a hash reference with the contents of $file. Keys included
+        are:
+
+        Average Cadence
+            Calculation of the averages of the non-zero Cadence values from
+            the Check Points array.
+
+        Average Heart Rate
+            Calculation of the averages of the non-zero Heart Rate values
+            from the Check Points array.
+
+        Average Speed
+            Calculation of the averages of the non-zero Speed values from
+            the Check Points array. Used to be just the division of the
+            Distance by the Elapsed Time, but the Elapsed Time is the time
+            of the race, where as the Distance is the whole distance,
+            including any warmup time. This lead to incorrect Average Speed
+            calculations in version 0.01.
+
+        Average Watts
+            Calculation of the averages of the non-zero Watts values from
+            the Check Points array.
+
+        Cadence
+            The overall Cadence of the training session, in miles.
+
+        Check Points
+            This is an array of each sample taken during the training
+            session. Each array element is an anonymous hash with the
+            following keys:
+
+            Altitude
+                The instantaneous Altitude at the Elapsed Time.
+
+            Cadence
+                The instantaneous Cadence at the Elapsed Time.
+
+            Elapsed Time
+                A calculation of when the sample was taken, based on the
+                number of samples collected multiplied by the Sample Rate.
+                Number is in seconds.
+
+            Grade
+                The instantaneous Grade at the Elapsed Time.
+
+            Heart Rate
+                The instantaneous Heart Rate at the Elapsed Time.
+
+            Speed
+                The instantaneous Speed at the Elapsed Time. Number is in
+                miles per hour.
+
+            Watts
+                The instantaneous Watts at the Elapsed Time.
+
+        Distance
+            The overall Distance of the training session, in miles.
+
+        Elapsed Time
+            The time of the training session, in seconds.
+
+        Heart Rate
+            Values taken from the training session.
+
+            Aerobic Threshold
+                The aerobic threshold based on the users Max Heart Rate.
+
+            Anaerobic Threshold
+                The anaerobic threshold based on the users Max Heart Rate.
+
+            Zone 1
+                The highest training zone.
+
+                Max The max heart rate for zone 1.
+
+                Min The min heart rate for zone 1.
+
+            Zone 2
+                The second training zone.
+
+                Max The max heart rate for zone 2.
+
+                Min The min heart rate for zone 2.
+
+            Zone 3
+                The bottom training zone.
+
+                Max The max heart rate for zone 3.
+
+                Min The min heart rate for zone 3.
+
+        Max Heart Rate
+            The Max Heart Rate throught the Check Points array.
+
+        Max Cadence
+            The Max Cadence throught the Check Points array.
+
+        Max Heart Rate
+            The Max Heart Rate throught the Check Points array.
+
+        Max Speed
+            The Max Speed throught the Check Points array.
+
+        Max Watts
+            The Max Watts throught the Check Points array.
+
+        Sample Rate
+            Number of seconds between each Check Point sample.
+
+        Start Time
+            The start time of the training session, in a UNIX time_t format.
+
+VARIABLES
+    $timeDelta
+        Number of minutes the time listed in the file name and the time
+        listed inside the file can vary before throwing an error. The
+        default is 1 minute.
+
+SEE ALSO
+    http://www.whitepeak.org/Raw.aspx
+
+NOTES
+    I believe that the field that Martin lists on his web site
+    (www.whitepeak.org) as the Grade of the course is not. In all my testing
+    the Grade was 0, whereas the field he listed as Unknown had positive and
+    negative values, and looks to me to be Grade * 10, so I have implemented
+    the code to show this deviation from Martin's documentation.
+
+    Based on some empirical data, I believe the Unknown value listed after
+    the Distance, is really Cadence for the entire time. I have added the
+    Cadence field in addition to Average Cadence.
+
+AUTHOR
+    Jim Pirzyk, <jim+perl@pirzyk.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2009 pirzyk.org All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

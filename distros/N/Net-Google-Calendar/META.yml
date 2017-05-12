@@ -1,0 +1,47 @@
+---
+abstract: 'Interface to Google calendars'
+author:
+  - 'Peter Lytle <pete@bluecampaigns.com>'
+build_requires:
+  Test::More: 0
+  lib: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Google-Calendar
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Data::ICal: 0
+  Data::ICal::Entry::Event: 0
+  Date::ICal: 0
+  DateTime: 0
+  DateTime::Event::Recurrence: 0
+  DateTime::Format::ICal: 0
+  Encode: 0
+  HTTP::Cookies: 0
+  HTTP::Headers: 0
+  HTTP::Request: 0
+  HTTP::Request::Common: 0
+  LWP::Simple: 0
+  LWP::UserAgent: 0
+  Net::Google::AuthSub: 0
+  URI: 0
+  URI::Escape: 0
+  XML::Atom: 0
+  XML::Atom::Entry: 0
+  XML::Atom::Feed: 0
+  XML::Atom::Link: 0
+  XML::Atom::Person: 0
+  XML::Atom::Thing: 0
+  XML::Atom::Util: 0
+  base: 0
+  strict: 0
+  vars: 0
+version: 1.05

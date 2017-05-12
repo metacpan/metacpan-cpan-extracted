@@ -1,0 +1,14 @@
+/*	rblf_mem.h
+ *	version 1.00	
+ */
+#define rblf_malloc malloc
+#define rblf_calloc calloc
+#define rblf_realloc realloc
+
+void * rblf_calloc(size_t nmemb, size_t size);
+void * rblf_malloc(size_t size);
+void * rblf_realloc(void *ptr, size_t size);
+void rblf_mtfree(void * mem);
+void rblf_mtrack(void * mem);
+void rblf_mtrack_forget(void * mem);
+void rblf_mtfree_all(void);

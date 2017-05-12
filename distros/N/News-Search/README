@@ -1,0 +1,55 @@
+= News-Search
+
+News::Search searches Usenet news postings.
+
+It can be used to search local news groups that google doesn't cover. Or,
+even for news groups that are covered by google, it can give you all the
+hits in one file, in the format that you prescribed.
+
+You can also use the provided news-search in cron to watch specific news
+groups for specific criteria and mail you reports according to the interval
+you set.
+
+== INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+=== FILES
+
+link:release-log.txt[Release notes]. 
+
+link:Changes[Changes logs]. 
+
+== SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc News::Search
+
+You can also look for information at:
+
+RT, CPAN's request tracker
+http://rt.cpan.org/NoAuth/Bugs.html?Dist=News-Search
+
+AnnoCPAN, Annotated CPAN documentation
+http://annocpan.org/dist/News-Search
+
+CPAN Ratings
+http://cpanratings.perl.org/d/News-Search
+
+Search CPAN
+http://search.cpan.org/dist/News-Search/
+
+
+== COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Tong Sun
+
+This program is released under the following license: BSD
+

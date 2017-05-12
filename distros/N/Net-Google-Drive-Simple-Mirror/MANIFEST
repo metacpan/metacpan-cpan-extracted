@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/test.pl
+'examples/test_data_mirror/Letters A_B'
+lib/Net/Google/Drive/Simple/Mirror.pm

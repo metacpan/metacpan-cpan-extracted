@@ -1,0 +1,136 @@
+Revision history for Perl extension Net-SCP-Expect
+
+0.16  Friday February 6 06:23:51 2009
+- Clean distribution of ._* OS X resource forks (i.e. file/..namedfork/rsrc -> ._file)
+
+0.15  Monday February 2 23:01:03 2009
+- Support IPv6 host addresses in long and short scp forms.
+- Add support for -C, -4 and -6 options (compress, force IPv4 and force
+IPv6, respectively).
+
+0.14  Saturday August 9 20:48:00 2008
+- Fixed RT#38081 (password not required if identity_file specified).
+- Fixed RT#36705 (itest.pl dynamically generates test files during runtime to reduce distribution size).
+
+0.13  Wednesday June 11 05:07:34 2008
+- Corrected issue with no exception thrown on failed scp execution after
+successful login.  In general, exception handling should be more robust
+and behave more consistently now.
+
+- If an error_handler is defined, will now immediately return void from a
+scp() call after the handler has executed.
+
+- Fixed RT#18077 (error_handler not handing timeouts properly). Also added
+immediate return from scp function if customer handler used, as no further
+actions may be taken.
+
+- Fixed RT#22907 (Some options require trailing space).
+
+- Fixed RT#22909 (scp command string is underquoted). Use option 'auto_quote'
+to enable auto-quote scp arguments.  Also escapes other single quotes to
+insure support for path names with single quotes.  NOTE: This option is
+enabled by default, which may break for backward compatibility with scripts
+that manually quoted input arguments as a work-around for this bug.
+
+- Fixed RT#24273 (scp binary is hardcoded, cannot specify a different path to
+scp).  Use option 'scp_path' to specify a different SCP binary.
+
+- Fixed RT#34001 (exit value is automatically set to -1 (255) when a program
+including threads uses 'Net::SCP::Expect' - this breaks Test::*).  Removed
+CHLD signal handler, instead relying on Expect to manage process exit cleanup.
+
+- Fixed RT#34503 (Destination can't contain colon ':').
+
+0.12  Wednesday Nov 24 08:03:33 2004
+- Dumb bug fix.
+
+0.11  Mon Nov 22 18:09:29 2004
+- Added support for the -i, -s and -o options (identity file, subsystem
+and option, respectively).
+- Doc updates and modifications, including a recommendation to use the
+Net::SFTP module instead of this one if possible.
+
+0.10  Tue Aug 12 13:03:22 2003
+- Made the initial password string more generic, allowing text between the
+  word "Password" (or "Passphrase") and the ':' character.  Thanks John Vogtle.
+- Added LICENSE and COPYRIGHT info.
+- Minor addition to itest.pl script (displays VERSION at start now).
+
+0.09  Sun May 11 12:24:32 2003
+- Fixed the Makefile.PL issue - it should actually build and install correctly
+  now.
+- Minor addition to itest/README file
+
+0.08  Sun Apr 26 17:22:03 2003
+- Added a test suite and interactive test program (see the "itest" directory).
+- Fixed a bug where verbose output was accidentally being picked up by
+  Expect, causing an error.  Thanks to Martin Burgess for the spot.
+- Fixed the regex problems with the scp() method.  Thanks to many.
+- The 'user' option now defaults to $ENV{USER}.
+- Added a 'protocol' option to set the ssh protocol.  Thanks to Emir Rodriguez.
+- Added a 'terminator' option to specify the character to immediately follow
+  the password.  Thanks Rob Coops.
+- Removed Term::ReadPassword from the prerequisites in the Makefile.PL file,
+  but you'll still need it to run the itest.pl script.
+- Minor doc changes/additions, including preferred email address change.
+- Some changes to Makefile.PL.
+- Added a README file.
+
+0.07  Sun Jul 7 16:08:00 2002
+- There was a syntax error (not picked up by "perl -c") with one of the
+  timeout error checks.  Thanks to Scott Glaser for the spot and fix.
+- Added "Term::ReadPassword" to the pre-req's in the Makefile.PL.  You
+  can ignore this if you don't care about the test.
+
+0.06  Mon Jun 10 14:00:00 2002
+- Fixed a MAJOR bug in which the spawned scp process was being killed by
+  the parent instead of waiting for the operation to complete.  Thanks to
+  Ruban Phukan for the spot and *many* thanks to J. David Blackstone for
+  the fix.
+- Some work on the test program - almost complete.
+
+0.05  Mon Apr 29 15:10:49 2002
+- Removed a lame -e check that was causing metacharacters to fail.  Any type
+  of non-existent file error will now be treated like any other error.
+- Modified the error handling yet again.  There were two problems that were
+  worked out.  I'll just sum up by saying that it should work better now.
+
+0.04  Fri Apr 12 15:52:33 2002
+- Documentation fixes and additions (thanks BbBoy)
+- Added an 'auto_yes' option/method so that you can automatically send
+  'yes' to any 'yes/no' questions you may receive before finally sending
+  your password (for first time connections, etc).
+- Added a 'no_check' option to help speed up scp calls by up to 2 seconds
+  per call.  Use this only if you're absolutely certain everything is
+  set up correctly.
+- Created separate timeouts for the 'auto_yes' and 'no_check' options, called
+  'timeout_auto', and 'timeout_err', respectively.  I set their defaults
+  to 1 second (which should be plenty) to improve speed.
+- The error_handler will now trap errors in the 'expect' call as well as
+  the 'scp' call.
+- The -q option is *actually* being passed automatically now (oops).  Don't
+  fret - this made no difference in any of the testing that I actually did,
+  but there it is for you.
+
+0.03  Wed Apr 10 08:04:17 2002
+- Added better error handling in the event that a call to 'scp()' fails
+- Added an 'error_handler' option/method so that programmers can trap
+  and deal with failed 'scp' calls on their own terms.  Just make sure
+  to die, croak, exit, etc. or your program may hang while waiting for
+  terminal input.
+
+0.02  Thu Apr 04 08:44:34 2002
+- The -e file test is no longer applied in a remote-to-local scenario
+- If a login is supplied, then that login is now automatically
+  prepended to the host name, e.g. 'host:file.txt' becomes
+  'login@host:file.txt', instead of using the current host name. Thanks
+  to Guoben Li for the report.
+- Regarding the above comment, there is a lot more automatic parsing
+  in general so that you can use less verbose syntax if you want.  See
+  the scp method for what now passes as valid syntax.
+- Tested with Expect 1.15 - seems to work
+- Fixed this distro so that it unpacks correctly. :)
+
+0.01  Fri Mar 15 14:22:37 2002
+- original version; created by h2xs 1.21 with options
+  -A -X -n String

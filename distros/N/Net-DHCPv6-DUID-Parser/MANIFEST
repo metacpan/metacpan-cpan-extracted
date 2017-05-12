@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-DHCPv6-DUID-Parser.t
+lib/Net/DHCPv6/DUID/Parser.pm
+META.yml                                 Module meta-data (added by MakeMaker)

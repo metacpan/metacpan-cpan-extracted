@@ -1,0 +1,51 @@
+---
+abstract: 'use Flotum as your payment gateway'
+author:
+  - 'Renato CRON <rentocron@cpan.org>'
+build_requires:
+  HTTP::Response: '0'
+  LWP::UserAgent: '0'
+  Test::More: '0.96'
+  Test::Pod: '0'
+  URL::Encode: '0.03'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Flotum
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Carp: '0'
+  Furl: '0'
+  HTTP::Request::Common: '0'
+  IO::Socket::SSL: '0'
+  JSON: '2.34'
+  JSON::MaybeXS: '0'
+  Log::Any: '0'
+  Moo: '0'
+  MooX::late: '0'
+  Stash::REST: '0.08'
+  URI: '0'
+  URI::Escape: '0'
+  common::sense: '0'
+  namespace::clean: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/eokoe/Net-Flotum/issues
+  homepage: https://github.com/eokoe/Net-Flotum
+  repository: https://github.com/eokoe/Net-Flotum.git
+version: '0.10'
+x_contributors:
+  - 'Junior Moraes <juniorfvox@gmail.com>'
+  - 'Renato CRON <renato.cron@gmail.com>'

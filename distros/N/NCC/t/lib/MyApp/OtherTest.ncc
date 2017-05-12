@@ -1,0 +1,7 @@
+use MyApp::Test;
+
+has blub => (
+  is => 'rw',
+);
+
+sub test { MyApp::Test->new( bla => $_[0]->blub ) }

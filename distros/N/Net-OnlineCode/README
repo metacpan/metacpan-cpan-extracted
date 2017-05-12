@@ -1,0 +1,67 @@
+Net::OnlineCode
+
+This module implements "Online Codes", a form of "rateless" forward
+error correction.  Unlike optimal error-correcting codes such as
+Reed-Solomon codes, Online Codes differ in certain respects:
+
+* They can send a practically infinite number of check blocks (ie,
+  they are "rateless") without needing to determine the network packet
+  loss rate in advance.
+
+* They are near-optimal (meaning that a certain percentage extra
+  blocks need to be sent for the original message to be decoded)
+
+* Encoding and decoding takes linear time (as opposed to, say RS
+  codes, which can take time proportional to O(n(log n))
+
+Taken together, this set of qualities makes Online Codes very suitable
+for transmission of data in a multicast or multi-sender network.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::OnlineCode
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-OnlineCode
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-OnlineCode
+
+    GNETRAID project homepage:
+        https://sourceforge.net/projects/gnetraid/
+
+    The included extended test and examples directories:
+	tests/
+	examples/
+
+    C code that is used to implement fast XORs is in clib/, while
+    tests for the same code is in ctest/
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Declan Malone
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation.
+
+Code under the clib/ directory may be distributed under the terms of
+the Lesser GNU General Public License.
+
+See http://dev.perl.org/licenses/ for more information.
+

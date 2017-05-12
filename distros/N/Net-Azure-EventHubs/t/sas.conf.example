@@ -1,0 +1,4 @@
+### copy to t/sas.conf and replace following values
+{
+    connection_string => 'Endpoint=...',
+};

@@ -1,0 +1,11 @@
+Revision history for Net-SMS-Massenversand
+
+0.03    2009/03/28
+        Encoding, again. And typo in pod
+
+0.02    2009/03/28
+        Fixed problem with unicode encoded messages
+
+0.01    2009/03/28
+        First version, released on an unsuspecting world.
+

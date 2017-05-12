@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Net/SenderBase.pm
+lib/Net/SenderBase/Query.pm
+lib/Net/SenderBase/Query/DNS.pm
+lib/Net/SenderBase/Query/HTTP.pm
+lib/Net/SenderBase/Results.pm
+t/00basic.t
+t/01basic.t
+t/dns01.t
+t/http01.t

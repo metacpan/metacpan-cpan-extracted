@@ -1,0 +1,88 @@
+Revision history for Net-SSL-ExpireDate
+
+1.20 2017-02-07
+  * Update expire date in test cases
+    ref: #6
+
+1.19 2017-01-13
+  * Add some SSL extensions (signature_algorithms, heartbeat)
+    ref: https://rt.cpan.org/Ticket/Display.html?id=118163
+
+1.18  2017-01-10
+  * Fix handling servername (SNI) contains numeric character
+    ref: issue #5
+
+1.17  2016-01-22
+  * Update certificate for t/02.file.t
+    ref: https://rt.cpan.org/Public/Bug/Display.html?id=111353
+
+1.16  2016-01-12
+  * Add modern cipher suites and change SSLv3 to TLSv1 #2
+
+1.15  2015-12-09
+  * Remove debugging code
+
+1.14  2015-12-09
+  * Process SSL3_RT_ALERT correctly
+    ref: https://rt.cpan.org/Public/Bug/Display.html?id=110171
+  * update expire date of test case
+
+1.13  2015-04-17
+  * Just update a certificates
+
+1.12  2014-06-03
+  * Support SNI (Server Name Indication) extension
+    ref: https://rt.cpan.org/Public/Bug/Display.html?id=94573
+
+1.11  2013-04-30
+  * Support TLS v1.2
+
+1.10  2011-03-16
+  * no feature changes
+  * use UNIVERSAL::require instead of eval EXPR
+  * update expire date of test case
+
+1.09  2010-11-08
+  * support timeout.
+    (thanks http://sharl.haun.org/d/2010110801)
+
+1.08  2010-10-22
+  * fixed require IO::Socket::INET.
+
+1.07  2010-10-21
+  * use IO::Socket::INET6 instead of ::INET if available.
+    (thanks https://rt.cpan.org/Public/Bug/Display.html?id=62236 )
+
+1.06  2009-06-30
+  * change test URL. (01.https_client-auth.t)
+  * move some tests to xt.
+
+1.05  2008-05-01
+  * support https which requires client authentication.
+    now, Net-SSL-ExpireDate talks SSL protocol directly not using OpenSSL.
+    inspired:  keepalived-extcheck, SSL_HELLO
+    http://lab.klab.org/modules/mediawiki/index.php/Software#keepalived-extcheck
+    (thanks: yasui0906)
+
+1.04  2007-04-12
+  * require IO::Socket::SSL >= 0.99.
+    because IO::Socket::SSL < 0.98 cause segmentation fault.
+    (thanks: tokuhirom)
+
+1.03  2007-03-01
+  * replace "https" (keyword in constructor) with "ssl".
+    you can check SMTP over SSL: "ssl => 'example.com:465'" without
+    incongruity. ;p)
+    (thanks: mizzy)
+
+1.02  2006-11-26
+  * neither functional changes nor bug fixes.
+  * fixed module dependence.
+
+1.01  2006-11-22
+  * added sample scripts to "samples" directory.
+  * added new getter methods: ExpireDate#type and #target.
+
+1.00  2006-11-18
+  * Initial release.
+

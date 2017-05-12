@@ -1,0 +1,61 @@
+NAME
+    Net::Amazon::Signature::V3 - Sign AWS requests -- V3
+
+VERSION
+    This document describes version 0.001 of Net::Amazon::Signature::V3 -
+    released October 29, 2012 as part of Net-Amazon-Signature-V3.
+
+SYNOPSIS
+        # somewhere inside the depths of your code...
+        my $signer = Net::Amazon::Signature::V3->new(id => $id, key => $key);
+        my $req = HTTP::Request->new('GET', $uri, [ $signer->signed_headers ]);
+
+        # profit!
+
+DESCRIPTION
+    Amazon requires authentication when interfacing with its web services;
+    this package implements V3 of Amazon's authentication schemes.
+
+METHODS
+  signed_headers
+    Returns a list of several key-value pairs suitable for including
+    directly as headers. These headers will authenticate the request to
+    Amazon.
+
+    Note that these headers are only good when used within 5 minutes of the
+    time that Amazon thinks it is.
+
+    This routine is largely based off code extracted from "request" in
+    Net::Amazon::Route53.
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   Net::Amazon::Route53 -- signed_headers() is largely based off of the
+        code
+
+    *   inside "request" in Net::Amazon::Route53.
+
+SOURCE
+    The development version is on github at
+    <http://github.com/RsrchBoy/net-amazon-signature-v3> and may be cloned
+    from <git://github.com/RsrchBoy/net-amazon-signature-v3.git>
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/net-amazon-signature-v3/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

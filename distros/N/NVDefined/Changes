@@ -1,0 +1,8 @@
+Revision history for Perl extension NVDefined.
+
+0.01  Thu Sep 30 21:44:21 1999
+	- original version; created by h2xs 1.18
+
+0.02  Thu Feb 17 20:15:41 EST 2000
+	- Last version; obsoleted by Hash::NoVivify
+

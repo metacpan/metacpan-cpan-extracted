@@ -1,0 +1,609 @@
+/* config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* define available include file */
+#undef HAVE_ALLOCA_H
+
+/* define available include file */
+#undef HAVE_ARPA_INET_H
+
+/* define available include file */
+#undef HAVE_ASM_TYPES_H
+
+/* define available include file */
+#undef HAVE_BYTESWAP_H
+
+/* Define to 1 if you have the `bzero' function. */
+#undef HAVE_BZERO
+
+/* Define to 1 if the system has the type `caddr_t'. */
+#undef HAVE_CADDR_T
+
+/* define available include file */
+#undef HAVE_CTYPE_H
+
+/* define available include file */
+#undef HAVE_ENDIAN_H
+
+/* define available include file */
+#undef HAVE_FCNTL_H
+
+/* define available include file */
+#undef HAVE_FEATURES_H
+
+/* Define to 1 if you have the `getnameinfo' function. */
+#undef HAVE_GETNAMEINFO
+
+/* Define to 1 if you have the `getpagesize' function. */
+#undef HAVE_GETPAGESIZE
+
+/* define available include file */
+#undef HAVE_IFADDRS_H
+
+/* Define to 1 if function 'inet_addr' is present */
+#undef HAVE_INET_ADDR
+
+/* Define to 1 if function 'inet_aton' is present */
+#undef HAVE_INET_ATON
+
+/* Define to 1 if function 'inet_pton' is present */
+#undef HAVE_INET_PTON
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* define available include file */
+#undef HAVE_LIBC_INTERNAL_H
+
+/* Define to 1 if function 'link_ntoa' is present */
+#undef HAVE_LINK_NTOA
+
+/* define available include file */
+#undef HAVE_LINUX_ATALK_H
+
+/* define available include file */
+#undef HAVE_LINUX_AX25_H
+
+/* define available include file */
+#undef HAVE_LINUX_IF_ARP_H
+
+/* define available include file */
+#undef HAVE_LINUX_IF_ETHER_H
+
+/* define available include file */
+#undef HAVE_LINUX_IF_FDDI_H
+
+/* define available include file */
+#undef HAVE_LINUX_IF_SLIP_H
+
+/* define available include file */
+#undef HAVE_LINUX_IF_STRIP_H
+
+/* define available include file */
+#undef HAVE_LINUX_IF_TR_H
+
+/* define available include file */
+#undef HAVE_LINUX_NETLINK_H
+
+/* define available include file */
+#undef HAVE_LINUX_ROSE_H
+
+/* define available include file */
+#undef HAVE_LINUX_RTNETLINK_H
+
+/* define available include file */
+#undef HAVE_LINUX_TYPES_H
+
+/* define available include file */
+#undef HAVE_LINUX_X25_H
+
+/* Define to 1 if your system has a GNU libc compatible `malloc' function, and
+   to 0 otherwise. */
+#undef HAVE_MALLOC
+
+/* define available include file */
+#undef HAVE_MALLOC_H
+
+/* MALLOC in <stdlib.h> */
+#undef HAVE_MALLOC_IN_STDLIB
+
+/* Define to 1 if you have the `memcmp' function. */
+#undef HAVE_MEMCMP
+
+/* Define to 1 if you have the `memcpy' function. */
+#undef HAVE_MEMCPY
+
+/* Define to 1 if you have the `memmove' function. */
+#undef HAVE_MEMMOVE
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the `memset' function. */
+#undef HAVE_MEMSET
+
+/* define available include file */
+#undef HAVE_NET80211_IEEE80211_CRYPTO_H
+
+/* define available include file */
+#undef HAVE_NET80211_IEEE80211_FREEBSD_H
+
+/* define available include file */
+#undef HAVE_NET80211_IEEE80211_H
+
+/* define available include file */
+#undef HAVE_NET80211_IEEE80211_IOCTL_H
+
+/* define available include file */
+#undef HAVE_NETATALK_AT_H
+
+/* define available include file */
+#undef HAVE_NETAX25_AX25_H
+
+/* define available include file */
+#undef HAVE_NETDB_H
+
+/* define available include file */
+#undef HAVE_NETECONET_EC_H
+
+/* define available include file */
+#undef HAVE_NETINET6_ND6_H
+
+/* define available include file */
+#undef HAVE_NETINET_ETHER_H
+
+/* define available include file */
+#undef HAVE_NETINET_IF_ETHER_H
+
+/* define available include file */
+#undef HAVE_NETINET_IF_FDDI_H
+
+/* define available include file */
+#undef HAVE_NETINET_IN_H
+
+/* define available include file */
+#undef HAVE_NETINET_IN_VAR_H
+
+/* define available include file */
+#undef HAVE_NETINET_IP_CARP_H
+
+/* define available include file */
+#undef HAVE_NETINET_IP_H
+
+/* define available include file */
+#undef HAVE_NETIO_H
+
+/* define available include file */
+#undef HAVE_NETIPX_IPX_H
+
+/* define available include file */
+#undef HAVE_NETIPX_IPX_IF_H
+
+/* define available include file */
+#undef HAVE_NETPACKET_PACKET_H
+
+/* define available include file */
+#undef HAVE_NET_ETHERNET_H
+
+/* define available include file */
+#undef HAVE_NET_IF_ARP_H
+
+/* define available include file */
+#undef HAVE_NET_IF_DL_H
+
+/* define available include file */
+#undef HAVE_NET_IF_H
+
+/* define available include file */
+#undef HAVE_NET_IF_LAGG_H
+
+/* define available include file */
+#undef HAVE_NET_IF_MEDIA_H
+
+/* define available include file */
+#undef HAVE_NET_IF_PFSYNC_H
+
+/* define available include file */
+#undef HAVE_NET_IF_TYPES_H
+
+/* define available include file */
+#undef HAVE_NET_IF_VAR_H
+
+/* define available include file */
+#undef HAVE_NET_IF_VLAN_VAR_H
+
+/* define available include file */
+#undef HAVE_NET_NIT_IF_H
+
+/* define available include file */
+#undef HAVE_NET_PFVAR_H
+
+/* define available include file */
+#undef HAVE_NET_ROUTE_H
+
+/* Define to 1 if pcap lib is present */
+#undef HAVE_PCAP
+
+/* Define to 1 if you have <pthread.h>. */
+#undef HAVE_PTHREAD_H
+
+/* Define to 1 if your system has a GNU libc compatible `realloc' function,
+   and to 0 otherwise. */
+#undef HAVE_REALLOC
+
+/* Define to 1 if sockaddr has member 'sa_len' */
+#undef HAVE_SA_LEN
+
+/* define available include file */
+#undef HAVE_SIGNAL_H
+
+/* Define to 1 if sockaddr_in6 has member 'sin6_scopeid' */
+#undef HAVE_SIN6_SCOPEID
+
+/* Define to 1 if function 'socket' is present */
+#undef HAVE_SOCKET
+
+/* define available include file */
+#undef HAVE_STDARG_H
+
+/* define available include file */
+#undef HAVE_STDBOOL_H
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* define available include file */
+#undef HAVE_STDIO_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* define available include file */
+#undef HAVE_STROPTS_H
+
+/* Define to 1 if the system has the type `struct ifaddrs'. */
+#undef HAVE_STRUCT_IFADDRS
+
+/* Define to 1 if the system has the type `struct ifdevea'. */
+#undef HAVE_STRUCT_IFDEVEA
+
+/* Define to 1 if the system has the type `struct ifreq'. */
+#undef HAVE_STRUCT_IFREQ
+
+/* Define to 1 if the system has the type `struct if_data'. */
+#undef HAVE_STRUCT_IF_DATA
+
+/* Define to 1 if the system has the type `struct if_laddrreq'. */
+#undef HAVE_STRUCT_IF_LADDRREQ
+
+/* Define to 1 if the system has the type `struct in6_ifreq'. */
+#undef HAVE_STRUCT_IN6_IFREQ
+
+/* Define to 1 if the system has the type `struct lifreq'. */
+#undef HAVE_STRUCT_LIFREQ
+
+/* define available include file */
+#undef HAVE_SYS_DLPI_H
+
+/* define available include file */
+#undef HAVE_SYS_IOCTL_H
+
+/* define available include file */
+#undef HAVE_SYS_LINKER_H
+
+/* define available include file */
+#undef HAVE_SYS_MAC_H
+
+/* define available include file */
+#undef HAVE_SYS_MODULE_H
+
+/* define available include file */
+#undef HAVE_SYS_PARAM_H
+
+/* define available include file */
+#undef HAVE_SYS_SOCKET_H
+
+/* define available include file */
+#undef HAVE_SYS_SOCKIO_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* define available include file */
+#undef HAVE_SYS_SYSCTL_H
+
+/* define available include file */
+#undef HAVE_SYS_TIME_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* define available include file */
+#undef HAVE_SYS_UN_H
+
+/* Define to 1 if you have <thread.h>. */
+#undef HAVE_THREAD_H
+
+/* define available include file */
+#undef HAVE_TIME_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Extra libraries */
+#undef LIBS
+
+/* define pointer size */
+#undef LOCAL_SIZEOF_POINTER
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR_ASH
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR_AT
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR_ATM
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR_AX25
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR_DECnet
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR_DL
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR_EC
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR_EON
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR_IN
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR_IN6
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR_INARP
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR_IPX
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR_ISO
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR_LL
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR_NS
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR_OSITP
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR_ROSE
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR_STORAGE
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR_TP
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR_UN
+
+/* define family size */
+#undef LOCAL_SIZEOF_SOCKADDR_X25
+
+/* define lifreq union offset */
+#undef NI_LIFREQ_OFFSET
+
+/* define lifreq pad size */
+#undef NI_LIFREQ_PAD
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* define PAGE_SIZE for this operating system */
+#undef PAGE_SIZE
+
+/* The size of `uint16_t', as computed by sizeof. */
+#undef SIZEOF_UINT16_T
+
+/* The size of `uint32_t', as computed by sizeof. */
+#undef SIZEOF_UINT32_T
+
+/* The size of `uint64_t', as computed by sizeof. */
+#undef SIZEOF_UINT64_T
+
+/* The size of `uint8_t', as computed by sizeof. */
+#undef SIZEOF_UINT8_T
+
+/* The size of `u_int16_t', as computed by sizeof. */
+#undef SIZEOF_U_INT16_T
+
+/* The size of `u_int32_t', as computed by sizeof. */
+#undef SIZEOF_U_INT32_T
+
+/* The size of `u_int64_t', as computed by sizeof. */
+#undef SIZEOF_U_INT64_T
+
+/* The size of `u_int8_t', as computed by sizeof. */
+#undef SIZEOF_U_INT8_T
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define to 1 if your processor stores words with the most significant byte
+   first (like Motorola and SPARC, unlike Intel and VAX). */
+#undef WORDS_BIGENDIAN
+
+/* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
+   <pthread.h>, or <semaphore.h> is not used. If the typedef was allowed, the
+   #define below would cause a syntax error. */
+#undef _UINT32_T
+
+/* Define for Solaris 2.5.1 so the uint64_t typedef from <sys/synch.h>,
+   <pthread.h>, or <semaphore.h> is not used. If the typedef was allowed, the
+   #define below would cause a syntax error. */
+#undef _UINT64_T
+
+/* Define for Solaris 2.5.1 so the uint8_t typedef from <sys/synch.h>,
+   <pthread.h>, or <semaphore.h> is not used. If the typedef was allowed, the
+   #define below would cause a syntax error. */
+#undef _UINT8_T
+
+/* OS name defined to version */
+#undef __ni_AIX
+
+/* OS name defined to version */
+#undef __ni_ALPHA
+
+/* OS name defined to version */
+#undef __ni_BEOS
+
+/* OS name defined to version */
+#undef __ni_BSD
+
+/* OS name defined to version */
+#undef __ni_Cygwin
+
+/* OS name defined to version */
+#undef __ni_DGUX
+
+/* OS name defined to version */
+#undef __ni_Darwin
+
+/* OS name defined to version */
+#undef __ni_DragonFly
+
+/* OS name defined to version */
+#undef __ni_FreeBSD
+
+/* OS name defined to version */
+#undef __ni_HPUX
+
+/* OS name defined to version */
+#undef __ni_IRIX
+
+/* OS name defined to version */
+#undef __ni_Interix
+
+/* OS name defined to version */
+#undef __ni_Linux
+
+/* OS name defined to version */
+#undef __ni_MachTen
+
+/* OS name defined to version */
+#undef __ni_MingW
+
+/* OS name defined to version */
+#undef __ni_NetBSD
+
+/* OS name defined to version */
+#undef __ni_Next2
+
+/* OS name defined to version */
+#undef __ni_NextStep
+
+/* OS name defined to version */
+#undef __ni_OSF
+
+/* OS name defined to version */
+#undef __ni_OpenBSD
+
+/* OS name defined to version */
+#undef __ni_QNX4
+
+/* OS name defined to version */
+#undef __ni_SCO
+
+/* OS name defined to version */
+#undef __ni_SRV4
+
+/* OS name defined to version */
+#undef __ni_SUNOS
+
+/* OS name defined to version */
+#undef __ni_SunOS
+
+/* OS name defined to version */
+#undef __ni_Ultrix
+
+/* OS name defined to version */
+#undef __ni_Unixware
+
+/* OS name defined to version */
+#undef __ni_Win32
+
+/* OS name defined to version */
+#undef __ni_Windows
+
+/* Define to empty if `const' does not conform to ANSI C. */
+#undef const
+
+/* Define to the type of a signed integer type of width exactly 16 bits if
+   such a type exists and the standard includes do not define it. */
+#undef int16_t
+
+/* Define to the type of a signed integer type of width exactly 32 bits if
+   such a type exists and the standard includes do not define it. */
+#undef int32_t
+
+/* Define to the type of a signed integer type of width exactly 64 bits if
+   such a type exists and the standard includes do not define it. */
+#undef int64_t
+
+/* Define to the type of a signed integer type of width exactly 8 bits if such
+   a type exists and the standard includes do not define it. */
+#undef int8_t
+
+/* Define to rpl_malloc if the replacement function should be used. */
+#undef malloc
+
+/* Define to rpl_realloc if the replacement function should be used. */
+#undef realloc
+
+/* Define to `unsigned int' if <sys/types.h> does not define. */
+#undef size_t
+
+/* Define to the type of an unsigned integer type of width exactly 16 bits if
+   such a type exists and the standard includes do not define it. */
+#undef uint16_t
+
+/* Define to the type of an unsigned integer type of width exactly 32 bits if
+   such a type exists and the standard includes do not define it. */
+#undef uint32_t
+
+/* Define to the type of an unsigned integer type of width exactly 64 bits if
+   such a type exists and the standard includes do not define it. */
+#undef uint64_t
+
+/* Define to the type of an unsigned integer type of width exactly 8 bits if
+   such a type exists and the standard includes do not define it. */
+#undef uint8_t

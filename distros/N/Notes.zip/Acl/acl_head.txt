@@ -1,0 +1,18 @@
+MODULE =    Notes::Acl   PACKAGE = Notes::Database
+
+PROTOTYPES: DISABLE
+
+void
+get_acl( db )
+      LN_Database *   db;
+   PREINIT:
+      d_LN_XSVARS;
+      LN_Acl_Impl *   a_impl;
+      int             i;
+      LN_RoleName     role_name;
+      int             len;
+      char*           role;
+   ALIAS:
+      acl     = 0
+      get_acl = 1
+   PPCODE:

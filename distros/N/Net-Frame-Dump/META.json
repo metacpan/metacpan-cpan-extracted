@@ -1,0 +1,58 @@
+{
+   "abstract" : "base-class for a tcpdump like implementation",
+   "author" : [
+      "GomoR <gomor-cpan_at_gomor.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Frame-Dump",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Gomor" : "1.00",
+            "IO::Select" : "0",
+            "Net::Frame" : "0",
+            "Net::Pcap" : "0.12",
+            "Time::HiRes" : "0",
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Frame::Dump" : {
+         "file" : "lib/Net/Frame/Dump.pm",
+         "version" : "1.14"
+      },
+      "Net::Frame::Dump::Offline" : {
+         "file" : "lib/Net/Frame/Dump/Offline.pm"
+      },
+      "Net::Frame::Dump::Online" : {
+         "file" : "lib/Net/Frame/Dump/Online.pm"
+      },
+      "Net::Frame::Dump::Online2" : {
+         "file" : "lib/Net/Frame/Dump/Online2.pm"
+      },
+      "Net::Frame::Dump::Writer" : {
+         "file" : "lib/Net/Frame/Dump/Writer.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_1_0"
+      ]
+   },
+   "version" : "1.14"
+}

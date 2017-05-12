@@ -1,0 +1,296 @@
+List of TODO items (oldest first)
+
+----------------------------------------------------------------------
+
+Subject: Write enough unit tests for first release
+Status: done
+
+There are plenty of extended tests in the tests/ directory, but I need
+to have some simpler unit test cases. Besides the usual use/use_ok
+stuff, any check that's currently implemented as a die/croak/warn can
+be converted into a unit test case.
+
+Also, I need to write test cases that ensure that the "fast" xor
+routine work in the same way as the "safe" one. I don't need too many
+tests for this as there are more tests in the ctest/ directory.
+
+----------------------------------------------------------------------
+
+Subject: Gather a list of references
+Status: done
+
+Basically the wikipedia article and the main papers referenced from
+there. Also link to Gwylim Ashley's python implementation.
+
+----------------------------------------------------------------------
+
+Subject: Investigate why the "asymptotically good in n" promise fails
+Status: done
+
+The algorithm is supposed to be able to decode a message after
+receiving a small number of check blocks over and above the number of
+message/composite blocks. In my testing, this isn't working.
+
+I may have to contact the papers' authors in order to find out what's
+going wrong.
+
+Done:
+
+It seems that my code was probably correct after all. After various
+experiments with modifying the algorithm, I haven't been able to find
+any errors. As I managed to improve the run time I was able to do more
+tests with higher numbers of message blocks and these show that
+increasing this value does improve the percentage of trials that
+satisfy the claims. That's the "asymptotically" part in action.
+
+I did add a new "auxiliary rule" which marks an auxiliary block as
+solved if it contains no unsolved message blocks. This wasn't in the
+original paper, but it actually reduces the number of check blocks
+required in some circumstances.
+
+I also discovered that it may be possible to bring the number of
+required check blocks down even more by implementing "transparent"
+auxiliary blocks. Basically, as well as the existing edges, I would
+add expand any auxiliary blocks contained in a check block. By going
+directly from check blocks to message blocks, this should allow more
+the check blocks to solve more message blocks than if the aux blocks
+they go through are "opaque".
+
+----------------------------------------------------------------------
+
+Subject: Write "multi-speed" example program
+Status: pending
+
+One of the nice applications described in one of the papers I've read
+is to have a sender transmitting over several different "channels",
+each of which has a distinct bandwidth rate (no. of check blocks sent
+per time unit). Listeners subscribe to one or more channels based on
+their ability to receive check blocks sent over that channel. The idea
+is that the sender doesn't have to receive explicit ACK/NAK messages
+from nodes that have poor network connectivity: so long as any nodes
+are subscribed to a lower-bandwidth channel, it simply continues
+sending check blocks their way (and doesn't stop sending until it's
+sent enough check blocks on that channel for the message to be
+reconstructed).
+
+As a variation of this, I want a program that will be testable over a
+local network that is separated into two subnets. Assume that the
+sender is on a high-speed subnet, so it can send at full speed to each
+local machine on this subnet via multicast messaging. Also assume that
+we have a router that can route multicast traffic to the second
+subnet.  Assume that this second subnet is slower than the main subnet
+(even if it's not, we can just pretend that it is). So we will send
+check blocks on a separate multicast channel at a slower speed.
+
+Besides joining a separate multicast channel for fast and slow
+receivers, we also set the ttl ("time-to-live") parameter for each
+multicast packet sent. We use a value of 1 for local (fast) network
+peers, with a value of 2 for peers that live on the other side of the
+router and have a slower network.
+
+----------------------------------------------------------------------
+
+Subject: get POD documentation into shape
+Status: done
+
+Some things may have changed since I started coding, so I have to
+check what I've already written.
+
+The Net::OnlineCode module needs to document what Online Codes are,
+and include references. (done)
+
+I also need to include a warning that the interfaces might change
+between the initial release and subsequent releases. In particular,
+I'm leaning towards changing how the Decoder class works. See the next
+TODO for that.
+
+----------------------------------------------------------------------
+
+Subject: rewrite Decoder to be be more POE-friendly
+Status: pending
+
+When using POE as an event loop, we generally want each event handler
+(callback) to take only a small time to complete. This way, we can do
+a small bit of work and then return control back to POE's main event
+loop, which can check for newly arrived network packets and so on.
+
+As the code stands, whenever we receive a check block the resolve()
+method tries to resolve as many auxiliary/message blocks as possible
+before returning. Unfortunately, if this takes too long (because too
+many new composite blocks have become decodable at once) then we may
+not return to the POE main loop for quite a while, and we may
+potentially miss receipt of several new check blocks as a result.
+
+By limiting the amount of work done in the resolve to only decode at
+most one composite block at a time (and arranging for any outstanding
+decoding work to be scheduled for the next invocation), we will have
+only a short delay each time we enter resolve(), and the calling
+program can then interleave checks for newly-incoming check blocks
+with the resolution step(s) without fear of dropping packets.
+
+Update: somewhat done
+
+I will probably implement a "single-stepping" flag in resolve() at
+some point. I have changed the call/return setup for the routine in
+preparation for this, but haven't actually made the other required
+changes. It should be quite trivial.
+
+
+----------------------------------------------------------------------
+
+Subject: Reduce memory requirements
+Status: done
+
+The algorithm is supposed to work best when there are a large number
+(eg, in the order of 100,000 to 1 million) of check blocks being sent.
+Unfortunately, as it stands, the program is a real memory hog when
+many check blocks are being received. I need to look into reducing the
+memory footprint, eg:
+
+* free up useless object-local storage (eg, auxiliary mapping?)
+* make sure to free memory where possible (eg, finished check blocks)
+* possibly move to using more space-efficient structures for edges
+* possibly move to C-based implementation for decoder
+
+After trying (or considering) some of the above, I ended up changing
+the algorithm so that it didn't automatically expand message/aux
+blocks into the full list of check blocks they depend on. I also used
+a profiler (nytprof) in parallel with this. The net result was an
+order of magnitude increase in throughput and a similar decrease in
+memory usage.
+
+I haven't yet tested for 1m check blocks, but the tests (with 5,000
+and 10,000 message blocks) seem promising.
+
+
+----------------------------------------------------------------------
+
+Subject: Make installing C/XS part of the code optional
+Status: pending
+
+Although I'm sure most people would prefer to have optimised C
+routines when they can, not all platforms where Perl is installed will
+have a C compiler. I'd like to make the module at least installable on
+such platforms.
+
+Related to this is making Net::OnlineCode::xor_strings call the
+appropriate safe/fast routine by default. May be as simple as:
+
+  our (*xor_strings) = safe_xor_strings|fast_xor_strings; #?
+
+----------------------------------------------------------------------
+
+Subject: get modules CPAN-ready
+Status: done
+
+The usual suspects:
+
+* license details (including copyright year) (done)
+* having useful unit tests (done)
+* project-specific README (done)
+* $VERSION in each file (done)
+* sanity-check MANIFEST file (and try installing from dist tarfile) (done)
+* POD included/up-to-date (done)
+* test on a variety of platforms (x86/x86_64/ARM) (oops.. forgot)
+
+Afterwards:
+
+* check smoke tests online and fix any problems
+
+
+----------------------------------------------------------------------
+
+Subject: Fix smoke test errors
+Status: done
+
+Edited error outputs:
+
+#   Failed test 'use Net::OnlineCode::Decoder;'
+#   at t/05_Decoder.t line 4.
+#     Tried to use 'Net::OnlineCode::Decoder'.
+#     Error:  Type of arg 1 to push must be array (not hash element) at GraphDecoder.pm line 80, near "};"
+# Type of arg 1 to push must be array (not array element) at GraphDecoder.pm line 235, near "$node;"
+# Type of arg 1 to keys must be hash or array (not array element) at GraphDecoder.pm line 465, near "];"
+# Type of arg 1 to push must be array (not hash element) at GraphDecoder.pm line 506, near "};"
+# Type of arg 1 to push must be array (not hash element) at GraphDecoder.pm line 513, near "$nodelist;"
+# Type of arg 1 to push must be array (not array element) at GraphDecoder.pm line 522, near "$node;"
+# Type of arg 1 to push must be array (not hash element) at GraphDecoder.pm line 529, near "$new_hash;"
+# Type of arg 1 to keys must be hash or array (not array element) at GraphDecoder.pm line 586, near "];"
+# Type of arg 1 to keys must be hash or array (not array element) at GraphDecoder.pm line 637, near "];"
+# Compilation failed in require at Decoder.pm line 9.
+# BEGIN failed--compilation aborted at Decoder.pm line 9.
+# Compilation failed in require at (eval 4) line 2.
+# BEGIN failed--compilation aborted at (eval 4) line 2.
+# Looks like you failed 1 test of 1.
+t/05_Decoder.t ......... 
+
+All of these are for Perl versions < 5.14. The problem is apparently
+that I'm using hashrefs and arrayrefs and operating on them as if they
+were hashes and arrays. This doesn't work in older versions of
+perl. See perllol/Growing Your Own.
+
+I'll install an old (5.004) version of Perl somewhere and see if I can
+rework the code to use explicit dereferences. In the meantime, I've
+marked all the places where the errors cropped up with the comment
+"5.14".
+
+Rather than test with older version of Perl (which proved impossible
+with my distro without installing from source), I've just put the
+appropriate @{} and %{} casts around the offending items.
+
+The other problem that I can deduce from the cpantester reports is
+that I was using 'integer-type int' in my Build.PL. This works fine
+for "short int", "long int" and so on, but obviously fails for "int
+int", which isn't a C type.
+
+----------------------------------------------------------------------
+
+Subject: Write a more memory-efficient Set module
+Status: done
+
+None of the alternatives look like they're particularly geared to
+reducing the memory footprint. Set::Light is supposed to be but I
+gather from reading the man page that it's effectively only using
+regular hashes to implement set membership. I'm inclined to implement
+a solution based on compressing the set contents in memory using Rice
+encoding:
+
+ http://giovanni.bajo.it/post/47119962313/golomb-coded-sets-smaller-than-bloom-filters
+
+Done:
+
+Hashes have been replaced by arrays everywhere except for graph "up"
+edges (eg, from message to aux/check blocks). For XOR lists, dealing
+with duplicate entries has been handled by "lazy" expansion of the
+list (done after resolution instead of during), while for down edges,
+the need to delete single edges was eliminated (now only need to
+delete all edges).
+
+----------------------------------------------------------------------
+
+Subject: implement "transparent" aux blocks
+Status: pending
+
+Add extra edges from check blocks to message blocks, passing through
+(expanding) auxiliary block. This should open up new opportunities to
+resolve the graph that aren't present in the original algorithm.
+
+----------------------------------------------------------------------
+
+Subject: Write C/XS version of large parts of code
+
+After extensive profiling-led modifications, I'm at the stage where no
+further (worthwhile) speed improvements can be made with the Perl
+code. I feel that the run time for graph decoding probably renders the
+library too slow to be useful in practice for many applications (ie,
+with upwards of 100,000 check blocks). It's still useful for some
+purposes (including using as a base for sketching out higher-level
+protocols and experimenting with changes such as "transparent" aux
+blocks, as above) but to bring it to the next level I'll need to
+re-code many parts in C:
+
+* RNG
+* Fisher-Yates algorithm
+* GraphDecoder::resolve()
+
+

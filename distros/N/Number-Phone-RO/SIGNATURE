@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 d25ceb8d1017946d61de8d2fdad073c144c30b89 Changes
+SHA1 f72c04c2ecfd152886f35d56dcf327894a8617f4 MANIFEST
+SHA1 bd4e0c2536103f08602f82f6283273fca447f681 META.json
+SHA1 f6d353b5486d40924195cc78ad5ff796fc9b69a3 META.yml
+SHA1 68b74465068c16b0a125002083e0ac5b5dc58a13 Makefile.PL
+SHA1 7dc1e5169674be01a557754d85b2fe3090b6f762 README
+SHA1 2e2711f8aab5a067442dccd8f63c531374ca0c45 lib/Number/Phone/RO.pm
+SHA1 26f04d0250318655651318852159aa9e2bd906e7 t/Number-Phone-RO.t
+SHA1 31e28b5d838b64cfbb4cf1a8040e9238b6d6af33 t/network.t
+SHA1 190939b33d26a5900164708c5b5fd550d3e853f0 t/perlcritic.t
+SHA1 e4e0fd9a5add27aea8ea4b88c780bba779e973f6 t/perlcriticrc
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJXN6/qAAoJEMoENb5ewbNiy3IP/j+U19nPX9WFVcBrNDbV+Kl2
+WlTSg/aObuUw2HMMAmuYqbyGJixYf4Sh9mjgjeOwWUssaHU9MM+EIzVZSb+UtpDF
+lIxHChDMSQsNYSNzP0cT80s4Q6naKIxodbsgeOmio3mb8zKX8/Bhv+sfgkD8peBd
+jZ64YBwFHWz7v/h7paViBHjZobG0eGKF8vCqO/z+T3VigtE4WQxDw6om6uXEc4iw
+UTAv2IumjY2xBXdgTTdEXTdXXYeupYbuHksGhoReKszwvWo+umfPLekqa3niEAK9
+G4rqaNgy36YJn7nW+3wtcVvSdyTG6fNCpKgH7c/2CANf7LUnaxUSQNt2H4Iqkawp
+m0gSH38tmguv+FBe6x053qePx+u32lrTEuLJPp37xwS1hrZIecdgBV3+okK5iUh5
+YNsofb5AxnhKISaeRYiFfNVn/H55NgYRzW5W8Y3GaTTtN6kkTNJO6kvNPpiJIBIX
+eZblmkxXgjxwWClwkmF+xRBtL1K1DovLnuqgZRI4QOCvyu872hrO5NW+a1JEKqXd
+D3Nrkp4EWREed3XqtaYIHJARAjykH8yD1r4ukJSzBUmOTiRBIwPqNEUpOcsbdiEz
+jkThDMTyvEaynBs+OcYknPv1bkBJXXdzypL1HgN6Yld83+BPbk/GEGZTELUJZ1vo
+T9ThuhaxJuRkM8+xnYJd
+=cRnP
+-----END PGP SIGNATURE-----

@@ -1,0 +1,41 @@
+Net-Rackspace-Notes
+
+A convenient command line interface to Rackspace Email Notes.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Usage: racknotes command [arguments]
+  
+  Available Commands:
+    add         add a new note, content is read from stdin
+    append      append the content of stdin to the note
+    delete      delete the note
+    help        show syntax and available commands
+    list        lists id and subject of all notes
+    replace     replace the contents of the note
+    show        show the contents of the note
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can read the documentation with the perldoc command:
+
+    perldoc racknotes
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Naveed Massjouni
+
+This program is free software. You can redistribute it and/or modify it
+under the terms of the GNU General Public License as published
+by the Free Software Foundation.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,14 @@
+/Build
+/Build.bat
+/MANIFEST.bak
+/META.yml
+/META.json
+/MYMETA.json
+/MYMETA.yml
+/Net-Duo-*/
+/Net-Duo-*.tar.gz
+/Net-Duo-*.tar.gz.asc
+/_build/
+/blib/
+/cover_db/
+/pm_to_blib

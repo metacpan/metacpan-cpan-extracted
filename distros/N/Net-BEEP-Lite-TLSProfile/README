@@ -1,0 +1,38 @@
+Net::BEEP::Lite::TLSProfile version 0.01
+==========================
+
+Net::BEEP::Lite::TLSProfile is (as it's name implies) a TLS profile
+implementation for Net::BEEP::Lite.
+
+There is an example client and server in the test directory
+(test_tls_echo_client.pl and test_tls_echo_server.pl) that can be used
+as a starting point, in addition to the built-in POD documentation.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  IO::Socket::SSL
+  XML::LibXML
+
+AUTHOR
+
+Send questions, comments, suggestions, bugs to
+davidb@verisignlabs.com.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Verisign, Inc.
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU LESSER GENERAL PUBLIC LICENSE.
+

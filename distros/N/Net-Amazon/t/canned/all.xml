@@ -1,0 +1,943 @@
+<?xml version="1.0"?>
+<ItemSearchResponse xmlns="http://webservices.amazon.com/AWSECommerceService/2011-08-01">
+  <Items>
+    <TotalResults>5379</TotalResults>
+    <TotalPages>538</TotalPages>
+    <MoreSearchResultsUrl>http://www.amazon.com/gp/redirect.html?camp=2025&amp;creative=386001&amp;location=http%3A%2F%2Fwww.amazon.com%2Fgp%2Fsearch%3Fkeywords%3Dperl%26url%3Dsearch-alias%253Daws-amazon-aps&amp;linkCode=xm2&amp;tag=blogdivebombo-20&amp;SubscriptionId=1V5JRJ4JQCSHB3NGG902</MoreSearchResultsUrl>
+    <Item>
+      <ASIN>1449303587</ASIN>
+      <SalesRank>9187</SalesRank>
+      <ItemAttributes>
+        <Author>Randal L. Schwartz</Author>
+        <Author>brian d foy</Author>
+        <Author>Tom Phoenix</Author>
+        <Binding>Paperback</Binding>
+        <EAN>9781449303587</EAN>
+        <EANList>
+          <EANListElement>9781449303587</EANListElement>
+        </EANList>
+        <Edition>Sixth Edition</Edition>
+        <ISBN>1449303587</ISBN>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <Label>O'Reilly Media</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>3999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$39.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>O'Reilly Media</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>390</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2011-07-01</PublicationDate>
+        <Publisher>O'Reilly Media</Publisher>
+        <SKU>A13410363</SKU>
+        <Studio>O'Reilly Media</Studio>
+        <Title>Learning Perl</Title>
+        <TradeInValue>
+          <Amount>970</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$9.70</FormattedPrice>
+        </TradeInValue>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>2199</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$21.99</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>2099</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$20.99</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>36</TotalNew>
+        <TotalUsed>14</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/1449303587%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D1449303587</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>UX5FqnIPaNpdK%2FiraUUYAkYqSChjLhGGVQjailwz4sG3ifHcEPPEDx9v03Yi%2FX40TYkFGMqde1ics6lAkhqrnk8yQhKpnCATxM0QH%2FYXOU4q3hQRWnay8w%3D%3D</OfferListingId>
+            <Price>
+              <Amount>2399</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$23.99</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>1600</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$16.00</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>40</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>0596520107</ASIN>
+      <SalesRank>49046</SalesRank>
+      <ItemAttributes>
+        <Author>Randal Schwartz</Author>
+        <Author>Tom Phoenix</Author>
+        <Author>brian d foy</Author>
+        <Binding>Paperback</Binding>
+        <EAN>9780596520106</EAN>
+        <EANList>
+          <EANListElement>9780596520106</EANListElement>
+        </EANList>
+        <Edition>5th</Edition>
+        <ISBN>0596520107</ISBN>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <ItemDimensions>
+          <Height Units="hundredths-inches">74</Height>
+          <Length Units="hundredths-inches">921</Length>
+          <Weight Units="hundredths-pounds">105</Weight>
+          <Width Units="hundredths-inches">709</Width>
+        </ItemDimensions>
+        <Label>O'Reilly Media</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>3999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$39.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>O'Reilly Media</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>352</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2008-07-04</PublicationDate>
+        <Publisher>O'Reilly Media</Publisher>
+        <SKU>0596520107BAK</SKU>
+        <Studio>O'Reilly Media</Studio>
+        <Title>Learning Perl, 5th Edition</Title>
+        <TradeInValue>
+          <Amount>893</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$8.93</FormattedPrice>
+        </TradeInValue>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>7485</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$74.85</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>792</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$7.92</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>9</TotalNew>
+        <TotalUsed>34</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+        <MoreOffersUrl>0</MoreOffersUrl>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>0596000278</ASIN>
+      <SalesRank>20572</SalesRank>
+      <ItemAttributes>
+        <Author>Larry Wall</Author>
+        <Author>Tom Christiansen</Author>
+        <Author>Jon Orwant</Author>
+        <Binding>Paperback</Binding>
+        <EAN>9780596000271</EAN>
+        <EANList>
+          <EANListElement>9780596000271</EANListElement>
+        </EANList>
+        <Edition>3rd</Edition>
+        <ISBN>0596000278</ISBN>
+        <ItemDimensions>
+          <Height Units="hundredths-inches">175</Height>
+          <Length Units="hundredths-inches">917</Length>
+          <Weight Units="hundredths-pounds">304</Weight>
+          <Width Units="hundredths-inches">701</Width>
+        </ItemDimensions>
+        <Label>O'Reilly Media</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>4999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$49.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>O'Reilly Media</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>1092</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2000-07-21</PublicationDate>
+        <Publisher>O'Reilly Media</Publisher>
+        <SKU>6885074</SKU>
+        <Studio>O'Reilly Media</Studio>
+        <Title>Programming Perl (3rd Edition)</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>1495</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$14.95</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>129</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$1.29</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>59</TotalNew>
+        <TotalUsed>108</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/0596000278%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D0596000278</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>AfVWFi1k54AVThH7yB%2BvrRMMRvPxtry%2FbX9m8sdc6cwFZfHuLHPqhdhRQDA9pbve6aYMhJDYdeGae64uDgGKQG%2Fxt3As3BDbUYYlUiRVNkk%3D</OfferListingId>
+            <Price>
+              <Amount>3149</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$31.49</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>1850</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$18.50</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>37</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>0321496949</ASIN>
+      <SalesRank>240267</SalesRank>
+      <ItemAttributes>
+        <Author>Joseph N. Hall</Author>
+        <Author>Joshua A. McAdams</Author>
+        <Author>brian d foy</Author>
+        <Binding>Paperback</Binding>
+        <CatalogNumberList>
+          <CatalogNumberListElement>0321496949</CatalogNumberListElement>
+        </CatalogNumberList>
+        <EAN>9780321496942</EAN>
+        <EANList>
+          <EANListElement>9780321496942</EANListElement>
+        </EANList>
+        <Edition>2</Edition>
+        <ISBN>0321496949</ISBN>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <ItemDimensions>
+          <Height Units="centimeters">2.18</Height>
+          <Weight Units="hundredths-pounds">2</Weight>
+          <Width Units="centimeters">1.75</Width>
+        </ItemDimensions>
+        <Label>Addison-Wesley Professional</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>4499</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$44.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Addison-Wesley Professional</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>504</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2010-04-29</PublicationDate>
+        <Publisher>Addison-Wesley Professional</Publisher>
+        <SKU>BH-9780321496942</SKU>
+        <Studio>Addison-Wesley Professional</Studio>
+        <Title>Effective Perl Programming: Ways to Write Better, More Idiomatic Perl (2nd Edition) (Effective Software Development Series)</Title>
+        <TradeInValue>
+          <Amount>610</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$6.10</FormattedPrice>
+        </TradeInValue>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>2557</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$25.57</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>2276</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$22.76</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>38</TotalNew>
+        <TotalUsed>23</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/0321496949%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D0321496949</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>ttH%2B7W3%2FCOEH4bAFu%2BYOthGPptFP%2FPKhIxHzQAnBclEceOxkHsaaqYNhtKfYMb5VtIWHEZ0Nui%2BwGcQzUfYwj%2FcxHPe67iRNaFqKh%2F4RzmU2Dk73tG652g%3D%3D</OfferListingId>
+            <Price>
+              <Amount>3149</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$31.49</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>1350</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$13.50</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>30</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>0596004923</ASIN>
+      <SalesRank>73143</SalesRank>
+      <ItemAttributes>
+        <Author>Tom Christiansen</Author>
+        <Author>brian d foy</Author>
+        <Author>Larry Wall</Author>
+        <Binding>Paperback</Binding>
+        <EAN>9780596004927</EAN>
+        <EANList>
+          <EANListElement>9780596004927</EANListElement>
+        </EANList>
+        <Edition>4</Edition>
+        <ISBN>0596004923</ISBN>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <Label>O'Reilly Media</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>4999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$49.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>O'Reilly Media</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>1000</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2011-12-31</PublicationDate>
+        <Publisher>O'Reilly Media</Publisher>
+        <SKU>0596004923</SKU>
+        <Studio>O'Reilly Media</Studio>
+        <Title>Programming Perl: Unmatched power for text processing and scripting (Otx)</Title>
+        <TradeInValue>
+          <Amount>888</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$8.88</FormattedPrice>
+        </TradeInValue>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>2961</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$29.61</FormattedPrice>
+        </LowestNewPrice>
+        <TotalNew>1</TotalNew>
+        <TotalUsed>0</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/0596004923%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D0596004923</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>mxTWfbvRdRLYlUM0ygkFTh1FM7mXIMb07GVMMcXZmXs3088Ur4BVyoYv05AaMffHZ%2FY5nd6yGTx%2FGUTVxfnkyyyd%2BFkDHStUQ4NRB8l%2FFAs3Q%2BX8vXS9Sw%3D%3D</OfferListingId>
+            <Price>
+              <Amount>2961</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$29.61</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>2038</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$20.38</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>41</PercentageSaved>
+            <Availability>Not yet published</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <IsPreorder>1</IsPreorder>
+              <MinimumHours>48</MinimumHours>
+              <MaximumHours>72</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B0026OR3NK</ASIN>
+      <SalesRank>17445</SalesRank>
+      <ItemAttributes>
+        <Author>Brian d foy</Author>
+        <Author>Randal L. Schwartz</Author>
+        <Author>Tom Phoenix</Author>
+        <Binding>Kindle Edition</Binding>
+        <Edition>5</Edition>
+        <EISBN>9780596550424</EISBN>
+        <Format>Kindle eBook</Format>
+        <Label>O'Reilly Media</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>3199</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$31.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>O'Reilly Media</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>352</NumberOfPages>
+        <ProductGroup>eBooks</ProductGroup>
+        <ProductTypeName>ABIS_EBOOKS</ProductTypeName>
+        <PublicationDate>2009-03-05</PublicationDate>
+        <Publisher>O'Reilly Media</Publisher>
+        <ReleaseDate>2009-03-05</ReleaseDate>
+        <Studio>O'Reilly Media</Studio>
+        <Title>Learning Perl</Title>
+      </ItemAttributes>
+    </Item>
+    <Item>
+      <ASIN>0596003137</ASIN>
+      <SalesRank>134170</SalesRank>
+      <ItemAttributes>
+        <Author>Tom Christiansen</Author>
+        <Author>Nathan Torkington</Author>
+        <Binding>Paperback</Binding>
+        <CatalogNumberList>
+          <CatalogNumberListElement>AL09041835</CatalogNumberListElement>
+        </CatalogNumberList>
+        <EAN>9780596003135</EAN>
+        <EANList>
+          <EANListElement>9780596003135</EANListElement>
+        </EANList>
+        <Edition>Second Edition</Edition>
+        <ISBN>0596003137</ISBN>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <ItemDimensions>
+          <Height Units="hundredths-inches">182</Height>
+          <Length Units="hundredths-inches">919</Length>
+          <Weight Units="hundredths-pounds">311</Weight>
+          <Width Units="hundredths-inches">703</Width>
+        </ItemDimensions>
+        <Label>O'Reilly Media</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>4995</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$49.95</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>O'Reilly Media</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>966</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2003-08-28</PublicationDate>
+        <Publisher>O'Reilly Media</Publisher>
+        <SKU>0596003137-1314560083302</SKU>
+        <Studio>O'Reilly Media</Studio>
+        <Title>Perl Cookbook, Second Edition</Title>
+        <TradeInValue>
+          <Amount>370</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$3.70</FormattedPrice>
+        </TradeInValue>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>2250</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$22.50</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>600</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$6.00</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>28</TotalNew>
+        <TotalUsed>43</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/0596003137%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D0596003137</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>2LIS0rXR4E%2Fce2hvgf9cXm%2BYs%2FvTDyL27xdqnwwhThSiR7Ez2cEYr2VrgkqJMGSdZ3Fgbw5BGpnzvrgupZtPpyW%2BkgtzPUuTeKR7aWS9pc4%3D</OfferListingId>
+            <Price>
+              <Amount>3297</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$32.97</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>1698</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$16.98</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>34</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>0596102062</ASIN>
+      <SalesRank>30981</SalesRank>
+      <ItemAttributes>
+        <Author>Randal L. Schwartz</Author>
+        <Author>Tom Phoenix</Author>
+        <Author>brian d foy</Author>
+        <Binding>Paperback</Binding>
+        <EAN>9780596102067</EAN>
+        <EANList>
+          <EANListElement>9780596102067</EANListElement>
+        </EANList>
+        <Edition>2nd</Edition>
+        <Feature>ISBN13: 9780596102067</Feature>
+        <Feature>Condition: New</Feature>
+        <Feature>Notes: BRAND NEW FROM PUBLISHER! 100% Satisfaction Guarantee. Tracking provided on most orders. Buy with Confidence! Millions of books sold!</Feature>
+        <ISBN>0596102062</ISBN>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <ItemDimensions>
+          <Height Units="hundredths-inches">62</Height>
+          <Length Units="hundredths-inches">917</Length>
+          <Weight Units="hundredths-pounds">87</Weight>
+          <Width Units="hundredths-inches">700</Width>
+        </ItemDimensions>
+        <Label>O'Reilly Media</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>3999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$39.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>O'Reilly Media</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>288</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2006-03-15</PublicationDate>
+        <Publisher>O'Reilly Media</Publisher>
+        <SKU>TU78036251</SKU>
+        <Studio>O'Reilly Media</Studio>
+        <Title>Intermediate Perl</Title>
+        <TradeInValue>
+          <Amount>425</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$4.25</FormattedPrice>
+        </TradeInValue>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>2000</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$20.00</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>1850</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$18.50</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>28</TotalNew>
+        <TotalUsed>24</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/0596102062%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D0596102062</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>iL7iwQVz9TYW8zFTz1riXqVaWfCZiQXHRSDIkEolo%2B8deU7MEB%2FWdWFkSauY%2FXel8bpB493%2FekJoBZg1YDl%2FlGehFf%2FsH7ga0N5th844AA1MH8dXSGr0QQ%3D%3D</OfferListingId>
+            <Price>
+              <Amount>2639</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$26.39</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>1360</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$13.60</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>34</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>059600639X</ASIN>
+      <SalesRank>56909</SalesRank>
+      <ItemAttributes>
+        <Author>David N. Blank-Edelman</Author>
+        <Binding>Paperback</Binding>
+        <EAN>9780596006396</EAN>
+        <EANList>
+          <EANListElement>9780596006396</EANListElement>
+        </EANList>
+        <Edition>Second Edition</Edition>
+        <ISBN>059600639X</ISBN>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <ItemDimensions>
+          <Height Units="hundredths-inches">133</Height>
+          <Length Units="hundredths-inches">912</Length>
+          <Weight Units="hundredths-pounds">189</Weight>
+          <Width Units="hundredths-inches">700</Width>
+        </ItemDimensions>
+        <Label>O'Reilly Media</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>3999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$39.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>O'Reilly Media</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>668</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2009-06-05</PublicationDate>
+        <Publisher>O'Reilly Media</Publisher>
+        <SKU>NP9780596006396</SKU>
+        <Studio>O'Reilly Media</Studio>
+        <Title>Automating System Administration with Perl: Tools to Make You More Efficient</Title>
+        <TradeInValue>
+          <Amount>775</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$7.75</FormattedPrice>
+        </TradeInValue>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>2224</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$22.24</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>2000</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$20.00</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>35</TotalNew>
+        <TotalUsed>22</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/059600639X%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D059600639X</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>1SOvTxDrn2SRHwJpTxs9k3%2FF2Mj7KIwI57X5e2DiD5%2FN%2F9iYvEm4JzAu3WLHoHBFcBwOyHJqV1uAEebgt6Q%2FiJIpt2urDYRd0H2PUr6GGk6NIxYDM3LWcA%3D%3D</OfferListingId>
+            <Price>
+              <Amount>2625</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$26.25</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>1374</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$13.74</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>34</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>24</MinimumHours>
+              <MaximumHours>24</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>1598632221</ASIN>
+      <SalesRank>42962</SalesRank>
+      <ItemAttributes>
+        <Author>Jr.  Jerry Lee Ford</Author>
+        <Binding>Paperback</Binding>
+        <EAN>9781598632224</EAN>
+        <EANList>
+          <EANListElement>9781598632224</EANListElement>
+        </EANList>
+        <Edition>1</Edition>
+        <ISBN>1598632221</ISBN>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <ItemDimensions>
+          <Height Units="hundredths-inches">95</Height>
+          <Length Units="hundredths-inches">847</Length>
+          <Weight Units="hundredths-pounds">175</Weight>
+          <Width Units="hundredths-inches">805</Width>
+        </ItemDimensions>
+        <Label>Course Technology PTR</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>2999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$29.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Course Technology PTR</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>400</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2006-06-30</PublicationDate>
+        <Publisher>Course Technology PTR</Publisher>
+        <SKU>UK-14573969BK386tol</SKU>
+        <Studio>Course Technology PTR</Studio>
+        <Title>Perl Programming for the Absolute Beginner</Title>
+        <TradeInValue>
+          <Amount>356</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$3.56</FormattedPrice>
+        </TradeInValue>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>1579</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$15.79</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>1145</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$11.45</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>18</TotalNew>
+        <TotalUsed>16</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/1598632221%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D1598632221</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>jeV7nQudWiWZfI0FLLVCXI01lbEnU6R470qFUGJrmfwSelEUQmUaP0VMY78yrtBqAay%2BtLL%2FEN0jPi%2BY5Vjv3rcsk9lkm8nBnPqlrMkgBoMc%2B%2FpSydvq6A%3D%3D</OfferListingId>
+            <Price>
+              <Amount>1635</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$16.35</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>1364</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$13.64</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>45</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+  </Items>
+</ItemSearchResponse>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><ShoppingCartResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://xml.amazon.com/schemas3/dev-heavy.xsd">
+
+<Request><Args><Arg value="Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.2.1) Gecko/20030225" name="UserAgent"></Arg><Arg value="1S6WKKEW0M7HA5VQ1AN5" name="RequestID"></Arg><Arg value="true" name="sims"></Arg><Arg value="us" name="locale"></Arg><Arg value="add" name="ShoppingCart"></Arg><Arg value="3" name="Asin.B00000IP2Z"></Arg><Arg value="D1QS8OZAEP31QW" name="dev-t"></Arg><Arg value="webservices-20" name="t"></Arg><Arg value="xml" name="f"></Arg><Arg value="1" name="Asin.B000002WU5"></Arg></Args></Request>  <ShoppingCart>
+   <CartId>102-3943239-9152129</CartId>
+   <HMAC>ZVqP4aWszFFI91NoeZ0P5f6JPhk=</HMAC>
+   <PurchaseUrl>http://www.amazon.com/exec/obidos/shopping-basket?cart-id=102-3943239-9152129%26associate-id=webservices-20%26hmac=ZVqP4aWszFFI91NoeZ0P5f6JPhk%3D</PurchaseUrl>
+   <Items>
+    <Item>
+
+     <ItemId>730120389330888857</ItemId>
+     <ProductName>Cabaret Manana</ProductName>
+     <MerchantSku></MerchantSku>
+     <Asin>B000002WU5</Asin>
+     <Quantity>1</Quantity>
+     <ListPrice>USD 11.98</ListPrice>
+
+     <OurPrice>USD 10.99</OurPrice>
+    </Item>
+    <Item>
+     <ItemId>5880242742174431647</ItemId>
+     <ProductName>Ultra-Lounge: Tiki Sampler</ProductName>
+     <MerchantSku></MerchantSku>
+     <Asin>B00000IP2Z</Asin>
+
+     <Quantity>3</Quantity>
+     <ListPrice>USD 19.98</ListPrice>
+     <OurPrice>USD 16.99</OurPrice>
+    </Item>
+   </Items>
+   <SimilarProducts>
+    <Product>B0000048E7</Product>
+
+    <Product>B000002MWF</Product>
+    <Product>B00006I0D4</Product>
+    <Product>B000002TWF</Product>
+    <Product>B000002U5V</Product>
+   </SimilarProducts>
+  </ShoppingCart>
+</ShoppingCartResponse>

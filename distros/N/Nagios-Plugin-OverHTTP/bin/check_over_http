@@ -1,0 +1,26 @@
+#!/usr/bin/perl
+#
+# This Nagios Plugin is ePN-compatible!
+# nagios: +epn
+#
+# It is highly recommended that you use this plugin with ePN
+# as this module uses Moose, which can sometimes result in slow
+# startup time.
+
+use 5.008001;
+use strict;
+use warnings 'all';
+
+use Nagios::Plugin::OverHTTP 0.06;
+
+# Script metadata
+our $AUTHORITY = 'cpan:DOUGDUDE';
+our $VERSION   = '0.13';
+
+# Clean the @ARGV that ePN may mess up
+if (__PACKAGE__ =~ m{\A Embed::}msx) {
+	@ARGV = grep { defined $_ } @ARGV;
+}
+
+# Make a plugin instance, run, and exit
+exit Nagios::Plugin::OverHTTP->new_with_options(timeout => 10)->run;

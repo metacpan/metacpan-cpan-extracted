@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+Build.PL
+README
+lib/Net/Domain/ExpireDate.pm
+META.yml                                Module meta-data (added by MakeMaker)
+domdates
+t/01.t
+META.json

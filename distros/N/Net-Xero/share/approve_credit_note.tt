@@ -1,0 +1,5 @@
+<CreditNote>
+<CreditNoteID>[% CreditNotes.CreditNote.CreditNoteID %]</CreditNoteID>
+<Type>[% CreditNotes.CreditNote.Type %]</Type>
+<Status>AUTHORISED</Status>
+</CreditNote>

@@ -1,0 +1,9 @@
+perl Makefile.pl
+
+make
+
+make install
+
+This will install Net::HTTPTunnel such that you will be able to use it.
+
+See README for information on how to use the module.

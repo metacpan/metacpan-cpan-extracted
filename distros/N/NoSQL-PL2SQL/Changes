@@ -1,0 +1,109 @@
+Revision history for Perl extension NoSQL::PL2SQL.
+
+0.01  Mon Oct  8 13:01:46 2012
+	- original version; created by h2xs 1.23 with options
+		-An NoSQL::PL2SQL
+
+1.00  Mon Oct  8 13:01:46 2012
+	- Incremented the version for release.
+
+1.01  Sat Nov  3 12:50:08 EDT 2012
+	- Ironically, PL2SQL::SQLObject() actually failed to bless 
+	  unblessed objects.  An explicit bless() was added.
+	- Added a test to insert an undef.
+	- Cleaned up documentation.
+
+1.02  Tue Nov 13 13:36:42 EST 2012
+	- Fixed a few more documentation typos.
+	- Tests to make sure PL2SQL methods handle non-tied objects.
+	- Fixed PL2SQL::Object::sqlobject() to identify and return
+	  untied containers
+
+1.03  Mon Nov 19 12:09:17 EST 2012
+	- Fixed a few more documentation typos.
+	- Throws an error on duplicate ObjectID assignment
+	- Added support for SQLObject() error handlers
+	- Added SQLError() method to assign error handlers
+	- Fixed a bug in PL2SQL::Object::DESTROY() preventing
+	  items from being added to empty containers
+
+1.04  Sat Nov 24 16:55:47 EST 2012
+	- Fixed a bug in PL2SQL::Node::stringsplit() which converted 
+	  a 0 length string to undefined
+	- Fixed a bug in PL2SQL::Object::DESTROY() which sometimes lost 
+	  global values writing new nodes.
+	- PL2SQL::DBI methods have been revised and are more useful for
+	  data sources other than PL2SQL:
+
+	- Generalized PL2SQL::DBI::fetch() and PL2SQL::DBI::perldata()
+	  methods to handle arbitrary schemas
+	- PL2SQL::DBI::perldata() arguments are explicitly defined
+	- PL2SQL::DBI::delete() now accepts the same argument format as
+	  PL2SQL::DBI::fetch()
+	- PL2SQL::DBI::table() can be invoked as a factory
+
+1.10  Tue Nov 27 13:54:59 EST 2012
+	- cksums.txt was incomplete
+	- Incremented minor version to reflect new functionality in PL2SQL::DBI
+
+	lib/NoSQL/PL2SQL/DBI.pm
+	  - Schema changed: CREATE INDEX
+	  - indexschema() method added
+	  - sqlstatement() sprintf changed to allow multiple terms
+	  - table() can now be overloaded as a factory constructor
+	    in order to share a db handle among several dsn's
+	  - Methods db(), connect(), and dbconnect() now reflect this change
+	  - Method sqlupdate() added:  Allows an SQL UPDATE statement to
+	    be generated using the same conditional arguments as fetch().
+	  - update() return value now contains {nvp} property that is
+	    passed to the sqlupdate() method.
+	  - perldata() returns array of hashes of rows_hash() unless
+	    exists {id} property
+
+	lib/NoSQL/PL2SQL/Object.pm
+	  - The test that determines the perldata header record was
+	    rewritten as it sometimes found the wrong record.
+
+	- lib/NoSQL/DBI/SQLite.pm was updated to reflect the changes
+	  in lib/NoSQL/DBI.pm
+
+1.11  Thu Dec 13 10:02:28 EST 2012
+	- Overloaded DESTROY method now fails gracefully
+	- Added method descriptors to sqlite.t so I can interprete
+	  the CPAN test reports
+
+1.12  Thu Dec 20 13:30:05 EST 2012
+	- Changed XML::Parser requirement to 2.41
+	- stringtest() fixed in sqlite.t
+	- Fixed insertall().  Scalars with refct > 1 need to be preserved.  
+	  When the delete flag is set, the chained string was recalculated 		  on undefined scalar data, resulting in a broken chain.  
+
+1.13  Sat Dec 22 09:52:39 EST 2012
+	- Fixed insertall() again (false postive on zero length strings)
+
+1.14  Tue Jan 22 12:36:46 EST 2013
+	- NoSQL::PL2SQL::DBI::perldata() has been changed again.  New 
+	  invocation:
+	    $dsn->fetch()->perldata
+
+1.20  Tue Mar  5 15:06:19 EST 2013
+	- Minor release:  Implements record locking and full vs partial \		  updates for better concurrent data access:
+	    Added NoSQL::PL2SQL::Lock class definition
+	    Added NoSQL::PL2SQL::Clone class definition
+	    Added method NoSQL::PL2SQL::Object::package
+	    Added method NoSQL::PL2SQL::Object::objectkey
+	    Added method NoSQL::PL2SQL::Object::innerclone
+	- Fixed a bug- now maintains internal references in SQLClone() clones.
+	- Eliminated NoSQL::PL2SQL::DBI::perldata() * NO BACKWARDS CAPABILITY *
+	- Rewrote documentation of NoSQL::PL2SQL::DBI to reflect usage
+	  independent of NoSQL::PL2SQL.
+	- Error handlers are now specifically assigned to a class.
+
+1.21  Mon Apr 29 23:37:09 EDT 2013
+	- Updated to reflect dependencies
+	- Refactored NoSQL::PL2SQL::Object
+	    data()
+	    FETCH()
+	    DELETE()
+	- Added internal %scalars to NoSQL::PL2SQL::Nodes::insertall
+

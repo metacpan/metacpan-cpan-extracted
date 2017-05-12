@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Net/DCCIf.pm
+t/00basic.t
+META.yml                                Module meta-data (added by MakeMaker)

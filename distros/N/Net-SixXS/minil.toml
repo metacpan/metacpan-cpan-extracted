@@ -1,0 +1,7 @@
+name = "Net-SixXS"
+# badges = ["travis"]
+authority="cpan:ROAM"
+
+module_maker="ModuleBuildTiny"
+
+release.do_not_upload_to_cpan=true

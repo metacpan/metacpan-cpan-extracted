@@ -1,0 +1,3 @@
+TYPEMAP
+yauid * T_PTROBJ
+Number::YAUID T_PTROBJ

@@ -1,0 +1,263 @@
+SIOC's from various systems
+
+############################
+solaris
+
+#define SIOCGIFCONF     _IOWRN('i', 20, 8)              /* get if list */
+
+#define SIOCSIFMTU      _IOW('i',  21, struct ifreq)    /* set if mtu */
+#define SIOCGIFMTU      _IOWR('i', 22, struct ifreq)    /* get if mtu */
+
+        /* from 4.3BSD */
+#define SIOCGIFBRDADDR  _IOWR('i', 23, struct ifreq)    /* get broadcast addr */
+#define SIOCSIFBRDADDR  _IOW('i',  24, struct ifreq)    /* set broadcast addr */
+#define SIOCGIFNETMASK  _IOWR('i', 25, struct ifreq)    /* get subnetmask */
+#define SIOCSIFNETMASK  _IOW('i',  26, struct ifreq)    /* set subnetmask */
+#define SIOCGIFMETRIC   _IOWR('i', 27, struct ifreq)    /* get if metric */
+#define SIOCSIFMETRIC   _IOW('i',  28, struct ifreq)    /* set if metric */
+
+#define SIOCSARP        _IOW('i',  30, struct arpreq)   /* set arp entry */
+#define SIOCGARP        _IOWR('i', 31, struct arpreq)   /* get arp entry */
+#define SIOCDARP        _IOW('i',  32, struct arpreq)   /* delete arp entry */
+#define SIOCUPPER       _IOW('i',  40, struct ifreq)    /* attach upper layer */
+#define SIOCLOWER       _IOW('i',  41, struct ifreq)    /* attach lower layer */
+#define SIOCSETSYNC     _IOW('i',  44, struct ifreq)    /* set syncmode */
+#define SIOCGETSYNC     _IOWR('i', 45, struct ifreq)    /* get syncmode */
+#define SIOCSSDSTATS    _IOWR('i', 46, struct ifreq)    /* sync data stats */
+#define SIOCSSESTATS    _IOWR('i', 47, struct ifreq)    /* sync error stats */
+
+#define SIOCSPROMISC    _IOW('i',  48, int)             /* request promisc */
+                                                        /* mode on/off */
+#define SIOCADDMULTI    _IOW('i',  49, struct ifreq)    /* set m/c address */
+#define SIOCDELMULTI    _IOW('i',  50, struct ifreq)    /* clr m/c address */
+
+/* STREAMS based socket emulation */
+
+#define SIOCGETNAME     _IOR('s',  52, struct sockaddr) /* getsockname */
+#define SIOCGETPEER     _IOR('s',  53, struct sockaddr) /* getpeername */
+#define IF_UNITSEL      _IOW('s',  54, int)             /* set unit number */
+#define SIOCXPROTO      _IO('s',   55)                  /* empty proto table */
+
+#define SIOCIFDETACH    _IOW('i',  56, struct ifreq)    /* detach interface */
+#define SIOCGENPSTATS   _IOWR('i', 57, struct ifreq)    /* get ENP stats */
+#define SIOCX25XMT      _IOWR('i', 59, struct ifreq)    /* start a slp proc */
+                                                        /* in x25if */
+#define SIOCX25RCV      _IOWR('i', 60, struct ifreq)    /* start a slp proc */
+                                                        /* in x25if */
+#define SIOCX25TBL      _IOWR('i', 61, struct ifreq)    /* xfer lun table to */
+                                                        /* kernel */
+#define SIOCSLGETREQ    _IOWR('i', 71, struct ifreq)    /* wait for switched */
+                                                        /* SLIP request */
+#define SIOCSLSTAT      _IOW('i',  72, struct ifreq)    /* pass SLIP info to */
+                                                        /* kernel */
+#define SIOCSIFNAME     _IOW('i',  73, struct ifreq)    /* set interface name */
+#define SIOCGENADDR     _IOWR('i', 85, struct ifreq)    /* Get ethernet addr */
+#define SIOCGIFNUM      _IOR('i',  87, int)             /* get number of ifs */
+
+#define SIOCGIFMUXID    _IOWR('i', 88, struct ifreq)    /* get if muxid */
+#define SIOCSIFMUXID    _IOW('i',  89, struct ifreq)    /* set if muxid */
+
+#define SIOCGIFINDEX    _IOWR('i', 90, struct ifreq)    /* get if index */
+#define SIOCSIFINDEX    _IOW('i',  91, struct ifreq)    /* set if index */
+
+/*
+ * New interface ioctls that use the struct lifreq. Can be used for
+ * both IPv4 and IPv6.
+ */
+#define SIOCLIFREMOVEIF _IOW('i',  110, struct lifreq)  /* delete logical */
+#define SIOCLIFADDIF    _IOWR('i', 111, struct lifreq)  /* create logical */
+
+#define SIOCSLIFADDR    _IOW('i',  112, struct lifreq)  /* set if address */
+#define SIOCGLIFADDR    _IOWR('i', 113, struct lifreq)  /* get if address */
+#define SIOCSLIFDSTADDR _IOW('i',  114, struct lifreq)  /* set p-p address */
+#define SIOCGLIFDSTADDR _IOWR('i', 115, struct lifreq)  /* get p-p address */
+#define SIOCSLIFFLAGS   _IOW('i',  116, struct lifreq)  /* set if flags */
+#define SIOCGLIFFLAGS   _IOWR('i', 117, struct lifreq)  /* get if flags */
+
+/*
+ * Needs to be defined using _IOWRN macro to make it datamodel independent.
+ * Argument is a struct lifconf.
+ */
+#define SIOCGLIFCONF    _IOWRN('i', 120, 16)            /* get if list */
+#define SIOCSLIFMTU     _IOW('i',  121, struct lifreq)  /* set if mtu */
+#define SIOCGLIFMTU     _IOWR('i', 122, struct lifreq)  /* get if mtu */
+#define SIOCGLIFBRDADDR _IOWR('i', 123, struct lifreq)  /* get broadcast addr */
+#define SIOCSLIFBRDADDR _IOW('i',  124, struct lifreq)  /* set broadcast addr */
+#define SIOCGLIFNETMASK _IOWR('i', 125, struct lifreq)  /* get subnetmask */
+#define SIOCSLIFNETMASK _IOW('i',  126, struct lifreq)  /* set subnetmask */
+#define SIOCGLIFMETRIC  _IOWR('i', 127, struct lifreq)  /* get if metric */
+#define SIOCSLIFMETRIC  _IOW('i',  128, struct lifreq)  /* set if metric */
+#define SIOCSLIFNAME    _IOWR('i',  129, struct lifreq) /* set interface name */
+#define SIOCGLIFNUM     _IOWR('i', 130, struct lifnum)  /* get number of ifs */
+#define SIOCGLIFMUXID   _IOWR('i', 131, struct lifreq)  /* get if muxid */
+#define SIOCSLIFMUXID   _IOW('i',  132, struct lifreq)  /* set if muxid */
+
+#define SIOCGLIFINDEX   _IOWR('i', 133, struct lifreq)  /* get if index */
+#define SIOCSLIFINDEX   _IOW('i',  134, struct lifreq)  /* set if index */
+
+#define SIOCSLIFTOKEN   _IOW('i',  135, struct lifreq)  /* Set token for link */
+#define SIOCGLIFTOKEN   _IOWR('i', 136, struct lifreq)  /* Get token for link */
+                                                        /* local address and */
+                                                        /* autoconf */
+
+#define SIOCSLIFSUBNET  _IOW('i',  137, struct lifreq)  /* set subnet prefix */
+#define SIOCGLIFSUBNET  _IOWR('i', 138, struct lifreq)  /* get subnet prefix */
+
+#define SIOCSLIFLNKINFO _IOW('i',  139, struct lifreq)  /* set link info */
+#define SIOCGLIFLNKINFO _IOWR('i', 140, struct lifreq)  /* get link info */
+
+#define SIOCLIFDELND    _IOW('i',  141, struct lifreq)  /* Delete ND entry */
+#define SIOCLIFGETND    _IOWR('i', 142, struct lifreq)  /* Get ND entry */
+#define SIOCLIFSETND    _IOW('i',  143, struct lifreq)  /* Set ND entry */
+
+######################################
+linux
+
+#define SIOCGIFNAME     0x8910          /* get iface name               */
+#define SIOCSIFLINK     0x8911          /* set iface channel            */
+#define SIOCGIFCONF     0x8912          /* get iface list               */
+#define SIOCGIFFLAGS    0x8913          /* get flags                    */
+#define SIOCSIFFLAGS    0x8914          /* set flags                    */
+#define SIOCGIFADDR     0x8915          /* get PA address               */
+#define SIOCSIFADDR     0x8916          /* set PA address               */
+#define SIOCGIFDSTADDR  0x8917          /* get remote PA address        */
+#define SIOCSIFDSTADDR  0x8918          /* set remote PA address        */
+#define SIOCGIFBRDADDR  0x8919          /* get broadcast PA address     */
+#define SIOCSIFBRDADDR  0x891a          /* set broadcast PA address     */
+#define SIOCGIFNETMASK  0x891b          /* get network PA mask          */
+#define SIOCSIFNETMASK  0x891c          /* set network PA mask          */
+#define SIOCGIFMETRIC   0x891d          /* get metric                   */
+#define SIOCSIFMETRIC   0x891e          /* set metric                   */
+#define SIOCGIFMEM      0x891f          /* get memory address (BSD)     */
+#define SIOCSIFMEM      0x8920          /* set memory address (BSD)     */
+#define SIOCGIFMTU      0x8921          /* get MTU size                 */
+#define SIOCSIFMTU      0x8922          /* set MTU size                 */
+#define SIOCSIFHWADDR   0x8924          /* set hardware address         */
+#define SIOCGIFENCAP    0x8925          /* get/set encapsulations       */
+#define SIOCSIFENCAP    0x8926
+#define SIOCGIFHWADDR   0x8927          /* Get hardware address         */
+#define SIOCGIFSLAVE    0x8929          /* Driver slaving support       */
+#define SIOCSIFSLAVE    0x8930
+#define SIOCADDMULTI    0x8931          /* Multicast address lists      */
+#define SIOCDELMULTI    0x8932
+#define SIOCGIFINDEX    0x8933          /* name -> if_index mapping     */
+#define SIOGIFINDEX     SIOCGIFINDEX    /* misprint compatibility :-)   */
+#define SIOCSIFPFLAGS   0x8934          /* set/get extended flags set   */
+#define SIOCGIFPFLAGS   0x8935
+#define SIOCDIFADDR     0x8936          /* delete PA address            */
+#define SIOCSIFHWBROADCAST      0x8937  /* set hardware broadcast addr  */
+#define SIOCGIFCOUNT    0x8938          /* get number of devices */
+
+#define SIOCGIFBR       0x8940          /* Bridging support             */
+#define SIOCSIFBR       0x8941          /* Set bridging options         */
+
+#define SIOCGIFTXQLEN   0x8942          /* Get the tx queue length      */
+#define SIOCSIFTXQLEN   0x8943          /* Set the tx queue length      */
+/* ARP cache control calls. */
+                    /*  0x8950 - 0x8952  * obsolete calls, don't re-use */
+#define SIOCDARP        0x8953          /* delete ARP table entry       */
+#define SIOCGARP        0x8954          /* get ARP table entry          */
+#define SIOCSARP        0x8955          /* set ARP table entry          */
+
+/* RARP cache control calls. */
+#define SIOCDRARP       0x8960          /* delete RARP table entry      */
+#define SIOCGRARP       0x8961          /* get RARP table entry         */
+#define SIOCSRARP       0x8962          /* set RARP table entry         */
+
+/* Driver configuration calls */
+
+#define SIOCGIFMAP      0x8970          /* Get device parameters        */
+#define SIOCSIFMAP      0x8971          /* Set device parameters        */
+
+/* DLCI configuration calls */
+
+#define SIOCADDDLCI     0x8980          /* Create new DLCI device       */
+#define SIOCDELDLCI     0x8981          /* Delete DLCI device           */
+
+#############################
+freebsd
+
+#define SIOCTMYADDR     _IOWR('i', 144, struct sioc_addrreq)
+                                                        /* My address? */
+#define SIOCTONLINK     _IOWR('i', 145, struct sioc_addrreq)
+                                                        /* Address on-link? */
+#define SIOCTMYSITE     _IOWR('i', 146, struct sioc_addrreq)
+                                                        /* In this site? */
+
+#define SIOCGTUNPARAM   _IOR('i',  147, struct iftun_req)
+                                                        /* get tunnel */
+                                                        /* parameters */
+#define SIOCSTUNPARAM   _IOW('i',  148, struct iftun_req)
+                                                        /* set tunnel */
+#define SIOCSIFADDR      _IOW('i', 12, struct ifreq)    /* set ifnet address */
+#define OSIOCGIFADDR    _IOWR('i', 13, struct ifreq)    /* get ifnet address */
+#define SIOCGIFADDR     _IOWR('i', 33, struct ifreq)    /* get ifnet address */
+#define SIOCSIFDSTADDR   _IOW('i', 14, struct ifreq)    /* set p-p address */
+#define OSIOCGIFDSTADDR _IOWR('i', 15, struct ifreq)    /* get p-p address */
+#define SIOCGIFDSTADDR  _IOWR('i', 34, struct ifreq)    /* get p-p address */
+#define SIOCSIFFLAGS     _IOW('i', 16, struct ifreq)    /* set ifnet flags */
+#define SIOCGIFFLAGS    _IOWR('i', 17, struct ifreq)    /* get ifnet flags */
+#define OSIOCGIFBRDADDR _IOWR('i', 18, struct ifreq)    /* get broadcast addr */
+#define SIOCGIFBRDADDR  _IOWR('i', 35, struct ifreq)    /* get broadcast addr */
+#define SIOCSIFBRDADDR   _IOW('i', 19, struct ifreq)    /* set broadcast addr */
+#define OSIOCGIFCONF    _IOWR('i', 20, struct ifconf)   /* get ifnet list */
+#define SIOCGIFCONF     _IOWR('i', 36, struct ifconf)   /* get ifnet list */
+#if  defined (__amd64__) || defined (COMPAT_32BIT)
+#define SIOCGIFCONF32   _IOWR('i', 36, struct ifconf32) /* get ifnet list */
+#endif
+#define OSIOCGIFNETMASK _IOWR('i', 21, struct ifreq)    /* get net addr mask */
+#define SIOCGIFNETMASK  _IOWR('i', 37, struct ifreq)    /* get net addr mask */
+#define SIOCSIFNETMASK   _IOW('i', 22, struct ifreq)    /* set net addr mask */
+#define SIOCGIFMETRIC   _IOWR('i', 23, struct ifreq)    /* get IF metric */
+#define SIOCSIFMETRIC    _IOW('i', 24, struct ifreq)    /* set IF metric */
+#define SIOCDIFADDR      _IOW('i', 25, struct ifreq)    /* delete IF addr */
+#define SIOCAIFADDR      _IOW('i', 26, struct ifaliasreq)/* add/chg IF alias */
+
+#define SIOCALIFADDR     _IOW('i', 27, struct if_laddrreq) /* add IF addr */
+#define SIOCGLIFADDR    _IOWR('i', 28, struct if_laddrreq) /* get IF addr */
+#define SIOCDLIFADDR     _IOW('i', 29, struct if_laddrreq) /* delete IF addr */
+#define SIOCSIFCAP       _IOW('i', 30, struct ifreq)    /* set IF features */
+#define SIOCGIFCAP      _IOWR('i', 31, struct ifreq)    /* get IF features */
+#define SIOCGIFINDEX    _IOWR('i', 32, struct ifreq)    /* get IF index */
+#define SIOCGIFMAC      _IOWR('i', 38, struct ifreq)    /* get IF MAC label */
+#define SIOCSIFMAC       _IOW('i', 39, struct ifreq)    /* set IF MAC label */
+#define SIOCSIFNAME      _IOW('i', 40, struct ifreq)    /* set IF name */
+
+#define SIOCADDMULTI     _IOW('i', 49, struct ifreq)    /* add m'cast addr */
+#define SIOCDELMULTI     _IOW('i', 50, struct ifreq)    /* del m'cast addr */
+#define SIOCGIFMTU      _IOWR('i', 51, struct ifreq)    /* get IF mtu */
+#define SIOCSIFMTU       _IOW('i', 52, struct ifreq)    /* set IF mtu */
+#define SIOCGIFPHYS     _IOWR('i', 53, struct ifreq)    /* get IF wire */
+#define SIOCSIFPHYS      _IOW('i', 54, struct ifreq)    /* set IF wire */
+#define SIOCSIFMEDIA    _IOWR('i', 55, struct ifreq)    /* set net media */
+#define SIOCGIFMEDIA    _IOWR('i', 56, struct ifmediareq) /* get net media */
+
+#define SIOCSIFGENERIC   _IOW('i', 57, struct ifreq)    /* generic IF set op */
+#define SIOCGIFGENERIC  _IOWR('i', 58, struct ifreq)    /* generic IF get op */
+
+#define SIOCGIFSTATUS   _IOWR('i', 59, struct ifstat)   /* get IF status */
+#define SIOCSIFLLADDR    _IOW('i', 60, struct ifreq)    /* set linklevel addr */
+#define SIOCSIFPHYADDR   _IOW('i', 70, struct ifaliasreq) /* set gif addres */
+#define SIOCGIFPSRCADDR _IOWR('i', 71, struct ifreq)    /* get gif psrc addr */
+#define SIOCGIFPDSTADDR _IOWR('i', 72, struct ifreq)    /* get gif pdst addr */
+#define SIOCDIFPHYADDR   _IOW('i', 73, struct ifreq)    /* delete gif addrs */
+#define SIOCSLIFPHYADDR  _IOW('i', 74, struct if_laddrreq) /* set gif addrs */
+#define SIOCGLIFPHYADDR _IOWR('i', 75, struct if_laddrreq) /* get gif addrs */
+
+#define SIOCGPRIVATE_0  _IOWR('i', 80, struct ifreq)    /* device private 0 */
+#define SIOCGPRIVATE_1  _IOWR('i', 81, struct ifreq)    /* device private 1 */
+
+#define SIOCSDRVSPEC    _IOW('i', 123, struct ifdrv)    /* set driver-specific
+                                                                  parameters */
+#define SIOCGDRVSPEC    _IOWR('i', 123, struct ifdrv)   /* get driver-specific
+                                                                  parameters */
+
+#define SIOCIFCREATE    _IOWR('i', 122, struct ifreq)   /* create clone if */
+#define SIOCIFCREATE2   _IOWR('i', 124, struct ifreq)   /* create clone if */
+#define SIOCIFDESTROY    _IOW('i', 121, struct ifreq)   /* destroy clone if */
+#define SIOCIFGCLONERS  _IOWR('i', 120, struct if_clonereq) /* get cloners */
+
+#define SIOCAIFGROUP     _IOW('i', 135, struct ifgroupreq) /* add an ifgroup */
+#define SIOCGIFGROUP    _IOWR('i', 136, struct ifgroupreq) /* get ifgroups */
+#define SIOCDIFGROUP     _IOW('i', 137, struct ifgroupreq) /* delete ifgroup */
+#define SIOCGIFGMEMB    _IOWR('i', 138, struct ifgroupreq) /* get members */

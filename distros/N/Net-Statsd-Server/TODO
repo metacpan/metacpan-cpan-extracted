@@ -1,0 +1,9 @@
+== TODO list for Net::Statsd::Server ==
+
+Last updated: 2013/12/13
+ 
+* Make sure the 'deleteIdleStats' configuration directive does not
+  delete the internal metrics about received packets and bad lines seen
+* Implement new internal metrics like flush_time, flush_length & timestamp_lag
+* Support the 'title' option
+* Support the 'healthStatus' option

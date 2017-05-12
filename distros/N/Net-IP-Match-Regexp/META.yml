@@ -1,0 +1,21 @@
+---
+name: Net-IP-Match-Regexp
+version: 1.01
+author:
+  - 'Chris Dolan <cdolan@cpan.org>'
+abstract: Efficiently match IP addresses against ranges
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  perl: 5.6.0
+build_requires:
+  Test::More: 0
+provides:
+  Net::IP::Match::Regexp:
+    file: lib/Net/IP/Match/Regexp.pm
+    version: 1.01
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

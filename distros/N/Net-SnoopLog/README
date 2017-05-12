@@ -1,0 +1,104 @@
+NAME
+     Net::SnoopLog - Read snoop network packet logs, from RFC1761
+     snoop ver 2. Perl implementation (not an interface).
+
+
+SYNOPSIS
+     use Net::SnoopLog;
+
+     $log = Net::SnoopLog->new(); 
+     $log->read("/tmp/out01");
+
+     @Indexes = $log->indexes;
+
+     foreach $index (@Indexes) {
+          ($length_orig,$length_incl,$drops,$secs,$msecs) =
+                                      $log->header($index);
+          $data = $log->data($index);
+
+          # your code here
+     }
+
+DESCRIPTION
+     This module can read the data and headers from snoop ver 2
+     logs (those that obey RFC1761 - try "man snoop").
+
+METHODS
+     new ()
+         Constructor, return a SnoopLog object.
+
+     read (FILENAME)
+         Read the snoop file indicated into memory.
+
+     indexes ()
+         Return an array of index numbers for the packet loaded
+         from the snoop file. The indexes start at 0.
+
+     maxindex ()
+         Return the number of the last index. More memory
+         efficient than indexes(). Add 1 to get the packet count.
+         The indexes start at 0.
+
+     header (INDEX)
+         Takes an integer index number and returns the packet
+         header. This is:
+            Length of original packet,
+            Length actually included in the snoop log,
+            Cumulative drops (since the snoop log began),
+            Packet arrival time as seconds since Jan 1st 1970,
+            Microseconds
+
+     data (INDEX)
+         Takes an integer index number and returns the raw packet
+         data. (This is usually Ethernet/IP/TCP data).
+
+     version ()
+         Returns a string containing the numeric snoop log
+         version, which is expected to be "2".
+
+     datalink ()
+         Returns a strings containing the numeric datalink type,
+         see RFC 1761 for a table of these. (4 is Ethernet).
+
+
+INSTALLATION
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+DEPENDENCIES
+     ExtUtils::MakeMaker
+
+EXAMPLES
+     Once you can read the raw packet data, the next step is read
+     through the protocol stack. An Ethernet/802.3 example is,
+
+     ($ether_dest,$ether_src,$ether_type,$ether_data) =
+      unpack('H12H12H4a*',$data);
+
+     Keep an eye on CPAN for Ethernet, IP and TCP modules. 
+
+LIMITATIONS
+     This reads snoop version 2 logs (the most common). There
+     could be a new version in the distant future with a move to
+     64-bit timestamps - at which point this module will need
+     updating.
+
+TODO
+     Future versions should include the ability to write as well
+     as read snoop logs. Also a memory efficient technique to
+     process very large snoop logs (where the log size is greater
+     than available virtual memory).
+
+SEE ALSO
+     RFC 1761
+
+COPYRIGHT
+     Copyright (c) 2003 Brendan Gregg. All rights reserved.  This
+     library is free software; you can redistribute it and/or
+     modify it under the same terms as Perl itself.
+
+AUTHORS
+     Brendan Gregg <brendan.gregg@tpg.com.au> [Sydney, Australia]
+

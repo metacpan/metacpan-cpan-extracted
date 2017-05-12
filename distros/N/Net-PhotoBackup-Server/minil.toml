@@ -1,0 +1,6 @@
+name = "Net-PhotoBackup-Server"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+authors_from="lib/Net/PhotoBackup/Server.pm"
+readme_from="README.md"
+markdown_maker="Pod::Markdown::Passthrough"

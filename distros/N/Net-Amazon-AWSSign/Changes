@@ -1,0 +1,39 @@
+Revision history for Perl extension Net::Amazon::AWSSign.
+
+0.01  Thu Oct 15 15:15:41 2009
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Net::Amazon::AWSSign
+
+0.02  Thu Oct 15 19:06:41 2009
+	- Used 'make dist' instead of just tar command.  Yeah, I'm that new to this.
+
+0.03  Mon Oct 19 10:06:41 2009
+	- Fixed a typo in the documentation.  No functional changes.
+
+0.04  Thu Oct 22 09:17:25 2009
+	- Another documentation problem - had an old name for the SOAP function in the synopsis.
+
+0.05  Thu Oct 22 10:16:37 2009
+	- Added prereqs to Makefile.PL
+
+0.06  Fri Oct 23 11:45:52 2009
+	- Reduced required Perl version to 5.8.8 - should be fine
+
+0.07  Mon Oct 26 11:40:07 2009
+	- Changed required version to 5.8 using another mod as template.  Hopefully that'll do it!
+
+0.08  Thu Jan 21 09:57:22 2010
+	- Updated documentation.  No changes to actual code.
+
+0.09  Mon Dec 13 23:37:03 2010
+	- Implemented changes (fixed key param and syntactical cleanup) as done by Bee Software (beesw.com)
+	- Added in params for Sig version and SHA version, also fixed to use https as well as http
+
+0.10  Tue Aug 16 11:04:07 2011
+	- Before uri encoding arg string, uri decode them first.  This allows for escaped chars in the arguments, specifically ampersand
+
+0.11  Tue Aug 16 12:06:58 2011
+	- Added the whole escaping thing in the documentation.  Shame on me for forgetting.
+
+0.12  Wed Nov 23 09:33:49 2011
+	- Put ItemSearch in quotes for testing to (hopefully) fix test compilation errors in Perl 5.14.1 (that exists?!?)

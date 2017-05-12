@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SellerListingLookupResponse xmlns="http://webservices.amazon.com/AWSECommerceService/2006-06-28">
+  <SellerListings>
+    <TotalResults>2</TotalResults>
+    <TotalPages>1</TotalPages>
+    <SellerListing>
+      <ExchangeId>Y01Y4725136Y4353165</ExchangeId>
+      <ListingId>1220R554328</ListingId>
+      <ASIN>0393023826</ASIN>
+      <SKU>492</SKU>
+      <EAN>9780393023824</EAN>
+      <WillShipExpedited>1</WillShipExpedited>
+      <WillShipInternational>0</WillShipInternational>
+      <Title>Setting the Mould: The United States and Britain 1945-50  by Edmonds, Robin</Title>
+      <Price>
+        <Amount>1058</Amount>
+        <CurrencyCode>USD</CurrencyCode>
+        <FormattedPrice>$10.58</FormattedPrice>
+      </Price>
+      <StartDate>2003-12-20</StartDate>
+      <EndDate>2006-12-04</EndDate>
+      <Status>Open</Status>
+      <Quantity>1</Quantity>
+      <Condition>collectible</Condition>
+      <SubCondition>verygood</SubCondition>
+      <Seller>
+        <SellerId>A23JJ2BNHZMFCO</SellerId>
+        <Nickname>brick_road_books</Nickname>
+      </Seller>
+    </SellerListing>
+    <SellerListing>
+      <ExchangeId>Y01Y4725136Y4353165</ExchangeId>
+      <ListingId>1220R554328</ListingId>
+      <ASIN>0393023826</ASIN>
+      <SKU>492</SKU>
+      <EAN>9780393023824</EAN>
+      <WillShipExpedited>1</WillShipExpedited>
+      <WillShipInternational>0</WillShipInternational>
+      <Title>Setting the Mould: The United States and Britain 1945-50  by Edmonds, Robin</Title>
+      <Price>
+        <Amount>1058</Amount>
+        <CurrencyCode>USD</CurrencyCode>
+        <FormattedPrice>$10.58</FormattedPrice>
+      </Price>
+      <StartDate>2003-12-20</StartDate>
+      <EndDate>2006-12-04</EndDate>
+      <Status>Open</Status>
+      <Quantity>1</Quantity>
+      <Condition>collectible</Condition>
+      <SubCondition>verygood</SubCondition>
+      <Seller>
+        <SellerId>A23JJ2BNHZMFCO</SellerId>
+        <Nickname>brick_road_books</Nickname>
+      </Seller>
+    </SellerListing>
+  </SellerListings>
+</SellerListingLookupResponse>

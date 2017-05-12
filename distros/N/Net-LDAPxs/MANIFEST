@@ -1,0 +1,16 @@
+Changes
+LDAPxs.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+typemap
+t/Net-LDAPxs.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Net/LDAPxs.pm
+lib/Net/LDAPxs/Search.pm
+lib/Net/LDAPxs/Entry.pm
+lib/Net/LDAPxs/Control.pm
+lib/Net/LDAPxs/Exception.pm
+META.yml                                 Module meta-data (added by MakeMaker)

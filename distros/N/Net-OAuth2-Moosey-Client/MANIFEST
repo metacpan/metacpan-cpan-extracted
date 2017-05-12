@@ -1,0 +1,16 @@
+Makefile.PL
+Changes
+demo/config.yml
+demo/fusion_tables_demo.pl
+ignore.txt
+lib/Net/OAuth2/Moosey/AccessToken.pm
+lib/Net/OAuth2/Moosey/Client.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-client.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

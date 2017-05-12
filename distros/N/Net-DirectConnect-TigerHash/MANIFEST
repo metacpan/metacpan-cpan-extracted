@@ -1,0 +1,43 @@
+Changes
+dcpp/compiler.h
+dcpp/debug.h
+dcpp/Encoder.cpp
+dcpp/Encoder.h
+dcpp/Exception.h
+dcpp/HashValue.h
+dcpp/MerkleTree.h
+dcpp/stdinc.h
+dcpp/TigerHash.cpp
+dcpp/TigerHash.h
+dcpp/typedefs.h
+getpagesize.c
+lib/Net/DirectConnect/TigerHash.pm
+Makefile.PL
+MANIFEST			This list of files
+os.h
+p5-Net-DirectConnect-TigerHash/distinfo
+p5-Net-DirectConnect-TigerHash/pkg-descr
+p5-Net-DirectConnect-TigerHash/pkg-plist
+patch/Encoder.cpp
+patch/HashValue.h
+patch/stdinc.h
+patch/TigerHash.cpp
+patch/typedefs.h
+t/0-LWPNACQDBZRYXW3VHJVCJ64QBZNGHOHHHZWCLNQ.tth
+t/1-0-VK54ZIEEVTWNAUI5D5RDFIL37LX2IQNSTAXFKSA.tth
+t/10000-0-WB73GPSFDKPJBPGNZLUWZPJGAYBB5RD4YAMXLXY.tth
+t/10000-20-5N7HETNEFRAOKWKKBDDUIBLTJTOFGDFJP773BHY.tth
+t/10000-t-CGAC63YTNA374BGB4WIWANOUPL25O5CW4RBZ5EI.tth
+t/10000-t20-Z74VEH32UIGWJO5HTKU2FA2QETCKWBLW4ENXYJI.tth
+t/10m-0-NMHTHQ77K2DLM4AWH2RU5QTLUO5ZMD6BK2HVQEQ.tth.bz2
+t/10m-t-T63HAKJBKRTNLZRQWJNJHOCC2TGBOLDUNAUNRMQ.tth.bz2
+t/20m-0-BVJ4R4O4ESBHHGBNDASPZUECGBRWGJAOO4O6UTY.tth.bz2
+t/20m-t-4UG3LKT7HLDXN2E2A7ARWMJPB4T6EGN2BPUCXMQ.tth.bz2
+t/256-0-ZZ6BBMNDYGRRDQWLJHBBSLNWKQN7CYAHATJ7T5Y.tth
+t/256-t-KRFVROLZISHLBMSRMCWYXWCJ2YRDVH7UTFB4L7Y.tth
+t/t-0-B37KMLIQJWLWKKD25PHO3ROKMCTALOUJP6U6EXA.tth
+t/t-3YFOLBEU4YZVNMMQ2AS3ORT2CKKT6CSQZXEJ5TQ.tth
+t/TigerHash.t
+TigerHash.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

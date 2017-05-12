@@ -1,0 +1,23 @@
+You'll find in this packaged:
+- the module Net::MRIM, which is an API to the mail.ru agent network
+- three example scripts, the first being an answering machine,
+  and the second being a simple CLI client for mail.ru agent,
+  and the third a simple GUI wxWidgets client.
+
+You can use that CLI client, that support basic messaging. Edit
+the file mrim.pl and enter your login information.
+This is the most simple mail.ru agent client ever: only two files
+are needed to make it work: mrim.pl and MRIM.pm.
+
+I paid a lot of attention to be sure that it works on any platform.
+This wasn't that easy, since the protocol was designed with x86 in mind.
+
+It should work on any standard PERL with version > 5.8.
+
+For mrimwx.pl you also need WxPerl >0.7
+
+Everything in this package is licensed under the terms of the GPLv2.
+
+USE AT YOUR OWN RISK. THERE IS NO WARRANTY WHATSOEVER.
+
+Alexandre Aufrere

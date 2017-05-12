@@ -1,0 +1,60 @@
+---
+abstract: 'Library for One Time Password Server'
+author:
+  - 'ritou <ritou.06@gmail.com>'
+build_requires:
+  Crypt::OpenSSL::Random: '0.04'
+  Test::MockTime: '0.13'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-OATH-Server
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::OATH::Server:
+    file: lib/Net/OATH/Server.pm
+    version: '0.02'
+  Net::OATH::Server::Lite:
+    file: lib/Net/OATH/Server/Lite.pm
+  Net::OATH::Server::Lite::DataHandler:
+    file: lib/Net/OATH/Server/Lite/DataHandler.pm
+  Net::OATH::Server::Lite::Endpoint::Login:
+    file: lib/Net/OATH/Server/Lite/Endpoint/Login.pm
+  Net::OATH::Server::Lite::Endpoint::User:
+    file: lib/Net/OATH/Server/Lite/Endpoint/User.pm
+  Net::OATH::Server::Lite::Error:
+    file: lib/Net/OATH/Server/Lite/Error.pm
+  Net::OATH::Server::Lite::Login:
+    file: lib/Net/OATH/Server/Lite/Login.pm
+  Net::OATH::Server::Lite::Model::User:
+    file: lib/Net/OATH/Server/Lite/Model/User.pm
+  Net::OATH::Server::Lite::User:
+    file: lib/Net/OATH/Server/Lite/User.pm
+requires:
+  Authen::OATH: v1.0.0
+  Class::Accessor::Fast: '0.34'
+  Convert::Base32: '0.06'
+  JSON::XS: '3.01'
+  Params::Validate: '1.13'
+  Plack: '1.0031'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/ritou/p5-net-oath-server/issues
+  homepage: https://github.com/ritou/p5-net-oath-server
+  repository: git://github.com/ritou/p5-net-oath-server.git
+version: '0.02'

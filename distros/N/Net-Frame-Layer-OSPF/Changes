@@ -1,0 +1,13 @@
+Revision history for Perl extension Net::Frame::Layer::OSPF.
+
+1.01 Wed Jan 14 07:40:48 CET 2015
+   - update: copyright notice
+   - update: Kwalitee
+
+1.00 Tue Mar 13 19:26:20 CET 2007
+   - pod
+   - first stable release
+
+1.00_01
+   - first public release
+

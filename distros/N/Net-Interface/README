@@ -1,0 +1,52 @@
+
+README for Net::Interface version 1.xx
+
+Net::Interface is a module that allows access to the host
+network interfaces in a manner similar to ifconfig(8).
+Version 1.00 is a complete re-write and includes support
+for IPV6 as well as the traditional IPV4.
+
+Creating and deleting interfaces is not yet supported 
+although the documentation says otherwise. Give it some 
+time.
+
+Net::Interface 1.0x works on more platforms and supports 
+all the operations of the previous version with the addition
+of ipV6 support as well as numerous new methods and functions.
+
+Hackers welcome, see Net::Interface::Developer.
+
+There are revisions to the API, see the section titled:
+
+	WARNING - API CHANGES
+
+In most instances this will not make a difference since previous
+versions of Net::Interface had no support for multiple addresses 
+on the same interface and no support for a variety of platforms 
+where the difference would be noticed.
+
+NOT YET SUPPORTED:
+
+	$if->delete
+	$if->new(%iface_spec)	(create or update)
+	$if->hwaddr($new_mac)	(change MAC addr)
+
+If something except the three items above does not work on your
+platform, please let me know. I have limited availability OS's 
+with which to develop and a development account on a foreign host 
+with a different OS would be very useful.
+
+UN-TESTED CODE
+
+Code to retrieve the MAC address using:
+
+    #ifdef HAVE_NIT_IF_H	(sun OS, not solaris)
+	or
+    #ifdef HAVE_NETIO_H		(win32, not yet supported)
+	or
+    "style 1" DLPI		(...ooold solaris)
+
+is implemented but untested. If you have a platform to test this,
+your assistance would be appreciated.
+
+Enjoy: Michael Robinton <michael@bizsystems.com>

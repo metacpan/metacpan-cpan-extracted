@@ -1,0 +1,34 @@
+---
+abstract: 'Submit host and service monitoring results using the NSCA-ng protocol'
+author:
+  - 'Matthias Bethke <matthias@towiski.de>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::CheckManifest: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+configure_requires:
+  Devel::CheckLib: '0'
+  ExtUtils::MakeMaker: '6.52'
+  ExtUtils::PkgConfig: '0'
+  version: '0.77'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-NSCAng-Client
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.010001'
+version: v2.0.0
+x_repository:
+  type: git
+  url: git@github.com:mbethke/nsca-ng.git
+  web: https://github.com/mbethke/nsca-ng/tree/perl-module/perl
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

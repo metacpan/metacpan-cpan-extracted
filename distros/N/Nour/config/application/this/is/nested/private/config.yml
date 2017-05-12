@@ -1,0 +1,4 @@
+---
+username: a_secret
+password: also_a_secret
+a_setting: overridden

@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+RULI.xs
+t/RULI.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Net/RULI.pm
+examples/ruli-sync-smtp.pl
+examples/ruli-sync-srv.pl

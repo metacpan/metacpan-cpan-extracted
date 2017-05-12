@@ -1,0 +1,247 @@
+NAME
+    Net::SSH::Mechanize - asynchronous ssh command invocation
+
+VERSION
+    version 0.1.3
+
+SYNOPSIS
+    Somewhat like "POE::Component::OpenSSH", "SSH::Batch",
+    "Net::OpenSSH::Parallel", "App::MrShell" etc, but:
+
+    *   It uses the asynchonous "AnyEvent" event framework.
+
+    *   It aims to support sudoing smoothly.
+
+    Synchronous usage:
+
+        use Net::SSH::Mechanize;
+
+        # Create an instance. This will not log in yet.
+        # All but the host name below are optional.
+        # Your .ssh/config will be used as normal, so if you 
+        # define ssh settings for a host there they will be picked up.
+        my $ssh = Net::SSH::Mechanize->new(
+            host => 'somewhere.com',
+            user => 'jbloggs',
+            password => 'secret',
+            port => 22,
+        );
+
+        my $ssh->login;
+
+        my $output = $ssh->capture("id");
+
+        # If successful, $output now contains something like:
+        # uid=1000(jbloggs) gid=1000(jbloggs) groups=1000(jbloggs)
+
+        $output = $ssh->sudo_capture("id");
+
+        # If successful, $output now contains something like:
+        # uid=0(root) gid=0(root) groups=0(root)
+
+        $ssh->logout;
+
+    As you can see, "Net::SSH::Mechanize" instance connects to only *one*
+    host. Net::SSH::Mechanize::Multi manages connections to many.
+
+    See below for further examples, and "script/gofer" in the distribution
+    source for a working, usable example.
+
+    This is work in progress. Expect rough edges. Feedback appreciated.
+
+DESCRIPTION
+    The point about using "AnyEvent" internally is that "blocking" method
+    calls only block the current "thread", and so the above can be used in
+    parallel with (for example) other ssh sessions in the same process
+    (using "AnyEvent", or "Coro"). Although a sub-process is spawned for
+    each ssh command, the parent process manages the child processes
+    asynchronously, without blocking or polling.
+
+    Here is an example of asynchronous usage, using the
+    "<AnyEvent-"condvar>> API. Calls return an "<AnyEvent::CondVar">
+    instance, which you can call the usual "->recv" and "->cb" methods on to
+    perform a blocking wait (within the current thread), or assign a
+    callback to be called on completion (respectively). See AnyEvent.
+
+    This is effectively what the example in the synopsis is doing, behind
+    the scenes.
+
+        use Net::SSH::Mechanize;
+
+        # Create an instance, as above.
+        my $ssh = Net::SSH::Mechanize->new(
+            host => 'somewhere.com',
+            user => 'jbloggs',
+            password => 'secret',
+            port => 22,
+        );
+
+        # Accessing ->capture calls ->login automatically.
+        my $condvar = AnyEvent->condvar;
+        $ssh->login_async->cb(sub {
+            my ($session) = shift->recv;
+            $session->capture_async("id")->cb(sub {
+                my ($stderr_handle, $result) = shift->recv;
+
+                $condvar->send($result);
+            });
+        });
+
+        # ... this returns immediately.  The callbacks assigned will get
+        # invoked behind the scenes, and we just need to wait and collect
+        # the result handed to our $condvar.
+
+        my $result = $convar->recv;
+
+        # If successful, $output now contains something like:
+        # uid=1000(jbloggs) gid=1000(jbloggs) groups=1000(jbloggs)
+
+        $ssh->logout;
+
+    You would only need to use this asynchronous style if you wanted to
+    interface with "AnyEvent", and/or add some "Expect"-like interaction
+    into the code.
+
+    However, see also "Net::SSH::Mechanize::Multi" for a more convenient way
+    of running multiple ssh sessions in parallel. It uses Coro to provide a
+    (cooperatively) threaded model.
+
+  gofer
+    The "script/" sub-directory includes a command-line tool called "gofer"
+    which is designed to accept a list of connection definitions, and
+    execute shell commands supplied in the arguments in parallel on each.
+    See the documentation in the script for more information.
+
+JUSTIFICATION
+    The problem with all other SSH wrappers I've tried so far is that they
+    do not cope well when you need to sudo. Some of them do it but
+    unreliably ("SSH::Batch"), others allow it with some help, but then
+    don't assist with parallel connections to many servers ("Net::OpenSSH").
+    The I tried "POE::Component::OpenSSH", but I found the
+    "POE::Component::Generic" implementation forced a painful programming
+    style with long chains of functions, one for each step in an exchange
+    with the ssh process.
+
+    Possibly I just didn't try them all, or hard enough, but I really needed
+    something which could do the job, and fell back to re-inventing the
+    wheel. Initial experiments with "AnyEvent" and "AnyEvent::Subprocess"
+    showed a lot of promise, and the result is this.
+
+CLASS METHODS
+  "$obj = $class->new(%params)"
+    Creates a new instance. Parameters is a hash or a list of key-value
+    parameters. Valid parameter keys are:
+
+    "connection_params"
+        A Net::SSH::Mechanize::ConnectParams instance, which defines a host
+        connection. If this is given, any individual connection parameters
+        also supplied to the constructor ("host", "user", "port" or
+        "password"), will be ignored.
+
+        If this is absent, a "Net::SSH::Mechanize::ConnectParams" instance
+        is constructed from any other individual connection parameters - the
+        minimum which must be supplied is "hostname". See below.
+
+    "host"
+        The hostname to connect to. Either this or "connection_params" must
+        be supplied.
+
+    "user"
+        The user account to log into. If not given, no user will be supplied
+        to "ssh" (this typically means it will use the current user as
+        default).
+
+    "port"
+        The port to connect to ("ssh" will default to 22 if this is not
+        specificed).
+
+    "password"
+        The password to connect with. This is only required if
+        authentication will be performed, either on log-in or when sudoing.
+
+    "login_timeout"
+        How long to wait before breaking a connection (in seconds). It is
+        passed to "AnyEvent-"timer> handler, whose callback will terminate
+        the session if the period is exceeded. This avoids hung connections
+        when the remote end isn't answering, or isn't answering in a way
+        that will allow "Net::SSH::Mechanize" to terminate.
+
+        The default is 30.
+
+INSTANCE ATTRIBUTES
+  "$params = $obj->connection_params"
+    This is a read-only accessor for the "connection_params" instance passed
+    to the constructor (or equivalently, constructed from the constructor
+    parameters).
+
+  "$session = $obj->session"
+    This is read-only accessor to a lazily-instantiated
+    "Net::SSH::Mechanize::Session" instance, which represents the "ssh"
+    process. Accessing it causes the session to be created and the remote
+    host to be logged into.
+
+  "$obj->login_timeout($integer)"
+=head2 "$integer = $obj->login_timeout"
+    This is a read-write accessor to the log-in timeout parameter passed to
+    the constructor.
+
+    It is passed to "Net::SSH::Mechanize::Session"'s constructor, so if you
+    plan to modify it, do so before "->session" has been instantiated or
+    will not have any effect on anything thereafter.
+
+INSTANCE METHODS
+  "login"
+=head2 "login_async"
+=head2 "capture"
+=head2 "capture_async"
+=head2 "sudo_capture"
+=head2 "sudo_capture_async"
+=head2 "logout"
+    These methods exist here for convenience; they delegate to the
+    equivalent "Net::SSH::Mechanize::Session" methods.
+
+KNOWN ISSUES
+    "unexpected stderr from command: stderr output" in test output
+        Something I haven't yet figured out how to banish properly. However,
+        it does appear to be harmless. Patches welcome.
+
+SEE ALSO
+    There are a lot of related tools, and this is just in Perl. Probably the
+    most similar are "SSH::Batch", "POE::Component::OpenSSH", and
+    "App::MrShell" (which at the time of writing, I've not yet tried.) None
+    use "AnyEvent", so far as I can tell.
+
+    SSH::Batch, Net::OpenSSH, Net::OpenSSH::Parallel, Net::SSH, Net::SSH2,
+    Net::SSH::Expect, Net::SSH::Perl, POE::Component::OpenSSH, App::MrShell.
+
+AUTHOR
+    Nick Stokoe "<wulee@cpan.org>"
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2011, Nick Stokoe "<wulee@cpan.org>". All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

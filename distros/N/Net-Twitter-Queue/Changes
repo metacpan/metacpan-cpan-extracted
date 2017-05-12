@@ -1,0 +1,10 @@
+0.4       2014-09-05 10:02:21-04:00 America/New_York
+    Use the Twitter API v1.1
+
+0.3       2014-09-04 12:52:41-04:00 America/New_York
+    Use latest Net::Twitter (v4.01005) for SSL support
+
+0.2       2012-03-18 21:49:16 EST5EDT
+
+0.1       2011-10-25 08:56:22 America/New_York
+    - Initial version of Net::Twitter::Queue

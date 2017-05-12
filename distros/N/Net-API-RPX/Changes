@@ -1,0 +1,54 @@
+Revision history for Net-API-RPX
+
+1.000001 2017-03-07T15:14:16Z 2f2a14f
+ - Bugfix: Avoid test failures due to -Ddefault_inc_excludes_dot
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - develop: +5 ↑2 -1 (suggests: ↑2)
+ - test: ↓1
+
+1.000000 2015-03-25T17:27:21Z 4b74171
+ [Dependencies::Stats]
+ - Dependencies changed since 0.04, see misc/*.deps* for details
+ - build: -1
+ - configure: +2 -1 (recommends: +1)
+ - develop: +56 (recommends: +1, suggests: +2)
+ - runtime: +2 -1 (recommends: +1)
+ - test: +3 ↑1 -2 (recommends: +3)
+
+ [Internals]
+ - Now uses JSON::MaybeXS instead of JSON::Any for JSON usage.
+
+ [Major - Toolkit changed]
+ - Now uses EUMM
+ - Dependencies are softened.
+ - https://questhub.io/realm/perl/quest/5388cc12bbd0be5b2500011f
+
+ [Major - Version Scheme Changed]
+ - Now uses x.yyyyyy
+ - https://questhub.io/realm/perl/quest/5388d3a9bbd0be2224000129
+
+ [Metadata]
+ - Repo moved to KENTNL org.
+ - Issues moved to github
+
+0.04 2012-05-24T00:27:53Z
+ - Re-released to avoid a lot of cruft that snuck in somehow ( WTF?!!? )
+
+0.03 2012-05-24T00:23:24Z
+ - Toolkit switched to Dist::Zilla ( Kent Fredric )
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.02, see misc/*.deps* for details
+ - build: +1
+ - configure: +1
+ - runtime: +9
+ - test: +7
+
+0.02 2012-05-23T23:31:00Z
+ - Added fully fledged exception objects to replace die() calls.
+ - If you catch one somehow, you can now introspect them and get a better idea of what went wrong. ( Kent Fredric )
+
+0.01 2009-02-20T12:14:00Z
+ - First version.

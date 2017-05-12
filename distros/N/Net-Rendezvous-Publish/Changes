@@ -1,0 +1,13 @@
+0.04	Saturday 28th January, 2005
+	Fix the automatic backend selection to never pick ::Null if
+	there's a better one available (Tatsuhiko Miyagawa)
+
+0.03	Friday 18th February, 2005
+	Fix the null backend
+
+0.02	Friday 18th February, 2005
+	Add a Null backend, so we don't blow up if people didn't
+	fricking install one.
+
+0.01	February 21st, 2004
+	Initial CPAN release

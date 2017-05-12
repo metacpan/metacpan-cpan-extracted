@@ -1,0 +1,81 @@
+
+=head1 NAME
+
+NetApp::Qtree -- OO class for creating and managing qtrees
+
+=head1 SYNOPSIS
+
+    use NetApp::Filer;
+    use NetApp::Qtree;
+
+    my $filer 	= NetApp::Filer->new( .... );
+
+    # Create a tree, with all options in one call
+    my $qtree	= $filer->create_qtree(
+        name		=> "/vol/vol1/qtreename",
+	oplocks		=> 1,
+	mode		=> 0755,
+	security	=> 'unix',
+    );
+
+    # Alternately, you can create it, and then change things
+    my $qtree	= $filer->create_qtree(
+        name		=> "/vol/vol1/qtreename",
+        mode		=> 0755,
+    );    
+    
+    # The mode must be set when created
+    $qtree->set_oplock(1);
+    $qtree->set_security('unix');
+
+=head1 DESCRIPTION
+
+This class encapsulates a single NetApp qtree, and provides methods
+for querying information about the qtree, as well as methods for
+managing it.
+
+=head1 METHODS
+
+=head2 set_security( $security )
+
+This method method takes a single argument, which is the security
+value to set on the qtree.  It must have one of the following values:
+
+    unix
+    ntfs
+    mixed
+
+=head2 get_security
+
+Returns a string containing the current security setting
+of the qtree.
+
+=head2 set_oplocks( $boolean )
+
+This method takes a boolean argument, and sets the oplocks attribute
+of the qtree to "enabled" if the value is true, and "disabled" if the
+value is false.
+
+=head2 get_oplocks
+
+Returns true is the oplocks are set to "enabled", false if
+they are set to "disabled".
+
+=head2 get_status
+
+Returns the status value for the qtree.  It waill have the
+values such as:
+
+    normal
+    snapmirrored
+
+=head2 get_id
+
+Returns the qtree id.
+
+=head2 get_vfiler
+
+Returns the vfiler which owns the qtree.  If vfilers are not licensed
+on the filer, this method will simply return a false value.
+
+=cut

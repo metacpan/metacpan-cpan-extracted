@@ -1,0 +1,55 @@
+Revision history for Net::Bullfinch
+
+0.16 Mar 1 2013
+  * Don't schedule result retrieval when submitting the request failed in the
+    first palce. All that means is waiting for a timeout (Florian Ragwitz).
+
+0.15 Feb 17 2013
+  * Notify ->iterate_async users of request timeouts through the error
+    callback (Florian Ragwitz).
+
+0.14 Feb 14 2013
+  * Add ->iterate_asnc as an AnyEvent compatible way of making requests
+    asynchronously (Florian Ragwitz).
+
+0.13 Jan 31 2013
+  * Bugfix: Iterator ->next() no longer returns an empty array ref after
+    returning all available rows. (Jesse Luehrs, Jay Hannah)
+
+0.12 Jun 02 2012
+
+0.11 May 18 2012
+
+0.10 Apr 17 2012
+  * Fix bug in queue name checking (Jay Hannah)
+
+0.09 Mar 26 2012
+  * Add queue name checking to prevent bad queue names from causing problems.
+
+0.08 Mar 12 2012
+   * Die if sending the request fails and warn if deleting the response fails.
+   * Doc fixes (Jay Hannah)
+
+0.07 Feb 15 2012
+   * More iterator fixes.
+
+0.06 Feb 14 2012
+   * Fix busted iterator
+   * Don't bother with /open and /close
+
+0.05 Feb 8 2012
+   * Add expire support for requests
+
+0.04 Feb 7 2012
+   * Use Memcached::Client in lieu of Net::Kestrel, as it's likely
+     much more reliable.
+
+0.03 Jan 24 2012
+   * Add process-by option
+
+0.02 Nov 27 2011
+   * Add port as an attr (Stevan Little)
+
+0.01 Oct 5 2011
+    * First release
+

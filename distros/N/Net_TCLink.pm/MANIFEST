@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+README
+LICENSE
+Makefile.PL
+TCLink.pm
+TCLink.xs
+test.pl
+tclink.h
+tclink.c
+doc/TCDevGuide.txt
+doc/TCDevGuide.html

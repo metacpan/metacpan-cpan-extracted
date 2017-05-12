@@ -1,0 +1,87 @@
+Revision history for Perl extension Net::MirrorDir.
+
+0.20 Mon Jun  1 18:09:34 2009
+ 	- bugfix to switch off debug information (Thanks to Nils Goroll!)
+
+0.19 Sat Jul 12 20:34:26 2008 
+ 	- "connection" is now a class-attribute to avoid multiple ftp-connections
+ 	- change attribut "$self->{usr}" into "$self->{user}"
+
+0.18 Sun Mar 30 16:58:32 2008 
+ 	- changes in ReadRemoteDir()
+
+0.17 Fri Mar 21 11:43:03 2008 
+ 	- change in the treatment of time-outs
+
+0.16 Fri Mar 14 18:09:22 2008 
+ 	- skip tests with user prompt, if $ENV{AUTOMATED_TESTING} is true
+
+0.15 Sun Mar  9 10:29:55 2008 
+ 	- Time-outs of the connection are caught.
+ 	- add some tests
+
+0.14 Sat Feb 23 10:36:50 2008 
+ 	- using the function "$self->{_connection}->dir($dir)" to the search of the directory
+ 	the FTP-server should return the following format as response of the LIST command:
+ 	-r--r--r--   1 ftpuser  ftpusers       576 Feb 23 09:23 file.txt
+	drwxrwxr-x   2 ftpuser  ftpusers       512 Feb 21 13:54 Dir1
+ 	Directory- or filenames should not contain any white space.
+ 	- add some tests
+
+0.13 Wed Feb 20 19:36:06 2008 
+ 	- changes in function ReadRemoteDir()
+	if($self->{_connection}->size($p))
+ 	will not work correctly with files, of zero byte size
+
+0.12 Tue Feb 19 19:04:36 2008 
+ 	- changes in function ReadRemoteDir()
+	elsif(my @files =  $self->{_connection}->ls($p))
+ 	will not work correctly with empty directories
+
+0.11 Sun Feb 17 13:26:45 2008 
+ 	- add arg-check for ReadRemoteDir()
+
+0.10 Thu Feb 14 20:46:05 2008 
+ 	- improvement of function ReadRemoteDir()
+
+0.09 Sat Feb  2 17:23:57 2008 
+ 	- insert function IsConnection()
+ 	- insert bindings for attribute
+ 	- adjustment of the documentation
+
+0.08 Sat Jan 19 18:48:40 2008
+ 	- insert a abstract method _Init()
+
+0.07 Mon Jan 14 19:42:04 2008
+ 	- insert the argument subset
+ 	- insert an add function for "subet" and "exclusions" created by $AUTOLOAD
+ 	- add some documentation
+
+0.06 Sat Dec 8 19:52:09 2007
+	-  if functions ReadLocalDir() or ReadRemoteDir() fails, they return
+ 	references to empty hashs
+
+0.05 Sat Mar 18 20:07:45 2006
+ 	- bugfix in Makefile.PL
+
+0.04 Sat Mar 11 11:59:21 2006
+ 	- add some documentation
+
+0.03 Fri Jan 13 18:10:57 2006
+ 	- change our $VERSION in $Net::MirrorDir::VERSION
+
+0.02 Sun Jan 8 12:46:38 2006
+ 	- some changes in ReadLocalDir and ReadRemoteDir for more OOP style
+ 	- add some tests
+ 	- remove Exporter.pm, also in future nothing will be to be exported
+
+0.01  Thu Jan  5 12:01:41 2006
+	- original version; created by h2xs 1.23 with options
+		-XAn Net::MirrorDir
+
+
+
+
+
+
+

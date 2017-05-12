@@ -1,0 +1,8 @@
+dictionary
+Changes
+Makefile.PL
+MANIFEST
+README
+SSG.pm
+t/1.t
+META.yml                                Module meta-data (added by MakeMaker)

@@ -1,0 +1,36 @@
+---
+abstract: 'Routines useful for processing network abuse'
+author:
+  - 'mikegrb <michael@thegrebs.com>'
+  - 'Wes Young <github@barely3am.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.8, Dist::Zilla version 5.021, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Abuse-Utils
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Email::Address: '0'
+  Net::DNS: '0'
+  Net::IP: '0'
+  Net::Whois::IP: '1.11'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/mikegrb/Net-Abuse-Utils/issues
+  homepage: https://github.com/mikegrb/Net-Abuse-Utils
+  repository: https://github.com/mikegrb/Net-Abuse-Utils.git
+version: '0.25'
+x_contributors:
+  - 'Wes Young <wes@barely3am.com>'

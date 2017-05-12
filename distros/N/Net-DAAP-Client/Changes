@@ -1,0 +1,28 @@
+0.42	Wednesday 1st September, 2004
+	Cleaned up the DESTROY/disconnect logic a little
+	Added a t/compile.t and moved the other tests over to the
+	Net::DAAP::DMAP dist as they were really testing DMAP unpacking.
+	Fixed the email address of the daap-dev list.
+
+0.41	Monday 26th July, 2004
+	No longer call the /update thing as it hangs on daapd, and we
+	don't currently use the value
+	Fixed a bug in parameter handling in _init
+	Ignores content-type of responses for downloads (daapd interop)
+
+0.4	Monday 26th July, 2004
+	richardc@unixbeard.net took over caretaker duties
+	DEBUG now optional, and off by default.
+	LWP::UserAgent set keep_alive => 1, so that newer iTunes servers don't
+	think we keep sodding off.
+	Merge in Net::DAAP::Client::Auth, which makes the validator
+	code less objectionable
+	Made a SONG_ATTRIBUTES parameter, which is used when populating ->songs
+
+0.2  Fri Mar 23 10:01:04 2003
+        - can list and fetch songs and playlists
+
+0.1  Tue May 13 00:01:47 2003
+	- original version; skeletal framework
+
+

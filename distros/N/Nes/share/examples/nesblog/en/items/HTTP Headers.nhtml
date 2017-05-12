@@ -1,0 +1,56 @@
+<h2><a href="#">HTTP-headers</a></h2>
+<h3>Description</h3> 
+<p> 
+With the HTTP-headers variable we have to define in our Perl script:
+<pre>
+use Nes;
+my $nes = Nes::Singleton->new('template.nhtml');
+my $nes_tags = {};
+
+$nes_tags->{'HTTP-headers'} = "Content-type: text/html\n\n";
+
+$nes->out(%$nes_tags);
+</pre>
+</p>
+<p> 
+We can control the headers of the HTML output.
+</p>
+<p>
+When Nes verifies that HTTP-headers has value, prints its content and not the 
+headers by default. Should be included immediately after the NES Tag:
+<pre>
+&#123;: NES 1.0 ('file.pl') :&#125;
+&#123;: $ HTTP-headers :&#125;
+</pre>
+<p>
+If you define HTTP-headers and then not included with &#123;: $ HTTP-headers :&#125; we get an error.
+</p>
+</p>
+
+
+<h3>Example</h3>
+<p>
+<strong>template.nhtml:</strong>
+<pre>
+&#123;: NES 1.0 ('file.pl') :&#125;
+&#123;: $ HTTP-headers :&#125;
+&lt;html&gt;
+  &lt;head&gt;
+   ...
+   
+</pre>
+</p>
+
+<strong>file.pl:</strong>
+<pre>   
+use Nes;
+my = Nes::Singleton:Singleton->new('template.nhtml');
+my $nes_tags = {};
+
+$nes_tags->{'HTTP-headers'}  = "Cache-control: max-age=0\n";
+$nes_tags->{'HTTP-headers'} .= "Cache-control: no-cache\n";
+$nes_tags->{'HTTP-headers'} .= "Content-type: text/html\n\n";
+
+$nes->out(%$nes_tags);
+</pre>
+

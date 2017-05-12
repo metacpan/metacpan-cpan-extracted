@@ -1,0 +1,15 @@
+1.04    2016-10-09
+
+  - mark this library deprecated, suggest newer Net::SMTP instead
+
+1.03    2015-06-20
+
+  - $net_smtp_ssl->isa('Net::SMTP') is now true
+
+1.02    2015-03-26
+
+  - make it work again under blead; thanks to Zefram for the patch
+
+1.01    2004-07-19
+
+  - Initial Revision.

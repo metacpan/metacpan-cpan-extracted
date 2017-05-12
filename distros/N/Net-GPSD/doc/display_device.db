@@ -1,0 +1,21 @@
+CREATE TABLE "tracking" (
+	"id" integer DEFAULT nextval('"tracking_id_seq"'::text) NOT NULL,
+	"device" integer,
+	"lat" real,
+	"lon" real,
+	"dtg" timestamp without time zone DEFAULT now(),
+	"speed" real,
+	"heading" real,
+	"quality" integer,
+	Constraint "tracking_id_pkey" Primary Key ("id")
+);
+
+REVOKE ALL on "tracking" from PUBLIC;
+GRANT INSERT,SELECT on "tracking" to "apache";
+
+CREATE SEQUENCE "tracking_id_seq" start 1 increment 1 maxvalue 9223372036854775807 minvalue 1 cache 1;
+
+REVOKE ALL on "tracking_id_seq" from PUBLIC;
+GRANT SELECT,UPDATE on "tracking_id_seq" to "apache";
+
+CREATE INDEX tracking_dtg_indx ON tracking USING btree (dtg);

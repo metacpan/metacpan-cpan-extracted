@@ -1,0 +1,17 @@
+Class to simplify the generation of Nagios service checks of Web
+transactions.
+
+Web transactions are sequences of fill out forms through which a
+user interacts with a database search engine or a registration
+service.
+
+A successfull transaction is characterised by successfull
+traversing each fill out form ie by each form returning both the
+expected values (pattern) and not returning patterns that
+characterise faults.
+
+The class offers limited ability to respond to dynamic web pages.
+
+perldoc WebTransact
+
+

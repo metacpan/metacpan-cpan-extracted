@@ -1,0 +1,50 @@
+{
+   "abstract" : "Version-agnostic representation of an IP address",
+   "author" : [
+      "Paul Bennett <paul.w.bennett@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-IPAddress-Util",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0",
+            "Time::HiRes" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "List::MoreUtils" : "0",
+            "Math::BigInt" : "0",
+            "overload" : "0",
+            "perl" : "5.010000",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "3.027",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

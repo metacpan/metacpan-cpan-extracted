@@ -1,0 +1,22 @@
+---
+name: Net-ModestMaps
+version: 1.1
+author:
+  - 'Aaron Straup Cope  E<lt>ascope@cpan.orgE<gt>'
+abstract: Simple OOP wrapper for calling ModestMaps web services.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  LWP::UserAgent: 0
+  URI: 0
+build_requires:
+  Test::Simple: '>= 0.47'
+provides:
+  Net::ModestMaps:
+    file: lib/Net/ModestMaps.pm
+    version: 1.1
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

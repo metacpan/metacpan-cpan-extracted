@@ -1,0 +1,119 @@
+#! /opt/local/bin/perl
+
+# $Id: ypdump,v 1.4 1999/08/31 19:32:11 jgsmith Exp $
+#
+# Copyright (c) 1999, Texas A&M University
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. Neither the name of the University nor the names of its contributors
+#    may be used to endorse or promote products derived from this software
+#    without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTERS ``AS IS''
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+use lib "../lib";
+#use lib "/public/src/CIS/claim";
+
+use Data::Dumper;
+use yppasswd_private::Data;
+use yppasswd_private::Constants;
+use RPC::ONC;
+use NIS::DBM;
+
+my %nisinfo;
+my $daemon = tie %nisinfo, 'NIS::DBM', { filename => '/etc/accounts',
+                                         required_keys => [ qw/yp_src/ ]
+                                       };
+
+my $yp_src = $daemon->get_option('yp_src');
+
+chdir $yp_src or die "Unable to chdir to $yp_src: $!";
+
+my $adjunct = 0;
+if($daemon->get_option('use_adjunct')) {
+  $adjunct = 1;
+}
+
+if($adjunct) {
+  open ADJUNCT, ">$yp_src/security/passwd.adjunct.$$" or die "Unable to open temporary adjunct file: $!";
+  open SHADOW,  ">$yp_src/shadow.$$" or die "Unable to open temporary shadow file: $!";
+}
+
+open PASSWD, ">$yp_src/passwd.$$" or die "Unable to open temporary password file: $!";
+
+$daemon->set_option(key_set => 'byname');
+
+scalar(keys %nisinfo);
+
+my($uname, $info);
+
+while(($uname, $info) = each %nisinfo) {
+  next if $$info{username} =~ /^\s*$/;
+  next if $$info{username} ne $uname;
+  my $u = "$$info{uid}:$$info{gid}:$$info{gecos}:$$info{home}:$$info{shell}";
+  if($adjunct) {
+    print ADJUNCT "$$info{username}:x:$u\n";
+    print PASSWD  "$$info{username}:##$$info{username}:$u\n";
+    print SHADOW  "$$info{username}:$$info{password}:$u\n";
+  } else {
+    print PASSWD  "$$info{username}:$$info{password}:$u\n";
+  }
+}
+
+close PASSWD;
+close ADJUNCT if $adjunct;
+close SHADOW  if $adjunct;
+
+my $new_passwd_size = -s "$yp_src/passwd.$$";
+my $old_passwd_size = -s "$yp_src/passwd";
+my $new_shadow_size = -s "$yp_src/shadow.$$";
+my $old_shadow_size = -s "$yp_src/shadow";
+my $new_adjunct_size = -s "$yp_src/security/passwd.adjunct.$$";
+my $old_adjunct_size = -s "$yp_src/security/passwd.adjunct";
+my($passwd_growth, $adjunct_growth, $shadow_growth);
+if($old_passwd_size) {
+  $passwd_growth = abs($new_passwd_size - $old_passwd_size) / $old_passwd_size;
+} else {
+  $passwd_growth = 1.0;
+}
+if($old_adjunct_size) {
+  $adjunct_growth= abs($new_adjunct_size - $old_adjunct_size) / $old_adjunct_size;
+} else {
+  $adjunct_growth = 1.0;
+}
+
+if($old_shadow_size) {
+  $shadow_growth = abs($new_shadow_size - $old_shadow_size) / $old_shadow_size;
+} else {
+  $shadow_growth = 1.0;
+}
+
+$passwd_growth > 0.1 && warn "$yp_src/passwd has grown by more than 10% - new file is $yp_src/passwd.$$\n";
+$adjunct_growth > 0.1 && warn "$yp_src/security/passwd.adjunct has grown by more than 10% - new file is $yp_src/security/passwd.adjunct.$$\n";
+$shadow_growth > 0.1 && warn "$yp_src/shadow has grown by more than 10% - new file is $yp_src/shadow.$$\n";
+
+unless($passwd_growth > 0.1 || $adjunct_growth > 0.1 || $shadow_growth > 0.1) {
+  rename "$yp_src/passwd.$$", "$yp_src/passwd";
+  if($adjunct) {
+    rename "$yp_src/security/passwd.adjunct.$$", "$yp_src/security/passwd.adjunct";
+    rename "$yp_src/shadow.$$", "$yp_src/shadow";
+  }
+}

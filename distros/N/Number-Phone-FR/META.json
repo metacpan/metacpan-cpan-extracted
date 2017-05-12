@@ -1,0 +1,63 @@
+{
+   "abstract" : "Phone number information for France (+33)",
+   "author" : [
+      "Olivier Mengué <dolmen@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Number-Phone-FR",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.94",
+            "Test::NoWarnings" : "1.02"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Number::Phone" : "1.7004",
+            "Scalar::Util" : "0",
+            "parent" : "0.221",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Number::Phone::FR" : {
+         "file" : "lib/Number/Phone/FR.pm",
+         "version" : "0.08"
+      },
+      "Number::Phone::FR::Full" : {
+         "file" : "lib/Number/Phone/FR/Full.pm",
+         "version" : "0.0815091"
+      },
+      "Number::Phone::FR::Simple" : {
+         "file" : "lib/Number/Phone/FR.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Number-Phone-FR"
+      },
+      "homepage" : "https://github.com/dolmen/p5-Number-Phone-FR",
+      "repository" : {
+         "url" : "https://github.com/dolmen/p5-Number-Phone-FR.git"
+      }
+   },
+   "version" : "0.0815091"
+}

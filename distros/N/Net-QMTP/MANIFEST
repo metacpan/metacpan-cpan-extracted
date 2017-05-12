@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+QMTP.pm
+t/qmtp.t

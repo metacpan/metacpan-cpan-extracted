@@ -1,0 +1,10 @@
+Revision history for Net-Detect
+
+0.3  Wed Nov  7 20:52:07 2013
+    - require minimum version of Net::Ping in order to ensure port_number() method is available
+
+0.2  Sat Apr 20 21:02:32 2013
+    - fix SKIP in test
+
+0.1  Sat Apr 20 20:14:54 2013
+       Initial release.

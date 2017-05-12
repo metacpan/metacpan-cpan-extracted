@@ -1,0 +1,88 @@
+#!/usr/bin/perl
+
+# Example usage of Net::Gadu 
+# 
+# Copyright (C) 2002-2007 Marcin Krzy¿anowski
+# http://www.hakore.com/
+# 
+# This program is free software; you can redistribute it and/or modify 
+# it under the terms of the GNU Lesser General Public License as published by 
+# the Free Software Foundation; either version 2 of the License, or 
+# (at your option) any later version. 
+# 
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the implied warranty of 
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+# GNU General Public License for more details. 
+# 
+# You should have received a copy of the GNU Lesser General Public License 
+# along with this program; if not, write to the Free Software 
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+
+
+#use ExtUtils::testlib;
+use lib '../blib/lib';
+use lib '../blib/arch';
+use Net::Gadu; 
+use Data::Dumper;
+
+my $gg = new Net::Gadu(async => 1);
+
+## LOGIN
+$gg->login("1234567","password") or die "Login error\n";
+
+## EVENTS(this example, after successful login change status, send message and logout
+while (1) {
+    while ($gg->check_event() == 1) {
+
+	my $e = $gg->get_event();
+	my $type = $e->{type};
+	
+	if ($type == $Net::Gadu::EVENT_CONN_FAILED) {
+	    die "Connection failed";
+	}
+
+	if ($type == $Net::Gadu::EVENT_NOTIFY60) {
+	    print "EVENT_NOTIFY60 from ".$e->{uin}."\n" ;
+	}
+
+	if ($type == $Net::Gadu::EVENT_STATUS60) {
+	    print "EVENT_STATUS60 from ".$e->{uin}.", status ".$e->{status}."\n" ;
+	}
+
+	if ($type == $Net::Gadu::EVENT_DISCONNECT) {
+	    die "disconnect";
+	}
+	
+	if ($type == $Net::Gadu::EVENT_CONN_SUCCESS) {
+	    # need to be sent after connection success
+	    $gg->notify();
+
+	    # notify server that you want to receive status notifications
+	    $gg->add_notify("42112");
+
+	    # Send THANKS to author
+	    $gg->send_message_chat("42112","dziekuje za Net::Gadu");
+
+	    
+	    # SEARCH INIT
+	    $gg->search("","krzak","","","","male",0);
+	}
+
+	if ($type == $Net::Gadu::EVENT_MSG) {
+	    print $e->{message}." ".$e->{sender}."\n";
+	}
+
+	if ($type == $Net::Gadu::EVENT_SEARCH_REPLY) {
+	    # SEARCH RESULT
+	    print Dumper($e->{results});
+	    #$gg->logoff();
+	    #exit(1);
+	}
+
+	if ($type == $Net::Gadu::EVENT_ACK) {
+	}
+    }
+}
+
+## LOGOFF

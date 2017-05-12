@@ -1,0 +1,22 @@
+TYPEMAP
+DBusConnection*	O_OBJECT_connection
+GMainContext* O_OBJECT_maincontext
+
+INPUT
+O_OBJECT_connection
+    if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
+        $var = ($type)SvIV((SV*)SvRV( $arg ));
+    else {
+        warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+INPUT
+O_OBJECT_maincontext
+    if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
+        $var = ($type)SvIV((SV*)SvRV( $arg ));
+    else {
+        warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+        XSRETURN_UNDEF;
+    }
+

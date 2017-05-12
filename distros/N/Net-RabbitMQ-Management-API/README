@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Net-RabbitMQ-Management-API,
+version 0.01:
+
+  Interface to the HTTP Rest API of the RabbitMQ management plugin
+
+This software is copyright (c) 2011 by Ioana Budai.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

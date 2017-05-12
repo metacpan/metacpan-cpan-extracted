@@ -1,0 +1,17 @@
+1.22
+	Bug fixed: 23939 23938
+
+1.20
+	Added HTTP proxy support
+
+1.18
+	Has corrected for work with Windows systems ( windows 2000 )
+
+1.17
+	Added parameter CHAIN_FILE_DATA for use SC without configuration file.
+
+1.16
+	Has corrected work with $^W=1
+
+1.15-1
+	Added PREREQ_PM keyword to Makefile.PL 

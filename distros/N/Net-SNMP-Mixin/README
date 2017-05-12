@@ -1,0 +1,213 @@
+NAME
+    Net::SNMP::Mixin - mixin framework for Net::SNMP
+
+VERSION
+    Version 0.14
+
+ABSTRACT
+    Thin framework to access cooked SNMP information from SNMP agents with
+    various mixins to Net::SNMP.
+
+SYNOPSIS
+      use Net::SNMP;
+      use Net::SNMP::Mixin;
+
+      my $session = Net::SNMP->session( -hostname => 'example.com' );
+  
+      # method mixin and initialization
+      $session->mixer(qw/Net::SNMP::Mixin::Foo Net::SNMP::Mixin::Bar/);
+      $session->init_mixins();
+  
+      # event_loop in case of nonblocking sessions
+      snmp_dispatcher();
+
+      # check for initialization errors
+      $session->init_ok();
+
+      die scalar $session->errors if $session->errors;
+
+      # use mixed-in methods to retrieve cooked SNMP info
+      my $a = $session->get_foo_a();
+      my $b = $session->get_bar_b();
+
+DESCRIPTION
+    Net::SNMP implements already the methods to retrieve raw SNMP values
+    from the agents. With the help of specialized mixins, the access to
+    these raw SNMP values is simplified and necessary calculations on these
+    values are already done for gaining high level information.
+
+    This module provides helper functions in order to mixin methods into the
+    inheritance tree of the Net::SNMP session instances or the Net::SNMP
+    class itself.
+
+    The standard Net::SNMP get_... methods are still supported and the
+    mixins fetch itself the needed SNMP values during initialization with
+    these standard get_... methods. Blocking and non blocking sessions are
+    supported. The mixins don't change the Net::SNMP session instance,
+    besides storing additional payload in the object space prefixed with the
+    unique mixin module names as the hash key.
+
+DEFAULT EXPORTS
+    These methods are exported by default into the Net::SNMP namespace:
+
+    *   mixer
+
+    *   init_mixins
+
+    *   init_ok
+
+    *   errors
+
+    Please see the following description for details.
+
+  mixer(@module_names)
+      # class method
+      Net::SNMP->mixer(qw/Net::SNMP::Mixin::Foo/);
+
+      # instance method
+      $session->mixer(qw/Net::SNMP::Mixin::Yazz Net::SNMP::Mixin::Brazz/)
+
+    Called as class method mixes the methods for all session instances. This
+    is useful for agents supporting the same set of MIBs.
+
+    Called as instance method mixes only for the calling session instance.
+    This is useful for SNMP agents not supporting the same set of MIBs and
+    therefore not the same set of mixin modules.
+
+    Even the SNMP agents from a big network company don't support the most
+    useful standard MIBs. They always use proprietary private enterprise
+    MIBs (ring, ring, Cisco, do you hear the bells, grrrmmml).
+
+    The name of the modules to mix-in is passed to this method as a list.
+    You can mix class and instance mixins as you like, but importing the
+    same mixin module twice is an error.
+
+    Returns the invocant for chaining method calls, dies on error.
+
+  init_mixins($reload)
+    This method should be called in void context.
+
+      $session->init_mixins();
+      $session->init_mixins(1);
+
+    This method redispatches to every *_init()* method in the loaded mixin
+    modules. The raw SNMP values for the mixins are loaded during this call
+    - or via callbacks during the snmp_dispatcher event loop for nonblocking
+    sessions - and stored in the object space. The mixed methods deliver
+    afterwards cooked meal from these values.
+
+    The MIB values are reloaded for the mixins if the argument $reload is
+    true. It's an error calling this method twice without forcing $reload.
+
+    If there is an error in a mixin, the rest of the initialization is
+    skipped to preserve the current Net::SNMP error message.
+
+    With the init_ok() method, after the snmp_dispatcher run, the successful
+    initialization must be checked.
+
+      $session->init_mixins;
+      snmp_dispatcher;
+      $session->init_ok();
+      die scalar $session->errors if $session->errors;
+
+  init_ok($mixin)
+      $session->init_ok();
+      $session->init_ok('Net::SNMP::Mixin::MyMixin');
+
+    Test if all mixins or a single mixin is proper initialized.
+
+    Returns undef on error. The error is pushed on the sessions error
+    buffer.
+
+      die scalar $session->errors unless $session->init_ok();
+
+  errors($clear)
+      @errors = $session->errors();
+      @errors = $session->errors(1);
+
+    Net::SNMP::error() has only one slot for errors. During nonblocking
+    calls it's possible that an error followed by a successful transaction
+    is cleared before the user gets the chance to see the error. For the
+    mixin modules we use an error buffer until they are explicit cleared.
+
+    This method returns the list of all errors pushed by any mixin module.
+    Called in scalar context returns a string of all @errors joined with
+    "\n".
+
+    The error buffer is cleared if the argument $clear is true.
+
+GUIDELINES FOR MIXIN AUTHORS
+    See the Net::SNMP::Mixin::System module as a blueprint for a simple
+    mixin module.
+
+    As a mixin-module author you must respect the following design
+    guidelines:
+
+    *   Write more separate mixin-modules instead of 'one module fits all'.
+
+    *   Don't build mutual dependencies with other mixin-modules.
+
+    *   In no circumstance change the given attributes of the calling
+        Net::SNMP session instance. In any case stay with the given behavior
+        for blocking, translation, debug, retries, timeout, ... of the
+        object. Remember it's a mixin and no sub- or superclass.
+
+    *   Don't assume the translation of the SNMP values by default. Due to
+        the asynchronous nature of the SNMP calls, you can't rely on the
+        output of $session->translate. If you need a special representation
+        of a value, you have to check the values itself and perhaps
+        translate or untranslate it when needed. See the source of
+        Net::SNMP::Mixin::Dot1qVlanStatic for an example.
+
+    *   Implement the *_init()* method and fetch SNMP values only during
+        this call. If the session instance is nonblocking use a callback to
+        work properly with the *snmp_dispatcher()* event loop. In no
+        circumstance load additonal SNMP values outside the *_init()*
+        method.
+
+    *   Don't die() on SNMP errors during *_init()*, just return premature
+        with no value. The caller is responsible to check the
+        *$session->error()* method.
+
+    *   Use Sub::Exporter and export the mixin methods by default.
+
+DEVELOPER INFORMATION
+    If mixer() is called as a class method, the mixin-methods are just
+    imported into the Net::SNMP package.
+
+    If called as an instance method for the first time, the methods are
+    imported into a newly generated, unique package for this session. The
+    session instance is reblessed into this new package. The new package
+    inherits from the Net::SNMP class. Successive calls for this session
+    instance imports just the additional mixin-methods into the already
+    generated package for this instance.
+
+SEE ALSO
+    Sub::Exporter, and the Net::SNMP::Mixin::... documentations for more
+    details about the provided mixin methods.
+
+REQUIREMENTS
+    Net::SNMP, Sub::Exporter, Package::Generator, Package::Reaper
+
+BUGS, PATCHES & FIXES
+    There are no known bugs at the time of this release. However, if you
+    spot a bug or are experiencing difficulties that are not explained
+    within the POD documentation, please submit a bug to the RT system (see
+    link below). However, it would help greatly if you are able to pinpoint
+    problems or even supply a patch.
+
+    Fixes are dependant upon their severity and my availablity. Should a fix
+    not be forthcoming, please feel free to (politely) remind me by sending
+    an email to gaissmai@cpan.org .
+
+      RT: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-SNMP-Mixin
+
+AUTHOR
+    Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
+
+COPYRIGHT & LICENSE
+    Copyright 2008-2015 Karl Gaissmaier, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

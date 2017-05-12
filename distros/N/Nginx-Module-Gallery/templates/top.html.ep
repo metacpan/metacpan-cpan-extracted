@@ -1,0 +1,18 @@
+% my (%opts) = @_;
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>
+        %= $opts{title} || ''
+    </title>
+    <style type="text/css">
+        %= $self->render_file( $opts{path} . '/main.css', size => $opts{size} )
+    </style>
+    <link rel="shortcut icon" type="image/png"
+        href="<%= $opts{favicon}{icon}{href} %>" />
+</head>
+<body>
+    <header>
+    </header>
+    <article>

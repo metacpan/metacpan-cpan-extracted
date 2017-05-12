@@ -1,0 +1,40 @@
+Net-GrowlClient version 0.01
+============================
+
+Net::GrowlClient provides a complete object oriented interface to send Mac OS X Growl notifications across the network.
+
+It is inspired by Net::Growl provided by Nathan McFarland
+
+Growl only needs to be installed on the  Mac receiving notification not on the machine using this module.  
+
+Make sure to go to System Preferences -> Growl -> Network and:
+1) Enable incoming notifications and registration
+2) Add a server password if you wish
+3) Take care that not all display style support sticky notifications.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Digest::MD5
+   Digest::SHA
+   Growl (http://growl.info) on the computer receiving the notifications (not the computer using this module, sending the notifications).
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Raphaël ROULET
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

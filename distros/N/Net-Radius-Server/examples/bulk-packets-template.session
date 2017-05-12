@@ -1,0 +1,26 @@
+#!/usr/bin/perl
+
+# These lines are eval()ed once at the beginning of a session, and
+# then once for each session update up to session termination. $s is
+# initialized by rad-bulk-make to be an empty hashref. There is one
+# for each individual session created.
+
+# You should set values here that can be accessed from the template,
+# in order to create the packets you want.
+
+$s->{mac}      //= join(':', map { sprintf ("%02x", (rand(256)))} 0 .. 5 );
+$s->{framedip} //= "10.0.0." . int(rand(255));
+$s->{sessid}   //= $p->{nasip} . ':' . join('', map { sprintf ("%02x", 
+							       (rand(256)))} 
+					    0 .. 15 );
+$s->{ioctets}  //= 0;
+$s->{ooctets}  //= 0;
+$s->{ipackets} //= 0;
+$s->{opackets} //= 0;
+$s->{stime}    //= 0;
+$s->{ioctets}  += int(rand(1024*1024));
+$s->{ooctets}  += int(rand(1024*1024));
+$s->{ipackets} += int(rand(1024));
+$s->{opackets} += int(rand(1024));
+$s->{stime}    += int(rand(300));
+

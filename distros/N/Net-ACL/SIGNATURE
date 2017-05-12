@@ -1,0 +1,64 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.22.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 721bcb3ce69ab7a2a920407d88175a5694b7e29d Changes
+SHA1 2488484a830ae41f9dba2b218c86b7047efe3b00 MANIFEST
+SHA1 05b77ccd15ffbcc2949ec93ac75515c9e630a6aa Makefile.PL
+SHA1 726b4b751a93a3fbae3c380f77231bca3a740e45 README
+SHA1 4cd6fe6bd3e9c67ae0eaa365c333cc3c0ddb56a6 lib/Net/ACL.pm
+SHA1 8c29fb6b51b24545dc8a728ea2d95ac6010d0172 lib/Net/ACL/Bootstrap.pm
+SHA1 dfba645ccf93ad7f5a68d3322534211fc2b2bf49 lib/Net/ACL/File.pm
+SHA1 f2327ac7a5546d119c78448a0da0ee0ad750aa59 lib/Net/ACL/File/ASPath.pm
+SHA1 640b294886cb104601f5feab09571b5ad397ed4a lib/Net/ACL/File/Community.pm
+SHA1 e26842043184be08d01f57a5bdc2c8c544b805a2 lib/Net/ACL/File/IPAccess.pm
+SHA1 68e307be296850529b00c0b9dfa2c7d15bc3aaaf lib/Net/ACL/File/IPAccessExt.pm
+SHA1 5c0477c42abebac2e8c7c6a1fe48c435c8187226 lib/Net/ACL/File/Prefix.pm
+SHA1 c7b253c6dfcfa2d446453922bf2f6052a9c7570b lib/Net/ACL/File/RouteMap.pm
+SHA1 bea141b471f3af5ef7a10a88c8ce8dc26b24aabf lib/Net/ACL/File/Standard.pm
+SHA1 09621dbff753c5aad618762e0ca8588abd8e1e9a lib/Net/ACL/IPAccessExtRule.pm
+SHA1 66302ad9044bb84a9d3b45ba896a08f81ebb5aaf lib/Net/ACL/Match.pm
+SHA1 0b641ddc658653736138bf7c9d4d849624ba859f lib/Net/ACL/Match/IP.pm
+SHA1 e0e1126f143fda75ec8e858781946471adc4d72b lib/Net/ACL/Match/List.pm
+SHA1 52f61c7122e59b0a759dfdf5abbf38c1cc3f6dc2 lib/Net/ACL/Match/Member.pm
+SHA1 83bc87edb94170197423f1e0a53f743ca151be1b lib/Net/ACL/Match/Prefix.pm
+SHA1 b8d7c3083715fc9fcad8ca0b8bc459695296afc4 lib/Net/ACL/Match/Regexp.pm
+SHA1 723ffee89cbc3ccec011121326dd730d0efd9122 lib/Net/ACL/Match/Scalar.pm
+SHA1 ea1271664e4a82c541cde0ffc85d033b28c5878a lib/Net/ACL/RouteMapRule.pm
+SHA1 b37e314c8ef5668cf262f343e3b58633ede36bbb lib/Net/ACL/Rule.pm
+SHA1 9db04ca993a830c8fe2a85b5a99d8ce090632a51 lib/Net/ACL/Set.pm
+SHA1 646fc733c172044a6bd0e5170f5911e3f4116db5 lib/Net/ACL/Set/Add.pm
+SHA1 0491bc7482c443a46e6d27fad8866cf360771c71 lib/Net/ACL/Set/Scalar.pm
+SHA1 0a2017d6fc78988bdbe9e51d8ab5365ad84721e8 lib/Net/ACL/Set/Union.pm
+SHA1 04e4911e9aa4d1fee94ace393b20d79e1668964f t/00-Signature.t
+SHA1 dc5890903b6beba43870449a1cf4eecd0a2f01f4 t/01-pod.t
+SHA1 a125d0b1e4aff9e8f46ee4c8112a0e378ea01a2e t/02-Netmask.t
+SHA1 1c0d366a8112afc1279ec43577fef9b8c4bd4fcb t/03-Reconfig.t
+SHA1 15527fd955aa3973515e96fe08652277e0495edb t/10-MatchIP.t
+SHA1 a64c45cde8d4819768c83ac6e47e3bb2bc92d3dd t/11-MatchPrefix.t
+SHA1 d38e27ab197e2de52b506957db18ae462ca85ce6 t/20-MatchList.t
+SHA1 11d3b8e2fc88891d10485e94b74806d0d533e49f t/30-SetScalar.t
+SHA1 99c69e3e91375230069a0710b4b37bbcc1880cc8 t/40-ACL.t
+SHA1 54a57dbefe76d67a3816b05618bd79a5da9f6473 t/41-Bootstrap.t
+SHA1 43233ed2053f727cbbc832778e2b74e094097102 t/50-RouteMap.t
+SHA1 d456ff6d755cb23b8b9d6232abdddc7b6b23c508 t/80-File.t
+SHA1 2018d18461fa33c2e06ba1335d2aa17769bdcd0e t/81-RealFile.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.2 (GNU/Linux)
+
+iD8DBQE+4PDwXejZQ7TqiLoRAsPmAJ4ulyNh1zBs78LyGdNfjIo7BxK74QCfYU70
+VgZMWaOah3jFoFmX3KbThCs=
+=77qr
+-----END PGP SIGNATURE-----

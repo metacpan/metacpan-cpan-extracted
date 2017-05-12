@@ -1,0 +1,174 @@
+Revision history for Net-Async-Matrix
+
+0.19    2017/04/04 16:25:19
+        [CHANGES]
+         * Rebuild internals to use /sync rather than /initialSync + /events
+         * Add first-class exposed API to encapsulate "room state"
+         * Improvements to formatted message utility functions
+         * Added some simple one-method example scripts
+         * Support sending and receiving m.read receipts
+         * Configurable amount of initial backlog to request from homeserver
+           at first sync
+         * Have $state->members only return non-"leave" state members
+         * Support monospace tags in build_formatted_message
+         * Added ->convert_mxc_url
+
+0.18    2015/07/22 16:44:56
+        [CHANGES]
+         * Turn off HTTP pipelining by default
+         * Include the Matrix user_id in the Notifier name, for logging
+           identification
+
+        [BUGFIXES]
+         * Placate synapse bug involving duplicate rooms in initialSync result
+         * Use JSON::MaybeXS also in unit tests
+
+0.17    2015/04/30 16:07:30
+        [CHANGES]
+         * Configurable longpoll timeout
+         * Give Rooms a startup future so users can await the initialSync of a
+           room
+         * Allow message sending using transaction IDs
+         * Use JSON::MaybeXS so we have a chance of faster JSON parsing
+
+        [BUGFIXES]
+         * Don't crash if ->stop is called twice
+         * Avoid a race condition if a new room event arrives before we finish
+           the room initialSync
+         * Fix to optional dependency in test skip logic
+         * Ensure that ->stop/re->start doesn't crash
+
+0.16    2015/02/18 20:08:08
+        [CHANGES]
+         * Support m.notice and the various attachment types (m.file, audio,
+           video) in bundled client.pl
+         * Added ->upload method
+
+0.15    2015/02/03 16:33:49
+        [CHANGES]
+         * Add an option to disable the evenstream for the case of lightweight
+           send-only clients
+         * Support m.notice
+
+0.14    2015/01/09 19:25:06
+        [CHANGES]
+         * Support typing notifications
+
+0.13    2014/12/10 17:08:42
+        [CHANGES]
+         * Initial start at some unit tests
+
+        [BUGFIXES]
+         * 'use URI' since it's needed
+         * Clear the (global and room) initialSync futures if the operation
+           fails so that the next call will re-attempt it
+
+0.12    2014/12/02 15:50:18
+        [CHANGES]
+         * Cope with new m.room.power_levels event format
+         * Allow applications to handle new/unrecognised events by adding
+           'on_unknown_events' event
+        
+        [BUGFIXES]
+         * Don't emit rich formatted messages if there are no actual
+           formatting tags set on the String::Tagged instance
+
+0.11    2014/11/14 18:25:06
+        [CHANGES]
+         * Support formatted messages in the "org.matrix.custom.html" format
+           by conversion to/from String::Tagged::Formatting instances
+         * Display formatted messages and image URLs in the client
+
+0.10    2014/11/04 16:15:31
+        [CHANGES]
+         * Extracted 'make_room' as a subclassable method
+         * Use new Net::Async::HTTP 0.36 ability to store SSL parameters
+         * Pass $event as another param in on{_back,}_message so that new
+           timestamp API is visible
+
+        [BUGFIXES]
+         * Declare correct version of IaNotifier in Build.PL
+         * Not all '/register' alternatives will have 'stages'
+         * Fix to ->join_room ensuring that $room itself is always returned
+
+0.09    2014/10/07 18:05:58
+        [CHANGES]
+         * Many more events are handled and reported via on_state:
+            + m.room.aliases
+            + m.room.join_rules
+            + m.room.*_level
+         * Added ability to send invites and an event for incoming invites
+         * Room membership change events now also include the member making
+           the change as well as the member the change is about
+         * Allow setting room names and topics, adding and removing aliases,
+           and changing member and room power levels
+
+        [BUGFIXES]
+         * Fetch full room initial state on join or create before invoking
+           on_state_synced event
+
+0.08    2014/09/24 17:09:50
+        [CHANGES]
+         * Added $room->joined_members, to allow filtering of other states
+           (invitees, kicks/bans)
+         * Fix ->register for new Registration API, including multi-stage
+           flows
+         * Added $room->leave
+         * Client improvements
+            + per-room commands: /me and /leave
+            + display a user total count on the user list for a room
+
+0.07    2014/09/22 17:05:01
+        [CHANGES]
+         * Support /register Matrix API with user_id + password
+         * Fix on_membership event argument order to match on_state_change
+
+0.06    2014/09/19 17:35:40
+        [CHANGES]
+         * New room event model to handle back-pagination as well as forward
+           events
+         * Support room names and topics
+         * Much improvement to 'client.pl' - nicer formatting, room topics,
+           put member joins/leaves/renames in the event log
+         * Support /login Matrix API with user_id + password
+
+0.05    2014/09/10 11:25:22
+        [CHANGES]
+         * Split room 'on_member' events into separate events for membership
+           vs. presence
+         * Various neatenings and improvements in included 'client.pl' script
+
+        [BUGFIXES]
+         * Apply a timeout for longpoll so we don't end up waiting forever
+         * Invoke ->log method of containing $matrix object, not toplevel
+           main::log()
+
+0.04    2014/09/04 18:10:00
+        [CHANGES]
+         * Many and various improvements to the display of the sample client
+         * Added 'on_synced_*' events to Room objects, removed 'on_room_synced'
+           from Matrix object
+
+0.03    2014/09/03 16:30:54
+        [CHANGES]
+         * Many more updates for current Matrix API
+         * Split 'on_room_add' into on_room_new + on_room_synced events
+         * Support SSL
+
+0.02    2014/08/27 19:30:34
+        [CHANGES]
+         * Updates for latest Matrix REST API
+         * ->create_room to return a new Room object
+         * Document the user and membership structs
+         * Initial sync of rooms when joining
+         * Don't store room alias names
+         * Added $room->members
+         * Allow setting default on_room_* event handlers
+
+        [BUGFIXES]
+         * Remember to fill in request content body of event stream requests,
+           so wrappers around NaHTTP still see it
+
+0.01    2014/08/23 10:29:11
+        First version, released on an unsuspecting world.
+

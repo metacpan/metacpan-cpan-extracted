@@ -1,0 +1,55 @@
+This program assumes that you already have the Hesiod libraries installed
+on the system you plan to install the module on, and gives no assistance
+or instruction on the Hesiod install.
+
+The module installs using the standard Perl 
+perl Makefile.PL
+make
+make test
+make install
+method, but because of some system dependencies, you will likely need to
+modify some stuff at the top of the Makefile.PL.
+
+First off, you will need to indicate where the hesiod library stuff is.
+On my systems, it is under /usr/local/athena, and that is what it defaults
+to.  The Perl variables $HESIOD_LIBDIR and $HESIOD_INCDIR should point to
+the location of the libhesiod.a, etc. library and the hesiod.h include file
+respectively.  Since usually these are in lib and include subdirectories of
+some common Hesiod root, you can usually just set $HESIOD_ROOTDIR appropriately
+and the other two will be fine.
+
+The other option you may need to adjust is the $HACKS variable.
+There are 2 "HACKS" currently defined to deal with cases in which 
+systems lack some components of the passwd structure.  The variables
+$PW_QUOTA_HACK and $PW_COMMENT_HACK determine whether the defines
+DONT_HAVE_PW_QUOTA and DONT_HAVE_PW_COMMENT are sent to the C-code.  If set,
+the quota and comment fields returned by the hesiod getpwnam and getpwuid
+functions will be undef.  The system tries to determine whether these hacks
+are needed automatically when Makefile.PL is run, but if it errs you can
+manually override them.
+
+The system also tries to automatically determine whether it needs to link
+again libresolv.a, etc. or not.  (Actually, it just determines whether 
+libresolv exists, and if so links against it, whether needed or not).
+
+
+Finally, the tests require a fair amount of site specific information to
+work properly.  You need to provide a name and type for a valid query, and
+its results, a valid username and his mail host entry, etc.  The script
+t/make_testdata.pl will get called when Makefile.PL is executed, and will
+prompt for the information if t/testdata.pl does not already exist.  You
+can add/change site specific information by manually editting the testdata.pl
+script or by running make_testdata.pl with the -f flag.  Even so, it is
+hard to get a truly good set of tests run which report success/failure 
+accurately.  The tests seem to generate a lot of false failures--- if most
+of the tests are passing, it might behoove you to edit the failed tests to print
+out more information and see if really failed.  
+
+If you are getting really odd port numbers in getservbyname and relatives,
+check the setting of -DHESIOD_PORT_ENDIAN_HACK.
+
+Thus far, the code has been successfully installed/tested on the following
+systems:
+alpha-dec_osf
+i386-linux
+sun4-solaris

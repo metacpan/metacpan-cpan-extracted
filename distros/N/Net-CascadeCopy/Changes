@@ -1,0 +1,46 @@
+Revision changes for Net::CascadeCopy
+
+0.2.6
+
+  - handle error condition where no available servers in group
+
+  - report number of failed processes on completion
+
+0.2.5
+
+  - use Mouse instead of inside-out objects
+    - some setters changed to required constructor arguments
+
+  - preserve server insertion sort order
+
+  - update to use latest version of Dist::Zilla
+
+0.2.4
+
+  - resolve a bug where source server is reused too many times
+    - created a new method get_transfer_map for more introspection into transfer loop
+    - thanks to mikegrb for the excellent bug report!
+
+  - use Test::Differences in test cases
+
+  - added test coverage report
+
+  - added a roadmap
+    
+0.2.3
+
+  - resolve multiple issues with transfers from 'localhost'
+    - prevent failed transfers from 'localhost' from going into a loop, thanks to twelch!
+    - prevent issues with hosts sorted after localhost, introduced in 0.2.0
+  - tweaks for using Dist::Zilla
+
+0.2.0
+
+  - added some unit test cases for successful transfers
+  - modified some methods to make automated testing easier
+  - replaced _has_*_server() methods with _get_*_servers()
+  - resolved a bug with re-scheduling an available server too many times
+  - better handling of -help and usage info
+  - moved source to github and released using Dist::Zilla
+  - still some really ugly code in this release, more updates coming
+

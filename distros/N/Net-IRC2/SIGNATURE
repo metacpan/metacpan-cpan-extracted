@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.50.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a9e35ec7f28b2367fa837e9723e303854f0d0b57 Build.PL
+SHA1 0acadfa2935d24498c70c3dce1a32c9cdfa20bcb Changes
+SHA1 ab92609c1edf422b6dbf437c0451bd90715a4b00 MANIFEST
+SHA1 2645eea7723dd3b2b441ce112087bb7bddbd4cd9 META.yml
+SHA1 54cc5eea5653ce27bce79d6c13e6cee5707b5c58 README
+SHA1 4864f3df5612b3bc4f4ae568e672a83794fe1cf7 lib/Net/IRC2.pm
+SHA1 5a3f50be78181edc5d6ed00da590a903d5821a02 lib/Net/IRC2/Chan.pm
+SHA1 0da7fb8d51a8670c1f2fdf011c47827b43bcd2ee lib/Net/IRC2/Connection.pm
+SHA1 e1c15096ca7af57adef013fb73fe4f4a6857af5f lib/Net/IRC2/Event.pm
+SHA1 ac8a68106a4fe61b5533c8555cccc2f18a27f562 lib/Net/IRC2/Parser.pm
+SHA1 b046a172ae5676a266dce0bd87701788030aeb77 lib/Net/IRC2/Parser.pod
+SHA1 fd4d2e909b1a0419092da85f70cd7bc4335c4b30 lib/Net/IRC2/grammar
+SHA1 29046eb41b780d7032f693a710e862727570d1a1 t/00-load.t
+SHA1 6da39b48ce64b584e4c3274bff96fc76ff484820 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFDChnwyj2/PKaFIL0RAt/OAJ0TCXRF1dCjzI44PG+yrEkwbKPr7wCfeDbF
+kDRQUdGr8FojSr/BxfdoeNs=
+=3DmE
+-----END PGP SIGNATURE-----

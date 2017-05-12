@@ -1,0 +1,509 @@
+
+=head1 NAME
+
+Nes::Obj::multi_step - Secure Multi Step Form.
+
+=head1 SYNOPSIS
+
+Send data over a script handler:
+
+    {: include ('{: * cfg_obj_top_dir :}/Nes/form/multi_step.nhtml',
+                "
+                  script_handler   => 'my_script_handler.pl',
+                  function_handler => 'my_function_handler',
+                  form_name        => 'my_form_1',
+
+                  steps  => {: # steps  :}
+                      [     
+                        [   {: # step 1 :}
+                          { {: # field 1 for step 1 :}
+                            name     => 'name', 
+                            msg      => 'The \"Name\"',
+                            type     => 'text',
+                            size     => 12,
+                            {: # check 4 min, 22 max, begins with a 
+                            letter, alphanumeric :} 
+                            check    => '4,22,/^[a-zA-Z]\w*$/',
+                          },
+                          { {: # field 2 for step 1 :}
+                            name     => 'email', 
+                            msg      => 'Email Address',
+                            type     => 'tex',
+                            size     => 12,
+                            check    => '8,40,/[\w-]+@([\w-]+\.)+[\w-]+/i',
+                          },
+                            {: # more fields for stept 1 ... :}
+                        ],
+                        [   {: # step 2 :}
+                          { {: # field 1 for step 2 :}
+                            name     => 'message', 
+                            msg      => 'Message',
+                            type     => 'textarea',
+                            filter   => 'yes_tag_B,yes_tag_BR,yes_tag_I',
+                            cols     => 20,
+                            rows     => 6,
+                          },
+                            {: # more fields for step 2 ... :}
+                        ],                                
+                            {: #  more steps ... :}                                              
+                      ],
+                "
+               )         
+    :}
+
+Insert data directly to the database:
+
+    {: include ('{: * cfg_obj_top_dir :}/Nes/form/multi_step.nhtml',
+                "
+                  to_database        => 'INSERT',
+                  to_table           => 'table',
+                  to_fields_assort   => 
+                         {
+                           name      => 'name',
+                         },   
+
+                  {: # steps ... :}
+                "
+               )         
+    :}
+
+Update data directly to the database:
+
+    {: include ('{: * cfg_obj_top_dir :}/Nes/form/multi_step.nhtml',
+                "
+                  to_database        => 'UPDATE',
+                  to_table           => 'table',
+                  to_where           => '',
+                  to_limit           => '',                  
+                  to_fields_assort   => 
+                         {
+                           name      => 'name',
+                         },   
+
+                  {: # steps ... :}
+                "
+               )         
+    :}
+
+=head1 DESCRIPTION
+
+Create a form with one or more steps, with a captcha at the end. Data can be 
+sent over a script handler or directly to the database.
+
+For a better understanding of this object see live sample: 
+http://nes.sourceforge.net or install 'nesblog' and see scripts and 
+templates, with set_nes_site utility:
+
+    set_nes_site --from_exam=nesblog --to_exam=/full-path/root-www/nesblog
+
+=head1 PARAMETERS
+
+=over 2
+
+=item script_handler
+
+The script that contains the "function_handler"
+
+=item function_handler
+
+Function that receives the form data. Receives the form fields in a 
+hash reference. Must return none if successful, scalar if error or 
+hash reference if fields errors. Sample:
+
+    sub function_handler {
+        my $data = shift;
+        my $error_fields = {};
+        my $error;
+        ...
+        if ( ! $data->{'name'} ) {
+            $error_fields->{'name'} = 'Name is required';
+        }
+        ...
+        return $error_fields if $error_fields;
+        return 'Error in DB' if $DB->{'error'};
+        return;
+     }
+
+See live sample: L<http://nes.sourceforge.net/miniblog/en/?action=register>
+
+=item script_NES
+
+Perl script to execute. Default none.
+
+=item to_database
+
+INSERT or UPDATE database.
+
+=item to_table
+
+Table name to insert or update.
+
+=item to_where
+
+WHERE clause in sql sentence in UPDATE mode.
+
+=item to_limit
+
+LIMIT clause in sql sentence in UPDATE mode.
+
+=item to_fields_assort
+
+Correspondence from the fields of the database to form. If it begins with 
+two points, is a function sql. Sample: date => ':NOW()'
+
+=item DB_base
+
+Database name. Usually DB_... must be previously defined in its nes.cfg, 
+multi_step take these defaults. But if you need to consult another 
+database, can DB_... as parameters.
+
+Not a good idea to include passwords in files html:
+
+    BAD:
+    {: include ('{: * cfg_obj_top_dir :}/Nes/form/multi_step.nhtml',
+                "
+                  to_database        => 'INSERT',
+                  to_table           => 'table',
+                  DB_base            => 'basename',
+                  DB_user            => 'baseuser',
+                  DB_pass            => 'sakjuje7ey',                  
+                  ...
+                "
+               )         
+    :}    
+
+Declare them as variables in their nes.cfg:
+
+    # primary database
+    DB_base    = basename
+    DB_user    = username
+    DB_pass    = password
+    DB_driver  = mysql
+    DB_host    = localhost
+    DB_port    = 3306
+
+    # alternative database
+    form1_DB_base    = otherbasename
+    form1_DB_user    = username
+    form1_DB_pass    = password
+    form1_DB_driver  = mysql
+    form1_DB_host    = localhost
+    form1_DB_port    = 3306
+
+And so:
+
+    {: include ('{: * cfg_obj_top_dir :}/Nes/form/multi_step.nhtml',
+                "
+                  to_database        => 'INSERT',
+                  to_table           => 'table',
+                  DB_base            => '{: * cfg_form1_DB_base :}',
+                  DB_user            => '{: * cfg_form1_DB_user :}',
+                  DB_pass            => '{: * cfg_form1_DB_pass :}',            
+                  ...
+                "
+               )         
+    :}  
+
+=item DB_user
+
+Database user.
+
+=item DB_pass
+
+Database password.
+
+=item DB_driver
+
+Database driver.
+
+=item DB_host
+
+Database host.
+
+=item DB_port
+
+Database port.
+
+=item msg_error_data
+
+Text to show if error data.
+
+=item msg_ok_data
+
+Text to show if success data.
+
+=item referer
+
+Check referer.
+
+=item private_key
+
+Private key to crypt data.
+
+=item show_captcha
+
+1 show captcha, 0 not
+
+=item table_width
+
+Width table form.
+
+=item submit_begin
+
+Text or HTML to show before submit button.
+
+=item submit_end
+
+Text or HTML to show after submit button.
+
+=item span_error
+
+Text to show in span tag error.
+
+=item form_expire
+
+Time to expire form. Default 60 second for field. Time suffix: 
+s: seconds, m: minutes h: hours d: days, M: months, y: years. 
+
+=item form_name
+
+Tag name property of form.
+
+=item captcha_name
+
+Tag name property of captcha.
+
+=item captcha_type
+
+ascii.
+
+=item captcha_digits
+
+Digit number captcha.
+
+=item captcha_size
+
+Captcha size.
+
+=item captcha_noise
+
+Captcha noise level.
+
+=item captcha_sig
+
+Character to the foreground
+
+=item captcha_spc
+
+Character to the background
+
+=item captcha_expire
+
+Time to expire captcha. Default '40s'. Time suffix: 
+s: seconds, m: minutes h: hours d: days, M: months, y: years. 
+
+=item captcha_end
+
+Text or HTML to show after captcha.
+
+=item captcha_begin
+
+Text or HTML to show before captcha.
+
+=item captcha_atempts
+
+Attempts/minutes, if we reach attempts, wait the time shown in "minutes". 
+Default is '10/5'
+
+=item captcha_tag_start
+
+HTML Tag for the design of the captcha.
+
+=item captcha_tag_end
+
+HTML Tag for the design of the captcha.
+
+=item out_page
+
+Out page. Default self.
+
+=item msg_legend
+
+Text to show in lengend tag.
+
+=item msg_submit
+
+Text to show in send button.
+
+=item msg_captcha
+
+Text to show in captcha field.
+
+=item txt_captcha
+
+Text or HTML to show in captcha. Default 
+"Finally, enter the security code below."
+
+=item msg_error_captcha
+
+Text or HTML to show if captcha error.
+
+=item msg_error_form
+
+Text or HTML to show if form error.
+                             
+=item id_form
+
+Tag id property of form.
+
+=item class_form
+
+Tag class property of form.
+
+=item action_form
+
+Action property form.
+
+=item tpl_errors
+
+Template errors.
+
+=item tpl_options_begin
+
+Template for options.
+
+=item tpl_options_end
+
+Template for options.
+
+=item msg_error_fields
+
+Text or HTML to show if field error.
+
+=back
+
+=head1 STEPS PARAMETERS
+
+=over 2
+
+=item name
+
+Tag name property of field.
+
+=item field_id
+
+Tag id property of field.
+
+=item field_class
+
+Tag class property of field.
+
+=item value
+
+Tag value property of field.
+
+=item size
+
+Tag size property of field.
+
+=item property
+
+Others tag property of field. Sample: property => 'READONLY'
+
+=item type
+
+Tag type of field: text, textarea, select, hidden.
+
+=item cols
+
+Tag cols property in textarea.
+
+=item rows
+
+Tag rows property in textarea.
+
+=item msg
+
+Text to show for the field.
+
+=item begin
+
+Text or HTML to show before field.
+
+=item end
+
+Text or HTML to show after field.
+
+=item check
+
+Verify field in format: 'min,max,regexp'. Sample: 
+'0,70,/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i' is optional (0 min length)
+70 max length, and email regular expression.
+
+=item msg_error
+
+Text or HTML to show if check error.
+
+=item filter
+
+Filter field value by Nes filter options, no_html, yes_html, etc.
+
+=item tpl
+
+Template to include in field.
+
+=back
+
+=head1 BUGS
+
+Not support "multiple select".
+
+=head1 AUTHOR
+
+Skriptke: Enrique Castañón
+
+=head1 VERSION
+
+Version 1.03 April 2010
+
+=head1 COPYRIGHT
+
+Copyright (c) Enrique F. Castanon Barbero. All rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms and conditions as
+GNU Public License (GPL).
+
+This means that you can, at your option, redistribute it and/or 
+modify it under either the terms the GNU Public License (GPL), 
+or under the Perl Artistic License.
+
+See http://dev.perl.org/licenses/
+
+=head1 DISCLAIMER
+
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE.
+
+Use of this software in any way or in any form, source or binary,
+is not allowed in any country which prohibits disclaimers of any
+implied warranties of merchantability or fitness for a particular
+purpose or any disclaimers of a similar nature.
+
+IN NO EVENT SHALL I BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL,  OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE
+USE OF THIS SOFTWARE AND ITS DOCUMENTATION (INCLUDING, BUT NOT
+LIMITED TO, LOST PROFITS) EVEN IF I HAVE BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE
+
+=head1 SEE ALSO
+
+L<Nes>, L<Nes::Tutorial>, L<Nes::Singleton>, L<Nes::nes.cfg>, 
+Sample to use Nes; L<http://nes.sourceforge.net/>
+
+=cut
+

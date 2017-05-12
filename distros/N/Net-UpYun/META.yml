@@ -1,0 +1,39 @@
+---
+abstract: 'Simple client library for UpYun Restful API.'
+author:
+  - 'Night Sailer(Pan Fan) <nightsailer{at}gmail_dot_com>'
+build_requires:
+  Data::Dumper: 0
+  ExtUtils::MakeMaker: 6.62
+  HTTP::Date: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.62
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.04'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-UpYun
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Digest::MD5: 0
+  HTTP::Date: 0
+  HTTP::Response: 0
+  Moose: 2.0401
+  Moose::Object: 2.0401
+  WWW::Curl::Easy: 4.15
+  feature: 1.16
+  namespace::autoclean: 0
+  perl: 5.10.0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-UpYun
+  homepage: http://search.cpan.org/dist/Net-UpYun
+  license: http://dev.perl.org/licenses/
+  repository: origin
+version: 0.001

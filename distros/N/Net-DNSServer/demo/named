@@ -1,0 +1,73 @@
+#!/usr/bin/perl -w -T
+
+# $Id: named,v 1.5 2002/04/16 20:40:17 rob Exp $
+#
+# This example starter script to load a configuration.
+# It really only forwards and caches right now, since I
+# haven't finished the configuration parsing stuff yet.
+
+BEGIN {
+  # Taint clean PERL5LIB if exists (useful for debugging)
+  if ($ENV{PERL5LIB} && $ENV{PERL5LIB}=~m%^([\w\-\./:]+)$%) {
+    foreach (split /:/,$1) {
+      unshift (@INC,$_);
+    }
+  }
+}
+
+use strict;
+use Net::DNSServer;
+use Net::DNSServer::ConfParser;
+use Net::DNSServer::SharedCache;
+use Net::DNSServer::Proxy;
+#use Net::DNSServer::HintNS;
+
+# DEBUG
+use Data::Dumper;
+
+my $options_ref = {};
+my $zone_ref = {};
+#    $conf_file ||= "/etc/named.conf";
+
+&Net::DNSServer::ConfParser::load_configuration ({
+  conf_file      => "conf/named.conf",
+  opts_callback  => sub {
+    my $field = shift;
+    my $value = shift;
+    $value =~ s/^"(.*)"$/$1/;
+    $options_ref->{$field} = $value;
+  },
+  zone_callback  => sub {
+    my $zone  = shift;
+    my $class = shift;
+    my $field = shift;
+    my $value = shift;
+    $zone  =~ s/\.*$/./;
+    $value =~ s/^"(.*)"$/$1/;
+    die "Unimplemented class [$class]"
+      if $class && $class ne "IN";
+    $zone_ref->{$zone}->{$field} = $value;
+  },
+});
+
+# DEBUG
+print Data::Dumper->Dump([$options_ref,$zone_ref],qw($options $zone));
+
+my $cache_resolver = new Net::DNSServer::SharedCache {
+  ipc_key  => "DNSk",
+  max_size => 0,
+  fresh    => 1,
+};
+
+#  my $hint_resolver = new Net::DNSServer::HintNS {
+#    zone => ["."];
+#    hint_file => "conf/named.root",
+#  };
+
+my $proxy_resolver = new Net::DNSServer::Proxy;
+
+run Net::DNSServer {
+  priority => [$cache_resolver,$proxy_resolver],
+};
+
+exit;

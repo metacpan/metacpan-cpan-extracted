@@ -1,0 +1,60 @@
+Revision history for Perl extension Net::Frame::Layer::ICMPv6.
+
+1.09 Wed Apr  9 08:31:41 CEST 2014
+   - bugfix: https://rt.cpan.org/Ticket/Display.html?id=93405
+   - update: copyright notice
+
+1.08 Sun Dec  2 17:10:28 CET 2012
+   - bugfix: ICMPv6::Option: some systems do not set length as others.
+             We added a check on option type so we set manually length while 
+             unpacking.
+
+1.07 Wed Nov 14 21:48:47 CET 2012
+   - bugfix: on length calculation for ICMPv6::Option
+   - new: support for HopByHop, Destination and Mobility extension headers
+   => thanks to Vince from vinsworld.com
+   - update: more tests
+
+1.06 Thu Feb 23 20:10:45 CET 2012
+   - new: computeChecksum() takes into account IPv6Routing and IPv6fragment
+   => contributed by vinsworld.com (Thanks Vince)
+   - new: ICMPv6::DestUnreach, ICMPv6::TimeExceed, ICMPv6::TooBig and
+   ICMPv6::ParameterProblem
+   => contributed by vinsworld.com (Thanks Vince)
+   - update: copyright notice
+
+1.05 Mon Nov 16 20:43:50 CET 2009
+   - bugfix: permission on namespace for RouterAdvertisement
+     and RouterSolicitation
+   - cosmetics
+
+1.04 Fri Nov 13 07:46:21 CET 2009
+   - bugfix: some new files were not put in MANIFEST :(
+
+1.03 Thu Nov 12 22:36:35 CET 2009
+   - new: ICMPv6 RouterAdvertisement and RouterSolicitation
+   => Contributed by Paolo Vanni M. Venegas
+
+1.02 Sun May 31 17:12:08 CEST 2009
+   - UPDATE: payload is no more an attribute in ICMPv6 modules, it is
+             handled in a generic way like any other layer
+   - UPDATE: icmpType is no more an attribute in ICMPv6 module, it is
+             handled in a generic way like any other layer
+   - UPDATE: options is no more an attribute in ICMPv6 module, it is
+             handled in a generic way like any other layer
+   - UPDATE: options are handled also in specific ICMPv6 layers, with 
+             options attribbute (ARRAYREF) and getOptionsLength() function
+   - REMOVED: getPayloadLength() functions
+   - REMOVED: getOptionsLength() functions
+   - update: computeChecksum() and computeLengths() to reflect new computation
+             scheme from Net::Frame::Simple
+   - update: copyright notice
+
+1.01 Thu Dec 28 16:58:44 CET 2006
+   - bugfix: computeChecksums() now handles ICMPv6 options
+   - bugfix: recv() on Neighbor Solicitation messages
+   - update: examples/lookup-mac.pl
+
+1.00 Thu Dec 21 23:53:20 CET 2006
+   - first public release
+

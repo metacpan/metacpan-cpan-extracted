@@ -1,0 +1,21 @@
+CHANGES
+conf/gallery.conf
+conf/gallery.localhost
+icons/archive.png
+icons/edit-undo.png
+icons/favicon.png
+icons/folder.png
+icons/unknown.png
+lib/Nginx/Module/Gallery.pm
+Makefile.PL
+MANIFEST
+README
+t/000-gallery.t
+t/000-use.t
+t/001-gallery.t
+t/data/image.png
+templates/bottom.html.ep
+templates/item.html.ep
+templates/main.css
+templates/top.html.ep
+META.yml                                 Module meta-data (added by MakeMaker)

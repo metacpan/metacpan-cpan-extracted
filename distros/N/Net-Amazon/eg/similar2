@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+############################################################
+# Similar test
+############################################################
+use strict;
+use warnings;
+
+use Net::Amazon;
+use Net::Amazon::Request::Similar;
+use Log::Log4perl qw(:easy);
+
+#Log::Log4perl->easy_init($DEBUG);
+
+my $ua = Net::Amazon->new(
+    associate_tag => $ENV{AMAZON_ASSOCIATE_TAG},
+    token         => $ENV{AMAZON_TOKEN},
+    secret_key    => $ENV{AMAZON_SECRET_KEY},
+);
+
+my $req = Net::Amazon::Request::Similar->new(
+    similar  => 'B00005B6TL',
+);
+
+my $resp = $ua->request(
+    $req,
+);
+
+if($resp->is_success()) {
+    for($resp->properties()) {
+        print $_->as_string(), "\n";
+    }
+} else {
+    print "Error: ",
+          $resp->message(), "\n";
+}

@@ -1,0 +1,46 @@
+INSTALLING
+
+    Be sure before installing that you have previously installed 
+    Net::ICQV5 module.
+
+    After unzipping and untarring the distribution directory, you install
+    the library by running these commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+NAME
+    `Net::ICQV5' - Net::ICQV5 is a Perl module that allows your Perl
+    programs to send and receive ICQ messages.
+
+SYNOPSIS
+     use Net::ICQV5CD;
+     $ICQ = new Net::ICQV5 ('icq4.mirabilis.com','4000');
+     $ICQ->login($uin,$password) || die "Couldn't log on.";
+     $ICQ->logout();
+
+DESCRIPTION
+    Net::ICQV5 is a Perl module that allows your Perl programs to send and
+    receive ICQ messages. Perhaps the most obvious use of Net::ICQ would be
+    to write an ICQ client in Perl. Some other uses that people have come up
+    with are:
+
+    Allow a server or daemon to notify its administrator via ICQ when a
+    critical error occurrs. Enable ICQ chat functionality where youd never
+    thought of it before: MUDs, IRC bots, etc.
+
+DISCLAIMERS
+    I am in no way affiliated with Mirabilis!
+
+    This module was made without any help from Mirabilis or their consent.
+    No reverse engineering or decompilation of any Mirabilis code took place
+    to make this program.
+
+COPYRIGHT
+    Copyright (c) 2000-2001 Sergei A. Nemarov (admin@tapor.com). All rights
+    reserved. This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+    http://www.tapor.com/NetICQ/
+

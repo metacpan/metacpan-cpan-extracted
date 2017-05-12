@@ -1,0 +1,75 @@
+*   make good test cases for test.pl on users networks.
+
+*   Make sure to get hostname lookups in soon.
+
+*   Use requires instead of "use" to help with memory footprint.
+
+*   Run podchecker every now and then.
+
+*   Add more info into the Host objects.  An example from pkent (email
+    withheld until he releases it):
+
+	the host has one interface
+	which is Ethernet, and has MAC address 1:2:3:4...
+	and on that interface...
+	it understands IP
+	its IP address is 10.1.1.10
+	its reverse DNS lookup yields wibble.london.foo...
+	it talks TCP
+	it listens on these ports: 1, 13, 25, 80
+	it talks UDP
+	ditto for UDP ports
+	SNMP is disabled
+	it understands NETBIOS
+	its Netbios name is \\LONDON\WIBBLE
+	some more protocol-specific info goes
+	here
+	it understands AppleTalk
+	it's in zone London
+	its node is Wibble
+	some more protocol-specific
+	info goes here
+	it does not understand IPX
+	it does not understand Netware
+
+*   Find a better method for finding a unique ID for a host.  Currently
+    it is IPADDR+MACADD or just IPADDR if we can't find the MAC.  Two
+    networks with the same address scheme will over write each other.
+
+*   Keep a history of the network state.  Add ability to warn of hosts
+    that have been added or removed from the network.  Warn about new
+    routes within our network.  Warn of extreme conditions (latency,
+    bandwidth).
+
+*   Perhaps integreate with Mon (http://www.kernel.org/software/mon/).
+
+*   Make a network protocol for this set of modules so that we can make
+    agents that sit on remote boxes.  These agents would pass data back
+    to our main instance to build a better description of the network. 
+    This allows us to find MAC addresses on remote networks, find NAT 
+    situations, discover firewall rules, and more.  The protocol would
+    idealy run encrypted so our network info isn't being sniffed by the
+    bad guys. It would also be nice if we could trigger Detection events
+    from the main instance.
+
+*   Add more Detection modules:
+	host/port scanner
+	BroadcastPing
+	SNMP
+	BGP
+	RIP
+	OSPF
+	CDP
+
+*   Add a GUI interface.  I have poked around with Tk, but I need some
+    input from others, as I am not a GUI guy.  Perhaps a web front end
+    instead or also?  In the gui, I'd like to be able:
+    *	to see the network in real-time as we discover it
+    *	zoom out to see just networks, and zoom in to see a single network
+    *	change host info by clicking on the host
+    *	see latency from host to host
+    *	see bandwidth usage across routers if we cna get the data
+    *	do other things that I haven't thought of
+
+#done in v0.07
+*   Add ACLs so that we don't monitor OPN (other people's networks).

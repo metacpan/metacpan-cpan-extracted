@@ -1,0 +1,29 @@
+
+* NAS-IP-Address and other "ipaddr" encoding inconsistencies
+
+  I've confirmed some reports that the Alcatel 5620 SAM Release 3.0
+  and possibly other endpoints from this or other vendors, are
+  improperly encoding the IP address in the NAS-IP-Address tuple. The
+  relevant RFCs state that NAS-IP-Address should be encoded as four
+  octets, MSB. However, this device seems to be packing the argument
+  as a plain string.
+
+  This error may manifest itself as a parameter length mismatch with
+  inet_ntoa() in earlier versions of Net::Radius. A packet dump
+  exhibiting this problem looks like this...
+
+  $ tcpdump -vvv -nr tcpdump-radius.out
+  reading from file tcpdump-radius.out, link-type EN10MB (Ethernet)
+  16:13:29.540605 IP (tos 0x0, ttl 250, id 41011, offset 0, flags
+  [DF], length: 108) 10.120.156.15.33452 > 161.196.109.5.1645: RADIUS, 
+  length: 80
+        Access Request (1), id: 0x78, Authenticator: ...
+          NAS IP Address Attribute (4), length: 15, Value: ERROR: length 13 != 4
+            0x0000:  3130 2e31 3230 2e31 3536 2e31 35
+
+  Note the error pointed out by tcpdump, referring to the length of
+  the attribute.
+	    
+  In order to improve interoperability, I've included code that allows
+  decoding of these packets, by simply returning the enclosed string
+  "as is" to the calling script.

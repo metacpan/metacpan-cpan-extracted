@@ -1,0 +1,63 @@
+Numeric-LL_Array version 0.01
+==========================
+
+For unsigned int/long, *_abs first converts to signed variant, then takes abs().
+
+~, <<, >>, and % do not allow floating-point source and/or target types.
+
+Transcendental functions are defined only with the same source type and target
+types, both floating-point.
+
+Binary operations are defined only for target type being one of the source types.
+
+Dot product operation: targ += s1 * s2.
+
+NEED: product with wider target; same for lshift...
+	(need src casts...)
+NEED: modf, ldexp, frexp (all take *l), cbrt...
+NEED: min/max ???  min_assign???
+NEED: How to find first elt which breaks conditions (as in a[n+1] == a[n]+1???
+NEED: more intelligent choice of accessors for q/Q and D...
+NEED: accessor to long double max-aligned (to 16 when size is between 8 and 16)
+NEED: abs() for long long?
+NEED: signed vs unsigned comparison? char-vs-quad comparison? cmp?
+NEED: pseudo-flavor: k-th coordinate of the index
+
+DONE: creation of Perl funcs undoing our econimizing on C level...
+DONE: ceil, floor, trunc, rint (all take *l)
+DONE: comparison 
+DONE: accessors, >, == etc
+DONE: remove duplicate flavors for commutative 2-arg operations...
+DONE: make methods static
+DONE: skip duplicate sizes (such as int/long may be)...
+DONE: skip duplicate commutative (first size never larger than the second)...
+DONE: packId_star_format
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+A fully working Perl installation.  Since vendor-supplied installations
+most of the time are not "fully working", Perl's which are not compiled
+on the machine in question are not supported (unless you can prove you
+know what you are talking about).
+
+[It may take a pretty large amount of memory and time to compile the
+ C files used by this module.  Expect needs of about 512MB of memory,
+ and minutes of time on even on fast hardware of 2009.]
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Ilya Zakharevich
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+

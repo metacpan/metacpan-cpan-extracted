@@ -1,0 +1,89 @@
+{
+   "abstract" : "Airbrake Notifier API V3 Client",
+   "author" : [
+      "Six Apart, Ltd. <sixapart@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Airbrake",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Tiny" : "1.001",
+            "Data::Dumper" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON" : "2.00",
+            "Scope::Guard" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::MockModule" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Airbrake" : {
+         "file" : "lib/Net/Airbrake.pm",
+         "version" : "0.02"
+      },
+      "Net::Airbrake::Error" : {
+         "file" : "lib/Net/Airbrake/Error.pm"
+      },
+      "Net::Airbrake::Request" : {
+         "file" : "lib/Net/Airbrake/Request.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sixapart/Net-Airbrake/issues"
+      },
+      "homepage" : "https://github.com/sixapart/Net-Airbrake",
+      "repository" : {
+         "url" : "git://github.com/sixapart/Net-Airbrake.git",
+         "web" : "https://github.com/sixapart/Net-Airbrake"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:SIXAPART",
+   "x_contributors" : [
+      "ziguzagu <ziguzagu@gmail.com>"
+   ]
+}

@@ -1,0 +1,16 @@
+Changes
+lib/Net/Spotify.pm
+lib/Net/Spotify/Lookup.pm
+lib/Net/Spotify/Search.pm
+lib/Net/Spotify/Service.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+scripts/net-spotify-tester.pl
+t/00-load.t
+t/01-lookup.t
+t/02-search.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

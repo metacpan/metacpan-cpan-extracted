@@ -1,0 +1,91 @@
+Net:WWD Apache Integration
+
+In your httpd.conf file, add the following:
+
+#----- cut here -------------------------------
+<Files *.wjs>
+    SetHandler perl-script
+    PerlHandler Net::WWD::Parser
+    Options ExecCGI
+    PerlSendHeader On
+</Files>
+<Files *.wwd>
+    SetHandler perl-script
+    PerlHandler Net::WWD::Parser
+    Options ExecCGI
+    PerlSendHeader On
+</Files>
+
+<Location /wwd/wwd.cgi>
+    SetHandler perl-script
+    PerlResponseHandler Net::WWD::Interface
+</Location>
+#----- cut here -------------------------------
+
+
+Change users to the user your web server runs as, and run
+"./finalize", e.g.,:
+
+	(modify /etc/passwd changing apache's
+	 default shell from /sbin/nologin to
+	 /bin/bash)
+
+	su apache
+	./finalize
+	exit
+
+	(modify /etc/passwd setting apache's
+	 default shell back to /sbin/nologin)
+
+
+
+WHAT THIS DOES:
+--------------
+
+The two Files configuration blocks tell Apache to run 
+.wjs and .wwd files through Net::WWD::Parser before 
+sending the out to the requesting connection.
+
+The Location is the standard protocol to manipulate WWD
+objects. Objects require authentication. User data is
+located in the /usr/share/wwd/users/ directory. WWD
+object data is located in the /usr/share/wwd/data/
+directory.
+
+You also should add "index.wwd" to the DirectoryIndex
+configuration item.
+
+
+
+CREATING USERS:
+--------------
+
+You should only do this as either the user your web server
+runs under, or root. The following commands are available:
+
+	wwd-users set user@domain password emailaddress
+	wwd-users user@domain
+
+
+To add a new user, or modify an existing user:
+
+	wwd-users set john@doe.com hello john@realdomain.com
+
+will add the user "john@doe.com" with a password of hello, and
+an email address of "john@realdomain.com"
+
+
+To remove a user:
+
+	wwd-user del jeff@otherdomain.com
+
+will delete the user "jeff@otherdomain.com"
+
+
+
+EDITING WWD OBJECTS:
+-------------------
+
+As a skeleton, copy wwdeditor.pl to any directory. Protect it how you see fit. Modify to meet your needs.
+
+Browse to this page after creating a user for yourself, and login. The username is only the user part of the login. The domain is picked up from the URL. For example, if you install the application to http://otherdomain.com/somedir/wwdeditor.pl, and you use a username of "testing", the full username is testing@otherdomain.com, which is what you want to use when you add a new user.

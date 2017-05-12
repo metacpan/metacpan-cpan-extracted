@@ -1,0 +1,148 @@
+> Copyright (c) 2003-2004 AirWave Wireless, Inc.
+
+> Redistribution and use in source and binary forms, with or without
+> modification, are permitted provided that the following conditions
+> are met:
+
+>    1. Redistributions of source code must retain the above
+>    copyright notice, this list of conditions and the following
+>    disclaimer.
+>    2. Redistributions in binary form must reproduce the above
+>    copyright notice, this list of conditions and the following
+>    disclaimer in the documentation and/or other materials provided
+>    with the distribution.
+>    3. The name of the author may not be used to endorse or
+>    promote products derived from this software without specific
+>    prior written permission.
+
+> THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS
+> OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+> WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+> ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+> DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+> DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+> GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+> INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+> WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+> NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+> THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+SNMP is a new pure-Perl SNMP management library that's dramatically
+faster, simpler to use, and less bug-prone than Net::SNMP, the
+widely-used pure-Perl SNMP library.
+
+SNMP is also more flexible than Net::SNMP, in that you could use it to
+build an SNMP agent, SNMP packet dumper, POE component, etc., without
+rewriting major parts of the code.  None of these features are built
+in yet, except for a skeletal undocumented 87-line SNMP agent
+implementation used for the regression tests.
+
+However, Net::SNMP is much more mature and presently supports more
+features, including SNMPv3, traps, the new request types introduced in
+SNMPv2 (bulk gets and inform requests), nonblocking callback-based
+operation, OID sorting, robustness against some common bugs in SNMP
+agent implementations (specifically, sending negative values for
+unsigned numbers, and circular getNextRequest handling) and (in the
+easy-to-use SNMP::Simple interface) multiple OIDs per request.
+
+I plan to add all of these features, but the existing featureset
+actually covers the majority of management-station uses of SNMP I've
+seen.  SNMPv2 is more efficient than SNMPv1, but not as widely
+supported, and SNMPv2 support is often buggy.  Management stations, by
+definition, don't send SNMP traps or inform-requests.  SNMPv3 still
+isn't widely deployed, despite the absurd security problems SNMPv1
+creates.  Nonblocking operation is important for some high-performance
+applications, but harder to use.  OID sorting is primarily useful when
+you're implementing an agent; both this package and Net::SNMP give you
+back OIDs from walks in sorted order.
+
+That said, this package is about 20% of the size of Net::SNMP,
+counting non-duplicate lines of B::Deparse'd code in SNMP.pm,
+SNMP/Simple.pm, and SNMP/Mapper.pm.
+
+On the other hand, the regression tests for Net::SNMP are just over
+100 lines (using the same metric), while the regression tests for this
+module are about 550.
+Why would you want to use this module instead of its much-more-mature
+sibling, Net::SNMP?
+
+Well, usually, you wouldn't.  I anticipate that this module will get
+better in time, but right now, you probably don't want to use it,
+unless Net::SNMP just doesn't work for you.
+
+Some of the reasons Net::SNMP doesn't work for me follow:
+
+- it's slow.  On my 500MHz laptop, Net::SNMP can do about 110 simple
+  request/response pairs per CPU second.  These SNMP modules can do
+  about 1100, about as many as ucd-snmp snmpd can respond to.  (The
+  SNMP agent in SNMP::Agent is a little faster.)
+
+- it's inconvenient to use for simple cases.
+
+- its interface is bug-prone in a few ways.
+
+  - By default, it does all sorts of translations to make things
+    human-readable, but the translations are sometimes pretty
+    heuristic.  This can result in bugs in your code.  (For example,
+    it renders OCTET_STRINGs in hexadecimal if they contain any
+    unprintable characters.  This (in combination, obviously, with our
+    carelessness) resulted in our software failing to handle MAC
+    addresses correctly if they happened to contain no unprintable
+    characters.
+
+  - You can't do SNMP operations in blocking mode when nonblocking
+    SNMP sessions exist --- that is to say, Perl hasn't destructed
+    them yet.  This occasionally catches performance bugs, but it's
+    silly when you're trying to send an SNMP trap, which doesn't block
+    in any case, or when your nonblocking SNMP sessions have merely
+    not yet gone out of scope.
+
+  - Its SNMP walk interface gives you the results of the walk in a
+    hash, so their order is scrobbled.  There's another method to get
+    the order of the OIDs, though.
+
+  - With SNMPv2, it often returns error indicators in-band, as the
+    values of OIDs.
+
+- it's completely unhelpful for dissecting captured SNMP packets (say,
+  for debugging) because demultiplexing and decoding logic are closely
+  intertwined, apparently for efficiency.
+
+- it's not suitable for writing SNMP agents, because it discards the
+  types before it hands the data back to you.  It also doesn't
+  document a way to receive requests and send responses.  (It exists,
+  of course.)
+
+- it's not suitable for making test stubs for systems that speak SNMP,
+  because it does too much on your behalf.  For example, you might
+  want to verify that your management station handles negative
+  TIMETICKS values in a sane way, but Net::SNMP won't let you send
+  negative TIMETICKS values.  (Net::SNMP does, by default.)
+
+- it has a nonblocking mode, but it insists on using its own event
+  loop, which means you can't integrate it into, say, a POE program.
+
+- it's huge and complicated, and therefore hard to maintain and hard
+  to find bugs in.  Net::SNMP 4.1.2's .pm files total 9690 lines,
+  including 4456 distinct lines.  These SNMP modules total 712 lines
+  at the moment, including 466 distinct lines.  If you use Deparse,
+  Net::SNMP is about 2000 lines, while these SNMP modules are about
+  400.  We had a couple of serious bugs in critical parts of our
+  system that turned out to come from bugs in Net::SNMP, but we only
+  know that because they disappeared when we upgraded to a new version
+  of Net::SNMP that fixed the bugs.  I also find the Net::SNMP code
+  hard to read and understand, which may be just a dialect issue; you
+  be the judge.  Here's the routine that convinced me I needed to
+  rewrite Net::SNMP instead of trying to hack on it:
+
+	sub debug
+	{
+	   (@_ == 2) ? $DEBUG = ($_[1]) ? TRUE : FALSE : $DEBUG;
+	}
+
+  That routine exists, in exactly the same form, in
+  Net::SNMP::Security::USM, Net::SNMP::Security::Community,
+  Net::SNMP::MessageProcessing, Net::SNMP::Message,
+  Net::SNMP::Dispatcher, Net::SNMP::Transport::UDP, Net::SNMP::PDU,
+  and Net::SNMP::Security.  It is by no means the only code duplicated
+  verbatim between these modules.

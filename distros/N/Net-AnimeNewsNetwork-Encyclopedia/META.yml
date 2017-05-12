@@ -1,0 +1,44 @@
+---
+abstract: 'Client library of the AnimeNewsNetwork Encyclopedia API'
+author:
+  - 'Ryosuke IWANAGA <riywo.jp@gmail.com>'
+build_requires:
+  Path::Tiny: 0
+  Test::Fake::HTTPD: 0
+  Test::More: 0.98
+  Try::Tiny: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.4.5, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-AnimeNewsNetwork-Encyclopedia
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Net::AnimeNewsNetwork::Encyclopedia:
+    file: lib/Net/AnimeNewsNetwork/Encyclopedia.pm
+    version: 0.02
+requires:
+  Data::Validator: 1.02
+  LWP::Simple: 0
+  Moo: 1.002
+  XML::Simple: 2.20
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/riywo/Net-AnimeNewsNetwork-Encyclopedia/issues
+  homepage: https://github.com/riywo/Net-AnimeNewsNetwork-Encyclopedia
+  repository: git://github.com/riywo/Net-AnimeNewsNetwork-Encyclopedia.git
+version: 0.02

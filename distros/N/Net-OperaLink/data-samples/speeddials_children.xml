@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<response>
+  <resource>
+    <type>speeddial</type>
+    <id>1</id>
+    <properties>
+      <reload_interval>0</reload_interval>
+      <title>Opera Portal beta</title>
+      <uri>http://redir.opera.com/speeddials/portal/</uri>
+      <reload_only_if_expired>0</reload_only_if_expired>
+      <reload_enabled>0</reload_enabled>
+      <position>1</position>
+    </properties>
+  </resource>
+  <resource>
+    <type>speeddial</type>
+    <id>2</id>
+    <properties>
+      <reload_interval>0</reload_interval>
+      <title>Flyvninger. Søk data fra flere hundre reisesider for billige flyvninger på KAYAK</title>
+      <uri>http://redir.opera.com/speeddials/kayak/</uri>
+      <reload_only_if_expired>0</reload_only_if_expired>
+      <reload_enabled>0</reload_enabled>
+      <position>2</position>
+    </properties>
+  </resource>
+  <resource>
+    <type>speeddial</type>
+    <id>3</id>
+    <properties>
+      <reload_interval>0</reload_interval>
+      <title>Amazon.com: Online Shopping for Electronics, Apparel, Computers, Books, DVDs &amp; more</title>
+      <uri>http://redir.opera.com/speeddials/amazon/</uri>
+      <reload_only_if_expired>0</reload_only_if_expired>
+      <reload_enabled>0</reload_enabled>
+      <position>3</position>
+    </properties>
+  </resource>
+  <resource>
+    <type>speeddial</type>
+    <id>4</id>
+    <properties>
+      <reload_interval>0</reload_interval>
+      <title>My Opera - Share your photos, get a free blog and meet friends</title>
+      <uri>http://redir.opera.com/speeddials/myopera/</uri>
+      <reload_only_if_expired>0</reload_only_if_expired>
+      <reload_enabled>0</reload_enabled>
+      <position>4</position>
+    </properties>
+  </resource>
+</response>

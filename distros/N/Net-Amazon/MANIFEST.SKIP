@@ -1,0 +1,13 @@
+blib
+^Makefile$
+^Makefile.old$
+CVS
+.cvsignore
+.gitignore
+.git
+docs
+MANIFEST.bak
+adm/release
+adm/sourceforge
+adm/sfupd
+t/gen

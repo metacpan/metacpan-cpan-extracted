@@ -1,0 +1,8 @@
+MANIFEST
+Makefile.PL
+lib/Net/GeoPlanet.pm
+README
+CHANGES
+t/00-load.t
+t/pod-coverage.t
+t/pod.t

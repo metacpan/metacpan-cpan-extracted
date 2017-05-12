@@ -1,0 +1,9 @@
+Changes
+inc/ExtUtils/AutoInstall.pm
+lib/Net/UCP/Common.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+samples/README
+t/Net-UCP-Common.t

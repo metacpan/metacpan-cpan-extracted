@@ -1,0 +1,26 @@
+Revision history for Perl extension Net::POP3::SSLWrapper
+
+0.06
+
+    - specify the versions for deps
+    - use parent instead of base.pm for better error message.
+
+0.05
+
+    - fixed typo in synopsis(Jon Hermansen)
+
+0.04
+
+    - better error handling in case of failed connects (with new test)
+      (Slaven Rezic)
+
+0.03
+
+    - remove all instances before leave from block
+
+0.02
+
+    - some tests moved to xt/
+
+0.01  Mon Nov 12 20:13:46 2007
+      - original version

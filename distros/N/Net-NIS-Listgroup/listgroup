@@ -1,0 +1,147 @@
+#!/usr/local/bin/perl
+#
+#  Listgroup command.
+#
+#  $Id: listgroup,v 1.8 2003-01-21 12:23:53-05 mprewitt Exp $
+#
+#  -----
+
+=head1 NAME 
+
+B<listgroup> - Lists hosts/users in a netgroup group.
+
+=head1 SYNOPSIS
+
+    listgroup
+
+    listgroup [--host] groupname1 [ [-]groupname2 [-]groupname3 ... ]
+
+    listgroup [--user] groupname1 [ [-]groupname2 [-]groupname3 ... ]
+
+=head1 DESCRIPTION
+
+Lists groups or members of a netgroup NIS map.  B<listgroup> without any parameters
+lists all the available netgroup groups.
+
+With groupname parameters, B<listgroup> will recusively list the members of the 
+named groups.  Each member in a group is a triplet of (host,user,domain).  The host 
+portion or user portion of the members is returned depending upon whether B<--host> 
+or B<--user> is used.  If neither B<--host> or B<--user> is used, listgroup will 
+return the host portion.
+
+If a {groupname} is preceded with a B<->, members of that group will be excluded from
+the output.
+
+Groups are processed in the order they appear on the command line.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--host>
+
+Restrict output to only contain the host portion of the members in the groupname.
+
+=item B<--user>
+
+Restrict output to only contain the user portion of the members in the groupname.
+
+=back
+
+=head1 REQUIRES
+
+Perl Modules:
+
+    Net::NIS::Listgroup
+    Net::NIS
+
+=head1 SEE ALSO
+
+L<netgroup(4)>, L<Net::NIS::Listgroup(3)>, L<Net::NIS(3)>
+
+=head1 AUTHOR
+
+Original unknown
+
+Major rewrite by Marc Prewitt <mprewitt@chelsea.net>
+
+Copyright (C) 2003 Chelsea Networks, under the GNU GPL.
+listgroup comes with ABSOLUTELY NO WARRANTY. This is free software, and you are
+welcome to redistribute it under certain conditions; see the COPYING file 
+for details.
+
+listgroup is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+listgroup is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+=cut
+BEGIN {
+    # for testing the library
+    unshift @INC, '.';
+}
+use Net::NIS::Listgroup;
+use strict;
+use vars qw(%ENV);
+use Getopt::Long;
+
+$ENV{'PATH'} = "/bin:/usr/bin/:/usr/local/bin:.";
+$ENV{'SHELL'} = "/bin/ksh";
+$ENV{'IFS'} = undef;
+$ENV{'ENV'} = "/usr/local/lib/env";
+
+
+my $opt_host;
+my $opt_user;
+
+my $group;
+if (@ARGV) {
+    while (index($ARGV[0], '-') == 0) {
+        if ($ARGV[0] =~ /-?-u(ser)?/ ) {
+            $opt_user = 1;
+            shift @ARGV;
+        } elsif ($ARGV[0] =~ /-?-h(ost)?/) {
+            $opt_host = 1;
+            shift @ARGV;
+        } elsif ($ARGV[0] =~ /-?-\?/) {
+            exit Usage();
+        } else {
+            print STDERR "Unknown option: $ARGV[0]\n";
+            exit Usage();
+        }
+    }
+
+    if ($opt_host && $opt_user) {
+        print STDERR "Only one of --user or --host allowed\n";
+        exit Usage();
+    } elsif ( $opt_user ) {
+        $group = Net::NIS::Listgroup::listgroup_user(@ARGV);
+    } else {
+        $group = Net::NIS::Listgroup::listgroup_host(@ARGV);
+    }
+} else {
+    $group = Net::NIS::Listgroup::listgroups();
+}
+
+exit unless $group;
+
+print join (" ", @{$group}), "\n";
+
+sub Usage {
+    print STDERR qq{
+Usage:
+        listgroup
+        listgroup [--host] groupname1 [ [-]groupname2 [-]groupname3 ... ]
+        listgroup [--user] groupname1 [ [-]groupname2 [-]groupname3 ... ]
+};
+    return 1;
+}

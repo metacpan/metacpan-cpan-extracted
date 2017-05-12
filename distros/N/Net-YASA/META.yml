@@ -1,0 +1,20 @@
+---
+name: Net-YASA
+version: 0.03
+author:
+  - 'Cheng-Lung Sung <clsung@FreeBSD.org>'
+abstract: Interface to YASA (Yet Another Suffix Array)
+license: perl
+resources:
+  license: ~
+build_requires:
+  Encode: 0
+  LWP::UserAgent: 0
+provides:
+  Net::YASA:
+    file: lib/Net/YASA.pm
+    version: 0.03
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

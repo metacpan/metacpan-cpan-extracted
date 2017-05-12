@@ -1,0 +1,57 @@
+---
+abstract: 'perl5 server for https://photobackup.github.io'
+author:
+  - 'Dave Webb.'
+build_requires:
+  HTTP::Request::Common: '0'
+  Plack::Test: '0'
+  Pod::Markdown::Passthrough: '0'
+  Test::More: '0.98'
+  autodie: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-PhotoBackup-Server
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::PhotoBackup::Server:
+    file: lib/Net/PhotoBackup/Server.pm
+    version: '0.11'
+requires:
+  Data::Dumper: '0'
+  Digest::SHA: '0'
+  File::Copy: '0'
+  File::HomeDir: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  Plack: '0'
+  Pod::Usage: '0'
+  Starman: '0'
+  Try::Tiny: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/PhotoBackup/server-perl/issues
+  homepage: https://github.com/PhotoBackup/server-perl
+  repository: git://github.com/PhotoBackup/server-perl.git
+version: '0.11'
+x_contributors:
+  - 'Dave Webb <wfh@dcw.co.nz>'
+  - 'Stéphane Péchard <stephanepechard@gmail.com>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Dave Webb <d5ve.github.com@dcw.co.nz>'
+  - 'Dave Webb <github@d5ve.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

@@ -1,0 +1,577 @@
+=pod
+
+=head1 NAME
+
+Net::LPR - Perl extension for printing to RFC1179-compliant print servers.
+
+=head1 DESCRIPTION
+
+This module implements a low-level interface into a line printer daemon
+connection.  It implements all the commands listed in RFC 1179, including
+queue control commands and output file formatting commands.
+
+=head1 COMMAND MODES
+
+Some methods (see below) are only available in certain modes known as
+B<command> B<modes>.  There are a series of command modes available that
+are reached by invoking certain methods.  See the list here.
+
+=over 4
+
+=item ROOT Command Mode
+
+This command mode is entered after a connection has been established.  The
+following methods are available I<only> in this mode:  
+B<print_waiting_jobs>, B<send_jobs>, B<get_queue_state>, and
+B<remove_jobs>.
+
+=item JOB Command Mode
+
+This command mode is entered via the B<send_jobs> method.  This mode is
+where commands regarding configuring a job to be printed can be executed.  
+The following methods are available I<only> in this mode: B<job_abort>, and
+B<job_send_control_file>.  In addition, the B<job_send_data> method is
+available in this mode.
+
+=item DATA Command Mode
+
+This command mode is used to send data.  The B<job_send_data> method is
+available in this mode, however only in its two-argument form.  This mode
+will not be exited until all data for the job has been sent.
+
+=back 4
+
+Some methods are available in all modes.  These include B<connect>,
+B<connected>, B<disconnect>, B<error>, B<new_job>, all the B<job_enable_*>,
+B<job_get_*>, B<job_mail_when_printed>, B<job_mode_*>, and B<job_set_*>
+methods.  B<NOTE:> If you are disconnected for any reason, all jobs
+associated with the printer object are cleared and must be re-created.
+
+B<NOTE:> In order to be in a command mode, you must be connected.  If you
+are disconnected, you must reconnect (thereby entering ROOT command mode)
+before sending any of these commands.
+
+=head1 METHODS
+
+B<Net::LPR> is implemented with an object-oriented interface; as such, it
+is used by constructing objects and invoking methods.  The following is the
+list of methods available.
+
+=head2 Class Method: B<new>
+
+Example:
+
+  use Net::LPR;
+  
+  my $lp = new Net::LPR (
+    StrictRFCPorts => 1,
+    RemoteServer => 'lp.foo.com',
+    RemotePort => 515,
+    PrintErrors => 0,
+    RaiseErrors => 1,
+  );
+
+This class method is used to create an object that represents a remote
+print server.  The object is returned as a scalar.  It takes a series of
+key/value parameters that specify details about the remote printer.  All
+the parameters are optional and have reasonable default values.  Here's the
+list of valid parameters.
+
+=over 4
+
+=item B<StrictRFCPorts>
+
+This paramter is a boolean.  If true, the source port will be chosen from
+the range 721 through 731 as stated in RFC 1179.  Note that on many UNIX
+systems, you need to be root to bind to ports below 1024.  However some
+print servers will not accept a connection from a system unless the source
+port is in this range.  If false, a source port is chosen via the OS's
+standard mechanism.  B<Defaults to true.>
+
+=item B<RemoteServer>
+
+This parameter is the IP address or hostname of the remote print server. If
+not specified, it defaults to B<127.0.0.1>.
+
+=item B<RemotePort>
+
+This parameter is the port number on the remote server to connect to. If
+not specified, it defaults to B<515>.
+
+=item B<PrintErrors>
+
+This boolean parameter will tell B<Net::LPR> to print any error messages to
+B<stderr>.  Defaults to B<false>.
+
+=item B<RaiseErrors>
+
+If true, any errors encountered will cause an exception to be thrown
+instead of the function returning a normal failure code.  Defaults to
+B<false>.
+
+=back 4
+
+=head2 Instance Method: B<error>
+
+Example:
+
+  print "The last error was: ".$lp->error()."\n";
+
+This instance method returns the last error encountered for that object as
+a string.  If no error has occured, the empty string is returned.
+
+=head2 Instance Method: B<disconnect>
+
+Example:
+
+  $lp->disconnect() or die "Can't disconnect: ".$lp->error();
+
+This command disconnects from a remote printer and drops any current jobs.
+Returns B<true> on success or B<undef> on failure.
+
+=head2 Instance Method: B<connect>
+
+Example:
+
+  $lp->connect() or die "Can't connect: ".$lp->error();
+
+If you're already connected to the printer, returns B<true> immediately,
+otherwise attempts to connect to the remote printer.  If the connection
+succeeds, B<Root> command mode is entered and B<true> is returned. In case
+of an error, B<undef> is returned.
+
+=head2 Instance Method: B<connected>
+
+Example:
+
+  print "I am connected\n" if ($lp->connected());
+
+Determines whether you are currently connected to the remote print server.  
+Returns B<true> if you are, or B<false> if you aren't.
+
+=head2 Instance Method: B<print_waiting_jobs>
+
+Example:
+
+  $lp->print_waiting_jobs("my_lp_queue") or die "Can't send command:
+".$lp->error();
+
+Sends the "Print Any Waiting Jobs" command (RFC 1179 section 5.1), and
+subsequently disconnects from the printer.  Accepts one argument, which is
+the name of the queue that is to begin printing.  Returns B<true> on
+success and B<undef> on error. B<NOTE:> To process any additional commands
+after this one, you must reconnect using the B<connect> method above.  
+This method is only available in the ROOT command mode.
+
+=head2 Instance Method: B<send_jobs>
+
+Example:
+
+  $lp->send_jobs("my_lp_queue");
+
+Sends the "Receive A Printer Job" command (RFC 1179 section 5.2), and
+enters the JOB command mode.  Accepts one argument, which is the name of
+the queue that is to receive the new job(s).  Returns B<true> on success
+and B<undef> on error.  This method is only available in the ROOT command
+mode.
+
+=head2 Instance Method: B<get_queue_state>
+
+Example:
+
+  $lp->get_queue_state("my_lp_queue");
+  $lp->get_queue_state("my_lp_queue", 1);
+  $lp->get_queue_state("my_lp_queue", 1, "dmlloyd", 302);
+
+Sends the "Send Queue State (short)" or "Send Queue State (long)" command
+(RFC 1179 sections 5.3 and 5.4).  This is similar to the B<lpq> command.
+Accepts one or more arguments.  The first argument is the name of the queue
+you are interested in.  The optional second argument is a flag, where a
+B<true> value is used to get the "long" form of the queue state, and
+B<false> is for the "short" form.  This information may be ignored by a
+printer or printer daemon.  The additional arguments are an optional list
+of items that you are interested in.  If none are specified, a full list is
+generated.  Returns B<true> on success and B<undef> on error.  After this
+command is processed, the connection to the printer is closed.  B<NOTE:> To
+process any additional commands after this one, you must reconnect using
+the B<connect> method above.  This method is only available in the ROOT
+command mode.
+
+=head2 Instance Method: B<remove_jobs>
+
+Example:
+
+  $lp->remove_jobs("my_lp_queue", "dmlloyd");
+  $lp->remove_jobs("my_lp_queue", "dmlloyd", 120);
+
+Sends the "Remove Jobs" command (RFC 1179 section 5.5).  This is similar to
+the B<lprm> command.  It takes two or more arguments.  The first argument
+is the name of the queue the job should be removed from.  The second
+argument is the "Agent", or user ID whose job is to be deleted.  The
+optional remaining arguments are a list of job IDs or user IDs whose jobs
+are to be deleted.  Only the user "root" can remove other people's jobs.  
+If no jobs are listed, the currently active job is removed. Returns B<true>
+on success and B<undef> on error.  After this command is processed, the
+connection to the printer is closed.  B<NOTE:> To process any additional
+commands after this one, you must reconnect using the B<connect> method
+above.  This method is only available in the ROOT command mode.
+
+=head2 Instance Method: B<new_job>
+
+Example:
+
+  my $jobkey = $lp->new_job();
+  my $jobkey = $lp->new_job(102);
+  my $jobkey = $lp->new_job(102, "fake.hostname.com");
+
+This method creates a control file for a new job.  It takes zero to two
+arguments. The first argument is the job ID number for this job.  If one is
+not specified, or B<undef> is given, a job number is chosen that is one
+higher than the previous job, modulus 1000.  The third argument is the
+hostname field of the job name.  If none is specified, the system hostname
+as returned by B<hostname()> is used.  Returns the new job key (used below)
+on success, or B<undef> on failure.
+
+=head2 Instance Method: B<job_get_data_filename>
+
+Example:
+
+  print "The data file is ".$lp->job_get_data_filename($jobkey)."\n";
+
+This method returns the name of the data file associated with the job key
+specified in the first argument.  Returns the file name on success, or
+B<undef> on error.
+
+=head2 Instance Method: B<job_set_data_filename>
+
+Example:
+
+  $lp->job_set_data_filename($jobkey, "MyDataFileName");
+
+This method allows you to override the default RFC-compliant naming
+convention for the data file with any name of your choosing.  RFC 1179
+section 6.3 specifies that the data file should start with ASCII "dfA",
+followed by a three-digit job number, followed by the hostname of the
+originating server.  Care should be taken when using this method, because
+creating a nonstandard file name might confuse less intelligent printers or
+print servers.  Returns B<true> on success and B<undef> on error.
+
+=head2 Instance Method: B<job_get_control_filename>
+
+Example:
+
+  print "The control file is ".$lp->job_get_control_filename($jobkey)."\n";
+
+This method returns the name of the control file associated with the job
+key specified in the first argument.  Returns the file name on success, or
+B<undef> on error.
+
+=head2 Instance Method: B<job_set_control_filename>
+
+Example:
+
+  $lp->job_set_control_filename($jobkey, "MyCtrlFileName");
+
+This method allows you to override the default RFC-compliant naming
+convention for the control file with any name of your choosing.  RFC 1179
+section 6.2 specifies that the control file should start with ASCII "cfA",
+followed by a three-digit job number, followed by the hostname of the
+originating server.  Care should be taken when using this method, because
+creating a nonstandard file name might confuse less intelligent printers or
+print servers.  Returns B<true> on success and B<undef> on error.
+
+=head2 Instance Method: B<job_set_banner_class>
+
+Example:
+
+  $lp->job_set_banner_class($jobkey, "MyClass");
+  $lp->job_set_banner_class($jobkey, "");
+
+This method sets the class name to be printed on the banner page of the job
+specified in the first argumnet, as per RFC 1179 section 7.1.  If the
+argument is an empty string, an RFC-compliant printer will use the host
+name on which the file is printed.  Returns B<true> on success and B<undef>
+on error.
+
+=head2 Instance Method: B<job_set_hostname>
+
+Example:
+
+  $lp->job_set_hostname($jobkey, "my.host.name");
+
+This method sets the name of the host which is to be treated as the source
+of the print job specified in the first argment, as specified in RFC 1179
+section 7.2.  If this command is not given, the hostname as returned by
+B<hostname()> is returned. Returns B<true> on success and B<undef> on
+error.
+
+=head2 Instance Method: B<job_set_banner_name>
+
+Example:
+
+  $lp->job_set_banner_name($jobkey, "My_Print_Job_Name");
+
+This method sets the job name to be printed on the banner page of the job
+associated with the job key in the first argument, as per RFC 1179 section
+7.4. Returns B<true> on success and B<undef> on error.
+
+=head2 Instance Method: B<job_enable_banner_page>
+
+Example:
+
+  $lp->job_enable_banner_page($jobkey, "dmlloyd");
+  $lp->job_enable_banner_page($jobkey, "");
+
+This method causes the banner page to be printed, as per RFC 1179 section
+7.5. The first argument is the job whose banner page should be printed.  
+The second argument is the username for this job, or an empty string.  
+Returns B<true> on success and B<undef> on failure.
+
+=head2 Instance Method: B<job_mail_when_printed>
+
+Example:
+
+  $lp->job_mail_when_printed($jobkey, "dmlloyd");
+
+This method causes mail to be sent to the user given as the second argument
+at the host specified with the B<job_set_hostname> method, as specified in
+RFC 1179 section 7.6.  Returns B<true> on success and B<undef> on failure.
+
+=head2 Instance Method: B<job_set_source_filename>
+
+Example:
+
+  $lp->job_set_source_filename($jobkey, "output.ps");
+
+This method specifies the name of the file from which the data file
+associated with the first argument was or will be contstructed, as per RFC
+1179 section 7.7. Returns B<true> on success and B<undef> on failure.
+
+=head2 Instance Method: B<job_set_user_id>
+
+Example:
+
+  $lp->job_set_user_id($jobkey, "dmlloyd");
+
+This method sets the user identification of the entity requesting the
+printing jo, as per RFC 1179 section 7.8.  If this method is not called, it
+defaults to the user name associated with the calling user's effective UID.  
+Returns B<true> on success and B<undef> on failure.
+
+=head2 Instance Method: B<job_set_symlink_data>
+
+Example:
+
+  $lp->job_set_symlink_data($jobkey, 6, 13024);
+
+This method is used to record symbolic link data on a UNIX system so that
+changing a file's directory entry after a file is printed will not print
+the new file, as per RFC 1179 section 7.9.  The first argument is the job
+associated with the file.  The second argument is the device number.  The
+third argument is the inode number. Returns B<true> on success and B<undef>
+on failure.
+
+=head2 Instance Method: B<job_unlink>
+
+Example:
+
+  $lp->job_unlink($jobkey);
+
+This method is used to indicate that the data file associated with this job
+is no longer needed, as specified in RFC 1179 section 7.11.  Returns
+B<true> on success and B<undef> on failure.
+
+=head2 Instance Methods: B<job_set_troff_*_font>
+
+Example:
+
+  $lp->job_set_troff_r_font($jobkey, $rfilename);
+  $lp->job_set_troff_i_font($jobkey, $ifilename);
+  $lp->job_set_troff_b_font($jobkey, $bfilename);
+  $lp->job_set_troff_s_font($jobkey, $sfilename);
+
+These methods specify the filenames to use for the various L<troff|troff>
+fonts.
+
+=head2 Instance Methods: B<job_mode_*>
+
+Example:
+
+  $lp->job_mode_cif($jobkey);
+  $lp->job_mode_dvi($jobkey);
+  $lp->job_mode_text($jobkey);
+  $lp->job_mode_text($jobkey, 75);
+  $lp->job_mode_text($jobkey, 75, 8);
+  $lp->job_mode_text($jobkey, 75, 8, 1);
+  $lp->job_mode_text($jobkey, undef, undef, 1); # Print raw data
+  $lp->job_mode_plot($jobkey);
+  $lp->job_mode_ditroff($jobkey);
+  $lp->job_mode_postscript($jobkey);
+  $lp->job_mode_pr($jobkey);
+  $lp->job_mode_pr($jobkey, "Title");
+  $lp->job_mode_pr($jobkey, "Title", 75);
+  $lp->job_mode_fortran($jobkey);
+  $lp->job_mode_troff($jobkey);
+  $lp->job_mode_raster($jobkey);
+
+These methods specify the type of data inside the data file, as specifed in
+RFC 1179 sections 7.17 through 7.29.  All the methods take one single
+argument, the job, except for B<job_mode_text> and B<job_mode_pr>.  If none
+of these methods is called for a job, no output will be generated on the
+printer.
+
+The optional second argument to B<job_mode_text> is the line width, or
+B<undef> to let the printer choose.  The optional third argument is the
+indentation count, or B<undef> to let the printer choose.  The optional
+fourth argument is a boolean.  If B<true>, the printer will not strip out
+control charaters; in this way raw data can be sent to the printer.
+
+The optional second argument to B<job_mode_pr> is the job title.  The
+optional third argument to B<job_mode_pr> is the line width, or B<undef> to
+let the printer choose.
+
+This method returns B<true> on success or B<undef> on error.
+
+=head2 Instance Method: B<job_send_control_file>
+
+Example:
+
+  $lp->job_send_control_file($jobkey);
+
+This method sends the control file, as constructed with the above methods,
+to the printer. Once the control file is sent, no further changes to the
+job can be made.  This method can only be called in the JOB command mode.  
+Returns B<true> on success or B<undef> on error.
+
+=head2 Instance Method: B<job_send_data>
+
+Example:
+
+  $lp->job_send_data($jobkey, $data);
+  $lp->job_send_data($jobkey, $data, $totalsize); # only in JOB mode
+
+This method sends data to the printer.
+
+If the object is in JOB command mode, and the two-argument form is used,
+DATA command mode is entered and the printer continues to accept data
+until the connection is broken with the B<disconnect> method, or by the
+Net::LPR object going out of scope or being destroyed.  B<NOTE>:  Some
+printers may not accept the two-argument form, so it is recommended that
+you use the three-argument form to specify the length of your data.
+
+If the object is in JOB command mode, and the three-argument form is used,
+the data is sent to the printer.  If the length of data is less than the
+total size specified, DATA command mode is entered, and the printer will
+accept data until the total size has been satisfied, at which time JOB
+command mode will be re-entered.
+
+If the object is in DATA mode, only the two-argument form is available.
+Passing the third argument in this mode will generate an error.  In
+DATA mode, the data will be sent to the printer, and if the total size
+was specified, and the amount of data sent matches the total size, JOB
+command mode will be re-entered.
+
+If you are sending multiple jobs to the same printer, you should
+disconnect and connect again after each job.  This will ensure that
+the printer is in a consistant state.
+
+You must be in JOB or DATA command mode to use this method.  This method
+returns B<true> on success or B<undef> on error.
+
+=head1 EXAMPLES
+
+Here are some example scripts.
+
+=head2 Example 1: Hello World
+
+This example uses RaiseError to automatically die if an error occurs.
+
+  #!/usr/bin/perl -w
+  
+  use strict;
+  
+  use Net::LPR;
+  
+  my $lp = new Net::LPR(
+  	StrictRFCPorts => 0,
+	RemoteServer => 'localhost',
+	RemotePort => 515,
+	PrintErrors => 0,
+	RaiseErrors => 1,
+  );
+  
+  my $data = "Hello World";
+  
+  $lp->connect();
+  
+  my $jobkey = $lp->new_job();
+  
+  $lp->send_jobs('lp');
+  $lp->job_mode_text($jobkey);
+  $lp->job_send_control_file($jobkey);
+  $lp->job_send_data($jobkey, $data, length($data));
+  $lp->disconnect();
+
+=head2 Example 2: Print a text file
+
+This example does not automatically die when an error occurs; therefore
+we must check the return value of each method.  Also, this example does
+not account for "stair-stepping" on UNIX platforms.
+
+  #!/usr/bin/perl -w
+  
+  use strict;
+  use vars '@ARGV';
+  
+  use Net::LPR;
+  use IO::File;
+  
+  die "usage: $0 <filename> <printer> <queue>\n" if (@ARGV != 3);
+  
+  my $lp = new Net::LPR(
+  	StrictRFCPorts => 0,
+	RemoteServer => $ARGV[1],
+	RemotePort => 515,
+	PrintErrors => 0,
+	RaiseErrors => 0,
+  ) or die "Can't create print context\n";
+  
+  my $fh = new IO::File $ARGV[0], O_RDONLY or die "Can't open $ARGV[0]: $!\n";
+  my $size = ($fh->stat())[7]; # Hope file doesn't change while printing
+  
+  $lp->connect() or die "Can't connect to printer: ".$lp->error."\n";
+  my $jobkey = $lp->new_job() or die "Can't create new job: ".$lp->error."\n";
+  $lp->send_jobs('lp') or die "Can't send jobs: ".$lp->error."\n";
+  # Can easily print postscript by changing method to job_mode_postscript
+  $lp->job_mode_text($jobkey) or die "Can't set job mode to text: ".$lp->error."\n";
+  $lp->job_send_control_file($jobkey) or die "Can't send control file: ".$lp->error."\n";
+  $lp->job_send_data($jobkey, '', $size);
+  
+  while (my $line = $fh->getline()) {
+  	$lp->job_send_data($jobkey, $line);
+  }
+  
+  $lp->disconnect();
+
+=head1 BUGS
+
+There are lots of bugs in the stuff I write.  Don't hesitate to yell at me
+if you find one.  If you can fix it and send me a diff, you'll be my hero,
+forever.  Please use this form of the diff command:
+
+  diff -u original/LPR.pm my_local/LPR.pm
+
+and send me the output at the email address below.
+
+=head1 AUTHOR
+
+David M. Lloyd E<lt>L<dmlloyd@cpan.org|mailto:dmlloyd@cpan.org>E<gt>
+
+=head1 SEE ALSO
+
+For information on line printing, see L<lpr>, L<lpq>, L<lprm>, L<lp>,
+L<lpd>, L<RFC1179|http://www.faqs.org/rfcs/rfc1179.html>.
+
+For information on troff and troff fonts, see L<troff>.
+
+=cut

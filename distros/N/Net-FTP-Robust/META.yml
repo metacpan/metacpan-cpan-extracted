@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Net-FTP-Robust
+version:             0.08
+abstract:            download directories over unencrypted FTP
+license:             perl
+author:              
+    - Mark Overmeer
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Log::Report:                   0.25
+    Test::Pod:                     1.00
+    Time::HiRes:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

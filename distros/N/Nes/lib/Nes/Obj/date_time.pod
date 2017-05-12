@@ -1,0 +1,80 @@
+
+=head1 NAME
+
+Nes::Obj::date_time - Get date and time.
+
+=head1 SYNOPSIS
+
+    {: include ( '{: * cfg_obj_top_dir :}/date_time.html', 
+                 'gmt',                  {: # local o gmt :}
+                 '%A %e %B %Y %H:%M:%S'  {: # format :}
+               ) 
+    :}
+
+=head1 DESCRIPTION
+
+Get date and time in POSIX strftime format.
+
+=head1 PARAMETERS
+
+=over 2
+
+=item local o gmt
+
+Get local or gmt.
+
+=item format
+
+POSIX strftime format 
+
+=back
+
+=head1 AUTHOR
+
+Skriptke: Enrique Castañón
+
+=head1 VERSION
+
+Version 1.03 April 2010
+
+=head1 COPYRIGHT
+
+Copyright (c) Enrique Castanon. All rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms and conditions as
+GNU Public License (GPL).
+
+This means that you can, at your option, redistribute it and/or 
+modify it under either the terms the GNU Public License (GPL), 
+or under the Perl Artistic License.
+
+See http://dev.perl.org/licenses/
+
+=head1 DISCLAIMER
+
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE.
+
+Use of this software in any way or in any form, source or binary,
+is not allowed in any country which prohibits disclaimers of any
+implied warranties of merchantability or fitness for a particular
+purpose or any disclaimers of a similar nature.
+
+IN NO EVENT SHALL I BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL,  OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE
+USE OF THIS SOFTWARE AND ITS DOCUMENTATION (INCLUDING, BUT NOT
+LIMITED TO, LOST PROFITS) EVEN IF I HAVE BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE
+
+=head1 SEE ALSO
+
+L<Nes>, L<Nes::Tutorial>, L<Nes::Singleton>, L<Nes::nes.cfg>, 
+Sample to use Nes; L<http://nes.sourceforge.net/>
+
+=cut
+

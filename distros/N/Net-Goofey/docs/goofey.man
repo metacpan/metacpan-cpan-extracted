@@ -1,0 +1,905 @@
+.TH GOOFEY 1 "March 1 1995"
+.SH NAME
+goofey \- distributed message and utility service
+.SH SYNOPSIS
+.B goofey
+[
+.B \-v
+] [
+.IR options
+]* [
+.IR command
+]
+.SH DESCRIPTION
+.I Goofey
+is a program which provides many services by communicating with a
+central server
+.IR "Pluto".
+Services provided by 
+.I goofey
+include remote user location, message sending, fortune provision, jargon
+file lookup and a timetable service.
+.PP
+The default action of 
+.I goofey
+is to inform the server that you have arrived and then stay resident.
+The resident
+.I goofey
+will answer requests from the server about your idle time, and
+display any messages that it receives from the server. (Messages may be
+disabled with the
+.B -Q
+option).
+.PP
+.B Goofey
+accepts the following options. Since most of these are implemented at the
+server end, additions to the options may occur without any modification to
+the goofey client.
+.TP
+.BI \-v
+Display the version number of
+.I goofey.
+.PP
+The above options are implemented within
+.I goofey,
+while all the following options are implemented by
+.I pluto.
+You may optionally specify any of the above options, but only one of the
+options below will be recognised.
+.TP 
+.BI "-N"
+This is the command used for registering on goofey. 
+If you are not registered, then 
+.I "'goofey -N'"
+will tell you what to do next. If you have not registered on goofey on
+any machine you will need to use
+.I "'goofey -N create'".
+This will send a password to you via mail. The mail will tell you how
+to install the password.
+
+If, however, you have already registered on goofey under some other name
+on another machine, copy the password on the other machine to the account
+you wish to register on goofey and type
+.I "'goofey -N alias <name>'".
+The name you supply should be the goofey name your password corresponds to.
+
+If you wish to have you goofey name changed, contact the person who
+administers your goofey server. (Usually contained in the mail you receive
+with your password).
+
+
+Registered users should use the command
+.I "'goofey -N request <name>'" if they wish to request an alias. This
+does some sanity checks on the name and sends a request for the name
+change to the administrator of pluto.
+
+If a user does not have a password issued to them (or has had their
+password removed because they have lost it) then the command
+.I "'goofey -N sendpw'"
+will issue a new password. Note that if you are not registered or
+already have a current password you cannot use this command.
+.TP
+.BI \-s\ name[,name]*\ [message]
+Send 
+.I message
+to user 
+.I name.
+If 
+.I message
+is empty, you will be prompted for a message. You may
+end the message with a blank line, or by sending EOF (control-D on most
+systems).
+
+You may specify more that one name on the command line if you separate
+the names with commas.
+
+You will be warned if you are not logged onto pluto when you send a message.
+Users may also prevent you from sending them messages with the
+.B \-Q
+option. You will be warned if this is the case.
+
+There exist a number of 'special users'. These are not real users, but
+are sent messages in the same way as normal users. See the section below
+for more information.
+.TP
+.BI \-s!\ user
+Delete all trace of your last message to
+.I user.
+This is useful if you say something you don't mean to and the person was
+not around to see it.
+.TP
+.BI \-Q\ [+|-|!]\ [message]
+Toggle the quiet option. When you have quietness turned on messages sent to
+you will be blocked by the server, but they will still go into your
+message recall buffer. When quietness is switched on, your name will have
+a '*' before it when listed with the
+.B \-l
+command.
+
+Users in your
+.I unquiet
+alias, however, will be able to send you messages as if you were not quiet.
+
+You will always be quiet to users in your
+.I enquiet
+alias.
+
+.B \-Q+
+will switch messages on and tell you about any unread messages.
+.B \-Q-
+will switch messages off. 
+.B \-Q!
+will switch messages off completely, not even people on your unquiet alias
+will be able to talk to you. If you specify a
+.I message
+then messages will be switched off and the quiet message changed to
+that message. You can also set the quiet message with
+.B \-s\ quiet
+command.
+.TP
+.BI \-x\ [all|other|host\ [tty]]\ [-\ message]
+Kill the goofey on this tty. This command is useful if you do not want
+to receive messages on this tty, or if you don't want to be seen :).
+
+If
+.I all
+is specified, then all 
+.I goofey\'s
+belonging to you are killed.
+
+If 
+.I other
+is specified, then all other 
+.I goofey\'s
+(not on this tty) are killed.
+
+You may also specify the host and/or tty on which the goofey you wish to
+be killed is running.
+
+Everything after a '-' is a parting message which will be included in the
+"goofed OUT" message sent to people who watch you.
+.TP
+.BI "-d [host] [tty]"
+Toggle/set the "designated client". 
+
+The designated client is the only client which will receive messages that
+are sent to you. If you have no designated client then messages will be sent
+to all clients. You may only have one designated client at any one time.
+
+Your designated client will have a '!' before it in the -l list.
+
+You can designate a particular client by specifying it's host and/or tty.
+You can give prefixes of host or tty, but the specification must map to a 
+single client.
+
+When a designated client dies or is killed and there are other clients
+still running pluto switches you to completely quiet mode.
+.TP
+.BI "-dq [host] [tty]"
+Query the designated status of a particular (or the current tty's) client.
+A single number is returned:
+.in +3
+-1 : No registered client on this tty.
+.nl
+ 0 : Designated client which is not this tty.
+.nl
+ 1 : No designated client.
+.nl
+ 2 : This is the designated client.
+.in
+.TP
+.BI "-d-"
+De-designate any designated client.
+.TP
+.BI "-dc"
+Print the host and tty of the current designated client.
+
+.TP
+.BI "-r [q | u | number [count] | wipe]"
+Repeat messages. The
+.B \-r
+option on its own will repeat the last 25 messages sent to you
+along with the time they were sent. Messages that you have read will
+be deleted after 24 hours.
+
+If you specify a 
+.I number,
+then a the last 
+.I number
+messages will be repeated. This is useful
+if you want to examine only the last message.
+If
+.I count
+is specified, it specifies the maximum number of messages to repeat.
+E.g. "-r 5 2" will repeat messages 5 and 4.
+
+If you place the word
+.I wipe
+after
+.B \-r,
+then your messages will be repeated, then deleted.
+
+The
+.B \-ru
+option will repeat all unread messages.
+
+The
+.B \-rq
+option will tell you how many unread messages you have and also your current
+quiet status.
+.TP
+.BI "-r [sfc] users [num [count]]"
+This option allows you to repeat messages sent to, received from and
+a conversation with
+.I users.
+.I users
+is a comma separated list of users and aliases.
+
+.B \-rs
+repeats messages sent to
+.I users.
+.B \-rf
+repeats messages from
+.I users,
+and
+.B \-rc
+repeats the conversation with
+.I users
+in the order that the messages occurred.
+
+If you specify
+.I num
+then only that the last
+.I num
+messages become eligible for repeating. If
+.I count
+is not specified then all these messages will be repeated, otherwise 
+only the first
+.I count
+will be repeated.
+.TP
+.BI "-rw [user[,user]*]"
+Display the recent activity of the users specified or of your watch alias if
+no users are specified.  The information
+is printed in order of goof in/out time, with the most recent listed first.
+The most recent goof in/out time for each user is printed.
+.TP
+.BI \-w\ user
+List that user's finger information. A user may store their finger information
+by sending a message to the
+.I finger
+user.
+.TP
+.BI \-w
+List the names of all clients on pluto (including whose idle for more than
+1 hour and server clients). Users who are quiet will be prefixed by a '*',
+those who are idle for more than an hour will be bracketed, and server clients
+will be prefixed with a '%'.
+.TP
+.BI \-W
+List the names of the people who are logged onto pluto. Users who have been
+idle for more than 1 hour and server clients (such as
+.I Donald
+) will not be displayed.
+.TP
+.BI "-l [user[,user]*]"
+List the locations and idle times of
+.I user.
+If
+.I user
+is empty then all users are listed, but their idle times are not queried:
+the last obtained idle time is printed.
+Users those idle times are more
+than 1 hour are not listed. Users who are quiet (using the
+.B \-Q
+option) will have a '*' before their name. A user's
+.I designated
+client will have a '!' before their name. The 
+.I designated 
+client is the only client belonging to that user that will receive messages.
+
+If you want to know the accurate idle time of a user, then you must list them
+explicitly.
+
+You may also specify a number of users to list by separating the names with
+commas. Specific groups may also be listed using the alias feature (see the
+.B \-a
+option).
+
+If only one user is listed, then that user's
+.I 'load\ average'
+is also displayed. This consists of nine values, in three groups.
+The first group refers to requests made by that user to the server, the
+second to pages received by that user, and the third to listings of that
+user by other users.
+
+The 3 numbers in each load average are 1, 5 and 15 minute running averages.
+.TP
+.BI "-lq"
+Prints 1 if the current terminal is registered on goofey, 0 otherwise.
+.TP
+.BI "-lt [user]"
+List the 'true' identity of the user.
+.TP
+.BI "-lc [user[,user]*]
+Count the number of clients registered by particular users.
+.TP
+.BI "-L [user]"
+Identical to
+.B \-l,
+except that when you list all users the idle time is ignored.
+
+.TP
+.BI "-f [options]"
+Give a fortune cookie.
+The server
+.I pluto
+has a large collection of fortunes, including the entire jargon file.
+Currently, we have around 28,000 fortunes, and these are constantly being
+added to. If you specify
+.I lines,
+then you will be supplied with a fortune with at most that many lines.
+If
+.I lines
+is <= 0, then a fortune with unlimited size will be supplied. If you do
+not supply a parameter, then the size will be limited to 20 lines.
+
+If you have any good fortunes, quotes, ascii pictures, or anything else
+that would be suitable for the fortune file, please submit them to
+tym@dibbler.cs.monash.edu.au for addition to the file.
+
+The new fortune system is designed to be fast and comprehensive.
+Fortunes are divided into several database files, each with indexes.
+Commands to fortune lookups follow the -f option to goofey. They are:
+
+.in +3
+.B h
+- give this help description.
+
+.B "l [database [,database]*]"
+- list all the available databases, or the specified ones.
+
+.B d<string>
+- set the default lookup to <string> (described below). This is used as
+the lookup string if none is provided.
+
+.B "[r|f|p][n] [length] [[+|-] database [,database]* [item]]"
+- lookup string format.
+
+If 
+.I r
+is the first character of the lookup, then the last fortune will be repeated.
+You may use the
+.I n
+option as well, but none of the others.
+
+The
+.I f
+option is similar to 
+.I r
+except that the next fortune in the volume will be returned.
+
+.I p
+is similar again except that the previous fortune will be returned.
+
+If 
+.I n
+is the first char in the lookup, the fortune will include its index.
+If a number
+.I length
+is specified, this is the maximum number of lines returned.
+The length is ignored if 
+.I item
+is specified.
+
+ '+' and '-' specify the polarity of the search. If '-' is used, then only
+databases not in the list are considered. Otherwise only databases 
+.I in
+the
+list are considered in the search. ('+' is the default if neither is specified).
+
+If a number
+.I item
+is specified then this number fortune from the first specified
+database is printed.
+
+eg: goofey -fn 10 - ba,ft # max 10 line fortune not in volumes ba or ft with id
+
+    goofey -f ba 10  # print fortune 10 from the ba volume.
+
+    goofey -fl       # List the fortune databases with descriptions.
+.in
+.TP
+.BI "-F [options]"
+This option is identical in operation to the
+.B \-f
+option, except that the
+.I goofey
+is also logged into the server. This is normally used in a users
+.I .login
+file, and is useful to avoid having to use two separate commands.
+.TP
+.BI \-h
+List the options to goofey. This option (and the
+.B \-n
+new features
+option) are the only way of finding the current list of options (since
+they may change at any time).
+.TP
+.BI \-n
+Display the
+.I new features
+file. This contains a description of any new features introduced into the
+server, and will be updated whenever the server is updated.
+.TP
+.BI "-j name"
+Extract an entry from the jargon file. The jargon file is a dictionary of
+around 2000 terms related to computing and USENET. This command will extract
+the first entry that is lexicographically >=
+.I name.
+For a start you might want to look at the entries for
+.I usenet,
+or
+.I yoyo.
+If you have the time, read the entry for
+.I saga.
+
+Within a jargon entry, cross references are highlighted with braces ({}).
+.TP
+.BI \-a
+The 
+.B \-a
+options manipulate your user aliases. An alias specifies a mapping from
+a name to a collection of names. For instance, you might have a mapping
+from the name 'td' to 'tym' and 'daz', you could then send messages to 'td' 
+and both 'tym' and 'daz' would receive them. Created aliases may also
+be used with the list (
+.B \-l
+) command.
+
+Using the
+.B \-a
+option on its own will list all aliases that you have.
+It will also list your
+.I away
+and
+.I quiet
+messages (see next section for more info on these).
+.TP
+.BI "-a name"
+If you only specify a single
+.I name
+with 
+.B \-a,
+then only that alias will be listed.
+.TP
+.BI "-a+ name"
+This option lists the users that alias
+.I name
+expands to. Any user or system aliases in the alias are expanded.
+.TP
+.BI "-a name names"
+Create, add to, modify an alias. If the alias
+.I name
+does not exist then it is created. For example
+`goofey -a td tym daz'
+will create a mapping td->tym,daz.  If the alias already exists then it will
+be replaced.
+
+.B Adding and removing to/from an existing alias.
+
+.B "-a+ name names"
+will add
+.I names
+to alias
+.I name.
+You may also add to an existing alias by specifying it in both the source
+and destination. eg. if an alias
+.I td
+already exists, then you could add 'andy' to it with 'goofey -a td td andy'.
+
+.B "-a- name names"
+will remove
+.I names
+from alias
+.I name.
+
+You may refer to aliases within an alias. Thus you can group together users
+into groups, then group those groups into a super-group.
+.I Pluto
+will detect and disallow any alias loops.
+.TP
+.BI "-A name"
+Delete alias 
+.I name
+from your aliases.
+.TP
+.BI \-R
+Print your name following system alias expansion.
+.TP
+.BI "-R name[,name]*"
+List all aliases associated with particular name/s.
+.TP
+.BI "-S [filename]"
+Send file
+.I filename
+if it is specified, otherwise list the files that may be obtained.
+The files that can be obtained include:
+
+.TP 11
+.B goofey.c
+The source for goofey.
+.TP
+.B goofey.man
+The latest version of this man page.
+.TP
+.B xidle.c
+A program for obtaining idle times on X-windows displays. This is used by
+the X goofey client, minnie.
+.TP
+.BI "-P [names]"
+Display the pgp information provided by the users listed (or your own if no
+names are provided). This information is set by a user by sending a message 
+to the
+.I pgp
+special user.
+.TP
+.BI "-E [email-address]"
+Set or display your current preferred email address. This is the address to
+which pluto sends overflowed or expired unread messages.
+
+You cannot change where pluto sends passwords - you must register from a
+properly connected host.
+.TP
+.BI "-E-"
+Remove your preferred email address. Pluto will now send messages to the
+last username@host which you logged in from.
+
+.SH SPECIAL USERS
+A number of special users have been defined which allow you (the user)
+to use the
+.B \-s
+interface to supply strings to the server.
+
+The currently implemented special users are:
+.TP 7
+.BI finger
+A message sent to this user will be stored in the server and repeated
+whenever someone uses the
+.B \-w\ user
+command. Use this buffer to tell people something about yourself. Please
+include your full real name and your location.
+.TP
+.BI pgp
+A message sent to this user will be stored in the server and repeated
+whenever someone uses the
+.B \-P\ user
+command. Use this buffer to store your pgp public key so others can get it.
+.TP
+.BI quiet
+The message you send to 
+.I quiet
+will be stored in the server and repeated to any user who sends you a
+message when you have the quiet 
+.B (\-Q\)
+option set. It will also be repeated if a user lists you explicitly
+(-l name) when you are quiet.
+You may examine your
+.I quiet
+message using the 
+.B \-a
+option.
+.TP
+.BI away
+A message sent to user
+.I away
+will be repeated to anyone who sends you a message when you are not
+logged onto goofey.
+You may examine your
+.I away
+message using the 
+.B \-a
+option.
+.TP
+.BI blat
+Holds the message that is sent to you as a header when people send you
+messages. This message
+can contain whatever you like, but it is truncated after the first line.
+For example, many users put terminal specific control codes in their 
+.I blat
+message so the header is highlighted on the screen.
+
+The control code
+.I "%s"
+is replaced with the time and date the message was sent.
+.TP
+.BI Donald
+.I Donald
+is the timetable server maintained separately by Kevin Lentin (kev).
+To use 
+.I Donald,
+send him a message. A good start is '-s Donald bighelp'.
+.SH SPECIAL ALIASES
+There are a number of special aliases which are recognised by the server.
+These are set using the normal
+.B \-a
+command.
+.TP 8
+watch
+The 
+.I watch
+alias contains a list of users who you want to watch. When they arrive or
+leave you will be informed with a message of the form:
+
+<user> goofed IN/OUT from <host>
+
+This alias is the same as other aliases in terms of manipulation. It may
+contain other aliases.
+
+See also the 
+.B \-rw
+option.
+
+.TP
+.B listen
+The
+.I listen
+alias contains a list of users for which pluto will inform you when they
+switch quiet mode off. Pluto informs you that a user is no longer quiet
+using a message of the form
+
+<user> is IN a lot less quiet state
+
+The user will be removed from the
+.I listen
+alias as soon as they switch off quiet mode and the alias deleted if empty.
+
+.TP
+.B active
+The 
+.I active
+alias contains a list of users for which pluto will inform you when their
+idle time decreases or they start a new resident goofey. It is similar
+to the
+.I listen
+alias in that users are removed once the user becomes active (regardless
+of whether you are on or not). 
+
+Note that the user must be listed or paged
+before their idle time is queried, so you will not be told immediately if
+they become active.
+In the worst case, you will not be informed for n/2 minutes (where n is the
+number of clients currently registered)
+
+.TP
+.B unquiet
+The
+.I unquiet
+alias contains names of users to whom you are not quiet. Users in this alias
+will not be able to tell that you are quiet, and will be able to send you
+messages, goof IN and OUT, etc. If you add a user to your
+.I unquiet
+alias while you are quiet and they have you in their
+.I listen
+alias they will receive a message letting them know that they can now send 
+you messages.
+
+This feature is useful if you want to stop most of the population, except for
+a select few, sending you messages which could interrupt your most important
+meditation.
+
+.TP
+.B enquiet
+The
+.I enquiet
+alias contains names of users to whom you are always quiet. Users in this alias
+will not be able to tell that you are quiet, and although they can still
+send you messages, they will not be sent to immediately.
+
+This feature is useful if you want to stop a few idiots from sending you
+messages. Please do not use this feature to block a lot of users: the
+.I unquiet
+alias is much better for this purpose.
+
+.TP
+.B bounce
+The
+.I bounce
+alias contains names of users from whom you never want to receive messages.
+When a person on your bounce alias sends you a message they get a response
+indicating that the message bounced. You will not see the message.
+
+This is a somewhat more powerful version of
+.I enquiet
+and gives a strong indication that you don't want to communicate with
+the person concerned.
+
+.SH SYSTEM ALIASES
+The server keeps a list of aliases for users. This means that people who
+have accounts with different usernames on separate machines can have
+all their sessions listed under the same name.
+
+Also, people whose username is unrelated to their real name (as with most
+of the Computer Centre student accounts) may have an alias more representative
+of their real name.
+
+To get you alias changed, please let tym know. You can do this by using
+goofey (goofey -s tym), or by mailing him. You should suggest a name,
+anything reasonable will be tolerated.
+.SH ADVANCED GOOFEY OPTIONS
+Versions of goofey from 3.00 support extra options to allow you to do similar
+things to what server clients such as Donald do. Most of these are not of
+much use to the normal user, but will be of use when doing non-standard
+actions.
+
+These options take two forms, and they must appear on the goofey command line
+before the normal goofey command.
+
+.TP
+.BI "--machine hostname or --machine=hostname or --m hostname or --m=hostname"
+Tell
+.I goofey
+on which machine the server is. You will not normally have to modify this.
+The default machine is
+dibbler.cs.monash.edu.au (130.194.64.33). You may use a full address or an
+IP address.
+
+In older versions of goofey, this option was
+.B "-m hostname"
+
+.TP
+.BI "--port portnum or --port=portnum or --p portnum or --p=portnum"
+Tell
+.I goofey
+which port to contact. The default is
+.B 3987.
+.I Goofey
+currently uses INET sockets for all its communication. It is the intention
+to change over to DGRAM sockets when the extra overhead of INET sockets
+becomes a problem.
+
+In older versions of goofey, this option was
+.B "-p portnum"
+
+.TP
+.BI "--width cols"
+This supplies the terminal width to pluto. Pluto uses this when sending you
+messages when you run a resident goofey, and when you repeat messages using
+the
+.B "-r"
+commands. The maximum width of the message will be less than
+.B cols.
+
+If you do not use the
+.B "--width"
+option, and the output is not to a terminal, then the message will be repeated
+in the same format as it was sent. If the output is a terminal, then
+.I goofey
+will ask the terminal what width it is unless the
+.B COLUMNS
+environment variable is set, in which case it's value will be used.
+
+If the width is less than 20 or greater then 255 it will be ignored.
+
+.TP
+.BI "--no-blat or +B"
+Pluto will not send you a blat message at all if you use this option.
+[Only useful for resident goofeys]
+
+.TP
+.BI "--only-one or +1"
+Pluto will only send one message per connection. This is useful if you want
+to handle messages separately and is not useful in standard goofey.
+
+.TP
+.BI "--return-response or +R"
+Pluto will send the response returned by goofey to the goofey that is paging
+you. This is what is used by Donald and other server clients to reply to
+the caller rather then by sending another page.
+
+.TP
+.BI "--inform-replace or +I"
+Pluto will emit a GOOFED IN message when your client is replaced, even if you
+don't GOOF OUT. Not really of much use except for server clients if you want
+to keep your friends.
+
+.TP
+.BI "--forget-fail or +F"
+Pluto will not buffer any messages that do not get through to the callee.
+This might be useful if you want to send a message but don't want to bother
+the recipient if they are not around.
+
+.TP
+.BI "--tag-success or +T"
+Pluto will add a single character to the end of its' response to page requests
+letting you know if things succeeded or not. "*" is added for a successful
+request, '#' is added for failed message due to the user being quiet and
+nothing is added is the user is not on.
+
+.TP
+.BI "--ignore-alias or +E"
+Do not use your user aliases when sending a message. This allows you to 
+send a message to an otherwise hidden (for you) user. [Very useful for
+the reply script]. This option does not cause system aliases to be
+ignored (only ones you set using 
+.I "-a"
+).
+
+.TP
+.BI "--auto-split or +A"
+This is really a client interpreted flag. If set, goofey will split
+your message into as many parts as is necessary. Each part will be sent as a
+separate message. This is a useful flag to put into your 
+.B GOOFEY_ARGS
+environment variable.
+
+.TP
+.BI "--shutdown-broke or +S"
+Change the protocol slightly to allow conversations with pluto when the
+shutdown(2) system call does not work. This is useful on machines with buggy
+tcp or in strange situations where the connection is shutdown completely when
+you do a half-shutdown.
+.SH FILES
+.B $HOME/.goofeypw
+contains the password for a user.
+.SH ENVIRONMENT
+.TP 11
+.B HOME
+Used to determine where to find the goofey password file.
+.TP
+.B USER
+Determines what user to register with the server as. Do not change your
+USER environment variable for goofey... if you have to you can change:
+.TP
+.B GOOFEYUSER
+Overrides the value of the
+.B USER 
+environment variable. Do not change this environment variable to something
+which is not a valid mail address (one of your own)
+on the machine which you are on: doing so
+will prevent pluto from sending you mail (containing unread messages or
+new passwords).
+
+A valid use of the
+.B GOOFEYUSER
+environment variable would be if you wanted to use goofey from another of
+your accounts on the same machine (e.g. the
+.I root
+account) without gaining exclusive access to goofey from that account.
+The system alias mechanism is a much better way to achieve a "change of name".
+.TP
+.B GOOFEYLOC
+This is supplied to the server and will be printed next to your idle time
+when someone lists you using
+.I \-l.
+.TP
+.B GOOFEY_ARGS
+This environment variable may contain '--' and '+' argument which are
+prepended to your goofey command. Useful for setting host, port, and
+various flags (such as auto-split).
+.SH FUTURE WORK
+If you have any suggestions for additions to the server, please let tym know.
+.SH BUGS
+.PP
+Prompt for -s should be controlled by the server, so 
+.I goofey
+doesn't have to recognise it.
+.PP
+.I Goofey
+should really use DGRAM sockets.
+.SH AUTHORS
+Tim MacKenzie (tym) and Darren Platt (daz) wrote the original
+.I goofey
+program in early 1991.
+.I Goofey
+was eventually stripped down to what it is now, with most of the work done
+in the server (
+.I pluto
+).
+
+There are a number of contributors to the server code, these include
+tym and daz, who maintain the system, Andrew Davison, and Kevin Lentin.
+
+.SH ACKNOWLEDGEMENTS
+Thanks to the curator of the jargon file, and all those collectors of
+fortunes out there.

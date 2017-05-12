@@ -1,0 +1,1 @@
+bash -l -c "echo /home/\$USER > /tmp/fa_aws_home.txt;echo '_p_' >> /tmp/fa_aws_home.txt;echo TagFA=_c_ >> /tmp/fa_aws_home.txt;fa -gi '_p_' --iset-amazon '_i_' --authorize_connect --dashboard --log"

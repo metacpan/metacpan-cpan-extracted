@@ -1,0 +1,73 @@
+#!/usr/bin/perl -w
+
+# Example command-line:
+#	./zselect -t q localhost:3313/IR-Explain---1 "net.port=3950" "concat(zeerex:serverInfo/zeerex:host, ':', zeerex:serverInfo/zeerex:port, '/', zeerex:serverInfo/zeerex:database)"
+
+use strict;
+use warnings;
+use Getopt::Std;
+use ZOOM;
+use XML::LibXML;
+use XML::LibXML::XPathContext;
+
+my %opts = (t => "p");
+if (!getopts('t:', \%opts) || @ARGV != 3) {
+    print STDERR "Usage: $0 [-t queryType] <target> <query> <xpath>
+Query types:
+	p	Query is in prefix query format (PQF) [default]
+	c	Query is in CCL, sent directly to server
+	q	Query is in CQL, sent directly to server
+	C	Query is in CCL, translated on client side
+	Q	Query is in CQL, translated on client side
+";
+    exit 1;
+}
+
+my($target, $qstring, $xpath) = @ARGV;
+my $type = $opts{t};
+my %type2class = (
+		  p => "PQF",
+		  c => "CCL",	# Bizarrely, not yet implemented in ZOOM
+		  q => "CQL",
+		  C => "CCL2RPN",
+		  Q => "CQL2RPN",
+		  );
+my $class = $type2class{$type};
+if (!defined $class) {
+    print STDERR "$0: unrecognised query type '$type'\n";
+    exit 2;
+}
+
+my $conn = new ZOOM::Connection($target);
+my $query = "ZOOM::Query::$class"->new($qstring, $conn);
+$conn->option(presentChunk => 50);
+my $rs = $conn->search($query);
+my $n = $rs->size();
+#print "found $n record", ($n==1 ? "" : "s"), "\n";
+
+$rs->option(preferredRecordSyntax => "xml");
+$conn->option(elementSetName => "zeerex");
+my $parser = new XML::LibXML();
+
+foreach my $i (1..$n) {
+    my $rec = $rs->record($i-1);
+    my $xml = $rec->render();
+    my $doc = $parser->parse_string($xml);
+    my $root = $doc->getDocumentElement();
+    my $xc = XML::LibXML::XPathContext->new($root);
+    register_namespaces($xc);
+    print $xc->find($xpath), "\n";
+}
+
+
+# I feel really bad about having to have a hardwired list of supported
+# namespaces, but since it's entirely the fault of LibXML's retarded
+# lack of proper namespace support in its XPath handling, I am not
+# going to let it spoil my day.
+#
+sub register_namespaces {
+    my($xc) = @_;
+    $xc->registerNs(zeerex => 'http://explain.z3950.org/dtd/2.0/');
+    $xc->registerNs(irspy => 'http://indexdata.com/irspy/1.0');
+    # More to come
+}

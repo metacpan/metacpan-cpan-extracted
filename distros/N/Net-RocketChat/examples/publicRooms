@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+
+use Net::RocketChat;
+use Getopt::Long;
+use YAML::XS;
+use strict;
+
+my ($username,$password,$server,$debug);
+GetOptions(
+   "username:s" => \$username,
+   "password:s" => \$password,
+   "server:s" => \$server,
+   "debug" => \$debug,
+);
+
+my $chat = Net::RocketChat->new(username => $username, password => $password, server => $server, debug => $debug);
+$chat->login;
+print Dump($chat->publicRooms);

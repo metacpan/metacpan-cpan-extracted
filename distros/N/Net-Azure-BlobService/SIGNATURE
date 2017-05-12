@@ -1,0 +1,32 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2f6977d9ccc98d2849d2387c02bb1cd7c764fe32 Build.PL
+SHA1 1b55a99f6f2abf3e97fc58850dd46080122ca73e CHANGES
+SHA1 c24c5f3e328a1da44c15d3117c39ddb9483aca45 LICENSE
+SHA1 cc4193adb4c7c2be4a719be01368df0ecfc70a3c MANIFEST
+SHA1 c24e0de47127df3c67d286813f4db55ebd60d45e META.json
+SHA1 f7d8bd75de01defba31ac756910db87d0cdf9434 META.yml
+SHA1 13cb18eb220447260ca9fefd68739b3b1fb825d3 README
+SHA1 84f68a41a1ba3eb8d09a6f216b7734cc9840f0e4 examples/simple.pl
+SHA1 ab11b9209a818b5019adfea9f7a88cc3677ccc89 lib/Net/Azure/BlobService.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk8LVfgACgkQnvdMljFk9hXRjgCeKYTK53tiZKjsQrqV7iDpMkEr
+rVYAniOl5oe1z5ojCn+nKq/ai2I/4PyZ
+=RGck
+-----END PGP SIGNATURE-----

@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+#
+# nc.sniffer.coalesce.cgi
+# version 1.00, 12-21-06, michael@bizsystems.com
+#
+use strict;
+#use diagnostics;
+use lib qw(blib/lib);
+
+use Net::Connection::Sniffer::Report qw(
+	rem_report
+);
+
+# EDIT the configuration to fit your site
+#
+my $wconf = {		# web configuration
+
+# location of 'ssh'
+# it is recommend that you use certificates rather than users with no passwords
+# [REQUIRED]
+
+	ssh	=>	'/usr/bin/ssh',
+
+# location of 'rsync', use ssh transport
+# to retrieve dump file created by 'ssh' above
+# [REQUIRED]	used in the form: rsync -utz -e ssh
+
+	rsync	=>	'/usr/bin/rsync',
+
+# source of remote files
+# [REQUIRED]
+
+	src	=>	{
+#   by hostname
+	    'user@somehost.com'	=> {
+#   file to execute for remote stat dump
+		exec	=> './nc.sniffer.dump.pl',
+#   dump file to fetch
+		fetch	=> '/var/run/nc.sniffer/nc.sniffer.stats',
+	    },
+	},
+
+# location of statistics file if localhost stats are present
+# [OPTIONAL]
+#
+	stats	=> '/var/run/nc.sniffer/nc.sniffer.stats',
+
+# update host:port	if localhost stats are present
+#
+# format:
+#	port
+#   or
+#	host:port
+#   or
+#	ipaddr:port
+#
+# host defaults to 'localhost', 127.0.0.1
+# [OPTIONAL]
+#
+	update	=> '127.0.0.1:10004',
+
+# location of web cache file, this must exist
+# and be writable by the web daemon
+# dump files (above) will be kept here as well
+# [REQUIRED]
+#
+	cache	=> './tmp/sniffer.cache',
+
+# statstistics update timeout
+# [REQUIRED] default 15 seconds
+#
+	updto	=> 15,
+
+# cache refresh every nnn seconds
+# default is 300 seconds
+# [OPTIONAL]
+#
+	refresh	=> 300,
+
+};
+
+rem_report($wconf);

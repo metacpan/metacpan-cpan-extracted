@@ -1,0 +1,43 @@
+NAME
+    Net::UPS - Implementation of UPS Online Tools API in Perl
+
+SYNOPSIS
+        use Net::UPS;
+        $ups = Net::UPS->new($userid, $password, $accesskey);
+        $rate = $ups->rate($from_zip, $to_zip, $package);
+        printf("Shipping this package $from_zip => $to_zip will cost you \$.2f\n", $rate->total_charges);
+
+WARNING
+    Although functional, this is an alpha software. Net::UPS is still under
+    testing stage, and interface can change in the future without any
+    notice. Until this warning sign is removed and Net::UPS version becomes
+    at least 1.0, you are discouraged from using this software in production
+    environment, or do not expect backward-compatible upgrades!
+
+DESCRIPTION
+    Net::UPS implements UPS' Online Tools API in Perl. In a nutshell,
+    Net::UPS knows how to retrieve rates and service information for
+    shipping packages using UPS, as well as for validating U.S. addresses.
+
+    This manual is optimized to be used as a quick reference. If you're knew
+    to Net::UPS, and this manual doesn't seem to help, you're encouraged to
+    read Net::UPS::Tutorial first.
+
+AUTHOR
+    Sherzod B. Ruzmetov <sherzodr@cpan.org>, http://author.handalak.com/
+
+COPYRIGHT
+    Copyright (C) 2005 Sherzod Ruzmetov. All rights reserved. This library
+    is free software. You can modify and/or distribute it under the same
+    terms as Perl itself.
+
+DISCLAIMER
+    THIS LIBRARY IS PROVIDED WITH USEFULNES IN MIND, BUT WITHOUT ANY
+    GUARANTEE (NEITHER IMPLIED NOR EXPRESSED) OF ITS FITNES FOR A PARTICUALR
+    PURPOSE. USE IT AT YOUR OWN RISK.
+
+SEE ALSO
+    Net::UPS::Address, Net::UPS::Rate, Net::UPS::Service, Net::UPS::Package,
+    Net::UPS::Tutorial
+
+

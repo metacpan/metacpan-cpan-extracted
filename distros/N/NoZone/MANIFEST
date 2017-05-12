@@ -1,0 +1,19 @@
+AUTHORS
+autobuild.sh
+bin/nozone
+Build.PL
+CHANGES
+etc/nozone.cfg
+lib/NoZone.pm
+lib/NoZone/Zone.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+perl-NoZone.spec
+perl-NoZone.spec.PL
+README
+t/005-pod.t
+t/010-pod-coverage.t
+t/100-generate.t
+META.yml
+META.json

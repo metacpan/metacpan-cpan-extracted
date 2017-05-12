@@ -1,0 +1,34 @@
+---
+abstract: 'Perl modules for MQTT Protocol (http://mqtt.org/)'
+author:
+  - 'Mark Hindess <soft-cpan@temporalanomaly.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-MQTT
+requires:
+  Carp: '0'
+  Getopt::Long: '0'
+  IO::Select: '0'
+  IO::Socket::INET: '0'
+  Module::Pluggable: '0'
+  Pod::Usage: '0'
+  Time::HiRes: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/beanz/net-mqtt-perl/issues
+  homepage: http://search.cpan.org/dist/Net-MQTT/
+  repository: git://github.com/beanz/net-mqtt-perl.git
+version: '1.163170'
+x_serialization_backend: 'YAML::Tiny version 1.69'

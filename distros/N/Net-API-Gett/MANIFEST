@@ -1,0 +1,21 @@
+Build.PL
+Changes
+ignore.txt
+lib/Net/API/Gett.pm
+lib/Net/API/Gett/File.pm
+lib/Net/API/Gett/Share.pm
+lib/Net/API/Gett/User.pm
+lib/Net/API/Gett/Request.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-basic.t
+t/02-use_auth.t
+t/03-many_file_share.t
+t/04-chunked_upload.t
+t/manifest.t
+t/pod.t
+Makefile.PL
+META.yml
+META.json

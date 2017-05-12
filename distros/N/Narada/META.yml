@@ -1,0 +1,71 @@
+---
+abstract: 'framework for ease deploy and support microservice projects'
+author:
+  - 'Alex Efros <powerman@cpan.org>'
+build_requires:
+  File::Copy::Recursive: '0'
+  Module::Build: '0.28'
+  Test::Database: '0'
+  Test::Differences: '0'
+  Test::Exception: '0'
+  Test::MockModule: '0'
+  Test::More: '0.96'
+  Test::Output: '0'
+configure_requires:
+  CPAN::Meta: '2.150005'
+  Devel::AssertOS: '0'
+  Devel::CheckOS: '1.63'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Narada
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Narada:
+    file: lib/Narada.pm
+    version: v2.3.7
+  Narada::Config:
+    file: lib/Narada/Config.pm
+    version: v2.3.7
+  Narada::Lock:
+    file: lib/Narada/Lock.pm
+    version: v2.3.7
+  Narada::Log:
+    file: lib/Narada/Log.pm
+    version: v2.3.7
+requires:
+  App::migrate: v0.2.0
+  App::powerdiff: '0'
+  DBI: '0'
+  Export::Attrs: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  List::Util: '0'
+  Log::Fast: '0'
+  MIME::Base64: '0'
+  Path::Tiny: '0.065'
+  Time::HiRes: '0'
+  Time::Local: '0'
+  parent: '0'
+  perl: '5.010001'
+  version: '0.77'
+resources:
+  bugtracker: https://github.com/powerman/Narada/issues
+  homepage: https://github.com/powerman/Narada
+  repository: https://github.com/powerman/Narada.git
+version: v2.3.7
+x_contributors:
+  - 'Prylutskyi Anatolii <prylutskyi@qarea.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

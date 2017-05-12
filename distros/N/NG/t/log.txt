@@ -1,0 +1,2 @@
+line1 123&abc
+line2 321&abc

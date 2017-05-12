@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TiVoContainer xmlns="http://www.tivo.com/developer/calypso-protocol-1.6/">
+  <Details>
+    <ContentType>x-tivo-container/folder</ContentType>
+    <SourceFormat>x-tivo-container/tivo-dvr</SourceFormat>
+    <Title>Anthony Bourdain: No Reservations</Title>
+    <LastChangeDate>0x470D841B</LastChangeDate>
+    <TotalItems>2</TotalItems>
+    <UniqueId>/NowPlaying/2151379</UniqueId>
+  </Details>
+  <SortOrder>CaptureDate</SortOrder>
+  <GlobalSort>Yes</GlobalSort>
+  <ItemStart>0</ItemStart>
+  <ItemCount>2</ItemCount>
+  <Item>
+    <Details>
+      <ContentType>video/x-tivo-raw-pes</ContentType>
+      <SourceFormat>video/x-tivo-raw-pes</SourceFormat>
+      <Title>Anthony Bourdain: No Reservations</Title>
+      <SourceSize>1308622848</SourceSize>
+      <Duration>3600000</Duration>
+      <CaptureDate>0x470C402E</CaptureDate>
+      <EpisodeTitle>New Jersey</EpisodeTitle>
+      <Description>Dig deep to find the real Jersey identity. Copyright Tribune Media Services, Inc.</Description>
+      <SourceChannel>27</SourceChannel>
+      <SourceStation>TRAV</SourceStation>
+      <HighDefinition>No</HighDefinition>
+      <ProgramId>EP8003660001</ProgramId>
+      <SeriesId>SH800366</SeriesId>
+      <ByteOffset>0</ByteOffset>
+    </Details>
+    <Links>
+      <Content>
+        <Url>http://tivo:80/download/Anthony%20Bourdain%20No%20Reservations.TiVo?Container=%2FNowPlaying&amp;id=2574026</Url>
+        <ContentType>video/x-tivo-raw-pes</ContentType>
+      </Content>
+      <TiVoVideoDetails>
+        <Url>https://tivo:443/TiVoVideoDetails?id=2574026</Url>
+        <ContentType>text/xml</ContentType>
+        <AcceptsParams>No</AcceptsParams>
+      </TiVoVideoDetails>
+    </Links>
+  </Item>
+  <Item>
+    <Details>
+      <ContentType>video/x-tivo-raw-pes</ContentType>
+      <SourceFormat>video/x-tivo-raw-pes</SourceFormat>
+      <Title>Anthony Bourdain: No Reservations</Title>
+      <SourceSize>1308622848</SourceSize>
+      <Duration>3601000</Duration>
+      <CaptureDate>0x470AFCBE</CaptureDate>
+      <EpisodeTitle>Malaysia</EpisodeTitle>
+      <Description>Anthony explores how Chinese influence has mixed with Malay, Indian, Nyonya and indigenous Borneo cultures in Malaysia. Copyright Tribune Media Services, Inc.</Description>
+      <SourceChannel>27</SourceChannel>
+      <SourceStation>TRAV</SourceStation>
+      <HighDefinition>No</HighDefinition>
+      <ProgramId>EP8003660006</ProgramId>
+      <SeriesId>SH800366</SeriesId>
+      <ByteOffset>0</ByteOffset>
+    </Details>
+    <Links>
+      <Content>
+        <Url>http://tivo:80/download/Anthony%20Bourdain%20No%20Reservations.TiVo?Container=%2FNowPlaying&amp;id=2574027</Url>
+        <ContentType>video/x-tivo-raw-pes</ContentType>
+      </Content>
+      <CustomIcon>
+        <Url>urn:tivo:image:expires-soon-recording</Url>
+        <ContentType>image/*</ContentType>
+        <AcceptsParams>No</AcceptsParams>
+      </CustomIcon>
+      <TiVoVideoDetails>
+        <Url>https://tivo:443/TiVoVideoDetails?id=2574027</Url>
+        <ContentType>text/xml</ContentType>
+        <AcceptsParams>No</AcceptsParams>
+      </TiVoVideoDetails>
+    </Links>
+  </Item>
+</TiVoContainer>

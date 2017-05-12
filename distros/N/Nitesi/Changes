@@ -1,0 +1,253 @@
+Revision history for Nitesi
+
+0.0094 Thu Dec  5 09:57:14 2013 CET
+
+    [ENHANCEMENTS]
+
+    * Adjust account manager to new default permissions of ACL::Lite 0.0003.
+
+    [BUG FIXES]
+
+    * Add check whether account exists before creating it.
+
+0.0093 Tue Nov 19 09:50:59 2013 CET
+
+    [ENHANCEMENTS]
+
+    * Initialize created and last_modified values on instantiation of
+      Nitesi::Cart.
+
+0.0092 Sun Oct  6 12:18:30 2013 EDT
+
+    [ENHANCEMENTS]
+
+    * Add Nitesi::Provider::Object module.
+    * Add template, language and alias accessors to Nitesi::Navigation.
+
+0.0091 Tue Jul 30 11:03:23 2013 CEST
+
+    [BUG FIXES]
+
+    * Avoid crash when trying to logout an anonymous user (Marco Pessotto)
+
+    [DOCUMENTATION]
+
+    * Add methods header to Nitesi::Cart's POD.
+
+0.0090 Wed Jun 19 19:51:37 2013 CEST
+
+    [ENHANCEMENTS]
+
+    * Replace Nitesi::Object and Nitesi::Object::Singleton with Moo.
+    * Add last_login method to account manager.
+
+0.0080 Sun May 26 10:30:47 2013 CEST
+
+    [ENHANCEMENTS]
+
+    * Add api_attributes method to Nitesi::Product.
+    * Add support for API attributes to Nitesi::Provider::Role.
+    * Add Git repository to Makefile.PL
+
+0.0070 Wed May 22 17:04:39 2013 CEST
+
+    [ENHANCEMENTS]
+
+    * Add uri method to Nitesi::Product.
+    * Add created and last_modified attributes to Nitesi::Cart.
+    * Add permissions method to account manager.
+
+    [TESTS]
+
+    * Execute POD tests only for release testing.
+
+0.0061 Sun Oct 28 18:42:44 2012 CET
+
+    [BUG FIXES]
+
+    * Add Nitesi::Transaction to MANIFEST.
+
+0.0060 Sun Oct 28 15:47:36 2012 CET
+
+    [ENHANCEMENTS]
+
+    * Add Nitesi::Core::Types class.
+    * Add account role.
+    * Add Nitesi::Transaction class.
+ 
+    [TESTS]
+
+    * Add test account provider.
+    * Add tests for account manager.
+
+0.0053 Fri Oct 26 11:24:14 2012 CEST
+
+    [API CHANGES]
+
+    * Rename api_info method of Nitesi::Inventory class to
+      inventory_api_info. This resolves a conflict when composing Nitesi
+      objects from multiple roles.
+
+    [BUG FIXES]
+
+    * Fix crash on missing account provider during logout.
+
+    [ENHANCEMENTS]
+
+    * Elevate _find to a public method for Nitesi::Cart.
+
+0.0052 Tue Oct  9 15:46:05 2012 CEST
+
+    [BUG FIXES]
+
+    * Return empty string for missing account status variables instead of
+      undef.
+    * Erase account data from account manager object on logout.
+
+    [ENHANCEMENTS]
+
+    * Change return value of account manager's login method to 0 in case of
+      failure.
+
+    [DOCUMENTATION]
+
+    * Improve documentation with more examples and explanations.
+      (Jure Kodžoman)
+    * Expand documentation on Nitesi::Account::Manager's create method.
+    * Add description section to Nitesi::Account::Password's POD.
+
+0.0051 Wed Jul 18 11:17:42 2012 CEST
+
+    [BUG FIXES]
+
+    * Create ACL object immediately after successful login or become
+      operation (RT #78326).
+
+    [DOCUMENTATION]
+
+    * Add description section to account manager's POD.
+
+0.0050 Wed Jul 11 13:36:38 2012 CEST
+  
+    [BUG FIXES]
+
+    * Switch account manager to a normal object instead of a singleton to
+      prevent problems with stale database handles.
+    * Reroute cart updates with quantity zero to cart removal.
+
+    [ENHANCEMENTS]
+    
+    * Add generic product class.
+    * Add provider role.
+    * Add inventory, navigation and address role.
+    * Add password generator to Nitesi::Account::Password.
+    * Add load, create, delete and become method to account manager.
+
+    [DOCUMENTATION]
+
+    * Add bundles section to Nitesi's POD.
+   
+0.0040 Sat Feb  4 10:17:41 2012 CET
+
+    [ENHANCEMENTS]
+
+    * Allow passing of hash to Nitesi::Cart's add method.
+    * Add update method to Nitesi::Cart.
+    * Add quantity and count methods to Nitesi::Cart.
+
+    [DOCUMENTATION]
+
+    * Add section with cart features to Nitesi's POD.
+    * Use better example for adding absolute cost to cart.
+
+0.0034 Sat Jan  7 07:56:48 2012 EST
+
+    [BUG FIXES]
+
+    * Use check_password function instead of check method which has
+      been removed in Crypt::Password 0.23 (#73809).
+
+    [DOCUMENTATION]
+
+    * Fix password example in account manager's synopsis.
+
+0.0033 Sun Nov 27 11:26:19 2011 CET
+
+    [TESTS]
+
+    * Get rid of -T switch on password tests as a few systems still fail.
+
+0.0032 Sun Nov 13 14:48:34 2011 CET
+
+    [BUG FIXES]
+
+    * Set PATH environment variable to fixed system directories in password test.
+
+    [DOCUMENTATION]
+
+    * Fix POD example for changing password of an arbitrary account.
+
+0.0031 Mon Nov  7 09:00:07 2011 CET
+
+    [ENHANCEMENTS]
+
+    * Add before_cart_clear and after_cart_clear hooks.
+    * Add before_cart_rename and after_cart_rename hooks.
+
+0.0030 Sat Oct 29 12:43:03 2011 CEST
+
+    [BUG FIXES]
+
+    * Pass update flag to after_cart_add hook.
+
+0.0020 Wed Oct 26 16:12:08 2011 CEST
+
+    [ENHANCEMENTS]
+
+    * Add inclusive costs to cart class.
+    * Add cost method to cart class.
+    * Add has_role method to Nitesi::Account::Manager.
+    * Extend value method of account manager with setting account values.
+
+    [BUG FIXES]
+
+    * Populate account data in Nitesi::Account::Manager immediately after login.
+
+0.0010 Thu Oct 13 08:42:33 2011 EDT 
+
+    [ENHANCEMENTS]
+
+    * Add Account::Manager::Password class.
+    * Add exists, roles and values method to Nitesi::Account::Manager.
+    * Remove leading and trailing spaces from username and password 
+      before login.
+    * Add costs and id method to cart class.
+    * Add before_cart_add_validate and before_cart_remove_validate hooks.
+    * Add load method to Nitesi::Class.
+
+    [TESTS]
+
+    * Add tests for remove method of cart class.
+
+    [DOCUMENTATION]
+
+    * Add short description to Nitesi::Cart's POD.
+
+0.0002 Sat Sep 24 19:34:11 2011 CEST
+
+    [API CHANGES]
+
+    * Move Nitesi::Account::Provider::DBI to Nitesi::DBI distribution.
+
+    [ENHANCEMENTS]
+
+    * Add remove method to cart class.
+    * Add uid method to account manager class.
+
+    [BUG FIXES]
+
+    * Let account manager handle missing providers gracefully.
+
+0.0001 Tue Sep 20 16:38:28 2011 CEST
+ 
+    * Initial release

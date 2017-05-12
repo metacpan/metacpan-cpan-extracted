@@ -1,0 +1,69 @@
+INSTALLATION
+
+perl Makefile.PL
+make
+make test
+make install
+
+NOTE:  This module relies on XML::SAX for parsing the XML output of
+       nmap; it will use any XML::SAX conformant parser installed on
+       a system as it uses XML::SAX::ParserFactory.  Please see the 
+       documentation for XML::SAX for the rules on what parser the parser 
+       factory will choose to use.  XML::SAX always comes with at least
+       one implementation of an XML::SAX compliant parser, XML::SAX::PurePerl.
+       For better speed, install a C-glue code SAX:XML module like 
+       XML::LibXML::SAX.
+
+DOCUMENTATION
+
+If you want to view the docs post installation, do
+
+perldoc Nmap::Scanner
+
+then
+
+perldoc Nmap::Scanner::Scanner
+
+to start.
+
+If you want to look pre-install, cd to lib first.
+
+SYNOPSIS
+========
+
+Nmap::Scanner perlifies the output of the network mapping tool nmap 
+(http://www.insecure.org/nmap/), creating lists of model objects in batch scan
+mode or firing events when significant scanning events occur in event scan mode.
+
+If you do not have nmap installed on your system, you will need to install it 
+before you can use this module (or only use scan_from_file(), which reads 
+nmap-generated XML files).  Please make sure to use a version of nmap that is
+newer than 3.50 if possible, as the XML DTD for nmap changed several times
+prior to 3.50.  Using a version prior to 3.50 may work but no guarantees.
+
+PROJECT INFORMATION
+===================
+
+Home page: http://nmap-scanner.sourceforge.net/
+
+If you are interested in making suggestions, reporting bugs, etc, please 
+join the nmap-scanner mailing list at
+
+https://lists.sourceforge.net/lists/listinfo/nmap-scanner-general
+
+or use the Sourceforge "Help" or "Open Discussion" forums:
+
+http://sourceforge.net/forum/?group_id=101546
+
+If you are interested in contributing, join the mailing list or post to the
+"Developers" forum:
+
+http://sourceforge.net/forum/forum.php?forum_id=351428
+
+Please feel free to email me with nmap-scanner related questions, comments, and
+criticisms (mailing list postings preferred).  All feedback is welcomed.
+
+I hope you find this project useful,
+Max
+
+maxschube@cpan.org

@@ -1,0 +1,22 @@
+0.21 	Thu Mar 16 23:21:54 CET 2006
+# my version numbering seems to be quite out of control.. thats just 
+# due to my lazyness. i dont like to compile cpan releases all the time.
+    - removed psyc-state again.. too many problems because psycmuve doesnt
+    - several bugs in the parsers
+    - support for file-transfer ..
+	- Net::PSYC::FileShare
+	- Net::PSYC::send_file()
+0.13 aka 0.14	Wed Jun 15 20:04:00 CEST 2005
+    - added psyc-state for all object communication
+    - added timer events
+    - ssl and zlib negotiation
+    - more test scripts.
+    - removed some unsafe uses of parseUNL
+    - completely changed Net::PSYC::Client api
+    - fixed a bug in the mmp-parser
+0.12	Thu Oct 21 23:28:43 CEST 2004
+    - fixed some bugs in Datagram.pm to make it run together with the new
+      PSYC-parser
+    - build a simple test-script
+0.11
+    - checkin to CPAN

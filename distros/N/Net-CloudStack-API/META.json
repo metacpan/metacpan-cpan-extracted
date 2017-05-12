@@ -1,0 +1,67 @@
+{
+   "abstract" : "Basic request and response handling for calls to a CloudStack service.",
+   "author" : [
+      "Alan Young <harleypig@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-CloudStack-API",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Net::CloudStack" : "0",
+            "Params::Validate" : "0",
+            "Scalar::Util" : "0",
+            "Sub::Exporter" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "MIME::Base64" : "0",
+            "Test::CheckDeps" : "0.002",
+            "Test::More" : "0.94",
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::UseAllModules" : "0",
+            "URI::Encode" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {}
+   },
+   "version" : "0.02"
+}
+

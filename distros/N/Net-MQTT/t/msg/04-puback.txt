@@ -1,0 +1,9 @@
+$args =
+{
+ message_type => MQTT_PUBACK,
+ message_id => 1234,
+}
+
+40 02 04d2
+
+PubAck/at-most-once 1234 

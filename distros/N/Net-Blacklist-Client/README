@@ -1,0 +1,9 @@
+This module provides parallel lookups of IPs in RBLs and
+domains in URIBLs.
+
+INSTALL:
+
+perl Makefile.PL
+make
+make install
+

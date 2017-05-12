@@ -1,0 +1,17 @@
+\bRCS\b
+\bCVS\b
+\bbin\b
+,v$
+~$
+.gz$
+\B\.svn\b
+^bin/
+^blib/
+^pm_to_blib
+^MakeMaker-\d
+Makefile$
+Makefile.old$
+\.db
+t/TEST$
+t/SMOKE$
+^blibdirs\.ts

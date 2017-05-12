@@ -1,0 +1,31 @@
+{
+   "abstract" : "Perl extension for the Google Safe Browsing v3 API. (Google Safe Browsing v2 has been deprecated by Google.)",
+   "author" : [
+      "Julien Sobrier <julien@sobrier.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Google-SafeBrowsing3",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/juliensobrier/Net-Google-SafeBrowsing3.git",
+         "web" : "https://github.com/juliensobrier/Net-Google-SafeBrowsing3"
+      }
+   },
+   "version" : "0.7"
+}

@@ -1,0 +1,60 @@
+INTRODUCTION
+
+Net::Ncap is a Perl extension to the ncap(3) network data capture library.
+The ncap documentation describes itself thusly:
+
+      The ncap library is a high level interface for network
+      data capture. The source of network data can be either
+      live traffic or files containing previously captured or
+      generated data. Files can be in ncap format or in pcap(3)
+      format, and can be either normal binary files or network
+      sockets.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+SOURCE CODE
+
+The offical distribution lives here:
+
+https://tools.netsa.cert.org/wiki/display/tt/Net-Ncap
+
+The package is also available via the CPAN:
+
+http://search.cpan.org/dist/Net-Ncap/
+
+
+DEPENDENCIES
+
+This module requires the ncap(3) library. It can be downloaded from:
+
+  ftp://ftp.isc.org/isc/ncap/
+
+
+CONTACT
+
+If you have bug reports, patches, feedback or questions please send them
+to netsa-help@cert.org
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 by Carnegie Mellon University
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License, as published
+by the Free Software Foundation, under the terms pursuant to Version
+2, June 1991.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+Public License for more details.

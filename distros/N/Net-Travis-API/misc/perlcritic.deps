@@ -1,0 +1,16 @@
+Perl::Critic::Policy::Documentation::PodSpelling~0
+Perl::Critic::Policy::Lax::RequireExplicitPackage::ExceptForPragmata~0
+Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs~0
+Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter~0
+Perl::Critic::ProfileCompiler::Bundle::Bangs~0
+Perl::Critic::ProfileCompiler::Bundle::Compatibility~0
+Perl::Critic::ProfileCompiler::Bundle::Core~0
+Perl::Critic::ProfileCompiler::Bundle::Deprecated~0
+Perl::Critic::ProfileCompiler::Bundle::Itch~0
+Perl::Critic::ProfileCompiler::Bundle::Lax~0
+Perl::Critic::ProfileCompiler::Bundle::Moose~0
+Perl::Critic::ProfileCompiler::Bundle::More~0
+Perl::Critic::ProfileCompiler::Bundle::Pulp~0
+Perl::Critic::ProfileCompiler::Bundle::StricterSubs~0
+Perl::Critic::ProfileCompiler::Bundle::Swift~0
+Perl::Critic::ProfileCompiler::Bundle::Tics~0

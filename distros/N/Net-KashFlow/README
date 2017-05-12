@@ -1,0 +1,114 @@
+NAME
+    Net::KashFlow - Interact with KashFlow accounting web service
+
+SYNOPSIS
+        my $kf = Net::KashFlow->new(username => $u, password => $p);
+
+        my $c = $kf->get_customer($cust_email);
+        my $i = $kf->create_invoice({ 
+            InvoiceNumber => time, CustomerID => $c->CustomerID 
+        });
+
+        $i->add_line({ Quantity => 1, Description => "Widgets", Rate => 100 })
+
+        $i->pay({ PayAmount => 100 });
+
+METHODS
+  new
+    Simple constructor - requires "username" and "password" named
+    parameters.
+
+  get_customer($id | $email)
+    Returns a Net::KashFlow::Customer object for the given customer. If the
+    parameter passed has an "@" sign then this is treated as an email
+    address and the customer looked up email address; otherwise the customer
+    is looked up by customer code. If no customer is found in the database,
+    nothing is returned.
+
+  get_customer_by_id($internal_id)
+    Like "get_customer", but works on the internal ID of the customer.
+
+  get_customers
+    Returns all customers
+
+  create_customer({ Name => "...", Address => "...", ... });
+    Inserts a new customer into the database, returning a
+    Net::KashFlow::Customer object.
+
+  get_invoice($your_id)
+  get_invoice_by_id($internal_id)
+    Returns a Net::KashFlow::Invoice object representing the invoice.
+
+  create_invoice({ ... })
+Net::KashFlow::Customer
+        my $c = $kf->get_customer($email);
+
+        $c->Telephone("+44.500123456");
+        $c->update;
+
+        print $c->Address1(), $c->Address2();
+
+    Customer objects have accessors as specified by
+    "http://accountingapi.com/manual_class_customer.asp" - these accessors
+    are not "live" in that changes to them are only sent to KashFlow on call
+    to the "update" method.
+
+    This package also has a "delete" method to remove the customer from the
+    database, and an "invoices" method which returns all the
+    "Net::KashFlow::Invoice" objects assigned to this customer.
+
+Net::KashFlow::Invoice
+        my @i = $kf->get_customer($email)->invoices;
+        for (@i) { $i->Paid(1); $i->update }
+
+    Similarly to Customer, fields found at
+    http://accountingapi.com/manual_class_invoice.asp
+
+    Also:
+
+        $i->add_line({ Quantity => 1, Description => "Widgets", Rate => 100 });
+        $i->pay({ PayAmount => 100 });
+
+AUTHOR
+    Simon Cozens, "<simon at simon-cozens.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-net-kashflow at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-KashFlow>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+    I am aware that this module is WOEFULLY INCOMPLETE and I'm looking
+    forward to receiving patches to add new functionality to it. Currently
+    it does what I want and I don't have much incentive to finish it. :/
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Net::KashFlow
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-KashFlow>
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/Net-KashFlow>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/Net-KashFlow>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/Net-KashFlow/>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Simon Cozens.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

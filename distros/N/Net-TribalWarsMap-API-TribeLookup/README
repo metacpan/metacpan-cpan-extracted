@@ -1,0 +1,144 @@
+NAME
+    Net::TribalWarsMap::API::TribeLookup - Query general information about
+    tribes.
+
+VERSION
+    version 0.1.0
+
+SYNOPSIS
+        # Tag based lookup
+        my $result = Net::TribalWarsMap::API::TribeLookup->get_tag('en69', 'kill');
+
+        # Generic search
+        my @results = Net::TribalWarsMap::API::TribeLookup->search_tribes('en69', 'Alex');
+
+        # generic search with name filter
+        my @results = Net::TribalWarsMap::API::TribeLookup->search_tribes('en69', 'lex',qr/^Alex/ );
+
+        # Advanced
+        my $instance = Net::TribalWarsMap::API::TribeLookup->new(
+            world => 'en69',
+            search => 'alex',
+        );
+        my $raw_results = $instance->_results;
+
+METHODS
+  "ua"
+        my $ua = $instance->ua;
+
+  "decoder"
+        my $decoder = $instance->decoder();
+
+  "world"
+        my $world = $instance->world(); # en67 or similar
+
+  "search"
+        my $search = $instance->search();
+
+  "uri"
+        my $search_uri = $class->new( world => ... , search => ... )->uri;
+
+  "get_tag"
+        my $result = $class->get_tag( $world, $tag );
+
+    For example:
+
+        my $result = $class->get_tag('en69', 'kill');
+
+    If $tag is not found, "undef" is returned.
+
+  "search_tribes"
+        my @results = $class->search_tribes( $world, $search_string );
+
+    or
+
+        my @results = $class->search_tribes( $world, $search_string , $name_filter_regexp );
+
+    For instance:
+
+          my @results = $class->search_tribes( 'en69', 'kill' );
+
+    will return all tribes in "world en69" with the sub-string "kill" in
+    their tag or name.
+
+          my @results = $class->search_tribes( 'en69', 'kill' , qr/bar/);
+
+    will return all tribes in "world en69" with the sub-string "kill" in
+    their tag or name, where their name also matches
+
+          $tribe->name =~ qr/bar/
+
+ATTRIBUTES
+  "ua"
+    The HTTP User Agent to use for requests.
+
+    Default is a "Net::TribalWarsMap::API::HTTP" instance.
+
+        $instance->new( ua => $user_agent );
+        ...
+        my $ua = $instance->ua();
+
+  "decoder"
+    The "JSON" Decoder object
+
+        my $instance = $class->new(
+            decoder => JSON->new()
+        );
+
+  "world"
+    MANDATORY PARAMETER:
+
+        my $instance = $class->new( world => $world_name );
+
+    This will be something like "en67", and is the prefix used in domain
+    "URI"'s.
+
+  "search"
+        my $instance = $class->new( search => $string );
+
+  "uri"
+    Normally this parameter is not required to be provided, and is instead
+    composed by joining an existing base URI with "world" "search" and "_ts"
+
+        my $instance = $class->new( uri => 'fully qualified search URI' );
+
+PRIVATE ATTRIBUTES
+  "_ts"
+        my $instance = $class->new( _ts => "mm-dd-yyy" );
+
+  "_results"
+    Lazy builder that returns a "json"-decoded version of the result of
+    fetching "uri".
+
+        my $instance = $class->new( _results => { %complex_structure } );
+
+  "_decoded_results"
+    Lazy builder that returns a Hash of Objects decoded from the result of
+    "_results"
+
+        my %complex_structure = (
+            key => Net::TribalWarsMap::API::TribeLookup::Result->new(),
+            key2 => Net::TribalWarsMap::API::TribeLookup::Result->new(),
+        );
+        my $instance => $class->new( _decoded_results => { %complex_structure } );
+
+PRIVATE METHODS
+  "_ts"
+        my $now = $instance->_ts;
+
+  "_results"
+        my $raw_results = $instance->_results;
+
+  "_decoded_results"
+        my %decoded_results = %{ $instance->_decoded_results };
+
+AUTHOR
+    Kent Fredric <kentfredric@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Kent Fredric
+    <kentfredric@gmail.com>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

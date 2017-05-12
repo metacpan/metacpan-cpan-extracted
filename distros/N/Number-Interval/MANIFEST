@@ -1,0 +1,9 @@
+lib/Number/Interval.pm
+MANIFEST
+MANIFEST.SKIP
+Build.PL
+README
+t/interval.t
+ChangeLog
+META.yml
+META.json

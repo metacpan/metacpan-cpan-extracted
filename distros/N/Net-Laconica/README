@@ -1,0 +1,164 @@
+Net-Laconica
+
+NAME
+    Net::Laconica - Perl extension for fetching from, and sending
+    notices/messages to Laconica instances
+
+VERSION
+    Version 0.08
+
+SYNOPSIS
+        use Net::Laconica;
+
+        my $identi = Net::Laconica->new(
+            uri      => 'http://identi.ca/',
+            username => 'alanhaggai',
+            password => 'topsecret'
+        );
+
+        print map { $_, "\n" } $identi->fetch;
+
+DESCRIPTION
+    This module is designed to support "fetch"ing and "send"ing messages to
+    Laconica instances.
+
+METHODS
+    The implemented methods are:
+
+    "new"
+        Returns a blessed hash reference object. This method accepts a hash
+        reference with "uri", "username" and "password" as keys. "uri" and
+        "username" are required, whereas "password" is optional.
+
+        "uri"
+            Holds the URI to the particular Laconica instance to which the
+            object is to be bound.
+
+            Example:
+
+                uri => 'http://identi.ca'  # Presence or absence of a trailing slash in the URI does not matter
+
+        "username"
+            Username for the Laconica instance.
+
+            Example:
+
+                username => 'alanhaggai'
+
+        "password"
+            Password for the Laconica instance.
+
+            Password is required only if you wish to "send" messages.
+
+            Example:
+
+                my $identi = Net::Laconica->new(
+                    uri      => 'http://identi.ca/',
+                    username => 'alanhaggai',
+                    password => 'topsecret'
+                );
+
+            Or:
+
+                my $identi = Net::Laconica->new(
+                    uri      => 'http://identi.ca/',
+                    username => 'alanhaggai',
+                    password => 'topsecret'
+                );
+
+    "fetch"
+        Returns an array of recent messages.
+
+        Default number of recent messages returned is 10. The value can be
+        changed by passing the value as an argument to the method. Maximum
+        limit for the value is 20.
+
+        Example:
+
+            my @messages = $laconica->fetch;  # Fetches the top 10 messages
+                                              # (If there exists less than 10 messages,
+                                              # they are all returned)
+
+        Or:
+
+            my @messages = $laconica->fetch(3);  # Fetches the top 3 messages
+
+    "send"
+        Sends a message.
+
+        Returns 0 if an error occurs.
+
+        Example:
+
+            if( $laconica->send('Hello world') ) {
+                print 'Message sent successfully.';
+            }
+
+TODO
+    These are some features which will be implemented soon:
+
+    *   Migrate to the API once it is made a standard
+
+    *   Delete notices
+
+    *   Subscriptions
+
+    *   Profile
+
+    *   Favourites
+
+    *   Replies
+
+    *   Inbox
+
+    *   Outbox
+
+    *   Avatars
+
+AUTHOR
+    Alan Haggai Alavi, "<alanhaggai at alanhaggai.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-net-laconica at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Laconica>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::Laconica
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Laconica
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-Laconica
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-Laconica
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-Laconica
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2008 Alan Haggai Alavi
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

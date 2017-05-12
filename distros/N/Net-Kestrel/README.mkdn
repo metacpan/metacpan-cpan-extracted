@@ -1,0 +1,118 @@
+# NAME
+
+Net::Kestrel - Kestrel Client for Perl
+
+# VERSION
+
+version 0.08
+
+# SYNOPSIS
+
+    use Net::Kestrel;
+
+    my $queuename = 'myqueue';
+
+    my $kes = Net::Kestrel->new; # defaults to host => 127.0.0.1, port => 2222
+    $kes->put($queuename, 'foobar');
+    # ... later
+
+    # take a peek, doesn't remove the item
+    my $item = $kes->peek($queuename);
+
+    # get the item out, beginning a transaction
+    my $real_item = $kes->get($queuename);
+    # ... do something with it
+
+    # then confirm we finished it so kestrel can discard it
+    $kes->confirm($queuename, 1); # since we got one item
+
+# DESCRIPTION
+
+Net::Kestrel is a __text protocol__ client for [https://github.com/robey/kestrel](https://github.com/robey/kestrel).
+
+# ATTRIBUTES
+
+## debug
+
+## host
+
+The ip address of the Kestrel host you want to connect to.
+
+## port
+
+The port to connect to.  Defaults to 2222.
+
+## timeout
+
+The timeout value for operations.  Defaults to 3 seconds.
+
+# METHODS
+
+## confirm ($queuename, $count)
+
+Confirms $count items from the queue.
+
+## delete ($queuename)
+
+Delete the specified queue.
+
+## flush ($queuename)
+
+Flush (empty) the specified queue.
+
+## get ($queuename, $timeout_in_millis)
+
+Gets an item from the queue.  Note that this implicitly begins a transaction
+and the item must be `confirm`ed or kestrel will give the item to another
+client when you disconnect.  Optionally you may provide a timeout (in
+milliseconds).  Net::Kestrel will block for that long waiting for a value in
+the queue.
+
+## peek ($queuename, $timeout_in_millis)
+
+Peeks into the specified queue and "peeks" at the next item.  Optionally you
+may provide a timeout (in milliseconds).  Net::Kestrel will block for that
+long waiting for a value in the queue.
+
+## put ($queuename, $string)
+
+Puts the provided payload into the specified queue.
+
+## stats
+
+Returns stats from the kestrel instance
+
+# NOTES
+
+## Incomplete
+
+__This module is brand new and is likely missing features.__
+
+## Protocol
+
+Net::Kestrel speaks Kestrel's text protocol only at present.
+
+## Error Handling
+
+Kestrel returns errors in the form of:
+
+  -Error string
+
+When any command returns a string like this, Net::Kestrel will die with that
+message.  Therefore you should `eval` any methods you care to deal with
+errors for.
+
+# CONTRIBUTORS
+
+Me
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Infinity Interactive, Inc.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

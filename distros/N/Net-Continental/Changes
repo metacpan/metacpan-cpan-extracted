@@ -1,0 +1,41 @@
+Release history for Net-Continental
+
+0.016     2015-02-25 14:59:45-05:00 America/New_York
+        - added Curaçao (with its description in ASCII)
+
+0.015     2015-01-22 19:14:29-05:00 America/New_York
+        - Sometimes, a country's continent is in dispute.  Georgia, for
+          example, is famously disputed.  Other times, we're just dead wrong,
+          as we were with Bolivia, Colombia, and Ecuador.  What happened?  We
+          don't remember, it was a long time ago.  Fixed now!
+
+0.014     2014-08-21 11:52:04-04:00 America/New_York
+        - forbid asking for the zone for a nerd IP when the IP is bogus or
+          undefined (which is bogus)
+
+0.013     2014-01-27 15:13:49-05:00 America/New_York
+        - require Locale::Country 3.29, which restore previously-retired
+          numeric codes
+
+0.012     2014-01-21 22:15:23-05:00 America/New_York
+        - fix links to github (was using wrong user)
+
+0.011     2014-01-21 12:30:19-05:00 America/New_York
+        - fix long-broken zone_for_nerd_ip
+
+0.010     2014-01-20 16:51:01-05:00 America/New_York
+        - provide a nerd_dk response even for retired Taiwan; some other
+          countries are not yet handled; for more information, see
+          https://rt.cpan.org/Ticket/Display.html?id=92303
+        - more clearly handle the gb-vs-uk conflict by making "code" always
+          mean ISO code
+
+0.009     2014-01-20 13:13:44-05:00 America/New_York
+        - nerd.dk responses are now interpreted by the IP value, rather
+          than lookup in a list
+
+0.008     2013-10-06 22:47:18 America/New_York
+          update bugtracker
+
+0.007     2013-06-18 11:02:33 America/New_York
+          first release on CPAN

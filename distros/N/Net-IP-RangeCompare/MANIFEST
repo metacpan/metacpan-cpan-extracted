@@ -1,0 +1,20 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-IPRangeCompare.t
+t/TestCore.t
+t/Base_Broadcast.t
+t/Net-IPRangeCompare.t  
+t/TestForceCidr.t  
+t/enumerate_size.t
+t/NthTest.t             
+t/TestNextCIDR.t   
+t/sort_notations.t
+t/TestRow.t        
+t/sort_quad.t
+t/netmask.t
+t/grep_overlap.t
+lib/Net/IP/RangeCompare.pm
+lib/Net/IP/RangeCompare.pod
+META.yml                                 Module meta-data (added by MakeMaker)

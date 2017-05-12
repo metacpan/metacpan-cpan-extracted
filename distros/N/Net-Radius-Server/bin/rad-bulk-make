@@ -1,0 +1,336 @@
+#!/usr/bin/perl
+
+# rad-bulk: A tool for bulk testing of Radius AAA servers
+#
+# © 2009 Luis E. Muñoz <luismunoz@cpan.org>
+#
+# $Id: rad-bulk-make 113 2009-10-21 19:49:48Z lem $
+
+use strict;
+use warnings;
+
+our $VERSION = do { sprintf "%0.3f", 1+(q$Revision: 113 $ =~ /\d+/g)[0]/1000};
+
+use IO::File;
+use Pod::Usage;
+use File::Slurp;
+use Getopt::Long;
+use File::Basename;
+use Text::Template;
+
+use constant start_probability => 0.2;
+use constant alive_probability => 0.1;
+use constant kaput_probability => 0.1;
+
+my %opt;
+GetOptions(\%opt, qw/
+	   help
+	   version
+	   template=s
+	   sessions=i
+	   ports=i
+	   max-acct=i
+	   iterations=i
+	   /);
+
+sub _show_version
+{
+    print basename($0) . " $VERSION\n";
+    for my $mod ( sort map { s!/!::!g; s/\.pm$//; $_ } keys %INC )
+    {
+	no strict 'refs';
+	print "$mod ", 
+	${${mod}.'::VERSION'} || ${${mod}.'::Version'} || 'N/A', "\n";
+    }
+    exit 0;
+}
+
+pod2usage(verbose => 1, exitval => 0) 
+    if $opt{help};
+
+_show_version if $opt{version};
+
+pod2usage(verbose => 1, exitval => 1, 
+	  -message => 'Must specify a template')
+    unless $opt{template};
+
+$opt{ports}      //= 100;
+$opt{sessions}   //= 5;
+$opt{'max-acct'} //= 5;
+$opt{iterations} //= 1000;
+
+my $t_sessions = read_file($opt{template} . '.session')
+    or die 'Failed to read session script ' . $opt{template} .
+    ".session: $!\n";
+
+my $t_ports = read_file($opt{template} . '.port')
+    or die 'Failed to read port script ' . $opt{template} .
+    ".port: $!\n";
+
+my $fh = new IO::File $opt{template}, "r"
+    or die "Failed to open template file " . $opt{template} . ": $!\n";
+
+my @packets;
+my $curr_packet = '';
+my %t = (
+	 authentication => undef,
+	 start =>          undef,
+	 alive =>          undef,
+	 stop =>           undef,
+);
+
+sub _auth_packet
+{
+    ($T::p, $T::s) = @_;
+    return unless defined $t{authentication};
+
+    print "Authentication\n" 
+	. $t{authentication}->fill_in(Package => 'T') . "\n\n";
+}
+
+sub _start_packet
+{
+    ($T::p, $T::s) = @_;
+    $T::s->{_state} = 1;
+    return unless defined $t{start};
+    print "Accounting\n" . $t{start}->fill_in(Package => 'T') . "\n\n";
+}
+
+sub _alive_packet
+{
+    ($T::p, $T::s) = @_;
+    $T::s->{_state} ++;
+    return unless defined $t{alive};
+    print "Accounting\n" . $t{alive}->fill_in(Package => 'T') . "\n\n";
+}
+
+sub _stop_packet
+{
+    ($T::p, $T::s) = @_;
+    $T::s->{_state} = 0;
+    return unless defined $t{stop};
+    print "Accounting\n" . $t{stop}->fill_in(Package => 'T') . "\n\n";
+}
+
+# Parse the template, to extract the relevant snippets
+
+while (<$fh>)
+{
+    my $eop = m/^\s*$/ || eof;
+
+    unless ($eop)
+    {
+	chomp;
+	$curr_packet .= $_ . "\n";
+	next;
+    }
+
+    # Strip all comments from the input
+    while($curr_packet =~ s!(?mx) ^ \s* \# .* $ !!){};
+    $curr_packet =~ s/^\s*[\r\n]+//;
+
+    my ($type, $body) = split(m/[\r\n]+/, $curr_packet, 2);
+    next unless $type;
+    $t{lc $type} = Text::Template->new(TYPE => STRING => SOURCE => $body);
+    $t{lc $type}->compile 
+	or die "Failed to compile template fragment: $Text::Template::ERROR\n";
+    $curr_packet = '';
+}
+
+# Generate the bunch of ports we want
+
+my @p = ();
+
+for (my $i = 0; $i < $opt{ports}; ++$i)
+{
+    my $p = {};
+    eval $t_ports;
+    die "Failed to execute port script: $@\n" if $@;
+    $p->{_session} = [ map {{ _state => 0, }} 0 .. rand($opt{sessions}) ];
+    push @p, $p;
+}
+
+my $count = $opt{iterations};
+
+while ($count -- > 0)
+{
+    for my $p (@p)
+    {
+	for my $s (@{$p->{_session}})
+	{
+	    if ($s->{_state} == 0)
+	    {
+		if (rand(1) <= start_probability)
+		{
+		    eval $t_sessions;
+		    die "Failed to execute session script: $@\n" if $@;
+		    _auth_packet($p, $s);
+		    _start_packet($p, $s);
+		}
+	    }
+	    elsif ($s->{_state} == 1)
+	    {
+		if ($opt{'max-acct'} >= 1 
+		    and rand(1) <= alive_probability)
+		{
+		    eval $t_sessions;
+		    die "Failed to execute session script: $@\n" if $@;
+		    _alive_packet($p, $s);
+		}
+	    }
+	    elsif ($s->{_state} >= 1)
+	    {
+		if ($s->{_state} >= ($opt{'max-acct'} + 1)
+		    or rand(1) <= kaput_probability)
+		{
+		    eval $t_sessions;
+		    die "Failed to execute session script: $@\n" if $@;
+		    _stop_packet($p, $s);
+		    # Wipe the state
+		    $s = { _state => 0 };
+		}
+	    }
+	}
+    }
+}
+
+__END__
+
+=head1 NAME
+
+rad-bulk-make - Generate test files for rad-bulk
+
+=head1 SYNOPSIS
+
+    rad-bulk-make --template files --sessions num --ports num 
+    --max-acct num --iterations num
+
+=head1 DESCRIPTION
+
+rad-bulk-make produces packet files suitable for using with
+rad-bulk(1) for testing RADIUS server configurations. It uses its own
+template files to build large numbers of typical RADIUS packets.
+
+The resulting packet file will be sent to STDOUT, so that it can be
+redirected. It is recommended that you create a number of packet files
+and stick to them for testing, so that you can consistently excercise
+your RADIUS server.
+
+Various classes of packets can be generated, depending on the specific
+configuration.
+
+=over
+
+=item B<--template file>
+
+Specifies the basenames of the templates to use for packet
+generation. The template is composed of three files: The session
+script, the port script and the packet template.
+
+=over
+
+=item B<The Packet Template>
+
+The packet template is located in the file whose name is specified in
+the command line option. This file is composed of sections that are
+evaluated with Text::Template(3).
+
+This file specifies what attributes should be placed on each packet.
+
+=item B<The Session Script>
+
+This script resides in a file with the same name as the template file,
+with the extension C<.session> appended to it. It contains Perl code
+that will be evaluated once at session creation, once for each "Alive"
+packet to be generated and once for the "Stop" packet.
+
+It is supposed to work on C<$s>, which is a reference to a hash --
+initially empty -- provided by rad-bulk-make.
+
+Note that each different session will receive its own C<$s>, and the
+C<$p> corresponding to the port where it was created.
+
+=item B<The Port Script>
+
+This script resides in a file with the same name as the template file,
+with the extension C<.port> appended to it. It contains Perl code that
+will be evaluated once at port creation.
+
+It is supposed to work on C<$p>, which is a reference to a hash --
+initially empty -- provided by rad-bulk-make.
+
+=back
+
+=item B<--ports num>
+
+The number of ports to be created. Each of this ports is capable of
+carrying a number of concurrent sessions, depending on the
+configuration.
+
+=item B<--sessions num>
+
+For each port, a number between 1 and C<num> sessions will be active
+at any time. A session has a 20% chance of being created during each
+iteration.
+
+=item B<--max-acct num>
+
+Each session will generate between 0 and C<num> "Alive" accounting
+packets. Start and Stop are always generated.
+
+Each session has a 10% chance of being terminated after the "Start"
+and the randomly selected number of "Alive" accounting packets have
+been generated.
+
+=item B<--iterations num>
+
+This controls how many iterations of the generator will be run. Each
+iteration is a scan through the list of ports / sessions. Defaults to
+1000.
+
+=item B<--help>
+
+Shows basic usage information and then exit.
+
+=item B<--version>
+
+Show version numbers of this program and the libraries that are used.
+
+=back
+
+=head2 Template File Format
+
+Packets are specified with a keyword (C<Authentication>, C<Start>,
+C<Alive> or C<Stop>) and a number of input lines, with each line
+specifying an attribute. Blank lines delimit packets. Lines whose
+first non-blank character is C<#> are ignored as comments.
+
+The keyword specifies which kind of packet can be generated with this
+template. Each fragment is interpreted as a Text::Template(3)
+template.
+
+Radius attributes are as follows:
+
+  [vendor.]attribute=value
+
+Where B<vendor> and B<attribute> are the labels specified in the
+dictionary.
+
+=head1 LICENSE AND WARRANTY
+
+This code and all accompanying software comes with NO WARRANTY. You
+use it at your own risk.
+
+This code and all accompanying software can be used freely under the
+terms of the GNU General Public License version 2.
+
+=head1 AUTHOR
+
+Luis E. Muñoz E<lt>luismunoz@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+perl(1), Getopt::Long(3), Net::Radius::Packet(3),
+Net::Radius::Dictionary(3), Text::Template(3).
+
+=cut

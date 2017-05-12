@@ -1,0 +1,60 @@
+NAME
+    Number::Continuation - Create number continuations
+
+SYNOPSIS
+     use Number::Continuation qw(continuation);
+
+     $set = '1 2 3 6 7 10 11 12 14';
+     @set = (1,2,3,6,7,10,11,12,14);
+
+     $contin = continuation($set);
+     @contin = continuation($set);
+
+     $contin = continuation(@set);
+     @contin = continuation(@set);
+
+     $contin = continuation(\@set);
+     @contin = continuation(\@set);
+
+     $contin = continuation($set, { delimiter => '[]', range => '~', separator => ';' });
+     ...
+
+     __OUTPUT__
+
+     scalar context ($contin): '1-3, 6-7, 10-12, 14';
+     list   context (@contin): [1,2,3], [6,7], [10,11,12], [14];
+
+DESCRIPTION
+  continuation
+     continuation($set | @set | \@set [, { options } ])
+
+    Returns in scalar context a stringified representation of a number
+    continuation. In list context a two-dimensional array is returned where
+    each entry represents a list of numbers that belong to a single
+    continuation or which does not belong to a continuation at all.
+
+    Continuation ranges may be negative.
+
+    It takes optionally a hash reference as last argument containing the
+    parameters `delimiter', `range' and `separator'. `delimiter' may contain
+    two characters, where first one is prepended to the beginning of a
+    continuation and the second one appended to the end; `range' may consist
+    of one or two characters which are being inserted between the beginning
+    and end of a continuation; `separator' may be set to a single character
+    which ends a continuation.
+
+    `delimiter', `range' and `separator' aren't mandatory parameters. If
+    options aren't defined, a reasonable default will be assumed.
+
+EXPORT
+    `continuation()' is exportable.
+
+AUTHOR
+    Steven Schubiger <schubiger@cpan.org>
+
+LICENSE
+    This program is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://dev.perl.org/licenses/
+

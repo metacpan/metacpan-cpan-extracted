@@ -1,0 +1,71 @@
+<h2><a href="#">&#123;: $ variable :&#125;</a></h2>
+<h3>Descripción</h3> 
+<p> 
+El bloque se sustituye por el valor de &quot;<i>variable</i>&quot; que previamente
+ ha debido ser definida en nuestro script Perl, de no estarlo el bloque se
+ sustituye por una cadena vacía.<br>
+</p>
+
+<h3>Seguridad</h3> 
+<p> 
+ Ver: <a href="./?item=Seguridad">Inyección de código y Cross-site scripting</a>.
+</p>
+
+<h3>Inclusión y anidamiento</h3> 
+No se permite la inclusión ni el anidamiento:
+<pre> 
+&#123;: $ var &#123;: * env_var2 :&#125; :&#125; <- ERROR
+&#123;: $ var &#123;: $ var :&#125; :&#125;    <- ERROR
+
+</pre>
+Salvo comentarios
+<pre>
+    
+&#123;: $ var &#123;: # Los comentarios siempre se pueden incluir :&#125; :&#125;    <- Ok
+
+</pre>
+Pero por claridad se recomienda esta forma:
+<pre>
+    
+&#123;: $ var :&#125; &#123;: # comentario :&#125;
+
+</pre>
+</p>
+
+<h3>Ejemplo</h3>
+<p>
+<strong>archivo.nhtml:</strong>
+<pre>
+&#123;: NES 1.0 ('archivo.pl') :&#125;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Nes sample/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;b&gt;&#123;: $ var_name :&#125;&lt;/b&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+
+</pre>
+
+<strong>archivo.pl:</strong>
+<pre>
+    
+use Nes;
+
+my $nes = Nes::Singleton->new('archivo.nhtml');
+my $nes_tags = {};
+
+$nes_tags->{'var_name'} = 'Hello!';
+
+$nes->out(%$nes_tags);
+
+</pre>
+
+<strong>Salida:</strong>
+<pre>   
+Hello!
+</pre>
+
+</p>
+<br>

@@ -1,0 +1,67 @@
+Net::Packet is now part of the following systems/distributions:
+
+   - NetBSD pkgsrc
+   - FreeBSD ports collection
+   - DragonFly ports collection
+   - Mandrake/Mandriva RPMs
+   - OpenPKG system
+
+Net::Packet
+===========
+
+This module is a unified framework to craft, send and receive packets at 
+layers 2, 3, 4 and 7.
+
+Basically, you forge each layer of a frame (Net::Packet::IPv4 for layer 3, 
+Net::Packet::TCP for layer 4 ; for example), and pack all of this into a 
+Net::Packet::Frame object. Then, you can send the frame to the network, 
+and receive it easily, since the response is automatically searched for 
+and matched against the request.
+
+*** This framework is obsolete. Use Net::Frame::* now.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Perl v5.6.1
+   Class::Gomor
+   Net::Pcap
+   Net::Write
+   Net::Libdnet
+   Time::HiRes
+   Net::IPv4Addr
+   Net::IPv6Addr
+   Socket6
+   Bit::Vector
+   Storable
+
+GETTING HELP
+
+*** No more help will be provided. Use Net::Frame::* now.
+
+LIMITATIONS
+
+Does NOT work under big endian architecture.
+
+Performances (memory usage, object creation speed) may be quite limited 
+for now. I will work on it in the near (or not) future. So this module 
+can only handle a few thousand packets on a 512MB RAM machine. Since 
+Net::Packet 3.00, performances are better, with some memory optimizations.
+
+COPYRIGHT AND LICENSE
+
+You may distribute this module under the terms of the Artistic license.
+See LICENSE.Artistic file in the source distribution archive.
+
+Copyright (c) 2004-2015, Patrice <GomoR> Auffret
+

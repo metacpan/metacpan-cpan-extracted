@@ -1,0 +1,13 @@
+Revision history for Perl extension Nephia-Plugin-FormValidator-Lite
+
+0.03 2013-09-30T14:34:48Z
+    - !!NOT COMPATIBLE VOSON JUMP!! support to Nephia-0.80 or latter
+
+0.02 2013-07-13T02:12:35Z
+
+    - support for Nephia-0.31 higher
+
+0.01 2013-07-02T15:07:43Z
+
+    - original version
+

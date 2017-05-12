@@ -1,0 +1,24 @@
+Build.PL
+Changes
+lib/Net/OpenAMD.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+script/test_server.pl
+script/update_json.pl
+t/00.load.t
+t/data/interests
+t/data/location
+t/data/speakers
+t/data/stats
+t/data/talks
+t/data/users
+t/local_server.t
+t/main.t
+t/network_tests.t
+t/perlcritic.t
+t/perlcriticrc
+t/pod-coverage.t
+t/pod.t

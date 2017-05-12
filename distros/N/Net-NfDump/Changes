@@ -1,0 +1,313 @@
+Revision history for C and Perl extension of nfdump.
+
+1.25 2016-12-04
+	- libnf and modules moved to separate repositories (libnf, libnf-ffilter, libnf-perl)
+	  command git submodule update --remote --merge must be used to update to latest 
+	  submodule reference
+	-c: some leaks in memheap removed
+	-c: versioning of libnf.so added (issue #5, thanks to Tomas Cejka)
+	-c: added new API function lnf_mem_clean(lnf_mem_t *lnf_mem)
+	-c: added exmaple lnf_ex11_memclean.c
+	-c: new finction lnf_rec_get_raw/lnf_rec_set_raw
+	-c: new example examples/lnf_ex12_rec_raw.c 
+	-c: new function lnf_filter_ffilter_ptr
+	-c: fix of RPM build (issue #5, thanks to Tomas Cejka)
+	-perl: added new test 53-libnf-filter.t
+	-nfdumpp: handles properly error messages for libnf filter
+	-nfdumpp: ability ro read binnary format from stdin (nfdumpp -r -)
+
+1.24 2016-06-21
+	-perl: better thread testing (with more detailed results)
+
+1.23 2016-06-20
+	-c: fixed build on FreeBSD
+
+1.22 2016-06-18
+	-c: adjusted to nfdump-1.6.15
+
+1.21 2016-05-28
+	-nffdump: invalid mutex initialisation 
+
+1.20 2016-05-09
+	-removed several warnings 
+	-c: new field LNF_FLD_INET_FAMILY containing either AF_INET or AF_INET6
+	-perl: new field inetfamily 
+	-perl: new function family2txt and txt2family 
+	-nfdumpp: removed bug where nfdumpp produces corupted output file 
+	-nfdumpp: added -n option to limit aggregated outputs 
+
+1.19 2016-02-03
+	-perl: removed dependency on lbz 
+
+1.18 2016-01-29
+	-perl: new variables $flow->{NUM_OF_FIELDS} and $flow->{NAME} can be accesed 
+	       Zangerl, Report #110170)
+	-c: adjusted to nfdump-1.6.14
+	-c: two new lnf_open flags LNF_COMP_LZO and LNF_COMP_BZ2
+	-c: two new info options LNF_INFO_LZO_COMPRESSED and LNF_INFO_BZ2_COMPRESSED
+	-c: new ./configure option to build with static or dynam BZ2 support
+	-c: separation of new filter code. The new filter can also be used in 
+		other projects (include/ffliter.h and src/ffiltler,
+		thank to Lukas Hutak for cooperation). 
+	-c: removed memory leak in lnf_lookup_map and lnf_close (tnaks for Lukas
+	    Hutak)
+	-c: fixed size of some fields (patch submitted by Lukas Hutak)
+	-c: API change - tha value of LNF_AGGR_KEY is 0x0008
+	-c: API change - new LNF_AGGR_AUTO for autodetection of aggregation mode
+	-nfdumpp: new -w and -o options 
+	-nfdumpp: new modular output system 
+	-nfdumpp: invalid dispaly of duration field 
+	-nfdumpp: multiple outputs when multiple -A switch is used 
+	          Examples: 
+	           nfdumpp -R DIR -A proto -O bytes -A srcvlan -O bps
+	           nfdumpp -R DIR -A ip -O pkts -A port -O bytes -A proto 
+	           nfdumpp -R DIR -A ip/16 -O bytes -A ip/24 
+	
+1.17 2015-10-27
+	-perl: added test t/09-instances.t
+	-perl: test for calculated items in test t/08-aggreg-sort.t
+	-perl: new option CompatMode
+	-c: time fields can be user as aggregation key with alligned time
+	-c: new lnf_mem option LNF_OPT_COMP_STATSCMP 
+	-c: sort support for calculated fields
+	-c: removed bug when thread key was nor released after lnf_mem release
+	-c: LNF_CALC_*PS items returns LNF_ERR_NAN when division by 0 is detected 
+	-c: new flag LNF_APPEND in lnf_open for open file in append mode (not supported by nfdump format)
+	-c: LNF_FLD_INFO_SIZE can be returned by lnf_fld_info
+	-c: added LNF_<type>_T with basic types definitions used by libnf 
+	-c: removed bug when memheap crashes after mixing pair and non pair 
+	    fields (Thanks to Jan Wrona)
+	-c: new fields LNF_FLD_INGRESS_ACL and LNF_FLD_EGRESS_ACL representing 
+	    all fields *_ACL_ID, *_ACE_ID, *_XACE_ID in one structure lnf_acl_t
+	-nfdumpp: redesigned command options 
+
+1.16 2015-09-07
+	-c: added license and copyright information 
+	-c: added field event (thanks to Artem Buglak)
+	-perl: module allows to sort records without aggregation (list mode)
+	-c: bug when sorting same values (Thanks to Jan Wrona) 
+	-c: libnf-info is compiled statically now (Thanks to Lukas Hutak)
+
+1.15 2015-07-26
+	- c: new function lnf_mem_setopt for configuring some lnf_mem options 
+	- c: lnf_mem_t can be switched into list mode via 
+	     lnf_mem_setopt(LNF_OPT_LISTMODE, ...); In this mode there is no 
+		 aggregation of items; mode can be used for sorting records 
+	- c: improved merge_threads (removed deadlock)
+	- c: new function lnf_mem_lookup_c and lnf_mem_lookup_raw_c
+	- c: new example examples/lnf_ex09_memlookup.c 
+	- c: new example examples/lnf_ex10_listmode.c
+	- c: new option -l in examples/lnf_ex04_threads.c
+	- nfdumpp: sorting without aggregation 
+	- c: removed binary and .o objects from original nfdump 
+	     sources in distribution package (Bug #105944)
+
+1.14 2015-07-18
+	- c: new way to work with data in lnf_mem, new functions 
+	  lnf_mem_first_c, lnf_mem_next_c, lnf_mem_read_c,
+	  lnf_mem_read_raw_c
+	- c: functions lnf_mem_read, lnf_mem_read_raw,
+	  lnf_mem_read_reset marked as deprecated
+	- c: examples redesigned to use new lnf_mem functions 
+	- c: libnf.h was not installed by default (thanks to Tomas Cejka)
+	- c: removed memory release bug in merge_threads
+	- perl: added new test 52-libnf-examples.t to test examples 
+	- perl: t/08-aggreg-sort.t was missing in distribution package 
+	- perl: Socket6 module is not required starting with perl 5.14.0 
+	  http://search.cpan.org/~jesse/perl-5.14.0/pod/perldelta.pod#Improved_IPv6_support
+	- perl: buggy implementation of inet_pton in Ubuntu 
+
+1.13 2015-07-08
+	- perl: module requires use of threads 
+	- perl: tests that depends on threads are executed only on 
+	  systems where thread support is enabled
+
+1.12 2015-07-05
+	- c: removed __thread directive from source codes 
+	- c: redesign of thread patch support nfdump-thread.patch and
+	  nfdump-leak.patch patch merged into one file
+
+1.11 2015-07-04
+	- nfdumpp: added basic comparison test for threads
+	- perl: removed some issues with thread support in perl 
+
+1.10 2015-06-30
+	- Project entered into close cooperation with 
+	  CESNET - Czech National Research Network
+	- c: thread support enabled by default (--enable-threads)
+	- c: aggregation unit supports statistics 
+	- c: new pair fields LNF_FLD_PAIR_PORT|ADDR|AS|IF|VLAN
+	- c: examples/lnf_ex08_statistics added 
+	- perl: Net::NfDump->info returns proper data 
+	- perl: invalid handling of LNF_UINT16 (Bug #105472)
+	- perl: nfasnupd do not require Geo::IP module
+
+1.09 2015-05-28
+	- perl: removed memory leak (Bug #104294)
+	- perl: improved test 
+
+1.08 2015-05-27
+	- c: doc update 
+	- c: EXPERIMENTAL very early stage of new filter code independent of the 
+	     original nfdump filter code. New function lnf_filter_init_v1 or 
+	     lnf_filter_init_v2 is used to initialize either old (nfdump) or 
+	     new (libnf) filter. By default lnf_filter_init calls the old 
+	     one filter. 
+	- c: new error code LNF_ERR_OTHER_MSG for errors where lnf_error buffer is set 
+	- c: _LIBNF_H macro added in the libnf.h file 
+	- c: new function lnf_mem_read_reset - set cursor to first record 
+	- c: nfdumpp uses by default only 70% of available threads 
+	- c: nfdumpp checks -O option 
+	- c: removed bug - libnf fails after attempt to read empty lnf_mem 
+	- c: removed memory leak in original nfdump in LZO 
+	- c: initial number of buckets in hash table increased to 500000
+	- c: new functions lnf_mem_read_raw, lnf_mem_write_raw added
+	- c: examples/lnf_ex06_readreset added
+	- c: examples/lnf_ex05_memtrans added
+	- c: examples/lnf_ex04_threads option -n added 
+	- c: bug in bpd and pps calculation 
+	- perl: removed memory leak in perl API (Bug #104294)
+	- perl: nfasnupd accepts -c <file> with additional prefix database 
+
+1.07 2015-03-17
+	- c: nfdumpp utility added
+	- c: added calculated items - duration, bps, pps, bpp
+	- c: lnf_fld_info added 
+	- c: lnf_fld_parse added 
+	- c: lnf_mem_fastaggr added
+	- c: lnf_info extended
+	- c: performance update (15-20%)
+	- c: thread support for filter operations (not released to public)
+	- perl: static library removed from build tree (Bug #101544) 
+	- perl: nf_asn_geo_update and download_asn_db removed
+	- perl: bin/nfasnupd - ASn updater added (replacement for nf_asn_geo_update)
+	- perl: doc update 
+
+1.06 2014-12-06
+	- c: lnf_rec_fget lnf_rec_fset performance update (15%)
+	- c: added src/fields.c,h - code related to fields is now separated 
+	- perl: build system update 
+
+1.05 2014-12-05
+	- c: build system update 
+	- c: added --enable-threads for thread support; disabled by default
+	- c: flex, bison is not needed for building 
+	- c: adjusted to nfdump 1.6.13
+
+1.04 2014-11-17
+	- perl: added example examples/example2.pl 
+	- perl: added test 08-aggreg-sort.t 
+	- perl: aggregation and sorting added into 
+	  Net::NfDump (Aggreg => 1 and SortBy => <field> attributes)
+	- c: lnf_field_t structure extended with default sort and 
+	  aggregation order 
+	- c: added example lnf_ex04_threads.c 
+	- c: threads support added for parallel processing flow 
+	  records in aggregation. Code not released for public,
+	  the public version works properly only in single 
+	  thread environment.
+	- c: added example lnf_ex03_aggreg.c 
+	- c: added lnf_mem object with aggregation and sorting capability 
+	- c: lnf_rec_fget, lnf_rec_fset increased performance (30%) 
+	  Thanks to Vasek Bartos.
+
+1.03 2014-06-23
+	- c: headers includes in the examples
+	- c: code preparation for aggregation and sorting
+	- perl: test for pure read without record processing (-G)
+
+1.02 2014-06-18
+	- c: added structure lnf_brec1_t containing most commonly used records 
+	- c: examples updated to use lnf_brec1_t
+	- c: examples updated to be usable for benchmarks 
+	- perl: updated build system (more resistant)
+	- perl: benchmarks of c code added as the part of perl testing 
+
+1.01 2014-06-15
+	- source code strictly separated into autonomous 
+	  package (libnf-xxx, universal C API) and perl 
+	  Net::NfDump module that is placed on top of the C API
+	- redesigned build system 
+	- prepared for new features (aggregation, sorting, ...) 
+	- changes inspired by Vasek Bartos and his libnfdump code 
+
+0.14 2014-04-24
+	- examples updated to use last version of Net::IP::LPM
+
+0.13 2014-04-20
+	- adjusted to nfdump 1.6.12
+	- support for new record type introduced by nfdump 1.6.12
+	- transparently reads record types from previous nfdump 
+	- created files are always with the new record type 
+	- !! files created by this version mus be read by nfdump >= 1.6.12
+	- support for new fields (ingress_vrfid, egress_vrfid, event_flag
+	  block_start, block_end, block_step, block_size)
+	- flow_start item changed to event_time 
+	- fw_event removed (use fw_xevent instead) 
+	- doc extended with info about aggregation 
+
+0.11 2013-11-26
+	- adjusted to nfdump 1.6.11
+
+0.10 2013-09-12
+	- decreased test length 
+
+0.09 2013-08-13
+	- adjusted to nfdump 1.6.10p1
+
+0.08 2013-06-06
+	- removed bug in TimeWindowStart, thanks to Pavel Sejnoha
+
+0.07 2013-05-21
+	- removed bug in examples, thanks to James Deaton 
+	- updated to nfdump 1.6.10
+
+0.05 2013-05-03
+	- language corrections
+
+0.05 2013-03-16
+	- silently skip known (but not supported) blocks 
+	- example added (update AS info)
+
+0.04 2013-03-03
+	- the first stable version 
+
+0.03_02 2013-03-03
+	- the version of nfdump updated to 1.6.9
+
+0.03_01 2013-02-28
+	- NEL, NSEL support added 
+	- a few bugs removed
+
+0.02_05 2013-02-26
+	- example1.pl added 
+	- documentation updated 
+
+0.02_04 2013-02-24
+	- a few bugs removed 
+	- clonerow added 
+	- InputFiles and Fields can by handled as a reference to list or comma separated list 
+
+0.02_01 2013-02-11
+	- hasharray functions added
+	- performance optimization (4x faster) 
+
+0.01_06 2013-01-20
+	- nfdump source codes added into distribution 
+	- fixes for libnf on OpenBSD apllied
+
+0.01_04 2013-01-15
+	- extra compilation of nfdump utility 
+
+0.01_04 2013-01-14
+	- removed dependency on lex/flex during compilation 
+
+0.01_03  2013-01-12
+	- fixes for multiplaform compilation 
+
+0.01_02  2013-01-10 
+	- documentation update 
+
+0.01_01  2012-11-30 
+	- initial version 
+

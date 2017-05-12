@@ -1,0 +1,202 @@
+#!/usr/bin/perl -w
+
+# Run like this: perl -I ../lib ./uddihd -q approximateMatch -q caseInsensitiveMatch http://uddi.csiss.gmu.edu:6060/soar/uddi/inquire %cl%
+# Or:            perl -I ../lib ./uddihd -o uddi-version=2 http://registry.gbif.net/uddi/inquiry %geo%
+# Or:            perl -I ../lib ./uddihd -o http-version=1.0 -o uddi-version=2 http://uddi.microsoft.com/inquire microsoft
+#	(We have to force the use of HTTP 1.00 when talking to the
+#	Microsoft server, otherwise a bug in Net::HTTP::Methods.pm
+#	will prevent LWP from handling Microsoft's chunked response
+#	correctly.  Not Microsoft's fault this time, so far as I can
+#	tell.  We also need to force UDDI v2, since otherwise we can't
+#	understand the v2 faults we get back from our v3 requests,
+#	which I think _is_ Microsoft's fault.)
+# All three of these return <businessInfo>s with <name>; the first and
+# second also include <description>s and the second and third include
+# <serviceInfo>s, so that only the GBIF registry includes all three
+# fields in its responses.
+
+use strict;
+use warnings;
+use UDDI::HalfDecent;
+use Data::Dumper; $Data::Dumper::Indent = 1;
+
+my $probe_services = 0;
+my $probe_bindings = 0;
+my $tmodels = 0;
+my %options;
+my @qualifiers;
+while (@ARGV) {
+    if ($ARGV[0] eq "-s") {
+	shift @ARGV;
+	$probe_services = 1;
+    } elsif ($ARGV[0] eq "-b") {
+	shift @ARGV;
+	$probe_bindings = $probe_services = 1;
+    } elsif ($ARGV[0] eq "-t") {
+	shift @ARGV;
+	$tmodels = 1;
+    } elsif (@ARGV > 1 && $ARGV[0] eq "-o") {
+	shift @ARGV;
+	my $kv = shift @ARGV;
+	my($key, $value) = split /=/, $kv;
+	$options{$key} = $value;
+    } elsif (@ARGV > 1 && $ARGV[0] eq "-q") {
+	shift @ARGV;
+	push @qualifiers, shift @ARGV;
+    } else {
+	last;
+    }
+}
+
+if (@ARGV != 2) {
+    print STDERR <<__EOT__;
+Usage: $0 [options] <endpoint-url> <query>
+	-s			Probe services related to businesses
+	-b			Probe bindings related to services (implies -s)
+	-t			Search for tModels instead of businesses
+	-o <key>=<value>	Set option in UDDI object
+	-q <qualifier>		Include qualifier in initial search
+__EOT__
+    exit 1;
+}
+
+my($endpoint, $query) = @ARGV;
+my $uddi = new UDDI::HalfDecent($endpoint);
+foreach my $key (keys %options) {
+    $uddi->option($key, $options{$key});
+}
+
+my @args = (name => $query);
+unshift @args, qualifiers => \@qualifiers if @qualifiers;
+my $rs = $tmodels ? $uddi->find_tModel(@args) :
+                    $uddi->find_business(@args);
+
+my $n = $rs->count();
+warn "found $n ", ($tmodels ? "tModels" : "businesses") , "\n";
+foreach my $i (0 .. $n-1) {
+    my $business = $rs->record($i);
+    my $bk = $business->xpath($tmodels ? '@tModelKey' : '@businessKey');
+    print $i+1, ": ", $business->xpath('name'), " -- $bk\n";
+    my $description = $business->xpath('description');
+    print "$description\n" if $description;
+
+    if ($probe_services) {
+	my $rs2 = $uddi->find_service(businessKey => $bk, name => '%');
+	my $n2 = $rs2->count();
+	print "\tfound $n2 services\n";
+	foreach my $j (0.. $n2-1) {
+	    my $service = $rs2->record($j);
+	    my $sk = $service->xpath('@serviceKey');
+	    print("\t", $j+1, ": ", $service->xpath('name'), " -- $sk\n");
+
+	    if ($probe_bindings) {
+		# Microsoft requires both qualifiers and tModelBag
+		# GBIF requires tModelBag but not qualifiers
+		# GEOSS can't find any services, so this is moot
+		my $rs3 = $uddi->find_binding(serviceKey => $sk,
+					      qualifiers => [],
+					      tModelBag => [ "" ]);
+		my $n3 = $rs3->count();
+		print "\t\tfound $n3 bindings\n";
+		foreach my $k (0.. $n3-1) {
+		    my $binding = $rs3->record($k);
+		    print("\t\t", $k+1, ": ", $binding->xpath('name'), " -- ", 
+			  $binding->xpath('@bindingKey'), "\n");
+		}
+	    }
+	}
+    }
+}
+
+=head1 NAME
+
+uddihd - simple test-harness for the UDDI::HalfDecent library
+
+=head1 SYNOPSIS
+
+C<uddihd>
+[
+C<-s>
+]
+[
+C<-b>
+]
+[
+C<-t>
+]
+[
+C<-o>
+I<key>C<=>I<value>
+...
+]
+[
+C<-q>
+I<qualifier>
+...
+]
+I<endpoint-url>
+I<query-string>
+
+=head1 DESCRIPTION
+
+C<uddihd> exercises the C<UDDI:HalfDecent> library by running a
+C<find_business> search against a specified UDDI endpoint and emitting
+the names and descriptions of the resulting records.  The URL of the
+endpoint and the query string must both be specified on the
+command-line.
+
+The library's running is influenced by the environment variables
+described in its documentation.  For example, setting
+C<UDDI_LOG=request,response> will cause both request and response XML
+documents to be dumped to standard error.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -s
+
+Search for, and display, services that pertain to the businesses found
+by the initial query.
+
+=item -b
+
+Search for, and display, bindings of the services that pertain to the
+businesses found by the initial query.  Implies C<-s>.
+
+=item -t
+
+Find tModels rather than businesses in the initial search.  This is a
+bit of a hack, and tends to make C<-s> and C<-b> rather meaningless.
+
+=item -o key=value
+
+Sets the option I<key> to the specified I<value> in the UDDI object
+before submitting the C<find_business> request.  Options are described
+in the library documentation.  For example, using C<-o uddi-version=2>
+forces the use of UDDI version 2.
+
+=item -q qualifier
+
+Adds the specified <qualifier> to the search - for example,
+C<approximateMatch>, C<caseInsensitiveMatch>.  Different servers
+support different qualifiers.
+
+=back
+
+=head1 SEE ALSO
+
+The C<UDDI::HalfDecent> module, which this program exercises.
+
+The C<Net::Z3950::UDDI> package which contains that module and this
+program, since C<UDDI::HalfDecent> was created for use by the
+Z39.50-to-UDDI gateway.
+
+C<z2uudi>, the Z39.50-to-UDDI program, which makes much better use of
+the UDDI library than this program does.
+
+=head1 AUTHOR, COPYRIGHT AND LICENSE
+
+As for C<Net::Z3950::UDDI>.
+
+=cut

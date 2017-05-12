@@ -1,0 +1,38 @@
+Dette er en samling av perlmoduler som prøver å gjøre det lettere å være
+perlprogrammerer i Norge.  Jeg har her prøvd å samle likt og ulikt av slikt
+som er spesielt for norske forhold.  Følgende moduler er med:
+
+No::Dato
+  Formattering av datoer i henhold til norsk standard (på norsk).
+  Norske ukedager og månedsnavn.  Norske helligdager.
+
+No::KontoNr
+  Validere bank- og postbankkontonummer samt kredittkortnummer.
+  Modulus 10 og modulus 11 algiritme for å lage KID.
+  Formattering av kronebeløp.
+
+No::PersonNr
+  Validere personnummer og ekstrahere diverse info fra nummeret.
+
+No::Sort
+  Norsk sortering av Latin1 tekst.  Også latin1 "up/down casing".
+
+Du må ha perl versjon 5.002 eller bedre for å bruke disse modulene.
+Installasjonen foregår ved å kjøre følgende kommandoer etter at du har
+pakket ut distribusjonen (noe som du selvfølgelig allerede har gjort
+siden du leser dette):
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Spørsmål eller forslag til ny funksjonalitet og forbedringer kan rettes til
+USENET News gruppen "no.it.programmering.perl" eller direkte til
+forfatteren.
+
+© 1997-1999,2003 Gisle Aas <gisle@aas.no>
+
+Denne samlingen av perl moduler er å regne som fritt tilgjengelig
+programvare.  Du kan redistribuere eller modifisere den etter samme
+betingelser som de som gjelder for Perl distribusjonen.

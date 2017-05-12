@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a1b546c922a54a080a069d233b86dc30e5aeec3a Build.PL
+SHA1 7c92cd848dad1d9a183af5eb447487189382e59e Changes
+SHA1 db6132facac62a3a2dcc70d64533ba437679c966 LICENSE
+SHA1 62db3dd7115f07d7b69b90e0d91ec4dcb344288f MANIFEST
+SHA1 c135e99d6c3e897da286461d7f33ebaeba63ffb6 META.json
+SHA1 94387136ce738102f460b7e0e357979a2eab46b7 META.yml
+SHA1 83a8d49574fa37f2231839d47e28a5966fb17dbf Makefile.PL
+SHA1 7826704243709e5875ab8cb595bb29efe043d04a README
+SHA1 52e9f5d8fe95af4457d66fb8f668900d56bff248 lib/Net/IDN/IDNA2003.pm
+SHA1 976b64ad583eb1f6fbc51eeabf1c934ea596b941 t/00use.t
+SHA1 4bf2ce7aa9320362cccabd1e8a1b623192584890 t/10pod.t
+SHA1 6769166f2f7888b7c7982de6f9a6416e6fe1d3a5 t/11pod_cover.t
+SHA1 292f8211b867e9b26d5711fe0d9c5ccfb047ed73 t/encode_bytes.t
+SHA1 1b06adfba78a615763915e08a14b0f6b589b9fa4 t/encode_utf8.t
+SHA1 118a7b6087a4f5d1fa2d8894c7f131026c50e1dc t/to_ascii.t
+SHA1 e552b212dbed2dc0d2985e4fdd23c33d3e1a070a t/to_unicode.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (Darwin)
+
+iEYEARECAAYFAk795jEACgkQSKUOY2OWgPBw1ACbBeI8iG1cZXbAMkRadVv8cgVZ
+5ecAmwZvt5lgzXiBoNnz7J1KwZJDv9kK
+=qlrU
+-----END PGP SIGNATURE-----

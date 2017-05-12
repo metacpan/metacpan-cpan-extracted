@@ -1,0 +1,10 @@
+Revision history for Net-SMS-TxtLocal
+
+0.01  Sat Jun 12 14:08:51 2010
+       Initial functional release.
+
+0.02  Sat 26 Jun 2010 09:48:14 BST
+       Updated JSON dep so that 'decode_json' method is available.
+
+0.03  Wed 20 Apr 2011
+        Changes to reflect changed TxtLocal API (thanks Richard Huxton)

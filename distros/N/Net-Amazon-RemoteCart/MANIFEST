@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Net/Amazon/RemoteCart.pm
+t/1.t
+t/canned/add.xml
+t/canned/add_error.xml
+t/canned/clear.xml
+t/canned/modify.xml
+t/canned/remove.xml

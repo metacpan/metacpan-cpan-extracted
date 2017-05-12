@@ -1,0 +1,28 @@
+NCBIx-eUtils-GeneAliases version 0.9.0
+
+Retrieves the "Official Symbol" and "Other Alias" names for a gene using the NCBI eUtils web service.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+ Class::Std;
+ Class::Std::Utils;
+ LWP::Simple;
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2010, Roger A Hall
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

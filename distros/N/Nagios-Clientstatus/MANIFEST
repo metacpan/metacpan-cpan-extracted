@@ -1,0 +1,10 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Nagios/Clientstatus.pm
+t/001_load.t
+t/010_new.t
+t/020_optional.t

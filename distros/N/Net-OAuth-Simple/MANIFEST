@@ -1,0 +1,16 @@
+Changes
+examples/fireeagle.cgi
+examples/twitter
+examples/twitter_xauth
+lib/Net/OAuth/Simple.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/boilerplate.t
+t/browser.t
+t/pod-coverage.t
+t/pod.t
+META.json

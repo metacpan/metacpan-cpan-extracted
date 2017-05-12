@@ -1,0 +1,11 @@
+MYMETA.json
+MYMETA.yml
+pm_to_blib
+blib
+Makefile$
+\.*tar.gz$
+\.tmp$
+\.old$
+\.bak$
+\.git.+
+test.pl

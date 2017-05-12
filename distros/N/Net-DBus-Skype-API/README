@@ -1,0 +1,26 @@
+This is Perl module Net::DBus::Skype::API.
+
+INSTALLATION
+
+Net::DBus::Skype::API installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpanm Net::DBus::Skype::API
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Net::DBus::Skype::API documentation is available as in POD. So you can do:
+
+    % perldoc Net::DBus::Skype::API
+
+to read the documentation online with your favorite pager.
+This is Perl module Net::DBus::Skype::API.

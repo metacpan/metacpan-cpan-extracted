@@ -1,0 +1,38 @@
+---
+abstract: 'A dropbox API interface'
+author:
+  - 'Lenz Gschwendtner, C<< <norbu09 at cpan.org> >>'
+  - 'Lenz Gschwendtner <norbu09@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Dropbox-API
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Data::Random: 0
+  Encode: 0
+  File::Basename: 0
+  HTTP::Request::Common: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Mouse: 0
+  Net::OAuth: 0
+  URI: 0
+  common::sense: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/norbu09/Net--Dropbox
+version: 1.9

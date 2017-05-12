@@ -1,0 +1,26 @@
+username=joebloggs					# Username at http://BulkSMS.2way.co.za
+password=S3kR3t						# Password for above
+verbose=1							# Log verbose messages. Default: 0
+logfile=/var/log/sms.log			# Where to write the log to. Default: no logging
+http_proxy=http://10.0.0.1:8080		# Use an HTTP proxy. Default: none
+sa_numbers_only=0					# South African numbers only. Default: 0
+country=ZA							# Can be one of ZA, UK, ES, DE, US, INT. Default: ZA
+
+# Config options below are specific to the BulkSMS API.
+# For the meaning of the options below see http://bulksms.2way.co.za/docs/eapi/submission/send_sms/
+#sender
+#msg_class 
+#dca 
+#want_report 
+#routing_group 
+#source_id 
+#repliable 
+#strip_dup_recipients 
+#stop_dup_id 
+#send_time 
+#send_time_unixtime 
+#scheduling_description 
+#test_always_succeed 
+#test_always_fail 
+#allow_concat_text_sms 
+#concat_text_sms_max_parts

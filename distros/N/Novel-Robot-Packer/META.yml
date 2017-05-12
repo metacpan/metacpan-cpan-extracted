@@ -1,0 +1,25 @@
+---
+abstract: 'pack novel/bbs content to html / txt / web , etc'
+author:
+  - 'abbypan <abbypan@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Novel-Robot-Packer
+requires:
+  Data::MessagePack: '0'
+  Encode::Locale: '0'
+  File::Slurp: '0'
+  HTML::FormatText: '0'
+  HTML::TreeBuilder: '0'
+  Template: '0'
+resources:
+  repository: https://github.com/abbypan/Novel-Robot-Packer.git
+version: '0.20'
+x_serialization_backend: 'YAML::Tiny version 1.69'

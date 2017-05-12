@@ -1,0 +1,35 @@
+---
+abstract: 'Perl wrapper for talking with Bullfinch'
+author:
+  - 'Cory G Watson <gphat@cpan.org>'
+  - 'Stevan Little <stevan.little@iinteractive.com>'
+  - 'Jay Hannah <jay.hannah@iinteractive.com>'
+  - 'Trey Bianchini <trey.bianchini@iinteractive.com>'
+  - 'Jesse Luehrs <doy@tozt.net>'
+  - 'Florian Ragwitz <rafl@debian.org>'
+build_requires:
+  Test::Exception: 0
+  Test::Fatal: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Bullfinch
+requires:
+  Data::Stream::Bulk: 0
+  Data::Stream::Bulk::DoneFlag: 0
+  Data::UUID: 0
+  JSON::XS: 0
+  Memcached::Client: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::Params::Validate: 0
+  MooseX::Types::DateTime: 0
+version: 0.16

@@ -1,0 +1,156 @@
+#!/usr/bin/perl -w
+# $Id: pssh,v 1.16 2001/04/28 05:28:40 btrott Exp $
+
+use strict;
+
+use Net::SSH::Perl;
+use Getopt::Long;
+
+my %opts;
+Getopt::Long::Configure('no_ignore_case');
+GetOptions(\%opts, "c=s", "l=s", "p=i", "i=s@", "v", "t", "C", "o=s@", "V", "2", "1");
+
+if ($opts{V}) {
+    print Net::SSH::Perl->version_string, "\n";
+    exit;
+}
+
+my($host, $cmd) = @ARGV;
+
+die "usage: pssh [options] hostname [command]"
+    unless $host;
+
+my %cipher_map = (
+    idea => 'IDEA',
+    des  => 'DES',
+    '3des' => 'DES3',
+    blowfish => 'Blowfish',
+);
+
+my %args;
+$args{compression} = 1 if $opts{C};
+$args{cipher} = $cipher_map{ $opts{c} } || $opts{c} if $opts{c};
+$args{port} = $opts{p} if $opts{p};
+$args{debug} = 1 if $opts{v};
+$args{identity_files} = $opts{i} if $opts{i};
+$args{use_pty} = 1 if $opts{t};
+$args{options} = $opts{o} if $opts{o};
+$args{protocol} = 2 if $opts{2};
+$args{protocol} = 1 if $opts{1};
+
+my $ssh = Net::SSH::Perl->new($host, %args);
+$ssh->config->set('interactive', 1)
+    unless defined $ssh->config->get('interactive');
+$ssh->login($opts{l});
+
+if ($cmd) {
+    my($out, $err, $exit) = $ssh->cmd($cmd);
+    print $out if $out;
+    print $err if $err;
+}
+else {
+    eval "use Term::ReadKey;";
+    ReadMode('raw');
+    eval "END { ReadMode('restore') };";
+    $ssh->shell;
+    print "Connection to $host closed.\n";
+}
+
+__END__
+
+=head1 NAME
+
+pssh - Perl secure shell client
+
+=head1 SYNOPSIS
+
+pssh I<hostname> [I<command>]
+
+pssh [B<-c> I<idea>|I<blowfish>|I<des>|I<3des>]|I<arcfour> [B<-i>
+I<identity_file>] [B<-l> I<login_name>] [B<-V>] [B<-o> I<option>]
+[B<-p> I<port>] [B<-t>] [B<-v>] [B<-C>] [B<-1>] [B<-2>]
+I<hostname> [I<command>]
+
+=head1 DESCRIPTION
+
+I<pssh> is a Perl version of the I<ssh> command line client, based upon
+the I<Net::SSH::Perl> library. It is a program for logging into a remote
+machine and for executing commands in a remote machine.
+
+Given both I<hostname> and I<command>, executes I<command> on the host
+I<hostname> and prints out the result of that command's execution.
+
+Given only I<hostname>, opens a secure connection to I<hostname> and
+starts up a shell on the remote machine.
+
+This behavior should be pretty much identical to that of the standard
+I<ssh> command line client. Of course I<pssh> is missing some of the
+options in I<ssh>, simply because I<Net::SSH::Perl> doesn't support
+those options.
+
+Please see the I<Net::SSH::Perl> docs for more information.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -c I<idea>|I<des>|I<3des>|I<blowfish>|I<arcfour>
+
+Selects the cipher to use for session encryption. I<idea> is the default,
+unless it's not supported by the server, in which case I<3des> is
+used. I<arcfour> is only available in SSH2.
+
+=item -i I<identity_file>
+
+Specifies the file(s) from which the private key identity is to be
+read for RSA authentication. The default is F<$ENV{HOME}/.ssh/identity>
+in SSH1, and F<$ENV{HOME}/.ssh/id_dsa> in SSH2. You can use multiple
+B<-i> options; each key file will be tried until one works.
+
+=item -l I<login_name>
+
+Specifies the user to log in as on the remote machine.
+
+=item -o I<'option'>
+
+Can be used to give additional options in the config file format, eg.
+I<"BatchMode yes">.
+
+=item -p I<port>
+
+Port to connect to on the remote host.
+
+=item -t
+
+Force pseudo-tty allocation. You generally won't need to use this,
+because if you request a shell opened up by I<Net::SSH::Perl>,
+this will automatically be set.
+
+Analogous to the I<use_pty> option to I<Net::SSH::Perl>.
+
+=item -v
+
+Verbose mode, in which I<pssh> (ie. I<Net::SSH::Perl>) prints out
+debugging messages about its progress. These can be quite helpful
+in debugging connection, authentication, and configuration issues.
+
+=item -V
+
+Print only I<Net::SSH::Perl> version number and exit.
+
+=item -1
+
+Force client to use the SSH1 protocol.
+
+=item -2
+
+Force client to use the SSH2 protocol.
+
+=back
+
+=head1 AUTHOR & COPYRIGHTS
+
+Please see the Net::SSH::Perl manpage for author, copyright,
+and license information.
+
+=cut

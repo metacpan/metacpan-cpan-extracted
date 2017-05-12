@@ -1,0 +1,29 @@
+{: NES 1.0 ('none','{: * cfg_plugin_top_dir :}/debug_info.pl') :}
+{: #
+  ----------------------------------------------------------------------
+    
+  NES 1.0 by Skriptke
+  Copyright 2009 - 2010 Enrique F. Castañón
+  Licensed under the GNU GPL.
+  http://nes.sourceforge.net/
+        
+  test.nhtml
+
+  ----------------------------------------------------------------------
+:}
+<pre>
+Plugin dir...: {: * cfg_plugin_top_dir :}
+Object dir...: {: * cfg_obj_top_dir :}
+Nes dir......: {: * cfg_nes_top_dir :}
+Nes Version..: {: * nes_ver :}{: ~ (* nes_ver =~ /_/) <b>(developer version)</b> :}
+Mod Perl.....: {: * env_MOD_PERL :}
+You IP.......: {: * nes_remote_ip :}
+
+Test Object: (you must see the date and time)
+  Include date_time.html ...: <b>{: include ('{: * cfg_obj_top_dir :}/date_time.html','local','%A %e %B %Y %H:%M:%S') :}</b>
+  
+For this test is ok make sure your error.log does not contain errors!
+* This test does not work if you call the cgi file:
+    http://example.com/hello_nes/test.cgi   <- not work
+    http://example.com/hello_nes/test.nhtml <- Ok
+</pre>

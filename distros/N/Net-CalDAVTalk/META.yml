@@ -1,0 +1,33 @@
+---
+abstract: 'Module to talk CalDAV and give a JSON interface to the data'
+author:
+  - 'Bron Gondwana <brong@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-CalDAVTalk
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::ICal::TimeZone: '1.23'
+  DateTime::Format::ICal: '0.09'
+  DateTime::Format::ISO8601: '0.08'
+  DateTime::TimeZone: '0'
+  JSON: '0'
+  JSON::XS: '0'
+  MIME::Types: '0'
+  Net::DAVTalk: '0.02'
+  Text::LevenshteinXS: '0.03'
+  Text::VCardFast: '0.06'
+  perl: '5.006'
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

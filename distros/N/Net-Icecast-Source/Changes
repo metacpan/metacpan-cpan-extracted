@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::Icecast::Source.
+
+1.0  Sun Jun  7 03:21:31 2009
+	- original version; created by h2xs 1.23 with options
+		-n Net::Icecast::Source -X -P --skip-exporter --skip-ppport --skip-autoloader -v 1.0
+

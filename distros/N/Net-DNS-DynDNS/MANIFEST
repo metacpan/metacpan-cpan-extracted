@@ -1,0 +1,10 @@
+MANIFEST
+Makefile.PL
+t/test.t
+lib/Net/DNS/DynDNS.pm
+examples/dyndnsd.pl
+examples/dyndnsd.cnf
+Changes
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

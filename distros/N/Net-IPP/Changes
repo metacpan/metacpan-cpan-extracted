@@ -1,0 +1,26 @@
+Revision history for Perl IPP API:
+
+0.01 Tue Aug 17
+	- first beta version
+0.02 Wed Aug 18
+	- updated documention
+	- cleaner source and output
+0.03 Tue Aug 24
+	- updated layout
+	- prototypes for each function
+	- added statusToDetailedString function
+0.04 Thu Aug 26
+	- added monitorState.pl sample program
+	- updated README
+	- added warning if collection syntax is used in IPP response
+	- small changes in different functions 
+0.05 Fri Aug 27
+	- added monitorJobs.pl sample program
+	- findGroup functions added to IPPUtil.pm
+0.06 Mon Aug 30
+	- changed all croaks to confess (prints whole stacktrace)
+	- added exception handling example to ipptest.pl
+	- warning if no starting group is found while decoding
+	- rudimentary POD documentation
+0.1 Thu Nov 11
+	- published on CPAN

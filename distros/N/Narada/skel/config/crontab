@@ -1,0 +1,1 @@
+*/1  * * * *    exec chpst -L var/.lock.service runsvdir service/ &>/dev/null &

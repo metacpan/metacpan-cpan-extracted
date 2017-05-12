@@ -1,0 +1,21 @@
+Contrib/accept_over_socks_chain.pl
+Contrib/http_over_socks_chain.pl
+Contrib/telnet_over_socks_chain.pl
+Contrib/over_inetd.pl
+Contrib/inetd.conf
+Contrib/xinetd.conf
+Contrib/dump_swap.pl
+Contrib/scssh
+Contrib/sctelnet
+Contrib/SC.conf
+Contrib/Doc/ReadMe.html
+Contrib/Doc/SC.html
+Contrib/Doc/CHANGELOG.html
+Contrib/sc.dump
+lib/Net/SC.pm
+Makefile.PL
+MANIFEST
+README
+test.pl
+changelog
+META.yml                                 Module meta-data (added by MakeMaker)

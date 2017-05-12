@@ -1,0 +1,34 @@
+This is the README file for Net::FileShare, a utility for creating file sharing clients and servers by Gene Gallistel <gravalo@uwm.edu>.
+
+* Installation
+
+	Please view the INSTALL file contained within this distribution.
+
+* Changes 
+
+	Please view the Changes file contained within this distribution.
+
+* ToDo
+
+	Please view the TODO file contained within this distribution.
+
+* Examples
+
+	See the "examples" directory contained within the distribution. Within this directory are three example scripts, which show how to create a server, automated client and interactive client connections.
+	Also, example are listed under the EXAMPLES section in the pod
+
+* Background
+
+	The Net::FileShare mod began while developing an ICB bot. I wanted to develop a file transfer method which could be integrated into the bot. With the development of the module, the bot could then transfer files to remote systems. 
+
+	The initial code base for Net::FileShare reached version 1.5. It had a few serious flaws in design, which I wanted to correct. Thus begun a complete rewrite and this current distribution (as of 030403 - version 0.18). If you currently have an older version 1.X of Net::FileShare, its recommended that you download and install the 0.1X distribution. 
+
+* Description
+
+	The interface and usage for the users of Net::FileShare are roughly the same. The amount of variables needed for the Net::FileShare object construction have been reduced, yet scripts which utilized previous versions of Net::FileShare should still work. 
+
+	The protocol which was used in previous versions of Net::FileShare was innefficient, and has thus been scrapped. In its place is a protocol similiar to the ftp protocol for message passing. This uses numeric flags as well as descriptive messages for the server to communicate with the client. Thus, if a client requests a file, which does not exist on the server, they will receive a numeric message along with a description, such as "File Not Found". The previous protocol implimentation only responded with an acknowledge or rejection. 
+
+	The servers constructed with Net::FileShare are all forking. This was a feature which had not been implimented in previous distributions. The server will fork as many as SOMAXCONN connections.
+
+	The clients constructed with the module now have the ability to choose between an automated vs. an interactive session. The interactive session was a new feature to this distribution. 

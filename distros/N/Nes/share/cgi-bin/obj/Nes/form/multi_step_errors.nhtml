@@ -1,0 +1,59 @@
+{: NES 1.0 none :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  Nes 1.03 by Skriptke
+  Copyright 2009 - 2010 Enrique Casta\xc3\xb1\xc3\xb3n
+  Licensed under the GNU GPL.
+
+  Sample:
+  http://nes.sourceforge.net/
+
+  CPAN:
+  http://search.cpan.org/dist/Nes/
+
+  Repository:
+  http://github.com/Skriptke/nes
+  
+  DOCUMENTATION:
+  perldoc Nes::Obj::multi_step  
+
+  -----------------------------------------------------------------------------
+:}
+<center><br><blink>&#10038;</blink><b> Security ERROR </b><blink>&#10038;</blink><br></center>
+<br>{: ~ ( $ form_error_fatal == 1 )
+    <p>Referer form not accepted.<br> Please click to 
+    <a href="http://{: * env_SERVER_NAME :}{: * env_REQUEST_URI :}">try again</a>
+    </p>
+:}{: ~ ( $ form_error_fatal == 4 )
+    <p>Form fields error.<br> Please click to 
+    <a href="http://{: * env_SERVER_NAME :}{: * env_REQUEST_URI :}">try again</a>
+    </p>
+:}{: ~ ( $ form_error_fatal >= 5 )
+    <p>The form has expired.<br> Please click to 
+    <a href="http://{: * env_SERVER_NAME :}{: * env_REQUEST_URI :}">try again</a>
+    </p>
+:}{: ~ ( $ captcha_error == 1 || $ form_error_fatal == 2 || $ form_error_fatal == 3 )
+    <p>The form has expired or your browser does not accept cookies.<br> Please click to 
+    <a href="http://{: * env_SERVER_NAME :}{: * env_REQUEST_URI :}">try again</a>
+    </p>
+:}{: ~   ( $ captcha_error == 3 )
+    <p>It has reached the maximum attempts. <br>Please 
+    <a href="http://{: * env_SERVER_NAME :}{: * env_REQUEST_URI :}">try again</a> a<b> few minutes</b>.</p>
+:}{: ~   ( $ captcha_error == 4 )
+    <p>Cookie error. Please do not use the Back button to this form.<br> Please click to 
+    <a href="http://{: * env_SERVER_NAME :}{: * env_REQUEST_URI :}">try again</a>
+    </p>:}
+<br>
+<p><small>
+Please check these options:<br>
+Please do not use the Back button to this form.<br> 
+Please do not use the Reload button to this form.<br>
+This form required to enable Cookies.<br>
+This form required to enable JavaScript.<br>
+If you try many times, get an error.<br>
+There is a limit time to complete the form, if it exceeds the limit, the cookie expires or form.<br>
+</small></p>
+<p>
+<a href="http://{: * env_SERVER_NAME :}{: * env_REQUEST_URI :}">back</a>
+</p>

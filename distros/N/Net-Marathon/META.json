@@ -1,0 +1,104 @@
+{
+   "abstract" : "An object-oriented Mapper for the Marathon REST API, fork of Marathon module",
+   "author" : [
+      "Sebastian Geidies C<< <seb at geidi.es> >> (original Marathon module)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Marathon",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CPAN::Uploader" : "0",
+            "Minilla" : "0",
+            "Module::Build::Tiny" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Version::Next" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "IO::All" : "0",
+            "JSON::XS" : "3.01",
+            "LWP::UserAgent" : "6.13",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::CheckManifest" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Marathon" : {
+         "file" : "lib/Net/Marathon.pm",
+         "version" : "v0.1.0"
+      },
+      "Net::Marathon::App" : {
+         "file" : "lib/Net/Marathon/App.pm"
+      },
+      "Net::Marathon::Deployment" : {
+         "file" : "lib/Net/Marathon/Deployment.pm"
+      },
+      "Net::Marathon::Deployment::Step" : {
+         "file" : "lib/Net/Marathon/Deployment.pm"
+      },
+      "Net::Marathon::Events" : {
+         "file" : "lib/Net/Marathon/Events.pm"
+      },
+      "Net::Marathon::Group" : {
+         "file" : "lib/Net/Marathon/Group.pm"
+      },
+      "Net::Marathon::Remote" : {
+         "file" : "lib/Net/Marathon/Remote.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tynovsky/Net-Marathon/issues"
+      },
+      "homepage" : "https://github.com/tynovsky/Net-Marathon",
+      "repository" : {
+         "url" : "git://github.com/tynovsky/Net-Marathon.git",
+         "web" : "https://github.com/tynovsky/Net-Marathon"
+      }
+   },
+   "version" : "0.1.0",
+   "x_authority" : "cpan:TYNOVSKY",
+   "x_contributors" : [
+      "Miroslav Tynovsky <tynovsky@users.noreply.github.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,29 @@
+---
+abstract: 'distributed locks via ZooKeeper'
+author:
+  - 'Yury Zavarin <yury.zavarin@gmail.com>'
+build_requires:
+  IO::Handle: 0
+  POSIX: 0
+  Test::Class: 0
+  Test::More: 0
+  Time::HiRes: 0
+  parent: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300025, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-ZooKeeper-Lock
+requires:
+  Net::ZooKeeper: 0
+  Params::Validate: 0
+  strict: 0
+  warnings: 0
+resources:
+  homepage: http://github.com/tadam/Net-ZooKeeper-Lock
+  repository: git://github.com/tadam/Net-ZooKeeper-Lock.git
+version: 0.03

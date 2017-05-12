@@ -1,0 +1,9 @@
+README
+t/1.t
+t/2.t
+lib/Net/DNS/Dynamic/Proxyserver.pm
+MANIFEST
+CHANGES
+Makefile.PL
+script/dns-proxy.pl
+META.yml                                 Module meta-data (added by MakeMaker)

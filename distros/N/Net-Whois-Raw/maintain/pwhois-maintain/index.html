@@ -1,0 +1,69 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>New gTLDs found</title>
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+        <script src="pwhois-maintain/func.js"></script>
+        <script src="pwhois-maintain/logic.js"></script>
+        <style>
+            textarea {
+                white-space: pre;
+                overflow-wrap: normal;
+                overflow-x: scroll;
+            }
+            
+            tr.border_bottom td {
+                border-bottom:1pt solid black;
+                padding: 10px 0px 10px 0px;
+            }
+            
+            td.whois_column {
+                position: relative;
+            }
+            
+            .accept_block {
+                position: absolute;
+                top: 0px;
+                right: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <table style="width: 100%" id="result">
+            <tr style="text-align: left;">
+                <th>TLD</th><th>Whois server</th><th>Not Found pattern</th>
+            </tr>
+            [% FOREACH i IN new %]
+                <tr class="border_bottom">
+                    <td data-id="tld"><b>[% i.tld %]</b></td>
+                    <td data-id="whois_server" class="whois_column">
+                        <div class="accept_block">
+                            <label><input type="radio" name="[% i.tld %]" value="accept"> Accept</label><br>
+                            <label><input type="radio" name="[% i.tld %]" value="skip"> Skip</label>
+                        </div>
+                        <input type="text" value="[% i.whois_server %]">
+                    </td>
+                    <td data-id="notfound">
+                        [% IF i.notfound or not i.notfound.defined  %]
+                            <div>
+                                <input data-id="notfound_pat" type="text" style="width: 400px" value="[% FILTER html %][% i.notfound_pat %][% END %]">
+                            </div>
+                            [% IF i.notfound %]
+                                <textarea style="width: 700px; height: 300px;">[% FILTER html %][% i.notfound %][% END %]</textarea>
+                            [% ELSE %]
+                                <font color="red">couldn't receive response from the whois server</font>
+                            [% END %]
+                        [% ELSE %]
+                            <i>Not Found pattern already in Data.pm or above</i>
+                        [% END %]
+                    </td>
+                </tr>
+            [% END %]
+        </table>
+        <div style="text-align: center; margin: 20px;"><button id="process">PROCESS!</button></div>
+        <div style="display: none" id="source_block">
+            <center>Now copy and paste code below to <i>lib/Net/Whois/Raw/Data.pm</i></center>
+            <textarea style="width:100%; height: 500px;" id="source">[% FILTER html %][% source %][% END %]</textarea>
+        </div>
+    </body>
+</html>

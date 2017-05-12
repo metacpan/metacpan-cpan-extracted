@@ -1,0 +1,8 @@
+CDDBSearch.pm
+Changes
+MANIFEST
+Makefile.PL
+test.pl
+examples/ex-01.pl
+examples/ex-02.pl
+examples/ex-03.pl

@@ -1,0 +1,41 @@
+Net::SSH
+
+Copyright (c) 2002 Ivan Kohler
+Copyright (c) 2007 Freeside Internet Services, Inc.
+All rights reserved.
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+This module implements a Perl interface to ssh.  It is a simple wrapper around
+the system `ssh' command.  For a perl implementation that does not require
+the system B<ssh> command, see L<Net::SSH::Perl> instead.  For a wrapper
+version that allows you to use passwords, see L<Net::SSH::Expect> instead.
+For another non-forking version that uses the libssh2 library, see 
+L<Net::SSH2>.  For a way to execute remote Perl code over an ssh connection
+see L<IPC::PerlSSH>.
+
+To install:
+        perl Makefile.PL
+        make
+        make test # nothing substantial yet
+        make install
+
+Documentation will then be available via `man Net:SSH' or `perldoc Net::SSH'
+
+Anonymous CVS access is available:
+  $ export CVSROOT=":pserver:anonymous@cleanwhisker.420.am:/home/cvs/cvsroot"
+  $ cvs login
+  (Logging in to anonymous@pouncequick.cleanwhisker.420.am)
+  CVS password: anonymous
+  $ cvs checkout Net-SSH
+as well as <http://www.420.am/cgi-bin/cvsweb/Net-SSH>.
+
+Assitance wanted - this module could really use a maintainer with enough time
+to at least review and apply more patches.  Or the module should just be
+deprecated in favor of Net::SSH::Expect or made into an ::Any style
+compatibility wrapper that uses whatver implementation is avaialble
+(Net::SSH2, Net::SSH::Perl or shelling out like the modules does now).  Please
+email if you are interested in helping.
+
+Ivan Kohler <ivan-netssh_readme@420.am>
+

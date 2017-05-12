@@ -1,0 +1,279 @@
+NAME
+    Net::Moo - OOP wrapper for the Moo.com API
+
+SYNOPSIS
+     use Net::Moo;
+
+     my $moo = Net::Moo->new();
+     my $rsp = $moo->api_call('build', 'stickers', \@designs); 
+
+     print $rsp->findvalue("start_url");
+
+     # Or, if you're feeling verbose...
+
+     use Net::Moo;
+     use Net::Moo::Validate;
+
+     my $xml = $moo->builder('stickers', \@designs);
+
+     my $vld = Net::Moo::Validate->new();
+     my $rpt = $vld->report_errors($xml)
+
+     if ($vld->is_valid_xml($rpt)){
+            my $res = $moo->execute_request($xml);
+            my $rsp = $moo->parse_response($res);
+            print $rsp->findvalue("start_url");
+     }
+
+DESCRIPTION
+    Net::Moo is an OOP wrapper for the Moo.com API.
+
+OPTIONS
+    Options are passed to Net::Moo using a Config::Simple object or a valid
+    Config::Simple config file. Options are grouped by "block".
+
+  moo
+
+    * api_key
+        String. *required*
+
+        A valid Moo API key.
+
+    * validate
+        Boolean.
+
+        Indicates whether product requests should be validated before they
+        are submitted to the Moo API for processing.
+
+        Default is false.
+
+LOGGING AND ERROR HANDLING
+    All errors are logged using the object's *log* method which dispatches
+    notices to an internal *Log::Dispatch* object. By default, only error
+    messages are logged to STDERR.
+
+METHODS, PRODUCTS AND DESIGNS
+    This section describes the various arguments passed to the *api_call*
+    method as well as the various other helper methods that it calls to
+    generate requests to the Moo API.
+
+  Methods
+
+    * choose
+        For submitting a list of images that the user can then modify to
+        make before placing an order.
+
+    * build
+        For submitting a list of images that will be used to make place and
+        order.
+
+  Products
+
+    Whatever the Moo API supports. As of this writing, this includes :
+
+    * minicard
+        Small cards.
+
+    * notecard
+        Square cards.
+
+    * sticker
+        Sticky cards. Small ones.
+
+    * postcard
+        Cards from the past, to the future.
+
+    * greetingcard
+        OH HAI.
+
+  Designs
+
+        Designs are the list of images and any formatting used when placing
+        and order. Designs are passed in as an array reference of hash
+        references, with the following keys :
+
+        * url
+            The URL for the image. Really, the only thing you sort of have
+            to include.
+
+        * type
+            There's not much point in passing this at the moment as the API
+            docs indicated its value must always be variable for now.
+
+        * crop
+            Defines how an image will be cropped. Possible values are auto
+            and manual.
+
+            Default is *auto*.
+
+        * manual
+            Required only if the *crop* args is set to manual, it is a hash
+            ref containing the following keys :
+
+            * x The top left (x) co-ordinate of the cropping rectangle in
+                pixels.
+
+            * y The top left (y) co-ordinate of the cropping rectangle in
+                pixels.
+
+            * width
+                The width of the cropping rectangle in pixels.
+
+            * height
+                The height of the cropping rectangle in pixels.
+
+        * text
+            The text for the back of a card. This is also an array reference
+            of hash references, each with the following keys :
+
+            * id
+                The id of the text line that tells us where to place it on
+                the back of the card. The IDs allowed are defined in the
+                schema document. Links to examples of where the ids go are
+                below.
+
+            * string
+                The text you want to add. As a general rule, if the id is a
+                number, then the string can only be on one line.
+
+            * bold
+                This can either be (the string literals) 'true' or 'false'.
+                If ommitted, the default is 'false'
+
+            * align
+                This is either left, right or center. Some products only
+                allow a subset of these (such as greetingcard). The default
+                value is left unless otherwise stated in the schema.
+
+            * font
+                You can specify one of three fonts: modern
+                (arial/helvetica), traditional (georgia) and typewriter
+                (courier). The default is modern.
+
+            * colour
+                A hexidecimal string (with the #) for the colour of the line
+                of text. The default is #000000 (i.e. black).
+
+        * text (for greeting cards)
+            But wait! There's more!! When you are specifying text for
+            greeting card products, it gets a little more involved.
+
+            Rather than pass an array of hash references, you need to pass a
+            hash of arrays of hash references where the top level keys
+            represent the page on which the text will be placed. (See the
+            examples section below.)
+
+            Valid keys are :
+
+            * main
+                Contains an array reference of hash references whose keys
+                (described above) may be : 'string', 'align', 'font',
+                'colour'
+
+            * back
+                Contains an array reference of hash references whose keys
+                (described above) may be : 'id', 'string', 'bold', 'align',
+                'font', 'colour'
+
+  Examples
+
+        More examples are available in the tests (./t) directory for this
+        package but here's an idea of how you specify a list of "designs" :
+
+         my @minicards = ({'url' => 'http://farm3.static.flickr.com/2300/2179038972_23d2a1ff40_o.jpg',
+                          'text' => [{'id' => 1, 'string' => 'Bold / left / modern / red', 'bold' => 'true', 'align' => 'left', 'font' => 'modern', 'colour' => '#ff0000'},
+                                     {'id' => 2, 'string' => 'normal / center / traditional / green', 'bold' => 'false', 'align' => 'center', 'font' => 'traditional', 'colour' => '#00ff00'},
+                                     {'id' => 3, 'string' => 'bold / right / typewriter / blue', 'bold' => 'true', 'align' => 'right', 'font' => 'typewriter', 'colour' => '#0000ff'},
+                                     {'id' => 4, 'string' => 'normal / left / modern / yellow', 'bold' => 'false', 'align' => 'left', 'font' => 'modern', 'colour' => '#fff000'},
+                                     {'id' => 5, 'string' => 'bold / center / traditional / purple', 'bold' => 'true', 'align' => 'center', 'font' => 'traditional', 'colour' => '#ff00ff'},
+                                     {'id' => 6, 'string' => 'normal / right / typewriter / cyan', 'bold' => 'false', 'align' => 'right', 'font' => 'typewriter', 'colour' => '#00ffff'}],
+         });
+
+         my @greeting_cards = ({
+                 'url' => 'http://farm3.static.flickr.com/2300/2179038972_23d2a1ff40_o.jpg',
+                 'text' => {'main' => [{'string' => qq(Script to the right (red)), 'align' => 'right', 'font' => 'script', 'colour' => '#ff0000'}],
+                            'back' => [{'id' => 1, 'string' => qq(Can has cheese burger?)}] },
+         });
+
+PACKAGE METHODS
+  __PACKAGE__->new($cfg)
+
+        Where $cfg is either a valid *Config::Simple* object or the path to
+        a file that can be parsed by *Config::Simple*.
+
+        Returns a *Net::Moo* object.
+
+OBJECT METHODS YOU SHOULD CARE ABOUT
+  $obj->api_call($method, $product, \@designs)
+
+        Submit a set of designs to the Moo API for processing.
+
+        Returns a *XML::XPath::Node* object (referencing the Moo API
+        response <payload> element) on success and undef if an error was
+        encountered.
+
+OBJECT METHODS YOU MAY CARE ABOUT
+  $obj->builder($product, \@designs)
+
+        Generate the required XML document for submitting a list of images
+        that will be used to make cards or stickers.
+
+        Returns a string.
+
+  $obj->chooser($product, \@urls)
+
+        Generate the required XML document for submitting a list of images
+        (\@urls) that the user can pick from and/or modify to make cards or
+        stickers.
+
+        Returns a string.
+
+  $obj->execute_request($xml)
+
+        Issue a request to the Moo API and get back a reponse (fancy talk
+        for HTTP).
+
+        Returns a *HTTP::Response* object.
+
+  $obj->parse_response(HTTP::Response)
+
+        Parse a response from the Moo API and return the payload
+        information.
+
+        Returns a *XML::XPath::Node* object (referencing the Moo API
+        response <payload> element) on success and undef if an error was
+        encountered.
+
+  $obj->config()
+
+        Returns a *Config::Simple* object.
+
+  $obj->log()
+
+        Returns a *Log::Dispatch* object.
+
+VERSION
+        0.11
+
+DATE
+        $Date: 2008/06/19 15:15:34 $
+
+AUTHOR
+        Aaron Straup Cope <ascope@cpan.org>
+
+SEE ALSO
+        http://www.moo.com/api/documentation.php
+
+        http://www.moo.com/xsd/api_0.7.xsd
+
+BUGS
+        Sure, why not.
+
+        Please report all bugs via http://rt.cpan.org/
+
+LICENSE
+        Copyright (c) 2008 Aaron Straup Cope. All rights reserved.
+
+        This is free software. You may redistribute it and/or modify it
+        under the same terms as Perl itself.
+

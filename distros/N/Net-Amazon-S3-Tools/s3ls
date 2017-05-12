@@ -1,0 +1,346 @@
+#!/usr/local/bin/perl
+
+# Copyright (C) 2007 by Mark Atwood <mark@fallenpegasus.com>.
+# 
+# This module is not an official Amazon product or service.  Information
+# used to create this module was obtained only from publicly available
+# information, mainly from the published Amazon documentation.
+#
+# This module is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published
+# by the Free Software Foundation, either version 2.1 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# and the GNU Lesser General Public License along with this program.
+# If not, see <http://www.gnu.org/licenses/>.
+
+use warnings;
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use Net::Amazon::S3;
+use Net::Amazon::S3::Bucket;
+use Getopt::ArgvFile qw/argvFile/;
+use File::HomeDir;
+
+my $aws_access_key_id = $ENV{AWS_ACCESS_KEY_ID};
+my $aws_secret_access_key = $ENV{AWS_ACCESS_KEY_SECRET};
+my $opt_verbose =0;
+my $opt_help =0;
+my $opt_man =0;
+my $opt_secure =0;
+
+my $opt_long =0;
+
+# get the options from the users ~/.s3-tools file, if it exists
+my $users_config = File::HomeDir->my_home() . '/.s3-tools';
+if (-e $users_config) {
+    unshift @ARGV, '@' . $users_config;
+}
+argvFile();
+
+GetOptions('help|?' => \$opt_help, 'man' => \$opt_man,
+	   'verbose+' => \$opt_verbose,
+	   'access-key=s' => \$aws_access_key_id,
+	   'secret-key=s' => \$aws_secret_access_key,
+	   'secure' => \$opt_secure,
+	   'long' => \$opt_long,
+	   )
+    or pod2usage(2);
+pod2usage(1) if $opt_help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $opt_man;
+
+my $s3p = { aws_access_key_id => $aws_access_key_id,
+	    aws_secret_access_key => $aws_secret_access_key };
+$s3p->{secure} = $opt_secure
+    if ($opt_secure);
+my $s3 = Net::Amazon::S3->new($s3p);
+($s3) or die("$0: fail Net::Amazon::S3: $!, stopped");
+
+my $bkts = make_bucketlist();
+
+if (@{$bkts}) {
+    foreach my $b (@{$bkts}) {
+	if ($b->{itemkey}) {
+	    list_item($s3, $b, $opt_long);
+	} else {
+	    list_bucket($s3, $b, $opt_long);
+	}
+    }
+} else {
+    # if no buckets or items were specified
+    list_all_buckets($s3, $opt_long);
+}
+
+sub make_bucketlist
+{
+    my @B;
+    my ($bn, $ik, $b);
+    foreach my $arg (@ARGV) {
+	$b = undef;
+	$b->{arg} = $arg;
+	($bn, $ik) = split('/', $arg, 2);
+	$b->{bucketname} = $bn;
+	$b->{itemkey} = $ik
+	    if ($ik);
+	$b->{bucketobject} = $s3->bucket($bn);
+	push @B, $b;
+    }
+    return \@B;
+}
+
+sub list_all_buckets
+{
+    my $s3 = shift;
+    my $opt_long = shift;
+    if ($opt_long) {
+	foreach $b (@{$s3->buckets()->{buckets}}) {
+	    print $b->{creation_date}, "\t", $b->{bucket}, "\n";
+	}
+    } else {
+	foreach $b (@{$s3->buckets()->{buckets}}) {
+	    print $b->{bucket}, "\n";
+	}
+    }
+    return;
+}
+
+sub list_bucket
+{
+    my $s3 = shift;
+    my $b = shift;
+    my $opt_long = shift;
+
+    my $r = $b->{bucketobject}->list_all();
+
+    if ($opt_long) {
+	foreach (@{$r->{keys}}) {
+	    print $_->{owner_id}, "/", $_->{owner_displayname}, "\t";
+	    print $_->{last_modified}, "\t";
+	    print $_->{etag}, "\t";
+	    print $_->{size}, "\t";
+	    print $_->{key}, "\n";
+	}
+    } else {
+	foreach (@{$r->{keys}}) {
+	    print $_->{key}, "\n";
+	}
+	
+    }
+    return;
+}
+
+sub list_item
+{
+    my $s3 = shift;
+    my $b = shift;
+
+    # an S3 item can have many interesting standard HTTP headers,
+    # including Content-Length, Content-Type, Content-Language,
+    # Expires, Cache-Control, Content-Disposition, and
+    # Content-Encoding, in addition to the x-amz- metadata headers
+
+    if ($opt_long) {
+	print "bucket: ", $b->{bucketname}, "\n";
+	print "itemkey: ", $b->{itemkey}, "\n";
+	my $r = $b->{bucketobject}->head_key($b->{itemkey});
+	foreach (sort(keys(%{$r}))) {
+	    next if $_ eq 'client-date';
+	    next if $_ eq 'client-response-num';
+	    next if $_ eq 'key';
+	    next if $_ eq 'date';
+	    next if $_ eq 'value';
+	    next if $_ eq 'server';
+	    next if $_ eq 'content-type';
+	    next if $_ eq 'x-amz-request-id';
+	    next if $_ eq 'x-amz-id-2';
+	    next if $_ eq 'client-peer';
+	    print $_, ": ", $r->{$_}, "\n";
+	}
+    } else {
+	print "bucket: ", $b->{bucketname}, "\n";
+	print "itemkey: ", $b->{itemkey}, "\n";
+    }
+
+    print "\n";
+
+    return;
+}
+
+__END__
+
+=head1 NAME
+
+s3ls - List S3 buckets and bucket contents
+
+=head1 SYNOPSIS
+
+s3ls [options]
+
+s3ls [options] [ [ bucket | bucket/item ] ...]
+
+ Options:
+   --access-key    AWS Access Key ID
+   --secret-key    AWS Secret Access Key
+   --long
+ Environment:
+   AWS_ACCESS_KEY_ID
+   AWS_ACCESS_KEY_SECRET
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=item B<--verbose>
+
+Output what is being done as it is done.
+
+=item B<--access-key> and B<--secret-key>
+
+Specify the "AWS Access Key Identifiers" for the AWS account.
+B<--access-key> is the "Access Key ID", and B<--secret-key> is
+the "Secret Access Key".  These are effectively the "username" and
+"password" to the AWS account, and should be kept confidential.
+
+The access keys MUST be specified, either via these command line
+parameters, or via the B<AWS_ACCESS_KEY_ID> and
+B<AWS_ACCESS_KEY_SECRET> environment variables.
+
+Specifying them on the command line overrides the environment
+variables.
+
+=item B<--secure>
+
+Uses SSL/TLS HTTPS to communicate with the AWS service, instead of
+HTTP.
+
+=item B<--long>
+
+=back
+
+=head1 ENVIRONMENT VARIABLES
+
+=over 8
+
+=item B<AWS_ACCESS_KEY_ID> and B<AWS_ACCESS_KEY_SECRET>
+
+Specify the "AWS Access Key Identifiers" for the AWS account.
+B<AWS_ACCESS_KEY_ID> contains the "Access Key ID", and
+B<AWS_ACCESS_KEY_SECRET> contains the "Secret Access Key".  These are
+effectively the "username" and "password" to the AWS service, and
+should be kept confidential.
+
+The access keys MUST be specified, either via these environment
+variables, or via the B<--access-key> and B<--secret-key> command line
+parameters.
+
+If the command line parameters are set, they override these
+environment variables.
+
+=back
+
+=head1 CONFIGURATION FILE
+
+The configuration options will be read from the file C<~/.s3-tools> if it
+exists.  The format is the same as the command line options with one option
+per line.  For example, the file could contain:
+
+    --access-key <AWS access key>
+    --secret-key <AWS secret key>
+    --secure
+
+This example configuration file would specify the AWS access keys and that a
+secure connection using HTTPS should be used for all communications.
+
+=head1 DESCRIPTION
+
+Lists the buckets owned by the user, or all the item keys in a given
+bucket, or attributes associated with a given item.
+
+If no buckets or bucket/itemkey is specified on the command line, all
+the buckets owned by the user are listed.
+
+If the C<--long> option is specified, the creation date of each bucket
+is also output.
+
+If a bucket name is specified on the command line, all the item keys
+in that bucket are listed.
+
+If the C<--long> option is specified, the ID and display string of the
+item owner, the creation date, the MD5, and the size of the item are
+also output.
+
+If a bucket name and an item key, seperated by a slash character, is
+specified on the command line, then the bucket name and the item key
+are output.  This is useful to check that the item actually exists.
+
+If the C<--long> option is specified, all the HTTP attributes of the
+item are also output.  This will include Content-Length, Content-Type,
+ETag (which is the MD5 of the item contents), and Last-Modifed.
+
+It may also include the HTTP attributes Content-Language, Expires,
+Cache-Control, Content-Disposition, and Content-Encoding.
+
+It will also include any x-amz- metadata headers.
+
+=head1 BUGS
+
+Report bugs to Mark Atwood L<mark@fallenpegasus.com>.
+
+Occasionally the S3 service will randomly fail for no externally
+apparent reason.  When that happens, this tool should retry, with a
+delay and a backoff.
+
+Access to the S3 service can be authenticated with a X.509
+certificate, instead of via the "AWS Access Key Identifiers".  This
+tool should support that.
+
+It might be useful to be able to specify the "AWS Access Key
+Identifiers" in the user's C<~/.netrc> file.  This tool should support
+that.
+
+Errors and warnings are very "Perl-ish", and can be confusing.
+
+Trying to access a bucket or item that does not exist or is not
+accessable by the user generates less than helpful error messages.
+
+This tool does not efficiently handle listing huge buckets, as it
+downloads and parses the entire bucket listing, before it outputs
+anything.
+
+This tool does not take advantage of the prefix, delimiter, and
+hierarchy features of the AWS S3 key listing API.
+
+=head1 AUTHOR
+
+Written by Mark Atwood L<mark@fallenpegasus.com>.
+
+Many thanks to Wotan LLC L<http://wotanllc.com>, for supporting the
+development of these S3 tools.
+
+Many thanks to the Amazon AWS engineers for developing S3.
+
+=head1 SEE ALSO
+
+These tools use the L<Net::Amazon:S3> Perl module.
+
+The Amazon Simple Storage Service (S3) is documented at
+L<http://aws.amazon.com/s3>.
+
+=cut
+
+

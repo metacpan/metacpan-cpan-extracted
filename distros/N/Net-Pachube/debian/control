@@ -1,0 +1,15 @@
+Source: libnet-pachube-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 5)
+Build-Depends-Indep: perl (>= 5.6.10-12)
+Maintainer: Mark Hindess <soft-pachube@temporalanomaly.com>
+Standards-Version: 3.8.0
+Homepage: http://wiki.github.com/beanz/net-pachube-perl/
+
+Package: libnet-pachube-perl
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}, libclass-accessor-perl, libwww-perl, libxml-simple-perl
+Description:  Perl extension for manipulating pachube.com feeds
+ This module provides a simple API to fetch and/or update pachube.com
+ feeds.

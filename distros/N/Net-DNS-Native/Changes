@@ -1,0 +1,60 @@
+Revision history for Perl extension Net::DNS::Native
+
+0.15  Wed Dec 17 19:59:21 NOVT 2014
+    - Block all signals for newly created threads to prevent signal
+      mess
+
+0.14  Fri Dec 12 22:44:09 NOVT 2014
+    - Detect situations when somebody loaded non thread safe symbols
+      which we can't override
+
+0.13  Fri Nov 14 14:14:48 NOVT 2014
+    - Compare PerlInterpreter pointers without casting: this will eliminate
+      compilation problems for strict compilers
+    - Wait detached threads before destroying: this will eliminate segfault
+      possibility when destroying object with active detached threads
+
+0.12  Sat Nov  8 18:13:49 KRAT 2014
+    - Fix test warnings on old perls
+    - Try to behave well with perl threads
+
+0.11  Fri Nov  7 17:41:09 NOVT 2014
+    - Found a way to get it work on any perl under Linux
+    - Try to behave well when process with Net::DNS::Native instances calls fork()
+
+0.10  Tue Nov  4 01:00:54 NOVT 2014
+    - More correct perl checks
+    - Few typo fixes
+
+0.09  Thu Oct  2 15:53:53 NOVT 2014
+    - Fix segfaults on NetBSD and OpenBSD
+    - Move perl checks to Makefile.PL
+
+0.08  Wed Oct  1 22:27:19 NOVT 2014
+    - `notify_on_begin' option added
+
+0.07  Wed Oct  1 00:51:12 NOVT 2014
+    - timedout() method added
+    - skip inet_pton(AF_INET6) test if Socket::inet_ntop not implemented
+
+0.06  Mon Sep 29 00:39:03 NOVT 2014
+    - `extra_thead' option added
+    - tests: try to workaround cases when getnameinfo() doesn't know about AF_INET6
+
+0.05  Fri Sep 26 00:28:55 NOVT 2014
+    - Added forgotten queue.h
+    - Fix pool for MacOS and Windows
+
+0.04  Wed Sep 24 23:51:28 NOVT 2014
+    - Thread pool support added
+
+0.03  Wed Sep 24 01:28:38 NOVT 2014
+    - Check is your perl supports threaded extensions
+
+0.02  Tue Sep 23 14:14:22 NOVT 2014
+    - Windows support added
+    - Fix for gethostbyname() in list context
+    - More tests
+
+0.01  Sun Sep 21 21:36:16 NOVT 2014
+    - First release to this unpredictable world

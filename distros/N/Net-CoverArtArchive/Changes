@@ -1,0 +1,8 @@
+1.02 2012-05-11
+    - Added a basic compilation test
+
+1.01 2012-05-11
+    - Removed incorrect $VERSION variable from Net::CoverArtArchive
+
+1.00 2012-05-04
+    - Initial release

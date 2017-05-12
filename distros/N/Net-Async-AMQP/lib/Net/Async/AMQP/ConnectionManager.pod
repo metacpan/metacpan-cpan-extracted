@@ -1,0 +1,228 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::AMQP::ConnectionManager
+at lib/Net/Async/AMQP/ConnectionManager.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::AMQP::ConnectionManager - handle MQ connections
+
+=head1 VERSION
+
+version 2.000
+
+=head1 SYNOPSIS
+
+ use IO::Async::Loop;
+ use Net::Async::AMQP;
+ my $loop = IO::Async::Loop->new;
+ $loop->add(
+  my $cm = Net::Async::AMQP::ConnectionManager->new
+ );
+ $cm->add(
+   host  => 'localhost',
+   user  => 'guest',
+   pass  => 'guest',
+   vhost => 'vhost',
+ );
+ $cm->request_channel->then(sub {
+   my $ch = shift;
+   Future->needs_all(
+     $ch->declare_exchange(
+       'exchange_name'
+     ),
+     $ch->declare_queue(
+       'queue_name'
+     ),
+   )->transform(done => sub { $ch })
+ })->then(sub {
+   my $ch = shift;
+   $ch->bind_queue(
+     'exchange_name',
+	 'queue_name',
+	 '*'
+   )
+ })->get;
+
+=head1 DESCRIPTION
+
+=head2 Channel management
+
+Each connection has N total available channels, recorded in a hash. The total number
+of channels per connection is negotiated via the initial AMQP Tune/TuneOk sequence on
+connection.
+
+We also maintain lists:
+
+=over 4
+
+=item * Unassigned channel - these are channels which were in use and have now been released.
+
+=item * Closed channel - any time a channel is closed, the ID is pushed onto this list so we can reopen it later without needing to scan the hash, contains arrayrefs of [$mq_conn, $id]
+
+=back
+
+Highest-assigned ID is also recorded per connection.
+
+ if(have unassigned) {
+ 	return shift unassigned
+ } elsif(have closed) {
+ 	my $closed = shift closed;
+ 	return $closed->{mq}->open_channel($closed->{id})
+ } elsif(my $next_id = $mq->next_id) {
+ 	return $mq->open_channel($next_id)
+ } else {
+ 
+ }
+
+Calling methods on the channel proxy will establish
+a cycle for the duration of the pending request.
+This cycle will not be resolved until after all
+the callbacks have completed for a given request.
+
+The channel object does not expose any methods that allow
+altering QoS or other channel state settings. These must be
+requested on channel assignment. This does not necessarily
+mean that any QoS change will require allocation of a new
+channel.
+
+Bypassing the proxy object to change QoS flags is not recommended.
+
+=head2 Connection pool
+
+Connections are established on demand.
+
+=head1 METHODS
+
+=head2 request_channel
+
+Attempts to assign a channel with the given QoS settings.
+
+Available QoS settings are:
+
+=over 4
+
+=item * prefetch_count - number of messages that can be delivered at a time
+
+=item * prefetch_size - total size of messages allowed before acknowledging
+
+=item * confirm_mode - explicit publish ack
+
+=back
+
+Confirm mode isn't really QoS but it fits in with the others since it modifies
+the channel state (and once enabled, cannot be disabled without closing and
+reopening the channel).
+
+Will resolve to a L<Net::Async::AMQP::ConnectionManager::Channel> instance on success.
+
+=head2 can_reopen_channels
+
+A constant which indicates whether we can reopen channels. The AMQP0.9.1
+spec doesn't seem to explicitly allow this, but it works with RabbitMQ 3.4.3
+(and probably older versions) so it's enabled by default.
+
+=head2 channel_retry_count
+
+Returns the channel retry count. The default is 10, call L</configure>
+with undef to retry indefinitely, 0 to avoid retrying at all:
+
+ # Keep trying until it works
+ $mq->configure(channel_retry_count => undef);
+ # Don't retry at all
+ $mq->configure(channel_retry_count => 0);
+
+=head2 connect_timeout
+
+Returns the current connection timeout. undef/zero means "no timeout".
+
+=head2 apply_qos
+
+Set QoS on the given channel.
+
+Expects the L<Net::Async::AMQP::Channel> object as the first
+parameter, followed by the key/value pairs corresponding to
+the desired QoS settings:
+
+=over 4
+
+=item * prefetch_count - number of messages that can be delivered before ACK
+is required
+
+=back
+
+Returns a L<Future> which will resolve to the original 
+L<Net::Async::AMQP::Channel> instance.
+
+=head2 request_connection
+
+Attempts to connect to one of the known AMQP servers.
+
+=head2 next_host
+
+Returns the next AMQP host.
+
+=head2 connect
+
+Attempts a connection to an AMQP host.
+
+=head2 mark_connection_full
+
+Indicate that this connection has already allocated all available
+channels.
+
+=head2 key_for_args
+
+Returns a key that represents the given arguments.
+
+=head2 on_channel_close
+
+Called when one of our channels has been closed.
+
+=head2 release_channel
+
+Releases the given channel back to our channel pool.
+
+=head2 connection_valid
+
+Returns true if this connection is one we know about, false if it's
+closed or otherwise not usable.
+
+=head2 add
+
+Adds connection details for an AMQP server to the pool.
+
+=head2 exch
+
+=head2 release_connection
+
+Releases a connection.
+
+Doesn't really do anything.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Licensed under the same terms as Perl itself, with additional licensing
+terms for the MQ spec to be found in C<share/amqp0-9-1.extended.xml>
+('a worldwide, perpetual, royalty-free, nontransferable, nonexclusive
+license to (i) copy, display, distribute and implement the Advanced
+Messaging Queue Protocol ("AMQP") Specification').

@@ -1,0 +1,36 @@
+TYPEMAP
+net_drizzle*          T_DRIZZLE
+net_con*               T_CON
+net_result*               T_RESULT
+net_col*               T_COL
+uint64_t               T_UV
+uint16_t               T_UV
+drizzle_con_options_t  T_IV
+drizzle_return_t       T_IV
+
+INPUT
+T_CON
+    $var = XS_STATE(net_con*, $arg);
+
+T_DRIZZLE
+    $var = XS_STATE(net_drizzle*, $arg);
+
+T_RESULT
+    $var = XS_STATE(net_result*, $arg);
+
+T_COL
+    $var = XS_STATE(net_col*, $arg);
+
+OUTPUT
+T_DRIZZLE
+    XS_STRUCT2OBJ($arg, CLASS, $var);
+
+T_CON
+    XS_STRUCT2OBJ($arg, "Net::Drizzle::Connection", $var);
+
+T_RESULT
+    XS_STRUCT2OBJ($arg, "Net::Drizzle::Result", $var);
+
+T_COL
+    XS_STRUCT2OBJ($arg, "Net::Drizzle::Column", $var);
+

@@ -1,0 +1,7 @@
+.git
+blib
+MANIFEST.(old|bak)
+Makefile(.old)?$
+.*~$
+debian/
+.*-stamp

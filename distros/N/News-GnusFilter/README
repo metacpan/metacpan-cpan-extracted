@@ -1,0 +1,31 @@
+News/GnusFilter version 0.5
+============================
+News::GnusFilter is a pure-Perl package for scripting an inline message 
+filter. The filter adds "Gnus-Warning:" headers when presented with 
+evidence of atypical content or formatting for usenet messages.  
+
+News::GnusFilter should be drop-in compatible with other newsreaders that 
+are capable of filtering a usenet posting through an external application
+prior to display.
+
+A sample script is provided in the ./gnusfilter file.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires perl 5.6.0 or greater.
+
+COPYRIGHT AND LICENCE
+
+Copyright 2001 Joe Schaefer.  This code is free software; it is freely
+modifiable and redistributable under the same terms as Perl itself.
+
+$Id: README,v 1.4 2001/08/19 19:20:37 joe Exp $

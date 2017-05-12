@@ -1,0 +1,28 @@
+---
+abstract: 'A co-operative multithreaded server using Coro'
+author:
+  - 'Alex Vandiver <alexmv@bestpractical.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Server-Coro
+no_index:
+  directory:
+    - inc
+recommends:
+  Net::SSLeay: 0
+requires:
+  AnyEvent: 0
+  Coro: 0
+  Net::Server: 2
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: 1.3

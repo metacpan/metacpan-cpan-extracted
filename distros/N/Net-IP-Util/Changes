@@ -1,0 +1,14 @@
+Revision history for Perl extension Net::IP::Util.
+
+1.01  Tue Apr 30 18:24:24 2013
+	- original version; created by h2xs 1.23 with options
+		-e -n Net::IP::Util
+1.02  Wed May 1 18:24:24 2013
+        - Removed flag parameter $dec from functions which suggests decimal IP address
+          The address is now implicitly checked by isBinaryIpAddr()
+1.03  Sat May 4 19:24:21 2013
+        - Function name change calcSubnetNHosts -> calcSubnetExt
+                               getBroadcastAddr -> getNetworkAddr
+          New functions calcSubnet, calcSubnetCIDR
+          getNetworkAddr -> gives broadcast addresses on adding additional flag parameter
+          Documentation tuning

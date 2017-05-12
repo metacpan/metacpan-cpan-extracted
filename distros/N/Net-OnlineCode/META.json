@@ -1,0 +1,63 @@
+{
+   "abstract" : "A rateless forward error correction scheme",
+   "author" : [
+      "Declan Malone <idablack@users.sourceforge.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4001, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-OnlineCode",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "Module::Build" : "0.40",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      }
+   },
+   "provides" : {
+      "Net::OnlineCode" : {
+         "file" : "lib/Net/OnlineCode.pm",
+         "version" : "0.04"
+      },
+      "Net::OnlineCode::Bones" : {
+         "file" : "lib/Net/OnlineCode/Bones.pm",
+         "version" : "0.04"
+      },
+      "Net::OnlineCode::Decoder" : {
+         "file" : "lib/Net/OnlineCode/Decoder.pm",
+         "version" : "0.04"
+      },
+      "Net::OnlineCode::Encoder" : {
+         "file" : "lib/Net/OnlineCode/Encoder.pm",
+         "version" : "0.04"
+      },
+      "Net::OnlineCode::GraphDecoder" : {
+         "file" : "lib/Net/OnlineCode/GraphDecoder.pm",
+         "version" : "0.04"
+      },
+      "Net::OnlineCode::RNG" : {
+         "file" : "lib/Net/OnlineCode/RNG.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt"
+      ]
+   },
+   "version" : "0.04"
+}

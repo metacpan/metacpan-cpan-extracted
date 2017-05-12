@@ -1,0 +1,52 @@
+{
+   "abstract" : "a pure-Perl implementation of the RIPE Database client.",
+   "author" : [
+      "Luis Motta Campos <lmc@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Whois-RIPE",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "LWP::UserAgent" : "0"
+         },
+         "requires" : {
+            "Iterator" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/arhuman/Net-Whois-RIPE/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/arhuman/Net-Whois-RIPE"
+      }
+   },
+   "version" : 2.006
+}

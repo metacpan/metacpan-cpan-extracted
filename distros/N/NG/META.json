@@ -1,0 +1,53 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "chenryn <rao.chenlin@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "NG",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent::HTTP" : "0",
+            "DBI" : "0",
+            "File::Copy::Recursive" : "0",
+            "HTML::Element" : "5.00",
+            "HTML::Selector::XPath" : "0",
+            "HTML::TreeBuilder::XPath" : "0",
+            "SQL::Abstract" : "0",
+            "Spreadsheet::ParseExcel" : "0",
+            "Spreadsheet::WriteExcel" : "0",
+            "Time::HiRes" : "0",
+            "autodie" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.001"
+}

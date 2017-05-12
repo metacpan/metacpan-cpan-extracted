@@ -1,0 +1,10 @@
+This is the INSTALL file for Net::FileShare, a utility for creating file sharing clients and servers by Gene Gallistel <gravalo@uwm.edu>.
+
+* Installation
+
+Net::FileShare uses the standard Perl module install process:
+perl Makefile.PL
+make 
+make test
+make install (as root)
+

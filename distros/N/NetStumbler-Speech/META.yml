@@ -1,0 +1,10 @@
+--- #YAML:1.0
+name: NetStumbler-Speech
+version: 0.01
+author:
+  - |-
+    Salvatore E. ScottoDiLuzio <lt>washu@olypmus.net<gt>
+abstract: Module to manipulate MS TTS Com object
+license: perl
+provides: {}
+generated_by: Module::Build version 0.24

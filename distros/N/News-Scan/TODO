@@ -1,0 +1,15 @@
+To Do:
+======
+
+o Add a facility for composite statistics (i.e. stats over a month's
+  worth of articles from scan's dumps without having to actually save
+  an entire's month's worth of articles).
+
+o This should work for mailing lists too.
+
+o Limit News::Scan::collect to only in-range articles (perhaps by
+  using XHDR)
+
+o Lots of configurability and hooks
+
+o Probably lots more.. :-(

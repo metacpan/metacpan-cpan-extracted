@@ -1,0 +1,34 @@
+OVERVIEW
+
+  Net::IDN::Encode   -- Internationalized Domain Names in
+			Applications (IDNA)
+
+  Net::IDN::UTS46    --	Unicode IDNA Compatibility Processing
+			(UTS #46)
+
+  Net::IDN::Punycode -- ASCII-compatible encoding of Unicode 
+  			(Punycode, RFC 3492)
+
+INSTALLATION
+
+  To install this module type the following:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+DEPENDENCIES
+
+  This module requires these other modules and libraries:
+
+    Unicode::Normalize
+
+AUTHOR
+
+  Claus Färber <CFAERBER@cpan.org>
+
+ACKNOWLEDGMENTS
+
+  Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+  Robert Urban <urban@UNIX-Beratung.de>

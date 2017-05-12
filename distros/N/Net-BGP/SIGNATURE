@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 05e831159181a1d1e3e245492074a261bcb5e414 Changes
+SHA1 94b12d4af61abf03594da4e4012b15ed486d61a1 MANIFEST
+SHA1 75ad13aea83ce9f6fb281835196de9982fb92b82 META.json
+SHA1 3d7fb2f7a02d2fb94115faa737c319e111a7f1c5 META.yml
+SHA1 38f39131dff0fa44d9fe9fbac63af436f39c3346 Makefile.PL
+SHA1 5720d71d2c7ca7e4447e6e8d09850a9028fdde58 README
+SHA1 e0405fc2a61a600c4569b94979c8cbc79cc05611 lib/Net/BGP.pm
+SHA1 86fc52c5a4001e62930c93deba8efaa814325db8 lib/Net/BGP/ASPath.pm
+SHA1 38512f1e4177a37801bf16a9f6af7eb7492f51c3 lib/Net/BGP/ASPath/AS.pm
+SHA1 4a8cb313585e22520a5957c6daf0778bb91e3a34 lib/Net/BGP/ASPath/AS_CONFED_SEQUENCE.pm
+SHA1 c3ffa7c05d42b03e7b708346a6896b8c6a7d2f39 lib/Net/BGP/ASPath/AS_CONFED_SET.pm
+SHA1 d1fddcfb45391eaccfdcc26642e2781c904c5bbf lib/Net/BGP/ASPath/AS_SEQUENCE.pm
+SHA1 743ff30a13b6959ad904138e89a835374f397442 lib/Net/BGP/ASPath/AS_SET.pm
+SHA1 16eb7b1be3243ce0c0cada52aee0e9323a2c46e3 lib/Net/BGP/NLRI.pm
+SHA1 3fe1ae17c711a7fac49ae24d114a009713e17b62 lib/Net/BGP/Notification.pm
+SHA1 002cc578dce44897c03d0754972c48374fe7d689 lib/Net/BGP/Peer.pm
+SHA1 0b9d5eebf2622bd646b7789e4999fa54d2be2e34 lib/Net/BGP/Process.pm
+SHA1 a96a68a187008bd960111b841d17555c9c16d87f lib/Net/BGP/Refresh.pm
+SHA1 2d973bc8a30dfee8cb1683392d212d3ffb0c1e20 lib/Net/BGP/Transport.pm
+SHA1 5ffb158d7430f92e92599dc9eb95d7c89a96ef2c lib/Net/BGP/Update.pm
+SHA1 eced5a63c6b2387b8353cc37946d0d31cb52ea47 t/00-Signature.t
+SHA1 88a0415b0a85623ca280c885a3f45fa93a40981e t/01-pod.t
+SHA1 91f08ddc68b3ef95e565a5fd14ad53866d39be46 t/10-ASPathSegment.t
+SHA1 b3cdf8c4ec86e26b898b811c579dc05ea785bedf t/11-ASPath.t
+SHA1 82945165a0d2dcd2f77765a83ca083ac5b104069 t/20-NLRI.t
+SHA1 048377cd65127ba7f747191b2e35747057214bb3 t/30-Update.t
+SHA1 521fb8dc727e8b9382d84e18457392354c8eb6c0 t/31-Refresh.t
+SHA1 9048c658bae01f21e3f7de66f3a40f99b7d0522d t/32-Open.t
+SHA1 b2edcf18b4dd9f9265426d2b4afd6c41872b88de t/50-BGP.t
+SHA1 dec67b3288bb34fb52b49a7e6e36ef4f5eca1651 t/51-BGP-AS4.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iF4EAREIAAYFAlTIGVgACgkQpXv1spMilt1BPQD/VbzbciNpMkDNRWt/aS83tDix
+O78j1wTEuNAsY/svK7oA/j6/oivh2o5XeGwLljExnn6vCb1WUSXomqV9/0MWaGAi
+=Poge
+-----END PGP SIGNATURE-----

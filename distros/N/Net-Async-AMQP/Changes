@@ -1,0 +1,337 @@
+Revision history for Net-Async-AMQP
+
+2.000     2016-12-27 20:44:32+08:00 Asia/Kuala_Lumpur
+	Features:
+	* RPC server/client implementation, should be compatible with
+	http://www.rabbitmq.com/tutorials/tutorial-six-python.html
+	* Connection blocked support
+	* Custom headers and delivery mode
+	* Correlation and reply_to fields are available in ->publish and also passed to
+	the consumer via the {properties} information
+
+1.000     2015-09-14 02:21:19+01:00 Europe/London
+	API changes: The close events now use 'code' and 'reason' more consistently - previously the
+	code had reply_code / message in some places. This may affect any "close" event
+	handlers in existing code (for channels or connections).
+
+	Features:
+	* Queue declare now resolves with number of messages and consumers as well
+	as the queue instance.
+	* Futures are now labelled for easier tracing
+	* amqp_frame_info() provides more information on known frame types
+	* Net::Async::AMQP::Queue now has a ->consumer wrapper, which is slightly more
+	userfriendly than the ->listen method.
+
+	Bugs fixed:
+	* Various connection handling issues when client/server close a channel or the
+	entire connection.
+
+	Also updated the list of alternative AMQP implementations.
+
+	This version has only been tested up to 80k channels across 80 connections, with a pair
+	of consumer and publisher for each of those channels - so although it should be possible
+	to run with more active channels, given sufficient memory/CPU, that's as far as this version
+	has been tested.
+
+0.031     2015-08-20 02:50:43+01:00 Europe/London
+	Features:
+	* Support more options when publishing messages (including message
+	expiration, thanks to Naveen Nathan for the patch)
+	* ->unbind_exchange method
+
+	Bugs fixed:
+	* Don't send a CloseOk frame if we were the ones closing the channel.
+	* More cleanup in Net::Async::ConnectionManager when channels and/or connections
+	are closed.
+
+0.030     2015-05-01 19:29:16+01:00 Europe/London
+	Features:
+	* Support more options when publishing messages (including message
+	expiration, thanks to Naveen Nathan for the patch)
+
+0.029     2015-04-20 01:11:17+01:00 Europe/London
+	Features:
+	* Helper functions in Net::Async::AMQP::Utils for converting status codes
+	to message/description
+
+	Bugs fixed:
+	* On connection close, do a better job of cleaning up, and include a test
+	to verify that we can dispose the Net::Async::AMQP instance after loop removal
+	(thanks to snappy for reporting + providing a test case for tracing).
+
+0.028     2015-04-15 23:31:34+01:00 Europe/London
+	Features:
+	* Supports messages which have been split into multiple frames - currently
+	there's no streaming support, but this should now handle arbitrarily-large
+	messages as long as you have the memory available.
+
+	Bugs fixed:
+	* Better channel close detection and handling - we now also record when
+	a ::Channel instance has been closed, so we know to report an error if any
+	further requests are attempted.
+
+	Internal API changes:
+	* ->send_frame on Net::Async::AMQP and Net::Async::AMQP::Channel now return
+	a Future instead of $self, since parts of the code need to know when we've
+	attempted to send the frame.
+
+0.027     2015-03-22 15:11:03+00:00 Europe/London
+	No new features.
+
+	Test fixes:
+	* fixed typo in t/conman-memory.t
+
+0.026     2015-03-17 16:57:07+00:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Connections are removed from the full list when closed by the server
+
+	Test fixes:
+	* Test::MemoryGrowth is currently Linux-only, so make it optional (RT102681)
+
+0.025     2015-02-04 17:05:39+00:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* ConnectionManager updated to use List::UtilsBy::extract_by, not
+	Scalar::Utils::extract_by, since the former has the advantage of actually
+	being a real thing.
+
+0.024     2015-02-04 14:26:38+00:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* In some cases would raise an exception due to attempting to unsubscribe
+	from an event that had already been unsubscribed (close, for example).
+
+0.023     2015-01-23 12:34:48+00:00 Europe/London
+	New features:
+	* Proper timeout/retry support in ::ConnectionManager
+
+0.022     2015-01-20 11:00:03+00:00 Europe/London
+	New features:
+	* SSL support, pass ssl => 1 in $amqp->connect
+
+0.021     2015-01-06 12:18:20+00:00 Europe/London
+	API CHANGES: The undocumented Queue methods now all take a channel
+	parameter, so that we don't retain a channel on the queue instance.
+	This is unlikely to change again before 1.0 so the methods are now
+	documented. Queues are no longer notifier subclasses.
+
+	Bugs fixed:
+	* Memory leak due to ::Queue instances being held by the loop, and
+	channels being retained by the queue instances (caught by
+	Test::MemoryGrowth, analysed by Devel::MAT, a handy pair of tools
+	indeed)
+
+0.020     2015-01-05 12:54:17+00:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Don't call ->on_ready on a Future that's already been cleaned up,
+	and handle cases where the Future is passed to ->closure_protection
+	in a ready state
+
+0.019     2014-12-30 11:47:16+00:00 Europe/London
+	No new features.
+
+	Test fixes:
+	* conman-channels.t was attempting to load a specific IO::Async::Loop
+	subclass, causing dependency failures.
+
+0.018     2014-12-28 17:41:10+00:00 Europe/London
+	Same code as previous version, this time with updated Changes file.
+
+0.017     2014-12-28 17:31:35+00:00 Europe/London
+	API CHANGES: The ->write method on Net::Async::AMQP::Channel was
+	not used by anything in this code, and has been dropped. You
+	probably shouldn't call ->write directly on Net::Async::AMQP either.
+
+	New features:
+	* Reports frames sent/received when IO_ASYNC_DEBUG is enabled
+	* Methods on Net::Async::AMQP::Queue now hold on to the Future
+	instances, bringing this in line with other classes - this means
+	methods such as $queue->delete in void context no longer raise
+	warnings about ->then in void context
+
+	Bugs fixed:
+	* Various issues around reopening channels now resolved, in particular
+	earlier versions were likely to report a "second channel.open" error
+	(tested with RabbitMQ only so far)
+	* Hardcoded "warn" removed
+
+0.016     2014-12-26 13:10:19+00:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Test::HexString test dependency was not declared
+
+0.015     2014-12-26 07:02:06+00:00 Europe/London
+	New features:
+	* Support exchange-to-exchange binding (RabbitMQ-specific feature)
+
+	Bugs fixed:
+	* Header frames have no ->method_frame, amqp_frame_type in Utils.pm was not handling
+	them correctly
+	* Heartbeat failure now uses the ->close method rather than just sending a close
+	frame, for consistency with other close handling
+
+0.014     2014-12-25 14:31:23+00:00 Europe/London
+	New features:
+	* Support max_channels in connection manager
+	* When requesting a channel, attempt a new connection if all existing connections
+	are full (was only partially implemented previously)
+
+0.013     2014-12-25 11:33:37+00:00 Europe/London
+	This release raises the minimum Perl version requirement to 5.14,
+	for the ${^GLOBAL_PHASE} variable.
+
+	New features:
+	* Support reusing closed channel IDs by default in Net::Async::AMQP
+	* Remove connection from available pool when no channels are available
+	* Hardcoded connection manager channel assignment retry count moved
+	to a method so that it's easier to override if required
+	* Server implementation now supports channel opening (still a long way
+	from a usable server)
+
+	Bugs fixed:
+	* Prevent ->confirm_mode on an existing ConnectionManager channel
+	* Call cleanup tasks when releasing a managed channel
+
+0.012     2014-12-11 11:04:10+00:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Heartbeat handling overhaul - the send/receive heartbeat timers are independent,
+	so we can now pick up heartbeat failure when we're not actively sending.
+	* Fixes for channel/connection close handling - all Futures representing channel activities
+	will now be marked as failed on channel closure
+	* Default values for user+password (guest/guest) are now applied - this avoids the following
+	RabbitMQ error:
+	 "AMQPLAIN auth info [{<<76,79,71,73,78>>,void,undefined},{<<80,65,83,83,87,79,82,68>>,void,undefined}]
+	 is missing LOGIN or PASSWORD field"
+
+	Internal changes:
+	* Timers and stream are now children of the top-level Net::Async::AMQP object
+	rather than attached directly to the loop
+
+0.011     2014-12-03 13:20:39+00:00 Europe/London
+	New features:
+	* Pass Basic.CancelOk notifications through as a cancel event:
+	 $ch->bus->subscribe_to_event(cancel => sub { my ($ev, $ctag) = @_; warn "cancel ctag $ctag" });
+	Needs the client property set for RabbitMQ to start sending these
+	messages - http://www.rabbitmq.com/consumer-cancel.html:
+     client_properties => {
+      capabilities => {
+       consumer_cancel_notify => Net::AMQP::Value->true,
+	  }
+	 }
+	in ->connect() or ConnectionManager->add()
+
+	Bugs fixed:
+	* Header and body frame type detection fixed
+	* Outgoing heartbeat timer reset on expiry
+
+0.010     2014-12-02 10:14:25+00:00 Europe/London
+	New features:
+	* Support for passing heartbeat as a server parameter when calling
+	->add() on a Net::Async::AMQP::ConnectionManager.
+
+0.009     2014-12-01 14:41:04+00:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* No longer attempts to call ->frame_method on heartbeat frames
+
+0.008     2014-08-30 00:33:42+01:00 Europe/London
+	New features:
+	* Debugging uses ->debug_printf() everywhere, and is controlled by the
+	standard IO_ASYNC_DEBUG env var
+	* Basic server implementation, still not usable but clients can at least
+	connect now
+	* All channel frames are now handled by the relevant ::Channel instance,
+	should provide slightly better performance and less chance for things
+	to go out of sync
+
+	Bugs fixed:
+	* Expect publish ACK even when we get a NO_ROUTE response 
+	* Explicit string type enforced on all queue/exchange/routing key/ctag
+	fields, to allow numeric-looking values - a precaution against issues like
+	https://rt.cpan.org/Ticket/Display.html?id=81733
+	* Avoid excessive warnings in global destruction when the
+	Net::Async::AMQP::ConnectionManager objects go out of scope.
+
+0.007     2014-08-27 03:27:09+01:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Channel traffic is independent. As such, the global pending frame handling
+	was broken: instead, we now track pending frames on a per-channel basis.
+	* Cancelling a ->listen request between the Consume.Start and Consume.Ok frames
+	meant that you'd end up with an active listener - we now explicitly cancel this
+	listener when the Consume.Ok frame turns up.
+	* Connection manager now applies the managed channel to queue objects
+	* Unnecessary extra connections were being opened, this has been fixed.
+
+0.006     2014-08-25 18:01:14+01:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Handle channel close correctly
+	* Pass type information from messages - previously we were using the 'type' header
+	instead.
+
+0.005     2014-08-18 05:11:08+01:00 Europe/London
+	No new featues.
+
+	Tests fixed:
+	* Don't try to connect to a 'default' AMQP server,
+	skip if env vars were not provided
+
+0.004     2014-08-17 18:40:45+01:00 Europe/London
+	API CHANGES:
+	* The Net::Async::AMQP class is now an IO::Async::Notifier, to bring it in line with
+	other IO::Aync code. One side effect of this change is that events are now raised through
+	a message bus rather than directly on the Net::Async::AMQP instance itself.
+
+	Existing code will need to change this:
+
+	 my $amqp = Net::Async::AMQP->new(loop => $loop);
+
+	to this:
+
+	 $loop->add->(my $amqp = Net::Async::AMQP->new);
+
+	and this:
+
+	 $amqp->subscribe_to_event(...);
+
+	to this:
+
+	 $amqp->bus->subscribe_to_event(...);
+
+	New features:
+	* Connection manager for automatically connecting and assigning channels
+	* Some loadtesting scripts, for performance+stability testing on the server
+	implementation (not available yet, should be in the next release)
+
+	Bugs fixed:
+	* If we establish TCP connection but fail to negotiate auth with server,
+	previously this would leave the connection future unresolved. It will now
+	fail with a message indicating that the remote closed the connection.
+	* Net::AMQP was generating an invalid initial connection header
+	(AMQP\x01\x01$major$minor rather than AMQP\x00$major$minor$rev as the
+	AMQP 0.9.1 spec seems to require), we now generate our own header.
+	RabbitMQ seems happy with either.
+
+0.003     2014-02-27 07:56:25+00:00 Europe/London
+	Bugs fixed:
+	* Connection close sends a real connection close, rather than a channel close request
+
+0.002     2014-02-27 07:10:14+00:00 Europe/London
+	New features:
+	* Support parameters when declaring queues (passive, durable, exclusive)
+
+0.001     2014-01-05 04:52:26 Europe/London
+	Initial CPAN release

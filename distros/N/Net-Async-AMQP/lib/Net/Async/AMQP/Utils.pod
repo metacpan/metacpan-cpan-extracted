@@ -1,0 +1,77 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::AMQP::Utils
+at lib/Net/Async/AMQP/Utils.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::AMQP::Utils
+
+=head1 VERSION
+
+version 2.000
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+All functions are imported by default.
+
+=head2 amqp_frame_info
+
+Returns a string with information about the given AMQP frame.
+
+=head2 amqp_frame_type
+
+Takes the following parameters:
+
+=over 4
+
+=item * $frame - the L<Net::AMQP::Frame> instance
+
+=back
+
+Returns string representing type, typically the base class with Net::AMQP::Protocol prefix removed.
+
+=head2 message_for_code
+
+Returns the name (short message) corresponding to the given status code.
+
+Example:
+
+ message_for_code(540) => 'not implemented'
+
+=head2 description_for_code
+
+Returns the description (long message) corresponding to the given status code.
+
+=head2 type_for_code
+
+Returns the type for the given status code - typically "channel" or "connection".
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Exporter>
+
+L<as_heavy|Exporter/as_heavy>, L<export|Exporter/export>, L<export_fail|Exporter/export_fail>, L<export_ok_tags|Exporter/export_ok_tags>, L<export_tags|Exporter/export_tags>, L<export_to_level|Exporter/export_to_level>, L<import|Exporter/import>, L<require_version|Exporter/require_version>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Licensed under the same terms as Perl itself, with additional licensing
+terms for the MQ spec to be found in C<share/amqp0-9-1.extended.xml>
+('a worldwide, perpetual, royalty-free, nontransferable, nonexclusive
+license to (i) copy, display, distribute and implement the Advanced
+Messaging Queue Protocol ("AMQP") Specification').

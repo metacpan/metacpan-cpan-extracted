@@ -1,0 +1,23 @@
+---
+abstract: 'a Moose interface to the Zootool API'
+author:
+  - 'Josep Roca <quelcom@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-ZooTool
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Digest::SHA1: 0
+  JSON::XS: 0
+  Moose: 0
+  Test::More: 0
+  WWW::Curl::Easy: 0
+version: 0.0031

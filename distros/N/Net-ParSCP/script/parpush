@@ -1,0 +1,489 @@
+#!/usr/bin/perl -w
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use Net::ParSCP;
+
+# Command line options
+my $configfile = "";
+my $scp = 'scp';
+my $scpoptions = '';
+my $maxprocesses = 8; # control the maximum number of processes at any time
+my $cssh = 0;
+my %name;
+
+Getopt::Long::Configure('no_ignore_case');
+my $result = GetOptions(
+                'configfile=s', \$configfile,
+                'dryrun',       \$DRYRUN,
+                'scpoptions=s', \$scpoptions,
+                'program=s',    \$scp,
+                'name=s',       \%name,
+                'processes=i',  \$maxprocesses,
+                'verbose',      \$VERBOSE,
+                'xterm',        \$cssh,
+                'help',         \&help,
+                'Version',      \&version,
+             );
+
+my $sourcefile = shift;
+
+usage("Error. Not defined source file\n") unless defined($sourcefile); 
+
+usage("Error. Provide a destination target!\n") unless @ARGV;
+
+my $okh = parpush(
+  configfile  => $configfile,
+  destination => \@ARGV,
+  scp         => $scp,
+  scpoptions  => $scpoptions,
+  sourcefile  => $sourcefile,
+  name        => \%name,
+);
+
+my @machines = keys %$okh;
+exec_cssh(@machines) if $cssh && (@machines);
+
+__END__
+
+=head1 NAME
+
+parpush - Secure transfer of files between clusters via SSH
+
+=head1 SYNOPSIS
+
+  parpush [options] '*.tar.gz m1:*.pl m2:*.txt' c1%c2:/dir1 c3+c4:/dir2 ... 
+
+  # You need to set first a configuration file describing the
+  # set of clusters: 
+
+      $ cat $HOME/.clustersrc
+      cluster1 = machine1 machine2 machine3
+      cluster2 = machine2 machine4 machine5
+      num = 193.140.101.175 193.140.101.246
+      # Comments are allowed
+      # same as range = cc100 cc101 cc102
+      range = cc100..102
+
+  # or have the cluster defined in the $HOME/.csshrc file associated with cssh.
+
+
+
+=head1 OPTIONS
+
+ --configfile file 
+                    File describing the clusters. If not specified
+                    parpush will look for the files:
+                       $HOME/.clustersrc
+                       $HOME/.csshrc
+                       /etc/clusters
+
+
+ --scpoptions 'options for scp'
+                     A string with the options for scp.
+                     The default is no options and '-r' if 
+                     sourcefile is adirectory
+
+ --program '/usr/local/bin/scp'
+                     A string with the name of the program to 
+                     use for secure copy. The default is 'scp'
+
+ --name  machine1=string1 --name machine2=string2
+                    It may appear several times.
+                    The value associated used with machine1
+                    will be used  in the @# and @= macros 
+                    instead the machine name. 
+
+ --processes       
+                    Maximum number of concurrent processes
+
+ --verbose
+
+ --xterm           
+                    runs cssh to the target machines
+
+ --dryrun
+                    It shows the scp commands that will be issued
+                    but does not transfer the files
+ --help            
+
+ --Version
+
+=head1 EXAMPLES
+
+  # Copy 'sourcefile' to the union of cluster1 and cluster2
+  $ parpush sourcefile  cluster1+cluster2:/tmp 
+
+  # Copy 'sourcefile' to the /tmp/ directory in machine1, machine2, machine3
+  # machine4 and machine 5
+  $ parpush sourcefile machine1..5:/tmp/  
+
+  # Copy 'sourcefile' to the intersection of cluster1 and cluster2
+  # i.e. to 'machine2'
+  $ parpush sourcefile  cluster1*cluster2:/tmp 
+
+  # Copy 'sourcefile' to the machines in cluster1 that don't belong to cluster2
+  # i. e. to 'machine1', 'machine2'
+  $ parpush sourcefile  cluster1-cluster2:/tmp 
+
+  # Copies file 'sourcefile' to file 'tfmachine1.txt' in 'machine1'
+  # and to 'tfmachine2.txt' in 'machine2'. The macro '@=' inside
+  # a path is substituted by the name of the target machine
+  $ parpush sourcefile  cluster1-cluster2:/tmp/tf@=.txt
+
+  # Copies all the files with name '.bashrc' in the home directories
+  # of machines in cluster1 to the '/tmp/' directories of machines
+  # in cluster2. The macro '@#' stands for the name of the source machine.
+  # Thus, the file .bashrc in machine1 will be copied as 
+  # '/tmp/bashrc_at_machine1' in the machines in 'cluster2':
+  $ parpush -v cluster1:.bashrc cluster2:/tmp/bashrc_at_@#
+
+  # Copies .bashrc in machine1 and .bashrc in machine2
+  # to machine3:/tmp/bashrc.ORION and machine3:/tmp/bashrc.BEO
+  $ parpush -n machine1=ORION -n machine2=BEO \
+            'machine1:.bashrc beowulf:.bashrc' \
+            machine3:/tmp/bashrc.@#
+
+  # A more complicated formula.
+  # Though 'machine2' is an alias for 193.140.101.175, (see the
+  # cluster definition above) they aren't 
+  # considered equal by parpush. The file will be transferred to 
+  # 'machine2'
+  $ parpush 'sourcefile'  '(cluster1+cluster2)-num:/tmp'
+
+
+  # Several cluster expressions may appear as targets.
+  # Send 'sourcefile' to machines in cluster1 but not in cluster2 
+  # and store it in /tmp. Send it to machines in cluster2 but not cluster1
+  # and store it at the home directory
+  $ parpush sourcefile  cluster1-cluster2:/tmp  cluster2-cluster1:
+
+  # Copy from remote machine 'machine1' the file 'file.txt' to
+  # all the machines in 'cluster1' other than 'machine1':
+  $ parpush machine1:file.txt cluster1-machine1:
+
+  # You can also transfer several files from several source clusters/machines to
+  # some set of machines. In such case
+  # protect the source with single quotes. 
+  $ parpush  'machine1:file1.txt machine2:file2.txt' cluster1-machine1-machine2:
+
+  # You can "rename" the names of the source machines. In this example
+  # the file '.bashrc' at machine1 will be copied as 'dog_bashrc' in
+  # all the machines in 'cluster2' (other than 'machine1'):
+  $ parpush -n machine1=dog -n machine2=cat -n machine3=mouse -v cluster1:.bashrc \
+                                                  cluster2-machine1/tmp/@#_bashrc
+
+  # A combination of local and remote files can be sent. 
+  # Protect the source with single quotes. The following command
+  # sends 'localfile.txt' in the local machine and 'remote.txt' in 'machine4'
+  # to machine3
+  $ parpush  'localfile.txt machine4:remote.txt' cluster1-machine1-machine2:
+
+
+  # Globs can be used in the sourcefile argument.
+  # All the files matching the glob 'file*' in the local machine will be sent.
+  # Also those in machine1 matching the glob '*.pl'
+  $ parpush  'file* machine1:*.pl' cluster2-machine2:/tmp
+
+  # All the files matching the glob 'file*' in the 'machine1' will be sent
+  # to the local machine.  The directory 'dir/' in machine2 will be also sent
+  # to '/tmp/dir/' in the local machine.
+  $ parpush  'machine1:*.pl machine2:dir/' :/tmp
+
+  # The macro '@#' stands for the "source machine". Thus, in the example
+  # below file 'file.txt' in machine1 will be copied to file '/tmp/file.txt.machine1'
+  # in machine3. File 'file.txt' in machine2 will be copied to 
+  # file '/tmp/file.txt.machine2' in machine3.
+  $ parpush 'machine1:file.txt machine2:file.txt' machine3/tmp/file_txt.@#  
+
+  # You have to write a colon for any target, even if the target is the local host.
+  # in the example below 'file.txt' in machine1 will be copied to 
+  # file '/tmp/file.txt.machine1' in the local machine. File 'file.txt' in machine2 
+  # will be copied to file '/tmp/file.txt.machine2' in the local machine
+  $ parpush 'machine1:file.txt machine2:file.txt' :/tmp/file_txt.@#  
+
+
+=head1 INSTALLATION
+
+Install L<Set::Scalar> first. Then the 
+installation uses the traditional procedure.
+The program C<cssh> (C<clustercssh>) is not needed
+but I recommend its installation. 
+Then issue the usual commands (or use C<cpan>):
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+=head1 DESCRIPTION
+
+C<parpush> push files and directories across sets of remote machines.
+
+
+=head2 Syntax of Cluster Description Files
+
+Unless the option C<--configfile> is specified
+C<parpush> will look for a filename named C<~/.clusterrc> in the home
+directory. If it does not exists, the looks for C<~/.csshrc>.
+Last, it looks for the file C</etc/clusters>.
+
+      $ cat Cluster
+      cluster1 = machine1 machine2 machine3
+      cluster2 = machine2 machine4 machine5
+      num = 193.140.101.175 193.140.101.246
+      range = cc10..11a4..5
+
+Ranges are allowed. Thus, the definition above
+
+      range = cc10..11a4..5
+
+is equivalent to:
+
+      range = cc10a4 cc10a5 cc11a4 cc11a5
+
+See C<man cssh> to find out how to describe a cluster in the
+C<~/.csshrc> file.
+
+=head2 C<parpush> Syntax
+
+When calling C<parpush> you have to specify the source and the targets.
+Each target is split in two parts: the cluster description and the 
+path. You have to write a colon for any target, even if the target is the local host.
+This behavior differs from C<scp>.
+in the example below C<'file.txt'> in C<machine1> will be copied to 
+file C<'/tmp/file.txt.machine1'> in the local machine. File C<'file.txt'> in C<machine2> 
+will be copied to file C<'/tmp/file.txt.machine2'> in the local machine
+
+  $ parpush 'machine1..2:file.txt' :/tmp/file_txt.@#  
+
+
+=head2 The Syntax of Cluster Expressions
+
+=over 2
+
+=item * C<s + t> union
+
+=item * C<s * t> intersection
+
+=item * C<s - t> difference
+
+=item * C<s % t> symmetric_difference
+
+=item * Ranges are allowed. Use C<..> to define them.
+Thus C<cc101..102.4..5> defines the set of machines
+
+   cc101.4
+   cc101.5
+   cc102.4
+   cc102.5
+
+=back
+
+=head2 Path Syntax. The C<@=> macro
+
+Inside a path the macro C<@=> stands for the name
+of the current machine.
+Thus, the command:
+
+  $ parpush file.txt machine1+machine2:/tmp/@=.txt
+
+copies C<file.txt> to C<machine1.txt> in C<machine1>
+and to C<machine2.txt> in C<machine2>.
+
+=head2 Path Syntax. The C<@#> macro
+
+Inside a path the macro C<@#> stands for the name
+of the source machine.
+Thus, the command:
+
+  $ parpush 'machine1:file.txt machine2:file.txt' :/tmp/file_txt.@#  
+
+copies C<file.txt> in C<machine1>
+to C</tmp/file.txt.machine1> in the 
+local machine and the file with the same name in 
+C<machine2> to the file C</tmp/file.txt.machine2>.
+
+
+=head2 Source Syntax
+
+If your source is a file or directory nothing is needed.
+If you are going to send several files you must protect them
+inside single quotes as in:
+
+  $ parpush  'machine1:file1.txt machine2:file2.txt' cluster1-machine1-machine2:
+
+cluster expressions can be used in the source description argument as in:
+
+  $ parpush -v 'machine1+machine2:.bashrc' machine3:/tmp/bashrc_at_@#
+  Executing system command:
+          scp  machine1:.bashrc machine3:/tmp/bashrc_at_machine1
+  Executing system command:
+          scp  machine2:.bashrc machine3:/tmp/bashrc_at_machine2
+  machine3 output:
+
+  machine3 output:
+
+=head1 SETTING SSH AUTOMATIC AUTHENTICATION 
+
+To use this script you have to set 
+automatic authentication via SSH between the source machine (your
+machine) and the other destiny machines.
+This section explains the simplified procedure. 
+
+SSH includes the ability to authenticate users using public keys. Instead of 
+authenticating the user with a password, the SSH server on the remote machine will
+verify a challenge signed by the user's I<private key> against its copy
+of the user's I<public key>. To achieve this automatic ssh-authentication
+you have to:
+
+=over 2
+
+=item * Generate a public key use the C<ssh-keygen> utility. For example:
+
+  local.machine$ ssh-keygen -t dsa -N ''
+
+The option C<-t> selects the type of key you want to generate.
+There are three types of keys: I<rsa1>, I<rsa> and I<dsa>.
+The C<-N> option is followed by the I<passphrase>. The C<-N ''> setting
+indicates that no passphrase will be used. This is useful when used 
+with key restrictions or when dealing with cron jobs, batch 
+commands and automatic processing which is the context in which this 
+module was designed.
+By default, in OpenSSH, your identification will be saved in a file C</home/user/.ssh/id_dsa>.
+Your public key will be saved in C</home/user/.ssh/id_dsa.pub>.
+
+=item *
+If still you don't like to have a private key without passphrase, 
+provide a passphrase and use C<ssh-agent> 
+to avoid the inconvenience of typing the passphrase each time. 
+C<ssh-agent> is a program you run once per login session and load your keys into.
+Keys are added to the C<ssh-agent> using the program C<ssh-add>. 
+From that moment on, any C<ssh> client will contact C<ssh-agent>
+and no more passphrase typing will be needed.
+Use the program C<keychain> to manage the communication with the agent from different 
+sessions.
+
+=item * Once you have generated a key pair, you must install the public key on the 
+remote machine. To do it, append the public component of the key in
+
+           /home/user/.ssh/id_rsa.pub
+
+to file 
+
+           /home/user/.ssh/authorized_keys
+           
+on the remote machine.
+If the C<ssh-copy-id> script is available, you can do it using:
+
+  local.machine$ ssh-copy-id -i ~/.ssh/id_rsa.pub user@remote.machine
+
+Alternatively you can write the following command:
+
+  $ ssh remote.machine "umask 077; cat >> .ssh/authorized_keys" \
+                                  < /home/user/.ssh/id_rsa.pub
+
+The C<umask> command is needed since the SSH server will refuse to 
+read a C</home/user/.ssh/authorized_keys> files which have loose permissions.
+
+=item * Edit your local configuration file C</home/user/.ssh/config> (see C<man ssh_config> 
+in UNIX) and create a new section for C<GRID::Machine> connections to that host.
+Here follows an example:
+
+
+ ...
+
+ # A new section inside the config file: 
+ # it will be used when writing a command like: 
+ #                     $ ssh gridyum 
+
+ Host gridyum
+
+ # My username in the remote machine
+ user my_login_in_the_remote_machine
+
+ # The actual name of the machine: by default the one provided in the
+ # command line
+ Hostname real.machine.name
+
+ # The port to use: by default 22
+ Port 2048
+
+ # The identitiy pair to use. By default ~/.ssh/id_rsa and ~/.ssh/id_dsa
+ IdentityFile /home/user/.ssh/yumid
+
+ # Useful to detect a broken network
+ BatchMode yes
+
+ # Useful when the home directory is shared across machines,
+ # to avoid warnings about changed host keys when connecting
+ # to local host
+ NoHostAuthenticationForLocalhost yes
+
+
+ # Another section ...
+ Host another.remote.machine an.alias.for.this.machine
+ user mylogin_there
+
+ ...
+
+This way you don't have to specify your I<login> name on the remote machine even if it
+differs from your  I<login> name in the local machine, you don't have to specify the 
+I<port> if it isn't 22, etc. This is the I<recommended> way to work with C<GRID::Machine>.
+Avoid cluttering the constructor C<new>.
+
+=item * Once the public key is installed on the server and the key added to the agent,
+you should be able to authenticate using your private key
+
+  $ ssh remote.machine
+  Linux remote.machine 2.6.15-1-686-smp #2 SMP Mon Mar 6 15:34:50 UTC 2006 i686
+  Last login: Sat Jul  7 13:34:00 2007 from local.machine
+  user@remote.machine:~$                                 
+
+=back
+
+=head1 SEE ALSO
+
+
+=over 2
+
+
+=item * L<Set::Scalar>
+
+
+
+=item * Cluster ssh: cssh L<http://sourceforge.net/projects/clusterssh/>
+
+
+
+=item * Project C3 L<http://www.csm.ornl.gov/torc/C3/>
+
+=item * L<http://code.google.com/p/net-parscp/>
+
+=item * L<GRID::Cluster>
+
+=item * L<GRID::Machine>
+
+=item * C<keychain> article: L<http://www.ibm.com/developerworks/linux/library/l-keyc2/>
+
+=back
+
+
+=head1 AUTHOR
+
+Casiano Rodriguez-Leon E<lt>casiano.rodriguez.leon@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+
+Copyright (C) 2009-2009 by Casiano Rodriguez-Leon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+
+=cut
+

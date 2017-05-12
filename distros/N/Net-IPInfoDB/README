@@ -1,0 +1,90 @@
+NAME
+    Net::IPInfoDB - Perl interface to ipinfodb.com's Geolocation XML API
+
+SYNOPSIS
+        use Net::IPInfoDB;
+
+        my $g = Net::IPInfoDB->new($key);
+        my $c = $g->get_city("128.103.1.1");
+
+USAGE
+    "Net::IPInfoDB" makes use of the free Geolocation API from ipinfodb.com.
+    Note that you'll need to register your app for a (free) API key in order
+    to use this module. Information on the API is available at
+    "http://ipinfodb.com/ip_location_api.php".
+
+    Basic usage follows the API petty closely:
+
+        use Net::IPInfoDB;
+
+        my $g = Net::IPInfoDB->new;
+        $g->key($api_key);
+
+        my $addr = $g->get_city($ip_address);
+
+    Get data from the returned object via method calls:
+
+        printf "%s is located at (%s, %s)\n",
+            $addr->ip_address, $addr->latitude, $addr->longitude;
+
+    These methods are detailed below.
+
+METHODS
+    new Creates a new "Net::IPInfoDB" instance.
+
+        Optionally takes a key as the first argument; if provided, will call
+        the "key" method for you. If the $ENV{IPINFODB_TOKEN} exists,
+        "Net::IPInfoDB" assumes it contains the token and will call
+        "key($ENV{IPINFODB_TOKEN})" for you.
+
+    key Use "key" to specify your API key. Calling "get_city" or
+        "get_country" without specifying a key will result in a failure.
+
+    get_country
+        Returns country-level details about the host or ip address. Takes an
+        IP address or hostname as the only argument. Returns a
+        "Net::IPInfoDB::Result" object.
+
+    get_city
+        Returns city-level details, which is more resource-intensive on the
+        server. If you only need the country name, avoid using the city
+        precision API. Returns a "Net::IPInfoDB::Result" object.
+
+CACHING
+    "Net::IPInfoDB" does *not* do any caching of responses. You should
+    definitely cache your responses using "Cache::Cache" or something
+    similar.
+
+Net::IPInfoDB::Results object
+    The "get_city" and "get_country" methods return a
+    "Net::IPInfoDB::Result" object, which has the following read-only
+    methods, which correspond directly to the data returned:
+
+    status_code
+    status_message
+    ip_address
+    country_code
+    country_name
+    region_name
+    city_name
+    zip_code
+    latitude
+    longitude
+    timezone
+
+    There is also the following additional methods:
+
+    web_uri
+        "web_uri" returns the web URI of the IP, for fancier viewing.
+
+    fields
+        "fields" returns an array of fieldnames in the
+        "Net::IPInfoDB::Result" object, for iteration.
+
+AUTHOR
+    Darren Chamberlain <darren@cpan.org>
+
+VERSION
+    This is version 3.0. Note that the major version of "Net::IPInfoDB"
+    matches the ipinfodb.com API version.
+

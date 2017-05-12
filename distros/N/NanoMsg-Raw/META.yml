@@ -1,0 +1,33 @@
+---
+abstract: 'Low-level interface to the nanomsg scalability protocols library'
+author:
+  - 'Florian Ragwitz <rafl@debian.org>, Boris Zentner <bzm@2bz.de>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Fatal: '0'
+  Test::More: '0.89'
+  Test::SharedFork: '0'
+  Test::TCP: '0'
+  Time::HiRes: '0'
+configure_requires:
+  Devel::CheckLib: '0.9'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: NanoMsg-Raw
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  XSLoader: '0'
+  overload: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,8 @@
+{
+	user        => 'net_lastfm',
+	password    => '12',
+	
+	api_key     => 'daabe7b25a3fc37d1beb07288db65558',
+	api_secret  => '90c2da039cbd1d8a7f863048ca3ddcb4',
+	session_key => 'key',
+};

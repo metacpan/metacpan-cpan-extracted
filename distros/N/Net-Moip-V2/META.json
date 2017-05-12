@@ -1,0 +1,83 @@
+{
+   "abstract" : "Perl SDK for the Moip (Money over IP) v2 API.",
+   "author" : [
+      "Carlos Fernando Avila Gratz <cafe@kreato.com.br>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Moip-V2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Furl" : "0",
+            "IO::Socket::SSL" : "0",
+            "JSON::MaybeXS" : "0",
+            "MIME::Base64" : "0",
+            "Moo" : "0",
+            "URI" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Bundle::Extended" : "0",
+            "Test::Mock::Furl" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Moip::V2" : {
+         "file" : "lib/Net/Moip/V2.pm",
+         "version" : "0.06"
+      },
+      "Net::Moip::V2::Endpoint" : {
+         "file" : "lib/Net/Moip/V2/Endpoint.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cafe01/Net-Moip-V2/issues"
+      },
+      "homepage" : "https://github.com/cafe01/Net-Moip-V2",
+      "repository" : {
+         "url" : "git://github.com/cafe01/Net-Moip-V2.git",
+         "web" : "https://github.com/cafe01/Net-Moip-V2"
+      }
+   },
+   "version" : "0.06",
+   "x_authority" : "cpan:CAFEGRATZ",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

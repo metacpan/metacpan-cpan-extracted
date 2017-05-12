@@ -1,0 +1,62 @@
+Revision history for No-Worries:
+
+1.4	Mon Nov 21 2016
+	* No::Worries::File: added a binary option and changed the binmode
+	  option to be transparent wrt binmode().
+	* No::Worries::File: added a handle option.
+
+1.3	Wed Oct  5 2016
+	* No::Worries::Date: handle times in scientific notation.
+
+1.2	Tue Apr  8 2014
+	* No::Worries::PidFile: added a timeout option to pf_status().
+
+1.1	Fri Jan 10 2014
+	* No::Worries::String: added an "align" option to string_table().
+	* No::Worries::PidFile: added pf_sleep() to ease sleeping.
+	* No::Worries::String: added string_plural() and string_quantify().
+
+1.0	Tue May 21 2013
+	* Improved tests' portability.
+	* Promoted to 1.0 after successful testing.
+	* The API is now stable.
+
+0.9	Wed Feb 27 2013
+	* No::Worries::String: added string_table() for table formatting.
+	* No::Worries::Proc: improved support for embedded Perl Nagios (ePN).
+	* No::Worries::Stat: improved portability.
+
+0.8	Wed Dec 19 2012
+	* No::Worries::Export: added support for version checking.
+	* Added No::Worries::Stat to ease file status handling.
+
+0.7	Tue Nov  6 2012
+	* Added No::Worries::String to ease string handling.
+	* Added No::Worries::Export to ease symbol export control.
+	* Moved $HostName from No::Worries::Log to No::Worries.
+	* Cleanup code to please Perl::Critic.
+
+0.6	Mon Oct  1 2012
+	* No::Worries::File: fixed documentation typo.
+	* No::Worries::PidFile: pf_status() now also returns an LSB compatible
+	  exit status (as defined in http://goo.gl/vQqaC).
+
+0.5	Wed Jul 25 2012
+	* Added No::Worries::DN to ease Distinguished Names handling.
+
+0.4	Tue Jul  3 2012
+	* Added thread support to No::Worries::Log.
+	* No::Worries::PidFile's pf_unset() now accepts a non-existing path.
+
+0.3	Mon May 14 2012
+	* Portability fixes for process and pid file handling.
+	* Better handle processes dying before all their output could be read.
+
+0.2	Mon Apr 30 2012
+	* Improved documentation, portability and symbol export control.
+	* Improved No::Worries::Log's handlers.
+	* Added No::Worries::Proc's $Transient variable.
+	* First version released in CPAN.
+
+0.1	Wed Apr 25 2012
+	* First version released.

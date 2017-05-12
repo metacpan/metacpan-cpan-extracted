@@ -1,0 +1,29 @@
+Net::Shaper version 0.3
+=======================
+
+Net::Shaper is a simple TCP network traffic shaper.  It acts as a bandwidth-limited
+tunnel between a TCP client and a TCP server.  It is written to accept multiple
+connections and limit the total bandwidth.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  IO::Select
+  Time::HiRes
+
+COPYRIGHT AND LICENCE
+
+This module is distributed under the same terms as Perl itself.
+
+Copyright (C) 2003 Benjamin Holzman
+

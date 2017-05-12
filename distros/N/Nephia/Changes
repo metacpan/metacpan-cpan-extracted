@@ -1,0 +1,199 @@
+Revision history for Perl extension Nephia
+
+0.87 2014-01-02T19:21:55Z
+    - bug fix: fix for crashing on multi-process situation
+
+0.86 2013-11-20T02:37:21Z
+    - feature : [Setup.pm] split extract_archive from assets_archive
+
+0.85 2013-10-26T02:13:54Z
+    - bug fix : fix arguments for controller logic, ( ${ref of Nephia::Core}, ${ref of Nephia::Context} ) is legal.
+                ( Nephia::Core object was not passed. )
+
+0.84 2013-10-21T17:07:04Z
+    - feature : add call method and Nephia::Container
+
+0.83 2013-10-05T23:13:23Z
+    - bug fix : reset VERSION of skelton
+
+0.82 2013-10-04T06:30:26Z
+    - feature : implement Nephia::Chain->fetch($name)
+
+0.81 2013-10-04T03:24:06Z
+    - feature : add redirect dsl that provided from Nephia::Plugin::Basic
+
+0.80 2013-09-28T22:51:09Z
+
+    - MAJOR VERSION UP. Old version is PrimalNephia of github. (https://github.com/ytnobody/PrimalNephia)
+
+0.37 2013-07-19T15:16:27Z
+    - bug fix : fix documentation (could not use context() in load() of plugin)
+    - feature : add plugin_config() DSL for development plugins
+
+0.36 2013-07-19T14:14:44Z
+    - refactor : modify some logic to more thin one
+    - refactor : split plugin loader logic into Nephia::PluginLoader
+    - refactor : add request object into context
+    - refactor : enable context in before_action
+    - feature : add before_action hook for plugins
+    - refactor : suppress side-effect that destroys $env by Plack::Request
+    - refactor : split action build logic into _build_action
+    - bug fix : add Config::Micro as deps. "Keep genleness for user" :)
+    - refactor : use trenary operator in _process_response
+
+0.35 2013-07-17T11:53:56Z
+    - feature : add application class name into context with keyname "app"
+    - bug fix : fix strange specification of charset in http-header
+    - refactor : use ternary operator in "path" feature
+    - refactor : remove unused stuff
+
+0.34 2013-07-17T01:58:21Z
+    - refactor : move global-vars into Nephia::GlobalVars
+    - feature  : add request context(Nephia::Context)
+    - feature  : add hooks for development some plugins
+    - feature  : add context feature for plugins
+    - documentation : for context and hooks
+    - documentation : split plugin documentation into Nephia::Plugin
+
+0.33 2013-07-16T01:54:57Z
+    - bug fix : suppress warning when mismatched overriden prototype [macopy]
+    - bug fix : suppress a test "010_flavor.t" when OStype is windows
+
+0.32 2013-07-12T02:15:43Z
+    - bug fix : suppress warning when override DSL [ytnobody]
+    - refactor : [INCOMPATIBLE] update refactor loading logic [songmu]
+
+0.31 2013-07-11T04:06:33Z
+    - bug fix : fix bug of reverse prefix in submapper [songmu]
+    - bug fix : strange works of base_dir [songmu]
+    - refactor : Implement Nephia::Response [songmu]
+    - refactor : fix Nephia::Setup#get_version for more shortly [songmu]
+    - refactor : remove duplicated code that loading plugins [songmu]
+    - refactor : remove Nephia::ClassLoader and use Module::Load [songmu]
+    - refactor : Nephia::Core inherits Exporter for export_to_level [songmu]
+    - refactor : add test for Nephia::Core [songmu / ytnobody]
+    - refactor : add template_path into arguments of Nephia::View when instantiate [ytnobody]
+    - feature : --plugin option enabled in primalnephia-setup [papix]
+
+
+0.30 2013-07-09T02:27:49Z
+    - refactor : support multiple submapper[macopy]
+    - bug fix : skip t/010_flavor.t when git is not installed
+
+0.29 2013-07-08T06:29:54Z
+    - bug fix : fix setup function [papix]
+
+0.28 2013-07-08T05:58:20Z
+    - refactor : modify setup more friendly for minilla
+    - refactor : improved generation of cpanfile [papix]
+    - bug fix : fix mojibake in config file [ichigotake]
+    - feature : add Setup::Git as an only one core flavor [papix]
+
+0.27 2013-07-06T17:07:26Z
+    - refactor : add trigger "required_modules" in Nephia::Setup
+    - feature : add nip / path_param feature
+    - refactor : modify param function so that does not address the value associated with "Router::Simple".
+
+0.26 2013-07-06T07:39:10Z
+    - feature : modify to return the query parameter that specified when given an argument to param DSL 
+
+0.25 2013-07-03T06:43:55Z
+    - feature : add cookie / set_cookie DSL
+
+0.24 2013-07-03T01:52:36Z
+    - bug fix : fix logic that checks existance of plugin coderef
+
+0.23 2013-07-02T03:21:31Z
+    - refactor: Split DSLModifier as external module
+
+0.22 2013-06-28T15:16:13Z
+    - feature : add DSL Modifier
+
+0.21 2013-06-28T05:46:17Z
+    - feature : support ".primalnephia-setup" file in primalnephia-setup command
+    - bug fix : fix base_dir test with psgi
+
+0.20 2013-06-27T13:06:30Z
+    - bug fix : sort flavor order by "view or not" rule
+
+0.19 2013-06-27T07:13:20Z
+    - feature : allow to use multiple flavor in primalnephia-setup
+
+0.18 2013-06-26T16:07:12Z
+    - bug fix : Nephia::MetaTemplate tag matching rule was not good :(
+
+0.17 2013-06-26T15:04:27Z
+    - bug fix : Nephia::MetaTemplate->argument added
+
+0.16 2013-06-26T14:48:06Z
+    - fix missing pseudo code for "res" in document
+    - add meta template feature for creating new flavor easy
+
+0.15 2013-06-21T02:33:36Z
+    - add Config::Micro as a recommends
+    - fix test for MSWin32
+
+0.14 2013-06-19T07:34:12Z
+    - bug fix : Setup::Base cpanfile requires Config::Micro
+
+0.13 2013-06-19T07:13:42Z
+    - add submapper feature [macopy]
+    - wrap request-class with Nephia::request [songmu]
+    - expand number of testfile
+    - stop using 'Plack::Middleware::ContentLength' internally
+    - implement get_version() feature into Setup.pm
+    - show Nephia version to 'primalnephia-setup --version'
+
+0.12 2013-06-14T11:11:42Z
+    - import() will execute when plugin is loaded
+
+0.11 2013-06-12T09:22:18Z
+    - move Nephia to Nephia::Core for import() separation
+    - add a feature that loads plugins when called import()
+    - became able to use prototype-function in plugin
+
+0.10 2013-06-10T12:12:12Z
+    - Nephia::View::MicroTemplate is new default template engine. 
+    - Nephia::View::Xslate was split to new distribution(it's same name).
+
+0.09 2013-06-07T15:57:16Z
+    - more quite design template and style
+    - stop using Class::Load. use Nephia::ClassLoader
+    - remove unrequired dependency (Mouse::Util::TypeConstraints, Class::Accesor::Fast)
+    - stop using Path::Class.
+
+0.08 2013-06-07T01:41:12Z
+    - cut out validation feature into plugin (Nephia::Plugin::Data::Validator)
+    - add documentation for commands in res function
+
+0.07 2013-05-18T08:05:12Z
+    - security fix for CVE-2013-1297
+    - fix Setup::Base more scalable
+
+0.06 2013-05-17T09:02:58Z
+    - add nephia_plugins function.
+    - done minil migrate (see Minilla)
+
+0.05   Tue Apr 23 22:46:33 JST 2013
+    [Setup::Base] 
+    - use Config::Micro for loading config
+    - change config as hashref
+    - change dependency for Class::Accessor::Fast to Class::Accessor::Lite (thx, ichigotake)
+    - avoid indexing of POD in application template
+
+0.04   Thu Feb 23 13:11:23 2013
+    - res() supports return values.
+    - add config() function.
+    - use EU::MM for makefile template.
+    - add config file template.
+
+0.03   Wed Jan 30 11:54:29 2013
+    - support param function.
+
+0.02   Mon Jan 28 11:28:32 2013
+    - change mapper class from Plack::App::URLMap to Router::Simple.
+    - support (get|post|put|del) function.
+
+0.01   Wed Jul 18 08:18:52 2012
+    - original version
+

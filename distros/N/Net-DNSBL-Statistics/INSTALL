@@ -1,0 +1,27 @@
+
+INSTALL version 1.00 Sat Jan  5 17:31:45 PST 2008
+
+Installation of Net::DNSBL::Statistics is straightforward.
+
+	tar -xzvf Net-DNSBL-Statistics-version.string.tgz
+	cd Net-DNSBL-Statistics-version.string
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Copy the script file 'dnsblstat' and its companion sample
+configuration file to the user/directory of your choice.
+
+Edit the configuration file to include those DNSBL's you 
+wish to profile and adjust the 'FILES' key to point to
+the ip list(s) you wish to use.
+
+Run the script from cron or by hand 
+
+	./dnsblstat path/to/config.file
+
+This will print the report to standard output or you can
+pipe it to a file.
+

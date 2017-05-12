@@ -1,0 +1,48 @@
+<HTML>
+ <HEAD>
+  <TITLE>Work still to be done in Net::Z3950.pm</TITLE>
+  <STYLE type="text/css"><!--
+	/* Netscape 4.51 applies this to the entire <UL> rather than
+	   to the individual <LI>s within it: my mistake or its bug? */
+	ul li { margin-top: 0.5em; }
+  --></STYLE>
+ </HEAD>
+ <BODY>
+  <H1>Work still to be done in Net::Z3950.pm</H1>
+  <P>
+  Things that need fixing include, but may not be limited to, the
+  following.  (They're listed in the order that they occurred to me,
+  which is by no means order of importance or anything.)
+  <UL>
+   <LI>Creating a non-blocking COMSTACK to a non-existent server
+	(e.g. <TT>ECONNREFUSED</TT>) is not properly diagnosed,
+	yielding a <TT>SIGPIPE</TT> instead of a graceful error
+	report.
+   <LI>Support for more types of APDU.
+   <LI>Support for more of the elements in APDUs of types that are
+	handled -- for example, the initResponse APDU's
+	<TT>otherInfo</TT> field.
+   <LI>Rework the sample code (including fragments in the SYNOPSIS
+	sections of the various PODs) to reflect the reality of the
+	fully-evolved interface more fully.
+   <LI>Test all the code-paths related to non-blocking multiplexing -
+	sending a PDU of which only a part can be written in the
+	initial syswrite(), receiving a PDU of which only a part can
+	be read in the initial cs_get(), doing both together across
+	multiple connections, etc.
+   <LI>Improve the reporting of Z39.50 errors.
+   <LI>Clue in the Event.pm dispatcher to call the
+	<TT>decodeAPDU()</TT> again straight away when
+	<TT>cs_more()</TT> is true.
+   <LI>Fix <TT>makeInitRequest()</TT> (and no doubt other functions
+	too) to understand undefined arguments, and pass null pointers
+	accordingly.  (By inspection, all <TT>undef</TT> arguments are
+	passed as the same zero-length string - address
+	<TT>0x80b94fc</TT> in my most recent run - so it should be
+	possible to tie this down as the address of a well-known
+	zero-length object in the Perl run-time system, perhaps
+	something related to <TT>PL_sv_undef</TT>.)
+   <LI>Write a simple command-line Zthes browsing client.
+  </UL>
+ </BODY>
+</HTML>

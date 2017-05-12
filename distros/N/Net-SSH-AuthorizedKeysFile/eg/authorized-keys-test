@@ -1,0 +1,105 @@
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+use Net::SSH::AuthorizedKeysFile;
+use Log::Log4perl qw(:easy);
+use Getopt::Std;
+
+getopts("sv", \my %opts);
+
+my $level = $INFO;
+
+if($opts{v}) {
+    $level = $DEBUG;
+}
+
+Log::Log4perl->easy_init({ level => $level, layout => "%F{1}-%L: %m%n" });
+
+my($file) = @ARGV;
+
+die "usage: $0 file" unless defined $file;
+
+my $ak = Net::SSH::AuthorizedKeysFile->new( 
+    file   => $file,
+    strict => ($opts{s} ? 1 : 0),
+);
+
+my $rc = $ak->read();
+
+if($rc) {
+    print "$file ok\n";
+} else {
+    print "$file *not* ok\n";
+}
+
+my @keys = $ak->keys();
+
+print "Found ", scalar @keys, " keys\n";
+
+for my $key (@keys) {
+    print "  * ", $key->type(), "\n";
+}
+
+__END__
+
+=head1 NAME
+
+    authorized-keys-test - Validate a authorized_keys file
+
+=head1 SYNOPSIS
+
+    authorized-keys-test ~/.ssh/authorized_keys
+
+=head1 DESCRIPTION
+
+authorized-keys-test reads in the keys of an ssh client authorized_keys
+file and reports any errors.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -v
+
+Verbose mode. Turns on DEBUG instead of INFO.
+
+=item -s
+
+Strict mode. If on, the test insists on properly formatted authorized_keys
+files and isn't nearly as lenient as the sshd daemon's parser.
+
+=back
+
+=head1 EXAMPLES
+
+  $ authorized-keys-test ~/.ssh/authorized_keys
+
+  /home/joe/.ssh/authorized_keys ok
+  Found 4 keys
+    * ssh-2
+    * ssh-2
+    * ssh-2
+    * ssh-2
+
+
+     # strict mode:
+  $ authorized-keys-test -s ~/.ssh/authorized_keys
+
+  AuthorizedKeysFile.pm-69: Key [eme alsdkfj] failed sanity check -- ignored
+  AuthorizedKeysFile.pm-71: Strict mode on: Abort
+  /home/joe/.ssh/authorized_keys *not* ok
+  Found 4 keys
+    * ssh-2
+    * ssh-2
+    * ssh-2
+    * ssh-2
+
+=head1 LEGALESE
+
+Copyright 2009 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2009, Mike Schilli <cpan@perlmeister.com>

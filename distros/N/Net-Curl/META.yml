@@ -1,0 +1,42 @@
+---
+abstract: 'Perl interface for libcurl'
+author:
+  - 'Przemysław Iskra <sparky at pld-linux.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker::Config: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Curl
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  ExtUtils::PkgConfig: '0'
+  XSLoader: '0'
+requires:
+  Carp: '0'
+  DynaLoader: '0'
+  Exporter: '0'
+  overload: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/sparky/perl-Net-Curl/issues
+  homepage: https://github.com/sparky/perl-Net-Curl
+  repository: git://github.com/sparky/perl-Net-Curl.git
+version: 0.37
+x_contributors:
+  - 'Bálint Szilakszi'
+  - 'Fuji, Goro'
+  - 'Przemysław Iskra'
+  - 'Stanislaw Pusep'
+  - 'Olaf Alders'
+  - 'Maksym Davydov'

@@ -1,0 +1,48 @@
+Revision history for Perl extension NetAthlon2::RAW
+
+0.31 Tue Aug 24 08:08:51 EDT 2010
+	- Fix roundoff errors in make test cases.
+	- Added RPM spec file.
+	- Renamed na2gd to na2png
+
+0.30 Sat Dec  5 17:22:10 EST 2009
+	- Added na2png script.
+	- Require GD::Graph perl module.
+	- Fix documentation bug WRT Heart Rate in the Check Points section.
+	- Added more test cases.
+
+0.20 Sat Nov 21 14:12:04 EST 2009
+	- Added Max Speed, Max Cadence, Max Heart Rate and Max Watts keys.
+	- Add debug option to new(). 
+	- Add checking of time conversion.
+	- Start of support on MSWin32 platforms.
+
+0.13 Mon Nov 16 08:43:16 EST 2009
+	- Open file in read only mode.
+	- Change some croaks to carps in the parse() routine.
+	- Better checking of data file.
+	- Change Archive::Tar from recommends to build_requires.
+
+0.12 Mon Nov  9 08:58:16 EST 2009
+	- Fix am/pm conversion for the noon hour.
+	- Remove the NetAthlon::RAW::maxWatts variable, check for a zero Speed
+		value instead.
+	- Fix make test to round off test results to 4 significant digits.
+
+0.11 Sun Nov  8 15:20:07 EST 2009
+	- Fix make test, set TZ to be EDT so Start Time values are correct.
+
+0.10 Sun Oct 25 18:09:10 2009
+	- Add NetAthlon::RAW::timeDelta variable to adjust the slop between
+		the time in the filename and the start time within the file.
+	- Add NetAthlon::RAW::maxWatts variable to ignore unrealistically large
+		values in the Average Watts calculation.
+	- Add Calculated Distance keys in both the Check Point and summary
+		values.
+	- Recalculate the Average Speed based on the Calculated Distance in
+		the summary level and the Elapsed Time.  This is because the
+		Elapsed Time is based on only the race time, whereas the 
+		Distance is based on the race time and warmup time.
+
+0.01	Sun Aug 30 15:31:30 2009
+	- original version

@@ -1,0 +1,16 @@
+Revision history for Perl extension Net-Statsite-Client
+
+1.1.0 2017-03-01T15:03:04Z
+    - tcp support
+1.0.3 2016-12-07T10:20:05Z
+    - replace / by _ in key
+1.0.2
+    - add travis badges to readme
+1.0.1
+    - improve documentation
+1.0.0
+    - change counstructor api (method new) to named parameters
+    - add uniq method
+    - sanitize key (remove statsite separators)
+0.1.0
+    - migrate from Etsy::StatsD

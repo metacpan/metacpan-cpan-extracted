@@ -1,0 +1,6 @@
+Revision history for Perl extension NetPacket::LACP.
+
+0.01  Thu Jan  2 18:20:26 2003
+	- original version; created by h2xs 1.21 with options
+		-XA -n NetPacket::LACP
+

@@ -1,0 +1,17 @@
+TYPEMAP
+
+xs_rabbitmq_t * T_PTROBJ
+amqp_connection_state_t T_PTROBJ
+amqp_socket_t * T_PTROBJ
+amqp_rpc_reply_t * T_PTROBJ
+amqp_sasl_method_enum T_IV
+amqp_channel_t T_IV
+amqp_basic_properties_t * T_PTROBJ
+amqp_basic_consume_ok_t * T_PTROBJ
+amqp_envelope_t * T_PTROBJ
+amqp_boolean_t T_IV
+struct timeval * T_PTROBJ
+
+xs_status T_IV
+
+Net::RabbitMQ::Client T_PTROBJ

@@ -1,0 +1,63 @@
+Revision history for Perl extension Net::LibIDN.
+
+0.12  Thu Feb 26 13:44:06 CET 2009
+	- Applied NetBSD compatibility patch (Thanks Havard Eidnes), fixes #39294
+	- Applied Win32 memory free compatibility patch (Thanks CPAN user SISYPHUS),
+	  maybe fixes #43110
+
+0.11  Tue Aug 26 19:42:18 CEST 2008
+	- Move ldflags to back of cc test compile to improve the portability of
+	  Libidn installation checks yet again, 
+	  thanks to nix of esperi dot o r g dot uk 
+
+0.10  Thu Dec 13 00:18:56 CET 2007
+	- Shut up CPAN tester mails
+	- Correct some linitian problems
+
+0.09  Mon Aug  7 19:20:00 CEST 2006
+	- Minor doc changes
+
+0.08  Mon Jan 17 13:07:04 CET 2005
+	- Try cc as well as gcc when testing for a functioning Libidn-Installation in
+	  Makefile.PL to improve portability, thanks to Keith A Hackworth
+
+0.07  Mon Apr 14 11:44:05 CEST 2004
+	- More debianization fixes from Matthias Urlichs
+	- Makefile.PL remembers calling options in generated Makefile
+	- Rewrote tests to not depend on "de"-Tables
+
+0.06  Mon Mar 29 19:31:06 CEST 2004
+	- Added Cygwin compile infos (Thanks to Sergei Kolodka)
+	- Fixed builddeps, dependency bug in Makefile.PL (Thanks to Matthias Urlichs)
+	- A number of cosmetic changes
+
+0.05  Thu Mar 18 16:15:33 CET 2004
+	- Test code now uses \xHH literals instead of direct non-ASCII
+		character input, to be more portable, thanks to Sergei Kolodka
+		for pointing out the problem
+	- Added Perl prototypes
+	- Using xs default parameters instead of C ellipsis in most functions
+	- Remove typemap, we don't use types that require it
+	- Tweak META.yml a little
+
+0.04  Sun Feb 29 16:34:44 CET 2004
+	- Adapting to Dataformat changes in actual Libidn 0.4.0 release
+
+0.03  Mon Feb 16 21:25:21 CET 2004
+	- Changed name to Net::LibIDN
+	- Added support for TLD checking stuff in LibIDN >= 0.4.0
+	- Generally cleaned up the code
+	- Wrote some meaningful docs
+	- Makefile.PL checks if it can find Libidn with or without TLD checking
+	- Added debian control files, thanks to dh-make-perl
+
+0.02  Tue Jan 29 17:21:50 2004
+	- Minor Doc changes
+
+0.01  Tue Dec  2 11:04:50 2003
+	- original version; created by h2xs 1.21 with options
+		-xan NET::LibIDN idna.h
+	- worked on it till it resembled the interface of php-idn
+		of Turbo Fredriksson's php-idn bindings
+		(http://php-idn.bayour.com/)
+

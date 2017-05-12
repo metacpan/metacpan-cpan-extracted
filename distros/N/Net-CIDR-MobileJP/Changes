@@ -1,0 +1,97 @@
+Revision history for Net-CIDR-MobileJP
+
+0.24
+
+    - fixed releng issue
+    - regen cidr.yaml
+
+0.23
+
+    - regen cidr.yaml
+    - depend to latest WWW::MobileCarrierJP for security reason
+
+0.21
+
+    - regen cidr.yaml
+    - depend to latest WWW::MobileCarrierJP
+
+0.20
+
+    - adde default cidr.yaml for failing issue...
+
+0.19
+
+    - fixed Makefile.PL for installing cidr.yaml
+
+0.18
+
+    - depend to File::ShareDir 1.02
+    - releng with M::I 0.97
+
+0.17
+
+    - use dist_file
+    - generate cidr.yaml automatically
+
+0.16
+
+    - fixed tests bug
+
+0.15
+
+    - depend to WWW::MobileCarrierJP 0.19
+
+0.14
+
+    - use YAML::Syck, if it's available.
+
+0.13
+
+    - some tests moved to xt/
+
+0.12
+
+    - remove Net::CIDR::MobileJP::Scraper.
+
+0.11
+
+    - updated cidr.yaml
+    - use latest vesion of WWW::MobileCarrierJP.
+    - fixed typo
+
+0.10
+    fix a build problem
+
+0.0.9  Thu Dec  6 18:21:39 PST 2007
+
+    use WWW::MobileCarrierJP;
+
+0.0.8  Mon Mar  5 11:26:06 JST 2007
+    suck around docomo's html version up.
+    thanks to Shunichiro Fujiwara.
+
+0.0.7  Thu Dec  7 15:01:11 JST 2006
+    suck around ezweb's html version up.
+    thanks to HIROSE, Masaaki
+
+0.0.6  Mon Nov 20 16:50:53 JST 2006
+    fixed Makefile.PL(thanks to Masayoshi Sekimura)
+
+0.0.5  Thu Nov 16 15:31:55 JST 2006
+    avoid to warnings(thanks to Tatsuhiko Miyagawa)
+
+0.0.4  Thu Nov 16 13:18:41 JST 2006
+    version up the Module::Install.
+    added share/DUMMY file.
+
+0.0.3  Mon Oct 23 21:43:05 JST 2006
+      use Module::Install.
+      use File::ShareDir.
+
+0.0.2  Fri Oct 13 00:09:54 JST 2006
+       Change Author Name.
+       Hatena ID to real name.
+
+0.0.1  Wed Oct 11 19:07:57 2006
+       Initial release.
+

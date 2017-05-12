@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Nokia-File-NFB
+version:      0.01
+version_from: lib/Nokia/File/NFB.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    Compress::Zlib:                0
+    Encode:                        0
+    Fcntl:                         0
+    FileHandle:                    0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

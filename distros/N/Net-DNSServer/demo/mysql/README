@@ -1,0 +1,189 @@
+$Id: README,v 1.1 2002/04/29 10:57:05 rob Exp $
+
+PURPOSE
+-------
+MySQL SQL backend DNS name server.
+
+
+CONTENTS
+--------
+
+README: This file
+
+dnsdbd: Starter script
+
+schema.mysql: Example schema file
+
+To be used in conjuction with dnsdbd.
+It can be redirected to mysql from commandline.
+
+
+INSTALL
+-------
+
+1) Make sure you have MySQL installed before continuing.
+
+Get the MySQL server, client, and shared packages
+from the mysql web site.  (The MySQL RPMs that come
+with the RedHat distributions will cause corrupt
+databases under high loads.)
+
+http://www.mysql.com/downloads/
+
+May may get the required DBD::mysql perl API also
+from there or from CPAN.
+
+http://www.mysql.com/downloads/api-dbi.html
+  or
+http://search.cpan.org/search?dist=DBD-mysql
+
+
+A trick in case you lost the root password to mysql:
+
+# /etc/rc.d/init.d/mysql stop
+# /usr/bin/safe_mysqld --datadir=/var/lib/mysql --pid-file=/var/lib/mysql/skip.pid --skip-grant-tables &
+mysqld --basedir=/ --datadir=/var/lib/mysql --user=mysql --skip-grant-tables &
+# echo 'use mysql ; update user set password = password("foo") where host = "localhost" and user = "root";' | mysql
+# kill `cat /var/lib/mysql/skip.pid`
+# /etc/rc.d/init.d/mysql start
+
+2) Load the schema into the database.
+
+$ mysql -uroot -p -h localhost < schema.mysql
+Enter password: foo
+
+$ mysqladmin flush-privileges -uroot -p
+
+
+3) A quick test to make sure mysql is configured:
+
+$ mysql --user=named --password=notbind dns
+mysql> show tables;
+mysql> select * from template;
+mysql> quit;
+Bye
+$ perl -e 'use DBI;'
+$ perl -e 'use DBD::mysql;'
+
+4) You need to be root to turn on dnsdbd:
+
+# /usr/doc/Net-DNSServer/demo/mysql/dnsdbd
+
+5) Editing DNS Entries
+
+This is meant to be performed by manipulating
+the "zone" table using INSERT, DELETE, and UPDATE
+SQL queries appropriately.  The name server is NOT
+compatible with "update" packets (i.e. using nsupdate)
+at this time.  Modifications can be made through the
+"mysql" client program or any other utility you create
+that can perform SQL queries on the database.
+
+TEST
+----
+
+The schema.mysql provides a zone "test.com"
+for testing and validation purposes only.
+You will probably want to DELETE this entry
+from the "zone" table once you know everything
+is functioning correctly.
+
+Check to make sure that dnsdbd started
+correctly.
+
+# tail -f /var/log/named.log
+Process Backgrounded
+2002/04/01-12:00:00 Net::DNSServer starting!
+Binding to TCP port 53 on host 0.0.0.0
+Binding to UDP port 53 on host 0.0.0.0
+
+^C
+#
+
+Run a few tests to make sure it is answering
+correctly.
+
+$ nslookup 127.0.0.1 127.0.0.1
+Server:  localhost
+Address:  127.0.0.1
+
+Name:    localhost
+Address:  127.0.0.1
+
+$ nslookup localhost. localhost.
+Server:  localhost
+Address:  127.0.0.1
+
+Name:    localhost
+Address:  127.0.0.1
+
+$ nslookup test.com. localhost.
+Server:  localhost
+Address:  127.0.0.1
+
+Name:    test.com
+Address:  192.168.1.100
+
+$ nslookup www.test.com. localhost.
+Server:  localhost
+Address:  127.0.0.1
+
+Name:    test.com
+Address:  192.168.1.100
+Aliases:  www.test.com
+
+$ nslookup -type=mx test.com. localhost.
+Server:  localhost
+Address:  127.0.0.1
+
+test.com        preference = 10, mail exchanger = mail.isp.com
+test.com        nameserver = ns.roobik.com
+$
+
+
+INTEGER IP?
+-----------
+
+In order to improve SQL storage and query time,
+the IP Addresses are stored in the "address"
+field of the "zone" table as its network packed
+integer value.  This number can be used by most
+resolvers as is.
+
+$ nslookup 2130706433 127.0.0.1
+Server:  localhost
+Address:  127.0.0.1
+
+Name:    localhost
+Address:  127.0.0.1
+
+$
+
+But it can be more confusing to understand than
+the dotted IP string format.  For your convenience,
+here are some nice subroutines to translate back
+and forth between the two:
+
+sub ip_to_int {
+  unpack("N", pack("C4", split( /\./, shift)));
+}
+
+sub int_to_ip {
+  join(".", unpack("C4", pack("N", shift)));
+}
+
+Example Usage:
+
+$string = "127.0.0.1";
+$int = ip_to_int($string); # Sets to 2130706433
+$ip =  int_to_ip($int);    # Sets to "127.0.0.1"
+
+
+LICENSE
+-------
+
+Copyright (c) 2002, Rob Brown <bbb@cpan.org>.
+All rights reserved.
+
+Net::DNSServer is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.

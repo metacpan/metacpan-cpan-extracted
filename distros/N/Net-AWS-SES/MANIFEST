@@ -1,0 +1,9 @@
+Changes
+lib/Net/AWS/SES.pm
+lib/Net/AWS/SES/Response.pm
+Makefile.PL
+MANIFEST
+README
+t/image.gif
+t/Net-AWS-SES.t
+META.yml                                 Module meta-data (added by MakeMaker)

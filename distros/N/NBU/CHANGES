@@ -1,0 +1,117 @@
+For release 0.93
+Second round of NBU 6.5 related fixes as well as some enhancements.  Most
+significantly, we are getting ready to use NBU to move beyond just inspecting
+and monitoring and start making changes to the running NetBackup environment!
+- "Gracefully" notice NetBackup is not installed
+- Handle multiple image copies by maintaining fragment lists for each one
+- Better license key analysis
+- Distinction between media managers and robotic media managers
+- Non-removable media forced to "disk" density
+- Some policy manipulation code
+	- activate / de-activate
+For release 0.92
+First round of updates focused on support release 6.5  Most of these updates
+revolve parsing the much enhanced (but still hopelessly broken) output of
+bpdbjobs.  However, it looks like this time around there is enough of a cooky
+crumb trail to come up with some sort of speed analysis again.  Run nbutop.pl
+and enjoy!
+For release 0.91
+Bug fixes, of course; mostly related to changes in the output of various
+NetBackup tools as this release finally catches up with Veritas' release 5.1
+and its patches.  Hopefully support for 6.x will not take near as long!
+Here is a brief overview of some of the major work that has gone into
+release 0.91:
+- Support for Windows (under cygwin) completed
+- Properly handle disk based storage units and their file "volumes".
+- Handle new calendaring schedule format
+- Handle Duplicate job type
+- coverage.pl XML-ized and taught about various new OS versions
+- client-list.pl, volume-use.pl, robot-status.pl "production" ready
+- policy-space.pl shows backup volume analysis capabilities
+and of course many, many bug-fixes.
+For release 0.90
+Finally getting down to the hard work of writing docs and on-line help.  Can
+you believe it?
+- class-list.pl XML-ized and moved into "production"
+- toc.pl into "production"
+For release 0.86
+Lots of work regarding volumes and their existence in media manager or volume
+databases.
+- Figured out, I think, bit 0x10 of the media status field
+- Deal with multiple volume databases and thus volume-ds that could exist
+  more than once.  That is, complain and ignore the second definition.
+- Licensing handles re-using the same key on more than one host (naughty,
+  naughty!)
+- Add jobtype "Import"
+and lots more...
+For release 0.85
+Some minor fixes and updates for NBU 4.5 compatibility
+- Handle multiplexed fragments when computing a volume's TOC
+- Properly code job types
+- 4.5.0 recognized in robot inventorying logic
+- drives and robots now track whether they're known to any storage units;
+ this allows one to identify equipment currently in use by NetBackup or not.
+- Scratch pools identified via -listscratch
+- Fix bug in job parsing when tapes are positioning before they're mounted
+For release 0.75
+This release builds on its predecessors by fleshing out more and more functionality
+as user (my) needs warrant.  Lately these have been focussed on two areas in
+particular: volume tracking and job reporting.  Hence the NBU::Media class implements
+quite a few more attribute manipulation methods and the NBU::Job class has gotten
+quite adept at parsing through the bpdbjobs output.
+And this just in under the wire: a start on License analysis using a NBU::License class
+Here is a somehwat arbitrary summary of changes:
+- nbutop.pl figures out which drives it should monitor by scavenging through all
+  the storage unit definitions.
+- The NBU::Host class implements a crude hostname aliasing mechanism so servers
+  listed under multiple names (read: with multiple interfaces) can be identified
+  as being one and the same.  At some point the aliases list will be read from a
+  configuration file.  (If only XML support wasn't such a pain to install!)
+- js.pl and nbutop.pl can be made to talk to other master servers with by
+  setting a -M flag.
+- client and class list examples now list class membership and member clients
+  respectively.
+- Get and set offsite attributes on volumes.
+- Jobs can now regurgitate the errors associated with them.
+- If you're willing to install some XML related modules, the new
+  robot-snapshot.pl script's configuration files are now written in XML; more
+  of this is coming.
+- Volume ejecting and robot inventory updating are now wired live.  (Vaulting
+  here we come :-)
+- Minor code re-arranging has lowered the Perl version requirements to 5.004
+- js.pl with -e will list the errors associated with a job; especially helpful
+  for those pesky status 1 jobs against Windoze boxes.
+- Quash stderr messages from the various cli tools
+For release 0.74
+- Run bpconfig as part of gathering the full picture of the NetBackup
+  environment.  This allows us to display information on e-mail notifications
+  amongst other things (see config.pl).
+- The volume-list.pl example displays assigned retention levels for each
+  volume.
+- Courtesy of Peter Buschman we now parse a disk storage unit in bpdbjobs
+  output.
+- js.pl can display the file list for a given job
+- toc.pl example sorts image file lists
+- Man pages for NBU.pm; nbutop.pl
+  The .pl files with man pages were moved into a bin sub-directory and are now
+  officially installed as part of this module
+- Fix the problem caused by bpdbjobs sending refresh data about jobs that
+  are being expired from its database
+- Handle drive indices on a media server by media server basis rather than
+  having a single global list of them.
+- Even the Image class now has a loadImages factory method which will indeed
+  load all images.  Oh the questions you can now finally ask!  Take a peek at
+  examples/statistics.pl for a few simple ones
+- Class objects implement loadImages.
+- Class information is now loaded on demand as well.  Of course if you know
+  you are going to loop over all of them, you'd still want to load them en
+  masse first.
+
+For release 0.73:
+Most changes are bug fix and example script related.  It is interesting to see
+how easy it has been to whip up scripts on top of the object model.  However,
+sometimes a flaw in the underlying model is exposed :-(  Major changes are:
+- addition of nbutop.pl
+  Patterned after the famous top utility, this script lists the currently active
+  jobs in a number of sort orders.  Leveraging the object model correlating
+  active jobs to volumes and drives was a no-brainer!

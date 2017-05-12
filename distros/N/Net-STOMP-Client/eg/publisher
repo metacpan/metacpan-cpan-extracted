@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+#
+# sample publisher
+#
+
+# required modules
+
+use strict;
+use warnings;
+use Net::STOMP::Client;
+use Time::HiRes qw(time);
+
+# global variables
+
+our(%Option, $Conn, $Start);
+
+# options setting
+
+$Option{user} = $ENV{STOMP_USER} || "admin";
+$Option{password} = $ENV{STOMP_PASSWORD} || "password";
+$Option{host} = $ENV{STOMP_HOST} || "localhost";
+$Option{port} = $ENV{STOMP_PORT} || 61613;
+$Option{destination} = $ENV{STOMP_DESTINATION} || "/topic/event";
+$Option{count} = $ENV{STOMP_COUNT} || 10000;
+
+# connection
+
+$Conn = Net::STOMP::Client->new(
+    host => $Option{host},
+    port => $Option{port},
+);
+$Conn->connect(
+    login    => $Option{user},
+    passcode => $Option{password},
+);
+printf("connected to %s:%d using STOMP %s\n",
+       $Conn->peer()->addr(), $Conn->peer()->port(), $Conn->version());
+
+# sending messages
+
+$Start = time();
+foreach my $i (1 .. $Option{count}) {
+    $Conn->send(
+        destination => $Option{destination},
+        persistent  => "true",
+        body        => "Hello world from Perl",
+    );
+}
+printf("sent %d messages in %.3f seconds\n", $Option{count}, time()-$Start);
+
+# disconnection
+
+$Conn->send(
+    destination => $Option{destination},
+    body        => "SHUTDOWN",
+);
+$Conn->disconnect();

@@ -1,0 +1,215 @@
+
+=head1 NAME
+
+Net::SIP - Framework SIP (Voice Over IP, RFC3261)
+
+=head1 SYNOPSIS
+
+...
+
+=head1 DESCRIPTION
+
+Net::SIP consists of packages for handling the SIP packets,
+for transport of the packets, for processing the packets
+and on top of all that a simplified layer for common tasks.
+
+Addionally L<Net::SIP::Util> provides utility functions
+and L<Net::SIP::Debug> provides a debugging layer used
+by all these packages. Especially it provides the function
+B<invoke_callback> which is used for all callbacks unless
+documentation specifies otherwise. This function
+supports a variety of different callback styles.
+
+For first and simple applications you best start with L<Net::SIP::Simple>.
+If this is no longer enough you might look at the details of
+L<Net::SIP::Dispatcher>, L<Net::SIP::Endpoint>,
+L<Net::SIP::Register> and L<Net::SIP::StatelessProxy>.
+Although these packages are in itself well documented the functionality
+and the design is best understandable if you look how it gets used
+in the source of L<Net::SIP::Simple>.
+
+=head2 SIP packet handling
+
+=over 4
+
+=item L<SIP::Net::Packet>
+
+The base class for handling SIP packets and provides ways to
+parse, construct and manipulate SIP packets.
+
+=item L<SIP::Net::Request>
+
+Derived from L<SIP::Net::Packet> and handles the request packets.
+Provides ways to create special requests like ACK or CANCEL based
+on previous requests and responses, for creating responses based
+on requests, for authorization of requests.
+
+=item L<SIP::Net::Response>
+
+Derived from L<SIP::Net::Packet> and handles the response packets.
+
+=item L<SIP::Net::SDP>
+
+Handles SDP bodies from SIP packets. Provides ways to parse, construct
+these bodies, to get media information from them and to manipulate the
+SDP data for NAT etc.
+
+=back
+
+=head2 Transport of SIP packets
+
+=over 4
+
+=item L<Net::SIP::Leg>
+
+Encapsulates socket for transport of packet. Provides way to find out,
+if target is reachable through this socket. Prepares incoming, outgoing
+and forwarding packets by removing or adding header like B<Via>,
+B<Record-Route>.
+
+=item L<Net::SIP::Dispatcher>
+
+Handles new packets coming in through a L<Net::SIP::Leg>.
+Delivers outgoing packets through the appropriate L<Net::SIP::Leg>.
+Handles timeouts and retransmission of outgoing packets, lookup
+of the appropriate leg through DNS etc.
+
+=item L<Net::SIP::Dispatcher::Eventloop>
+
+Simple implementation of an event loop for handling socket events
+and timers.
+Can be replaced to integrate into other event loops, like L<Tk>,
+L<Lib::Event> or L<POE>.
+
+=back
+
+=head2 Processing of SIP packets, application layer
+
+=over 4
+
+=item L<Net::SIP::Endpoint>
+
+Implements a SIP endpoint (UAC,UAS). Provides ways to INVITE or BYE
+calls or to handle incoming calls. Calls themselves will be handled by
+L<Net::SIP::Endpoint::Context>.
+
+=item L<Net::SIP::Registrar>
+
+Simple implementation of a registrar.
+
+=item L<Net::SIP::StatelessProxy>
+
+Simple implementation of a stateless proxy. Stateful proxies should
+probably be implemented by putting multiple L<Net::SIP::Endpoint>s
+together.
+
+=item L<Net::SIP::Blocker>
+
+Can block requests by method name with custom error code.
+
+=item L<Net::SIP::ReceiveChain>
+
+Can contain various objects for processing objects. Useful
+in connection with L<Net::SIP::Authorize>.
+
+=item L<Net::SIP::Redirect>
+
+Works together with a registrar and redirects requests.
+
+=item L<Net::SIP::Authorize>
+
+If put into a L<Net::SIP::ReceiveChain> it requests and checks
+authorization and gives only authorized requests to the next
+member of the chain.
+
+=back
+
+=head2 Simplified Layer for common tasks
+
+=over 4
+
+=item Net::SIP::Simple
+
+Provides simple layer for common tasks and tests, like sending
+a voice message to somebody, receiving a message or even implementing
+an answer machine. Together with L<Net::SIP::Simple::RTP> it
+is possible to handle simple RTP data (PCMU/8000).
+
+=back
+
+=head2 Error handling
+
+Unless otherwise documented the common way to propagate errors is to
+raise an exception, e.g. call die(). This might especially happen
+when parsing packets from strings, so unless you want to crash your
+application on bad input you should catch these exceptions with
+eval.
+
+=head1 EXPORTS
+
+By default nothing is exported. There are various arguments for
+exporting:
+
+=over 4
+
+=item :alias
+
+Exports constants as aliases for the Net::SIP::* packages, e.g.
+'Simple' for 'Net::SIP::Simple', 'Registrar' for 'Net::SIP::Registrar',
+'Packet' for 'Net::SIP::Packet', 'NATHelper_Client' for 'Net::SIP::NATHelper::Client'
+ etc.
+
+=item :util
+
+Exports everything (tag ':all') from L<Net::SIP::Util>.
+
+=item :debug
+
+Exports the default exports from L<Net::SIP::Debug>.
+
+=item :all
+
+Everything from ':debug', ':util' and ':alias'.
+
+=item rtp=MINPORT-MAXPORT|rtp:MINPORT-MAXPORT
+
+Set the range of ports to be used for creating RTP sockets to MINPORT..MAXPORT.
+This affects L<Net::SIP::Util::create_rtp_sockets>.
+
+=item debug=LEVEL|debug:LEVEL
+
+Set Debugging level to LEVEL
+
+=item string
+
+Strings where the first character is upper case will be interpreted
+as aliases for Net::SIP::* and it will try to export it. If
+the first character is lower case it will try to import it from
+L<Net::SIP::Util>.
+
+=back
+
+=head2 EXAMPLES
+
+  use Net::SIP 'invoke_callback'; # use Net::SIP::Util 'invoke_callback'
+  use Net::SIP ':debug';          # use Net::SIP::Debug
+  use Net::SIP ':util';           # use Net::SIP::Util ':all'
+
+  use Net::SIP ':alias';
+  Packet->new( ... );             # Net::SIP::Packet->new( ... )
+
+
+  # restrict rtp sockets from command line
+  perl -MNet::SIP=rtp:4000-4010 program.pl
+
+=head1 BUGS
+
+Support for TCP and SIPS and not or not fully implemented.
+
+=head1 COPYRIGHT
+
+This module and are modules in the Net::SIP Hierarchy distributed
+together with this module are copyright (c) 2006-2013, Steffen Ullrich.
+All Rights Reserved.
+These modules are free software. They may be used, redistributed
+and/or modified under the same terms as Perl itself.

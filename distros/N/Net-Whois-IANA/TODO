@@ -1,0 +1,5 @@
+o Follow redirection of queries and fixate it.
+  This is tricky - I am unable to catch the redirection signal
+o Add a plug-in spot for servers beyond the five basics (JPNIC etc.).
+o Provide built-in cache support.
+o Make some order about the invalid responses.

@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+
+<!--
+This file, /usr/local/etc/robot-conf.xml, is used by various NBU scripts
+to monitor and maintain robot and storage unit contents
+-->
+<media-configuration>
+
+  <!--
+  The robot-levels element describes how the robots in this netbackup
+  configuration should be managed.
+  -->
+  <robot-levels>
+    <frozen>0</frozen>
+
+    <!--
+    Each robot element consists of a list of pool elements
+    
+    A pool element minimally has a name attribute with and optionally
+    these additional elements:
+    - full
+      no more than the target number of full tapes are allowed in the robot
+    - empty
+      there must be at least that many empty volumes available for that pool
+    -->
+    <robot id ="1">
+      <pool name="Scratch"/>
+      <pool name="MAXpool">
+	<full>140</full>
+      </pool>
+      <pool name="NetBackup">
+	<total>1</total>
+      </pool>
+    </robot>
+    <robot id ="2">
+      <pool name="Scratch"/>
+      <pool name="SAP_Production"/>
+      <pool name="MAXpool">
+	<full>140</full>
+      </pool>
+      <pool name="NetBackup">
+	<total>1</total>
+      </pool>
+    </robot>
+    <robot id ="3">
+      <pool name="Scratch"/>
+      <pool name="MAXpool">
+	<full>70</full>
+      </pool>
+    </robot>
+    <robot id ="4">
+      <pool name="Scratch"/>
+      <pool name="MAXpool">
+	<full>70</full>
+      </pool>
+    </robot>
+    <robot id ="5">
+      <pool name="Scratch"/>
+      <pool name="MAXpool"/>
+      <pool name="SAP_Production"/>
+    </robot>
+    <robot id ="6">
+      <pool name="Scratch"/>
+      <pool name="MAXpool"/>
+    </robot>
+  </robot-levels>
+
+  <!--
+  The itchy element consists of a list of pool elements.  For each
+  such volume pool element a number of tape density elements can be
+  listed.  Under each pool/density combination a newpool element can
+  be set to control the new pool's name.  Without a newpool element to
+  control the new name, the pool's unallocated volumes will be
+  moved into the default scratch pool.
+  -->
+  <itchy>
+    <pool name="MAXpool">
+      <density code="11"/>
+      <density code="14">
+	<newpool name="relabel"/>
+      </density>
+    </pool>
+    <pool name="SAP_Production">
+      <density code="11"/>
+      <density code="14"/>
+    </pool>
+  </itchy>
+</media-configuration>

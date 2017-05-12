@@ -1,0 +1,12 @@
+Revision history for Perl extension NetAddr::IP::Find.
+
+0.03  Tue Jul  8 13:15:22 JST 2003
+	* Fixed bug that any 4 integers with dot are parsed as IP
+	  (Thanks to Reid Leatzow)
+
+0.02  Fri Oct  5 01:21:25 JST 2001
+	- renamed to NetAddr::IP::Find
+
+0.01  Mon Jul  9 20:04:14 2001
+	- original version; created by h2xs 1.19
+

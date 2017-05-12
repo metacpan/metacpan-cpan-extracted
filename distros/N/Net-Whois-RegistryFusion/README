@@ -1,0 +1,38 @@
+Net-Whois-RegistryFusion version 0.05
+========================================
+
+This module lets you perform cacheable whois lookups using RegistryFusion XML API
+in an object-oriented way:
+
+    my $rf = new Net::Whois::RegistryFusion;
+    my $xml = $rf->whois('domain.com');
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Required Modules:
+ Date::Format (any)
+ Error (any)
+ File::Slurp (any)
+ File::stat (any)
+ IO::LockedFile (any)
+ LWP::Simple (any)
+ Module::Signature (any)
+ Set::Array (any)
+ Test::More (any)
+ Test::Signature (any)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Ilia Lobsanov
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.

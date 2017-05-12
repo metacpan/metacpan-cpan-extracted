@@ -1,0 +1,80 @@
+Revision history for Perl extension Net::Socket::NonBlock.
+
+0.15  Tue Apr 01 04:00:00 2003
+	- Minor bugfix with Gets()
+	  If socket buffer is full it's content have to be returned
+	  by Gets() even no '\n' symbol in the buffer.
+	- Minor documentation change
+
+0.14  Mon Feb 17 19:00:00 2003
+        - Major bug fixed in Gets()
+          The last piece of data is never returned unless it is terminated by '\n'
+	- UDP receiving performance is improved dramaticaly (actually, minor bug fixed)
+	- 'Broadcast' parameter added to Listen() and Connect() methods
+	- 'DiscEmpty' parameter added to Listen() and Connect() methods
+	- Puts(\@Array, ...) syntax introduced
+	- IO() is now returning the meaningful value
+	- Method DESTROY is defined for Net::Socket::NonBlock::Nest
+	  and references to a nest removed from Net::Socket::NonBlock,
+	  so garbage collector can do his work now
+	- Licence and Copyright changed
+
+0.13  Fri Jan 24 23:05:00 2003
+	- I forget to change a version number in the module. Sorry.
+
+0.12  Fri Jan 24 23:00:00 2003
+	- Serious bug with "Undefined subroutine &Net::Socket::NonBlock::inet_aton" fixed
+
+0.11  Fri Jan 24 00:10:00 2003
+	- Serious bug with delayed close fixed
+
+0.10  Sun Jan 19 19:30:00 2003
+	- object-oriented interface to sockets added
+	- Net::Socket::NonBlock::Nest class introduced
+	  It is placed in the same file as Net::Socket::NonBlock class
+	- functions Listen and Connect are moved to the Net::Socket::NonBlock::Nest package
+	- function Net::Socket::NonBlock->new() is returning the Net::Socket::NonBlock::Nest object.
+	  Note: Net::Socket::NonBlock->new() is provided for compatibility only.
+	  Use Net::Socket::NonBlock::Nest->new() instead.
+        - functions Net::Socket::NonBlock::Nest::Listen and
+          Net::Socket::NonBlock::Nest::Connect are returning the Net::Socket::NonBlock object
+        - function Net::Socket::NonBlock::Nest::Properties exists in parralell
+          to Net::Socket::NonBlock::Properties
+        - documentation changed according to module changes
+        - I hope the v.0.10 is fully compatible with v.0.06. It means you can continue to
+          use the functions in old style.
+
+0.06  Tue Sep 24 19:00:00 2002
+ 	- Close($SocketID [, $Flush [, $Timeout]]) syntax introduced
+ 	- IO([$Errors]) syntax introduced
+        - SafeStr function removed from the module.
+	  You can obtain the sources for this function from the SYNOPSIS section of documentation.
+        - The way how the SilenceT working is changed.
+          It is necessary now to call the Close function for the sockets which become unavailable
+          because of silence timeout.
+ 	- Minor bugfixes
+ 	- Minor changes in debug messages printing
+ 	- Minor documentation changes
+        - Minor changess in test.pl
+
+0.05  Fri Jul 19 17:00:00 2002
+ 	- Minor bugfixes
+ 	- 'NestProperties' method introduced
+
+0.04  Sat Jul  6 23:00:00 2002
+ 	- Serious bugfixes
+ 	- 'InstantDeth' parameter removed
+ 	- 'debug' parameter introduced
+ 	- The example updated
+
+0.03  Wed Jun 24 23:40:00 2002
+	- SafeStr not exported by default any more
+	- 'MaxClients' parameter for 'Listen' method introduced
+
+0.02  Tue Jun 19 10:00:00 2002
+	- first public release
+
+0.01  Fri Apr 26 17:43:45 2002
+	- original version; created by h2xs 1.21 with options
+		-AXcfn Net::Socket::NonBlock
+	  "friends and family release"

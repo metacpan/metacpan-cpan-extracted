@@ -1,0 +1,13 @@
+Net/Z3950/AsyncZ version 0.04
+=======================
+
+TO-DO
+=====	
+
+-- Add a default output callback (for both plain text and html)
+-- Add a default errors callback (for both plain text and html)
+-- enable a string server:port/database as option to servers parameter
+    in both Net::Z3950::AsyncZ::new and  Net::Z3950::AsyncZ:Options_param
+
+
+

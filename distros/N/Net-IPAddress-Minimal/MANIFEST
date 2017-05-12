@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/tester.pl
+lib/Net/IPAddress/Minimal.pm
+t/00-compile.t
+t/author-critic.t
+t/basic.t
+t/basic_invert.t
+t/extend_invert.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

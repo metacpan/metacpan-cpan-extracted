@@ -1,0 +1,42 @@
+Net-Random-QRBG
+
+This is something magical
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::Random::QRBG
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Random-QRBG
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-Random-QRBG
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-Random-QRBG
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-Random-QRBG/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Brent Garber
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

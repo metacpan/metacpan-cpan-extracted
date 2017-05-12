@@ -1,0 +1,61 @@
+0.724 2016-02-01
+- fix duplicate ACK for FIN in some occassion of multiple shutdown/close.
+0.723 2016-01-29
+- fixed off-by-one calculation of sequence number for FIN in TCP.pm
+- added explicit connect function in TCP.pm
+0.722 2016-01-21
+- reopen function usable for rotating output etc
+0.721 2016-01-08
+- more control over the closing process with the close method in TCP
+0.720 2015-12-16
+- option to disable checksum calculation completly which gives a major
+  performance boost
+0.719 2015-12-15
+- faster checksum calculation which has a major performance impact
+0.718 2015-12-08
+- fix IPv6 support (was bad ethernet type id)
+- performance should be faster for TCP and UDP now
+- Behavior change: Net::PcapWriter::packet gets Layer 2 packet now
+  (ethernet layer) instead of IP packet
+0.717 2015-12-07
+- update documentation for TCP ack, shutdown to include timestamp.
+  Add write_with_flags to documented API for TCP. Make write_with_flags
+  update the internal state of the connection. Optimize DESTROY/_close
+  to write only the packets which are necessary to close the connection.
+0.716 2015-08-31
+- set binmode for output file to work on Windows platforms.
+  Thanks to security[AT]knochner[DOT]com for reporting.
+0.715 2015-02-02
+- merge changes to fix kwalitee issues.
+  Thanks to oeuftete and to CPAN Pull Request Challenge
+0.714 2014-12-15
+- forgot to add ICMP_Echo.pm to MANIFEST
+0.713 2014-12-14
+- support for ICMP/ICMPv6 echo, based on patch from EmmanuelBau
+0.712 2014-07-04
+- fix checksum computation, thanks to BLUHM for reporting
+0.711 2014-07-03
+- added support for IPv6
+0.710_2 2013-07-04
+- try to find usable inet_pton in IP.pm and export it for TCP and UDP
+0.710_1 2013-07-02
+- try to detect unusable inet_pton in Makefile.PL (Win32)
+0.71 2013-05-07
+- fixed writing timestamp in Tcp.pm and Udp.pm
+  Thanks to christian[DOT]janssen[AT]evonik[DOT]com for reporting
+0.7 2013-03-06
+- add udp_conn
+0.6 2012-10-01
+- add license to Makefile.PL, change email in author section
+0.5 2012-03-01
+- forgot to add PREREQ_PM to WriteMakefile
+0.4 2012-02-29
+- add Socket6 to PREREQ_PM if inet_pton is not in Socket yet (<5.12)
+0.3 2012-02-27
+- switch to DLT_EN10MB instead of DLT_RAW, because type-id is the same for
+  all systems
+0.2 2011-10-20
+- make it work on 5.10 and 5.8, where inet_pton is in Socket6
+  and not Socket
+0.1 2011-10-07
+- initial release

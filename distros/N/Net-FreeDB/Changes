@@ -1,0 +1,40 @@
+Revision history for Perl extension Net::FreeDB.
+
+0.10  Tue Oct 14 09:33:00 2014
+    - Major rewrite, interface is NOT backward compatible
+    - Fixed many issues that caused most of the funtionality to not work
+    - Is now CDDB Protocol Level 6 compliant, this includes many new methods
+    - Code no longer requires regular expressions to parse data, is much more sane
+
+0.09  Mon Oct 13 13:26:00 2014
+    - Applied patch for FreeBSD from Daniel Lintott for kFreeBSD-* systems
+    - Applied patch for FreeBSD from Gregor Herrmann to disable some tests when no net access is available
+    - Applied patch to fix POD error from Gregor Herrmann
+
+0.08  Thu Sep 28 11:02:51 2006
+	- Fix the use of CDDB::File in the read() method.
+	  Reported by Kaloyan Dimitrov <kaloyan.dimitrov@mail.bg>
+	- Remove an unreferenced variable in the XS files.
+	  Closes: CPAN RT #4191
+	- Add the Changes file to the packing manifest.
+
+0.07  Tue Jan  3 15:57:08 2006
+	- Add FreeBSD support
+	  various minor cleanups
+	  release as 0.07 by Peter Pentchev after e-mail silence by
+	  David Shultz for a couple of months
+
+0.06  Tue Feb 26 10:27:00 2002
+	- Merging query and inexact methods
+	  changing return of query method to return an
+	  array of hashes
+
+0.05  Wed Feb 20 12:00:00 2002
+	- Various changes including adding CDDB::File support
+	  more tests for method and static calls and various
+	  bug fixes
+
+0.01  Wed Aug  1 11:28:11 2001
+	- original version; created by h2xs 1.21 with options
+		-n Net::FreeDB -d -x discid.h
+

@@ -1,0 +1,13 @@
+COPYRIGHT
+lib/Net/INET6Glue.pm
+lib/Net/INET6Glue/FTP.pm
+lib/Net/INET6Glue/INET_is_INET6.pm
+Makefile.PL
+MANIFEST
+Changes
+README
+t/01_inet_is_inet6.t
+t/02_ftp_load.t
+t/external/03_ftp6.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

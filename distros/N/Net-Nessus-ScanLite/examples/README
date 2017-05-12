@@ -1,0 +1,15 @@
+These are simple example for this module.
+example.ini   	- Edit this file for your own environment. 
+ex_ini.pl  	- Uses file path and Config::IniFile object.
+
+Non ini examples.
+
+ex_no_ini.pl	- Edit the example to use your own info.
+
+Cgi example
+
+scan.cgi       - Simple cgi application to do a revers scan on the connecting agent.
+                 Use for testing only or put auth in front of it. It may scan robots.
+
+results.tmpl   - HTML::Template for use with scan.cgi
+

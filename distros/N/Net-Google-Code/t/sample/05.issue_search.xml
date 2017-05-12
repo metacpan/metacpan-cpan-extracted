@@ -1,0 +1,368 @@
+<?xml version="1.0"?>
+
+<feed xmlns="http://www.w3.org/2005/Atom">
+ <updated>2009-06-12T05:55:48Z</updated>
+ <id>http://code.google.com/feeds/p/net-google-code/issueupdates/basic</id>
+ <title>Issue updates for project net-google-code on Google Code</title>
+ <link rel="alternate" type="text/html" href="http://code.google.com/p/net-google-code/issues/list"/>
+ <link rel="self" type="application/atom+xml;type=feed" href="http://code.google.com/feeds/p/net-google-code/issueupdates/basic"/>
+ 
+ 
+ <entry>
+ <updated>2009-06-12T05:55:48Z</updated>
+ <id>http://code.google.com/feeds/p/net-google-code/issueupdates/basic/22/2</id>
+ <link rel="alternate" type="text/html" href="http://code.google.com/p/net-google-code/issues/detail?id=22#c2" />
+ <title>Update 2 to issue 22 (&quot;for sd test&quot;)</title>
+ <author>
+ <name>sunnavy</name>
+ </author>
+ <content type="html">&lt;pre&gt;second comment
+ &lt;/pre&gt;
+ </content>
+</entry>
+
+ 
+ 
+ 
+ <entry>
+ <updated>2009-06-12T05:55:22Z</updated>
+ <id>http://code.google.com/feeds/p/net-google-code/issueupdates/basic/22/1</id>
+ <link rel="alternate" type="text/html" href="http://code.google.com/p/net-google-code/issues/detail?id=22#c1" />
+ <title>Update 1 to issue 22 (&quot;for sd test&quot;)</title>
+ <author>
+ <name>sunnavy</name>
+ </author>
+ <content type="html">&lt;pre&gt;first comment
+ &lt;/pre&gt;
+ </content>
+</entry>
+
+ 
+ 
+ 
+ <entry>
+ <updated>2009-06-12T05:55:06Z</updated>
+ <id>http://code.google.com/feeds/p/net-google-code/issueupdates/basic/22</id>
+ <link rel="alternate" type="text/html" href="http://code.google.com/p/net-google-code/issues/detail?id=22" />
+ <title>Issue 22 created: &quot;for sd test&quot;</title>
+ <author>
+ <name>sunnavy</name>
+ </author>
+ <content type="html">&lt;pre&gt;this is description
+ &lt;/pre&gt;
+ </content>
+</entry>
+
+ 
+ 
+ 
+ <entry>
+ <updated>2009-06-04T05:35:33Z</updated>
+ <id>http://code.google.com/feeds/p/net-google-code/issueupdates/basic/13/4</id>
+ <link rel="alternate" type="text/html" href="http://code.google.com/p/net-google-code/issues/detail?id=13#c4" />
+ <title>Update 4 to issue 13 (&quot;Enter one-line summary&quot;)</title>
+ <author>
+ <name>sunnavy</name>
+ </author>
+ <content type="html">&lt;pre&gt;test 2
+ &lt;/pre&gt;
+ </content>
+</entry>
+
+ 
+ 
+ 
+ <entry>
+ <updated>2009-06-04T05:34:42Z</updated>
+ <id>http://code.google.com/feeds/p/net-google-code/issueupdates/basic/13/3</id>
+ <link rel="alternate" type="text/html" href="http://code.google.com/p/net-google-code/issues/detail?id=13#c3" />
+ <title>Update 3 to issue 13 (&quot;Enter one-line summary&quot;)</title>
+ <author>
+ <name>sunnavy</name>
+ </author>
+ <content type="html">&lt;pre&gt;test 2
+ &lt;/pre&gt;
+ </content>
+</entry>
+
+ 
+ 
+ 
+ <entry>
+ <updated>2009-06-04T05:34:41Z</updated>
+ <id>http://code.google.com/feeds/p/net-google-code/issueupdates/basic/13/2</id>
+ <link rel="alternate" type="text/html" href="http://code.google.com/p/net-google-code/issues/detail?id=13#c2" />
+ <title>Update 2 to issue 13 (&quot;Enter one-line summary&quot;)</title>
+ <author>
+ <name>sunnavy</name>
+ </author>
+ <content type="html">&lt;pre&gt;test 1
+ &lt;/pre&gt;
+ </content>
+</entry>
+
+ 
+ 
+ 
+ <entry>
+ <updated>2009-06-04T05:02:17Z</updated>
+ <id>http://code.google.com/feeds/p/net-google-code/issueupdates/basic/13/1</id>
+ <link rel="alternate" type="text/html" href="http://code.google.com/p/net-google-code/issues/detail?id=13#c1" />
+ <title>Update 1 to issue 13 (&quot;Enter one-line summary&quot;)</title>
+ <author>
+ <name>sunnavy</name>
+ </author>
+ <content type="html">&lt;pre&gt;06-04 13:02 CST
+ &lt;/pre&gt;
+ </content>
+</entry>
+
+ 
+ 
+ 
+ <entry>
+ <updated>2009-06-03T11:32:10Z</updated>
+ <id>http://code.google.com/feeds/p/net-google-code/issueupdates/basic/14/12</id>
+ <link rel="alternate" type="text/html" href="http://code.google.com/p/net-google-code/issues/detail?id=14#c12" />
+ <title>Update 12 to issue 14 (&quot;sd1&quot;)</title>
+ <author>
+ <name>sunnavy</name>
+ </author>
+ <content type="html">&lt;pre&gt;
+ 
+ &lt;br/&gt;Blockedon: 23 &lt;/pre&gt;
+ </content>
+</entry>
+
+ 
+ 
+ 
+ <entry>
+ <updated>2009-06-02T00:34:20Z</updated>
+ <id>http://code.google.com/feeds/p/net-google-code/issueupdates/basic/10/16</id>
+ <link rel="alternate" type="text/html" href="http://code.google.com/p/net-google-code/issues/detail?id=10#c16" />
+ <title>Update 16 to issue 10 (&quot;not touch labels&quot;)</title>
+ <author>
+ <name>sunnavy</name>
+ </author>
+ <content type="html">&lt;pre&gt;Issue 14 has been merged into this issue.
+ &lt;/pre&gt;
+ </content>
+</entry>
+
+ 
+ 
+ 
+ <entry>
+ <updated>2009-06-02T00:34:20Z</updated>
+ <id>http://code.google.com/feeds/p/net-google-code/issueupdates/basic/14/11</id>
+ <link rel="alternate" type="text/html" href="http://code.google.com/p/net-google-code/issues/detail?id=14#c11" />
+ <title>Update 11 to issue 14 (&quot;sd1&quot;)</title>
+ <author>
+ <name>sunnavy</name>
+ </author>
+ <content type="html">&lt;pre&gt;
+ 
+ &lt;br/&gt;Status: Duplicate&lt;br/&gt;Mergedinto: 10&lt;br/&gt;Blockedon: -10 &lt;/pre&gt;
+ </content>
+</entry>
+
+ 
+ 
+ 
+ <entry>
+ <updated>2009-06-02T00:33:32Z</updated>
+ <id>http://code.google.com/feeds/p/net-google-code/issueupdates/basic/14/10</id>
+ <link rel="alternate" type="text/html" href="http://code.google.com/p/net-google-code/issues/detail?id=14#c10" />
+ <title>Update 10 to issue 14 (&quot;sd1&quot;)</title>
+ <author>
+ <name>sunnavy</name>
+ </author>
+ <content type="html">&lt;pre&gt;
+ 
+ &lt;br/&gt;Blockedon: 10 &lt;/pre&gt;
+ </content>
+</entry>
+
+ 
+ 
+ 
+ <entry>
+ <updated>2009-05-27T03:24:40Z</updated>
+ <id>http://code.google.com/feeds/p/net-google-code/issueupdates/basic/14/9</id>
+ <link rel="alternate" type="text/html" href="http://code.google.com/p/net-google-code/issues/detail?id=14#c9" />
+ <title>Update 9 to issue 14 (&quot;sd1&quot;)</title>
+ <author>
+ <name>sunnavy</name>
+ </author>
+ <content type="html">&lt;pre&gt;
+ 
+ &lt;br/&gt;Summary: sd1 &lt;/pre&gt;
+ </content>
+</entry>
+
+ 
+ 
+ 
+ <entry>
+ <updated>2009-05-27T02:45:04Z</updated>
+ <id>http://code.google.com/feeds/p/net-google-code/issueupdates/basic/14/8</id>
+ <link rel="alternate" type="text/html" href="http://code.google.com/p/net-google-code/issues/detail?id=14#c8" />
+ <title>Update 8 to issue 14 (&quot;sd1 test&quot;)</title>
+ <author>
+ <name>sunnavy</name>
+ </author>
+ <content type="html">&lt;pre&gt;
+ 
+ &lt;br/&gt;Summary: sd1 test&lt;br/&gt;Labels: -priority-critical -test -bool 3 &lt;/pre&gt;
+ </content>
+</entry>
+
+ 
+ 
+ 
+ <entry>
+ <updated>2009-05-27T02:40:29Z</updated>
+ <id>http://code.google.com/feeds/p/net-google-code/issueupdates/basic/14/7</id>
+ <link rel="alternate" type="text/html" href="http://code.google.com/p/net-google-code/issues/detail?id=14#c7" />
+ <title>Update 7 to issue 14 (&quot;sd1&quot;)</title>
+ <author>
+ <name>sunnavy</name>
+ </author>
+ <content type="html">&lt;pre&gt;
+ 
+ &lt;br/&gt;Labels: -Priority-Medium priority-critical ok test bool &lt;/pre&gt;
+ </content>
+</entry>
+
+ 
+ 
+ 
+ <entry>
+ <updated>2009-05-27T02:19:57Z</updated>
+ <id>http://code.google.com/feeds/p/net-google-code/issueupdates/basic/14/6</id>
+ <link rel="alternate" type="text/html" href="http://code.google.com/p/net-google-code/issues/detail?id=14#c6" />
+ <title>Update 6 to issue 14 (&quot;sd1&quot;)</title>
+ <author>
+ <name>sunnavy</name>
+ </author>
+ <content type="html">&lt;pre&gt;
+this is comment
+ &lt;/pre&gt;
+ </content>
+</entry>
+
+ 
+ 
+ 
+ <entry>
+ <updated>2009-05-27T02:12:57Z</updated>
+ <id>http://code.google.com/feeds/p/net-google-code/issueupdates/basic/14/5</id>
+ <link rel="alternate" type="text/html" href="http://code.google.com/p/net-google-code/issues/detail?id=14#c5" />
+ <title>Update 5 to issue 14 (&quot;sd1&quot;)</title>
+ <author>
+ <name>sunnavy</name>
+ </author>
+ <content type="html">&lt;pre&gt;
+bla
+ &lt;/pre&gt;
+ </content>
+</entry>
+
+ 
+ 
+ 
+ <entry>
+ <updated>2009-05-27T01:03:29Z</updated>
+ <id>http://code.google.com/feeds/p/net-google-code/issueupdates/basic/14/4</id>
+ <link rel="alternate" type="text/html" href="http://code.google.com/p/net-google-code/issues/detail?id=14#c4" />
+ <title>Update 4 to issue 14 (&quot;sd1&quot;)</title>
+ <author>
+ <name>sunnavy</name>
+ </author>
+ <content type="html">&lt;pre&gt;test attachment
+ &lt;/pre&gt;
+ </content>
+</entry>
+
+ 
+ 
+ 
+ <entry>
+ <updated>2009-05-26T15:34:05Z</updated>
+ <id>http://code.google.com/feeds/p/net-google-code/issueupdates/basic/14/3</id>
+ <link rel="alternate" type="text/html" href="http://code.google.com/p/net-google-code/issues/detail?id=14#c3" />
+ <title>Update 3 to issue 14 (&quot;sd1&quot;)</title>
+ <author>
+ <name>sunnavy</name>
+ </author>
+ <content type="html">&lt;pre&gt;heya!
+ &lt;/pre&gt;
+ </content>
+</entry>
+
+ 
+ 
+ 
+ <entry>
+ <updated>2009-05-26T15:00:28Z</updated>
+ <id>http://code.google.com/feeds/p/net-google-code/issueupdates/basic/bulk</id>
+ <link rel="alternate" type="text/html" href="http://code.google.com/p/net-google-code/issues/list" />
+ <title>7 issues changed in net-google-code</title>
+ <author>
+ <name>sunnavy</name>
+ </author>
+ <content type="html">&lt;pre&gt;Updates:
+	Status: Duplicate
+
+Comment by sunnavy:
+(No comment was entered for this change.)
+
+Affected issues:
+  issue 15: test sd push
+    http://code.google.com/p/net-google-code/issues/detail?id=15
+
+  issue 16: test sd push
+    http://code.google.com/p/net-google-code/issues/detail?id=16
+
+  issue 17: test sd push
+    http://code.google.com/p/net-google-code/issues/detail?id=17
+
+  issue 18: test sd push
+    http://code.google.com/p/net-google-code/issues/detail?id=18
+
+  issue 19: test sd push
+    http://code.google.com/p/net-google-code/issues/detail?id=19
+
+  issue 20: test sd push
+    http://code.google.com/p/net-google-code/issues/detail?id=20
+
+  issue 21: test sd push
+    http://code.google.com/p/net-google-code/issues/detail?id=21
+
+
+
+&lt;/pre&gt;
+ </content>
+</entry>
+
+ 
+ 
+ 
+ <entry>
+ <updated>2009-05-26T14:59:34Z</updated>
+ <id>http://code.google.com/feeds/p/net-google-code/issueupdates/basic/14/2</id>
+ <link rel="alternate" type="text/html" href="http://code.google.com/p/net-google-code/issues/detail?id=14#c2" />
+ <title>Update 2 to issue 14 (&quot;sd1&quot;)</title>
+ <author>
+ <name>sunnavy</name>
+ </author>
+ <content type="html">&lt;pre&gt;
+ 
+ &lt;br/&gt;Summary: sd1 &lt;/pre&gt;
+ </content>
+</entry>
+
+ 
+ 
+</feed>

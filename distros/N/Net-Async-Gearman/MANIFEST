@@ -1,0 +1,15 @@
+Build.PL
+examples/client.pl
+examples/worker.pl
+lib/Net/Async/Gearman.pm
+lib/Net/Async/Gearman/Client.pm
+lib/Net/Async/Gearman/Worker.pm
+MANIFEST			This list of files
+t/00use.t
+t/01client.t
+t/99pod.t
+Makefile.PL
+README
+LICENSE
+META.yml
+META.json

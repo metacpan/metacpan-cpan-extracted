@@ -1,0 +1,81 @@
+2002-04-27 20:25  jodrell
+
+	* Bot.pm: updated version to 0.16.
+
+2002-04-27 20:25  jodrell
+
+	* Bot.pm: fixed another bug - login functions are properly tested
+	for.
+
+2002-04-20 20:40  jodrell
+
+	* Bot.pm: updated version number to 0.15.
+
+2002-04-20 20:35  jodrell
+
+	* Bot.pm: Removed some extraneous code, added some extra checking
+	with login and logout functions, and fixed the module's behaviour
+	when it fails to connect.
+
+2002-04-20 20:06  jodrell
+
+	* Bot.pm: fixed a couple of typos.
+
+2002-04-17 12:05  jodrell
+
+	* Bot.pm: re-arranged top of file so make test doesn't die. duh.
+
+2002-04-16 21:09  jodrell
+
+	* Bot.pm, ChangeLog: ChangeLog removed, fixed an error in POD.
+
+2002-04-01 13:02  jodrell
+
+	* Bot.pm, ChangeLog: Updated copyright and generated ChangeLog with
+	cvs2cl.
+
+2002-04-01 12:59  jodrell
+
+	* README: added more info.
+
+2002-04-01 12:58  jodrell
+
+	* ChangeLog, mytest.pl: Removed mytest.pl from module.
+
+2002-04-01 12:55  jodrell
+
+	* Bot.pm, Changes, INSTALL, MANIFEST, README: Removed some
+	redundant files, added license to Bot.pm and populated README.
+
+2002-03-29 15:38  jodrell
+
+	* COPYING, LICENSE: Moved COPYING to LICENSE and imported the
+	Artistic License.
+
+2002-03-29 15:37  jodrell
+
+	* Bot.pm, MANIFEST: Err, I can't remember what I did, but I must
+	have done it!
+
+2002-03-29 14:52  jodrell
+
+	* Bot.pm, mytest.pl: Yay! I think it's nearly finished!
+
+2002-03-03 17:40  jodrell
+
+	* Bot.pm, mytest.pl: got closer to fixing the trigger problem
+
+2002-01-06 18:21  jodrell
+
+	* Bot.pm: Minor mod.
+
+2002-01-06 18:20  jodrell
+
+	* Bot.pm, COPYING, Changes, INSTALL, MANIFEST, Makefile.PL, README,
+	mytest.pl, test.pl: Initial revision
+
+2002-01-06 18:20  jodrell
+
+	* Bot.pm, COPYING, Changes, INSTALL, MANIFEST, Makefile.PL, README,
+	mytest.pl, test.pl: Initial Import
+

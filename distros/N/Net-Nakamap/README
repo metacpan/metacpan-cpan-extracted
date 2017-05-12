@@ -1,0 +1,26 @@
+This is Perl module Net::Nakamap.
+
+INSTALLATION
+
+Install cpanm and then run the following command to install
+
+    $ cpanm Net::Nakamap
+
+or
+
+    $ cpanm https://github.com/kayac/p5-Net-Nakamap/archive/master.zip
+
+DOCUMENTATION
+
+Net::Nakamap documentation is available as in POD. So you can do:
+
+    $ perldoc Net::Nakamap
+
+to read the documentation online with your favorite pager.
+
+LICENSE AND COPYRIGHT
+
+Copyright (c) 2013, NAGATA Hiroaki <handlename>. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

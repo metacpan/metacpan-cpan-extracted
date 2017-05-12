@@ -1,0 +1,119 @@
+Revision history for Perl module Nagios::Monitoring::Plugin.
+
+0.51 17th September 2015
+  - Remove usage of defined %hash in test for perl 5.21.x and later
+
+0.50 16th September 2015
+  - Rename package to Nagios::Monitoring::Plugin
+
+0.36 22nd December 2011
+  - Updated check_threshold to allow multiple check values to be checked at once
+
+0.35 3rd December 2010
+  - Fixed test failures with Test::More 0.96 (Slaven Rezic and Peter John Edwards - RT57709)
+
+0.34 15th April 2010
+  - Amended standard --extra-opts help
+  - pod fix (Frank Wiegand - RT51872)
+  - Added %STATUS_TEXT to valid possible exports (Andrew Ford - RT46048)
+
+0.33 5th June 2009
+  - Fixed infinite loop when invalid performance data with multiple = were present
+
+0.32 3rd March 2009
+  - Handle performance data with quotes in the label (thanks to Kang)
+  - Die if default config file is not available and --extra-opts is set
+
+0.31 5th January 2009
+  - Check for valid numerical value before returning perfdata object
+
+0.30 13th December 2008
+  - Fixed performance parsing when numeric fields had commas instead of periods due to locale settings
+  - If a performance set is not parseable, instead of returning an empty array, will return all the successfully
+    parsed sets
+  - Fixed test plan for Nagios-Monitoring-Plugin-Performance.t
+
+0.29 2nd December 2008
+  - clean_label, for cleaning up a label for RRD, but without truncation
+
+0.28 21st November 2008
+  - Fixed test problems when run against Test::More 0.86
+  - Added max_state_* wrappers
+
+0.27 14th May 2008
+  - Fixed parsing of performance data with scientific notation
+
+0.26 28th March 2008
+  - Fixed test failure in t/Nagios-Monitoring-Plugin-Getopt-03.t (Thomas Guyot-Sionnest)
+
+0.25  17th March 2008
+  - Fixed parsing of performance data with negative values and full range definitions
+
+0.24  1st February 2008
+  - Fixed a test failure which highlighted a precision rounding within hashes
+
+0.23  18th December 2007
+  - Use $^X for perl in check_stuff.t test, due to lots of failing in CPAN Testers
+
+0.22  13th December 2007
+  - Fixed handling of repeated ini arguments
+
+0.21  24th September 2007
+  - Help, usage and version output now goes to stdout, not stderr
+
+0.20  5th September 2007
+  - Version bump because of CPAN permission problems
+
+0.19  4th September 2007
+  - Fix test failures due to bad MANIFEST file
+  - Fixed performance parsing where uom = %
+  - Fixed version numbering
+
+0.18  31st August 2007
+  - Fix error when parsing performance data where warn or crit are 0
+  - Optional _use_die flag to force nagios_die to call die instead of exit, so
+    exceptions can be caught with an eval
+  - Convenience function to set use_die so you can run 'use Nagios::Monitoring::Plugin::Performance use_die => 1'
+
+0.17  23rd March 2007
+  - bump version number again due to cpan indexing stupidity (Gavin)
+
+0.16  23rd March 2007
+  - added support for multi-entry help output (e.g. two separate help entries for --warning) (Gavin)
+  - added automatic spec-to-help-text support to N::P::Getopt (Gavin)
+  - added initial --extra-opts support to N::P::Getopt (Gavin)
+  - removed default use of Threshold from N::P::Performance (Gavin)
+  - removed remaining Class::Struct usages from Performance, Threshold, and Range (Gavin)
+  - fixed warnings when no uom specified for add_perfdata (Ton)
+  - added max_state function in N::P::Functions (Ton)
+
+0.15  19th December 2006
+  - exposed Getopt and Threshold functionality from top level Nagios::Monitoring::Plugin
+  - exchanged Class::Struct for Class::Accessor
+
+0.14  18th October 2006
+  - Fixed version number due to CPAN upload
+
+0.13  18th October 2006
+  - Lots of extra tests and fixes from Nathan Vonnahme
+  - Nagios::Monitoring::Plugin::Getopt, Functions and ExitResult added by Gavin Carr
+
+0.12  15th June 2006
+  - rrdlabel method available to get a performance label, 
+	converted to something rrd can use
+  - fixes to parse_perfstring routine if values are 0
+  - is_set method for range object to see if warning/critical range is set
+
+0.11  14th June 2006
+  - Interface changed for parse_perfstring, returning empty 
+	array if not parseable
+  - Fixed problem when parsing nagiosgraph data (linefeed at end 
+	of perfdata)
+
+0.10  8th June 2006
+	First release to CPAN
+
+0.01  Fri Jun  2 14:10:58 2006
+	- original version; created by h2xs 1.23 with options
+		-X -n Nagios::Monitoring::Plugin
+

@@ -1,0 +1,60 @@
+{
+   "abstract" : "asyncronously check remote host for reachability",
+   "author" : [
+      "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Async-Ping",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Future" : "0",
+            "IO::Async" : "0.61",
+            "Module::Runtime" : "0",
+            "Moo" : "1",
+            "Time::HiRes" : "0",
+            "namespace::clean" : "0.23",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/frioux/Net-Async-Ping/issues"
+      },
+      "homepage" : "https://github.com/frioux/Net-Async-Ping",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/frioux/Net-Async-Ping.git",
+         "web" : "https://github.com/frioux/Net-Async-Ping"
+      }
+   },
+   "version" : "0.002000",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+}
+

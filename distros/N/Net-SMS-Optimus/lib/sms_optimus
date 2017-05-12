@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Net::SMS::Optimus;
+
+my $username = shift or usage();
+my $password = shift or usage();
+my $number   = shift or usage();
+my $msg      = shift or usage();
+
+send_sms($username, $password, $number, $msg);
+
+sub usage {
+    print <<EOF;
+sms_optimus "username" "password" "931234567" "msg"
+
+The message should not be larger than 152 characters.
+
+EOF
+    exit(1);
+}
+
+=head1 NAME
+
+sms_optimus - Command Line interface to Net::SMS::Optimus
+
+=head1 USAGE
+
+Please run the script without parameters to see the usage.. I like to DRY :)
+
+=cut
+
+

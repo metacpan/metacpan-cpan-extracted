@@ -1,0 +1,111 @@
+{: NES 1.0 none :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  Nes 1.03 by Skriptke
+  Copyright 2009 - 2010 Enrique Castañón
+  Licensed under the GNU GPL.
+
+  Sample:
+  http://nes.sourceforge.net/
+
+  CPAN:
+  http://search.cpan.org/dist/Nes/
+
+  Repository:
+  http://github.com/Skriptke/nes
+
+  -----------------------------------------------------------------------------
+:}
+<a name="form_register" id="form_register"></a>
+<div id="cuadro2">
+<center>
+    
+{: ~ ( ! * nes_session_ok ) 
+    {: include ('{: * cfg_obj_form :}/multi_step.nhtml',
+                "
+                  script_handler     => '{: * nes_this_dir :}/../scripts/add_user.pl',
+                  function_handler   => 'register_user',
+                  msg_legend         => '',
+                  form_name          => 'fnb_reg',
+                  captcha_name       => 'cnb_reg',
+                  id_form            => 'fnb_id',
+                  captcha_atempts    => '5/5',   
+                  show_captcha       => 1, 
+                  table_width        => '90%',
+                  action_form        => '#form_register',
+                  msg_captcha        => '',
+                  span_error         => '&#8226',
+                  msg_ok_data        => '<b>You have been signed up as a user, use \"login\" to enter.</b>',
+                  tpl_options_begin  => '{: * nes_this_dir :}/register_options.nhtml',
+
+                  steps  => 
+                      [  
+                        [   
+                          { 
+                            begin    => '',
+                            name     => 'name', 
+                            msg      => 'Name:',
+                            type     => 'text',
+                            size     => 12,
+                            check    => '4,18',
+                            msg_error=> '<img src=\"{: * cfg_img_dir :}/error.gif\"><br>Between 4 and 18 characters, please ',
+                            existing => '<img src=\"{: * cfg_img_dir :}/error.gif\"><br>No disponible, elije otro ',
+                          },
+                          {
+                            name     => 'password', 
+                            msg      => 'Password:',
+                            type     => 'password',
+                            size     => 12,
+                            check    => '6,18',
+                            msg_error=> '<img src=\"{: * cfg_img_dir :}/error.gif\"><br>Between 6 and 18 characters, please ',
+                            error1   => '<img src=\"{: * cfg_img_dir :}/error.gif\"><br>The password can not be the name ',
+                            error2   => '<img src=\"{: * cfg_img_dir :}/error.gif\"><br>The password can not be so simple ',
+                          },
+                          { 
+                            name     => 'email', 
+                            msg      => 'Email (optional):',
+                            type     => 'text',
+                            size     => 12,
+                            msg_error=> '<img src=\"{: * cfg_img_dir :}/error.gif\"><br>Optional, but if valid ',
+                            check    => '0,50,/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i',
+                          },                             
+                        ],
+                        [   
+                          { 
+                            begin    => 'Language you use normally.<br>',
+                            name     => 'script', 
+                            msg      => 'My favorite:',
+                            type     => 'select',
+                            options  => ' <option value=\"\">Select</option>
+                                          <option value=\"Python\">Python</option>
+                                          <option value=\"PHP\">PHP</option>
+                                          <option value=\"Perl\">Perl</option>
+                                          <option value=\"Ruby\">Ruby</option>
+                                          <option value=\"Java\">Java</option>
+                                          <option value=\"Other\">Otro</option>',
+                            check    => '1,99',
+                            value    => '',
+                          },                          
+                          {
+                            begin    => 'Write a text to your profile, others can see it.<br>',
+                            name     => 'message', 
+                            msg      => 'Message:',
+                            type     => 'textarea',
+                            filter   => 'no_html',
+                            cols     => 30,
+                            rows     => 6,
+                            check    => '6,200',
+                            msg_error=> '<img src=\"{: * cfg_img_dir :}/error.gif\"><br>Between 6 and 200 characters, please ',
+                          },                                     
+                        ],               
+                      ],
+                "
+               )         
+    :}
+:}           
+{: ~ ( * nes_session_ok )
+ Logged in as: {: * nes_session_user :}
+:}
+</center>
+</div> 

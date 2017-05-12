@@ -1,0 +1,80 @@
+Copyright (c) 2000 Rootlevel. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms
+as Perl itself.
+
+Written by: Joe Lauer <joelauer@rootlevel.com>
+
+Net::Pager version 2.00 - August 28, 2000
+
+    * The module was totally re-written since XML has been introduced
+      as the language for all client/server communication between this
+      client tool and the SimpleWire network.
+    * Support for asynchronous sending of pages has been added.  This
+      means that network delays are now handled by the SimpleWire servers
+      rather than the client tools. This has eliminated any timeout
+      bugs that might occur, since SimpleWire can now respond immediately.
+    * Object oriented design following the HTTP::Response and
+      HTTP::Request methodology.  Clients now construct Net::Pager::Request
+      objects, submit various requests through this object, and use
+      the Net::Pager::Response object to analyze the response from the
+      SimpleWire servers.  This resulted in three more objects:
+      Net::Pager::Common, Net::Pager::Request, and Net::Pager::Response.
+    * SimpleWire now captures more error messages from each paging service.
+      A good example is the attempt to send pages to Sprint PCS phones
+      even though text messaging costs extra and most users don't have
+      it.  SimpleWire now catches this kind of error.
+    * Added new services: Verizon, VoiceStream/OmniPoint
+      Bell Mobility, and Weblink Wireless Two-Way.
+	* Introduction of a ticket system where a TICKET ID is assigned
+      to every sendpage transaction.  This allows clients to check on
+      the status of pages sent asynchronously or to check up on older
+      pages sent through our system.
+    * Added support for sending a page to a simplewire alias.  This
+      means clients can now send pages to an alias instead of a pin
+      and service id, provided that the alias is setup and registered
+      on the SimpleWire network.
+    * Improved documentation on error codes and tapping into our
+      protocol.  Please refer to www.simplewire.com to download these
+      helpful documents.
+	* Fixed small issue with clients entering pins that contain a dash
+	  or a period.  Our servers will now filter out this garbage to
+      ensure proper formatting of the pin.
+    * Added support for Subscriber IDs and Subscriber passwords.
+    * Added an optional delimiter parameter to be passed along with a page
+      so that client tools can override our default delimiter to
+      seperate the from, callback, and text fields in messages.
+    * Fixed timeout bugs by using LWP::UserAgent instead of our own
+      networking code.
+    * SimpleWire can now support proxy servers via the LWP::UserAgent
+      module.  However, this will take custom tweaking of our 
+	  Net::Pager moduele until native support is added.
+    * Revised the system for remotely retrieving our service list.  Many new
+      options have been added so that the list comes back sorted or
+      filtered in whatever way you like.
+    * Improved functions to use with the service list.  New functions
+      include DBI-like interface for retrieval and looping.  Such
+      functions are fetchrow_service, fetchall_services, and fetchrow_rewind.
+    * Fixed small bug that was related to timeouts where 2 or 3 duplicated
+      pages would be sent off.  This was solved via LWP and smarter
+      error checking before moving onto the next simplewire server.
+
+
+Net::Pager version 1.12 - June 17, 2000
+
+	* Added UserAgent string to URL that hits SimpleWire's RPCs
+	* Improved Installation Process
+
+Net::Pager version 1.10 - June 10, 2000
+
+    * No outside dependencies
+    * Removed Net::Telnet dependence by adding own telnet functionality
+    * Improved fail-safe redundancy by checking for correct return from
+      SimpleWire's network.
+    * Streamlined downloading process and improved downloading performance.
+    * Changed RPC download directories
+    * Added serviceExists() function
+    * Added debug statements
+
+Net::Pager version 0.90 - June 1, 2000
+
+    * First public BETA release of Net::Pager

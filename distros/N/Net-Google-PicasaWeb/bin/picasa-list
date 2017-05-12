@@ -1,0 +1,566 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+# PODNAME: picasa-list
+# ABSTRACT: list albums, photos, tags, or comments from Google Picasa Web
+
+use Getopt::Long;
+use IO::Prompt;
+use List::Util qw/ max /;
+use Pod::Usage;
+use Net::Google::PicasaWeb;
+
+my ($help, $man);
+my ($username, $password);
+my $kind;
+my ($user_id, $album_id, $photo_id, $comment_id);
+my $featured;
+my @rules;
+my %options;
+my ($long, $human, $quiet);
+
+GetOptions(
+    'username=s'   => \$username,
+    'password=s'   => \$password,
+
+    'kind=s'       => \$kind,
+    'featured'     => \$featured,
+    'user-id=s'    => \$user_id,
+    'album-id=s'   => \$album_id,
+    'photo-id=s'   => \$photo_id,
+    'comment-id=s' => \$comment_id,
+
+    'find=s@'      => \@rules,
+
+    'option=s%'    => \%options,
+
+    'long'         => \$long,
+    'human'        => \$human,
+    'quiet'        => \$quiet,
+
+    help           => \$help,
+    man            => \$man,
+) || pod2usage(-verbose => 0);
+
+pod2usage(-verbose => 1) if $help;
+pod2usage(-verbose => 2) if $man;
+
+$kind ||= $featured ? 'photo' : 'album';
+
+pod2usage("$0: The --kind option must be photo if --featured is used")
+    if $featured and $kind and $kind ne 'photo';
+
+pod2usage("$0: The --kind option must be set to one of: album, photo, tag, comment")
+    unless $kind eq 'album' or $kind eq 'photo'
+        or $kind eq 'tag'   or $kind eq 'comment';
+
+pod2usage("$0: You cannot use --photo-id when --kind is album")
+    if $kind eq 'album' and defined $photo_id;
+
+pod2usage("$0: You cannot use --find when --kind is tag")
+    if $kind eq 'tag' and @rules;
+
+pod2usage("$0: You cannot user --user-id with --featured")
+    if $featured and $user_id;
+
+if (defined $username and not $password) {
+    $password = prompt -echo => '', 'password: ';
+}
+
+pod2usage("$0: You must give both --username and if you give --password")
+    if defined $password and not defined $username;
+pod2usage("$0: You must enter a password if you give --username")
+    if defined $username and not defined $password;
+
+$options{featured} = 1        if $featured;
+$options{user_id}  = $user_id if $user_id;
+
+my $service = Net::Google::PicasaWeb->new;
+
+if ($username) {
+    $service->login($username, $password);
+}
+
+{
+    # This is excessive, yes? :-D
+    my @human_abbr = (
+        KiB => 10,
+        MiB => 20,
+        GiB => 30,
+        TiB => 40,
+        PiB => 50,
+        EiB => 60,
+        ZiB => 70,
+        YiB => 80,
+    );
+
+    sub humanize_bytes {
+        my $bytes = shift;
+        return $bytes unless $human;
+
+        # Work with a copy
+        my @human_abbr = @human_abbr;
+        my ($last_abbr, $base_size) = ('  B', 1);
+        ABBR: while (my ($abbr, $power2) = splice @human_abbr, 0, 2) {
+            my $new_base_size = 2**$power2;
+
+            last ABBR if $bytes < $new_base_size;
+
+            ($last_abbr, $base_size) = ($abbr, $new_base_size);
+        }
+
+        return sprintf('%-.2f', $bytes / $base_size) . $last_abbr;
+    }
+}
+
+sub print_list {
+    my $type = shift;
+    unless (@_ > 1) {
+        print "No $type found.\n" unless $quiet;
+        return;
+    }
+
+    my @numbers = (1) x scalar(@_);
+    my @longest;
+    my $skip_first = 1;
+    ROW: for my $row (@_) {
+        COLUMN: for my $i (0 .. $#{ $row }) {
+            my @lines = split /\n/, $row->[$i];
+            $longest[$i] = max($longest[$i]||0, map { length } @lines);
+
+            next COLUMN if $skip_first;
+            $numbers[$i] &&= $lines[0] =~ /^\d/;
+        }
+
+        $skip_first = 0;
+    }
+
+    my $format;
+    for my $i (0 .. $#longest) {
+        my $length  = $longest[$i];
+        my $numbers = $numbers[$i];
+
+        $format .= '%' . ($numbers ? '' : '-') . $length . 's ';
+    }
+    $format .= "\n";
+
+    my $first_row = shift;
+    unless ($quiet) {
+        printf $format, @{ $first_row };
+        printf $format, map { '-' x $_ } @longest;
+    }
+    for my $row (@_) {
+        my @extra_lines;
+        for my $i (0 .. $#{ $row }) {
+            my $col = $row->[$i];
+            if ($col =~ /\n/) {
+                my @lines = split /\n/, $col;
+                $row->[$i] = shift @lines;
+                $extra_lines[$i] = \@lines;
+            }
+        }
+
+        printf $format, @$row;
+        while (grep { defined $_ and @{ $_ } > 0 } @extra_lines) {
+            my @extra_row;
+            for my $i (0 .. $#longest) {
+                my $col = $extra_lines[$i];
+                if (defined $col and @$col > 0) {
+                    push @extra_row, shift @$col;
+                }
+                else {
+                    push @extra_row, '';
+                }
+            }
+            printf $format, @extra_row;
+        }
+    }
+
+    unless ($quiet) {
+        printf $format, map { '-' x $_ } @longest;
+        my $count  = scalar @_;
+        local $_ = $type;
+        my ($things) = $count == 1 ? /(.*)s$/ : /(.*)$/;
+        print "Found $count $things.\n";
+    }
+}
+
+sub find_items(\@\@) {
+    my ($items, $rules) = @_;
+
+    my %rules;
+    for (@$rules) {
+        my ($field, $op, $value);
+        unless (($field, $op, $value) = /^(\w+)(=~|=)(.*)$/) {
+            die "Invalid --find rule: $_\n";
+        }
+
+        if ($op eq '=') {
+            $rules{$field} = $value;
+        }
+        else {
+            $rules{$field} = qr/$value/;
+        }
+    }
+
+    @$items = Net::Google::PicasaWeb::Base->grep_matches($items, %rules);
+}
+
+if ($kind eq 'album') {
+    my @albums;
+    if (defined $album_id) {
+        @albums = $service->get_album(
+            user_id  => $user_id,
+            album_id => $album_id,
+        );
+    }
+    else {
+        @albums = $service->list_albums(%options);
+    }
+
+    find_items(@albums, @rules) if @rules;
+
+    if ($long) {
+        print_list( albums =>
+            [ 'ID', 'Name', 'Number', 'Bytes' ],
+            map { 
+                [ $_->entry_id, $_->title, $_->number_of_photos, 
+                  humanize_bytes($_->bytes_used) ] 
+            } @albums
+        );
+    }
+    else {
+        print_list( albums =>
+            [ 'ID', 'Name' ],
+            map { [ $_->entry_id, $_->title ] } @albums
+        );
+    }
+}
+
+elsif ($kind eq 'photo') {
+    my @photos;
+    if (defined $photo_id and defined $album_id) {
+        @photos = $service->get_media_entry(
+            user_id  => $user_id,
+            album_id => $album_id,
+            photo_id => $photo_id,
+        );
+    }
+    elsif (defined $photo_id) {
+        pod2usage("You must also use --album-id with --photo-id.\n");
+    }
+    elsif (defined $album_id) {
+        my $album = $service->get_album( 
+            user_id  => $user_id,
+            album_id => $album_id,
+        );
+        @photos = $album->list_media_entries(%options)
+            if defined $album;
+    }
+    else {
+        @photos = $service->list_media_entries(%options);
+    }
+
+    find_items(@photos, @rules) if @rules;
+
+    if ($long) {
+        print_list( photos =>
+            [ 'ID', 'Name', 'Width', 'Height', 'Size' ],
+            map { [ $_->entry_id, $_->title, $_->width, $_->height, 
+                    humanize_bytes($_->size) ] }
+                   @photos
+        );
+    }
+    else {
+        print_list( photos =>
+            [ 'ID', 'Name' ],
+            map { [ $_->entry_id, $_->title ] } @photos
+        );
+    }
+}
+
+elsif ($kind eq 'tag') {
+    my @tags;
+    if (defined $album_id and defined $photo_id) {
+        my $photo = $service->get_media_entry(
+            user_id  => $user_id,
+            album_id => $album_id,
+            photo_id => $photo_id,
+        );
+        @tags = $photo->list_tags(%options);
+    }
+    elsif (defined $album_id) {
+        my $album = $service->get_album(
+            user_id  => $user_id,
+            album_id => $album_id,
+        );
+        my @photos = $album->list_media_entries;
+        for my $photo (@photos) {
+            push @tags, $photo->list_tags(%options);
+        }
+    }
+    elsif (defined $photo_id) {
+        pod2usage("You must also use --album-id with --photo-id.\n");
+    }
+    else {
+        @tags = $service->list_tags(%options);
+    }
+    print_list( tags => [ 'Tag' ], map { [ $_ ] } @tags );
+}
+
+elsif ($kind eq 'comment') {
+    my @comments;
+    if (defined $album_id) {
+        if (defined $photo_id) {
+            if (defined $comment_id) {
+                @comments = $service->get_comment(
+                    user_id    => $user_id,
+                    album_id   => $album_id,
+                    photo_id   => $photo_id,
+                    comment_id => $comment_id,
+                );
+            }
+            else {
+                my $photo = $service->get_media_entry(
+                    user_id  => $user_id,
+                    album_id => $album_id,
+                    photo_id => $photo_id,
+                );
+                @comments = $photo->list_comments(%options);
+            }
+        }
+        else {
+            if (defined $comment_id) {
+                pod2usage("You must also use --photo-id with --comment-id.\n");
+            }
+            else {
+                my $album = $service->get_album(
+                    user_id  => $user_id,
+                    album_id => $album_id,
+                );
+                my @photos = $album->list_media_entries;
+                for my $photo (@photos) {
+                    push @comments, $photo->list_comments(%options);
+                }
+            }
+        }
+    }
+    else {
+        if (defined $photo_id) {
+            pod2usage("You must also use --album-id with --photo-id.\n");
+        }
+        elsif (defined $comment_id) {
+            pod2usage("You must also use --album_id and --photo-id with --comment-id.\n");
+        }
+        else {
+            @comments = $service->list_comments(%options);
+        }
+    }
+    find_items(@comments, @rules) if @rules;
+    print_list( comments =>
+        [ 'ID', 'By', 'Content' ],
+        map { [ $_->entry_id, $_->title, $_->content ] } @comments
+    );
+}
+
+# Probably can't happen, but just in case
+else {
+    pod2usage(1);
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+picasa-list - list albums, photos, tags, or comments from Google Picasa Web
+
+=head1 VERSION
+
+version 0.12
+
+=head1 SYNOPSIS
+
+  picasa-list [options]
+
+  Options:
+    --username <username>    the username to login as
+    --password <password>    the password to login with
+
+    --kind <kind>            "album", "photo", "tag", or "comment"
+    --featured               list featured photos (implies --kind photo)
+    --user-id <user-id>      the user ID to look for albums or photos in 
+    --album-id <album-id>    album ID to look in for photos, comments, or tags
+    --photo-id <photo-id>    photo ID to look at for comments or tags
+
+    --find <field>=<value>   Limit to items just matching this rule
+    --find <field>=<regex>   Limit to items just matching the Perl regex
+
+    --option <key>=<value>   special options: q, location, etc.
+
+    --long                   show more information on each item
+    --human                  show byte values in human consumable abbreviations
+    --quiet                  suppress messages
+    
+    --help                   get some help
+    --man                    get lots of help
+
+=head1 DESCRIPTION
+
+This script will list information about albums, photos, tags, or comments found to match the arguments given.
+
+=head1 NAME
+
+picasa-list - list albums, photos, tags, or comments from Google Picasa Web
+
+=head1 OPTIONS
+
+=over
+
+=item B<--username>
+
+This is the Google username to use when logging in. This is generally a GMail address or another email address used to login to Google services.
+
+=item B<--password>
+
+This is the Google password to use when loggin in.
+
+=item B<--kind>
+
+This is the kind of information to pull. There are four possible settings:
+
+=over
+
+=item album
+
+This is the default. This will list all the albums matching the authenticated user or user ID given with the B<--user-id> option.
+
+=item photo
+
+This will list all the photos matching the authenticated user or user ID given with the B<--user-id> option.
+
+=item tag
+
+This will list all the tags matching the authenticated user or user ID given with the B<--user-id> option.
+
+=item comment
+
+This will list all the comments made on the authenticated user's account or the one given by B<--user-id>.
+
+=back
+
+=item B<--featured>
+
+This fetches the list of current featured photos. This must not be used with C<--user-id> and implies that C<--kind> is set to "photo". (Setting C<--kind> to something other than "photo" is an error.)
+
+=item B<--user-id>
+
+This is the Google user ID to list from. 
+
+=item B<--album-id>
+
+This is the ID of the album to use when listing photos, tags, or comments.
+
+=item B<--photo-id>
+
+This is the ID of the photo to use when listing tags or comments.
+
+=item B<--find>
+
+This option allows you to specify additional rules to match items by. This option can be used more than once to require additional rules. Each rule is given with a field name followed by either "=" to specify and exact match or "=~" to specify a Perl regular expression match, finally with the value to match. For example, to match only those albums containing "2008" in the name, you could run:
+
+  picasa-list --kind album --username example --find title=~2008
+
+Here is a list of fields you can compare against:
+
+=over
+
+=item *
+
+id
+
+=item *
+
+url
+
+=item *
+
+title
+
+=item *
+
+summary
+
+=item *
+
+author_name
+
+=item *
+
+author_uri
+
+=item *
+
+entry_id
+
+=item *
+
+user_id
+
+=item *
+
+content (only available on comments)
+
+=back
+
+=item B<--option>
+
+This option allows you to specify arbitrary options on the Picasa Web query. To see a list of available options, check L<Net::Google::PicasaWeb/STANDARD LIST OPTIONS>.
+
+=item B<--long>
+
+Show the long view. On albums this will add the album size and number of photos to the list. On photos this will add the width, height, and byte size of each photo.
+
+=item B<--human>
+
+Show byte values in a human readable form. So it will show byte values in the thousands will be shown in kilobytes, anything in the millions in Megabytes, etc. These use divisions based on powers of 2, not powers of 10 (i.e., always in kibibytes, Mebibytes, gibibytes, etc.)
+
+=item B<--quiet>
+
+Suppresses the headings and footer usually given and also doesn't print anything if no results are found.
+
+=item B<--help>
+
+Show some of this help stuff.
+
+=item B<--man>
+
+Show lots of help.
+
+=back
+
+=head1 AUTHOR
+
+Andrew Sterling Hanenkamp, C<< <hanenkamp at cpan.org> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2008 Andrew Sterling Hanenkamp
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Andrew Sterling Hanenkamp <hanenkamp@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Andrew Sterling Hanenkamp.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

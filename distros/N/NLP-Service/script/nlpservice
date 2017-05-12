@@ -1,0 +1,122 @@
+#!/usr/bin/perl
+use common::sense;
+use Getopt::Long ();
+use Pod::Usage;
+
+my $help       = 0;
+my $man        = 0;
+my $verbose    = 0;
+my $port       = 3000;
+my $daemon     = 0;
+my $log2file   = 0;
+my $workingdir = $ENV{PWD};
+my $server     = '0.0.0.0';
+my $proxy      = 0;
+my $envt       = 'development';
+Getopt::Long::Configure("bundling");
+Getopt::Long::GetOptions(
+    'help|h|?'        => \$help,
+    'man|m'           => \$man,
+    'verbose|v'       => \$verbose,
+    'log2file|l'      => \$log2file,
+    'environment|e=s'   => \$envt,
+    'working-dir|w=s' => \$workingdir,
+    'port|p=i'        => \$port,
+    'daemon|d'        => \$daemon,
+    'server|s=s'      => \$server,
+    'behind-proxy|P'  => \$proxy,
+) or pod2usage( { -exitval => 2, -verbose => 1 } );
+pod2usage( { -verbose => 2, -exitval => 1 } ) if $man;
+pod2usage(1) if $help;
+
+my $config = {
+    appname      => 'nlpservice',
+    show_errors  => 1,
+    startup_info => $verbose,
+    port         => $port,
+    daemon       => $daemon,
+    server       => $server,
+    appdir       => $workingdir,
+    logger       => $log2file ? 'file' : 'console',
+    log          => $verbose ? 'debug' : 'warning',
+    behind_proxy => $proxy,
+    environment  => $envt, 
+};
+# this is done so that Dancer does not override cmdline options
+eval "require NLP::Service" or die 'Unable to find NLP::Service';
+NLP::Service::run( config => $config );
+__END__
+
+=head1 NAME
+
+nlpservice
+
+=head1 SYNOPSIS
+
+nlpservice [options]
+
+nlpservice is a barebones NLP::Service application. Takes in command line arguments for
+configuration.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--help, -h, -?>
+
+Prints this help message.
+
+=item B<--man, -m>
+
+Opens the man page.
+
+=item B<--verbose, -v>
+
+Turns on verbose logging. By default logging is to the console unless in daemon
+mode. Then logging is to a file.
+
+=item B<--environment, -e>
+
+Takes a string that is used as the name of the environment, and also becomes the
+name of the logfile. Default value is 'development'.
+
+=item B<--log2file, -l>
+
+Logs to a file instead of the console. Creates a logs/ directory in the working
+directory of the application, with the environment name being set by the
+--environment option or 'development'.
+
+=item B<--working-dir, -w>
+
+Changes the working directory of the application. Default is the directory from
+where the application has been launched.
+
+=item B<--port, -p>
+
+Sets the port on which the application will listen on. Default is 3000.
+
+=item B<--daemon, -d>
+
+Runs the application in daemon mode. This stops logging to the console, and logs
+to a file if not specified.
+
+=item B<--server, -s>
+
+The IP interface to bind to. Default is 0.0.0.0, which binds to all interfaces.
+
+=item B<--behind-proxy, -P>
+
+The application adjusts the headers accordingly for proxying redirects, and
+assumes you're behind a proxy here. Should not be used unless needed.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2011. B<Vikas Naresh Kumar> <vikas@cpan.org>
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Started on 28th March 2011.
+

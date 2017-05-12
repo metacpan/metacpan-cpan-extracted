@@ -1,0 +1,62 @@
+
+Net::IP::Identifier - identify entities from IP address or network block.
+
+For example, you might be running logwatch on your system, and you get SMTP
+messages in the log files from everyone who sends you email.  For logwatch,
+it's convenient to group everything coming from GMail under a single name
+instead of the mutiple IP addresses used by Google.  This module lets you
+identify a particular IP address (or network block) as one of a set of
+'identified' entities.
+
+Any number of plugin modules can be added to the Net/IP/Identifier/Plugin
+directory.  Each plugin is dedicated to a particular entity (they must each
+satisfy the Net::IP::Identifier_Role - see perldoc Role::Tiny).
+Net::IP::Identifier loads all submodules found in Net/IP/Identifier/Plugin
+by default, or it can be configured to use a subset of them.  Also, each
+plugin can be used stand-alone if you only need to identify a particular
+entity.  Parent/child relationships among network blocks is supported, but
+not actually used.
+
+This module is a modulino, meaning it can be used as either a module or as
+a script.  When called as a script, pass in any number of IP addresses or
+network blocks on the command line (in any of the forms acceptable to
+Net::IP).  Alternatively, pass in filenames - the files are scanned for
+strings that look like IP addresses or CIDR strings.  The output is
+the same as the input IPs/CIDRs except that identified IPs and network
+blocks are replaced by the name of the identified entity.  Unidentified IPs
+and network blocks are normalized to dotted decimal or CIDR format.  IP
+range notation (looking like N.N.N.N - N.N.N.N, such as often seen in WHOIS
+reports) will be interpreted correctly as a network block (even with spaces
+surrounding the '-').
+
+Note that this module has the same restrictions on contiguous bits in the
+bitmask as Net::IP (which this module uses heavily).  Keep in mind that a
+single IP range (N.N.N.N - N.N.N.N) may require multiple netblocks in CIDR
+notation (N.N.N.N/W).
+
+
+INSTALLATION
+
+To install this module, perform the following incantation
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+After installing, you can find documentation for this module with the
+perldoc command:
+
+    perldoc Net::IP::Identifier
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014, 2015 Reid Augustin
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

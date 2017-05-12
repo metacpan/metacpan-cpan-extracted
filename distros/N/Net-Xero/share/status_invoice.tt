@@ -1,0 +1,4 @@
+<Invoice>
+  <InvoiceNumber>[% invoice_number %]</InvoiceNumber>
+  <Status>[% status %]</Status>
+</Invoice>

@@ -1,0 +1,109 @@
+<!-- $Id: nla.xml,v 1.1 2007-08-10 22:08:19 mike Exp $ -->
+<client>
+  <database name="anbd">
+    <!-- This ZURL is wrong, but it is at least a bibliographic SRU server -->
+    <zurl>http://z3950.loc.gov:7090/voyager</zurl>
+    <option name="sru">get</option>
+    <charset>marc-8</charset>
+    <search>
+      <querytype>cql</querytype>
+      <!--
+	Summary of indexes supported by existing implementation.
+	Taken from nlaspecs.doc, working draft 3 of 2nd April 2007.
+
+	Search	Scan	Attr	Description
+	===================================
+	yes	yes	4	Title
+	yes	yes	7	ISBN
+	yes	yes	8	ISSN
+	yes	yes	9	LC control number
+	yes		12	Australian NBD number
+	yes	yes	13	Dewey classification
+	yes	yes	14	Universal decimal classification
+	yes	yes	16	LC classification
+	yes	yes	17	NLM classification
+	yes		20	Classification
+	yes	yes	21	Subject heading
+	yes		31	Date of publication
+		yes	33	Key title
+	yes		47	Subject subdivision
+	yes	yes	51	Music publisher number
+	yes		54	Language
+	yes		55	Geographic area code
+	yes		56	ILL library symbol
+	yes		59	Country/state/provice
+	yes	yes	60	CODEN
+	yes		63	Note
+	yes		1001	Material type
+	yes	yes	1003	Name
+	yes	yes	1004	Personal name
+	yes	yes	1005	Corporate name
+	yes	yes	1006	Conference/meeting name
+	yes		1007	Standard identifier
+	yes		1011	Date of entry
+	yes		1012	Time/date of last transaction
+	yes		1016	Any
+	yes		1018	Publisher name
+	yes		1031	Material type (duplicate of 1001)
+	yes		2004	Other control number
+	yes	yes	2005	ISMN
+	yes	yes	2006	Other classification
+	yes		2009	Immutable number
+	yes		2023	Country/state/provice (duplicate of 59?)
+	yes		2024	Australian content indicator
+	yes		2025	Form of item
+	yes		2026	Government publication
+	yes		2073	Bibliographic level
+	yes		2100	Conference/meeting code
+	yes		2146	Series type
+	yes		2277	Local system number
+      -->
+
+      <!-- These mappings are VERY approximate and will need more work -->
+      <map use="4"><index>dc.title</index></map>
+      <map use="7"><index>dc.identifier</index></map>
+      <map use="8"><index>bath.issn</index></map>
+      <map use="9"><index>dc.identifier</index></map>
+      <map use="12"><index>dc.identifier</index></map>
+      <map use="13"><index>dc.subject</index></map>
+      <map use="14"><index>dc.subject</index></map>
+      <map use="16"><index>dc.subject</index></map>
+      <map use="17"><index>dc.subject</index></map>
+      <map use="20"><index>dc.subject</index></map>
+      <map use="21"><index>dc.subject</index></map>
+      <map use="31"><index>dc.date</index></map>
+      <map use="33"><index>dc.title</index></map>
+      <map use="47"><index>dc.subject</index></map>
+      <map use="51"><index>nla.publisher</index></map>
+      <map use="54"><index>dc.language</index></map>
+      <map use="55"><index>nla.geographicAreaCode</index></map>
+      <map use="56"><index>nla.illLibrarySymbol</index></map>
+      <map use="59"><index>nla.countryStateProvice</index></map>
+      <map use="60"><index>nla.coden</index></map>
+      <map use="63"><index>bath.notes</index></map>
+      <map use="1001"><index>dc.format</index></map>
+      <map use="1003"><index>dc.creator</index></map>
+      <map use="1004"><index>dc.creator</index></map>
+      <map use="1005"><index>dc.creator</index></map>
+      <map use="1006"><index>dc.creator</index></map>
+      <map use="1007"><index>dc.identifier</index></map>
+      <map use="1011"><index>dc.date</index></map>
+      <map use="1012"><index>dc.date</index></map>
+      <map use="1016"/>
+      <map use="1018"><index>nla.publisher</index></map>
+      <map use="1031"><index>dc.format</index></map>
+      <map use="2004"><index>dc.identifier</index></map>
+      <map use="2005"><index>dc.identifier</index></map>
+      <map use="2006"><index>dc.subject</index></map>
+      <map use="2009"><index>dc.identifier</index></map>
+      <map use="2023"><index>nla.countryStateProvice</index></map>
+      <map use="2024"><index>nla.australian</index></map>
+      <map use="2025"><index>dc.format</index></map>
+      <map use="2026"><index>nla.governmentPublication</index></map>
+      <map use="2073"><index>nla.bibliographicLevel</index></map>
+      <map use="2100"><index>dc.identifier</index></map>
+      <map use="2146"><index>nla.seriesType</index></map>
+      <map use="2277"><index>rec.identifier</index></map>
+    </search>
+  </database>
+</client>

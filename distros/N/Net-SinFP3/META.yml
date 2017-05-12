@@ -1,0 +1,172 @@
+---
+abstract: 'more than OS fingerprinting unification'
+author:
+  - 'GomoR <gomor_at_metabrik.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-SinFP3
+provides:
+  Net::SinFP3:
+    file: lib/Net/SinFP3.pm
+    version: '1.23'
+  Net::SinFP3::DB:
+    file: lib/Net/SinFP3/DB.pm
+  Net::SinFP3::DB::Null:
+    file: lib/Net/SinFP3/DB/Null.pm
+  Net::SinFP3::DB::SinFP3:
+    file: lib/Net/SinFP3/DB/SinFP3.pm
+  Net::SinFP3::Ext::IP:
+    file: lib/Net/SinFP3/Ext/IP.pm
+  Net::SinFP3::Ext::IP::IPv4:
+    file: lib/Net/SinFP3/Ext/IP/IPv4.pm
+  Net::SinFP3::Ext::IP::IPv6:
+    file: lib/Net/SinFP3/Ext/IP/IPv6.pm
+  Net::SinFP3::Ext::S:
+    file: lib/Net/SinFP3/Ext/S.pm
+  Net::SinFP3::Ext::SP:
+    file: lib/Net/SinFP3/Ext/SP.pm
+  Net::SinFP3::Ext::TCP:
+    file: lib/Net/SinFP3/Ext/TCP.pm
+  Net::SinFP3::Global:
+    file: lib/Net/SinFP3/Global.pm
+  Net::SinFP3::Input:
+    file: lib/Net/SinFP3/Input.pm
+  Net::SinFP3::Input::ArpDiscover:
+    file: lib/Net/SinFP3/Input/ArpDiscover.pm
+  Net::SinFP3::Input::Connect:
+    file: lib/Net/SinFP3/Input/Connect.pm
+  Net::SinFP3::Input::IpPort:
+    file: lib/Net/SinFP3/Input/IpPort.pm
+  Net::SinFP3::Input::Null:
+    file: lib/Net/SinFP3/Input/Null.pm
+  Net::SinFP3::Input::Pcap:
+    file: lib/Net/SinFP3/Input/Pcap.pm
+  Net::SinFP3::Input::Server:
+    file: lib/Net/SinFP3/Input/Server.pm
+  Net::SinFP3::Input::Signature:
+    file: lib/Net/SinFP3/Input/Signature.pm
+  Net::SinFP3::Input::SignatureP:
+    file: lib/Net/SinFP3/Input/SignatureP.pm
+  Net::SinFP3::Input::Sniff:
+    file: lib/Net/SinFP3/Input/Sniff.pm
+  Net::SinFP3::Input::SynScan:
+    file: lib/Net/SinFP3/Input/SynScan.pm
+  Net::SinFP3::Log:
+    file: lib/Net/SinFP3/Log.pm
+  Net::SinFP3::Log::Console:
+    file: lib/Net/SinFP3/Log/Console.pm
+  Net::SinFP3::Log::Null:
+    file: lib/Net/SinFP3/Log/Null.pm
+  Net::SinFP3::Mode:
+    file: lib/Net/SinFP3/Mode.pm
+  Net::SinFP3::Mode::Active:
+    file: lib/Net/SinFP3/Mode/Active.pm
+  Net::SinFP3::Mode::Null:
+    file: lib/Net/SinFP3/Mode/Null.pm
+  Net::SinFP3::Mode::Passive:
+    file: lib/Net/SinFP3/Mode/Passive.pm
+  Net::SinFP3::Next:
+    file: lib/Net/SinFP3/Next.pm
+  Net::SinFP3::Next::Active:
+    file: lib/Net/SinFP3/Next/Active.pm
+  Net::SinFP3::Next::Client:
+    file: lib/Net/SinFP3/Next/Client.pm
+  Net::SinFP3::Next::Frame:
+    file: lib/Net/SinFP3/Next/Frame.pm
+  Net::SinFP3::Next::IpPort:
+    file: lib/Net/SinFP3/Next/IpPort.pm
+  Net::SinFP3::Next::MultiFrame:
+    file: lib/Net/SinFP3/Next/MultiFrame.pm
+  Net::SinFP3::Next::Null:
+    file: lib/Net/SinFP3/Next/Null.pm
+  Net::SinFP3::Next::Passive:
+    file: lib/Net/SinFP3/Next/Passive.pm
+  Net::SinFP3::Output:
+    file: lib/Net/SinFP3/Output.pm
+  Net::SinFP3::Output::CSV:
+    file: lib/Net/SinFP3/Output/CSV.pm
+  Net::SinFP3::Output::Client:
+    file: lib/Net/SinFP3/Output/Client.pm
+  Net::SinFP3::Output::Console:
+    file: lib/Net/SinFP3/Output/Console.pm
+  Net::SinFP3::Output::Dumper:
+    file: lib/Net/SinFP3/Output/Dumper.pm
+  Net::SinFP3::Output::Null:
+    file: lib/Net/SinFP3/Output/Null.pm
+  Net::SinFP3::Output::OsOnly:
+    file: lib/Net/SinFP3/Output/OsOnly.pm
+  Net::SinFP3::Output::OsVersionFamily:
+    file: lib/Net/SinFP3/Output/OsVersionFamily.pm
+  Net::SinFP3::Output::Pcap:
+    file: lib/Net/SinFP3/Output/Pcap.pm
+  Net::SinFP3::Output::Simple:
+    file: lib/Net/SinFP3/Output/Simple.pm
+  Net::SinFP3::Output::Ubigraph:
+    file: lib/Net/SinFP3/Output/Ubigraph.pm
+  Net::SinFP3::Plugin:
+    file: lib/Net/SinFP3/Plugin.pm
+  Net::SinFP3::Result:
+    file: lib/Net/SinFP3/Result.pm
+  Net::SinFP3::Result::Active:
+    file: lib/Net/SinFP3/Result/Active.pm
+  Net::SinFP3::Result::Passive:
+    file: lib/Net/SinFP3/Result/Passive.pm
+  Net::SinFP3::Result::PortError:
+    file: lib/Net/SinFP3/Result/PortError.pm
+  Net::SinFP3::Result::Unknown:
+    file: lib/Net/SinFP3/Result/Unknown.pm
+  Net::SinFP3::Search:
+    file: lib/Net/SinFP3/Search.pm
+  Net::SinFP3::Search::Active:
+    file: lib/Net/SinFP3/Search/Active.pm
+  Net::SinFP3::Search::Null:
+    file: lib/Net/SinFP3/Search/Null.pm
+  Net::SinFP3::Search::Passive:
+    file: lib/Net/SinFP3/Search/Passive.pm
+  Net::SinFP3::Worker:
+    file: lib/Net/SinFP3/Worker.pm
+  Net::SinFP3::Worker::Fork:
+    file: lib/Net/SinFP3/Worker/Fork.pm
+  Net::SinFP3::Worker::Single:
+    file: lib/Net/SinFP3/Worker/Single.pm
+  Net::SinFP3::Worker::Thread:
+    file: lib/Net/SinFP3/Worker/Thread.pm
+requires:
+  Class::Gomor: '0'
+  DBD::SQLite: '0'
+  DBI: '0'
+  Data::Dumper: '0'
+  Digest::MD5: '0'
+  File::Glob: '0'
+  FindBin: '0'
+  Frontier::Client: '0'
+  IO::Select: '0'
+  IO::Socket::INET: '0'
+  IO::Socket::INET6: '0'
+  LWP::UserAgent: '0'
+  Net::Frame: '1.07'
+  Net::Frame::Device: '0'
+  Net::Frame::Dump: '1.12'
+  Net::Frame::Layer::IPv6: '0'
+  Net::Frame::Layer::SinFP3: '0'
+  Net::Frame::Simple: '0'
+  Net::Libdnet: '0.90'
+  Net::Netmask: '0'
+  Net::Write: '0'
+  Net::Write::Fast: '0'
+  POSIX: '0'
+  Parallel::ForkManager: '0'
+  Socket: '0'
+  Socket6: '0'
+  Time::Interval: '0'
+  perl: v5.6.1
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: '1.23'

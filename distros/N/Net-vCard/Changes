@@ -1,0 +1,15 @@
+Revision history for Perl extension Net::vCard
+
+0.4 added vCard2label script
+    a few more bug fixes
+
+0.3 Functional bug fixes
+
+0.2 UTF-16 support
+     Apple's address book poops out UTF-16BE files from time to time.
+     I have figured this all out and now it will correctly detect and load that kinda
+     data too.
+
+0.1 First prototype - put up on CPAN to solicit feedback
+
+

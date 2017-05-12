@@ -1,0 +1,94 @@
+NAME
+    Net::Download::Queue - Download files with one or more workers.
+
+SYNOPSIS
+      # *** In the app which needs to download files
+      use Net::Download::Queue;
+      my $oQueue = Net::Download::Queue->new() or die;
+      my $oDownload = $oQueue->oDownloadAdd(
+          "http://www.darserman.com/Perl/TexQL/texql.pl",
+          "./downloads",
+          "texql.pl.txt",
+          $urlReferer,      #Optional
+      ) or die;
+      #The url is now queued
+
+      # *** Or using the command line
+      download_queue --url=http://www.darserman.com/Perl/TexQL/texql.pl \
+          --dir=./downloads --file=texql.pl.txt --
+      #The url is now queued
+
+      # *** On another command line (you can have many of these)
+      download_queue --process
+      #Urls are downloaded as they appear in the queue
+
+DESCRIPTION
+    Download files asynchronously in a queued fashion.
+
+    Your application (or a CLI script) can add files to the queue, and other
+    workes will process the queue and actually download the files.
+
+METHODS
+  new()
+    Create new queue.
+
+  oDownloadAdd($url, $dirDownload, $file, [$urlReferer = ""])
+    Add $url to the queue, to be downloaded in $dirDownload/$file.
+
+    Return the new Download object on success, else die.
+
+  oDownloadDequeue()
+    If there is any pending download in the queue, return a Download object,
+    or return undef if there are no pending downloads.
+
+    The Download object is now in "downloading" state.
+
+    Die on errors.
+
+  requeueDownloading()
+    Set any downloads in status "downloading" back into status "queued".
+
+    Die on errors.
+
+  percentComplete()
+    Return the percent 0..100 how complete the download of all current
+    downloads are.
+
+    If none is current, that's 100% complete.
+
+    Die on errors.
+
+CLASS METHODS
+  rebuildDatabase()
+    Empty and rebuild the SQLite database.
+
+    Return 1 on success, else die on errors.
+
+  ensureDatabase()
+    Rebuild the SQLite database if it's not present.
+
+    Return 1 on success, else die on errors.
+
+SEE ALSO
+    I haven't found any modules that perform the downloads asynchronously.
+
+KNOWN BUGS
+    Ther is a race condition when dequeueing a Download from the queue.
+    Should run in a transaction.
+
+AUTHOR
+    Johan Lindstrom, "<johanl@cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-net-download-queue@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Download-Queue>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+COPYRIGHT & LICENSE
+    Copyright 2005 Johan Lindstrom, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

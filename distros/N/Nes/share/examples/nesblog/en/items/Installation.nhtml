@@ -1,0 +1,131 @@
+<h2><a href="#">Installation</a></h2>
+<h3>Requires the modules</h3>
+<pre>
+    
+  Mandatory:
+    Crypt::CBC
+    Crypt::Blowfish
+    IO::String
+    IO::File
+     
+  For PHP Wrapper or mod_perl:
+    Env::C
+    IPC::Run
+    
+  For mysql or other:
+    DBI
+    DBD::mysql
+    DBD::Pg
+    DBD:: ...
+    
+  For set_nes_site script utility:
+    File::ShareDir
+    File::Copy::Recursive
+    
+</pre>
+<p>
+* We recommend installing all modules.
+</p>
+<h3>Install as root</h3>
+<pre>
+    
+  perl Makefile.PL
+  make
+  make test
+  make install
+  
+</pre>
+
+<h3>Install locally</h3>
+<pre>
+    
+  perl Makefile.PL PREFIX=/home/USER/dir
+  make
+  make test
+  make install
+  
+</pre>
+<p>
+ * Change /home/USER/dir for you particular path
+</p>
+
+<h3>Configuration</h3>
+<p>
+Nes requires configuration of you cgi-bin and .htaccess for 
+directory of the Nes templates.
+</p>
+<p>
+To active and configure Nes use utility: <i><b>set_nes_site</b></i>
+</p>
+
+<h3>Configured as root</h3>
+<p>
+Examples:
+</p>
+<pre>
+  Active Nes in /usr/lib/cgi-bin:
+    set_nes_site --cgi_dir=/usr/lib/cgi-bin
+    
+  Configure Nes for directory /var/www/myweb:
+    set_nes_site --dir_cfg=/var/www/myweb
+    
+  Configure Nes for all site:
+    set_nes_site --dir_cfg=/var/www  
+        
+  Install hello world and test examples in /var/www/test_nes:
+    set_nes_site --from_exam=hello_nes --to_exam=/var/www/test_nes
+    
+  More help:
+    set_nes_site --help    
+
+</pre>
+<p>
+  * Change /usr/lib/cgi-bin and /var/www for you particular path
+</p>
+
+<h3>Configured locally</h3>
+<p>
+For configured Nes locally find you path to Nes.pm and add in 
+iprefix in cgi_dir and from_exam options.
+</p>
+<p>
+Examples:
+</p>
+<pre>
+  Active Nes in /usr/lib/cgi-bin:
+    set_nes_site --cgi_dir=/usr/lib/cgi-bin --iprefix=/home/USER/path-to-Nes
+    
+  More help:
+    set_nes_site --help      
+
+</pre>
+<p>
+* Change /usr/lib/cgi-bin and /home/USER/path-to-Nes for you particular path
+</p>
+<h3>Test you instalation</h3>
+<pre>
+    
+  Active Nes in cgi-bin:
+    set_nes_site --cgi_dir=/full-path-to/cgi-bin
+  * include --iprefix option if configured Nes locally.
+    
+  Install hello world and test examples in directory test_nes:
+    set_nes_site --from_exam=hello_nes --to_exam=/full-path-to/root-www/test_nes
+  * include --iprefix option if configured Nes locally.
+
+</pre>
+<p>
+* change /full-path-to... for you particular path
+</p>
+<pre>
+  Test:
+    http://yousite/test_nes/hello.nhtml
+      You must see "Hello World!" in this page
+      
+    http://yousite/test_nes/test.nhtml
+      You must see "Hello Nes!" and Nes variables in this page
+
+</pre>
+<p>
+For test is ok make sure your error.log does not contain errors.
+</p>

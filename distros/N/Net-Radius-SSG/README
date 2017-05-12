@@ -1,0 +1,39 @@
+Net/Radius/SSG version 0.04
+===========================
+
+Net::Radius::SSG is a module for communicating with a SSG enabled Cisco router.
+SSG stands for Service Selection Gateway.  This module is useful for people who
+do not want to use Cisco's SSD (Service Selection Dashboard) or Cisco's SESM
+(Subscriber Edge Service Manager) and would rather write their own.
+
+The protocol used to communicate with the SSG is RADIUS.  A Merit style RADIUS
+attribute dictionary that has Cisco VSA (Vendor specfic attributes) is also 
+required and an example dictionary is included.  Please refer to the Net::Radius
+package for more information on RADIUS dictionaries.
+
+This package is still experimental so please email me at 
+ssg@chrisandjo.com with any comments or sugguestions (or bugfixes).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Net::Radius
+  Net::UDP
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004,2005 Chris Myers
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+Bin.xs
+lib/Net/IP/Match/Bin.pm		Net::IP::Match::Bin Perl Module
+lib/Net/IP/Match/Bin/Perl.pm	Net::IP::Match::Bin::Perl Module
+ppport.h
+README
+t/0_new.t
+t/1.1_add.t
+t/1.2_add_range.t
+t/2_match.t
+t/3_list.t
+t/Z_perl.x
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module meta-data (added by MakeMaker)

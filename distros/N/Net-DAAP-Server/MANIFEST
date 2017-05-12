@@ -1,0 +1,14 @@
+Makefile.PL
+Changes
+Build.PL
+META.yml
+daap_server
+MANIFEST
+MANIFEST.SKIP
+lib/Net/DAAP/Server.pm
+lib/Net/DAAP/Server/Track.pm
+t/client.t
+t/compile.t
+t/share/id3lib1.mp3
+t/share/id3v2.4.mp3
+t/share/no_id3.mp3

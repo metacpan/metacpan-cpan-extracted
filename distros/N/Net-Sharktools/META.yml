@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               Net-Sharktools
+version:            0.009
+abstract:           Use Wireshark's packet inspection capabilities in Perl
+author:
+    - A. Sinan Unur <nanis@cpan.org>
+license:            gpl2
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    Config:               0
+    File::Spec::Functions:  0
+    Getopt::Long:         0
+    YAML:                 0
+requires:
+    perl:  5.008001
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

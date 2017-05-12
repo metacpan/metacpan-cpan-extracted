@@ -1,0 +1,32 @@
+Revision history for Perl extension Net::RTorrent.
+#$Id: Changes 938 2011-04-05 07:12:53Z zag $
+
+0.11 Apr 5, 2011
+    - fix CPAN distr
+    
+0.10 Oct 26, 2010
+    - fix make instance on socket at RTorrent::Socket. ( submitted by  James Nylen )
+
+0.09 05.07.2010
+    - add use directive  RPC::XML::Parser;
+    - comment buggy fields ( thanks Duff aka cmacduff@)
+
+0.08 05.07.2010 
+    -fix tests
+
+0.07
+    - add is_active and is_open
+0.06
+    - add direct connect to rtorrent via INET or UNIX socket
+0.05
+    - fix Collection
+0.04
+    - add d.get_custom2 support
+0.03
+    - handle <detete> operation; clean torrent and downloaded files
+0.02
+    - add system_stat
+    - add load_raw
+
+0.01
+    - create classes

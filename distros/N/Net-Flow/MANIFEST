@@ -1,0 +1,13 @@
+Changes
+examples/flowdump.pl
+examples/v5_to_v9.pl
+lib/Net/Flow.pm
+lib/Net/Flow/Constants.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/Net-Flow.t
+util/parse_ipfix_xml.pl
+META.json                                Module JSON meta-data (added by MakeMaker)

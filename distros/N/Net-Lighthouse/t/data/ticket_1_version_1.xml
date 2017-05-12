@@ -1,0 +1,25 @@
+<version type="Ticket::Version">
+<assigned-user-id type="integer">67166</assigned-user-id>
+<attachments-count type="integer">0</attachments-count>
+<body>this's 1st description</body>
+<body-html>&lt;div&gt;&lt;p&gt;this's 1st description&lt;/p&gt;&lt;/div&gt;</body-html>
+<closed type="boolean">false</closed>
+<created-at type="datetime">2009-08-21T11:15:50Z</created-at>
+<creator-id type="integer">67166</creator-id>
+<diffable-attributes type="yaml">--- {}
+
+</diffable-attributes>
+<milestone-id type="integer" nil="true"/>
+<number type="integer">1</number>
+<permalink>first-ticket</permalink>
+<project-id type="integer">35918</project-id>
+<state>new</state>
+<tag>first</tag>
+<title>first ticket</title>
+<updated-at type="datetime">2009-08-21T11:15:53Z</updated-at>
+<user-id type="integer">67166</user-id>
+<user-name>sunnavy (at gmail)</user-name>
+<creator-name>sunnavy (at gmail)</creator-name>
+<assigned-user-name>sunnavy (at gmail)</assigned-user-name>
+<url>http://sunnavy.lighthouseapp.com/projects/35918/tickets/1</url>
+</version>

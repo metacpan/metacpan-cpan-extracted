@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+
+use Net::FCP;
+
+my $fcp = new Net::FCP;
+
+my $nodehello = $fcp->client_hello;
+
+print "your node:\n";
+print "protocol version:  $nodehello->{protocol}\n";
+print "node description:  $nodehello->{node}\n";
+print "maximum file size: $nodehello->{max_file_size}\n";
+
+

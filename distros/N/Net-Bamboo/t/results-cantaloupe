@@ -1,0 +1,129 @@
+HTTP/1.1 200 OK
+Content-Type: application/xml
+
+
+<results expand="results">
+  <results expand="result" size="5" max-result="5" start-index="0">
+    <result restartable="false" continuable="false" id="1278294" number="7" lifeCycleState="Finished" state="Successful" key="CANTALOUPE-DEFAULT-7" expand="vcsRevisions,artifacts,comments,labels,jiraIssues,stages">
+      <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/result/CANTALOUPE-DEFAULT-7" />
+      <planName>Default</planName>
+      <projectName>Cantaloupe</projectName>
+      <buildStartedTime>2011-11-18T14:36:27.000-06:00</buildStartedTime>
+      <prettyBuildStartedTime>Fri, 18 Nov, 02:36 PM</prettyBuildStartedTime>
+      <buildCompletedTime>2011-11-18T14:36:38.000-06:00</buildCompletedTime>
+      <prettyBuildCompletedTime>Fri, 18 Nov, 02:36 PM</prettyBuildCompletedTime>
+      <buildDurationInSeconds>11</buildDurationInSeconds>
+      <buildDuration>11159</buildDuration>
+      <buildDurationDescription>11 seconds</buildDurationDescription>
+      <buildRelativeTime>1 day ago</buildRelativeTime>
+      <vcsRevisionKey>ab6134223645e7015f01203cb51473416f1f2bab</vcsRevisionKey>
+      <vcsRevisions size="2" max-result="2" start-index="0" />
+      <buildTestSummary>8 passed</buildTestSummary>
+      <successfulTestCount>8</successfulTestCount>
+      <failedTestCount>0</failedTestCount>
+      <buildReason>&lt;a href="http://bamboo.fruits.com/browse/CANTALOUPE-DEFAULT-7/commit">Updated by Fruit Bat&amp;lt;bat@fruits.com&amp;gt;&lt;/a></buildReason>
+      <artifacts size="1" max-result="1" start-index="0" />
+      <comments size="0" max-result="0" start-index="0" />
+      <labels size="0" max-result="0" start-index="0" />
+      <jiraIssues size="0" max-result="0" start-index="0" />
+      <stages size="2" max-result="2" start-index="0" />
+    </result>
+    <result restartable="false" continuable="false" id="590161" number="6" lifeCycleState="Finished" state="Successful" key="CANTALOUPE-DEFAULT-6" expand="vcsRevisions,artifacts,comments,labels,jiraIssues,stages">
+      <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/result/CANTALOUPE-DEFAULT-6" />
+      <planName>Default</planName>
+      <projectName>Cantaloupe</projectName>
+      <buildStartedTime>2011-11-01T12:14:56.000-05:00</buildStartedTime>
+      <prettyBuildStartedTime>Tue, 1 Nov, 12:14 PM</prettyBuildStartedTime>
+      <buildCompletedTime>2011-11-01T12:15:07.000-05:00</buildCompletedTime>
+      <prettyBuildCompletedTime>Tue, 1 Nov, 12:15 PM</prettyBuildCompletedTime>
+      <buildDurationInSeconds>11</buildDurationInSeconds>
+      <buildDuration>11100</buildDuration>
+      <buildDurationDescription>11 seconds</buildDurationDescription>
+      <buildRelativeTime>2 weeks ago</buildRelativeTime>
+      <vcsRevisionKey>e52d817795c87b165ba6274a59a2cb5bec1a2946</vcsRevisionKey>
+      <vcsRevisions size="2" max-result="2" start-index="0" />
+      <buildTestSummary>8 passed</buildTestSummary>
+      <successfulTestCount>8</successfulTestCount>
+      <failedTestCount>0</failedTestCount>
+      <buildReason>Manual build by &lt;a href="http://bamboo.fruits.com/browse/user/uncle.sam">Uncle Sam&lt;/a></buildReason>
+      <artifacts size="1" max-result="1" start-index="0" />
+      <comments size="0" max-result="0" start-index="0" />
+      <labels size="0" max-result="0" start-index="0" />
+      <jiraIssues size="0" max-result="0" start-index="0" />
+      <stages size="2" max-result="2" start-index="0" />
+    </result>
+    <result restartable="false" continuable="false" id="590158" number="5" lifeCycleState="Finished" state="Successful" key="CANTALOUPE-DEFAULT-5" expand="vcsRevisions,artifacts,comments,labels,jiraIssues,stages">
+      <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/result/CANTALOUPE-DEFAULT-5" />
+      <planName>Default</planName>
+      <projectName>Cantaloupe</projectName>
+      <buildStartedTime>2011-11-01T10:48:07.000-05:00</buildStartedTime>
+      <prettyBuildStartedTime>Tue, 1 Nov, 10:48 AM</prettyBuildStartedTime>
+      <buildCompletedTime>2011-11-01T10:48:23.000-05:00</buildCompletedTime>
+      <prettyBuildCompletedTime>Tue, 1 Nov, 10:48 AM</prettyBuildCompletedTime>
+      <buildDurationInSeconds>16</buildDurationInSeconds>
+      <buildDuration>16909</buildDuration>
+      <buildDurationDescription>16 seconds</buildDurationDescription>
+      <buildRelativeTime>2 weeks ago</buildRelativeTime>
+      <vcsRevisionKey>75ed9459a99e9851e8cce942dc1b1b1a05adc57e</vcsRevisionKey>
+      <vcsRevisions size="2" max-result="2" start-index="0" />
+      <buildTestSummary>8 passed</buildTestSummary>
+      <successfulTestCount>8</successfulTestCount>
+      <failedTestCount>0</failedTestCount>
+      <buildReason>&lt;a href="http://bamboo.fruits.com/browse/CANTALOUPE-DEFAULT-5/commit">Updated by Uncle Sam&amp;lt;uncle.sam@fruits.com&amp;gt;&lt;/a></buildReason>
+      <artifacts size="1" max-result="1" start-index="0" />
+      <comments size="0" max-result="0" start-index="0" />
+      <labels size="0" max-result="0" start-index="0" />
+      <jiraIssues size="0" max-result="0" start-index="0" />
+      <stages size="2" max-result="2" start-index="0" />
+    </result>
+    <result restartable="false" continuable="false" id="589853" number="4" lifeCycleState="Finished" state="Successful" key="CANTALOUPE-DEFAULT-4" expand="vcsRevisions,artifacts,comments,labels,jiraIssues,stages">
+      <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/result/CANTALOUPE-DEFAULT-4" />
+      <planName>Default</planName>
+      <projectName>Cantaloupe</projectName>
+      <buildStartedTime>2011-10-26T13:14:18.000-05:00</buildStartedTime>
+      <prettyBuildStartedTime>Wed, 26 Oct, 01:14 PM</prettyBuildStartedTime>
+      <buildCompletedTime>2011-10-26T13:17:48.000-05:00</buildCompletedTime>
+      <prettyBuildCompletedTime>Wed, 26 Oct, 01:17 PM</prettyBuildCompletedTime>
+      <buildDurationInSeconds>210</buildDurationInSeconds>
+      <buildDuration>210324</buildDuration>
+      <buildDurationDescription>3 minutes</buildDurationDescription>
+      <buildRelativeTime>3 weeks ago</buildRelativeTime>
+      <vcsRevisionKey>2b07b321e50928a28cfc4b788ce32695ac4a0617</vcsRevisionKey>
+      <vcsRevisions size="2" max-result="2" start-index="0" />
+      <buildTestSummary>8 passed</buildTestSummary>
+      <successfulTestCount>8</successfulTestCount>
+      <failedTestCount>0</failedTestCount>
+      <buildReason>Manual build by &lt;a href="http://bamboo.fruits.com/browse/user/uncle.sam">Uncle Sam&lt;/a></buildReason>
+      <artifacts size="1" max-result="1" start-index="0" />
+      <comments size="0" max-result="0" start-index="0" />
+      <labels size="0" max-result="0" start-index="0" />
+      <jiraIssues size="0" max-result="0" start-index="0" />
+      <stages size="2" max-result="2" start-index="0" />
+    </result>
+    <result restartable="false" continuable="false" id="589847" number="3" lifeCycleState="Finished" state="Successful" key="CANTALOUPE-DEFAULT-3" expand="vcsRevisions,artifacts,comments,labels,jiraIssues,stages">
+      <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/result/CANTALOUPE-DEFAULT-3" />
+      <planName>Default</planName>
+      <projectName>Cantaloupe</projectName>
+      <buildStartedTime>2011-10-26T13:05:36.000-05:00</buildStartedTime>
+      <prettyBuildStartedTime>Wed, 26 Oct, 01:05 PM</prettyBuildStartedTime>
+      <buildCompletedTime>2011-10-26T13:05:57.000-05:00</buildCompletedTime>
+      <prettyBuildCompletedTime>Wed, 26 Oct, 01:05 PM</prettyBuildCompletedTime>
+      <buildDurationInSeconds>21</buildDurationInSeconds>
+      <buildDuration>21808</buildDuration>
+      <buildDurationDescription>21 seconds</buildDurationDescription>
+      <buildRelativeTime>3 weeks ago</buildRelativeTime>
+      <vcsRevisionKey>2bdb1c430689f10dd07c763928a9db3f5fc8d5e4</vcsRevisionKey>
+      <vcsRevisions size="2" max-result="2" start-index="0" />
+      <buildTestSummary>8 passed</buildTestSummary>
+      <successfulTestCount>8</successfulTestCount>
+      <failedTestCount>0</failedTestCount>
+      <buildReason>Manual build by &lt;a href="http://bamboo.fruits.com/browse/user/uncle.sam">Uncle Sam&lt;/a></buildReason>
+      <artifacts size="1" max-result="1" start-index="0" />
+      <comments size="0" max-result="0" start-index="0" />
+      <labels size="0" max-result="0" start-index="0" />
+      <jiraIssues size="0" max-result="0" start-index="0" />
+      <stages size="2" max-result="2" start-index="0" />
+    </result>
+  </results>
+  <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/result/CANTALOUPE-DEFAULT" />
+</results>

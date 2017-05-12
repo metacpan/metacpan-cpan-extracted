@@ -1,0 +1,28 @@
+Net::CIDR::Compare
+===============================
+
+See POD for module synopsis and description.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Net::Netmask 1.9013
+  Net::CIDR 0.11
+
+COPYRIGHT AND LICENSE
+
+Sections of this code were obtained from a C program called cidr-convert
+which can be found on numerous sites.  The sourcecode claimed to be of
+"the public domain."  This code is also part of the public domain.
+
+Please send feedback to grjones@gmail.com.

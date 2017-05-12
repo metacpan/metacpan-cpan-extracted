@@ -1,0 +1,31 @@
+Net-NSCAng-Client version 0.01
+==============================
+
+This is a Perl/XS client module to submit host/service checks and arbitrary
+external commands to a monitoring server running NSCA-ng.
+
+## INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+## DEPENDENCIES
+
+None. Testing requires `Test::More`, `Test::Exception`, `Test::Pod` and
+`Test::CheckManifest` though.
+
+## COPYRIGHT AND LICENCE
+
+Copyright © 2015 by Matthias Bethke
+
+Portions Copyright © by Alexander Golovko <alexandro@onsec.ru>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,365 @@
+NAME
+
+    Net::DNS::SPF::Expander
+
+DESCRIPTION
+
+    This module expands DNS SPF records, so you don't have to. The problem
+    is that you only get 10 per SPF record, and recursions count against
+    you. Your record won't validate.
+
+    Let's say you start with this as an SPF record:
+
+        @   TXT   "v=spf1 include:_spf.google.com include:sendgrid.net a:hq1.campusexplorer.com a:hq2.campusexplorer.com a:mail2.campusexplorer.com ~all"
+
+    You go to http://www.kitterman.com/spf/validate.html and check this
+    record. It passes validation. But later you come back and add
+    salesforce, so that you now have:
+
+        @   TXT   "v=spf1 include:_spf.google.com include:sendgrid.net include:salesforce.com a:hq1.campusexplorer.com a:hq2.campusexplorer.com a:mail2.campusexplorer.com ~all"
+
+    And now your record fails validation.
+
+        _spf.google.com takes 3 lookups.
+            _spf1.google.com
+            _spf2.google.com
+            _spf3.google.com
+        sendgrid.net takes 1 lookup.
+            _sendgrid.biz
+        hq1 takes 1 lookup.
+        hq2 takes 1 lookup.
+        mail2 takes 1 lookup.
+
+    Salesforce adds:
+
+        _spf.google.com (3 you already did)
+            _spf1.google.com
+            _spf2.google.com
+            _spf3.google.com
+        mx takes 4 lookups.
+            salesforce.com.s8a1.psmtp.com.
+            salesforce.com.s8a2.psmtp.com.
+            salesforce.com.s8b1.psmtp.com.
+            salesforce.com.s8b2.psmtp.com.
+
+    So now instead of 7 you have 14. The common advice is to expand them,
+    and that is a tedious process. It's especially tedious when, say,
+    salesforce changes their mx record.
+
+    So this module and the accompanying script attempt to automate this
+    process for you.
+
+SYNOPSIS
+
+    Using the script:
+
+        myhost:~/ $ dns-dpf-expander --input_file zone.db
+        myhost:~/ $ ls
+         zone.db   zone.db.new   zone.db.bak
+
+    Using the module:
+
+        {
+            package MyDNSExpander;
+    
+            use Net::DNS::SPF::Expander;
+    
+            my $input_file = '/home/me/project/etc/zone.db';
+            my $expander = Net::DNS::SPF::Expander->new(
+                input_file => $input_file
+            );
+    
+            my $string = $expander->write;
+    
+            1;
+        }
+
+CONFIGURABLE ATTRIBUTES
+
+ input_file
+
+    This is the path and name of the zonefile whose SPF records you want to
+    expand. It must be a valid Net::DNS::Zonefile zonefile.
+
+ output_file
+
+    The path and name of the output file. By default, we tack ".new" onto
+    the end of the original filename.
+
+ backup_file
+
+    The path and name of the backup file. By default, we tack ".bak" onto
+    the end of the original filename.
+
+ nameservers
+
+    A list of nameservers that will be passed to the resolver.
+
+ parsed_file
+
+    The Net::DNS::Zonefile object created from the input_file.
+
+ to_expand
+
+    An arrayref of regexes that we will expand. By default we expand a, mx,
+    include, and redirect records. Configurable.
+
+ to_copy
+
+    An arrayref of regexes that we will simply copy over. By default we
+    will copy ip4, ip6, ptr, and exists records. Configurable.
+
+ to_ignore
+
+    An arrayref of regexes that we will ignore. By default we ignore ?all,
+    exp, v=spf1, and ~all.
+
+ maximum_record_length
+
+    We leave out the protocol declaration and the trailing ~all while we
+    are expanding records, so we need to subtract their length from our
+    length calculation.
+
+ ttl
+
+    Default time to live is 10 minutes. Configurable.
+
+ origin
+
+    The origin of the zonefile. We take it from the zonefile, or you can
+    set it if you like.
+
+PRIVATE ATTRIBUTES
+
+ _input_file
+
+    The IO::All object created from the input_file.
+
+ _resource_records
+
+    An arrayref of all the Net::DNS::RR resource records found in the
+    entire parsed_file.
+
+ _spf_records
+
+    An arrayref of the Net::DNS::RR::TXT or Net::DNS::RR::SPF records found
+    in the entire parsed_file.
+
+ _resolver
+
+    What we use to do the DNS lookups and expand the records. A
+    Net::DNS::Resolver object. You can still set environment variables if
+    you want to change the nameserver it uses.
+
+ _expansions
+
+    This is a hashref representing the expanded SPF records. The keys are
+    the names of the SPF records, and the values are hashrefs. Those are
+    keyed on the include, and the values are arrayrefs of the expanded
+    values. There is also a key called "elements" which gathers all the
+    includes into one place, e.g.,
+
+        "*.test_zone.com" => {
+            "~all"   => undef,
+            elements => [
+                "ip4:216.239.32.0/19", "ip4:64.233.160.0/19",
+                "ip4:66.249.80.0/20",  "ip4:72.14.192.0/18",
+                ...
+            ],
+            "include:_spf.google.com" => [
+                 "ip4:216.239.32.0/19",
+                 "ip4:64.233.160.0/19",
+                 ...
+            ],
+            "ip4:96.43.144.0/20" => [ "ip4:96.43.144.0/20" ],
+            "v=spf1"             => undef
+          }
+
+    They are alpha sorted in the final results for predictability in tests.
+
+ _lengths_of_expansions
+
+    We need to know how long the expanded record would be, because SPF
+    records should be less than 256 bytes. If the expanded record would be
+    longer than that, we need to split it into pieces.
+
+ _record_class
+
+    What sort of records are SPF records? IN records.
+
+BUILDERS
+
+ _build_resolver
+
+    Return a Net::DNS::Resolver. Any nameservers will be passed through to
+    the resolver.
+
+ _build_origin
+
+    Extract the origin from parsed_file.
+
+ _build_expansions
+
+ _build_backup_file
+
+    Tack a ".bak" onto the end of the input_file.
+
+ _build__input_file
+
+    Turn the string input_file into a filehandle with IO::All.
+
+ _build_output_file
+
+    Tack a ".new" onto the end of the input_file.
+
+ _build_parsed_file
+
+    Turn the IO::All filehandle into a Net::DNS::Zonefile object, so that
+    we can extract the SPF records.
+
+ _build_resource_records
+
+    Extract all the resource records from the Net::DNS::Zonefile.
+
+ _build__spf_records
+
+    Grep through the _resource_records to find the SPF records. They can be
+    both "TXT" and "SPF" records, so we search for the protocol string,
+    v=spf1.
+
+ _build__lengths_of_expansions
+
+    Calculate the length of each fully expanded SPF record, because they
+    can't be longer than 256 bytes. We have to split them up into multiple
+    records if they are.
+
+PUBLIC METHODS
+
+ write
+
+    This is the only method you really need to call. This expands all your
+    SPF records and writes out the new and the backup files.
+
+    Returns a scalar string of the data written to the file.
+
+ new_spf_records
+
+    In case you want to see how your records were expanded, this returns
+    the hashref of Net::DNS::RR objects used to create the new records.
+
+PRIVATE METHODS
+
+ _normalize_component
+
+    Each component of an SPF record has a prefix, like include:, mx:, etc.
+    Here we chop off the prefix before performing the lookup on the value.
+
+ _perform_expansion
+
+    Expand a single SPF record component. This returns either undef or the
+    full SPF record string from Net::DNS::RR::TXT->txtdata.
+
+ _expand_spf_component
+
+    Recursively call _perform_expansion for each component of the SPF
+    record. This returns an array consisting of the component, e.g.,
+    include:salesforce.com, and an arrayref consisting of its full
+    expansion, e.g.,
+
+        [
+            "ip4:216.239.32.0/19",
+            "ip4:64.233.160.0/19",
+            ...
+            "ip6:2c0f:fb50:4000::/36"
+        ]
+
+ _expand
+
+    Create the _expansions hashref from which we generate new SPF records.
+
+ _extract_expansion_elements
+
+    Filter ignored elements from component expansions.
+
+ _new_records_from_arrayref
+
+    The full expansion of a given SPF record is contained in an arrayref,
+    and if the length of the resulting new SPF record would be less than
+    the maximum_record_length, we can use this method to make new
+    Net::DNS::RR objects that will later be stringified for the new SPF
+    record.
+
+ _new_records_from_partition
+
+    The full expansion of a given SPF record is contained in an arrayref,
+    and if the length of the resulting new SPF record would be greater than
+    the maximum_record_length, we have to jump through some hoops to
+    properly split it into new SPF records. Because there will be more than
+    one, and each needs to be less than the maximum_record_length. We do
+    our partitioning here, and then call _new_records_from_arrayref on each
+    of the resulting partitions.
+
+ _get_single_record_string
+
+    Stringify the Net::DNS::RR::TXT records when they will fit into a
+    single SPF record.
+
+ _normalize_record_name
+
+    Net::DNS uses fully qualified record names, so that new SPF records
+    will be named *.domain.com, and domain.com, instead of * and @. I
+    prefer the symbols. This code replaces the fully qualified record names
+    with symbols.
+
+ _get_multiple_record_strings
+
+    Whereas a single new SPF record needs to be concatenated from the
+    stringified Net::DNS::RR::TXTs, and have the trailing ~all added,
+    multiple new SPF records do not need that. They need to be given
+    special _spf names that will then be included in "master" SPF records,
+    and they don't need the trailing ~all.
+
+ _get_master_record_strings
+
+    Create our "master" SPF records that include the split _spf records
+    created in _get_multiple_record_strings, e.g.,
+
+        *    600    IN    TXT    "v=spf1 include:_spf1.test_zone.com include:_spf2.test_zone.com ~all"
+
+ _new_records_lines
+
+    Assemble the new DNS zonefile from the lines of the original, comment
+    out the old SPF records, add in the new lines, and append the end of
+    the original.
+
+AUTHOR
+
+    Amiri Barksdale <amiri@campusexplorer.com>
+
+ CONTRIBUTORS
+
+    Neil Bowers <neil@bowers.com>
+
+    Marc Bradshaw <marc@marcbradshaw.net>
+
+    Karen Etheridge <ether@cpan.org>
+
+    Chris Weyl <cweyl@campusexplorer.com>
+
+COPYRIGHT
+
+    Copyright (c) 2015 Campus Explorer, Inc.
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    Net::DNS
+
+    Net::DNS::RR::TXT
+
+    MooseX::Getopt
+

@@ -1,0 +1,24 @@
+
+description:
+Phone number validation
+----------------------------
+revision 1.5
+date: 2002/08/10 05:13:25;  author: kennedyh;  state: Exp;  lines: +4 -4
+documentation fixes
+----------------------------
+revision 1.4
+date: 2002/08/10 04:36:04;  author: kennedyh;  state: Exp;  lines: +9 -5
+enforcing consistency and simple tests
+----------------------------
+revision 1.3
+date: 2000/09/15 20:53:12;  author: kennedyh;  state: Exp;  lines: +30 -5
+added convenience method for app beauty
+----------------------------
+revision 1.2
+date: 2000/09/14 19:54:23;  author: kennedyh;  state: Exp;  lines: +132 -3
+inital production version
+----------------------------
+revision 1.1
+date: 2000/09/14 14:29:07;  author: kennedyh;  state: Exp;
+Initial revision
+=============================================================================

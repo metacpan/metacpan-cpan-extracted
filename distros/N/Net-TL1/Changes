@@ -1,0 +1,20 @@
+05/12/24 - Net::TL1 0.05
+  - Added test script capability (read_testfile, Execute($cmd, [@lines]))
+  - Added test script for Alcatel ASAM7301
+  - Allow 'User' parameter to be specified for CANC-USER
+    command (patch of bengan at sunet.se)
+
+05/11/11 - Net::TL1 0.04
+  - Added Status field to $this->ParseCompoundOutputLines
+
+05/10/31 - Net::TL1 0.03
+  - Improved parser in $this->ParseCompoundOutputLines
+  - Added commands to Alcatel.pm module
+
+05/06/13 - Net::TL1 0.02
+  - Moved Login / Logout methods to Net::TL1
+  - Included Net::TL1::Alcatel in distribution
+  - removed default username/password
+
+05/05/20 - Net::TL1 0.01
+  - Initial releas

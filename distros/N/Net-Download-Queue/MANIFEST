@@ -1,0 +1,22 @@
+.cvsignore
+bin/download_queue
+Build.PL
+Changes
+lib/Net/Download/Queue.pm
+lib/Net/Download/Queue/database/sqlite/create.sql
+lib/Net/Download/Queue/DBI.pm
+lib/Net/Download/Queue/Download.pm
+lib/Net/Download/Queue/DownloadStatus.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/Download-Queue-Database-create.t
+t/Download-Queue-Database.t
+t/Download-Queue-DBI.t
+t/Download-Queue-Download-status-list.t
+t/Download-Queue-Download.t
+t/Download-Queue.t
+t/pod-coverage.t
+t/pod.t

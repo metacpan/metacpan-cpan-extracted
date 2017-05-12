@@ -1,0 +1,56 @@
+Nagios-Plugin-OverHTTP version 0.15
+===================================
+
+INSTALLATION
+------------
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If you have CPANPLUS installed (`whereis cpanp`), you can use the following
+command to install this module:
+
+    cpanp i ./
+
+This module also comes with a check_over_http Nagios plugin, which is
+located in bin/ and you will want to copy that over to your Nagios
+plugins directory (usually /usr/local/libexec/nagios/)
+
+    cp bin/check_over_http /usr/local/libexec/nagios/
+
+SUPPORT AND DOCUMENTATION
+-------------------------
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Nagios::Plugin::OverHTTP
+
+You can also look for information at:
+
+*   [RT, CPAN's request tracker](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Nagios-Plugin-OverHTTP)
+
+*   [AnnoCPAN, Annotated CPAN documentation](http://annocpan.org/dist/Nagios-Plugin-OverHTTP)
+
+*   [CPAN Ratings](http://cpanratings.perl.org/d/Nagios-Plugin-OverHTTP)
+
+*   [Search CPAN](http://search.cpan.org/dist/Nagios-Plugin-OverHTTP/)
+
+
+COPYRIGHT AND LICENCE
+---------------------
+
+Copyright 2009 Douglas Christopher Wilson.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of either:
+
+*   the GNU General Public License as published by the Free
+    Software Foundation; either version 1, or (at your option) any
+    later version, or
+
+*   the Artistic License version 2.0.

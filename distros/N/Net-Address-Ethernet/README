@@ -1,0 +1,32 @@
+Net::Address::Ethernet
+======================
+
+Finds the hardware ethernet address of the local machine.  
+The ethernet address is a 6-byte value that is formatted as 
+hex digits with colon between.  
+For example, 00:03:2A:47:65:EE
+
+SPECIAL NOTE FOR VERSION 1.091 RELEASED AROUND 2006-12-29 
+and following releases until further notice:
+
+I know that this release does not work on Darwin (Macintosh).
+If someone could please send me the output of `ifconfig -a`
+(edit the numbers to protect yourself) I would really appreciate it.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make test
+   make install
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2003-2006 Martin Thurn 
+http://www.sandcrawler.com/SWB/cpan-modules.html
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

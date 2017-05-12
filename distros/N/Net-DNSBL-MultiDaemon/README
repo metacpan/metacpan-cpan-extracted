@@ -1,0 +1,488 @@
+NAME
+    Net::DNSBL::MultiDaemon - multi DNSBL prioritization
+
+SYNOPSIS
+      use Net::DNSBL::MultiDaemon qw(
+            :debug
+            run
+            bl_lookup  
+            set_extension
+      );
+
+      run($BLzone,$L,$R,$DNSBL,$STATs,$Run,$Sfile,$StatStamp,$DEBUG)
+      bl_lookup($put,$mp,$rtp,$sinaddr,$alarm,$rid,$id,$rip,$type,$zone,@blist);
+
+DESCRIPTION
+    Net::DNSBL::MultiDaemon is the Perl module that implements the
+    multi_dnsbl daemon.
+
+    multi_dnsbl is a DNS emulator daemon that increases the efficacy of
+    DNSBL look-ups in a mail system. multi_dnsbl may be used as a
+    stand-alone DNSBL or as a plug-in for a standard BIND 9 installation.
+    multi_dnsbl shares a common configuration file format with the
+    Mail::SpamCannibal sc_BLcheck.pl script so that DNSBL's can be
+    maintained in a common configuration file for an entire mail
+    installation.
+
+    Because DNSBL usefulness is dependent on the nature and source of spam
+    sent to a specific site and because sometimes DNSBL's may provide
+    intermittant service, multi_dnsbl interrogates them sorted in the order
+    of greatest successful hits. DNSBL's that do not respond within the
+    configured timeout period are not interrogated at all after 6
+    consecutive failures, and thereafter will be retried not more often than
+    once every hour until they come back online. This eliminates the need to
+    place DNSBL's in a particular order in your MTA's config file or
+    periodically monitor the DNSBL statistics and/or update the MTA config
+    file.
+
+    In addition to optimizing DNSBL interrogation, multi_dnsbl may be
+    configured to locally accept or reject specified IP's, IP ranges and to
+    reject specified countries by 2 character country code. By adding a
+    DNSBL entry of in-addr.arpa, IP's will be rejected that do not return
+    some kind of valid reverse DNS lookup. In addition, IP's can be rejected
+    that have a PTR record that matchs a configurable GENERIC 'regexp' set.
+
+    Reject codes are as follows:
+
+      query 2.0.0.127.{zonename}    127.0.0.2
+      blocked by configured DNSBL   127.0.0.2
+      no reverse DNS                127.0.0.4
+      BLOCKED (local blacklist)     127.0.0.5
+      Blocked by Country            127.0.0.6
+      Blocked GENERIC               127.0.0.7
+
+OPERATION
+    The configuration file for multi_dnsbl contains optional IGNORE (always
+    pass), optional BLOCK (always reject), and optional BBC (block by
+    country) entries against which all received queries are checked before
+    external DNSBL's are queried. IP's which pass IGNORE, BLOCK, and BBC
+    test are then checked against the prioritized list of DNSBL's to try
+    when looking up an IP address for blacklisting. Internally, multi_dnsbl
+    maintains this list in sorted order (including 'in-addr.arpa') based on
+    the number of responses that resulted in an acceptable A record being
+    returned from the DNSBL query. For each IP address query sent to
+    multi_dnsbl, a query is sent to each configured DNSBL sequentially until
+    all DNSBL's have been queried or an acceptable A record is returned.
+
+    Let us say for example that blackholes.easynet.nl (below) will return an
+    A record and list.dsbl.org, bl.spamcop.net, dynablock.easynet.nl, will
+    not.
+
+                    LIST
+            9451    list.dsbl.org
+            6516    bl.spamcop.net
+            2350    dynablock.easynet.nl
+            575     blackholes.easynet.nl
+            327     cbl.abuseat.org
+            309     dnsbl.sorbs.net
+            195     dnsbl.njabl.org
+            167     sbl.spamhaus.org
+            22      spews.dnsbl.net.au
+            6       relays.ordb.org
+            1       proxies.blackholes.easynet.nl
+            0       dsbl.org
+
+    A query to multi_dnsbl (pseudo.dnsbl in this example) looks like this
+
+            QUERY
+      1.2.3.4.pseudo.dnsbl
+              |
+              V
+      ####################
+      #    multi_dnsbl   #
+      ####################
+       |                                  RESPONSE
+       +--> 1.2.3.4.list.dsbl.org         NXDOMAIN
+       |
+       +--> 1.2.3.4.bl.spamcop.net        NXDOMAIN
+       |
+       +--> 1.2.3.4.dynablock.easynet.nl  NXDOMAIN
+       |
+       +--> 1.2.3.4.blackholes.easynet.nl A-127.0.0.2
+
+    The A record is returned to originator of the Query and the statistics
+    count on blackholes.easynet.nl is incremented by one.
+
+INSTALLATION / CONFIGURATION / OPERATION
+    multi_dnsbl can be installed as either a standalone DNSBL or as a
+    plug-in to a BIND 9 installation on the same host. In either case, copy
+    the rc.multi_daemon script to the appropriate startup directory on your
+    host and modify the start, stop, restart scripts as required. Operation
+    of the script is as follows:
+
+      Syntax: ./rc.multi_dnsbl start    /path/to/config.file
+              ./rc.multi_dnsbl start -v /path/to/config.file
+              ./rc.multi_dnsbl stop     /path/to/config.file
+              ./rc.multi_dnsbl restart  /path/to/config.file
+
+      The -v switch will print the scripts 
+      actions verbosely to the STDERR.
+
+  CONFIGURATION FILE
+
+    The configuration file for multi_dnsbl shares a common format with the
+    Mail::SpamCannibal sc_BLcheck.pl script, facilitating common maintenance
+    of DNSBL's for your MTA installation.
+
+    The sample configuration file multi_dnsbl.conf.sample is heavily
+    commented with the details for each configuration element. If you plan
+    to use a common configuration file in a SpamCannibal installation,
+    simply add the following elements to the sc_BlackList.conf file:
+
+      MDstatfile     => '/path/to/statistics/file.txt',
+      MDpidpath      => '/path/to/pidfiles', # /var/run
+      MDzone         => 'pseudo.dnsbl',
+
+      # OPTIONAL
+      MDstatrefresh => 300,       # seconds
+      MDipaddr      => '0.0.0.0', # PROBABLY NOT WHAT YOU WANT
+      MDport        => 9953,
+      MDcache       => 10000,     # an entry takes ~400 bytes
+                                  # default 10000 (to small)
+  
+    ### WARNING ### failure to set MDipaddr to a valid ip address will
+    result in the authority section return an NS record of INADDR_ANY This
+    will return an invalid NS record in stand alone operation
+
+  STANDALONE OPERATION
+
+    For standalone operation, simply set MDport = 53, nothing more is
+    required.
+
+    Interrogating the installation will then return the first match from the
+    configured list of DNSBL servers.
+
+      i.e.  dig 2.0.0.127.pseudo.dnsbl
+
+            .... results
+
+  PLUGIN to BIND 9
+
+    multi_dnsbl may be used as a plugin helper for a standard bind 9
+    installation by adding a forward zone to the configuration file as
+    follows:
+
+      //zone pseudo.dnsbl
+      zone "pseudo.dnsbl" in {
+            type forward;
+            forward only;
+            forwarders { 
+                127.0.0.1 port 9953;
+            };
+      };
+
+    You may also wish to add one or more of the following statements with
+    appropriate address_match_lists to restrict access to the facility.
+
+            allow-notify {};
+            allow-query { address_match_list };
+            allow-recursion { address_match_list };
+            allow-transfer {};      
+
+  MTA CONFIGURATION
+
+    Access to DNSBL lookup is configured in the normal fashion for each MTA.
+    Since MTA's generally must interrogate on port 53, multi_dnsbl must be
+    installed on a stand-alone server or as a plugin for BIND 9.
+
+    A typical configuration line for sendmail M4 configuration file is shown
+    below:
+
+      FEATURE(`dnsbl',`pseudo.dnsbl',
+      `554 Rejected $&{client_addr} found in http://www.my.blacklist.org')dnl
+
+SYSTEM SIGNALS
+    multi_dnsbl responds to the following system signals:
+
+    * TERM
+        Operations the statistics file is updated with the internal counts
+        and the daemon then exits.
+
+    * HUP
+        Operations are stopped including an update of the optional
+        statistics file, the configuration file is re-read and operations
+        are restarted.
+
+    * USR1
+        The statistics file is updated on the next second tick.
+
+    * USR2
+        The statistics file is deleted, internal statistics then a new
+        (empty) statistics file is written on the next second tick.
+
+PERL MODULE DESCRIPTION
+    Net::DNSBL::MultiDaemon provides most of the functions that implement
+    multi_dnsbl which is an MTA helper that interrogates a list of DNSBL
+    servers in preferential order based on their success rate.
+
+    The following describes the workings of individual functions used to
+    implement multi_dnsbl.
+
+    * run($BLzone,$L,$R,$DNSBL,$STATs,$Run,$Sfile,$StatStamp,$DEBUG);
+        This function is the 'run' portion for the DNSBL multidaemon
+
+          input:
+                $BLzone zone name,
+                $L      local listen socket object pointer,
+                $R      remote socket object pointer,
+                $DNSBL  config hash pointer,
+                $STATs  statistics hash pointer
+                $Run    pointer to stats refresh time,  # must be non-zero
+                $Sfile  statistics file path,
+                $StatStamp      stat file initial time stamp
+
+          returns:      nothing
+
+        * $BLzone
+          The fully qualified domain name of the blacklist lookup
+
+        * $L
+          A pointer to a UDP listener object
+
+        * $R
+          A pointer to a unbound UDP socket used for interogation and
+          receiving replies for the multiple DNSBL's
+
+        * $DNSBL
+          A pointer to the configuration hash of the form:
+
+            $DNSBL = {
+              # Always allow these addresses
+                  'IGNORE' => [   # OPTIONAL
+                     # a single address
+                  '11.22.33.44',
+                     # a range of ip's, ONLY VALID WITHIN THE SAME CLASS 'C'
+                  '22.33.44.55 - 22.33.44.65',
+                     # a CIDR range
+                  '5.6.7.16/28',
+                     # a range specified with a netmask
+                  '7.8.9.128/255.255.255.240',
+                     # you may want these
+                  '10.0.0.0/8',
+                  '172.16.0.0/12',
+                  '192.168.0.0/16',
+                     # this should ALWAYS be here
+                  '127.0.0.0/8',  # ignore all test entries and localhost
+                  ],
+
+              # Do rhbl lookups only, default false
+              # all other rejection classes are disabled, IGNORE, BLOCK, BBC, in-addr.arpa
+              # RHBL need only be "true" for operation. If OPTIONAL URBL conditioning
+              # is needed, then the parameters in the has must be added
+                  RHBL    => {    # optional URBL preparation
+                    urblwhite => [
+                          '/path/to/cached/whitefile',
+                          '/path/to/local/file'   # see format of spamassassin file
+                    ],
+                    urblblack => [
+                          '/path/to/local/blacklist'
+                    ],
+          # NOTE: level 3 tld's should be first before level 2 tld's
+                    urbltlds  => [
+                          '/path/to/cached/tld3file',
+                          '/path/to/cached/tld2file'
+                    ],
+                    urlwhite  => [
+                          'http://spamassasin.googlecode.com/svn-history/r6/trunk/share/spamassassin/25_uribl.cf',
+                          '/path/to/cached/whitefile'
+                    ],
+                    urltld3   => [
+                          'http://george.surbl.org/three-level-tlds',
+                          '/path/to/cached/tld3file'
+                    ],
+                    urltld2   => [
+                          'http://george.surbl.org/two-level-tlds',
+                          '/path/to/cached/tld2file'
+                    ],
+                  },
+
+              # Authoratative answers
+                  'AUTH'  => 0,
+
+              # Always reject these addresses
+                  'BLOCK' => [    # OPTIONAL
+                     # same format as above
+                  ],
+
+              # Always block these countries
+                  'BBC'   => [qw(CN TW RO )],
+
+              # Check for reverse lookup failures - OPTIONAL
+                  'in-addr.arpa'  => {
+                      timeout     => 15,  # default timeout is 30
+                  },
+
+              # RBL zones as follows: OPTIONAL
+                  'domain.name' => {
+              # mark this dnsbl to require right hand side domain processing
+              # requires URBL::Prepare
+          # NOT IMPLEMENTED
+          #           urbl        => 1,
+                      acceptany   => 'comment - treat any response as valid',
+              # or
+                      accept      => {
+                          '127.0.0.2' => 'comment',
+                          '127.0.0.3' => 'comment',
+                      },
+              # or
+              # mask the low 8 bits and accept any true result
+                      acceptmask  => 0x3D,        # accepts 0011 1101
+
+            #         timeout     => 30,  # default seconds to wait for dnsbl
+                  },
+
+                  'next.domain' = {
+                      etc....
+            # included but extracted external to B<run>
+
+                  MDzone          => 'pseudo.dnsbl',
+                  MDstatfile      => '/path/to/statistics/file.txt',
+                  MDpidpath       => '/path/to/pidfiles
+            # OPTIONAL, defaults shown
+            #     MDstatrefresh   => 300, # max seconds for refresh
+            #     MDipaddr        => '0.0.0.0', # PROBABLY NOT WHAT YOU WANT
+            #     MDport          => 9953,
+            # syslog. Specify the facility, one of: 
+            # LOG_EMERG LOG_ALERT LOG_CRIT LOG_ERR LOG_WARNING LOG_NOTICE LOG_INFO LOG_DEBUG
+            #     MDsyslog        => 'LOG_WARNING',
+            #
+            #     cache lookups using the TTL of the providing DNSBL
+            #     each cache entry takes about 400 bytes, minimum size = 1000
+            #     MDcache         => 1000,      # 1000 is too small
+            };
+
+          Zone labels that are not of the form *.*... are ignored, making
+          this hash table fully compatible with the SpamCannibal
+          sc_Blacklist.conf file.
+
+        * $STATs
+          A pointer to a statistics collection array of the form:
+
+            $STATs = {
+                  'domain.name' => count,
+                  etc...,
+                  'CountryCode' => count,
+                  etc...
+            };
+
+          Initialize this array with cntinit($DNSBL,$cp) the
+          Net::DNSBL::Utilities manpage/cntinit, then list2hash($BBC,$cp)
+          the Net::DNSBL::Utilities manpage/list2hash, then
+          statinit($Sfile,$cp) the Net::DNSBL::Utilities manpage/statinit,
+          below.
+
+        * $Run
+          A POINTER to the time in seconds to refresh the $STATs backing
+          file. Even if there is not backing file used, this value must be a
+          positive integer. Setting this value to zero will stop the daemon
+          and force a restart. It is used by $SIG{HUP} to restart the
+          daemon.
+
+        * $Sfile
+          The path to the STATISTICS backing file.
+
+            i.e.  /some/path/to/filename.ext
+
+          If $Sfile is undefined, then the time stamp need not be defined
+
+        * $StatTimestamp
+          Normally the value returned by statinit($Sfile,$cp) the
+          Net::DNSBL::Utilities manpage/statinit, below.
+
+    *
+    bl_lookup($put,$mp,$rtp,$sinaddr,$alarm,$rid,$id,$rip,$type,$zone,@blist
+    );
+        Generates a query message for the first DNSBL in the @blist array.
+        Creates a thread entry for the response and subsequent queries
+        should the first one fail.
+
+          input:        put,
+                        message pointer,
+                        remote thread pointer,
+                        sockinaddr,
+                        connection timeout,
+                        remote id or undef to create
+                        id of question,
+                        reverse IP address in text
+                        type of query received, (used in response)
+                        ORIGINAL zone (case preserved),
+                        array of remaining DNSBL's in sorted order
+          returns:      nothing, puts stuff in thread queue
+
+          extra:        if URBL processing is required,
+                        $remoteThreads{$rid}->{urbl}
+                        is set to the domain to look up
+
+    * set_extension($pointer);
+        This function sets a pointer to user defined extensions to
+        Net::DNSBL::MultiDaemon.
+
+        Pointer is of the form:
+
+                $Extension ->{
+                        OPCODE   => value,
+                        CLASS    => subref->($Extension,internal args),
+                        NAME     => subref->($Extension,internal args),
+                        TYPE     => subref->($Extension,internal args),
+                        LOOKUP   => subref->($Extension,internal args),
+                        ANSWER   => subref->($Extension,internal args),
+                        NOTFOUND => subref->($Extension,internal args)
+                };
+
+        The pointer should be blessed into the package of the caller if the
+        calling package needs to store persistant variables for its own
+        instance. The subref will be called with the first argument of
+        $Extension.
+
+        Care should be taken to NOT instantiate a %remoteThreads in the
+        CLASS, NAME, TYPE section unless it is know that it will be found
+        and expired/deleted.
+
+        Read the code if you wish to add an extension
+
+DEPENDENCIES
+      Unix::Syslog
+      Geo::IP::PurePerl [conditional for country codes]
+      NetAddr::IP
+      Net::DNS::Codes
+      Net::DNS::ToolKit
+
+EXPORT_OK
+            run
+            bl_lookup  
+
+EXPORT_TAGS :debug
+      DEBUG is a set of semaphores for the 'run' function
+
+      $D_CLRRUN    = 0x1;  # clear run flag and force unconditional return
+      $D_SHRTHD    = 0x2;  # return short header message
+      $D_TIMONLY   = 0x4;  # exit at end of timer section
+      $D_QRESP     = 0x8;  # return query response message
+      $D_NOTME     = 0x10; # return received response not for me
+      $D_ANSTOP    = 0x20; # clear run OK flag if ANSWER present
+      $D_VERBOSE   = 0x40; # verbose debug statements to STDERR 
+
+AUTHOR
+    Michael Robinton, michael@bizsystems.com
+
+COPYRIGHT
+    Copyright 2003 - 2014, Michael Robinton & BizSystems This program is
+    free software; you can redistribute it and/or modify it under the terms
+    as Perl itself or the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+SEE ALSO
+    the URBL::Prepare manpage, the Geo::IP::PurePerl manpage, the
+    Net::DNSBL::Utilities manpage, the Net::DNS::Codes manpage, the
+    Net::DNS::ToolKit manpage, the Mail::SpamCannibal manpage
+

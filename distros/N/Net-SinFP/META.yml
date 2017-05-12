@@ -1,0 +1,65 @@
+---
+abstract: 'a full operating system stack fingerprinting suite'
+author:
+  - 'GomoR <gomor_at_cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-SinFP
+provides:
+  Net::SinFP:
+    file: lib/Net/SinFP.pm
+    version: '2.10'
+  Net::SinFP::Consts:
+    file: lib/Net/SinFP/Consts.pm
+  Net::SinFP::DB:
+    file: lib/Net/SinFP/DB.pm
+  Net::SinFP::DB::IpVersion:
+    file: lib/Net/SinFP/DB/IpVersion.pm
+  Net::SinFP::DB::Os:
+    file: lib/Net/SinFP/DB/Os.pm
+  Net::SinFP::DB::OsVersion:
+    file: lib/Net/SinFP/DB/OsVersion.pm
+  Net::SinFP::DB::OsVersionChildren:
+    file: lib/Net/SinFP/DB/OsVersionChildren.pm
+  Net::SinFP::DB::OsVersionFamily:
+    file: lib/Net/SinFP/DB/OsVersionFamily.pm
+  Net::SinFP::DB::PatternBinary:
+    file: lib/Net/SinFP/DB/PatternBinary.pm
+  Net::SinFP::DB::PatternTcpFlags:
+    file: lib/Net/SinFP/DB/PatternTcpFlags.pm
+  Net::SinFP::DB::PatternTcpMss:
+    file: lib/Net/SinFP/DB/PatternTcpMss.pm
+  Net::SinFP::DB::PatternTcpOptions:
+    file: lib/Net/SinFP/DB/PatternTcpOptions.pm
+  Net::SinFP::DB::PatternTcpWindow:
+    file: lib/Net/SinFP/DB/PatternTcpWindow.pm
+  Net::SinFP::DB::Signature:
+    file: lib/Net/SinFP/DB/Signature.pm
+  Net::SinFP::DB::SystemClass:
+    file: lib/Net/SinFP/DB/SystemClass.pm
+  Net::SinFP::DB::Vendor:
+    file: lib/Net/SinFP/DB/Vendor.pm
+  Net::SinFP::Result:
+    file: lib/Net/SinFP/Result.pm
+  Net::SinFP::Search:
+    file: lib/Net/SinFP/Search.pm
+  Net::SinFP::SinFP4:
+    file: lib/Net/SinFP/SinFP4.pm
+  Net::SinFP::SinFP6:
+    file: lib/Net/SinFP/SinFP6.pm
+requires:
+  Class::Gomor: '0'
+  DBIx::SQLite::Simple: '0.33'
+  Net::Packet: '3.20'
+  Net::Packet::Target: '0'
+  perl: v5.6.1
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+version: '2.10'

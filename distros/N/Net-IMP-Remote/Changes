@@ -1,0 +1,27 @@
+0.009 2015/02/20
+- support extended information in IMP_LOG and IMP_DENY
+0.008 2013/06/27
+- support for IMP_REPLACE_LATER
+0.007 2013/06/26
+- reconnect after fork
+- timeout for connect
+0.006 2013/06/25
+- configurable error handling: hard and soft.
+  In the latter case all traffic is passed unchanged if the connection to the
+  IMP server failed.
+0.005 2013/06/24
+- attempt to reconnect after lost connection, but all existing analyzers are lost
+- resolved leak of analyzer
+0.004 2013/06/21 
+- move mappings between dualvars for various types and integer representation
+  for wire transport into DualvarMapping, gets used from Storable and Sereal
+- try to get unknown data types at runtime using Net::IMP::IMP_DATA_TYPES
+0.003 2013/06/21 
+- fixed dependency in 01_load to Sereal, added check for Storable
+- Connection: return EIO instead of ENODATA on eof on incomplete package,
+  EIO seems to be more available than ENODATA
+- add Storable to MANIFEST
+0.002 2013/06/20 
+- new default wire implementation Storable
+0.001 2013/06/20 
+- initial, kind of working version

@@ -1,0 +1,25 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/Net/Safari.pm
+lib/Net/Safari/Response.pm
+lib/Net/Safari/Response/Author.pm
+lib/Net/Safari/Response/Book.pm
+lib/Net/Safari/Response/Section.pm
+t/001_load.t
+t/search_booktitle.t  
+t/search_pubdate.t
+t/safari_accessors.t  
+t/search_category.t   
+t/search_publisher.t
+t/safari_new.t        
+t/search_code.t       
+t/search_title.t
+t/search.t            
+t/search_isbn.t
+t/search_author.t     
+t/search_note.t
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,133 @@
+NAME
+    Net::Sieve::Script - parse and write sieve scripts
+
+SYNOPSIS
+      use Net::Sieve::Script;
+  
+      my $test_script = 'require "fileinto";
+         # Place all these in the "Test" folder
+         if header :contains "Subject" "[Test]" {
+                   fileinto "Test";
+         }';
+  
+      my $script = Net::Sieve::Script->new ($test_script);
+     
+         print "OK" if ( $script->parsing_ok ) ;
+     
+         print $script->write_script;
+
+    or
+
+        my $script = Net::Sieve::Script->new();
+    
+        my $cond = Net::Sieve::Script::Condition->new('header');
+           $cond->match_type(':contains');
+           $cond->header_list('"Subject"');
+           $cond->key_list('"Re: Test2"');
+    
+        my $actions = 'fileinto "INBOX.test"; stop;';
+    
+        my $rule =  Net::Sieve::Script::Rule->new();
+           $rule->add_condition($cond);
+           $rule->add_action($actions);
+       
+           $script->add_rule($rule);
+       
+           print $script->write_script;
+
+DESCRIPTION
+    Manage sieve script
+
+    Read and parse file script, make Net::Sieve::Script::Rule,
+    Net::Sieve::Script::Action, Net::Sieve::Script::Condition objects
+
+    Write sieve script
+
+    Support RFC 5228 - sieve base RFC 5231 - relationnal RFC 5230 - vacation
+    Draft regex
+
+    missing 5229 variables 5232 imapflags 5233 subaddress 5235 spamtest
+    notify draft
+
+CONSTRUCTOR
+  new
+        Argument : optional text script
+        Purpose  : if param, put script in raw, parse script
+        Return   : main Script object
+
+    Accessors :
+
+        ->raw()          : read or set original text script
+        ->require()      : require part of script
+        ->rules()        : array of rules
+        ->max_priority() : last rule id 
+
+METHODS
+  parsing_ok
+    return 1 on raw parsing success
+
+  write_script
+    Purpose : write full script, require and rules parts
+
+    Return : set current require, return rules ordered by priority in text
+    format
+
+  read_rules
+     $script->read_rules()  : read rules from raw 
+     $script->read_rules($some_text) : parse text rules
+     use of read_rules set $script->rules()
+
+    Return 1 on success
+
+  find_rule
+    Return Net::Sieve::Script::Rule pointer find by priority
+
+    Return 0 on error, 1 on not find
+
+  swap_rules
+    Swap priorities, now don't take care of if/else/elsif
+
+    Return 1 on success, 0 on error
+
+  delete_rule
+    Delete rule and change priority, delete rule take care for 'if' test
+
+     if deleted is 'if'
+      delete next if next is 'else'
+      change next in 'if' next is 'elsif'
+
+    Return : 1 on success, 0 on error
+
+  add_rule
+    Purpose : add a rule in end of script
+
+    Return : priority on success, 0 on error
+
+    Argument : Net::Sieve::Script::Rule object
+
+BUGS
+    Rewrite a hand made script will lose comments. Verify parsing success
+    with parsing_ok method before write a new script.
+
+SUPPORT
+    Please report any bugs or feature requests to "bug-net-sieve-script at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Sieve-Script>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+AUTHOR
+    Yves Agostini - Univ Metz - <agostini@univ-metz.fr>
+
+    <http://www.crium.univ-metz.fr>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    Net::Sieve
+

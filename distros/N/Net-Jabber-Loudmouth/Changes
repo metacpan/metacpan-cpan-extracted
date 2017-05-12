@@ -1,0 +1,32 @@
+Revision history for Perl extension Net::Jabber::Loudmouth.
+
+0.07  Sun Feb 26 16:28:22 2006
+	- Added accessors for DefaultPort and DefaultPortSSL. Using
+	$Net::Jabber::Loudmouth::DefaultPort{,SSL} is deprecated now.
+	- Make MessageNode_set_attributes C99 compliant.
+
+0.06  Tue Sep 06 21:10:21 2005
+	- Removed Gtk2::CodeGen dependency in flavour of Glib::CodeGen.
+
+0.05  Tue Aug 16 12:57:07 2005
+	- Updated MANIFEST
+	- UNTODO some tests. They work with loudmouth 1.0 now.
+
+0.04  Tue Aug  2 23:10:14 2005
+	- Changed Net::Jabber::Loudmouth::Connection::register_message_handler() to
+	  accept Net::Jabber::Loudmouth::MessageHandler instances and regular code
+	  references. We now return a Net::Jabber::Loudmouth::MessageHandler object
+	  instead of nothing to be able to remove the handler afterwards easily
+	- Removed unneeded type for T_STRUCT_TM from typemap
+
+0.03  Mon Aug  1 22:06:48 2005
+	- Added lots of tests
+
+0.02  Thu Jul 28 18:13:22 2005
+	- Added documentation
+	- Removed xs/ppport.h
+
+0.01  Sat Jul 23 02:51:26 2005
+	- original version; created by h2xs 1.23 with options
+		-AO -n Net::Jabber::Loudmouth
+

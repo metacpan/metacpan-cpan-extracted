@@ -1,0 +1,22 @@
+Build.PL
+COPYING
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml                                 Module meta-data (added by MakeMaker)
+Makefile.PL
+README
+TEMP/meaningless.txt
+examples/Gimp-Test-Harness.pl
+inc/Test/Run/Builder.pm
+lib/Net/SeedServe.pm
+lib/Net/SeedServe/Server.pm
+t/api.t
+t/connect.t
+t/cpan-changes.t
+t/lib/StatusFile.pm
+t/pod-coverage.t
+t/pod.t
+t/protocol.t
+t/style-trailing-space.t

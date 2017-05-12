@@ -1,0 +1,92 @@
+Revision history for Net-Whois-RIS
+
+commit ce4464952f5dc00867e5af536f040a9d97839a4b
+Author: Alexandre Dulaunoy <a@foo.be>
+Date:   Sun May 29 21:36:46 2011 +0200
+
+    Net::Whois::RIS 0.6
+
+commit 40a5dc7c155c82a155296580cecaef2c4c444cca
+Author: Alexandre Dulaunoy <a@foo.be>
+Date:   Sun May 15 22:39:27 2011 +0200
+
+    Properly close the socket
+
+commit 2a71d66d32504a524cf5f8fbd5ebb50ddc02f6d9
+Author: Alexandre Dulaunoy <a@foo.be>
+Date:   Sat Jan 1 18:04:21 2011 +0100
+
+    Net::Whois::RIS 0.5
+
+commit fe171295e423ca5622c8fc0bf248a29b0b8fd99b
+Author: Alexandre Dulaunoy <a@foo.be>
+Date:   Sat Jan 1 17:58:46 2011 +0100
+
+    cleanup and repository reference
+
+commit f11e5726f1a59f3d5cd73742abaec6083fbf7a31
+Author: Alexandre Dulaunoy <a@foo.be>
+Date:   Mon Dec 20 13:40:02 2010 +0100
+
+    Return undef the AS is not announcing any prefixes
+
+commit fb4de1d587dab70525c3a5f87d197d87ddb2134f
+Author: Alexandre Dulaunoy <a@foo.be>
+Date:   Sat Dec 18 09:04:25 2010 +0100
+
+    Updated metafile
+
+commit 533363de4a06d45c0af29a2121735799cd6d8105
+Author: Alexandre Dulaunoy <a@foo.be>
+Date:   Sat Dec 18 08:56:48 2010 +0100
+
+    Scrappy dependency added
+
+commit 1abd1408e998c4fdc1de7159154af2de7ceeb250
+Author: Alexandre Dulaunoy <a@foo.be>
+Date:   Fri Dec 17 22:49:05 2010 +0100
+
+    Updated ChangeLog for CPAN upload
+
+commit 414351d4e3a78cd4982e8d6c2808f100d24f5e48
+Author: Alexandre Dulaunoy <a@foo.be>
+Date:   Fri Dec 17 22:34:32 2010 +0100
+
+    Function to get prefixes announced per ASN added
+
+    Expecting to see a way to get the information per ASN
+    via the RIS whois protocol, I discovered this not the case.
+    As the RIPE RIS dashboard is providing the information,
+    the function is relying on the Ajax interface to gather the data.
+    I hope this is an acceptable use of the Ajax interface for RIPE RIS.
+    Maybe RIPE RIS will decide to add the ability to query an ASN
+    directly via the RIS whois later on. The Scrappy perl module is required
+    if you intend to use the function.
+
+
+commit ce137214e17bf7afe80fb7aba9a9d14cf6d5c587
+Author: Alexandre Dulaunoy <a@foo.be>
+Date:   Sat Nov 13 09:27:42 2010 +0100
+
+    Net::Whois::RIS 0.2
+
+
+commit 4fbece5f017aff71ffd3af6262ac6e3c2ca7f0e6
+Author: Alexandre Dulaunoy <a@foo.be>
+Date:   Sat Nov 13 09:13:59 2010 +0100
+
+    Clarified a bit the documentation and the interfaces.
+
+
+commit c13662a2d305dd2668225b03ed80050a63268cd7
+Author: Alexandre Dulaunoy <a@foo.be>
+Date:   Sun Nov 7 17:00:07 2010 +0100
+
+    getRoute method added: to fetch the last announced
+    route matching the requested IP/network address.
+
+
+
+0.1	Fri Nov  5 11:25:48 CET 2010
+        First version, minimal getOrigin and getDescr working. 
+

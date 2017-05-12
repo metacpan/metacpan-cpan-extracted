@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Net-SMS-PChome
+version:      0.11
+version_from: lib/Net/SMS/PChome.pm
+installdirs:  site
+requires:
+    Crypt::SSLeay:                 0.51
+    Date::Calc:                    5.4
+    HTML::TagParser:               0.13
+    Test::Simple:                  0.44
+    WWW::Mechanize:                1.18
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

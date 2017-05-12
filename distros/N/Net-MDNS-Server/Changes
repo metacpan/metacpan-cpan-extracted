@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::MDNS::Server.
+
+0.01  Wed May 21 12:29:59 2003
+	- original version; created by h2xs 1.22 with options
+		-n Net::MDNS::Server -pmdnss_
+

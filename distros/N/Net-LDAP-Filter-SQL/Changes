@@ -1,0 +1,5 @@
+Revision history for Perl module Net::LDAP::Filter::SQL
+
+0.03 2013-11-24
+    
+    * FIX: correct github URL https://rt.cpan.org/Public/Bug/Display.html?id=90718

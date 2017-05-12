@@ -1,0 +1,7 @@
+Installation instructions for Net-Journyx 0.01:
+
+1. Run "perl Makefile.PL". This will install a number of dependencies.
+2. Run "make test". This will run tests against a live Journyx database. If
+   there are any test failures, please report them to Best Practical.
+3. Run "make install".
+

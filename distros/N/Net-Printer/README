@@ -1,0 +1,154 @@
+NAME
+    Net::Printer - Perl extension for direct-to-lpd printing.
+
+SYNOPSIS
+      use Net::Printer;
+
+      # Create new Printer Object
+      $lineprinter = new Net::Printer(
+                                      filename    => "/home/jdoe/myfile.txt",
+                                      printer     => "lp",
+                                      server      => "printserver",
+                                      port        => 515,
+                                      lineconvert => "YES"
+                                      );
+
+      # Print the file
+      $result = $lineprinter->printfile();
+
+      # Optionally print a file
+      $result = $lineprinter->printfile("/home/jdoe/myfile.txt");
+
+      # Print a string
+      $result =
+        $lineprinter->printstring("Smoke me a kipper, I'll be back for breakfast.");
+
+      # Did I get an error?
+      $errstr = $lineprinter->printerror();
+
+      # Get Queue Status
+      @result = $lineprinter->queuestatus();
+
+DESCRIPTION
+    Perl module for directly printing to a print server/printer without
+    having to create a pipe to either lpr or lp. This essentially mimics
+    what the BSD LPR program does by connecting directly to the line printer
+    printer port (almost always 515), and transmitting the data and control
+    information to the print server.
+
+    Please note that this module only talks to print servers that speak BSD.
+    It will not talk to printers using SMB, SysV, or IPP unless they are set
+    up as BSD printers. CUPS users will need to set up cups-lpd to provide
+    legacy access. ( See "Using Net::Printer with CUPS" )
+
+METHODS
+  new
+    Constructor returning Net::Printer object
+
+   Parameters
+    A hash with the following keys:
+
+    *   filename
+
+        [optional] absolute path to the file you wish to print.
+
+    *   printer
+
+        [default: "lp"] Name of the printer you wish to print to.
+
+    *   server
+
+        [default: "localhost"] Name of the printer server
+
+    *   port
+
+        [default: 515] The port you wish to connect to
+
+    *   lineconvert
+
+        [default: "NO"] Perform LF -> LF/CR translation
+
+    *   rfc1179
+
+        [default: "NO"] Use RFC 1179 compliant source address. Default "NO".
+        see "RFC-1179 Compliance Mode and Security Implications".
+
+   Returns
+    The bless'd object
+
+  printerror
+    Getter for error string, if any.
+
+   Returns
+    String containing error text, if any. Undef otherwise.
+
+  printfile
+    Transmits the contents of the specified file to the print server
+
+   Parameters
+    *   file
+
+        Path to file to print
+
+   Returns
+    1 on success, undef on fail
+
+  printstring
+    Prints the given string to the printer. Note that each string given to
+    this method will be treated as a separate print job.
+
+   Parameters
+    *   string
+
+        String to send to print queue
+
+   Returns
+    1 on succes, undef on fail
+
+  queuestatus
+    Retrives status information from print server
+
+   Returns
+    Array containing queue status
+
+TROUBLESHOOTING
+  Stair Stepping Problem
+    When printing text, if you have the infamous "stair-stepping" problem,
+    try setting lineconvert to "YES". This should, in most cases, rectify
+    the problem.
+
+  RFC-1179 Compliance Mode and Security Implications
+    RFC 1179 specifies that any program connecting to a print service must
+    use a source port between 721 and 731, which are *reserved ports*,
+    meaning you must have root (administrative) privileges to use them.
+    *This is a security risk which should be avoided if at all possible!*
+
+  Using Net::Printer with CUPS
+    Net::Printer does not natively speak to printers running CUPS (which
+    uses the IPP protocol). In order to provide support for legacy clients,
+    CUPS provides the cups-lpd mini-server which can be set up to run out of
+    either inetd or xinetd depending on preference. You will need to set up
+    this functionality in order to use Net::Printer with CUPS server.
+    Consult your system documentation as to how to do this.
+
+SEE ALSO
+    cups-lpd, lp, lpr, perl
+
+    RFC 1179 <http://www.ietf.org/rfc/rfc1179.txt?number=1179>
+
+AUTHOR
+    Christopher M. Fuhrman "<cfuhrman at panix.com>"
+
+REVISION INFORMATION
+      $Id: 4902495d7ce35b34c1a0d1c7bfb573e8fe822534 $
+
+COPYRIGHT & LICENSE
+    Copyright (c) 2000-2004 Christopher M. Fuhrman, All rights reserved.
+
+    This program is free software licensed under the...
+
+            The BSD License
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

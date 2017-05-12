@@ -1,0 +1,834 @@
+.rn '' }`
+''' $RCSfile$$Revision$$Date$
+'''
+''' $Log$
+'''
+.de Sh
+.br
+.if t .Sp
+.ne 5
+.PP
+\fB\\$1\fR
+.PP
+..
+.de Sp
+.if t .sp .5v
+.if n .sp
+..
+.de Ip
+.br
+.ie \\n(.$>=3 .ne \\$3
+.el .ne 3
+.IP "\\$1" \\$2
+..
+.de Vb
+.ft CW
+.nf
+.ne \\$1
+..
+.de Ve
+.ft R
+
+.fi
+..
+'''
+'''
+'''     Set up \*(-- to give an unbreakable dash;
+'''     string Tr holds user defined translation string.
+'''     Bell System Logo is used as a dummy character.
+'''
+.tr \(*W-|\(bv\*(Tr
+.ie n \{\
+.ds -- \(*W-
+.ds PI pi
+.if (\n(.H=4u)&(1m=24u) .ds -- \(*W\h'-12u'\(*W\h'-12u'-\" diablo 10 pitch
+.if (\n(.H=4u)&(1m=20u) .ds -- \(*W\h'-12u'\(*W\h'-8u'-\" diablo 12 pitch
+.ds L" ""
+.ds R" ""
+'''   \*(M", \*(S", \*(N" and \*(T" are the equivalent of
+'''   \*(L" and \*(R", except that they are used on ".xx" lines,
+'''   such as .IP and .SH, which do another additional levels of
+'''   double-quote interpretation
+.ds M" """
+.ds S" """
+.ds N" """""
+.ds T" """""
+.ds L' '
+.ds R' '
+.ds M' '
+.ds S' '
+.ds N' '
+.ds T' '
+'br\}
+.el\{\
+.ds -- \(em\|
+.tr \*(Tr
+.ds L" ``
+.ds R" ''
+.ds M" ``
+.ds S" ''
+.ds N" ``
+.ds T" ''
+.ds L' `
+.ds R' '
+.ds M' `
+.ds S' '
+.ds N' `
+.ds T' '
+.ds PI \(*p
+'br\}
+.\"	If the F register is turned on, we'll generate
+.\"	index entries out stderr for the following things:
+.\"		TH	Title 
+.\"		SH	Header
+.\"		Sh	Subsection 
+.\"		Ip	Item
+.\"		X<>	Xref  (embedded
+.\"	Of course, you have to process the output yourself
+.\"	in some meaninful fashion.
+.if \nF \{
+.de IX
+.tm Index:\\$1\t\\n%\t"\\$2"
+..
+.nr % 0
+.rr F
+.\}
+.TH TOC 7 "perl 5.004, patch 05" "6/Jul/2000" "User Contributed Perl Documentation"
+.UC
+.if n .hy 0
+.if n .na
+.ds C+ C\v'-.1v'\h'-1p'\s-2+\h'-1p'+\s0\v'.1v'\h'-1p'
+.de CQ          \" put $1 in typewriter font
+.ft CW
+'if n "\c
+'if t \\&\\$1\c
+'if n \\&\\$1\c
+'if n \&"
+\\&\\$2 \\$3 \\$4 \\$5 \\$6 \\$7
+'.ft R
+..
+.\" @(#)ms.acc 1.5 88/02/08 SMI; from UCB 4.2
+.	\" AM - accent mark definitions
+.bd B 3
+.	\" fudge factors for nroff and troff
+.if n \{\
+.	ds #H 0
+.	ds #V .8m
+.	ds #F .3m
+.	ds #[ \f1
+.	ds #] \fP
+.\}
+.if t \{\
+.	ds #H ((1u-(\\\\n(.fu%2u))*.13m)
+.	ds #V .6m
+.	ds #F 0
+.	ds #[ \&
+.	ds #] \&
+.\}
+.	\" simple accents for nroff and troff
+.if n \{\
+.	ds ' \&
+.	ds ` \&
+.	ds ^ \&
+.	ds , \&
+.	ds ~ ~
+.	ds ? ?
+.	ds ! !
+.	ds /
+.	ds q
+.\}
+.if t \{\
+.	ds ' \\k:\h'-(\\n(.wu*8/10-\*(#H)'\'\h"|\\n:u"
+.	ds ` \\k:\h'-(\\n(.wu*8/10-\*(#H)'\`\h'|\\n:u'
+.	ds ^ \\k:\h'-(\\n(.wu*10/11-\*(#H)'^\h'|\\n:u'
+.	ds , \\k:\h'-(\\n(.wu*8/10)',\h'|\\n:u'
+.	ds ~ \\k:\h'-(\\n(.wu-\*(#H-.1m)'~\h'|\\n:u'
+.	ds ? \s-2c\h'-\w'c'u*7/10'\u\h'\*(#H'\zi\d\s+2\h'\w'c'u*8/10'
+.	ds ! \s-2\(or\s+2\h'-\w'\(or'u'\v'-.8m'.\v'.8m'
+.	ds / \\k:\h'-(\\n(.wu*8/10-\*(#H)'\z\(sl\h'|\\n:u'
+.	ds q o\h'-\w'o'u*8/10'\s-4\v'.4m'\z\(*i\v'-.4m'\s+4\h'\w'o'u*8/10'
+.\}
+.	\" troff and (daisy-wheel) nroff accents
+.ds : \\k:\h'-(\\n(.wu*8/10-\*(#H+.1m+\*(#F)'\v'-\*(#V'\z.\h'.2m+\*(#F'.\h'|\\n:u'\v'\*(#V'
+.ds 8 \h'\*(#H'\(*b\h'-\*(#H'
+.ds v \\k:\h'-(\\n(.wu*9/10-\*(#H)'\v'-\*(#V'\*(#[\s-4v\s0\v'\*(#V'\h'|\\n:u'\*(#]
+.ds _ \\k:\h'-(\\n(.wu*9/10-\*(#H+(\*(#F*2/3))'\v'-.4m'\z\(hy\v'.4m'\h'|\\n:u'
+.ds . \\k:\h'-(\\n(.wu*8/10)'\v'\*(#V*4/10'\z.\v'-\*(#V*4/10'\h'|\\n:u'
+.ds 3 \*(#[\v'.2m'\s-2\&3\s0\v'-.2m'\*(#]
+.ds o \\k:\h'-(\\n(.wu+\w'\(de'u-\*(#H)/2u'\v'-.3n'\*(#[\z\(de\v'.3n'\h'|\\n:u'\*(#]
+.ds d- \h'\*(#H'\(pd\h'-\w'~'u'\v'-.25m'\f2\(hy\fP\v'.25m'\h'-\*(#H'
+.ds D- D\\k:\h'-\w'D'u'\v'-.11m'\z\(hy\v'.11m'\h'|\\n:u'
+.ds th \*(#[\v'.3m'\s+1I\s-1\v'-.3m'\h'-(\w'I'u*2/3)'\s-1o\s+1\*(#]
+.ds Th \*(#[\s+2I\s-2\h'-\w'I'u*3/5'\v'-.3m'o\v'.3m'\*(#]
+.ds ae a\h'-(\w'a'u*4/10)'e
+.ds Ae A\h'-(\w'A'u*4/10)'E
+.ds oe o\h'-(\w'o'u*4/10)'e
+.ds Oe O\h'-(\w'O'u*4/10)'E
+.	\" corrections for vroff
+.if v .ds ~ \\k:\h'-(\\n(.wu*9/10-\*(#H)'\s-2\u~\d\s+2\h'|\\n:u'
+.if v .ds ^ \\k:\h'-(\\n(.wu*10/11-\*(#H)'\v'-.4m'^\v'.4m'\h'|\\n:u'
+.	\" for low resolution devices (crt and lpr)
+.if \n(.H>23 .if \n(.V>19 \
+\{\
+.	ds : e
+.	ds 8 ss
+.	ds v \h'-1'\o'\(aa\(ga'
+.	ds _ \h'-1'^
+.	ds . \h'-1'.
+.	ds 3 3
+.	ds o a
+.	ds d- d\h'-1'\(ga
+.	ds D- D\h'-1'\(hy
+.	ds th \o'bp'
+.	ds Th \o'LP'
+.	ds ae ae
+.	ds Ae AE
+.	ds oe oe
+.	ds Oe OE
+.\}
+.rm #[ #] #H #V #F C
+.SH "NAME"
+TOC Documentation \- Documentation for the AOL TOC Instant Messenging Protocol
+.SH "LICENSE"
+Copyright (c) 1998-9 America Online, Inc. All Rights Reserved.
+.PP
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+.PP
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+.PP
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place \- Suite 330, Boston, MA 02111-1307,
+USA.
+.SH "SYNOPSIS"
+Version: TOC1.0
+.PP
+This document describes the protocol between TOC and TOC clients.  The
+protocol is built on TCP.  Framing is done by SFLAP, described at the
+bottom of this document.  Inside each SFLAP frame is a TOC command.
+.PP
+The TOC protocol is ASCII based, and special attention must be placed
+argument separation.  The separator and the rules of separation are
+different for messages inbound to TOC and outbound to the client.  The
+rules of separation are described in sections below.
+.PP
+The TOC server is built mainly to service the TIC and TiK clients.
+Since the TIC client is a Java applet, and downloadable, TOC will NOT
+support multiple TOC protocol versions at the same time.  Therefore,
+TiK users will be forced to upgrade if the protocol version changes.
+TOC sends down the protocol version it expects the client to speak and
+understand.  Note, the protocol version is a string.
+.SH "IMPORTANT NOTES"
+.Ip "\(bu \s-1TOC\s0 will drop the connection if a command exceeds the maximum   length, which is currently 1024 bytes.  So the client needs to spend   special attention to im, chat, and config message lengths.  There is   an 8k length maximum from \s-1TOC\s0 to the client." 4
+.Ip "\(bu No commands should be sent to \s-1TOC\s0 (besides toc_signon) before   a \s-1SIGN_ON\s0 is received.  If you do send a command before \s-1SIGN_ON\s0 the   command will be ignored, and in some case the connection will be   dropped." 4
+.Ip "\(bu Initial permit/deny items should be sent after receiving   \s-1SIGN_ON\s0 but before sending toc_init_done, otherwise the user will   flash on peoples buddylist who the user has denied.  You will   probably want to send the toc_add_buddies at this time also." 4
+.Ip "\(bu After \s-1TOC\s0 sends the \s-1PAUSE\s0 message to a client, all messages   sent to \s-1TOC\s0 will be ignored, and in some cases the connection will   be dropped.  Another \s-1SIGN_ON\s0 message will be sent to the client when   it is online again.  The buddy list and permit/deny items must be   sent again, followed by the toc_init_done.  In most cases the   \s-1SIGN_ON\s0 message will be sent between 1-2 seconds after the \s-1PAUSE\s0   message.  Therefore a client could choose to ignore the \s-1PAUSE\s0   message and hope nothing bad happens." 4
+.Ip "\(bu The string used for roasting passwords is \*(N'Tic/Toc\*(T' (no quotes), or \fB01010100011010010110001100101111010101000110111101100011\fR in binary." 4
+.SH "DESCRIPTION"
+.SH "Client \-> TOC"
+The commands and the arguments are usually separated by whitespaces.
+Arguments with whitespace characters should be enclosed in quotes.
+Dollar signs, curly brackets, square brackets, parentheses, quotes,
+and backslashes must all be backslashed whether in quotes or not.  It
+is usually a good idea just to use quotes no matter what.  All user
+names from clients to TOC should be normalized (spaces removed and
+lowercased), and therefore are the one exception to the always use
+quotes rule.
+.PP
+When sending commands to the server you will not get a response back
+confirming that the command format was correct or not!  However in
+some cases if the command format was incorrect the connection will be
+dropped.
+.Sh "toc_signon <authorizer host> <authorizer port> <User Name> <Password> <language> <version>"
+.PP
+.Vb 9
+\&    The password needs to be roasted with the Roasting String if
+\&    coming over a FLAP connection, CP connections don't use
+\&    roasted passwords.  The language specified will be used
+\&    when generating web pages, such as the get info pages.
+\&    Currently the only supported language is 'english'.
+\&    If the language sent isn't found, the default 'english'
+\&    language will be used.  The version string will be used
+\&    for the client identity, and must be less then 50
+\&    characters.
+.Ve
+.Vb 7
+\&    Passwords are roasted when sent to the host.  This is done so they 
+\&    aren't sent in 'clear text' over the wire, although they are still 
+\&    trivial to decode.  Roasting is performed by first xoring each byte 
+\&    in the password with the equivalent modulo byte in the roasting 
+\&    string.  The result is then converted to ascii hex, and prepended 
+\&    with '0x'.  So for example the password 'password' roasts to 
+\&    '0x2408105c23001130'
+.Ve
+.Sh "toc_init_done"
+.PP
+.Vb 6
+\&    Tells TOC that we are ready to go online.  TOC clients should first 
+\&    send TOC the buddy list and any permit/deny lists.  However toc_init_done
+\&    must be called within 30 seconds after toc_signon, or the connection
+\&    will be dropped.  Remember, it can't be called until after the SIGN_ON
+\&    message is received.  Calling this before or multiple times after a
+\&    SIGN_ON will cause the connection to be dropped.
+.Ve
+.Sh "toc_send_im <Destination User> <Message> [auto]"
+.PP
+.Vb 3
+\&    Send a message to a remote user.  Remember to quote and encode the 
+\&    message.  If the optional string 'auto' is the last argument, then the 
+\&    auto response flag will be turned on for the im. 
+.Ve
+.Sh "toc_add_buddy <Buddy User 1> [<Buddy User2> [<Buddy User 3> [...]]]"
+.PP
+.Vb 2
+\&    Add buddies to your buddy list.  This does not change your
+\&    saved config.
+.Ve
+.Sh "toc_remove_buddy <Buddy User 1> [<Buddy User2> [<Buddy User 3> [...]]]"
+.PP
+.Vb 2
+\&    Remove buddies from your buddy list.  This does not change your
+\&    saved config.
+.Ve
+.Sh "toc_set_config <Config Info>"
+.PP
+.Vb 5
+\&    Set the config information for this user.  The config information
+\&    is line oriented with the first character being the item type,
+\&    followed by a space, with the rest of the line being the item
+\&    value.  Only letters, numbers, and spaces should be used.  Remember
+\&    you will have to enclose the entire config in quotes.
+.Ve
+.Vb 11
+\&    Item Types:
+\&    g - Buddy Group (All Buddies until the next g or the end of config 
+\&                     are in this group.)
+\&    b - A Buddy 
+\&    p - Person on permit list
+\&    d - Person on deny list
+\&    m - Permit/Deny Mode.  Possible values are
+\&        1 - Permit All
+\&        2 - Deny All
+\&        3 - Permit Some
+\&        4 - Deny Some
+.Ve
+.Sh "toc_evil <User> <norm|anon>"
+.PP
+.Vb 5
+\&    Evil/Warn someone else.  The 2nd argument is either the string
+\&    'norm' for a normal warning, or 'anon' for an anonymous 
+\&    warning.  You can only evil people who have recently sent you
+\&    ims.  The higher someones evil level, the slower they can
+\&    send message.
+.Ve
+.Sh "toc_add_permit [ <User 1> [<User 2> [...]]]"
+.PP
+.Vb 6
+\&    ADD the following people to your permit mode.  If
+\&    you are in deny mode it will switch you to permit
+\&    mode first.  With no arguments and in deny mode
+\&    this will switch you to permit none. If already
+\&    in permit mode, no arguments does nothing
+\&    and your permit list remains the same.
+.Ve
+.Sh "toc_add_deny [ <User 1> [<User 2> [... ]]]"
+.PP
+.Vb 6
+\&    ADD the following people to your deny mode. If
+\&    you are in permit mode it will switch you to
+\&    deny mode first.  With no arguments and in permit
+\&    mode, this will switch you to deny none. If
+\&    already in deny mode, no arguments does nothing
+\&    and your deny list remains unchanged.
+.Ve
+.Sh "toc_chat_join <Exchange> <Chat Room Name>"
+.PP
+.Vb 13
+\&    Join a chat room in the given exchange.  Exchange is
+\&    an integer that represents a group of chat rooms.
+\&    Different exchanges have different properties.  For
+\&    example some exchanges might have room replication (ie
+\&    a room never fills up, there are just multiple
+\&    instances.) and some exchanges might have navigational
+\&    information, and some exchanges might have ...  Currently
+\&    exchange should always be 4, however this may
+\&    change in the future.  You will either
+\&    receive an ERROR if the room couldn't be joined
+\&    or a CHAT_JOIN message.  The Chat Room Name
+\&    is case insensitive and consecutive spaces
+\&    are removed.
+.Ve
+.Sh "toc_chat_send <Chat Room \s-1ID\s0> <Message>"
+.PP
+.Vb 5
+\&    Send a message in a chat room using the chat room
+\&    id from CHAT_JOIN.  Since reflection is always on in
+\&    TOC, you do not need to add the message to your chat UI,
+\&    since you will get a CHAT_IN with the message.  
+\&    Remember to quote and encode the message.
+.Ve
+.Sh "toc_chat_whisper <Chat Room \s-1ID\s0> <dst_user> <Message>"
+.PP
+.Vb 7
+\&    Send a message in a chat room using the chat room
+\&    id from CHAT_JOIN.  This message is directed at
+\&    only one person.  (Currently you DO need to add this to
+\&    your UI.)  Remember to quote and encode the message.  
+\&    Chat whispering is different from IMs since it is linked
+\&    to a chat room, and should usually be displayed in the chat
+\&    room UI.
+.Ve
+.Sh "toc_chat_evil <Chat Room \s-1ID\s0> <User> <norm|anon>"
+.PP
+.Vb 3
+\&    Evil/Warn someone else inside a chat room.  The 3rd argument is either 
+\&    the string 'norm' for a normal warning, or 'anon' for an anonymous 
+\&    warning.  Currently chat evil is not turned on in the chat complex.
+.Ve
+.Sh "toc_chat_invite <Chat Room \s-1ID\s0> <Invite Msg> <buddy1> [<buddy2> [<buddy3> [...]]]"
+.PP
+.Vb 2
+\&    Once you are inside a chat room you can invite other people into
+\&    that room.  Remember to quote and encode the invite message.
+.Ve
+.Sh "toc_chat_leave <Chat Room \s-1ID\s0>"
+.PP
+.Vb 1
+\&    Leave the chat room.
+.Ve
+.Sh "toc_chat_accept <Chat Room \s-1ID\s0>"
+.PP
+.Vb 2
+\&    Accept a CHAT_INVITE message from TOC.  The server will send a
+\&    CHAT_JOIN in response.
+.Ve
+.Sh "toc_get_info <username>"
+.PP
+.Vb 2
+\&    Gets a user's info a GOTO_URL or ERROR message will be sent back to the 
+\&    client.
+.Ve
+.Sh "toc_set_info <info information>"
+.PP
+.Vb 2
+\&    Set the LOCATE user information.  This is basic HTML.
+\&    Remember to encode the info.
+.Ve
+.Sh "toc_set_away [<away message>]"
+.PP
+.Vb 5
+\&    if the away message is present, then the unavailable
+\&    status flag is set for the user.  If the away message
+\&    is not present, then the unavailable status flag is
+\&    unset.  The away message is basic HTML, remember to
+\&    encode the information.
+.Ve
+.Sh "toc_get_dir <username>"
+.PP
+.Vb 2
+\&    Gets a user's dir info a GOTO_URL or ERROR message will be sent back to the 
+\&    client.
+.Ve
+.Sh "toc_set_dir <info information>"
+.PP
+.Vb 6
+\&    Set the DIR user information.  This is a colon separated fields as
+\&    in: 'first name':'middle name':'last name':'maiden
+\&    name':'city':'state':'country':'email':'allow web searches' Should
+\&    return a DIR_STATUS msg.  Having anything in the 'allow web
+\&    searches' field allows people to use web-searches to find your
+\&    directory info.  Otherwise, they'd have to use the client.
+.Ve
+.Sh "toc_dir_search <info information>"
+.PP
+.Vb 4
+\&    Perform a search of the Oscar Directory, using colon separated
+\&    fields as in: 'first name':'middle name':'last name':'maiden
+\&    name':'city':'state':'country':'email' Returns either a GOTO_URL
+\&    or ERROR msg.
+.Ve
+.Sh "toc_set_idle <idle secs>"
+.PP
+.Vb 5
+\&    Set idle information. If <idle secs> is 0 then the user isn't idle at all.
+\&    If <idle secs> is greater then 0 then the user has already been idle
+\&    for <idle secs> number of seconds.  The server will automatically
+\&    keep incrementing this number, so do not repeatedly call with new
+\&    idle times.
+.Ve
+.SH "TOC \-> Client"
+All user names from TOC to client are NOT normalized, and are sent as
+they should be displayed.  String are NOT encoded, instead we use
+colons as separators.  So that you can have colons inside of messages,
+everything after the colon before :<Message> should be considered part
+of the message (ie don't just \*(L'split\*(R' on colons, instead split with a
+max number of results.)
+.Sh "\s-1SIGN_ON\s0:<Client Version Supported>"
+.PP
+.Vb 3
+\&   This is sent after a successful toc_signon command is sent to TOC.
+\&   If the command was unsuccessful either the FLAP connection will
+\&   be dropped or you will receive a ERROR message.
+.Ve
+.Sh "\s-1CONFIG\s0:<config>"
+.PP
+.Vb 3
+\&   A user's config. Config can be empty in which case the host was not able to
+\&   retrieve it, or a config didn't exist for the user.  See toc_set_config
+\&   above for the format.
+.Ve
+.Sh "\s-1NICK\s0:<Nickname>"
+.PP
+.Vb 2
+\&   Tells you your correct nickname (ie how it should be capitalized and
+\&   spacing)
+.Ve
+.Sh "\s-1IM_IN\s0:<Source User>:<Auto Response T/F?>:<Message>"
+.PP
+.Vb 2
+\&   Receive an IM from some one.  Everything after the third colon is
+\&   the incoming message, including other colons.
+.Ve
+.Sh "\s-1UPDATE_BUDDY\s0:<Buddy User>:<Online? T/F>:<Evil Amount>:<Signon Time>:<IdleTime>:<\s-1UC\s0>"
+.PP
+.Vb 3
+\&   This one command handles arrival/depart/updates.  Evil Amount is
+\&   a percentage, Signon Time is UNIX epoc, idle time is in minutes, UC (User Class)
+\&   is a two/three character string.
+.Ve
+.Vb 3
+\&   uc[0]:
+\&   ' '  - Ignore
+\&   'A'  - On AOL
+.Ve
+.Vb 5
+\&   uc[1]
+\&   ' '  - Ignore
+\&   'A'  - Oscar Admin
+\&   'U'  - Oscar Unconfirmed
+\&   'O'  - Oscar Normal
+.Ve
+.Vb 4
+\&   uc[2] 
+\&   '\e0' - Ignore
+\&   ' '  - Ignore
+\&   'U'  - The user has set their unavailable flag.
+.Ve
+.Sh "\s-1ERROR\s0:<Error Code>:Var args"
+.PP
+.Vb 5
+\&   * General Errors *
+\&   901   - $1 not currently available
+\&   902   - Warning of $1 not currently available
+\&   903   - A message has been dropped, you are exceeding
+\&           the server speed limit
+.Ve
+.Vb 2
+\&   * Chat Errors  *
+\&   950   - Chat in $1 is unavailable.
+.Ve
+.Vb 4
+\&   * IM & Info Errors *
+\&   960   - You are sending message too fast to $1
+\&   961   - You missed an im from $1 because it was too big.
+\&   962   - You missed an im from $1 because it was sent too fast.
+.Ve
+.Vb 11
+\&   * Dir Errors *
+\&   970   - Failure
+\&   971   - Too many matches
+\&   972   - Need more qualifiers
+\&   973   - Dir service temporarily unavailable
+\&   974   - Email lookup restricted
+\&   975   - Keyword Ignored
+\&   976   - No Keywords
+\&   977   - Language not supported
+\&   978   - Country not supported
+\&   979   - Failure unknown $1
+.Ve
+.Vb 8
+\&   * Auth errors *
+\&   980   - Incorrect nickname or password.
+\&   981   - The service is temporarily unavailable.
+\&   982   - Your warning level is currently too high to sign on.
+\&   983   - You have been connecting and
+\&           disconnecting too frequently.  Wait 10 minutes and try again.
+\&           If you continue to try, you will need to wait even longer.
+\&   989   - An unknown signon error has occurred $1
+.Ve
+.Sh "\s-1EVILED\s0:<new evil>:<name of eviler, blank if anonymous>"
+.PP
+.Vb 1
+\&   The user was just eviled.
+.Ve
+.Sh "\s-1CHAT_JOIN\s0:<Chat Room Id>:<Chat Room Name>"
+.PP
+.Vb 2
+\&   We were able to join this chat room.  The Chat Room Id is
+\&   internal to TOC.
+.Ve
+.Sh "\s-1CHAT_IN\s0:<Chat Room Id>:<Source User>:<Whisper? T/F>:<Message>"
+.PP
+.Vb 1
+\&   A chat message was sent in a chat room.
+.Ve
+.Sh "\s-1CHAT_UPDATE_BUDDY\s0:<Chat Room Id>:<Inside? T/F>:<User 1>:<User 2>..."
+.PP
+.Vb 3
+\&   This one command handles arrival/departs from a chat room.  The
+\&   very first message of this type for each chat room contains the
+\&   users already in the room.
+.Ve
+.Sh "\s-1CHAT_INVITE\s0:<Chat Room Name>:<Chat Room Id>:<Invite Sender>:<Message>"
+.PP
+.Vb 1
+\&   We are being invited to a chat room.
+.Ve
+.Sh "\s-1CHAT_LEFT\s0:<Chat Room Id>"
+.PP
+.Vb 1
+\&   Tells tic connection to chat room has been dropped
+.Ve
+.Sh "\s-1GOTO_URL\s0:<Window Name>:<Url>"
+.PP
+.Vb 2
+\&   Goto a URL.  Window Name is the suggested internal name of the window
+\&   to use.  (Java supports this.) 
+.Ve
+.Sh "\s-1DIR_STATUS\s0:<Return Code>    "
+.Sh "\s-1PAUSE\s0"
+.PP
+.Vb 1
+\&   Tells TIC to pause so we can do migration
+.Ve
+.SH "Typical Signon Process"
+Except for the section marked optional this is an sequential process.
+Each line MUST occur before the following line.
+.Ip "\(bu Client connects to \s-1TOC\s0" 4
+.Ip "\(bu Client sends \*(N'\s-1FLAPON\s0\er\en\er\en\*(T'" 4
+.Ip "\(bu \s-1TOC\s0 sends Client \s-1FLAP\s0 \s-1SIGNON\s0" 4
+.Ip "\(bu Client sends \s-1TOC\s0 \s-1FLAP\s0 \s-1SIGNON\s0" 4
+.Ip "\(bu Client sends \s-1TOC\s0 \*(N'toc_signon\*(T' message" 4
+.Ip "\(bu if login fails \s-1TOC\s0 drops client's connection else \s-1TOC\s0 sends client \s-1SIGN_ON\s0 reply" 4
+.Ip "\(bu if Client doesn't support version it drops the connection" 4
+.Ip "[\s-1BEGIN\s0 \s-1OPTIONAL\s0]" 4
+.Ip "\(bu \s-1TOC\s0 sends Client \s-1CONFIG\s0" 4
+.Ip "\(bu Client sends \s-1TOC\s0 permit/deny stuff" 4
+.Ip "\(bu Client sends \s-1TOC\s0 toc_add_buddy message" 4
+.Ip "[\s-1END\s0 \s-1OPTIONAL\s0]" 4
+.Ip "\(bu Client sends \s-1TOC\s0 toc_init_done message" 4
+.SH "SFLAP Documentation"
+SFLAP is pretty much a FLAP connection except the DATA frame payload
+is a null terminated string when traveling from client to host, it is
+NOT null terminated when traveling from host to client.  The FLAP
+Header is binary data, and is in network byte order.  The data portion
+is at offset 6, after the header.  The sequence number is sequential
+in each direction.  So packets from the server to client have one
+sequence number, while the packets from the client to server have an
+independent increasing number.
+.Ip "\s-1FLAP\s0 Header (6 bytes)" 4
+.Sp
+.Vb 6
+\&        Offset   Size  Type
+\&        0        1     ASTERISK (literal ASCII '*')
+\&        1        1     Frame Type
+\&        2        2     Sequence Number
+\&        4        2     Data Length
+\&         
+.Ve
+.Ip "Valid Frame Type Values" 4
+.Sp
+.Vb 5
+\&        1   SIGNON
+\&        2   DATA
+\&        3   ERROR     (Not used by TOC)
+\&        4   SIGNOFF   (Not used by TOC)
+\&        5   KEEP_ALIVE
+.Ve
+.SH "TOC SIGNON FRAME TYPE"
+Sequence Number contains the initial sequence number used in each
+direction.  Data Length contains the payload length, with the payload
+described below.  The payload area is NOT null terminated.
+.Ip "Host To Client:" 4
+.Sp
+.Vb 1
+\&        4 byte FLAP version (1)
+.Ve
+.Ip "Client To Host:  " 4
+.Sp
+.Vb 4
+\&        4 byte FLAP version (1)
+\&        2 byte TLV Tag (1)
+\&        2 byte Normalized User Name Length
+\&        N byte Normalized User Name  (NOT null terminated)
+.Ve
+.SH "TOC DATA FRAME TYPE"
+Sequence Number contains the next sequence number.  Data Length is the
+length of the payload, including the null termination from client to
+host.
+.SH "RESTRICTIONS"
+This protocol description may not be complete.
+.SH "AUTHOR"
+Converted from text to a manpage by Riad Wahby
+<\fBrsw@jfet.org\fR>, 7/6/00.
+.SH "HISTORY"
+Originally the PROTOCOL file from the TiK distribution.
+
+.rn }` ''
+.IX Title "TOC 7"
+.IX Name "TOC Documentation - Documentation for the AOL TOC Instant Messenging Protocol"
+
+.IX Header "NAME"
+
+.IX Header "LICENSE"
+
+.IX Header "SYNOPSIS"
+
+.IX Header "IMPORTANT NOTES"
+
+.IX Item "\(bu \s-1TOC\s0 will drop the connection if a command exceeds the maximum   length, which is currently 1024 bytes.  So the client needs to spend   special attention to im, chat, and config message lengths.  There is   an 8k length maximum from \s-1TOC\s0 to the client."
+
+.IX Item "\(bu No commands should be sent to \s-1TOC\s0 (besides toc_signon) before   a \s-1SIGN_ON\s0 is received.  If you do send a command before \s-1SIGN_ON\s0 the   command will be ignored, and in some case the connection will be   dropped."
+
+.IX Item "\(bu Initial permit/deny items should be sent after receiving   \s-1SIGN_ON\s0 but before sending toc_init_done, otherwise the user will   flash on peoples buddylist who the user has denied.  You will   probably want to send the toc_add_buddies at this time also."
+
+.IX Item "\(bu After \s-1TOC\s0 sends the \s-1PAUSE\s0 message to a client, all messages   sent to \s-1TOC\s0 will be ignored, and in some cases the connection will   be dropped.  Another \s-1SIGN_ON\s0 message will be sent to the client when   it is online again.  The buddy list and permit/deny items must be   sent again, followed by the toc_init_done.  In most cases the   \s-1SIGN_ON\s0 message will be sent between 1-2 seconds after the \s-1PAUSE\s0   message.  Therefore a client could choose to ignore the \s-1PAUSE\s0   message and hope nothing bad happens."
+
+.IX Item "\(bu The string used for roasting passwords is \*(N'Tic/Toc\*(T' (no quotes), or \fB01010100011010010110001100101111010101000110111101100011\fR in binary."
+
+.IX Header "DESCRIPTION"
+
+.IX Header "Client \-> TOC"
+
+.IX Subsection "toc_signon <authorizer host> <authorizer port> <User Name> <Password> <language> <version>"
+
+.IX Subsection "toc_init_done"
+
+.IX Subsection "toc_send_im <Destination User> <Message> [auto]"
+
+.IX Subsection "toc_add_buddy <Buddy User 1> [<Buddy User2> [<Buddy User 3> [...]]]"
+
+.IX Subsection "toc_remove_buddy <Buddy User 1> [<Buddy User2> [<Buddy User 3> [...]]]"
+
+.IX Subsection "toc_set_config <Config Info>"
+
+.IX Subsection "toc_evil <User> <norm|anon>"
+
+.IX Subsection "toc_add_permit [ <User 1> [<User 2> [...]]]"
+
+.IX Subsection "toc_add_deny [ <User 1> [<User 2> [... ]]]"
+
+.IX Subsection "toc_chat_join <Exchange> <Chat Room Name>"
+
+.IX Subsection "toc_chat_send <Chat Room \s-1ID\s0> <Message>"
+
+.IX Subsection "toc_chat_whisper <Chat Room \s-1ID\s0> <dst_user> <Message>"
+
+.IX Subsection "toc_chat_evil <Chat Room \s-1ID\s0> <User> <norm|anon>"
+
+.IX Subsection "toc_chat_invite <Chat Room \s-1ID\s0> <Invite Msg> <buddy1> [<buddy2> [<buddy3> [...]]]"
+
+.IX Subsection "toc_chat_leave <Chat Room \s-1ID\s0>"
+
+.IX Subsection "toc_chat_accept <Chat Room \s-1ID\s0>"
+
+.IX Subsection "toc_get_info <username>"
+
+.IX Subsection "toc_set_info <info information>"
+
+.IX Subsection "toc_set_away [<away message>]"
+
+.IX Subsection "toc_get_dir <username>"
+
+.IX Subsection "toc_set_dir <info information>"
+
+.IX Subsection "toc_dir_search <info information>"
+
+.IX Subsection "toc_set_idle <idle secs>"
+
+.IX Header "TOC \-> Client"
+
+.IX Subsection "\s-1SIGN_ON\s0:<Client Version Supported>"
+
+.IX Subsection "\s-1CONFIG\s0:<config>"
+
+.IX Subsection "\s-1NICK\s0:<Nickname>"
+
+.IX Subsection "\s-1IM_IN\s0:<Source User>:<Auto Response T/F?>:<Message>"
+
+.IX Subsection "\s-1UPDATE_BUDDY\s0:<Buddy User>:<Online? T/F>:<Evil Amount>:<Signon Time>:<IdleTime>:<\s-1UC\s0>"
+
+.IX Subsection "\s-1ERROR\s0:<Error Code>:Var args"
+
+.IX Subsection "\s-1EVILED\s0:<new evil>:<name of eviler, blank if anonymous>"
+
+.IX Subsection "\s-1CHAT_JOIN\s0:<Chat Room Id>:<Chat Room Name>"
+
+.IX Subsection "\s-1CHAT_IN\s0:<Chat Room Id>:<Source User>:<Whisper? T/F>:<Message>"
+
+.IX Subsection "\s-1CHAT_UPDATE_BUDDY\s0:<Chat Room Id>:<Inside? T/F>:<User 1>:<User 2>..."
+
+.IX Subsection "\s-1CHAT_INVITE\s0:<Chat Room Name>:<Chat Room Id>:<Invite Sender>:<Message>"
+
+.IX Subsection "\s-1CHAT_LEFT\s0:<Chat Room Id>"
+
+.IX Subsection "\s-1GOTO_URL\s0:<Window Name>:<Url>"
+
+.IX Subsection "\s-1DIR_STATUS\s0:<Return Code>    "
+
+.IX Subsection "\s-1PAUSE\s0"
+
+.IX Header "Typical Signon Process"
+
+.IX Item "\(bu Client connects to \s-1TOC\s0"
+
+.IX Item "\(bu Client sends \*(N'\s-1FLAPON\s0\er\en\er\en\*(T'"
+
+.IX Item "\(bu \s-1TOC\s0 sends Client \s-1FLAP\s0 \s-1SIGNON\s0"
+
+.IX Item "\(bu Client sends \s-1TOC\s0 \s-1FLAP\s0 \s-1SIGNON\s0"
+
+.IX Item "\(bu Client sends \s-1TOC\s0 \*(N'toc_signon\*(T' message"
+
+.IX Item "\(bu if login fails \s-1TOC\s0 drops client's connection else \s-1TOC\s0 sends client \s-1SIGN_ON\s0 reply"
+
+.IX Item "\(bu if Client doesn't support version it drops the connection"
+
+.IX Item "[\s-1BEGIN\s0 \s-1OPTIONAL\s0]"
+
+.IX Item "\(bu \s-1TOC\s0 sends Client \s-1CONFIG\s0"
+
+.IX Item "\(bu Client sends \s-1TOC\s0 permit/deny stuff"
+
+.IX Item "\(bu Client sends \s-1TOC\s0 toc_add_buddy message"
+
+.IX Item "[\s-1END\s0 \s-1OPTIONAL\s0]"
+
+.IX Item "\(bu Client sends \s-1TOC\s0 toc_init_done message"
+
+.IX Header "SFLAP Documentation"
+
+.IX Item "\s-1FLAP\s0 Header (6 bytes)"
+
+.IX Item "Valid Frame Type Values"
+
+.IX Header "TOC SIGNON FRAME TYPE"
+
+.IX Item "Host To Client:"
+
+.IX Item "Client To Host:  "
+
+.IX Header "TOC DATA FRAME TYPE"
+
+.IX Header "RESTRICTIONS"
+
+.IX Header "AUTHOR"
+
+.IX Header "HISTORY"
+

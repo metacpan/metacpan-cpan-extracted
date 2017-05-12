@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Net-IRC3
+version:             0.6
+abstract:            An event system independend IRC protocol module
+license:             perl
+author:              
+    - Robin Redeker <elmex@ta-sa.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    AnyEvent:                      0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

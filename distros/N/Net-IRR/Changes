@@ -1,0 +1,37 @@
+Revision history for Perl extension Net::IRR.
+
+0.08 Mar 30 2010
+  - Changed dependency from Net::TCP to IO::Socket::INET.
+
+0.07 Nov 5 2009
+  - Added $whois->get_ipv6_routes_by_origin() - Greg Skinner [RT #48316]
+  - Fixed connect bug - Greg Skinner [RT #51154]
+
+0.06 Tue Aug 10 15:20:54 2004
+  - $whois->sources() now uses wantarray to return a scalar or list
+  - fixed a couple of typos in t/01_methods.t (reported by Joshua Keroes)
+  - the synopsis compiles now
+
+0.05 Tue Aug 10 08:07:10 2004
+  - seperated $whois->get_route_search() from $whois->get_as_search()
+  - cleaned up warnings
+  - refactored $whois->route_search() internals
+  - fixed a croak() typo in $whois->update()
+
+0.04 Mon Aug 9 08:07:10 2004
+  - added $whois->get_route_set() (suggested by Peter Mills)
+  - fixed a usage message in $whois->get_as_set()
+
+0.03  Wed Jul 21 09:37:58 2004
+  - more documentation cleanup
+  - better error handling for parsing server responses (bug reported by Peter Mills)
+
+0.02  Thu Jun 24 09:13:47 2004
+  - updated documentation
+  - fixed required parameter checking
+  - now using croak() instead of die()
+
+0.01  Mon Sep 22 09:02:33 2003
+  - renamed from IRR to Net::IRR 
+  - added more tests
+

@@ -1,0 +1,16 @@
+Source: net-address-ip-local-perl
+Section: perl
+Priority: optional
+Maintainer: Julian Mehnle <julian@mehnle.net>
+Build-Depends: debhelper (>= 5)
+Build-Depends-Indep: perl, libmodule-build-perl, libtest-simple-perl
+Standards-Version: 3.8.0
+
+Package: libnet-address-ip-local-perl
+Architecture: all
+Depends: ${perl:Depends}, liberror-perl
+Suggests: libio-socket-inet6-perl
+Description: A class for discovering the local system's IP address
+ Net::Address::IP::Local discovers the local system's IP address that would
+ be used as the source address when contacting "the internet" or a certain
+ specified remote IP address.

@@ -1,0 +1,2803 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<activities>
+  <activity>
+    <created_at type="datetime">2008-08-07T18:06:46Z</created_at>
+    <device>web</device>
+    <id>6352172</id>
+    <plaze_id type="integer">25487</plaze_id>
+    <status>Having a coffee and fun with javascript</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-08-07T00:00:00+02:00</scheduled_at>
+    <plaze>
+      <address>Wickenburggasse</address>
+      <category>home</category>
+      <city>Vienna</city>
+      <country_code>AT</country_code>
+      <created_at type="datetime">2006-04-13T09:49:10Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>25487</id>
+      <link>http://www.nver.net</link>
+      <name>Wicke</name>
+      <state></state>
+      <timezone>Europe/Vienna</timezone>
+      <updated_at type="datetime">2007-02-19T07:32:36Z</updated_at>
+      <zip_code>1080</zip_code>
+      <latitude type="float">48.214629184069</latitude>
+      <longitude type="float">16.353224515915</longitude>
+      <country>Austria</country>
+      <picture_url>http://plazes.com/pictures/40857b67f1419dfd1801b82e674e33ee-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-01T12:17:05Z</created_at>
+    <device>web</device>
+    <id>6343055</id>
+    <plaze_id type="integer">114380</plaze_id>
+    <status>Plazecloud 3.0!</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-08-05T13:00:00+02:00</scheduled_at>
+    <plaze>
+      <address>AUGUSTSTRASSE 8</address>
+      <category>restaurant</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-08-07T11:12:04Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>114380</id>
+      <link>http://www.chez-de-nhat.de</link>
+      <name>Chez De Nhat</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-05-06T14:02:11Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5258825609947</latitude>
+      <longitude type="float">13.391604423523</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/95cfa4a6abcf107e95ee66a9fa57fd03-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-06-30T14:24:15Z</created_at>
+    <device>web</device>
+    <id>6295497</id>
+    <plaze_id type="integer">114380</plaze_id>
+    <status>ClouPlaNok Lunch</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-07-01T13:00:00+02:00</scheduled_at>
+    <plaze>
+      <address>AUGUSTSTRASSE 8</address>
+      <category>restaurant</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-08-07T11:12:04Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>114380</id>
+      <link>http://www.chez-de-nhat.de</link>
+      <name>Chez De Nhat</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-05-06T14:02:11Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5258825609947</latitude>
+      <longitude type="float">13.391604423523</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/95cfa4a6abcf107e95ee66a9fa57fd03-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-06-28T10:20:38Z</created_at>
+    <device>web</device>
+    <id>6292733</id>
+    <plaze_id type="integer">5156</plaze_id>
+    <status>Walking into the city now, hunting for a nokia charger</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-06-28T12:20:38+02:00</scheduled_at>
+    <plaze>
+      <address>Danasvej 32-34</address>
+      <category>hotel</category>
+      <city>Copenhagen / Frederiksberg</city>
+      <country_code>DK</country_code>
+      <created_at type="datetime">2005-06-11T19:46:19Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>5156</id>
+      <link>http:// www.cab-inn.dk/</link>
+      <name>CabInn Express / Copenhagen</name>
+      <state></state>
+      <timezone>Europe/Copenhagen</timezone>
+      <updated_at type="datetime">2006-06-02T23:33:45Z</updated_at>
+      <zip_code>1910</zip_code>
+      <latitude type="float">55.679539603589</latitude>
+      <longitude type="float">12.55011</longitude>
+      <country>Denmark</country>
+      <picture_url></picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-06-28T10:10:15Z</created_at>
+    <device>web</device>
+    <id>6292725</id>
+    <plaze_id type="integer">5156</plaze_id>
+    <status>Woke up, wondering how to communicate without batteries in the phone</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-06-28T12:10:15+02:00</scheduled_at>
+    <plaze>
+      <address>Danasvej 32-34</address>
+      <category>hotel</category>
+      <city>Copenhagen / Frederiksberg</city>
+      <country_code>DK</country_code>
+      <created_at type="datetime">2005-06-11T19:46:19Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>5156</id>
+      <link>http:// www.cab-inn.dk/</link>
+      <name>CabInn Express / Copenhagen</name>
+      <state></state>
+      <timezone>Europe/Copenhagen</timezone>
+      <updated_at type="datetime">2006-06-02T23:33:45Z</updated_at>
+      <zip_code>1910</zip_code>
+      <latitude type="float">55.679539603589</latitude>
+      <longitude type="float">12.55011</longitude>
+      <country>Denmark</country>
+      <picture_url></picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-04-10T10:01:42Z</created_at>
+    <device>web</device>
+    <id>6160672</id>
+    <plaze_id type="integer">127181</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-04-10T12:01:00+02:00</scheduled_at>
+    <plaze>
+      <address>ORANIENBURGER STRASSE 54</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-11-08T14:05:51Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>127181</id>
+      <link>http://bootlab.org</link>
+      <name>Bootlab 3.0</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-11-25T20:16:04Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5260377363206</latitude>
+      <longitude type="float">13.3886205810805</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/661f7607bc5b8b86aa15be2e69db9497-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-03-15T12:08:12Z</created_at>
+    <device>web</device>
+    <id>6114858</id>
+    <plaze_id type="integer">46739</plaze_id>
+    <status>pre-reboot dinner</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-06-25T19:30:00+02:00</scheduled_at>
+    <plaze>
+      <address></address>
+      <category>restaurant</category>
+      <city>Copenhagen</city>
+      <country_code>DK</country_code>
+      <created_at type="datetime">2006-10-28T19:10:44Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>46739</id>
+      <link></link>
+      <name>Wagamama copenhagen</name>
+      <state></state>
+      <timezone>Europe/Copenhagen</timezone>
+      <updated_at type="datetime">2008-05-24T14:58:25Z</updated_at>
+      <zip_code></zip_code>
+      <latitude type="float">55.67628154815</latitude>
+      <longitude type="float">12.569284735245</longitude>
+      <country>Denmark</country>
+      <picture_url>http://plazes.com/pictures/452b8f867f9b6e7f7262d50c8550b1b2-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-03-10T20:59:40Z</created_at>
+    <device>web</device>
+    <id>6106090</id>
+    <plaze_id type="integer">127181</plaze_id>
+    <status>pg_standby work, yippie!</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-03-10T21:59:40+01:00</scheduled_at>
+    <plaze>
+      <address>ORANIENBURGER STRASSE 54</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-11-08T14:05:51Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>127181</id>
+      <link>http://bootlab.org</link>
+      <name>Bootlab 3.0</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-11-25T20:16:04Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5260377363206</latitude>
+      <longitude type="float">13.3886205810805</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/661f7607bc5b8b86aa15be2e69db9497-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-03-09T19:53:30Z</created_at>
+    <device>web</device>
+    <id>6104347</id>
+    <plaze_id type="integer">127670</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-03-09T20:53:30+01:00</scheduled_at>
+    <plaze>
+      <address>GREIFSWALDER STRASSE</address>
+      <category>coffee_shop</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-11-13T18:45:48Z</created_at>
+      <has_free_wifi type="boolean">true</has_free_wifi>
+      <id>127670</id>
+      <link></link>
+      <name>Grad Celsius</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-11-13T21:25:43Z</updated_at>
+      <zip_code>10405-10409</zip_code>
+      <latitude type="float">52.5378735082553</latitude>
+      <longitude type="float">13.4352203922129</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-03-09T13:50:27Z</created_at>
+    <device>web</device>
+    <id>6103942</id>
+    <plaze_id type="integer">103634</plaze_id>
+    <status>Ingwerzitronetee, auch ok</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-03-09T14:50:27+01:00</scheduled_at>
+    <plaze>
+      <address>winsstrasse 56</address>
+      <category>coffee_shop</category>
+      <city>berlin</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-06-30T15:57:58Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>103634</id>
+      <link></link>
+      <name>enten und katzen</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-12-11T10:40:41Z</updated_at>
+      <zip_code></zip_code>
+      <latitude type="float">52.5339744555812</latitude>
+      <longitude type="float">13.4253963633493</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-03-07T11:14:38Z</created_at>
+    <device>web</device>
+    <id>6100659</id>
+    <plaze_id type="integer">127181</plaze_id>
+    <status>Working, still</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-03-07T12:14:38+01:00</scheduled_at>
+    <plaze>
+      <address>ORANIENBURGER STRASSE 54</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-11-08T14:05:51Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>127181</id>
+      <link>http://bootlab.org</link>
+      <name>Bootlab 3.0</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-11-25T20:16:04Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5260377363206</latitude>
+      <longitude type="float">13.3886205810805</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/661f7607bc5b8b86aa15be2e69db9497-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-03-07T09:04:50Z</created_at>
+    <device>web</device>
+    <id>6100466</id>
+    <plaze_id type="integer">104270</plaze_id>
+    <status>Working</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-03-07T10:04:50+01:00</scheduled_at>
+    <plaze>
+      <address>heinrich roller stra&#223;e 20</address>
+      <category>restaurant</category>
+      <city>berlin</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-07-03T08:34:24Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>104270</id>
+      <link></link>
+      <name>goldapfel</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-03-19T10:36:12Z</updated_at>
+      <zip_code></zip_code>
+      <latitude type="float">52.5308307915195</latitude>
+      <longitude type="float">13.4224875012391</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/2d5e1f410a2e0f3173ead20438a49741-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-03-06T17:26:15Z</created_at>
+    <device>web</device>
+    <id>6099307</id>
+    <plaze_id type="integer">127181</plaze_id>
+    <status>Nerd Prostitution</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-03-06T20:30:00+01:00</scheduled_at>
+    <plaze>
+      <address>ORANIENBURGER STRASSE 54</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-11-08T14:05:51Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>127181</id>
+      <link>http://bootlab.org</link>
+      <name>Bootlab 3.0</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-11-25T20:16:04Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5260377363206</latitude>
+      <longitude type="float">13.3886205810805</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/661f7607bc5b8b86aa15be2e69db9497-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-03-06T13:32:35Z</created_at>
+    <device>web</device>
+    <id>6098918</id>
+    <plaze_id type="integer">127181</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-03-06T14:32:35+01:00</scheduled_at>
+    <plaze>
+      <address>ORANIENBURGER STRASSE 54</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-11-08T14:05:51Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>127181</id>
+      <link>http://bootlab.org</link>
+      <name>Bootlab 3.0</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-11-25T20:16:04Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5260377363206</latitude>
+      <longitude type="float">13.3886205810805</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/661f7607bc5b8b86aa15be2e69db9497-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-03-06T09:00:28Z</created_at>
+    <device>web</device>
+    <id>6098446</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Sitting down</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-03-06T10:00:28+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-03-05T13:25:58Z</created_at>
+    <device>web</device>
+    <id>6096871</id>
+    <plaze_id type="integer">127181</plaze_id>
+    <status>org-mode rocks</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-03-05T14:25:00+01:00</scheduled_at>
+    <plaze>
+      <address>ORANIENBURGER STRASSE 54</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-11-08T14:05:51Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>127181</id>
+      <link>http://bootlab.org</link>
+      <name>Bootlab 3.0</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-11-25T20:16:04Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5260377363206</latitude>
+      <longitude type="float">13.3886205810805</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/661f7607bc5b8b86aa15be2e69db9497-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-03-05T11:45:48Z</created_at>
+    <device>web</device>
+    <id>6096705</id>
+    <plaze_id type="integer">127181</plaze_id>
+    <status>Thinking about currywurst and pommes in the sun</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-03-05T12:45:48+01:00</scheduled_at>
+    <plaze>
+      <address>ORANIENBURGER STRASSE 54</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-11-08T14:05:51Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>127181</id>
+      <link>http://bootlab.org</link>
+      <name>Bootlab 3.0</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-11-25T20:16:04Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5260377363206</latitude>
+      <longitude type="float">13.3886205810805</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/661f7607bc5b8b86aa15be2e69db9497-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-03-05T09:17:57Z</created_at>
+    <device>web</device>
+    <id>6096447</id>
+    <plaze_id type="integer">127181</plaze_id>
+    <status>kwallet is great, except when it doesn't work</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-03-05T10:00:00+01:00</scheduled_at>
+    <plaze>
+      <address>ORANIENBURGER STRASSE 54</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-11-08T14:05:51Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>127181</id>
+      <link>http://bootlab.org</link>
+      <name>Bootlab 3.0</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-11-25T20:16:04Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5260377363206</latitude>
+      <longitude type="float">13.3886205810805</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/661f7607bc5b8b86aa15be2e69db9497-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-03-04T14:18:20Z</created_at>
+    <device>web</device>
+    <id>6094527</id>
+    <plaze_id type="integer">127181</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-03-04T15:18:20+01:00</scheduled_at>
+    <plaze>
+      <address>ORANIENBURGER STRASSE 54</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-11-08T14:05:51Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>127181</id>
+      <link>http://bootlab.org</link>
+      <name>Bootlab 3.0</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-11-25T20:16:04Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5260377363206</latitude>
+      <longitude type="float">13.3886205810805</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/661f7607bc5b8b86aa15be2e69db9497-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-03-04T12:30:30Z</created_at>
+    <device>web</device>
+    <id>6094398</id>
+    <plaze_id type="integer">114380</plaze_id>
+    <status>Plazes &amp; SoundCloud lunch</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-03-04T14:00:00+01:00</scheduled_at>
+    <plaze>
+      <address>AUGUSTSTRASSE 8</address>
+      <category>restaurant</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-08-07T11:12:04Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>114380</id>
+      <link>http://www.chez-de-nhat.de</link>
+      <name>Chez De Nhat</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-05-06T14:02:11Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5258825609947</latitude>
+      <longitude type="float">13.391604423523</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/95cfa4a6abcf107e95ee66a9fa57fd03-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-03-04T09:12:17Z</created_at>
+    <device>web</device>
+    <id>6094150</id>
+    <plaze_id type="integer">127181</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-03-04T10:00:00+01:00</scheduled_at>
+    <plaze>
+      <address>ORANIENBURGER STRASSE 54</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-11-08T14:05:51Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>127181</id>
+      <link>http://bootlab.org</link>
+      <name>Bootlab 3.0</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-11-25T20:16:04Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5260377363206</latitude>
+      <longitude type="float">13.3886205810805</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/661f7607bc5b8b86aa15be2e69db9497-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-03-03T15:27:30Z</created_at>
+    <device>web</device>
+    <id>6092902</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Update, review</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-03-06T10:15:00+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-03-03T15:26:06Z</created_at>
+    <device>web</device>
+    <id>6092900</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>BOD</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-03-04T11:30:00+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-03-03T09:16:32Z</created_at>
+    <device>web</device>
+    <id>6092469</id>
+    <plaze_id type="integer">127181</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-03-03T10:16:32+01:00</scheduled_at>
+    <plaze>
+      <address>ORANIENBURGER STRASSE 54</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-11-08T14:05:51Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>127181</id>
+      <link>http://bootlab.org</link>
+      <name>Bootlab 3.0</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-11-25T20:16:04Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5260377363206</latitude>
+      <longitude type="float">13.3886205810805</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/661f7607bc5b8b86aa15be2e69db9497-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-03-02T11:53:06Z</created_at>
+    <device>web</device>
+    <id>6091064</id>
+    <plaze_id type="integer">103634</plaze_id>
+    <status>Soy milk coffee, as usual</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-03-02T12:53:06+01:00</scheduled_at>
+    <plaze>
+      <address>winsstrasse 56</address>
+      <category>coffee_shop</category>
+      <city>berlin</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-06-30T15:57:58Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>103634</id>
+      <link></link>
+      <name>enten und katzen</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-12-11T10:40:41Z</updated_at>
+      <zip_code></zip_code>
+      <latitude type="float">52.5339744555812</latitude>
+      <longitude type="float">13.4253963633493</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-03-01T11:40:02Z</created_at>
+    <device>web</device>
+    <id>6089544</id>
+    <plaze_id type="integer">104270</plaze_id>
+    <status>French toast aus, grr</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-03-01T12:40:02+01:00</scheduled_at>
+    <plaze>
+      <address>heinrich roller stra&#223;e 20</address>
+      <category>restaurant</category>
+      <city>berlin</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-07-03T08:34:24Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>104270</id>
+      <link></link>
+      <name>goldapfel</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-03-19T10:36:12Z</updated_at>
+      <zip_code></zip_code>
+      <latitude type="float">52.5308307915195</latitude>
+      <longitude type="float">13.4224875012391</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/2d5e1f410a2e0f3173ead20438a49741-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-29T09:27:17Z</created_at>
+    <device>web</device>
+    <id>6087613</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-29T10:27:17+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-28T09:20:44Z</created_at>
+    <device>web</device>
+    <id>6085835</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Starting to like the CouchDb concept</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-28T10:20:44+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-28T08:35:24Z</created_at>
+    <device>web</device>
+    <id>6085747</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-28T09:35:24+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-27T14:41:41Z</created_at>
+    <device>web</device>
+    <id>6084435</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-27T15:41:41+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-26T08:02:28Z</created_at>
+    <device>web</device>
+    <id>6081418</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-26T09:02:28+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-25T11:12:58Z</created_at>
+    <device>web</device>
+    <id>6080002</id>
+    <plaze_id type="integer">104270</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-25T12:12:58+01:00</scheduled_at>
+    <plaze>
+      <address>heinrich roller stra&#223;e 20</address>
+      <category>restaurant</category>
+      <city>berlin</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-07-03T08:34:24Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>104270</id>
+      <link></link>
+      <name>goldapfel</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-03-19T10:36:12Z</updated_at>
+      <zip_code></zip_code>
+      <latitude type="float">52.5308307915195</latitude>
+      <longitude type="float">13.4224875012391</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/2d5e1f410a2e0f3173ead20438a49741-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-24T10:46:06Z</created_at>
+    <device>web</device>
+    <id>6078320</id>
+    <plaze_id type="integer">104270</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-24T11:46:06+01:00</scheduled_at>
+    <plaze>
+      <address>heinrich roller stra&#223;e 20</address>
+      <category>restaurant</category>
+      <city>berlin</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-07-03T08:34:24Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>104270</id>
+      <link></link>
+      <name>goldapfel</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-03-19T10:36:12Z</updated_at>
+      <zip_code></zip_code>
+      <latitude type="float">52.5308307915195</latitude>
+      <longitude type="float">13.4224875012391</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/2d5e1f410a2e0f3173ead20438a49741-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-23T18:00:21Z</created_at>
+    <device>web</device>
+    <id>6077693</id>
+    <plaze_id type="integer">135709</plaze_id>
+    <status>M-x zone</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-23T19:00:21+01:00</scheduled_at>
+    <plaze>
+      <address>LINIENSTRASSE 54</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2008-02-23T13:33:08Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>135709</id>
+      <link></link>
+      <name>1010 office</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-02-23T13:33:08Z</updated_at>
+      <zip_code>10119</zip_code>
+      <latitude type="float">52.5286160795802</latitude>
+      <longitude type="float">13.4063355431708</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-23T13:33:09Z</created_at>
+    <device>web</device>
+    <id>6077429</id>
+    <plaze_id type="integer">135709</plaze_id>
+    <status>emacs workshop</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-23T14:33:09+01:00</scheduled_at>
+    <plaze>
+      <address>LINIENSTRASSE 54</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2008-02-23T13:33:08Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>135709</id>
+      <link></link>
+      <name>1010 office</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-02-23T13:33:08Z</updated_at>
+      <zip_code>10119</zip_code>
+      <latitude type="float">52.5286160795802</latitude>
+      <longitude type="float">13.4063355431708</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-22T10:48:51Z</created_at>
+    <device>web</device>
+    <id>6075835</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Listening to C64 Radio</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-22T11:48:51+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-22T10:46:52Z</created_at>
+    <device>web</device>
+    <id>6075832</id>
+    <plaze_id type="integer">92120</plaze_id>
+    <status>Mittagessen</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-22T13:00:00+01:00</scheduled_at>
+    <plaze>
+      <address>Monbijouplatz 12</address>
+      <category>restaurant</category>
+      <city>Berlin</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-31T07:32:34Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>92120</id>
+      <link></link>
+      <name>A Posto Pizzeria</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-12-18T08:38:37Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.522743457759</latitude>
+      <longitude type="float">13.4000997469796</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/bdc06ac481b944e7ef10bc9c2c759430-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-22T10:45:49Z</created_at>
+    <device>web</device>
+    <id>6075831</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Trying to clean up undefined SRID issues</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-22T10:00:00+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-21T13:43:24Z</created_at>
+    <device>web</device>
+    <id>6074398</id>
+    <plaze_id type="integer">135561</plaze_id>
+    <status>pickle.el: GNU Emacs as artistic operating system</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-23T14:00:00+01:00</scheduled_at>
+    <plaze>
+      <address>LINIENSTRASSE 54</address>
+      <category>coffee_shop</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2008-02-21T13:43:20Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>135561</id>
+      <link></link>
+      <name>pickledfeet</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-02-21T13:43:20Z</updated_at>
+      <zip_code>10119</zip_code>
+      <latitude type="float">52.5286160795802</latitude>
+      <longitude type="float">13.4063355431708</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-21T11:30:06Z</created_at>
+    <device>web</device>
+    <id>6074233</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Things</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-21T12:30:06+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-20T11:38:50Z</created_at>
+    <device>web</device>
+    <id>6072513</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-20T12:38:50+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-19T10:26:50Z</created_at>
+    <device>web</device>
+    <id>6070611</id>
+    <plaze_id type="integer">114380</plaze_id>
+    <status>Plazecloud</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-19T13:30:00+01:00</scheduled_at>
+    <plaze>
+      <address>AUGUSTSTRASSE 8</address>
+      <category>restaurant</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-08-07T11:12:04Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>114380</id>
+      <link>http://www.chez-de-nhat.de</link>
+      <name>Chez De Nhat</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-05-06T14:02:11Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5258825609947</latitude>
+      <longitude type="float">13.391604423523</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/95cfa4a6abcf107e95ee66a9fa57fd03-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-19T08:37:33Z</created_at>
+    <device>web</device>
+    <id>6070457</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Oabeitn</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-19T09:37:33+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-18T08:39:54Z</created_at>
+    <device>web</device>
+    <id>6068447</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Finger auftauen</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-18T09:39:54+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-17T14:52:56Z</created_at>
+    <device>web</device>
+    <id>6067054</id>
+    <plaze_id type="integer">127670</plaze_id>
+    <status>Waschen</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-17T15:52:56+01:00</scheduled_at>
+    <plaze>
+      <address>GREIFSWALDER STRASSE</address>
+      <category>coffee_shop</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-11-13T18:45:48Z</created_at>
+      <has_free_wifi type="boolean">true</has_free_wifi>
+      <id>127670</id>
+      <link></link>
+      <name>Grad Celsius</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-11-13T21:25:43Z</updated_at>
+      <zip_code>10405-10409</zip_code>
+      <latitude type="float">52.5378735082553</latitude>
+      <longitude type="float">13.4352203922129</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-16T12:58:46Z</created_at>
+    <device>web</device>
+    <id>6065327</id>
+    <plaze_id type="integer">22793</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-16T13:58:46+01:00</scheduled_at>
+    <plaze>
+      <address>ANKLAMER STRASSE 27</address>
+      <category>bar</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2006-03-12T21:01:07Z</created_at>
+      <has_free_wifi type="boolean">true</has_free_wifi>
+      <id>22793</id>
+      <link></link>
+      <name>Weltempf&#228;nger</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-07-25T09:06:42Z</updated_at>
+      <zip_code>10115</zip_code>
+      <latitude type="float">52.5365079736487</latitude>
+      <longitude type="float">13.4005737304688</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/b3b73a1fd999659a6b1b45b25172b998-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-15T16:18:22Z</created_at>
+    <device>web</device>
+    <id>6063492</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Hoping to find this in plazes poetry</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-15T17:18:22+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-15T08:50:06Z</created_at>
+    <device>web</device>
+    <id>6062540</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-15T09:50:06+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-13T10:47:47Z</created_at>
+    <device>web</device>
+    <id>6057839</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Xen rocks</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-13T11:47:47+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-12T13:57:03Z</created_at>
+    <device>web</device>
+    <id>6055877</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Getting schizophrenic with Xen</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-12T14:00:00+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-12T11:50:15Z</created_at>
+    <device>web</device>
+    <id>6055622</id>
+    <plaze_id type="integer">17392</plaze_id>
+    <status>Having a good time lunch</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-12T12:50:15+01:00</scheduled_at>
+    <plaze>
+      <address>Chausseestrasse 1</address>
+      <category>restaurant</category>
+      <city>Berlin</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2005-12-22T13:16:44Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>17392</id>
+      <link></link>
+      <name>Good Time</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-07-25T16:59:48Z</updated_at>
+      <zip_code>10115</zip_code>
+      <latitude type="float">52.527159406037</latitude>
+      <longitude type="float">13.3871337738794</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/6d6c67a4e3667950bceb8e59f379159c-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-12T09:08:52Z</created_at>
+    <device>web</device>
+    <id>6055272</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Changing backup drives</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-12T10:08:00+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-11T15:15:49Z</created_at>
+    <device>web</device>
+    <id>6053320</id>
+    <plaze_id type="integer">127181</plaze_id>
+    <status>Dingens</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-11T16:15:49+01:00</scheduled_at>
+    <plaze>
+      <address>ORANIENBURGER STRASSE 54</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-11-08T14:05:51Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>127181</id>
+      <link>http://bootlab.org</link>
+      <name>Bootlab 3.0</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-11-25T20:16:04Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5260377363206</latitude>
+      <longitude type="float">13.3886205810805</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/661f7607bc5b8b86aa15be2e69db9497-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-11T13:41:44Z</created_at>
+    <device>web</device>
+    <id>6053124</id>
+    <plaze_id type="integer">127181</plaze_id>
+    <status>Not so sunny anymore</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-11T14:41:44+01:00</scheduled_at>
+    <plaze>
+      <address>ORANIENBURGER STRASSE 54</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-11-08T14:05:51Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>127181</id>
+      <link>http://bootlab.org</link>
+      <name>Bootlab 3.0</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-11-25T20:16:04Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5260377363206</latitude>
+      <longitude type="float">13.3886205810805</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/661f7607bc5b8b86aa15be2e69db9497-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-10T11:15:12Z</created_at>
+    <device>web</device>
+    <id>6050660</id>
+    <plaze_id type="integer">127181</plaze_id>
+    <status>Sunny day</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-10T12:15:12+01:00</scheduled_at>
+    <plaze>
+      <address>ORANIENBURGER STRASSE 54</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-11-08T14:05:51Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>127181</id>
+      <link>http://bootlab.org</link>
+      <name>Bootlab 3.0</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-11-25T20:16:04Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5260377363206</latitude>
+      <longitude type="float">13.3886205810805</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/661f7607bc5b8b86aa15be2e69db9497-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-08T11:56:13Z</created_at>
+    <device>web</device>
+    <id>6046551</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-08T12:56:13+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-07T13:31:40Z</created_at>
+    <device>web</device>
+    <id>6044134</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Escape from the 'tou paie' man</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-07T14:31:40+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-07T12:13:14Z</created_at>
+    <device>web</device>
+    <id>6043925</id>
+    <plaze_id type="integer">108839</plaze_id>
+    <status>Fearing the creepy waiter</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-07T13:13:14+01:00</scheduled_at>
+    <plaze>
+      <address>ORANIENBURGER STRASSE 26</address>
+      <category>restaurant</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-07-13T11:33:29Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>108839</id>
+      <link>http://www.aarti-restaurant.de</link>
+      <name>Aarti</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-12-11T11:00:41Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5244935464039</latitude>
+      <longitude type="float">13.3948950190441</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/e8360dc34175b66059a518ea8f04f556-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-07T10:53:39Z</created_at>
+    <device>web</device>
+    <id>6043751</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Permanent code and review from now on</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-07T11:53:39+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-07T10:45:15Z</created_at>
+    <device>web</device>
+    <id>6043729</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Wondering why it's always such a hassle to start the code review</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-07T11:45:15+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-07T09:09:56Z</created_at>
+    <device>web</device>
+    <id>6043525</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-07T10:09:56+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-06T13:24:13Z</created_at>
+    <device>web</device>
+    <id>6041515</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Admiring markaby</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-06T14:24:13+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-06T11:56:05Z</created_at>
+    <device>web</device>
+    <id>6041340</id>
+    <plaze_id type="integer">134502</plaze_id>
+    <status>Thinking about hamburgers with pommes frittes</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-06T13:15:00+01:00</scheduled_at>
+    <plaze>
+      <address>ORANIENBURGER STRASSE</address>
+      <category>restaurant</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2008-02-06T11:56:03Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>134502</id>
+      <link></link>
+      <name>American Diner</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-02-06T11:56:03Z</updated_at>
+      <zip_code>10115-10178</zip_code>
+      <latitude type="float">52.5246271317448</latitude>
+      <longitude type="float">13.3942894028791</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-06T11:00:54Z</created_at>
+    <device>web</device>
+    <id>6041236</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Doing things</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-06T12:00:54+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-06T08:44:23Z</created_at>
+    <device>web</device>
+    <id>6040972</id>
+    <plaze_id type="integer">85709</plaze_id>
+    <status>Getting Kaffee und Croissant of course (at 9:50 actually, but Plazes wont let me enter that)</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-06T10:00:00+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>coffee_shop</category>
+      <city>berlin</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-09T16:50:27Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>85709</id>
+      <link></link>
+      <name>Lavazza Cafe Bar</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-01-21T22:46:20Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.523517499731</latitude>
+      <longitude type="float">13.398562147688</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-06T08:22:01Z</created_at>
+    <device>web</device>
+    <id>6040923</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Kaffee und Croissant, anyone?</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-06T09:22:01+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-05T14:21:26Z</created_at>
+    <device>web</device>
+    <id>6039044</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Directly assigning permissions</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-05T15:21:26+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-05T09:52:40Z</created_at>
+    <device>web</device>
+    <id>6038486</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-05T10:52:40+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-04T17:17:47Z</created_at>
+    <device>web</device>
+    <id>6036734</id>
+    <plaze_id type="integer">114380</plaze_id>
+    <status>PlazeCloud lunch</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-05T14:00:00+01:00</scheduled_at>
+    <plaze>
+      <address>AUGUSTSTRASSE 8</address>
+      <category>restaurant</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-08-07T11:12:04Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>114380</id>
+      <link>http://www.chez-de-nhat.de</link>
+      <name>Chez De Nhat</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-05-06T14:02:11Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5258825609947</latitude>
+      <longitude type="float">13.391604423523</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/95cfa4a6abcf107e95ee66a9fa57fd03-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-04T08:41:53Z</created_at>
+    <device>web</device>
+    <id>6035504</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-04T09:41:53+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-03T16:06:36Z</created_at>
+    <device>web</device>
+    <id>6033766</id>
+    <plaze_id type="integer">103634</plaze_id>
+    <status>Tee &amp; Stulle</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-03T17:06:36+01:00</scheduled_at>
+    <plaze>
+      <address>winsstrasse 56</address>
+      <category>coffee_shop</category>
+      <city>berlin</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-06-30T15:57:58Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>103634</id>
+      <link></link>
+      <name>enten und katzen</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-12-11T10:40:41Z</updated_at>
+      <zip_code></zip_code>
+      <latitude type="float">52.5339744555812</latitude>
+      <longitude type="float">13.4253963633493</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-02T14:54:17Z</created_at>
+    <device>web</device>
+    <id>6031514</id>
+    <plaze_id type="integer">134273</plaze_id>
+    <status>Tirana hochleben lassen</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-02T15:54:17+01:00</scheduled_at>
+    <plaze>
+      <address></address>
+      <category>home</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2008-02-02T14:54:17Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>134273</id>
+      <link></link>
+      <name>Geheimes Zuhause</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-02-02T14:54:17Z</updated_at>
+      <zip_code>10115-14199</zip_code>
+      <latitude type="float">52.5159755255962</latitude>
+      <longitude type="float">13.3771381476947</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-02T13:41:47Z</created_at>
+    <device>web</device>
+    <id>6031398</id>
+    <plaze_id type="integer">134270</plaze_id>
+    <status>cool sein</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-02T14:41:47+01:00</scheduled_at>
+    <plaze>
+      <address>BRUNNENSTRASSE 54</address>
+      <category>club</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2008-02-02T13:41:45Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>134270</id>
+      <link></link>
+      <name>wedding dress #2</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-02-02T13:41:45Z</updated_at>
+      <zip_code>13355</zip_code>
+      <latitude type="float">52.5388179122884</latitude>
+      <longitude type="float">13.3957043399193</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-01T17:00:55Z</created_at>
+    <device>web</device>
+    <id>6029763</id>
+    <plaze_id type="integer">29411</plaze_id>
+    <status>Me was here, long time ago</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2006-11-08T17:00:00-08:00</scheduled_at>
+    <plaze>
+      <address>363 Brannan Street</address>
+      <category>office</category>
+      <city>San Francisco</city>
+      <country_code>US</country_code>
+      <created_at type="datetime">2006-05-31T21:45:28Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>29411</id>
+      <link>http://www.adaptivepath.com/</link>
+      <name>Adaptive Path</name>
+      <state>CA</state>
+      <timezone>America/Los_Angeles</timezone>
+      <updated_at type="datetime">2006-09-07T19:36:32Z</updated_at>
+      <zip_code>94107</zip_code>
+      <latitude type="float">37.780729986362</latitude>
+      <longitude type="float">-122.39347249348</longitude>
+      <country>United States</country>
+      <picture_url>http://plazes.com/pictures/325a851e516c4610f5995f3ae1b9b2cb-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-01T14:17:23Z</created_at>
+    <device>web</device>
+    <id>6029471</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>I'm here actually</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-01T15:17:23+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-01T14:14:25Z</created_at>
+    <device>web</device>
+    <id>6029466</id>
+    <plaze_id type="integer">103177</plaze_id>
+    <status>Yippie, plazing myself with Konqueror 3.5.8!</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-01T15:14:25+01:00</scheduled_at>
+    <plaze>
+      <address>Monbijouplatz 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-29T16:22:13Z</created_at>
+      <has_free_wifi type="boolean">true</has_free_wifi>
+      <id>103177</id>
+      <link>http://www.plazes.com</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-04-09T09:53:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235848364431</latitude>
+      <longitude type="float">13.3986639976501</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/1183e78194b9048f238224b5e50ee3f3-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-02-01T08:19:28Z</created_at>
+    <device>web</device>
+    <id>6028714</id>
+    <plaze_id type="integer">103177</plaze_id>
+    <status>Who needs the BVG</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-02-01T09:19:00+01:00</scheduled_at>
+    <plaze>
+      <address>Monbijouplatz 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-29T16:22:13Z</created_at>
+      <has_free_wifi type="boolean">true</has_free_wifi>
+      <id>103177</id>
+      <link>http://www.plazes.com</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-04-09T09:53:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235848364431</latitude>
+      <longitude type="float">13.3986639976501</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/1183e78194b9048f238224b5e50ee3f3-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-31T08:02:36Z</created_at>
+    <device>web</device>
+    <id>6026096</id>
+    <plaze_id type="integer">103177</plaze_id>
+    <status>Zweita!</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-31T09:02:36+01:00</scheduled_at>
+    <plaze>
+      <address>Monbijouplatz 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-29T16:22:13Z</created_at>
+      <has_free_wifi type="boolean">true</has_free_wifi>
+      <id>103177</id>
+      <link>http://www.plazes.com</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-04-09T09:53:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235848364431</latitude>
+      <longitude type="float">13.3986639976501</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/1183e78194b9048f238224b5e50ee3f3-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-30T15:05:43Z</created_at>
+    <device>web</device>
+    <id>6024436</id>
+    <plaze_id type="integer">103177</plaze_id>
+    <status>Watching pgbench heating the server room</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-30T16:05:43+01:00</scheduled_at>
+    <plaze>
+      <address>Monbijouplatz 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-29T16:22:13Z</created_at>
+      <has_free_wifi type="boolean">true</has_free_wifi>
+      <id>103177</id>
+      <link>http://www.plazes.com</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-04-09T09:53:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235848364431</latitude>
+      <longitude type="float">13.3986639976501</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/1183e78194b9048f238224b5e50ee3f3-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-30T11:12:15Z</created_at>
+    <device>web</device>
+    <id>6023991</id>
+    <plaze_id type="integer">103177</plaze_id>
+    <status>Vergessen gesagt zu haben dagewesen zu sein</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-30T12:12:15+01:00</scheduled_at>
+    <plaze>
+      <address>Monbijouplatz 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-29T16:22:13Z</created_at>
+      <has_free_wifi type="boolean">true</has_free_wifi>
+      <id>103177</id>
+      <link>http://www.plazes.com</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-04-09T09:53:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235848364431</latitude>
+      <longitude type="float">13.3986639976501</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/1183e78194b9048f238224b5e50ee3f3-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-29T15:52:16Z</created_at>
+    <device>web</device>
+    <id>6022145</id>
+    <plaze_id type="integer">103177</plaze_id>
+    <status>Checking out pgbench</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-29T16:52:16+01:00</scheduled_at>
+    <plaze>
+      <address>Monbijouplatz 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-29T16:22:13Z</created_at>
+      <has_free_wifi type="boolean">true</has_free_wifi>
+      <id>103177</id>
+      <link>http://www.plazes.com</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-04-09T09:53:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235848364431</latitude>
+      <longitude type="float">13.3986639976501</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/1183e78194b9048f238224b5e50ee3f3-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-29T08:50:51Z</created_at>
+    <device>web</device>
+    <id>6021369</id>
+    <plaze_id type="integer">103177</plaze_id>
+    <status>Printer fun</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-29T09:50:51+01:00</scheduled_at>
+    <plaze>
+      <address>Monbijouplatz 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-29T16:22:13Z</created_at>
+      <has_free_wifi type="boolean">true</has_free_wifi>
+      <id>103177</id>
+      <link>http://www.plazes.com</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-04-09T09:53:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235848364431</latitude>
+      <longitude type="float">13.3986639976501</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/1183e78194b9048f238224b5e50ee3f3-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-28T16:12:48Z</created_at>
+    <device>web</device>
+    <id>6019918</id>
+    <plaze_id type="integer">114380</plaze_id>
+    <status>Cloudy plaze</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-29T14:00:00+01:00</scheduled_at>
+    <plaze>
+      <address>AUGUSTSTRASSE 8</address>
+      <category>restaurant</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-08-07T11:12:04Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>114380</id>
+      <link>http://www.chez-de-nhat.de</link>
+      <name>Chez De Nhat</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-05-06T14:02:11Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5258825609947</latitude>
+      <longitude type="float">13.391604423523</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/95cfa4a6abcf107e95ee66a9fa57fd03-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-28T11:31:10Z</created_at>
+    <device>web</device>
+    <id>6019401</id>
+    <plaze_id type="integer">108839</plaze_id>
+    <status>Food! Spicy!</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-28T13:00:00+01:00</scheduled_at>
+    <plaze>
+      <address>ORANIENBURGER STRASSE 26</address>
+      <category>restaurant</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-07-13T11:33:29Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>108839</id>
+      <link>http://www.aarti-restaurant.de</link>
+      <name>Aarti</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-12-11T11:00:41Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5244935464039</latitude>
+      <longitude type="float">13.3948950190441</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/e8360dc34175b66059a518ea8f04f556-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-28T08:13:24Z</created_at>
+    <device>web</device>
+    <id>6019013</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Admiring the S60 plazer success</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-28T09:13:24+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-26T17:59:12Z</created_at>
+    <device>web</device>
+    <id>6016940</id>
+    <plaze_id type="integer">127181</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-26T18:59:12+01:00</scheduled_at>
+    <plaze>
+      <address>ORANIENBURGER STRASSE 54</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-11-08T14:05:51Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>127181</id>
+      <link>http://bootlab.org</link>
+      <name>Bootlab 3.0</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-11-25T20:16:04Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5260377363206</latitude>
+      <longitude type="float">13.3886205810805</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/661f7607bc5b8b86aa15be2e69db9497-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-25T17:36:43Z</created_at>
+    <device>web</device>
+    <id>6015512</id>
+    <plaze_id type="integer">72089</plaze_id>
+    <status>vorschlafen</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-25T18:36:43+01:00</scheduled_at>
+    <plaze>
+      <address>WINSSTRASSE 15</address>
+      <category>other</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-03-11T15:21:16Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>72089</id>
+      <link></link>
+      <name>tilscave</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-11-04T20:57:30Z</updated_at>
+      <zip_code>10405</zip_code>
+      <latitude type="float">52.533439343127</latitude>
+      <longitude type="float">13.424901519793</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-25T08:04:18Z</created_at>
+    <device>web</device>
+    <id>6014633</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-25T09:04:18+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-24T09:26:41Z</created_at>
+    <device>web</device>
+    <id>6013004</id>
+    <plaze_id type="integer">127181</plaze_id>
+    <status>nerdprostitution - finding a way to zfs in the misterious OS freebsd </status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-24T19:00:00+01:00</scheduled_at>
+    <plaze>
+      <address>ORANIENBURGER STRASSE 54</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-11-08T14:05:51Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>127181</id>
+      <link>http://bootlab.org</link>
+      <name>Bootlab 3.0</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-11-25T20:16:04Z</updated_at>
+      <zip_code>10117</zip_code>
+      <latitude type="float">52.5260377363206</latitude>
+      <longitude type="float">13.3886205810805</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/661f7607bc5b8b86aa15be2e69db9497-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-24T09:26:22Z</created_at>
+    <device>web</device>
+    <id>6013003</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Contemplating on where to get coffee</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-24T10:26:22+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-23T15:26:27Z</created_at>
+    <device>web</device>
+    <id>6011656</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Support</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-23T16:26:27+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-23T15:06:25Z</created_at>
+    <device>web</device>
+    <id>6011627</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>ess oohh viieeeeeeeeeeeeeeeh! -ing</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-23T16:06:25+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-23T09:31:50Z</created_at>
+    <device>web</device>
+    <id>6011111</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Goodbye silly throttle!</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-23T10:31:50+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-23T08:51:22Z</created_at>
+    <device>web</device>
+    <id>6011045</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Can't wait to get rid of the mongrel throttle again</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-23T09:51:22+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-21T08:13:07Z</created_at>
+    <device>web</device>
+    <id>6007014</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-21T09:13:07+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-20T20:35:20Z</created_at>
+    <device>web</device>
+    <id>6006350</id>
+    <plaze_id type="integer">115154</plaze_id>
+    <status>Writing a mail reader in camping</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-20T21:35:20+01:00</scheduled_at>
+    <plaze>
+      <address>Prenzlauer Allee</address>
+      <category>coffee_shop</category>
+      <city>Berlin</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-08-11T15:47:29Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>115154</id>
+      <link></link>
+      <name>Caf&#233; Melis</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-12-11T10:14:38Z</updated_at>
+      <zip_code>10405</zip_code>
+      <latitude type="float">52.5389733511188</latitude>
+      <longitude type="float">13.4239836153614</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-20T11:54:21Z</created_at>
+    <device>web</device>
+    <id>6005508</id>
+    <plaze_id type="integer">103634</plaze_id>
+    <status>Espresso</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-20T12:54:21+01:00</scheduled_at>
+    <plaze>
+      <address>winsstrasse 56</address>
+      <category>coffee_shop</category>
+      <city>berlin</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-06-30T15:57:58Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>103634</id>
+      <link></link>
+      <name>enten und katzen</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-12-11T10:40:41Z</updated_at>
+      <zip_code></zip_code>
+      <latitude type="float">52.5339744555812</latitude>
+      <longitude type="float">13.4253963633493</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-19T11:11:47Z</created_at>
+    <device>web</device>
+    <id>6004068</id>
+    <plaze_id type="integer">72089</plaze_id>
+    <status></status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-19T12:11:47+01:00</scheduled_at>
+    <plaze>
+      <address>WINSSTRASSE 15</address>
+      <category>other</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-03-11T15:21:16Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>72089</id>
+      <link></link>
+      <name>tilscave</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-11-04T20:57:30Z</updated_at>
+      <zip_code>10405</zip_code>
+      <latitude type="float">52.533439343127</latitude>
+      <longitude type="float">13.424901519793</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-16T14:04:38Z</created_at>
+    <device>web</device>
+    <id>5998860</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Working on badges with Bob</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-16T15:04:00+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-01-15T09:28:50Z</created_at>
+    <device>web</device>
+    <id>5996092</id>
+    <plaze_id type="integer">87873</plaze_id>
+    <status>Extra so fr&#252;h gekommen und dann erst auf die Stechuhr vergessen</status>
+    <user_id type="integer">266</user_id>
+    <scheduled_at type="datetime">2008-01-15T09:00:00+01:00</scheduled_at>
+    <plaze>
+      <address>MONBIJOUPLATZ 5</address>
+      <category>office</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-18T17:08:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>87873</id>
+      <link>http://plazes.com/plazes/87873</link>
+      <name>Plazes Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-08-06T13:44:24Z</updated_at>
+      <zip_code>10178</zip_code>
+      <latitude type="float">52.5235174997307</latitude>
+      <longitude type="float">13.3985621476876</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/98aef2fe3598ac4737b20452b7753715-medium.jpg</picture_url>
+    </plaze>
+  </activity>
+</activities>

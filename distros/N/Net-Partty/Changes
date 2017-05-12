@@ -1,0 +1,11 @@
+Revision history for Perl extension Net::Partty
+
+0.03    2008-03-31T21:51:49+09:00
+        - add dependents
+        - fix pertty.pl command bug
+
+0.02    2008-03-27T20:06:13+09:00
+        - updated to example/pertty.pl script
+
+0.01    2008-03-27T17:24:43+09:00
+        - original version

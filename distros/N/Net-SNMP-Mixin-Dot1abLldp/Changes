@@ -1,0 +1,51 @@
+Revision history for Net-SNMP-Mixin-Dot1abLldp
+
+0.13	Mon, 20 Jun 2016 18:02:09 +0200
+	new method init_ok(), check for partial initialization
+	support no longer a workaround for buggy SNMP agents in get_table, use maxrepetitions > 0
+
+0.12	Mon, 10 Dec 2012 15:34:26 +0100
+	add support for lldpLocPortTable
+
+0.11	Sat Jul 12 17:06:20 MEST 2008
+	changed interface of get_lldp_rem_table in order to support
+	multiple neighbors on one local port
+
+0.10	Sun Jun 22 16:47:12 MEST 2008
+	changed get_request to get_entries for better dealing
+        with noSuchObject
+
+	used new util method push_error()
+
+0.09	Mo 16. Jun 14:53:31 CEST 2008
+	normalize lldpLocChassisId if lldpLocChassisIdSubtype is macAddress
+
+0.08	Fr 25. Apr 19:32:37 CEST 2008
+	no interface change
+	internal optimization for return value handling
+
+0.07	Mi 23. Apr 09:20:30 CEST 2008
+	grml, again Build.PL tweaks
+
+0.06	Mi 23. Apr 00:45:23 CEST 2008
+	Stop CPANTesters sending wrong FAIL reports
+	minor change in example script
+
+0.05	Mo 21. Apr 17:45:38 CEST 2008
+	tests with 127.0.0.1 instead of 0.0.0.0
+
+0.04_01	Di 15. Apr 11:08:01 CEST 2008
+	sorry, renamed from ...LLDP to ...Lldp
+
+0.03	Mon Apr 14 10:51:07 CEST 2008
+	fixed typo in ABSTRACT
+	Test::More in build_require
+
+0.02	Mon Apr 14 00:05:47 CEST 2008
+	more pod
+	fixed test plan
+	kwalitee and LICENSE
+
+0.01_01 Sat Apr 12 23:27:54 CEST 2008
+        First developer release.
+

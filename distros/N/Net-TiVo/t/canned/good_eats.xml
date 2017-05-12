@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TiVoContainer xmlns="http://www.tivo.com/developer/calypso-protocol-1.5/">
+  <Details>
+    <ContentType>x-tivo-container/folder</ContentType>
+    <SourceFormat>x-tivo-container/tivo-dvr</SourceFormat>
+    <Title>Good Eats</Title>
+    <LastChangeDate>0x44C9689C</LastChangeDate>
+    <TotalItems>5</TotalItems>
+  </Details>
+  <SortOrder>CaptureDate</SortOrder>
+  <GlobalSort>Yes</GlobalSort>
+  <ItemStart>0</ItemStart>
+  <ItemCount>5</ItemCount>
+  <Item>
+    <Details>
+      <ContentType>video/x-tivo-mpeg</ContentType>
+      <SourceFormat>video/x-tivo-mpeg</SourceFormat>
+      <Title>Good Eats</Title>
+      <SourceSize>649068544</SourceSize>
+      <Duration>1800000</Duration>
+      <CaptureDate>0x403D7646</CaptureDate>
+      <EpisodeTitle>The Dough Also Rises</EpisodeTitle>
+      <Description>Biscuits. Copyright Tribune Media Services, Inc.</Description>
+      <SourceChannel>54-0</SourceChannel>
+      <SourceStation>FOOD</SourceStation>
+      <ProgramId>EP2739280018</ProgramId>
+      <SeriesId>SH273928</SeriesId>
+      <EpisodeNumber>0</EpisodeNumber>
+    </Details>
+    <Links>
+      <Content>
+        <Url>http://tivo:80/download/Good%20Eats.TiVo?Container=%2FNowPlaying&amp;id=672351</Url>
+        <ContentType>video/x-tivo-mpeg</ContentType>
+        <AcceptsParams>No</AcceptsParams>
+      </Content>
+      <CustomIcon>
+        <Url>urn:tivo:image:save-until-i-delete-recording</Url>
+        <ContentType>image/*</ContentType>
+        <AcceptsParams>No</AcceptsParams>
+      </CustomIcon>
+      <TiVoVideoDetails>
+        <Url>https://tivo:443/TiVoVideoDetails?id=672351</Url>
+        <ContentType>text/xml</ContentType>
+        <AcceptsParams>No</AcceptsParams>
+      </TiVoVideoDetails>
+    </Links>
+  </Item>
+  <Item>
+    <Details>
+      <ContentType>video/x-tivo-mpeg</ContentType>
+      <SourceFormat>video/x-tivo-mpeg</SourceFormat>
+      <Title>Good Eats</Title>
+      <SourceSize>648019968</SourceSize>
+      <Duration>1800000</Duration>
+      <CaptureDate>0x403AD346</CaptureDate>
+      <EpisodeTitle>A Bird in the Pan</EpisodeTitle>
+      <Description>Broiled chicken. Copyright Tribune Media Services, Inc.</Description>
+      <SourceChannel>54-0</SourceChannel>
+      <SourceStation>FOOD</SourceStation>
+      <ProgramId>EP2739280016</ProgramId>
+      <SeriesId>SH273928</SeriesId>
+      <EpisodeNumber>0</EpisodeNumber>
+    </Details>
+    <Links>
+      <Content>
+        <Url>http://tivo:80/download/Good%20Eats.TiVo?Container=%2FNowPlaying&amp;id=669458</Url>
+        <ContentType>video/x-tivo-mpeg</ContentType>
+        <AcceptsParams>No</AcceptsParams>
+      </Content>
+      <CustomIcon>
+        <Url>urn:tivo:image:save-until-i-delete-recording</Url>
+        <ContentType>image/*</ContentType>
+        <AcceptsParams>No</AcceptsParams>
+      </CustomIcon>
+      <TiVoVideoDetails>
+        <Url>https://tivo:443/TiVoVideoDetails?id=669458</Url>
+        <ContentType>text/xml</ContentType>
+        <AcceptsParams>No</AcceptsParams>
+      </TiVoVideoDetails>
+    </Links>
+  </Item>
+  <Item>
+    <Details>
+      <ContentType>video/x-tivo-mpeg</ContentType>
+      <SourceFormat>video/x-tivo-mpeg</SourceFormat>
+      <Title>Good Eats</Title>
+      <SourceSize>648019968</SourceSize>
+      <Duration>1800000</Duration>
+      <CaptureDate>0x40358D46</CaptureDate>
+      <EpisodeTitle>Family Roast</EpisodeTitle>
+      <Description>Meats; flower pots, Copyright Tribune Media Services, Inc.</Description>
+      <SourceChannel>54-0</SourceChannel>
+      <SourceStation>FOOD</SourceStation>
+      <ProgramId>EP2739280066</ProgramId>
+      <SeriesId>SH273928</SeriesId>
+      <EpisodeNumber>0</EpisodeNumber>
+    </Details>
+    <Links>
+      <Content>
+        <Url>http://tivo:80/download/Good%20Eats.TiVo?Container=%2FNowPlaying&amp;id=663877</Url>
+        <ContentType>video/x-tivo-mpeg</ContentType>
+        <AcceptsParams>No</AcceptsParams>
+      </Content>
+      <CustomIcon>
+        <Url>urn:tivo:image:save-until-i-delete-recording</Url>
+        <ContentType>image/*</ContentType>
+        <AcceptsParams>No</AcceptsParams>
+      </CustomIcon>
+      <TiVoVideoDetails>
+        <Url>https://tivo:443/TiVoVideoDetails?id=663877</Url>
+        <ContentType>text/xml</ContentType>
+        <AcceptsParams>No</AcceptsParams>
+      </TiVoVideoDetails>
+    </Links>
+  </Item>
+  <Item>
+    <Details>
+      <ContentType>video/x-tivo-mpeg</ContentType>
+      <SourceFormat>video/x-tivo-mpeg</SourceFormat>
+      <Title>Good Eats</Title>
+      <SourceSize>649068544</SourceSize>
+      <Duration>1801000</Duration>
+      <CaptureDate>0x4034189E</CaptureDate>
+      <EpisodeTitle>Cheesecake</EpisodeTitle>
+      <Description>Cheesecake. Copyright Tribune Media Services, Inc.</Description>
+      <SourceChannel>54-0</SourceChannel>
+      <SourceStation>FOOD</SourceStation>
+      <ProgramId>EP2739280069</ProgramId>
+      <SeriesId>SH273928</SeriesId>
+      <EpisodeNumber>0</EpisodeNumber>
+    </Details>
+    <Links>
+      <Content>
+        <Url>http://tivo:80/download/Good%20Eats.TiVo?Container=%2FNowPlaying&amp;id=662317</Url>
+        <ContentType>video/x-tivo-mpeg</ContentType>
+        <AcceptsParams>No</AcceptsParams>
+      </Content>
+      <CustomIcon>
+        <Url>urn:tivo:image:save-until-i-delete-recording</Url>
+        <ContentType>image/*</ContentType>
+        <AcceptsParams>No</AcceptsParams>
+      </CustomIcon>
+      <TiVoVideoDetails>
+        <Url>https://tivo:443/TiVoVideoDetails?id=662317</Url>
+        <ContentType>text/xml</ContentType>
+        <AcceptsParams>No</AcceptsParams>
+      </TiVoVideoDetails>
+    </Links>
+  </Item>
+  <Item>
+    <Details>
+      <ContentType>video/x-tivo-mpeg</ContentType>
+      <SourceFormat>video/x-tivo-mpeg</SourceFormat>
+      <Title>Good Eats</Title>
+      <SourceSize>648019968</SourceSize>
+      <Duration>1800000</Duration>
+      <CaptureDate>0x4032EA46</CaptureDate>
+      <EpisodeTitle>Steak Your Claim</EpisodeTitle>
+      <Description>Steak; cow; iron skillet. Copyright Tribune Media Services, Inc.</Description>
+      <SourceChannel>54-0</SourceChannel>
+      <SourceStation>FOOD</SourceStation>
+      <ProgramId>EP2739280001</ProgramId>
+      <SeriesId>SH273928</SeriesId>
+      <EpisodeNumber>0</EpisodeNumber>
+    </Details>
+    <Links>
+      <Content>
+        <Url>http://tivo:80/download/Good%20Eats.TiVo?Container=%2FNowPlaying&amp;id=660710</Url>
+        <ContentType>video/x-tivo-mpeg</ContentType>
+        <AcceptsParams>No</AcceptsParams>
+      </Content>
+      <CustomIcon>
+        <Url>urn:tivo:image:save-until-i-delete-recording</Url>
+        <ContentType>image/*</ContentType>
+        <AcceptsParams>No</AcceptsParams>
+      </CustomIcon>
+      <TiVoVideoDetails>
+        <Url>https://tivo:443/TiVoVideoDetails?id=660710</Url>
+        <ContentType>text/xml</ContentType>
+        <AcceptsParams>No</AcceptsParams>
+      </TiVoVideoDetails>
+    </Links>
+  </Item>
+</TiVoContainer>

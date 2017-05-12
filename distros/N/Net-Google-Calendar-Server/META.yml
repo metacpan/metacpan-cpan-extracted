@@ -1,0 +1,36 @@
+---
+name: Net-Google-Calendar-Server
+version: 0.1
+author:
+  - 'Simon Wistow <simon@thegestalt.org>'
+abstract: pretend to be like Google's Calendar
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Data::ICal::DateTime: 0
+  DateTime: 0
+  LWP::UserAgent: 0
+  Test::More: 0
+  URI: 0
+  XML::Atom: 0
+provides:
+  Net::Google::Calendar::Backend:
+    file: lib/Net/Google/Calendar/Server/Backend.pm
+  Net::Google::Calendar::Server:
+    file: lib/Net/Google/Calendar/Server.pm
+    version: 0.1
+  Net::Google::Calendar::Server::Auth:
+    file: lib/Net/Google/Calendar/Server/Auth.pm
+  Net::Google::Calendar::Server::Auth::Dummy:
+    file: lib/Net/Google/Calendar/Server/Auth/Dummy.pm
+  Net::Google::Calendar::Server::Backend::ICalendar:
+    file: lib/Net/Google/Calendar/Server/Backend/ICalendar.pm
+  Net::Google::Calendar::Server::Handler::Apache:
+    file: lib/Net/Google/Calendar/Server/Handler/Apache.pm
+  Net::Google::Calendar::Server::Handler::Apache2:
+    file: lib/Net/Google/Calendar/Server/Handler/Apache2.pm
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

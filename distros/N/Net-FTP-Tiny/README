@@ -1,0 +1,30 @@
+NAME
+
+Net::FTP::Tiny - minimal FTP client
+
+DESCRIPTION
+
+This module provides an easy interface to retrieve files using the FTP
+protocol.  The location of a file to retrieve is specified using a URL.
+IPv6 is supported, if the optional module IO::Socket::IP is installed.
+Only retrieval is supported, not storing or anything more exotic.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2012 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

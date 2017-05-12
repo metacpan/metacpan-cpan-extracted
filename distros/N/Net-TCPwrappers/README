@@ -1,0 +1,297 @@
+NAME
+    Net::TCPwrappers - Perl interface to tcp_wrappers.
+
+SYNOPSIS
+      use Net::TCPwrappers qw(RQ_DAEMON RQ_FILE request_init fromhost hosts_access);
+      ...
+      my $progname = 'yadd';
+      while (accept(CLIENT, SERVER)) {
+        my $req = request_init(RQ_DAEMON, $progname, RQ_FILE, fileno(CLIENT));
+        fromhost($req);
+        if (!hosts_access($req)) {
+          # unauthorized access.
+          ...
+        }
+        else {
+          # service connecting client.
+          ...
+        }
+      }
+
+ABSTRACT
+    Net::TCPwrappers offers perl programmers a convenient interface to the
+    libwrap.a library from tcp_wrappers, Wietse Venema's popular TCP/IP
+    daemon wrapper package. Use it in your perl code to monitor and filter
+    access to TCP-based network services on unix hosts.
+
+DESCRIPTION
+    Net::TCPwrappers mimics the libwrap.a library fairly closely - the names
+    of the functions and constants are identical, and calling arguments have
+    been altered only slightly to be more perl-like.
+
+  FUNCTIONS
+    This module defines all the public functions available in the libwrap.a
+    library: "request_init", "request_set", "hosts_access", and "hosts_ctl".
+    None are exported by default; you must either add the package name when
+    calling them (eg, "Net::TCPwrappers::request_init(...)") or import them
+    explicitly (eg, "use Net::TCPwrappers qw(request_init ...);").
+
+    request_init($key1, $value1, $key2, $value2, ...)
+        Creates a new request structure and initializes it using the
+        supplied key / value pairs. The keys are used to specify the
+        interpretation of the value argument (eg, daemon name, file
+        descriptor, host name, etc) and should be one of the constants
+        described below. As many key / value pairs (for the same request, of
+        course) can be specified as desired.
+
+        Returns an integer representing a pointer to the newly created
+        request structure. In the unlikely event of failure, the function
+        returns undef. This may arise because memory can not be allocated
+        for the request structure or because the key / value pairs are not
+        of the correct types. [If the later, make sure you're using the
+        proper constants as described below.]
+
+        Note: the pointer to the request structure is blessed into the class
+        Request_infoPtr and will be automatically destroyed when the program
+        exits.
+
+    request_set($request, $key1, $value1, $key2, $value2, ...)
+        Copies an existing request structure (represented by the pointer
+        $request) into a new one and updates it using the supplied key /
+        value pairs, which are described above.
+
+        Returns an integer representing a pointer to the updated request
+        structure. In the unlikely event of failure, the function returns
+        undef. This may arise because memory can not be allocated for the
+        request structure or because the key / value pairs are not of the
+        correct types. [If the later, make sure you're using the proper
+        constants as described below.]
+
+        Note: the pointer to the request structure is blessed into the class
+        Request_infoPtr and will be automatically destroyed when the program
+        exits.
+
+    fromhost($request))
+        Updates an existing request structure (pointed to by $request) with
+        the port and address information obtained from the client and server
+        endpoints.
+
+        Note: this should be used after "request_init" or "request_set" if
+        either is called with "RQ_FILE".
+
+    hosts_access($request)
+        Determines whether to allow access based on information in the
+        request structure pointed to by $request along with the host access
+        tables (see hosts_access).
+
+        Returns 0 if access should be denied.
+
+    hosts_ctl($daemon, $client_name, $client_addr [, $client_user])
+        Determines whether to allow access based on the supplied daemon
+        name, host name, host IP address, and optionally username of the
+        client host making the request.
+
+        Returns 0 if access should be denied.
+
+        Note: this is implemented in libwrap.a as a wrapper around the
+        "request_init" and "hosts_access" functions.
+
+  CONSTANTS
+    The keys used in the functions "request_init" and "request_set" and
+    their meanings are:
+
+    RQ_CLIENT_ADDR
+        A string representing the client's IP address.
+
+    RQ_CLIENT_NAME
+        A string representing the client's hostname.
+
+    RQ_CLIENT_SIN
+        A pointer to the client's "sockaddr_in" structure, representing its
+        host address and port.
+
+    RQ_DAEMON
+        A string representing the daemon's name as it appears in the access
+        control tables.
+
+        Note: a key / value pair with "RQ_DAEMON" must be supplied via
+        either "request_init" or "request_set" if calling "hosts_access".
+
+    RQ_FILE
+        An integer representing the file descriptor associated with the
+        request.
+
+        Note: "fromhost" should be called after "request_init" or
+        "request_set" if using this key.
+
+    RQ_SERVER_ADDR
+        A string representing the server's IP address.
+
+    RQ_SERVER_NAME
+        A string representing the server's hostname.
+
+    RQ_SERVER_SIN
+        A pointer to the server's "sockaddr_in" structure, representing its
+        host address and port.
+
+    RQ_USER
+        A string representing the name of the user making the request from
+        the client host.
+
+    None of these are exported by default.
+
+RATIONALE
+    At first blush, this module might seem like overkill. "Why not just
+    write the necessary code myself and include that in my programs?" you're
+    probably thinking. Sure, any competent programmer can easily do that.
+    Moreover, perl, with its regular expressions, affords extremely flexible
+    matching of host names / addresses.
+
+    Yet by rolling your own you would likely miss out on the following:
+
+    *   A common facility for controlling host access. As distributed,
+        tcp_wrappers works not only with daemons started via inetd but also
+        with a wide variety of C programs that support it (eg, sendmail,
+        OpenSSH, Nessus, etc). With Net::TCPwrappers, this support is now
+        available to perl programs.
+
+    *   Access controls are stored apart from programs and are re-read each
+        time a check is done. This makes it trivial to adjust access
+        controls, whether by hand as your needs evolve or automatically, as
+        in the case of an intrusion detection system.
+
+INSTALLATION
+    Installation of Net::TCPWrappers requires a working installation of
+    Wietse Venema's TCP/IP daemon wrapper package, tcp_wrappers, including
+    the libwrap.a library. The latest version currently is 7.6, released in
+    March 1997; earlier versions may also work as it appears the library
+    interface has been rather stable.
+
+    If you need a copy, visit <ftp://ftp.porcupine.org/pub/security/> for
+    the source code or check with your favourite software respository for
+    pre-compiled binaries (eg, RPMs for Linux, Packages for Sun, etc).
+
+  BUILDING
+    To build and test the module, type the following:
+
+      perl Build.PL
+      ./Build
+      ./Build test
+
+    Check the troubleshooting section if you encounter any problems or any
+    of the tests fail.
+
+    To install it, type:
+
+      ./Build install
+
+    Note: you probably need to do this as root to have it installed
+    system-wide.
+
+    At this point, you may wish to look at the sample programs in the
+    examples directory to give you some ideas about how to use this module.
+
+  TROUBLESHOOTING
+    Build.PL will look for libwrap.{so,a} and tcpd.h in the following
+    prefixes:
+
+      /usr
+      /usr/local
+      /opt
+      /opt/local
+      /opt/libwrap
+      /opt/tcpwrappers
+
+    If your copy of TCP wrappers is not in one of these directories, pass
+    the prefix (not including the 'include' and 'lib' directories) to
+    Build.PL:
+
+      perl Build.PL /opt/tcpd-7.6
+
+    Build.PL normally prompts for confirmation when it has found a suitable
+    library and include file. To suppress this behaviour and use the first
+    match found, pass "--noprompt" to Build.PL on the command line:
+
+      perl Build.PL --noprompt
+
+    If one or more of the tests fail, run them in verbose mode (eg, "./Build
+    test verbose=1"). This may give you an idea of which specific tests fail
+    and why.
+
+    Another option involves modifying the file TCPwrappers.xs. Edit the file
+    and change the line near the top that reads:
+
+      #if 0
+
+    to:
+
+      #if 1
+
+    and recompile. This will turn on tracing of the XSUBs, which provide the
+    glue between libwrap.a and Perl. Because this is a compiled-in change,
+    it should be used only in extreme situations to send debug information
+    to the author. To disable tracing, re-edit the file and recompile /
+    reinstall.
+
+TODO
+    The current maintainer of this module wrote another Perl wrapper for
+    libwrap called Authen::Libwrap. It didn't cover the API as
+    comprehensively, and very little feedback was ever received on it. The
+    original author of Net::TCPWrappers offered his source code for possible
+    integration, but it turned out to be easier to integrate what little
+    unique functional was in Authen::Libwrap into Net::TCPWrappers.
+
+    The tests for Authen::Libwrap are part of the test suite for
+    Net::TCPWrappers, but many of them are expected to fail at present. The
+    goal is to get those tests to pass, at which point Authen::Libwrap can
+    be deprecated in favour of this module.
+
+    Other specific tasks:
+
+    * develop an OO interface
+
+BUGS
+    None currently reported. If you find one, first read the troubleshooting
+    section and then check for a newer version of Net::TCPwrappers on CPAN.
+    If problems still persist, submit a bug report via the bug tracker at
+    http://rt.cpan.org/.
+
+    If you like this module, please rate it on it's CPAN page:
+
+    http://cpanratings.perl.org/rate/?distribution=Net-TCPwrappers
+
+    In your bug report, please include as much information as possible,
+    including:
+
+    *   Your platform and OS version (eg, "uname -a"). If using Linux, also
+        include your glibc version (eg, "ls -al /lib/libc*").
+
+    *   The ANSI C/C++ compiler name and version (eg, "gcc -v").
+
+    *   Perl's configuration, obtained by running "perl -V".
+
+    *   The version of tcp_wrappers installed on your system and how it got
+        there (ie, from an RPM, compiled yourself, etc).
+
+    *   Results from running "./Build test verbose=1" after building this
+        module.
+
+DIAGNOSTICS
+    The routines in libwrap.a report problems via the syslog daemon.
+
+SEE ALSO
+    hosts_access, libwrap.a documentation.
+
+AUTHOR
+    George A. Theall, <theall@tifaware.com>
+
+    Currently maintained by James FitzGibbon, <jfitz@CPAN.org>.
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2002, George A. Theall. All Rights Reserved.
+
+    Copyright (c) 2004, James FitzGibbon. All Rights Reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

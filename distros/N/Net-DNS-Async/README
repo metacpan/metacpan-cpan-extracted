@@ -1,0 +1,78 @@
+NAME
+    Net::DNS::Async - Asynchronous DNS helper for high volume applications
+
+SYNOPSIS
+            use Net::DNS::Async;
+
+            my $c = new Net::DNS::Async(QueueSize => 20, Retries => 3);
+
+            for (...) {
+                    $c->add(\&callback, @query);
+            }
+            $c->await();
+
+            sub callback {
+                    my $response = shift;
+                    ...
+            }
+
+DESCRIPTION
+    Net::DNS::Async is a fire-and-forget asynchronous DNS helper. That is,
+    the user application adds DNS questions to the helper, and the callback
+    will be called at some point in the future without further intervention
+    from the user application. The application need not handle selects,
+    timeouts, waiting for a response or any other such issues.
+
+    If the same query is added to the queue more than once, the module may
+    combine the queries; that is, it will perform the query only once, and
+    will call each callback registered for that query in turn, passing the
+    same Net::DNS::Response object to each query. For this reason, you
+    should not modify the Net::DNS::Response object in any way lest you
+    break things horribly for a subsequent callback.
+
+    This module is similar in principle to POE::Component::Client::DNS, but
+    does not require POE.
+
+CONSTRUCTOR
+    The class method new(...) constructs a new helper object. All arguments
+    are optional. The following parameters are recognised as arguments to
+    new():
+
+    QueueSize
+        The size of the query queue. If this is exceeded, further calls to
+        add() will block until some responses are received or time out.
+
+    Retries
+        The number of times to retry a query before giving up.
+
+    Timeout
+        The timeout for an individual query.
+
+METHODS
+    $c->add($callback, @query)
+        Adds a new query for asynchronous handling. The @query arguments are
+        those to Net::DNS::Resolver->bgsend(), q.v. This call will block if
+        the queue is full. When some pending responses are received or
+        timeout events occur, the call will unblock.
+
+        The user callback will be called at some point in the future, with a
+        Net::DNS::Packet object representing the response. If the query
+        timed out after the specified number of retries, the callback will
+        be called with undef.
+
+    $c->await()
+        Flushes the queue, that is, waits for and handles all remaining
+        responses.
+
+BUGS
+    The test suite does not test query timeouts.
+
+SEE ALSO
+    Net::DNS, POE::Component::Client::DNS
+
+COPYRIGHT
+    Copyright (c) 2005-2006 Shevek. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

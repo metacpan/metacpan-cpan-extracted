@@ -1,0 +1,16 @@
+MANIFEST
+Makefile.PL
+lib/NcFTPd/Log/Parse.pm
+lib/NcFTPd/Log/Parse/Base.pm
+lib/NcFTPd/Log/Parse/Misc.pm
+lib/NcFTPd/Log/Parse/Session.pm
+lib/NcFTPd/Log/Parse/Xfer.pm
+TODO
+t/00_xfer.t
+t/01_misc.t
+t/02_sess.t
+t/03_parse.t
+t/lib/TestHelper.pm
+t/logs/misc.log
+t/logs/sess.log
+t/logs/xfer.log

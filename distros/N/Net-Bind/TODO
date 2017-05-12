@@ -1,0 +1,25 @@
+###############################################################################
+
++ Utilize DNS::ZoneFile and DNS::ZoneParse where appropriate.
+
+###############################################################################
+Net::Bind::Resolv
+
++ have ndots check be more rigorous
+
++ Maybe have policy methods set a {Checked} flag in the object.
+  The print object would fail if the flag wasn't checked.
+  Have an option to disable this behavior
+###############################################################################
+Net::Bind::Boot
+
+###############################################################################
+Net::Bind::Zone
+
+###############################################################################
+Net::Bind::Dump
+
+###############################################################################
+Net::Bind::Conf (newer named.conf syntax in bind-8.X)
+
+###############################################################################

@@ -1,0 +1,9 @@
+*.ERR
+META.yml
+Makefile
+inc/
+*.bak
+*.org
+Makefile.old
+blib/
+pm_to_blib

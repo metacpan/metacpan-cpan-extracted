@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:         Net-DBus-GLib
+abstract:     Extension for the DBus GLib bindings
+version:      0.33.0
+author:
+  - Daniel P. Berrange <dan@berrange.com>
+license: gpl
+generated_by: ExtUtils::MakeMaker version 6.30
+requires:
+   GLib:                          0
+   Net::DBus:                     0.33.0
+build_requires:
+   Test::More:                    0
+   Test::Pod:                     0
+   Test::Pod::Coverage:           0
+
+resources:
+  license: http://www.gnu.org/licenses/gpl.html
+  homepage: http://www.freedesktop.org/wiki/Software/dbus
+  repository: http://hg.berrange.com/libraries/net-dbus-glib--devel
+  MailingList: http://lists.freedesktop.org/mailman/listinfo/dbus/
+
+distribution_type: module
+
+meta-spec:
+   version: 1.3
+   url: http://module-build.sourceforge.net/META-spec-v1.3.html

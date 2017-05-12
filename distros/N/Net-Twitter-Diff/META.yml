@@ -1,0 +1,27 @@
+---
+abstract: 'Twitter Diff'
+author:
+  - 'Tomohiro Teranishi <tomohiro.terranishi@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.92'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Twitter-Diff
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Array::Diff: 0
+  Net::Twitter: 3.03000
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.coderepos.org/share/lang/perl/Net-Twitter-Diff/trunk
+version: 0.12

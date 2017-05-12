@@ -1,0 +1,49 @@
+severity = 1
+color    = 1
+verbose  = 9
+
+theme = (bangs || bugs || complexity || core || cosmetic || danger || lax || maintenance || moose || pbp || performance || portability || pulp || readability || security || strictersubs || swift || tests || unicode) && (! (compatibility || deprecated || editor || more || nits || tics))
+
+
+[Bangs::ProhibitVagueNames]
+    names = bar bat data foo info item obj object temp tmp val var
+
+[BuiltinFunctions::ProhibitStringyEval]
+allow_includes = 1
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+[Compatibility::PerlMinimumVersionAndWhy]
+    above_version = 5.008
+
+[Compatibility::PodMinimumVersion]
+    above_version = 5.008
+
+[Lax::RequireExplicitPackage::ExceptForPragmata]
+allowed_pragmata = diagnostics feature perlversion strict warnings utf8
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 10
+
+[Subroutines::RequireArgUnpacking]
+short_subroutine_statements = 1
+
+[InputOutput::RequireCheckedSyscalls]
+    functions = :builtins
+    exclude_functions = print printf
+
+
+[-Bangs::ProhibitCommentedOutCode]
+[-CodeLayout::RequireTidyCode]
+[-ControlStructures::ProhibitPostfixControls]
+[-ControlStructures::ProhibitUnlessBlocks]
+[-ControlStructures::ProhibitUntilBlocks]
+[-Documentation::PodSpelling]
+[-Documentation::RequirePodSections]
+[-ErrorHandling::RequireCarping]
+[-Modules::RequireExplicitInclusion]
+[-Modules::RequireExplicitPackage]
+[-References::ProhibitDoubleSigils]
+[-Subroutines::ProhibitCallsToUndeclaredSubs]
+[-Miscellanea::RequireRcsKeywords]

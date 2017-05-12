@@ -1,0 +1,40 @@
+---
+abstract: 'manage route entries on Operating Systems'
+author:
+  - 'GomoR <gomor_at_cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Routing
+provides:
+  Net::Routing:
+    file: lib/Net/Routing.pm
+    version: '0.44'
+  Net::Routing::Darwin:
+    file: lib/Net/Routing/Darwin.pm
+    version: '0.44'
+  Net::Routing::FreeBSD:
+    file: lib/Net/Routing/FreeBSD.pm
+    version: '0.44'
+  Net::Routing::Linux:
+    file: lib/Net/Routing/Linux.pm
+    version: '0.44'
+  Net::Routing::NetBSD:
+    file: lib/Net/Routing/NetBSD.pm
+    version: '0.44'
+requires:
+  Class::Gomor: '1.00'
+  IPC::Run3: '0'
+  Net::CIDR: '0'
+  Net::IPv4Addr: '0'
+  Net::IPv6Addr: '0'
+  perl: v5.6.1
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: '0.44'

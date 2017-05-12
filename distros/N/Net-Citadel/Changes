@@ -1,0 +1,110 @@
+Revision history for Perl extension Net::Citadel.
+
+0.23    13:55 25 August 2016
+  - Change the default IP in t/test.yaml to be '127.0.0.1'.
+  - Add "lib/Net/Citadel/ToDo.pod" to the PODs being checked in t/00pods.t.
+
+0.22    18:46 22 August 2016
+  - Add line missing from the 0.21 Changes regarding the MANIFEST file.
+  - Correct spelling of 'formated' to 'formatted' in lib/Net/Citadel.pm.
+  - Add a "dist" line including a 'ZIPFLAGS' option to the Makefile.PL file.
+
+0.21    14:44 16 August 2016
+  - Add 'META.json' to the MANIFEST file.
+  - Set MIN_PERL_VERSION in Makefile.PL to '5.6.0'.
+
+0.20    10:55  5 June 2013
+  - Correct number of info lines tested for in t/01citadel.t to '24'.
+  - Add a META_MERGE repository resources item to WriteMakefile in Makefile.PL.
+
+0.19    09:17 13 February 2013
+  - Correct mis-spelled words in the Changes file.
+  - Change the name of the testing user from RobertBarta to TestUser in the
+    t/01citadel.t and lib/Net/Citadel.pm files.
+
+0.18    22:23 21 October 2012
+  - Add capability for the MRTG command as the function citadel_mrtg.
+  - Add testing for the citadel_mrtg function to the t/01citadel.t script.
+  - Remove unneeded variable assignment from the citadel_info function.
+
+0.17    18:12 21 October 2012
+  - Add capability for the INFO command as the function citadel_info.
+  - Add testing for the citadel_info function to the t/01citadel.t script.
+
+0.16    15:31 16 October 2012
+  - Correct the mcpani authorid used in Makefile.PL from DRRHO to JAME.
+  - Tab/whitespace cleanup and update the documentation for the 'new' function.
+
+0.15    08:05  6 October 2012
+  - Correct the definition of the constant BINARY_FOLLOWS.
+  - Add a LICENSE line to the WriteMakefile configuration in Makefile.PL
+  - Correct usage of the DELETE_USER constant in the remove_user function.
+
+0.14    06:47  6 October 2012
+  - Have the following functions explicitly return true to indicate success:
+    login, logout, assert_floor, retract_floor, assert_room, retract_room,
+    create_user, change_user, and remove_user.
+
+0.13    15:59  5 October 2012
+  - Change to use the Readonly module for the User related constants: NEW_USER,
+    DELETED_USER, PROBLEM_USER, LOCAL_USER, NETWORK_USER, PREFERRED_USER, AIDE.
+
+0.12    14:44  5 October 2012
+  - Change to use the Readonly module for the Room Access constants: PUBLIC,
+    PRIVATE, PRIVATE_PASSWORD, PRIVATE_INVITATION, and PERSONAL.
+
+0.11    12:53  5 October 2012
+  - Add a ReadOnly constant for the ASYNC_MSG result code.
+  - Change to use the Readonly module for the Result Codes constants: CIT_OK,
+    LISTING_FOLLOWS, MORE_DATA, SEND_LISTING, BINARY_FOLLOWS, SEND_BINARY,
+    ERROR, and START_CHAT_MODE.
+
+0.10    17:54 23 September 2012
+  - Rename 'echo' function in Citadel.pm to 'citadel_echo'.
+  - Add an explicit 'return' line to the citadel_echo function.
+  - Rename 'echo' function call in t/01citadel.t to 'citadel_echo'.
+  - Rewrite the citadel_echo function POD documentation. RT#71743
+
+0.09    14:46 23 September 2012
+  - Change AUTHOR parameter in Makefile.PL to be a string.
+  - Fix a tabs issue in the 'package MY' section of the Makefile.PL file.
+  - Update the README file and add current version of lib/Net/Citadel/ToDo.pod
+    documentation file.
+
+0.08    17:51 17 September 2012
+  Changes to Makefile.PL:
+  - Clean up of whitespace and tabs.
+  - Add the Readonly module to the PREREQ_PM section.
+  - Add a 'clean' configuration item to the Makefile.PL file.
+  - Move AUTHOR and ABSTRACT_FROM to earlier in the Makefile.PL file.
+  - Move Config::YAML plus add TEST::MORE and TEST::Pod to BUILD_REQUIRES.
+
+0.07    16:13 17 September 2012
+  - Correct URLs for the Citadel Application API information in the JAM.pm file.
+  - Move the VERSION code line in and add a VERSION POD documentation section
+    to the JAM.pm file.
+
+0.06    13:34 17 September 2012
+  - Change to using Readonly for the constant CITADEL_PORT.
+  - Update usage of the constant CITADEL_PORT to '$CITADEL_PORT'.
+  - Add POD documentation for the constant $CITADEL_PORT.
+
+0.05    08:53 14 September 2012
+  - Rename the 'time' function in Citadel.pm to 'citadel_time'.
+  - Rename the 'time' function call in t/01citadel.t to 'citadel_time'.
+  - Rewrite the POD documentation for the citadel_time function.
+
+0.04    13:36 12 September 2012
+  - Use the Carp module in the lib/Net/Citadel.pm file.
+  - Use 'croak' instead of 'die' in the lib/Net/Citadel.pm file.
+
+0.03    12:46 12 September 2012
+  - As the new maintainer; add Robert James Clay to the COPYRIGHT AND LICENSE
+    section in the README file and to the AUTHORS and COPYRIGHT AND LICENSE
+    sections in Citadel.pm.
+
+0.02  So 3. Feb 10:56:28 CET 2008
+  - some typos fixes
+
+0.01  Mon Oct  1 09:07:58 2007
+  - first, very rough cut to get something working

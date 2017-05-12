@@ -1,0 +1,26 @@
+#!/usr/bin/perl -w
+
+# Should be more careful about where it puts temporary files.
+
+if (@ARGV == 0) {
+    print STDERR "Usage: $0 <POD-file> [<POD-file> ...]\n";
+    exit 1;
+}
+
+foreach my $i (1 .. @ARGV) {
+    my $file = $ARGV[$i-1];
+    x("pod2man $file tmp$i.man");
+    x("groff -man tmp$i.man > tmp$i.ps");
+}
+
+x("gs -q -sPAPERSIZE=a4 -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=- " . join(" ", map { "tmp$_.ps" } 1..@ARGV));
+
+foreach my $i (1 .. @ARGV) {
+    unlink("tmp$i.man");
+    unlink("tmp$i.ps");
+}
+
+sub x {
+    print STDERR @_, "\n";
+    system(@_);
+}

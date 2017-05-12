@@ -1,0 +1,60 @@
+0.14 -> 0.15
+
+    * Made sure all uses of next_sibling (from XML::Twig) were qualified
+      with a condition to avoid breaking on some iTMS XML with later versions
+      of XML::Twig
+
+0.13 -> 0.14
+
+    * Bugfixes in advanced search and artist parsing and general
+      requests
+	
+    * Note about broken simple search (Net::iTMS::Search) and other
+      documentation updates
+
+    * Changed previewUrl to previewURL (RT #12008)
+        
+    * Added artist biographies and influences
+
+0.12 -> 0.13
+
+    * Minor bugfix in advanced searching (robustness)
+
+0.11 -> 0.12
+    
+    * Added advanced searching
+    
+    * Artist, album, song, and genre objects will now stringify to the name
+      of the artist, album, song, or genre instead of the Package=HASH(0x8172b34)
+      crap
+
+0.10 -> 0.11
+
+    * Copyright regex fixes in Album.pm and Search.pm
+
+    * Minor bug fixes in album parsing when the album is an audiobook
+
+0.04 -> 0.10
+
+    * HUGE rearrangement/rewrite of code.  Refactored by creating Request,
+      Album, Artist, Genre, and Song objects.  Data is fetched efficiently
+      and transparently.  Still missing some parts -- see the TODO section
+      in Net::iTMS's POD -- but these will be easy to implement.
+    
+    * See all the doc for more usage info.  It's dead easy.
+        perldoc Net::iTMS
+        perldoc Net::iTMS::Artist
+        perldoc Net::iTMS::Album
+        perldoc ...
+
+0.03a -> 0.04
+    
+    * Bug fixes in Net::iTMS::XML -- still are probably a bunch of edge
+      cases.
+    
+    * Changed method names in Net::iTMS -- NOT backwards compatible.
+
+0.01 -> 0.03a
+    
+    Undocumented except in Subversion.  If it really matters, email me,
+    or just use diff yourself.

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<request method="client.list">
+    <email>janedoe@freshbooks.com</email>
+    <username>janedoe</username>
+    <page>1</page>
+    <per_page>15</per_page>
+</request>

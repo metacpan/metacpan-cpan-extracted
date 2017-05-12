@@ -1,0 +1,10 @@
+Revision history for Net-POP3-PerMessage
+
+0.03	2009-08-13 06:34:00+0900
+	add Makefile.PL. crucial miss! (Christopher Rath)
+
+0.02	2008-01-07 06:27:21+0900
+	loadable on perl 5.8.0.
+
+0.01    2007-08-31 02:55:00+0900
+        First version, released on an unsuspecting world.

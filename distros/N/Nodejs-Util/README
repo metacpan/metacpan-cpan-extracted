@@ -1,0 +1,20 @@
+append:FUNCTIONS
+
+ system_nodejs([ \%opts ], @argv)
+
+    Will call IPC::System::Options's system(), but with node.js binary as
+    the first argument. Known options:
+
+      * harmony_scoping => bool
+
+      If set to 1, will attempt to enable block scoping. This means at
+      least node.js v0.5.10 (where --harmony_scoping is first recognized).
+      But --harmony_scoping is no longer needed after v2.0.0 and no longer
+      recognized in later versions.
+
+      * path => str
+
+      Will be passed to nodejs_available().
+
+    Other options will be passed to IPC::System::Options's system().
+

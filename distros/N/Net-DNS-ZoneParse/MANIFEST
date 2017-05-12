@@ -1,0 +1,23 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/001_load.t
+t/010_zoneparse_parse.t
+t/011_zoneparse_directives.t
+t/011_inner.db
+t/012_zoneparse_nsec3.t
+t/020_zoneparse_export.t
+t/090_zoneparse_coverage.t
+t/190_zone.db
+t/190_zone_coverage.t
+lib/Net/DNS/ZoneParse.pm
+lib/Net/DNS/ZoneParse/Generator/Native.pm
+lib/Net/DNS/ZoneParse/Generator/DNSZoneParse.pm
+lib/Net/DNS/ZoneParse/Parser/Native.pm
+lib/Net/DNS/ZoneParse/Parser/Native/DNSext.pm
+lib/Net/DNS/ZoneParse/Parser/NetDNSZoneParser.pm
+lib/Net/DNS/ZoneParse/Parser/NetDNSZoneFileFast.pm
+lib/Net/DNS/ZoneParse/Parser/DNSZoneParse.pm
+lib/Net/DNS/ZoneParse/Zone.pm
+META.yml                                 Module meta-data (added by MakeMaker)

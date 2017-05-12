@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+statsd - Simple daemon for easy stats aggregation
+
+=head1 DESCRIPTION (the original node.js-based statsd)
+
+A network daemon that runs on the Node.js platform and
+listens for statistics, like counters and timers, sent over B<UDP>
+and sends aggregates to one or more pluggable backend services (e.g.,
+C<Graphite>).
+
+=head1 DESCRIPTION
+
+This is the Perl port of the node.js statsd B<server>.
+Please consult statsd documentation available at:
+
+  https://github.com/etsy/statsd
+
+If you're looking for a Perl B<client> for C<statsd>, then
+have a look here:
+
+  https://metacpan.org/module/Net::Statsd
+
+=head1 AUTHOR
+
+Cosimo Streppone, E<lt>cosimo@cpan.orgE<gt>
+
+=cut
+
+use 5.008;
+use strict;
+use warnings;
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+use Net::Statsd::Server;
+
+my $config_file = $ARGV[0] || 'localConfig.js';
+
+# By default, it looks up localConfig.js
+my $statsd = Net::Statsd::Server->new({
+  config_file => $config_file
+});
+
+# Not that easy, since we'd have to shutdown
+# and rebind the sockets, but for everything
+# else it should work fine.
+$SIG{HUP} = sub { $statsd->{server}->send; $statsd->reload_config; };
+
+# Show a nice progname in ps/top
+my $conf = $statsd->config;
+my $host = $conf->{address};
+my $port = $conf->{port};
+$0 = sprintf "statsd [%s:%d]", $host, $port;
+
+# Gentlemen, start your engines
+$statsd->start_server();

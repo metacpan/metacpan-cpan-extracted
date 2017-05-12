@@ -1,0 +1,1 @@
+application/msword; ns="%s"\; nf="${ns}".html\;wvHtml "${ns}" >"${nf}"\; netscape -remote 'openURL(file:'"${nf}"')' \; sleep 2 \; rm "${nf}"

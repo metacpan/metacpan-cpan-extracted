@@ -1,0 +1,57 @@
+{
+   "abstract" : "a Perl wrapper around F<libasyncns>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4204",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-LibAsyncNS",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::PkgConfig" : "0",
+            "Module::Build" : "0",
+            "Module::Build::Compat" : "0",
+            "Test::Identity" : "0",
+            "Test::More" : "0",
+            "Test::Refcount" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CChecker" : "0.05",
+            "ExtUtils::PkgConfig" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57"
+         }
+      }
+   },
+   "provides" : {
+      "Net::LibAsyncNS" : {
+         "file" : "lib/Net/LibAsyncNS.pm",
+         "version" : "0.02"
+      },
+      "Net::LibAsyncNS::Constants" : {
+         "file" : "lib/Net/LibAsyncNS/Constants.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02"
+}

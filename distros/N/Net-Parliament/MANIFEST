@@ -1,0 +1,14 @@
+bin/scrape-parl
+Changes
+lib/Net/Parliament.pm
+lib/Net/Parliament/UserAgent.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/get-bills.t
+t/get-members.t
+t/get-votes.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

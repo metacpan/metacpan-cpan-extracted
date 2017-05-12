@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Net-BEEP-Lite-TLSProfile
+version:      0.01
+version_from: TLSProfile.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    IO::Socket::SSL:               0.9
+    Net::BEEP::Lite:               0.02
+    XML::LibXML:                   1.5
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.16

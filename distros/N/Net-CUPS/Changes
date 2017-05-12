@@ -1,0 +1,118 @@
+Revision history for Perl extension Net::CUPS.
+
+0.63 Thu Oct 31 09:15:00 2016
+	- Fix segfaults in Net::CUPS::PPD::getNextOption when enumerating
+	  options by Alexis Bienvenüe
+	- Fix bad free() when finalizing the result of getDestinations()
+	  by Alexis Bienvenüe
+	- Fix a spelling mistake by Gregor Herrmann
+	- Update support information
+
+0.62 Thu Jul 21 08:20:30 2016
+	- Fix version check on CUPS 2 by Mathieu Simon
+	- Fix compatibility with CUPS >= 1.6 by contyk
+
+0.61 Tue Aug 18 21:21:28 2009
+	- Changes to build system to make it easier for packagers.
+
+0.60 Thu Jul 30 08:28:18 2009
+	- Graham Jenkins <graham@vpac.org> reported additional issues
+	  with the cleanup in the DESTROY method.  Tweaked it to avoid
+	  double free issues.
+
+0.59 Wed Sep  3 13:56:12 2008
+	- I really removed the test this time.
+
+0.58 Thu Aug 21 10:04:32 2008
+	- No changes to the core in this release.  This release is designed
+	  to address issues with automated testing.  I have removed the
+	  tests for manipulating destinations since they required to have
+      accounts on the CUPS system.  I have also modified the Makefile.PL
+	  to deal with issues in the Perl Testers systems.
+
+0.57 Sun Aug 10 19:19:33 2008
+	+ Special thanks to Mike Eldridge <diz@cpan.org> for submitting a 
+      patch to correct issues with constants on certain platforms.
+	- Small compile patch to deal with changes in Fedora 9.
+
+0.56 Wed Mar 26 19:35:05 2008
+	+ Most of the changes below were added by Mark Gannon <mark@truenorth.nu>
+	- Added methods to Net::CUPS::Destination to get Uri, Location and
+	  Description.
+	- Added methods to Net::CUPS to get PPDs.
+	- Added methods to Net::CUPS to create and delete destinations.
+	- Corrected the issue of creating bastardized objects as reported by
+	  Gunnar Wolf.
+
+0.55 Tue Oct 09 20:46:58 2007
+	- Fixed a segfault in getJobs [Sven-Haegar Koch]
+	- The job hash from getJobs now returns the state!
+	- Added a human readable state to the job hash [Sven-Haegar Koch]
+	- Added basic examples of Net::CUPS operations.
+	- The method getDestination() will attempt to get the default
+	  destination on the server if a destination is not provided.
+
+0.51 Wed Mar 14 10:35:16 2007
+	- Attempt to rework the DESTROY method for Net::CUPS::Destination for
+      a bug reported by Graham Jenkins <graham@vpac.org>
+	- Added some extra commentary to the source.
+
+0.50 Fri Feb 15 18:38:28 2007
+	- Reworked the entire module into the new design. 
+
+0.41 Sun Feb 26 22:14:45 2006
+	- Added patch from Aike Reyer <aike@users.sourceforge.net> for dealing
+	  with passwords.
+	- Added SUPPORT and updated documentation.
+
+0.40 Mon Nov 29 20:46:44 2004
+	- It was pointed out to me that Network is probably not the best
+      name for the integrated IPP and HTTP modules.  Instead they are
+      now named Net::CUPS::Protocol.
+
+0.37 Mon Nov  8 23:49:36 2004
+	- Net::CUPS::IPP module has been moved to Net::CUPS::Network as the
+	  initial plan to have seperate IPP and HTTP modules proved to be
+	  an unwise design decision.
+	- Added all HTTP constants to Net::CUPS::Network
+
+0.35  Tue Oct 12 23:37:27 2004
+	- Upgraded to handle the latest release of CUPS - 1.2.21
+	- Added the SUPPORT disclaimer to the POD located in CUPS.pm.
+	- Moved all typemaps into a global typemap.
+	- Moved all pack/unpack functions into a globally accessible
+	  area.
+	- Fixed issue with running certain functions in Net::CUPS::Printer
+	  without having any printers setup in the CUPS config.
+	- Added constants to the Net::CUPS::IPP module.
+	- Added more debugging and polishing to net-cups-lpr
+
+0.30  Tue Dec  9 23:26:17 2003 (Not Distributed)
+	- Added an simple example script demonstrating the usage of Net::CUPS.
+	- Added a Net::CUPS::IPP stub.
+	- Tweaked documentation.
+
+0.25  Sat May 31 19:45:45 2003
+	- Added constants to Net::CUPS::Printer.
+	- Updated constants in Net::CUPS::PPD.
+	- Added cupsAddDest, cupsGetPPD, cupsGetDest, cupsSetDests
+	  to Net::CUPS::Printer.
+	- Added more tests to Net::CUPS::Printer.
+	- Added more tests to Net::CUPS::PPD.
+	- Seperated the C routines for CUPS data type converstion for sharing
+	  between the individual perl modules.
+	- Added conversion routines for ppd_attr_t.
+	- Added more error handling to each module.
+	- Started Net::CUPS::IPP module.
+
+0.20  Thu Apr 10 02:22:16 2003
+	- Reworked the framework of the Net::CUPS module.
+
+0.11  Mon Apr 07 12:00:00 2003
+	- Added printer configuration option code and documented it.
+	- I don't know why, but for some reason the typemap file was missing from
+	  the CPAN tarball.  Does 'make dist' not include them in the final
+	  package?
+
+0.10  Wed Feb 26 13:18:44 2003
+	- First public release of Net::CUPS.

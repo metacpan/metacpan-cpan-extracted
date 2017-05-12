@@ -1,0 +1,64 @@
+# $Id: TODO 779 2011-05-20 19:58:56Z pro $ $URL: svn://svn.setun.net/dcppp/trunk/TODO $
+
+
+dont add to share downloaded filelists
+
+better nick-port-ip-lists
+udp UPSR
+relisten
+
+tests
+
+DC++ replaces all occurrences of "|" in <message> with "&#124;" and all occurrences of "$" with "&#36;". When displaying <message> the inverse replacement should be done.
+
+check socket->send ret
+
+libevent http://paste.org.ru/?nt15er
+
+
+
+
+
+
+inlib:
+
+connect-listen ip range
+
+collect search results [n]
+
+make connection-listener
+
+examples/stat : finish adc
+
+lang:
+founded -> found
+
+tigerhash: mmap, speed limit, ttfile raw,
+
+filelist.pm: 
+ standalone @ARGV -> config parse
+ file mask
+
+downloader:
+ files 
+  users    
+
+
+?add finished file to share hashes and db
+
+
+search results via sqlite
+
+
+fix wait_clients array
+
+good named incoming clients
+
+adjustable: delete user from hash when quit
+
+?Сейчас метод "get" загружает файл полностью, было бы неплохо реализовать частичную загрузку с указанного места в файле и указанное кол-во байт. Такая возможность нужна для получения информации о видео, аудио файле и т.д. Скачал первые 10 Кб - и все стало ясно))
+
+.tth.partial
+dont get shared
+
+dcstat: json, xml output, json input

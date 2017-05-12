@@ -1,0 +1,9 @@
+ChangeLog for Net::Plazes
+-------------------------
+
+0.03 Ditched a lot of tests from plazes.t - looks like that interface isn't supported any more.
+     Changed 'presences' to 'activities'. Added support for users and plazes on an activity.
+
+0.02 Still read-only, but more complete tests & child-entity processing. Will be somewhat adversely affected by the switch-off of the plazes.net services. 0.03 will run against the new plazes.com api.
+
+0.01 **READ-ONLY** access to plazes api

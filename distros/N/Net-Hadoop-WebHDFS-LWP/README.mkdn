@@ -1,0 +1,49 @@
+# NAME
+
+Net::Hadoop::WebHDFS::LWP - Client library for Hadoop WebHDFS and HttpFs, with Kerberos support
+
+# VERSION
+
+version 0.005
+
+# SYNOPSIS
+
+    use Net::Hadoop::WebHDFS::LWP;
+
+    my $client = Net::Hadoop::WebHDFS::LWP->new(
+        host        => 'webhdfs.local',
+        port        => 14000,
+        username    => 'jdoe',
+        httpfs_mode => 1,
+    );
+    $client->create(
+        '/foo/bar', # path
+        "...",      # content
+        permission => '644',
+        overwrite => 'true'
+    ) or die "Could not write to HDFS";
+
+# DESCRIPTION
+
+This module is a quick and dirty hack to add Kerberos support to Satoshi
+Tagomori's module [Net::Hadoop::WebHDFS](https://metacpan.org/pod/Net::Hadoop::WebHDFS), to access Hadoop secure clusters. It
+simply subclasses the original module, replacing [Furl](https://metacpan.org/pod/Furl) with [LWP](https://metacpan.org/pod/LWP), which
+will transparently use [LWP::Authen::Negotiate](https://metacpan.org/pod/LWP::Authen::Negotiate) when needed. So the real
+documentation is contained in [Net::Hadoop::WebHDFS](https://metacpan.org/pod/Net::Hadoop::WebHDFS).
+
+# ACKNOWLEDGEMENTS
+
+As mentioned above, the real work was done by Satoshi Tagomori
+
+Thanks to my employer Booking.com to allow me to release this module for public use
+
+# AUTHOR
+
+David Morel <david.morel@amakuru.net>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by David Morel.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

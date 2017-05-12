@@ -1,0 +1,37 @@
+Net-Rovio version 1.5
+======================
+
+CHANGES
+
+In 1.5: Added lights_blue function, changed Docs again. 
+In 1.4: Made several more changes to the documentation to clarify
+In 1.3: Made several changes to the documentation to clarify
+In 1.2: Added many additional functions from the Rovio API.
+In 1.1: Switched from WWW::Mechanize to LWP::Simple for simplicity, added send_photo()
+In 0.9: A second argument for send() is optional
+In 0.8: Prerequisite for WWW::Mechanize added
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP::Simple
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Ivan Greene portions Copyright (c) 2010 by Ty Roden
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

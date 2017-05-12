@@ -1,0 +1,44 @@
+---
+abstract: 'a Number::Format that ignores the system locale'
+author:
+  - 'Christian Walde <walde.christian@googlemail.com>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::InDistDir: 0
+  Test::More: 0
+  strict: 0
+  utf8: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300017, CPAN::Meta::Converter version 2.120921'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Number-Format-FixedLocale
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Number::Format::FixedLocale:
+    file: lib/Number/Format/FixedLocale.pm
+    version: 1.121780
+requires:
+  Carp: 0
+  Number::Format: 0
+  base: 0
+  perl: 5.008
+  strictures: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Number-Format-FixedLocale
+  homepage: https://github.com/wchristian/number-format-fixedlocale
+  repository: https://github.com/wchristian/number-format-fixedlocale.git
+version: 1.121780

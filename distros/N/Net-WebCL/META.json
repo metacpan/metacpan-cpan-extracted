@@ -1,0 +1,43 @@
+{
+   "abstract" : "LWP::UserAgent base easy web access module.",
+   "author" : [
+      "root <root@localdomain>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-WebCL",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Cookies" : "6.01",
+            "HTTP::Request::Common" : "6.06",
+            "LWP" : "6.05"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.03"
+}

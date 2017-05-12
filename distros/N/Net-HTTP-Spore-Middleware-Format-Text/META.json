@@ -1,0 +1,58 @@
+{
+   "abstract" : "middleware for Text format",
+   "author" : [
+      "Daniel Gempesaw <gempesaw@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-HTTP-Spore-Middleware-Format-Text",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "Net::HTTP::Spore::Middleware::Format" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Net::HTTP::Spore" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gempesaw/Net-HTTP-Spore-Middleware-Format-Text/issues"
+      },
+      "homepage" : "https://github.com/gempesaw/Net-HTTP-Spore-Middleware-Format-Text",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gempesaw/Net-HTTP-Spore-Middleware-Format-Text.git",
+         "web" : "https://github.com/gempesaw/Net-HTTP-Spore-Middleware-Format-Text"
+      }
+   },
+   "version" : "0.01"
+}
+

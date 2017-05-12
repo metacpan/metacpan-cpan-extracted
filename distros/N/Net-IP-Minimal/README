@@ -1,0 +1,67 @@
+NAME
+    Net::IP::Minimal - Minimal functions from Net::IP
+
+VERSION
+    version 0.06
+
+SYNOPSIS
+      use Net::IP::Minimal qw[:PROC];
+
+      my $ip = '172.16.0.216';
+
+      ip_is_ipv4( $ip ) and print "$ip is IPv4";
+
+      $ip = 'dead:beef:89ab:cdef:0123:4567:89ab:cdef';
+
+      ip_is_ipv6( $ip ) and print "$ip is IPv6";
+
+      print ip_get_version( $ip );
+
+DESCRIPTION
+    Net::IP is very feature complete, but I found I was only using three of
+    its functions and it uses quite a bit of memory
+    <https://rt.cpan.org/Public/Bug/Display.html?id=24525>.
+
+    This module only provides the minimal number of functions that I use in
+    my modules.
+
+FUNCTIONS
+    The same as Net::IP these functions are not exported by default. You may
+    import them explicitly or use ":PROC" to import them all.
+
+    "ip_get_version"
+        Try to guess the IP version of an IP address.
+
+            Params  : IP address
+            Returns : 4, 6, undef(unable to determine)
+
+        "$version = ip_get_version ($ip)"
+
+    "ip_is_ipv4"
+        Check if an IP address is of type 4.
+
+            Params  : IP address
+            Returns : 1 (yes) or 0 (no)
+
+        "ip_is_ipv4($ip) and print "$ip is IPv4";"
+
+    "ip_is_ipv6"
+        Check if an IP address is of type 6.
+
+            Params            : IP address
+            Returns           : 1 (yes) or 0 (no)
+
+        "ip_is_ipv6($ip) and print "$ip is IPv6";"
+
+SEE ALSO
+    Net::IP
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Chris Williams and RIPE-NCC.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

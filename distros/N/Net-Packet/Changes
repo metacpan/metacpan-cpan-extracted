@@ -1,0 +1,290 @@
+Revision history for Perl extension Net::Packet.
+
+*** This will probably be the last release. From now on, please use 
+Net::Frame::* modules on CPAN. This framework is obsolete.
+
+3.28 Sun Feb 15 17:45:54 CET 2015
+   - FEATURE: use $Env->noObsoleteWarning(1) to disable the obsolete warning
+   - bugfix: check payload length before using it in PPPoE
+   - update: copyright notice
+
+3.27 Mon Nov  9 19:19:57 CET 2009
+   - bugfix: PPPoE packing payload
+   => http://rt.cpan.org/Public/Bug/Display.html?id=51112
+   - update: copyright notice
+
+3.26 Sat Apr 19 18:41:12 CEST 2008
+   - new: added possibility to adjust snaplen in Dump.pm
+     => contributed by Darien Kindlund
+   - bugfix: examples/read-pcap.pl
+
+3.25 Thu Dec 28 11:11:19 CET 2006
+   - bugfix: Utils.pm: forget to load some subs for IPv6 handling
+
+3.24 Sat Dec 16 17:48:15 CET 2006
+   - NEW: now supports big-endian archs (IPv4 and IPv6 update)
+   - bugfix: Frame: require VLAN
+
+3.23 Thu Nov 23 23:47:10 CET 2006
+   - examples: updates and bugfixes
+   - tests: bugfix when test modules not available
+
+3.22 Sat Nov 18 14:44:49 CET 2006
+   - update: ETH: print() now displays length instead of type if 802.3 layer
+   - new: IPv4: isProtocolIgmpv4() and NP_IPv4_PROTOCOL_IGMPv4
+   - test: added Test::Pod::Coverage
+   - test: added Test::Pod
+   - pod: old undocumented methods are now documented
+
+3.21 Wed Nov 15 19:52:43 CET 2006
+   - NEW: added layers STP, OSPF (header only), IGMPv4 (v1 and v2),
+          CDP::Address, CDP::TypeAddresses, CDP::TypeCapabilities,
+          CDP::TypePortId, CDP::TypeSoftwareVersion
+   - NEW: Dump now support PPP links
+   - UPDATE: old PPP integrated into PPPoE, because this is PPP for PPPoE
+             So, there is a new PPP implementation, which is now a layer 2
+   - UPDATE: also, PPPLCP is now a layer 3
+   - UPDATE: IPv4: hlen now defaults to 5, length now defaults to
+             NP_IPv4_HDR_LEN
+   - update: CDP: new attributes: typeAddresses, typePortId, typeCapabilities,
+             typeSoftwareVersion
+   - update: Packet: removed the END block that would clean $Env->dump,
+             it is user responsibility to do that
+   - bugfix: Frame: _getPadding()
+   - bugfix: Dump: storing of received frames when doFrameReturnList is true
+   - bugfix: Dump: .storable file removing in all cases
+   - bugfix: Dump: isFather(), isSon()
+   - bugfix: ARP: print()
+
+3.20 Sun Nov 12 23:02:09 CET 2006
+  - NEW: support for PPPoE, PPP, PPPLCP, LLC, and begin the work for CDP
+  - NEW: Frame->new can now return an array ref of decoded frames, to handle 
+         new layers, and such things as IPv6 within IPv4.
+         See doFrameReturnList from Env.
+         With this new scheme, the behaviour from unpacking VLAN or ICMPv4 
+         has changed. Old behaviour remains the same, but if you set 
+         doFrameReturnList to true (not by default), your programs will need 
+         updating.
+  - NEW: all layers: be able to create layers without having the need to 
+                     build a full frame
+  - new: Frame: print() and dump() methods, encapsulate attribute
+  - new: Consts: new constants
+  - new: Layer: isLayer2(), isLayer3(), isLayer4(), isLayer7(),
+                getPayloadLength()
+  - new: Utils: debugDeviceList()
+  - new: Env: doFrameReturnList, noFramePadding, doIPv4Checksum,
+              noFrameComputeChecksums, noFrameComputeLengths,
+              doMemoryOptimizations
+  - update: all layers: rewrite of print() methods
+  - update: TCP: optimizations on recv() method
+  - removed: Frame: noPadding attribute, moved to Env noFramePadding
+  - removed: Frame: doChecksum attribute, moved to Env doIPv4Checksum
+  - bugfix: Env: in getSubnet()
+  - bugfix: Env: mapping between dnet interface and WinPcap interface should 
+                 now work
+  - bugfix: Env: no IPv6 under Windows for now
+  - bugfix: ETH: in isTypeIp()
+  - bugfix: Frame: do not use Dump and Desc if they do not exist
+  - bugfix: Frame: getFilter() only when a Frame is competely filled
+  - bugfix: IPv4: do not use l4 if it does not exist
+  - bugfix: IPv6: do not use l4 if it does not exist
+
+3.01 Sun Nov  5 16:27:50 CET 2006
+  - NEW: ported to Windows ActivePerl
+  - Utils: new subs: getGatewayIp, getGatewayMac, getIpMac
+  - Env: new attributes: subnet, gatewayIp, gatewayMac
+  - Desc: new attributes: gatewayIp, gatewayMac
+  => gatewayIp is automatically set, but not gatewayMac, due to the 
+     nature of the ARP lookup implementation.
+  - DescL3: under Windows, the layer 2 (ethernet) is automatically built, 
+            so using DescL3 is the same as using DescL3 under Unix/Linux 
+            systems.
+
+3.00 Sun Oct 29 15:31:06 CET 2006
+  - Net::Packet::Dump: added keepTimestamp attribute to keep original pcap 
+                       timestamp. Default is to not keep original and use our 
+                       own timestamp.
+  - bugfix: in Utils.pm, a redifined error is now removed
+  - bugfix: in DescL4.pm, a redifined error is now removed
+  - bugfix: in DescL4.pm, family attribute now initialized
+  - pod update: lib/Net/Packet.pm
+  - pod update: lib/Net/Packet/Dump.pm
+  - pod update: lib/Net/Packet/Env.pm
+  - pod update: lib/Net/Packet/Frame.pm
+  - pod update: lib/Net/Packet/Desc.pm
+  - pod update: lib/Net/Packet/DescL2.pm
+  - pod update: lib/Net/Packet/DescL3.pm
+  - pod update: lib/Net/Packet/DescL4.pm
+
+3.00_02 Wed Oct  4 23:18:43 CEST 2006
+   - bugfix: now it is possible to open a network interface with no IP address
+   - bugfix: now it is possible to create a Dump object and give it another Env 
+             object, without interfering with the default Env object
+
+3.00_01 Wed Sep 27 17:25:47 CEST 2006
+   - *** WARNING: developer release, the pod is not up to date with the code
+   - Now uses array as objects (with Class::Gomor::Array)
+   - good speed improvement by replacing calls to accessors methods to 
+     direct array indice lookup
+   - small memory usage improvement thanks to array objects
+   - Net::Packet::Dump: complete rewrite
+   - Net::Packet::Env: nearly complete rewrite
+
+2.22 Sat May 13 11:45:03 CEST 2006
+   - bugfix: in Env.pm, debug mode was not working anymore
+
+2.21 
+   - Net::Packet::Dump: added getStats()
+   - now uses Class::Gomor instead of Class::Gomor::Hash (but objects are 
+     still hashes)
+
+2.20 Sun Mar 19 18:23:51 CET 2006
+   - Net::Packet: ported under Cygwin (now works under Windows :) )
+   - Net::Packet: is now a pure Perl module
+   - IO::Interface: removed from dependances
+   - Net::Write: new dependance
+   - update: Desc*: now use new Net::Write portable module
+   - bugfix: Dump: many fix, Debian users should now be able to use Net::Packet
+
+2.06 Mon Mar 13 13:53:54 CET 2006
+   - Frame: added noPadding option
+
+2.05 Sun Mar 12 12:09:18 CET 2006
+   - bugfix: IPv4: flags field is now split into flags and offset fields
+   - bugfix: IPv4: constants for IPv4 flags are now ok
+   - bugfix: Env: when we are not able to autoDev(), do not bother to autofind 
+             IP and MAC addresses
+   - bugfix: VLAN: pack/unpack methods fixed (now vlanId can be greater than 16
+   - updated: IPv4: print() now also prints new offset field
+   - updated: IPv4: pod for new offset field
+   - updated: dump methods: no more new line character at the end of string
+   - type: Utils: pod documentation typo fixed
+   - new depdendance: Bit::Vector for VLAN.pm
+   - examples/ipv4-flags.pl: new example
+   - examples/vlan-craft.pl: new example
+   - examples/vlan-support.pl: new example
+
+2.04 Sun May 22 21:18:41 CEST 2005
+   - examples/arp-scan.pl: bugfix in pcap filter
+   - examples/sniffer.pl: new feature (dump payload as ASCII)
+   - Makefile.PL: bugfix: removed PREREQ_FATAL that was breaking cpan install
+   - Makefile.PL: bugfix: corrected a check to let Darwin OS to compile module
+   - ETH.pm: added isTypeVlan()
+   - IPv4.pm: added pod for noFixLen and doChecksum
+
+2.03 Fri Feb  4 00:08:14 CET 2005
+   - So sorry. Forgot VLAN.pm in MANIFEST
+
+2.02 Thu Feb  3 23:36:04 CET 2005
+   - NEW LAYER: VLAN/802.1Q, see Net::Packet::VLAN
+   - IPv4: noFixLen and doChecksum attributes
+
+2.01 Tue Feb  1 17:28:04 CET 2005
+   - bugfix: added explodeIps() explodePorts() into export in Utils.pm
+   - bugfix: flush() in Dump.pm
+   - getFilter(): better pcap filter for ARP packets
+   - minor changes in various pod
+
+2.00 Thu Jan 27 22:12:41 CET 2005
+   - major release, backward compatibility broken
+   - full documentation
+   - a battery of tests
+   - new layers:
+     o Layer2/SLL
+     o Layer2/RAW
+     o Layer2/NULL
+     o Layer3/IPv6
+   - sending frames at DescL4 now fully works
+   - huge speed improvements
+   - some memory usage improvements
+   - many many bugfixes
+
+1.28 Thr Dec  2 20:36:11 CEST 2004
+   - bugfix: netpacket_pcap_fp: now works with libpcap 0.8
+
+1.27 Sun Oct  3 20:39:13 CEST 2004
+   - Makefile.PL searches for location of libpcap
+   - IPv4: auto resolution of names to IP addr
+   - ARP:  auto resolution of names to IP addr
+   - ICMPv4: pack/unpack Destination Unreachable messages
+   - ICMPv4: pack/unpack Redirect messages
+   - ICMPv4: pack/unpack Time Exceeded messages
+
+1.26 Wed Sep 29 23:24:57 CEST 2004
+   - renaming: Net::Pkt => Net::Packet to get registered on CPAN
+   - unlinkAfterAnalyze is no more
+   - unlinkOnDestroy defaults to 1 (replaces unlinkAfterAnalyze)
+   - callStart defaults to 1
+   - Auto DescL\d creation when a new Frame is created
+     If a DescL\d has already been created on the first Frame creation, it is 
+     not overwritten.
+   - Auto creation of Dump object on the first new Frame, started on the first 
+     Frame sent
+
+0.26 Wed Sep 29 18:23:19 2004
+   - !!! last version of Net::Pkt. It is renamed to Net::Packet.
+   - NEW: Net::Pkt::getHostIpv4Addr()
+   - NEW: Net::Pkt::getHostIpv4Addrs()
+
+0.25 Sun Sep 26 21:20:37 2004
+   - bugfix: an error in method Net::Pkt::next was making a segfault, due to a 
+     bad typemap in Net::Pcap (FILE * to T_IN under Perl 5.8 is bad). Resolved 
+     by creating my own Net::Pcap::file sub.
+
+0.24 Sun Sep 26 15:08:11 2004
+  - !!! live capture ready via next sub in Net::Pkt::Dump.
+    See examples/arp-scan.pl of perldoc Net::Pkt::Dump.
+  - Net::Ifconfig::Wrapper: removed, now uses IO::Interface which is better 
+    (but not perfect, so there remains the need for a wrapper around ifconfig 
+    on some systems)
+  - NEW: Net::Pkt::LayerARP: isReply
+  - NEW: Net::Pkt::LayerARP: isRequest
+  - Net::Pkt::Frame: new object data: reply to store the frame received on 
+    a recv method call
+  - NEW: Net::Pkt::Dump->next: returns next available frame from savefile
+  - Net::Pkt::Dump->analyze: returns empty array if there is nothing to read 
+    in savefile
+  - Net::Pkt::Dump->analyze: now returns @frames if some have been analyzed
+  - Net::Pkt::Dump: added a global to set sniffing in promiscuous mode
+    => $Net::Pkt::Promisc, default to 0.
+  - Net::Pkt::Dump: signal to handle DESTROY cleanly when hiting CTRL+C
+  - Net::Pkt::Dump: documentation
+  - Net::Pkt::Dump->new: callStart option (default 0)
+  - Net::Pkt::LayerUDP->print: also prints payload size
+  - Net::Pkt::LayerICMPv4: do not exit when an ICMP message is not yet known
+
+0.23  Fri Sep  3 22:24:18 2004
+  - bugfix: META.yml
+  - bugfix: libnetpkt.c and Makefile.PL to let compilation work on Linux and 
+    OpenBSD
+
+0.22  Fri Sep  3 21:49:30 2004
+   - LayerICMPv4: echo request/reply, timestamp request/reply, information 
+     request/reply, address mask request/reply
+   - constant renaming: NETPKT_IPv4_TRANSPORT_TCP => NETPKT_IPv4_PROTOCOL_TCP
+   - constant renaming: NETPKT_IPv4_TRANSPORT_UDP => NETPKT_IPv4_PROTOCOL_UDP
+   - method renaming: getRandom32bitInt => getRandom32bitsInt
+   - method renaming: getRandom16bitInt => getRandom16bitsInt
+   - method renaming: ipTransport => ipProtocol
+   - method renaming: isTransportTcp => isProtocolTcp
+   - method renaming: isTransportUdp => isProtocolUdp
+   - Dump: removed dependance upon tcpdump binary, implemented as a C function 
+     to do its work. But it adds the need to link with libpcap on module 
+     building
+   - tcpPrint: now displays options
+   - printDebug: now go to STDERR
+   - METAL.yml written
+
+0.21  Sun Aug 29 20:20:33 2004
+   - changes in Dump scheme; now requires to call start and stop methods
+   - auto* subs do not try anymore to find values if respective class
+     data are already set
+   - first public release
+
+0.20  Sun Aug 29 12:00:34 2004
+   - first release to private people
+
+0.01  Wed Aug  4 12:16:03 2004
+   - original version; created by h2xs 1.21 with options:
+      -Oxan Net::Pkt libnetpkt.h
+

@@ -1,0 +1,15 @@
+Revision history for Net-NationalRail-LiveDepartureBoards
+
+0.02    Tue, 12 Jan 2010 23:03:03 +0000
+
+	Add support for filtering by destination, or getting arrivals
+	from a particular station.  Many thanks to Ian Dash for the
+	initial patch, which I then ruthlessly refactored - any
+	mistakes are my own. (RT bug #53629.)
+
+	Add examples/arrivals_at_soton_from_winchester.pl to
+	demonstrate the new feature.
+
+0.01    Thu, 08 Jan 2009 20:22:21 +0000
+        Release early, release often.
+

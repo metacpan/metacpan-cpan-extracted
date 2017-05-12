@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Net-Laconica
+version:            0.08
+abstract:           Perl extension for fetching from, and sending notices/messages to Laconica instances
+author:
+    - Alan Haggai Alavi <alanhaggai@alanhaggai.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Data::Validate:       0
+    Data::Validate::URI:  0
+    HTML::Parser:         3.56
+    LWP::UserAgent:       0
+    Test::Exception:      0
+    Test::More:           0
+    Test::Warn:           0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.46
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

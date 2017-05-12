@@ -1,0 +1,60 @@
+bhahahahaha...
+
+General:
+
+	The documentation is still a little scruffy, but it's a
+	considerable improvement over the previous release.
+
+IMAP:
+
+	IMAP specifies modified UTF-7 encoding for mailbox names.  The
+	IMAP module currently only escape and unescapes '&'
+	characters.  The encode_mailbox and decode_mailbox can be
+	overridden if you write a better routine before I do (in which
+	case, please toss me a copy :-).
+
+	The parsing of response codes is looser than it should be.
+
+	There is minimal arg checking in methods.
+
+	Disconnections from the server aren't handle very well.
+
+	The SASL authentication doesn't support a security layer.
+
+	Doesn't support X* IMAP commands.
+
+	Multiple pending commands haven't been tested.  For now, they
+	should not be used.
+
+	There is no mechanism for preventing ambiguous multiple
+	pending commands.  ...more proof that multiple pending
+	commands should not be used.
+	
+	There are several things that well-behaved IMAP clients shouldn't
+	do that Net::IMAP doesn't prevent.
+	
+	Not all of the extensions have been tested.  Bug reports
+	gleefully accepted.
+
+	The regression tests are incomplete.
+
+	The IMAP regression tests require UW-imapd.
+
+	The IMAP module hasn't been tested against very many IMAP servers.
+
+	There is minimal arg checking in IMAP command methods.
+	
+	There is minimal sanity checking of server responses.
+	
+xAP:
+	The base class hasn't been completely generalized yet.
+
+	The SASL support doesn't support an security layer.
+	
+	Server-initiated disconnects haven't been tested.
+
+	The technique for handling literals works, but there are some
+	pathological cases where it could break.  Most users won't have a
+	problem with it.
+
+lots more, no doubt...

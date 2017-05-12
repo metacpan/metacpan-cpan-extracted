@@ -1,0 +1,37 @@
+---
+abstract: 'An OpenVPN tray icon.'
+author:
+  - 'Mugen Kenichi <mugen.kenichi@uninets.eu>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-OpenVPN-TrayIcon
+no_index:
+  directory:
+    - t
+provides:
+  Net::OpenVPN::TrayIcon:
+    file: lib/Net/OpenVPN/TrayIcon.pm
+    version: v0.2.2
+  Net::OpenVPN::TrayIcon::Version:
+    file: lib/Net/OpenVPN/TrayIcon/Version.pm
+    version: v0.2.2
+requires:
+  Data::Section: 0
+  Gtk2: 0
+  Gtk2::TrayIcon: 0
+  MIME::Base64: 0
+  Moo: 0
+  POSIX: 0
+  Proc::Daemon: 0
+  Time::HiRes: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02.02

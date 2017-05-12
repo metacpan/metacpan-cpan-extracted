@@ -1,0 +1,27 @@
+Revision history for Netflow-Parser
+
+0.6.002 2016.06.15
+        add META_MERGE block into Makefile.PL
+
+0.6.001 2016.06.14
+        update pod description
+        test version
+
+0.5     2016.02.02
+        MIN_PERL_VERSION requires ExtUtils::MakeMaker at least 6.48
+
+0.4     2016.01.28
+        min perl 5.8 required to fit unpack template grouping
+
+0.3     2016.01.20
+        add briefly ABSTRACT description
+        bug parse_template_v9 fixed
+        bug in add_template fixed
+        add 01-run.t to MANIFEST
+
+0.02    2014.12.29
+        bug fixing _parse_flowset_v9
+        refactoring: parse method returns a Netflow::Parser::Packet object
+
+0.01    2014.12.23
+        First release supports v9

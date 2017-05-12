@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::Wigle.
+
+0.01  Sat May 22 14:30:17 2010
+	- original version; created by h2xs 1.23 with options
+		-AX Net::Wigle
+

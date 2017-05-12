@@ -1,0 +1,81 @@
+
+
+                        CHANGELOG for Net::XWhois
+           $Id: Changes,v 1.4 2001/12/30 06:52:52 vipul Exp $
+
+--------------------------------------------------------------------------
+
+0.90                                                     December 29, 2001
+
+  * Rob Woodard <rwoodard15@attbi.com> added support for 
+    ARIN lookups, updated RIPE definition and applied several 
+    pending patches. 
+
+  * Applied Erik Aronesty's patch to add reg_date, exp_date, 
+    and record_updated_date to the INTERNIC parser; parsers
+    for whois.nic.mx and whois.adamsnames.tc responses and 
+    several new TLD -> server associations.  
+
+0.83                                                         July 14, 2001
+
+  * Added a server() method. Thanks to Steve Weathers for the patch.
+
+  * AUTHOLOAD now carp()'s about non-existant methods instead of
+    croak()'ing.
+
+
+0.82                                                         July 14, 2001
+
+  * Minor fixes.
+
+0.81                                                         July 13, 2001
+
+  * Change the definition of TLDs to accomodate second level tlds.
+  
+  * Applied a patch by Matt Spiers <matt@pavilion.net> that supplies
+    parsers for NOMINET (whois.nic.uk), CENTRALNIC (whois.centralnic.com)
+    and UKERNA (whois.ja.net).
+
+  * Applied a patch by Robert Puettmann <rpuettmann@ipm.net> that supplies a
+    parser for DENIC (whois.denic.de) responses.
+
+  * Applied a patch by Steve Weathers <steve@domainit.com> that enhances
+    the INTERNIC parser and supplies parsers for INWW
+    (whois.InternetNamesWW.com) and BULKREG (whois.bulkregister.com)
+    responses.
+
+  * Changed "registrants" in RIPE format to "registrant".
+
+  * Fixed a bug in contact_handles regex of INTERNIC parser. Thanks to
+    Martin H . Sluka" <martin@sluka.de> for the patch.
+
+0.80                                                         July 13, 2001
+
+  * Steinar Overbeck Cook <steinar@balder.no> added RSPL support and split
+    up the %ASSOC into two data structures to avoid ambiguous lookups.
+.
+.
+.
+.
+
+0.49                                                     December 13, 1998
+
+  * Introduced domain_status method for InterNIC domains.
+
+0.48                                                     December 12, 1998
+
+  * Pod changes.
+
+0.46                                                     December 07, 1998
+
+  * Changed contact_handles definition.
+
+0.45                                                     December 07, 1998
+
+  * Wrote register_cache() and corresponding pod documentation.
+
+0.44                                                     December 07, 1998
+
+  * Wrote $self->personality()
+
+  * Introduced caching.

@@ -1,0 +1,81 @@
+NAME
+
+    NetAddr::IP::FastNew - NetAddr::IP new() methods with no validation
+
+VERSION
+
+    0.4
+
+SYNOPSIS
+
+        use NetAddr::IP::FastNew;
+    
+        my $ip = new NetAddr::IP::FastNew( '10.10.10.5' );
+
+DESCRIPTION
+
+    This module is designed to quickly create NetAddr::IP objects.
+
+    If you have a situation where you need 200_000 NetAddr::IP objects then
+    the initialization speed can really become a problem.
+
+CREDITS
+
+    Robert Drake, <rdrake@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2014 by Robert Drake
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.7 or, at
+    your option, any later version of Perl 5 you may have available.
+
+METHODS
+
+ new
+
+    Right now this just calls NetAddr::IP->new().
+
+       my $ip = NetAddr::IP::FastNew->new("127.0.0.1");
+
+ new_ipv4
+
+    Create a real NetAddr::IP from a single IPv4 address with almost no
+    validation.
+
+    This only takes one argument, the single IP address. Anything else will
+    fail in (probably) bad ways. Validation is completely up to you and is
+    not done here.
+
+       my $ip = NetAddr::IP::FastNew->new_ipv4("127.0.0.1");
+
+ new_ipv4_mask
+
+    Create a real NetAddr::IP from a IPv4 subnet with almost no validation.
+
+    This requires the IP address and the subnet mask as it's two arguments.
+    Anything else will fail in (probably) bad ways. Validation is
+    completely up to the caller is not done here.
+
+       my $ip = NetAddr::IP::FastNew->new_ipv4_mask("127.0.0.0", "255.255.255.0");
+
+ new_ipv4_cidr
+
+    Create a real NetAddr::IP object from a IPv4 cidr with almost no
+    validation.
+
+    This requires the IP address and the cidr in a single argument.
+    Anything else will fail in (probably) bad ways. Validation is
+    completely up to the caller is not done here.
+
+       my $ip = NetAddr::IP::FastNew->new_ipv4_cidr("127.0.0.0/24");
+
+ new_ipv6
+
+    Create a real NetAddr::IP object from an IPv6 subnet with no
+    validation. This is almost as fast as the lazy object. The only caveat
+    being it requires a cidr mask.
+
+       my $ip = NetAddr::IP::FastNew->new_ipv6("fe80::/64");
+

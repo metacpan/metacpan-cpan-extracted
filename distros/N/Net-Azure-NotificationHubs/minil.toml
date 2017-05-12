@@ -1,0 +1,6 @@
+name = "Net-Azure-NotificationHubs"
+badges = ["travis"]
+authority="cpan:YTURTLE"
+
+module_maker="ModuleBuildTiny"
+

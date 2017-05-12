@@ -1,0 +1,71 @@
+{
+   "abstract" : "Minimal-configuration, read-only LDAP server",
+   "author" : [
+      "Alexei Znamensky <russoz@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-LDAP-SimpleServer",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "File::Basename" : "0",
+            "File::HomeDir" : "0",
+            "File::Path" : "2.08",
+            "File::Spec" : "0",
+            "Net::LDAP::Constant" : "0",
+            "Net::LDAP::FilterMatch" : "0",
+            "Net::LDAP::LDIF" : "0",
+            "Net::LDAP::Server" : "0",
+            "Net::LDAP::Util" : "0",
+            "Net::Server" : "2.003",
+            "Scalar::Util" : "0",
+            "UNIVERSAL::isa" : "0",
+            "base" : "0",
+            "fields" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Authen::SASL" : "0",
+            "Exporter" : "0",
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "IO::Pipe" : "0",
+            "Net::LDAP" : "0",
+            "Proc::Fork" : "0",
+            "Test::More" : "0.88",
+            "Test::UseAllModules" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {},
+      "homepage" : "https://github.com/russoz/Net-LDAP-SimpleServer",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/russoz/Net-LDAP-SimpleServer.git",
+         "web" : "https://github.com/russoz/Net-LDAP-SimpleServer"
+      }
+   },
+   "version" : "0.0.17"
+}
+

@@ -1,0 +1,15 @@
+#
+#	 Cosine IPSX Dictionary 
+#
+#	$Id: dictionary.cosine 45 2006-11-14 17:45:00Z lem $
+#
+VENDOR		Cosine	3085
+
+ATTRIBUTE	 Cosine-Connection-Profile-Name 1 string Cosine
+ATTRIBUTE	 Cosine-Enterprise-ID   2 string Cosine
+ATTRIBUTE	 Cosine-Address-Pool-Name 3 string Cosine
+ATTRIBUTE	 Cosine-DS-Byte 4 integer Cosine
+ATTRIBUTE	 Cosine-VPI-VCI 5 octets Cosine
+ATTRIBUTE	 Cosine-DLCI 6 integer Cosine
+ATTRIBUTE	 Cosine-LNS-IP-Address 7 ipaddr Cosine
+ATTRIBUTE	 Cosine-CLI-User-Permission-ID 8 string Cosine

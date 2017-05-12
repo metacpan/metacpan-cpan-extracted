@@ -1,0 +1,36 @@
+# NAME
+
+Net::Rendezvous::Publish::Backend::Avahi - Publish zeroconf data via Avahi
+
+# VERSION
+
+version 0.04
+
+# COPYRIGHT AND LICENSE
+
+Copyright (c) 2006 by Jack Bates.  All rights reserved.
+
+Copyright (c) 2012 by Ioan Rogers.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+# SEE ALSO
+
+- [Net::Rendezvous::Publish](http://search.cpan.org/perldoc?Net::Rendezvous::Publish) - The module this module supports.
+- [Avahi](http://avahi.org/)
+
+# AUTHORS
+
+- Ioan Rogers <ioanr@cpan.org>
+- Jack Bates <jablko@cpan.org>
+
+# BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at [https://github.com/ioanrogers/Net-Rendezvous-Publish-Backend-Avahi/issues](https://github.com/ioanrogers/Net-Rendezvous-Publish-Backend-Avahi/issues).
+
+# SOURCE
+
+The development version is on github at [http://github.com/ioanrogers/Net-Rendezvous-Publish-Backend-Avahi](http://github.com/ioanrogers/Net-Rendezvous-Publish-Backend-Avahi)
+and may be cloned from [git://github.com/ioanrogers/Net-Rendezvous-Publish-Backend-Avahi.git](git://github.com/ioanrogers/Net-Rendezvous-Publish-Backend-Avahi.git)

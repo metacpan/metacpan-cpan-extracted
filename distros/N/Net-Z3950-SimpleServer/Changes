@@ -1,0 +1,253 @@
+Revision history for Perl extension Net::Z3950::SimpleServer
+
+1.21  Tue Sep 27 09:40:12 UTC 2016
+	* Better support for facets. Cope with absent terms.
+	* Sample server ztest.pl demonstrates facets implemention.
+	* The ztest.pl sample server now emits all INIT parameter when
+	  a connection is made.
+	* Add Travis continuous integration configuration (modified
+	  from that of ZOOM-Perl).
+	* Fix a bizarre RPM package-building bug whereby the
+	  lower-case letter 'n' was stripped from the name of the
+	  person building the package. Fixes SA-743
+	* Major overhaul of search documentation, which was missing
+	  many parameters including facet requests. Part of SUP-946.
+	* Document CQL queries.
+	* Document the Explain Handler.
+	* Fix obsolete Library-of-Congress URL in documentation.
+	* Fix links into Index Data's own documentation to use .html
+	  extensions rather than the old .tkl.
+	* Fix some typos in documentation and change-log.
+	* README file converted to README.md (Markdown).
+	* Many other improvements and clarifications to
+	  documentation.
+	* Update which distributions we build for.
+	  
+1.20  Thu Jan 29 07:53:46 UTC 2015
+	- Add support for Type-1's proximity operator. Patch from
+	  Simon Jacob of the National Library of Australia.
+
+1.19  Fri Nov 22 12:31:24 CET 2013
+       -  ESTIMATED_HIT_COUNT = 1 from search_handler signal.
+       -  fetch handler: partial present response for undef RECORD
+          The old behavior was to return empty record (if RECORD was
+          not modified by handler). RECORD is now undefined upon entry
+          to fetch handler and handler must set it to return a record
+	  or just leave it undefined to signal "no record".
+
+1.18  Mon Oct 14 11:23:17 CEST 2013
+       -  Debian/RPM packages now built with YAZ 5.
+
+1.17  Tue Feb 12 13:30:52 CET 2013
+	- Scan and Search handler gets EXTRA_ARGS . It's represented as
+	  a hash. It holds the extra arguments for SRU (URL).
+	- Scan and Search handler may return extra response data in
+	  EXTRA_RESPONSE_DATA. That's an XML fragment for SRU extra
+	  response data.
+	- Scan Term may include a DISPLAY_TERM (Z39.50 / SRU display term).
+	  Thanks to Simon Jacob for patch.
+	  
+1.16  Thu Jan 10 13:22:01 CET 2013
+        - Create packages for Ubuntu quantal precise oneiric.
+        - Add support for GFS start handler (START) to allow handling
+          of GFS config file (-c).
+        - Handler search now gets PRESENT_NUMBER - a hint for how many
+          records are to be fetched following search (piggyback).
+
+1.15  Fri Oct 14 14:01:18 CEST 2011
+        - Fix decoding of OUTPUTFACETS (optinal) ; crashed on some Perl
+          versions
+
+1.14  Thu Aug 18 08:47:13 UTC 2011
+	- Support for facets in search handler
+	- Corrections to manual, kindly supplied by Ben Webb
+	  <bjwebb67@googlemail.com>
+	- Resolve contradictory licence terms: SimpleServer is now
+	  definitely distributed under the Revised BSD licence, whereas
+	  earlier versions claimed in the source code to be Revised
+	  BSD but in the README to be under the same terms as Perl.
+
+1.13  Wed Mar 16 17:07:10 GMT 2011
+	- The SimpleServer test-script now uses a Unix-domain socket,
+	  with a filename generated from the process-ID, rather than
+	  the default Inet-document socket on port 9999.  Hopefully
+	  this should resolve the race-condition problems that have
+	  been affecting the "make test" part of the build cycle when
+	  building packages for four systems simultaneously under
+	  id-pbuild.sh
+
+1.12  Thu Feb  4 16:33:19 GMT 2010
+	- Remove handling of "hits" parameter in the present handler.
+	  That should never have been there (and was probably sloppy
+	  copy), and prevents compilation under YAZ 4, which has
+	  removed the member from the bend_present_rr structure.
+
+1.11  Wed Mar  4 15:12:53 GMT 2009
+	- Add explicit statement of license (same terms as Perl).
+	  No functional changes.
+
+1.10  Tue Mar  3 22:47:16 GMT 2009
+	- Document the init-handler's PEER_NAME argument.
+	- Update URL into YAZ documentation.
+	- bend_delete() no longer returns without value.
+	- Route around ActivePerl's damage to the "open" symbol.
+
+1.09  Mon Sep 10 15:54:38 BST 2007
+	- *Argh*  Another mixed statement/declaration.
+
+1.08  Mon Sep 10 12:15:29 BST 2007
+	- *Sigh*  Fix mixed statement/declaration.
+
+1.07  Sat Sep  1 10:31:26 BST 2007
+	- When the scan-handler callback returns, do not attempt to
+	  copy the terms from Perl structures if the error-code is
+	  non-zero (i.e. if an error has occurred).  This protects
+	  against a segmentation fault when the Perl callback does not
+	  explicitly set $args->{NUMBER} = 0 on error.
+	- Correct transcription of string-valued attributes in
+	  $args->{RPN}.
+	- Scan handler is now passed RPN as well as TERM, a tree of
+	  Perl structures representing the entire scan clause
+	  including access-points and other attributes (which are
+	  discarded from TERM).
+	- The various classes used to represent nodes in the RPN query
+	  tree (Net::Z3950::APDU::Query, Net::Z3950::RPN::And,
+	  Net::Z3950::RPN::Or, Net::Z3950::RPN::AndNot,
+	  Net::Z3950::RPN::Term and Net::Z3950::RPN::RSID) now all
+	  share a newly introduced superclass Net::Z3950::RPN::Node,
+	  making it possible to write methods that apply to all node
+	  types.
+	- A utility method toPQF() is provided for
+	  Net::Z3950::RPN::Node, enabling the RPN tree to be converted
+	  back into a flat PQF query.
+	- Add support for the Delete Result Set service.
+	- Add documentation for the Sort service.
+	- Some clarifications to documentation.
+
+1.06  Fri Aug 10 23:30:00 BST 2007
+	- New global-handle element can be specified when creating a
+	  simple-server object and will be passed to all callback
+	  functions.  This allows global state to be eliminated from
+	  SimpleServer applications ... finally!
+	- Search handler now deals correctly with undefined addinfo:
+	  previously a (harmless) error message was emitted.
+	- Add Perl API to yaz_diag_srw_to_bib1(), which SimpleServer
+	  applications will need if they access SRU/SRW back-end
+	  databases and need to report errors.
+	- Add Perl API to yaz_diag_bib1_to_srw(), because it would
+	  seem churlish not to.
+
+1.05  Wed Dec 27 13:19:13 CET 2006
+        - Taking new naming convention for YAZ constants into account.
+
+1.04  Fri Dec  1 10:48:32 CET 2006
+        - Build such that SimpleServer links to new yaz shared object.
+
+1.03  Tue Aug  8 17:27:16 BST 2006
+	- Rely on version 2.1.14 or later of YAZ; this is the first
+	  version that reliably passes through the additional
+	  information associated with errors generated while serving
+	  SRU/W requests.  No functional differences since 1.02.
+
+1.02  Wed Jul 26 12:09:50 BST 2006
+	- Better support for Open and User/Password authentication.
+	- SimpleServer.xs's rpn2pquery() is now discarded, and YAZ's
+	  yaz_rpnquery_to_wrbuf() used instead.  This is more robust
+	  in dealing with unusual cases such as string-valued
+	  attributes.
+	- Support for SCHEMA element when fetching records.
+
+1.01  Fri Mar 24 12:09:32 GMT 2006
+	- Documentation of release 1.00's SRU/SRW facilities.
+	- Makefile.PL now fails if YAZ version is earlier than 2.0.0,
+	  which was the first with SRU/SRW support.
+
+1.00  Fri Mar 24 01:20:24 GMT 2006
+	- Support for SRU and SRW.  Mostly this is provided by the YAZ
+	  GFS, but changes are needed to allow for the case where
+	  there is no RPN query (due to absent on invalid <cql2rpn>
+	  element in GFS configuration) so that CQL is passed through
+	  natively; and also to fake up an {REQ_FORM} and {REP_FORM}
+	  parameters set to the "text/xml" OID when this information
+	  is not specified by the GFS.
+	  (The jump in version number is due to the SRU/W support.)
+	- Include "logging-server.pl" in the distribution: the
+	  simplest possible SimpleServer application, which merely
+	  logs the client-request data structures.
+	- Makefile.PL is more helpful if yaz-config isn't found.
+	- Explicitly disable prototypes in SimpleServer.xs: makes no
+	  difference but suppresses an error message for a cleaner
+	  build.
+
+0.08  Mon Jun 14 14:51:01 2004
+	- SimpleServer is now perl 5.8 thread proof 
+	- Support for IMP_ID parameter in Init responses.  This was
+	  actually written a long time ago, but left commented out as
+	  the underlying YAZ back-end server didn't support
+	  implementation-ID setting.  Now that it does (and has done
+	  for eighteen months -- since YAZ release 1.8.6 of
+	  2002/03/25!), I've finally removed the comments.
+	- Init handler now understands the setting of {ERR_CODE} as
+	  more than a boolean success indicator, and also {ERR_STR}.
+	  They are now passed back to the client (thanks to recent
+	  changes to the YAZ generic front-end server) in accordance
+	  with Z39.50 Implementor Agreement 5, found at
+		http://www.loc.gov/z3950/agency/agree/initdiag.html
+
+0.07  Fri Jan 03 10:12:15 2003
+        - Applied Dave Mitchell's (davem@fdgroup.com) GRS-1 parsing patch.
+	  Thanks Dave, and sorry it didn't find its way to release 0.06,
+	  completely my fault.
+
+0.06  Thu Jan 02 11:15:01 2003
+        - Added support for authentication
+	- Add documentation for the object tree passed as the RPN
+	  member of the search-handler's argument hash.
+	- We actually removed the vacuous Changelog and TODO files
+	  back in 0.05.  They should never have been here :-)
+
+0.05  Tue Feb 05 21:54:30 2002
+        - Add brief documentation of the new handling
+	  of RPN.
+
+0.04  Tue Feb 05 21:49:56 2002
+	- Add Changelog (Why?  We already have this file!)
+	- Add TODO file (although it's empty!)
+	- Change interface to constructor, and fix test.pl script to
+	  use the new interface.
+	- Add support for Scan.
+	- Add support for building GRS-1 records.
+	- Add grs_test.pl test suite for new GRS-1 code.
+	- Add RPN structure to search-handler argument hash.
+	- Add PID element to init, search, fetch and present-handler
+	  argument hashes (but not the sort, scan and close-handlers,
+	  for some reason.)
+	- Fix typos in documentation.
+
+0.03  Thu Nov 09 16:22:00 2000
+	- Add the INSTALL file.
+	- Add support for a present-handler (distinct from fetch).
+	- Remove `$args->{LEN} = length($record)' from the example
+	  fetch-handler in the documentation.
+	- Minor corrections to documentation, e.g. add commas after
+	  elements in anonymous hash of arguments.
+	- Record syntaxes (formats) are now specified as ASCII OIDs
+	  (e.g. "1.2.840.10003.5.10") rather than human-readable
+	  strings (e.g. "usmarc")
+	- Add some XS code to support sorting, though it doesn't seem
+	  to be finished yet, and is not wired out.
+	- Use symbolic constants (e.g. Z_ElementSetNames_generic
+	  instead of hard-wired magic number 1).
+	- Add PEER_NAME element to init-handler argument hash.
+	- Minor changes to ztest.pl.
+
+0.02  Mon Sep 11 12:32:00 2000
+	- First released versions
+
+0.01  Wed Aug 30 14:54:01 2000
+	- original version; created by h2xs 1.19
+
+### To do
+	- When invoking Init callback, set initial values of IMP_ID,
+	  IMP_NAME and IMP_VER from the client's Init request.
+

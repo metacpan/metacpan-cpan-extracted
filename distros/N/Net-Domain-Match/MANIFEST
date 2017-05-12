@@ -1,0 +1,9 @@
+lib/Net/Domain/Match.pm
+Makefile.PL
+MANIFEST
+misc/tld.txt
+README
+t/001.t
+t/100-af.t
+t/map.t
+META.yml                                 Module meta-data (added by MakeMaker)

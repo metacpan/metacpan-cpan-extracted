@@ -1,0 +1,31 @@
+Revision history for Perl extension Net::NicoVideo
+
+0.28 2013-11-04
+  - "GINZA" is supported
+  - Improve Net::NicoVideo::Content, API was changed, but it has no discernible impact on the interface with UA
+  - Deprecete is_content_success and is_content_error on Net::NicoVideo::Response
+  - Improve samples
+  - Improve documents
+
+0.27 2013-08-12
+  - Short domain nico.sc is discriminable
+  - Improve tests
+
+0.01_25 2013-06-12
+  - Improve document, Japanese split off
+  - Tidy Makefile.PL
+
+0.01_24 2013-06-09
+  - Add Net::NicoVideo::URL to convert long URL and short URL mutually
+
+0.01_23 2013-01-26
+  - Fix bug, tag request cannot URI::Escape::escape \x{NNNN}
+  - Fix sort order bug in fetch_tag_rss_by_recent_post
+  - Add workaround in fetch_flv, because "so" does not use as video_id. Why?
+  - Update README
+
+0.01_20 2012-07-19
+  - The first of public release
+
+0.01 2011-11-23
+  - Original version

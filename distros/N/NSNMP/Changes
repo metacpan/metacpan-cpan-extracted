@@ -1,0 +1,219 @@
+2004-01-25  kragen  <kragen@pobox.com>
+
+	* added copyright and license notice, renamed for release
+
+Copyright (c) 2003-2004 AirWave Wireless, Inc.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+   1. Redistributions of source code must retain the above
+   copyright notice, this list of conditions and the following
+   disclaimer.
+   2. Redistributions in binary form must reproduce the above
+   copyright notice, this list of conditions and the following
+   disclaimer in the documentation and/or other materials provided
+   with the distribution.
+   3. The name of the author may not be used to endorse or
+   promote products derived from this software without specific
+   prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+	
+2004-01-07  kragen  <kragen@pobox.com>
+
+	* SNMP/Agent.pm, SNMP/Agent.t, SNMP/Mapper.pm, SNMP/Simple.pm,
+	SNMP/Simple.t, ChangeLog, README, SNMP.pm, SNMP.t, TODO,
+	methtest.pl, update-todo: 
+
+	Added placeholders for copyright notice.
+
+	Eliminated duplicate lines from ChangeLog.
+
+	Updated and cleaned up documentation and comments, fixing several
+	errors.
+
+	Trimmed source lines to 80 columns.
+
+	Removed excessive peformance history in SNMP.pm comments.
+
+	Updated TODO.
+
+2003-12-24  kragen  <kragen@pobox.com>
+
+	* SNMP/Agent.t, SNMP/Simple.t, SNMP.pm, SNMP.t, WHY, linecount:
+	Packaged things up for distribution:
+	 - Updated tests to run better in the test harness.
+	 - Updated bragging line counts.
+	 - fixed a warning during some tests.
+
+2003-12-20  kragen  <kragen@pobox.com>
+
+	* SNMP/Simple.t, SNMP/Simple.pm, TODO, getsysname-lots-net-snmp.pl, SNMP.pm:
+	Updated documentation in preparation for release.
+
+	Rearranged TODO.
+
+	Added another couple of tests.
+
+2003-12-10  kragen  <kragen@pobox.com>
+
+	* ChangeLog: Updated ChangeLog.
+
+	* SNMP/Agent.t, SNMP/Simple.pm, SNMP/Simple.t, ChangeLog, SNMP.pm, SNMP.t, TODO:
+	Added ability to encode Perlish values in SNMP::Simple::set.  Haven't
+	measured performance impact.  User impact is that you have to supply a
+	type when you set things.  Ick.
+
+	Updated documentation.
+
+	Minor cleanups here and there.
+
+	Added tests for encoding and decoding packets with many lengths, and
+	for badValue.  Found a buglet: some warning in 'unpack' for some
+	packet lengths.
+
+	TODO list slowly shrinking.
+
+2003-12-09  kragen  <kragen@pobox.com>
+
+	* SNMP/Simple.pm, SNMP/Simple.t, SNMP.pm, TODO:
+	Added ability to get many different data types.
+
+	Supposedly boosted performance in SNMP.pm by normally using the short-form
+	encoding.  Haven't measured.
+
+	Added and rearranged documentation in SNMP.pm.
+
+2003-12-08  kragen  <kragen@pobox.com>
+
+	* SNMP/Simple.pm, SNMP/Simple.t, TODO:
+	Added basic support for getting integers.
+
+2003-12-07  kragen  <kragen@pobox.com>
+
+	* ChangeLog: Updated ChangeLog.
+
+	* SNMP/Simple.t, SNMP.pm, SNMP.t, TODO, ChangeLog:
+	Fixed encoding of things with long length fields.  It's like 40 more
+	lines of code, and 30 more microseconds (on top of only 136 before, so
+	it's a significant jump!)  Cranked down performance thresholds in
+	tests to compensate for the lousier performance.  1000
+	request/response pairs per CPU second still isn't too bad, though.
+
+2003-12-07  kragen  <kragen@pobox.com>
+
+	* SNMP/Simple.pm, SNMP.t, decodetest.pl, SNMP/Simple.t, SNMP.pm,
+	SNMP.t, TODO, ChangeLog:
+	
+	Fixed encoding and decoding of things with long length fields.
+	10% performance penalty for things without, but at least the code
+	is correct now.
+
+2003-12-04  kragen  <kragen@pobox.com>
+
+	* BERdecode.pm, SNMP.t: Found a really serious bug --- my
+	length-field decoding is wrong, everywhere, so it fails on long
+	packets.  Fixed it in BERdecode (that was easy enough), but
+	haven't yet fixed it in SNMP, where it has performance
+	requirements.
+
+	* linecount: Added line-count script.
+
+	* ChangeLog, TODO, update-todo: Updated.
+
+	* SNMP/Agent.pm, SNMP/Agent.t, SNMP/Simple.pm, SNMP/Simple.t:
+	Fixed Simple to handle packets >1024 bytes, up to 64K.
+
+	Added performance test to Simple.t (which now takes >15 seconds,
+	ick.).  Improved performance of agent for walks.  The performance test
+	automatically takes care of ensuring Simple reuses its socket, because
+	performance halves when it doesn't.
+
+	Simplified and optimized walk code in Simple.  Also, it now handles
+	leading dots the way the documentation I wrote this morning said it
+	did.
+
+	Doubled Agent.t's timeout on socket reads to 250ms --- I had a
+	spurious test failure.
+
+	Added getNextRequest handling to the SNMP agent and walks to
+	SNMP::Simple.
+
+	Added $SNMP::Simple::error_status.
+
+	Updated and corrected documentation and TODO file.
+
+	Refactored some tests.
+
+2003-12-03  kragen  <kragen@pobox.com>
+
+	* SNMP/Agent.pm, SNMP/Agent.t, SNMP/Simple.pm, SNMP/Simple.t, SNMP.pm, SNMP.t:
+	Added robustness against garbage packets in SNMP, SNMP::Simple, and
+	SNMP::Agent.
+
+	Implemented adjustable timeouts and retries in SNMP::Simple, with defaults
+	from Net::SNMP.
+
+	Added request-ID generation and checking to SNMP::Simple.
+
+	Raised threshold on Mapper performance test so it doesn't fail
+	sporadically.
+
+	* TODO: Updated TODO.
+
+2003-12-01  kragen  <kragen@pobox.com>
+
+	* SNMP/Agent.pm, SNMP/Agent.t, SNMP/Simple.pm, SNMP/Simple.t, TODO, WHY:
+	Changed Simple.t tests to use SNMP::Agent instead of whatever's running
+	on port 161.  Moved 'spawn agent' routine into SNMP::Agent.  Made
+	SNMP::Simple able to accept a port number, and added some error checking.
+
+	Added community string handling to agent.
+
+2003-11-30  kragen  <kragen@pobox.com>
+
+	* SNMP/Simple.t, ChangeLog, TODO, WHY: Commented tests, added WHY.
+
+	* SNMP/Agent.pm, SNMP/Agent.t, SNMP/Simple.pm, SNMP/agent.pl:
+	Added ChangeLog.
+
+	Now SNMP agent actually uses network and handles get and set requests,
+	but it's still pretty incomplete.
+
+	* ChangeLog: Added ChangeLog.
+
+	* SNMP/Agent.pm, SNMP/Agent.t, SNMP/Mapper.pm, SNMP/handle-lotsa-requests.pl:
+	Added SNMP agent implementation --- it can generate plausible response
+	packets, but doesn't yet know how to ship them over the network.  And it
+	looks like it can do that about 2000 times per second!
+
+	* SNMP.pm, SNMP.t, TODO, getsysname-lots-simple.pl, update-todo:
+	Added SNMP::Simple module to do one-line SNMP gets and sets.  Not really
+	production-quality yet.  Needs a lot more work.  Significantly slower
+	than raw SNMP.pm, but still 10x as fast as Net::SNMP.
+
+	Added TODO file and build script.
+
+	Corrected test count.
+
+2003-11-29  kragen  <kragen@pobox.com>
+
+	* BERdecode.pm, SNMP/Mapper.pm, decodetest.pl, encode_oid.pl,
+	getsysname.pl, SNMP/Mapper.pm, SNMP.pm,
+	getsysname-lots-net-snmp.pl, getsysname-lots.pl:
+	
+	Initial CVS import.  Can encode and decode SNMP messages, and
+	there are some scripts to use this ability to do actual SNMP
+	transactions, about 12x as fast as Net::SNMP 4.1.2.

@@ -1,0 +1,46 @@
+-------------------------------------------------------------------------------
+Version 0.05
+-------------------------------------------------------------------------------
+2002 Apr 17
+Add spec file for rpm.
+Minor documental changes.
+
+-------------------------------------------------------------------------------
+Version 0.04
+-------------------------------------------------------------------------------
+Updated Copyright information.
+
+Net::Bind::Utils
+Make it a real module that exports functions.
+Reverted valid_domain back to the original version
+created by Kevin and renamed it valid_domain_rfc1035
+because this functionality could still be useful for
+some applications.  Created a new valid_domain
+function to determine if bind can actually resolve
+the domain.
+
+Net::Bind::Resolv
+Make /etc/resolv.conf the default when using new.
+Applied patch from Blair Zajac <blair@orcablue.com>:
+Improved and fixed the functionality of some issues
+including some methods where the values would be
+appended to the existing list instead of replacing
+the list.  Allow comments to work for as_string().
+
+-------------------------------------------------------------------------------
+Version 0.03
+-------------------------------------------------------------------------------
+Moved modules to lib/* directory to fit the CPAN model better.
+
+-------------------------------------------------------------------------------
+Version 0.02
+-------------------------------------------------------------------------------
+Compatibility porting to Perl 5.6.x
+Warn cleaning.
+More accurate domain validation.
+Changes made by Rob Brown <rob@roobik.com>
+
+-------------------------------------------------------------------------------
+Version 0.01
+-------------------------------------------------------------------------------
+Initial alpha release.

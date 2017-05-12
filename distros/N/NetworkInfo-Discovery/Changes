@@ -1,0 +1,100 @@
+Revision history for NetworkInfo::Discovery and related modules:
+----------------------------------------------------------------
+
+0.12 Thu Sep 25 18:37:12 EDT 2003
+   - made some fixes for the scan module.  i somehow forgot to do this
+     in 0.10
+   
+0.11 Mon Mar 10 12:31:02 EST 2003
+   - When adding an interface with no subnet, try to guess the 
+     subnet address.
+
+0.10 Wed Feb  5 12:20:17 EST 2003
+   x Added a pre-alpha version of a Tk front end to display the network
+     in all it's glory.  this was for nothing... see next note. will
+     need to redo this for the new register.
+     
+     Fri Feb 14 12:24:38 EST 2003
+   - Switching from using Graph as the internal representation.  It is 
+     too slow, and memory inefficent.  Will now be using my own
+     "Register" that allows faster access and information to be better
+     agregatted.  This means most of the modules will be changing.
+   - Sniff was updated to reflect the change.
+
+     Wed Feb 19 16:25:54 EST 2003
+   - Moved the ACLs from Discover.pm to Register.pm.  Newly found 
+     interfaces are checked against the ACLs as they are added to the
+     register.  You can still check by hand, but this is a time saver
+     for me.
+   - Added methods for reading and writing the register from and to a
+     file using Storable.  This should be in the core perl distribution
+     for most folks.
+   - Made changes to all the examples to reflect the new Register.
+   - Made changes to all the detection modules, and Detect.pm to work
+     with the new register.
+
+0.09 Wed Jan 15 16:42:05 EST 2003
+   - added a temporary hack to Traceroute.pm to prevent traceroute from
+     getting a broadcast address.
+   - Added "does_icmp" to Host.pm... I thought it was there... maybe 
+    I cut it by accident.
+
+0.08  Wed Jan 15 13:04:28 EST 2003
+    - Added Scan.pm.  This can be used to scanl ranges of ipaddresses for
+      open tcp or udp ports.
+    - Added tests to test Scan.
+    - Changed the way Discovery->add_host works.  Now tries to log a 
+      changed attribute.
+    - Added changed Host attribute "open_ports" to be "tcp_open_ports" or
+      "udp_open_ports".  Also fixed them so that they can accept a string
+      to get around reading in the host from a file.
+    - Added pod to Scan.pm
+    - Ran podchecker on Discovery.pm, Host.pm, Scan.pm, and Detect.pm.
+
+0.07  Wed Jan  8 23:28:42 EST 2003
+    - Finished off the first attempt at acls.  look at the test.pl or 
+      example/sample.pl for examples.
+
+0.06  Tue Jan  7 15:20:14 EST 2003
+    - added "do_it", "add_host", "add_hop", "get_hosts", "get_hops" functions
+      to "Detect.pm".
+    - Updated to reflect this: Sniff.pm, Traceroute.pm, and the test scripts.
+
+      Mon Jan  6 17:58:43 EST 2003
+    - added the acl_match function.  hope to add acl entries soon, then I can
+      stop mapping the whole internet.
+
+      Thu Jan  2 19:07:35 EST 2003
+    - Added a few more bits of info to Host.
+    - The Discovery server is now marked so so that we can find it easily
+      later. 
+
+0.05  Mon Dec 30 10:33:49 EST 2002
+    - Modules renamed as NetworkInfo:: for CPAN
+
+0.04  Fri Dec 27 13:09:14 EST 2002
+    - Added find_host and get_host to Discovery.pm.  This allows you to
+    locate a host in the graph and to make a new C<Host> out of a few
+    query attributes.
+    - Added a TODO file, in case someone wants to join in the effort here.
+
+0.03  Mon Dec 23 17:45:46 EST 2002
+    - Added documentation to Net::Discovery and Net::Discovery::Host
+    - Added dependencies into the Makefile.PL so they should get caught
+	on a perl Makefile.PL
+
+0.02  Sun Dec 22 20:07:28 EST 2002
+    - Added Net::Discovery::Detect.  This should now be subclassed to 
+	write detection modules.  Look at ::Traceroute and ::Sniff for 
+	examples.
+    - Added Net::Discovery::Sniff.pm to sniff ethernet traffic.
+    - Added Net::Discovery::Traceroute.pm to pick up hosts and hops
+	between end points.
+    - Added tests for all of the above.
+    - Added the ability to add edges to the network graph with weights
+	based on latency.
+    
+0.01  Fri Nov  1 13:15:06 2002
+    - original version; created by h2xs 1.21 with options
+		-X -n Net::Discovery
+

@@ -1,0 +1,27 @@
+#!perl
+use strict;
+use warnings;
+use Nephia::Setup;
+use Getopt::Long;
+
+my $appname = shift(@ARGV);
+help() unless $appname;
+
+my $plugins;
+GetOptions (
+    "plugins=s" => \$plugins,
+);
+
+my $setup = Nephia::Setup->new(appname => $appname, plugins => ['Minimal', split(/,/, $plugins)]);
+$setup->do_task;
+
+sub help {
+    my $data = join('', (<DATA>));
+    print $data."\n";
+    exit;
+}
+
+__DATA__
+Usage:
+
+  nephia-setup AppName [--plugins=<plugin>...]

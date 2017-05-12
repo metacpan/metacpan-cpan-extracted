@@ -1,0 +1,15 @@
+Revision history for Perl module NetRabbitMQPerl
+
+0.04 2017-04-28
+    - [add] return delivery_tag with basic_get (GH #2, GH #3)
+      thanks to Ben Kaufman for the patch
+
+0.03 2016-08-16
+    - [fix] test failures due to dependencies not listed
+    - [fix] test failures due to MANIFEST entries missed
+
+0.02 2016-08-11
+    - first release to CPAN
+
+0.01 2013-01-10
+    - original version; created by ExtUtils::ModuleMaker 0.51

@@ -1,0 +1,19 @@
+Build.PL
+Changes
+lib/NetSDS/Util.pm
+lib/NetSDS/Util/Convert.pm
+lib/NetSDS/Util/DateTime.pm
+lib/NetSDS/Util/File.pm
+lib/NetSDS/Util/FileImport.pm
+lib/NetSDS/Util/Misc.pm
+lib/NetSDS/Util/String.pm
+lib/NetSDS/Util/Struct.pm
+lib/NetSDS/Util/Translit.pm
+lib/NetSDS/Util/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/01_load.t
+t/02_pod.t
+t/03_pod_coverage.t
+META.json

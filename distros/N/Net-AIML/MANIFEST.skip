@@ -1,0 +1,4 @@
+t/000_standard__compile.t
+t/000_standard__perl_critic.t
+t/000_standard__pod.t
+t/000_standard__pod_coverage.t

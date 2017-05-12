@@ -1,0 +1,66 @@
+{
+   "abstract" : "Implements the Amazon Web Services signature version 4, AWS4-HMAC-SHA256",
+   "author" : [
+      "Tim Nordenfur <tim@gurka.se>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Amazon-Signature-V4",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "Time::Piece" : "1.17",
+            "URI::Escape" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Slurper" : "0",
+            "HTTP::Request" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Grinnz/Net-Amazon-Signature-V4.git",
+         "web" : "https://github.com/Grinnz/Net-Amazon-Signature-V4"
+      }
+   },
+   "version" : "0.16",
+   "x_contributors" : [
+      "Arthur Axel fREW Schmidt <frioux@gmail.com>",
+      "Dan Book <dbook@cpan.org>",
+      "Karen Etheridge <ether@cpan.org>",
+      "Steven Hartland <steven.hartland@multiplay.co.uk>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

@@ -1,0 +1,405 @@
+#!/usr/bin/env perl
+use 5.010001;
+use warnings;
+use strict;
+use utf8;
+
+our $VERSION = 'v2.3.7';
+
+use FindBin;
+use lib "$FindBin::Bin/../lib/perl5";
+use Narada;
+use Narada::Lock qw( exclusive_lock unlock_new unlock );;
+use Narada::Config qw( get_config get_config_line get_db_config );
+use DBI;
+use Time::Local;
+use List::Util qw( max );
+use File::Temp qw( tempfile );
+use Fcntl qw(F_SETFD);
+
+use constant IS_NARADA      => Narada::detect() eq 'narada';
+use constant CONFIG_DIR     => IS_NARADA ? 'mysql'      : 'db';
+use constant SQL_DIR        => IS_NARADA ? 'var/mysql'  : 'var/sql';
+use constant SCHEME         => SQL_DIR.'/db.scheme.sql';
+use constant REQUIRED_TABLE => 0;
+use constant OPTIONAL_TABLE => 1;
+use constant TIMELOCAL_MONTH=> 4;
+use constant STAT_MTIME     => 9;
+use constant DESC_FIELD     => 0;
+use constant DESC_TYPE      => 1;
+use constant DESC_NULL      => 2;
+use constant DESC_KEY       => 3;
+use constant DESC_DEFAULT   => 4;
+use constant DESC_EXTRA     => 5;
+
+# GLOBALS:  $::dbh, $::mycnf, $::MYSQLDUMP
+
+
+main(@ARGV) if !caller;
+
+
+sub err { die "narada-mysqldump: @_\n" }
+
+sub main {
+    die "Usage: narada-mysqldump\n" if @_;
+
+    init_globals() or return;
+
+    exclusive_lock();
+    unlock_new();
+
+    my ($full, $incremental, $ignore) = list_tables();
+    my $unchanged = detect_unchanged($full);
+
+    del_dumps_except($incremental, $unchanged);
+    dump_scheme_except($ignore);
+    dump_full($full, $unchanged);
+    dump_incremental($incremental);
+
+    # To correctly detect_unchanged() we should guarantee next table's
+    # Update_time after executing narada-mysqldump will be at least 1
+    # second later than previous (which kept in dump file's mtime).
+    sleep 1;
+
+    unlock();
+
+    return;
+}
+
+sub init_globals {
+    my $db = get_db_config() or return;
+    $::dbh = DBI->connect($db->{dsn}, $db->{login}, $db->{pass},
+        {RaiseError=>1}) or err DBI->errstr;
+    $::mycnf = tempfile(DIR=>'tmp');
+    print {$::mycnf} "[client]\n";
+    print {$::mycnf} "user     = $db->{login}\n";
+    print {$::mycnf} "password = $db->{pass}\n"  if length $db->{pass}; ## no critic (ProhibitPostfixControls)
+    print {$::mycnf} "host     = $db->{host}\n"  if length $db->{host}; ## no critic (ProhibitPostfixControls)
+    print {$::mycnf} "port     = $db->{port}\n"  if length $db->{port}; ## no critic (ProhibitPostfixControls)
+    $::mycnf->flush;
+    sysseek $::mycnf, 0, 0 or err "sysseek: $!";
+    fcntl $::mycnf, F_SETFD, 0 or err "fcntl: $!";
+    my $fd = fileno $::mycnf;
+    $::MYSQLDUMP = "mysqldump --defaults-file=/proc/self/fd/\Q$fd\E \Q$db->{db}\E";
+    return 1;
+}
+
+sub list_tables {
+    my $incremental = load_db_conf('dump/incremental', REQUIRED_TABLE);
+    my $empty       = load_db_conf('dump/empty', REQUIRED_TABLE);
+    my $ignore      = load_db_conf('dump/ignore', OPTIONAL_TABLE);
+    my %other = map {$_=>1} @{$incremental}, @{$empty}, @{$ignore};
+    my @full;
+    for my $table (@{ $::dbh->selectcol_arrayref('SHOW TABLES') }) {
+        next if $other{$table};
+        push @full, $table;
+    }
+    return ([sort @full], $incremental, $ignore);
+}
+
+sub load_db_conf {
+    my ($conf, $required) = @_;
+    my @conf = eval { split /\s*\n/xms, get_config(CONFIG_DIR."/$conf") };
+    my @tables;
+    for my $table (@conf) {
+        local ($::dbh->{RaiseError}, $::dbh->{PrintError});
+        my $desc = $::dbh->selectall_arrayref('DESC '.$table);
+        if ($desc) {
+            push @tables, $table;
+        }
+        elsif ($required == REQUIRED_TABLE) {
+            err "Table $table listed in ".CONFIG_DIR."/$conf does not exists\n";
+        }
+    }
+    return [sort @tables];
+}
+
+sub detect_unchanged {
+    my ($full) = @_;
+    my @unchanged;
+    for my $table (@{$full}) {
+        my $file = SQL_DIR."/$table.sql";
+        if (-f $file && mtime($file) == get_table_status($table, 'Update_time')) {
+            push @unchanged, $table;
+        }
+    }
+    return \@unchanged;
+}
+
+sub del_dumps_except {
+    my ($incremental, $unchanged) = @_;
+    my %incremental = map {$_=>1} @{$incremental};
+    my %unchanged   = map {$_=>1} @{$unchanged};
+    for my $file (glob SQL_DIR.'/*.sql') {
+        if ($file =~ m{\A\Q${\SQL_DIR}\E/([^.]*)[.]sql\z}xms) {
+            my $table = $1;
+            next if $unchanged{$table};
+        }
+        elsif ($file =~ m{\A\Q${\SQL_DIR}\E/([^.]*)[.]\d+-(\d+)[.]sql\z}xms) {
+            my $table = $1;
+            next if $incremental{$table}
+                && mtime($file) >= get_table_status($table, 'Create_time');
+        }
+        unlink $file or err "unlink($file): $!\n";
+    }
+    return;
+}
+
+sub dump_scheme_except {
+    my ($ignore) = @_;
+    my $db = get_config_line(CONFIG_DIR.'/db');
+    my $tables = join q{ }, map {"--ignore-table=\Q$db\E.\Q$_\E"} @{$ignore};
+    mysqldump("--opt -d $tables", SCHEME, time);
+    return;
+}
+
+sub dump_full {
+    my ($full, $unchanged) = @_;
+    my %unchanged = map {$_=>1} @{$unchanged};
+    for my $table (@{$full}) {
+        next if $unchanged{$table};
+        my $file = SQL_DIR."/$table.sql";
+        my $t = get_table_status($table, 'Update_time');
+        mysqldump("--opt -t \Q$table\E", $file, $t);
+    }
+    return;
+}
+
+sub dump_incremental {
+    my ($incremental) = @_;
+    for my $table (@{$incremental}) {
+        my $key  = get_key($table);
+        my $prev = max(0, map {m/-(\d+)[.]sql\z/xms} glob SQL_DIR."/\Q$table\E.*.sql");
+        my $next = get_table_status($table, 'Auto_increment');
+        if ($prev < $next-1) {
+            my $from = $prev+1;
+            my $to   = $next-1;
+            my $file = SQL_DIR."/$table.$from-$to.sql";
+            my $where= "$key>=$from AND $key<=$to";
+            my $t    = get_table_status($table, 'Update_time');
+            mysqldump("--opt -t -w \Q$where\E \Q$table\E", $file, $t);
+        }
+    }
+    return;
+}
+
+###
+
+sub get_table_status {
+    my ($table, $field) = @_;
+    my $val = $::dbh->selectrow_hashref('SHOW TABLE STATUS LIKE ?',
+        undef, $table)->{$field};
+    if ($field =~ /_time\z/xms) {
+        if (!defined $val) {
+            $val = 0;
+        }
+        else {
+            my @datetime = reverse split /\D+/xms, $val;
+            $datetime[TIMELOCAL_MONTH]--;
+            $val = timelocal(@datetime);
+        }
+    }
+    return $val;
+}
+
+sub get_key {
+    my ($table) = @_;
+    my $desc = $::dbh->selectall_arrayref('DESC '.$table);
+    err "First field in table $table must be: INT AUTO_INCREMENT PRIMARY KEY\n"
+        if !(@{ $desc }
+        && $desc->[0][DESC_TYPE]=~/\A\w*int\b/xms
+        && $desc->[0][DESC_KEY] eq 'PRI'
+        && $desc->[0][DESC_EXTRA] eq 'auto_increment'
+        && 1 == grep {$_->[DESC_KEY] eq 'PRI'} @{$desc});
+    return $desc->[0][DESC_FIELD];
+}
+
+sub mtime {
+    my ($file) = @_;
+    return (stat $file)[STAT_MTIME];
+}
+
+sub mysqldump {
+    my ($opt, $file, $t) = @_;
+    system("$::MYSQLDUMP $opt > \Q$file\E.tmp")
+        == 0 or err "system($::MYSQLDUMP $opt > $file.tmp): $?";
+    rename "$file.tmp", $file       or err "rename($file.tmp, $file): $!";
+    utime $t, $t, $file             or err "utime($file): $!";
+    return;
+}
+
+
+1; # Magic true value required at end of module
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+narada-mysqldump - dump project database
+
+=head1 VERSION
+
+This document describes narada-mysqldump version v2.3.7
+
+
+=head1 USAGE
+
+    narada-mysqldump
+
+
+=head1 DESCRIPTION
+
+Should be executed in project deploy directory (or Narada 1.x project root
+directory).
+
+Backup your Narada project's MySQL database.
+
+If "config/mysql/db" absent or empty do nothing.
+
+Dump database as quickly as possible to files "var/mysql/*.sql":
+
+=over
+
+=item *
+
+Tables listed in "config/mysql/dump/ignore" doesn't included in dump
+(even in database scheme).
+
+=item *
+
+Database scheme saved in "var/mysql/db.scheme.sql".
+
+=item *
+
+Content for tables listed in "config/mysql/dump/empty" doesn't dumped.
+
+=item *
+
+Content for tables listed in "config/mysql/dump/incremental" saved in
+"var/mysql/TABLE_NAME.FROM-TO.sql".
+
+=over
+
+=item *
+
+Only new rows will be saved, which is absent in already existing files.
+
+=back
+
+=item *
+
+Content for other tables saved in "var/mysql/TABLE_NAME.sql".
+
+=over
+
+=item *
+
+If table wasn't changed since previous dump - do nothing and just keep
+file with previous dump.
+
+=back
+
+=item *
+
+All other "*.sql" files will be removed from "var/mysql/".
+
+=back
+
+To force full dump (including incremental and unchanged tables) run
+"rm var/mysql/*.sql" before "narada-mysqldump".
+
+Will set exclusive lock on this project while doing database analyse and
+dumping database scheme and non-incremental tables. Incremental tables
+will be dumped after releasing lock.
+
+Will set dump file's mtime to Update_time of related database table, and
+use mtime on next dump to detect table change.
+
+All incremental tables MUST have first column's type "INT AUTO_INCREMENT
+PRIMARY KEY" (can also use "MEDIUMINT", etc.).
+
+After ALTER incremental table or doing TRUNCATE existing files with
+incremental dumps will be automatically removed and replaced by new ones.
+
+Tables listed in "config/mysql/dump/empty" and "config/mysql/dump/incremental"
+must exists; listed in "config/mysql/dump/ignore" may not exists.
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+    config/mysql/db
+    config/mysql/login
+    config/mysql/pass
+    config/mysql/host
+    config/mysql/port
+    config/mysql/dump/incremental
+    config/mysql/dump/empty
+    config/mysql/dump/ignore
+    var/mysql/db.scheme.sql
+    var/mysql/*.sql
+
+Narada 1.x project use C<config/db/> instead of C<config/mysql/>,
+and C<var/sql/> instead of C<var/mysql/>.
+
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/powerman/Narada/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software. The code repository is available for
+public review and contribution under the terms of the license.
+Feel free to fork the repository and submit pull requests.
+
+L<https://github.com/powerman/Narada>
+
+    git clone https://github.com/powerman/Narada.git
+
+=head2 Resources
+
+=over
+
+=item * MetaCPAN Search
+
+L<https://metacpan.org/search?q=Narada>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/dist/Narada>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Narada>
+
+=item * CPAN Testers Matrix
+
+L<http://matrix.cpantesters.org/?dist=Narada>
+
+=item * CPANTS: A CPAN Testing Service (Kwalitee)
+
+L<http://cpants.cpanauthors.org/dist/Narada>
+
+=back
+
+
+=head1 AUTHOR
+
+Alex Efros E<lt>powerman@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2008- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+
+=cut

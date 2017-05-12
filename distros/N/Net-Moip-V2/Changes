@@ -1,0 +1,25 @@
+Revision history for Perl extension Net-Moip-V2
+
+0.06 2017-03-31T11:20:53Z
+    - fixed undeclared Moo dependency
+
+0.05 2017-03-20T17:00:20Z
+
+    - new methods oauth_get() and oauth_post()
+
+0.04 2017-03-19T02:29:01Z
+
+    - fixed authorization header
+
+0.03 2017-03-17T16:52:31Z
+
+    - configured travis and coveralls
+
+0.02 2017-03-17T16:31:13Z
+
+    - added JSON dep to cpanfile
+    - improved docs
+
+0.01 2017-03-17T16:20:44Z
+
+    - original version

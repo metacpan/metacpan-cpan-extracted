@@ -1,0 +1,69 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Eugene Marcotte <emarcotte@athenahealth.com>",
+      "Lee Johnson <leejo@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-AMQP-RabbitMQ-PP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::Exception" : "0.43",
+            "Test::File::ShareDir" : "1.001001",
+            "Test::Most" : "0.31"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "1",
+            "File::ShareDir::Install" : "0.11",
+            "List::MoreUtils" : "0.25",
+            "Net::AMQP" : "0.06",
+            "Socket::Linux" : "0.01",
+            "Try::Tiny" : "0.12",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Humanstate/net-amqp-rabbitmq/issues"
+      },
+      "homepage" : "https://metacpan.org/module/Net::AMQP::RabbitMQ::PP",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/Humanstate/net-amqp-rabbitmq"
+      }
+   },
+   "version" : "0.04",
+   "x_repository" : {
+      "type" : "git",
+      "url" : "https://github.com/Humanstate/net-amqp-rabbitmq.git",
+      "web" : "https://github.com/Humanstate/net-amqp-rabbitmq"
+   },
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

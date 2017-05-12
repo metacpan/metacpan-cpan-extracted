@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Net/LDAP/Batch.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+lib/Net/LDAP/Batch/Action.pm
+lib/Net/LDAP/Batch/Action/Add.pm
+lib/Net/LDAP/Batch/Action/Delete.pm
+lib/Net/LDAP/Batch/Action/Update.pm
+t/001-batch.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                Net-LastFM
+version:             0.34
+abstract:            A simple interface to the Last.fm API
+license:             perl
+author:              
+    - Leon Brocard <acme@astray.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Digest::MD5:                   0
+    JSON::XS::VersionOneAndTwo:    0
+    LWP::UserAgent:                0
+    Moose:                         0
+    MooseX::StrictConstructor:     0
+    URI::QueryParam:               0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

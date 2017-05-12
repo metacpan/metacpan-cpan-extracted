@@ -1,0 +1,20 @@
+ICAP/1.0 200 OK
+Date: Mon, 10 Jan 2000  09:55:21 GMT
+Server: ICAP-Server-Software/1.0
+Connection: close
+ISTag: "W3E4R7U9-L2E4-2"
+Encapsulated: res-hdr=0, res-body=222
+
+HTTP/1.1 200 OK
+Date: Mon, 10 Jan 2000  09:55:21 GMT
+Via: 1.0 icap.example.org (ICAP Example RespMod Service 1.1)
+Server: Apache/1.3.6 (Unix)
+ETag: "63840-1ab7-378d415b"
+Content-Type: text/html
+Content-Length: 92
+
+5c
+This is data that was returned by an origin server, but with
+value added by an ICAP server.
+0
+

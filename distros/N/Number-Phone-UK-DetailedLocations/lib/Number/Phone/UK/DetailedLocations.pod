@@ -1,0 +1,50 @@
+=head1 NAME
+
+Number::Phone::UK::DetailedLocations - more detailed location information for Number::Phone::UK
+
+=head1 SYNOPSIS
+
+Just install it, and Number::Phone::UK will magically pick it up and use it
+instead of the restricted data set distributed with it.
+
+=head1 IMPORTANT NOTE WHAT YOU SHOULD READ
+
+All previous versions had a dependency on the excellent DBM::Deep module.
+Unfortunately its file format changed when it hit version 1.0.  Therefore
+this release has an old version of DBM::Deep bundled with it, which you
+may use in parallel with the new version.
+
+=head1 ACCURACY
+
+The data in this add-on module is more accurate than that distributed with
+Number::Phone because Number::Phone only has location data for one of the
+several exchanges serving each area code.  This is therefore a superset of
+that data.
+
+The latitude and longitude data has several more significant figures than it
+deserves, simply because that's what was in the datasource I got it from.
+
+=head1 LIMITATIONS/BUGS/FEEDBACK
+
+This module contains the locations of most BT phone exchanges, and the
+number ranges handled by them.  However, the data is (at the time of writing)
+nearly a year old.  I can't find a more recent source.  Thankfully, this
+sort of data doesn't go stale quickly.  New exchanges hardly ever open, and
+while new number ranges may be assigned to exchanges, they will for at least
+a few years be a small proportion of all numbers.
+
+If you find any errors, please report them by email.
+
+=head1 LICENCE
+
+You may use, modify and distribute this software under the same terms as
+perl itself.
+
+=head1 AUTHOR
+
+David Cantrell E<lt>david@cantrell.org.ukE<gt>
+
+Copyright 2006 - 2007
+
+=cut
+

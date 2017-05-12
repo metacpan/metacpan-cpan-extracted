@@ -1,0 +1,10 @@
+MANIFEST
+README
+LICENSE
+Changes
+Makefile.PL
+lib/Net/SMS/Mollie.pm
+t/001_load.t
+t/002_not_too_useful.t
+t/003_bug_reported.t
+META.yml                                 Module meta-data (added by MakeMaker)

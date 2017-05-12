@@ -1,0 +1,10 @@
+Revision history for Perl module Net::Hadoop::DFSAdmin::ReportParser
+
+0.3 2013-09-30T06:51:17Z
+   - dist with Minilla
+
+0.2  Mon Oct 22 12:25:18 JST 2012
+   - update bundled Module::Install to 1.06
+
+0.1  Tue Jun 26 12:31:16 JST 2012
+   - original version

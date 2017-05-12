@@ -1,0 +1,20 @@
+#!/usr/local/bin/perl
+use common::sense;
+use lib '../lib/';
+use lib './lib';
+use Net::Highrise;
+
+  my $bp = Net::Highrise->new(user  => $ENV{HIGHRISE_USER},
+			      token => $ENV{HIGHRISE_TOKEN},
+			      ssl =>1,
+    );
+  use Data::Dumper;
+my $res =   $bp->tags_list_all(xml=>1);
+my $res =   $bp->people_list_all();
+
+ my $res =   $bp->person_get(id=> 43263697);
+print Dumper($res);
+# my $res =   $bp->people_search_by_criteria( email => 'danny@sadinoff.com');
+
+
+

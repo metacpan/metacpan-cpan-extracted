@@ -1,0 +1,9 @@
+{: NES 1.0 ( 'none', '{: * cfg_plugin_top_dir :}/filter_demo.pl' ) :}
+<html>
+  <head>
+    <title>Nes Tutorial</title>
+  </head>
+  <body>
+    Nes blink
+  </body>
+</html>

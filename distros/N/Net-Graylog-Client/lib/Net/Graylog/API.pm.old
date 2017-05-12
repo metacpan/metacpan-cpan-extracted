@@ -1,0 +1,140 @@
+# ABSTRACT: API Client for Graylog2 analysis server
+
+=head1 NAME
+
+Net::Graylog::API
+
+=head1 SYNOPSIS
+
+  use Net::Graylog::API ;
+ 
+  my $api = Net::Graylog::API->new( url => 'http://graylog.server:12900' ) ;
+
+
+=head1 DESCRIPTION
+ 
+
+=head1 AUTHOR
+
+ kevin mulholland
+
+=head1 VERSIONS
+
+v0.1  2014/03/24, initial work
+
+=head1 Notes
+
+
+=cut
+
+package Net::Graylog::API;
+
+use 5.16.0;
+use strict;
+use warnings;
+use POSIX qw(strftime);
+use Data::Printer;
+use JSON;
+
+use POSIX qw(strftime);
+
+# need to use Mouse, Moo, Moose are not compatible with it
+use Mouse;
+with 'Web::API';
+
+use namespace::clean;
+
+# -----------------------------------------------------------------------------
+
+=head1 Public Functions
+
+=over 4
+
+=cut
+
+=item new
+
+Create a new instance of the api connection
+
+    my $log = Net::Graylog::Client->new( url=> 'http://graylog2_server:12900') ;
+
+B<Parameters>
+  url the url of the graylog server API, of the form http://graylog2_server:12900
+
+=cut
+
+has url      => ( is => 'ro', required => 1 );
+has user     => ( is => 'ro', required => 1 );
+has password => ( is => 'ro', required => 1 );
+
+# -----------------------------------------------------------------------------
+
+# all the API commands we think are appropriate
+
+has 'commands' => (
+    is      => 'rw',
+    default => sub {
+        {
+            # remember ALWAYS remove leading '/' from path
+            count_total => { path => 'count/total' },
+
+            search_absolute => {
+                path      => 'search/universal/absolute',
+                mandatory => [qw(query from to )],
+
+                # optional parameters
+                # => [qw(limit offset filter sort)].
+            },
+
+            search_keyword => {
+                path      => 'search/universal/keyword',
+                mandatory => [qw(query keyword )],
+
+                # optional parameters
+                # => [qw(limit offset filter sort)].
+            },
+
+            sources => { path => 'sources', mandatory => [qw(range)] },
+
+            streams => { path => 'streams' },
+
+            system_notifications => { path => 'system/notifications' },
+
+            users => { path => 'users' },
+
+        };
+    },
+    init_arg => undef,
+);
+
+# -----------------------------------------------------------------------------
+# if we use Moo or Moose then this method will fail as it matches the
+# variable 'commands'
+sub commands {
+    my ($self) = @_;
+    return $self->commands;
+}
+
+# -----------------------------------------------------------------------------
+sub BUILD {
+    my ($self) = @_;
+
+    $self->user_agent( __PACKAGE__ . ' ' . $Net::Graylog::API::VERSION );
+    $self->api_key( $self->password );    # this is the password for basic auth
+    $self->auth_type('basic');            # missing in Web::API docs
+    $self->base_url( $self->url );
+    $self->content_type('application/json');
+    $self->extension('');                 # there is no extension to the urls
+    $self->default_method('GET');         # default
+
+    # $self->debug(1);
+
+    return $self;
+}
+
+=back
+
+=cut
+
+# -----------------------------------------------------------------------------
+1;

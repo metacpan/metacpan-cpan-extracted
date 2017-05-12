@@ -1,0 +1,287 @@
+NAME
+    Net::Google - simple OOP-ish interface to the Google SOAP API
+
+SYNOPSIS
+     use Net::Google;
+     use constant LOCAL_GOOGLE_KEY => "********************************";
+
+     my $google = Net::Google->new(key=>LOCAL_GOOGLE_KEY);
+     my $search = $google->search();
+
+     # Search interface
+
+     $search->query(qw(aaron straup cope));
+     $search->lr(qw(en fr));
+     $search->starts_at(5);
+     $search->max_results(15);
+
+     map { print $_->title()."\n"; } @{$search->results()};
+
+     # or...
+
+     foreach my $r (@{$search->response()}) {
+       print "Search time :".$r->searchTime()."\n";
+
+       # returns an array ref of Result objects
+       # the same as the $search->results() method
+       map { print $_->URL()."\n"; } @{$r->resultElements()};
+     }
+
+     # Spelling interface
+
+     print $google->spelling(phrase=>"muntreal qwebec")->suggest(),"\n";
+
+     # Cache interface
+
+     my $cache = $google->cache(url=>"http://search.cpan.org/recent");
+     print $cache->get();
+
+DESCRIPTION
+    Provides a simple OOP-ish interface to the Google SOAP API
+
+ENCODING
+    According to the Google API docs :
+
+     "In order to support searching documents in multiple languages 
+     and character encodings the Google Web APIs perform all requests 
+     and responses in the UTF-8 encoding. The parameters <ie> and 
+     <oe> are required in client requests but their values are ignored.
+     Clients should encode all request data in UTF-8 and should expect
+     results to be in UTF-8."
+
+    (This package takes care of setting both parameters in requests.)
+
+PACKAGE METHODS
+  __PACKAGE__->new(\%args)
+    Valid arguments are :
+
+    *   key
+
+        *string*. A Google API key.
+
+    *   http_proxy
+
+        *url*. A URL for proxy-ing HTTP requests.
+
+    *   debug
+
+        Valid options are:
+
+        *   *boolean*
+
+            If true prints debugging information returned by SOAP::Lite to
+            STDERR
+
+        *   *coderef*.
+
+            Your own subroutine for munging the debugging information
+            returned by SOAP::Lite.
+
+    Note that prior to version 0.60, arguments were not passed by reference.
+    Versions >= 0.60 are backwards compatible.
+
+    Returns an object. Woot!
+
+OBJECT METHODS
+  $obj->key($string)
+    Get/set the Google API key for this object.
+
+  $obj->http_proxy($url)
+    Get/set the HTTP proxy for this object.
+
+    Returns a string.
+
+  $obj->search(\%args)
+    Valid arguments are :
+
+    *   key
+
+        *string*. A Google API key.
+
+        If none is provided then the key passed to the parent *Net::Google*
+        object will be used.
+
+    *   starts_at
+
+        *int*. First result number to display.
+
+        Default is 0.
+
+    *   max_results
+
+        *int*. Number of results to return.
+
+        Default is 10.
+
+    *   lr
+
+        *string* or *array reference*. Language restrictions.
+
+    *   safe
+
+        *boolean*.
+
+    *   filter
+
+        *boolean*.
+
+    *   http_proxy
+
+        *url*. A URL for proxy-ing HTTP requests.
+
+    *   debug
+
+        Valid options are:
+
+        *   *boolean*
+
+            If true prints debugging information returned by SOAP::Lite to
+            STDERR
+
+        *   *coderef*
+
+            Your own subroutine for munging the debugging information
+            returned by SOAP::Lite.
+
+    Note that prior to version 0.60, arguments were not passed by reference.
+    Versions >= 0.60 are backwards compatible.
+
+    Returns a *Net::Google::Search* object. Woot!
+
+    Returns undef if there was an error.
+
+  $obj->spelling(\%args)
+    Valid arguments are:
+
+    *   key
+
+        *string*. A Google API key.
+
+        If none is provided then the key passed to the parent *Net::Google*
+        object will be used.
+
+    *   phrase
+
+        *string* or *array reference*.
+
+    *   http_proxy
+
+        *url*. A URL for proxy-ing HTTP requests.
+
+    *   debug
+
+        *   boolean
+
+            Prints debugging information returned by SOAP::Lite to STDERR
+
+        *   coderef
+
+            Your own subroutine for munging the debugging information
+            returned by SOAP::Lite.
+
+        If no option is defined then the debug argument passed to the parent
+        *Net::Google* object will be used.
+
+    Note that prior to version 0.60, arguments were not passed by reference.
+    Versions >= 0.60 are backwards compatible.
+
+    Returns a *Net::Google::Spelling* object. Woot!
+
+    Returns undef if there was an error.
+
+  $obj->cache(\%args)
+    Valid arguments are :
+
+    *   key
+
+        String. Google API key.
+
+        If none is provided then the key passed to the parent *Net::Google*
+        object will be used.
+
+    *   url
+
+        *string*
+
+    *   http_proxy
+
+        *url*. A URL for proxy-ing HTTP requests.
+
+    *   debug
+
+        Valid options are:
+
+        *   *boolean*
+
+            If true, prints debugging information returned by SOAP::Lite to
+            STDERR
+
+        *   *coderef*
+
+            Your own subroutine for munging the debugging information
+            returned by SOAP::Lite.
+
+        If no option is defined then the debug argument passed to the parent
+        *Net::Google* object will be used.
+
+    Note that prior to version 0.60, arguments were not passed by reference.
+    Versions >= 0.60 are backwards compatible.
+
+    Returns a *Net::Google::Cache* object. Woot!
+
+    Returns undef if there was an error.
+
+  $obj->queries_exhausted()
+    Returns true or false depending on whether or not the current in-memory
+    session has exhausted the Google API 1000 query limit.
+
+VERSION
+    1.0
+
+DATE
+    $Date: 2005/03/26 20:49:03 $
+
+AUTHOR
+    Aaron Straup Cope
+
+CONTRIBUTORS
+    Marc Hedlund <marc@precipice.org>
+
+SEE ALSO
+    http://www.google.com/apis
+
+    Net::Google::Search
+
+    Net::Google::Spelling
+
+    Net::Google::Cache
+
+    Net::Google::Response
+
+    Net::Google::Service
+
+    http://aaronland.info/weblog/archive/4231
+
+TO DO
+    *   Tickle the tests so that they will pass on systems without
+        Test::More.
+
+    *   Add tests for filters.
+
+    *   Add some sort of functionality for managing multiple keys. Sort of
+        like what is describe here :
+
+        http://aaronland.net/weblog/archive/4204
+
+        This will probably happen around the time Hell freezes over so if
+        you think you can do it faster, go nuts.
+
+BUGS
+    Please report all bugs via http://rt.cpan.org
+
+LICENSE
+    Copyright (c) 2002-2005, Aaron Straup Cope. All Rights Reserved.
+
+    This is free software, you may use it and distribute it under the same
+    terms as Perl itself.
+

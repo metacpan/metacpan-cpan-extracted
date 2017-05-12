@@ -1,0 +1,81 @@
+Net-Sharktools version 0.009
+============================
+
+C<Net::Sharktools> is an adaptation of the Python interface provided with the
+C<Sharktools> package which is a "small set of  tools that allow use of
+Wireshark's deep packet inspection capabilities in interpreted programming
+languages."
+
+Sharktools can be obtained obtained Armen Babikyan's web site at
+L<http://www.mit.edu/~armenb/sharktools/>. To use C<Net::Sharktools>, you must
+first build the Sharktools C library successfully as described in the README
+for the Sharktools package (the version of this file bundled with Sharktools
+v.0.1.5 is included in this module for your reference).
+
+C<Net::Sharktools> is almost a direct translation of the Python interface
+C<pyshark> included with Sharktools.
+
+INSTALLATION
+
+Sharktools is closely coupled with the internals of Wireshark. Before
+attempting to build C<Net::Sharktools>, you should ensure that you are able to
+build and run the Python module C<pyshark> distributed with Sharktools. Note
+that you should use C<python2> to test C<pyshark>.
+
+The build process for Sharktools requires you to install Wireshark and also
+have the full source tree for Wireshark accessible. You will need the same to
+build Sharktools as well.
+
+Currently, the C<Makefile.PL> for C<Net::Sharktools> makes no attempt to
+automatically deduce the locations for your WireShark and Sharktools
+distributions. You will need to edit C<Makefile.PL> to point both the compiler
+and linker to the correct locations.
+
+You can do that by specifying command line options when you generate the
+Makefile:
+
+    perl Makefile.PL --PREFIX=/install/path \
+        --sharktools-src /home/user/sharktools-0.1.5/src \
+        --wireshark-src /home/user/shark/wireshark-1.4.3 \
+        [ --lib-path /additional/library/paths ] \
+        [ --inc-path /additional/include/paths ]
+
+--inc-path and --lib-path are array valued options, so they can be specified
+multiple times on the command line.
+
+You should definitely specify those (in addition to the Sharktools and
+Wireshark source directories) if you encounter any difficulties related to
+locating glib headers and/or glib and Wireshark libraries on your system.
+
+I have use Devel::CheckLib to perform a sanity check prior to WriteMakefile
+using a select few headers and libraries. If the checks fail, no Makefile will
+be generated. Ensure that you have the requisite libraries installed, make sure
+you have built Sharktools according to its instructions prior to attempting to
+build Net::Sharktools, and specified the correct paths when invoking
+Makefile.PL.
+
+Once a Makefile is generated, you can do:
+
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+- Wireshark
+- Sharktools
+- Glib 2.0
+
+AUTHOR
+
+A. Sinan Unur <nanis@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2011 The Perl Review, LLC.
+
+This module is free software. You can redistribute it and/or modify it under
+the terms of GNU General Public License, version 2. See
+http://www.gnu.org/licenses/gpl-2.0.html

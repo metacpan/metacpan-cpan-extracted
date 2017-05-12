@@ -1,0 +1,6 @@
+Revision history for Perl extension NTS::Utils.
+
+0.01  Fri Feb 28 18:33:19 2003
+	- original version; created by h2xs 1.22 with options
+		h2xs -X -n NTS::Utils
+

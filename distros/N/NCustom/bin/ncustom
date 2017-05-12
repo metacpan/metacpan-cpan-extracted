@@ -1,0 +1,454 @@
+#!/usr/bin/perl
+
+# ///////////////////////////////////////////////////////////////////
+#<< PP: POD Start       <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+# \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+=head1 NAME
+
+ncustom - command line interface to NCustom
+
+=head1 SYNOPSIS
+
+ncustom [{-i|--initialise}]
+
+        [{-n|--ncustom} ncustom_filename/url ]
+
+        [{-u|--undo}    transaction_dirname  ]
+
+        [{-b|--blat}]
+
+        [{-c|--config}  name=value  ]
+
+
+Options:
+        --initialise    purges the transaction archive
+
+        --undo          undoes the transactions specified
+
+        --ncustom       fetch and execute the ncustom scripts specified
+
+        --blat          blat personal configuration with global configuration
+
+        --config        edit settings in personal configuration file
+
+
+
+=head1 ABSTRACT
+
+A command line interface to the NCustom module.
+Currently invocation of only the simplest NCustom methods is supported, namely initialising the transaction archive, undoing transactions, and executing new NCustom scripts. 
+
+=head1 DESCRIPTION
+
+=head1 OPTIONS
+
+=over 8
+
+=cut
+
+# ///////////////////////////////////////////////////////////////////
+#<< CC: Code            <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+# \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+#====================================================================
+# Inline testing 
+# setup only
+
+=begin testing
+
+use Carp;
+use File::Compare ;
+use File::Copy ;
+use File::Path ;
+use File::Spec ;
+use vars qw($ncustom $output $input);
+
+# test setup
+$output = File::Spec->rel2abs("./t/embedded-bin-ncustom.o");
+$input  = File::Spec->rel2abs("./t/embedded-bin-ncustom.i");
+ok( -d $input)
+  || diag("TEST:<test setup> requires the data input directory be present");
+
+-d $input || die; # as if we have that wrong we could clobber allsorts
+rmtree  $output;
+mkpath  $output;
+$ENV{HOME} = $output ; # lets be non-intrusive
+
+#system("ncustom") && $ncustom = "ncustom";
+if(-f "./bin/ncustom"){$ncustom = "./bin/ncustom" }
+ok($ncustom ne "")
+  || diag("TEST:<test setup> must be able to find ncustom program");
+
+
+sub test_reset {
+  #Test::Inline doesnt execute test blocks in order
+  #it does all basic tests first (seemingly in declaration order),
+  #then examples tests (seemingly in declaration order).
+  #hmmm.. test_rest can erase "why test failed" data
+  rmtree  $output;
+  mkpath  $output;
+  system("cp -r $input/subject/* $output");
+}
+
+sub output {
+  $_STDOUT_ && diag($_STDOUT_);
+  $_STDERR_ && diag($_STDERR_);
+}
+
+output();
+
+=end testing
+
+=cut
+
+#====================================================================
+
+use 5.008;
+use strict qw(vars);
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+
+# get opts
+my ($initialise, @ncustom, @undo, $blat, %config );
+my $rc = GetOptions (
+  "initialise" => \$initialise,
+  "ncustom=s"  => \@ncustom,
+  "undo=s"     => \@undo,
+  "blat"       => \$blat,
+  "config=s"   => \%config);
+unless($rc){pod2usage(2) }
+
+# handle opts
+my $run = 0 ;
+my $ok  = 1;
+if($initialise   ){ initialise() or $ok = 0; $run = 1; }
+if($#ncustom >= 0){ ncustom()    or $ok = 0; $run = 1; }
+if($#undo    >= 0){ undo()       or $ok = 0; $run = 1; }
+if($blat         ){ blat()       or $ok = 0; $run = 1; }
+if(%config       ){ config()     or $ok = 0; $run = 1; }
+
+# finished
+unless($run){pod2usage(2)}
+exit (! $ok); #perl 1 == TRUE, shell 0 == TRUE
+
+#====================================================================
+# general
+
+=begin testing
+
+test_reset();
+my ($rc, $o);
+$rc = system("$ncustom -junk > /dev/null 2>&1");
+ok($rc != 0)
+  || diag("TEST:<general> returns error for invalid arguments");
+$o = `$ncustom 2>&1 `;
+like( $o, qr/Usage:/m)
+  || diag("TEST:<general> displays useage for invalid arguments");
+$rc = system("$ncustom > /dev/null 2>&1");
+ok($rc != 0)
+  || diag("TEST:<general> returns error for no arguments");
+$o = `$ncustom 2>&1 `;
+like( $o, qr/Usage:/m)
+  || diag("TEST:<general> displays useage for no arguments");
+
+output();
+
+=end testing
+
+=cut
+
+#====================================================================
+# initialise
+
+=item B<-i, --initialise>
+
+Initialises (purges) the transaction archive. The transactions will no longer be able to be undone.
+
+
+=begin testing
+
+test_reset();
+
+ok(! -d "$output/.ncustom/save/all")
+  || diag("TEST:<test setup> require void setup, ie no ~/.ncustom...");
+
+my ($rc);
+$rc = system("$ncustom -i");
+ok($rc == 0)
+  || diag("TEST:<initialise> returns success for void initialisation");
+
+# NB: we just called $ncustom, which used NCustom, so ~/.ncustom now exists
+ok(-d "$output/.ncustom/save/all")
+  || diag("TEST:<test setup> require ~/.ncustom...");
+system("mkdir -p $output/.ncustom/save/dummydir");
+system("echo content > $output/.ncustom/save/dummydir/dummyfile");
+ok(-f "$output/.ncustom/save/dummydir/dummyfile")
+  || diag("TEST:<test setup> require dummy transaction");
+$rc = system("$ncustom -i");
+ok($rc == 0)
+  || diag("TEST:<initialise> returns success for initialisation");
+ok(! -f "$output/.ncustom/save/dummydir/dummyfile")
+  || diag("TEST:<initialise> purges transactions");
+output();
+
+=end testing
+
+=cut
+
+#====================================================================
+sub initialise {
+  require NCustom;
+  return NCustom::initialise();
+}
+
+#====================================================================
+# undo
+
+=item B<-u,--undo>
+
+=begin example
+
+test_reset();
+my $eg ;
+
+=end example
+
+=for example begin
+
+  $eg = <<'  end_eg';
+  
+  grep -c incomplete ~/file1 >> ~/log 
+
+  ncustom -n test5.ncus ;
+  grep -c incomplete ~/file1 >> ~/log
+
+  ncustom -n test6.ncus ;
+  grep -c incomplete ~/file1 >> ~/log
+
+  ncustom -u test6.ncus ;
+  grep -c incomplete ~/file1 >> ~/log 
+  
+  cat ~/log # 7,3,1,3
+
+  end_eg
+
+=for example end
+
+Undo is followed by one or more transaction names, transaction names are sub-directoy names within the transaction archive directory. 
+There is a sub-directoy "all" that contains the entire journal of transactions since the last initialise.
+Transaction names are created when using the NCusom module in NCustom scripts.
+They are generaly named after the basename of the NCustom script, and generaly the is a one to one relationship, but the NCustom script may override these behaviours.
+
+=for example_testing
+copy("$input/file1", "$output");
+copy("$input/test5.ncus", "$output");
+copy("$input/test6.ncus", "$output");
+chmod 750, "$output/test5.ncus", "$output/test6.ncus";  
+#
+$eg =~ s/ncustom/$ncustom/g ; # or insert ncustom in path ?
+system("$eg");
+#
+open(LOG, "< $output/log");
+my @lines = <LOG>;
+close(LOG);
+my @expected_lines = ("7\n", "3\n", "1\n", "3\n");
+#
+eq_array( \@lines, \@expected_lines )
+  || diag("TEST:<undo> undoes transactions");
+#
+output();
+
+=cut
+
+#====================================================================
+sub undo {
+  my $dirs = join("\n", @undo);
+  require NCustom;
+  return NCustom::undo_files($dirs);
+}
+
+#====================================================================
+# ncustom
+
+=item B<-n,--ncustom>
+
+=begin example
+
+test_reset();
+my $eg ;
+
+=end example
+
+=for example begin
+
+  $eg = <<'  end_eg';
+  
+  # default_dir contains test2.ncus 
+  # default_url contains test3.ncus 
+  
+  ncustom -n ~/dir20/test1.ncus -n test2.ncus ;
+  ncustom -n test3.ncus -n http://install/install/NCustom/test4.ncus ;
+  
+  end_eg
+
+=for example end
+
+Ncustom is followed by one or more filenames, either local filenames or URLs.
+The filenames are assumed to be NCustom scripts, are fetched, and executed.
+If the filename is not an NCustom script, then transactions will not be journalled, and will not be able to be undone.
+An unqualified NCustom script name will be searched for in the loaction(s) specified in NCustom::Config.
+Settings in NCustom::Config may be overridden using ~/.ncustom/NCustom/MyConfig.pm.
+
+=for example_testing
+mkpath  "$output/dir20";
+copy("$input/test1.ncus", "$output/dir20");
+copy("$input/test2.ncus", "$output");
+chmod 0750, "$output/dir20/test1.ncus", "$output/test2.ncus";  
+#now tell me again, how we are getting test3.ncus to url ?
+#should make tests conditional on config - but hey test config test chicken egg
+#
+$eg =~ s/ncustom/$ncustom/g ; # or insert ncustom in path ?
+system("$eg");
+#
+open(STUBSLOG, "< $output/stubs.log");
+my @stubslog = <STUBSLOG>;
+close(STUBSLOG);
+#
+ok( grep( /ncustom test1.ncus/, @stubslog) > 0 )
+  || diag("TEST:<ncustom> fetches and executes file from given dir");
+ok( grep( /ncustom test2.ncus/, @stubslog) > 0 )
+  || diag("TEST:<ncustom> fetches and executes file from default dir");
+ok( grep( /ncustom test3.ncus/, @stubslog) > 0 )
+  || diag("TEST:<ncustom> fetches and executes file from default url");
+ok( grep( /ncustom test4.ncus/, @stubslog) > 0 )
+  || diag("TEST:<ncustom> fetches and executes file from given url");
+#
+output();
+
+=cut
+
+#====================================================================
+sub ncustom {
+  my $files = join("\n", @ncustom);
+  require NCustom;
+  return NCustom::ncustom($files);
+}
+
+#====================================================================
+# blat
+
+=item B<-b, --blat>
+
+Blat overwrites the personal configuration profile with the global conf iguration profile. The personal configuration profile is "~/.ncustom/NCustom/MyConfig.pm".
+
+
+=begin testing
+
+my $rc = system("$ncustom -b");
+ok($rc == 0)
+  || diag("TEST:<blat_myconfig> returns success for void initialisation");
+is(compare("$output/.ncustom/NCustom/MyConfig.pm", "$input/Global.pm"), 0)
+  || diag("TEST:<blat_myconfig> MyConfig.pm replaced by Config.pm");
+output();
+
+=end testing
+
+=cut
+
+
+#====================================================================
+sub blat {
+  require NCustom;
+  return NCustom::blat_myconfig();
+}
+
+#====================================================================
+# config
+
+=item B<-c,--config>
+
+=begin example
+
+test_reset();
+my $eg2 ;
+
+=end example
+
+=for example begin
+
+  $eg2 = <<'  end_eg';
+
+  # modify existing values
+  ncustom -c src_fqdn=\"install.baneharbinger.com\" ;
+  ncustom -c test_url1=\"install.baneharbinger.com/index.html\" ;
+
+  # add new values
+  ncustom -c my_number=5 -c my_text=\"blah\" ;
+
+  # add new complex (eg hash) values
+  ncustom -c my_hosts='{ mew => "192.168.0.10", pikachu => "192.168.0.20" }' ;
+
+  end_eg
+
+=for example end
+
+Config is followed by name vaule pairs. If there is a corresponding name in the personal configuration file, then its vaule shall be updated. If there is no corresponding name then the name value shall be added to the end of the file.  If there is no file it shall be created. The personal configuration file is "~/.ncustom/NCustom/MyConfig.pm".  
+
+If some configuration vlaues are defined in terms of other configuration values, then the order may be important.
+
+The current implementation is simplistic and erroneous in all but the simplest cases (eg the pre-existing name value assignment is only a one liner).
+
+=for example_testing
+#
+$eg2 =~ s/ncustom/$ncustom/g ; # or insert ncustom in path ?
+system("$eg2");
+#
+my @lines ;
+open(MYCFG, "< $output/.ncustom/NCustom/MyConfig.pm");
+@lines = <MYCFG>;
+close(MYCFG);
+ok( grep( /src_fqdn.*"install.baneharbinger.com"/, @lines) > 0 )
+  || diag("TEST:<config_edit> can edit(add) src_fqdn");
+ok( grep( /test_url1.*"install.baneharbinger.com\/index.html"/, @lines) > 0 )
+  || diag("TEST:<config_edit> can edit(add) test_url1");
+#
+output();
+
+=cut
+
+#====================================================================
+sub config {
+  require NCustom;
+  return NCustom::config_edit(%config);
+}
+
+#====================================================================
+
+# ///////////////////////////////////////////////////////////////////
+#<< PP: POD end		<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+# \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+=back
+
+=head1 SEE ALSO
+
+NCustom
+NCustom::Config
+ncustom
+
+http://baneharbinger.com/NCustom
+
+=head1 AUTHOR
+
+Bane Harbinger, E<lt>bane@baneharbinger.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2003 by Bane Harbinger
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+

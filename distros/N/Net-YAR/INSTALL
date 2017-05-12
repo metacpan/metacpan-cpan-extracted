@@ -1,0 +1,18 @@
+Install Procedure:
+
+To build:
+------------------------------------
+perl Makefile.PL
+make
+
+To test:
+------------------------------------
+make test
+
+To test client connections you could also run:
+------------------------------------
+TEST_NET_YAR_CONNECT=user/pass/host make test
+
+To install (as root):
+------------------------------------
+make install

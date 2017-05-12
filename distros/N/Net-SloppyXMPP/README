@@ -1,0 +1,425 @@
+NAME
+    Net::SloppyXMPP - A rather sloppy XMPP client implementation
+
+DESCRIPTION
+    In an attempt to drastically reduce external dependencies, this module
+    doesn't use a lot of them. Therefore, it doesn't do a whole lot via
+    proper standards.
+
+    The XML parser is a combination of a mess of regex hacks and some
+    processing through XML::Simple.
+
+    XML namespaces aren't really used properly.
+
+    There's no guarantee that this will work for anything.
+
+    Reinventing the wheel? You betcha. Unfortunately, neither Net::XMPP nor
+    AnyEvent::XMPP would work in the fashion I needed. It doesn't help that
+    Net::XMPP is unmaintained (or so it seems) these days. AnyEvent::XMPP
+    requires LibIDN, which has been too big of an issue to deal with where
+    I'm needing to implement an XMPP client.
+
+    SASL and TLS are both available, but not required. Just disable one or
+    both of them if you don't want or can't use them. SASL features are
+    provided via Authen::SASL and are only used if "usesasl" is true (it's
+    true unless you specifically set it to false). TLS features are provided
+    via Net::SSLeay and are only used if "usetls" is true (it's true unless
+    you specifically set it to false).
+
+    One of the goals of this implementation is to ensure that it will work
+    on as many platforms as possible, especially those that can't use a few
+    of the dependencies of the other XMPP modules available for Perl.
+
+WHO SHOULD USE THIS?
+    Probably no one. It's sloppy. It's untested. It's incomplete. But if the
+    description above didn't scare you away, you might be a good candidate.
+    You'll probably need to track down some bugs in it before you can really
+    use it. If you're using Openfire 3.6.2 as an XMPP server, you might have
+    good luck in using it straight away. If you're using Google's XMPP
+    service, you won't have any luck (yet).
+
+    If you really want to use this module, but it doesn't work for you,
+    please post your troubles on the CPAN bug tracker. If you need support
+    for additional XMPP servers, I'd love to add such support. To do that, I
+    might need access to the XMPP server with a test username/password. I'd
+    really rather not setup loads of XMPP servers for testing purposes.
+    Providing me with a test account will help the process of adding
+    additional XMPP servers.
+
+    But like I said, maybe no one should be using this module. Other
+    seemingly good XMPP modules are available on CPAN. Some examples:
+    Net::XMPP and AnyEvent::XMPP.
+
+EXAMPLE
+      use Net::SloppyXMPP;
+
+      my $xmpp = Net::SloppyXMPP->new(
+        debug => 1,
+        tickdelay => 1,
+        #usetls => 0, # set this if you don't want TLS
+        #usesasl => 0, # set this if you don't want SASL
+        domain => 'yourdomain.xyz',
+        username => 'yourusername',
+        password => 'yourpassword',
+        resource => 'yourresourcename', # or don't set and a default will be supplied
+        initialpresence => 'available', # available, busy, dnd, defaults to available
+        initialstatus => 'I am alive!', # defaults to ''
+      );
+      die qq(XMPP didn't create.\n) unless $xmpp;
+
+      my $xmppConnect = $xmpp->connect;
+      die qq(XMPP didn't connect.\n) unless $xmppConnect;
+
+      # if you want SloppyXMPP to control your main loop
+      $xmpp->run(\&tick);
+      sub tick
+      {
+        # do stuff in here that needs to happen each loop (use as a main loop)
+        my $xmpp = shift; # if you need it, same object as the $xmpp you already used
+        print "This runs every $xmpp->{tickdelay} seconds.\n";
+      }
+
+      # or if you want to run your own loop, do this:
+      sub loop
+      {
+        print "Doing something useful here...\n";
+
+        # ... more useful code ...
+
+        $xmpp->tick; # runs the SloppyXMPP loop once
+
+        # ... and more useful code ...
+      }
+      loop();
+
+DOCUMENTATION
+    Not complete, just like the module itself. Feel free to read the source
+    code to figure out how to use it. A bit of help is sprinkled about the
+    page below.
+
+    WARNING: Most of these functions are internal functions not to be used
+    outside of the module. If you use them yourself, I don't want to get bug
+    reports about it. If it just says ""Used internally"" but doesn't say
+    you can't use it, you're probably okay to use it. If it says something
+    like ""Don't use it yourself"", don't use it. You're likely to upset the
+    delicate balance of nature and might cause mass casualties, famine,
+    hurricanes, tornadoes, floods, or drought. You've been warned.
+
+    If you've avoided my warning above and are using a function that you
+    really have no business using, let me know (see my contact info at the
+    end of this doc) so I can create a more proper interface into whatever
+    it is that you're doing improperly.
+
+  new
+      my $xmpp = Net::SloppyXMPP->new(
+        someoption => "somevalue",       # see below
+        anotheroption => "anothervalue", #   for the options
+      );
+
+    usetls
+        Specify the use of TLS. TLS requires Net::SSLeay, but it'll only be
+        loaded if this is true. Your XMPP server must support TLS. Default
+        true if not set.
+
+    usesasl
+        Specify the use of SASL for authentication. SASL requires
+        Authen::SASL and MIME::Base64, but they'll only be loaded if this is
+        true. Your XMPP server must support SASL. Default true if not set.
+
+    usesrv
+        Specify the use of SRV records to determine XMPP host/port based on
+        domain. This requires Megagram::ResolveSRV, but it'll only be loaded
+        if this is true. If your domain doesn't use
+        "_xmpp-client._tcp.yourdomain.com" SRV records, this will fail.
+        Default true if not set.
+
+    domain
+        The domain. If your XMPP user is "fred@yourdomain.xyz", the domain
+        is "yourdomain.xyz". *A required variable*.
+
+    host
+        The IP/domain of the XMPP server to connect to. You can use either
+        "yourdomain.xyz" or "yourdomain.xyz:5222" formats. If you're using
+        SRV records (see "usesrv" above), don't set this. *A required
+        variable*, but only if "usesrv" is false.
+
+    port
+        The port of the XMPP server to connect to. If you've set the port
+        number along with the host (see "host" above), don't set this. If
+        you're using SRV records (see "usesrv" above), don't set this. *A
+        required variable*, but only if "usesrv" is false.
+
+    username
+        The username. If your XMPP user is "fred@yourdomain.xyz", the
+        username is "fred". *A required variable*.
+
+    password
+        The password. This probably doesn't need introduction. *A required
+        variable*.
+
+    resource
+        The resource. If you don't know what this is, you probably don't
+        need to set it. In the JID "fred@yourdomain.xyz/Office", the
+        resource is "Office". A default is provided if you don't set it.
+
+    debug
+        The debug level. The higher the number, the more debug messages
+        you'll get. If you don't want to get *any* messages, set it to -1.
+        Default is 0.
+
+    tickdelay
+        The delay in the "run" loop, in floating-point seconds. If you don't
+        use "run" (see below), you won't need this. Default is 0.5 seconds.
+
+    initialpresence
+        Your initial presence on the XMPP server upon connection. Set it to
+        any valid presence value (such as "available", "dnd", "away"). Can
+        be changed at any time while connected via the "presence" function
+        (see below). Default is "available".
+
+    initialstatus
+        Your initial status message on the XMPP server upon connection. Set
+        it to some string. Can be changed at any time while connected via
+        the "presence" function (see below). Default is empty string.
+
+    socket_write_len
+        If you don't know what this is for, don't mess with it. Sets the
+        amount to write to the socket at one time. Default is 4096.
+
+    socket_read_len
+        If you don't know what this is for, don't mess with it. Sets the
+        amount to read from the socket at one time. Default is 4096.
+
+  debug
+    Used internally. Don't use it yourself. Debug messages are written to
+    this function. Debug messages only appear (via STDERR) when
+    "($debugvalue <= $xmpp-{debug})".
+
+  connect
+    Initiates the XMPP connection.
+
+  sendhandshake
+    Used internally. Don't use it yourself. Sends the XMPP handshake.
+
+  check_socket_connected
+    Used internally. Checks to see if the socket is currently connected.
+    Doesn't test to see if the socket is TLS or not.
+
+  disconnect
+    Disconnects the socket. Also shuts down the TLS connection cleanly.
+
+  ready
+    Used internally. Determines if the XMPP socket is ready to be used. It's
+    ready after authentication was successful, the resource is bound, and
+    the session has started.
+
+  use_tls
+    Used internally. Determines whether the socket is TLS'ified or not.
+
+  setup_tls
+    Used internally. Don't use it yourself. Sets up the TLS connection over
+    the socket.
+
+  run
+      $xmpp->run(\&mycallbackfunction);
+      # .. or ..
+      $xmpp->run(sub {
+        my $xmpp = shift;
+        print "This is my callback function!\n";
+      });
+
+    Starts the SloppyXMPP-controlled main loop. If you don't want SloppyXMPP
+    to control your loop, use "tick" instead. Runs "tick" once, runs your
+    callback function, and then sleeps for "$xmpp->{tickdelay}" seconds.
+
+  tick
+    Runs the SloppyXMPP loop once. Don't use this if you're using "run".
+
+  write
+    Used internally. Don't use it yourself. Writes raw data to the socket
+    write queue.
+
+  read
+    Used internally. Don't use it yourself. Reads data from the read queue.
+    Used by the event manager.
+
+  unread
+    Used internally. Don't use it yourself. If "read" was used, but the data
+    can't be used, put it back in the queue.
+
+  readable
+    Used internally. Don't use it yourself. Determines if there is any data
+    to be read in the read queue.
+
+  socket_write
+    Used internally. Don't use it yourself. Writes data from the socket
+    write queue to the socket.
+
+  socket_read
+    Used internally. Don't use it yourself. Reads data from the socket and
+    pushes it into the socket read buffer to be processed by
+    "process_read_buffer".
+
+  process_read_buffer
+    Used internally. Don't use it yourself. Processes data in the socket
+    read buffer and pushes it into the read queue to be processed by
+    "process_read_queue".
+
+  process_read_queue
+    Used internally. Don't use it yourself. Handles events, errors, etc.
+
+  authenticated
+    Used internally. Returns true if this connection has been authenticated
+    successfully.
+
+  authenticate
+    Used internally. Don't use it yourself. Begins the authentication
+    process.
+
+  saslchallenge
+    Used internally. Don't use it yourself. Handles the SASL challenge.
+
+  saslsuccess
+    Used internally. Don't use it yourself. Handles SASL challenge success.
+
+  bindresource
+    Used internally. Don't use it yourself. Binds this connection to a
+    specific resource.
+
+  startsession
+    Used internally. Don't use it yourself. Starts the XMPP session.
+
+  presence
+      $xmpp->presence('available', 'Playing music and eating chips.');
+
+    Sets your presence and status.
+
+  messagecomposingstarted
+    Used internally. Don't use it yourself. Event handler uses this function
+    to handle the "messagecomposingstarted" event. This happens when some
+    user starts typing a message to you. Not all XMPP clients send this
+    notification.
+
+  messagecomposingpaused
+    Used internally. Don't use it yourself. Event handler uses this function
+    to handle the "messagecomposingpaused" event. This happens when the
+    person typing the message stopped typing (but didn't erase their
+    message, send the message, or close the message window).
+
+  messagecomposingended
+    Used internally. Don't use it yourself. Event handler uses this function
+    to handle the "messagecomposingended" event. This happens when the
+    person typing the message quit their message (erased their message, sent
+    the message, or closed the message window).
+
+  messagereceived
+    Used internally. Don't use it yourself. Event handler uses this function
+    to handle the "messagereceived" event. This happens when a message is
+    received from another XMPP user.
+
+  roster
+      my $roster = $xmpp->roster;
+
+    Returns an arrayref that contains the roster.
+
+  rosterfetch
+    Used internally. Don't use it yourself. Requests the roster from the
+    XMPP server. Only has to happen once at connection time.
+
+  rosterreceived
+    Used internally. Don't use it yourself. The roster arrived from the XMPP
+    server. This populates the proper variable that contains the roster
+    arrayref. Access this data via "roster" (see above).
+
+TODO
+    *   Event callbacks. There aren't any. They are planned and should be
+        reasonably easy to setup. This module isn't all that useful without
+        them.
+
+    *   Test on more XMPP servers. This has only been tested on the Openfire
+        XMPP Server, version 3.6.2.
+
+    *   Make sure it works on Google's XMPP servers. Right now, it doesn't.
+
+BUGS
+    Find bugs? Of course you will. Report them on the CPAN bug tracker.
+    Don't email me directly about bugs. If it works for you, I'd love to
+    hear about it. Find my email address in my CPAN profile ("wilsond").
+    Make sure to put ""Net::SloppyXMPP Feedback"" in the subject line or I
+    might ignore it completely. Please don't send HTML email if at all
+    possible. I greatly prefer plaintext email.
+
+    If you have a patch for this module, post it on the CPAN bug tracker. If
+    it fits the goal of this module, I'll be very happy to merge it in. If
+    it doesn't fit the goal, I won't, even if you think it makes sense.
+
+    *   This is version 0.1 of a module called SloppyXMPP. If you don't hit
+        any bugs, you might want to try your luck at the lottery today.
+
+    *   Doesn't work with Google's XMPP server right now. I plan to make it
+        work.
+
+COPYRIGHT/LICENSE
+    Copyright 2009 Megagram. You can use any one of these licenses: Perl
+    Artistic, GPL (version >= 2), BSD.
+
+  Perl Artistic License
+    Read it at <http://dev.perl.org/licenses/artistic.html>. This is the
+    license we prefer.
+
+  GNU General Public License (GPL) Version 2
+      This program is free software; you can redistribute it and/or
+      modify it under the terms of the GNU General Public License
+      as published by the Free Software Foundation; either version 2
+      of the License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program.  If not, see http://www.gnu.org/licenses/
+
+    See the full license at <http://www.gnu.org/licenses/>.
+
+  GNU General Public License (GPL) Version 3
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation, either version 3 of the License, or
+      (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program.  If not, see http://www.gnu.org/licenses/
+
+    See the full license at <http://www.gnu.org/licenses/>.
+
+  BSD License
+      Copyright (c) 2009 Megagram.
+      All rights reserved.
+
+      Redistribution and use in source and binary forms, with or without modification, are permitted
+      provided that the following conditions are met:
+
+          * Redistributions of source code must retain the above copyright notice, this list of conditions
+          and the following disclaimer.
+          * Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+          and the following disclaimer in the documentation and/or other materials provided with the
+          distribution.
+          * Neither the name of Megagram nor the names of its contributors may be used to endorse
+          or promote products derived from this software without specific prior written permission.
+
+      THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+      WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+      PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+      ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+      LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+      INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+      OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+      IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

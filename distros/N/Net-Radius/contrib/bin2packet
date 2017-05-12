@@ -1,0 +1,320 @@
+#!/usr/bin/perl
+
+no utf8;
+use strict;
+use warnings;
+
+our $VERSION = do { sprintf "%0.03f", (q$Revision: 93 $ =~ /\d+/g) };
+
+use IO::File;
+use IO::Prompt;
+use Pod::Usage;
+use Data::Dumper;
+use Getopt::Long;
+use Net::Radius::Packet;
+use Net::Radius::Dictionary;
+
+use UNIVERSAL qw/isa/;
+
+my %opt;
+GetOptions(\%opt, qw/
+	   dictionary=s@
+	   authenticator=s
+	   code=s
+	   description=s
+	   dont-embed-dict
+	   dump
+	   help
+	   identifier=i
+	   noprompt
+	   output=s
+	   secret=s
+	   slots=i
+	   /);
+
+my %data = ();
+
+pod2usage(verbose => 2, exitval => 0) 
+    if $opt{help};
+
+pod2usage(verbose => 1, exitval => 1,
+	  message => 'Missing dictionary specification')
+    unless $opt{dictionary} and @{$opt{dictionary}};
+
+pod2usage(verbose => 1, exitval => 1,
+	  message => 'Missing output file specification')
+    unless $opt{output};
+
+my $output = $opt{output} . ".p";
+
+pod2usage(verbose => 1, exitval => 1,
+	  message => "Won't clobber existing output file $output")
+    if -f $output;
+
+# Format general warnings
+local $SIG{__WARN__} = sub { warn "bin2packet: ", @_ };
+
+# Further processing will need us to read and parse a dictioary file -
+# Let's do this.
+
+my $d = new Net::Radius::Dictionary;
+
+foreach (@{$opt{dictionary}})
+{
+    die "Dictionary $_ unreadable: ", ($!||'Check permissions'), "\n" 
+	unless -r $_;
+    $d->readfile($_);
+}
+
+$data{dictionary} = $opt{'dont-embed-dict'} ? undef : $d;
+$data{opts} = \%opt; 
+
+# Attempt to parse the packet, to auto-guess information and provide a
+# packet dump
+
+my $file = shift @ARGV;
+
+pod2usage(verbose => 1, exitval => 1,
+	  message => "Must specify a packet dump file to process")
+    unless $file;
+
+my $fh = new IO::File $file, "r";
+
+pod2usage(verbose => 1, exitval => 1,
+	  message => "Failed to read dump file $file: $!")
+    unless $fh;
+
+my $packet;
+
+do {
+    local $/ = undef;
+    $data{packet} = <$fh>;
+};
+
+close $fh;
+
+warn length($data{packet}), " octets read from file $file\n";
+
+my $p;
+
+eval 
+{ 
+    local $SIG{__WARN__} = sub {warn "bin2packet (during decode): ", @_ }; 
+    $p = new Net::Radius::Packet $d, $data{packet}; 
+};
+
+warn "(Decoding error) $_\n" for split(/\n/, $@);
+
+if ($p and isa($p, 'Net::Radius::Packet'))
+{
+    warn "Packet decoded\n";
+
+    unless (defined $opt{authenticator})
+    {
+	my $auth = $p->authenticator;
+	if (length($auth) == 16)
+	{
+	    warn "authenticator taken from the packet\n";
+	    $opt{authenticator} = $auth;
+	}
+	else
+	{
+	    warn "authenticator looks weird - ignoring\n";
+	}
+    }
+
+    unless (defined $opt{identifier})
+    {
+	my $id = $p->identifier;
+	warn "identifier set to $id from the packet\n";
+	$opt{identifier} = $id;
+    }
+
+    unless (defined $opt{slots})
+    {
+	my $id = $p->attr_slots;
+	warn "slots set to $id from the packet\n";
+	$opt{slots} = $id;
+    }
+}
+else
+{
+    warn "Failed to decode packet\n";
+}
+
+if ($opt{dump})
+{
+    print $p->dump;
+    exit 0;
+}
+
+# Add default (unknown) values and build the base structure where the
+# information is to be stored
+
+foreach (qw/secret authenticator identifier description slots/)
+{
+    next if defined $opt{$_};
+    unless ($opt{noprompt})
+    {
+	$opt{$_} = prompt("Enter packet $_ (if known): ", -tty,
+			  ($_ eq 'secret' ? (-echo => '*') : ()));
+	# Simplify the stored object by removing the reference to
+	# IO::Prompt::ReturnVal
+	$opt{$_} = "$opt{$_}";
+    }
+    $opt{$_} = undef unless defined $opt{$_};
+}
+continue
+{
+    $data{$_} = $opt{$_};
+}
+
+die "Failed to create output file $output: $!\n"
+    unless $fh = new IO::File $output, "w+";
+
+die "Failed storing contents of file $output: $!\n"
+    unless print $fh "#!/usr/bin/perl\n\n" .
+    "no utf8;\n\n# Net::Radius test input\n" . '# Made with $Id: bin2packet 93 2009-09-23 14:38:39Z lem $' 
+    . "\n\n" . Data::Dumper->Dump([\%data]);
+
+die "Failed to close output file $output: $!\n"
+    unless close $fh;
+
+warn "Test input $output succesfully created\n";
+exit 0;
+
+__END__
+
+=head1 NAME
+
+bin2packet - Convert a RADIUS packet payload into a useable test point
+
+=head1 SYNOPSIS
+
+    bin2packet --dictionary dictfile [--authenticator auth-string]
+    [--code code] [--description packet-desc] [--dont-embed-dict]
+    [--dump] [--help] [--identifier id] [--noprompt] [--output file]
+    [--secret secret] [--slots number] dump-file...
+
+=head1 DESCRIPTION
+
+This tool is used to convert the payload of a RADIUS packet stored in
+B<dump-file> into a "test input". This test input can then be used by
+the test harness included in the Net::Radius::Packet(3) distribution
+as part of the regression tests.
+
+The following options are supported (Options can be shortened - See
+Getopt::Long(3)):
+
+=over
+
+=item B<--dictionary dictfile...>
+
+Specifies one or more dictionary files to use for decoding the
+supplied packet. Those dictionaries may be required for derived tests
+to work properly (ie, match the expected attribute names and/or
+values).
+
+A serialized dictionary is appended to the test input.
+
+This argument is mandatory.
+
+=item B<--authenticator auth-string>
+
+Specifies the RADIUS packet authenticator. If the provided
+packet dump can be decoded by Net::Radius::Packet, this value will be
+supplied automatically. If the guess is wrong, you must use this
+option to provide a correct value.
+
+=item B<--code code>
+
+The RADIUS packet code. If the provided packet dump can be decoded by
+Net::Radius::Packet, this value will be supplied automatically. If the
+guess is wrong, you must use this option to provide a correct value.
+
+=item B<--description packet-desc>
+
+A (hopefully) informative description of this packet. The most
+relevant information items that should be present is the name/version
+of the device that generated the packet, as well as a concise
+reference to where this packet belongs (ie, simple user
+authentication).
+
+=item B<--dont-embed-dict>
+
+Causes the resulting test input to not embed the
+Net::Radius::Dictionary(3) object used to contain the dictionary
+data. This can be used when only dictionaries found in the
+distribution are used to process the packet.
+
+=item B<--dump>
+
+Dump the decoded packet and exit without further actions.
+
+=item B<--help>
+
+Shows this documentation, then exits.
+
+=item B<--identifier id>
+
+Specifies the RADIUS packet identifier, if known. If the provided
+packet dump can be decoded by Net::Radius::Packet, this value will be
+supplied automatically. If the guess is wrong, you must use this
+option to provide a correct value.
+
+=item B<--noprompt>
+
+All the packet information items available in the command-line will be
+prompted if not specified. This option causes non-supplied options to
+remain undefined, which may prevent certain tests over the packet.
+
+=item B<--output file>
+
+Name of the file where this test input will be stored. The B<.p>
+extension will be automatically added.
+
+=item B<--secret secret>
+
+Specify the RADIUS secret to use for decoding the packet. If not
+specified, it will be prompted depending on the B<--noprompt> option.
+
+=item B<--slots number>
+
+Specify the number of attribute slots (ie, attribute-value tuples)
+stored in the RADIUS packet. If the provided packet dump can be
+decoded by Net::Radius::Packet, this value will be supplied
+automatically. If the guess is wrong, you must use this option to
+provide a correct value.
+
+=back
+
+=head1 HISTORY
+
+    $Log$
+    Revision 1.2  2007/01/14 18:51:42  lem
+    When Dump()ing and eval()ing back the packet, IO::Prompt::ReturnVal
+    may not be within reach of the test script (different machine,
+    etc). Make sure we drop this magic when we generate the test input.
+
+    Revision 1.1  2007/01/09 17:55:10  lem
+    First release of bin2packet added
+
+
+=head1 LICENSE AND WARRANTY
+
+This code and all accompanying software comes with NO WARRANTY. You
+use it at your own risk.
+
+This code and all accompanying software can be used freely under the
+same terms as Perl version 5.8.6 itself.
+
+=head1 AUTHOR
+
+Luis E. Muñoz E<lt>luismunoz@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+perl(1), Getopt::Long(3), Net::Radius::Packet(3),
+Net::Radius::Dictionary(3).
+
+=cut

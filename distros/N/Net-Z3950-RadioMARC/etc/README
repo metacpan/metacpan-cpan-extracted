@@ -1,0 +1,10 @@
+$Id: README,v 1.1 2004/11/21 21:27:24 mike Exp $
+
+"simple.pl" is a very simple radioactive-MARC test script,
+demonstrating some of the capabilities of the RadioMARC module.
+
+"sample.marc" is a file containing a single MARC records, obtained by
+searching for "mineral" at indexdata.com:210/gils, and downloading the
+first record in the result set.  We can use this record in example
+test-scripts against the Index Data public server.
+

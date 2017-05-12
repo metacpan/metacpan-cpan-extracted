@@ -1,0 +1,41 @@
+{
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/Number-Rangify/",
+      "repository" : "http://github.com/hanekomu/Number-Rangify",
+      "bugtracker" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Number-Rangify"
+   },
+   "generated_by" : "Dist::Zilla version 1.100711",
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "version" : "1.100860",
+   "name" : "Number-Rangify",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "license" : "perl",
+   "build_requires" : {},
+   "provides" : {
+      "Number::Rangify" : {
+         "version" : "1.100860",
+         "file" : "lib/Number/Rangify.pm"
+      }
+   },
+   "requires" : {
+      "Scalar::Util" : "0",
+      "English" : "0",
+      "Exporter" : "0",
+      "Carp" : "0",
+      "perl" : "5.008",
+      "Test::More" : "0.88",
+      "Set::IntRange" : "0",
+      "File::Find" : "0",
+      "File::Temp" : "0"
+   },
+   "abstract" : "Optimize a list of values into ranges",
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   }
+}
+

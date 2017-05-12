@@ -1,0 +1,14 @@
+DocumentRoot $apache_root/html
+
+DirectoryIndex index.html
+
+PerlFreshRestart On
+PerlWarn On
+PerlTaintCheck On
+
+Alias /perl/ "$apache_root/perl/"
+<Location /perl>
+SetHandler perl-script
+PerlHandler Apache::Registry
+Options +ExecCGI
+</Location>

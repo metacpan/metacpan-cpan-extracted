@@ -1,0 +1,9 @@
+{: NES 1.0 ('lucky_01.pl') :}
+<html>
+  <head>
+    <title>Lucky</title>
+  </head>
+  <body>
+    The lucky number is: <b>{: $ number :}</b>
+  </body>
+</html>

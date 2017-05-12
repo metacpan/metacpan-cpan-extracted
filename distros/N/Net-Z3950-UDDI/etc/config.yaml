@@ -1,0 +1,79 @@
+# Configuration file for z2uddi (Z59.50-to-YAML gateway).
+#
+# For documentation, use: perldoc ../lib/Net/Z3950/UDDI/Config.pm
+
+zparams:
+  implementation-id: 169
+  implementation-name: z2uddi [$(package)]
+  implementation-version: $(version)
+
+params:
+  soap-fault: die
+	# This value may be "die", "warn" or "ignore"; die is the default
+  soap-debug: method parameters fault
+
+databases:
+  hibye:
+    type: soap
+    description: Ultra-simple service that just says hello and goodbye
+    proxy: http://services.soaplite.com/hibye.cgi
+    uri: http://www.soaplite.com/Demo
+    indexmap:
+      bib-1:
+        1: hi
+        2: bye
+    params:
+      soap-debug: method
+    zeerex: hibye.zeerex
+
+  hibye-debug:
+    inherit-from: hibye
+    description: Same as "hibye", but emits verbose logging
+    params:
+      soap-debug: all
+
+  temperatures:
+    type: soap
+    description: Converts between Fahrenheit and Celsius
+    proxy: http://services.soaplite.com/temper.cgi
+    uri: http://www.soaplite.com/Temperatures
+    indexmap:
+      bib-1:
+        1: f2c
+        2: c2f
+
+  stock:
+    type: soap
+    description: Retrieves stock quotes by ticker symbol
+    service: http://www.swanandmokashi.com/HomePage/WebServices/StockQuotes.asmx?WSDLj
+    indexmap:
+      bib-1:
+        1: GetStockQuotes
+
+  geoss:
+    type: uddi
+    endpoint: http://uddi.csiss.gmu.edu:6060/soar/uddi/inquire
+    qualifiers: approximateMatch,caseInsensitiveMatch
+    record-attrs: xmlns:ns0='urn:uddi-org:api_v3'
+	# Specifying the namespace in record-attrs like this is a
+	# hack: the software should see to it that all necessary
+	# namespaces are propagated down from the XML response
+	# document into the XML fragment that is the record.
+
+  gbif:
+    type: uddi
+    endpoint: http://registry.gbif.net/uddi/inquiry
+    option-uddi-version: 2
+    record-attrs: xmlns='urn:uddi-org:api_v2'
+
+  gbif-debug:
+    inherit-from: gbif
+    log: request,response
+
+  ms:
+    type: uddi
+    endpoint: http://uddi.microsoft.com/inquire
+    option-http-version: 1.0
+    option-uddi-version: 2
+    record-attrs: xmlns='urn:uddi-org:api_v2'
+

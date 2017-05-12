@@ -1,0 +1,106 @@
+{
+   "abstract" : "Send passive checks to Nagios locally and remotely.",
+   "author" : [
+      "Douglas Christopher Wilson <doug@somethingdoug.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-NSCA-Client",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Data::Section" : 0,
+            "MIME::Base64" : "2.00",
+            "Test::Class" : "0.33",
+            "Test::Command" : "0.08",
+            "Test::Fatal" : 0,
+            "Test::More" : "0.94",
+            "Test::Requires" : "0.02",
+            "Test::TCP" : "1.03"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Const::Fast" : 0,
+            "Convert::Binary::C" : "0.74",
+            "Data::Rand::Obscure" : "0.020",
+            "Data::Validate::Domain" : "0.02",
+            "Digest::CRC" : 0,
+            "English" : 0,
+            "IO::Socket::INET" : 0,
+            "List::MoreUtils" : 0,
+            "Moose" : "0.89",
+            "MooseX::Clone" : 0,
+            "MooseX::StrictConstructor" : "0.08",
+            "MooseX::Types" : "0.08",
+            "MooseX::Types::PortNumber" : 0,
+            "namespace::clean" : "0.04",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Net::NSCA::Client" : {
+         "file" : "lib/Net/NSCA/Client.pm",
+         "version" : "0.009002"
+      },
+      "Net::NSCA::Client::Connection" : {
+         "file" : "lib/Net/NSCA/Client/Connection.pm",
+         "version" : "0.009002"
+      },
+      "Net::NSCA::Client::Connection::TLS" : {
+         "file" : "lib/Net/NSCA/Client/Connection/TLS.pm",
+         "version" : "0.009002"
+      },
+      "Net::NSCA::Client::DataPacket" : {
+         "file" : "lib/Net/NSCA/Client/DataPacket.pm",
+         "version" : "0.009002"
+      },
+      "Net::NSCA::Client::InitialPacket" : {
+         "file" : "lib/Net/NSCA/Client/InitialPacket.pm",
+         "version" : "0.009002"
+      },
+      "Net::NSCA::Client::Library" : {
+         "file" : "lib/Net/NSCA/Client/Library.pm",
+         "version" : "0.009002"
+      },
+      "Net::NSCA::Client::ServerConfig" : {
+         "file" : "lib/Net/NSCA/Client/ServerConfig.pm",
+         "version" : "0.009002"
+      },
+      "Net::NSCA::Client::Utils" : {
+         "file" : "lib/Net/NSCA/Client/Utils.pm",
+         "version" : "0.009002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/dougwilson/perl5-net-nsca-client/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/dougwilson/perl5-net-nsca-client.git"
+      }
+   },
+   "version" : "0.009002"
+}

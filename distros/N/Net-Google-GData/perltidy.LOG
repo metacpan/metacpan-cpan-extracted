@@ -1,0 +1,19 @@
+perltidy version 20121207 log file on a linux system, OLD_PERL_VERSION=5.010001
+Found Configuration File >>> .perltidyrc 
+Configuration and command line parameters for this run:
+--maximum-line-length=132 --indent-columns=2 --notabs --nocheck-syntax --continuation-indentation=2 --noline-up-parentheses --closing-token-indentation=0 --noindent-closing-brace --nooutdent-long-quotes --nooutdent-labels --nooutdent-keywords --paren-tightness=0 --square-bracket-tightness=1 --brace-tightness=0 --block-brace-tightness=0 --nospace-terminal-semicolon --space-for-semicolon --add-semicolons --delete-semicolons --add-whitespace --delete-old-whitespace --want-right-space=! --nospace-after-keyword=chomp --nospace-keyword-paren --nospace-function-paren --trim-qw --indent-block-comments --nooutdent-long-comments --minimum-space-to-comment=2 --hanging-side-comments --closing-side-comments --closing-side-comment-interval=18 --closing-side-comment-maximum-text=15 --closing-side-comments-balanced --closing-side-comment-prefix=## end --closing-side-comment-list=if elsif else unless for foreach sub while until : try catch BEGIN END --closing-side-comment-else-flag=0 --static-block-comments --static-block-comment-prefix=## --nooutdent-static-block-comments --static-side-comments --static-side-comment-prefix=## --format-skipping --format-skipping-begin=## BEGIN UNTIDY --format-skipping-end=## END UNTIDY --cuddled-else --noopening-brace-on-new-line --noopening-sub-brace-on-new-line --noopening-anonymous-sub-brace-on-new-line --nobrace-left-and-indent --opening-brace-always-on-right --opening-token-right --vertical-tightness=1 --vertical-tightness-closing=0 --block-brace-vertical-tightness=0 --block-brace-vertical-tightness-list=if elsif else unless for foreach sub while until : try catch --stack-opening-tokens --stack-closing-tokens --delete-old-newlines --add-newlines --break-before-all-operators --comma-arrow-breakpoints=2 --break-at-old-logical-breakpoints --break-at-old-keyword-breakpoints --break-at-old-ternary-breakpoints --keep-interior-semicolons --blanks-before-comments --blanks-before-subs --blanks-before-blocks --long-block-line-count=0 --maximum-consecutive-blank-lines=1 --keep-old-blank-lines=1
+To find error messages search for 'WARNING' with your editor
+Indentation will be with 2 spaces
+Line 1 implies starting-indentation-level = 0
+The nesting depths in the table below are at the start of the lines.
+The indicated output line numbers are not always exact.
+ci = levels of continuation indentation; bk = 1 if in BLOCK, 0 if not.
+
+in:out indent c b  nesting   code + messages; (messages begin with >>>)
+lines  levels i k            (code begins with one '.' per indent level)
+------  ----- - - --------   -------------------------------------------
+L10:10   i0:0 0 1            >>>Starting __DATA__ section
+No indentation disagreement seen
+
+No lines exceeded 132 characters
+  Maximum output line length was 63 at line 6

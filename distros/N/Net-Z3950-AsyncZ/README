@@ -1,0 +1,92 @@
+Net/Z3950/AsyncZ version 0.04
+=======================
+
+Net::Z3950::AsyncZ adds a layer of asynchronous support for the Z3950
+module through the use of multiple forked processes. This approach
+enables it to handle queries to a large numbers of servers in a
+single session. The speed of Net::Z3950::AsyncZ depends on the
+responsiveness of the servers; if the servers are responsive,
+Net::Z3950::AsyncZ can be very fast. 
+
+Users should also find that it provides a useful front end to
+Net::Z3950, by providing convenient facilities to process and format
+Z39.50 records. 
+
+See the DESCRIPTION section of AsyncZ.html/AsyncZ.pod.
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+      MARC::Record =>1.15,
+      MARC::Base => 0.0, 	******* INCLUDED WITH THIS DISTRIBUTION********
+      Net::Z3950 => 0.31,	
+      Event => 0.86,
+      IPC::ShareLite => 0.09	      
+
+     MARC::Charset   **** not required but needed if you want unicode support****     
+
+MARC::BASE is from MARC,a small package which I include with this distribution,
+because (as far as I can tell) it is not a CPAN module: see  MARC/MARC.tar.  
+
+ISSUES
+
+Net::Z3950::AsyncZ uses shared memory and so there is always a chance that
+some shared memory and semaphores will not be freed.  This is rare
+with AsyncZ. I have found IPC::ShareLite extremely reliable, and
+AsyncZ has features built into it which work to prevent unfreed
+memory problems. Nevertheless, I've provided ipc.pl 
+to free unfreed memory and semaphores, should they occur.
+You run it as:
+
+	perl ipc.pl <userid>
+
+where userid is the userid of the user who created the shared
+memory.  Where this is not yourself you'll have to su to root
+in order to free the resources of a user other than yourself.
+If you don't have admnistrative privileges, you'll most likely
+have to go to your server administrator.
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+One of the test suite scripts requires an open Internet connection.
+
+You can also run the demo scripts in the script directory using:
+
+		perl <script.pl>
+
+There have been some problems installing Net::Z3950 on Redhat 8. Users
+on the Z3950 mailing list have provided the following fixes:
+
+ [1] In Makefile.PL and yazwrap/Makefile.PL  set
+  
+   	    'DEFINE'    => '-D_GNU_SOURCE',
+
+ [2] I found that this was all I needed.  But it has been suggested
+that the following change also be made in yazwrap/Makefile.PL:    
+
+ 	  'CCFLAGS'   => $defaultCCFLAGS . ' -Wall',
+   to
+
+	 'CCFLAGS'   => $defaultCCFLAGS . ' -Wall -D_GNU_SOURCE',
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Myron Turner
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,77 @@
+---
+abstract: 'RPC client for Neovim'
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  Exporter: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Net::EmptyPort: '0'
+  Test::Class::Moose: '0'
+  Test::Class::Moose::Load: '0'
+  Test::Class::Moose::Runner: '0'
+  Test::More: '0'
+  lib: '0'
+  parent: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Neovim-RPC
+provides:
+  Neovim::RPC:
+    file: lib/Neovim/RPC.pm
+    version: v0.2.0
+  Neovim::RPC::API:
+    file: lib/Neovim/RPC/API.pm
+    version: v0.2.0
+  Neovim::RPC::API::AutoDiscover:
+    file: lib/Neovim/RPC/API/AutoDiscover.pm
+    version: v0.2.0
+  Neovim::RPC::API::Command:
+    file: lib/Neovim/RPC/API/Command.pm
+    version: v0.2.0
+  Neovim::RPC::Plugin:
+    file: lib/Neovim/RPC/Plugin.pm
+    version: v0.2.0
+  Neovim::RPC::Plugin::FileToPackageName:
+    file: lib/Neovim/RPC/Plugin/FileToPackageName.pm
+    version: v0.2.0
+  Neovim::RPC::Plugin::LoadPlugin:
+    file: lib/Neovim/RPC/Plugin/LoadPlugin.pm
+    version: v0.2.0
+requires:
+  Class::Load: '0'
+  IO::Socket::INET: '0'
+  List::AllUtils: '0'
+  List::Util: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  MooseX::Role::Loggable: '0'
+  MsgPack::Decoder: '0'
+  MsgPack::Encoder: '0'
+  MsgPack::RPC: '0'
+  MsgPack::Type::Ext: '0'
+  Promises: '0'
+  Try::Tiny: '0'
+  experimental: '0'
+  perl: v5.20.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/Neovim-RPC/issues
+  homepage: https://github.com/yanick/Neovim-RPC
+  repository: https://github.com/yanick/Neovim-RPC.git
+version: 0.2.0
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+  - 'Yanick Champoux <yanick@qwerty-PC>'

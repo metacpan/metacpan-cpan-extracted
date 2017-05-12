@@ -1,0 +1,16 @@
+Changes
+lib/Net/IPP/IPP.pm
+lib/Net/IPP/IPPAttribute.pm
+lib/Net/IPP/IPPRequest.pm
+lib/Net/IPP/IPPUtil.pm
+lib/Net/IPP/IPPMethods.pm
+Makefile.PL
+MANIFEST
+README
+t/codec.t
+t/transform.t
+sample/ipptest.pl
+sample/printerAttributes.pl
+sample/showJobs.pl
+sample/monitorState.pl
+sample/monitorJobs.pl

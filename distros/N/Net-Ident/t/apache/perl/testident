@@ -1,0 +1,28 @@
+BEGIN {
+    require './inc';
+}
+
+use Net::Ident qw(:apache lookupFromInAddr);
+use Apache;
+use Apache::Constants qw(:common);
+use Socket;
+
+my $r = Apache->request;
+
+$r->content_type("text/plain");
+$r->send_http_header;
+
+my $c = $r->connection;
+my $localaddr = $c->local_addr;
+my $remoteaddr = $c->remote_addr;
+my($localport, $localip) = sockaddr_in($localaddr);
+my($remoteport, $remoteip) = sockaddr_in($remoteaddr);
+
+$r->print("You are connecting from ", inet_ntoa($remoteip), ":$remoteport to ",
+    inet_ntoa($localip), ":$localport\n");
+my $user = lookupFromInAddr($localaddr, $remoteaddr, 5) || "LOOKUP FAILED!\n";
+$r->print("function lookupFromInAddr says you are: $user\n");
+$user = $c->ident_lookup(5) || "LOOKUP FAILED!\n";
+$r->print("ident_lookup method says you are: $user\n");
+
+OK;

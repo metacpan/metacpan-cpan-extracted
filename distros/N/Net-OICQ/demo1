@@ -1,0 +1,118 @@
+#!/usr/bin/env perl
+# $Id: demo1,v 1.4 2007/06/11 04:47:17 tans Exp $
+
+# Copyright (c) 2006, 2007 Shufeng Tan.  All rights reserved.
+# 
+# This package is free software and is provided "as is" without express
+# or implied warranty.  It may be used, redistributed and/or modified
+# under the terms of the Perl Artistic License (see
+# http://www.perl.com/perl/misc/Artistic.html)
+
+# This is a simple example of using Net::OICQ modules.
+
+use strict;
+use Net::OICQ;
+use Net::OICQ::ServerEvent;
+use Net::OICQ::ClientEvent;
+use Term::ReadKey;
+
+my $uid = shift;
+die "Usage: $0 <QQ_id>\n" unless $uid =~ /^[1-9]\d{2,9}$/;
+
+my $oicq = new Net::OICQ;
+
+$oicq->{Debug} = 9;
+
+my $pw = $ENV{OICQ_PW};
+if ($pw) {
+	print "OICQ_PW found in env.\n";
+} else {
+	print "Password: ";
+	local $SIG{__DIE__} = { ReadMode 0 };
+	ReadMode 2;
+	$pw = <STDIN>;
+	ReadMode 0;
+	$pw =~ s/[^ -~]*$//;
+	print "\n";
+	die "Password is empty.\n" unless $pw;
+}
+
+my $login =  $oicq->login($uid, $pw, 'Invisible');
+die "Login failed.\n" unless $login;
+
+$oicq->get_online_friends;
+$oicq->get_user_info($uid);
+$oicq->get_friends_list;
+$oicq->send_msg($uid, "Hello " . localtime);
+
+my $socket = $oicq->{Socket};
+my $timeout = 30;
+my $timeout_msg = "timeout\n";
+local $SIG{ALRM} = sub { die $timeout_msg };
+alarm($timeout);
+my $count = @{$oicq->{EventQueue}};
+print "$count commands sent.  Program will timeout in $timeout\"\n";
+while($count) {
+	my $reply;
+	eval {$socket->recv($reply, 49152)};
+	last unless $reply;
+	foreach my $data ($oicq->get_data($reply)) {
+		my $event = new Net::OICQ::ServerEvent($data, $oicq);
+		unless(defined $event) {
+			print "No event created for:\n", unpack("H*", $data), "\n";
+			next;
+		}
+		next unless $event->{Data};
+		$event->parse;
+		my $cmd = $event->cmd;
+		if ($cmd eq 'get_online_friends') {
+			my $online_friends = $event->{OnlineFriends};
+			if (@$online_friends) {
+				print "Online friends:\n";
+			} else {
+				print "No friend online.\n";
+			}
+			foreach my $fid (@$online_friends) {
+				my $info = $oicq->{Info}->{$fid};
+				print "$fid $info->{Mode} $info->{Addr}\n";
+			}
+			$count--;
+		} elsif ($cmd eq 'get_user_info') {
+			my $info = $oicq->{MyInfo};
+			for(my $i = 0; $i < @Net::OICQ::InfoHeader; $i++) {
+				print $Net::OICQ::InfoHeader[$i], ": ", $info->[$i], "\n";
+			}
+			$count--;
+		} elsif ($cmd eq 'get_friends_list') {
+			print '-'x25, " Friends List ", '-'x25, "\n";
+			my $info = $oicq->{Info};
+			my $idx = 1;
+			foreach my $id (sort {$a <=> $b} keys %$info) {
+				my $hashref = $info->{$id};
+				next unless defined $hashref->{Friend};
+				printf "%2d.  %9d  %3s  %3s  %4s : %-16s %s\n",
+					$idx++, $id,
+					defined($hashref->{Sex}) ? $hashref->{Sex} : '',
+					defined($hashref->{Age}) ? $hashref->{Age} : '',
+					defined($hashref->{Face}) ? $hashref->{Face} : '',
+					defined($hashref->{Nickname}) ? $hashref->{Nickname} : '',
+					defined($hashref->{Unknown}) ? $hashref->{Unknown} : '';
+  			}
+			print '='x65, "\n";
+			$count--;
+		} elsif ($cmd eq 'send_msg') {
+			$count--;
+		} elsif ($cmd eq 'recv_msg') {
+			print "Message from $event->{SrcId}:\n$event->{Mesg}\n";
+		}
+	}
+}
+
+print "=========== Event Queue =========\n";
+foreach my $e (@{$oicq->{EventQueue}}) {
+	print $e->dump;
+}
+
+$oicq->logout;
+
+__END__

@@ -1,0 +1,1 @@
+#CRON: host  corona    0 0,4,8-20,22 * * 1,6 -1 -2 job7

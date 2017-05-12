@@ -1,0 +1,58 @@
+{: NES 1.0 ('{: * cfg_plugin_top_dir :}/captcha.pl','none') :}
+<html>
+  <head>
+    <meta http-equiv="content-type" 
+    content="text/html;charset=utf-8" />
+    <title>Nes Tutorial</title>
+  </head>
+  <body>
+  <form method="POST" name="test1" action="">
+    {: # captcha parameters:
+        name,type,digits,noise,size,sig,spc,expire,attempts 
+    :}
+    {: & captcha (test1,ascii,4,2,2,,,3m,5/1) 
+     <table width="100%" border="0">
+      <tr>
+        <td align="right">User:</td>
+        <td width="20%">
+        <input name="user" type="text"  
+        size="12" value="{: * q_user :}"/>
+        </td>
+        <td width="60%" rowspan="3">
+<pre>
+nes_captcha_plugin_test1_error_last : {: * nes_captcha_plugin_test1_error_last :} 
+nes_captcha_plugin_test1_error_fatal: {: * nes_captcha_plugin_test1_error_fatal :} 
+nes_captcha_plugin_test1_attempts   : {: * nes_captcha_plugin_test1_attempts :}
+nes_captcha_plugin_test1_is_ok      : {: * nes_captcha_plugin_test1_is_ok :}
+</pre>        
+        </td>
+      </tr>
+      <tr>
+        <td align="right">Password:</td>
+        <td width="20%">
+        <input name="password" type="password"  
+        size="12" value="{: * q_password :}"/>        
+        </td>
+      </tr>
+      <tr>
+        <td align="right">{: & captcha_code :}</td>
+        <td width="20%">
+        Security code:<br>
+        <input type="text" name="test1" size="8" /> 
+        {: ~ *nes_captcha_plugin_test1_error_fatal 
+           <blink>&#10038;</blink> <br> 
+           <small>Incorrect code</small>
+        :}        
+        </td>
+      </tr>
+      <tr>
+        <td align="right"></td>
+        <td width="20%">
+        <input name="send" type="submit" value="Send" />        
+        </td>
+      </tr>      
+     </table>
+    :}
+  </form> 
+  </body>
+</html>

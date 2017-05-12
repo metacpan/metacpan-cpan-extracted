@@ -1,0 +1,38 @@
+Net::SMS::WorldText - Send SMS messages via the World-Text HTTP API
+===================================================================
+
+SYNOPSIS
+
+use Net::SMS::WorldText;
+my $wt = Net::SMS::WorldText->new(user => "testuser", pass => "123456");
+$wt->send(
+    message => "A thing of beauty is a joy forever",
+    dest => "+15550123456",
+);
+
+INSTALLATION
+
+You can download the latest code from http://github.com/seveas/Net-SMS-WorldText
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Dennis Kaarsemaker
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <http://www.gnu.org/licenses/>.

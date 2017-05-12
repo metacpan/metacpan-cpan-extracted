@@ -1,0 +1,78 @@
+{
+   "abstract" : "Open Shortest Path First layer object",
+   "author" : [
+      "GomoR <gomor_at_cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Frame-Layer-OSPF",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::Frame" : "0",
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Frame::Layer::OSPF" : {
+         "file" : "lib/Net/Frame/Layer/OSPF.pm",
+         "version" : "1.01"
+      },
+      "Net::Frame::Layer::OSPF::DatabaseDesc" : {
+         "file" : "lib/Net/Frame/Layer/OSPF/DatabaseDesc.pm"
+      },
+      "Net::Frame::Layer::OSPF::Hello" : {
+         "file" : "lib/Net/Frame/Layer/OSPF/Hello.pm"
+      },
+      "Net::Frame::Layer::OSPF::LinkStateAck" : {
+         "file" : "lib/Net/Frame/Layer/OSPF/LinkStateAck.pm"
+      },
+      "Net::Frame::Layer::OSPF::LinkStateRequest" : {
+         "file" : "lib/Net/Frame/Layer/OSPF/LinkStateRequest.pm"
+      },
+      "Net::Frame::Layer::OSPF::LinkStateUpdate" : {
+         "file" : "lib/Net/Frame/Layer/OSPF/LinkStateUpdate.pm"
+      },
+      "Net::Frame::Layer::OSPF::Lls" : {
+         "file" : "lib/Net/Frame/Layer/OSPF/Lls.pm"
+      },
+      "Net::Frame::Layer::OSPF::Lsa" : {
+         "file" : "lib/Net/Frame/Layer/OSPF/Lsa.pm"
+      },
+      "Net::Frame::Layer::OSPF::Lsa::Network" : {
+         "file" : "lib/Net/Frame/Layer/OSPF/Lsa/Network.pm"
+      },
+      "Net::Frame::Layer::OSPF::Lsa::Opaque" : {
+         "file" : "lib/Net/Frame/Layer/OSPF/Lsa/Opaque.pm"
+      },
+      "Net::Frame::Layer::OSPF::Lsa::Router" : {
+         "file" : "lib/Net/Frame/Layer/OSPF/Lsa/Router.pm"
+      },
+      "Net::Frame::Layer::OSPF::Lsa::Router::Link" : {
+         "file" : "lib/Net/Frame/Layer/OSPF/Lsa/Router/Link.pm"
+      },
+      "Net::Frame::Layer::OSPF::Lsa::SummaryIp" : {
+         "file" : "lib/Net/Frame/Layer/OSPF/Lsa/SummaryIp.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license.php"
+      ]
+   },
+   "version" : "1.01"
+}

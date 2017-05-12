@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use IO::Async::Stream 0.57;
+use IO::Async::Loop;
+use Net::Async::Webservice::S3;
+
+GetOptions(
+   'meta|m=s' => \my %META,
+) or exit 1;
+
+my $loop = IO::Async::Loop->new;
+
+my %config = do {
+   open my $rc, "<", ".s3rc" or die "Cannot read .s3rc config - $!\n";
+   map { chomp; m/^(.*?)=(.*)$/ } <$rc>;
+};
+
+my ( $bucket, $prefix ) = split m{/}, ( $config{bucket} || die "Could not find 'bucket' in config\n" ), 2;
+my $s3 = Net::Async::Webservice::S3->new(
+   access_key => ( $config{access_key} || die "Could not find 'access_key' in config\n" ),
+   secret_key => ( $config{secret_key} || die "Could not find 'secret_key' in config\n" ),
+   ssl        => $config{ssl},
+   bucket     => $bucket,
+   prefix     => $prefix,
+);
+
+$loop->add( $s3 );
+
+$loop->add( my $stdin = IO::Async::Stream->new_for_stdin( on_read => sub { 0 } ) );
+
+# TODO: IO::Async::Stream 0.58's ->is_read_eof isn't set until after the read
+# handler returns, so we need to capture $eof here to detect the EOF condition
+
+my $eof;
+$s3->put_object(
+   key => shift @ARGV,
+   gen_parts => sub {
+      return if $eof;
+      return $stdin->read_exactly( 100*1024*1024 ) # 100 MiB
+         ->on_done( sub { ( undef, $eof ) = @_; } );
+   },
+   meta => \%META,
+)->get;

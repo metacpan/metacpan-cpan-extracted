@@ -1,0 +1,87 @@
+CHANGES file for Net::DAV::Server
+
+1.305 Mon Apr 8 13:55:00 SDT 2013
+  - Fix RT #46865. copy() depth problem and source/target path
+    alteration problem. Patch needed updates to match current code.
+1.304 Tue Nov 22 11:00:00 CST 2011
+  - Make propfind handle a direct request for supportedlock property.
+1.303 Thu Aug 4 14:00:00 CDT 2011
+  - Allow domain names that start with a digit in virtual user names.
+  - Remove UTF8 decode/encode calls that were messing up actual utf8 strings.
+1.302 Tue Nov 30 23:40:00 CST 2010
+  - Remove unexpected IO::Scalar dependency in test.
+1.301 Mon Nov 29 11:00:00 CST 2010
+  - Release version incorporating recent development changes.
+1.300_05 Sat Jun 5 12:10:00 CST 2010
+  - Correct path separators in propfind under Windows.
+  - Modify UUID to be more resistant to bad rand() function under Windows.
+1.300_04 Tue Jun 1 12:00:00 CST 2010
+  - Set XML::LibXML dependency to fix yet another dependency issue causing
+    CPANTS failures.
+1.300_03 Wed May 26 20:00:00 CST 2010
+  - Fix dependency problem cause a linux/Perl 5.8.8 failure.
+1.300_02 Fri May 21 23:15:00 CST 2010
+  - Fix dependency problem cause solaris/Perl 5.12 failure.
+1.300_01 Thu May 20 10:00:00 CST 2010
+  - Add LOCK/UNLOCK implementation
+    * Bugfix: RT#56096 - Remove trace from implemented list.
+    * Bugfix: RT#56099 - Don't call lock/unlock on filesys object.
+    * Bugfix: RT#56097 - Make lock method return valid response
+    * Bugfix: RT#56098 - Add locking checks to methods that modify
+  - Bugfix: RT#56082 - Add a post method that returns 'not implemented'
+  - Extended unit tests to allow for better confidence in code.
+1.29 Wed Jul 19 11:42:56 EST 2006
+  - Bugfix: RT#17077 - uninitialised variable.  
+    -- Thanks to CLOTHO
+  - Bugfixes/interoperability:
+    * RT#20022 - add trailing slashes to directory names in listing.
+    * RT#20016 - remove upwards path from directory listing.
+    -- Both thanks to HACHI
+  - Test infrastructure (requires litmus installed) to ensure
+    new changes don't cause regressions.
+  - Add 'TODO' list to remind myself of other work I want to do. 
+
+1.28 Sat Jul  9 00:08:24 EST 2005
+  - new maintainer: Bron Gondwana <brong@brong.net>
+  - fix DAV: namespace in propfind
+  - use ISO time format for DAV::creationdate property
+
+1.27 Wed Jun  8 10:33:44 BST 2005
+  - advertise that locking is available to get Windows DAV happier
+    (thanks to Stefan `Sec` Zehl)
+
+1.26 Tue Apr 26 22:03:33 BST 2005
+  - removed webdav.pl (spotted by CDOLAN)
+
+1.25 Sat Mar 26 07:06:03 CST 2005
+  - finished the support for parsing PROPFIND request bodies - for
+    retreiving property names, named properties, or all properties.
+  - tweaked some things to support publishing DAV using
+    POE::Component::Server::HTTP (bug #11821)
+  - a little more magic to make wide character file names work
+  - all above patches by Jack/ms419
+  - added POD test
+
+1.24 Tue Mar  8 18:58:05 EST 2005
+  - included big patch from Mark A. Hershberger, so that
+    Net::DAV::Server passes more litmus tests
+  - remove silly line that stopped cadaver from working
+  - return 201 if moving to a new directory
+  - return 409 if writing to a directory which does not exist
+
+1.23 Thu May 20 10:06:05 BST 2004
+  - implemented recursive copy, delete, move using
+    File::Find::Rule::Filesys::Virtual
+  - 403 on more things we don't support
+
+1.22 Wed May 19 14:04:47 BST 2004
+  - give a 404 on unknown error (thanks to Yair Lenga)
+  - add Last-Modified upon GETs (thanks to Yair Lenga)
+  - remove DateTime dependency  (thanks to Yair Lenga) 
+  - fix URI encoding problems
+  - give proper Server: header
+  - use XML::LibXML to generate proper XML
+  - refactoring
+
+1.21 Sun May  9 10:16:31 IST 2004
+  - first release

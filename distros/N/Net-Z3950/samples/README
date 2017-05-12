@@ -1,0 +1,9 @@
+$Id: README,v 1.3 2003/06/26 21:39:16 mike Exp $
+
+Sample code in this directory:
+
+canonical.pl	The most trivial complete program: fetch and print a record
+fetch1.pl	Like canonical.pl but with rudimentary error checking
+simple.pl	Similar, but takes command-line args and prints all records
+batch-isbn.pl	Fetch a batch of records with ISBNs taken from names file
+multiplex.pl	Searches concurrently across multiple servers

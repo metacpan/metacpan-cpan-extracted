@@ -1,0 +1,94 @@
+Net::BitTorrent::Protocol changelog!
+
+1.5.3 2016-10-02T12:20:57Z
+
+    Resolved Issues/Bug Fixes:
+     * Forgot to remove strictures for 1.5.2 (thanks, CPANTesters...)
+
+1.5.2 2016-10-01T03:24:25Z
+
+    Resolved Issues/Bug Fixes:
+     * Previous release handled transaction IDs poorly in BEP15
+
+1.5.1 2016-09-30T14:19:37Z
+
+    API Changes/Compatibility Information:
+     * BEP15 - UDP Tracker Protocol for BitTorrent
+
+1.5.0 2016-09-27T03:16:05Z
+
+    API Changes/Compatibility Information:
+     * Fatal errors cause parsed packets to contain a new 'fatal' key
+
+Version 1.0.2 | Way too early in the morning on June 26th, 2014 | ???????
+
+    Documentation/Sample Code/Test Suite:
+     * Move to Minilla
+     * Fix bad MANIFEST
+
+Version 1.0.1 | Early afternoon on June 20th, 2014 | 740e054ed3
+
+    API Changes/Compatibility Information:
+     * Add backet builder for BEP09
+
+Version 1.0.0 | A quarter after one on December 29th, 2011 | 0a59488647
+
+    API Changes/Compatibility Information:
+     * New utility function ::BEP06::generate_fast_set(...)
+
+    Documentation/Sample Code/Test Suite:
+     * Example script is now a standalone module: AnyEvent::BitTorrent
+     * BEP06 and BEP10 are now documented
+     * BEP07 and BEP23 now have (weak) tests
+
+Version 0.9.1 | The wee hours of December 19th, 2011 | 5506598358
+
+    API Changes/Compatibility Information:
+     * ::BEP03::build_piece(...) wants the actual data rather than a reference
+     * { error => $msg } is returned when parsing bad packet data
+     * ::BEP03::build_bitfield(...) expects bitfields to be in ascending order
+         which makes things easy for vec()
+
+    Resolved Issues/Bug Fixes:
+     * ::BEP03::build_piece(...) and ::BEP03::parse_port(...)
+
+    Documentation/Sample Code/Test Suite:
+     * BEP03 parsing functions are now documented
+
+    Notes:
+     * Meanwhile...
+         - The first of two major clients, AnyEvent::BitTorrent should be on
+             PAUSE later today. I need to figure out some simple, light weight
+             tests first.
+
+Version 0.9.0 | December 2nd, 2011 during the Nightly News | b921b4c08f
+
+    API Changes/Compatibility Information:
+     * Support for generating BEP05 (DHT Protocol) packets
+
+    Documentation/Sample Code/Test Suite:
+     * Include README
+
+Version 0.1.0 | Mid-afternoon on December 2nd, 2011 | ad0b7b5a74
+
+    API Changes/Compatibility Information:
+     * It exists!
+
+    Resolved Issues/Bug Fixes:
+     * None yet!
+
+    Protocol/Behavioral Changes:
+     * It... exists?
+
+    Documentation/Sample Code/Test Suite:
+     * Guess.
+
+    Notes:
+     * Meanwhile...
+         - This distribution is my first step toward breaking Net::BitTorrent
+             up into manageable parts. Next comes AnyEvent::DHT or
+             AnyEvent::BitTorrent::DHT... I haven't decided on a namespace.
+
+_ -.-. .... .- -. --. . ... _________________________________________
+For more information, see the commit log:
+    http://github.com/sanko/net-bittorrent-protocol/commits/

@@ -1,0 +1,46 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.94, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Random",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode::Locale" : "1.01",
+            "JSON" : "2.9",
+            "LWP::UserAgent" : "0",
+            "Test::MockObject" : "1.07",
+            "Test::More" : "0.64"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {},
+   "version" : "2.31"
+}

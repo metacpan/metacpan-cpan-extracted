@@ -1,0 +1,30 @@
+<pre>
+==========================================
+ Template: {: $ object_no_path :}
+==========================================
+
+Template.....: [{: $ object :}]
+Parent.......: [{: $ parent :}]
+Type.........: [{: $ type :}]
+Interactions.: [{: $ interactions :}]
+Scripts......: [{: $ scripts :}]
+
+==========================================
+ Dumper Tags: {: $ object_no_path :} 
+==========================================
+{: $ dumper_tags,no_br :}
+{: ~ $top_template 
+==========================================
+ Top: {: $ object_no_path :}
+==========================================
+
+URL..........: [{: $ url :}]
+Template.....: [{: $ object :}]
+Headers......: [{: $ headers :}]
+Cookies......: [{: $ cookies :}]
+GET..........: [{: $ GET :}]
+POST.........: [{: $ POST :}]
+Scripts......: [{: $ scripts :}]
+:}
+</pre>
+

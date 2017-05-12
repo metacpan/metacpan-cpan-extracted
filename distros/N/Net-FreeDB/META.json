@@ -1,0 +1,45 @@
+{
+   "abstract" : "OOP Interface to FreeDB Server(s)",
+   "author" : [
+      "David Shultz <dshultz@cpan.org>, Peter Pentchev <roam@ringlet.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.84, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-FreeDB",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CDDB::File" : "1.01",
+            "File::Temp" : "0.05",
+            "IO::Socket::INET" : "0",
+            "Moo" : "0",
+            "Net::Cmd" : "2.12"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.10"
+}

@@ -1,0 +1,21 @@
+Revision history for Net::Laconica
+
+2008-10-04  Alan Haggai Alavi   alanhaggai@alanhaggai.org
+
+    Release 0.08
+    
+  - Changed namespace from Net::Identica to Net::Laconica.  
+  - Fixed instance creation by removing global variables which were
+    originally intended to be instance variables. They have been
+    integrated to instances.
+  - Improved the methods and added more error checks. Renamed get() to
+    fetch() and post() to send().
+  - Added named parametre support to new().
+  - Supports messages with more than 140 characters by stripping extra
+    characters. 
+  - Added support for Laconica instances.
+  - Added missing prerequisites.
+  - Thanks to David Precious (BIGPRESH) and Chris Hills (chaz6) for
+    the bugs they reported.
+  - Thanks to Ken Sheppardson (kshep) for the suggestion to migrate
+    Net::Identica to Net::Laconica.

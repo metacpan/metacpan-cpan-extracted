@@ -1,0 +1,6 @@
+better error reporting
+pass in raw data rather than a file path?
+check for html encoding etc etc
+add tests that are skipped unless GMAIL_USERNAME and GMAIL_PASSWORD env variables are set
+develop whole suite of Net::FS modules
+delete function?

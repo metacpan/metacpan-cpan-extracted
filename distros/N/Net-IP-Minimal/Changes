@@ -1,0 +1,36 @@
+==============================
+2012-11-28 15:50:44 +0000 0.06
+==============================
+
+  commit cdf80687d77bcef707132a08e3c3efbf601163c9
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Wed Nov 28 15:50:44 2012 +0000
+  
+    Incorporate changes from Net::IP 1.26 
+
+==============================
+2012-09-13 10:06:16 +0100 0.04
+==============================
+
+  commit 29428016b6fc07a7e97ae0b421429df7f66466e8
+  Author: Jon Portnoy <avenj@cpan.org>
+  Date:   Thu Sep 13 10:06:16 2012 +0100
+  
+    [rt.cpan.org #79612] s/_ip_is_ipv4/ip_is_ipv4/ on line 53
+
+    Just a leading '_' on line 53 (_ip_is_ipv4), manifests when checking
+    v4-in-v6 addresses:
+
+    use Test::Simple tests => 1;
+
+    use strict; use warnings FATAL => 'all';
+
+    use Net::IP::Minimal 'ip_is_ipv6';
+
+    ok( ip_is_ipv6( '::ff00:192.0.0.1' ), 'v6-encapsulated v4' );
+
+    Signed-off-by: Chris 'BinGOs' Williams <chris@bingosnet.co.uk> 
+
+====================================
+End of changes in the last 1825 days
+====================================

@@ -1,0 +1,27 @@
+Revision history for Net-PMP-Client
+
+0.006 06 May 2015
+ - add PMP_CLIENT_CONFIG support to Client to match CLI
+
+0.005 05 May 2015
+ - fix unit tests to match newer sandbox and server-side API
+ - fix CollectionDocLink coercion to allow for media enclosures
+
+0.004 03 Sept 2014
+ - CLI->get() prints raw JSON, not a Perl dump
+ - CLI respects PMP_CLIENT_CONFIG env var in addition to --configfile param
+
+0.003 14 Aug 2014
+ - fix CLI pod for get() action
+ - use 'auth' links in root doc for Client->get_credentials_uri()
+
+0.002 20 June 2014
+ - fix CLI child item profile display bug
+ - catch/re-throw json encoding errors to generate full stack trace
+ - round-trip GET/PUT of a single object now safe
+ - make sure get_self_uri check for defined links before treating as a
+   hashref
+
+0.001 06 June 2014
+ - first release
+

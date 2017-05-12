@@ -1,0 +1,95 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>NET::IPFilterSimple - Perl extension accessing ipfilter.dat files the very simple way
+Warning: Please Update your Sources. Current Version fixed a very critical bug that prevents Program from working correctly.</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<ul>
+
+		<li><a href="#dependencie">DEPENDENCIE</a></li>
+	</ul>
+
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#export">EXPORT</a></li>
+	</ul>
+
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>NET::IPFilterSimple - Perl extension accessing ipfilter.dat files the very simple way
+Warning: Please Update your Sources. Current Version fixed a very critical bug that prevents Program from working correctly.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use NET::IPFilterSimple;
+  my $obj      = NET::IPFilterSimple-&gt;new( ipfilter =&gt; '/home/thecerial/firewall/ipfilter.dat' );
+  my $IP       = &quot;199.196.016.200&quot;;
+  my $isValid  = $obj-&gt;isValid($IP);    #  1 not to be blocked | 0 to be blocked</pre>
+<p>
+</p>
+<h2><a name="dependencie">DEPENDENCIE</a></h2>
+<p>use strict;</p>
+<p>Because it uses no more modules ( in contrast to NET::IPFiler ) it is easily portable to Windows, MAC, Solaris. You only need to give a valid path as ipfilter parameter to the new constructor.</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Perl Module for accessing ipfilter.dat files the easy way. IPs from the ranges of ipfilter.dat
+there are the dots removed and these ranges are then saved in an array. later a given ip is 
+checked against the ranges in the array</p>
+<p>
+</p>
+<h2><a name="export">EXPORT</a></h2>
+<p><code>isValid()</code> - Checks given ip against ipfilter.dat range</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>eMule | BitTorrent | Torrent Sites using ipfilter.dat perl modules</p>
+<p><a href="http://www.zoozle.net">http://www.zoozle.net</a></p>
+<p><a href="http://www.zoozle.org">http://www.zoozle.org</a></p>
+<p><a href="http://www.zoozle.biz">http://www.zoozle.biz</a></p>
+<p><a href="http://search.cpan.org/author/SENGER/">http://search.cpan.org/author/SENGER/</a></p>
+<p>NET::IPFilterSimple
+NET::IPFilter</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Sebastian Enger, bigfish82 |ät! gmail?com</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright (C) 2008 by Sebastian Enger</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.</p>
+
+</body>
+
+</html>

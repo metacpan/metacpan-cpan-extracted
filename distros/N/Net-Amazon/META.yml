@@ -1,0 +1,33 @@
+--- #YAML:1.0
+name:               Net-Amazon
+version:            0.62
+abstract:           Framework for accessing amazon.com via REST
+author:
+    - Mike <m@perlmeister.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Data::Dumper:    0
+    Digest::SHA:     0
+    HTTP::Message:   0
+    Log::Log4perl:   0.3
+    LWP::UserAgent:  5.814
+    perl:            5.006
+    Time::HiRes:     1
+    URI:             0
+    URI::Escape:     0
+    XML::Simple:     2.08
+resources:
+    repository:  http://github.com/boumenot/p5-Net-Amazon
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

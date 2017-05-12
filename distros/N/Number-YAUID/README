@@ -1,0 +1,25 @@
+Number::YAUID
+=============
+
+INSTALLATION
+
+Just follow the usual procedure:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+REPORTING BUGS
+
+Alexander Borisov <lastmac@cpan.org>
+
+
+COPYRIGHT
+
+  © 2014 Alexander Borisov. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

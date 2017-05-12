@@ -1,0 +1,39 @@
+No-Giro version 0.2
+===================
+
+This is a Perl Module for generating Norwegian bank slips. 
+
+It provides some methods to enter data into a standard F60-1 GIRO
+slip. This is an A4 sheet with a standard layout and where data are
+entered at the bottom and there is some space to enter any information
+at the top. It returns an Encapsulated Postscript object that can be
+used in a Postscript document, which again is suitable to be printed. 
+
+This is an early release, mostly thrown together to meet the needs of
+the author. It should nevertheless be useful for most of those issuing
+these kinds of slips. It has methods to set all sensible fields, but
+two are still left out, they are both something that very few issuers
+would ever need to set.
+
+INSTALLATION
+
+To install this module use CPANPLUS or CPAN tools or type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires PostScript::Simple version 0.06p3 or later. 
+	
+  
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Kjetil Kjernsmo
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.

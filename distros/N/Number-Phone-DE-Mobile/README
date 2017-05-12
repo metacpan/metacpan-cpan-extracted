@@ -1,0 +1,22 @@
+README for Perl module:
+Number::Phone::DE_mobile
+
+
+Directories/Files in this Package:
+./lib		the perl-module(s)
+./example	example script(s)
+Makefile.PL	the perl makefile for this module.
+
+
+Installation:
+at the command prompt type:
+	perl Makefile.PL
+	make
+	make install
+
+if there is an error, ask the admin! :)
+
+this module should work for linux and win32 systems
+running at least perl 5.6.0...
+if not, write your comments to: netsrak@cpan.org
+----------------------------------------------------

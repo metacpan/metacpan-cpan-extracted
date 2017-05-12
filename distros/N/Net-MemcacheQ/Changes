@@ -1,0 +1,10 @@
+ChangeLog for Net::MemcacheQ
+============================
+
+1.03	updated META
+
+1.02	Tweaked build dependencies
+
+1.01	Added examples
+
+1.00	First release - basic connectivity: set/get/stats queue

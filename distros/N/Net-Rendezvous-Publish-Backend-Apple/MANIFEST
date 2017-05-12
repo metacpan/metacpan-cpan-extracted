@@ -1,0 +1,10 @@
+Makefile.PL
+META.yml
+Build.PL
+lib/Net/Rendezvous/Publish/Backend/Apple.pm
+lib/Net/Rendezvous/Publish/Backend/Apple.xs
+lib/Net/Rendezvous/Publish/Backend/typemap
+MANIFEST
+MANIFEST.SKIP
+t/backend_core.pl
+t/live.t

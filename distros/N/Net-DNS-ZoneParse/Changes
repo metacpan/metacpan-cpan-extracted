@@ -1,0 +1,35 @@
+Revision history for Perl extension Net::DNS::ZoneParse.
+
+0.0103 Sun Jul 31 30:30:21 2011
+	- Cleanup Documentaion for Net::DNS::ZoneParse::Parser::DNSZoneParse
+	Thanks to Anthony Kirby for those:
+	- fix ttl-regex to support NSEC3-entries
+	- added t/012-zoneparse-sec.t
+
+0.0102 Mon Oct 12 20:30:32 2010
+	- Set License
+	- cleanup indexer
+	- Added new_from_filestring for Net::DNS::RR::NS
+	- Net::DNS::ZoneParse::Parser::Native
+		- Fixed up handling for empty names
+		- Added test for correct expanding of '@' 
+	- Net::DNS::ZoneParse::Parser::NetDNSZoneFileFast
+		- renamed from ZFFast
+	- Net::DNS::ZoneParse::Zone
+		- added delall-function to remove a zone from the system.
+	- Net::DNS::ZoneParse
+		- giving parser-specific options through parser_args
+		- added uncache-function to delete zone from the cache
+	- Net::DNS::ZoneParse::(Parser|Generator)::DNSZoneParse
+		- added Backends for DNS::ZoneParse
+
+0.0101 Mon Oct 11 18:17:25 2010
+	- Fixed POD-Namespace in Net::DNS::ZoneParse::Generator::Native
+	- Fixed missing dependency on Class::Accessor
+	- Cleanup Headings for methods
+	- Added Support for Net::DNS::Zone::Parser through NetDNSZoneParser
+
+0.01  Sat Oct  2 15:28:22 2010
+	- original version; created by h2xs 1.23 with options
+		-XA -n Net::DNS::ZoneParse -b 5.8.0
+

@@ -1,0 +1,61 @@
+Net-Nessus-ScanLite version 0.01
+================================
+
+This module is designed to perform a fast authentication and request a nessus attack on a given host.
+This module takes advantage of the nessus NTP 1.2 protocol's fast_login mechanism.
+In the past nessus would send a plethora of information about all the plugins it knows about.
+This could take minutes.
+Systems that can benefit from this module include a CGI  self scan and NetReg type applications.
+
+This module does "not" speed the latency or duration of nessus scans.
+That is primarily determined by the plugin_set and preferences such as auto enabling dependencies.
+
+FEATURES
+========
+
+1) Uses the nessus  NTP over a socket which means you don't need the client installed locally.
+2) Supports ssl and non-ssl nessusd connections.
+3) Performs a "fast_login", bypassing the huge list of nessus plugins.
+4) Supports ini style configuration files as well as methods for specifying configuration attributes.
+3) Can present the lists of 'INFO' and 'HOLES' as arrays or HTPL::Template ready lists.
+
+
+I've supplied several script and a cgi example in the examples subdirectory.
+
+This has been tested using perl 5.8 under solaris, debian and fedora environments.
+Works under apache 1.3.x and apache2.
+I've nessusd SSL using TLSV1 and no peer certificate verification and seems to works ok.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ IO::Socket::SSL
+ Config::IniFiles
+ Net::Nessus::Client
+ Net::Nessus::Message
+
+This module uses NTP 1.2 protocol which requires you to run a 
+nessusd (Nessus) 2.0.9 daemon
+ 
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2003 by John Ballem, Brown University
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

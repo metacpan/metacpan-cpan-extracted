@@ -1,0 +1,12 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+Sendmail.pm
+SENDMAIL-STATS.txt
+install-mib.pl
+Sendmail.mib2c
+sendmail.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Nephia/Plugin/CSRFDefender.pm
+t/00_compile.t
+t/01_csrf_defender.t
+t/02_csrf_defender_manual.t
+META.yml
+MANIFEST

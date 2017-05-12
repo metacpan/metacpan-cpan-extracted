@@ -1,0 +1,18 @@
+---
+name: Net-FS-Gmail
+version: 0.2
+author:
+  - Simon Wistow <simon@thegestalt.org>
+abstract: store and retrieve files on Gmail
+license: perl
+requires:
+  File::Basename: 0
+  Mail::Webmail::Gmail: 1.05.1
+  Test::More: 0
+  Time::ParseDate: 0
+  URI::Escape: 0
+provides:
+  Net::FS::Gmail:
+    file: lib/Net/FS/Gmail.pm
+    version: 0.2
+generated_by: Module::Build version 0.2611

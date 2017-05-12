@@ -1,0 +1,378 @@
+{
+   "abstract" : "Sign AWS requests -- V3",
+   "author" : [
+      "Chris Weyl <cweyl@alumni.drew.edu>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Amazon-Signature-V3",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::HMAC_SHA1" : "0",
+            "HTTP::Date" : "0",
+            "MIME::Base64" : "0",
+            "Moose" : "0",
+            "MooseX::Types::Common::String" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.008",
+            "utf8" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::Moose::More" : "0",
+            "Test::More" : "0.88",
+            "aliased" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Amazon::Signature::V3" : {
+         "file" : "lib/Net/Amazon/Signature/V3.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/RsrchBoy/net-amazon-signature-v3/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/RsrchBoy/net-amazon-signature-v3.git",
+         "web" : "https://github.com/RsrchBoy/net-amazon-signature-v3"
+      }
+   },
+   "version" : "0.001",
+   "x_Dist_Zilla" : {
+      "perl" : {
+         "version" : "5.016001"
+      },
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::NextRelease",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::NextRelease",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Check",
+            "name" : "@RSRCHBOY/@Git/Check",
+            "version" : "2.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "name" : "@RSRCHBOY/@Git/Commit",
+            "version" : "2.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "name" : "@RSRCHBOY/@Git/Tag",
+            "version" : "2.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Push",
+            "name" : "@RSRCHBOY/@Git/Push",
+            "version" : "2.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::NextVersion",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::Git::NextVersion",
+            "version" : "2.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
+            "name" : "@RSRCHBOY/@Git::CheckFor/Git::CheckFor::CorrectBranch",
+            "version" : "0.005"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::CheckFor::Fixups",
+            "name" : "@RSRCHBOY/@Git::CheckFor/Git::CheckFor::Fixups",
+            "version" : "0.005"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::GatherDir",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::PruneCruft",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::ExecDir",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::ShareDir",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::MakeMaker",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::InstallGuide",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::InstallGuide",
+            "version" : "1.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::Manifest",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::SurgicalPkgVersion",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::SurgicalPkgVersion",
+            "version" : "0.0019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReadmeFromPod",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::ReadmeFromPod",
+            "version" : "0.16"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MinimumPerl",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::MinimumPerl",
+            "version" : "1.003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReportVersions::Tiny",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::ReportVersions::Tiny",
+            "version" : "1.08"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::AutoPrereqs",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prepender",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::Prepender",
+            "version" : "1.112280"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::PodSpelling",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::Test::PodSpelling",
+            "version" : "2.002005"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConsistentVersionTest",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::ConsistentVersionTest",
+            "version" : "0.02"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodCoverageTests",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::PodCoverageTests",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::PodSyntaxTests",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NoTabsTests",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::NoTabsTests",
+            "version" : "0.01"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::EOLTests",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::EOLTests",
+            "version" : "0.02"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::HasVersionTests",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::HasVersionTests",
+            "version" : "1.101420"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Compile",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::Test::Compile",
+            "version" : "1.112820"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Portability",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::Test::Portability",
+            "version" : "2.000003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::ExtraTests",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NoSmartCommentsTests",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::NoSmartCommentsTests",
+            "version" : "0.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::MetaConfig",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::MetaJSON",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::MetaYAML",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaNoIndex",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::MetaNoIndex",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::MetaProvides::Package",
+            "version" : "1.14000001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GitHub::Meta",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::GitHub::Meta",
+            "version" : "0.27"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::TestRelease",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckChangesHasContent",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::CheckChangesHasContent",
+            "version" : "0.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckPrereqsIndexed",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::CheckPrereqsIndexed",
+            "version" : "0.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::ConfirmRelease",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GitHub::Update",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::GitHub::Update",
+            "version" : "0.27"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::UploadToCPAN",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Signature",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::Signature",
+            "version" : "1.100930"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::InstallRelease",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::InstallRelease",
+            "version" : "0.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ArchiveRelease",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::ArchiveRelease",
+            "version" : "4.00"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::License",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CopyFilesFromBuild",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::CopyFilesFromBuild",
+            "version" : "0.103510"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
+            "name" : "@RSRCHBOY/ReadmePodInRoot",
+            "version" : "0.120120"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodWeaver",
+            "name" : "@RSRCHBOY/Dist::Zilla::Plugin::PodWeaver",
+            "version" : "3.101641"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "4.300028"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "4.300028"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : "0"
+         },
+         "version" : "4.300028"
+      }
+   }
+}
+

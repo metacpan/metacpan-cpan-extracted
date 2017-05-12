@@ -1,0 +1,44 @@
+{
+   "abstract" : "Network Information Extractor",
+   "author" : [
+      "Nuno Martins <nuno.martins@caixamagica.pt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "NetInfoExtractor",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Long" : "0",
+            "JSON" : "0",
+            "Moose" : "0",
+            "UUID::Tiny" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.1"
+}

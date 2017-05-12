@@ -1,0 +1,8 @@
+Revision history for Perl extension FreeDB.
+
+0.01  Wed Sep 25 17:48:03 2002
+	- original version; created by h2xs 1.20 with options
+		-X FreeDB
+
+0.8.2 Fri Sep 27 18:45:41 CEST 2002
+	- Renamed FreeDB* to Net::FreeDB2. Renaming is tough!

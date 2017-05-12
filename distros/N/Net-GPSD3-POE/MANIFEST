@@ -1,0 +1,11 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Net/GPSD3/POE.pm
+t/001_load.t
+scripts/perl-Net-GPSD3-POE-Example.pl
+perl-Net-GPSD3-POE.spec
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,52 @@
+Revision history for Perl extension Net::CyanChat.
+
+  Version 0.07 - Sep 15 2015
+  - Update documentation.
+
+  Version 0.06 - Oct 24 2008
+  - Broke backwards compatibility *big time*.
+  - Removed the Chat_Buddy_Here method. It was useless and difficult to work with.
+  - All the Message handlers (Message, Private, Chat_Buddy_In, Chat_Buddy_Out)
+    now receive a hashref containing the details of the event, instead of
+    receiving them in array format.
+  - The Who Lists are now separated internally into "Who" (normal users)
+    and "Special" (Cyan & Guests). Cyanites so rarely enter the CyanChat room
+    that conflicts in nicknames between normal users and Cyanites was rare, but
+    possible, and the previous version of the module wouldn't be able to handle
+    that.
+  - The function getBuddies returns a higher level hash dividing the users into
+    the "who" and "special" categories (i.e. $ret->{who}->{Kirsle} = 11223135).
+  - All functions return undef on error now, and 1 on success (unless another
+    value is expected), instead of returning 0 on error.
+  - Removed some leftover prints in the code from the last version.
+  - Revised the POD to include some bits of example code, particularly around
+    the HANDLERS section.
+  - Added a new section to the POD to list some tips for interacting with the
+    official chat server, Cho.
+  - Cleared up some of the vocabulary in the POD, since "nicknames" and
+    "usernames" are two different beasts, and it's important to know which one
+    to use for any given method.
+  - Included a command-line CyanChat client as a demonstration of this module
+    (and to complement the `ccserver` script). The client requires Term::ReadKey
+    and, on Win32, Win32::Console::ANSI (if you want ANSI colors).
+
+  Version 0.05 - Jun  1 2007
+  - Fixed the end-of-line characters, it now sends a true CrLf.
+  - Added the WhoList handler.
+  - Added the authenticate(), promote(), and demote() methods.
+
+  Version 0.04 - Oct 24 2006
+  - The enter/exit chat messages now go by the tag number (like it's supposed to),
+    not by the contained text.
+  - Messages can contain pipes in them and be read okay through the module.
+  - Added a "ping" function. Apparently Cho will disconnect clients who don't do
+    anything in 5 minutes. The "ping" function also helps detect disconnects!
+  - The Disconnected handler has been added to detect disconnects.
+
+  Version 0.03 - Oct  1 2006
+  - Bug fix: the $level received to most handlers used to be 1 (cyan staff) even
+    though it should've been 0 (or any other number), so this has been fixed.
+
+  Version 0.01 - May 14 2005
+  - Initial release.
+  - Fully supports both protocols 0 and 1 of CyanChat.

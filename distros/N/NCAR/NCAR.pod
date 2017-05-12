@@ -1,0 +1,258 @@
+=head1 NAME
+
+NCAR
+
+=head1 SYNOPSIS
+
+   use PDL;
+   use NCAR;
+
+   &NCAR::gopks( 6, 1 );
+   &NCAR::gopwk( 1, 2, 1 );
+   &NCAR::gacwk( 1 );
+
+   #
+   #  Symbolic station model
+   #
+
+   &NCAR::wmsetr('WBS',0.20);
+   &NCAR::gslwsc(3.);
+
+   ( ... )
+
+   &NCAR::frame();
+   &NCAR::gdawk( 1 );
+   &NCAR::gclwk( 1 );
+   &NCAR::gclks();
+
+
+=head1 DESCRIPTION
+
+Interfaces Perl, PDL & NCAR, through XS code. The aim is to provide the user
+with native NCAR commands.
+
+Whenever large float/int arrays are needed, piddles have to be passed to NCAR
+routines, eg : 
+
+   my $F = float [ [ ... ], ... ];
+   my $NX = ...;
+   my $NY = ...;
+
+   &NCAR::cpezct( $F, $NX, $NY );
+
+Because the Fortran declaration of the routine cpezct looks like :
+
+   C
+         SUBROUTINE CPEZCT (ZDAT,MZDT,NZDT)
+   C
+         DIMENSION ZDAT(MZDT,NZDT)
+
+However, small arrays ( ie arrays whose dimension is fixed and small ) are passed 
+as native Perl ARRAY refs :
+
+   &NCAR::mapset( "CO", [ 0., 0. ], [ -90., 0. ], [ 90., 0. ], [ 90., 0. ] );
+
+Because the Fortran declaration of mapset is : 
+
+         SUBROUTINE MAPSET (ARG1,ARG2,ARG3,ARG4,ARG5)
+         CHARACTER*(*) ARG1
+         REAL          ARG2(2),ARG3(2),ARG4(2),ARG5(2)
+
+So there is no need to use piddles in that case ( and it would not be very 
+convenient ). 
+
+It is possible to pass arrays of strings : 
+
+   my @IMDAT = ( 
+    '11212',
+    '83320',
+    '10011',
+    '20000',
+    '30000',
+    '40147',
+    '52028',
+    '60111',
+    '77060',
+    '86792',
+   );
+   &NCAR::wmstnm($X2,.23, \@IMDAT);
+
+Such arrays are converted into Fortran arrays of strings ( which is a rather 
+dirty business ), and passed by value( up to now ), which means that you can't 
+get back the modified values ( if the array was modified by the Fortran 
+subroutine ).
+
+=head2 Callbacks
+
+Some NCAR Fortran subroutines accept callback subroutines as arguments, eg :
+
+      EXTERNAL SHADER
+      ( ... )
+      CALL ARSCAM (IAMA,XCRA,YCRA,1000,IARA,IGRA,10,SHADER)
+      ( ... )
+      SUBROUTINE SHADER (XCS,YCS,NCS,IAI,IAG,NAI)
+
+      END
+
+It's possible to do that in Perl as wall, that is, one would write :
+
+      &NCAR::arscam($IAMA,$XCRA,$YCRA,1000,$IARA,$IGRA,10,\&SHADER);
+      ( ... )
+      sub SHADER {
+        my (XCS,YCS,NCS,IAI,IAG,NAI) = @_;
+        ( ... )
+      }
+
+=head2 Common blocks
+
+Some NCAR Fortran examples access COMMON blocks of the NCAR library, eg :
+
+      COMMON /SRFIP1/ IFR        ,ISTP       ,IROTS      ,IDRX       ,
+     1                IDRY       ,IDRZ       ,IUPPER     ,ISKIRT     ,
+     2                NCLA       ,THETA      ,HSKIRT     ,CHI        ,
+     3                CLO        ,CINC       ,ISPVAL
+      ( ... )
+      IFR = 0
+
+In Perl, one would write :
+  
+      use NCAR::COMMON qw( %SRFIP1 );
+      ( ... )
+      $SRFIP1{IFR} = 0;
+
+Note that only a few of the NCAR COMMON blocks have been included in NCAR.pm,
+although it would be possible to include them all ( there are about 280 of
+them in the NCAR library, so I will take a bit of time to consider which of
+them might be useful ).
+
+=head2 User defined routines.
+
+Some NCAR Fortran routines called from within the library may be re-defined 
+by the user ( actually the whole library may be redefined 
+by the user in Fortran :-); the following routines may 
+( according to their embedded documentation ) be overriden by the user :
+
+=over 4
+
+=item *
+
+agchax 
+
+=item *
+
+agchnl 
+
+=item *
+
+agchcu 
+
+=item *
+
+agchil 
+
+=item *
+
+agutol 
+
+=item *
+
+cpchhl 
+
+=item *
+
+cpchll 
+
+=item *
+
+cpmpxy 
+
+=item *
+
+mapeod 
+
+=item *
+
+mapusr 
+
+=item *
+
+mpchln 
+
+=item *
+
+slubkg 
+
+=item *
+
+vvumxy 
+
+=back
+
+In Perl, to override one of those routines, one would write :
+
+      sub NCAR::mpchln {
+        ( ... )
+      }
+
+for a permanent redefinition of mpchln, or :
+
+      {
+         local *NCAR::mpchln = sub {
+           ( ... )
+         };
+         ( ... )
+      }
+
+for a local redefinition of mpchln.
+
+Note that redefining a routine which is not part of the above mentioned set
+would not allow access to it from within the Fortran library.
+
+=head1 BUILD
+
+You need the full PDL package in order to build an use NCAR.
+Currently, the NCAR XS interface has only been tested on linux-i686 using
+the g77 compiler.
+
+=head1 EXAMPLES
+
+There's now quite a few examples ( converted by hand ) from the NCAR 
+distribution. `make test' will execute them, and dump ncgm
+in the ncgm/ directory. ncgm files are viewable with the ctrans NCAR
+utility :
+
+  ctrans -d X11 myplot.ncgm 
+  ctrans -d ps.color myplot.ncgm > myplot.ps
+
+=head1 BUGS
+
+Maybe plenty of them !! Note that the XS glue includes the interfaces for
+more than 500 Fortran subroutines, and I haven't tested them all, though
+I have about 160 of the NCAR packages which seems to work fine.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+NCAR graphics documentation ( http://ngwww.ucar.edu/ng4.3/ )
+
+=item *
+
+PDL documentation ( http://pdl.perl.org/ )
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (c) 2003 Philippe Marguinaud. All rights reserved.
+This program is free software; you can redistribute it
+and/or modify it under the same terms as the NCAR graphics
+library.
+
+=head1 AUTHOR
+
+Philippe Marguinaud, pmarguinaud@hotmail.com
+
+=cut

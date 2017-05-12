@@ -1,0 +1,75 @@
+{
+   "abstract" : "a Number::Format that ignores the system locale",
+   "author" : [
+      "Christian Walde <walde.christian@googlemail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300017, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Number-Format-FixedLocale",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Number::Format" : "0",
+            "base" : "0",
+            "perl" : "5.008",
+            "strictures" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::InDistDir" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Number::Format::FixedLocale" : {
+         "file" : "lib/Number/Format/FixedLocale.pm",
+         "version" : "1.121780"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-number-format-fixedlocale at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Number-Format-FixedLocale"
+      },
+      "homepage" : "https://github.com/wchristian/number-format-fixedlocale",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/wchristian/number-format-fixedlocale.git",
+         "web" : "https://github.com/wchristian/number-format-fixedlocale"
+      }
+   },
+   "version" : "1.121780"
+}
+

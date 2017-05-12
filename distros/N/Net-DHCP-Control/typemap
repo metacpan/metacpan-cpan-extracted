@@ -1,0 +1,3 @@
+dhcpctl_handle *		T_PTRREF
+isc_result_t			T_UV
+TYPE				T_UV

@@ -1,0 +1,36 @@
+#!/usr/bin/perl -w -T
+
+# $Id: named.forwarder,v 1.5 2002/04/16 20:52:57 rob Exp $
+#
+# This example starter script configuration just fowards all
+# requests to the default resolver in /etc/resolv.conf.
+# Nothing special.
+
+BEGIN {
+  # Taint clean PERL5LIB if exists (useful for debugging)
+  if ($ENV{PERL5LIB} && $ENV{PERL5LIB}=~m%^([\w\-\./:]+)$%) {
+    foreach (split /:/,$1) {
+      unshift (@INC,$_);
+    }
+  }
+}
+
+use strict;
+use Net::DNSServer;
+use Net::DNSServer::Cache;
+use Net::DNSServer::Proxy;
+
+my $cache_resolver = new Net::DNSServer::Cache;
+my $proxy_resolver = new Net::DNSServer::Proxy;
+
+run Net::DNSServer {
+  priority => [$cache_resolver, $proxy_resolver],
+  server => {
+    server_type => 'Single',
+    log_file => "/var/log/named.log",
+  },
+};
+
+# never gets here
+
+exit;

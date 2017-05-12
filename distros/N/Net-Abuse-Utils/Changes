@@ -1,0 +1,125 @@
+Revision history for Perl extension Net::Abuse::Utils.
+
+0.25  2016-06-12 21:39:45 EDT
+    - Fix a typo that broke get_asn_info when multiple elements were returned.
+      Thanks to @rwfranks @NathanGibbs3 @wesyoung
+    - Update AS decscription and company tests to just verify some true value was
+      returned.  Thanks to @rwfranks @NathanGibbs3
+
+0.24  2016-03-08 07:43:15 EST
+    - patch from rwfranks to remove some of the more volatile tests
+    - get_all_asn_info for getting data for all anoucing ASN(s)
+
+0.23  2013-10-24 19:08:48 EDT
+    - [wesyoung] regex fix to get_peer_info where a date is not returned
+    - minor build changes
+
+0.22  2013-10-17 06:14:33 EDT
+    - Pass prefix length to Net::IP::ip_reverse
+
+0.21  2013-10-13 21:25:01 EDT
+    - Return early when we don't have an AS Description, closes GitHub #10
+
+0.20  2013-09-13 23:51:24 EDT
+    - @RESOLVERS package variable to use custom DNS resolvers instead of system
+      resolvers
+    - Declare required Perl version in dist metadata files
+
+0.19  2013-09-05 18:21:39 EDT
+    - Update docs, indicate which functions are IPv4 only
+    - IPv6 test coverage
+    - Other misc testing improvments
+
+0.18  2013-09-03 21:17:51 EDT
+    - [Andrew Hoying] IPv6 Support thanks to Andrew Hoying
+
+0.17  2013-08-27 16:59:21 EDT
+    - Offline tests
+
+0.16  2013-08-25 23:15:13 EDT
+    - Require ONLINE_TESTS ENV variable be set for online tests.
+
+0.15  2013-07-30 06:16:32 EDT
+    - Remove old Build.PL... ooops!
+
+0.14  2013-07-29 01:02:00 EDT
+    - Convert to Milla for authoring tool
+
+0.13 2012-12-06
+    - account for Net::DNS >= 0.69 converting SOA email record to address
+
+0.12_01 2012-09-24
+    - [wesyoung.me] added get_malware function based on: http://www.team-cymru.org/Services/MHR
+
+0.12 2012-08-29
+    - [wesyoung.me] test false failure bugfix
+    - [wesyoung.me] get_asn_info and get_ipwi_contacts bug fixes
+      closes RT #73203 and RT #70209
+    - comment out some old DNSBLs and reorder output in ip-info.pl
+    - add Wes Young to authors
+
+0.11_01 2012-07-30
+    - [wesyoung.me] added get_peer_info function
+    - Use /usr/bin/env perl for example script shebangs
+
+0.11  Sun Sep 14 2009
+	- Moar Tests
+	- Check asn is a number in get_asn_country
+
+0.10  Sun Dec 28 2008
+	- New get_domain function that converts host name to domain name
+	- Memoize support though commented out by default, enable by
+	  uncommenting the following two lines in lib/Net/Abuse/Utils.pm:
+		# use Memoize;
+		# memoize('_return_rr');
+	  A future version will likely allow Memoization via an export tag.
+
+0.09  Sun Jun 15 2008
+	- Fix META.yml issues that were missed in 0.08
+
+0.08  Fri Jun 13 2008
+	- update output of get_as_description to make ARIN IPs match other
+	  RIRs, HANDLE AS Org
+	  eg: THEPLANET-AS ThePlanet.com Internet Services, Inc.
+
+0.07  Fri Mar 30 2008
+	- update regexs used by get_as_company to remove trailing 'AS Number'
+	  as well as 'AS'
+	- remove stripping of AS Handle from ARIN AS Desc now that we have
+	  get_as_company
+	- Module::Signature module signing stuff
+	- Add license to Makefile.PL
+	- Use newer ExtUtils::MakeMaker to generate the new META.yml format
+
+0.06  Fri May 30 2008
+	- Added get_as_company which functions similiarly to
+	  get_as_description but attempts to clean up the string found before
+	  returning it
+	- Update AS description for 21844 in t/Net-Abuse-Utils.t
+	- Remove relays.ordb.org from the DNSBL list in examples/ip-info.pl
+
+0.05  Sun Mar 19 2006
+	- Update Makefile.PL to specify Perl 5.6.1, missed this last rev
+	- Fixed a bug in looking up ASN when the same block is announced by
+	  multiple ASNs.
+	- Fixed a bug where looking up AS Org for ASN not in Cymru database would
+	  generate warnings rather then just return undef
+
+0.04  Fri Mar 10 2006
+	- Added public is_ip function to check that a string looks like an IP
+	- Added tests using Test::Pod::Coverage and Test::Pod (if installed)
+	- Prefix private functions with _ for Test::Pod::Coverage
+	- Require Perl 5.6.1 rather then 5.8.7
+
+0.03  Sun Mar  5 2006
+	- 0.02 was uploaded with a broken test
+
+0.02  Sun Mar  5 2006
+	- Fixed a bug where AS Description would only return data
+	  for ASs assigned by ARIN.
+	- In get_ipwi_contacts check that whoisip_query returns a
+	  hash ref rather then just checking that it isn't an array ref.
+	- a few minor formatting cleanups
+
+0.01  Sat Mar  4 2006
+	- Initial Release

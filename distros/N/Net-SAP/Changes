@@ -1,0 +1,45 @@
+Revision history for Perl extension Net::SAP.
+
+
+0.10  Tue Sep 19 16:16:29 BST 2006
+	Converted to pure-perl module that uses IO::Socket::Multicast6
+	Added ttl() method to Net::SAP
+	Added tests for Net::SAP::Packet methods 
+
+0.09  Fri Apr 21 22:24:36 BST 2006
+	Added Makefile.PL compatibility
+	Added IPv4 addresses for relative scoping
+	Changed multicast group in example to ipv4-global
+
+0.08  
+	Removed unistd.h from mcast_socket.c
+	Add seperate variable declarations in SAP.xs
+
+0.07  Sun Nov  7 15:52:51 2004
+	Fixed Net::SAP::Packet::type() method
+	  (advert and delete were the wrong way round)
+	Removed references to u_int32_t in SAP.xs
+	Changed origin_ip to origin_address in Packet.pm hash
+
+0.06  Sun Nov  7 15:52:51 2004
+	Added IPv6 support by adding XS/C code
+	Added support for creating and sending packets
+
+0.05  Wed Sep  8 19:31:52 2004
+	Added Net::SAP::Packet
+	(undocumented and unreleased)
+
+0.04  Tue Aug 17 13:00:07 2004
+	Changed to the Module::Build system
+
+0.03  Sun Aug 15 16:38:08 2004
+	Changed msg_id_hash to a decimemal integer instead of hex
+	Added test script
+	Better checks when creating multicast socket
+
+0.02  Sun Jul 25 15:47:18 2004
+	Minor Documentation corrections
+
+0.01  Sun Jul 25 01:07:29 2004
+	First release
+	

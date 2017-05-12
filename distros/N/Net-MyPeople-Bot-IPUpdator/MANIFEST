@@ -1,0 +1,10 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+bin/mypeople_bot_ipupdate.pl
+dist.ini
+lib/Net/MyPeople/Bot/IPUpdator.pm

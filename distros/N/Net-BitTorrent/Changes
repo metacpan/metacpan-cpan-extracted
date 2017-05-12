@@ -1,0 +1,417 @@
+Version 0.052 | 2010-04-02 18:31:29Z (Fri, 02 Apr 2010) | 07f0c35
+
+    Documentation/Sample Code/Test Suite:
+    * miniswarm tests are given less time before giving up
+    * 'bad' test (checking if port was opened twice... which seems to be okay
+        on some systems) has been removed
+    * Removing t/900_data/950_torrents/951_single.torrent which was used to
+        test large file support (caused "Out of memory!" errors on smokers
+        with limited resources)
+
+    Notes:
+     * This will probably be the last 'stable' version before Net::BitTorrent
+        is rewritten. Stuff in TODO.pod will be expanded and used as a roadmap
+
+Version 0.051 | 2009-09-12 04:52:06Z (Sat, 12 Sep 2009) | 694da26
+
+    API Changes/Compatibility Information:
+     * N/A
+
+    Resolved Issues/Bug Fixes:
+     * DHT nodes found in metadata are now handled according to spec
+       - Bug reported by Wouter Godefroy via email
+
+    Protocol/Behavioral Changes:
+     * N/A
+
+    Documentation/Sample Code/Test Suite:
+    * New script /scripts/net-bittorrent.pl is installed with distribution. It
+        is a very short version of /tatoeba/005-console.pl
+
+    Notes:
+     * Meanwhile...
+         - New IRC-based support: irc://irc.p2p-network.com/net-bittorrent
+         - Bug tracker is now at http://github.com/sanko/net-bittorrent/issues
+
+---
+Version 0.050 | 2009-02-13 20:55:16Z (Fri, 13 Feb 2009) | d8d71ee
+
+    API Changes/Compatibility Information:
+     * N::B::Peer objects have their sockets closed and removed *before*
+        calling any peer_disconnect callbacks.
+     * Reasons handed to peer_disconnect callbacks are now language agnostic.
+       Please see Notes section in Net::BitTorrent::Peer for more information.
+
+    Resolved Issues/Bug Fixes:
+     * Fixed major bug related to outgoing HAVE packets.
+
+    Protocol/Behavioral Changes:
+     * Message Stream Encryption (enabled by default) with plaintext fallback
+     * Shorter waiting period before filling requests (15s -> 3s)
+     * Default for number of allowed connections per host has changed (2 -> 1)
+
+    Documentation/Sample Code/Test Suite:
+    * Genereal documentation cleanup
+    * Fix t/[...]/Protocol.t failures due to the limits of 32-bit math
+    * (Start of a) Rewrite of t/[...]Peer.t to be more complete and emulate
+       real-world sessions.
+    * New demonstration script: /tatoeba/005-console.pl
+         - Formerly known as /scripts/bittorrent.pl
+
+    Notes:
+     * With the addition of Protocol Encryption and the bugfix, I strongly
+       suggest an upgrade for all users despite the API tweeks.
+     * Meanwhile...
+         - Development moved to github: http://github.com/sanko/net-bittorrent
+
+---
+Version 0.049 | 2009-01-05 17:38:02 -0500 (Mon, 05 Jan 2009)
+
+    API Changes/Compatibility Information:
+     * Net::BitTorrent::Torrent->peers() is now public
+     * Lists of potential peers are kept by their source (N::B::DHT,
+       N::B::T::Tracker::HTTP, N::B::T::Tracker::UDP) rather than in
+       Net::BitTorrent::Torrent.
+     * Resume system (yeah, the thing I added two versions ago) was deprecated
+       and has been replaced.  I thought about it and changing the original
+       .torrent's metadata is a bad idea so I switched from Rakshasa- to
+       Rasterbar-like.
+
+    Resolved Issues/Bug Fixes:
+     * None
+
+    Protocol/Behavioral Changes:
+     * N::B::T::Tracker::HTTP retry is now 30s on socket error (formerly 5m).
+     * N::B::Peer objects are disconnected if they don't complete handshake
+       within 30s.
+
+    Documentation/Sample Code/Test Suite:
+     * New debugging demonstration in /tatoeba/002-debug.pl
+     * New threaded demonstration in /tatoeba/003-threads.pl
+     * New resume demonstration in /tatoeba/004-resume.pl
+     * Various tests temporarily tie STDERR to check as_string() output
+
+    Notes:
+     * There are several incompatible changes and I've been coding with the
+       flu this week.  Upgrade at your own risk.
+     * THIS PROJECT IS ACTIVELY SEEKING DEVELOPERS. Ahem, I hate to shout but
+       N::B could really use your help. Yes, you, the person reading this. If
+       you're interested, see the "Joining the Project" section in
+       Net::BitTorrent::Notes.
+     * Various N::B::Torrent status and internal schedule fixes were made none
+       of which really effect behavior.
+     * Meanwhile...
+         - 2008 ends as it began: uneventfully.
+         - RIAA drops MediaSentry.
+
+---
+Version 0.046 | 2008-12-30 18:25:17 -0500 (Tue, 30 Dec 2008)
+
+ API Changes/Compatibility Information:
+  - Net::BitTorrent::Torrent::HTTP->url() is now public
+  - Net::BitTorrent::Torrent::UDP->url() is now public
+
+ Resolved Issues/Bug fixes:
+  - In 0.045, if no arguments were passed, Net::BitTorrent->new() failed to
+      set set defaults, generate a peerid, or create a DHT object.
+
+ Protocol/Behavioral Changes:
+  - None
+
+ Documentation/Sample Code/Test Suite:
+  - The first two in a series of demonstration scripts are in the /tatoeba/ directory
+  - Minor tweaking and clean up in Net::BitTorrent::Notes
+
+ Notes:
+  - This is a major bug fix release with which introduces no incompatibilities.
+    Upgrade is highly recommended.
+
+---
+Version 0.045 | 2008-12-26 17:17:16 -0500 (Fri, 26 Dec 2008)
+
+ API Changes/Compatibility Information:
+  - [Beta] Torrent resume system (see Net::BitTorrent::Notes).
+  - Net::BitTorrent::Torrent->hashcheck() clears the bitfield when it begins.
+
+ Resolved Issues/Bug Fixes:
+  - Close related sockets on N::B::DESTROY (left behind FIN_WAIT1 on Win32).
+
+ Protocol/Behavioral Changes:
+  - DHT actually works. For real this time.
+
+ Documentation/Sample Code/Test Suite:
+  - scripts/bittorrent.pl supports resume (overwrites .torrent file).
+
+ Notes:
+  - No non-compatible API changes so upgrade is suggested.
+  - The announce and discussion lists have been combined into a single list found at http://groups.google.com/group/net-bittorrent.
+  - All code is now covered by the Artistic 2 License (actually since v0.040
+      but I failed to mention it in the changelog).
+  - Meanwhile,...
+    + the RIAA stops suing people and will, instead, cancel your 'net service (http://tinyurl.com/4h9omj) and bed your crush.
+    + Australia plans to filter BitTorrent. (http://tinyurl.com/95uvg5) ...eventually (http://tinyurl.com/a4juwy).
+
+---
+Version 0.042 | 2008-12-04 23:54:43 -0500 (Thu, 04 Dec 2008)
+
+ API Changes/Compatibility Information:
+  - as_string() is now a public method in all classes
+
+ Issues Resolved:
+  - Fixed crash bug (call to legacy method) on failure to write data to disk
+
+ Protocol/Behavioral Changes:
+  - None
+
+ Documentation/Sample Code/Test Suite:
+  - as_string() is documented all around
+  - Affected tests updated to reflect as_string() change
+  - Synopsis in README now matches that of N::B proper
+  - More silly POD changes for scripts/bittorrent.pl ((sigh))
+
+ Notes:
+  - PAUSE vs. The World (Writable Files)
+
+---
+Version 0.040 | 2008-12-01 23:25:26 -0500 (Mon, 01 Dec 2008)
+
+ API changes:
+  - See the Notes section
+  - Torrents can now be paused, stopped, and started (alpha code)
+  - Torrent objects can now be created without a parent client for
+      informational use (See perldoc Net::BitTorrent::Torrent)
+
+ Compatibility Information:
+  - See the Notes section
+  - Net::BitTorrent::Session::* is now Net::BitTorrent::Torrent::* thanks to
+      one very squeaky wheel.
+  - PeerID spec has changed (stability marker is now 'U'nstable/'S'table
+      instead of the less obvious and misleading 'S'VN/'C'PAN)
+  - Torrents aren't automatically checked when loaded.
+
+ Internal changes:
+  - See the Notes section
+  - UDP trackers are now supported
+  - DHT actually works
+  - Fast Ext. is back
+  - PeerID, DHT node ID, ExtProtocol name, and dist version are all generated
+      in Net::BitTorrent::Version
+
+ Issues resolved:
+  - No longer floods the system with CLOSE_WAIT sockets which eventually block
+      the allocation of new sockets
+
+ Notes:
+  - Since the previous stable release, Net::BitTorrent has been rewritten from
+      scratch, so yeah, 90% of everything internal has changed, the API was
+      redesigned as well.  I've been pushing dev builds for more than three
+      months so... yeah.
+
+---
+Version 0.027_001 | Fall 2008
+
+ Internal changes:
+  - Net::BitTorrent is going through a rewrite.  Idle hands...
+
+ Notes:
+  - Don't use this.  I'm serious.  I'm only uploading it to get some CPAN
+      testers data.
+
+---
+Version 0.025 | 2008-07-01 23:07:52 -0400 (Tue, 01 Jul 2008)
+
+ Internal changes:
+  - Fix crash bug by re-enabling N::B::S::Peer::_parse_packet_allowed_fast and
+      N::B::S::Peer::_parse_packet_reject in the packet dispatch table
+  - Fixed crash bug in Data::Dumper usage in N::B::S::Peer and N::B::DHT
+  - Fixed non-critical bug in N::B::S::Peer when a connected peer goes
+      ((poof)) in the middle of something.
+
+ Notes:
+  - Please see the Compatibility Information section from the previous version
+  - Gah, what a waste of a great version number (0.025)... That's what I get
+      for not eating my own dog food before shipping it.
+  - I knew I was forgetting something.
+
+---
+Version 0.024 | 2008-07-01 19:52:15 -0400 (Tue, 01 Jul 2008)
+
+ API changes:
+   - Entire API has changed.  See the Compatibility Information below.
+   - New DHT-related callback: peer_outgoing_port
+
+ Internal changes:
+  - DHT is included with this release.  It's really raw code so don't expect
+      too much.
+
+ Compatibility Information:
+  - I've changed the API to pretty much everything in the distribution with a
+      depreciation cycle.  Bold, yes? So, with so much having changed, putting
+      a full list of what's changed will be a horrific waste of space.  These
+      are the highlights:
+      Old Mutator/Accessor         New Getter               New Setter
+    --------------------------------------------------------------------------
+    N::B
+     maximum_buffer_size       get_max_buffer_per_conn  set_max_buffer_per_conn
+     kbps_down                 get_max_dl_rate          set_max_dl_rate
+     kbps_up                   get_max_ul_rate          set_max_ul_rate
+     maximum_peers_per_client  get_conns_per_client     set_conns_per_client
+     maximum_peers_per_session get_conns_per_session    set_conns_per_session
+     maximum_peers_half_open   get_max_halfopen         set_max_halfopen
+     debug_level               get_debug_level          set_debug_level
+     maximum_requests_per_peer get_ul_slots_per_session set_ul_slots_per_session
+     maximum_requests_size     get_ul_slot_size         get_ul_slot_size
+     peer_id                   get_peer_id              --NA--
+     sockport                  get_sockport             --NA--
+     sockaddr                  get_sockaddr             --NA--
+     sessions                  get_sessions             --NA--
+    N::B::S::Piece
+     check                     get_cached_integrity
+     verify                    get_verified_integrity
+  - The arguments Net::BitTorrent's constructor expects have been changed to
+      stay in step with the new get/set methods:
+             Old                           New
+      ------------------------------------------------------------------------
+      maximum_peers_per_client      conns_per_client
+      maximum_peers_per_session     conns_per_session
+      kbps_down                     max_dl_rate
+      kbps_up                       max_ul_rate
+      maximum_peers_half_open       max_halfopen
+      maximum_buffer_size           max_buffer_per_conn
+      maximum_requests_size         ul_slot_size
+      maximum_requests_per_peer     ul_slots_per_session
+  - Removed accessors:
+        - N::B->timeout( [NEWVAL] )
+          This was the select timeout used in N::B::do_one_loop().  It has
+          been removed completely in favor of a new optional parameter passed
+          to N::B::do_one_loop( [TIMEOUT] ) itself.
+ Notes:
+  - I'm sure I'm forgetting something... several somethings, in fact...
+  - This is an UNSTABLE stable release.  There may be calls to old methods
+    hiding out in a dark corner...
+    data on the extended test suite, the rewritten API, and the alpha DHT
+    code.  DO NOT INSTALL!  Stick with the 0.022 release!  As soon as I have a
+    few reports, I will mark this distribution for deletion from PAUSE.
+
+Version 0.022 | 2008-05-24 10:31:26 -0400 (Sat, 24 May 2008)
+
+ API changes:
+  - Callback system is complete.
+    + N::B::S::Tracker was the holdup...
+
+ Issues resolved:
+  - None
+
+ Internal changes:
+  - None
+
+ Notes:
+  - Upgrade is not required in general but recommended for heavy callback users.
+  - More POD tweaks.
+  - Very few changes to scripts/web-gui.pl.  These are untested changes, btw.
+
+---
+Version 0.020 | 2008-05-22 19:09:05 -0400 (Thu, 22 May 2008)
+
+ API changes:
+  - Experimental N::B::use_unicode() has been removed as wide char filenames
+      are now handled transparently on Win32.
+  - New accessor: N::B::Session::name() - see N::B::Session docs
+  - New methods for alternative event processing:
+    + N::B::process_connections() - implement your own select() statement
+    + N::B::process_timers() - easily keep internal timers up to date
+  - Experimental kbps_up and kbps_down methods and N::B::new() parameters have
+      been renamed properly: kBps_up, kBps_down.  Bits.  Bytes.  It happens.
+
+ Issues resolved:
+  - #1: Line 231 Piece.pm - Check existence of $self->session->files->[$f]->size
+    + New .torrent metadata integrity checks during add_session() and piece
+        read/write.
+    + Log warning and undef returned when N::B::add_session() is handed a
+        .torrent that does not contain files. (eh, it's a start)
+
+ Internal changes:
+  - Plenty of layout and ideology changes.  None of which immediately affect
+      usability or behavior.
+  - Extended charset filenames are now handled properly on Win32.
+    + Depends on properly encoded utf8 metadata (and the J-Pop fans rejoice)
+  - (The piece containing) Outgoing blocks are verified for integrity before
+      being sent to remote peers.  Just in case.
+
+ Notes:
+  - Upgrade is recommended in general.
+  - Upgrade is strongly recommended for Win32 systems.
+  - New sample code: scripts/web-gui.pl
+    + µTorrent WebUI-like demo of alternative event processing.
+  - To keep N::B from growing too messy and to make co-development attractive,
+      I'm imposing some coding standards, defining what should be internal,
+      and deciding how N::B should behave.  Between that and the nice weather,
+      the addition of new features (DHT, UDP trackers, etc.) will be pushed
+      back a bit.  The next few releases will probably be bugfix, API, and
+      base protocol-behavioral changes.
+  - Documentation rework in progress.
+  - What's the cutoff for apologizing for things you said in high school?
+
+---
+Version 0.018 | 2008-04-24 21:14:52 -0400 (Thu, 24 Apr 2008)
+
+ API changes:
+  - Old style set_callback_* syntax is depreciated.
+  - New methods: kbps_up, kbps_down
+  - New optional parameters for N::B::new(): kbps_up, kbps_down
+
+ Internal changes:
+  - Fixed crash bug in N::B::S::Peer during endgame
+
+ Notes:
+  - Upgrade is strongly recommended.
+  - New feature: Transfer limits to control how much bandwidth N::B is
+      allowed to use.
+  - No longer causes taint warnings.
+  - perl 5.8.1 required.  This is based solely on available CPAN
+      Reporter PASS/FAIL tests and may not be a true representative
+      value.
+
+---
+Version 0.015 | 2008-04-11 20:00:26 -0400 (Fri, 11 Apr 2008)
+
+ Notes:
+  - Dup of 0.013 to fix bad M::B dist.  Something fishy going on with
+    the gzip'd file.  Some systems (like PAUSE) properly extract
+    directories and some (like the cpan shell) extract it all into the
+    base directory causing build failures.
+
+---
+Version 0.013 | 2008-04-11 13:30:36 -0400 (Fri, 11 Apr 2008)
+
+ API changes:
+  - log callbacks now include a message level.  See
+     N::B::Util/"LOG LEVELS".
+  - removed peer_outgoing_packet callback in favor of more specific,
+     per-packet-type callbacks.
+
+ Internal changes:
+  - Fixed a bug causing files to be re-opened every time they are read.
+  - Tons of N::B::S::Peer refactoring.  (and much more to do)
+  - Early Fast Peers and Ext. Protocol testing. (disabled by default)
+
+ Notes:
+  - Upgrade is recommended.
+  - This is a documentation update.  100% coverage.
+
+---
+Version 0.008 | 2008-04-01 19:46:20 -0400 (Tue, 01 Apr 2008)
+
+ API changes:
+  - It actually exists
+
+ Internal changes:
+  - See above
+
+_ -.-. .... .- -. --. . ... _________________________________________
+For more information, see the commit log:
+    http://github.com/sanko/net-bittorrent/commits/master
+
+$Ver: 0.052 $ from git $Rev: 07f0c35 $
+$Date: 2010-04-02 18:31:29Z (Fri, 02 Apr 2010) $
+$Url: http://github.com/sanko/net-bittorrent//raw/07f0c359852c544af35477308b26705bc2e593a5/Changes $

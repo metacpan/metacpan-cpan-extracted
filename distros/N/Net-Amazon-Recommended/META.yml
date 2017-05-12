@@ -1,0 +1,29 @@
+---
+abstract: 'Grab and configurate recommendations by Amazon'
+author:
+  - 'Yasutaka ATARASHI <yakex@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Amazon-Recommended
+requires:
+  Data::Section: 0
+  DateTime::Format::Strptime: 0
+  Template::Extract: 0
+  WWW::Mechanize: 0
+  perl: 5.006
+resources:
+  homepage: https://github.com/yak1ex/Net-Amazon-Recommended
+  repository: https://github.com/yak1ex/Net-Amazon-Recommended.git
+version: v0.0.4

@@ -1,0 +1,11 @@
+lib/Net/Chat/Daemon.pm
+lib/Net/Chat/Jabber.pm
+Makefile.PL
+MANIFEST
+README
+scripts/jserv
+scripts/jabber
+t/1.t
+t/pod.t
+t/pod-coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

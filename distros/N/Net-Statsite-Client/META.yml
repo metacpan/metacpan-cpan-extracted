@@ -1,0 +1,44 @@
+---
+abstract: 'Object-Oriented Client for L<statsite|http://armon.github.io/statsite> server'
+author:
+  - 'Jan Seidl <seidl@avast.com>'
+build_requires:
+  Port::Selector: '0'
+  Test::Exception: '0'
+  Test::MockModule: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Statsite-Client
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::Statsite::Client:
+    file: lib/Net/Statsite/Client.pm
+    version: v1.1.0
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/avast/Net-Statsite-Client/issues
+  homepage: https://github.com/avast/Net-Statsite-Client
+  repository: git://github.com/avast/Net-Statsite-Client.git
+version: 1.1.0
+x_contributors:
+  - 'Miroslav Tynovsky <tynovsky@avast.com>'
+  - 'Mohelníková Lucie <mohelnikova@avast.com>'
+  - 'Jan Seidl <janseidl@volny.cz>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

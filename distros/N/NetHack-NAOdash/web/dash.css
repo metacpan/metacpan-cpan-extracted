@@ -1,0 +1,114 @@
+html {
+	color: #DDD;
+	background-color: #000;
+	margin: 0;
+	padding: 0 2% 1%;
+	line-height: 1.5;
+}
+
+h2 {
+	text-align: center;
+	display: table;
+	white-space: nowrap;
+	margin: 0.5em;
+	text-transform: uppercase;
+	font-family: monospace;
+	font-size: 1.5em;
+	font-weight: 100;
+}
+
+h2:before,
+h2:after {
+	content: ' ';
+	display: table-cell;
+	position: relative;
+	top: 0.55em;
+	width: 48%;
+	border-top: 1px dashed #BBB;
+}
+
+h2:before {
+	right: 1.5%;
+}
+
+h2:after {
+	left: 1.5%;
+}
+
+#title {
+	text-align: center;
+}
+
+#versions {
+	text-align:center;
+	margin: 5px;
+}
+
+#versions li {
+	display: inline;
+}
+
+#versions li::after {
+	content: "|";
+	margin: 0 0.5em;
+}
+
+#versions li:last-child::after {
+	content: "";
+}
+
+span[title] {
+	color: #D33;
+	font-family: monospace;
+	font-size: 1.25em;
+	margin-right: 1.5em;
+}
+
+
+span[title].done {
+	color: #8F8;
+	text-decoration: underline;
+}
+
+dl {
+	font-family: monospace;
+	font-size: 1.25em;
+	margin-top: 0;
+}
+
+dt {
+	font-weight: bold;
+	float: left;
+	clear: left;
+}
+
+dt:after {
+	content: ":";
+}
+
+dd {
+	float: left;
+	margin-left: 1em;
+}
+
+footer {
+	margin-top: 1em;
+	text-align: center;
+	clear: both;
+}
+
+a:link {
+	color: #66F;
+	text-decoration: none;
+}
+
+a:visited {
+	color: #84B;
+}
+
+@media (min-width: 500px) {
+	.cols {
+		-moz-columns: 2;
+		-webkit-columns: 2;
+	}
+}

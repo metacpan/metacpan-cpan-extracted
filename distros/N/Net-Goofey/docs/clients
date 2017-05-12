@@ -1,0 +1,55 @@
+This file details the various goofey clients available.
+
+Name: goofey
+Author: Tim MacKenzie <tym@cs.monash.edu.au>, Darren Platt
+Email: tym@cs.monash.edu.au
+Description: Basic text client. Reference client.
+Status: Always up to date :)
+Location: goofey -S
+
+Name: Daisey
+Author: Tim MacKenzie <tym@cs.monash.edu.au>
+Description: Tk/Tcl/DP X-windows client
+Status: Functional, needs better documentation, port to new tk, etc
+Location: goofey -S
+
+Name: GWC
+Author: Colin Enticott <cent@silas.cc.monash.edu.au>
+Description: Goofey Windows Client
+Status: Funcational, currently beta testing
+Location: http://yoyo.cc.monash.edu.au/~colin/gwcProject/
+
+Name: WinGoofey
+Author: Hong Yew <cyclone@yoyo.cc.monash.edu.au>
+Description: Win95 windows client
+Status: Don't know
+Location: http://yoyo.cc.monash.edu.au/~cyclone/software.html
+
+Name: minnie
+Author: Tim MacKenzie <tym@cs.monash.edu.au>
+Description: Original Tk/Tcl client
+Status: Not supported (superceded by Daisey). Probably doesn't work anymore
+
+Name: Mickey
+Author: Tim MacKenzie <tym@cs.monash.edu.au>, Darren Platt
+Description: The evolved pluto console client
+Status: Still functional
+Location: telnet://pluto.cc.monash.edu.au:4470
+
+Name: Donald
+Author: Kevin Lentin <kevinl@cs.monash.edu.au>
+Description: Calender server client
+Location: goofey -s Donald, source not available
+
+Name: Et
+Author: Darren Platt <darrenp@cs.monash.edu.au>
+Description: Phone directory server client
+
+Name: pygoofey (better suggestions welcome :) )
+Author: Toby Sargeant <toby@forefront.com.au>
+Status: Functional, under development. documentation lacking (use the source,
+        luke).  suggestions welcome.
+Requires: python 1.4 or above, tcl/tk8.0, tkinter 1.4 or above.
+Tested on: Linux 2.0.30 with python 1.4 and 1.5, WinNT with python 1.4 and 1.5
+           should run on just about anything that python runs on though.
+

@@ -1,0 +1,26 @@
+NAME
+    "Net::Async::ArtNet" - use ArtNet with "IO::Async"
+
+DESCRIPTION
+    This object class allows you to use the Art-Net protocol with
+    "IO::Async". It receives Art-Net frames containing DMX data.
+
+EVENTS
+  on_dmx $seq, $phy, $uni, $data
+    A new set of DMX control values has been received. $seq contains the
+    sequence number from the packet, $phy and $uni the physical and universe
+    numbers, and $data will be an ARRAY reference containing up to 512 DMX
+    control values.
+
+PARAMETERS
+    The following named parameters may be passed to "new" or "configure":
+
+    port => INT
+            Optional. Port number to listen for Art-Net packets on.
+
+SEE ALSO
+    *   <http://en.wikipedia.org/wiki/Art-Net> - Art-Net - Wikipedia
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -1,0 +1,44 @@
+<CreditNote>
+<Reference>[% reference %]</Reference>
+  <Type>[%- IF type == 'pay' %]ACCPAYCREDIT[%- ELSE %]ACCRECCREDIT[%- END %]</Type>
+  <Status>[% status || 'DRAFT' %]</Status>
+  [%- IF currency %]<CurrencyCode>[% currency %]</CurrencyCode>[%- END %]
+  <Contact>
+    [%- IF contact.company %]
+    <Name>[% contact.company %]</Name>
+    <FirstName>[% contact.firstname %]</FirstName>
+    <LastName>[% contact.lastname %]</LastName>
+    [%- ELSE %]
+    <Name>[% contact.firstname %] [% contact.lastname %]</Name>
+    [%- END %]
+    <EmailAddress>[% contact.email %]</EmailAddress>
+    [%- IF type == 'pay' %]
+    <IsSupplier>true</IsSupplier>
+    [%- ELSE %]
+    <IsCustomer>true</IsCustomer>
+    [%- END %]
+  </Contact>
+  <Date>[% date %]</Date>
+  <DueDate>[% duedate %]</DueDate>
+  <LineAmountTypes>[% lineamounttypes %]</LineAmountTypes>
+  <LineItems>
+  [%- FOREACH line IN lineitems %]
+    <LineItem>
+      <Description>[% line.desc %]</Description>
+      <Quantity>[% line.quantity %]</Quantity>
+      <UnitAmount>[% line.amount %]</UnitAmount>
+      <AccountCode>[% line.account %]</AccountCode>
+      [%- IF line.tracking %]
+      <Tracking>
+      [%- FOREACH track in line.tracking %]
+      <TrackingCategory>
+        <Name>[% track.category %]</Name>
+        <Option>[% track.option %]</Option>
+      </TrackingCategory>
+      [%- END %]
+      </Tracking>
+      [%- END %]
+    </LineItem>
+  [%- END %]
+  </LineItems>
+</CreditNote>

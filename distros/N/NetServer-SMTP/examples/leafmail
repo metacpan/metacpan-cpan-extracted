@@ -1,0 +1,214 @@
+#!/usr/bin/perl
+
+# simple SMTP spooler daemon
+#
+# accepts connections, then spools mail. when invoked on the command
+# line, attempts to poll upstream smarthost and send spooled mail onwards.
+
+use NetServer::Generic;
+use NetServer::SMTP;
+use IO::Handle;
+use Sys::Syslog;
+use Mail::Internet;
+use Data::Dumper;
+
+require "/etc/leafmail.cf";
+
+# main program
+
+openlog 'leafmail', 'pid,ndelay,cons', 'messages';
+
+$SIG{INT} = sub {
+    my $msg = "leafmail going down on signal INT";
+    syslog("info", "%s", $msg);
+    exit 0;
+};
+
+sub smtp_session {
+    my ($serv) =shift @_ if @_;
+    my ($self) = NetServer::SMTP->new(%MAIN::leafmail_param);
+    if (defined($serv)) { $self->serv($serv); };
+    my ($in) = new IO::Handle;
+    $in->fdopen(fileno(STDIN),"r");
+    $in->autoflush(1);
+    my ($out) = new IO::Handle;
+    $out->fdopen(fileno(STDOUT),"w");
+    $out->autoflush(1);
+    while (<$in>) {
+        next if (! defined($_));
+        my (@vec) = split(/\s+/);
+        my ($fn) = shift @vec;
+        $fn = uc($fn);
+        if (grep(/$fn/i, @$NetServer::SMTP::States) != 0) {
+            my $msg = join(" ", ($fn, @vec));
+            syslog("info", "%s", $msg);
+            $self->in($in);
+            $self->out($out);
+            $self->next_state_ok($fn) && do {
+                $self->$fn(@vec);
+            };
+        } else {
+              print "What on earth does [$fn][", join(" ", @vec), "] mean?\n";
+        }
+        if ($self->{ERROR} > 0 ) {
+	    $self->DESTROY();
+            shutdown($out, 2);
+            shutdown($in, 2);
+	    exit;
+	}
+    }
+}
+
+sub queue {
+    $MAIN::leafmail_param{silent} = 1;
+    my ($self) = NetServer::SMTP->new(%MAIN::leafmail_param);
+    close STDERR;
+    my (@dumb_msg) = (<STDIN>);
+    my (@msg) = @dumb_msg;
+    my ($mail) = new Mail::Internet(\@dumb_msg);
+    my ($head) = $mail->head();
+    my ($body) = $mail->body();
+    $self->{from} =  ( $head->get("From:") ) ;
+    $self->{rcpt} = [ ( $head->get("To:") ) ];   
+    $self->{body} = \@msg;
+    $self->spool();
+    return;
+}
+
+my $name = $0;
+
+# if we are being run as sendmail, we're to accept a message from some
+# dumb mutt of a mailer ;-)
+
+if ($name =~ /sendmail/) {
+    queue();
+    exit 0;
+}
+
+if (@ARGV) {
+    foreach (@ARGV) {
+        my ($self) = NetServer::SMTP->new($_);
+	my $retvar = $self->send();
+        if ( $self->send() ne 0) {
+	   syslog("info", "spooler sent message $retvar");
+	   print STDERR "spooler sent message $retvar\n";
+        } else {
+           $self->send();
+        }
+        undef $self;
+    }
+    exit 0;
+} else {
+    my ($cb) = sub { smtp_session(@_); };
+    my (%config) = (
+       "port" => $MAIN::port,
+       "callback" => $cb
+    );
+    if ($MAIN::bindhost ne "") {
+       $config{hostname} = $MAIN::bindhost;
+    }
+    $config{callback} = $cb;
+    my ($smtp) = NetServer::Generic->new(%config);
+    my $msg = "$0 [$$] started on port 25\n";
+    print $msg;
+    syslog("info", "%s", $msg);
+    $smtp->run();
+}
+
+__END__
+
+
+=head1 NAME
+
+leafmail - minimal spooling SMTP server
+
+=head1 SYNOPSIS
+
+A minimal SMTP server intended for leaf sites connected to the internet
+via an intermittent dial-up connection. 
+
+=head1 DESCRIPTION
+
+When running as a standalone daemon C<leafmail> listens for incoming
+local SMTP traffic. When it receives mail, it spools it in a local spool
+directory.  When a dialup connection is available, C<leafmail> may be
+run as a command-line application (rather than a daemon); each file
+named on the command line is then read in and transmitted to the
+smarthost, and removed from the spool directory.
+
+In addition, if C<leafmail> is run as C</usr/lib/sendmail>, it reads a
+mail message from its standard input and spools it (to simulate
+C<sendmail>'s spooling mechanism).
+
+C<Leafmail> has B<no> local delivery mechanism; the only thing it can do
+with mail is send it to an upstream server. It cannot deliver mail
+locally. This is not as useless as it sounds. Many dialup internet
+users collect incoming mail via POP3, but have to send it via SMTP to
+their ISP's server. C<Leafmail> fits in this gap by providing a local
+SMTP-spooling service for such sites.
+
+C<Leafmail> has been tested with C<Pine> (SMTP connection) and C<mutt>
+(standard input to C<sendmail>). Other MUAs may have quirks I haven't
+been bitten by yet; expect C<leafmail> to evolve rapidly from this
+alpha-release.
+
+I would be very surprised indeed to hear that C<leafmail> runs on a non-
+UNIX operating system.
+
+=head2 INSTALLATION
+
+To install C<leafmail> ...
+
+=over 4
+
+=item 1
+
+You need a full Perl 5.004 (or higher) installation, including the
+modules C<NetServer::Generic> (0.02 or higher) and C<NetServer::SMTP>
+(0.01 or higher), and all the modules they depend on.
+
+=item 2
+
+You also need the Perl modules C<Data::Dumper> and C<Mail::Internet>,
+both available from CPAN. If they aren't installed, you can't run
+C<leafmail>.
+
+=item 3
+
+Make sure the hash-bang line at the top of the C<leafmail> script points
+to your copy of Perl. B<chmod> C<leafmail> to executable, B<chown> it
+to B<mail>, and stick it in I</usr/sbin> or somewhere similar.
+
+=item 4
+
+Edit your copy of I<leafmail.cf>, the C<leafmail> configuration file. Put
+it in I</etc> and make sure it's readable by C<leafmail> (but not writable
+by non-privileged users!). Ensure that the spool directory indicated in
+I<leafmail.cf> exists and is readable, writable, and executable by the
+owner of the I<leafmail> program (i.e. probably the UID B<mail>).
+
+=item 5
+
+Create some method for starting/stopping C<leafmail>. This will typically
+be a line in I</etc/rc.local> (for BSD-ish systems) or a custom script
+in I</etc/rc.d/init.d> (for SVR-ish systems).
+
+=item 6
+
+Test C<leafmail>. You should probably do this by telling I<leafmail.cf>
+to use a non-standard port for sessions (e.g. 9000) rather than port 25,
+then telnet to that port and interactively enter SMTP commands. If this
+works, switch to port 25, ensure that no other SMTP server (e.g. C<qmail>,
+C<sendmail>) is running, then restart C<leafmail>.
+
+=back
+
+=head1 BUGS
+
+Probably loads of them. C<leafmail> is a work in progress, and this is 
+the first alpha release. Caveat programmer!
+
+=head1 AUTHOR
+
+Charlie Stross <charlie@antipope.org>.
+

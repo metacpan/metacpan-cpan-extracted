@@ -1,0 +1,17 @@
+Revision history for Perl extension Net::Hesiod.
+1.11  Tue Sep 10 19:08:00 2002
+	Some minor changes in installation.  No changes in actual module, just
+	will now search for hesiod stuff a bit better.  Also trying to make
+	more compatible for CPAN module installs.
+1.10  Tue Apr 24 13:00:00 2001
+	Discovered that hesiod_getservbyname IS functioning properly by
+	returning port number in network byte order.  Not well documented
+	in DEC man pages.  So removed HESIOD_PORT_ENDIAN_HACK, and automatcally
+	do a ntohs for everything.  (Perl gerservbyname gives port in host
+	byte order, so we stick with that).
+1.00  Mon Apr 23 18:00:00 2001
+	Installed and tested on alpha-dec_osf, i386-linux, and sun4-solaris
+0.01  Mon Apr 16 14:12:34 2001
+	- original version; created by h2xs 1.20 with options
+		-A -n Hesiod /usr/local/athena/include/hesiod.h
+

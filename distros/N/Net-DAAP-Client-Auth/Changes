@@ -1,0 +1,16 @@
+1.21	Monday 26th July, 2004
+	Gut it - no longer needed so point users at Net::DAAP::Client 0.4
+
+0.13	Wednesday 16th June, 2004
+	Fix the regex to speak daap v3 to iTunes 4.6 too.
+
+0.12	Monday 17th May, 2004
+	Added in fetching of daap.songcompilation, daap.songtracknumber, and
+	daap.songtrackcount for Filesys::Virtual::DAAP
+
+0.10	Thursay 6th May, 2004
+	Refactoring.
+	Added protocol version 3.0 (iTunes 4.5) support
+
+0.01	Friday 30th April, 2004
+	Initial CPAN release

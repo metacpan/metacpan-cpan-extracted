@@ -1,0 +1,76 @@
+NAME
+    Net::RRP::Lite - simple interface of RRP.
+
+SYNOPSIS
+      use Net::RRP::Lite;
+      use IO::Socket::SSL;
+
+      my $sock = IO::Socket::SSL->new(
+          PeerHost => '....',
+          PeerPort => '....',
+          #....
+      );
+      my $rrp = Net::RRP::Lite->new($sock);
+      $rrp->login('registrer', 'xxxx');
+      my $res = $rrp->check(Domain => {
+          DomainName => 'example.com',
+      });
+      $rrp->disconnect;
+
+DESCRIPTION
+    Net::RRP::Lite provides a simple interface of Registry Registrar
+    Protocol. RRP has four elements, Command, Entity, Attributes and
+    Options.
+
+    Net::RRP::Lite generates method dynamically, and method structure is
+    below.
+
+    $rrp->*command_name*(*Entity* => { Attributes and Options });
+
+  EXAMPLES
+    C represents data sent by client, S represents data received from
+    server.
+
+       C:add<crlf>
+       C:EntityName:Domain<crlf>
+       C:DomainName:example.com<crlf>
+       C:-Period:10<crlf>
+       C:.<crlf>
+       S:200 Command completed successfully<crlf>
+       S:registration expiration date:2009-09-22 10:27:00.0<crlf>
+       S:status:ACTIVE<crlf>
+       S:.<crlf>
+
+       my $rrp = Net::RRP::Lite->new($sock);
+       my $res = $rrp->add(Domain => 
+                           { DomainName => 'example.com', -Period => 10});
+       print $res->code; # 200
+       print $res->message; # Command completed successfully
+       print $res->param('registration expiration date') 
+       print $res->param('status');
+
+METHODS
+    new($sock)
+        constructor of Net::RRP::Lite object. $sock is a IO::Socket::SSL
+        object.
+
+    connect(%options)
+        connect RRP Server and construct new Net::RRP::Lite object. %options
+        are passed to IO::Socket::SSL.
+
+    $rrp->login($id, $password)
+        shortcut for $rrp->session(undef, { -Id => $id, -Password =>
+        $password});
+
+    $rrp->disconnect;
+        send quit command and close socket.
+
+AUTHOR
+    IKEBE Tomohiro <ikebe@edge.co.jp>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Net::RRP RFC2832
+

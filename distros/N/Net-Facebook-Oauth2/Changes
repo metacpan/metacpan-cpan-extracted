@@ -1,0 +1,36 @@
+Revision history for Perl module Net::Facebook::Oauth2.
+
+0.10  2016 2016-10-14
+	- Update to Graph API v2.8
+	- add missing deps
+	- minor code tidying
+	- documentation improvements
+	- trigger warning when API is about to deprecate
+	- update example and readme to v2.8
+	- All changes in this release contributed by (Breno G. de Oliveira)
+
+0.09  2015 2015-03-25
+	- Code clean (Breno G. de Oliveira)
+	- Using JSON::MaybeXS instead of deprecated JSON::ANY (Breno G. de Oliveira)
+	- Update Facebook graph API to version 2.2 (Breno G. de Oliveira)
+
+0.08  2013 2013-10-10
+	- Bug fix reported by Emad Fanous, adding query to already existing one
+	- Update Changes File
+
+0.07  2013 2013-08-21
+	- Updating MANIFEST file to include examples folder
+
+0.06  2013-05-28
+	- Allow Browser options to pass in by & tests (William Bellamy)
+	- Changed behavior to access_token & tests by (Takatsugu Shigeta)
+
+0.03  2012 2012-09-01
+	- Fixed some bugs
+	- Fixed documentations and examples
+	- Added more examples
+
+0.02  2010-07-29
+	- Fixed some methods
+	- Added better documentations
+	- Added more examples

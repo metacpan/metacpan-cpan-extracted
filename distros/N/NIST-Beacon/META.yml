@@ -1,0 +1,28 @@
+---
+abstract: "A Perl module for querying NIST's randomness beacon."
+author:
+  - 'William Woodruff <william@tuffbizz.com>'
+build_requires:
+  Net::Ping: '0'
+  Test::More: '0'
+  Test::RequiresInternet: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: NIST-Beacon
+requires:
+  LWP::UserAgent: '0'
+  Moo: '0'
+  XML::Simple: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/woodruffw/NIST-Beacon/issues
+  homepage: http://metacpan.org/release/NIST-Beacon
+  repository: git://github.com/woodruffw/NIST-Beacon
+version: '1.002'

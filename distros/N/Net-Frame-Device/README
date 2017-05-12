@@ -1,0 +1,42 @@
+Net::Frame::Device
+==================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Perl v5.6.1
+   Class::Gomor
+   Net::Libdnet
+   Net::Libdnet6
+   Net::IPv4Addr
+   Net::IPv6Addr
+   Net::Pcap
+   Net::Write
+   Net::Frame
+   Net::Frame::Dump
+   Net::Frame::Layer::IPv6
+   Net::Frame::Layer::ICMPv6
+   Net::Frame::Simple
+
+GETTING HELP
+
+A mailing list is available for all questions concerning Net::Frame::*:
+https://www.secure-side.com/lists/mailman/listinfo/netframe
+
+COPYRIGHT AND LICENSE
+
+You may distribute this module under the terms of the Artistic license.
+See LICENSE.Artistic file in the source distribution archive.
+
+Copyright (c) 2006-2015, Patrice <GomoR> Auffret
+

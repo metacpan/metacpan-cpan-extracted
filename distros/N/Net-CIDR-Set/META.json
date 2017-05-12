@@ -1,0 +1,55 @@
+{
+   "abstract" : "Manipulate sets of IP addresses",
+   "author" : [
+      "Andy Armstrong <andy.armstrong@messagesystems.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-CIDR-Set",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::CIDR::Set" : {
+         "file" : "lib/Net/CIDR/Set.pm",
+         "version" : "0.13"
+      },
+      "Net::CIDR::Set::IPv4" : {
+         "file" : "lib/Net/CIDR/Set/IPv4.pm",
+         "version" : "0.13"
+      },
+      "Net::CIDR::Set::IPv6" : {
+         "file" : "lib/Net/CIDR/Set/IPv6.pm",
+         "version" : "0.13"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-CIDR-Set"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/AndyA/Net--CIDR--Set.git (fetch)"
+      }
+   },
+   "version" : "0.13"
+}

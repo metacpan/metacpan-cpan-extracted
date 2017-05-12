@@ -1,0 +1,7 @@
+uint16_t              T_UV
+uint8_t               T_UV
+uint8_t            *  T_PV
+wdns_rr_t          *  T_OPAQUEPTR
+wdns_rrset_t       *  T_OPAQUEPTR
+wdns_rrset_array_t *  T_OPAQUEPTR
+wdns_message_t     *  T_OPAQUEPTR

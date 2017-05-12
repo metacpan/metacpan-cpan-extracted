@@ -1,0 +1,90 @@
+Revision history for Net-Google-Code
+
+0.19 Thu Apr 29 05:49:48 CST 2010
+
+    * google code changed summary page
+    * fix the bug in cc extraction
+
+0.18 Wed Apr  7 12:38:05 GMT 2010
+
+* explicitly delete HTML::TreeBuilder object
+
+0.17 Fri Jan 29 04:15:09 UTC 2010
+
+* work around a weird bug of Mouse or even perl itself
+
+0.16 Tue Dec 22 03:31:43 UTC 2009
+
+* update issue part since google changed attachments snippet
+
+0.15 Tue Oct 20 23:28:15 UTC 2009
+
+* added fallback_to_search arg to updated_after
+    so we can return asap if the quick way fails
+* added stars attribute for issue
+* fixed timezone: should be US/Pacific
+* don't set content if the content is bogus for issue comment
+* trim trailing spaces for description/content
+* initial implementation of Google's new API for Issues
+
+0.14 Wed Jul  8 08:46:43 CST 2009
+
+* google code changed Options page, so we changed our code correspondingly
+
+0.13 Tue Jun 23 09:46:17 CST 2009
+
+* Atom role => AtomParser class
+* decode utf8 more conservatively
+
+0.12 Thu Jun 18 12:06:52 CST 2009
+
+* refactor Issue::Search, added updated_after method for Issue::Search
+* added Predefined and Atom roles
+* switched from Moose to Any::Moose
+* converted DateTime from a role into a class
+* switched mech to be a single shared global and turn on the connection cache
+* removed the never used PropChange.pm
+
+0.11 Wed May 27 11:38:06 CST 2009
+
+bug fix version
+
+0.10 Tue May 26 15:05:22 CST 2009
+
+* simple write support for Issue
+* added reported, merged and updated attributes for Issue
+* added id and content_type attributes for Issue/Attachment
+* date attribute is changed from string to DateTime object
+
+0.05 Thu May 14 16:00:07 CST 2009
+
+* load_downloads doesn't parse feed any more, instead, it parses the 
+    downloads list page now.
+* added Role/Pageable.pm
+* removed Role.pm
+
+0.04 Tue May 12 16:07:09 CST 2009
+
+refactor version.
+
+CAVEAT: this release is not back compatible, the changes are:
+
+* lables are not parsed any more, now they're just an array ref with unparsed
+    string, e.g. [ 'Pri-2', 'Mstone-X' ]
+* no Home.pm, its related functions are moved to Code.pm, 
+    see Net::Google::Code::load and Net::Google::Code::parse
+* no Downloads.pm, see Net::Google::Code::load_downloads and Net::Google::Code::Download
+* no WikiEntry.pm. see Net::Google::Code::load_wikis, the new Net::Google::Code::Wiki 
+    and Net::Google::Code::Wiki::Comment
+
+0.03 Fri Apr 24 16:08:06 CST 2009
+
+* mostly a bug fix version
+
+0.02
+    added api for Downloads, Wiki and Home
+    refactor a bit
+
+0.01 Tue Jan  6 10:17:56 CST 2009
+       Initial release.
+

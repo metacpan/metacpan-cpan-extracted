@@ -1,0 +1,48 @@
+{
+   "abstract" : "OAuth version 2 client",
+   "author" : [
+      "Mark Overmeer"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-OAuth2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Request" : "0",
+            "HTTP::Status" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
+            "URI" : "0",
+            "YAML" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.63"
+}

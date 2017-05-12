@@ -1,0 +1,135 @@
+NAME
+    Net::LDAP::FilterBuilder - Build LDAP filter statements
+
+VERSION
+    version 1.103620
+
+SYNOPSIS
+     use Net::LDAP::FilterBuilder;
+
+     my $filter1 = Net::LDAP::FilterBuilder->new( sn => 'Jones' );
+     # now $filter1 eq '(sn=Jones)'
+
+    Basic logic operations such as "and", "or" and "not":
+
+     $filter1->and( givenName => 'David' );
+     # (&(sn=Jones)(givenName=David))
+     
+ my $filter2 = Net::LDAP::FilterBuilder->new( sn => [ 'Jones', 'Edwards', 'Lewis' ] );
+     # (|(sn=Jones)(sn=Edwards)(sn=Lewis))
+     
+ my $filter3 = Net::LDAP::FilterBuilder->new( givenName => 'David' )->not;
+     # (!(givenName=David))
+
+    Build up filters incrementally from other FilterBuidler objects:
+
+     my $filter4 = Net::LDAP::FilterBuilder->new( sn => ['Jones', 'Edwards'] )->and( $filter3 );
+     # (&(|(sn=Jones)(sn=Edwards))(!(givenName=David)))
+
+    Special characters to LDAP will be escaped:
+
+     my $filter5 = Net::LDAP::FilterBuilder->new( sn => 'foo*bar' );
+     # (sn=foo\*bar)
+
+    To disable escaping, pass a Scalar reference:
+
+     my $filter6 = Net::LDAP::FilterBuilder->new( sn => \'foo*bar' );
+     # (sn=foo*bar)
+
+    Alternate operators are available through the three-argument constructor
+    form:
+
+     my $filter7 = Net::LDAP::FilterBuilder->new( '>=', dateOfBirth => '19700101000000Z' );
+     # (dateOfBirth>=19700101000000Z)
+
+DESCRIPTION
+    This is a convenience module which greatly simplifies the construction
+    of LDAP query filter statements, which are described in RFC 4515 and also
+    the Net::LDAP::Filter manual page.
+
+PURPOSE
+    Use this module to construct LDAP filter statements which are compliant
+    with the RFC 4515 syntax and also safely escape special characters.
+    Filter statements can be built incrementally using simple logic
+    operations.
+
+USAGE
+    To make any filter, call the constructor "new" with the attribute and
+    value to match:
+
+     my $filter = Net::LDAP::FilterBuilder->new( sn => 'Jones' );
+
+    The value returned is an object, but stringifies to the current query:
+
+     print "success" if $filter eq '(sn=Jones)';
+     # prints "success"
+
+    However you can refine the filter statement using three additional
+    methods for the logical operations "and", "or" and "not", as shown in
+    the "SYOPSIS" section, above, and the "METHODS" section below.
+
+    There are two ways to refine a filter. Either call the logic method with
+    a new attribute and value, or call a logic method and pass another
+    Net::LDAP::FilterBuilder object. These two practices are also shown in
+    the "SYNOPSIS" section, above.
+
+  Comparison Operators
+    By default the module uses an equal operator between the attribute and
+    value. To select an alternate operator, use the three agurment form of
+    the constructor:
+
+     my $filter = Net::LDAP::FilterBuilder->new( '>=', dateOfBirth => '19700101000000Z' );
+     # (dateOfBirth>=19700101000000Z)
+
+    Note that this module is not aware of the list of valid operators, it
+    simply takes the first argument to be the operator, whatever it might
+    be.
+
+  Special Character Escaping
+    If you happen to include one of the small set of characters which are of
+    special significance to LDAP filter statements in your value argument,
+    then those characters will be escaped. The list of characters is:
+
+     ( ) * \ NUL
+
+    To avoid this pass in a scalar reference as the value argument. For
+    example to enable a wildcard (substring) match on a value:
+
+     my $filter = Net::LDAP::FilterBuilder->new( sn => \'foo*bar' );
+     # (sn=foo*bar)
+
+METHODS
+    as_str
+        Returns the string representation of the LDAP filter. Note that the
+        object will stringify to this value in string context, too.
+
+    and(FILTERSPEC)
+        Logically conjoins this filter with the one specified by FILTERSPEC.
+        FILTERSPEC may be a Net::LDAP::FilterBuilder object, or a hash
+        representation of the filter as taken by new.
+
+        Returns the newly-conjoined Net::LDAP::FilterBuilder.
+
+    or(FILTERSPEC)
+        Logically disjoins this filter with the one specified by FILTERSPEC.
+        FILTERSPEC may be a Net::LDAP::FilterBuilder object, or a hash
+        representation of the filter as taken by new.
+
+        Returns the newly-disjoined Net::LDAP::FilterBuilder.
+
+    not Logically complements this filter.
+
+        Returns the newly-negated Net::LDAP::FilterBuilder.
+
+MAINTAINER
+    Oliver Gorwits "<oliver.gorwits@oucs.ox.ac.uk>"
+
+AUTHOR
+    Originally written by Ray Miller.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by University of Oxford.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

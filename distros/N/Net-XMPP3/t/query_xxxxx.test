@@ -1,0 +1,49 @@
+use lib "t/lib";
+use Test::More tests=>1;
+
+BEGIN{ use_ok( "Net::Jabber","Client" ); }
+
+exit(0);
+
+require "t/mytestlib.pl";
+
+my $query = new Net::Jabber::Query();
+ok( defined($query), "new()" );
+isa_ok( $query, "Net::Jabber::Query" );
+
+testScalar($query,"XMLNS","jabber:iq:");
+
+testScalar($query,"","");
+testScalar($query,"","");
+testScalar($query,"","");
+testScalar($query,"","");
+testScalar($query,"","");
+testScalar($query,"","");
+testScalar($query,"","");
+testScalar($query,"","");
+
+print $query->GetXML(),"\n";
+is( $query->GetXML(), "", "GetXML()" );
+
+
+
+my $query2 = new Net::Jabber::Query();
+ok( defined($query2), "new()" );
+isa_ok( $query2, "Net::Jabber::Query" );
+
+testScalar($query2,"XMLNS","jabber:iq:");
+
+$query2->Set();
+
+testPostScalar($query2,);
+testPostScalar($query2,);
+testPostScalar($query2,);
+testPostScalar($query2,);
+testPostScalar($query2,);
+testPostScalar($query2,);
+testPostScalar($query2,);
+testPostScalar($query2,);
+
+print $query2->GetXML(),"\n";
+is( $query2->GetXML(), "", "GetXML()" );
+

@@ -1,0 +1,16 @@
+Net::Subnet
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Or use cpan(1) to automate the process.
+
+PREREQUISITES
+
+    Socket6

@@ -1,0 +1,150 @@
+#!/usr/bin/perl -Ilib -w
+###----------------------------------------###
+###     spooler server class               ###
+###----------------------------------------###
+
+use base qw/Net::Server::Framework/;
+use strict;
+use warnings;
+
+our ($VERSION) = '1.3';
+
+### run the server
+__PACKAGE__->run;
+exit;
+
+###----------------------------------------------------------------###
+
+### set up some server parameters
+use Data::Dumper;
+use Time::HiRes qw(gettimeofday tv_interval);
+use Carp;
+use Switch;
+use Net::Server::Framework::Client;
+use Net::Server::Framework::Spooler;
+use Net::Server::Framework::Validate;
+
+sub configure_hook {
+    my $self = shift;
+
+    $self->{timeout}             = 15;
+    $self->{server_root}         = "/tmp";
+    $self->{server}->{conf_file} = 'etc/spooler.conf';
+    return;
+}
+
+sub pre_loop_hook {
+    my $self = shift;
+    $self->{start} = time();
+    $self->register();
+    return;
+}
+### process the request
+
+sub process_request {
+    my $self = shift;
+
+    my $stack;
+    while (<STDIN>) {
+        $stack .= $_;
+    }
+    my $request = $self->decode($stack);
+    my $a = $self->dispatch_n_collect($request);
+    if ($a =~ /^\d+$/){
+        $a = $self->_return($a);
+    }
+    my $answer = Net::Server::Framework::Format::format( $a->{data} );
+    print STDOUT $self->encode($answer);
+    return;
+}
+
+### do the dirty work
+sub dispatch_n_collect {
+    my $self = shift;
+    my $c    = shift;
+
+    $c = Net::Server::Framework::Validate::verify_command($c);
+    if ($c =~ /^\d+$/){
+        print STDERR "Validation failed - dodgy command!";
+        return $c;
+    }
+    my $error;
+    return(2200) unless defined ($c->{user} and $c->{pass});
+    if ( !defined ($error = Net::Server::Framework::Auth::authenticate( $c->{user}, $c->{pass}, 'userpass' )))
+    {
+        my $put = {body => $c, user => $c->{user}};
+        $c->{ID} = Net::Server::Framework::Spooler::put($put);
+        return(2400) unless defined $c->{ID};
+        switch ( $c->{command} ) {
+            case /login/i { return(1000); }
+
+            # implement your command set here
+            #case /command/i { return($self->_command($c)); }
+
+            else                { return(2000); }
+        }
+    }
+    else {
+        $self->_return($error);
+    }
+
+}
+
+#sub _command {
+#    my $self = shift;
+#    my $c = shift;
+#    my $res;
+#
+#    my $t0 = [gettimeofday];
+#    my $data = Net::Server::Framework::Client::talk('DAEMON_TO_TALK_TO',$c);
+#    # we got an error - damn
+#    if ($data =~ /^\d+$/){
+#        my $code = $data;
+#        $res->{code} = $code;
+#    } else {
+#        $res = $data;
+#    }
+#    $res->{ID} = $c->{ID};
+#    $res->{TIME} = tv_interval($t0);
+#    $res->{code} = 1000
+#        unless defined $res->{code};
+#    return $res;
+#}
+
+sub _return {
+    my $self = shift;
+    my $data = shift;
+    my $res;
+    # we got an error - damn
+    if ($data =~ /^\d+$/){
+        $res->{code} = $data;
+    } else {
+        $res = $data;
+    }
+    return $res;
+}
+
+sub pre_server_close_hook {
+    my $self = shift;
+    $self->register('down');
+}
+
+sub _chat {
+    my $self = shift;
+    my ( $mech, $data ) = @_;
+
+    # TODO: can we use UDP datagrams to speed things up here?
+    my $remote = Net::Server::Framework::Client::c_connect($mech)
+      or $self->log(
+        1,
+        "cannot connect to $mech Daemon, check the config section
+      in your program"
+      );
+
+    # send the hash to the daemon
+    print $remote $self->encode($data);
+    shutdown $remote, 1;
+    my $resp = <$remote>;
+    return $self->decode($resp);
+}
+

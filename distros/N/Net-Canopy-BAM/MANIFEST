@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-Canopy-BAM.t
+lib/Net/Canopy/BAM.pm

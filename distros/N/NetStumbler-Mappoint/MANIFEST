@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/NetStumbler-MapPoint.t
+lib/NetStumbler/MapPoint.pm
+Build.PL
+META.yml

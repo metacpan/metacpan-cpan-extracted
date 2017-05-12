@@ -1,0 +1,16 @@
+=head1 SEE ALSO
+
+This module is part of $project distribution version $version,
+built on $today.  Development was supported by NIC.at, the Austrian
+Domainname Registry.
+
+$web
+
+The documentation and interface style is consistent with a large set of
+modules, belonging to the L<XML::Compile> suite.
+
+=head1 LICENSE
+
+Copyrights $year$author.$contrib
+
+$lictext

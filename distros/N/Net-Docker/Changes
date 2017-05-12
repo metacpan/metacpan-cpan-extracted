@@ -1,0 +1,37 @@
+Changes for Net-Docker
+
+0.002005  2014-06-22 15:05:42 CEST
+	[Improvement]
+		- Allow setting docker host via env var DOCKER_HOST
+		- Add name method to create method.
+
+0.002004  2013-12-28 13:04:23 CET
+	[Improvement]
+		- Add support for Unix socket
+
+0.002003  2013-08-05 22:15:57 CEST
+	[Bug]
+		- Fix 'streaming_logs' example
+
+0.002002  2013-08-05 22:12:43 CEST
+	[Improvement]
+		- First try to write a docker-like command-line client
+
+0.002001  2013-08-05 18:19:47 CEST
+	[Improvement]
+		- Add tests for 'run' methods
+
+0.002000  2013-08-05 18:08:22 CEST
+	[Improvement]
+		- Add dependency for AnyEvent
+		- Add dependency for AnyEvent-HTTP
+		- Add start method
+		- Add streaming_logs method
+
+0.001001  2013-08-02 22:21:34 CEST
+	[Improvement]
+		- add `pull` method
+
+0.001000  2013-08-02 21:55:18 CEST
+	[Improvement]
+		- Converted to Milla

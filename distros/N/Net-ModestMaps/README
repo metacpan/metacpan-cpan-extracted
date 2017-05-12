@@ -1,0 +1,104 @@
+NAME
+    Net::ModestMaps - Simple OOP wrapper for calling ModestMaps web
+    services.
+
+SYNOPSIS
+     my %args = (
+            'provider' => 'MICROSOFT_ROAD',
+            'method' => 'center',
+            'latitude' => '45.521375561025756',
+            'longitude' => '-73.57049345970154',
+            'zoom' => 15,
+            'height' => 500,
+            'width' => 500
+     );
+
+     my $mm = Net::ModestMaps->new();
+     my $data = $mm->draw(\%args);
+
+     if (my $err = $data->{'error'}){
+            die "$err->{'message'}";
+     }
+
+     my $img = $data->{'path'};
+
+DESCRIPTION
+    Simple OOP wrapper for calling the *ws-compose* and *ws-pinwin*
+    ModestMaps web services.
+
+PACKAGE METHODS
+  __PACKAGE__->new(%options)
+
+    Net::ModestMaps subclasses *LWP::UserAgent* so all its constructor
+    arguments are valid. No other arguments are required.
+
+    Returns a *Net::ModestMaps* object!
+
+OBJECT METHODS
+  $obj->draw(\%args, $img='')
+
+    Valid args are any query parameters that you would pass to a ModestMaps
+    web service using the *URI->query_form* conventions (multiple parameters
+    with same name passed as an array reference, etc.)
+
+    *$img* is the path where the map image returned by the ModestMaps web
+    service should be written to disk. If no argument is passed the map
+    image will be return to a file in your operating system's temporary
+    directory.
+
+    The method always returns a hash reference, whether or not it succeeded.
+
+    If a failure condition was encountered the hash will contain a single
+    key labeled "error" which is a pointer to another hash containing
+    (error) "code" and "message" pairs.
+
+    On success, the hash will contain at least two keys : "path" indicating
+    where the resultant map image was written and "url" indicating the
+    actual URL used to retrieve map image.
+
+    Additionally, any "X-wscompose-*" headers returned by the ModestMaps
+    server are also stored in the hash.
+
+  $obj->host($url='')
+
+    Get and set the host where ModestMaps web service requests should be
+    sent.
+
+    The default values is *http://127.0.0.1:9999*
+
+  $obj->ensure_max_header_lines(\@items)
+
+    By default the *Net::HTTP* package sets the maximum number of headers
+    that may be returned with a response to 128. If you are plotting lots of
+    "markers" (pinwins, dots, etc.) this number may be too low.
+
+    This method will check to see how many items you are plotting and update
+    the *MaxHeaderLines* config, if necessary.
+
+VERSION
+    1.1
+
+DATE
+    $Date: 2008/07/24 06:05:16 $
+
+AUTHOR
+    Aaron Straup Cope <ascope@cpan.org>
+
+SEE ALSO
+    http://www.modestmaps.com
+
+    http://modestmaps.com/examples-python-ws/
+
+    http://www.aaronland.info/weblog/2008/02/05/fox/#ws-modestmaps
+
+BUGS
+    Sure, why not.
+
+    Please report all bugs via http://rt.cpan.org
+
+LICENSE
+    Copyright (c) 2008 Aaron Straup Cope. All Rights Reserved.
+
+    This is free software. You may redistribute it and/or modify it under
+    the same terms as Perl itself.
+

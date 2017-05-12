@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name: Net-DAAP-Client-Auth
+version: 1.21
+author:
+  - Richard Clamp <richardc@unixbeard.net>
+abstract: obsolete extension to Net::DAAP::Client
+license: perl
+requires:
+  Net::DAAP::Client: 0.4
+  perl: 5.006
+build_requires:
+  Test::More: 0
+provides:
+  Net::DAAP::Client::Auth:
+    file: lib/Net/DAAP/Client/Auth.pm
+    version: 1.21
+generated_by: Module::Build version 0.25

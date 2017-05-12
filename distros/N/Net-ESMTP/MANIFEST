@@ -1,0 +1,14 @@
+Changes
+ESMTP.pm
+ESMTP.xs
+Makefile.PL
+MANIFEST
+README
+t/1.t
+fallback/const-c.inc
+fallback/const-xs.inc
+ESMTP.pod
+examples/mail-file.pl
+test.eml
+typemap
+COPYING

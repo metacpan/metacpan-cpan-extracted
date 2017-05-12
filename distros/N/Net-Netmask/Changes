@@ -1,0 +1,190 @@
+
+Revision history for Perl module Net::Netmask
+
+1.9022 2015-05-05
+
+ - Changes from adamherzog: minor cleanups plus
+ - A bunch of addtional tests
+ - A couple of small code fixes
+
+1.9021 2014-07-17
+
+ - Spelling fix in documentation.
+
+1.9019 2013-10-01
+
+ - Rename $b to $bits so that netmask can be sorted.  Change mostly
+   from https://rt.cpan.org/Ticket/Display.html?id=76939
+
+1.9018 2013-09-26
+
+ - Minor MANIFEST fix.
+
+1.9017 2013-09-20
+
+ - Add network split() function.
+ - Re-arrange the distribution a bit.
+
+1.9016 2011-03-22
+
+ - Fix bug #46996: warnings issued for bad input.
+ - Fix bug #43348: use POSIX::floor() instead of int()
+ - Rewrite netmask.t to use Test::More
+
+1.9015 2006-11-30
+
+ - Fix bug # 22662 reported by grjones at gmail: cidrs2inverse
+   wouldn't notice /32-sized leftovers.
+
+1.9014 2006-10-13
+
+ - Fix bug # 22085 reported by grjones at gmail: cidrs2inverse
+ - wouldn't notice /32-sized holes.
+
+1.9013 2006-09-06
+
+ - Added the nextblock() method as suggested by Robert Drake <rdrake at stayonline.net>
+
+ - Bugfix: it couldn't parse 10/8 or 127/8
+
+1.9011 2004-05-31
+
+ - Some speed improvements from Todd R. Eigenschink <todd at tekinteractive.com>
+
+1.9009 2004-04-12
+
+ - Fix to netmasks.t for compatability with older perls
+
+1.9008 2004-04-06
+
+ - Added cidrs2inverse() which will find the gaps in a list of blocks.
+ - Based on a request from Howard Jones <howard.jones at network-i.net>
+   the tag() method was added.  It allows you to store your own data in
+   a Net::Netmask object.  (Of course, you could have anyway as long as you
+   didn't use the keys 'IBASE' or 'BITS')
+ - Long ago, Alexandros M Manoussakis <amm2 at ini.cmu.edu> reported a bug
+   that findAllNetblock would often return the same block multiple times.  
+   Fixed.
+ - Based on requests from Alexandros M Manoussakis <amm2 at ini.cmu.edu>
+   and Lamprecht Andreas <andreas.a.lamprecht at siemens.com> the
+   undefined behavior for overlapping blocks with cidrs2contiglists
+   is no longer.  Such blocks will be in the same sublist.
+ - Based on a requests from Tom Rudnick <trudnick at itc.nrcs.usda.gov>
+   and Anthony Pardini <tony at pardini.org> new function was added:
+   cidrs2cidrs().  cidrs2cidrs will condense a set of netblocks by
+   combining blocks together that make up larger blocks.
+ - Anthony Pardini <tony at pardini.org>, Frank Tegtmeyer <fte @ fte.to>
+   and George Walker <gwalker at irish-times.com> pointed me to a bug
+   with the contains() method.  Fixed.
+
+1.9007 2004-01-01
+
+ - At Max Baker <max at warped.org>'s request, the "require 5.6.1" 
+   was removed for better compatability with older perl versions.
+
+1.9006 2003-12-05
+
+ - Removed '@'s from this file.
+
+1.9005 2003-11-29
+
+ - Matija Papec <matija at post.hinet.hr> suggested that I do a
+   Schwartzian transform on the IP address sort function.  I 
+   tried it.  It's faster.  Sort function replaced.
+
+ - Added a sort_network_blocks function.
+ - Added a contains() function to test if one block fits within
+   another.
+ - Peter Chen <petechen at netilla.com> was concerned about 
+   using an illegal bitmask.  Now checked.
+ - Long ago, Alexandros M Manoussakis <amm2 at ini.cmu.edu> noted that
+   could be exported even though it was in EXPORT_OK.  Fixed.
+
+1.9004 2003-05-28
+
+ - Martin Lorensen <martin at lorensen.dk>: make 'any' a synonym for
+   'default'.  
+ - Bugfix (aslo from Martin): fix the require to accept 5.6.1
+
+1.9003 2003-05-26
+
+ - Roman Shishkin <roman at rt.mipt.ru> provided several (public exported)
+   functions for looking at network tables:
+   	dumpNetworkTable()
+   	checkNetblock()
+   Inspired: changing findOuterNetblock() so it can take a block
+   as it's IP address.
+ - Bugfix: notice that '218.0.0.0 - 221.255.255.255' isn't a valid
+   netmask.  Reported by Dan Wright <wright at smx.pair.com>.
+ - Bugfix: could not specify network '0.0.0.0-255.255.255.255'.  Fix
+   from Dominic Mitchell <dom at semantico.com>.
+ - Added ->sameblock() from Martin Lorensen <martin at lorensen.dk>
+ - Added ->cmpblocks().
+ - Added overloaded stringification so that blocks stringify to their
+   description.
+ - Added overloaded block comparision so that blocks can be compared and
+   sorted.
+ - Added hostmask syntax a.b.c.d#hostmask - Martin Lorensen <martin at lorensen.dk>
+ - Bugfix: t/badnets.t was missing from the MANIFEST.
+ - Some spelling and typo mistakes fixed in the documentation.
+
+1.9002 2001-11-12
+
+ - Change the license to make the Debian folks happy.  Interface through
+   Jonas Smedegaard <dr at jones.dk>.
+
+1.9001 2001-09-29
+
+ - Sapient Fridge <sapient.fridge at WaCkY.zzn.com> and Alexander Karptsov
+   <karp at visti.net> sent a patch for a bug in range2cidrlist.  The
+   last IP in the range was skipped.
+ - Sam Denton <sdenton at wantec.com> requested support for 
+   a.b.c.d/mask.mask.mask.mask.
+ - Sam also sent a request that I include the world's fastest
+   sort-by-ip-address-in-perl function in Net::Netmask as there didn't
+   seem to be a better place to put it.  I've included it.  The function
+   in question was found/benchmarked by John Porter and written about
+   in the Perl-Users Digest, Issue 3860, Volume 8.
+ - Sam sent a patch to eliminate a couple of trailing spaces in
+   the error codes.
+ - My IP address are now 216.240.32/19 instead of 140.174.82/19 and
+   thus I've changed the examples in the pod.  :-)
+
+1.9 2001-05-15
+
+ - Added deleteNetblock to match storeNetblock.
+ - Carol Lerche <cafl at securify.com> contributed findOuterNetblock()
+   and findAllNetblocks().
+ - Kevin Baker <kevin at apnic.net> sent in patches that suggested a new
+   handling of error conditions; extra error conditions to test for; and
+   a test script to exercise the error conditions.
+ - Bruce Peikon <Bruce.Peikon at msdw.com> sent a contribution which suggested
+   that enumerate could do so by network.
+ - Dominic Mitchell <dom at semantico.com> sent in code that suggested the 
+   creation of cidrs2contiglists() and range2cidrlist().
+ - A couple of documentation fixes from Igor Vinokurov <igor at rtsnet.ru>.
+
+1.8 1999-09-20
+
+ - Modified the match() method to return the position within the block.
+
+1.7 1999-09-15
+
+ - Added support for understanding network blocks in the form that the
+   whois database uses: FirstIP-LastIP.
+
+1.6 1999-03-27
+
+ - Jochen Wiedmann <joe at ispsoft.de> contributed a function to test an IP
+   address and a block to test see if the IP address is in the block. 
+   Accordingly, there is now a match() method.
+ - Rob Walker <rob at varesearch.com> contributed a function to return the
+   first usable adress in a block.  Instead of using that, I added a function
+   to return the nth address in a block.  There is now an nth() function.
+
+1.4 1998-11-29
+
+ - Jean-Luc Szpyrka <Jean-Luc.Szpyrka at sophia.inria.fr> requested that a
+   function be provided that returns the oposite of a netmask.  Accordingly,
+   there is now the hostmask() method.
+ - http://faqchest.dynhost.com/prgm/perlu-l/perl-98/perl-9809/perl-980905/perl98093023_24256.html

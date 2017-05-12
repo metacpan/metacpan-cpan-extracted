@@ -1,0 +1,104 @@
+
+                          DEST_Optus_SLA_hours
+
+HOST_NAME                 TIME_UP_SCHEDULE PERCENT_TIME_UP_ PERCENT_KNOWN_TI TIME_UP_UNSCHEDU PERCENT_TIME_UP_
+                          PERCENT_KNOWN_TI TOTAL_TIME_UP    PERCENT_TOTAL_TI PERCENT_KNOWN_TI TIME_DOWN_SCHEDU
+                          PERCENT_TIME_DOW PERCENT_KNOWN_TI TIME_DOWN_UNSCHE PERCENT_TIME_DOW PERCENT_KNOWN_TI
+                          TOTAL_TIME_DOWN  PERCENT_TOTAL_TI PERCENT_KNOWN_TI TIME_UNREACHABLE PERCENT_TIME_UNR
+                          PERCENT_KNOWN_TI TIME_UNREACHABLE PERCENT_TIME_UNR PERCENT_KNOWN_TI TOTAL_TIME_UNREA
+                          PERCENT_TOTAL_TI PERCENT_KNOWN_TI TIME_UNDETERMINE PERCENT_TIME_UND TIME_UNDETERMINE
+                          PERCENT_TIME_UND TOTAL_TIME_UNDET PERCENT_TOTAL_TI AVAIL_URL
+Bendigo_DEST_router       0                0.000%           0.000%           955207           46.706%
+                          46.706%          955207           46.706%          46.706%          0
+                          0.000%           0.000%           1089920          53.294%          53.294%
+                          1089920          53.294%          53.294%          0                0.000%
+                          0.000%           0                0.000%           0.000%           0
+                          0.000%           0.000%           0                0.000%           0
+                          0.000%           0                0.000%           http://nms/nagio
+Kempsey_Optus_router_PE_i 0                0.000%           0.000%           1715518          83.883%
+                          83.883%          1715518          83.883%          83.883%          0
+                          0.000%           0.000%           329609           16.117%          16.117%
+                          329609           16.117%          16.117%          0                0.000%
+                          0.000%           0                0.000%           0.000%           0
+                          0.000%           0.000%           0                0.000%           0
+                          0.000%           0                0.000%           http://nms/nagio
+Kempsey_DEST_router       0                0.000%           0.000%           1715529          83.884%
+                          83.884%          1715529          83.884%          83.884%          0
+                          0.000%           0.000%           0                0.000%           0.000%
+                          0                0.000%           0.000%           0                0.000%
+                          0.000%           329598           16.116%          16.116%          329598
+                          16.116%          16.116%          0                0.000%           0
+                          0.000%           0                0.000%           http://nms/nagio
+DUBSW200                  0                0.000%           0.000%           1881740          92.011%
+                          92.011%          1881740          92.011%          92.011%          0
+                          0.000%           0.000%           163387           7.989%           7.989%
+                          163387           7.989%           7.989%           0                0.000%
+                          0.000%           0                0.000%           0.000%           0
+                          0.000%           0.000%           0                0.000%           0
+                          0.000%           0                0.000%           http://nms/nagio
+Dubbo_DEST_router         0                0.000%           0.000%           1881750          92.011%
+                          92.011%          1881750          92.011%          92.011%          0
+                          0.000%           0.000%           163377           7.989%           7.989%
+                          163377           7.989%           7.989%           0                0.000%
+                          0.000%           0                0.000%           0.000%           0
+                          0.000%           0.000%           0                0.000%           0
+                          0.000%           0                0.000%           http://nms/nagio
+HOST_NAME                 TIME_UP_SCHEDULE PERCENT_TIME_UP_ PERCENT_KNOWN_TI TIME_UP_UNSCHEDU PERCENT_TIME_UP_
+                          PERCENT_KNOWN_TI TOTAL_TIME_UP    PERCENT_TOTAL_TI PERCENT_KNOWN_TI TIME_DOWN_SCHEDU
+                          PERCENT_TIME_DOW PERCENT_KNOWN_TI TIME_DOWN_UNSCHE PERCENT_TIME_DOW PERCENT_KNOWN_TI
+                          TOTAL_TIME_DOWN  PERCENT_TOTAL_TI PERCENT_KNOWN_TI TIME_UNREACHABLE PERCENT_TIME_UNR
+                          PERCENT_KNOWN_TI TIME_UNREACHABLE PERCENT_TIME_UNR PERCENT_KNOWN_TI TOTAL_TIME_UNREA
+                          PERCENT_TOTAL_TI PERCENT_KNOWN_TI TIME_UNDETERMINE PERCENT_TIME_UND TIME_UNDETERMINE
+                          PERCENT_TIME_UND TOTAL_TIME_UNDET PERCENT_TOTAL_TI AVAIL_URL
+Bendigo_DEST_router       0                0.000%           0.000%           393625           51.552%
+                          51.552%          393625           51.552%          51.552%          0
+                          0.000%           0.000%           369920           48.448%          48.448%
+                          369920           48.448%          48.448%          0                0.000%
+                          0.000%           0                0.000%           0.000%           0
+                          0.000%           0.000%           0                0.000%           0
+                          0.000%           0                0.000%           http://nms/nagio
+
+                          24x7
+
+Kempsey_DEST_router       0                0.000%           0.000%           604800           79.209%
+                          79.209%          604800           79.209%          79.209%          0
+                          0.000%           0.000%           0                0.000%           0.000%
+                          0                0.000%           0.000%           0                0.000%
+                          0.000%           158745           20.791%          20.791%          158745
+                          20.791%          20.791%          0                0.000%           0
+                          0.000%           0                0.000%           http://nms/nagio
+Kempsey_Optus_router_PE_i 0                0.000%           0.000%           604800           79.209%
+                          79.209%          604800           79.209%          79.209%          0
+                          0.000%           0.000%           158745           20.791%          20.791%
+                          158745           20.791%          20.791%          0                0.000%
+                          0.000%           0                0.000%           0.000%           0
+                          0.000%           0.000%           0                0.000%           0
+                          0.000%           0                0.000%           http://nms/nagio
+Armidale_Optus_router_PE_ 0                0.000%           0.000%           730375           95.656%
+                          95.656%          730375           95.656%          95.656%          0
+                          0.000%           0.000%           33170            4.344%           4.344%
+                          33170            4.344%           4.344%           0                0.000%
+                          0.000%           0                0.000%           0.000%           0
+                          0.000%           0.000%           0                0.000%           0
+                          0.000%           0                0.000%           http://nms/nagio
+Armidale_DEST_router      0                0.000%           0.000%           730505           95.673%
+                          95.673%          730505           95.673%          95.673%          0
+                          0.000%           0.000%           0                0.000%           0.000%
+                          0                0.000%           0.000%           0                0.000%
+                          0.000%           33040            4.327%           4.327%           33040
+                          4.327%           4.327%           0                0.000%           0
+                          0.000%           0                0.000%           http://nms/nagio
+Albany_DEST_router        0                0.000%           0.000%           745449           97.630%
+                          97.630%          745449           97.630%          97.630%          0
+                          0.000%           0.000%           0                0.000%           0.000%
+                          0                0.000%           0.000%           0                0.000%
+                          0.000%           18096            2.370%           2.370%           18096
+                          2.370%           2.370%           0                0.000%           0
+                          0.000%           0                0.000%           http://nms/nagio
+Albany_Optus_router_PE_in 0                0.000%           0.000%           745449           97.630%
+                          97.630%          745449           97.630%          97.630%          0
+                          0.000%           0.000%           18096            2.370%           2.370%
+                          18096            2.370%           2.370%           0                0.000%
+                          0.000%           0                0.000%           0.000%           0
+                          0.000%           0.000%           0                0.000%           0
+                          0.000%           0                0.000%           http://nms/nagio

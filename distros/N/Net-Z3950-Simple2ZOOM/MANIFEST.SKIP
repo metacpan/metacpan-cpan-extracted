@@ -1,0 +1,14 @@
+# $Id: MANIFEST.SKIP,v 1.4 2007-08-16 12:14:11 mike Exp $
+
+.cvsignore
+CVS
+archive
+bin/.gdbinit
+bin/CVS
+bin/s2z_test
+debian
+etc/CVS
+lib/CVS
+lib/Net/CVS
+lib/Net/Z3950/CVS
+t/CVS

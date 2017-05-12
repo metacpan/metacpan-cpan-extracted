@@ -1,0 +1,24 @@
+0.09 Fri Sep 11 2015 Pavel Shaydo <zwon@cpan.org>
+    - document and test sort stability. See #2
+
+0.08 Thu Apr 17 2014 Pavel Shaydo <zwon@cpan.org>
+    - fix handling of 64 bit integers and long doubles. See #1
+
+0.06 Tue Apr  8 2014 Pavel Shaydo <zwon@cpan.org>
+    - change behaviour of find_closest_numbers_around
+
+0.05 Mon Jan 20 2014 Pavel Shaydo <zwon@cpan.org>
+    - do not require 5.10
+
+0.04 Sun Jan 19 2014 Pavel Shaydo <zwon@cpan.org>
+    - use Newx/Safefree instead of calloc/free
+
+0.03 Sun Jan 19 2014 Pavel Shaydo <zwon@cpan.org>
+    - fix dependencies
+
+0.02 Sun Jan 19 2014 Pavel Shaydo <zwon@cpan.org>
+    - Add links to repo and bugtraker
+
+0.01 Sat Jan 11 2014 Pavel Shaydo <zwon@cpan.org>
+    - First version, released on an unsuspecting world.
+

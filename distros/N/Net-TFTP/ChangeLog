@@ -1,0 +1,86 @@
+0.1901 -- Fri Feb 24 18:11:22 CST 2017
+
+  * Fix Test::MockModule build_requires version [Ben Bullock]
+
+0.19 -- Wed Nov 24 18:22:33 CST 2010
+
+  * Get rid of unlink [Maik Hentsche]
+  * Fixed build_requires [Maik Hentsche]
+  * fix BUILD_REQUIRES to more classical PREREQ_PM [Steffen Schwigon]
+
+0.18 -- Mon May 31 10:38:13 CDT 2010
+
+  * Added support for IPv6 (patch from John Jason Brzozowski)
+  * Added .gitignore file [Maik Hentsche]
+  * added unit tests [Maik Hentsche]
+  * added directory for unit test [Maik Hentsche]
+  * handle unlink error [Maik Hentsche]
+  * added unit test for missing host [Maik Hentsche]
+  * Fix warning for new() without host argument [Maik Hentsche]
+
+Release 0.17 -- Wed Jul 18 06:30:05 CDT 2007
+
+Enhancements
+ * Added support for IPv6 (patch from John Jason Brzozowski)
+
+
+Change 746 on 2002/09/23 by <gbarr@pobox.com> (Graham Barr)
+
+	Fix return logic for get and put (patch from Bruce Gray)
+
+Change 726 on 2002/05/27 by <gbarr@pobox.com> (Graham Barr)
+
+	Release 0.15
+
+Change 725 on 2002/05/27 by <gbarr@pobox.com> (Graham Barr)
+
+	Fix 'Use of uninitialized' warning
+
+Change 693 on 2002/01/11 by <gbarr@pobox.com> (Graham Barr)
+
+	Add O_TRUNC to open in get() so an existing file is truncated instead
+	of unlinked and recreated
+
+Change 646 on 2001/09/17 by <gbarr@pobox.com> (Graham Barr)
+
+	Ensure local files are in binmode when transfer is octet mode
+	Avoid spurious Buffer underflow warning
+
+Change 633 on 2001/09/03 by <gbarr@pobox.com> (Graham Barr)
+
+	Release 0.12
+
+Change 614 on 2001/05/29 by <gbarr@pobox.com> (Graham Barr)
+
+	Move TFTP out of libnet
+
+Change 469 on 2000/03/30 by <gbarr@pobox.com> (Graham Barr)
+
+	Documentation updates
+
+Change 430 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::TFTP
+	- There is no quit method, so don't document one
+
+Change 264 on 1999/03/18 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::TFTP
+	- Fix typo in CLOSE()
+
+Change 196 on 1998/10/16 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::TFTP
+	- Initial public release
+
+Change 187 on 1998/09/02 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::TFTP
+	- Some cleanup of the code
+	- removed leading - from named args
+
+Change 185 on 1998/08/24 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::TFTP
+	- Initial version
+

@@ -1,0 +1,94 @@
+<h2><a href="#">&#123;: NES ver (file) :&#125;</a></h2>
+<h3>Descripción</h3> 
+<p> 
+Es la primera linea de los archivos <i>nhtml</i>, donde "<i>ver</i>" es la versión y
+ "<i>file</i>" es el <b><i>script Perl</i></b> a ejecutar. Es una linea
+  equivalente a la de los archivos del shell de unix (<i>#!/usr/bin/...</i>) que
+  indica que script se debe ejecutar:
+<pre>
+&#123;: NES 1.0 ('file.cgi') :&#125;
+</pre>
+</p>
+<p> 
+De no existir ésta linea el archivo es tratado como HTML (tipo text/html) sin 
+ sustitución alguna de <i>Tags</i>. Si no es necesario ningún script Perl pero
+ se desea que el archivo sea tratado como <i>nhtml</i> con sustitución de <i>Tag Nes</i>:
+<pre>
+&#123;: NES 1.0 ('') :&#125;
+
+</pre>
+O explicitamente indicando '<i>none</i>' para evitar que se pueda pensar
+ que se trata de un error u olvido:
+<pre>
+    
+&#123;: NES 1.0 ('none') :&#125;
+
+</pre>
+Por claridad se recomienda esta forma:
+<pre>
+    
+&#123;: NES 1.0 none :&#125;
+
+</pre>
+</p>
+
+<h3>Ejemplo</h3>
+<p>
+<strong>archivo.nhtml:</strong>
+<pre>
+&#123;: NES 1.0 ('file.pl') :&#125;
+&lt;html&gt;
+  &lt;head&gt;
+   ...
+   
+</pre>
+</p>
+<h3>Otros tipos de archivos</h3> 
+<p> 
+Para su uso con <i><a href="./?item=Tag include (file)">include</a></i> ésta linea
+ puede ser incorporada a otros tipos de archivos no <i>nhtml</i> como <i>php</i>, 
+ <i>txt</i>, etc. Indica que en esos archivos existen <i>Tags Nes</i> y deben sustituirse:
+<pre>
+&#123;: NES 1.0 ('file.pl') :&#125;
+&lt;?php
+...
+{: $ var :}
+...
+?&gt; 
+</pre>
+<p>
+Esto es posible porque en realidad una <i>plantilla de Nes</i> puede ser cualquier
+ archivo no binario. En el caso de que sea un tipo de archivo reconocido por Nes, 
+ éste se ejecutará después de la sustitución de <i>Tags</i>.
+</p>
+<h3>Inclusión</h3> 
+<p> 
+Permite la inclusión de variables en los parámetros:
+<pre>
+&#123;: NES 1.0 ('&#123;: * plugin_top_dir :&#125;/captcha.pl','script.cgi') :&#125;
+
+</pre>
+A tener en cuenta que las variables de <i>script.cgi</i> no estarán disponibles, ya que éste aún no se ha ejecutado.
+</p>
+<p> 
+Este Tag únicamente puede ocupar una linea (la primera del archivo).
+<pre>
+&#123;: NES 1.0  ('&#123;: $ file :&#125;') :&#125;  <- Ok
+
+&#123;: NES 1.0  (                             
+              '&#123;: $ file :&#125;'     <- ERROR
+            ) 
+:&#125;
+
+</pre>
+
+<h3>Plugins</h3> 
+<p>
+Se puede indicar si desea incorporar uno o más <i>plugin</i>. El orden en que se indique será el oden de carga y ejecución de los scripts: 
+<pre>
+&#123;: NES 1.0 ('plugin1.pl','file.pl','plugin2.pl') :&#125;
+
+</pre>
+Para más detalles sobre este punto ver: <a href="./?item=Plugins">plugins</a>
+</p>
+<br>

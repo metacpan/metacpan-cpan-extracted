@@ -1,0 +1,63 @@
+v1.0.0	2016/12/06
+	* Use version.pm and bump to 1.0.0 to try and fix the mess of previous
+	  numbering schemes.
+
+v0.55	2016/04/05
+	* remove leftover // operator in IPv6 version
+
+v0.54	2016/04/04
+	* remove single use of // operator; requires only Perl 5.8.8 now
+	* Clarify POD (thanks to J.D. Baldwin!)
+
+v0.52	2014/09/29
+	* Fixed a long-standing bug on pure 32-bit perls (i.e. on 32-bit systems
+	  that don't use Perl's software support for 64-bit integers) that would
+	  cause "Modification of non-creatable array value attempted" errors.
+	  Counterintutitively, the ternary operator even seems slightly faster
+	  than the bit-shifting it replaces now.
+
+v0.51	2014/02/08
+	* Fixed C<to_hash()> that the change to iterative tree walking had
+	  broken. Yes, there are tests for it, too now.
+	* Dropped the redundant address parsing/printing code in favor of
+	  socket functions.
+	* For the IPv6 version changed address parsing from getaddrinfo()
+	  to the simpler inet_pton(). This should also fix the problems on
+	  some systems (mostly BSDs and Solaris) where passing a zero port
+	  number caused the call to fail.
+
+v0.5	2012/09/04
+	* This version removes the global $errstr variable and switches to
+	  the same interface as Net::CIDR::Lookup::IPv6 that signals errors
+	  using exceptions. So all methods but new() may now die if you don't
+	  wrap them in eval or equivalent.
+	* dump() is called more sensibly to_hash() now.
+	* Replaced the recursive implementations of lookup() and walk() with
+	  iterative ones for about a 30% speed increase.
+	* Moved version history to its own POD file
+
+v0.41	2012/07/31
+	* Version bump to sync with IPv6 version
+
+v0.4	2012/07/30
+	* Version bump for inclusion of the IPv6 version
+
+v0.3.1 	2012/07/30
+	* Replaced the simplistic list-based CIDR block splitting function with
+	  bit-fiddling for about a threefold speedup of add_num_range() and
+	  slightly less in add_range().
+	* Recursive merging-up up of blocks during add_* works now. If e.g.
+	  you had a /24 and an adjacent /25 net with the same value before,
+	  adding a new /25 would have merged the new block with the existing
+	  /25, resulting in two adjacent /24s with the same value because only
+	  single-level merging was possible. Now the two will be merged to a
+	  single /23.
+	* Removed some redundant tests and added new ones.
+	* Removed some leftover debug code.
+	* Some small fixes/improvements like stricter range checking in
+	  add_range()
+
+v0.3	2008/10/30
+	* First CPAN release
+
+

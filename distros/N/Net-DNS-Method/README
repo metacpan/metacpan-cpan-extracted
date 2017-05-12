@@ -1,0 +1,106 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+
+
+Net::DNS::Method
+================
+
+This is a simple infrastructure for building "programatic" DNS
+servers. This would be a DNS server that can construct an answer based
+on a query. An example, would be building the names corresponding to
+addresses in a pool such as in
+
+	10.10.10.10.in-addr.arpa IN PTR host-10-10-10-10.ourdomain.com
+
+This infrastructure, while simple, is powerful enough so as to permit
+DBI-based servers and other goodies. Servers supporting millions of
+queries a day have been built (and are running today) using this code.
+
+The following classes are included
+
+Net::DNS::Method - The base class from which all DNS resolver methods
+		   should inherit. This includes code to automatically
+		   create default methods for all known
+		   Net::DNS::RR resource records.
+
+Net::DNS::Method::Constant - Provides a simple mechanism for answering
+			     fixed sets of RRs for queries matching a
+			     given criteria.
+
+Net::DNS::Method::Hash - Provides a resolver class that can store
+			 answer RRs in hashes. This allows for a very
+			 fast, in-memory server. Note that the hashes
+			 can be tie()d to data sources such as DBI.
+
+Net::DNS::Method::Pool - Automates the generation of names / reverse
+			 RRs for pools of IP space.
+
+Net::DNS::Method::Regexp - Allows a Perl's regexp to match the
+			   question in a DNS query. The answer is then
+			   constructed by the passed parameters.
+
+Net::DNS::Method::Status - Emits a simple status report about the
+			   server's activity.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DOCUMENTATION
+
+Complete documentation is included in this package, accessible through
+perldoc.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Net::DNS
+   File::Find
+
+This module is currently maintained under Perl 5.6.x. While it may run
+under earlier Perls with slight modifications, support under such old
+environments might be more complicated for the author. Seriously, you
+should be thinking about upgrading. Really.
+
+SECURITY CONSIDERATIONS
+
+I have no control on the machanisms involved in the storage or
+transport of this distribution.  This means that I cannot guarantee
+that the distribution you have in your hands is indeed, the same
+distribution I packed and uploaded.
+
+You should have a file with the extension ".asc" along the .tar.gz
+uploaded to CPAN.  This contains a GPG "detached signature" that makes
+it impossible for anybody to alter this distribution.  If security is
+of any concern to you, by all means verify the signature of this file
+and contact the author if any discrepancy is detected.
+
+You can find more information about this at the following URL
+
+             http://mipagina.cantv.net/lem/gpg/
+
+This information includes the correct keys, fingerprints, etc. Note
+that this README file should also be signed.
+
+COPYRIGHT AND LICENSE
+
+This code is released under the same terms as Perl itself
+
+Copyright (C) 2002,2003 Luis E. Muñoz <luismunoz@cpan.org>
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.1 (Darwin)
+
+iD8DBQE+64GHQyDWGRI/hhARAi1AAJ4z97QZNmTzm63fZr6N+pPxsiSI9QCfVLZk
+TTdk0uZ+r0FPZLjEwNKMFZw=
+=BVTJ
+-----END PGP SIGNATURE-----
+
+$Id: README,v 1.4 2003/06/14 20:12:23 lem Exp $

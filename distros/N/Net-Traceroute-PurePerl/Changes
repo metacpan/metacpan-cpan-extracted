@@ -1,0 +1,43 @@
+Revision history for Perl module Net::Traceroute::PurePerl.
+
+0.10    Sun Aug 27 21:08:00 MST 206 (ahoying)
+    - Official .10 release
+    - Fixed more bugs in the core traceroute code.
+    - Updated the POD with documentation for the changes since 0.02
+    - Updated readme with changes to the POD
+
+0.10_02 Fri Aug 25 17:02:00 MST 2006 (ahoying)
+	- Rewrote traceroute core to not use Net::RawIP but instead do all the
+		heavy lifting internal to this module.
+	- Added support for concurrent queries, defaults to 6, tested up to 90
+	- Added support for ICMP traceroutes, still defaults to UDP
+	- Removed libpcap requirement
+	- Added support for setting the first hop
+	- Added support for binding to a specific interface
+	- Changed pretty_print to closely match traceroute(1) output
+	- Added example traceroute.pl which closely matches traceroute(1)
+	- Updated the simple.pl to allow a host to be given as an argument
+		and changed it to use ICMP by default
+	- Added test case t/01_trace.t
+	- Updated Makefile.PL
+	- Removed automatic IP to host name resolution
+	- Added support to resolve router IPs in pretty_print function
+
+*NOTE Incompatibilities*
+
+Net::Traceroute::PurePerl no longer resolves router IPs when adding hops. IPs
+have to be resolved by the calling program or by calling pretty_print with a
+positive value as an argument.
+
+Also the current version does not correctly detect network unreachable and 
+other nonstandard ICMP errors. This can lead to problems on networks where
+these errors are sent instead of a port unreachable or ttl exceeded packet.
+
+The complete internal working of the module was rewritten, so those relying
+on private methods or functions will find their code no longer works. Other
+incompatibilities may have been accidentally introduced as well.
+
+0.01  Thu Oct 24 11:57:07 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n Net::Traceroute::PurePerl
+

@@ -1,0 +1,7 @@
+Revision history for Perl extension Net::CIDR::ORTC.
+
+0.02 2013-04-30
+    Fix when perl -V:ivsize is 4 (e. g. 32bit platform without use64bitint).
+
+0.01 2013-04-25
+    First public release.

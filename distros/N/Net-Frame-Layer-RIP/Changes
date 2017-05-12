@@ -1,0 +1,11 @@
+Revision history for Perl extension Net::Frame::Layer::RIP.
+
+1.02 Thu Jan 26 17:48:36 EST 2012
+   - Windows + CPAN = withoutworldwriteables
+
+1.01 Thu Jan 26 17:48:36 EST 2012
+   - t\02 ... dubious test number corrected
+
+1.00 Wed Jan 17 17:48:36 EST 2012
+   - first public release
+

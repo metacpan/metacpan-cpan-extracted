@@ -1,0 +1,26 @@
+{: NES 1.0 ('../scripts/items.cgi') :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  Nes 1.03 by Skriptke
+  Copyright 2009 - 2010 Enrique Castañón
+  Licensed under the GNU GPL.
+
+  Sample:
+  http://nes.sourceforge.net/
+
+  CPAN:
+  http://search.cpan.org/dist/Nes/
+
+  Repository:
+  http://github.com/Skriptke/nes
+
+  -----------------------------------------------------------------------------
+:}
+{: include ('{: $ article :}') :}
+{: ~ ( * nes_error_file_not_exist ) 
+    <h2>ERROR</h2>
+    <br>
+    {: # nes_error_file_not_exist se define cuando el último 'include' no existe :}
+    <h3>No se ha encontrado: "{: * nes_error_file_not_exist :}"</h3>
+:}

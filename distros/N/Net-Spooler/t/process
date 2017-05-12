@@ -1,0 +1,50 @@
+# -*- perl -*-
+
+# Process a file; processing it means reading the contents (number)
+# and writing
+#
+#    OK ($num)
+#
+# into the file process.res.
+
+use strict;
+use Fcntl ();
+use Symbol ();
+use Getopt::Long ();
+
+use vars qw($opt_file $opt_errors $opt_resfile);
+Getopt::Long::GetOptions('file=s', 'errors');
+$opt_resfile ||= 'process.res';
+die "Missing attribute: 'file=s'" unless $opt_file;
+
+sub Reject {
+    my $err = shift;
+    print STDERR "$err\n";
+    print "Status: REJECT\n$err\n";
+    exit 1;
+}
+
+
+my $fh = Symbol::gensym();
+open($fh, "<$opt_file") or Reject("Failed to open $opt_file: $!");
+my $num = <$fh>;
+Reject("Failed to read from $opt_file: $!") unless defined $num;
+if ($num =~ /(\d+)/) {
+    $num = $1;
+} else {
+    Reject("Cannot parse contents of $opt_file: " .
+	   (defined($num) ? "undef" : $num));
+}
+close($fh) or Reject("Failed to close $opt_file: $!");
+
+open($fh, ">>$opt_resfile")
+    or Reject("Failed to open $opt_resfile for output: $!");
+flock($fh, Fcntl::LOCK_EX())
+    or Reject("Failed to lock $opt_resfile: $!");
+seek($fh, 0, 2)
+    or Reject("Failed to seek in $opt_resfile: $!");
+(print $fh "OK ($num)\n")
+    or Reject("Failed to write to $opt_resfile: $!");
+close($fh)
+    or Reject("Failed to close $opt_resfile: $!");
+print "Status: OK\n";

@@ -1,0 +1,2 @@
+SetHandler default-handler
+Options -ExecCGI

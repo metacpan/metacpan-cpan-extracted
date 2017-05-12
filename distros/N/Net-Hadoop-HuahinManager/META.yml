@@ -1,0 +1,46 @@
+---
+abstract: 'Client library for Huahin Manager.'
+author:
+  - 'TAGOMORI Satoshi <tagomoris {at} gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  ExtUtils::MakeMaker: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.6.6, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Hadoop-HuahinManager
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Net::Hadoop::HuahinManager:
+    file: lib/Net/Hadoop/HuahinManager.pm
+    version: 0.03
+requires:
+  Furl: 0
+  JSON: 0
+  JSON::XS: 0
+  Test::More: 0
+  Try::Tiny: 0
+  URI::Escape: 0
+resources:
+  bugtracker: https://github.com/tagomoris/Net-Hadoop-HuahinManager/issues
+  homepage: https://github.com/tagomoris/Net-Hadoop-HuahinManager
+  repository: git://github.com/tagomoris/Net-Hadoop-HuahinManager.git
+version: 0.03
+x_contributors:
+  - 'TAGOMORI Satoshi <tagomoris@gmail.com>'

@@ -1,0 +1,1349 @@
+<?xml version="1.0"?>
+<ItemSearchResponse xmlns="http://webservices.amazon.com/AWSECommerceService/2011-08-01">
+  <Items>
+    <TotalResults>322</TotalResults>
+    <TotalPages>33</TotalPages>
+    <MoreSearchResultsUrl>http://www.amazon.com/gp/redirect.html?camp=2025&amp;creative=386001&amp;location=http%3A%2F%2Fwww.amazon.com%2Fgp%2Fsearch%3Fkeywords%3DAdam%2BSandler%26url%3Dsearch-alias%253Ddvd&amp;linkCode=xm2&amp;tag=blogdivebombo-20&amp;SubscriptionId=1V5JRJ4JQCSHB3NGG902</MoreSearchResultsUrl>
+    <Item>
+      <ASIN>B005F3XV62</ASIN>
+      <SalesRank>111</SalesRank>
+      <ItemAttributes>
+        <Actor>Kevin James</Actor>
+        <Actor>Rosario Dawson</Actor>
+        <Actor>Adam Sandler</Actor>
+        <Actor>Sylvester Stallone</Actor>
+        <AspectRatio>2.40:1</AspectRatio>
+        <AudienceRating>PG (Parental Guidance Suggested)</AudienceRating>
+        <Binding>DVD</Binding>
+        <Brand>Sony</Brand>
+        <EAN>0043396376731</EAN>
+        <EANList>
+          <EANListElement>0043396376731</EANListElement>
+        </EANList>
+        <Format>AC-3</Format>
+        <Format>Closed-captioned</Format>
+        <Format>Color</Format>
+        <Format>Dolby</Format>
+        <Format>Dubbed</Format>
+        <Format>DVD</Format>
+        <Format>Subtitled</Format>
+        <Format>Widescreen</Format>
+        <Format>NTSC</Format>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <Label>Sony Pictures Home Entertainment</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>French</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>Spanish</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>French</Name>
+            <Type>Dubbed</Type>
+          </Language>
+          <Language>
+            <Name>Spanish</Name>
+            <Type>Dubbed</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>3099</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$30.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Sony Pictures Home Entertainment</Manufacturer>
+        <MPN>COLD37673D</MPN>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <PartNumber>COLD37673D</PartNumber>
+        <PictureFormat>Anamorphic Widescreen</PictureFormat>
+        <ProductGroup>DVD</ProductGroup>
+        <ProductTypeName>ABIS_DVD</ProductTypeName>
+        <Publisher>Sony Pictures Home Entertainment</Publisher>
+        <RegionCode>1</RegionCode>
+        <ReleaseDate>2011-10-11</ReleaseDate>
+        <RunningTime Units="minutes">102</RunningTime>
+        <SKU>86.COL D37673D</SKU>
+        <Studio>Sony Pictures Home Entertainment</Studio>
+        <Title>Zookeeper</Title>
+        <TradeInValue>
+          <Amount>575</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$5.75</FormattedPrice>
+        </TradeInValue>
+        <UPC>043396376731</UPC>
+        <UPCList>
+          <UPCListElement>043396376731</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>993</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$9.93</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>798</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$7.98</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>41</TotalNew>
+        <TotalUsed>27</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B005F3XV62%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB005F3XV62</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>x1kQfZsBW8cC%2Bs2E0eovaY8g0b%2BaVT7UxfEkp0KvGeOeUT2fkdmxXW1UxcBQ2QMnR%2BDTFr1jQtIP5feuLDx3V7La3pXQ5iQyKyu9GOCbvxNjKXvzmj2FRw%3D%3D</OfferListingId>
+            <Price>
+              <Amount>1799</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$17.99</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>1300</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$13.00</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>42</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B003Y5H524</ASIN>
+      <SalesRank>393</SalesRank>
+      <ItemAttributes>
+        <Actor>Jennifer Aniston</Actor>
+        <Actor>Adam Sandler</Actor>
+        <AspectRatio>1.85:1</AspectRatio>
+        <AudienceRating>PG-13 (Parental Guidance Suggested)</AudienceRating>
+        <Binding>DVD</Binding>
+        <Brand>Sony</Brand>
+        <Director>Dennis Dugan</Director>
+        <EAN>0043396376793</EAN>
+        <EANList>
+          <EANListElement>0043396376793</EANListElement>
+        </EANList>
+        <Format>AC-3</Format>
+        <Format>Closed-captioned</Format>
+        <Format>Color</Format>
+        <Format>Dolby</Format>
+        <Format>Dubbed</Format>
+        <Format>DVD</Format>
+        <Format>Subtitled</Format>
+        <Format>Widescreen</Format>
+        <Format>NTSC</Format>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <Label>Columbia Pictures</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>French</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>Spanish</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>French</Name>
+            <Type>Dubbed</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>2895</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$28.95</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Columbia Pictures</Manufacturer>
+        <MPN>COLD37679D</MPN>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <PartNumber>COLD37679D</PartNumber>
+        <PictureFormat>Anamorphic Widescreen</PictureFormat>
+        <ProductGroup>DVD</ProductGroup>
+        <ProductTypeName>ABIS_DVD</ProductTypeName>
+        <Publisher>Columbia Pictures</Publisher>
+        <RegionCode>1</RegionCode>
+        <ReleaseDate>2011-06-07</ReleaseDate>
+        <RunningTime Units="minutes">117</RunningTime>
+        <SKU>ING49</SKU>
+        <Studio>Columbia Pictures</Studio>
+        <Title>Just Go With It</Title>
+        <TradeInValue>
+          <Amount>300</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$3.00</FormattedPrice>
+        </TradeInValue>
+        <UPC>043396376793</UPC>
+        <UPCList>
+          <UPCListElement>043396376793</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>933</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$9.33</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>547</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$5.47</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>42</TotalNew>
+        <TotalUsed>38</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B003Y5H524%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB003Y5H524</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>rslQnD%2BuKJAUYr8ha6%2FxnvtC6SlZOTbcx950bOK37w%2FHJznEA82swK58YpnUwwzPiSwlC8v6t1PUdw8%2BUVYa6%2Fr6k3hDzyfJZfScYV3HjfZqU7fYx7Wh4w%3D%3D</OfferListingId>
+            <Price>
+              <Amount>1399</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$13.99</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>1496</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$14.96</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>52</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B005F3XV7Q</ASIN>
+      <SalesRank>901</SalesRank>
+      <ItemAttributes>
+        <Actor>Kevin James</Actor>
+        <Actor>Rosario Dawson</Actor>
+        <Actor>Adam Sandler</Actor>
+        <Actor>Sylvester Stallone</Actor>
+        <AspectRatio>2.40:1</AspectRatio>
+        <AudienceRating>PG (Parental Guidance Suggested)</AudienceRating>
+        <Binding>Blu-ray</Binding>
+        <Brand>SONY PICTURES HOME ENT</Brand>
+        <EAN>0043396385665</EAN>
+        <EANList>
+          <EANListElement>0043396385665</EANListElement>
+        </EANList>
+        <Format>AC-3</Format>
+        <Format>Color</Format>
+        <Format>Dolby</Format>
+        <Format>Dubbed</Format>
+        <Format>Subtitled</Format>
+        <Format>Widescreen</Format>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <Label>Sony</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>French</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>Spanish</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>French</Name>
+            <Type>Dubbed</Type>
+          </Language>
+          <Language>
+            <Name>Spanish</Name>
+            <Type>Dubbed</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>4099</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$40.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Sony</Manufacturer>
+        <MPN>COLBR38566</MPN>
+        <NumberOfDiscs>2</NumberOfDiscs>
+        <PartNumber>COLBR38566</PartNumber>
+        <PictureFormat>Anamorphic Widescreen</PictureFormat>
+        <ProductGroup>DVD</ProductGroup>
+        <ProductTypeName>ABIS_DVD</ProductTypeName>
+        <Publisher>Sony</Publisher>
+        <ReleaseDate>2011-10-11</ReleaseDate>
+        <RunningTime Units="minutes">102</RunningTime>
+        <SKU>173708</SKU>
+        <Studio>Sony</Studio>
+        <Title>Zookeeper (Two-Disc Blu-ray/DVD Combo)</Title>
+        <TradeInValue>
+          <Amount>725</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$7.25</FormattedPrice>
+        </TradeInValue>
+        <UPC>043396385665</UPC>
+        <UPCList>
+          <UPCListElement>043396385665</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>1598</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$15.98</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>1050</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$10.50</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>38</TotalNew>
+        <TotalUsed>10</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B005F3XV7Q%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB005F3XV7Q</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>nrh%2Bm9SgSm2h9VQ4D8iAUE92tbN560NjV7vTmvSWfYu87JPMT9sxddHv0bF0fSESPVQJ4B%2FS4jx90t6Ceu3YNOk9%2Fjl5clBIT7JgFFT2T1TGcPm3lg7cRg%3D%3D</OfferListingId>
+            <Price>
+              <Amount>2499</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$24.99</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>1600</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$16.00</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>39</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B002ZG97TW</ASIN>
+      <SalesRank>1103</SalesRank>
+      <ItemAttributes>
+        <Actor>Adam Sandler</Actor>
+        <Actor>Maria Bello</Actor>
+        <AspectRatio>1.85:1</AspectRatio>
+        <AudienceRating>PG-13 (Parental Guidance Suggested)</AudienceRating>
+        <Binding>DVD</Binding>
+        <Brand>SONY PICTURES HOME ENT</Brand>
+        <Director>Dennis Dugan</Director>
+        <EAN>0043396350144</EAN>
+        <EANList>
+          <EANListElement>0043396350144</EANListElement>
+        </EANList>
+        <Format>AC-3</Format>
+        <Format>Closed-captioned</Format>
+        <Format>Color</Format>
+        <Format>Dolby</Format>
+        <Format>Dubbed</Format>
+        <Format>DVD</Format>
+        <Format>Subtitled</Format>
+        <Format>Widescreen</Format>
+        <Format>NTSC</Format>
+        <IsAdultProduct>0</IsAdultProduct>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <ItemDimensions>
+          <Weight Units="hundredths-pounds">15</Weight>
+        </ItemDimensions>
+        <Label>Columbia Pictures</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>French</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>Spanish</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>French</Name>
+            <Type>Dubbed</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>1999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$19.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Columbia Pictures</Manufacturer>
+        <MPN>COLD35014D</MPN>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <PackageQuantity>1</PackageQuantity>
+        <PartNumber>COLD35014D</PartNumber>
+        <PictureFormat>Anamorphic Widescreen</PictureFormat>
+        <ProductGroup>DVD</ProductGroup>
+        <ProductTypeName>ABIS_DVD</ProductTypeName>
+        <Publisher>Columbia Pictures</Publisher>
+        <RegionCode>1</RegionCode>
+        <ReleaseDate>2010-11-09</ReleaseDate>
+        <RunningTime Units="minutes">102</RunningTime>
+        <SKU>043396350144BAKE</SKU>
+        <Studio>Columbia Pictures</Studio>
+        <Title>Grown Ups</Title>
+        <TradeInValue>
+          <Amount>100</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$1.00</FormattedPrice>
+        </TradeInValue>
+        <UPC>043396350144</UPC>
+        <UPCList>
+          <UPCListElement>043396350144</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>398</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$3.98</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>219</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$2.19</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>51</TotalNew>
+        <TotalUsed>71</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B002ZG97TW%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB002ZG97TW</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>i41wAS0Qg5jqsyAYJxN3sFSFGrSporXfS%2Bc36UJ8Qs6e0BDIX1pw6blXw5YgcM3HV91MYZh%2FVYKDQHWuvPYDiF2ftkG726wU%2BbcpV31WSdvIA5oUsy7UPqhAFevjQ9MXoDd9bsBhdEVpO8TiS9AcXw%3D%3D</OfferListingId>
+            <Price>
+              <Amount>969</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$9.69</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>1030</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$10.30</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>52</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B005F3XVA8</ASIN>
+      <SalesRank>2871</SalesRank>
+      <ItemAttributes>
+        <Actor>Kevin James</Actor>
+        <Actor>Rosario Dawson</Actor>
+        <Actor>Adam Sandler</Actor>
+        <Actor>Sylvester Stallone</Actor>
+        <AspectRatio>2.40:1</AspectRatio>
+        <AudienceRating>PG (Parental Guidance Suggested)</AudienceRating>
+        <Binding>Blu-ray</Binding>
+        <Brand>SONY PICTURES HOME ENT</Brand>
+        <EAN>0043396376700</EAN>
+        <EANList>
+          <EANListElement>0043396376700</EANListElement>
+        </EANList>
+        <Format>AC-3</Format>
+        <Format>Dolby</Format>
+        <Format>Dubbed</Format>
+        <Format>Subtitled</Format>
+        <Format>Widescreen</Format>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <Label>Sony Pictures Home Entertainment</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>French</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>French</Name>
+            <Type>Dubbed</Type>
+          </Language>
+          <Language>
+            <Name>Spanish</Name>
+            <Type>Dubbed</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>3599</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$35.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Sony Pictures Home Entertainment</Manufacturer>
+        <MPN>COLBR37670</MPN>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <PartNumber>COLBR37670</PartNumber>
+        <PictureFormat>Anamorphic Widescreen</PictureFormat>
+        <ProductGroup>DVD</ProductGroup>
+        <ProductTypeName>ABIS_DVD</ProductTypeName>
+        <Publisher>Sony Pictures Home Entertainment</Publisher>
+        <ReleaseDate>2011-10-11</ReleaseDate>
+        <RunningTime Units="minutes">102</RunningTime>
+        <SKU>COL BR37670</SKU>
+        <Studio>Sony Pictures Home Entertainment</Studio>
+        <Title>Zookeeper [Blu-ray]</Title>
+        <TradeInValue>
+          <Amount>510</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$5.10</FormattedPrice>
+        </TradeInValue>
+        <UPC>043396376700</UPC>
+        <UPCList>
+          <UPCListElement>043396376700</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>1045</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$10.45</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>940</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$9.40</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>32</TotalNew>
+        <TotalUsed>10</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B005F3XVA8%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB005F3XVA8</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>l54oPI5fp4i2RHmCc4EqkwTLCeHqQJ2Krsb3OqtkKGeET%2ByqZ%2Bn%2FoZ%2FTTUG2HgaaevB9O8C66HEmaai8Y441EBht%2FzRGM9AQ3iEeEEeT1MreKECEKA3JHA%3D%3D</OfferListingId>
+            <Price>
+              <Amount>1999</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$19.99</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>1600</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$16.00</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>44</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B000ELJAEM</ASIN>
+      <SalesRank>3226</SalesRank>
+      <ItemAttributes>
+        <Actor>Adam Sandler</Actor>
+        <Actor>Drew Barrymore</Actor>
+        <Actor>Christine Taylor</Actor>
+        <Actor>Allen Covert</Actor>
+        <Actor>Matthew Glave</Actor>
+        <AspectRatio>1.85:1</AspectRatio>
+        <AudienceRating>PG-13 (Parental Guidance Suggested)</AudienceRating>
+        <Binding>DVD</Binding>
+        <Brand>NEW LINE HOME VIDEO</Brand>
+        <EAN>0794043102646</EAN>
+        <EANList>
+          <EANListElement>0794043102646</EANListElement>
+        </EANList>
+        <Format>AC-3</Format>
+        <Format>Closed-captioned</Format>
+        <Format>Color</Format>
+        <Format>Dolby</Format>
+        <Format>DTS Surround Sound</Format>
+        <Format>DVD</Format>
+        <Format>Special Edition</Format>
+        <Format>Subtitled</Format>
+        <Format>Widescreen</Format>
+        <Format>NTSC</Format>
+        <IsAdultProduct>0</IsAdultProduct>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <ItemDimensions>
+          <Weight Units="hundredths-pounds">20</Weight>
+        </ItemDimensions>
+        <Label>New Line Home Video</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+            <AudioFormat>Dolby Digital 2.0 Surround</AudioFormat>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>Spanish</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+            <AudioFormat>Dolby Digital 2.0 Surround</AudioFormat>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>598</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$5.98</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>New Line Home Video</Manufacturer>
+        <MPN>TRNDN10264D</MPN>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <PackageQuantity>1</PackageQuantity>
+        <PartNumber>TRNDN10264D</PartNumber>
+        <ProductGroup>DVD</ProductGroup>
+        <ProductTypeName>ABIS_DVD</ProductTypeName>
+        <Publisher>New Line Home Video</Publisher>
+        <RegionCode>1</RegionCode>
+        <ReleaseDate>2006-04-25</ReleaseDate>
+        <RunningTime Units="minutes">95</RunningTime>
+        <SKU>2-128501</SKU>
+        <Studio>New Line Home Video</Studio>
+        <Title>The Wedding Singer - Totally Awesome Edition</Title>
+        <TradeInValue>
+          <Amount>100</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$1.00</FormattedPrice>
+        </TradeInValue>
+        <UPC>794043102646</UPC>
+        <UPCList>
+          <UPCListElement>794043102646</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>290</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$2.90</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>218</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$2.18</FormattedPrice>
+        </LowestUsedPrice>
+        <LowestCollectiblePrice>
+          <Amount>1000</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$10.00</FormattedPrice>
+        </LowestCollectiblePrice>
+        <TotalNew>58</TotalNew>
+        <TotalUsed>29</TotalUsed>
+        <TotalCollectible>1</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B000ELJAEM%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB000ELJAEM</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>NDXuij2jQ7vC2u0ZLaLOgsCbTXVQHGL5ff1KqE8zJAw2PngpffdQoFqkpeGRJOdPET1BDK3k36kSjvMq%2FF6TVetcdJypHcEhYK26PX6Kzyt3Wz9F97meAQ%3D%3D</OfferListingId>
+            <Price>
+              <Amount>598</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$5.98</FormattedPrice>
+            </Price>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>630529142X</ASIN>
+      <SalesRank>3675</SalesRank>
+      <ItemAttributes>
+        <Actor>Adam Sandler</Actor>
+        <Actor>Kathy Bates</Actor>
+        <Actor>Henry Winkler</Actor>
+        <Actor>Fairuza Balk</Actor>
+        <Actor>Jerry Reed</Actor>
+        <AspectRatio>1.85:1</AspectRatio>
+        <AudienceRating>PG-13 (Parental Guidance Suggested)</AudienceRating>
+        <Binding>DVD</Binding>
+        <Brand>Buena Vista Home Video</Brand>
+        <CatalogNumberList>
+          <CatalogNumberListElement>16540</CatalogNumberListElement>
+        </CatalogNumberList>
+        <Creator Role="Producer">Adam Sandler</Creator>
+        <Creator Role="Writer">Adam Sandler</Creator>
+        <Creator Role="Producer">Ira Shuman</Creator>
+        <Creator Role="Producer">Jack Giarraputo</Creator>
+        <Creator Role="Producer">Michelle Holdsworth</Creator>
+        <Creator Role="Producer">Phyllis Alia</Creator>
+        <Creator Role="Writer">Tim Herlihy</Creator>
+        <Director>Frank Coraci</Director>
+        <EAN>9786305291428</EAN>
+        <EANList>
+          <EANListElement>9786305291428</EANListElement>
+          <EANListElement>9780788814945</EANListElement>
+          <EANListElement>0717951001665</EANListElement>
+        </EANList>
+        <Format>Closed-captioned</Format>
+        <Format>Color</Format>
+        <Format>DVD</Format>
+        <Format>Letterboxed</Format>
+        <Format>Widescreen</Format>
+        <Format>NTSC</Format>
+        <IsAdultProduct>0</IsAdultProduct>
+        <IsAutographed>0</IsAutographed>
+        <ISBN>078881494X</ISBN>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <IsMemorabilia>0</IsMemorabilia>
+        <ItemDimensions>
+          <Height Units="hundredths-inches">0</Height>
+          <Length Units="hundredths-inches">0</Length>
+          <Weight Units="hundredths-pounds">100</Weight>
+          <Width Units="hundredths-inches">0</Width>
+        </ItemDimensions>
+        <Label>Walt Disney Video</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+            <AudioFormat>Dolby Digital 5.1</AudioFormat>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+            <AudioFormat>Dolby Digital 5.1</AudioFormat>
+          </Language>
+          <Language>
+            <Name>French</Name>
+            <Type>Original Language</Type>
+            <AudioFormat>Dolby Digital 2.0 Surround</AudioFormat>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>1499</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$14.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Walt Disney Video</Manufacturer>
+        <MPN>TM2571</MPN>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <PackageQuantity>1</PackageQuantity>
+        <PartNumber>TM2571</PartNumber>
+        <ProductGroup>DVD</ProductGroup>
+        <ProductTypeName>ABIS_DVD</ProductTypeName>
+        <Publisher>Walt Disney Video</Publisher>
+        <RegionCode>1</RegionCode>
+        <ReleaseDate>1999-03-16</ReleaseDate>
+        <RunningTime Units="minutes">90</RunningTime>
+        <SKU>00717951001665U</SKU>
+        <Studio>Walt Disney Video</Studio>
+        <Title>The Waterboy</Title>
+        <TradeInValue>
+          <Amount>150</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$1.50</FormattedPrice>
+        </TradeInValue>
+        <UPC>717951001665</UPC>
+        <UPCList>
+          <UPCListElement>717951001665</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>591</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$5.91</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>332</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$3.32</FormattedPrice>
+        </LowestUsedPrice>
+        <LowestCollectiblePrice>
+          <Amount>1499</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$14.99</FormattedPrice>
+        </LowestCollectiblePrice>
+        <TotalNew>36</TotalNew>
+        <TotalUsed>79</TotalUsed>
+        <TotalCollectible>5</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/630529142X%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D630529142X</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>nrM%2Fx%2B%2FSyM8iAxdbANBwzltvHDp%2FnOB4neI1x%2Be4cIKbqmxQlj6tpcMpr6IR0FjeCM1FGRLQDScKv%2BgaE60%2Bav%2BKkgncsMbPtPk5L58nk1fjkM99W7RsOVT%2BsEISDscjjpM953Dz2iXmdsB64xV%2Fxg%3D%3D</OfferListingId>
+            <Price>
+              <Amount>1120</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$11.20</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>379</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$3.79</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>25</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B00000K3UU</ASIN>
+      <SalesRank>4972</SalesRank>
+      <ItemAttributes>
+        <Actor>Adam Sandler</Actor>
+        <Actor>Joey Lauren Adams</Actor>
+        <Actor>Jon Stewart</Actor>
+        <Actor>Cole Sprouse</Actor>
+        <Actor>Dylan Sprouse</Actor>
+        <AspectRatio>1.85:1</AspectRatio>
+        <AudienceRating>PG-13 (Parental Guidance Suggested)</AudienceRating>
+        <Binding>DVD</Binding>
+        <Brand>Sony</Brand>
+        <CatalogNumberList>
+          <CatalogNumberListElement>3922</CatalogNumberListElement>
+        </CatalogNumberList>
+        <Creator Role="Producer">Adam Sandler</Creator>
+        <Creator Role="Writer">Adam Sandler</Creator>
+        <Creator Role="Producer">Allen Covert</Creator>
+        <Creator Role="Producer">Alex Siskin</Creator>
+        <Creator Role="Producer">Jack Giarraputo</Creator>
+        <Creator Role="Writer">Steve Franks</Creator>
+        <Creator Role="Writer">Tim Herlihy</Creator>
+        <Director>Dennis Dugan</Director>
+        <EAN>9780767836241</EAN>
+        <EANList>
+          <EANListElement>9780767836241</EANListElement>
+          <EANListElement>0043396039223</EANListElement>
+        </EANList>
+        <Format>Anamorphic</Format>
+        <Format>Closed-captioned</Format>
+        <Format>Color</Format>
+        <Format>Dolby</Format>
+        <Format>DVD</Format>
+        <Format>Full Screen</Format>
+        <Format>Subtitled</Format>
+        <Format>Widescreen</Format>
+        <Format>NTSC</Format>
+        <IsAdultProduct>0</IsAdultProduct>
+        <ISBN>0767836243</ISBN>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <ItemDimensions>
+          <Weight Units="hundredths-pounds">25</Weight>
+        </ItemDimensions>
+        <Label>Sony Pictures Home Entertainment</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+            <AudioFormat>Dolby Digital 2.0 Surround</AudioFormat>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+            <AudioFormat>Dolby Digital 2.0 Surround</AudioFormat>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>1499</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$14.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Sony Pictures Home Entertainment</Manufacturer>
+        <MPN>COLD03922D</MPN>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <PackageQuantity>1</PackageQuantity>
+        <PartNumber>COLD03922D</PartNumber>
+        <ProductGroup>DVD</ProductGroup>
+        <ProductTypeName>ABIS_DVD</ProductTypeName>
+        <Publisher>Sony Pictures Home Entertainment</Publisher>
+        <RegionCode>1</RegionCode>
+        <ReleaseDate>1999-11-02</ReleaseDate>
+        <RunningTime Units="minutes">93</RunningTime>
+        <SKU>A043396039223</SKU>
+        <Studio>Sony Pictures Home Entertainment</Studio>
+        <Title>Big Daddy</Title>
+        <TradeInValue>
+          <Amount>25</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.25</FormattedPrice>
+        </TradeInValue>
+        <UPC>043396039223</UPC>
+        <UPCList>
+          <UPCListElement>043396039223</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>300</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$3.00</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>18</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.18</FormattedPrice>
+        </LowestUsedPrice>
+        <LowestCollectiblePrice>
+          <Amount>592</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$5.92</FormattedPrice>
+        </LowestCollectiblePrice>
+        <TotalNew>78</TotalNew>
+        <TotalUsed>310</TotalUsed>
+        <TotalCollectible>4</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B00000K3UU%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB00000K3UU</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>OTSXzg7ZK1Sl%2BT7DXDrMf5sDZhUCVVgQkfvsf1oKYTz6dhAIefZcEX3czHsE4H7UhaTchuWBUe6J3p1PSgMIf2Hq8kDvH2xF6uZarY%2ByzLM%3D</OfferListingId>
+            <Price>
+              <Amount>649</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$6.49</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>850</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$8.50</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>57</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+      <Accessories>
+        <Accessory>
+          <ASIN>B00000JBED</ASIN>
+          <Title>Big Daddy: Music from the Motion Picture</Title>
+        </Accessory>
+      </Accessories>
+    </Item>
+    <Item>
+      <ASIN>B0009X760U</ASIN>
+      <SalesRank>4286</SalesRank>
+      <ItemAttributes>
+        <Actor>Adam Sandler</Actor>
+        <Actor>Christopher McDonald</Actor>
+        <Actor>Julie Bowen</Actor>
+        <Actor>Frances Bay</Actor>
+        <Actor>Allen Covert</Actor>
+        <AspectRatio>1.85:1</AspectRatio>
+        <AudienceRating>PG-13 (Parental Guidance Suggested)</AudienceRating>
+        <Binding>DVD</Binding>
+        <Brand>Universal Studios</Brand>
+        <Creator Role="Writer">Adam Sandler</Creator>
+        <Creator Role="Producer">Bernie Brillstein</Creator>
+        <Creator Role="Producer">Brad Grey</Creator>
+        <Creator Role="Producer">Jack Giarraputo</Creator>
+        <Creator Role="Producer">Robert Simonds</Creator>
+        <Creator Role="Producer">Sandy Wernick</Creator>
+        <Creator Role="Writer">Tim Herlihy</Creator>
+        <Director>Dennis Dugan</Director>
+        <EAN>9781417010950</EAN>
+        <EANList>
+          <EANListElement>9781417010950</EANListElement>
+          <EANListElement>0025192544224</EANListElement>
+        </EANList>
+        <Format>AC-3</Format>
+        <Format>Closed-captioned</Format>
+        <Format>Color</Format>
+        <Format>Dolby</Format>
+        <Format>DTS Surround Sound</Format>
+        <Format>Dubbed</Format>
+        <Format>DVD</Format>
+        <Format>Special Edition</Format>
+        <Format>Subtitled</Format>
+        <Format>Widescreen</Format>
+        <Format>NTSC</Format>
+        <IsAdultProduct>0</IsAdultProduct>
+        <ISBN>1417010959</ISBN>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <ItemDimensions>
+          <Weight Units="hundredths-pounds">25</Weight>
+        </ItemDimensions>
+        <Label>Universal Studios</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>French</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>Spanish</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>French</Name>
+            <Type>Dubbed</Type>
+          </Language>
+          <Language>
+            <Name>Spanish</Name>
+            <Type>Dubbed</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>1498</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$14.98</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Universal Studios</Manufacturer>
+        <MPN>MCAD25442D</MPN>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <PackageQuantity>1</PackageQuantity>
+        <PartNumber>MCAD25442D</PartNumber>
+        <ProductGroup>DVD</ProductGroup>
+        <ProductTypeName>ABIS_DVD</ProductTypeName>
+        <Publisher>Universal Studios</Publisher>
+        <RegionCode>1</RegionCode>
+        <ReleaseDate>2005-08-23</ReleaseDate>
+        <RunningTime Units="minutes">92</RunningTime>
+        <SKU>S025192544224</SKU>
+        <Studio>Universal Studios</Studio>
+        <Title>Happy Gilmore (Widescreen Special Edition)</Title>
+        <TradeInValue>
+          <Amount>75</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.75</FormattedPrice>
+        </TradeInValue>
+        <UPC>025192544224</UPC>
+        <UPCList>
+          <UPCListElement>025192544224</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>623</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$6.23</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>180</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$1.80</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>46</TotalNew>
+        <TotalUsed>66</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B0009X760U%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB0009X760U</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>AkfN%2FR7e4Eftc6NwoMYhU7owb7QBkzsV9r5B8FdorJz9Cua9%2BteFhmxvqyLRYrETGgRC8NiaLls5EePrFWZqB%2FHCk0FZLO%2FMBenEic3THl7bzh0MdoH%2Biw%3D%3D</OfferListingId>
+            <Price>
+              <Amount>749</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$7.49</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>749</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$7.49</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>50</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B003Y5H52E</ASIN>
+      <SalesRank>6804</SalesRank>
+      <ItemAttributes>
+        <Actor>Jennifer Aniston</Actor>
+        <Actor>Adam Sandler</Actor>
+        <AspectRatio>1.85:1</AspectRatio>
+        <AudienceRating>PG-13 (Parental Guidance Suggested)</AudienceRating>
+        <Binding>Blu-ray</Binding>
+        <Brand>Sony</Brand>
+        <Director>Dennis Dugan</Director>
+        <EAN>0043396381742</EAN>
+        <EANList>
+          <EANListElement>0043396381742</EANListElement>
+        </EANList>
+        <Format>Multiple Formats</Format>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <Label>Columbia Pictures</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>French</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>Spanish</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>French</Name>
+            <Type>Dubbed</Type>
+          </Language>
+          <Language>
+            <Name>Spanish</Name>
+            <Type>Dubbed</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>3896</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$38.96</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Columbia Pictures</Manufacturer>
+        <MPN>COLBR38174</MPN>
+        <NumberOfDiscs>2</NumberOfDiscs>
+        <PartNumber>COLBR38174</PartNumber>
+        <PictureFormat>Anamorphic Widescreen</PictureFormat>
+        <ProductGroup>DVD</ProductGroup>
+        <ProductTypeName>ABIS_DVD</ProductTypeName>
+        <Publisher>Columbia Pictures</Publisher>
+        <RegionCode>1</RegionCode>
+        <ReleaseDate>2011-06-07</ReleaseDate>
+        <RunningTime Units="minutes">117</RunningTime>
+        <SKU>BD-140253</SKU>
+        <Studio>Columbia Pictures</Studio>
+        <Title>Just Go with It (Two-Disc Blu-ray/DVD Combo)</Title>
+        <TradeInValue>
+          <Amount>485</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$4.85</FormattedPrice>
+        </TradeInValue>
+        <UPC>043396381742</UPC>
+        <UPCList>
+          <UPCListElement>043396381742</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>986</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$9.86</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>861</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$8.61</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>35</TotalNew>
+        <TotalUsed>33</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B003Y5H52E%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB003Y5H52E</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>fwd0L7%2BUCYpzxjIVms%2F61McdCs9PE0L7IJ2kxEPThb0f6Sxka90hjvln8rnqJwkr29pXwMFmyPyxGCg%2FXhCQR%2FN292u%2FEilHzSnDyqhQVViI8rRCouIJEA%3D%3D</OfferListingId>
+            <Price>
+              <Amount>2399</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$23.99</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>1497</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$14.97</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>38</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+  </Items>
+</ItemSearchResponse>

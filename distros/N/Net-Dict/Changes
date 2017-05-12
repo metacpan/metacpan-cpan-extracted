@@ -1,0 +1,235 @@
+Revision history for Perl module Net::Dict
+
+2.21 2016-03-01 NEILB
+    - Use Test::RequiresInternet to skip tests if you don't have
+      an internet connection and ability to connect to dict.org's
+      DICT server. This is a holding position until I can add a
+      mock DICT server. Added a basic require test, so there's
+      always at least one test that should pass.
+
+2.20 2016-02-27 NEILB
+    - Updated tests to reflect changes in dict.org databases.
+      Thanks to SREZIC for pointing out that they'd changed.
+    - Fixed typo in doc. Patch from Gregor Herrmann. RT#112367
+    - Dropped usage of "use vars".
+
+2.19 2014-12-17
+    - Fixed failing tests - caused by updated dictionaries on dict.org
+    - Added a TODO.md file with the things I want to get around to doing.
+
+2.18 2014-06-26
+    - Some of the dict.org databases have been updated, needing updates
+      to databases. Reported by RJBS.
+    - Converted tests to use eq_or_diff() from Test::Differences,
+      also suggested by RJBS.
+
+2.17 2014-04-25
+    - Converted all remaining tests to use Test::More
+    - Tidied up SEE ALSO, including fixing of broken links
+    - Tidied up code snippets in the doc
+    - Reformatted code according to my current conventions,
+      and got rid of a few rogue tab characters
+
+2.16 2014-04-20
+    - Test server config in Net::Dict::TestConfig in t/lib.
+      We no longer prompt for test config -- it hasn't changed in years.
+    - Refactored t/connection.t to use Test::More
+
+2.15 2014-04-04
+    - tkdict script had a very site-specific #! path. Changed to use env.
+      RT#92184
+
+2.14 2014-03-28
+    - We weren't correctly handling dictionary db names containing a '-'.
+      Fix from RJBS.
+
+2.13 2013-12-23
+    - Added "use warnings" to Net::Dict
+    - Specified min perl version as 5.006 in Makefile.PL
+
+2.12 2013-11-18
+
+    - Corrected the dependency I meant to add in the previous release.
+      I added a dependency on Net::Dict (ie itself) instead.
+
+2.11 2013-11-15
+
+    - Added missing dependency (AppConfig::Std) to Makefile.PL
+
+2.10 2013-07-20
+
+    - Reformatted this file according to CPAN::Changes::Spec
+    - Repository details added to metadata (Makefile.PL) and pod
+    - License type added to metadata (Makefile.PL)
+
+2.09 2011-12-18
+
+    - Fixed tests that started breaking due to changes in the dict.org server
+    - Renamed ChangeLog to Changes & tweaked formatting to CPAN::Changes::Spec
+
+2.08 2011-08-02
+
+    - updated testsuite to refer to dict.org, as test.dict.org no longer exists
+    - updated testsuite to reflect the much longer list of databases now hosted on dict.org
+
+2.07 2003-05-06
+
+    - updated testsuite to refer to test.dict.org,
+      and to reflect changes in the databases.
+
+2.06 2002-03-23
+
+    - imported into my home machine's CVS repository
+    - updated email address
+
+2.05 2001-04-25
+
+    - moved the inline documentation to a separate file Dict.pod
+    - added examples/portuguese.pl which illustrates accessing
+      an english-portuguese dictionary.
+      Example from Jose Joao Dias de Almeida <jj@di.uminho.pt>.
+
+2.04 2001-04-23
+
+    - tidied up the code for auth(), removing debugging statements, etc.
+    - added documentation for the auth() method.
+    - renamed auth.t to auth.test - don't want this run as
+      part of "make test": it needs my local config for testing.
+      Do something about that later.
+
+2.03 2001-04-23
+
+    - Added code which parses the welcome banner, to get msg id and
+      optional capabilities.
+    - Added capabilities() method which returns a list of
+      supported optional capabilities.
+    - Added has_capability() method for checking whether a
+      capability is supported by the server.
+    - msg_id() method which returns the msg id from the server.
+      This is used in the auth() method.
+    - Added auth() method, which uses Digest::MD5.
+    - Created a testsuite for auth - auth.t
+
+
+2.02 2001-04-03
+
+    - Oops - forgot to add documentation for the status() method.
+
+2.01 2001-04-03
+
+    - Added status() method to Net::Dict - returns the string
+      returned by the DICT server when STATUS command is sent.
+      Couple of test cases in t/connection.t
+
+    - When using the sample dict client, if no definition was
+      found, then it will use Levenshtein or Soundex matching
+      to look for close words. If the server doesn't support
+      either strategy, then it just gives a basic error message.
+
+    - Updated the testsuite - new databases on dict.org meant
+      that certain tests failed (eg where the date is included
+      in the title of a database).
+
+2.00 2001-04-01
+
+    - up'd the major version number - this will be the first public
+      release version since changing the API for the constructor.
+        - updated dict and tkdict to use the new method name
+
+    - Various documentation updates, including:
+        - adding more to the descriptive section of the documentation.
+        - reformatting the METHODS section
+
+    - strats() method renamed to strategies(). The old name is
+      retained for backwards compatibility.
+
+    - Put a hack in the match.t test to supress unwanted output
+      from _print_isa function in Net::Cmd.
+
+    - Removed the dependence on Net::Config from Makefile.PL
+
+
+1.09 2001-03-26
+
+    - Send the CLIENT command to identify us before any other command
+      is sent.
+
+    - Don't need to "use Net::Config" now
+
+    - dbTitle() checks whether the given DB name is valid.
+      If it isn't, and debug is set to non-zero, then we now carp.
+
+    - Fixed a bug in define() - couldn't handle multi-word entries, eg:
+        $dict->define("oboe d'amore");
+      didn't work as it should. The private _DEFINE method now quotes
+      all arguments before passing them on, since having everything
+      quoted is ok by RFC 2229.
+
+    - Fixed the same bug in match() method.
+
+    - Finished first pass at testsuite for define() method.
+
+1.08 2001-03-22
+
+    - first version of testsuite - not the full set, but enough
+      to get a few people to test and find out if it's sensible.
+    - Makefile.PL updated to get hostname and port for test server,
+      it builds a config file in t/
+
+    - dbInfo now returns a string rather than an array of lines.
+      This means it now matches the documentation!
+
+    - dbTitle() returns undef if you request a title of a
+      non-existent database.
+
+    - Now checks for legality of arg names passed to constructor
+    - constructor requires hostname as first argument
+    - don't look for default list of hosts to try from Net::Config
+    - updated checking of arguments to constructor and error messages
+    - changed all self variables from $obj to $self
+    - improved wording of error messages when checking method arg lists
+    - private method _CLIENT now takes arg, rather than hard-coding
+      reference to package variable $CLIENT_INFO
+    - Removed references in to the doc to ConfigFile and HTML
+      arguments - they weren't actually supported - now mention
+      this in the LIMITATIONS section
+    - Put an example of use of constructor with all arguments
+      in the doc
+
+1.07 2001-03-04
+
+    - Updated the one-line description in the NAME pod section.
+      Previous one was a bit terse - that's what shows up
+      on search.cpan.org, and similar places.
+
+1.06 2001-03-04
+
+    - created tkdict, first cut at a Perl/Tk DICT client.
+      The interface is currently very DICT protocol centric.
+    - added dbTitle() method, which is used to query the title
+      string for a specific database.
+    - the description strings returned by dbs() and strats() were
+      quoted with double strings (if that's what the server returned).
+      Similarly every word returned by match() was quoted.
+      Now the quotation marks are removed.
+
+1.05 2001-03-01
+
+    - added "dict", a sample client script
+    - strats() method was including a newline in the description
+      of each strategy, unlike dbs(), which chomp()s the description.
+      strats() now chomps as well!
+    - added Client option to Net::Dict, for CLIENT identifier string
+    - added AUTHOR and ABSTRACT_FROM keys to Makefile.PL
+
+1.04 2001-02-22
+
+    - First version under maintenance of Neil Bowers
+    - Added Makefile.PL, README, MANIFEST.
+    - Added examples/simple.pl, based on example submitted
+      by Jose Joao Dias de Almeida <jj@di.uminho.pt>
+    - Modified in constructor for default port number,
+      also from Jose.
+    - previous versions released by Dmitry Rubinstein
+      <dimrub@wisdom.weizmann.ac.il>
+

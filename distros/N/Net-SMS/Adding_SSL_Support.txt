@@ -1,0 +1,52 @@
+
+
+Adding SSL Support for Perl SMS Software Development Kit
+
+Prerequisites
+-----------------------------------------------
+
+1. Version 2.6.0 or above of SMS SDK
+
+
+Unix/Linux
+-----------------------------------------------
+
+1. Ensure normal TCP/IP functions properly by setting up
+all proper dependencies for Net::SMS
+
+2. Install Crypt::SSLeay so that internal LWP::UserAgent
+can access https URLs.
+
+  perl -MCPAN -e shell
+  
+  cpan> install Crypt::SSLeay
+  
+3. SSLeay will require that OpenSSL is installed.
+Most Linux distributions already come with OpenSSL
+installed.
+
+4. Set $sms->secure(1); so that SSL is used to
+send the SMS versus normal TCP/IP.
+
+5. If you run into a problem, please try to turn the
+debug mode on to see more problems revealed:
+
+$sms->debug(1);
+
+
+Windows (ActiveState Perl)
+-----------------------------------------------
+
+ActiveState does not provide a pre-compiled or PPM
+version of Crypt::SSLeay.
+
+Simplewire will NOT support SSL on Windows until
+ActiveState provides this.
+
+However, there are numerous resources on the Internet
+of users getting LWP::UserAgent to support SSL via
+various installation methods.  Its not impossible
+to get SSL to work on Windows, but Simplewire will
+not support questions regarding this issue until
+ActiveState supports it.
+

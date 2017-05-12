@@ -1,0 +1,99 @@
+#!/usr/bin/perl -w
+
+=pod
+
+=head1 NAME
+
+Net::DAS - A simple DAS (Domain Availabilty Seach) client.
+
+=head1 SYNOPSIS
+
+Shell script for L<Net::DAS>
+
+  Usage: das [switch] [timeout] domain.tld [domain2.tld] ...
+  Switches:
+  -h      help
+  -v      print version
+  -e      exit code only (only works when quering a single domain)
+  -r      use registrar das servers where available (normally requires signup/ip whitelist)
+  Examples:
+  das test1.eu test2.be test3.no
+  das -er 3 test.eu
+
+=head1 DESCRIPTION
+
+Net::DAS is a client that aims to simplify using DAS with multiple registries by having small submodules (see L<Net::DAS::*>) to iron out the differences in the servers. It also inclused a shell script  L<Net::DAS::das> to do lookups from the command line.
+
+=head1 AUTHOR
+
+Michael Holloway <michael@thedarkwinter.com>
+
+=head1 LICENSE
+
+Artistic License
+
+=cut 
+
+use 5.010;
+use strict;
+use warnings;
+use Net::DAS;
+
+sub usage {
+    my $a = shift;
+    print "Usage: das [switch] [timeout] domain.tld [domain2.tld] ...\n";
+    exit 0 unless $a;
+    print "     Switches:\n";
+    print "     -h      this help screen\n";
+    print "     -v      print version\n";
+    print "     -e      exit code only (only works when quering a single domain)\n";
+    print "     -r      use registrar das servers where available (normally requires signup/ip whitelist)\n";
+    print "     Examples:\n";
+    print "             das test1.eu test2.be test3.no\n";
+    print "             das -er 3 test.eu\n";
+    exit 1;
+}
+
+sub version {
+    print "Version " . $Net::DAS::VERSION . "\n";
+    exit 0;
+}
+
+usage() unless $#ARGV >= 0;
+my ( @domains, @switches, $timeout, $exitcode, $registrar );
+
+foreach my $a (@ARGV) {
+    if ( $a =~ m/^[0-9]*$/ ) {
+        $timeout = $a;
+        next;
+    }
+    if ( $a =~ /^-/ ) {
+        $a =~ s/^-//;
+        if ( $a =~ m/h/ ) { usage(1); }
+        if ( $a =~ m/v/ ) { version(); }
+        if ( $a =~ m/e/ ) { $exitcode = 1; }
+        if ( $a =~ m/r/ ) { $registrar = 1; }
+        next;
+    }
+    push @domains, $a;
+}
+
+usage() unless $#domains >= 0;
+
+my $opt = {};
+$opt->{'timeout'}       = $timeout if defined $timeout;
+$opt->{'use_registrar'} = 1        if defined $registrar;
+my $das = Net::DAS->new($opt);
+
+$b = $das->lookup(@domains);
+foreach (@domains) {
+    if ( $#domains == 0 && defined $exitcode ) {
+        $das->DESTROY();
+        exit 0 if ( $b->{$_}->{'avail'} == 1 );
+        exit 1;
+    }
+    print "$_ " . $b->{$_}->{'reason'} . "\n";
+}
+
+exit 0;
+

@@ -1,0 +1,31 @@
+{: NES 1.0 none :}
+<html>
+  <head>
+    <title>Nes Tutorial</title>
+  </head>
+  <body>
+    <form method="POST" name="test0" action="">
+        <table  border="0">
+          <tr>
+            <td align="right">
+            User:
+            </td>
+            <td align="left">
+            <input name="user" type="text"  
+            size="12" value="{: * q_user :}"/>
+            </td>
+          </tr>
+          <tr>
+            <td align="right">
+            Password:
+            </td>
+            <td align="left">
+            <input name="password" type="password"  
+            size="12" value="{: * q_password :}"/>
+            </td>
+          </tr>        
+        </table>
+        <input name="send" type="submit" value="Send" />
+    </form> 
+  </body>
+</html>

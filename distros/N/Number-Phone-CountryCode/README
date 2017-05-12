@@ -1,0 +1,29 @@
+Number-Phone-CountryCode
+========================
+
+This distribution contains the Number::Phone::CountryCode module.  This module
+contains methods for looking up country specific dialing prefixes for phone
+numbers.  As of release 0.01, this module supports 208 different countries.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Class::Accessor
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Michael Schout
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.

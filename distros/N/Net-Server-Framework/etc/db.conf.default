@@ -1,0 +1,14 @@
+# spool DB
+spool_host    db/spool.db
+spool_db      spool
+spool_type    sqlite
+
+# registry DB
+registry_host    db/registry.db
+registry_db      services
+registry_type    sqlite
+
+# user DB
+user_host    db/user.db
+user_db      users
+user_type    sqlite

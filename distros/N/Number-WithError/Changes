@@ -1,0 +1,42 @@
+Revision history for Perl extension Number::WithError.
+
+1.01  Wed Sep 22 2010
+  - Require Math::BigFloat 1.40 (core in 5.8.1)
+
+1.00  Mon Sep 20 2010
+  - Add public utility function round_a_number.
+  - Minor POD fixes
+  - Module::Install 1.00
+
+0.08  Mon Dec 18 2006
+  - Fixing bug related to Math::BigFloat overloading in stringification
+    context. This was reported by Jerrad Pierce: RT #23972
+
+0.07  Mon Dec 18 2006
+  - Refactor constructor tests.
+  - Remove dependency on Math::SymbolicX::Inline.
+
+0.06  Wed Aug 30 2006
+  - Upgrade to Module::Install 0.64.
+  - Removed SIGNATURE because Module::Signature is still broken.
+  - Removed auto_install from Makefile.PL
+
+0.05  Fri Jun  9 2006
+  - Upgrade Module::Install to 0.63 to reclaim win32.
+
+0.04  Sat Mar  4 2006
+  - Now using Test::LectroTest's new feature to record past test failures.
+    Shipping with an example database called 'regression.txt'.
+
+0.03  Sun Feb 18 2006
+  - Fixed bug in raw_error().
+  - Added as_array() which returns the representation as accepted by the
+    constructor.
+  - Improved test coverage.
+
+0.02  Wed Feb  8 2006
+  - Added a dependency on Test::LectroTest for the build.
+
+0.01  Sat Jan 29 2006
+  - original version as uploaded to CPAN
+

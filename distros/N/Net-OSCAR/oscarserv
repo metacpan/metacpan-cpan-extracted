@@ -1,0 +1,107 @@
+#!/usr/bin/perl -w
+
+use lib "./blib/lib";
+use strict;
+use warnings;
+use Getopt::Long;
+use Net::OSCAR qw(:standard :loglevels);
+use Net::OSCAR::Utility qw(randchars);
+use IO::Poll;
+eval {
+	require Data::Dumper;
+};
+use vars qw($oscar %fdmap $poll);
+
+#$Carp::Verbose = 1;
+$| = 1;
+
+sub connection_changed($$$) {
+	my($oscar, $connection, $status) = @_;
+
+	my $h = $connection->get_filehandle();
+	$connection->log_printf(OSCAR_DBG_DEBUG, "State changed (FD %d) to %s", fileno($h), $status);
+	my $mask = 0;
+
+	if($status eq "deleted") {
+		delete $fdmap{fileno($h)};
+	} else {
+		$fdmap{fileno($h)} = $connection;
+		if($status eq "read") {
+			$mask = POLLIN;
+		} elsif($status eq "write") {
+			$mask = POLLOUT;
+		} elsif($status eq "readwrite") {
+			$mask = POLLIN | POLLOUT;
+		}
+	}
+
+	$poll->mask($h => $mask);
+}
+
+$poll = IO::Poll->new();
+$poll->mask(STDIN => POLLIN);
+
+$oscar = Net::OSCAR->new();
+$oscar->set_callback_connection_changed(\&connection_changed);
+$oscar->loglevel(10);
+$oscar->server(local_port => 5190);
+
+my($inline, $inchar);
+while(1) {
+	next unless $poll->poll();
+
+	my $got_stdin = 0;
+	my @handles = $poll->handles(POLLIN | POLLOUT | POLLHUP | POLLERR | POLLNVAL);
+	foreach my $handle (@handles) {
+		if(fileno($handle) == fileno(STDIN)) {
+			$got_stdin = 1;
+		} else {
+			my($read, $write, $error) = (0, 0, 0);
+			my $events = $poll->events($handle);
+			$read = 1 if $events & POLLIN;
+			$write = 1 if $events & POLLOUT;
+			$error = 1 if $events & (POLLNVAL | POLLERR | POLLHUP);
+
+			my $conn = $fdmap{fileno($handle)};
+			#$conn->log_print(OSCAR_DBG_DEBUG, "Got r=$read, w=$write, e=$error");
+			$conn->process_one($read, $write, $error);
+
+			next unless $write;
+			my $hash = $Net::OSCAR::ServerCallbacks::SESSIONS;
+		}
+	}
+
+	next unless $got_stdin;
+	sysread(STDIN, $inchar, 1);
+	if($inchar eq "\n") {
+		my($cmd, @params) = split(/[ \t]+/, $inline);
+		$inchar = "";
+		$inline = "";
+		$cmd ||= "";
+
+		if($cmd eq "eval") {
+			eval(join(" ", @params));
+			if($@) {
+				print "$@\n";
+			}
+		} elsif($cmd eq "migrate") {
+			my $session = $params[0];
+			if(!$session) {
+				print "Usage: migrate screenname\n";
+			} else {
+				my $bos = $Net::OSCAR::ServerCallbacks::SESSIONS->{$params[0]}->{sessions}->[0];
+				my $families = $bos->{families};
+
+				my $cookie = randchars(8);
+				$Net::OSCAR::ServerCallbacks::COOKIES{$cookie} = {sn => $params[0]};
+				$bos->proto_send(protobit => "migrate", protodata => {
+					families => $families,
+					peer => "127.0.0.1:5190",
+					cookie => $cookie
+				});
+			}
+		}
+	} else {
+		$inline .= $inchar;
+	}
+}

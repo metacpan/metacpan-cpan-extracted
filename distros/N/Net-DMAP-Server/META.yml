@@ -1,0 +1,23 @@
+---
+name: Net-DMAP-Server
+version: 0.05
+author:
+  - Richard Clamp <richardc@unixbeard.net>
+abstract: 'base class for D[A-Z]AP servers'
+license: perl
+requires:
+  Net::DAAP::DMAP: 1.21
+  Net::Rendezvous::Publish: 0
+  POE::Component::Server::HTTP: 0.05
+  perl: 5.006
+build_requires:
+  Test::More: 0
+provides:
+  Net::DMAP::Server:
+    file: lib/Net/DMAP/Server.pm
+    version: 0.05
+  Net::DMAP::Server::Playlist:
+    file: lib/Net/DMAP/Server/Playlist.pm
+  Net::DMAP::Server::Track:
+    file: lib/Net/DMAP/Server/Track.pm
+generated_by: Module::Build version 0.25

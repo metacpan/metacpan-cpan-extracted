@@ -1,0 +1,34 @@
+Revision history for Net-Wireless-802_11-WPA-CLI
+
+2.1.0	 2011-08-19/06:00
+		 -Add missing dependency to Makefile.PL.
+		 -POD cleanup.
+		 -get_network no longer removes quotes
+		 -Add the methods below.
+		 	  bss
+			  scan
+			  scan_results
+			  get_capability
+
+2.0.2	 2011-08-18/10:40
+		 -list_networks now properly parses the returned data.
+
+2.0.1	 2011-08-18/10:10
+		 -Fix some initialization errors and issues with status_breakdown.
+
+2.0.0	 2011-08-18/08:15
+		 -Now uses Error::Helper.
+		 -Allows for a control socket to be specified.
+		 -Now depends on shell_quote.
+		 -Lots of cleanup in regards to error handling.
+
+1.0.0	2011-08-16/03:05
+		-Rename to Net::Wireless::802_11::WPA::CLI.
+
+0.1.1	 2011-07-01/18:10
+		 -Fix POD issues.
+		 -Update name post marriage.
+		 -Minor cleanups.
+
+0.1.0	 2008-04-06/19:00
+		 -Initial release.

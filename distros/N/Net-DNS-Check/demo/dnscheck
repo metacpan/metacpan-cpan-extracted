@@ -1,0 +1,99 @@
+#!/usr/bin/perl 
+
+use strict;
+
+use Net::DNS::Check;
+use Net::DNS::Check::Config;
+
+my $config = new Net::DNS::Check::Config();
+
+$config->debug_default(2);
+
+my $domain = shift @ARGV;
+my $nserver = shift @ARGV;
+
+
+unless ( $domain ) {
+	print <<USAGE;
+
+
+ dnscheck <domain> [nserver]
+
+ Examples:
+ - dnscheck foo.com
+
+ - dnscheck foo.com 'ns1.foo.com=1.2.3.4;ns.acme.com'
+
+USAGE
+
+	exit;
+
+}
+
+print <<END;
+
+Check for domain: $domain
+
+END
+
+my $dnscheck = new Net::DNS::Check(
+	domain 		=> $domain, 
+    nserver 	=> $nserver, 
+	config		=> $config
+);
+
+unless ( $dnscheck->error() ) {
+	$dnscheck->check();
+	print &txt_result($dnscheck);
+} else {
+	print "NO AUTH NS FOUND\n";
+}
+
+
+
+
+
+sub txt_result() {
+	my $dnscheck = shift;
+
+	return unless $dnscheck;
+
+	my $result;
+
+	my $status_str = ($dnscheck->check_status()?'OK':'FAILED');
+	$result = <<END;
+
+Check Results: **** $status_str ****
+
+END
+	my %hash = %{$dnscheck->test_summary()} ;
+
+	foreach my $status ( keys %hash ) {
+		$result .= "$status: $hash{$status}\n";
+	}
+
+	# Visualizza lo stato dei nameserver autoritativi
+	foreach my $nsname ( $dnscheck->nsauth() ) {
+		my $error = $dnscheck->ns_status( $nsname );
+		$error = 'OK' unless ( $error );
+		$result .= "$nsname: $error\n";
+	}
+	$result .=  "\n";
+
+	foreach my $test_name ( $dnscheck->test_list() ) {
+		$result .= "\n$test_name: ".$dnscheck->test_status($test_name) ."\n";
+		$result .= "==============================\n";
+		my %test_detail = $dnscheck->test_detail($test_name);
+		foreach my $ns_name ( keys %test_detail ) {
+			if ( defined $test_detail{$ns_name}->{desc} ) {
+				my $detail_status   = $test_detail{$ns_name}->{status};
+				my $detail_desc     = $test_detail{$ns_name}->{desc};
+				$result .= "$ns_name: Status: $detail_status Desc: $detail_desc\n";
+			} else {
+				$result .= "$test_name: $ns_name Desc not found\n"
+			}
+		}
+	}
+
+	return $result;
+}

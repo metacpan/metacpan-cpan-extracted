@@ -1,0 +1,19 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TODO
+t/01net-parscp.t
+t/02net-parscp.t
+lib/Net/ParSCP.pm
+lib/Net/ParSCP.pod
+lib/Net/HostLanguage.pm
+script/parpush
+examples/automatic_authentication.instructions
+examples/Cluster
+examples/Cluster2
+examples/config
+examples/csshlocals
+examples/csshothers
+examples/csshrc
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+release-log.txt
+bin/news-search
+lib/News/Search.pm
+t/00-load.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

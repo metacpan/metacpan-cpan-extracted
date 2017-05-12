@@ -1,0 +1,206 @@
+NAME
+    Net::PayPal - Perl extension for PayPal's REST API server
+
+SYNOPSIS
+        use Net::PayPal;
+        my $p = Net::PayPal->new(client_id  => $client_id, secret => $client_secret);
+
+        my $payment = $p->cc_payment({
+            cc_number       => '4353185781082049',
+            cc_type         => 'visa',
+            cc_expire_month => 3,
+            cc_expire_year  => 2018,
+            amount          => 19.95,
+        });
+
+        unless ( $payment ) {
+            die $p->error;
+        }
+
+        unless ( $payment->{state} eq "approved" ) {
+            printf("Your payment was not approved");
+        }
+
+WARNING
+    Since as of this writing (March 10th, 2013) PayPal's REST api was still
+    in BETA state it's fair to consider Net::PayPal is an ALPHA software,
+    meaning any part of this module may change in subsequent releases. In
+    the meantime any suggestions and feedback and contributions are welcome.
+
+    Consult CHANGES file in the root folder of the distribution before
+    upgrading
+
+DESCRIPTION
+    Net::PayPal implements PayPal's REST API. Visit
+    http://developer.paypal.com for further information.
+
+    To start using Net::PayPal the following actions must be completed to
+    gain access to API endpoints:
+
+    1   Sign up for a developer account by visiting
+        http://developer.paypal.com. It is free!
+
+    2   Under "Applications" tab (after signing into developer.paypal.com)
+        make note of secret and client_id. You will need these two
+        identifiers to interact with PayPal's API server
+
+    3   Create Net::PayPal instance using secret and "client_id"
+        identifiers.
+
+  SUPPORTED APIs
+    As of this writing the following APIs are implemented. As PayPal's REST
+    Api evolves this module will evolve together
+
+    /v1/payments/payment
+    /v1/payments/payment/{payment_id}
+    /v1/vault/credit-card
+    /v1/vault/credit-card/{credit_card_id}
+
+  METHODS
+    Following methods are available
+
+   new(client_id => $client_id, secret => $secret);
+    Creates and returns an instance of Net::PayPal class. If it's the first
+    time you call this method within 8 hour period it will attempt to
+    authenticate the instance by submitting your credentials to paypal's
+    /v1/oauth/token API. The access token is then cached for 8 hour period
+    in your system's temp folder.
+
+    "access_token" is a very sensitive data. For this reason Net::PayPal
+    encrypts this data using Blowfish algorithm, using your "secret" as key.
+    As long as you can keep your "secret" identifier in secret your access
+    token is reasonably safe!
+
+    Caching is very useful. Without cahing each API call in separate
+    processes must attempt to authenticate the API, thus slowing down each
+    API call. By making use of caching technique a separate token is stored
+    for each client_id in the temp folder.
+
+    If you insist no caching should take place you can disable caching
+    altogether by passing "no_cache => 1" to new(). Expect slowdowns in API
+    calls because for each api call accross separate processes Net::PayPal
+    must request for an access_token!
+
+   cc_payment(\%data)
+    Implements "/v1/payments/payment" API.
+
+        my $payment = $p->cc_payment({
+            cc_number       => '4353185781082049',
+            cc_type         => 'visa',
+            cc_expire_month => 3,
+            cc_expire_year  => 2018,
+            first_name      => 'Sherzod',
+            last_name       => 'Ruzmetov',
+            amount          => 19.95,
+        }) or die $p->error;
+
+    You may choose to store "id" payment attribute should you wish to lookup
+    payment details in the future. The state of the payment is stored in
+    'state' attribute:
+
+        unless ( $payment->{state} eq 'approved' ) {
+            die "Your payment wasn't approved";
+        }
+
+    On error returns undef. Last error message can be queried through
+    error() class method.
+
+   stored_cc_payment(\%data)
+    The same as cc_payment(), except using a credit card stored in vault
+
+        my $payment = $p->cc_payment({
+            id      => 'CARD-ADFA13413241241324'
+            amount  => '19.95',
+            currency=> 'USD'
+        });
+
+    "id" is the result of previously invoked store_cc().
+
+    On error returns undef. Last error message can be queried through
+    error() class method.
+
+   get_payment( $id )
+    Returns previously processed payment information, given the payment ID.
+
+        my $payment = $p->get_payment( 'PAY-9D023728F47376036KE5OTKY' );
+
+    On error returns undef. Last error message can be queried through
+    error() class method.
+
+   get_payments()
+    Returns list of previously processed payments.
+
+        my @payments = $p->get_payments;
+
+    On error returns undef. Last error message can be queried through
+    error() class method.
+
+   store_cc(\%credit_card);
+    Stores a credit card profile in the vault:
+
+        my $cc = $p->store_cc({
+            cc_number       => '4353185781082049',
+            cc_type         => 'visa',
+            cc_expire_month => '3',
+            cc_expire_year  => '201'8,
+            cvv2            => '420',
+            first_name      => 'Sherzod',
+            last_name       => 'Ruzmetov'
+        });
+
+    "id" is probably the most important attribute of the response data. To
+    make a payment using the stored CC see stored_cc_payment() method.
+
+   head3 get_cc( $id )
+    Retrieves stored CC information from the database. Usual, in real world
+    applications there is rarely a need for this method. Since once can
+    already charge a credit card without retrieving it completely.
+
+        my $cc = get_cc( $id );
+
+    On error returns undef. Last error message can be queried through
+    error() class method.
+
+GOING LIVE
+    All the above methods invoke the sandbox API hosted at
+    api.sandbox.paypal.com. Once you're done developing your tool you must
+    go live by doing:
+
+        Net::PayPal->live( 1 );
+
+    Before creating a Net::PayPal instance using new():
+
+        Net::PayPal->live( 1 );
+        my $pp = Net::PayPal->new($client_id, $secret);
+
+SEE ALSO
+    Business::PayPal::API
+    Business::PayPal::IPN
+    Business::OnlinePayment::PayPal
+
+CREDITS
+    Net::PayPal relies on the following Perl modules. Without these writing
+    this tool would've been very painful, to say the least:
+
+    *   Crypt::SSLeay by Gisle Aas and et. al.
+
+    *   Crypt::Blowfish by Systemics Ltd. and et. al.
+
+    *   Crypt::CBC by Lincoln Stein
+
+    *   Cache::FileCache by DeWitt Clinton
+
+    *   LWP by Gisle Aas
+
+    *   JSON by Makamaka Hannyaharamitu
+
+AUTHOR
+    Sherzod B. Ruzmetov <sherzodr@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2013 Sherzod B. Ruzmetov.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.14.2 or, at
+    your option, any later version of Perl 5 you may have available.
+

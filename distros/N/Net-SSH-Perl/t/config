@@ -1,0 +1,9 @@
+Host foo
+  Port 10000
+  HostName foo.bar.com
+  IdentityFile identity
+  IdentityFile identity2
+
+Host dummy
+  Port 5000
+  BatchMode no

@@ -1,0 +1,30 @@
+
+
+
+void
+remove_entries_by_name( a, ... )
+      LN_Acl *       a;
+   PREINIT:
+      d_LN_XSVARS;
+      LN_Acl_Impl*   a_impl;
+      HANDLE              a_h;
+      int                 i;
+      char                name[   MAXUSERNAME ]; 
+   ALIAS:
+      remove                  = 0
+      remove_entries          = 1
+      remove_entries_by_name  = 2
+   PPCODE:
+      a_impl              = (LN_Acl_Impl*) LN_H(a);
+      a_h                 = a_impl->h;
+      if ( items <= 1 ) { XSRETURN( 0 ); }
+
+      for ( LN_SET_OK(a), i = 1; i < items; i++ ) { /* i=0 skipped */
+
+         ln_stat =
+           DNCanonicalize(0L,NULL,SvPV(ST(i),na),name,MAXUSERNAME,NULL);
+
+         if ( LN_IS_OK )     { ln_stat    = ACLDeleteEntry(a_h, name); }
+         if ( LN_IS_NOT_OK ) { LN_STAT(a) = ln_stat;                   }
+      }
+      XSRETURN( 0 );

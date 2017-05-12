@@ -1,0 +1,63 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 501e321e888bf6963d9f4340e3dbdcc2c8735473 Changes
+SHA1 8b3894ef01d8bfbe277e6bd1581377c1ff77ef90 INSTALL
+SHA1 6b50b30fa6f8d063d96e32c9a81f3f82328925f7 LICENSE
+SHA1 984ef2c7a6325f0b8cf7543e0651eee3dfcb73d3 MANIFEST
+SHA1 5072d105557c91eb409479427a8e20084822a68d META.json
+SHA1 c6ac5e3beed37c40044eb26f9fe38aa0ef65356e META.yml
+SHA1 a6025dd75f630a1870c3c77f0343fe905a063c93 Makefile.PL
+SHA1 7160ddde8ff9c226d7a074949b9c705be3aee4d3 README
+SHA1 8d9a77c34b9befbd09f3d9f1d1bf096d9737d49c cpanfile
+SHA1 d3742b6e53883bdbe362846745d81e91ebcb1b8c dist.ini
+SHA1 918abf80c43270da509eb9435f6e34f7ae6637f3 examples/statsd-server.pl
+SHA1 2d33a5adc110b0cddd233d561419bf3cc005add8 lib/Net/Async/Statsd.pm
+SHA1 3ade7147a7a34d582c87bb03163a794de6019269 lib/Net/Async/Statsd/Bus.pm
+SHA1 1b77c60c29d916a4d154fc0dd5c8a5705babee92 lib/Net/Async/Statsd/Bus.pod
+SHA1 05604a37187cba8b0065b3a3cbbc2e1f5a904559 lib/Net/Async/Statsd/Client.pm
+SHA1 dabbd36e5e4f40824b53f2200c4bd5037519fc6e lib/Net/Async/Statsd/Client.pod
+SHA1 c4cbd6a00fe43b97a1231c1fc325545e14488ded lib/Net/Async/Statsd/Server.pm
+SHA1 327f9dac253b29c39eed7ff912514296e2de6286 lib/Net/Async/Statsd/Server.pod
+SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
+SHA1 1c4f2e3a91ba0ee5a2f76e7dfa7f8a50981d12af t/00-compile.t
+SHA1 9a264e09ed9d1639400263ea65cdc5da20465dc3 t/00-report-prereqs.dd
+SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
+SHA1 d6747b6a87ed5791c49ce3a030623d1201dbea0c t/client.t
+SHA1 49002de3f32a780fde26671ad329c8e94f203dc3 t/sampling.t
+SHA1 143460bcf326782f47b76da74dc17a69d7cb16ed t/server.t
+SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
+SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/author/synopsis.t
+SHA1 187e6d98759176eb6fd4fb386871b0ebc51cf289 xt/author/test-version.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJYYl/gAAoJEG2WkcbynxAloXMP/izi9Ijg9t6KYGdwzKc5l95D
+Tkj4Xmv5ayPHeJeGljhzrWGS0RxJ+H5WqolM4HRO7xwRKk/pClntZmOkISPxOQ/m
+QWxqVMf93afj481fm66n3twem+EOhqCcM9OCjiMz00QQSAk0Leww1ffK1p41kLSQ
+DzWtBwrpEV0BOnSJ7vCpW6FUGdVbSSZMmgYqNXp44b6BcdM29TNAvY1gYgGP2hnj
+NhQk86aMxxCRgMI6VptB5qoGgTPues47OAT/J2pa/H8/iteqSnX3sonH2fRT80JK
+h1YWxjACKpJLuYGLU44gHg33iIZGoV3PHpfNTl0eYBuLnzShdnVVsJTWPUyCe8AL
+ojUHdjVdTm1uSoUMUn4UUnFUyITcCaS5bzIHjuHG5zOLH2CFsV6XT46LoebfrMEb
+ohm17Mjld0gvGuEksNe+23LX4sRJFS1cA58h1WsuxHslj14+nc/o7B3uS8UdQnW+
+icN0Q8knDggn8+rqs0D2VWn9qoPBjotDdNIt3E3SSQsJWqeyZemia2pIBkJfOUhy
+GL25C3e3Dj8CCoIPe7ZrADpHwUj/ne7LWOOfbKBtcgUnY/9Ej1JMA0hmEGbwlXnd
+u/Kt23DbR6+a/Aa4CnxxdJubLn/O93+IMan5DRFfGvjUCifoQhwZ3oQjbVLGMh/p
+ZgC3nIRFgjwAxdD3Gi19
+=T49C
+-----END PGP SIGNATURE-----

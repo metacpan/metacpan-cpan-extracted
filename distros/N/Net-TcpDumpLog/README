@@ -1,0 +1,132 @@
+NAME
+     Net::TcpDumpLog - Read tcpdump/libpcap network packet logs.
+     Perl implementation (not an interface).
+
+SYNOPSIS
+     use Net::TcpDumpLog;
+
+     $log = Net::TcpDumpLog->new(); $log->read("/tmp/out01");
+
+     @Indexes = $log->indexes;
+
+     foreach $index (@Indexes) {
+          ($length_orig,$length_incl,$drops,$secs,$msecs) =
+                                      $log->header($index);
+          $data = $log->data($index);
+
+          # your code here
+     }
+
+
+DESCRIPTION
+     This module can read the data and headers from tcpdump logs
+     (these use the libpcap log format).
+
+METHODS
+     new ()
+         Constructor, return a TcpDumpLog object.
+
+     new (BITS)
+         This optional argument is to force reading timestamps of
+         that number of bits. eg new(32). Could be needed when
+         processing tcpdumps from one OS on another.
+
+     new (BITS,SKIP)
+         This second options argument is how many bytes to skip
+         for every record header.  "SuSE linux 6.3" style logs
+         need this set to 4, everything else (so far) is 0.
+
+     read (FILENAME)
+         Read the tcpdump file indicated into memory.
+
+     indexes ()
+         Return an array of index numbers for the packets loaded
+         from the tcpdump file. The indexes start at 0.
+
+     maxindex ()
+         Return the number of the last index. More memory
+         efficient than indexes(). Add 1 to get the packet count.
+         The indexes start at 0.
+
+     header (INDEX)
+         Takes an integer index number and returns the packet
+         header. This is:
+            Length of original packet,
+            Length actually included in the tcpdump log,
+            Number of bytes dropped in this packet,
+            Packet arrival time as seconds since Jan 1st 1970,
+            Microseconds
+
+     data (INDEX)
+         Takes an integer index number and returns the raw packet
+         data.  (This is usually Ethernet/IP/TCP data).
+
+     version ()
+         Returns a string containing the libpcap log version,
+         major and minor number - which is expected to be "2.4".
+
+     linktype ()
+         Returns a strings containing the numeric linktype.
+
+     zoneoffset ()
+         Returns the zoneoffset for the packet log.
+
+     accuracy ()
+         Returns a the accuracy of the packet log.
+
+     dumplength ()
+         Returns the length of the packet log.
+
+INSTALLATION
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+
+DEPENDENCIES
+     ExtUtils::MakeMaker
+
+EXAMPLES
+     Once you can read the raw packet data, the next step is read
+     through the protocol stack. An Ethernet/802.3 example is,
+
+     ($ether_dest,$ether_src,$ether_type,$ether_data) =
+      unpack('H12H12H4a*',$data);
+
+     Keep an eye on CPAN for Ethernet, IP and TCP modules.
+
+LIMITATIONS
+     This reads tcpdump/libpcap version 2.4 logs (the most
+     common). There could be new versions in the future, at which
+     point this module will need updating.
+
+BUGS
+     If this module is not reading your logs correctly, try
+     forcing the timestamp bits to either 32 or 64, eg "$log =
+     Net::TcpDumpLog->new(32);". Also try printing out the log
+     version using version() and checking it is "2.4".
+
+     There is a certain tcpdump log format "SuSE linux 6.3" that
+     put extra fields in the log without any clear identifier. If
+     you think you have this log, put a "4" as a second argument
+     to new, eg "$log = Net::TcpDumpLog->new(32,4);".  (The 4
+     specifies how many extra header bytes to skip).
+
+TODO
+     Future versions should include the ability to write as well
+     as read tcpdump logs. Also a memory efficient technique to
+     process very large tcpdump logs (where the log size is
+     greater than available virtual memory).
+
+SEE ALSO
+     http://www.tcpdump.org
+
+COPYRIGHT
+     Copyright (c) 2003 Brendan Gregg. All rights reserved.  This
+     library is free software; you can redistribute it and/or
+     modify it under the same terms as Perl itself
+
+AUTHORS
+     Brendan Gregg <brendan.gregg@tpg.com.au> [Sydney, Australia]
+

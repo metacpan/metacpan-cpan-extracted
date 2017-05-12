@@ -1,0 +1,83 @@
+<h2><a href="#">Security</a></h2>
+<h3>Code Injection and Cross-site scripting</h3>
+<p>
+Nes transparently manages the removal of malicious code variables.
+</p>
+<p>
+By default is filtered HTML and the tags Nes all environment variables (*) from forms.
+</p>
+<p>
+By default is filtered HTML and the tags of all the variables Nes ($).
+</p>
+<p>
+By  default is filtered HTML and the tags Nes all the variables of Tables and SQL (@$).
+</p>
+<p>
+By default HTML is allowed &lt;br&gt; HTML Tag.
+</p>
+<p>
+By default, calls <a href="http://search.cpan.org/~timb/DBI/DBI.pm#quote">DBI::quote</a>
+on all variables that are part of a SELECT statement in sql Tag.
+</p> 
+
+<h3>Change the default behavior</h3>
+<p>
+The types of variables x, $ y @$ accept parameters to change this behavior:
+<pre>
+&#123;: $  ('var','yes_html','no_sql') :&#125;
+&#123;: *  ('q_var','yes_html','no_sql') :&#125;
+&#123;: @$ ('table.field','yes_html','no_sql') :&#125;
+
+</pre>
+We passed as parameters the filtering options you want, and are:
+<p>
+<pre>
+no_sql   # not allow SQL, call DBI::quote
+no_html  # not allow Tag HTML
+no_br    # not allow Tag HTML &lt;br&gt;
+no_nes   # not allow Tag Nes &#123;: :&#125;
+
+yes_sql  # allow SQL, not DBI::quote filter 
+yes_html # allow all Tags HTML
+yes_br   # allow Tag HTML &lt;br&gt;
+yes_nes  # allow Tag Nes &#123;: :&#125;
+
+Allow specific HTML tags ( yes_tag_TAG ):
+
+yes_tag_B      # allow Tag HTML &lt;B&gt;&lt;/B&gt;
+yes_tag_strong # allow Tag HTML &lt;strong&gt;&lt;/strong&gt;
+...
+</pre>
+</p>
+<p>
+Format:
+<pre>
+&#123;: $  ('var',[list of options in any order]) :&#125;
+
+</pre> 
+</p>
+<h3>Nes Tags</h3>
+<p>
+If we make a variable 'yes_no' will not get run code that contains the variable.
+For safety, you can not execute code from a Nes variable. The effect of 'no_nes'
+is that the tags are visible, and 'yes_no' is disappearing.
+</p>
+
+<h3>.nes.cfg</h3>
+<p>
+We must prevent access to these files in .htaccess:
+<pre>
+ &lt;FilesMatch \.nes.cfg$&gt;
+    order deny,allow
+    deny from all
+ &lt;/FilesMatch&gt;
+ 
+</pre>
+
+<h3>PHP</h3>
+<p>
+Nes filters the Nes Tags of the forms in PHP include or Wrapper, but NOT the 
+HTML and SQL. It is assumed that the PHP script should incorporate these filters.
+</p>
+
+

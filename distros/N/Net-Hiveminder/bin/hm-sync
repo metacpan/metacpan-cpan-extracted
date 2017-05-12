@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Net::Hiveminder;
+
+my $file = shift
+    or die "Usage: $0 file";
+
+my $hm = Net::Hiveminder->new(use_config => 1);
+
+# update any tasks with the changes you've made
+print $hm->upload_file($file), "\n"
+    if -e $file;
+
+# and sync your file with any other changes made
+$hm->download_file($file);
+

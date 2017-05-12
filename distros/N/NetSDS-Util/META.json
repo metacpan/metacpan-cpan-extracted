@@ -1,0 +1,107 @@
+{
+   "abstract" : "Utility Perl5 modules for NetSDS VAS development framework",
+   "author" : [
+      "Net.Style Development Team <info@netstyle.com.ua>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.3901, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "NetSDS-Util",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.20",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.39"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::UUID" : "1.000",
+            "Date::Format" : "0",
+            "Date::Parse" : "0",
+            "Encode" : "2.000",
+            "File::Copy" : "0",
+            "File::MMagic" : "1.000",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "HTTP::Date" : "0",
+            "IO::File" : "0",
+            "MIME::Base64" : "0",
+            "POSIX" : "0",
+            "Pod::Usage" : "0",
+            "Scalar::Util" : "0",
+            "Spreadsheet::Read" : "0.30",
+            "Time::HiRes" : "0",
+            "Time::Local" : "0",
+            "URI" : "1.00",
+            "URI::Escape" : "1.00",
+            "perl" : "5.008",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "NetSDS::Util" : {
+         "file" : "lib/NetSDS/Util.pm",
+         "version" : "1.045"
+      },
+      "NetSDS::Util::Convert" : {
+         "file" : "lib/NetSDS/Util/Convert.pm",
+         "version" : "1.044"
+      },
+      "NetSDS::Util::DateTime" : {
+         "file" : "lib/NetSDS/Util/DateTime.pm",
+         "version" : "1.044"
+      },
+      "NetSDS::Util::File" : {
+         "file" : "lib/NetSDS/Util/File.pm",
+         "version" : "1.044"
+      },
+      "NetSDS::Util::FileImport" : {
+         "file" : "lib/NetSDS/Util/FileImport.pm",
+         "version" : "1.044"
+      },
+      "NetSDS::Util::Misc" : {
+         "file" : "lib/NetSDS/Util/Misc.pm",
+         "version" : "1.044"
+      },
+      "NetSDS::Util::String" : {
+         "file" : "lib/NetSDS/Util/String.pm",
+         "version" : "1.044"
+      },
+      "NetSDS::Util::Struct" : {
+         "file" : "lib/NetSDS/Util/Struct.pm",
+         "version" : "1.044"
+      },
+      "NetSDS::Util::Translit" : {
+         "file" : "lib/NetSDS/Util/Translit.pm",
+         "version" : "1.044"
+      },
+      "NetSDS::Util::Types" : {
+         "file" : "lib/NetSDS/Util/Types.pm",
+         "version" : "1.044"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/gpl-license.php"
+      ]
+   },
+   "version" : "1.045"
+}

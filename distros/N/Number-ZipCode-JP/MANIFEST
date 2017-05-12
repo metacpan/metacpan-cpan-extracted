@@ -1,0 +1,26 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/AuthorTests.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Number/ZipCode/JP.pm
+lib/Number/ZipCode/JP/Table.pm
+lib/Number/ZipCode/JP/Table/Area.pm
+lib/Number/ZipCode/JP/Table/Company.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+regexp-table-maker.pl
+t/00_compile.t
+t/area.t
+t/company.t
+t/pod.t
+t/use-twice.t
+xt/perlcritic.t
+xt/perlcriticrc

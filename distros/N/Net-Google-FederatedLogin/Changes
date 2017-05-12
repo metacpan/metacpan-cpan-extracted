@@ -1,0 +1,53 @@
+Revision history for Net-Google-FederatedLogin
+
+0.8.0     2014-03-03 20:55:49 Australia/Sydney
+    Reverted use of uri_escape_utf8 back to uri_escape, I hope this doesn't cause problems for anyone.
+
+0.7.2     2012-12-09 22:36:18 Australia/Sydney
+    Fixed RT-81565 (change in perl5.17.6 broke a test; thanks to Andreas Koenig for narrowing down the cause)
+    Git repo metadata
+
+0.7.1     2012-04-18 13:04:10 Australia/Sydney
+    Fixed RT-76617 (Catalyst::Runtime now requires _log attribute in constructor)
+
+0.7.0     2011-05-01 22:37:38 Australia/Sydney
+    Fixed RT-67832 (use uri_escape_utf8 instead of uri_escape; thanks to Erik Gimbert).
+    Fixed RT-66332 (not strictly requiring CGI; Erik Gimbert again).
+
+0.6.0     2011-04-29 14:36:51 Australia/Sydney
+    Added minimalish synopsis
+    Attribute Exchange parameters need to be signed
+
+0.5.3     2010-09-03 11:37:46 Australia/Sydney
+    Minimum version of Moose required to get BUILDARGS (see http://www.cpantesters.org/cpan/report/58873350-b5ce-11df-8c9f-73fc23310e15)
+
+0.5.2     2010-06-22 11:04:50 Australia/Sydney
+    Documentation formatting fixes. Again.
+
+0.5.1     2010-06-22 00:45:14 Australia/Sydney
+    Documentation formatting fixes.
+
+0.5.0     2010-06-21 20:28:24 Australia/Sydney
+    Added handling for OpenID extensions.
+
+0.4.0     2010-06-16 18:33:52 Australia/Sydney
+    Added support for the openid.realm parameter
+
+0.3.0     2010-05-12 19:32:59 Australia/Sydney
+    OpenID endpoint discovery has been improved (which implementation to use, and wider set of allowed values).
+
+0.2.0     2010-05-07 11:50:12 Australia/Sydney
+    The get_openid_endpoint() method is now available in the public interface.
+    Documentation has had some slight updates.
+
+0.1.0     2010-04-30 16:54:50 Australia/Sydney
+    Handling for hosted domains.
+    Some testing.
+
+0.0.2     2010-04-07 11:44:02 Australia/Sydney
+    Fixed internal documentation links.
+    Added repository metadata.
+
+0.0.1     2010-04-06 16:43:50 Australia/Sydney
+    First version.
+    Needs more tests.

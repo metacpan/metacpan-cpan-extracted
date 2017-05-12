@@ -1,0 +1,39 @@
+---
+abstract: 'A Perl interface for gandi api'
+author:
+  - 'Natal Ngétal'
+build_requires:
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Gandi
+requires:
+  Carp: 0
+  Const::Fast: 0
+  Data::Dumper: 0
+  Exporter: 0
+  Module::Load: 0
+  Moose: 0
+  Moose::Role: 0
+  MooseX::Params::Validate: 0
+  MooseX::Traits: 0
+  MooseX::Types: 0
+  MooseX::Types::Moose: 0
+  MooseX::Types::URI: 0
+  Params::Check: 0
+  XMLRPC::Lite: 0
+  namespace::autoclean: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/hobbestigrou/Net-Gandi.git
+version: 1.122180

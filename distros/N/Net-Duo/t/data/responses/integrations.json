@@ -1,0 +1,21 @@
+[
+    {
+        "enroll_policy": "enroll",
+        "greeting": "",
+        "groups_allowed": [],
+        "integration_key": "DIRWIH0ZZPV4G88B37VQ",
+        "ip_whitelist": [
+            "192.0.2.8",
+            "198.51.100.0-198.51.100.20",
+            "203.0.113.0/24"
+        ],
+        "ip_whitelist_enroll_policy": "enforce",
+        "name": "Integration for the web server",
+        "notes": "",
+        "secret_key": "QO4ZLqQVRIOZYkHfdPDORfcNf8LeXIbCWwHazY7o",
+        "type": "websdk",
+        "trusted_device_days": 0,
+        "username_normalization_policy": "None",
+        "visual_style": "default"
+    }
+]

@@ -1,0 +1,34 @@
+---
+abstract: 'Send data to a Graylog server for analysis'
+author:
+  - 'Kevin Mulholland <moodfarm@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Graylog-Client
+requires:
+  App::Basis: 0
+  App::Basis::Config: 0
+  Data::Printer: 0
+  Data::UUID: 0
+  Furl: 0
+  JSON: 0
+  JSON::Tiny: 0
+  Moo: 0
+  POSIX: 0
+  Sys::Hostname: 0
+  URI::Escape::XS: 0
+  constant: 0
+  namespace::clean: 0
+  perl: v5.16.0
+  strict: 0
+  vars: 0
+  warnings: 0
+version: 0.3

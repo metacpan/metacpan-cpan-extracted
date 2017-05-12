@@ -1,0 +1,7 @@
+Net::Plazes
+-----------
+
+Net::Plazes is a set of Perl modules against the RESTful web service
+interfaces provided by the social geo-location platform Plazes
+(plazes.net and plazes.com).
+

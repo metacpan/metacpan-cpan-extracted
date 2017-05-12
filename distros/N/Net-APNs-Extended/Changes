@@ -1,0 +1,39 @@
+Revision history for Perl extension Net::APNs::Extended
+
+0.12 2016-01-24T14:00:09Z
+    - Fixed obtain empty string from Net::SSLeay::read() (suggested by perlDreamer)
+
+0.11 2015-06-26T11:36:21Z
+    - Fix a POD typo and Fix typo in File::Temp invocation (perlDreamer++)
+
+0.10 2014-02-25T12:23:28Z
+    - Added error status code `SHUTDOWN`
+
+0.09 2014-02-25T11:00:12Z
+    - Added write_timeout option
+
+0.08 2014-02-25T10:47:15Z
+    - Fixed error message from inet_aton
+
+0.07 2013-07-27T09:53:15Z
+    - Fixed test for 5.18.0 (syohex++)
+
+0.06 2013-07-17T04:52:11Z
+    - Fixed a problem that pass through invalid connection on retrieve_error()
+        (reported by zhao-yangyang++)
+
+0.05  Thu Dec 27 23:57:19 2012
+    - fixed select() error handling (suggested by nhayashi)
+
+0.04  Wed Nov 21 15:39:25 2012
+    - fixed typo s/retrive_error/retrieve_error/
+    - no depends Exporter::Constants (suggested by Naritoshi Hayashi)
+
+0.03  Mon Nov  5 20:48:47 2012
+    - fixed constants
+
+0.02  Sat Jul 14 19:08:16 2012
+    - first release
+
+0.01  Tue Jan 24 18:35:59 2012
+    - original version

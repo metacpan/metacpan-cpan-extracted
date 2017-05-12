@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Net/FCP/Tiny.pm
+t/00-compile.t
+t/release-pod-syntax.t

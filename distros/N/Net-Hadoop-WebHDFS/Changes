@@ -1,0 +1,31 @@
+Revision history for Perl extension Net-Hadoop-WebHDFS
+
+0.8 2017-02-10T17:15:20Z
+   - New endpoints for xattrs, checkaccess, concat, truncate, delegation tokens, snapshot and createsymlink (commented out)
+
+0.7 2016-09-07T02:59:00Z
+   - New extension methods: exists() & find()
+
+0.6 2014-08-20T02:59:00Z
+
+   - Add 'touchz' method
+
+0.5 2014-06-03T10:05:18Z
+
+   - support Namenode HA
+
+0.4 2013-09-30T06:37:07Z
+
+   - new dist with Minilla
+
+0.3  Mon Oct 22 12:34:22 JST 2012
+
+   - update bundled Module::Install to 1.06
+
+0.2  Mon Jun 25 22:15:44 JST 2012
+
+   - shrink distribution
+
+0.1  Mon Jun 25 18:00:00 JST 2012
+
+   - original version

@@ -1,0 +1,25 @@
+---
+name: Net-DNS-ValueDomain-DDNS
+version: 0.02
+author:
+  - 'Daisuke Murase, E<lt>typester@cpan.orgE<gt>'
+abstract: Update your Value-Domain (https://www.value-domain.com/) DynamicDNS records.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Accessor::Fast: 0
+  Class::ErrorHandler: 0
+  HTTP::Request::Common: 0
+  LWP::UserAgent: 0
+  Readonly: 0
+recommends:
+  Crypt::SSLeay: 0
+build_requires:
+  Test::MockObject: 0
+  Test::More: 0
+provides:
+  Net::DNS::ValueDomain::DDNS:
+    file: lib/Net/DNS/ValueDomain/DDNS.pm
+    version: 0.02
+generated_by: Module::Build version 0.2703

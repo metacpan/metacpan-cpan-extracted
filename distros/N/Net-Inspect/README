@@ -1,0 +1,7 @@
+Net::Inspect
+Library for inspecting of network traffic
+
+see perldoc lib/Net/Inspect.pm for more information.
+see COPYRIGHT for license
+see TODO for plans of what to do next
+see Changes for history

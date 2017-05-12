@@ -1,0 +1,86 @@
+NAME
+    Nginx::HTTP - asynchronous http client for nginx-perl
+
+SYNOPSIS
+        use Nginx;
+        use Nginx::HTTP;
+    
+        ngx_http "1.2.3.4:80", "GET / HTTP/1.1"   . "\x0d\x0a" .
+                               "Host: localhost"  . "\x0d\x0a" .
+                               ""                 . "\x0d\x0a"   , sub {
+        
+            my ($headers, $buf_ref) = @_;
+        
+            unless ($headers) {
+                ngx_log_error $!, "error";
+                return;
+            }
+        
+            ngx_log_notice 0, "got $headers->{'_status'}";
+            ...
+        };
+
+DESCRIPTION
+    Fast and simple asynchronous http client for nginx-perl. Supports
+    keepalive.
+
+EXPORT
+        ngx_http
+        ngx_http_client
+
+FUNCTIONS
+   "ngx_http "$ip:$port:key=value;key=value...", $request, sub { }"
+    Establishes new connection with "$ip:$port" and sends raw HTTP request.
+    $request should be either scalar or scalar reference. Additionally there
+    are two options available: "timeout" and "ssl". E.g.:
+
+        ngx_http "1.2.3.4:443:ssl=1;timeout=15", ...
+        ngx_http "1.2.3.4:80:timeout=15", ...
+        ngx_http "1.2.3.4:80", ...
+
+    Calls back with parsed response header in $_[0] and scalar reference to
+    the body in $_[1].
+
+        $headers =  {  _status        => 503,
+                       content-type   => ['text/html'],
+                       content-length => [1234],
+                       ...                              };
+    
+        $body = \"foobar";
+
+    $body is cleared right after the callback, so you have to copy its
+    content if you want to use it later.
+
+    On error calls back without any arguments. Tries to reconnect on the
+    next request.
+
+    For now every connection is cached forever. But you can use
+    "ngx_http_client" to create desired caching behaviour.
+
+        ngx_http "1.2.3.4:80", "GET / HTTP/1.1"   . "\x0d\x0a" .
+                               "Host: localhost"  . "\x0d\x0a" .
+                               ""                 . "\x0d\x0a"   , sub {
+        
+            my ($headers, $body_ref) = @_;
+        
+            unless ($headers) {
+                ngx_log_error $!, "error";
+                return;
+            }
+        
+            ngx_log_notice 0, "got $headers->{'_status'}";
+            ...
+        };
+
+SEE ALSO
+    Nginx, HTTP::Parser2::XS
+
+AUTHOR
+    Alexandr Gomoliako <zzz@zzz.org.ua>
+
+LICENSE
+    Copyright 2012 Alexandr Gomoliako. All rights reserved.
+
+    This module is free software. It may be used, redistributed and/or
+    modified under the same terms as Perl itself.
+

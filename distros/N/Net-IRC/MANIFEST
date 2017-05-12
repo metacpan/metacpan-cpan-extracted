@@ -1,0 +1,14 @@
+Changes
+Connection.pm
+DCC.pm
+Entry.pm
+Event.pm
+EventQueue.pm
+IRC.pm
+irctest
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/01_minimal.t
+META.yml                                 Module meta-data (added by MakeMaker)

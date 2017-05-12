@@ -1,0 +1,53 @@
+NAME
+    Net::SSH::W32Perl - Win32 compatibility layer for Net::SSH::Perl
+
+SYNOPSIS
+    use Net::SSH::W32Perl;
+
+    my $host = 'foo.bar.com';
+    my $ssh = new Net::SSH::W32Perl($host, [options]);
+    $ssh->login('user', 'password');
+    my ($out, $err, $exit) = $ssh->cmd('cat', 'Hello W32 User!');
+
+INSTALLATION
+    perl Makefile.PL
+    nmake
+    nmake test
+    nmake install
+            
+    NOTE: I've made ppms (binaries) available for this and most of it's 
+    required modules at http://www.soulcage.net/ppds/. The following 
+    command should install everything you need.
+
+    "ppm install --location=http://www.soulcage.net/ppds Net::SSH::W32Perl"
+    
+        
+ABSTRACT
+    This module provides limited Net::SSH::Perl functionality under Win32
+    (ActivePerl).
+
+LIMITATIONS
+    * SSH2 is the only supported protocol due to Net::SSH::Perl's reliance
+    on Math::GMP.
+    * The "shell()" interface is not supported due to Win32's lack of
+    support for "select()" on non-socket filehandles.
+    * The *privileged* option is not supported, I hope to fix this in a
+    future release.
+    * Anything else that doesn't work :)
+
+TO DO
+    Create some tests, fix "privileged", etc...
+
+AUTHOR & COPYRIGHT
+    Scott Scecina, <scotts@inmind.com>
+
+    Except where otherwise noted, Net::SSH::W32Perl is Copyright 2001 Scott
+    Scecina. All rights reserved. Net::SSH::W32Perl is free software; you
+    may redistribute it and/or modify it under the same terms as Perl
+    itself.
+
+    Code taken from Net::SSH::Perl is Copyright 2001 Benjamin Trott. Please
+    see the the Net::SSH::Perl manpage manual for more information.
+
+SEE ALSO
+    the Net::SSH::Perl manpage.

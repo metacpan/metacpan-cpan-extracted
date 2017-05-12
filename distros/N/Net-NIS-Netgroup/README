@@ -1,0 +1,29 @@
+Net::NIS::Netgroup
+==================
+
+Interface for glibc functions "getdomainname", "setdomainname", "innetgr".
+Please see the respective functions' man pages for detailed information,
+or visit the perldoc of this module.
+
+
+Installation
+============
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+
+You may test the package with "make test"; some tests, however, will be skipped
+if not running as root.
+
+Copyright and licence
+=====================
+
+Copyright (C) 2009, 2010 Collax GmbH. All rights reserved.
+(Bastian Friedrich <bastian.friedrich@collax.com> or <bastian@bastian-friedrich.de>)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

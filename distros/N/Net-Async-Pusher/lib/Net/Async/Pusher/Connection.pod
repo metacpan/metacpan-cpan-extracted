@@ -1,0 +1,76 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::Pusher::Connection
+at lib/Net/Async/Pusher/Connection.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::Pusher::Connection - represents one L<Net::Async::Pusher> server connection
+
+=head1 VERSION
+
+version 0.001
+
+=head1 DESCRIPTION
+
+Provides basic integration with the L<https://pusher.com|Pusher> API. This implements
+the protocol as documented in L<https://pusher.com/docs/pusher_protocol>.
+
+=head1 METHODS
+
+=head2 send_ping
+
+Sends a ping request on this connection.
+
+=head2 incoming_frame
+
+Deals with incoming frames.
+
+=head2 client
+
+Returns the L<Net::Async::WebSocket::Client> instance.
+
+=head2 open_channel
+
+Opens a channel.
+
+ my $ch = $conn->open_channel(
+  'xyz'
+ )->get;
+
+Resolves to a L<Net::Async::Pusher::Channel> instance.
+
+=head2 connect
+
+(Re)connects to the feed.
+
+=head2 connected
+
+L<Future> representing current connection state.
+
+=head2 key
+
+The key.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2015-2016. Licensed under the same terms as Perl itself.

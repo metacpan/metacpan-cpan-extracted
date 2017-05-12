@@ -1,0 +1,6 @@
+lib/Net/Yadis/HTMLParse.pm
+lib/Net/Yadis.pm
+t/yadis.t
+Makefile.PL
+README
+MANIFEST

@@ -1,0 +1,46 @@
+---
+name: Net-Route
+version: v0.02
+author:
+  - 'Straton IT <tequeter@straton-it.fr>'
+abstract: Portable interface to the routing table
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  IPC::Run3: 0
+  Moose: 0
+  NetAddr::IP: 0
+  Readonly: 0
+  perl: 5.8.0
+  version: 0.74
+build_requires:
+  Test::More: 0
+recommends:
+  Class::C3: 0
+  Class::MOP: 0
+  Devel::GlobalDestruction: 0
+  Sub::Exporter: 0
+provides:
+  Net::Route:
+    file: lib/Net/Route.pm
+    version: v0.02
+  Net::Route::Parser:
+    file: lib/Net/Route/Parser.pm
+    version: 363
+  Net::Route::Parser::MSWin32:
+    file: lib/Net/Route/Parser/MSWin32.pm
+    version: 366
+  Net::Route::Parser::linux:
+    file: lib/Net/Route/Parser/linux.pm
+    version: 363
+  Net::Route::Parser::solaris:
+    file: lib/Net/Route/Parser/solaris.pm
+    version: 363
+  Net::Route::Table:
+    file: lib/Net/Route/Table.pm
+    version: 363
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,219 @@
+#!/usr/bin/perl
+use strict;
+use Data::Hexdumper;
+use File::Basename;
+use Getopt::Long        qw(:config no_auto_abbrev);
+use Net::Pcap           qw(:functions);
+use NetPacket::Ethernet qw(:types);
+use NetPacket::IP       qw(:protos);
+use NetPacket::TCP;
+use Pod::Usage;
+use Socket              qw(inet_ntoa);
+
+
+$::PROGRAM = basename($0);
+$::VERSION = "0.01";
+
+
+# globals
+my $dumper  = undef;
+
+my %icmp = (
+    ICMP_ECHO           => "echo",
+    ICMP_ECHOREPLY      => "echo-reply",
+    ICMP_IREQ           => "ireq",
+    ICMP_IREQREPLY      => "ireq-reply",
+    ICMP_MASREQ         => "mask",
+    ICMP_MASKREPLY      => "mask-reply",
+    ICMP_PARAMPROB      => "param-prob",
+    ICMP_REDIRECT       => "redirect",
+    ICMP_ROUTERADVERT   => "router-advert",
+    ICMP_ROUTERSOLICIT  => "router-solicit",
+    ICMP_SOURCEQUENCH   => "source-quench",
+    ICMP_TIMXCEED       => "time-exceeded",
+    ICMP_TSTAMP         => "timestamp",
+    ICMP_TSTAMPREPLY    => "timestamp-reply",
+    ICMP_UNREACH        => "unreachable",
+);
+
+
+MAIN: {
+    run();
+}
+
+
+sub run {
+    $|++;
+
+    # get options
+    my %options = (
+        count   =>    10, 
+        promisc =>     0, 
+        snaplen =>   256, 
+        timeout =>    10,
+    );
+
+    GetOptions(\%options, qw{
+        help|h!  version|V!
+        count|c=i  interface|i=s  promisc|p!  snaplen|s=i  writeto|w=s
+    }) or pod2usage();
+
+    pod2usage({ -verbose => 2, -exitval => 0 }) if $options{help};
+    print "$::PROGRAM v$::VERSION\n" if $options{version};
+
+    my ($err, $net, $mask, $filter);
+    my $dev = $options{interface} || pcap_lookupdev(\$err);
+    my $filter_str = join " ", @ARGV;
+
+    # open the interface
+    my $pcap = pcap_open_live($dev, @options{qw(snaplen promisc timeout)}, \$err)
+        or die "fatal: can't open network device $dev: $err ",
+               "(do you have the privileges?)\n";
+
+    if ($filter_str) {
+        # compile the filter
+        pcap_compile($pcap, \$filter, $filter_str, 1, 0) == 0
+            or die "fatal: filter error\n";
+        pcap_setfilter($pcap, $filter);
+    }
+
+    if ($options{writeto}) {
+        $dumper = pcap_dump_open($pcap, $options{writeto}) 
+            or die "fatal: can't write to file '$options{writeto}': $!\n";
+    }
+
+    # print some information about the interface we're currently using
+    pcap_lookupnet($dev, \$net, \$mask, \$err);
+    print "listening on $dev (", dotquad($net), "/", dotquad($mask), ")", 
+          ", capture size $options{snaplen} bytes";
+    print ", filtering on $filter_str"  if $filter_str;
+    print $/;
+
+    # enter the main loop
+    pcap_loop($pcap, $options{count}, \&process_packet, '');
+    pcap_close($pcap);
+}
+
+
+sub process_packet {
+    my ($user_data, $header, $packet) = @_;
+    my ($proto, $payload, $src_ip, $src_port, $dest_ip, $dest_port, $flags);
+
+    printf "packet: len=%s, caplen=%s, tv_sec=%s, tv_usec=%s\n", 
+        map { $header->{$_} } qw(len caplen tv_sec tv_usec);
+
+    # dump the packet if asked to do so
+    pcap_dump($dumper, $header, $packet) if $dumper;
+
+    # decode the Ethernet frame
+    my $ethframe = NetPacket::Ethernet->decode($packet);
+
+    if ($ethframe->{type} == ETH_TYPE_IP) {
+        # decode the IP payload
+        my $ipframe = NetPacket::IP->decode($ethframe->{data});
+        $src_ip  = $ipframe->{src_ip};
+        $dest_ip = $ipframe->{dest_ip};
+
+        if ($ipframe->{proto} == IP_PROTO_ICMP) {
+            my $icmpframe = NetPacket::ICMP->decode($ipframe->{data});
+            $proto     = "ICMP";
+            $payload   = $icmpframe->{data};
+        }
+        elsif ($ipframe->{proto} == IP_PROTO_TCP) {
+            my $tcpframe = NetPacket::TCP->decode($ipframe->{data});
+            $proto     = "TCP";
+            $src_port  = $tcpframe->{src_port};
+            $dest_port = $tcpframe->{dest_port};
+            $payload   = $tcpframe->{data};
+            $flags     = flags_of($tcpframe->{flags});
+        }
+        elsif ($ipframe->{proto} == IP_PROTO_UDP) {
+            my $udpframe = NetPacket::UDP->decode($ipframe->{data});
+            $proto     = "UDP";
+            $src_port  = $udpframe->{src_port};
+            $dest_port = $udpframe->{dest_port};
+            $payload   = $udpframe->{data};
+        }
+
+        printf "IP:%s %s:%d -> %s:%d (%s)\n",
+            $proto, $src_ip, $src_port, $dest_ip, $dest_port, $flags;
+        print hexdump(data => $payload, start_position => 0) if length $payload;
+        print $/;
+    }
+}
+
+
+sub flags_of {
+    my ($flags) = @_;
+    my @strarr = ();
+    push @strarr, "urg" if $flags & URG;
+    push @strarr, "ack" if $flags & ACK;
+    push @strarr, "psh" if $flags & PSH;
+    push @strarr, "fin" if $flags & FIN;
+    push @strarr, "syn" if $flags & SYN;
+    push @strarr, "rst" if $flags & RST;
+    push @strarr, "ece" if $flags & ECE;
+    push @strarr, "cwr" if $flags & CWR;
+    return join ",", @strarr
+}
+
+
+sub dotquad {
+    return inet_ntoa( pack("I", $_[0]) )
+}
+
+
+__END__
+
+=head1 NAME
+
+pcapdump - Dump packets from the network
+
+=head1 SYNOPSIS
+
+    pcapdump [-c count] [-i interface] [-s snaplen] [-w file] [expression]
+
+    pcapdump --help
+    pcapdump --version
+
+=head1 OPTIONS
+
+=over
+
+=item B<-c>, B<--count>  I<N>
+
+Exit after receiving I<N> packets.
+
+=item B<-i>, B<--interface>  I<device>
+
+Listen on the specified interface. If unspecified, the program will use 
+the interface returned by C<pcap_lookupdev()>.
+
+=item B<-s>, B<--snaplen>  I<L>
+
+Capture I<L> bytes of data for each packet. Defaults to 256.
+
+=item B<-w>, B<--writeto>  I<file>
+
+=back
+
+
+=head1 DESCRIPTION
+
+B<pcapdump> mimics the very basic features of B<tcpdump(1)> and provides
+a good example of how to use C<Net::Pcap>.
+
+
+=head1 AUTHOR
+
+SE<eacute>bastien Aperghis-Tramoni, E<lt>sebastien@aperghis.netE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005, 2006, 2007, 2008, 2009 SE<eacute>bastien Aperghis-Tramoni.
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

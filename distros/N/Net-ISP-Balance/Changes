@@ -1,0 +1,89 @@
+1.25    -Fixed bug that caused custom chains to be overwritten when load_balance restarted.
+
+1.24    -Fixed bug that prevented load_balance.pl from executing properly after
+	a virgin install.
+
+1.23    -Fixed memory allocation bug that was causing random silent crashes in lsm.
+
+1.22    -Workaround for apparent lsm bug: binding to the device only doesn't allow ping
+        to bypass routing tables. Must set source address as well.
+
+1.21    -Added a failover-only mode (add "mode=failover" to config file) for those
+	who want to use the failover feature without interface balancing.
+
+1.20	-Further changes to support pre-run scripts that bring up interfaces at
+	the last minute (e.g. openvpn)
+	-Added an example configuration for load balancing over two openvpn servers.
+
+1.19    -Expose a new interface_info() method to end users.
+        -Change behavior of pre-run-scripts to execute AFTER the routing tables
+         and firewall rules are flushed. This allows the pre-run-script to add
+         routing and firewall rules and not have them flushed immediately afterward.
+
+1.18    -Prevent gateways from becoming permanently inaccessible when they temporarily
+          lose their assigned IP addresses.
+	-Fix lsm to allow to specify virtual devices (e.g. eth0:1)
+
+1.17    -PREROUTING rules for incoming traffic on the WAN devices were incorrectly 
+	 setting a source filter. This is now removed.
+
+1.16    -If an interface is down, or unconfigured, at the time of
+	initialization, then proceed without it.
+
+1.15	-Documentation fixes to force_route()
+
+1.14    -Handle virtual interfaces correctly.
+
+1.13	-Save and restore any custom chains found in iptables to avoid overwriting
+	rules produced by other firewall manipulation software.
+	-Add --flush option to load_balance.pl to override this behavior.
+
+1.12    -Add locking to load_balance.pl script to avoid conditions in
+         which multiple instances of the script is running.
+
+1.11    -Fix inter-LAN forwarding when more than 1 LAN is defined.
+	-Add ability to control whether packets are forwarded freely
+	 among LAN and ISP interfaces or are restricted to certain
+	 groups of mutually forwarding interfaces using the
+	 forward_group configuration file option.
+
+1.10	-Adjust interface parsing rules to recognize bonded vlan interfaces.
+
+1.09    -Fix the way that load balancing marks work so that user code can
+	 again "force" certain connections to go over one ISP or another.
+
+1.08
+	-Stability fix: restart lsm every time load_balance.pl invoked. This
+	 avoids correct state not being detected if load_balance.pl called
+	 while an interface is down.
+	-Stability fix: prevent routing tables from being rewritten when
+	 long_down_to_up event occurs (already handled by down_to_up).
+
+1.07    -Bug fix: packets weren't being balanced correctly.
+	-Bug fix: lsm action directories were not being installed in correct place.
+
+1.06	-You can now assign weights to each of the ISPs in order to prefer one over the ohter
+
+1.06	-Remove dependencies on interface configuration files. Everything figured out using ip route and ip addr.
+	-Assign weights to ISPs for traffic flow preferences.
+	-Allow user to take actions based on lsm events.
+	-Retry interfaces that are not running at time load_balance runs
+	-Remove dependencies on interface configuration files. Everything figured out using ip route and ip addr.
+	
+1.05    -Delete user-defined chains for the "nat" and "mangle" tables.
+	-Create Net::Netmask objects using the new2() constructor, which returns
+	 undef in cases when the address or mask can't be parsed.
+
+1.04    -Add two new convenience methods: add_route() and force_route().
+	-Add explicit pre-run and post-run scripts.
+
+1.03    -Documentation fixes.
+
+1.02    -lsm now calls load_balance.pl directly as an eventscript, rather than indirectly.
+	-Cleaned up documentation.
+	-Add --kill and --status arguments to load_balance.pl
+
+1.01	-Update lsm config file when network configuration changes.
+	-Use log-level 4 for all iptables logging events.        
+
+1.00	-Initial release

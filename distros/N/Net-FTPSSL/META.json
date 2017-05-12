@@ -1,0 +1,50 @@
+{
+   "abstract" : "A FTP over SSL/TLS class",
+   "author" : [
+      "Curtis Leach <cleach at cpan dot org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-FTPSSL",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "IO::Socket::INET" : "0",
+            "IO::Socket::SSL" : "1.26",
+            "Net::HTTPTunnel" : "0.5",
+            "Net::SSLeay" : "0",
+            "Net::SSLeay::Handle" : "0",
+            "Sys::Hostname" : "0",
+            "Time::Local" : "0",
+            "perl" : "5.006001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.38"
+}

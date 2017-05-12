@@ -1,0 +1,3 @@
+These are some more elaborate examples that make more liberal
+use of the modules available from the CPAN such as Net::WDNS
+and Net::DNS::Toolkit.

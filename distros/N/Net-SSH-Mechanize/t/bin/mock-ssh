@@ -1,0 +1,163 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Text::ParseWords qw(parse_line);
+use Getopt::Long qw(:config posix_default);
+
+# Note: this script can't deal with ; delimiters which are run into other arguments
+
+# Hack off the quotes :(  yuk
+# Needed to work around the shonkiness of the tokeniser
+sub hack_off_quotes {
+    return map { s/^'(.*)'$/$1/ or s/^"(.*)"$/$1/; $_ } @_
+}
+
+
+my $unauthenticated = 1;
+sub sudo {
+    my ($params, %env) = @_;
+
+    # Locally alias @ARGV to $params rather than use
+    # GetOptionsFromArray, for the sake of portability (Some currently
+    # widely used versions of Perl don't have a version of
+    # Getopt::Long with it).
+    local *ARGV = $params;
+
+    shift @$params;
+    
+    my $pw_prompt = '[sudo] password for user: ';
+    my $unauthenticate = 0;
+
+    GetOptions(
+        "K" => \$unauthenticate,
+        "p=s" => \$pw_prompt,
+    )
+        or warn "oops, bad parameters to sudo\n";
+
+    if ($unauthenticate) {
+        $unauthenticated = 1;
+        # ignore anything else
+        return;
+    }
+
+    if ($unauthenticated) {
+        print hack_off_quotes $pw_prompt;
+        my $input = <STDIN>;
+#        print "\n";
+    }
+
+    $unauthenticated = 0;
+
+    if ($params->[0] eq 'sh') { # ignore the rest if any
+        return shell(%env);
+    }
+    
+    print "sudo got: @$params\n";
+}
+
+
+sub shell {
+    my %env = @_;
+    $env{PS1} ||= 'sh$ ';
+
+    PROMPT: while (1) {
+        print $env{PS1};
+
+        my @cmds = [];
+
+        # Parse line, then split any parameters like
+        # "foo;" into "foo" and ";" (so that we can parse ; delimiters
+        # consistently).  This will have some edge cases like
+        #
+        #   foo bar="baz;" biz
+        #
+        # which gets parsed as two commands:
+        #
+        #   "foo", "bar=baz"
+        #   "biz"
+        #
+        # but we don't really care about them.
+        
+        my $line = <STDIN>;
+        chomp $line;
+        my @toks = parse_line '\s+', 1, $line;
+        @toks = grep { defined $_ } @toks;
+        @toks = map { /(.*);$/? ($1, ';') : ($_) } @toks;
+        for my $tok (@toks) {
+            $tok eq ';'?
+                push @cmds, []  :
+                push @{ $cmds[-1] }, $tok;
+        }
+
+    CMD: for my $toks (@cmds) { 
+            @$toks 
+                or next;
+
+            local $_ = $toks->[0];
+
+            /^exit$/
+                and last PROMPT;
+
+            /^(\w+)=(.*)/
+                and do {
+                    $env{$1} = $2; 
+                    next CMD;
+                };
+            
+            /^export$/ 
+                and next CMD; # ignore it
+            
+            /^sh$/
+                and do {
+                    shell(%env);
+                    next CMD;
+                };
+
+            /^sudo$/
+                and do {
+                    sudo($toks, %env);
+                    next CMD;
+                };
+            
+            /^printf$/
+                and do { # this is a hackery and a mockery of printf :)
+                    shift @$toks;
+                    my $fh = \*STDOUT;
+                    if (@$toks && $toks->[0] eq '>&2') {
+                        shift @$toks;
+                        $fh = \*STDERR;
+                    }
+                    my $fmt = shift(@$toks) || '';
+                    ($fmt) = hack_off_quotes $fmt;
+                    $fmt = eval qq(sprintf "$fmt");
+                    
+                    printf {$fh} $fmt, @$toks;
+                    next CMD;
+                };
+
+            /^id$/
+                and do {
+                    print <<OUT;
+uid=1000(nick) gid=1000(nick) groups=4(adm),6(disk),20(dialout),24(cdrom),46(plugdev),105(lpadmin),115(admin),116(sambashare),122(libvirtd),1000(nick)
+OUT
+                    next CMD;
+                };
+
+            print "got: @$toks\n";
+        }
+    }
+}
+
+
+######################################################################
+
+$| = 1; # turn on autoflush
+
+# get passwd
+print q(user@nowhere's password: );
+my $input = <STDIN>;
+
+print "\nLast login: blah de da\n";
+
+shell %ENV, PS1 => '[user@nowhere]$ ';
+print "Connection to nowhere closed\n"

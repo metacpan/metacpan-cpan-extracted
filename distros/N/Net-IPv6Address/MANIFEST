@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-IPv6Address.t
+lib/Net/IPv6Address.pm
+META.yml                                 Module meta-data (added by MakeMaker)

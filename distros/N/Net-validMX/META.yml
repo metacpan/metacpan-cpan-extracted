@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Net-validMX
+version:      2.2.0
+version_from: lib/Net/validMX.pm
+installdirs:  site
+requires:
+    Net::DNS:                      0.53
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30
+license: perl
+abstract: Perl DNS mail exchange & email format validation module
+author: Kevin A. McGrail <kevin.mcgrail@thoughtworthy.com>

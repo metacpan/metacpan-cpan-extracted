@@ -1,0 +1,29 @@
+---
+abstract: 'Internationalizing Domain Names in Applications (2003) (RFC 3490)'
+author:
+  - 'Claus Färber <CFAERBER@cpan.org>'
+build_requires:
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-IDN-IDNA2003
+no_index:
+  directory:
+    - eg
+provides:
+  Net::IDN::IDNA2003:
+    file: lib/Net/IDN/IDNA2003.pm
+    version: 1.000
+requires:
+  Net::IDN::Nameprep: 1.1
+  Net::IDN::Punycode: 1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.000

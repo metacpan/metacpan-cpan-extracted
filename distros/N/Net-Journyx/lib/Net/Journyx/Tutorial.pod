@@ -1,0 +1,507 @@
+=head1 NAME
+
+Net::Journyx::Tutorial - tutorial for Journyx perl API covering all operations.
+
+=head1 BASICS
+
+    use Net::Journyx;
+    my $jx = Net::Journyx->new(
+        site => 'https://services.journyx.com/jxadminXX/jtcgi/jxapi.pyc',
+        wsdl => 'file:jxapi.wsdl',
+        username => 'user',
+        password => 'password',
+    );
+
+To get a journyx object you can either call
+
+    my $project = $jx->project;
+
+or
+
+    my $project = Net::Journyx::Project->new( jx => $jx );
+
+Then you can either create a new object or load old one, for example:
+
+    $project->load( name => 'my project' );
+
+    # all in one:
+    my $project = $jx->project->load( name => 'my project' );
+
+See more on basic operations in L</CRUD>.
+
+=head1 RENAMING
+
+All basic methods are converted to lower case, for example:
+
+    version    -> version
+    apiVersion -> api_version
+
+From all JX classes Record and Object suffixes has been stripped:
+
+    UserRecord -> Net::Journyx::User
+    TimeRecord -> Net::Journyx::Time
+
+Instead off get/remove/delete/modify/update... we have four common operations:
+
+    load
+    create
+    update
+    delete
+
+Read about them in </CRUD>.
+
+=head1 LOGIN AND LOGOUT
+
+You don't need to worry about it, just provide username and password.
+When a session key is required you'll be logged in automatically
+using provided credentials.
+
+Logout happens when a L<Net::Journyx> object is destroyed. (TODO: implement this).
+
+=head1 BASE CLASS - L<Net::Journyx>
+
+The following journyx operations are implemented in L<Net::Journyx>.
+B<Don't forget> about L</RENAMING>.
+
+    login
+    whoami
+    logout
+
+    adminEmail
+    adminName
+    adminTelephone
+
+    companyName
+    customerNumber
+
+    uname
+    hostname
+
+    licensedHost
+    licensedUsers
+
+    installDate
+    expirationDate
+
+    apiVersion
+    version
+    versionCheck
+
+As well each class representing a journyx record has a shortcut:
+
+    my $project = $jx->project;
+    my $user = $jx->user;
+    ...
+
+=head1 CRUD
+
+CRUD - is abreviatian for Create, Read, Update and Delete.
+
+Four basic operations with record.
+
+=head2 create
+
+Each class representing a record has method create. This method is based
+on "addFullXxx" jx operations.
+
+We decided not to change names of records columns and leave them alone,
+so you can find that some records have 'name', some 'pname' and some
+'pretty_name'.
+
+Uses getDefaultXxx to get template for the record (described below),
+after creation record is loaded.
+
+Returns this object back so you can do the following:
+
+    my $project = $jx->project->create(name => 'my project');
+
+create is based on the following Journyx operations:
+
+    addFullCode
+    addFullExpenseRecord
+    addFullGroup
+    addFullProject
+    addFullSubcode
+    addFullSubsubcode
+    addFullTimeRecord
+    addFullUser
+
+Creating any record via 'addFullRecord' is not implemented.
+
+addXxx are simplified versions of above. We don't use them at the moment
+as some of them can explode without any abviouse reasons (e.g. addCode).
+Really, you don't need them.
+
+    addCode
+    addExpenseRecord
+    addGroup
+    addProject
+    addSubcode
+    addSubsubcode
+    addTimeRecord
+    addUser
+
+=head2 load (read)
+
+C<load> loads a record from Journyx DB by columns, for example:
+
+    my $project = $jx->project->load( id => $id );
+    # or 
+    my $project = $jx->project->load( name => $name );
+
+Use C<$record_obj->is_loaded> to check if record is loaded or not.
+
+Implemented using the following methods:
+
+    getCode
+    getExpenseRecord
+    getGroup
+    getProject
+    getSubcode
+    getSubsubcode
+    getTimeRecord
+    getUser
+
+The following methods returns record's defaults, you can get access to
+them if you have to using "record_template" method, but usually you
+don't want to.
+
+    getDefaultCode
+    getDefaultExpenseRecord
+    getDefaultGroup
+    getDefaultProject
+    getDefaultSubcode
+    getDefaultSubsubcode
+    getDefaultTimeRecord
+    getDefaultUser
+
+=head2 update
+
+Updates columns of the record, for example:
+
+    $project->update( name => 'new name' );
+
+Record must be loaded before update, throws a runtime
+exception otherwise.
+
+Based on:
+
+    modifyCode
+    modifyExpenseRecord
+    modifyGroup
+    modifyProject
+    modifySubcode
+    modifySubsubcode
+    modifyTimeRecord
+    modifyUser
+
+=head2 delete
+
+Deletes a record, for example:
+
+    my $project = $jx->project->load( name => 'completed' );
+    $project->delete;
+
+Record must be loaded before delete, throws a runtime
+exception otherwise.
+
+Based on:
+
+    removeCode
+    removeExpenseRecord
+    removeGroup
+    removeProject
+    removeSubcode
+    removeSubsubcode
+    removeTimeRecord
+    removeUser
+
+=head1 Record
+
+Along with </CRUD> there are some helpers.
+
+=head2 User
+
+NOT IMPLEMENTED:
+
+    getUserAccruals
+    getUserMemorizedEntries
+    getUserPermissions
+
+    changePassword
+    changePasswordForUser
+    changeUserPassword
+
+    getUserRoles
+    removeRoleFromUser
+
+=head2 Group
+
+    getGroupObjectClasses
+
+    listGroupObjects
+
+    listObjectGroups NOT IMPLEMENTED
+
+    addObjectToGroup
+    removeObjectFromGroup
+
+    addCodeToGroup
+    addProjectToGroup
+    addSubcodeToGroup
+    addSubsubcodeToGroup
+    addUserToGroup
+
+    removeCodeFromGroup
+    removeProjectFromGroup
+    removeSubcodeFromGroup
+    removeSubsubcodeFromGroup
+    removeUserFromGroup
+
+=head2 Project
+
+    getProjectDependencies
+    addProjectDependency
+    removeProjectDependency
+
+=head1 Listing (NOT IMPLEMENTED)
+
+    getExpenseCodeList
+    getExpenseCurrencyList
+    getSubcodeList
+    getSubsubcodeList
+    getTimeList
+    getCodeList
+    getExpenseList
+    getProjectList
+    getRecordsList
+    getExpenseSourceList
+
+=head1 UNSORTED AND NOT IMPLEMENTED
+
+    deleteGroupMemorizedEntry
+    deleteRateRule
+    deleteRuleSet
+    deleteUserAccrual
+    deleteUserMemorizedEntry
+
+    AssignApprovalPlan
+    assignRoleToUser
+    assignRuleSetToUser
+    ChangeSheetStatus
+
+    CreateApprovalPlan
+    createGroupMemorizedEntry
+    createRateRule
+    createRuleSet
+    createUserAccrual
+    createUserMemorizedEntry
+
+    getAllSheetIDs
+    getAllTimeSheetIDs
+
+    getApprovalPlans
+    getApprovalPlansForUser
+
+    getDatesInSheet
+    getDatesInTimeSheet
+
+    getEnabledExpenseFields
+    getEnabledTimeFields
+
+    getExpensePeriodDates
+
+    getGroupMemorizedEntries
+
+    getLatestSheetID
+    getLatestTimeSheetID
+    getNextSheetID
+    getNextTimeSheetID
+    getPeriodDates
+    getPreferenceValue
+    getPreviousSheetID
+    getPreviousTimeSheetID
+
+
+    getRateRule
+    getRateRuleNames
+    getRecentSheetIDsForUser
+    getRecentSheetStatus
+    getRecentTimeSheetStatus
+
+    getRecordIDsInSheet
+    getRecordsForSheet
+    getRecordStructure
+
+    getRuleSet
+    getRuleSetNames
+
+    getSearchableTables
+
+    getSheetIDByDate
+    getSheetReason
+    getSheetRejectedStatuses
+    getSheets
+    getSheetStatus
+
+    getTimePeriodDates
+
+    getTimeRecordIDsInSheet
+
+    getTimeSheetIDByDate
+
+    getTimeSheetReason
+    getTimeSheetRejectedStatuses
+    getTimeSheetStatus
+
+    getTotalHoursInTimeSheet
+
+    modifyRateRule
+    modifyRuleSet
+
+    modifyUserAccrual
+
+    modifyUserMemorizedEntry
+    modifyGroupMemorizedEntry
+
+    submitSheet
+    submitTimeSheet
+
+    UnassignApprovalPlan
+    unassignApprovalPlanForUser
+
+=head1 Attributes
+
+AttributeTypeRecord in JX represents a custom field, it's
+a combination of: object type it applies to, attribute name
+and data type of the attribute.
+
+L<Net::Journyx::Attribute> is more natural naming.
+
+It's record is quite different from others thus B<is not>
+a subclass of L<Net::Journyx::Record>.
+
+Object type is some lower case table name and there is no
+map between XxxRecord names to tables. However you can get
+list of types using:
+
+    getAttributeObjectTypes - ::Attribute->object_types
+
+So object type is either hardcoded or guessed.
+
+
+Data type is some UPER CASE string, at least the following
+are known to be supported: INTEGER, NUMBER, STRING, CHAR
+and DATE. You can check if type is valid using:
+
+    checkAttributeDataType - ::Attribute->is_valid_type
+
+=head2 Setting attributes on objects
+
+Attributes can be changed using the following methods:
+
+    get_attribute
+    set_attribute
+    del_attribute
+
+and generic method attribute that re-dispatches to above methods,
+for example:
+
+    my $v = $project->attribute('name'); # -> get_attribute
+    $project->attribute('name', 'value', %rest); # -> set_attribute
+    $project->attribute('name', undef); # -> del_attribute
+
+Implemented using the following JX operations:
+
+    getAttribute
+    getAttributeInteger
+    getAttributeNumber
+
+    setAttribute
+    setAttributeInteger
+    setAttributeNumber
+
+    deleteAttribute
+
+
+    getAttributeTypeRecordByName
+    getAttributeTypeByName
+
+=head2 Dealing with default values
+
+The following methods deal with defaults.
+Default attribute values are applied when new records are created;
+changing the default value will not alter any attribute values
+on already-existing records. 
+
+    getAttributeTypeDefaultValue
+    getAttributeTypeDefaultValueInteger
+    getAttributeTypeDefaultValueNumber
+    setAttributeTypeDefaultValue
+    setAttributeTypeDefaultValueInteger
+    setAttributeTypeDefaultValueNumber
+    removeAttributeTypeDefaultValue
+
+=head3 Selections (not yet implemented)
+
+    getAttributeTypeSelectionValueRecords
+    getAttributeTypeSelectionValues
+    setAttributeTypeSelectionDefault
+    deleteAttributeTypeSelectionValue
+
+    addAttributeTypeSelectionValue
+    addAttributeTypeSelectionValueInteger
+    addAttributeTypeSelectionValueNumber
+
+    checkAttributeValue
+    checkAttributeValueInteger
+    checkAttributeValueNumber
+
+    dropAttributeTypeAsHistorical
+
+    getHistoricalAttributeObjectTypes
+    getHistoricalAttributeTypes
+
+    makeAttributeTypeAsHistorical
+
+    modifyAttributeTypeDescription
+    modifyAttributeTypeName
+    modifyAttributeTypeReportability
+
+    queryAttributes
+    queryAttributesByValue
+    queryAttributesByValueInteger
+    queryAttributesByValueNumber
+    queryAttributeTypes
+
+    deleteAttributeType
+
+    addAttributeType
+    addFullAttributeType
+
+=head1 Things we don't implement or use
+
+
+The following may be useful, but we have ->update that works,
+implementation may be delayed:
+
+    updateExpenseValue - updates only value field of Expense record
+    updateTimeValue    - updates only value field of Time record
+
+newXxx are not used as those are internal:
+
+    newCode
+    newExpenseRecord
+    newGroup
+    newProject
+    newSubcode
+    newSubsubcode
+    newTimeRecord
+    newUser
+
+We don't allow to work with any record using the following:
+
+    removeRecord
+    getDefaultRecord
+
+=cut

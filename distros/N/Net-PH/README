@@ -1,0 +1,26 @@
+Net::PH was previously part of the libnet distribution. But has now
+been separated out to a distribution of its own.
+
+INSTALLATION
+
+Installastion is the same as any other MakeMaker packaged distribution
+from CPAN.
+
+   perl Makefile.PL
+   make
+   make install
+
+If you are on a mchine where Makemaker does not run, or you do not
+have a copy of make, then you can simply copy the PH.pm file from
+this directory into a Net subdirectory in your perl installation
+library directory. However you will need to have Net::Cmd
+from libnet installed
+
+COPYRIGHT
+
+  © 1996-2001 Graham Barr. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Share and Enjoy!

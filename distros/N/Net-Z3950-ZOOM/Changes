@@ -1,0 +1,347 @@
+Revision history for Perl extension Net::Z3950::ZOOM.
+
+1.30  Wed Mar 12 14:08:26 CET 2014
+        - Update test 19-events.t and 29-events.t
+          Events check: allow for multiple Connect events
+	- Require YAZ 4 or later
+	- Require perl-XML-LibXML-XPathContext on RHEL/CentOS v5 only.
+
+1.29  Mon Oct 14 10:41:28 CEST 2013
+	- Debian/RPM packages now built with YAZ 5.
+	- Do not depend on libyaz4-devel in Debian package
+	  (only required for building)  
+	- Include the useful example program
+	  samples/zoom-delete-records which is installed as part of
+	  "make install".
+	- Fix documentation of connect() method so that it doesn't
+	  imply that it can accept options.
+
+1.28  Fri Oct 15 13:34:41 BST 2010
+	- In the test-suite, provide a more explicit report when the
+	  scan identity test (display term == term) fails.
+	- The displayTerm==term assertion is now case-insensitive, as
+	  it ought always to have been: previously, the test-suite
+	  relied on a specific implementaton detail of the
+	  test-server, which has recently changed causing extraneous
+	  test-suite failures.
+	- Also in the test-suite for scan, remove the test that all
+	  title-terms are in the general-term list, an assumption that
+	  should never have been made.
+
+1.27  Wed Aug 11 17:13:07 BST 2010
+	- Support for Index Data build procedures, including making
+	  Debian/Ubuntu and Red Hat packages from clean tarballs.
+	- No upstream changes -- packaging only.
+
+1.26  Tue Jun  8 16:43:29 BST 2010
+	- Tweak the test-suite so that it works correctly on Fedora
+	  Core 12 (2.6.31.5-127.fc12.x86_64).  For some reason,
+	  attempts to connect to a non-existent host can fail with
+	  ERROR_TIMEOUT and no addinfo, rather than ERROR_CONNECT and
+	  the hostname as addinfo; and the number of terms to request
+	  in a scan needs to be explicitly specified in an option.
+	- Add "debclean" target to generated Makefile.
+	- Remove extraneous and misleading old CVS IDs.
+
+1.25  Fri Feb 19 15:04:26 GMT 2010
+	- Fix test-suite not to run the "packages" tests against
+	  test.indexdata.com, which has gone away, but against
+	  z3950.indexdata.com, like the other tests.  A new server
+	  runs on a different port for these tests.
+	- Rename zdump.pl to zoomdump, and add it to the set of
+	  programs installed.
+	- Switch to git for version control.  Not that it should make
+	  any difference to the Perl distribution.
+	- Add semicolons to the commented-out sample configuration
+	  lines for Windows in Makefile.PL
+
+1.24  Tue Jun 17 11:31:08 BST 2008
+	- When Net::Z3950::ZOOM::record_get() fetches an XML record
+	  because the requested OPAC record is empty,  it now wraps it
+	  in an OPAC wrapper, making the difference invisible to
+	  application code.
+
+1.23  Mon Jun  9 14:53:15 BST 2008
+	- Net::Z3950::ZOOM::record_get() now patches around the
+	  problem of naughty servers that refuse to return anything
+	  for an OPAC record when there is no non-bibliographic part,
+	  by falling back on requesting an XML record in such cases.
+
+1.22  Tue May 27 14:00:12 BST 2008
+	- Fix Net::Z3950::ZOOM::record_get() to use a struct datachunk
+	  _when_ appropriate, e.g. for "render" not for "database" and
+	  "syntax".
+	- Remove the unused $len reference parameter from record_get()
+	  and $record->get(): this is now used in the underlying C
+	  layer to make Perl strings of the right length, and is of no
+	  value higher up the stack.
+	- Fix a bug in ZOOM::ResultSet::records(): requests including
+	  the last record in the set were incorrectly declined.
+	- Better Debian packaging: use "make debian" to create new
+	  "debian/output" directory containing .deb package file,
+	  changes file, etc.
+	- Clear up a few warnings in ZOOM.xs
+	- Minor documentation improvements.
+
+1.21  Mon Oct 29 12:07:25 GMT 2007
+	- In the "typemap" file's handling of opaquechar*, use STRLEN
+	  type for _unused_len in instead of unsigned: this prevents a
+	  (possibly serious) warning on some 64-bit architectures,
+	  although applications that do not use the option_binary()
+	  methods will be safe with the previous release.
+	- Add explicit "#include <yaz/log.h>" to ZOOM.xs in the hope
+	  of preventing undeclared-function warnings that some users
+	  have reported but which I have been unable to reproduce.
+
+1.20  Fri Sep 21 17:51:55 BST 2007
+	- Add new sample program, samples/zoom/zoomscan.pl
+	- samples/zoom/zoomtst1.pl now accepts arbitrary options at
+	  the end of the command-line, so that (for example) you can
+	  specify a non-USMARC record syntax.
+	- Add new functions Net::Z3950::ZOOM::diag_srw_str() and
+	  ZOOM::diag_srw_str() to map SRW diagnostic codes into
+	  human-readable messages.
+	- ZOOM::Exception() constructor uses diag_srw_str() to fill in
+	  the error message, if it is undefined, for SRW errors.
+	- The render() method of ZOOM::Exception(), and therefore the
+	  overloaded stringifying operator, deals with exceptions that
+	  have no message().
+	- Corrected the scan parts of the test-suite that use CQL so
+	  that they explicitly perform client-side CQL compilation and
+	  send the resulting Type-1 query.  Previously, these tests
+	  were (accidentally) requesting that CQL be sent as-is to the
+	  server, but this mistake was being masked by an error in
+	  older versions of ZOOM-C that compiled client-side anyway!
+
+1.19  Mon Jul  9 14:09:31 BST 2007
+	- Add $conn->exception() method.
+	- Set version number for Net::Z3950 to 0.99 -- less than the
+	  1.0 version number that will be used when it successfully
+	  emulates the old Net::Z3950 module, but superseding the last
+	  release, 0.51, of that module.
+	- Include samples/zoom/zdump.pl in distribution.
+	- Add "irspy" namespace to samples/zoom/zselect
+
+1.18  Mon Feb 26 14:57:48 GMT 2007
+	- When a connection is in asynchronous mode, failing
+	  operations (search, scan, etc.) no longer throw exceptions.
+	  This is because the event-loop in asychronous applications
+	  needs to check for errors anyway, in case the server has
+	  returned high-level diagnostics such as "unsupported use
+	  attribute".  So this check within the event-loop is now the
+	  only place where error-checking need be done.
+	- Add new public ZOOM::Connection() function, check(), which
+	  throws an exception if an error is pending (even if the
+	  connection is asynchronous).
+	- New YAZ logging level, "zoom_check", notes when errors are
+	  detected and either left unreported (asynchronous
+	  connections) or thrown as exception (synchronous).
+
+1.17  Thu Feb 22 20:38:45 GMT 2007
+	- Change Net::Z3950::ZOOM::event() to allocate its array of
+	  connection pointers dynamically, so there is no longer an
+	  arbitrary limit of 100.
+	- New connection-level option "_check_debug" emits messages on
+	  standard error when checking a connection find an error that
+	  is about to result in throwing an exception.  There is no
+	  reason for you ever to use this, though -- pretend you don't
+	  know about it.
+
+1.16  Tue Jan 16 11:18:34 GMT 2007
+	- Require version 2.1.41 or better of YAZ, so that Init
+	  Response options are available using
+	  $conn->option("init_opt_sort") etc.
+	- Include samples/zoom/zhello.pl to exercise these options.
+	- Add ZOOM_connection_peek_event() and $conn->peek_event().
+	- Require YAZ version 2.1.45, which is the first to provide
+	  ZOOM_connection_peek_event().
+
+1.15  Fri Dec  1 14:17:49 GMT 2006
+	- ZOOM::Error::INIT is renamed to ZOOM::Error::ZINIT, since
+	  INIT is a reserved word in Perl.  In version 1.14 and
+	  earlier, "require ZOOM" would fail, saying "Too late to run
+	  INIT block", and "use ZOOM" would result in
+	  ZOOM::Error::INIT having a value equal to its name (why?!)
+	  rather than, as intended, Net::Z3950::ZOOM::ERROR_INIT.
+	- Belatedly added documentation for $rec->error() and
+	  $rec->exception().
+
+1.14  Tue Nov 28 17:33:07 GMT 2006
+	- Add $record->error() to return non-surrogate diagnostics,
+	  and $record->exception() to return the same information
+	  wrapped in a ZOOM::Exception object.
+	- Requires YAZ 2.1.40, which provides ZOOM_record_error().
+	- $conn->error_x() now returns the error-code when called in
+	  scalar context, rather than the diagnostic set name.
+
+1.13  Sat Nov  4 16:47:00 GMT 2006
+	- ZOOM::Connection::create() may now take either a single
+	  argument, which is a ZOOM::Options object, or any even
+	  number of argument (including zero), which are key => value
+	  pairs of options to set.
+	- ZOOM::Connection::new(), having been refactored to use
+	  create(), can now also take a ZOOM::Options argument.
+	- Documentation now includes information on specifying SRW,
+	  SRU-over-GET and SRU-over-POST connections.
+	- ZOOM::ResultSet::record() throws a diagnostic if asked to
+	  retrieve records out of range for the result-set.
+	- All tests against indexdata.com are now explicitly against
+	  z3950.indexdata.com, as the identity of the former name has
+	  recently changed.
+
+1.12  (NEVER PUBLICLY RELEASED; these changes are included in 1.13)
+	- Include the useful example program samples/zoom/zselect,
+	  which is installed as part of "make install".
+	- Add ZOOM_connection_is_idle() and $conn->is_idle().
+	- Require YAZ version 2.1.35, which is the first to provide
+	  ZOOM_connection_is_idle().
+	- Fix bug in ZOOM::Connection class code that made the
+	  difficult to subclass -- when called as
+	  $class->SUPER::new(@_), the constructor blessed the new
+	  object into ZOOM::Connection rather than info the subclass.
+
+1.11  Thu Aug 31 16:47:53 BST 2006
+	- Require YAZ version 2.1.17, which has important ZOOM-C
+	  bug-fixes.
+	- Do not use "-Wdeclaration-after-statement" compiler option,
+	  since this supported only by GCC (and only recent versions).
+
+1.10  Thu Jun 15 16:42:47 BST 2006
+	- No functional changes, but use Adam's modified API to
+	  ZOOM_query_ccl2rpn().  This incompatible change means that
+	  RELEASE 1.09 WILL NOT BUILD against any recent YAZ.
+
+1.09  Tue Jun 13 17:44:43 2006
+	- Add new function Net::Z3950::ZOOM::query_ccl2rpn(), for
+	  client-side CCL compilation.
+	- Add new ZOOM::Query::CCL2RPN class, encapsulating CCL
+	  compiler functionality as a Query subclass.  This allows
+	  client-side CCL to be used for both search and scan.
+	- Add two new error-codes, CCL_CONFIG and CCL_PARSE,
+	  returned by the client-side CCL facilities.
+	- Supply a sample CCL profile file: samples/ccl/default.bib,
+	  copied from the same-named file distributed with YAZ.
+	- The test-scripts t/12-query.t and t/22-query.t are extended
+	  to also test client-side CCL searching.
+	- The test-scripts t/15-scan.t and t/25-scan.t are extended
+	  to also test client-side CCL scanning.
+	- Documentation updated to describe use of CCL.
+	- Add a nice, simple update client: samples/zoom/update.pl
+
+1.08  Thu May 11 22:40:41 BST 2006
+	- Requires version 2.1.11 of YAZ, not 2.0.11.  This is a
+	  bugfix: the old reliance on 2.0.11 was merely a typo.
+
+1.07  Thu May 11 17:45:37 BST 2006
+	- Makefile.PL checks for at least version 2.1.11 of YAZ, and
+	  refuses to build if it's not present.  Thanks to "gregor"
+	  (an otherwise anonymous CPAN tester) for notifying me of the
+	  previously poor reporting of failure when running against an
+	  earlier YAZ.
+	- No changes to functionality or documentation.
+
+1.06  Wed Apr 19 21:11:52 BST 2006
+	- Avoid mixed statement/declaration in ZOOM.xs.  *sigh*  Why
+	  the heck GCC allows this by default I will never understand.
+	- Add (commented out) OPTIMIZE option to Makefile.PL, to turn
+	  on -Wdeclaration-after-statement, which makes mixed
+	  statement/declaration illegal.
+
+1.05  Wed Apr 12 13:31:27 BST 2006
+	- Implementation of asynchronous events!  The Net::Z3950::ZOOM
+	  interface provides this through the event, last_event() and
+	  event_str() functions.  The ZOOM interface provides it
+	  through the ZOOM::event() and ZOOM:event_str() functions,
+	  and the ZOOM::Connection class's last_event() function.
+	- New sample programs added illustrating both asynchronous
+	  interfaces: samples/net-z3950-zoom/zoomtst3.pl and
+	  samples/zoom/zoomtst3.pl respectively.  Additional sample
+	  programs "async.pl" and "trivial-async.pl" for the ZOOM
+	  interface only, the latter being a "shortest possible
+	  broadcast search application".
+	- Added documentation on writing asynchronous applications.
+	- Added test-scripts "t/19-events.t" and "t/29-event.t" for
+	  events on an asynchronous connection.
+	- Fix ZOOM::Connection::new so that options are handled in
+	  accordance with the documentation: applied _before_ the
+	  connection is forged, so that "async" and similar options
+	  can take effect.
+
+1.04  Mon Apr  3 14:56:11 BST 2006
+	- The ZOOM-Perl layer now provides access to the underlying
+	  ZOOM-C's character-translation functionality, through new
+	  optional arguments to ZOOM::Record's render() and raw()
+	  methods, and a new underlying get() method.
+
+1.03  Thu Mar  9 12:55:23 GMT 2006
+	- Allow additional key => value pairs as arguments to the
+	  ZOOM::Connectoion constructor; these are added as Connection
+	  options before the protocol connection is forged.
+
+1.02  Thu Mar  9 11:36:55 GMT 2006
+	- Add interface to yaz_version().
+	- Emit big warning at startup time if YAZ version is less than
+	  2.0.11 (which is what ZOOM-Perl 1.02 requires) unless the
+	  file /tmp/ignore-ZOOM-YAZ-version-mismatch exists.
+	- Fix incorrect ZOOM-package URL in documentation.
+	- Fix typo ("createdb" package) in documentation.
+	- The ZOOM::Connection constructor may now be called with only
+	  a single argument (host-string) and does not require a
+	  dummy port-number argument.
+
+1.01  Thu Dec 22 14:13:34 GMT 2005
+	- Place some CODE: chunks in "ZOOM.xs" inside curly brackets
+	  so that the declarations they begin with are at the start of
+	  the block.  This avoid mixed code/declarations.  (The
+	  "correct" solution is to use INIT: clauses in the XS file,
+	  but they don't seem to work: the code in them is slapped
+	  down right next to the CODE:, so declarations are not
+	  acceptable there either.)
+	- Add new function Net::Z3950::ZOOM::connection_scan1(), which
+	  uses a query object to indicate the start-term.  This opens
+	  the way for using CQL queries for scanning once the
+	  underlying ZOOM-C code supports this.
+	- NOTE BACKWARDS-INCOMPATIBLE CHANGE: The ZOOM::Connection
+	  method scan() is renamed scan_pqf(), and a new scan() method
+	  is introduced which calls the underlying scan1() function.
+	  Thus the scan()/scan_pqf() dichotomy is consistent with that
+	  between search()/search_pqf().
+	- The tests t/15-scan.t and t/25-scan.t now also test for
+	  scanning by CQL query.  To support these tests, a new files
+	  is added to the distribution, "samples/cql/pqf.properties"
+	- Remove nonsensical clause about CQL sort-specifications from
+	  the documentation.
+	- Add new function Net::Z3950::ZOOM::query_cql2rpn(), for
+	  client-side CQL compilation.
+	- Add new ZOOM::Query::CQL2RPN class, encapsulating CQL
+	  compiler functionality as a Query subclass.
+	- Add two new error-codes, CQL_PARSE and CQL_TRANSFORM,
+	  returned by the client-side CQL facilities.
+	- The test-scripts t/12-query.t and t/22-query.t are extended
+	  to also test client-side CQL compilation.
+	- Add all the yaz_log*() functions within the Net::Z3950::ZOOM
+	  namespace. 
+	- Add new ZOOM::Log class for logging, providing aliases for
+	  the functions in the Net::Z3950::ZOOM layer.
+	- Add diagnostic set to rendering of Exception objects.
+	- Documentation added for CQL compilation and logging.
+
+1.00  Wed Dec 14 11:18:33 GMT 2005
+	- First distributed version.
+
+0.01  Fri Oct  7 16:14:20 2005
+	- original version; created by h2xs 1.23 with options
+		--name=Net::Z3950::ZOOM --compat-version=5.8.0 \
+		--omit-constant --skip-exporter --skip-ppport \
+		--autogen-xsubs yaz/zoom.h -lyaz -lxml2
+
+--
+
+To be done in future releases:
+	- Complete, test and document "update.pl"
+	- Create old-style Net::Z3950 compatibility layer.
+	- Fix memory leaks in callback functions for option sets.
+	- Fix limitation that option-set callback functions must be
+	  specified as strings containing package-qualified function
+	  names.
+

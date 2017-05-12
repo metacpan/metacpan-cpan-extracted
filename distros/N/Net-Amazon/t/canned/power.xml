@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ItemSearchResponse xmlns="http://webservices.amazon.com/AWSECommerceService/2005-10-05">
+  <Items>
+    <Request>
+      <IsValid>True</IsValid>
+      <ItemSearchRequest>
+        <ItemPage>1</ItemPage>
+        <Power>author: randal schwartz and author: tom phoenix</Power>
+        <ResponseGroup>Large</ResponseGroup>
+        <SearchIndex>Books</SearchIndex>
+        <Sort>salesrank</Sort>
+      </ItemSearchRequest>
+    </Request>
+    <TotalResults>4</TotalResults>
+    <TotalPages>1</TotalPages>
+    <Item>
+      <ASIN>0596101058</ASIN>
+      <DetailPageURL>http://www.amazon.com/exec/obidos/redirect?tag=webservices-20%26link_code=xm2%26camp=2025%26creative=165953%26path=http://www.amazon.com/gp/redirect.html%253fASIN=0596101058%2526tag=webservices-20%2526lcode=xm2%2526cID=2025%2526ccmID=165953%2526location=/o/ASIN/0596101058%25253FSubscriptionId=YOUR_AMAZON_TOKEN</DetailPageURL>
+      <SalesRank>3023</SalesRank>
+      <SmallImage>
+        <URL>http://images.amazon.com/images/P/0596101058.01._SCTHUMBZZZ_.jpg</URL>
+        <Height Units="pixels">75</Height>
+        <Width Units="pixels">56</Width>
+      </SmallImage>
+      <MediumImage>
+        <URL>http://images.amazon.com/images/P/0596101058.01._SCMZZZZZZZ_.jpg</URL>
+        <Height Units="pixels">160</Height>
+        <Width Units="pixels">120</Width>
+      </MediumImage>
+      <LargeImage>
+        <URL>http://images.amazon.com/images/P/0596101058.01._SCLZZZZZZZ_.jpg</URL>
+        <Height Units="pixels">500</Height>
+        <Width Units="pixels">376</Width>
+      </LargeImage>
+      <ItemAttributes>
+        <Author>Randal L. Schwartz</Author>
+        <Author>Tom Phoenix</Author>
+        <Author>brian d foy</Author>
+        <Binding>Paperback</Binding>
+        <DeweyDecimalNumber>005.13</DeweyDecimalNumber>
+        <EAN>9780596101053</EAN>
+        <Edition>4</Edition>
+        <ISBN>0596101058</ISBN>
+        <Label>O'Reilly Media</Label>
+        <ListPrice>
+          <Amount>3995</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$39.95</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>O'Reilly Media</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>283</NumberOfPages>
+        <PackageDimensions>
+          <Height Units="hundredths-inches">77</Height>
+          <Length Units="hundredths-inches">920</Length>
+          <Weight Units="hundredths-pounds">109</Weight>
+          <Width Units="hundredths-inches">710</Width>
+        </PackageDimensions>
+        <ProductGroup>Book</ProductGroup>
+        <PublicationDate>2005-07-14</PublicationDate>
+        <Publisher>O'Reilly Media</Publisher>
+        <Studio>O'Reilly Media</Studio>
+        <Title>Learning Perl, Fourth Edition</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>2499</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$24.99</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>2498</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$24.98</FormattedPrice>
+        </LowestUsedPrice>
+        <LowestCollectiblePrice>
+          <Amount>3995</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$39.95</FormattedPrice>
+        </LowestCollectiblePrice>
+        <TotalNew>50</TotalNew>
+        <TotalUsed>19</TotalUsed>
+        <TotalCollectible>2</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <Offer>
+          <Merchant>
+            <MerchantId>ATVPDKIKX0DER</MerchantId>
+            <GlancePage>http://www.amazon.com/gp/help/seller/home.html?seller=ATVPDKIKX0DER</GlancePage>
+          </Merchant>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>t%2F6glACTQ0mMq40DWoEma%2FBVQV00Rt0ppFY181ehhk8vVHO725KEV%2FmUag0wbR3S%2BF2JsGpIq98%3D</OfferListingId>
+            <Price>
+              <Amount>2517</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$25.17</FormattedPrice>
+            </Price>
+            <Availability>Usually ships in 24 hours</Availability>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+      <SimilarProducts>
+        <SimilarProduct>
+          <ASIN>0596003137</ASIN>
+          <Title>Perl Cookbook, Second Edition</Title>
+        </SimilarProduct>
+        <SimilarProduct>
+          <ASIN>0596003749</ASIN>
+          <Title>Perl Pocket Reference, 4th Edition</Title>
+        </SimilarProduct>
+        <SimilarProduct>
+          <ASIN>0596002890</ASIN>
+          <Title>Mastering Regular Expressions, Second Edition</Title>
+        </SimilarProduct>
+        <SimilarProduct>
+          <ASIN>0596002815</ASIN>
+          <Title>Learning Python, Second Edition</Title>
+        </SimilarProduct>
+        <SimilarProduct>
+          <ASIN>0596004788</ASIN>
+          <Title>Learning Perl Objects, References, and Modules</Title>
+        </SimilarProduct>
+      </SimilarProducts>
+    </Item>
+    <Item>
+      <ASIN>0596102062</ASIN>
+      <DetailPageURL>http://www.amazon.com/exec/obidos/redirect?tag=webservices-20%26link_code=xm2%26camp=2025%26creative=165953%26path=http://www.amazon.com/gp/redirect.html%253fASIN=0596102062%2526tag=webservices-20%2526lcode=xm2%2526cID=2025%2526ccmID=165953%2526location=/o/ASIN/0596102062%25253FSubscriptionId=YOUR_AMAZON_TOKEN</DetailPageURL>
+      <SalesRank>38914</SalesRank>
+      <SmallImage>
+        <URL>http://images.amazon.com/images/P/0596102062.01._SCTHUMBZZZ_.jpg</URL>
+        <Height Units="pixels">75</Height>
+        <Width Units="pixels">57</Width>
+      </SmallImage>
+      <MediumImage>
+        <URL>http://images.amazon.com/images/P/0596102062.01._SCMZZZZZZZ_.jpg</URL>
+        <Height Units="pixels">160</Height>
+        <Width Units="pixels">121</Width>
+      </MediumImage>
+      <LargeImage>
+        <URL>http://images.amazon.com/images/P/0596102062.01._SCLZZZZZZZ_.jpg</URL>
+        <Height Units="pixels">500</Height>
+        <Width Units="pixels">378</Width>
+      </LargeImage>
+      <ItemAttributes>
+        <Author>Randal L. Schwartz</Author>
+        <Author>brian d foy</Author>
+        <Author>Tom Phoenix</Author>
+        <Binding>Paperback</Binding>
+        <DeweyDecimalNumber>005.133</DeweyDecimalNumber>
+        <EAN>9780596102067</EAN>
+        <Edition>2</Edition>
+        <ISBN>0596102062</ISBN>
+        <Label>O'Reilly Media</Label>
+        <ListPrice>
+          <Amount>3999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$39.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>O'Reilly Media</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>256</NumberOfPages>
+        <PackageDimensions>
+          <Height Units="hundredths-inches">72</Height>
+          <Length Units="hundredths-inches">918</Length>
+          <Weight Units="hundredths-pounds">100</Weight>
+          <Width Units="hundredths-inches">700</Width>
+        </PackageDimensions>
+        <ProductGroup>Book</ProductGroup>
+        <PublicationDate>2006-03-08</PublicationDate>
+        <Publisher>O'Reilly Media</Publisher>
+        <Studio>O'Reilly Media</Studio>
+        <Title>Intermediate Perl</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>2289</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$22.89</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>2287</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$22.87</FormattedPrice>
+        </LowestUsedPrice>
+        <LowestCollectiblePrice>
+          <Amount>3999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$39.99</FormattedPrice>
+        </LowestCollectiblePrice>
+        <TotalNew>49</TotalNew>
+        <TotalUsed>16</TotalUsed>
+        <TotalCollectible>2</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <Offer>
+          <Merchant>
+            <MerchantId>ATVPDKIKX0DER</MerchantId>
+            <GlancePage>http://www.amazon.com/gp/help/seller/home.html?seller=ATVPDKIKX0DER</GlancePage>
+          </Merchant>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>42FRz39eTamrlByHV3IGHYxADcqha3Xs9TeFl3D%2FBgwy0qJdDQe4r48dnv%2FL1nYrlUgNL2PXHJE%3D</OfferListingId>
+            <Price>
+              <Amount>2639</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$26.39</FormattedPrice>
+            </Price>
+            <Availability>Usually ships in 24 hours</Availability>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+      <SimilarProducts>
+        <SimilarProduct>
+          <ASIN>0596001738</ASIN>
+          <Title>Perl Best Practices</Title>
+        </SimilarProduct>
+        <SimilarProduct>
+          <ASIN>0596004567</ASIN>
+          <Title>Advanced Perl Programming</Title>
+        </SimilarProduct>
+        <SimilarProduct>
+          <ASIN>0596526741</ASIN>
+          <Title>Perl Hacks: Tips &amp; Tools for Programming, Debugging, and Surviving (Hacks)</Title>
+        </SimilarProduct>
+        <SimilarProduct>
+          <ASIN>0596003137</ASIN>
+          <Title>Perl Cookbook, Second Edition</Title>
+        </SimilarProduct>
+        <SimilarProduct>
+          <ASIN>0596002890</ASIN>
+          <Title>Mastering Regular Expressions, Second Edition</Title>
+        </SimilarProduct>
+      </SimilarProducts>
+    </Item>
+    <Item>
+      <ASIN>0596004788</ASIN>
+      <DetailPageURL>http://www.amazon.com/exec/obidos/redirect?tag=webservices-20%26link_code=xm2%26camp=2025%26creative=165953%26path=http://www.amazon.com/gp/redirect.html%253fASIN=0596004788%2526tag=webservices-20%2526lcode=xm2%2526cID=2025%2526ccmID=165953%2526location=/o/ASIN/0596004788%25253FSubscriptionId=YOUR_AMAZON_TOKEN</DetailPageURL>
+      <SalesRank>75318</SalesRank>
+      <SmallImage>
+        <URL>http://images.amazon.com/images/P/0596004788.01._SCTHUMBZZZ_.jpg</URL>
+        <Height Units="pixels">75</Height>
+        <Width Units="pixels">57</Width>
+      </SmallImage>
+      <MediumImage>
+        <URL>http://images.amazon.com/images/P/0596004788.01._SCMZZZZZZZ_.jpg</URL>
+        <Height Units="pixels">160</Height>
+        <Width Units="pixels">121</Width>
+      </MediumImage>
+      <LargeImage>
+        <URL>http://images.amazon.com/images/P/0596004788.01._SCLZZZZZZZ_.jpg</URL>
+        <Height Units="pixels">500</Height>
+        <Width Units="pixels">377</Width>
+      </LargeImage>
+      <ItemAttributes>
+        <Author>Randal L. Schwartz</Author>
+        <Binding>Paperback</Binding>
+        <Creator Role="Foreword">Tom Phoenix</Creator>
+        <DeweyDecimalNumber>005</DeweyDecimalNumber>
+        <EAN>9780596004781</EAN>
+        <Edition>1</Edition>
+        <ISBN>0596004788</ISBN>
+        <Label>O'Reilly Media</Label>
+        <ListPrice>
+          <Amount>3495</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$34.95</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>O'Reilly Media</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>205</NumberOfPages>
+        <PackageDimensions>
+          <Height Units="hundredths-inches">53</Height>
+          <Length Units="hundredths-inches">912</Length>
+          <Weight Units="hundredths-pounds">80</Weight>
+          <Width Units="hundredths-inches">710</Width>
+        </PackageDimensions>
+        <ProductGroup>Book</ProductGroup>
+        <PublicationDate>2003-06-30</PublicationDate>
+        <Publisher>O'Reilly Media</Publisher>
+        <Studio>O'Reilly Media</Studio>
+        <Title>Learning Perl Objects, References, and Modules</Title>
+        <UPC>636920004783</UPC>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>2201</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$22.01</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>1699</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$16.99</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>37</TotalNew>
+        <TotalUsed>12</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <Offer>
+          <Merchant>
+            <MerchantId>ATVPDKIKX0DER</MerchantId>
+            <GlancePage>http://www.amazon.com/gp/help/seller/home.html?seller=ATVPDKIKX0DER</GlancePage>
+          </Merchant>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>F5PUUXlDLhCC5RTXk%2BDGF8qkeoIew%2BZsmvAWawXwGT%2BqwYjRiwjpnqFTX9gAslkCLRnNvZBKma8%3D</OfferListingId>
+            <Price>
+              <Amount>2202</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$22.02</FormattedPrice>
+            </Price>
+            <Availability>Usually ships in 24 hours</Availability>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+      <SimilarProducts>
+        <SimilarProduct>
+          <ASIN>0596003137</ASIN>
+          <Title>Perl Cookbook, Second Edition</Title>
+        </SimilarProduct>
+        <SimilarProduct>
+          <ASIN>0596001738</ASIN>
+          <Title>Perl Best Practices</Title>
+        </SimilarProduct>
+        <SimilarProduct>
+          <ASIN>1884777791</ASIN>
+          <Title>Object Oriented Perl: A Comprehensive Guide to Concepts and Programming Techniques</Title>
+        </SimilarProduct>
+        <SimilarProduct>
+          <ASIN>0596004567</ASIN>
+          <Title>Advanced Perl Programming</Title>
+        </SimilarProduct>
+        <SimilarProduct>
+          <ASIN>1565926994</ASIN>
+          <Title>Programming the Perl DBI</Title>
+        </SimilarProduct>
+      </SimilarProducts>
+    </Item>
+    <Item>
+      <ASIN>2841772012</ASIN>
+      <DetailPageURL>http://www.amazon.com/exec/obidos/redirect?tag=webservices-20%26link_code=xm2%26camp=2025%26creative=165953%26path=http://www.amazon.com/gp/redirect.html%253fASIN=2841772012%2526tag=webservices-20%2526lcode=xm2%2526cID=2025%2526ccmID=165953%2526location=/o/ASIN/2841772012%25253FSubscriptionId=YOUR_AMAZON_TOKEN</DetailPageURL>
+      <SmallImage>
+        <URL>http://images.amazon.com/images/P/2841772012.01._SCTHUMBZZZ_.jpg</URL>
+        <Height Units="pixels">60</Height>
+        <Width Units="pixels">44</Width>
+      </SmallImage>
+      <MediumImage>
+        <URL>http://images.amazon.com/images/P/2841772012.01._SCMZZZZZZZ_.jpg</URL>
+        <Height Units="pixels">140</Height>
+        <Width Units="pixels">102</Width>
+      </MediumImage>
+      <LargeImage>
+        <URL>http://images.amazon.com/images/P/2841772012.01._SCLZZZZZZZ_.jpg</URL>
+        <Height Units="pixels">475</Height>
+        <Width Units="pixels">346</Width>
+      </LargeImage>
+      <ItemAttributes>
+        <Author>Randal L. Schwartz</Author>
+        <Author>Tom Phoenix</Author>
+        <Binding>Paperback</Binding>
+        <EAN>9782841772018</EAN>
+        <ISBN>2841772012</ISBN>
+        <Label>O'Reilly</Label>
+        <Manufacturer>O'Reilly</Manufacturer>
+        <ProductGroup>Book</ProductGroup>
+        <PublicationDate>2002-01-23</PublicationDate>
+        <Publisher>O'Reilly</Publisher>
+        <Studio>O'Reilly</Studio>
+        <Title>Introduction à Perl, 3e Edition</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <TotalNew>0</TotalNew>
+        <TotalUsed>0</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+      </Offers>
+    </Item>
+  </Items>
+</ItemSearchResponse>

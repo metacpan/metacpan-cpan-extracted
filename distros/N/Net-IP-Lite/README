@@ -1,0 +1,51 @@
+Net::IP::Lite
+
+This module contains functions to manipulate IPv4/IPv6 addresses.
+
+DESCRIPTION
+
+This is another module to manipulate B<IPv4/IPv6> addresses.
+In contrast of NET::IP, it does not require Math::BigInt.
+Also, it supports some additional IPv4 formats like 0x7f000001,
+2130706433, 017700000001, 0177.0.0.1, 0x7f.0.0.0x1.
+
+INSTALLATION
+
+In order to install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+	perldoc Net::IP::Lite
+
+You can also look for information at:
+
+	RT, CPAN's request tracker
+		http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-IP-Lite
+
+	Search CPAN
+		http://search.cpan.org/dist/Net-IP-Lite/
+
+	Code Repository at GitHub
+		http://github.com/alexey-komarov/Net-IP-Lite
+
+	GitHub Issue Tracker
+		http://github.com/alexey-komarov/Net-IP-Lite/issues
+
+AUTHOR
+
+Alexey A. Komarov <alexkom@cpan.org>
+
+COPYRIGHT AND LICENCE
+
+2013 Alexey A. Komarov
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

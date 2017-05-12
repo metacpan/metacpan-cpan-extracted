@@ -1,0 +1,124 @@
+NAME
+    Net::SNMP::Mixin::CiscoDot1qVlanStaticTrunks - mixin class for static
+    Cisco IEEE-trunks info
+
+VERSION
+    Version 0.03
+
+SYNOPSIS
+      use Net::SNMP;
+      use Net::SNMP::Mixin;
+
+      # initialize session and mixin library
+      my $session = Net::SNMP->session( -hostname => 'foo.bar.com' );
+      $session->mixer('Net::SNMP::Mixin::CiscoDot1qVlanStaticTrunks');
+      $session->init_mixins;
+      snmp_dispatcher();
+      $session->init_ok();
+      die $session->errors if $session->errors;
+
+      # show VLAN IDs and corresponding names
+      my $id2name = $session->cisco_vlan_ids2names();
+      foreach my $vlan_id ( keys %{$id2name} ) {
+          printf "Vlan-Id: %4d  => Vlan-Name: %s\n", $vlan_id,
+            $id2name->{$vlan_id};
+      }
+
+      # show ports for vlan_id
+      my $id2port = $session->cisco_vlan_ids2trunk_ports();
+      foreach my $vlan_id ( keys %{$id2port} ) {
+          printf "Vlan-Id: %4d\n", $vlan_id;
+          printf "\tTagged-Ports:     %s\n",
+            ( join ',', @{ $id2port->{$vlan_id} } );
+      }
+
+      # show tagged vlans for port
+      my $port2id = $session->cisco_trunk_ports2vlan_ids();
+      foreach my $port ( keys %{$port2id} ) {
+          printf "Port: %s\n", $port;
+          printf "\tVLANs:     %s\n", ( join ',', @{ $port2id->{$port} } );
+      }
+
+DESCRIPTION
+    A mixin class for vlan related infos from the CISCO-VTP-MIB for
+    IEEE-trunks. The mixin-module provides methods for mapping between
+    vlan-ids and vlan-names und relations between trunk-ports and tagged
+    vlan-ids.
+
+MIXIN METHODS
+  OBJ->cisco_vlan_ids2names()
+    Returns a hash reference with statically configured vlan-ids as keys and
+    the corresponing vlan-names as values:
+
+      {
+        vlan_id => vlan_name,
+        vlan_id => vlan_name,
+        ... ,
+      }
+
+  OBJ->cisco_vlan_ids2trunk_ports()
+    Returns a hash reference with the vlan-ids as keys and tagged port-lists
+    as values:
+
+      {
+        vlan_id => [port_list],
+        vlan_id => [port_list],
+        ... ,
+      }
+
+  OBJ->cisco_trunk_ports2vlan_ids()
+    Returns a hash reference with the ifIndexes as keys and tagged vlan-ids
+    as values:
+
+      {
+        ifIndex => [vlan_id_list],
+        ifIndex => [vlan_id_list],
+        ... ,
+      }
+
+INITIALIZATION
+  OBJ->_init($reload)
+    Fetch basic Cisco-VTP Dot1Q Vlan related snmp values from the host.
+    Don't call this method direct!
+
+PRIVATE METHODS
+    Only for developers or maintainers.
+
+  _fetch_vtp_vlan_tbl_entries($session)
+    Fetch selected rows from vtpVlanTable during object initialization.
+
+  _vtp_vlan_tbl_entries_cb($session)
+    The callback for _fetch_vtp_vlan_tbl_entries.
+
+  _fetch_vtp_vlan_trunk_port_tbl_entries($session)
+    Fetch selected rows from vlanTrunkPortTable during object
+    initialization.
+
+  _vtp_vlan_trunk_port_tbl_entries_cb($session)
+    The callback for _fetch_vtp_vlan_trunk_port_tbl_entries_cb.
+
+REQUIREMENTS
+    Net::SNMP, Net::SNMP::Mixin
+
+BUGS, PATCHES & FIXES
+    There are no known bugs at the time of this release. However, if you
+    spot a bug or are experiencing difficulties that are not explained
+    within the POD documentation, please submit a bug to the RT system (see
+    link below). However, it would help greatly if you are able to pinpoint
+    problems or even supply a patch.
+
+    Fixes are dependant upon their severity and my availablity. Should a fix
+    not be forthcoming, please feel free to (politely) remind me by sending
+    an email to gaissmai@cpan.org .
+
+      RT: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-SNMP-Mixin-CiscoDot1qVlanStaticTrunks
+
+AUTHOR
+    Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
+
+COPYRIGHT & LICENSE
+    Copyright 2011-2016 Karl Gaissmaier, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

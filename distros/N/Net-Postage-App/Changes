@@ -1,0 +1,9 @@
+Revision history for perl module Net::Postage::App
+
+0.03 2013-10-04
+
+ - add attachments support
+
+0.02 2010-07-24
+
+ - Initial release

@@ -1,0 +1,10 @@
+Revision history for Perl extension Net::MDNS::Client.
+
+0.01  Tue May 20 21:26:17 2003
+	- original version; created by h2xs 1.22 with options
+	-xn Net::MDNS::Client -pmdnsc_ ../mdns-wrapper/mdns_client.h
+
+0.04  Mon May 10 
+	- updated documentation for new calling convention
+	- changed return type for query() in C code
+	- added some rudimentary tests

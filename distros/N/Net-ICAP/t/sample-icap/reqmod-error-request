@@ -1,0 +1,10 @@
+REQMOD icap://icap-server.net/content-filter ICAP/1.0
+Host: icap-server.net
+Date: Wed, 08 Nov 2000 16:02:10 GMT
+Encapsulated: req-hdr=0, null-body=119
+
+GET /naughty-content HTTP/1.1
+Host: www.naughty-site.com
+Accept: text/html, text/plain
+Accept-Encoding: compress
+

@@ -1,0 +1,53 @@
+{
+   "abstract" : "Bindings for the CloudStack API\r",
+   "author" : [
+      "Shugo Numano <numano@cc.rim.or.jp>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-CloudStack",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Digest::SHA" : 0,
+            "Encode" : 0,
+            "HTTP::Response" : 0,
+            "JSON" : 0,
+            "LWP::UserAgent" : 0,
+            "MIME::Base64" : 0,
+            "Mouse" : 0,
+            "Mouse::Util::TypeConstraints" : 0,
+            "Test::More" : 0,
+            "URI::Encode" : 0,
+            "XML::Simple" : 0,
+            "XML::Twig" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01005"
+}

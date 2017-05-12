@@ -1,0 +1,27 @@
+Yadis 0.7
+Dag Arneson, JanRain Inc.  dag@janrain.com
+
+This library does Yadis discovery and parses XRDS services documents
+(hopefully) as per Yadis spec 0.92.  
+
+Dependencies:
+LWPx::ParanoidAgent or LWP::UserAgent
+XML::XPath
+
+Usage is simple:
+
+my $yadis = Net::Yadis->discover($url);
+
+#get the highest priority service matching $type_regexp
+$svc = $yadis->service_of_type($type_regexp);
+$nsvc = $yadis->service_of_type($type_regexp); # next one
+
+@services = $yadis->services; # get all services as a list
+
+$uri = $svc->uri; # The highest Priority URI
+$backupuri = $svc->uri; # URI with next highest priority
+
+@uris = $svc->uris; # or get them as a list
+
+$svc->is_type($type_regexp) # just to be sure
+

@@ -1,0 +1,25 @@
+#!/usr/bin/perl -w
+
+# $Id$
+
+# $Log$
+
+use strict ;
+
+my @recip = qw(
+  Stanley.Hopcroft@Dest.Gov.AU  
+) ;
+
+my $rep  = `host_down_report -t last12hours` ;
+
+exit 
+  unless length($rep) >= 100 ;
+
+my $then = localtime(time() - 12 * 3_600) ;
+
+open  M, "| mail -s 'Outages (reachability failures) since $then' @recip"
+  or die "popen mail failed: $!" ;
+
+print M $rep ;
+
+close M ;

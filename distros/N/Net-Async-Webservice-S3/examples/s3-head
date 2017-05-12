@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use IO::Async::Loop;
+use Net::Async::Webservice::S3;
+
+GetOptions(
+   'meta|m' => \my $META,
+) or exit 1;
+
+my $loop = IO::Async::Loop->new;
+
+my %config = do {
+   open my $rc, "<", ".s3rc" or die "Cannot read .s3rc config - $!\n";
+   map { chomp; m/^(.*?)=(.*)$/ } <$rc>;
+};
+
+my ( $bucket, $prefix ) = split m{/}, ( $config{bucket} || die "Could not find 'bucket' in config\n" ), 2;
+my $s3 = Net::Async::Webservice::S3->new(
+   access_key => ( $config{access_key} || die "Could not find 'access_key' in config\n" ),
+   secret_key => ( $config{secret_key} || die "Could not find 'secret_key' in config\n" ),
+   ssl        => $config{ssl},
+   bucket     => $bucket,
+   prefix     => $prefix,
+);
+
+$loop->add( $s3 );
+
+my ( $header, $meta ) = $s3->head_object(
+   key => shift @ARGV,
+)->get;
+
+if( $META ) {
+   print "$_=$meta->{$_}\n" for sort keys %$meta;
+}
+else {
+   $header->scan( sub {
+      my ( $key, $value ) = @_;
+      print "$key: $value\n";
+   });
+}

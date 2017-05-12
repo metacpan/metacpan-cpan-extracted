@@ -1,0 +1,109 @@
+---
+abstract: 'BitTorrent peer-to-peer protocol'
+author:
+  - 'Sanko Robinson <sanko@cpan.org>'
+build_requires:
+  Module::Build: 0.3
+  Test::More: 0.8
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Conversion, software version 7.0'
+keywords:
+  - BitTorrent
+  - client
+  - peer
+  - p2p
+  - torrent
+  - socket
+  - DHT
+  - Kademlia
+  - exhange
+  - kad
+  - Mainline
+  - MSE
+  - stream
+  - encryption
+  - cryptography
+  - PHE
+  - PE
+  - DH
+  - D-H
+  - Diffie-Hellman
+  - key
+  - exchange
+  - RC4
+  - ARC4
+  - Alleged
+  - ARCFOUR
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-BitTorrent
+no_index:
+  file:
+    - scripts/net-bittorrent.pl
+provides:
+  Net::BitTorrent:
+    file: lib/Net/BitTorrent.pm
+    version: 0.050
+  Net::BitTorrent::DHT:
+    file: lib/Net/BitTorrent/DHT.pm
+    version: 0.050
+  Net::BitTorrent::Peer:
+    file: lib/Net/BitTorrent/Peer.pm
+    version: 0.052
+  Net::BitTorrent::Protocol:
+    file: lib/Net/BitTorrent/Protocol.pm
+    version: 0.050
+  Net::BitTorrent::Torrent:
+    file: lib/Net/BitTorrent/Torrent.pm
+    version: 0.051
+  Net::BitTorrent::Torrent::File:
+    file: lib/Net/BitTorrent/Torrent/File.pm
+    version: 0.050
+  Net::BitTorrent::Torrent::Tracker:
+    file: lib/Net/BitTorrent/Torrent/Tracker.pm
+    version: 0.050
+  Net::BitTorrent::Torrent::Tracker::HTTP:
+    file: lib/Net/BitTorrent/Torrent/Tracker/HTTP.pm
+    version: 0.050
+  Net::BitTorrent::Torrent::Tracker::UDP:
+    file: lib/Net/BitTorrent/Torrent/Tracker/UDP.pm
+    version: 0.050
+  Net::BitTorrent::Util:
+    file: lib/Net/BitTorrent/Util.pm
+    version: 0.050
+  Net::BitTorrent::Version:
+    file: lib/Net/BitTorrent/Version.pm
+    version: 0.052
+recommends:
+  Data::Dump: 0
+  Math::BigInt::Pari: 0
+  Math::Pari: 0
+  perl: v5.10.0
+requires:
+  Cwd: 0
+  Data::Dumper: 0
+  Digest::SHA: 5.45
+  Errno: 0
+  Exporter: 0
+  Fcntl: 0
+  File::Path: 0
+  File::Spec: 0
+  Math::BigInt: 1.78
+  Module::Build: 0.3
+  Scalar::Util: 1.19
+  Socket: 1.77
+  Test::More: 0.8
+  Time::HiRes: 0
+  perl: v5.8.8
+  version: 0.74
+resources:
+  ChangeLog: http://github.com/sanko/net-bittorrent/commits/master
+  MailingList: http://groups.google.com/group/net-bittorrent
+  bugtracker: http://github.com/sanko/net-bittorrent/issues
+  homepage: http://sankorobinson.com/net-bittorrent/
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: http://github.com/sanko/net-bittorrent/
+version: 0.052

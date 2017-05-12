@@ -1,0 +1,23 @@
+Lyskom.pm
+Makefile.PL
+MANIFEST
+README
+test.pl
+Examples/gunther.pl
+Lyskom/MiscInfo.pm
+Lyskom/AuxItem.pm
+Lyskom/Time.pm
+Lyskom/TextStat.pm
+Lyskom/Object.pm
+Lyskom/Util.pm
+Lyskom/Person.pm
+Lyskom/Conference.pm
+Lyskom/Membership.pm
+Lyskom/TextMapping.pm
+Lyskom/ConfZInfo.pm
+Lyskom/DynamicSession.pm
+Lyskom/StaticSession.pm
+Lyskom/Member.pm
+Lyskom/Info.pm
+Lyskom/Simple.pm
+META.yml                                 Module meta-data (added by MakeMaker)

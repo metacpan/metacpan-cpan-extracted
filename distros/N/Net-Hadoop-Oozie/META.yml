@@ -1,0 +1,62 @@
+---
+abstract: 'Interface to various Oozie REST endpoints and utility methods.'
+author:
+  - 'David Morel <david.morel@amakuru.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - hadoop
+  - yarn
+  - oozie
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Hadoop-Oozie
+requires:
+  CHI: '0'
+  Carp: '0'
+  Clone: '0'
+  Constant::FromGlobal: '0'
+  Data::Dumper: '0'
+  Date::Format: '0'
+  Date::Parse: '0'
+  Exporter: '0'
+  Hash::Flatten: '0'
+  JSON::XS: '0'
+  LWP::UserAgent: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Net::Hadoop::YARN: '0'
+  Net::Hadoop::YARN::Roles::Common: '0'
+  Ref::Util: '0'
+  Regexp::Common: '0'
+  Scalar::Util: '0'
+  URI: '0'
+  XML::Simple: '0'
+  XML::Twig: '0'
+  constant: '0'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Perl-Hadoop/Net-Hadoop-Oozie/issues
+  homepage: http://metacpan.org/release/Net-Hadoop-Oozie
+  repository: git://github.com/Perl-Hadoop/Net-Hadoop-Oozie.git
+version: '0.109'
+x_contributors:
+  - 'Burak Gursoy <burak@cpan.org>'
+  - 'David Morel <dmor@cpan.org>'
+  - 'Eric Herman <eherman@cpan.org>'
+  - 'Rafaël Garcia-Suarez <rgarcia@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

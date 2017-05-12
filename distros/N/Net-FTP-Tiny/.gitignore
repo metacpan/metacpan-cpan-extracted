@@ -1,0 +1,11 @@
+/Build
+/Makefile
+/_build
+/blib
+/META.json
+/META.yml
+/MYMETA.json
+/MYMETA.yml
+/Makefile.PL
+/SIGNATURE
+/Net-FTP-Tiny-*

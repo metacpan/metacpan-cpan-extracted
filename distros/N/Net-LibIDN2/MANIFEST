@@ -1,0 +1,12 @@
+MANIFEST
+MANIFEST.SKIP
+README
+Build.PL
+lib/Net/LibIDN2.xs
+lib/Net/LibIDN2.pm
+t/001_basic.t
+LICENSE
+META.yml
+META.json
+inc/Devel/CheckLib.pm
+Changes

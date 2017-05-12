@@ -1,0 +1,57 @@
+{
+   "abstract" : "a portable interface to open and send raw data to network",
+   "author" : [
+      "GomoR <gomor_at_cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Write",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Gomor" : "0",
+            "Net::Pcap" : "0.12",
+            "Socket" : "0",
+            "Socket::GetAddrInfo" : "0",
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Write" : {
+         "file" : "lib/Net/Write.pm",
+         "version" : "1.10"
+      },
+      "Net::Write::Layer" : {
+         "file" : "lib/Net/Write/Layer.pm"
+      },
+      "Net::Write::Layer2" : {
+         "file" : "lib/Net/Write/Layer2.pm"
+      },
+      "Net::Write::Layer3" : {
+         "file" : "lib/Net/Write/Layer3.pm"
+      },
+      "Net::Write::Layer4" : {
+         "file" : "lib/Net/Write/Layer4.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license.php"
+      ]
+   },
+   "version" : "1.10"
+}

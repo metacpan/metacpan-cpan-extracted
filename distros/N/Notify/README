@@ -1,0 +1,28 @@
+package Notify
+
+All documentation, as well as the COPYING terms, is maintained within POD
+documentation in the modules themselves. To see the documentation, please
+use perldoc:
+
+    perldoc Notify
+
+Otherwise, if you have any questions or comments, send an email my way
+(mgilfix@eecs.tufts.edu).
+
+Installation
+============
+
+To install these modules, use:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+You can also install the latest version via CPAN with:
+
+  perl -MCPAN -e'install Notify'
+
+==
+Michael Gilfix <mgilfix@eecs.tufts.edu>
+Copyright (C) 2001.

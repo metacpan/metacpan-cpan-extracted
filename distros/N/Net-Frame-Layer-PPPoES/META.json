@@ -1,0 +1,43 @@
+{
+   "abstract" : "PPP-over-Ethernet layer object",
+   "author" : [
+      "GomoR <gomor_at_cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Frame-Layer-PPPoES",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bit::Vector" : "0",
+            "Net::Frame" : "0",
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Frame::Layer::PPPoES" : {
+         "file" : "lib/Net/Frame/Layer/PPPoES.pm",
+         "version" : "1.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license.php"
+      ]
+   },
+   "version" : "1.02"
+}

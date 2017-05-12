@@ -1,0 +1,34 @@
+---
+abstract: 'Lookup the username on the remote end of a TCP/IP connection'
+author:
+  - 'Jan-Pieter Cornet <johnpc@xs4all.nl>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  IO::Socket: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Ident
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Config: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  FileHandle: '0'
+  Socket: '0'
+  vars: '0'
+resources:
+  homepage: http://wiki.github.com/toddr/Net-Ident/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/toddr/Net-Ident
+version: '1.24'

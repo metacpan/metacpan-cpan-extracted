@@ -1,0 +1,587 @@
+#!/usr/bin/perl -w -T
+# -*- cperl -*-
+
+# gplproxy.pl is Copyright 2004, Galion Public Library.  Written by Nathan Eady for library
+# purposes, this code is released with NO WARRANTY under the same terms as Net::Server::POP3
+# Note that in this code the letters GPL (or gpl) always stand for Galion Public Library.
+
+# This is gplproxy.pl version 0.0001
+
+# This code is in alpha stage, may be incomplete, and has received
+# very little testing; it will probably not work entirely as desired
+# and MAY lose mail (though I hope not), contain security flaws, or
+# cause other issues.  Caveat user.  Please perform a full security
+# audit on this code before deploying it in a production environment.
+# I have not even deployed it for production here yet, and I'm the
+# clown that wrote it.
+
+# Bug reports are welcome; send them to eady@galion.lib.oh.us and/or
+# jonadab@bright.net and be sure to include your %config settings.
+
+our $debug = 2; $|++; use Data::Dumper; # For testing purposes.
+
+our %config =
+  (
+   storedir   => '/home/mailproxy/store',        # Directory where stuff is stored.  The user specified
+                                                 # by sysaccount needs read/write privileges here.
+   server     => 'postoffice.brightchoice.com',  # Where to get mail from, probably your ISP's mail server.
+   serverdel  => 1,                              # Set serverdel to 1 to delete mail from server
+                                                 # once stored (untested).  If undef, mail is left
+                                                 # on server (untested).  Set serverdel to 0 to
+                                                 # delete mail from server only once it has been
+                                                 # retrieved by a client.
+   storedel   => undef,                          # Set storedel to 1 to delete mail from store once
+                                                 # retrieved by client (untested).  If undef, mail
+                                                 # is archived.  Note that certain combinations will
+                                                 # result in weird behavior; for example, if you set
+                                                 # serverdel to undef and storedel to 1, the client
+                                                 # may keep getting copies of each message
+                                                 # repeatedly forever.
+   polldelay  => 600,                            # Number of seconds to delay between rounds of
+                                                 # checking the server.  Does not have to be an
+                                                 # integer.  Low values of this will pester the mail
+                                                 # server continuously, so be aware of bandwidth and
+                                                 # performance issues and your ISP's policies.
+   sysaccount => 'mailproxy',                    # Account on the system that we run as while talking
+                                                 # to the users.  This account must have read/write
+                                                 # privs on the storedir, and preferably nowhere else
+                                                 # that matters.  TODO: make the poller run as this
+                                                 # account also.
+   sysgroup   => 'nobody',                       # Group on the system that we run as.
+   log_level  => 3,                              # Log level for Net::Server
+   authretr   => 0,                              # Set this to a true value to check for new mail
+                                                 # on the spot when authenticating (untested), false
+                                                 # to just use what's already stored.
+   archiver   => ':archive',                     # Username suffix that magically accesses the user's
+                                                 # archive (i.e., causes already retrieved messages to
+                                                 # be offered again).  User postpends a number to this
+                                                 # suffix indicating how many times a message can have
+                                                 # been retrieved and still be offered.  Note that
+                                                 # setting storedel true will make archiver _mostly_
+                                                 # useless, but the user can still use it with a value
+                                                 # of 0 to authenticate by the password stored in the
+                                                 # database e.g. when the real POP3 server is down, or
+                                                 # if the user wants to avoid waiting for the real
+                                                 # POP3 server (e.g. dialup users can reduce latency).
+   maxboxsize  => 200,                           # Maximum number of messages to serve out per session.
+                                                 # High values for this may cause weird bugs I haven't
+                                                 #    tracked down yet to rear their ugly heads.
+   # If you want to use MySQL instead of SQLite:
+   dbd        => 'MySQL',                        # Set this to 'MySQL' to use MySQL (default is SQLite).
+   mysqldb    => 'gplproxy',                     # Name of database to use in MySQL.
+   mysqluser  => 'gplproxy',                     # MySQL username with privileges on that database.
+   mysqlpass  => 'password',                     # MySQL password for that user.
+   mysqlhost  => 'localhost',                    # Host where the MySQL db lives.
+  );
+
+use strict; use warnings; # I normally don't make all my code do this,
+                          # but this code might end up on the
+                          # CPAN and be seen by other people :-)
+
+# You're now looking under the hood and should probably know Perl if
+# you want to change much of anything below this point.  The truly
+# user-serviceable stuff is above.
+
+use Net::Server::POP3; # This handles the server half of the protocol, for talking to clients.
+use Mail::POP3Client;  # This handles the client half of the protocol, for talking to servers.
+use DateTime; use DateTime::Format::Mail; # retrieve uses these to insert a Received: header.
+use DBI; # You also need DBD::SQLite installed, or else you have to change the db:: stuff to use a
+         # different DBD module (e.g., DBD::mysql).  The db::handle routine would need to be changed
+         # as well as the line in db::addrecord that gets the id of the record that was inserted.
+
+# Ensure that at least the users table exists:
+{
+  my $text = ($config{dbd}eq'MySQL')?'mediumtext':'text';
+  db::table('users', 'username' => $text, 'password' => $text #, 'nopoll' => 'integer',
+           );
+}
+
+my ($sigint, $parent, $child);
+sub attemptcleanexit {
+  my ($sig) = @_;
+  ++$sigint;
+  warn "Caught SIG$sig $sigint\n";
+  if (defined $child and $child) {
+    warn "Parent/polling process should exit momentarily."; # The select seems to automatically short
+                                                            # out when a signal is caught, at least
+                                                            # on my OS and Perl version.  (Is this
+                                                            # defined/standard behavior?)
+    return;
+  } elsif (defined $child) {
+    warn "Child/listening process attempting clean exit.";
+    exit 0;
+  } elsif ($sigint<3) {
+    warn "Attempting clean exit...";
+    exit 1;
+  } else {
+    die "Okay, okay, dying now.";
+  }
+};
+$parent = $$; $child = fork;
+if (defined $child) {
+  if ($child) {
+    # This is the parent process.  $child holds the PID of the child.
+    # This process polls the real server for new mail and stores it.
+    $SIG{INT} = $SIG{USR1} = \&attemptcleanexit; $0 .= " (poller)";
+    while (not $sigint) {
+      pollserver();
+      select undef,undef,undef, $config{polldelay};
+      warn "Ready to poll again..." if $debug;
+    }
+    exit 0;
+  } else {
+    # This is the child process.  $parent holds the PID of the parent.
+    # This process listens for client connections.
+    $SIG{INT} = $SIG{USR1} = \&attemptcleanexit; $0 .= " (listener)";
+    listenforclients();
+  }
+} else {
+  die "Fatal Error: missing pronged tableware: $!\nAttempting to make do with spoon...\nThere is no spoon.  Aborting...\n";
+}
+
+die "Fallthrough Error:  Something returned that should not have.  " . ($debug?"[Parent $parent] [Child $child]":"This is really odd.  You might consider filing a bug report.");
+
+sub unpolled {
+  my ($userrecord) = @_;
+  # Return true if this user's mail should not be retrieved from the
+  # real server.  (Mail that has already been retrieved is kept
+  # however.)  For testing, I'm just hardcoding one user here, but you
+  # can substitute other code.
+  # return ($userrecord->{username} eq 'jonadab'); # Poll mail for everyone EXCEPT jonadab
+  # return 1 unless ($userrecord->{username} eq 'jonadab'); return; # Poll mail for jonadab ONLY.
+  return 1; # Poll nobody.
+  # return 0; # Poll everybody in the users table.
+}
+
+sub pollserver {
+  my $user;
+  for $user (db::getrecord('users')) {
+    fetchmail($user) unless unpolled($user);
+  }
+}
+
+sub fetchmail {
+  my %user = %{shift@_};
+  use Mail::POP3Client;
+  warn "Polling server for mail for $user{username}\n" if defined $debug;
+  my $pop = new Mail::POP3Client(AUTH_MODE => 'PASS', USER => $user{username}, PASSWORD => $user{password},
+                                 # HOST => $config{server}
+                                 HOST => ($user{username}eq'jonadab'?"mail.bright.net":$config{server}), # Very temporary kludge, for testing.
+                                 DEBUG => $debug);
+  my $popcount = $pop->Count();
+  if ($popcount >= 0) {
+    # There are messages in the drop.  Get them (if we don't have them already) and store them.
+    my $num;
+    for $num (1..$popcount) {
+      my $uidl = $pop->Uidl($num);
+      $uidl =~ s/\s*$//;; # Otherwise, badness can ensue.
+      if (not alreadyhave($user{username}, $uidl)) {
+        my $msg = $pop->Retrieve($num);
+        $msg =~ s/\r\n/\n/g;  $msg =~ s/^A(\n|\r)//g;
+        my $now = DateTime::Format::Mail->new()->format_datetime(DateTime->now());
+        $msg = "Received: from $config{server} by $0; $now\n" . $msg;
+        my $id = storemessage($user{username}, $uidl, $msg); # The store routine takes care of extracting the other metadata it needs from the message headers.
+        if ($id and defined $config{serverdel} and $config{serverdel}==1) {
+          $pop->Delete($num); # This doesn't happen if storemessage returns undef; in that case,
+                              # we'll retrieve again (and attempt to store again) another time.
+        }
+      } elsif (defined $config{serverdel}) {
+        # Delete the message if it has been retrieved by a client, or if serverdel is 1
+        # Look up the message in the db:
+        my $msg = db::findrecord("mail_for_$user{username}", 'UIDL', $uidl);
+        # Has it been retrieved by a client (or, alternately, do we now want to delete it by virtue of having retrieved it already)?
+        if ($$msg{retrieved} or ($config{serverdel}==1)) {
+          $pop->Delete($num);
+        }
+      }
+    }
+  }
+}
+
+my %maildrop; # When we lock a maildrop, we hold state in this variable.
+sub listenforclients {
+  my $serv = Net::Server::POP3->new
+    (
+     serveropts   => +{
+                       user      => $config{sysaccount},
+                       group     => $config{sysgroup},
+                       log_level => $config{log_level},
+                      },
+     authenticate => \&userauth,
+     list         => \&msglist,
+     retrieve     => \&retrieve,
+     size         => \&sizemsg,
+     delete       => \&delmsg,
+     disconnect   => \&discon,
+     # EOL          => "\r\n",
+     EOL          => "\n",
+     #DEBUG        => $debug, # As of Net::Server::POP3 0.0008, setting DEBUG nonzero manifests a bug that causes authentication to fail.  It's on my TODO list.
+    );
+  $serv->startserver();
+}
+
+sub alreadyhave {
+  my ($username, $uidl) = @_;
+  return db::findrecord("mail_for_$username", 'UIDL', $uidl);
+}
+
+sub storemessage {
+  my ($username, $uidl, $msg) = @_;
+  my $now = db::now();
+  my %r =
+    (
+     UIDL       => $uidl,
+     message    => $msg,
+     stored     => $now,
+     retrieved  => 0,      # Will hold a count of the number of POP3 clients that have retrieved this message.
+    );
+  my $result = db::addrecord("mail_for_$username", \%r) or return undef;
+  return $db::added_record_id;
+}
+
+sub storeuser {
+  my %u = @_;
+  my $r = db::findrecord('users', 'username', $u{username});
+  if ($r) {
+    db::updaterecord('users', \%u);
+  } else {
+    db::addrecord('users', \%u);
+    my $text = ($config{dbd}eq'MySQL')?"mediumtext":"text";
+    db::table("mail_for_$u{username}", UIDL => $text, stored => 'datetime', retrieved => 'integer', message => $text);
+  }
+}
+
+sub userauth {
+  my ($user, $pass, $ip) = @_;
+  if ($config{archiver} and $user =~ /^(.*)\Q$config{archiver}\E(\d*)$/) {
+    # User wants to access his archive (i.e., already-retrieved messages):
+    my ($realuser, $archcount) = ($1, $2);
+    # In order to authenticate the user, we check against the already-stored password:
+    my %r = %{db::findrecord('users', 'username', $user)};
+    if ($pass eq $r{password}) {
+      warn "Authenticated; locking drop for $user ($realuser)...\n" if $debug;
+      return lockmaildrop($realuser, $archcount);
+    } else {
+      warn "Cannot authenticate $user ($realuser) with password $pass from $ip\n" if defined $debug;
+      return 0;
+    }
+  } else {
+    warn "Non-archive user: $user\n" if $debug;
+    # This is a regular user.  Authenticate either via the existing
+    # password or by checking with the real POP3 server:
+    my %r = %{db::findrecord('users', 'username', $user)};
+    exists $r{username} or warn "Bizarre Error:  User Without Name";
+    if (($r{password} eq $pass) and not $config{authretr}) {
+      warn "Authenticated $user at $ip via stored password\n" if $debug;
+      return lockmaildrop($user);
+    } else {
+      warn "Consulting real POP3 server for authentication...\n" if $debug;
+      use Mail::POP3Client;
+      my $pop = new Mail::POP3Client(AUTH_MODE => 'PASS', USER => $user, PASSWORD => $pass,
+                                     # HOST => $config{server}
+                                     HOST => ($user eq'jonadab'?"mail.bright.net":$config{server}), # Very temporary kludge, for testing.
+                                     DEBUG => $debug);
+      my $popcount = $pop->Count();
+      if (defined $popcount and $popcount != -1) {
+        warn "Authenticated $user at $ip via POP3 (asked real server)\n" if $debug;
+        storeuser(username => $user,  # Saves the username and password (for fetchmail to
+                  password => $pass); # use) in the users table and also ensures that
+                                      # there's a table for the user's mail.
+        if ($popcount > 0 and $config{authretr}) {
+          # There are messages in the drop.  Get them (if we don't have them already) and store them:
+          warn "Retrieving $popcount messages from server for $user\n" if $debug;
+          my $num;
+          for $num (1..$popcount) {
+            my $uidl = $pop->Uidl($num);
+            if (not alreadyhave($user, $uidl)) {
+              my $msg = $pop->Retrieve($num);
+              $msg =~ s/\r\n/\n/g;  $msg =~ s/^A(\n|\r)//g;
+              my $now = DateTime::Format::Mail->new()->format_datetime(DateTime->now());
+              $msg = "Received: from $config{server} by $0; $now\n$msg";
+              my $id = storemessage($user, $uidl, $msg); # storemessage must extract any other metadata it needs from the message headers.
+              if ($id and defined $config{serverdel} and $config{serverdel}==1) {
+                $pop->Delete($num); # This doesn't happen if storemessage returns undef;
+                                    # in that case, we'll retrieve again (and attempt to
+                                    # store again) another time.
+              }
+            } elsif (defined $config{serverdel} and $config{serverdel} == 0) {
+              # Delete the message iff it has been retrieved by a client.
+              # Look up the message in the db:
+              my $msg = db::findrecord("mail_for_$user", 'UIDL', $uidl);
+              # Has it been retrieved by a client?
+              if ($$msg{retrieved}) {
+                $pop->Delete($num);
+              }
+            }
+          }
+        }
+        return lockmaildrop($user);
+      } else {
+        warn "Unable to authenticate $user with password $pass at $ip\n" if defined $debug;
+        return 0;
+      }
+    }
+  }
+}
+
+sub lockmaildrop {
+  my ($username, $archcount) = @_;
+  $archcount ||= 0;
+    warn "Attempting to lock drop for $username (level: $archcount)\n" if $debug;
+    # We must return 1 if we successfully lock the maildrop, 0 otherwise.  Note that we
+    # don't have to lock the database or even the table; it's enough to construct a
+    # maildrop that holds a list of the messages in the table at this moment, and the
+    # _list_ that we hold must not change.
+  my ($n, $ac);
+  $maildrop{user} = $username;
+  my @ac = 0 .. $archcount;
+  foreach $ac (@ac) {
+    $|++;
+    warn "Looking for messages at level $ac\n" if $debug;
+    my @m = map {
+      [++$n => $$_{UIDL}],
+    } db::findrecord("mail_for_$username", 'retrieved', $ac);
+    warn "Found " . scalar @m . " messages.\n" if $debug;
+    push @{$maildrop{list}}, @m;
+  }
+  if (@{$maildrop{list}} > $config{maxboxsize}) {
+    warn "Maildrop contains more than $config{maxboxsize} messages; only serving first $config{maxboxsize}\n" if defined $debug;
+    @{$maildrop{list}} = @{$maildrop{list}}[0..$config{maxboxsize}];
+  }
+  $maildrop{count} = (scalar @{$maildrop{list}});
+  warn "Locking maildrop with $maildrop{count} messages for $maildrop{user}\n" if $debug;
+  return \%maildrop;
+}
+
+sub msglist { # Note that $maildrop{list} caches a list of [number, uidl]
+  my ($username) = @_;
+  warn "msglist starting with " . Dumper(\$maildrop{list}) . "\n" if $debug>1;
+  if ($username eq $maildrop{user}) {
+    warn "mgslist returning a list of $maildrop{count} message UIDLs\n" if $debug;
+    return map { $$_[1] } @{$maildrop{list}};
+  } else {
+    warn "msglist received unmatching username, $username versus $maildrop{user}\n" if $debug;
+    return undef;
+  }
+}
+
+sub msgnumber {
+  # returns the message number for a given msgid.
+  my ($msgid) = @_;
+  warn "Finding message number for $msgid in list: " . Dumper(\$maildrop{list}) . "\n" if $debug;
+  return (map { $$_[0] } grep { $$_[1] eq $msgid } @{$maildrop{list}})[0];
+}
+
+sub retrieve {
+  warn "Attempting to retrieve @_\n" if $debug>1;
+  my ($username, $msgid) = @_;
+  my %r = %{db::findrecord("mail_for_$username", 'UIDL', $msgid)};
+  push @{$maildrop{retrieved}}, $r{id} if $r{id};
+  my $msg = $r{message};
+  $msg =~ s/^A\s*//;
+  return $msg;
+}
+
+sub sizemsg {
+  warn "Attempting to find size of @_\n" if $debug>1;
+  my $s = length(retrieve(@_));
+  warn "Returning $s as size for message (@_)\n" if $debug;
+  return $s;
+}
+
+sub delmsg {
+  warn "Attempting to delete @_\n" if $debug>1;
+  my ($username, $msgid) = @_;
+  my %r = %{db::findrecord("mail_for_$username", 'UIDL', $msgid)};
+  # Mark message as retrieved:
+  warn "Marking message $r{id} as retrieved ($r{UIDL})\n";
+  $r{retrieved}++;
+  db::updaterecord("mail_for_$username", \%r);
+  if (defined $config{storedel} and $config{storedel}==1) {
+    # Actually delete the message from the database
+    db::delrecord("mail_for_$username", $r{id});
+  }
+}
+
+sub discon {
+  warn "Disconnecting\n" if $debug;
+  %maildrop = ();
+}
+
+# ------------------------------------------------------------------------------------------
+#                                      DATABASE STUFF
+# ------------------------------------------------------------------------------------------
+
+package db;
+
+# ADD:     $result  = db::addrecord(tablename, $record_as_hashref);
+# UPDATE:  @changes = @{db::updaterecord(tablename, $record_as_hashref)};
+# GET:     %record  = %{db::getrecord(tablename, id)};
+# GETALL:  @records =   db::getrecord(tablename);     # Not for enormous tables.
+# FIND:    @records = db::findrecord(tablename, fieldname, exact_value);
+# DELETE:  $result  = db::delrecord(tablename, id);
+
+# To ensure that a table exists (or if not create it):
+# TABLE:   $result  = table(tablename, fieldname => type, fieldtwo => type, ...);
+
+our $added_record_id;
+
+sub handle {
+  warn "[new handle]" if $main::debug>2;
+  my $dbh;
+  if ($main::config{dbd} eq 'MySQL') {
+    $dbh =  DBI->connect("DBI:mysql:database=$main::config{mysqldb};host=$main::config{mysqlhost}",
+                         $main::config{mysqluser}, $main::config{mysqlpass}, {'RaiseError' => 1});
+    #$dbh->prepare("use $main::config{mysqldb}")->execute();
+  } else {
+    my $dbfile = "$main::config{storedir}/gplproxy.maildb.dat";
+    $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile","","") or die "Cannot Connect: $DBI::errstr\n$@\t$!\n";
+    $dbh->{sqlite_handle_binary_nulls}=1;
+  }
+  return $dbh;
+}
+
+sub now {
+  my $now;
+  if ($main::config{dbd} eq 'MySQL') {
+    use DateTime::Format::MySQL;
+    $now = DateTime::Format::MySQL->format_datetime(DateTime->now());
+  } else {
+    $now = DateTime::Format::Mail->format_datetime(DateTime->now());
+  }
+  return $now;
+}
+
+sub getrecord {
+  # GET:     %record  = %{getrecord(tablename, id)};
+  # GETALL:  @recrefs = getrecord(tablename);     # Don't use this way on enormous tables.
+  my ($table, $id, $q) = @_;
+  die "Too many arguments: getrecord(".(join', ',@_).")" if $q;
+  my $db = handle();
+  $q = $db->prepare("SELECT * FROM $table".(($id)?" WHERE id = '$id'":""));  $q->execute();
+  my @answer; my $r;
+  while ($r = $q->fetchrow_hashref()) {
+    if (wantarray) {
+      push @answer, $r;
+    } else {
+      return $r;
+    }
+  }
+  return @answer;
+}
+
+sub delrecord {
+  # DELETE:  $result  = delrecord(tablename, id);
+  my ($table, $id, $q) = @_;
+  die "Too many arguments: getrecord(".(join', ',@_).")" if $q;
+  my $db = handle();
+  $q = $db->prepare("DELETE FROM $table WHERE id=?");
+  return $q->execute($id);
+}
+
+sub changerecord {
+  # Used by updaterecord.  Do not call directly; use updaterecord instead.
+  my ($table, $id, $field, $value) = @_;
+  my $db = handle();
+  my $q = $db->prepare("update $table set $field=? where id='$id'");
+  return $q->execute($value);
+}
+
+sub updaterecord {
+# UPDATE:  @changes = @{updaterecord(tablename, $record_as_hashref)};
+# See end of function for format of the returned changes arrayref
+  my ($table, $r, $f) = @_;
+  die "Too many arguments: updaterecord(".(join', ',@_).")" if $f;
+  my %r = %{$r};
+  my %o = %{getrecord($table, $r{id})};
+  my @changes = ();
+  foreach $f (keys %r) {
+    if ($r{$f} ne $o{$f}) {
+      my $result = changerecord($table, $r{id}, $f, $r{$f});
+      push @changes, [$f, $r{$f}, $o{$f}, $result];
+    }
+  }
+  return \@changes;
+  # Each entry in this arrayref is an arrayref containing:
+  # [ field changed, new value, old value, result ]
+}
+
+sub addrecord {
+# ADD:     $result  = addrecord(tablename, $record_as_hashref);
+  my ($table, $r, $f) = @_;
+  die "Too many arguments: addrecord(".(join', ',@_).")" if $f;
+  my %r = %{$r};
+  my $db = handle();
+  my ($result,$q);
+  if ($main::config{dbd} eq 'MySQL') {
+    my @clauses = map { "$_=?" } sort keys %r;
+    my @values  = map { $r{$_} } sort keys %r;
+    $q = $db->prepare("INSERT INTO $table SET ". (join ", ", @clauses));
+    $result = $q->execute(@values);
+  } else {
+  # But for SQLite we require a different syntax:
+    $q = $db->prepare("INSERT INTO $table (".
+                      (join ", ", sort grep { defined $r{$_} } keys %r)
+                      .") VALUES (".
+                      (join ", ", map {"?"} grep { defined $r{$_} } keys %r)
+                      .")");
+    $result = $q->execute(map { $r{$_} } sort grep { defined $r{$_} } keys %r);
+  }
+  $result or warn "Cannot add record: " . $db->errstr . (($main::config{dbd}eq'MySQL')?("(".$db->{mysql_error}.")"):"") . " [[" . (Dumper(\%r)) . "]]" if defined $main::debug;
+  $added_record_id = ($main::config{dbd} eq 'MySQL') ? $q->{mysql_insertid} : $db->func('last_insert_rowid');
+  return $result;
+}
+
+sub findrecord {
+# FIND:    @records = findrecord(tablename, fieldname, exact_value);
+  my ($table, $field, $value, $q) = @_;
+  die "Too many arguments: getrecord(".(join', ',@_).")" if $q;
+  my $db = handle();
+  $q = $db->prepare("SELECT * FROM $table WHERE $field=?");  $q->execute($value);
+  my @answer; my $r;
+  while ($r = $q->fetchrow_hashref()) {
+    if (wantarray) {
+      push @answer, $r;
+    } else {
+      return $r;
+    }
+  }
+  return @answer;
+}
+
+# I have not tested searchrecord with DBD::SQLite and have commented
+# it out, since gplproxy.pl doesn't need it. Uncomment and try it if
+# you need it.  The function (and all this db stuff) was originally
+# written for a MySQL-based CGI thingy.  Of course you can always call
+# db::handle directly and do custom SQL commands.
+
+# sub searchrecord {
+# # SEARCH:  @records = @{searchrecord(tablename, fieldname, value_substring)};
+#   my ($table, $field, $value, $q) = @_;
+#   die "Too many arguments: getrecord(".(join', ',@_).")" if $q;
+#   my $db = handle();
+#   $q = $db->prepare("SELECT * FROM $table WHERE $field LIKE '%$value%'");  $q->execute();
+#   my @answer; my $r;
+#   while ($r = $q->fetchrow_hashref()) {
+#     if (wantarray) {
+#       push @answer, $r;
+#     } else {
+#       return $r;
+#     }
+#   }
+#   return @answer;
+# }
+
+sub table {
+  # To ensure that a table exists (or if not create it):
+  # TABLE:   $result  = addtable(tablename, fieldname => type, fieldtwo => type, ...);
+  # It is NOT necessary to include the id field; this will be added automagically.
+  my ($tablename, %fieldtype) = @_;
+  my $db = handle();
+  my $ifne = ($main::config{dbd} eq 'MySQL') ? "IF NOT EXISTS" : "";
+  my $idtype = ($main::config{dbd} eq 'MySQL') ? "integer NOT NULL AUTO_INCREMENT PRIMARY KEY" : "INTEGER PRIMARY KEY";
+  my $q = $db->prepare("CREATE TABLE $ifne $tablename ( id $idtype, "
+                       . (join ", ", map {"$_ $fieldtype{$_}"} keys %fieldtype ) . ")" );
+  my $result = $q->execute();
+  warn "Table creation result: $result" if $main::debug;
+}

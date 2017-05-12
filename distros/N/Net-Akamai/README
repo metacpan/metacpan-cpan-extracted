@@ -1,0 +1,66 @@
+NAME
+    Net::Akamai - Utility to interface with Akamai's API
+
+SYNOPSIS
+     my $data = new Net::Akamai::RequestData(
+            email=>'my@email.com', 
+            user => 'myuser', 
+            pwd => 'mypass'
+     );
+     $data->add_url('http://www.myurl.com');
+     $data->add_url('http://www.myurl.com/somethingelse');
+     my $ap = new Net::Akamai(req_data=>$data);
+     my $res = $ap->purge;
+ 
+     if (!$res->accepted) {
+            die "$res";
+     }
+     elsif ($res->warning) {
+            warn "$res";
+     }
+
+DESCRIPTION
+    Handles akamai purge request of multiple URLs
+
+    Patches welcome for extra functionality
+
+Attributes
+  soap_version
+    SOAP::Lite version
+
+  proxy
+    akamai purge proxy
+
+  uri
+    akamai purge uri
+
+  soap
+    SOAP::Lite object
+
+  req_data
+    Net::Akamai::RequestData object to hold data associated with an akamai
+    request
+
+  res_data
+    Net::Akamai::ResponseData object holds data associated with an akamai
+    response
+
+Methods
+  purge
+    initiate the purge request
+
+TODO
+    more tests and doc
+    support to read urls from file
+    better error checking and failure reporting
+
+AUTHOR
+    John Goulah <jgoulah@cpan.org>
+
+CONTRIBUTORS
+    Aran Deltac <bluefeet@cpan.org>
+
+LICENSE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

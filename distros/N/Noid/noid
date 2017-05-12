@@ -1,0 +1,2090 @@
+#!/usr/bin/perl -Tw -Ilib -I../lib
+#
+# noid - a Perl script that mints and binds nice opaque identifiers
+#   using the Noid.pm module.  This script can be invoked additionally
+#   via a URL interface as "noidu...", which formats output for the web.
+#
+# Author:  John A. Kunze, jak@ucop.edu, California Digital Library
+#    Orginally created Nov. 2002 at UCSF Center for Knowledge Management
+# 
+# ---------
+# Copyright (c) 2002-2006 UC Regents
+# 
+# Permission to use, copy, modify, distribute, and sell this software and
+# its documentation for any purpose is hereby granted without fee, provided
+# that (i) the above copyright notices and this permission notice appear in
+# all copies of the software and related documentation, and (ii) the names
+# of the UC Regents and the University of California are not used in any
+# advertising or publicity relating to the software without the specific,
+# prior written permission of the University of California.
+# 
+# THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND, 
+# EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY 
+# WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.  
+# 
+# IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE FOR ANY
+# SPECIAL, INCIDENTAL, INDIRECT OR CONSEQUENTIAL DAMAGES OF ANY KIND,
+# OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+# WHETHER OR NOT ADVISED OF THE POSSIBILITY OF DAMAGE, AND ON ANY
+# THEORY OF LIABILITY, ARISING OUT OF OR IN CONNECTION WITH THE USE
+# OR PERFORMANCE OF THIS SOFTWARE.
+# ---------
+
+# XXX change 'NOID' as database name to 'dbnoid' (for case insensitive filesys)
+# XXX fix To Do alphabets
+# XXX document an example of how to set up a rewrite rule that responds
+#     to the ? and ?? at the end of an id, and convert to a CGI string
+# XXX add java interface
+# XXX fix env test to suggest that NFS and AFS filesystems not be used
+# XXX why does dbopen fail when doing dbinfo from an account that can't
+#     write the file -- should be doing readonly open
+# XXX record literal noid dbcreate (re)creation command used into README
+
+use strict;
+
+#sub get_untainted_PERL5LIB {
+#	my $key;
+#	my $perl_5_lib = $ENV{"PERL5LIB"};
+#	#my @lib_list = ('./Noid/lib');
+#	my @lib_list = ('./lib');
+#	! defined($perl_5_lib) and
+#		return(@lib_list);
+#	if ($perl_5_lib =~ /^(\/\S+)$/) {
+#		push @lib_list, $1;
+#		return(@lib_list);
+#	}
+#	die(qq@Format of variable "PERL5LIB" ($perl_5_lib) invalid.\n@);
+#}
+#
+#use lib	get_untainted_PERL5LIB( );
+
+use Config;     # Now do Brian McCauley's perl5lib.pm trick for untainting.
+use lib map { /(.*)/ } split /$Config{path_sep}/ => $ENV{PERL5LIB};
+
+use Text::ParseWords;
+use Getopt::Long;
+use BerkeleyDB;
+use Noid;
+
+my $web = 0;
+my ($dbdir, $dbname, $debug, $locktest, $ver, $help, $contact, $bulkcmd);
+my ($template, $snaa, $total);
+my (@valid_helptopics, %info);		# purposely undefined for now
+my @valid_commands = qw(
+	bind dbinfo dbcreate fetch get hello help hold
+	mint note peppermint queue validate
+);
+
+# yyy make a noidmail (email robot interface?)
+# yyy location field for redirect should include a discriminant
+#     eg, ^c for client choice, ^i for ipaddr, ^f format, ^l language
+#     and ^b for browser type, ^xyz for any http header??
+# yyy add "file" command, like bind, but stores a file, either as file or
+#     in a big concatenation stream (binding offset, length, checksum)?
+# yyy figure out whether validate needs to open the database, and if not,
+#     what that means
+
+# yyy for locking and transactions: (1) ask Paul Marquess about what
+#  Perl interface support for txn and locking really is (2) check into
+#  lock and/or transaction timeout, (3) if I use cursors exclusively for
+#  storage, that may solve everything(?) (eg, no more simple tied assigments,
+#  which are db_put's in disguise, (4) make sure Noid.pm exit block releases
+#  locks, aborts transactions, etc.
+
+# main
+{
+	my $line;
+	if ($0 =~ m|noidu[^/]*$|) {	# if called with the URL interface
+		$web = 1;			# orient output for HTTP
+		print "Content-Type: text/plain\n\n";
+		open(STDERR, ">&STDOUT")
+			or die("Can't combine stderr and stdout: $!\n");
+		! defined($ENV{'QUERY_STRING'}) and
+			die("No QUERY_STRING (hence no command) defined.\n");
+		($line = $ENV{'QUERY_STRING'}) =~ tr/+/ /;
+		@ARGV = shellwords($line);
+		#print "ARGV: " . join("|", @ARGV) . "\n";
+	}
+	if ($0 =~ m|noidr[^/]*$|) {	# if called for RewriteMap resolving,
+					# see Apache Rewrite mod documentation
+		$| = 1;		# very important to unbuffer the output
+		$bulkcmd = 1;
+		# yyy should we set a timeout to prevent hanging the server?
+	}
+
+	if (! ($contact = who_are_you($web))) {
+		print STDERR "Can't tell who you are: $!\n";
+		exit(1);
+	}
+
+	if (! GetOptions(
+		'debug'		=> \$debug,	# flag
+		'locktest=i'	=> \$locktest,	# flag
+		'f=s'		=> \$dbdir,	# filesystem directory name
+		'version'	=> \$ver,	# flag
+		'help'		=> \$help,	# flag
+	)) {
+		print "error: GetOptions\n";
+		usage(1, 1, "intro");
+		exit(1);
+	}
+	if ($locktest) {
+		$locktest < 0 and
+			print("error: locktest value must be a positive "
+				. "number of seconds to sleep\n"),
+			exit(0);
+		Noid::locktest($locktest);
+	}
+	$web && $debug and
+		print "contact=$contact, pwd=", `pwd`;
+
+	# Handle -v or -h, and exit early.
+	if ($ver) {
+		# We take our version number from the Noid module version.
+		print qq@This is "noid" version $Noid::VERSION.\n@;
+		exit(0);
+	}
+	if ($help) {
+		# yyy should we encode help output?   print "help:\n";
+		usage(0, 0, "intro");
+		exit(0);
+	}
+
+	# Now try to find a database directory string.
+	# In the special case of dbcreate, we may create
+	# and name the directory on behalf of the user.
+	#
+	if (! defined($dbdir)) {
+		defined($ENV{'NOID'}) and	# is NOID env variable defined?
+			$dbdir = $ENV{'NOID'},
+		1 or
+		$0 =~ m|_([^/]+)$| and		# executable link reveals dbdir?
+			$dbdir = $1,
+		1 or
+			$dbdir = '.',		# else try current directory
+		;
+		if (! defined($dbdir) || $dbdir !~ /\S/) {
+			print "error: no Dbdir\n";
+			usage(1, 1, "intro");
+			exit(1);
+		}
+	}
+	elsif ($web) {
+		print qq@-f option not allowed in URL interface.\n@;
+		return(0);
+	}
+	# Now untaint $dbdir.  yyy we can do better?
+	$dbdir =~ m|^(.*)$| and
+		$dbdir = $1
+	or
+		print("error: bad Dbdir\n"),
+		usage(1, 1, "intro"),
+		exit(1)
+	;
+	$dbname = "$dbdir/NOID/noid.bdb";
+
+	# Bulk command mode is signified by a single final argument of "-".
+	# If we're _not_ in bulk command mode, expect a single command
+	# represented by the remaining arguments; do it and exit.
+	#
+	$bulkcmd ||= ($#ARGV == 0 && $ARGV[0] eq "-");
+	if (! $bulkcmd) {
+		do_command(@ARGV);
+		exit(0);
+	}
+
+	# If we get here, we're in bulk command mode.  Read, tokenize,
+	# and execute commands from the standard input.  Test with
+	#   curl --data-binary @cmd_file http://dot.ucop.edu/nd/noidu_kt5\?-
+	# where cmd_file contains newline-separated commands.
+	# XXX make sure to %-decode web QUERY_STRING, so we don't have
+	#     to always put +'s for spaces
+	#
+	while (($line = <STDIN>)) {
+		do_command(shellwords($line));
+	}
+	exit(0);
+}
+
+sub do_command {
+
+	# Any remaining args should form a noid command.
+	# Look at the command part (if any) now, and complain about
+	# a non-existent database unless the command is "dbcreate".
+	#
+	my $command = shift;
+	if (! defined($command)) {	# if no command arg
+		usage(1, 1, "intro");
+		return(0);
+	}
+	if (! -f $dbname
+			&& $command ne 'dbcreate' && $command ne 'help') {
+		# if the database doesn't exist when it needs to
+		bprint(*STDERR, "error: no database ($dbname) "
+			. "-- use dbcreate?\n\n");
+		usage(1, 1, "intro");
+		return(0)
+	}
+	if (grep(/^$command$/, @valid_commands) != 1) {
+		print "error: no such command: $command (",
+			join(" ", @_), ")\n";
+		usage(1, 1, "intro");
+		return(0);
+	}
+	# Perform extra checks in $web case.
+	if ($web && $command eq 'dbcreate') {
+		print qq@error: command "$command" not allowed in URL interface.\n@;
+		usage(1, 1, "intro");
+		return(0);
+	}
+	# It should now be safe to turn off strict 'refs' when we
+	# invoke a command via its subroutine name.
+	#if ($#_ < 0) {
+	#	usage(1);	# yyy say something senstive about $command
+	#usage(1, 1, "intro");
+	#	return(0);
+	#}
+
+	no strict 'refs';
+	&$command(@_);
+}
+
+#
+# --- begin almost alphabetic listing of functions ---
+#
+
+# yyy what is the sensible thing to do if (a) no element given,
+#     (b) if no value, or (c) if there are multiple values?
+# yyy vbind(..., template, ...)?  nvbind()?
+#
+# Returns number of elements successfully bound.
+#
+# yyy what about append at the list vs the string level?
+sub bind { my( $how, $id, $elem, $value )=@_;
+
+	my $validate = 1;
+	my $noid = Noid::dbopen($dbname, 0);
+	if (! $noid) {
+		print STDERR Noid::errmsg($noid);
+		return(0);
+	}
+	my $report;
+	! defined($elem) and
+		$elem = "";
+	if ($elem eq ":") {	# expect name/value pairs up to blank line
+		defined($value) and
+			print(STDERR "Why give a value ($value) with an "
+				. qq@element "$elem"?\n@),
+			Noid::dbclose($noid),
+			return(0);
+
+		# To slurp paragraph, apparently safest to use local $/, which
+		local $/;			# disappears when scope exits.
+		$/ = "\n\n";			# Means paragraph mode.
+		my $para = <STDIN> || "";
+		chop $para;	# yyy needed?
+		$para =~ s/^#.*\n//g;		# remove comment lines
+		$para =~ s/\n\s+/ /g;		# merge continuation lines
+		my @elemvals = split(/^([^:]+)\s*:\s*/m, $para);
+		shift @elemvals;		# throw away first null
+		my ($bound, $total) = (0, 0);
+		while (1) {
+			($elem, $value) = (shift @elemvals, shift @elemvals);
+			! defined($elem) && ! defined($value) and
+				last;
+			$total++;
+			! defined($elem) and
+				Noid::addmsg($noid,
+					"error: $id: bad element associated "
+						. qq@with value "$value".@),
+				last;
+			! defined($value) and
+				$value = "",
+			1 or
+				chop $value
+			;
+			$report = Noid::bind($noid, $contact, $validate,
+				$how, $id, $elem, $value);
+			! defined($report) and
+				print(STDERR $report, "\n"),
+				usage(1, 1, "bind"),
+				# yyy how/who should log failures in "hard" case
+			or
+				$bound++,
+				print($report, "\n"),
+			;
+		}
+		# yyy summarize for log $total and $bound
+		Noid::dbclose($noid);
+		return(defined($report) ? 1 : 0);
+	}
+	elsif ($elem eq ":-") {		# expect name/value to be rest of file
+		defined($value) and
+			print(STDERR "Why give a value ($value) with an "
+				. qq@element "$elem"?\n@),
+			Noid::dbclose($noid),
+			return(0);
+#		while (<STDIN>) {
+#			next if /^#/ || /^\s*\n/;
+#			last;		# end at first non-blank, non-comment
+#		}
+#		chop;
+#		! defined($_) || ! s/^(\w+)\s*:\s*// and
+#			Noid::addmsg($noid, "error: $id no element to bind."),
+#			Noid::dbclose($noid),
+#			return(0);
+#		$elem = $1;
+#		$value = $_;
+#		# To slurp file, apparently safest is to use local $/, which
+#		local $/;			# disappears when scope exits.
+#		$value .= <STDIN>;		# $/==undef means file mode.
+
+		# Read all of STDIN into array "@input_lines".
+		my @input_lines = <STDIN>;
+
+		# Remove all newlines.
+		foreach (@input_lines) {
+			chomp;
+			}
+
+		# Ignore any leading lines that start with a pound sign
+		# or contain nothing but white space.
+		while (scalar(@input_lines) > 0) {
+			if ((substr($input_lines[0], 0, 1) eq "#") ||
+				($input_lines[0] =~ /^\s*$/)) {
+				shift @input_lines;
+				next;
+				}
+			last;
+			}
+
+		# If we don't have any lines, there's a problem.
+		if (scalar(@input_lines) == 0) {
+			print STDERR "error:  no non-blank, non-comment ",
+				"input.\n";
+			Noid::dbclose($noid);
+			return(0);
+			}
+
+		# There must be an element and a colon on the first line.
+		unless ($input_lines[0] =~ /^\s*(\w+)\s*:\s*(.*)$/) {
+			print STDERR "error:  missing element or colon on ",
+				"first non-blank, non-comment line.\n";
+			Noid::dbclose($noid);
+			return(0);
+			}
+
+		# Save the element, and any part of the value that there
+		# might be on the first line.
+		$elem = $1;
+		$value = $2;
+
+		# Remove the first line from the array.
+		shift @input_lines;
+
+		# Append any additional lines to the value.
+		foreach (@input_lines) {
+			$value .= "\n" . $_;
+			}
+
+		# Put on the final newline.
+		$value .= "\n";
+
+		#
+		# Now drop through to end of if-elsif clause to real binding.
+	}
+	# yyy eg, :fragment:Offset:Length:Path
+	# yyy eg, :fragment:Offset:Length:Path
+	# yyy eg, :file:Path
+	# yyy eg, ":xml",
+	elsif ($elem =~ /^:/) {
+		print(STDERR qq@Binding to element syntax "$elem" @
+			. "not supported.\n");
+		Noid::dbclose($noid);
+		return(0);
+	}
+	$report = Noid::bind($noid, $contact, $validate,
+			$how, $id, $elem, $value);
+	! defined($report) and
+		print(STDERR Noid::errmsg($noid)),
+		usage(0, 1, "bind")
+	or
+		print($report, "\n")
+	;
+	# yyy make sure return(0)'s do dbclose...
+	Noid::dbclose($noid);
+	return(defined($report) ? 1 : 0);
+}
+
+# This routine may not make sense in the URL interface.
+#
+sub dbcreate { my( $template, $policy, $naan, $naa, $subnaa )=@_;
+
+	my $dbreport = Noid::dbcreate($dbdir, $contact, $template, $policy,
+			$naan, $naa, $subnaa);
+	if (! $dbreport) {
+		print Noid::errmsg(), "\n";
+		return(0);
+	}
+	print $dbreport, "\n";
+	return(1);
+}
+
+sub dbinfo { my( $level )=@_;
+
+	$level = "brief"
+		if (! defined($level));
+	my $noid = Noid::dbopen($dbname, DB_RDONLY);
+	if (! $noid) {
+		print Noid::errmsg($noid);
+		return(0);
+	}
+	Noid::dbinfo($noid, $level);
+	Noid::dbclose($noid);
+	return(1);
+}
+
+sub fetch { my( $id, @elems )=@_;
+
+	return(getfetch(1, $id, @elems));
+}
+
+sub get { my( $id, @elems )=@_;
+
+	return(getfetch(0, $id, @elems));
+}
+
+sub getfetch { my( $verbose, $id, @elems )=@_;
+
+	my $noid = Noid::dbopen($dbname, DB_RDONLY);
+	if (! $noid) {
+		print STDERR Noid::errmsg($noid);
+		return(0);
+	}
+	my $fetched = Noid::fetch($noid, $verbose, $id, @elems);
+	! defined($fetched) and
+		print(STDERR Noid::errmsg($noid))
+	or
+		print($fetched),
+		$verbose && print("\n")
+	;
+	Noid::dbclose($noid);
+	return(1);
+}
+
+sub hello {
+	print "Hello.\n";
+}
+
+sub help { my( $topic )=@_;
+
+	my $in_error = 0;
+	my $brief = 0;
+	return(usage($in_error, $brief, $topic));
+}
+
+# yyy what about a "winnow" routine that is either started
+#     from cron or is started when an exiting noid call notices
+#     that there's some harvesting/garbage collecting to do and
+#     schedules it for, say, 10 minutes hence (by not exiting,
+#     but sleeping for 10 minutes and then harvesting)?
+
+sub hold { my( $on_off, @ids )=@_;
+
+	my $noid = Noid::dbopen($dbname, 0);
+	if (! $noid) {
+		print STDERR Noid::errmsg($noid);
+		return(0);
+	}
+	if (! Noid::hold($noid, $contact, $on_off, @ids)) {
+		print(STDERR Noid::errmsg($noid));
+		usage(1, 1, "hold");
+		Noid::dbclose($noid);
+		return(0);
+	}
+	print(Noid::errmsg($noid), "\n");	# no error message at all
+	Noid::dbclose($noid);
+	return(1);
+}
+
+sub peppermint { my( $n, $elem, $value )=@_;
+	mint($n, $elem, $value, 1);
+}
+
+sub mint { my( $n, $elem, $value, $pepper )=@_;
+
+	if (defined($pepper)) {
+		print STDERR
+			"The peppermint command is not implemented yet.\n";
+		return(0);
+	}
+	if (! defined($n) || $n !~ /^\d+$/) {
+		print STDERR "Argument error: expected positive integer, got ",
+			(defined($n) ? qq@"$n"@ : "nothing"), "\n";
+		usage(1, 1, "mint");
+		return(0);
+	}
+	my $noid = Noid::dbopen($dbname, 0);
+	if (! $noid) {
+		print Noid::errmsg($noid);
+		return(0);
+	}
+	my $id;
+	while ($n--) {
+		if (! defined($id = Noid::mint($noid, $contact, $pepper))) {
+			print STDERR Noid::errmsg($noid);
+			Noid::dbclose($noid);
+			return(0);
+		}
+		print "id: $id\n";
+	}
+	Noid::dbclose($noid);
+	print "\n";
+	return(1);
+
+}
+
+sub note { my( $key, $value )=@_;
+
+	if (! defined($key) || ! defined($value)) {
+		print STDERR
+			"You must supply a key and a value.\n";
+		usage(1, 1, "note");
+		return(0);
+	}
+	my $noid = Noid::dbopen($dbname, 0);
+	! Noid::note($noid, $contact, $key, $value)
+		and print Noid::errmsg($noid);
+	Noid::dbclose($noid);
+	return(1);
+}
+
+sub queue { my( $when, @ids )=@_;
+
+	my $noid = Noid::dbopen($dbname, 0);
+	if (! $noid) {
+		print STDERR Noid::errmsg($noid);
+		return(0);
+	}
+	my @queued = Noid::queue($noid, $contact, $when, @ids);
+	my $retval;
+	! @queued and
+		$retval = 0,
+		print(STDERR Noid::errmsg($noid), "\n"),
+	1 or
+		$retval = 1,
+		print(join("\n", @queued), "\n"),
+	;
+	my $n = scalar(grep(! /^error:/, @queued));
+	print("note: $n identifier", ($n == 1 ? "" : "s"), " queued\n");
+	Noid::dbclose($noid);
+	return($retval);
+}
+
+# Returns the number of valid ids.
+sub validate { my( $template, @ids )=@_;
+
+	my $noid = Noid::dbopen($dbname, DB_RDONLY);
+	if (! $noid) {
+		print Noid::errmsg($noid);
+		return(0);
+	}
+	my @valids = Noid::validate($noid, $template, @ids);
+	! @valids and
+		print(STDERR Noid::errmsg($noid)),
+		Noid::dbclose($noid),
+		usage(1, 1, "validate"),
+		return(0);
+
+	my @iderrs = grep(/^error:/, @valids);
+	print($_, "\n")
+		for (@valids);
+	Noid::dbclose($noid);
+	return(scalar(@ids) - scalar(@iderrs));
+}
+
+# Print a blank (space) in front of every newline.
+# First arg must be a filehandle.
+#
+sub bprint { my( $out, @args )=@_;
+	map {s/\n/\n /g} @args;
+	return print $out @args;
+}
+
+# Always returns 1 so it can be used in boolean blocks.
+#
+sub usage { my( $in_error, $brief, $topic )=@_;
+
+	! defined($in_error) and
+		$in_error = 1;		# default is to treat as error
+	$in_error and
+		$| = 1;			# flush any pending output
+	my $out =			# where to send output
+		($in_error ? *STDERR : *STDOUT);
+	! defined($brief) and
+		$brief = 1;		# default is to be brief
+	$topic ||= "intro";
+	$topic = lc($topic);
+
+	# Initialize info topics if need be.
+	#
+	! @valid_helptopics and
+		init_help();
+	my @blurbs = grep(/^$topic/, @valid_helptopics);
+	if (scalar(@blurbs) != 1) {
+		print $out (scalar(@blurbs) < 1
+			? qq@Sorry: nothing under "$topic".\n@
+			: "Help: Your request ($topic), matches more than one "
+				. "topic:\n\t(" . join(", ", @blurbs) . ").\n"
+			),
+			" You might try one of these topics:";
+		my @topics = @valid_helptopics;
+		my $n = 0;
+		my $topics_per_line = 8;
+		while (1) {
+			! @topics and
+				print("\n "),
+				last
+			or
+			$n++ % $topics_per_line == 0 and
+				print("\n\t")
+			or
+				print(" ", shift(@topics))
+			;
+		}
+		print "\n\n";
+		return(1);
+	}
+	# If we get here, @blurbs names one story.
+	my $blurb = shift @blurbs;
+
+	# Big if-elsif clause to switch on requested topic.
+	#
+	# Note that we try to make the output conform to ANVL syntax;
+	# in the case of help output, every line tries to be a continuation
+	# line for the value of an element called "Usage".  To do this we
+	# pass all output through a routine that just adds a space after
+	# every newline.  The end of the output should end the ANVL record,
+	# so we print "\n\n" at the end.
+	#
+	my ($t, $i);
+	if ($blurb eq "intro") {
+		bprint $out,
+qq@Usage:
+              noid [-f Dbdir] [-v] [-h] Command Arguments@, ($brief ? qq@
+              noid -h             (for help with a Command summary).@
+	: qq@
+
+Dbdir defaults to "." if not found from -f or a NOID environment variable.
+For more information try "perldoc noid" or "noid help Command".  Summary:
+@);
+		$brief and
+			print("\n\n"),
+			return(1);
+		for $t (@valid_commands) {
+			$i = $info{"$t/brief"};
+			! defined($i) || ! $i and
+				next;
+			bprint $out, $i;
+		}
+bprint $out, qq@
+If invoked as "noidu...", output is formatted for a web client.  Give Command
+as "-" to run a block of noid Commands read from stdin or from POST data.@;
+		print "\n\n";
+		return(1);
+	}
+	#elsif $blurb eq "dbcreate" and print $out $info{$blurb}
+	#or
+	#$blurb eq "bind" and print $out
+	$brief and
+		$blurb .= "/brief";
+	$t = $info{$blurb};
+	if (! defined($t) || ! $t) {
+		print $out qq@Sorry: no information on "$blurb".\n\n@;
+		return(1);
+	}
+	bprint $out, $t;
+	print "\n";
+	return(1);
+
+# yyy fix these verbose messages
+
+my $yyyy = qq@
+Called as "noid", an id generator accompanies every COMMAND.  Called as
+"noi", the id generator is supplied implicitly by looking first for a
+NOID environment variable and, failing that, for a file calld ".noid" in
+the current directory.  Examples show the explicit form.  To create a
+generator, use
+
+	noid ck8 dbcreate TPL SNAA
+
+where you replace TPL with a template that defines the shape and number
+of all identifiers to be minted by this generator.  You replace SNAA with
+the name (eg, the initials) of the sub NAA (Name Assigning Authority) that
+will be responsible for this generator; for example, if the Online Archive
+of California is the sub-authority for a template, SNAA could be "oac".
+This example of generator intialization,
+
+	noid oac.noid dbcreate pd2.wwdwwdc oac
+
+sets up the "oac.noid" identifier generator.  It can create "nice opaque
+identifiers", such as "pd2pq5dk9z", suitable for use as persistent
+identifiers should the supporting organization wish to provide such a
+level of commitment.  This generator is also capable of holding a simple
+sequential counter (starting with 1), which some callers may wish to use
+as an internal number to keep track of minted external identifiers.
+[ currently accessible only via the count() routine ]
+
+In the example template, "pd2" is a constant prefix for an identifier
+generator capable of producing 70,728,100 identifiers before it runs out.
+A template has the form "prefix.mask", where 'prefix' is a literal string
+prepended to each identifier and 'mask' specifies the form of the generated
+identifier that will appear after the prefix (but with no '.' between).
+Mask characters are 'd' (decimal digit), 'w' (limited alpha-numeric
+digit), 'c' (a generated check character that may only appear in the
+terminal position).
+
+Alternatively, if the mask contains an 's' (and no other letters), dbcreate
+initializes a generator of sequential numbers.  Instead of seemingly random
+creates sequentially generated number.  Use '0s'
+to indicate a constant width number padded on the left with zeroes.
+@;
+	return(1);
+}
+
+sub init_help {
+
+	# For convenient maintenance, we store individual topics in separate
+	# array elements.  So as not to slow down script start up, we don't
+	# pre-load anything.  In this way only the requester of help info,
+	# who does not need speed for this purpose, pays for it.
+	#
+	@valid_helptopics = qw(
+		intro all templates
+	);
+	push(@valid_helptopics, @valid_commands);
+	%info = (
+		'bind/brief' =>
+q@
+   noid bind How Id Element Value	# to bind an Id's Element, where
+      How is set|add|insert|new|replace|mint|append|prepend|delete|purge.
+      Use an Id of :idmap/Idpattern, Value=PerlReplacementPattern so that
+      fetch returns variable values.  Use ":" as Element to read Elements
+      and Values up to a blank line from stdin (up to EOF with ":-").
+@,
+		'bind' =>
+q@@,
+		'dbinfo/brief' =>
+q@@,
+		'dbinfo' =>
+q@@,
+		'dbcreate/brief' =>
+q@
+   noid dbcreate [ Template (long|-|short) [ NAAN NAA SubNAA ] ]
+      where Template=prefix.Tmask, T=(r|s|z), and mask=string of (e|d|k)
+@,
+
+		'dbcreate' =>
+q|
+To create an identifier minter governed by Template and Term ("long" or "-"),
+
+   noid dbcreate [ Template Term [ NAAN NAA SubNAA ] ]
+
+The Template gives the number and form of generated identifiers.  Examples:
+
+    .rddd        minter of random 3-digit numbers that stops after the 1000th
+    .zd          sequential numbers without limit, adding new digits as needed
+  bc.sdddd       sequential 4-digit numbers with constant prefix "bc"
+    .rdedeede    .7 billion random ids, extended-digits at chars 2, 4, 5 and 7
+  fk.rdeeek      .24 million random ids with prefix "fk" and final check char
+
+For persistent identifiers, use "long" for Term, and specify the NAAN, NAA,
+and SubNAA.  Otherwise, use "-" for Term or omit it.  The NAAN is a globally
+registered Name Assigning Authority Number; for identifiers conforming to the
+ARK scheme, this is a 5-digit number registered with ark@cdlib.org, or 00000.
+The NAA is the character string equivalent registered for the NAAN; for
+example, the NAAN, 13030, corresponds to the NAA, "cdlib.org".  The SubNAA
+is also a character string, but it is a locally determined and possibly
+structured subauthority string (e.g., "oac", "ucb/dpg", "practice_area") that
+is not globally registered.
+|,
+		'fetch/brief' =>
+q@
+   noid fetch Id Element ...		# fetch/map one or more Elements
+@,
+		'fetch' =>
+q@
+To bind,
+
+   noid bind replace fk0wqkb myGoto http://www.cdlib.org/foobar.html
+
+sets "myGoto" element of identifier "fk0wqkb" to a string (here a URL).
+@,
+		'get/brief' =>
+q@
+   noid get Id Element ...		# fetch/map Elements without labels
+@,
+		'get' =>
+q@@,
+		'hello/brief' =>
+q@@,
+		'hello' =>
+q@@,
+		'hold/brief' =>
+q@
+   noid hold (set|release) Id ...	# place or remove a "hold" on Id(s)
+@,
+		'hold' =>
+q@@,
+		'mint/brief' =>
+q@
+   noid mint N [ Elem Value ]	# to mint N identifiers (optionally binding)
+@,
+		'mint' =>
+q@@,
+		'note/brief' =>
+q@@,
+		'note' =>
+q@@,
+		'peppermint/brief' =>
+q@@,
+		'peppermint' =>
+q@@,
+		'queue/brief' =>
+q@
+   noid queue (now|first|lvf|Time) Id ...	# queue (eg, recycle) Id(s)
+      Time is NU, meaning N units, where U= d(ays) | s(econds).
+      With "lvf" (Lowest Value First) lowest value of id will mint first.
+@,
+		'queue' =>
+q@@,
+
+		'validate/brief' =>
+q@
+   noid validate Template Id ...	# to check if Ids are valid
+      Use Template of "-" to use the minter's native template.
+@,
+		'validate' =>
+q@@,
+	);
+	return(1);
+}
+
+sub who_are_you { my( $web )=@_;
+
+	my $user;
+	if ($web) {
+		$user = $ENV{'REMOTE_USER'} || '';
+		my $host = $ENV{'REMOTE_HOST'} || $ENV{'REMOTE_ADDR'} || '';
+		$user .= '@' . $host;
+	}
+
+	# Look up by REAL_USER_ID first.
+	my ($name, undef, undef, $gid) = getpwuid($<);
+	my $ugid = getlogin() || $name;
+	! $ugid and
+		return "";
+	$ugid .= "/" . ((getgrgid($gid))[0] || "");
+
+	# If EFFECTIVE_USER_ID differs from REAL_USER_ID, get its info too.
+	if ($> ne $<) {
+		($name, undef, undef, $gid) = getpwuid($>);
+		! $name and
+			return "";
+		$ugid .= " ($name/" . ((getgrgid($gid))[0] || "") . ")";
+	}
+	$user = ($user ? "$user $ugid" : $ugid);
+	return $user;
+}
+
+exit 0;
+
+1;
+
+# yyy Possible for 'c' mask char:
+#	ASCII 33 to 126 (no SPACE, no DEL)  --> 94 (not prime)
+#	MINUS the 5 chars:  / \ - % "       --> 89 (prime)
+#    or MINUS the 5 chars:  / \ - % .       --> 89 (prime)
+#    or MINUS the 5 chars:  / \ - % SPACE   --> 89 (prime)
+#
+# Note: current (1/2004) restrictions on ARKs are alphanums plus
+#	= @ $ _ * + #
+# with the following reserved for special purposes
+#	/ . - %
+
+# yyy noid example:  shuffle play (as in random song list)
+# yyy bind is pair-wise or triple-wise?  (how to explain consistently)
+
+# yyy add java class to distro
+# yyy add pdf of doc to distro
+
+__END__
+
+=pod
+
+=for roff
+.nr PS 12p
+.nr VS 14.4p
+
+=head1 NAME
+
+noid - nice opaque identifier generator commands
+
+=head1 SYNOPSIS
+
+B<noid> [ B<-f> I<Dbdir> ] [ B<-vh> ] I<Command> I<Arguments>
+
+=head1 DESCRIPTION
+
+The B<noid> utility creates minters (identifier generators) and accepts
+commands that operate them.  Once created, a minter can be used to produce
+persistent, globally unique names for documents, databases, images,
+vocabulary terms, etc.  Properly managed, these identifiers can be used as
+long term durable information object references within naming schemes such
+as ARK, PURL, URN, DOI, and LSID.  At the same time, alternative minters
+can be set up to produce short-lived names for transaction identifiers,
+compact web server session keys, and other ephemera.
+
+A B<noid> minter is a lightweight database designed for efficiently
+generating, tracking, and binding unique identifiers, which are produced
+without replacement in random or
+sequential order, and with or without a check character that can be used
+for detecting transcription errors.  A minter can bind identifiers to
+arbitrary element names and element values that are either stored or
+produced upon retrieval from rule-based transformations of requested
+identifiers, the latter having application in identifier resolution.  Noid
+minters are very fast, scalable, easy to create and tear down, and have a
+relatively small footprint.  They use BerkeleyDB as the underlying database.
+
+An identifier generated by a B<noid> minter is also known generically
+as a "noid" (standing for nice opaque identifier and rhyming with void).
+While a minter can record and bind any identifiers 
+that you bring to its attention, often it is used to generate, bringing
+to your attention, identifier strings that carry no widely recognizable
+meaning.  This semantic opaqueness reduces their vulnerability to era-Z<>
+and language-specific change, and helps persistence by making for
+identifiers that can age and travel well.
+
+The form, number, and intended longevity of a minter's identifiers are given
+by a Template and a Term supplied when the generator database is created.
+A supplied Term of "long" establishes extra restrictions and logging
+appropriate for the support of persistent identifiers.  Across successive
+minting operations, the generator "uses up" its namespace (the pool of
+identifiers it is capable of minting) such that no identifier will ever be
+generated twice unless the supplied Term is "short" and the namespace is
+finite and completely exhausted.  The default Term is "medium".
+
+The B<noid> utility parameters -- flags, I<Dbdir> (database location),
+I<Command>, I<Arguments> -- are described later under COMMANDS AND MODES.
+There are also sections covering persistence, templates, rule-based
+mapping, URL interface, and name resolution.
+
+=head1 TUTORIAL INTRODUCTION
+
+Once the noid utility is installed, the command,
+
+    noid dbcreate s.zd
+
+will create a minter for an unlimited number of identifiers.
+It produces a generator for medium term identifiers (the default) with
+the Template, C<s.zd>, governing the order, number, and form of minted
+identifier strings.  These identifiers will begin with the constant part
+C<s> and end in a digit (the final C<d>), all within an unbounded sequential
+(C<z>) namespace.  The TEMPLATES section gives a full explanation.
+This generator will mint the identifiers, in order,
+
+    s0, s1, s2, ..., s9, s10, ..., s99, s100, ...
+
+and never run out.  To mint the first ten identifiers,
+
+    noid mint 10
+
+When you're done, on a UNIX platform you can remove that minter with
+
+    rm -fr NOID
+
+Now let's create a more complex minter.
+
+    noid dbcreate f5.reedeedk long 13030 cdlib.org oac/cmp
+
+This produces a generator for long term identifiers that begin with the
+constant part C<13030/f5>.  Exactly 70,728,100 identifiers will be minted
+before running out.
+
+The 13030 parameter is the registered Name Assigning Authority Number
+(NAAN) for the assigning authority known as "cdlib.org", and "oac/cmp"
+is a string chosen by the person setting up this minter to identify the
+project that will be operating it.  This particular minter generates
+identifiers that start with the prefix C<f5> in the 13030 namespace.
+If long term information retention is within the mission of your
+organization (this includes national and university libraries and archives),
+you may register for a globally unique NAAN by sending email to ark at
+cdlib dot org.
+
+Identifiers will emerge in "quasi-random" order, each consisting of six
+characters matching up one-for-one with the letters C<eedeed>.
+
+  noid mint 1
+
+The first identifier should be C<13030/f54x54g11>, with the namespace
+ranging from a low of C<13030/f5000000s> to a high of C<13030/f5zz9zz94>.
+You can create a "locations" element under a noid and bind three URLs
+to it with the command,
+
+  noid bind set 13030/f54x54g11 locations \
+    'http://a.b.org/foo|http://c.d.org/bar|http://e.f.org/zaf'
+
+The template's final C<k> causes a computed check character to be added
+to the end of every generated identifier.  It also accounts for why the
+lowest and highest noids look a little odd on the end.  The final check
+character allows detection of the most common transcription errors,
+namely, incorrect entry of one character and the transposition of two
+characters.  The next command takes three identifiers that someone
+might ask you about and determines that, despite appearances, only the
+first is in the namespace of this minter.
+
+  noid validate - 13030/f54x54g11 13030/f54y54g11 \
+    13030/f54x45g11
+
+To make way for creation of another minter, you can move the entire
+minter into a subdirectory with the command,
+
+  mkdir f57 ; mv NOID f57
+
+A minter may be set up on a web server, allowing the NAA organization
+easily to distribute name assigment to trusted parties operating from
+remote locations.  The URL INTERFACE section describes the procedure in
+detail.  Once set up, you could mint one identifier by entering a URL such
+as the following into your web browser:
+
+  http://foo.ucop.edu/nd/noidu_f57?mint+1 
+
+Using a different procedure, you can also make your identifier bindings
+(e.g., location information) visible to the Internet via a few web server
+configuration directives.  The NAME RESOLUTION section explains this further.
+
+=head1 IDENTIFIER - AN ASSOCIATION SUPPORTED BY BINDINGS
+
+An identifier is not a string of character data -- an identifier is an
+association between a string of data and an object.  This abstraction
+is necessary because without it a string is just data.  It's
+nonsense to talk about a string's breaking, or about its being strong,
+maintained, and authentic.  But as a representative of an association,
+a string can do, metaphorically, the things that we expect of it.
+
+Without regard to whether an object is physical, digital, or conceptual,
+to identify it is to claim an association between it and a representative
+string, such as "Jane" or "ISBN 0596000278".  What gives your claim
+credibility is a set of verifiable assertions, or metadata, about the
+object, such as age, height, title, or number of pages.  Verifiability is
+outside the scope of the noid utility, but you can use a minter to record
+assertions supporting an association by binding arbitrary named elements
+and values to the identifier.  Noid database elements can be up to 4
+gigabytes in length, and one noid minter is capable of recording billions
+of identifiers.
+
+You don't have to use the noid binding features at all if you prefer to
+keep track of your metadata elsewhere, such as in a separate database
+management system (DBMS) or on a sheet of paper.  In any case, for each
+noid generated, the minter automatically stores its own lightweight
+"circulation" record asserting who generated it and when.  If most of
+your metadata is maintained in a separate database, the minter's own
+records play a back up role, providing a small amount of redundancy that
+may be useful in reconstructing database bindings that have become damaged.
+
+An arbitrary database system can complement a noid minter without any
+awareness or dependency on noids.  On computers, identifier bindings are
+typically managed using methods that at some point map identifier strings
+to database records and/or to filesystem entries (effectively using the
+filesystem as a DBMS).  The structures and logistics for bindings
+maintenance may reside entirely with the minter database, entirely outside
+the minter database, or anywhere in between.  An individual organization
+defines whatever maintenance configuration suits it.
+
+=head1 PERSISTENCE
+
+A persistent identifier is an identifier that an organization commits to
+retain in perpetuity.  Associations, the I<sine qua non> of identifiers,
+last only as long as they (in particular, their bindings) are maintained.
+Often maintaining identifiers goes hand in hand with controlling the
+objects to which they are bound.  No technology exists that automatically
+manages objects and associations; persistence is a matter of service
+commitment, tools that support that commitment, and information that
+allows users receiving identifiers to make the best judgment regarding
+an organization's ability and intention to maintain them.
+
+It will be normal for organizations to maintain their own assertions
+about identifiers that you issue, and vice versa.  In general there is
+nothing to prevent discrepancies among sets of assertions.  Effectively,
+the association -- the identifier -- is in the eye of the beholder.  As a
+simple example, authors create bibliography entries for cited works, and
+in that process they make their claims, often with small errors, about
+such things as the author and title of the identified thing.  It is common
+for a provider of an identifier-driven service such as digital object
+retrieval to allow users to review its own, typically better-maintained
+sets of identifier assertions (i.e., metadata), even if it minted none
+of the identifiers
+that it services.  We call such an organization a Name Mapping Authority
+(NMA) because it "maps" identifiers to services.  It is possible for an
+NMA to service identifiers even if it neither hosts nor controls any
+objects.
+
+It will also be normal for archiving organizations to maintain their own
+peculiar ideas about what persistence means.  Different flavors will
+exist even within one organization, where, for example, it may be
+appropriate to apply corrections to persistent objects of one category,
+to never change objects of another, and to remove objects of a third
+category with a promise never to re-assign those objects' identifiers.
+One institution will guarantee persistence for certain
+things, while the strongest commitment made by some
+prominent archives will be "reasonable effort".  Given the range of
+possibilities, a memory organization will need to record not only the
+identities but also the support policies for objects in its care.
+Any database, including a noid minter, can be used for this purpose.
+
+For persistence across decades or centuries, opinions regarding an
+object's identity and commitments made to various copies of it will
+tend naturally to become more diverse.  An object may have been inherited
+through a chain of stewardship, subtle identity changes, and peaks of
+renewed interest
+stretching back to a completely unrelated and now defunct organization
+that created and named it.  For its original identifier to have persisted
+across the intervening years, it must look the same as when first minted.
+At that particular time, global uniqueness required the minted identifier
+to bear the imprint of the issuing organization (the NAA, or Name
+Assigning Authority), which long ago ceased to have any responsibility
+for its persistence.  There is thus no conflict in a mapping authority
+(NMA) servicing identifiers that originate in many different assigning
+authorities.
+
+These notions of flavors of persistence and separation of name authority
+function are built into the ARK (Archival Resource Key) identifier scheme
+that the B<noid> utility was partly created to support.  By design, noid
+minters also work within other schemes in recognition that persistence
+has nothing to do with identifier syntax.  Opaque identifiers can be used
+by any application needing to reduce the liability created when identifier
+strings contain linguistic fragments that, however appropriate or even
+meaningless they are today, may one day create confusion, give offense,
+or infringe on a trademark as the semantic environment around us and our
+communities evolves.  If employed for persistence, noid minters ease the
+unavoidable costs of long term maintenance by having a small technical
+footprint and by being implemented completely as open source software.
+For more information on ARKs, please see L<http://ark.cdlib.org/> .
+
+=head1 COMMANDS AND MODES
+
+Once again, the overall utility summary is
+
+=over 5
+
+B<noid> [ B<-f> I<Dbdir> ] [ B<-vh> ] I<Command> I<Arguments>
+
+=back
+
+In all invocations, output is intended to be both human- and
+machine-readable.  Batch operations are possible, allowing multiple
+minting and binding commands within one invocation.  In particular,
+if I<Command> is given as a "-" argument, then actual I<Commands>
+are read in bulk from the standard input.
+
+The string, I<Dbdir>, specifies the directory where the database resides.
+To protect database coherence, it should not be located on a filesystem
+such as NFS or AFS that doesn't support POSIX file locking semantics.
+I<Dbdir> may be given with the B<NOID>
+environment variable, overridable with the B<-f> option.  If those strings
+are empty, the name or link name of the B<noid> executable (argv[0] for C
+programmers) is checked to see if it reveals I<Dbdir>.  If that check
+(described next) fails, I<Dbdir> is taken to be the current directory.
+
+To check the name of the executable for I<Dbdir>, the final pathname
+component (tail) is examined and split at the first "_" encountered.  If none,
+the check fails.  Otherwise, the check is considered successful and the
+latter half is taken as naming I<Dbdir> relative to the current directory.
+This mechanism is designed for cases when it is inconvenient to specify
+I<Dbdir> (such as in the URL interface) or when you are running several
+minters at once.  As an example, F</usr/bin/noid_fk9> specifies a
+I<Dbdir> of F<fk9>.
+
+All files associated with a minter will be organized in a subdirectory,
+F<NOID>, of I<Dbdir>; this has the consequence that there can be at most
+one minter in a directory.  To allow B<noid> to create a new minter in
+a directory already containing a F<NOID> subdirectory, remove or rename
+the entire F<NOID> subdirectory.
+
+The B<noid> utility may be run as a URL-driven web server application,
+such as in a CGI that allows name assignment via remote operator.
+If the executable begins B<noidu...>, the noid URL mode is in effect.
+Input parameters, separated by a "+" sign, are expected to arrive
+embedded in the query part of a URL, and output will be formatted
+for display on an ordinary web browser.  An executable of B<noidu_xk4>,
+for example, would turn on URL mode and set I<Dbdir> to F<xk4>.
+This is further described under URL INTERFACE.
+
+The B<noid> utility may be run as a name resolver running behind a web
+server.  If the executable begins B<noidr...>, the noid resolver mode is
+in effect, which means that commands will be read from the standard input
+(as if only the "-" argument had been given) and the script output will
+be unbuffered.  This mode is designed for machine interaction and is
+intended to be operated by rewriting rules listed in a web server
+configuration file as described later under NAME RESOLUTION AND
+REDIRECTION INTERFACE.
+
+At minter creation time, a report summarizing its properties is produced
+and stored in the file, F<NOID/README>.  This report may be useful to the
+organization articulating the operating policy of the minter.  In a formal
+context, such as the creation of a minter for long term identifiers, that
+organization is the Name Assigning Authority.
+
+The B<-v> option prints the current version of the B<noid> utility and
+B<-h> prints a help message.
+
+In the I<Command> list below, capitalized symbols indicate values to be
+replaced by the caller.
+Optional arguments are in [brackets] and (A|B|C) means one of A or B or C.
+
+=over 4
+
+=item B<noid dbcreate> [ I<Template> [ I<Term> [ I<NAAN NAA SubZ<>NAA> ] ] ]
+
+Create a database that will mint (generate) identifiers according to the
+given Template and Term.  As a side-effect this causes the creation of
+a directory, F<NOID>, within I<Dbdir>.  If you have several generators,
+it may be convenient to operate each from within a I<Dbdir> that uniquely
+identifies each Template; for example, you might change to a directory
+that you named F<fk6> after the Template C<fk.rdeedde> ("fk" followed by
+6 variable characters) of the minter that resides there.
+
+The Term declares whether the identifiers are intended to be "long",
+"medium" (the default), or "short".  A short term identifier minter is
+the only one that will re-mint identifiers after the namespace is
+exhausted, simply returning the oldest previously minted identifier.
+As mentioned earlier, however, some namespaces are unbounded and never
+run out of identifiers.
+
+If Term is "long", the arguments NAAN, NAA, and SubZ<>NAA are required,
+and all minted identifiers will be returned with the NAAN and a "/"
+prepended to them.  The NAAN is a namespace identifier and should be a
+globally unique Name Assigning Authority (NAA) number.  Apply for one
+by email to ark@cdlib.org, or for testing purposes, use "00000" as a
+non-unique NAAN.
+
+The NAA argument is the character string equivalent for the NAAN; for
+example, 13960 corresponds to the NAA, "archive.org".  The SubNAA argument
+is also a character string, but is a locally determined and possibly
+structured subauthority string (e.g., "oac", "ucb/dpg", "practice_area")
+that is not globally registered.
+
+If Template is not supplied, the minter freely binds any identifier that
+you submit without validating it first.  In this case it also mints
+medium term identifiers under the default Template, C<.zd>.
+
+=item B<noid mint> I<N> [ I<Element Value> ]
+
+Generate N identifiers.  If other arguments are specified, for each
+generated noid, add the given Element and bind it to the given Value.
+[Element-Value binding upon minting is not implemented yet.]
+
+There is no "unmint" command.  Once an identifier has been circulated in
+the outside world, it may be hard to withdraw because external users and
+systems will have bound it with their own assertions.
+Even within the minting organization, removing all of the identifier's
+supporting bindings could entail actions such as file deletion that are
+outside the scope of the minter.  While there is no command capable of
+withdrawing a circulated identifier, it is nonetheless easy to B<queue>
+an identifier for reminting and to B<hold> it against the possibility of
+minting at all.  Identifiers that are long term should be treated as
+non-renewable resources except when you are absolutely sure about
+recycling them.
+
+=item B<noid peppermint> I<N> [ I<Element Value> ]
+
+[This command is not implemented yet.]
+Generate N "peppered" identifiers.  A peppered identifier is a regular
+identifier concatenated with a "!" character and a randomly generated
+cookie -- the pepper -- which serves as a kind of per-identifier password.
+(Salt is a technical term for some extra data that makes it harder to
+crack encrypted values; we use pepper for some extra data that makes it
+harder to crack unencrypted values.)  To provide an extra level of
+database security, the base identifier, which is everything up to the "!",
+should be used in all public communication, but the complete peppered
+identifier is required for all noid operations that would change values
+in the database.
+
+As with the B<mint> command, if other arguments are specified, for each
+generated noid, add the given Element and bind it to the given Value.
+
+=item B<noid bind> I<How Id Element Value>
+
+For the given Id, bind the Element to Value according to How.  The
+Element and Value may be arbitrary strings.  There are two reserved
+Element names allowing Values to be entered that are too large or
+syntactically inconvenient (depending on the calling environment's
+quoting restrictions) to pass in as command-line tokens.
+
+If the Element is ":" and no Value is present, lines are read
+from the standard input up to a blank line; they will contain
+Element-colon-Value pairs in essentially email header format,
+with long values continued on indented lines.  If the Element is ":-"
+and no Value is present, lines are read from the standard input up
+to end-of-file; the first non-comment, non-blank line must have an
+Element-colon to specify an Element name, and all the remaining input
+(up to EOF) is taken as its corresponding Value.  Lines beginning
+with "#" are considered "comment" lines and are skipped.
+
+=for later XXX test the "and no Value is present" in the both cases above
+
+The I<How> argument specifies one of the following kinds of binding.
+Of these, the B<set>, B<add>, B<insert>, and B<purge> kinds "don't care"
+if there is no current binding.
+
+=over 6
+
+=item B<new>
+
+Only if Element does not exist, create a new binding.
+
+=item B<replace>
+
+Only if Element exists, undo any old bindings and create a new binding.
+
+=item B<set>
+
+Means B<new> or, failing that, B<replace>.
+
+=item B<append>
+
+Only if Element exists, place Value at the end of the old binding.
+
+=item B<add>
+
+Means B<new> or, failing that, B<append>.
+
+=item B<prepend>
+
+Only if Element exists, place Value at the beginning of the old binding.
+
+=item B<insert>
+
+Means B<new> or, failing that, B<prepend>.
+
+=item B<delete>
+
+Remove any trace of Element, returning an error if it did not exist to
+begin with.
+
+=item B<purge>
+
+Remove any trace of Element, returning success whether or not it existed
+to begin with.
+
+=item B<mint>
+
+Means B<new>, but ignore the Id argument (actually, confirm that it
+was given as B<new>) and mint a new Id first.
+
+=item B<peppermint>
+
+[This kind of binding is not implemented yet.]
+Means B<new>, but ignore the Id argument (B<new>)
+and peppermint a new Id first.
+
+=back
+
+The RULEZ<>-Z<>BASED MAPPING section explains how to set up retrieval
+using non-stored values.
+
+=item B<noid fetch> I<Id> [ I<Element> ... ]
+
+For the noid, Id, print with labels all bindings for the given
+Elements.  If no Element is given, find and print all bindings for the
+given Id.  This is the verbose version of the B<get> command, in that it
+prints headers and labels for everything it finds.
+
+=item B<noid get> I<Id> [ I<Element> ... ]
+
+For the noid, Id, print without labels all bindings for the given
+Elements.  If no Element is given, find and print all bindings for the
+given Id.  This is the quiet version of the B<fetch> command, in that it
+suppresses all headers and labels.  Between each Element requested,
+the output will be separated by a blank line.
+
+=item B<noid hold> (B<set>|B<release>) I<Id> ...
+
+Place or remove a B<hold> on one or more Ids.  A hold placed on an Id that
+has not been minted will cause it to be skipped when its turn to be minted
+comes around.  A hold placed on an Id that has been minted will make it
+impossible to queue (typically for recycling).  Minters of long term
+identifiers automatically place a hold on every minted noid.
+Holds can be placed or removed manually at any time.
+
+=item B<noid queue> (B<now>|B<first>|B<lvf>|I<Time>) I<Id> ...
+
+Queue one or more Ids for minting.  Time is a number followed by units,
+which can be B<d> for days or B<s> for seconds (the default units).  This
+can be used to recycle noids B<now> or after a delay period.  With
+B<first>, the Id(s) will be queued such that they will be minted before
+any of the time-delayed entries.  With B<lvf> (Lowest Value First), the
+lowest valued identifier (intended for use with numeric identifiers) will
+be taken from the queue for minting before all others.  [ needs testing ]
+
+=for comment XXX is lvf tested enough?
+
+=item B<noid validate> (I<Template>|B<->) I<Id> ...
+
+Validate one or more Ids against a given Template, which, if given as "-",
+causes the minter's native I<Template> to be used.
+
+=back
+
+=head1 TEMPLATES
+
+A Template is a coded string of the form Prefix.Mask that is given to
+the noid B<dbcreate> command to govern how identifiers will be minted.
+The Prefix, which may be empty, specifies an initial constant string.
+For example, upon database creation, in the Template
+
+  tb7r.zdd
+
+the Prefix says that every minted identifier will begin with the literal
+string C<tb7r>.  Each identifier will end in at least two digits (C<dd>),
+and because of the C<z> they will be sequentially generated without limit.
+Beyond the first 100 mint operations, more digits will be added as needed.
+The minted noids will be, in order,
+
+  tb7r00, tb7r01, ..., tb7r100, tb7r101, ..., tb7r1000, ...
+
+The period (".") in the Template does not appear in the identifiers but
+serves to separate the constant first part (Prefix) from the variable
+second part (Mask).  In the Mask, the first letter determines either
+random or sequential ordering and the remaining letters each match up
+with characters in a generated identifier.  Perhaps the best way to
+introduce templates is with a series of increasingly complex examples.
+
+=over 12
+
+=item C<.rddd>
+
+to mint random 3-digit numbers, stopping after 1000th
+
+=item C<.sdddddd>
+
+to mint sequential 6-digit numbers, stopping after millionth
+
+=item C<.zd>
+
+sequential numbers without limit, adding new digits as needed
+ 
+=item C<bc.rdddd>
+
+random 4-digit numbers with constant prefix C<bc>
+
+=item C<8rf.sdd>
+
+sequential 2-digit numbers with constant prefix C<8rf>
+
+=item C<.se>
+
+sequential extended-digits (from 0123456789bcdfghjkmnpqrstvwxz)
+
+=item C<h9.reee>
+
+random 3-extended-digit numbers with constant prefix C<h9>
+
+=item C<.zeee>
+
+unlimited sequential numbers with at least 3 extended-digits
+
+=item C<.rdedeedd>
+
+random 7-char numbers, extended-digits at chars 2, 4, and 5
+
+=item C<.zededede>
+
+unlimited mixed digits, adding new extended-digits as needed
+
+=item C<sdd.sdede>
+
+sequential 4-mixed-digit numbers with constant prefix C<sdd>
+
+=item C<.rdedk>
+
+random 3 mixed digits plus final (4th) computed check character
+
+=item C<.sdeeedk>
+
+5 sequential mixed digits plus final extended-digit check char
+
+=item C<.zdeek>
+
+sequential digits plus check char, new digits added as needed
+
+=item C<63q.redek>
+
+prefix plus random 4 mixed digits, one of them a check char
+
+=back
+
+The first letter of the Mask, the generator type, determines the order
+and boundedness of the namespace.  For example, in the Template C<.sddd>,
+the Prefix is empty and the C<s> says that the namespace is sequentially
+generated but bounded.  The generator type may be one of,
+
+=over 4
+
+=item C<r>
+
+for quasi-randomly generated identifiers,
+
+=item C<s>
+
+for sequentially generated identifiers, limited in length and
+number by the length of the Mask,
+
+=item C<z>
+
+for sequentially generated identifiers, unlimited in length or
+number, re-using the most significant mask character (the second
+character of the Mask) as needed.
+
+=back
+
+Although the order of minting is not obvious for C<r> type minters,
+it is "quasi-random" in the sense that on your machine a minter created
+with the same Template will always produce the same sequence of noids
+over its lifetime.  Quasi-random is a shade more predictable than
+pseudo-random (which, techically, is as random as computers get).
+This is a feature designed to help noid managers in case they are
+forced to start minting again from scratch; they simply process their
+objects over in the same order as before to recover the original
+assignments.
+
+After the generator type, the rest of the Mask determines the form of
+the non-Prefix part, matching up letter-for-character with each generated
+noid character (an exception for the C<z> case is described below).
+In the case of the Template C<xv.sdddd>, the last four C<d> Mask characters
+say that all identifiers will end with four digits, so the last identifier
+in the namespace is C<xv9999>.
+
+When C<z> is used, the namespace is unbounded and therefore identifiers
+will eventually need to grow in length.  To accommodate the growth, the
+second character (C<e> or C<d>) of the Mask will be repeated as often as
+needed; for instance, when all 4-digit numbers are used up, a 5th digit
+will be added.  After the generator type character, Mask characters have
+the following meanings:
+
+=over 4
+
+=item C<d>
+
+a pure digit, one of { 0123456789 }
+
+=item C<e>
+
+an "extended digit", one of { 0123456789bcdfghjkmnpqrstvwxz }
+(lower case only)
+
+=item C<k>
+
+a computed extended digit check character;
+if present, it must be the final Mask character
+
+=back
+
+The set of extended digits is designed to help create more compact
+noids (a larger namespace for the same length of identifier) and
+discourage "accidental semantics", namely, the introduction of strings that
+have unintended but commonly recognized meanings.  Opaque identifiers are
+desirable in many situations and the absence of vowels in extended digits
+is a step in that direction.  To reduce visual mismatches, there is also
+no letter "l" (ell) because it is often mistaken for the digit "1".
+
+The optional C<k> Mask character, which may only appear at the end, enables
+detection of cases when a single character is mistyped and when two
+adjacent characters have been transposed -- the most common transcription
+errors.  A final C<k> in the Mask will cause a check character to be
+appended after first computing it on the entire identifier generated so
+far, including the NAAN if one was specified at database creation time.
+For example, the final digit C<1> in
+
+        13030/f54x54g11 
+
+was first computed over the string C<13030/f54x54g1> and then added to the end.
+
+=head1 RULEZ<>-Z<>BASED MAPPING
+
+Any Element may be bound to a class of Ids such that retrieval
+against that Element for any Id in the class returns a computed value when
+no stored value exists.  The class of Ids is specified via a regular
+expression (Perl-style) that will be checked for a match against Ids
+submitted via a retrieval operation (B<get> or B<fetch>) that names any
+Element bound in this manner.  If the match succeeds, the element Value
+that was bound with the Id class is used as the right-hand side of a Perl
+substitution, and the resulting transformation is returned.  We call this
+rule-based mapping, and it is probably best explained by working through
+the examples below.
+
+To set up rule-based mapping for an Id class, construct a B<bind> operation
+with an Id of the form C<:idmap/>I<Idpattern>, where I<Idpattern> is a Perl
+regular expression.  Then choose an Element name that you wish to have
+trigger the pattern match check whenever that Element is requested via a
+retrieval operation and a stored value does NOT exist; any Element will
+work as long as you use it for both binding and retrieving.  Finally,
+specify a Value to be used as replacement text that transforms matching
+Ids into computed values via a Perl s/// substitution.  As a simple example,
+
+    noid bind set :idmap/^ft redirect g7h
+
+would cause any subsequent retrieval request against the Element named
+"redirect" to try pattern matching when no stored value is found.
+If the Id begins with "ft", it would then try to replace the "ft" with
+"g7h" and return the result as if it were a stored value.  So if the Id
+were C<ft89xr2t>, the command
+
+   noid get ft89xr2t redirect
+
+would return C<g7h89xr2t>.  Fancier substitutions are possible, including
+replacement patterns that reference subexpressions in the original
+matching I<Idpattern>.  For example, the second command below,
+
+   noid bind set ':idmap/^ft([^x]+)x(.*)' my_elem '$2/g7h/$1'
+   noid get ft89xr2t my_elem
+
+would return C<r2t/g7h/89>.  For ease of implementation, internally this kind
+of binding is stored and reported (which can be confusing) as the special
+noid, C<:idmap/>I<Element>, under element name I<Idpattern>.
+
+=head1 URL INTERFACE
+
+Any number of minters can be operated behind a web server from a browser
+or any tool that activates URLs.  This section describes a one-time set up
+procedure to make your server aware of minters, followed by another set up
+procedure for each minter.  The one-time procedure involves creating a
+directory in your web server document tree where you will place one or
+more noid minter databases.  In this example, the directory is F<htdocs/nd>
+and we'll assume the B<noid> script was originally installed in
+F</usr/local/bin>.
+
+        mkdir htdocs/nd
+        cp -p /usr/local/bin/noid htdocs/nd/
+
+The second command above creates an executable copy of the noid script
+that will be linked to for each minter you intend to expose to the web.
+To make your server recognize such links, include the line
+
+ ScriptAliasMatch ^/nd/noidu(.*) "/srv/www/htdocs/nd/noidu$1"
+
+in your server configuration file and restart the server before trying the
+commands that follow.  If you did not install the supporting F<Noid.pm>
+module normally, you may also have to store a copy of it next to the script.
+This completes the one-time server set up.
+
+Thereafter, for each minter that you wish to expose, it must first be
+allowed to write to its own database when invoked via the web server.
+Because it will be running under a special user at that time, before you
+create it, first become the user that your server runs under.  In this
+example that user is "wwwrun".
+
+        cd htdocs/nd
+        su wwwrun
+        noid dbcreate kt.reeded
+        mkdir kt5
+        mv NOID kt5/
+        ln noid noidu_kt5
+
+The third command above creates a minter for noids beginning with
+C<kt> followed by 5 characters.  The minter is then moved into its own
+directory within F<htdocs/nd>.  Finally, the last command makes a hard
+link (not a soft link) to the noid script, which for this minter will
+be invoked under the name B<noidu_kt5>.
+
+The URL interface is similar to the command line interface, but
+I<Commands> are passed in via the query string of a URL where by
+convention a plus sign ("+") is used instead of spaces to separate
+arguments.  You will likely want to set up access restrictions (e.g.,
+with an F<.htaccess> file) so that only the parties you designate
+can generate identifiers.  There is also no B<dbcreate> command
+available from the URL interface.
+
+To mint one identifier, you could enter the following URL into your
+web browser, but replace "foo.ucop.edu" with your server's name:
+
+    http://foo.ucop.edu/nd/noidu_kt5?mint+1 
+
+Reload to mint again. If you change the 1 to 20, you get twenty new and
+different noids.
+
+    http://foo.ucop.edu/nd/noidu_kt5?mint+20 
+
+To bind some data to an element called "myGoto" under one of the noids
+already minted, 
+
+    http://foo.ucop.edu/nd/noidu_kt5?
+        bind+set+13030/kt639k9+myGoto+http://foo.ucsd.edu/ 
+
+In this case we stored a URL in "myGoto".  This kind of convention can
+underly a redirection mechanism that is part of an organization's overall
+identifier resolution strategy.  To retrieve that stored data, 
+
+  http://foo.ucop.edu/nd/noidu_kt5?get+13030/kt639k9+myGoto 
+
+Bulk operations can be performed over the web by invoking the URL with a
+query string of just "-", which will cause the minter to look for noid
+commands, one per line, in the POST data part of the HTTP request.  If
+you put noid commands in a file F<myCommands> and run the Unix utility
+
+  curl --data-binary @myCommands \
+    'http://foo.ucop.edu/nd/noidu_kt5?-'
+
+you could, for example, change the "myGoto" bindings for 500 noids
+in that one shell command.  The output from each command in the file
+will be separated from the next (on the standard output) by a blank line.
+
+=head1 NAME RESOLUTION AND REDIRECTION INTERFACE
+
+In a URI context, I<name resolution> is a computation, sometimes
+multi-stage, that translates a name into associated information of a
+particular type, often another name or an address.  A I<resolver> is
+a system that can perform one or more stages of a resolution.  Noid
+minters can be set up as resolvers.
+
+In our case, we're interested in automatically translating access
+requests for each of a number of identifiers into requests for another
+kind of identifier.  This is one tool in the persistent access strategy
+for naming schemes such as URL, ARK, PURL, Handle, DOI, and URN.  You
+can use a noid minter to bind a second name to each identifier, even
+to identifiers that the minter did not generate.  In principle, this
+will work with names from any scheme.
+
+With web browsers, a central mechanism for name resolution is known as the
+server redirect, and mainstream web servers can easily be configured to
+redirect a half million different names without suffering in performance.
+You might choose not to use native web server redirects if you require
+resolution of several million names, or if you require software and
+infrastructure for non-URL-based names.  Whatever your choice, maintaining
+a table that maps the first name to the second is an unavoidable burden.
+
+As with the URL interface, any number of resolvers (minters underneath)
+can be operated behind a web server from a browser or a tool that
+activates URLs.  This section describes a one-time set up procedure to
+make your server aware of resolvers, followed by another set up procedure
+for each resolver.  The one-time procedure involves creating a directory
+in your web server document tree where you will place one or more noid
+resolver databases.  In this example (and in the previous example),
+we use F<htdocs/nd>:
+
+        mkdir htdocs/nd
+        cp -p /usr/local/bin/noid htdocs/nd/
+
+The second command above creates an executable copy of the noid script
+that will be linked to for each resolver you intend to expose.  To make
+your server recognize such links, include the line (this is slightly
+different from the similar line in the previous section),
+
+ ScriptAliasMatch ^/nd/noidr(.*) "/srv/www/htdocs/nd/noidr$1"
+
+in your server configuration file.  If you did not install the supporting
+F<Noid.pm> module normally, you may also have to store a copy of it next
+to the script.  Then include the following lines in the configuration file;
+they form the start of a rewriting rule section that you will add to later
+for each resolver that you set up.
+
+        RewriteEngine on
+        # These next two files and their containing
+        # directory should be owned by "wwwrun".
+        RewriteLock   /var/log/rewrite/lock
+        RewriteLog    /var/log/rewrite/log
+        ## RewriteLogLevel 9
+
+The non-comment lines above initialize the rewriting system, identify the
+lock file used to synchronize access to the resolver, and identify the log
+file which can help in finalizing the exact rewrite rules that you use;
+disable logging with the default RewriteLogLevel value of 0, or set it as
+high as 9, with higher numbers producing more detailed information.
+This completes the one-time server set up for resolvers.
+
+Thereafter, for each resolver that you wish to run, you need to set up
+a noid database and create a link of the form B<noidr...> so that the
+noid script can be invoked in resolution mode.  Unlike the URL interface,
+the resolution interface does not itself mint from the underlying minter.
+A separate URL interface may still be set up to mint and bind identifiers
+in the resolver database, or minting and binding can take place off the net.
+
+In what follows, we will assume that you have set up a noid database with
+the same location and template as in the previous section.  As before, the
+server is assumed to run under the user "wwwrun" and the database resides
+in F<htdocs/nd/kt5>.  As if our intentions included persistent identification,
+the minter in this example is for generating long term identifiers.
+
+        cd htdocs/nd
+        noid dbcreate kt.reeded long 13030 cdlib.org dpg
+        mkdir kt5
+        mv NOID kt5/
+        ln noid noidr_kt5
+
+The last command makes a new hard link (not a soft link) to the noid
+script, which for this resolver will be invoked under the name B<noidr_kt5>.
+The resolution interface is not called by a URL directly, but is invoked
+once upon server startup, where the B<noidr...> prefix tells it to run in
+resolution mode.  In this mode it loops, waiting for and responding to
+individual resolution attempts from the server itself.
+
+To set up an individual resolver, define a Rewrite Map followed by a set
+of Rewrite Rules.  This is done using server configuration file lines as
+shown in the next example.  As with any change to the file, you will need
+to restart the server before it will have the desired effect.
+
+ # External resolution; start program once on server start
+ RewriteMap  rslv           prg:/srv/www/htdocs/nd/noidr_kt5
+ # Main lookup; add artificial prefix for subsequent testing
+ RewriteRule ^/ark:/(13030/.*)$ "_rslv_${rslv:get $1 myGoto}"
+
+ # Test: redirect [R] if it looks like a redirect
+ RewriteRule ^_rslv_([^:]*://.*)$    $1 [R]
+ # Test: strip prefix; pass through [PT] if intended for us
+ RewriteRule ^_rslv_(/.*)$           $1 [PT]
+ # Test: restore value if lookup failed; let come what may
+ RewriteRule ^_rslv_$                %{REQUEST_URI}
+ # Alternative: redirect failed lookup to a global resolver
+
+When a request received by the server matches a Rewrite Rule, an attempt
+to resolve it via the running B<noidr...> script is made.  In this example,
+we will need to have bound a string representing a URL to the value for
+the fixed element name "myGoto" under each identifier that we wish to be
+resolvable.  Building on the example from the previous section, assume the
+element "myGoto" holds the same URL as before for the noid C<13030/kt639k9>.
+A browser retrieval request made by entering or clicking on
+
+        http://foo.ucop.edu/ark:/13030/kt639k9
+
+would then result in a server redirect to
+
+        http://foo.ucsd.edu/ 
+
+The resolution result for an identifier is whatever the B<get> returns,
+which could as easily have retrieved a stored value as a rule-based
+value (allowing you to redirect many similar identifiers with one rule).
+
+This approach to resolution does not address resolver discovery.
+An identifier found in the wild need not easily reveal whether it is
+actionable or resolvable, let alone which system or resolver to ask.
+The usual strategy for contemporary (web era) identifier schemes relies
+on well-known, scheme-dependent resolvers and web proxying of identifiers
+embedded in URLs.  For example, global resolution for a non-proxied URN
+or Handle uses an undisclosed internet address, hard-coded into the
+resolver program, from which to start the resolution process.  An ARK,
+PURL, or proxied Handle or URN tend to rely on a disclosed starting point.
+Whatever method is used for discovery, a noid resolver can in principle
+be used to resolve identifiers from any scheme.
+
+=head1 NOID CHECK DIGIT ALGORITHM
+
+The following describes the Noid Check Digit Algorithm (NCDA).  Digits
+in question are actually "extended digits", or I<xdigits>, which form
+an ordered set of I<R> digits and characters.  This set has radix I<R>.
+In the examples below, we use a specific set of I<R=29> xdigits.
+
+When applied to substrings of well-formed identifiers, where the length
+of the substring is less than I<R>, the NCDA is "perfect" for single digit
+and transposition errors, by far the most common user transcription errors
+(see David Bressoud, Stan Wagon, "Computational Number Theory, 2000, Key
+College Publishing").  The NCDA is complemented by well-formedness rules
+that confirm the placement of constant data, including fixed labels and
+any characters that are not extended digits.  After running the NCDA on
+the selected substring, the resulting check digit, an xdigit actually,
+is used either for comparing with a received check digit or for appending
+to the substring prior to issuing the identifier that will contain it.
+
+For the algorithm to work, the substring in question must be less than
+I<R> characters.  The extended digit set used in the current instance is
+a sequence of I<R=29> printable characters defined as follows:
+
+    xdigit:  0  1  2  3  4  5  6  7  8  9  b  c  d  f  g
+     value:  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14
+
+    xdigit:  h  j  k  m  n  p  q  r  s  t  v  w  x  z
+     value: 15 16 17 18 19 20 21 22 23 24 25 26 27 28
+
+Each xdigit in the identifier has the corresponding ordinal value shown.
+Any character not in the xdigit set is considered in the algorithm to
+have an ordinal value of zero.
+
+A check digit is an xdigit computed from the base substring and then
+appended to form the "checked substring" (less than I<R+1> characters long).
+To determine if a received identifier has been corrupted by a single
+digit or transposition error, the relevant substring is extracted and
+its last character is compared to the result of the same computation
+performed on the preceding substring characters.
+
+The computation has two steps.  Consider a base substring (no check
+digit appended) such as
+
+C<    13030/xf93gt2        >(base substring)
+
+Step 1.  Check that the substring is well-formed, that is, that all
+non-xdigit characters (often constant character data) are exactly
+where expected; if not, the substring is not well-formed and the
+computation aborts.  (This step is required to accommodate characters
+such as "/" that contribute nothing to the overall computation.)
+
+Step 2.  Multiply each character's ordinal value by its position number
+(starting at position 1), and sum the products.  For example,
+
+ char: 1   3   0   3   0   /   x   f   9   3   g   t   2
+  ord: 1   3   0   3   0   0  27  13   9   3  14  24   2
+  pos: 1   2   3   4   5   6   7   8   9  10  11  12  13
+ prod: 1 + 6 + 0 +12 + 0 + 0+189+104 +81 +30+154+288 +26=891
+
+Step 3.  The check digit is the xdigit whose ordinal value is that sum
+modulo I<R> (divide the sum by I<R> and take the remainder).
+
+In the example, I<891 = 21> mod I<R> (29) and so the check digit is C<q>.
+This is appended to obtain the "checked substring", which is
+
+C<    13030/xf93gt2q	   >(substring with check digit appended)
+
+What follows is a two-part proof that this algorithm is "perfect" with
+respect to single digit and transposition errors.
+
+B<Lemma 1:>  The NCDA is guaranteed against single-character errors.
+
+Proof:  We must prove that if two strings differ in one single character,
+then the check digit (xdigit) also differs.  If the I<n>-th xdigit's
+ordinal is I<d> in one string and I<e> in another, the sums of products
+differ only by
+
+   (... + nd + ...) - (... + ne + ...) = n(d - e)
+
+The check digits differ only if I<n(d - e)> is not I<0> mod I<R>.  Assume
+(contrapositively) that I<n(d - e)> does equal I<0> mod I<R>.  First, we
+know that I<n(d - e)> is not zero because I<n> is positive and I<d> is
+different from I<e>.  Therefore, there must be at least one positive
+integer I<i> such that
+
+   n(d - e) = Ri     =>     (n/i)(d - e) = R
+
+Now, because I<R> is prime,
+
+   either   (a)  n/i = 1    and   d - e = R
+   or       (b)  n/i = R    and   d - e = 1
+
+But (a) cannot hold because xdigit ordinals differ by at most I<R-1>.
+This leaves (b), which implies that there is an integer I<i = n/R>.
+But since I<R> is prime and I<n> (a position number) is a positive
+integer less than I<R>, then I<S<0 E<lt> i E<lt> 1>>, which cannot be true.
+So the check digits must differ.
+
+B<Lemma 2:>  The NCDA is guaranteed against transposition of two single
+characters.
+
+Proof:  Non-contributing characters (non-xdigits) transposed with other
+characters will be detected in Step 1 when checking the constraints for
+well-formedness (e.g., the "/" must be at position 6 and only at position
+6).  Therefore we need only consider transposition of two xdigit
+characters.  We must prove that if one string has an xdigit of ordinal
+I<e> in position I<i> and an xdigit of ordinal I<d> in position I<j>,
+and if another string is the same except for having I<d> in position I<i>
+and I<e> in position I<j>, then the check digits also differ.  The sums
+of the products differ by
+
+   (... + ie + ... + jd + ...) - (... + id + ... + je + ...)
+       = (ie + jd) - (id + je) = e(i - j) + d(j - i)
+       =  d(j - i) - e(j - i)  = n(d - e)
+
+where I<< n = j - i > 0 >> and I<< n < R >>.  The check digits differ
+only if I<n(d - e) = 0> mod I<R>.  This reduces to the central statement
+of Lemma 1, which has been proven.
+
+=head1 TO DO
+
+Add features that are documented but not implemented yet:  Element-Value
+binding upon minting; the B<peppermint> command.  The B<append> and
+B<prepend> kinds of binding currently have string-level semantics
+(new data is added as characters to an existing element); should there
+also be list-level semantics (new data added as an extra subelement)?
+
+Add extra options for B<dbcreate>.  An option to specify one or more
+identifier labels to strip from requests, and one canonical label to
+add upon minting and reporting.  An option to set the initial seed for
+quasi-random ordering.  Utilize the granular BerkeleyDB transaction and
+locking protection mechanisms.
+
+Extend the Template Mask to allow for other character repertoires with
+prime numbers of elements.  These would trade a some eye-friendliness
+for much more compact identifiers (cf. UUID/GUID), possibly also a way
+of asking that the last character of the repertoire only appear in the
+check character (e.g., for i and x below).
+
+ { 0-9 x }			 cardinality 11, mask char i
+ { 0-9 a-f _ }			 cardinality 17, mask char x
+ { 0-9 a-z _ }			 cardinality 37, mask char v
+ { 1-9 b-z B-Z } - {l, vowels}	 cardinality 47, mask char E
+ { 0-9 a-z A-Z # * + @ _ }	 cardinality 67, mask char w
+ Visible ASCII - { % - . / \ } 	 cardinality 89, mask char c
+
+Add support for simple file management associated with identifiers.
+For example, minting (and reminting) the noid C<xv8t984> could result in
+the creation (and re-creation) of a corresponding canonical directory
+C<xv/8t/98/4/>.
+
+=head1 BETA SOFTWARE
+
+This utility is in the beta phase of development.  It is open source
+software written in the Perl scripting language with strictest type,
+value, and security checking enabled.  While its readiness for
+long term application is still being evaluated, it comes with a
+growing suite of regression tests (currently about 250).
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2002-2006 UC Regents.  BSD-type open source license.
+
+=head1 BUGS
+
+Under case-insensitive file systems (e.g., Mac OS X), there is a chance
+for conflicts between the directory name F<NOID>, script name F<noid>,
+and module documentation requested (via perldoc) as F<Noid>.
+
+Not yet platform-independent.
+
+Please report bugs to jak at ucop dot edu.
+
+=head1 FILES
+
+=over 17
+
+=item F<NOID>
+
+directory containing all database files related to a minter
+
+=item F<NOID/noid.bdb>
+
+the BerkeleyDB database file at the heart of a minter
+
+=item F<NOID/README>
+
+the creation record containing minter analysis details
+
+=back
+
+=head1 SEE ALSO
+
+L<dbopen(3)>, L<perl(1)>, L<uuidgen(1)>, L<http://www.cdlib.org/inside/diglib/ark/>
+
+=head1 AUTHORS
+
+John A. Kunze, Michael A. Russell
+
+=head1 PREREQUISITES
+
+Perl Modules: L<Noid>, L<BerkeleyDB>, L<Config>, L<Text::ParseWords>,
+L<Getopt::Long>, L<Fcntl>, L<Sys::Hostname>
+
+Script Categories:
+
+=pod SCRIPT CATEGORIES
+
+CGI
+UNIX : System_administration
+Web
+
+=cut

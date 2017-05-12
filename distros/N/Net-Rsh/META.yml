@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name: Net-Rsh
+abstract: Perl client for Rsh protocol
+version: 0.05
+author:
+  - Oleg Prokopyev <riiki@cpan.org>
+  - Marc Aslett <aslett@cpan.org>  # co-maintainer
+license: perl
+distribution_type: module
+version_from: Rsh.pm
+installdirs: site
+provides:
+  Net::Rsh:
+    file: lib/Net/Rsh.pm
+    version: 0.05
+
+requires:
+  IO::Socket: 0
+  Errno: 0
+
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test: 0
+
+urls:
+  license: http://dev.perl.org/licenses/
+meta-spec:
+  version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html

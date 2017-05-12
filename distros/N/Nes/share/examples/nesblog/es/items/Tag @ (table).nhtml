@@ -1,0 +1,151 @@
+<h2><a href="#">&#123;: @ (table) <strong>HTML</strong> :&#125;</a></h2>
+<h3>Descripción</h3> 
+<p>
+El bloque se sustituye y se repite por &quot;HTML&quot; tantas veces como 
+registros tenga Table. 
+</p>
+<p>
+Podemos hacer referencia a cada campo de cada registro con:
+<br>
+<br>
+<b>&#123;: @$ table.field :&#125;</b>
+<br>
+<br>
+Donde "<i>field</i>" es el nombre del campo de la tabla. <i>&#123;: @$ table.field :&#125;</i>
+ es una propiedad de <i>&#123;: @ (table) <strong>HTML</strong> :&#125;</i> por lo que
+ sólo tiene valor dentro del bloque table:
+<pre>
+    &lt;table border="1"&gt;
+    &#123;: @ usuarios
+      &lt;tr&gt;
+        &lt;td&gt; &#123;: @$ usuarios.name  :&#125; &lt;/td&gt;
+        &lt;td&gt; &#123;: @$ usuarios.email :&#125; &lt;/td&gt;
+      &lt;/tr&gt;
+    :&#125;
+    &lt;/table&gt;
+    
+    &#123;: @$ usuarios.email :&#125; <- ERROR, no tendrá ningún valor aquí.
+    
+</pre>
+</p>
+<p>
+Table ha de ser definido en nuestro script Perl como un <b><i>array of hashes reference</i></b>:
+<pre>
+  my $table = [ 
+                    { 
+                      name   => 'pepito',
+                      email  => 'pepito@example.com',
+                    },
+                    { 
+                      name   => 'juanin',
+                      email  => 'juanin@example.com',
+                    },
+                    { 
+                      name   => 'paca',
+                      email  => 'paca@example.com',
+                    }                                    
+              ];
+
+</pre>
+* Algunos módulos como DBI devuelven un <b><i>array hash reference</i></b> para
+ los registros, de esta forma no es necesaria conversión alguna.
+</p>
+
+<br><br>
+<h3>Seguridad</h3> 
+<p> 
+ Ver: <a href="./?item=Seguridad">Inyección de código y Cross-site scripting</a>.
+</p>
+
+<p>
+<h3>Inclusión</h3> 
+<p> 
+Los parámetros no permiten la inclusión:
+<pre> 
+    &lt;table border="1"&gt;
+    &#123;: @ ( '&#123;: $ table :&#125;' ) <- ERROR
+      &lt;tr&gt;   &#123;: # Los comentarios siempre se pueden incluir :&#125; <- Ok
+        &lt;td&gt; &#123;: @$ table.field1  :&#125; &lt;/td&gt;
+        &lt;td&gt; &#123;: @$ table.field2 :&#125; &lt;/td&gt;
+      &lt;/tr&gt;
+    :&#125;
+    &lt;/table&gt;
+
+</pre>
+</p>
+</p>
+
+<p>
+<h3>Ejemplo</h3>
+<p>
+<strong>archivo.nhtml:</strong>
+<pre>
+&#123;: NES 1.0 ('archivo.pl') :&#125;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Nes sample/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;table border="1"&gt;
+    &#123;: @ usuarios
+      &lt;tr&gt;
+        &lt;td&gt; &#123;: @$ usuarios.name  :&#125; &lt;/td&gt;
+        &lt;td&gt; &#123;: @$ usuarios.email :&#125; &lt;/td&gt;
+      &lt;/tr&gt;
+    :&#125;
+    &lt;/table&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+
+</pre>
+
+<strong>archivo.pl:</strong>
+<pre>   
+use Nes;
+
+my $nes = Nes::Singleton->new('archivo.nhtml');
+
+my $nes_tags = {};
+
+my $users = [ 
+                { 
+                  name   => 'pepito',
+                  email  => 'pepito@example.com',
+                },
+                { 
+                  name   => 'juanin',
+                  email  => 'juanin@example.com',
+                },
+                { 
+                  name   => 'paca',
+                  email  => 'paca@example.com',
+                }                                    
+          ];
+
+$nes_tags->{'usuarios'} = $users;
+
+$nes->out(%$nes_tags);
+
+</pre>
+
+<strong>Salida:</strong>
+<br>
+<br>
+ <table border="1">
+   <tr>
+     <td> pepito </td>
+     <td> pepito@example.com </td>
+   </tr>
+   <tr>
+     <td> juanin </td>
+     <td> juanin@example.com </td>
+   </tr>
+   <tr>
+     <td> paca </td>
+     <td> paca@example.com </td>
+   </tr>
+ </table>
+
+
+</p>
+<br>

@@ -1,0 +1,48 @@
+NAME
+    Net::IP::AddrRanges - IP address ranges to match
+
+SYNOPSIS
+      use Net::IP::AddrRanges;
+  
+      my $ranges = Net::IP::AddrRanges->new();
+      $ranges->add(
+        '192.168.0.0/24',               # CIDR style
+        '192.168.1.64/255.255.255.240', # netmask style
+        '192.168.3.23',                 # single address
+        '64::1/64',                     # IPv6 address range
+        '192.168.5.23-192.168.12.3',    # from-to
+      );
+      $ranges->subtract('192.168.0.64/27'); # excludes this range
+
+      $ranges->find('192.168.0.1');  # True 
+      $ranges->find('192.168.0.70'); # False
+
+DESCRIPTION
+    Net::IP::AddrRanges is to represent a list of IP address ranges.
+
+METHODS
+    new()
+        Construct new object. any arguments are passed to add();
+
+    add(@ranges)
+        Adds IP address ranges to the list. this accepts single, hyphenated,
+        netmask style and CIDR style IP address ranges.
+
+    subtract(@ranges)
+        Subtract IP address ranges from the list. this accepts same
+        arguments as "add()"
+
+    find($ip_address)
+        Finds passed IP address from the list. Returns true if found, false
+        otherwise.
+
+AUTHOR
+    Rintaro Ishizaki <rintaro@cpan.org>
+
+SEE ALSO
+    Net::CIDR::Lite - yet another
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,13 @@
+Revision history for Perl extension Net::ParSCP.
+
+0.02  jue mar 26 07:52:31 WET 2009 
+        - upload to CPAN
+        - path language: allow for expressions depending on the target machine
+        - allow source to be remote (only one machine)
+            parpush machine:filepath destinations ..
+        - source files: allow several files protected by quotes
+        - several inputs
+0.01  Mon Mar 23 12:16:29 2009
+	- original version; created by h2xs 1.23 with options
+		-XA -n Net::ParSCP
+

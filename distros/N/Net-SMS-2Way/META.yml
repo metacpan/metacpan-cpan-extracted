@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Net-SMS-2Way
+version:             0.08
+abstract:            BulkSMS API
+license:             ~
+author:              
+    - Lee S. Engel <lee@kode.co.za>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    HTTP::Request:                 1.4
+    LWP::UserAgent:                2.031
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

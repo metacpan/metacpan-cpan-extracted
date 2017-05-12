@@ -1,0 +1,6 @@
+name = "Net-Marathon"
+# badges = ["travis"]
+authority="cpan:TYNOVSKY"
+
+module_maker="ModuleBuildTiny"
+

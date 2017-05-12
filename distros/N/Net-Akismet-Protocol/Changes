@@ -1,0 +1,8 @@
+Revision history for Perl extension Net::Akismet::Protocol.
+
+0.02  2008-06-06 10:43:00
+    - Added missing live test.
+    - Pod fixes.
+    
+0.01  2008-06-05 11:36:08
+	- Adopted from Net::Akismet

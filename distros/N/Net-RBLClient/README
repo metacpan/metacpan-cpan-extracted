@@ -1,0 +1,9 @@
+This module is used to discover what RBL's are listing a particular
+IP address.  It parallelizes requests for fast response.
+
+INSTALL:
+
+perl Makefile.PL
+make
+make install
+

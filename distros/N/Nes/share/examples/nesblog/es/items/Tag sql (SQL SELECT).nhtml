@@ -1,0 +1,149 @@
+<h2><a href="#">&#123;: sql (SQL SELECT) <strong>HTML</strong> :&#125;</a></h2>
+<h3>Descripción</h3> 
+<p>
+El bloque se sustituye y se repite por &quot;<i>HTML</i>&quot; por cada registro
+ devuelto por la consulta. El funcionamiento es similar al 
+ <a href="./?item=Tag @ (table)">Tag @</a>. 
+ La sentencia <i>SQL</i> debe empezar por <i>SELECT</i>.
+</p>
+<p>
+Podemos hacer referencia a cada campo de cada registro con:
+<br>
+<br>
+<b>&#123;: @$ table.field :&#125;</b>
+<br>
+<br>
+Donde "<i>field</i>" es el nombre del campo de la tabla. &#123;: @$ table.field :&#125;
+ es una propiedad de &#123;: @ (table) <strong>HTML</strong> :&#125; por lo que 
+ sólo tiene valor dentro del bloque table:
+<pre>
+    &lt;table border="1"&gt;
+    &#123;: sql (
+              'SELECT * FROM `table` 
+                        WHERE 1 
+                        LIMIT 5;'
+           )
+      &lt;tr&gt;
+        &lt;td&gt; &#123;: @$ table.name  :&#125; &lt;/td&gt;
+        &lt;td&gt; &#123;: @$ table.email :&#125; &lt;/td&gt;
+      &lt;/tr&gt;
+    :&#125;
+    &lt;/table&gt;
+    
+    &#123;: @$ table.email :&#125; <- ERROR, no tendrá ningún valor aquí.
+</pre>
+</p>
+<p>
+Lee de la configuración (<i>.nes.cfg</i>) las siguientes 
+ variables para acceder a la base de datos:
+<pre>
+    DB_base    = base_name
+    DB_user    = user
+    DB_pass    = password
+    DB_driver  = mysql      # Valor por defecto: mysql
+    DB_host    = localhost  # Valor por defecto: localhost
+    DB_port    = 3306       # Valor por defecto: 3306
+
+</pre>
+<p>
+Aunque podemos incluir el <i>Tag sql</i> en cualquier archivo, Nes define un 
+ tipo de archivo para las sentencias SQL: <i>.nsql</i>
+</p>
+Con <i>include</i> se pueden enviar estas variables como parámetros a los archivos de
+tipo <i>nsql</i>:
+<pre>
+
+&#123;: include ('file.nsql','base_name','user','password','driver','host','port') :&#125;
+
+</pre>
+</p>
+
+<h3>Seguridad</h3> 
+<p> 
+ Ver: <a href="./?item=Seguridad">Inyección de código y Cross-site scripting</a>.
+</p>
+
+<p>
+<h3>Inclusión</h3> 
+<p> 
+Los parámetros permiten la inclusión:
+<pre> 
+    &lt;table border="1"&gt;
+    &#123;: sql (
+              'SELECT * FROM &#123;: $ table :&#125;
+                        WHERE &#123;: $ condition :&#125;
+                        LIMIT 5;'
+           )
+      &lt;tr&gt;
+        &lt;td&gt; &#123;: @$ table.name  :&#125; &lt;/td&gt;
+        &lt;td&gt; &#123;: @$ table.email :&#125; &lt;/td&gt;
+      &lt;/tr&gt;
+    :&#125;
+    &lt;/table&gt;
+</pre>
+</p>
+</p>
+
+<p>
+<h3>Ejemplo</h3>
+<p>
+<strong>archivo.nsql:</strong>
+<pre>
+&#123;: NES 1.0 ('archivo.pl') :&#125;
+
+    &lt;table border="1"&gt;
+    &#123;: sql (
+              'SELECT * FROM `users` 
+                        WHERE &#123;: $ condition  :&#125;
+                        LIMIT 3;'
+           )
+      &lt;tr&gt;
+        &lt;td&gt; &#123;: @$ users.name  :&#125; &lt;/td&gt;
+        &lt;td&gt; &#123;: @$ users.email :&#125; &lt;/td&gt;
+      &lt;/tr&gt;
+    :&#125;
+    &lt;/table&gt;
+    
+</pre>
+
+<strong>archivo.pl:</strong>
+<pre>   
+use Nes;
+
+my $nes = Nes::Singleton->new('archivo.nsql');
+
+my $nes_tags = {};
+
+$nes_tags->{'condition'} = 1;
+
+$nes->out(%$nes_tags);
+
+</pre>
+
+<strong>Salida:</strong>
+<br>
+<br>
+ <table border="1">
+   <tr>
+     <td> pepito </td>
+     <td> pepito@example.com </td>
+   </tr>
+   <tr>
+     <td> juanin </td>
+     <td> juanin@example.com </td>
+   </tr>
+   <tr>
+     <td> paca </td>
+     <td> paca@example.com </td>
+   </tr>
+ </table>
+
+
+</p>
+<br>
+<strong>Notas:</strong>
+<p>
+Se ha limitado explícitamente a sentencias <i>SELECT</i> la ejecución de <i>SQL</i> con éste Tag
+ para cumplir con la política de Nes de que los html/plantillas no modifiquen los datos.
+</p>
+

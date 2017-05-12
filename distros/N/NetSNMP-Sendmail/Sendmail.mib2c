@@ -1,0 +1,128 @@
+## SNMP Sendmail Statistics Module
+## Copyright (C) 2015 Sergey Poznyakoff <gray@gnu.org>
+##
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation; either version 3, or (at your option)
+## any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+@startperl@
+
+$vars{'sendmail_translate'} = sub {
+    my $name = shift;
+    if ($name eq 'queueTotal') {
+	$vars{'fn_table'} = 0;
+	$vars{'fn_get'} = "get_$name";
+    } elsif ($name =~ /^((queue)|(total)|(connection))/) {
+	$vars{'fn_table'} = 1;
+	$vars{'fn_get'} = "$1_table_get";
+    } else {
+	$vars{'fn_table'} = 0;
+	$vars{'fn_get'} = "get_$name";
+    }
+    return 0;
+};
+
+$vars{agentname} = $vars{name};
+$vars{agentname} =~ s/\.pm//; 
+$vars{tempfile} = "$vars{agentname}.tmp";
+
+my $oid = new NetSNMP::OID($vars{'oid'});
+$vars{rootoid} = '.' . join('.', $oid->to_array());
+
+0;
+@endperl@
+@open ${tempfile}@
+# Hash for all OIDs
+@printf "my %soidtable={\n", $@
+@foreach $t table@
+  @eval $needwalker = 1@   ## Need the walker and checker once this table
+  @foreach $c nonindex@    
+    @if $c.accessible @
+      ##
+      ## Generate the entry for the hash table
+      ## We first calculate the number of index items for this table
+      @eval $numindex = 0@
+      @eval $idxelem = ""@
+      @foreach $i index@
+        @perleval $vars{'idxelem'} .= '.0'; 0; @
+        @eval $numindex = $numindex + 1; @
+      @end@
+    @eval $idxoffset = $c.oidlength@
+    "$c.objectID$idxelem" => {
+	func     => sub { get_$t('$c', $c.oidlength, @_) },
+	type     => $c.type,
+	check    => sub { check_$t($c.oidlength, @_) },
+        nextoid  => sub { next_$t($c.oidlength, @_) },
+	istable  => '1',
+	next     => "",
+	numindex => $numindex
+     },
+    @end@
+  @end@
+@end@
+## output the hash with the OIDs and handlers
+## Scalars have a single index element
+# Scalars
+@foreach $s scalar@
+  @if $s.accessible@
+    @startperl@
+    &{$vars{'sendmail_translate'}}($vars{s});
+    @endperl@
+    '$s.objectID.0' => {
+      @if $fn_table@
+        func     => sub { $fn_get('$s', @_) },
+      @else@
+	func     => \&$fn_get,
+      @end@
+	istable  => 0,
+        type     => $s.type,
+	next     =>"",
+	numindex => 1
+    },	
+  @end@
+@end@
+##End of the OID hash
+};
+
+## Emit code to register the top level oid with the agent
+## The $oid variable comes from mib2c as the last non option arg
+# Register the top oid with the agent
+my $@agent = new NetSNMP::agent('Name' => '$agentname');
+registerAgent($@agent, '$rootoid', $@oidtable);
+
+@close ${tempfile}@
+@startperl@
+use File::Copy;
+use IO::Handle;
+use autodie;
+
+print "creating $vars{name}\n";
+
+open(FILE, '>', $vars{name});
+
+printflush FILE "# THIS FILE IS GENERATED AUTOMATICALLY.  PLEASE DO NOT EDIT.\n";
+
+copy($vars{prologue}, \*FILE) if defined $vars{prologue};
+copy($vars{tempfile}, \*FILE);
+copy($vars{epilogue}, \*FILE) if defined $vars{epilogue};
+
+# Use concatenation to prevent Emacs from handling this as local variables
+# block
+print FILE "# Local " . "variables:\n";
+print FILE "# buffer" . "-read-only: t\n";
+print FILE "# End:\n";
+print FILE "# vi: set ro:\n";
+
+close FILE;
+unlink $vars{tempfile};
+0;
+@endperl@
+    

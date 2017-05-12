@@ -1,0 +1,45 @@
+{
+   "abstract" : "Object-oriented API to the BGP protocol",
+   "author" : [
+      "Stephen J. Scheck <sscheck@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-BGP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::Harness" : "2.00",
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Select" : "0",
+            "IO::Socket" : "0",
+            "List::Util" : "1.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.16"
+}

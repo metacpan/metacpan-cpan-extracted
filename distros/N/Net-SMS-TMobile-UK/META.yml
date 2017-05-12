@@ -1,0 +1,23 @@
+---
+name: Net-SMS-TMobile-UK
+version: 0.03
+author:
+  - 'Ben Charlton <benc@cpan.org>'
+abstract: Send SMS Messages via the T-Mobile UK Website.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Crypt::SSLeay: 0
+  HTTP::Request::Common: 0
+  LWP::UserAgent: 0
+build_requires:
+  Test::More: 0
+provides:
+  Net::SMS::TMobile::UK:
+    file: lib/Net/SMS/TMobile/UK.pm
+    version: 0.03
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

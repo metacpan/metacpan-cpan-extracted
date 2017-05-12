@@ -1,0 +1,311 @@
+			Net-SC version 1.20
+			===================
+
+				INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+			COPYRIGHT AND LICENCE
+
+    Copyright (C) by  Okunev Igor gosha@prv.mts-nn.ru 2002-2006
+
+    All rights reserved. This program is free software;
+    you can redistribute it and/or modify it under the
+    same terms as Perl itself.
+																
+
+			===================
+
+
+NAME
+    Net::SC - perl module for create the chain from the SOCKS/HTTP proxies.
+
+SYNOPSIS
+     # CONNECT TO HOST
+     # ----------------
+
+     ...
+     $self = new Net::SC(
+                         Timeout         => ( $opt{'to'}  || 10      ),
+                         Chain_Len       => ( $opt{'l'}   || 2       ),
+                         Debug           => ( $opt{'d'}   || 0x04    ),
+                         Log_File        => ( $opt{'lf'}  || undef   ),
+                         Random_Chain    => ( $opt{'rnd'} || 0       ),
+                         Auto_Save       => 1
+                      );
+
+     die unless ref $self;
+
+     unless ( ( $rc = $self->connect( $host, $port ) ) == SOCKS_OKAY ) {
+       print STDERR "Can't connect to $host:$port [".( socks_error($rc) )."]\n";
+       exit;
+     }
+
+     $sh = $self->sh;
+
+     print $sh, "Hello !!!\n";
+     ...
+
+     --- or ---
+
+     ...
+     $self = new Net::SC(
+                         Timeout         => ( $opt{'to'}  || 10      ),
+                         Chain_Len       => ( $opt{'l'}   || 2       ),
+                         Debug           => ( $opt{'d'}   || 0x04    ),
+                         Random_Chain    => ( $opt{'rnd'} || 0       ),
+                         Auto_Save       => 0,
+                         Chain_File_Data => [
+                                              '200.41.23.164:1080:::4:383 b/s Argentina',
+                                              '24.232.88.160:1080:::4:1155 b/s Argentina',
+                                              '24.2.8.160:3128:::0:HTTP proxy',
+                                            ],
+                      );
+
+     die unless ref $self;
+
+     unless ( ( $rc = $self->connect( $host, $port ) ) == SOCKS_OKAY ) {
+       print STDERR "Can't connect to $host:$port [".( socks_error($rc) )."]\n";
+       exit;
+     }
+
+     $sh = $self->sh;
+
+     print $sh, "Hello !!!\n";
+     ...
+     $self->close;
+     ...
+
+     #  BIND THE PORT ( only SOCKS [4/5] proxies )
+     # ---------------
+ 
+     ...
+     $self = new Net::SC(
+                         Timeout         => ( $opt{'to'}  || 10      ),
+                         Chain_len       => ( $opt{'l'}   || 2       ),
+                         Debug           => ( $opt{'d'}   || 0x04    ),
+                         Log_file        => ( $opt{'lf'}  || undef   ),
+                         Random_chain    => ( $opt{'rnd'} || 0       ),
+                         Auto_save       => 1
+                      );
+
+     die unless ref $self;
+
+     unless ( ( $rc = $self->bind( $host, $port ) ) == SOCKS_OKAY ) {
+       print STDERR "Can't bind port [".( socks_error($rc) )."]\n";
+       exit;
+     }
+
+     print STDOUT "Binding the port : ",
+                   $self->socks_param('listen_port'), "\n";
+     print STDOUT "     in the host : ",
+                   $self->socks_param('listen_addr'), "\n";
+     print STDOUT "     for $host\n";
+        
+     $self->configure( TIMEOUT => 45 );
+     unless ( ( $rc = $self->accept() ) == SOCKS_OKAY ) {
+            return $rc;
+     } else {
+       $sh = $self->sh;
+     }
+ 
+     print STDOUT 'Connect from: ',
+                            $self->socks_param('listen_addr'), ':',
+                            $self->socks_param('listen_port'), "\n";
+
+     print $sh 'Hello : ', $self->socks_param('listen_addr'), "\n";
+     print $sh ' port : ', $self->socks_param('listen_port'), "\n";
+
+     print STDOUT <$sh>;
+     ...
+ 
+    For more information see examples: telnet_over_socks_chain.pl and
+    accept_over_socks_chain.pl
+
+DESCRIPTION
+  CONSTRUCTOR
+    new
+          TIMEOUT         - Time Out in seconds.
+
+          CHAIN_LEN       - Length of chain.
+
+          DEBUG           - Debug level ( 0x00 | 0x01 | 0x02 | 0x04 )
+                            0x00 - Off
+                            0x01 - Debug On
+                            0x02 - Write all answers of socks servers.
+                            0x04 - Write all requests of socks servers.
+                            0x08 - Extended error information.
+
+          CHAIN_FILE      - Configuration file name.
+
+          CHAIN_FILE_DATA - Array reference. ( a format same as well as
+                            in a file of a configuration ). It is possible
+                            to use for data transmission about chains directly,
+                            without use of a file of a configuration. At use
+                            of the given parameter, parameter CHAIN_FILE is
+                            ignored, that is the file of a configuration
+                            is not read.
+
+          LOG_FILE        - Log file name. if undef, writing
+                            all errors to STDERR or `syslogd`
+
+          RANDOM_CHAIN    - Rule for create the chains ( 0 || 1 ).
+                            0 - create chain by index...
+                            1 - create chain by random...
+
+          CHECK_DELAY     - Delay time for the next usage this proxy if
+                            the last connection failed ( in seconds )
+
+          AUTO_SAVE       - Auto save the data of chain to the cache file. 
+
+          LOG_FH          - File Descriptor of LOG file.
+
+          SYSLOG          - 1 - Use syslogd ( for *nix ), or eventlog
+                            ( for win32 ) for debug messages. Default 0.
+
+          HTTP_CLIENT     - User-Agent name for http proxies
+
+  METHODS
+    connect   Create new connection to remote host.
+
+               Usage:
+
+                die unless $self->connect( $peer_host, $peer_port ) == SOCKS_OKAY;
+
+    bind      Binding port.
+
+               Usage:
+
+                die unless $self->bind( $peer_host, $peer_port ) == SOCKS_OKAY;
+
+    accept    Accepting connection over SOCKS
+
+               Usage:
+
+                die unless $self->accept() == SOCKS_OKAY;
+                $sh = $self->sh;
+
+    sh        Returns the sock handle
+
+               Usage:
+
+                $sh = $self->sh;
+
+    close     Close the connection.
+
+               Usage:
+
+                $self->close;
+
+    configure Returns [ and modify ] the current configuration options.
+
+               Usage:
+  
+                # Change TIMEOUT
+                $self->configure( TIMEOUT => 10 );
+
+                # Returns TIMEOUT
+                $timeout = $self->configure( 'TIMEOUT' );
+
+    socks_param
+              Returns parameters of the last server into the chain socks...
+
+               Usage:
+
+                $listen_addr = $self->socks_param( 'listen_Addr' );
+
+               or:
+
+                $all_param = $self->socks_param();
+                $listen_addr = $all_param->{'listen_addr'};
+
+ANY ROUTINES
+        socks_error( ERROR_CODE ) 
+
+         Returns the error message.
+
+        Socks error codes:
+
+        SOCKS_GENERAL_SOCKS_SERVER_FAILURE
+        SOCKS_CONNECTION_NOT_ALLOWED_BY_RUL
+        SOCKS_NETWORK_UNREACHABLE
+        SOCKS_HOST_UNREACHABLE
+        SOCKS_CONNECTION_REFUSED
+        SOCKS_TTL_EXPIRED
+        SOCKS_COMMAND_NOT_SUPPORTED
+        SOCKS_ADDRESS_TYPE_NOT_SUPPORTED
+        SOCKS_OKAY
+        SOCKS_FAILED
+        SOCKS_NO_IDENT
+        SOCKS_USER_MISMATCH
+        SOCKS_INCOMPLETE_AUTH
+        SOCKS_BAD_AUTH
+        SOCKS_SERVER_DENIES_AUTH_METHOD
+        SOCKS_MISSING_SOCKS_SERVER_NET_DATA
+        SOCKS_MISSING_PEER_NET_DATA
+        SOCKS_SOCKS_SERVER_UNAVAILABLE
+        SOCKS_TIMEOUT
+        SOCKS_UNSUPPORTED_PROTOCOL_VERSION
+        SOCKS_UNSUPPORTED_ADDRESS_TYPE
+        SOCKS_HOSTNAME_LOOKUP_FAILURE
+
+        $self->read_chain_data();
+
+         Reading the configuration file.
+
+        $self->get_socks_count
+
+         Returns the number of the socks servers
+
+        $self->mark_proxy ( $proxy_id, $status );
+
+         Mark the socks server with index $proxy_id how dead
+         if $status not equally SOCKS_OKAY, otherwise
+         clearing counter of the connection failure...
+
+        $self->dump_cfg_data();
+
+         Dump socks data, in the cache file.
+
+        $self->restore_cfg_data();
+
+         Restore socks data, from the cache file.
+
+NOTES
+    accept method change the follow variable, which returns of the
+    socks_param:
+
+     listen_addr
+     listen_port
+
+    Methods connect, bind, accept returnings SOCKS_OKAY if it succeeded.
+
+    Http proxies do not support bind method.
+
+    Http proxies support only Basic auth.
+
+CONFIG FORMAT
+     #host           :   port    : uid   :   pswd    : socks_proto
+     192.168.1.90    :   1080    :       :           :   5
+     192.18.122.90   :   3128    : bbb   :  ccc      :   0
+     ...
+
+     You can use the comments in the configuration file, for 
+     this you must write `#' in the beginning of string...
+
+THANKS
+     JoNO <jonozzz[at]yahoo.com> - for ideas of a writing of support http a proxy.
+
+SEE ALSO
+    perl, RFC 1928, RFC 1929, ...
+
+AUTHOR
+     Igor V. Okunev  mailto:igor@prv.mts-nn.ru
+                     http://www.mts-nn.ru/~gosha
+                     icq:106183300
+

@@ -1,0 +1,59 @@
+---
+abstract: 'interface to the SixXS.org services'
+author:
+  - 'Peter Pentchev <roam@ringlet.net>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-SixXS
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::SixXS:
+    file: lib/Net/SixXS.pm
+    version: v0.1.1
+  Net::SixXS::Data::Tunnel:
+    file: lib/Net/SixXS/Data/Tunnel.pm
+    version: v0.1.1
+  Net::SixXS::Diag:
+    file: lib/Net/SixXS/Diag.pm
+    version: v0.1.1
+  Net::SixXS::Diag::MainDebug:
+    file: lib/Net/SixXS/Diag/MainDebug.pm
+    version: v0.1.1
+  Net::SixXS::Diag::None:
+    file: lib/Net/SixXS/Diag/None.pm
+    version: v0.1.1
+  Net::SixXS::TIC::Client:
+    file: lib/Net/SixXS/TIC/Client.pm
+    version: v0.1.1
+  Net::SixXS::TIC::Server:
+    file: lib/Net/SixXS/TIC/Server.pm
+    version: v0.1.1
+  Net::SixXS::TIC::Server::AnyEvent:
+    file: lib/Net/SixXS/TIC/Server/AnyEvent.pm
+    version: v0.1.1
+  Net::SixXS::TIC::Server::Inetd:
+    file: lib/Net/SixXS/TIC/Server/Inetd.pm
+    version: v0.1.1
+requires:
+  MooseX::Role::JSONObject: v0.1.0
+  perl: '5.010'
+version: v0.1.1
+x_authority: cpan:ROAM
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

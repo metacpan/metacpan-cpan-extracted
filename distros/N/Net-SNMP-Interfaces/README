@@ -1,0 +1,39 @@
+Net::SNMP::Interfaces.  README Mon Nov 27 08:21:38 GMT 2000
+
+This module is intended to provide simple methods of obtaining
+network interface information from a host via SNMP.
+
+PREREQUISITES
+=============
+
+The module requires Net::SNMP which must be installed before trying to
+install the current module. 
+
+INSTALLATION
+============
+
+After unpacking the distribution files you should change you current 
+directory to the one which contains this file and you should run :
+
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+If 'make install' complains about not having permission to do something
+then you will either have to become a user with the correct rights or
+install the module somewhere you do have permission - see the section on
+keeping your own private module library elsewhere in the Perl Documentation.
+
+SUPPORT
+=======
+
+Please e-mail any bug reports or feature requests  to
+<bug-Net-SNMP-Interfaces@rt.cpan.org> to the author Jonathan Stowe
+<jns@gellyfish.co.uk>.
+
+The code is hosted on Github at https://github.com/jonathanstowe/Net-SNMP-Interfaces
+Please feel free to fork and suggest patches.  Especially welcome would be 
+increased support for newer versions of SNMP (which weren't around when I first
+made this.)

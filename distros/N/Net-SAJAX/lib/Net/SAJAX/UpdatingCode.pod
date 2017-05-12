@@ -1,0 +1,38 @@
+=head1 NAME
+
+Net::SAJAX::UpdatingCode - Information regarding updating code due to an API
+change
+
+=head1 DESCRIPTION
+
+This document outlines updaing code utilizing L<Net::SAJAX> due to an API
+change. The purpose of this document is to keep any references to
+deprecated items out of the main documentation to keep new users from even
+knowing about them.
+
+=head1 DEPRECATED ITEMS
+
+There are no deprecated items at this time.
+
+=head1 AUTHOR
+
+Douglas Christopher Wilson, C<< <doug at somethingdoug.com> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2009 Douglas Christopher Wilson.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of either:
+
+=over 4
+
+=item * the GNU General Public License as published by the Free
+Software Foundation; either version 1, or (at your option) any
+later version, or
+
+=item * the Artistic License version 2.0.
+
+=back
+
+=cut

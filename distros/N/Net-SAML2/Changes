@@ -1,0 +1,41 @@
+Revision history for Perl extension Net::SAML2.
+
+0.01_01  Mon  4 Oct 2010 12:47:56 BST
+
+      Initial version. 
+
+      This version will correctly perform Web Browser SSO, but
+      with caveats. See the embedded documentation for details. 
+
+0.10     Tue 11 Jan 2011 15:11:38 GMT
+
+      First usable version.
+
+      POD, tests, Moose, etc. 
+      Embeds a local copy of XML::Sig
+
+0.11     Wed 12 Jan 2011 21:07:42 GMT
+
+      Test Updates
+
+0.12     Thu 13 Jan 2011 12:59:02 GMT
+
+      PAUSE-hide the local XML::Sig
+
+0.14     Thu 13 Jan 2011 19:26:46 GMT
+
+      Add SingleLogout with Redirect binding to SP metadata
+      Rename local copy of XML::Sig.
+
+0.15     Wed 09 Feb 2011 14:55:28 GMT
+
+      Handle unwrapped base64 certificate data in IdP metadata.
+
+0.16     Tue 01 Mar 2011 09:40:13 GMT
+
+      Use the IdP's advertised NameID formats.
+
+0.17     Fri 13 Jan 2012 13:41:23 GMT
+
+      Handle the InclusiveNamespaces element in XML Signature
+      Handle embedded certificate data presented without newlines.

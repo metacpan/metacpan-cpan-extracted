@@ -1,0 +1,78 @@
+Revision history for Net-Xero
+
+0.44    2015-06-05T15:09:00
+        Given is experimental
+
+0.43    2015-06-05T15:09:00
+        Fix version
+
+0.42    2015-06-05T13:58:22
+        Merge with fixed branch
+        Move to moo not mouse
+
+
+0.20    2012-05-31T01:37:23
+        proper utf8 support
+        added reference field to payments template
+
+0.19    2012-04-23T14:12:55
+        more bugfixing. uri_escape still not doing exactly what we need
+
+0.18    2012-04-20T12:41:41
+        Bugfix release: fixed encoding issue with uri_escape
+
+0.17    2012-04-12T00:19:52
+        added ManualJournal support
+
+0.16    2012-03-07T22:44:55
+        added support for search of multiple invoice refs with one call
+
+0.15    2012-02-29T21:56:42
+        clear old error message before making next call
+
+0.14    2011-12-10T11:12:13
+        removed calculated values from templates, let xero do this
+
+0.13    2011-12-09T19:41:12
+        major rewrite of internal _talk() method, simplified
+        fixed reading cert from file
+
+0.12    2011-12-02T22:25:34
+        sign post data before sending
+
+0.11    2011-12-02T12:27:54
+        upated to conform with latest API changes and URLs
+
+0.10    2011-01-13T11:53:01
+        tested payments and working template
+
+0.9     2010-12-07T12:58:16
+        added payments command
+
+0.8     2010-12-01T12:56:06
+        change the template path to the dist_dir
+
+0.7     2010-11-29T17:34:47
+        per line item tax definition if present
+
+0.6     2010-11-17T10:22:46
+        fixed the template path
+
+0.5     2010-11-16T18:27:44
+        added set_cert method
+
+0.4     2010-11-15T10:02:26
+        fixed package building
+
+0.3     2010-11-11T15:56:30
+        changed the API to make it easier to extend
+
+0.2     2010-11-11T14:36:48
+        fixed Makefile to install the shared directory
+
+0.1     2010-11-11T14:07:25
+        first version of the lib that can add invoices and credit notes
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

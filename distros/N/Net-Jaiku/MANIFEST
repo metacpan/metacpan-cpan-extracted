@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST			This list of files
+Makefile.PL
+README
+lib/Net/Jaiku.pm
+t/0_pod.t
+t/1_load.t
+t/2_feed.t
+t/3_presence.t
+t/4_info.t
+t/5_set.t

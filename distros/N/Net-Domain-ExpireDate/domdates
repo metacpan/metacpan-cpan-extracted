@@ -1,0 +1,38 @@
+#!/usr/bin/perl -w
+# domdates
+#
+# DESCRIPTION
+#   Get domain creation / expiration dates for given domains
+#
+# AUTHORS
+#   Walery Studennikov <despair@cpan.org>
+#
+#========================================================================
+
+use strict;
+use IO::Handle;
+use Getopt::Long;
+use Net::Domain::ExpireDate;
+
+my $use_registrar_servers;
+
+# ------ CMDLINE PROCESSING -------
+
+GetOptions(
+    'use_registrar_servers|R=i'	=> \$use_registrar_servers,
+);
+
+if (defined $use_registrar_servers) {
+    $Net::Domain::ExpireDate::USE_REGISTRAR_SERVERS = $use_registrar_servers
+}
+
+my @domnames = @ARGV;
+
+# ------ EXECUTE -------
+
+foreach my $domain (@domnames) {
+    print "$domain...\n";
+    my ($creation_str, $expiration_str) = domain_dates( $domain, '%Y-%m-%d' );
+    print "\tcreated: $creation_str\n";
+    print "\texpires: $expiration_str\n\n";
+}

@@ -1,0 +1,12 @@
+Revision history for Net-SNTP-Client
+
+0.20    2015-10-9/5:53:19 pm
+        Twentieth version, adding git hub repo.
+
+0.21    2015-11-5/11:22:19 am
+        Twenty first version, modifying in LI (test case) in /t/00-load.t line
+	93 from 0 to ignore(), due to CPAN failing test case.
+
+0.22    2015-11-6/10:28:19 am
+        Twenty second version, modifying in LI (test case) in /t/00-load.t line
+	88 from 0 to ignore(), due to CPAN failing test case.

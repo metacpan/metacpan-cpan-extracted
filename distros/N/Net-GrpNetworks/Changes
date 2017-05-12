@@ -1,0 +1,12 @@
+Revision history for Perl extension Net::GrpNetworks.
+
+1.08  Fri Nov 10 11:53:00 1999
+        - small changes on constructor;
+
+1.07  Fri Jul 09 20:24:00 1999
+	- small documentation change;
+
+1.06  Wed Jul 07 14:26:06 1999
+	- first release;
+
+

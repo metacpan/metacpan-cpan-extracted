@@ -1,0 +1,10 @@
+0.04 - 09-11-2007
+        - Fix spelling in POD Sample
+
+0.03 - 09-11-2007
+        - Switched to M-I
+        - Fixed dependencies.
+        - Fix to handle scalar context when following refs.
+        
+0.02 - 05-05-2005
+        - Initial release

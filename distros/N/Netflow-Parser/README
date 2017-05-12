@@ -1,0 +1,23 @@
+Netflow-Parser
+
+A Netflow Parser supports only Netflow V9. The callback will be applied to each parsed flow
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+    perldoc Netflow::Parser
+
+LICENSE AND COPYRIGHT
+
+Copyright 2014-2016 by Alexei Pastuchov E<lt>palik at cpan dot orgE<gt>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

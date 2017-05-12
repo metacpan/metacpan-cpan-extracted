@@ -1,0 +1,61 @@
+Revision history for Perl extension Net::Frame::Device.
+
+1.12 Sun Nov 22 13:07:50 CET 2015
+   - bugfix: add Build.PL to manifest file
+
+1.11 Sun Jan  4 17:47:17 CET 2015
+   - bugfix: some code was never reached in new() and made a warning to be printed
+   - copyright: 2015
+
+1.10 Sun Dec  2 17:08:27 CET 2012
+   - bugfix: analyze response to lookupMac6 to check MAC address is valid
+
+1.09 Fri Nov 16 16:28:14 CET 2012
+   - new: bin/nfd-print-routes6.pl
+   - bugfix: install bin/nfd-debug-devices.pl and bin/nfd-print-routes6.pl
+   - bugfix: Perl kwalitee
+
+1.08 Wed Sep 12 20:26:23 CEST 2012
+   - bugfix: Don't try lookupMac6() if gatewayIp6 has not been found
+   - update: dependance on Net::Frame::Simple 1.05 forced
+   - update: error message scheme
+   - update: copyright notice
+
+1.07 Wed Nov 16 23:32:20 CET 2011
+   - bugfix: correctly check return status from dnet calls
+   - bugfix: check if an address has a correct netmask (or ignore 
+             subnet attribute)
+
+1.06 Sat Mar 26 19:01:23 CET 2011
+   - feature: lookupMac() and lookupMac6() takes two additionnal parameters: 
+     retry count and timeout in seconds.
+
+1.05 Thu Jan 13 11:04:32 CET 2011
+   - bugfix: load Net::Frame::Layer::ICMPv6::NeighborSolicitation
+   - bugfix: make lookupMac6() work
+   - bugfix: update interface information on IPv6 stuff
+   - update: copyright notice
+
+1.04 Thu Jun  3 15:44:42 CEST 2010
+   - bugfix: die() on fatal errors from dnet
+   - bugfix: new() returns undef on error
+   - update: mailing list URL, see README
+   - update: copyright notice and email address
+
+1.03 Wed Feb 28 22:07:28 CET 2007
+   - bugfix: lookupMac*(): check for link layer type before building frame
+
+1.02 Thu Dec 28 17:05:27 CET 2006
+   - NEW: IPv6 support (*BSD and Linux systems for now)
+   - new: methods: lookupMac6(), updateFromTarget6()
+   - new: attributes: subnet6, gatewayIp6, gatewayMac6, target6
+   - new examples
+   - new dependances
+
+1.01 Sun Dec 17 17:22:29 CET 2006
+   - NEW: debug-devices.pl in bin/ directory
+   - UPDATE: all layers moved to Net::Frame::Layer::* namespace
+
+1.00 Sat Dec  9 19:03:24 CET 2006
+   - first public release
+

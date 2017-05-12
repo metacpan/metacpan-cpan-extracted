@@ -1,0 +1,10 @@
+lib/Docs/Site_SVD/Net_Netid.pm
+MANIFEST
+Makefile.PL
+README
+lib/Net/Netid.pm
+t/Net/Netid.d
+t/Net/Netid.pm
+t/Net/Netid.t
+tlib/File/Package.pm
+tlib/Test/Tech.pm

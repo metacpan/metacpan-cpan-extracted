@@ -1,0 +1,23 @@
+Revision history for Net-Google-Blogger
+
+0.08    19 Aug 2010
+        Added $blog->destroy to work around circular references. Updated documentation.
+
+0.07    18 Aug 2010
+        Added deletion of entries. Code cleaned up.
+
+0.06    17 Aug 2010
+        Removed POD coverage testing as it complained about not documenting private attributes.
+
+0.04    17 Aug 2010
+        Specifying numeric blogger ID is no longer required.
+
+0.03    17 Aug 2010
+        Included dependencies in the packaging.
+        
+0.02    17 Aug 2010
+        Improved performance and documentation.
+
+0.01    15 Aug 2010
+        First working version.
+

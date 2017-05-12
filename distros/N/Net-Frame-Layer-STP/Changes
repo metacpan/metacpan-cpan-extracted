@@ -1,0 +1,12 @@
+Revision history for Perl extension Net::Frame::Layer::STP.
+
+1.02 Wed Jan 14 07:53:13 CET 2015
+   - update: copyright notice
+   - update: Kwalitee
+
+1.01 Fri Jan  5 00:29:01 CET 2007
+   - bugfix: in POD coverage testing
+
+1.00 Wed Jan  3 22:55:18 CET 2007
+   - first public release
+

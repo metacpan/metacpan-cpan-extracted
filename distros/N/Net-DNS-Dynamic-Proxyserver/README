@@ -1,0 +1,23 @@
+Net::DNS::Dynamic::Proxyserver - a dynamic DNS proxy,
+which lets you run your own nameserver who answers
+DNS questions from your /etc/hosts file or your SQL database.
+
+The full documentation with examples is available via:
+
+ perldoc Net::DNS::Dynamic::Proxyserver
+
+A simple example script will be installed in
+
+/usr/local/bin/dns-proxy.pl
+
+which can be used as a basis for your own
+DNS proxy server. It does not support answers
+from SQL queries at this moment. You need to
+write your own wrapper script, if you want
+SQL support.
+
+Please run 
+
+ /usr/local/bin/dns-proxy.pl --help
+
+to see a list of available options.

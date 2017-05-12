@@ -1,0 +1,390 @@
+sshg3(1)                                                                                                                 General Commands Manual                                                                                                                sshg3(1)
+
+
+
+NAME
+       sshg3 - Secure Shell terminal client - Generation 3
+
+SYNOPSIS
+       sshg3 [options]...
+             profile | [user@] host [#port]
+             [command]
+
+DESCRIPTION
+       sshg3  is  a program for logging in to a remote machine and executing commands on a remote machine. sshg3 provides secure, encrypted communication channels between two hosts over an unsecured network. It can be used to replace the unsecured rlogin, rsh, and
+       telnet programs. Also X11 connections and arbitrary TCP/IP ports can be forwarded over secure channels with sshg3.
+
+       To connect to a remote host using sshg3, give either the name of a connection profile defined in the ssh-broker-config.xml file (profile) or the IP address or DNS name of the remote host, optionally with the remote user name and the port of the Secure Shell
+       server ([user@]host[#port]). If no user name is given, the local user name is assumed. If no port is given, the default Secure Shell port 22 is assumed. The remote host must be running a Secure Shell version 2 server.
+
+       sshg3 acts as a Connection Broker client and launches the actual Connection Broker process, ssh-broker-g3 as a transport (in run-on-demand mode), or uses an already running Connection Broker process.  The Connection Broker will ask the user to enter a pass‐
+       word or a passphrase if they are needed for authentication. Connection Broker uses the configuration specified in the ssh-broker-config.xml file.
+
+       When the user's identity has been accepted by the server, the server either executes the given command, or logs in to the machine and gives the user a normal shell. All communication with the remote command or shell will be automatically encrypted.
+
+       If no pseudo-tty has been allocated, the session is transparent and can be used to securely transfer binary data.
+
+       The session terminates when the command or shell on the remote machine exits and all X11 and TCP/IP connections have been closed. The exit status of the remote program is returned as the exit status of sshg3.
+
+   AGENT FORWARDING
+       ssh-broker-g3 acts as an authentication agent, and the connection to the agent is automatically forwarded to the remote side unless disabled in the ssh-broker-config.xml file or on the sshg3 command line (with the -a option).
+
+   X11 FORWARDING
+       If the user is using X11 (the DISPLAY environment variable is set), the connection to the X11 display can be automatically forwarded to the remote side in such a way that any X11 programs started from the shell (or command) will  go  through  the  encrypted
+       channel,  and the connection to the real X server will be made from the local machine. The user should not manually set DISPLAY. X11 connection forwarding can be allowed in the ssh-broker-config.xml file or on the sshg3 command line (with the +x option). By
+       default, X11 forwarding is disabled.
+
+       The DISPLAY value set by sshg3 will point to the server machine, but with a display number greater than zero.  This is normal, and happens because sshg3 creates a "proxy" X server on the server machine for forwarding the connections over the encrypted chan‐
+       nel.
+
+       sshg3 will also automatically set up the Xauthority data on the server machine. For this purpose, it will generate a random authentication cookie, store it in the Xauthority data on the server, and verify that any forwarded connections carry this cookie and
+       replace it with the real cookie when the connection is opened. The real authentication cookie is never sent to the server machine (and no cookies are sent in the plain).
+
+   TCP PORT FORWARDING
+       Forwarding of arbitrary TCP/IP connections over the secure channel can be specified either in the ssh-broker-config.xml file or on the sshg3 command line (with the -L and -R options).
+
+OPTIONS
+       Command-line options override the settings in the ssh-broker-config.xml file if the same option has been configured in both places. The following options are available:
+
+       -a, --no-agent-forwarding
+              Disables authentication agent forwarding. In the factory settings, agent forwarding is enabled.
+
+       +a     Enables authentication agent forwarding. In the factory settings, agent forwarding is enabled, but it can be denied in the Connection Broker configuration file, in which case users cannot enable it on the command-line and this +a will be ignored.
+
+       -B, --batch-mode
+              Uses batch mode. Fails authentication if it requires user interaction on the terminal.
+
+              Using batch mode requires that you have previously saved the server host key on the client and set up a non-interactive method for user authentication (for example, host-based authentication or public-key authentication without a passphrase).
+
+       -C     Disables compression from the current connection.
+
+       +C     Enables zlib compression for this particular connection.
+
+       -c, --ciphers=LIST
+              Sets the allowed ciphers to be offered to the server. List the cipher names in a comma-separated list. For example:
+
+              --ciphers seed-cbc@ssh.com,aes256-cbc
+
+              Enter help as the value to view the currently supported cipher names.
+
+       -D, --debug=LEVEL
+              Sets the debug level. LEVEL is a number from 0 to 99, where 99 specifies that all debug information should be displayed. This should be the first argument on the command line.
+              Note
+
+              The debug level can be set only when the sshg3 command starts the Connection Broker. This option has no effect in the command if the Connection Broker is already running.
+
+       -e, --escape-char=CHAR
+              Sets escape character (none: disabled, default: ~).
+
+       -f, --fork-into-background
+              Forks into background mode after authentication. Use this option with tunnels and remote commands. Implies -S (unless a command is specified). When tunnels have been specified, this option makes sshg3 stay in the background, so that it will wait  for
+              connections indefinitely.  sshg3 has to be killed to stop listening.
+
+       -g, --gateway
+              Gateways ports, which means that also other hosts may connect to locally forwarded ports. This option has to be specified before the "-L" option. Note the logic of + and - in this option.
+
+       +g     Does not gateway ports. Listens to tunneling connections originating only from the localhost. This is the default value. Note the logic of + and - in this option.
+
+       -i FILE
+              Defines that private keys defined in the identification file are used for public-key authentication.
+
+       -K, --identity-key-file=FILE
+              Defines that the given key file of a private key or certificate is used in user authentication. The path to the key file is given in the command.
+
+              If  the  file is a private key, it will be read and compared to the keys already known by the Connection Broker key store. If the key is not known, it will be decoded and added to the key store temporarily. If the file is a certificate and Connection
+              Broker knows a matching private key, it will be used. Both the certificate and the private key can be given using multiple -K options on command line.
+
+       -L, --localfwd [protocol/] [listen-address:] listen-port:dst-host:dst-port
+              Forwards a port on the local (client) host to a remote destination host and port.
+
+              This allocates a listener port (listen-port) on the local client. Whenever a connection is made to this listener, the connection is tunneled over Secure Shell to the remote server and another connection is made from the server to a specified destina‐
+              tion host and port (dst-host:dst-port). The connection from the server onwards will not be secure, it is a normal TCP connection.
+
+              Giving the argument protocol enables protocol-specific forwarding. The protocols implemented are tcp (default, no special processing), ftp (temporary forwarding is created for FTP data channels, effectively securing the whole FTP session), and socks.
+
+              With  the socks protocol, the syntax of the argument is "-L socks/[listen-address:]listen-port".  When this is set, Tectia Client or ConnectSecure will act as a SOCKS server for other applications, creating forwards as requested by the SOCKS transac‐
+              tion. This supports both SOCKS4 and SOCKS5.
+
+              If listen-address is given, only that interface on the client is listened. If it is omitted, all interfaces are listened.
+
+       -l, --user=USERNAME
+              Logs in using this user name.
+
+       -m, --macs=LIST
+              Sets the allowed MACs to be offered to the server. List the MAC names in a comma-separated list. For example:
+
+              --macs hmac-sha1-96,hmac-md5,hmac-md5-96
+
+              Enter help as the value to view the currently supported MAC names.
+
+       -u, --kexs=kexs
+              Sets the allowed key exchange (KEX) methods to be offered to the server. List the KEX names in a comma-separated list. For example:
+
+              --kexs diffie-hellman-group14-sha224@ssh.com,diffie-hellman-group14-sha256@ssh.com
+
+              Enter help as the value to view the currently supported KEX methods.
+
+              Due to issues in OpenSSL, the following KEXs cannot operate in the FIPS mode: diffie-hellman-group15-sha256@ssh.com and diffie-hellman-group15-sha384@ssh.com.
+
+       -j, --hostkey-algs=algs
+              Sets the allowed host key algorithms to be offered to the server. List the host key algorithms in a comma-separated list. For example:
+
+              --hostkey-algs ssh-dss-sha224@ssh.com,ssh-dss-sha256@ssh.com
+
+              Enter help as the value to view the currently supported host key algorithms.
+
+       -n, --dev-null
+              Redirects input from /dev/null .
+
+       -o option
+              Processes an option as if it was read from a Tectia Client 4.x-style configuration file. The supported options are ForwardX11, ForwardAgent, AllowedAuthentications and PidFile.  For example, -o "ForwardX11=yes". Also -o "PidFile=/tmp/sshg3.pid" makes
+              sshg3 to store its process ID into file "/tmp/sshg3.pid" if it goes into background.
+
+       -P, --password= PASSWORD | file:// PASSWORDFILE | extprog:// PROGRAM
+              Sets  user  password  that  the  client  will send as a response to password authentication. The PASSWORD can be given directly as an argument to this option (not recommended). Better alternatives are entering a path to a file containing the password
+              (--password=file://PASSWORDFILE), or entering a path to a program or script that outputs the password (--password=extprog://PROGRAM).
+
+              When using the extprog:// option to refer to a shell script, make sure the script also defines the user's shell, and outputs the actual password. Otherwise the executed program fails, because it does not know what shell to use for the  shell  script.
+              For example, if the password string is defined in a file named my_password.txt, and you want to use the bash shell, include these lines in the script:
+
+              #!/usr/bash
+              cat /full/pathname/to/my_password.txt
+              Caution
+
+              Supplying the password on the command line is not a secure option. For example, in a multi-user environment, the password given directly on the command line is trivial to recover from the process table.  You should set up a more secure way to authen‐
+              ticate. For non-interactive batch jobs, it is more secure to use public-key authentication without a passphrase, or host-based authentication. At a minimum, use a file or a program to supply the password.
+
+       -p, --port=PORT
+              Connects to this port on the remote host. A Secure Shell server must be listening on the same port.
+
+       -q     Quiet mode, reports only fatal errors.  This option overrides the quiet-mode setting made in the Connection Broker configuration file.
+
+       -R, --remotefwd [protocol/] [listen-address:] listen-port:dst-host:dst-port
+              Forwards a port on the remote (server) host to a destination host and port on the local side.
+
+              This allocates a listener port (listen-port) on the remote server. Whenever a connection is made to this listener, the connection is tunneled over Secure Shell to the local client and another connection is made from the client to a specified destina‐
+              tion host and port (dst-host:dst-port). The connection from the client onwards will not be secure, it is a normal TCP connection.
+
+              Giving the argument protocol enables protocol-specific forwarding. The protocols implemented are tcp (default, no special processing) and ftp (temporary forwarding is created for FTP data channels, effectively securing the whole FTP session).
+
+              If listen-address is given, only that interface on the server is listened. If it is omitted, all interfaces are listened.
+
+       -S, --no-session-channel
+              Does not request a session channel. This can be used with port-forwarding requests if a session channel (and tty) is not needed, or the server does not give one.
+
+       +S     Requests a session channel. This is the default value.
+
+       -s, --subsystem subsystem remote_server
+              Sets a subsystem or a service to be invoked on the remote server.  The subsystem is specified as a remote command. For example: sshg3 -s sftp <server>
+
+       -t, --tty
+              Allocates a tty even if a command is given.
+
+       -v, --verbose
+              Uses verbose mode. More information or error diagnostics are output if a connection fails.
+
+       -w     Does not try an empty password.
+
+       +w, --try-empty-password
+              Tries an empty password.
+
+       -x, -X, --no-x11-forwarding
+              Disables X11 connection forwarding. This is the default value.
+
+       +x, +X Enables X11 connection forwarding.
+
+       -z, --broker-log-file=FILE
+              Sets the Connection Broker log file to FILE. This option works only if ssh-broker-g3 gets started by this process).
+
+       --aa, --allowed-authentications=METHODS
+              Defines the only allowed methods that can be used in user authentication. List the methods in a comma-separated list. For example:
+
+              --allowed-authentications keyboard-interactive,password
+
+              Enter help as the value to view the currently supported authentication methods.
+
+       --abort-on-failing-tunnel
+              Aborts if creating a tunnel listener fails (for example, if the port is already reserved).
+
+       --compressions=METHODS
+              Sets the allowed compression methods to be offered to the server.  List the methods in a comma-separated list.
+
+              Enter help as the value to view the currently supported compression methods.
+
+       --exclusive
+              Defines that a new connection will be opened for each connection attempt, otherwise Connection Broker can reuse recently closed connections.
+
+       --hostkey-policy=POLICY
+              Defines the policy for checking server host keys and handling unknown server host keys.  The possible values are:
+
+              · ask (default): The user will be asked to verify and accept the server host keys, if the keys are not found in the host key storage or if the keys have changed.
+
+              · strict: The connection to the server will be allowed only if the host key is found in the user's known host keys storage.
+
+              · tofu: Trust on first use; new host keys are stored without prompting the user to accept them.
+
+              · advisory (not recommended): New host keys are stored without prompting the user to accept them, and connections are allowed also to servers offering a changed host key.
+              Caution
+
+              Consider carefully before setting the policy to advisory. Disabling the host-key checks makes the connection vulnerable to attacks.
+
+       You can also configure the host key policy in the ssh-broker-config.xml configuration file with the <auth-server-publickey> element in the default-settings and per profile.  See ssh-broker-config(5).
+
+       If this option is set on the command-line client and configured in the ssh-broker-config.xml, the command-line value will be used.
+
+       --identity=ID
+              Defines that the ID of the private key is used in user authentication.  The ID can be Connection Broker-internal ordinary number of the key, the key hash or the key file name.
+
+       --identity-key-hash ID
+              Defines the private key used in user authentication with the corresponding public key hash.
+
+       --identity-key-id ID
+              Defines that the Connection Broker-internal ordinary number of the key is used in user authentication.
+
+       --keep-alive=VALUE
+              Defines how often keep-alive messages are sent to the Secure Shell server.  Enter the value as seconds. The default value is 0, meaning that keep-alive messages are disabled.
+
+       --kip  Defines keyboard-interactive and password as the allowed methods for user authentication; the same as
+
+              --allowed-authentications keyboard-interactive,password
+
+       --remote-environment name=VALUE
+              When this option is used, the defined environment variables are passed to the server from the client side. The environment variables are applied on the server when requesting a command, shell or subsystem.
+
+              Note that the server can restrict the setting of environment variables.
+
+              You can also configure the environment variables to be passed to the server in the ssh-broker-config.xml configuration file with the <remote-environment> element in the default-settings and per profile.  See ssh-broker-config(5).
+
+              If the same variable is entered on the command-line client and configured in the ssh-broker-config.xml, the command-line version will be used.
+
+       --remote-environment-format name=VALUE
+              The defined environment variables are passed to the server from the client side. The Connection Broker processes the value before sending it to the server.
+
+              You can use %U in the value to indicate a user name. The Connection Broker replaces the %U with the actual user name before sending it to the server.
+
+              For more information, see the --remote-environment option above.
+
+       --tcp-connect-timeout=VALUE
+              Defines a timeout period (in seconds) for establishing a TCP connection to the Secure Shell server. Enter the value as a positive number.
+
+       -V, --version
+              Displays program version and exits.
+
+       -h, --help
+              Displays a short summary of command-line options and exits.
+
+COMMANDS
+       sshg3 can take as a command either of the following ones:
+
+       remote_command [arguments] ...
+              Runs the command on a remote host.
+
+       -s service
+              Enables a service in remote server.
+
+ESCAPE SEQUENCES
+       sshg3 supports escape sequences to manage a running session. For an escape sequence to take effect, it must be typed directly after a newline character (press Enter first). The escape sequences are not displayed on screen during typing.
+
+       The following escape sequences are supported:
+
+       ~.     Terminates the connection.
+
+       ~Ctrl-Z
+              Suspends the session.
+
+       ~~     Sends the escape character literally.
+
+       ~#     Lists forwarded connections.
+
+       ~-     Disables the escape character irrevocably.
+
+       ~?     Displays a summary of escape sequences.
+
+       ~r     Initiates rekeying manually.
+
+       ~s     Gives connection statistics, including server and client version, packets in, packets out, compression, key exchange algorithms, public-key algorithms, and symmetric ciphers.
+
+       ~u     Uploads the chosen public key automatically to the server. If the user has only one key, it will be uploaded. Otherwise the largest key with a name that matches id_dsa_<size>_a will be selected.
+
+       ~U     Uploads a public key to the server. A list of available keys is printed and the user is prompted to select one to be uploaded.
+
+       ~c     Gives statistics for individual channels (data window sizes etc).  This is for debugging purposes.
+
+       ~V     Dumps the client version number to stderr (useful for troubleshooting).
+
+ENVIRONMENT VARIABLES
+       Upon connection, the Secure Shell server will automatically set a number of environment variables that can be used by sshg3.  The exact variables set depend on the Secure Shell server. The following variables can be used by sshg3:
+
+       DISPLAY
+              The  DISPLAY  variable  indicates  the  location  of the X11 server. It is automatically set by the server to point to a value of the form hostname:n where hostname indicates the host on which the server and the shell are running, and n is an integer
+              greater than or equal to 1.  sshg3 uses this special value to forward X11 connections over the secure channel.
+
+              The user should normally not set DISPLAY explicitly, as that will render the X11 connection unsecured (and will require the user to manually copy any required authorization cookies).
+
+       HOME   The user's home directory.
+
+       LOGNAME
+              Synonym for USER; set for compatibility with systems using this variable.
+
+       MAIL   The user's mailbox.
+
+       PATH   Set to the default PATH, depending on the operating system or, on some systems, /etc/environment or /etc/default/login.
+
+       SSH_SOCKS_SERVER
+              The address of the SOCKS server used by sshg3.
+
+       SSH2_AUTH_SOCK
+              If this exists, it is used to indicate the path of a Unix-domain socket used to communicate with the authentication agent (or its local representative).
+
+       SSH2_CLIENT
+              Identifies the client end of the connection. The variable contains three space-separated values: client IP address, client port number, and server port number.
+
+       SSH2_ORIGINAL_COMMAND
+              This will be the original command given to sshg3 if a forced command is run. It can be used, for example, to fetch arguments from the other end. This does not have to be a real command, it can be the name of a file,  device,  parameters  or  anything
+              else.
+
+       SSH2_TTY
+              This is set to the name of the tty (path to the device) associated with the current shell or command. If the current session has no tty, this variable is not set.
+
+       TZ     The time-zone variable is set to indicate the present time zone if it was set when the server was started (the server passes the value to new connections).
+
+       USER   The name of the user.
+
+       For a list of varibles set by Tectia Server, see the ssh-server-g3(8) man page.
+
+EXIT VALUES
+       sshg3 returns the following values based on the success of the operation:
+
+       0     Operation was successful.
+       1     sshg3 has encountered an error,
+             the reason is usually given in an error message.
+
+       When executing remote commands, sshg3 exits with the status of the command run indicated with exit codes:
+
+       0     The remote command was run successfully.
+       127   The requested remote command was not found.
+
+EXAMPLES
+       Connect as the local user name to host remotehost, port 2222, and open shell:
+
+       $ sshg3 remotehost#2222
+
+       Connect to the host specified by the connection profile profile1 in the ssh-broker-config.xml file, and run the who command (and exit after running the command):
+
+       $ sshg3 profile1 who
+
+       Connect as user to host remotehost, and open a local port forwarding from port 143 on the client to port 143 on imapserver.  Do not open shell. Also other hosts may connect to the local port. The connection from remotehost to imapserver will not be secured:
+
+       $ sshg3 -L 143:imapserver:143 -g -S user@remotehost
+
+AUTHORS
+       SSH Communications Security Corporation
+
+       For more information, see http://www.ssh.com.
+
+SEE ALSO
+       ssh-broker-g3(1), ssh-broker-config(5), ssh-keygen-g3(1), scpg3(1), sftpg3(1), rlogin(1), rsh(1), telnet(1)
+
+
+
+                                                                                                                             21 January 2014                                                                                                                    sshg3(1)

@@ -1,0 +1,475 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>NAME</title>
+<link rev="made" href="mailto:feedback@suse.de" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#constructor">CONSTRUCTOR</a></li>
+		<li><a href="#methods">METHODS</a></li>
+	</ul>
+
+	<li><a href="#any_routines">ANY ROUTINES</a></li>
+	<li><a href="#notes">NOTES</a></li>
+	<li><a href="#config_format">CONFIG FORMAT</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p></p>
+<p>Net::SC - модуль для выстраивания цепочек через socks/http прокси, и передачи через них данных.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p></p>
+<pre>
+ # CONNECT TO HOST
+ # ----------------</pre>
+<pre>
+ ...
+ $self = new Net::SC(
+                     Timeout         =&gt; ( $opt{'to'}  || 10      ),
+                     Chain_Len       =&gt; ( $opt{'l'}   || 2       ),
+                     Debug           =&gt; ( $opt{'d'}   || 0x04    ),
+                     Log_File        =&gt; ( $opt{'lf'}  || undef   ),
+                     Random_Chain    =&gt; ( $opt{'rnd'} || 0       ),
+                     Auto_Save       =&gt; 1
+                  );</pre>
+<pre>
+ die unless ref $self;</pre>
+<pre>
+ unless ( ( $rc = $self-&gt;connect( $host, $port ) ) == SOCKS_OKAY ) {
+   print STDERR &quot;Can't connect to $host:$port [&quot;.( socks_error($rc) ).&quot;]\n&quot;;
+   exit;
+ }</pre>
+<pre>
+ $sh = $self-&gt;sh;</pre>
+<pre>
+ print $sh, &quot;Hello !!!\n&quot;;
+ ...
+ $self-&gt;close;
+ ...</pre>
+<pre>
+ --- or ---</pre>
+<pre>
+ ...
+ $self = new Net::SC(
+                     Timeout         =&gt; ( $opt{'to'}  || 10      ),
+                     Chain_Len       =&gt; ( $opt{'l'}   || 2       ),
+                     Debug           =&gt; ( $opt{'d'}   || 0x04    ),
+                     Random_Chain    =&gt; ( $opt{'rnd'} || 0       ),
+                     Auto_Save       =&gt; 0,
+                     Chain_File_Data =&gt; [
+                                          '200.41.23.164:1080:::4:383 b/s Argentina',
+                                          '24.232.88.160:1080:::4:1155 b/s Argentina',
+                                          '24.22.818.160:3128:::0:HTTP proxy',
+                                        ],
+                  );</pre>
+<pre>
+ die unless ref $self;</pre>
+<pre>
+ unless ( ( $rc = $self-&gt;connect( $host, $port ) ) == SOCKS_OKAY ) {
+   print STDERR &quot;Can't connect to $host:$port [&quot;.( socks_error($rc) ).&quot;]\n&quot;;
+   exit;
+ }</pre>
+<pre>
+ $sh = $self-&gt;sh;</pre>
+<pre>
+ print $sh, &quot;Hello !!!\n&quot;;
+ ...
+ $self-&gt;close;
+ ...
+ 
+ #  BIND THE PORT ( onlu SOCKS [4/5] proxies )
+ # ---------------
+ 
+ ...
+ $self = new Net::SC(
+                     Timeout         =&gt; ( $opt{'to'}  || 10      ),
+                     Chain_len       =&gt; ( $opt{'l'}   || 2       ),
+                     Debug           =&gt; ( $opt{'d'}   || 0x04    ),
+                     Log_file        =&gt; ( $opt{'lf'}  || undef   ),
+                     Random_chain    =&gt; ( $opt{'rnd'} || 0       ),
+                     Auto_save       =&gt; 1
+                  );</pre>
+<pre>
+ die unless ref $self;</pre>
+<pre>
+ unless ( ( $rc = $self-&gt;bind( $host, $port ) ) == SOCKS_OKAY ) {
+   print STDERR &quot;Can't bind port [&quot;.( socks_error($rc) ).&quot;]\n&quot;;
+   exit;
+ }</pre>
+<pre>
+ print STDOUT &quot;Binding the port : &quot;,
+               $self-&gt;socks_param('listen_port'), &quot;\n&quot;;
+ print STDOUT &quot;     in the host : &quot;,
+               $self-&gt;socks_param('listen_addr'), &quot;\n&quot;;
+ print STDOUT &quot;     for $host\n&quot;;
+        
+ $self-&gt;configure( TIMEOUT =&gt; 45 );
+ unless ( ( $rc = $self-&gt;accept() ) == SOCKS_OKAY ) {
+        return $rc;
+ } else {
+   $sh = $self-&gt;sh;
+ }
+ 
+ print STDOUT 'Connect from: ',
+                        $self-&gt;socks_param('listen_addr'), ':',
+                        $self-&gt;socks_param('listen_port'), &quot;\n&quot;;</pre>
+<pre>
+ print $sh 'Hello : ', $self-&gt;socks_param('listen_addr'), &quot;\n&quot;;
+ print $sh ' port : ', $self-&gt;socks_param('listen_port'), &quot;\n&quot;;</pre>
+<pre>
+ print STDOUT &lt;$sh&gt;;
+ ...
+ 
+Более детально все показано в примерах.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p></p>
+<p>
+</p>
+<h2><a name="constructor">CONSTRUCTOR</a></h2>
+<p></p>
+<dl>
+<dt><strong><a name="item_new">new</a></strong><br />
+</dt>
+<dd>
+
+</dd>
+<dd>
+<p>Инициализация внутренних переменных. В качестве параметров принимает хеш, со следующими ключами:</p>
+</dd>
+<dd>
+<pre>
+ TIMEOUT         - таймаут при создании цепочки, в секундах.</pre>
+</dd>
+<dd>
+<pre>
+ CHAIN_LEN       - длина цепочки.</pre>
+</dd>
+<dd>
+<pre>
+ DEBUG           - уровень отладки ( 0x00 | 0x01 | 0x02 | 0x04 )
+                   0x00 - выключить
+                   0x01 - включить
+                   0x02 - выводить все ответы от sokcs серверов
+                   0x04 - выводить все, что пишем socks'ам
+                   0x08 - расширенная информация об ошибках</pre>
+</dd>
+<dd>
+<pre>
+ CHAIN_FILE      - имя файла конфигурации.</pre>
+</dd>
+<dd>
+<pre>
+ CHAIN_FILE_DATA - ссылка на массив с данными ( формат такой же
+                   как и в файле конфигурации ). Можно использовать
+                   для передачи данных о цепочках напрямую, без
+                   использования файла конфигурации. При использовании
+                   данного параметра, параметр CHAIN_FILE игнорируется,
+                   то есть файл конфигурации НЕ читается.</pre>
+</dd>
+<dd>
+<pre>
+ SYSLOG          - 1 - Использовать для логирования syslogd
+                  ( под *nix ), или  eventlog ( под win32 ).
+                  По умолчанию 0.</pre>
+</dd>
+<dd>
+<pre>
+ LOG_FILE        - имя лог файла, если undef то все пишем в STDERR
+                   или передается syslogd.</pre>
+</dd>
+<dd>
+<pre>
+ RANDOM_CHAIN    - правило построения цепочки ( 0 || 1 ).
+                   0 - строить цепочку по порядку указанному в конфиге
+                   1 - строить цепочку в произвольном порядке.</pre>
+</dd>
+<dd>
+<pre>
+ CHECK_DELAY     - время в секундах, после которого при не удачной
+                   попытке коннекта к серверу, его имя не будет
+                   использовано при следующем создании цепочки.</pre>
+</dd>
+<dd>
+<pre>
+ AUTO_SAVE       - автоматически записывать данные о socks серверах
+                   в .db файл. Для более быстрого последующего коннекта.</pre>
+</dd>
+<dd>
+<pre>
+ LOG_FH          - Файловый дескриптор для LOG файла. Используется только
+                   если  LOG_FILE == undef</pre>
+</dd>
+<dd>
+<pre>
+ LOOP_CONNECT    - Прежде чем строить цепь дальше сервер коннектиться сам
+                   себе.
+                   0x01 - распространяется на socks v4
+                   0x02 - распространяется на socks v5
+                   0x04 - распространяется на http прокси</pre>
+</dd>
+<dd>
+<pre>
+ RESTORY_TYPE    - При установке в 1 данные из кэша об отсутствующих 
+                   машинах в файле конфигурации удаляются.</pre>
+</dd>
+<dd>
+<pre>
+ HTTP_CLIENT     - Имя клиента с которым ходим через http прокси.</pre>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="methods">METHODS</a></h2>
+<p></p>
+<dl>
+<dt><strong><a name="item_connect">connect</a></strong><br />
+</dt>
+<dd>
+Создает соединение с удаленной машиной.
+</dd>
+<dd>
+<pre>
+ Использование:</pre>
+</dd>
+<dd>
+<pre>
+  die unless $self-&gt;connect( $host, $port ) == SOCKS_OKAY;</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_bind">bind</a></strong><br />
+</dt>
+<dd>
+Создает соединение с socks сервером для соединения с ним.
+</dd>
+<dd>
+<pre>
+ Использование:</pre>
+</dd>
+<dd>
+<pre>
+  die unless $self-&gt;bind( $host, $port ) == SOCKS_OKAY;</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_accept">accept</a></strong><br />
+</dt>
+<dd>
+Ожидает соединение к соксу из вне...
+</dd>
+<dd>
+<pre>
+ Использование:</pre>
+</dd>
+<dd>
+<pre>
+  die unless $self-&gt;accept() == SOCKS_OKAY;
+  $sh = $self-&gt;sh;</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_sh">sh</a></strong><br />
+</dt>
+<dd>
+Возвращает сок хандле...
+
+</dd>
+<dd>
+<pre>
+
+ Использование:</pre>
+</dd>
+<dd>
+<pre>
+  $sh = $self-&gt;sh;</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_close">close</a></strong><br />
+</dt>
+<dd>
+Закрывает соединение через цепочку socks серверов...
+</dd>
+<dd>
+<pre>
+ Использование:</pre>
+</dd>
+<dd>
+<pre>
+  $self-&gt;close;</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_configure">configure</a></strong><br />
+</dt>
+<dd>
+Изменить/прочитать текущие значения ( инициализируются при создании <a href="#item_new"><code>new()</code></a> ).
+</dd>
+<dd>
+<pre>
+ Использование:</pre>
+</dd>
+<dd>
+<pre>
+  $self-&gt;configure( TIMEOUT =&gt; 10 );</pre>
+</dd>
+<dd>
+<pre>
+  первый аргумент - секция ( TIMEOUT, DEBUG, CHAIN_LEN, etc )
+  второй аргумент - новое значение. ( не обязательно )</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_socks_param">socks_param</a></strong><br />
+</dt>
+<dd>
+Возвращает параметры последнего socks сервера в цепочке, такие как listen_port, listen_addr, etc...
+</dd>
+<dd>
+<pre>
+ Использование:</pre>
+</dd>
+<dd>
+<pre>
+  $listen_addr = $self-&gt;socks_param( 'listen_Addr' );</pre>
+</dd>
+<dd>
+<pre>
+  $all_param = $self-&gt;socks_param();
+  $listen_addr = $all_param-&gt;{'listen_addr'};</pre>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="any_routines">ANY ROUTINES</a></h1>
+<p></p>
+<pre>
+    socks_error( ERROR_CODE )</pre>
+<pre>
+    Возвращает сообщение об ошибке по его коду.</pre>
+<pre>
+    Коды возврата socks'а :</pre>
+<pre>
+    SOCKS_GENERAL_SOCKS_SERVER_FAILURE
+    SOCKS_CONNECTION_NOT_ALLOWED_BY_RUL
+    SOCKS_NETWORK_UNREACHABLE
+    SOCKS_HOST_UNREACHABLE
+    SOCKS_CONNECTION_REFUSED
+    SOCKS_TTL_EXPIRED
+    SOCKS_COMMAND_NOT_SUPPORTED
+    SOCKS_ADDRESS_TYPE_NOT_SUPPORTED
+    SOCKS_OKAY
+    SOCKS_FAILED
+    SOCKS_NO_IDENT
+    SOCKS_USER_MISMATCH
+    SOCKS_INCOMPLETE_AUTH
+    SOCKS_BAD_AUTH
+    SOCKS_SERVER_DENIES_AUTH_METHOD
+    SOCKS_MISSING_SOCKS_SERVER_NET_DATA
+    SOCKS_MISSING_PEER_NET_DATA
+    SOCKS_SOCKS_SERVER_UNAVAILABLE
+    SOCKS_TIMEOUT
+    SOCKS_UNSUPPORTED_PROTOCOL_VERSION
+    SOCKS_UNSUPPORTED_ADDRESS_TYPE
+    SOCKS_HOSTNAME_LOOKUP_FAILURE</pre>
+<pre>
+    $self-&gt;get_socks_count</pre>
+<pre>
+     Возвращает число socks серверов которые могут быть
+     использованы для построения цепочки. Без учета находящихся
+     в данный момент в дауне.</pre>
+<pre>
+    $self-&gt;mark_proxy ( $proxy_id, $status );</pre>
+<pre>
+     Помечает прокси с порядковым номером в конфиге $id как временно 
+     недоступный - если $status != SOCKS_OKAY, иначе очищает счетчик
+     неудачных попыток...</pre>
+<pre>
+    $self-&gt;dump_cfg_data();</pre>
+<pre>
+     Сбрасывает текущее состояние всех серверов в ${CHAIN_FILE}.db
+     файл. Имеет смысл пользовать при большом списке соксов, многие
+     из которых часто дохнут... При Auto_Save данные сбрасываются
+     автоматически после каждого bind или connect.</pre>
+<pre>
+    $self-&gt;restore_cfg_data();</pre>
+<pre>
+     Восстанавливает значения таймаутов... Восстанавливаются
+     значения только для тех серверов которые прописаны в текущем
+     конфиге. Т.е. если конфиг пустой то ни чего не восстановится.
+     При установленной переменной $Net::SC::RESTORE_TYPE в 1 данные
+     из кеша удаляются, если в файле конфигурации не присутствует
+     больше данный Socks сервер.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="notes">NOTES</a></h1>
+<p></p>
+<p>accept изменяет следующие значения возвращаемые socks_param:</p>
+<pre>
+ listen_addr - IP адрес удаленной машины
+ listen_port - номер порта удаленной машины</pre>
+<p>Процедуры connect, bind, accept, при успешном завершении должны возвращать SOCKS_OKAY</p>
+<p>
+</p>
+<hr />
+<h1><a name="config_format">CONFIG FORMAT</a></h1>
+<p></p>
+<pre>
+ #host           :   port    : uid   :   pswd    : socks_proto
+ 192.168.1.90    :   1080    :       :           :   5
+ 192.18.122.90   :   3128    : bbb   :  ccc      :   0
+ ...</pre>
+<pre>
+ Коментари  - строки начинающиеся на `#', строки из одних
+ пробелов игнорируются.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p></p>
+<p>При использовании на сервере ( socks v5 ) правил доступа для юзеров, т.е. Васе можно на яндекс, а Вере на гугль, и запросе Васи к гуглю такая ситуация не обрабатывается в create_chain, считается, что прокся жива, но выдается честный SOCKS_CONNECTION_NOT_ALLOWED_BY_RULESET, поэтому если надо ловите такие ситуации сами, и с помощью <code>mark_proxy()</code> помечайте сервер как недоступный...</p>
+<p>В инете встречаются 'нехорошие' соксы которые вроде как есть, но не работают, поэтому например при коннекте к такому соксу v4 и длине цепочки равной 1, построение закончится неудачно даже если в конфиге еще остался список резервных серверов, для предотвращения этого можно попробовать пользоваться Loop_Connect - к каждому серверу в цепи коннектимся дважды, причем второй раз `через самого себя', что дает возможность проверить сервер...</p>
+<p>Loop_Connect также полезен в том смысле, что если коннекты через сервер запрещены, то помечается как плохой следующий в цепи, ну и чтоб предотвратить это...</p>
+<p>Http прокси не понимает метод bind.</p>
+<p>Http прокси поддерживает только basc авторизацию.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p></p>
+<p>perl, RFC 1928, RFC 1929, ...</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p></p>
+<pre>
+ Okunev Igor V.  <a href="mailto:igor@prv.mts-nn.ru">mailto:igor@prv.mts-nn.ru</a>
+                 <a href="http://www.mts-nn.ru/~gosha">http://www.mts-nn.ru/~gosha</a>
+                 icq:106183300
+</pre>
+
+</body>
+
+</html>

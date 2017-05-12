@@ -1,0 +1,22 @@
+Revision history for Net-MitM
+
+2013-04-15 Version 0.02
+  Don't use "my $_" construction in test suite.
+  No functional changes from 0.01.
+
+2013-04-13 Version 0.01.7745a5
+  Add interval_callback
+
+2013-04-12 Version 0.01_03.b400fa
+  Moved MitM from TCPIP::MitM to Net::MitM
+  Don't use "my $_" construction - breaks older versions of perl
+  Have a time based callback in mainloop - and allow it to tell mainloop to exit 
+
+2013-04-06 Version 0.01_02.51ae86
+  Renamed Tap to MitM
+  Directory of sample files added.
+  Serial now supports concurrent message handling - and is the default
+  General cleanup of POD, tests, code
+
+2013-04-01 Version 0.01_01.d7324d
+  Core functionality present and a basic test suite.

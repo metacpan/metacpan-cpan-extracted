@@ -1,0 +1,29 @@
+---
+abstract: 'a simple wrapper round the OAuth protocol'
+author:
+  - 'Simon Wistow, C<<simon@thegestalt.org>>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-OAuth-Simple
+provides:
+  Net::OAuth::Simple:
+    file: lib/Net/OAuth/Simple.pm
+    version: '1.7'
+requires:
+  CGI: '0'
+  Crypt::SSLeay: '0'
+  LWP::UserAgent: '0'
+  Net::OAuth: '0.27'
+  Test::More: '0.06'
+  URI: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.7'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

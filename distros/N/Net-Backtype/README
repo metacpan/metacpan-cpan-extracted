@@ -1,0 +1,83 @@
+NAME
+    Net::Backtype - client for the backtype API
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+      use Net::Backtype;
+      my $client = Net::Backtype->new();
+      my $res = $client->comments_page(url => 'http://...', key => $mykey);
+
+DESCRIPTION
+    Net::Backtype is a client for the backtype API
+
+  METHODS
+    comments_search
+        Search all the comments on BackType for a given string.
+
+            my $res = $client->comments_page(key => 's3kr3t', q => 'lumberjaph' );
+
+        q query (required)
+        key API key (required)
+        start date start (optional)
+        end date end (optional)
+
+        See <http://www.backtype.com/developers/comments-search>.
+
+    comments_connect
+        Retrieve all conversations related to a given URL.
+
+            my $res = $client->comments_connect(key => 's3kr3t', url => 'lumberjaph');
+
+        url url (required)
+        key API key (required)
+        sources (optional)
+        sort (optional)
+
+        See <http://www.backtype.com/developers/comments-connect>.
+
+    comments_connect_stats
+        Retrieve statistics on the conversations related to a given URL.
+
+            my $res = $client->comments_connect_stats(url => 'lumberjaph', key => 's3kr3t');
+
+        url url (required)
+        key API key (required)
+
+        See <http://www.backtype.com/developers/comments-connect-stats>.
+
+    comments_author
+        Retrieve comments written by a particular author.
+
+            my $res = $client->comments_author(url => 'lumberjaph', key => 's3kr3t');
+
+        url url (required)
+        key API key (required)
+
+        See <http://www.backtype.com/developers/url-comments>.
+
+    comments_page
+        Retrieve excerpts of comments published on a particular page.
+
+            my $res = $client->comments_page_stats(url => 'lumberjaph', key => 's3kr3t');
+
+        url url (required)
+        key API key (required)
+
+        See <http://www.backtype.com/developers/page-comments>.
+
+    comments_page_stats
+        Retrieve statistics for the comments published on a particular page.
+
+        See <http://www.backtype.com/developers/page-comments-stats>
+
+AUTHOR
+      franck cuny <franck@lumberjaph.net>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by linkfluence.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

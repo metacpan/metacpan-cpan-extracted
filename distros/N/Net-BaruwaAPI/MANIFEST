@@ -1,0 +1,24 @@
+Build.PL
+Changes
+lib/Net/BaruwaAPI.pm
+MANIFEST			This list of files
+README.pod
+t/00-load.t
+t/aliases.t
+t/authservers.t
+t/basic.t
+t/deliveryservers.t
+t/domainaliases.t
+t/domains.t
+t/ldapsettings.t
+t/organizations.t
+t/radiussettings.t
+t/relays.t
+t/status.t
+t/users.t
+t/lib/Test/Net/BaruwaAPI.pm
+t/responses/create_user
+Makefile.PL
+cpanfile
+META.yml
+META.json

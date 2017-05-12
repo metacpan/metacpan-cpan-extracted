@@ -1,0 +1,124 @@
+{
+   "abstract" : "Client library to interact with L<LCDproc|http://lcdproc.sourceforge.net/>",
+   "author" : [
+      "Ioan Rogers <ioanr@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-LCDproc",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Synopsis" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Const::Fast" : "0",
+            "Data::Dumper" : "0",
+            "IO::Socket::INET" : "0",
+            "Log::Any" : "0",
+            "Moo" : "1.001000",
+            "Moo::Role" : "0",
+            "Throwable::Error" : "0",
+            "Types::Standard" : "0",
+            "if" : "0",
+            "namespace::clean" : "0",
+            "perl" : "v5.10.2"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::More" : "0.94",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ioanrogers/Net-LCDproc/issues"
+      },
+      "homepage" : "http://metacpan.org/release/Net-LCDproc/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ioanrogers/Net-LCDproc.git",
+         "web" : "https://github.com/ioanrogers/Net-LCDproc"
+      }
+   },
+   "version" : "0.104",
+   "x_BuiltWith" : {
+      "modules" : {
+         "CPAN::Meta" : "2.150001",
+         "Const::Fast" : "0.014",
+         "Data::Dumper" : "2.154",
+         "ExtUtils::MakeMaker" : "7.04",
+         "File::Spec" : "3.48",
+         "IO::Handle" : "1.35",
+         "IO::Socket::INET" : "1.35",
+         "IPC::Open3" : "1.16",
+         "Log::Any" : "1.032",
+         "Module::Build::Tiny" : "0.039",
+         "Moo" : "2.000001",
+         "Moo::Role" : "2.000001",
+         "Test::CPAN::Changes" : "0.400001",
+         "Test::CPAN::Meta::JSON" : "0.16",
+         "Test::CheckDeps" : "0.010",
+         "Test::EOL" : "1.5",
+         "Test::More" : "1.001014",
+         "Test::NoTabs" : "1.4",
+         "Test::Pod" : "1.50",
+         "Test::Synopsis" : "0.11",
+         "Test::Version" : "2.01",
+         "Throwable::Error" : "0.200012",
+         "Types::Standard" : "1.000005",
+         "if" : "0.0603",
+         "namespace::clean" : "0.25",
+         "strict" : "1.08",
+         "warnings" : "1.23"
+      },
+      "perl" : {
+         "original" : "v5.20.1",
+         "qv" : 1,
+         "version" : [
+            5,
+            20,
+            1
+         ]
+      },
+      "perl-config" : {
+         "gccversion" : "4.2.1 Compatible Clang 3.5.0 (tags/RELEASE_350/final)",
+         "myarchname" : "x86_64-linux",
+         "osname" : "linux"
+      },
+      "platform" : "linux"
+   }
+}

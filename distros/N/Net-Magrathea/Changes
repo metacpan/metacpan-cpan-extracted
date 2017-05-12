@@ -1,0 +1,11 @@
+Revision history for Net-Magrathea
+
+0.03  Mon Jan 25 20:00:00 2010
+       status should be using STAT, not REAC
+
+0.02  Wed Jan 20 15:00:00 2010
+       Remove Build.PL as per Module::Install guidelines
+
+0.01  Thu Nov 26 18:00:00 2009
+       Initial release.
+

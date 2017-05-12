@@ -1,0 +1,763 @@
+Revision history for Net::SIP
+
+
+0.809 2017-03-14
+- StatelessProxy: decrease size of resulting new contact in the default
+  rewrite_contact handler to better deal with implementations which severally
+  limit the size of contact headers they accept.
+  Switch _stupid_crypt from mac-then-encrypt to encrypt-then-mac
+- RT#120593, StatelessProxy now handles rewriting of contacts with no '@'
+- RT#120039, SocketPool callbacks now include receiving socket object for
+  further analysis, like getting the certificates from the SSL socket
+- RT#120011, Leg::forward_outgoing - ignore (invalid) Via headers w/o branch
+- RT#120009, use ReuseAddr additionally to Reuse in IO::Socket* for compatibilty
+  with IO::Socket::IP
+0.808 2016-12-13
+- make DTMF detection more robust in case of UDP reordering, duplicates etc
+- make t/19_call_with_dtmf.t more robust on slooow systems
+- call UA cleanup in tests to reduce warnings at global destruction
+0.807 2016-12-07
+- fix workaround for IO::Socket::IP from 0.806
+- fix DNS resolver fix from 0.806
+0.806 2016-12-06
+- fixed case in builtin DNS resolver where address records got preference
+  to SRV records
+- work around IO::Socket::IP behavior on systems with only lo interface
+0.805 2016-12-05
+- use host argument in Leg::new even if ip and port are extracted from the
+  socket
+0.804 2016-12-05
+- fix requirement for 5.10.0 in Makefile.PL and SIP.pm
+0.803 2016-12-04
+- Dispatcher::resolve_uri - fix case with explicit transport
+- SocketPool: support for requesting client certificate (argument
+  verify_client). Update documentation to include TLS settings.
+- refuse to build if Socket does not implement inet_pton
+- spelling fixes from Debian RT#118979
+- make it more friendly to cpantesters
+0.802 2016-11-25
+- various small fixes primarily related to TLS
+- Util::sip_sockinfo2uri accepts hash for convinience
+- lots of improvements for code readibility and better documentation based on
+  feedback from BLUHM
+0.801 2016-11-23
+- bugfix Util::ip_string2parts
+0.800 2016-11-23
+- added support for TLS (SIPS) when IO::Socket::SSL >= 1.956 is installed
+- make the requirement for Net::DNS optional, i.e. only needed if actually used
+  for DNS lookups.
+- fully non-blocking DNS lookups in Dispatcher (dns_host2ip, dns_domain2srv)
+- new/extended API
+  - easy way to do own DNS resolving with dnsresolv argument to Dispatcher
+  - new function Util::ip_is_v46
+  - Util ip_string2parts, ip_sockaddr2parts return hash on wantarray and the
+    reverse functions ip_parts2string, ip_parts2sockaddr accept hash reference
+  - Leg->laddr(2) uses hostname instead of IP address
+- important, partly incompatible API changes
+  - Leg::new and Simple::new now croak when unexpected arguments are given
+  - Internals changed for more code reability and to take care of TLS where the
+    hostname is needed for certificate validatin. Lots of structures are now
+    managed by (restricted) hashes which were previously implemented as arrays.
+    Anybody grabbing in the internals will probably need to adjust code.
+    Affects partly the more public functions of Leg and Dispatcher too.
+
+0.703 2016-11-20
+- fix to support Perl 5.14.x and lower
+0.702 2016-11-18
+- fix wrong TCP connect timeout triggered long after successful connect
+- fix reading of partial SIP packet with TCP
+- various small improvements based on feedback from BLUHM
+0.701 2016-11-17
+- fix TCP async connect
+0.700 2016-11-17
+- support for TCP
+- major API changes !!!
+  - proxies, registrars etc are no longer given with udp:/tcp: prefix to signal
+    which protocol gets used but instead SIP URL's are used:
+      sip:...  - SIP over UDP
+      sip:...;transport=TCP - SIP over TCP
+      sips:... - SIP over TLS
+    the simplified syntax without protocol specification still works and is
+    considered as before as SIP over UDP
+  - Util: result of sip_uri2parts changed
+    from (domain,user,proto,param,data)
+    to   (domain,user,proto,data,param)
+  - Eventloop - addFD, delFD now take argument $rw to specify if the handler is
+    for read or for write. If omitted in delFD it will remove all handlers for
+    fd as before. Wrong (old) usage with addFD will result in Carp::confess.
+    !!! When integrating with its own eventloop this is also the interface this
+    loop is expected to provide !!!
+  - Dispatcher::deliver: arguments dst_addr now [proto,ip,port,family] instead
+    of string. Using string with SIP URI is also still supported but not
+    official API but existing code without protocol specification in string
+    should thus still work.
+  - Endpoint::register expects SIP URI, i.e. no longer adds 'sip:' prefix
+  - fields or meaning of fields in Leg, Packet, Dispatcher::Packet changed but
+    nobody should have accessed these internals anyway
+  - Leg::deliver: destination given as [proto,ip,port,family] instead of
+    ip:port string
+  - Leg::sendto takes packet object instead of packet string, dst as single
+    argument with [host,port,family] instead of separate addr and port arguments
+  - Leg::receive now gets (packet,from) and returns the same (might modify data
+    but currently doesn't). Previously reading of the packet was done inside
+    this function but now reading is done by SocketPool and Leg just has the
+    option to process packet.
+
+0.691 2016-10-31
+- various smaller enhancements
+- added spelling fixes from Debian, RT#118564
+0.690 2016-10-30
+- fix target hostname vs. IP detection in StatelessProxy with IPv6
+0.689 2016-10-28
+- some IPv6 fixes and enhancements in parts based on review by BLUHM
+0.688 2016-10-26
+- support for IPv6
+0.687 2014-02-11
+StatelessProxy:
+- better encryption for rewritten contact and way to define its own
+- fix loop detection
+0.686 2014-02-07
+- StatelessProxy: rewriting contact now contains information about incoming
+  and outgoing legs to restore the path if somebody uses the rewritten
+  contact for a new request
+0.685 2014-02-04
+- fix NATHelper::Call::session (wrong argument for callback)
+- enhance NATHelper::Session to connect sockets if we detect that the peer
+  uses symmetric RTP. Make sure, that even with asymmetric RTP we get the
+  data from always the same peer
+0.684 2014-01-27
+- add hooks into NATHelper::Base to make it easier to adapt
+0.683 2013-10-23
+- fix issue with comma inside <..>, thanks to ccjaph[AT]gmail[DOT]com
+  https://rt.cpan.org/Ticket/Display.html?id=89712
+0.682_1 2013-09-30
+- fixed issue, where incoming sequence number of 0 was seen as duplicate of
+  previous incoming request
+  Thanks to stefano[DOT]pisani[AT]omniavoip[DOT]org
+- added more meta information to Makefile.PL
+0.682 2013-07-29
+- add DTMF receiving to Simple::RTP send_recv handler
+  Thanks to stefano[DOT]pisani[AT]omniavoip[DOT]org
+- enhanced t/19_call_with_dtmf.t
+0.681 2013-07-29
+- add DMTF media type to SDPs media line in 
+  Simple::Call::_setup_local_rtp_sockets.
+  Thanks to stefano[DOT]pisani[AT]omniavoip[DOT]org
+0.68 2012-12-17
+- https://rt.cpan.org/Ticket/Display.html?id=82041 by dying in Makefile.PL
+  on Win32. Probably only the forking tests will be the problem on windows,
+  but for now I've no motivation to put more efforts in supporting this
+  platform.
+0.67 2012-08-29
+- fixed https://rt.cpan.org/Ticket/Display.html?id=78979, thanks to 
+  Martin Skøtt for reporting
+- added cb_notify callback to Net::SIP::Simple, which gets triggered 
+  when a NOTIFY gets received
+0.66_1 2012-07-03
+- added method request to Simple::Call, usable to create requests within the
+  context of the current call, like REFER.
+0.66 2012-06-26
+- fix in DTMF code for perl<5.14
+0.65 2012-06-25
+- first non-developer release with DTMF support.
+  Reworked some documentation regarding DTMF handling, otherwise same as
+  0.64_6
+- removed t/*fdleak tests for now, because they no longer work on recent
+  linux versions (ubuntu 12.04) which sometimes map /proc/pid/auxv as
+  a file descriptor and thus mix up fd count. 
+  Will be added again once the problem is worked around
+0.64_6 2012-06-12
+- support for DTMF in Net::SIP::Simple : sending and receiving, rfc2833 
+  and audio. See sub dtmf and callback cb_dtmf.
+0.64_5 2012-05-06
+- add info about final response to most of the cb_final callbacks
+  based on idea from r[DOT]molle[AT]teles[DOT]de
+0.64_4 2012-04-17
+- to modify request before authorized response one can now first issue 
+  request w/o authorization, catch the 401/407 response within the cb_final
+  and then reissue the request including the response containing the
+  authorization request as resp40x parameter
+0.64_3 2012-03-17
+- add response packet to final callback when registration failed in
+  Simple::register. Can be used to to preflight registration in case
+  of NAT and to extract received_addr etc from response.
+  based on idea from r[DOT]molle[AT]teles[DOT]de
+0.64_2 2012-03-17
+- if contact is given for leg use it for the default contact in 
+  INVITE requests and 2xx responses instead of addr:port,
+  based on idea from r[DOT]molle[AT]teles[DOT]de
+0.64_1 2012-01-13
+- let Net::SIP::Simple invite and register define the callid for the
+  connection, based on idea from r[DOT]molle[AT]teles[DOT]de
+0.64 2011-10-25
+- in stateless proxy: if incoming leg and outgoing leg are different add
+  via header for incoming leg and use it when response comes in to find 
+  the outgoing leg for the response
+0.63 2011-10-10
+- just call 0.62_12 0.63 because the last stable was released long ago
+0.62_12 2011-10-07
+- authorization infos gets copied to new call object if INVITE was received.
+- add create_auth to Net::SIP::Simple, fix authorization for registrar (only
+  on REGISTER)
+- add cb_invite callback to Net::SIP::Simple::Call, which gets triggered on
+  reinvite from peer
+- added more samples below samples/ directory
+0.62_11 2011-09-11
+- add authorization to listen, registrar, proxy
+- add test for invite+reinvite+bye with authorization
+- fix so that ACK and CANCEL reuse authorization from INVITE
+0.62_10 2011-08-26
+- reorder actions in Endpoint::Context::handle_response, so that 
+  response requesting authorized BYE gets handled with authorized BYE 
+  instead of ignoring it.
+  Thanks to Roland Mas lolando[AT]debian[DOT]org for reporting the problem.
+0.62_9 2011-05-17
+- clarify behavior for bad packets in documentation (e.g. throw
+  exception)
+0.62_8 2011-05-13
+- deal with mailformed SDP body in Net::SIP::Simple::Call, e.g. catch
+  error and ignore packet instead of letting the application die.
+  Thanks to vitspec[AT]gmail[DOT]com reporting the problem.
+0.62_7 2011-05-02
+- fix Dispatcher::add_leg for arguments IO::Handle and Hash.
+  Thanks to DetlefPilzecker[AT]web[DOT]de for reporting
+0.62_6 2011-04-15
+- fix UAC behavior for response to REGISTER in Net::SIP::Simple::register
+  Thanks to dmw for reporting http://cpanforum.com/posts/13305
+0.62_5 2011-03-08
+- fix to Net::SIP::Authorize::FromIsRealm. Here was not only the domain
+  part compared to the realm but additionally the port if the sender
+  was given as sip:user@host:port
+  Thanks to DetlefPilzecker[AT]web[DOT]de for reporting
+0.62_4 2011-02-14
+- on permanent delivery failure callback was called within context
+  with wrong order of arguments. Thanks to 
+  james[AT]bolderthinking[DOT]com for reporting problem.
+0.62_3 2011-02-03
+- track which method started context and close context on final
+  response (>=200) unless method was INVITE.
+  Thanks to james[AT]bolderthinking[DOT]com for reporting problem.
+0.62_2 2011-02-03
+- changes to Net::SIP::Dropper* based on feedback from
+  DetlefPilzecker[AT]web[DOT]de
+0.62_1 2011-01-18
+- add Net::SIP::Dropper incl. ...Dropper::{ByIPPort,ByField} based
+  on a lot of input and code from DetlefPilzecker[AT]web[DOT]de
+0.62 2010-12-06
+- overwrite route header from record-route only for 200 response
+  which established dialog, not for further responses
+  Thanks to vitspec[AT]gmail[DOT]com for reporting.
+0.61 2010-12-06
+- overwrite route header from record-route only for first INVITE
+  in context, not for re-INVITEs.
+  Thanks to vitspec[AT]gmail[DOT]com for reporting.
+0.60 2010-11-30
+- overwrite route header from record-route only for INVITE.
+  Thanks to vitspec[AT]gmail[DOT]com for reporting.
+0.59_11 2010-11-02
+- overwrite a given route header for any new request if there is
+  already a route information for the given context.
+  Thanks to vitspec[AT]gmail[DOT]com for reporting.
+0.59_10 2010-11-01
+- the route header in ACK must be set to the route it got by 
+  record-route from the response (if any), instead of using the
+  route from the INVITE.
+  Thanks to vitspec[AT]gmail[DOT]com for reporting the bug. 
+0.59_9 2010-09-09
+- bugfix rport handling by DetlefPilzecker[AT]web[DOT]de
+- clarify documentation of Net::SIP::Packet, e.g. that it die()s if
+  it cannot parse string as SIP packet
+0.59_8 2010-08-20
+- fixes to 0.59_7 from DetlefPilzecker[AT]web[DOT]de
+- added documentation for filter in Authorize
+0.59_7 2010-08-17
+- additional authorization based on idea of 
+  DetlefPilzecker[AT]web[DOT]de
+0.59_6 2010-08-09 
+- fix unitialized warning in Authorize if user neither in user2a1
+  nor in user2pass. 
+- dispatcher: add recieved + rport to via only for requests
+- Thanks again to DetlefPilzecker[AT]web[DOT]de
+0.59_5 2010-08-09 
+- fix Registrar to get the address for registration from 'To' header, 
+  not 'From' header. Thanks again to DetlefPilzecker[AT]web[DOT]de
+0.59_4 2010-08-08 
+- fix rport handling. Thanks again to DetlefPilzecker[AT]web[DOT]de
+0.59_3 2010-07-26
+- fix Via:..;received= handling - should by IP of sending host, not
+  of receiving leg. Moved setting it to dispatcher, and set target addr
+  from received in Statelessproxy instead of lookup for leg with this
+  addr.  Thanks again to DetlefPilzecker[AT]web[DOT]de
+- added rport support to Via header (RFC 3581)
+0.59_1 2010-07-22
+- Leg: Via..received= should only contain ip, not ip:port.
+  Thanks to DetlefPilzecker[AT]web[DOT]de for pointing out. Fix
+  Leg and StatelessProxy (where it expects to get port)
+0.59 2010-07-12
+- Dispatcher::cancel_delivery returns true if delivery was canceled
+- Blocker blocks all ACKS if all INVITE will be blocked, no mattter
+  if the response is in delivery queue. Thanks to 
+  DetlefPilzecker[AT]web[DOT]de
+0.58_11 2010-07-09
+- fix for Blocker + test from DetlefPilzecker[AT]web[DOT]de
+0.58_10 2010-06-24
+- if qop=auth,auth-int given respond with qop=auth
+0.58_9 2010-06-24
+- Endpoint::Context::request_delivery_done - do not remove 
+  transaction, because in case of tcp delivery done will be called
+  once request is send. transaction will be removed in handle_response
+  already
+0.58_8 2010-06-24
+- Request::authorize - accept qop="auth,auth-int".., e.g. es long 
+  auth is specifified its ok. Based on Bug report from 
+  alain[AT]knaff[DOT]lu
+0.58_7 2010-06-11
+- removed unused field outgoing_leg from Net::SIP::Dispatcher.
+  Thanks to DetlefPilzecker[AT]web[DOT]de for pointing this out
+0.58_6 2010-06-02
+- fixes on Authorize.pm based on reports from 
+  DetlefPilzecker[AT]web[DOT]de:
+  - cancel_delivery in Authorize on ACK
+0.58_4 2010-05-31
+- fixes on Redirect.pm based on reports from 
+  DetlefPilzecker[AT]web[DOT]de:
+  - respond 200 to CANCEL
+  - redirect everything except REGISTER, not only INVITE
+0.58_3 2010-05-31
+Based on patches from DetlefPilzecker[AT]web[DOT]de
+- Net::SIP::Request::create_response - msg is optional, if not given
+  a builtin msg for the code will be used. 
+- new functionality: Net::SIP::Blocker provides way to block requests
+  by method name with custom code
+0.58_2 2010-05-31
+- fix Net::SIP::Simple::register, so that it uses an explicitly 
+  given contact unchanged. Bug report by 
+  stefano[DOT]pisani[AT]omnianet[DOT]it
+0.58_1 2010-05-28
+various fixes based on feedback and patches from 
+DetlefPilzecker[AT]web[DOT]de
+- check authorization for CANCEL not only against INVITE:uri but also
+  against CANCEL:uri. The RFC is not specific in this area
+- Authorize: don't forward unauthorized ACKs
+- ReceiveChain: filter callback need not to be code ref, especially
+  if methods arg was used. Now called with invoke_callback instead
+
+0.58 2010-04-15
+- with 'perl -MNet::SIP=rtp:min-max' the ports to used for RTP can be
+  restricted, useful if behind firewall with limited forwarding.
+  See Net::SIP doku for more information.
+  Thanks to DetlefPilzecker[AT]web[DOT]de for pointing out the problem.
+0.57_4 2010-04-15
+- Net::SIP::Endpoint::Context - set context.to based on reply before
+  invoking callback. Thanks <vitspec[AT]gmail[DOT]com> for input.
+0.57_3 2010-04-15
+- Net::SIP::Leg::receive: ignore packets with len<13 because any valid
+  packet must be larger. Such packets are used for keep-alives.
+  Thanks to DetlefPilzecker[AT]web[DOT]de for pointing out the problem.
+0.57_2 2010-04-13
+- added Net::SIP::Simple::Call::get_param as pendant to set_param based
+  on patch from <dave[AT]3c[DOT]co[DOT]uk>
+0.57_1 2010-04-13
+- dispatcher calls receive callback with eval so that it does not 
+  die on bad or unexpected packets. Thanks to <vitspec[AT]gmail[DOT]com>
+  for pointing out the problem
+
+0.57 2010-03-19
+- save remote_contact from successful responses in context and use
+  them as remote-URI in new requests. 
+  Thanks to <vitspec[AT]gmail[DOT]com> for pointing out the problem.
+
+0.56 2010-02-02
+- fix CANCEL handling: instead of closing the context immediately:
+  - server should return 487 to client before closing the context
+  - server should ignore ACKs for unknown contexts instead of 
+    replying with 481
+  - client should not close context after CANCEL but wait for 
+    response too invite (probably 487) so that it can ACK it
+  - extend t/11_invite_timeout.t to test for the behavior
+  - thanks to <vitspec[AT]gmail[DOT]com> for pointing out the problems.
+
+0.55_1 2010-02-02
+- add samples/register_and_redirect.pl
+
+0.55 2010-01-27
+- Net::SIP::Redirect provides functionlity to redirect INVITES using
+  information from registrar. Sample program
+  samples/register_and_redirect.pl
+- fixes for Net::SIP::Authorize if no pass is known for user (or user
+  is not known).
+- fixes for Net::SIP::Authorize for ACK an CANCEL (no challenge 
+  possible, credentials should be compared against INVITE method)
+
+0.54 2009-09-04
+- bugfix in Net::SIP::Packet::new_from_parts when the header was already
+  given as list of Net::SIP::HeaderPair objects
+
+0.53 2009-01-26
+- add Option force_rewrite to Net::SIP::StatelessProxy so that it rewrites
+  the contact even if incoming and outgoing legs are the same
+
+0.52 2008-12-17
+- removed changes from 0.47 - if 2xx response to INVITE contains
+  contact header this is used as the base for the request-URI in ACK,
+  not the one from the original INVITE
+
+0.51 2008-12-16
+- get to+tag from 2xx response on invite only when call is outgoing,
+  e.g. not on re-INVITE from UAS where UAC send initial INVITE
+
+0.50 2008-10-31
+- release 0.49_3 as 0.50
+0.49_3 2008-10-29
+- Net::SIP::StatelessProxy - observe maddr of URI when forwarding
+0.49_2 2008-10-29
+- Net::SIP::Dispatcher - observe maddr and transport parameter of URI
+  when finding peer
+0.49_1 2008-10-23
+- fixed code in Net::SIP::Simple::RTP where it dropped packets
+  (and subsequently terminated the connection due to inactivity)
+  when the 16bit RTP sequence counter overflowed
+
+0.49  2008-09-30
+- fixed Socket6::inet_pton based check for valid IP6 address in 
+  Net::SIP::SDP
+0.48_1
+- fix bugs reported by gilad[AT]summit-tech[DOT]ca:
+  - force Allow and Supported header only on INVITE req and 2xx response
+    to INVITE, on 2xx responses to OPTIONS and on 405 responses
+  - force Contact header only on INVITE req and it's 2xx response
+
+0.48
+- new function Net::SIP::Util::sip_uri_eq to check if two URIs mean the 
+  same
+- fix bugs reported by gilad[AT]summit-tech[DOT]ca:
+  - when comparing Route header in incoming/outgoing request with myself
+    use sip_uri_eq instead of simple eq, because the URIs might be
+    the same, but one might specify a default port while the other not
+  - when adding record-route header in forward_outgoing check that the 
+    top record-route header isn't myself (in case incoming and outgoing
+    leg are the same)
+
+0.47
+- if contact header changes the URI of the dialog send the ACK with
+  the original URI of the INVITE and change the dialogs URI afterwards
+
+0.46
+- support for canceling a call after some time of ringing based on
+  input from http://rt.cpan.org/Ticket/Display.html?id=34576
+  see Net::SIP::Simple::Call documentation for sub reinvite, parameters
+  ring_time, cb_noanswer. See also method cancel in this package
+  feature gets used in samples/invite_and_send.pl too
+- fix for t/*_fdleak for platforms, which use 2 fd for tempfiles (see 
+  http://rt.cpan.org/Ticket/Display.html?id=35485). Now it allocates a
+  new fd simply by dup()ing STDOUT
+- fix in Net::SIP::Dispatcher::Eventloop in case the select returned
+  because of EINTR
+- fixes in handling response in Net::SIP::Endpoint::Context for the case,
+  that multiple requests shared the same tid (e.g. INVITE,CANCEL)
+- support for user2a1 instead of user2pass in Net::SIP::Authorize based
+  on input from Alex Revetski <revetski[AT]gmail[DOT]com>
+  http://rt.cpan.org/Ticket/Display.html?id=34648
+
+0.45
+- Net::SIP::Packet::sdp_body - content type is case insensitive,
+  accept application/SDP etc
+- more debug statements
+- Dispatcher::EventLoop::addFD
+  3rd arg name of callback to aid debugging
+- Net::SIP::SDP - better check for IP6 address
+- Leg: allow multiple contact header in request/response
+- StatelessProxy: 
+  - rewrite contact header only if incoming_leg!=outgoing_leg,
+  - let it actuall define external rewrite function
+  - prefix user in default rewrite contact with 'r' so that it does
+    not look like phone number and doesn't irritate rewriting
+  - fix rewriting, so that user part does not need to be \w+
+  - split __forward_request into __forward_request_getleg and 
+    __forward_request_getaddr for better subclassing
+  - reduce <..> into .. in route before processing it
+- Registrar: 
+  - update all contact information at once, don't combine information 
+    from different register requests
+  - access to internal store, to save/restore it from disk with
+    bin/stateless_proxy.pl
+- fix and extend bin/stateless_proxy.pl
+  - add rewriting, e.g. 0XXX gets forward as XXX to host 
+  - restore/save registry data on start/exit
+  - rework lots of code
+- Net::SIP::Debug: import can set debug function, level and export 
+  function within the same call
+- bugfix Net::SIP::Endpoint::Context::handle_response, see
+  http://rt.cpan.org/Ticket/Display.html?id=35121
+
+0.44
+- Net::SIP::Packet::get_header: if called in scalar to get the only
+  one value and we have multiple values try if they are all the same
+  and in this case return the uniq value instead of croaking
+  Works around bug in proxy which issued two content-length headers
+  with the same length as reported in
+  http://rt.cpan.org/Ticket/Display.html?id=33592
+- fix test skip in t/*fdleak.t 
+
+0.43
+- enforce codec 0 PCMU/8000 in outgoing SDP generated based on
+  incoming SDP, don't just accept all codecs the other party offers
+  because Net::SIP::Simple can only PCMU/8000
+- make header names per default ucfirst (Via not via)
+- add default allow and supported headers to INVITE requests and
+  2xx responses if none where given
+- fix bug indroduced in 0.42, where contact from incoming INVITE
+  was not used as URI for outgoing BYE for the call
+
+0.42
+- on 2xx responses set the URI of the dialog to the contact given
+  in the response. For 302 retry the request with the URI set to
+  the contact given in the 302 response.
+- make sure that the right contact header is set. for outgoing
+  invites and 2xx responses to invite combine the user part from the 
+  sender ('from' for requests, 'to' for responses) with addr and port 
+  from the outgoing leg - unless the contact was explicitly set.
+- if a contact header was given in Net::SIP::Simple which had a
+  port specification the port would be duplicated, e.g. 
+  user@ip:port:port
+
+0.41
+- give 'contact' header to Net::SIP::Simple which is then used for
+  invite and register
+- more checks of data when parsing SIP header, more knowledge about 
+  keys, where the values cannot be comma-seperated
+  (http://rt.cpan.org/Public/Bug/Display.html?id=31236)
+- fix wrong call of ok() in t/03_forward_stateless
+- fix http://rt.cpan.org/Public/Bug/Display.html?id=31284
+  (Net::SIP::Request::set_uri did not update string representation)
+
+0.40
+- Net::SIP::Simple::RTP - when sending data from file set the timestamp
+  based on sequence number and packet size ( == samples in packet for 8bit)
+- set Via header correct in the case of udp and port 5061.
+  No longer set Via based on contact header, base it only on address
+  of leg
+- primitive support for other codecs in Net::SIP::Simple, see 
+  rtp_param in Net::SIP::Simple::Call
+
+0.39
+- work around missing support for non-blocking sockets in IO::Socket
+  on MSWin32 platform
+- fix  http://rt.cpan.org/Ticket/Display.html?id=30691 where the same realm
+  was authorized again and again if the given user/pass where wrong
+
+0.38
+- fix dns lookup problem for SRV records. Instead of using the
+  IP it used the service name (e.g. _sip._udp....) as the target
+  of the packet
+- bin/answer_machine.pl - crude attempt to create filenames
+  which don't have chars special to windows ('<',...)
+
+0.37
+- Endpoint::close_context now cancel all outstanding deliveries 
+  for this context in the dispatcher. Extented queue objects 
+  and Dispatcher::cancel_delivery to make this possible
+- tests for file descriptor leaks (09_fdleak.t,10_fdleak.t)
+- some more Scalar::Util::weaken for callbacks in Simple::Call
+  to stop circular references
+
+0.36
+- small performance improvements for Net::SIP::Simple::RTP
+  and samples/bench
+- fixed race condition on Net::SIP::Dispatcher::Eventloop (e.g
+  one callback disabled fd, but it tried to call callback for the
+  disabled fd)
+- added Net::SIP::Simple::cleanup and made some references to the
+  objects within callbacks weak, so that no objects and file
+  descriptors would leak if properly used
+
+0.35
+- Net::SIP::Simple::Call - close call context in $call->cleanup,
+  otherwise it could leak file descriptors if the call wasn't
+  closed clean (with BYE or CANCEL).
+- new test applications for simple benchmarks in samples/bench
+- documentation: new file samples/README describes the files in 
+  samples/
+
+0.34
+- Net::SIP::Simple: handle OPTIONS requests. These are for 
+  instance used by Asterisk to determine if the registered 
+  party accepts incoming calls.
+ 
+0.33
+- fix rt#29153 in StatelessProxy.pm ($1 from prev regex
+  used after call of user function, which could change it)
+- Endpoint::new_response - make sure that 2xx responses to
+  INVITE carry a contact header
+
+0.32
+- Net::SIP::Registrar checks on non-REGISTER requests if the
+  target it registered with itself and then rewrites the URI in
+  the packet. This can be used for a combined Registar+Proxy,
+  see samples/test_registrar_and_proxy.pl
+- samples/invite_and_*.pl have now option -L|--leg to specify
+  a local address
+
+0.31
+- make it usable for perl5.9, tested with 5.9.5
+
+0.30
+- Option cb_preliminary for Simple::Call:reinvite to specify
+  callback which will be triggered when preliminary response
+  is received
+  more parameter for cb_create in Simple::listen, so that
+  it can create a response (like 180 Ringing) to the peer
+  see documentation and the adapted t/02_listen_and_invite.t
+
+0.29
+- make sure that max-forwards is added to every Request from the
+  endpoint and that all INVITE have a contact header because these
+  are mandatory according to RFC
+- invoke 'filter' callback in Net::SIP::Simple::listen with the
+  Request object as an additional argument, cb_create callback
+  in listen needs to return TRUE or the call will be closed
+  !!!! Warning: this might break code which did not return TRUE
+  from cb_create !!!!!
+
+0.28
+- Request.pm - make sure that nc-count is send when authorizing
+  and qop was set. This is required according to rfc2617
+
+0.27
+- Authorize.pm, Request.pm - support 'opaque' field in digest
+  authorization (when authorizing or when requesting authorization)
+
+0.26
+- SDP.pm - fix regex for IP4 which did not include all IPv4 addr
+
+0.25
+- small fixes to SDP
+- added concept of chains, e.g. put an Authorize object in
+  front of Registrar inside a ReceiveChain and all REGISTER
+  requests will be authorized,
+  see Net::SIP::{Authorize,ReceiveChain}
+- StatelessProxy can no longer have an internal Registrar.
+  use ReceiveChain to put a Registrar in front of the proxy
+  instead
+- new test t/08_register_with_auth.pl to test Authorize 
+  and ReceiveChain
+- fix Request::authorize
+  
+0.24
+- make adding commands to NATHelper::Server easier
+- add user params for NATHelper::Session during activate_session
+- SDP: make sure that IP4/IP6 is valid IP
+- small fixes
+
+0.23
+- fix memleak in NATHelper::Base
+- support for derived NATHelper::Base in NATHelper::Server 
+- update docu for NATHelper::Base::expire
+
+0.22
+- enforce perl5.8 and prerequisite Net::DNS in Makefile.PL
+- NATHelper::Base - more controling of resource usage with
+  max_sockets and max_sockets_in_group and/or by redefining
+  (un)get_rtp_sockets
+
+0.21
+- new sample samples/3pcc.pl for 3rd party call control
+- small fixes
+
+0.20
+- enhancements on tests, new tests for reinvite and call on hold
+- lots of bugfixes: re-invites, NAT, call on hold, branch tag
+  on via and 'tag' on to|from in responses, max-forwards handling,
+  response caching in dispatcher....
+- set route from record-route in responses, use route header
+  in dispatching outgoing requests
+- early loop detection for outgoing packets
+- new param call_on_hold for Net::Simple::Call to set call on
+  hold on reinvite...
+
+0.18
+- NATHelper::* changes in the return values of expire,
+  close_session, activate_session to aid logging of
+  sessions (see updated doc)
+- NATHelper::Local has smarter _update_callbacks
+- bugfixes, especially on Net::Simple regarding handling 
+  of re-invites in existing call
+- new test t/06_call_with_reinvite.t
+
+0.17
+- added documentation for Net::SIP::NATHelper::*
+- updated doc for Net::SIP::StatelessProxy regarding NAT
+- added HOWTO with some Q+A
+- added COPYRIGHT
+- new method 'method' in Net::SIP::Response
+- small bugfixes
+
+0.16
+- lots of bugfixes
+- removed leg2proxy and domain2leg from Net::SIP::Dispatcher
+  again because they do not fit into concept, see 
+  bin/stateles_proxy.pl how to achieve similar things
+- lot of bugfixes, changes and enhancement on StatelessProxy
+- Net::SIP can now export useful things, see doc
+- a lot of enhancements for NAT, implementation of local
+  (inside process) and remote NAT helpers which forward
+  RTP data
+- Net::SIP::Dispatcher: lookup for A an SRV records now in
+  seperate, callback oriented method (which are not asynchronous
+  yet, but have an asynchronous interface)
+- moved real world usable programs from samples/ to bin/
+- more tests, samples/ and bins/
+
+0.15
+- various bugfixes
+- limit Max-Forwards header to 70 while forwarding packets
+  for security reasons (to avoid bad clients which will set
+  it to something very high and then try to force loop)
+- do not add Record-Route header to REGISTER requests
+- major changes and enhancements on Net::SIP::StatelessProxy
+- rename Net::SIP::Dispatcher::Eventloop::addTimer to add_timer
+  so that it is the same name like in the other modules
+- Net::SIP::Simple: way to add explicit Route headers#
+- new package Net::SIP::NATHelper do aid in the writing of 
+  SIP proxies which do NAT (no documentation yet)
+- support for debug levels in Net::SIP::Debug
+  sample scripts support various debug levels, see doc to
+  Net::SIP::Debug for meaning of different levels
+- samples/stateless_proxy.pl as sample implementation for
+  slightly complex stateless proxy (not fully tested yet)
+- new function sip_uri2parts in Net::SIP::Util
+- ways to specify custom headers in Net::SIP::Simple using
+  option 'sip_header'
+- new keys domain2leg and leg2proxy in Net::SIP::Dispatcher
+  which influence routing
+- new method resolve_uri in Net::SIP::Dispatcher to asnychronously
+  resolve URI (was __resolve_uri, but now public with slightly
+  different interface)
+- new test 03_forward_stateless which tests parts of routing
+  for stateless proxy
+
+0.14
+- forgot to include samples to MANIFEST, this is fixed now
+  so that they get included into the distribution
+
+0.13
+- samples/answer_machine.pl as a sample implementation
+  of an answer machine
+- new methods peer in Net::SIP::Endpoint::Context and
+  get_peer in Net::SIP::Simple::Call
+- fix inactivity timeout for media_recv_send in Net::SIP::Simple::RTP
+- media_send_recv, media_recv_echo in Net::SIP::Simple::RTP can use 
+  callback for read/write data instead of filenames
+
+0.12
+- samples/invite_and_send.pl as new sample client
+  which can invite and send multiple voice file
+  to peer (using re-invites)
+- various small bug fixes
+
+0.11 
+- samples/invite_and_recv.pl as new sample client
+  which can invite and record a message
+- various small features and bug fixes
+
+0.1 - first public version

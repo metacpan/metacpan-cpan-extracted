@@ -1,0 +1,41 @@
+
+Vendor-Specific Attribute support
+
+This code supports the use of vendor specific attributes. This
+type of attribute is defined in RFC-2138 and is used to support
+'propietary' extensions on top of the base RADIUS specification.
+
+There are two new kinds of entries in the RADIUS dictionary in
+order to specify VSAs.
+
+VENDORATTR <vendor> <attribute> <id> <type>
+
+This entry is used to create a new kind of vendor attribute,
+such as in this example
+
+VENDORATTR 	9 	cisco-avpair 	1 	string
+
+This creates a new vendor-specific attribute for vendor 9 (Cisco
+Systems), with name 'cisco-avpair'. This attribute is identified by
+numeric id '1' and is associated with a string value.
+
+The second type of entry allows the specification of named values.
+The following is an hypotetical example of named value entry.
+
+VENDORATTR	9	cisco-enum	254	integer
+VENDORVALUE	9	cisco-enum	Value-1	1
+VENDORVALUE	9	cisco-enum	Value-2	2
+VENDORVALUE	9	cisco-enum	Value-3	3
+
+Questions and comments about the package can be sent to the
+author of the module, Christopher Masto <chris@netmonger.net>.
+
+Questions and comments about the VSA support can be directed
+to the author of this part of the code, Luis E. Muñoz 
+<luismunoz@cpan.org>
+
+Ian Smith <iansmith@ncinter.net> contributed code for 3COM 
+VSAs.
+
+$Id: README.VSA 7 2003-01-08 03:42:41Z lem $
+

@@ -1,0 +1,9 @@
+Revision history for Perl extension Net::Amazon::HadoopEC2
+
+0.02	2008-10-22T14:30:45+0900
+	
+	- added additional user_data support
+
+0.01	2008-10-14T13:56:31+0900
+
+	- original version

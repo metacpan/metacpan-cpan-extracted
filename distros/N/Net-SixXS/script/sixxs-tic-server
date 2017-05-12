@@ -1,0 +1,244 @@
+#!/usr/bin/perl
+
+use v5.010;
+use strict;
+use warnings;
+
+use Getopt::Std;
+
+use AnyEvent;
+use Net::SixXS;
+use Net::SixXS::Data::Tunnel;
+use Net::SixXS::Diag::MainDebug;
+use Net::SixXS::TIC::Server::AnyEvent;
+use Net::SixXS::TIC::Server::Inetd;
+
+my $debug = 0;
+my $version = '0.1.0_dev190';
+
+sub debug($);
+sub usage($);
+sub version();
+
+sub read_config($ $);
+sub read_tunnels($);
+
+MAIN:
+{
+	my %opts;
+
+	getopts('f:iht:Vv', \%opts) or usage 1;
+	version if $opts{V};
+	usage 0 if $opts{h};
+	exit 0 if $opts{V} || $opts{h};
+	$debug = $opts{v};
+
+	if (!defined $opts{f}) {
+		warn "No configuration file specified\n";
+		usage 1;
+	}
+	if (!defined $opts{t}) {
+		warn "No tunnels file specified\n";
+		usage 1;
+	}
+
+	usage 1 if @ARGV;
+
+	Net::SixXS::diag(Net::SixXS::Diag::MainDebug->new());
+
+	my $cfg = read_config $opts{f}, [qw/username password/];
+	debug "Got username $cfg->{username}";
+	my $tunnels = read_tunnels $opts{t};
+	debug "Got tunnels: ".join ' ', sort keys %{$tunnels};
+
+	my ($s, $cv);
+	if ($opts{i}) {
+		$s = Net::SixXS::TIC::Server::Inetd->new(
+		    username => $cfg->{username},
+		    password => $cfg->{password},
+		    tunnels => $tunnels) or
+		    die "Could not create the TIC server object: $!\n";
+	} else {
+		$s = Net::SixXS::TIC::Server::AnyEvent->new(
+		    username => $cfg->{username},
+		    password => $cfg->{password},
+		    tunnels => $tunnels) or
+		    die "Could not create the TIC server object: $!\n";
+		$cv = AnyEvent->condvar;
+	}
+
+	$s->server_name($s->server_name.'-tic-server');
+	$s->server_version($version);
+	$s->run;
+	$cv->recv unless $opts{i};
+}
+
+sub usage($)
+{
+	my ($err) = @_;
+	my $s = <<EOUSAGE
+Usage:	sixxs-tic-server [-iv] -f configfile -t tunnelsfile
+	sixxs-tic-server -V | -h
+
+	-f	specify the name of the authentication configuration file
+	-h	display program usage information and exit
+	-i	inetd mode - read from stdin, write to stdout
+	-t	specify the name of the tunnels data file
+	-V	display program version information and exit
+	-v	verbose operation; display diagnostic output
+EOUSAGE
+	;
+
+	if ($err) {
+		die $s;
+	} else {
+		print "$s";
+	}
+}
+
+sub version()
+{
+	say "sixxs-tic-server $version";
+}
+
+sub debug($)
+{
+	say STDERR "RDBG $_[0]" if $debug;
+}
+
+sub read_config($ $)
+{
+	my ($fname, $needed) = @_;
+
+	open my $f, '<', $fname or
+	    die "Could not open $fname: $!\n";
+	my %need = map { ($_, 1) } @{$needed};
+	my %cfg;
+	while (<$f>) {
+		s/[\r\n]*$//;
+		next if /^\s*(#|$)/;
+		if (!/^\s*(\S+)\s+(\S+)\s*$/) {
+			die "Invalid configuration line: $_\n";
+		}
+		my ($k, $v) = ($1, $2);
+		if (exists $cfg{$k}) {
+			die "Duplicate key $k in config file $fname\n";
+		}
+		$cfg{$k} = $v;
+		delete $need{$k};
+	}
+	close $f or
+	    die "Could not close $fname: $!\n";
+
+	if (%need) {
+		die "Missing configuration in $fname: ".
+		    join(', ', sort keys %need)."\n";
+	}
+	return \%cfg;
+}
+
+sub read_tunnels($)
+{
+	my ($fname) = @_;
+
+	open my $f, '<', $fname or
+	    die "Could not open $fname: $!\n";
+	my %cfg;
+	my $tname;
+	while (<$f>) {
+		s/[\r\n]*$//;
+		next if /^\s*(#|$)/;
+
+		if (/^(T[0-9]+)$/) {
+			$tname = $1;
+			$cfg{$tname} = {};
+		} elsif (/^\s+(\S[^:]*?\s*):\s*(.*?)\s*$/) {
+			if (!defined $tname) {
+				die "Tunnel data without a name in $fname\n";
+			}
+			$cfg{$tname}{$1} = $2;
+		} else {
+			die "Invalid tunnel line: $_\n";
+		}
+	}
+	close $f or
+	    die "Could not close $fname: $!\n";
+	return { map {
+	    ($_ => Net::SixXS::Data::Tunnel->from_json($cfg{$_}))
+	} keys %cfg };
+}
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+sixxs-tic-server - a trivial TIC server implementation using Net::SixXS
+
+=head1 SYNOPSIS
+
+  sixxs-tic-server [-iv] -f configfile -t tunnelsfile
+  sixxs-tic-server -V | -h
+
+=head1 DESCRIPTION
+
+The C<sixxs-tic-server> tool is a sample implementation of a TIC server
+for configuring IPv6-over-IPv4 tunnels running the "Anything-In-Anything"
+(AYIYA) protocol as used by SixXS.  It reads a configuration file in
+the format used by the L<aiccu> SixXS client to obtain the username and
+password for authentication and a tunnel description file in the format
+output by the L<sixxs-tic-tunnels> tool from the L<Net-SixXS> distribution.
+It listens on the TIC TCP port using one of the L<Net::SixXS::TIC::Server>
+implementation classes - L<Net::SixXS::TIC::Server::AnyEvent> by default,
+or L<Net::SixXS::TIC::Server::Inetd> if the C<-i> command-line option is
+specified.
+
+The C<sixxs-tic-server> tool accepts the following command-line options:
+
+=over 4
+
+=item B<-f>
+
+Specify the name of the authentication configuration file.
+
+=item B<-h>
+
+Display program usage information and exit.
+
+=item B<-i>
+
+L<inetd> mode - read from stdin, write to stdout
+
+=item B<-t>
+
+Specify the name of the tunnels data file.
+
+=item B<-V>
+
+Display program version information and exit.
+
+=item B<-v>
+
+Verbose operation; display diagnostic output.
+
+=back
+
+=head1 SEE ALSO
+
+L<Net::SixXS>, L<Net::SixXS::TIC::Server>,
+L<Net::SixXS::TIC::Server::AnyEvent>,
+L<Net::SixXS::TIC::Server::Inetd>,
+L<sixxs-tic-tunnels>
+
+=head1 LICENSE
+
+Copyright (C) 2015  Peter Pentchev E<lt>roam@ringlet.netE<gt>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Peter Pentchev E<lt>roam@ringlet.netE<gt>
+
+=cut

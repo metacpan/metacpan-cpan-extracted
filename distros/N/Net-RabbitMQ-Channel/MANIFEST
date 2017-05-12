@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+lib/Net/RabbitMQ/Channel.pm
+lib/Net/RabbitMQ/Connection.pm
+lib/Net/RabbitMQ/Exchange.pm
+lib/Net/RabbitMQ/Queue.pm
+t/001-mqc-basics.t

@@ -1,0 +1,12 @@
+--- #YAML:1.0
+name: Net-FTPTLS
+version: 0.84
+version_from: VERSION
+author:
+  - Dariush Pietrzak <cpan@safo.in>
+abstract: 
+license: perl
+requires:
+    Net::SSLeay::Handle:                     0.0
+generated_by: Eyck v1.01
+distribution_type: module

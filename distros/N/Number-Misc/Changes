@@ -1,0 +1,12 @@
+Number::Misc
+    Version 1.0 July, 2012
+
+      Initial release.
+
+    Version 1.1 April 25, 2014
+
+      Fixed problem in META.yml.
+
+    Version 1.2 January 2, 2015
+
+      Fixed issues in tests. Added 'sep' option to commafie.

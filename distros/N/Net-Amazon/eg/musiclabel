@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+############################################################
+# musiclabel musiclabel name
+# Christopher Boumenot <boumenot@gmail.com>, 2006
+############################################################
+
+use strict;
+use warnings;
+
+use Net::Amazon;
+use Net::Amazon::Request::MusicLabel;
+
+#use Log::Log4perl qw(:easy);
+#Log::Log4perl->easy_init($DEBUG);
+
+
+die "usage: $0 musiclabel\n(use Arista as an example)\n" unless defined $ARGV[0];
+
+my $ua = Net::Amazon->new(
+    associate_tag => $ENV{AMAZON_ASSOCIATE_TAG},
+    token         => $ENV{AMAZON_TOKEN},
+    secret_key    => $ENV{AMAZON_SECRET_KEY},
+);
+
+my $req = Net::Amazon::Request::MusicLabel->new(
+    musiclabel => $ARGV[0],
+);
+
+# Response is of type Net::Amazon::MusicLabel::Response
+my $resp = $ua->request($req);
+
+if($resp->is_success()) {
+    print $resp->as_string, "\n";
+} else {
+    print $resp->message, "\n";
+}

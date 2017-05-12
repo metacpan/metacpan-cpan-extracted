@@ -1,0 +1,5 @@
+#!/bin/sh
+FROM=/etc/mail/sms-related/sendmail.mc
+TO=/etc/mail/sms-related/sendmail.cf
+cd /usr/lib/sendmail-cf/cf
+m4 --include=/etc/mail/sms-related/cf/mailer $FROM >$TO

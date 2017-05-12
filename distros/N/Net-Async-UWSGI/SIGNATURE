@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2241e56032c4ff54521db1e407bce2bfa6ee22c7 Changes
+SHA1 9b9888820a03f251451a2e66923c028d6f04097a INSTALL
+SHA1 6b50b30fa6f8d063d96e32c9a81f3f82328925f7 LICENSE
+SHA1 5e5249121c6b687a722e0b9f41c8999a39cdca79 MANIFEST
+SHA1 10914119d63b138bc2a8fd9e042c15c85b7fb568 META.json
+SHA1 a2f3743529133632c0c4c1632f891f95ce75c0ba META.yml
+SHA1 c8f273bc66d98250e15569ca81bb1f11083fbe86 Makefile.PL
+SHA1 891d62712c66bf0bc4fa751f286e0f43fff34815 README
+SHA1 969f6739139140e76492bed1dfb022e20e885081 cpanfile
+SHA1 47cabe3a075d2a09c611d4e285ba92810d494055 dist.ini
+SHA1 b94143e138ffe117dee446167d5ddaa287f4a722 examples/nauwsgi.pl
+SHA1 1b7d4632976d250956d49d509b30bdd2ac5f48e5 inc/Devel/AssertOS.pm
+SHA1 2050c7f1cff1c952edc8d8461520c55df17591d3 inc/Devel/AssertOS/MSWin32.pm
+SHA1 52dcb8b2b98363d1e1fdebd5e193bc12c57c220a inc/Devel/CheckOS.pm
+SHA1 69bfe21868ded2d37e1e2a83d14f223c7be3dce1 lib/Net/Async/UWSGI.pm
+SHA1 6bb19e5c619302cf3eb8398170ba217ef8b8631c lib/Net/Async/UWSGI/Server.pm
+SHA1 6719ad74a10a8f459cb2090702d699e942012df5 lib/Net/Async/UWSGI/Server.pod
+SHA1 fe8eb92d03767139f000dcc1526e444d19d5e9b1 lib/Net/Async/UWSGI/Server/Connection.pm
+SHA1 5cb0d58245879e89864fed6a50e3a833e7ae6ee0 lib/Net/Async/UWSGI/Server/Connection.pod
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 8b3388d377e7343a49e98ab8aebc513379671251 t/00-compile.t
+SHA1 bae38c4f2481e47c513256406d4cc96fa0882bd5 t/000-report-versions-tiny.t
+SHA1 17e45c299dcf76cfb06f85c88f023e9f97d527ca t/server-validation.t
+SHA1 300dd32e3eb508c9493722bdc28aa9fa4ce53e52 t/server.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/release/synopsis.t
+SHA1 1294a6710ea8e2626e43722e50111bf872668316 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJVDt7bAAoJEFKElMNpjtyD5iEIAMUrY1Iy0ZQ4WtN7LxAlb3Xz
+/cPJ5OPcpWRi0xe1R2EYjkXgub+XDvln6sKWGGsFSbG1En1n6HiAP2sKKZY5VJe4
+mJQT92ElaYU+RVIUs8EmZOYtT8muYnsbOJCSKLwnb3oxiJB8GnyNsBzJ2t4QEW1i
+Bni1c4NUUhPW5sf05Xb0FpW/mF0Pkz/J9stKNhEyIeQQShFbzCv2Zaa0C6CaPCSa
+h5QbZ6MIqDyCv+1STNvEtJ4AEr/ijD08syXN5AjhLE6sm39DxJJZ2taV6jruat/C
+I4C3wmXYzaHHyumIL+eELLMN2uopeUrhdneqI0CXyMlKWd9HV4/a894Z/qPiqFY=
+=en0r
+-----END PGP SIGNATURE-----

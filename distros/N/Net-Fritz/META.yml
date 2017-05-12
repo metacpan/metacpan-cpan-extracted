@@ -1,0 +1,62 @@
+---
+abstract: 'AVM Fritz!Box interaction via TR-064'
+author:
+  - 'Christian Garbs <mitch@cgarbs.de>'
+build_requires:
+  HTTP::Response: '0'
+  Test::DescribeMe: '0'
+  Test::Exception: '0'
+  Test::Mock::LWP::Dispatch: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.142690'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Fritz
+provides:
+  Net::Fritz:
+    file: lib/Net/Fritz.pm
+    version: v0.0.5
+  Net::Fritz::Action:
+    file: lib/Net/Fritz/Action.pm
+    version: v0.0.5
+  Net::Fritz::Box:
+    file: lib/Net/Fritz/Box.pm
+    version: v0.0.5
+  Net::Fritz::Data:
+    file: lib/Net/Fritz/Data.pm
+    version: v0.0.5
+  Net::Fritz::Device:
+    file: lib/Net/Fritz/Device.pm
+    version: v0.0.5
+  Net::Fritz::Error:
+    file: lib/Net/Fritz/Error.pm
+    version: v0.0.5
+  Net::Fritz::IsNoError:
+    file: lib/Net/Fritz/IsNoError.pm
+    version: v0.0.5
+  Net::Fritz::Service:
+    file: lib/Net/Fritz/Service.pm
+    version: v0.0.5
+requires:
+  Digest::MD5: '0'
+  LWP::UserAgent: '6.00'
+  Moo: '0'
+  Moo::Role: '0'
+  SOAP::Lite: '0'
+  Scalar::Util: '0'
+  XML::Simple: '0'
+  constant: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/mmitch/fritz/issues
+  repository: git://github.com/mmitch/fritz.git
+version: v0.0.5

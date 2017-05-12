@@ -1,0 +1,8 @@
+Revision history for Perl extension Net::Digg.
+
+0.10  09 Nov 2007
+    - original version
+
+0.11  14 Dec 2007
+        - Updated Makefile with correct the dependencies
+        - Added Media and Container endpoints and unit tests

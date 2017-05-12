@@ -1,0 +1,75 @@
+# -*-cperl-*-
+# $Id: modestmaps_mk_historical_cluster_map,v 1.5 2008/08/03 17:08:39 asc Exp $
+
+use strict;
+
+use Config::Simple;
+use Getopt::Std;
+
+use Log::Dispatch::Screen;
+use Net::Flickr::Geo::ModestMaps;
+
+{
+        &main();
+        exit;
+}
+
+sub main {
+        
+        my %opts = ();
+        getopts('c:i:', \%opts);
+
+        my $cfg = Config::Simple->new($opts{'c'});
+
+        $cfg->param("modestmaps.filter", "atkinson");
+        $cfg->param("modestmaps.zoom", 17);
+        $cfg->param("modestmaps.bleed", 1);
+        $cfg->param("modestmaps.adjust", .1);
+        $cfg->param("modestmaps.provider", "MICROSOFT_AERIAL");
+        $cfg->param("modestmaps.method", "bbox");
+        $cfg->param("modestmaps.timeout", (60 * 60));
+
+        $cfg->param("clustermap.radius", .5);
+        $cfg->param("clustermap.offset", 360);
+        $cfg->param("clustermap.only_photo_owner", 0);
+        $cfg->param("clustermap.force_photo_owner", 0);
+        $cfg->param("clustermap.photo_license", "4,5,7");
+        $cfg->param("clustermap.max_photos", 150);
+
+        my $fl = Net::Flickr::Geo::ModestMaps->new($cfg);
+        $fl->log()->add(Log::Dispatch::Screen->new('name' => 'scr', min_level => 'debug'));
+
+        my $map = $fl->mk_historical_cluster_map_for_photo($opts{'i'});
+        $fl->log()->info("wrote map to $map->{path}");
+
+        my %attrs = ();
+
+        foreach my $id (keys %{$map->{attribution}}){
+
+                foreach my $who (keys %{$map->{attribution}->{$id}}){
+
+                        if (defined($attrs{$who})){
+                                next;
+                        }
+
+                        my $url;
+                        if (ref($map->{attribution}->{$id}->{$who}) eq "ARRAY"){
+                                $url = $map->{attribution}->{$id}->{$who}->[0];
+                        }
+
+                        else {
+                                $url = $map->{attribution}->{$id}->{$who};
+                        }
+
+                        $url =~ s/\/\d+$//;
+                        $attrs{$who} = $url;
+                }
+        }
+
+        foreach my $who (keys %attrs){
+                my $url = $attrs{$who};
+                print "<a href=\"$url\">$who</a>, \n";
+        }
+
+        return 1;
+}

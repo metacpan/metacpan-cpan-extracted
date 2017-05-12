@@ -1,0 +1,230 @@
+Revision history for Net-IMAP-Server
+
+1.39 2016-05-01T00:42:17Z
+ - Use 127.0.0.1 instead of localhost in tests
+ - Fix precedence error with "return" in
+   Net::IMAP::Server::Mailbox->selected
+
+1.38 2014-01-26T20:16:17Z
+ - Pass tests with IO::Socket::SSL 1.950 and above, which verify server SSL
+   certificates by default.
+
+1.37 2014-01-26T19:14:17Z
+ - Fix parsing par parenthesized expressions with recent Regexp::Common
+
+1.36 2012-01-17T08:09:17Z
+ - Fix string literals (such as for APPEND), which have counted characters
+   incorrectly since 1.32 due to newline trimming.
+
+1.35 2012-11-12T03:22:17Z
+ - Switch to AnyEvent, from EV
+
+1.34 2012-07-28T15:49:17Z
+ - Don't rely on $" being set to the default " " during UID SEARCH
+
+1.33 2012-04-07T19:37:17Z
+ - Test fixes; use recv() with MSG_PEEK | MSG_DONTWAIT to determine if a
+   TCP connection is in state CLOSE_WAIT
+
+1.32 2012-04-06T00:45:17Z
+ - Trim newlines passed to all commands, including continuation lines
+ - Remove erroneous extra \n on server SASL responses
+ - Bump MIME::Base64 dependency, and adjust bad mime encoding techniques to
+   compensate
+ - Better mapping of SASL mechanism names to method names
+
+1.31 2012-04-01T01:18:17Z
+ - Add test dependency on IO::Socket::SSL
+ - Minor ASCII art updates
+
+1.30 2011-10-25T11:30:17Z
+ - Beginnings of a testsuite based on the RFC spec
+ - Prepend, rather then append, un-asked-for message attributes, for picky
+   clients
+ - Properly escape mailbox names with quotes in LIST/LSUB
+ - Trap and report base64 errors during AUTH
+ - Returning -1 from a SASL auth now returns BAD, while returning false
+   returns NO
+ - Send an [ALERT] if the password was sent unprotected in plaintext
+ - Remove an incorrect call to ->socket which caused errors during DESTROY
+ - Selecting a bogus mailbox now leaves the state unselected
+ - Return BAD on CREATE or RENAME with 8-bit mailbox names or invalid UTF-7
+   encoding
+ - Forbid removal of INBOX
+
+1.29 2010-08-02T10:42:17Z
+ - Fix "UID SEARCH 1,2"
+ - Allow "UID SEARCH *"
+ - A better fix for [rt.cpan.org #58160], which is caused by a bug in
+   DateTime::Format::Strptime ([rt.cpan.org #58459])
+ - Fix a minor bug in UID wherein unknown subcommands would attempt to call
+   a nonexistant method
+
+1.28 2010-06-08T14:14:17Z
+ - Prevent warnings when CLOSE is called
+ - strftime("%e") can generate leading space, which strptime("%e") fails to
+   parse; parse with strptime("%n%e")
+
+ [rt.cpan.org #58160]
+ - Ensure that EXAMINE collowed by SELECT in the same mailbox leaves it
+   write-able [rt.cpan.org #58162]
+
+1.27 2010-05-03T21:27:17Z
+ - Make ->handle_command return the instance of the ::Command subclass that
+   ran, for more useful subclassing
+
+1.26 2009-12-15T22:31:17Z
+ - Fix ->read_only to only care about ->selected_read_only if the mailbox
+   is currently selected.
+ - Add a ->select callback (defautls to doing nothing) on mailboxes which
+   is called when it becomes selected.
+ - The content returned by FETCH BODY[1] should be the raw content, without
+   decoding transport encoding.
+
+1.25 2009-11-07T23:58:17Z
+ - BACKWARDS-INCOMPATIBLE CHANGE: Net::IMAP::Server::Command's ->log method
+   takes a loglevel argument by default, and simply defers to Net::Server's
+   logging infratructure.
+ - Handle more of Net::Server's arguments to ->new, including logging
+ - Pass through arguments to Net::Server any arguments to ->run
+ - Support mailboxes with flat hierarchies (undef hierarchy separator)
+ - Fix a bug where UID COPY set two OK responses
+
+1.24 2009-10-16T11:01:17Z
+ - Fix overzealous caching during mailbox renaming
+ - Bump Net::Server::Coro dep, to be able to specify SSL certificate paths
+
+1.23 2009-07-17T17:34:17Z
+ - Fix RT#47955; session flags were never getting stored, causing no
+   messages to ever be marked \Recent
+
+1.22 2009-07-13T12:13:17Z
+ - Warning avoidance for "substr outside of string" warnings
+ - Net::IMAP::Server::Command::UID still contained a reference to
+   untagged_fetch
+
+1.21 2009-07-09T14:52:17Z
+ - Bump copyright, link to mailing list
+ - Remove mostly undocumented an no-servicable-parts session_flags
+ - untagged_* renamed to _unsent_* (and thus private)
+ - A bit more documentation of accessors
+ - Better error message on unknown SEARCH token
+ - Add caching of "start of the day in utc" for searching
+ - Add extraction of "start of the Date: header in utc" for searching
+ - Add BEFORE, ON, SINCE, SENTBEFORE, SENTON, SENTSINC support to SEARCH
+ - Document Net::IMAP::Server::Message->expunged
+
+1.20 2009-06-19T16:04:17Z
+ - The logic for STATUS UNSEEN was backwards, counting the number of seen
+   messages.  Reported by Paul Miller <jettero@cpan.org>
+
+1.19 2009-06-19T13:26:17Z
+ - Fix POD coverage on Net::IMAP::Server::Error
+
+1.18 2009-06-17T14:50:16Z
+ - Handle compile errors in required commands better
+ - Add missing DateTime::Format::Strptime dependency
+
+1.17 2009-05-03T14:54:17Z
+ - Document "NO" and "BAD" die() arguments
+ - Fix mailbox read-only attribute
+
+1.16 2009-04-07T23:45:17Z
+ - Make UID fetches no longer O(range client requested), which is fragile
+   when there are few messages but they are high in UID.
+
+1.15 2009-04-06T12:49:17Z
+ - Calls to ->header_raw were being made on Email::MIME objects, instead of
+   Email::MIME::Header objects.  Reported by <dan@moore.cx>
+
+1.14 2009-04-06T03:55:17Z
+ - Bump Email::MIME dep, for ->header_raw method
+ - Fix typo in RFC reference.  Reported by <dan@moore.cx>
+ - Documentation typo fixes
+
+1.13 2009-03-20T14:11:17Z
+ - More UNSEEN fixes; the UNSEEN reported by STATUS and the UNSEEN reported
+   by SELECT are different beasts, and have been split into different
+   methods.
+
+1.12 2009-03-10T13:46:17Z
+ - Ensure that mailboxes passed to CREATE aren't trying to encode things
+   they shouldn't be, by round-tripping and comparing.
+ - Match query in LIST and LSUB against encoded path, not raw utf8 path
+ - Support for adding new commands via 'add_command' in Net::IMAP::Server
+
+1.11 2009-03-06T14:20:17Z
+ - Move IMAP-UTF-7 handling into model's ->split, so it runs for _all_
+   client-given input.	Then adjust ->handle_command to be able to send
+   specific messages to the client on some exceptions.	Reported by Jan
+   Dvorak <jdvorak@uikt.mendelu.cz>.
+ - Add a case for the suspected edge case where a timeout or printing error
+   is discovered while handling a command
+ - Upper-case command name in "command not recognized" to not leak
+   implementation as much
+
+1.10 2009-03-05T14:27:17Z
+ - Fix a major bug where UNSEEN reported the total number of unseen
+   messages in the mailbox, rather than the sequence of the first unseen
+   message.  Reported by Jan Dvorak <jdvorak@uikt.mendelu.cz>
+ - Always return un-decoded headers to the client.  Reported by Jan Dvorak
+   <jdvorak@uikt.mendelu.cz>
+ - Fixes for people who have set $" to something odd
+
+1.08 2009-02-24T16:27:17Z
+ - UTF-7 support for mailbox naming
+ - Add and document purge => 1 option to full_path
+
+1.07 2008-11-23T01:03:24Z
+ - Fixed missing UNIVERSAL::require dep
+
+1.06 2008-11-17T17:06:52Z
+ - Added NAMESPACE support
+
+1.05 2008-10-20T16:40:19Z
+ - Fixed spelling of 'separator' -- THIS BREAKS BACKWARDS COMPATIBILITY if
+   you had overridden the 'seperator' method.
+ - Added some missing pod on Net::IMAP::Server::DefaultModel
+
+1.01 2008-08-16T21:06:31Z
+ - Now with updated changelog and signatures - no functionality changes
+
+1.00 2008-08-16T21:05:25Z
+ - Remove Email::Folder dep, and default load_data behavior
+
+0.95 2008-08-06T18:46:09Z
+ - We can intuit the is_inbox mailbox property
+ - Include a simple example server
+
+0.9 2008-07-07T17:35:04Z
+ - Add update_tree hook so servers can dynamically create sub-mailboxes
+
+0.8 2008-06-16T18:34:56Z
+ - Special-casing for Zimbra clients
+ - client_id is a connection property, not an auth property
+ - Bump the Net::Server::Coro dep
+
+0.7 2008-05-19T13:30:17Z
+ - Per-session message flags actually stored on the session
+ - STATUS is now on the mailbox
+
+0.6 2008-05-16T13:29:12Z
+ - Add missing Net::SSLeay dep
+
+0.5 2008-04-25T12:18:17Z
+ - Add 'use Coro's for the places I added 'cede's
+ - Module::Install version bump
+
+0.4 2008-04-23T15:24:22Z
+ - Weaken the timeout callback, so we don't leak connection objects
+ - Don't double-store refs to connections
+ - Actually clean out old keys in the connection hash
+ - Try to print from the right coro, so EV doesn't complain about recursive
+   entry, and then wedge the next time it happens.
+ - Drop some more 'cede's in for commands which do many things
+
+0.3 2008-03-11T12:33:14Z
+ - Connections weren't being fully closed on timeout
+
+0.2 2008-03-10T16:47:52Z
+ - Initial release to CPAN

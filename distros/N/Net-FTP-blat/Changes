@@ -1,0 +1,9 @@
+Revision history for Perl extension Net::FTP::blat.
+
+0.01  Wed Nov 12 23:26:09 2003
+	- original version; created by editing a copy of Net::FTP.
+
+0.02 Thursday Nov 14
+	Settled on method names and wrote test suite, stopped
+	substr chunking in blat.
+

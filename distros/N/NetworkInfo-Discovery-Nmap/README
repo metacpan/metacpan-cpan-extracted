@@ -1,0 +1,34 @@
+NetworkInfo::Discovery::Nmap
+============================
+
+DESCRIPTION
+
+    This module is an extension to NetworkInfo::Discovery which uses the 
+    nmap(1) utility to scan networks, find active hosts, their services 
+    and operating system. 
+
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    Alternatively, to install with Module::Build, you can use the 
+    following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2004 Sébastien Aperghis-Tramoni
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.

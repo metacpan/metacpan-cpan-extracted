@@ -1,0 +1,59 @@
+# get events 
+my @events = eval { $cal->get_events() };
+is($@, '', "Got events");
+
+# should be none
+is(scalar(@events), 0, "No events so far");
+
+# create an event
+my $title  = "Test event ".time();
+my $entry  = Net::Google::Calendar::Entry->new();
+$entry->title($title);
+ok($cal->add_entry($entry), "Added an entry");
+
+
+# check updated event object
+my $id = $entry->id;
+isnt($id, undef, "Added event has an id");
+
+
+# get events again
+ok(@events = $cal->get_events(), "Got events again");
+
+# should be one
+is(scalar(@events), 1, "Got an event");
+
+# check listed events
+is($events[0]->title, $title, "Retrieved event has correct title");
+
+# update event
+$title = "Test event updated title ".time();
+ok($entry->title($title), "Changed event title");
+ok($cal->update_entry($entry), "And updated it");
+
+
+# check updated event object again
+# TODO check a revision number
+is($entry->id, $id, "Got same id");
+
+# get events once again
+ok((@events = $cal->get_events()), "Got events again");
+
+# should be one still
+is(scalar(@events), 1, "Got one event still");
+
+# check listed event again
+is($events[0]->title, $title, "Retrieved event has correct title");
+
+# delete event
+ok($cal->delete_entry($entry), "Deleted event");
+
+# get events once again
+@events = eval { $cal->get_events() };
+is($@, '', "Got events again");
+
+# should be none
+is(scalar(@events), 0, "Got one  no events");
+
+
+

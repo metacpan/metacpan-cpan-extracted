@@ -1,0 +1,25 @@
+Build.PL
+Changes
+examples/gai-nonblock.pl
+examples/res_query.pl
+lib/Net/LibAsyncNS.pm
+lib/Net/LibAsyncNS.xs
+lib/Net/LibAsyncNS/Constants.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01basic.t
+t/02constants.t
+t/10getaddrinfo.t
+t/11getnameinfo.t
+t/12res_query.t
+t/13res_search.t
+t/20cancel.t
+t/21userdata.t
+t/22getnext.t
+t/99pod.t
+typemap

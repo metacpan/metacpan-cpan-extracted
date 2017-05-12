@@ -1,0 +1,20 @@
+Revision history for Perl extension Net::Frame::Tools.
+
+1.04 Fri Jan 23 07:39:16 CET 2015
+   - update: copyright notice
+   - update: Kwalitee
+
+1.03 Wed Mar 23 23:37:54 CET 2011
+   - bugfix: in nf-grep.pl usage check
+   - update: copyright notice and email address
+
+1.02 Wed Feb 20 14:01:58 CET 2008
+   - update: license string, to make CPANTS happy
+   - added example
+
+1.01 Mon Apr 23 22:53:18 CEST 2007
+   - added test Pod::Coverage
+
+1.00 Mon Apr  2 18:49:42 CEST 2007
+   - first public release
+

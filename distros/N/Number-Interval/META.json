@@ -1,0 +1,45 @@
+{
+   "abstract" : "Representation of a numeric interval",
+   "author" : [
+      "Tim Jenness <tjenness@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Number-Interval",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      }
+   },
+   "provides" : {
+      "Number::Interval" : {
+         "file" : "lib/Number/Interval.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/timj/perl-Number-Interval/tree/master",
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt"
+      ],
+      "repository" : {
+         "url" : "git://github.com/timj/perl-Number-Interval.git"
+      }
+   },
+   "version" : "0.07"
+}

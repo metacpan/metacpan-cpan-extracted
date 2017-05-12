@@ -1,0 +1,185 @@
+=pod
+
+=head1 NAME
+
+Net::Citadel::ToDo - To Do items for the Net::Citadel Perl extension.
+
+
+=head1 TODO
+
+=head2 General
+
+Add a note in the documentation about the Net::Citadel repository and home page
+at GitHub? Also include a reference to where it is available at the C<gitpan>
+CPAN mirror at GitHub?
+
+Add capability to use SSL encrypted communications with the Citadel server,
+perhaps using IO::Socket::SSL?
+
+Change to using the jame@cpan.org address for Robert James Clay instead of the
+jame@rocasa.us address?
+
+
+=head2 Constants
+
+There are some numbers being used that are actually constants; change to
+using Readonly to define them for use in the code, unless there are other
+standard constants that can be used, like those for the flock operations.
+
+A "000" string constant is used quite often by Citadel but is not defined in the
+module.
+
+There is a set of follow up reply codes noted in the documentation that are not
+yet in the module.
+
+Add a link to the online documentation for the status codes:
+http://www.citadel.org/doku.php?id=documentation:appproto:statuscodes
+
+A C<NO_SUCH_USER> return code is mentioned in the command documentation (for
+the USER command, for instance,) but the module does not currently appear to
+define it.
+
+Add a paragraph to the documentation after the CONSTANTS header.
+
+Add a paragraph to the documentation after the 'Results Code' header, perhaps
+including a link to the online status codes page in Citadel Documentation.
+
+Add a paragraph to the documentation after the 'Room Access' header, perhaps
+including a link to the online page in Citadel Documentation that refers to
+them.
+
+
+=head2 Functions
+
+There does not seem to an explicit function to close the connection; i.e., close
+the socket being used to communicate with the server.
+
+Create an internal function to handle LISTING_FOLLOWS return lines from the server?
+Perhaps called something like C<_get_listing>?
+
+=over 4
+
+=item C<assert_room> function
+
+Is the C<assert_room> command coming up with the correct floor information?
+
+Is the C<assert_room> function sending the parameters for the CRE8 command
+properly? (There is a note in the code indicating an uncertainty about what
+should be sent.)
+
+
+=item C<retract_room> function
+
+In the existing test code for the C<retract_floor> function, there is a comment
+saying C<CITADEL BUG>; investigate if it an issue with the function itself, an
+actual issue with Citadel, and/or just something to do with the test script.
+ The documentation for the function itself refers back to Citadel v7.20, so
+there may not be any issue with it now.
+
+
+=item function C<new>
+
+The line just before the 'return $self' line actually has two commands on it,
+not just one. The second one is just "<$s>;" and that has the comment
+"# consume banner".  That 'banner' is something like the following:
+ "200 <systen name> Citadel server ready."  Instead of not doing anything
+with that, save it somewhere? At least the <system name> part of it?  (The
+first command on that line just establishes the $s variable for that read.)
+At least, put them on separate lines.
+
+
+=item C<citadel_time> function
+
+The current C<citadel_time> function only returns the first two parameters
+from the TIME command:  C<1347624956|-14400>.  The Citadel TIME command itself
+actually returns a line like this: C<200 1347625545|-14400|1|1347537300>,
+with the '200' being the OK code and the rest being the four fields that it
+returns (which also needs to be documented). So as currently written, the
+function does not return the daylight savings time indication and the actual
+citadel server start information. Function first needs to be changed to at
+least return all parameters.
+
+Rewrite the C<citadel_time> function to unpack the parameters that the
+TIME command returns when it is successful, and then return them to
+the calling program in a hash? Could also then return the hash with a 
+key named 'error' or 'Error' if it is not successful. Update its POD
+to reflect the changes.
+
+
+=item C<citadel_echo> function
+
+It appears to test if what was sent, was actually received back but it only
+returns true if it does not fail because there is no match. Add an explicit
+return of the value returned from the ECHO command? 
+
+=back
+
+
+=head2 Documentation
+
+Add something like Net::Citadel::Tutorial for examples of the use and configuration
+of the module?
+
+
+=head2 Testing
+
+Will the differences with the newer Citadels justify or neccessitate checking
+the version of the Citadel being tested and doing different tests depending
+on that version?
+
+Change the names of the test floors and rooms to something like C<Test Floor>
+and C<Test Room>?
+
+Update the testing for the C<citadel_time> function to at least check the
+number of parameters returned? Three of the parameters are Unix timestamps;
+validate those in some way? The other parameter being returned is a Boolean
+and is used to indicate Daylight Savings Time and should be a '0' or a '1'.
+
+When testing for a floor, it looks for C<Main Floor>: that exists on
+a default install but may not be on an working system. Make it another
+configuration item, which if not configured would default to C<Main Floor>?
+
+Separate the testing to: functions that do not require a log in, those that do
+require a log in, those that are read only, those that write to the server. Or
+use the separation given in the documentation for the different Sections for
+the commands?
+
+Since Config::YAML is already a build-depends and is used by the main test
+script, add a C<Testing> section of some sort to the test.yaml file and check
+that for the various options for testing instead of just attempting to reach a
+Citadel server?
+
+Instead of having the debugging 'warning' lines commented out, use a DEBUG
+environment variable and/or a test.yaml configuration item for it. Same
+for the 'use Data::Dumper' line itself.
+
+Use Config::YAML::Tiny instead of Config::YAML? (Does not appear to be in
+Debian as yet, although YAML::Tiny is.)
+
+Use something like Test::MockObject to do at least basic testing of the 
+various functions. And/or Test::TCP?
+
+Testing of the citadel_info function currently just checks the number of
+information lines returned by the server. That could change over time and
+different Citadel versions. Make that a testing configuration item?
+
+Do more extensive checking of what is returned by the citadel_info function?
+
+
+=head1 SEE ALSO
+
+ L<Net::Citadel>
+
+
+=head1 AUTHOR
+
+Robert James Clay, C<< <jame at rocasa.us> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2016 Robert James Clay, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,29 @@
+NAME
+    Net::DAAP::Server::MythTV - Publish MythTV videos to DAAP clients like
+    Apple's Front Row
+
+DESCRIPTION
+    MythTV is a homebrew PVR project. This module publishes MythTV videos,
+    including metadata, to DAAP clients like Apple's Front Row.
+
+PREREQUISITES
+    DBI
+
+    POE::Component::Server::HTTP
+
+    Net::DAAP::DMAP
+
+AUTHOR
+    Jack Bates <ms419@freezone.co.uk>
+
+COPYRIGHT
+    Copyright 2007, Jack Bates. All rights reserved.
+
+    This program is free software. You can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Net::DAAP::Server - The module on which this module is based
+
+    MythTV
+

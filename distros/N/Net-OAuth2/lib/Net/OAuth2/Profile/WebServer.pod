@@ -1,0 +1,367 @@
+=encoding utf8
+
+=head1 NAME
+
+Net::OAuth2::Profile::WebServer - OAuth2 for web-server use
+
+=head1 INHERITANCE
+
+ Net::OAuth2::Profile::WebServer
+   is a Net::OAuth2::Profile
+
+=head1 SYNOPSIS
+
+  # See examples/psgi/
+  my $auth = Net::OAuth2::Profile::WebServer->new
+    ( name           => 'Google Contacts'
+    , client_id      => $id
+    , client_secret  => $secret
+    , site           => 'https://accounts.google.com'
+    , scope          => 'https://www.google.com/m8/feeds/'
+    , authorize_path    => '/o/oauth2/auth'
+    , access_token_path => '/o/oauth2/token'
+    , protected_resource_url
+        =>  'https://www.google.com/m8/feeds/contacts/default/full'
+    );
+
+  # Let user ask for a grant from the resource owner
+  print $auth->authorize_response->as_string;
+  # or, in Plack:   redirect $auth->authorize;
+
+  # Prove your identity at the authorization server
+  # The $info are the parameters from the callback to your service, it
+  # will contain a 'code' value.
+  my $access_token  = $auth->get_access_token($info->{code});
+
+  # communicate with the resource serve
+  my $response      = $access_token->get('/me');
+  $response->is_success
+      or die "error: " . $response->status_line;
+
+  print "Yay, it worked: " . $response->decoded_content;
+
+=head1 DESCRIPTION
+
+Use OAuth2 in a WebServer context.  Read the DETAILS section, far below
+this man-page before you start implementing this interface.
+
+Extends L<"DESCRIPTION" in Net::OAuth2::Profile|Net::OAuth2::Profile/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Net::OAuth2::Profile|Net::OAuth2::Profile/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Net::OAuth2::Profile|Net::OAuth2::Profile/"Constructors">.
+ 
+=over 4
+
+=item Net::OAuth2::Profile::WebServer-E<gt>B<new>(%options)
+
+ -Option           --Defined in          --Default
+  auto_save                                <set token's changed flag>
+  client_id          Net::OAuth2::Profile  <required>
+  client_secret      Net::OAuth2::Profile  <required>
+  grant_type         Net::OAuth2::Profile  'authorization_code'
+  redirect_uri                             undef
+  referer                                  undef
+  scope              Net::OAuth2::Profile  undef
+  secrets_in_params  Net::OAuth2::Profile  <true>
+  site               Net::OAuth2::Profile  undef
+  state              Net::OAuth2::Profile  undef
+  token_scheme       Net::OAuth2::Profile  'auth-header:Bearer'
+  user_agent         Net::OAuth2::Profile  <created internally>
+
+=over 2
+
+=item auto_save => CODE
+
+When a new token is received or refreshed, it usually needs to get
+save into a database or file.  The moment you receive a new token is
+clear, but being aware of refreshes in your main program is a hassle.
+Read more about configuring this in the L</DETAILS> section below.
+
+=item client_id => STRING
+
+=item client_secret => STRING
+
+=item grant_type => STRING
+
+=item redirect_uri => URI
+
+=item referer => URI
+
+Adds a C<Referer> header to each request.  Some servers check whether
+provided redirection uris point to the same server the page where the
+link was found.
+
+=item scope => STRING
+
+=item secrets_in_params => BOOLEAN
+
+=item site => URI
+
+=item state => STRING
+
+=item token_scheme => SCHEME
+
+=item user_agent => LWP::UserAgent object
+
+=back
+
+=back
+
+=head2 Accessors
+
+Extends L<"Accessors" in Net::OAuth2::Profile|Net::OAuth2::Profile/"Accessors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<auto_save>()
+
+=item $obj-E<gt>B<bearer_token_scheme>()
+
+Inherited, see L<Net::OAuth2::Profile/"Accessors">
+
+=item $obj-E<gt>B<grant_type>()
+
+Inherited, see L<Net::OAuth2::Profile/"Accessors">
+
+=item $obj-E<gt>B<id>()
+
+Inherited, see L<Net::OAuth2::Profile/"Accessors">
+
+=item $obj-E<gt>B<redirect_uri>()
+
+=item $obj-E<gt>B<referer>( [$uri] )
+
+=item $obj-E<gt>B<scope>()
+
+Inherited, see L<Net::OAuth2::Profile/"Accessors">
+
+=item $obj-E<gt>B<secret>()
+
+Inherited, see L<Net::OAuth2::Profile/"Accessors">
+
+=item $obj-E<gt>B<site>()
+
+Inherited, see L<Net::OAuth2::Profile/"Accessors">
+
+=item $obj-E<gt>B<state>()
+
+Inherited, see L<Net::OAuth2::Profile/"Accessors">
+
+=item $obj-E<gt>B<user_agent>()
+
+Inherited, see L<Net::OAuth2::Profile/"Accessors">
+
+=back
+
+=head2 Actions
+
+Extends L<"Actions" in Net::OAuth2::Profile|Net::OAuth2::Profile/"Actions">.
+ 
+=over 4
+
+=item $obj-E<gt>B<authorize>(%options)
+
+On initial contact of a new user, you have to redirect to the resource
+owner.  Somewhere in the near future, your application will be contacted
+again by the same user but then with an authorization grant code.
+
+Only the most common %options are listed... there may be more: read the
+docs on what your server expects.
+
+ -Option       --Default
+  client_id      new(client_id)
+  response_type  'code'
+  scope          undef
+  state          undef
+
+=over 2
+
+=item client_id => STRING
+
+=item response_type => STRING
+
+=item scope => STRING
+
+=item state => STRING
+
+=back
+
+example: 
+
+  my $auth = Net::OAuth2::Profile::WebServer->new(...);
+
+  # From the Plack demo, included in this distribution (on CPAN)
+  get '/get' => sub { redirect $auth->authorize };
+
+  # In generic HTTP, see method authorize_response
+  use HTTP::Status 'HTTP_TEMPORARY_REDIRECT';   # 307
+  print HTTP::Response->new
+    ( HTTP_TEMPORARY_REDIRECT => 'Get authorization grant'
+    , [ Location => $auth->authorize ]
+    )->as_string;
+
+=item $obj-E<gt>B<authorize_response>( [$request] )
+
+Convenience wrapper around L<authorize()|Net::OAuth2::Profile::WebServer/"Actions">, to produce a complete
+HTTP::Response object to be sent back.
+
+=item $obj-E<gt>B<get_access_token>(CODE, %options)
+
+ -Option       --Default
+  client_id      new(client_id)
+  client_secret  new(client_secret)
+
+=over 2
+
+=item client_id => STRING
+
+=item client_secret => STRING
+
+=back
+
+=item $obj-E<gt>B<update_access_token>($token, %options)
+
+Ask the server for a new token.  You may pass additional %options as
+pairs.  However, this method is often triggered automatically, in which
+case you can to use the C<refresh_token_params> option of L<new()|Net::OAuth2::Profile::WebServer/"Constructors">.
+
+example: 
+
+  $auth->update_access_token($token);
+  $token->refresh;   # nicer
+
+=back
+
+=head2 Helpers
+
+Extends L<"Helpers" in Net::OAuth2::Profile|Net::OAuth2::Profile/"Helpers">.
+ 
+=over 4
+
+=item $obj-E<gt>B<add_token>($request, $token, $scheme)
+
+Inherited, see L<Net::OAuth2::Profile/"Helpers">
+
+=item $obj-E<gt>B<build_request>($method, $uri, $params)
+
+Inherited, see L<Net::OAuth2::Profile/"Helpers">
+
+=item $obj-E<gt>B<params_from_response>($response, $reason)
+
+Inherited, see L<Net::OAuth2::Profile/"Helpers">
+
+=item $obj-E<gt>B<site_url>( <$uri|$path>, $params )
+
+Inherited, see L<Net::OAuth2::Profile/"Helpers">
+
+=back
+
+=head1 DETAILS
+
+OAuth2 is a server-server protocol, not the usual client-server
+set-up. The consequence is that the protocol handlers on both sides will
+not wait for another during the communication: the remote uses callback
+urls to pass on the response.  Your side of the communication, your
+webservice, needs to re-group these separate processing steps into
+logical sessions.
+
+=head2 The process
+
+The client side of the process has
+three steps, nicely described in
+L<https://tools.ietf.org/html/rfc6749|RFC6749>
+
+=over 4
+
+=item 1. Send an authorization request to resource owner
+
+It needs a C<client_id>: usually the name of the service where you want
+get access to.  The answer is a redirect, based on the C<redirection_uri>
+which you usually pass on.  Additional C<scope> and C<state> parameters
+can be needed or useful.  The redirect will provide you with (amongst other
+things) a C<code> parameter.
+
+=item 2. Translate the code into an access token
+
+With the code, you go to an authorization server which will validate
+your existence.  An access token (and sometimes a refresh token) are
+returned.
+
+=item 3. Address the protected resource
+
+The access token, usually a 'bearer' token, is added to each request to
+the resource you want to address.  The token may refresh itself when
+needed.
+
+=back
+
+=head2 Saving the token
+
+Your application must implement a persistent session, probably
+in a database or file.  The session information is kept in an
+L<Net::OAuth2::AccessToken|Net::OAuth2::AccessToken> object, and does contain more facts than
+just the access token.
+
+Let's discuss the three approaches.
+
+=head3 no saving
+
+The Plack example contained in the CPAN distribution of this module
+is a single process server.  The tokens are administered in the memory
+of the process.  It is nice to test your settings, but probably not
+realistic for any real-life application.
+
+=head3 automatic saving
+
+When your own code is imperative:
+
+  my $auth = Net::OAuth2::Profile::WebServer->new
+    ( ...
+    , auto_save => \&save_session
+    );
+
+  sub save_session($$)
+  {   my ($profile, $token) = @_;
+      ...
+  }
+
+When your own code is object oriented:
+
+  sub init(...)
+  {  my ($self, ...) = @_;
+     my $auth = Net::OAuth2::Profile::WebServer->new
+       ( ...
+       , auto_save => sub { $self->save_session(@_) }
+       );
+  }
+
+  sub save_session($$)
+  {   my ($self, $profile, $token) = @_;
+      ...
+  }
+
+=head3 explicit saving
+
+In this case, do not use L<new(auto_save)|Net::OAuth2::Profile::WebServer/"Constructors">.
+
+=head1 SEE ALSO
+
+This module is part of Net-OAuth2 distribution version 0.63,
+built on January 18, 2016. Website: F<http://perl.overmeer.net>.
+
+=head1 COPYRIGHTS
+
+Copyrights 2013-2016 on the perl code and the related documentation
+ by [Mark Overmeer] for SURFnet bv, The Netherlands.  For other contributors see Changes.
+
+Copyrights 2011-12 by Keith Grennan.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

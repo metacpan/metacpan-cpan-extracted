@@ -1,0 +1,25 @@
+Revision history for Net-Twitter-Diff
+
+0.12    2010-08-13/21:12
+        - FIXED RT#60297 
+
+0.11    2009-12-03/01:22
+        - RT#52362 'Page vs. Cursor' thanks to BLOM's patch!
+
+0.10    2009-06-27/10:54
+        - Net::Twitter 3.03000 support.
+        - RT#43699 sort array
+
+0.04    2007-11-15/16:25
+        - Fix POD
+
+0.03    2007-11-14/11:04
+        - Relase on CPAN
+
+0.02    2007-11-14/00:05
+        - Change Interface.
+        - Support comp_following ,xfollowing , xfollowers
+
+0.01    2007-11-08/21:27
+        First version, released on an unsuspecting world.
+

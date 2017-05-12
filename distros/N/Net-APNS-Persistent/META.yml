@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               Net-APNS-Persistent
+version:            0.02
+abstract:           Send Apple APNS notifications over a persistent connection
+author:
+    - Mark Aufflick <mark@aufflick.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Class::Accessor:  0
+    Encode:           0
+    FindBin:          0
+    JSON::XS:         0
+    Net::SSLeay:      0
+    perl:             5.008
+    Socket:           0
+    Test::Exception:  0
+    Test::More:       0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

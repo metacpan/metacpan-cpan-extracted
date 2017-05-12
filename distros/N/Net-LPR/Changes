@@ -1,0 +1,28 @@
+Revision history for Perl extension Net::LPR.
+
+1.000  October 7, 2002
+	Initial version release.
+
+1.001  October 14, 2002
+	Fix bug in job_send_data that prevented proper usage.
+
+1.002  March 12, 2003
+	Fix warnings in job_mode_* and job_send_data.
+	Fix problem that prevented module from functioning properly under win32.
+	Add examples and notes to documentation.
+
+1.003  March 13, 2003
+	Fix incorrect assumption that $^O is win32 under windows.
+	Fix incorrect date in Changes file.
+
+1.004  May 1, 2003
+	Work around Solaris 2.6 bahavior when creating a socket whose address is in use (EBADF).
+
+1.005  Jan 6, 2004
+	Fix a bug where the set_control_filename method was actually setting the data file name (thanks to Andreas Håkansson).
+
+1.006  Apr 1, 2004
+	Fix a bug where the global jobid may run rampant when new_job() is called without arguments (thanks to Daniel Hentschel).
+
+1.007  Aug 23, 2004
+	Fix a bug where a warning is printed if use warnings; is in effect and reading from the printer socket failed after sending some date (thanks to Chris Donoghue).

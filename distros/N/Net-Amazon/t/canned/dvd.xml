@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<ItemLookupResponse xmlns="http://webservices.amazon.com/AWSECommerceService/2011-08-01">
+  <Items>
+    <Item>
+      <ASIN>6305181772</ASIN>
+      <SalesRank>45192</SalesRank>
+      <ItemAttributes>
+        <Actor>Tom Cruise</Actor>
+        <Actor>Jon Voight</Actor>
+        <Actor>Emmanuelle Béart</Actor>
+        <Actor>Henry Czerny</Actor>
+        <Actor>Jean Reno</Actor>
+        <AspectRatio>2.35:1</AspectRatio>
+        <AudienceRating>PG-13 (Parental Guidance Suggested)</AudienceRating>
+        <Binding>DVD</Binding>
+        <CatalogNumberList>
+          <CatalogNumberListElement>154977</CatalogNumberListElement>
+        </CatalogNumberList>
+        <EAN>9780792153016</EAN>
+        <EANList>
+          <EANListElement>9780792153016</EANListElement>
+          <EANListElement>0097361549729</EANListElement>
+          <EANListElement>0097361549774</EANListElement>
+          <EANListElement>9786305181774</EANListElement>
+        </EANList>
+        <Format>AC-3</Format>
+        <Format>Closed-captioned</Format>
+        <Format>Color</Format>
+        <Format>DVD</Format>
+        <Format>Full Screen</Format>
+        <Format>Letterboxed</Format>
+        <Format>Widescreen</Format>
+        <Format>NTSC</Format>
+        <ISBN>6305181772</ISBN>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <Label>Paramount</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+            <AudioFormat>Dolby Digital 2.0 Surround</AudioFormat>
+          </Language>
+          <Language>
+            <Name>Spanish</Name>
+            <Type>Subtitled</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+            <AudioFormat>Dolby Digital 2.0 Surround</AudioFormat>
+          </Language>
+          <Language>
+            <Name>French</Name>
+            <Type>Original Language</Type>
+            <AudioFormat>Dolby Digital 2.0 Surround</AudioFormat>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>1498</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$14.98</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Paramount</Manufacturer>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <ProductGroup>DVD</ProductGroup>
+        <ProductTypeName>ABIS_DVD</ProductTypeName>
+        <Publisher>Paramount</Publisher>
+        <RegionCode>1</RegionCode>
+        <ReleaseDate>1998-11-17</ReleaseDate>
+        <RunningTime Units="minutes">110</RunningTime>
+        <SKU>1U03J70002P1</SKU>
+        <Studio>Paramount</Studio>
+        <Title>Mission Impossible (Widescreen Edition)</Title>
+        <TradeInValue>
+          <Amount>25</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.25</FormattedPrice>
+        </TradeInValue>
+        <UPC>097361549729</UPC>
+        <UPCList>
+          <UPCListElement>097361549729</UPCListElement>
+          <UPCListElement>097361549774</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>614</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$6.14</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>1</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.01</FormattedPrice>
+        </LowestUsedPrice>
+        <LowestCollectiblePrice>
+          <Amount>1000</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$10.00</FormattedPrice>
+        </LowestCollectiblePrice>
+        <TotalNew>20</TotalNew>
+        <TotalUsed>191</TotalUsed>
+        <TotalCollectible>5</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/6305181772%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D6305181772</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>9k%2B2N1ZavzvK7j6T8CiL5CcZWZ9DNQeLUDv3cXG%2FWrpPz3T%2FrewSJ3JVtFYmqfd4qYQ6fPpWxurHyaPrR1OhIGa8ct1TYFboZ7Yt%2FmNhT%2FtbGYOYQperp0udpe4VXOAcGl0DT5VkJCBZk48Aq9SHeA%3D%3D</OfferListingId>
+            <Price>
+              <Amount>614</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$6.14</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>884</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$8.84</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>59</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+  </Items>
+</ItemLookupResponse>

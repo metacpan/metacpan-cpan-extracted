@@ -1,0 +1,37 @@
+Revision history for Perl extension Net::Libdnet6.
+
+0.27 Wed Jan 28 19:57:50 CET 2015
+   - bugfix: finding default route under FreeBSD > 9.x systems
+   - update: copyright notice
+
+0.26 Fri Nov 16 16:37:22 CET 2012
+   - bugfix: Perl kwalitee
+
+0.25 Wed Sep 12 20:21:04 CEST 2012
+   - bugfix: on finding the default gateway IPv6 on BSD systems
+   - update: error message scheme
+   - update: copyright notice
+
+0.24 Thu Jan 13 11:09:35 CET 2011
+   - bugfix: parsing of ifconfig for recent Linux systems
+   - bugfix: in auto-search for good network infertace
+   - update: copyright notice
+
+0.23 Tue Mar 13 21:01:07 CET 2007
+   - bugfix: removed a nasty warning on IPv6 address gathering
+
+0.22 Sun Feb  4 15:21:02 CET 2007
+   - bugfix: when a route has no IPv6 address, skip it
+
+0.21 Thu Dec 28 17:13:47 CET 2006
+   - error checking patchs
+
+0.20 Thu Dec 28 11:02:24 CET 2006
+   - NEW: route_get6()
+   - better support for *BSD systems
+   - all subs now ends with '6'
+   - exports Net::Libdnet subs
+
+0.10 
+   - first public release
+

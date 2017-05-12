@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+
+$strAction = lc($ARGV[0]);
+
+if($strAction eq "set") { set($ARGV[1], $ARGV[2], $ARGV[3]); }
+elsif($strAction eq "del") { del($ARGV[1]); }
+else {
+	print " Usage: \n";
+	print "\t\twwd-users set (user@domain) (password) (email address)\n";
+	print "\t\twwd-users del (user@domain)\n";
+}
+
+sub set {
+	my ($strUsername,$strPassword,$strEmail) = @_;
+	my ($strUser,$strDomain) = split(/\@/, $strUsername);
+	my $strData = "";
+
+	$strUser =~ s/://g;
+	$strDomain =~ s/://g;
+	$strPassword =~ s/://g;
+	$strEmail =~ s/://g;
+	if($strUser eq "" || $strDomain eq "") { return; }
+	open(FH,"+</usr/share/wwd/users");
+	flock(FH,LOCK_EX);
+	while(<FH>) {
+		($txtDomain, $txtUser, $txtPW, $txtEmail) = split(/:/, $_);
+		if($strDomain ne $txtDomain || $strUser ne $txtUser) {
+			$strData .= $_;
+		}
+	}
+	seek(FH, 0, 0);
+	truncate(FH, 0);
+	print FH $strData;
+	print FH "${strDomain}:${strUser}:${strPassword}:${strEmail}\n";
+	close(FH);
+
+	print "${strUser}\@${strDomain} (${strEmail}) has been saved.\n";
+}
+	
+	
+sub del {
+	my ($strUser,$strDomain) = split(/\@/, shift);
+        my $strData = "";
+
+        if($strUser eq "" || $strDomain eq "") { return; }
+        open(FH,"+</usr/share/wwd/users");
+        flock(FH,LOCK_EX);
+        while(<FH>) {
+                ($txtDomain, $txtUser, $txtPW, $txtEmail) = split(/:/, $_);
+                if($strDomain ne $txtDomain || $strUser ne $txtUser) {
+                        $strData .= $_;
+                }
+        }
+        seek(FH, 0, 0);
+        truncate(FH, 0);
+        print FH $strData;
+        close(FH);
+
+	print "${strUser}\@${strDomain} has been deleted.\n";
+}
+

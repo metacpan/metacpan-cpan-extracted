@@ -1,0 +1,50 @@
+---
+abstract: 'A Client Class for Azure Event Hubs '
+author:
+  - 'ytnobody <ytnobody@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Test::Time: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Azure-EventHubs
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::Azure::EventHubs:
+    file: lib/Net/Azure/EventHubs.pm
+    version: '0.03'
+  Net::Azure::EventHubs::Request:
+    file: lib/Net/Azure/EventHubs/Request.pm
+  Net::Azure::EventHubs::Response:
+    file: lib/Net/Azure/EventHubs/Response.pm
+requires:
+  Carp: '0'
+  Class::Accessor::Lite: '0'
+  HTTP::Message: '0'
+  HTTP::Request: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Net::Azure::Authorization::SAS: '0'
+  Try::Tiny: '0'
+  URI: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/ytnobody/p5-Net-Azure-EventHubs/issues
+  homepage: https://github.com/ytnobody/p5-Net-Azure-EventHubs
+  repository: git://github.com/ytnobody/p5-Net-Azure-EventHubs.git
+version: '0.03'

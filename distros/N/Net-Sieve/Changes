@@ -1,0 +1,45 @@
+Revision history for Perl module Net::Sieve
+
+0.11 Fri, 09 Nov 2012 13:13:08 +0100
+    * fix cyrus 2.3 connection drop
+    * minor debug messages fixes
+    * add gnutls-cli example
+
+0.10 Tue, 06 Nov 2012 16:25:41 +0100
+    * merge most of sieve-connect-0.83 (missing DNS SRV records and)
+    * add example
+    * fix ssl_verify and notssl_verify
+
+0.09 Wed, 22 Feb 2012 09:04:08 +0100
+    * set default port to 2000 instead of 'sieve(2000)' 
+    workaround to respect rfc5804
+    * update copyright year and author mail
+
+0.08 Tue, 13 Dec 2011 17:32:16 +0100
+    * typo in doc, thx to Federico Midaglia
+
+0.07 Fri, 01 Apr 2011 10:34:19 +0200
+    * fix connection closes thx to Klaus-Dieter Krannich [rt.cpan.org #67136]
+    * fix spelling error thx to Ansgar Burchardt [rt.cpan.org #58154]
+
+0.06 Fri, 04 Jun 2010 15:28:17 +0200
+    * patch for new dovecot servers thx to Heiko Schlittermann
+    * better connection closes on bad password
+
+0.05 Tue, 06 May 2008 22:12:27 +0200
+    * add clear copyright
+
+0.04 Tue, 29 Apr 2008 10:29:14 +0200
+    - backport from sieve-connect-0.57
+    * dep with Authen::SASL 2.11 first version with non-broken DIGEST-MD5
+
+0.03 Fri Mar 28 16:58:28 2008
+    - backport from sieve-connect-0.56
+
+0.02 Sat Mar  2 15:34:22 2008
+    - backport from sieve-connect-0.44
+
+0.01 Sat Mar  1 14:34:12 2008
+    - original version; created by ExtUtils::ModuleMaker 0.49
+
+

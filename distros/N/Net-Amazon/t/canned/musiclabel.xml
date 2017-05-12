@@ -1,0 +1,1119 @@
+<?xml version="1.0"?>
+<ItemSearchResponse xmlns="http://webservices.amazon.com/AWSECommerceService/2011-08-01">
+  <Items>
+    <TotalResults>12995</TotalResults>
+    <TotalPages>1300</TotalPages>
+    <MoreSearchResultsUrl>http://www.amazon.com/gp/redirect.html?camp=2025&amp;creative=386001&amp;location=http%3A%2F%2Fwww.amazon.com%2Fgp%2Fsearch%3Fkeywords%3DArista%26url%3Dsearch-alias%253Dpopular&amp;linkCode=xm2&amp;tag=blogdivebombo-20&amp;SubscriptionId=1V5JRJ4JQCSHB3NGG902</MoreSearchResultsUrl>
+    <Item>
+      <ASIN>B000E6UJP6</ASIN>
+      <SalesRank>423</SalesRank>
+      <ItemAttributes>
+        <Artist>Alan Jackson</Artist>
+        <Binding>Audio CD</Binding>
+        <EAN>0828768028124</EAN>
+        <EANList>
+          <EANListElement>0828768028124</EANListElement>
+        </EANList>
+        <ItemDimensions>
+          <Weight Units="hundredths-pounds">20</Weight>
+        </ItemDimensions>
+        <Label>Arista</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>1196</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$11.96</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Arista</Manufacturer>
+        <MPN>828768028124</MPN>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <PackageQuantity>1</PackageQuantity>
+        <PartNumber>828768028124</PartNumber>
+        <ProductGroup>Music</ProductGroup>
+        <ProductTypeName>ABIS_MUSIC</ProductTypeName>
+        <PublicationDate>2006-06-06</PublicationDate>
+        <Publisher>Arista</Publisher>
+        <ReleaseDate>2006-02-28</ReleaseDate>
+        <SKU>4338619 828768028124 Jackson, Alan</SKU>
+        <Studio>Arista</Studio>
+        <Title>Precious Memories</Title>
+        <UPC>828768028124</UPC>
+        <UPCList>
+          <UPCListElement>828768028124</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>609</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$6.09</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>598</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$5.98</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>16</TotalNew>
+        <TotalUsed>16</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+        <MoreOffersUrl>0</MoreOffersUrl>
+      </Offers>
+      <Tracks>
+        <Disc Number="1">
+          <Track Number="1">Blessed Assurance</Track>
+          <Track Number="2">Softly And Tenderly</Track>
+          <Track Number="3">I Love To Tell The Story</Track>
+          <Track Number="4">When We All Get To Heaven</Track>
+          <Track Number="5">'Tis So Sweet To Trust In Jesus</Track>
+          <Track Number="6">In The Garden</Track>
+          <Track Number="7">Are You Washed In The Blood?</Track>
+          <Track Number="8">I'll Fly Away</Track>
+          <Track Number="9">What A Friend We Have In Jesus</Track>
+          <Track Number="10">Standing On The Promises</Track>
+          <Track Number="11">Turn Your Eyes Upon Jesus</Track>
+          <Track Number="12">Leaning On The Everlasting Arms</Track>
+          <Track Number="13">The Old Rugged Cross</Track>
+          <Track Number="14">How Great Thou Art</Track>
+          <Track Number="15">I Want To Stroll Over Heaven With You</Track>
+        </Disc>
+      </Tracks>
+    </Item>
+    <Item>
+      <ASIN>B0044DL9TA</ASIN>
+      <SalesRank>712</SalesRank>
+      <ItemAttributes>
+        <Artist>Alan Jackson</Artist>
+        <Binding>Audio CD</Binding>
+        <EAN>0886977868122</EAN>
+        <EANList>
+          <EANListElement>0886977868122</EANListElement>
+        </EANList>
+        <ItemDimensions>
+          <Weight Units="hundredths-pounds">24</Weight>
+        </ItemDimensions>
+        <Label>SONY NASHVILLE/ ARISTA</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>1198</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$11.98</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>SONY NASHVILLE/ ARISTA</Manufacturer>
+        <NumberOfDiscs>2</NumberOfDiscs>
+        <PackageQuantity>1</PackageQuantity>
+        <ProductGroup>Music</ProductGroup>
+        <ProductTypeName>ABIS_MUSIC</ProductTypeName>
+        <Publisher>SONY NASHVILLE/ ARISTA</Publisher>
+        <ReleaseDate>2010-11-22</ReleaseDate>
+        <SKU>968210</SKU>
+        <Studio>SONY NASHVILLE/ ARISTA</Studio>
+        <Title>34 Number Ones</Title>
+        <UPC>886977868122</UPC>
+        <UPCList>
+          <UPCListElement>886977868122</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>601</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$6.01</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>695</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$6.95</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>48</TotalNew>
+        <TotalUsed>7</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B0044DL9TA%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB0044DL9TA</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>IVXoq4NevseG0QQPfG6kiEVvC1jeTlRY8PGRGCSagXGf6SC%2BgQfgVNhjXNZu6u2RnCMw0HCVDmjxtxG5qQ%2B1TGhBwR8c3LC3NalS7RrFPWj7niNQ8zyynQ%3D%3D</OfferListingId>
+            <Price>
+              <Amount>1170</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$11.70</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>28</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$0.28</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>2</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+      <Tracks>
+        <Disc Number="1">
+          <Track Number="1">Ring of Fire</Track>
+          <Track Number="2">Here In The Real World</Track>
+          <Track Number="3">Wanted</Track>
+          <Track Number="4">Chasin' That Neon Rainbow</Track>
+          <Track Number="5">I'd Love You All Over Again</Track>
+          <Track Number="6">Don't Rock the Jukebox</Track>
+          <Track Number="7">Someday</Track>
+          <Track Number="8">Dallas</Track>
+          <Track Number="9">Midnight In Montgomery</Track>
+          <Track Number="10">Love's Got a Hold On You</Track>
+          <Track Number="11">She's Got The Rhythm (And I Got The Blues)</Track>
+          <Track Number="12">Tonight I Climbed The Wall</Track>
+          <Track Number="13">Chattahoochee</Track>
+          <Track Number="14">(Who Says) You Can't Have It All</Track>
+          <Track Number="15">Summertime Blues</Track>
+          <Track Number="16">Livin' On Love</Track>
+          <Track Number="17">Gone Country</Track>
+          <Track Number="18">I Don't Even Know Your Name</Track>
+          <Track Number="19">Tall, Tall Trees</Track>
+        </Disc>
+        <Disc Number="2">
+          <Track Number="1">As She's Walking Away (Zac Brown Band Featuring Alan Jackson)</Track>
+          <Track Number="2">Look At Me</Track>
+          <Track Number="3">I'll Try</Track>
+          <Track Number="4">Home</Track>
+          <Track Number="5">Little Bitty</Track>
+          <Track Number="6">Who's Cheatin' Who</Track>
+          <Track Number="7">There Goes</Track>
+          <Track Number="8">Between the Devil And Me</Track>
+          <Track Number="9">Right On The Money</Track>
+          <Track Number="10">It Must Be Love</Track>
+          <Track Number="11">Where I Come From</Track>
+          <Track Number="12">Where Were You (When The World Stopped Turning)</Track>
+          <Track Number="13">Drive (For Daddy Gene)</Track>
+          <Track Number="14">It's Five O' Clock Somewhere (Alan Jackson and Jimmy Buffett)</Track>
+          <Track Number="15">Remember When</Track>
+          <Track Number="16">Small Town Southern Man</Track>
+          <Track Number="17">Good Time</Track>
+          <Track Number="18">Country Boy</Track>
+        </Disc>
+      </Tracks>
+    </Item>
+    <Item>
+      <ASIN>B0001XANAS</ASIN>
+      <SalesRank>502</SalesRank>
+      <ItemAttributes>
+        <Artist>Carly Simon</Artist>
+        <Binding>Audio CD</Binding>
+        <EAN>0828765942928</EAN>
+        <EANList>
+          <EANListElement>0828765942928</EANListElement>
+        </EANList>
+        <Format>Original recording remastered</Format>
+        <ItemDimensions>
+          <Weight Units="hundredths-pounds">23</Weight>
+        </ItemDimensions>
+        <Label>Arista</Label>
+        <ListPrice>
+          <Amount>999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$9.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Arista</Manufacturer>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <PackageQuantity>1</PackageQuantity>
+        <ProductGroup>Music</ProductGroup>
+        <ProductTypeName>ABIS_MUSIC</ProductTypeName>
+        <Publisher>Arista</Publisher>
+        <ReleaseDate>2004-05-04</ReleaseDate>
+        <SKU>mon0000001917</SKU>
+        <Studio>Arista</Studio>
+        <Title>Reflections: Carly Simon's Greatest Hits</Title>
+        <UPC>828765942928</UPC>
+        <UPCList>
+          <UPCListElement>828765942928</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>701</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$7.01</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>352</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$3.52</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>32</TotalNew>
+        <TotalUsed>30</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B0001XANAS%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB0001XANAS</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>mAjI9UjNty5MxGJy0VmR0wkPpyfpxu886%2FQQqGshGXxz%2BTj9dCQ5ZU9fbTXEzJJIXFvdKyOwwsBZEGSMEbzRsY7SeXJSPDoJ5ucgzryT354%3D</OfferListingId>
+            <Price>
+              <Amount>1056</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$10.56</FormattedPrice>
+            </Price>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+      <Tracks>
+        <Disc Number="1">
+          <Track Number="1">That's The Way I've Always Heard It Should Be</Track>
+          <Track Number="2">Legend In Your Own Time</Track>
+          <Track Number="3">Anticipation</Track>
+          <Track Number="4">The Right Thing To Do</Track>
+          <Track Number="5">You're So Vain</Track>
+          <Track Number="6">Mockingbird- with James Taylor</Track>
+          <Track Number="7">Haven't Got Time For The Pain</Track>
+          <Track Number="8">Nobody Does It Better</Track>
+          <Track Number="9">You Belong To Me</Track>
+          <Track Number="10">Jesse</Track>
+          <Track Number="11">Coming Around Again</Track>
+          <Track Number="12">Give Me All Night</Track>
+          <Track Number="13">The Stuff That Dreams Are Made Of</Track>
+          <Track Number="14">All I Want Is You</Track>
+          <Track Number="15">Let The River Run</Track>
+          <Track Number="16">Better Not Tell Her</Track>
+          <Track Number="17">Love Of My Life</Track>
+          <Track Number="18">Like A River</Track>
+          <Track Number="19">Touched By The Sun</Track>
+          <Track Number="20">Amity- with Sally Taylor</Track>
+        </Disc>
+      </Tracks>
+    </Item>
+    <Item>
+      <ASIN>B00005USBH</ASIN>
+      <SalesRank>1606</SalesRank>
+      <ItemAttributes>
+        <Artist>Barry Manilow</Artist>
+        <Binding>Audio CD</Binding>
+        <Brand>Ultimate</Brand>
+        <EAN>0007822106002</EAN>
+        <EANList>
+          <EANListElement>0007822106002</EANListElement>
+          <EANListElement>0078221060028</EANListElement>
+        </EANList>
+        <ItemDimensions>
+          <Weight Units="hundredths-pounds">23</Weight>
+        </ItemDimensions>
+        <Label>Arista</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$9.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Arista</Manufacturer>
+        <MPN>078221060028</MPN>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <PackageQuantity>1</PackageQuantity>
+        <PartNumber>078221060028</PartNumber>
+        <ProductGroup>Music</ProductGroup>
+        <ProductTypeName>ABIS_MUSIC</ProductTypeName>
+        <Publisher>Arista</Publisher>
+        <ReleaseDate>2002-02-05</ReleaseDate>
+        <SKU>B00005USBH-1317576212307</SKU>
+        <Studio>Arista</Studio>
+        <Title>Ultimate Manilow</Title>
+        <UPC>078221060028</UPC>
+        <UPCList>
+          <UPCListElement>078221060028</UPCListElement>
+          <UPCListElement>007822106002</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>649</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$6.49</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>165</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$1.65</FormattedPrice>
+        </LowestUsedPrice>
+        <LowestCollectiblePrice>
+          <Amount>1000</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$10.00</FormattedPrice>
+        </LowestCollectiblePrice>
+        <TotalNew>44</TotalNew>
+        <TotalUsed>82</TotalUsed>
+        <TotalCollectible>1</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B00005USBH%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB00005USBH</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>o%2Bw7hfkiBjf%2Bj5k13EVeWCI3WCfFXaMHyPf0l2Rhj1zbdX6cqC1tzDIIu3AIn9upRimYAsabcM7LkfSGChJuzghNSkTeNVK%2BKxUgpnIufZ8%3D</OfferListingId>
+            <Price>
+              <Amount>1097</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$10.97</FormattedPrice>
+            </Price>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+      <Tracks>
+        <Disc Number="1">
+          <Track Number="1">Mandy</Track>
+          <Track Number="2">It's A Miracle</Track>
+          <Track Number="3">Could It Be Magic</Track>
+          <Track Number="4">I Write The Songs</Track>
+          <Track Number="5">Bandstand Boogie</Track>
+          <Track Number="6">Tryin' To Get The Feeling</Track>
+          <Track Number="7">This One's For You</Track>
+          <Track Number="8">Weekend In New England</Track>
+          <Track Number="9">Looks Like We Made It</Track>
+          <Track Number="10">Daybreak</Track>
+          <Track Number="11">Can't Smile Without You</Track>
+          <Track Number="12">Even Now</Track>
+          <Track Number="13">Copacabana (At The Copa)</Track>
+          <Track Number="14">Somewhere In The Night</Track>
+          <Track Number="15">Ready To Take A Chance Again</Track>
+          <Track Number="16">Ships</Track>
+          <Track Number="17">I Made It Through The Rain</Track>
+          <Track Number="18">The Old Songs</Track>
+          <Track Number="19">When October Goes</Track>
+          <Track Number="20">Somewhere Down The Road</Track>
+        </Disc>
+      </Tracks>
+    </Item>
+    <Item>
+      <ASIN>B000F2CC0E</ASIN>
+      <SalesRank>1104</SalesRank>
+      <ItemAttributes>
+        <Artist>Marlo Thomas &amp; Friends</Artist>
+        <Binding>Audio CD</Binding>
+        <EAN>0828768031322</EAN>
+        <EANList>
+          <EANListElement>0828768031322</EANListElement>
+        </EANList>
+        <Format>Original recording remastered</Format>
+        <ItemDimensions>
+          <Weight Units="hundredths-pounds">25</Weight>
+        </ItemDimensions>
+        <Label>Arista</Label>
+        <ListPrice>
+          <Amount>799</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$7.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Arista</Manufacturer>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <PackageQuantity>1</PackageQuantity>
+        <ProductGroup>Music</ProductGroup>
+        <ProductTypeName>ABIS_MUSIC</ProductTypeName>
+        <Publisher>Arista</Publisher>
+        <ReleaseDate>2006-05-09</ReleaseDate>
+        <SKU>828768031322-</SKU>
+        <Studio>Arista</Studio>
+        <Title>Free to Be You &amp; Me</Title>
+        <UPC>828768031322</UPC>
+        <UPCList>
+          <UPCListElement>828768031322</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>391</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$3.91</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>492</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$4.92</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>37</TotalNew>
+        <TotalUsed>10</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B000F2CC0E%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB000F2CC0E</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>q8lRS3oqeG6IhUIiIyaglBkx77WOue57TjHa1OrlKNozrmmF2lKJFwdWQ%2F8%2FOJ5KoIYz81S3JqTR%2BgDvwaUbKJU9U%2FiyUIZQk4m81iEtYqPRB4V073zSJw%3D%3D</OfferListingId>
+            <Price>
+              <Amount>839</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$8.39</FormattedPrice>
+            </Price>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+      <Tracks>
+        <Disc Number="1">
+          <Track Number="1">Free To Be You And Me - The New Seekers</Track>
+          <Track Number="2">Boy Meets Girl - Mel Brooks and Marlo Thomas</Track>
+          <Track Number="3">When We Grow Up - Diana Ross</Track>
+          <Track Number="4">Don't Dress Your Cat In An Apron - Billy De Wolfe</Track>
+          <Track Number="5">Parents Are People - Harry Belafonte and Marlo Thomas</Track>
+          <Track Number="6">Housework - Carol Channing</Track>
+          <Track Number="7">Helping - Tom Smothers</Track>
+          <Track Number="8">Ladies First - Marlo Thomas</Track>
+          <Track Number="9">Dudley Pippin And The Principal - Billy De Wolfe, Marko Thomas, Bobby Morse</Track>
+          <Track Number="10">It's All Right To Cry - Rosey Grier</Track>
+          <Track Number="11">Sisters And Brothers - Sisters and Brothers</Track>
+          <Track Number="12">My Dog Is A Plumber - Dick Cavett</Track>
+          <Track Number="13">William's Doll - Alan Alda and Marlo Thomas</Track>
+          <Track Number="14">Atlanta - Alan Alda and Marlo Thomas</Track>
+          <Track Number="15">Grandma - Diana Sands</Track>
+          <Track Number="16">Girl Land - Jack Cassidy and Shirley Jones</Track>
+          <Track Number="17">Dudley Pippin And His No-Friend - Bobby Morse and Marlo Thomas</Track>
+          <Track Number="18">Glad To Have A Friend Like You - Marlo Thomas</Track>
+          <Track Number="19">Free To Be...You And Me - The New Seekers</Track>
+        </Disc>
+      </Tracks>
+    </Item>
+    <Item>
+      <ASIN>B00004R84V</ASIN>
+      <SalesRank>1057</SalesRank>
+      <ItemAttributes>
+        <Artist>Whitney Houston</Artist>
+        <Binding>Audio CD</Binding>
+        <Brand>HOUSTON,WHITNEY</Brand>
+        <CatalogNumberList>
+          <CatalogNumberListElement>14626</CatalogNumberListElement>
+        </CatalogNumberList>
+        <EAN>0078221462624</EAN>
+        <EANList>
+          <EANListElement>0078221462624</EANListElement>
+        </EANList>
+        <Feature>Condition: Used - Good</Feature>
+        <IsAdultProduct>0</IsAdultProduct>
+        <ItemDimensions>
+          <Height Units="hundredths-inches">500</Height>
+          <Length Units="hundredths-inches">50</Length>
+          <Weight Units="hundredths-pounds">26</Weight>
+          <Width Units="hundredths-inches">575</Width>
+        </ItemDimensions>
+        <Label>Arista</Label>
+        <ListPrice>
+          <Amount>1599</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$15.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Arista</Manufacturer>
+        <MPN>00078221462624</MPN>
+        <NumberOfDiscs>2</NumberOfDiscs>
+        <PackageQuantity>1</PackageQuantity>
+        <PartNumber>00078221462624</PartNumber>
+        <ProductGroup>Music</ProductGroup>
+        <ProductTypeName>ABIS_MUSIC</ProductTypeName>
+        <PublicationDate>2000</PublicationDate>
+        <Publisher>Arista</Publisher>
+        <ReleaseDate>2000-05-16</ReleaseDate>
+        <SKU>0NH35B000DGQ</SKU>
+        <Studio>Arista</Studio>
+        <Title>Whitney Houston - The Greatest Hits</Title>
+        <UPC>078221462624</UPC>
+        <UPCList>
+          <UPCListElement>078221462624</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>1011</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$10.11</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>246</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$2.46</FormattedPrice>
+        </LowestUsedPrice>
+        <LowestCollectiblePrice>
+          <Amount>1598</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$15.98</FormattedPrice>
+        </LowestCollectiblePrice>
+        <TotalNew>44</TotalNew>
+        <TotalUsed>73</TotalUsed>
+        <TotalCollectible>2</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B00004R84V%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB00004R84V</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>Z4zOStO34tH37O%2BvEY%2BREcpKOn6PEAEb3tAKTwcTbO%2FNwJNuKjF62WE7ouFq3zWCqYsn7ykNZYBR9QimZxQ%2FJQVl6Hx65c0yR7IELVU1RJ0%3D</OfferListingId>
+            <Price>
+              <Amount>1355</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$13.55</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>244</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$2.44</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>15</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+      <Tracks>
+        <Disc Number="1">
+          <Track Number="1">You Give Good Love</Track>
+          <Track Number="2">Saving All My Love For You</Track>
+          <Track Number="3">Greatest Love Of All</Track>
+          <Track Number="4">All At Once</Track>
+          <Track Number="5">If You Say My Eyes Are Beautiful</Track>
+          <Track Number="6">Didn't We Almost Have It All</Track>
+          <Track Number="7">Where Do Broken Hearts Go</Track>
+          <Track Number="8">All The Man That I Need</Track>
+          <Track Number="9">Run To You</Track>
+          <Track Number="10">I Have Nothing</Track>
+          <Track Number="11">I Will Always Love You</Track>
+          <Track Number="12">Exhale (Shoop Shoop)</Track>
+          <Track Number="13">Why Does It Hurt So Bad</Track>
+          <Track Number="14">I Believe In You And Me</Track>
+          <Track Number="15">Heartbreak Hotel (Featuring Faith Evans, &amp; Kelly Price)</Track>
+          <Track Number="16">My Love Is Your Love</Track>
+          <Track Number="17">Same Script, Different Cast (Duet With Deborah Cox)</Track>
+          <Track Number="18">Could I Have This Kiss Forever (Duet With Enrique Iglesias) (Metro Mix) </Track>
+        </Disc>
+        <Disc Number="2">
+          <Track Number="1">Fine</Track>
+          <Track Number="2">If I Told You That (Whitney Houston &amp; George Michael)</Track>
+          <Track Number="3">It's Not Right But It's Okay (Thunderpuss Mix)</Track>
+          <Track Number="4">My Love Is Your Love (Jonathan Peters Mix)</Track>
+          <Track Number="5">Heartbreak Hotel (Featuring Faith Evans And Kelly Price) (Hex Nector Mix) </Track>
+          <Track Number="6">I Learned From The Best (HQ2 Mix) </Track>
+          <Track Number="7">Step By Step (Junour Vasquez Mix)</Track>
+          <Track Number="8">I'm Every Woman (Clivilles &amp; Cole Mix)</Track>
+          <Track Number="9">Queen Of The Night (CJ MacIntosh Mix)</Track>
+          <Track Number="10">I Will Always Love You (Hex Rector Mix)</Track>
+          <Track Number="11">Love Will Save The Day (Jellybean &amp; David Morales Mix) </Track>
+          <Track Number="12">I'm Your Baby Tonight (Dronez Mix)</Track>
+          <Track Number="13">So Emotional (David Morales Mix)</Track>
+          <Track Number="14">I Wanna Dance With Somebody (Who Loves Me) (Junior Vasquez Mix)</Track>
+          <Track Number="15">How Will I Know (Junior Vasquez Mix)</Track>
+          <Track Number="16">Greatest Love Of All (Juniour Vasquez Mix) </Track>
+          <Track Number="17">One Moment In Time</Track>
+          <Track Number="18">The Star Spangled Banner (Performed Live 1/27/91 at Super Bowl XXV)</Track>
+        </Disc>
+      </Tracks>
+    </Item>
+    <Item>
+      <ASIN>B000HBKCDC</ASIN>
+      <SalesRank>1356</SalesRank>
+      <ItemAttributes>
+        <Artist>Sarah Mclachlan</Artist>
+        <Binding>Audio CD</Binding>
+        <EAN>0828768150429</EAN>
+        <EANList>
+          <EANListElement>0828768150429</EANListElement>
+        </EANList>
+        <Label>Arista</Label>
+        <ListPrice>
+          <Amount>798</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$7.98</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Arista</Manufacturer>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <PackageQuantity>1</PackageQuantity>
+        <ProductGroup>Music</ProductGroup>
+        <ProductTypeName>ABIS_MUSIC</ProductTypeName>
+        <Publisher>Arista</Publisher>
+        <ReleaseDate>2006-10-17</ReleaseDate>
+        <SKU>V0828768150429</SKU>
+        <Studio>Arista</Studio>
+        <Title>Wintersong</Title>
+        <UPC>828768150429</UPC>
+        <UPCList>
+          <UPCListElement>828768150429</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>273</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$2.73</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>179</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$1.79</FormattedPrice>
+        </LowestUsedPrice>
+        <LowestCollectiblePrice>
+          <Amount>1000</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$10.00</FormattedPrice>
+        </LowestCollectiblePrice>
+        <TotalNew>60</TotalNew>
+        <TotalUsed>63</TotalUsed>
+        <TotalCollectible>4</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B000HBKCDC%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB000HBKCDC</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>mVPgf9jf91Vv%2FmaPR0AYEmh9TupNN%2BXSLCvux2DnQqf%2FbtM9jnRQTKeU9P%2FcmgoO4BJdF7ng8XlyZs0TwtA4wVv6T4skh7vZnShyzxNVGB0%3D</OfferListingId>
+            <Price>
+              <Amount>704</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$7.04</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>94</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$0.94</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>12</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+      <Tracks>
+        <Disc Number="1">
+          <Track Number="1">Happy Xmas (War Is Over)</Track>
+          <Track Number="2">What Child Is This? (Greensleeves)</Track>
+          <Track Number="3">River</Track>
+          <Track Number="4">Wintersong</Track>
+          <Track Number="5">I'll Be Home For Christmas</Track>
+          <Track Number="6">O Little Town Of Bethlehem</Track>
+          <Track Number="7">The First Noel/Mary Mary</Track>
+          <Track Number="8">Silent Night</Track>
+          <Track Number="9">Song For A Winter's Night</Track>
+          <Track Number="10">Have Yourself A Merry Little Christmas</Track>
+          <Track Number="11">In A Bleak Mid-Winter</Track>
+          <Track Number="12">Christmas Time Is Here</Track>
+        </Disc>
+      </Tracks>
+    </Item>
+    <Item>
+      <ASIN>B00387F6ZG</ASIN>
+      <SalesRank>1077</SalesRank>
+      <ItemAttributes>
+        <Artist>Sarah McLachlan</Artist>
+        <Binding>Audio CD</Binding>
+        <EAN>0886975536726</EAN>
+        <EANList>
+          <EANListElement>0886975536726</EANListElement>
+        </EANList>
+        <Feature>Condition: New</Feature>
+        <ItemDimensions>
+          <Weight Units="hundredths-pounds">25</Weight>
+        </ItemDimensions>
+        <Label>Arista</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>1398</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$13.98</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Arista</Manufacturer>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <PackageQuantity>1</PackageQuantity>
+        <ProductGroup>Music</ProductGroup>
+        <ProductTypeName>ABIS_MUSIC</ProductTypeName>
+        <PublicationDate>2010-06-15</PublicationDate>
+        <Publisher>Arista</Publisher>
+        <ReleaseDate>2010-06-15</ReleaseDate>
+        <SKU>S100R3CD369</SKU>
+        <Studio>Arista</Studio>
+        <Title>Laws Of Illusion</Title>
+        <UPC>886975536726</UPC>
+        <UPCList>
+          <UPCListElement>886975536726</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>609</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$6.09</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>550</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$5.50</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>62</TotalNew>
+        <TotalUsed>24</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B00387F6ZG%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB00387F6ZG</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>W0b1nw64NNMUck%2Bn%2B3LCuGvBjEdefKywKBiUbMPTbYi%2B%2Bp3oIW3oNocJoo1VsLzFKCfNbEC%2FilqZN92DwihRTpVn2Ve90%2FGCvC9WR7Maq5mS6YrCF8%2B69A%3D%3D</OfferListingId>
+            <Price>
+              <Amount>1197</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$11.97</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>201</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$2.01</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>14</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+      <Tracks>
+        <Disc Number="1">
+          <Track Number="1">Awakenings</Track>
+          <Track Number="2">Illusions Of Bliss</Track>
+          <Track Number="3">Loving You Is Easy</Track>
+          <Track Number="4">Changes</Track>
+          <Track Number="5">Forgiveness</Track>
+          <Track Number="6">Rivers Of Love</Track>
+          <Track Number="7">Love Come</Track>
+          <Track Number="8">Out Of Tune</Track>
+          <Track Number="9">Heartbreak</Track>
+          <Track Number="10">Don t Give Up On Us</Track>
+          <Track Number="11">U Want Me 2</Track>
+          <Track Number="12">Bring On The Wonder</Track>
+          <Track Number="13">Love Come (Piano Version)</Track>
+        </Disc>
+      </Tracks>
+    </Item>
+    <Item>
+      <ASIN>B003TML0VO</ASIN>
+      <SalesRank>4789</SalesRank>
+      <ItemAttributes>
+        <Artist>Santana</Artist>
+        <Binding>Audio CD</Binding>
+        <EAN>0886974596424</EAN>
+        <EANList>
+          <EANListElement>0886974596424</EANListElement>
+        </EANList>
+        <IsAdultProduct>0</IsAdultProduct>
+        <ItemDimensions>
+          <Weight Units="hundredths-pounds">22</Weight>
+        </ItemDimensions>
+        <Label>Arista</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>Spanish</Name>
+            <Type>Original Language</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>1198</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$11.98</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Arista</Manufacturer>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <PackageQuantity>1</PackageQuantity>
+        <ProductGroup>Music</ProductGroup>
+        <ProductTypeName>ABIS_MUSIC</ProductTypeName>
+        <PublicationDate>2010-09-21</PublicationDate>
+        <Publisher>Arista</Publisher>
+        <ReleaseDate>2010-09-21</ReleaseDate>
+        <SKU>0027459642</SKU>
+        <Studio>Arista</Studio>
+        <Title>Guitar Heaven: The Greatest Guitar Classics of All Time</Title>
+        <UPC>886974596424</UPC>
+        <UPCList>
+          <UPCListElement>886974596424</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>607</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$6.07</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>375</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$3.75</FormattedPrice>
+        </LowestUsedPrice>
+        <LowestCollectiblePrice>
+          <Amount>1999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$19.99</FormattedPrice>
+        </LowestCollectiblePrice>
+        <TotalNew>72</TotalNew>
+        <TotalUsed>15</TotalUsed>
+        <TotalCollectible>1</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B003TML0VO%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB003TML0VO</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>QPZBiUIlePJD8UyRAFaN%2FLhAQzsNMZwQzOYo2Og%2B5cQIOPb2CCeVlhBkpt8l1%2FiQyi2%2FlC2qMX5Z1ugqwDFZpmK1RnTAZYvPN%2F%2FaIW1P938c9dAezRK42iZLfIeYAuiLKYSZ5L27Ki1dcPMyQ%2BHEbA%3D%3D</OfferListingId>
+            <Price>
+              <Amount>950</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$9.50</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>248</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$2.48</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>21</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+      <Tracks>
+        <Disc Number="1">
+          <Track Number="1">Whole Lotta Love (featuring Chris Cornell)</Track>
+          <Track Number="2">Can't You Hear Me Knocking (featuring Scott Weiland)</Track>
+          <Track Number="3">Sunshine Of Your Love (featuring Rob Thomas)</Track>
+          <Track Number="4">While My Guitar Gently Weeps (featuring India.Arie &amp; Yo-Yo Ma)</Track>
+          <Track Number="5">Photograph (featuring Chris Daughtry)</Track>
+          <Track Number="6">Back In Black (featuring Nas)</Track>
+          <Track Number="7">Riders On The Storm (featuring Chester Bennington &amp; Ray Manzarek)</Track>
+          <Track Number="8">Smoke On The Water (featuring Jacoby Shaddix)</Track>
+          <Track Number="9">Dance The Night Away (featuring Pat Monahan)</Track>
+          <Track Number="10">Bang A Gong (featuring Gavin Rossdale)</Track>
+          <Track Number="11">Little Wing (featuring Joe Cocker)</Track>
+          <Track Number="12">I Ain t Superstitious (featuring Jonny Lang)</Track>
+        </Disc>
+      </Tracks>
+    </Item>
+    <Item>
+      <ASIN>B000BGR18W</ASIN>
+      <SalesRank>627</SalesRank>
+      <ItemAttributes>
+        <Artist>Carrie Underwood</Artist>
+        <Binding>Audio CD</Binding>
+        <Brand>SBME/ARISTA</Brand>
+        <CatalogNumberList>
+          <CatalogNumberListElement>828767119724B34000</CatalogNumberListElement>
+        </CatalogNumberList>
+        <EAN>0828767119724</EAN>
+        <EANList>
+          <EANListElement>0828767119724</EANListElement>
+        </EANList>
+        <Feature>Condition: Used - Very Good</Feature>
+        <ItemDimensions>
+          <Weight Units="hundredths-pounds">22</Weight>
+        </ItemDimensions>
+        <Label>Arista</Label>
+        <ListPrice>
+          <Amount>999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$9.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Arista</Manufacturer>
+        <MPN>828767119724</MPN>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <PackageQuantity>1</PackageQuantity>
+        <PartNumber>828767119724</PartNumber>
+        <ProductGroup>Music</ProductGroup>
+        <ProductTypeName>ABIS_MUSIC</ProductTypeName>
+        <Publisher>Arista</Publisher>
+        <ReleaseDate>2005-11-15</ReleaseDate>
+        <SKU>14403598</SKU>
+        <Studio>Arista</Studio>
+        <Title>Some Hearts</Title>
+        <UPC>828767119724</UPC>
+        <UPCList>
+          <UPCListElement>828767119724</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>519</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$5.19</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>19</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.19</FormattedPrice>
+        </LowestUsedPrice>
+        <LowestCollectiblePrice>
+          <Amount>999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$9.99</FormattedPrice>
+        </LowestCollectiblePrice>
+        <TotalNew>58</TotalNew>
+        <TotalUsed>155</TotalUsed>
+        <TotalCollectible>4</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B000BGR18W%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB000BGR18W</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>g5JOhfq%2FG2k2943fpYAllHva2rZ5XoCFJu2bgARaew8N0yP76WaPHQ6erK0rxNZGva%2B9CWe2R6NjVLbhBBMl1tlEa05Fu5rsDw65fOiLpbxWIj5p0hlbUw%3D%3D</OfferListingId>
+            <Price>
+              <Amount>898</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$8.98</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>101</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$1.01</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>10</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+      <Tracks>
+        <Disc Number="1">
+          <Track Number="1">Wasted</Track>
+          <Track Number="2">Don't Forget To Remember Me</Track>
+          <Track Number="3">Some Hearts</Track>
+          <Track Number="4">Jesus, Take The Wheel</Track>
+          <Track Number="5">The Night Before (Life Goes On)</Track>
+          <Track Number="6">Lessons Learned</Track>
+          <Track Number="7">Before He Cheats</Track>
+          <Track Number="8">Starts With Goodbye</Track>
+          <Track Number="9">I Just Can't Live A Lie</Track>
+          <Track Number="10">We're Young And Beautiful</Track>
+          <Track Number="11">That's Where It Is</Track>
+          <Track Number="12">Whenever You Remember</Track>
+          <Track Number="13">I Ain't In Checotah Anymore</Track>
+          <Track Number="14">Inside Your Heaven</Track>
+        </Disc>
+      </Tracks>
+    </Item>
+  </Items>
+</ItemSearchResponse>

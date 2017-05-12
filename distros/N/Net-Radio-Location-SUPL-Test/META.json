@@ -1,0 +1,219 @@
+{
+   "abstract" : "Run Test Use-Cases for SUPL",
+   "author" : [
+      "Jens Rehsack <rehsack@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Radio-Location-SUPL-Test",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0.27",
+            "ExtUtils::ParseXS" : "0",
+            "Test::Differences" : "0",
+            "Test::More" : "0.90"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Any" : "0",
+            "Digest::SHA" : "0",
+            "File::ConfigDir" : "0.003",
+            "File::Find::Rule" : "0.32",
+            "List::Util" : "1.19",
+            "Log::Any" : "0.10",
+            "Log::Any::Adapter" : "0",
+            "Net::DBus" : "v1.0.0",
+            "Net::Radio::Modem::Adapter::oFono" : "0.001",
+            "Params::Util" : "0.37",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Radio::Location::SUPL::DBusObject" : {
+         "file" : "lib/Net/Radio/Location/SUPL/DBusObject.pm",
+         "version" : "0.001"
+      },
+      "Net::Radio::Location::SUPL::DBusObject::RecvPushMsg" : {
+         "file" : "lib/Net/Radio/Location/SUPL/DBusObject/RecvPushMsg.pm",
+         "version" : "0.001"
+      },
+      "Net::Radio::Location::SUPL::DBusObject::Translator" : {
+         "file" : "lib/Net/Radio/Location/SUPL/DBusObject/Translator.pm",
+         "version" : "0.001"
+      },
+      "Net::Radio::Location::SUPL::MainLoop" : {
+         "file" : "lib/Net/Radio/Location/SUPL/MainLoop.pm",
+         "version" : "0.001"
+      },
+      "Net::Radio::Location::SUPL::Test" : {
+         "file" : "lib/Net/Radio/Location/SUPL/Test.pm",
+         "version" : "0.001"
+      },
+      "Net::Radio::Location::SUPL::XS" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::AssistanceData_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::LocationId_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::LocationInfo_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::MethodType_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::MethodType_t_choice" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::MsrPosition_Req_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::MsrPosition_Rsp_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::PosCapability_Req_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::PosCapability_Rsp_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::PosPayLoad_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::PosPayLoad_t_choice" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::PositionInstruct_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::ProtocolError_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::RRLP_Component_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::RRLP_Component_t_choice" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::RRLP_PDU_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::SETId_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::SETId_t_choice" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::SLPAddress_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::SLPAddress_t_choice" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::SUPLAUTHREQ_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::SUPLAUTHRESP_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::SUPLEND_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::SUPLINIT_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::SUPLPOSINIT_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::SUPLPOS_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::SUPLRESPONSE_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::SUPLSTART_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::SessionID_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::SetSessionID_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::SlpSessionID_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::ULP_PDU_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::UlpMessage_t" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XS::UlpMessage_t_choice" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      },
+      "Net::Radio::Location::SUPL::XSc" : {
+         "file" : "lib/Net/Radio/Location/SUPL/XS.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.001"
+}

@@ -1,0 +1,46 @@
+NexStarCtl version 0.15
+=======================
+
+This module implements the serial commands supported by the Celestron
+NexStar hand control (HC) and SkyWatcher/Orion SynScan HC. This applies
+to the Celestron: NexStar GPS, NexStar GPS-SA, NexStar iSeries, NexStar
+SE Series, NexStar GT, CPC, SLT, Advanced-VX, Advanced-GT, CGE, CGEM etc.
+SkyWatcher: EQ5, HEQ5, EQ6 (Pro), AZ-EQ5 GT, AZ-EQ6 GT, EQ8 etc. and the
+corresponding Orion mounts.
+
+Communication to the hand control is 9600 bits/sec, no parity and one 
+stop bit via the RS-232 port on the base of the hand control.
+Communication can be established over TCP/IP if nexbridge is running
+on the computer connected to the telescope.
+
+For extended example how to use this perl module look in to the
+distribution folder for  nexstarctl/nexstarctl.pl. This program is a
+complete console tool to control NexStar telescopes based on NexStarCtl
+module.
+
+NOTE: For SkyWatcher/Orion mounts it is highly recommended to enforce
+protocol version checking (see enforce_protocol_version()) as the AUX
+commands are not supported or may behave erratically.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+   Device::SerialPort
+   Time::Local
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 by Rumen G.Bogdanovski
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.4 or,
+at your option, any later version of Perl 5 you may have available.
+

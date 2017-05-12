@@ -1,0 +1,64 @@
+---
+abstract: 'Kademlia-like DHT Node for BitTorrent'
+author:
+  - 'Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/'
+build_requires:
+  Test::Class: '0'
+  Test::Moose: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.1, CPAN::Meta::Converter version 2.141170'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-BitTorrent-DHT
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::BitTorrent::DHT:
+    file: lib/Net/BitTorrent/DHT.pm
+    version: v1.0.3
+  Net::BitTorrent::DHT::Bucket:
+    file: lib/Net/BitTorrent/DHT/Bucket.pm
+    version: v1.0.3
+  Net::BitTorrent::DHT::Node:
+    file: lib/Net/BitTorrent/DHT/Node.pm
+    version: v1.0.3
+  Net::BitTorrent::DHT::RoutingTable:
+    file: lib/Net/BitTorrent/DHT/RoutingTable.pm
+    version: v1.0.3
+  Net::BitTorrent::DHT::Tracker:
+    file: lib/Net/BitTorrent/DHT/Tracker.pm
+    version: v1.0.3
+recommends:
+  Config::IPFilter: '0'
+requires:
+  AnyEvent: '0'
+  AnyEvent::HTTP: '0'
+  AnyEvent::Util: '0'
+  Bit::Vector: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
+  Net::BitTorrent::Protocol: v1.0.2
+  Scalar::Util: '0'
+  Socket: '0'
+  Types::Standard: '0'
+  feature: '0'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/sanko/net-bittorrent-dht/issues
+  homepage: https://github.com/sanko/net-bittorrent-dht
+  repository: git://github.com/sanko/net-bittorrent-dht.git
+version: v1.0.3

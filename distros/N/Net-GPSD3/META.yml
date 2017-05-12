@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                Net-GPSD3
+version:             0.19
+abstract:            Interface to the gpsd server daemon protocol versions 3 (JSON).
+license:             ~
+author:              
+    - Michael R. Davis (domain=>michaelrdavis,tld=>com,account=>perl)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    DateTime:                      0
+    DateTime::Format::W3CDTF:      0.06
+    GPS::Point:                    0.1
+    IO::Socket::INET6:             0
+    JSON::XS:                      0
+    Test::Simple:                  0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

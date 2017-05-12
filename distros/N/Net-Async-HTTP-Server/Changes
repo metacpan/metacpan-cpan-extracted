@@ -1,0 +1,75 @@
+Revision history for Net-Async-HTTP-Server
+
+0.09    2015/09/09 15:53:42
+        [CHANGES]
+         * Added ->query_form, ->query_param_names, ->query_param
+         * New barename documentation style for methods
+
+        [BUGFIXES]
+         * Check definedness rather than truth of body chunks (RT101503)
+         * Gracefully close connections for received byte streams that don't
+           appear to be HTTP (RT105470, RT101146)
+         * Don't override a caller-specified request_class
+
+0.08    2015/07/08 19:03:43
+        [CHANGES]
+         * More intelligent parsing of --listen arguments to plackup, allowing
+           for host:port:SSL as well
+         * Weaken references held to request objects, so that DESTROY can
+           detect dropped unhandled ones
+         * Allow subclasses/instances to construct different classes of
+           request objects
+
+        [BUGFIXES]
+         * Print a more helpful warning if PSGI body contains undef (RT98985)
+         * Must not write zero-byte chunks in chunked-encoding mode
+
+0.07    2014/03/26 18:25:23
+        [CHANGES]
+         * Updated for IO::Async 0.61 - avoid IO::Async::Protocol::Stream
+         * Support ->listen on SSL extension
+         * Support listening on SSL from the Plack handler and commandline
+           (RT86436)
+
+        [BUGFIXES]
+         * Ensure that closed client connections get removed properly
+           (RT93202)
+
+        Bugfix sponsored by NET-A-PORTER (http://www.net-a-porter.com/)
+
+0.06    2013/12/30 01:40:55
+        [CHANGES]
+         * Set Content-Length header in SYNOPSIS so the response actually
+           works in real HTTP clients (happens to fix RT91647)
+         * Added some actual documentation for Plack::Handler::NaHTTP:Server
+         * Configurable listen() queuesize (RT91470)
+         * Pass a hash of parameters to the Plack server_ready callback
+           (RT91471)
+         * Set psgix.io and psgix.input.buffered in PSGI environment
+
+        [BUGFIXES]
+         * Don't crash on attempts to write to requests on connections that
+           are already closed
+
+0.05    CHANGES:
+         * Set PATH_INFO correctly in PSGI environment
+         * More unit testing - test crosslink with NaHTTP
+
+0.04    CHANGES:
+         * Provide access to all the HTTP headers via ->headers method
+         * Set HTTP headers in PSGI environment
+         * Remember not to write content using chunked transfer encoding when
+           that mode isn't actually set
+
+0.03    CHANGES:
+         * Implement PSGI container subclass and Plack::Handler:: module
+         * Added more accessors for request fields
+         * Reworked chunked response streaming API
+         * Don't force a Content-Length header in normal operation
+
+0.02    CHANGES:
+         * Changed request/response API - new NaHTTP::Server::Request objects
+         * Added response streaming with HTTP/1.1 chunked encoding
+
+0.01    First version, released on an unsuspecting world.
+

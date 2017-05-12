@@ -1,0 +1,7 @@
+Here's my usual sequence of commands for clpmisc:
+
+    % clpm-get
+    % ./news-scan >2003-02-10.scan
+    % news-stats 2003-02-10.scan >2003-02-10.scan
+    % cd ~/spool
+    % ./empty-old 2 comp.lang.perl.misc

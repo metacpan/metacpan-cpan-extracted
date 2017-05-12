@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?><ShoppingCartResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://xml.amazon.com/schemas3/dev-heavy.xsd">
+
+<Request><Args><Arg value="libwww-perl/5.65" name="UserAgent"></Arg><Arg value="1A1GNA08WM7QNCW76GC9" name="RequestID"></Arg><Arg value="true" name="sims"></Arg><Arg value="us" name="locale"></Arg><Arg value="104-0468881-3373551" name="CartId"></Arg><Arg value="clear" name="ShoppingCart"></Arg><Arg value="2yyCamdRF0g7ZCwe0r832oLeX/o=" name="Hmac"></Arg><Arg value="D1QS8OZAEP31QW" name="dev-t"></Arg><Arg value="webservices-20" name="t"></Arg><Arg value="xml" name="f"></Arg></Args></Request>  <ShoppingCart>
+   <CartId>104-0468881-3373551</CartId>
+   <HMAC>2yyCamdRF0g7ZCwe0r832oLeX/o=</HMAC>
+   <PurchaseUrl>http://www.amazon.com/exec/obidos/shopping-basket?cart-id=104-0468881-3373551%26associate-id=webservices-20%26hmac=2yyCamdRF0g7ZCwe0r832oLeX/o=</PurchaseUrl>
+  </ShoppingCart>
+</ShoppingCartResponse>

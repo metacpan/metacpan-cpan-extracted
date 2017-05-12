@@ -1,0 +1,39 @@
+Release history for Net-Minecraft-Login
+
+0.002000 2013-12-31T05:23:58Z
+ [00 Minor]
+ - Component Refactoring
+ - Note: This is still only supporing the legacy pre-yggdrasil api
+
+ [Dependencies::Noteworthy]
+ - Moo::Role⁺
+ - Module::Build 0.4003 → 0.4203
+ - Test::More 0.98 → 1.001002
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see Changes.deps{,.all,.dev} for
+   details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +46 -3
+ - runtime: +1
+ - test: ↑1 -2
+
+ [Documentation]
+ - Added README.mkdn
+ - added layout/*
+
+ [Internals]
+ - Net::Minecraft::Login has internal HTTP attributes extracted to a role
+ - Net::Minecraft::Login{Failure,Result} are both Role::LoginResult
+
+ [Modules::New]
+ - Net::Minecraft::Role::HTTP
+ - Net::Minecraft::Role::LoginResult
+
+ [Packaging]
+ - uses MB 0.4004 test_requires
+
+0.001000 2013-01-06T18:34:58Z
+ - First version.
+

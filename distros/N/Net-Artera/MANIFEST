@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Artera.t
+lib/Net/Artera.pm
+cid.csv
+cidhash.pl

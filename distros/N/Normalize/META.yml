@@ -1,0 +1,21 @@
+---
+name: Normalize
+version: 0.31
+author:
+  - 'Konstantin Kapitanov <perlovik at gmail dot com>'
+abstract: normalize scores between 0 and 1.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Math::Round::Var: 0
+build_requires:
+  Test::More: 0
+provides:
+  Normalize:
+    file: lib/Normalize.pm
+    version: 0.31
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

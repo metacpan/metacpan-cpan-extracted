@@ -1,0 +1,9 @@
+#!/bin/sh -x
+
+perl Makefile.PL PREFIX=$PERL
+rm *.tar.gz
+make docs
+make test
+make tardist
+make install
+pause *.tar.gz

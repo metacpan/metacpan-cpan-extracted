@@ -1,0 +1,41 @@
+---
+abstract: 'IO::Async support for dealing with UWSGI requests'
+author:
+  - 'Tom Molesworth <cpan@perlsite.co.uk>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::Fatal: '0.010'
+  Test::More: '0.98'
+  Test::Refcount: '0.07'
+  perl: '5.010001'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Async-UWSGI
+no_index:
+  directory:
+    - inc
+requires:
+  Future: '0.30'
+  HTTP::Response: '0'
+  IO::Async: '0.62'
+  JSON::MaybeXS: '0'
+  List::UtilsBy: '0'
+  Mixin::Event::Dispatch: '1.006'
+  Protocol::UWSGI: '1.000'
+  URI: '0'
+  URI::QueryParam: '0'
+  curry: '0'
+  parent: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-Async-UWSGI
+  homepage: http://search.cpan.org/dist/Net-Async-UWSGI/
+version: '0.006'

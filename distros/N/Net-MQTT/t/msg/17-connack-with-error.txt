@@ -1,0 +1,10 @@
+$args =
+{
+ message_type => MQTT_CONNACK,
+ return_code => 6,
+ connack_reserved => 2,
+}
+
+20 02 02 06
+
+ConnAck/at-most-once Reserved 

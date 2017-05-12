@@ -1,0 +1,9 @@
+Revision history for Net-LDAP-Batch
+
+0.01    10 July 2008
+        First version, released on an unsuspecting world.
+
+0.02    31 July 2008
+        * add more error messages on failure
+
+

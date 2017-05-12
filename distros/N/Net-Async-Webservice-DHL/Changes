@@ -1,0 +1,50 @@
+1.2.2     2016-08-29 16:03:43+01:00 Europe/London
+ - fix RT#114084 (avoid File::ShareDir::ProjectDistDir), thanks Ether
+ - minor code and dist.ini cleanup
+
+1.2.1     2015-02-26 12:00:14+00:00 Europe/London
+ - update to newer DHL schemas
+ - an ErrorResponse for "wrong password" contains the Password element,
+   even if DHL's schema does not say so
+
+1.2.0     2014-09-22 14:24:11+01:00 Europe/London
+ - route request call
+ - added optional message reference to all calls
+ - remove the included Net::Async::Webservice::Common
+
+1.1.1     2014-07-29 11:14:40+01:00 Europe/London
+ - use SingleEncoding (thanks sergeyromanov)
+
+1.1.0     2014-07-09 13:12:06+01:00 Europe/London
+ - product_code is no longer required (it was not used)
+ [Incompatible changes]
+ - if you pass product_code, it will now be used in the request
+
+1.0.0     2014-06-25 11:21:06+01:00 Europe/London
+ - first non-dev release
+
+0.01_6    2014-06-17 17:06:14+01:00 Europe/London
+ - no need for Task::Weaken
+ - migrate to Net::Async::Webservice::Common (not yet released, so
+   it's temporarily included in t/lib)
+
+0.01_5    2014-06-12 16:25:33+01:00 Europe/London
+ - install the share dir with the XML schema files
+
+0.01_4    2014-06-10 10:43:55+01:00 Europe/London
+ - do not swallow non-http exceptions
+
+0.01_3    2014-06-09 10:28:33+01:00 Europe/London
+ - failed Futures now have a 'dhl' string as second element, as
+   recommended by PEVANS
+ - fix Perl version specification
+ - add explicit dependency on DateTime::Format::ISO8601
+
+0.01_2    2014-06-05 15:14:10+01:00 Europe/London
+ - correctly handle connection failures
+
+0.01_1    2014-06-05 12:21:10+01:00 Europe/London
+ - first release
+ - requires Perl 5.10
+ - will work with IO::Async and Net::Async::HTTP, or with plain
+   LWP::UserAgent

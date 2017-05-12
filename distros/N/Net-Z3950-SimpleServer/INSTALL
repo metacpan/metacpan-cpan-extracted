@@ -1,0 +1,44 @@
+Building and installation
+-------------------------
+1. Requirements
+
+The Net::Z3950::SimpleServer Perl module requires the YAZ toolkit.
+Version 4 or later is recommended. You can download it via this link:
+
+	http://ftp.indexdata.dk/pub/yaz/
+
+You need to configure the YAZ toolkit with the command
+
+	% ./configure
+
+Then compile and install
+
+	% make
+	# make install
+
+You don't *need* to install YAZ globally on your machine if you
+prefer not to. In this case, you just have to update the Makefile.PL
+with the locations of the libraries.
+
+2. Installation
+
+Unpack the tar ball this way
+
+	% gunzip Net-Z3950-SimpleServer-xxxx.tar.gz
+	% tar xvf Net-Z3950-SimpleServer-xxxx.tar.gz
+
+and cd to the root directory of the module package
+
+	% cd Net-Z3950-SimpleServer-xxxx
+
+The installation takes place by issuing the following commands:
+
+	% perl Makefile.PL
+	% make
+	% make test
+	# make install
+
+The last command has to be issued as super user.
+
+Good luck!
+

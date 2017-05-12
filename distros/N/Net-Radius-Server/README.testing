@@ -1,0 +1,13 @@
+Test cases include so called "interactive" tests. These tests require
+an external application (LDAP server, PAM setup, RADIUS server) in
+order to complete.
+
+As this is not always available, you must enable the tests
+specifically by setting the value of the environment variable
+$NRS_INTERACTIVE to a true value. Something like this, works in a bash
+shell:
+
+export NRS_INTERACTIVE=1
+
+You will be required to supply a number of arguments to the test
+scripts in order to complete them.

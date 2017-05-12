@@ -1,0 +1,34 @@
+--- #YAML:1.0
+name: Net-DAAP-Client
+version: 0.42
+author:
+  - |-
+    Nathan Torkington, <nathan AT torkington.com>.  For support, join the
+    DAAP developers mailing list by sending mail to <daap-dev-subscribe
+    AT develooper.com>.  See the AUTHORS file in the distribution for other
+    contributors.
+  - |-
+    Richard Clamp <richardc@unixbeard.net> took on maintainership duties
+    for the 0.4 and subsequent releases.
+abstract: ~
+license: perl
+requires:
+  Digest::MD5: 0
+  Digest::MD5::M4p: 0
+  LWP: 0
+  Net::DAAP::DMAP: 1.22
+  perl: 5.006
+build_requires:
+  Test::More: 0
+provides:
+  Net::DAAP::Client:
+    file: lib/Net/DAAP/Client.pm
+    version: 0.42
+  Net::DAAP::Client::UA:
+    file: lib/Net/DAAP/Client.pm
+    version: 0.42
+  Net::DAAP::Client::v2:
+    file: lib/Net/DAAP/Client/v2.pm
+  Net::DAAP::Client::v3:
+    file: lib/Net/DAAP/Client/v3.pm
+generated_by: Module::Build version 0.25

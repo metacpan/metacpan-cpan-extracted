@@ -1,0 +1,10 @@
+#!/usr/bin/env perl -T
+use strict;
+use warnings;
+use Net::MemcacheQ;
+
+my $nmq = Net::MemcacheQ->new();
+
+while(my $message = $nmq->shift('demoqueue')) {
+  print $message, "\n";
+}

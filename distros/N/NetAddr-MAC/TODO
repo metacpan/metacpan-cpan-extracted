@@ -1,0 +1,3 @@
+- have the create function be able to be flagged that a mac address is token ring
+- perhaps provide some overloaded functions?
+- test the normalisation functions more than currently

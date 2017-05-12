@@ -1,0 +1,1118 @@
+
+=head1 NAME
+
+Net::ESMTP - SMTP client library (wrapper for C libESMTP library)
+
+=head1 SYNOPSIS
+
+  use Net::ESMTP;
+  
+  my $session = new Net::ESMTP::Session ();
+  my $message = $session->add_message();
+  
+  $session->set_server ("localhost:25");
+
+  # Set the reverse path for the mail envelope. (undef is ok)
+  my $from;
+  $message->set_reverse_path ($from);
+
+  open FH, "<test.eml" || die "Can not open test.eml: $!";
+  my $str = join'',<FH>;
+  $str =~ s/\r//g; $str =~ s/\n/\r\n/g;
+  close (FH) || die "Close test.eml: $!";
+
+  # set message contents to send
+  $message->set_message_str ($str);
+
+  my $rcpt = 'test-nonexistent@nonexistent-example.com';
+  my $recipient = $message->add_recipient ($rcpt);
+  $recipient->dsn_set_notify ( Notify_SUCCESS|Notify_FAILURE );
+
+  #
+  # send message
+  #
+  if (!$session->start_session ()) {
+      warn "SMTP server problem: " .
+        smtp_strerror (smtp_errno ());
+  } else {
+      my $status = $message->message_transfer_status();
+      print $status->{'code'} . ' ' . $status->{'text'};
+  }
+
+=head1 ABSTRACT
+
+Net::ESMTP is a wrapper for SMTP client library libESMTP
+(written in C). It has clear interface and access to SMTP
+advanced features like: SASL (authorization), TLS (privacy
+and authentication), ETRN, DSN etc.
+
+=head1 DESCRIPTION
+
+Net::ESMTP is a perl module to manage posting e-mail
+using SMTP to a preconfigured Mail Transport Agent (MTA)
+such as postfix. This C wrapper should give you besides faster
+runtime, access to advanced features of the libESMTP as
+SASL, TLS, pipelining, a failover mechanism based on DNS,
+other SMTP extensions (ETRN, DSN, etc).
+
+Although Net::ESMTP includes methods for manipulating message
+headers, it does not support MIME. For MIME support look for
+e.g. MIME::Fast perl module (based on C library called gmime).
+
+B<WARNING>: this code is still in beta phase, and interface methods
+could change.
+
+B<NOTE>: This documentation is mostly based on (and borrowed from)
+the libESMTP documentation.
+
+=head1 SIGNAL HANDLING
+
+It is advisable for your application to catch or ignore SIGPIPE,
+since sometimes connection to the SMTP server is lost and a program
+will blow up with SIGPIPE. Use the code similar to the following:
+
+  $SIG{PIPE} = 'IGNORE';
+
+or
+
+  local $SIG{PIPE} = sub { die "SMTP connection lost" };
+
+For further examples consult perlipc(1) manual page.
+
+=head1 COMMON FUNCTIONS
+
+=over 4
+
+=item I<smtp_version> ()
+
+Retrieve version information for the libESMTP in use.
+E.g.:
+    print Net::ESMTP::smtp_version();
+    # would print "1"
+
+B<Returns>: libESMTP version string.
+
+=item I<smtp_errno> ()
+
+Retrieve the error code for the most recently failed API in the
+calling thread.
+
+B<Returns>: libESMTP error code.
+
+=back
+
+=over 8
+
+=item Error codes:
+
+    SMTP_ERR_NOTHING_TO_DO                  2
+    SMTP_ERR_DROPPED_CONNECTION             3
+    SMTP_ERR_INVALID_RESPONSE_SYNTAX        4
+    SMTP_ERR_STATUS_MISMATCH                5
+    SMTP_ERR_INVALID_RESPONSE_STATUS        6
+    SMTP_ERR_INVAL                          7
+      # means that an API was called with invalid arguments
+    SMTP_ERR_EXTENSION_NOT_AVAILABLE        8
+
+    # libESMTP versions of some getaddrinfo error numbers
+    SMTP_ERR_EAI_ADDRFAMILY                 9
+    SMTP_ERR_EAI_NODATA                     10
+    SMTP_ERR_EAI_FAIL                       11
+    SMTP_ERR_EAI_AGAIN                      12
+    SMTP_ERR_EAI_MEMORY                     13
+    SMTP_ERR_EAI_FAMILY                     14
+    SMTP_ERR_EAI_BADFLAGS                   15
+    SMTP_ERR_EAI_NONAME                     16
+    SMTP_ERR_EAI_SERVICE                    17
+    SMTP_ERR_EAI_SOCKTYPE                   18
+
+=back
+
+=over 4
+
+=item I<smtp_strerror> (errno)
+
+Translate a libESMTP error number to a string suitable for use
+in an application error message.
+
+B<Returns>: Error description or undef on failure.
+
+=back
+
+B<NOTE>: The following calls are SMTP extensions for
+RFC 2487.  SMTP StartTLS Extension.
+
+If OpenSSL (http://www.openssl.org/) is available
+when building libESMTP, support for the STARTTLS extension can be enabled.
+If support is not enabled, the following APIs will always fail.
+
+=over 4
+
+=item I<starttls_set_password_cb> (function[, data])
+
+Call the callback function when OpenSSL requires a password
+(uses SSL_CTX_set_default_passwd_cb internally which sets
+a callback called when loading/storing a PEM certificate with encryption).
+
+The callback function would see the following input
+arguments: $rwflag, $data. The $rwflag parameter
+indicates whether the callback is used for reading/decryption ($rwflag=0)
+or writing/encryption ($rwflag=1). Usually when application
+prepares to encrypt data ($rwflag=1) user should be asked for password
+twice for comparison.
+
+N.B.  If this API is not called and OpenSSL requires a password, it
+will supply a default callback which prompts on the user's tty.
+This is likely to be undesired behaviour, so the app should
+supply a callback using this function.
+
+B<Returns>: Non zero on success, zero on failure.
+
+=back
+
+=head1 PUBLIC CLASSES
+
+The C libESMTP does not support object, however it would be
+easier for perl programmer to use the following classes:
+
+  Net::ESMTP::Session
+  Net::ESMTP::Message
+  Net::ESMTP::Recipient
+  Net::ESMTP::EtrnNode
+  Net::ESMTP::Auth
+
+There is a special hash returned from the following functions:
+
+  Net::ESMTP::Message object   -> message_transfer__status()
+  Net::ESMTP::Message object   -> reverse_path_status()
+  Net::ESMTP::Recipient object -> recipient_status()
+
+Returned HASh reference consists of the following key and value pairs:
+
+  'code'        => number, # SMTP protocol status pre
+  'text'        => string, # Text from the server
+  'enh_class'   => number, # RFC 2034 enhanced status triplet
+  'enh_subject' => number,
+  'enh_detail'  => number
+
+For Session, Message, Recipient, EtrnNode objects works the following functions:
+
+=over 4
+
+=item I<set_application_data> (data)
+
+=item I<get_application_data> ()
+
+These functions associate application defined data with each of the opaque
+structures.  The set variants of the functions set a new value for the
+application data and return the old value in their respective structures.
+The get variants return the current value of the application data.
+
+B<Returns>: The current application data.
+
+=back
+
+=head2 Net::ESMTP::Session
+
+=over 4
+
+=item I<new> ()
+
+Create session object. The first call you need to make before message creation
+and sending.
+
+B<Returns>: New Net::ESMTP::Session object or undef on failure.
+
+=item I<add_message> ()
+
+Add a message to the list of messages to be transferred to the remote
+MTA during an SMTP session.
+
+B<Returns>: New Net::ESMTP::Message object or undef on failure.
+
+=item I<enumerate_messages> (function[, data])
+
+Call the callback function once for each message in an smtp session.
+You can submit optional $data variable. For each message the callback function would
+see two arguments: Net::ESMTP::Message object, $data from the user.
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=item I<set_hostname> (string)
+
+Set the name of the localhost.  If one is not specified, the local host
+name will be determined using uname().
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=item I<set_server> (server[:service])
+
+Set the host name and service for the client connection.
+If not specified the port defaults to 587 (mail message submission, see RFC 2476).
+Host and service name validity is not checked until an attempt
+to connect to the remote host.
+Example:
+  $session->set_server ("localhost:25");
+  $session->set_server ("smtp.example.com:smtp");
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=item I<set_timeout> (which, value)
+
+Set the timeouts.  An absolute minumum timeout of one second ($value = 1000) is imposed.
+Unless overriden using the Timeout_OVERRIDE_RFC2822_MINIMUM flag, the minimum
+values recommended in RFC 2822 are enforced.
+
+The $which parameter can hæve one of the following values:
+Timeout_GREETING, Timeout_ENVELOPE, Timeout_DATA, Timeout_TRANSFER,
+Timeout_DATA2. While $value parameter is the number of milliseconds.
+
+B<Returns>: The actual timeout set or zero on error.
+
+=item I<option_require_all_recipients> (state)
+
+Some applications can't handle one recipient from many failing
+particularly well.  If the 'require_all_recipients' option is
+set, this will fail the entire transaction even if some of the
+recipients were accepted in the RCPT commands.
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=item I<set_eventcb> (function[, data])
+
+Set a callback function to process protocol events during the SMTP session
+with the server.  The callback function is called when something significant
+happens, such as when server, message or recipient status codes are notified.
+The callback function would see several arguments: $event_no (as a constant number),
+$data (specified by the user), optional parameters related to $event_no.
+
+The following callback arguments could be expected:
+
+  # Protocol progress
+  SMTP_EV_CONNECT (i.e. $event_no argument alone)
+  SMTP_EV_MAILSTATUS         $reverse_path_mailbox, $message_object
+  SMTP_EV_RCPTSTATUS         $rcpt_mailbox, $recipient_object
+  SMTP_EV_MESSAGEDATA        $current_message_object, $length
+  SMTP_EV_MESSAGESENT        $current_message_object
+  SMTP_EV_DISCONNECT
+
+  # Protocol extension progress
+  SMTP_EV_ETRNSTATUS         $node_option, $node_domain
+
+  # Required extensions
+  SMTP_EV_EXTNA_DSN          *) callback return value is important
+  SMTP_EV_EXTNA_8BITMIME
+  SMTP_EV_EXTNA_STARTTLS
+  SMTP_EV_EXTNA_ETRN         *) callback return value is important
+  SMTP_EV_EXTNA_CHUNKING     *) callback return value is important
+  SMTP_EV_EXTNA_BINARYMIME
+
+  # Extensions specific events
+  SMTP_EV_DELIVERBY_EXPIRED  $(min_by_time - by_time), *) callback return ...
+
+  # STARTTLS
+  SMTP_EV_WEAK_CIPHER        $bits, *) callback return value is important
+  SMTP_EV_STARTTLS_OK        (unsupported in Net::ESMTP for now (no SSL objects))
+  SMTP_EV_INVALID_PEER_CERTIFICATE $vfy_result, *) callback return ...
+  SMTP_EV_NO_PEER_CERTIFICATE    *) callback return value is important
+  SMTP_EV_WRONG_PEER_CERTIFICATE *) callback return value is important
+
+*) callback return value is important - for several
+events returns value from the callback function is used for
+making a decision what to do next.
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=item I<set_monitorcb> (function[, data, headers = 0])
+
+Set a callback function to monitor the SMTP session with the server.
+The callback function is called with the following arguments:
+$line (ended with new line), $writing, $data.
+
+The callback is called with packets of data either transmitted to or
+received from the server. When $writing is non-zero, data
+is being written to the remote host otherwise the data is being read
+from the remote host. In the event that an encrypted connection to the
+server is in use, the monitor callback will show the clear text.
+
+The content of the DATA (or BDAT) command is not passed back to the
+application since this is typically large and possibly binary.  However,
+it may be useful to view the message headers.
+If $headers is non-zero the callback will be used to
+display the message headers.  In this case, the value of
+$writing is set to SMTP_CB_HEADERS (2) instead of SMTP_CB_WRITING (1)
+so that the application can distinguish headers from other data sent to the SMTP
+server.  The callback is passed each header one at a time and in this
+case the data passed back to the application does not reflect the actual
+buffering of the data on-the-wire.
+
+Note that headers within MIME parts will not be returned,
+only the message headers.
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=item I<start_session> ()
+
+Initiate a mail submission session with an SMTP server.
+
+This connects to an SMTP server and transfers the messages in
+the session.  The SMTP envelope is constructed using the message
+and recipient parameters set up previously.  The message
+callback is then used to read the message contents to the
+server.  As the RFC 2822 headers are read from the application,
+they may be processed.  Header processing terminates when the
+first line containing only CR-LF is encountered.  The remainder of
+the message is copied verbatim.
+
+This call is atomic in the sense that a connection to the server
+is made only when this is called and is closed down before it
+returns, i.e. there is no connection to the server outside this
+function.
+
+The function fails if the SMTP connection fails (not if RCPT commands fail).
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=back
+
+B<NOTE>: The following calls are SMTP extensions for
+RFC 1985. Remote Message Queue Starting (ETRN).
+
+The SMTP ETRN extension is used to request a remore MTA to start its
+delivery queue for the specified domain.  If the application requests
+the use if the ETRN extension and the remote MTA does not list ETRN,
+libESMTP will use the event callback to notify the application.
+
+=over 4
+
+=item I<etrn_add_node> (option, node)
+
+Add an ETRN node to the SMTP session.
+For further STRN usage see Net::ESMTP::EtrnNode public class description below.
+
+B<Returns>: New Net::ESMTP::EtrnNode object or undef on failure.
+
+=back
+
+B<NOTE>: The following calls are SMTP extensions for
+RFC 2554.  SMTP Auth Extension.
+
+=over 4
+
+=item I<auth_set_context> (context)
+
+Enable the SMTP AUTH verb if $context is Net::ESMTP::Auth object
+or disable it when $context is undef.
+The authentication API (Net::ESMTP::Auth class) is described separately.
+
+When enabled and the SMTP server advertises the AUTH extension, libESMTP
+will attempt to authenticate to the SMTP server before transferring
+any messages.
+
+B<Returns>: Non zero on success, zero on failure.
+
+=back
+
+B<NOTE>: The following calls are SMTP extensions for
+RFC 2487.  SMTP StartTLS Extension.
+
+If TLS support is not enabled, the following APIs will always fail.
+
+=over 4
+
+=item I<starttls_enable> (how = Starttls_ENABLED)
+
+Enable the SMTP STARTTLS verb if $how is not
+I<Starttls_DISABLED>.  If set
+to I<Starttls_REQUIRED> the protocol will quit rather
+than transferring any messages if the STARTTLS extension is not
+available.
+
+B<Returns>: Non zero on success, zero on failure.
+
+=item I<starttls_set_ctx> ($ctx)
+
+Use an SSL_CTX created by the application.  The
+SSL_CTX must be created by the application which is assumed
+to have initialised the OpenSSL library.  If not used, OpenSSL is
+automatically initialised before calling any of the OpenSSL API
+functions.
+
+E.g.:
+
+  use SSL;
+  use Net::SSLeay qw(die_now die_if_ssl_error) ;
+  my $ctx = Net::SSLeay::CTX_new() or die_now("Failed to create SSL_CTX $!");
+  ...
+  $session->starttls_set_ctx ($ctx);
+  ...
+  Net::SSLeay::CTX_free ($ctx);
+
+B<Returns>: Non zero on success, zero on failure.
+
+B<NOTE>: not tested yet.
+
+=back
+
+=head2 Net::ESMTP::Message
+
+To create Net::ESMTP::Message object one need to call
+add_message() method on the Net::ESMTP::Session object.
+
+=over 4
+
+=item I<set_reverse_path> (mailbox)
+
+Set the reverse path (envelope sender) mailbox address.
+$mailbox must be an address using the syntax specified in RFC 2821.
+If a null reverse path is required, specify undef or "".
+
+If the value is a non-empty string and neither the message contains
+a From: header nor a From: is specified using
+set_header(), the reverse path mailbox address
+specified with this API will be used to generate one.
+
+It is strongly reccommended that the message supplies a From:
+header specifying a single mailbox or a Sender: header and
+a From: header specifying multiple mailboxes or that the
+libESMTP header APIs are used to create them.
+
+B<Returns>: Zero on failure, non-zero on success.
+
+B<NOTE>: Not calling this API has the same effect as specifing
+empty $mailbox.
+
+=item I<add_recipient> (mailbox)
+
+Add a recipient to the message. $mailbox must be an address
+using the syntax specified in RFC 2821.
+
+If neither the message contains a To: header nor a
+To: is specified using set_header(), a
+To: header will be automatically generated using the list
+of envelope recipients.
+
+It is strongly reccommended that the message supplies To:,
+Cc: and Bcc: headers or that the
+libESMTP header APIs are used to create them.
+
+B<Returns>: Net::ESMTP::Recipient object or undef on failure.
+
+B<NOTE>: The envelope recipient need not be related to the To/Cc/Bcc
+recipients, for example, when a mail is resent to the recipients
+of a mailing list or as a result of alias expansion.
+
+=item I<enumerate_recipients> (function[, data])
+
+Call the callback function once for each recipient in the SMTP
+message. For each recipient the callback function would
+see the following arguments: Net::ESMTP::Recipient object,
+$mailbox string, $data.
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=item I<set_header> ()
+
+Set an RFC 2822 message header.
+
+If a value is supplied using set_header() the header
+is required to be present in the message.  If the (constant) Hdr_OVERRIDE
+option is not set a value supplied in the message is used unchanged;
+otherwise the value in the message is replaced.
+
+Headers in the message not corresonding to a default header action or set
+with set_header() are passed unchanged.
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=item B<HEADERS>: This section lists the additional function arguments for individual RFC 2822 headers.
+
+=over 8
+
+=item default
+
+Headers not specifically known to libESMTP are treated as
+simple string values.
+
+=item Date: number
+
+A pointer to a time_t supplies the value for this header.
+The time pointed to is copied and is formatted according to RFC 2822 when
+the value is required.
+
+The Date: header is automatically generated if one is not
+supplied either in the message or via the API.
+
+=item Message-Id: string
+
+A string value is supplied which is the message identifier.
+If undef is supplied, a value is automatically generated.
+At present there is no way for the application to retrieve the
+automatically generated value.
+
+=item Disposition-Notification-To: phrase, mailbox
+
+$phrase is free format text which is usually the
+real name of the recipient specified in $mailbox.
+
+=item To: phrase, address
+
+=item Cc: phrase, address
+
+=item Bcc: phrase, address
+
+=item Reply-To: phrase, address
+
+$phrase is free format text which is usually the
+real name of the recipient specified in $address.
+$address is as defined in RFC 2822.
+These headers may be set multiple times, however only one copy of each
+header listing all the values is actually created in the message.
+
+B<NOTE>:
+
+Certain headers may not be set using this call.  In particular, MIME
+headers cannot be set, the values in the message are always used.
+This is because, in the words of RFC 2045, MIME (RFC 2045 -
+RFC 2049) is "orthogonal" to RFC 2822 and
+libESMTP strives to preserve this condition.
+In addition, headers added to a message at delivery time such as
+Return-Path: are always deleted from the message.
+
+Certain headers may be specified multiple times and generate a single
+header listing all values specified.  If the header does not permit a
+list of values, calls to set_header() but the
+first for a given header will fail.
+
+=back
+
+=item I<set_header_option> (header, Hdr_OVERRIDE | Hdr_PROHIBIT)
+
+Set an RFC 2822 message header option for $header.
+
+Normally, a header set by set_header() is used
+as a default if one is not supplied in the message.  When Hdr_OVERRIDE
+is set, the value supplied in the API overrides the value in the
+message.
+
+libESMTP generates certain headers automatically if not present in the
+message.  This is the default behaviour for headers that are RECOMMENDED
+but not REQUIRED by RFC 2822, such as Message-Id:.  Setting Hdr_PROHIBIT
+ensures the transmitted message does not contain the named header.  If the
+header is REQUIRED by RFC 2822, the API will fail.
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=item I<set_resent_headers> (0 | 1)
+
+Request special processing of headers which have a Resent-
+variation.  This option is used when resending messages as described in
+RFC 2822.
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=item I<set_messagecb> (function, data)
+
+Set a callback function to read an RFC 2822 formatted message
+from the application.
+
+The callback is called repeatedly until the entire message has
+been processed. Callback function need to return all or part of the
+message data. The callback function would see two arguments: $len
+and $data.
+
+For the first call callback function would see $len equal to undef.
+The first call should not return anything (it would be dropped),
+it is only for the application to know where to start reading a message
+(open or rewind a filehandle etc.).
+
+When all the message data has been read the
+callback should return undef.
+
+You can use predefined libESMTP callbacks
+set_message_fp() and set_message_str() (see below)
+for FILEHANDLE and for the message in string.
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=item I<set_message_fp> (FILE)
+
+Callback function to read the message from a file.  The file MUST be
+formatted according to RFC 2822 and lines MUST be terminated with the
+canonical CRLF sequence.  Furthermore, RFC 2821 line length
+limitations must be observed (1000 octets maximum).
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=item I<set_message_str> (str)
+
+Callback function to read the message from a string.
+The same formatting rules as in set_message_fp() apply here.
+The $str string should contain the whole message.
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=item I<message_transfer_status> ()
+
+Retrieve the message transfer success/failure status from a
+previous SMTP session.  This includes SMTP status codes, RFC
+2034 enhanced status codes, if available, and text from the
+server describing the status.  If a message is marked with a
+success or permanent failure status, it will not be resent if
+$session->start_session() is called again.
+
+B<Returns>: Reference to the status HASH (see above) or undef
+if no status information is available.
+
+=item I<reverse_path_status> ()
+
+Retrieve the reverse path status from a previous SMTP session.
+This includes SMTP status codes, RFC 2034 enhanced status codes,
+if available, and text from the server describing the status.
+
+B<Returns>: Reference to the status HASH (see above) or undef
+if no status information is available.
+
+=item I<message_reset_status> ()
+
+Reset the message status to the state it would have before
+$session->start_session() is called for the first time on the
+containing session.  This may be used to force libESMTP to
+resend certain messages.
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=back
+
+B<NOTE>: The following calls are SMTP extensions for
+RFC 2852.  Deliver By.
+
+=over 4
+
+=item I<deliverby_set_mode> (time, mode, trace)
+
+Set the DELIVERBY parameters for the message.
+The $mode parameter can have the following values:
+By_NOTSET, By_NOTIFY (just sent DSN),
+By_RETURN (return message if it can not be delivered in $time seconds).
+abs($time) can not be greater than 999999999.
+The $time parameter can be negative if deliver-by-time
+has passed. Negative or zero $time value is not allowed
+if $mode is equal to By_RETURN.
+
+If $trace is enabled (E<gt> 0) then a "relayed" DSN
+would be generated by the relaying SMTP client
+for each recipient which either did not specify
+a NOTIFY parameter or the NOTIFY parameter does
+not have the value "NEVER".
+
+If the by_time is greater than the server's min_by_time,
+the event callback is run with event_no equal to
+SMTP_EV_DELIVERBY_EXPIRED. If the callback returns
+with the number > 0, deliver by time is adjusted to
+be acceptable to the server. If not, the MAIL command
+will be failed by the server.
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=back
+
+B<NOTE>: The following calls are SMTP extensions for
+RFC 1891.  Delivery Status Notification (DSN).
+
+=over 4
+
+=item I<dsn_set_ret> (flags)
+
+Instruct the reporting MTA whether to include the full content
+of the original message in the Delivery Status Notification, or
+just the headers.
+
+$flags argument can have the following values:
+Ret_NOTSET, Ret_FULL, Ret_HDRS.
+
+B<Returns>: Non zero on success, zero on failure.
+
+=item I<dsn_set_envid> (envid)
+
+Set the envelope identifier.  This value ($envid is a string)
+is returned in the DSN and may be used by the MUA to associate the DSN with the
+message that caused it to be generated.
+
+B<Returns>: Non zero on success, zero on failure.
+
+=back
+
+B<NOTE>: The following calls are SMTP extensions for
+RFC 1870.  SMTP Size Extension.
+
+=over 4
+
+=item I<size_set_estimate> ()
+
+Used by the application to supply an estimate of the size of the
+message to be transferred.
+
+B<Returns>: Non zero on success, zero on failure.
+
+=back
+
+B<NOTE>: The following calls are SMTP extensions for
+RFC 1652.  SMTP 8bit-MIME Transport Extension.
+
+=over 4
+
+=item I< 8bitmime_set_body> (body)
+
+The 8-bit MIME extension allows an SMTP client to declare the message
+body is either in strict conformance with RFC 2822
+(I<E8bitmime_7BIT>) or that it is a MIME document
+where some or all of the MIME parts use 8bit encoding
+(I<E8bitmime_8BITMIME>).  If this API sets the body
+type to other than I<E8bitmime_NOTSET>, libESMTP will
+use the event callback to notify the application if the MTA does not
+support the 8BITMIME extension.
+
+B<Returns>: Non zero on success, zero on failure.
+
+
+=back
+
+=head2 Net::ESMTP::Recipient
+
+To create Net::ESMTP::Recipient object one need to
+call add_recipient() method on the Net::ESMTP::Message object.
+
+=over 4
+
+=item I<recipient_status> ()
+
+Retrieve the recipient success/failure status from a previous SMTP
+session. This includes SMTP status codes, RFC 2034 enhanced status
+codes, if available and text from the server describing the status.
+If a recipient is marked with a success or permanent failure status,
+it will not be resent if $session->start_session() is
+called again, however it may be used when generating To: or Cc: headers
+if required.
+
+B<Returns>: Reference to the status HASH (see above) or undef
+if no status information is available.
+
+=item I<recipient_check_complete> ()
+
+Check whether processing is complete for the specified recipient of the
+message.  Processing is considered complete when an MTA has assumed
+responsibility for delivering the message, or if it has indicated a
+permanent failure.
+
+B<Returns>: Zero if processing is not complete, non-zero otherwise.
+
+=item I<recipient_reset_status> ()
+
+Reset the recipient status to the state it would have before
+$session->start_session() is called for the first time on
+the containing session.  This is used to force the libESMTP to resend
+previously successful recipients.
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=back
+
+B<NOTE>: The following calls are SMTP extensions for
+RFC 1891.  Delivery Status Notification (DSN).
+
+=over 4
+
+=item I<dsn_set_notify> (notify_flags)
+
+Set the DSN notify options.  Flags may be Notify_NOTSET
+or Notify_NEVER or any combination of Notify_SUCCESS,
+Notify_FAILURE and Notify_DELAY.
+
+B<Returns>: Non zero on success, zero on failure.
+
+=item I<dsn_set_orcpt> (address_type, address)
+
+Set the DSN ORCPT option.
+
+Included only for completeness.  This DSN option is only used
+when performing mailing list expansion or similar situations
+when the envelope recipient no longer matches the recipient for
+whom the DSN is to be generated.  Probably only useful to an MTA
+and should not normally be used by an MUA or other program which
+submits mail.
+E.g.:
+    $recipient->dsn_set_orcpt ("smtp", "example@example.com");
+
+B<Returns>: Non zero on success, zero on failure.
+
+=back
+
+=head2 Net::ESMTP::EtrnNode
+
+To create Net::ESMTP::EtrnNode object one need to call
+etrn_add_node() method on the Net::ESMTP::Session object.
+
+=over 4
+
+=item I<etrn_enumerate_nodes> (function[, data])
+
+Call the callback function once for each etrn node in the smtp session.
+The callback function would see the following arguments in @_ array:
+Net::ESMTP::ETRNNode object, $option (number), $domain, $data.
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=item I<etrn_node_status> ()
+
+Retrieve the ETRN node success/failure status from a previous SMTP
+session. This includes SMTP status codes, RFC 2034 enhanced status
+codes, if available and text from the server describing the status.
+
+B<Returns>: Reference to the status HASH (see above) or undef
+if no status information is available.
+
+=back
+
+=head2 Net::ESMTP::Auth
+
+A separate authentication context must be created for each SMTP session.
+Context is obtained from the SASL (RFC 2222) client
+library API defined ini F<auth-client.h> - it is compiled into
+Net::ESMTP by default.
+
+To connect Net::ESMTP::Auth object to SMTP session use auth_set_context()
+method on the Net::ESMTP::Session object.
+
+=over 4
+
+=item I<new> ()
+
+Creates new Net::ESMTP::Auth object.
+
+B<Returns>: New Net::ESMTP::Auth object or undef on failure.
+
+=item I<set_mechanism_flags> (set, clear)
+
+Sets a plugin authentication flags.
+For enabling a specified mechanism use any set of the following
+as a $set parameter: AUTH_PLUGIN_ANONYMOUS, AUTH_PLUGIN_PLAIN (for
+PLAIN and LOGIN mechanisms). If you want to disable some mechanisms
+place AUTH_PLUGIN_* as a $clear parameter.
+
+The AUTH_PLUGIN_EXTERNAL is only set with the set_external_id() function.
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=item I<set_mechanism_ssf> (min_ssf)
+
+Sets a minimal security strength ($min_ssf is a number).
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=item I<get_ssf> ()
+
+Gets a current security strength for the client connection.
+
+B<Returns>: The SSF number.
+
+=item I<set_interact_cb> (function[, data])
+
+Call the callback function for collecting responses
+to plugin questions. E.g. PLAIN plugin requests reponses
+to "user" and "passphrase". It is packed as an array
+of hashes:
+
+  'name',    # Name of field requested from the application,
+             # e.g. "user", "passphrase" "realm" etc.
+  'flags',   # Alternative version of above
+  'prompt',  # Text that the application can use to prompt
+             # for input.
+  'size'     # Maximum length of response allowed. 0 == no limit
+
+The callback function would see two arguments on the input (@_):
+reference to array of response hashes, and $data.
+
+The 'flags' key of the request hash can have the following
+values: 
+
+    AUTH_USER                       0x0001
+    AUTH_REALM                      0x0002
+    AUTH_PASS                       0x0004
+
+and this flag is set for information passed in clear text on the wire:
+
+    AUTH_CLEARTEXT                  0x0008
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=item I<client_enabled> ()
+
+Perform various checks to see if SASL is usable.
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=item I<set_mechanism> (name)
+
+Load a plugin with a mechanism keyword specified in $name.
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=item I<mechanism_name> ()
+
+Gets a mechanism keyword from the SASL plugin information.
+
+B<Returns>: Mechanism keyword (string).
+
+=item I<response> (challenge)
+
+Gets a reponse string for the current state and plugin.
+
+B<Returns>: Response string or undef if response not found or not needed.
+
+=item I<encode> (srctext)
+
+=item I<decode> (srctext)
+
+Run the encoding and decoding function from the underlying SASL plugin.
+
+B<Returns>: void
+
+=item I<set_external_id> (identity)
+
+Sets SASL external id as defined in SASL EXTERNAL mechanism (RFC 2222).
+To reset external_id use undef as the method argument.
+
+B<Returns>: Zero on failure, non-zero on success.
+
+=back
+
+=head2 Exportable constants
+
+For the flags in the callback of $auth-Ê<gt>set_interact_cb()
+
+  AUTH_USER
+  AUTH_REALM
+  AUTH_PASS
+  AUTH_CLEARTEXT
+
+For $auth-E<gt>set_mechanism_flags()
+
+  AUTH_PLUGIN_ANONYMOUS
+  AUTH_PLUGIN_PLAIN
+  AUTH_PLUGIN_EXTERNAL
+
+For the $mode in $message-E<gt>deliverby_set_mode():
+  By_NOTSET
+  By_NOTIFY
+  By_RETURN
+
+For the $body in $message-Ê<gt>8bitmime_set_body():
+  E8bitmime_NOTSET
+  E8bitmime_7BIT
+  E8bitmime_8BITMIME
+  E8bitmime_BINARYMIME
+
+For the $header_option in $session-E<gt>set_header_option():
+  Hdr_OVERRIDE
+  Hdr_PROHIBIT
+
+For the $flags in $recipient-E<gt>dsn_set_notify():
+  Notify_NOTSET
+  Notify_NEVER
+  Notify_SUCCESS
+  Notify_FAILURE
+  Notify_DELAY
+
+For the $flags in $message->dsn_set_ret()
+
+  Ret_NOTSET
+  Ret_FULL
+  Ret_HDRS
+
+For the $event_no in the callback in $session-E<gt>set_eventcb():
+  SMTP_EV_CONNECT
+  SMTP_EV_MAILSTATUS
+  SMTP_EV_RCPTSTATUS
+  SMTP_EV_MESSAGEDATA
+  SMTP_EV_MESSAGESENT
+  SMTP_EV_DISCONNECT
+  SMTP_EV_ETRNSTATUS
+  SMTP_EV_EXTNA_DSN
+  SMTP_EV_EXTNA_8BITMIME
+  SMTP_EV_EXTNA_STARTTLS
+  SMTP_EV_EXTNA_ETRN
+  SMTP_EV_EXTNA_CHUNKING
+  SMTP_EV_EXTNA_BINARYMIME
+  SMTP_EV_DELIVERBY_EXPIRED
+  SMTP_EV_WEAK_CIPHER
+  SMTP_EV_STARTTLS_OK
+  SMTP_EV_INVALID_PEER_CERTIFICATE
+  SMTP_EV_NO_PEER_CERTIFICATE
+  SMTP_EV_WRONG_PEER_CERTIFICATE
+
+For the $writing in the callback in $session-E<gt>set_monitorcb():
+  SMTP_CB_HEADERS
+  SMTP_CB_READING
+  SMTP_CB_WRITING
+
+For the smtp_errno() and smtp_strerror():
+  SMTP_ERR_DROPPED_CONNECTION
+  SMTP_ERR_EAI_ADDRFAMILY
+  SMTP_ERR_EAI_AGAIN
+  SMTP_ERR_EAI_BADFLAGS
+  SMTP_ERR_EAI_FAIL
+  SMTP_ERR_EAI_FAMILY
+  SMTP_ERR_EAI_MEMORY
+  SMTP_ERR_EAI_NODATA
+  SMTP_ERR_EAI_NONAME
+  SMTP_ERR_EAI_SERVICE
+  SMTP_ERR_EAI_SOCKTYPE
+  SMTP_ERR_EXTENSION_NOT_AVAILABLE
+  SMTP_ERR_HOST_NOT_FOUND
+  SMTP_ERR_INVAL
+  SMTP_ERR_INVALID_RESPONSE_STATUS
+  SMTP_ERR_INVALID_RESPONSE_SYNTAX
+  SMTP_ERR_NOTHING_TO_DO
+  SMTP_ERR_NO_ADDRESS
+  SMTP_ERR_NO_RECOVERY
+  SMTP_ERR_STATUS_MISMATCH
+  SMTP_ERR_TRY_AGAIN
+  SMTP_ERR_UNTERMINATED_RESPONSE
+
+For $how in $session-E<gt>starttls_enable():
+  Starttls_DISABLED
+  Starttls_ENABLED
+  Starttls_REQUIRED
+
+For the $which in $session-E<gt>set_timeout():
+  Timeout_GREETING
+  Timeout_ENVELOPE
+  Timeout_DATA
+  Timeout_TRANSFER
+  Timeout_DATA2
+  Timeout_OVERRIDE_RFC2822_MINIMUM
+
+=head1 REQUIREMENTS
+
+This module Net::ESMTP requires perl 5.8.x and libesmtp 1.0 or higher.
+
+=head1 BUGS
+
+This is a first release, not very well tested. It has bugs for sure.
+
+=head1 SEE ALSO
+
+perl(1).
+
+=head1 AUTHOR
+
+Piotr Klaban, E<lt>post@klaban.torun.plE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2003 by Piotr Klaban
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

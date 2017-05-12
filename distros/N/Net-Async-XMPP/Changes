@@ -1,0 +1,20 @@
+0.003     2014-08-04 19:27:46+01:00 Europe/London
+	New features:
+	* Most of the public API methods now use Futures to indicate completion
+	* SRV lookup - needs DNS although an optional constant allows getnameinfo
+	lookups (these return servers that can't be contacted for gtalk, and do
+	not account for priority/weighting)
+
+	Bug fixes:
+	* Don't include <show> element in initial presence notification.
+
+	Documentation:
+	* Initial documentation for some of the more useful public methods, thanks
+	to frew
+
+0.002     2011-02-06 00:50:52 Europe/London
+	Fix broken dependencies from initial release (as reported by ANDK - thanks!).
+
+0.001     2011-02-01 05:10:00 Europe/London
+	Initial release to CPAN, linked to Protocol-XMPP-0.001.
+

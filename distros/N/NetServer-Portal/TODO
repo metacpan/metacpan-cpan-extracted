@@ -1,0 +1,50 @@
+PI
+  integrate path resolver with ls & other places
+  restrict infinite introspection
+  line wrap option
+  make line numbering optional
+  fix # of lines to scroll by
+  when searching, mark match line with **
+
+TOP
+  sort by type of watcher
+  show 'die' stat in bold
+  idle events are not display right (probably)?
+  make columns configurable?
+
+process detail screen?
+  exact @ARGV
+  etc..
+
+ANSIColor support?
+
+investigate getrusage
+
+documentation
+
+--------------------------------------------------------------------------------
+The original top looks like this:
+
+
+last pid: 16977;  load averages:  0.22,  0.12,  0.11                   14:09:56
+54 processes:  53 sleeping, 1 on cpu
+CPU states:     % idle,     % user,     % kernel,     % iowait,     % swap
+Memory: 128M real, 24M free, 96M swap in use, 290M swap free
+ 
+  PID USERNAME THR PRI NICE  SIZE   RES STATE   TIME    CPU COMMAND
+16095 joshua     1  33    0   22M   15M sleep   3:20  9.78% netscape
+15969 joshua     1  25    0   20M   11M sleep   3:17  7.41% netscape
+  482 joshua     1  33    0   12M 8976K sleep  14:18  6.19% Xsun
+16977 joshua     1   7    0 1416K 1232K cpu     0:00  1.46% top
+  533 joshua     1  33    0   28M   15M sleep  11:01  0.81% netscape
+  522 joshua     1  24    0   12M   10M sleep   8:55  0.16% xemacs-20.4
+  502 joshua     1  33    0 2216K 1712K sleep   0:29  0.16% fvwm95
+  504 joshua     1  33    0 1968K 1448K sleep   0:07  0.08% FvwmTaskBar
+  510 joshua     1  33    0 3704K 1960K sleep   0:01  0.03% perfmeter
+  220 root       1  33    0 1976K 1376K sleep   6:13  0.00% amd
+ 8187 root      12  33    0 4040K 1880K sleep   1:20  0.00% oscmgr4
+ 8065 joshua     1  33    0 4120K 2744K sleep   0:14  0.00% pine
+  513 joshua     1  33    0 2832K 2016K sleep   0:07  0.00% xterm
+  630 joshua     1  33    0 2912K 2032K sleep   0:06  0.00% xterm
+ 8064 joshua     1  33    0 1632K 1064K sleep   0:05  0.00% fetchmail
+ 

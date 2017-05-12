@@ -1,0 +1,7 @@
+# $Id: Changes,v 1.1 2004/12/23 12:02:30 jminieri Exp $
+Revision history for Perl extension Net::SDEE.
+
+0.01  Wed Sep 29 10:28:22 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -n Net::SDEE
+

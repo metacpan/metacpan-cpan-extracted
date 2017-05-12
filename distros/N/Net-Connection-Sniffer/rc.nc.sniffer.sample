@@ -1,0 +1,7 @@
+#!/bin/sh
+#
+# shell script 'rc.nc.sniffer'
+#
+# edit this to suit your system
+
+/etc/rc.d/nc.sniffer.pl $*

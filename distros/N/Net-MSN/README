@@ -1,0 +1,6 @@
+This module connects you to MSN, its severly under documented - but I am
+just submitting it now for thoes of you who wish to use it. It has a few
+bugs (like it disconnects after a while with no reason, 'Broken Pipe') - if
+you have any suggestions for fixes email: dj@boxen.net.
+
+Thanks.

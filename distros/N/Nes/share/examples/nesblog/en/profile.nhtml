@@ -1,0 +1,109 @@
+{: NES 1.0 none :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  Nes 1.03 by Skriptke
+  Copyright 2009 - 2010 Enrique Castañón
+  Licensed under the GNU GPL.
+
+  Sample:
+  http://nes.sourceforge.net/
+
+  CPAN:
+  http://search.cpan.org/dist/Nes/
+
+  Repository:
+  http://github.com/Skriptke/nes
+
+  -----------------------------------------------------------------------------
+:}
+<a name="form_profile"></a>
+<div id="cuadro2">
+<center>
+{: ~ ( * nes_session_ok ) 
+<h3>Logged in as: {: * nes_session_user :}</h3>
+  {: sql (
+          'SELECT * FROM `users` 
+                    WHERE name = {: * nes_session_user :}
+                    LIMIT 1;'
+         )
+                    
+      {: include ('{: * cfg_obj_form :}/multi_step.nhtml',
+                "
+                  msg_legend         => ' &#8226; Update Profile &#8226; ',
+                  form_name          => 'fnb_pro',
+                  captcha_name       => 'cnb_pro',
+                  id_form            => 'fnb_id',
+                  show_captcha       => 0, 
+                  table_width        => '90%',
+                  msg_ok_data        => '<br><b>The data have been updated.</b>',
+                  
+                  to_database        => 'UPDATE',
+                  to_table           => 'users',
+                  to_where           => 'name = \\'{: @$users.name :}\\'',
+                  to_limit           => '1',
+                  to_fields_assort   => 
+                         {
+                           name      => 'name',
+                           email     => 'email',
+                           script    => 'script',
+                           message   => 'message',
+                         },                  
+
+                  steps  => 
+                      [  
+                        [   
+                          { 
+                            name     => 'name', 
+                            msg      => 'Name:',
+                            type     => 'text',
+                            property => 'readonly',
+                            value    => '{: @$users.name :}',
+                            size     => 12,
+                            check    => ',,/^{: @$users.name :}$/',
+                          },
+                          { 
+                            name     => 'email', 
+                            msg      => 'Email:',
+                            type     => 'text',
+                            value    => '{: @$users.email :}',
+                            size     => 12,
+                            check    => '0,70,/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i',
+                          },                             
+                          { 
+                            begin    => 'Language you use normally.<br>',
+                            name     => 'script', 
+                            msg      => 'My favorite:',
+                            type     => 'select',
+                            options  => ' <option value=\"\">Select</option>
+                                          <option value=\"Python\">Python</option>
+                                          <option value=\"PHP\">PHP</option>
+                                          <option value=\"Perl\">Perl</option>
+                                          <option value=\"Ruby\">Ruby</option>
+                                          <option value=\"Java\">Java</option>
+                                          <option value=\"Other\">Otro</option>',
+                            check    => '1,99',
+                            value    => '{: @$users.script :}',
+                          },                          
+                          {
+                            begin    => 'Write a text to your profile, others can see it.<br>',
+                            name     => 'message', 
+                            msg      => 'Message:',
+                            type     => 'textarea',
+                            filter   => 'no_html',
+                            cols     => 30,
+                            rows     => 6,
+                            check    => '6,200',
+                            msg_error => '<br>Between 6 and 200 characters, please ',
+                            value    => '{: @$users.message :}',
+                          },                                     
+                        ], 
+                      ],
+                "
+               )         
+      :}                    
+  :}
+:}
+{: ~ ( ! * nes_session_ok ) <h3>Please: <a href="?action=login">Login</a> or <a href="?action=register">Register</a></h3> :} 
+</center>
+</div> 

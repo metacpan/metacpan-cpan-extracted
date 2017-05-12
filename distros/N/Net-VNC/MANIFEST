@@ -1,0 +1,12 @@
+bin/vnccapture
+Build.PL
+CHANGES
+lib/Net/VNC.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/pod.t
+t/pod_coverage.t
+SIGNATURE    Added here by Module::Build

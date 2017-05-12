@@ -1,0 +1,67 @@
+Net-LDAP-Makepath
+
+Provides a methode for creating paths in LDAP simply.
+
+    use Net::LDAP::Makepath;
+
+	#Uses $ldap to create the new entries.
+	#The objectClasses used are top and organizationalUnit.
+	#The attribute used for the DNs is ou.
+	#The path to be created is "some/path".
+	#The base is "dc=foo,dc=bar".
+	#
+	#The resulting entries are...
+	#dn: ou=some,dc=foo,dc=bar
+	#objectClass: top
+	#objectClass: orginationalUnit
+	#ou: some
+	#
+	#dn: ou=path,ou=some,dc=foo,dc=ath
+	#objectClass: top
+	#objectClass: orginationalUnit
+	#ou: path
+	my $returned=LDAPmakep+athSimple($ldap, ["top", "organizationalUnit"], "ou",
+						"some,path", "dc=foo,dc=bar")
+    if(!returned){
+    	print "LDAPmakepathSimple failed.";
+    };
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::LDAP::Makepath
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-LDAP-Makepath
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-LDAP-Makepath
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-LDAP-Makepath
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-LDAP-Makepath
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Zane C. Bowers
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

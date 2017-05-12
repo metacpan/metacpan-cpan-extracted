@@ -1,0 +1,8 @@
+ipinfodb
+IPInfoDB.pm
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+t/01.t
+META.yml                                 Module meta-data (added by MakeMaker)

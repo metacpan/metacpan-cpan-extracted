@@ -1,0 +1,144 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use Net::WinRM;
+use Getopt::Long;
+use IO::Lambda;
+
+my %opt = (
+	help      => undef,
+	username  => undef,
+	password  => undef,
+	full      => undef,
+	wql       => undef,
+	auth      => undef,
+	namespace => 'root/cimv2',
+	ntlm      => 1,
+);
+
+sub usage
+{
+	print <<USAGE;
+
+winrm - get or enumerate WMI instances
+
+format:
+   wmi [options] host class [query [query ...]]
+
+options:
+   -u|--username=<name>    username
+   -p|--password=<pass>    password
+   -f|--full               full enumeration (for enumeration only)
+
+protocol:
+      --wql=<filter>       add WQL filter
+   -n|--namespace=<space>  namespace, default is 'root/cimv2'
+   -a|--auth=<method>      HTTP authentication (Basic/Negotiate)
+      --ntlm=<version>     NTLM version, 1 (default) or 2 (Negotiate only)
+
+query: if given, performs GET action, otherwise ENUMERATE
+   
+examples:
+    wmi host Win32_Service
+    wmi host Win32_Service Name=CryptSvc
+    wmi host Win32_Environment Name=TMP User=<SYSTEM>
+    wmi host --wql 'select * from Win32_Service where Name=TMP' \\*
+
+configuration file \$HOME/.winrmpass:
+    host1 -u username -p password
+    host2 -u username -p password
+
+USAGE
+	exit(0);
+}
+
+my %p;
+my $reshuffle;
+
+my @savearg = @ARGV;
+
+RESHUFFLE:
+GetOptions(\%opt,
+	'help',
+	'username=s',
+	'password|p=s',
+	'full',
+	'wql|q=s',
+	'auth|a=s',
+	'namespace|n=s',
+	'ntlm=i',
+) or usage;
+
+
+usage if $opt{help};
+die "username and password must be set together\n"
+	if 1 == grep { exists $opt{$_} } qw(username password);
+usage if @ARGV < 2;
+die "authentication must be one of: Basic,Negotiate\n"
+	if defined($opt{auth}) and $opt{auth} !~ /^(Basic|Negotiate)$/;
+
+$p{host}   = shift;
+if ( not($reshuffle) and (open F, "$ENV{HOME}/.winrmpass")) {
+	while (<F>) {
+		chomp;
+		s/\#.*$//;
+		s/^\s*//;
+		s/\s*$//;
+		next unless length;
+		next unless m/^([\.\w]+)\s+(.*)$/;
+		next unless $1 eq $p{host};
+		
+		@ARGV = ( split(' ', $2), @savearg);
+		$reshuffle++;
+		goto RESHUFFLE;
+	}
+}
+
+$p{class}  = shift;
+my $method = $opt{full} ? 'enumerate' : 'instances';
+if ( @ARGV) {
+	usage if $opt{full};
+	my %selector;
+	for ( @ARGV) {
+		usage unless /^(.*?)\=(.*)$/;
+		die "$1 already set in query\n" if exists $selector{$1};
+		$selector{$1} = $2;
+	}
+	$p{selector} = \%selector;
+	$method      = 'get';
+}
+
+$p{username}       = $opt{username};
+$p{password}       = $opt{password};
+$p{wql}            = $opt{wql};
+$p{preferred_auth} = $opt{auth};
+$p{namespace}      = $opt{namespace};
+$p{ntlm_version}   = $opt{ntlm};
+
+my $e = Net::WinRM-> $method( %p);
+
+my $res = $e-> wait;
+die "winrm($p{class}):: $res\n" unless ref($res);
+
+print "\n$p{class}\n";
+use Data::Dumper;
+
+$res = [ $res ] unless ref($res) eq 'ARRAY';
+for my $h ( @$res) {
+	my @k;
+	for ( sort keys %$h) {
+		my ( $k, $v) = ( $_, $h-> {$_});
+		$v = 'undef' unless defined $v;
+		if ( ref($v) eq 'ARRAY' or ref($v) eq 'HASH') {
+			$v = Dumper($v);
+			$v =~ s/^\$VAR1 = //;
+			$v =~ s/^\s{7}//gm;
+			$v =~ s/;\n$//;
+		}
+		push @k, " $k=$v\n";
+	}
+	print @k, "\n";
+}
+print "\n";
+

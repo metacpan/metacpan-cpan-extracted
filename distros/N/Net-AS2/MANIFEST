@@ -1,0 +1,17 @@
+lib/Net/AS2.pm
+lib/Net/AS2/FAQ.pm
+lib/Net/AS2/MDN.pm
+lib/Net/AS2/Message.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/00-load.t
+t/10-constructor.t
+t/20-protocol.t
+t/30-message_mdn.t
+t/test.1.cert
+t/test.1.key
+t/test.2.cert
+t/test.2.key
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

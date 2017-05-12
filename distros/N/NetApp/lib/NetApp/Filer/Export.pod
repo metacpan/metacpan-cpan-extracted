@@ -1,0 +1,313 @@
+
+=head1 NAME
+
+NetApp::Filer::Export -- OO Class for representing NFS exports
+
+=head1 SYNOPSIS
+
+    use NetApp::Filer;
+
+    my $filer 			= NetApp::Filer->new({ ... });
+
+    # Filer methods for querying exports:
+    my @exports 		= $filer->get_exports;
+    my @temporary_exports 	= $filer->get_temporary_exports;
+    my @permanent_exports 	= $filer->get_permanent_exports;
+    my @active_exports 		= $filer->get_active_exports;
+    my @inactive_exports 	= $filer->get_inactive_exports;
+
+    # Methods for accessing export attributes
+    foreach my $export ( @exports ) {
+        
+    }
+
+    # Methods for changing export attributes
+    
+
+=head1 DESCRIPTION
+
+This class encapsulates a single NFS export on a NetApp filer, and
+provides methods for managing them.  There are related methods in the
+NetApp::Filer class for manging exports as a whole, but the methods in
+this class are specific to a single NFS export.
+
+=head2 API specific attributes
+
+This API also attempts to bring some sanity to how exports are
+managed, and some consistency to the interface.  Most of the
+attributes of an export are fairly obvious, and they map directly to
+the options supported by "exportfs" and the /etc/exports file.  This
+API introduces two new attributes: 'type' and 'active';
+
+=head3 The type attribute
+
+In order to distinguish between exports which are temporary (i.e. NOT
+saved to /etc/exports) and those which are permanent (i.e. ARE saved
+to /etc/exports), this API support a "type", which be either of:
+
+    permanent
+    temporary
+
+A temporary export is one which was created using "exportfs -io", and
+which was not saved to /etc/exports.  These exports will not survive a
+reboot of the filer.
+
+A permanent export is one which is found in /etc/exports.
+
+=head3 The active attribute
+
+Since you can change the export options for a filesystem temporarily
+(for example, by using the "fencing" option -b, or just manually
+specifying different options and re-exporting using -io), some
+permanent exports may not be in effect on the system.
+
+The active attribute is used to track these.  If the active attribute
+is true, then the export is currently in effect.  Almost by
+definition, all temporary exports are always active.  However, if a
+permanent export is not in effect because a temporary export for
+the same pathname has been created, then such an export is considerd
+inactive.
+
+=head2 Global vs. Limited ro/rw Attributes
+
+The "ro" and "rw" export options really have two different modes of
+use.  If either option is specified with no "=a[:b[:c...]]" list, then
+it means ALL hosts.  Since this API provides methods for adding and
+removing entries from those lists, it treats the "all" cases special,
+by managing thenm as separate attributes.
+
+To specify global readonly or readwrite access, use the following
+options:
+
+    ro_all
+    rw_all
+
+These have boolean values.  The "rw" and "ro" attributes/options are
+ARRAY references, each containing the list of entries for an "rw=" or
+"ro=" list for managing limited access.
+
+=head2 Change and Update Semantics
+
+There are several methods for changing the attributes of an export
+object, but in ALL cases, these merely change the object in memory.
+In order for the attribute change to take effect, the update method
+must be called, which will generate and execute the appropriate
+"exportfs" command.
+
+For example, suppose you wanted to remove root access for a specific
+hostname from all exports on a filer:
+
+    my $untrusted	= 'unsafe.foo.com';
+
+    my @exports		= $filer->get_exports;
+
+    foreach my $export ( @exports ) {
+        if ( $export->has_root( $untrusted ) ) {
+            $export->remove_root( $untrusted );
+            $export->update;
+        }
+    }
+
+The "remove_root" method simply removes the entry from the object in
+memory.  The "update" method re-exports that filesystem to make the
+change take effect on the filer.
+
+=head1 METHODS
+
+=head2 get_filer
+
+Returns the NetApp::Filer object for the filer on which this export exists.
+
+=head2 get_type
+
+Returns a string with one of the following values:
+
+    temporary
+    permanent
+
+indicating whether or not this particular export has been written to
+/etc/exports.
+
+=head2 get_active
+
+Returns a boolean value, false only if the type is "permanent", and
+the same export was not found in the list of currently active exports
+(i.e. not found in the output of "exportfs").  A temporary export is
+always active, by definition.
+
+=head2 get_path
+
+Returns a string representing the path for the export.  Note that this
+may not necessarily be the same as the actual pathname of the
+underlying volume or qtree.
+
+=head2 get_actual
+
+Returns a string representing the "actual" path of the underlying
+volume or qtree for the export.  If a volume or qtree as been exported
+using a different name, this is the actual path of the underlying
+object.  If this export option was not used, this method will return
+an empty string.
+
+=head2 get_nosuid
+
+Returns a boolean value, indicating whether or not the "nosuid" option
+is used by the export.
+
+=head2 set_nosuid( $boolean )
+
+This method takes a single argument, interpreted in boolean context,
+an sets the "nosuid" option for the export.
+
+=head2 get_anon
+
+Returns the value of the "anon" option, if set.  Since this option can
+have the value of "0", it returns undef when this option has not been
+set.
+
+WARNING: be careful interpreting this in a simple boolean context.  To
+test whether or not this option has been set use "defined".
+
+=head2 set_anon( $anon )
+
+Takes a single argument, and sest the "anon" opton to that value.  To
+unset this option, pass an undefined value:
+
+    $export->set_anon( undef );
+
+=head2 get_sec
+
+Returns a list of the "sec" option values.
+
+=head2 set_sec( $arrayref )
+
+Takes a single argument, an array reference of "sec" values, which can
+be any of: none, sec, krb5, krb5i, or krb5p.  This API does no
+validation of these values, so if an invalid value is given, this will
+result in a fatal exception when the "update" method is called.
+
+=head2 has_sec( $sec )
+
+Takes a single string argument, and returns true if that value is
+found in the list of "sec" options, false otherwise.
+
+=head2 add_sec( $sec )
+
+Takes a single string argument, and adds that value to the list of
+"sec" options, if not already present.
+
+=head2 remove_sec( $sec )
+
+Takes a single string argument, and removes that value from the list
+of "sec" options, if present.
+
+=head2 get_root
+
+Returns a list of the "root" option values.
+
+=head2 set_root( $arrayref )
+
+Takes a single argument, an array reference of "root" values, which
+can be any combination of hostnames, IP addresses, or networks.
+Again, no data validation is performed, so bogus values will not be
+detected until the export is updated on the filer, using the "update"
+method.
+
+To clear the root option entirely, simply pass an empty array reference.
+
+=head2 has_root( $root )
+
+Takes a single string argument, and returns true if that value is
+found in the list of "root" options, false otherwise.
+
+=head2 add_root( $root )
+
+Takes a single string argument, and adds that value to the list of
+"root" options, if not already present.
+
+=head2 remove_root( $root )
+
+Takes a single string argument, and removes that value from the list
+of "root" options, if present.
+
+=head2 get_ro_all
+
+Returns a boolean value, indicating whether or not the "ro_all" option
+has been set.
+
+=head2 set_ro_all( $boolean )
+
+Takes a single boolean argument, and sets the "ro_all" option to it's
+value.  Setting "ro_all" to a true value will clear the "ro" list, if
+it exists.
+
+Also, if "ro_all" is true, then the following methods will quietly do
+nothing:
+
+    has_ro
+    add_ro
+    remove_ro
+
+The "ro_all" option must be cleared (set to a false value) first.
+
+=head2 get_ro
+
+Returns a list of the "ro" entries, if any.  Returns nothing if
+"ro_all" has been set.
+
+=head2 set_ro( $arrayref )
+
+Takes a single argument, an array reference of "ro" values.  Setting
+the "ro" list explicitly will set clear "ro_all" (set it to a false
+value).
+
+=head2 has_ro( $ro )
+
+Takes a single argument, and returns true if that value is found in
+the list of "ro" options, false otherwise.  If "ro_all" is true, then
+it always returns false.
+
+=head2 add_ro( $ro )
+
+Takes a single string argument, and adds that value to the list of
+"ro" options, if not already present.  If "ro_all" is true, then this
+method will do nothing.
+
+=head2 remove_ro( $ro )
+
+Takes a single string argument, and removes that value from the list
+of "ro" options, if present.  If "ro_all" is true, then this method
+does nothing.
+
+=head2 get_rw_all, set_rw_all, get_rw, set_rw, has_rw, add_rw, remove_rw
+
+All of these methods behave exactly the same as their "ro"
+counterparts described immediately above.  They apply to the "rw"
+option, instead of "ro", but if that isn't obvious...
+
+=head2 update
+
+This method re-exports the export, using "exportfs".  If ANY of the
+object attributes have been changed programmatically, those changes
+will not take effect on the filer until this method has been called.
+
+Note that updating an export will not necessarily change it's "type"
+from temporary to permanent, unless the "type" is explicitly changed.
+
+=head2 compare( $export )
+
+This method takes a single NetApp::Filer::Export object, and compares
+the current object (that is, the one on which the method was called)
+to it.  If they have the same basic export options, it returns true,
+otherwise, it returns false.  Only the following options are
+compared:
+
+    actual
+    nosuid
+    anon
+    sec
+    root
+    rw/rw_all
+    ro/ro_all
+
+=cut

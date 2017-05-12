@@ -1,0 +1,11 @@
+LICENSE FOR Net-SNMP-Mixin
+
+Copyright (c) 2008 by Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself, using the Artistic License.
+
+The full text of the licenses can be found in the Artistic file included with 
+this distribution, or in perlartistic file as part of Perl installation, in 
+the 5.8.1 release or later.
+

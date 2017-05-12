@@ -1,0 +1,205 @@
+<h2><a href="#">Configuration file</a></h2>
+<h3>Setting.pm</h3>
+<p>
+This file is loaded configuration Nes. It is recommended not to change 
+their values and do it in the file .nes.cfg. private_key value that 
+is used to encrypt data, if not changed the script to launch a warning 
+each time you run Nes.
+</p>
+<h3>Variables</h3>
+<p>
+<pre>
+tmp_dir        # Temporary directory.
+tmp_suffix     # Suffix of the temporary files. 
+tmp_clear      # If delete the temporary files or 0 and does not delete
+               # time suffix: s: seconds,
+               # m: minutes h: hours d: days, M: months, y: years
+               # 24h is 24 hours. 
+top_dir        # Root directory of your site.
+nes_dir        # Directory of Nes.
+nes_top_dir    # Absolute path to the Nes directory.
+plugin_dir     # Directory of the Plugin, top_dir relative.
+obj_dir        # Directory of the Object, top_dir relative.
+plugin_top_dir # Absolute path to the Plugin directory.
+obj_top_dir    # Absolute path to the Object directory.
+time_zone      # *** unimplemented ***
+locale         # locale, ej.: es_ES.utf8
+session_prefix # Name cookie used for user session.
+private_key    # Private key used to encrypt data.
+DB_base        # Database name.
+DB_user        # Database user.
+DB_pass        # Database password.
+DB_driver      # Database driver, default 'mysql' 
+DB_host        # Database host, default 'localhost'
+DB_port        # Database port, default '3306' 
+php_cline      # Command line for PHP CLI
+php_cgi_cline  # Command line for PHP CGI
+perl_cline     # Command line for Perl
+shell_cline    # Command line for Shell
+python_cline   # Command line for Python
+max_post       # Max kB. maximum size of POST.
+max_upload     # Max kB. maximum size of the upload, 0 none
+tmp_upload     # In big upload, memory consumption is high,
+               # this defined from that kB. using a temporary
+               # file in the upload, preventing these are 
+               # loaded into memory.
+
+# Plugins list separated by commas to load at startup only
+# for the file in the URL, in all nhtml directory, eg.:
+# auto_load_plugin_top_first = &#123;: * cfg_plugin_top_dir :&#125;/cache.pl,./my_script.pl
+auto_load_plugin_top_first
+
+# Plugins list separated by commas to load at startup to
+# all files included in all nhtml directory, eg.:
+# auto_load_plugin_all_first = &#123;: * cfg_plugin_top_dir :&#125;/plugin.pl
+auto_load_plugin_all_first
+
+# Plugins list separated by commas to load at end only
+# for the file in the URL, in all nhtml directory, eg.:
+# auto_load_plugin_top_last = &#123;: * cfg_plugin_top_dir :&#125;/filter.pl,./my_script.pl
+auto_load_plugin_top_last
+
+# Plugins list separated by commas to load at end to
+# all files included in all nhtml directory, eg.:
+# auto_load_plugin_all_last = &#123;: * cfg_plugin_top_dir :&#125;/plugin.pl
+auto_load_plugin_all_last
+
+</pre>
+</p>
+<h3>.nes.cfg</h3>
+<p>
+The .nes.cfg is placed in the directory where you installed your 
+nhtml templates, it overwrites Setting and the plugins configuration.
+Level rises, until the root directory of the Web, to read .nes.cfg files.   
+</p>
+
+<h3>Example</h3>
+<pre>    
+/html/nhtml/.nes.cfg
+    private_key = pass1
+    mi_var1     = 10
+    mi_var2     = 20
+    
+/html/.nes.cfg
+    private_key = pass2
+    mi_var2     = 30 
+    mi_var3     = 40   
+    
+/.nes.cfg
+    private_key = pass3
+    mi_var1     = 50
+    mi_var2     = 60  
+    mi_var3     = 70
+    
+The value of the variables for the executable files in:     
+
+/html/nhtml/file.nhtml
+    private_key = pass1  # prevailing values of this level
+    mi_var1     = 10     # prevailing values of this level
+    mi_var2     = 20     # prevailing values of this level
+    mi_var3     = 40     # defined in /html/.nes.cfg
+                         # ignored mi_var3 of /.nes.cfg 
+    
+/html/file.nhtml
+    private_key = pass2  # prevailing values of this level
+    mi_var1     = 50     # defined in /.nes.cfg
+    mi_var2     = 30     # prevailing values of this level
+    mi_var3     = 40     # prevailing values of this level
+    
+/file.nhtml
+    private_key = pass3  # prevailing values of this level
+    mi_var1     = 50     # prevailing values of this level
+    mi_var2     = 60     # prevailing values of this level
+    mi_var3     = 70     # prevailing values of this level
+     
+</pre> 
+<p>
+<h3>Use in your script</h3>
+You can use .nes.cfg to add configuration variables to your script. We 
+recommend using a notation that clearly distinguishes Nes variables, 
+for example using prefixes the name of your application:
+<pre>    
+.nes.cfg
+    private_key = pass3
+    myscript_var1 = 50
+    myscript_var2 = 60  
+    myscript_var3 = 70
+
+</pre> 
+You can access these variables from the nhtml template as:
+<pre>    
+ &#123;: * cfg_myscript_var1 :&#125;
+
+</pre> 
+And from Perl:
+<pre>    
+use Nes;
+my $nes = Nes::Singleton->new();
+
+my $config = $nes->{'CFG'};
+my $var1   = $config->{'myscript_var1'};
+</pre> 
+</p>  
+<p>
+<h3>Perl syntax in the value</h3>
+
+In the predefined variables, Nes detects the data type automatically:
+<pre>    
+# Is scalar
+tmp_dir = /tmp/nes
+
+# It is an array, separated by commas
+auto_load_plugin_top_first = plugin1.pl, plugin1.pl
+
+</pre> 
+If we define our own variables with a particular data type:
+<pre>    
+# Scalar, using Perl syntax in the value.
+myscript_var1 $= 'scalar'
+
+# Hash
+myscript_var2 %= ( 'name' => 'Jason', 'email' => 'jason\@example.com' )
+
+# Array
+myscript_var3 @= ( 'one', 'two', 'three' )
+
+</pre> 
+We may also use Perl syntax for variables in the predefined value,
+taking care not to change the type:
+<pre>    
+# scalar
+tmp_dir $= '/tmp/nes'
+
+# It is an array, ERROR
+tmp_dir %= '/tmp/nes'
+
+# Array, separated by commas
+auto_load_plugin_top_first = plugin1.pl, plugin2.pl
+
+# Array, Perl syntax
+auto_load_plugin_top_first @= ( 'plugin1.pl', 'plugin2.pl' )
+
+</pre> 
+In the predefined variables are all scalar except those allowed 
+are comma-separated arrays. If we arrays can be useful if one 
+of the values has a coma, or the scalar to define a space:
+<pre>
+    
+# we can not take as value a space like this:
+myscript_var1 = ' '  <- error, value is the literal, including quotation 
+myscript_var1 =      <- error, no value
+
+# to give as value a space can do so:
+myscript_var1 $= ' ' 
+
+# Array, the name includes a comma
+auto_load_plugin_top_first = plugin,1.pl, plugin,2.pl <- error
+
+# Array, Perl syntax the name includes a comma
+auto_load_plugin_top_first @= ( 'plugin,1.pl', 'plugin,2.pl' )
+</pre>
+</p>
+
+<p>
+Each variable can only occupy one line.
+</p>

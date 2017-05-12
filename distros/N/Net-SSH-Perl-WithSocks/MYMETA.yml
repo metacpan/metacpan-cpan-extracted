@@ -1,0 +1,27 @@
+---
+abstract: 'Connect to an SSH host through a TCP proxy'
+author:
+  - 'Jennie Rose Evers-Corvina <seven@nanabox.net>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+distribution_type: module
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.57_05'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-SSH-Perl-WithSocks
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::Socket::Socks: 0
+  IPC::PerlSSH: 0
+  Net::SSH::Perl: 0
+resources:
+  repository: https://github.com/briandfoy/Net-SSH-Perl-WithSocks
+version: 0.02

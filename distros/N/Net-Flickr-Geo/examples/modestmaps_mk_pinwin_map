@@ -1,0 +1,41 @@
+# -*-cperl-*-
+# $Id: modestmaps_mk_pinwin_map,v 1.6 2008/08/03 17:08:39 asc Exp $
+
+use strict;
+
+use Config::Simple;
+use Getopt::Std;
+
+use Log::Dispatch::Screen;
+use Net::Flickr::Geo::ModestMaps;
+
+{
+        &main();
+        exit;
+}
+
+sub main {
+        
+        my %opts = ();
+        getopts('c:i:', \%opts);
+
+        my $cfg = Config::Simple->new($opts{'c'});
+
+        $cfg->param("pinwin.photo_size", "Original");
+        
+        $cfg->param("modestmaps.filter", "atkinson");
+        $cfg->param("modestmaps.zoom", 16);
+        # $cfg->param("modestmaps.bleed", 1);
+        $cfg->param("modestmaps.adjust", .25);
+        $cfg->param("pinwin.map_height", 1950);
+        $cfg->param("pinwin.map_width", 1300);
+        $cfg->param("modestmaps.provider", "MICROSOFT_AERIAL");
+
+        my $fl = Net::Flickr::Geo::ModestMaps->new($cfg);
+        $fl->log()->add(Log::Dispatch::Screen->new('name' => 'scr', min_level => 'debug'));
+
+        my $map = $fl->mk_pinwin_map_for_photo($opts{'i'});
+
+        $fl->log()->info("wrote map to $map->[0]->[0]");
+        return 1;
+}

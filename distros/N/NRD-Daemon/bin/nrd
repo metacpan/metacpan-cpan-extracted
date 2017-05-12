@@ -1,0 +1,5 @@
+#!/usr/bin/perl
+
+use NRD::Daemon;
+
+NRD::Daemon->run(conf_file => '/etc/nrd.conf');

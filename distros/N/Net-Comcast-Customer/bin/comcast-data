@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+use Net::Netrc;
+use Net::Comcast::Customer;
+
+my $credentials = Net::Netrc->lookup('login.comcast.net');
+if (!$credentials) {
+	die "Please check your .netrc for login.comcast.net.\n";
+}
+
+my $c = new Net::Comcast::Customer;
+$c->debug(0);
+
+$c->login($credentials->login, $credentials->password);
+my $usage = $c->get_usage();
+if (!$usage) {
+	# Dump or log $c->mech->content;
+}
+my $budgeted = $c->get_budgeted_usage();
+
+# Print in Cacti-readable format
+print( 'Usage:', $usage, ' Budgeted:', $budgeted );

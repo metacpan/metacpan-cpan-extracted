@@ -1,0 +1,59 @@
+Revision history for Perl extension NexStarCtl.
+0.15  Thu Apr  7 15:21:03 2016
+	- add several new calls
+	- add support for SkyWatcher mounts
+	- add support for different protocol versions
+	- bug/typo fixes
+
+0.14  Fri Sep  4 16:24:41 2015
+	- fix tc_set_location()
+
+0.13  Fri Sep 19 15:04:10 2014
+	- added TCP/IP telescope control
+
+0.11  Wed Mar 12 11:28:25 2014
+	- ported nexstarctl.pl to windows OS.
+	- several bugfixes
+	- CGEM mount is now recognized
+	- decreased required perl version
+
+      Mon Mar 10 01:25:12 2014
+	- initial port to Windows OS.
+	- fix several typos
+
+0.10  Sun Mar  9 21:20:07 2014
+	- added aux commands tc_get_autoguide_rate
+	  tc_set_autoguide_rate tc_get_backlash tc_set_backlash
+
+0.09  Sat Dec  7 22:21:45 2013
+	- created nexstarctl.pl tool
+	- small fixes to NexStarCtl.pm
+
+0.08  Wed Dec  4 21:36:19 2013
+	- tc_set_time() fix misstype in daylight saving logic
+
+      Tue Dec  3 14:38:36 2013
+	- tc_set_time() sets date/time to RTC too, if available
+
+0.06.1 Tue Dec  3 12:24:58 2013
+	- fix some documentation errors
+
+0.06  Sun Nov  3 13:16:30 2013
+	- fix the ID of Advanced VX
+
+0.05  Fri Oct 25 17:01:44 2013
+	- add get_model_name()
+
+0.04  Sun Sep 29 15:40:22 2013
+	- Fix read_telescope() it needs $len parameter because '#' does not 
+	  always indicate end of responce.
+	- changed port data type to raw.
+
+0.03  Sat Sep 21 22:06:39 2013
+	- Fix Declination -90deg boder condition
+
+0.02  Fri Aug 30 00:33:20 2013
+	- Fix message lenght in variable rate slew command
+
+0.01  Thu Aug 29 12:04:24 2013
+	- initial version

@@ -1,0 +1,21 @@
+Revision history for Net-Lighthouse
+
+0.06 Sat Mar 27 05:52:25 GMT 2010
+    * fix the similar problem for Mouse(0.51+) as the one in 0.05 for Moose
+
+0.05 Fri Mar 26 07:48:36 GMT 2010
+    * fixed Moose related issue
+
+0.04 Sat Sep 12 00:10:18 CST 2009
+    * use XML::TreePP to parse xml
+
+0.03 Wed Sep  9 17:09:14 CST 2009
+    * typo fix
+    * add repository info
+
+0.02 Wed Sep  9 10:37:42 CST 2009
+    * use either YAML::Syck or YAML, depending on what people have
+
+0.01 Wed Sep  9 08:49:29 CST 2009
+       Initial release.
+

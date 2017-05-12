@@ -1,0 +1,117 @@
+The various parties:
+--------------------
+
+In this diagram the Resource Server also plays the part of the Authorization
+Server
+
+         __3_[dis]allow access from client to resource server____
+        /                                                         \
+       /                                                           \
+      /     __1_client to use resource?___        __2_auth code__   \
+     /     /                               \     /               \   \
+    /     /                                 \   /                 \   \
+[ Resource Owner ] <-> [ User Agent ] <-> [ Client ] <-> [ Resource Server ]
+                                              \  \                  /  /
+                                               \  \_4_access token_/  /
+                                                \                    /
+                                                 \_5_refresh token__/
+
+1. Client wants to be able to manipulate Resource Server on behalf of the
+   Resource Owner (the user).
+
+2. Client gets an Authorization Code from Resource Server (this can only work
+   if the Resource Server knows of the Client in advance - the Client must
+   identify itself to the Resource Server).
+
+3. Resource Server checks with Resource Owner that Client can act on behalf
+   of Resource Owner (with the scopes requires by the Client). Resource Owner
+   confirms/denies. In most cases the Resource Owner must be logged in on the
+   Resource Server.
+
+4. (If Client confirms in step 3) Client asks Resource Server for an access
+   token - Client POSTs to Resource Server as the Client must pass the client
+   secret in this part of the process. If client ids, secret, allowed scopes
+   pass checks the Resource Server returns an access token back to the Client.
+
+5. Client can use the access token to act on behalf of the Resource Owner until
+   the access token expires or the Resource Owner revokes the access token (or
+   scopes). If the access token expires the refresh token can be used to obtain
+   a new access token from the Resource Server by the Client.
+
+What we have available in this examples/ directory:
+---------------------------------------------------
+
+examples/oauth2_client.pl           - A Client - this will need at least v1.51 of
+                                     the Mojolicious::Plugin::OAuth2 module
+
+examples/oauth2_server_simple.pl    - An Authorization Server and Resource Server
+                                     (that only runs one proc and will not retain
+                                     tokens across restarts) in its simplest form.
+                                     it will not prompt for login or permission
+                                     so is useful to "emulate" an oauth2 server
+
+examples/oauth2_server_simple_jwt.pl - As above but uses JWTs for the auth codes
+                                     and access/refresh tokens. this allows the
+                                     server to be persistent and multi threaded
+                                     but makes revoking tokens slightly awkward
+
+examples/oauth2_server_realistic.pl - An Authorization Server and Resource Server
+                                     that will prompt for login and permission so
+                                     is a more realistic emulation. configured with
+                                     the examples/oauth2_db.json file. also of note
+                                     this can handle multiple procs and restarts
+                                     without losing know tokens - although will
+                                     not scale, you should use a database really.
+
+examples/oauth2_server_db.pl       - As above but uses a db (you will need mongodb
+                                     and the perl MongoDB module to be able to use
+                                     this example)
+
+examples/oauth2_schema.sql         - And example schema for storing auth codes,
+                                     access tokens, etc, in a relational database
+
+examples/OAuth2Functions.pm        - Functions that could be used with the above
+                                     schema
+
+web browser / /usr/bin/curl        - A User Agent
+
+the command line                   - A Resource Owner (A person, You!)
+
+To run:
+-------
+
+cd examples;
+perl -I../lib ~/bin/morbo -l "https://*:3000" oauth2_server_realistic.pl &
+perl ~/bin/morbo -l "https://*:3001" oauth2_client.pl &
+
+Then:
+-----
+
+Visit https://127.0.0.1:3001 and click "Connect to Overly Attached Social
+Network" then "login" and confirm permissions, you will be given a JSON response
+that should contain the details of the access token (if you don't deny access)
+that you can use to access the API of Overly Attached Social Network. The JSON
+response will also contain the refresh token, type, and the expires_in details.
+
+So on the command line (which we are substituting for calls that would be made
+by TrendyNewService here):
+
+# should say "Lee Annoyed Friends":
+curl -k -H"Authorization: Bearer $token" \
+  https://127.0.0.1:3000/api/annoy_friends
+
+# should say "Lee Posted Image":
+curl -k -H"Authorization: Bearer $token" \
+  https://127.0.0.1:3000/api/post_image
+
+# should say "You cannot track location" (with a 401 status):
+curl -k -H"Authorization: Bearer $token" \
+  https://127.0.0.1:3000/api/track_location
+
+# should say "Unauthorized" (with a 401 status):
+curl -k -H"Authorization: Bearer foo" \
+  https://127.0.0.1:3000/api/annoy_friends
+
+# You can even use the refresh token to generate a new access token:
+curl -k -XPOST https://127.0.0.1:3000/oauth/access_token \
+  -d "client_id=TrendyNewService&refresh_token=$refresh_token&grant_type=refresh_token" | json_pp

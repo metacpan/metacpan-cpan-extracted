@@ -1,0 +1,7 @@
+---
+- name:       "counter.server"
+  scriptname: "t/scripts/counter.pl"
+  nproc:       1
+  pidfile:    "/tmp/counter.pid"
+  socket:     "/tmp/counter.socket"
+

@@ -1,0 +1,35 @@
+Revision history for Perl module Net::Sieve::Script
+
+0.08 Mon, 15 Sep 2008 12:48:29 +0200
+   - equals methods on Script, Action, Condition, Rule
+   - test exists
+   thanks to Mark Chappell patch on cpan RT, close RFI 39246
+   - add tests and pod for equals methods
+   - add tests for exists
+
+0.07 Thu, 08 May 2008 09:41:35 +0200
+   - pod clean up
+   - add script->reorder_rules method and tests
+   - clean bug $object masks earlier declaration in same scope at t/001_load_script.t line 25
+
+0.06 Tue, 6 May 2008 20:20:04 +0200
+   - add copyright
+   - add use warnings, fix uninitialized values
+
+0.05 Fri, 11 Apr 2008 11:31:45 +0200
+   - use Module::Install instead of ModuleMaker
+   - add version for all files
+
+0.04 Wed, 19 Mar 2008 15:07:12 +0100
+   - less strip on [], to preserv key header
+
+0.03 Sun, 16 Mar 2008 08:52:34 +0100
+   - old NET name was wrong, rename to Net
+
+0.02 Wed Mar 12 09:41:13 2008
+    - missing dep for CPAN tester
+
+0.01 Wed Mar  5 09:41:13 2008
+    - original version; created by ExtUtils::ModuleMaker 0.49
+
+

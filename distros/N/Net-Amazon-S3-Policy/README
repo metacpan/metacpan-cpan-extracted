@@ -1,0 +1,67 @@
+Net-Amazon-S3-Policy version 0.1.3
+
+Net::Amazon::S3::Policy gives you an object-oriented interface to man‐
+age policies for Amazon S3 HTTP POST uploads.
+
+Amazon S3 relies upon either a REST interface (see Net::Amazon::S3) or
+a SOAP one; as an added service, it is possible to give access to the
+upload of resources using HTTP POSTs that do not involve using any of
+these two interfaces, but a single HTML FORM. The rules you have to
+follow are explained in the Amazon S3 Developer Guide.
+
+More or less, it boils down to the following:
+
+·   if the target bucket is not writeable by the anonymous group,
+   you’ll need to set an access policy;
+
+·   almost every field in the HTML FORM that will be used to build up
+   the HTTP POST message by the browser needs to be included into a
+   policy, and the policy has to be sent along within the HTTP POST
+
+·   together with the policy, also the bucket owner’s AWS ID (the pub‐
+   lic one) has to be sent, together with a digital signature of the
+   policy that has to be created using the bucket owner’s AWS secret
+   key.
+
+This module lets you manage the build-up of a policy document, provid‐
+ing you with tools to get the Base64 encoding of the resulting JSON
+policy document, and to calculate the Base64 encoding of the signature.
+See "Example" for a complete example of how to do this.
+
+In addition to policy synthesis, the module is also capable of parsing
+some policy (base64-encoded or not, but in JSON format). This shouldn’t
+be a need in general... possibly for debug reasons.
+
+AVAILABILITY
+
+You can either grab the module from CPAN, or see what's going on at
+http://repo.or.cz/w/Net-Amazon-S3-Policy.git
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+version and JSON.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, Flavio Poletti
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

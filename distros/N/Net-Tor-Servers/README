@@ -1,0 +1,32 @@
+Net::Tor::Servers version 0.02
+==============================
+
+This module was written to make life a little easier for me when I have been developing a dymanic blocklist for educational
+institutions to prevent students from being able to circumvent legally required content filtering systems.
+
+Its nothing special, just a quick and easy way to get the data together in an array.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP::Simple
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Andy Dixon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

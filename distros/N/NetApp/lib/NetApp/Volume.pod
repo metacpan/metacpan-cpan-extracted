@@ -1,0 +1,322 @@
+
+=head1 NAME
+
+NetApp::Volume -- OO class for creating and managing NetApp filer volumes
+
+=head1 SYNOPSIS
+
+    use NetApp::Filer;
+    use NetApp::Aggregate;
+
+    my $filer = NetApp::Filer->new({ .... });
+
+    my @volume_names	= $filer->get_volume_names;
+
+    my @volumes		= $filer->get_volumes;
+
+    my $volume		= $filer->get_volume( 'volname' );
+
+=head1 DESCRIPTION
+
+This class encapsulates a single NetApp filer volume, and provides
+methods for querying information about the volume and it's
+sub-objects (eg. qtrees), as well as methods for managing the
+volume itself.
+
+=head1 INSTANCE METHODS
+
+=head2 get_filer
+
+Returns the NetApp::Filer object representing the filer on which the
+aggregate exists.
+
+=head2 get_name
+
+Returns the name of the volume as a string.
+
+=head2 get_states, get_statuses, get_options
+
+Each of these methods returns a list of strings, each of which
+represents a single state, status, or option for the volume.
+
+    NOTE: All you English grammar pluralization rules fanatics can
+    give up trying to convince the author to call that one method
+    get_stati.
+
+=head2 get_state( $state ), get_status( $status ), get_option( $option )
+
+Each of these methods returns the value for the specified state,
+status or option.  If that particular key wasn't present, then this
+method will return undef.  This makes it easy to tell the difference
+between a key that doesn't exist, and one that has a false value.
+
+=head2 set_option( $option => $value )
+
+This method sets a single option to the specified value.  It always
+returns true, and raises a fatal exception if it can not set the
+option.
+
+=head2 get_aggregate_name
+
+Returns the name of the aggregate on which the volume lives.  For a
+"traditonal" volume, this will be a false value.
+
+=head2 get_aggregate
+
+Returns the NetApp::Aggregate object representing the aggregate on
+which the volume lives.  For a "traditonal" volume, this will be a
+false value.
+
+=head2 get_qtree_names
+
+Returns a list of strings, each of which is the name of a qtree on the
+volume.
+
+=head2 get_qtrees
+
+Returns a list of NetApp::Qtree objects, each of which represents a
+single qtree on the volume.
+
+=head2 get_qtree( $name )
+
+Returns a single NetApp::Qtree object for the specified qtree
+name. The name must in the form of a pathname, for example:
+
+    /vol/volume_name/qtree_name
+
+The qtree_name is optional if querying the object for a volume's
+qtree.  This method simply returns nothing if the specified qtree
+doesn't exist on the volume.
+
+=head2 get_language
+
+Returns a string representing the language code for the volume.
+
+=head2 set_language( $language )
+
+Set the language code to the specified value.  Always returns a true
+value, or raises a fatal exception if the language code can not be
+set.
+
+=head2 get_size
+
+Returns the size of the volume as a string.  
+
+=head2 set_size( $size )
+
+This method sets the size of the volume to the specified value.  In
+all cases, the $size value is of the same form accepted by the
+create() method, and the underlying ONTAP CLI command:
+
+    [+|-] <number> k|m|g|t
+
+=head2 get_maxfiles
+
+Returns the maxfiles value for the volume.
+
+=head2 set_maxfiles( $maxfiles )
+
+Sets the maxfiles value for the volume.
+
+=head2 is_clone
+
+Returns true if the volume is a clone, false otherwise.
+
+=head2 get_parent_name
+
+Returns a string representing the name of the parent volume, if this
+volume is a clone.
+
+=head2 get_parent
+
+Returns a NetApp::Volume object representing the parent volume, if
+this volume is a clone.
+
+=head2 get_snapshot_name
+
+Returns a string representing the snapshot name, if the volume is a
+clone.
+
+=head2 get_snapshot
+
+NOT YET IMPLEMENTED.  This will return a NetApp::Snapshot object, once
+the API is extended to support snapshots (RSN, I'm sure...)
+
+=head2 get_snapmirrors
+
+Returns a list of NetApp::Snapmirror objects, each of which represents
+a snapmirror relationship for this volume.
+
+=head2 offline( %args )
+
+Takes the volume offline.  The arguments are as follows:
+
+    $volume->offline(
+        # Optional arguments
+	cifsdelaytime	=> $cifsdelaytime,
+    );
+
+=head2 online( %args )
+
+Bring the volume online.  The arguments are as follows:
+
+    $volume->online(
+        # Optional arguments
+	force	=> 1,
+    );
+
+=head2 rename( %args )
+
+Renames the volume to the specified newname.  Always returns a true
+value, and raises a fatal exception if the name can not be changed.
+The arguments are as follows:
+
+    $volume->rename(
+	# Required arguments
+	newname		=> $newname,
+    );
+
+=head2 restrict( %args )
+
+Puts the volume into the restricted state.  The arguments are as follows:
+
+    $volume->restrict(
+        # Optional arguments
+	cifsdelaytime	=> $cifsdelaytime,
+    );
+
+=head2 Snapshot Specific Methods
+
+=head3 get_snapshots
+
+Returns a list of NetApp::Snapshot objects for each of the snapshots
+of the volume.
+
+=head3 get_snapshot( $name )
+
+Returns a single NetApp::Snapshot object matching the specified name,
+if it exists for the volume.
+
+=head3 create_snapshot( $name )
+
+Creates a snapshot of the volume with the specified name.
+
+=head3 delete_snapshot( $name )
+
+Deletes a snapshot of the volume with the specified name.
+
+=head3 get_snapshot_deltas
+
+Returns a list of NetApp::Snapshot::Delta objects for each snapshot
+delta for the volume.
+
+=head3 get_snapshot_reserved
+
+Returns a string representing the amount of reserved space, as a
+percentage.  This string does NOT include the % sign.
+
+=head3 set_snapshot_reserved( $percentage )
+
+Sets the snapshot reserved space to the specified percentage, which
+should also NOT include the % sign.
+
+=head3 get_snapshot_schedule
+
+Returns a NetApp::Snapshot::Schedule object representing the snapshot
+schedule for the volume.
+
+=head3 set_snapshot_schedule( %args )
+
+Sets the snapshot schedule for the volume based on the arguments
+passed.  The argument syntax is:
+
+    $volume->set_snapshot_schedule(
+        weekly		=> $weekly,
+        daily		=> $daily,
+        hourly		=> $hourly,
+	hourlist	=> [
+	    $hour1, $hour2, $hour3, ....
+        ],
+    );
+
+=head3 enable_shapshot_autodelete
+
+This method turns on snapshot autodelete for the volume.
+
+=head3 disable_snapshot_autodelete
+
+This method turns off snapshot autodelete for the volume.
+
+=head3 reset_snapshot_autodelete
+
+This method resets snapshot autodelete for the volume to the filer
+defaults.
+
+=head3 set_snapshot_autodelete_option( $name => $value )
+
+Sets the specified snapshot autodelete option ($name) to the specified
+$value.
+
+=head3 get_snapshot_autodelete_option( $name )
+
+Returns the value of the specified autodelete option ($name).  Note
+that if the prefix is "(not specified)", then the value returned is
+the empty string.
+
+=head1 UNIMPLEMENTED COMMANDS
+
+The following ONTAP vol commands are not implemented, because the same
+functionality and information is provided through this API via some
+other means.
+
+=head2 container
+
+The aggregate containing the volume can be obtained using:
+
+    $volume->get_aggregate;
+
+which will return the NetApp::Aggregate object for it.
+
+=head1 TO BE IMPLEMENTED
+
+All other commands will be implemented in a future release of this
+API.  Commands for flexible volumes will most likely have preference
+over traditional volumes.
+
+=head2 autosize
+
+It's not yet clear just how this one should be implemented, since the
+command does several things.  It enables and disables the autosize
+feature, or resets it to defaults, and it also sets the maximum and
+incremental sizes to autosize to.
+
+This could be implemented a few different ways, for example:
+
+    $volume->autosize(
+        # Optional arguments
+	maximum		=> $maximum,
+	incremental	=> $incremental,
+	# Optional, but mutually exclusive:
+	on	       	=> 1,
+	off		=> 1,
+	reset		=> 1,
+    );
+
+That seems a little clumsy, though.  Perhaps a better interface would
+be to have methods to control the state of the feature:
+
+    $volume->enable_autosize;
+    $volume->disable_autosize;
+    $volume->reset_autosize;
+
+and then methods to set/get the autosize values:
+
+    $volume_set_autosize(
+	# Required but mutually exclusive options
+	maximum		=> $maximum,
+	incremental	=> $incremental,
+    );
+
+    $volume->get_autosize;
+
+=cut

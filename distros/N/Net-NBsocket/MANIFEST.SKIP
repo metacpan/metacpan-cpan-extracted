@@ -1,0 +1,9 @@
+Makefile
+Makefile.old
+~$
+blib
+tmp
+\.o$
+\.bs$
+\.sav$
+\.yml$

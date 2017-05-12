@@ -1,0 +1,19 @@
+Revision history for NetworkInfo-Discovery-NetBIOS
+
+0.05    2005.04.03
+        [TESTS] Corrected t/01api.t
+
+0.04    2005.02.03
+        [DOC] Added diagnostics section in documentation.
+        [TESTS] Added a few tests in t/01api.t
+        [TESTS] Added Net::Netmask as a prerequisite.
+
+0.03    2004.10.19
+        [TESTS] Added t/20netbios.t
+
+0.02    2004.08.28
+        [TESTS] Added t/10hosts.t
+
+0.01    2004.09.28
+        First version, released on an unsuspecting world.
+

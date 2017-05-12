@@ -1,0 +1,105 @@
+{
+   "abstract" : "Kademlia-like DHT Node for BitTorrent",
+   "author" : [
+      "Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.1",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-BitTorrent-DHT",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Config::IPFilter" : "0"
+         },
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::HTTP" : "0",
+            "AnyEvent::Util" : "0",
+            "Bit::Vector" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "Net::BitTorrent::Protocol" : "v1.0.2",
+            "Scalar::Util" : "0",
+            "Socket" : "0",
+            "Types::Standard" : "0",
+            "feature" : "0",
+            "perl" : "v5.10.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Class" : "0",
+            "Test::Moose" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Net::BitTorrent::DHT" : {
+         "file" : "lib/Net/BitTorrent/DHT.pm",
+         "version" : "v1.0.3"
+      },
+      "Net::BitTorrent::DHT::Bucket" : {
+         "file" : "lib/Net/BitTorrent/DHT/Bucket.pm",
+         "version" : "v1.0.3"
+      },
+      "Net::BitTorrent::DHT::Node" : {
+         "file" : "lib/Net/BitTorrent/DHT/Node.pm",
+         "version" : "v1.0.3"
+      },
+      "Net::BitTorrent::DHT::RoutingTable" : {
+         "file" : "lib/Net/BitTorrent/DHT/RoutingTable.pm",
+         "version" : "v1.0.3"
+      },
+      "Net::BitTorrent::DHT::Tracker" : {
+         "file" : "lib/Net/BitTorrent/DHT/Tracker.pm",
+         "version" : "v1.0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sanko/net-bittorrent-dht/issues"
+      },
+      "homepage" : "https://github.com/sanko/net-bittorrent-dht",
+      "repository" : {
+         "url" : "git://github.com/sanko/net-bittorrent-dht.git",
+         "web" : "https://github.com/sanko/net-bittorrent-dht"
+      }
+   },
+   "version" : "v1.0.3"
+}

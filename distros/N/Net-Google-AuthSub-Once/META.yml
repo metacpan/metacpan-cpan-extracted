@@ -1,0 +1,26 @@
+---
+name: Net-Google-AuthSub-Once
+version: v0.1.0
+author:
+  - 'Peter Stuifzand E<lt>peter@stuifzand.euE<gt>'
+abstract: Make one secure authenticated request to a Google service
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Crypt::OpenSSL::RSA: 0
+  Crypt::Random: 0
+  File::Slurp: 0
+  MIME::Base64: 0
+  URI: 0
+  URI::QueryParam: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Net::Google::AuthSub::Once:
+    file: lib/Net/Google/AuthSub/Once.pm
+    version: v0.1.0
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

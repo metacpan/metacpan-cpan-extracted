@@ -1,0 +1,60 @@
+Revision history for Net-eBay
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+0.02    A little cleanup, remove confusion about name
+0.03    Documentation cleanup
+0.04    Documentation cleanup
+0.05    Added a constructor from a .ini file name
+0.06    Cleaned docs, renamed site_level into SiteLevel everywhere
+0.07    A little more cleanup, added view counter
+0.08    General cleanup
+0.09    Better error handling, added a 'validate' script for validating a token
+0.10    Cleaned up ebay-validate-test-user.pl, it now warns if validating in production environment (wrong)
+0.11    Added a ebay-get-categories script
+0.12    Added a ebay-get-categories script to installs list
+0.13    Support for new Schema added. $eBay->setDefaults( { API => 2 } )
+        Added script ebay-add-item.pl, showing how to add items using NEW Schema.
+0.14    Documentation cleanup
+0.15    Added a user's ability to specify XML attributes for the New Schema
+0.16    Added a little extra debugging
+0.17    Bug fix
+0.18    Added scripts to dist
+0.19    Added my ebay type script, get-ebay-item, and get-seller-items script
+0.21    Corrected handling of arrays
+0.22    Added UTF-8 support, ebay-get-suggested-categories.pl example
+0.23    Cleanup
+0.24    Made SiteID settable with 'siteid' parameter
+0.25    Added method of setting special attributes
+0.26    Changed minimum compatibility, made it also settable
+0.27    Improvement in compatibility
+0.28    Misc bug fixes
+0.29    MUCH improved command line search utility, and settable timeout
+0.30    Docs reviewed
+0.31    Added module dependencies, and mention of Object::eBay
+0.32    Added module dependency on Net::SSLeay
+0.33    Added module dependency on Crypt::SSLeay
+0.34    Added (purposely not well documented yet) submitRequestGetText
+0.35    Little cleanups here and there
+0.36    Better error reporting, patch courtesy of Michael Hendricks, a little expanded by me
+0.37    Added ebay-revise-item script, slightly improved error reporting
+0.38    Fixed MANIFEST
+0.39    Changed default compatibility level to 477, improved scripts such as revise item.
+0.40    Added a ebay-leave-feedback.pl script
+0.41    Added ebay-get-item script
+0.42    Added _last_text variable to have the last original XML response value
+0.43    Changed stuff for new way of specifying pictures when listing items
+0.44    Added dependency on DateTime::Precise
+0.45    Updated listing script to submit picture URL. 
+0.46    Fixed POD coverage; changed some scripts  in a minor way
+0.47    Added more Scripts
+0.48    Changes ebay-search.pl to add --currency and --country
+0.49    Patches by Michael Hendrick and Tim Keefer. 
+0.50    Patches by Michael Hendrick to enable compression and use of 'warn' instead of print STDERR.
+0.51    Added a missing dependency.
+0.52    Patch by Michael Hendrix to make eBay client retry up to 2 times (configurable) in case of connection errors. 
+0.53    Added support for return policy in my sample listing script
+0.54    Refined listing script to reflect a "no foreign sales" polify.
+0.55    Added ability to get complete XML of last response as $eBay->{last_result_xml}
+0.60    Added support for submitFindingRequest function to work with eBay finding API. In Progress
+0.61    added submitPaginatedFindingRequest with obvious functionality (takes all work out of pagination). 

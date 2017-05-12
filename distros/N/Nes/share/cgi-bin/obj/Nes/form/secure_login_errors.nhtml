@@ -1,0 +1,74 @@
+{: NES 1.0 none :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  Nes 1.03 by Skriptke
+  Copyright 2009 - 2010 Enrique Castañón
+  Licensed under the GNU GPL.
+
+  Sample:
+  http://nes.sourceforge.net/
+
+  CPAN:
+  http://search.cpan.org/dist/Nes/
+
+  Repository:
+  http://github.com/Skriptke/nes
+  
+  DOCUMENTATION:
+  perldoc Nes::Obj::secure_login  
+
+  -----------------------------------------------------------------------------
+:}
+<center><br><blink>&#10038;</blink><b> Login security ERROR </b><blink>&#10038;</blink><br></center>
+<br>
+{: ~ ( $ form_error_fatal == 1 || $ captcha_error_fatal == 1 )
+    <p>The form has expired or your browser does not accept cookies.<br> Please click to 
+    <a href="http://{: * env_SERVER_NAME :}{: * env_REQUEST_URI :}">try again</a>
+    </p>
+:}
+
+{: ~ ( $ form_error_fatal == 2 )
+    <p>Cookie expired error. Time limit exceeded.<br> Click to 
+    <a href="http://{: * env_SERVER_NAME :}{: * env_REQUEST_URI :}">try again</a>
+    </p>
+:}
+
+{: ~ ( $ form_error_fatal == 3 )
+    <p>Cookie key error. Please do not use the Back button to this form.<br> Click to 
+    <a href="http://{: * env_SERVER_NAME :}{: * env_REQUEST_URI :}">try again</a>
+    </p>
+:}
+
+{: ~ ( $ form_error_fatal == 4 )
+    <p>No key form. This form require Cookies and JavaScript.<br> Please click to 
+    <a href="http://{: * env_SERVER_NAME :}{: * env_REQUEST_URI :}">try again</a>
+    </p>
+:}
+
+{: ~ ( $ form_error_fatal == 5 || $ captcha_error_fatal == 3 )
+    <p>It has reached the maximum attempts. <br>Please <a href="http://{: * env_SERVER_NAME :}{: * env_REQUEST_URI :}">try again</a> a<b> few minutes</b>.</p>
+:}
+
+{: ~ ( $ form_error_fatal == 6 || $ captcha_error_fatal == 4 )
+    <p>Cookie error. Please do not use the Back button to this form.<br> Please click to 
+    <a href="http://{: * env_SERVER_NAME :}{: * env_REQUEST_URI :}">try again</a>
+    </p>
+:}
+
+{: ~ ( $ form_error_fatal == 7 )
+    <p>No key form. Please do not use the Back button to this form.<br> Click to 
+    <a href="http://{: * env_SERVER_NAME :}{: * env_REQUEST_URI :}">try again</a>
+    </p>
+:}
+
+<br>
+<p>Please check these options:<br>
+Please do not use the Back button to this form.<br> 
+Please do not use the Reload button to this form.<br>
+This form required to enable Cookies.<br>
+This form required to enable JavaScript.<br>
+If you try many times, get an error.<br>
+There is a limit time to complete the form, if it exceeds the limit, the cookie expires or form.<br>
+</p>
+<br>

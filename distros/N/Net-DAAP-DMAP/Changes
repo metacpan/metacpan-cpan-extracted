@@ -1,0 +1,30 @@
+1.27	Monday 16th January, 2012
+	Correctly emit utf-8 bytes for type 9 (text).
+
+1.26	Wednesday 1st September, 2004
+	Fixed the email address of the daap-dev list.
+
+1.25	Wednesday 18th August, 2004
+	Add a type 42 - non-utf-8 text (Net::DPAP::Client breaks else)
+
+1.24	Friday 30th July, 2004
+	Doh! text is type 9, not type 7
+
+1.23	Friday 30th July, 2004
+	Decodes text as utf-8 when Encode is available.
+
+1.22	Wendesday 28th July, 2004
+	fixed a bug in update_content_codes that was causing subsequent
+	calls to mess up spectacularly
+	Introduced $Net::DAAP::DMAP::NOISY to optionally turn on the
+	warnings added in 1.20 (defaults to off)
+	
+1.21	Monday 26th July, 2004
+	Added dmap_flat_list, needed for Net::DAAP::Client 0.4
+
+1.20	Monday 12th July, 2004
+	Split from the dapple dist
+	Pod fixes
+        + t/content-codes.dump
+	carps about unknown key types
+	knows about DPAP (Leon Brocard)

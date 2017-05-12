@@ -1,0 +1,16 @@
+Steps on adding a new TCP capture file ...
+
+ * Give it a useful filename (e.g. t/tNN_description.tcp)
+ * Load it into ethereal, and right click the 'assemble TCP stream option'
+ * select the 'hex dump' option
+ * Save the assembled stream as t/tNN_description.hex
+ * Checkin both of the t/tNN_description.{hex|tcp} files
+
+This means that (so far) each capture file can only contain a single TCP
+session. You can also use ethereal to save the raw TCP data into a new file
+if your original capture has multiple sessions.
+
+Now when you run the test-suite, they'll be automatically picked up. And
+maybe even pass :)
+
+ - Adam

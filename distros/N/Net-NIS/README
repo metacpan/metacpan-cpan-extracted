@@ -1,0 +1,78 @@
+This is a snapshot release of the NIS interface to Perl 5.  There are
+three parts to the interface: the raw component (Net::NIS), the object-
+oriented component (Net::NIS::Table), and the tied interface (Net::NIS).
+
+Unless someone provides strong reason to support the raw or OO components,
+they will be marked as deprecated and not documented or enhanced (but
+still supported for backward compatibility).
+
+The tied interface provides simple, Perl-like access to NIS databases:
+
+  use Net::NIS;
+  tie %ip, 'Net::NIS', 'hosts.byname'
+    or die "Cannot tie to hosts.byname YP map: $yperr\n";
+  $hostname = "test";
+  print "$hostname's IP address is ", $ip{$hostname} || "<unknown>", "\n";
+
+  # Look for any hosts named "test-XXX"
+  @test_hosts = sort grep(/^test-/, keys %ip);
+
+INSTALLATION:
+------------
+
+The usual:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+You may see some (different) compiler warnings on Linux, FreeBSD,
+and Solaris.  Suggestions welcome on portable ways to clean those up.
+
+
+DEPENDENCIES:
+-------------
+
+Net::NIS is being developed under Perl 5.6.1.  It has been tested
+with 5.005_03, and seems to work.  Sorry, Net::NIS will not compile
+under Perl 5.004 or anything earlier.
+
+The tests require that the "ypcat" and "domainname" executables be
+found somewhere in your $PATH, and that the compile system be bound
+to a YP server containing some of the "usual suspects" maps.  If you
+build on a system not running NIS, the tests will fail.
+
+
+BUGS:
+-----
+
+Net::NIS has not changed much (read "at all") in many years,
+so I (Ed) am not about to go changing interfaces.  I have made some
+bug fixes:
+
+  * trailing-NUL bugs fixed: calling code no longer needs to trim
+    NULs from returned keys, or append them in lookups.
+  * YPERR_xxx constants are now properly defined
+
+...and added some new features:
+
+  * when called in scalar context, yp_match() returns
+  * New magic variable "$yperr" for determining error status
+  * New tied interface
+
+There have been a lot of changes, and that means there will be
+bugs.  Please report any bugs you encounter to <esm@cpan.org>.
+
+have fun,
+rik.	(1995-11-10)
+Ed      (2014-02-22)
+
+
+COPYRIGHT AND LICENSE:
+---------------------
+
+Copyright © 1995,2002 Rik Harris; 2002-2014 Ed Santiago
+
+This package is free software; you may redistribute it and/or
+modify it under the same terms as Perl itself.

@@ -1,0 +1,14 @@
+Changelog
+examples/01.pl
+examples/02.pl
+examples/03.pl
+examples/04.pl
+examples/05.pl
+examples/06.pl
+lib/Net/Amazon/DynamoDB.pm
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/01.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

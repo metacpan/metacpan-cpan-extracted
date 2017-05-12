@@ -1,0 +1,1025 @@
+<?xml version="1.0"?>
+<ItemSearchResponse xmlns="http://webservices.amazon.com/AWSECommerceService/2011-08-01">
+  <Items>
+    <TotalResults>105</TotalResults>
+    <TotalPages>11</TotalPages>
+    <MoreSearchResultsUrl>http://www.amazon.com/gp/redirect.html?camp=2025&amp;creative=386001&amp;location=http%3A%2F%2Fwww.amazon.com%2Fgp%2Fsearch%3Fkeywords%3Dperl%2Bpower%26url%3Dsearch-alias%253Dstripbooks&amp;linkCode=xm2&amp;tag=blogdivebombo-20&amp;SubscriptionId=1V5JRJ4JQCSHB3NGG902</MoreSearchResultsUrl>
+    <Item>
+      <ASIN>0131480057</ASIN>
+      <SalesRank>9602</SalesRank>
+      <ItemAttributes>
+        <Author>Evi Nemeth</Author>
+        <Author>Garth Snyder</Author>
+        <Author>Trent R. Hein</Author>
+        <Author>Ben Whaley</Author>
+        <Binding>Paperback</Binding>
+        <EAN>9780131480056</EAN>
+        <EANList>
+          <EANListElement>9780131480056</EANListElement>
+        </EANList>
+        <Edition>4th</Edition>
+        <ISBN>0131480057</ISBN>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <ItemDimensions>
+          <Height Units="centimeters">2.31</Height>
+          <Weight Units="hundredths-pounds">0</Weight>
+          <Width Units="centimeters">1.81</Width>
+        </ItemDimensions>
+        <Label>Prentice Hall</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>5999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$59.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Prentice Hall</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>1344</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2010-07-24</PublicationDate>
+        <Publisher>Prentice Hall</Publisher>
+        <SKU>NU-ING-00644322</SKU>
+        <Studio>Prentice Hall</Studio>
+        <Title>UNIX and Linux System Administration Handbook (4th Edition)</Title>
+        <TradeInValue>
+          <Amount>2400</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$24.00</FormattedPrice>
+        </TradeInValue>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>3798</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$37.98</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>3785</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$37.85</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>50</TotalNew>
+        <TotalUsed>38</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/0131480057%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D0131480057</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>t8ndCrMY3RwcZbEF1obrYtd6Dm0iXkiN5vTYdf%2FmRypLiZBusjSo3O8fOWILZzOG5vTcgvv2pZPs%2BOF9yPN6b%2FTFBMe3kkJFhdDR9C7Pr9rEKwt%2BoS1v7A%3D%3D</OfferListingId>
+            <Price>
+              <Amount>4199</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$41.99</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>1800</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$18.00</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>30</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>1401902103</ASIN>
+      <SalesRank>3833</SalesRank>
+      <ItemAttributes>
+        <Author>Eric Pearl</Author>
+        <Binding>Paperback</Binding>
+        <EAN>9781401902100</EAN>
+        <EANList>
+          <EANListElement>0656629002828</EANListElement>
+          <EANListElement>9781401902100</EANListElement>
+        </EANList>
+        <Feature>ISBN13: 9781401902100</Feature>
+        <Feature>Condition: New</Feature>
+        <Feature>Notes: BRAND NEW FROM PUBLISHER! 100% Satisfaction Guarantee. Tracking provided on most orders. Buy with Confidence! Millions of books sold!</Feature>
+        <ISBN>1401902103</ISBN>
+        <ItemDimensions>
+          <Height Units="hundredths-inches">62</Height>
+          <Length Units="hundredths-inches">900</Length>
+          <Weight Units="hundredths-pounds">92</Weight>
+          <Width Units="hundredths-inches">612</Width>
+        </ItemDimensions>
+        <Label>Hay House</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>1495</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$14.95</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Hay House</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>223</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2003-04-01</PublicationDate>
+        <Publisher>Hay House</Publisher>
+        <SKU>110929010</SKU>
+        <Studio>Hay House</Studio>
+        <Title>The Reconnection</Title>
+        <UPC>656629002828</UPC>
+        <UPCList>
+          <UPCListElement>656629002828</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>810</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$8.10</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>246</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$2.46</FormattedPrice>
+        </LowestUsedPrice>
+        <LowestCollectiblePrice>
+          <Amount>1995</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$19.95</FormattedPrice>
+        </LowestCollectiblePrice>
+        <TotalNew>61</TotalNew>
+        <TotalUsed>69</TotalUsed>
+        <TotalCollectible>1</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/1401902103%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D1401902103</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>Ckol9wzCIZhVeVM4%2Fq0xdJZ11JvCuV%2FZ9ZRkk9bdDbnci%2BknbR0%2FOt2O51ip1dF4BwEc5gIrUWWft7Ef%2F2UTfNIaCQ2GnpN%2BfSj4XU1kMS8%3D</OfferListingId>
+            <Price>
+              <Amount>1017</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$10.17</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>478</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$4.78</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>32</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>0596000278</ASIN>
+      <SalesRank>20572</SalesRank>
+      <ItemAttributes>
+        <Author>Larry Wall</Author>
+        <Author>Tom Christiansen</Author>
+        <Author>Jon Orwant</Author>
+        <Binding>Paperback</Binding>
+        <EAN>9780596000271</EAN>
+        <EANList>
+          <EANListElement>9780596000271</EANListElement>
+        </EANList>
+        <Edition>3rd</Edition>
+        <ISBN>0596000278</ISBN>
+        <ItemDimensions>
+          <Height Units="hundredths-inches">175</Height>
+          <Length Units="hundredths-inches">917</Length>
+          <Weight Units="hundredths-pounds">304</Weight>
+          <Width Units="hundredths-inches">701</Width>
+        </ItemDimensions>
+        <Label>O'Reilly Media</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>4999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$49.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>O'Reilly Media</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>1092</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2000-07-21</PublicationDate>
+        <Publisher>O'Reilly Media</Publisher>
+        <SKU>6885074</SKU>
+        <Studio>O'Reilly Media</Studio>
+        <Title>Programming Perl (3rd Edition)</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>1495</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$14.95</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>129</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$1.29</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>59</TotalNew>
+        <TotalUsed>108</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/0596000278%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D0596000278</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>AfVWFi1k54AVThH7yB%2BvrRMMRvPxtry%2FbX9m8sdc6cwFZfHuLHPqhdhRQDA9pbve6aYMhJDYdeGae64uDgGKQG%2Fxt3As3BDbUYYlUiRVNkk%3D</OfferListingId>
+            <Price>
+              <Amount>3149</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$31.49</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>1850</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$18.50</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>37</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>0123745144</ASIN>
+      <SalesRank>72255</SalesRank>
+      <ItemAttributes>
+        <Author>Michael L. Scott</Author>
+        <Binding>Paperback</Binding>
+        <EAN>9780123745149</EAN>
+        <EANList>
+          <EANListElement>9780123745149</EANListElement>
+        </EANList>
+        <Edition>3</Edition>
+        <ISBN>0123745144</ISBN>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <ItemDimensions>
+          <Height Units="centimeters">2.31</Height>
+          <Weight Units="hundredths-pounds">3</Weight>
+          <Width Units="centimeters">1.87</Width>
+        </ItemDimensions>
+        <Label>Morgan Kaufmann</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>7495</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$74.95</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Morgan Kaufmann</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>944</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2009-04-06</PublicationDate>
+        <Publisher>Morgan Kaufmann</Publisher>
+        <SKU>Lot500-N-120</SKU>
+        <Studio>Morgan Kaufmann</Studio>
+        <Title>Programming Language Pragmatics, Third Edition</Title>
+        <TradeInValue>
+          <Amount>2530</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$25.30</FormattedPrice>
+        </TradeInValue>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>2626</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$26.26</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>3339</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$33.39</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>43</TotalNew>
+        <TotalUsed>55</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/0123745144%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D0123745144</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>KXi%2BZ0%2Ba%2BGgyXNV2%2FLAXIAFpPknj1Rhy5%2BWl8palDDOb0OeXpvaTMm0al8ip07nW4seYmEqoragNGmf02WOdoilZ4dKWIkTfh9zMucv%2F9CM%3D</OfferListingId>
+            <Price>
+              <Amount>4949</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$49.49</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>2546</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$25.46</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>34</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>1565922255</ASIN>
+      <SalesRank>49998</SalesRank>
+      <ItemAttributes>
+        <Author>Dale Dougherty</Author>
+        <Author>Arnold Robbins</Author>
+        <Binding>Paperback</Binding>
+        <EAN>9781565922259</EAN>
+        <EANList>
+          <EANListElement>9781565922259</EANListElement>
+        </EANList>
+        <Edition>Second Edition</Edition>
+        <ISBN>1565922255</ISBN>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <ItemDimensions>
+          <Height Units="hundredths-inches">89</Height>
+          <Length Units="hundredths-inches">924</Length>
+          <Weight Units="hundredths-pounds">130</Weight>
+          <Width Units="hundredths-inches">706</Width>
+        </ItemDimensions>
+        <Label>O'Reilly Media</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>3999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$39.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>O'Reilly Media</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>432</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>1997-03-08</PublicationDate>
+        <Publisher>O'Reilly Media</Publisher>
+        <SKU>765922259</SKU>
+        <Studio>O'Reilly Media</Studio>
+        <Title>sed &amp; awk (2nd Edition)</Title>
+        <TradeInValue>
+          <Amount>350</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$3.50</FormattedPrice>
+        </TradeInValue>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>1755</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$17.55</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>937</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$9.37</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>28</TotalNew>
+        <TotalUsed>50</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/1565922255%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D1565922255</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>8Cv0UzLBYuwZQZqy1%2BjhTAHocGYgSDs7a3XbklHEofvX0fYo2b4j4rb%2Bv2l5d2JsaF6MV9NPYoFEK81CXr9hntyiWgNxPKFrV0AqyGwzXV0%3D</OfferListingId>
+            <Price>
+              <Amount>2030</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$20.30</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>1969</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$19.69</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>49</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>0596007973</ASIN>
+      <SalesRank>78102</SalesRank>
+      <ItemAttributes>
+        <Author>Alex Martelli</Author>
+        <Author>Anna Ravenscroft</Author>
+        <Author>David Ascher</Author>
+        <Binding>Paperback</Binding>
+        <CatalogNumberList>
+          <CatalogNumberListElement>AL12178810</CatalogNumberListElement>
+        </CatalogNumberList>
+        <EAN>9780596007973</EAN>
+        <EANList>
+          <EANListElement>9780596007973</EANListElement>
+        </EANList>
+        <Edition>Second Edition</Edition>
+        <ISBN>0596007973</ISBN>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <ItemDimensions>
+          <Height Units="hundredths-inches">150</Height>
+          <Length Units="hundredths-inches">918</Length>
+          <Weight Units="hundredths-pounds">255</Weight>
+          <Width Units="hundredths-inches">704</Width>
+        </ItemDimensions>
+        <Label>O'Reilly Media</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>4995</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$49.95</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>O'Reilly Media</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>848</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2005-03-25</PublicationDate>
+        <Publisher>O'Reilly Media</Publisher>
+        <SKU>KA9780596007973</SKU>
+        <Studio>O'Reilly Media</Studio>
+        <Title>Python Cookbook</Title>
+        <TradeInValue>
+          <Amount>382</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$3.82</FormattedPrice>
+        </TradeInValue>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>1800</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$18.00</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>1230</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$12.30</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>36</TotalNew>
+        <TotalUsed>23</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/0596007973%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D0596007973</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>F0oe3xB%2F3OPP6alO2HcQXPqPIYeC2rGOM%2FCI7fBR8K2lXEXdSk8tE5dML%2BhFh4uPcnyH2fjbrdXZ3u3SjSvYa%2Buxfes%2FNTwI2t5WLFp%2B2YjYMhrxE1hPWg%3D%3D</OfferListingId>
+            <Price>
+              <Amount>2885</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$28.85</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>2110</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$21.10</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>42</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>0596514980</ASIN>
+      <SalesRank>96053</SalesRank>
+      <ItemAttributes>
+        <Author>Bryan O'Sullivan</Author>
+        <Author>John Goerzen</Author>
+        <Author>Don Stewart</Author>
+        <Binding>Paperback</Binding>
+        <EAN>9780596514983</EAN>
+        <EANList>
+          <EANListElement>9780596514983</EANListElement>
+        </EANList>
+        <Edition>1</Edition>
+        <ISBN>0596514980</ISBN>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <Label>O'Reilly Media</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>4999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$49.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>O'Reilly Media</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>720</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2008-12-01</PublicationDate>
+        <Publisher>O'Reilly Media</Publisher>
+        <SKU>0596514980N</SKU>
+        <Studio>O'Reilly Media</Studio>
+        <Title>Real World Haskell</Title>
+        <TradeInValue>
+          <Amount>250</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$2.50</FormattedPrice>
+        </TradeInValue>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>2589</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$25.89</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>1188</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$11.88</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>36</TotalNew>
+        <TotalUsed>37</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/0596514980%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D0596514980</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>Dd77AFAf4KJuL%2FU0XgSSOZDNEqDSRTMFFh1sLwlxoSy4BqkXxtA%2FzpOqgYIa2tDAxRZMZEkEzerY%2FBeVoxFymH2251%2BopHdzctfIJm2j1u4%3D</OfferListingId>
+            <Price>
+              <Amount>4260</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$42.60</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>739</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$7.39</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>15</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>0761556346</ASIN>
+      <SalesRank>49405</SalesRank>
+      <ItemAttributes>
+        <Binding>Paperback</Binding>
+        <Brand>Brady Games</Brand>
+        <Creator Role="Editor">Lawrence Neves</Creator>
+        <Creator Role="Editor">Katherine Fang</Creator>
+        <Creator Role="Editor">Kristina Naudus</Creator>
+        <Creator Role="Editor">Cris Silvestri</Creator>
+        <EAN>9780761556343</EAN>
+        <EANList>
+          <EANListElement>9780761556343</EANListElement>
+        </EANList>
+        <ESRBAgeRating>Everyone</ESRBAgeRating>
+        <ISBN>0761556346</ISBN>
+        <ItemDimensions>
+          <Height Units="hundredths-inches">43</Height>
+          <Length Units="hundredths-inches">1094</Length>
+          <Weight Units="hundredths-pounds">153</Weight>
+          <Width Units="hundredths-inches">858</Width>
+        </ItemDimensions>
+        <Label>Prima Games</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>1699</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$16.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Prima Games</Manufacturer>
+        <MPN>GKW33630</MPN>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>296</NumberOfPages>
+        <PackageQuantity>1</PackageQuantity>
+        <PartNumber>GKW33630</PartNumber>
+        <Platform>Nintendo DS</Platform>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2007-04-22</PublicationDate>
+        <Publisher>Prima Games</Publisher>
+        <ReleaseDate>2007-04-22</ReleaseDate>
+        <SKU>6614545</SKU>
+        <Studio>Prima Games</Studio>
+        <Title>Pokemon Diamond &amp; Pearl (Prima Official Game Guide)</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>6964</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$69.64</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>7</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.07</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>7</TotalNew>
+        <TotalUsed>160</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+        <MoreOffersUrl>0</MoreOffersUrl>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>0596515170</ASIN>
+      <SalesRank>297854</SalesRank>
+      <ItemAttributes>
+        <Author>Federico Biancuzzi</Author>
+        <Author>Chromatic</Author>
+        <Binding>Paperback</Binding>
+        <EAN>9780596515171</EAN>
+        <EANList>
+          <EANListElement>9780596515171</EANListElement>
+        </EANList>
+        <Edition>1</Edition>
+        <Feature>ISBN13: 9780596515171</Feature>
+        <Feature>Condition: New</Feature>
+        <Feature>Notes: BRAND NEW FROM PUBLISHER! 100% Satisfaction Guarantee. Tracking provided on most orders. Buy with Confidence! Millions of books sold!</Feature>
+        <ISBN>0596515170</ISBN>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <ItemDimensions>
+          <Height Units="hundredths-inches">116</Height>
+          <Length Units="hundredths-inches">912</Length>
+          <Weight Units="hundredths-pounds">192</Weight>
+          <Width Units="hundredths-inches">700</Width>
+        </ItemDimensions>
+        <Label>O'Reilly Media</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>3999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$39.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>O'Reilly Media</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>496</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2009-04-03</PublicationDate>
+        <Publisher>O'Reilly Media</Publisher>
+        <SKU>0596515170</SKU>
+        <Studio>O'Reilly Media</Studio>
+        <Title>Masterminds of Programming: Conversations with the Creators of Major Programming Languages (Theory in Practice (O'Reilly))</Title>
+        <TradeInValue>
+          <Amount>129</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$1.29</FormattedPrice>
+        </TradeInValue>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>1705</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$17.05</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>444</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$4.44</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>43</TotalNew>
+        <TotalUsed>36</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/0596515170%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D0596515170</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>FzAgHRSTZoVa1zxZev5GrZK98LD%2BefxUaUDKS9OMUZkE2ZwhcWSv1r%2Bd1pcEQ%2BohZGscaKMcodEzkWjy7MiCHlfH5A6O80q7fTJL%2FwVLcQg%3D</OfferListingId>
+            <Price>
+              <Amount>2639</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$26.39</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>1360</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$13.60</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>34</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>0596100892</ASIN>
+      <SalesRank>201782</SalesRank>
+      <ItemAttributes>
+        <Author>Guy Harrison</Author>
+        <Author>Steven Feuerstein</Author>
+        <Binding>Paperback</Binding>
+        <EAN>9780596100896</EAN>
+        <EANList>
+          <EANListElement>9780596100896</EANListElement>
+        </EANList>
+        <Edition>1</Edition>
+        <ISBN>0596100892</ISBN>
+        <IsEligibleForTradeIn>1</IsEligibleForTradeIn>
+        <ItemDimensions>
+          <Height Units="hundredths-inches">116</Height>
+          <Length Units="hundredths-inches">916</Length>
+          <Weight Units="hundredths-pounds">194</Weight>
+          <Width Units="hundredths-inches">710</Width>
+        </ItemDimensions>
+        <Label>O'Reilly Media</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>4499</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$44.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>O'Reilly Media</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>638</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2006-04-04</PublicationDate>
+        <Publisher>O'Reilly Media</Publisher>
+        <SKU>NU-ING-00311288</SKU>
+        <Studio>O'Reilly Media</Studio>
+        <Title>MySQL Stored Procedure Programming</Title>
+        <TradeInValue>
+          <Amount>300</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$3.00</FormattedPrice>
+        </TradeInValue>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>2449</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$24.49</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>949</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$9.49</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>33</TotalNew>
+        <TotalUsed>26</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/0596100892%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D0596100892</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>w2HrBm5LnxuWsJ3A1UL3zi6iMTXiAE2RnmUBeEZioADFIdP2KHLX3FfDJmPKJs4SlUfpM%2Bjx2XrLQKXnxYCBO1AM4tSggduM8rgeLRUCPLSUs%2BRf3glGeA%3D%3D</OfferListingId>
+            <Price>
+              <Amount>2969</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$29.69</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>1530</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$15.30</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>34</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+  </Items>
+</ItemSearchResponse>

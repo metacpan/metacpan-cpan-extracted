@@ -1,0 +1,52 @@
+{
+   "abstract" : "use Gearman with L<IO::Async>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Async-Gearman",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::HexString" : "0",
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Async::Stream" : "0",
+            "Protocol::Gearman" : "0.03"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Async::Gearman" : {
+         "file" : "lib/Net/Async/Gearman.pm",
+         "version" : "0.01"
+      },
+      "Net::Async::Gearman::Client" : {
+         "file" : "lib/Net/Async/Gearman/Client.pm",
+         "version" : "0.01"
+      },
+      "Net::Async::Gearman::Worker" : {
+         "file" : "lib/Net/Async/Gearman/Worker.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01"
+}

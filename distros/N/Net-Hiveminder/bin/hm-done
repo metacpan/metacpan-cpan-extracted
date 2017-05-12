@@ -1,0 +1,8 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Net::Hiveminder;
+
+$\ = "\n";
+print Net::Hiveminder->new(use_config => 1)->done(@ARGV);
+

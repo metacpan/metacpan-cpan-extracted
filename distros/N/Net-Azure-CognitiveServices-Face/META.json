@@ -1,0 +1,94 @@
+{
+   "abstract" : "A wrapper class for Face API of Azure Cognitive Services",
+   "author" : [
+      "ytnobody <ytnobody@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Azure-CognitiveServices-Face",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor::Lite" : "0",
+            "HTTP::Request" : "0",
+            "JSON" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "URI" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Azure::CognitiveServices::Face" : {
+         "file" : "lib/Net/Azure/CognitiveServices/Face.pm",
+         "version" : "0.01"
+      },
+      "Net::Azure::CognitiveServices::Face::Base" : {
+         "file" : "lib/Net/Azure/CognitiveServices/Face/Base.pm"
+      },
+      "Net::Azure::CognitiveServices::Face::Face" : {
+         "file" : "lib/Net/Azure/CognitiveServices/Face/Face.pm"
+      },
+      "Net::Azure::CognitiveServices::Face::FaceList" : {
+         "file" : "lib/Net/Azure/CognitiveServices/Face/FaceList.pm"
+      },
+      "Net::Azure::CognitiveServices::Face::Person" : {
+         "file" : "lib/Net/Azure/CognitiveServices/Face/Person.pm"
+      },
+      "Net::Azure::CognitiveServices::Face::PersonGroup" : {
+         "file" : "lib/Net/Azure/CognitiveServices/Face/PersonGroup.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ytnobody/p5-Net-Azure-CognitiveServices-Face/issues"
+      },
+      "homepage" : "https://github.com/ytnobody/p5-Net-Azure-CognitiveServices-Face",
+      "repository" : {
+         "url" : "git://github.com/ytnobody/p5-Net-Azure-CognitiveServices-Face.git",
+         "web" : "https://github.com/ytnobody/p5-Net-Azure-CognitiveServices-Face"
+      }
+   },
+   "version" : "0.01"
+}

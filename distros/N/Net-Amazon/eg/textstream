@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+###########################################
+# textstream - trying rayg's textstream
+###########################################
+use warnings;
+use strict;
+
+use Net::Amazon;
+
+#use Log::Log4perl qw(:easy);
+#Log::Log4perl->easy_init({level => $DEBUG, layout => '%F{1}-%L: %m%n'});
+
+my $ua = Net::Amazon->new(
+    associate_tag => $ENV{AMAZON_ASSOCIATE_TAG},
+    token         => $ENV{AMAZON_TOKEN},
+    secret_key    => $ENV{AMAZON_SECRET_KEY},
+);
+
+my $resp = $ua->search(
+    textstream  => "Here's some blurb mentioning the rolling stones",
+);
+
+if($resp->is_success()) {
+    print $resp->as_string(), "\n";
+} else {
+    print "Error: ", 
+          $resp->message(), "\n";
+}

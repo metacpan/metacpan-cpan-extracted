@@ -1,0 +1,8 @@
+$args =
+{
+ message_type => MQTT_PINGRESP,
+}
+
+d0 00
+
+PingResp/at-most-once

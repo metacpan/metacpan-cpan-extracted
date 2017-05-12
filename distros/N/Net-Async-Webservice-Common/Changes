@@ -1,0 +1,24 @@
+1.0.2     2014-07-31 10:07:57+01:00 Europe/London
+ - bump version requirements for Future (to get is_done) and Moo (to
+   get non-ref defaults via constants instead of coderefs)
+
+1.0.1     2014-07-29 11:19:55+01:00 Europe/London
+ - use SingleEncoding (thanks sergeyromanov)
+
+1.0.0     2014-06-25 11:11:57+01:00 Europe/London
+ - first regular release
+
+0.01_4    2014-06-24 09:54:46+01:00 Europe/London
+ - make tests pass when IO::Socket::SSL is not installed
+
+0.01_3    2014-06-23 09:55:46+01:00 Europe/London
+ - avoid stealth dependency on Config::General, use a Perl "config
+   file" for testing
+
+0.01_2    2014-06-18 10:38:23+01:00 Europe/London
+ - avoid package-block syntax, we don't want to exclude 5.10 and 5.12
+
+0.01_1    2014-06-17 18:00:21+01:00 Europe/London
+ - factored out common pieces from Net::Async::Webservice::{UPS,DHL}
+ - added more flexible SSL options specification
+ - SyncAgentWrapper is more powerful

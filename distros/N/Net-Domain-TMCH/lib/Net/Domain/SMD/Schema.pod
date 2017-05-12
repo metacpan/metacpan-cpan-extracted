@@ -1,0 +1,105 @@
+=encoding utf8
+
+=head1 NAME
+
+Net::Domain::SMD::Schema - Mark and Signed-Mark Objects Mapping
+
+=head1 INHERITANCE
+
+ Net::Domain::SMD::Schema
+   is a Exporter
+
+=head1 SYNOPSIS
+
+  # This object is used by Net::Domain::TMCH, so usually not directly
+  # accessed by end-users.
+
+  my $smd  = Net::Domain::SMD::Schema->new(%options);
+  my $info = $smd->read($fn);
+
+=head1 DESCRIPTION
+
+Draft RFC L<http://tools.ietf.org/html/draft-lozano-tmch-smd-02>
+specifies a way for TLD (domain registries) to exchange mark
+rights (brand registrations): "SMD"-files.
+
+This module unpacks these SMD-files, decoding the XML contained in them.
+Each SMD-file is represented by a separate L<Net::Domain::SMD::File|Net::Domain::SMD::File>
+object.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Net::Domain::SMD::Schema-E<gt>B<new>(%options)
+
+ -Option         --Default
+  auto_datetime    false
+  tmv_certificate  <undef>
+
+=over 2
+
+=item auto_datetime => BOOLEAN
+
+Convert all dateTime fields into DateTime objects.
+
+=item tmv_certificate => Crypt::OpenSSL::X509 object
+
+[0.18] Enables writing of SMD structures, using this certificate to sign
+the content.
+
+=back
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<schemas>()
+
+=back
+
+=head2 Actions
+
+=over 4
+
+=item $obj-E<gt>B<createSignedMark>($document, $data, %options)
+
+Used by L<Net::Domain::TMCH::createSignedMark()|Net::Domain::TMCH/"Actions"> to produce an XML
+structure to be included in the $document, which may (for instance) be an
+SMD file or an EPP message.
+
+=item Net::Domain::SMD::Schema-E<gt>B<from>( <$filename|$xmlnode|STRING>, %options )
+
+Returns an L<Net::Domain::SMD|Net::Domain::SMD> object and a source string, which represents
+the xml input data.
+
+=item $obj-E<gt>B<read>($filename)
+
+Returns an L<Net::Domain::SMD::File|Net::Domain::SMD::File> object, or an exception which can
+be caught with Log::Report subroutine try or C<eval>.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Net-Domain-TMCH distribution version 0.18,
+built on December 30, 2015.  Development was supported by NIC.at, the Austrian
+Domainname Registry.
+
+ Website: F<http://perl.overmeer.net/net-domain-tmch/>
+
+The documentation and interface style is consistent with a large set of
+modules, belonging to the L<XML::Compile> suite.
+
+=head1 LICENSE
+
+Copyrights 2013-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

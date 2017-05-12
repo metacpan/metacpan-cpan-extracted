@@ -1,0 +1,9 @@
+Revision history for Net-Iugu
+
+0.0.2       2015-02-27
+                - Updating dependency list
+                - Removing direcotry local/ from final dist
+                - Some housekeeping
+
+0.0.1       2015-02-05
+                - First version

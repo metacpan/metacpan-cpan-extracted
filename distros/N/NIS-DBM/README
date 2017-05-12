@@ -1,0 +1,52 @@
+                                 -------------
+                                 NIS::DBM 0.02
+                                 -------------
+
+NIS::DBM presents the dbm files used by NIS as a single hash indexed by
+username and uid (when in doubt, it's a username).  The indexing behavior 
+may be changed at any time after the tied hash is created.  The tie 
+supports all normal hash operations except clearing the hash (we don't 
+want to easily get rid of the entire database).  The code tries to minimize 
+the file operations needed to correctly present the information and modify 
+the dbm files.
+
+While the code will try to detect the use of adjunct files, this is not
+perfect.  In addition, only one kind of adjunct file usage is supported.
+If there are other types, please send the details to <jgsmith@tamu.edu>.
+
+NIS::DBM requires the following modules from CPAN:
+     IniConf
+     Net::NIS
+
+NIS::DBM relies on the correct implementation of the following
+modules in the standard Perl distribution:
+     Carp
+     NDBM_File
+     Fcntl
+     IPC::Open3
+     LockFile::Simple
+
+To install, simply type
+
+     $ perl Makefile.PL
+     $ make
+     $ make install
+
+See the example configuration file in sample/accounts.conf.  This should 
+be copied to a suitable place and the daemons and other code be made aware 
+of it.  A sample yppasswd daemon is provided in sample/ also along with 
+the Makefile for the C code to tie the Perl functions to the RPC interface.  
+This uses the Sun/Solaris RPC definition (.x) file (or at least an 
+approximation of it).
+
+------------------------
+N.B. concerning IniConf:
+------------------------
+
+IniConf has a few peculiarities.  However, IniConf easily gives me the 
+capabilities I want.  As IniConf is distributed, do not put any spaces
+between the brackets and the section names in the configuration file.
+Also, ensure that all the sections required actually exist.  This can
+cause a fatal error if they do not.  Patching IniConf to work well is
+not too difficult.  I have sent the included patch to the IniConf author.
+The patch should work with version 0.92 of IniConf.

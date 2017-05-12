@@ -1,0 +1,27 @@
+Revision history for Net-DAVTalk
+
+0.14    Mon Mar 20 11:55 2017
+  - fix totally broken regex.  Never install version 13 of anything
+
+0.13    Mon Mar 20 11:42 2017
+  - remove trailing slash from SetURL to avoid double // in fullpath
+
+0.12    Fri Nov 18 00:53 2016
+  - work with attributes with namespaces on them
+
+0.11    Wed Oct 12 13:52 2016
+  - avoid adding default namespace to attributes
+
+0.10    Wed Sep 28 11:18 2016
+  - fix bug where URI wasn't used an redirects were needed
+
+0.09    Tue May  3 09:07 2016
+  - depend on DateTime::Format::ISO8601
+
+0.08    Mon May  2 11:43 2016
+  - Obviously there have been tons of changes up until now.
+  - this release includes GetProps API call and uses it
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

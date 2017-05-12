@@ -1,0 +1,43 @@
+$Id: Changes,v 1.10 2007/10/05 12:13:23 mike Exp $
+
+Revision history for Perl extension Net::Z3950::PQF.
+
+0.04  Fri Oct  5 13:13:20 BST 2007
+	- Add new toSimpleServer() method to Net::Z3950::PQF::Node,
+	  returning the compiled query as a nested set of structures
+	  identical to those produced by the SimpleServer module and
+	  passed as the {RPN} argument into the search handler.
+	- Add new test-suite script, t/3-simpleserver.t, to test the
+	  translation of compiled queries into SimpleServer format.
+
+0.03  Wed Apr 27 11:51:28 BST 2005
+	- Net::Z3950::PQF::TermNode and Net::Z3950::PQF::BooleanNode
+	  are now subclasses of Net::Z3950::PQF::BooleanNode as
+	  documented.  Test script "t/1-node.t" now tests subclass
+	  relationships.
+	- Support for Rset nodes.  Test script "t/1-node.t" now tests
+	  Rset nodes.
+	- Support for parsing @set.  Test script "t/2-parser.t" now
+	  tests @set queries.
+	- Handle multi-word terms enclosed in {curly brackets}.  Test
+	  script "t/2-parser.t" tests this.
+	- Representation of Term nodes has changed due to new private
+	  base-class shared with Rset nodes.  NOTE THAT THIS IS A
+	  BACKWARDS INCOMPATIBLE CHANGE.  Code that used to
+	  inspect $termNode->{term} should now use $termNode->{value}
+
+0.02  Fri Dec 17 17:17:47 GMT 2004
+	- Write the code!  First functional version.
+
+0.01  Fri Dec 17 10:41:04 2004
+	- original version; created by h2xs 1.22 with options
+		-b 5.6.0 -X Net::Z3950::PQF
+
+
+### Still to do:
+	- Correct handling of double-quoted terms, so that backslash
+	  can protect embedded double quotes.
+	- Support for creating and rendering ProxNode.
+	- Support for parsing @prox.
+	- Support for parsing @term.
+

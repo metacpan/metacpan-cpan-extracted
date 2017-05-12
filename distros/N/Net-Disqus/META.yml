@@ -1,0 +1,31 @@
+---
+abstract: 'Disqus.com API access'
+author:
+  - 'Ben van Staveren <madcat@cpan.org>'
+build_requires:
+  Module::Build: 0.38
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Disqus
+requires:
+  Class::Accessor: 0
+  JSON::PP: 0
+  LWP::UserAgent: 0
+  Try::Tiny: 0
+  URI: 0
+  URI::Escape: 0
+  overload: 0
+resources:
+  bugtracker: https://github.com/benvanstaveren/Net-Disqus/issues
+  homepage: http://search.cpan.org/dist/Net-Disqus/
+  repository: git://github.com/benvanstaveren/Net-Disqus.git
+version: 1.19

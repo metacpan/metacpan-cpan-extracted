@@ -1,0 +1,27 @@
+---
+abstract: 'download novel /bbs thread'
+author:
+  - 'abbypan <abbypan@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Novel-Robot
+requires:
+  Encode::Detect::CJK: '0'
+  Encode::Locale: '0'
+  File::Find::Rule: '0'
+  JSON: '0'
+  Moo: '0'
+  Novel::Robot::Packer: '0'
+  Novel::Robot::Parser: '0'
+  Parallel::ForkManager: '0'
+resources:
+  repository: https://github.com/abbypan/Novel-Robot.git
+version: '0.39'
+x_serialization_backend: 'YAML::Tiny version 1.69'

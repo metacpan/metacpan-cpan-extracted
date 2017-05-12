@@ -1,0 +1,555 @@
+#!/usr/bin/perl
+
+# rad-bulk: A tool for bulk testing of Radius AAA servers
+#
+# © 2009 Luis E. Muñoz <luismunoz@cpan.org>
+#
+# $Id: rad-bulk 116 2009-10-24 15:49:59Z lem $
+
+use 5.010;
+use strict;
+use warnings;
+
+our $VERSION = do { sprintf "%0.3f", 1+(q$Revision: 116 $ =~ /\d+/g)[0]/1000};
+
+use Pod::Usage;
+use IO::Select;
+use Time::HiRes;
+use Getopt::Long;
+use Time::Stopwatch;
+use IO::Async::Loop;
+use IO::Socket::INET;
+use Net::Radius::Packet;
+use Net::Radius::Dictionary;
+use Statistics::Descriptive;
+use Digest::MD5 qw/md5_hex/;
+
+my %opt;
+GetOptions(\%opt, qw/
+	   secret=s
+	   server=s
+	   dictionary=s@
+	   authport=i
+	   acctport=i
+	   children=i
+	   count=n
+	   timeout=i
+	   random
+	   help
+	   verbose
+	   /);
+
+pod2usage(verbose => 2, exitval => 0) 
+    if $opt{help};
+
+$opt{authport} ||= 1812;
+$opt{acctport} ||= 1813;
+$opt{children} ||= 1;
+$opt{$_} ||= 3 for qw/timeout/;
+
+pod2usage(verbose => 1, exitval => 1,
+	  message => 'One or more mandatory options are missing')
+    unless $opt{secret} and $opt{server} and $opt{dictionary} and 
+    @{$opt{dictionary}};
+
+$|++;				# Send normal messages quickly...
+
+my $d = new Net::Radius::Dictionary;
+
+foreach (@{$opt{dictionary}})
+{
+    die "Dictionary $_ unreadable: ", ($!||'Check permissions'), "\n" 
+	unless -r $_;
+    $d->readfile($_);
+}
+
+# Read in the packets files
+
+my @packets     = ();
+my $curr_packet = '';
+
+while (<>)
+{
+    my $eop = m/^\s*$/ || eof;
+
+    unless ($eop)
+    {
+	chomp;
+	$curr_packet .= $_ . "\n";
+	next;
+    }
+
+    # Strip all comments from the input
+    while($curr_packet =~ s!(?mx) ^ \s* \# .* $ !!){};
+    $curr_packet =~ s/^\s*[\r\n]+//;
+
+    push @packets, $curr_packet if $curr_packet;
+    $curr_packet = '';
+}
+continue { close ARGV if eof; }
+
+my $pcount = scalar(@packets); 	# How many packet definitions are there...
+
+$opt{count} //= $pcount;
+printf("Read %d packets. Translating to pseudo-packets...\n", $pcount);
+printf("Will process $pcount packets\n");
+
+for my $i (0 .. $#packets)
+{
+    my $packet = $packets[$i];
+    my $p = new Net::Radius::Packet $d;
+
+    if ($packet =~ s/(?x) ^ [\r\n\s]* Accounting [\r\n]+ //)
+    {
+	$p->set_code('Accounting-Request');
+    }
+    elsif ($packet =~ s/(?x) ^ [\r\n\s]* Authentication [\r\n]+ //)
+    {
+	$p->set_code('Access-Request');
+    }
+    else
+    {
+	die "Found unknown packet spec:\n$packet\n";
+    }
+
+    for my $s (split(m/[\r\n]+/, $packet))
+    {
+	my ($a, $val) = split(m/=/, $s, 2);
+	my $vendor = undef;
+	if ($a =~ m/\./)
+	{
+	    ($vendor, $a) = split(m/\./, $a, 2);
+	}
+	if ($vendor)
+	{
+	    $p->set_vsattr($vendor, $a => $val);
+	}
+	else
+	{
+	    $p->set_attr($a => $val);
+	}
+    }
+
+    my $auth = substr(md5_hex($$ . rand(4096)), 0, 16);
+    $p->set_authenticator($auth);
+    $p->set_identifier(int rand(256));
+
+    if ($p->code eq 'Access-Request')
+    {
+	my $pass = ($p->attr('User-Password') || md5_hex($$ . rand(4096)));
+	$p->set_password($pass, $opt{secret});
+    }
+
+    $packets[$i] = $p;
+}
+
+# Setup the statistical collectors...
+
+my %stats = ();
+
+$stats{total} = new Statistics::Descriptive::Sparse->new();
+
+# At this point, we're ready to begin testing. Setup the IO::Async::Loop
+
+my $loop = new IO::Async::Loop ();
+
+# This is the function implementing the Radius client, running at each
+# child
+
+sub child_radius_client
+{
+    my $p = shift;		# A pseudo-packet
+    my $pdata = undef;		# Packed request packet
+    my $r = undef;		# The response
+    my $reply = undef;		# The raw reply
+    my $port = 0;		# Where to send the requests?
+
+    tie my $time, 'Time::Stopwatch';
+    my $diff = 0;
+
+    # Find out the time offset of the tie access
+    $time = 0;
+    $diff -= $time;
+    $time = 0;
+
+    if ($p->code eq 'Access-Request')
+    {
+	$pdata = $p->pack;
+	$port = $opt{authport};
+    }
+    else
+    {
+	unless ($p->attr('Acct-Session-Id'))
+	{
+	    $p->set_attr('Acct-Session-Id' => $$ . ":" 
+			 . $p->authenticator . "/" . time());
+	}
+	$pdata = auth_resp($p->pack, $opt{secret}, 1);
+	$port = $opt{acctport};
+    }
+
+    # This is needed to recover the resulting authenticator
+    $p = Net::Radius::Packet->new($d, $pdata);
+
+    my $sock = IO::Socket::INET->new
+	(
+	 PeerAddr	=> $opt{server},
+	 PeerPort	=> $port,
+	 Proto	        => 'UDP',
+	 );
+
+    unless ($sock)
+    {
+	die "Cannot create socket: $!\n";
+	return $diff += $time;
+    }
+
+    unless ($sock->send($pdata))
+    {
+	die "Failed to send packet: $!\n";
+	return $diff += $time;
+    }
+
+    my $select = new IO::Select $sock;
+
+    unless ($select)
+    {
+	die "Failed to create IO::Select object\n";
+	return $diff += $time;
+    }
+
+    if ($select->can_read($opt{timeout}))
+    {
+	unless ($sock->recv($reply, 8192))
+	{
+	    die "Failed to recv(): $!\n";
+	    return $diff += $time;
+	}
+    }
+    else
+    {
+	die "Timeout!\n";
+	return $diff += $time;
+    }
+
+    if ($reply)
+    {
+	unless (auth_req_verify($reply, $opt{secret}, $p->authenticator))
+	{
+	    die "Invalid authenticator in response\n";
+	    return $diff += $time;
+	}
+
+	unless (eval { $r = Net::Radius::Packet->new($d, $reply) })
+	{
+	    die "Failed to decode reply\n";
+	    return $diff += $time;
+	}
+	
+	if ($r->identifier ne $p->identifier)
+	{
+	    die "Wrong identifier in response\n";
+	    return $diff += $time;
+	}
+    }
+    else
+    {
+	die "No valid response\n";
+	return $diff += $time;
+    }
+
+    $diff += $time;
+    return ($p->code, $r->code, $diff);
+}
+
+# These functions handle the logging of the results
+
+my $processed_requests = 0;
+
+sub result_handler
+{
+    my ($code, @val) = @_;
+
+    if ($code eq 'return')
+    {
+	$stats{$val[0]}->{$val[1]} = Statistics::Descriptive::Sparse->new()
+	    unless exists $stats{$val[0]}->{$val[1]};
+	$stats{total}->add_data($val[2]);
+	$stats{$val[0]}->{$val[1]} = Statistics::Descriptive::Sparse->new()
+	    unless exists $stats{$val[0]}->{$val[1]};
+	$stats{$val[0]}->{total} = Statistics::Descriptive::Sparse->new()
+	    unless exists $stats{$val[0]}->{total};
+	$stats{$val[0]}->{$val[1]}->add_data($val[2]);
+	$stats{$val[0]}->{total}->add_data($val[2]);
+    }
+    else
+    {
+	$stats{errors}->{$val[0]} = Statistics::Descriptive::Sparse->new()
+	    unless exists $stats{errors}->{$val[0]};
+
+	$stats{errors}->{$val[0]}->add_data(0);
+
+	warn "Error: $val[0]\n";
+    }
+
+    if (++$processed_requests % 1000 == 0
+	and $opt{verbose})
+    {
+	warn "\n$processed_requests requests processed (", 
+	scalar(localtime), 
+	")\n";
+    }
+}
+
+my $client = $loop->detach_code
+(
+ code       => \&child_radius_client,
+ workers    => $opt{children},
+ marshaller => 'storable',
+ );
+
+if ($opt{random})
+{
+    for my $i (1 .. $opt{count})
+    {
+	$client->call
+	    (
+	     args      => [ $packets[ int rand($pcount) ] ],
+	     on_result => \&result_handler,
+	     );
+    }
+}
+else
+{
+    for my $i (1 .. $opt{count})
+    {
+	$client->call
+	    (
+	     args      => [ $packets[ $i % $pcount ] ],
+	     on_result => \&result_handler,
+	     );
+    }
+}
+
+print "Test run starting now...\n";
+
+# Time the total run time
+tie my $t_total, 'Time::Stopwatch';
+my $t_diff = 0;
+$t_total = 0;
+$t_diff -= $t_total;
+$t_total = 0;
+
+while ($processed_requests < $opt{count}) { $loop->loop_once(0) };
+
+$t_diff += $t_total;
+
+print "Test run finished...\n\n\n";
+
+print <<EOF;
+Radius Bulk Test Result Report
+Children:                    $opt{children}
+Requested Packet Count:      $opt{count}
+---------------------------------------------------------
+EOF
+
+for my $code (sort keys %stats)
+{
+    next if $code eq 'total';
+    next if $code eq 'errors';
+    print $code, "\n";
+    for my $resp (sort keys %{$stats{$code}})
+    {
+	printf("  %20s %10s %s\n", $resp, "Count", 
+	       $stats{$code}->{$resp}->count() // 'undef');
+	printf("  %20s %10s %s\n", '', "Mean", 
+	       $stats{$code}->{$resp}->mean() // 'undef');
+	printf("  %20s %10s %s\n", '', "St.Dev.", 
+	       $stats{$code}->{$resp}->standard_deviation() // 'undef');
+	printf("  %20s %10s %s\n\n", '', "Max", 
+	       $stats{$code}->{$resp}->max() // 'undef');
+    }
+}
+
+print <<EOF;
+---------------------------------------------------------
+            Errors Reported by the Client
+---------------------------------------------------------
+
+EOF
+    ;
+
+for my $err (sort keys %{$stats{errors}})
+{
+    printf("%20s   %10s %s\n", $err, "Count", 
+	   $stats{errors}->{$err}->count() // 'undef');
+}
+
+print <<EOF;
+---------------------------------------------------------
+Totals
+---------------------------------------------------------
+EOF
+    ;
+
+printf("%20s   %10s %s\n", ' ' x 20, "Count", 
+       $stats{total}->count() // 'undef');
+printf("%20s   %10s %s\n", ' ' x 20, "Mean", 
+       $stats{total}->mean() // 'undef');
+printf("%20s   %10s %s\n", ' ' x 20, "St.Dev.", 
+       $stats{total}->standard_deviation() // 'undef');
+printf("%20s   %10s %s\n", ' ' x 20, "Max", 
+       $stats{total}->max() // 'undef');
+
+print "\n";
+print 'Overall running time: ' , $t_diff, "\n";
+print 'Overall requests/sec: ', $opt{count} / $t_diff, "\n";
+
+__END__
+
+=head1 NAME
+
+rad-bulk - A command line Radius bulk-testing client
+
+=head1 SYNOPSIS
+
+    rad-bulk --secret secret --server server --dictionary dictfile ...
+    [--timeout n] [--authport port] [--acctport port] [--help]
+    [--children n] [--count n] [--random] [--verbose] packet-file ...
+
+=head1 DESCRIPTION
+
+rad-bulk reads in one or more packet files containing the
+specification of the packets to send, and then proceed to flood the
+target server with a total of C<count> requests, coming from up to
+C<children> number of children.
+
+Statistics are then printed, depicting the number of packets sent and
+some general timing statistics that allow for the measurement of the
+server's performance.
+
+The packets are either Access-Request or Accounting-Request. The
+actual attributes are encoded in one or more packet files, allowing
+for some control in the specific work-load to be imposed in the target
+server.
+
+=over
+
+=item B<--children n>
+
+How many children to C<fork()> in order to send requests in parallel
+to the Radius server. This parameter can be used to increase the
+number of concurrent requests being sent to the server, to test in
+hight load scenarios.
+
+Defaults to 1 child, which is useful to verify the test input
+parameters.
+
+=item B<--count n>
+
+How many packets to process. Defaults to the amount of packets loaded
+via the packet file.
+
+=item B<--timeout t>
+
+How much a child must wait for an answer before failing, in
+seconds. Defaults to 3 seconds.
+
+=item B<--server server>
+
+Surprisingly, the server address to which to send the RADIUS packets.
+
+=item B<--acctport port> and B<--authport port>
+
+The accounting and authorization ports, used for Accounting-Request
+and Access-Request respectively. Defaults to 1812 and 1813, which are
+the standard ports for these purposes.
+
+=item B<--secret secret>
+
+The RADIUS shared secret used for packet authentication.
+
+=item B<--prompt [attribute]>
+
+Prompt the user and add a password-encoded RADIUS attribute to the
+request. By default, this works in the RADIUS attribute 2.
+
+=item B<--dictionary dictfile...>
+
+Specifies one or more dictionary files to use for crafting the Radius
+packets and for decoding the eventual responses. Multiple files can be
+specified, causing the dictionaries to be loaded in order.
+
+=item B<--help>
+
+Shows this documentation, then exits.
+
+=item B<--random>
+
+Send a random sample of packets from the input packet files. By
+default, the requested count of packets is sent in order, from the
+packet file.
+
+=item B<--verbose>
+
+Send a "." to STDOUT each time a packet is sent, and a "\b" each time
+an answer is received. Additionally, output character codes for each
+error found.
+
+Also, provide feedback about test progress.
+
+=back
+
+=head2 Packet File Format
+
+Packets are specified with a keyword (C<Authentication> or
+C<Accounting>) and a number of input lines, with each one specifying
+an attribute. Blank lines delimit packets. Lines whose first non-blank
+character is C<#> are ignored as comments.
+
+Radius attributes are as follows:
+
+  [vendor.]attribute=value
+
+Where B<vendor> and B<attribute> are the labels specified in the
+dictionary.
+
+This is an example of a valid packet specification:
+
+    # A simple auth packet
+    Authentication
+    User-Name=lem
+    User-Password=Sikrit
+    NAS-IP-Address=127.0.0.1
+    Service-Type=PPP
+    
+    # A simple accounting packet. Note that
+    # Acct-Session-Id will be provided automatically
+    Accounting
+    User-Name=lem
+    NAS-IP-Address=127.0.0.1
+
+Packet encoding is done as expected, depending on the type of packet
+being processed. Required attributes such as the Id and Authenticator
+are automatically provided.
+
+Packet response authentication is checked for correctness. Invalid
+packets are logged and reported.
+
+=head1 LICENSE AND WARRANTY
+
+This code and all accompanying software comes with NO WARRANTY. You
+use it at your own risk.
+
+This code and all accompanying software can be used freely under the
+terms of the GNU General Public License version 2.
+
+=head1 AUTHOR
+
+Luis E. Muñoz E<lt>luismunoz@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+perl(1), Getopt::Long(3), Net::Radius::Packet(3), Net::Radius::Dictionary(3).
+
+=cut

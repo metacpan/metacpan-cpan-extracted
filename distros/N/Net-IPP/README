@@ -1,0 +1,139 @@
+Perl IPP API
+============
+
+This API can be used to send Internet Printing Protocol requests and receive
+the corresponding responses.
+
+Currently not implemented is the collection syntax as specified in [RFC 3382].
+A Warning will appear if an IPP response contains a collection attribute. 
+All other IPP related Operations and Types should work as described in the RFCs.
+
+You can use this API in two different ways:
+
+1. build your own IPP requests: This is the low level access to the API. 
+   Principally you look at the RFC which attributes a specific IPP request requires,
+   encode all required and optional attributes as shown in sample/ipptest.pl and let
+   Net::IPP::IPPRequest::ippRequest($request) do the rest.
+
+2. Use the functions in Net::IPP::IPPMethods: This is the high level access to the API.
+   Some IPP Operations have already been implemented in IPPMethods. You can for example
+   use getPrinterAttributes($url) to get all attributes of a printer object, and you only
+   need to know the URL of the printer. For more examples read/run the programs
+   sample/printerAttributes.pl and sample/showJobs.pl.
+   
+You can of course mix both methods as the functions in IPPMethods are just wrappers around 
+ippRequest.
+
+Every important line in the sample programs is commented, so you really should read them...
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+RUNNING TESTS
+
+To run all tests in the t/ directory type the following:
+
+   make test
+
+For more details while running the tests type:
+   
+   make TEST_VERBOSE=1 test
+
+RUNNING SAMPLES
+
+After installation all programs in the sample directory should run
+without problems. To run the sample programs without installing this
+package use the blib module:
+
+   perl Makefile.PL
+   make
+   cd samples
+   perl -Mblib sampleprogram.pl [arguments]
+
+STRUCTURE
+
+              +------------+
+              | IPPMethods |
+              +------------+
+                     ^
+                     |
+              +------------+
+              | IPPRequest |
+              +------------+
+                     ^
+                     |
+       +-------------+---+-----------+
+       |                 |           |
++--------------+    +---------+   +-----+
+| IPPAttribute |    | IPPUtil |   | IPP |
++--------------+    +---------+   +-----+
+
+WHAT TO DO, IF
+
+1. you get the error "Error: Unknown attribute xyz used in request.":
+
+ The API did not find a default IPP type for attribute xyz in the hash 
+ Net::IPP::IPPAttribute::attributeTypes.
+
+ Method 1 (workaround): Look in [RFC 2911] which type attribute xyz has. It may
+          f.e. have the type XYZ. If you used something like 
+               "xyz" => "value",
+          in the IPP request before, substitute that with 
+               "xyz" => { &TYPE => &XYZ,
+                         &VALUE => "value" },
+                
+ Method 2 (permanent solution): Find the attribute type like in Method 1. 
+          Insert the line 
+              "xyz" => &XYZ,
+          into the hash Net::IPP::IPPAttribute::attributeTypes.
+
+2. you get the warning "Unknown Value type 0x88 for key "xyz". Performing no 
+   transformation.":
+
+ While de- or encoding a unknown IPP type was encountered. To permanently add 
+ this type to the API search for the name of this type in the RFCs and add this
+ type to the IPP type in IPP.pm. You also have to write transform methods for 
+ this IPP type. All value transformations between IPP byte encoding and Perl 
+ encoding are done in transformValue in IPPAttribute.pm. A additional testcase 
+ in t/transform.t would be nice, too.
+
+ Alternatively you can ignore this warning if you don't need the value of 
+ attribute xyz or if the value does not need to be transformed.
+
+3. you get the error "ERROR: IPP response is not RFC conform.":
+
+ The length check in testLengths() went wrong, the decoding became probably 
+ totally confused some bytes earlier. 
+
+ Bad Luck, the printer encoded the IPP response wrong (or you just found a bug 
+ in this API). This error simply says that a length field contained a greater 
+ length than the remaining bytes in the response. The API became probably 
+ totally confused much earlier than the offset states. 
+
+ If the printer is from HP you can try to run the same IPP request with the 
+ HP_BUGFIX option turned on. 
+
+4. you get the warning "WARNING: Collection Syntax not supported. Attribute 
+   xyz will have invalid value.":
+   
+ Implement the collection syntax ;-)
+
+DEPENDENCIES
+
+LWP: IPPRequest.pm uses LWP::UserAgent to send the HTTP Request.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2004 Matthias Hilbig <bighil@cpan.org>
+All rights reserved.
+ 
+This program is free software; you may redistribute it and/or modify it
+under the same terms as Perl itself.
+ 
+

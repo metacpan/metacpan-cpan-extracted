@@ -1,0 +1,75 @@
+{
+   "abstract" : "This package is a pipeline wrapper for BAMSurgeon (https://github.com/adamewing/bamsurgeon) and provides additional functionality for the simulation of copy number abberations in the tumour.",
+   "author" : [
+      "Christopher Lalansingh  <clalansingh@oicr.on.ca>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "NGS-Tools-BAMSurgeon",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Path" : "0",
+            "File::ShareDir" : "1.00",
+            "FindBin" : "0",
+            "HPCI" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util" : "0",
+            "Params::Validate" : "0",
+            "Pod::Usage" : "0",
+            "YAML" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "NGS::Tools::BAMSurgeon" : {
+         "file" : "lib/NGS/Tools/BAMSurgeon.pm",
+         "version" : "v1.0.0"
+      },
+      "NGS::Tools::BAMSurgeon::Germline" : {
+         "file" : "lib/NGS/Tools/BAMSurgeon/Germline.pm"
+      },
+      "NGS::Tools::BAMSurgeon::Helper" : {
+         "file" : "lib/NGS/Tools/BAMSurgeon/Helper.pm"
+      },
+      "NGS::Tools::BAMSurgeon::Merge" : {
+         "file" : "lib/NGS/Tools/BAMSurgeon/Merge.pm"
+      },
+      "NGS::Tools::BAMSurgeon::Somatic" : {
+         "file" : "lib/NGS/Tools/BAMSurgeon/Somatic.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v1.0.0",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

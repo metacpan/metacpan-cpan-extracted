@@ -1,0 +1,4 @@
+954_perl-5.10.0.tar.gz.torrent | single file, multiple tiers, udp
+Perl 5.10 source | initially seeded by acme
+http://torrents.thepiratebay.org/3938859/perl-5.10.0.tar.gz.3938859.TPB.torrent
+http://use.perl.org/articles/07/12/18/1836229.shtml?tid=34

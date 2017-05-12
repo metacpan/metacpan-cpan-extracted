@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+manifest
+readme
+t/Net-UploadMirror.t
+lib/Net/UploadMirror.pm
+meta.yml                                 Module meta-data (added by MakeMaker)

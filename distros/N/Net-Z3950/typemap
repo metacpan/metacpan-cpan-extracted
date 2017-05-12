@@ -1,0 +1,35 @@
+# $Header: /home/cvsroot/NetZ3950/typemap,v 1.1.1.1 2001/02/12 10:53:54 mike Exp $ 
+
+# We need this for three reasons.
+#
+# 1. To provide the trivial mappings for types like "const char *"
+# (which clearly behaves the same as a "char *", so why isn't it in
+# the default typemap?) and COMSTACK (on opaque pointer).
+#
+# 2. To provide a mapping for the "databuf" type, a simple
+# counted-length data buffer (we can't use a simple char* as it chokes
+# on NUL characters.)
+#
+# 3. To provide support for the nmchar* (maybe-null char*) type.  This
+# behaves the same as boring old char* except that it's legitimate to
+# pass an undefined value, which yields a null pointer.
+
+# basic C types
+const char *	T_PV
+COMSTACK	T_PTR
+databuf		T_DATABUF
+mnchar *	T_MNPV
+
+#############################################################################
+INPUT
+T_DATABUF
+	$var = SVstar2databuf($arg)
+T_MNPV
+	$var = SVstar2MNPV($arg)
+
+#############################################################################
+OUTPUT
+T_DATABUF
+	sv_setpvn($arg, $var.data, $var.len);
+T_MNPV
+	NOT IMPLEMENTED

@@ -1,0 +1,20 @@
+
+Note:       Sometimes there are notes at the beginning now.
+Name:       Blow, Joe
+Handle:     JBLOW-ARIN
+Company:    Foobar, Inc.
+Address:    18300 Ventura Blvd
+Address:    Suite 420
+City:       Tarzana
+StateProv:  CA
+PostalCode: 91356
+Country:    US
+Comment:
+RegDate:    2004-05-06
+Updated:    2004-05-18
+Phone:      +1-800-555-8080
+Phone:      +1-800-555-2443
+Email:      jblow@foobar.com
+
+# ARIN WHOIS database, last updated 2006-10-08 19:10
+# Enter ? for additional hints on searching ARIN's WHOIS database.

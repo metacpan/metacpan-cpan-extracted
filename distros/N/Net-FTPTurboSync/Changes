@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::FTPTurboSync.
+
+0.01  Sun Aug 14 13:49:02 2011
+	- original version; created by h2xs 1.23 with options
+		-AX -n Net::FTPTurboSync
+

@@ -1,0 +1,17 @@
+
+How to setup the spooler for accepting mails?
+=============================================
+
+1.) First of all, you need to configure your sendmail for passing mails
+    to the spooler. There are two ways to do it:
+
+      a) Configure a single email address for receiving mails.
+
+         In /etc/aliases insert something like
+
+		mysms: "| /usr/bin/smsmail -d 02376723@sms"
+
+         After executing the command "newaliases", any mail to
+         user "mysms" will be forwarded to the script /usr/bin/smsmail.
+
+     b) Configure a complete domain for receiving 

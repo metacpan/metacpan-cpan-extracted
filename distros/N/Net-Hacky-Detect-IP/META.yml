@@ -1,0 +1,31 @@
+---
+abstract: 'Hackily try different methods of attaining local system IPs'
+author:
+  - 'Paul G Webster <daemon@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Hacky-Detect-IP
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Capture::Tiny: '0.40'
+  File::Temp: '0.2000'
+  IO::Socket::IP: '0.00'
+  Try::Tiny: '0.20'
+  perl: '5.006'
+resources:
+  bugtracker: https://gitlab.com/paul-g-webster/PL-Net-Hacky-Detect-IP/issues
+  repository: https://gitlab.com/paul-g-webster/PL-Net-Hacky-Detect-IP.git
+version: '0.023'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

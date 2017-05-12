@@ -1,0 +1,33 @@
+---
+abstract: "(** DEPRECATED **) Interface to Google's Blogger service."
+author:
+  - 'Egor Shipovalov <kogdaugodno@gmail.com>'
+build_requires:
+  Test::Deep: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Google-Blogger
+provides:
+  Net::Google::Blogger:
+    file: lib/Net/Google/Blogger.pm
+    version: 0.09
+  Net::Google::Blogger::Blog:
+    file: lib/Net/Google/Blogger/Blog.pm
+    version: 0.09
+  Net::Google::Blogger::Blog::Entry:
+    file: lib/Net/Google/Blogger/Blog/Entry.pm
+    version: 0.09
+requires:
+  Any::Moose: 0
+  HTTP::Request::Common: 0
+  LWP::UserAgent: 0
+  XML::Simple: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.09

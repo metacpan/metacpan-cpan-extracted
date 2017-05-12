@@ -1,0 +1,31 @@
+---
+abstract: perl API for http://eboks.dk/
+author:
+  - 'Dmitry Karasik <dmitry@karasik.eu.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Eboks
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DateTime: 0
+  Digest::SHA: 0
+  Getopt::Long: 0
+  IO::Lambda: 1.26
+  LWP: 0
+  MIME::Entity: 0
+  XML::Simple: 0
+  perl: 5.01
+resources:
+  repository: http://github.com/dk/Net-Eboks
+version: 0.04

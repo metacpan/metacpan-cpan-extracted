@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ticket-bins type="array">
+  <ticket-bin>
+    <default type="boolean" nil="true"/>
+    <id type="integer">48889</id>
+    <name>Open tickets</name>
+    <position type="integer">1</position>
+    <project-id type="integer">35918</project-id>
+    <query>state:open</query>
+    <shared type="boolean">true</shared>
+    <tickets-count type="integer">2</tickets-count>
+    <updated-at type="datetime">2009-08-21T10:02:21Z</updated-at>
+    <user-id type="integer">67166</user-id>
+  </ticket-bin>
+  <ticket-bin>
+    <default type="boolean" nil="true"/>
+    <id type="integer">48890</id>
+    <name>Resolved tickets</name>
+    <position type="integer">2</position>
+    <project-id type="integer">35918</project-id>
+    <query>state:resolved</query>
+    <shared type="boolean">true</shared>
+    <tickets-count type="integer">0</tickets-count>
+    <updated-at type="datetime">2009-08-21T10:02:21Z</updated-at>
+    <user-id type="integer">67166</user-id>
+  </ticket-bin>
+  <ticket-bin>
+    <default type="boolean" nil="true"/>
+    <id type="integer">48891</id>
+    <name>This week's tickets</name>
+    <position type="integer">3</position>
+    <project-id type="integer">35918</project-id>
+    <query>created:'this week'</query>
+    <shared type="boolean">true</shared>
+    <tickets-count type="integer">1</tickets-count>
+    <updated-at type="datetime">2009-08-21T10:02:21Z</updated-at>
+    <user-id type="integer">67166</user-id>
+  </ticket-bin>
+</ticket-bins>

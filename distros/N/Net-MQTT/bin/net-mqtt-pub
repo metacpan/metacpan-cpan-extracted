@@ -1,0 +1,218 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+# ABSTRACT: Perl script for publishing to an MQTT topic
+# PODNAME: net-mqtt-pub
+
+
+use strict;
+use Net::MQTT::Constants;
+use Net::MQTT::Message;
+use IO::Select;
+use IO::Socket::INET;
+use Time::HiRes;
+use Getopt::Long;
+use Pod::Usage;
+
+my $help;
+my $man;
+my $verbose = 0;
+my $host = '127.0.0.1';
+my $port = 1883;
+my $keep_alive_timer = 120;
+my $retain;
+my $client_id;
+GetOptions('help|?' => \$help,
+           'man' => \$man,
+           'verbose+' => \$verbose,
+           'host=s' => \$host,
+           'port=i' => \$port,
+           'keepalive=i' => \$keep_alive_timer,
+           'retain' => \$retain,
+           'client_id|client-id|C=s' => \$client_id,
+          ) or pod2usage(2);
+pod2usage(1) if ($help);
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+my $topic = shift || pod2usage(2); # need a topic
+
+my $socket =
+  IO::Socket::INET->new(PeerAddr => $host.':'.$port,
+                        Timeout => $keep_alive_timer,
+                       ) or die "Socket connect failed: $!\n";
+
+my $stdin_buf = '';
+my $sock_buf = '';
+my $mid = 1;
+my $next_ping;
+my $got_ping_response = 1;
+my @connect = ( message_type => MQTT_CONNECT,
+                keep_alive_timer => $keep_alive_timer );
+push @connect, client_id => $client_id if (defined $client_id);
+send_message($socket, @connect);
+my $msg = read_message($socket, $sock_buf) or die "No ConnAck\n";
+print 'Received: ', $msg->string, "\n" if ($verbose >= 2);
+
+if (@ARGV) {
+  $msg = join ' ', @ARGV;
+  send_message($socket,
+               message_type => MQTT_PUBLISH,
+               retain => $retain,
+               topic => $topic,
+               message => $msg);
+  #$msg = read_message($socket, $sock_buf) or die "No PubAck\n";
+  #print 'Received: ', $msg->string, "\n" if ($verbose >= 2);
+  exit;
+}
+
+while (1) {
+  $msg = read_message($socket, $sock_buf, $stdin_buf);
+  if ($msg) {
+    if (ref $msg) {
+      if ($msg->message_type == MQTT_PINGRESP) {
+        $got_ping_response = 1;
+        print 'Received: ', $msg->string, "\n" if ($verbose >= 3);
+      } else {
+        print 'Received: ', $msg->string, "\n" if ($verbose >= 2);
+      }
+    } else {
+      send_message($socket,
+                   message_type => MQTT_PUBLISH,
+                   retain => $retain,
+                   topic => $topic,
+                   message => $msg);
+    }
+  }
+  if (Time::HiRes::time > $next_ping) {
+    die "Ping Response timeout.  Exiting\n" unless ($got_ping_response);
+    send_message($socket, message_type => MQTT_PINGREQ);
+  }
+}
+
+sub send_message {
+  my $socket = shift;
+  my $msg = Net::MQTT::Message->new(@_);
+  print 'Sending: ', $msg->string, "\n" if ($verbose >= 2);
+  $msg = $msg->bytes;
+  syswrite $socket, $msg, length $msg;
+  print dump_string($msg, 'Sent: '), "\n\n" if ($verbose >= 3);
+  $next_ping = Time::HiRes::time + $keep_alive_timer;
+}
+
+sub read_message {
+  my $socket = shift;
+  my $select = IO::Select->new($socket);
+  $select->add(\*STDIN) if (@_ > 1);
+  my $timeout = $next_ping - Time::HiRes::time;
+  do {
+    my $mqtt = Net::MQTT::Message->new_from_bytes($_[0], 1);
+    return $mqtt if (defined $mqtt);
+    return $1 if (@_ > 1 && $_[1] =~ s/^(.*?)\n//);
+    my @handles = $select->can_read($timeout) or return;
+    $timeout = $next_ping - Time::HiRes::time;
+    foreach my $handle (@handles) {
+      if ($handle eq $socket) {
+        my $bytes = sysread $socket, $_[0], 2048, length $_[0];
+        unless ($bytes) {
+          die "Socket closed ", (defined $bytes ? 'gracefully' : 'error'), "\n";
+        }
+        print "Receive buffer: ", dump_string($_[0], '   '), "\n\n"
+          if ($verbose >= 3);
+      } else {
+        my $bytes = sysread STDIN, $_[1], 2048, length $_[1];
+        exit unless ($bytes);
+      }
+    }
+  } while ($timeout > 0);
+  return;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+net-mqtt-pub - Perl script for publishing to an MQTT topic
+
+=head1 VERSION
+
+version 1.163170
+
+=head1 SYNOPSIS
+
+  # messages one per line on stdin
+  echo message | net-mqtt-pub [options] topic
+
+  # message as command line arguments
+  net-mqtt-pub [options] topic this is a message
+
+=head1 DESCRIPTION
+
+This script publishes each line from stdin as an MQTT message on the
+given topic.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-help>
+
+Print a brief help message.
+
+=item B<-man>
+
+Print the manual page.
+
+=item B<-host>
+
+The host running the MQTT service.  The default is C<127.0.0.1>.
+
+=item B<-port>
+
+The port of the running MQTT service.  The default is 1883.
+
+=item B<-client-id>
+
+The client id to use in the connect message.  The default is
+'NetMQTTpm' followed by the process id of the process.
+
+=item B<-verbose>
+
+Include more verbose output.  Without this option the script only
+outputs errors
+
+=item B<-keepalive NNN>
+
+The keep alive timer value.  Defaults to 120 seconds.  For simplicity,
+it is also currently used as the connection timeout.
+
+=item B<-retain>
+
+Set the retain flag on the message.  Default is not set.
+
+=back
+
+=head1 SEE ALSO
+
+Net::MQTT::Message(3)
+
+=head1 DISCLAIMER
+
+This is B<not> official IBM code.  I work for IBM but I'm writing this
+in my spare time (with permission) for fun.
+
+=head1 AUTHOR
+
+Mark Hindess <soft-cpan@temporalanomaly.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Mark Hindess.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

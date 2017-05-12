@@ -1,0 +1,21 @@
+NAME
+    NETIOM - Interact with NETIOM™ devices.
+
+SYNOPSIS
+        use NETIOM;
+
+DESCRIPTION
+    NETIOM is a stand alone WEB server capable of monitoring 16 digital and
+    4 analogue inputs. It can also control 16 digital outputs.
+
+AUTHOR
+    Adam Clarke <adamc@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2010. Adam Clarke.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

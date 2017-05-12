@@ -1,0 +1,53 @@
+---
+abstract: 'A wrapper class for Face API of Azure Cognitive Services'
+author:
+  - 'ytnobody <ytnobody@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Azure-CognitiveServices-Face
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::Azure::CognitiveServices::Face:
+    file: lib/Net/Azure/CognitiveServices/Face.pm
+    version: '0.01'
+  Net::Azure::CognitiveServices::Face::Base:
+    file: lib/Net/Azure/CognitiveServices/Face/Base.pm
+  Net::Azure::CognitiveServices::Face::Face:
+    file: lib/Net/Azure/CognitiveServices/Face/Face.pm
+  Net::Azure::CognitiveServices::Face::FaceList:
+    file: lib/Net/Azure/CognitiveServices/Face/FaceList.pm
+  Net::Azure::CognitiveServices::Face::Person:
+    file: lib/Net/Azure/CognitiveServices/Face/Person.pm
+  Net::Azure::CognitiveServices::Face::PersonGroup:
+    file: lib/Net/Azure/CognitiveServices/Face/PersonGroup.pm
+requires:
+  Carp: '0'
+  Class::Accessor::Lite: '0'
+  HTTP::Request: '0'
+  JSON: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  URI: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/ytnobody/p5-Net-Azure-CognitiveServices-Face/issues
+  homepage: https://github.com/ytnobody/p5-Net-Azure-CognitiveServices-Face
+  repository: git://github.com/ytnobody/p5-Net-Azure-CognitiveServices-Face.git
+version: '0.01'

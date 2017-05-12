@@ -1,0 +1,24 @@
+Revision history for Perl extension Net::SMS::SMSPilot.
+
+0.01  Sun Apr 17 17:27:37 2011
+	Initial functional release.
+	
+0.02  Mon Apr 18 21:45:48 2011
+	Added methods:
+		* set_sender
+		* apikey_info
+		* balance
+		* check
+
+0.03  Tue Apr 19 20:53:06 2011
+	In the constructor adds the ability to change the coding and managing a secure connection.
+	Rewrote the _query procedure.
+
+0.04  Tue Apr 19 20:53:06 2011
+	Added ability to specify the sender of constructor.
+	After using the method send(), now available fields of the object "balance" and "cost".
+	
+0.05  Thu Apr 21 03:52:29 2011
+	Code optimization.
+	Revision description.
+	

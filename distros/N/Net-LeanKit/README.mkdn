@@ -1,0 +1,248 @@
+# NAME
+
+Net::LeanKit - A perl library for Leankit.com
+
+# VERSION
+
+version 2.001
+
+# SYNOPSIS
+
+    use Net::LeanKit;
+    my $lk = Net::LeanKit->(email => 'user\@.mail.com',
+                            password => 'pass',
+                            account => 'my company');
+    $lk->getBoards;
+
+# ATTRIBUTES
+
+## email
+
+Login email
+
+## password
+
+Password
+
+## account
+
+Account name in which your account is under, usually a company name.
+
+# METHODS
+
+## getBoards
+
+Returns list of boards
+
+## getNewBoards
+
+Returns list of latest created boards
+
+## getBoard
+
+Gets leankit board by id
+
+## getBoardByName
+
+Finds a board by name
+
+## getBoardIdentifiers
+
+Get board identifiers
+
+## getBoardBacklogLanes
+
+Get board back log lanes
+
+## getBoardArchiveLanes
+
+Get board archive lanes
+
+## getBoardArchiveCards
+
+Get board archive cards
+
+## getNewerIfExists
+
+Get newer board version if exists
+
+## getBoardHistorySince
+
+Get newer board history
+
+## getBoardUpdates
+
+Get board updates
+
+## getCard
+
+Get specific card for board
+
+## getCardByExternalId
+
+Get specific card for board by an external id
+
+## addCard
+
+Add a card to the board/lane specified. The card hash usually contains
+
+    { TypeId => 1,
+      Title => 'my card title',
+      ExternalCardId => DATETIME,
+      Priority => 1
+    }
+
+## addCards
+
+Add multiple cards to the board/lane specified. The card hash usually contains
+
+    { TypeId => 1,
+      Title => 'my card title',
+      ExternCardId => DATETIME,
+      Priority => 1
+    }
+
+## moveCard
+
+Moves card to different lanes
+
+## moveCardByExternalId
+
+Moves card to different lanes by externalId
+
+## moveCardToBoard
+
+Moves card to another board
+
+## updateCard
+
+Update a card
+
+## updateCardFields
+
+Update fields in card
+
+## getComments
+
+Get comments for card
+
+## addComment
+
+Add comment for card
+
+## addCommentByExternalId
+
+Add comment for card
+
+## getCardHistory
+
+Get card history
+
+## searchCards
+
+Search cards, options is a hashref of search options
+
+Eg,
+
+    searchOptions = {
+        IncludeArchiveOnly: false,
+        IncludeBacklogOnly: false,
+        IncludeComments: false,
+        IncludeDescription: false,
+        IncludeExternalId: false,
+        IncludeTags: false,
+        AddedAfter: null,
+        AddedBefore: null,
+        CardTypeIds: [],
+        ClassOfServiceIds: [],
+        Page: 1,
+        MaxResults: 20,
+        OrderBy: "CreatedOn",
+        SortOrder: 0
+    };
+
+## getNewCards
+
+Get latest added cards
+
+## deleteCard
+
+Delete a single card
+
+## deleteCards
+
+Delete batch of cards
+
+## getTaskBoard
+
+Get task board
+
+## addTask
+
+Adds task to card
+
+## updateTask
+
+Updates task in card
+
+## deleteTask
+
+Deletes task
+
+## getTaskBoardUpdates
+
+Get latest task additions/changes
+
+## moveTask
+
+Moves task to different lanes
+
+## getAttachmentCount
+
+Get num of attachments for card
+
+## getAttachments
+
+Get list of attachments
+
+## getAttachment
+
+Get single attachment
+
+## deleteAttachment
+
+Removes attachment from card
+
+# AUTHOR
+
+Adam Stokes <adamjs@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Adam Stokes.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+# DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT
+WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER
+PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND,
+EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
+SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME
+THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGES.

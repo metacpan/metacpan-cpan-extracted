@@ -1,0 +1,9 @@
+const char *	T_PV
+void * T_PTRREF
+char **	T_AVREF
+void **	T_PTRREF
+uid_t	T_IV
+struct passwd *	T_PTRREF
+struct servent *	T_PTRREF
+struct hesiod_postoffice *	T_PTRREF
+

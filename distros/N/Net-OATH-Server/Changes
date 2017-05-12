@@ -1,0 +1,8 @@
+Revision history for Perl extension Net-OATH-Server
+
+0.02 2014-11-02T11:50:01Z
+    - separate logic from endpoint
+
+0.01 2014-10-05T10:16:15Z
+    - original version
+

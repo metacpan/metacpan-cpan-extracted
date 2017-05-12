@@ -1,0 +1,43 @@
+2010-10-13  Juan J. Merelo  <jmerelo@sheldon>
+
+	* lib/Net/Lujoyglamour.pm: 0.0.6 adds more tests, some URLs were not working. 
+	(get_long_for): Added this to API and added "hashed" URLs to set 
+
+2010-10-10  Juan J. Merelo  <jmerelo@sheldon>
+
+	* lib/Net/Lujoyglamour.pm (generate_candidate_url): Mainly doc
+	changes, and inclusion of the novel file for the 0.0.4.1.9 ==
+	0.0.4.l.g (luxury and glamour) version of the module.
+	Changed to g.l (9.1) after failing to include the PDF in the file...
+
+2010-10-04  Juan J. Merelo  <jmerelo@sheldon>
+
+	* t/02-webapp-run.t: Fixed test problem when random dir ended with "t", thanks to Sebastian Woetzel
+
+2010-10-03  Juan J. Merelo  <jmerelo@sheldon>
+
+	* lib/Net/Lujoyglamour.pm: Added mysql compatibility, and mysql test.
+
+2010-09-28  Juan J. Merelo  <jmerelo@sheldon>
+
+	* lib/Net/Lujoyglamour.pm: Added more tests for correctly loaded templates
+
+	* lib/Net/Lujoyglamour/WebApp.pm (get_url): Revised short_url error checking, to avoid problems when URL generated is "0". Upgraded for 0.0.3.2
+
+2010-09-26  Juan J. Merelo  <jmerelo@sheldon>
+
+	*  (Warning): Fixed some docs, and added tests to avoid test FAILs in 0.0.3
+
+2010-01-06    <jmerelo@localhost.localdomain>
+
+	* MANIFEST: 0.0.3 starts with a new TODO file. 
+
+2010-01-01  Juan J. Merelo  <jmerelo@vega>
+
+	* MANIFEST: 0.0.2 tries to fix some errors and add app code. 
+
+Revision history for Net-Lujoyglamour
+
+0.0.1  Tue Oct  6 19:31:52 2009
+       Initial release.
+

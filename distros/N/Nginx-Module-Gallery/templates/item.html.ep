@@ -1,0 +1,48 @@
+% my (%opts) = @_;
+<%
+    my @class = ('item');
+    push @class, $opts{item}{mime}->mediaType
+        if defined $opts{item}{mime};
+    push @class, 'thumb'
+        if defined $opts{item}{icon} and $opts{item}{icon}{thumb};
+    push @class, $opts{item}{class}
+        if defined $opts{item}{class};
+%>
+<div class="<%= join ' ', @class =%>">
+    <a href="<%= $opts{item}{href} =%>">
+        <% if( defined $opts{item}{icon} ) { =%>
+            <img
+                <% if( defined $opts{item}{mime} ) { =%>
+                    title="<%= "$opts{item}{mime}" =%>"
+                <% } =%>
+                <% if( defined $opts{item}{width} ) { =%>
+                    width="<%= $opts{item}{width} =%>"
+                <% } =%>
+                <% if( defined $opts{item}{height} ) { =%>
+                    height="<%= $opts{item}{height} =%>"
+                <% } =%>
+                src="<%= $opts{item}{icon}{href} =%>"
+            />
+        <% } =%>
+        <% if( defined $opts{item}{filename} ) { =%>
+            <br/>
+            <details class="filename" open="open">
+                <%= $opts{item}{filename} =%>
+            </details>
+        <% } =%>
+        <% if($opts{item}{image}{width} and $opts{item}{image}{height} ) { =%>
+            <br/>
+            <details class="extended wxh" open="open">
+                <%= $opts{item}{image}{width} %>
+                x
+                <%= $opts{item}{image}{height} %>
+            </details>
+        <% } =%>
+        <% if( defined $opts{item}{size} ) { =%>
+            <br/>
+            <details class="extended size" open="open">
+                <%= $opts{item}{size} || '' =%>
+           </details>
+        <% } =%>
+    </a>
+</div>

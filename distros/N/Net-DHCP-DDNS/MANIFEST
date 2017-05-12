@@ -1,0 +1,15 @@
+Makefile.PL
+DDNS.pm
+DDNS/API.pm
+DDNS/DHCID.pm
+DDNS/DHCID/iscdhcp.pm
+DDNS/DHCID/rfc4701.pm
+DDNS/Lookup.pm
+DDNS/TSIG.pm
+DDNS/Update.pm
+MANIFEST
+AUTHORS
+COPYING
+LGPL-2.1
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

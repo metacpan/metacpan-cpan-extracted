@@ -1,0 +1,141 @@
+Revision history for Number::Tolerant
+
+1.708     2015-11-01 14:33:27-05:00 America/New_York
+        [MAYBE JUST POSSIBLY A BREAKING CHANGE]
+        - ...but probably not
+        - fix the <=> operator to behave more predictably
+        - now implemented in terms of ==, <, and >
+        - thanks, Karen Etheridge!
+
+1.707     2015-07-17 20:36:41-04:00 America/New_York
+        - do not lose a min or max of 0 when intersecting two tolerances
+          (thanks, Michael Carman!)
+
+1.706     2015-03-22 12:27:08-04:00 America/New_York
+        - do not allow offsets with inverted/broken offset values
+
+1.705     2014-11-16 13:59:01-05:00 America/New_York
+        - correct reversed-order of parameters in documentation for
+          Test::Tolerant
+
+1.704     2014-10-30 23:11:41-04:00 America/New_York
+        - do not rely on feature.pm -- that was an accident
+
+1.703     2014-02-01 19:31:40-05:00 America/New_York
+        - overload tolerances for ~~ operator (thanks, Smylers!)
+
+1.702     2013-10-07 10:22:17 America/New_York
+          update bugtracker
+
+          avoid circular loading problems (with a nasty hack)
+
+          fix spelling error; thanks, Alexandre Mestiashvili!
+
+1.701   2010-11-29
+
+        include Test::Tolerant
+
+1.700   2010-08-10
+        major changes to support rational numbers via BigRat; n +/- a/b
+
+        refuse to build impossible intersections as previously promised
+          (now fatal, as all previous undef-on-failures became in 1.600)
+
+        several "0 treated like undef" bugs fixed
+
+1.601   2008-10-06
+        remove tests that non-author testers should not run
+
+1.600   2008-07-30
+        Still tolerant after all these years!
+        100% test coverage restored
+
+        THIS MAY BREAK YOUR CODE:
+        "return undef on error" has been replaced by "throw exception on error"
+        ...when creating a tolerance with bogus args
+        ...and intersecting a tolerance with a constant outside its range
+
+1.556   2006-06-11
+        perl critic, and other minor format/packaging changes
+
+1.555   2006-06-11
+        use Sub::Exporter to export
+
+1.540   2006-05-18
+        allow more variety in spaces inside parsed tolerance strings
+
+1.52    2006-05-11
+        no functional changes
+        documentation tweaks, individual module versions updated
+
+1.50    2006-01-27
+        large refactoring of types
+        BasicTypes divided, plugin mechanism rewritten
+
+1.44    2006-01-26
+        add "offset" type (largely from a patch by Tom Freedman)
+        greatly expanded test coverage
+
+1.42    2004-12-08
+        bump requirements to perl 5.8 (5.6 has an overload bug, it seems)
+
+1.40    2004-12-07
+        added end-point exclusion
+        rewrote exensibilty as subclassing, like a sane person would
+        eliminated most numifications
+
+1.34    2004-08-24 15:45
+        minor refactoring of new() to allow extensible non-object returns
+        added ::Constant
+
+1.32    2004-08-23 09:25
+        packaging brought in line with internal specs
+        updated SEE ALSO and TODO
+
+1.30    2004-08-20 15:15
+        refactored; all type-based methods collected and extensible
+
+1.20     2004-08-19 15:35
+        from_string method added
+
+1.016    2004-07-22 10:35
+        statement coverage at 100%
+        branch coverage at 100%
+        condition coverage at 100%
+        sub coverage at 100%
+        pod coverage at 100%
+
+1.015    2004-07-21 13:35
+        more tests!
+        (x | y) & z now works
+
+1.013    2004-07-21 12:40
+        more tests!
+        Number::Range cross-ref
+        fix typos in changelog (it's not 2005 yet!)
+
+1.012   2004-07-20 15:35
+        add Union.pm
+        enable |-overloaded union of ranges
+
+1.011   2004-07-19 14:55
+        fix misuse of "union"
+
+1.010   2004-07-06 22:36
+        better documentation for infinite tolerances
+        infinite & infinite yields infinite
+        more tests!
+        POD formatting error
+
+1.009   2004-07-06 16:21
+        POD formatting error
+
+1.008   2004-07-06 16:18
+        add 'infinite' method (still sketchy)
+        add & operator overloading
+        add tests for the above
+        fix some test formatting errors
+
+1.007    2004-07-01 23:05
+        refactored awful "values" sub (it's still ugly)
+        return simple scalars when tolerance == 0

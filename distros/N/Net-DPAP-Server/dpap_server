@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use lib 'lib',
+        "$ENV{HOME}/lab/perl/Net-DAAP-DMAP/lib",
+        "$ENV{HOME}/lab/perl/Net-DMAP-Server/lib",
+        "$ENV{HOME}/lab/perl/Net-DAAP-Server/lib",
+        "$ENV{HOME}/hck/opensource-trunk/POE-Component-Server-HTTP/lib";
+use POE;
+use Net::DPAP::Server;
+
+my $path = shift || 't/share';
+my $server = Net::DPAP::Server->new(path => $path, port => 23689, debug => 1);
+$poe_kernel->run;

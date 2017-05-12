@@ -1,0 +1,1803 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<activities>
+  <activity>
+    <created_at type="datetime">2008-08-14T20:00:04Z</created_at>
+    <device>plazer</device>
+    <id>6362837</id>
+    <plaze_id type="integer">152960</plaze_id>
+    <status></status>
+    <user_id type="integer">236124</user_id>
+    <scheduled_at type="datetime">2008-08-14T16:00:04-04:00</scheduled_at>
+    <plaze>
+      <address></address>
+      <category>home</category>
+      <city>Brooklyn</city>
+      <country_code>US</country_code>
+      <created_at type="datetime">2008-08-11T06:49:07Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>152960</id>
+      <link>http://en.wikipedia.org/wiki/Flatbush</link>
+      <name>Home Sweet Home</name>
+      <state>NY</state>
+      <timezone>America/New_York</timezone>
+      <updated_at type="datetime">2008-08-11T06:49:07Z</updated_at>
+      <zip_code>11226</zip_code>
+      <latitude type="float">40.6464710113465</latitude>
+      <longitude type="float">-73.9570669236034</longitude>
+      <country>United States</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2007-06-07T22:41:24Z</created_at>
+      <full_name>Troy Tolley</full_name>
+      <id>236124</id>
+      <updated_at type="datetime">2008-08-14T15:41:52Z</updated_at>
+      <name>CocteauBoy</name>
+      <avatar_url>http://plazes.com/pictures/0ef9136cd1b69e8e177dd94dd3a68f1b-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:55:25Z</created_at>
+    <device>plazer</device>
+    <id>6362832</id>
+    <plaze_id type="integer">51017</plaze_id>
+    <status></status>
+    <user_id type="integer">25413</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:55:25+02:00</scheduled_at>
+    <plaze>
+      <address>Schlangenbader Stra&#223;e 32c</address>
+      <category>home</category>
+      <city>Berlin</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2006-11-28T22:36:24Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>51017</id>
+      <link>http://matthiashebenstreit.com</link>
+      <name>Daheim</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-05-30T15:22:36Z</updated_at>
+      <zip_code>14197</zip_code>
+      <latitude type="float">52.471434554013</latitude>
+      <longitude type="float">13.308015377524</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/535b06d63e28aeec0aca8ec25af2679e-medium.jpg</picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2006-11-28T22:35:58Z</created_at>
+      <full_name></full_name>
+      <id>25413</id>
+      <updated_at type="datetime">2008-07-29T16:03:09Z</updated_at>
+      <name>hanson59</name>
+      <avatar_url>http://plazes.com/pictures/e60b6c2d49c897d2a3d6965b3b3b5a10-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:55:08Z</created_at>
+    <device>web</device>
+    <id>6362830</id>
+    <plaze_id type="integer">153372</plaze_id>
+    <status>am online</status>
+    <user_id type="integer">264838</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:55:08+02:00</scheduled_at>
+    <plaze>
+      <address></address>
+      <category>home</category>
+      <city>cape town</city>
+      <country_code>ZA</country_code>
+      <created_at type="datetime">2008-08-14T19:55:07Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>153372</id>
+      <link></link>
+      <name>guguletu, ny49, im my room</name>
+      <state></state>
+      <timezone>Africa/Maseru</timezone>
+      <updated_at type="datetime">2008-08-14T19:55:07Z</updated_at>
+      <zip_code></zip_code>
+      <latitude type="float">-34.0192253168922</latitude>
+      <longitude type="float">18.4376205872312</longitude>
+      <country>South Africa</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2008-08-14T19:52:09Z</created_at>
+      <full_name></full_name>
+      <id>264838</id>
+      <updated_at type="datetime">2008-08-14T19:52:09Z</updated_at>
+      <name>Bulelwa</name>
+      <avatar_url></avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:54:05Z</created_at>
+    <device>plazer</device>
+    <id>6362828</id>
+    <plaze_id type="integer">63492</plaze_id>
+    <status></status>
+    <user_id type="integer">29314</user_id>
+    <scheduled_at type="datetime">2008-08-14T13:54:05-06:00</scheduled_at>
+    <plaze>
+      <address></address>
+      <category>home</category>
+      <city>BOISE</city>
+      <country_code>US</country_code>
+      <created_at type="datetime">2007-01-30T08:10:31Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>63492</id>
+      <link>http://www.captainestes.blogspot.com</link>
+      <name>Captain's Cabin</name>
+      <state></state>
+      <timezone>America/Boise</timezone>
+      <updated_at type="datetime">2007-03-05T06:00:54Z</updated_at>
+      <zip_code>83704</zip_code>
+      <latitude type="float">43.627643823412</latitude>
+      <longitude type="float">-116.28700228707</longitude>
+      <country>United States</country>
+      <picture_url>http://plazes.com/pictures/0a54d11c89a891b4b87c162395b472ed-medium.jpg</picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2007-01-29T09:51:00Z</created_at>
+      <full_name>Captain Estes</full_name>
+      <id>29314</id>
+      <updated_at type="datetime">2008-07-29T17:13:25Z</updated_at>
+      <name>chadestes</name>
+      <avatar_url>http://plazes.com/pictures/034fd28e5b38522217bd6d54c335960a-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:53:18Z</created_at>
+    <device>plazer</device>
+    <id>6362827</id>
+    <plaze_id type="integer">47315</plaze_id>
+    <status></status>
+    <user_id type="integer">11449</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:53:18+02:00</scheduled_at>
+    <plaze>
+      <address>Waldheimstrasse 1</address>
+      <category>home</category>
+      <city>ZUG</city>
+      <country_code>CH</country_code>
+      <created_at type="datetime">2006-11-01T21:49:29Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>47315</id>
+      <link>http://www.reppel.ch &amp; www.wireless-zug.ch</link>
+      <name>@Home</name>
+      <state></state>
+      <timezone>Europe/Zurich</timezone>
+      <updated_at type="datetime">2007-09-16T19:41:04Z</updated_at>
+      <zip_code>6300</zip_code>
+      <latitude type="float">47.16476241768</latitude>
+      <longitude type="float">8.5227096098889</longitude>
+      <country>Switzerland</country>
+      <picture_url>http://plazes.com/pictures/65efed5eafed6d5389a3f492dc17a72a-medium.jpg</picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2005-12-10T17:25:14Z</created_at>
+      <full_name>Marcus Reppel</full_name>
+      <id>11449</id>
+      <updated_at type="datetime">2008-08-03T09:28:12Z</updated_at>
+      <name>Citibroker</name>
+      <avatar_url>http://plazes.com/pictures/7173c3ded6bb327a9cb16ef558a05372-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:52:38Z</created_at>
+    <device>plazer</device>
+    <id>6362826</id>
+    <plaze_id type="integer">14029</plaze_id>
+    <status></status>
+    <user_id type="integer">1946</user_id>
+    <scheduled_at type="datetime">2008-08-14T15:52:38-04:00</scheduled_at>
+    <plaze>
+      <address>Stanby Court</address>
+      <category>home</category>
+      <city>Alexandira</city>
+      <country_code>US</country_code>
+      <created_at type="datetime">2005-11-03T12:47:31Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>14029</id>
+      <link></link>
+      <name>Somewhere Between Heaven and There</name>
+      <state>Virginia</state>
+      <timezone>America/New_York</timezone>
+      <updated_at type="datetime">2006-02-15T16:56:31Z</updated_at>
+      <zip_code>22312</zip_code>
+      <latitude type="float">38.8176</latitude>
+      <longitude type="float">-77.1489</longitude>
+      <country>United States</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2004-10-21T15:31:59Z</created_at>
+      <full_name>Jo</full_name>
+      <id>1946</id>
+      <updated_at type="datetime">2008-07-29T16:30:20Z</updated_at>
+      <name>JustJo</name>
+      <avatar_url>http://plazes.com/pictures/5cccecf0b9605917f2166be44c7d39e6-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:52:38Z</created_at>
+    <device>plazer</device>
+    <id>6362824</id>
+    <plaze_id type="integer">72018</plaze_id>
+    <status></status>
+    <user_id type="integer">32672</user_id>
+    <scheduled_at type="datetime">2008-08-14T12:52:38-07:00</scheduled_at>
+    <plaze>
+      <address></address>
+      <category>home</category>
+      <city>Kirkland</city>
+      <country_code>US</country_code>
+      <created_at type="datetime">2007-03-11T04:57:33Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>72018</id>
+      <link></link>
+      <name>Home</name>
+      <state></state>
+      <timezone>America/Los_Angeles</timezone>
+      <updated_at type="datetime">2007-03-11T05:09:46Z</updated_at>
+      <zip_code>98033</zip_code>
+      <latitude type="float">47.675365618155</latitude>
+      <longitude type="float">-122.18751804489</longitude>
+      <country>United States</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2007-03-06T08:03:14Z</created_at>
+      <full_name>YM Chen</full_name>
+      <id>32672</id>
+      <updated_at type="datetime">2007-04-30T08:48:18Z</updated_at>
+      <name>YMChen</name>
+      <avatar_url></avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:51:48Z</created_at>
+    <device>plazer</device>
+    <id>6362823</id>
+    <plaze_id type="integer">70439</plaze_id>
+    <status></status>
+    <user_id type="integer">258705</user_id>
+    <scheduled_at type="datetime">2008-08-14T16:51:48-03:00</scheduled_at>
+    <plaze>
+      <address>Estrada da Aldeia</address>
+      <category>home</category>
+      <city>Cotia</city>
+      <country_code>BR</country_code>
+      <created_at type="datetime">2007-03-04T19:31:42Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>70439</id>
+      <link></link>
+      <name>Home</name>
+      <state></state>
+      <timezone>America/Sao_Paulo</timezone>
+      <updated_at type="datetime">2008-06-23T13:43:13Z</updated_at>
+      <zip_code>06709-300</zip_code>
+      <latitude type="float">-23.587980392537</latitude>
+      <longitude type="float">-46.827077865601</longitude>
+      <country>Brazil</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2008-06-23T13:35:58Z</created_at>
+      <full_name>Dolf Wiemer</full_name>
+      <id>258705</id>
+      <updated_at type="datetime">2008-07-29T16:49:20Z</updated_at>
+      <name>dolf</name>
+      <avatar_url>http://plazes.com/pictures/44e339f2bb12ddf25edd10b5e0cb6aa5-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:46:33Z</created_at>
+    <device>plazer</device>
+    <id>6362819</id>
+    <plaze_id type="integer">131865</plaze_id>
+    <status></status>
+    <user_id type="integer">245211</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:46:33+02:00</scheduled_at>
+    <plaze>
+      <address>BERGFINKSV&#196;GEN 4</address>
+      <category>home</category>
+      <city>VEJBYSTRAND</city>
+      <country_code>SE</country_code>
+      <created_at type="datetime">2008-01-01T00:01:32Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>131865</id>
+      <link></link>
+      <name>Home</name>
+      <state></state>
+      <timezone>Europe/Copenhagen</timezone>
+      <updated_at type="datetime">2008-01-01T00:01:32Z</updated_at>
+      <zip_code>260 83</zip_code>
+      <latitude type="float">56.3123016725981</latitude>
+      <longitude type="float">12.7752783187227</longitude>
+      <country>Sweden</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2007-10-04T10:47:26Z</created_at>
+      <full_name>Morris Packer</full_name>
+      <id>245211</id>
+      <updated_at type="datetime">2008-07-29T16:14:34Z</updated_at>
+      <name>morris</name>
+      <avatar_url>http://plazes.com/pictures/05d4985197bb76135e08203dfdbca325-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:41:44Z</created_at>
+    <device>plazer</device>
+    <id>6362815</id>
+    <plaze_id type="integer">57642</plaze_id>
+    <status></status>
+    <user_id type="integer">237172</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:41:44+02:00</scheduled_at>
+    <plaze>
+      <address>Alexanderplatz 8</address>
+      <category>hotel</category>
+      <city>Berlin</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2006-12-26T18:22:26Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>57642</id>
+      <link>http://www.parkinn.de/cs/Satellite/Page/ParkInn/Page/parkinnLocation/1058741757112/de/hotelCode--berp1/</link>
+      <name>Park Inn Berlin</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2007-01-31T13:22:58Z</updated_at>
+      <zip_code>101178</zip_code>
+      <latitude type="float">52.52274274252</latitude>
+      <longitude type="float">13.412847518921</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2007-06-21T15:00:38Z</created_at>
+      <full_name>Daniel</full_name>
+      <id>237172</id>
+      <updated_at type="datetime">2008-08-14T19:43:56Z</updated_at>
+      <name>DerSchwede</name>
+      <avatar_url>http://plazes.com/pictures/f8c01d17243266042c4b5953c917b1a7-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:41:08Z</created_at>
+    <device>plazer</device>
+    <id>6362814</id>
+    <plaze_id type="integer">17976</plaze_id>
+    <status></status>
+    <user_id type="integer">12222</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:41:08+02:00</scheduled_at>
+    <plaze>
+      <address>Weidpark</address>
+      <category>home</category>
+      <city>Hochdorf</city>
+      <country_code>CH</country_code>
+      <created_at type="datetime">2006-01-02T13:57:59Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>17976</id>
+      <link></link>
+      <name>Weidpark</name>
+      <state>Luzern</state>
+      <timezone>Europe/Zurich</timezone>
+      <updated_at type="datetime">2007-11-27T15:06:42Z</updated_at>
+      <zip_code>6280</zip_code>
+      <latitude type="float">47.168644505688</latitude>
+      <longitude type="float">8.2956004142761</longitude>
+      <country>Switzerland</country>
+      <picture_url>http://plazes.com/pictures/0df18cc52129d3bc78843e99a06b702f-medium.jpg</picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2006-01-02T13:49:21Z</created_at>
+      <full_name>Ansgar Wollnik</full_name>
+      <id>12222</id>
+      <updated_at type="datetime">2008-07-29T16:14:26Z</updated_at>
+      <name>awollnik</name>
+      <avatar_url>http://plazes.com/pictures/1437fd60aa21158729af6f9a45e81cb0-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:38:30Z</created_at>
+    <device>plazer</device>
+    <id>6362811</id>
+    <plaze_id type="integer">106480</plaze_id>
+    <status></status>
+    <user_id type="integer">244336</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:38:30+02:00</scheduled_at>
+    <plaze>
+      <address></address>
+      <category>home</category>
+      <city>B&#252;rmoos</city>
+      <country_code>AT</country_code>
+      <created_at type="datetime">2007-07-11T15:41:43Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>106480</id>
+      <link></link>
+      <name>B&#252;rmoos</name>
+      <state></state>
+      <timezone>Europe/Ljubljana</timezone>
+      <updated_at type="datetime">2007-12-11T10:50:53Z</updated_at>
+      <zip_code>5111</zip_code>
+      <latitude type="float">47.9834773916622</latitude>
+      <longitude type="float">12.9204362519927</longitude>
+      <country>Austria</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2007-09-20T13:09:18Z</created_at>
+      <full_name>Wolf Hilzensauer</full_name>
+      <id>244336</id>
+      <updated_at type="datetime">2008-07-29T16:18:17Z</updated_at>
+      <name>whilzensauer</name>
+      <avatar_url>http://plazes.com/pictures/64e367f4fbd11ef3b862f0920970cc4d-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:37:45Z</created_at>
+    <device>plazer</device>
+    <id>6362810</id>
+    <plaze_id type="integer">153087</plaze_id>
+    <status></status>
+    <user_id type="integer">264587</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:37:45+02:00</scheduled_at>
+    <plaze>
+      <address>NASSAUKADE 135</address>
+      <category>home</category>
+      <city>AMSTERDAM</city>
+      <country_code>NL</country_code>
+      <created_at type="datetime">2008-08-12T17:01:58Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>153087</id>
+      <link></link>
+      <name>Home - Nassaukade 135</name>
+      <state></state>
+      <timezone>Europe/Amsterdam</timezone>
+      <updated_at type="datetime">2008-08-12T17:05:05Z</updated_at>
+      <zip_code>1052</zip_code>
+      <latitude type="float">52.3735260353693</latitude>
+      <longitude type="float">4.87492171266533</longitude>
+      <country>Netherlands</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2008-08-12T13:58:48Z</created_at>
+      <full_name></full_name>
+      <id>264587</id>
+      <updated_at type="datetime">2008-08-12T14:04:05Z</updated_at>
+      <name>Nestflow</name>
+      <avatar_url></avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:37:14Z</created_at>
+    <device>plazer</device>
+    <id>6362809</id>
+    <plaze_id type="integer">153371</plaze_id>
+    <status>chilled</status>
+    <user_id type="integer">7377</user_id>
+    <scheduled_at type="datetime">2008-08-14T12:37:14-07:00</scheduled_at>
+    <plaze>
+      <address>629 11TH AVE</address>
+      <category>home</category>
+      <city>KIRKLAND</city>
+      <country_code>US</country_code>
+      <created_at type="datetime">2008-08-14T19:37:12Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>153371</id>
+      <link></link>
+      <name>KTown</name>
+      <state>WA</state>
+      <timezone>America/Vancouver</timezone>
+      <updated_at type="datetime">2008-08-14T19:37:12Z</updated_at>
+      <zip_code>98033</zip_code>
+      <latitude type="float">47.6839585684008</latitude>
+      <longitude type="float">-122.196080983235</longitude>
+      <country>United States</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2005-09-05T01:15:46Z</created_at>
+      <full_name>Frank Arrigo</full_name>
+      <id>7377</id>
+      <updated_at type="datetime">2008-08-14T19:57:45Z</updated_at>
+      <name>frankarr</name>
+      <avatar_url>http://plazes.com/pictures/b4246faa98e7822303b534b6d255b59e-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:35:26Z</created_at>
+    <device>plazer</device>
+    <id>6362807</id>
+    <plaze_id type="integer">13151</plaze_id>
+    <status></status>
+    <user_id type="integer">6816</user_id>
+    <scheduled_at type="datetime">2008-08-14T12:35:26-07:00</scheduled_at>
+    <plaze>
+      <address>342 Grant Ave.</address>
+      <category>hotel</category>
+      <city>San Francisco</city>
+      <country_code>US</country_code>
+      <created_at type="datetime">2005-10-20T18:27:54Z</created_at>
+      <has_free_wifi type="boolean">true</has_free_wifi>
+      <id>13151</id>
+      <link>http://www.hoteltriton.com/</link>
+      <name>Hotel Triton</name>
+      <state>California</state>
+      <timezone>America/Los_Angeles</timezone>
+      <updated_at type="datetime">2006-04-22T16:44:35Z</updated_at>
+      <zip_code>94108</zip_code>
+      <latitude type="float">37.790153589509</latitude>
+      <longitude type="float">-122.40548172272</longitude>
+      <country>United States</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2005-08-23T11:54:02Z</created_at>
+      <full_name>Marc Pilloud</full_name>
+      <id>6816</id>
+      <updated_at type="datetime">2008-08-13T19:48:51Z</updated_at>
+      <name>MarcPilloud</name>
+      <avatar_url>http://plazes.com/pictures/5c6578cb7cced163a29ba523e577a3b0-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:34:25Z</created_at>
+    <device>plazer</device>
+    <id>6362805</id>
+    <plaze_id type="integer">73745</plaze_id>
+    <status></status>
+    <user_id type="integer">33381</user_id>
+    <scheduled_at type="datetime">2008-08-14T20:34:25+01:00</scheduled_at>
+    <plaze>
+      <address></address>
+      <category>home</category>
+      <city>STOKE NEWINGTON</city>
+      <country_code>GB</country_code>
+      <created_at type="datetime">2007-03-17T15:21:45Z</created_at>
+      <has_free_wifi type="boolean">true</has_free_wifi>
+      <id>73745</id>
+      <link>http://dictionary.reference.com/browse/home</link>
+      <name>Home</name>
+      <state></state>
+      <timezone>Europe/London</timezone>
+      <updated_at type="datetime">2008-06-11T11:38:12Z</updated_at>
+      <zip_code>N16</zip_code>
+      <latitude type="float">51.5611908496221</latitude>
+      <longitude type="float">-0.0829804650983876</longitude>
+      <country>United Kingdom</country>
+      <picture_url>http://plazes.com/pictures/ed99a8d124a4f5d4382334f622d5bfde-medium.jpg</picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2007-03-14T19:48:17Z</created_at>
+      <full_name>Gideon</full_name>
+      <id>33381</id>
+      <updated_at type="datetime">2008-08-14T14:34:08Z</updated_at>
+      <name>Gids</name>
+      <avatar_url>http://plazes.com/pictures/6aecbe609cbcf8b04b74f5365855b83a-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:34:15Z</created_at>
+    <device>plazer</device>
+    <id>6362804</id>
+    <plaze_id type="integer">123673</plaze_id>
+    <status></status>
+    <user_id type="integer">7563</user_id>
+    <scheduled_at type="datetime">2008-08-14T22:34:15+03:00</scheduled_at>
+    <plaze>
+      <address>Vallikuja</address>
+      <category>home</category>
+      <city>Vantaa</city>
+      <country_code>FI</country_code>
+      <created_at type="datetime">2007-10-03T15:02:49Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>123673</id>
+      <link></link>
+      <name>Vallikuja</name>
+      <state></state>
+      <timezone>Europe/Helsinki</timezone>
+      <updated_at type="datetime">2007-10-03T15:02:49Z</updated_at>
+      <zip_code></zip_code>
+      <latitude type="float">60.3245931783135</latitude>
+      <longitude type="float">25.0616758341592</longitude>
+      <country>Finland</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2005-09-07T13:24:58Z</created_at>
+      <full_name>Edi Immonen</full_name>
+      <id>7563</id>
+      <updated_at type="datetime">2008-07-29T16:03:58Z</updated_at>
+      <name>jemi</name>
+      <avatar_url>http://plazes.com/pictures/3cfa913bd0940518eb485ee826edb383-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:33:09Z</created_at>
+    <device>sms</device>
+    <id>6362802</id>
+    <plaze_id type="integer">153370</plaze_id>
+    <status></status>
+    <user_id type="integer">264387</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:33:09+02:00</scheduled_at>
+    <plaze>
+      <address></address>
+      <category>other</category>
+      <city>paris</city>
+      <country_code>FR</country_code>
+      <created_at type="datetime">2008-08-14T19:33:08Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>153370</id>
+      <link></link>
+      <name>la strada</name>
+      <state></state>
+      <timezone>Europe/Paris</timezone>
+      <updated_at type="datetime">2008-08-14T19:33:08Z</updated_at>
+      <zip_code></zip_code>
+      <latitude type="float">48.8568637949829</latitude>
+      <longitude type="float">2.34124541698635</longitude>
+      <country>France</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2008-08-09T14:01:42Z</created_at>
+      <full_name>S&#233;bastien Bertrand</full_name>
+      <id>264387</id>
+      <updated_at type="datetime">2008-08-14T12:34:41Z</updated_at>
+      <name>seber</name>
+      <avatar_url>http://plazes.com/pictures/ff702fc8d7638d8b9436866794f2c4c4-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:32:29Z</created_at>
+    <device>web</device>
+    <id>6362800</id>
+    <plaze_id type="integer">150239</plaze_id>
+    <status></status>
+    <user_id type="integer">13573</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:32:29+02:00</scheduled_at>
+    <plaze>
+      <address>Frohnhauser Str 6</address>
+      <category>hotel</category>
+      <city>ESSEN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2008-07-16T20:53:34Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>150239</id>
+      <link>https://secure.ichotelsgroup.com/h/d/6c/394/de/hd/essfh?crUrl=/h/d/6c/394/de/hotelsearchresults&amp;rpb=hotel&amp;_requestid=179349</link>
+      <name>holiday inn</name>
+      <state></state>
+      <timezone>Europe/Amsterdam</timezone>
+      <updated_at type="datetime">2008-07-16T20:55:21Z</updated_at>
+      <zip_code>45127</zip_code>
+      <latitude type="float">51.4564353735442</latitude>
+      <longitude type="float">7.00413609243581</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2006-02-08T11:41:42Z</created_at>
+      <full_name>hans.</full_name>
+      <id>13573</id>
+      <updated_at type="datetime">2008-08-13T04:49:50Z</updated_at>
+      <name>alp_prenzl</name>
+      <avatar_url>http://plazes.com/pictures/a89794d4540b458c8cf5fa3dc06c4b5c-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:28:04Z</created_at>
+    <device>plazer</device>
+    <id>6362796</id>
+    <plaze_id type="integer">151914</plaze_id>
+    <status></status>
+    <user_id type="integer">255564</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:28:04+02:00</scheduled_at>
+    <plaze>
+      <address>SCHILLERSTRASSE 48</address>
+      <category>home</category>
+      <city>HAMM</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2008-07-29T20:04:39Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>151914</id>
+      <link></link>
+      <name>Zuhause</name>
+      <state></state>
+      <timezone>Europe/Amsterdam</timezone>
+      <updated_at type="datetime">2008-07-29T20:04:39Z</updated_at>
+      <zip_code>59065</zip_code>
+      <latitude type="float">51.6736700733662</latitude>
+      <longitude type="float">7.81303696285326</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2008-05-15T22:05:52Z</created_at>
+      <full_name></full_name>
+      <id>255564</id>
+      <updated_at type="datetime">2008-08-10T21:33:34Z</updated_at>
+      <name>eismaus</name>
+      <avatar_url>http://plazes.com/pictures/ad43214fd44f6ab18eaa853ffc848c72-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:25:48Z</created_at>
+    <device>plazer</device>
+    <id>6362792</id>
+    <plaze_id type="integer">144602</plaze_id>
+    <status></status>
+    <user_id type="integer">15245</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:25:48+02:00</scheduled_at>
+    <plaze>
+      <address>MAURITIUSSTEINWEG 64</address>
+      <category>home</category>
+      <city>K&#214;LN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2008-06-09T19:48:11Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>144602</id>
+      <link></link>
+      <name>Ulf's new place</name>
+      <state></state>
+      <timezone>Europe/Luxembourg</timezone>
+      <updated_at type="datetime">2008-06-09T19:48:11Z</updated_at>
+      <zip_code>50676</zip_code>
+      <latitude type="float">50.9329090223326</latitude>
+      <longitude type="float">6.94520276729008</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2006-03-19T18:19:07Z</created_at>
+      <full_name>Ulf M&#246;hring</full_name>
+      <id>15245</id>
+      <updated_at type="datetime">2008-07-29T16:42:54Z</updated_at>
+      <name>UlfMoehring</name>
+      <avatar_url>http://plazes.com/pictures/a26db84472e04214296fe06731ffb2e7-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:25:33Z</created_at>
+    <device>plazer</device>
+    <id>6362791</id>
+    <plaze_id type="integer">81132</plaze_id>
+    <status></status>
+    <user_id type="integer">35986</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:25:33+02:00</scheduled_at>
+    <plaze>
+      <address>HEILIGENBERGER STRASSE 4</address>
+      <category>home</category>
+      <city>BERLIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-04-19T19:49:53Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>81132</id>
+      <link></link>
+      <name>Scholz@Home</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-06-02T19:15:27Z</updated_at>
+      <zip_code>10318</zip_code>
+      <latitude type="float">52.4809236077747</latitude>
+      <longitude type="float">13.5227970898722</longitude>
+      <country>Germany</country>
+      <picture_url>http://plazes.com/pictures/d6a29acf3dd20dc29164a7d2febbe792-medium.jpg</picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2007-04-19T11:39:16Z</created_at>
+      <full_name>Martin Scholz</full_name>
+      <id>35986</id>
+      <updated_at type="datetime">2008-08-13T08:47:53Z</updated_at>
+      <name>binomsc</name>
+      <avatar_url>http://plazes.com/pictures/7fc502814e1171aeb220b0d394025bd9-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:25:04Z</created_at>
+    <device>plazer</device>
+    <id>6362790</id>
+    <plaze_id type="integer">75507</plaze_id>
+    <status></status>
+    <user_id type="integer">34165</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:25:04+02:00</scheduled_at>
+    <plaze>
+      <address>ROSENV&#198;NGETS ALL&#201; 8</address>
+      <category>home</category>
+      <city>INDRE &#216;STERBRO</city>
+      <country_code>DK</country_code>
+      <created_at type="datetime">2007-03-25T21:50:59Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>75507</id>
+      <link></link>
+      <name>@ home</name>
+      <state></state>
+      <timezone>Europe/Copenhagen</timezone>
+      <updated_at type="datetime">2008-05-26T19:38:54Z</updated_at>
+      <zip_code>2100</zip_code>
+      <latitude type="float">55.698901538847</latitude>
+      <longitude type="float">12.579437879504</longitude>
+      <country>Denmark</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2007-03-25T21:19:55Z</created_at>
+      <full_name>Patrick Znaty</full_name>
+      <id>34165</id>
+      <updated_at type="datetime">2008-07-29T16:06:08Z</updated_at>
+      <name>PZnaty</name>
+      <avatar_url>http://plazes.com/pictures/32cf8fc4253bd4135782564034b76b37-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:24:43Z</created_at>
+    <device>plazer</device>
+    <id>6362789</id>
+    <plaze_id type="integer">20429</plaze_id>
+    <status></status>
+    <user_id type="integer">13504</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:24:43+02:00</scheduled_at>
+    <plaze>
+      <address>Multergasse 43</address>
+      <category>home</category>
+      <city>St. Gallen</city>
+      <country_code>CH</country_code>
+      <created_at type="datetime">2006-02-07T20:54:15Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>20429</id>
+      <link></link>
+      <name>Jabba's Home</name>
+      <state></state>
+      <timezone>Europe/Vaduz</timezone>
+      <updated_at type="datetime">2006-03-05T09:05:25Z</updated_at>
+      <zip_code>9000</zip_code>
+      <latitude type="float">47.4239</latitude>
+      <longitude type="float">9.3746</longitude>
+      <country>Switzerland</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2006-02-07T10:26:33Z</created_at>
+      <full_name>Jabba</full_name>
+      <id>13504</id>
+      <updated_at type="datetime">2008-08-06T09:57:29Z</updated_at>
+      <name>malbertin</name>
+      <avatar_url>http://plazes.com/pictures/3b1fae3b75938d4c730d1d25f5d39c7d-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:23:58Z</created_at>
+    <device>plazer</device>
+    <id>6362787</id>
+    <plaze_id type="integer">6556</plaze_id>
+    <status></status>
+    <user_id type="integer">4116</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:23:58+02:00</scheduled_at>
+    <plaze>
+      <address>&#216;restads Boulevard 59B</address>
+      <category>home</category>
+      <city>K&#248;benhavn S</city>
+      <country_code>DK</country_code>
+      <created_at type="datetime">2005-07-27T14:39:18Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>6556</id>
+      <link></link>
+      <name>&#216;restad, hjemme</name>
+      <state></state>
+      <timezone>Europe/Copenhagen</timezone>
+      <updated_at type="datetime">2007-02-14T08:12:28Z</updated_at>
+      <zip_code>2300</zip_code>
+      <latitude type="float">55.634064710655</latitude>
+      <longitude type="float">12.58202791214</longitude>
+      <country>Denmark</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2005-05-22T15:17:24Z</created_at>
+      <full_name></full_name>
+      <id>4116</id>
+      <updated_at type="datetime">2008-07-29T16:10:16Z</updated_at>
+      <name>Martinbc</name>
+      <avatar_url>http://plazes.com/pictures/5520c46b75569e50362f0b5f62504f84-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:23:19Z</created_at>
+    <device>plazer</device>
+    <id>6362785</id>
+    <plaze_id type="integer">15449</plaze_id>
+    <status></status>
+    <user_id type="integer">10652</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:23:19+02:00</scheduled_at>
+    <plaze>
+      <address>Landoltstrasse</address>
+      <category>home</category>
+      <city>Bern</city>
+      <country_code>CH</country_code>
+      <created_at type="datetime">2005-11-24T19:44:05Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>15449</id>
+      <link>http://olivier.oswald.name</link>
+      <name>oo's</name>
+      <state></state>
+      <timezone>Europe/Zurich</timezone>
+      <updated_at type="datetime">2007-03-01T22:39:56Z</updated_at>
+      <zip_code>3000</zip_code>
+      <latitude type="float">46.9372</latitude>
+      <longitude type="float">7.4393</longitude>
+      <country>Switzerland</country>
+      <picture_url>http://plazes.com/pictures/781c9dea2c13a4aa36dd3cf3b2222465-medium.jpg</picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2005-11-24T16:40:59Z</created_at>
+      <full_name>Olivier Oswald</full_name>
+      <id>10652</id>
+      <updated_at type="datetime">2008-08-12T15:01:45Z</updated_at>
+      <name>ooswald</name>
+      <avatar_url>http://plazes.com/pictures/fcdfa6f896b85acf4954e7e8be374b8b-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:22:06Z</created_at>
+    <device>web</device>
+    <id>6362784</id>
+    <plaze_id type="integer">153369</plaze_id>
+    <status>Working</status>
+    <user_id type="integer">25476</user_id>
+    <scheduled_at type="datetime">2008-08-14T15:22:06-04:00</scheduled_at>
+    <plaze>
+      <address></address>
+      <category>office</category>
+      <city>Hicksville</city>
+      <country_code>US</country_code>
+      <created_at type="datetime">2008-08-14T19:22:04Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>153369</id>
+      <link></link>
+      <name>100 Frank Road, Hicksville, NY  11801</name>
+      <state>NY</state>
+      <timezone>America/New_York</timezone>
+      <updated_at type="datetime">2008-08-14T19:22:04Z</updated_at>
+      <zip_code></zip_code>
+      <latitude type="float">40.763449186999</latitude>
+      <longitude type="float">-73.527573920742</longitude>
+      <country>United States</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2006-11-29T19:43:58Z</created_at>
+      <full_name>Paul Dunn</full_name>
+      <id>25476</id>
+      <updated_at type="datetime">2008-08-14T19:21:14Z</updated_at>
+      <name>akaharry</name>
+      <avatar_url>http://plazes.com/pictures/542c44c8bbf93149e6a2b62b0d61b129-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:19:41Z</created_at>
+    <device>plazer</device>
+    <id>6362781</id>
+    <plaze_id type="integer">138760</plaze_id>
+    <status></status>
+    <user_id type="integer">24270</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:19:41+02:00</scheduled_at>
+    <plaze>
+      <address>VIA PRUDENZIANA</address>
+      <category>home</category>
+      <city>COMO</city>
+      <country_code>IT</country_code>
+      <created_at type="datetime">2008-04-04T07:41:22Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>138760</id>
+      <link></link>
+      <name>Joerns Place</name>
+      <state></state>
+      <timezone>Europe/Vaduz</timezone>
+      <updated_at type="datetime">2008-04-22T12:11:00Z</updated_at>
+      <zip_code>22100</zip_code>
+      <latitude type="float">45.817786157468</latitude>
+      <longitude type="float">9.08492088317871</longitude>
+      <country>Italy</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2006-11-03T17:15:45Z</created_at>
+      <full_name>Joern</full_name>
+      <id>24270</id>
+      <updated_at type="datetime">2008-08-13T05:47:34Z</updated_at>
+      <name>joernba</name>
+      <avatar_url>http://plazes.com/pictures/190669e310fbf8531e13a380f6a0537d-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:19:28Z</created_at>
+    <device>plazer</device>
+    <id>6362780</id>
+    <plaze_id type="integer">153368</plaze_id>
+    <status></status>
+    <user_id type="integer">256656</user_id>
+    <scheduled_at type="datetime">2008-08-14T14:19:28-05:00</scheduled_at>
+    <plaze>
+      <address></address>
+      <category>university</category>
+      <city>CIUDAD DE MEXICO</city>
+      <country_code>MX</country_code>
+      <created_at type="datetime">2008-08-14T19:19:22Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>153368</id>
+      <link></link>
+      <name>DGSCA</name>
+      <state></state>
+      <timezone>America/Mexico_City</timezone>
+      <updated_at type="datetime">2008-08-14T19:19:22Z</updated_at>
+      <zip_code>03000-57460</zip_code>
+      <latitude type="float">19.4318682377523</latitude>
+      <longitude type="float">-99.1328816354051</longitude>
+      <country>Mexico</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2008-05-29T08:59:28Z</created_at>
+      <full_name>BulletCupid</full_name>
+      <id>256656</id>
+      <updated_at type="datetime">2008-07-29T16:28:45Z</updated_at>
+      <name>BulletCupid</name>
+      <avatar_url>http://plazes.com/pictures/fabd7fd7d2a9883628ca0b07c801d2f3-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:19:05Z</created_at>
+    <device>plazer</device>
+    <id>6362778</id>
+    <plaze_id type="integer">135876</plaze_id>
+    <status></status>
+    <user_id type="integer">247998</user_id>
+    <scheduled_at type="datetime">2008-08-14T15:19:05-04:00</scheduled_at>
+    <plaze>
+      <address></address>
+      <category>home</category>
+      <city>NEWMARKET</city>
+      <country_code>CA</country_code>
+      <created_at type="datetime">2008-02-25T21:16:28Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>135876</id>
+      <link></link>
+      <name>Home</name>
+      <state>ON</state>
+      <timezone>America/Detroit</timezone>
+      <updated_at type="datetime">2008-02-25T21:16:28Z</updated_at>
+      <zip_code>L3X1A1-L3Y9G2</zip_code>
+      <latitude type="float">44.0516176250252</latitude>
+      <longitude type="float">-79.45319091633</longitude>
+      <country>Canada</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2007-11-27T23:09:44Z</created_at>
+      <full_name>Ron</full_name>
+      <id>247998</id>
+      <updated_at type="datetime">2008-08-06T00:39:23Z</updated_at>
+      <name>ronjcharity</name>
+      <avatar_url>http://plazes.com/pictures/3146d93d74512a315741d0250854f2ad-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:18:52Z</created_at>
+    <device>web</device>
+    <id>6362777</id>
+    <plaze_id type="integer">153367</plaze_id>
+    <status>work</status>
+    <user_id type="integer">264836</user_id>
+    <scheduled_at type="datetime">2008-08-15T04:18:52+09:00</scheduled_at>
+    <plaze>
+      <address></address>
+      <category>other</category>
+      <city>Beijing</city>
+      <country_code>CN</country_code>
+      <created_at type="datetime">2008-08-14T19:18:51Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>153367</id>
+      <link></link>
+      <name>beijing, Starbucks 17th St, John's office </name>
+      <state></state>
+      <timezone>Asia/Pyongyang</timezone>
+      <updated_at type="datetime">2008-08-14T19:18:51Z</updated_at>
+      <zip_code></zip_code>
+      <latitude type="float">39.925910263583</latitude>
+      <longitude type="float">116.406847602855</longitude>
+      <country>China</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2008-08-14T19:05:32Z</created_at>
+      <full_name></full_name>
+      <id>264836</id>
+      <updated_at type="datetime">2008-08-14T19:05:32Z</updated_at>
+      <name>justin778899</name>
+      <avatar_url></avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:18:42Z</created_at>
+    <device>plazer</device>
+    <id>6362776</id>
+    <plaze_id type="integer">149929</plaze_id>
+    <status></status>
+    <user_id type="integer">17267</user_id>
+    <scheduled_at type="datetime">2008-08-14T15:18:42-04:00</scheduled_at>
+    <plaze>
+      <address>3255 W HAMLIN RD</address>
+      <category>office</category>
+      <city>ROCHESTER HILLS</city>
+      <country_code>US</country_code>
+      <created_at type="datetime">2008-07-14T13:19:26Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>149929</id>
+      <link></link>
+      <name>Trico Products</name>
+      <state>MI</state>
+      <timezone>America/Detroit</timezone>
+      <updated_at type="datetime">2008-07-14T13:19:26Z</updated_at>
+      <zip_code>48309</zip_code>
+      <latitude type="float">42.647298688985</latitude>
+      <longitude type="float">-83.1965195494325</longitude>
+      <country>United States</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2006-05-22T03:44:34Z</created_at>
+      <full_name>Michael Colson</full_name>
+      <id>17267</id>
+      <updated_at type="datetime">2008-08-09T18:38:25Z</updated_at>
+      <name>MichaelColson</name>
+      <avatar_url>http://plazes.com/pictures/b6fed9eacb8284cae4fea6714e22f044-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:17:17Z</created_at>
+    <device>plazer</device>
+    <id>6362773</id>
+    <plaze_id type="integer">153365</plaze_id>
+    <status></status>
+    <user_id type="integer">24460</user_id>
+    <scheduled_at type="datetime">2008-08-14T12:17:17-07:00</scheduled_at>
+    <plaze>
+      <address>1200 NW NAITO PKY</address>
+      <category>office</category>
+      <city>PORTLAND</city>
+      <country_code>US</country_code>
+      <created_at type="datetime">2008-08-14T19:17:15Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>153365</id>
+      <link></link>
+      <name>The 451 Group</name>
+      <state>OR</state>
+      <timezone>America/Vancouver</timezone>
+      <updated_at type="datetime">2008-08-14T19:17:15Z</updated_at>
+      <zip_code>97209</zip_code>
+      <latitude type="float">45.5319300222618</latitude>
+      <longitude type="float">-122.67820115077</longitude>
+      <country>United States</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2006-11-08T03:49:19Z</created_at>
+      <full_name>Reid Beels</full_name>
+      <id>24460</id>
+      <updated_at type="datetime">2008-08-12T16:45:26Z</updated_at>
+      <name>reidab</name>
+      <avatar_url>http://plazes.com/pictures/8278cbb42f70e84aca313976b5a60ef1-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:12:50Z</created_at>
+    <device>plazer</device>
+    <id>6362767</id>
+    <plaze_id type="integer">130536</plaze_id>
+    <status></status>
+    <user_id type="integer">20067</user_id>
+    <scheduled_at type="datetime">2008-08-14T15:12:50-04:00</scheduled_at>
+    <plaze>
+      <address>55 CHALLENGER RD</address>
+      <category>office</category>
+      <city>RIDGEFIELD PARK</city>
+      <country_code>US</country_code>
+      <created_at type="datetime">2007-12-14T19:48:48Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>130536</id>
+      <link></link>
+      <name>Eisai Medical Research</name>
+      <state>NJ</state>
+      <timezone>America/New_York</timezone>
+      <updated_at type="datetime">2007-12-14T19:48:48Z</updated_at>
+      <zip_code>07660</zip_code>
+      <latitude type="float">40.8475703778494</latitude>
+      <longitude type="float">-74.0139223815696</longitude>
+      <country>United States</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2006-08-15T16:48:24Z</created_at>
+      <full_name>Ernie Oporto</full_name>
+      <id>20067</id>
+      <updated_at type="datetime">2008-08-14T10:43:46Z</updated_at>
+      <name>shokk</name>
+      <avatar_url>http://plazes.com/pictures/93b74fb6e74a3d168d3bfb49f420c059-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:12:14Z</created_at>
+    <device>plazer</device>
+    <id>6362765</id>
+    <plaze_id type="integer">141963</plaze_id>
+    <status></status>
+    <user_id type="integer">12370</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:12:14+02:00</scheduled_at>
+    <plaze>
+      <address>HUSUMER STRASSE 44</address>
+      <category>home</category>
+      <city>HAMBURG</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2008-05-13T19:37:09Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>141963</id>
+      <link>https://twitter.com/Moe</link>
+      <name>Moe's Home</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-05-13T19:38:10Z</updated_at>
+      <zip_code>20249</zip_code>
+      <latitude type="float">53.5879986998982</latitude>
+      <longitude type="float">9.98144551058128</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2006-01-06T15:29:44Z</created_at>
+      <full_name>Moe</full_name>
+      <id>12370</id>
+      <updated_at type="datetime">2008-07-29T16:00:32Z</updated_at>
+      <name>PlasticThinking</name>
+      <avatar_url>http://plazes.com/pictures/e98afa21bcf676ac0ccfaee3dd7f4881-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:09:51Z</created_at>
+    <device>plazer</device>
+    <id>6362763</id>
+    <plaze_id type="integer">68720</plaze_id>
+    <status></status>
+    <user_id type="integer">6910</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:09:51+02:00</scheduled_at>
+    <plaze>
+      <address>44 BOULEVARD ANATOLE FRANCE</address>
+      <category>home</category>
+      <city>AUBERVILLIERS</city>
+      <country_code>FR</country_code>
+      <created_at type="datetime">2007-02-24T11:43:43Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>68720</id>
+      <link></link>
+      <name>Appartement Etienne</name>
+      <state></state>
+      <timezone>Europe/Paris</timezone>
+      <updated_at type="datetime">2007-04-15T21:03:33Z</updated_at>
+      <zip_code>93300</zip_code>
+      <latitude type="float">48.918193092343</latitude>
+      <longitude type="float">2.3821999386997</longitude>
+      <country>France</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2005-08-24T14:01:07Z</created_at>
+      <full_name>Etienne Cazin</full_name>
+      <id>6910</id>
+      <updated_at type="datetime">2008-07-29T16:31:50Z</updated_at>
+      <name>Etienne</name>
+      <avatar_url>http://plazes.com/pictures/0896d6ba25cfe92e1bc8e85861fbe297-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:09:04Z</created_at>
+    <device>plazer</device>
+    <id>6362762</id>
+    <plaze_id type="integer">148749</plaze_id>
+    <status></status>
+    <user_id type="integer">764</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:09:04+02:00</scheduled_at>
+    <plaze>
+      <address>LEONORENSTRASSE 21</address>
+      <category>home</category>
+      <city>STUTTGART</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2008-07-01T14:48:29Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>148749</id>
+      <link></link>
+      <name>Lion's Den 21</name>
+      <state></state>
+      <timezone>Europe/Zurich</timezone>
+      <updated_at type="datetime">2008-07-01T14:48:29Z</updated_at>
+      <zip_code>70597</zip_code>
+      <latitude type="float">48.7532163439432</latitude>
+      <longitude type="float">9.16917830583176</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2004-09-09T13:25:49Z</created_at>
+      <full_name>Wolfgang</full_name>
+      <id>764</id>
+      <updated_at type="datetime">2008-08-11T17:19:38Z</updated_at>
+      <name>0xcafebabe</name>
+      <avatar_url>http://plazes.com/pictures/6e588117442b0d1f4fbd1215ffc02ece-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:08:36Z</created_at>
+    <device>plazer</device>
+    <id>6362760</id>
+    <plaze_id type="integer">148779</plaze_id>
+    <status></status>
+    <user_id type="integer">261601</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:08:36+02:00</scheduled_at>
+    <plaze>
+      <address>RUE DES PERRI&#200;RES</address>
+      <category>home</category>
+      <city>NANTES</city>
+      <country_code>FR</country_code>
+      <created_at type="datetime">2008-07-01T21:25:52Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>148779</id>
+      <link></link>
+      <name>rue des Perri&#232;res, Nantes</name>
+      <state></state>
+      <timezone>Europe/Paris</timezone>
+      <updated_at type="datetime">2008-07-01T21:25:52Z</updated_at>
+      <zip_code>44100</zip_code>
+      <latitude type="float">47.2033862942139</latitude>
+      <longitude type="float">-1.57858006839863</longitude>
+      <country>France</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2008-07-01T21:18:47Z</created_at>
+      <full_name></full_name>
+      <id>261601</id>
+      <updated_at type="datetime">2008-07-04T19:39:12Z</updated_at>
+      <name>fdegouzon</name>
+      <avatar_url></avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:08:08Z</created_at>
+    <device>plazer</device>
+    <id>6362757</id>
+    <plaze_id type="integer">132418</plaze_id>
+    <status></status>
+    <user_id type="integer">20817</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:08:08+02:00</scheduled_at>
+    <plaze>
+      <address>WASASTRASSE 10</address>
+      <category>home</category>
+      <city>DRESDEN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2008-01-08T22:43:44Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>132418</id>
+      <link></link>
+      <name>@ Home</name>
+      <state></state>
+      <timezone>Europe/Prague</timezone>
+      <updated_at type="datetime">2008-01-08T22:43:44Z</updated_at>
+      <zip_code>01219</zip_code>
+      <latitude type="float">51.0298871205445</latitude>
+      <longitude type="float">13.7582810737873</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2006-08-31T19:24:55Z</created_at>
+      <full_name>Conrad Rentsch</full_name>
+      <id>20817</id>
+      <updated_at type="datetime">2008-08-13T12:48:15Z</updated_at>
+      <name>ice8878</name>
+      <avatar_url>http://plazes.com/pictures/5c1b63f260e3b540bc0e839563d0412c-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:03:10Z</created_at>
+    <device>plazer</device>
+    <id>6362753</id>
+    <plaze_id type="integer">5808</plaze_id>
+    <status>Pondering whether or not to Jailbreak my iPhone</status>
+    <user_id type="integer">5387</user_id>
+    <scheduled_at type="datetime">2008-08-14T16:03:10-03:00</scheduled_at>
+    <plaze>
+      <address>90 University Ave.</address>
+      <category>office</category>
+      <city>Charlottetown</city>
+      <country_code>CA</country_code>
+      <created_at type="datetime">2005-06-28T18:00:46Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>5808</id>
+      <link></link>
+      <name>Atlantic Technology Centre</name>
+      <state>PE</state>
+      <timezone>America/Halifax</timezone>
+      <updated_at type="datetime">2005-06-28T18:17:45Z</updated_at>
+      <zip_code></zip_code>
+      <latitude type="float">46.2365</latitude>
+      <longitude type="float">-63.1282</longitude>
+      <country>Canada</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2005-07-26T20:14:58Z</created_at>
+      <full_name>Rob Lantz</full_name>
+      <id>5387</id>
+      <updated_at type="datetime">2008-08-08T14:17:20Z</updated_at>
+      <name>rlantz</name>
+      <avatar_url>http://plazes.com/pictures/6a22c3d670180847dc6231c46d7d4625-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:02:54Z</created_at>
+    <device>plazer</device>
+    <id>6362751</id>
+    <plaze_id type="integer">133843</plaze_id>
+    <status></status>
+    <user_id type="integer">250369</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:02:54+02:00</scheduled_at>
+    <plaze>
+      <address>GISBERT BROMLAAN</address>
+      <category>home</category>
+      <city>UTRECHT</city>
+      <country_code>NL</country_code>
+      <created_at type="datetime">2008-01-27T17:33:51Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>133843</id>
+      <link></link>
+      <name>Niels en Rianne</name>
+      <state></state>
+      <timezone>Europe/Amsterdam</timezone>
+      <updated_at type="datetime">2008-06-10T09:06:27Z</updated_at>
+      <zip_code>3571</zip_code>
+      <latitude type="float">52.1079474251838</latitude>
+      <longitude type="float">5.11842467026262</longitude>
+      <country>Netherlands</country>
+      <picture_url>http://plazes.com/pictures/1b9f645ad573a7b9a1c0ba2e5d72784f-medium.jpg</picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2008-01-27T16:37:19Z</created_at>
+      <full_name>Rianne</full_name>
+      <id>250369</id>
+      <updated_at type="datetime">2008-07-29T16:35:28Z</updated_at>
+      <name>riannesalden</name>
+      <avatar_url>http://plazes.com/pictures/0b647b443d76f8b923ea3ee942a13b7d-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:02:31Z</created_at>
+    <device>plazer</device>
+    <id>6362750</id>
+    <plaze_id type="integer">129098</plaze_id>
+    <status></status>
+    <user_id type="integer">5175</user_id>
+    <scheduled_at type="datetime">2008-08-14T15:02:31-04:00</scheduled_at>
+    <plaze>
+      <address>1735 MARKET ST</address>
+      <category>office</category>
+      <city>PHILADELPHIA</city>
+      <country_code>US</country_code>
+      <created_at type="datetime">2007-11-29T17:38:45Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>129098</id>
+      <link></link>
+      <name>FMC Mellon Bank Building</name>
+      <state>PA</state>
+      <timezone>America/New_York</timezone>
+      <updated_at type="datetime">2007-11-29T17:38:45Z</updated_at>
+      <zip_code>19103</zip_code>
+      <latitude type="float">39.9530237460016</latitude>
+      <longitude type="float">-75.16898040863</longitude>
+      <country>United States</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2005-07-12T16:17:36Z</created_at>
+      <full_name></full_name>
+      <id>5175</id>
+      <updated_at type="datetime">2008-07-29T16:00:13Z</updated_at>
+      <name>simonbarratt</name>
+      <avatar_url>http://plazes.com/pictures/9ae9fe5dbe4d672272cd225c6f3a68a9-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:01:50Z</created_at>
+    <device>plazer</device>
+    <id>6362748</id>
+    <plaze_id type="integer">152164</plaze_id>
+    <status></status>
+    <user_id type="integer">242056</user_id>
+    <scheduled_at type="datetime">2008-08-14T12:01:50-07:00</scheduled_at>
+    <plaze>
+      <address>3766 5TH AVE</address>
+      <category>coffee_shop</category>
+      <city>SAN DIEGO</city>
+      <country_code>US</country_code>
+      <created_at type="datetime">2008-08-01T21:00:49Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>152164</id>
+      <link>http://babycakessandiego.com/</link>
+      <name>Babycakes</name>
+      <state>CA</state>
+      <timezone>America/Tijuana</timezone>
+      <updated_at type="datetime">2008-08-14T19:05:35Z</updated_at>
+      <zip_code>92103</zip_code>
+      <latitude type="float">32.7462667513711</latitude>
+      <longitude type="float">-117.160414417014</longitude>
+      <country>United States</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2007-08-14T23:20:54Z</created_at>
+      <full_name>Eric Bidwell</full_name>
+      <id>242056</id>
+      <updated_at type="datetime">2008-08-01T20:55:11Z</updated_at>
+      <name>RevolutionaryMayor</name>
+      <avatar_url>http://plazes.com/pictures/67747c649d090c5e1c955734581ba485-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:00:45Z</created_at>
+    <device>plazer</device>
+    <id>6362746</id>
+    <plaze_id type="integer">153363</plaze_id>
+    <status></status>
+    <user_id type="integer">32136</user_id>
+    <scheduled_at type="datetime">2008-08-14T13:00:45-06:00</scheduled_at>
+    <plaze>
+      <address></address>
+      <category>hotel</category>
+      <city>LOS CABOS</city>
+      <country_code>MX</country_code>
+      <created_at type="datetime">2008-08-14T19:00:42Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>153363</id>
+      <link></link>
+      <name>Cabo Azul</name>
+      <state></state>
+      <timezone>America/Mazatlan</timezone>
+      <updated_at type="datetime">2008-08-14T19:00:42Z</updated_at>
+      <zip_code>23400-23478</zip_code>
+      <latitude type="float">22.883519033266</latitude>
+      <longitude type="float">-109.913934164505</longitude>
+      <country>Mexico</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2007-02-27T20:22:54Z</created_at>
+      <full_name>Pablo H</full_name>
+      <id>32136</id>
+      <updated_at type="datetime">2008-07-29T16:12:49Z</updated_at>
+      <name>hapoptosis</name>
+      <avatar_url>http://plazes.com/pictures/6ba2a40c414f4cdb7c30bac924b6fce0-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T19:00:44Z</created_at>
+    <device>plazer</device>
+    <id>6362745</id>
+    <plaze_id type="integer">135619</plaze_id>
+    <status></status>
+    <user_id type="integer">251272</user_id>
+    <scheduled_at type="datetime">2008-08-14T21:00:44+02:00</scheduled_at>
+    <plaze>
+      <address>LINDENSTRASSE 33</address>
+      <category>home</category>
+      <city>SCH&#214;NBERG</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2008-02-22T08:06:42Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>135619</id>
+      <link></link>
+      <name>at home</name>
+      <state></state>
+      <timezone>Europe/Berlin</timezone>
+      <updated_at type="datetime">2008-02-22T08:06:42Z</updated_at>
+      <zip_code>23923</zip_code>
+      <latitude type="float">53.8588970576196</latitude>
+      <longitude type="float">10.9272200824903</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2008-02-22T08:05:11Z</created_at>
+      <full_name>Sebastian</full_name>
+      <id>251272</id>
+      <updated_at type="datetime">2008-07-29T16:37:48Z</updated_at>
+      <name>smetti</name>
+      <avatar_url>http://plazes.com/pictures/9083371aba3f0578e0ec2e90fc1c5341-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T18:59:52Z</created_at>
+    <device>plazer</device>
+    <id>6362743</id>
+    <plaze_id type="integer">84494</plaze_id>
+    <status></status>
+    <user_id type="integer">15706</user_id>
+    <scheduled_at type="datetime">2008-08-14T20:59:52+02:00</scheduled_at>
+    <plaze>
+      <address>ERLENSTRASSE 16</address>
+      <category>home</category>
+      <city>FRANKFURT AM MAIN</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2007-05-04T00:01:55Z</created_at>
+      <has_free_wifi type="boolean">true</has_free_wifi>
+      <id>84494</id>
+      <link></link>
+      <name>Tapio's Plaze</name>
+      <state></state>
+      <timezone>Europe/Luxembourg</timezone>
+      <updated_at type="datetime">2007-12-20T23:27:48Z</updated_at>
+      <zip_code>60325</zip_code>
+      <latitude type="float">50.1103834917821</latitude>
+      <longitude type="float">8.65884836612392</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2006-04-01T00:40:45Z</created_at>
+      <full_name>tapioliller</full_name>
+      <id>15706</id>
+      <updated_at type="datetime">2008-07-29T17:15:09Z</updated_at>
+      <name>tapioliller</name>
+      <avatar_url>http://plazes.com/pictures/8e49430fe861efbbe4840ed7ae1df506-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T18:58:57Z</created_at>
+    <device>plazer</device>
+    <id>6362741</id>
+    <plaze_id type="integer">114738</plaze_id>
+    <status></status>
+    <user_id type="integer">32136</user_id>
+    <scheduled_at type="datetime">2008-08-14T14:58:57-04:00</scheduled_at>
+    <plaze>
+      <address></address>
+      <category>hotel</category>
+      <city>Cataratas del Iguazu</city>
+      <country_code>AR</country_code>
+      <created_at type="datetime">2007-08-09T08:33:03Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>114738</id>
+      <link></link>
+      <name>Sheraton Hotel</name>
+      <state></state>
+      <timezone>America/Asuncion</timezone>
+      <updated_at type="datetime">2007-12-11T10:57:46Z</updated_at>
+      <zip_code></zip_code>
+      <latitude type="float">-25.6708359237327</latitude>
+      <longitude type="float">-54.4545819862293</longitude>
+      <country>Argentina</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2007-02-27T20:22:54Z</created_at>
+      <full_name>Pablo H</full_name>
+      <id>32136</id>
+      <updated_at type="datetime">2008-07-29T16:12:49Z</updated_at>
+      <name>hapoptosis</name>
+      <avatar_url>http://plazes.com/pictures/6ba2a40c414f4cdb7c30bac924b6fce0-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T18:55:31Z</created_at>
+    <device>plazer</device>
+    <id>6362738</id>
+    <plaze_id type="integer">153362</plaze_id>
+    <status></status>
+    <user_id type="integer">264630</user_id>
+    <scheduled_at type="datetime">2008-08-14T11:55:31-07:00</scheduled_at>
+    <plaze>
+      <address>10675 SORRENTO VALLEY RD</address>
+      <category>office</category>
+      <city>SAN DIEGO</city>
+      <country_code>US</country_code>
+      <created_at type="datetime">2008-08-14T18:55:25Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>153362</id>
+      <link></link>
+      <name>Work</name>
+      <state>CA</state>
+      <timezone>America/Tijuana</timezone>
+      <updated_at type="datetime">2008-08-14T18:55:25Z</updated_at>
+      <zip_code>92121</zip_code>
+      <latitude type="float">32.8980201075514</latitude>
+      <longitude type="float">-117.220062931388</longitude>
+      <country>United States</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2008-08-13T02:30:21Z</created_at>
+      <full_name></full_name>
+      <id>264630</id>
+      <updated_at type="datetime">2008-08-14T17:12:02Z</updated_at>
+      <name>GuiBRZ</name>
+      <avatar_url>http://plazes.com/pictures/ba787d8e7d11dc942fcda77ef20ee681-medium.jpg</avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T18:54:55Z</created_at>
+    <device>plazer</device>
+    <id>6362736</id>
+    <plaze_id type="integer">153361</plaze_id>
+    <status></status>
+    <user_id type="integer">21602</user_id>
+    <scheduled_at type="datetime">2008-08-14T13:54:55-05:00</scheduled_at>
+    <plaze>
+      <address></address>
+      <category>other</category>
+      <city>CHICAGO</city>
+      <country_code>US</country_code>
+      <created_at type="datetime">2008-08-14T18:54:53Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>153361</id>
+      <link></link>
+      <name>Aceyus</name>
+      <state>IL</state>
+      <timezone>America/Chicago</timezone>
+      <updated_at type="datetime">2008-08-14T18:54:53Z</updated_at>
+      <zip_code>60601-60701</zip_code>
+      <latitude type="float">41.8841364623638</latitude>
+      <longitude type="float">-87.6323692852557</longitude>
+      <country>United States</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2006-09-23T19:03:12Z</created_at>
+      <full_name></full_name>
+      <id>21602</id>
+      <updated_at type="datetime"></updated_at>
+      <name>fullstate</name>
+      <avatar_url></avatar_url>
+    </user>
+  </activity>
+  <activity>
+    <created_at type="datetime">2008-08-14T18:51:16Z</created_at>
+    <device>plazer</device>
+    <id>6362731</id>
+    <plaze_id type="integer">57830</plaze_id>
+    <status></status>
+    <user_id type="integer">1817</user_id>
+    <scheduled_at type="datetime">2008-08-14T20:51:16+02:00</scheduled_at>
+    <plaze>
+      <address></address>
+      <category>home</category>
+      <city>W&#252;rselen</city>
+      <country_code>DE</country_code>
+      <created_at type="datetime">2006-12-27T16:38:27Z</created_at>
+      <has_free_wifi type="boolean">false</has_free_wifi>
+      <id>57830</id>
+      <link>http://www.marcokalz.de</link>
+      <name>Euregio@Home</name>
+      <state></state>
+      <timezone>Europe/Brussels</timezone>
+      <updated_at type="datetime">2007-01-02T11:37:53Z</updated_at>
+      <zip_code>52146</zip_code>
+      <latitude type="float">50.828072452635</latitude>
+      <longitude type="float">6.1484276690027</longitude>
+      <country>Germany</country>
+      <picture_url></picture_url>
+    </plaze>
+    <user>
+      <created_at type="datetime">2004-10-13T16:12:32Z</created_at>
+      <full_name>Marco Kalz</full_name>
+      <id>1817</id>
+      <updated_at type="datetime">2008-07-29T16:42:01Z</updated_at>
+      <name>mkalz</name>
+      <avatar_url>http://plazes.com/pictures/3ad9ff32bcc0c1f69c8065a40082aead-medium.jpg</avatar_url>
+    </user>
+  </activity>
+</activities>

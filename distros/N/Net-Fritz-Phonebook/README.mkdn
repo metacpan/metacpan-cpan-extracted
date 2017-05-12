@@ -1,0 +1,144 @@
+
+[![Build Status](https://travis-ci.org/Corion/Net-Fritz-Phonebook.svg?branch=master)](https://github.com/Corion/Net-Fritz-Phonebook)
+
+# NAME
+
+Net::Fritz::Phonebook - manage the Fritz!Box phonebook from Perl
+
+# SYNOPSIS
+
+    my $fb = Net::Fritz::Box->new(
+        username => $username,
+        password => $password,
+        upnp_url => $host,
+    );
+    my $device = $fb->discover;
+    if( my $error = $device->error ) {
+        die $error
+    };
+
+    my @phonebooks = Net::Fritz::Phonebook->list(device => $device);
+
+This module uses the API exposed by the Fritz!Box via TR064 to read, create and
+update contacts in a phone book. This uses the `X_AVM-DE_OnTel` service, which
+is specific to the AVM Fritz!Box line of products.
+
+# ACCESSORS
+
+## `id`
+
+    print $phonebook->id;
+
+The ID of the phone book on the Fritz!Box
+
+## `name`
+
+    print $phonebook->name;
+
+The user visible name of the phone book on the Fritz!Box
+
+## `url`
+
+    print $phonebook->url;
+
+The URL of the phone book on the Fritz!Box
+
+This URL is used to access the phone book contents.
+
+## `entries`
+
+    for my $entry ( @{ $phonebook->entries }) {
+        print $entry->name
+    };
+
+Arrayref of the entries in this phone book. Each entry is
+a [Net::Fritz::Phonebook::Entry](https://metacpan.org/pod/Net::Fritz::Phonebook::Entry).
+
+# METHODS
+
+## `$phonebook->create`
+
+    $phonebook->create();
+
+Creates the phone book on the FritzBox. Entries of this phone book are not
+saved.
+
+## `$phonebook->delete`
+
+    $phonebook->delete();
+
+Deletes the phone book on the FritzBox. All entries of this phone book are also
+deleted with the phone book.
+
+## `$phonebook->add_entry`
+
+    $phonebook->add_entry( $new_contact );
+
+Saves an entry in the phone book on the FritzBox.
+
+## `$phonebook->get_entry_by_uniqueid`
+
+    my $entry = $phonebook->get_entry_by_uniqueid( $uniqueid );
+
+Scans all phone book entries and returns the one with the matching unique id
+
+## `$phonebook->get_entry_by_index`
+
+    my $entry = $phonebook->get_entry_by_index( 0 );
+
+Retrieves a single entry in the phone book on the FritzBox by its index in the
+list. This avoids fetching the complete phone book, but you basically have no
+way of determining the order of entries.
+
+## `Net::Fritz::Phonebook->by_name( $device, $name )`
+
+    my $device = $fb->discover;
+    my $phonebook = Net::Fritz::Phonebook->by_name( device => $device, name => 'Telefonbuch' );
+
+Utility function to find a phonebook by name.
+
+## `Net::Fritz::Phonebook->list( $service )`
+
+    my $device = $fb->discover;
+    my $services = $device->find_service_names(qr/X_AVM-DE_OnTel/);
+    my @phonebooks = Net::Fritz::Phonebook->list( service => $services->data->[0] );
+
+## `Net::Fritz::Phonebook->reload`
+
+    $phonebook->reload();
+
+Refreshes the content of the phonebook from the Fritz!Box. This is useful if you
+have added or removed entries from the phone book and want to fetch the state
+on the Fritz!Box again.
+
+# SEE ALSO
+
+[https://avm.de/fileadmin/user\_upload/Global/Service/Schnittstellen/X\_contactSCPD.pdf](https://avm.de/fileadmin/user_upload/Global/Service/Schnittstellen/X_contactSCPD.pdf)
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/Net-Fritz-Phonebook](https://github.com/Corion/Net-Fritz-Phonebook).
+
+# SUPPORT
+
+The public support forum of this module is
+[https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+[https://rt.cpan.org/Public/Dist/Display.html?Name=Net-Fritz-Phonebook](https://rt.cpan.org/Public/Dist/Display.html?Name=Net-Fritz-Phonebook)
+or via mail to [net-fritz-phonebook-Bugs@rt.cpan.org](https://metacpan.org/pod/net-fritz-phonebook-Bugs@rt.cpan.org).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2017 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

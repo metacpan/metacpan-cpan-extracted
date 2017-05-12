@@ -1,0 +1,115 @@
+#!/local/bin/perl -w
+
+# Dette skriptet går loggene som PPP oppkoblingene gir på Linux boksen
+# min og beregner telefonutgiftene og hvor mye tid som jeg har brukt
+# online.  Hvis du ikke har ppp/chat som er satt opp helt slik som meg
+# (det har du sikkert ikke!) så vil tilpasse litt etter hva som havner
+# i din log.
+#
+# Skrevet av: Gisle Aas <gisle@aas.no>
+
+use HTTP::Date qw(str2time);
+use No::Telenor qw(samtale_pris);
+use No::KontoNr qw(nok_f);
+
+# In order to calculate prices
+$LOKAL_PREFIKS    = 55;    # siden jeg bor i Bergen
+$LOKAL_TAKST      = "LFV"; # jeg har Familie&Venner
+
+
+my $log = shift || "/var/log/messages";
+if ($log =~ /\.gz$/) {
+    $log = "gunzip -c $log|";
+}
+
+open(LOG, $log) or die;
+my $tot_dur   = 0;
+my $tot_local = 0;
+my $tot_riks  = 0;
+my $tot_price = 0;
+
+while (<LOG>) {
+    if (/kernel: ippp0: dialing [01] (\d+)/) {
+	#print;
+	$phone = $1;
+	$connect = undef;
+    } elsif (/kernel: isdn_net: ippp0 connected/) {
+	#print;
+	$connect = extract_time($_);
+	$ppp_up = undef;
+    } elsif (/kernel: isdn_net: local hangup ippp0/) {
+	if ($connect) {
+	    my $dur = extract_time($_) - $connect;
+	    $tot_dur += $dur;
+	    if (local_phone($phone)) {
+		$tot_local += $dur;
+	    } else {
+		$tot_riks += $dur;
+	    }
+	    my $price = samtale_pris($connect, $dur, takst($phone));
+	    $tot_price += $price;
+	    $ppp_up ||= "-";
+	    printf "%s  %s %s  %2d %9s", time2iso($connect), $phone, dur2str($dur), $ppp_up, nok_f($price);
+	    print "\n";
+	} else {
+	    print STDERR "NO CONNECT FOR: $_";
+	}
+    } elsif (/remote IP address/) {
+	if ($connect) {
+	    $ppp_up = extract_time($_) - $connect;
+	}
+	#print;
+    } elsif (/BUSY -- failed/) {
+	my $t = time2iso(extract_time($_));
+	print "$t  $phone BUSY\n";
+	$connect = $ppp_up = undef;
+    } else {
+	# ignore
+    }
+}
+
+print "-" x 52, "\n";
+print  "\t\t     Lokal:   ", dur2str($tot_local), "\n";
+print  "\t\t     Riks:    ", dur2str($tot_riks), "\n";
+printf "\t\t     TOTAL:   %s  %12s\n", dur2str($tot_dur), nok_f($tot_price);
+
+
+sub local_phone
+{
+    my $phone = shift;
+    return 1 if $phone =~ /^$LOKAL_PREFIKS/o;
+    return 1 if $phone eq "81007007";
+    return 0;
+}
+
+sub takst
+{
+    # jeg bor i Bergen
+    return $LOKAL_TAKST if local_phone(shift);
+    return "R";
+}
+
+sub extract_time
+{
+    str2time(substr($_[0], 0, 15) . " " . ((localtime)[5]+1900));
+}
+
+sub time2iso
+{
+    my($sec,$min,$hour,$mday,$mon,$year) = localtime(shift);
+    sprintf("%04d-%02d-%02d %02d:%02d:%02d",
+            $year+1900, $mon+1, $mday, $hour, $min, $sec);
+}
+
+sub dur2str
+{
+    my $hour = 0;
+    my $min  = 0;
+    my $sec  = shift;
+    $min = int($sec/60);
+    $sec = $sec%60;
+    $hour = int($min/60);
+    $min = $min%60;
+    sprintf "%2d:%02d:%02d", $hour, $min, $sec;
+}
+

@@ -1,0 +1,41 @@
+Net::Server::POP3::Skeleton version 1.0
+=======================================
+
+This module implements a bare-bones skeleton POP3 server.  It is
+intended as a base class.  You should inherit from this class (which,
+in turn, inherits from Net::Server::Fork|Net::Server::Fork).  The only
+POP3 command implemented by this module is the QUIT command.  All
+others should be implemented by your code as methods.
+
+The purpose of this module is for easily creating non-standard POP3
+servers in Perl.  If you want a normal POP3 server (ie, one that
+simply serves emails from an MBOX or MailDirs file), you would
+probably be better off using one of the pre-built, faster C-based
+servers.  If, on the other hand, you want to create a specialized POP3
+server that, for instance, generates the content of the messages
+dynamically based on data from a website, this module is what you
+want.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Net::Server, IO::Select, Carp
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004, Cory Johns.  All rights reserved.
+
+This module is free software; you can redistribute and/or modify
+it under the same terms as Perl itself.
+
+Address bug reports and comments to: Cory Johns <johnsca@cpan.org>

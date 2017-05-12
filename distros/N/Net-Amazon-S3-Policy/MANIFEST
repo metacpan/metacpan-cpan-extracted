@@ -1,0 +1,13 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+README
+eg/sample-form.pl
+lib/Net/Amazon/S3/Policy.pm
+t/00.load.t
+t/01.test.t
+t/pod-coverage.t
+t/pod.t
+META.yml
+META.json                                Module JSON meta-data (added by MakeMaker)

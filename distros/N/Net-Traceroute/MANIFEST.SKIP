@@ -1,0 +1,7 @@
+^MANIFEST\.bak$
+^Makefile(\.old)?$
+~$
+^\.git
+^archive/
+^blib/
+^pm_to_blib$

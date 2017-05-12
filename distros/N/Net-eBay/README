@@ -1,0 +1,118 @@
+Net-eBay
+
+This module allows users to communicate with eBay using perl and their
+XML based eBay API. You can use it to list items for sale, bid, get
+seller item list, search, get ebay time, or do anything else.
+
+Many details of this API can be found at http://developer.ebay.com. To
+be able to use this module, you need to register there and obtain keys
+and a authentication token using "tokentool".
+
+The job of its module is to encapsulate connectivity and
+authentication, and communication with ebay. First, you need to
+initialize your ebay connection by passing it credentials. After that,
+you can send queries to eBay. A typical request is comprised of its
+name, and a hash table of application parameters.
+
+It supports BOTH New and Legacy API (Legacy API will expire in summer
+2006).
+
+Example of listing an item for sale:
+  
+  use Net::eBay;
+  use Data::Dumper;
+  
+  my $ebay = new Net::eBay( {
+                                site_level => 'prod',
+                                DeveloperKey => '...',
+                                ApplicationKey => '...',
+                                CertificateKey => '...',
+                                Token => '...',
+                               } ); 
+  
+  my $result = $ebay->submitRequest( "AddItem",
+                        {
+                         DetailLevel => "0",
+                         ErrorLevel => "1",
+                         SiteId => "0",
+                         Verb => "  AddItem",
+                         Category => "14111",
+                         CheckoutDetailsSpecified => "0",
+                         Country => "us",
+                         Currency => "1",
+                         Description => "For sale is like new <A HREF=http://www.example.com/jhds/>thingamabob</A>.Shipping is responsibility of the buyer.",
+                         Duration => "7",
+                         Location => "Anytown, USA, 43215",
+                         Gallery => 1,
+                         GalleryURL => 'http://igor.chudov.com/images/mark_mattson.jpg',
+                         MinimumBid => "0.99",
+                         BuyItNowPrice => 19.99,
+                         PayPalAccepted => "1",
+                         PayPalEmailAddress => "ichudov\@example.com",
+                         Quantity => "1",
+                         Region => "60",
+                         Title => "Igor's Item with Gallery xaxa",
+                        }
+                      );
+  
+    print "Result: " . Dumper( $result ) . "\n";
+  
+Result of submitRequest is a perl hash obtained from the response XML using XML::Simple, something like this:
+  
+  Result: $VAR1 = {
+            'Item' => {
+                      'Id' => '4503546598',
+                      'Fees' => {
+                                'FeaturedGalleryFee' => '0.00',
+                                'InternationalInsertionFee' => '0.00',
+                                'CurrencyId' => '1',
+                                'GalleryFee' => '0.25',
+                                'AuctionLengthFee' => '0.00',
+                                'ProPackBundleFee' => '0.00',
+                                'BorderFee' => '0.00',
+                                'FeaturedFee' => '0.00',
+                                'SchedulingFee' => '0.00',
+                                'HighLightFee' => '0.00',
+                                'FixedPriceDurationFee' => '0.00',
+                                'PhotoDisplayFee' => '0.00',
+                                'ListingFee' => '0.55',
+                                'BuyItNowFee' => '0.00',
+                                'PhotoFee' => '0.00',
+                                'GiftIconFee' => '0.00',
+                                'SubtitleFee' => '0.00',
+                                'InsertionFee' => '0.30',
+                                'ListingDesignerFee' => '0.00',
+                                'BoldFee' => '0.00',
+                                'ReserveFee' => '0.00',
+                                'CategoryFeaturedFee' => '0.00'
+                              },
+                      'StartTime' => '2005-08-30 04:50:47',
+                      'EndTime' => '2005-09-06 04:50:47'
+                    },
+            'EBayTime' => '2005-08-30 04:50:47'
+          };
+  
+  
+
+THIS IS A NEW MODULE
+
+This module is new and may have bugs (gasp). Please contact Igor
+Chudov, ichudov AT algebra DOT com, maybe I could help you, or you
+could help me.
+
+INSTALLATION
+
+To install this module, run the following commands:
+  
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Igor Chudov
+  
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

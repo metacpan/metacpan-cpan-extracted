@@ -1,0 +1,298 @@
+=head1 NAME
+
+Net::SMTP::Receive - receive mail via SMTP
+
+=head1 SYNOPSIS
+
+	MyMailReceiver->showqueue()
+
+	MyMailReceiver->runqueue()
+
+	MyMailReceiver->server(%options)
+
+	package MyMailReceiver;
+
+	@ISA = qw(Net::SMTP::Receive);
+
+	use Net::SMTP::Receive;
+
+	sub deliver
+	{
+		my ($message) = @_;
+
+		# attempt to deliver a message...
+		die or return, return code ignored
+	}
+
+	sub is_delivered
+	{
+		my ($message, $recipient) = @_;
+
+		if ($recipient) {
+			return 1 if delivered to recipient
+			return 0 if not
+		} 
+		return 1 if message is fully delivered
+		return 0 if not
+	}
+
+=head1 DESCRIPTION
+
+Net::SMTP::Receive handles receiving email via SMTP.  It is built
+as a base class that must be subclassed to provide methods 
+for actually delivering a message.  Many aspects of 
+Net::SMTP::Receive's behavior can be modified by overriding
+methods in the subclass.
+
+Net::SMTP::Receive does not provide any method to deliver a 
+message or even check that it has been delivered.  That's left
+for the subsclass.  However, it will queue the message until
+it has been delivered.  
+
+Almost all configuration of Net::SMTP::Receive is done through
+overriding method definitions.
+
+Both the SMTP server and individual messages are represented
+by Net::SMTP::Receive objects (or rather MyMailReceiver
+objects if that's what you choose to name your subclass).
+
+This module defines the pieces you need for a basic mail server
+but it since some of the bits must be overriden, it does not 
+define a complete mail server.  A complete mail server, 
+listens for connections, queues mail, re-runs the queue every
+now and then, and can display the queue.  A call to
+C<serer()> will listen for conenctions.   It blocks forever.
+A call to C<runqueue()> will process the pending queue.  Arrange
+to call this periodically.   A call to C<showqueue()> will 
+display the queue: provide a command to for users to do this.
+This is not meant as a high-volume mail server.  It is mean to
+provide a way to directly receive mail in perl while honoring
+the guarantees that mail servers should make.
+
+=head1 MEMBER DATA
+
+The following fields exist the sever objects and continue
+to exist as the server object forks itself to become
+a message object.
+
+=over 4
+
+=item PEERHOST, PEERADDR
+
+C<PEERADDR> is the IP address of the system the email is
+coming from.  C<PEERHOST> is the hostname of the system
+the email is coming from.
+
+=item IDENT
+
+C<IDENT> is the username returned by doing an ident query
+on the sender.
+
+=item HELO
+
+C<HELO> is a copy of the greeting sent by the client.
+
+=item MIMETYPE
+
+C<MIMETYPE> is either C<8BITMIME> or C<7BIT> depending on the
+transfer encoding used.
+
+=item FROM
+
+C<FROM> is the address provided with C<MAIL FROM>.
+
+=item TO
+
+C<TO> is an anonymous array of addresses provided by the
+C<RCPT TO> command.  This array may be modified by 
+the C<deliver()> method.
+
+=item TIME
+
+C<TIME> is a timestamp (integer) of when the message was first 
+enqueued.
+
+=item ID
+
+C<ID> is the identification assigned to the message as it is
+enqueued.  The filename of the message is
+C<$queue_directory/$message->{ID}.txt> (also available
+as C<$message->{TEXTFILE}>).  The envelope is stored as a 
+perl object in C<$queue_directory/$message->{ID}.pqf>.
+
+=item TEXTFILE
+
+C<TEXTFILE> is the filename where the message is stored while
+in the message queue.  Messages are placed in the queue before
+delivery is attempted.
+
+=item ERROR
+
+C<ERROR> contains the die message (C<$@>) from the last delivery
+attempt.
+
+=item LASTRUN
+
+C<LASTRUN> is the timestamp (integer) of when delivery was last
+attempted on the message.
+
+=item STATE
+
+C<STATE> is a status field that is left over from the protocol
+negotiations.  It's mentioned here because it's reserved for
+internal use.  Any additional fields added after this release
+will use a member data naming prefix of C<NSR_>.
+
+=back
+
+=head1 REQUIRED METHODS TO OVERRIDE
+
+You must override C<deliver> and C<is_delivered>.  In the 
+context of method delivery, C<$message> is a persistent object.
+You can add or change fields and unless the message is fully
+delivered, your changes stored with Storable and restored the
+next time delivery() is attempted.
+
+See the L</"MEMBER DATA"> section for the pre-defined keys that
+the message object provides.
+
+For C<is_delivered> the recipient optional. If present, the return
+value is used for for C<showqueue>.
+
+For C<deliver>, it is okay to C<die>.  If you do, the die message
+will become the C<ERROR> field and be displayed by C<showqueue>.
+Delivery will be re-attempted by C<runqueue>.
+
+=head1 ADDITIONAL METHODS TO OVERRIDE
+
+The following is not a complete set, but it is likely to be
+enough.  For the complete set, read the source.
+
+C<check_rcptto()> is an important method to define.  It is
+here that it is easiest to prevent open relaying.  A simple
+check that the recipient address belongs to you will do.  A
+return code of something like: "550 relaying denied"
+works.
+
+	sub check_rcptto
+	{
+		my ($self, $envelope_to_address) = @_;
+
+		return 0 if the address is okay as it stands
+		return (0, @replacement_addresses) if the address is okay
+			but delivery should be redirected to antoher 
+			address or addresses.
+		return "550 relaying denied, so go away!"
+	}
+
+C<check_mailfrom> is less important, but can also be useful.
+
+	sub check_mailfrom
+	{
+		my ($self, $envelope_from_address) = @_;
+
+		return 0 if the from address is okay
+		return $smtp_3digit_error_code otherwise
+	}
+
+	sub do_syslog
+	{
+		return 1 if you want syslogging of activity
+		return 0 if you want errors to stderr
+	}
+
+	sub queue_directory 
+	{
+		return '/var/spool/pmqueue';
+		# return something else to place the message queue
+		# elsewhere.
+	}
+
+	sub checkaccess
+	{
+		my ($self, $client_iohandle, $remote_ident) = @_;
+
+		die or exit() if you don't want to talk to the client
+		otherwise, return anything
+	}
+
+	sub prestart
+	{
+		my ($self, %config) = @_;
+
+		# initialize any special MyMailReceiver state before
+		# starting to listen as a server
+	}
+
+	sub max_datalength
+	{
+		return 20_000_000; 
+		# return something smaller if you don't want to accept
+		# 20GB messages..
+	}
+
+	sub max_recipients
+	{
+		return 10_000;
+		# return something smaller if you want to place a more
+		# reasonable limit on the number of recipients.
+	}
+
+	sub add_envelope
+	{
+		return 0; #default
+		return 1 
+		# if you want to add an C<X-Envelope-To:> header.
+		# If you do this, C<Bcc:> won't be blind.
+	}
+
+	sub predeliver
+	{
+		my ($msg, $client, $msgref) = @_;
+		# check over the incoming message before it is enqueued
+		# this is a good place to enforce policy or do quick
+		# spam checks.  Die with an SMTP error code to reject
+		# the message --- die "500 relaying denied"
+		# The $msgref is an anonymous list comprising the body
+		# of the message.
+		die "500 relaying denied" if $msgref->[0] !~ /\@myhost/;
+		return 0
+	}
+
+
+=head1 METHODS TO CALL
+
+Net::SMTP::Receive has three core methods that are used to fire it up.
+
+	MyMailReceiver->server(%config)
+
+C<server()> starts an SMTP listening server.  The config parameters
+currently supported are:
+
+	IPAddr
+	Port
+
+	MyMailReceiver->runqueue()
+
+C<runqueue()> processes the mail queue.  It is not called automatically
+by the server.  Call it with a cron job instead.  Be sure to do this!
+
+	MyMailReceiver->showqueue([$message ids])
+
+C<showqueue()> prints a sendmail-style mail queue report to STDOUT.
+It is optionally restricted to particular message ids.
+
+
+Net::SMTP::Receive doesn't provide much for the subclass to call.  However,
+there are a few methods that might be some help.  Well, one anyway:
+
+	$message->log($text, $args)
+
+syslog()s text and also printf's it.
+
+=head1 LICENSE  
+
+Copyright (C) 2001, 2002 David Muir Sharnoff.  License hereby
+granted for anyone to use, modify or redistribute this module at 
+their own risk.  Please feed useful changes back to muir@idiom.org.
+

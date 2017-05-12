@@ -1,0 +1,6 @@
+Revision history for Perl extension Nokia::File::NFB.
+
+0.01  Wed Sep 15 17:52:14 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -b 5.5.3 -n Nokia::File::NFB
+

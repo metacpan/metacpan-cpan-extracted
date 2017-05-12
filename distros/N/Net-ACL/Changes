@@ -1,0 +1,47 @@
+$Id: Changes,v 1.15 2003/06/06 19:28:40 unimlo Exp $
+
+Revision history for Perl extension Net::ACL.
+
+0.07  Fri Jun  6
+	- Spell-checked documentation!
+	- Fixed test of routemap not to use RIBEntry!
+	- Fixed routemap test to be skiped if no Net::BGP is installed
+	- Added POD test 'stolen' from Net::DNS
+
+0.06  Sun Jun 01
+	- Added signature
+	- Update requirements
+	- More documentation fixed
+	- Added peer/route-source to RouteMapRule
+
+0.05  Sat May 31
+	- Updated more documentation
+	- Added features for routemap/NLRI and tests of this
+	- Added new Set and Match objects (Member and Union)
+	- Changed Set::Add to use $x = $x + $y rather then $x += $y since the
+		other resulted in segmentation faults in some situations - STRANGE!
+
+0.04  Thu May 29
+	- Updated more documentation
+	- Fixed last requirements to match real versions (waiting for a release of Net::BGP)
+	- Fixed some tests and some code (not much)
+
+0.03  Wed May 28
+	- Added support for minimum/maximum prefix-length in Match::Prefix
+	- Some documentation updated
+	- Some documentation switched to use =item instead of B<> or I<> for
+		methods/arguments. The rest will follow later
+	- Added/fixed a few configuration string syntaxes
+	- Added a few test scripts and updated others
+
+0.02  Tue May 27
+	- Added half a test script for route-map
+	- Changed constructors for set and match objects to always have index as first argument.
+	- Documentation clean-up!
+	- Code clean-up!
+
+0.01  Tue May 27
+	- Original version; created by h2xs 1.21
+	- First PRE-ALPHA release to public
+	- Still lots of bugs and missing documentation
+

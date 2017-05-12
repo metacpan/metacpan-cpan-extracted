@@ -1,0 +1,13 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Net/Google/Blogger.pm
+lib/Net/Google/Blogger/Blog.pm
+lib/Net/Google/Blogger/Blog/Entry.pm
+t/00-load.t
+t/10-crud.t
+t/manifest.t
+t/pod.t
+Makefile.PL
+META.yml

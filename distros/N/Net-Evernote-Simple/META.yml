@@ -1,0 +1,27 @@
+---
+abstract: 'Simple interface to the Evernote API'
+author:
+  - 'Mike Schilli <cpan@perlmeister.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Evernote-Simple
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Temp: '0.22'
+  Log::Log4perl: '1'
+  Thrift: v0.6.1
+  YAML: '0.71'
+resources:
+  repository: http://github.com/mschilli/net-evernote-simple.git
+version: '0.07'

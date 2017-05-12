@@ -1,0 +1,25 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Net/iContact.pm
+t/00-load.t
+t/01-new.t
+t/02-login.t
+t/contacts.t
+t/gen_.t
+t/get_error.t
+t/to_arrayref.t
+t/to_hashref.t
+t/lists.t
+t/campaigns.t
+t/putmessage.t
+t/putcontact.t
+t/putsubscription.t
+t/stats.t
+t/pod-coverage.t
+t/pod.t
+ex/printlists.pl
+ex/contactlookup.pl
+ex/createmessage.pl

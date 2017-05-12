@@ -1,0 +1,153 @@
+Revision history for Net-LDAP-Class
+
+0.27 01 July 2016
+ - use Net::LDAP::SID (with fixed AD SID manipulation)
+   fixes https://rt.cpan.org/Ticket/Display.html?id=115702
+
+0.26 22 Feb 2011
+ - patch from dekimsey@ufl.edu per RT#65658
+   https://rt.cpan.org/Ticket/Display.html?id=65658 that fixes bug with
+   multiple add_user/remove_user calls on a AD group object.
+
+0.25 17 Feb 2010
+ - rewrite of internal _sid2string() and _string2sid() pack/unpack magic.
+   Many thanks to David Lowe for the help.
+
+0.24 29 Nov 2009
+ - flag some AD tests as TODO until the pack/unpack issue with SIDs can be
+   ironed out. It only seems to affect Net::LDAP::Server::Test, not actual
+   AD servers.
+
+0.23 24 Nov 2009
+ - add explicit unbind() calls in tests per RT #52037
+
+0.22 14 Sep 2009
+ - add pswd_will_expire_localtime to User::AD
+ - remove init_user_class and init_group_class overrides in subclasses,  to
+   prevent masking the fact that you must create your own subclass.
+
+0.21 26 Aug 2009
+ - change fetch_secondary_users() in both Group::AD and Group::POSIX to
+   just wrap around secondary_users_iterator().
+
+0.20 26 Aug 2009
+ - add Iterator, SimpleIterator and MultiIterator classes and supporting
+   methods. Thanks to Peter Newman for dialogue on the development of the
+   iterator feature. See https://rt.cpan.org/Ticket/Display.html?id=48562
+ - fix overloading for boolean checks when stringify() evaluates false
+   (emptry string, e.g.)
+
+0.19 10 Aug 2009
+ - tweek N::L::C::G::AD per
+   https://rt.cpan.org/Ticket/Display.html?id=48562
+ - add isa_user() and isa_group() methods to base class per same RT ticket.
+
+0.18_03 27 Jan 2009
+ - add more debugging to trace the 'no such group in AD server: 101 at
+   t/002-ad.t line 99' failure.
+ - add act_on_all() utility method
+
+0.18_02 26 Jan 2009
+ - add POD that some versions of Pod::Coverage seem to need.
+
+0.18_01 23 Jan 2009
+ - turn on some debugging to pinpoint cpan test failures
+
+0.18 5 Mar 2009
+ - refactor random SHA1 seed generation to speed it up.
+ - add save() method
+ - add ldap option to act_on_all() to allow calling as class method.
+ - group->name a setter as well as getter
+ - default User::AD DN now based on username plus human name, to help
+   enforce uniqueness. This allows for the same human to have multiple
+   accounts in the same OU.
+
+0.17 16 Jan 2009
+ - add Loader tests
+ - fix bug when setting name and email for both AD and POSIX. Bug was
+   equivalent to ||= instead of //= since an empty string is different than
+   undef. Allows for setting the value to an empty string.
+ - new method has_local_changes()
+
+0.16 22 Nov 2008
+ - fix overload for Test::More 0.86
+
+0.15 6 Nov 2008
+ - escape () in DN value in Group::AD since user DN might have () marks in
+   it (though this is *bad* practice)
+
+0.14 3 Nov 2008
+ - fix bug with create action in both User subclasses where some attrs were
+   not being respected
+
+0.13 16 Oct 2008
+ - add has_user() convenience method in base Group class
+ - fix bug in AD::User where secondary groups were not being saved on
+   create()
+ - explicitly pass base_dn in AD::Group fetch_*_users()
+
+0.12 15 Oct 2008
+ - refactor action_for_create in POSIX and AD user classes to also set
+   non-default attributes that might have been set prior to calling
+   create().
+
+0.11 13 Oct 2008
+ - fix User::AD so that password can be set in single action.
+ - fix User::AD so that add_to_group() can be called before initial
+   creation.
+ - only set groups in User::AD create if there are any, since AD will croak
+   if memberOf is set to empty array.
+
+0.10 26 Sept 2008
+ - tweek list of possible_chars in random_string generation
+
+0.09 21 Aug 2008
+ - change from meta() to metadata() at mst's request. Should help with
+   Moose compatability.
+ - added validate() method
+
+0.08 12 Aug 2008
+ - check return result from Net::LDAP search() in find() and croak on
+   error.
+ - fix bug with action_for_delete() in ::Group::POSIX that manifested when
+   trying to rename a group. New feature is 'skip_check' to skip the sanity
+   check for whether a group still has users.
+
+0.07 31 July 2008
+ - refer everywhere internally in ::User::AD to ->gid instead of
+   primaryGroupID() so that the attribute can be disabled in subclasses.
+ - use ->attributes instead of ->meta->attributes everywhere internally
+ - if fetch_* methods return undef from find() then return empty array(ref)
+ - force random_string() to be a little more random
+ - refactor ::User::AD objectSID code into its own functions
+
+0.06 23 July 2008
+ - simplify encoding/decoding of AD password (no Encode required)
+
+0.05 22 July 2008
+ - switch logic for AD User/Group to use Group->member as primary setting.
+ - add a bunch of AD User attributes
+ - get AD password set working
+ - new object_or_meta_class() method type; switch attributes(), base_dn()
+   and unique_attribues() in base Class to use it instead of defaulting to
+   meta->$name. This means you can override any of  those values
+   per-object, but they default to those set in the object class meta
+   object.
+
+0.04 21 July 2008
+ - explicitly ask for meta->attributes whenever we search
+ - add add_to_batch() and prev_batch() methods and refactor how rollback()
+   works.
+ - fix bug, renaming unique_keys to unique_attributes in a few leftover
+   places.
+ - add Active Directory classes for User and Group
+
+0.03 11 July 2008 
+ - replace Scalar::Util::Clone with Clone (5.10 issue?)
+
+0.02 10 July 2008
+ - fix Makefile.PL to include Net::LDAP::Batch dependency.
+
+0.01 10 July 2008
+ - First version, released on an unsuspecting world.
+

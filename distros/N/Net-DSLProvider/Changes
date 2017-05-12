@@ -1,0 +1,11 @@
+Revision history for Net-DSLProvider
+
+0.03    2012-10-31
+        Enta deprecated. Entanet module for new API. Fixed many bugs. Tests work!
+
+0.02    2012-06-06
+        Internal Update only bugfixes
+
+0.01    2012-05-05
+        First version, released on an unsuspecting world.
+

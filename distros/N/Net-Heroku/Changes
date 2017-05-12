@@ -1,0 +1,36 @@
+This file documents the revision history for the Net::Heroku distribution.
+
+0.10    2013-04-21 00:00:00
+        - Using form generator instead of post_form for Mojolicious >= 3.85
+        - Updated for API changes in ps and domain requests
+        - Fixed add_config 'Not a HASH reference' error when nothing returned
+
+0.09    2012-06-30 00:00:00
+        - Requires IO::Socket::SSL > 1.75 for Mojolicious >= 3.0
+
+0.08    2012-06-21 00:00:00
+        - Fixed run process test
+        - Added add_domain, domains, remove_domain
+
+0.07    2012-06-06 00:00:00
+        - Dropped IO::Socket::SSL requirement from 1.74 to 1.49,
+            so cpanm Net::Heroku will work in Strawberry Perl 5.14.2
+
+0.06    2012-06-06 00:00:00
+        - IO::Socket::SSL dependency
+
+0.05    2012-06-05 00:00:00
+        - Changed expected text for BUILDPACK_URL config test
+        - Accepts email/pass in addition to API key
+
+0.04    2012-02-27 00:00:00
+        - Removed Devel::Dwarn dep
+
+0.03    2012-02-26 00:00:00
+        - create returns empty list on failure
+
+0.02    2012-02-26 00:00:00
+        - Better POD
+
+0.01    2012-02-25 00:00:00
+        - Initial release

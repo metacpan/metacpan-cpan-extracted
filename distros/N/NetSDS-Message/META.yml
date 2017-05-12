@@ -1,0 +1,38 @@
+---
+name: NetSDS-Message
+version: 0.021
+author:
+  - 'Michael Bochkaryov <misha@rattler.kiev.ua>'
+abstract: 'Messages (SMS, MMS, etc) processing libraries for NetSDS'
+license: gpl
+resources:
+  license: http://www.opensource.org/licenses/gpl-license.php
+requires:
+  NetSDS: 1.000
+  NetSDS::Class::Abstract: 1.000
+  NetSDS::Util::Convert: 1.000
+  NetSDS::Util::String: 1.000
+  perl: 5.008
+  version: 0.50
+build_requires:
+  Module::Build: 0.2805
+  Test::More: 0.62
+  Test::Pod: 1.26
+  Test::Pod::Coverage: 1.08
+provides:
+  NetSDS::Const::Message:
+    file: lib/NetSDS/Const/Message.pm
+    version: 0.021
+  NetSDS::Message:
+    file: lib/NetSDS/Message.pm
+    version: 0.021
+  NetSDS::Message::SMS:
+    file: lib/NetSDS/Message/SMS.pm
+    version: 0.021
+  NetSDS::Util::SMS:
+    file: lib/NetSDS/Util/SMS.pm
+    version: 0.021
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,27 @@
+Net/ProxyMod version 0.04
+=========================
+
+Small TCP proxy for packet alteration
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+For documenation on how to use this package see perldoc Net::ProxyMod 
+after installation.
+
+For questions/comments/suggestions/... about Net::Divert please use 
+atrak-perl@r4k.net for faster replies thento my normal swamped email
+account ;) 
+
+- Stephanie Wehner <_@r4k.net>
+
+see LICENSE file for copyright and licensing information
+
+People who contributed to this module:
+- Thomas Kratz (nonforking addition) 

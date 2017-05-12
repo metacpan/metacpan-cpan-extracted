@@ -1,0 +1,5 @@
+# $Creator: Network Stumbler Version 0.4.0
+# $Format: wi-scan summary with extensions
+# Latitude	Longitude	( SSID )	Type	( BSSID )	Time (GMT)	[ SNR Sig Noise ]	# ( Name )	Flags	Channelbits	BcnIntvl	DataRate	LastChannel
+# $DateGMT: 2004-05-06
+N 33.8465150	W 84.0024650	( olympus )	BSS	( 00:0c:41:d8:53:f0 )	16:49:26 (GMT)	[ 35 184 149 ]	# (  )	0011	00000040	100	360	6

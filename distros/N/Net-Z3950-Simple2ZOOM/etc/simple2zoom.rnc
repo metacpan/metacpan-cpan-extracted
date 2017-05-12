@@ -1,0 +1,50 @@
+# $Id: simple2zoom.rnc,v 1.10 2007-09-14 14:35:40 mike Exp $
+
+# Simple2ZOOM configuration XML is not in any namespace.
+
+start = element client {
+	element authentication { text }?,
+	database*,
+	search?
+}
+
+database = element database {
+	attribute name { text },
+	element zurl { text },
+	element resultsetid { "id" | "search" | "fallback" }?,
+	element nonamedresultsets { empty }?,
+	option*,
+	element charset { text }?,
+	search?,
+	schema*,
+	element sutrs-record { field* }?,
+	element usmarc-record { field* }?,
+	element grs1-record { field* }?
+}
+
+option = element option {
+	attribute name { text },
+	text
+}
+
+search = element search {
+	element querytype { "cql" },
+	map*
+}
+
+map = element map {
+	attribute use { text },
+	element index { text }?
+}
+
+schema = element schema {
+	attribute oid { text },
+	attribute sru { text },
+	attribute format { text },
+	attribute encoding { text }
+}
+
+field = element field {
+	attribute xpath { text },
+	text
+}

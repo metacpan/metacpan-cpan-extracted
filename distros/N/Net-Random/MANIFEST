@@ -1,0 +1,22 @@
+lib/Net/Random.pm
+t/param-checking.t
+t/live-tests.t
+t/pod.t
+t/pod-coverage.t
+t/fake-tests.t
+README
+MANIFEST
+Makefile.PL
+t/fourmilab-data
+t/fourmilab-outofdata
+t/random.org-checkbuf
+t/random.org-data
+t/qrng-data
+TODO
+example/dice
+ARTISTIC.txt
+CHANGELOG
+GPL2.txt
+t/context.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

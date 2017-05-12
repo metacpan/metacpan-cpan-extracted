@@ -1,0 +1,37 @@
+---
+abstract: 'Implements the Amazon Web Services signature version 4, AWS4-HMAC-SHA256'
+author:
+  - 'Tim Nordenfur <tim@gurka.se>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Slurper: '0'
+  HTTP::Request: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Amazon-Signature-V4
+no_index:
+  directory:
+    - t
+    - inc
+    - xt
+requires:
+  Digest::SHA: '0'
+  Time::Piece: '1.17'
+  URI::Escape: '0'
+  perl: '5.008001'
+resources:
+  repository: https://github.com/Grinnz/Net-Amazon-Signature-V4.git
+version: '0.16'
+x_contributors:
+  - 'Arthur Axel fREW Schmidt <frioux@gmail.com>'
+  - 'Dan Book <dbook@cpan.org>'
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Steven Hartland <steven.hartland@multiplay.co.uk>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

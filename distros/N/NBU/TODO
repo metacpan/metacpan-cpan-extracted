@@ -1,0 +1,21 @@
+As of $Date: 2007/11/30 13:57:29 $ the list of things we'd like to add to this
+package are:
+- Handle multiple volumes per image
+- Cover pending mount requests somewhere and possibly automate notification
+  of interested parties
+- Do something useful with bplist.  But what?
+- Make sure we can answer the age old question: "When I restore <xyzzy> which
+  tapes will I need?"
+- Determine which robot a tape was in when it filled up.  Part of an effort to
+  monitor tape consumption by robot to help manage their contents.
+- Add XML configuration files to:
+	- manage behavior of notify and exit scripts
+- Build database interface to centralized drive and media failure tracking
+  system.  (bperror is nice but it doesn't carry info on DOWNED drives.)
+  the vmglob command, new with 3.4, allows us to uniquely identify drives and
+  robots (except that replacing drives does not update their serial numbers!)
+- Investigate additional information provided by vmquery -X; a value of 0x0 in
+  the flags field indicates the tape has been marked for deletion.  This format
+  though carries more information and might be better used than the current -w
+  layout
+- License analysis against class types and client counts

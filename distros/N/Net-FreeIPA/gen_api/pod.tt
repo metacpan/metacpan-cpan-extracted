@@ -1,0 +1,17 @@
+=pod
+
+=head2 Generated API data version v[% version %]
+
+=over
+
+=cut
+
+[% FOREACH command IN commands.pairs %]
+[%      INCLUDE data_pod.tt name=command.key details=command.value %]
+[% END %]
+
+=pod
+
+=back
+
+=cut

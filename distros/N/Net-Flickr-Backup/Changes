@@ -1,0 +1,376 @@
+# -*-n3-*-
+
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix doap:    <http://usefulinc.com/ns/doap#> .
+@prefix asc:     <http://aaronland.info/ns/changefile/> .
+
+<>
+        dc:identifier           "$Id: Changes,v 1.52 2010/12/19 19:06:56 asc Exp $" ;
+        dc:description          "Changes for Net::Flickr::Backup" ;
+        dcterms:references      <http://aaronland.info/perl/net/flickr/backup/> .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-3.1.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-3.0.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "3.1" ;
+                        doap:created      "2010-12-27" ;
+                        ];
+        asc:changes     [
+			asc:bugfix	  "Fix fetch video original by default (thanks TSIBLEY, https://github.com/straup/p5-Net-Flickr-Backup/pull/2)" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-3.0.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.991.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "3.0" ;
+                        doap:created      "2010-12-22" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Fetch Medium 640, Video Original and Site MP4" ;
+                        asc:update        "Require Net::Flickr::RDF 2.2" ;
+			asc:update	  "Thomas Sibley's patches: https://github.com/straup/p5-Net-Flickr-Backup/pull/1" ;
+			asc:bugfix	  "Use originalsecret to fetch EXIF data" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.991.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.99.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "2.991" ;
+                        doap:created      "2008-02-26" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Require Net::Flickr::RDF 2.1 (record Flickr Places/geo info)" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.99.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.98.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "2.99" ;
+                        doap:created      "2007-10-01" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Ensure that RDF dumps for the current valid photo are excluded when scrubbing photos" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.98.tar.gz>        
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.97.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "2.98" ;
+                        doap:created      "2007-09-03" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "When writing RDF dumps do not call IO::AtomicFile->delete if we are doing inline RDF" ;
+                        asc:update        "Log 'info' events when scrubbing files" ;
+                        asc:update        "Update to use N:F:RDF 2.01 (bug fixes in N:F:API)" ;
+                        asc:update        "Replace calls to _auth with N:F:API->get_auth" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.97.tar.gz>        
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.96.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "2.97" ;
+                        doap:created      "2007-06-05" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Update POD to make note of N:F:API handler requirements (RT # 27548)" ;
+                        asc:bugfix        "Update POD to use 'flickr' config section, rather than 'flick' (RT # 27547)" ;
+                        asc:update        "Replace Sys::Hostname::FQDN with Sys::Hostname (RT # 27459)" ; 
+                        asc:update        "Update to use N:F:RDF 2.0 (add support for machine tags and Flickr place names)" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.96.tar.gz>        
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.95.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "2.96" ;
+                        doap:created      "2006-11-19" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Be more forgiving about the change-iness of files; better reporting/handling of missing RDF dumps, inline or on the file-system" ;
+                        asc:bugfix        "Fixed typo in 'modified_since' POD such that it will, you know, work now" ;
+                        asc:update        "Replaced all calls to $xml->findvalue() with $xml->find()->string_value() to account for XML::XPath::Literal string overloading" ;
+                        asc:update        "Update to use N:F:RDF 1.96 (add support for the trynt.com colour extraction service)" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.95.tar.gz>        
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.94.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "2.95" ;
+                        doap:created      "2006-10-19" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Require N:F:R 1.94 (add reverse geocoding and topo support from geonames.org)" ;
+                        asc:update        "Updated POD" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.94.tar.gz>        
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.93.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "2.94" ;
+                        doap:created      "2006-09-07" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Test $num_page for a 'value' method to prevent overloaded magic weirdness when comparing (==) against $current_page" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.93.tar.gz>        
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.92.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "2.93" ;
+                        doap:created      "2006-09-04" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Test $num_page for a 'value' method to prevent overloaded magic weirdness when comparing (==) against $current_page" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.92.tar.gz>        
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.91.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "2.92" ;
+                        doap:created      "2006-09-01" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Require Net::Flickr::RDF 1.92 - support for location data in RDF dumps (and fixing of the fixing in Net::Flickr::API)" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.91.tar.gz>        
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.9.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "2.91" ;
+                        doap:created      "2006-08-23" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Require Net::Flickr::RDF 1.91 (sigh)" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.9.tar.gz>        
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.8.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "2.9" ;
+                        doap:created      "2006-08-18" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Require Net::Flickr::RDF 1.9" ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.8.tar.gz>        
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.7.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "2.8" ;
+                        doap:created      "2006-06-24" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Added the ability to store limited metadata set in IPTC" ;
+                        asc:update        "Updated POD." ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.7.tar.gz>        
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.6.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "2.7" ;
+                        doap:created      "2006-06-23" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Added option to use flickr.photos.recentlyUpdated" ;
+                        asc:addition      "Added rdfdump_inline config option to store RDF metadata in the COM of the file (this is still experimental)" ;
+                        asc:addition      "Added MANIFEST.SKIP" ;
+                        asc:bugfix        "Fixed 00-load.t to load the correct package" ;
+                        asc:update        "Require Net::Flickr::RDF 1.8 - changes in the RDF out are NOT backwards compatible" ;
+                        asc:update        "Fixed typo in doap:created for 2.6" ;
+                        asc:update        "Updated POD." ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.6.tar.gz>        
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.5.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "2.6" ;
+                        doap:created      "2006-02-22" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Require Net::Flickr::RDF 1.6 (for comments!)" ;
+                        asc:update        "Remove dots (.) from image names" ;
+                        asc:update        "Updated POD." ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.5.tar.gz>        
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.4.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "2.5" ;
+                        doap:created      "2005-12-28" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Added (experimental) 'register_callback' method." ;
+                        asc:addition      "Added 'cancel_backup' method." ;
+                        asc:bugfix        "Test for $id in shortname during scrub process." ;
+                        asc:bugfix        "Fixed POD." ;
+                        asc:update        "Switch Changes file to N3 format." ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.4.tar.gz>        
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.3.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "2.4" ;
+                        doap:created      "2005-12-17" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Fixed a bug where root directories for RDF files were not being created properly (like, at all)." ;
+                        asc:update        "Require Net::Flickr::RDF 1.5." ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.3.tar.gz>        
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.2.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "2.3" ;
+                        doap:created      "2005-12-17" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Require Net::Flickr::RDF 1.4." ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.2.tar.gz>        
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.1.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "2.2" ;
+                        doap:created      "2005-09-29" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "FIXED dependecy list in Build.PL to include Text::Unidecode." ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.1.tar.gz>        
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.0.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "2.1" ;
+                        doap:created      "2005-09-28" ;
+                        ];
+        asc:changes     [
+                        asc:update        "UPDATED to require Net::Flickr::RDF 1.1." ;
+                        asc:update        "UPDATED POD." ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-2.0.tar.gz>        
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-1.3.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "2.0" ;
+                        doap:created      "2005-09-25" ;
+                        ];
+        asc:changes     [
+                        asc:update        "UPDATED to sub-class Net::Flickr::RDF 1.0." ;
+                        asc:addition      "ADDED 'backup_photo' method." ;
+                        asc:addition      "ADDED option to toggle whether or not originals are downloaded." ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-1.3.tar.gz>        
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-1.2.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "1.3" ;
+                        doap:created      "2005-09-14" ;
+                        ];
+        asc:changes     [
+                        asc:comment       "The 'Embarassing Bugs' bug-fix (never-released) release." ;
+                        asc:bugfix        "FIXED RT bug #14429 to check for required Config::Simple blocks." ;
+                        asc:bugfix        "FIXED a bug where already decoded UTF-8 was being decoded again." ;
+                        asc:bugfix        "FIXED to use rdf, not rdfs, for 'type'." ;
+                        asc:update        "UPDATED to include groups and photosets in RDF dump." ;
+                        asc:update        "UPDATED basically the entire RDF schema to use a Flickr specific namespace for photos, notes, tags, groups, users and photosets." ;
+                        asc:update        "UPDATED RDF schema for dc:creator for actual downloads." ;
+                        asc:update        "UPDATED to require RDF::Simple ..." ;
+                        asc:addition      "ADDED Memoize to list of requirements." ;
+                        asc:addition      "ADDED Sys::Hostname::FQDN to list of requirements." ;
+                        asc:addition      "ADDED example config file to POD." ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-1.2.tar.gz>        
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-1.1.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "1.2" ;
+                        doap:created      "2005-09-01" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Added throttling to API calls." ;
+                        asc:addition      "Added hooks to use Log::Dispatch." ;
+                        asc:addition      "Added fetch_* config options." ;
+                        asc:update        "Require RDF::Simple.pm 0.21." ;
+                        asc:update        "Send User-Agent header." ;
+                        asc:update        "Updated POD." ;
+                        asc:comment       "Initial public release." ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-1.1.tar.gz>        
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-1.0.tar.gz> ;
+
+        doap:Version    [
+                        doap:revision     "1.1" ;
+                        doap:created      "2005-06-22" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Require Flickr::API 0.07; added support for the Auth API." ;
+                        asc:addition      "Download 'square' and 'small' versions." ;
+                        asc:update        "Updated RDF to use SKOS for tag descriptions." ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/Net-Flickr-Backup-1.0.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/net/flickr/backup/> ;
+
+        doap:Version    [
+                        doap:revision     "1.0" ;
+                        doap:created      "2005-02-06" ;
+                        ];
+        asc:changes     [
+                        asc:comment       "Initial release.";
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/backup/>
+        a doap:Project ;
+        doap:download-page      "http://search.cpan.org/dist/Net-Flickr-Backup/" ;
+        doap:download-mirror    "http://aaronland.info/perl/net/flickr/backup/"
+        .

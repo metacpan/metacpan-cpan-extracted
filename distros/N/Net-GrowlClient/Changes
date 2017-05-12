@@ -1,0 +1,8 @@
+Revision history for Perl extension Net::GrowlClient.
+
+0.01  Mon Feb 26 04:40:54 2007
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Net::GrowlClient
+0.02  Sat Mar 17 21:56:00 2007
+	- bug corrected when priority not given in notify()
+	- add two tests

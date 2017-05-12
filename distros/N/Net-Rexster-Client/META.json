@@ -1,0 +1,61 @@
+{
+   "abstract" : "Handle Rexster REST request and response",
+   "author" : [
+      "Shohei Kameda <shoheik@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Rexster-Client",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Encode" : 0,
+            "JSON" : 0,
+            "LWP::UserAgent" : 0,
+            "Moose" : 0,
+            "Test::Fake::HTTPD" : 0,
+            "Test::MockObject" : 0,
+            "Test::MockObject::Extends" : 0,
+            "Test::More" : 0,
+            "Test::Perl::Critic" : 0,
+            "URI::Escape" : 0,
+            "utf8" : 0,
+            "version" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Net::Rexster::Client" : {
+         "file" : "lib/Net/Rexster/Client.pm",
+         "version" : "v0.0.5"
+      },
+      "Net::Rexster::Request" : {
+         "file" : "lib/Net/Rexster/Request.pm",
+         "version" : 0
+      },
+      "Net::Rexster::Response" : {
+         "file" : "lib/Net/Rexster/Response.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.0.5"
+}

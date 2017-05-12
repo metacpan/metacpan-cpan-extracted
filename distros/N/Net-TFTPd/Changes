@@ -1,0 +1,47 @@
+Revision history for Perl extension Net::TFTPD.
+
+0.10  Fri Jul 16 20:30:00 2016
+    - Added V6Only feature to pass to IO::Socket::IP.
+
+0.09  Thu Mar 19 20:30:00 2015
+	- Top down Changes file.
+    - Moved files to proper module format with lib/ bin/ and t/ directories.
+    - Added t/ tests.
+    - Added bin/tftpd-simple.pl for more features.
+
+0.08  Wed Mar 18 16:30:00 2015
+	- Fixed v6Only tag when selecting IPv6 to account for Windows issues.
+
+0.07  Tue Nov 18 09:00:00 2014
+	- Updated v6Only tag when selecting IPv6 to account for Linux issues.
+
+0.06  Wed Oct 17 11:13:00 2012
+	- fix, thanks again to Michael Vincent: now supporting also Socket.pm
+	  version which doesn't support IPv6
+
+0.05  Thu Oct 11 09:30:00 2012
+	- some changes, thanks again to Michael Vincent
+	  - Changed to optional IO::Socket::IP and enabled IPv6 support, with
+	    failback to IP::Socket::INET
+	  - Added a server() accessor.
+
+0.04  Mon May 25 15:00:00 2009
+	- some fixes, thanks to Michael Vincent
+	  - support for NETASCII transfer mode
+	  - added $request->getTotalBytes() method to retrieve the number
+	    of bytes transferred for the request
+	  - added various other request methods
+
+0.03  Mon Sep 17 07:41:00 2007
+	- some fixes, thanks to Onigiusz Zarzycki:
+	  - now work also on linux (tested on SUSE Linux 10.1)
+	  - handling TFTP transmissions with more than 65535 packets
+	  - handling TFTP transmissions with block size between 8 and 511 Bytes
+
+0.02  Mon Aug 23 17:10:12 2004
+	- project revision, added examples and POD documentation
+	  first public release
+
+0.01  Mon Oct 21 11:06:19 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n Net::TFTPd

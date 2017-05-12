@@ -1,0 +1,246 @@
+NAME
+    Net::Spooler - A Perl extension for writing spooling daemons
+
+SYNOPSIS
+      # Create a subclass of Net::Spooler
+      use Net::Spooler;
+      package MySpooler;
+      @MySpooler::ISA = qw(Net::Spooler);
+
+      # Inherit everything, except a single method:
+      sub ProcessFile {
+        my $self = shift; my $file = shift;
+
+        # Try to process the file here
+        ...
+
+        # Raise an exception, if something went wrong:
+        die "Failed: $!" unless Something();
+
+        # Return to indicate sucess.
+      }
+
+      # Create and run the spooler
+      package main;
+      my $spooler = Net::Spooler->new(
+          'spool-dir' => '/var/myspooler'
+      );
+      $spooler->Bind();
+
+DESCRIPTION
+    This package contains a spooling daemon, in other words a
+    process, that accepts files from an outside source (currently a
+    Unix or TCP/IP socket), stores them in a spooling directory and
+    processes them.
+
+    The package is implemented as an abstract base class: It is not
+    usefull in itself, but you can get your spooling daemon easily
+    by deriving a concrete subclass from `Net::Spooler'. In the best
+    case you can inherit everything and overwrite just a single
+    method, the *ProcessFile* method, which attempts to process a
+    single file from the spooling directory.
+
+    `Net::Spooler' is in turn derived from the `Net::Daemon'
+    package, thus it borrows class design, in particular methods and
+    attributes, from `Net::Daemon'. See the Net::Daemon manpage for
+    details on this superclass.
+
+    However, there are a few additions to `Net::Daemon':
+
+  Attributes
+
+    Like in `Net::Daemon', attributes can be set via the command
+    line, in the config file or as constructor arguments (order
+    descending from most important). And remember, that you can use
+    the `Net::Daemon' attributes too! See the Net::Daemon manpage.
+
+    *admin* (B<--admin=<email>)
+            The administrators email address. From time to time it
+            may happen, that the admin receives an email in case of
+            problems.
+
+    *expiretime* (--expiretime=<time>)
+            If processing a file fails repeatedly, the file may
+            finally expire. This means that the file will be removed
+            from the spool directory and a message is sent to the
+            administrator.
+
+            The default value are 432000 seconds (5 days). A value
+            of 0 means that expiration never happens.
+
+            Example: Expire after 3 days.
+
+              --expiretime=259200
+
+    *maxsixe* (--maxsize=<maxsize>)
+            By default the maximum size of a file is restricted to
+            100000 bytes and larger files will be rejected. This
+            option is changing the size, a value of 0 means
+            disabling the limitation.
+
+            Example: Disable max size
+
+              --maxsize=0
+
+    *processtimeout* (--processtimeout=<timeout>)
+            If processing a single file may result in an endless
+            loop, or simply run too long, then you may specify a
+            timeout. The daemon will raise a signal after the given
+            amount of seconds and stop processing the file, as if
+            the method `ProcessFile' raised an exception.
+
+            The default value is 0 seconds which means that no
+            timeout is used.
+
+            Example: Use a timeout of 30 seconds.
+
+              --processtimeout=30
+
+    *loop-timeout* (--loop-timeout=<time>)
+            If processing a file failed, the spooler will reprocess
+            the file later by forking a child process after the
+            given amount of seconds, by default 300 seconds (5
+            minutes). This child process will run through all
+            scheduled file
+
+    *spool-dir* (--spool-dir=<dir>)
+            If the daemon accepts files, they are stored in the
+            *spool directory*. There's no default, you must set this
+            attribute.
+
+            Example: Use /var/myspooler as a spool directory.
+
+              --spool-dir=/var/myspooler
+
+    *tmpfiles*
+            This attribute is for internal use only. It contains an
+            hash ref, the keys being temporary file names to be
+            removed later.
+
+  Methods
+
+    As already said, the `Net::Spooler' package inherits from
+    `Net::Daemon'. All methods of the superclass are still valid in
+    `Net::Spooler', in particular access control and the like. See
+    the Net::Daemon manpage for details.
+
+    Processing a file
+              $self->ProcessFile($file)
+
+            (Instance method) Called for processing a single file.
+            This is typically the only method you have to overwrite.
+
+            The method raises an exception in case of errors. If an
+            exception is raised, the scheduler will later retry to
+            process the file until it expires. See the *queuetime*
+            and *expiretime* attributes above.
+
+            If processing a file exceeds the *processtimeout* (see
+            above), then the scheduler will cancel processing the
+            method and continue as if it raised an exception. (This
+            timeout can be disabled by setting it to 0, the default
+            value.)
+
+            If the method returns without raising an exception, then
+            the scheduler assumes that the file was processed
+            successfully and remove it from the spool directory.
+
+    Choosing file names
+              my $sfile = $self->SequenceFile();
+              my $seq = $self->Sequence($sfile);
+              my $dfile = $self->DataFile($seq);
+              my $cfile = $self->ControlFile($seq);
+
+            (Instance methods) If the daemon receives a new file, it
+            has to choose a name for it. These names are constructed
+            as follows:
+
+            First of all, a so-called sequence number is generated
+            by calling the method *Sequence*. By default these are
+            the numbers 1, 2, 3, ... in 8 hex digits (00000001,
+            00000002, 00000003, ...). The last generated sequence
+            number is always stored in the sequence file (by default
+            $spool-dir/.sequence, set by calling the *SequenceFile*
+            method).
+
+            Two files are generated for processing the file: The
+            *data file* is the unmodified file, as received by the
+            client. The *control file* contains information used
+            internally by `Net::Spooler', for example the time and
+            date of spooling this file. By default the names $spool-
+            dir/$seq.dat and $spool-dir/$seq.ctl are used, generated
+            by calling the methods *DataFile* and *ControlFile*.
+            Temporary file names are derived by adding the suffix
+            .tmp.
+
+            Typically you rarely need to overwrite these methods.
+
+    Accepting a file from the client
+      $self->ReadFile($socket, $fh, $file, $control);
+
+    (Instance method) This method is actually reading the file $file
+    from the socket $socket. The file is already opened and the
+    method must use the file handle $fh for writing into $file. (The
+    file name is passed for creating error messages only.)
+
+    The method may store arbitrary data in the hash ref $control:
+    This hash ref is stored in the control file later.
+
+    The default implementation is accepting a raw file on the
+    socket. You should overwrite the method, if you are accepting
+    structured data, for example 4 bytes of file size and then the
+    raw file. However, if you do overwrite this method, you should
+    consider the *maxsize* attribute. (See above.)
+
+    A Perl exception is raised in case of problems.
+
+    Creating the control file
+      $self->ControlFile($fh, $file, $control);
+
+    (Instance method) Creates the control file $file by writing the
+    hash ref $control into the open file handle $fh. (The file name
+    $file is passed for use in error messages only.)
+
+    The default implementation is using the `Data::Dumper' module
+    for serialization of $control and then writing the dumped hash
+    ref into $fh.
+
+    A Perl exception is raised in case of problems; nothing is
+    returned otherwise.
+
+    Reading the control file
+      my $ctrl = $self->ReadControlFile($file);
+
+    (Instance method) This method reads a control file, as created
+    by the *ControlFile* method and creates an instance of
+    *Net::Spooler::Control*.
+
+    The default implementation does a simple require (in a Safe
+    compartment for security reasons, see the the Safe manpage
+    package for details) for loading the hash ref from the file. The
+    hash ref is then blessed into the package corresponding to
+    $self: The package name of $self is taken by appending the
+    string ::Control.
+
+    The method returns nothing, a Perl exception is thrown in case
+    of trouble.
+
+AUTHOR AND COPYRIGHT
+    This package is
+
+      Copyright (C) 1999            Jochen Wiedmann
+                                    Am Eisteich 9
+                                    72555 Metzingen
+                                    Germany
+
+                                    E-Mail: joe@ispsoft.de
+
+      All rights reserved.
+
+    You may distribute under the terms of either the GNU General
+    Public License or the Artistic License, as specified in the Perl
+    README file.
+
+SEE ALSO
+      L<Net::Daemon(3)>
+

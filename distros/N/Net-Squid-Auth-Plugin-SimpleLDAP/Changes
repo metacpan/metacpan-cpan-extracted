@@ -1,0 +1,14 @@
+Revision History for Net-Squid-Auth-Plugin-SimpleLDAP
+=====================================================
+
+v0.1.84 2012-06-10
+------------------
+
+commit 61eb98e794b6bb0e034312dd866c9189d1e000ef
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    Revamped dist.ini to use @Author::RUSSOZ
+
+===================================
+End of changes in the last 365 days
+===================================

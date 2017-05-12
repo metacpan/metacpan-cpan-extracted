@@ -1,0 +1,98 @@
+#!/usr/bin/perl
+use 5.014000;
+use strict;
+use warnings;
+
+use App::NAOdash;
+use Getopt::Long;
+
+my %args = (
+	include_versions => [],
+	exclude_versions => [],
+);
+
+GetOptions(
+	"exclude-version=s@", \$args{exclude_versions},
+	"include-version=s@", \$args{include_versions},
+);
+
+App::NAOdash::run(\%args, @ARGV);
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+naodash - Analyze NetHack xlogfiles and extract statistics (command-line interface)
+
+=head1 SYNOPSIS
+
+  naodash mgv # Show statistics for the mgv user on NAO
+  naodash /path/to/xlogfile # Show statistics for a given xlogfile
+
+  # Show statistics for mgv, only including games played on 3.4.3 or 3.60
+  naodash --include-versions=3.6.0 --include-versions=3.4.3 mgv
+  # Show statistics for mgv, ignoring games played on 3.6.0
+  naodash --exclude-versions=3.6.0 mgv
+
+=head1 DESCRIPTION
+
+naodash is a command-line interface to L<NetHack::NAOdash>. It takes a
+NAO username or a path to an xlogfile, analyzes it, and prints the
+results of the analysis. A terminal with ANSI escape code support is
+required. Do not parse this command's output. For computer-readable
+output, please use the L<NetHack::NAOdash> library directly.
+
+=head1 OPTIONS
+
+=over
+
+=item B<--include-version>=I<version>
+
+Only consider games played on this version of NetHack. Can be
+specified multiple times to include multiple versions.
+
+=item B<--exclude-version>=I<version>
+
+Do not consider games played on this version of NetHack. Can be
+specified multiple times to exclude multiple versions.
+
+=back
+
+If a version is included and excluded at the same time, games played
+on that version will not be considered.
+
+=head1 ENVIRONMENT
+
+=over
+
+=item NAODASH_CACHE
+
+Path to a directory that should be used to cache xlogfiles downloaded
+from NAO, or the special value 'none' (case-insensitive) to disable
+caching.
+
+By default a directory named 'naodash' in the default temporary
+directory (C<< File::Spec->tmpdir >>) is used.
+
+=back
+
+=head1 SEE ALSO
+
+L<NetHack::NAOdash>, L<http://alt.org/nethack/>, L<App::NAOdash>, L<App::Web::NAOdash>
+
+=head1 AUTHOR
+
+Marius Gavrilescu, E<lt>marius@ieval.roE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

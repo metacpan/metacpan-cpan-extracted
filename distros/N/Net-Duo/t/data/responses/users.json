@@ -1,0 +1,43 @@
+[
+    {
+        "user_id": "DU3RP9I2WOC59VZX672N",
+        "username": "jsmith",
+        "realname": "Joe Smith",
+        "email": "jsmith@example.com",
+        "status": "active",
+        "groups": [
+            {
+                "desc": "People with hardware tokens",
+                "name": "token_users"
+            }
+        ],
+        "last_login": 1343921403,
+        "notes": "",
+        "phones": [
+            {
+                "phone_id": "DPFZRS9FB0D46QFTM899",
+                "number": "+15555550100",
+                "extension": "",
+                "name": "", 
+                "postdelay": null,
+                "predelay": null,
+                "type": "Mobile",
+                "capabilities": [
+                    "sms",
+                    "phone",
+                    "push"
+                ],
+                "platform": "Apple iOS",
+                "activated": false,
+                "sms_passcodes_sent": false
+            }
+        ],
+        "tokens": [
+            {
+                "serial": "0", 
+                "token_id": "DHIZ34ALBA2445ND4AI2",
+                "type": "d1"
+            }
+        ]
+    }
+]

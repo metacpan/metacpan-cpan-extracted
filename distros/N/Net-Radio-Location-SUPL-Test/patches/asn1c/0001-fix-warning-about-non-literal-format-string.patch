@@ -1,0 +1,25 @@
+From 561649ec1dae4447fb22c634bbff6cc4c0d329d2 Mon Sep 17 00:00:00 2001
+From: Jens Rehsack <sno@NetBSD.org>
+Date: Mon, 2 Jul 2012 10:14:27 +0200
+Subject: [PATCH 1/4] fix warning about non-literal format string
+
+---
+ asn1c/unber.c |    2 +-
+ 1 Datei geändert, 1 Zeile hinzugefügt(+), 1 Zeile entfernt(-)
+
+diff --git a/asn1c/unber.c b/asn1c/unber.c
+index 6973698..8546f40 100644
+--- a/asn1c/unber.c
++++ b/asn1c/unber.c
+@@ -392,7 +392,7 @@ print_TL(int fin, asn1c_integer_t offset, int level, int constr, ssize_t tlen, b
+ 		return;
+ 	}
+ 
+-	while(level-- > 0) printf(indent_bytes);  /* Print indent */
++	while(level-- > 0) printf("%s", indent_bytes);  /* Print indent */
+ 	printf(fin ? "</" : "<");
+ 
+ 	printf(constr ? ((tlv_len == -1) ? "I" : "C") : "P");
+-- 
+1.7.10.5
+

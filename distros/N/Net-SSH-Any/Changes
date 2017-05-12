@@ -1,0 +1,99 @@
+Revision history for Perl extension Net::SSH::Any.
+
+0.10  Jun 13, 2016
+       - Make local command lookup strict by default and add support
+         for the relaxed_command_lookup flag.
+       - Fix several documentation errors.
+
+0.09  Jun 11, 2016
+       - Require a recent version of Test::More for testing.
+       - Add pointer to git repository in module meta info.
+
+0.08  Jun 11, 2016
+       - Improve remote OS autodetection.
+
+0.07  Jun 10, 2016
+        - Improve diagnostic messages for Net::SSH::Any::Test
+          failures.
+
+0.06  Jun 10, 2016
+        - Improve diagnostic messages for autodetect failures in tests.
+
+0.05  Jun 9, 2016
+
+        * There is a long history behind this module:
+
+          In order to get it to work correctly I ended becoming the
+          de-facto main maintainer of Net::SSH2, rewriting large parts
+          of it and also fixing lots of bugs in libssh2. That took me
+          two years and a half.
+
+          In the meantime I have keep adding features to Net::SSH::Any...
+
+        - Ssh_Cmd backend which runs on top of any ssh binary
+          supporting command line flags compatible with the OpenSSH
+          one which are not good enough for Net::OpenSSH as for
+          instance Oracle SSH or the Cygwin openssh package.
+
+        - Plink_Cmd backend which uses the "plink" executable (part of
+          the PuTTY project).
+
+        - Sexec_Cmd backend which uses Bitwise Tunnelier "sexec"
+          utility.
+
+        - Dbclient_Cmd backend which uses the dropbear client
+          "dbclient".
+
+        - Sshg3_Cmd backend which uses the Tectia command line SSH
+          client "sshg3".
+
+        - dpipe support, providing an object able to talk to the
+          remote process both ways.
+
+        - Net::SSH::Any::Test framework which anyhow is able to
+          provide the details of a running SSH server that could be
+          used for testing. This module replaces my old Test::SSH
+          package and includes the backends Remote which tries to
+          connect to localhost; OpenSSH_Daemon which starts a local
+          SSH server in some spare port; Dropbead_Daemon which does
+          the same but using Dropbear and Cygwin that on Windows is
+          able to install the Cygwin OpenSSH package and use it to
+          start a local server.
+
+        - Net::SSH::Any::Test::Isolated which runs Net::SSH::Any::Test
+          in an isolated process so that there are not interferences
+          between the tested module and the test server provider.
+
+        - Net::SSH::Any::Autodetector which is able to find out
+          several properties about the remote machine as operating
+          system and the user shell.
+
+        - Integration with Net::OpenSSH quoters.
+
+        - Documentation is still a WIP.
+
+        - And lots and lots of issues fixed...
+
+
+0.04  Sep 25, 2013
+        - add support for SCP
+        - handle errors on Net_SSH2 backend when calling channel and
+          exec methods (bug report by mpapec)
+        - infer default remote login name from local one
+        - allow configuration of remote slave commands
+        - add support for timeouts on Net_SSH2 backend
+        - several bugs corrected
+        - better docs
+
+0.03  Nov 19, 2012
+        - add support for SFTP via Net::SFTP::Foreign
+
+0.02  Nov 14, 2012
+        - password authentication was broken
+        - several bugs corrected and general improvements
+        - still a work in progress
+
+0.01  Sun Sep 11 15:56:00 2011
+	- original version; created by h2xs 1.23 with options
+		-AXn Net::SSH::Any
+

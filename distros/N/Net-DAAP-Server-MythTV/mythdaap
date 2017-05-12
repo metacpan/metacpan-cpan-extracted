@@ -1,0 +1,85 @@
+#!/usr/bin/perl
+
+# vi: ts=4 sw=4
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Net::DAAP::Server::MythTV;
+use POE;
+
+our $VERSION = 0.01;
+
+my %args;
+GetOptions('help|?' => \&Getopt::Long::HelpMessage,
+		   'db_name:s' => \$args{db_name},
+		   'db_host:s' => \$args{db_host},
+		   'db_username:s' => \$args{db_username},
+		   'db_password:s' => \$args{db_password});
+
+$args{db_name} = $args{db_name} || shift;
+$args{db_host} = $args{db_host} || shift;
+$args{db_username} = $args{db_username} || shift;
+$args{db_password} = $args{db_password} || shift;
+
+Net::DAAP::Server::MythTV->new(%args);
+$poe_kernel->run;
+
+__END__
+
+=head1 NAME
+
+MythTV DAAP Server - Publish MythTV videos to DAAP clients like Apple's Front Row
+
+=head1 SYNOPSIS
+
+mythdaap [--db_name] db_name [--db_host] db_host [--db_username] db_username [--db_password] db_password
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--db_name>
+
+MythTV database name.  Default: 'mythconverge'
+
+=item B<--db_host>
+
+MythTV database host.  Default: 'localhost'
+
+=item B<--db_username>
+
+MythTV database username.  Default: 'mythtv'
+
+=item B<--db_password>
+
+MythTV database password.  Default: 'mythtv'
+
+=back
+
+=head1 PREREQUISITES
+
+Getopt::Long
+
+Net::DAAP::Server::MythTV
+
+POE
+
+=head1 AUTHOR
+
+Jack Bates <ms419@freezone.co.uk>
+
+=head1 COPYRIGHT
+
+Copyright 2007, Jack Bates.  All rights reserved.
+
+This program is free software.  You can redistribute it and/or modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Net::DAAP::Server::MythTV - The module this script uses
+
+=head1 SCRIPT CATEGORIES
+
+Networking

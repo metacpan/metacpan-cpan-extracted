@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+Build.PL
+MANIFEST
+README
+t/NetStumbler-Wap.t
+lib/NetStumbler/Wap.pm
+META.yml                                 Module meta-data (added by MakeMaker)

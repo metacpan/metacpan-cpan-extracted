@@ -1,0 +1,43 @@
+---
+abstract: 'FormValidator::Lite plugin for Nephia'
+author:
+  - 'MACOPY <macopy123[attttt]gmai.com>'
+build_requires:
+  Config::Micro: 0
+  Nephia::Plugin::Dispatch: 0
+  Nephia::Plugin::JSON: 0
+  Nephia::Plugin::View::MicroTemplate: 0
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.7.0, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Nephia-Plugin-FormValidator-Lite
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Nephia::Plugin::FormValidator::Lite:
+    file: lib/Nephia/Plugin/FormValidator/Lite.pm
+    version: 0.03
+requires:
+  FormValidator::Lite: 0
+  Nephia: 0.31
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/mackee/Nephia-Plugin-FormValidator-Lite/issues
+  homepage: https://github.com/mackee/Nephia-Plugin-FormValidator-Lite
+  repository: git://github.com/mackee/Nephia-Plugin-FormValidator-Lite
+version: 0.03

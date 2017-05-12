@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:                Net-Radius-Server
+version:             1.116
+abstract:            Framework for RADIUS Servers
+license:             ~
+author:              
+    - Luis E. Muñoz <luismunoz@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Authen::PAM:                   0
+    BerkeleyDB:                    0
+    Class::Accessor:               0.27
+    File::Find::Rule:              0
+    IO::Async:                     0
+    IO::Prompt:                    0
+    MLDBM::Sync:                   0
+    Net::LDAP:                     0
+    Net::Radius::Dictionary:       1.51
+    Net::Radius::Packet:           1.51
+    Net::Server:                   0.94
+    NetAddr::IP:                   4
+    Statistics::Descriptive:       0
+    Test::File::Contents:          0
+    Time::HiRes:                   0
+    Time::Stopwatch:               0
+    YAML::Syck:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

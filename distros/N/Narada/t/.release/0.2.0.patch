@@ -1,0 +1,16 @@
+diff --git a/service/log/log/run b/service/log/log/run
+new file mode 100755
+index 0000000..a5ed3e0
+--- /dev/null
++++ b/service/log/log/run
+@@ -0,0 +1,2 @@
++#!/bin/sh
++exec svlogd -tt $(find ../../../var/log -type d) 2>&1
+diff --git a/service/log/run b/service/log/run
+new file mode 100755
+index 0000000..e24c273
+--- /dev/null
++++ b/service/log/run
+@@ -0,0 +1,2 @@
++#!/bin/sh
++exec socklog unix ../../var/log.sock 2>&1

@@ -1,0 +1,36 @@
+Net::SNMP::HostInfo
+===================
+
+Net::SNMP::HostInfo is a class that simplifies access to the
+IP, TCP, and UDP information of a MIB-II compliant network host,
+such as a router or a PC.
+
+You can use it to retrieve numerous statistics on IP, ICMP, TCP, and UDP,
+as well as the IP routing table (ipRouteTable),
+the IP address table (ipAddrTable),
+the ARP table (ipNetToMediaTable),
+the TCP connection table (tcpConnTable),
+and the UDP listener table (udpTable).
+Browse the list of available methods to see what values are available.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+On Win32 systems, you can use Microsoft's nmake.
+
+DEPENDENCIES
+
+This module requires David Town's Net::SNMP module.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 James Macfarlane
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

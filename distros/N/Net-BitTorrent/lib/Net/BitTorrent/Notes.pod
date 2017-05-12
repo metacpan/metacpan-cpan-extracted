@@ -1,0 +1,654 @@
+=pod
+
+=head1 NAME
+
+Net::BitTorrent::Notes - Annotated Guide to the Ins and Outs of Net::BitTorrent
+
+=head1 Description
+
+This is a first draft attempt at defining a road map for future
+C<Net::BitTorrent> development and a behavioral reference for third-party
+client developers.  A few bits for users might slip in too.
+
+=head1 Net::BitTorrent's Way-too-Obvious Class Hierarchy
+
+                                            .---- N::B::T::T::UDP
+                                           /
+                      .-------- N::B::T::Tracker
+                     /                     \
+                    /   .-- N::B::T::File   `--- N::B::T::T::HTTP
+                   /   /
+            .---- Net::BitTorrent::Torrent
+           /
+          /   .--- Net::BitTorrent::DHT
+         /   /
+  Net::BitTorrent
+         \
+          `---- Net::BitTorrent::Peer
+
+The following utility modules also come with the distribution and will be
+of great use if you decide to whip together your own BitTorrent module.
+
+=over
+
+=item C<Net::BitTorrent::Protocol>
+
+Correctly builds and parses all known BitTorrent packets.
+
+=for TODO And contains other protocol-related values (MSE's 768bit safe Diffie-Hellman prime, for example)
+
+=item C<Net::BitTorrent::Util>
+
+Contains basic functions to parse and create .torrent metadata files, and
+compact peer lists from trackers.
+
+=back
+
+To pick and choose which functions will be exported into your namespace
+from these modules, see their POD documentation for more information.
+
+=head1 Installation
+
+This distribution uses C<Module::Build> for installation, so use the
+following procedure:
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+See also: L<Automated Test Reports|/"Automated Test Reports">
+
+=head2 Prerequisites
+
+C<Net::BitTorrent> requires L<version|version> and
+L<Digest::SHA|Digest::SHA>.  On Win32, we try to use
+L<Win32API::File|Win32API::File> and L<Encode|Encode> to handle extended
+charset filenamesL<[1]|/"[1]">.  As of perl 5.10, all of these modules
+are are CORE; they come bundled with the distribution.
+
+I have listed these modules as prerequisites in Build.PL so, unless you
+answer 'no' when prompted, the CPAN shell should automagically install
+them for you.
+
+X<[1]> We also use the internal C<utf8()> functions which didn't appear
+until perl 5.8.1.
+
+=head1 How Do I...
+
+Parts that aren't handled internally are described here (eventually) with
+sample code to get you started.
+
+=head2 Get basic info from a .torrent without adding it to a client
+
+L<Net::BitTorrent::Torrent|Net::BitTorrent::Torrent> objects can be
+created directly without a parent client.  While functionally limited
+(obvious things like an inability to serve data, etc.) basic information
+is available and some 'advanced' functions still work (hashchecking, for
+example).  See L<Net::BitTorrent::Torrent|Net::BitTorrent::Torrent> for
+more.
+
+=head2 Pause and Resume a .torrent Session
+
+See
+L<Net::BitTorrent::Torrent::pause( )|Net::BitTorrent::Torrent/"pause( )">
+and
+L<Net::BitTorrent::Torrent::start( )|Net::BitTorrent::Torrent/"start( )">
+
+=head2 Stop and Resume a .torrent Session
+
+See
+See
+L<Net::BitTorrent::Torrent::stop( )|Net::BitTorrent::Torrent/"stop( )">
+and
+L<Net::BitTorrent::Torrent::start( )|Net::BitTorrent::Torrent/"start( )">
+
+
+=head2 Quick Resume a .torrent Session Between Client Sessions
+
+Note: This section describes resume functionality as of C<v0.045>.
+
+C<Net::BitTorrent> is capable of restoring the state of single torrents
+between sessions.  To store resume data, use the
+L<save_resume_data( )|Net::BitTorrent::Torrent/"save_resume_data ( [ PATH ] )">
+
+To resume a single torrent, use a variation of the following to save the
+data...
+
+ my $torrent = $bt->add_torrent( { Path=> 'some.torrent', Resume = '.resume' });
+
+ # later...
+
+ $torrent->save_resume_data();
+
+...and unless C<Net::BitTorrent::Torrent> decides the resume data is
+bad, you'll start right were you left off. I would suggest storing resume
+data on a regular basis while the client runs and again on exit.
+
+
+To view a fully functioning example, see C</tatoeba/004-resume.pl>.
+
+For more on what exactly you're saving and the structure of the data, see
+L<Resume API|/"Resume API"> in the
+<Net::BitTorrent Internals|/"Net::BitTorrent Internals"> section.
+
+=head2 Save and Restore Client-wide State and DHT Data
+
+Unless you've hard coded everything, being able to restore client-wide
+state is a necessary feature.  Besides, DHT can be very slow to boot
+without a good set of initial nodes and the spec states that the local
+nodeID should not change very often, so resume is a useful thing.
+
+I would use a hash with the following keys:
+
+=over
+
+=item C<.hash>
+
+This would be a SHA-1 hash of the bencoded data in the C<.t>, C<dht>,
+C<nodes>, and C<torrents> keys. On restore, I would use this to validate
+the data in case it was tampered with.
+
+=item C<.t>
+
+Timestamp.
+
+=item C<.version>
+
+To avoid problems (API changes, etc.), I would use an API version
+number and ignore resume data created with a newer/incompatible version.
+This value would not be included in the SHA-1 digest used to prevent
+tampering.
+
+=item C<dht>
+
+A hash with the following keys:
+
+=over
+
+=item C<id>
+
+The local node ID used in the DHT swarm.  To obtain this, see
+L<node_id( )|Net::BitTorrent::DHT/"node_id( )">.
+
+=item C<nodes>
+
+List of nodes in the DHT routing table.
+
+To make life easy, each node would be a hash with the following keys:
+
+=over
+
+=item C<ip>
+
+IP or hostname of the remote node.
+
+=item C<port>
+
+UDP port number the remote port has been contacted on.
+
+=back
+
+A list of nodes with this format is obtained from
+L<nodes ( )|Net::BitTorrent::DHT/"nodes ( )">.  To reload these later,
+use the L<add_node ( )|Net::BitTorrent::DHT/"add_node ( { [...] } )">
+method.
+
+=back
+
+=item C<settings>
+
+These would be any client-wide settings I allow users to change.
+
+=item C<torrents>
+
+This would be a list of filenames, their current status, and some sort of
+verification that the .torrent file hasn't been replaced; the infohash
+would do.
+
+=back
+
+I would save a bencoded version of this data in a file for later.  For
+now, putting all of this into practice is an exercise for the reader.
+
+Note: Reloading the data may require using otherwise private methods
+(specifically the private C<Net::BitTorrent::DHT-E<gt>_set_node_id( )>
+method). Changes to private methods are not listed in the changelog
+found in this distribution but they are noted in the public git
+repository's log.
+
+=head2 Set File Download Priorities
+
+See
+L<Net::BitTorrent::Torrent::File|Net::BitTorrent::Torrent::File/"priority( [NEWVAL] )">.
+
+=head2 Implement My Own Event Loop
+
+[TODO]
+
+=head1 Net::BitTorrent Internals
+
+This section describes all the behind the scenes stuff that makes
+C<Net::BitTorrent> work.  Or not work.  It depends.
+
+=head2 Peer ID Specification
+
+Please see
+L<Net::BitTorrent::Version|Net::BitTorrent::Version/"Peer ID Specification">.
+
+=head2 IPv6-Related Information
+
+L<Socket6|Socket6> does not seem to work with Win32 so... no plans for
+IPv6 right now.
+
+=head2 Implemented Extensions
+
+The BitTorrent Community Forum coordinates the development of the
+BitTorrent protocol suite, its reference implementation, and BitTorrent
+Enhancement Proposals (BEPs).  For more information, see BEP 0: Index of
+BitTorrent Enhancement Proposals http://bittorrent.org/beps/bep_0000.html
+
+This is the list of extensions used by this release of
+L<Net::BitTorrent|Net::BitTorrent> sorted by their progress toward
+standardization.
+
+=over
+
+=item *
+
+BEP 5: DHT Protocol - http://bittorrent.org/beps/bep_0005.html
+
+=item *
+
+BEP 6: Fast Extension - http://bittorrent.org/beps/bep_0006.html
+
+Note: the Fast Extension is only partially implemented in
+L<Net::BitTorrent|Net::BitTorrent>.
+
+=item *
+
+BEP 10: Extension Protocol - http://bittorrent.org/beps/bep_0010.html
+
+=item *
+
+BEP 12: Multitracker Metadata Extension -
+http://bittorrent.org/beps/bep_0012.html
+
+=item *
+
+BEP 15: UDP Tracker Protocol - http://bittorrent.org/beps/bep_0015.html
+
+=item *
+
+BEP 27: Private Torrents - http://bittorrent.org/beps/bep_0027.html
+
+=item *
+
+BEP 32: Tracker Returns Compact Peer Lists -
+http://bittorrent.org/beps/bep_0023.html
+
+=back
+
+=head2 Resume API
+
+C<Net::BitTorrent::Torrent>'s resume data is bencoded and stored in a
+file.  To restore this data, use the C<Resume> parameter when calling
+L<Net::BitTorrent::Torrent-E<gt>new( )|Net::BitTorrent::Torrent/"new ( { [ARGS] } )">
+or L<Net::BitTorrent-E<gt>add_torrent( )|Net::BitTorrent/"add_torrent ( { ... } )">.
+
+I<Note: The structure and data held in the resume data is subject to
+change in future versions.>
+
+=head3 Data Structure
+
+Parsed resume data is a simple hash containing the following keys:
+
+=over
+
+=item C<.format>
+
+A string describing what sort of file this is.  For now, it's value is
+C<Net::BitTorrent resume>.
+
+=item C<.t>
+
+Timestamp when data was gathered.
+
+=item C<.version>
+
+API version used to gather data.  To avoid problems (API changes, etc.),
+L<Net::BitTorrent::Torrent|Net::BitTorrent::Torrent>
+will not load resume data created with a higher version.
+
+=item C<bitfield>
+
+A bitvector representing the pieces we already have.
+
+=item C<files>
+
+A list of hashes (one for each file in the .torrent) with the following
+keys:
+
+=over
+
+=item C<mtime>
+
+The modified times for the files (or C<0> if the file does not exist).
+
+=item C<priority>
+
+The file's download priority.
+
+=back
+
+=item C<peers>
+
+Compact list of peers we've found either through DHT or from a tracker.
+
+=item C<working>
+
+List of hashes representing pieces we are currently downloading with the
+following keys: I<(Subject to change)>
+
+=over
+
+=item C<Block_Count>
+
+Number of blocks contained in the piece.
+
+=item C<Block_Length>
+
+Size of blocks in piece.
+
+=item C<Block_Length_Last>
+
+Size of final block in piece.
+
+=item C<Blocks_Received>
+
+Bitfield representing which blocks have been received and written to
+disk.
+
+=item C<Endgame>
+
+Boolean value dependent on endgame state when we began working on this
+piece.
+
+=item C<Index>
+
+Zero-based index of the piece.
+
+=item C<Length>
+
+Total size of the piece in bytes.
+
+=item C<Priority>
+
+Priority based (partially) on the piece's containing file.
+
+=item C<Slow>
+
+Boolean value dependent on how long ago we received a block contained
+within this piece.
+
+=back
+
+=back
+
+=head2 Development Policy
+
+=over 4
+
+=item * B<All APIs are subject to change.>
+
+Changes to documented or well established parts will be clearly listed
+and archived in the F<CHANGES> file.
+
+=item * B<All undocumented functionality is subject to change without notice.>
+
+L<Net::BitTorrent|Net::BitTorrent> is just asploding with incomplete bits
+of stuff so I reserve the right to change or eliminate code at any time
+without warning I<unless> functionality is defined in POD documentation.
+If you sift through the source and find something nifty that isn't
+described I<in full> in POD, don't expect your client to work with future
+releases.
+
+=back
+
+=head2 Compatibility Notes
+
+This section lists recent major changes in API or behavior between stable
+releases.  For older news see the F<Changes> file included with this
+distribution.  For detail see the commit logs.
+
+=over
+
+=item v0.050
+
+Protocol Encryption (MSE) is now supported and enabled by default. It is
+still rather unstable, so outgoing connections use header-only encryption
+but incoming connections allow for full RC4 encrypted sessions.
+
+=item v0.040
+
+Entire distribution was rewritten. Both the internals and the API have
+broken compatibility.
+
+=back
+
+=head1 Giving back
+
+If you're interested in assisting with
+L<Net::BitTorent|Net::BitTorrent>'s development but don't know where to
+begin, here are a few ideas.
+
+=head2 Joining the Project
+
+C<Net::BitTorrent> is too large for just one person to hack on.  If
+you're Perl adept and would like to help, you can start by forking the
+project on github: http://github.com/sanko/net-bittorrent/.  When ready,
+send me a pull request, I'll look over your changes and get back to you.
+Minor patches get your name in the changelog.  Major patches get your
+name in the L<Acknowledgments|Net::BitTorrent/Acknowledgments> section
+and an invitation to be a trusted collaborator.  Oooo.  Ahhh.
+
+=for html <span style="color: #F00; font-size: 1.5em;">
+
+THIS PROJECT IS ACTIVELY SEEKING DEVELOPERS.
+
+If you're interested in helping clear things out of the
+L<TODO|Net::BitTorrent::Todo> list or if you have a suggestion and are
+willing to see it through to completion, L<contact me|/"Author"> or,
+better yet, go ahead and fork the project on github:
+http://github.com/sanko/net-bittorrent.
+
+=for html </span>
+
+In general, N::B could use a second or third pair of eyes.  So, if you're
+interested in BitTorrent, p2p, or just Perl in general,
+L<let me know|/"Author">.
+
+=head2 Bug Reporting
+
+Found bugs should be reported through C<Net::BitTorrent>'s
+L<Issue Tracker|/"Issue Tracker">.  Before creating a new report through
+C<Net::BitTorrent>'s L<Issue Tracker|/"Issue Tracker">, please review the
+following list:
+
+=over
+
+=item 1.
+
+Make sure you are using the most recent stable release.
+
+=item 2.
+
+Make sure the bug is reproducible.
+
+=item 3.
+
+Please write in clear English.
+
+=item 4.
+
+Provide "baby steps" to describe exactly how to replicate the bug.
+Sample code is welcome.  The issue tracker also allows attachments so,
+if relevant, include the .torrent file.
+
+=item 5.
+
+Search the list of open and resolved issues to make sure the flaw hasn't
+already been reported.  If it has, star the issue to stay up to date.
+
+=item 6.
+
+One bug is one bug report.  Please do not include multiple, separate
+issues in one report unless they are explicitly related to each other.
+
+=item 7.
+
+Star the issue so you'll be notified of any changes.
+
+=item 8.
+
+Look over your report before submission to be sure you've included as
+much detail as possible.  Seriously.  Get up, have a drink of water, come
+back, read over it again to make sure you've included everything you
+intended, and then submit it.
+
+=back
+
+=head2 Automated Test Reports
+
+Becoming a CPAN Tester is an easy, automatic way to contribute to the
+quality of your favorite module and CPAN in general.  If you would like
+to contribute automated test reports for C<Net::BitTorrent>, install
+C<CPAN::Reporter> from the CPAN shell first:
+
+ $ cpan
+ cpan> install CPAN::Reporter
+ cpan> reload cpan
+ cpan> o conf init test_report
+   [...follow the CPAN::Reporter setup prompts...]
+ cpan> o conf commit
+ cpan> install Net::BitTorrent
+
+For more on becoming a CPAN Tester and why this is useful, see the
+L<CPAN::Reporter|CPAN::Reporter/"DESCRIPTION"> documentation and
+http://cpantesters.org/.
+
+=head1 See Also
+
+=head2 Support and Information Links for C<Net::BitTorrent>
+
+=over
+
+=item Website and Blog
+
+The official website is http://sankorobinson.com/net-bittorrent/
+and related blog entries are posted to http://sankorobinson.com/.
+
+If you're looking for a feed with only on-topic articles, subscribe to
+http://sankorobinson.com/atom/?tag=Net::BitTorrent
+
+=item Live support
+
+The official means of support for C<Net::BitTorrent> is through
+C<#net-bittorrent> on the p2p IRC network:
+irc://irc.p2p-network.net/net-bittorrent
+
+=item Receive Commit and Issue Tracker Updates
+
+These are posted to the public mailing list for which both ATOM 1.0 and
+RSS 2.0 feeds are available; see
+http://groups.google.com/group/net-bittorrent/feeds.
+
+=item Mailinglist
+
+To subscribe to the list or view the archive, visit
+http://groups.google.com/group/net-bittorrent.  Both ATOM 1.0 and RSS
+2.0 feeds are provided; see
+http://groups.google.com/group/net-bittorrent/feeds for a list.
+
+=item Issue Tracker
+
+Use http://github.com/sanko/net-bittorrent/issues for bug tracking.
+Please include as much information as possible and review
+the list L<above|/"Bug Reporting">.
+
+=item Twitter
+
+I announce stable builds and occasionally complain on Twitter:
+http://twitter.com/net_bitTorrent
+
+=back
+
+=head2 Other Recommend Open Source BitTorrent Clients
+
+=over
+
+=item *
+
+libtorrent (L<http://www.rasterbar.com/products/libtorrent/>) is covered
+by the The BSD License.
+
+=item *
+
+Bitflu (L<http://bitflu.workaround.ch/>) is a full client written in
+*nix oriented Perl.  It is available under the Perl/Artistic License.
+
+=item *
+
+btpeer (L<http://www.alhem.net/project/btpeer/>) is "a collection of
+classes implementing the core client functionality of the BitTorrent
+protocol" and has been released under the GPL.
+
+=item *
+
+Arctic (L<http://dev.int64.org/arctic.html>) is a minimal client based on
+libtorrent, written in C++ and released under the MIT License.
+
+=back
+
+=head2 Related Information
+
+=over
+
+=item RFC 3986 (URI: Generic Syntax)
+
+Section 2.3. "Unreserved Characters"
+(L<http://tools.ietf.org/html/rfc3986#section-2.3>)
+
+=item PAUSE FAQ sub-section entitled "Developer Releases"
+
+(L<http://www.cpan.org/modules/04pause.html>)
+
+=back
+
+=head1 Author
+
+Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/
+
+CPAN ID: SANKO
+
+=head1 License and Legal
+
+Copyright (C) 2008-2009 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of The Artistic License 2.0.  See the F<LICENSE>
+file included with this distribution or
+http://www.perlfoundation.org/artistic_license_2_0.  For
+clarification, see http://www.perlfoundation.org/artistic_2_0_notes.
+
+When separated from the distribution, all POD documentation is covered
+by the Creative Commons Attribution-Share Alike 3.0 License.  See
+http://creativecommons.org/licenses/by-sa/3.0/us/legalcode.  For
+clarification, see http://creativecommons.org/licenses/by-sa/3.0/us/.
+
+Neither this module nor the L<Author|/Author> is affiliated with
+BitTorrent, Inc.
+
+=for svn $Id: Notes.pod 64e98b0 2009-09-12 05:23:14Z sanko@cpan.org $
+
+=cut

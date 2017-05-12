@@ -1,0 +1,10 @@
+Build.PL
+lib/NetSDS/Feature/Kannel.pm
+lib/NetSDS/Kannel.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01_load.t
+t/02_pod.t
+t/03_pod_coverage.t

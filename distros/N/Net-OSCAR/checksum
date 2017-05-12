@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+
+# Checksums data from standard input with the OSCAR file transfer checksum algorithm
+
+use strict;
+use warnings;
+
+undef $/;
+my $data = <STDIN>;
+
+# Adopted from Gaim's implementation
+sub checksum($) {
+	my($part) = @_;
+	my $check = sprintf("%lu", (0xFFFF0000 >> 16) & 0xFFFF);
+
+	for(my $i = 0; $i < length($part); $i++) {
+		my $oldcheck = $check;
+
+		my $byte = ord(substr($part, $i, 1));
+		my $val = ($i & 1) ? $byte : ($byte << 8);
+		$check -= $val;
+		$check = sprintf("%lu", $check);
+
+		if($check > $oldcheck) {
+			$check--;
+			$check = sprintf("%lu", $check);
+		}
+	}
+
+	$check = (($check & 0x0000FFFF) + ($check >> 16));
+	$check = (($check & 0x0000FFFF) + ($check >> 16));
+	$check = $check << 16;
+
+	printf "%lu\n", $check;
+}
+
+checksum($data);
+

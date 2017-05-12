@@ -1,0 +1,23 @@
+Revision history for Perl module Net::Cisco::ACS
+
+0.01 Mon Aug 22 20:12:46 2016
+    - original version; created by ExtUtils::ModuleMaker 0.55
+    - Added query function (REST) for User, Device and DeviceGroup
+    - Added query function / ByName & ById
+    - Added update function
+    - Added delete function
+    - Added documentation
+
+0.02 Fri Sep 01 19:12:46 2016
+    - Added support for IdentityGroup
+    - Added support for Host
+    - Added support for ServiceLocation, Version and ErrorMessage
+    - Added LOTS of documentation
+
+0.03 Mon Oct 17 19:30:00 2016
+    - Extended functionality of create and update
+    - Fixed some POD
+
+0.04 Mon Jan 26 22:50:00 2017
+    - Fix in XML parsing
+    - Fix for HTTPS module dependency - LWP::Protocol::https

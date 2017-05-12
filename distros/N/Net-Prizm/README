@@ -1,0 +1,33 @@
+Net-Prizm version 0.04
+====================
+
+THis module implements a client to Motorola's Canopy Prizm Northbound
+SOAP interface enabling a perl application to talk to a Prizm server.
+
+This module is not sponsored or endorsed by Motorola.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  SOAP::Lite
+  Prizm WSDL files supplied by Motorola
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Jeff Finucane
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Motorola Inc. reserves all rights on its WSDL files.
+

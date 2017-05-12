@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::Rovio.
+
+0.01  Wed Jun  3 23:05:31 2009
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Net::Rovio
+

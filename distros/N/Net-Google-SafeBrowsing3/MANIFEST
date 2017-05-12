@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-Google-SafeBrowsing3.t
+lib/Net/Google/SafeBrowsing3.pm
+lib/Net/Google/SafeBrowsing3/DBI.pm
+lib/Net/Google/SafeBrowsing3/MySQL.pm
+lib/Net/Google/SafeBrowsing3/Sqlite.pm
+lib/Net/Google/SafeBrowsing3/Storage.pm
+lib/Net/Google/SafeBrowsing3/Lookup.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

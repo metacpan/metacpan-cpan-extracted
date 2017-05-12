@@ -1,0 +1,13 @@
+Revision history for Number-Object
+
+0.03  2014-04-01 11:59:50 JST
+        - modern way
+        - japanese tax rate++ ;(
+
+0.02    2007-06-08T19:37:00+09:00
+        - add plugin ArithmeticOperation
+        - add method of processing the decimal point of Tax plugin.
+        - add POD to Tax plugin
+
+0.01    2007-05-10T06:02:08+09:00
+        - original version

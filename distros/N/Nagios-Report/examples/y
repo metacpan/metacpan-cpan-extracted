@@ -1,0 +1,50 @@
+#!/usr/bin/perl -w
+
+use strict ;
+
+my $schema = <> ;
+chomp($schema) ;
+my @schema = split /,/, $schema ;
+   pop @schema ;
+   pop @schema ;
+
+my @save_schema = @schema ;
+
+# HOST_NAME,PERCENT_TOTAL_TIME_UP,TOTAL_TIME_DOWN,TOTAL_TIME_DOWN_HMS,TOTAL_TIME_UNREACHABLE,TOTAL_TIME_UNREACHABLE_HMS,AVAIL_URL,TREND_URL
+
+my $stdout_form_top  = "format STDOUT_TOP = \n" ;
+   $stdout_form_top .= '^' . '<' x 35 . '~~' . ' ' x 5 ;
+   $stdout_form_top .= '^' . '<' x 10 . '~~' . ' ' x 5
+     foreach ( 1.. $#schema ) ;
+   $stdout_form_top .= "\n" ;
+   $stdout_form_top .= "\$schema[$_], "
+     foreach ( 0 .. $#schema ) ;
+   $stdout_form_top .= "\n" . '.' ;
+
+eval $stdout_form_top ;
+
+my $stdout_form ;
+($stdout_form = $stdout_form_top) =~ s/_TOP// ;
+$stdout_form  =~ s/^\.//sm ;
+$stdout_form  =~ s/schema/_/g ;
+
+$stdout_form .= <<EOFORM ;
+Availability URL @*
+\$_[\$#_ - 1]
+       Trend URL @*
+\$_[\$#_]
+
+.
+EOFORM
+
+eval $stdout_form ;
+
+print $stdout_form_top, "\n" ;
+print $stdout_form, "\n" ;
+
+while (<>) {
+  @_ = split /,/ ;
+  @schema = @save_schema
+   if $- <= 3 ;
+  write ;
+}

@@ -1,0 +1,7 @@
+Revision history for Perl extension Net::Syslog.
+
+0.01  Wed Dec 22 09:10:36 1999
+	- original version; created by h2xs 1.19
+
+0.03  Sat Mar 10 10:48:23 2000
+	- first official release

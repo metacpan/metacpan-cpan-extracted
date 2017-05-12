@@ -1,0 +1,19 @@
+Revision history for Perl extension Net::Subnet.
+
+Incompatible changes are marked with "!!". Incompatibility with and changes in
+"undocumented features" are not always specifically mentioned here.
+
+1.03  Mon Jun 3 14:48 2013
+        - Fix IPv6 matching for CIDR lengths that aren't a multiple of 8
+          (Reported and patched by <wouter@widexs.nl>.)
+
+1.02  Sun Aug 28 1:58 2011
+        - Fix undef warnings for single subnet matcher that gets an address
+          from another family, or other unparsable input.
+        - Added some usage examples to the documentation.
+
+1.01  Fri Aug 26 23:41 2011
+        - Minor documentation fixes.
+
+1.00  Fri Aug 26 23:01 2011
+        - CPAN release.

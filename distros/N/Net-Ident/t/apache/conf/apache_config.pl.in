@@ -1,0 +1,3 @@
+\$apache_root = "$apache_root";
+\$apache_bin = "$apache_bin";
+\$apache_addr = "localhost:$port";

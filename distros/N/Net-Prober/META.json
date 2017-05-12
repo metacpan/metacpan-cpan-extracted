@@ -1,0 +1,57 @@
+{
+   "abstract" : "Probes network hosts for downtime, latency, etc...",
+   "author" : [
+      "Cosimo Streppone <cosimo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Prober",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Digest::MD5" : "0",
+            "IO::Socket::INET" : "0",
+            "IO::Socket::SSL" : "0",
+            "IO::Socket::UNIX" : "0",
+            "LWPx::ParanoidAgent" : "0",
+            "Net::Ping" : "2.34",
+            "Sys::Syslog" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "LWP::Online" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-net-prober@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Prober"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/cosimo/perl5-net-prober.git",
+         "web" : "http://github.com/cosimo/perl5-net-prober"
+      }
+   },
+   "version" : "0.16"
+}
+

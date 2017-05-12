@@ -1,0 +1,16 @@
+Revision history for Net-Async-TransferFD
+
+0.002     2015-11-13 17:08:01+00:00 Europe/London
+	No new features.
+
+	Documentation updates:
+
+	* Included POD for some user-accessible methods
+
+	Refactoring:
+
+	* Uses Variable::Disposition::retain_future rather than attempting to manage
+	the future ourselves
+
+0.001     2014-08-17 04:29:31+01:00 Europe/London
+	Initial CPAN release

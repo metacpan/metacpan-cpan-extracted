@@ -1,0 +1,549 @@
+Revision history for Perl extension Net::DNS::SEC.
+
+
+**** 1.03 August 26, 2016
+
+Fix: rt.cpan.org #108908
+	Tests break when Net::DNS gets shadowed by existing pre-1.01 version.
+
+
+**** 1.02 September 16, 2015
+
+Fix:	Bug in t/10-keyset.t raises exception in Net::DNS
+
+
+**** 1.01 August 3, 2015
+
+Feature
+	The RRs previously implemented in Net::DNS::SEC are now
+	integrated with Net::DNS.
+
+Fix: rt.cpan.org #105808
+	Version test for Pod::Test is broken
+
+Fix: rt.cpan.org #105698
+	Net-DNS 1.01 conflicts with Net-DNS-SEC 0.22
+
+
+**** 0.22 February 11, 2015
+
+   Fix: rt.cpan.org #101184
+   make siginception and sigexpiration available as time() values
+
+   Fix: rt.cpan.org #101183
+   wrong URL for blog in README
+
+   Fix: rt.cpan.org #83031
+   [RRSIG] lack of ECDSA support
+
+
+***0.21 October 24, 2014
+
+   Fix: rt.cpan.org #99250
+   [RRSIG] validation fails when Signer's Name is upper case
+
+   Fix: rt.cpan.org #99106
+   Premature end of base64 data  (in 14-misc.t test script)
+
+
+***0.20 August 15, 2014
+
+   Fix: rt.cpan.org #97457
+   !hex! error when parsing NSEC3 with empty salt
+
+
+***0.19 Jun 6, 2014
+
+   Remove inappropriate deprecation warning in DNSKEY.pm
+
+
+***0.18 May 8, 2014
+
+   Recode RR implementations to provide Net::DNS 0.69+ interface.
+
+   Fix: rt.cpan.org #95034
+   Failure to parse NSEC3PARAM record with null salt
+
+   Fix: rt.cpan.org #81289
+   Failure to handle GOST DS records
+
+
+***0.17 November 29, 2013
+
+   Fix: rt.cpan.org #90270
+   NSEC3->covered() should use case-insensitive comparisons
+
+   Fix: rt.cpan.org #79606
+   Lower case zone-name part with DNSKEY::privatename
+
+   Allow to specify algorithms with ::Private->new_rsa_private and
+   ::Private->generate_rsa instead of assuming RSASHA1.
+
+   Fix: rt.cpan.org #55621
+   Specify license type (mit) in META.yml
+
+   Fix: rt.cpan.org #60269
+   Remove Digest::SHA1 prerequirement
+
+   Fix: rt.cpan.org #62387 & #63273
+   Typo fixes
+
+   Fix: rt.cpan.org #62386
+   Make Net::DNS::RR::DS::digtype method work
+
+   Fix: rt.cpan.org #62385
+   Do not compress Next Domain Name in NSEC rdata.
+
+   Fix: rt.cpan.org #61104
+   Spelling correction in DS.pm and fix of key2ds demo program
+
+   Fix: rt.cpan.org #60185
+   Make sure %main::SIG hash keeps its values when compiling Net::DNS::RR::SIG
+   in perl versions before 5.14.  See also: rt.perl.org #76138
+
+   Fix: rt.cpan.org #64552 and rt.cpan.org #79606
+   Support for private-key-format v1.3
+
+   Fix: rt.cpan.org #75892
+   Do not canonicalize the "Next Domain Name" rdata field of a NSEC RR
+   for draft-ietf-dnsext-dnssec-bis-updates-17 compliance.
+
+   BUG FIX/FEATURE: validation of wildcard RRs now available. Duane
+   Wessels is acknowledged for submitting the initial code on which
+   this fix is based.
+
+   FIX: case sensitivity of ownername during DS generation
+        (Acknowledgements Jens Wagner)
+
+
+***0.16 March 12, 2010
+
+   Feature: KEY inherits DNSKEY
+   This helps maintenance in one part of the code.
+
+   Feature: keylength method (rt.cpan.org #53468)
+   Added keylength method for RSA and DSA
+   Acknowledgements Hugo Salgado
+
+   Fix: rt.cpan.org #51778
+   Empty bitmap would cause error about undefined ARRAY in NSEC/NSEC3.
+   Now the code will allow empty bitmaps gracefully    
+
+   Feature: New Algorithm Support (rt.cpan.org #51092) 
+   SHA2 algorithm support, including NSEC3 algorithm parameters updated
+   Acknowledgement Jakob Shlyter
+
+   Fix: rt.cpan.org #42089
+   NSEC3 Algorithm support in NSEC3 broken
+   patch by Wes Hardaker
+
+
+***0.15 December 31, 2008
+
+
+   Fix: digestbin not set when an empty value passed to hash.
+
+   Feature: Added DLV (rfcc 4431). The RR object is simply a clone of
+   the DS RR and inherits ... everything
+
+   Feature: Added NSEC3 and NSEC3PARAM support (RFC5155). 
+   This adds Mime::Base32 to the module dependency list. 
+   The RR type was still experimental at that time and is maintained
+   in Net::DNS::RR.
+
+   Fix: Test script recognizes change in Time::Local. Note that
+   Time::Local does not deal with dates beyond 03:14:07 UTC on
+   Tuesday, 19 January 2038. Therefore this code has a year 2038 
+   problem.
+
+   Fix: DS create_from_hash now produces objects that can create
+   wireformat.
+
+   Other: minor changes to the debug statements
+          added t/05-rr.t (and identified a couple of bugs using it)
+
+   Fix: a few inconsistencies with respect to parsing of trailing dots.
+
+
+   During development the test signatures generated with the BIND tools
+   were re-generated in order to troubleshoot a bug that (most
+   probably) was caused by a version incompatibility between Net::DNS
+   and Net::DNS::SEC.  Before release the original test from the 0.14
+   release were ran against this version too.
+   
+
+ 
+
+0.14 February 14, 2005
+
+   FIX: The introducion of the keytag warning triggered a bug with RSAMD5
+        keys, causing RSAMD5 keys not to be loaded. 
+
+
+
+0.13 December 9, 2005 
+
+   FEAT: rt.cpan.org 14588
+
+        Added support for passing (a reference to) an array of keys to the
+	RRSIG verify function.
+
+   FIX/FEAT:
+	The Net::DNS::SEC::Private function will for RSA based keys verify if
+	the keytag in the filename is actually correct.
+	Since at parsing the value of the DNSKEY RR flags is not known we
+	test against the currently defined flag values 256 and 257.
+
+	If we cannot find a keytag match a warning is printed and Private
+	key generation fails
+
+        This inconsistency was spotted by Jakob Shlyter.
+	
+
+   FEAT: Added support for SHA256 to the DS RR. Assigned the expected 
+        digest type2 for SHA256 type hashes.
+	
+        Note that this makes the Net::DNS::SEC depend on Digest::SHA instead
+        of Digest::SHA1.
+
+        The default digest type is still set to 1.
+
+        NB. The code makes assumptions about the IANA assignment of the 
+            digest type. The assignment may change. Do not use SHA256 in 
+	    production zones!!
+
+   FIX: rt.cpan.org #15662
+
+	Roy Arends noticed and patched the label counting did not ignore
+        an initial asterisk label.
+
+   FIX: Wes Hardaker noticed the default TTL values for created signatures to
+        be different from the TTLs from the data that is being signed.
+
+   FIX: Wes Hardaker reported there was a problem with validating
+        RRsets that had ownernames with capitals.
+	The fix depends on a fix in Net::DNS::RR that is available in
+	version 0.53_03 or later of the Net::DNS distribution.
+
+
+  FEAT: Propper dealing with mnemonics for algorithm and digest type
+	added to DS
+
+  FIX/FEAT: Mnemonics were written as RSA/MD5 and RSA/SHA1. This has been
+        corrected tp RSASHA1 and RSAMD5, as in the IANA registry.
+	
+
+0.12_02 June 6, 2005 (beta 2 release for 0.13)
+
+   Bug: new_from_hash would not correctly create the RR since internally
+	typebm is used to store the data this has been fixed so that
+        the following works
+
+        Net::DNS::RR->new(name=>$name,
+                    ttl=>$ttl,
+                    type=>"NSEC",
+                    nxtdname=>$nxtdname,
+                    typelist=>join(" ",@types)
+                   );
+
+
+   FEAT: Introduced the "use bytes" pragma to force character interpretation
+         of all the scalars. Any utf processing by perl makes the code behave
+         unpredictable.
+
+0.12_01 April 18, 2005. (beta release for version 0.13)
+
+   FEAT (!!!): Changed the symantics of the Net::DNS::Keyset::verify method.
+	 Read the perldoc for details. The requirement that each key in a 
+         keyset has to be selfsigned has been loosened.
+
+   FEAT: Added a "carp" to the new methods of the NXT RR. Warning that
+	 that record is depricated.
+
+   FEAT: Cleaned the tests so that RRSIG and DNSKEY are used except for 
+         SIG0 based tests.
+
+   FEAT: Changed the name of the siginceptation[SIC] to siginception.
+	 Thanks Jakob Schlyter for notifying me of this mistyping.
+	 An alias for the method remains available. 	
+
+
+   FEAT: Renamed unset_sep() to clear_sep().
+
+
+   NOTE: To avoid confusion the Net::DNS::SIG::Private class has been
+         removed. Use Net::DNS::SEC::Private!
+
+   DOC:  Added references to RFC 4033, RFC 4034 and RFC 4035. Rewrote parts
+         of the perlpod.
+   
+
+
+
+0.12 June 2004 "DNSSEC-bis Release"
+
+   FEAT: Added utility function key_difference() to Net::DNS::SEC. See
+         perlpod for details. I needed this in other software and
+         figured they are generic enough to make them available
+         through this module.
+
+   FEAT: Modified some functions to use DNSKEY and RRSIG instead off
+         KEY and SIG.
+         - Net::DNS::Keyset now uses DNSKEY and RRSIG.
+	 - the demo function getkeyset.pl now uses DNSKEY too.
+ 
+   FEAT: Added the possibility to create a keyset out of two arrays of
+         dnskey and rrsig object.
+         
+
+   FEAT: Added some helperfunctions to Net::DNS::SEC::Private to read X509 
+         formated private keys and dump them into bind format.
+	 This functionality has not been tested well.
+
+   BUG : When reading a RRSIG from a packet the signame would not have
+         a trailing dot.
+
+
+0.11_4  Apr 24 2004 Development snapshot.
+
+   BUG: - Fixed MANIFEST.
+
+   FEAT:  Removed critical dependency on bubblebabble. It is available to 
+          DS if installed but not critically dependend.
+
+
+0.11_3  Mar 4 2004 Development snapshot.
+
+   BUG: - Fixed minor in signing unknown RR types.
+
+0.11_2  Jan 27 2004 Development snapshot.
+
+   FEAT: - Prelimanary support for draft-ietf-dnssec-nsec-rdata-02. This
+	   depends on support for unknown RR types (Net::DNS version
+           0.44) 
+   
+
+0.11_1  Sep 23 2003 Development snapshot.
+
+   FEAT: - To be able to deal with argument supplied as either mnemonics or
+           by value the Net::DNS::SEC::argument method was created. It can
+           be used as a class method but it is also inherited by
+	   Net::DNS::RR::RRSIG and Net::DNS::RR::DNSKEY.
+
+
+0.11 August 28 2003
+
+   FEAT: - Implemented draft-ietf-dnsext-dnssec-2535typcode-change-04.txt 
+           This document has been through review and will be published
+           as standard track RFCs shortly. (Publsished as RFC3755).
+           IMPORTANT: the implementation of the typecode roll deprecated 
+           the use of SIG->create for any other reason than SIG0. If
+           you try to create SIGs over RRsets you will be warned.
+
+   FEAT: - Modified the namespace for the module that holds the name
+           of the private key from Net::DNS::RR::SIG::Private to 
+           Net::DNS::SEC::Private.  
+           !!!!!
+           Net::DNS::RR::SIG::Private will be deprecated in a next release.
+           !!!!!
+
+
+   CLEAN:- Crypt::OpenSSL::RSA v 0.19 introduced the possibility to
+           create keys directly from parameters, although this introduced
+           a dependency on Crypt::OpenSSL::Bignum it allowed to get rid
+           from converting all parameters to DER/ANS1 encoding. Got rid of 
+           a number of lines of code.
+
+
+0.10 January 8 2003
+
+   BUG:  - Crypt::OpenSSL::RSA::new method has been depricated. Code has
+	   been modified to deal with the new constructors
+
+0.09 January 6 2003
+
+   FEAT: - Added Net::DNS::RR::SIG::Private. The class provides 
+           an abstraction to the private key material. The SIG create
+	   method now either takes a filename, like previously, or a 
+	   Private key object as an argument. If you have to create
+	   many signatures the latter is preferred because you only have
+	   to read the file with the private key material once.
+	   
+	   Note that by adding this feature a modification to
+	   Net::DNS::Resolver was needed to properly do SIG0.  Use
+	   Net::DNS version 0.32 or later in combination with this
+	   version
+
+   FEAT: - Wes Griffen added a parameter change to keyset:
+
+  	   'Attached is a diff for Net::DNS::SEC v0.8 that adds a
+	   parameter changes keyset->writekeyset($path) to
+	   keyset->writekeyset($prefix,$path) where prefix is an
+	   optional string that is prepended to the filename of the
+	   keyset. That way I can keep my unsigned keyset in
+	   keyset-<domain>. and have the signed keyset in
+	   signed-keyset-<domain>.'
+
+
+   FEAT: - Babblebubble, handy for telephone confirmation of hashes.
+           Added babblebubble string as comment to DS RR.
+           DS->babble returns the babble bubble string
+  
+
+   FEAT: - Miek Gieben contributed demo/key2ds
+
+
+0.08 November 4 2002
+
+   BUG:  - DSA signature verification failed at random about 1 per 10
+           sigatures. Corrected allignment problem that lead to this.
+	   Added 'stresstest' that loops over creation and verification
+	   of signatures to spot these kind of seldomly occuring errors.
+          
+           On my VAIO PII 500Mhz the take about a minute:
+ 	   Files=3, Tests=3056, 69 wallclock secs 
+                               (63.30 cusr +  0.70 csys = 63.99 CPU)
+
+
+   FEAT: - Added Test::More as dependency as on some systems diag was failing.
+
+
+0.07 October 2 2002
+
+   FEAT: - Added demo/make-signed-keyset, a contribution by Wes Griffin.
+
+   FEAT: - Removed dependency on Math::Pari by porting away from
+	   Crypt::DSA to Crypt::OpenSSL::DSA (version 0.10). This should
+	   increase portability over platform.
+
+           T.J. Mather, the Crypt::OpenSSL::DSA maintainer has been
+	   particularly helpfull and responsive by adding a few
+	   methods to the DSA modules.
+
+0.06 August 16 2002
+
+   NOTE: In one of ther versions prior to Net::DNS 0.26 a bug
+         got introduced that made Net::DNS::SEC break. The bug was fixed in
+	 version 0.27.
+
+   BUG:  - Check on the existence of the private file improved in SIG.pm
+
+         - signame got trailing dot with the create methods and not with
+	   others.
+
+   FEAT: - Added privatekeyname method to KEY.pm
+         - Started work on Net::DNS::Keyset.
+         - Added RSA/SHA1 (algorithm ID 5) to SIG.pm. Patch supplied by
+	   Andy Vaskys,  Network Associates Laboratories.
+	 - Rewrote regexp's to not use $' (Postmatch).
+
+0.05 and 0.04 June 17, 2002
+
+    BUG:  Makefile.PL needed a fix for unused dependency. This failed
+	  made the installation fail :-(. 0.04 introduced another failing
+	  dependency.
+
+    DOC:  Clarified the documentation at points. 
+
+
+
+0.03 June 14, 2002
+   
+    DOC: Few Clarifications
+
+0.02 June 4, 2002
+
+    First CPAN Release.
+    Some modifications to the packaging.
+
+
+0.01 May 25, 2002  
+
+    Version 0.01 of the package is an alpha for CPAN release.
+
+
+
+---------------------------------------------------------------------------
+The extensions used to be published as a modified version of
+Net::DNS. The history of those is documented below.
+
+0.20-DNSSEC-0.2:
+  
+  Branched off Net::DNS version 0.20 release (CPAN May 15, 2002)
+
+
+0.20-DNSSEC-0.1:
+
+  This version had limited distribution
+  
+  First patch against a version 0.20 snapshot (2002-03-27).
+  http://www.dyndns.org/~ctriv/net-dns-snaps/2002/03/
+
+
+  Modified t/09-dnssec.t; uses Test::More now and includes a number of
+  self consistency checks.
+ 
+
+  DOC   Cleaned up the documentation and removed some references to functions
+	and libraries that where not used anyway.
+
+  FIX   'aesthetic' patch supplied by Simon Josefsson reordering the NXT
+        RR map for the  print  method.
+ 
+  FEAT  Added checks on keytype and updated to latest specs for DS 
+        Added SIG0 support. See Net::DNS::Packet for details. The verify and
+	create methods of SIG.pm where modified somewhat to cope with the 
+	difference.
+        Changed RSA backend from Crypt::RSA to Crypt::OpenSSL::RSA because
+	Crypt::RSA failed during a 'loss of Math::Pari precision in 
+	Crypt::Primes'.
+  
+
+0.19-DNSSEC-0.5: 
+
+  BUG   DS create method: Hash calculation was done over concatenation of name
+        and key material while the hash should be taken over concatenation of
+        canonical name and key rdata. (Fix by Mike Schiraldi)
+
+
+0.19-DNSSEC-0.4: 
+  Added CERT support: Courtesy of Mike Schiraldi <raldi@research.netsol.com> 
+        for VeriSign
+ 
+  BUG Fixed MANIFEST file. make dist will result in proper module tar ball
+ 
+
+0.19-DNSSEC-0.3: 
+  Solved patch problems that where due to the $ Id $ in headers not 
+  being from the original distribution.
+
+  Added DSA signature creation
+
+  Added DS support 
+        You have to uncomment line 77 in Net/DNS.pm to fully enable DS
+	This will assign QTYPE 93 to the DS RR.
+	That value is not assigned by IANA. 
+
+
+  Added this README.DNSSEC file
+
+  Added t/09-dnssec.t to the test script with a number of consistency checks.
+        after patching the original distribution direction
+        perl Makefile.PL
+        make test 
+        will call this function among other things.
+
+  BUG   KeyID set to 0 for null keys.
+
+  BUG   Sorting of canonical RDATA; 
+	Data over which SIG was created was not sorted properly (RFC2535 
+        sect 8.3) causing signature verification errors for RDATA within 
+	a RRset having different length (e.g. some NS RRsets would not 
+	verify.)
+
+0.19-DNSSEC-0.2: 
+  First somewhat public release.
+
+
+---------------------------------------------------------------------------
+$Id: Changes 1503 2016-08-26 11:51:16Z willem $

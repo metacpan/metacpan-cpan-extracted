@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Net-OpenSRS-OMA
+version:            0.02
+abstract:           Client library for the OpenSRS Mail API
+author:
+    - Richard Platel <rplatel@opensrs.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    JSON:                 2
+    LWP::Protocol::https:  0
+    LWP::UserAgent:       2
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,13 @@
+Revision history for Notification-Center
+0.0.5   July 28 2009
+        Ability to add observe multiple objects - baldmantom
+
+0.0.4   Mar 28 2008
+        Correct POD examples
+
+0.0.3   Feb 27 2008
+        Rename MooseX::Notification to Notification::Center
+
+0.0.2   Feb 27 2008
+        First version, released on an unsuspecting world.
+

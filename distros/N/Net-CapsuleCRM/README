@@ -1,0 +1,48 @@
+=head1 SYNOPSIS
+
+my $foo = Net::CapsuleCRM->new(
+  token => 'xxxx',
+  target_domain => 'test.capsulecrm.com',
+  debug => 0,
+);
+
+=head2 find_party_by_email
+
+find by email
+
+=head2 find_party
+
+find by id
+
+=head2 create_person
+
+$cap->create_person({
+  contacts => {
+    email => {
+      emailAddress => 'xxx',
+    },
+    address => {
+      type => 'xxx',
+      street => "xxx",
+      city => 'xxx',
+      zip => 'xxx',
+      country => 'xxx',
+    },
+    phone => {
+      type => 'Home',
+      phoneNumber => '123456',
+    },
+  },
+  title => 'Mr',
+  firstName => 'Simon',
+  lastName => 'Elliott',
+});
+
+=head2 create_organization
+
+See Person
+
+=head2 add_tag
+
+$cap->add_tag($person_id,'customer','difficult');
+

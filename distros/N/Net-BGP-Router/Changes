@@ -1,0 +1,9 @@
+Revision history for Perl extension Net-BGP-Router.
+
+0.04  Mon Jun  2 01:25:26 2003
+	- initial release
+	- moved RIB.pm from Net::BGP to this distribution
+	- version number skiped to 0.04 due to old RIB.pm version was 0.03
+
+0.01  Wed May 28 23:34:03 2003
+	- original version; created by h2xs 1.21

@@ -1,0 +1,36 @@
+
+=item [% name %]
+
+JSON data for API method [% name %]
+
+[% details.doc %]
+
+=over
+
+=item [% -%]
+[%- IF check_hash(details.takes_args).size -%]
+Required arguments
+
+=over
+[%      FOREACH arg IN check_hash(details.takes_args) %]
+=item [% arg.name %]: [% arg.doc %] ([% arg.multivalue ? 'arrayref of ' : ''  %]type [% arg.type %] class [% arg.class %])
+[%      END %]
+=back
+[% ELSE -%]
+No required arguments
+[%- END %]
+
+=item Options
+
+=over
+[%      FOREACH opt IN check_hash(details.takes_options) %]
+=item [% opt.name %]: [% opt.doc %] ([% (opt.required && ! opt.autofill) ? 'mandatory ' : '' %][% opt.multivalue ? 'arrayref of ' : ''  %]type [% opt.type %] class [% opt.class %])
+[%      END -%]
+
+=item All options starting with C<__> are passed as options to C<Net::FreeIPA::RPC::rpc>.
+
+=back
+
+=back
+
+=cut

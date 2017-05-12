@@ -1,0 +1,23 @@
+Revision history for Net-Hadoop-WebHDFS-LWP
+
+0.010 2017-05-04 BURAK
+	Whitelist setting a cookie jar.
+
+0.009 2017-01-17 BURAK
+        Parse / cleanup the HTML response returned from the endpoints
+                (happens with GSSAPI - secure clusters).
+                Ideally we should always receive json and such but unfortunately
+                Hadoop is broken in some ways in this regard.
+        The feature also makes HTML::Parser a recommended module.
+        Cleanup / rework some internal parts.
+
+0.008   2016-09-30
+        Pass proxy settings to the UA object (Yati Sagade).
+        Net::Hadoop::WebHDFS dependency bumped to have new methods in there available
+        form this module as well.
+
+0.007   2016-05-27
+        Fix for RT#114762
+
+0.006   2016-05-26
+        Fix for RT#109101: "libwww" specified in TEST_REQUIRES

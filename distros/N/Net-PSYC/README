@@ -1,0 +1,43 @@
+About PSYC:
+
+    PSYC is a flexible text-based protocol for delivery of data to a flexible
+    amount of recipients by unicast or multicast TCP or UDP. It is primarily
+    used for chat conferencing, multicasting presence, friendcasting, 
+    newscasting, event notifications and plain instant messaging, but not 
+    limited to that.
+
+    Existing systems can easily use PSYC, since PSYC hides its complexity from
+    them. For example if an application wants to send data to one person or a
+    group of people, it just needs to drop a few lines of text into a TCP
+    connection (or UDP packet) to a static address. In other words: trivial.
+
+    The PSYC network resembles more the Web rather than IRC, which it once was
+    inspired by. Each administrator of a machine on the Internet can install a
+    PSYC server which has equal rights in the world wide network. #
+    No hierarchies, no boundaries. The administrator then has the right to 
+    decide which rooms or people to host, without interfering with other PSYC 
+    servers. Should an administrator behave incorrectly towards her users, 
+    they will simply move on to a different server. Thus, administrators must be
+    have to be a popular PSYC host for their friends and social network.
+
+    This implementation is in pretty stable and has been doing a good job in
+    production environments for several years.
+
+    See http://psyc.pages.de for protocol specs and other info on PSYC.
+
+    for information about how to use Net::PSYC have a look at the pod included
+    in the source-files. (perldoc PSYC.pm)
+
+INSTALL:
+
+    perl Makefile.PL
+    make
+    make install
+
+CVS:
+
+    to get the latest sources from cvs, type
+
+    cvs -d :pserver:anonymous@cvs.psyced.org:/CVS/anonCVS/ co perlpsyc
+
+http://perlpsyc.pages.de

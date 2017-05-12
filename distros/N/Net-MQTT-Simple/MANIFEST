@@ -1,0 +1,11 @@
+lib/Net/MQTT/Simple.pm
+lib/Net/MQTT/Simple/SSL.pm
+bin/mqtt-simple
+t/use.t
+t/regex.t
+Makefile.PL
+README
+Changes
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

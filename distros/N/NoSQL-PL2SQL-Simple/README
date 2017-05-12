@@ -1,0 +1,77 @@
+NoSQL-PL2SQL-Simple version 0.24
+================================
+
+NoSQL::PL2SQL is an object oriented interface to access data:
+
+  ## Instantiate a data definition (includes a data source)
+  my $datadef = new myDataDefinition ;
+
+  ## provided the data definition includes "contactemail"
+  my $user = $datadef->contactemail('jim@tqis.com')->record ;
+
+  ## prints something like "myDataDefinition=HASH(0x0000000)"
+  print $user ;
+
+  ## prints the equivalent of "Jim Schueler"
+  print join ' ', @$user{ qw( firstname lastname ) } ;
+
+  ## prints the equivalent of "TQISJIM"
+  print $user->{cpanid} ;
+
+  ## modify and save the record
+  $user->{contactemail} = 'jschueler@tqis.com' ;
+  $user->save ;
+
+This example illustrates the simplicity of the API required to manage
+data.
+
+NoSQL::PL2SQL::Simple provides a shrinkwrapped version of NoSQL::PL2SQL.
+There are only a few setup requirements:
+  1.  Define a data source (DSN)
+  2.  Create a data definition
+
+The data source is an implementation of NoSQL::PL2SQL::DBI.  The best 
+approach is to wrap the data source (dsn) in an abstract data source
+subclass, which is described in the documentation.
+
+The data definition is essentially a list of the object record 
+properties.  The data definition only consists of properties that will
+be queried.  Essentially the same as an RDB table index.
+
+
+NoSQL::PL2SQL::Simple requires a second DSN (RDB table) in addition to the
+one used to store object data.  However, both tables can be applied to 
+multiple data definition classes.  With NoSQL::PL2SQL::Simple, It is 
+possible to build a fully normalized data set using only two tables.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  NoSQL::PL2SQL
+  An implementation of NoSQL::PL2SQL::DBI
+  DBI::SQLite	- used for testing
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2012 by Jim Schueler
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.
+
+

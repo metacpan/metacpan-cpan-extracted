@@ -1,0 +1,161 @@
+NAME
+
+News::NNTPClient - Perl 5 module to talk to NNTP (RFC977) server
+
+DESCRIPTION
+
+This module implements a client interface to NNTP, enabling a Perl 5
+application to talk to NNTP servers.  It uses the OOP (Object Oriented
+Programming) interface introduced with Perl 5.
+
+##########################
+# YEAR 2000 (Y2K) NOTICE #
+##########################
+
+I've made changes to make this module "Year 2000" compliant (catch
+phrase of the millennium?).  If your NNTP server is "Year 2000"
+compliant, things should work without modification.  If your NNTP
+server is NOT "Year 2000" compliant, you will have problems with the
+three commands that make use of the date.
+
+RFC977 specifies that the year is two digits.  It further specifies
+that the closest century is assumed.  I quote:
+
+    The closest century is assumed as part of the year (i.e., 86
+    specifies 1986, 30 specifies 2030, 99 is 1999, 00 is 2000).
+
+However, some servers apparently have been changed to use four digit
+years, so I've added a method to turn on four digit years.  Further,
+the year is now modified to be no more than two digits if the four
+digit year mode is off.  For example, in the year 2000, in four digit
+mode, the year will be 2000 and in two digit mode it will be 00.
+
+To turn it on, just add a call to the fourdigityear() method after the
+call to new:
+
+   $c = new News::NNTPClient;
+   $c->fourdigityear(1);
+
+The three NNTP commands affected by the date are:
+
+   newgroups()
+   newnews()
+   xmotd()
+
+which call
+
+   yymmdd_hhmmss()
+
+If you don't use any of these methods, then you shouldn't be affected
+by two vs. four digit year problems.
+
+My NNTP server is not yet year 2000 compliant, so these changes have
+not been well tested.  However, calls to yymmdd_hhmmss() work as
+expected.
+
+CHANGES
+
+RELEASE TO CPAN
+0.36 Fixed bug in group/groupinfo.  Now returns false for invalid group.
+
+0.35 More documentation for post.  More extensive testing in test.pl.
+
+0.34 Year is four or two digits; two digit Y2K will be 00, not 100.
+
+RELEASED TO CPAN
+0.33 Removed (c), fixed spelling.  Removed date checks from test.pl.
+
+RELEASED TO CPAN (then deleted)
+0.32 Added Y2K flag and method to enable use with old servers.
+
+0.31 Documented xhdr allows Message-ID.
+
+0.30 Change USAGE to SYNOPSIS in documentation.
+
+0.29 Added Y2K fix.  Generates YYYYMMDD HHMMSS instead of YYMMDD HHMMSS.
+
+RELEASED TO CPAN
+0.28 Added GMT.  Use gmt() method to set to GMT mode.
+
+0.27 Delete reference to fetch by e-mail.  Most fetch from CPAN now.
+
+RELEASED TO CPAN
+0.26 Moved initialization to separate subroutine so it may be sub-classed.
+
+0.25 General cleanup and update to use Socket-1.5 and perl 5.002.
+
+0.24 Moved documentation to end of module.
+
+0.23 Created README, changed $version to $VERSION, started using Makefile.PL.
+
+RELEASED TO CPAN
+0.22 Better failure handling.
+
+0.21 Made hostname lookup less strict.
+
+0.20 Fixed message(), created internal msg(), changed date() and xpath() to
+     use msg().
+
+0.19 Updated documentation.
+
+0.18 Allow null responses, report garbled responses.
+
+RELEASED TO CPAN
+0.17 Updated documentation.
+
+0.16 Fixed bug in debug initialization.
+
+...
+
+INSTALLATION
+
+To install News::NNTPClient, perform the following steps.  You'll
+likely need to have system administration (a.k.a. root, super-user)
+privilege to perform the install step:
+
+    perl Makefile.PL
+    make test
+    make install
+
+Be warned that some of the tests may fail, depending on your news
+server.  If you don't have access to a news server, most of the tests
+will fail.
+
+If that doesn't do it for you, you can try the following manual steps:
+
+Copy NNTPClient.pm to perl5lib, where perl5lib is your local Perl 5
+library directory, usually /usr/local/lib/perl5.  You'll likely have
+to create the News directory, as the perl5 distribution doesn't
+normally include it.  Be sure to give everyone read permission on the
+file and read/execute permission on the directory.
+
+    umask 022
+    mkdir /usr/local/lib/perl5/News
+    cp NNTPClient.pm /usr/local/lib/perl5/News
+
+You could then run the following to create a man page:
+
+    cd /usr/local/lib/perl5/News
+    pod2man NNTPClient.pm > /usr/local/man/man1/NNTPClient.1
+
+AUTHOR
+
+Rodger V. Anderson  <rodger@boi.hp.com>
+
+SOURCE
+
+The latest version may be retrieved from your nearest CPAN
+(Comprehensive Perl Archive Network) site, in the directory
+CPAN/modules/by-module/News.  A list of CPAN sites can be found at:
+
+    http://www.perl.com/perl/CPAN/CPAN.html
+
+You might also try:
+
+    http://www.perl.com/CPAN/modules/by-module/News/
+
+COPYRIGHT
+
+Copyright 1995 Rodger V. Anderson. All rights reserved.  This module
+is free software; you may redistribute and/or modify it under the same
+terms as Perl itself.

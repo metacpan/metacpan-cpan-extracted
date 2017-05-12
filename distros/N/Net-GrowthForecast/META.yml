@@ -1,0 +1,48 @@
+---
+abstract: 'A client library for awesome visualization tool GrowthForecast'
+author:
+  - 'tagomoris (TAGOMORI Satoshi) <tagomoris {at} gmail.com>'
+build_requires:
+  File::Find::Rule: 0
+  Test::More: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.6.6, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-GrowthForecast
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Net::GrowthForecast:
+    file: lib/Net/GrowthForecast.pm
+    version: 0.02
+requires:
+  File::Find::Rule: 0
+  Furl: 0
+  JSON: 0
+  JSON::XS: 0
+  List::MoreUtils: 0
+  Log::Minimal: 0
+  Test::More: 0
+  Try::Tiny: 0
+resources:
+  bugtracker: https://github.com/tagomoris/p5-Net-GrowthForecast/issues
+  homepage: https://github.com/tagomoris/p5-Net-GrowthForecast
+  repository: git://github.com/tagomoris/p5-Net-GrowthForecast.git
+version: 0.02
+x_contributors:
+  - 'HIROSE Masaaki <hirose31@gmail.com>'
+  - 'TAGOMORI Satoshi <tagomoris@gmail.com>'

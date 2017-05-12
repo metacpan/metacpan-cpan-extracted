@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Nephia/Setup/Plugin/Assets/JQuery.pm
+share/jquery.min.js
+t/00_compile.t
+t/01_setup.t
+META.yml
+MANIFEST

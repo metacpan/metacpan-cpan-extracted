@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::PortTest.
+
+0.01  Fri Mar 22 11:33:32 2013
+	- original version; created by h2xs 1.23 with options
+		-XAn Net::PortTest
+

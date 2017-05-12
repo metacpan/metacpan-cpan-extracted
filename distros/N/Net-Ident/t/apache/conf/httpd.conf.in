@@ -1,0 +1,39 @@
+ServerType standalone
+ServerRoot $orig_apache_root
+
+PidFile $apache_root/logs/httpd.pid
+LockFile $apache_root/logs/httpd.lock
+ScoreBoardFile $apache_root/logs/httpd.scoreboard
+ResourceConfig $apache_root/conf/srm.conf
+AccessConfig $apache_root/conf/access.conf
+TypesConfig $apache_root/conf/mime.types
+
+Timeout 300
+KeepAlive On
+MaxKeepAliveRequests 10
+KeepAliveTimeout 15
+MinSpareServers 1
+MaxSpareServers 2
+StartServers 1
+MaxClients 5
+MaxRequestsPerChild 50
+
+$LoadModule
+
+Port $port
+
+$usergroup
+
+HostnameLookups Off
+
+ErrorLog $apache_root/logs/error_log
+
+$ifversion1.3{
+LogLevel debug
+LogFormat "%h %l %u %t \\"%r\\" %>s %b \\"%{Referer}i\\" \\"%{User-Agent}i\\"" combined
+CustomLog $apache_root/logs/access_log combined
+
+ServerSignature On
+}{
+TransferLog $apache_root/logs/access_log
+}

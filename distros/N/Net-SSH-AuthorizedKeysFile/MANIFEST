@@ -1,0 +1,36 @@
+Changes
+eg/authorized-keys-test
+lib/Net/SSH/AuthorizedKey.pm
+lib/Net/SSH/AuthorizedKey/Base.pm
+lib/Net/SSH/AuthorizedKey/SSH1.pm
+lib/Net/SSH/AuthorizedKey/SSH2.pm
+lib/Net/SSH/AuthorizedKeysFile.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/001Basic.t
+t/002Ssh-2.t
+t/003Format.t
+t/004Mixed.t
+t/005Empty.t
+t/006Broken.t
+t/007ssh-1.t
+t/008ssh-2.t
+t/009weird-keys.t
+t/010sanity.t
+t/011order.t
+t/012l4p.t
+t/canned/ak-broken.txt
+t/canned/ak-comments.txt
+t/canned/ak-ecdsa.txt
+t/canned/ak-ed25519.txt
+t/canned/ak-manpage.txt
+t/canned/ak-mixed.txt
+t/canned/ak-ssh1-weirdo.txt
+t/canned/ak-ssh2.txt
+t/canned/ak.txt
+t/canned/pk-empty.txt
+t/canned/pk-ssh2.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

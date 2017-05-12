@@ -1,0 +1,8 @@
+Revision history for Net::TPP
+
+0.02   May 2014
+        Better handling of name server updating, various doc fixes
+
+0.01   September 2013
+        First version, released on an unsuspecting world.
+

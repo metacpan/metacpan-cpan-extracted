@@ -1,0 +1,21 @@
+Revision History for Perl extension News-Scan.
+
+0.50  Tue Dec 16 17:32:52 CST 1997
+
+	- first release to CPAN
+
+0.51  Wed Dec 17 07:45:25 CST 1997
+
+	- fixed some really embarassing bugs
+	- minor changes to the stats script
+
+0.52  Mon Jul 20 10:20:08 CDT 1998
+
+	- added new posters example scripts
+
+0.53  Mon Feb 10 06:47:37 CST 2003
+
+	- cleanup in eg/news-stats
+	- in News::Scan::collect, fixed bogus assumptions
+	  about the return values of Net::NNTP::{listgroup,article}
+	- added hokey little t/use.t

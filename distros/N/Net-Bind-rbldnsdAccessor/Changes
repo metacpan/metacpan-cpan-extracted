@@ -1,0 +1,21 @@
+Revision history for Perl extension Net::Bind::rbldnsdAccessor.pm
+
+0.05  Wed Oct 15 14:19:29 PDT 2008
+	minor documentation updates and corrections
+	require Net::DNS::ToolKit version 0.41 or higher
+
+0.04  Thu Oct 19 17:43:55 PDT 2006
+	add zone file reload timer that ticks every 60 seconds
+
+0.03  Thu Oct 19 07:57:41 PDT 2006
+	initial release
+	malloc, calloc, realloc tracked and
+	released by bind when rblf_clear() called
+
+0.02  Wed Oct 18 15:38:12 PDT 2006
+	tested with bind 9.3.2-P1
+	malloc memory in rbldnsd portion not
+	recoverd on rblf_clear, but it works!
+
+0.01  Mon Oct 16 18:21:03 PDT 2006
+	Perl portion of module complete and tested

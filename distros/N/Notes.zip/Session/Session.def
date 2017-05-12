@@ -1,0 +1,5 @@
+LIBRARY "Session"
+EXPORTS
+  boot_Notes__Session
+  _boot_Notes__Session = boot_Notes__Session
+  

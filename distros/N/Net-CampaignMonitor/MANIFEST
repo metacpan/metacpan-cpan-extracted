@@ -1,0 +1,24 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/DSL.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Net/CampaignMonitor.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/01_connection.t
+t/02_account.t
+t/03_clients.t
+t/04_lists.t
+t/05_segments.t
+t/06_subscribers.t
+t/07_templates.t
+t/08_campaigns.t
+t/09_oauth.t
+t/99_cleanup.t

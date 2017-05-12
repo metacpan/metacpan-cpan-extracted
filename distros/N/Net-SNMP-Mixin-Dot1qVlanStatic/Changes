@@ -1,0 +1,15 @@
+Revision history for Net-SNMP-Mixin-Dot1qVlanStatic
+
+0.04	Wed, 22 Jun 2016 14:18:13 +0200
+	use new method init_ok(), check for partial initialization
+	bump version
+
+0.03	Mi 23. Apr 09:28:52 CEST 2008
+	Build.PL tweaks
+
+0.02	Mi 23. Apr 00:27:39 CEST 2008
+	First production release
+
+0.01_01 Mo 21. Apr 17:26:15 CEST 2008
+        First developer release.
+

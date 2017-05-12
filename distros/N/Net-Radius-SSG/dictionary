@@ -1,0 +1,10 @@
+# This is an example dictionary that only contains the required Vendor
+# specific attributes for SSG.  Please refer to the Net::Radius package
+# for a proper Merit style dictionary.
+VENDORATTR	9	cisco-avpair	1	string
+VENDORATTR	9	Cisco-NAS-Port	2	string
+# These are the ones that SSG really needs
+VENDORATTR	9	Account-Info	250	string
+VENDORATTR	9	Service-Info	251	string
+VENDORATTR	9	Command-Code	252	string
+VENDORATTR	9	Control-Info	253	string

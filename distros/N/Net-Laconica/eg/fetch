@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+use Net::Laconica;
+
+my $laconica = Net::Laconica->new(
+    uri      => 'http://identi.ca',
+    username => 'alanhaggai',
+);
+
+print "\nFetched messages:\n\n";
+print map { "\t$_\n" } $laconica->fetch(5);
+print "\n";

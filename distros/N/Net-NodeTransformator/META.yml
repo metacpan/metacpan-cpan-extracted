@@ -1,0 +1,37 @@
+---
+abstract: 'interface to node transformator'
+author:
+  - 'David Zurborg <zurborg@cpan.org>'
+build_requires:
+  Test::More: '0'
+  Test::Most: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-NodeTransformator
+requires:
+  AnyEvent: '0'
+  AnyEvent::Handle: '0'
+  AnyEvent::Proc: '0.101'
+  AnyEvent::Socket: '0'
+  CBOR::XS: '0'
+  Carp: '0'
+  Env::Path: '0'
+  File::Temp: '0'
+  POSIX: '0'
+  Try::Tiny: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/zurborg/libnet-nodetransformator-perl/issues
+  homepage: https://github.com/zurborg/libnet-nodetransformator-perl
+  repository: https://github.com/zurborg/libnet-nodetransformator-perl.git
+version: '0.105'

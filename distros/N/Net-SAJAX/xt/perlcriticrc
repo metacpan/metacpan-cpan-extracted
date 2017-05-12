@@ -1,0 +1,17 @@
+exclude  = Miscellanea::RequireRcsKeywords
+severity = 1
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | VERSION | SYNOPSIS | DESCRIPTION | METHODS | DEPENDENCIES | BUGS AND LIMITATIONS | AUTHOR | LICENSE AND COPYRIGHT
+
+[NamingConventions::Capitalization]
+package_exemptions = pack
+
+[TestingAndDebugging::RequireUseStrict]
+severity = 5
+
+[TestingAndDebugging::RequireUseWarnings]
+severity = 5
+
+[Documentation::PodSpelling]
+stop_words = SAJAX HASHREF PHP JavaScript ARRAYREF perldoc CPAN's AnnoCPAN CPAN url stringify

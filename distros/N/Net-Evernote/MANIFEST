@@ -1,0 +1,28 @@
+Changes
+lib/Net/Evernote/EDAMErrors/Constants.pm
+lib/Net/Evernote/EDAMErrors/Types.pm
+lib/Net/Evernote/EDAMLimits/Constants.pm
+lib/Net/Evernote/EDAMLimits/Types.pm
+lib/Net/Evernote/EDAMNoteStore/Constants.pm
+lib/Net/Evernote/EDAMNoteStore/NoteStore.pm
+lib/Net/Evernote/EDAMNoteStore/Types.pm
+lib/Net/Evernote/EDAMTypes/Constants.pm
+lib/Net/Evernote/EDAMTypes/Types.pm
+lib/Net/Evernote/EDAMUserStore/Constants.pm
+lib/Net/Evernote/EDAMUserStore/Types.pm
+lib/Net/Evernote/EDAMUserStore/UserStore.pm
+lib/Net/Evernote.pm
+lib/Net/Evernote/Note.pm
+lib/Net/Evernote/Notebook.pm
+lib/Net/Evernote/Tag.pm
+Makefile.PL
+MANIFEST
+README
+t/00-authentication.t
+t/01-note.t
+t/02-notebook.t
+t/03-tag.t
+t/Common.pm
+t/manifest.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

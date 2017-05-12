@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>NetHack.alt.org dashboards</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+html {
+	color: #DDD;
+	background-color: #000;
+	padding: 1%;
+	line-height: 1.5;
+}
+
+a:link {
+	color: #66F;
+	text-decoration: none;
+}
+
+a:visited {
+	color: #84B;
+}
+
+code {
+	color: #90EE90;
+}
+
+dt {
+	font-weight: bold;
+}
+</style>
+
+<p><strong>NAOdash</strong> is a service that analyzes <a href="https://nethackwiki.com/wiki/NetHack">NetHack</a> players' game data on the <a href="https://alt.org/nethack/">nethack.alt.org</a> public server and displays statistics.
+
+<p>It can be used in several ways. In all cases below, USERNAME is your NAO username.
+
+<dl>
+<dt>Website
+<dd>Go to /dash/USERNAME. <a href="/dash/mgv">Example</a>.
+
+<dt>CLI program
+<dd>Install the <code>App::NAOdash</code> module using your favourite CPAN client, for example by running <code>cpanm --sudo App::NAOdash</code> or <code>sudo cpan App::NAOdash</code>.
+<p>You can then run <code>naodash USERNAME</code>.
+
+<dt>JSON API
+<dd>Go to /json/USERNAME. <a href="/json/mgv">Example</a>.
+
+<dt>Perl module
+<dd>Install the <code>NetHack::NAOdash</code> module using your favourite CPAN client. <a href="https://metacpan.org/pod/NetHack::NAOdash">Link to documentation</a>.
+</dl>

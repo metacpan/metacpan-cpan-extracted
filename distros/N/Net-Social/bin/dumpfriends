@@ -1,0 +1,91 @@
+#!/usr/bin/perl -w
+
+use strict;
+use lib qw(lib);
+use Net::Social qw(:all);
+use YAML::Tiny;
+binmode STDOUT, ":utf8";
+
+
+my %arrows = ( 
+	NONE()        => '',  
+	FRIENDED()    => '->', 
+	FRIENDED_BY() => '<-', 
+	MUTUAL()      => '<->',
+);
+
+
+=head1 NAME
+
+dumpfriends - a test tool for dumping your friends from Net::Social
+
+=head1 USAGE 
+
+	dumpfriends <path to config yaml> [site[s]]
+
+=head1 DESCRIPTION
+
+It requires a config file containing the auth values for each service -
+the format of that is described below.
+
+Can optionally take a list of sites to restrict the output to. 
+
+For example
+
+	dumpfriends conf.yaml facebook vox
+
+will only dump your friends from Vox and Facebook.
+
+=head1 CONFIG FILE
+
+The config file is merely a YAML file with the services as keys and 
+then the auth requirements for each service as described by their docs.
+
+For example yours might look like
+
+	flickr:
+		api_key: 12341234123412341234123412341234
+		username: myusername
+	facebook: 
+		api_key: 12341234123412341234123412341234
+		session_key: 12341234123412341234123412341234
+		session_secret: 12341234123412341234123412341234
+	jabber:
+		username: example@jabber.com
+		password: 12341234
+
+
+=head AUTHOR
+
+Simon Wistow <simon@thegestalt.org>
+
+=head1 COPYRIGHT
+
+Destributed under the same terms as Perl itself.
+
+=cut
+
+
+my $params   = YAML::Tiny->read(shift)->[0];
+my %only     = map { $_ => 1 } @ARGV;
+my @services = Net::Social->services;
+
+# TODO - need to be able to have, for example, 
+# multiple Jabbers
+foreach my $name (@services) {
+	next if keys %only && !$only{$name};
+    my $service  = Net::Social->service($name);
+
+	print "$name:\n";
+    $service->login(%{$params->{$name}}) || (print "\t login failed" && next);
+	my @friends = $service->friends;
+	foreach my $friend (sort { lc($a->{name}) cmp lc($b->{name}) } @friends) {
+		print "\t".$friend->{name}." ";
+        print "(".$friend->{username}.") " if $friend->{username};
+	    print $arrows{$friend->{type}}."\n";	
+	}
+	print "----------------------------\n";
+	print "Total=".scalar(@friends)."\n";
+	print "----------------------------\n\n";
+
+}

@@ -1,0 +1,268 @@
+NAME
+    Net::Server::ZMQ - Preforking ZeroMQ job server
+
+SYNOPSIS
+            use Net::Server::ZMQ;
+
+            Net::Server::ZMQ->run(
+                    port => [6660, 6661],   # [frontend port, backend port]
+                    min_servers => 5,
+                    max_servers => 10,
+                    app => sub {            # this is your worker code
+                            my $payload = shift;
+
+                            return uc($payload);
+                    }
+            );
+
+DESCRIPTION
+    "Net::Server::ZMQ" is a Net::Server personality based on
+    Net::Server::PreFork, providing an easy way of creating a preforking
+    ZeroMQ job server. It uses ZMQ::FFI for ZeroMQ integration, independent
+    of the installed "libzmq" version. You will need to have "libffi"
+    installed.
+
+    Currently, this personality implements the load balancing "simple
+    pirate" pattern described in the ZeroMQ guide
+    <http://zguide.zeromq.org/page:all>. The server creates a
+    "ROUTER"-to-"ROUTER" broker in the parent process, and one or more child
+    processes as "DEALER" workers. Multiple "REQ" clients can send requests
+    to those workers through the broker, which operates in a non-blocking
+    way and balances requests across the workers.
+
+    The created topology looks like this:
+
+            +--------+     +--------+     +--------+
+            | CLIENT |     | CLIENT |     | CLIENT |
+            +--------+     +--------+     +--------+
+            |  REQ   |     |  REQ   |     |  REQ   |
+            +---+----+     +---+----+     +---+----+
+                |              |              |
+                |______________|______________|
+                               |
+                               |
+                           +---+----+
+                           | ROUTER |
+                           +--------+
+                           | BROKER |
+                           +--------+
+                           | ROUTER |
+                           +---+----|
+                               |
+                  _____________|_____________
+                 |             |             |
+                 |             |             |
+            +----+---+    +----+---+    +----+---+
+            | DEALER |    | DEALER |    | DEALER |
+            +--------+    +--------+    +--------+
+            | WORKER |    | WORKER |    | WORKER |
+            +--------+    +--------+    +--------+
+
+    You get the full benefits of "Net::Server::PreFork", including the
+    ability to increase or decrease the number of workers at real-time by
+    sending the "TTIN" and "TTOU" signals to the server, respectively.
+
+    This is an early release, do not rely on it on production systems
+    without thoroughly testing it beforehand.
+
+    I plan to implement better reliability as described in the ZeroMQ guide
+    in future versions, and also add support for different patterns such as
+    publish-subscribe.
+
+    The ZMQ server does not care about the format of messages passed between
+    clients and workers, this kind of logic is left to the applications. You
+    can easily implement a JSON-based job broker, for example, either by
+    taking care of encoding/decoding in the worker code, or by extending
+    this class and overriding "process_request()".
+
+    Note that configuration of a ZMQ server requires two ports, one for the
+    frontend (the port to which clients connect), and one for the backend
+    (the port to which workers connect).
+
+  INTERNAL NOTES
+    ZeroMQ has some different concepts regarding sockets, and as such this
+    class overrides the bindings done by "Net::Server" so they do nothing
+    ("pre_bind()", "bind()" and "post_bind()" are emptied). Also, since
+    ZeroMQ never exposes client information to request handlers, it is
+    possible for "Net::Server::ZMQ" to provide workers with data such as the
+    IP address of the client, and the "get_client_info()" method is empties
+    as well. Supplying client information should therefore be done
+    applicatively. The "allow_deny()" method is also overridden to always
+    return true, for the same reason, though I'm not so certain yet whether
+    a better solution can be implemented.
+
+    Unfortunately, I did have to override quite a few methods I really
+    didn't want to, such as "loop()", "run_n_children()", "run_child()" and
+    "delete_child()", mostly to get rid of any traditional socket
+    communication between the child and parent processes and replace it was
+    ZeroMQ communication.
+
+  CLIENT IMPLEMENTATION
+    Clients should be implemented according to the lazy pirate client
+    <http://zguide.zeromq.org/pl:lpclient> in the ZeroMQ guide. Clients
+    *MUST* define a unique identity on their sockets when communicating with
+    the broker, otherwise the broker will not be able to direct responses
+    from the workers back to the correct client.
+
+    A client implementation, zmq-client, is provided with this distribution
+    to get up and running as quickly as possible.
+
+OVERRIDDEN METHODS
+  pre_bind()
+  bind()
+  post_bind()
+    Emptied out
+
+  options()
+    Adds the custom "app" option to "Net::Server". It takes the subroutine
+    reference that handles requests, i.e. the worker subroutine.
+
+  post_configure()
+    Validates the "app" option and provides a useless default (a worker
+    subroutine that simply echos back what the client sends). Validates the
+    "port" option, and sets default values for "user" and "group".
+
+  loop()
+    Overrides the main loop subroutine to remove pipe creation.
+
+  run_parent()
+    Creates the broker process, binding a "ROUTER" on the frontend port
+    (facing clients), and "ROUTER" on the backend port (facing workers).
+
+    It then starts polling on both sockets for events and passes messages
+    between clients and workers.
+
+    The parent process will receive the proctitle "zmq broker
+    <fport>-<bport>", where "<fport> is the frontend port and "<bport>" is
+    the backend port.
+
+  run_n_children( $n )
+    The same as in "Net::Server::PreFork", with all socket communication
+    code removed.
+
+  run_child()
+    Creates a "DEALER" socket between workers and server. Every child
+    process with get a proctitle of "zmq worker <bport>", where "<bport>" is
+    the backend port.
+
+    The child then signals the server that it is ready, and waits for
+    requests.
+
+  accept()
+    Waits for new messages from clients. When a message is received, it is
+    stored as the "payload" attribute, with the socket stored as the
+    "client" attribute.
+
+  post_accept()
+  get_client_info()
+    Emptied out
+
+  allow_deny()
+    Simply returns a true value
+
+  process_request()
+    Calls the "app" (i.e. worker subroutine) with the payload from the
+    client, and sends the result back to the client.
+
+  post_process_request()
+    Removes the "client" attribute (holding the "REP" socket) at the end of
+    the request.
+
+  sig_hup()
+    Overridden to simply send "SIGHUP" to the children (to restart them),
+    and that's it
+
+  shutdown_sockets()
+    Closes the ZeroMQ sockets
+
+  child_finish_hook()
+    Closes the children's socket and destroys the context (this is
+    necessary, otherwise we'll have zombies).
+
+  delete_child( $pid )
+    Overridden to remove dealing with sockets.
+
+CONFIGURATION AND ENVIRONMENT
+    Read Net::Server for more information about configuration.
+
+DEPENDENCIES
+    "Net::Server::ZMQ" depends on the following CPAN modules:
+
+    *   Carp
+
+    *   Getopt::Long
+
+    *   Net::Server::PreFork
+
+    *   Pod::Usage
+
+    *   ZMQ::FFI
+
+BUGS AND LIMITATIONS
+    Please report any bugs or feature requests to
+    "bug-Net-Server-ZMQ@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Server-ZMQ>.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+            perldoc Net::Server::ZMQ
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Server-ZMQ>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Net-Server-ZMQ>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Net-Server-ZMQ>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Net-Server-ZMQ/>
+
+AUTHOR
+    Ido Perlmuter <ido@ido50.net>
+
+ACKNOWLEDGMENTS
+    In writing this module I relied heavily on Starman by Tatsuhiko
+    Miyagawa, and on code and information from the official ZeroMQ guide
+    <http://zguide.zeromq.org/>.
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2015, Ido Perlmuter "ido@ido50.net".
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either version 5.8.1 or any later
+    version. See perlartistic and perlgpl.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

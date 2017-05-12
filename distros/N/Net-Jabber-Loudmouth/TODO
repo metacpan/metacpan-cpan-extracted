@@ -1,0 +1,4 @@
+* More tests for Net::Jabber::Loudmouth::MessageNode.
+* Fix Glib and perl warnings (caused by HTTP::Proxy) for t/10_proxy.t.
+* Find a pure perl Jabber server implementation that actually works.
+  Net::Jabber::Server and POE::Component::Jabber appearently don't.

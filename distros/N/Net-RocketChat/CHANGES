@@ -1,0 +1,57 @@
+==================================================
+Changes from 2015-05-05 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2016-05-04 02:17:39 +0000
+------------------------------------------
+
+  Change: 27d6f2c1a503f3fc6d70fd80752d2e41343cd2b1
+  Author: Dale Evans <dale.evans@mycanadapayday.com>
+  Date : 2016-05-04 02:07:18 +0000
+
+    stop requiring username/password/server/debug fields to be set when
+    they can come from the environment or have a sensible default 
+
+  Change: b661ab51f55292976595698ddb6d654debd90ad7
+  Author: Dale Evans <dale.evans@mycanadapayday.com>
+  Date : 2016-05-03 19:00:14 +0000
+
+    Merge pull request #1 from Manwar/improve-distribution-package
+
+    Improve distribution package 
+
+  Change: 11adc5c25ebc52764a4ef569bfc7342bfbd4a048
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2016-05-01 09:15:20 +0000
+
+    - Autogenerate CHANGES file from git log using dzil plugin
+    [ChangelogFromGit]. 
+
+  Change: e5b7cb53b2c4141f2444e72be1c3dc2167aeadcb
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2016-05-01 09:11:04 +0000
+
+    - Auto-add $VERSION to the package using dzil plugin [PkgVersion]. 
+
+  Change: 2b71face61509ba17f79ef2fb733eccd30ab9640
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2016-05-01 09:08:56 +0000
+
+    - Auto generate META.json using dzil plugin [MetaJSON]. 
+
+  Change: 6632c129641315926f9f902e980647f768828718
+  Author: Dale Evans <dale.evans@mycanadapayday.com>
+  Date : 2016-04-30 23:34:09 +0000
+
+    initial version 
+
+  Change: 1c207c9a715db19a2a839704de29951bbd2bcb72
+  Author: Dale Evans <dale.evans@mycanadapayday.com>
+  Date : 2016-04-30 16:07:07 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

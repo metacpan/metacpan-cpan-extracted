@@ -1,0 +1,10 @@
+Revision history for Perl extension Net::Axigen.
+
+0.09  Apr 30 14:01:44 2009
+ - original version
+ 
+0.10 May 13 11:21:00 2009
+ - the module description is corrected
+
+0.11 May 14 11:21:00 2009
+ - The method listAccountsEx has been added

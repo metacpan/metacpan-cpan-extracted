@@ -1,0 +1,149 @@
+So I'm about to grab some module name space.
+There's currently a dev release out
+
+   http://search.cpan.org/search?query=Net-OAuth2-Scheme&mode=all
+
+so as to not be polluting the hierarchy just yet...
+
+...but once it's done a round or two with the testers, I *would*
+rather like to get it out the door for real, which then entails
+claiming actual namespace and coordinating so that I'm not stomping
+all over whatever the current plan for Net::OAuth2 might be
+(... unless there isn't one, and I can just upload and call it a day,
+which would be good to know...)
+
+meaning please yell if you'd rather I used a different name.
+
+ - - - - - - - -
+What Net::OAuth2::Scheme actually is:
+
+This is a token/token-scheme description framework to be shared
+amongst clients, authorization servers, and resource servers.  It
+deals with all of the transport/formatting/encoding issues and
+the secret-sharing protocol -- basically everything you need in order
+to be able to create, use, and validate tokens, i.e., beyond what's 
+actually spelled out in the OAuth2 spec itself (it incorporates 
+the current state of the world in the Bearer and HTTP_MAC drafts
+with options to cover everything anybody's likely to want to do...)
+
+full docs are in
+  Net::OAuth2::Scheme  -- the token scheme objects & methods
+  Net::OAuth2::Scheme::Factory -- how to specify token schemes
+
+the general theory is that this + protocol handlers + policies
+gives you actual OAuth2 (authentication and resource) servers.
+
+(...I also have thoughts about Net::OAuth2::Server and
+Net::OAuth2::Resource, but, one thing at a time....)
+
+ - - - - - - - -
+It's almost entirely orthogonal to what's currently under Net::OAuth2
+since everything there thus far appears to be client-specific, though
+with Net::OAuth::Scheme in place you could, if you wanted, deprecate
+
+  Net::OAuth2::Client -> bearer_token_scheme
+
+(while keeping legacy support for it, see below)
+in favor of new fields/accessors:
+
+  Net::OAuth2::Client      -> scheme
+  Net::OAuth2::AccessToken -> scheme
+
+and then modify WebServer::get_access_token and AccessToken::request
+accordingly (below), wiping out about 20-30 lines of code and getting
+http_hmac support (and whatever else) essentially for free.
+
+(...the following is not YET a pull request;
+    this is more to get an idea of what the changes
+    would look like
+...)
+
+Net::OAuth2::Profile::WebServer::get_access_token
+ ...   
+   die "Unable to parse access token response '".substr($response->decoded_content, 0, 64)."'" unless defined $res_params;
+-  $res_params->{client} = $self->client;
+-  return Net::OAuth2::AccessToken->new(%$res_params);
++  my $scheme = $self->client->scheme;
++  my ($error, @token) = $scheme->token_accept(%$res_params);
++  die ..._text_for($error) # e.g., unexpected token_type
++    if $error
++  return Net::OAuth2::AccessToken->new
++    (scheme => $scheme, client => $self->client, access_token => @token);
+ }
+
+Net::OAuth2::AccessToken::request
+ ...
+   my $request = HTTP::Request->new(
+     $method => $self->client->site_url($uri), $header, $content
+   );
+-  # We assume a bearer token type, but could extend to other types in the future
+-  my $bearer_token_scheme = $self->client->bearer_token_scheme;
+-  my @bearer_token_scheme = split ':', $bearer_token_scheme;
+-  if (lc($bearer_token_scheme[0]) eq 'auth-header') {
+-    # Specs suggest using Bearer or OAuth2 for this value, but OAuth appears to be the de facto accepted value.
+-    # Going to use OAuth until there is wide acceptance of something else.
+-    my $auth_scheme = $bearer_token_scheme[1] || 'OAuth';
+-    $request->headers->push_header(Authorization => $auth_scheme . " " . $self->access_token);
+-  }
+-  elsif (lc($bearer_token_scheme[0]) eq 'uri-query') {
+-    my $query_param = $bearer_token_scheme[1] || 'oauth_token';
+-    $request->uri->query_form($request->uri->query_form, $query_param => $self->access_token);
+-  }
+-  elsif (lc($bearer_token_scheme[0]) eq 'form-body') {
+-    croak "Embedding access token in request body is only valid for 'application/x-www-form-urlencoded' content type"
+-      unless $request->headers->content_type eq 'application/x-www-form-urlencoded';
+-    my $query_param = $bearer_token_scheme[1] || 'oauth_token';
+-    $request->add_content(
+-      ((defined $request->content and length $request->content) ?  "&" : "") .  
+-      uri_escape($query_param) . '=' . uri_escape($self->access_token)
+-    );
++  my %params = %$self;
++  my ($token) = delete @params{qw(access_token scheme client)};
++  (my $error, $request) = $self->scheme->http_insert($request, $token, %params);
++  croak ..._text_for($error)  # e.g., post body has wrong content_type, etc...
++    if $error;
+   return $self->client->request($request);
+ }
+
+You MIGHT also want to restructure Net::OAuth2::Access_Token->new so
+that values that are NOT coming from a token response get stored
+separately rather than punning everything into the same hash.
+Otherwise, there's a chance that someone will someday register, say,
+'client' as an extension parameter, in which case you're screwed,
+because that'll then either be overwriting your link back to the 
+Net::OAuth2::Client object or you lose that parameter value.
+
+To keep existing support for ->bearer_token_scheme 
+the values there would translate as follows:
+
+    "auth-header:$scheme" 
+    --->
+    Net::OAuth2::Scheme->new(
+       %common_stuff,
+       transport => ['bearer', scheme => ($scheme || 'OAuth')]
+    );
+
+    "form-body:$param"
+    --->
+    Net::OAuth2::Scheme->new(
+       %common_stuff,
+       transport => ['bearer', param => $param, client_uses_param => 1],
+    );
+
+    "uri-query:$param"
+    --->
+    Net::OAuth2::Scheme->new(
+       %common_stuff,
+       transport => ['bearer', param => $param, client_uses_param => 1,
+                     allow_body => 0, allow_uri => 1],
+    );
+
+where
+
+   %common_stuff = (
+       context => 'client',
+
+       # in order to NOT strip out expires_in/scope/refresh_token
+       accept_remove => [], 
+   );
+

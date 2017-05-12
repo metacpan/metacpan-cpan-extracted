@@ -1,0 +1,29 @@
+---
+abstract: 'A simple wrapper around the excellent Net::DNS::Async'
+author:
+  - 'Dana M. Diederich <dana@realms.org>'
+build_requires:
+  Test::More: '0'
+  lib: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-DNS-Async-Simple
+requires:
+  Data::Dumper: '0'
+  Modern::Perl: '0'
+  Net::DNS::Async: '0'
+  Net::DNS::Resolver: '0'
+  Storable: '0'
+resources:
+  bugtracker: https://github.com/dana/perl-Net-DNS-Async-Simple/issues
+  homepage: https://github.com/dana/perl-Net-DNS-Async-Simple
+  repository: https://github.com/dana/perl-Net-DNS-Async-Simple.git
+version: '1.161090'

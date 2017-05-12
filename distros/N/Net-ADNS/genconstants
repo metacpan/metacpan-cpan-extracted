@@ -1,0 +1,41 @@
+
+use strict;
+use warnings;
+
+my $pkg = "Net::ADNS";
+
+print <<EOH;
+
+{
+  HV *package_stash = gv_stashpv("$pkg", 1);
+  AV *export_ok = GvAV(gv_fetchpv("${pkg}::EXPORT_OK", TRUE, SVt_PVAV));
+
+EOH
+
+while (<>) {
+    chomp;
+    next if /^\s*(?:#.*)?$/;
+    my ($type, $name, $value) = split;
+    $value ||= $name;
+    
+    my $sv;
+    if ($type eq 'i') {
+        $sv = "newSViv($value)"
+    }
+    elsif ($type eq 'p') {
+        $sv = "newSVpvn($value, strlen($value))";
+    }
+
+    my $namelen = length $name;
+
+    print <<EOC
+  newCONSTSUB(package_stash, "$name", $sv);
+  av_push(export_ok, newSVpvn("$name", $namelen));
+
+EOC
+}
+
+print <<EOE
+}
+
+EOE

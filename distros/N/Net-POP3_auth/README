@@ -1,0 +1,72 @@
+Copyright (c) 2003 Alex Pleiner - zeitform Internet Dienste. 
+alex@zeitform.de - http://www.zeitform.de. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Note: This version requires Authen::SASL. If you want to want to go
+without, use version Net::POP3_auth 0.02.
+
+Can someone please provide me with a SMTP account on a 
+maschine using DIGEST-MD5 or NTLM for testing?
+
+--------
+Abstract
+--------
+
+Net::POP3_auth is a small extension to G. Barr's Net::POP3
+to authenticate to an POP3 server using one of the AUTH
+methods APOP and SASL (Authen::SASL). This module can be expanded 
+and is a very first implementation.
+
+------------
+Requirements
+------------
+
+This module requires:
+ 
+   - Net::POP3 (should be obvious)
+   - MIME::Base64
+   - Digest::HMAC_MD5
+   - Authen::SASL
+
+The requirements are encoded in Makefile.PL.  
+
+------------------
+Basic Installation
+------------------
+
+Net::POP3_auth may be installed through the CPAN shell in the
+usual CPAN shell manner.  This typically is:
+
+  $ perl -MCPAN -e 'install Net::POP3_auth'
+
+You can also read this README from the CPAN shell:
+
+  $ perl -MCPAN -e shell
+  cpan> readme Net::POP3_auth
+
+And you can install the component from the CPAN prompt as well:
+
+  cpan> install Net::POP3_auth
+
+-------------------
+Manual Installation
+-------------------
+
+Net::POP3_auth can also be installed manually.  
+
+Download the package from:
+http://alex.zeitform.de/smtp_auth/
+
+Downloading and unpacking the distribution are left as exercises for
+the reader.  To build and test it:
+
+  perl Makefile.PL
+  make test
+
+When you're ready to install the component:
+
+  make install
+
+It should now be ready to use.
+

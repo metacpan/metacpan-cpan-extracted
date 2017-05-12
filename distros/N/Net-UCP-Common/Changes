@@ -1,0 +1,11 @@
+Revision history for Perl extension Net::UCP::Common.
+
+0.01  Tue Apr  8 10:19:57 2008
+	- original version; created by h2xs 1.23 with options
+		-AXn Net::UCP::Common
+
+0.02  Thu Apr 10 16:34:51 CEST 2008
+	- solved cpan tester bugs
+
+0.04  Wed Apr 16 12:25:57 CEST 2008
+	- unit test fix

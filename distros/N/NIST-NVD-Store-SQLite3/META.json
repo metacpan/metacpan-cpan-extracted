@@ -1,0 +1,50 @@
+{
+   "abstract" : "SQLite3 store for NIST::NVD",
+   "author" : [
+      "C.J. Adams-Collier <cjac@f5.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "NIST-NVD-Store-SQLite3",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Perl::Critic" : 0,
+            "Test::More" : 0,
+            "Test::Pod" : 0,
+            "Test::Pod::Coverage" : 0,
+            "XML::XPath" : 0,
+            "XML::XPath::XMLParser" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : 0,
+            "DBI" : 0,
+            "NIST::NVD" : "1",
+            "Time::HiRes" : 0,
+            "XML::XPath" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.00.00"
+}

@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Net-Z3950-AsyncZ
+version:      0.10
+version_from: AsyncZ.pm
+installdirs:  site
+requires:
+    Event:                         0.86
+    IPC::ShareLite:                0.09
+    MARC::Record:                  1.15
+    Net::Z3950:                    0.31
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

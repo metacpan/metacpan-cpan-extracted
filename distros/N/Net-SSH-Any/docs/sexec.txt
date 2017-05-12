@@ -1,0 +1,152 @@
+Bitvise SSH Client 6.08 - sexec, a scriptable remote execute client
+Copyright (C) 2000-2014 by Bitvise Limited.
+
+USAGE:
+sexec [username@]host[:port] OR -profile=file [-host=host] [-port=port] [-spn=SPN] [-sspi=y|n] [-sspiDlg=y|n]
+      [-user=username] [-gka] [-gma [-krb OR -ntlm] [-gmaDlg]] [-pk=slot [-pp=passphrase]] [-pw=password] [-kbdi [-sub=submethods]]
+      [-unat=y|n] [-trustLsp=y|n]
+      [-encr=list] [-mac=list] [-cmpr=list] [-kex=list] [-hkey=list] [-ka=y|n] [-kre=y|n]
+      [-noRegistry OR -baseRegistry=registry-key]
+      [-proxy=y|n [-proxyType=type] -proxyServer=server [-proxyPort=port] [-proxyUsername=username [-proxyPassword=password]] [-proxyResolveLocally=y|n]]
+      [-hostKeyMD5=MD5-fingerprint] [-hostKeyBB=Bubble-Babble] [-hostKeyFile=file]
+      [-keypairFile=file [-keypairPassphrase=passphrase]]
+      [-traceLog] [-flowDebugFile=file]
+      [-title=title]
+      [-x11=y|n [-x11Dsp=display] [-x11MMC1=mitMagicCookie1]]
+      [-shell OR -cmd=command OR command]
+
+PARAMETERS:
+-profile=file
+  Load connect parameters from the specified Bitvise SSH Client profile. Server host, port, SPN, SSPI, username, initial authentication method, algorithms, keep alive and re-exchange settings are loaded. If a command line parameter is additionally specified for any of these, it overrides the corresponding profile setting.
+-host=host
+  The server host to connect to overriding the already set host.
+-port=port
+  The port on server host to connect to overriding the already set port.
+-spn=SPN
+  If specified, Bitvise SSH Client will use the value of this parameter as the service principal name during Kerberos authentication. If not specified, Bitvise SSH Client will use a default, but possibly incorrect, SPN based on the SSH server's host name.
+-sspi=y|n
+  SSPI/Kerberos 5 host authentication - disabled by default, but can also be disabled explicitly to override profile setting.
+-sspiDlg=y|n
+  Permit access delegation - disabled by default, but can also be disabled explicitly to override profile setting. For use only with SSPI/Kerberos 5 host authentication.
+-user=username
+  The username to login with overriding the already set username.
+-gka
+  Log in using the gssapi-keyex method. Available only when SSPI/Kerberos 5 host authentication has been performed. Can also be combined with other authentication methods, in which case gssapi-keyex is attempted first.
+-gma
+  Log in using the gssapi-with-mic method. Can also be combined with other authentication methods, in which case gssapi-with-mic is attempted after gssapi-keyex.
+-krb
+  Use gssapi-with-mic with the Kerberos 5 mechanism only.
+-ntlm
+  Use gssapi-with-mic with the NTLM mechanism only.
+-gmaDlg
+  Permit access delegation - disabled by default. For use only with gssapi-with-mic user authentication.
+-pk=slot
+  Log in using the publickey method, with the keypair in the specified slot. Can also be combined with other authentication methods, in which case publickey is attempted after gssapi-with-mic.
+-pp=passphrase
+  A passphrase for the keypair specified with -pk.
+-pw=password
+  Log in with the specified password. Can also be combined with other authentication methods, in which case the password is attempted after the publickey method.
+-kbdi
+  Log in with the keyboard-interactive method. Can also be combined with other authentication methods, in which case the keyboard-interactive method is attempted last.
+-sub=submethods
+  Optional submethods for keyboard-interactive.
+-unat=y|n
+  Use unattended mode to prevent any user interaction by the SSH session - in particular, host key verification and user authentication. Disabled by default.
+-trustLsp=y|n
+  If enabled, only a narrow selection of trusted Windows Sockets LSP providers will be used, promoting stability, but at a possible expense of connectivity. If disabled, any LSP that is installed will be used, promoting connectivity, but at a possible expense of stability. By default, only trusted LSPs are used.
+-encr=list
+  Comma-separated priority list of session encryption algorithms. If not specified, the following algorithm list is assumed: aes256-ctr,aes192-ctr,aes128-ctr,3des-ctr,aes256-cbc,aes192-cbc,aes128-cbc,3des-cbc.
+-mac=list
+  Comma-separated priority list of session MAC algorithms. If not specified, the following algorithm list is assumed: hmac-sha2-256,hmac-sha1.
+-cmpr=list
+  Comma-separated priority list of session compression algorithms. If not specified, the following algorithm list is assumed: none,zlib.
+-kex=list
+  Comma-separated priority list of ECDH and DH key exchange algorithms. If not specified, the following algorithm list is assumed: ecdh-sha2/secp256k1,ecdh-sha2/nistp521,ecdh-sha2/nistp384,ecdh-sha2/nistp256,diffie-hellman-group14-sha1,diffie-hellman-group1-sha1, plus any GSSAPI key exchange methods if -sspi was specified. When connecting to OpenSSH servers, the diffie-hellman-group-exchange-sha256 and diffie-hellman-group-exchange-sha1 algorithms will automatically be moved to the back of the list for compatibility reasons.
+-hkey=list
+  Comma-separated priority list of host key algorithms. If not specified, the following algorithm list is assumed: ECDSA/secp256k1,ECDSA/nistp521,ECDSA/nistp384,ECDSA/nistp256,RSA,DSA.
+-ka
+  Keep-alive / broken session detection - enabled by default, but can also be enabled explicitly to override profile.
+-kre
+  Key re-exchange - enabled by default, but can also be enabled explicitly to override profile.
+-noRegistry
+  Do not load settings from or store them to Windows registry. Use of global client proxy settings, host key database, and user keypair database is prevented.
+-baseRegistry=registry-key
+  A base Windows registry key to replace the default 'HKEY_CURRENT_USER\Software\Bitvise' key.
+-proxy=y|n
+  Use a proxy server, overrides global client proxy settings.
+-proxyType=type
+  The type of proxy server to use. 'SOCKS4', 'SOCK5', and 'HTTP' proxy types are supported. 'SOCKS4' is set by default.
+-proxyServer=server
+  The IP address or DNS name of the proxy server.
+-proxyPort=port
+  The proxy server port, 1080 by default.
+-proxyUsername=username
+  The proxy server username (SOCKS5 and HTTP only).
+-proxyPassword=password
+  The proxy server password (SOCKS5 and HTTP only).
+-proxyResolveLocally=y|n
+  Resolve a DNS name locally before passing it to the proxy when this flag is used.
+-hostKeyMD5=MD5-fingerprint
+  A CSV list of MD5 fingerprints of host keys to accept, used additionally to global client host key database
+-hostKeyBB=Bubble-Babble
+  A CSV lost of Bubble-Babble of host keys to accept, used additionally to global client host key database
+-hostKeyFile=file
+  A file containing host keys to accept, used additionally to global client host key database
+-keypairFile=file
+  A file containing a private key for authentication; overrides keys in global client user keypair database.
+-keypairPassphrase=passphrase
+  Provide a passphrase for the keypair specified with the -keypairFile parameter. Passphrase must always be present when an OpenSSH encoded and passphrase protected keypair is specified.
+-traceLog
+  Enable trace logging.
+-flowDebugFile=file
+  Enable Flow debbuging to the specified textual file.
+-title=title
+  Use this parameter to set a custom console window title.
+-x11=y|n
+  Enable X11 forwarding. Disabled by default.
+-x11Dsp=display
+  The X11 display associated with X11 forwarding. Set to 127.0.0.1:0.0 by default.
+-x11MMC1=mitMagicCookie1
+  MIT-MAGIC-COOKIE-1 for use with X11 forwarding, if any. If your X11 server cannot use host-based authorization, set this to match the cookie configured in your X11 server.
+-shell
+  Execute the program configured at the server as the shell. This is the default choice when no command is specified.
+-cmd=command
+  Execute the specified command. Alternativelly, a command can be passed without being -cmd prefixed. In that case, however, note that any parameters beyond the command are treated as part of the command itself.
+
+EXAMPLES:
+sexec myserver -cmd="cmd /c dir"
+  Logs into 'myserver' with the account name of the current Windows user as the username. Will prompt to choose an authentication method when connected.Will execute 'cmd /c dir'.
+sexec someuser@myserver -cmd="ls -la"
+  Logs into 'myserver' as 'someuser'; will prompt to choose an authentication method when connected and execute 'ls -la'.
+sexec someuser@myserver:9222 -cmd=df
+  Logs into 'myserver' on port 9222 as 'someuser', executing 'df'.
+sexec myusername@myserver -pw=mypassword -shell
+  Logs into 'myserver' as 'myusername' with password 'mypassword', executing whatever program is configured at the server as the shell.
+sexec myusername@myserver -pk=1 -cmd="cmd /c cd \temp & rd subdir"
+  Uses the public key in slot 1 for user authentication instead of a plain password, then executing 'cd \temp' followed by 'rd subdir'.
+
+RETURN CODES:
+   0  Success
+   1  Unknown failure
+   2  Usage error
+ 100  SSH session failure
+ 101  Failure connecting to server
+ 102  SSH host authentication failure
+ 103  SSH user authentication failure
+ 200  Session channel open request was rejected.
+ 201  Execution request was rejected.
+ 900  The remote process was terminated by a signal.
+ 901  The remote process was terminated by a signal with core dumped.
+1000  The remote process completed with exit code 0.
+1001  The remote process completed with exit code 1.
+1002  The remote process completed with exit code 2.
+ ...  ...
+
+To more easily read the above help, try:
+  sexec -help-usage    (display usage)
+  sexec -help | more   (displays help page by page)
+  sexec -help > h.txt  (creates a text file you can open e.g. with Notepad)
+  sexec -help-params   (display parameters help)
+  sexec -help-<param>  (display help for a particular parameter)
+  sexec -help-examples (display examples)
+  sexec -help-codes    (display return codes)

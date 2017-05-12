@@ -1,0 +1,26 @@
+beeplite-license.txt
+ChangeLog
+DESIGN_NOTES
+lib/Net/BEEP/Lite.pm
+lib/Net/BEEP/Lite/BaseProfile.pm
+lib/Net/BEEP/Lite/Channel.pm
+lib/Net/BEEP/Lite/ClientSession.pm
+lib/Net/BEEP/Lite/Frame.pm
+lib/Net/BEEP/Lite/Message.pm
+lib/Net/BEEP/Lite/MgmtProfile.pm
+lib/Net/BEEP/Lite/ServerSession.pm
+lib/Net/BEEP/Lite/Session.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/channel.t
+t/frame.t
+t/FullDuplexScalar.pm
+t/message.t
+t/mgmtprofile.t
+t/profile.t
+t/session.t
+t/test_echo_client.pl
+t/test_echo_server.pl
+TODO

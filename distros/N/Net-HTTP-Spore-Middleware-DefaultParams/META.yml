@@ -1,0 +1,26 @@
+---
+abstract: 'Middleware to set default params for every request made by a spore client'
+author:
+  - "Emmanuel \"BHS_error\" Peroumalnaik <peroumalnaik.emmanuel@gmail.com>"
+build_requires:
+  JSON: 0
+  Module::Build: 0.3601
+  Net::HTTP::Spore: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-HTTP-Spore-Middleware-DefaultParams
+requires:
+  Moose: 0
+  Net::HTTP::Spore::Middleware: 0
+  perl: 5.006
+version: 0.04

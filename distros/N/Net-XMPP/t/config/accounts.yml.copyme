@@ -1,0 +1,13 @@
+# An account on a server supporting
+# TLS and having an SRV record in DNS
+srv_and_tls:
+  bare_jid: you@example.com
+  auth:
+    password: som3passw0rd
+    username: you
+  conn:
+    hostname: example.com
+    port: 5222
+    srv: 1
+    ssl_ca_path: /path/to/ca/certificates
+    tls: 1

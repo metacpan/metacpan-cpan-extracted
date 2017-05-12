@@ -1,0 +1,11 @@
+Revision history for Perl extension Net::Syndic8.
+
+0.04 Add Base.pm class
+
+0.02 Documenting
+
+0.01  Wed Jun  9 09:41:58 2004
+	- original version; created by h2xs 1.23 with options
+		-AXc --skip-exporter -n Net::Syndic8
+
+

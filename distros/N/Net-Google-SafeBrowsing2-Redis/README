@@ -1,0 +1,45 @@
+Net-Google-SafeBrowsing2-Redis
+==============================
+
+Redis back-end for Net::Google::SafeBrowsing2 (http://search.cpan.org/perldoc?Net::Google::SafeBrowsing2).
+
+The source code is available on github at https://github.com/juliensobrier/Net-Google-SafeBrowsing2-Redis.
+
+The CPAN release is available at http://search.cpan.org/perldoc?Net::Google::SafeBrowsing2::Redis
+
+See http://search.cpan.org/~jsobrier/Net-Google-SafeBrowsing2/ for other back-ends: Sqlite, MySQL, Postgres, etc.
+
+
+IMPORTANT
+
+You should flush your Redis database if you are upgrading from a version lower than 0.6 (some keys were never deleted).
+
+Version 0.3 breaks backward compatibility. If you are using version 0.2 or below, you need to reset your Redis database (i.e. start from an empty database).
+
+As of 07/31/2012, the Redis database takes 900 MB for both Google Safe Browsing lists (malware and phishing).
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Net::Google::SafeBrowsing2::Storage
+  Redis::hiredis
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Julien Sobrier
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

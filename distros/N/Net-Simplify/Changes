@@ -1,0 +1,39 @@
+Revision history for Perl module Net::Simplify
+
+1.4.0 2016-02-28
+
+   - Added Card data to Refund.
+
+1.3.0 2016-01-18
+
+   - Addition of Data Token.
+
+1.2.0 2015-12-02
+
+   - Addition of Fraud Check API and Transaction Review API.
+
+1.1.0 2014-11-07
+
+   - Addition of Authorization API and update to Payment API
+
+1.0.5 2014-01-20
+
+   - Added refunded fees data to the payment response.
+
+1.0.4 2013-10-31
+
+   - Updates to API documentation.
+   - Update Changes to match CPAN::Changes::Spec.
+
+1.0.3 2013-10-21
+
+   - Disabling signing of the distribution to simplify the installation.
+
+1.0.2 2013-10-21
+
+   - Fixing error in package name that was causing a problem deploying
+   to CPAN.
+
+1.0.0 2013-10-21
+
+   - Initial release

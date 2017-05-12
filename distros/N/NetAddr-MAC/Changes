@@ -1,0 +1,67 @@
+NetAddr::MAC - A MAC address object
+
+0.95    2017-04-19
+        - POD spelling and whitespace
+
+0.94    2015-02-14
+        - Minor changes for updated dist.ini
+
+0.93    2015-01-26
+        - Further improve exclusion of ipv6 addresses that look like enough like mac addresses to pass
+
+0.92    2015-01-13
+        - Fix for is_unicast RT101508. Thanks to Aaron (vitahall@cpan.org) for the bug report and patch including tests!
+
+0.91    2015-01-12
+        - Reject strings that could be MAC addresses but which are clearly abbreviated IPv6
+
+0.9     2014-11-16
+        - WARNING: Incompatible changes in this release! Oliver G has pointed out that the as_microsoft and as_ieee were switched. I have swapped their output formats in this version and bumped the version to 0.9. This change brings the API in sync with Net::MAC.
+
+0.87    2014-11-04
+        - Added is_msnlb property, for Microsoft Network Load Balancing MAC addresses. See also http://msdn.microsoft.com/en-us/library/bb742455.aspx
+
+0.86    2014-10-22
+        - Added is_vrrp property
+        - Added is_hsrp and is_hsrp2 properties
+
+0.85    2014-10-21
+        - Added is_broadcast property, ff:ff:ff:ff:ff:ff no longer returns true for is_multicast
+
+0.84    2014-06-28
+        - Added priority and as_bridge_id functions, subsuming NetAddr::BridgeID's functionality (but without Moose)
+        - Added oui function
+        - Added as_pgsql and mac_as_pgsql functions
+
+0.83    2014-06-24
+        - Fiddled more with the pod in MAC.pm
+        - Added t/140-new.t
+        - Enhancements to t/150-misc-bad-formats-via-die.t
+
+0.82_01    2014-06-03
+        - Some typos in the pod of MAC.pm
+        - Fixing RT96045 (https://rt.cpan.org/Public/Bug/Display.html?id=96045) reported by Oliver Gorwits.
+        - Closed out RT79915, no changes here but bugs caused by yucky overrides to core functions
+        - Tweaks to the README file and added the # ABSTRACT: line
+
+0.82    2013-12-09
+        - Tests for bad mac addresses from Oliver Gorwits (http://gorwits.me.uk/)
+        - For Cisco format 1111.2222.3333 - we no longer support dropping leading zeros. This was a trade off to better detect broken mac's. Cisco doesnt drop them anyway so its, IMO, the most sensible compromise.
+
+0.81    2013-11-01
+        - Handle strange things like aabb.cc.11.22.33 or 11.22.33.aabbcc
+
+0.80    2013-08-23
+        - Zap leading and trailing white space
+        - Improve error messages
+        - Major changes to error handling, doesnt die anymore. See pod for details
+
+0.79    2013-07-03
+        - Minor changes
+
+0.78    2012-10-03
+        - Fixes for RT79915
+
+0.77    2012-06-04
+        - Added changelog
+        - Changed to dzil

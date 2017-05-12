@@ -1,0 +1,6 @@
+Revision history for Perl extension NDFD::Weather::Report.
+
+0.01  Fri Dec 28 13:49:39 2012
+	- original version; created by h2xs 1.23 with options
+		-AX -n NDFD::Weather::Report
+

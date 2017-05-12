@@ -1,0 +1,11 @@
+This module makes calculations with formatted numbers transparent.
+All arithmetric operators and and some arithmetric functions (I<sqrt, abs, cos, sin, exp, log>) are overloaded.
+
+to install the module...
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

@@ -1,0 +1,22 @@
+Revision history for Net-ICAP-Client
+
+0.07   Sun Sep 25 17:49:00 2015
+        Fixes to licensing terms
+
+0.06   Sun Sep 25 16:32:00 2015
+        Fixed documentation, added debug/diag to OPTIONS call in test suite
+
+0.05   Sat Sep 24 23:32:00 2015
+        Added c-icap compatibility
+
+0.04   Fri Sep 23 19:17:00 2015
+        Improved debug routines, ICAP server error handling, turned on diag for tests
+
+0.03   Thu Sep 22 19:07:00 2015
+        Added README
+
+0.02   Thu Sep 22 19:05:00 2015
+        Fixes to documentation, license
+
+0.01   Wed Sep 21 20:06:00 2015
+        Initial release.

@@ -1,0 +1,20 @@
+Revision history for Perl module Nagios::Plugin::DieNicely
+
+0.01 Fri May 23 13:32:43 2008
+    - original version; created by ExtUtils::ModuleMaker 0.51
+0.02 Tue Jun 10 21:45:00 2008
+    - let module user specify the desired Nagios exit status
+    - better testing (use $^X) to lauch correct perl interpreter
+0.03 Tue Dec 02 17:10:00 2008
+    - don't catch dies that are in eval blocks
+0.04 Thu May 27 19:00:00 2010
+    - Bug fixed: if a module was dieing in a BEGIN block, Nagios::Plugin::DieNicely
+      would capture it and exit. Now it will propagate the exception backwards. If
+      it was in an eval block, the exception will be correctly captured. If it
+      wasn't, the plugin will die in a non-nagios compatible way.
+      Now running plugins under the debugger is possible, and doing 
+      use Math::BigInt try => 'GMP' without GMP installed will all work (yay!)
+    - Fixed test suite
+0.05 Sat May 29 19:00:00
+    - Fixed test suite. On some platforms one test case was exiting with a different exit code.
+      Really not a problem with Nagios::Plugin::DieNicely

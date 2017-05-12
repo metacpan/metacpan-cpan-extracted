@@ -1,0 +1,263 @@
+{: NES 0.9 ('{: * cfg_plugin_top_dir :}/forms_captcha.pl','none') :}
+{: #
+    ----------------------------------------------------------------------------
+    
+        NES 0.9 beta by - Skriptke
+        Copyright 2009 - 2010 Enrique F. Castañón
+        Licensed under the GNU GPL.
+        http://sourceforge.net/projects/nes/
+        
+        Sample to use Nes;
+        
+    ----------------------------------------------------------------------------
+:}
+
+<a name="test0" id="test0"></a> 
+<div id="comment">
+<p>
+Formulario seguro con chequeo de campos:
+</p>
+{: & form (test0,,,,20m,30s,none,5/1)
+
+<pre>
+nes_forms_plugin_test0_error_last  : {: *nes_forms_plugin_test0_error_last :} &nbsp;
+nes_forms_plugin_test0_error_fatal : {: *nes_forms_plugin_test0_error_fatal :} &nbsp;
+nes_forms_plugin_test0_attempts    : {: *nes_forms_plugin_test0_attempts :} &nbsp;
+
+</pre>
+
+    {: & check ( 
+                {: # field_name:min,max,type # type: num, email o regex :}
+                'user: 4,30', 
+                'password: 4,20'           
+               ) 
+    :}
+                         
+    <center>              
+    {: ~ !*nes_forms_plugin_test0_is_ok     
+
+    {: ~ *nes_forms_plugin_test0_error_field {: # error en cualquier campo de form1 :}
+        <p align="center"><big><b>Se han detectado errores:</b></big>
+        {: ~ *nes_forms_plugin_test0_error_field_user  {: # error en el campo nombre de form1 :}   
+            <br>* ERROR en Usuario:    <br> necesario entre 4 y 30 caracteres 
+        :}
+        {: ~ *nes_forms_plugin_test0_error_field_password 
+            <br>* ERROR en Password:<br> es necesario y debe tener entre 2 y 20 caracteres 
+        :}
+        </p>
+    :}        
+      
+    <form method="GET" name="test0" action="#test0">
+        <table  border="0">
+            
+          <tr>
+            <td align="right">
+            Usuario:
+            </td>
+            <td align="left">
+            <input name="{: & obfuscated user :}" type="text"  size="12" value="{: * q_user :}"/>
+            </td>
+          </tr>
+                   
+          <tr>
+            <td align="right">
+            Password:
+            </td>
+            <td align="left">
+            <input name="{: & obfuscated password :}" type="password"  size="12" value="{: * q_password :}"/>
+            </td>
+          </tr>        
+        </table>
+        
+        <input type="hidden" name="item"  value="{: * q_item :}" />
+        <input name="enviar" type="submit" value="Enviar" />
+        
+    </form>  
+    :}
+    {: ~ *nes_forms_plugin_test0_is_ok 
+        <big><b>Ok Send data</b></big>
+    :}
+    </center>    
+:}
+<br>
+</div>
+
+<br><br>
+
+
+<a name="test1" id="test1"></a>
+<div id="comment">
+<p>
+Formulario seguro con chequeo de campos y captcha:
+</p>
+{: & form (test1,,ctest1,,20m,30s,none,10/1)
+
+<pre>
+nes_forms_plugin_test1_error_last    : {: *nes_forms_plugin_test1_error_last :} &nbsp;
+nes_forms_plugin_test1_error_fatal   : {: *nes_forms_plugin_test1_error_fatal :} &nbsp;
+nes_forms_plugin_test1_attempts      : {: *nes_forms_plugin_test1_attempts :} &nbsp;
+nes_captcha_plugin_ctest1_error_last : {: *nes_captcha_plugin_ctest1_error_last :} &nbsp;
+nes_captcha_plugin_ctest1_error_fatal: {: *nes_captcha_plugin_ctest1_error_fatal :} &nbsp;
+nes_captcha_plugin_ctest1_attempts   : {: *nes_captcha_plugin_ctest1_attempts :} &nbsp;
+
+</pre>
+
+    {: & check ( 
+                {: # field_name:min,max,type # type: num, email o regex :}
+                'user: 4,30', 
+                'password: 4,20'           
+               ) 
+    :}
+                          
+    <center>              
+    {: ~ !*nes_forms_plugin_test1_is_ok      
+
+    <form method="GET" name="test1" action="#test1">
+        <table  border="0">
+            
+          <tr>
+            <td valign="top" align="right">
+            Usuario:
+            </td>
+            <td valign="top" align="left">
+            <input name="{: & obfuscated user :}" type="text"  size="12" value="{: * q_user :}"/>
+            {: ~ *nes_forms_plugin_test1_error_field_user  {: # error en el campo nombre de form1 :}   
+                <blink>&#10038;</blink> <br> <small>Requiere entre 4 y 30 caracteres</small>
+            :}
+            </td>
+          </tr>
+         
+          <tr>
+            <td valign="top" align="right">
+            Password:
+            </td>
+            <td valign="top" align="left">
+            <input name="{: & obfuscated password :}" type="password"  size="12" value="{: * q_password :}"/>
+            {: ~ *nes_forms_plugin_test1_error_field_password 
+                <blink>&#10038;</blink> <br> <small>Requiere entre 2 y 20 caracteres</small>
+            :}
+            </td>
+          </tr>        
+          
+          {: ~ ( ! * nes_forms_plugin_test1_last_step ) 
+              {: & captcha (ctest1,ascii,4,0)
+              <tr>
+                <td align="right">{: & captcha_code :}</td>
+                <td valign="top"  align="left">
+                &nbsp;Código de seguridad:<br>
+                &nbsp;<input type="text" name="ctest1"  size="16" />
+                {: ~ *nes_captcha_plugin_ctest1_error_fatal <blink>&#10038;</blink> <br> &nbsp;<small>Código incorrecto</small>:}
+                </td>            
+              </tr>
+              :}
+         :}
+         
+          <tr>
+            <td align="right"></td>
+            <td align="left">&nbsp;<input name="enviar" type="submit" value="Enviar" /></td>
+          </tr> 
+                   
+        </table>
+        <input type="hidden" name="item"  value="{: * q_item :}" />
+
+    </form>  
+    :}
+    {: ~ *nes_forms_plugin_test1_is_ok 
+        <big><b>Ok Send data</b></big>
+    :}
+    </center>    
+:}
+<br>
+</div>
+
+<br><br>
+
+
+<a name="test2" id="test2"></a>
+<div id="comment">
+<p>
+Formulario seguro con chequeo y captcha en el último paso:
+</p>
+{: & form (test2,0,ctest2,last,20m,30s,none,10/1)
+
+<pre>
+nes_forms_plugin_test2_error_last    : {: *nes_forms_plugin_test2_error_last :} &nbsp;
+nes_forms_plugin_test2_error_fatal   : {: *nes_forms_plugin_test2_error_fatal :} &nbsp;
+nes_forms_plugin_test2_attempts      : {: *nes_forms_plugin_test2_attempts :} &nbsp;
+nes_captcha_plugin_ctest2_error_last : {: *nes_captcha_plugin_ctest2_error_last :} &nbsp;
+nes_captcha_plugin_ctest2_error_fatal: {: *nes_captcha_plugin_ctest2_error_fatal :} &nbsp;
+nes_captcha_plugin_ctest2_attempts   : {: *nes_captcha_plugin_ctest2_attempts :} &nbsp;
+
+</pre>
+
+    {: & check ( 
+                {: # field_name:min,max,type # type: num, email o regex :}
+                'user: 4,30', 
+                'password: 4,20'           
+               ) 
+    :}
+                            
+    <center>              
+    {: ~ !*nes_forms_plugin_test2_is_ok
+    
+    {: ~ *nes_forms_plugin_test2_error_field {: # error en cualquier campo de form1 :}
+        <p align="center"><big><b>Se han detectado errores:</b></big>
+        {: ~ *nes_forms_plugin_test2_error_field_user  {: # error en el campo nombre de form1 :}   
+            <br>* ERROR en Usuario:    <br> necesario entre 4 y 30 caracteres 
+        :}
+        {: ~ *nes_forms_plugin_test2_error_field_password 
+            <br>* ERROR en Password:<br> es necesario y debe tener entre 2 y 20 caracteres 
+        :}
+        </p>
+    :}     
+           
+    <form method="GET" name="test2" action="#test2">
+        <table  border="0">
+          
+           {: ~ *nes_forms_plugin_test2_last_step
+              {: & captcha (ctest2,ascii,4,0)
+              <tr>
+                <td align="right">{: & captcha_code :}</td>
+                <td align="left">
+                &nbsp;Código de seguridad:<br>
+                &nbsp;<input type="text" name="ctest2"  size="16" />
+                {: ~ *nes_captcha_plugin_ctest2_error_fatal <br><b>&nbsp;Código incorrecto</b> :}
+                <br>
+                &nbsp;<input name="enviar" type="submit" value="Enviar" />
+                <br><br>
+                </td>            
+              </tr>
+              :}
+           :}          
+          <tr>
+            <td align="right">
+            Usuario:
+            </td>
+            <td align="left">
+            <input name="{: & obfuscated user :}" type="text"  size="12" value="{: * q_user :}"/>
+            </td>
+          </tr>
+         
+          <tr>
+            <td align="right">
+            Password:
+            </td>
+            <td align="left">
+            <input name="{: & obfuscated password :}" type="password"  size="12" value="{: * q_password :}"/>
+            </td>
+          </tr>            
+          
+        </table>
+        <input type="hidden" name="item"  value="{: * q_item :}" />
+        <input name="enviar" type="submit" value="Enviar" />
+        
+    </form>  
+    :}
+    {: ~ *nes_forms_plugin_test2_is_ok 
+        <big><b>Ok Send data</b></big>
+    :}
+    </center>    
+:}
+<br>
+</div>
+

@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::uTorrent.
+
+0.01  Tue Sep  1 17:30:20 2009
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Net::uTorrent
+

@@ -1,0 +1,102 @@
+1.058 2016/06/17
+- RT#109887 - fix t/01_load.t in case only very old version of LWP was
+  installed which did not have LWP::Protocol::https
+1.057 2016/04/04
+- removed warning with very old versions of LWP where
+  LWP::Protocol::https::VERSION was not defined yet.
+  Thanks to denis[AT]fateyev[DOT]com for reporting
+
+1.056 2015/10/31
+- fix another memory leak which happened on data connections only
+- make sure that context reuse is done properly, see
+  https://github.com/noxxi/p5-net-sslglue/pull/3
+
+1.055 2015/10/25
+- fix memory leak in Net::SSLGlue::Socket, RT#107816.
+  Thanks to kasyap.mr[AT]gmail[DOT]com  for reporting
+
+1.054 2015/04/28
+- if a version of libnet is detected which already supports TLS (i.e.
+  libnet 3.0+) warn and use this instead.
+
+1.053 2014/05/28
+- if current LWP is detected is use this mostly unpatched
+- fix Net::SSLGlue::FTP to use the same hostname when verifying the
+  certificate of the data connection
+
+1.052 2014/01/16
+- FTPS: reuse same SSL session for control and data channnel to work
+  with default configuration of proftpd. 
+
+1.051 2014/01/10
+- fixes to Net::FTP SSL support
+- examples/ftps-tests.pl has lots of tests for FTP against live server
+
+1.05 2014/01/09
+- added support for SSL+IPv6 in Net::FTP
+- new package Net::SSLGlue::Socket for a socket which combines plain,ssl,ipv6
+- fixed some tests - some checks for bad certificates do not work anymore
+  because these certs were fixed
+
+1.04 2013/08/01
+replace Net::Cmd::getline via Net::SSLGlue::POP3 because it assumed, that it
+just needs to wait for read events on the sockets - which is not the case for
+SSL (e.g. SSL_WANT_READ, SSL_WANT_WRITE).
+Fixes https://rt.cpan.org/Ticket/Display.html?id=87507.
+Thanks to MICHIELB for reporting
+
+1.03 2013/05/15
+fixed documentation for Net::SSLGlue::POP3
+
+1.02 2013/05/14
+added Net::SSLGlue::POP3
+
+1.01 2012/01/31
+Net::SSLGlue::LDAP as wrongly named Net::DNSGlue::LDAP
+
+1.0 2012/01/30
+Net::SSLGlue::SMTP: save hello domain from last hello call, so that the 
+hello after the starttls uses the same domain argument.
+Thanks to zaucker[AT]oetiker[DOT]ch for reporting problem.
+
+0.9 2012/01/24
+Net::SSLGlue::SMTP: fixed stripping of port from host/ip for name 
+verification. Added hello after successful starttls. Extented tests
+to check, if we can actually talk after starttls.
+Thanks to zaucker[AT]oetiker[DOT]ch for reporting problem.
+
+0.8 2011/07/17
+fixed wrong position for include encode_base64 and uri_unescape in *::LWP.
+Thanks to mtelle[AT]kamp-dsl[DOT]de for reporting
+
+0.7 2011/05/27
+strip port from host/ip for name verification in Net::SSLGlue::SMTP
+
+0.6 2011/05/02
+fixed english, thanks to dom, https://rt.cpan.org/Ticket/Display.html?id=46284
+
+0.5 2011/02/03
+documentation fixes: http://rt.cpan.org/Ticket/Display.html?id=65258
+
+0.4 2010/06/13
+added Changes, put examples into examples/ dir
+
+0.3 2010/05/13
+rewrite parts of Net::SSLGlue::LWP so that it sends the correct request
+to the peer even if https_proxy is used. In former version it ommitted
+the HTTP version number in the request (thus the request was invalid).
+Bug report by PMOONEY https://rt.cpan.org/Ticket/Display.html?id=57365
+
+0.2_1 2010/05/11
+document way to set different verification scheme for LWP
+requested by PMOONEY https://rt.cpan.org/Ticket/Display.html?57367
+
+0.2 2009/01/02
+https_proxy support for LWP, HTTPS_PROXY from Crypt::SSLeay did not work and
+the https_proxy from LWP was broken with both Crypt::SSLeay and
+IO::Socket::SSL (it did unencrypted https:// requests to the proxy).
+Fix it so that it now does CONNECT (this is the meaning of https_proxy for
+all other programs)
+
+0.1 2008/12/31 
+initial release

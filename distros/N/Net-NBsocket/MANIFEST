@@ -1,0 +1,25 @@
+MANIFEST
+MANIFEST.SKIP
+README
+Makefile.PL
+NBsocket.pm
+Changes
+Artistic
+GPL
+t/accept.t
+t/dyn_bind.t
+t/dyn_bind6.t
+t/import.t
+t/inet_sock.t
+t/open_udpNB.t
+t/tcpux_NB.t
+t/tcplh_NB.t
+t/tcp_NB.t
+t/support.t
+t/inet_pton.t
+t/open6_udpNB.t
+t/sockaddr_in6.t
+t/tcp_6NB.t
+t/tcplh_6NB.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

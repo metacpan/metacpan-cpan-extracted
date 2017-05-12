@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+Spice.pm
+t/convert.t

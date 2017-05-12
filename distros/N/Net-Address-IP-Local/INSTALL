@@ -1,0 +1,27 @@
+System Requirements
+-------------------
+
+The following Perl packages are required for running Net::Address::IP::Local:
+
+  Perl
+  Error
+  IO
+  Test-Simple
+
+For IPv6 support, the following package is also required:
+
+  IO-Socket-INET6
+
+Building and Installing
+-----------------------
+
+You can build and install Net::Address::IP::Local automatically through CPAN,
+or manually with the following commands:
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+# $Id: INSTALL 19 2008-03-16 02:37:14Z julian $
+# vim:tw=79

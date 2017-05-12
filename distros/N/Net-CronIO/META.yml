@@ -1,0 +1,26 @@
+---
+abstract: 'Perl binding for cron.io'
+author:
+  - 'Mark Allen <mrallen1@yahoo.com>'
+build_requires:
+  Socket: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300007, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-CronIO
+requires:
+  Carp: 0
+  Net::HTTP::API: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-CronIO
+  homepage: https://metacpan.org/dist/Net-CronIO
+  repository: git://github.com/mrallen1/Net-CronIO.git
+version: 0.01

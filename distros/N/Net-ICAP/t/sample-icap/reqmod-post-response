@@ -1,0 +1,19 @@
+ICAP/1.0 200 OK
+Date: Mon, 10 Jan 2000  09:55:21 GMT
+Server: ICAP-Server-Software/1.0
+Connection: close
+ISTag: "W3E4R7U9-L2E4-2"
+Encapsulated: req-hdr=0, req-body=244
+
+POST /origin-resource/form.pl HTTP/1.1
+Host: www.origin-server.com
+Via: 1.0 icap-server.net (ICAP Example ReqMod Service 1.1)
+Accept: text/html, text/plain, image/gif
+Accept-Encoding: gzip, compress
+Pragma: no-cache
+Content-Length: 45
+
+2d
+I am posting this information.  ICAP powered!
+0
+

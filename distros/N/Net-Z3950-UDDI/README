@@ -1,0 +1,57 @@
+The Net::Z3950::UDDI library exists to provide a Z39.50-to-UDDI
+gateway, implemented using Index Data's fine Net::Z3950::SimpleServer
+module to provide the Z39.50 server component.  ("Z39.50" here
+includes its descendent protocols SRU and SRW, thanks to the wonder of
+the YAZ Generic Frontend Server.)
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   sudo make install
+
+Then you will be able to run
+
+   z2uddi
+
+For more information, see the embedded POD documentation in
+bin/z2uddi, lib/Net/Z3950/UDDI.pm and the other files.
+
+
+SAMPLE SESSION WITHOUT INSTALLATION
+
+The gateway can be run from its current location as follows:
+
+   $ perl -I lib bin/z2uddi etc/config.yaml
+
+And a client can be run against it as follows, to find and retrieve
+business records from three different UDDI repositories:
+
+  $ yaz-client
+  Z> format xml
+  Z> open localhost:9999/gbif
+  Z> find @attr 1=4 geo%
+  Z> show 1
+  Z> base geoss
+  Z> find @attr 1=4 %cl%
+  Z> show 1
+  Z> base ms
+  Z> find @attr 1=4 microsoft
+  Z> show 1
+
+See the Net::Z3950::UDDI::Config documentation for information about
+running and accessing an equivalent SRU service.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Mike Taylor.
+
+I gratefully acknowledge the funding provided by the United States
+Geological Survey (USGS) to create this software.
+
+This library is distributed under the terms of GNU General Public
+License, version 2.  A copy of the license is included in the file
+"GPL-2" in this distribution.
+

@@ -1,0 +1,42 @@
+Revision history for Perl extension Net::DNS::ZoneFile::Fast.
+
+1.11  Wed Apr 29 2009
+        - Patch from Chris Adams to allow for negative offsets in $GENERATE
+
+1.1   Tue Jan 27 2009
+        - Expanded SSHFP formatting support
+        - NSEC3 and NSEC3PARAM support
+        - fix issues with recent changes in Net::DNS
+
+1.01  Tue Oct  7 2008
+        - Many many fixes, improvements, and even releases since the
+          last Changes listing here.  whoops.
+
+0.6.1 Sat Apr  8 21:19:21 PDT 2006
+        - bug fix to match current Net::DNS::SEC APIs we shouldn't be using.
+
+0.6   Mon Nov 14 16:35:00 PST 2005
+        - added support for DNSSEC records (RRSIG, DNSKEY, DS, NSEC, RRSIG)
+        - added support for AFSDB records
+        - added support for parsing included files (commonly used in DNSSEC)
+
+0.5   Thu Apr 15 23:17:56 CEST 2004
+	- add support for RP "Responsible Person" records
+
+0.4   Fri Mar 26 11:06:21 CET 2004
+	- add dependency from Net::DNS
+
+0.3   Wed Mar 24 20:01:18 CET 2004
+	- rename the module from Net::DNS::Zone to Net::DNS::ZoneFile::Fast
+	  (after consulting with Net::DNS::ZoneFile's author)
+	- fix a small bug with TXT records parsing
+
+0.2   Mon Nov 17 14:21:33 CET 2003
+	- rename the module from Net::DNS::ZoneParse to Net::DNS::Zone
+	- add documentation
+	- add soft_errors parameter and fix die/fatal/warn/quiet logic
+	- small fixes
+
+0.01  Mon Oct 13 20:38:04 CET 2003
+	- original version
+

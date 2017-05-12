@@ -1,0 +1,10 @@
+Changes             History of this package
+eg/fetch            Fetch messages
+lib/Net/Laconica.pm Module for fetching and sending notices/messages
+Makefile.PL         Creates the 'Makefile'
+MANIFEST			This list of files
+README              Instructions
+t/net-laconica.t    Test methods
+t/pod-coverage.t    Test POD coverage
+t/pod.t             Test POD
+META.yml                                 Module meta-data (added by MakeMaker)

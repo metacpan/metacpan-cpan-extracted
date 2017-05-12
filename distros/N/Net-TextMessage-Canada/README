@@ -1,0 +1,43 @@
+Net-TextMessage-Canada
+
+This module helps you map a mobile device to an email address using the
+phone number and phone provider.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::TextMessage::Canada
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-TextMessage-Canada
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-TextMessage-Canada
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-TextMessage-Canada
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-TextMessage-Canada/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Luke Closs
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

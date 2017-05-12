@@ -1,0 +1,43 @@
+Net::OpenProxyLookup version 0.03
+=================================
+
+This module queries the major Open Proxy DNS Blocklists, including Sorbs,
+Easynet, NJABL, DSBL, and Blitzed.  Open Proxies are servers that allow
+hackers to mask their true IP address.  Some of these blocklists also contain 
+hosts that have been known to send spam.  This module distinguishes the
+results between Open Proxy and Spam/Open Relay servers.
+
+This module can be used to block or flag Internet connections coming from
+Open Proxy or Spam servers.  Why would you want to do this?  Hackers often
+use Open Proxy servers to hide their true IP address when doing "bad" stuff.
+This includes using purchasing stuff with stolen credit cards, and getting
+around IP Address based restrictions
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+EXAMPLE
+
+A sample script is included in example/proxylookup.pl
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+L<Net::DNS>
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 MaxMind LLC
+
+Send any correspondence to:
+support@maxmind.com
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

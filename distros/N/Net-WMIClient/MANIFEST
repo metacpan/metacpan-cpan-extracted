@@ -1,0 +1,15 @@
+Changes
+COPYING
+lib/Net/WMIClient.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+script/wmic.pl
+t/001_base.t
+t/002_netbogus.t
+t/003_network.t
+t/004_kwalitee.t
+t/005_pod.t
+t/006_pod_coverage.t
+WMIClient.xs

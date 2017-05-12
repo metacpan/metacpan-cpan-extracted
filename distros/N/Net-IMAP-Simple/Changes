@@ -1,0 +1,585 @@
+1.2207: Sat Oct 01 2016
+   - repair unit tests to work with gmail (pfft)
+   - added in pull requests on github
+     the only non-doc item was https://github.com/jettero/net--imap--simple/pull/6
+
+1.2206: Thu Dec 18 2014
+   - minor debug issue
+
+1.2205: Sat May 17 2014
+   - Patch from Rob Hoelz to fix bug/docbug regarding port numbers.
+
+1.2204: Sat Dec 14 2013
+   - disable error checking on expunge.  It's not clear to me
+     that this ever produces an error (which would be with the
+     delete or select commands, not expunge).
+
+1.2203: Mon Oct 07 2013
+   - https://rt.cpan.org/Public/Bug/Display.html?id=89296
+     I think I fixed a design problem (no argument sanitization)
+     thinking it fixed the bug, but there may have never been a
+     bug.
+   - nope, was a format problem.  Holborn supplied his own
+     patches.
+
+1.2202: Wed Oct 02 2013
+   - really minor pod fix
+     https://rt.cpan.org/Public/Bug/Display.html?id=89195
+
+1.2201: Mon Aug 05 2013
+   - stupid bug in the new ssl defaults code, fixed by
+     ChinaXing(陈云星) — how do I miss this stuff?
+
+1.2200: Wed Apr 07 2013
+   - SSL evolved on me.  They actually expect me to check certs?
+     Madness.  I came up with some reasonable defaults and some
+     settings and things.  The final solution to the defaults
+     puzzle was an amalgam of various ideas from Tom Heady
+     (https://github.com/tomheady).
+
+   - I deleted the Net::IMAP::Server from inc/ and there is no
+     longer a Net::IMAP::Server environment to test in.  It was
+     driving me crazy how buggy that was in some places, and I
+     had no ability to reproduce those environments, so I removed
+     it.  If you want to test against a real dovecot or uwash
+     server, super! check the t/test_runner.pm file for the
+     settings.  They are intentionally unobvious -- please don't
+     run automated tests unless you're willing to help debug.
+     The automated results don't help anybody without further
+     information on the failures.  Normally, cpan testers is the
+     best thing in the world ... IMAP sucks.
+
+1.2034_2: Fri Nov 16 2012
+   - finally, some testers rand _1 ... didn't tell me anything;
+     but they ran it.  I'm just going to remove the offending
+     module load.  I'm never going to figure out why it fails on
+     so many machines (but never ever mine).
+
+1.2034_1: Thu Oct 25 2012
+   - I still have no idea why t/07 fails on basically everyone's
+     machine except mine, but I did find that croaks and dies are
+     totally lost because of the way I run the tests.
+
+1.2034: Wed Oct 10 2012
+   - https://rt.cpan.org/Ticket/Display.html?id=80088
+
+1.2033: Mon Jul 23 2012
+   - https://rt.cpan.org/Public/Bug/Display.html?id=78539
+
+1.2032: Thu Apr 05 2012
+   - my school switched to SSLv3 only and they just kinda time
+     out on autonegotiation...  So I added a way to specify the
+     ssl version.
+
+1.2031: Fri Mar 02 2012
+   - these tests don't work under this new EV multithreaded
+     system.  Disabled all tests unless people promise to test
+     single threaded.  I'd rather have nobody test it than have
+     all the tests fail every time.  I'll fix the tests later.
+
+1.2030: Mon Feb 06 2012
+   - fixed bug in get that was fetching more message than there
+     actually was to get (spuriously appending FLAGS \Seen and
+     the like)
+   - made sure the tests run in order (re: EV testers).  What I
+     did is really truly awful.  If there is a good way to force
+     the tests to run in order, please tell it to me.  My
+     solution is just horrible (see top of t/test_server.pm)
+
+1.2029: Mon Jan 30 2012
+   - spelling fix from the debian people
+
+1.2028: Wed Jan 25 2012
+   - separator method from glaess@glaessixs
+
+1.2027: Wed Dec 28 2011
+   - ...
+
+1.20271: Wed Dec 28 2011
+   - heh, spurious number of tests
+
+1.2027: Fri Dec 23 2011
+   - deal with this: https://rt.cpan.org/Ticket/Display.html?id=73431
+
+1.2026: Mon Oct 10 2011
+   - Bug in UID search, contribs by Jorge
+
+1.2025: Fri Sep 02 2011
+   - removed unused build rules that fail to compile in dmake
+
+1.2024: Tue Aug 02 2011
+   - Jason Woodard submitted a patch to remove the post-sort from
+     range2list.  I don't recall why the sort was there to begin
+     with, so the patch seems reasonable to me.  All tests
+     passed, released.
+
+1.2023: Wed May 25 2011
+   - patch for minor (but annoying) options bug. Thanks Mr.  Griffiths!
+
+1.2022: Fri Mar 04 2011
+   - horrid little typo in socket builder
+
+1.2021: Fri Mar 04 2011
+   - removed the die() after do("") loading the test server
+     http://goo.gl/FUQPn
+
+1.2020: Mon Feb 07 2011
+   - Andrzej Adam Filip requested a CLOSE method for ::PipeSocket
+
+1.2019: Wed Dec 01 2010
+   - _process_flags() was a little too aggressive about what's a
+     valid flag and what isn't.  Really, it needs to be up to the
+     server.  https://rt.cpan.org/Ticket/Display.html?id=63282
+   - many doc bugs fixed thanks to HM 2k
+
+1.2018: Thu Oct 28 2010
+   - minor bug with the sloppy CRLF code
+     Thanks go to: http://github.com/marado
+
+1.2016: Sun Sep 05 2010
+   - fixed ipv4 address stuff
+
+1.2016: Wed Sep 01 2010
+   - added readline callbacks; which I think I may leave
+     undocumented for now.
+
+1.2016: Mon Aug 30 2010
+   - found something to fix in https://rt.cpan.org/Ticket/Display.html?id=60537
+
+1.2015: Sun Aug 29 2010
+   - got the pipesocket working
+   - made sure it ps works in the context of nisim
+
+1.2014: Sun Aug 15 2010
+   - added uidsearch() -- just like search()
+
+1.2013: Mon Aug 09 2010
+   - created the PipeSocket object
+   - skeled the connect support
+
+1.2013: Sat Aug 07 2010
+   - added seq()
+   - added list2range
+   - added contrib/uidfetch
+   - fixed a BODY bug in the fetch grammar
+
+1.2012: Sun Aug 01 2010
+   - added uidcopy()
+
+1.2011_00: Sat Jul 31 2010
+   - .{32766} appears to be a limit for that type of matching.
+     I also found a SIGSEGV in (??{ _noexist }) that may or may
+     not be known.  Result?  A billion times better interface for
+     the {#}\r\nstrings .
+
+1.2010_99: Sun Jul 25 2010
+   - added a logout method that's just like quit, but doesn't
+     expunge and doesn't have a hardquit option.
+
+1.2010_99: Sat Jul 24 2010
+   - I really like the way body_summary works and I love writing
+     grammars, so I wrote a generalized fetch() routine.  It
+     could probably be used by body_summary() in the future.
+
+1.2010: Mon Jul 19 2010
+   - If the client is not yet setting on a mailbox and a search
+     is issued, the client now selects the default mbox first.
+   - RFC3501 wants RFC 2822 dates for date-based searches,
+     %d-%m-%Y is therefore wrong, it should be %d-%b-%Y (huh).
+   - provide uidnext, uidvalidity, and uid
+   - also (incidental to the above) make status() take field
+     arguments
+   - fixed a "bug" where not passing coderefs to _process_cmd
+     will probably cause various crashes.
+
+1.2010: Sun Jul 18 2010
+   - I was having some issues getting the debugs to work inside
+     Coro threads.  Rather than debugging it properly I just
+     added more debug options
+   - changed the behavior of ->top($id) so that )\r\n isn't left
+     on the end of the last line of headers as they come back.
+     *** let me know if this broke something for you ***
+
+1.2001: Wed Jul 14 2010
+   - Ugh.  I have seen it before and I already found this
+     problem.  It's still that DateTime bug:
+
+     https://rt.cpan.org/Public/Bug/Display.html?id=58459
+
+1.2000_1: Wed Jul 14 2010
+   - ugh, I'm *STILL* getting that bug (is it?) where sometimes
+     machines can't copy messages (line 25) after there's
+     definitely (line 22) 10 messages in the mailbox. WHY WHY WHY
+     WHY?  Naturally, the logdump is truncated at the point where
+     I really need it.
+
+     http://www.cpantesters.org/cpan/report/590a9a6e-8e97-11df-b0b7-6c9e78e28bc1
+
+     Changed the t/22 test to dump the last 200 lines instead of
+     the first few hundred.
+
+1.2000: Tue Jul 06 2010
+   - Jason and I (due to a disagreement about what should be
+     returned by body_summary()) begun using objects instead.
+     This way the return value can be interrogated easily to see
+     what it is and what it has.
+
+1.2000: Sat Jul 03 2010
+   - woodward sent in some rfc3501 fetch-body support and docs.
+     The extension requires Parse::RecDescent for correct
+     parsing, so body_summary() was forked off to an extensions
+     module.
+
+1.1916: Mon Jun 07 2010
+    - woodward sent in an RFC-5256 patch to make SEARCH more correct
+
+1.1915: Sat Jun 05 2010
+   - import the latest Net-IMAP-Server to the inc/ dir (1.27)
+   - report various bugs
+   - fix various bugs in inc/ dir
+
+1.1913: Wed May 26 2010
+1.1914: Wed May 26 2010
+   - pulled in changes from alexmv
+
+1.1912: Fri Apr 23 2010
+   - Doug confirmed that it worked.  I'm going to go ahead and
+     release this as a new version.
+
+1.1912_1: Thu Apr 22 2010
+   - Hrm, per Doug Reed at Service Optimi, I noticed that _last
+     returns self->{last} regardless of whether it's ever been
+     set.  Seems like we can DWIM and call self->select if it's
+     never been called yet and make ->list (et al) function.
+
+     We'll see what he thinks of this fix.
+
+1.1911: Sun Mar 14 2010
+   - Fixed [introduced] bugs illuminated in #55552 (RT), thanks
+     to Aaron Wilson <aaron@gmx.co.uk> for a positively excellent
+     bug report!
+
+1.1910_2: Wed Feb 17 2010
+   - http://www.nntp.perl.org/group/perl.cpan.testers/2010/02/msg6764802.html
+     - I still can't figure out what's causing this... NO IDEA
+     - I made the test ridiculously verbose if two conditions are
+       met: 1) automated testing; 2) the copy tests fail in some
+       way.
+
+1.1910_1: Sun Jan 17 2010
+   - http://www.nntp.perl.org/group/perl.cpan.testers/2010/01/msg6625605.html
+     It seems the t/22_* tests are failing, but I can't seem to
+     build a perl for which the tests fail. :(  No idea.
+     I added another prereq to the makefile and added another
+     line (perhaps informative?) to the t/22_copy* test.
+
+1.1910: Tue Oct 27 2009
+   - documented search() and added a bunch of kid functions that
+     issue searches on your behalf.  Added tests for search().
+
+1.1908: Thu Sep 24 2009
+   - top() does a surprisingly terrible job at groking header
+     lines.  If you have something like this:
+
+       message-id:
+            <blarg-blarg.blarg>
+
+       date: wednesday, blarg blarg
+            xx:xx:xx (pdt)
+
+     The results are somewhat random concerning, lines vs
+     header-rows.  My goal is to make sure each element of the
+     arrayref returned is a header line, not just a line of text.
+
+1.1908: Sun Sep 20 2009
+   - added a really weak search command.  I think we can do a
+     little better...
+
+1.1907: Sun Jul 26 2009
+   - PREAUTH fix and tests
+   - a nifty little contrib/ dovecot pipe server thingy
+   - fixed serious issues with the greeting timeout
+
+1.1905: Mon Jul 20 2009
+   - I apparently need Class::Accessor installed for tests.
+     Pulling over all deps of the now included net-imap-server
+
+1.1904: Fri Jul 17 2009
+   - bestpractical's patch makes more sense than mine does
+
+1.1903: Fri Jul 17 2009
+   - actually use the inc/ copy of net-imap-server
+
+1.1902: Fri Jul 17 2009
+   - I decided to include a static copy of net-imap-server so I
+     know precisely what version is there for tests.  Suggested
+     net-imap-server build tests using net-imap-simple this way.
+
+1.1902: Thu Jul 16 2009
+   - There's apparently 5.10 problems with the tests (probably
+     not with the module).  The tests are kinda hinky anyway.
+
+1.1900: Fri Jul 10 2009
+   - I really thought I released this already.  Lawl.
+
+1.1900: Fri Jun 26 16:03:16 EDT 2009
+   - prolly going to release this, it seems to test fine all over
+     the place.
+
+1.1899_07: Sun Jun 21 07:16:36 EDT 2009
+   - I decided to do get() my way, without ruining everything, by
+     blessing the arrayref and overloading '""'.
+   - I tought the t/35 test to prove that _process_command fails
+     just as Jonathan Kamens says.
+   - applied JIK's patch.
+
+1.1899_07: Sat Jun 20 22:12:00 EDT 2009
+   - I want to change the way get() works.  I don't think I
+     should, but I'd like to return the actual message in scalar
+     context and the lines in list context.  Returning the lines
+     as an arrayref makes no sense to me.
+
+1.1899_07: Sat Jun 20 15:26:13 EDT 2009
+   - while trying to get some delete and copy tests I ended up
+     working on expunge_mailbox() a little
+   - found another bug in Net::IMAP::Server::Mailbox... It's
+     clearly just a demo, but since I'm using it for my tests,
+     it's worth fixing.
+   - my delete tests do show that ranges like 3:5 really do work,
+     which makes me think RT#40203 may turn out to be spurious.
+     I'll let the tests prove it out before I close it though.
+   - I refactored the _reselect() stuff away, it was poorly
+     thought out.  There's a _clear_cache() instead.  Yeah, 40203
+     appears to be bogus because the client doesn't really parse
+     the sequence-set numbers.  I have confirmed for sure that
+     you can $imap->delete("3:5,7,10") and it'll work just like
+     you called delete 5 times.
+   - Copies seem to work fine too.  I'm going to close the
+     ticket.
+   - Documented the sequence set stuff so RT#40203 doesn't come
+     up again.
+
+1.1899_06: Fri Jun 19 08:54:07 EDT 2009
+   - added a status() sub for the STATUS command
+   - added a status() test, with some unseen() flag tests
+   - added a select() and current_mailbox() test -- failed to unescape
+     the working mailbox for current_mailbox()
+   - reported a status command bug (in Mailbox) to
+     Net::IMAP::Server
+   - moved a bunch of contrib and t7lib modules around to keep
+     pause from indexing them.
+   - worked on the docs for seen and unseen
+   - created a method for error-checking when using msg_flags(),
+     seen() and unseen() -- which I think solves ticket 33189.
+     Basically, if Cyrus-imap is returning different values for
+     FETCH (FLAGS) than for STATUS, what can I really do to fix
+     it?  However, the log provided by Mr Spiegl seems to suggest
+     he was counting errors as unseen messages... so this may
+     just fix it.
+
+1.1899_05: Wed Jun 17 06:25:39 EDT 2009
+   - documented see, unsee, add_flags, and sub_flags
+   - used the IMAP RFC to show that gmail is wrong,
+     Net::IMAP::Server is right.  google apps for domains
+     apparently selects an unseen message willy nilly (or which
+     ever is last) for the OK [UNSEEN #] message.  It should be
+     the *first* unseen message.  Their IMAP is notoriously
+     un-IMAP though.  I shouldn't be so surprised.
+   - added undelete to go with the other flaggy functions
+   - added more flag tests
+
+1.1899_05: Tue Jun 16 06:42:16 EDT 2009
+   - I started working on ticket 45953,
+   - created sub_flags() and add_flags()
+   - taught delete() to use add_flags() -- adds \Deleted
+   - providing see() and unsee() for ticket 45953
+   - I started building tests for the flag manipulation stuff and
+     put reselect stuff ... noticed a possible bug in
+     Net::IMAP::Server
+
+1.1899_05: Sun Jun 14 07:14:54 EDT 2009
+   - fixed t/test_server.pm (use IO::Socket::INET, not Net::TCP)
+
+1.1899_04: Sat Jun 13 18:33:46 EDT 2009
+   - added deleted() from JIK <jik@kamens.brookline.ma.us>'s
+     patch.
+
+1.1899_03: Sat Jun 13 17:05:55 EDT 2009
+   - added a connection class so we might reject connections
+     after the 4th, or whatever, and possibly solve ticket 30229
+   - banged my head on the IO::Socket::SSL wall for a while
+   - buu (#perl freenode) set me straight on something enabling
+     me to close 30229.
+
+1.1899_02: Sat Jun 13 07:39:29 EDT 2009
+   - moved some tests around and fixed the manifests
+   - added support, docs and test for EXAMINE
+
+1.1899_01: Fri Jun 12 22:06:36 EDT 2009
+   - man Coro is disaggreable in the shutdown epoch, it took a
+     fork, a setsid and another fork to disssociate the test from
+     the Coro ... um... messing with exit().
+   - decided as I clear tickets from RT, I'll write tests.  As I
+     write tests, I'll release dev releases, the *goal* will be
+     1.1900 -- all RT cleared.
+
+1.1900: Thu Jun 11 07:17:13 EDT 2009
+   - fixed a bug I created in select
+   - moved the tests around a little, getting ready for a whole
+     suite
+
+1.1900: Wed Jun 10 22:01:53 EDT 2009
+   - It took me forever to figure out why the append command
+     wouldn't work.  Bug submitted to Net::IMAP::Server
+   - added my login function to contrib
+   - I think I fixed the oldest bug on RT
+
+1.1810: Sun Jun  7 10:52:30 EDT 2009
+   - made $imap->select return "0E0" when 0 messages are found
+     after an otherwise successful select.
+
+1.1810: Sat Jun  6 22:13:34 EDT 2009
+   - Started working on the tests.    Net::IMAP::Simple doesn't
+     seem to be able to handle the results of a select command as
+     returned by Net::IMAP::Server.  This may indicate other
+     problems with protocol compliance.  I can't say definitley
+     for sure that it's ::Simple, but that's the most likely
+     suspect.
+
+   - Made the module pull in IO::Socket::SSL without needing to
+     involve another module that probably shouldn't be a whole
+     separate distribution anyway.  Considering deprecating the
+     Net::IMAP::Simple::SSL for that reason, and because that
+     whole distribution is only 2 useful lines anyway.
+
+1.1800: Thu Jun  4 21:44:59 EDT 2009
+   - jettero started pulling in his changes.
+
+1.17  2006-10-11
+      - Beta/Developer release -> production
+
+1.16_1 2006-10-02
+      - Beta Release
+      - Added debugging
+      - Upgraded imap.pl example script
+      - Updated documentation
+      - Added a few patches here and there
+
+1.16  2006-06-13
+    - Multiple bugs identified by nate@cs.wisc.edu. Patch
+      provided by Nate.  Nate also provided new release tests -
+      thanks man.
+
+1.15  2005-11-21
+    - Added mailboxes_subscribed() function introduced by John
+      Cappiello.  This function provides a method for retreiving
+      a list of mailboxes which the user has subscribed to. This
+      differs from the mailboxes() function in that with the
+      mailboxes() function all mailboxes are returned, regardless
+      ass to whether or not the user has subscribed to them.
+
+1.14  2005-10-01
+    - Fixed error in sample code within the POD documentation
+      identified by Matthew S. Hallacy
+
+1.13  2005-09-28
+    - Versioning schema changed to use CVS versioning rather than
+      hard coded versioning. This is to address issues some
+      people are having with bug tracking and package management
+      tools.
+
+0.105 2005-09-28
+    - Fixed syntax problem in the bindaddr option. Thanks
+      Dagobert Michelsen for pointing this out.
+
+0.104 2005-08-06
+    - Fixed major bug discovered in get() and getfh() which
+      caused message lines to be dropped if they started with an
+      "*"
+
+0.103 2005-07-10
+    - Fixed error in select() identified by Guido Kerkewitz and
+      Jonathan B. Glatt
+    - Added folder_subscribe() and folder_unsubscribe() functions
+      provided by Guido Kerkewitz.
+
+0.102 2005-06-25
+    - Fixed protocol error identified within the
+      expunge_mailbox() function. (Thanks alot to William Faulk
+      for pointing this out)
+    - Fixed bugs in the sample imap.pl script provided.
+    - Added flags() and recent() routines
+    - Added current_box() function
+    - Added use_select_cache and select_cache_ttl options. These
+      options will allow you to enable internal caching for
+      select() operations.
+
+0.101 2005-01-06
+    - Fixed bug which resulted in inconsistant results from
+      login()
+
+0.100 2005-14-05
+    - Fixed dates in Changes file
+    - Fixed IMAP protocol error identified by John A. Murphy
+    - Changed behavior of login() to only return true or false.
+      This change means that to get the current number of
+      messages in a users INBOX folder you will need to preform a
+      simple $imap->select("INBOX") after successfully logging
+      in.
+    - Added messages() function
+    - Added the frame work within select() to provide more
+      detailed information about the current IMAP framework
+
+0.99  2005-28-04
+    - Added multi-line header patch for bug discovered in top(),
+      thanks Sergey Mudrik for pointing this out.
+
+0.98  2005-27-04
+    - Minor document changes
+    - Fixed implimentation bug with the new option set
+
+0.97  2005-26-04
+    - Added patch submitted by LTHEGLER to address the multiple
+      line output problem.
+
+0.96  2005-26-04
+    - Took over module development (Colin Faber)
+    - Fixed synopsis to provide a functional example (Colin
+      Faber)
+    - Added error handling (Colin Faber)
+    - Added IPv6 support (Colin Faber)
+    - Added port, timeout, use_v6, retry, retry_delay and
+      bindaddr options to the object creation method.
+
+0.95  2004-06-09
+    - Accept port configuration (Matt Bradford).
+    - Documentation overhaul (Casey West).
+    - Huge internal code overhaul (Casey West).
+    - Implemented expunge_mailbox() (Florin Andrei).
+
+0.94  Thu May 20 15:24:21 EDT 2004
+    - Taken by Casey West.
+    - Quoted the password argument to login() when sending to
+      IMAP LOGIN command.
+    - Added arguments for searching in paths and for mailboxes in
+      the mailboxes() command.
+    - Distribution clean up.
+
+
+0.93  Thu Dec 16 16:15:00 1999
+    - LIST ... {\d}\r\nmailbox parsing in mailboxes()
+        - better escaping of \" e \\ (Netscape server doesn't put
+          the \\ in the mailbox name. Why?)
+
+0.92  Tue Dec 13 15:07:00 1999
+    - seen method
+        - \r\n as EOL. Thanks to Edward Chao!
+        - \" escaping. Thanks to Edward Chao!
+
+0.91  Tue Nov  9 11:41:00 1999
+    - getfh method
+        - fixed bugs in the documentation(!!!)
+
+0.90  Wed Nov  3 15:29:13 1999
+    - original version; created by h2xs 1.18
+

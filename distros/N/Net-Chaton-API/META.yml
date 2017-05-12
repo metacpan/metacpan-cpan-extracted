@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               Net-Chaton-API
+version:            0.02
+abstract:           WebAPI for Chaton.
+author:
+    - Pocket <poketo7878@yahoo.co.jp>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Desktop::Notify:      0.03
+    Encode:               2.39
+    Encode::Guess:        2.03
+    HTTP::Request::Common:  5.824
+    JSON:                 2.22
+    LWP::UserAgent:       5.835
+    Pipe::Between::Object:  0.01
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

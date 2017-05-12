@@ -1,0 +1,6 @@
+Changes             - revision history
+MANIFEST            - this file
+Makefile.PL         - "perl Makefile.PL" to start
+README              - read this first
+lib/Net/MacMap.pm   - the main module
+t/simple.t          - test script

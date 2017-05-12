@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+test.pl
+LICENSE
+t/Net-CyanChat.t
+lib/Net/CyanChat.pm
+lib/Net/CyanChat/Server.pm
+bin/ccserver
+bin/tcc
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

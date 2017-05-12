@@ -1,0 +1,8 @@
+Tasks this library should support:
+
+List all hosts supplying a certain service
+Note that the above is roughly equivalent to "List all hosts on the network".  The hosts just have to be offering a service that you recognise.
+
+Get the IP addrs for a host/service
+List all services for a host - Not supported!
+Get SRV record for a service

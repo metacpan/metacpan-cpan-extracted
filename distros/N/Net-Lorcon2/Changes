@@ -1,0 +1,20 @@
+Revision history for Perl extension Net::Lorcon2.
+
+2.03 Tue Feb 17 08:01:33 CET 2015
+   - update: Kwalitee
+   - update: copyright notice
+
+2.02 Sat Sep 25 10:22:45 CEST 2010
+   - Net::Lorcon2 is born, supports new lorcon2 API
+
+0.02 Sat Nov 08 13:45:11 2008
+   - update: getchan() is now getchannel()
+   - more tests
+   - more injection drivers supported
+   - some examples written
+   - new constants
+   - no need for include linux/wireless.h anymore
+
+0.01  Sun Jan 21 21:27:16 2007
+   - original version
+

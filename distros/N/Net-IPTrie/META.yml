@@ -1,0 +1,28 @@
+---
+abstract: 'Perl module for building IPv4 and IPv6 address space hierarchies'
+author:
+  - 'Carlos Vicente  <cvicente@cpan.org>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-IPTrie
+provides:
+  Net::IPTrie:
+    file: lib/Net/IPTrie.pm
+    version: 0.7
+  Net::IPTrie::Node:
+    file: lib/Net/IPTrie/Node.pm
+    version: 0.7
+requires:
+  Class::Struct: 0.63
+  NetAddr::IP: 4.007
+  Scalar::Util: 1.21
+  Test::More: 0
+  perl: v5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.7

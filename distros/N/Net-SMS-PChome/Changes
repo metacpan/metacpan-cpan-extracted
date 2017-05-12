@@ -1,0 +1,9 @@
+Revision history for Perl extension Net::SMS::PChome.
+
+0.11 Thu Aug 17 10:21:50 2006
+     fixed some wrong in POD.
+
+0.1  Tue Aug 15 00:18:32 2006
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Net::SMS::PChome
+

@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/Net/Google/AuthSub.pm
+lib/Net/Google/AuthSub/Response.pm
+MANIFEST			This list of files
+t/00use.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml

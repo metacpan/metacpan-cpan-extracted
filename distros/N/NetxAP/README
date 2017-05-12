@@ -1,0 +1,75 @@
+Please read NEWS, and possibly TODO, if you've written code for a
+previous version of Net::xAP.  Significant changes have been made
+since the previous release.  Your code will probably break on this
+version!!!  The good news is that this version is a signficant
+improvement over the previous version.
+
+This is an alpha release of the Net::xAP module package for perl5.
+
+This module provides an interface to the protocol family represented
+by IMAP, IMSP, ACAP, and ICAP.  A usable IMAP module is also provide.
+As a side note, the following list of acronym expansions is in the
+same priority order I expect to follow for the development of
+Net::xAP.
+
+    IMAP = Internet Message Access Protocol
+    ACAP = Application Configuration Access Protocol
+    IMSP = Internet Message Support Protocol
+    ICAP = Internet Calendar Access Protocol
+
+WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!
+Think twice about using this module to modify data on a server.  I'm not
+done beating on it.
+
+WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!
+The method interface is currently in an evaluation phase.  Since the
+module is at an early stage of its life, I'm not going to try too
+hard to maintain backward compatability with older alpha versions.  I
+am, however, going to try to make all changes to the method interfaces
+before it reaches beta release.  Also note that the code is still
+crufty in several conspicuous places, but it's moving in the right
+direction.
+
+WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!
+In case the previous two warnings weren't enough for you - some of the
+protocols this package implements are still under development. Expect
+discontinuities between this package and the protocols as they trek
+towards standardosity.  As of the writing of this file, IMAP and ACAP
+are 'Proposed Standard' protocols, so they shouldn't present any
+significant problems.  ICAP is an 'Internet Draft' and is subject to
+change at any time, possibly even death.  IMSP never quite made it to
+an RFC, and is being supplanted by ACAP.
+
+To build and install the package execute the following commands:
+	perl Makefile.PL
+	make
+	make test
+		Note: The regression currently requires UW-imapd, and
+		      expects to find it in /usr/sbin.  Edit
+		      t/*_imap*.t if it's located elsewhere.
+	make install
+
+Net::xAP requires the MIME::Base64 and Digest-MD5 modules.
+
+The TODO file has a list of features that either aren't present or
+aren't complete.
+
+The NEWS file has summary information on the changes from release to
+release.
+
+The BUGS file has information on current implementation bugs/malfeatures.
+
+The CREDITS file lists folks who have been particularly helpful/brave.
+
+This release was developed and tested using 5.005_03.
+
+Please contact me if you use this for anything non-trivial.  This is
+not for permission, it's so I can get some idea of what folks are
+using the package for other than trivial scripts.
+
+Please report any bugs/suggestions to <kjj@pobox.com>.
+
+Copyright (c) 1997-1999 Kevin Johnson <kjj@pobox.com>.
+
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.

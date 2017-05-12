@@ -1,0 +1,8 @@
+Revision history for Nagios-Status-Service
+
+0.01    01/06/2009 15:06:34
+        Initial release
+
+0.02    09/21/2009 09:55:15
+        Patch fix written by Jeremy Krieg. Error parsing
+        '=' signs in service status descriptions.

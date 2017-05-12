@@ -1,0 +1,74 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use IO::Async::Loop;
+use Net::Async::CassandraCQL;
+
+use Getopt::Long;
+use Future::Utils qw( fmap_void );
+
+GetOptions(
+   'host|h=s' => \(my $HOST = "localhost"),
+   'user|u=s' => \my $USERNAME,
+   'pass|p=s' => \my $PASSWORD,
+   'version|V=i' => \my $CQL_VERSION,
+) or exit 1;
+
+my $loop = IO::Async::Loop->new;
+
+my $cass = Net::Async::CassandraCQL->new(
+   host     => $HOST,
+   username => $USERNAME,
+   password => $PASSWORD,
+   cql_version => $CQL_VERSION,
+);
+$loop->add( $cass );
+
+$cass->connect->get;
+
+my %schema; # {$keyspace}{$columnfamily} = \@columns
+
+# Ofcourse this could be done neater with a SELECT on system.schema_columns
+# without WHERE clauses, but we're demonstrating metadata methods here :)
+
+$cass->schema_keyspaces->then( sub {
+   my $result = shift;
+
+   fmap_void {
+      my $row = shift;
+      my $keyspace = $row->{keyspace_name};
+
+      $cass->schema_columnfamilies( $keyspace )->then( sub {
+         my $result = shift;
+
+         fmap_void {
+            my $row = shift;
+            my $columnfamily = $row->{columnfamily_name};
+
+            $cass->schema_columns( $keyspace, $columnfamily )->then( sub {
+               my $result = shift;
+
+               foreach my $row ( $result->rows_hash ) {
+                  my $column = $row->{column_name};
+                  push @{ $schema{$keyspace}{$columnfamily} }, $column;
+               }
+               Future->new->done;
+            });
+         } foreach => [ $result->rows_hash ];
+      });
+   } foreach => [ $result->rows_hash ];
+})->get;
+
+foreach my $keyspace ( sort keys %schema ) {
+   print "Keyspace: $keyspace\n";
+   foreach my $columnfamily ( sort keys %{ $schema{$keyspace} } ) {
+      print "  Column family: $columnfamily\n";
+
+      print "    $_\n" for @{ $schema{$keyspace}{$columnfamily} };
+
+      print "\n";
+   }
+   print "\n";
+}

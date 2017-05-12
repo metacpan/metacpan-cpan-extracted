@@ -1,0 +1,15 @@
+1. Get your feed url as described here
+
+    http://code.google.com/apis/gdata/calendar.html#find_feed_url
+
+
+2. Run
+
+    perl -Ilib bin/google-calendar <url> <user name> <password>
+
+to list stuff and
+
+    perl -Ilib bin/google-calendar <url> <user name> <password> <title>
+
+to add an event.
+

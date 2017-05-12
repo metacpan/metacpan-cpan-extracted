@@ -1,0 +1,8 @@
+sw_port						T_UV
+sw_long						T_IV
+sw_const_string					T_PV
+sw_rendezvous					T_PTROBJ
+sw_rendezvous_browse_id				T_PTR
+sw_rendezvous_publish_id			T_PTR
+sw_result					T_IV
+sw_salt						T_PTROBJ

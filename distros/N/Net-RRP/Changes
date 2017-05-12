@@ -1,0 +1,21 @@
+Revision history for Perl extension Net::RRP.
+
+0.01  Tue Jun 20 12:45:00 MSD 2000
+	- client part done
+0.02  Tue Jun 20 12:45:00 MSD 2000
+	- add a Net::RRP class with README content for registration at modules@perl.org
+        - Net::RRP::Exception, Net::RRP::Exception::*
+        - Net::RRP::Server abstract class
+        - rrp state machine at Net::RRP::Server
+0.03  Thu Jun 29 12:17:47 MSD 2000
+	- same changes
+0.04  *
+	- internal revision
+0.05  Mon Aug  7 11:10:12 MSD 2000
+	- new exceptions
+        - bug fixing
+0.06  Mon Oct  2 15:36:33 MSD 2000
+	- move to Proc::Application
+	- new entities
+	- Entity::getPrimaryAttributeValue
+	- case insensivity for rrp commands

@@ -1,0 +1,46 @@
+Net-Bot-IRC-Message
+
+This is a simple module for parsing and compiling incoming and
+outgoing IRC protocol messages.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::Bot::IRC::Message
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Bot-IRC-Message
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-Bot-IRC-Message
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-Bot-IRC-Message
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-Bot-IRC-Message/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Mark Caudill
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

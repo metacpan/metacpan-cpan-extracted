@@ -1,0 +1,19 @@
+libnet-address-ipv4-local-perl (0.12) unstable; urgency=low
+
+  * Added dependency on liberror-perl.
+
+ -- Julian Mehnle <julian@mehnle.net>  Thu,  5 May 2005 15:03:07 +0200
+
+libnet-address-ipv4-local-perl (0.11) unstable; urgency=low
+
+  * Made module actually work in all cases. (Explicitly specify a valid port
+    number when creating the UDP socket, otherwise the creation might fail.)
+
+ -- Julian Mehnle <julian@mehnle.net>  Sat, 15 Jan 2005 15:44:06 +0100
+
+libnet-address-ipv4-local-perl (0.10) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Julian Mehnle <julian@mehnle.net>  Sat, 15 Jan 2005 00:00:00 +0100
+

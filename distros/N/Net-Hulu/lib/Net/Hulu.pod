@@ -1,0 +1,216 @@
+__END__
+
+=head1 NAME
+
+Net::Hulu - Perl extension for the Net::Hulu name space.  Can be use to download
+and process all XML-formatted RSS feeds provided by the popular site hulu.com.
+
+=head1 ABSTRACT
+
+Net::Hulu will download and process XML-formatted RSS feeds provided by hulu.com.
+
+=head1 SYNOPSIS
+
+  use strict;
+  use warnings;
+  use Net::Hulu qw(
+                get_recent_videos get_recent_shows get_recent_movies get_highest_rated_videos
+                get_popular_videos_today get_popular_videos_this_week get_popular_videos_all_time
+                get_soon_to_expire_videos get_recent_blog_postings download_recent_videos_xml
+                download_recent_shows_xml download_recent_movies_xml download_highest_rated_videos_xml
+                download_popular_videos_today_xml download_popular_videos_this_week_xml
+                download_popular_videos_all_time_xml download_soon_to_expire_videos_xml
+                download_recent_blog_postings_xml get_popular_videos_this_month
+                download_popular_videos_this_month_xml);
+
+=head1 DESCRIPTION
+
+Net::Hulu provides methods to download all XML-formatted RSS feeds provided by hulu.com and 
+then return a data structure to the user containing the Data from the RSS feeds.
+
+The following methods will download RSS feeds from hulu.com to directory where Hulu.pm is installed.
+Method download_recent_videos_xml will download RSS feed for recent videos.
+Method download_recent_shows_xml will download RSS feed for recent shows.
+Method download_recent_movies_xml will download RSS feed for recent movies.
+Method download_highest_rated_videos_xml will download RSS feed for highest rated videos.
+Method download_popular_videos_today_xml will download RSS feed for today's popular videos.
+Method download_popular_videos_this_week_xml will download RSS feed for this week's popular videos.
+Method download_popular_videos_this_month_xml will download RSS feed for this month's popular videos.
+Method download_popular_videos_all_time_xml will download RSS feed for most popular videos of all time.
+Method download_soon_to_expire_videos_xml will download RSS feed for soon to expire videos.
+Method download_recent_blog_postings_xml will download RSS feed for recent blog postings to hulu.com.
+
+The following methods will process all RSS feeds provided by hulu.com.
+Method get_recent_videos returns a list of recently added videos to the user.
+Method get_recent_shows returns a list of recently added shows to the user.
+Method get_recent_movies returns a list of recently added movies to the user.
+Method get_highest_rated_videos returns a list of highest rated videos to the user.
+Method get_popular_videos_today returns a list of most popular videos today to the user.
+Method get_popular_videos_this_week returns a list of most popular videos this week to the user.
+Method get_popular_videos_this_month returns a list of most popular videos this month to the user.
+Nethod get_popular_videos_all_time returns a list of most popular videos of all time to the user.
+Method get_soon_to_expire_videos returns a list of soon to expire videos to the user.
+Method get_recent_blog_postings returns recent blog postings for hulu.com to the user.
+
+=head2 Getting Started
+
+The following code will download all the XML-formatted RSS feeds provided by hulu.com,
+process their content, and print the results for the user.
+
+   use strict;
+   use warnings;
+   use Net::Hulu qw(
+                   get_recent_videos get_recent_shows get_recent_movies get_highest_rated_videos
+                   get_popular_videos_today get_popular_videos_this_week get_popular_videos_all_time
+                   get_soon_to_expire_videos get_recent_blog_postings download_recent_videos_xml
+                   download_recent_shows_xml download_recent_movies_xml download_highest_rated_videos_xml
+                   download_popular_videos_today_xml download_popular_videos_this_week_xml
+                   download_popular_videos_all_time_xml download_soon_to_expire_videos_xml
+                   download_recent_blog_postings_xml);
+
+   download_recent_videos_xml();
+   get_recent_videos();
+
+   download_recent_shows_xml();
+   get_recent_shows();
+
+   download_recent_movies_xml();
+   get_recent_movies();
+
+   download_highest_rated_videos_xml();
+   get_highest_rated_videos();
+
+   download_popular_videos_today_xml();
+   get_popular_videos_today();
+
+   download_popular_videos_this_week_xml();
+   get_popular_videos_this_week();
+
+   download_popular_videos_this_month_xml();
+   get_popular_videos_this_month();
+
+   download_popular_videos_all_time_xml();
+   get_popular_videos_all_time();
+
+   download_soon_to_expire_videos_xml();
+   get_soon_to_expire_videos();
+
+   download_recent_blog_postings_xml();
+   get_recent_blog_postings();
+ 
+=head2 download_recent_videos_xml
+
+The subroutine download_recent_videos_xml will download http://rss.hulu.com/HuluRecentlyAddedVideos?format=xml
+to the directory where Hulu.pm is installed.
+
+=head2 get_recent_videos
+
+The subroutine get_recent_videos will return a list of recently added videos for the user.
+
+=head2 download_recent_shows_xml
+
+The subroutine download_recent_shows_xml will download http://rss.hulu.com/HuluRecentlyAddedShows?format=xml
+to the directory where Hulu.pm is installed.
+
+=head2 get_recent_shows
+
+The subroutine get_recent_shows will return a list of recently added shows for the user.
+
+=head2 download_recent_movies_xml
+
+The subroutine download_recent_movies_xml will download http://rss.hulu.com/HuluRecentlyAddedMovies?format=xml
+to the directory where Hulu.pm is installed.
+
+=head2 get_recent_movies
+
+The subroutine get_recent_movies will return a list of recently added movies for the user.
+
+=head2 download_highest_rated_videos_xml
+
+The subroutine download_highest_rated_videos_xml will download http://www.hulu.com/feed/highest_rated/videos
+to the directory where Hulu.pm is installed.
+
+=head2 get_highest_rated_videos
+
+The subroutine get_highest_rated_videso will return a list of the highest rated videos for the user.
+
+=head2 download_popular_videos_today_xml
+
+The subroutine download_popular_videos_today_xml will download http://rss.hulu.com/HuluPopularVideosToday?format=xml
+to the directory where Hulu.pm is installed.
+
+=head2 get_popular_videos_today
+
+The subroutine get_popular_videos_today will return a list of the most popular videos today for the user.
+
+=head2 download_popular_videos_this_week_xml
+
+The subroutine download_popular_videos_this_week_xml will download http://rss.hulu.com/HuluPopularVideosThisWeek?format=xml
+to the directory where Hulu.pm is installed.
+
+=head2 get_popular_videos_this_week
+
+The subroutine get_popular_videos_this_week will return a list of most popular videos this week for the user.
+
+=head2 download_popular_videos_this_month_xml
+
+The subroutine get_popular_videos_this_month_xml will download http://rss.hulu.com/HuluPopularVideosThisMonth?format=xml
+to the directory where Hulu.pm is installed.
+
+=head2 get_popular_videos_this_month
+
+The subroutine get_popular_videos_this_month will return a list of most popular videos this month for the user.
+
+=head2 download_popular_videos_all_time_xml
+
+The subroutine download_popular_videos_all_time_xml will download http://rss.hulu.com/HuluPopularVideosAllTime?format=xml
+to the directory where Hulu.pm is installed.
+
+=head2 get_popular_videos_all_time
+
+The subroutine get_popular_videos_all_time will return a list of most popular videos of all time to the user.
+
+=head2 download_soon_to_expire_videos_xml
+
+The subroutine download_soon_to_expire_videos_xml will download http://www.hulu.com/feed/expiring/videos
+to the directory where Hulu.pm is installed.
+
+=head2 get_soon_to_expire_videos
+
+The subroutine get_soon_to_expire_videos will return a list of soon to expire videos to the user.
+
+=head2 download_recent_blog_postings_xml
+
+The subroutine download_recent_blog_postings_xml will download http://rss.hulu.com/HuluBlog?format=xml
+to the directory where Hulu.pm is installed.
+
+=head2 get_recent_blog_postings
+
+The subroutine get_recent_blog_postings will return a list of blog postings to hulu.com to the user.
+  
+=head2 SEE ALSO
+
+Please see the documentation for the Perl modules XML::Twig an LWP::Simple
+for details on how Net::Hulu downloads and processes the XML-formatted
+RSS feeds provided by the popular website hulu.com.
+
+Please send all bug reports to the maintainer's email address hevenerg {[at]} marshall {[dot]} edu.
+
+=head1 AUTHOR
+
+Net::Hulu was written and is currently maintained by Gerald L. Hevener, M.S..
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 by Gerald L. Hevener, M.S. <hevenerg {[at]} marshall {[dot]} edu.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 DISCLAIMER OF WARRENTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIESOR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+=cut

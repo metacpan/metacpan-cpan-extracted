@@ -1,0 +1,39 @@
+Net-Amazon-S3-ACL version 0.1.0
+
+This module represents an S3 Access Control List; it is a representation
+of the XML ACL that is easier to handle. As such, there are methods
+that ease passing from one representation to the other, namely
+"parse" (to parse an XML document into an object) and "stringify" (to
+get the XML representation of the ACL).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+* Class::Access::Fast
+* XML::LibXML
+* XML::LibXML::XPathContext
+* version (whenever this is necessary)
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, Flavio Poletti
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

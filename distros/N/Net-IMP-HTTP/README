@@ -1,0 +1,9 @@
+Net::IMP::HTTP
+Base classes and classes for HTTP specific Net::IMP plugins
+
+This module is copyright by Steffen Ullrich.
+
+The module was developed while working on project Padiofire
+(http://padiofire.org) at genua mbh (http://www.genua.de).
+The padiofire project was partly funded by BMBF (German Federal Ministry
+of Education an Research).

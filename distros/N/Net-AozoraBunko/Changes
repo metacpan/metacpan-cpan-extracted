@@ -1,0 +1,25 @@
+Revision history for Perl extension Net::AozoraBunko
+
+0.05    Sun Jun  2 00:54:35 JST 2013
+    [No CODE CHANGE]
+        - added prereq modules in Build.PL
+        - added META.json to git repos
+
+0.04    Tue May 14 10:01:02 JST 2013
+    [Bug Fix]
+        - changed encoding for HTML of Aozora-Bunko: euc-jp -> utf8
+    [Improvement]
+        - run all tests under Travis-ci
+
+0.03    Sat Oct 27 23:57:00 JST 2012
+    [No CODE CHANGE]
+        - support travis-ci.org(on github)
+        - fix README
+        - fix for kwalitee
+
+0.02    Sat Jan 15 01:01:01 2011
+        - added command line interface 'aozora'
+        - fixed style of version
+
+0.0.1    Sat Jan 15 17:00:00 2011
+        - original version

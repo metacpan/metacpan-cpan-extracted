@@ -1,0 +1,25 @@
+---
+abstract: 'A perl interface to kotonoha.cc'
+author:
+  - 'Yasuhiro Matsumoto <mattn.jp@gmail.com>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Kotonoha
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Encode: 2.2
+  HTML::Selector::XPath: 0.02
+  HTML::TreeBuilder::XPath: 0.08
+  WWW::Mechanize: 1.22
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.07

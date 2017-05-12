@@ -1,0 +1,51 @@
+NAME
+    Net::Server::Mail::ESMTP::SIZE - add support for the SIZE ESMTP
+    extension to Net::Server::Mail
+
+SYNOPSIS
+        use Net::Server::Mail::ESMTP;
+
+        my @local_domains = qw(example.com example.org);
+        my $server = new IO::Socket::INET Listen => 1, LocalPort => 25;
+
+        my $conn;
+        while($conn = $server->accept)
+        {
+            my $esmtp = new Net::Server::Mail::ESMTP socket => $conn;
+            # activate some extensions
+            $esmtp->register('Net::Server::Mail::ESMTP::SIZE');
+            $esmtp->set_size(10_000_000); #10 Milion bytes
+            $esmtp->process();
+            $conn->close()
+        }
+
+DESCRIPTION
+    Add the ESMTP SIZE extension to Net::Server::Mail::ESMTP. I stubbed this
+    extension when I wrote Test::SMTP and thought it would be nice to finish
+    it off.
+
+METHODS
+    set_size($size)
+        Establishes the size threshold for rejecting messages.
+
+USAGE
+    Register the plugin in the ESMTP object, and then call set_size on the
+    object instance
+
+AUTHOR
+        Jose Luis Martinez
+        CPAN ID: JLMARTIN
+        CAPSiDE
+        jlmartinez@capside.com
+        http://www.pplusdomain.net
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    Net::Server::Mail, Net::Server::Mail::ESMTP
+

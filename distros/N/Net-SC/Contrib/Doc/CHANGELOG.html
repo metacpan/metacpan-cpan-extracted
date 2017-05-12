@@ -1,0 +1,298 @@
+<HTML><BODY BGCOLOR="#c8c8c8" TEXT="#000000"><H1>CVS logs for:</H1><HR><UL><LI><A HREF="#1">SC.pm</A></LI><LI><A HREF="#24">telnet_over_socks_chain.pl</A></LI><LI><A HREF="#37">accept_over_socks_chain.pl</A></LI></UL><HR><H2><A NAME="1"><A HREF="#2">SC.pm</A></A></H2><UL><LI><A HREF="#3">revision 1.21</A></LI><LI><A HREF="#4">revision 1.20</A></LI><LI><A HREF="#5">revision 1.19</A></LI><LI><A HREF="#6">revision 1.18</A></LI><LI><A HREF="#7">revision 1.17</A></LI><LI><A HREF="#8">revision 1.16</A></LI><LI><A HREF="#9">revision 1.15</A></LI><LI><A HREF="#10">revision 1.14</A></LI><LI><A HREF="#11">revision 1.13</A></LI><LI><A HREF="#12">revision 1.12</A></LI><LI><A HREF="#13">revision 1.11</A></LI><LI><A HREF="#14">revision 1.10</A></LI><LI><A HREF="#15">revision 1.9</A></LI><LI><A HREF="#16">revision 1.8</A></LI><LI><A HREF="#17">revision 1.7</A></LI><LI><A HREF="#18">revision 1.6</A></LI><LI><A HREF="#19">revision 1.5</A></LI><LI><A HREF="#20">revision 1.4</A></LI><LI><A HREF="#21">revision 1.3</A></LI><LI><A HREF="#22">revision 1.2</A></LI><LI><A HREF="#23">revision 1.1</A></LI></UL><HR><H2><A NAME="24"><A HREF="#25">telnet_over_socks_chain.pl</A></A></H2><UL><LI><A HREF="#26">revision 1.11</A></LI><LI><A HREF="#27">revision 1.10</A></LI><LI><A HREF="#28">revision 1.9</A></LI><LI><A HREF="#29">revision 1.8</A></LI><LI><A HREF="#30">revision 1.7</A></LI><LI><A HREF="#31">revision 1.6</A></LI><LI><A HREF="#32">revision 1.5</A></LI><LI><A HREF="#33">revision 1.4</A></LI><LI><A HREF="#34">revision 1.3</A></LI><LI><A HREF="#35">revision 1.2</A></LI><LI><A HREF="#36">revision 1.1</A></LI></UL><HR><H2><A NAME="37"><A HREF="#38">accept_over_socks_chain.pl</A></A></H2><UL><LI><A HREF="#39">revision 1.4</A></LI><LI><A HREF="#40">revision 1.3</A></LI><LI><A HREF="#41">revision 1.2</A></LI><LI><A HREF="#42">revision 1.1</A></LI>
+<HR><H2><STRONG><A NAME="2">SC.pm</A></STRONG></H2><P><PRE>Working file: SC.pm
+head: 1.21
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 21;	selected revisions: 21
+description:
+</PRE></P><HR><H2><STRONG><A NAME="3">SC.pm [ revision 1.21 ]</A></STRONG></H2><BR><STRONG>date: 2009-11-14 13:18:40 +0300;  author: gosha;  state: Exp;  lines: +6 -6;  commitid: aIJfw1aGsrMvltbu;</STRONG><P><PRE>bug fixed: 23939 23938
+</PRE></P><HR><H2><STRONG><A NAME="4">SC.pm [ revision 1.20 ]</A></STRONG></H2><BR><STRONG>date: 2006-10-19 23:13:35 +0400;  author: gosha;  state: Exp;  lines: +24 -11;  commitid: 75e34537ce544567;</STRONG><P><PRE>Поправил сообщения отладки
+</PRE></P><HR><H2><STRONG><A NAME="5">SC.pm [ revision 1.19 ]</A></STRONG></H2><BR><STRONG>date: 2006-10-19 22:36:45 +0400;  author: gosha;  state: Exp;  lines: +304 -244;  commitid: 6ff64537c5af4567;</STRONG><P><PRE>Добавил поддержку http проксей
+</PRE></P><HR><H2><STRONG><A NAME="6">SC.pm [ revision 1.18 ]</A></STRONG></H2><BR><STRONG>date: 2005-01-10 14:32:19 +0300;  author: gosha;  state: Exp;  lines: +78 -69;</STRONG><P><PRE>Немного переписал работу с syslogd
+
+Добавил поддержку виндового eventlog
+	( тоесть при SYSLOG =&gt; 1, проверяем операционную
+	систему и если вин то пользуем eventlog )
+
+Поправил процедуру first_connect
+	вернул взад использование IO::Socket
+
+Протестировал под win2000 - вроде работает...
+	тоесть все вышеописанные исправления
+	для этого...
+</PRE></P><HR><H2><STRONG><A NAME="7">SC.pm [ revision 1.17 ]</A></STRONG></H2><BR><STRONG>date: 2004-11-30 00:15:52 +0300;  author: gosha;  state: Exp;  lines: +43 -25;</STRONG><P><PRE>Добавил параметр CHAIN_FILE_DATA в конструктор new
+	ссылка на массив строк, если определено то данные
+	читются не из файла конфигурации а из данного массива.
+	Использовать для работы без `всяких` файлов конфигурации.
+</PRE></P><HR><H2><STRONG><A NAME="8">SC.pm [ revision 1.16 ]</A></STRONG></H2><BR><STRONG>date: 2004-09-24 12:20:06 +0400;  author: gosha;  state: Exp;  lines: +42 -34;</STRONG><P><PRE>Поборолся с ворнингами. Теперь вроде поменьше стали ругаться
+	при установленной $^W
+</PRE></P><HR><H2><STRONG><A NAME="9">SC.pm [ revision 1.15 ]</A></STRONG></H2><BR><STRONG>date: 2004-03-27 15:27:17 +0300;  author: gosha;  state: Exp;  lines: +29 -20;</STRONG><P><PRE>Бага с залочкой и проверкой существования кешированных данных
+    состояния сокс серверов.
+
+    Определяли по наличию файла .sc.conf.db в более других версиях перла
+    вместо .db пользуется .dir и .pag.
+
+    Сейчас лочится конфигурационный файл.
+
+    Процедура restore_cfg_data теперь вызывается незавимсимо от того есть
+    файл с кештрованными данными или нет.
+
+Имя dbm файла для хранения кешированных данных состояния сокс серверов
+    теперь ${конфигурационный файл}-cache. Связано с тем что опять же на
+    некоторых перлах при создании dbm файла вообще ни каких расширений не
+    добавляется - отсюда потеря конфига.
+</PRE></P><HR><H2><STRONG><A NAME="10">SC.pm [ revision 1.14 ]</A></STRONG></H2><BR><STRONG>date: 2003-12-14 12:39:55 +0300;  author: gosha;  state: Exp;  lines: +85 -93;</STRONG><P><PRE>При ошибки открытии лог файла - данные об этой ошибке пропадали...
+
+Добавил возможность ведения лога черес syslog. В связи с эти пришлось
+	добавить процедуру debug - пишет лог в секцию debug сислога,
+	без DEBUG'а все пишется с приоритетом warning
+
+Вернул все варнинги назад - т.е. теперь об ошибках
+	ругаемся не только при включенном $^W
+</PRE></P><HR><H2><STRONG><A NAME="11">SC.pm [ revision 1.13 ]</A></STRONG></H2><BR><STRONG>date: 2002-11-23 00:16:08 +0300;  author: gosha;  state: Exp;  lines: +104 -86;</STRONG><P><PRE>Таймауты сделал на select'е вместо Alarm'а
+</PRE></P><HR><H2><STRONG><A NAME="12">SC.pm [ revision 1.12 ]</A></STRONG></H2><BR><STRONG>date: 2002-09-03 01:01:19 +0400;  author: gosha;  state: Exp;  lines: +5 -8;</STRONG><P><PRE>Ну вобщем то ничего такого глобального,	просто перенес
+	инициализацию __peer_addr и __peer_port в create_chain
+	для совместимости с версией модуля 1.10
+</PRE></P><HR><H2><STRONG><A NAME="13">SC.pm [ revision 1.11 ]</A></STRONG></H2><BR><STRONG>date: 2002-09-02 21:02:53 +0400;  author: gosha;  state: Exp;  lines: +932 -344;</STRONG><P><PRE>Не корректно строилась цепь с использованием протокола v4...
+
+В кеш ( .db ) теперь скидываются _все_ параметры сокс сервера...
+
+Поменял флаги для DEBUG, теперь:
+	 DEBUG         - уровень отладки ( 0x00 | 0x01 | 0x02 | 0x04 | 0x08 )
+			  0x00 - выключить
+			  0x01 - минимальный уровень ( connect и error'ы )
+			  0x02 - выводить все ответы от sokcs серверов
+			  0x04 - выводить все, что пишем socks'ам
+			  0x08 - расширенная информация об ошибках
+
+Все что писалось раньше в log_error ( кроме случаев с DEBUG )
+	теперь выводится только при включенном $^W
+
+Поправил путаницу с расчетом таймаутов CHECK_DELAY
+
+Добавил параметр LOOP_CONNECTION - проверка серверов на
+	возможность коннектов. Появилось в свете багов с
+	socks 4 которых много левых... Вобщем при включении
+	данной опции после коннекта к данному серверу
+	прежде чем строить цепь дальше второй раз коннектимся
+	к этому же серверу но через существующую цепь... т.е.
+
+	my -&gt;1   -&gt;2   -&gt;3
+	      -&gt;1   -&gt;2   -&gt;3
+
+    короче проверяем а сокс ли там в принципе..., путем коннекта
+	к самому себе... Это в большей степени относится к socks v4
+
+Заменил процедуру bad_proxy на mark_proxy
+	Теперь принимает два аргумента, первый так же
+	как и раньше ID socks сервера в конфиге,
+	второй аргумент - код возврата, если он равен
+	SOCKS_OKAY то очищаем все неудачные попытки, иначе
+	увеличиваем на единицу...
+
+Не очищался счетчик неудачных попыток при восстановлении
+	связи...
+
+Текстовые сообщения о socks ошибках теперь хранятся в
+	константе SOCKS_MSG
+
+Добавил процедуру sh - возвратить $self-&gt;{sock_h}
+
+Добавил процедуру close - закрыть соединение
+
+Конфигурационные параметры передающиеся в new и configure
+	могут быть в любом регистре.
+
+При записи данных в порт теперь ловится SIGPIPE
+
+create_chain больше не принимает в качестве последнего
+	аргумента ссылку на хеш...
+
+Написал процедуру socks_param
+	Возвращает параметры сеанса работы последнего socks сервера
+	Возможные параметры : listen_addr, listen_port, proxy_id, etc...
+
+	при отсутствии $param возвращает ссылку на хеш со всеми
+	имеющимися параметрами...
+
+Поменял явное использование хеша с ключами CFG_ на
+	использование configure
+
+В конструктор добавил новый параметр AUTO_SAVE -
+	автоматически сохранять данные в .db файле
+	По умолчанию 0, Эта фича работает в connect и bind,
+
+Появился параметр RESTORE_TYPE
+	при 0 - не удалять данные из .db файла если в новом конфиге они
+			для данного хоста отсутствуют
+		1 - удалять.
+
+		Раньше было всегда 0.
+
+connect и bind теперь можно вызывать и без предварительного
+	read_chain_data();
+
+Написал две новых процедуры connect и bind
+	- просто обертки для create_chain, аргументы такие же
+      только не нужен тип соединения...
+
+Процедура для соединения с первым сокс сервером
+	теперь зовется first_connect
+
+accept теперь без параметра socks_obj
+
+Добавил немного комментариев в код... так на будующее...
+
+В качестве дескриптора LOG файла теперь используется не STDERR
+	както не красиво закрывать его...
+
+Дескриптор LOG файла может быть напрямую передан в переменной
+	LOG_FH, только при инициализации ( new ) LOG_FILE должно
+	быть undef.
+</PRE></P><HR><H2><STRONG><A NAME="14">SC.pm [ revision 1.10 ]</A></STRONG></H2><BR><STRONG>date: 2002-08-19 15:40:58 +0400;  author: gosha;  state: Exp;  lines: +4 -3;</STRONG><P><PRE>При проверке на наличие в системе alarm'а была
+	очепятка проверялось не d_alarm а d_flock
+</PRE></P><HR><H2><STRONG><A NAME="15">SC.pm [ revision 1.9 ]</A></STRONG></H2><BR><STRONG>date: 2002-07-27 18:28:33 +0400;  author: gosha;  state: Exp;  lines: +52 -23;</STRONG><P><PRE>Теперь проверяю $Config{d_flock} и $Config{d_alarm} перед
+	использованием flock'а и alarm'а
+
+
+Убрал из new переопределение сигналов __DIE__ и __WARN__
+</PRE></P><HR><H2><STRONG><A NAME="16">SC.pm [ revision 1.8 ]</A></STRONG></H2><BR><STRONG>date: 2002-06-25 20:30:39 +0400;  author: gosha;  state: Exp;  lines: +6 -4;</STRONG><P><PRE>При создании цепочки теперь не зависимо от того есть DEBUG или нет
+	в STDERR пишем 'Connect to Socks....'
+
+В dump_cfg_data некорректно отрабатывался сброс данных в
+	файл. Т.е. если запись с таким ключем уже уже существовала
+	то ни чего не изменялось...
+</PRE></P><HR><H2><STRONG><A NAME="17">SC.pm [ revision 1.7 ]</A></STRONG></H2><BR><STRONG>date: 2002-06-17 21:55:23 +0400;  author: gosha;  state: Exp;  lines: +3 -3;</STRONG><P><PRE>При разборе конфига некорректно парсилась информация
+	о версии socks протокола. Т.е. всегда возвращаласть
+	версия N 5....
+</PRE></P><HR><H2><STRONG><A NAME="18">SC.pm [ revision 1.6 ]</A></STRONG></H2><BR><STRONG>date: 2002-06-05 21:55:19 +0400;  author: gosha;  state: Exp;  lines: +125 -52;</STRONG><P><PRE>По умолчанию конфиг теперь лежит в  $ENV{HOME}/.sc.conf
+
+Добавил методы dump_cfg_data и restore_cfg_data
+
+Добавил метод bad_proxy - помечать прокси которые не надо пользовать
+	принимает на входе id прокси в конфигу.
+
+create_chain в ссылке на хеш теперь возвращает еще
+	и ID прокси в proxy_id
+
+Ошибка в расчете доступных проксей в create_chain
+
+Ошибка в подсчете проксей в get_socks_count
+</PRE></P><HR><H2><STRONG><A NAME="19">SC.pm [ revision 1.5 ]</A></STRONG></H2><BR><STRONG>date: 2002-06-04 03:02:39 +0400;  author: gosha;  state: Exp;  lines: +60 -50;</STRONG><P><PRE>Заточил под цивильный модуль...
+
+timeout поменял на configure - для изменения
+	любых параметров инициализированных в new();
+
+Несколько подправил код, чтоб меньше ругалость на -w
+
+$socks_obj-&gt;{listen_addr} - теперь содержит IP
+	в формате xxx.xxx.xxx.xxx
+</PRE></P><HR><H2><STRONG><A NAME="20">SC.pm [ revision 1.4 ]</A></STRONG></H2><BR><STRONG>date: 2002-05-31 21:55:17 +0400;  author: gosha;  state: Exp;  lines: +48 -15;</STRONG><P><PRE>В конфиге может не описываться номер протокола - по умолчанию
+	пользуется 5.
+
+Добавил процедуру accept
+
+Добавил процедуру timeout - читает/изменяет текущий
+	таймаут.
+
+В create_socks_chain() теперь два новых аргумента:
+
+	третий (4) по номеру - тип запроса;
+		1 - connect
+		2 - bind
+
+	четвертый (5) по номеру - ссылка на хеш в который
+				запишутся параметры последнего коннекта
+				в цепочке.
+</PRE></P><HR><H2><STRONG><A NAME="21">SC.pm [ revision 1.3 ]</A></STRONG></H2><BR><STRONG>date: 2002-05-27 18:43:11 +0400;  author: gosha;  state: Exp;  lines: +54 -49;</STRONG><P><PRE>В create_chain - цепочка строится пока не достигнет нужной длинны или
+	в списке не кончутся доступные серверы.
+
+Время задержки CFG_CHECK_DELAY с каждой неудачной попыткой увеличивается на
+	100 %, те все движется для использования в серверной части...
+</PRE></P><HR><H2><STRONG><A NAME="22">SC.pm [ revision 1.2 ]</A></STRONG></H2><BR><STRONG>date: 2002-05-24 02:53:37 +0400;  author: gosha;  state: Exp;  lines: +63 -37;</STRONG><P><PRE>Протестировал все с реальным socks'ом
+
+Добавил новую функцию get_chains_count - возвращает количество
+	socks серверов, которые считаюся доступными на данный момент
+
+Из параметров CFG_ убрал RULE - за ненадобностью.
+
+Сделал проверку: если CFG_LOG_FILE не undef то открывается лог
+	файл, иначе все ошибки пишутся в STDERR
+
+Функция socks_error - теперь если не может определить
+	строковое представление ошибки возвращает ее номер.
+
+connect - теперь тоже с timeout'ом
+
+read_data - при таймауте возвращает 0, при закрытие сокета -1
+
+create_chain - в начале делает undef $self-&gt;{sock_h} -
+	сделано для возможности организации цикла с перебором
+	всех возможных proxy...
+
+	Если число доступных в данный момент socks серверов
+	меньше  CHAIN_LEN - то даже не пытаемся законектится
+	к доступным в данный момент серверам.
+
+socks5_auth - даже при пустых user_id и user_pswd пытались
+	передать пароль, в результате чего все отваливалось
+	по AUTH_FAILED...
+</PRE></P><HR><H2><STRONG><A NAME="23">SC.pm [ revision 1.1 ]</A></STRONG></H2><BR><STRONG>date: 2002-04-27 19:51:59 +0400;  author: gosha;  state: Exp;</STRONG><P><PRE>Всю работу по построению цепочек вытаскиваю в отдельный модуль,
+	далее для каждого сервиса надо писать клиента
+	( http, ftp, telnet, etc...)
+=============================================================================
+
+</PRE></P><HR><H2><STRONG><A NAME="25">telnet_over_socks_chain.pl</A></STRONG></H2><P><PRE>Working file: telnet_over_socks_chain.pl
+head: 1.11
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 11;	selected revisions: 11
+description:
+</PRE></P><HR><H2><STRONG><A NAME="26">telnet_over_socks_chain.pl [ revision 1.11 ]</A></STRONG></H2><BR><STRONG>date: 2009-11-14 13:18:47 +0300;  author: gosha;  state: Exp;  lines: +1 -1;  commitid: bsJNWFjNPnEEltbu;</STRONG><P><PRE>minor changes
+</PRE></P><HR><H2><STRONG><A NAME="27">telnet_over_socks_chain.pl [ revision 1.10 ]</A></STRONG></H2><BR><STRONG>date: 2004-03-27 15:31:04 +0300;  author: gosha;  state: Exp;  lines: +7 -4;</STRONG><P><PRE>В accept при создании локального сокета добавил тайм-аут
+</PRE></P><HR><H2><STRONG><A NAME="28">telnet_over_socks_chain.pl [ revision 1.9 ]</A></STRONG></H2><BR><STRONG>date: 2002-11-23 00:19:42 +0300;  author: gosha;  state: Exp;  lines: +5 -4;</STRONG><P><PRE>Ну поправил немного, на предмет того, что в Net::SC (1.13) больше
+	не пользуется IO::Socket
+</PRE></P><HR><H2><STRONG><A NAME="29">telnet_over_socks_chain.pl [ revision 1.8 ]</A></STRONG></H2><BR><STRONG>date: 2002-09-03 00:38:49 +0400;  author: gosha;  state: Exp;  lines: +65 -54;</STRONG><P><PRE>Добавил два параметра коммандной строки
+	-as   - выключить auto_save
+	-cfg  - имя файла конфигурации
+
+При принятии соединений к локальному порту сделал проверку на
+	IP адрес хоста который коннектится...
+
+Поправил все для версии Net::SC 1.11
+</PRE></P><HR><H2><STRONG><A NAME="30">telnet_over_socks_chain.pl [ revision 1.7 ]</A></STRONG></H2><BR><STRONG>date: 2002-06-25 20:31:25 +0400;  author: gosha;  state: Exp;  lines: +4 -1;</STRONG><P><PRE>Добавил опцию -cd
+</PRE></P><HR><H2><STRONG><A NAME="31">telnet_over_socks_chain.pl [ revision 1.6 ]</A></STRONG></H2><BR><STRONG>date: 2002-06-17 21:57:19 +0400;  author: gosha;  state: Exp;  lines: +8 -3;</STRONG><P><PRE>Добаил опцию коммандной строки -cmd - для описания комманды
+	прямо в строке...
+</PRE></P><HR><H2><STRONG><A NAME="32">telnet_over_socks_chain.pl [ revision 1.5 ]</A></STRONG></H2><BR><STRONG>date: 2002-06-05 21:56:42 +0400;  author: gosha;  state: Exp;  lines: +17 -9;</STRONG><P><PRE>Прикрутил пользование dump_ и restore_
+</PRE></P><HR><H2><STRONG><A NAME="33">telnet_over_socks_chain.pl [ revision 1.4 ]</A></STRONG></H2><BR><STRONG>date: 2002-06-04 03:05:24 +0400;  author: gosha;  state: Exp;  lines: +5 -5;</STRONG><P><PRE>Вызов SC теперь сделан чуть по другому,
+
+убрал use IO::Socket
+</PRE></P><HR><H2><STRONG><A NAME="34">telnet_over_socks_chain.pl [ revision 1.3 ]</A></STRONG></H2><BR><STRONG>date: 2002-05-31 21:55:17 +0400;  author: gosha;  state: Exp;  lines: +2 -2;</STRONG><P><PRE>новый формат вызова create_chains
+</PRE></P><HR><H2><STRONG><A NAME="35">telnet_over_socks_chain.pl [ revision 1.2 ]</A></STRONG></H2><BR><STRONG>date: 2002-05-27 19:26:48 +0400;  author: gosha;  state: Exp;  lines: +65 -16;</STRONG><P><PRE>Добавил опций кучку к командной строке, и самое главное теперь его
+можно пользовать не только с телнетом.
+</PRE></P><HR><H2><STRONG><A NAME="36">telnet_over_socks_chain.pl [ revision 1.1 ]</A></STRONG></H2><BR><STRONG>date: 2002-05-26 00:28:20 +0400;  author: gosha;  state: Exp;</STRONG><P><PRE>Тунеь telnet'а через цепочку соксов.
+=============================================================================
+
+</PRE></P><HR><H2><STRONG><A NAME="38">accept_over_socks_chain.pl</A></STRONG></H2><P><PRE>Working file: accept_over_socks_chain.pl
+head: 1.4
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 4;	selected revisions: 4
+description:
+</PRE></P><HR><H2><STRONG><A NAME="39">accept_over_socks_chain.pl [ revision 1.4 ]</A></STRONG></H2><BR><STRONG>date: 2009-11-14 13:18:47 +0300;  author: gosha;  state: Exp;  lines: +1 -1;  commitid: bsJNWFjNPnEEltbu;</STRONG><P><PRE>minor changes
+</PRE></P><HR><H2><STRONG><A NAME="40">accept_over_socks_chain.pl [ revision 1.3 ]</A></STRONG></H2><BR><STRONG>date: 2002-09-03 00:41:55 +0400;  author: gosha;  state: Exp;  lines: +25 -17;</STRONG><P><PRE>Поправил все для версии Net::SC 1.11
+</PRE></P><HR><H2><STRONG><A NAME="41">accept_over_socks_chain.pl [ revision 1.2 ]</A></STRONG></H2><BR><STRONG>date: 2002-06-04 03:06:52 +0400;  author: gosha;  state: Exp;  lines: +24 -22;</STRONG><P><PRE>Убрал use IO::Socket
+
+Переписал чуть, для более красивого использования...
+</PRE></P><HR><H2><STRONG><A NAME="42">accept_over_socks_chain.pl [ revision 1.1 ]</A></STRONG></H2><BR><STRONG>date: 2002-05-31 21:59:23 +0400;  author: gosha;  state: Exp;</STRONG><P><PRE>Пример входящий соединений через socks
+=============================================================================
+</PRE></P></UL></BODY></HTML>

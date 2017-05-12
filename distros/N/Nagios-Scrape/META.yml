@@ -1,0 +1,24 @@
+---
+name: Nagios-Scrape
+version: 0.03
+author:
+  - 'Joe Topjian <joe@terrarum.net>'
+abstract: Scrapes and Parses the status.cgi page of a Nagios installation
+license: perl
+requires:
+  CGI: 0
+  Error: 0
+  LWP::UserAgent: 0
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Nagios::Scrape:
+    file: lib/Nagios/Scrape.pm
+    version: 0.03
+resources:
+  license: http://dev.perl.org/licenses/

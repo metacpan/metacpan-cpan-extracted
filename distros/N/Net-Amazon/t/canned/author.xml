@@ -1,0 +1,262 @@
+<?xml version="1.0"?>
+<ItemSearchResponse xmlns="http://webservices.amazon.com/AWSECommerceService/2011-08-01">
+  <Items>
+    <TotalResults>3</TotalResults>
+    <TotalPages>1</TotalPages>
+    <MoreSearchResultsUrl>http://www.amazon.com/gp/redirect.html?camp=2025&amp;creative=386001&amp;location=http%3A%2F%2Fwww.amazon.com%2Fgp%2Fsearch%3Fkeywords%3DMichael%2BSchilli%26url%3Dsearch-alias%253Dstripbooks&amp;linkCode=xm2&amp;tag=blogdivebombo-20&amp;SubscriptionId=1V5JRJ4JQCSHB3NGG902</MoreSearchResultsUrl>
+    <Item>
+      <ASIN>0201360683</ASIN>
+      <SalesRank>2831243</SalesRank>
+      <SmallImage>
+        <URL>http://ecx.images-amazon.com/images/I/516Y2ENTVFL._SL75_.jpg</URL>
+        <Height Units="pixels">75</Height>
+        <Width Units="pixels">54</Width>
+      </SmallImage>
+      <MediumImage>
+        <URL>http://ecx.images-amazon.com/images/I/516Y2ENTVFL._SL160_.jpg</URL>
+        <Height Units="pixels">160</Height>
+        <Width Units="pixels">116</Width>
+      </MediumImage>
+      <LargeImage>
+        <URL>http://ecx.images-amazon.com/images/I/516Y2ENTVFL.jpg</URL>
+        <Height Units="pixels">475</Height>
+        <Width Units="pixels">345</Width>
+      </LargeImage>
+      <ItemAttributes>
+        <Author>Michael Schilli</Author>
+        <Binding>Paperback</Binding>
+        <CatalogNumberList>
+          <CatalogNumberListElement>AL07005145</CatalogNumberListElement>
+        </CatalogNumberList>
+        <EAN>9780201360684</EAN>
+        <EANList>
+          <EANListElement>9780201360684</EANListElement>
+        </EANList>
+        <ISBN>0201360683</ISBN>
+        <Label>Addison-Wesley Professional</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>English</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>3999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$39.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Addison-Wesley Professional</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>464</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>1998-12-16</PublicationDate>
+        <Publisher>Addison-Wesley Professional</Publisher>
+        <SKU>3_0201360683</SKU>
+        <Studio>Addison-Wesley Professional</Studio>
+        <Title>Perl Power!: A JumpStart Guide to Programming with Perl 5</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>200</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$2.00</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>80</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.80</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>11</TotalNew>
+        <TotalUsed>17</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+        <MoreOffersUrl>0</MoreOffersUrl>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>3827313783</ASIN>
+      <SmallImage>
+        <URL>http://ecx.images-amazon.com/images/I/41DCASXRYML._SL75_.jpg</URL>
+        <Height Units="pixels">75</Height>
+        <Width Units="pixels">53</Width>
+      </SmallImage>
+      <MediumImage>
+        <URL>http://ecx.images-amazon.com/images/I/41DCASXRYML._SL160_.jpg</URL>
+        <Height Units="pixels">160</Height>
+        <Width Units="pixels">112</Width>
+      </MediumImage>
+      <LargeImage>
+        <URL>http://ecx.images-amazon.com/images/I/41DCASXRYML.jpg</URL>
+        <Height Units="pixels">500</Height>
+        <Width Units="pixels">351</Width>
+      </LargeImage>
+      <ItemAttributes>
+        <Author>Michael Schilli</Author>
+        <Binding>Hardcover</Binding>
+        <EAN>9783827313782</EAN>
+        <EANList>
+          <EANListElement>9783827313782</EANListElement>
+        </EANList>
+        <ISBN>3827313783</ISBN>
+        <Languages>
+          <Language>
+            <Name>German</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>German</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>German</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <SKU>MAK_MNT_9783827313782</SKU>
+        <Title>Go To Perl 5 .</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestUsedPrice>
+          <Amount>3934</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$39.34</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>0</TotalNew>
+        <TotalUsed>3</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+        <MoreOffersUrl>0</MoreOffersUrl>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>3540284028</ASIN>
+      <SalesRank>10717237</SalesRank>
+      <SmallImage>
+        <URL>http://ecx.images-amazon.com/images/I/41Ba1lx1inL._SL75_.jpg</URL>
+        <Height Units="pixels">75</Height>
+        <Width Units="pixels">49</Width>
+      </SmallImage>
+      <MediumImage>
+        <URL>http://ecx.images-amazon.com/images/I/41Ba1lx1inL._SL160_.jpg</URL>
+        <Height Units="pixels">160</Height>
+        <Width Units="pixels">106</Width>
+      </MediumImage>
+      <LargeImage>
+        <URL>http://ecx.images-amazon.com/images/I/41Ba1lx1inL.jpg</URL>
+        <Height Units="pixels">420</Height>
+        <Width Units="pixels">277</Width>
+      </LargeImage>
+      <ItemAttributes>
+        <Author>August-Wilhelm Scheer</Author>
+        <Author>Manfred Boczanski</Author>
+        <Author>Michael Muth</Author>
+        <Author>Willi-Gerd Schmitz</Author>
+        <Author>Uwe Segelbacher</Author>
+        <Binding>Hardcover</Binding>
+        <Creator Role="Contributor">A. Cocchi</Creator>
+        <Creator Role="Contributor">C. Herzog</Creator>
+        <Creator Role="Contributor">I. Kern</Creator>
+        <Creator Role="Contributor">H. Okruch</Creator>
+        <Creator Role="Contributor">A. Schadenberger</Creator>
+        <Creator Role="Contributor">B. Schilli</Creator>
+        <Creator Role="Contributor">M. Stürken</Creator>
+        <EAN>9783540284024</EAN>
+        <EANList>
+          <EANListElement>9783540284024</EANListElement>
+        </EANList>
+        <Edition>1</Edition>
+        <ISBN>3540284028</ISBN>
+        <Label>Springer</Label>
+        <Languages>
+          <Language>
+            <Name>German</Name>
+            <Type>Unknown</Type>
+          </Language>
+          <Language>
+            <Name>German</Name>
+            <Type>Original Language</Type>
+          </Language>
+          <Language>
+            <Name>German</Name>
+            <Type>Published</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>7995</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$79.95</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Springer</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>276</NumberOfPages>
+        <ProductGroup>Book</ProductGroup>
+        <ProductTypeName>ABIS_BOOK</ProductTypeName>
+        <PublicationDate>2005-10-05</PublicationDate>
+        <Publisher>Springer</Publisher>
+        <SKU>MUK3540284028</SKU>
+        <Studio>Springer</Studio>
+        <Title>Prozessorientiertes Product Lifecycle Management (German Edition)</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>6504</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$65.04</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>9326</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$93.26</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>12</TotalNew>
+        <TotalUsed>5</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/3540284028%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3D3540284028</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>vxAQXieuYbzqnQpUSyamoEFoCefPp2%2Fvei1rtCowbEVhzhryssRVF0wM6rF8FtuucBcmw3YHJJqiNHlxMAAWqhnKz8qezoJUlqOaHSNvd4oZt0T87y60CQ%3D%3D</OfferListingId>
+            <Price>
+              <Amount>7995</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$79.95</FormattedPrice>
+            </Price>
+            <Availability>Temporarily out of stock. Order now and we'll deliver when available. We'll e-mail you with an estimated delivery date as soon as we have more information. Your credit card will not be charged until we ship the item.</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>unknown</AvailabilityType>
+              <MinimumHours>672</MinimumHours>
+              <MaximumHours>1008</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+    </Item>
+  </Items>
+</ItemSearchResponse>

@@ -1,0 +1,29 @@
+This is version 1.14 of Net::Traceroute.  Users upgrading from before
+version 1.04, please note that there has been an interface change.
+Your program may not work.  Please see "CLONING SUPPORT BEFORE 1.04"
+in the pod documentation.
+
+This release adds support for a few flags in newer traceroutes.
+
+Net::Traceroute is available from CPAN and my home
+page.  My CPAN area is authors/id/H/HA/HAG, and my home page is
+currently http://www.linnaean.org/~hag/ .  I hope you find the
+module useful.
+
+Daniel Hagerty
+hag@linnaean.org
+
+Example:
+
+use Net::Traceroute;
+$tr = Net::Traceroute->new(host => "life.ai.mit.edu");
+
+if($tr->found) {
+    my $hops = $tr->hops;
+    if($hops == 1) {
+	print "Same subnet\n";
+    } else {
+	print "Last router is " .
+	    $tr->hop_query_host($hops - 1, 0) . "\n";
+    }
+}

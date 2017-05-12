@@ -1,0 +1,32 @@
+Revision history for Perl extension Net::Sharktools.
+
+0.009 Fri Feb 4 2011
+    - Fix license typo in Sharktools.xs
+
+0.008 Mon Jan 31 2011
+    - Fix license typo in Makefile.PL
+
+0.007 Mon Jan 31 2011
+    - Fix README and POD references to license terms
+
+0.006 Mon Jan 31 2011 
+    - Release under GPLv2
+
+0.005 Fri Jan 28 2011 
+    - POD fixes (copyright, formatting, spelling)
+    - Add LICENSE to WriteMakefile
+
+0.003 Thu Jan 27 2011 
+    - Add ability to specify Wireshark and Sharktools source directories and library paths on the Makefile.PL command line
+    - Add Devel::CheckLib functionality to Makefile.PL
+
+0.002 Tue Jan 25 2011 
+    - Add copyright, license statement, and disclaimer of warranty to Sharktools.xs
+    - Make internal callbacks static
+    - Add comments to explain structure of module
+    - Add usage example to Sharktools.xs
+    - Remove unnecessary cast to (AV *)
+
+0.001 Thu Jan 20 2011 
+    - First public version
+

@@ -1,0 +1,33 @@
+---
+abstract: 'Basic socket abstraction for memcacheq'
+author:
+  - 'Roger M Pettett <rmp@psyphi.net>'
+build_requires:
+  File::Path: 2.07_03
+  Test::Distribution: 2.00
+  Test::More: 0.8
+  Test::Perl::Critic: 1.01
+  Test::Trap: 0
+  Time::HiRes: 1.9719
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-MemcacheQ
+provides:
+  Net::MemcacheQ:
+    file: lib/Net/MemcacheQ.pm
+    version: 1.04
+requires:
+  Carp: 1.08
+  IO::Socket::INET: 1.31
+  Readonly: 1.03
+  base: 2.13
+  strict: 1.03
+  warnings: 1.05_01
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.04

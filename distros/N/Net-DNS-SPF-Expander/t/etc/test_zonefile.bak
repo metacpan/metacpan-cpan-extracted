@@ -1,0 +1,10 @@
+$ORIGIN test_zone.com.
+
+yo      CNAME   111.222.333.4.
+mama    CNAME   222.333.444.5.
+
+@               SPF     "v=spf1 include:_spf.google.com ip4:96.43.144.0/20 ~all"
+*               TXT     "v=spf1 include:_spf.google.com ip4:96.43.144.0/20 ~all"
+
+greasy  CNAME   333.444.555.6.
+granny  CNAME   666.777.888.9.

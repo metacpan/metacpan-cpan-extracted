@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:                Net-Z3950-Simple2ZOOM
+version:             1.04
+abstract:            Gateway between Z39.50 and SRU/SRW
+license:             ~
+author:              
+    - Sebastian Hammer <quinn@indexdata.com> and colleagues
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Data::Dumper:                  2.121
+    LWP::UserAgent:                2.033
+    MARC::File::XML:               0.84
+    MARC::Record:                  1.38
+    Net::Z3950::SimpleServer:      1.08
+    Net::Z3950::ZOOM:              1.19
+    Time::HiRes:                   1.86
+    URI::Escape:                   3.28
+    XML::LibXML:                   1.59
+    XML::Simple:                   2.14
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

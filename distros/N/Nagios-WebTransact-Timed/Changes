@@ -1,0 +1,12 @@
+Revision history for Perl extension Nagios:WebTransactTimed.
+
+0.01  Tue Jun 10 16:54:25 EST 2003
+	- original version; created by h2xs 1.19
+
+	- formerly called Nagios::WebTransactTimed. It's a subclass so name it
+	  accordingly.
+
+0.06 Sat 1 Nov 2003
+
+Trying to add an image download function like that in WebTransact.
+

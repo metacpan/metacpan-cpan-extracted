@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+README.md
+cpanfile
+lib/Nephia/Setup/Plugin/Assets/Bootstrap.pm
+share/bootstrap-2.3.2.zip
+t/00_compile.t
+t/01_setup.t
+META.yml

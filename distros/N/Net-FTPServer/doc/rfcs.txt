@@ -1,0 +1,13 @@
+The important RFCs and Internet Drafts relating to FTP are:
+
+	rfc959		The core standard.
+	rfc1123		Various clarifications and requirements.
+	rfc2389		Feature negotiation.
+	rfc2428		FTP extensions for IPv6 and NATs.
+	rfc2577		FTP security considerations.
+	rfc2640		Internationalization of the protocol.
+	draft-ietf-ftpext-mlst-11.txt	Proposed extensions.
+
+Other references of interest:
+
+	http://cr.yp.to/ftp/security.html

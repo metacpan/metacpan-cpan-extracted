@@ -1,0 +1,9 @@
+Revision history for Perl extension Net::TcpDumpLog.
+
+0.11  19-Oct-2003
+      Changed the unpack code so this library will work better on other OSs.
+
+0.10  Sun Oct 12 17:50:22 2003
+	- original version; created by h2xs 1.21 with options
+		-A Net::TcpDumpLog
+

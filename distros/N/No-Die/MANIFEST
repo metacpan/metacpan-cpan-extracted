@@ -1,0 +1,7 @@
+Makefile.PL
+README
+MANIFEST
+lib/No/Die.pm
+t/01_Standard_No-Die.t
+t/02_Allow_No-Die.t
+t/to_load/Foo.pm

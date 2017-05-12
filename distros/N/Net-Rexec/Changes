@@ -1,0 +1,8 @@
+Revision history for Perl extension Net::Rexec.
+
+0.11  Tue Sep 15 14:45:00 1998
+	- Add rexec to @EXPORT_OK.
+
+0.01  Thu Sep 10 10:11:19 1998
+	- original version; created by h2xs 1.18
+

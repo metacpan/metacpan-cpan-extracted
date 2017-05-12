@@ -1,0 +1,138 @@
+NAME
+    Net::DNS::Dynamic::Adfilter - A DNS ad filter
+
+VERSION
+    version 0.075
+
+DESCRIPTION
+    This is an ad filter for use in a local area network. Its function is to
+    load lists of ad domains and answer DNS queries for those domains with a
+    loopback address. Any other DNS queries are forwarded upstream, either
+    to a specified list of nameservers or to those listed in
+    /etc/resolv.conf.
+
+    The module loads externally maintained lists of ad hosts intended for
+    use by the *adblock plus* Firefox extension. Use of the lists focuses
+    only on third-party listings that define dedicated advertising and
+    tracking hosts.
+
+    A custom blacklist and/or whitelist can also be loaded. In this case,
+    host listings must conform to a one host per line format.
+
+    Once running, local network dns queries can be addressed to the host's
+    ip.
+
+SYNOPSIS
+        my $adfilter = Net::DNS::Dynamic::Adfilter->new();
+
+        $adfilter->run();
+
+    Without any parameters, the module will function simply as a proxy,
+    forwarding all requests upstream to nameservers defined in
+    /etc/resolv.conf.
+
+ATTRIBUTES
+  adblock_stack
+        my $adfilter = Net::DNS::Dynamic::Adfilter->new(
+
+            adblock_stack => [
+                {
+                url => 'http://pgl.yoyo.org/adservers/serverlist.php?hostformat=adblockplus&showintro=0&startdate[day]=&startdate[month]=&startdate[year]=&mimetype=plaintext',
+                path => '/var/named/pgl-adblock.txt',     #path to ad hosts
+                refresh => 7,                             #refresh value in days (default = 7)
+                },
+                {
+                url => "abp:subscribe?location=https%3A%2F%2Feasylist-downloads.adblockplus.org%2Feasyprivacy.txt&title=EasyPrivacy&requiresLocation=https%3A%2F%2Feasylist-downloads.adblockplus.org%2Feasylist.txt&requiresTitle=EasyList",
+                path => '/var/named/easyprivacy.txt',
+                refresh => 5,
+                },
+            ],
+        );
+
+    The adblock_stack arrayref encloses one or more hashrefs composed of
+    three parameters: a url that returns a list of ad hosts in adblock plus
+    format; a path string that defines where the module will write a local
+    copy of the list; a refresh value that determines what age (in days) the
+    local copy may be before it is refreshed.
+
+    A collection of lists is available at
+    http://adblockplus.org/en/subscriptions. The module will accept standard
+    or abp:subscribe? urls. You can cut and paste encoded links directly.
+
+  blacklist
+        my $adfilter = Net::DNS::Dynamic::Adfilter->new(
+
+            blacklist => '/var/named/blacklist',  #path to secondary hosts
+        );
+
+    A path string that defines where the module will access a local list of
+    ad hosts. A single column is the only acceptable format:
+
+        # ad nauseam
+        googlesyndication.com
+        facebook.com
+        twitter.com
+        ...
+        adinfinitum.com
+
+  whitelist
+        my $adfilter = Net::DNS::Dynamic::Adfilter->new(
+
+            whitelist => '/var/named/whitelist',  #path to exclusions
+        );
+
+    A path string to a single column list of hosts. These hosts will be
+    removed from the filter.
+
+  host, port
+        my $adfilter = Net::DNS::Dynamic::Adfilter->new( host => $host, port => $port );
+
+    The IP address to bind to. If not defined, the server attempts binding
+    to the local ip. The default port is 53.
+
+  nameservers, nameservers_port
+        my $adfilter = Net::DNS::Dynamic::Adfilter->new( nameservers => [ $ns1, $ns2, ], nameservers_port => $port );
+
+    An arrayref of one or more nameservers to forward any DNS queries to.
+    Defaults to nameservers listed in /etc/resolv.conf. The default port is
+    53. Windows machines should define a forwarder to avoid the default
+    behavior.
+
+  setdns
+        my $adfilter = Net::DNS::Dynamic::Adfilter->new( setdns  => '1' } ); #defaults to '0'
+
+    If set, the module attempts to set local dns settings to the host's ip.
+    This may or may not work if there are multiple active interfaces. You
+    may need to manually adjust your local dns settings.
+
+  loopback
+        my $adfilter = Net::DNS::Dynamic::Adfilter->new( loopback  => '127.255.255.254' ); #defaults to '127.0.0.1'
+
+    If set, the nameserver will return this address rather than the standard
+    loopback address.
+
+  debug
+        my $adfilter = Net::DNS::Dynamic::Adfilter->new( debug => '1' ); #defaults to '0'
+
+    The debug option logs actions to stdout and can be set from 1-3 with
+    increasing output: the module will feedback (1) adfilter.pm logging, (2)
+    nameserver logging, and (3) resolver logging.
+
+CAVEATS
+    Tested under darwin only.
+
+AUTHOR
+    David Watson <dwatson@cpan.org>
+
+SEE ALSO
+    scripts/ in the distribution
+
+    Net::DNS::Dynamic::Proxyserver
+
+COPYRIGHT AND LICENSE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

@@ -1,0 +1,22 @@
+:127.0.0.2:blocked, See: http://www.my.zone2.com/lookup.cgi?page=lookup&lookup=$
+#$TTL 600
+#$SOA 600 bl.my.zone2.com. sysadm.my.zone2.com. 1160938802 43200 900 172800 43200
+#$TTL 43200
+125.175.164.0-255
+125.200.23.0-255
+125.200.27.0-255
+125.200.33.0-255
+125.207.243.0-255
+125.207.247.0-255
+126.104.19.0-255
+127.0.0.2:127.0.0.2:blocked, See: http://www.my.zone2.com/lookup.cgi?page=lookup&lookup=$
+127.0.0.3:127.0.0.3:valid response for remote DNSBL additions
+128.0.0.0-255
+128.2.123.128
+128.2.164.228
+128.2.169.168
+128.2.198.144
+128.2.247.100
+128.4.10.219
+128.6.62.3
+#$NS 43200 bl.my.zone2.com. ns1.nameserver.com. ns4.nameserver.com.

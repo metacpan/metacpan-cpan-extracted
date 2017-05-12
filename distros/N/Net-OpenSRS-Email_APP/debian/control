@@ -1,0 +1,17 @@
+Source: libnet-opensrs-email-app-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 7), libio-socket-ssl-perl
+Build-Depends-Indep: perl
+Maintainer: Mark Goldfinch <mark.goldfinch@modicagroup.com>
+Standards-Version: 3.8.4
+Homepage: http://search.cpan.org/dist/Net-OpenSRS-Email_APP/
+
+Package: libnet-opensrs-email-app-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}, libio-socket-ssl-perl
+Description: OpenSRS Email Service Account Provisioning Protocol
+ "Net::OpenSRS::Email_APP" provides an object interface for
+ communicating OpenSRS Email Service Account Provisioning Protocol
+ (APP). For this module to be useful to you, you will need an
+ OpenSRS reseller account, and MAC credentials.

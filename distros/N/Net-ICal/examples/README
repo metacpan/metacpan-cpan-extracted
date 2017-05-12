@@ -1,0 +1,37 @@
+README for Net::ICal examples
+
+* cal2fb.pl
+   Converts a calendar to a list of times you're free and busy.
+   This is in flux, as Freebusy.pm is half-rewritten. 
+
+* freebusy_demo.pl
+   Also in flux.
+   
+* gtk_todo.pl
+   You'll need Gnome.pm, Gtk.pm,  and Date::Parse for this
+
+* html_calendar.pl
+   You'll need CGI and HTML::CalendarMonthSimple for this
+
+* lunchtime.pl
+   Supposed to be a timezone demo; shows what your local lunchtime
+   is in a variety of other timezones. Doesn't work now because
+   we're still getting timezone handling straightened out. 
+
+* reply.pl
+   You'll need MIME::Tools for this one. It reads in a MIME message,
+   and will send a reply back saying you won't be coming to the
+   first event in the first text/calendar MIME part in the message (if
+   present).
+
+* showical.perl
+   Shows a little information from events in an iCAL stream in simple
+   text format. You could use this to show text/calendar attachments
+   in your mailer by putting the following line in your .mailcap:
+
+text/calendar; /path/to/showical.perl '%s'; copiousoutput;
+
+* test(_alarm|_duration|_journal|_todo|cal).pl
+   simple scriptlets to show how to create and read back in several
+   types of iCAL data. Originally written to test various Net::ICal
+   modules.

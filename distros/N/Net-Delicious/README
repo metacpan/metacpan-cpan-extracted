@@ -1,0 +1,425 @@
+NAME
+    Net::Delicious - OOP for the del.icio.us API
+
+SYNOPSIS
+      use Net::Delicious;
+      use Log::Dispatch::Screen;
+
+      my $del = Net::Delicious->new({user => "foo",
+                                     pswd => "bar"});
+
+      foreach my $p ($del->recent_posts()) {
+          print $p->description()."\n";
+      }
+
+DESCRIPTION
+    OOP for the del.icio.us API
+
+PACKAGE METHODS
+  __PACKAGE__->new(\%args || Config::Simple)
+    Arguments to the Net::Delicious object may be defined in one of three
+    ways :
+
+    *   As a single hash reference
+
+    *   As a reference to a *Config::Simple* object
+
+    *   As a path to a file that may be read by the *Config::Simple*.
+
+    The first option isn't going away any time soon but should be considered
+    as deprecated. Valid hash reference arguments are :
+
+    *   user
+
+        String. *required*
+
+        Your del.icio.us username.
+
+    *   pswd
+
+        String. *required*
+
+        Your del.icio.us password.
+
+    *   updates
+
+        String.
+
+        The path to a directory where the timestamp for the last update to
+        your bookmarks can be recorded. This is used by the *all_posts*
+        method to prevent abusive requests.
+
+        Default is the current user's home directory; If the home directory
+        can not be determined Net::Delicious will use a temporary directory
+        as determined by File::Temp.
+
+    *   debug
+
+        Boolean.
+
+        Add a *Log::Dispatch::Screen* dispatcher to log debug (and higher)
+        notices. Notices will be printed to STDERR.
+
+    *Config::Simple* options are expected to be grouped in a "block" labeled
+    delicious. Valid options are :
+
+    *   user
+
+        String. *required*
+
+        Your del.icio.us username.
+
+    *   pswd
+
+        String. *required*
+
+        Your del.icio.us password.
+
+    *   updates
+
+        String.
+
+        The path to a directory where the timestamp for the last update to
+        your bookmarks can be recorded. This is used by the *all_posts*
+        method to prevent abusive requests.
+
+        Default is the current user's home directory, followed by a
+        temporary directory as determined by File::Temp.
+
+    *   xml_parser
+
+        String.
+
+        You may specify one of three XML parsers to use to handle response
+        messages from the del.icio.us servers. You many want to do this if,
+        instead of Perl-ish objects, you want to access the raw XML and
+        parse it with XPath or XSLT or some other crazy moon language.
+
+        *   simple
+
+            This uses XML::Simple to parse messages. If present, all
+            successful API method calls will return, where applicable,
+            Net::Delicious::* objects.
+
+        *   libxml
+
+            This uses XML::LibXML to parse messages. If present, all
+            successful API method calls will return a
+            *XML::LibXML::Document* object.
+
+            Future releases may allow responses parsed with libxml to be
+            returned as Net::Delicious::* objects.
+
+        *   xpath
+
+            This uses XML::XPath to parse messages. If present, all
+            successful API method calls will return a *XML::XPath* object.
+
+            Future releases may allow responses parsed with XML::XPath to be
+            returned as Net::Delicious::* objects.
+
+        The default value is simple.
+
+    *   force_xml_objects
+
+        Boolean.
+
+        Set to true if you are using XML::Simple to parse response messages
+        from the del.icio.us servers but want to return the object's
+        original data structure rather than Net::Delicious::* objects.
+
+        Default is false.
+
+    *   endpoint
+
+        String.
+
+        Set the endpoint for all API calls.
+
+        There's no particular reason you should ever need to set this
+        unless, say, this module falls horribly out of date with the API
+        itself. Anyway, now you can.
+
+        Default is https://api.del.icio.us/v1/
+
+    *   debug
+
+        Boolean.
+
+        Add a *Log::Dispatch::Screen* dispatcher to log debug (and higher)
+        notices. Notices will be printed to STDERR.
+
+    Returns a Net::Delicious object or undef if there was a problem creating
+    the object.
+
+    It is also possible to set additional config options to tweak the
+    default settings for API call parameters and API response properties.
+    Please consult the POD for Net::Delicious::Config for details.
+
+UPDATE METHODS
+  $obj->update()
+    Returns return the time of the last update formatted as a W3CDTF string.
+
+POST METHODS
+  $obj->add_post(\%args)
+    Makes a post to del.icio.us.
+
+    Valid arguments are :
+
+    *   url
+
+        String. *required*
+
+        Url for post
+
+    *   description
+
+        String.
+
+        Description for post.
+
+    *   extended
+
+        String.
+
+        Extended for post.
+
+    *   tags
+
+        String.
+
+        Space-delimited list of tags.
+
+    *   dt
+
+        String.
+
+        Datestamp for post, format "CCYY-MM-DDThh:mm:ssZ"
+
+    *   shared
+
+        Boolean. (Technically, you need to pass the string "no" but N:D will
+        handle 1s and 0s.)
+
+        Make the post private. Default is true.
+
+    *   replace
+
+        Boolean. (Technically, you need to pass the string "no" but N:D will
+        handle 1s and 0s.)
+
+        Don't replace post if given url has already been posted. Default is
+        true.
+
+    Returns true or false.
+
+  $obj->delete_post(\%args)
+    Delete a post from del.icio.us.
+
+    Valid arguments are :
+
+    *   url
+
+        String. *required*
+
+    Returns true or false.
+
+  $obj->posts_per_date(\%args)
+    Get a list of dates with the number of posts at each date.
+
+    Valid arguments are :
+
+    *   tag
+
+        String.
+
+        Filter by this tag.
+
+    Returns a list of *Net::Delicious::Date* objects when called in an array
+    context.
+
+    Returns a *Net::Delicious::Iterator* object when called in a scalar
+    context.
+
+  $obj->recent_posts(\%args)
+    Get a list of most recent posts, possibly filtered by tag.
+
+    Valid arguments are :
+
+    *   tag
+
+        String.
+
+        Filter by this tag.
+
+    *   count
+
+        Int.
+
+        Number of posts to return. Default is 20; maximum is 100
+
+    Returns a list of *Net::Delicious::Post* objects when called in an array
+    context.
+
+    Returns a *Net::Delicious::Iterator* object when called in a scalar
+    context.
+
+  $obj->all_posts()
+    Returns a list of *Net::Delicious::Post* objects when called in an array
+    context.
+
+    Returns a *Net::Delicious::Iterator* object when called in a scalar
+    context.
+
+    If no posts have been added between calls to this method, it will return
+    an empty list (or undef if called in a scalar context.)
+
+  $obj->posts(\%args)
+    Get a list of posts on a given date, filtered by tag. If no date is
+    supplied, most recent date will be used.
+
+    Valid arguments are :
+
+    *   tag
+
+        String.
+
+        Filter by this tag.
+
+    *   dt
+
+        String.
+
+        Filter by this date.
+
+    Returns a list of *Net::Delicious::Post* objects when called in an array
+    context.
+
+    Returns a *Net::Delicious::Iterator* object when called in a scalar
+    context.
+
+TAG METHODS
+  $obj->tags()
+    Returns a list of tags.
+
+  $obj->rename_tag(\%args)
+    Renames tags across all posts.
+
+    Valid arguments are :
+
+    *   old
+
+        String. *required*
+
+        Old tag
+
+    *   new
+
+        String. *required*
+
+        New tag
+
+    Returns true or false.
+
+  $obj->all_posts_for_tag(\%args)
+    This is a just a helper method which hides a bunch of API calls behind a
+    single method.
+
+    Valid arguments are :
+
+    *   tag
+
+        String. *required*
+
+        The tag you want to retrieve posts for.
+
+    Returns a list of *Net::Delicious::Post* objects when called in an array
+    context.
+
+    Returns a *Net::Delicious::Iterator* object when called in a scalar
+    context.
+
+BUNDLE METHODS
+  $obj->bundles()
+    Returns a list of *Net::Delicious::Bundle* objects when called in an
+    array context.
+
+    Returns a *Net::Delicious::Iterator* object when called in a scalar
+    context.
+
+  $obj->set_bundle(\%args)
+    Valid arguments are :
+
+    *   bundle
+
+        String. *required*
+
+        The name of the bundle to set.
+
+    *   tags
+
+        String. *required*
+
+        A space-separated list of tags.
+
+    Returns true or false
+
+  $obj->delete_bundle(\%args)
+    Valid arguments are :
+
+    *   bundle
+
+        String. *required*
+
+        The name of the bundle to set
+
+    Returns true or false
+
+HELPER METHODS
+  $obj->logger()
+    Returns a Log::Dispatch object.
+
+  $obj->config(@args)
+    This is just a short-cut for calling the current object's internal
+    Config::Simple *param* method. You may use to it to get and set config
+    parameters although they will not be saved to disk when the object is
+    destroyed.
+
+  $obj->username()
+    Returns the del.icio.us username for the current object.
+
+  $obj->password()
+    Returns the del.icio.us password for the current object.
+
+  $object->user_agent()
+    This returns the objects internal LWP::UserAgent in case you need to
+    tweak timeouts, proxies, etc.
+
+    By default the UA object enables the *proxy_env* glue.
+
+ERRORS
+    Errors are logged via the object's *logger* method which returns a
+    *Log::Dispatch* object. If you want to get at the errors it is up to you
+    to provide it with a dispatcher.
+
+VERSION
+    1.13
+
+DATE
+    $Date: 2008/03/03 16:55:04 $
+
+AUTHOR
+    Aaron Straup Cope <ascope@cpan.org>
+
+SEE ALSO
+    http://del.icio.us/doc/api
+
+NOTES
+    This package implements the API in its entirety as of *DATE*.
+
+LICENSE
+    Copyright (c) 2004-2008, Aaron Straup Cope. All Rights Reserved.
+
+    This is free software, you may use it and distribute it under the same
+    terms as Perl itself.
+

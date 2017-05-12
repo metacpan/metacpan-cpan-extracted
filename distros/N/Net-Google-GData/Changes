@@ -1,0 +1,11 @@
+Revision history for Net-Google-GData
+
+0.03      2012-12-25 22:41:43 America/Boise
+
+0.02      2012-12-25 22:39:55 America/Boise
+  Convert to Dist::Zilla
+  Make tests pass so cpantesters will stop choking on this module.
+
+0.01      2007-06-21 23:20:00 America/Boise
+  First version, released on an unsuspecting world.
+

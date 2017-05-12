@@ -1,0 +1,11 @@
+INPUT
+T_PTROBJ_CURL
+	$var = ($type) perl_curl_getptr_fatal( aTHX_ $arg,
+		&perl_curl_${my$n=$ntype;$n=~s/.*::(.)/\l$1/;\$n}_vtbl,
+		\"$var\", \"$ntype\" );
+
+TYPEMAP
+Net::Curl::Easy T_PTROBJ_CURL
+Net::Curl::Form T_PTROBJ_CURL
+Net::Curl::Multi T_PTROBJ_CURL
+Net::Curl::Share T_PTROBJ_CURL

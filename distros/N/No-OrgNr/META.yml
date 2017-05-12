@@ -1,0 +1,29 @@
+---
+abstract: "Utility functions for Norwegian organizations' ID numbers"
+author:
+  - 'Geir Myklebust <geirmy@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: No-OrgNr
+provides:
+  No::OrgNr:
+    file: lib/No/OrgNr.pm
+    version: v0.9.3
+requires:
+  Net::Whois::Norid: '0'
+  Net::Whois::Raw: '2.76'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/geirmyk/No-OrgNr/issues
+  homepage: https://metacpan.org/pod/No::OrgNr
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/geirmyk/No-OrgNr
+version: v0.9.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

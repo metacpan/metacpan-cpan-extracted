@@ -1,0 +1,24 @@
+---
+abstract: 'LWP::UserAgent base easy web access module.'
+author:
+  - 'root <root@localdomain>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.112621'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-WebCL
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTTP::Cookies: 6.01
+  HTTP::Request::Common: 6.06
+  LWP: 6.05
+version: 0.03

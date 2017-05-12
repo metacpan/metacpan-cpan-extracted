@@ -1,0 +1,39 @@
+---
+abstract: 'A rateless forward error correction scheme'
+author:
+  - 'Declan Malone <idablack@users.sourceforge.net>'
+build_requires:
+  ExtUtils::CBuilder: 0
+  Module::Build: 0.40
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.4
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4001, CPAN::Meta::Converter version 2.120921'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-OnlineCode
+provides:
+  Net::OnlineCode:
+    file: lib/Net/OnlineCode.pm
+    version: 0.04
+  Net::OnlineCode::Bones:
+    file: lib/Net/OnlineCode/Bones.pm
+    version: 0.04
+  Net::OnlineCode::Decoder:
+    file: lib/Net/OnlineCode/Decoder.pm
+    version: 0.04
+  Net::OnlineCode::Encoder:
+    file: lib/Net/OnlineCode/Encoder.pm
+    version: 0.04
+  Net::OnlineCode::GraphDecoder:
+    file: lib/Net/OnlineCode/GraphDecoder.pm
+    version: 0.04
+  Net::OnlineCode::RNG:
+    file: lib/Net/OnlineCode/RNG.pm
+    version: 0.04
+resources:
+  license: http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+version: 0.04

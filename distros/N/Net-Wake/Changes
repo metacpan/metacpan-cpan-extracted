@@ -1,0 +1,5 @@
+0.02 Wed Jun 11 13:44:20 PDT 2003
+	- added support for broadcasting with by_udp().
+
+0.01 Sat May 15 10:28:15 PDT 1999
+	- original version; created by h2xs 1.16

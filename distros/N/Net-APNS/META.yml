@@ -1,0 +1,29 @@
+---
+abstract: 'Apple Push Notification Service for perl.'
+author:
+  - 'haoyayoi <st.hao.yayoi@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.02'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-APNS
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Any::Moose: 0.10
+  Filter::Util::Call: 0
+  JSON::XS: 2.25
+  Net::SSLeay: 1.35
+  Sub::Exporter: 0.982
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.0202

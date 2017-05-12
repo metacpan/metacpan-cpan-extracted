@@ -1,0 +1,33 @@
+NetStumbler-MapPoint version 0.01
+=================================
+
+Version 0.01 -- 5/29/2004
+	-- Initial version of MapPoint
+This modules is for use with NetStumbler/Kismet/iStumbler
+it was initially created for use with perl scripts under netstumbler, hence the netstumbler
+package name. Got a better suggestion for a package name send me an email to
+washu@olypmus.net. This package provides a methods to parse NetStumbler files
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Salvatore E. ScottoDiLuzio
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

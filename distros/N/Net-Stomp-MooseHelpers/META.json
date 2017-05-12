@@ -1,0 +1,82 @@
+{
+   "abstract" : "set of helper roles and types to deal with Net::Stomp",
+   "author" : [
+      "Gianni Ceccarelli <gianni.ceccarelli@net-a-porter.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Stomp-MooseHelpers",
+   "no_index" : {
+      "directory" : [
+         "t/lib"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Temp" : "0",
+            "List::Util" : "1.33",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util" : "0",
+            "MooseX::Role::WithOverloading" : "0",
+            "MooseX::Types" : "0",
+            "MooseX::Types::Common::Numeric" : "0",
+            "MooseX::Types::Moose" : "0",
+            "MooseX::Types::Path::Class" : "0",
+            "MooseX::Types::Structured" : "0",
+            "Net::Stomp" : "0.51",
+            "Net::Stomp::Frame" : "0",
+            "Path::Class" : "0",
+            "Throwable" : "0",
+            "Time::HiRes" : "0",
+            "Try::Tiny" : "0",
+            "namespace::autoclean" : "0",
+            "overload" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Printer" : "0",
+            "File::Find" : "0",
+            "Test::Deep" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/dakkar/Net-Stomp-MooseHelpers.git",
+         "web" : "https://github.com/dakkar/Net-Stomp-MooseHelpers"
+      }
+   },
+   "version" : "2.9"
+}
+

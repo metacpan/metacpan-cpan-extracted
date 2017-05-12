@@ -1,0 +1,33 @@
+---
+abstract: 'Libraries shared between Net::OpenID::Consumer and Net::OpenID::Server'
+author:
+  - 'Robert Norris <rob@eatenbyagrue.org>'
+  - 'Roger Crew <crew@cs.stanford.edu>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-OpenID-Common
+requires:
+  Crypt::DH::GMP: '0.00011'
+  Encode: '0'
+  HTML::Parser: '3.40'
+  HTTP::Headers::Util: '0'
+  HTTP::Message: '5.814'
+  HTTP::Request: '0'
+  HTTP::Status: '0'
+  MIME::Base64: '0'
+  Math::BigInt: '0'
+  Time::Local: '0'
+  XML::Simple: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-OpenID-Common
+  homepage: http://groups.google.com/group/openid-perl
+  repository: git://github.com/wrog/Net-OpenID-Common.git
+version: '1.20'

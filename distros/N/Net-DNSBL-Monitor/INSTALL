@@ -1,0 +1,27 @@
+
+INSTALL version 1.00 Sat Jan 19 11:08:16 PST 2008
+
+Installation of Net::DNSBL::Monitor is straightforward.
+
+	tar -xzvf Net-DNSBL-Monitor-version.string.tgz
+	cd Net-DNSBL-Monitor-version.string
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Copy the script file 'dnsblmon' and its companion sample
+configuration file to the user/directory of your choice.
+
+Edit the configuration file to include those DNSBL's you 
+wish to profile and adjust the 'FILES' key to point to
+the ip list(s) you wish to use.
+
+Run the script from cron or by hand 
+
+	./dnsblmon path/to/config.file
+
+This will print the report to standard output or you can
+pipe it to a file.
+

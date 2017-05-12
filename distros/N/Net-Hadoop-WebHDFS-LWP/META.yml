@@ -1,0 +1,57 @@
+---
+abstract: 'Client library for Hadoop WebHDFS and HttpFs, with Kerberos support'
+author:
+  - 'David Morel <david.morel@amakuru.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  HTTP::Message: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  LWP: '0'
+  Net::Hadoop::WebHDFS: '0.7'
+  Ref::Util: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - hadoop
+  - yarn
+  - hdfs
+  - webhdfs
+  - filesystem
+  - rest
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Hadoop-WebHDFS-LWP
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  HTML::Parser: '0'
+  HTTP::Request::StreamingUpload: '0'
+  LWP::Authen::Negotiate: '0'
+  LWP::UserAgent: '0'
+  Net::Hadoop::WebHDFS: '0.7'
+  Ref::Util: '0'
+  Scalar::Util: '0'
+  constant: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Perl-Hadoop/Net-Hadoop-WebHDFS-LWP/issues
+  repository: git://github.com/Perl-Hadoop/Net-Hadoop-WebHDFS-LWP.git
+version: '0.010'
+x_contributors:
+  - 'Burak Gursoy <burak@cpan.org>'
+  - 'David Morel <dmor@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

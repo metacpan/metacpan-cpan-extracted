@@ -1,0 +1,48 @@
+Revision history for Perl extension Net::QMTP.
+$Id: Changes,v 1.8 2004/11/02 14:59:33 james Exp $
+
+0.06  Tue 2 Nov 2004 14:56:33 GMT
+	Fix a bug on platforms that distinguish between binary and text
+	 files.
+
+0.05  Tue Jun 24 18:26:04 IST 2003
+	This release of Net::QMTP has changed to move all netstring
+	 handling out to the Text::Netstring module. You require version
+	 0.04 or later of Text::Netstring. 
+
+0.04  Thu Jan 30 19:56:47 GMT 2003
+	Timeout constructor option renamed to ConnectTimeout.
+	Better protocol compliance: invalid responses from servers
+	 dealt with, preliminary support for the one hour session
+	 limit. This is not yet enabled.
+	IO::Socket eof and/or errors dealt with much better.
+	More debugging output and POD updates.
+	Fixed bug affecting message_from_file() and check that file
+	 size doesn't change while file is being sent.
+
+0.03  Wed Jan 29 16:18:39 GMT 2003
+	The host() method has been renamed to server().
+	ManualConnect constructor option renamed to DeferConnect.
+	Inverted logic bug fixed in above.
+	Constructor accepts Port option to connect to alternative port
+	 on QMTP server.
+	Constructor accepts Timeout option to specify timeout used by
+	 our socket.
+	reconnect() method will disconnect the existing socket if
+	 necessary.
+	Copious amounts of debugging output added.
+	Reword some POD docs and update for the above changes.
+
+0.02  Tue Jan 28 20:24:23 GMT 2003
+	Write new POD and fix some broken old POD.
+	Implement some similar protocol checks as serialqmtp.
+	New methods: new_message, new_envelope, disconnect, reconnect and
+	 a destructor.
+	send() performs a basic sanity check before attempting to send a
+	 message.
+	new() accepts hash key arguments; ManualConnect and Debug.
+	Code cleanup w.r.t precedence and die vs. croak, et al.
+
+0.01  Mon Jan 27 11:31:59 2003
+	First release.
+	- original version; created by h2xs 1.19

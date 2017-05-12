@@ -1,0 +1,59 @@
+{
+   "abstract" : "A simple module to access SugarCRM via Rest services",
+   "author" : [
+      "Nito Martinez <Nito@Qindel.ES>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "gpl_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-SugarCRM",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "0",
+            "DateTime" : "0",
+            "File::Spec" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Log::Log4perl" : "0",
+            "Moose" : "0",
+            "Readonly" : "0",
+            "Try::Tiny" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::SugarCRM" : {
+         "file" : "lib/Net/SugarCRM.pm",
+         "version" : "3.23144"
+      },
+      "Net::SugarCRM::Entry" : {
+         "file" : "lib/Net/SugarCRM/Entry.pm",
+         "version" : "3.20471"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+      ]
+   },
+   "version" : "3.23144",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

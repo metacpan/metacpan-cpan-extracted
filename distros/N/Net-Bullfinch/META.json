@@ -1,0 +1,58 @@
+{
+   "abstract" : "Perl wrapper for talking with Bullfinch",
+   "author" : [
+      "Cory G Watson <gphat@cpan.org>",
+      "Stevan Little <stevan.little@iinteractive.com>",
+      "Jay Hannah <jay.hannah@iinteractive.com>",
+      "Trey Bianchini <trey.bianchini@iinteractive.com>",
+      "Jesse Luehrs <doy@tozt.net>",
+      "Florian Ragwitz <rafl@debian.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Bullfinch",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Stream::Bulk" : "0",
+            "Data::Stream::Bulk::DoneFlag" : "0",
+            "Data::UUID" : "0",
+            "JSON::XS" : "0",
+            "Memcached::Client" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::Params::Validate" : "0",
+            "MooseX::Types::DateTime" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.16"
+}
+

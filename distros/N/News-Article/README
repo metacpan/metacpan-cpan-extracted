@@ -1,0 +1,84 @@
+News::Article - Object for handling Usenet articles in mail or news form.
+
+    Copyright 1997 by Andrew Gierth <andrew@erlenstar.demon.co.uk>.
+    All rights reserved.
+    This program is free software; you may redistribute it and/or 
+    modify it under the same terms as Perl itself.
+
+MODULES
+
+  News::Article
+  News::AutoReply
+  News::FormArticle
+  News::FormReply
+
+STATUS
+
+  This release is considered reasonably stable, both in functionality
+  and interface.
+
+INTRODUCTION
+
+  This module originated with the development of the software intended
+  to handle newsgroup creation for the (new) mod.* Usenet hierarchy.
+  The requirement to centralise, and fully automate, the process of
+  group creation and the detection of defunct groups led to a large
+  number of cases where the software would be required to read, parse,
+  forward, reply to, mail and post articles of various forms.
+
+  Therefore, this module allows for creating articles from scratch, or
+  reading them from various data sources; various header
+  manipulations, and posting via NNTP or mailing via a
+  sendmail-workalike.
+
+  Support is included for PGPMoose v1.1-compatible signatures, and
+  also for control-message signatures believed to be compatible with
+  current distributions of signcontrol and pgpverify.
+
+  FormArticle is a derivative, intended for the construction of news
+  articles (or mail messages) by substitutions into boilerplate text.
+  AutoReply and FormReply are additional (very simple) derivatives.
+
+REQUIREMENTS
+
+  This probably won't work except on Unix or a very good imitation.
+
+  Net::Domain
+  Net::NNTP
+  PGP::Sign
+
+  (It would be nice to weaken these dependencies somewhat.)
+
+  Mailing articles requires a sendmail-workalike (normally
+  /usr/lib/sendmail or /usr/sbin/sendmail).
+
+INSTALLATION
+
+  Review the "System Dependent Configuration" section near the
+  beginning of Article.pm. If it would fail to find a working sendmail
+  on your system, and you care, then fix it as necessary.
+
+  Then follow the standard installation procedure for Perl modules,
+  which is to type the following commands:
+
+        perl Makefile.PL
+        make
+        make install
+
+  You'll probably need to do the last as root.  A testsuite (though not
+  an extensive one yet) is supplied.
+
+THANKS
+
+  Thanks to Russ Allbery <rra@stanford.edu> for comment and
+  significant contributions.
+
+AUTHOR
+
+  Andrew Gierth <andrew@erlenstar.demon.co.uk>
+
+AVAILABILITY
+
+  CPAN, or see http://www.erlenstar.demon.co.uk/perl
+
+END

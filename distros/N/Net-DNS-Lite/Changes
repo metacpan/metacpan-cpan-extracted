@@ -1,0 +1,38 @@
+Revision history for Perl extension Net::DNS::Lite
+
+0.12
+	- fix handling of MX records (by fujiwara)
+
+0.11
+	- ignore ipv6 addresses in resolve.conf, since we do not yet support DNS queries transferred over IPv6
+
+0.10
+	- fix documentation issue (by tokuhirom)
+
+0.09
+	- support for the "attempts" field in resolve.conf (by kazeburo)
+0.08
+	- temporary disable timeout test (due to the expiration of the domain used for testing)
+
+0.07
+	- remove implicit dependency on AnyEvent
+
+0.06
+	- do not send unnecessary packets on DNS timeout
+
+0.05
+	- add support for internal cache
+
+0.04
+	- reopen udp socket when pid changes
+
+0.03
+	- (hopefully) fix compatibility issues with the tar archive
+
+0.02
+	- (hopefully) fix compatibility issues with the tar archive
+	- proper handling of query ids (generation using random and reuse list)
+	- more tests
+
+0.01
+	- initial release

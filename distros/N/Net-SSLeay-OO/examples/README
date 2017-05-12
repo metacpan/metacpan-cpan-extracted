@@ -1,0 +1,22 @@
+README for Net::SSLeay::OO examples
+-----------------------------------
+Currently the examples in this directory are ... well, sparse.
+
+I prefer examples in the form of tests which are actually run at to
+verify that new changes work, rather than example scripts which IME
+tend to bit-rot.
+
+However there are a number of examples that come with Net::SSLeay, and
+by and large they should be relatively easy to port to Net::SSLeay::OO.
+All of the examples in the Net::SSLeay distribution are included in
+the git source, but only the ones finished are included in the
+MANIFEST and shipped with the distribution.
+
+Should you find one in there you like, and feel inclined to port it to
+the new API, then please do and submit it for inclusion with the main
+module.  Submitting a change for this project is as simple as forking
+it on github, making signed-off commits and then sending a pull
+request!
+
+Enjoy,
+Sam Vilain.

@@ -1,0 +1,124 @@
+                 Net::DBus::GLib
+                 ===============
+
+Net::DBus::GLib provides a Perl XS API to the dbus glib bindings.
+Currently it performs integration with the glib main loop context.
+For more information on dbus visit the project website at:
+
+  http://www.freedesktop.org/software/dbus/
+
+This version operates against DBus 0.33, through 1.1.2 and 
+probably later versions, if there have been no serious API 
+changes. It works against dbus-glib 033, through 0.73 and
+probably later versions.
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   sudo make install
+
+The makefile calls the C<pkg-config> script to determine the
+correct flags to pass to the compiler & linkers when building
+the XS part of the module. Thus, ensure pkg-config is in
+a directory listed by the $PATH environment. 
+
+The pkg-config program will likely find the DBus install in /usr
+provided by the base OS distribution, so if testing against an 
+alternate  install of DBus, set the $PKG_CONFIG_PATH env 
+variable before generating the Makefile. For example, if your 
+dbus installation is in C<$HOME/usr/dbus-cvs-tip> , then to build
+and install against this version of DBus do
+
+   export PKG_CONFIG_PATH=$HOME/usr/dbus-cvs-tip/lib/pkg-config
+   perl Makefile.PL PREFIX=$HOME/usr/dbus-cvs-tip
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+------------
+
+This module requires the following:
+
+  Net::DBus
+  Glib
+  dbus-glib
+
+And to run the test suite:
+
+  Test::More
+  Test::Pod (optional, but recommended)
+  Test::Pod::Coverage (optional, but recommended)
+
+Although they are not part of the base Perl distribution, most 
+OS distributor will already provide addon packages containing
+these modules. Failing this, they are all available from CPAN
+http://search.cpan.org/
+
+EXAMPLES
+--------
+
+There are a number of example programs in the examples/
+subdirectory demonstrating use of the high level application
+developer APIs.
+
+  example-service.pl         - Providing a simple service
+  example-client.pl          - Talking to a remote service
+
+CONTRIBUTIONS
+-------------
+
+Contributions both simple bug fixes & new features are
+always welcome. Please supply patches in context, or
+unified diff format. A simple method to generate such a
+patch is as follows:
+
+  * Clean out generated files from your working
+    directory:
+
+        make distclean
+
+  * Rename your working directory to have '-new'
+    extension:
+
+        mv Net-DBus-GLib-0.33.0 Net-DBus-GLib-0.33.0-new
+
+  * Extract a pristine copy of the source:
+
+        gunzip -c Net-DBus-GLib-0.33.0.tar.gz | tar xf -
+        mv Net-DBus-GLib-0.33.0 Net-DBus-GLib-0.33.0-orig
+
+  * Generate the patch:
+
+        diff -ruNp Net-DBus-GLib-0.33.0-orig Net-DBus-GLib-0.33.0-new \
+          > Net-DBus-GLib-0.33.0-[something].patch
+        gzip Net-DBus-GLib-0.33.0-[something].patch
+
+
+Send the resulting to .patch.gz file directly to 
+Daniel Berrange <dan at berrange dot com>
+
+Copyright (C) 2006-2008 Daniel Berrange
+
+Net-DBus-GLib may be redistributed and/or modified under the terms of Perl itself.
+Either:
+
+a) the GNU General Public License as published by the Free
+   Software Foundation; either version 2, or (at your option) any
+   later version
+
+or
+
+b) the "Artistic License"
+
+
+See the LICENSE file for further information
+
+-- End
+

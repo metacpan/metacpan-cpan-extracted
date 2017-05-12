@@ -1,0 +1,58 @@
+Revision history for Net-Fluidinfo
+
+0.45    2012-02-12
+
+        * Quick fix.
+
+0.44    2012-02-11
+
+        * Fluidinfo no longer has sets of strings, now they
+          are lists of strings. This is a change that has
+          been deployed but not yet announcent.
+
+        * Updates copyrights.
+
+0.43    2011-12-27
+
+        * Changes the random name generator of the test suite
+          to workaround a new issue in Fluidinfo itself with
+          tag names containing colons, seen as 500s while
+          running some tests.
+
+        * Documentation improvements.
+
+0.42    2011-10-25
+        * /policies is gone and so is Net::Fluidinfo::Policy,
+          now permissions inherit defaults from their parent.
+
+        * Now there's a delay between tagging and being able
+          to search against that tag. The test suite has been
+          revised to tolerate such delays.
+
+        * Net::Fluidinfo::ACL is gone, it was a common ancestor
+          for policies and permissions only meant to be used
+          through inheritance.
+
+        * The methods Net::Fluidinfo->get_permission, and
+          Net::Fluidinfo::Permission::get accept a namespace
+          or tag in addition to a path.
+
+        * Documents the new recommended idioms for creation of
+          namespaces and tags.
+
+        * Documents that all tags are indexed nowadays. Thus,
+          the indexed flag is kept to mirror the Fluidinfo API,
+          but the user can no longer set it.
+
+0.41    2011-08-16
+        * Changes are no longer available in searches immediately.
+          This release only adds a delay tolerance to the test suite.
+
+0.40    2011-03-20
+        * FluidDB has been renamed to Fluidinfo. This module is a
+          rename of Net:FluidDB at version 0.30. Net::FluidDB is
+          not going to be maintained anymore, development continues
+          here.
+
+        * To migrate a program that used Net::FluidDB basically
+          s/FluidDB/Fluidinfo/g, and s/fdb/fin/g.

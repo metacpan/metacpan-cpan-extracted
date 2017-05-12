@@ -1,0 +1,50 @@
+<pre>
+===========================================
+      Compare source and executed
+Debug info generted by plugin/debug_info.pl
+===========================================
+
+Template.....: [{: $ object :}]
+Parent.......: [{: $ parent :}]
+Interactions.: [{: $ interactions :}]
+Scripts......: [{: $ scripts :}]
+
+==============
+  The Source 
+==============
+{: $ source :}
+
+==============
+  The Out 
+==============
+{: $ out :}
+{: ~ $top_template 
+URL..........: [{: $ url :}]
+Template.....: [{: $ object :}]
+Headers......: [{: $ headers :}]
+Cookies......: [{: $ cookies :}]
+GET..........: [{: $ GET :}]
+POST.........: [{: $ POST :}]
+Scripts......: [{: $ scripts :}]
+Go to........: <a href="http://nes.sourceforge.net/miniblog/en/?item=Tutorial">Tutorial</a>
+
+=============================
+  Nes .nes.cfg variables
+=============================
+{: @ (cfg) 
+{: @$ cfg.key :} = [{: @$ cfg.value :}] :}
+
+=============================
+  Nes environment variables
+=============================
+{: @ (env_nes) 
+{: @$ env_nes.key :} = [{: @$ env_nes.value :}] :}
+
+=============================
+  CGI environment variables
+=============================
+{: @ (env_cgi) 
+{: @$ env_cgi.key :} = [{: @$ env_cgi.value :}] :}
+
+:}
+</pre>

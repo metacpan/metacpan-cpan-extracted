@@ -1,0 +1,45 @@
+This area contains sample programs that exercise all three of the APIs
+supported by this module.  The programs for each API are contained in
+separate subdirectories:
+
+net-z3950-zoom -- Test programs using the low-level Net::Z3950::ZOOM
+	API, which is an as-literal-as-possible translation of the
+	ZOOM-C API.  You should almost certainly not bother reading
+	these programs: they are for the benefit of the module
+	maintainers.
+
+zoom -- Test programs using the object-oriented ZOOM interface, which
+	is a nice, Perlish interpretation of the ZOOM abstract API as
+	documented at http://zoom.z3950.org/api/
+
+net-z3950 -- Test programs using the obsolescent Net::Z3950 interface,
+	which is provided by this distribution as a plug-compatible
+	replacement for the old Net::Z3950 module.  There is no reason
+	to use this API unless you are maintaining an existing
+	application that uses Net::Z3950.
+
+In general, each sample program exists in a different version in all
+three directories, under the same name in each.  The programs are:
+
+zoomtst1.pl -- A direct translation of the "zoomtst1.c" application
+	from the YAZ distribution, except that these versions go on to
+	fetch the records that they find, whereas the C version is
+	satisfied just to get the hit count.
+
+zoomtst3.pl -- A direct translation of the "zoomtst3.c" application
+	from the YAZ distribution -- simultaneous search of multiple
+	targets.  Pretty cool :-)
+
+async.pl -- A slightly cleverer version of "zoomtst3.pl" which takes
+	advantage of the new END element introduced in YAZ 2.1.17 to
+	display each server's records as soon as they have been
+	received, rather than waiting until all servers have finished
+	their jobs as in every previous ZOOM-based multiplexer.
+
+update.pl -- Create a new database and add a record to it.
+
+In addition, this "sample" directory contains sample records that are
+used by the test-suite to exercise the update functionality.  These
+are found in the "records" subdirectory.  It also provides a
+CQL-to-PQF mapping file (copied blindly from the one in the YAZ
+distribution), found in the "cql" directory.

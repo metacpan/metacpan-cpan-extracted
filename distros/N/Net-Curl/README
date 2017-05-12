@@ -1,0 +1,65 @@
+** Net::Curl 0.37 **
+
+STATUS: This package is working and the interface is mostly stable.
+
+** BUILDING **
+- you need libcurl 7.15.5 or newer, try to get one as recent as you can
+  * it is highly suggested to build libcurl with asynchdns (c-ares) support
+    (besides the usual extensions: libz, ssl)
+
+- you should have ExtUtils::PkgConfig installed, it should pick all the
+  libcurl options needed to build this module
+  * if the above isn't working for you, you can edit Makefile.PL,
+    there is a %curl hash on the top of the file, which should be filled
+    with correct value
+
+- have in mind that tests depend on network availability and may not cover
+  all the quirks found in your operating system, some of them even depend on
+  proper timing, so sometimes they could fail without an apparent reason
+  (in case of very slow network connection or very heavily loaded system)
+
+
+
+** WWW::Curl compatibility **
+
+For packages requiring WWW::Curl you can use Net::Curl instead of WWW::Curl
+if you don't want to install WWW::Curl in your system. Can be useful in
+space-constrained systems if you already have something that requires
+Net::Curl anyways.
+
+Set environment variable WWW_COMPAT to "ext" before calling Makefile.PL
+to install WWW/Curl/* wrapper files directly.
+
+By default build system creates Net::Curl::Compat package which can be used
+to enable WWW::Curl compatibility in Net::Cutl, but it must be loaded manually
+before something tries to use WWW::Curl.
+
+
+** WARNING **
+- pushopt() may disappear yet.
+
+
+** TODO **
+
+XS:
+- under coro and threads, when forcibly destroyed, there are some ways to
+  make it leak or double-free memory, must be investigated further.
+
+Easy:
+- test callback arguments just before perform (maybe only for default writers)
+- write more documentation
+- in case of multi interface CLOSESOCKET will be called long after destroying
+  the easy handle, this will be deadly
+
+Form:
+- implement read callback
+- write more documentation
+
+Multi:
+- write more documentation
+
+Share:
+- write more documentation
+
+tests:
+- review and renumerate

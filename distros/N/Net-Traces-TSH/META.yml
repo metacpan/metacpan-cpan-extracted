@@ -1,0 +1,10 @@
+--- #YAML:1.0
+name: Net-Traces-TSH
+version: 0.16
+license: perl
+distribution_type: module
+requires:
+  perl: 5.6.1
+  Carp: 0
+dynamic_config: 0
+generated_by: Kostas Pentikousis

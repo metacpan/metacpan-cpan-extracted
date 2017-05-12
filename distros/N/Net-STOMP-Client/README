@@ -1,0 +1,57 @@
+Net-STOMP-Client
+
+This module provides an object oriented client interface to interact
+with servers supporting STOMP (Streaming Text Orientated Messaging
+Protocol). It supports the major features of messaging brokers: SSL,
+asynchronous I/O, receipts and transactions.
+
+Note: This module has been initially released on CPAN as Net::STOMP
+but has later been renamed to Net::STOMP::Client to avoid a naming
+conflict.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+To test this module with a STOMP broker, see t/2broker.t.
+
+In addition to the mandatory modules listed in Makefile.PL, the
+following optional modules do bring extra functionality:
+
+    Authen::Credential - allows easy authentication support
+    IO::Socket::SSL - allows using STOMP over SSL
+    Messaging::Message - allows frame <-> message conversions
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::STOMP::Client
+    perldoc Net::STOMP::Client::Auth
+    perldoc Net::STOMP::Client::Connection
+    perldoc Net::STOMP::Client::Frame
+    perldoc Net::STOMP::Client::HeartBeat
+    perldoc Net::STOMP::Client::IO
+    perldoc Net::STOMP::Client::Peer
+    perldoc Net::STOMP::Client::Receipt
+    perldoc Net::STOMP::Client::Version
+
+You can find some examples in the eg directory and a detailed tutorial:
+
+    perldoc Net::STOMP::Client::Tutorial
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) CERN 2010-2017
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

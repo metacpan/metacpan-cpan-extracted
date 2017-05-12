@@ -1,0 +1,302 @@
+#!/usr/bin/perl -w
+
+#
+# $Revision: 1.22 $
+# $Author: aryeh $
+# $Date: 2001/10/31 17:19:25 $
+#
+
+use strict;
+use lib '.';
+use Net::AIM;
+
+$|=1;
+
+if (@ARGV != 2) {
+	print "Usage: $0 <screenname> <password>\n";
+	exit;
+}
+
+my $DEBUG = 0;
+
+my $aim = new Net::AIM;
+$aim->debug(1) if ($DEBUG);
+
+print "Creating connection to AIM server...\n";
+$aim->newconn(  Screenname => $ARGV[0],
+	 Password => $ARGV[1],
+	 AutoReconnect => 1
+      ) or die "aimtest: Can't connect to AIM server.\n";
+
+my $conn = $aim->getconn();
+my @zippy = ('Someday, when I\'m awfully low, And the world is cold, I will feel a glow just thinking of you, and the way you look tonight',
+ 'Put your hand inside the puppet head',
+ 'The best thing about New York City is Naomi',
+ "When you're following an angel\nDoes it mean you have to throw your body off a building?",
+ 'Let it be known that all women suffer from: GENDER SPECIFIC CONFUSION',
+ 'Commonsense is not that common!',
+ 'Build a little birdhouse in your soul',
+ "He wants a shoehorn, the kind with teeth\nPeople should get beat up for stating their beliefs",
+ 'Because it jiggles!',
+ 'All your base are belong to us!',
+ 'Cheeses loves ya!    - The Messy Gourmet', 
+
+ 'KILLROY KILLROY'
+ );
+
+# Hmmmm objects - altered in functions?... aahhh its a test script
+my %suspects = ();
+my %stats = ();
+my %speed_limit = ();
+my %user_times = ();
+my %morons = (
+   'ph0enix23a' => 5,
+   'interkom1a ' => 5,
+   'xXxHUHUxXx' => 5
+);
+
+# Choose a random quote from the @zippy array.
+sub pickrandom { return $zippy[ rand scalar @zippy ]; }
+
+# What to do when we receive an IM 
+sub on_im {
+   my ($self, $evt, $from, $to) = @_;
+   my $args = $evt->args();
+   my ($nick, $auto_msg, $msg) = @$args;
+
+   $stats{msgs_received}++;
+
+   chomp($msg);
+   my $stripped = $msg;
+   $stripped =~ s/<[^>]+>//g;
+   $stripped =~ s/^\s+//g;
+
+   my $time = time;
+   print "$nick:  $stripped" , "\n";
+
+
+   $self->{_last_msg_dest} = $from;
+
+   # Lets log it...
+   if (open(LOG, ">>aim.log")) {
+      print LOG "<$from> $msg\n";	
+      close LOG;
+   }
+
+   #  should we redirect msgs?
+   if (my $st = $self->get('redirect')) {
+      $self->send_im($st, $nick . ': ' . $msg);
+   }
+
+   $nick = $self->normalize($from);
+   if ( exists $morons{$nick}) {
+      $user_times{$nick} = $time;
+      $self->evil($nick);
+#      $self->send_im('myscreenname', 'I warned for a message ' . $nick);
+      return;
+   }
+   
+
+   unless (exists $user_times{$nick} && defined $user_times{$nick} ) {
+      $speed_limit{$nick} = 0;
+      $suspects{$nick} = 0;
+      $user_times{$nick} = 0;
+   }
+
+   if ($user_times{$nick} + 3 < $time) {
+      $user_times{$nick} = $time;
+      $speed_limit{$nick}-- if ($speed_limit{$nick} > 0);
+
+   if (my $v = $self->get('custmsg')) {
+      $self->send_im($nick, $v);
+      return;
+   }
+
+   if ($self->get('zipem')) {
+      $self->send_im($nick, &pickrandom()) unless ($self->normalize($nick) eq $self->normalize($self->{_conn}->screenname));  # Say a Zippy quote.
+   }
+
+   } else {
+      $user_times{$nick} = $time;
+      if (++$speed_limit{$nick} > 2) {
+	  $self->evil($nick);
+	  $speed_limit{$nick} = 0;
+	  if ($suspects{$nick}++ > 2) {
+	     $morons{$nick}++;
+	  }
+      } elsif ($speed_limit{$nick} == 2) {
+	 $self->send_im($nick, 'You better slow down!!!');
+      }
+   }
+
+}
+
+sub on_nick {
+	my ($self, $evt, $from, $to) = @_;
+	my $args = $evt->args();
+	my $nick = $args->[0];
+
+	print "*$nick* \n";
+}
+
+my %users_online;
+sub on_update_buddy {
+   my ($self, $evt, $from, $to) = @_;
+   my ($nick) = $from;
+
+   my ($bud, $online, $evil, $signon_time, $idle_amount, $user_class) = @{$evt->args()};
+
+   #lets print out when users leave and when they enter;
+   if ($online eq 'T' && ! exists $users_online{$bud}) {
+      $users_online{$bud} = $signon_time;
+      print "$bud has signed on at " . scalar localtime($signon_time) . "\n";
+   } elsif ($online eq 'F') {
+      delete $users_online{$bud};
+      print "$bud has signed off at " . scalar localtime($signon_time)  . "\n";
+   }
+}
+
+sub on_config {
+   my ($self, $evt, $from, $to) = @_;
+	
+   my $str = shift @{$evt->args()};
+   $self->set_config_str($str, 1);
+
+#   $self->send_buddies;
+   $self->send_config();
+}
+
+sub on_error {
+   my ($self, $evt) = @_;
+   my ($error, @stuff) = @{$evt->args()};
+
+   my $errstr = $evt->trans($error);
+   $errstr =~ s/\$(\d+)/$stuff[$1]/ge;
+
+   print STDERR "ERROR: $errstr\n";
+}
+
+sub on_chat_left {
+   my ($self, $evt) = @_;
+
+   my ($id) = @{$evt->args()};
+   my $name = $self->get_roomname($id);
+
+   $self->del_roomname($id);
+   print "We left room $name\n";
+
+}
+
+
+sub on_chat_join {
+   my ($self, $evt) = @_;
+   my ($id, $name) = @{$evt->args()};
+
+   $self->set_roomname($id, $name);
+   print "We joined room $name\n";
+}
+
+
+sub on_chat_update_buddy {
+   my ($self, $evt) = @_;
+   my ($id, $inside, @users) = @{$evt->args()};
+
+   my $room = $self->get_roomname($id);
+   my %act = (
+   	'T' => 'entered',
+   	'F' => 'left'
+   );
+
+   foreach my $u (@users) {
+      print "$u has $act{$inside} $room\n";
+   }
+}
+
+
+sub on_chat_in {
+   my ($self, $evt) = @_;
+   my ($id, $user, $whisper, $msg) = @{$evt->args()};
+
+   my $action = 'said';
+   $action = 'whispered' if ($whisper =~ /T/i);
+
+   print $self->get_roomname($id) . "> $user $action $msg\n";
+	
+   if ($msg =~ /please leave/i) {
+      $self->chat_leave($id);
+   }
+}
+
+sub on_chat_invite {
+   my ($self, $evt) = @_;
+
+   my ($name, $id, $user, $msg) = @{$evt->args()};
+   print "Invited to room $name by $user\n";
+   $self->chat_accept($id);
+}
+
+sub on_eviled {
+   my ($self, $evt, $from, $to) = @_;
+	
+   my ($level, $culprit) = @{$evt->args};
+#	$culprit = 'An anonymous user' if ($culprit =~ /^\s*$/);
+   print "$culprit slapped us! Our evil level is now $level\n";
+
+   #should we hit them back twice??
+   
+   if ($culprit !~ /^\s*$/) {
+      $morons{$self->normalize($culprit)}++;
+
+      my $nick = $self->normalize($culprit);
+      if ( exists $morons{$nick}) {
+	 $self->evil($nick);
+	 sleep(1);
+	 $self->evil($nick);
+	 sleep(1);
+	 $self->evil($nick);
+#	 $self->send_im('myscreenname', 'I warned ' . $nick);
+	 return;
+      }
+
+#      $self->send_im('myscreenname', $culprit . ' eviled me that moron!');
+      $self->evil($culprit);
+      $self->evil($culprit);
+      $self->send_im($culprit, 'Yo what\'s your problem?');
+
+   } else {
+     my $lmd =  $self->{_last_msg_dest};
+     if (++$suspects{$lmd} > 3) {
+        $morons{$lmd}++;
+        $self->evil($lmd);
+     }
+
+   }
+}
+
+print "Installing handler routines...";
+
+$conn->set_handler('error',    \&on_error);
+$conn->set_handler('im_in',    \&on_im);
+$conn->set_handler('nick',    \&on_nick);
+$conn->set_handler('eviled',    \&on_eviled);
+$conn->set_handler('config',    \&on_config);
+$conn->set_handler('chat_join',    \&on_chat_join);
+$conn->set_handler('chat_left',    \&on_chat_left);
+$conn->set_handler('chat_in',    \&on_chat_in);
+$conn->set_handler('chat_invite',    \&on_chat_invite);
+$conn->set_handler('chat_update_buddy',    \&on_chat_update_buddy);
+$conn->set_handler('update_buddy',    \&on_update_buddy);
+#$conn->set_handler('goto_url',    \&on_goto_url);
+
+print " done.\n" if ($DEBUG);
+print "starting...\n" if ($DEBUG);
+
+# Looks like you need to add buddies
+$aim->add_buddy(0,'Buddies', ($ARGV[0]));
+
+#$aim->set('custmsg', "\nI think back and I remember.\nYou kissed with your eyes open.\nDid you not trust me?\nYou kissed without passion.\nDid you not love me?\nThis hurt me so.\nSo why did I fall in love with you?\n");
+
+#$aim->set('redirect', 'myscreenname');
+$aim->set('zipem', 1);
+
+$aim->start;

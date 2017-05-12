@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Net::ClientServer;
+
+my $port = 8012;
+my $platform = Net::ClientServer->new(
+    port => $port,
+#    stderr => './synopsis-stderr',
+    start => sub {
+        STDERR->print( "Listening to ", $port, "\n" );
+    },
+    serve => sub {
+        my $client = shift;
+        $client->print( "Yoink $0!\n" );
+        $client->close;
+    },
+);
+
+$platform->start;

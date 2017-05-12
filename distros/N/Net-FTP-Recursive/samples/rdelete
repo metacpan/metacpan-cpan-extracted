@@ -1,0 +1,50 @@
+#!/usr/bin/perl
+# $Id: rdelete,v 1.2 2008/02/04 00:56:51 jdl Exp $
+
+=pod
+
+=head1 NAME
+
+rdelete - Sample script to show you how to use the rdelete function.
+
+=head1 SYNOPSIS
+
+    % rdelete [--help] <server> <user> <password> <remote_path> <local_path>
+           [rdelete function arguments to set to true]
+
+=head1 DESCRIPTION
+
+This script is an example script for users of the C<Net::FTP::Recursive>
+module to be able to see how to utilize the C<rdelete> method in a script.
+
+=head1 AUTHOR
+
+Jeremiah Lee <texasjdl_AT_yahoo_DOT_com>
+
+=cut
+
+use Net::FTP::Recursive;
+use Pod::Usage;
+use Getopt::Long;
+use strict;
+use warnings;
+
+GetOptions( 'help|?' => sub { pod2usage(); }, );
+
+pod2usage() unless @ARGV >= 4;
+
+my $host        = shift;
+my $username    = shift;
+my $passwd      = shift;
+my $remote_path = shift; #where to delete
+
+my $ftp = Net::FTP::Recursive->new($host, Debug => 1);
+
+$ftp->login($username, $passwd) or die "Could not log in!";
+$ftp->binary();
+
+$ftp->cwd($remote_path);
+
+$ftp->rdelete( map{($_, 1)} @ARGV);
+
+$ftp->quit;

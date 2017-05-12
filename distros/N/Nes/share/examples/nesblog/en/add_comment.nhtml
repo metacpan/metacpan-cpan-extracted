@@ -1,0 +1,175 @@
+{: NES 1.0 ('../scripts/comments.cgi') :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  Nes 1.03 by Skriptke
+  Copyright 2009 - 2010 Enrique Castañón
+  Licensed under the GNU GPL.
+
+  Sample:
+  http://nes.sourceforge.net/
+
+  CPAN:
+  http://search.cpan.org/dist/Nes/
+
+  Repository:
+  http://github.com/Skriptke/nes
+
+  -----------------------------------------------------------------------------
+:}
+<a name="form_comment"></a>
+<div id="cuadro2">
+<center>
+{: ~ ( !*nes_session_ok && !$comment_send ) 
+    {: include ('{: * cfg_obj_form :}/multi_step.nhtml',
+                "
+                  form_name          => 'fnb_comment',
+                  captcha_name       => 'cnb_comment',
+                  id_form            => 'fnb_id',
+                  captcha_atempts    => '5/5',   
+                  show_captcha       => 1, 
+                  table_width        => '90%',
+                  action_form        => '#form_comment',
+                  msg_captcha        => '',
+                  msg_error_data     => '<b>There was an error in the database.</b>',
+                  msg_ok_data        => '<b>Thanks for your comment.</b>',
+                  
+                  to_database        => 'insert',
+                  to_table           => 'comments',
+                  to_fields_assort   => 
+                         {
+                           name      => 'name',
+                           email     => 'email',
+                           comment   => 'comment',
+                           article   => 'article',
+                           lang      => 'lang',
+                           date      => ':NOW()',
+                         },
+
+                  steps => 
+                      [  
+                        [   
+                          { 
+                            begin    => '<center>Comment: {: $ item_name :}</center><br>',
+                            name     => 'name', 
+                            msg      => 'Name:',
+                            type     => 'text',
+                            property => 'READONLY',
+                            value    => 'Anonymous',
+                            check    => ',,/^Anonymous$/',                            
+                            size     => 12,
+                          },
+                          { 
+                            name     => 'email', 
+                            msg      => 'Email (optional):',
+                            type     => 'text',
+                            size     => 12,
+                            check    => '0,50,/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i',
+                          },
+                          {
+                            name     => 'comment', 
+                            msg      => 'Comment:',
+                            type     => 'textarea',
+                            filter   => 'no_html,yes_br',
+                            cols     => 35,
+                            rows     => 7,
+                            check    => '10,255',
+                            end      => '',
+                          }, 
+                          {
+                            name     => 'article', 
+                            type     => 'hidden',
+                            value    => '{: $ item_name :}',
+                            check    => ',,/^{: $ item_name :}$/',
+                            msg_error=> '',
+                          }, 
+                          {
+                            name     => 'lang', 
+                            type     => 'hidden',
+                            value    => '{: $ lang :}',
+                            check    => ',,/^{: $ lang :}$/',
+                            msg_error=> ' ',
+                          }, 
+                        ],             
+                      ],
+                "
+               )         
+    :}
+:}           
+{: ~ ( *nes_session_ok && !$comment_send )
+    {: include ('{: * cfg_obj_form :}/multi_step.nhtml',
+                "
+                  form_name         => 'fnb_comment',
+                  captcha_name      => 'cnb_comment',
+                  id_form           => 'fnb_id',
+                  show_captcha      => 0, 
+                  table_width       => '90%',
+                  action_form       => '#form_comment',
+                  msg_captcha       => '',
+                  msg_error_data     => '<b>There was an error in the database.</b>',
+                  msg_ok_data        => '<b>Thanks for your comment.</b>',
+
+                  to_database        => 'insert',
+                  to_table           => 'comments',
+                  to_fields_assort   => 
+                         {
+                           name      => 'name',
+                           email     => 'email',
+                           comment   => 'comment',
+                           article   => 'article',
+                           lang      => 'lang',
+                           date      => ':NOW()',
+                         },
+
+                  steps => 
+                      [  
+                        [   
+                          { 
+                            begin    => '<center>Comment: {: $ item_name :}</center><br>',
+                            name     => 'name', 
+                            msg      => 'Name:',
+                            type     => 'text',
+                            size     => 12,
+                            property => 'READONLY',
+                            value    => '{: * nes_session_user :}',
+                            check    => ',,/^{: * nes_session_user :}$/',
+                          },
+                          { 
+                            name     => 'email', 
+                            msg      => 'Email (optional):',
+                            type     => 'text',
+                            size     => 12,
+                            check    => '0,50,/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i',
+                          },
+                          {
+                            name     => 'comment', 
+                            msg      => 'Comment:',
+                            type     => 'textarea',
+                            filter   => 'no_html,yes_br',
+                            cols     => 35,
+                            rows     => 7,
+                            check    => '10,255',
+                            end      => '',
+                          }, 
+                          {
+                            name     => 'article', 
+                            type     => 'hidden',
+                            value    => '{: $ item_name :}',
+                            check    => ',,/^{: $ item_name :}$/',
+                            msg_error=> '',
+                          }, 
+                          {
+                            name     => 'lang', 
+                            type     => 'hidden',
+                            value    => '{: $ lang :}',
+                            check    => ',,/^{: $ lang :}$/',
+                            msg_error=> ' ',
+                          }, 
+                        ],             
+                      ],
+                "
+               )         
+    :}
+:}
+</center>
+</div> 

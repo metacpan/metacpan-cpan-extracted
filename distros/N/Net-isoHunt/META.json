@@ -1,0 +1,54 @@
+{
+   "abstract" : "Access isohunt.com from Perl",
+   "author" : [
+      "Alan Haggai Alavi <alanhaggai@alanhaggai.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-isoHunt",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : 0,
+            "LWP::UserAgent" : 0,
+            "Moose" : 0,
+            "Moose::Util::TypeConstraints" : 0,
+            "URI" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/alanhaggai/Net-isoHunt.git",
+         "web" : "http://github.com/alanhaggai/Net-isoHunt"
+      }
+   },
+   "version" : "0.102770"
+}
+

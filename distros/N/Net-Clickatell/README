@@ -1,0 +1,204 @@
+NAME
+        Net::Clickatell - Access to Clickatell HTTP API
+
+This is the README file for Net::SMS::Clickatell module.
+
+This module provides access to Clickatell SMS messaging service.
+
+This module support the API from Clickatell's HTTP API Specification v.2.2.7.
+The following is all the available API and not all are supported
+
+         Basic Commands
+
+         http://api.clickatell.com/http/auth                   Yes (But session not support)
+         http://api.clickatell.com/http/ping                   Yes (But session not support)
+         http://api.clickatell.com/http/querymsg               Yes
+         http://api.clickatell.com/http/sendmsg                Yes
+
+         Additional Commands
+
+         http://api.clickatell.com/http/delmsg                 No
+         http://api.clickatell.com/http/getbalance             Yes
+         http://api.clickatell.com/http/routeCoverage.php      Yes
+         http://api.clickatell.com/mms/ind_push.php            Yes
+         http://api.clickatell.com/mms/si_push.php             Yes
+         http://api.clickatell.com/http/getmsgcharge           Yes
+         http://api.clickatell.com/http/token_pay              No
+
+         Batch Messaging
+
+         http://api.clickatell.com/http_batch/startbatch       No
+         http://api.clickatell.com/http_batch/senditem         No
+         http://api.clickatell.com/http_batch/quicksend        No
+         http://api.clickatell.com/http_batch/endbatch         No
+
+
+I tested this module on perl  v5.8.5.
+
+INSTALL
+	To install do
+
+	perl Makefile.PL
+	make
+	make install
+
+The following a a perldoc of this module:
+
+SYNOPSIS
+	With SSL
+
+	  use Net::Clickatell;
+
+	  my $clickatell = Net::Clickatell->new( API_ID => $api_id, USERNAME =>$username, PASSWORD =>$password );
+	  my $bal=$clickatell->getBalance;
+
+	Without SSL
+
+	  use Net::Clickatell;
+
+	  my $clickatell = Net::Clickatell->new( UseSSL=>0, API_ID => $api_id, USERNAME =>$username, PASSWORD =>$password );
+	  my $bal=$clickatell->getBalance;
+
+DESCRIPTION
+	Clickatell (http://www.clickatell.com) is a commercial service that allows its users to send SMS messages to anyone in the world. This perl module allow users to
+	send SMS, WAP push and MMS through Clickatell HTTP API.
+
+	Please take note that neither this software nor the author are related to Clickatell in any way.
+
+METHODS
+	new This method is used to create the Clickatell object.
+
+	    Usage:
+
+	      my $clickatell = Net::Clickatell->new( API_ID => $api_id, USERNAME= $user, PASSWORD =>$passwd );
+
+	    The complete list of arguments is:
+
+	      API_ID    : Unique number received from Clickatell when an account is created.
+	      UseSSL    : Tell Clickatell module whether to use SSL or not (0 or 1).
+	      BaseURL   : Default URL used to connect with Clickatell service.
+	      UserAgent : Name of the user agent you want to display to Clickatell service.
+
+	getBalance
+	    This method will return the Balance of the account.
+
+	    Usage:
+
+	      $clickatell->getBalance;
+
+	    Succesful example of the return is as followed:
+	     OK: Credit: 100.3
+
+	    Failed example of the return is as followed:
+	     ERR: 001, Authentication failed
+
+	checkCoverage
+	    This method will return the Balance of the account.
+
+	    Usage:
+
+	      $clickatell->checkCoverage($msisdn);
+
+	    Succesful example of the return is as followed:
+	     OK: This prefix is currently supported. Messages sent to this prefix will be routed. Charge: 1
+
+	    Failed example of the return is as followed:
+	     ERR: This prefix is not currently supported. Messages sent to this prefix will fail. Please contact support for assistance.
+
+	getReturnMessageCharge
+	    This method will return the Message Charge Status.
+
+	    Usage:
+
+	      my $messagecharge=$clickatell->getMessageCharge($smsResult);
+
+	    Succesful example of the return is as followed:
+	     OK: This prefix is currently supported. Messages sent to this prefix will be routed. Charge: 1
+
+	    Failed example of the return is as followed:
+	     ERR: This prefix is not currently supported. Messages sent to this prefix will fail. Please contact support for assistance.
+
+	sendBasicSMSMessage
+	    This method is used to send a SMS Message.
+
+	    Usage:
+
+	      my $smsResult=$clickatell->sendBasicSMSMessage($from,$to,$msg);
+
+	    Succesful example of the return is as followed:
+	     OK: ID: dd8f5556c0d3d54bc94a4cd8800f01b4
+
+	    Failed example of the return is as followed:
+	     ERR: 105, Invalid Destination Address
+
+       sendAdvanceSMSMessage
+           This method is used to send a customised SMS Message. The following are the accepted parameter format:
+             to
+             text
+             from
+             callback
+             deliv_time
+             concat
+             max_credits
+             req_feat
+             queue
+             escalate
+             mo
+             cliMsgId
+             Unicode
+             msg_type
+             udh
+             data
+             validity
+             binary
+             schedule_time
+
+           Usage:
+
+             my $smsResult=$clickatell->sendAdvanceSMSMessage(to=>'6591234567',from=>'6591234568',text=>'testing');
+
+           Succesful example of the return is as followed:
+            OK: ID: dd8f5556c0d3d54bc94a4cd8800f01b4
+
+           Failed example of the return is as followed:
+            ERR: 105, Invalid Destination Address
+
+	sendMMNotification
+	    This method is used to send a MMS Notification Push Message.
+
+	    Usage:
+
+	      my $mmsResult=$clickatell->sendMMNotification($from,$to,$subject,$expiry,$url);
+
+	    Succesful example of the return is as followed:
+	     OK: ID: dd8f5556c0d3d54bc94a4cd8800f01b4
+
+	    Failed example of the return is as followed:
+	     ERR: 105, Invalid Destination Address
+
+	sendWAPPush
+	    This method is used to send a WAP Push. Currently, only SI WAP Push message is supported.
+
+	    Usage:
+
+	      my $wapResult=$clickatell->sendWAPPush($from,$to,$msg,$url);
+
+	    Succesful example of the return is as followed:
+	     OK: ID: dd8f5556c0d3d54bc94a4cd8800f01b4
+
+	    Failed example of the return is as followed:
+	     ERR: 105, Invalid Destination Address
+
+AUTHOR
+	Christopherus Goo <software@artofmobile.com>
+
+COPYRIGHT
+	Copyright (c) 2010 Christopherus Goo.  All rights reserved.  This software may be used and modified freely, but I do request that this copyright notice remain
+	attached to the file.  You may modify this module as you wish, but if you redistribute a modified version, please attach a note listing the modifications you
+	have made.
+
+	Clickatell is Copyright (c) 2010 Clickatell (Pty) Ltd: Bulk SMS Gateway
+
+	This software or the author aren't related to Clickatell in any way.
+
+

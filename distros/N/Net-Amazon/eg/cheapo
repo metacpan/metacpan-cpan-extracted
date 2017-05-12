@@ -1,0 +1,67 @@
+#!/usr/bin/perl
+###########################################
+# maxauthors keyword
+# Mike Schilli <mschilli1@aol.com>, 2003
+###########################################
+
+use strict;
+use warnings;
+
+use Net::Amazon;
+use Net::Amazon::Property;
+use Net::Amazon::Request::Keyword;
+
+# use Log::Log4perl qw(:easy);
+# Log::Log4perl->easy_init({level => $DEBUG, layout => '%F{1}-%L: %m%n'});
+
+die "usage: $0 keyword" unless 
+    defined $ARGV[0];
+
+my $ua = Net::Amazon->new(
+    associate_tag => $ENV{AMAZON_ASSOCIATE_TAG},
+    token         => $ENV{AMAZON_TOKEN},
+    secret_key    => $ENV{AMAZON_SECRET_KEY},
+    max_pages   => 20,
+);
+
+my $req = Net::Amazon::Request::Keyword->new(
+    keyword   => $ARGV[0],
+    mode      => "books"
+);
+
+ # Response: Net::Amazon::Keyword::Response
+my $resp = $ua->request($req);
+
+if($resp->is_error()) {
+    die "Error: ", $resp->message();
+}
+
+my $max_authors = 0;
+my @books = 
+   sort { saved($b) <=> saved($a) }
+   grep { $_->Catalog eq "Book" &&
+          $_->title =~ /$ARGV[0]/i &&
+          $_->ListPrice }
+    $resp->properties;
+
+for(0..4) {
+    next unless $books[$_];
+    printf "%.2f%% (%s/%s) %s\n\n", 
+          saved($books[$_]),
+          $books[$_]->ListPrice,
+          $books[$_]->OurPrice,
+          $books[$_]->as_string;
+}
+
+###########################################
+sub saved {
+###########################################
+    my($book) = @_;
+
+    my $list = $book->ListPrice;
+    my $our  = $book->OurPrice;
+    $list =~ s/\$//;
+    $our  =~ s/\$//;
+
+    return ($list - $our)/$list*100;
+}

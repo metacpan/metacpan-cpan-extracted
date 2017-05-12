@@ -1,0 +1,91 @@
+Revision history for Net-xFTP
+
+0.01    2005/07/15
+        First version, released.
+0.02    2005/07/15
+        Removed debugging print stmts (already commented out) and fixed small 
+        bug involving Cwd::cwd (changed to Cwd::getcwd).  Also removed 
+        extranious "total" line at top of long directory listings.
+0.10    2005/07/19
+        Added copy, move methods.  Added filehandle option for the local
+        file argument for get and put (now works like Net::FTP).
+        Fixed several minor bugs.
+0.11    2005/07/20
+        Mostly doc mods.  Added BlockSize option handling and defaulted it 
+        to 10240 (FTP's default).  
+0.12    2005/07/21
+        Remove some leftover "construction tape" (a couple of debug print 
+        statements.  Also fixed a buglet involving warnings from SFTP->get 
+        and put returning failure.
+0.13    2005/07/22
+        Fix sorting for SFTP->dir.
+0.14    Fixed SFTP relative path-change problem (caught by Marty Himmelstein).
+0.15    -not released-
+0.16    Fixed local file list when running under Windows (was trying to call
+        ls which does not exist in Windows - we now emulate it, except can't 
+        get user/group name.  I'm open to ideas on this.
+0.17    Fixed bug that caused warning when ftp::ls() returns undef at lines 
+        360, 396, 458, and 495.  Also optimized many regices w/ \o.
+0.20    Added support for Net::SSH2 and made compatable with Windows.
+0.21    Added "mdtm" function to return a file's modification time.  Also fixed 
+        bug in the "size" function for SSH2 protocol.  Also fixed bug that 
+        caused "ls" function to return hidden files reguardless of "showall" 
+        parameter value.
+0.3b1   Rewrote to modularize each supported protocol in it's own module file.
+        Added support for protocols:  Net::SFTP::Foreign, Net::OpenSSH,
+        and Net::FSP!
+0.4     Added support for Net::FTPSSL protocol.
+0.41    Fixed bugs that caused FTPSSL protocol to silently use FTP protocol 
+        instead.  This addresses bug#58210.
+0.42    Fix bug in xFTP_SSH2 that prevented "puts" (line 403 - chg put() 
+        to scp_put() - caught by me.
+0.43    Fix type bug in xFTP.pm affecting Net::SFTP::Foreign (had it as 
+        "Net::SFTP2::Foreign at line 305.  Caught by Paul Findlay, Thanks, Paul!
+        Also fixed formatting bug in the dir() function and added 
+        login timeout handler (sig(alarm)) and new option "login_timeout" (sec) - 
+        default is 30 seconds (caught by me).
+0.44    Fix bug that prevented module-specific arguments from being passed 
+        directly to the module.  Caught by Paul Findlay, Thanks again, Paul.
+0.44b1	 Fix FTPSSL mkdir() to actually implement recursion, fix FTPSSL dir 
+	  & ls functions to be specific to this module (FTPSSL uses different 
+	  names for them and does not implement recursion in mkdir.  These 
+	  address CPAN bug#63290. Thanks Kate Yoak for the catch & patch!
+	  Incorporated minor change to Foreign and removed depreciated set_status 
+	  call from FTP.
+0.45    Incorporate 0.44b1 changes into an actual release.  This should address 
+	  bugs 63290 & 68801.
+0.46	  Attempt to prevent nanny module "Test::Pod::Coverage" from 
+	  preventing installation!  I don't have the time to make sure each & 
+	  every fsckin' function has POD docs - The main one (xFTP.pm) does. 
+	  This module is documented in it's man-page and README!  Sweating 
+	  stuff like this is for Pascal programmers. :-/  If this bothers you, 
+	  either don't use my module, or else write up some POD foo & send it 
+	  to me & i'll include it in next release.
+.50    Fix several path issues in xFTP_LOCAL.pm to properly configure and 
+	  "remember" the current working directory to addres bug#91600
+	  Add "MAVIT patch" to address bug#74082 (xFTP_Foreign.pm)
+	  Change "return" to "return undef" in xFTP:new() in several places to 
+	  address bug#68800 regarding FTPSSL, but was most likely an issue with
+	  the others as well.  If one does not have the correct module installed, 
+	  it should now fail with error.
+.51    Restore Test::Pod::Coverage for main module (Net::xFTP) only, and only 
+	  to be run if user has Test::Pod::Coverage installed, whilst excluding 
+	  POD-coverage testing for all the (non user-facing) submodules.  
+	  Tested on both a system with and withoug Test::Pod::Coverage installed. 
+	  This addresses and closes Bug#68833.
+.52    Resave all source files in "Unix" format (LF) instead of DOS (CR,LF) to 
+	  remove CR from generated *META* files to address bug#103081.
+1.00   Foreign: Added "Port" option along with the ability to handle 
+	  some other options when connecting in both Foreign and SSH2.
+	  SSH2: Fixed call to auth_* on connect (new() - create connection) - 
+	  new() was not always calling the right auth_* with proper arguments.
+	  Added $ftp->method() method to allow for easier calling of module-
+	  specific methods in all supported protocols.  Misc. cleanups / fixes.
+	  OpenSSH: Fixed bug in change working directory (cwd) function's 
+	  causing it to fail and not preserve the new "current working directory".
+	  OpenSSH: Fix error handling.
+	  OpenSSH: Replace obsolete "defined(@hash) and defined(@array) with 
+	  proper "@hash" and "@array" respectively, checked that this was not in 
+	  any other modules.
+1.01	  Fix xFTP_LOCAL to handle subdirectories with spaces in name in *nix
+	  Fix haveModule([Net::]module) function to actually work (it didn't)!

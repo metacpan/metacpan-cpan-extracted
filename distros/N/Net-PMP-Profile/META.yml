@@ -1,0 +1,40 @@
+---
+abstract: 'Base Content Profile for PMP CollectionDoc'
+author:
+  - 'Peter Karman, C<< <karman at cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-PMP-Profile
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::Clean::JSON: 0
+  Data::Validate::URI: 0
+  DateTime::Format::DateParse: 0
+  DateTime::Format::Strptime: 0
+  Media::Type::Simple: 0
+  Moose: 0
+  Net::PMP: '0.001'
+  Test::Exception: 0
+  Test::More: 0
+  URI: 0
+  URI::Template: 0
+  UUID::Tiny: 0
+  perl: 5.8.3
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-PMP-Profile
+  homepage: https://github.com/APMG/net-pmp-profile-perl
+  license: http://opensource.org/licenses/mit-license.php
+  repository: http://github.com/APMG/net-pmp-profile-perl
+version: '0.101'

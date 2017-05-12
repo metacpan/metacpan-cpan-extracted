@@ -1,0 +1,37 @@
+verbose = %f:%l:%c:%m (%e %P)\n
+severity = 1
+
+[-Miscellanea::RequireRcsKeywords]
+
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireLineBoundaryMatching]
+[-ControlStructures::ProhibitPostfixControls]
+
+[Variables::ProhibitPunctuationVars]
+allow = $+
+
+[InputOutput::RequireCheckedSyscalls]
+exclude_functions = say
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | SYNOPSIS | AUTHOR | COPYRIGHT AND LICENSE
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Modern::Perl
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Modern::Perl
+
+[-Documentation::PodSpelling]
+
+# Dist::Zilla::Plugin::PkgVersion makes a small part untidy
+[-CodeLayout::RequireTidyCode]
+
+# Moose builder methods are allowed
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+private_name_regex = _(?!build_)\w+
+
+[-Modules::RequireExplicitPackage]
+[Lax::RequireExplicitPackage::ExceptForPragmata]
+allowed_pragmata = Modern::Perl

@@ -1,0 +1,133 @@
+Revision history for Perl extension Number::Range::Regexp
+
+0.32 Feb 21 14:29:26 EDT 2014 r3804
+   - doc fix: to_string was misspelled. Thanks to George Wood of Qualcomm
+     for the report.
+   - support for non-10 bases between 2 and 16, so you can say eg:
+       rangespec('8c..c8', {base => 16})->regex
+     and get something like:
+       / 8[c-f] | [9-b][\da-f] | c[0-8] /
+   - lots of internal reorganization, dead code trimming, simplification,
+     golfing, futureproofing, and nice-ification of code
+   - fix behavior of iterators on empty ranges
+   - eliminate EmptyRange.pm, add is_empty()
+   - introduce handle-deprecated-cruft.pl to overwrite any old pms
+     that are no longer used
+   - fix bug in _collapse_ranges when collapsing twice in a row
+   - $opts->{allow_wildcard} no longer not necessary with rangespec()
+     or range() called with explicit arguments ('-inf', '+inf').
+     allow_wildcard is only necessary when called as range( undef, undef )
+     ( which looks like range() )
+
+0.31 Oct 21 14:34:26 EDT 2012 r3171
+   - various fixes and tests for negative numbers
+   - init_opts defaults to default_opts, not empty hashref
+   - save opts given at new() time in $self
+   - add tests for invert(empty) == universal and invert(universal) == empty
+   - fix bug in invert() on ranges not bounded with a max
+   - multi_union() now returns an empty_range when given no arguments
+   - fix some hard to track down edge cases in sectionify() that were
+     triggered e.g. when doing set ops on ranges that touched but did
+     not overlap
+   - handle buggy rangespecs appropriately (eg "-3 -2..-1")
+   - start using inf.pm to fix bugs with non-libc glibc (win32 and solaris
+     at least):
+       http://www.cpantesters.org/cpan/report/5e73b674-6ca0-1014-9aa7-d95518fa49ba
+       http://www.cpantesters.org/cpan/report/f432d580-1921-11e2-bdcc-373e3b6b8117
+
+0.30 Oct 17 11:41:24 EDT 2012 r3143
+   - support for rangespec() with arguments of '-inf', '+inf'
+   - implement & document is_infinite()
+   - improve scope mangling in Util::most()
+   - proper operations of all utility functions with infinite values
+   - fix bug in xor affecting simple ranges
+   - implement NRR::Util::inf to support arithmetic on potentially
+     infinite values (perl's implementation is dodgy on 5.[68].X
+     and with certain libc implementations)
+   - restructure to eliminate a separate InfiniteRange.pm, saving
+     ~150 lines of code
+   - POD improvements
+
+0.20 Oct  3 17:34:01 EDT 2012 r3074
+   - fairly complete implementation - just missing intersect/subtract/xor
+     on compound, infinite ranges.
+   - support for negative integers
+   - proper support for infinite ranges in all codepaths
+   - new set operation: not()/invert()
+   - allow whitespace in rangespecs: "3..5,7..9" == "3..5, 7..9"
+   - fix regex_range() with options before call to init()
+   - document NRR::Iterator, add $iterator->seek( number )
+   - various under the hood improvements wrt maintenance
+
+0.13  Sep 22 22:21:07 EDT 2012 r2970
+   - graceful but ugly degradation: string context will give regex()
+     output when overload can't distinguish between regex and string
+     context (overload < v1.10, or equivalently, perl < v5.12)
+   - more readable, less verbose CompoundRange regex commenting
+       (since we include the CompoundRange::to_string() output,
+       don't need it from each SimpleRange therein)
+   - overhaul POD, documenting all functionality
+   - support perl 5.6.x
+   - overload.pm now required since it's been available with perl
+     since 5.5.x or earlier)
+   - regex_range() deprecated
+   - add META.yml, README
+   - less verbose regex commenting for CompoundRanges
+
+0.12  Sep 21 00:36:38 EDT 2012 r2945
+   -  overload ranges such that ->regex() and ->to_string() are implied
+      depending on context (in a regex or string respectively), update
+      POD and tests accordingly
+
+0.11  Sep 20 23:37:45 EDT 2012 r2940
+   -  regex_range( ... ) deprecated in favor of range( ... )->regex
+   -  range & rangespec exported by default
+   -  implement contains() to check for range membership w/o regexification
+   -  document iterators
+   -  common, fast implementation of all set ops (except union)
+   -  implement to_string() to describe ranges
+   -  EmptyRange->to_string() is now an empty string for consistency
+   -  seemlessly promote SimpleRanges to CompoundRanges when necessary
+   -  EmptyRange->regex() is now a regex that does not match anything
+   -  unify option mangling code
+
+0.09  Sep 19 18:31:36 EDT 2012 r2915
+   -  NRR implements range() and rangespec() as recommended API
+   -  intersection, subtraction, xor implemented
+   -  EmptyRange->new()->regex() no longer dies - it now returns a regex
+      that doesn't match anything
+   -  clearer inheritance
+   -  operate internally on SimpleRanges, not TrivialRanges. this allows
+      for simpler code and faster operation (O(1) vs. O(lg n))
+   -  implement iterators
+
+0.08  Sep 10 15:47:15 EDT 2012 r2874
+   -  object-orient-ify and implement union (intersect on the way)
+   -  use string ops to avoid fp-induced bugs with large numbers
+   -  thoroughly test 0..12 x 0..12 with regex_range()
+   -  add some more targetted test cases
+   -  refactor the two loops in regex_range to have parallel construction
+
+0.07  Aug 29 21:23:23 2012 svn r2817
+   -  readability: change e.g. '\d\d\d\d\d\d' to '\d{6}'
+   -  $opts->{readable} implemented
+   -  comment now works properly when min/max is undef
+
+0.06  Aug 29 19:44:29 2012
+   -  fix crash when regex_range() is called before init()
+
+0.05  Tue Aug 28 22:20:42 2012
+   -  silence a debug warning that was left enabled by accident
+
+0.04  Tue Aug 28 21:44:08 2012 svn r2800
+   -  auto-commenting implemented and enabled by default
+
+0.03  Tue Aug 28 04:21:52 2012 svn r2794
+   -  more exhaustive and informative test scripts
+
+0.02  Thu Aug 23 13:45:23 2012
+   -  no_leading_zeroes option implemented
+
+0.01  Thu Aug 23 11:27:39 2012
+   -  original version
+

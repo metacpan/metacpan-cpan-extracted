@@ -1,0 +1,25 @@
+From 9865c18d11049ec93994fd0eb183f866b64ba627 Mon Sep 17 00:00:00 2001
+From: Jens Rehsack <sno@NetBSD.org>
+Date: Mon, 2 Jul 2012 10:15:16 +0200
+Subject: [PATCH 3/4] fix orthographic typo in comment
+
+---
+ skeletons/OCTET_STRING.c |    2 +-
+ 1 Datei geändert, 1 Zeile hinzugefügt(+), 1 Zeile entfernt(-)
+
+diff --git a/skeletons/OCTET_STRING.c b/skeletons/OCTET_STRING.c
+index 584def8..f2eec13 100644
+--- a/skeletons/OCTET_STRING.c
++++ b/skeletons/OCTET_STRING.c
+@@ -1571,7 +1571,7 @@ OCTET_STRING_encode_uper(asn_TYPE_descriptor_t *td,
+ 		csiz->lower_bound, csiz->upper_bound,
+ 		csiz->effective_bits, ct_extensible ? " EXT" : "");
+ 
+-	/* Figure out wheter size lies within PER visible constraint */
++	/* Figure out whether size lies within PER visible constraint */
+ 
+ 	if(csiz->effective_bits >= 0) {
+ 		if((int)sizeinunits < csiz->lower_bound
+-- 
+1.7.10.5
+

@@ -1,0 +1,11 @@
+Revision history for Perl extension Net::Shaper.
+
+0.1  Fri May 30 14:43:22 2003
+	- original version; created by h2xs 1.21 with options
+		-n IO::Shaper -A -X
+
+0.2  Mon Jun 02
+	- Replaced non-portable MSG_NOSIGNAL flag with $SIG{PIPE} = 'IGNORE';
+
+0.3  Fri Nov 07
+	- Renamed from IO::Shaper to Net::Shaper

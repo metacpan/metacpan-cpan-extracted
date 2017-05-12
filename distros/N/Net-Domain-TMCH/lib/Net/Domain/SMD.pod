@@ -1,0 +1,203 @@
+=encoding utf8
+
+=head1 NAME
+
+Net::Domain::SMD - info from one SMD structure
+
+=head1 INHERITANCE
+
+ Net::Domain::SMD is extended by
+   Net::Domain::SMD::File
+
+=head1 SYNOPSIS
+
+  # end-user route to collect the info
+  my $tmch  = Net::Domain::TMCH->new(%options);
+  my $smdf  = $tmch->smd($filename);
+  my $smdf  = $tmch->smd($node);   # XML::LibXML::Element
+  my $smdf  = $tmch->smd($string); # bytes
+
+  # Data::Dumper is your friend
+  foreach my $court ($smd->courts)
+  {   print $court->{courtName}, "\n";
+      print Dumper $court;
+  }
+
+  foreach my $trademark ($smd->trademarks)
+  {   print $trademark->{markName}, "\n";
+      my $holders = $trademark->{holder} || [];
+      foreach my $holder (@$holders)
+      {  print "Holder: $holder->{name}\n";
+      }
+  }
+
+  foreach my $treaty ($smd->treaties) ...
+
+=head1 DESCRIPTION
+
+Draft RFC L<http://tools.ietf.org/html/draft-lozano-tmch-smd-03>
+SMD information is packaged.  This object represents one file in wrapped
+format.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Net::Domain::SMD-E<gt>B<fromNode>($node, %options)
+
+Input is an XML::LibXML::Element, which contains a signedMark structure.
+The %options are passed on to L<new()|Net::Domain::SMD/"Constructors">.
+
+ -Option --Default
+  schemas  <required>
+
+=over 2
+
+=item schemas => L<XML::Compile::Schema|XML::Compile::Schema>
+
+=back
+
+=item Net::Domain::SMD-E<gt>B<new>(%options)
+
+ -Option --Default
+  data     <required>
+  payload  <required>
+
+=over 2
+
+=item data => HASH
+
+=item payload => XML-NODE
+
+=back
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<payload>()
+
+Returns the XML::LibXML::Element which contains the whole SMD
+structure.
+
+=back
+
+=head2 XML content access
+
+The following methods try to be smart, to hide complexities in the XML
+structure, simplifying the main program.
+
+=over 4
+
+=item $obj-E<gt>B<certificates>(%options)
+
+Returns the certificates as contained in the SMD file.
+
+ -Option--Default
+  issuer  <any issuer>
+
+=over 2
+
+=item issuer => NAME
+
+Limit to the certificates of the issuer.
+
+=back
+
+=item $obj-E<gt>B<courts>()
+
+Returns a list of HASHes, each representing one court.
+See F<examples/mark-templ.pl>
+
+example: 
+
+  foreach my $court ($smd->courts)
+  {   print $court->{courtName}, "\n";
+      print Dumper $court;
+  }
+
+=item $obj-E<gt>B<from>()
+
+Returns the timestamp reflecting the 'notBefore' field, as string.
+When "auto_datetime" is enabled, this will return a DateTime
+object.
+
+=item $obj-E<gt>B<fromTime>()
+
+The value of L<from()|Net::Domain::SMD/"XML content access"> converted into seconds from epoch.
+
+=item $obj-E<gt>B<issuer>()
+
+Returns the issuer information, as a HASH.
+
+=item $obj-E<gt>B<smdID>()
+
+=item $obj-E<gt>B<trademarks>()
+
+Returns a list of HASHes, each representing one trademark.
+See F<examples/mark-templ.pl>
+
+example: 
+
+  foreach my $trademark ($smd->trademarks)
+  {   print $trademark->{markName}, "\n";
+      my $holders = $trademark->{holder} || [];
+      foreach my $holder (@$holders)
+      {  print "Holder: $holder->{name}\n";
+      }
+  }
+
+=item $obj-E<gt>B<treaties>()
+
+Returns a list of HASHes, each representing one treaty or statute (one
+element of type "treatyOrStatute".  See F<examples/mark-templ.pl>
+
+=item $obj-E<gt>B<until>()
+
+Returns the timestamp reflecting the 'notAfter' field, as string.
+When "auto_datetime" is enabled, this will return a DateTime
+object.
+
+=item $obj-E<gt>B<untilTime>()
+
+The value of L<until()|Net::Domain::SMD/"XML content access"> converted into seconds from epoc.
+
+=back
+
+=head2 Helpers
+
+=over 4
+
+=item $obj-E<gt>B<date2time>(STRING)
+
+=item Net::Domain::SMD-E<gt>B<date2time>(STRING)
+
+Converts a time string into a DateTime object.  Accepted time-STRINGs
+are like time stamps in the SMD file headers, but also the ISO values
+inside an object.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Net-Domain-TMCH distribution version 0.18,
+built on December 30, 2015.  Development was supported by NIC.at, the Austrian
+Domainname Registry.
+
+ Website: F<http://perl.overmeer.net/net-domain-tmch/>
+
+The documentation and interface style is consistent with a large set of
+modules, belonging to the L<XML::Compile> suite.
+
+=head1 LICENSE
+
+Copyrights 2013-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

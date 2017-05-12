@@ -1,0 +1,25 @@
+Revision history for Perl extension Nginx::ReadBody.
+
+0.07  Wed Apr 19 20:51:00 2010
+	- Bugfix: test disable on install as this module could only be loaded from nginx
+
+0.06  Wed Feb 17 12:52:21 2010
+	- One more try to fix Russian doc
+
+0.05  Tue Feb 16 19:54:21 2010
+	- Minor doc fix
+	- One more try to nake Russian doc processed properly
+
+0.04  Tue Feb 16 19:15:21 2010
+	- Link to Russian doc fixed
+
+0.03  Tue Feb 16 16:12:21 2010
+	- Requirements fixed: perl 5.8.0 should be enough
+
+0.02  Tue Feb 16 03:45:21 2010
+	- Russian doc fixed
+
+0.01  Tue Feb 16 03:45:21 2010
+	- original version; created by h2xs 1.23 with options
+		-AXcfn Nginx::ReadBody
+

@@ -1,0 +1,69 @@
+{
+   "abstract" : "Asynchronous support for the Extensible Message Passing Protocol",
+   "author" : [
+      "Tom Molesworth <cpan@entitymodel.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Async-XMPP",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.48"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41",
+            "Test::Synopsis" : "0",
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Future" : "0.29",
+            "Future::Utils" : "0.29",
+            "IO::Async" : "0.60",
+            "IO::Async::Resolver::DNS" : "0.04",
+            "IO::Async::SSL" : "0.14",
+            "Mixin::Event::Dispatch" : "1.000",
+            "Protocol::XMPP" : "0.006",
+            "Socket" : "2.000",
+            "curry" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::Fatal" : "0.010",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-net-async-xmpp at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Net-Async-XMPP"
+      },
+      "homepage" : "http://search.cpan.org/dist/Net-Async-XMPP/"
+   },
+   "version" : "0.003"
+}
+

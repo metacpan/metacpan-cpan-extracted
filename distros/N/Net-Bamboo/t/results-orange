@@ -1,0 +1,155 @@
+HTTP/1.1 200 OK
+Content-Type: application/xml
+
+
+<results expand="results">
+  <results expand="result" size="10" max-result="10" start-index="0">
+    <result restartable="false" continuable="false" id="1278260" number="74" lifeCycleState="Finished" state="Successful" key="FRTORANGE-DEFAULT-74" expand="vcsRevisions,artifacts,comments,labels,jiraIssues,stages">
+      <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/result/FRTORANGE-DEFAULT-74" />
+      <planName>Master</planName>
+      <projectName>Fruit Orange</projectName>
+      <buildStartedTime>2011-11-17T20:02:13.000-06:00</buildStartedTime>
+      <prettyBuildStartedTime>Thu, 17 Nov, 08:02 PM</prettyBuildStartedTime>
+      <buildCompletedTime>2011-11-17T20:09:30.000-06:00</buildCompletedTime>
+      <prettyBuildCompletedTime>Thu, 17 Nov, 08:09 PM</prettyBuildCompletedTime>
+      <buildDurationInSeconds>437</buildDurationInSeconds>
+      <buildDuration>437637</buildDuration>
+      <buildDurationDescription>7 minutes</buildDurationDescription>
+      <buildRelativeTime>2 days ago</buildRelativeTime>
+      <vcsRevisionKey>44fa6735a52943b7d60e92d0126bf7b6e0f027ce</vcsRevisionKey>
+      <vcsRevisions size="2" max-result="2" start-index="0" />
+      <buildTestSummary>1034 passed</buildTestSummary>
+      <successfulTestCount>1034</successfulTestCount>
+      <failedTestCount>0</failedTestCount>
+      <buildReason>Manual build by &lt;a href="http://bamboo.fruits.com/browse/user/toucan.sam">Toucan Sam&lt;/a></buildReason>
+      <artifacts size="6" max-result="6" start-index="0" />
+      <comments size="0" max-result="0" start-index="0" />
+      <labels size="0" max-result="0" start-index="0" />
+      <jiraIssues size="0" max-result="0" start-index="0" />
+      <stages size="3" max-result="3" start-index="0" />
+    </result>
+    <result restartable="false" continuable="false" id="1278254" number="73" lifeCycleState="Finished" state="Successful" key="FRTORANGE-DEFAULT-73" expand="vcsRevisions,artifacts,comments,labels,jiraIssues,stages">
+      <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/result/FRTORANGE-DEFAULT-73" />
+      <planName>Master</planName>
+      <projectName>Fruit Orange</projectName>
+      <buildStartedTime>2011-11-17T19:13:07.000-06:00</buildStartedTime>
+      <prettyBuildStartedTime>Thu, 17 Nov, 07:13 PM</prettyBuildStartedTime>
+      <buildCompletedTime>2011-11-17T19:25:48.000-06:00</buildCompletedTime>
+      <prettyBuildCompletedTime>Thu, 17 Nov, 07:25 PM</prettyBuildCompletedTime>
+      <buildDurationInSeconds>1143</buildDurationInSeconds>
+      <buildDuration>1143495</buildDuration>
+      <buildDurationDescription>19 minutes</buildDurationDescription>
+      <buildRelativeTime>2 days ago</buildRelativeTime>
+      <vcsRevisionKey>45ad815d73bbde7ba7997d1bcdb889c7021758ec</vcsRevisionKey>
+      <vcsRevisions size="2" max-result="2" start-index="0" />
+      <buildTestSummary>1034 passed</buildTestSummary>
+      <successfulTestCount>1034</successfulTestCount>
+      <failedTestCount>0</failedTestCount>
+      <restartCount>1</restartCount>
+      <buildReason>&lt;a href="http://bamboo.fruits.com/browse/FRTORANGE-DEFAULT-73/commit">Updated by Toucan Sam &amp;lt;toucan.sam@fruits.com&amp;gt;&lt;/a></buildReason>
+      <artifacts size="6" max-result="6" start-index="0" />
+      <comments size="0" max-result="0" start-index="0" />
+      <labels size="0" max-result="0" start-index="0" />
+      <jiraIssues size="0" max-result="0" start-index="0" />
+      <stages size="3" max-result="3" start-index="0" />
+    </result>
+    <result restartable="false" continuable="false" id="1278248" number="72" lifeCycleState="Finished" state="Successful" key="FRTORANGE-DEFAULT-72" expand="vcsRevisions,artifacts,comments,labels,jiraIssues,stages">
+      <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/result/FRTORANGE-DEFAULT-72" />
+      <planName>Master</planName>
+      <projectName>Fruit Orange</projectName>
+      <buildStartedTime>2011-11-17T18:06:04.000-06:00</buildStartedTime>
+      <prettyBuildStartedTime>Thu, 17 Nov, 06:06 PM</prettyBuildStartedTime>
+      <buildCompletedTime>2011-11-17T18:12:29.000-06:00</buildCompletedTime>
+      <prettyBuildCompletedTime>Thu, 17 Nov, 06:12 PM</prettyBuildCompletedTime>
+      <buildDurationInSeconds>385</buildDurationInSeconds>
+      <buildDuration>385452</buildDuration>
+      <buildDurationDescription>6 minutes</buildDurationDescription>
+      <buildRelativeTime>2 days ago</buildRelativeTime>
+      <vcsRevisionKey>c952924dbec4326d8ce6d869b86199bf4a3e7a09</vcsRevisionKey>
+      <vcsRevisions size="2" max-result="2" start-index="0" />
+      <buildTestSummary>1034 passed</buildTestSummary>
+      <successfulTestCount>1034</successfulTestCount>
+      <failedTestCount>0</failedTestCount>
+      <buildReason>Manual build by &lt;a href="http://bamboo.fruits.com/browse/user/toucan.sam">Toucan Sam&lt;/a></buildReason>
+      <artifacts size="6" max-result="6" start-index="0" />
+      <comments size="0" max-result="0" start-index="0" />
+      <labels size="0" max-result="0" start-index="0" />
+      <jiraIssues size="0" max-result="0" start-index="0" />
+      <stages size="3" max-result="3" start-index="0" />
+    </result>
+    <result restartable="false" continuable="false" id="1278242" number="71" lifeCycleState="Finished" state="Successful" key="FRTORANGE-DEFAULT-71" expand="vcsRevisions,artifacts,comments,labels,jiraIssues,stages">
+      <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/result/FRTORANGE-DEFAULT-71" />
+      <planName>Master</planName>
+      <projectName>Fruit Orange</projectName>
+      <buildStartedTime>2011-11-17T16:05:07.000-06:00</buildStartedTime>
+      <prettyBuildStartedTime>Thu, 17 Nov, 04:05 PM</prettyBuildStartedTime>
+      <buildCompletedTime>2011-11-17T17:55:40.000-06:00</buildCompletedTime>
+      <prettyBuildCompletedTime>Thu, 17 Nov, 05:55 PM</prettyBuildCompletedTime>
+      <buildDurationInSeconds>38556</buildDurationInSeconds>
+      <buildDuration>38556489</buildDuration>
+      <buildDurationDescription>642 minutes</buildDurationDescription>
+      <buildRelativeTime>2 days ago</buildRelativeTime>
+      <vcsRevisionKey>e855dad194b0b614ef03329a38e1fcc5d5564c9e</vcsRevisionKey>
+      <vcsRevisions size="2" max-result="2" start-index="0" />
+      <buildTestSummary>1034 passed</buildTestSummary>
+      <successfulTestCount>1034</successfulTestCount>
+      <failedTestCount>0</failedTestCount>
+      <restartCount>12</restartCount>
+      <buildReason>&lt;a href="http://bamboo.fruits.com/browse/FRTORANGE-DEFAULT-71/commit">Updated by Toucan Sam &amp;lt;toucan.sam@fruits.com&amp;gt;&lt;/a></buildReason>
+      <artifacts size="6" max-result="6" start-index="0" />
+      <comments size="0" max-result="0" start-index="0" />
+      <labels size="0" max-result="0" start-index="0" />
+      <jiraIssues size="0" max-result="0" start-index="0" />
+      <stages size="3" max-result="3" start-index="0" />
+    </result>
+    <result restartable="false" continuable="false" id="1278185" number="70" lifeCycleState="Finished" state="Successful" key="FRTORANGE-DEFAULT-70" expand="vcsRevisions,artifacts,comments,labels,jiraIssues,stages">
+      <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/result/FRTORANGE-DEFAULT-70" />
+      <planName>Master</planName>
+      <projectName>Fruit Orange</projectName>
+      <buildStartedTime>2011-11-16T21:17:32.000-06:00</buildStartedTime>
+      <prettyBuildStartedTime>Wed, 16 Nov, 09:17 PM</prettyBuildStartedTime>
+      <buildCompletedTime>2011-11-16T21:23:39.000-06:00</buildCompletedTime>
+      <prettyBuildCompletedTime>Wed, 16 Nov, 09:23 PM</prettyBuildCompletedTime>
+      <buildDurationInSeconds>367</buildDurationInSeconds>
+      <buildDuration>367821</buildDuration>
+      <buildDurationDescription>6 minutes</buildDurationDescription>
+      <buildRelativeTime>3 days ago</buildRelativeTime>
+      <vcsRevisionKey>e375cc851eb9b5b77ac89e082acef367fa129222</vcsRevisionKey>
+      <vcsRevisions size="2" max-result="2" start-index="0" />
+      <buildTestSummary>1034 passed</buildTestSummary>
+      <successfulTestCount>1034</successfulTestCount>
+      <failedTestCount>0</failedTestCount>
+      <buildReason>Manual build by &lt;a href="http://bamboo.fruits.com/browse/user/uncle.sam">Uncle Sam&lt;/a></buildReason>
+      <artifacts size="2" max-result="2" start-index="0" />
+      <comments size="0" max-result="0" start-index="0" />
+      <labels size="0" max-result="0" start-index="0" />
+      <jiraIssues size="0" max-result="0" start-index="0" />
+      <stages size="2" max-result="2" start-index="0" />
+    </result>
+    <result restartable="true" continuable="false" id="1278180" number="69" lifeCycleState="Finished" state="Failed" key="FRTORANGE-DEFAULT-69" expand="vcsRevisions,artifacts,comments,labels,jiraIssues,stages">
+      <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/result/FRTORANGE-DEFAULT-69" />
+      <planName>Master</planName>
+      <projectName>Fruit Orange</projectName>
+      <buildStartedTime>2011-11-16T21:14:06.000-06:00</buildStartedTime>
+      <prettyBuildStartedTime>Wed, 16 Nov, 09:14 PM</prettyBuildStartedTime>
+      <buildCompletedTime>2011-11-16T21:16:37.000-06:00</buildCompletedTime>
+      <prettyBuildCompletedTime>Wed, 16 Nov, 09:16 PM</prettyBuildCompletedTime>
+      <buildDurationInSeconds>151</buildDurationInSeconds>
+      <buildDuration>151768</buildDuration>
+      <buildDurationDescription>2 minutes</buildDurationDescription>
+      <buildRelativeTime>3 days ago</buildRelativeTime>
+      <vcsRevisionKey>ecd8e67bf8c2e29eeb664d174db6cc78fa8874f4</vcsRevisionKey>
+      <vcsRevisions size="2" max-result="2" start-index="0" />
+      <buildTestSummary>290 failed</buildTestSummary>
+      <successfulTestCount>744</successfulTestCount>
+      <failedTestCount>290</failedTestCount>
+      <buildReason>&lt;a href="http://bamboo.fruits.com/browse/FRTORANGE-DEFAULT-69/commit">Updated by Fruit Bat &amp;lt;bat@fruits.com&amp;gt;&lt;/a></buildReason>
+      <artifacts size="2" max-result="2" start-index="0" />
+      <comments size="0" max-result="0" start-index="0" />
+      <labels size="0" max-result="0" start-index="0" />
+      <jiraIssues size="0" max-result="0" start-index="0" />
+      <stages size="2" max-result="2" start-index="0" />
+    </result>
+  </results>
+  <link rel="self" href="http://bamboo.fruits.com/rest/api/latest/result/FRTORANGE-DEFAULT" />
+</results>

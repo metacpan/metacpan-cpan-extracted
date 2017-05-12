@@ -1,0 +1,12 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+readme.html
+lib/Net/Server/POP3.pm
+scripts/simpletest.pl
+scripts/proxytest.pl
+t/001_load.t
+t/002_taintload.t
+Makefile.PL

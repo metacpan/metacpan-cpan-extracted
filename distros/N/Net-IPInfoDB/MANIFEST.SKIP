@@ -1,0 +1,7 @@
+.git
+.svn
+CVS
+Makefile
+Net-IPInfoDB-*.tar.gz
+blib
+pm_to_blib

@@ -1,0 +1,15 @@
+README
+Changes
+MANIFEST
+COPYING
+Makefile.PL
+FCP.pm
+FCP/Util.pm
+FCP/Metadata.pm
+FCP/Key/CHK.pm
+FCP/Key/SSK.pm
+t/00_load.t
+eg/simple
+eg/fetch1
+bin/fmd
+META.yml                                Module meta-data in YAML

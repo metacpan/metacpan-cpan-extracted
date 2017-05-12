@@ -1,0 +1,6 @@
+*.[0-9]
+*.pem
+*.req
+index.txt
+index.txt.*
+serial*

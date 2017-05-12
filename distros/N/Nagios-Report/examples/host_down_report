@@ -1,0 +1,141 @@
+#!/usr/bin/perl
+
+# $Id: host_down_report,v 1.15 2006-08-21 14:14:06+10 sh1517 Exp sh1517 $
+
+use strict ;
+
+use Nagios::Report ;
+use Getopt::Std ;
+
+use vars qw($opt_t $opt_h) ;
+
+getopt 'th' ;
+
+my $usage = <<USAGE ;
+
+$0 { -t <timeperiod>  | -h '<host_regex> }'
+
+Displays host outages for the hosts matching the -h option, in the interval defined by the timeperiod.
+
+  for each outage in the interval, sorted in ascending order of time down (ie when the outage occurred)
+    displays the
+      host_name
+      time the host went down
+      time the host came up
+      the outage
+
+timeperiod ::= today | yesterday   |
+           thisweek  | lastweek    |
+           thismonth | lastmonth   |
+           thisyear  | lastyear    |
+           last12hours    | last24hours      | last7days | last31days   |
+           last<days>days | last<hours>hours | last<mins>min(ute)?(s)?  |
+           HHMM      | HH:MM       |
+           DD.MM.YY  | DD.MM.YYYY  | MM/DD/YY | MM/DD/YYYY    |
+           24hourtime date         |
+           date1 - date2           |
+           24hourtime date1 - 24hourtime date2 |
+           Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec (YYYY)?
+
+
+Timeperiods other than 'yesterday', 'lastweek', 'lastmonth' or 'lastyear' end now.
+
+If the -h option is missing, select all (host) outages in the time period.
+If the -t option is missing but the -h option is present, select all matching hosts for 'thismonth'.
+One or both of the -t and -h options must be used.
+
+Quote the timeperiod if it contains spaces ('time date').
+
+The host regex should NOT include pattern delimiters (//). To specify case insensitive
+matches use 'Extended patterns', with or with out clustering. You will need to 
+quote the regex.
+
+eg
+  $0 -t '07:00 01.12.2005'
+  $0 -t last7days
+  $0 -t last2hours
+  $0 -h '(?i:ben)'
+  $0 -h '(?i)ben'
+  $0 -t '07:00 01.12.2005-07:00 02.12.2005'
+  $0 -t '01.12.2005 - 02.12.2005'
+  $0 -t 'Mar 2006'
+
+USAGE
+
+die $usage
+  unless $opt_t || $opt_h ;
+
+my $valid_time = qr<^(?:
+    today                                                                           |
+    yesterday                                                                       |
+    this (?:week|month|year)                                                        |
+    last (?:week|24hours|12hours|7days|31days|\d+days?|\d+hours?|\d+min(ute)?s?)    |
+    (?: \d\d :? \d\d  \s+  \d\d? [./] \d\d? [./] \d\d? (?:\d\d)?)                   |
+    (?: \d\d :? \d\d)                                                               |
+    (?: \d\d? [./] \d\d? [./] \d\d (?:\d\d)?)                                       |
+    (?: \d\d? [./] \d\d? [./] \d\d (?:\d\d)? \s* - \s* \d\d? [./] \d\d? [./] \d\d? (?:\d\d)?)                                   |
+    (?: \d\d :? \d\d \s+ \d\d? [./] \d\d? [./] \d\d (?:\d\d)? \s* - \s* \d\d :? \d\d \s+ \d\d? [./] \d\d? [./] \d\d (?:\d\d)?)  |
+    (?i: Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)                           |
+    (?i: Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \s* \d{4}
+)$>x ;
+
+die $usage
+  unless $opt_t =~ /$valid_time/ || defined($opt_h) ;
+
+my $host_re ;
+if ($opt_h ) {
+  eval { $host_re = qr<$opt_h> } ;
+  die <<BADRE
+
+$0 Host regex '$opt_h' failed to compile: '$@'
+BADRE
+    if $@ ;
+}
+
+$opt_t ||= 'thismonth' ;
+
+my $pre_filter = $opt_h
+    ? sub { my %F = @_; my ($d, $h) =($F{TOTAL_TIME_DOWN}, $F{HOST_NAME}); $d > 300 && ($h =~ qr<$opt_h>) }
+    : sub { my %F = @_; $F{TOTAL_TIME_DOWN} > 300 } ;
+
+my $x = Nagios::Report->new(
+                q<local_cgi Nagios_Server Auth_Nagios_User>,
+                [ qw(24x7) ],
+                $opt_t,
+                0,
+                $pre_filter,
+                # sub { my %F = @_; $F{TOTAL_TIME_DOWN} > 300 },
+               )    
+  or die "Can't construct Nagios::Report object." ;
+
+$x->mkreport(
+        [ qw(
+            HOST_NAME
+            DOWN
+            UP
+            OUTAGE
+           )
+        ],
+
+        sub { my %F = @_; i2t($F{OUTAGE}) > 300 },
+        # sub { my %F = @_; my $u = $F{PERCENT_TOTAL_TIME_UP}; $u =~ s/%//; $u < 100 },
+
+        sub { 
+                my %f = @_ ;
+                d2t($Nagios::Report::a->[$f{DOWN}])     <=>
+                d2t($Nagios::Report::b->[$f{DOWN}]) ;
+        },
+
+                # Sort by outage duration.
+         # sub { 
+         #         my %f = @_ ;
+         #         i2t($Nagios::Report::a->[$f{OUTAGE}])     <=>
+         #         i2t($Nagios::Report::b->[$f{OUTAGE}]) ;
+         # },
+
+        undef,
+
+        1,
+) ;
+
+$x->debug_dump(30, 4) ;

@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+use strict;
+use utf8;
+use Net::IPMessenger::Bot;
+use Sys::Hostname ();
+
+my $bot = Net::IPMessenger::Bot->new(
+    configure => {
+        NickName  => 'system_bot',
+        GroupName => 'bot',
+        UserName  => 'system_bot',
+        HostName  => Sys::Hostname::hostname(),
+        Debug     => 1,
+    },
+    on_message => [
+        qr/top/ => sub { `top -b -n 1` },
+        qr/ps/  => sub { `ps aux` },
+        qr/df/  => sub { `df` },
+    ],
+);
+
+$bot->start;

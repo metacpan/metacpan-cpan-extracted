@@ -1,0 +1,32 @@
+---
+abstract: 'NetSNMP module for Sendmail statistics'
+author:
+  - 'Sergey Poznyakoff <gray@gnu.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: NetSNMP-Sendmail
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  NetSNMP::Sendmail:
+    file: lib/Sendmail.pm
+    version: '0.95'
+requires:
+  NetSNMP::ASN: '0'
+  NetSNMP::OID: '0'
+  NetSNMP::agent: '0'
+  perl: '5.010000'
+resources:
+  repository: git://git.gnu.org.ua/netsnmp-sendmail.git
+version: '0.95'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

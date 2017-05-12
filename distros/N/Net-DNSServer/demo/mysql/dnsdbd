@@ -1,0 +1,52 @@
+#!/usr/bin/perl -w
+
+# $Id: dnsdbd,v 1.1 2002/04/29 10:57:05 rob Exp $
+#
+# This example starter script uses MySQL as its
+# backend database for the name server.  Be sure
+# that schema.mysql has been installed into
+# mysql prior to running this script.
+#
+# See README for more details.
+
+use strict;
+use Net::DNSServer;
+use Net::DNSServer::DBI;
+
+my @mysql_dsn
+  =((join ":",
+     "dbi:mysql",
+     "host=localhost",
+     "port=3306",
+     "database=dns",
+     "user=named",
+     "password=notbind",
+     ),
+    "","");
+
+my $dbi_resolver = new Net::DNSServer::DBI {
+  connect => \@mysql_dsn,
+};
+
+
+run Net::DNSServer {
+  priority => [ $dbi_resolver ],
+  server => {
+    server_type => 'Single',
+    log_level=> 2,
+    log_file => "/var/log/named.log",
+    pid_file => "/var/run/named.pid",
+  },
+};
+
+# never gets here
+
+exit;
+
+__END__
+
+Copyright (c) 2002, Rob Brown <bbb@cpan.org>.
+All rights reserved.
+
+Net::DNSServer is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.

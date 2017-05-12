@@ -1,0 +1,58 @@
+{
+   "abstract" : "NetSNMP module for Sendmail statistics",
+   "author" : [
+      "Sergey Poznyakoff <gray@gnu.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "NetSNMP-Sendmail",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "NetSNMP::ASN" : "0",
+            "NetSNMP::OID" : "0",
+            "NetSNMP::agent" : "0",
+            "perl" : "5.010000"
+         }
+      }
+   },
+   "provides" : {
+      "NetSNMP::Sendmail" : {
+         "file" : "lib/Sendmail.pm",
+         "version" : "0.95"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.gnu.org.ua/netsnmp-sendmail.git",
+         "web" : "http://git.gnu.org.ua/cgit/netsnmp-sendmail.git/"
+      }
+   },
+   "version" : "0.95",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

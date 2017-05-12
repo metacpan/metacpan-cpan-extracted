@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c0fe169946b70c4fef4e2df02ca82fb5e0cf0c34 Changes
+SHA1 57845100da695bdfbd480d1052abcea04c197887 INSTALL
+SHA1 509f655780fe2a934ad8515fa15921b96a6de84c LICENSE
+SHA1 510519e719f7e69b33a7ce40044e1db14110a832 MANIFEST
+SHA1 930037153f6ee92e79ec5cab54a65c455121d601 META.json
+SHA1 818c678c92b81135d4f6008645231580541fd899 META.yml
+SHA1 14d0746a58f29e9c38cca2a7594e9a41865a33f0 Makefile.PL
+SHA1 33f342e76ac893b16e19668157c528210b2c9120 cpanfile
+SHA1 d53be26fb79c18790e40f4a4423e0bd7761d14bf dist.ini
+SHA1 a68f9e75dbfa15fea4e4a1ded6b08ac23af66d29 lib/Net/Async/TransferFD.pm
+SHA1 b55440cd42d492955957bfc7506551ae7cdc6389 lib/Net/Async/TransferFD.pod
+SHA1 947ca86c2bef5344eb858480d48451963933ae9d t/00-check-deps.t
+SHA1 9f7e534455ae1100cf273a877af2f60d55622fff t/00-compile.t
+SHA1 7c9bd879814958a6487d41985af42cd7085a7fc2 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 80b92204288dcc880ccef4c49e24e6c91805f12d t/realsend.t
+SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
+SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
+SHA1 5598b706d9b813eafb74508a7575b391ccd30423 xt/author/test-version.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/release/synopsis.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJWRhjyAAoJEMUM364e+fE4sdgQAIrLT7otoQHtJt9OY8As/Y2E
+HexH8/I+bv5fRY4eNEpZqbDJe23plV+hXEu11Lw2gBt/1OKwpb307bwLq4iK3QS2
+b8BzT55NRCjoWBUMSe9IiSq+RFLg1jRKKGsexoFDt7UCyDzsV+lOTckq6HCqr1hK
+i7wdX5eWT3IdosDZ31cFp+Jo0ouh7XT//YVH3uCjeZp6E7q1oD9G14d4deYmGVVg
+n7aFWHj7HlnCyxrGe5QxL3vFzu3/+gAagXPffT6hwGvVGgUt7+hJuKmMQ5E4jXK4
+gY/jBJIEyd9N6dGfFunqHrJeZSB0jNZJOto+C3offcm7zLEmiBxyfrJyXsCTcOwG
+CTl2hn2QFYDhbUM2MoKSP/gtpZEow4Y75VN8YKkBYkdeQq8M9ynIonTVaKcSpGdx
+Wyt4+alICBm+ueMvrU2i1RtToUfauSl5BvLm7vo9Ocaqive2iIZq4xerGhSp9+KT
+Hd7qDXMZb4Ac/taM4miKl7W2DsQIyD0UIZgKkguw5pKhitNKJ0Pj20ctjDJ/4zVe
+TzVl+RGjIJ2TrI9MmBnbe/pdbg9GPvTZu9f5u1VN8FpAnK4TnqBlhK9aam/qLtxw
+vS7Xix6ek5a2YwYg/8Js/cSnZXfeRB1BuoNvY7RB42DERm7TD3eA3uGoPU9g48y+
+FYaKLOwH/myNqPejHI6f
+=5tQe
+-----END PGP SIGNATURE-----

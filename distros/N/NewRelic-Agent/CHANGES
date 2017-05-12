@@ -1,0 +1,290 @@
+==================================================
+Changes from 2015-04-24 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version 0.0532 at 2016-04-23 17:31:33 +0000
+-------------------------------------------
+
+  Change: df2b13b86501d665cddb030225ab9e0b9bae48b6
+  Author: Tim Bunce <tim.bunce@pobox.com>
+  Date : 2016-04-23 17:30:57 +0000
+
+    Auto-updated README.md 
+
+  Change: 2b5c8e94f1ca07f8fe9dd8bbeb2f12c42cb13a95
+  Author: Tim Bunce <tim.bunce@pobox.com>
+  Date : 2016-04-23 16:54:22 +0000
+
+    Merge remote-tracking branch 'fastly/master' 
+
+  Change: 1127c8ea88e7c87fe25152369bae34cd2e9ab4e2
+  Author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+  Date : 2016-03-07 19:48:14 +0000
+
+    add META.yml 
+
+  Change: 7ceefb338ef975f797f56a5cee9b10a11e149840
+  Author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+  Date : 2016-03-07 18:27:57 +0000
+
+    bump 
+
+  Change: 3897d1cb9f4919e7288df78fa2b72dbb19aa20a0
+  Author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+  Date : 2016-03-07 18:27:09 +0000
+
+    Move XSpp to configure requires 
+
+  Change: b5965c886179a12a419b369e17df7e29378a793e
+  Author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+  Date : 2016-03-04 16:23:06 +0000
+
+    add MetaJSON 
+
+  Change: 4bb12c1365d0cdfa181c71011f09af43e7f66cb6
+  Author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+  Date : 2016-03-04 16:19:08 +0000
+
+    add CommitBuild 
+
+  Change: 08a6a8a48d4fe4af71ab27f1d789712aaee3e7c6
+  Author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+  Date : 2016-03-04 16:11:13 +0000
+
+    band-aid fix to require ParseXS in configure 
+
+  Change: d2e85b9a4944bdf3ff05a3e92685752610413484
+  Author: Tim Bunce <tim@tigerlms.com>
+  Date : 2015-11-02 12:53:46 +0000
+
+    Upgrade sdk to v0.16.2.0
+
+    https://discuss.newrelic.com/t/agent-sdk-0-16-2-release-notes/26045 
+
+  Change: 9f130479f0cf16038af3fea0f55af3ae4d5b36d4
+  Author: Tim Bunce <tim@tigerlms.com>
+  Date : 2015-11-02 12:06:36 +0000
+
+    Merge branch 'master' into upstream-master 
+
+  Change: b513e5887a3cd99ee223f1054c7f40b25ea78a82
+  Author: Tim Bunce <tim@tigerlms.com>
+  Date : 2015-11-02 11:43:08 +0000
+
+    Merge remote-tracking branch 'upstream/master' 
+
+  Change: 29fc86ad759bae0496851b455ba0183386c2ba4e
+  Author: Tim Bunce <tim@tigerlms.com>
+  Date : 2015-09-03 20:30:43 +0000
+
+    Merge remote-tracking branch 'upstream/master' 
+
+  Change: 4d6b77b47bb416874fb93692f894abf4384bfd7b
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-09-03 08:07:15 +0000
+
+    Bumped version 
+
+  Change: be8ccd57046935a283fc2e726324d006a85e1ba8
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-09-03 08:06:35 +0000
+
+    Bumped version 
+
+  Change: 4a481ac7301bce6ceafc5456d15eeae6738c43f4
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-09-03 08:04:27 +0000
+
+    Merge pull request #3 from timbunce/remove-method-signatures
+
+    Remove use of Method::Signatures (to improve speed and reduce memory
+    usage) 
+
+  Change: 4b6f93857e5d6d4aff1ba0e65abdbefbe8a1ef6a
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-09-03 08:00:50 +0000
+
+    Merge pull request #4 from timbunce/remove-method-signatures
+
+    Remove use of Method::Signatures, add arg checking (saves >35MB) 
+
+  Change: ce5e310dc5ea06354eb2e8038ce171d208c18666
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-09-03 08:00:20 +0000
+
+    Merge pull request #3 from timbunce/fix-01-basic-perl-version
+
+    Fix t/01-basic.t to not assume/require 5.014002 
+
+  Change: af5ea627c1b70d300ea18bbd0be44286834680f1
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-09-03 07:59:56 +0000
+
+    Merge pull request #1 from slobo/patch-1
+
+    Fix test relying being run on per 5.14.2 
+
+  Change: 0de8a6593931cafd799c614e1c7356081213e447
+  Author: Tim Bunce <tim@tigerlms.com>
+  Date : 2015-09-02 14:42:45 +0000
+
+    Remove use of Method::Signatures (to improve speed and reduce memory
+    usage) 
+
+  Change: 4cf70d9263220a17ac5c372f1629db69fa506e21
+  Author: Tim Bunce <tim@tigerlms.com>
+  Date : 2015-09-02 13:48:41 +0000
+
+    Remove use of Method::Signatures, add arg checking (saves >35MB on my
+    system) 
+
+  Change: 1b4fa0560a9e7557d1a87e0806b68315888f979d
+  Author: Tim Bunce <tim@tigerlms.com>
+  Date : 2015-09-02 13:38:15 +0000
+
+    Fix t/01-basic.t to not assume/require 5.014002 
+
+  Change: 54bc373216f9df2e0be6fe8b47b8919b2ade43bd
+  Author: Slobodan MiÅ¡koviÄ <slobodan@miskovic.ca>
+  Date : 2015-07-05 09:45:12 +0000
+
+    Fix test relying being run on per 5.14.2
+
+    This made the build fail on anything but. 
+
+  Change: 20c5217a96f0e975d74cf3c349eece21d08837de
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-05-27 23:28:41 +0000
+
+    Added README file 
+
+  Change: 223b4fb4496804af992c29af68ceb81a3e4f4507
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-05-27 23:27:32 +0000
+
+    Added CHANGES file 
+
+  Change: 992a0a8fffbf3f58ae22d02fff310357e17ddb81
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-05-27 23:25:05 +0000
+
+    Large refactor with CHI and path_rules 
+
+  Change: 6f02c94aa0c36679f6728acf51c65952b1b17559
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-04-25 17:25:02 +0000
+
+    Added ENV variable support 
+
+  Change: 74c73b065d4322424a5b05cce7f9531a18781a3e
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-04-25 17:17:52 +0000
+
+    Some method refactoring 
+
+  Change: b1435403dadf0a0d1a65e5b0b75c8ba293280fb2
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-04-25 01:36:46 +0000
+
+    Initialized Agent 
+
+  Change: 70f9d2a9f77d7b42da7158ab9004f6b6134597f3
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-04-23 10:52:45 +0000
+
+    Added POD 
+
+  Change: 4f7b1f7e7cd0c61f0d08b505428d609e21b7ffa7
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-04-23 09:51:11 +0000
+
+    Bumped version 
+
+  Change: cc6c5be9e1943b2ca07ad73463c37f935a159613
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-04-23 09:50:37 +0000
+
+    Added dzil and travis config 
+
+  Change: edba0619b8fe03b003afd01ef3c20eadc955b881
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-04-23 09:46:57 +0000
+
+    First commit 
+
+-------------------------------------------
+version 0.0510 at 2015-05-12 19:09:22 +0000
+-------------------------------------------
+
+  Change: dae25bb8b19169c8ad362aa61f73fcce15be2969
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-05-12 19:09:22 +0000
+
+    Fixed absolute vs. relative path issue 
+
+-------------------------------------------
+version 0.0503 at 2015-05-07 14:40:10 +0000
+-------------------------------------------
+
+  Change: bd7234b1323c27e1b2b7a7c3cdeb06625053f31c
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-05-07 14:40:10 +0000
+
+    Fixed abstract 
+
+  Change: 1e0e00c297357440edb2bf9f99ee55d783113626
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-05-07 14:33:58 +0000
+
+    Added README file 
+
+-------------------------------------------
+version 0.0501 at 2015-05-07 14:15:32 +0000
+-------------------------------------------
+
+  Change: e46bc306ddbc76e961c07d7906564036145bddce
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-05-07 14:15:32 +0000
+
+    Added CHANGES file 
+
+-------------------------------------------
+version 0.0500 at 2015-04-30 21:58:15 +0000
+-------------------------------------------
+
+  Change: ff30eb072be8f4c3557e5ea1d3c2ae44df03479d
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-04-30 21:58:15 +0000
+
+    Fixed destructor, embed_collector, and init 
+
+-------------------------------------------
+version 0.0420 at 2015-04-25 15:58:15 +0000
+-------------------------------------------
+
+  Change: c26f40d836304a86c5666cad4ec416015d36b1a7
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-04-25 15:58:15 +0000
+
+    Fixed manifest .so issue 
+
+-------------------------------------------
+version 0.0410 at 2015-04-25 00:36:19 +0000
+-------------------------------------------
+
+  Change: 5561629e473e763588d029b0841b289a8de2c145
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-04-25 00:36:19 +0000
+
+    Fixed relative to absolute paths 
+
+  Change: 1b11ec85066f8830b648010090669057a7c516e9
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-04-22 20:01:16 +0000
+
+    update travis config 
+
+===============================================
+Plus 1 release after 2015-04-24 00:00:00 +0000.
+===============================================

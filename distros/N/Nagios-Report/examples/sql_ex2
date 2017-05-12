@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+
+
+use strict ;
+
+use Nagios::Report ;
+
+# $SIG{__WARN__} = sub { 0 } ;
+
+my @month_time_periods = (
+  '0000 01.02.2006 - 1500 27.02.2006',
+  '0000 01.01.2006 - 2359 31.01.2006',
+  '0000 01.12.2005 - 2359 31.12.2005',
+  '0000 01.11.2005 - 2359 30.11.2005',
+  '0000 01.10.2005 - 2359 31.10.2005',
+  '0000 01.09.2005 - 2359 30.09.2005',
+  '0000 01.08.2005 - 2359 31.08.2005',
+  '0000 01.07.2005 - 2359 31.07.2005',
+) ;
+
+my @file_names = qw(
+  ar-24x7_Feb_2006.csv
+  ar-24x7_Jan_2006.csv
+  ar-24x7_Dec_2005.csv
+  ar-24x7_Nov_2005.csv
+  ar-24x7_Oct_2005.csv
+  ar-24x7_Sep_2005.csv
+  ar-24x7_Aug_2005.csv
+  ar-24x7_Jul_2005.csv
+) ;
+
+foreach (@month_time_periods) {
+
+  my $fn = shift @file_names ;
+
+  open STDOUT, "> $fn" ;
+
+  my $x = Nagios::Report->new('local_cgi Nagios_Server Auth_Nagios_User', [ '24x7' ], $_) ;
+
+  my $SQL =<<SQL;
+SELECT * FROM tab_24x7
+SQL
+# SELECT * FROM tab_24x7 ORDER BY host_name ASC
+
+  my ($d) = $x->to_dbh ;
+  my $s   = $d->prepare($SQL) ;
+     $s->execute ;
+     $s->dump_results(256, "\n", ',', *STDOUT) ;
+     $s->finish ;
+     $d->disconnect ;
+
+  close STDOUT ;
+
+}

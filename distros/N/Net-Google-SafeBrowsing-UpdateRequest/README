@@ -1,0 +1,39 @@
+Net-Google-SafeBrowsing-UpdateRequest
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc
+command.
+
+    perldoc Net::Google::SafeBrowsing::UpdateRequest
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-Google-SafeBrowsing-UpdateRequest
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Google-SafeBrowsing-UpdateRequest
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Net-Google-SafeBrowsing-UpdateRequest
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Net-Google-SafeBrowsing-UpdateRequest
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Dan Born
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

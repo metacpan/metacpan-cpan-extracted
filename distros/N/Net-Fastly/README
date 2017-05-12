@@ -1,0 +1,413 @@
+NAME
+
+    Net::Fastly - client library for interacting with the Fastly web
+    acceleration service
+
+SYNOPSIS
+
+        use Net::Fastly;
+    
+        my $fastly = Net::Fastly->new(%login_opts);
+        
+        my $current_user     = $fastly->current_user;
+        my $current_customer = $fastly->current_customer;
+        
+        my $user     = $fastly->get_user($current_user->id);
+        my $customer = $fastly->get_customer($current_customer->id);
+        
+        print "Name: ".$user->name."\n";
+        print "Works for ".$user->customer->name."\n";
+        print "Which is the same as ".$customer->name."\n";
+        print "Which has the owner ".$customer->owner->name."\n";
+        
+        # Let's see which services we have defined
+        foreach my $service ($fastly->list_services) {
+            print $service->name." (".$service->id.")\n";
+            foreach my $version ($service->versions) {
+                print "\t".$version->number."\n";
+            }
+        }
+        
+        my $service        = $fastly->create_service(name => "MyFirstService");
+        my $latest_version = $service->version;
+        
+        # Create a domain and a backend for the service ...
+        my $domain         = $fastly->create_domain(service_id => $service->id, version => $latest_version->number, name => "www.example.com");
+        my $backend        = $fastly->create_backend(service_id => $service->id, version => $latest_version->number, ipv4 => "127.0.0.1", port => 80);
+        
+        # ... and activate it. You're now hosted on Fastly.
+        $latest_version->activate;
+        
+        # Let's take a peek at the VCL that Fastly generated for us
+        my $vcl = $latest_version->generated_vcl;
+        print "Generated VCL file is:\n".$vcl->content."\n";
+        
+        # Now let's create a new version ...
+        my $new_version    = $latest_version->clone;
+        # ... add a new backend ...
+        my $new_backend    = $fastly->create_backend(service_id => $service->id, version => $new_version->number, ipv4 => "192.0.0.1", port => 8080);
+        # ... and upload some custome vcl (presuming we have permissions)
+        $new_version->upload_vcl($vcl_name, slurp($vcl_file));    
+        
+        $new_version->activate;
+    
+        # Purging
+        $fastly->purge('http://www.example.com');    # regular purge
+        $fastly->purge('http://www.example.com', 1); # 'soft' purge (see note below)
+        $service->purge_by_key('article-1');         # purge by surrogate key, note this works on $service
+        $service->purge_by_key('article-1', 1);      # 'soft' purge by surrogate key
+        $service->purge_all;                         # use with caution!
+
+DESCRIPTION
+
+METHODS
+
+ new <opt[s]>
+
+    Create a new Fastly client. Options are
+
+    user - your Fastly login
+
+    password - your Fastly password
+
+    api_key - your Fastly api key
+
+    You only need to pass in api_key OR user and password.
+
+    Some methods require full username and password rather than just auth
+    token.
+
+ client
+
+    Get the current Net::Fastly::Client
+
+ set_customer <customer id>
+
+    Set the current customer to act as.
+
+    NOTE: this will only work if you're an admin
+
+ authed
+
+    Whether or not we're authed at all by either username & password or API
+    key
+
+ fully_authed
+
+    Whether or not we're fully (username and password) authed
+
+ current_user
+
+    Return a User object representing the current logged in user.
+
+    This will not work if you're logged in with an API key.
+
+ current_customer
+
+    Return a Customer object representing the customer of the current
+    logged in user.
+
+ commands
+
+    Return a hash representing all commands available.
+
+    Useful for information.
+
+ purge <path> [soft]
+
+    Purge the specified path from your cache.
+
+    You can optionally pass in a true value to enable "soft" purging e.g
+
+        $fastly->purge($url, 1);
+
+    See https://docs.fastly.com/guides/purging/soft-purges
+
+    Previously purging made an API call to the /purge endpoint of the
+    Fastly API.
+
+    The new method of purging is done by making an HTTP request against the
+    URL using the PURGE HTTP method.
+
+    This module now uses the new method. The old method can be used by
+    passing the use_old_purge_method into the constructor.
+
+        my $fastly = Net::Fastly->new(%login_opts, use_old_purge_method => 1);
+
+ stats [opt[s]]
+
+    Fetches historical stats for each of your fastly services and groups
+    the results by service id.
+
+    If you pass in a field opt then fetches only the specified field.
+
+    If you pass in a service opt then fetches only the specified service.
+
+    The field and service opts can be combined.
+
+    If you pass in an aggregate flag then fetches historical stats
+    information aggregated across all of your Fastly services. This cannot
+    be combined with field and service.
+
+    Other options available are:
+
+    from & to
+
+    by
+
+    region
+
+    See http://docs.fastly.com/docs/stats for details.
+
+ usage [opt[s]]
+
+    Returns usage information aggregated across all Fastly services and
+    grouped by region.
+
+    If the by_service flag is passed then teturns usage information
+    aggregated by service and grouped by service & region.
+
+    Other options available are:
+
+    from & to
+
+    by
+
+    region
+
+    See http://docs.fastly.com/docs/stats for details.
+
+ regions
+
+    Fetches the list of codes for regions that are covered by the Fastly
+    CDN service.
+
+ create_user <opts>
+
+ create_customer <opts>
+
+ create_service <opts>
+
+ create_version service_id => <service id>, [opts]
+
+ create_backend service_id => <service id>, version => <version number>,
+ name => <name> <opts>
+
+ create_director service_id => <service id>, version => <version number>,
+ name => <name> <opts>
+
+ create_domain service_id => <service id>, version => <version number>,
+ name => <name> <opts>
+
+ create_healthcheck service_id => <service id>, version => <version
+ number>, name => <name> <opts>
+
+ create_match service_id => <service id>, version => <version number>, name
+ => <name> <opts>
+
+ create_origin service_id => <service id>, version => <version number>,
+ name => <name> <opts>
+
+ create_syslog service_id => <service id>, version => <version number>,
+ name => <name> <opts>
+
+ create_vcl service_id => <service id>, version => <version number>, name
+ => <name> <opts>
+
+ create_condition service_id => <service id>, version => <version number>,
+ name => <name> <opts>
+
+    Create new objects.
+
+ get_user <id>
+
+ get_customer <id>
+
+ get_service <id>
+
+ get_version <service id> <number>
+
+ get_backend <service id> <version number> <name>
+
+ get_director <service id> <version number> <name>
+
+ get_domain <service id> <version number> <name>
+
+ get_healthcheck <service id> <version number> <name>
+
+ get_invoice [<year> <month>]
+
+    Return a Net::Fastly::Invoice objects representing an invoice for all
+    services.
+
+    If a year and month are passed in returns the invoice for that whole
+    month.
+
+    Otherwise it returns the invoices for the current month to date.
+
+ get_match <service id> <version number> <name>
+
+ get_origin <service id> <version number> <name>
+
+ get_syslog <service id> <version number> <name>
+
+ get_vcl <service id> <version number> <name>
+
+ get_version <service id> <version number> <name>
+
+ get_settings <service id> <version number>
+
+ get_condition <service id> <version number> <name>
+
+    Get existing objects.
+
+ update_user <obj>
+
+ update_customer <obj>
+
+ update_service <obj>
+
+ update_version <obj>
+
+ update_backend <obj>
+
+ update_director <obj>
+
+ update_domain <obj>
+
+ update_healthcheck <obj>
+
+ update_match <obj>
+
+ update_origin <obj>
+
+ update_syslog <obj>
+
+ update_vcl <obj>
+
+ update_version <obj>
+
+ update_settings <obj>
+
+ update_condition <obj>
+
+    Update existing objects.
+
+    Note - you can also do
+
+        $obj->save;
+
+ delete_user <obj>
+
+ delete_customer <obj>
+
+ delete_service <obj>
+
+ delete_version <obj>
+
+ delete_backend <obj>
+
+ delete_director <obj>
+
+ delete_domain <obj>
+
+ delete_healthcheck <obj>
+
+ delete_match <obj>
+
+ delete_origin <obj>
+
+ delete_syslog <obj>
+
+ delete_vcl <obj>
+
+ delete_version <obj>
+
+ delete_condition <obj>
+
+    Delete existing objects.
+
+    Note - you can also do
+
+        $obj->delete
+
+ list_users
+
+ list_customers
+
+ list_versions
+
+ list_services
+
+ list_backends
+
+ list_directors
+
+ list_domains
+
+ list_healthchecks
+
+ list_matchs
+
+ list_origins
+
+ list_syslogs
+
+ list_vcls
+
+ list_versions
+
+ list_conditions
+
+    Get a list of all objects
+
+ search_services <param[s]>
+
+    Search all the services that the current customer has.
+
+    In general you'll want to do
+
+            my @services = $fastly->search_services(name => $name);
+
+    or
+
+            my ($service) = $fastly->search_services(name => $name, version => $number);
+
+CLASS METHODS
+
+ load_options <file>
+
+    Attempts to load various config options in the form
+
+       <key> = <value>
+       
+
+    From a file.
+
+    Skips whitespace and lines starting with #.
+
+ get_options <file[s]>
+
+    Tries to load options from the file[s] passed in using, load_options,
+    stopping when it finds the first one.
+
+    Then it overrides those options with command line options of the form
+
+        --<key>=<value>
+
+COPYRIGHT
+
+    Copyright 2011 - Fastly Inc
+
+    Distributed under the same terms as Perl itself.
+
+SUPPORT
+
+    Mail support at fastly dot com if you have problems.
+
+DEVELOPERS
+
+    http://github.com/fastly/fastly-perl
+
+    http://www.fastly.com/documentation
+

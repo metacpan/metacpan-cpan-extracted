@@ -1,0 +1,36 @@
+---
+abstract: 'DNSSEC extensions to Net::DNS'
+author:
+  - 'Olaf Kolkman'
+  - 'Dick Franks'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-DNS-SEC
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  Crypt::OpenSSL::DSA: '0.15'
+  Crypt::OpenSSL::EC: '1.01'
+  Crypt::OpenSSL::ECDSA: '0.06'
+  Crypt::OpenSSL::Random: '0.1'
+  Digest::GOST: '0.06'
+  Digest::SHA: '5.23'
+requires:
+  Crypt::OpenSSL::Bignum: '0.05'
+  Crypt::OpenSSL::RSA: '0.28'
+  File::Spec: '0.86'
+  MIME::Base64: '2.11'
+  Net::DNS: '1.01'
+  Test::More: '0.47'
+  perl: '5.006'
+version: '1.03'

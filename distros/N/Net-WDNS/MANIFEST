@@ -1,0 +1,22 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+typemap
+README
+GPL.txt
+LICENSE.txt
+
+WDNS.xs
+
+lib/Net/WDNS.pm
+lib/Net/WDNS/Msg.pm
+lib/Net/WDNS/Question.pm
+lib/Net/WDNS/RD.pm
+lib/Net/WDNS/RR.pm
+
+t/00_load.t
+t/20_msg.t
+t/query.dat
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

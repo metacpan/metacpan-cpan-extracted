@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+###########################################
+use warnings;
+use strict;
+
+use Net::Amazon;
+use Net::Amazon::Request::Manufacturer;
+
+die "usage: $0 manufacturer (e.g. disney)" unless defined $ARGV[0];
+
+my $ua = Net::Amazon->new(
+    associate_tag => $ENV{AMAZON_ASSOCIATE_TAG},
+    token         => $ENV{AMAZON_TOKEN},
+    secret_key    => $ENV{AMAZON_SECRET_KEY},
+    max_pages   => 1,
+);
+
+my $req = Net::Amazon::Request::Manufacturer->new(
+    manufacturer  => $ARGV[0],
+);
+
+my $resp = $ua->request($req);
+
+if($resp->is_success()) {
+    print $resp->as_string(), "\n";
+} else {
+    print "Error: ", 
+          $resp->message(), "\n";
+}

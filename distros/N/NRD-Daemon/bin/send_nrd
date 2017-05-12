@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Std;
+use NRD::Client;
+
+my %opts;
+getopts('c:', \%opts) || die "Incorrect options";
+my $conf_file = $opts{'c'} || '/etc/send_nrd.cfg';
+my $conf = NRD::Client->read_config($conf_file);
+
+my ($host, $port) = ($conf->{'host'}, $conf->{'port'});
+
+#
+#use Data::Dumper;
+#print Dumper($conf, $host, $port);
+#
+my $client;
+eval {
+    my $client = NRD::Client->new( $conf );
+    $client->connect(
+        PeerAddr => $host,
+        PeerPort => $port, 
+        Proto    => 'tcp',
+    );
+    $client->send_results_from_lines( *STDIN );
+    $client->end;
+};
+if ($@) {
+  print $@;
+  exit 1;
+}
+
+exit;

@@ -1,0 +1,45 @@
+Revision history for Perl extension Net::DownloadMirror.
+
+0.10 Fri Sep 19 15:26:42 2008
+	- add methods CleanUp(), LtoR(), RtoL(), UpdateLastModified()
+ 	- now we do not call the function CheckIfModified() for
+ 	remotepaths not in local directory  
+
+0.09 Sun Jul  6 20:22:58 2008 
+ 	- changes in the documentation
+
+0.08 Sun Apr  6 09:24:04 2008 
+ 	- code improvements
+ 	- change function Update() to Download()
+	- skip tests with user prompt, if $ENV{AUTOMATED_TESTING} is true
+
+0.07 Wed Feb 13 19:00:04 2008 
+ 	- insert  the attribute "current_modified" to keep times,
+ 	 received from the function mdtm(), 
+ 	while calling "CheckIfModified()"
+
+0.06 Sun Feb  3 19:32:17 2008 
+ 	- check the connection in a better way with function IsConnection()
+	- adjustment of the documentation
+ 	- bind attribute "filename"
+ 	- add some tests
+ 	- bugfix in StoreFiles()
+
+0.05 Sat Jan 19 18:35:15 2008
+ 	- insert a option for the file name in which the last modified times will be stored
+
+0.04 Sat Mar 18 20:25:01 2006
+ 	- bugfix in Makefile.PL
+
+0.03 Mon Jan 16 19:24:13 2006
+ 	- remove "use 5.009002;" in Makefile.PL
+
+0.02 Fri Jan 13 18:41:26 2006
+ 	- remove Exporter.pm, also in future nothing will be to be exported
+ 	- change our $VERSION in $Net::DownloadMirror::VERSION
+ 	- change our @ISA in @Net::DownloadMirror
+ 	- some bugfix in Net-DownloadMirror.t
+
+0.01  Wed Jan  4 09:55:21 2006
+	- original version; created by h2xs 1.23 with options
+		-AXn Net::DownloadMirror

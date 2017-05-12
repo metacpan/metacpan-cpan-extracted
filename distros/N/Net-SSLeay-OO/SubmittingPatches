@@ -1,0 +1,194 @@
+Checklist (and a short version for the impatient):
+
+        Commits:
+
+        - make commits of logical units
+        - check for unnecessary whitespace/identation/documentation
+          with "git diff --check" and maintainer tests for each commit
+        - do not check in commented out code or unneeded files
+        - provide a meaningful commit message
+        - the first line of the commit message should be a short
+          description and should skip the full stop
+        - if you want your work included, add a
+          "Signed-off-by: Your Name <you@example.com>" line to the
+          commit message (or just use the option "-s" when
+          committing) to confirm that you agree to the Developer's
+          Certificate of Origin (below)
+        - make sure that you have tests for the bug you are fixing
+        - make sure that the test suite passes after your commit
+
+        Patches:
+
+        - use "git format-patch -M" to create the patch
+
+        - send the patch to (srsadmins@catalyst.net.nz) If you use
+          git-send-email(1), please test it first by sending email to
+          yourself.
+
+        - patches may also be sent to the RT queue for the module on
+          rt.cpan.org; please only create one ticket for each
+          independent change or closely related series of independent
+          changes.
+
+        Pull requests:
+
+        - if you use github, use the 'pull request' option and select
+          'Catalyst' as the recipient.  Please do remember to sign-off
+          your changes!
+
+----
+
+  Developer's Certificate of Origin 1.2-gnu
+
+  By making a contribution to this project, I certify that:
+
+  (a) The contribution was created in whole or in part by me and I
+      have the right to submit it under the license indicated in the
+      file; or
+
+  (b) The contribution is based upon previous work that, to the best
+      of my knowledge, is covered under an compatible license and I
+      have the right under that license to submit that work with
+      modifications, whether created in whole or in part by me, under
+      the same license (unless I am permitted to submit under a
+      different license), as indicated in the file; or
+
+  (c) The contribution was provided directly to me by some other
+      person who certified (a), (b) or (c) and I have not modified it.
+
+  (d) I understand and agree that this project and the contribution
+      are public and that a record of the contribution (including all
+      personal information I submit with it, including my sign-off) is
+      maintained indefinitely and may be redistributed consistent with
+      this project or the license(s) involved.
+
+----
+
+These patch guidelines are intended to help you help us maintain the
+software.  We are interested in all submissions, however we may not
+have time to make the changes you submit meet the code base standard.
+
+
+Detailed information:
+
+(1) Make separate commits for logically separate changes.
+
+Unless your patch is really trivial, you should not be sending
+out a patch that was generated between your working tree and
+your commit head.  Instead, always make a commit with complete
+commit message and generate a series of patches from your
+repository.  It is a good discipline.
+
+Describe the technical detail of the change(s).
+
+The guiding principle for change messages is that they should only
+describe the change that they are making.  There should be a little
+story:
+
+  1. why the change must happen (the motivation)
+
+  2. what the code used to do, if appropriate (old behaviour)
+
+  3. an outline of the new approach, sparing excessive details (new
+     behaviour)
+
+They should always be written from the perspective that someone has
+just run 'git annotate' and landed on this commit; that person has no
+idea whatsoever about related commits in time.  The description should
+be written in the present tense; with no reference to terms like "this
+patch".
+
+If your description starts to get too long, that's a sign that you
+probably need to split up your commit to finer grained pieces.
+
+
+(1a) Test your changes
+
+Your changes should include tests which demonstrate and hopefully test
+corner cases of your new additions.  If you have difficulty writing
+these, please submit anyway but tests will help us be sure that your
+code works and is suitable for inclusion.
+
+Ideally, the new tests should fail on the old code, pass on the new
+code, and test the documented functionality.
+
+
+(1b) Whitespace, indentation, documentation and copyright boilerplate
+
+There are tests which check that the indentation matches that which
+'perltidy' will produce for the file.  Please use them to check that
+you are conforming to the indentation style of the project.  This will
+involve installing 'perltidy', and setting an environment variable.
+The style is specifically chosen to allow readers to choose their own
+tab width setting without breaking the appearance of the code, and to
+make merging changes easier.
+
+In terms of documentation, we also have a rule that all object methods
+must be documented, or at least mentioned in the SYNOPSIS section of
+the man page/perldoc for that module.  The exception to this is
+internal functions, which are marked by starting with an underscore.
+Again, there is a test script for this which only runs with a
+particular environment variable set.  Running the test suite using
+'make test' will tell you what you need to set.
+
+It is also required that every Perl program contains a brief copyright
+statement, and there is a test for that too.
+
+
+(1c) Be nice to Perl 5.8.x
+
+This codebase is currently designed to run on older perls, ie 5.8.x;
+though we are likely to soon be making 5.10.0 a minimum requirement.
+So currently, do not use 5.10+ features such as //-defined-or,
+smartmatch or newer regex-engine features.  We will also endeavour to
+test the code base on the latest blead and Perl maint branches.
+
+
+(2) Generate your patch using git tools out of your commits.
+
+git based diff tools (git, StGIT, etc) generate unidiff which is the
+preferred format.
+
+You do not have to be afraid to use -M option to "git diff" or
+"git format-patch", if your patch involves file renames.  The
+receiving end can handle them just fine.
+
+Please make sure your patch does not include any extra files
+which do not belong in a patch submission.  Make sure to review
+your patch after generating it, to ensure accuracy.  Before
+sending out, please make sure it cleanly applies to the "master"
+branch head.  If you are preparing a work based on "next" branch,
+that is fine, but please mark it as such.
+
+
+(3) Agreeing to the DCO
+
+The "Sign-off" procedure from git.git and linux-2.6.git is used for
+this project.  This Sign-off indicates _copyright_ conformance only,
+and is the only strict requirement for submissions.
+
+If you are submitting many changes and are worried about potential
+patent infringement lawsuits, please contact us for a copyright
+assignment agreement so that we can take formal ownership of your
+contributions.  However this is not necessary for casual submissions,
+or for those who do not worry about such things.
+
+If you want to indicate your change has been reviewed by someone, you
+can use 'Acked-by:'
+
+
+(4) Sending it in.
+
+As there is not currently a mailing list for this program, please
+submit via one of the following means:
+
+  * drop a patch to the Net::SSLeay developer list, perhaps using
+    git-send-email(1) - see
+    http://lists.alioth.debian.org/mailman/listinfo/net-ssleay-devel
+
+  * fork the project on github
+    (http://github.com/catalyst/Net-SSLeay-OO) and send a pull
+    request.
+
+  * Log a ticket at rt.cpan.org under the queue for 'Net::SSLeay::OO'
+    (if you must)

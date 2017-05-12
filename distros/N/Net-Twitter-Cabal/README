@@ -1,0 +1,51 @@
+Net::Twitter::Cabal
+
+You have a Twitter stream than can be updated by several people. Dealing with
+authorisations is painful, and there's no way to identify a poster.
+
+Net::Twitter::Cabal let's you manage this stream from a central point, where
+you have full control of who can post and without the need to distribute the account's credentials.
+
+You need a Jabber account for the receiver, and everyone involved must have an account on a Jabber network* (e.g., a GMail account will work, via Google Talk). You then tell the participants the name (but not the password!) of the receiver's Jabber account (the JID) and once they add it to their friends list, they're ready to rock.
+
+* In the future I might add a plugin mechanism to make it easy to support
+  other types of transport.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::Twitter::Cabal
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Twitter-Cabal
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-Twitter-Cabal
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-Twitter-Cabal
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-Twitter-Cabal/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Pedro Figueiredo
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

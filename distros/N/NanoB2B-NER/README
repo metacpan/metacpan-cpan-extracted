@@ -1,0 +1,109 @@
+NanoB2B::NNER
+  SYNOPSIS
+      NNER takes a nanoparticle article from the END database and searches for
+      the nanoparticle based entity characteristics to create two ARFF
+      files [train and test] using k-fold cross validation. WEKA is run
+      on these ARFF files and an accuracy and customized results file is made
+
+  INSTALL
+        To install these modules run:
+
+          perl Makefile.PL
+          make
+          make test
+          make install
+
+        This will install the modules in the standard locations. You will, 
+        most probably, require root privileges to install in standard system
+        directories. To install in a non-standard directory, specify a prefix
+        during the 'perl Makefile.PL' stage as:
+
+          perl Makefile.PL PREFIX=/home
+
+        It is possible to modify other parameters during installation. The
+        details of these can be found in the ExtUtils::MakeMaker
+        documentation. However, it is highly recommended not messing 
+        around with other parameters, unless you know what you're doing.
+
+  CONTENTS
+        All the modules that will be installed in the Perl system directory are
+        present in the '/lib' directory tree of the package. These include the
+        semantic relatedness modules -- 
+
+          NanoB2B/NER.pm 
+
+        -- present in the lib/ subdirectory. All these modules, once installed
+        in the Perl system directory, can be directly used by Perl programs.
+
+        The package contains a utils/ directory that contain Perl utility 
+        programs. These utilities use the modules or provide some supporting
+        functionality.
+
+          nanob2b-ner.pl         -- simple example of using the module
+
+  CONFIGURATION
+    Configuration details that will help the user understand the packages
+    dependendies.
+
+    If you are using the UMLS or WordNet, descriptions of those and what
+    aspects of the resources your are using go here.
+
+    If you have some specific parameters, details of those can go here. For
+    example if you have a configuration file that the user can modify.
+
+  SOFTWARE COPYRIGHT AND LICENSE
+        Copyright (C) 2017 Megan Charity & Bridget T McInnes
+
+        This suite of programs is free software; you can redistribute it and/or
+        modify it under the terms of the GNU General Public License as published
+        by the Free Software Foundation; either version 2 of the License, or (at
+        your option) any later version.
+
+        This program is distributed in the hope that it will be useful, but
+        WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+        General Public License for more details.
+
+        You should have received a copy of the GNU General Public License along
+        with this program; if not, write to the Free Software Foundation, Inc.,
+        59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+        Note: The text of the GNU General Public License is provided in the file
+        'GPL.txt' that you should have received with this distribution.
+
+  SEE ALSO
+    <http://search.cpan.org/dist/NanoB2B-NNER>
+
+  CONTACT US
+    If you have any trouble installing and using NanoB2B-NNER, please
+    contact us via the users mailing list :
+
+      Megan Charity <charityml@vcu.edu>
+
+    You may also contact us directly if you prefer :
+
+      Megan Charity: charityml at vcu.edu
+      Bridget T. McInnes: btmcinnes at vcu.edu
+
+  AUTHORS
+     Megan Charity, Virginia Commonwealth University
+     charityml at vcu.edu
+
+     Bridget T McInnes, University of Minnesota Twin Cities
+     bthomson at cs.umn.edu
+
+  DOCUMENTATION COPYRIGHT AND LICENSE
+    Copyright (C) 2017 Megan Charity & Bridget T. McInnes
+
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.2 or
+    any later version published by the Free Software Foundation; with no
+    Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+    Note: a copy of the GNU Free Documentation License is available on the
+    web at:
+
+    <http://www.gnu.org/copyleft/fdl.html>
+
+    and is included in this distribution as FDL.txt.
+

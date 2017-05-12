@@ -1,0 +1,30 @@
+---
+abstract: 'find numbers closest to a given'
+author:
+  - 'Pavel Shaydo <zwon@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.94'
+  Test::Most: '0.22'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Number-Closest-XS
+no_index:
+  directory:
+    - t
+    - inc
+  file:
+    - README.pod
+requires: {}
+resources:
+  bugtracker: https://github.com/trinitum/perl-Number-Closest-XS/issues
+  homepage: https://github.com/trinitum/perl-Number-Closest-XS
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/trinitum/perl-Number-Closest-XS
+version: '0.09'

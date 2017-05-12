@@ -1,0 +1,11 @@
+README for Net::MemcacheQ
+=========================
+
+Net::MemcacheQ is a very basic client wrapper around IO::Socket::INET
+designed to speak a subset of the MemcacheQ protocol as described at
+http://memcachedb.org/memcacheq/
+
+Motivation for this was the fact that there didnt seem to be anything
+on CPAN directly related to MemcacheQ with few dependencies, except
+possibly things relating to memcached, none of which explicitly state
+whether they work with memcacheq or not.

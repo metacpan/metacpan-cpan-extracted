@@ -1,0 +1,12 @@
+<milestone>
+  <created-at type="datetime"></created-at>
+  <due-on type="datetime"></due-on>
+  <goals></goals>
+  <goals-html></goals-html>
+  <open-tickets-count type="integer">0</open-tickets-count>
+  <permalink></permalink>
+  <project-id type="integer"></project-id>
+  <tickets-count type="integer">0</tickets-count>
+  <title></title>
+</milestone>
+

@@ -1,0 +1,29 @@
+---
+abstract: 'Interface to Azure Blob Service'
+author:
+  - 'Leon Brocard <acme@astray.com>'
+build_requires:
+  ExtUtils::CBuilder: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Azure-BlobService
+provides:
+  Net::Azure::BlobService:
+    file: lib/Net/Azure/BlobService.pm
+    version: 0.35
+requires:
+  Digest::MD5: 0
+  Digest::SHA: 0
+  LWP::UserAgent: 0
+  MIME::Base64: 0
+  Moose: 0
+resources:
+  homepage: http://search.cpan.org/dist/Net-Azure-BlobService/
+  license: http://dev.perl.org/licenses/
+version: 0.35

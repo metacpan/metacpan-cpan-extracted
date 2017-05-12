@@ -1,0 +1,44 @@
+{
+   "abstract" : "frame crafting made easy",
+   "author" : [
+      "GomoR <gomor_at_cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Frame-Simple",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Gomor" : "1.00",
+            "Net::Frame" : "0",
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Frame::Simple" : {
+         "file" : "lib/Net/Frame/Simple.pm",
+         "version" : "1.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_1_0"
+      ]
+   },
+   "version" : "1.08",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

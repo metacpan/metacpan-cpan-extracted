@@ -1,0 +1,12 @@
+.cvsignore
+.git
+debian
+lib/CVS
+t/CVS
+archive
+build-stamp
+install-stamp
+IDMETA
+mkdist.sh
+modules
+zoom-perl.spec

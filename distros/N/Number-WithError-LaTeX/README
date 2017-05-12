@@ -1,0 +1,40 @@
+Number::WithError::LaTeX
+========================
+
+DESCRIPTION
+
+This is a subclass of Number::WithError that adds support for printing
+numbers as valid LaTeX.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+For list of dependencies, please refer to the
+META.yml file in this distribution.
+
+SEE ALSO
+
+Current versions of this module may be found via http://steffen-mueller.net or
+CPAN.
+
+Please send your suggestions, inquiries, and feedback to
+modules at steffen-mueller dot net.
+
+Any bugs should be reported via
+http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Number-WithError-LaTeX
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2006 Steffen Mueller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

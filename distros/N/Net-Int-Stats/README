@@ -1,0 +1,63 @@
+Net-Int-Stats version 2.1
+===========================
+
+NAME
+    Net::Int::Stats - Reports specific ifconfig values for a network interface
+
+SYNOPSIS
+    use Net::Int::Stats;
+
+    my $get = Net::Int::Stats->new();
+
+    # get a value for a specific interface
+    my $int     = 'eth0';
+    my $stat	= 'rx_packets';
+    my $packets = $get->value($int, $stat);
+
+    # get a list of all interfaces
+    my @interface_list = $get->interfaces();
+
+DESCRIPTION
+    This module provides a list of all interfaces and various statistics generated from the ifconfig command 
+    for specific interfaces. RX values consist of packets, errors, dropped, overruns, frame, and bytes. TX 
+    values consist of packets, errors, dropped, overruns, carrier, and bytes. In addition IPv4 address, collisions, 
+    and txqueuelen are reported. Values are in the format of type:n - ex 'packets:123456'. The interfaces() method 
+    returns a space delimited list of all interfaces. Ex: lo eth0 eth1.
+    
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module is platform dependent. It uses the linux version
+of /sbin/ifconfig. Other platforms such as the windows equivalent
+of ipconfig, mac osx, and other versions of unix are not supported. 
+This is due to the fact that each platform generates and displays
+different information in different formats of ifconfig results.
+The linux version is used over the other platforms because of the 
+amount of data the default command outputs.
+
+SEE ALSO
+
+linux command /sbin/ifconfig
+
+NOTES
+
+ifconfig output contains more information than the values that are
+extracted in this module. More values and/or support for other
+operating systems can be added if there are any requests to do so.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 Bruce Burch
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

@@ -1,0 +1,33 @@
+Net-SSH-Expect
+===========================
+
+This module is being used by people worldwide and is having a good acceptance. Read the documentation on CPAN to see how you can use this module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Expect.pm
+
+BUGS
+
+If you find any bug you can use the bug reporting tool available on CPAN website. I'll evaluate each bug and fix as soon as I can.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Bruno Negrao Guimaraes Zica <bnegrao@gmail.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

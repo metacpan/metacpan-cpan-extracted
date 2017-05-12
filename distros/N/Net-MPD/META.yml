@@ -1,0 +1,35 @@
+---
+abstract: 'Communicate with an MPD server'
+author:
+  - 'Alan Berndt <alan@eatabrick.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.16, Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-MPD
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Carp: '0'
+  IO::Socket::INET: '0'
+  Scalar::Util: '0'
+  perl: '5.010'
+  version: '0.77'
+resources:
+  bugtracker: https://github.com/bentglasstube/Net-MPD/issues
+  homepage: https://github.com/bentglasstube/Net-MPD
+  repository: https://github.com/bentglasstube/Net-MPD.git
+version: '0.06'
+x_serialization_backend: 'YAML::Tiny version 1.69'

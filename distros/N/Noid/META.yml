@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Noid
+version:      0.424
+version_from: VERSION
+installdirs:  site
+requires:
+    BerkeleyDB:                    0
+    Config:                        0
+    Fcntl:                         0
+    Getopt::Long:                  0
+    Sys::Hostname:                 0
+    Text::ParseWords:              0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

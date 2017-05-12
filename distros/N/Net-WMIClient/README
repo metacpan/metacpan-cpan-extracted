@@ -1,0 +1,44 @@
+Net::WMIClient version 0.62
+======================
+
+This module provides a pure perl interface to the WMI client from the wmi
+package that does not require forking to execute wmic.  It requires that
+lib_async_wmilib.so from the WMI package be installed, and that the
+configured WMI source code be available at build time to provide the
+required headers.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL (You will be prompted for the path to the WMI source)
+   make
+   make test
+   make install
+
+TESTING
+
+By default, network tests are not done.  If you wish to do network tests
+against a Windows machine, you need to create a Samba auth file with proper
+credentials in it, and run 'make test' as follows:
+
+   WMICLIENT_AUTHFILE=<path_to_auth_file> WMICLIENT_TESTHOST=<test_hostname> make test
+
+That will run a few basic tests against the host using the specified credentials.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  lib_async_wmilib.so from the wmi package, along with the configured
+  source code at build.  The current source is available at
+  http://www.edcint.co.nz/checkwmiplus/wmi-1.3.14.tar.gz.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Joshua Megerman
+Portions Copyright by Jelmer Vernooij, Tim Potter, and Andrzej Hajda
+
+This program is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later version.

@@ -1,0 +1,166 @@
+#!/usr/bin/perl -w
+#
+# Example Goofey client using Net::Goofey
+# 
+# ObLegalStuff:
+#    Copyright (c) 1998 Bek Oberin. All rights reserved. This program is
+#    free software; you can redistribute it and/or modify it under the
+#    same terms as Perl itself.
+# 
+# Last updated by gossamer on Mon May 17 15:22:06 EST 1999
+#
+
+use strict;
+
+use Getopt::Std;
+use Text::LineEditor;
+use Net::Goofey;
+
+
+my %opt;
+my $DEBUG = 0;
+
+sub die_nicely {
+   my $signal = shift;
+
+   print STDERR "Perlgoofey got signal $signal, exiting.\n";
+   exit;
+
+}
+
+sub user_help {
+
+   print <<EOF;
+
+Options:
+   -h          Print this help and exit
+   -N          Register a new goofey user
+   -s <name>[,<name>]*
+               Send a message to <name>
+   -S <name>   Delete all traces of your last message to <name>
+   -r <stuff>  Repeat messages.  Same options as regular goofey.
+   -w <name>   List <name>'s finger information
+   -l <name>   List locations and idletimes for <name>
+   -Q <on|off|all> [<quiet-message>]
+               Set you quiet/unquiet/quiet-to-all
+   -x <this|all|other> [<kill-message>]
+               Kill goofey clients on this/all/other ttys
+   -v          Print version and exit
+
+EOF
+
+   return 1;
+}
+
+#
+# Main
+#
+
+getopts('hw:l:r:s:S:x:N:Q:v', \%opt) ||
+   die "Try -h for help.\n";
+
+if ($opt{"h"}) {
+   # help requested
+   &user_help();
+   exit;
+} elsif ($opt{"v"}) {
+   # version number
+   print "Perlgoofey\nBasic Net::Goofey client built with " . Net::Goofey::version() . "\n";
+   exit;
+}
+
+# gotta do this separately or waiting in the editor will
+# fsck up the connection
+if ($opt{"s"}) {
+   my $text = line_editor();
+
+   my $Goofey = Net::Goofey->new();
+   print $Goofey->send($opt{"s"}, $text);
+   exit;
+}
+
+# every other option requires a goofey connection so do it here
+my $Goofey = Net::Goofey->new();
+if (!$Goofey) {
+   die "Perlgoofey failed to connect to Goofey server: $!\n";
+}
+
+# Go through other options
+if ($opt{"w"}) {
+   print $Goofey->who($opt{"w"});
+
+} elsif ($opt{"S"}) {
+   print $Goofey->unsend($opt{"S"});
+
+} elsif ($opt{"Q"}) {
+   my $quietmsg = join(" ",@ARGV);
+   warn "Found arguments to -Q: $quietmsg" if $DEBUG;
+   if (lc($opt{"Q"}) eq "on") {
+      print $Goofey->quiet($quietmsg);
+   } elsif (lc($opt{"Q"}) eq "all") {
+      print $Goofey->quietall($quietmsg);
+   } elsif (lc($opt{"Q"}) eq "off") {
+      print $Goofey->unquiet();
+   } else {
+      die "Unknown arguments to -Q option.  Try -h for help.\n";
+   }
+
+} elsif ($opt{"x"}) {
+   my $killmsg = join(" ",@ARGV);
+   warn "Found arguments to -x: $killmsg" if $DEBUG;
+   print $Goofey->killclient($opt{"x"}, $killmsg);
+
+} elsif ($opt{"r"}) {
+   my $extrargs = join(" ",@ARGV);
+   print $Goofey->repeat($opt{"r"} . $extrargs);
+
+} elsif ($opt{"N"}) {
+   print $Goofey->register($opt{"N"});
+
+} elsif (!%opt) {
+   # No options, register as resident goofey
+
+   $Goofey->signon() || die "Couldn't sign on.";
+
+   print "Successfully signed on, backgrounding client.\n";
+
+   # At this point, we have a connection
+   if (fork()) {
+      # Parent process - die politely
+      exit();
+   }
+
+   # This is the child process, backgrounded.  It stays alive to do stuff.
+
+   # Set the interrupt handlers
+   $SIG{INT} = $SIG{TERM} = \&die_nicely;
+
+   while (1) {
+      # Try to accept a connection
+      # If we have one, answer it properly
+      # else continue
+      my($message_type, $message_data) = $Goofey->listen();
+
+      warn "Client:  message type:  '$message_type'\n" if $DEBUG;
+      warn "Client:  message data:  '$message_data'\n" if $DEBUG;
+
+      if ($message_type eq $Messages{"exit"}) {
+         die "Goofey:  Died at server request.\n";
+      } elsif ($message_type eq $Messages{"idle"}) {
+         # nothing
+      } elsif ($message_type eq $Messages{"message"}) {
+         print "Goofey Message:\n$message_data\n\n";
+      } else {
+         die "Goofey:  Unknown message type: '$message_type'";
+      }
+
+   }
+
+} else {
+   die "Impossible.\n";
+}
+
+
+#
+# End.
+#

@@ -1,0 +1,62 @@
+0.19 : Wed Nov 09 2016
+    -  Added .RO support
+    -  Fix .EU parsing
+
+0.18 : Fri 23 Jan 2015
+    -  Removed Test::LongString / is_string as it was causing failures on CPAN
+
+0.17 : Thu 22 Jan 2015
+    -  Fixed MANIFEST / CPAN Version
+
+0.16 : Thu 22 Jan 2015
+    -  Added .SE & .NU support
+
+0.15 : Mon 6 Oct 2014
+    -  Fix CPAN Upload
+
+0.14 : Mon 6 Oct 2014
+    -  Added .GENT support
+
+0.13 : Wed 4 Sep 2013
+    -  POD & Readme cleanup
+
+0.12 : Mon 28 Aug 2013
+    -  Fixed MANIFEST
+
+0.11 : Mon 27 Jul 2013
+    -  Some code cleanup
+
+0.10 : Thu 25 Jul 2013
+    -  Added POD Data
+
+0.09 : Thu 25 Jul 2013
+    - /bin/das with parameters
+
+0.08 : Thu 25 Jul 2013
+    - SIG ALARM Timout for each query
+
+0.07 : Thu 25 Jul 2013
+    - Batch mode
+
+0.06 : Thu 25 Jul 2013
+    - Got all the tests working
+    - Fixed UK unit
+
+0.05 : Thu 25 Jul 2013
+    - Some minor work on testing
+
+0.04 : Wed 24 Jul 2013
+    - Added NO Unit
+    - Added (but not yet working) UK Unit
+    - Added shell script (needs work)
+    - Some more improvements
+
+0.03 : Wed 24 Jul 2013
+    - Added BE/LT/IT/IS Units
+    - Improvements as a while
+
+0.02 : Wed 24 Jul 2013
+    - Added EU Unit
+
+0.01 : Wed 24 Jul 2013
+    - First build, basic framework

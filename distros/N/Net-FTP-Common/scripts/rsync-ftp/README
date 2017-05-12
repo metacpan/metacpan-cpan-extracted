@@ -1,0 +1,15 @@
+-*- text -*-
+rsync.pl
+	This script uses File::Find to traverse a directory hierarchy
+	and upload the files to a remote machine. If the file has
+	already been uploaded then it is not uploaded again.
+
+	This script was written after 1 hour of fighting with rsync.pl
+	and not getting it to work!
+
+	So, once I get all 5 gigs of my stuff uploaded elsewhere via
+	this script, then I will write rsync2.pl which will only do
+	the upload if the uploaded file date is older.
+
+	Note - it requires AppConfig::Std which actually requires a
+	number of other things. Get 'em all at CPAN

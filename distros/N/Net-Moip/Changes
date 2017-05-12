@@ -1,0 +1,22 @@
+Revision history for Net-Moip
+
+0.05    2015-09-16
+    - aumentando timeout padrão para 15 segundos, já que os servidores
+      da nova API do Moip estão demorando mais para responder.
+    - forçando TLS 1.2 para obter melhores mensagens de erro em
+      caso de incompatibilidade.
+    - melhorias na documentação.
+
+0.04    2015-08-03
+    - atualização dos novos endpoints do Moip. A partir de 30/9/2015
+      o endpoint antigo (www.moip.com.br) será DESATIVADO.
+
+0.03    2014-11-14
+    - novo atributo "decode_as".
+    - monta XML em iso-8859-1, conforme exigido pelo Moip.
+
+0.02    2014-10-30
+    - tratamento correto de url_notificacao e url_retorno.
+
+0.01    2014-10-29
+    - Release inicial.

@@ -1,0 +1,11 @@
+TYPEMAP
+Net::CUPS::Destination	cups_dest_t*
+cups_dest_t *	T_PTRREF
+ppd_file_t *	T_PTRREF
+http_t *		T_PTRREF
+ipp_t *			T_PTRREF
+ipp_op_t		T_IV
+size_t *		T_IV
+ipp_tag_e		T_IV
+ipp_tag_t		T_IV
+const char *	T_PV

@@ -1,0 +1,11 @@
+$args =
+{
+ message_type => MQTT_CONNECT,
+ client_id => 'mosquitto_sub_10888',
+}
+
+10 21 00 06  4d 51 49 73    64 70 03 02  00 3c 00 13
+6d 6f 73 71  75 69 74 74    6f 5f 73 75  62 5f 31 30
+38 38 38
+
+Connect/at-most-once MQIsdp/3/mosquitto_sub_10888 

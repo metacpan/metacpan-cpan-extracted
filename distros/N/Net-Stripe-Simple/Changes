@@ -1,0 +1,15 @@
+Revision history for Net::Stripe::Simple
+
+0.004     2016-10-31 09:18:36-04:00 America/New_York
+  * declare LWP::Protocol::https dependency
+
+0.003     2016-10-28 15:40:58-04:00 America/New_York
+  * remove reliance on smartmatch (RT #107784)
+  * fix error messages in basic.t (RT #107782)
+  * fix charges documentation (RT #100274)
+
+0.002     2014-08-22 10:15:57-04:00 America/New_York
+  * validate all parameters required to construct the URL
+
+0.001     2014-08-11 15:37:03-04:00 America/New_York
+

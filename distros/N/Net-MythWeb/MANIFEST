@@ -1,0 +1,12 @@
+CHANGES
+examples/export_recordings.pl
+examples/mightyv.pl
+lib/Net/MythWeb.pm
+lib/Net/MythWeb/Channel.pm
+lib/Net/MythWeb/Programme.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/pod.t
+t/pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

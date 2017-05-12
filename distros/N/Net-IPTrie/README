@@ -1,0 +1,89 @@
+Net::IPTrie
+
+############################################################################
+INSTALLATION
+############################################################################
+
+You have two options:
+
+perl Build.PL
+./Build
+./Build test
+./Build install
+
+or (if you have GNU make):
+perl Makefile.PL
+make
+make test
+make install
+
+
+############################################################################
+BACKGROUND: 
+############################################################################
+A trie structure is based on a radix tree using a radix of two.  
+This is commonly used in routing engines, which need to quickly find the best 
+match for a given address against a list of prefixes.
+The term "Trie" is derived from the word "retrieval".
+For more information on digital trees, see:
+   * Algorithms in C, Robert Sedgewick
+
+How it works:
+A digital tree is built by performing a binary comparison on each bit of 
+the number (in this case, the IP address) sequentially, starting from the 
+most significant bit.  
+
+Examples:
+
+ Given these two IP addresses:
+                 bit 31                                0
+                     |                                 |
+   10.0.0.0/8      : 00001010.00000000.00000000.00000000/8
+   10.128.0.0/32   : 00001010.10000000.00000000.00000000/32
+
+ Insert the first one in the trie and look up the second one.
+
+ Starting with the first address:
+
+ bit     tree position
+ -------------------------------------------------------------------
+ 31             0
+ 30           0
+ 29         0
+ 28       0
+ 27         1
+ 26       0
+ 25         1
+ 24       0    <-- Prefix position (size - prefix).  Stop and save object
+
+
+ Continuing with the second address:
+
+ bit     tree position
+ -------------------------------------------------------------------
+ 31             0
+ 30           0
+ 29         0
+ 28       0
+ 27         1
+ 26       0
+ 25         1
+ 24       0    <-- 10.0.0.0/8 exists here
+ 23          1  
+ 22     0
+
+ ...continued until bit 0
+
+Since there are no more objects to process, it is determined
+that the "parent" of the second adddress is the first address.
+
+
+############################################################################
+COPYRIGHT AND LICENCE
+############################################################################
+
+Copyright (c) Carlos Vicente <cvicente@cpan.org>. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

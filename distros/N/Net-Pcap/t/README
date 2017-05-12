@@ -1,0 +1,11 @@
+Most of these tests need to bypass the TCP/IP stack in order to directly 
+open the network interface, which generally requires administrative 
+privileges or appropriate access rights. The tests are skipped if the 
+user account running these does not have the required rights. 
+
+Note that some of these tests require a working network interface with
+actual traffic on it.  For example the loop test waits for 10 packets
+to be received on the network before exiting.  If there is no traffic
+on the interface, this test will block.
+
+The memory leak tests do not complete.

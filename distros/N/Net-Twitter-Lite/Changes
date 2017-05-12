@@ -1,0 +1,164 @@
+Revision history for Net::Twitter::Lite
+
+0.12008  2016-12-05 17:21:25 PST
+    - modifed example/oauth_webapp.pl (issue 18)
+    - added upload_media; deprecated update_with_media
+
+0.12007 2016-11-18
+    - depend on LWP::Protocol::https instead of Crypt::SSLeay
+    - make SSL the default for Net::Twitter::Lite::WithAPIv1_1
+
+0.12006 2014-01-24
+    - Added WrapResult: return both the Twitter result and HTTP::Response
+
+0.12005 2014-01-17
+    - Twitter now requires SSL connections
+
+0.12004 2013-05-03
+    - restore list_subscriptions
+
+0.12003 2013-04-25
+    - Added list_ownerships
+
+0.12002 2013-03-11
+    - 30 second delay in OAuth requests fixed with Net::HTTP 6.06
+
+0.12001 2013-03-06
+    - Fixed tests (Net::OAuth is optional) (closses issue #7)
+    - Updated examples to use Twitter API v1.1
+
+0.12000 2013-03-04
+    - URI encode POSTDATA to match Twitter's more stringent (non-standard) requirements
+    - created Net::Twitter::Lite::WithAPIv1_1 for Twitter API v1.1 support
+
+0.11002 2012-06-27
+    - rebuilt from Net::Twitter 3.18003 to fix replies, mentions path
+
+0.11001 2012-05-08
+    - CPAN release
+
+0.11000_01 2012-04-24
+    - functional parity with Net::Twitter 3.18002
+    - Replaced JSON::Any with JSON
+    - new lists methods, legacy_lists_api option for back compat
+    - update_with_media and other new API methods ported from Net::Twitter
+
+0.10004 2011-03-28
+	- ported from Net::Twitter 3.16000
+	- fixed: methods requiring HTTP DELETE failed with OAuth
+    - doc fix: use verifier in request_access_token call
+    - always use SSL for token exchange
+
+0.10003 2010-05-27
+    - fixed ssl test: skip_all if Crypt::SSLeay is not available
+
+0.10002 2010-05-27
+    - fixed: set correct url to https when ssl is specified RT#57889
+
+0.10001 2010-05-26
+    - fixed "plan twice" error in unicode test
+
+0.10000 2010-05-21
+    - production release, ported from Net::Twitter 3.13003
+
+0.09002_03 2010-05-13
+    - ported from Net::Twitter 3.13002_03
+    - handle DELETE HTTP method (for Lists API)
+
+0.09002_02 2010-05-12
+    - ported from Net::Twitter 3.13002_02
+    - Added Lists API support
+
+0.09001 2010-05-10
+    - removed Try::Tiny from unicode test to avoid an additional dependency
+    - Fixed unicode test, aburch (Ansgar Burchardt)
+
+0.09000 2010-05-09
+    - New API methods (from Net::Twitter): friendships_incoming,
+      friendships_outgoing, geo_id, retweeted_by, retweeted_by_ids,
+      reverse_geocode.
+    - Added XAuth support (method xauth)
+    - Fixed: Net::Twitter::Lite::Error - needed overload fallback => 1
+    - Fixed: utf8 encoding error for latin1 using Basic Authentication (ported from Net::Twitter)
+
+0.08006 2009-12-15
+    - Ported from Net::Twitter:
+      - netrc/netrc_machine changes from Net::Twitter
+      - trends_available/trends_location API methods
+      - documented lat/long parameters to update
+      - added users_search/find_people API method
+      - updated apiurl default to http://api.twitter.com/1
+    - Fixed: retweeted_{to,of}_me API URLs (RT#52784)
+
+0.08005 2009-11-02
+    - Return user_id and screen_name from request_access token (ported from Net::Twitter)
+
+0.08004 2009-10-22
+    - Fixed: cached request_token resulted in stale authentication/autorization urls
+    - Added better runtime error message when SSL support is missing
+
+0.08003 2009-10-13
+    - Added new API method: report_spam
+
+0.08002 2009-10-12
+    - ported support for multipart/from-data posts, used by update_profile_image and
+      update_profile_background_image, from Net::Twitter
+    - Improved error message when Net::OAuth is not install or version is inadequate
+    - Changed nonce generation to remove dependency on Digest::SHA
+    - Doc patch: created_at, not time (thanks to Blair Christensen RT#50313)
+
+0.08001 2009-09-10
+    - URI 1.35 causes utf8 encoding problems; require 1.40 (thanks to Dan Boger, @zigdon)
+    - Removed deprecated is_authorized from examples in pod (thanks to Nigel Metheringham)
+
+0.08000 2009-08-27
+    - Ported get_authentication_url from Net::Twitter
+    - Work around perl bug requiring encoded hash keys when client uses "use utf8"
+
+0.07000 2009-08-14
+    - Removed JSON::DWIW as a handler (no support for JSON::Any's utf8 option)
+
+0.06002 2009-07-29
+    - Fix: spurious OAuth signature failures (ported from Net::Twitter)
+
+0.06001 2009-07-28
+    - Fix: OAuth / unicode conflict
+
+0.06000 2009-07-28
+    - Bug fix: OAuth signatures on POST requests (Galen Huntington)
+    - Unicode fixes
+
+0.05000 2009-07-09
+    - Added ssl and netrc arguments to new
+
+0.04001 2009-07-07
+    - Added documentation for the required callback param to
+      get_authorization_url
+    - New nonce algorithm to eliminate potential duplicates on forked
+      processes
+
+0.04000 2009-06-27
+    - Added support for the "authenticate" parameter to API methods
+
+    - Twitter API update:
+        - Added screen_name and user_id parameters to new_direct_message
+        - Added show_friendship method (friendships/show.json)
+
+0.03001 2009-06-20
+    - Fixed Basic Auth regression error
+
+0.03000 2009-06-20
+    - Added OAuth 1.0a support
+    - Added examples using OAuth
+
+0.02002 2009-06-11
+    - Reverted the 'forceauth' feature; it requires too recent LWP::UserAgent
+
+0.02000 2009-06-07
+    - Added support for the saved_searches API methods
+
+0.01001 2009-06-06
+    - Fixed: accept extra args as a hashref (search behaved this way in 2.12)
+
+0.01000 2009-06-06
+    - non-Moose variation of Net::Twitter

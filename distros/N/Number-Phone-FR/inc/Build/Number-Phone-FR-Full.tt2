@@ -1,0 +1,46 @@
+use utf8;
+use strict;
+use warnings;
+
+package Number::Phone::FR::Full;
+
+our $VERSION;
+BEGIN {
+    $VERSION = '[% VERSION %]';
+}
+
+use Number::Phone::FR;
+
+use parent 'Number::Phone::FR';
+use Scalar::Util 'blessed';
+
+sub RE_0() {
+    qr/[% RE_0 %]/
+}
+
+sub RE_SUBSCRIBER() {
+    qr/\A(?:[% RE_SUBSCRIBER %])\z/
+}
+
+sub RE_FULL() {
+    qr/\A(?:[% RE_FULL %])\z/
+}
+
+sub RE_PFX() {
+    qr/[% RE_PFX %]/
+}
+
+sub operator
+{
+    my $num = Number::Phone::FR::subscriber(@_);
+    return unless defined $num;
+    $num .= '_' x (9 - length($num));
+    if ("${num}[% STR_OPERATORS %]" =~ m/^([% RE_OPERATOR %])/) {
+        my $op = substr($1, -4);
+        $op =~ s/ *$//;
+        return $op;
+    }
+    return undef;
+}
+
+1; # vim:set ft=perl et sw=4 sts=4:

@@ -1,0 +1,12 @@
+README
+Changes
+Build.PL
+Makefile.PL
+MANIFEST
+lib/Net/IDN/Nameprep.pm
+t/00use.t
+t/nameprep_vec.t
+LICENSE
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

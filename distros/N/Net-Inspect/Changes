@@ -1,0 +1,206 @@
+0.326 2016/07/06
+- initial support for SMTP 
+  - implemented in L7::SMTP
+  - tool to extract mails from SMTP traffic: tools/smtp2mbox.pl
+  - no support for BDAT yet (will croak)
+- L4::HTTP
+  - if request object implements fix_reqhdr/fix_rsphdr method these get
+    used in case of invalid request/response headers to fix the headers
+  - downgrade unexpected status code 1xx to warning instead of error
+- L4::TCP 
+  - don't call upper flow with empty packets (unless FIN)
+  - merge data into next buffer and retry if no data could be processed by upper
+    flow
+- escape special characters in debug function
+
+0.325 2015/07/23
+- new tool tools/multiflow to extract UDP, TCP streams and HTTP requests as
+  pcap. More information in verbose output of httpflow, like ttl and
+  referer.
+- L4::TCP now propagates TTL from SYN+ACK of server within meta data of new
+  connection to next layer
+- some fixes for handling IPv6 and invalid IPv4
+- httpflow no works with newer Net::Pcap which don't export :functions 
+0.324 2015/04/20
+- L7::HTTP - include CONNECT in METHODS_WITHOUT_RPBODY
+0.323 2015/04/14
+- L7::HTTP::Request::InspectChain - call new_request from upper_flow with
+  meta data when creating a new request object
+0.322 2015/04/14
+- L4::TCP - handle case where only part of packet gets ACKed
+0.321 2015/04/14
+- L7::HTTP::Request::InspectChain - various fixes
+0.320 2015/03/07
+- L7::HTTP - make sure in_wsdata is called when only data frame header is
+  received.
+0.319 2015/03/06
+- L7::HTTP - defer forwarding of empty request body on upgrade requests until we
+  know that the server does not want to upgrade and instead continue with normal
+  HTTP. Do not call in_request_body if upgrade succeeded.
+0.318 2015/02/25
+- L7::HTTP
+  - Handle case of eof from server before sending response back in a special
+    way: if this is not the first request don't fatal but instead call
+    in_response_header with an empty header to signal this totally valid
+    server behavior (server might close any time before sending response,
+    client must retry).
+  - better debugging - debug messages include request-id relative to connection
+    and are more conistent
+0.317 2015/02/22
+- L7::HTTP - move websocket handling to L7::HTTP::WebSocket and implement this
+  and other upgrade handling in a more generic way.
+0.316 2015/02/21
+- L7::HTTP 
+  - provide bytes_left and header in frameinfo of in_wsdata/in_wsctl
+  - complain again if request header contain information about non-zero body
+  -  parse_reqhdr allows to parse header w/o length info if explicitly told
+0.315 2015/02/18
+- L7::HTTP support for Websockets
+- L7::HTTP exportable function parse_reqhdr and parse_rsphdr to parse
+  message header
+0.314 2015/02/16
+- L7::HTTP option header_maxsize for new_connection allows it to configure the
+  maximum size of the message headers.
+0.313 2015/02/06
+- L7::HTTP fixed offset calculation in case of gaps
+0.312 2015/01/28
+- L7::HTTP fixed handling of some broken input
+0.311 2015/01/26
+- L7::HTTP
+  - allow \x80-\xff in field-name
+  - allow gaps for upgraded connections (i.e. calls for in_data)
+  - better detection of chunked encoding, that is accept if given together with
+    parameters or with further transfer-encodings inside the same field-value
+  - expect body data (especially gaps) only with CONNECT once a successful
+    response was received.
+  - some code refactoring
+0.310 2015/01/20
+- L7::HTTP 
+  - gap_diff, gap_offset, offset behave now as expected in array
+    and scalar context. 
+  - correctly mark end of body in call of in_request_body
+  - fix for handling gaps in response
+0.309 2015/01/07
+- L7::HTTP - connections can now track where gaps are possible (i.e. body data
+  not needed for HTTP analysis itself), see gap_offset, gap_diff.
+- L7::HTTP - bugfix for correctly calculating offset with chunked requests
+0.308 2015/01/06
+- L7::HTTP - fixed typo in METHODS_WITHOUT_RQBODY (use of METHODS_WITHOUT_RPBODY
+  instead of METHODS_WITHOUT_RQBODY)
+- L7::HTTP - check that content-length is valid number
+0.307 2014/12/12
+- L7::HTTP - export some functionality for external use
+0.306 2014/12/11
+- L7::HTTP - fix bug when calling in_junk
+0.305 2014/11/12
+- Net::Inspect::IP: don't endless-loop if we don't find the expected
+  protocol header in the IPv6 headers. Accept ICMPv6 as protocol header.
+0.304 2014/07/03
+- added IPv6 support for L3::IP
+0.303 2013/11/08
+- fix L4::TCP for case, where FIN+ACK not only acked FIN but also previous data
+- tools/tcpudpflow: add feature to write each flow as single pcap file (needs
+  Net::PcapWriter) instead of one file for each direction
+0.302 2013/07/23
+- L7::HTTP::dump_state will return message if defined wantarray instead of
+  writing into debug
+0.301 2013/07/05
+- L7::HTTP::open_requests can now return (selected) request objects
+0.300 2013/07/04
+- clearer handling of end-of-body in HTTP for in_response_body, in_request_body calls
+0.29 2013/04/09
+- L7::HTTP
+  - support for 1xx responses
+  - support for chunked requests
+    INTERFACE CHANGE!! in_chunk_{header,trailer} now specifify direction
+    before the data
+  - fixes for chunked handling:
+    - Transfer-Encoding is compared case insensitive
+    - chunked is only enabled if Transfer-Encoding is exactly 'chunked' 
+      (ignore case) not 'chunked whatever' etc
+    - chunked is only available with version >= 1.1
+  - added test 02_l7http
+0.28 2013/02/25 
+- same as 0.27_1
+0.27_1 2013/02/13
+- fix documentation errors, thanks to perl[AT]theconrys[DOT]com 
+  https://rt.cpan.org/Ticket/Display.html?id=83213
+0.27 2013/02/01
+- fix deflate decoding in Net::Inspect::L7::HTTP::Request::InspectChain
+0.26 2013/02/01
+- L7::HTTP - more information for in_(request|response)_header, including
+  all fields, url, version and possible junk data from header
+- L7::HTTP - call trace/debug only when %TRACE/$DEBUG to get better performance
+- L7::HTTP - be more lax when parsing headers, but report invalid data
+0.25 2013/01/11
+- L7::HTTP - in_(request|response)_header gets additional argument for
+  information extracted from the header, especially the calculated
+  content-length
+0.24 2012/12/03
+- since 0.17 Net::Pcap no longer exports pcap_* functions when importing
+  ':functions'. Work around by explicitly importing the needed functions.
+0.23 2012/11/22
+- removed tools/http_inspection_proxy from distribution.
+  It is now available as a seperate distribution App::HTTP_Proxy_IMP
+0.22 2012/11/22
+- enhanced Net::Inspect::Debug with ideas and code from Net::IMP::Debug for
+  better integration into other debugging frameworks
+0.21 2012/11/20
+- update to 0.20 - forgot to include files into MANIFEST
+0.20 2012/11/19
+- major change on tools/http_inspection_proxy. complete rewrite and support
+  Net::IMP content filters added
+- small bugfixes and enhancements
+0.19 2012/10/1
+- put license into Makefile.PL
+0.18 2012/06/14
+- fixed detach inside Socks::guess_protocol, flow to detach was missing
+0.17 2012/06/11
+- basic support for gaps in the data stream in L7::HTTP and above.
+0.16 2012/06/06
+- harmonize behavior of offset method in L7::HTTP
+0.15 2012/06/05
+- added tool tools/unsocksify-pcap.pl to extract and unsocksify socks4
+  connections from one pcap into another
+0.14 2012/06/04
+- Socks4 encapsulation
+  - Net::Inspect::L5::Socks4
+  - including autodetect
+  - support in httpflow to detect http requests inside socks connections
+- bugfixes related to 0.13
+0.13 2012/05/30
+- L4::TCP: use as time in call of in() the arliest time in the data
+- TCP and above: added dir and time to fatal handlers
+- L7::HTTP: method offset to get position in stream
+0.12 2012/05/25
+- option --anon-stats for httpflow to generate statistics useful for benchmarks
+- L7::HTTP set meta.time for current request when receiving new request header
+  instead of leaving it to start of tcp connection
+0.11 2012/03/27
+- fix in L7::HTTP no valid data in request header
+0.10 2012/03/27
+- dummy expire in base flow object
+0.09 2012/03/06
+- new tools/live-http-headers.pl
+0.08 2012/02/28
+- fixed Changes, added L4::UDP and rtpxtract and renamed tcpudpflow
+  to MANIFEST
+0.07 2012/02/27
+- added rtpxtract
+0.06 2012/02/27 , 0.05 2012/02/27 
+- added L4::UDP
+- added expire for TCP and UDP connections
+- upgraded tcpflow to tcpudpflow
+0.04 2012/01/08 
+- put Net/Inspect.pm (which just contains documentation for now)
+  inside package Net::Inspect
+0.03 2011/12/21 
+- add HTTP::Request, HTTP::Response and Scalar::Util to prereq
+  Thanks to ANDK for reporting
+  https://rt.cpan.org/Ticket/Display.html?id=73417
+- fixes and enhancements for httpflow
+0.02 2011/12/19 
+- fix http_inspection_proxy loading of Net::PcapWriter
+- make all formatting indent=4 tabstop=8
+0.01 2011/12/19 
+- initial release with working tcpflow, httpflow and http_inspection_proxy

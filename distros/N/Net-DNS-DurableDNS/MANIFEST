@@ -1,0 +1,9 @@
+Changes
+examples/durable.pl
+MANIFEST
+Makefile.PL
+README
+lib/Net/DNS/DurableDNS.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,11 @@
+Changes
+lib/Net/Azure/StorageClient.pm
+lib/Net/Azure/StorageClient/Blob.pm
+lib/Net/Azure/StorageClient/MIMEType.pm
+examples/blob.pl
+examples/blobsync.pl
+Makefile.PL
+MANIFEST
+README
+t/00-Blob.t
+META.yml                                 Module meta-data (added by MakeMaker)

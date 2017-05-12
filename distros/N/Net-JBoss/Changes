@@ -1,0 +1,23 @@
+Revision history for Net::JBoss
+
+0.04    26 Nov 2015
+        - fix typo on method name
+        - add support to get stats for xa data source
+
+0.03	29 May 2015
+		- add SSL support
+
+0.02	28 April 2015
+		- reload, restart, shutdown JBoss instance
+		- get application deployment info 
+		- enable / disable pool statistics 
+		- get application runtime statistics
+		- test data source connection pooling
+		- set data source min pool size
+		- set data source max pool size
+		- get jndi view
+		- get and set log level
+		
+0.01    27 April 2015
+        First version.
+

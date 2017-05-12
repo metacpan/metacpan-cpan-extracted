@@ -1,0 +1,43 @@
+$Id: README,v 1.2 2004/12/17 17:16:46 mike Exp $
+
+
+Net::Z3950::PQF
+===============
+
+This library provides a parser for PQF (Prefix Query Format), an ugly
+but precise string format for expressing Z39.50 Type-1 queries. This
+format is widely used behind the scenes of Z39.50 applications, and is
+also used extensively with test-harness programs such as the YAZ
+command-line client, yaz-client.
+
+
+Installation
+------------
+
+To install this module type the following:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+Dependencies
+------------
+
+This module requires these other modules and libraries:
+
+	[None!]
+
+
+Copyright and Licence
+---------------------
+
+Written by Mike Taylor <mike@indexdata.com>
+
+Copyright (C) 2004 by Index Data ApS.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+

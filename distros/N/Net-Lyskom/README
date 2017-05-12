@@ -1,0 +1,25 @@
+Net::Lyskom version 1.2
+=======================
+
+This is a module for talking to Lyskom servers. See
+http://www.lysator.liu.se/lyskom/ for more information on those. It's
+installed in the usual way:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Documentation is available via perldoc as usual. Some knowledge about
+how the Lyskom system works will be needed, and for more than trivial
+applications a working knowledge of Protocol A is pretty much
+necessary. For trivial applications, have a look at
+Net::Lyskom::Simple (which is a part of this package).
+
+For questions, comments and bug reports, try to use the "Perlkom"
+conference at kom.lysator.liu.se. If that's difficult, send mail to
+perlkom@cyberpomo.com or use the issue tracker at
+https://github.com/cdybedahl/perlkom
+
+/Calle Dybedahl, 31 December 2011
+

@@ -1,0 +1,20 @@
+Changes
+eg/consumed
+eg/enumerate
+eg/folders
+lib/Net/TiVo.pm
+lib/Net/TiVo/Folder.pm
+lib/Net/TiVo/Show.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/001constructors.t
+t/002folder.t
+t/003shows.t
+t/004pod.t
+t/005pod-coverage.t
+t/canned/family_guy.xml
+t/canned/good_eats.xml
+t/canned/no_reservations.xml
+META.yml                                 Module meta-data (added by MakeMaker)

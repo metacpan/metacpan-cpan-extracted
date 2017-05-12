@@ -1,0 +1,35 @@
+==================================================
+Changes from 1740-01-29 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2013-11-12 08:45:34 +0000
+------------------------------------------
+
+  Change: b6aea247e6f9ee3204b94de33f4d9ed3ef858316
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-11-12 09:44:44 +0000
+
+    some pod... 
+
+  Change: 5ea1101c245832069f9b1e35516386c6a800ef16
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-11-12 09:25:49 +0000
+
+    Now with WarpCore and new base concept (.pm => .ncc) 
+
+  Change: bff61b24a5b5f4637585a8872b599448bba3baf4
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-11-12 05:46:28 +0000
+
+    First working version... prove of base concepts 
+
+  Change: 0d36c5b7c8698951c7b9f8bbad3495e09f94b555
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-11-12 05:04:58 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

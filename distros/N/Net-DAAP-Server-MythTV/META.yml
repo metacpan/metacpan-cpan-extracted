@@ -1,0 +1,17 @@
+---
+name: Net-DAAP-Server-MythTV
+version: 0.01
+author:
+  - 'Jack Bates <ms419@freezone.co.uk>'
+abstract: Publish MythTV videos to DAAP clients like Apple's Front Row
+license: perl
+requires:
+  DBI: 0
+  Net::DAAP::DMAP: 0
+  POE::Component::Server::HTTP: 0
+  perl: 5
+provides:
+  Net::DAAP::Server::MythTV:
+    file: lib/Net/DAAP/Server/MythTV.pm
+    version: 0.01
+generated_by: Module::Build version 0.26

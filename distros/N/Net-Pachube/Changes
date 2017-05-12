@@ -1,0 +1,12 @@
+Revision history for Perl extension Net::Pachube.
+
+1.102900  2010-10-17 10:49:58 Europe/London
+        - Fix POD bug.  https://rt.cpan.org/Ticket/Display.html?id=51747.
+          Thanks to FWIE.
+	- Add debian package files.
+	- Begin using Dist::Zilla to make releases easier.
+
+0.01  Thu Apr 30 20:53:23 2009
+	- original version; created by h2xs 1.23 with options
+		-X -A -n Net::Pachube
+

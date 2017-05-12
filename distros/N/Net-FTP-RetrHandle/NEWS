@@ -1,0 +1,20 @@
+0.2 Released 2006-09-27
+=======================
+
+* Fix bug with tell returning real position, not taking buffering into
+  account.
+
+* Seperate seek and sysseek, and move all buffer-related seek code
+  into seek.
+
+* seek will do nothing if it seeks to the same position it's already in.
+  This is a common idiom for finding the current position, and anyways
+  Archive::Zip does it a lot.  This makes a big performance difference
+  with Archive::Zip over FTP.  
+
+* Fix caching of current mode in binmode method.  This makes a big
+  performance difference with Archive::Zip over FTP.
+
+0.1 Released 2006-04-02
+=======================
+* Initial Release

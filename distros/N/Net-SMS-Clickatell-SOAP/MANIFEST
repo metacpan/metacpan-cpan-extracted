@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+COPYING
+t/SMS-Clickatell.t
+lib/Net/SMS/Clickatell/SOAP.pm
+META.yml                                 Module meta-data (added by MakeMaker)

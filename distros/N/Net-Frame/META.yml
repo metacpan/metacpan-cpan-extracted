@@ -1,0 +1,48 @@
+---
+abstract: 'the base framework for frame crafting'
+author:
+  - 'GomoR <gomor_at_cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Frame
+provides:
+  Net::Frame:
+    file: lib/Net/Frame.pm
+    version: '1.17'
+  Net::Frame::Layer:
+    file: lib/Net/Frame/Layer.pm
+  Net::Frame::Layer::ARP:
+    file: lib/Net/Frame/Layer/ARP.pm
+  Net::Frame::Layer::ETH:
+    file: lib/Net/Frame/Layer/ETH.pm
+  Net::Frame::Layer::IPv4:
+    file: lib/Net/Frame/Layer/IPv4.pm
+  Net::Frame::Layer::NULL:
+    file: lib/Net/Frame/Layer/NULL.pm
+  Net::Frame::Layer::PPP:
+    file: lib/Net/Frame/Layer/PPP.pm
+  Net::Frame::Layer::RAW:
+    file: lib/Net/Frame/Layer/RAW.pm
+  Net::Frame::Layer::SLL:
+    file: lib/Net/Frame/Layer/SLL.pm
+  Net::Frame::Layer::TCP:
+    file: lib/Net/Frame/Layer/TCP.pm
+  Net::Frame::Layer::UDP:
+    file: lib/Net/Frame/Layer/UDP.pm
+requires:
+  Bit::Vector: '0'
+  Class::Gomor: '1.00'
+  Net::IPv6Addr: '0'
+  Socket: '0'
+  perl: v5.6.1
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: '1.17'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

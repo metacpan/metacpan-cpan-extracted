@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+META.yml
+README
+lib/Net/SMS/Optimus.pm
+lib/sms_optimus
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

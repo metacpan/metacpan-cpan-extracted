@@ -1,0 +1,18 @@
+Revision history for Net-Netcat
+
+0.01    Dec 18 2012
+        First version, released to the wild
+
+0.02	Dec 18 2012
+	Fixed the first bug, poor option parsing of options with 
+	values
+
+0.03	Dec 19 2012
+	Fixed the UNIX domain socket handling, verbose flag and added
+some fluff to the man page. Did some testing. ;)
+
+0.04	Dec 19 2012
+	Fixed several POD errors, now the man page should read fine
+0.05	Dec 19 2012
+	Removed copy paste error in man page	
+

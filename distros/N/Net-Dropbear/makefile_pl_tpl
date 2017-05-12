@@ -1,0 +1,90 @@
+use strict;
+use warnings;
+
+use 5.8.8;
+
+use ExtUtils::MakeMaker 6.30;
+use Config;
+
+eval { build_dropbear() };
+if ($@)
+{
+  warn "Unable to build dropbear: $@\n";
+  warn "Aborted.\n";
+  exit 0;    # tell cpan testers that this is not a failure
+}
+
+my $objs
+    = qx[make -s -f printvar.mak -f dropbear/Makefile print-dropbearobjs print-LIBTOM_LIBS 2>/dev/null];
+my $libs
+    = qx[make -s -f printvar.mak -f dropbear/Makefile print-LIBS 2>/dev/null];
+
+$objs = join " ", map {"dropbear/$_"} split( /\s+/xms, $objs );
+$libs .= ' -lcrypt';
+
+my %WriteMakefileArgs = (
+##{ $plugin->get_default(qw/ABSTRACT/) ##}
+##{ $plugin->get_default(qw/AUTHOR/) ##}
+##{ $plugin->get_default(qw/DISTNAME/) ##}
+##{ $plugin->get_default(qw/LICENSE/) ##}
+##{ $plugin->get_default(qw/NAME/) ##}
+##{ $plugin->get_default(qw/MIN_PERL_VERSION/) ##}
+##{ $plugin->get_default(qw/VERSION/) ##}
+
+  test => { TESTS => "t/*.t" },
+  INC => '-I. -Idropbear -Idropbear/libtomcrypt/src/headers',
+  LDFROM => '$(OBJECT)' . " $objs",
+  LIBS   => $libs,
+
+##{ $plugin->get_prereqs(1) ##}
+);
+
+my %FallbackPrereqs = (
+##{ $plugin->get_prereqs(0) ##}
+);
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } )
+{
+  delete $WriteMakefileArgs{TEST_REQUIRES};
+  delete $WriteMakefileArgs{BUILD_REQUIRES};
+  $WriteMakefileArgs{PREREQ_PM} = {
+    %{ $FallbackPrereqs{PREREQ_PM} },
+    %{ $FallbackPrereqs{BUILD_REQUIRES} },
+  };
+}
+
+delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
+    unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+
+WriteMakefile(%WriteMakefileArgs);
+
+sub run
+{
+  my ($cmd) = @_;
+  warn "$cmd\n";
+  my $ret = system($cmd);
+  die "Error running $cmd ($!)\n"
+      unless $ret == 0;
+}
+
+sub build_dropbear
+{
+  my $db_src = 'dropbear/';
+  local $ENV{DESTDIR};    # do not let Perl module config leak through
+
+  local $ENV{CFLAGS}   = $Config{cccdlflags} . ' ' . $Config{ccflags};
+  local $ENV{LDFLAGS}  = $Config{ldflags} . ' ' . $Config{ccdlflags};
+  local $ENV{CPPFLAGS} = $Config{cppflags};
+
+  return
+      if -e "$db_src/dropbear";
+
+  run("cd $db_src && make distclean")
+      if -f "$db_src/Makefile";
+
+  run("cd $db_src && patch -N -i ../dropbear.patch")
+      if !-f "$db_src/libdropbear.h";
+
+  run("cd $db_src && ./configure");
+  run("cd $db_src && make");
+}

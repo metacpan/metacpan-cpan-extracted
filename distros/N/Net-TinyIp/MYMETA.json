@@ -1,0 +1,51 @@
+{
+   "abstract" : "IP object",
+   "author" : [
+      "kuniyoshi <kuniyoshi@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.01, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-TinyIp",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.42"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Module::Install::ReadmeFromPod" : 0,
+            "Readonly" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/kuniyoshi/Net-TinyIp.git"
+      }
+   },
+   "version" : "0.08"
+}

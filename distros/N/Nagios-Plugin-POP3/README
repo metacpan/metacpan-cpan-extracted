@@ -1,0 +1,102 @@
+NAME
+    Nagios::Plugin::POP3 - Nagios plugin for checking POP3 Servers
+
+VERSION
+    version 1.001
+
+SYNOPSIS
+    Installs the "nagios_plugin_pop3" command that can be used as:
+
+        > nagios_plugin_pop3 --help
+        nagios_plugin_pop3 0.01
+
+        This nagios plugin is free software, and comes with ABSOLUTELY NO WARRANTY.
+        It may be used, redistributed and/or modified under the terms of the GNU
+        General Public Licence (see http://www.fsf.org/licensing/licenses/gpl.txt).
+
+        Nagios plugin for POP3 mailboxes
+
+        Usage: nagios_plugin_pop3 [ -v|--verbose ] [-h|--host=<host>] [-u|--user=<user>] [-p|--password=<password>] [--count] [--delete]
+        [ -c|--critical=<critical threshold> ]
+        [ -w|--warning=<warning threshold> ]
+
+         -?, --usage
+           Print usage information
+         -h, --help
+           Print detailed help screen
+         -V, --version
+           Print version information
+         --extra-opts=[<section>[@<config_file>]]
+           Section and/or config_file from which to load extra options (may repeat)
+         -w, --warning=INTEGER:INTEGER
+        Minimum and maximum number of allowable result, outside of which a
+        warning will be generated.  If omitted, no warning is generated.
+
+         -c, --critical=INTEGER:INTEGER
+        Minimum and maximum number of the generated result, outside of
+        which a critical will be generated.
+
+         -h, --host
+        POP3 Host (defaults to localhost.localdomain)
+
+         -u, --username
+        POP3 Username
+
+         -p, --password
+        POP3 password
+
+         --count
+        Count the number of messages on the server. The messages on the server are not modified.
+        This is the default action.
+
+         --delete
+        Delete all messages on the server. Counts how many messages were deleted.
+
+         -t, --timeout=INTEGER
+           Seconds before plugin times out (default: 15)
+         -v, --verbose
+           Show details for command-line debugging (can repeat up to 3 times)
+        Currently only two POP3 mailbox actions are supported: count and delete
+
+        Count - Counts the number of messages on the server. The messages are not modified.
+        Delete - Deletes all messages on the server (and returns then number deleted)
+
+        THRESHOLDs for -w and -c are specified 'min:max' or 'min:' or ':max'
+        (or 'max'). If specified '@min:max', a warning status will be generated
+        if the count *is* inside the specified range.
+
+    For example, if you have a process that sends an email to a pop3 mailbox
+    once per day, you can get nagios to check the mailbox for a single
+    message (and delete all messages) every day via:
+
+        nagios_plugin_pop3 -h myhost -u myname -p mypass -c 1:1 --delete
+
+DESCRIPTION
+    Currently only two POP3 mailbox actions are supported: "count" and
+    "delete"
+
+    *   count
+
+        Counts the number of messages on the server. The messages are not
+        modified.
+
+    *   delete
+
+        Deletes all messages on the server (and returns then number deleted)
+
+METHODS
+  run
+    Run the plugin
+
+SEE ALSO
+    Nagios::Plugin
+
+AUTHOR
+    Patrick Donelan <pdonelan@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Patrick Donelan.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

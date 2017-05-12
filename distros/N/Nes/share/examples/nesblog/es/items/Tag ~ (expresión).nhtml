@@ -1,0 +1,88 @@
+<h2><a href="#">&#123;: ~ (expresión) <strong>HTML</strong> :&#125;</a></h2>
+<h3>Descripción</h3> 
+<p>
+El bloque se sustituye por &quot;<i>HTML</i>&quot; si expresión resulta cierto.
+</p>
+<p>
+Expresión  puede ser cualquier expresión Perl válida, incluidas expresiones
+ regulares Perl, la variable sólo pueden ser una variable  <a href="./?item=Tag $ (variable)"><i>$</i></a>,
+ de entorno <a href="./?item=Tag * (environment_variable)">*</a>, o un literal:
+<br>
+<br>
+&#123;: ~ ( $ variable =~ /hola/ ) &lt;p&gt;La variable nos saluda&lt;/p&gt; :&#125;<br>
+&#123;: ~ ( * variable ) &lt;p&gt;La variable está definida&lt;/p&gt; :&#125;<br>
+&#123;: ~ ( ! * variable ) &lt;p&gt;La variable no está definida&lt;/p&gt; :&#125;<br>
+</p>
+<p>
+Las expresiones que tengan como resultado la asignación de una variable,
+ devolverán cierto o falso pero la asignación no tendrá efecto:
+<br>
+<br>
+&#123;: ~ ( $ variable = 1 ) &lt;p&gt;La variable NO cambia de valor&lt;/p&gt; :&#125;<br>
+</p>
+
+<p>
+<h3>Inclusión y anidamiento</h3> 
+<p> 
+Los parámetros no permiten la inclusión:
+<pre> 
+&#123;: ~ ( '&#123;: $ var :&#125;' ) &lt;p&gt;html&lt;/p&gt; :&#125;  <- ERROR
+</pre>
+</p>
+<p> 
+Se permite la inclusión y anidamiento de bloques:
+<pre> 
+ &#123;: ~ ( $ monton )  &#123;: # Los comentarios siempre se pueden incluir :&#125;
+      Un montón de HTML...
+      ... 
+      &#123;: ~ ( $ opcion eq 'a' ) 
+             &#123;: include ('archivo_a.html') :&#125;
+      :&#125;
+      &#123;: ~ ( $ opcion eq 'b' ) 
+             &#123;: include ('archivo_b.html') :&#125;
+
+      :&#125;
+      ...
+ :&#125;
+</pre>
+</p>
+</p>
+
+<p>
+<h3>Ejemplo</h3>
+<p>
+<strong>archivo.nhtml:</strong>
+<pre>
+&#123;: NES 1.0 ('archivo.pl') :&#125;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Nes sample/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;b&gt;&#123;: ~ $variable &lt;p&gt;la variable está definia&lt;/p&gt; :&#125;&lt;/b&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+
+</pre>
+
+<strong>archivo.pl:</strong>
+<pre>   
+use Nes;
+
+my $nes = Nes::Singleton->new('archivo.nhtml');
+
+my $nes_tags = {};
+
+$nes_tags->{'variable'} = 1;
+
+$nes->out(%$nes_tags);
+
+</pre>
+
+<strong>Salida:</strong>
+<pre>   
+la variable está definia
+</pre>
+
+</p>
+<br>

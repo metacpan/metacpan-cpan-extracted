@@ -1,0 +1,267 @@
+# This file describe operations needed for migration between versions,
+# both for UPGRADE and DOWNGRADE.
+#
+# Documentation about syntax of this file:
+# https://metacpan.org/pod/App::migrate#SYNTAX
+#
+# You shouldn't modify anything in this file BEFORE LAST "VERSION" LINE!
+# If you will do this you'll likely BREAK DOWNGRADE for some version.
+# Exceptions from this rule are:
+# - git rebase
+# - add/remove comments, empty lines or do other visual/formatting changes
+# - add new DEFINEs
+# - modification of downgrade/after_downgrade operations needed to FIX
+#   BROKEN DOWNGRADE
+#
+# You shouldn't manually add "VERSION" lines - run narada-release instead.
+# Exceptions from this rule are some advanced use cases like:
+# - squashing several patches into one
+# - merging different release branches like 1.x and 2.x
+
+
+# INSTALL
+# - usually it will be automatically added by ./release, and you shouldn't
+#   add it manually
+# - this operation must be the last one, right before VERSION - to make
+#   sure patch&tgz will be applied exactly between before_upgrade and
+#   upgrade operations, and will be reversed exactly between downgrade and
+#   after_downgrade operations
+DEFINE2 INSTALL
+before_upgrade
+  if test -f .release/${MIGRATE_NEXT_VERSION}.patch; then
+    GIT_DIR=.git git apply .release/${MIGRATE_NEXT_VERSION}.patch
+  fi
+  if test -f .release/${MIGRATE_PREV_VERSION}.tgz; then
+    files='m{\A[.]/\n}&&next;s/\n/\0/;s/(\\.)/"\"$1\""/gee;m{/\0}||print'
+     dirs='m{\A[.]/\n}&&next;s/\n/\0/;s/(\\.)/"\"$1\""/gee;m{/\0}&&print'
+    names=$(tar tzf .release/${MIGRATE_PREV_VERSION}.tgz)
+    echo "$names" |       perl -ne "$files" | xargs -0 -r rm -f
+    echo "$names" | tac | perl -ne "$dirs"  | xargs -0 -r rmdir --ignore-fail-on-non-empty
+  fi
+  if test -f .release/${MIGRATE_NEXT_VERSION}.tgz; then
+    tar xzvpf .release/${MIGRATE_NEXT_VERSION}.tgz
+  fi
+  narada-bg-killall
+after_downgrade
+  if test -f .release/${MIGRATE_PREV_VERSION}.patch; then
+    GIT_DIR=.git git apply -R .release/${MIGRATE_PREV_VERSION}.patch
+  fi
+  if test -f .release/${MIGRATE_PREV_VERSION}.tgz; then
+    files='m{\A[.]/\n}&&next;s/\n/\0/;s/(\\.)/"\"$1\""/gee;m{/\0}||print'
+     dirs='m{\A[.]/\n}&&next;s/\n/\0/;s/(\\.)/"\"$1\""/gee;m{/\0}&&print'
+    names=$(tar tzf .release/${MIGRATE_PREV_VERSION}.tgz)
+    echo "$names" |       perl -ne "$files" | xargs -0 -r rm -f
+    echo "$names" | tac | perl -ne "$dirs"  | xargs -0 -r rmdir --ignore-fail-on-non-empty
+  fi
+  if test -f .release/${MIGRATE_NEXT_VERSION}.tgz; then
+    tar xzvpf .release/${MIGRATE_NEXT_VERSION}.tgz
+  fi
+  narada-bg-killall
+
+DEFINE2 only_before_upgrade
+upgrade
+downgrade true
+
+DEFINE2 only_upgrade
+upgrade
+downgrade true
+
+DEFINE2 only_downgrade
+upgrade true
+downgrade
+
+DEFINE2 only_after_downgrade
+upgrade true
+after_downgrade
+
+# mysql path/to/alter.sql
+# mysql
+#   sql commands here ...
+DEFINE mysql
+upgrade
+  test -f "$1" -a -r "$1"
+  narada-mysql < "$1"
+
+# rollback_mysql path/to/alter.sql
+# rollback_mysql
+#   sql commands here ...
+DEFINE rollback_mysql
+downgrade
+  test -f "$1" -a -r "$1"
+  narada-mysql < "$1"
+
+# mkdir some/dir ...
+# - parameters can't contain /../ or begin with /
+DEFINE2 mkdir
+upgrade
+  perl -e 'exit grep {m{\A/|(\A|/)[.][.](/|\z)}} @ARGV' "$@"
+  mkdir "$@"
+downgrade
+  perl -e 'exit grep {m{\A/|(\A|/)[.][.](/|\z)}} @ARGV' "$@"
+  rm -rf "$@"
+
+# rmdir some/dir ...
+# - parameters can't contain /../ or begin with /
+DEFINE2 rmdir
+upgrade
+  perl -e 'exit grep {m{\A/|(\A|/)[.][.](/|\z)}} @ARGV' "$@"
+  rm -rf "$@"
+after_downgrade
+  perl -e 'exit grep {m{\A/|(\A|/)[.][.](/|\z)}} @ARGV' "$@"
+  narada-restore .backup/full-"$MIGRATE_NEXT_VERSION".tar "$@"
+
+# rm some/file ...
+# - parameters can't contain /../ or begin with /
+DEFINE2 rm
+upgrade
+  perl -e 'exit grep {m{\A/|(\A|/)[.][.](/|\z)}} @ARGV' "$@"
+  rm -f "$@"
+after_downgrade
+  perl -e 'exit grep {m{\A/|(\A|/)[.][.](/|\z)}} @ARGV' "$@"
+  narada-restore .backup/full-"$MIGRATE_NEXT_VERSION".tar "$@"
+
+# add_config some/config "value"
+# add_config some/config -
+#   value
+# - config must not exists
+DEFINE2 add_config
+upgrade
+  test ! -e config/"$1"
+  mkdir -p $(dirname config/"$1")
+  { test $# = 3 && cat "$3" || echo -n "$2"; } > config/"$1"
+  # echo "$1" | grep -v -q '^crontab/' || narada-setup-cron
+  # echo "$1" | grep -v -q '^qmail/'   || narada-setup-qmail
+downgrade
+  rm -f config/"$1"
+  rmdir -p $(dirname config/"$1") 2>/dev/null || :
+  # echo "$1" | grep -v -q '^crontab/' || narada-setup-cron
+  # echo "$1" | grep -v -q '^qmail/'   || narada-setup-qmail
+
+# set_config some/config "new value"
+# set_config some/config -
+#   new value
+# - config may exists
+# - on downgrade previous value restored only if current is "new value"
+DEFINE2 set_config
+upgrade
+  mkdir -p $(dirname config/"$1")
+  { test $# = 3 && cat "$3" || echo -n "$2"; } > config/"$1"
+  # echo "$1" | grep -v -q '^crontab/' || narada-setup-cron
+  # echo "$1" | grep -v -q '^qmail/'   || narada-setup-qmail
+after_downgrade
+  test $# = 3 && value=$(cat "$3") || value="$2"
+  if test "$(cat config/"$1")" = "$value"; then
+    narada-restore .backup/full-"$MIGRATE_NEXT_VERSION".tar config/"$1"
+    # echo "$1" | grep -v -q '^crontab/' || narada-setup-cron
+    # echo "$1" | grep -v -q '^qmail/'   || narada-setup-qmail
+  fi
+
+# mod_config some/config "pcre regex" "new value"
+# mod_config some/config "pcre regex" -
+#   new value
+# - config must exists
+# - value changed only if current value match "pcre regex"
+# - on downgrade previous value restored only if current is "new value"
+DEFINE2 mod_config
+upgrade
+  test -e config/"$1"
+  if grep -q -P -- "$2" config/"$1"; then
+    { test $# = 4 && cat "$4" || echo -n "$3"; } > config/"$1"
+    # echo "$1" | grep -v -q '^crontab/' || narada-setup-cron
+    # echo "$1" | grep -v -q '^qmail/'   || narada-setup-qmail
+  fi
+after_downgrade
+  test $# = 4 && value=$(cat "$4") || value="$3"
+  if test "$(cat config/"$1")" = "$value"; then
+    narada-restore .backup/full-"$MIGRATE_NEXT_VERSION".tar config/"$1"
+    # echo "$1" | grep -v -q '^crontab/' || narada-setup-cron
+    # echo "$1" | grep -v -q '^qmail/'   || narada-setup-qmail
+  fi
+
+# del_config some/config
+DEFINE2 del_config
+upgrade
+  rm -f config/"$1"
+  rmdir -p $(dirname config/"$1") 2>/dev/null || :
+  # echo "$1" | grep -v -q '^crontab/' || narada-setup-cron
+  # echo "$1" | grep -v -q '^qmail/'   || narada-setup-qmail
+after_downgrade
+  narada-restore .backup/full-"$MIGRATE_NEXT_VERSION".tar config/"$1"
+  # echo "$1" | grep -v -q '^crontab/' || narada-setup-cron
+  # echo "$1" | grep -v -q '^qmail/'   || narada-setup-qmail
+
+# exclude_from_backup "value"
+DEFINE2 exclude_from_backup
+upgrade
+  test -e config/backup/exclude
+  if ! grep -q -F -x -- "$1" config/backup/exclude; then
+    echo "$1" >> config/backup/exclude
+  fi
+after_downgrade
+  test -e config/backup/exclude
+  grep -v -F -x -- "$1" config/backup/exclude >tmp/config_backup_exclude.$$
+  mv tmp/config_backup_exclude.$$ config/backup/exclude
+
+# kill process_name ...
+# - make sure processes started before upgrade/downgrade but blocked on
+#   start because of lock won't continue to run after upgrade/downgrade
+DEFINE2 kill
+upgrade
+  killall -9 "$@" || :
+after_downgrade
+  killall -9 "$@" || :
+
+
+# Initial version. MUST be 0.0.0 for new empty projects.
+VERSION 0.0.0
+
+
+# REQUIRED Narada files & directories:
+only_upgrade
+    mkdir -p .backup
+mkdir config
+mkdir tmp
+mkdir var
+mkdir var/log
+mkdir var/use
+
+add_config backup/exclude -
+  ./.backup/*
+  ./.lock*
+  ./tmp/*
+  ./.release/*
+add_config crontab/backup -
+  1 3 * * *   ( narada-backup && echo Reminder: encrypt .backup/full.tar with config/backup/pass and upload it somewhere >&2) >/dev/null
+  1 2 * * 1   rm .backup/full.tar >/dev/null 2>&1
+
+add_config log/level    DEBUG
+add_config log/type     file
+add_config log/output   var/log/default.log
+
+
+# OPTIONAL Narada files & directories:
+mkdir config/qmail
+mkdir var/mysql
+mkdir var/qmail
+
+add_config mysql/host
+add_config mysql/port 3306
+add_config mysql/db
+add_config mysql/login
+add_config mysql/pass
+add_config mysql/dump/empty
+add_config mysql/dump/ignore
+add_config mysql/dump/incremental
+
+
+INSTALL
+VERSION 2.1.0
+
+upgrade
+    test ! -e .release/fail-upgrade-2.2.0
+downgrade true
+
+VERSION 2.2.0
+
+
+VERSION 2.3.0

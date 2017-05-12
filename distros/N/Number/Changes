@@ -1,0 +1,6 @@
+Revision history for Perl extension Number::Convert.
+
+1.0.2  Mon Mar  3 13:22:33 2014
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Number::Convert -v 1.0.2
+

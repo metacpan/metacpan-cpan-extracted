@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Net/IPAddr/Find.pm
+t/00_find.t

@@ -1,0 +1,34 @@
+<Contacts>
+  <Contact>
+      <ContactNumber>[% contacts.contact.id %]</ContactNumber>
+      <ContactStatus>ACTIVE</ContactStatus>
+      <EmailAddress>[% contacts.contact.email %]</EmailAddress>
+      <Name>[% contacts.contact.title %] [% contacts.contact.firstname %] [% contacts.contact.LastName %]</Name>
+      <FirstName>[% contacts.contact.firstname %]</FirstName>
+      <LastName>[% contacts.contact.lastname %]</LastName>
+      <DefaultCurrency>GBP</DefaultCurrency>
+      <IsCustomer>true</IsCustomer>
+      <Addresses>
+        <Address>
+          <AddressType>STREET</AddressType>
+          <AttentionTo>[% contacts.contact.firstname %] [% contacts.contact.lastname %]</AttentionTo>
+          <AddressLine1>[% contacts.contact.address_line_1 %]</AddressLine1>
+          <AddressLine2>[% contacts.contact.address_line_2 %]</AddressLine2>
+          <AddressLine3>[% contacts.contact.address_line_3 %]</AddressLine3>
+          <City>[% contacts.contact.town_city %]</City>
+          <Region>[% contacts.contact.county %]</Region>
+          <PostalCode>[% contacts.contact.postcode %]</PostalCode>
+          <Country>[% contacts.contact.country %]</Country>
+        </Address>
+      </Addresses>
+      <Phones>
+        <Phone>
+          <PhoneType>DEFAULT</PhoneType>
+          <PhoneNumber>[% contacts.contact.phone %]</PhoneNumber>
+          <PhoneAreaCode></PhoneAreaCode>
+          <PhoneCountryCode></PhoneCountryCode>
+        </Phone>
+      </Phones>
+    </Contact>
+</Contacts>
+

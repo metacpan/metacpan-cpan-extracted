@@ -1,0 +1,80 @@
+# NAME
+
+Net::Launchpad - Launchpad.net Authentication
+
+# VERSION
+
+version 2.101
+
+# ATTRIBUTES
+
+## **staging**
+
+Boolean to interact with staging server or production.
+
+## **ua**
+
+A [Mojo::UserAgent](https://metacpan.org/pod/Mojo::UserAgent).
+
+## **json**
+
+A [Mojo::JSON](https://metacpan.org/pod/Mojo::JSON).
+
+## **consumer\_key**
+
+Holds the string that identifies your application.
+
+    $lp->consumer_key('my-app-name');
+
+## **callback\_uri**
+
+Callback url to redirect use back to once authenticated.
+
+## **nonce**
+
+Nonce
+
+## **params**
+
+OAuth 1.0a parameters used in request, authenticate, and access
+
+# METHODS
+
+## **api\_host**
+
+Hostname used for authentication
+
+## **request\_token\_path**
+
+OAuth Request token url
+
+## **access\_token\_path**
+
+OAuth Access token url
+
+## **authorize\_token\_path**
+
+OAuth Authorize token url
+
+## **request\_token**
+
+Perform the request-token request
+
+## **authenticate\_token**
+
+Perform the authentication request
+
+## **access\_token**
+
+Perform the access token request
+
+# AUTHOR
+
+Adam Stokes <adamjs@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Adam Stokes.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

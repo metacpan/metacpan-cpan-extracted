@@ -1,0 +1,50 @@
+Revision history for Net-Server-Coro
+
+1.3    Mon Nov 12 03:11:17 2012
+        * Require Net::Server 2.0, and adjust to its API
+
+1.2    Sat Oct 29 02:26:17 2011
+        * Net::SSLeay is now an optional dependency
+
+1.1    Mon Sep  5 01:15:17 2011
+        * Fix SIGNATURE; no code changes
+
+1.0    Mon Sep  5 00:03:17 2011
+        * Catch and warn of possible CVE-2011-0411 attacks
+        * No longer make use of a bug in perl pre 5.14 wherein TIEHANDLE
+          happened to be called on scalars containing typeglobs
+
+0.9    Sun Nov 15 11:53:17 2010
+        * Change socket code to work with Net::Server >= 0.99
+
+0.8    Sat Jan 30 11:10:17 2010
+        * Do reverse lookups (into "peerhost") if reverse_lookups is
+          set, as Net::Server does
+
+0.7    Tue Dec 15 22:25:17 2009
+        * Use Coro::Specific variables for client filehandle, socket,
+          and peer info
+
+0.6    Fri Oct 16 10:55:17 2009
+        * Allow ->new to take paths to server certificate and key
+          files, and propagate them down to both SSL and TLS
+          connections.
+
+0.5    Thu Oct 15 23:45:42 2009
+        * Allow start_SSL to take paths to server certificate and key
+          files (thanks to Dan Keder for the patch).
+        * Add missing Net::SSLeay dependency (thanks to Andreas
+          Koenig)
+
+0.4    Wed Oct 22 13:40:58 2008
+        * No code changes
+        * Hide Net::Server::Proto::TCP class from PAUSE indexer
+
+0.3    Wed Oct 22 13:33:56 2008
+        * Fixed licensing -- now licensed under the MIT license
+        * Better bullet-proofing on SSL errors
+        * Fix a bug where Net::Server closed the most recently-opened
+          connection whenever any connection closed.
+
+0.2    Mon Mar 10 15:20:08 2008
+        * Initial release to CPAN

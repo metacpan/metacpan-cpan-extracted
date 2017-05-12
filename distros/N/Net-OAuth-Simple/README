@@ -1,0 +1,41 @@
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::OAuth::Simple
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-OAuth-Simple
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-OAuth-Simple
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-OAuth-Simple
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-OAuth-Simple/
+
+EXAMPLES
+
+There are example Twitter and Twitter xAuth 'desktop' apps and a FireEagle OAuth 1.0a web app in the examples directory.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Simon Wistow
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

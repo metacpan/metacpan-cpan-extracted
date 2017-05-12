@@ -1,0 +1,6 @@
+lib/Net/IPA.pm
+lib/Net/IPA/Methods.pm
+lib/Net/IPA/Response.pm
+MANIFEST
+README.md
+LICENSE.md

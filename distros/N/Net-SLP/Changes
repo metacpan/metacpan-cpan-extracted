@@ -1,0 +1,27 @@
+Revision history for Perl extension Net::SLP.
+
+1.0  Mon Nov  1 11:04:24 2004
+	- original version; created by h2xs 1.23 with options
+		-O -n Net::SLP /usr/include/slp.h -lslp -b 5.5.3
+
+1.1 Tue Jun 19 2007
+    - Original distro was missing typemap file.
+    - slp_attr_callback_glue now returns FALSE to prevent uninitialised result
+    warning.
+
+1.2 Thu Jun 21 2007
+    - Return value from slp_attr_callback_glue cause test 24 to fail. Changed
+    to TRUE.
+
+1.3 Thu Mar 03 2008
+    - Test suite would fail in a confusing fashion if the SLP server could not
+    be contacted. Now it die()s with an informative message.
+    - Altered prerequisites to openslp 1.2.1. 1.2.0 has a bug in SLPDereg that
+    causes a seg fault on some platforms when the tests are run.
+
+1.4 Sat Nov  1 15:14:50 EST 2008
+    - Fix a test suite failure. Net::SLP::SLPFindScopes can result in a
+    scopelist of DEFAULT or default.
+
+1.5 Fri Mar 22 10:23:20 EST 2013
+    Updated author and distribution location details to airspayce.com

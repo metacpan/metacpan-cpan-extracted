@@ -1,0 +1,19 @@
+---
+name: News-Pictures
+version: 0.14
+author:
+  - 'Christian Guine <c.guine@free.fr>'
+abstract: 'a package which allows to search photographs in a forum, to show them and possibly to save them'
+license: perl
+resources:
+  license: ~
+build_requires:
+  Test::More: 0
+provides:
+  News::Pictures:
+    file: lib/News/Pictures.pm
+    version: 0.14
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

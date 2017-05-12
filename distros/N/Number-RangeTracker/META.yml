@@ -1,0 +1,32 @@
+---
+abstract: 'Keep track of numerical ranges quickly'
+author:
+  - 'Michael F. Covington <mfcovington@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Getopt::Long: '0'
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4206, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Number-RangeTracker
+provides:
+  Number::RangeTracker:
+    file: lib/Number/RangeTracker.pm
+    version: v0.6.1
+recommends:
+  Pod::Markdown: '0'
+requires:
+  Carp: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Mouse: '0'
+  Scalar::Util: '0'
+  perl: '5.006'
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.6.1

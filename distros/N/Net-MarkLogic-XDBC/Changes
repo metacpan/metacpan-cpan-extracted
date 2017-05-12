@@ -1,0 +1,17 @@
+Revision history for Perl module Net::MarkLogic::XDBC
+
+0.05 Sun Nov 21 18:00:00 2004
+     - Connect using a single connection string
+       XDBC->new("user:pass@host:port")(Thanks Michael Blakeley)
+     - Argument checking. (Thanks Michael Blakeley)
+     - Put <result> tag in namespace. (Thanks Raffaele Sena)
+
+0.04  
+     - API changes. Mostly just naming. 
+     - Also added query_from_template, so that xquery can be stored and
+       processed in TT templates.
+
+0.01 Sun Oct 31 20:17:51 2004
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+

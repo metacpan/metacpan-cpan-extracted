@@ -1,0 +1,23 @@
+---
+abstract: 'Simple implementation of HELP for Net::Server::Mail::ESMTP'
+author:
+  - 'Dan Moore <dan@moore.cx>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3624'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Server-Mail-ESMTP-HELP
+provides:
+  Net::Server::Mail::ESMTP::HELP:
+    file: lib/Net/Server/Mail/ESMTP/HELP.pm
+    version: 0.01
+requires:
+  Net::Server::Mail::ESMTP::Extension: 0
+resources:
+  repository: git://github.com/mgrdcm/net-server-mail-esmtp-help.git
+version: 0.01

@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+VERSION='v2.3.7'
+
+perl -MNarada -E 'Narada::detect(@ARGV)' narada-1 || exit 1
+
+perl -ne 'print if ($rec+=/^\S/) == 1' doc/ChangeLog  >tmp/ChangeLog.$$
+# Mutt options:
+#   1) list of attached files: -a file1 -a file2 ...
+#   2) subject
+#   3) file with email body
+#   4) disabling 'editor' to avoid editing email body
+#   5) don't wait for To: recipient list confirmation
+#   6) enable email encrypting and signing
+#   7) send command 'y' - i.e. "send email"
+#   8) recipient list excluding myself
+version=$(< config/version )
+mutt									\
+    $(ls var/patch/$version.$USER.* | sed 's,^,-a ,')			\
+    -s "patch: $version"						\
+    -i "tmp/ChangeLog.$$"						\
+    -e 'set editor=true'						\
+    -e 'set autoedit=yes'						\
+    -e 'set edit_headers=yes'						\
+    -e 'send-hook . set crypt_autoencrypt=yes crypt_autosign=yes'	\
+    -e 'send2-hook . push y'						\
+    -- "$(find config/patch/send/ -type f \! -name "$USER" -exec grep -qvFxe "$NARADA_USER" {} \; -exec cat {} +)"
+rm tmp/ChangeLog.$$
+
+
+: <<'=cut'
+
+=encoding utf8
+
+=head1 NAME
+
+narada-patch-send - send latests patch files by email to other developers
+
+
+=head1 VERSION
+
+This document describes narada-patch-send version v2.3.7
+
+
+=head1 USAGE
+
+    narada-patch-send
+
+
+=head1 DESCRIPTION
+
+Should be executed in Narada 1.x project root directory.
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+TODO
+
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/powerman/Narada/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software. The code repository is available for
+public review and contribution under the terms of the license.
+Feel free to fork the repository and submit pull requests.
+
+L<https://github.com/powerman/Narada>
+
+    git clone https://github.com/powerman/Narada.git
+
+=head2 Resources
+
+=over
+
+=item * MetaCPAN Search
+
+L<https://metacpan.org/search?q=Narada>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/dist/Narada>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Narada>
+
+=item * CPAN Testers Matrix
+
+L<http://matrix.cpantesters.org/?dist=Narada>
+
+=item * CPANTS: A CPAN Testing Service (Kwalitee)
+
+L<http://cpants.cpanauthors.org/dist/Narada>
+
+=back
+
+
+=head1 AUTHOR
+
+Alex Efros E<lt>powerman@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2008- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+
+=cut

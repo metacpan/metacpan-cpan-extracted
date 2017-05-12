@@ -1,0 +1,21 @@
+The original maintainer for Net::Parse::Whois has been MIA for many years. 
+I adopted the project back in 2005 and fixed a number of problems it had. 
+But sadly I did not have the time to polish it and update it on CPAN.
+
+Now, finally, about 3 years later I can upload it to CPAN! Additional 
+registrars will *definitely* be added but I can't promise any specific one 
+or a time-line.
+
+If you have any bugfixes or additions, please feel free to e-mail me!
+
+-- Jeff The Riffer <riffer@vaxer.net.
+
+--------
+
+
+See perldoc Net::ParseWhois .. or see the project web pages and mailing list at 
+http://dajoba.com/projects/netparsewhois/.
+
+
+--ai
+

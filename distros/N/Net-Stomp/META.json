@@ -1,0 +1,65 @@
+{
+   "abstract" : "A Streaming Text Orientated Messaging Protocol Client",
+   "author" : [
+      "Leon Brocard <acme@astray.com>,",
+      "Thom May <thom.may@betfair.com>,",
+      "Michael S. Fischer <michael@dynamine.net>,",
+      "Ash Berlin <ash_github@firemirror.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Stomp",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "IO::Socket::IP" : "0.20",
+            "IO::Socket::SSL" : "1.75"
+         },
+         "requires" : {
+            "Class::Accessor::Fast" : "0",
+            "IO::Select" : "0",
+            "IO::Socket::INET" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Stomp" : {
+         "file" : "lib/Net/Stomp.pm",
+         "version" : "0.57"
+      },
+      "Net::Stomp::Frame" : {
+         "file" : "lib/Net/Stomp/Frame.pm",
+         "version" : "0.57"
+      },
+      "Net::Stomp::StupidLogger" : {
+         "file" : "lib/Net/Stomp/StupidLogger.pm",
+         "version" : "0.57"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.57"
+}

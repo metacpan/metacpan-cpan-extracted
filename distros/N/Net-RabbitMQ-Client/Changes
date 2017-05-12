@@ -1,0 +1,5 @@
+0.4	Wed Sep 09 2015 17:35:00 GMT+0300
+	+ Add Simple API
+
+0.3	Thu Jul 30 2015 22:41:39 GMT+0300
+	+ First glue for librabbitmq v0.7.0

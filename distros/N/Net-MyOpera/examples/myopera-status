@@ -1,0 +1,81 @@
+#!/usr/bin/env perl
+#
+# Update your My Opera status by running:
+#
+# Usage:
+#   ./myopera-status "If you see this, it worked!"
+
+use strict;
+use warnings;
+
+use Net::MyOpera ();
+use File::Slurp  ();
+
+# Test keys. Get your own at:
+#   https://auth.opera.com/service/oauth/applications/
+
+our $CONSUMER_KEY    = 'test_desktop_key';
+our $CONSUMER_SECRET = 'p2FlOFGr3XFm5gOwEKKDcg3CvA4pp0BC';
+
+my $rc_file = exists $ENV{HOME}
+    ? "$ENV{HOME}/.myoperarc"
+    : ".myoperarc" ;
+
+my $new_status = $ARGV[0] or die "Usage: $0 '<new_status>'\n";
+
+# Read tokens from the .rc file
+sub restore_tokens {
+    my @tokens;
+
+    if (-s $rc_file) {
+        @tokens = File::Slurp::read_file($rc_file);
+        chomp @tokens;
+        if (
+            (@tokens != 2) ||
+            ($tokens[0] !~ m{^ [\w\-]+ $}x) ||
+            ($tokens[1] !~ m{^ [\w\-]+ $}x)
+        ) {
+            die "Invalid tokens in $rc_file. Maybe delete '$rc_file?'\n";
+        }
+    }
+
+    return @tokens;
+}
+
+# Save tokens to the .rc file
+sub save_tokens {
+    my (@tokens) = @_;
+
+    open(my $rc_fh, ">$rc_file")
+        or die "Can't open $rc_file: $!";
+    print $rc_fh $tokens[0], "\n", $tokens[1], "\n";
+    close $rc_fh;
+}
+
+my $myopera = Net::MyOpera->new(
+    consumer_key    => $CONSUMER_KEY,
+    consumer_secret => $CONSUMER_SECRET,
+);
+
+# You'll save the token and secret in cookie, config file or session database
+my ($access_token, $access_token_secret) = restore_tokens();
+if ($access_token && $access_token_secret) {
+    $myopera->access_token($access_token);
+    $myopera->access_token_secret($access_token_secret);
+}
+
+unless ($myopera->authorized) {
+    # The client is not yet authorized: Do it now
+    print
+        "Please authorize me at ", $myopera->get_authorization_url, " and then\n",
+        "type the verifier + ENTER to continue\n";
+    chomp (my $verifier = <STDIN>);
+    my($access_token, $access_token_secret) = $myopera->request_access_token(verifier => $verifier);
+    save_tokens($access_token, $access_token_secret);
+}
+
+# Fire!
+my $res = $myopera->update({ status => $new_status });
+
+exit $res ? 0 : 1;
+

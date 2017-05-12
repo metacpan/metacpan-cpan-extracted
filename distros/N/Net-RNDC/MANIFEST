@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Net/RNDC.pm
+lib/Net/RNDC/Exception.pm
+lib/Net/RNDC/Packet.pm
+lib/Net/RNDC/Session.pm
+scripts/rndc.pl
+t/00_rndc.t
+t/01_packet.t
+t/02_session.t
+t/release-pod-spell.t
+t/release-pod-syntax.t

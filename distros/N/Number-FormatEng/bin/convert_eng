@@ -1,0 +1,122 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use Number::FormatEng qw(:all);
+
+my $prefix;
+my $unf;
+my $ez;
+my $help;
+
+Getopt::Long::Configure('prefix=+');
+
+GetOptions(
+    'pref'  => \$prefix,
+    'unf'   => \$unf,
+    'ez'    => \$ez,
+    'help'  => \$help
+) or pod2usage();
+
+$help and pod2usage(-verbose => 2);
+
+use_e_zero() if $ez;
+
+for (@ARGV) {
+    if ($unf) {
+        print unformat_pref($_), "\n";
+    }
+    else {
+        if ($prefix) {
+            print format_pref($_), "\n";
+        }
+        else {
+            print format_eng($_), "\n";
+        }
+    }
+}
+
+=head1 NAME
+
+B<convert_eng> - Convert numbers to and from engineering notation
+
+=head1 SYNOPSIS
+
+convert_eng [options] number number ...
+
+    Options:
+    +help   verbose help
+    +pref   format a number using SI prefixes
+    +ez     explicitly display 'e0'
+    +unf    unformat: convert a string back to a number
+
+=head1 DESCRIPTION
+
+Format a number (or a list of numbers) using engineering notation.
+Formatted/converted values will be printed to STDOUT, one per line.
+
+=head1 OPTIONS
+
+Note that the options use C<+>, instead of a conventional
+dash, so that negative numbers can be converted.
+All options can be abbreviated.
+
+=over 3
+
+=item B<+pref>
+
+To format a floating-point numeric value using SI prefixes,
+use the C<+pref> option.
+
+    convert_eng +pref 1e-16
+
+=item B<+unf>
+
+To convert a string formatted with an SI prefix back to a
+numeric value, use the C<+unf> option.
+
+    convert_eng +unf 77M
+
+=item B<+ez>
+
+By default, if the exponent is zero, C<e0> is not displayed.
+To explicitly display C<e0>, use the C<+ez> option.  This
+option has no effect if C<+pref> is used.
+
+    convert_eng +ez 22.2
+
+=item B<+help>
+
+Show verbose usage information.
+
+=back
+
+=head1 EXAMPLES
+
+Convert 50000 to 50e3:
+
+    convert_eng 50000
+
+Convert 5000 to 5k and 0.037 to -37m:
+
+    convert_eng +p 5000 -0.037
+
+Convert 1.23k to 1234:
+
+    convert_eng +u 1.23k
+
+Displays 7.89 as 7.89e0:
+
+    convert_eng +ez 7.89
+
+=head1 DEPENDENCIES
+
+Number::FormatEng
+
+=head1 AUTHOR
+
+Gene Sullivan (gsullivan@cpan.org)
+
+=cut

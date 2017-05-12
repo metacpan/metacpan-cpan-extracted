@@ -1,0 +1,10 @@
+
+ AddHandler cgi-script .cgi
+ Options +ExecCGI
+ DirectoryIndex stat.cgi
+
+ Order allow,deny
+ <FilesMatch (\.(html?|cgi|fcgi|css|js|gif|png|jpe?g|ico)|(^))$>
+  Allow from all
+ </FilesMatch>
+ Deny from all

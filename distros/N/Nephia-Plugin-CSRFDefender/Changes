@@ -1,0 +1,14 @@
+Revision history for Perl extension Nephia-Plugin-CSRFDefender
+
+0.81 2013-11-24T19:27:26Z
+
+    - fix cpanfile
+
+0.80 2013-11-22T06:35:59Z
+
+    - support to Nephia-0.82 or latter
+
+0.01 2013-07-20T18:36:38Z
+
+    - original version
+

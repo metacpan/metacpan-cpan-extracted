@@ -1,0 +1,47 @@
+---
+abstract: 'Launchpad.net Authentication'
+author:
+  - 'Adam Stokes <adamjs@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Mojolicious: '0'
+  Test::Compile: '0'
+  Test::Exception: '0'
+  Test::Kwalitee: '0'
+  Test::Mojo: '0'
+  Test::More: '0'
+  Test::NoTabs: '0'
+  lib: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Launchpad
+requires:
+  Data::Dumper::Concise: '0'
+  Function::Parameters: '0'
+  Module::Runtime: '0'
+  Mojo::JSON: '0'
+  Mojo::Parameters: '0'
+  Mojo::URL: '0'
+  Mojo::UserAgent: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util: '0'
+  namespace::autoclean: '0'
+resources:
+  homepage: https://github.com/battlemidget/Net-Launchpad
+  repository: https://github.com/battlemidget/Net-Launchpad.git
+version: '2.101'
+x_authority: cpan:ADAMJS

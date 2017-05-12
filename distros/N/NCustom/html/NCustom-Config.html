@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>NCustom::Config - configuration file for NCustom</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#abstract">ABSTRACT</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#export">EXPORT</a></li>
+		<li><a href="#configuration_variables">CONFIGURATION VARIABLES</a></li>
+	</ul>
+
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<hr />
+<h1><a name="name">NAME</a></h1>
+<p>NCustom::Config - configuration file for NCustom</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use NCustom::Config;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="abstract">ABSTRACT</a></h1>
+<pre>
+  Configuration file for NCustom.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Useful only with NCustom.</p>
+<p>NCustom::Config provides configuration for NCustom. 
+This is affected by NCustom ``using'' NCustom::Config, whereupon NCustom::Config creates and sets configuration variables in NCustom's namespace.</p>
+<p>Should a user of NCustom require personalised configuration, they may copy part or all (depending on whether they wish to over ride part or all of the configuration settings) of NCustom::Config to ~/.ncustom/NCustom/MyConfig.pm.
+The file must be a perl module.
+If such a file exists is will be ``used'' by NCustom after it has ``used'' NCustom::Config.</p>
+<p>
+</p>
+<h2><a name="export">EXPORT</a></h2>
+<p>None - but it does create and set variables within the NCustom namespace.</p>
+<p>
+</p>
+<h2><a name="configuration_variables">CONFIGURATION VARIABLES</a></h2>
+<p>Following is a descriptin of configuration variables.</p>
+<dl>
+<dt><strong><a name="item_test_data1_2c_test_data2_2c_test_url1"><code>test_data1, test_data2, test_url1</code></a></strong><br />
+</dt>
+<dd>
+Ignore these. They are for internal use only (make test).
+</dd>
+<p></p>
+<dt><strong><a name="item_base_dir"><code>base_dir</code></a></strong><br />
+</dt>
+<dd>
+This is the base directory for NCustom.
+It is within here that personalised configuration file will be searched for.
+It is within here that transactions shall be archived.
+</dd>
+<p></p>
+<dt><strong><a name="item_save_dir"><code>save_dir</code></a></strong><br />
+</dt>
+<dd>
+The directory into which transactions shall be archived. So that they may be later undone.
+</dd>
+<p></p>
+<dt><strong><a name="item_tmp_dir"><code>tmp_dir</code></a></strong><br />
+</dt>
+<dd>
+NCustom requires a temporary directory on occassion. It makes troubleshooting easier if we know where that is.
+</dd>
+<p></p>
+<dt><strong><a name="item_src_fqdn"><code>src_fqdn</code></a></strong><br />
+</dt>
+<dd>
+The fully qualified domain name of the default server for fetching source such as NCustom files, or rpms from.
+Not using fully qualified domain name may affect fetching of source for some utilities for some command line options (such as dont follow offsite links).
+</dd>
+<p></p>
+<dt><strong><a name="item_default_src"><code>default_src</code></a></strong><br />
+</dt>
+<dd>
+A reference to an anonymous array that contains which directories or urls to look in to find files for whom a path name was not given.
+</dd>
+<p></p>
+<dt><strong><a name="item_get_url"><code>get_url</code></a></strong><br />
+</dt>
+<dd>
+A subroutine ref for fetching the <code>file(s)</code> from a particular url, and placing them in a given target directory.
+</dd>
+<dd>
+<p>Simple needs should be met by the provided subroutine.
+Desired behaviour (such as proxy configuration or reference to passwords) are easily met by adding command line arguments to the provided subroutine's system call.
+Complex needs would require recoding of the subroutine.</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>NCustom
+NCustom::Config
+ncustom</p>
+<p><a href="http://baneharbinger.com/NCustom">http://baneharbinger.com/NCustom</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Bane Harbinger, &lt;<a href="mailto:bane@baneharbinger.com">bane@baneharbinger.com</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright 2003 by Bane Harbinger</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

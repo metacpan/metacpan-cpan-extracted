@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+bin/nabaztry.pl
+README
+lib/Nabaztag.pm
+t/00-load.t
+#t/pod-coverage.t
+#t/pod.t

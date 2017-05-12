@@ -1,0 +1,53 @@
+Revision history for Net-SugarCRM
+
+3.23143 13/03/2014
+	Updated test
+3.23133 12/03/2014
+	Added encryption parameter per bug https://rt.cpan.org/Ticket/Display.html?id=93696
+3.23126 11/03/2014
+	Fix bug https://rt.cpan.org/Ticket/Display.html?id=93696
+3.22375 27/11/2013
+	Handle SugarCRM responses for JSON::Boolean empty responses for dates
+3.21344 20/08/2013
+	Add more logging in sugarcrm update entry
+3.20698 19/06/2013
+	Fix syntax error logcroack -> logcroak
+3.20492 04/06/2013
+	Reuse of Moose because the compatibility with Any::Moose is still not ready. It should be possible
+	to change the line of use Moose with use Moo, if you don't use Moose anywhere else
+3.20472 03/06/2013
+	Use of lighter Moo instead of Moose
+2.20449 31/05/2013
+	Add has pod
+2.20414 30/05/2013
+	Add has method in Net::SugarCRM::Entry
+2.20254 17/05/2013
+	Fix bug in get_module_link_ids and enhanced documentation
+2.19983 12/01/2013
+	Allow to set max_results to retrieve more than 20 records. The default is set to 1000
+2.17738 12/01/2013
+	Fix Net::SugarCRM::Entry to allow for perl < 5.10
+2.17725 10/01/2013
+        Slight change of api (use of Net::SugarCRM::Entry)
+        using logconfess and logcroak from log4perl instead of confess and croak
+        New .pm for Net::SugarCRM::Entry
+        better error handling in _rest_request_no_json
+        use http "keep alive" for api connections
+        use Log::Log4perl instead of MooseX::Log::Log4perl to prevent sending log messages in random categories
+1.14455 10/03/2012
+        Added patch for get_module_link_ids get_contact_account_ids from Phil Hallows http://www.globemicro.com
+1.12990 18/11/2011
+        Added support for sending emails in the accounts module
+1.12860 6/11/2011
+        Added DBI dependency
+1.12860 5/11/2011
+        Added converted attribute in doc and dependency for DateTime
+1.12855 4/11/2011
+        Set the CONTACTS, LEADS, variables as module variables
+1.12839 3/11/2011
+        Added Tutorial
+1.12833 2/11/2011
+        Added Currency methods
+1.12756 21/10/2011
+        First version
+

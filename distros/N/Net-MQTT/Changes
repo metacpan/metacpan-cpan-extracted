@@ -1,0 +1,51 @@
+Revision history for Perl extension Net::MQTT.
+
+1.163170  2016-11-12 16:08:05+00:00 Europe/London
+    - Add username and password options to net-mqtt-sub. Thanks to @hollie.
+    - Fix author tests.
+
+1.143260  2014-11-22 18:57:01+00:00 Europe/London
+    - Fix authordeps.
+
+1.143250  2014-11-21 23:04:32+00:00 Europe/London
+    - Fix default client id to meet spec. 1-23 characters from A-Za-z0-9.
+      Thanks to Richard Postlethwaite for the bug report.
+
+1.142010  2014-07-20 13:33:15+01:00 Europe/London
+    - Fix bad PAUSE upload.
+
+1.142001  2014-07-19 12:41:51+01:00 Europe/London
+    - Fix bad packaging.
+
+1.142000  2014-07-19 08:25:34+01:00 Europe/London
+    - Fix to will message handling.
+
+1.130190  2013-01-19 09:23:43 Europe/London
+    - Remove unintended files from distribution.
+
+1.123440  2012-12-09 15:23:47 Europe/London
+    - Fix test problem with hash key ordering.  Thanks to andk
+      and CPAN Testers.
+
+1.112330  2011-08-21 18:24:34 Europe/London
+    - Reduce requirement for Net::Pcap.
+
+1.112320  2011-08-20 22:41:19 Europe/London
+    - Fix topic matching bug.
+
+1.110400  2011-02-09 19:24:51 Europe/London
+    - Fix topic test to work on perl 5.8 and older.
+
+1.110390  2011-02-08 22:33:18 Europe/London
+    - Fix inadvertent removal of header bytes when checking incomplete
+      messages.
+    - Error checking when decoding short messages.
+
+1.110200  2011-01-20 23:13:32 Europe/London
+    - Minor improvements to sample scripts.
+
+1.110170  2011-01-17 19:58:17 Europe/London
+    - Fix pack syntax error.  Thanks to CPAN Testers.
+
+1.110160  2011-01-16 13:20:17 Europe/London
+    - Initial release.

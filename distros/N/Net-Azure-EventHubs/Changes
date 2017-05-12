@@ -1,0 +1,15 @@
+Revision history for Perl extension Net-Azure-EventHubs
+
+0.03 2016-11-10T07:28:11Z
+    - enhance tests
+    - fix missing class name (Net::Azure::EventHub::Response -> Net::Azure::EventHubs::Response)
+    - add documentation for Net::Azure::EventHubs::Request and Net::Azure::EventHubs::Response
+
+0.02 2016-11-03T16:52:43Z
+
+    - fix a lie in documentation 
+
+0.01 2016-11-01T05:48:52Z
+
+    - original version
+

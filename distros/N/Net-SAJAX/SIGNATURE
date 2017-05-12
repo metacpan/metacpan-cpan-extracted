@@ -1,0 +1,70 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 748d5a16718a4b18ceae541c7a83679223aff766 Build.PL
+SHA1 d4f1ed44bebcd3370f88de79d2077cb2cd2af919 Changes
+SHA1 a809c6971c66430d9e95ae5adb7d2ca76fa5b875 LICENSE
+SHA1 1f6a0d92f3d96b7b27707c35a20631f251351070 MANIFEST
+SHA1 ba63bc9b57e92806a735dfb1a03df14aea798131 MANIFEST.SKIP
+SHA1 0d505b3d75e460456188b39c084074bcf9189143 META.json
+SHA1 6d9c6dd684f211076555c348ffe7e4ebc5877109 META.yml
+SHA1 b69fe5189bf183c4a264fae5120f61072039e458 README
+SHA1 8590ad34604f24cb97d76f7c6ef6e20b87e1a53f lib/Net/SAJAX.pm
+SHA1 22c7037593032686e491d79eb6a0f867eecdbd19 lib/Net/SAJAX/Exception.pm
+SHA1 153fc0b3f37968daea03037a7bb9ca46be2a22d9 lib/Net/SAJAX/Exception/JavaScriptConversion.pm
+SHA1 c052ef039b5ee4e4a0ef07420eca80783249e925 lib/Net/SAJAX/Exception/JavaScriptEvaluation.pm
+SHA1 59054bfe3d7ff7a4406f21e1477addb949dd0f9f lib/Net/SAJAX/Exception/MethodArguments.pm
+SHA1 b85e90577889e9d68c6128df26881a7376c5e5c6 lib/Net/SAJAX/Exception/RemoteError.pm
+SHA1 a1c3bd2ceb714b245aa15981b09937b0f6a93562 lib/Net/SAJAX/Exception/Response.pm
+SHA1 c2e432d0b6e7adb147976cc6962ef70227d8a0b7 lib/Net/SAJAX/UpdatingCode.pod
+SHA1 29661256fa4035217d311476ee39c0d9cf50dafe lib/Net/SAJAX/VersionGuarantee.pod
+SHA1 2fa9b07cfe602306a4b30ce21a1f385e3b582fce t/00-load.t
+SHA1 bc38d42368690df305947f99091cd001d6232f65 t/attributes.t
+SHA1 b917cd0bb8f4e138dbcf6964294044f82d42c8ff t/constructor.t
+SHA1 048c05158becfca03996a63a5ee695d2fbaf5bf4 t/javascript_types.t
+SHA1 435f09a27d2c8ecc7dbaabe23766bd876fcc50f2 t/lib/Test/Net/SAJAX/UserAgent.pm
+SHA1 154c657d90aa7ad1737b9f8f798d6bd8d90e6f7a t/request_complex.t
+SHA1 5064151f85996fdde2f8f2ed67eca213866221e1 t/request_diagnostic.t
+SHA1 459c2ca493107b569b91c7429338c2b5e2d4a093 t/request_garbage.t
+SHA1 167c7f473bc1f493c99a76d63be3296532f02aff t/request_malformed.t
+SHA1 6cbcf75116ab74ce028ac8650bd73c6aff18f6c7 t/request_simple.t
+SHA1 4df68cb4b8f7e9b752598804dcc673a846a1ec64 t/request_url.t
+SHA1 3f1c9fae28f9ffa27092e4ba10050f955d99d5a3 xt/clean-namespaces.t
+SHA1 38d8ce1e4de7d0c87cfb912fd4bb5a8357ca7811 xt/consistent-version.t
+SHA1 7fc7058f9d184127c41cb8e7540f30ececfa5edf xt/critic.t
+SHA1 a1db6b35567196f75f782a9699e869742ead2564 xt/kwalitee.t
+SHA1 60a5b83e839e66bc7f52f0da3d9aef4d891ddecb xt/manifest.t
+SHA1 8b5d8044ee7a0d61865d4e8e0181aad51cee80d3 xt/perl-version.t
+SHA1 70e3b43f95ecfe17045145af4f94728e27c48d92 xt/perlcriticrc
+SHA1 39389b5ad48260f67ab578ad615a27bfac720215 xt/pod-coverage.t
+SHA1 7db1fcc4c42b28c02de9dc9b421e973dcef0f8f1 xt/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAEBAgAGBQJOo5jxAAoJEGN8PvITkwmbFeAP/izInpyuh41f30Hw5uz4x9Iw
+pppVFO/wYHtDBBhVkxCQjiCZ/GWXxlyhMLARZwrM2bDJJYo31GwTr3tcgHU9LkFK
+CXbKoODepReT+yk4WVEjZ3IoI6lAa7SdS7LF2tSLZZuRIdKDYmETc5SXRTrSaip6
+BeEzc7YpMtLmLT6qvbCQNHNgt4ZFNZEKW7i6wcn2GXaXLWFbb4KGbuly2XY4iOkC
+Pta7NuwpVoKAzCCmItUVWXR8NyQz2JAC+PmWc8sWXNvzTWP8ZxzW7Yx9P20lG3OW
+vtyqRE/fH/QcelP2hmF73qfbjtsAdxL0ihSLMp/ksfQ56L+Jd9z7gfwNU2UzN6R3
+gcbOezGzLxWdohVdcQzrc3qvyvrG+gqwid+XSShI0DFO5c+tIuHxNa13ofyhVXLw
+vPSpQWcHuqEU5UXN2ydtt1A4Tgr+4+e5zBGQixfqo3rTNDU38Na+8xwZW+fqtDR2
+FDZfDE3qHpYk81GTHS9xW/h4Ybzb8V7sQmcaKy1+WVPivivvtkdUxct0DyTH8UGp
+l+PdFk1tklge5I+uHfpVRvhbya+YZiAIzCpEnbFPpy6AQsaSymgT1+Y8k5df/AOg
+mgKHrxfW8V4E5LvVdEKrXQhS3jLsmzDFrqlbJMJ7LJ4j9xdY9xag8ph6DEO6jfAW
+Hc3qBpVVaodjgKjqMIJ5
+=LFUm
+-----END PGP SIGNATURE-----

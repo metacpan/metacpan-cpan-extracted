@@ -1,0 +1,40 @@
+Nokia-File-NFB version 0.01
+====================================
+
+This module provides methods to modify or create the backup files used
+by the Nokia PC Suite - Backup And Restore program.
+
+It can be used to extract or add new elements to the file.
+
+These elements contain items such as the Phone Book, Calendar, Radio Settings,
+Pictures, Photos, etc. 
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Compress::Zlib
+
+AUTHOR
+
+Robert Price - http://www.robertprice.co.uk/
+  
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Robert Price <rprice@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,18 @@
+CHANGES
+-------
+
+  0.65 - 12 April 2005
+
+	* Make the module compatible with perl 5.8.0 by removing reference to 'use Exporter qw(import)'
+
+  0.64 - 24 March 2005
+
+	* Added Net::SSL, Crypt::SSLeay as a pre-req to help testers.cpan.org
+
+  0.63 - 23 March 2005
+
+	* Removed some debugging code 
+
+  0.62 - 23 March 2005
+
+	* Altered the module to use the https api, including verifying peer certificate

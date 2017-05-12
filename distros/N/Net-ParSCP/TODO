@@ -1,0 +1,68 @@
+* config files: alternatives to .csshrc
+* General layout:
+    there will be 
+              parscp - like scp but for clusters
+              parssh - like ssh but for clusters
+              parssh-copy-id - etc.
+              par    - config files administration
+
+* There are more than one connection per machine. 
+  I guess we are not considering the closing of all the connections?
+* cluster description file: 
+    search for clusters etc/parsshrc  ~/.parsshrc ~/.csshrc ./.parsshrc and build the accumulative
+    * option -u like in cssh?
+    number of processors per machine, like beowulf:2
+    dynamic clusters like: those in subnetwork XXX.XXX.XXX that are SSH available (parallel SSH ping)
+    regexp clusters (from a subnetwork or from a cluster)
+
+* -h problem with section(s)?: not reliable Pod::Usage depedence
+
+* add option that asks if exists in the remote side  (like -i in cp)
+* option for interactive: if the remote files exists, then ask
+
+* I believe there is a bug when a machine is target several times
+
+* log support
+
+* Options to query the data base:
+        parpush -q beow
+        > beowulf europa orion tegastaste
+
+* Options to build regexp clusters
+ 
+        parpush source.tar.gz  cluster1+'/^a/':/tmp
+        parpush source.tar.gz  cluster1+'cluster2=~/^a/':/tmp
+
+* Macro for source machine
+
+* Option to execute command after the transference:
+        parpush -e 'tar xvzf source.tar.gz' source.tar.gz  cluster1+cluster2:/tmp 
+
+  environment variables will be set to refer to sourcefiles, sourcemachines, etc.
+        parpush source.tar.gz  cluster1+cluster2:/tmp  -e 'tar xvzf $SF1'
+        parpush source.tar.gz  cluster1+cluster2:/tmp  -e 'tar xvzf $SF1; cd somedir; perlmantra'
+        parpush source.tar.gz  cluster1+cluster2:/tmp  -te 'perlmantra' # remote copy and execute
+
+* automatize cluster file creation
+
+* options for ssh depending on the machine cluster
+     -S clusterexp '-v'
+
+* finer grain control of cssh
+
+* substitute hashes and arrays by references
+
+* Maximum number of processes
+
+* cssh with specification of command
+
+* Error and exception control
+   -- CTRL-C
+     Kill the pending processes
+   --SIGPIPE
+     Report error
+   -- Control errors returned by scp
+* documentation
+
+* Efficiency: rsync?
+* Efficiency: tree of prcesses?

@@ -1,0 +1,50 @@
+---
+abstract: 'Airbrake Notifier API V3 Client'
+author:
+  - 'Six Apart, Ltd. <sixapart@cpan.org>'
+build_requires:
+  Test::Exception: '0'
+  Test::MockModule: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Airbrake
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::Airbrake:
+    file: lib/Net/Airbrake.pm
+    version: '0.02'
+  Net::Airbrake::Error:
+    file: lib/Net/Airbrake/Error.pm
+  Net::Airbrake::Request:
+    file: lib/Net/Airbrake/Request.pm
+requires:
+  Class::Tiny: '1.001'
+  Data::Dumper: '0'
+  HTTP::Tiny: '0'
+  JSON: '2.00'
+  Scope::Guard: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/sixapart/Net-Airbrake/issues
+  homepage: https://github.com/sixapart/Net-Airbrake
+  repository: git://github.com/sixapart/Net-Airbrake.git
+version: '0.02'
+x_authority: cpan:SIXAPART
+x_contributors:
+  - 'ziguzagu <ziguzagu@gmail.com>'

@@ -1,0 +1,33 @@
+Revision history for Net-OpenStack-Attack
+
+1.0500  2012-04-11
+        Added --detail option.
+        Added flavors.
+
+1.0401  2012-03-16
+        Disabled ssl verification.
+
+1.0400  2012-03-08
+        Added support for rebuilding servers.
+
+1.0300  2012-03-08
+        Added support for https.
+
+1.0200  2012-03-03
+        Added support for Rackspace (RAX) auth.
+
+1.0100  2012-01-17
+        Added --all|-a option to delete command for really deleting ALL servers.
+
+1.0001  2012-01-03
+        Fixed --image option parsing bug.
+
+1.0000  2011-12-22
+        Cleaning up command line interface.
+        Now using Net::OpenStack::Compute::Auth for auth.
+
+0.0002  2011-12-15
+        Bug fix. Forgot to import json functions.
+
+0.0001  2011-12-14
+        First version, released on an unsuspecting world.

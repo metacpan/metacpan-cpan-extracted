@@ -1,0 +1,251 @@
+#!/usr/bin/env perl
+# PODNAME: graylog
+# ABSTRACT: Command line script to send data to a Graylog2 server
+
+
+use 5.10.0;
+use strict;
+use warnings;
+use POSIX qw( strftime);
+use Data::Printer;
+use App::Basis;
+use App::Basis::Config;
+use Net::Graylog::Client qw( valid_levels valid_facilities);
+
+# -----------------------------------------------------------------------------
+sub basic_debug {
+    my ( $lvl, $debug ) = @_;
+
+    # we are not doing anything with the debug, but lets not print it out anyplace
+    # say strftime( '%Y-%m-%d %H:%M:%S', gmtime( time() ) ) . " " . get_program() . " [$lvl] $debug";
+}
+
+# -----------------------------------------------------------------------------
+# remove leading and trailing spaces
+sub trim {
+    my ($str) = @_;
+
+    $str =~ s/^\s+//gsm;
+    $str =~ s/\s+$//gsm;
+
+    return $str;
+}
+
+# -----------------------------------------------------------------------------
+# find the keyvalue pairs in a string, return a hash of them
+# keys and values separated by ':' or '='
+sub parse_keyvalues {
+    my ($str) = @_;
+    my %data;
+
+    $str =~ s/\b(\w+[:=])/|$1/g;
+    $str =~ s/^\|//;
+    my @things = split( /\|/, $str );
+
+    foreach my $d (@things) {
+        my ( $k, $v ) = split( /[:=]/, $d );
+
+        # remove any enclosing quotes
+        $v =~ s/^['"](.*?)['"]$/$1/;
+        $data{$k} = trim($v);
+    }
+
+    return %data;
+}
+
+# -----------------------------------------------------------------------------
+# main
+
+my $program = get_program();
+
+# process the command line options
+my %opt = init_app(
+    help_text    => "Send messages to a graylog server",
+    help_cmdline => "[optional] key:value pairs='of information'",
+    options      => {
+        'verbose|v'    => 'Dump extra useful information',
+        'level|l=s'    => { desc => 'Syslog severity level one of ' . join( ', ', valid_levels() ), },
+        'facility|f=s' => { desc => 'Syslog facility level one of ' . join( ', ', valid_facilities() ), },
+        'logger=s'     => {
+            desc    => 'The name of the logger to report',
+            default => get_program()
+        },
+        'server=s'    => { desc => 'The name of the server to report this message came from', },
+        'target=s'    => { desc => 'target to send messages to, either url or name of item in config file', },
+        'message|m=s' => { desc => 'A short message to send', required => 1 },
+        'long=s' => { desc => "Optional long message to additionally send"},
+        'config=s'    => { desc => 'Config file to use', default => "$ENV{HOME}/.$program.cfg" }
+    }
+);
+
+set_debug( \&basic_debug );
+debug( 'INFO', "Started" );
+
+if ( defined $opt{level} ) {
+    show_usage("Invalid level") if ( !grep ( $opt{level}, valid_levels ) );
+}
+
+if ( defined $opt{facility} ) {
+    show_usage("Invalid facility") if ( !grep ( $opt{facility}, valid_facilities ) );
+}
+
+my $verbose = $opt{verbose};
+
+# -----------------------------------------------------------------------------
+# work out the URL either from the target or the config file
+my $url;
+if ( !$opt{target} || $opt{target} !~ m|^https?://| ) {
+
+    # get the config if needed
+    my $config = App::Basis::Config->new( filename => $opt{config} );
+    if ( $config->error ) {
+        msg_exit( $config->error, 2 );
+    }
+    if ( $config->has_data ) {
+        my $target = $opt{target} || $config->get('/default');
+        $url = $config->get("/targets/$target");
+    }
+}
+else {
+    $url = $opt{target};
+}
+
+if ( !$url ) {
+    msg_exit( "Could not evaluate a target, is the config file OK?", 2 );
+}
+
+# -----------------------------------------------------------------------------
+# ready to build the message to send
+
+my $graylog = Net::Graylog::Client->new( url => $url );
+
+# init the msg block with any colon separated key value pairs
+my %msg = parse_keyvalues( join( ' ', @ARGV ) );
+
+# overwrite any things in the optional extra data, with
+# parameters passed as options
+map { $msg{$_} = $opt{$_}; } keys %opt;
+
+# remove some fields the options left behind
+map { delete $msg{$_} } qw( target verbose config);
+
+my ( $s, $code ) = $graylog->send(%msg);
+
+$s = $s ? 'Sent' : 'Failed';
+print "$s, $code\n" if ($verbose);
+debug( 'INFO', "msg $s" );
+
+# -----------------------------------------------------------------------------
+# all done
+
+exit $code == 200 ? 0 : 1 ;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+graylog - Command line script to send data to a Graylog2 server
+
+=head1 VERSION
+
+version 0.3
+
+=head1 SYNOPSIS
+
+    graylog -m "sending a basic message"
+
+=head1 DESCRIPTION
+
+Send a message to a graylog2 analysis server, sent using GELF format over HTTP.
+
+You may send any data to a gray log server, but there are some restrictions plus this module
+adds some defaults.
+
+* There must be a message field
+
+* a level field will be interpreted as a syslog level and converted to a number
+
+    * you can access the original value with the levelstr field
+
+* timestamp and timestr field are added, the former is a unix int timestamp, the latter a time string
+
+* each message gets a uuid
+
+* a server field will be reinterpreseted as a host field, a default of hostname() will be added if needed
+
+=head1 NAME
+
+graylog
+
+=head1 Help
+
+    graylog --help
+
+    Syntax: graylog [options] [optional] key:value pairs='of information'
+
+    About:  Send messages to a graylog server
+
+    [options]
+        --config        Config file to use [DEFAULT: $HOME/.graylog.cfg]
+        --facility      Syslog facility level one of kern, user, mail, daemon, auth, syslog, lpr, news, uucp, clock, authpriv, ftp, ntp, audit, alert, cron, local0, local1, local2, local3, local4, local5, local6, local7
+        --help          Show help
+        --level         Syslog severity level one of emerg, alert, crit, error, warning, notice, info, debug
+        --logger        The name of the logger to report [DEFAULT: graylog]
+        --long          Optional long message to additionally send
+        --message*      The message to send
+        --server        The name of the server to report this message came from
+        --target        target to send messages to, either url or name of item in config file
+        --verbose       Dump extra useful information
+    * required option
+
+=head1 Config file settings
+
+The config file is a YAML file in $HOME/graylog.cfg
+
+    ---
+    # config file for graylog
+    # default should match an entry in the targets
+
+    default: local
+    targets: 
+        local: 'http://localhost:12202/gelf'
+        server2: 'http://server2:12202/gelf'
+        server3: 'http://server3:12202/gelf'
+
+Set default to one of the targets. The targets are the URLs of graylog servers 
+that you have access to
+
+=head1 AUTHOR
+
+ kevin mulholland
+
+=head1 VERSIONS
+
+v0.1  2014/03/19, initial work
+
+=head1 Notes
+
+Obviously if you just want oto do this on the command line you can use 
+
+curl -XPOST http://graylog2_server:12202/gelf -p0 -d '{"short_message":"Hello there", "host":"example.org", "facility":"test", "_foo":"bar"}'
+
+=head1 See Also
+
+L<Log::Log4perl::Layout::GELF> , L<Net::Sentry::Client>
+
+=head1 AUTHOR
+
+Kevin Mulholland <moodfarm@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Kevin Mulholland.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

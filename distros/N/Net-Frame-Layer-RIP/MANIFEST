@@ -1,0 +1,21 @@
+Changes
+lib/Net/Frame/Layer/RIP.pm
+lib/Net/Frame/Layer/RIP/v1.pm
+lib/Net/Frame/Layer/RIP/v2.pm
+LICENSE
+LICENSE.Artistic
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-use.t
+t/02-pod-coverage.t
+t/03-test-pod.t
+t/04-rip.t
+t/05-ripv1.t
+t/06-ripv2.t
+t/07-ripvx.t
+t/08-ripv1compare.t
+t/09-ripv2compare.t
+t/10-ripv1decode.t
+t/11-ripv2decode.t
+META.yml                                 Module meta-data (added by MakeMaker)

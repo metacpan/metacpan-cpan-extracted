@@ -1,0 +1,183 @@
+
+CLASSES
+
+A basic rundown of the classes and their base purposes and
+capabilities.
+
+Frame
+------
+
+Frames can either be constructed from scratch with a single call to
+the constructor, from a <header, payload> pair (again through the
+constructor), and from a header, with payload added later.  The first
+and the last are the methods most commonly used.
+
+It does not yet support construction from a stream, leaving that task
+to a different class (Session).
+
+It only contains information about the frame.
+
+It is the union of all known frame types (including ANS and SEQ), so
+is generally not to be subclassed.
+
+Message
+--------
+
+Messages may be constructed from scratch, or from one or more frames.
+Messages know how to render themselves into frames.  They also do the
+mime encoding/decoding to make available the payload (encoded) and
+content (not encoded).
+
+Messages only contain information about the message.  The sequence
+number should be set at send time.  The message number for MSG
+messages should also be set at send time, although for other message
+types, that must be set at creation time (or anytime before sending
+it).
+
+Messages are fairly straightforward, except when it comes to the exact
+point of sending them.  The main method involved is the next_frame
+method.  There is a question of what next_frame does vs. what the
+caller (send_message) does.  One approach would be for the message to
+have a reference to its Channel, or be passed a reference to its
+Channel, then use the Channel object to calculate the next sequence
+and message number.  Or those values could just be passed in as
+arguments to the next_frame method.  Currently, this latter approach
+is chosen, mostly in the name of simplifying message creation from
+frames.
+
+
+Channel
+--------
+
+Channels in this framework are just collections of counters associated
+with a channel: message numbers, sequence numbers, window size (for
+SEQ processing), and (usually) a profile implementation.
+
+It also contains a spot for assembling a message, and spots for
+assembling ANS messages.  These slots are for collating message from
+interleaved frames (across channels, or, for ANS message, even within
+a channel).
+
+
+Session
+--------
+
+Sessions own the socket.  The contain a collection of channels, and
+start with at least one (channel zero, the management channel).  The
+subclasses will send the greeting message on initialization, unless
+the NoGreeting parameter is set to true.  Or the Session was
+initialized without a proper socket.
+
+Session objects have primitives for reading and writing frames,
+sending and receiving messages.  These primitives handle SEQ
+processing, and channel zero messages.
+
+Session objects also contain routines for sending management
+messages.  This would normally be the provence of the management
+profile, but since that is held internally by the session, the send
+methods are made available at this level.
+
+Profiles
+---------
+
+The API for profiles is defined by the BaseProfile class.
+Essentially, these are collections of callbacks for the various (data)
+message types: MSG, RPY, ERR, ANS, NULL, and the start channel data.
+
+Each of these callback methods get the message that triggered them,
+and a reference to the session.  The start channel data method gets
+the data (possibly un-base64-ed) that was sent along with the start
+message, not the raw start message.
+
+Profiles use the session to send replies.  The may frequently contain
+other methods for initiating messages.
+
+MgmtProfile
+------------
+
+This is the subclass of BaseProfile that handles channel zero
+management messages.  It also contains methods for sending (or just
+creating) the management messages.
+
+ServerSession
+--------------
+
+A subclass of Session, this basically just creates a dispatch loop
+around the socket.  That is, it loops around reading messages from its
+socket, handing them off to the profile implementation associated with
+whatever channel it was received on.
+
+
+ClientSession
+--------------
+
+A subclass of Session, this class provides some useful methods
+allowing a client to send and receive messages.  No provision is made
+for handing off anything to anybody.
+
+THREADING
+----------
+
+This implementation doesn't do it.  Well, on the server side, it is
+expected to fork for each session, it will not thread (or fork, even)
+for channels.  This means that using multiple channels with this
+package is not going to give you any performance benefits.
+
+
+SEQ
+----
+
+Real SEQ processing is totally overkill for this package, which
+expects a single channel to be in use mostly, and can only deal with
+one message at a time regardless.
+
+Unfortunately, there are a few bits that you cannot ignore.  Mainly,
+when sending, you cannot exceed the channel window size, because this
+may cause other implementations to drop the frames that exceed it,
+thus corrupting the channel.  When receiving, you MUST send SEQ frames
+as you actually receive frames, otherwise the channel will stall.
+
+Currently the API supports two message-level primitives: send_message
+and recv_message (these are built on _write_frame and _read_frame).
+Given the names, it should be obvious that these only handle single
+messages.  I don't think that that will ever be a great issue for
+recv_message (which just returns the first completed message), but it
+can be somewhat non-optimal on the sending side, since one cannot send
+messages across different channels as channels windows fill up.
+
+In the send_message scenario, it is necessary to send up to the window
+size, then switch into reading mode until the window opens up again
+(which many implementations will do almost immediately).  When
+receiving, it is necessary to emit SEQ frames to keep the channel from
+stalling.  Fundamentally, this means that while writing, you will have
+to read, and while reading, you will have to write.
+
+Now, while trying to send a message, it is likely that while waiting
+for the window to open, stuff is read that is of no immediate interest
+(that is, not a SEQ message on the current channel).  Thus we need a
+place to put messages (or frames), so that the next time the code
+cares to read something, it gets stuff that has officially already
+been read.
+
+The recv side is simpler.  Since there aren't any channel queues to
+speak of, a SEQ is emitted every time a frame is received with the
+static window size.
+
+When reading frames (either during a recv_message call, or stuff being
+read while trying to send), it is always possible to recieve
+interleaved frames (unless no data channels have been started yet).
+
+Thus, the read primitives need to have two separate places to store
+stuff that is not of immediate interest: one, a per channel slot for
+incomplete messages, two a general message queue.  The message-level
+read primitives need to consult the message queue before reading from
+the socket.
+
+In the future, I may add a send primitive that will allow applications
+to attempt to send multiple messages at a time, which will allow for
+multiplexing across channels.  However, it is fairly low priority at
+this point.
+
+David Blacka
+September 2003
+

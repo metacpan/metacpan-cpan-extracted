@@ -1,0 +1,40 @@
+Revision history for Perl extension Net::LDAP::Express.
+
+0.12 Sat Jun 28 20:04:49 CEST 2014
+     - Fixed bug 96007: misleading error message when the connection
+       with the directory server fails. The module now returns the
+       correct error message that comes from Net::LDAP itself.
+
+0.11 Mon Dec  6 14:11:14 CET 2004
+     - error in the number of test in 01basic.t: fixed
+
+0.10 Sat Dec  4 18:31:32 CET 2004
+     - applied patches from Gordon Lack to do exact searches: exact
+       searches are now supported;
+     - better management of undefined values, so that tests don't
+       issue warnings any more;
+     - in particular, now the $ldap->error for error code 0 (that
+       means: no error) is a null string, and not undef.
+       I hope this doesn't break any existing application, but in
+       case it does please contact me!
+     - test scripts have been deeply revised
+     - filters are now built differently: attribute/search-string
+       are not coupled with a boolean operator any more: now there
+       is a single boolean operator in the whole filter
+     - no delegation yet, sorry guys... :-(
+
+
+0.03, 0.04, 0.05 have been created, but never released to the public
+
+0.02  Sun May 18 17:00:38 CEST 2003
+	- modified Makefile.PL to require Test::More (no specific
+	  version)
+        - added the sort_by parameter, so that search results from
+	  simplesearch are sorted by the specified attributes
+	- optimized code in search methods; now, for each instance,
+	  search parameters are calculated once
+
+0.01  Mon Apr 14 14:08:17 2003
+	- original version; created by h2xs 1.21 with options
+		-XA Net::LDAP::Express
+

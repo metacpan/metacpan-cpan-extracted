@@ -1,0 +1,39 @@
+Net::IEC104 - Perl implementation of IEC 60870-5-104 standard (server and client)
+
+DESCRIPTION
+
+This module implement IEC 60870-5-104 standard (also known as IEC 870-5-104).
+IEC 870-5-104 is a network access for IEC 60870-5-101 using standard transport profiles (TCP/IP),
+its application layer is based on IEC 60870-5-101. IEC 60870-5-104 enables communication between
+control station and substation via a standard TCP/IP network. The TCP protocol is used for
+connection-oriented secure data transmission.
+
+Current implementation supports only ASDU NN 30,35,36,37,100,103. Its enough for now.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+    Event::Lib => 1.03,
+    IO::Socket::INET => 1.29,
+    Carp => 1.0,
+    Date::Manip => 1.0
+    Time::HiRes
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-2011 by Vladimir Lettiev
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

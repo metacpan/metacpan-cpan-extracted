@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 546706d1ede58a10b620597bda655e318c015e0e Build.PL
+SHA1 919ec59102e37857b11731134573d3357493d0c6 Changes
+SHA1 5c65606f2269c4386fda9ccf8d71152dc0f49518 MANIFEST
+SHA1 45620806a67a2d4c495db3f445d683615e82975b META.yml
+SHA1 cd9351675c76304eab73b5d3e893fbb879e1e434 Makefile.PL
+SHA1 0248b55501caf408508c62f5f8f7ee2b96d8293c README
+SHA1 ef99b868e3283ab7c64e4b27858730827cd3e15b examples/pusher
+SHA1 4f2a672f4101ed111a31d40caa08c6661dd2b49b examples/shifter
+SHA1 8eae72ccc8245ae9d6ec11ff3f43c25e58e8f526 lib/Net/MemcacheQ.pm
+SHA1 2c398e8c9650bb4c63d068f94d8d7e239931ce75 t/00-critic.t
+SHA1 81a495a7014487c9d2b0049344d00058abe71739 t/00-distribution.t
+SHA1 1f03cd78697676d69f3e91c196f29f1e95ad9413 t/00-pod.t
+SHA1 70e89690ecdefd93ab6d565d871ad0b74149e2d4 t/00-podcoverage.t
+SHA1 19bbf08c9c678f6646f0993aad04da5f395546e8 t/10-memcacheq.t
+SHA1 992d9c3947e91addb6455b779a7a794dac14a77c t/sock.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (Darwin)
+
+iQIcBAEBAgAGBQJLb9ZUAAoJEKRiRxpY9zRJYXYP/1H+Sl9uc8O3tCsIpbxnVpVF
+j54pgy7t4Ws+7jmo0QnWWOrMjUgGN6VNVgzQTF9JqsjDnbnTQHfm1e0ozvPdEiWH
+reVXPMVYFKIozZCSwpjG9EttMVo8Ls1SP0rXWVKb0vHaQzvtBi9SdRVvCHynWTo5
+3zTFAAEsDvc2LGe4BcM75WeTHO6nS/3RFIXsdz9DYGjNsJ3X1oHrb41IZLNUQ+K1
+4zZpGEvFVKHlJEaQdbh3kyyXfenDdG6kcip55254QadUM9kfrkHcM7f5IQKaaMYM
+kwBW+bL54xnA9Dcj/tj7CDkJ8hdeYY2EVw6n7MB7M4VS4enbaRyizSiL3iboKgrN
+KzVYjdVBEXG9WVK6NdgqjgylJMtUXkE7o7+lxbwE+zHFkKR5CrM+eNu9nyZd3sTO
+3DfdvMRXy+A0ARqcn9pkTqR5mmvIS73Hnu7yJhrHFUuMZ3XsMX2TfUqpDtsnyAxA
+Ji/+ntr8mfD3iZly3Rklyxxt+uRf5xD6sGE79oDPaxToExps5Rab/R8UILIIieYG
+5qd9rImjBEDQ+1auTl1EfDnkaU96b6+t7xbJgxWIQvEAzX/s6viAMVvd3qMyiGum
+iOy/O7lCkr/cwQIQOYS0mDqfR5UDOHlt2073iZJTMnYuHPs+IAKNWFpWeqla6eCt
+8X6Mnt9d6/Ia8aUmgvCB
+=hruR
+-----END PGP SIGNATURE-----

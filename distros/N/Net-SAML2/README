@@ -1,0 +1,19 @@
+Net::SAML2 - module implementing SAML2 bindings and protocol.
+
+This module implements enough of SAML2 to be a Service Provider
+supporting the Web Browser SSO profile. 
+
+Major dependencies:
+
+ * XML::XPath
+ * Crypt::OpenSSL::RSA
+ * Crypt::OpenSSL::X509
+ * Crypt::OpenSSL::VerifyX509
+
+This distribution is currently shipping a modified version of
+XML::Sig, (c) Byrne Reese <byrne@majordojo.com>, as
+Net::SAML2::XML::Sig.
+
+Those modifications are available here:
+
+  https://github.com/chrisa/perl-XML-Sig

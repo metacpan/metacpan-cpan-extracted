@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!-- This is "visit.html", as automatically converted from the Psion
+     WRD file where I made notes during the visit, with only minor
+     hacks to improve the HTML, fix spelling mistakes, etc. -->
+<html>
+<head>
+<title>ZZPerl - Perl interface to Z39.50</title>
+</head>
+<body>
+<!-- Header text "" -->
+<h1>ZZPerl - Perl interface to Z39.50</h1>
+
+<h2>Class Hierarchy</h2>
+
+<p>
+All classes defined by the Z3950 Perl module (note the absence of the
+dot - this really is a Perl module name) are of the form
+<i>Z3950::*</i>.
+
+<h3>Z3950::Manager</h3>
+
+<p>
+This encapsulate the Z3950 module's global state - option for search
+parsing, preferred record syntaxes, compiled configuration files,
+<i>etc.</i> - as well as a list of references to all the open
+connections.  We would normally expect there to be just one of these,
+but I suppose there's no reason why you shouldn't make more if you
+want.
+
+<h3>Z3950::Connection</h3>
+
+<p>
+Represents an established connection to a particular server on a
+particular port, together with options such as the default database in
+which to search.  Maintains a record of all outstanding requests, and
+maybe - why not? - history of previous requests.
+
+<p>
+(Could have this merely store information and not actually do the the
+INIT until you do a search.)
+
+<h3>Z3950::Search</h3>
+
+<p>
+Represents a compiled search, ready to be sent to a server.  May be
+built by calling a constructor to compile a search command (e.g. using
+CCL with a specified set of qualifiers) or Index Data's prefix
+notation; or a Type-1 or 101 query may be built "by hand" by creating
+an composing nodes of type <b>Z3950::Search::Type1</b> and promoting
+the top-level node to a fully-fledged <b>Z3950::Search</b>.
+
+<h3>Z3950::ResultSet</h3>
+
+<p>
+Represents the result of executing a search against a specific
+database on a specific connection, and contains an ordered list of
+zero or more elements each of which is either a record or a surrogate
+diagnostic (see below).
+
+<h3>Z3950::Record</h3>
+
+<p>
+This is an abstract type, in the sense that it is never actually
+instantiated.  Instead, it is used as a base class - really an
+interface specification - for a variety of concrete derivatives, of
+which the most interesting are:
+
+<ul>
+<li><b>Z3950::Record::SUTRS</b>
+<li><b>Z3950::Record::USMARC</b>
+<li><b>Z3950::Record::DANMARC</b>
+<li><i>etc.</i>
+<li><b>Z3950::Record::GRS1</b>
+<li><b>Z3950::Record::XML</b>
+</ul>
+
+<p>
+(Alternatively, the various <b>*MARC</b> record types could be
+represented as <b>Z3950::Record::MARC::US</b> <i>etc.</i>)
+
+<p>
+Each of these record types defines standard methods for operations
+such as as ``what's your type?'' and ``render yourself''.
+
+<p>
+An obvious starting point would be to implement SUTRS only - it's easy
+to translate a C-level SUTRS record (basically a string) into a Perl
+version.
+
+<p>
+The various MARC formats could perhaps also be dealt with trivially by
+simply returning a flat block of data to be interpreted by a
+pre-existing MARC package - is there such a beast on CPAN?
+
+<p>
+The real challenge of course is translating GRS-1 records from Yaz's
+format into Perl data structures: this will presumably require us to
+define yet more types such as Z3950::Record::GRS1::Element and build
+recursive trees reflecting the GRS-1 ASN.1 in Appendix RET.
+
+<p>
+XML records can be passed through "as it".
+
+<h3>Z3950::Diagnostic</h3>
+
+<p>
+Represents a surrogate diagnostic occurring  in a result set in place
+of a record.  (Non-surrogate diagnostics do not have an explicit
+representation - they are indicated by methods returning an undefined
+value and storing error information in the object.)
+
+<h3>Future Directions</h3>
+
+<p>
+The type system described in this document provides an interface to
+only four Z39.50 services - INIT, SEARCH, PRESENT and (implicitly)
+CLOSE.  A future version could also provide objects to invoke SCAN,
+EXTENDED SERVICES, <i>etc.</i>
+
+<h3>Note</h3>
+
+<p>
+This system appears simple and indeed obvious.  Is that because it's
+trivial, or is it just elegantly minimal and generally perfect?  (And
+do those two options even conflict?)
+
+<h2>GRS-1 Interface</h2>
+
+<p>
+Apart from the obvious traversal functions, we want to be able to say:
+
+<ul>
+<li>Get me all top-level elements tagged (2,1)
+<li>Get me all elements with tag-path (2,1)/(4,2)/(1,1)
+<li>zthes-like selection by related element.
+</ul>
+
+<h2>Simple Client Code</h2>
+<BLOCKQUOTE><PRE>
+use Z3950;
+$conn = new Z3950::Connection('indexdata.dk');
+$rs = $conn-&gt;search('au=kernighan');
+foreach $rec ($rs-&gt;records()) {
+	print $rec-&gt;render();
+}
+</PRE></BLOCKQUOTE>
+
+<h2>Multiplexing Client Code</h2>
+<BLOCKQUOTE><PRE>
+use Z3950;
+$mgr = new Z3950::Manager(-mode =&gt; 'async');
+my @conn;
+foreach $host ('indexdata.dk', 'tecc.co.uk') {
+	push @conn, $mgr-&gt;startConnect($host);
+}
+foreach $conn (@conn) {
+	$conn-&gt;startSearch('au=kernighan');
+}
+while ($conn = $mgr-&gt;wait()) {
+	if ($conn-&gt;failed()) {
+		die "error " . $conn-&gt;errcode() .
+			"( " . $conn-&gt;addinfo() . ")" .
+			" in " . $conn-&gt;where();
+	}
+	$op = $conn-&gt;op();
+	if ($op == Z3950::Op::Search) {
+		$rs = $conn-&gt;resultSet();
+		$size = $rs-&gt;size();
+		$rs-&gt;startGet(1, $size);
+	} elsif ($op == Z3950::Op::Get) {
+		foreach $rec ($conn-&gt;records()) {
+		print $rec-&gt;render();
+	}
+}
+</PRE></BLOCKQUOTE>
+<!-- Footer text "%P" -->
+</body>
+</html>

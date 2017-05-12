@@ -1,0 +1,694 @@
+=head1 NAME
+
+Net::OAuth2::AuthorizationServer::Manual - How to use Net::OAuth2::AuthorizationServer
+
+=head1 DESCRIPTION
+
+The modules within the L<Net::OAuth2::AuthorizationServer> namespace implement
+the various OAuth2 grant type flows. Each module implements a specific grant
+flow and is designed to "just work" with minimal detail and effort.
+
+However there are some limitations in using the grant modules in a minimal way,
+such as inability to store tokens across restarts or multi-proc and losing tokens
+over a restart. You can get around these limitations by supplying a C<jwt_secret>
+or by supplying your own overrides. The overrides are detailed in the L<CALLBACK FUNCTIONS>
+section below - each grant module's docs lists the supported callback functions.
+
+If you would still like to use the grant modules in an easy way, but also have
+tokens persistent across restarts and shared between multi processes then you can
+supply a jwt_secret. What you lose when doing this is the ability for tokens to
+be revoked. You could implement the verify_auth_code and verify_access_token
+methods to handle the revoking in your app. So that would be halfway between
+the "simple" and the "realistic" way. L<CLIENT SECRET, TOKEN SECURITY, AND JWT>
+has more detail about JWTs.
+
+=head1 WHICH GRANT TYPE SHOULD I USE?
+
+You are advised to read L<https://tools.ietf.org/html/rfc6749> and figure that
+out depending on your needs, but to simplify - if you are implementing an app
+server and need to give out access tokens you should be using the "Authorization
+Code Grant" as this is the most secure flow. If you need to do a call from javascript
+then the "Implicit Grant" is probably what you need. You should B<not> use the
+"Password Grant" or "Client Credentials Grant" unless your client/server apps
+are non-public facing or you B<really> know what you are doing.
+
+The "Authorization Code Grant" is used to obtain both access tokens and refresh
+tokens and is optimized for confidential clients. Since this is a redirection-based
+flow, the client must be capable of interacting with the resource owner's user-agent
+(typically a web browser) and capable of receiving incoming requests (via
+redirection) from the authorization server.
+
+The "Implicit Grant" is used to obtain access tokens (it does not support the
+issuance of refresh tokens) and is optimized for public clients known to operate
+a particular redirection URI. These clients are typically implemented in a browser
+using a scripting language such as JavaScript.
+
+The "Password Grant" type is suitable in cases where the resource owner has a trust
+relationship with the client, such as the device operating system or a highly
+privileged application. The authorization server should take special care when
+enabling this grant type and only allow it when other flows are not viable.
+
+The "Client Credentials Grant" can request an access token using only its client
+credentials (or other supported means of authentication) when the client is
+requesting access to the protected resources under its control, or those of another
+resource owner that have been previously arranged with the authorization server.
+
+=head1 CONSTRUCTOR ARGUMENTS
+
+The following are accepted by all grant types
+
+=head2 clients
+
+A hashref of client details keyed like so:
+
+  clients => {
+    $client_id => {
+      client_secret => $client_secret,
+      redirect_uri  => $redirect_uri,  # in the case of "Implicit Grant"
+      scopes        => {
+        eat       => 1,
+        drink     => 0,
+        sleep     => 1,
+      },
+    },
+  },
+
+Note that setting a client_secret implies either "Authorization Code Grant" or
+"Client Credentials Grant". if this is not set then "Implicit Grant" is implied
+(that has an optional redirect_uri parameter)
+
+Note the clients config is not required if you add all of the necessary callback
+functions detailed below, but is necessary for running the grant types in their
+simplest form (when there are *no* callbacks provided)
+
+=head2 users
+
+In the case of the "Password Grant" you should supply a hash of user to password
+mappings as well as the above client details:
+
+	users => {
+		test_user => 'reallyletmein',
+	}
+
+Again, the users config is not required if you add all of the necessary callback
+functions detailed below.
+
+=head2 jwt_secret
+
+This is optional. If set JWTs will be returned for the auth codes, access, and
+refresh tokens. JWTs allow you to validate tokens without doing a db lookup, but
+there are certain considerations (see L<CLIENT SECRET, TOKEN SECURITY, AND JWT>)
+
+=head2 access_token_ttl
+
+The validity period of the generated access token in seconds. Defaults to 3600
+seconds (1 hour)
+
+=head1 CALLBACK FUNCTIONS
+
+These are the callbacks necessary to use the grant modules in a more realistic
+way, and are required to make the auth code, access token, refresh token, etc
+available across several processes and persistent.
+
+The should be passed to the grant module constructor, each should be a reference
+to a subroutine:
+
+  my $Grant = Net::OAuth2::AuthorizationServer::AuthorizationCodeGrant->new(
+    ...
+    confirm_by_resource_owner_cb => \&your_subroutine,
+  );
+
+The examples below use monogodb (a db helper returns a MongoDB::Database object)
+for the code that would be bespoke to your application - such as finding access
+codes in the database, and so on. You can refer to the tests in t/ and examples
+in examples/ in this distribution for how it could be done and to actually play
+around with the code both in a browser and on the command line.
+
+The examples below are also using a "mojo_controller" object within the args hash
+passed to the callbacks - you can pass any extra keys/values you want within
+the args hash so you can do the necessary things (e.g. logging) along with the
+required args
+
+=head2 confirm_by_resource_owner_cb
+
+A callback to tell the grant module if the Resource Owner allowed or denied access to
+the Resource Server by the Client. The args hash should contain the client id,
+and an array reference of scopes requested by the client.
+
+The callback should return a list with three elements. The first element is 1 if
+access is allowed, 0 if access is not allowed, otherwise undef if the flow was
+interrupted (e.g. calling redirect in a controller). The second element element should
+be the error message in the case of problems with the confirmation of the scopes. The
+third element should be an array reference of scopes as the user may choose to modify
+the list of requested scopes when confirming them.
+
+  my $resource_owner_confirm_scopes_sub = sub {
+    my ( %args ) = @_;
+
+    my ( $obj,$client_id,$scopes_ref,$redirect_uri,$response_type )
+        = @args{ qw/ mojo_controller client_id scopes redirect_uri response_type / };
+
+    my $error;
+    my $is_allowed = $obj->flash( "oauth_${client_id}" );
+
+    # if user hasn't yet allowed the client access, or if they denied
+    # access last time, we check [again] with the user for access
+    if ( ! $is_allowed ) {
+      $obj->flash( client_id => $client_id );
+      $obj->flash( scopes    => $scopes_ref );
+
+      # we need to redirect back to the /oauth/authorize route after
+      # confirm/deny by resource owner (with the original params)
+      my $uri = join( '?',$obj->url_for('current'),$obj->url_with->query );
+      $obj->flash( 'redirect_after_login' => $uri );
+      $obj->redirect_to( '/oauth/confirm_scopes' );
+    }
+
+    return ( $is_allowed,$error,$scopes_ref );
+  };
+
+Note that you need to pass on the current url (with query) so it can be returned
+to after the user has confirmed/denied access, and the confirm/deny result is
+stored in the flash (this could be stored in the user session if you do not want
+the user to confirm/deny every single time the Client requests access). Also note
+the caveat regarding flash and Path as documented above (L<login_resource_owner>)
+
+=head2 login_resource_owner_cb
+
+A callback to tell the grant module if the Resource Owner is logged in. You can pass
+a hash of arguments should you need to do anything within the callback It should
+return 1 if the Resource Owner is logged in, otherwise it should do the required
+things to login the resource owner (e.g. redirect) and return 0:
+
+  my $resource_owner_logged_in_sub = sub {
+    my ( %args ) = @_;
+
+    my $c = $args{mojo_controller};
+
+    if ( ! $c->session( 'logged_in' ) ) {
+      # we need to redirect back to the /oauth/authorize route after
+      # login (with the original params)
+      my $uri = join( '?',$c->url_for('current'),$c->url_with->query );
+      $c->flash( 'redirect_after_login' => $uri );
+      $c->redirect_to( '/oauth/login' );
+      return 0;
+    }
+
+    return 1;
+  };
+
+Note that you need to pass on the current url (with query) so it can be returned
+to after the user has logged in. You can see that the flash is in use here - be
+aware that the default routes (if you don't pass them to grant module constructor) for
+authorize and access_token are under /oauth/ so it is possible that the flash may
+have a Path of /oauth/ - the consequence of this is that if your login route is
+under a different path (likely) you will not be able to access the value you set in
+the flash. The solution to this? Simply create another route under /oauth/ (so in
+this case /oauth/login) that points to the same route as the /login route
+
+=head2 verify_client_cb
+
+References: L<http://tools.ietf.org/html/rfc6749#section-4.1.1>, L<http://tools.ietf.org/html/rfc6749#section-4.2.1>, 
+L<http://tools.ietf.org/html/rfc6749#section-4.3.1>, L<http://tools.ietf.org/html/rfc6749#section-4.4.1>, 
+
+A callback to verify if the B<client> asking for authorization is known to the 
+B<authorization server> and allowed to get authorization for the passed scopes.
+
+The args hash will always contain the B<client id> and an array reference of 
+B<requested scopes>. Additionally for a ClientCredentials Grant the args hash
+will also contain the B<client secret> or for an Implicit Grant B<response type>
+and optionally B<redirect uri> will be present, or for a Code Grant 
+B<response type> will be present.
+
+The callback should return a list with three elements. The first element is 
+either 1 or 0 to say that the client is allowed or disallowed, the second 
+element should be the error message in the case of the client being 
+disallowed and the third should be the ammended scopes_ref denoting the 
+allowed scopes after filtering by the client allowed scopes:
+
+  my $verify_client_sub = sub {
+    my ( %args ) = @_;
+
+    my ( $obj,$client_id,$scopes_ref,$client_secret,$redirect_uri,$response_type )
+        = @args{ qw/ mojo_controller client_id scopes client_secret redirect_uri response_type / };
+
+    if (my $client = $obj->db->get_collection( 'clients' )->find_one({ client_id => $client_id })) {
+        my $client_scopes = [];
+
+        # Check scopes
+        foreach my $scope ( @{ $scopes_ref // [] } ) {
+
+          if ( ! exists( $client->{scopes}{$scope} ) ) {
+            return ( 0,'invalid_scope' );
+          } elsif ( $client->{scopes}{$scope} ) {
+            push @{$client_scopes}, $scope;
+          }
+        }
+
+        # Implicit Grant Checks
+        if ( $response_type && $response_type eq 'token' ) {
+          # If 'credentials' have been assigned Implicit Grant should be prevented, so check for secret
+          return (0, 'unauthorized_grant') if $client->{'secret'};
+
+          # Check redirect_uri
+          return (0, 'access_denied') 
+              if ($client->{'redirect_uri'} && (!$redirect_uri || $redirect_uri ne $client->{'redirect_uri'});
+        }
+
+        # Credentials Grant Checks
+        if ($client_secret && $client_secret ne $client->{'secret'}) {
+            return (0, 'access_denied');
+        }
+
+        return ( 1, undef, $client_scopes );
+    }
+
+    return ( 0,'unauthorized_client' );
+  };
+
+=head2 store_auth_code_cb
+
+A callback to allow you to store the generated authorization code. The args hash
+should contain the client id, the auth code validity period in seconds, the Client
+redirect URI, and a list of the scopes requested by the Client.
+
+You should save the information to your data store, it can then be retrieved by
+the verify_auth_code callback for verification:
+
+  my $store_auth_code_sub = sub {
+    my ( %args ) = @_;
+
+    my ( $obj,$auth_code,$client_id,$expires_in,$uri,$scopes_ref ) =
+        @args{qw/ mojo_controller auth_code client_id expires_in redirect_uri scopes / };
+
+    my $auth_codes = $obj->db->get_collection( 'auth_codes' );
+
+    my $id = $auth_codes->insert({
+      auth_code    => $auth_code,
+      client_id    => $client_id,
+      user_id      => $obj->session( 'user_id' ),
+      expires      => time + $expires_in,
+      redirect_uri => $uri,
+      scope        => { map { $_ => 1 } @{ $scopes_ref // [] } },
+    });
+
+    return;
+  };
+
+=head2 verify_auth_code_cb
+
+Reference: L<http://tools.ietf.org/html/rfc6749#section-4.1.3>
+
+A callback to verify the authorization code passed from the Client to the
+Authorization Server. The args hash should contain the client_id, the
+client_secret, the authorization code, and the redirect uri.
+
+The callback should verify the authorization code using the rules defined in
+the reference RFC above, and return a list with 4 elements. The first element
+should be a client identifier (a scalar, or reference) in the case of a valid
+authorization code or 0 in the case of an invalid authorization code. The second
+element should be the error message in the case of an invalid authorization
+code. The third element should be a hash reference of scopes as requested by the
+client in the original call for an authorization code. The fourth element should
+be a user identifier:
+
+  my $verify_auth_code_sub = sub {
+    my ( %args ) = @_;
+
+    my ( $obj,$client_id,$client_secret,$auth_code,$uri )
+        = @args{qw/ mojo_controller client_id client_secret auth_code redirect_uri / };
+
+    my $auth_codes      = $obj->db->get_collection( 'auth_codes' );
+    my $ac              = $auth_codes->find_one({
+      client_id => $client_id,
+      auth_code => $auth_code,
+    });
+
+    my $client = $obj->db->get_collection( 'clients' )
+      ->find_one({ client_id => $client_id });
+
+    $client || return ( 0,'unauthorized_client' );
+
+    if (
+      ! $ac
+      or $ac->{verified}
+      or ( $uri ne $ac->{redirect_uri} )
+      or ( $ac->{expires} <= time )
+      or ( $client_secret ne $client->{client_secret} )
+    ) {
+
+      if ( $ac->{verified} ) {
+        # the auth code has been used before - we must revoke the auth code
+        # and access tokens
+        $auth_codes->remove({ auth_code => $auth_code });
+        $obj->db->get_collection( 'access_tokens' )->remove({
+          access_token => $ac->{access_token}
+        });
+      }
+
+      return ( 0,'invalid_grant' );
+    }
+
+    # scopes are those that were requested in the authorization request, not
+    # those stored in the client (i.e. what the auth request restriced scopes
+    # to and not everything the client is capable of)
+    my $scope = $ac->{scope};
+
+    $auth_codes->update( $ac,{ verified => 1 } );
+
+    return ( $client_id,undef,$scope,$ac->{user_id} );
+  };
+
+=head2 store_access_token_cb
+
+A callback to allow you to store the generated access and refresh tokens. The
+args hash should contain the client identifier as returned from the
+verify_auth_code callback, the authorization code, the access token, the
+refresh_token, the validity period in seconds, the scope returned from the
+verify_auth_code callback, and the old refresh token,
+
+Note that the passed authorization code could be undefined, in which case the
+access token and refresh tokens were requested by the Client by the use of an
+existing refresh token, which will be passed as the old refresh token variable.
+In this case you should use the old refresh token to find out the previous
+access token and revoke the previous access and refresh tokens (this is *not* a
+hard requirement according to the OAuth spec, but i would recommend it).
+
+The callback does not need to return anything.
+
+You should save the information to your data store, it can then be retrieved by
+the verify_access_token callback for verification:
+
+  my $store_access_token_sub = sub {
+    my ( %args ) = @_;
+
+    my (
+      $obj,$client,$auth_code,$access_token,$refresh_token,
+      $expires_in,$scope,$old_refresh_token
+    ) = @args{qw/
+      mojo_controller client_id auth_code access_token
+      refresh_token expires_in scopes old_refresh_token
+    / };
+
+    my $access_tokens  = $obj->db->get_collection( 'access_tokens' );
+    my $refresh_tokens = $obj->db->get_collection( 'refresh_tokens' );
+
+    my $user_id;
+
+    if ( ! defined( $auth_code ) && $old_refresh_token ) {
+      # must have generated an access token via refresh token so revoke the old
+      # access token and refresh token (also copy required data if missing)
+      my $prev_rt = $obj->db->get_collection( 'refresh_tokens' )->find_one({
+        refresh_token => $old_refresh_token,
+      });
+
+      my $prev_at = $obj->db->get_collection( 'access_tokens' )->find_one({
+        access_token => $prev_rt->{access_token},
+      });
+
+      # access tokens can be revoked, whilst refresh tokens can remain so we
+      # need to get the data from the refresh token as the access token may
+      # no longer exist at the point that the refresh token is used
+      $scope //= $prev_rt->{scope};
+      $user_id = $prev_rt->{user_id};
+
+      # need to revoke the access token
+      $obj->db->get_collection( 'access_tokens' )
+        ->remove({ access_token => $prev_at->{access_token} });
+
+    } else {
+      $user_id = $obj->db->get_collection( 'auth_codes' )->find_one({
+        auth_code => $auth_code,
+      })->{user_id};
+    }
+
+    if ( ref( $client ) ) {
+      $scope  = $client->{scope};
+      $client = $client->{client_id};
+    }
+
+    # if the client has en existing refresh token we need to revoke it
+    $refresh_tokens->remove({ client_id => $client, user_id => $user_id });
+
+    $access_tokens->insert({
+      access_token  => $access_token,
+      scope         => $scope,
+      expires       => time + $expires_in,
+      refresh_token => $refresh_token,
+      client_id     => $client,
+      user_id       => $user_id,
+    });
+
+    $refresh_tokens->insert({
+      refresh_token => $refresh_token,
+      access_token  => $access_token,
+      scope         => $scope,
+      client_id     => $client,
+      user_id       => $user_id,
+    });
+
+    return;
+  };
+
+=head2 verify_access_token_cb
+
+Reference: L<http://tools.ietf.org/html/rfc6749#section-7>
+
+A callback to verify the access token. The args hash should contain the access
+token, an optional reference to a list of the scopes and if the access_token is
+actually a refresh token. Note that the access token could be the refresh token,
+as this method is also called when the Client uses the refresh token to get a
+new access token (in which case the value of the $is_refresh_token variable will
+be true).
+
+The callback should verify the access code using the rules defined in the
+reference RFC above, and return false if the access token is not valid otherwise
+it should return something useful if the access token is valid - since this
+method is called by the call to $c->oauth you probably need to return a hash
+of details that the access token relates to (client id, user id, etc).
+
+In the event of an invalid, expired, etc, access or refresh token you should
+return a list where the first element is 0 and the second contains the error
+message (almost certainly 'invalid_grant' in this case)
+
+  my $verify_access_token_sub = sub {
+    my ( %args ) = @_;
+
+    my ( $obj,$access_token,$scopes_ref,$is_refresh_token )
+  	  = @args{qw/ mojo_controller access_token scopes is_refresh_token /};
+
+    my $rt = $obj->db->get_collection( 'refresh_tokens' )->find_one({
+      refresh_token => $access_token
+    });
+
+    if ( $is_refresh_token && $rt ) {
+
+      if ( $scopes_ref ) {
+        foreach my $scope ( @{ $scopes_ref // [] } ) {
+          if ( ! exists( $rt->{scope}{$scope} ) or ! $rt->{scope}{$scope} ) {
+            return ( 0,'invalid_grant' )
+          }
+        }
+      }
+
+      # $rt contains client_id, user_id, etc
+      return $rt;
+    }
+    elsif (
+      my $at = $obj->db->get_collection( 'access_tokens' )->find_one({
+        access_token => $access_token,
+      })
+    ) {
+
+      if ( $at->{expires} <= time ) {
+        # need to revoke the access token
+        $obj->db->get_collection( 'access_tokens' )
+          ->remove({ access_token => $access_token });
+
+        return ( 0,'invalid_grant' )
+      } elsif ( $scopes_ref ) {
+
+        foreach my $scope ( @{ $scopes_ref // [] } ) {
+          if ( ! exists( $at->{scope}{$scope} ) or ! $at->{scope}{$scope} ) {
+            return ( 0,'invalid_grant' )
+          }
+        }
+
+      }
+
+      # $at contains client_id, user_id, etc
+      return $at;
+    }
+
+    return ( 0,'invalid_grant' )
+  };
+
+=head2 verify_user_password_cb
+
+A callback to verify a username and password. The args hash should contain the
+client_id, client_secret, username, password, an optional reference to a list of
+the scopes.
+
+The callback should verify client details and username + password and return a
+a list with 4 elements. The first element should be the client id if the client
+details + username is valid. The second element should be the error message in
+the case of bad credentials. The third element should be an array reference of
+the required scopes. The fourth should be the username.
+
+  my $verify_user_password_sub = sub {
+    my ( $self, %args ) = @_;
+
+    my ( $obj, $client_id, $client_secret, $username, $password, $scopes ) =
+      @args{ qw/ mojo_controller client_id client_secret username password scopes / };
+
+    my $client = $obj->db->get_collection( 'clients' )
+      ->find_one({ client_id => $client_id });
+
+    $client || return ( 0, 'unauthorized_client' );
+
+    my $user = $obj->db->get_collection( 'users' )
+      ->find_one({ username => $username });
+
+    if (
+      ! $user
+      or $client_secret ne $client->{client_secret}
+      # some routine to check the password against hashed + salted
+      or ! $obj->passwords_match( $user->{password},$password )
+    ) {
+      return ( 0, 'invalid_grant' );
+    }
+    else {
+      return ( $client_id, undef, $scopes, $username );
+    }
+
+  };
+
+=head1 PUTTING IT ALL TOGETHER
+
+Having defined the above callbacks, customized to your app/data store/etc, you
+can configuration the grant module. This example is using the for
+L<Net::OAuth2::AuthorizationServer::AuthorizationCodeGrant>:
+
+  my $Grant = Net::OAuth2::AuthorizationServer::AuthorizationCodeGrant->new(
+    login_resource_owner_cb      => $resource_owner_logged_in_sub,
+    confirm_by_resource_owner_cb => $resource_owner_confirm_scopes_sub,
+    verify_client_cb             => $verify_client_sub,
+    store_auth_code_cb           => $store_auth_code_sub,
+    verify_auth_code_cb          => $verify_auth_code_sub,
+    store_access_token_cb        => $store_access_token_sub,
+    verify_access_token_cb       => $verify_access_token_sub,
+  );
+
+Note because we are using the verify_client_cb above we do not need to pass
+a hashref of clients - this will be handled in the verify_client_cb sub
+
+=head1 SCOPES
+
+Access tokens can have the concept of "scopes", which you can roughly translate
+to permissions/privileges on your application side. The RFC covers the details:
+L<https://tools.ietf.org/html/rfc6749#section-3.3>. You've probably seen this
+in action when logging into a service using a social login option, you see a
+list of things the service would like to be able to do on your behalf and in most
+cases you are allowed to uncheck certain permissions from the list.
+
+The various grant types supported by the modules in this distribution fully
+support the use of scopes and the important thing to note is that the various
+grant types (as used with no overrides) will validate any requested scopes against
+the configured scopes with the following logic:
+
+  1) If a scope is requested that the client is not configured to have (does
+  not exist in the client's scope list) then "invalid_scope" will be returned
+
+  2) If a scope is requested that the client is not configured to use (exists
+  in the client's scope list but is set to false) then "access_denied" wil be
+  returned
+
+Note that this may change slightly as we figure out the best implementation for
+various use cases when no overrides are supplied.
+
+=head1 CLIENT SECRET, TOKEN SECURITY, AND JWT
+
+The auth codes and access tokens generated by the grant modules should be unique. When
+jwt_secret is B<not> supplied they are generated using a combination of the
+generation time (to microsecond precision) + rand() + a call to Crypt::PRNG's
+random_string function. These are then base64 encoded to make sure there are no
+problems with URL encoding.
+
+If jwt_secret is set, which should be a strong secret, the tokens are created
+with the L<Mojo::JWT> module and each token should contain a jti using a call
+to Crypt::PRNG's random_string function. You can decode the tokens, typically
+with L<Mojo::JWT>, to get the information about the client and scopes - but you
+should not trust the token unless the signature matches.
+
+As the JWT contains the client information and scopes you can, in theory, use
+this information to validate an auth code / access token / refresh token without
+doing a database lookup. However, it gets somewhat more complicated when you
+need to revoke tokens. For more information about JWTs and revoking tokens see
+L<https://auth0.com/blog/2015/03/10/blacklist-json-web-token-api-keys/> and
+L<https://tools.ietf.org/html/rfc7519>. Ultimately you're going to have to use
+some shared store to revoke tokens, but using the jwt_secret config setting means
+you can simplify parts of the process as the JWT will contain the client, user,
+and scope information (JWTs are also easy to debug: L<http://jwt.io>).
+
+When using JWTs expiry dates will be automatically checked (L<Mojo::JWT> has this
+built in to the decoding) and the hash returned from the call to ->oauth will
+look something like this:
+
+  {
+    'iat'     => 1435225100,               # generation time
+    'exp'     => 1435228700,               # expiry time
+    'aud'     => undef                     # redirect uri in case of type: auth
+    'jti'     => 'psclb1AcC2OjAKtVJRg1JjRJumkVTkDj', # unique
+
+    'type'    => 'access',                 # auth, access, or refresh
+    'scopes'  => [ 'list','of','scopes' ], # as requested by client
+    'client'  => 'some client id',         # as returned from verify_auth_code
+    'user_id' => 'some user id',           # as returned from verify_auth_code
+  };
+
+Since a call for an access token requires both the authorization code and the
+client secret you don't need to worry too much about protecting the authorization
+code - however you obviously need to make sure the client secret and resultant
+access tokens and refresh tokens are stored securely. Since if any of these are
+compromised you will have your app endpoints open to use by who or whatever has
+access to them.
+
+You should therefore treat the client secret, access token, and refresh token as
+you would treat passwords - so hashed, salted, and probably encrypted. As with
+the various checking functions required by the grant module, the securing of this data
+is left to you. More information:
+
+L<https://stackoverflow.com/questions/1626575/best-practices-around-generating-oauth-tokens>
+
+L<https://stackoverflow.com/questions/1878830/securly-storing-openid-identifiers-and-oauth-tokens>
+
+L<https://stackoverflow.com/questions/4419915/how-to-keep-the-oauth-consumer-secret-safe-and-how-to-react-when-its-compromis>
+
+=head1 REFERENCES
+
+=over 4
+
+=item * L<http://oauth.net/documentation/>
+
+=item * L<http://tools.ietf.org/html/rfc6749>
+
+=back
+
+=head1 EXAMPLES
+
+There are examples included with this distribution in the examples/ dir.
+See examples/README for more information about these examples.
+
+=head1 AUTHOR
+
+Lee Johnson - C<leejo@cpan.org>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. If you would like to contribute documentation
+or file a bug report then please raise an issue / pull request:
+
+    https://github.com/Humanstate/net-oauth2-authorizationserver
+
+=cut

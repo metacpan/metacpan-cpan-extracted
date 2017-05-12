@@ -1,0 +1,11 @@
+$args =
+{
+ message_type => MQTT_PUBLISH,
+ topic => 'testing',
+ message => 'test',
+}
+
+30 0d 00 07  74 65 73 74    69 6e 67 74  65 73 74
+
+Publish/at-most-once testing 
+  74 65 73 74                                      test

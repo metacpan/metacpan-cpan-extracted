@@ -1,0 +1,50 @@
+#!/usr/bin/perl -wT
+
+# This example simulates (some of) the behaviour of tcpdmatch by
+# checking the supplied information on the daemon and client 
+# against the access control tables.
+#
+# 04-Nov-2002, George A. Theall
+
+
+##############################################################################
+use Net::TCPwrappers qw(/^RQ_/ request_init hosts_access);
+
+
+# Parse commandline arguments.
+die "usage: tcpdmatch daemon[\@server] [user\@]client\n" 
+    unless (@ARGV == 2);
+my($daemon, $server) = split('@', shift, 2);
+my $client = shift;
+my $user;
+($user, $client) = split('@', $client) if ($client =~ /\@/);
+
+
+# Load an array with the key / value pairs for the request.
+my @req_args;
+push(@req_args, RQ_DAEMON, $daemon);
+if ($server) {
+    push(
+        @req_args, 
+        (($server =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\.?$/) ? RQ_SERVER_ADDR : RQ_SERVER_NAME),
+        $server
+    );
+}
+push(@req_args, RQ_USER, $user) if ($user);
+push(
+    @req_args, 
+    (($client =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\.?$/) ? RQ_CLIENT_ADDR : RQ_CLIENT_NAME),
+    $client
+);
+
+
+# Check and report whether connection is allowed.
+my $req = request_init(@req_args) or die "Request creation failed - $!\n";
+my $rc = hosts_access($req);
+print "daemon:    $daemon\n",
+      ($server ?
+      "server:    $server\n" : ""),
+      "client:    $client\n",
+      ($user ?
+      "user:      $user\n" : ""),
+      "access:    ", ($rc ? "granted" : "denied"), "\n";

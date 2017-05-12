@@ -1,0 +1,49 @@
+Net-Growl version 0.99
+
+Net::Growl provieds simple interface to send Mac OS X Growl notifications across the network. 
+
+Growl only needs to be installed on the  Mac receiving notification not on the machine using this module.  
+
+Make sure to go to System Preferences -> Growl -> Network and:
+1) Enable incoming notifications
+2) Allow remote applications (depending on your code this may be optional)
+3) Add a server password
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    
+Then go to System Preferences -> Growl -> Network and:
+
+    Enable incoming notifications
+    Allow remote applications (depending on your code this may be optional)
+    Add a server password
+
+You can test the install by running ./scripts/example.pl.
+
+If things are broken:
+    Go to System Preferences -> Growl -> General 
+          'enable logging' 
+           open Console.app. 
+
+   Messages are logged - and debugging is usually easy.
+
+
+
+DEPENDENCIES
+
+Growl (http://growl.info) on the computer receiving the notifications (not the computer using this module, sending the notifications).
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, Nathan McFarland
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

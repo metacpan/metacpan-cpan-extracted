@@ -1,0 +1,18 @@
+exclude  = Miscellanea::RequireRcsKeywords
+severity = 1
+
+[Documentation::PodSpelling]
+stop_words = CFB CPAN CPAN's CRC HASHREF hostname IP Nagios NSCA NULLs obfucated octothorpe perl perldoc plugin PortNumber STDERR Str TCP timestamp TODO UDP UTF XOR'd
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME | VERSION | SYNOPSIS | DESCRIPTION | METHODS | DEPENDENCIES | BUGS AND LIMITATIONS | AUTHOR | LICENSE AND COPYRIGHT
+script_sections = NAME | VERSION | USAGE | DESCRIPTION | OPTIONS | EXIT STATUS | CONFIGURATION | DEPENDENCIES | BUGS AND LIMITATIONS | AUTHOR | LICENSE AND COPYRIGHT
+
+[NamingConventions::Capitalization]
+package_exemptions = pack
+
+[TestingAndDebugging::RequireUseStrict]
+severity = 5
+
+[TestingAndDebugging::RequireUseWarnings]
+severity = 5

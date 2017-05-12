@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+
+use lib '../lib';
+use strict;
+use warnings;
+use Getopt::Long;
+use IO::Interface::Simple;
+use Net::SRCDS::Queries;
+use Term::Encoding qw(term_encoding);
+use YAML;
+
+my $result = GetOptions(
+    "addr=s" => \my $addr,
+    "port=s" => \my $port,
+);
+unless ( defined $addr and defined $port ) {
+    die "Usage: a2s_info --addr=address --port=portnumber\n";
+}
+
+my $encoding = term_encoding;
+
+my $q = Net::SRCDS::Queries->new( encoding => $encoding );
+$q->add_server( $addr, $port );
+warn YAML::Dump $q->get_all;

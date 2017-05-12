@@ -1,0 +1,117 @@
+Chages Net::GPSD
+
+2010-06-01 0.39
+2010-01-02 0.38
+  - GPS-PRN moved to GPS-OID
+2009-01-18 0.37
+  - Added socket caching (Bug RT 38406)
+2007-09-15 0.36
+  - Added set to Net::GPSD->host and Net::GPSD->port methods
+  - Updated Net::GPSD->speed_knots method
+  - Added example-googleearth.cgi
+2006-01-15 0.35
+  - Added Net::GPSD->speed_knots method
+2006-01-03 0.34
+  - Added extensions to example scripts
+2006-12-17 0.31
+  - added oid satellite capability from GPS::PRN
+2006-12-02 0.30
+  - cleaned
+2006-12-01 0.29
+  - updated test near function 
+  - Distance function from Geo::Inverse
+2006-11-30 0.28
+  - documentation
+  - getsatellite method supports wantarray
+  - moved PI from sub to constant
+  - moved stuff around everywhere but no real changes
+2006-10-28 0.27
+  - changed track formula to use Geo:Forward.
+2006-10-11 0.26
+  - Error in Net::GPSD->track $||$*$ -> ($||$)*$;
+2006-06-19 0.25
+  - Change dependancy on S[0] first and then O[14]||M[0] to get fix.
+  - Added examples
+2006-06-14 0.24
+  - Change dependancy on O[14](new) and M[0] vice S[0] to get fix.
+2006-06-11 0.23
+  - added logic to handle O=? watcher no fix
+2006-06-08 0.22
+  - modified subscribe method to use gpsd watcher mode vs. poll mode
+2006-06-08 0.21
+  - updated example-tracker-text
+2006-06-08 0.20
+  - Scrapped development concerning Math::Bezier
+2006-04-23 0.19
+  - added example-tracker-text
+  - added Point latlon method
+  - added wantarray capability to commands method
+  - changed a connection error print from stdout to a warn on stderr
+2006-04-08 0.18
+  - shift() warning
+  - fixed test errors
+2006-04-08 0.17
+  - Forgot to update versions
+  - Updated the CHANGES file
+2006-04-08 0.16
+  - Error in track function
+    >   # Heading is measured clockwise from the North.  The angles for the math
+    >   # sin and cos formulas are measured anti-clockwise from the East.  So,
+    >   # in order to get this correct, we have to shift sin and cos the 90
+    >   # degrees to cos and -sin.  The anti-clockwise/clockwise change flips
+    >   # the sign on the sin back to positive.
+    >   my $distance_lat_meters=$distance_meters * cos(deg2rad $p1->heading);
+    >   my $distance_lon_meters=$distance_meters * sin(deg2rad $p1->heading);
+  - Added deg2rad function
+  - Added Point->latlon function
+2006-04-01 0.15
+  - Updated pod for GPSD.pm mostly just the examples are linked
+2006-03-29 0.14
+  - Renamed GPS::gpsd to Net::GPSD
+2006-03-22 0.13
+  - Internel version numbers were wrong
+2006-03-22 0.12
+  - Error in point copy for initialization
+    < $self->{$_}=$data->{$_};
+    > $self->{$_}=[@{$data->{$_}}];
+2006-03-21 0.11
+  - simplified GPSD default_handler
+  - pods for ./bin/ examples
+  - hopefully fixed META.yml error
+2006-03-19 0.10
+  - moved examples to ./bin/ folder
+2006-03-17 0.09
+  - fixed 1 warning
+2006-03-15 0.08
+  - CPAN changes.  Now automakes with CPAN!
+  - moved Report::http under gpsd namespace
+  - moved modules to the lib folder
+  - renamed tgz file to GPS-gpsd-X.XX.tgz format
+2006-03-11 0.07
+  - made a bunch of changes to the distance calculations
+  - Fixes error in in the parse routine 
+     < $data{$1}=[split(/ /, $2)];
+     > $data{$1}=[split(/\s+/, $2)];
+  - Updates to CPAN install capability
+  - Updates to documentation
+  - Update to the subscribe interface
+2006-02-23 0.06
+  - No user interface changes
+  - Updates the pod documentation so that it displays better on CPAN.
+  - Moved code from GPS::gpsd::Satellite->list to GPS::gpsd->getsatellitelist. 
+  - Documentation, Documentation, Documentation...
+2006-02-22 0.05
+  - Heavy user interface changes
+  - Modified a few interface names to meet my tastes register->subscribe
+  - Documentation, Documentation, Documentation...
+2006-02-21 0.04
+  - Heavy user interface changes
+  - First CPAN Documentation Begins
+  - Added satellite object interface
+2006-02-19 0.03
+  - Heavy user interface changes
+  - Added Point object interface
+2006-02-?? 0.02
+  - Heavy user interface changes
+2006-02-?? 0.01
+  - Original version on CPAN.

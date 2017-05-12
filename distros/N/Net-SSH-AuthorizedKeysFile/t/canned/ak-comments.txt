@@ -1,0 +1,4 @@
+# comments with white space
+ssh-rsa AAAAB3Nza...LiPk== Quack Schmack quack@schmack.com
+command="dump /home",no-pty,no-port-forwarding ssh-dss AAAAC3...51R== Quack Schmack quack@schmack.com
+command="dump /home",no-pty,no-port-forwarding ssh-dss AAAAC3...51R== Quack Schmack, quack@schmack.com

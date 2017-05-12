@@ -1,0 +1,12 @@
+* add a XML dumping routine ( XHTML? )
+
+* the remove() methods need to do various clean-ups, or decide not to:
+	+ removed Links should remove corresponding Aliases
+	+ removed Categories should recursively remove its elements
+	+ removed Aliases should remove ALIASID from target Link
+	+ should all of this be handled in DESTROY anyway?
+
+* a bookmarks file diff routine (not just a text diff) would
+be nice.
+
+* add support for other formats (like IE, Opera, iCab)

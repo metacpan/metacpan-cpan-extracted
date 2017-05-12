@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::SMS::TextMagic.
+
+1.00  Sat Dec 31 08:45:00 2011
+	- original version, implements all documented functions of TextMagic
+	  HTTPS API
+

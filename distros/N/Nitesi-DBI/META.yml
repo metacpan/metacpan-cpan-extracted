@@ -1,0 +1,28 @@
+---
+abstract: 'DBI bundle for Nitesi shop machine'
+author:
+  - 'Stefan Hornburg (Racke) <racke@linuxia.de>'
+build_requires:
+  SQL::Statement: 0
+  Test::Database: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.76, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Nitesi-DBI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Nitesi: 0.0092
+  SQL::Abstract: 0
+  SQL::Abstract::More: 0
+resources:
+  repository: https://github.com/racke/Nitesi-DBI
+version: 0.0092

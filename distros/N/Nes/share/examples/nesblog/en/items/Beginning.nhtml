@@ -1,0 +1,120 @@
+<h2><a href="#">Beginning</a></h2>
+<h3>What is not Nes</h3> 
+<p>
+It is not a Perl's functions library. (Although it may be used as such)
+<br>
+It is not a programming language. (Although it seems)
+</p>
+<h3>What is Nes</h3>
+<p>
+It is a system of templates and replacement of variables for the Web and Perl. It manages web components,
+ pages, URLs, graphics, HTML tags, as objects.
+</p>
+<p>
+It is a way to separate Perl code and HTML. The HTML Tags are replaced by variables created in Perl.
+</p>
+<h3>Objetives</h3>
+<p>
+Separation between Perl code and HTML.
+</p>
+<p>
+Simplicity, not many things to learn about Perl. Objetive is that Nes has not more of twenty Tags, and <b>only one object</b> to created in Perl.
+</p>
+<p>
+Reuse Code, encapsulating HTML with your Perl code.
+</p>
+<h3>How it works</h3>
+<p>
+CGI distinguishes scripts running on server side and scripts running on client side. For a Web server is not same a file called "file.cgi" and other called "file.html"
+</p>
+<p>
+This distinction is good for a Web Server, but not for a Web user, who know nothing about that.
+</p>
+<p>
+Sometimes we access to information in this way:
+<pre>
+http://domain.com/file.cgi
+</pre>
+And other times we use­:
+<pre>
+    
+http://domain.com/file.html
+</pre>
+</p>
+<p>
+If you ask to Web Server, CGI is the reason, and if you ask to an user, may be that you will create a problem to he.
+</p>
+<p>
+With simple instructions into file "htaccess" we can create a handler and we can run the perl scripts with the extension that we want.
+</p>
+<p>
+For Nes we are created extension <i>nhtml</i> (nes-html), htmaccess file seens as follow:
+</p>
+<pre>
+AddHandler perl-nes .nhtml
+AddHandler perl-nes .nhtm
+Action perl-nes /nes/dispatch.cgi
+</pre>
+<p>
+Well and, what is the way to know the script to run for a certain html file?
+</p>
+<p>
+Nes uses next Tag to be included at the fist line of HTML file:
+<pre>
+&#123;: NES 0.4 ('file.cgi') :&#125;
+&lt;html&gt;
+  &lt;head&gt;
+  ... 
+</pre>
+</p>
+<p>
+"dispatch.cgi" will launch "file.cgi", but...
+</p>
+<p>
+What is required on "file.cgi" to put things on "file.nhtml"?
+</p>
+<p>
+If we put nothing Nes will launch thew file as a HTML,
+ but for the other cases we only need five simple lines of Perl code:
+<pre>
+# fundamental :-)
+use Nes;
+
+# Create a objet of class Singleton.
+my $nes = Nes::Singleton->new('file.nhtml');
+
+# variable to store data which we will show on HTML
+my $nes_tags = {};
+
+# data to be send to HTML output
+$nes_tags->{'variable'} = 'Things to say to world';
+
+# sending data to HTML output
+$nes->out(%$nes_tags);
+</pre>
+</p>
+<p>
+How show we this variable on file.nhtml?
+</p>
+<p>
+With this Tag Nes:
+<pre>
+&#123;: NES 0.4 ('file.cgi') :&#125;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Nes sample/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+   &#123;: $ variable :&#125;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+<p>
+doing <i>http://domain.com/file.nhtml</i> we will have:
+</p>
+<pre>   
+Things to say to world
+</pre>
+<br>
+<br>
+

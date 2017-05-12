@@ -1,0 +1,50 @@
+{
+   "abstract" : "Perl extension for representing and manipulating MAC addresses ",
+   "author" : [
+      "Karl Ward <karlward@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-MAC",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "integer" : 0,
+            "overload" : 0,
+            "perl" : "5.006000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Net-MAC"
+      },
+      "homepage" : "https://github.com/ollyg/Net-MAC/wiki",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ollyg/Net-MAC.git",
+         "web" : "https://github.com/ollyg/Net-MAC"
+      }
+   },
+   "version" : "2.103622"
+}
+

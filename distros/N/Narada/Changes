@@ -1,0 +1,397 @@
+Revision history for Narada
+
+v2.3.7  2017-02-22 06:49:08 EET
+	- narada-new now compatible with git-2.9
+
+v2.3.6  2016-12-13 01:07:47 EET
+	- narada-install notify when acquire lock
+	- narada-backup notify when acquire lock
+
+v2.3.5  2016-06-16 20:23:16 EEST
+	- Reformat doc.
+
+v2.3.4  2016-02-16 10:21:57 EET
+	- Support CPAN Testers without $AUTOMATED_TESTING.
+
+v2.3.3  2016-02-15 20:33:19 EET
+	- Fix POD.
+
+v2.3.2  2016-02-15 18:36:07 EET
+	- Improve tests setup with $AUTOMATED_TESTING.
+
+v2.3.1  2016-02-12 21:22:52 EET
+	- Use Export::Attrs instead of Perl6::Export::Attrs.
+
+v2.3  2015-11-29 23:55:51 EET
+	- Ban Perl6::Export::Attrs-0.0.5.
+	- Speedup and improve parallel tests.
+	- Use Test::Database.
+	- narada-shutdown-services waits for services to exit.
+	- narada-backup ignores non-fatal tar error.
+	- Make DBD::mysql an optional dependency.
+	- Fix narada-mysql exit code when db not configured.
+	- Incremental tar backups was disabled - need to find
+	  a better solution.
+
+	[Update for narada-base]
+	- Exclude .release/* from backups.
+	- Fixed INSTALL macro.
+
+v2.2.3  2015-10-08 17:59:49 EEST
+	- Ban Perl6::Export::Attrs-0.0.4.
+
+v2.2.2  2015-09-06 16:00:30 EEST
+	- Fix tests for new Path::Tiny.
+
+v2.2.1  2015-09-06 14:55:25 EEST
+	- Improve narada-viewlog.
+
+v2.2.0  2015-04-18 06:36:25 EEST
+	[Loading Narada::Config not in narada directory]
+	- get_config() return undef instead of throwing
+	- set_config() will throw
+
+v2.1.0  2015-04-12 08:03:24 EEST
+	- Improve portability.
+
+	[Backup and restore state of project's setup]
+	- narada-*-services save state in var/use/services
+	- narada-setup-*    save state in var/use/*
+	- narada-setup-qmail support --lock parameter
+	- narada-restore also restore project state
+
+v2.0.2  2015-04-09 12:34:52 EEST
+	- Fix hang in narada-install while restoring backup.
+	- Improve tests portability.
+
+v2.0.1  2015-04-09 08:32:49 EEST
+	- Allow `narada-setup-cron --clean` in empty dir.
+	- Allow `narada-setup-qmail --clean` in empty dir.
+	- Improve general doc.
+
+v2.0.0  2015-04-09 02:40:20 EEST
+	[Changes in project structure]
+	- config/crontab    -> config/crontab/*
+	- config/db/        -> config/mysql/
+	- config/patch/     ->
+	-                   -> config/service/type
+	- config/version    -> VERSION
+	- var/backup/       -> .backup/
+	- var/.lock         -> .lock
+	- var/.lock.new     -> .lock.new
+	-                   -> .lock.bg
+	- var/.lock.service -> .lock.service
+	- var/patch/        -> .release/
+	- var/sql/          -> var/mysql/
+
+	[New tools]
+	- add narada-new
+	- add narada-install
+	- add narada-restore
+	- add narada-bg
+	- add narada-bg-killall
+	- add narada-start-services
+
+	[Compatibility with Narada 1.x]
+	- add narada-new-1
+	- all old Narada 1.x tools still compatible with Narada 1.x
+	- keep narada-diff
+	- keep narada-release
+	- keep narada-patch-remote
+	- keep narada-patch-send
+	- keep narada-patch-pull
+	- keep narada-patch
+
+	[Improve detection of Narada dirs]
+	- add Narada::detect()
+	- update all scripts to use Narada::detect()
+
+	[Regroup tests]
+	- add t/narada1/
+	- add xt/release/
+	- add xt/author/
+
+	[Tests]
+	- consistently use cwd()
+	- add share.pm
+	- add more tests
+
+	[Internal]
+	- powerdiff moved to App::powerdiff
+	- reformat Changes to match CPAN::Changes::Spec
+
+v1.4.5  2015-02-07 07:44:20 EET
+	- fix mysql detection for tests
+	- cleanup POD
+	- remove occasionally bundled Devel::CheckOS
+	- add coveralls badge
+
+v1.4.4  2015-02-06 04:11:49 EET
+	- fix travis setup and mysql-related tests
+
+v1.4.3  2015-02-05 22:50:10 EET
+	- force commit for bin/* after release
+
+v1.4.2  2015-02-05 22:36:26 EET
+	- copy released bin/* back into repo
+
+v1.4.1  2015-02-05 22:29:00 EET
+	- add Travis CI support
+
+v1.4.0  2015-02-05 22:09:55 EET
+	- change license to MIT
+	- migrate to Dist::Milla
+	- create on GitHub
+	- imported into git using App::cpangitify
+
+v1.3.15 2015-01-30 20:54:02 EET
+	- avoid password in mysql/mysqldump command line
+	- removed default (mysql) value for config/db/port
+	- minor doc update
+
+v1.3.14 2014-12-24 12:01:59 EET
+	- fix dependencies
+
+v1.3.13 2014-11-20 06:05:42 EET
+	- give up on tar test
+
+v1.3.12 2014-11-20 06:05:42 EET
+	- fix tests portability
+
+v1.3.11 2014-11-19 18:54:35 EET
+	- fix tests portability
+
+v1.3.10 2014-07-11 05:51:08 EEST
+	- fix tests portability
+	- fix compatibility with perl 5.18
+
+v1.3.9  2014-04-16 22:31:27 EEST
+	- Security: fix permissions for backup- and db-related dirs
+
+v1.3.8  2013-11-23 16:24:37 EET
+	- Add *BSD support.
+
+v1.3.7  2013-11-22 04:20:57 EET
+	- Fix plugins support in bin/narada-release.
+	- Improve compatibility with CPAN Testers.
+
+v1.3.6  2013-05-12 19:03:07 EEST
+	- require GNU tar (for -g)
+
+v1.3.5  2013-05-11 14:52:41 EEST
+	- completely remove dependency on base64 command
+
+v1.3.4  2013-05-10 17:31:18 EEST
+	- fix author email
+	- remove dependency on base64 command
+	- add Makefile.PL for compatibility
+	- fix umask for some tests
+	- improve compatibility with Pod::Coverage-0.23
+
+v1.3.3  2013-04-26 03:39:23 EEST
+	- fix issue with Module::Build
+
+v1.3.2  2013-04-25 05:21:38 EEST
+	- fix portability issues in tests
+
+v1.3.1  2013-04-25 01:11:28 EEST
+	- fix tests
+
+v1.3.0  2013-04-24 22:32:23 EEST
+	- add Narada::Config::get_db_config
+	- fix portability issues in tests
+
+v1.2.2  2013-04-22 03:22:56 EEST
+	- improve doc
+	- narada-lock*: improve $PS1
+	- fix portability issues in tests
+
+v1.2.1  2013-04-07 17:46:13 EEST
+	- fix config/crontab: run runsvdir in background
+
+v1.2.0  2013-04-07 15:43:44 EEST
+	- add narada-shutdown-services
+	- rename var/patch/prev/ to var/patch/.prev/
+
+v1.1.0  2013-04-07 13:41:29 EEST
+	- add experimental support for addons
+
+v1.0.1  2013-04-06 21:55:17 EEST
+	- fix doc
+
+v1.0.0  2013-04-06 19:48:11 EEST
+	- first public release
+
+v0.9.5  2013-04-06 19:45:13 EEST
+	- fix narada-patch-send
+
+v0.9.4  2013-04-06 16:58:33 EEST
+	- bin/narada-* compatible with local::lib
+	- remove skel/perl/
+	- remove skel/config/developers
+	- add skel/config/patch/send/
+	- $NARADA_USER support
+	- narada-new: initialize config/patch/send/$USER
+	- narada-patch-send: avoid sending email to $NARADA_USER
+	- narada-patch-send: don't ask confirmation for recipients
+	- narada-release: use $NARADA_USER when available
+	- narada-release: prepend empty line with tab to ChangeLog
+
+v0.9.3  2013-04-06 11:47:03 EEST
+	- add bin/narada-patch-pull
+	- remove skel/doc/index.txt
+	- update skel/var/patch/.mc.menu
+	- narada-new create var/patch/*-0.0.000.tar
+	- Narada::Config::set_config use default perms
+	- narada-patch don't need --no-prev anymore
+	- add config/log/type (default to "syslog")
+	- fix powerdiff: replace symlink with file
+
+v0.9.2  2013-04-05 23:23:23 EEST
+	- dependencies cleanup
+	- add bin/powerdiff
+	- add bin/narada-remote
+	- add bin/narada-upload
+	- add bin/narada-download
+	- ready for CPAN!
+
+v0.9.1  2013-04-05 19:19:19 EEST
+	- require perl 5.10
+	- sync VERSION/Copyright in all files
+	- add main documentation to Narada.pm
+	- add documentation to some narada-* scripts
+
+v0.9.0  2012-05-21 03:12:45 EEST
+	- added config/backup/exclude
+
+v0.8.10 2012-05-20 21:35:25 EEST
+	- force var/patch/ChangeLog to be symlink
+
+v0.8.9  2012-02-16 14:23:45 EET
+	- minor fixes
+
+v0.8.8  2011-12-20 16:00:32 EET
+	- fix build
+
+v0.8.7  2011-12-10 08:52:14 EET
+	- fix test
+
+v0.8.4  2011-05-09 13:33:16 EEST
+	- added support for emu params in bin/narada-emu
+
+v0.8.3  2011-03-08 13:55:23 EET
+	- filtered tar error 'socket ignored' from narada-backup's output
+
+v0.8.2  2010-12-05 16:45:45 EET
+	- improved bin/narada-viewlog
+
+v0.8.1  2010-11-17 23:24:26 EET
+	- switched from POWER::LOG to Log::Fast
+
+v0.8.0  2010-10-24 19:10:37 EEST
+	- added bin/narada-mysql
+	- added bin/narada-mysqldump
+	- added bin/narada-setup-mysql
+	- added config/db/host
+	- added config/db/port
+	- deleted config/db/incr
+	- deleted config/db/skip
+	- added config/db/dump/incremental
+	- added config/db/dump/empty
+	- added config/db/dump/ignore
+
+v0.7.1  2010-08-02 20:14:06 EEST
+	- fixed bin/narada-viewlog
+
+v0.7.0  2010-07-28 19:16:53 EEST
+	- added bin/narada-viewlog
+
+v0.6.2  2010-05-04 21:32:11 EEST
+	- added config for t/perlcritic.t
+
+v0.6.1  2010-05-04 20:56:45 EEST
+	- previous version was broken, fixed MANIFEST
+	- fixed t/narada-backup.t on raiserfs
+
+v0.6.0  2010-03-11 10:35:53 EET
+	- added bin/narada-emu
+	- added t/narada-emu.t
+	- fixed tests
+
+v0.5.1  2009-10-14 15:48:39 EEST
+	- fixed patch version detection in narada-patch
+
+v0.5.0  2009-10-12 17:02:43 EEST
+	- added bin/narada-release
+	- added bin/narada-patch
+	- added bin/narada-patch-remote
+	- added bin/narada-patch-send
+	- added to skel: var/patch/PENDING.50.sql
+	- added to skel: var/patch/PENDING.90.sh
+	- added to skel: var/patch/.mc.menu
+	- added to skel: var/patch/ChangeLog (symlink)
+
+v0.4.0  2009-10-10 18:57:47 EEST
+	- added bin/narada-diff
+	- narada-new: populate var/patch/prev/
+
+v0.3.0  2009-08-16 12:09:44 EEST
+	- added support for $NARADA_SKIP_LOCK
+	- added bin/narada-backup
+	- added to skel: tmp/
+	- added to skel: var/sql/
+	- added to skel: config/db/incr
+	- added to skel: config/db/skip
+	- del from skel: config/backup/pass
+	- del from skel: config/backup/db/dynamic
+	- del from skel: config/backup/db/
+	- del from skel: config/backup/
+	- fixed bin/narada-lock-exclusive: keep exit status
+
+v0.2.0  2009-08-14 13:59:28 EEST
+	- narada-setup-cron: don't quote safe chars in path to improve readability
+	- Narada::Config: added get_config_line()
+	- added Narada::Log
+	- added Narada::Lock
+	- added narada-lock
+	- added narada-lock-exclusive
+	- added t/get_config_line.t
+	- added t/log-file.t
+	- added t/log-svc.t
+	- added t/lock.t
+	- added t/lock-scripts.t
+	- added to skel: config/log/level
+	- added to skel: service/log/run, service/log/log/run
+	- added to skel: perl/_Inline/
+
+v0.1.0  2009-06-28 15:18:34 EEST
+	- fixed few tests
+	- passes perlcritic
+
+v0.0.8  2009-02-25 02:07:43 EET
+	- refactored bin/narada-setup-qmail
+	- updated documentation in bin/narada-setup-qmail
+
+v0.0.7  2008-10-03
+	- fixed narada-setup-qmail.t
+	- bin/narada-setup-qmail: bugfix
+
+v0.0.6  2008-10-02
+	- added narada-setup-qmail.t - alpha
+
+v0.0.5  2008-07-17
+	- added narada-setup-qmail
+
+v0.0.4  2008-07-11 11:15:00 EEST
+	- narada-setup-cron: small bug fixing, test writing
+
+v0.0.3  2008-07-03 00:21:43 EEST
+	- bin/narada-setup-cron: rewritten to simplify code
+	- t/narada-setup-cron.t: test plan added, some tests added
+
+v0.0.2  2008-06-29 19:00:00 EEST
+	- added narada-setup-cron
+
+v0.0.1  2008-06-25 16:20:14 EEST
+	- Initial release.
+

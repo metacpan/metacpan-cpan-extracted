@@ -1,0 +1,42 @@
+{
+   "abstract" : "Implements the REST API for Rocket.Chat",
+   "author" : [
+      "Dale Evans <dale.evans at mycanadapayday.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-RocketChat",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Method::Signatures" : "0",
+            "Moose" : "0",
+            "YAML::XS" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/daleevans/perl-Net-RocketChat",
+         "web" : "https://github.com/daleevans/perl-Net-RocketChat"
+      }
+   },
+   "version" : "0.002"
+}
+

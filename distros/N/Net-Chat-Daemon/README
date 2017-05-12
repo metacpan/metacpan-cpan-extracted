@@ -1,0 +1,51 @@
+Net::Chat::Daemon version 0.3
+=============================
+
+Module for setting up a daemon that can be controlled via instant
+messaging. Useful for automation frameworks that you want to be able
+to monitor and control easily.
+
+Note that this module is currently very preliminary. It contains no
+tests -- mostly because I don't want to write a mock server, nor do I
+want to flood jabber.org with test messages and new accounts. (I have
+asked permission, to see if they even care, but I have received no
+response as yet.) Perhaps I will eventually write a mock server, but
+for now I'm just going to release this module so I can build on it.
+
+I have documented the code and internals, but I have very little in
+the way of friendly usage documents yet.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Net::Jabber
+  Time::HiRes
+
+You will also need a jabber id. I use jabber.org as my server; if you
+pass in 'somename@jabber.org' as the user to these modules, they will
+automatically try to register a new account for you (with the default
+password of "secret"). Use your own username and password if you have
+one; otherwise just make something up. (Actually, you'll want at least
+two accounts: one to put in your IM client, and another for the
+daemon. The two of you will chat with each other.)
+
+You do not need to use jabber.org. You can use another of the free
+servers, or run your own jabber server. I am currently using jabberd2
+(http://jabberd.jabberstudio.org/).
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Steve Fink
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

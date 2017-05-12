@@ -1,0 +1,293 @@
+NETCONF Perl client
+===================
+
+       Contents
+         * Abstract
+         * Supported Platforms
+         * Prerequisites
+         * Installation
+         * Running the Sample Scripts
+         * Troubleshooting
+
+Abstract
+========
+
+   The NETCONF API provides mechanisms to install, manipulate, and delete the
+   configuration of network devices. The NETCONF API uses an Extensible markup 
+   Language (XML) based data encoding for the configuration data as well as operations
+   and messages defined in the API.
+
+   The Net::Netconf::Manager module provides an object-oriented interface for
+   communicating with the NETCONF server so you can start using the NETCONF
+   API quickly and easily. There are several modules in this library but
+   client applications directly invoke the Manager object only. When the
+   client application creates a Net::Netconf::Manager object, it specifies a
+   router name and the login name to use when accessing the router (which
+   determines the client application's access level).
+
+   The following code segment shows how to use the Net::Netconf::Manager
+   object to request information from a routing platform.
+   This example invokes the query called get_chassis_inventory.
+    
+     # Step 1: set up the query
+     // RPC tag <get-chassis-inventory> should be querried as below
+     my $query = "get_chassis_inventory";
+     my %queryargs = ( 'detail' => 'True' );
+     # Step 2: Create a Netconf Manager object and connect to Networks routing platform
+     my %deviceinfo = (
+      access => "ssh",
+      login => "johndoe",
+      password => "secret",
+      hostname => "router11"
+      );
+      my $jnx = new Net::Netconf::Manager(%deviceinfo);
+      unless ( ref $jnx ) {
+             croak "ERROR: $deviceinfo{hostname}: failed to connect.\n";
+      }
+     # Step 3: send the query and receive a reply
+     my $res = $jnx->$query( %queryargs );
+     # Step 4: check for error
+     if ($jnx->has_error) {
+          croak "ERROR: in processing request \n $jnx->{request} \n";
+      } 
+      else {
+     # Step 5: do something with the result
+      }
+     # Step 6: always disconnect from the server when you're done
+     $jnx->disconnect();
+
+Supported Platforms
+===================
+
+   The current version of this module has been tested on the following
+   platforms. Later releases may support additional platforms.
+
+     * Ubuntu 12.04LTS 
+     * Fedora 15 i686
+     * Centos-6.5-i386
+        
+Prerequisites
+==============
+
+    Following are the Prerequisites for using this API:
+       1. Net::SSH2
+       2. File::Which
+       3. XML::LibXML
+
+Also make sure that your system has libxml2 and libxml2-dev library. If not then either install it from source package in ubuntu website or by using apt-get. 
+For more info look at the Troubleshooting 
+
+Installation
+=============
+
+    Make sure Perl is installed. If necessary, see Installation of Perl.
+    % which perl
+    % perl -v
+    The NETCONF Perl API requires version 5.6.1 or later of the perl executable. Verify that you are running 
+    that version of the perl executable. If not, check your PATH or install the latest release of perl.
+            
+        There are two ways to install Net::Netconf Module in your system:
+        1. Using CPAN
+        2. Using source code in github
+    Note: If you are using cpan command then you don't have to install prerequisites, they will automatically be
+    installed by cpan        
+     
+        Using CPAN
+        -----------------------------------------------------------------------------------------
+        Before installing using cpan, make sure your system has cpan, if not then install it either by "apt-get 
+        install cpan" or "yum install cpan" (according to the OS you are using)
+        1. To install using CPAN make sure your system has C dependencies, i.e. libxml2 and libxml2-dev package.
+        2. After installing these two packages in your system install Net::Netconf module by using CPAN command 
+        "cpan Net::Netconf". 
+       
+        Sometimes cpan command gives error then try installing using "cpanm" command. First install cpanm in your 
+        system by "apt-get install cpanminus"  and then install this module by "cpanm Net::Netconf"
+        
+        Using Source code in github
+        --------------------------------------------------------------------------------------------
+        Instructions for UNIX Systems
+        Install the prerequisites of Perl modules. 
+        Following are the prerequites
+        1. Net::SSH2
+        2. File::Which
+        3. XML::LibXML
+        
+        Steps to install Prerequisites in Ubuntu12.04LTS :
+        1. cpan Net::SSH2
+        2. cpan File::Which
+        3. cpan XML::LibXML
+            
+        After successfully installing Prerequisites install NETCONF PERL CLIENT
+          
+        1. Download the Perl NETCONF zip archive from Juniper's Repository in github 
+        2. Unzip the archive.
+            % unzip netconf-Perl-master.zip
+        3. Change to the NETCONF directory.
+            % cd netconf-perl-master
+        4. Create Net::Netconf Makefile.
+           If installing Net::Netconf::Manager under the standard directory
+            (by default it is /usr/local/lib):
+            [/my/netconf-perl-master]% perl Makefile.PL
+        5. Install the Net::Netconf module.
+            [/my/netconf-perl-master]% make
+            [/my/netconf-perl--master]% make install
+            (to run make install user should have root permission)
+            
+Running the Sample Scripts
+==========================
+
+The NETCONF Perl distribution includes sample scripts that demonstrate how to use NETCONF to retrieve 
+and change the configuration of a Networks routing platform. The samples reside in the netconf-perl-n.n/examples directory.
+
+Reading configuration: System Information
+This example sends a <get-system-information> request to the Networks routing platform and displays the
+result to the standard output.It also shows how to parse reply from server
+
+Script: get_system_information.pl
+```
+        use Net::Netconf::Manager;
+        print "Enter hostname\n";
+        my $hostname = <>;
+        print "Enter username\n";
+        my $login= <>;
+        print "Enter password\n";
+        my $pass = <>;
+        chomp($hostname);
+        chomp($login);
+        chomp($pass);
+        $jnx = new Net::Netconf::Manager( 'access' => 'ssh',
+                      'login' => $login,
+                      'password' => $pass,
+                      'hostname' => $hostname);
+        if(! $jnx ) {
+              print STDERR "Unable to connect to Junos device \n";
+              exit 1;
+         }
+         print "Connection established: " . $jnx->get_session_id . "\n";
+         my $reply=$jnx->get_system_information();
+         if ($jnx->has_error) {
+         print "ERROR: in processing request\n";
+         # Get the error
+         my $error = $jnx->get_first_error();
+         $jnx->print_error_info(%$error);
+         exit 1;
+         }
+ 	  print "Server request: \n $jnx->{'request'}\n Server response: \n $jnx->{'server_response'} \n";
+
+         # this parsing is specifically for <get-system-information> tag
+         # you can write your own application in similar way
+         #parsing reply from server
+         my $config= $jnx->get_dom();
+         $res= $config->getElementsByTagName("hardware-model")->item(0)->getFirstChild->getData;
+         $res2= $config->getElementsByTagName("os-name")->item(0)->getFirstChild->getData;
+         $res3= $config->getElementsByTagName("host-name")->item(0)->getFirstChild->getData;
+         print "\nhardware information  ". $res ."\n";
+         print "os-name  " .$res2 . "\n";
+         print "host-name  ". $res3. "\n";
+         $jnx->disconnect();
+```
+
+Output:  
+Run netconf-perl script:
+```
+perl <script_name>
+```
+```
+priyal@priyal:~/Desktop$ perl get_system_information.pl
+Enter hostname: device1
+Enter username: foo
+Enter password: passwd123
+
+Server request: 
+ <rpc message-id='1'>
+  <get-system-information/>
+</rpc>
+
+ Server response: 
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" xmlns:junos="http://xml.juniper.net/junos/15.2I0/junos" message-id='1'>
+<system-information>
+<hardware-model>olive</hardware-model>
+<os-name>junos</os-name>
+<os-version>15.2I20151211</os-version>
+<host-name>device1</host-name>
+</system-information>
+</rpc-reply>
+
+hardware information:  olive
+os-name:  junos
+host-name: device1
+```
+
+
+Troubleshooting  (Ubuntu12.04LTS or higher version) 
+=================
+
+    1. Installing libxml2 and libxml2-dev 
+       - Install using apt-get
+            apt-get install libxml2
+            apt-get install libxml2-dev
+       - Installing from source code
+         Download your system specific package from http://packages.ubuntu.com/
+         For Precise(12.04 LTS) download its .dpkg packages
+         For libxml2: http://packages.ubuntu.com/precise/libxml2
+         For libxml2-dev : http://packages.ubuntu.com/precise/libxml2-dev
+         
+         Install these packages in your system :
+            dpkg -i libxml2_2.7xyz__.dpkg
+            dpkg -i libxml2-dev_2xyz__.dpkg
+            
+      Note : Libxml2 and libxml2-dev should be of same version
+      
+    If you get libxml related error even after installing its dependency like libxml2 and libxml2-dev then try 
+    below  command
+            apt-get install libxml-libxml-perl
+            
+    Sometimes you may get error like "Checking for ability to link against xml2...no " while installing LibXML then 
+    use this command
+          sudo apt-get install zlib1g-dev
+          
+    2. For error related to Net::SSH2
+       Sometimes you may get error like,
+              fatal error: openssl/crypto.h: No such file or directory
+              #include <openssl/crypto.h>
+                            ^
+              compilation terminated.
+              make: *** [SSH2.o] Error 1
+      then use then command:
+      sudo apt-get install libssl-dev
+      
+    3. For YAML related Errors
+       Sometimes you may get that yaml is not installed then run following commands:
+             apt-get install libyaml-appconfig-perl
+             apt-get install libconfig-yaml-perl
+
+    3. For libz errors like:
+             /usr/bin/ld: /usr/local/lib/libz.a(crc32.o): relocation R_X86_64_32 against `.rodata' can not be used when 
+               making a shared object; recompile with -fPIC
+             /usr/local/lib/libz.a: could not read symbols: Bad value
+         try installing from source code:
+             download libz source code, https://google-desktop-for-linux-mirror.googlecode.com/files/zlib-1.2.3.tar.gz
+             according to platform u are using.
+             open Makefile and add -fPIC in cflag, (smth like: CFLAGS=-O3 -DUSE_MMAP -fPIC)
+             then compile it:
+             ./configure
+             make test
+             make install
+        
+    4. For cpan related errors:
+       While installing some files using cpan, for example "cpan File::Which" you may get error like checksum mismatch
+       for distribution, then try installing that package using "cpanm"
+       First install cpanm in your system by:
+       apt-get install cpanminus
+       and then install desired package by using cpanm, for example:
+       cpanm File::Which
+       
+       While installing perl dependency using cpan, if you get errors like "XML::NamespaceSupport package not found" or
+       unmet dependency then first install that package using cpan / cpanm and then install your desired package.
+       you can also try installing by force :
+       apt-get -f install
+             
+# CONTRIBUTORS
+
+ - [Ganesh Nalawade](https://github.com/ganeshnalawade)
+ - [Priyal Jain](https://github.com/Jainpriyal)

@@ -1,0 +1,241 @@
+#!/usr/bin/perl
+#
+# dnsblmon
+#
+# version 1.02, 11-16-08
+#
+# Copyright 2008, Michael Robinton <michael@bizsystems.com>
+   
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+   
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+   
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+
+use strict;
+#use diagnostics;
+#use lib qw(blib/lib blib/arch);
+
+use Net::DNSBL::Utilities qw(
+	doINCLUDE
+);
+use Net::NBsocket qw(
+	open_udpNB
+	sockaddr_in
+);
+use Net::DNS::ToolKit qw(
+	get_ns
+);
+use Proc::PidUtil qw(
+	if_run_exit
+	zap_pidfile
+);
+use Net::DNSBL::Monitor qw(
+	run
+	plaintxt
+	htmltxt
+	plainresp
+	htmlresp
+);
+
+sub usage {
+  print STDERR $_[0],"\n\n" if $_[0];
+  print STDERR qq|
+Syntax:	$0 path/to/config.file
+    or
+	$0 -t path/to/config.file
+	$0 -w path/to/config.file
+
+	$0 path/to/config.file -r -s
+	$0 path/to/config.file -s -r
+
+	$0 path/to/config.file \
+		-r path/outfile1 \
+		-s path/outfile2
+
+Normally $0 prints an IP report sorted by "comment" 
+and IP of the DNSBL's interrogated with their reply 
+results for each IP address. 
+
+The 'comment' field may contain html markup text.
+
+  i.e.	commenta
+	  1.2.3.4  127.0.0.3  zen.spamhaus.org
+	           127.0.0.5  dnsbl.sorbs.net
+	  1.2.3.5  127.0.0.5  dnsbl.sorbs.net
+
+	commentb
+	  3.4.5.6 127.0.0.2 bl.spamcannibal.org
+
+
+With the (-s) switch, $0 prints a sorted list (by count)
+of the DNSBL's interrogated with their reply count,
+percentage of the total count, and any comments from
+the DNSBL's 'comment' key field in the config file.
+The 'comment' field may contain html markup text.
+
+  i.e.
+  44 100.0%  TOTAL IP's interrogated
+  41  93.2%  UNION of all results
+  34  77.3%  dnsbl.sorbs.net comment
+  ........
+
+The -t switch will print a start and stop time to STDOUT
+
+  i.e.
+  # start: Fri Jan  4 17:46:44 2008
+  # stop : Fri Jan  4 17:58:21 2008
+
+The -w switch will put the output into an HTML table
+without the <table> statement </table>., a commment as above
+and with an <a href="...">dnsbl name</a> statement replacing
+the dnsbl name if the 'url' key is present in the config file.
+
+The -r and -s switchs are position dependent output designators.
+
+  -r	REPORT output designator
+  -s	STATISTICS output designator
+
+  as follows:
+
+  -r -s would produce the report on STDOUT and the statistics
+	on STDERR.
+  -s -r would produce the statistics on STOUT and the 
+	report on STDERR.
+
+  -s outfile1 -r outfile2 would write the statistics and report
+	to outfile1 and outfile2 respectively.
+
+Other combinations are possible. Switches are order dependent 
+but not positionally dependent with respect to other switches
+
+|;
+  exit 1;
+}
+
+$| = 1;
+my $WEB;
+my $TIME;
+local(*X,*Y);
+my($x,$y);
+my($config,@ckys);
+my($ROUT,$SOUT);
+
+while ($_ = shift @ARGV) {
+  if ($_ eq '-w') {
+    $WEB = 1;
+    next;
+  }
+  elsif ($_ eq '-t') {
+    $TIME = time;
+    next;
+  }
+  elsif ($_ eq '-r') {
+    if ($ARGV[0] && $ARGV[0] !~ /^\-/) {
+      $ROUT = shift @ARGV;
+      open(X,'>'. $ROUT) or die "could not open ${ROUT}.tmp for write\n";
+      $x = $ROUT = *X;
+    } else {
+      if ($SOUT && fileno($SOUT) == 1) {
+	$ROUT = *STDERR;
+      } else {
+	$ROUT = *STDOUT;
+      }
+    }
+    next;
+  }
+  elsif ($_ eq '-s') {
+    if ($ARGV[0] && $ARGV[0] !~ /^\-/) {
+      $SOUT = shift @ARGV;
+      open(Y,'>'. $SOUT) or die "could not open ${SOUT}.tmp for write\n";
+      $y = $SOUT = *Y;
+    } else {
+      if ($ROUT && fileno($ROUT) == 1) {
+	$SOUT = *STDERR;
+      } else {
+	$SOUT = *STDOUT;
+      }
+    }
+    next;
+  }
+  $config = $_;
+}
+
+$ROUT = *STDOUT unless $ROUT;
+unless ($SOUT) {
+  if ($ROUT && fileno($ROUT) == 1) {
+    $SOUT = *STDERR;
+  } else {
+    $SOUT = *STDOUT;
+  }
+}
+
+usage() unless $config;
+my $Conf = doINCLUDE($config);
+usage("could not load config file: $config")
+	unless $Conf;
+usage("corrupted config file: $config")
+	unless (@ckys = keys %$Conf);
+
+if (exists $Conf->{IMPORT} && (my $sconf = $Conf->{IMPORT}->{FILE})) {
+  my $Sconf = doINCLUDE($sconf);
+  usage("could not load spamcannibal config file: $sconf")
+	unless $Sconf;
+  usage("corrupted spamcannibal config file: $sconf")
+	unless (@_ = keys %$Sconf);
+
+  my $keyexp = $Conf->{IMPORT}->{KEYexp};
+  my @skys = grep ($_ =~ /$keyexp/o,@_);
+  @{$Conf}{@skys} = @{$Sconf}{@skys};
+}
+
+if_run_exit($Conf->{PIDdir},'already running');
+
+my $Ttxt = '';
+if ($TIME) {
+  if ($WEB) {
+    $Ttxt =  '<!-- start: '. scalar localtime($TIME) ." -->\n";
+  } else {
+    $Ttxt =  'start: '. scalar localtime($TIME) ."\n";
+  }
+}
+
+my $sock = open_udpNB();
+my $sockaddr_in = sockaddr_in(53, scalar get_ns());
+my($dnsbls,$respons) = run($Conf,$sock,$sockaddr_in);
+
+if ($TIME) {
+  my $now = time;
+  if ($WEB) {
+    $Ttxt .= '<!-- stop : '. scalar localtime($now) . sprintf("\n     total: %1.1f minutes -->\n", ($now - $TIME)/60);
+  } else {
+    $Ttxt .= 'stop : '. scalar localtime($now) . sprintf("\ntotal: %1.1f minutes\n", ($now - $TIME)/60);
+  }
+}
+
+select STDERR;
+$| = 1;
+select STDOUT;
+$| = 1;
+
+if ($WEB) {
+  print $SOUT $Ttxt, htmltxt($Conf,$dnsbls), "\n";
+  print $ROUT $Ttxt, htmlresp($Conf,$respons);
+} else {
+  print $SOUT $Ttxt, plaintxt($Conf,$dnsbls), "\n";
+  print $ROUT $Ttxt, plainresp($respons);
+}
+
+close X if $x;
+close Y if $y;
+
+zap_pidfile($Conf->{PIDdir});

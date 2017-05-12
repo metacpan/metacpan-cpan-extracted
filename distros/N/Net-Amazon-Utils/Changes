@@ -1,0 +1,11 @@
+Revision history for Net-Amazon-Utils
+
+0.21    2014-07-31
+        Further fixes on older and newer perl.
+
+0.2     2014-07-31
+        Fix formatting of region file. Fix tests on many platforms.
+
+0.1     2014-07-25
+        First version, basic support for com.amazonaws.region.Region endpoint
+        recognition and region lists.

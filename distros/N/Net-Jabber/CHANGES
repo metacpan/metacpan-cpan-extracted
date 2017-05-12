@@ -1,0 +1,438 @@
+2.0
+===
+  - All of the core functionality has moved into Net::XMPP.
+    It provides the connection, messages, iq, and presence.
+    Net::Jabber now just provides the extensions that the
+    JEPs define and that are truly Jabber and not XMPP.
+
+1.30
+====
+  - Added initial support for XMPP 1.0 via XML::Stream 1.18.
+  - Locked version of XML::Stream to 1.18.
+  - Changed connectiontimeout to just timeout in the Connect
+    function.
+  - Hey, here's a good idea.  Instead of copying the function
+    hash out of each namespace why not just use a refrence...
+    duh...  This might make things a little faster and use a
+    smidge less memory.  Just a little thought.
+  - Fixed a taint problem with an eval and the xmlns read from
+    the socket.
+  - Fixed some -w warnings.
+  - Updated client test to user newer methods and create the
+    test account.
+  - Added password to MUCJoin.
+  - Fixed typo in DefineNamespace.
+  - Added Tree Transfer (JEP-105)
+
+1.29
+====
+  - Added PubSub (JEP-60)
+  - Added documentation for most of the below.
+  - Added in a basic basic support for SOAP (JEP-72).  You can
+    dump in rawxml and get it back out.
+  - Looking into using contants for the namespaces, but they
+    don't work in hashes. =(
+  - Removed jabber:x:sxpm (it was never used).
+  - Added initial (low level) support for Commands (JEP-50).
+  - Added initial (low level) support for FNeg (JEP-20),
+    Disco (JEP-30), Bytestream (JEP-65), SI (JEP-95), and
+    FT-Profile (JEP-96).
+  - Made Client, Component, and Server inherit from Protocol
+    instead of AUTOLOADing.  Why didn't I do this in the
+    beginning?
+  - Added function RosterRequest to let the user handle processing
+    the roster in their own callback and not return a hash.
+  - Added function PresenceDBClear that will clear out the
+    presence database.
+  - Added check to see if Process generated an error, and then
+    was called again (bad thing).
+  - Moved Process into Client.pm, Component.pm, and Server.pm.
+  - Locked version of XML::Stream to 1.17.
+  - Fixed typos in the Protocol help.
+
+1.28
+====
+  - Fixed bug in XPathDefined which caused the main iq callback
+    function to not work.  Show stopper bug.
+  - Fixed iq:time test.
+
+1.27
+====
+  - Update examples/client scripts to include an xpath based
+    example.
+  - Added support for XPath based callbacks.
+  - Updated x:data to match the call for experience.
+  - Requires perl 5.6 in an attempt to get Unicode support.
+  - Added finer callback support for presence and message
+    based on type.
+  - Minor tweak to NOT remove an unknown xmlns packet (duh...)
+  - Fixed bug in JID.
+  - Updated DefineNamespace to handle most old style, and all
+    new style.
+  - Locked version of XML::Stream to 1.16.
+  - Major recore due to XML::Stream::Node and XPath.
+  - Moved from XML::Stream::Hash to XML::Stream::Node.
+  - Fixed XDB Reply error.
+  - Uninitialized value round up.
+
+1.26
+====
+  - Changed to a more sane version scheme.
+  - Locked version of XML::Stream to 1.15.
+
+1.0025
+======
+  - Documented the PresenceSend function a little better.
+  - Added GetHumanTime function to convert seconds to
+    a sentence.  Useful for various Jabber things (last,
+    time, etc.)
+  - Added the ability to remove a callback.  This is to
+    try and speed thigs up by being able to unregister the
+    receive and send callbacks when you don't care about them.
+  - Added jabber:iq:rpc support based on JEP-0009.
+  - Fixed bad function call in VersionQuery.
+  - Added code to handle tracking the user's activity.
+  - Added <desc/> to the x:data.
+  - Added RemoveXXXX function to match GetXXXX and SetXXXX.
+  - Added timeouts to RegisterRequest(), SearchRequest(), and
+    LastQuery().
+  - Fixed bug in LastQuery().
+  - Finished support for jabber:x:data (previously jabber:x:form
+    in the 1.0021 change messages).
+  - Added Execute function to Component to provide a generic
+    inner loop for easier component writing.
+  - Added support for a finer level of callbacks.  You can now
+    create callbacks for all types of <iq/> packets and
+    namespaces.  See Net::Jabber::Protocol for more details.
+  - Fixed bugs with the Raw XML functionality.
+  - Added documentation to Net::Jabber for the Raw XML
+    functions.
+
+1.0024
+======
+  - Fixed a bug where no flag children were being put into the
+    XML string.  (ie. <remove/> for iq:register).  Ooops.
+  - Ok... found a really stupid module scoping problem.  If
+    Protocol.pm is used before say Dialback.pm, then Protocol
+    cannot call new from Dialback to make a packet.  Moved
+    use Protocol; to the last thing in import().
+  - Callback now checks if you have a callback defined for a
+    packet, or if you were waiting for a packet via
+    SendAndReceiveWithID.  Might make some things faster.
+  - Fixed mistake in DefineNamespace where it copied too many
+    things into the hash.
+
+1.0023
+======
+  - Fixed bugin accept for Components.
+  - Added InsertRawXML and ClearRawXML.
+  - Fixed Reply function in IQ.
+  - Fixed bug in X.pm.
+  - Added jabber:iq:pass support.  DRAFT
+  - Added jabber:iq:browse support into Protocol.
+
+1.0022
+======
+  - XML::Stream supports SSL.  Client docs updated to show the
+    switches needed to enable that and HTTP.
+  - Started to work on supporting XDB.  But due to lack of
+    documentation, this release DOES NOT 100% support it.  Use
+    at your own risk.
+  - Updated docs to reflect changes.
+  - Added Net::Jabber::Namespaces as a way to help document
+    how the redesign works.  It's probably incomplete so
+    ask questions and I'll work on it.
+  - Added check to make sure you specify a schema for the
+    use Net::Jabber qw ( xxx ); line.
+  - Fixed bug in Connect where it would not handle the case where
+    it could not connect properly.
+  - Fixed bug in Debug.
+  - Fixed iq:time and iq:version.  The redesign broke the automatic
+    behavior they had before.
+  - Tweaked ParseTree for changes in XML::Stream.
+  - Fixed bug in Query.pm where I forgot to copy over a function
+    for jabber:iq:search.
+  - Redesigned modules to try and use less memeory.
+  - Changed over to the new XML::Stream Hash data format.  This
+    has helped to reduce memory usage by half (initial results)
+    although it comes at the cost of increased disk usage.
+  - Moved the GetXMLData, SetXMLData, and BuildXML functions into
+    XML::Stream where they belong.  Should have done that long ago.
+
+1.0021
+======
+  - Fixed bug in the Process function caused by the XML::Stream
+    changes.
+  - Added in jabber:x:form.
+  - Added in jabber:x:sxpm.
+  - Removed Transport.pm.
+  - Removed the transport examples and created Component examples.
+  - Changed Component.pm to stop using tcpip and stdinout and
+    use the standard accept and exec.
+  - Changed Debug to handle LogN instead of just 0, 1, and 2.
+  - Added RemoveX to Message and Presence.
+  - Added x:signed and x:encrypted.
+  - In the GetXMLData function in Jabber.pm I forgot to add a test
+    for existence of an attribute in the root tag.
+
+1.0020
+======
+  - Added support for jabber:x:replypres.
+  - Added an update function to the SetCallBacks function list.
+  - In the SetTo and SetFrom functions, if you try to set it to
+    "" it ignores your request.
+  - Since those are gone, the Reply functions got a lot simpler,
+    so I removed the template argument on most of them.
+  - Removed all references to etherx:to, etherx:from, sto, and
+    sfrom.
+  - Removed anonymous connections from AuthSend since they were
+    taken out of Jabber.
+  - Changed AuthSend to always pick the highest level of security
+    as possible.  It now queries the server for all possibilities
+    and picks from the answer.
+  - PresenceDBParse now returns the current presence based on
+    PresenceDBQuery.
+  - Forgot to add a timeout to the Connect functions in Client.pm
+    and Component.pm.
+  - Modified the object creation functions to handle the below so
+    that old code doesn't break.
+  - Changed the way that callbacks are handled.  Instead of passing
+    in an XML::Parser::Tree array that the user had to then convert
+    into a Net::Jabber::XXXXXX object.  Now the callbacks are passed
+    in the proper Net::Jabber::XXXXXX objects directly.
+  - Modified the GetTimeStamp function in Jabber.pm to support two
+    new types: utcdelaytime and localdelaytim so that you can the
+    tiem value back out to modify before converting to a string.
+  - Added support for ZeroK Authentication.  Both in Query/Auth.pm
+    and in AuthSend in Protocol.pm.
+
+1.0019
+======
+  - Fixed Component.pm to use the new XML::Stream to argument in the
+    Connect function for writing Components to work with the accept
+    model.
+  - Fixed bug in Component.pm where someone on the sever side changed
+    the namespace that you are supposed to connect with and never told
+    me.
+  - Fixed bug in the cases where I would use SendAndReceiveWithID.
+    I was not checking for undef.
+  - Added more debugging in Protocol.pm.
+
+1.0018
+======
+  - Changed the WaitForID function to be Process() instead of
+    Process(0).
+  - Fixed bug in RosterGet where I might get an undefined value and
+    I wasn't checking for it.
+  - Fixed bug in PresenceDBQuery in Protocol.pm.  A hash value was
+    being accessed and causing the Presence DB to become tainted.
+  - Added boiler plate comments for the LGPL.
+
+1.0017
+======
+  - Deprecating Transport.pm.  It will cease to exist in the near
+    future in favor of the Component.pm module and Jabber Server
+    Components.
+  - Fixed support for the new connection profile found in the new
+    Jabber server.  (You cannot use this to connect a Transport
+    to a server before 1.1.2).
+  - Fixed bug in JID.pm where changing a JID that did not have a UserID
+    part, but previously had a value in the Server would goof up.
+  - Fixed bug in AuthSend where the type='set' attribute was not being
+    set for the <iq/>.
+  - Fixed bug where an unkown namespace in an IQ would cause an error.
+
+1.0016
+======
+  - Converted the rest of the functions to the AUTOLOAD method.
+  - PresenceSend in Protocol.pm now returns the presence object that it
+    sent.
+  - Changed GetJID in JID to not return the @ when the JID dues not have
+    a userid.
+  - Moved Perl requirement to 5.005.
+  - Moved XML::Stream requirement to 1.06 to support the timestamp and a
+    bug fix.
+  - Added timestamp support to Debug.pm.
+  - Added digest control to AuthSend.
+
+1.0015
+======
+  - Fixed bug with EscapeXML and the XML::Parser.
+  - Converted the Query namespaces to the new AUTOLOAD method.
+  - Fixed bug in the Search.pm file where it would trounce the 
+    XML::Parser::Tree.
+
+1.0014
+======
+  - Fixed bug in the Search namespaces that would cause duplicates to be
+    placed in the query if multiple calls to MergeItems were made.
+
+1.0013
+======
+  - Removed some leftover print statements that would cause confusing output
+    to STDOUT.
+
+1.0012
+======
+  - In the Message module Reply function, it only does "re: " for normal
+    messages now.
+  - Added <registered/> to the iq:register namespace.
+
+1.0011
+======
+  - Added PresenceDBDelete to allow for deleting JIDs from the the DB.
+  - Fixed a bug where PresenceDBParse would take any presence, regardless of 
+    the type.  It should only take available and unavailable.
+
+1.0010
+======
+  - Fixed a bug in the GetXMLData function where it would try to check an
+    attrib but the array entry it was checking did not contain an array.
+    Added a ref() statement in there to fix that.
+  - Fixed another bug with the ErrorCode functions where I forgot to change
+    all of the calls in Protocol to ErrorCode from ErrorType.
+
+1.0009
+======
+  - Fixed bug in the error tags.
+
+1.0008
+======
+  - Fixed a bug in the AutoUpdate/Release.pm code.
+
+1.0007
+======
+  - Added Query/Filter to support the mod_filter in the server.
+  - Added PresenceDB functions to make managing the multiple resource and 
+    priority thing much easier for a client/transport.
+  - Initialized some variables to get rid of warnings under perl -w.
+  - Fixed outgoing XML to be UTF-8 encoded.
+
+1.0006
+======
+  - Added support for <truncated/> in iq:search.
+
+1.0005
+======
+  - Changed AutoUpdate namespaces to show <ver/> becoming <version/>.
+  - When SeachRequest and RegisterRequest get errors they now return undef
+    to show that there was an error.
+  - Changed versioning scheme to match up Perl and Jabber.  1.005 refers to
+    Jabber version 1.0 and Net::Jabber verison 005.
+
+1.0d
+====
+  - GetQuery and GetX returns undef if there is not valid namespace found.
+  - Fixed bug in namespace handling.  Instead of hardcoding looking for <x/>
+    and <query/> Net::Jabber now searches for any tag that has an xmlns and
+    uses that tag as the query or x.
+  - Added Jabber::X::GC to handle GroupChat X tags.
+  - Added Debug object to make it easier to log debug information.
+  - Fixed bug in JID where GetJID did not return the correct JID if there
+    is an % in the UserID.
+  - Added Key.pm.
+  - Fixed bug in RosterRemove where the JID was not being sent and thus the
+    item not being removed.
+
+1.0c
+====
+  - Fixed bug in Message, Presence, and IQ with the GetJID function changing.
+
+1.0b
+====
+  - Added Query::AutoUpdate.
+  - In Query::Version, a call to SetOS will call POSIX::uname and try to get
+    the OS name from there.  (Not sure if this work on Windows and Mac...)
+  - Added GetAgents function to Protocol.pm to query a server/transport
+    and get the list of supported agents.
+  - Fixed bug in Query where the sub lists (items from roster and agents from
+    agents) were not being pulled back into <query/>.
+  - Fixed bug in Agent were the GetJID and SetJID were operating on the wrong
+    value.
+  - Fixed bug in Agents where the new agent objects were not being created
+    properly.
+  - Fixed bug in examples/client where it called a function from Query without
+    getting the query from the iq.
+  - Added function Reply to IQ and Presence objects as well.
+  - Added function Reply to Message objects.  It takes a string, and based
+    on that string it sets the proper values for to/from/etherx:to/etherx:from,
+    thread, type, and id.
+
+1.0a
+====
+  - Added better example files in examples/.
+  - Wrote Transport.pm, it too uses Protocol.pm through delegates.
+  - Client.pm now uses delegates to pull in the functiosn from Protocol.pm.
+  - Moved high-level functions out of Client.pm into Protocol.pm.
+  - Added support for jabber:iq:agent, jabber:iq:agents, and jabber:x:roster.
+  - Updated example.pl.
+  - If you have Time::Timezone installed in the Query/Time.pm automagically
+    uses the timezone functions to figure out your timezone when you call
+    SetTZ().
+  - If you have Digest::SHA1 installed then Client.pm automagically uses the 
+    SHA-1 digest to encrypt the password for Authorization.
+  - RosterGet returns a complex data structure that contains the roster from
+    the server.
+  - <iq/> modules now use the AUTOLOAD and delegates same as the <x/> modules 
+    do.
+  - Bumped version to 1.0a.
+  - Changed method of handling timeouts.
+  - Added code to better handle errors on the Stream.  It now actually returns
+    undef, or "", when the server or connection dies.
+  - Added code to test a Connect without crashing.  Connect returns undef, or
+    "", if the Connect failed.
+
+0.8.1b
+======
+  - Added IgnoreIDs() and WatchIDs() in Client.pm.
+  - Added support for delegates in the X/pm module.
+  - Added X.pm alpha code to handle reading and setting <x/> tags in various
+    top-level tags.
+  - Added PresenceSend to send a presence tag.
+  - Added RegisterSend to send a registration packet.
+  - Fixed SetError and SetErrorType in Message.pm.
+  - Added SetError and SetErrorType to IQ.pm.
+  - Added support for "value" and "tree" on the root tag in the GetXMLData
+    function in Jabber.pm.
+  - Moved Disconnect functionality into XML::Stream.  That's really where we
+    should have been sending the closing tag...
+
+0.8.1a
+======
+  - Supports Jabber v0.8.1.
+  - Fixed support for IQ tags.  Changed to distributed modules for each
+    namespace.
+  - Created IQ/Auth.pm to give authentication support.
+  - Created IQ/Roster.pm and IQ/Roster/Item.pm to provide Roster support.
+  - Created IQ/Register.pm to give registration support.  (Still experimental)
+  - Created Presence.pm to provide support for presence tags.
+  - Changed internal data structure to XML::Parser::Tree.  This made
+    integration with XML::Stream a snap.
+  - Created helper functions to access an XML::Parser::Tree easily.
+  - Changed Client.pm to use XML::Stream instead of doing it manually.
+
+0.7.1
+=====
+  - Added support for the new IQ, and Presence tags from Jabber-0.7.
+  - Removed support for Status and Roster since those were removed from
+    Jabber-0.7 in favor of IQ, and Presence.
+
+0.6.2
+=====
+  - Added Set* functions to Message.pm, Status.pm, and Roster.pm.
+  - Moved Simply, BuildXML, and EscapeXML into Jabber.pm to avoid redundant
+    functions.
+  - Redesigned internal data structures to better handle <ext> structures
+    and multiple copies of the same tag.
+  - Added better documentation in the perldocs for each.
+  - Changed the perldocs in each file from use Net::Jabber::xxxxx to just
+    use Net::Jabber.
+  - Removed <ext> support from Status since it isn't designed to handle it.
+  - Changed the names of the Roster Set* functions.  Get()->SetGet(),
+    Add()->SetAdd(), and Delete()->SetDelete().
+  - Added support to Message.pm to send to multiple people using the SetTo
+    command.
+
+0.6.1
+=====
+  - First version.

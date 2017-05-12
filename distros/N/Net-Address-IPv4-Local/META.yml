@@ -1,0 +1,21 @@
+---
+name: Net-Address-IPv4-Local
+version: 0.12
+author:
+  - Julian Mehnle <julian@mehnle.net>
+abstract: |-
+  A class for discovering the local system's IP
+  address
+license: perl
+requires:
+  Error: 0
+  IO::Socket::INET: 0
+  perl: 0
+provides:
+  Net::Address::IPv4::Local:
+    file: lib/Net/Address/IPv4/Local.pm
+    version: 0.12
+  Net::Address::IPv4::Local::Error:
+    file: lib/Net/Address/IPv4/Local.pm
+    version: 0.12
+generated_by: Module::Build version 0.26

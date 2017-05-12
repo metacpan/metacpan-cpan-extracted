@@ -1,0 +1,11 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Net/SMS/TMobile/UK.pm
+examples/sendsms.pl
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

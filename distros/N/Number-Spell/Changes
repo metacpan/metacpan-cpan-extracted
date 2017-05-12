@@ -1,0 +1,10 @@
+Revision history for Perl extension Number::Spell.
+
+0.01  Tue Feb 29 18:39:58 2000
+	- original version; created by h2xs 1.18
+
+0.03  Sat Mar 11 10:19:23 2000
+	- first release version
+
+0.04  Sat Mar 11 15:20:25 2000
+	- fixed bug in test.pl

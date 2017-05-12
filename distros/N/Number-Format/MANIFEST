@@ -1,0 +1,17 @@
+CHANGES
+Format.pm
+MANIFEST
+META.yml
+Makefile.PL
+README
+TODO
+t/format_bytes.t
+t/format_negative.t
+t/format_number.t
+t/format_picture.t
+t/format_price.t
+t/locale.t
+t/object.t
+t/round.t
+t/unformat_number.t
+META.json                                Module JSON meta-data (added by MakeMaker)

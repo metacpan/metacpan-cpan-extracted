@@ -1,0 +1,29 @@
+OVERVIEW
+
+  Net::IDN::IDNA2003	-- Internationalizing Domain Names in
+			   Applications (2003) (S<RFC 3490>)
+
+INSTALLATION
+
+  To install this module type the following:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+DEPENDENCIES
+
+  This module requires these other modules and libraries:
+
+    Net::IDN::Nameprep
+    Net::IDN::Punycode
+
+AUTHOR
+
+  Claus Färber <CFAERBER@cpan.org>
+
+ACKNOWLEDGMENTS
+
+  Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+  Robert Urban <urban@UNIX-Beratung.de>

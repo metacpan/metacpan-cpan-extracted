@@ -1,0 +1,133 @@
+#!/usr/local/bin/perl
+# This is -*- perl -*-
+#!/usr/local/bin/suidperl
+
+#
+# $Id: nscache,v 1.8 1999/06/05 00:27:38 eserte Exp $
+# Author: Slaven Rezic
+#
+# Copyright (C) 1997 Slaven Rezic. All rights reserved.
+# This package is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+#
+# Mail: <URL:mailto:eserte@cs.tu-berlin.de>
+# WWW:  <URL:http://www.cs.tu-berlin.de/~eserte/>
+#
+
+use Netscape::Cache;
+use strict;
+
+$| = 1;
+
+print
+  "Content-type: text/html\n\n",
+  "<head><title>Cache</title><base target=o></head><body bgcolor=\"#ffffff\">",
+  qq{<font size="-1" face="helvetica,arial">\n};
+
+# fix $HOME since this script might be run under the uid of the web server
+$ENV{HOME} = (getpwuid($>))[7];
+
+my $indent = 3; # indentation for tree option
+
+my @links;
+my $req;
+eval { require CGI };
+if ($@) {
+    eval { require CGI::Request };
+    if ($@) {
+	print
+	  "You need CGI.pm (standard in perl5.004)\n",
+	  "or CGI-modules-2.74 to perform this action\n";
+	exit 0;
+    }
+    else {
+	$req = new CGI::Request;
+    }
+} else {
+    $req = new CGI;
+}
+
+my $type = $req->param('type');
+my $sort = $req->param('sort');
+my $mycache = ($req->param('mycache') eq 'on');
+my $tree    = ($req->param('notree') eq 'on' ? 0 : 1);
+my $cachedir = $req->param('cachedir');
+
+my $cache = new Netscape::Cache
+  (defined $cachedir ? (-cachedir => $cachedir) : ());
+
+if ($type) {
+    while(my $o = $cache->next_object()) {
+	push(@links, $o) if $o->{'MIME_TYPE'} =~ /$type/o;
+    }
+} elsif (!$type && !$sort && !$mycache) {
+    while(my $url = $cache->next_url()) {
+	push(@links, {URL => $url});
+    }
+} else {
+    while(my $o = $cache->next_object()) {
+	push(@links, $o);
+    }
+}
+
+if ($sort eq 'type') {
+    @links = sort {$a->{'MIME_TYPE'} cmp $b->{'MIME_TYPE'}} @links;
+} elsif ($sort eq 'size') {
+    @links
+      = sort {$a->{'CACHEFILE_SIZE'} <=> $b->{'CACHEFILE_SIZE'}} @links;
+} elsif ($sort eq 'date') {
+    @links = sort {$b->{'LAST_VISITED'} <=> $a->{'LAST_VISITED'}} @links;
+} else {
+    # XXX sort case insensitive
+    @links = sort {$a->{'URL'} cmp $b->{'URL'}} @links;
+}
+
+if ($tree) { print "<pre>" }
+
+my @last_component;
+foreach (@links) {
+    my $printed_url;
+    if ($tree) {
+	# split URL by scheme+host and path components
+	my @component;
+	if ($_->{'URL'} =~ m|^([^:]+://[^/]+)/?(.*)|) {
+	    @component = ($1, split(m|/|, $2));
+	} else {
+	    @component = ($_->{'URL'});
+	}
+	# XXX cmp case insensitive
+	if ($component[0] ne $last_component[0]) { print "<hr>" }
+	# comparing how many components have changed
+	my $eq = _equal_components(\@component, \@last_component);
+	my $i;
+	foreach $i ($eq+1 .. $#component-1) {
+	    print " " x ($indent*$i) . "$component[$i]\n";
+	}
+	print " " x ($indent*$#component);
+	$printed_url = $component[$#component];
+	@last_component = @component;
+    } else {
+	$printed_url = $_->{'URL'};
+    }
+    print
+      "<a href=\"",
+      ($mycache 
+       ? "file://$cache->{'CACHEDIR'}/$_->{'CACHEFILE'}"
+       : $_->{'URL'}),
+	 "\">", $printed_url, "</a>";
+    if (!$tree) { print "<br>" }
+    print "\n";
+}
+    
+if ($tree) { print "</pre>\n" }
+
+print "</font></body>\n";
+
+sub _equal_components {
+    my($new, $old) = @_;
+    my $i;
+    for($i = 0; $i <= $#$new; $i++) {
+	if ($new->[$i] ne $old->[$i]) { return $i-1 }
+    }
+    $#$new;
+}

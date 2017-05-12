@@ -1,0 +1,38 @@
+2.0005: Wed Jul 08 2009
+   - cleaned up this distribution
+   - fixed various pod problems
+   - added critic stuff
+   - fixed pet peve most hated bug ever (paul@cpan.org is not me,
+     I am jettero@cpan.org)
+   - modernized the makefile and posted module on github
+
+2.0: Fri Mar  6 11:26:01 EST 2009
+   - ditched version.pm (doesn't work reliably)
+   - added content encoding and transfers
+
+1.4.0: Sun Oct 19 13:15:01 EDT 2008
+   - made the subject optional
+
+1.3.3: Tue May 27 12:02:10 EDT 2008
+   - (wow, use version has to be on the same line as our $VERSION
+      for older EUMM)
+
+1.3.2: Tue May 27 07:30:11 EDT 2008
+   - still forgot the version.pm
+
+1.3.1: Mon May 26 15:42:56 EDT 2008
+   - I might as well do a new version of everything using
+     version.pm while I wait for all my CPAN deletes to go
+     through.  I just discovered that version.pm doesn't/didn't
+     go core until perl 5.9...  I really wish I'd have prereqed
+     it everywhere I used it, but I didn't.  *sigh*
+
+1.3.0:
+   - using version.pm as suggested by Andreas Koenig
+   - added a PORT option, which arguably already existed in
+     HOSTNAME
+
+1.2.0: Tue Aug 23 07:05:38 EDT 2005
+   - I made cc and bcc work just like to.  You can also send
+     messages with only bcc's.  Lastly, bcc's weren't working at
+     all until I fixed the bug pointed out by Stephen Thomas.

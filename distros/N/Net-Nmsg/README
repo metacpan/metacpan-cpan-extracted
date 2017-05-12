@@ -1,0 +1,63 @@
+Net-Nmsg version
+================
+
+Net::Nmsg is a perl binding to libnmsg, the reference implementation of
+the NMSG binary structured message interchange format. The NMSG
+documentation describes the format as:
+
+  The NMSG format is an efficient encoding of typed, structured data
+  into payloads which are packed into containers which can be
+  transmitted over the network or stored to disk. Each payload is
+  associated with a specific message schema. Modules implementing a
+  certain message schema along with functionality to convert between
+  binary and presentation formats can be loaded at runtime by libnmsg.
+  nmsgtool provides a command line interface to control the
+  transmission, storage, creation, and conversion of NMSG payloads.
+
+This release was tested on NMSG version 0.13.0.
+The minimum version of NMSG required is 0.10.0.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+SOURCE CODE
+
+The official distribution lives here:
+
+https://tools.netsa.cert.org/confluence/display/tt/Net-Nmsg
+
+The package is also available via the CPAN:
+
+http://search.cpan.org/dist/Net-Nmsg/
+
+
+DEPENDENCIES
+
+This module requires the presense of libnmsg and libpcap.
+
+Additionally the following perl modules are required:
+
+  Math::Int64
+  NetAddr::IP::Util
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2010-2015 by Carnegie Mellon University
+
+Use of the Net-Silk library and related source code is subject to the
+terms of the following licenses:
+
+GNU Public License (GPL) Rights pursuant to Version 2, June 1991
+Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
+
+NO WARRANTY
+
+See GPL.txt and LICENSE.txt for more details.

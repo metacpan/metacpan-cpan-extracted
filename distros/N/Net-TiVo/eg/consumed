@@ -1,0 +1,27 @@
+#!/usr/bin/perl 
+# $Id: consumed 56 2007-01-10 14:41:53Z boumenot $
+# Christopher Boumenot <boumenot@gmail.com>
+
+use strict;
+use warnings;
+
+use Net::TiVo;
+#use Log::Log4perl qw(:easy);
+#Log::Log4perl->easy_init($DEBUG);
+
+my $tivo = Net::TiVo->new(host  => $ENV{TIVO_HOST},
+                          mac   => $ENV{TIVO_MAC});
+
+my $space = 0;
+$space += $_->size() for ($tivo->folders());
+
+print commify($space), " bytes\n";
+
+# stolen from someone on USENET
+sub commify {
+    my $input = shift;
+    $input = reverse $input;
+    $input =~ s<(\d\d\d)(?=\d)(?!\d*\.)><$1,>g;
+	$input = reverse $input;
+    return $input;
+}

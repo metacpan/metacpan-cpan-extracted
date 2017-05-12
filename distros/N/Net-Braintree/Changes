@@ -1,0 +1,104 @@
+Revision history for Net-Braintree
+0.30.0  04/10/17
+        Export Net::Braintree::ClientToken (thanks @msjohns1!)
+        Note community fork in documentation
+0.29.0  06/23/16
+        Add additional deprecation warnings in documentation
+        Fix typo in Net::Braintree::ErrorCodes::MerchantAccount::ApplicantDetails::Address
+0.28.0  06/02/15
+        Validate webhook challenge payload
+0.27.0  03/04/15
+        Allow settlement amount to be specified in submit_for_settlement (thanks @evanernest!)
+0.26.0  10/06/14
+        Allow descriptor to be passed in Funding Details options params for Merchant Account create and update
+0.25.0  09/24/14
+        Add additional_processor_response to transaction
+0.24.1  09/17/2014
+        Allow payee_email to be passed in options params for Transaction create
+0.24.0  09/10/2014
+        Added paypal specific fields to transaction calls
+        Added SettlementPending, SettlementDeclined transaction statuses
+0.23.0  08/12/2014
+        Add descriptor url support
+0.22.0  08/05/2014
+        Allow credit card verification options to be passed outside of the nonce for PaymentMethod.create
+        Allow billing_address parameters and billing_address_id to be passed outside of the nonce for PaymentMethod.create
+        Add Subscriptions to paypal accounts
+        Add PaymentMethod.update
+        Add fail_on_duplicate_payment_method option to PaymentMethod.create
+0.21.0  07/18/2014
+        Add support for v.zero SDKs.
+0.20.0  03/31/2014
+        Include Dispute information on Transaction
+        Search for Transactions dispute on certain date
+0.19.1  03/25/2014
+        Fix error result objects
+0.19.0  03/04/2014
+        Disbursement Webhooks
+0.18.0  12/31/2013
+        Merchant account find API
+0.17.0  12/04/2013
+        Merchant account update API
+        Merchant account create API v2
+0.16.1  10/31/2013
+        Updates configuration URLs
+0.16.0  10/27/2013
+        Adds support for Partnerships
+0.15.0  08/13/2013
+        Adds hold_in_escrow method
+        Add error codes for verification not supported error
+        Add company_name and tax_id to merchant account create
+        Adds cancel_release method
+        Adds release_from_escrow functionality
+        Adds owner_phone to merchant account signature.
+        Adds merchant account phone error code.
+0.14.0  07/19/2013
+        Adds device data to transactions, customers, and credit cards.
+0.13.0  05/01/2013
+        Adds disbursement details to transactions.
+        Adds image url to transactions.
+0.12.0  04/03/2013
+        Adds Venmo Touch support.
+0.11.0  12/20/2012
+        Adds channel field to transactions
+0.10.0  11/09/2012
+        Adds country of issuance and issuing bank bin database fields
+0.9.0   10/25/2012
+        Adds verification search
+0.8.0   10/04/2012
+        Additional card information, such as prepaid, debit, commercial, Durbin regulated, healthcare, and payroll, are returned on credit card responses
+        Allows transactions to be specified as recurring
+        Compatibility fix (thanks @pilcrow)
+0.7.0   09/13/2012
+        Adds Prepaid field to credit card (possible values include Yes, No, Unknown)
+0.6.2   08/10/2012
+        Fixes ValidationErrorCollection deep_errors
+0.6.1   05/08/2012
+        Adds ValidationError and ValidationErrorCollection and updates $result->errors to return a ValidationErrorCollection
+0.5.0   04/19/2012
+        Adds webhooks gateways for parsing, verifying, and testing notifications
+0.4.0   03/06/2012
+        Adds search for duplicate credit cards given a payment method token
+        Adds flag to fail saving credit card to vault if card is duplicate
+0.3.3   02/01/2012
+        Exposes plan_id on transactions
+        Correctly parses query strings that use semicolons instead of ampersands
+0.3.2   11/15/2011
+        Increases compatibility with versions of Perl prior to 5.10
+0.3.1   11/03/2011
+        Removed embedded perl5
+        Aliased $transaction->credit_card_details to $transaction->credit_card
+0.3.0   10/07/2011
+        Added ability to retrieve all Plans, AddOns, and Discounts
+        Added Transaction cloning
+0.2.0   8/24/2011
+        Added SettlementBatchSummary
+0.1.3   8/15/2011
+        Point release to ensure strict pragma is always used.
+0.1.2   8/15/2011
+        Point release to not ship 3rd party dependencies.
+0.1.1   8/15/2011
+        Point release to fix packaging of CPAN module.
+0.1.0   8/15/2011
+        First version, allows for connectivity to the braintree payment processing API with all functionality except search.
+

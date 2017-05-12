@@ -1,0 +1,39 @@
+Revision history for Net-Dropbear
+
+0.10  2016-08-10 01:03:01 EDT
+        * Fix tests for GNU/kFreeBSD
+        * Up the minimum perl requirement back up to 5.10
+
+0.09  2016-08-08 01:54:25 EDT
+        * Improve the testing code to try and better handle race conditions
+
+0.08  2016-08-04 01:34:49 EDT
+        * Update to Dropbear 2016.74
+        * Use gmake on FreeBSD
+        * Fix a memory corruption bug with auth_state (gh1)
+        * Add synchronization so $sshd->run doesn't return until the child is up
+
+0.07  2016-01-02 00:55:23 EST
+        * Improve the tests by reading from all the active file descriptors
+        * Fix the handling of channels when there is no child process
+
+0.06  2015-11-28 19:34:41 EST
+        * Add on_crypt_passwd to let users crypt the incoming password
+        * Improve testing diagnostics
+
+0.04  2015-11-06 22:38:15 EST
+        * Drop the min perl requirement to 5.8.8
+        * Use the c/cpp/ld flags from perl to compile dropbear
+        * Rename "kill" to "stop"
+
+0.03  2015-11-05 01:47:00 EST
+        * Try again to get compiled on x86_64
+        * Update some XS thanks to the suggestions of ppport.h
+
+0.02  2015-11-03 23:14:12 EST
+        * Update the autoconf to try and get x86_64 to compile Dropbear
+        * Clean up some POD
+        * Clean up Makefile.PL
+
+0.01  2015-11-03 13:29:05 EST
+        * Initial release with Net::Dropbear::SSHd and related code for controlling the server side of Dropbear

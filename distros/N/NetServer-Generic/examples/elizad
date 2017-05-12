@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+use lib ".";
+use NetServer::Generic;
+use Chatbot::Eliza;
+
+# Simple psychotherapist server
+
+my ($cb) = sub {
+    my ($tmp) = "";
+    my ($el) = new Chatbot::Eliza;
+    print STDOUT "Let me help you; talk to me.\n=>";
+    while (defined ($tmp = <STDIN>)) {
+        # a little bit of harmless fun which demonstrates interactive
+        # commands on a server
+        #
+        if ($tmp =~ /^(bye|exit|quit|\.)/i) {
+            return;
+        } ;
+        chomp $tmp;
+        print STDOUT $el->transform($tmp), "\n=> ";
+    }
+};  
+
+my (%config) =  ("port" => 9000, "callback" => $cb);
+my ($foo) = new NetServer::Generic(%config);
+
+print "$0 [$$] started on port 9000\n";
+$foo->run();
+   
+
+__END__
+
+=pod 
+
+=head1 elizad -- internet psychotherapy daemon
+
+A very simple example server program. It binds to port 9000 of localhost;
+if you wish to change this, add a "hostname" parameter to %config.
+
+Telnet to port 9000 and you will find yourself talking to a new 
+ChatBot::Eliza object. Try it!
+

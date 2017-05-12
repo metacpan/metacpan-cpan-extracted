@@ -1,0 +1,204 @@
+Net::Silk::IPSet               T_PTROBJ
+Net::Silk::Bag                 T_PTROBJ
+Net::Silk::Pmap                T_PTROBJ
+
+Net::Silk::IPAddr              T_SILK_IPADDR
+Net::Silk::IPv4Addr            T_SILK_IPV4ADDR
+Net::Silk::IPv6Addr            T_SILK_IPV6ADDR
+
+Net::Silk::IPWildcard          T_SILK_IPWILDCARD
+
+Net::Silk::IPSet::iter_xs      T_OPAQUE_STRUCT_SHARED
+Net::Silk::IPWildcard::iter_xs T_OPAQUE_STRUCT_SHARED
+
+Net::Silk::Bag::iter_xs        T_PTROBJ
+Net::Silk::Pmap::iter_xs       T_PTROBJ
+Net::Silk::Site::iter_xs       T_PTROBJ
+
+Net::Silk::ProtoPort           T_SILK_PROTOPORT
+
+Net::Silk::TCPFlags            T_SILK_TCPFLAGS
+
+Net::Silk::RWRec               T_OPAQUE_STRUCT_SHARED
+
+Net::Silk::File::io_xs         T_PTROBJ
+
+skBagTypedKey_t       T_SILK_BAGKEY
+skBagTypedCounter_t   T_SILK_BAGCNT
+
+skBagFieldType_t      T_ENUM
+skBagKeyType_t        T_ENUM
+skBagCounterType_t    T_ENUM
+
+skPrefixMapContent_t  T_ENUM
+
+sk_sensor_id_t        T_UV
+sk_class_id_t         T_UV
+sk_flowtype_id_t      T_UV
+
+uint8_t               T_UV
+uint16_t              T_UV
+uint32_t              T_UV
+
+int64_t               T_INT64
+uint64_t              T_UINT64
+
+int128_t              T_INT128
+uint128_t             T_UINT128
+
+#############################################################################
+INPUT
+
+T_SILK_IPADDR
+        //fprintf(stderr, \"T_SILK_IPADDR arg       : %p\\n\", $arg);
+        //fprintf(stderr, \"T_SILK_IPADDR arg SvOK  : %d\\n\", (int)SvOK($arg));
+        //fprintf(stderr, \"T_SILK_IPADDR arg SvRV  : %d\\n\", (int)SvROK($arg));
+        //if (SvROK($arg)) {
+        //    fprintf(stderr, \"T_SILK_IPADDR arg SvRV  : %p\\n\", SvRV($arg));
+        //    if (SvPOK(SvRV($arg)))
+        //        fprintf(stderr, \"T_SILK_IPADDR arg->SvPV(%p) : %p %s\\n\", SvRV($arg), SvPV_nolen(SvRV($arg)), SvPV_nolen(SvRV($arg)));
+        //    switch(SvTYPE(SvRV($arg))) {
+        //        case SVt_IV:
+        //            fprintf(stderr, \"type Scalar IV\\n\");
+        //            break;
+        //        case SVt_NV:
+        //            fprintf(stderr, \"type Scalar NV\\n\");
+        //            break;
+        //        case SVt_RV:
+        //            fprintf(stderr, \"type Scalar RV\\n\");
+        //            break;
+        //        case SVt_PVAV:
+        //            fprintf(stderr, \"type Array\\n\");
+        //            break;
+        //        case SVt_PVHV:
+        //            fprintf(stderr, \"type Hash\\n\");
+        //            break;
+        //        case SVt_PVCV:
+        //            fprintf(stderr, \"type Code\\n\");
+        //            break;
+        //        case SVt_PVGV:
+        //            fprintf(stderr, \"type Glob/FH\\n\");
+        //            break;
+        //        case SVt_PVMG:
+        //            fprintf(stderr, \"type Blessed or Magical Scalar\\n\");
+        //            break;
+        //     }
+        //}
+        //if (SvPOK($arg))
+        //    fprintf(stderr, \"T_SILK_IPADDR arg SvPV(%p) : %s\\n\", SvPV_nolen($arg), SvPV_nolen($arg));
+        $var = SvIPADDR(aTHX_ $arg);
+
+T_SILK_IPV4ADDR
+        $var = SvIPV4ADDR(aTHX_ $arg);
+
+T_SILK_IPV6ADDR
+        $var = SvIPV6ADDR(aTHX_ $arg);
+
+T_SILK_IPWILDCARD
+        $var = SvIPWILDCARD(aTHX_ $arg);
+
+T_SILK_PROTOPORT
+        $var = SvPROTOPORT(aTHX_ $arg);
+
+T_SILK_TCPFLAGS
+        $var = SvTCPFLAGS(aTHX_ $arg);
+
+T_SILK_BAGCNT
+        $var = SvBAGCNT(aTHX_ $arg);
+
+T_GLOB_PTROBJ
+        if (sv_derived_from($arg, \"${ntype}\")) {
+            IV tmp = SvIV(GvSV((SV*)SvRV($arg)));
+            $var = INT2PTR($type,tmp);
+        }
+        else
+            Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+                        ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+                        \"$var\", \"$ntype\")
+
+T_OPAQUE_STRUCT_SHARED
+        if (sv_derived_from($arg, \"${ntype}\")) {
+            STRLEN len;
+            char  *s = SvPV((SV*)SvRV($arg), len);
+            //fprintf(stderr, \"shared ptr %p (len: %d vs %d vs %d) type: $type\\n\", s, len, sizeof(*$var), sizeof(skIPWildcardIterator_t));
+
+            if (len != sizeof(*$var))
+                croak(\"Size %d of packed data != expected %d\",
+                        len, sizeof(*$var));
+            $var = ($type)s;
+        }
+        else
+            croak(\"$var is not of type ${ntype}\")
+
+T_OPAQUE_STRUCT
+        if (sv_derived_from($arg, \"${ntype}\")) {
+            STRLEN len;
+            char  *s = SvPV((SV*)SvRV($arg), len);
+
+            if (len != sizeof($var))
+                croak(\"Size %d of packed data != expected %d\",
+                        len, sizeof($var));
+            $var = *($type *)s;
+        }
+        else
+            croak(\"$var is not of type ${ntype}\")
+
+T_INT64
+        $var = SvI64($arg);
+
+T_UINT64
+        $var = SvU64($arg);
+
+T_INT128
+        $var = SvI128(aTHX_ $arg);
+
+T_UINT128
+        $var = SvU128(aTHX_ $arg);
+
+#############################################################################
+OUTPUT
+
+T_SILK_IPADDR
+        $arg = newSvIPADDR(aTHX_ &$var);
+
+T_SILK_IPV4ADDR
+        $arg = newSvIPV4ADDR(aTHX_ &$var);
+
+T_SILK_IPV6ADDR
+        $arg = newSvIPV6ADDR(aTHX_ &$var);
+
+T_SILK_IPWILDCARD
+        $arg = newSvIPWILDCARD(aTHX_ &$var);
+
+T_SILK_PROTOPORT
+        $arg = newSvPROTOPORT(aTHX_ $var);
+
+T_SILK_TCPFLAGS
+        $arg = newSvTCPFLAGS(aTHX_ $var);
+
+T_SILK_BAGKEY
+        $arg = newSvBAGKEY(aTHX_ &$var);
+
+T_SILK_BAGCNT
+        $arg = newSvBAGCNT(aTHX_ &$var);
+    
+T_GLOB_PTROBJ
+        sv_setpvn($arg, (char *)$var, sizeof(*$var));
+
+T_OPAQUE_STRUCT_SHARED
+        sv_setref_pvn($arg, \"${ntype}\", (char *)$var, sizeof(*$var));
+
+T_OPAQUE_STRUCT
+        sv_setref_pvn($arg, \"${ntype}\", (char *)&$var, sizeof($var));
+
+T_INT64
+        $arg = newSVi64($var);
+
+T_UINT64
+        $arg = newSVu64($var);
+
+T_INT128
+        $arg = newSVi128($var);
+
+T_UINT128
+        $arg = newSVu128($var);

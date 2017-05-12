@@ -1,0 +1,251 @@
+;; Connection to 2001:610:240:3:0:1234:be21:e31e#53(2001:610:240:3:0:1234:be21:e31e) for disi.nl failed: network unreachable.
+
+; <<>> DiG 9.3.1 <<>> @bert.secret-wg.org disi.nl axfr
+; (2 servers found)
+;; global options:  printcmd
+disi.nl.		600 IN SOA bert.secret-wg.org. olaf.ripe.net. (
+				2003060988 ; serial
+				450        ; refresh (7 minutes 30 seconds)
+				600        ; retry (10 minutes)
+				345600     ; expire (4 days)
+				300        ; minimum (5 minutes)
+				)
+disi.nl.		600 IN RRSIG NS 5 2 600 20050710065550 (
+				20050610065550 6905 disi.nl.
+				Avj34mwuNpd8JwcifHYluVy+Z4OTxRgAh5C8vGs5+9VC
+				Lt20lXNKYzjAYfogdfVCSvOuicglnpndabZ1tLTuGOG1
+				bPuMbiY0mWhG3xKgpxQ+frkxoguHbjp92J52OlgRq4wb
+				oYurDB3nuAI9xSQVNASy5wd/vxXMPg9E8bAijcDDH38i
+				ARydrCJiytFSf18K0ILBZIkzSgDWSZLVHnHy )
+disi.nl.		600 IN MX 100 bert.secret-wg.org.
+disi.nl.		600 IN RRSIG MX 5 2 600 20050710065550 (
+				20050610065550 6905 disi.nl.
+				Bkf4S1MfZSUsdXAOWhEBRUkAv541GWHFZTlJNZ/FEVua
+				O18MabpNByt0prO9oyJwnqZrST6/EYDX+RExY0d2NYuQ
+				pALx3mqluTDDOTv+7z3emC4BFjIQY2eyMuhnNFoSkpcj
+				18lKP3xzIvtx7tDsFeADZkKZ4Ui9QPZPXCLmrw3yyOIY
+				d9HTL20riiMhlTtbPwpzE8EJh/PC3E9t3D9T )
+disi.nl.		600 IN TXT "DISI.nl Demo and Test zone "
+disi.nl.		600 IN RRSIG TXT 5 2 600 20050710065550 (
+				20050610065550 6905 disi.nl.
+				AqSzQmR9IQp/tdZpjdLK19vU/XT3qUaAh3YNBb2ryVGy
+				Ef12lYhOuGIMrEXCgfI6R+nZi3407QxGI1D90ogFbXPg
+				iZxNZzlib75cqitTSufIBkwo1wTsQjQkGlFz2MaFQLYC
+				4zwBTSiCg6h8oQkPYPnTIxRrwFhqGuSFHZ4HxqdEDQ3W
+				ZzviRcN1QOOP3FIVsOM+cfftLqFbmrC5G0sR )
+disi.nl.		3600 IN	KEY 256 3 5 (
+				AQOomEDiebJictBbRInDL90G+0oi8/hUXpnbPkNktFVf
+				7sIt0R0+ngW9U1VZIjXRkVX8vIJmrGIJeOE0vZ1EBefC
+				HcT7NpAK8zS1RzPBdJRh7q2DWHzzFSyonnpGmstLcQk1
+				DmM/q7p0MuvIlz1cw7LjZHX4XnNryIR+2ynqlXJm0IhX
+				xP91wx1jxr2sfgONbuKU5p8v+ALAuKDcFAVh4gsRpcMb
+				lGxAvxd4NL7Hlqq0zl8PwUiX1BWZeFrTa8P3+/mVy0Cz
+				Q6wi4FGTgv24SQx9fVw9wzZ6gg4i1VfhGLZPtN26DZbu
+				/vV4Ll6b1PMblkuVmIKqGDpq2JYb3C4FKNLb
+				) ; key id = 61952
+disi.nl.		3600 IN	KEY 256 3 5 (
+				AQOxui3oSFVj9CllMFVMDJFdaXQN0COUkcUpvNoE9Ddk
+				tPJ4lDUkS+d9t2CsVbu4AUwtBlMEkU4titf7XqaKXEV8
+				JE5Rf5EjpKQ8dW0gGoAFEtRB9MP5/AvOuVO0I8XDxy0=
+				) ; key id = 34796
+disi.nl.		3600 IN	RRSIG KEY 5 2 3600 20050710065550 (
+				20050610065550 6905 disi.nl.
+				Aj0h1gYx1DcGe2Rzs527z2AOImkOomXGpRPwyh2a7Pxc
+				I+/TveVgpY3dGe57A7u3hFqdtfkLllrAwbBtFSpWPT4K
+				nHw9SyCSEmUxS+G0/+22Y7XcFkk4/k5iQP9AGyXRJG/v
+				8T4B7PpN1jmo+kjrsBdvgX8pI017EH0wofJVPLAzjjgv
+				JJ2sgE6ZvV2qxBFK2kRfDDqPag+Wef5ZkawI )
+disi.nl.		600 IN LOC 52 21 23.000 N 4 57 5.500 E 0.00m 100m 100m 100m
+disi.nl.		600 IN RRSIG LOC 5 2 600 20050710065550 (
+				20050610065550 6905 disi.nl.
+				BjO9RkdYHXMbcG5k4VST0BtqzopTXo1p6/wKGtLG91bD
+				z3z32uXSWq1c2B5cG/nY/3nYXSGexPr0XwtqbqY1jcgK
+				/iUtwymH1PKmx9h0kTx19PL3Mkl/as42D8DRZU19gJdA
+				AreYidHhn8+AZ3HjI9nJ6RRT9Gk/ej5IYsC0dCra75FY
+				DoJdxYMA5szReGzaguyHmshcJi6fLGWy0bM0 )
+disi.nl.		300 IN NSEC a.disi.nl. NS SOA MX TXT KEY LOC RRSIG NSEC DNSKEY
+disi.nl.		300 IN RRSIG NSEC 5 2 300 20050710065550 (
+				20050610065550 6905 disi.nl.
+				A+aFEpQfOgTu16n+OyQRV8++hD4lEj464U/5/Xcl+CYr
+				led2wNkRVSrEUdSuAnRhJt5IbmsVR6MBS49cQjzdhuyf
+				bb7igEnDte11ls7C3pN0IcYevKIdfmfvS9hmvkIPZYyR
+				yVqk1Uw3AzSkKUpd8RWK61vgrnwVcYVkHUqbwandnjsV
+				XeapFNYT/n6HMvjvoFnCnPk/JmxhsYyOO5mh )
+disi.nl.		3600 IN	RRSIG DNSKEY 5 2 3600 20050710065550 (
+				20050610065550 6905 disi.nl.
+				CP4qGbCsYdGMrArLCDimZosZfs+iZ9gFz7wjUBhuB8PQ
+				jPtU9RHhzFsHkvB9M0DG8Jbxa+SJwdKrNMam3EB3Za8T
+				Vz91hrBsOSWOwUmrEK2XkO+5UnXGiekpaFkzQy2w4S9C
+				Ib+injIaIYP5Bwf6ssz9Ur+rR6g3IPiiEhE48PAEpZFn
+				OdHlHYBP+AyiVm2hLA/h3437LR2Ihv6TEJkM )
+disi.nl.		3600 IN	RRSIG DNSKEY 5 2 3600 20050710065550 (
+				20050610065550 52080 disi.nl.
+				CAD1qHz/Zicn4USK3nrslz8H2z6HwpkThIW7BfiPDJl0
+				073Ko5+zWjNSnYRi16kwOB/oghX9RmftVGjdZLoe+Wd4
+				btqa2rW6UP7GCisijDfXv4oVL+C/IOVT9EHFdp7G4/BB
+				y0cIhBdyzCAxWJEQ8snNaFwCFunbR9GKjIrW8qmMYhe+
+				Yn0pbe7TaS2Ju4D0lrCWses3AToZKbBq/Vzm )
+a.disi.nl.		600 IN TXT "A label"
+a.disi.nl.		600 IN RRSIG TXT 5 3 600 20050710065550 (
+				20050610065550 6905 disi.nl.
+				AzyhUSWRMt63mc/TuYkHmuPRSp1JrND/97Ql5JFMpOD1
+				wVrR4bcRuXHzDTTCCdSzidPDMaVLmPrc4BiXKEDcZ2Rg
+				a2RNf92hKHJpjZQunHgB9NqxJ2nttCWB7CEywC/IRfJD
+				Fn1q07JJB8mbReDwQx/IgmVKKsC7ITcQIB0FaF+mWtWK
+				gUtsxP5jigO8MS/MJEQQTz/LwEV0U7GwZrng )
+a.disi.nl.		300 IN NSEC *.b.disi.nl. TXT RRSIG NSEC
+a.disi.nl.		300 IN RRSIG NSEC 5 3 300 20050710065550 (
+				20050610065550 6905 disi.nl.
+				CWNfWpwnrlMgRjc02LX1SYThOmjSIRKL90G+aL0T9Uik
+				aAnihwUpIzqnfoVgRbUJwp5lwEShZiSk0ndnIa7FjRo5
+				vU75OGUcX6ZBuMQ0KfGcEXST/19Z+y5g2fQ/Yh/qE5QU
+				cIGN6B1vONyjmqdpMYDheOemjiv2w40UrZpFIccUKgfL
+				+z6/0gg/fv5ZWe3Hhare9HzadrxZKEPsLnmZ )
+*.b.disi.nl.		600 IN TXT "wildcard match"
+*.b.disi.nl.		600 IN RRSIG TXT 5 3 600 20050710065550 (
+				20050610065550 6905 disi.nl.
+				AcPADv3d9O+QL+EDjTJAzpwr6MNfgC1AfICs5IqVSsF4
+				nXcAmGPQMvIW7wIxZglgxiFBmwMp6nnuaQjXM7fokBeQ
+				VXf3x+RVQMdKvCJG0Cm37pyG52jXTq9mHkudkbXwFODM
+				GlKt0tO/9bj4CUyYaYB1UVEdMUkVgiXtJMFHe3enobh+
+				9tZYEs4nG21S/B0v2WQm3MWsXpqr7MiCaK1u )
+*.b.disi.nl.		300 IN NSEC a.b.disi.nl. TXT RRSIG NSEC
+*.b.disi.nl.		300 IN RRSIG NSEC 5 3 300 20050710065550 (
+				20050610065550 6905 disi.nl.
+				CjzSX+EGFadWIRjruy7kfrN2gP2kJm+QK9jsMjoMjnQT
+				twXTZ8x1T1Ld2Kv9BiwLhZkOtzQqn9D3BxecZkS8USZN
+				lXHcRaUwGdNZ6K70Ex5Fi2cfQGPKQd1WPFbHK3e+ELRP
+				mIIqLEFNPTqnY8vUFHG8EU9ZOooWXJurew6QEcN478tY
+				2458TgGweyaN/amq5qY/3AJZme5qWWAFFQQf )
+a.b.disi.nl.		600 IN TXT "A.b label"
+a.b.disi.nl.		600 IN RRSIG TXT 5 4 600 20050710065550 (
+				20050610065550 6905 disi.nl.
+				C5tPcf7Ta+A+xzBi1JdHiG6tD4kAMl1uTmG57llFikSK
+				jQ7xFAzmexyqZLZsNkL4P18mPP0Bb2DL4TjSsgzRO6uq
+				tRV8DTeE6mm+wexooClcrF8N79cJzQz7suRblOcKZlho
+				3ESQrwKKiARqcz518g/FYBBhiiODpkevmg5c4aHNTt0O
+				nB7uW9DB1V+RPr73yhvR5n7xFh+2nlYafKeC )
+a.b.disi.nl.		300 IN NSEC a.c.disi.nl. TXT RRSIG NSEC
+a.b.disi.nl.		300 IN RRSIG NSEC 5 4 300 20050710065550 (
+				20050610065550 6905 disi.nl.
+				Bgx8wZcdOC+U+swtASjgAZXBPGjO/btPqq3la76EPo+V
+				oux8U7TCWvRw9SA8k78IMC6R2aW4WitERq7QyWYoGU1P
+				NTmizIB8zYMA9yE924ML6NjIG4hd8mZO+IdrjkloS/SV
+				Z1sa6IR49yw36Q22whRyk5f8O3jgeA26Xup3unZ4XrgA
+				hwtyvC687j9lAIVeDZsDCoJWvBrpAypj8dny )
+a.c.disi.nl.		600 IN TXT "a.c label"
+a.c.disi.nl.		600 IN RRSIG TXT 5 4 600 20050710065550 (
+				20050610065550 6905 disi.nl.
+				And9OW/6JsrTZkX/t3XQBqIs0Ot2XLXmQEpyGy59/ui3
+				QB+wEKkbnFK/L/DJlkJo01F/TrMUDJ0KJj+bpWH6DlPQ
+				qEnlYY7WONXeZV9IC0oFCGGklnW0kjysumJWrv5wo2Xk
+				+wfGxB+esJ7y1xLB0YAJtSGtN/mmzXdmetCXDQgyFAGw
+				ZEd96MzTI9lTSNd5SZHR58qiKWNXTjHkgp/I )
+a.c.disi.nl.		300 IN NSEC a.b.c.disi.nl. TXT RRSIG NSEC
+a.c.disi.nl.		300 IN RRSIG NSEC 5 4 300 20050710065550 (
+				20050610065550 6905 disi.nl.
+				CXu+MIA26yM6l4XQNZz48ZWsBh4j8HDWH1I3uw9fSEld
+				yQftcxYV97qwmqUYSYYZVFcOTBq0qXQdtHUiLo8RA8Hr
+				soamBRahxA+xiP498oyYNkdl4ro21HV+js/19/1g5Xuw
+				9MtWveq6C/snMTEUd6O0dCDfIt3jt2LhXPiDsg2bSO81
+				aJLKfhSFgA+FHP6o8vg/MEUhvNvPBorJpiw9 )
+a.b.c.disi.nl.		600 IN TXT "a.b.c label"
+a.b.c.disi.nl.		600 IN RRSIG TXT 5 5 600 20050710065550 (
+				20050610065550 6905 disi.nl.
+				CfYvDx6B2bUiKPHiDDe5MTZq2p7rQiRTEMVzRc9myTVY
+				vSnxMZHC+lvTqrEqozs6wX9flpfVXQ1J+Ua9y1z5ZESs
+				RAspM9omE38AiRCIVcGtGf7geikPHyXa0bsNN9BzdB1Z
+				h9zY7iJ5laEbHT12CCSriQ6keRycFWUAaUjAUE9rqJcp
+				/SWVj06N+nwgfIXVrhicms26ROA4R+dO3YEn )
+a.b.c.disi.nl.		300 IN NSEC juergen.disi.nl. TXT RRSIG NSEC
+a.b.c.disi.nl.		300 IN RRSIG NSEC 5 5 300 20050710065550 (
+				20050610065550 6905 disi.nl.
+				AHaywdzztXSA8VSzoO2gxCuZGDbPfj9WZVnmaX8ksjVd
+				3jzDZPUcd09l39hRTV2LBwIW0av28mPIw9X1zjclOYMv
+				M0Q5UsoNxbPDLGrbsbYWF9sp3yVtlVY5g4UuGw36a9VL
+				IQSEqtJ78ZnHKsJR/tcHcaVRF+C+qDnpch0So3AXXfpA
+				hDX/QkfCMCfpaTUr3OX0OkwH2mDSmUnjwPQM )
+juergen.disi.nl.	600 IN A 193.176.144.195
+juergen.disi.nl.	600 IN RRSIG A 5 3 600 20050710065550 (
+				20050610065550 6905 disi.nl.
+				CkPKhmE9HfZ9arJ5tMxP1wItMjFtDh1NsLsf3bQkZIdb
+				IwT/xvabn4noW4h2c6muPePfLKpx9wMwIlLJOa1gu/y8
+				GnV5txhWdx5mCP4+YSeWTCONEM8x6G3RIcxvySoXcJmo
+				YxgiyxmflO+ePWgmB5LYlu1yrG0/dsbiNLlJ1ueE2TTS
+				pUPN48l0K2cPcpvvQYZ0aOzdIhDC/wnIjWdE )
+juergen.disi.nl.	300 IN NSEC olaf.disi.nl. A RRSIG NSEC
+juergen.disi.nl.	300 IN RRSIG NSEC 5 3 300 20050710065550 (
+				20050610065550 6905 disi.nl.
+				APDXrt0XnO1CBzE+YouZRfn3i4vr7YbCJiRDzGtVaHKb
+				AXagw8qyPjR5mvPboCCSEqQUemb9qyLgYWMYUxmm6UFX
+				1Miq5MaEuU2stkyNd5WnPYQHJIUXPFr13q5lockQr6Jn
+				GAjZAK6IQYBbAoSGXcKGYuR/RsaZkm0irTxhWNsk53Rk
+				AOGsT4RVeAGXgfvoAEN4MXa9dYXAETTJOgJC )
+olaf.disi.nl.		600 IN A 193.176.144.198
+disi.nl.		3600 IN	DNSKEY 256 3 5 (
+				AQMLuNO0rRtONTVFupVznFEQRmBmeB/T1wctp3MIXhGm
+				+4eP8Lv5sHsW31SkSqZsRN02QS/2HjZLL9PrH/QrsTuP
+				xsZC6ZbIPwY4KfQI2BYA0JDQIVry0K1HfiMyzBnQcopk
+				nSjJvv4qw59f5n8HFEDMAi9sysUEDc4yWw2IBJGngIOx
+				KlZKTKF0LEFAwdfcukTeljpsH/J194gaBvijxlU=
+				) ; key id = 6905
+disi.nl.		3600 IN	DNSKEY 256 3 5 (
+				AQMMmc/T8GDXBDzL/SqF28UpEiP8FwipZdzW462SZ80G
+				J0Cv8aXLLhly6cFpN06G6CRq0J0T+q52ZT7P2HkLmOFx
+				yW3Oe4eZCB3GQ8dKodUr70s/3PsyO+7s9ojnz1kQUatd
+				P2Ch3/ciFbxR7cFD+OAhkdAmqqtKdE8kHDHX9J9MEbEq
+				Xtt9PD12edm4/VwyG1uozX9we1S+NYnhBFmjrv0=
+				) ; key id = 4856
+disi.nl.		3600 IN	DNSKEY 257 3 5 (
+				AQML82dGOtpN50pnwyVtNk4YFtyF0Y+mqHdyr5Zpa+sT
+				ds6FZWWUdgg18cyXtGMwcwaXpkKMc6S/DVXAGYTcw/Va
+				osaGDuUgtWQbvyxhdfk/yIW7wPS160yMqqO4WScGgIEJ
+				6C5dR4PZDO9ATZnvSMyqyBjNA637urCvHL1kMkycG+6v
+				o7mM7g/5JYeMwg3GZbJsvVP6RTylZPSqSc2Ijr8=
+				) ; key id = 52080
+
+
+olaf.disi.nl.		600 IN RRSIG A 5 3 600 20050710065550 (
+				20050610065550 6905 disi.nl.
+				CCWYNUJNchnlPe9mzLpodHNI4iWtKhxKLkJyoTiksEmk
+				kCFnsaU1woWFk8qKqLqffDpjC54NIJ5Dy4FloiFjaBRn
+				G3AK2YxsP+wvzXKfIvbE4IG8xu++e4Q3psOY82ef14AI
+				f7eHSCLMqf6ycmYZaTR58oJB9vliN5GASB/PssG5jBVc
+				DRo75X0f2feQs8Utt73rHpKi3V9SeqxuojHL )
+olaf.disi.nl.		300 IN NSEC workshop.disi.nl. A RRSIG NSEC
+olaf.disi.nl.		300 IN RRSIG NSEC 5 3 300 20050710065550 (
+				20050610065550 6905 disi.nl.
+				C1NGtlMPAiMjb7+Dte6++HTFZmbgJFM9gO9p7lnL5IkW
+				0tvTKsx+pKzmk7QCvbQHLblFoZxe1oGoHLiPLq/a1C1Q
+				px29hJzjXFfA0Snm+cH7jIFLeCMx889w48vpeh6yRyW3
+				DoZBMpyvQWRZVIHqv87QEDAlnn3ZNCM0q7r1XmYmAUnX
+				HKKuSXw/8YLJOa6XW19qGxIdTgMvgHXSChGJ )
+workshop.disi.nl.	600 IN A 193.176.144.198
+workshop.disi.nl.	600 IN RRSIG A 5 3 600 20050710065550 (
+				20050610065550 6905 disi.nl.
+				BVLO82fb2+A5gh1CweBn/O+Hkb/kj5XXSSJA6rIePmU6
+				xeF4YMvnSyq2RbyipW8atH6p9KpYDxYANtjZ8YeA1N18
+				n3veA2RR7DXbVBHOxzQod3j+ZMPauvuBBznVyXIK3sGn
+				CsGv+obqM6Bql5kpGDg5mmKkb/7DWkuD7SlTDoq8JBon
+				Xa2c1vCxqEHvc1gGlOw+O1eSD0bHlkrq3Blf )
+workshop.disi.nl.	300 IN NSEC disi.nl. A RRSIG NSEC
+workshop.disi.nl.	300 IN RRSIG NSEC 5 3 300 20050710065550 (
+				20050610065550 6905 disi.nl.
+				B03EV5QBbfwLE44fDvz4zH4W1cf/6O4DM70hz42Pssai
+				AG6CYB07Cq+CeReIu0paMW2HoKyR1GqzdTP7wHytrFmr
+				kprqdaibztTINkmKQrM/PbYhKV1tvwP3WeKh3DzX5RU+
+				K9TGNKoRnE4Mrwyg6zF1d21s50JhkuaVuJk0mJ67nT3x
+				yxYzrTmGOK+LOXGhsHrtHwntstRFytYHZtdB )
+
+disi.nl.		600 IN RRSIG SOA 5 2 600 20050710065550 (
+				20050610065550 6905 disi.nl.
+				BRfdvnol1aDXT3/NA8AzwT0qdM5CCowhLCLY+psqGRqN
+				kOui6tFxVPBTepz7lhZSlJ3Y2A/WoizjOSr5r7b0iMov
+				xyVExGQJVV7/brxVAk+H9TTMF3kBiW6Y6p+iS8CPCG5h
+				hndlo77G+rap5iyLJ+MM1MU9pwpt04wErIIzMXsMNDpg
+				6/xonFRnpwNmnbimsU+z5ZVcMahKNY4dtaov )
+disi.nl.		600 IN NS bert.secret-wg.org.
+disi.nl.		600 IN NS sprout.ripe.net.
+
+
+

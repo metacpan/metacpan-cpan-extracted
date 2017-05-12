@@ -1,0 +1,82 @@
+{
+   "abstract" : "A client library for awesome visualization tool GrowthForecast",
+   "author" : [
+      "tagomoris (TAGOMORI Satoshi) <tagomoris {at} gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.6.6",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-GrowthForecast",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Find::Rule" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Find::Rule" : "0",
+            "Furl" : "0",
+            "JSON" : "0",
+            "JSON::XS" : "0",
+            "List::MoreUtils" : "0",
+            "Log::Minimal" : "0",
+            "Test::More" : "0",
+            "Try::Tiny" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::GrowthForecast" : {
+         "file" : "lib/Net/GrowthForecast.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tagomoris/p5-Net-GrowthForecast/issues"
+      },
+      "homepage" : "https://github.com/tagomoris/p5-Net-GrowthForecast",
+      "repository" : {
+         "url" : "git://github.com/tagomoris/p5-Net-GrowthForecast.git",
+         "web" : "https://github.com/tagomoris/p5-Net-GrowthForecast"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "HIROSE Masaaki <hirose31@gmail.com>",
+      "TAGOMORI Satoshi <tagomoris@gmail.com>"
+   ]
+}

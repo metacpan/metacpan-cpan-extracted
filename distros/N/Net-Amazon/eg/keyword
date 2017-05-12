@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+###########################################
+# keyword - search by keyword
+#     keyword what_to_search_for mode
+# Mike Schilli <mschilli1@aol.com>, 2003
+###########################################
+
+use strict;
+use warnings;
+
+use Net::Amazon;
+use Net::Amazon::Property;
+use Net::Amazon::Request::Keyword;
+
+die "usage: $0 keyword what mode\n(use " .
+    "'perl power'/books as an example)\n" 
+    unless defined $ARGV[1];
+
+my $ua = Net::Amazon->new(
+    associate_tag => $ENV{AMAZON_ASSOCIATE_TAG},
+    token         => $ENV{AMAZON_TOKEN},
+    secret_key    => $ENV{AMAZON_SECRET_KEY},
+    max_pages   => 5,
+);
+
+my $req = Net::Amazon::Request::Keyword->new(
+    keyword   => $ARGV[0],
+    mode      => $ARGV[1],
+);
+
+ # Response: Net::Amazon::Keyword::Response
+my $resp = $ua->request($req);
+
+for ($resp->properties) {
+   print $_->as_string()."\n";
+}

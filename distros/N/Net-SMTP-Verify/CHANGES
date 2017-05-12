@@ -1,0 +1,65 @@
+==================================================
+Changes from 2014-09-03 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.03 at 2015-09-03 08:14:48 +0000
+-----------------------------------------
+
+  Change: 35f5bf49af8a7bbbcfae5b58adfe0376c345144a
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-09-03 10:11:24 +0000
+
+    improved SMTP test case and small bug fixes
+
+    * use Test::Mock::Mail::Server::Mail to test module
+
+    * bug fix: the port parameter was not used
+
+    * turn some accessors from ro -> rw 
+
+  Change: aace46ba0b82194aeddab399a4c4b7fed9fb9372
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 08:59:21 +0000
+
+    add minimum perl version 
+
+-----------------------------------------
+version 1.02 at 2015-08-30 15:26:52 +0000
+-----------------------------------------
+
+  Change: eae3ad53dc34d3da7632dce64c0e361559a61148
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-30 17:26:52 +0000
+
+    added support for OPENPGPKEYs 
+
+-----------------------------------------
+version 1.01 at 2015-08-30 12:46:49 +0000
+-----------------------------------------
+
+  Change: e833439938e7dde5f257607a0d13dad3317f9d18
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-30 14:46:49 +0000
+
+    added class documentation 
+
+-----------------------------------------
+version 1.00 at 2015-08-29 18:16:52 +0000
+-----------------------------------------
+
+  Change: 790acb2d71b7f3343236b0163f20e51be83e368b
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-29 20:16:52 +0000
+
+    added travis CI file 
+
+  Change: 4127c6fa2e3f74cfef5d52b577708fba47b45238
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-29 20:15:14 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

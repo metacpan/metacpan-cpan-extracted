@@ -1,0 +1,60 @@
+Revision history for No::OrgNr
+
+0.9.3  2016-07-24
+       Add author tests.
+       Remove Net::Ping::External dependency.
+
+0.9.2  2016-07-24
+       Utilize Net::Ping::External, as it does not requre root privileges.
+
+0.9.1  2016-07-24
+       Use Net::Ping instead of Net::Ping::External.
+       Variuos code cleanup.
+
+0.9.0  2016-07-05
+       Added new function num_domains.
+       Fixed bug when an orgnr does not own any domain names.
+       Various code cleanup.
+
+0.8.4  2016-04-06
+       Fixed badges.
+
+0.8.3  2016-04-03
+       Cleanup of test code.
+
+0.8.2  2016-04-03
+       Fixed tests so that test coverage is 100 %.
+
+0.8.1  2016-04-03
+       Added requirement for Net::Whois::Raw.
+
+0.8.0  2016-02-21
+       Added badges for GitHub and MetaCPAN.
+
+0.7.3  2016-02-13
+       Fixed module metadata.
+
+0.7.2  2016-02-03
+       Fixed version number.
+
+0.7.1  2016-02-03
+       Added done_testing to all test scripts.
+
+0.7.0  2016-01-31
+       Fixed bug for orgnr ending with a zero.
+       Removed pragmas not needed.
+       Made test modules optional.
+       Minor changes for tests.
+
+0.6.1  2016-01-02
+       Updated module documentation.
+
+0.6.0  2015-12-19
+       Updated tests to handle empty results from Net::Whois::Norid.
+
+0.5.0  2015-06-12
+       Added new functions orgnr2domains and domain2orgnr.
+       Uploaded module to CPAN.
+
+0.1.0  2015-08-24
+       Initial release.

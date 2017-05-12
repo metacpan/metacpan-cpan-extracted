@@ -1,0 +1,47 @@
+Revision history for Net-Flotum
+
+0.10  2017-03-23 22:30:59 BRT
+    - added support for updating customer Net::Flotum::Object::Customer->update
+    - added support for dynamic methods Net::Flotum::Object::Customer
+    - Reduced number of tests (but kept same coverage)
+
+0.09  2016-08-15 20:29:56 BRT
+    - refactory and fixes on new-charge
+
+0.08  2016-08-15 18:10:50 BRT
+    - Removed hardcoded merchant_payment_account_id
+
+0.068  2016-08-12 19:26:43 BRT
+    - added callback support on $customer->add_credit_card( callback => URI )
+
+0.064  2016-06-13 10:34:18 BRT
+    - missing dependencies again =(
+
+0.062  2016-06-10 11:19:28 BRT
+    - missing dependencies
+
+0.06  2016-06-09 18:17:06 BRT
+
+    - added support to charges
+
+0.05  2016-05-16 20:25:33 BRT
+    - added method remove on Net::Flotum::Object::CreditCard
+
+0.04  2016-04-05 15:27:22 BRT
+    - require IO::Socket::SSL
+
+0.03  2016-04-03 02:08:03 BRT
+    - use different remote_id in t/ as cpan-testers run in parallel!
+    - treat undef $res on Net::Flotum::API::ExceptionHandler (new I die with $@ without trying to read ->code)
+
+0.02  2016-03-28 11:38:43 BRT
+    - Now we have a proper website! https://api.flotum.com
+    - Increased timeout to 15 seconds on t/05-list-credit-cards.t
+
+0.01  2015-11-30 16:33:28 BRST
+
+    - Init version, you can:
+        - create customer
+        - load a customer by id or by remote_id
+        - ask for a session for adding a credit card
+        - list all credit cards.

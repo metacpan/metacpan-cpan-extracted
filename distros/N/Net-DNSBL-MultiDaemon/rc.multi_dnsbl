@@ -1,0 +1,213 @@
+#!/usr/bin/perl
+#
+# rc.multi_dnsbl
+# version 1.07, 3-6-10
+#
+#
+#################################################################
+# WARNING! do not modify this script, make one with a new name. #
+# This script will be overwritten by subsequent installs of     #
+# SpamCannibal.                                                 #
+#################################################################
+#
+# Copyright 2003 - 2010, Michael Robinton <michael@bizsystems.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+
+use strict;
+#use diagnostics;
+use lib qw(blib/lib blib/arch);
+use Socket;
+use Net::DNSBL::MultiDaemon qw(
+	run
+	$D_VERBOSE
+);
+
+use Net::DNSBL::Utilities qw(
+	statinit
+	cntinit
+	list2hash
+	doINCLUDE
+	open_udpNB
+);
+my $daemon = 0;
+my $LogLevel = 0;
+
+sub usage {
+  if ($daemon) {
+    if ($LogLevel) {
+      syslog($LogLevel,"%s\n",$_[0]);
+      closelog();
+    }
+  } else {
+    print STDERR $_[0],"\n" if $_[0];
+    print STDERR qq|
+Syntax:	$0 start    /path/to/config.file
+	$0 start -v /path/to/config.file
+	$0 stop     /path/to/config.file
+	$0 restart  /path/to/config.file
+
+The -v switch will print the scripts 
+actions verbosely to the STDERR.
+
+|;
+  }
+  exit 1;
+}
+
+$| = 1;
+
+usage() if @ARGV < 2;
+
+my $VERBOSE = 0;
+my $command;
+my $config = '';
+
+while($_ = shift @ARGV) {
+  if ($_ eq '-v') {
+    $VERBOSE = $D_VERBOSE;
+  }
+  else {
+    $command = $config;
+    $config = $_;
+  }
+}
+usage('bad command') unless
+	$command eq 'start' ||
+	$command eq 'stop' ||
+	$command eq 'restart';
+
+usage() unless $config;
+usage('path to config must be absolute')
+	unless $config =~ m|^/|;
+
+# bind these to all local subroutines
+my ($DNSBL,%STATS,$StatStamp,$pidfile,$RUN,$pid);
+
+local $SIG{HUP} = sub {$RUN = 0; $command = 'received sig HUP'};
+local $SIG{TERM} = sub {$RUN = 0; $command = 'exiting... sig TERM'};
+
+$0 =~ m|([^/]+)$|;
+my $me = $1;		# script name
+$me =~ s/rc\.//;
+$0 = $me;
+
+while (1) {
+
+  $DNSBL = doINCLUDE($config);
+  usage('could not load config file')
+	unless $DNSBL;
+  usage('corrupted config file')
+	unless  keys %$DNSBL;
+  usage('no zone name')
+	unless $DNSBL->{MDzone};
+  cntinit($DNSBL,\%STATS);
+  list2hash($DNSBL->{BBC},\%STATS)
+	if $DNSBL->{BBC} && ref $DNSBL->{BBC} eq 'ARRAY' && @{$DNSBL->{BBC}};
+  usage('statfile path does not exist or is not writable')
+	unless ($StatStamp = statinit($DNSBL->{MDstatfile},\%STATS));
+  $DNSBL->{MDstatrefresh} = 300 unless $DNSBL->{MDstatrefresh};
+  $DNSBL->{MDport}	  = 9953 unless $DNSBL->{MDport};
+  $pidfile = $DNSBL->{MDpidpath} .'/'. $me . '.pid';    
+  local *PID;
+  my $running = 0;
+  if (	-e $pidfile &&
+	-r $pidfile &&
+	open(PID,$pidfile)) {
+    $pid = <PID> || 0;
+    close PID;
+    chomp $pid;
+    if ($pid and kill(0, $pid)) {
+      $running = 1
+    } else {
+      $pid = 0;
+    }
+  }
+  if ($command eq 'start') {
+    print STDERR "$pid already running"
+	if $running && ! $daemon;
+    unless ($pid) {
+      $pid = fork;
+      usage("could not fork") if $pid < 0;	# FATAL
+      if ($pid) {
+	waitpid($pid,0);
+	exit 0;
+      }
+      $daemon = 1;
+# set daemon for disconnect
+      chdir '/';			# root dismount
+      local *Null;
+      if (open(Null,'/dev/null')) {	# IO closed
+	open(STDIN,'>&Null') || close STDIN;
+	open(STDOUT,'>&Null') || close STDOUT;
+	unless ($VERBOSE) {
+	  open(STDERR,'>&Null') || close STDERR;
+	}
+      } else {
+	close STDIN;
+	close STDOUT;
+	close STDERR unless $VERBOSE;
+      }
+      if($pid = fork) {			# release child to 'init'
+	exit 0;
+      }
+      $pid = $$;
+    }
+    open(PID,'>'.$pidfile)
+	or usage("could not open $pidfile");
+    print PID $pid,"\n";
+    close PID;
+    if ($DNSBL->{MDsyslog}) {		# if logging requested
+      require Unix::Syslog;
+      import Unix::Syslog @Unix::Syslog::EXPORT_OK;
+      $LogLevel = eval "$DNSBL->{MDsyslog}";
+      openlog($me, LOG_PID(), LOG_MAIL());
+      syslog($LogLevel,"%s\n",'Initiated...');
+    }
+    (my $L = open_udpNB())
+	or usage("could not open listening UDP socket");
+    bind($L,sockaddr_in($DNSBL->{MDport},inet_aton($DNSBL->{MDipaddr})))
+	or usage("could not bind listening UDP listening port");
+    (my $R = open_udpNB())
+	or usage("could not open unbound UDP send socket");
+    $RUN = $DNSBL->{MDstatrefresh};
+    $command = 'internal ERROR';
+    run($DNSBL->{MDzone},$L,$R,$DNSBL,\%STATS,\$RUN,$DNSBL->{MDstatfile},$StatStamp,$VERBOSE);
+    close $L;
+    close $R;
+  }
+  if ($command eq 'stop' || $command eq 'restart') {	# can not be daemonized yet
+    if ($pid) {
+      kill 15, $pid;
+      $pid = 0;
+      sleep 1;
+    } else {
+      print STDERR "$me: not running\n";
+    }
+  }
+  if ($LogLevel) {	# set by 'start'
+    syslog($LogLevel,"%s\n",$command);
+    closelog() unless $command =~ /HUP/;
+  }
+  unlink $pidfile if $pidfile;
+
+  exit 1 if $command =~ /ERROR/;
+  exit 0 if $command =~ /TERM/;
+  exit 0 if $command eq 'stop';
+# restart, HUP fall through
+
+  $command = 'start';
+}

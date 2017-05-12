@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+###########################################
+# asin_fetch
+# Mike Schilli, 2003 (m@perlmeister.com)
+# Fetch book info by ASIN
+#     asin_fetch 0201360683
+###########################################
+use warnings;
+use strict;
+
+use Net::Amazon;
+use Net::Amazon::Request::ASIN;
+
+use Log::Log4perl qw(:easy);
+
+Log::Log4perl->easy_init({level => $ERROR, layout => '%F{1}-%L: %m%n'});
+
+my $ua = Net::Amazon->new(
+    associate_tag => $ENV{AMAZON_ASSOCIATE_TAG},
+    token         => $ENV{AMAZON_TOKEN},
+    secret_key    => $ENV{AMAZON_SECRET_KEY},
+);
+
+my $req = Net::Amazon::Request::ASIN->new(
+    asin  => "6305181772",
+);
+
+  # Response is Net::Amazon::ASIN::Response
+my $resp = $ua->request($req);
+
+for($resp->properties()) {
+    print "Studio: ", $_->studio(), "\n";
+    print "Directors: ", join ('/', $_->directors()), "\n";
+    print "Features: ", join ('/', $_->features()), "\n";
+    print "MPAA: ", $_->mpaa_rating(), "\n";
+}

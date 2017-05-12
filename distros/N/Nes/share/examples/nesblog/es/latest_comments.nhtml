@@ -1,0 +1,31 @@
+{: NES 1.0 none :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  Nes 1.03 by Skriptke
+  Copyright 2009 - 2010 Enrique Castañón
+  Licensed under the GNU GPL.
+
+  Sample:
+  http://nes.sourceforge.net/
+
+  CPAN:
+  http://search.cpan.org/dist/Nes/
+
+  Repository:
+  http://github.com/Skriptke/nes
+
+  -----------------------------------------------------------------------------
+:}
+            <h3>Latest Comments</h3>
+            <ul>
+            {: sql (
+                      'SELECT * FROM `comments` 
+                                WHERE lang LIKE {: $ lang :}
+                                ORDER BY date DESC
+                                LIMIT 10;'
+                    )
+                <li><a href="./?action=item&item={: @$ comments.article :}#comments">{: @$ comments.name :}: {: @$ comments.article :}</a></li>
+            :}
+            </ul> 
+            <br>

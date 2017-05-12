@@ -1,0 +1,33 @@
+Net/EMI/Client
+==============
+
+This module implements a client Interface to the EMI (External Machine Interface) specification,
+which itself is based on the ERMES UCP (UNIVERSAL Computer Protocol) with some SMSC-specific
+extensions.
+It can be used to compose, send, receive, deliver... short messages to GSM Networks via
+EMI-enabled SMSC's (Short Message Service Center).
+Usually the Network connection is based on TCP/IP or X.25.
+The EMI/UCP specification can be found as http://cpa.telenor.no/docs/SMSC_EMI_specification_3.5.pdf
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+   IO::Socket;
+   Net::EMI::Common;
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002 Jochen Schneider.
+Copyright (c) 2003, Gustav Schaffter.
+All rights reserved. This program is free software;
+you can redistribute it and/or modify it under the same terms as Perl itself.
+

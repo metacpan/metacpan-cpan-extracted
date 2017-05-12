@@ -1,0 +1,36 @@
+Revision history for Net-Rest-Generic
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02	2013-11-09
+	Second point release, first usable version. Uploaded to cpan.
+
+0.03	2013-11-12
+	Cleanup release for CPAN, fixed test warnings when installing
+	the module.
+
+0.04	2013-11-19
+	Merge conflicts
+
+0.05	2013-11-21
+	Maintenance: cleanup for whitespace, an uneeded method, added more
+	POD documentation, simplified error helper methods.
+
+0.06	2013-11-24
+	Maintenance: cleanup for copyright and author information
+
+0.07	2013-11-27
+	Added clone() and userAgentOptions
+
+0.08	2013-12-02
+	changed clone() to cloneApi() and added http request hooks
+
+0.09	2014-03-25
+	updated the makefile to include build necessities
+
+0.10	2014-03-25
+	updated the version
+
+0.11	2014-04-01
+	adding missing deps

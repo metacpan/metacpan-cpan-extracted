@@ -1,0 +1,5 @@
+LIBRARY "View"
+EXPORTS
+  boot_Notes__View
+  _boot_Notes__View = boot_Notes__View
+  

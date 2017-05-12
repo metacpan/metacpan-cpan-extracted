@@ -1,0 +1,138 @@
+
+=head1 NAME
+
+Net::SIP::StatelessProxy - Simple implementation of a stateless proxy
+
+=head1 SYNOPSIS
+
+..
+
+=head1 DESCRIPTION
+
+This package implements a simple stateless SIP proxy.
+Basic idea is that the proxy has either a single or two legs
+and that the packets are exchanged between those legs,
+e.g. packets incoming on one leg will be forwarded through the
+other leg.
+
+Because this is a stateless proxy no retransmits will be done
+by the proxy.
+
+If the proxy should work as a registrar too it should be put
+after a L<Net::SIP::Registrar> in a L<Net::SIP::ReceiveChain>.
+
+While forwarding the proxy will be insert itself into the packet,
+e.g. it will add B<Via> and B<Record-Route> header while
+forwarding requests.
+
+Additionally it will rewrite the B<Contact> header while forwarding
+packets (see below), e.g. if the B<Contact> header points to some client
+it will rewrite it, so that it points to the proxy and if it
+already points to the proxy it will rewrite it back so that it again
+points to the client.
+
+=head1 CONSTRUCTOR
+
+=over 4
+
+=item new ( %ARGS )
+
+Creates a new stateless proxy. With %ARGS the behavior can be
+influenced:
+
+=over 8
+
+=item dispatcher
+
+The L<Net::SIP::Dispatcher> object managing the proxy.
+
+=item rewrite_contact
+
+Callback which is used in rewriting B<Contact> headers.
+If one puts user@host in it or if it is called with B<force_rewrite> then it
+should rewrite it and if one puts something without '@' it should try to rewrite
+it back or return B<()> if it cannot be rewritten back.
+
+A working default implementation is provided.
+If you want to implement your own: the callbacks gets the arguments B<contact>,
+B<incoming_leg> and B<outgoing_leg> and B<force_rewrite>.
+For rewriting a contact of user@host the legs will be L<Net::SIP::Leg> objects.
+For rewriting the contact back B<outgoing_leg> can be either a leg object and
+you should check if it is the expected leg. Or it is a scalar reference which
+you should fill with the leg extracted from the contact.
+The function should return the new contact or nothing if there was nothing to
+rewrite or the rewrite failed.
+
+Note that some servers apply length limitiations to the contact so the function
+should not return too long values.
+
+=item rewrite_crypt
+
+If you want to have your own encryption for the rewritten contact you should
+defined a subroutine here, which gets C<data> as the first and C<dir> as the
+second parameter and should return the de/encrypted data. If C<dir> is +1 it
+should encrypt and on -1 it should decrypt.
+The optional third argument C<add2mac> should be included in calculation and
+verification of the MAC.
+The function should return the encrypted/decrypted data or undef if decryption
+failed because the MAC did not match.
+
+If not defined, then RC4 will be used with a (pseudo)random key, 4 byte
+(pseudo)random seed and 4 byte MAC (md5) over seed and data.
+
+=item nathelper
+
+Optional Net::SIP::NATHelper::* object. When given it will be
+used to do NAT, e.g. if the incoming and outgoing legs are different
+it will rewrite the SDP bodies to use local sockets and the nathelper
+will transfer the RTP data between the local and the original
+sockets.
+
+=item force_rewrite
+
+Usually the contact header will only be rewritten, if the incoming and
+outgoing leg are different. With this option one can force the rewrite,
+even if they are the same.
+
+=back
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item receive ( PACKET, LEG, FROM )
+
+PACKET is the incoming packet,
+LEG is the L<Net::SIP::Leg> where the packet arrived and FROM
+is the C<< "ip:port" >> of the sender.
+
+Called from the dispatcher on incoming packets. The packet
+will be rewritten (C<Via> and C<Record-Route> headers added,
+B<Contact> modified) and then the packet will be forwarded.
+
+For requests it can determine the target of the forwarded
+packet by looking at the route or if no route it looks at
+the URI. For responses it looks at the next B<Via> header.
+
+=item do_nat ( PACKET, INCOMING_LEG, OUTGOING_LEG )
+
+This will be called from B<receive> while forwarding data.
+If B<nathelper> is defined it will be used to rewrite SDP bodies
+and update nathelpers internal states to forward RTP data.
+
+Return values are like B<forward_outgoing> in L<Net::SIP::Leg>, e.g.
+it will return C<< [code,text] >> on error or C<()> on success,
+where success can be that the packet was rewritten or that there
+was no need to touch it.
+
+=back
+
+=head1 UNDOCUMENTED METHODS
+
+=over 4
+
+=item idside2hash
+
+=back

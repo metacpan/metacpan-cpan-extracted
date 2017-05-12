@@ -1,0 +1,336 @@
+#!perl -w 
+
+use strict;
+use Net::Dopplr;
+use Net::Google::AuthSub;
+use Data::Dumper;
+
+=head1 NAME 
+
+dopplr - a simple Dopplr client
+
+=head1 USAGE
+
+First off you'll need to get a session token. See below for details.
+
+After that all invocations of C<dopplr> should be of the form
+
+    dopplr session_token=<session token> [method] [opt[s]]
+
+or if there is a C<.dopplr file> in your home directory that looks like
+
+    session_token=<session token>
+
+Then that will be used instead.
+
+Assuming you're using the C<.dopplr> then after that simply call dopplr
+
+    dopplr 
+
+to get a list of all your future trips. Alternatively supply a method 
+name and then the options, as described on the Dopplr wiki here
+
+    http://dopplr.pbwiki.com/API+Resource+URLs
+
+Some examples
+
+    dopplr trips_info
+    dopplr trip_info trip_id=<trip_id>
+
+    dopplr fellows
+
+    dopplr location_on_date date=2008-04-22
+
+    dopplr search q=london,england
+    dopplr city_search q=london,england
+
+=head1 AUTHENTICATION AND USER TOKENS
+
+You need to get a token by visiting this url
+
+    https://www.dopplr.com/api/AuthSubRequest?next=http%3A%2F%2Fwww.example.com%2Fdopplrapi&scope=http%3A%2F%2Fwww.dopplr.com%2F&session=1
+
+and then grabbing the token from the url it redirects to. Yes, that's icky.
+
+Ten put that as 
+
+    token=<token>
+
+in a C<.dopplr> file in your home directory or call
+
+    dopplr token=<token>
+
+And this will give you a session token. You should stick that 
+in the C<.dopplr> file as
+
+    session_token=<session token>
+
+or all subsequent invocations of C<dopplr> should be of the form
+
+    dopplr session_token=<session token> [method] [opt[s]]
+
+=head1 ABOUT
+
+Dopplr is an online service for intelligent business travellers.
+
+Dopplr lets you share your future travel plans privately with friends and colleagues. 
+The service then highlights coincidence, for example, telling you that three people 
+you know will be in Paris when you will be there too. You can use Dopplr on your 
+personal computer and mobile phone. It links with online calendars and social networks.
+
+=cut
+
+binmode STDOUT, ":utf8";
+my %tokens = get_tokens();
+
+unless ($tokens{session_token}) {
+    error("You must pass in a token - see C<dopplr> man page for details.")
+        unless (defined $tokens{token});
+
+
+    my $auth = Net::Google::AuthSub->new( url => 'https://www.dopplr.com/api');
+    $auth->auth('null', $tokens{token});
+
+    $tokens{session_token} = $auth->session_token() || die "Couldn't get session token: $@\n";
+    print "We've obtained your session token, It is:\n";
+    print "session_token=".$tokens{session_token}."\n";
+    print "\n";
+    print "You should note it down or put it in $ENV{HOME}/.dopplr\n\n";
+}
+
+# create the Dopplr object
+my $dopplr = Net::Dopplr->new( $tokens{session_token} );
+
+my $method = shift @ARGV || "future_trips_info";
+my %opts   = get_options();
+
+
+my %transforms;
+
+$transforms{fellows} = sub {
+    my $data = shift;
+    foreach my $key (keys %$data) {
+        my @peeps = @{$data->{$key}};
+        @peeps = ("... no-one") unless @peeps;
+
+        $key = join(" ", map { ucfirst } split('_', $key));
+        print "$key:\n";
+        foreach my $peep (@peeps) {
+            print "\t";
+            unless (ref($peep)) {
+                print "$peep\n";
+                next;
+            }
+            printf "%s (%s) who %s\n", $peep->{name}, $peep->{nick}, $peep->{status};
+        }
+        print "\n";
+    }
+};
+
+$transforms{traveller_info} = $transforms{update_traveller} = sub {
+    my $data      = shift;
+    my $traveller = $data->{traveller};
+    print "$traveller->{name} $traveller->{status}\n";
+};
+
+$transforms{trips_info} = $transforms{future_trips_info} = sub {
+    my $data  = shift;
+    my $count = 1;
+    my @trips = @{$data->{trip}};
+    my $len   = length(scalar(@trips))+1;
+    foreach my $trip (@trips) {
+        printf "% ${len}d) ", $count;
+        _print_trip($trip);
+        $count++;
+    }
+};
+
+
+$transforms{fellows_travellingtoday} = sub {
+    my $data = shift;
+    my @travelling = @{$data->{travelling}};
+    return print "None\n" unless @travelling;
+    foreach my $fellow (@travelling) {
+        print "$fellow->{name} travelling to $fellow->{current_trip}->{city}->{name}, $fellow->{current_trip}->{city}->{country_code}\n";
+    }
+};
+
+
+sub _print_trip {
+    my $trip = shift;
+    print $trip->{city}->{name}.", ".$trip->{city}->{country_code};
+    if ($trip->{start} eq $trip->{finish}) {
+        print " on $trip->{start}";
+    } else {
+        print " from $trip->{start} to $trip->{finish}";
+    }
+    print " (trip_id=$trip->{id})\n";
+}
+
+$transforms{location_on_date} = sub {
+    my $data  = shift;
+    my $away  = defined $data->{location}->{trip};
+    my $trip = ($away) ? $data->{location}->{trip}->{city} : $data->{location}->{home};
+    print "".($away)? "Away: " : "At home: ";
+    print $trip->{name}.", ".$trip->{country_code}."\n";
+};
+
+
+$transforms{trip_info} = sub {
+    my $data = shift;
+    _print_trip($data->{trip});
+};
+
+$transforms{search} = $transforms{traveller_search} = $transforms{city_search} = sub {
+    my $data = shift;
+    if (defined $data->{traveller}) {
+        print "Travellers:\n";
+        foreach my $traveller (@{$data->{traveller}}) {
+            printf "\t%s (%s)\n", $traveller->{name}, $traveller->{nick};    
+        }
+    }
+    if (defined $data->{city}) {
+        print "Cities:\n";
+        foreach my $city (@{$data->{city}}) {
+            my $where = $city->{country};
+            $where    = $city->{region}.", $where" if defined $city->{region};
+            printf "\t%s - %s (geoname_id=%s)\n", $city->{name}, $where, $city->{geoname_id};
+        }
+    }
+};
+
+$transforms{add_trip_tags} = sub {
+    my $data = shift;
+    my @tags = @{$data->{trip}->{tag}||[]};
+    if (@tags) {
+        print "Tags: ".join(", ",@tags)."\n";
+    } else {
+        print "No tags\n";
+    }
+};
+
+$transforms{add_trip_note} = sub {
+    my $data = shift;
+    my @notes = @{$data->{trip}->{note}||[]};
+    if (@notes) {
+        foreach my $note (@notes) {
+            print $note->{body}."\n\t- ".$note->{traveller_name}."\n";
+        }
+    } else {
+        print "No notes\n";
+    }
+};
+
+$transforms{delete_trip} = sub {
+    my $data = shift;
+    my $message = $data->{delete_trip} || "No such trip";
+    print "$message\n";
+};
+
+$transforms{add_trip} = sub {
+    my $data = shift;
+    my $message = ($data->{trip})? "Trip added to $data->{trip}->{city}->{name}" :
+                                   "Couldn't add trip";
+    print "$message\n";
+};
+
+$transforms{add_tip} = sub {
+    my $data = shift;
+    my $message = ($data->{tip})? "Tip added to $data->{tip}->{city}->{name}" :
+                                  "Couldn't add tip";
+    print "$message\n";
+};
+
+$transforms{tag} = sub {
+    my $data = shift;
+    foreach my $trip (@{$data->{trip}}) {
+        _print_trip($trip);
+    }
+};
+
+$transforms{tips} = sub {
+    my $data = shift;
+    foreach my $tip (@{$data->{tip}}) {
+        print "$tip->{title}:\n";
+        print "-"x(length($tip->{title})+1);
+        print "\n";
+        my $r = $tip->{review}; $r =~ s!\s+$!!msg;
+        print "$r\n";
+        print "\t- $tip->{traveller}->{name}\n\n";
+    }
+};
+
+
+
+if ('help' eq $method) {
+	error("Commands are: ".join(", ", keys %transforms));
+} 
+
+my $data   = eval { $dopplr->call($method, {%opts}) };
+error("$@") if $@;
+
+if (defined $transforms{$method}) {
+    $transforms{$method}->($data);
+} else {
+    print Dumper($data);
+}
+
+
+
+
+sub get_tokens {
+    # This also needs to try reading from a config file
+    my %tokens = fetch_config();
+    my %opts   = get_options();
+    return (%tokens, %opts);
+}
+
+sub get_options {
+    my %opts;
+    while (@ARGV && $ARGV[0] =~ m!^([^\s]+)\=([^\s]+)$!) {
+        $opts{$1} = $2;
+        shift @ARGV;
+    }
+    return %opts;
+}
+
+sub fetch_config {
+    my %tokens = ();
+    my $file   = $ENV{HOME}."/.dopplr";
+    return %tokens unless -f $file;
+
+    open(my $fh, $file) || die "Couldn't open $file: $!\n";
+    while (<$fh>) {
+        chomp;
+        next if /^#/;
+        next if /^\s*$/;
+        next unless /=/;
+        my ($key, $val) = split /\s*=\s*/, $_, 2;
+        $tokens{$key} = $val;
+    }
+    return %tokens;
+}
+
+sub error {
+    my $msg = shift;
+    die "Usage: dopplr [token=<token>] [session_token=<session token>] [command [opt[s]]\n".
+        "$msg\n"."\n\n".
+        "See man page for details: perldoc dopplr or man dopplr\n";
+}
+
+
+=head1 AUTHOR
+
+Simon Wistow <simon@thegestalt.org>
+
+=head1 COPYRIGHT
+
+Copyright 2008, Simon Wistow
+
+Distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Net::Dopplr> L<Net::Google::AuthAub>
+
+=cut

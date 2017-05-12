@@ -1,0 +1,100 @@
+Revision history for Perl module Net::Server::POP3
+
+* denotes changes that are known to break backward compatibility.
+- denotes changes that (theoretically) shouldn't do so.
+
+0.0009
+        - Changed the default EOL to a value that I think should
+          be correct on all platforms (needs testing)
+        - Included the (still in-progress) gplproxy example in the
+          distribution.
+        - Improvements to the gplproxy example, including the ability
+          to use MySQL as the backend (since SQLite showed signs of
+          distress trying to handle several days' worth of my rather
+          active mail account) and a hook function to allow some
+          users' mail to not be polled.
+        - Fixed some bugs in the gplproxy example.
+        - Documented a bug in Net::Server::POP3 that was uncovered by
+          testing with the gplproxy example.
+0.0008    2004 May 25
+        - That more involved proxy I wanted to write is in
+          progress, but complete and not included yet.
+          Hopefully in a few releases I'll be able to
+          include at least a tentative version of it.
+        - linetimeout may now be passed to startserver or new
+          to change the line timeout.  Default is the same as
+          the old value.  See the documentation.
+        - Updated the POD some more, including the BUGS section.
+        - Whose bright idea was it to write tests?  I find more bugs
+          in the tests than in the code!  Fixed another one in
+          t/003_simpletest.t, this time a test miscount.  Maybe
+          I should write tests for the tests.</rimshot>
+0.0007    2004 May 22
+        - t/003_simpletest.t, was blowing up under taint mode on some
+          systems on the chdir back to $originaldirectory   If it's
+          unsafe to change back to the original current directory,
+          someone explain why, otherwise I've untainted it.  Kudos to
+          the CPAN testers for making me aware of this issue.
+        - Added REQUIRES section to the POD.  (Does CPAN.pm look
+          at this?)
+0.0006    2004 May 19
+        - Included a couple of basic tests.
+        - EOL can now be passed to new() or startserver() at runtime,
+          so that editing POP3.pm is not necessary just to change
+          $EOL.  (I still need to actually _fix_ this bug...)
+        - DEBUG can also be passed to new() or startserver() to set
+          the desired level of debug output at runtime.
+        - The client's IP address is now passed to the authenticate
+          callback, as documented.
+        - Various improvements to the POD, for consistency and
+          accuracy and clarity.  I think the bug list now has
+          everything I know about.  The description now actually
+          describes what the module does, in addition to warning
+          that the code is not release quality.  Also, I've labelled
+          the code "beta" rather than "alpha" although there are still
+          sundry things unimplemented.
+        - Updated the Todo list (woo).
+0.0005    2004 April 05
+        * The size callback is now passed the username and the message
+          id, for consistency with the other callbacks.  Note that
+          this change breaks backward-compatibility for the size
+          callback.  simpletest.pl was updated to handle this change.
+        - Included proxytest.pl, a slightly more involved sample script
+          than simpletest.pl.  Thanks to Galion Public Library for
+          this better sample script.  When you get mail from it, it
+          gets the mail from your ISP's mailserver on the fly, using
+          Mail::POP3Client.  A more advanced proxy that does
+          cacheing and preretrieval is planned for a future release.
+        - Updated the POD to reflect these changes.
+        - Fixed (hopefully) the link to the sample script in the POD
+          (note to self:  variables don't interpolate in POD), and
+          added a link to the new sample script also.
+        - Removed most of what was left of the stub documentation.
+        - Minor change to simpletest.pl to generate better message IDs
+          in the test messages.  (Why?  Umm, because.)
+        - Added tests to check that the module loads under Taint mode.
+0.0004    2004 March 08
+        - Minor improvements to the documentation.  Attempted to make
+          the documentation on CPAN link to the simpletest.pl script
+          (not sure how that'll turn out).
+        - Started keeping track of changes (in this file you're reading).
+        - Fixed minor package scope bug introduced in 0.0003.
+0.0003    Feb 13 11:15    2004
+        - Abstracted network line endings to a $EOL variable until I
+          figure out how to make this work on all platforms and Perl
+          versions.
+        - Fixed a fencepost error in the delete code that was not
+          exercised by simpletest.pl but was discovered and reported
+          by Christian Neeb.
+0.0002    Jan 25 16:50    2004
+        - first version to be indexed by the indexer, so you can find
+          it on search.cpan.org (0.0001 was not indexed, because it
+          did not unpack into a single directory).  Minimal changes.
+          The version number inside POP3.pm was not incremented as
+          it should have been, so may show up as 0.0001
+0.0001    Jan 24 19:04    2004
+        - first version uploaded to CPAN.  Very early version, totally incomplete.
+0.0000    Dec 30 16:49:29 2003
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+

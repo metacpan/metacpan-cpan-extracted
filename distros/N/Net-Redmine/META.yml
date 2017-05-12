@@ -1,0 +1,41 @@
+---
+abstract: 'A mechanized-based programming API against redmine server.'
+author:
+  - 'Kang-min Liu <gugod@gugod.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Redmine
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Any::Moose: 0.07
+  DateTime::Format::DateParse: 0.04
+  DateTimeX::Easy: 0.086
+  Encode: 2.31
+  HTML::WikiConverter: 0.68
+  HTML::WikiConverter::Markdown: 0.05
+  IO::All: 0.39
+  IO::String: 1.08
+  Params::Validate: 0.91
+  Regexp::Common: 2.122
+  Regexp::Common::Email::Address: 1.01
+  Text::CSV::Slurp: 0.5
+  URI: 1.38
+  URI::Escape: 3.29
+  WWW::Mechanize: 1.52
+  pQuery: 0.07
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+  repository: http://github.com/gugod/net-redmine
+version: 0.09

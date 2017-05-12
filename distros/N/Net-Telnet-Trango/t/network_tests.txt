@@ -1,0 +1,120 @@
+AP	192.168.206.222
+AP_PASSWD	trango
+SU_ID	6
+SU_MAC	0001de10e464
+SU	192.168.206.223
+SU_PASSWD	trango
+
+50 GENERIC
+    connect
+    is_connected?
+    login
+    logged_in ?
+
+    bye
+
+51 IF ADD SU AND AP
+    connect
+    is_connected?
+    login
+    logged_in ?
+
+    sudb_view
+
+    sudb_add
+    check for correct SU MAC in sudb
+    save_sudb
+
+    sudb_modify
+    check sudb for correct new cir/mir
+    save_sudb
+
+   
+52 IF AP
+    connect
+    is_connected?
+    login
+    logged_in ?
+
+    sudb_view
+
+    if sudb set opmode ap y
+
+    check opmode
+    save_ss
+
+    bye
+
+53 IF ADD SU AND AP AND SU
+    connect
+    is_connected?
+    login
+    logged_in ?
+
+    su_password
+    su_ipconfig?
+
+    sudb_view
+    su_info 
+    su_testrflink
+    linktest
+
+    bye
+
+54 IF AP OR SU (do for both)
+    connect
+
+    is_connected?
+
+    check login_banner
+    check firmware_version
+    check host_type
+
+    login
+    logged_in ?
+    check sysinfo
+    check ver
+    set and check remarks
+    save_ss
+
+    check pipe
+    check maclist
+    try maclist_reset
+    check eth_link
+
+    enable_tftpd
+    check tftpd
+    disable_tftpd
+    check tftpd
+
+    bye
+
+55 IF ADD_SU AND SU
+    connect (to SU)
+    is_connected?
+    login
+    logged_in ?
+
+    bye
+
+56 IF SU
+    connect
+    is_connected?
+    login
+    logged_in ?
+
+    bye
+
+
+59 CLEANUP (after su tests)
+    connect
+    is_connected?
+    login
+    logged_in ?
+
+    IF ADD_SU AND AP 
+      sudb_delete
+      save_sudb
+
+    bye
+

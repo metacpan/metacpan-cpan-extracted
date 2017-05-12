@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <archived type="boolean">false</archived>
+  <created-at type="datetime" nil="true"/>
+  <default-assigned-user-id type="integer" nil="true"/>
+  <default-milestone-id type="integer" nil="true"/>
+  <description nil="true"/>
+  <description-html nil="true"/>
+  <hidden type="boolean">false</hidden>
+  <license nil="true"/>
+  <name nil="true"/>
+  <open-tickets-count type="integer">0</open-tickets-count>
+  <permalink nil="true"/>
+  <public type="boolean">false</public>
+  <send-changesets-to-events type="boolean">true</send-changesets-to-events>
+  <updated-at type="datetime" nil="true"/>
+  <open-states-list>new,open</open-states-list>
+  <closed-states-list>resolved,hold,invalid</closed-states-list>
+  <open-states>new/f17  # You can add comments here
+open/aaa # if you want to.</open-states>
+  <closed-states>resolved/6A0 # You can customize colors
+hold/EB0     # with 3 or 6 character hex codes
+invalid/A30  # 'A30' expands to 'AA3300'</closed-states>
+</project>

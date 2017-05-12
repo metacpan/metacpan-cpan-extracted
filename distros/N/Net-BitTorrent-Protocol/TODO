@@ -1,0 +1,12 @@
+Unwritten...
+ - ::BEP32 DHT ext for IPv6
+ - Parsing functions for ::BEP05
+
+Already in dist but require tests...
+ - ::BEP05 (DHT)
+
+Ideas...
+ - compact( ... ) and uncompact( ... ) to wrap both BEP23 and BEP07 functions
+
+Bugs
+ - Everything IPv6 related is considered incomplete or incorrect

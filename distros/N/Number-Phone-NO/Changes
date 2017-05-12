@@ -1,0 +1,30 @@
+Revision history for Number-Phone-NO
+0.11      2013-09-02 11:10:55 Asia/Bangkok
+        - Skip a dep (Thanks to Alexandr Ciorni)
+        - Re-make github repo to get away from gitpan.
+
+0.10      2013-08-29 10:31:07 Asia/Bangkok
+        - Switch to Dist::Zilla
+        - Upgrade to Number::Phone 2.2
+
+0.09    2008-02-13 11:52:00 Europe/Oslo
+        - Updated to DBM::Deep 1.0007 (v3 database)
+
+0.08    2007-08-15 12:21:00 Europe/Oslo
+        - Botched upload
+
+0.07    2007-08-15 12:10:00 Europe/Oslo
+        - Fix a bug with subscriber method not handeling non-valid numbers
+
+0.06    2007-08-15 10:20:00 Europe/Oslo
+        - Including Makefile.PL seems like a jolly good idea
+
+0.05    2007-08-14 09:07:00 Europe/Oslo
+        - Fix some install issues
+
+0.04    2007-07-14 07:35:00 Europe/Oslo
+        - Updated dependencies
+
+0.03    2007-07-09 15:13:38 Europe/Oslo
+        - Initial release.
+

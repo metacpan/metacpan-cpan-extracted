@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::DDDS.
+
+0.01  Sun Oct 26 12:59:48 2008
+	- original version; created by h2xs 1.23 with options
+		-X -n Net::DDDS
+

@@ -1,0 +1,178 @@
+#!/usr/bin/env bash
+VERSION='v2.3.7'
+
+warn()  { echo "$@" >&2;        }
+die()   { warn "$@"; exit 1;    }
+
+contents="$(find . -mindepth 1 -maxdepth 1 \! -name .release \! -name .backup \! -name '.lock*')"
+test -z "$contents" || perl -MNarada -E 'Narada::detect(@ARGV)' narada || exit 1
+
+[ $# -ne 0 ] || die "Usage: narada-restore path/to/backup.full.tar [files]"
+
+[ $# -eq 1 -a -n "$contents" -a -z "$NARADA_SKIP_LOCK" ] && exec narada-lock-exclusive $0 "$@"
+
+backup="$1"
+shift
+
+# Make sure every file name to extract (if any) begins with ./
+files=("$@")
+files=("${files[@]#/}")
+files=("${files[@]#./}")
+files=("${files[@]/#/./}")
+
+# If backup contains .backup/ or .lock* then this is 100% error in
+# config/backup/exclude and may result in damaging project when unpacked
+# (unlike similar error with including tmp/* into backup),
+# so let's protect against this just in case.
+# If backup contains .release/ (which is usually redundant but not an
+# error) then it should be unpacked only if there is no .release/ yet,
+# otherwise it also may damage project when unpacked.
+excl=()
+test -d '.release' && excl+=( --exclude './.release' )
+excl+=( --exclude './.backup' )
+excl+=( --exclude './.lock*' )
+
+# Order of commands to run before/after unpacking archive is CRITICAL!
+# - qmail should be --lock, not --clean, to avoid losing emails while
+#   restoring from backup
+# - services should be shut down after cron to avoid starting them from
+#   cron right after shutdown
+
+if test -z "$files" -a -n "$contents"; then
+	narada-setup-qmail --lock
+	narada-setup-cron  --clean
+	narada-shutdown-services
+	narada-bg-killall
+	narada-setup-mysql --clean
+fi
+
+TAR=`which gtar tar 2>/dev/null | head -n 1`
+LANG= $TAR -x -p -f "$backup" -g /dev/null --anchored "${excl[@]}" "${files[@]}"
+code=$?
+
+if test -z "$files"; then
+	if test $code -ne 0; then
+		(
+		echo
+		echo 'Run these commands after fixing above errors:'
+		test -f var/use/mysql           && echo 'narada-setup-mysql'
+		test -f var/use/services        && echo 'narada-start-services &'
+		test -f var/use/cron            && echo 'narada-setup-cron'
+		test ! -f var/use/qmail         && echo 'narada-setup-qmail --clean'
+		test -f var/use/qmail           && echo 'narada-setup-qmail'
+		) >&2
+	else
+		test -f var/use/mysql           && narada-setup-mysql
+		test -f var/use/services        && narada-start-services &
+		test -f var/use/cron            && narada-setup-cron
+		test ! -f var/use/qmail         && narada-setup-qmail --clean
+		test -f var/use/qmail           && narada-setup-qmail
+	fi
+fi
+
+exit $code
+
+
+: <<'=cut'
+
+=encoding utf8
+
+=head1 NAME
+
+narada-restore - restore full project or some files from backup
+
+
+=head1 VERSION
+
+This document describes narada-restore version v2.3.7
+
+
+=head1 USAGE
+
+    narada-restore path/to/backup.full.tar [files]
+
+
+=head1 DESCRIPTION
+
+Should be executed in project deploy directory.
+
+Will restore full project or just extract given files from backup created
+using C<narada-backup>.
+
+When restoring full project in directory with existing project will run
+under L<narada-lock-exclusive>.
+
+When restoring full project will also update project's external setup (for
+ex. if project use MySQL then C<narada-setup-mysql --clean> will be run
+before unpacking backup and C<narada-setup-mysql> will be run after).
+
+When given, file names must be the full path from project deploy directory,
+without wildcards. Values C<a/b>, C</a/b> and C<./a/b> are all handled in
+same way (as C<./a/b>).
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+	var/use/*
+
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/powerman/Narada/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software. The code repository is available for
+public review and contribution under the terms of the license.
+Feel free to fork the repository and submit pull requests.
+
+L<https://github.com/powerman/Narada>
+
+    git clone https://github.com/powerman/Narada.git
+
+=head2 Resources
+
+=over
+
+=item * MetaCPAN Search
+
+L<https://metacpan.org/search?q=Narada>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/dist/Narada>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Narada>
+
+=item * CPAN Testers Matrix
+
+L<http://matrix.cpantesters.org/?dist=Narada>
+
+=item * CPANTS: A CPAN Testing Service (Kwalitee)
+
+L<http://cpants.cpanauthors.org/dist/Narada>
+
+=back
+
+
+=head1 AUTHOR
+
+Alex Efros E<lt>powerman@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2008- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+
+=cut

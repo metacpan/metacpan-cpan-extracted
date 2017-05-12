@@ -1,0 +1,13 @@
+    Net::DBus::GLib - Perl APIs for DBus GLib bindings
+    ==================================================
+
+Net::DBus::GLib is written by 
+
+    Daniel Berrange <dan-at-berrange-dot-com>
+
+With patches, contributions & suggestions gratefully received 
+from
+
+    [...send patches to get your name here!]
+
+-- End

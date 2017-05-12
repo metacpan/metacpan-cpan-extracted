@@ -1,0 +1,147 @@
+Change history
+--------------
+
+0.81:
+* Change in the licence. The Beer-ware license was considered non-free by the
+  Fedora legal department, given that it would require you to give is beer in 
+  some situations. So now we just stringly encourage you to do so...
+
+0.80:
+* POD fixes
+
+0.79:
+* Added IO::Socket::Timeout to requirements
+
+0.78:
+* Added timeout to daemon connection, so as to close connections on badly
+  behaved clients
+
+0.77:
+* Fixed Segment->getFieldAsString so as to properly return values that
+  Perl considers 'not true'.
+
+0.76:
+* Added getFieldAsString method to Segment
+* Added tests for above
+* Made getSegmentAsString use getFieldAsString 
+
+version 0.75:
+
+* Fixed regex describing segment name in Message.pm for compatibility
+  with all segment names.
+
+version 0.74:
+* Fixed documentation issue (again, hinted by Brent B. Powers)
+* Added removeSegmentByName method (added by Sebastian John)
+* Fix for regex describing segment name in Message.pm, hinted by Brent B.Powers
+
+version 0.73:
+* Fixed issue 1035505 with proposed patch of Brent B. Powers
+* Fixed issue 1034857
+* Fixed issue 1033989 with proposed patch of Brent B. Powers
+
+version 0.72:
+* Fixed broken Message.pm: new message from string with subcomponents
+  didn't produce a correct string with toString. Thanx to Jason Aragorn 
+  Tobias Lunn <jlunn@coderyte.com> of CodeRyte, Inc..
+* Added untaint in Message, so that no errors are produced when using
+  the tainted mode (like the hl7d does) 
+* Added getSegmentAsString and getSegmentFieldAsString methods to Message, 
+  after a proposal by H.Emery Ford (emery_ford@bigfoot.com).
+
+version 0.71:
+* Fixed broken MANIFEST: added lib/Net/HL7.pm
+
+version 0.70:
+* Full redesign of internal structure of the Message and Segment
+  classes. Changes have been made to the toString method of the
+  Message, and to the constructor when providing a string representation
+  of a HL7 message.
+* Added the possibility of passing an array of field values to the
+  constructor of the Segment.
+* Removed automatic creation of a MSH segment when creating an HL7 
+  message.
+* Added better (sub)composed fields support on Segment getField method.
+* Added the Net::HL7 module, to provide a version number of the whole 
+  package to Perl 'things' requiring a specific version, and as a container
+  for global HL7 properties, like control characters.
+* Refactored tests to use Test::More after mysterious failing of
+  existing tests under Perl 5.8.2, due to a change in the implementation
+  of the 'eq' operator regarding 'undefined' (?).
+
+version 0.68:
+* Added more documentation (this is an ongoing effort...)
+* made setField on segment accept multiple values. These are joined with
+  the component separator.
+* Added the HL7 NULL variable for the setField operation on a segment.
+* Fixes in MSH segment due to some reference interference quirks on 
+  Solaris.
+* Added size method to Segment
+* Made ACK message type copy full MSH when initialized with message, then
+  set it's own specific fields.
+* Fixed some complaints when running in strict mode on uninitialized values.
+* Fixed some tests that used undefined values.
+
+version 0.67:
+* Added COMPONENT_SEPARATOR, REPETITION_SEPARATOR, ESCAPE_CHARACTER and
+  SUBCOMPONENT_SEPARATOR to the MSH segment. The setField method on this
+  segment, on index 2 now actually changes the values of these variables.
+  Also checks on setting field 1 on MSH, whether input is just 1 char.
+* Fixes on ACK, to set the error message.  
+* Check on segment id: it must be exactely three characters long, upper 
+  case.
+* Fixed Makefile.PL, so it now really installs into the Perl lib path.
+* Added more methods to the Message to manipulate segments.
+
+version 0.66:
+* Implemented the getNextRequest method to actually read new data. The
+  getRequest method only reads data from the socket if there's no request
+  cached.
+
+version 0.65:
+* the getRequest method of the Net::HL7::Daemon::Client has been enabled for
+  multiple incoming messages. This means that the getRequest method now tries
+  to read from the socket every time it is called.
+* Fixed some documentation
+
+version 0.64:
+* Fixed error in daemon and ack tests
+* Fixed erroneous setting of MSH fields in Message.pm
+* set MSH(11) to P and MSH(15) to AL per default
+* Made new() method of Message also split message string on \n
+* ACK now takes MSH(11) and MSH(12) from incoming MSH, and sets MSH(15) and MSH(16)
+  to the empty string.
+* Fixed erroneous sendAck and sendNack methods. The stuff is now sent as a single 
+  line, to prevent perl from inserting separators, like end of lines, etc.
+
+version 0.63:
+* fixed some POD errors
+* added the sendResponse method to Net::HL7::Daemon::Client
+* Removed NACK module: it doesn't exists in the HL7 world.
+* The MSH segment now uses index 1 of it's fields for the FIELD_SEPARATOR value;
+  other fields have moved one to the right
+* added setAckCode method to ACK, to be able to set the error for the acknowledgement.
+
+version 0.62:
+* Fixed erroneous read of input buffer for Client
+* Added ACK, NACK messages
+* Added MSH segment
+* getSegmentByName is removed
+* Made the Daemon and the Client inherit from IO::Socket, so you can more 
+  easy do things with forking and other server operations you would 
+  perform on sockets.
+* Made several constructors set segments and values, like auto-adding the
+  MSH segment to every instance of Message.
+
+version 0.61:
+* Moved the stuff to a new namespace (Net::HL7)
+* Created a Daemon, resembling the HTTP::Daemon
+* Created the Request and Response classes
+* added tests
+
+version 0.5:
+* Added the getField method to HL7::Message
+* repaired broken message parse for HL7::Message constructor
+
+version 0.4:
+* Removed spurious newline between segments.

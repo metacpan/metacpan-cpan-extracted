@@ -1,0 +1,87 @@
+Revision history for Perl extension Net::Frame.
+
+1.17 Sun  7 May 14:21:26 CEST 2017
+   - update: IP in IP encapsulation should use IPv4 layer type
+   - update: copyright notice
+
+1.16 Mon Nov 16 09:31:06 CET 2015
+   - bugfix: t/13-gethostsubs.t updated cause gomor.org addresses have changed
+
+1.15 Sun Feb 15 18:09:23 CET 2015
+   - BUGFIX: IPv4 header length calculation on Mac OS X and OpenBSD
+   => Read: support for OpenBSD and Mac OS X now ok
+   - bugfix: check if inet_ntop/getaddrinfo are *really* supported by trying to use them.
+
+1.14 Wed Jan 28 20:01:48 CET 2015
+   - BUGFIX: getHostIpv6addr: not working on FreeBSD/Socket because of nasty getaddrinfo()
+   - tests: added tests for getHost* subs and inet* subs
+
+1.13 Wed Jan 28 07:49:11 CET 2015
+   - BUGFIX: getHostIpv6Addr: use getaddrinfo/getnameinfo from Socket or Socket6 where available
+   => Thanks to Vince
+
+1.12 Tue Jan 20 19:33:06 CET 2015
+   - bugfix: TCP/UDP computeChecksums() so 6to4 and other encapsulations work
+   => Thanks to Vince
+   - update: copyright notice
+   - update: Kwalitee
+
+1.11 Tue Apr  8 15:33:43 CEST 2014
+   - bugfix: https://rt.cpan.org/Public/Bug/Display.html?id=94035
+   - bugfix: on making Socket6 optional, bugfix contributed by Andrew Feren
+   - optimization: convertMac() contributed by Andrew Feren
+   - optimization: inetChecksum() contributed by Andrew Feren
+
+1.10 Mon Mar 10 13:26:53 CET 2014
+   - UPDATE: makes Socket6 optional, contributed by Andrew Feren
+   - update: copyright notice
+
+1.09 Wed Jan 25 22:48:18 CET 2012
+   - UPDATE: %Next in UDP and TCP layers are now empty by default. The
+   developper who wants to add a new layer 7 seven will have to fill the
+   variable straight from his module.
+
+1.08 Sat Jan 14 09:49:09 CET 2012
+   - bugfix: TCP and UDP checksum computation when using another
+     Net::Frame::Layer object (instead of plain payload).
+   => Thanks to Vince
+   - update: copyright notice
+
+1.07 Sun Feb 20 17:49:11 CET 2011
+   - bugfix: in ARP pack/unpack
+   - bugfix: AF_INET6 constant badly used
+   - UPDATE: IGMPv4 renamed to IGMP
+   - update: copyright notice
+
+1.06 Sat May 23 15:33:44 CEST 2009
+   - update: TCP computeChecksums()
+   - update: UDP computeChecksums()
+   - update: IPv4 added UDPLite support
+   - update: IPv4 computeLengths()
+   - update: copyright notice
+
+1.05 Sun Nov  9 22:51:39 CET 2008
+   - new: computeLengths() in ETH, to use 802.3 easily
+   - new: $Next global variable in each module to allow customized encapsulation()
+          => mainly used to encapsulate application layer procotols
+   - new: UDP now have some $Next values (DHCP, RIPv1, HSRP)
+   - new: added link to a MPLS layer from ETH and SLL layers
+   - bugfix: pad TCP and UDP raw data if less than required length
+
+1.04 Mon Mar 26 23:19:44 CEST 2007
+   - bugfix: TCP: computeLengths() with options
+   - update: ETH: more checks for next layer decoding (LLC)
+
+1.03 Wed Jan  3 22:44:59 CET 2007
+   - update: Net::Libdnet no more required
+
+1.02 Thu Dec 21 23:51:07 CET 2006
+   - bugfix: forgot to load some subs for IPv6 subs in Layer.pm
+
+1.01 Sun Dec 17 17:45:32 CET 2006
+   - UPDATE: moved all layers to Net::Frame::Layer::* namespace
+   - bugfix: IPv6 layer handling in computeLengths() for TCP layer
+
+1.00 Sat Dec  9 18:39:09 CET 2006
+   - first public release
+

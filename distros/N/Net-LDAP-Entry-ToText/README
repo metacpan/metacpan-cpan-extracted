@@ -1,0 +1,43 @@
+Net-LDAP-Entry-ToText
+
+Convert a Net::LDAP::Entry to text. This function is currently some what
+primitive and does not handle multiline entries.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::LDAP::Entry::ToText
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-LDAP-Entry-ToText
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-LDAP-Entry-ToText
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-LDAP-Entry-ToText
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-LDAP-Entry-ToText
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Zane C. Bowers
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,20 @@
+README
+MANIFEST
+Makefile.PL
+Changes
+lib/Net/Dict.pm
+lib/Net/Dict.pod
+dict
+tkdict
+examples/simple.pl
+examples/portuguese.pl
+t/01-require.t
+t/connection.t
+t/database.t
+t/define.t
+t/match.t
+t/auth.test
+t/lib/Net/Dict/TestConfig.pm
+TODO.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

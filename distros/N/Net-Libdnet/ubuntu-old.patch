@@ -1,0 +1,133 @@
+Index: Makefile.PL
+===================================================================
+--- Makefile.PL	(revision 42)
++++ Makefile.PL	(working copy)
+@@ -3,10 +3,10 @@
+ #
+ use ExtUtils::MakeMaker;
+ 
+-my $libs = qx{dnet-config --libs 2>/dev/null}
+-   || ['-L/lib -L/usr/lib -L/usr/local/lib -ldnet'];
++my $libs = qx{dumbnet-config --libs 2>/dev/null}
++   || ['-L/lib -L/usr/lib -L/usr/local/lib -ldumbnet'];
+ 
+-my $inc = qx{dnet-config --cflags 2>/dev/null}
++my $inc = qx{dumbnet-config --cflags 2>/dev/null}
+    || '-I/include -I/usr/include -I/usr/local/include';
+ 
+ WriteMakefile(
+Index: Libdnet.xs
+===================================================================
+--- Libdnet.xs	(revision 42)
++++ Libdnet.xs	(working copy)
+@@ -34,38 +34,38 @@
+ #include "XSUB.h"
+ 
+ #include <stdio.h>
+-#include <dnet.h>
++#include <dumbnet.h>
+ 
+-#ifdef DNET_BLOB_H
++#ifdef DUMBNET_BLOB_H
+ typedef blob_t              Blob;
+ #endif
+ 
+-#ifdef DNET_ETH_H
++#ifdef DUMBNET_ETH_H
+ typedef eth_t               EthHandle;
+ typedef eth_addr_t          EthAddr;
+ #endif
+ 
+-#ifdef DNET_INTF_H
++#ifdef DUMBNET_INTF_H
+ typedef intf_t              IntfHandle;
+ #endif
+ 
+-#ifdef DNET_ARP_H
++#ifdef DUMBNET_ARP_H
+ typedef arp_t               ArpHandle;
+ #endif
+ 
+-#ifdef DNET_FW_H
++#ifdef DUMBNET_FW_H
+ typedef fw_t                FwHandle;
+ #endif
+ 
+-#ifdef DNET_ROUTE_H
++#ifdef DUMBNET_ROUTE_H
+ typedef route_t             RouteHandle;
+ #endif
+ 
+-#ifdef DNET_TUN_H
++#ifdef DUMBNET_TUN_H
+ typedef tun_t               TunHandle;
+ #endif
+ 
+-#ifdef DNET_IP_H
++#ifdef DUMBNET_IP_H
+ typedef ip_t                IpHandle;
+ #endif
+ 
+@@ -866,7 +866,7 @@
+ # obsolete XS implementation.
+ #
+ 
+-#if defined DNET_INTF_H
++#if defined DUMBNET_INTF_H
+ 
+ IntfHandle *
+ dnet_intf_open()
+@@ -981,7 +981,7 @@
+ 
+ #endif
+ 
+-#if defined DNET_ARP_H
++#if defined DUMBNET_ARP_H
+ 
+ ArpHandle *
+ dnet_arp_open()
+@@ -1064,7 +1064,7 @@
+ 
+ #endif
+ 
+-#if defined DNET_ROUTE_H
++#if defined DUMBNET_ROUTE_H
+ 
+ RouteHandle *
+ dnet_route_open()
+@@ -1148,7 +1148,7 @@
+ 
+ #endif
+ 
+-#if defined DNET_FW_H
++#if defined DUMBNET_FW_H
+ 
+ FwHandle *
+ dnet_fw_open()
+@@ -1215,7 +1215,7 @@
+ 
+ #endif
+ 
+-#if defined DNET_TUN_H
++#if defined DUMBNET_TUN_H
+ 
+ TunHandle *
+ dnet_tun_open(src, dst, size)
+@@ -1290,7 +1290,7 @@
+ 
+ #endif
+ 
+-#if defined DNET_ETH_H
++#if defined DUMBNET_ETH_H
+ 
+ EthHandle *
+ dnet_eth_open(device)
+@@ -1346,7 +1346,7 @@
+ 
+ #endif
+ 
+-#if defined DNET_IP_H
++#if defined DUMBNET_IP_H
+ 
+ IpHandle *
+ dnet_ip_open()

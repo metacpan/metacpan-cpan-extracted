@@ -1,0 +1,47 @@
+{
+   "abstract" : "A library for talking to CardDAV servers",
+   "author" : [
+      "Bron Gondwana <brong@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-CardDAVTalk",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::MoreUtils" : "0.01",
+            "List::Pairwise" : "1.00",
+            "Net::DAVTalk" : "0.08",
+            "Text::VCardFast" : "0.07",
+            "XML::Spice" : "0.04",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

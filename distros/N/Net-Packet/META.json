@@ -1,0 +1,171 @@
+{
+   "abstract" : "a framework to easily send and receive frames from layer 2 to layer 7",
+   "author" : [
+      "GomoR <gomor_at_cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Packet",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bit::Vector" : "0",
+            "Class::Gomor" : "1.00",
+            "Net::IPv4Addr" : "0",
+            "Net::IPv6Addr" : "0",
+            "Net::Libdnet" : "0",
+            "Net::Pcap" : "0.12",
+            "Net::Write" : "1.00",
+            "Socket6" : "0",
+            "Storable" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Packet" : {
+         "file" : "lib/Net/Packet.pm",
+         "version" : "3.28"
+      },
+      "Net::Packet::ARP" : {
+         "file" : "lib/Net/Packet/ARP.pm"
+      },
+      "Net::Packet::CDP" : {
+         "file" : "lib/Net/Packet/CDP.pm"
+      },
+      "Net::Packet::CDP::Address" : {
+         "file" : "lib/Net/Packet/CDP/Address.pm"
+      },
+      "Net::Packet::CDP::Type" : {
+         "file" : "lib/Net/Packet/CDP/Type.pm"
+      },
+      "Net::Packet::CDP::TypeAddresses" : {
+         "file" : "lib/Net/Packet/CDP/TypeAddresses.pm"
+      },
+      "Net::Packet::CDP::TypeCapabilities" : {
+         "file" : "lib/Net/Packet/CDP/TypeCapabilities.pm"
+      },
+      "Net::Packet::CDP::TypeDeviceId" : {
+         "file" : "lib/Net/Packet/CDP/TypeDeviceId.pm"
+      },
+      "Net::Packet::CDP::TypePortId" : {
+         "file" : "lib/Net/Packet/CDP/TypePortId.pm"
+      },
+      "Net::Packet::CDP::TypeSoftwareVersion" : {
+         "file" : "lib/Net/Packet/CDP/TypeSoftwareVersion.pm"
+      },
+      "Net::Packet::Consts" : {
+         "file" : "lib/Net/Packet/Consts.pm"
+      },
+      "Net::Packet::Desc" : {
+         "file" : "lib/Net/Packet/Desc.pm"
+      },
+      "Net::Packet::DescL2" : {
+         "file" : "lib/Net/Packet/DescL2.pm"
+      },
+      "Net::Packet::DescL3" : {
+         "file" : "lib/Net/Packet/DescL3.pm"
+      },
+      "Net::Packet::DescL4" : {
+         "file" : "lib/Net/Packet/DescL4.pm"
+      },
+      "Net::Packet::Dump" : {
+         "file" : "lib/Net/Packet/Dump.pm"
+      },
+      "Net::Packet::ETH" : {
+         "file" : "lib/Net/Packet/ETH.pm"
+      },
+      "Net::Packet::Env" : {
+         "file" : "lib/Net/Packet/Env.pm"
+      },
+      "Net::Packet::Frame" : {
+         "file" : "lib/Net/Packet/Frame.pm"
+      },
+      "Net::Packet::ICMPv4" : {
+         "file" : "lib/Net/Packet/ICMPv4.pm"
+      },
+      "Net::Packet::IGMPv4" : {
+         "file" : "lib/Net/Packet/IGMPv4.pm"
+      },
+      "Net::Packet::IPv4" : {
+         "file" : "lib/Net/Packet/IPv4.pm"
+      },
+      "Net::Packet::IPv6" : {
+         "file" : "lib/Net/Packet/IPv6.pm"
+      },
+      "Net::Packet::LLC" : {
+         "file" : "lib/Net/Packet/LLC.pm"
+      },
+      "Net::Packet::Layer" : {
+         "file" : "lib/Net/Packet/Layer.pm"
+      },
+      "Net::Packet::Layer2" : {
+         "file" : "lib/Net/Packet/Layer2.pm"
+      },
+      "Net::Packet::Layer3" : {
+         "file" : "lib/Net/Packet/Layer3.pm"
+      },
+      "Net::Packet::Layer4" : {
+         "file" : "lib/Net/Packet/Layer4.pm"
+      },
+      "Net::Packet::Layer7" : {
+         "file" : "lib/Net/Packet/Layer7.pm"
+      },
+      "Net::Packet::NULL" : {
+         "file" : "lib/Net/Packet/NULL.pm"
+      },
+      "Net::Packet::OSPF" : {
+         "file" : "lib/Net/Packet/OSPF.pm"
+      },
+      "Net::Packet::PPP" : {
+         "file" : "lib/Net/Packet/PPP.pm"
+      },
+      "Net::Packet::PPPLCP" : {
+         "file" : "lib/Net/Packet/PPPLCP.pm"
+      },
+      "Net::Packet::PPPoE" : {
+         "file" : "lib/Net/Packet/PPPoE.pm"
+      },
+      "Net::Packet::RAW" : {
+         "file" : "lib/Net/Packet/RAW.pm"
+      },
+      "Net::Packet::SLL" : {
+         "file" : "lib/Net/Packet/SLL.pm"
+      },
+      "Net::Packet::STP" : {
+         "file" : "lib/Net/Packet/STP.pm"
+      },
+      "Net::Packet::TCP" : {
+         "file" : "lib/Net/Packet/TCP.pm"
+      },
+      "Net::Packet::UDP" : {
+         "file" : "lib/Net/Packet/UDP.pm"
+      },
+      "Net::Packet::Utils" : {
+         "file" : "lib/Net/Packet/Utils.pm"
+      },
+      "Net::Packet::VLAN" : {
+         "file" : "lib/Net/Packet/VLAN.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license.php"
+      ]
+   },
+   "version" : "3.28"
+}

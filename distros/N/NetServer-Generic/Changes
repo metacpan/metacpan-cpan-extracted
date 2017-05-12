@@ -1,0 +1,43 @@
+Revision history for Perl extension NetServer::Generic.
+
+1.02 Wed Jun 27
+	bugfix: various suggestions by Lincoln Stein. 
+        - Switch from FIFO to pipe for controlling preforked children
+          (for Win32 compatability)
+        - Revised wait() behaviour for Solaris
+        - First attempt at fixing "thundering herd" problems
+
+1.01 Wed May 17 17:07:00 2000
+        - bugfix: doesn't require a threaded perl now. Also tested on Solaris.
+
+1.00 Fri May 11 10:35:00 2000
+        - added alpha-ish preforked server mode
+        - added alpha-ish multithreaded mode (UNSTABLE)
+        - modified IP address filtering to cope with regexps
+        - option to log new connection peer addresses via STDERR
+        - extra test scripts
+        - updated documentation
+
+        * NetServer::Generic has now been running a mission-critical
+          high-demand e-commerce server for the past couple of years,
+          and has been in use elsewhere; the core functionality and API
+          is stable. Two years is a bit long for beta test, so I'm 
+          declaring this release to be version 1.0.
+
+0.03 Thurs Sep 02 09:13:00 1998
+        - fixed test failure
+
+0.02  Wed Sep 02 11:57:00 1998
+        - added peer() method to get peer information
+        - added mode() switch, with fork, select, and client parameters
+          to govern server mode of operation
+          * client mode supports the additional trigger() method
+        - added an improved (working!) client/server test script
+        - updated documentation
+        - minor bugfixes
+        - support for NetServer::SMTP
+
+0.01  Fri Jul 17 13:03:55 1998
+        - original version; created by h2xs 1.18
+          Doesn't include the minimal SMTP server yet
+

@@ -1,0 +1,32 @@
+Net-XRC version 0.01
+====================
+
+THis module implements a client interface to Everyone.net's XRC protocol,
+enabling a perl application to talk to Everyone.net's XRC server.
+
+This module is not sponsored or endorsed by Everyone.net.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP
+  Crypt::SSLeay
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Ivan Kohler
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

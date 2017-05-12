@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Build.PL
+README
+lib/Net/YASA.pm
+t/00-load.t
+t/01-yasa-utf8.t
+t/02-json-output.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

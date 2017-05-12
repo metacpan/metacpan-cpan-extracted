@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/NetHack/Engravings.pm
+t/00-compile.t
+t/is_degradation.t
+t/is_maybe_preengraved.t
+t/lib/Test/NetHack/Engravings.pm
+xt/release/eol.t
+xt/release/no-tabs.t
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t

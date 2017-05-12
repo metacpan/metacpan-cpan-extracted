@@ -1,0 +1,277 @@
+Revision histories for Perl extension Number::Phone::JP
+
+0.20170501 Mon May  1 2017
+     - Update some table classes.
+
+0.20170104 Wed Jan  4 2017
+     - Update some table classes.
+
+0.20161101 Tue Nov  1 2016
+     - Update some table classes.
+
+0.20161003 Mon Oct  3 2016
+     - Update some table classes.
+
+0.20160801 Tue Aug  2 2016
+     - Update some table classes.
+
+0.20160705 Wed Jul  6 2016
+     - Update some table classes.
+
+0.20160601 Thu Jun  2 2016
+     - Update some table classes.
+
+0.20160502 Tue May 10 2016
+     - Update some table classes.
+
+0.20160404 Tue Apr  5 2016
+     - Update some table classes.
+
+0.20160301 Thu Mar  3 2016
+     - Update some table classes.
+
+0.20160201 Tue Feb  9 2016
+     - Update some table classes.
+
+0.20160105 Tue Jan 12 2016
+     - Update some table classes.
+
+0.20151202 Mon Dec  7 2015
+     - Update some table classes.
+
+0.20150901 Thu Sep  3 2015
+     - Update some table classes.
+
+0.20150803 Mon Aug  3 2015
+     - Update some table classes.
+
+0.20150703 Fri Jul  3 2015
+     - Update some table classes.
+
+0.20150602 Tue Jun  2 2015
+     - Update some table classes.
+
+0.20150513 Wed May 13 2015
+     - Update some table classes.
+
+0.20150402 Mon Apr  6 2015
+     - Update some table classes.
+
+0.20150304 Thu Mar  5 2015
+     - Update some table classes.
+
+0.20150203 Mon Feb  9 2015
+     - Update some table classes.
+
+0.20150106 Tue Jan 13 2015
+     - Update some table classes.
+
+0.20141201 Thu Dec  4 2014
+     - Update some table classes.
+
+0.20141105 Mon Nov 10 2014
+     - In October, rules of mobile number portability in Japan has been changed.
+       Each number of Mobiles (cellular) phones and PHS phones can be exchanged
+       portably and seamlessly. Therefore, Number::Phone::JP::Table::Mobile and
+       Number::Phone::JP::Table::Phs use same validation table and
+       return same results on given same numbers.
+       It was noticed, and patched by Kazuma Shiraiwa.
+     - Update some table classes.
+
+0.20141001 Fri Oct  3 2014
+     - Update some table classes.
+
+0.20140901 Thu Sep  4 2014
+     - Update some table classes.
+
+0.20140804 Wed Aug  6 2014
+     - Update some table classes.
+
+0.20140602 Mon Jun  2 2014
+     - Update some table classes.
+
+0.20140501 Thu May  1 2014
+     - Update some table classes.
+
+0.20140401 Mon Apr  7 2014
+     - Update some table classes.
+
+0.20140303 Tue Mar  4 2014
+     - Update some table classes.
+     - Ministry of Internal Afairs and Communications of Japan
+       announced that "Q2" service has been stopped providing
+       at the end of February 2014 but this module will handle valid for
+       some former Q2 numbers for some future versions because some ranges of
+       the Q2 numbers are still allocated for NTT East and NTT West.
+       It means that maybe Number::Phone::JP::Table::Q2 will be
+       stopped updating.
+
+0.20140203 Mon Feb  3 2014
+     - Update some table classes.
+
+0.20140106 Mon Jan  6 2014
+     - Update some table classes.
+
+0.20131001 Tue Oct  1 2013
+     - Update some table classes.
+
+0.20130603 Mon Jun  3 2013
+     - Update some table classes.
+
+0.20130501 Tue May  7 2013
+     - Update some table classes.
+
+0.20130401 Wed Apr  3 2013
+     - Update some table classes.
+
+0.20130201 Mon Feb  4 2013
+     - Update some table classes.
+
+0.20130107 Mon Jan  7 2013
+     - Update some table classes.
+
+0.20121203 Mon Dec  3 2012
+     - Update some table classes.
+
+0.20121001 Mon Oct  1 2012
+     - Update some table classes.
+
+0.20120801 Thu Aug  2 2012
+     - Update some table classes.
+
+0.20120702 Tue Jul 10 2012
+     - Update some table classes.
+
+0.20120601 Fri Jun  1 2012
+     - Update some table classes.
+
+0.20120502 Mon May  7 2012
+     - Update some table classes.
+
+0.20120301 Fri Mar  2 2012
+     - Update some table classes.
+     - Quit updating the table of Number::Phone::JP::Table::Fmc.
+       It will be deprecated because Ministry of Internal Afairs and
+       Communications of Japan stopped updating this table.
+       They said the number which is prefixed with "060" is currently
+       no longer used by any telecommunication business operator.
+
+0.20120105 Wed Jan 11 2012
+     - Update some table classes.
+
+0.20111101 Wed Nov  2 2011
+     - Update some table classes.
+
+0.20111003 Tue Oct 11 2011
+     - Update some table classes.
+     - Fixed typo (bug) in xt/perlcritic.t
+     - Modified JP.pm to work correctly when the user uses Number::Phone
+       module and set Japanese number with country code prefix.
+       was advised, and patched by Naoki Tomita (tomi-ru).
+     - Implemented some Number::Phone compatible methods and interfaces.
+       was also patched by Naoki Tomita (tomi-ru). thanks a lot.
+
+0.20110901 Mon Sep  5 2011
+     - Update some table classes.
+
+0.20110801 Mon Aug  8 2011
+     - Update some table classes.
+
+0.20110704 Fri Jul  8 2011
+     - Update some table classes.
+
+0.20110601 Thu Jun  9 2011
+     - Update some table classes.
+
+0.20110502 Wed Jun  8 2011
+     - fixed to avoid being purged the hash of phone number table
+       if you use this module twice or more than twice time.
+       was patched by TOKUHIROM (MATSUNO★Tokuhiro). thanks.
+
+0.20110401 Fri Apr  8 2011
+     - Update some table classes.
+
+0.20110301 Fri Mar  4 2011
+     - Update some table classes.
+     - move a test involved with perlcritic to xt (author_test)
+       to stop to be received some reports.
+
+0.20110201 Wed Feb  9 2011
+     - Update some table classes.
+
+0.20110106 Fri Jan 14 2011
+     - Update some table classes.
+
+0.20101201 Tue Dec  7 2010
+     - Update some table classes.
+
+0.20101101 Tue Nov  9 2010
+     - Update some table classes.
+
+0.20101001 Tue Oct 12 2010
+     - Update some table classes.
+
+0.20100906 Mon Sep 13 2010
+     - Update some table classes.
+     - Ministry of Internal Affairs and Communication of Japan
+       has been started providing the data of phone numbers as
+       Microsoft Excel formats by request from me.
+       I appreciate their sincere response and I apologize
+       my inappropriate change-log as below.
+     - Regexp generator was rebundled.
+
+0.20100701 Tue Aug  3 2010
+     - Update some table classes.
+     - Pod update.
+     - Ministry of Internal Affairs and Communication of Japan
+       has stopped providing the data of phone numbers by HTMLs.
+       Instead, bloody PDFs have been started to provide
+       as substitute for HTMLs. They suck. Then I tried to make
+       the massive regexp tables by myself.
+     - Regexp generator was removed.
+
+0.20100601 Wed Jun  9 2010
+     - Updated some table classes
+
+0.20100401 Wed Apr  7 2010
+     - Updated some table classes
+
+0.20100302 Tue Mar  9 2010
+     - Covered the failure of previous version.
+
+0.20100301 Tue Mar  9 2010
+     - Updated some table classes
+
+0.20100104 Thu Jan 28 2010
+     - Updated some table classes ...
+       was menthioned by MIKIHOSHI (KAN Fushihara). thanks for letting me know.
+     - Added a new table class Number::Phone::JP::Table::Fmc
+     - And also Number::Phone::JP::Table::Upt class will be deprecated
+       in near future.
+     - Added a script that updates all of the table classes
+       when the tables are updated.
+
+0.12  Thu Jun  4 2008
+     - Updated some table classes
+
+0.11  Thu Feb 12 2008
+     - Updated all table classes
+
+0.10  Thu Feb 15 2007
+     - Full refactored. lib/* and t/*
+     - Added a new table class Number::Phone::JP::Table::Upt
+
+0.03  Thu Jul 11 2003
+     - Bug fixed in set_number() method working.
+       ... is_valid_number() method reuses old garbage data when the
+           passed argument(s) is invalid.
+           Found by Taro Nishino. Thanks !!
+     - Added new pattern to set a phone number by scalar context.
+       ... Perceived by Taro Nishino. Thanks too !!
+
+0.02  Tue Jul 11 2003
+     - Bug fixed in table of Number::Phone::JP::Table::Home.
+       ... local area prefix must not begins from "0" (ZERO).
+
+0.01  Tue Jul 08 2003
+     - original version

@@ -1,0 +1,12 @@
+This distribution includes a few RADIUS servers with different degrees
+if functionality in the examples directory. If you're considering
+writing a RADIUS server, take a look at Net::Radius::Server before
+starting.
+
+Net::Radius::Server is an extensible framework allowing the creation
+of RADIUS servers with very little programming. Complex tasks are
+easily accomplished by means of a pipeline architecture in which each
+request is matched and then acted upon by Perl code.
+
+Classes implementing common tasks are already included.
+

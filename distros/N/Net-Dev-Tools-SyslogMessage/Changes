@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::Dev::Tools::SyslogMessage.
+
+1.00  Wed Dec 19 08:31:09 2007
+	- first version
+1.01  Thu Feb 26 19:56:45 2015
+    - Added fix to %SYSLOG_MONTH_CODES (Jul is #7, not #6), thanks to ABRAXXA for letting me know

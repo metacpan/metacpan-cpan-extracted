@@ -1,0 +1,25 @@
+Revision history for Perl extension Netgear::WGT624.
+
+0.04 Thu May 11 21:02:29 EDT 2006
+	- Changed the previous driver file from get-wgt624-statistics
+	  to get-wgt624-status for the sake of warding off carpal tunnel
+	  as much as possible.
+	- Changed method getStatistic to getStatus in WGT624.pm to be 
+	  similar to other naming changes in program.
+	- Improved documentation and made terms of licensing more visible.
+	- Turned some methods that should have been private into closures
+	  in WGT624.pm.
+
+0.03 Thu May 11 15:11:39 2006
+	- Adds better functionality for Windows systems.
+	- More test cases and robustness for router addresses
+	  in different formats.	
+	
+
+0.02 No date information entered.
+	- Change information not entered.
+
+0.01  Sun Mar 26 17:08:45 2006
+	- original version; created by h2xs 1.23 with options
+		-X -n Netgear::WGT624
+

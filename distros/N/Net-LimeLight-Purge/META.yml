@@ -1,0 +1,23 @@
+---
+abstract: 'LimeLight Purge Service API'
+author:
+  - 'Cory G Watson <gphat@cpan.org>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.75'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Net-LimeLight-Purge
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DateTime::Format::ISO8601: 0.06
+  Moose: 0.72
+  MooseX::AttributeHelpers: 0.14
+  SOAP::Lite: 0.710.08
+version: 0.03

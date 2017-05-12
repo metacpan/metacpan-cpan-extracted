@@ -1,0 +1,37 @@
+2004-10-23  Tiago Stock <tstock@tiago.com> (0.09)
+
+	* Added Net::Nessus::Message::FINISHED
+	* Change defaul port from 3001 to 1241
+
+2001-06-08  Jochen Wiedmann  <joe@ispsoft.de> (0.07)
+
+	* lib/Net/Nessus/Client.pm (new): Telnetmode is now set
+	  to 0. (Chee-Wai Yeung <cheewai@cs.ust.hk>)
+
+2001-05-07  Jochen Wiedmann  <joe@ispsoft.de> (0.07)
+
+	* Added two bug fixes from Chee-Wai Yeung <cheewai@cs.ust.hk>.
+
+2001-02-25  Jochen Wiedmann  <joe@ispsoft.de> (0.06)
+
+	* Added Net::Nessus::Message::ERROR.
+
+1999-01-31  Jochen Wiedmann  <joe@ispsoft.de> (0.05)
+
+	* lib/Net/Nessus/Client.pm (Attack): Added the possibility
+	  to scan multiple hosts with one call.
+
+1999-01-29  Jochen Wiedmann  <joe@ispsoft.de> (0.04)
+
+	* lib/Net/Nessus/Message.pm: Added support for NTP 1.2.
+	* lib/Net/Nessus/Client.pm: Added Attack and Show* methods.
+	* Added nessusc.PL as a Perl frontend; test.pl is now
+	  based on it.
+	* Term::ReadKey is a prerequisite now.
+
+1998-12-21  Jochen Wiedmann  <joe@ispsoft.de> (0.02)
+
+	* lib/Net/Nessus/Message.pm: Fixed missing 'name' attribute in
+	  Net::Nessus::Message::PLUGIN_LIST.
+
+$Id: ChangeLog,v 1.4 1999/01/31 14:03:17 joe Exp $

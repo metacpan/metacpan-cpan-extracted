@@ -1,0 +1,108 @@
+#!/usr/bin/perl -w
+
+use warnings;
+use strict;
+use Net::VNC;
+use Getopt::Long;
+use Pod::Usage;
+
+my %opts = (
+    password   => '',
+    host       => 'localhost',
+    port       => 5900,
+    depth      => 24,
+    type       => 'png',
+    cursor     => 0,
+    outfile    => undef,
+    endian     => undef,
+    verbose    => 0,
+    help       => 0,
+    version    => 0,
+);
+
+Getopt::Long::Configure('bundling');
+GetOptions('P|password=s' => \$opts{password},
+           'H|host=s'     => \$opts{host},
+           'p|port=s'     => \$opts{port},
+           'd|depth=s'    => \$opts{depth},
+           't|type=s'     => \$opts{type},
+           'C|cursor'     => \$opts{cursor},
+           'o|outfile=s'  => \$opts{outfile},
+           'e|endian'     => \$opts{endian},
+           'v|verbose'    => \$opts{verbose},
+           'h|help'       => \$opts{help},
+           'V|version'    => \$opts{version},
+           ) or pod2usage(1);
+if ($opts{help}) {
+    pod2usage(-exitstatus => 0, -verbose => 2);
+}
+if ($opts{version}) {
+    print "Net::VNC v$Net::VNC::VERSION\n";
+    exit 0;
+}
+my $end = shift || 1;
+$end = 1 if ($end =~ /\D/);
+
+my $vnc = Net::VNC->new({hostname => $opts{host},
+                         port => $opts{port},
+                         password => $opts{password},
+                        });
+$vnc->server_endian($opts{endian});
+$vnc->depth($opts{depth});
+$vnc->login();
+print "Logged in\n" if ($opts{verbose});
+
+$vnc->hide_cursor(!$opts{cursor});
+
+for my $n (1..$end) {
+   my $filename
+       = defined $opts{outfile} ? $opts{outfile}.($end == 1 ? q{} : q{.}.$n)
+       : sprintf 'snapshot%04d.%s', $n, $opts{type};
+    $vnc->capture()->save($filename);
+    print "Wrote $filename\n" if ($opts{verbose});
+}
+
+__END__
+
+=head1 NAME
+
+vnccapture - Capture a screenshot via VNC
+
+=head1 SYNOPSIS
+
+ vnccapture [options] [numcaptures]
+
+ Options:
+   -P --password=str   password for the VNC server, if applicable
+   -H --host=str       address of VNC server (default: 'localhost')
+   -p --port=num       TCP port for VNC server (default: 5900)
+   -d --depth=8|16|24  screen depth for capture (default: 24)
+   -t --type=ext       image type for output (default: 'png')
+   -C --cursor         include the mouse cursor in the image
+   -o --outfile        capture to the specified path
+                       otherwise capture to "snapshot<num>.<type>"
+   -v --verbose        print status and diagnostics to STDOUT
+   -h --help           verbose help message
+   -V --version        print the Net::VNC version
+
+=head1 DESCRIPTION
+
+Connect to a VNC server and capture the screen one or more times.  The
+output is written to, for example, C<snapshot0001.png>.  The number is
+the sequence of captures and the extension is specified by the
+C<--type> argument.
+
+The C<--type> argument can be any format that L<Image::Imlib2> can
+support.
+
+=head1 SEE ALSO
+
+L<Net::VNC>
+
+L<Image::Imlib2>
+
+=head1 AUTHOR
+
+Chris Dolan, I<cdolan@cpan.org>
+
+=cut

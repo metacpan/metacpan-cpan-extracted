@@ -1,0 +1,35 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7fd9ff9bb3a4250acdbc5bf6362ad343e2cb33e3 Changes
+SHA1 0b0d3fe360f7a445c3a3a21feb6ea278db155ba3 LICENSE
+SHA1 a5f188761b258d6e6ae1990473c4768ce9db759d MANIFEST
+SHA1 59549cfb0fe14c858e642738f1baee7db286e1c0 MANIFEST.SKIP
+SHA1 9c75dbf0ed26bef4d108e22de95be52e33628922 META.yml
+SHA1 368efc559d727068991b8f01f98f02b32dfc6d90 Makefile.PL
+SHA1 5e69706f0be89a49fd1ff0142f3f32c322310cdd README
+SHA1 5a665d2aa6000696ddfd2f6c6c70c51a2f4f6cd5 lib/Number/Phone/Formatter/EPP.pm
+SHA1 519eeb8342b1615bbc8e2077928e39881b61888e t/author-pod-coverage.t
+SHA1 f406569e6d2f498d09ae9f62baeb9b5b0c84ffbc t/author-pod-syntax.t
+SHA1 7afed6406017d09e119d1f771841d2714df3d53c t/basic.t
+SHA1 98daf46002aba9a0b19c26f10b02c6dc91820d31 t/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iD8DBQFXvv40+CqvSzp9LOwRAnDbAJ4wYZFbykEXfL1zXPLcyPuvX9e8TgCfUrPI
+RuJcPw5a+AjErrn7ZsIsnjQ=
+=oQU3
+-----END PGP SIGNATURE-----

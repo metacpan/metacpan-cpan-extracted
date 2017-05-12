@@ -1,0 +1,62 @@
+#!/usr/bin/env perl
+#
+# Usage example (with distribution files:
+#    bin/tmch -p --smdrl t/smd-test-revocation-15jul13-en.csv \
+#      check test/testset-20130715/smd-revoked/Court-Agent-Arabic-Revoked.smd
+
+use warnings;
+use strict;
+
+use Log::Report;
+use Getopt::Long qw(GetOptions);
+
+# Development path, can be removed when all of these modules are installed
+use lib 'lib', '../WSSSIG/lib', '../XMLWSS/lib', 'lib';
+
+use Net::Domain::TMCH  ();
+
+my ($pilot, $help, $smdrl, $tmvrl) = (0, 0, undef, undef);
+
+sub help() { print <<__HELP; exit 1 }
+  $0 [OPTIONS] ACTION
+  Options:
+    --pilot -p         use pilot settings
+    --help  -h         this help
+    --smdrl            SMD serials revocation list (needs filename or URI)
+    --tmvrl            TMV certificate revocations (filename or URI)
+  Actions:
+      check <smdfile> ...
+__HELP
+
+GetOptions
+    'pilot|p!'  => \$pilot
+  , 'help|h|?!' => \$help
+  , 'smdrl=s'   => \$smdrl
+  , 'tmvrl=s'   => \$tmvrl
+    or help;
+
+@ARGV
+    or help;
+
+my $action = shift @ARGV;
+
+my $tmch = Net::Domain::TMCH->new
+  ( is_pilot         => $pilot
+  , smd_revocations  => $smdrl
+  , cert_revocations => $tmvrl
+  );
+
+if($action eq 'check')
+{   @ARGV or error __x"action 'check' requires SMD filenames";
+
+    foreach my $smdfn (@ARGV)
+    {   my $smd = try {$tmch->smd($smdfn)};
+        if($@) { print $@->wasFatal->message, "\n" }
+        else   { print "OK $smdfn\n" }
+    }
+}
+else
+{   error __x"unknown action '$action'";
+}
+
+exit 0;

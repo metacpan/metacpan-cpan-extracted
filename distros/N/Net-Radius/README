@@ -1,0 +1,119 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+
+
+Net::Radius Modules
+===================
+
+The modules included here provide an interface to the RADIUS
+protocol. It consists of the following modules:
+
+Net::Radius::Packet	- Deals with RADIUS packets
+Net::Radius::Dictionary	- Deals with RADIUS dictionaries
+
+This module is essentially the original RADIUS-1.0 distribution by
+Christopher Masto plus a number of changes and fixes by Luis Muñoz and
+Ian Smith.
+
+It has been changed so that it better fits the CPAN namespace. See the
+other README.* files in this archive for additional information.
+
+The installation follows the standard protocol...
+
+$ perl Makefile.PL
+$ make
+$ make test
+$ make install
+
+The ./examples directory contain a number of simple examples.
+
+This code supports the use of vendor specific attributes. This
+type of attribute is defined in RFC-2138 and is used to support
+'propietary' extensions on top of the base RADIUS specification.
+
+There are two new kinds of entries in the RADIUS dictionary in
+order to specify VSAs.
+
+VENDORATTR <vendor> <attribute> <id> <type>
+
+This entry is used to create a new kind of vendor attribute,
+such as in this example
+
+VENDORATTR 	9 	cisco-avpair 	1 	string
+
+This creates a new vendor-specific attribute for vendor 9 (Cisco
+Systems), with name 'cisco-avpair'. This attribute is identified by
+numeric id '1' and is associated with a string value.
+
+The second type of entry allows the specification of named values.
+The following is an hypotetical example of named value entry.
+
+VENDORATTR	9	cisco-enum	254	integer
+VENDORVALUE	9	cisco-enum	Value-1	1
+VENDORVALUE	9	cisco-enum	Value-2	2
+VENDORVALUE	9	cisco-enum	Value-3	3
+
+Alternatively, you can use the widely deployed FreeRadius dictionary
+files' syntax of:
+
+VENDOR		Cisco		9
+ATTRIBUTE	Cisco-AVPair	1	string		Cisco
+
+About the stability, this code has been in very active use at a
+largish ISP with millions of users using a variety of network
+equipment with impressive results. It has been succesfully used under
+FreeBSD, Linux, Solaris and Tru64.
+
+There's copious support material along with this distribution. Please
+do take a look.
+
+DO YOU WANT TO THANK ME?
+
+If  you consider this  a valuable  contribution, there  is a  web page
+where you can express your gratitude. Please see
+
+	http://mipagina.cantv.net/lem/thanks-en.html (English)
+	http://mipagina.cantv.net/lem/thanks-es.html (Spanish)
+
+SECURITY CONSIDERATIONS
+
+I have no control on the machanisms involved in the storage or
+transport of this distribution. This means that I cannot guarantee
+that the distribution you have in your hands is indeed, the same
+distribution I packed and uploaded.
+
+Along the distribution file, you should have a file with the extension
+".asc". This contains a GPG "detached signature" that makes it
+impossible for anybody to alter this distribution. If security is of
+any concern to you, by all means verify the signature of this file and
+contact the author if any discrepancy is detected.
+
+You can find more information about this at the following URL
+
+             http://mipagina.cantv.net/lem/gpg/
+
+COPYRIGHT AND LICENSE
+
+Original work (c) Christopher Masto. Changes (c) 2002,2003 Luis
+E. Muñoz <luismunoz@cpan.org>.
+
+This software can be used under the same terms as perl itself. It also
+carries the same warranties.
+
+Please send bug reports (or patches) as well as feedback and
+suggestions to
+
+luismunoz@cpan.org
+
+When submitting bugs, it is very important that you include the
+relevant information for reproducing the bug. Packet dumps are most
+useful.
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.1 (Darwin)
+
+iD8DBQFEznquQyDWGRI/hhARAq37AJ4nwkdiU1eqgpTObZ0G2QZ0jvQU2QCgkR28
+nf3syw7TJsGGyrr/KSTcyfU=
+=Of85
+-----END PGP SIGNATURE-----

@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               Net-Elexol-EtherIO24
+version:            0.22
+abstract:           Threaded object interface for manipulating Elexol Ether I/O 24 units with Perl
+author:
+    - Chris Luke <chrisy@flirble.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    IO::Select:        0
+    IO::Socket::INET:  0
+    Socket:            0
+    Test::More:        0
+    threads:           0
+    threads::shared:   0
+    Time::HiRes:       0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

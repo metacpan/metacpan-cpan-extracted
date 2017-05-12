@@ -1,0 +1,46 @@
+
+
+  Net::Whois::RIPE::Syncupdates -- Perl interface to the RIPE Whois Database
+
+
+  Syncupdates is the facility of the RIPE database to enable updates 
+  synchronously, meaning the result is returned immediately to the user. In 
+  the other method, asynchronous updates, the update is e-mailed to the 
+  server, and the result is e-mailed back.
+
+  This package implements a client to the Syncupdates backend, and can be
+  used to send arbitrary updates to the RIPE database.  The package has an 
+  object oriented interface which supports the password-based authentication
+  scheme, and has hooks via which other authentication methods can be 
+  implemented.
+
+  Note that this is BETA code, we are providing it in order to collect
+  input from the user community.  
+  
+  Please send bug reports, feedback to: <swbugs@ripe.net>
+
+
+
+
+
+
+
+  Copyright (c) 1993 - 2003 RIPE NCC
+  
+  All Rights Reserved
+  
+  Permission to use, copy, modify, and distribute this software and its
+  documentation for any purpose and without fee is hereby granted,
+  provided that the above copyright notice appear in all copies and that
+  both that copyright notice and this permission notice appear in
+  supporting documentation, and that the name of the author not be
+  used in advertising or publicity pertaining to distribution of the
+  software without specific, written prior permission.
+  
+  THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
+  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
+  AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
+  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+  AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+  

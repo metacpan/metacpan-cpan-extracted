@@ -1,0 +1,18 @@
+Revision history for Perl extension Net::Frame::Layer::LLC.
+
+1.03 Tue Jan 13 19:31:43 CET 2015
+   - update: copyright notice
+   - update: Kwalitee
+
+1.02 Thu Jun  3 14:44:35 CEST 2010
+   - bugfix: Bit::Vector is PREREQ
+   - update: copyright notice and email address
+
+1.01 Mon Mar 26 23:43:01 CEST 2007
+   - UPDATE: LLC has split, new layer: SNAP
+   - bugfix: byte ordering in unpack()
+   => thanx to kittekat for all the debugging
+
+1.00 Wed Jan  3 22:51:56 CET 2007
+   - first public release
+

@@ -1,0 +1,36 @@
+Revision history for Net-NodeTransformator
+
+0.105 2015-07-09
+ - shutdown socket
+
+0.104 2014-12-11
+ - fix prerequirements
+ - provide asychronous form of standalone()
+
+ [API CHANGES]
+
+ [BUG FIXES]
+
+ [DOCUMENTATION]
+
+ [ENHANCEMENTS]
+
+0.103 2014-11-27
+ - provide standalone mechanism
+ - use AnyEvent::Proc instead of IPC::Run
+
+0.102 2014-11-22
+ - use Dist::Zilla::TravisCI
+ - install Software::License::ISC at first
+ - install Software::License::ISC at first
+ - fix a problem with automatic build IPC::Run
+ - delete obsolete directory
+ - manually add CBOR::XS to Prereqs
+ - use Dist::Zilla::Plugin::GithubMeta
+
+0.101 2014-11-19
+ - (no information about this release available)
+
+0.100 2014-11-19
+ - (no information about this release available)
+

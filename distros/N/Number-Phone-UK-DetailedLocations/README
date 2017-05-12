@@ -1,0 +1,13 @@
+This module does nothing on its own, but is an add-on for Number::Phone::UK,
+to make the location() method more accurate.  I decided to distribute it
+seperately because to include all this data as well as that for the national
+numbering scheme would make the module ridiculously big.  Better to have this,
+which will not be needed so often and is updated far less often, as a seperate
+package.
+
+To install it, do the usual dance:
+
+    perl Makefile.PL
+    make
+    make test
+    make install

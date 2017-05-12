@@ -1,0 +1,13 @@
+
+$Revision: 1.3 $
+$Author: aryeh $
+$Date: 2001/01/24 22:25:30 $
+
+There are still a few things that are not ready yet.
+
+- First and most importantly is connection/disconnection handling
+- A few instances of messy pointers .... I have to make sure
+      everything is organized neatly.
+- Hack at implementing the real AOL IM PROTOCOL.
+
+

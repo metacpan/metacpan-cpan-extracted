@@ -1,0 +1,225 @@
+=======================================================================
+                Net::LDAPapi Module v3.0.x for Perl5
+		by Quanah Gibson-Mount @ Zimbra, Inc.
+	based on version 2.00 by Quanah Gibson-Mount @ Stanford University
+	based on version 1.50 by Howard Chu @ Symas Corporation
+	based on version 1.43 by Clayton Donley, <donley@wwa.com>
+=======================================================================
+
+COPYRIGHT
+=========
+
+   Copyright (c) 2007 Quanah Gibson-Mount. All rights reserved
+   Copyright (c) 2007 Board of Trustees, Leland Stanford Jr. University
+   Copyright (c) 2003 Howard Chu. All rights reserved.
+   Copyright (c) 1998 Clayton Donley. All rights reserved.
+   This program is free software; you can redistribute it and/or
+   modify it under the same terms as Perl itself.
+
+
+INTRODUCTION
+============
+
+This module acts as a Perl5 interface to the LDAP C Development Kits from
+OpenLDAP and Mozilla.  The module itself is written completely
+in C.  Full documentation is included, as are commented example scripts. 
+The current version supports the LDAPv3 API as implemented in OpenLDAP.
+
+REQUIREMENTS
+============
+
+This module requires Perl5, a C compiler, and the LDAP libraries and include
+files from one of the following: 
+
+OpenLDAP C SDK (support added by Symas):
+    http://www.openldap.org
+Mozilla LDAP C SDK
+    http://wiki.mozilla.org/LDAP_C_SDK
+
+A C Compiler is not required for the NT version if you download Perl5
+and module binaries and the Mozilla SDK (you must copy the DLL into your
+system directory).
+
+
+PLATFORMS SUPPORTED
+===================
+
+This version should be easily compiled on various platforms. It has been tested
+extensively under Solaris and Linux.
+
+As of 3.00, the module has not been tested on Windows.
+
+Please let me know if you compile it successfully on a new platform or have
+any problems. For problems, please include the compilation errors. 
+
+Support for the Mozilla SDK has not been tested with the v3 rewrites.  Testing
+welcomed.
+
+
+NEW PERL-OO INTERFACE
+=====================
+
+As of version 1.40, a new Perl-OO layer has been added to allow more
+object oriented access into the API.  All of the original commands are
+unchanged, but are no longer documented.  You are encouraged to use the
+new OO style routines, which are documented in the man-page.
+
+Version 1.42 and above support passing named arguments to all methods.
+
+
+UNIX INSTALLATION
+=================
+
+   After extracting the archive, simply type the following:
+
+      $ perl5 Makefile.PL
+      $ make
+
+   Edit the file test.pl to contain your LDAP server, BASEDN, and filter
+string.  Next type:
+
+      $ make test
+
+   It should complete all of its tests with no problems.  To install the
+module you will likely need to become root and type:
+
+      # make install
+
+   That's it.  You can now 'use Net::LDAPapi' and make LDAP calls within your
+PERL5 scripts with ease.
+
+NT SOURCE INSTALLATION
+======================
+
+   I use Microsoft Visual C++ 5.0.  I am not certain what procedures you will
+need to follow with other compilers.
+
+   C:\> perl Makefile.PL
+
+   Answer the questions appropriately.  Supply the path to PERL.EXE and the
+Mozilla library and include files from their SDK.
+
+   C:\> nmake
+
+   The module will now be built.
+
+   c:\> edit test.pl
+
+   Change the LDAP server name and other attributes as necessary.
+
+   C:\> nmake test
+
+   If it passes most of the tests, it probably works, so you'll want to
+install.  For this, just type:
+
+   C:\> nmake install
+
+   You can now do a 'use Net::LDAPapi' from your NT Perl modules.  You will
+also want be be sure to copy the nsldap32v11.dll file into your system32
+folder.
+
+ 
+NT BINARY INSTALLATION
+======================
+
+   First, obtain Perl 5.004 binaries for Windows NT.  You can get it at the
+following URL:  http://www.perl.com/CPAN-local/authors/id/GSAR/.  Simply get
+one of the files starting with 'perl5.004'.
+
+   You will also need the Mozilla LDAP SDK mentioned previously.  Copy the
+nsldap32v11.dll file from that archive into your system32 folder.
+
+   Finally, unzip the archive into the C:\ directory if you installed
+PERL in C:\PERL.  Otherwise, extract to the parent directory of your PERL
+installation directory.
+
+
+EXAMPLES
+========
+
+   There exists six examples in the 'examples' directory.  The current
+examples are:
+
+      o ldapwalk.pl - This script demonstrates the use of Asynchronous LDAP
+         calls to return all the attributes and values for entries matching
+         a filter specified on the command line.  Simply change the variables
+         at the start of the file to match your environment.
+
+      o ldapwalk2.pl - This is the same as ldapwalk.pl, only it shows how to
+         replace the portion that retrieves results and packages them in
+         the hash of hashes with the new get_all_entries function.
+
+      o testwrite.pl - This script demonstrates using synchronous Add, Modify,
+         and Delete calls to manage an LDAP server.  You need update access
+         to an LDAP server to run this example.  Once again, simply change
+         the variables at the top of the file.
+
+      o www-ldap.pl - This script uses both this module and the CGI.pm
+         module available on the Internet (and included in 5.004).  It
+         allows users to authenticate and modify their own information.
+         You can easily customize this program, or learn from it and
+         write your own CGIs.  The BIND and WEB_AUTHENTICATE subroutines
+         would be especially useful in incorporating LDAP authentication
+         into your own CGI scripts, even if the script has nothing to
+         do with LDAP otherwise.
+
+      o web500.pl - This script is a complete Web->LDAP gateway.  It uses
+         CGI.pm and this module.  It can be easily customized, supports
+         searching, modifications, and even things like jpegphoto uploads
+         and displaying.  The original design used frames, but switched
+         to a WebPH style interface for the search part on the advice of
+         Douglas Gray Stephens.
+
+      o updatepw.pl - Updates a password entry for a user from Unix into
+         the LDAP server.  You'll likely have to tinker with this program
+         to get it to do exactly what you want, but it exists as an idea
+         as to how you can do this.
+
+      o ldap_mod_attr.pl - Matches a filter or UID and makes specified changes
+         to each entry.  Contributed by Andrew J Cosgriff.
+
+   In addition, the test.pl program in the top level directory shows some
+of the basic synchronous search functionality.
+
+
+LDAP C API SUPPORT
+==================
+
+   This module supports direct perl access to all C API calls with the
+exception of filter generation calls (since you can do this better in Perl
+anyway).
+
+   While direct access is available, it is suggested that you use the
+Perl-OO style interface if you have never used the C API.
+
+
+FEEDBACK
+========
+   Any feedback should be directed to quanah.gibsonmount@gmail.com
+
+
+BUGS
+====
+
+   The non-OO stuff should work well.  Please let me know if I've introduced
+any bugs in the OO stuff or the changed examples.
+
+   Please report bugs at github - https://github.com/quanah/net-ldapapi/issues/
+
+--
+Clayton Donley
+Rolling Meadows, IL, USA
+email: donley@wwa.com
+web:   http://www.wwa.com/~donley
+CPAN:  /authors/id/CDONLEY
+
+Howard Chu
+Chief Architect, Symas Corporation	http://www.symas.com
+Core Team, OpenLDAP Project		http://www.openldap.org
+
+Quanah Gibson-Mount
+email: quanah.gibsonmount@gmail.com
+CPAN: /by-authors/id/M/MI/MISHIKAL
+Platform Architect
+Synacor, Inc				http://www.zimbra.com http://synacor.com/
+Core Team, OpenLDAP Project		http://www.openldap.org

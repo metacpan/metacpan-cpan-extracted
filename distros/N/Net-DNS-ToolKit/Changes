@@ -1,0 +1,243 @@
+Revision history for Perl extension Net::DNS::ToolKit
+
+0.48  Mon Jan 27 11:59:58 PST 2014
+        modify Makefile.PL to bypass missing 'pod2text'
+
+	correct typo's in documentation for NULL and TXT
+	Net::DNS::ToolKit::RR data records
+
+	add test for "names" ending '.'
+	die with message, not allowed per RFC's
+
+	localize $_ in RR.pm v0.09
+
+0.47  Tue Apr 16 11:59:02 PDT 2013
+	add #ifdef BIND_4_COMPAT
+	around #include nameser_compat.h
+	so that later versions of OpenBSD work properly
+
+0.46  Sun Apr  7 14:16:12 PDT 2013
+	add support for SRV
+
+0.45  Nov 17 11:52:05 PST 2011
+	update buggy test for Windows OS in Makefile.pl, bug #72478
+	Thanks to Chrisv for spotting that.
+
+0.44  Sat Nov  5 14:02:42 PDT 2011
+	add support for 'unknown RR's' per RFC 3597
+	add support for 
+		AFSDB
+		ISDN
+		MD
+		MF
+		RT
+		X25
+
+0.43  Fri Sep 23 23:08:24 PDT 2011
+	add test for OS "windows" and exit 0
+
+	add "putflags" function
+
+0.42  Sat Mar  7 17:38:03 PST 2009
+	edits to xs_include/dn_expand.inc and ToolKit.xs
+	to clean up char/u_char mismatches that "cc" cares about
+
+0.41  Wed Oct 15 14:19:29 PDT 2008
+	require Net::DNS::Codes version 0.09 or higher
+
+0.40  Wed Oct 15 13:30:22 PDT 2008
+	revised get_ns and replaced it with a cluster of XS and perl
+	routines to circumvent thread issues in res_init and res_ninit
+
+0.39  Mon Oct  6 13:16:02 PDT 2008
+	clean up windows build bug
+
+0.38  Thu Oct  2 14:49:26 PDT 2008
+	update ToolKit.xs get_ns to be thread safe
+
+0.37  Sat Sep 27 11:16:29 PDT 2008
+	Include definition of MAXDNAME missing in osx
+	Thanks to schneecrash@gmail.com for pointing this out
+
+0.36  Wed Feb 27 11:12:58 PST 2008
+	Fixed typo in sub 'newhead' where the wrong variable
+	referenced in argument testing.
+	Thanks to Rafal Krypa for spotting and reporting that error.
+
+0.35  release date missing 
+	update v0.05 of Utilities::dns_ptr to
+	return a scalar or an array of names
+
+0.34  Thu Oct  4 09:54:14 PDT 2007
+	include <arpa/nameser_compat.h>
+	so build works on OSX
+	Thanks to Chris Turner chris@turnerhq.com for providing
+	the bug fix.
+
+0.33  Wed Sep 19 21:28:00 PDT 2007
+	correct typo in variable name in dig.pl
+
+0.32  Wed Sep 19 21:08:21 PDT 2007
+	add "print header" switch to dig.pl
+
+0.31  Wed Apr 11 11:43:23 PDT 2007
+	RR.pm ver 0.06, small documentation update
+
+	Thanks to "Clayton O'Neill" <coneill@oneill.net> for spotting this
+	one. Fixed bug in dn_comp which only seems to manifest when you pass in
+	a name that begins with a number.  Sometimes it seems that if perl has
+	evaluated the scalar in a numeric context for some reason, it's type
+	will be considered to be IV, not PV.  The patch I've attached changes
+	the check to see if it's a glob first, and if not, checks to see if it
+	can be used as a PV, instead of checking if it is already a PV.
+
+0.30  Thu Oct 19 09:43:36 PDT 2006
+	Added RP and MINFO types
+
+0.29  Mon Jul 24 14:07:10 PDT 2006
+	remove unused reference to NetAddr::IP in
+	Net::DNS::ToolKit::Utilities
+
+0.28  Mon Jun  5 15:04:20 PDT 2006
+	remove references to miniSocket.inc in Makefile.PL
+	this is now imported from NetAddr/IP/Util
+
+	fix solaris compiler ENDIANness problems
+
+0.27  Tue Mar 28 21:02:54 PST 2006
+	migrate inex_xxx and ipv6_xxx functions to 
+	NetAddr::IP::Util
+
+0.26  Tue Mar 21 19:44:57 PST 2006
+	update MX.pm to correct documentation typo
+
+	fix ipv6_aton to correctly convert pathological case of
+	::1:2:3:4:5:6:7 and 1:2:3:4:5:6:7:: where there are 8 colons
+	i.e. ::nnn... ...nnn:: 	instead of starting or ending with 
+	:nnn nnn: or 0:nnn... ...nnn:0
+
+0.25  Sat Jun 11 23:34:32 PDT 2005
+	'new' failed to build a packet with a transaction ID of '0'
+	Thanks to "Clayton O'Neill" <coneill@oneill.net> for 
+	spotting that.
+
+0.24  Tue Feb 22 21:47:21 PST 2005
+	add IPv6 support for return records (not query)
+		ipv6_aton
+		ipv6_n2x
+		ipv6_n2d
+		getIPv6  
+		putIPv6
+
+0.23  Sat Nov 27 17:08:45 PST 2004
+	removed a legacy package 'use package'
+	that is not called in Net::DNS::ToolKit::Utilities
+
+0.22  Sun Nov 14 23:33:19 PST 2004
+	corrected a 'use package' call in t/ss_id.t
+	call should be to Net::DNS::ToolKit::Utilities
+	and was to a legacy package that is not a dependency
+	of this module
+
+0.21  Sat Sep 18 12:33:59 PDT 2004
+	update docs in Utilities.pm
+
+0.20  Wed Sep  1 15:56:25 PDT 2004
+	Create Utilities.pm from portions of
+	Mail::SpamCannibal::ScriptSupport
+
+	see comments in Mail::SpamCannibal v0.44 Changes
+
+0.19  not released
+	update rdns_blk.pl v0.03, add optional -d switch
+	to show rDNS response for bad lookups
+
+0.18  Thu Jun 24 15:38:36 PDT 2004
+	update rdns_blk.pl v0.02 to print PTR when response is a C_NAME
+
+0.17  Fri Jun  4 13:23:16 PDT 2004
+	correct documentation error for "parse_char"
+	correct documentation error in Net::DNS::ToolKit::RR::CNAME v0.04
+
+	add script 'rdns_blk.pl' to do lookups on cidr24 reverse IP's
+
+0.16  Sat Nov 22 14:32:27 PST 2003
+	There is a bug that I can't reproduce here on either the 
+	linux or sun boxes for version of perl 5.003 -> 5.8x so I've
+	added a trap in get_ns.t to check hosts for problems with 
+	resolver not returning the local host name server IP addy's
+	Hopefully, someone will find such a host and provide a user
+	account so I can find the problem and fix it.
+
+	DOCUMENTATION change only.
+	correct the comments for $put->CNAME,MB,MG,MR,NS,PTR
+	erronously said that $rdlength was an input ARG when
+	it is actually calculated and inserted by the function
+
+0.15  Sat Nov  1 09:44:17 PST 2003
+	change RR module instantiation from eval {some code}
+	to an eval "$code" in RR.pm. A problem arose where 
+	simltaneous instantations overwrote the namespace with
+	the old method.
+
+	missed typo "TookKit" in ToolKit.pm
+
+0.14  Mon Sep 29 10:22:30 PDT 2003
+	removed typo "TookKit" in numerous places
+
+First BETA release
+0.13  Thu Sep 25 11:14:25 PDT 2003
+	add Makefile constant MY_POD2TEXT
+
+0.12  Sun Sep 21 14:57:34 PDT 2003
+	add siteconf to define u_intxx_t on systems
+	where they are undefined
+
+0.11  Fri Sep 19 11:09:02 PDT 2003
+	putstring did not actually append at 'offset', instead
+	it always appended. Fix so it appends at offset.
+
+	RR::SOA, bad pointer to @dnptrs fixed,
+	RR::SOA, incorrectly calculated RDLENGTH
+
+0.10  Mon Sep 15 16:34:53 PDT 2003
+	update scripts/dig.pl to support +tcp flag
+	and the retrieval of multirecord zone transfers
+
+0.09  Tue Aug  5 15:14:56 PDT 2003
+	dn_comp pointer to dnptrs needed to be checked
+	that is was an RV. The RV value sometimes comes
+	back as an SVt_PVMG and sometimes a plain SVt_PV
+
+0.08  Thu Jul 31 18:35:44 PDT 2003
+	fixed bug in dig.pl where it would
+	loop if the dns server failed to respond
+	correctly to an axfr request.
+
+0.07  Sat Jul  5 21:40:45 PDT 2003
+	add 'put1char', update RR TXT to conform to
+	current BIND specifications, add RR HINFO,
+	extend Question to pick up $class from 
+	new statement but not override its own
+	$class argument.
+
+0.06  Sat Jun 28 18:05:31 PDT 2003
+	add work-around for perl 5.00503's missing newSVuv
+
+0.05  Wed Jun 25 08:23:49 PDT 2003
+	back port to perl 5.00503
+	gcc version egcs-2.91.66 19990314/Linux (egcs-1.1.2 release)
+	initial release
+
+0.04  Tue Jun 24 22:36:03 PDT 2003
+	various small edits for clean up
+
+0.03  Tue Jun 24 18:27:52 PDT 2003
+	change dn_comp to use a pointer
+	to array of dnptrs
+
+0.02  Wed Jun 18 22:21:33 PDT 2003
+	many additions
+
+0.01  Sat Jun 14 15:45:32 PDT 2003
+	alpha release

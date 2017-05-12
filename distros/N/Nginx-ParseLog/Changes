@@ -1,0 +1,11 @@
+Revision history for Perl extension Nginx::ParseLog.
+
+1.00  Sat Mar 28 23:50:43 2009
+        - original version; created by h2xs 1.23 with options
+		--omit-XS --omit-autoload --force --version=0.01 --compat-version=5.8.8 --name Nginx::ParseLog
+1.01  Mon Mar 30 20:02:43 2009
+        - fix examples
+1.02  Tue Jul 26 19:51:21 2016
+        - Added support to IPv6
+1.03  Thu Jul 28 17:02:38
+        - Corrected dependencies listed in the META files

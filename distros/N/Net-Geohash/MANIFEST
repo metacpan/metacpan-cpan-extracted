@@ -1,0 +1,8 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Net/Geohash.pm
+t/00-load.t
+t/01-use.t

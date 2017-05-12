@@ -1,0 +1,16 @@
+---
+name: Net-oRTP
+version: 0.02
+author:
+  - 'Nicholas Humfrey, njh@ecs.soton.ac.uk'
+abstract: Perl interface to the oRTP C library
+license: lgpl
+requires:
+  Test: 1.00
+build_requires:
+  Module::Build: 0.20
+provides:
+  Net::oRTP:
+    file: lib/Net/oRTP.pm
+    version: 0.02
+generated_by: Module::Build version 0.2611

@@ -1,0 +1,159 @@
+Net-oRTP version 0.02
+=====================
+
+Perl interface to the oRTP C library.
+
+
+INSTALLATION
+------------
+
+	I now use Module::Build to build and install the module.
+	To install this module type the following:
+	
+		perl Build.PL
+		./Build
+		./Build test
+		
+	And then as root:
+	
+		./Build install
+
+	Module::Build is available in the debian package:
+
+		libmodule-build-perl
+
+
+DEPENDENCIES
+------------
+
+	This module requires oRTP library on your system.
+	http://www.linphone.org/ortp/
+	
+	Version 0.9.x of oRTP is recommended (currently in CVS).
+
+
+
+API OVERVIEW
+------------
+
+	Methods marked with a dash will be included in version 0.1.
+	Methods marked with a question mark will be included in a later release.
+
+
+	Net::oRTP
+		- new( mode )  (mode={RECVONLY,SENDONLY,SENDRECV})
+		- set_blocking_mode( yesno )
+		? set_profile( profile )
+		? get_profile( )
+		- set_local_addr( addr, port )
+		- get_local_port()
+		- set_remote_addr( addr, port )
+		- get_jitter_compensation( )
+		- set_jitter_compensation( milisec )
+		- set_adaptive_jitter_compensation( yesno )
+		- get_adaptive_jitter_compensation()
+		- set_send_ssrc( ssrc )
+		- get_send_ssrc( )
+		- set_send_seq_number( seq )
+		- get_send_seq_number( )
+		- set_send_payload_type( pt )
+		- get_send_payload_type( )
+		- set_recv_payload_type( pt )
+		- get_recv_payload_type( )
+		- get_send_ts( )
+		- get_recv_ts( )
+
+		? signal_connect( signal, callback, userdata )
+		? signal_disconnect( signal, callback )
+		
+		- recv_with_ts( bytes, ts )
+		- send_with_ts( data, ts )
+		? create_packet( payload )
+		? recv_packet_with_ts( ts )
+		? send_packet_with_ts( packet, ts )
+		? get_current_send_ts()
+		? get_current_recv_ts()
+
+
+		- flush_sockets()
+		- reset()
+		? release_sockets()
+		? set_source_description( cname, name, email, phone, loc, tool, note )
+		? send_bye()
+
+
+	Net::oRTP::Packet
+		? set_payload( data )
+		? get_payload()
+		? set_markbit( value )
+		? get_markbit()
+		? set_seqnumber( seq )
+		? get_seqnumber()
+		? set_timestamp( ts )
+		? get_timestamp()
+		? set_ssrc( ssrc )
+		? get_ssrc()
+		? set_payload_type( pt )
+		? get_payload_type()
+
+
+	Net::oRTP::TelephoneEvent
+		? get_event
+		? set_event
+		? get_volume
+		? set_volume
+		? get_endbit
+		? set_endbit
+		? get_duration
+		? set_duration
+
+	Net::oRTP::Profile
+		? get_name
+		? get_payload( index )
+		? get_payload_from_mime
+		? get_payload_from_rtpmap
+		? get_payload_number_from_mime
+		? get_payload_number_from_rtpmap
+		? find_payload_number
+		? find_payload
+	
+	$Net::oRTP::Profile::AV
+		* instance of Net::oRTP::Profile
+
+	Net::oRTP::PayloadType
+		? get_media_type
+		? get_clock_rate
+		? get_bits_per_sample
+		? get_pattern_length
+		? get_normal_bitrate
+		? get_mime_type
+		? get_format_parameters
+	
+	
+		
+		
+
+AUTHOR
+------
+
+	Nicholas Humfrey, njh@ecs.soton.ac.uk
+
+
+COPYRIGHT AND LICENSE
+---------------------
+
+	Copyright (C) 2006 University of Southampton
+
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Lesser General Public
+	License as published by the Free Software Foundation; either
+	version 2.1 of the License, or (at your option) any later version.
+	
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Lesser General Public License for more details.
+	
+	You should have received a copy of the GNU Lesser General Public
+	License along with this library; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA

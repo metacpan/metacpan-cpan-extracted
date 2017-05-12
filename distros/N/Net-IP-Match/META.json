@@ -1,0 +1,58 @@
+{
+   "abstract" : "Efficiently match IP addresses against IP ranges",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.101582, CPAN::Meta::Converter version 2.101591",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-IP-Match",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Filter::Simple" : 0,
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : 0,
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "provides" : {
+      "Net::IP::Match" : {
+         "file" : "lib/Net/IP/Match.pm",
+         "version" : "1.101700"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-net-ip-match at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Net-IP-Match"
+      },
+      "homepage" : "http://search.cpan.org/dist/Net-IP-Match/",
+      "repository" : {
+         "url" : "http://github.com/hanekomu/Net-IP-Match"
+      }
+   },
+   "version" : "1.101700"
+}
+

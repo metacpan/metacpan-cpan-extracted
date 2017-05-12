@@ -1,0 +1,33 @@
+---
+abstract: 'easy, limited, Moose-based ORM for the unafraid'
+author:
+  - 'David Chester <davidchester@gmx.net>'
+build_requires:
+  DBD::SQLite: 0
+  ExtUtils::MakeMaker: 6.42
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Norma
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DBI: 0
+  Lingua::EN::Inflect::Number: 0
+  Moose: 0
+  Moose::Role: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::Role::Parameterized: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/dchester/Norma
+version: 0.02

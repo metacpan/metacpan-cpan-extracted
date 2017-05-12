@@ -1,0 +1,74 @@
+Net::MySQL
+==========
+
+Net::MySQL - Pure Perl MySQL network protocol interface.
+
+Net::MySQL is a Pure Perl client interface for the MySQL database.
+This module implements network protool between server and client of
+MySQL, thus you don't need external MySQL client library like
+libmysqlclient for this module to work. It means this module enables
+you to connect to MySQL server from some operation systems which MySQL
+is not ported. How nifty!
+
+
+OPERATING SYSTEM SUPPORTED BY 'Net::MySQL'
+
+This module has been tested on these OSes.
+
+   * MacOS 9.x with MacPerl 5.6.1r1
+   * MacOS X with perl 5.6.0 build for darwin
+   * Windows2000 with ActivePerl 5.6.1-build631
+   * FreeBSD 3.4 with perl 5.6.1 build for i386-freebsd
+   * FreeBSD 4.5 with perl 5.6.1 build for i386-freebsd
+   * FreeBSD 4.0 with perl 5.005_03 build for i386-freebsd
+   * Linux with perl 5.005_03 built for ppc-linux
+   * Linux with perl 5.6.0 bult for i386-linux
+   * Solaris 2.6 with perl 5.6.1 built for sun4-solaris
+   * Solaris 2.6 with perl 5.004_04 built for sun4-solaris
+
+# This list is the environment which I can use by the test usually.
+# Net::MySQL will operate also in much environment which is not in a list.
+
+Can use on Solaris2.6 with perl5.004_04, although 'make test' is
+failure.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  IO::Socket
+  DIGEST::SHA1
+
+BUG REPORT
+
+When a problem is found, please submit a bug report 
+to RT http://rt.cpan.org/ with following information
+
+  * The version and platform of Perl which are used.
+  * The version and platform of MySQL server.
+  * All the error messages generated with the problem.
+  * The sample code which can reproduce the problem.
+  * The execution result of the following code:
+       perl -MNet::MySQL -e 'print Net::MySQL::Password->scramble("hello", "world!", 1), "\n"'
+  * The output result which attached and operated the 'debug'
+    option to Net::MySQL.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002-2011 Hiroyuki OYAMA. Japan. All rights reserved.
+Copyright (C) 2011 Takuya Tsuchida
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

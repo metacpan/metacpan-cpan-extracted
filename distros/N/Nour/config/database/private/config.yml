@@ -1,0 +1,5 @@
+---
+development:
+    dsn: dbi:mysql:database=myapp_development;host=127.0.0.1;port=6033
+default:
+    password: this_is_hidden

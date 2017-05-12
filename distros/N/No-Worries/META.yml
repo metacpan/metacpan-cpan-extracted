@@ -1,0 +1,36 @@
+---
+abstract: 'coding without worries'
+author:
+  - 'Lionel Cons <lionel.cons@cern.ch>'
+build_requires:
+  Config: 0
+  File::Temp: 0
+  Getopt::Long: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: No-Worries
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Encode: 0
+  Fcntl: 0
+  HTTP::Date: 0
+  IO::Handle: 0
+  IO::Select: 0
+  POSIX: 0
+  Params::Validate: 0
+  Sys::Hostname: 0
+  Sys::Syslog: 0
+  Time::HiRes: 0
+  URI::Escape: 0
+version: 1.4

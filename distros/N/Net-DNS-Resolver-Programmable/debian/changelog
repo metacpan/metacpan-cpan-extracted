@@ -1,0 +1,36 @@
+libnet-dns-resolver-programmable-perl (0.003) unstable; urgency=low
+
+  * Depends: libnet-dns-perl
+  * Dropped build dependency on libtest-simple-perl for now.  There are
+    currently no tests.
+
+ -- Julian Mehnle <julian@mehnle.net>  Wed, 30 May 2007 22:03:19 +0000
+
+libnet-dns-resolver-programmable-perl (0.002.2) unstable; urgency=low
+
+  * Slightly adjusted license statement in debian/copyright.
+
+ -- Julian Mehnle <julian@mehnle.net>  Tue,  9 Jan 2007 13:00:00 +0000
+
+libnet-dns-resolver-programmable-perl (0.002.1) unstable; urgency=low
+
+  ! Depends, Build-Depends-Indep: libversion-perl
+  * Correctly handle undefined result code returned by custom resolver code.
+
+ -- Julian Mehnle <julian@mehnle.net>  Wed, 15 Nov 2006 15:30:00 +0000
+
+libnet-dns-resolver-programmable-perl (0.002) unstable; urgency=low
+
+  + Support non-RCODE strings to be returned by custom resolver code, which is
+    then taken as the resolver's error string.
+  * Do not fold identical returned RRs into a single RR.
+  * Minor documentation fixes.
+
+ -- Julian Mehnle <julian@mehnle.net>  Wed, 15 Nov 2006 03:45:00 +0000
+
+libnet-dns-resolver-programmable-perl (0.001) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Julian Mehnle <julian@mehnle.net>  Mon, 01 Jan 2005 01:00:00 +0100
+

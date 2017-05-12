@@ -1,0 +1,15 @@
+# example of entries in the file ~/.ssh/config
+Host local1
+HostName 127.0.0.1
+user mayname
+ForwardX11 yes
+
+Host local2
+HostName 127.0.0.2
+user anothername
+ForwardX11 yes
+
+Host local3
+HostName 127.0.0.3
+user nickname
+ForwardX11 yes

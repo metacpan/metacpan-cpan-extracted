@@ -1,0 +1,31 @@
+This directory contains two sample programs showing how to send and receive
+messages using Net::STOMP::Client. They use environment variables to get
+their configuration information.
+
+Here is for instance how to configure them for a remote broker with a guest
+account (assuming a Bourne shell):
+
+  $ export STOMP_HOST=test-broker
+  $ export STOMP_USER=guest
+  $ export STOMP_PASSWORD=guest
+
+Running the listener:
+
+  $ ./listener 
+  connected to 192.168.0.17:61613 using STOMP 1.0
+  subscribed to /topic/event
+  [...]
+
+The listener now hangs, waiting for messages.
+
+Running the publisher:
+
+  $ ./publisher 
+  connected to 192.168.0.17:61613 using STOMP 1.0
+  sent 10000 messages in 2.273 seconds
+
+The publisher sends a final message telling the listener to stop.
+The listener now reports:
+
+  [...]
+  received 10001 messages in 6.259 seconds

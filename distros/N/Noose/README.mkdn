@@ -1,0 +1,111 @@
+# NAME
+
+Noose - just enough object orientation to hang yourself
+
+# VERSION
+
+version 0.001
+
+# DESCRIPTION
+
+[Moose](http://search.cpan.org/perldoc?Moose) led to [Mouse](http://search.cpan.org/perldoc?Mouse) led to [Moo](http://search.cpan.org/perldoc?Moo) led to [Mo](http://search.cpan.org/perldoc?Mo) led finally to [M](http://search.cpan.org/perldoc?M), which gives
+you the least object-orientation possible, which is none at all. Noose continues
+this [illustrious trend](https://twitter.com/\_doherty/statuses/115258513390960640).
+
+__Noose gives you _just_ enough object orientation to hang yourself.__
+
+# METHODS
+
+## import
+
+Imports the ["new"](#new) constructor into your class.
+
+## new
+
+You can use ["import"](#import) to bring __new__ into your class, and it will become a
+constructor that blesses any key-value pairs provided into an object of the
+specified class. This is probably not very useful if you are trying not to
+hang yourself, _hint hint_.
+
+Simply `use Noose` to give your class a `new` method. When the method is
+called with some key-value pairs, a new object of the specified class is
+created with the given attributes. Methods are created for each attribute,
+in the familiar accessor form: calling the method with no arguments just
+returns the current value for that attribute; calling the method with an
+argument sets the attribute to that value. No checking of any kind is
+performed.
+
+## Controlling object construction
+
+If you need to have attributes that shouldn't be given in the contructor,
+or if you want to have any amount of control over object construction at all
+(which is proably a good idea), then give the empty list when loading Noose,
+and write a constructor that provides the attributes.
+
+You can use the same technique to override parameters the caller gives you,
+add new ones, provide defaults, filter or alter values, die if invalid data
+is provided etc.
+
+    package Fancy;
+    use Noose ();
+
+    sub new {
+        my $class = shift;
+        my %args  = @_;
+
+        die 'RTFM' unless $args{make_it_go};
+        $args{fancy}  = 1;
+        $args{useful} = 0;
+
+        return Noose::new($class, %args);
+    }
+
+    # class body
+    sub method { ... }
+
+See `examples/2.pl` for another example of this technique.
+
+## Using the constructor to clone an object
+
+If you call `new` as an object method, then you will get a clone of the object,
+unless you used some parameters, in which case those parameters will be used
+to create accessors just like with normal object creation. If there already were
+accessors by those names, then the new values will prevail.
+
+See `examples/3.pl` for example usage.
+
+# EXAMPLES
+
+See the `examples` subdirectory.
+
+# CAVEATS
+
+In case it isn't obvious, __you should not actually use Noose__. It has an `Acme::`
+module in the dependency tree, for crying out loud!
+
+# AVAILABILITY
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit [http://www.perl.com/CPAN/](http://www.perl.com/CPAN/) to find a CPAN
+site near you, or see [https://metacpan.org/module/Noose/](https://metacpan.org/module/Noose/).
+
+# SOURCE
+
+The development version is on github at [http://github.com/doherty/Noose](http://github.com/doherty/Noose)
+and may be cloned from [git://github.com/doherty/Noose.git](git://github.com/doherty/Noose.git)
+
+# BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at [https://github.com/doherty/Noose/issues](https://github.com/doherty/Noose/issues).
+
+# AUTHOR
+
+Mike Doherty <doherty@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Mike Doherty.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

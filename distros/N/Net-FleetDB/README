@@ -1,0 +1,30 @@
+NAME
+    Net::FleetDB - Query FleetDB
+
+SYNOPSIS
+      my $fleetdb = Net::FleetDB->new(
+          host => '127.0.0.1',
+          port => 3400,
+      );
+      my $updates = $fleetdb->query( 'insert', 'people',
+        { 'id' => 1, 'name' => 'Bob' } );
+      my $people = $fleetdb->query( 'select', 'people',
+        { 'order' => [ 'id', 'asc' ] } )
+
+DESCRIPTION
+    FleetDB is a "schema-free database optimized for agile development".
+    Read more about it including the types of queries you can run at
+    http://fleetdb.org/
+
+    This module allows you to query a FleetDB database.
+
+AUTHOR
+    Leon Brocard <acme@astray.com>.
+
+COPYRIGHT
+    Copyright (C) 2010, Leon Brocard
+
+LICENSE
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

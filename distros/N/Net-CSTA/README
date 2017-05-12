@@ -1,0 +1,42 @@
+Net-CSTA version 0.02
+=====================
+
+CSTA is short for "Computer Supported Telecommunications Applications". It 
+is a CTI protocol defined in ASN.1 by ECMA:
+
+http://www.ecma-international.org/activities/Communications/TG11/cstaIII.htm
+
+This perl-module implements CSTA phase I. It has been tested with the Ericsson
+MD110 PBX and Application Link 4.0.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Convert::ASN1
+  MIME::Base64
+  XML::Simple
+
+  and a patched version of Convert::ASN1 available at
+  http://devel.it.su.se/pub/jsp/polopoly.jsp?d=1026&a=6589 
+  
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2006 by Leif Johansson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

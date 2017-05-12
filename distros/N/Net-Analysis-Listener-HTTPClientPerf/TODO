@@ -1,0 +1,5 @@
+HTTPClientPerf.pm:
+  * Better auto-scaling of postscript diagram (make tslot obsolete)
+  * Find a way for HTTPClientPerf.pm to declare that it depends on HTTP.pm
+  * Smaller font for URIs
+  * Migrate from PS to SVG

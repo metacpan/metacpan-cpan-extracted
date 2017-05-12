@@ -1,0 +1,116 @@
+#!/usr/bin/perl -w
+
+use strict ;
+
+use Nagios::Report ;
+use DBI ;
+
+my @rep_periods = qw(
+	24x7
+	Other_Report_Period
+) ;
+
+							# FIXME - replace by your DB driver, Database name, User and PW.
+
+my @dsn = qw(
+	dbi:mysql:DB_Database_Name
+	DB_User
+	DB_Password
+) ;
+
+my $x   = Nagios::Report->new('local_cgi Nag_server Auth_Nag_user', \@rep_periods) ;
+
+my $dbh = DBI->connect(@dsn)
+  or die "Can't connect to Database '$dsn[0]' as user '$dsn[1]': $DBI::errstr" ;
+
+my @ad_dbh    = $x->to_dbh ;
+					
+							# FIXME - There is a one to one corresp between report periods
+							# and DB tables. Data is extracted for that report/time period
+							# and inserted into the corresp RDBMS table.
+my @mysql_tab = qw(
+  MySQL_Table_1
+  MySQL_Table_2
+) ;
+
+my @cols = qw(
+	YEAR
+	MONTH
+	HOST_NAME
+	TIME_UP_SCHEDULED
+	PERCENT_TIME_UP_SCHEDULED
+	PERCENT_KNOWN_TIME_UP_SCHEDULED
+	TIME_UP_UNSCHEDULED
+	PERCENT_TIME_UP_UNSCHEDULED
+	PERCENT_KNOWN_TIME_UP_UNSCHEDULED
+	TOTAL_TIME_UP
+	PERCENT_TOTAL_TIME_UP
+	PERCENT_KNOWN_TIME_UP
+	TIME_DOWN_SCHEDULED
+	PERCENT_TIME_DOWN_SCHEDULED
+	PERCENT_KNOWN_TIME_DOWN_SCHEDULED
+	TIME_DOWN_UNSCHEDULED
+	PERCENT_TIME_DOWN_UNSCHEDULED
+	PERCENT_KNOWN_TIME_DOWN_UNSCHEDULED
+	TOTAL_TIME_DOWN
+	PERCENT_TOTAL_TIME_DOWN
+	PERCENT_KNOWN_TIME_DOWN
+	TIME_UNREACHABLE_SCHEDULED
+	PERCENT_TIME_UNREACHABLE_SCHEDULE
+	PERCENT_KNOWN_TIME_UNREACHABLE_SCHEDULED
+	TIME_UNREACHABLE_UNSCHEDULED
+	PERCENT_TIME_UNREACHABLE_UNSCHEDULED
+	PERCENT_KNOWN_TIME_UNREACHABLE_UNSCHEDULED
+	TOTAL_TIME_UNREACHABLE
+	PERCENT_TOTAL_TIME_UNREACHABL
+	PERCENT_KNOWN_TIME_UNREACHABL
+	TIME_UNDETERMINED_NOT_RUNNING
+	PERCENT_TIME_UNDETERMINED_NOT_RUNNING
+	TIME_UNDETERMINED_NO_DATA
+	PERCENT_TIME_UNDETERMINED_NO_DATA
+	TOTAL_TIME_UNDETERMINED
+	PERCENT_TOTAL_TIME_UNDETERMINED
+	AVAIL_URL
+	TREND_URL
+) ;
+
+my $col_names = join ',', @cols ;
+
+my ($month, $year) = (localtime())[4, 5] ;
+$month++ ;
+$year+= 1900 ;
+
+foreach (@rep_periods)  {
+
+  my $mysql_tab = shift @mysql_tab ;
+  my ($ad_dbh)  = shift @ad_dbh ;
+  
+
+  my $ad_sql = <<ADSQL;
+  SELECT * FROM tab_$_
+ADSQL
+
+  my $sad = $ad_dbh->prepare($ad_sql) ;
+     $sad->execute ;
+
+  my (@r, $col_vals, $mysql_sql) ;
+
+  while ( my @rr = $sad->fetchrow_array ) {
+
+    @r         = map { s/'(\d+)'/$1/g; s/(\d+\.\d+)%/$1/g; $_ } @rr ;
+    $col_vals  = join ',', qq('$r[0]'), @r[1..($#r - 2)], qq('$r[-2]'), qq('$r[-1]') ;
+
+    $mysql_sql = <<MYSQL;
+    INSERT INTO $mysql_tab ($col_names) VALUES ($year,$month,$col_vals)
+MYSQL
+
+    $dbh->do($mysql_sql) ;
+  }
+
+  $sad->finish ;
+  $ad_dbh->disconnect ;
+
+}
+
+$dbh->disconnect ;
+

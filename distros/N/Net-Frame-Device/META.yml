@@ -1,0 +1,35 @@
+---
+abstract: 'get network device information and gateway'
+author:
+  - 'GomoR <gomor_at_cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Frame-Device
+provides:
+  Net::Frame::Device:
+    file: lib/Net/Frame/Device.pm
+    version: '1.12'
+requires:
+  Class::Gomor: '1.00'
+  Net::Frame: '0'
+  Net::Frame::Dump: '1.08'
+  Net::Frame::Layer::ICMPv6: '0'
+  Net::Frame::Layer::IPv6: '0'
+  Net::Frame::Simple: '1.05'
+  Net::IPv4Addr: '0'
+  Net::IPv6Addr: '0'
+  Net::Libdnet: '0'
+  Net::Libdnet6: '0'
+  Net::Pcap: '0.12'
+  Net::Write: '1.00'
+  perl: v5.6.1
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: '1.12'

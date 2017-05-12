@@ -1,0 +1,125 @@
+TYPEMAP
+const char *    T_PV
+DBusConnection*	O_OBJECT_connection
+DBusServer*	O_OBJECT_server
+DBusMessage*	O_OBJECT_message
+DBusPendingCall* O_OBJECT_pendingcall
+DBusWatch*      O_OBJECT_watch
+DBusTimeout*      O_OBJECT_timeout
+DBusMessageIter* O_OBJECT_messageiter
+DBusBusType T_IV
+dbus_bool_t T_BOOL
+dbus_int16_t T_IV
+dbus_uint16_t T_UV
+dbus_int32_t T_IV
+dbus_uint32_t T_UV
+dbus_int64_t T_DBUS_INT64
+dbus_uint64_t T_DBUS_UINT64
+
+INPUT
+T_DBUS_INT64
+    $var = _dbus_parse_int64($arg);
+
+OUTPUT
+T_DBUS_INT64
+    $arg = _dbus_format_int64($var);
+
+INPUT
+T_DBUS_UINT64
+    $var = _dbus_parse_uint64($arg);
+
+OUTPUT
+T_DBUS_UINT64
+    $arg = _dbus_format_uint64($var);
+
+INPUT
+O_OBJECT_connection
+    if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
+        $var = ($type)SvIV((SV*)SvRV( $arg ));
+    else {
+        warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+OUTPUT
+O_OBJECT_connection
+        sv_setref_pv( $arg, "Net::DBus::Binding::C::Connection", (void*)$var );
+
+INPUT
+O_OBJECT_server
+    if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
+        $var = ($type)SvIV((SV*)SvRV( $arg ));
+    else {
+        warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+OUTPUT
+O_OBJECT_server
+        sv_setref_pv( $arg, "Net::DBus::Binding::C::Server", (void*)$var );
+
+INPUT
+O_OBJECT_message
+    if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
+        $var = ($type)SvIV((SV*)SvRV( $arg ));
+    else {
+        warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+OUTPUT
+O_OBJECT_message
+        sv_setref_pv( $arg, "Net::DBus::Binding::C::Message", (void*)$var );
+
+
+INPUT
+O_OBJECT_pendingcall
+    if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
+        $var = ($type)SvIV((SV*)SvRV( $arg ));
+    else {
+        warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+OUTPUT
+O_OBJECT_pendingcall
+        sv_setref_pv( $arg, "Net::DBus::Binding::C::PendingCall", (void*)$var );
+
+INPUT
+O_OBJECT_watch
+    if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
+        $var = ($type)SvIV((SV*)SvRV( $arg ));
+    else {
+        warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+OUTPUT
+O_OBJECT_watch
+        sv_setref_pv( $arg, "Net::DBus::Binding::C::Watch", (void*)$var );
+
+INPUT
+O_OBJECT_timeout
+    if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
+        $var = ($type)SvIV((SV*)SvRV( $arg ));
+    else {
+        warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+OUTPUT
+O_OBJECT_timeout
+        sv_setref_pv( $arg, "Net::DBus::Binding::C::Timeout", (void*)$var );
+
+INPUT
+O_OBJECT_messageiter
+    if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
+        $var = ($type)SvIV((SV*)SvRV( $arg ));
+    else {
+        warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+OUTPUT
+O_OBJECT_messageiter
+        sv_setref_pv( $arg, "Net::DBus::Binding::Iterator", (void*)$var );

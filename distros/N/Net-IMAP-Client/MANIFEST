@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Net/IMAP/Client.pm
+lib/Net/IMAP/Client/MsgAddress.pm
+lib/Net/IMAP/Client/MsgSummary.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/boilerplate.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

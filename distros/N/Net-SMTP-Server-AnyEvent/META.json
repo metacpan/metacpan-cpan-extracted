@@ -1,0 +1,42 @@
+{
+   "abstract" : "Expiremental SMTP server using AnyEvent!",
+   "author" : [
+      "KnowZero"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-SMTP-Server-AnyEvent",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::SMTP::Server::AnyEvent" : {
+         "file" : "lib/Net/SMTP/Server/AnyEvent.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "0.02"
+}

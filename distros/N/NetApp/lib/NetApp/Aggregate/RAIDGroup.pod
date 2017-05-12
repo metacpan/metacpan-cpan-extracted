@@ -1,0 +1,35 @@
+
+=head1 NAME
+
+NetApp::Aggregate::RAIDGroup -- OO Class for representing NetApp raidgroups
+
+=head1 SYNOPSIS
+
+    use NetApp::Filer;
+    use NetApp::Aggregate;
+
+    my $aggregate 	= $filer->get_aggregate( $name );
+
+    my $raidgroup	= $aggregate->get_raidgroup;
+
+=head1 DESCRIPTION
+
+This class is used to encapsulate a NetApp raidgroup, and provide access to
+the name and states of the raidgroup.
+
+=head1 METHODS
+
+=head2 get_name
+
+Returns the name of the raidgroup as a string.
+
+=head2 get_states
+
+Returns a list of strings, each of which represents a single state for
+the raidgroup.
+
+=head2 get_state( $state )
+
+Returns true if the raidgroup has the given state, false otherwise.
+
+=cut

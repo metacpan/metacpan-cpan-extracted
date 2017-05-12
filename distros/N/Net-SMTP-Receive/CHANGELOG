@@ -1,0 +1,10 @@
+= 2012/01/05 0.301
+
+Updated documentation.
+
+if bind IP address isn't specified, default to INADDR_ANY now works.
+
+= 2002/11/18 0.3
+
+Just fixed the use vars qw($VERSION) line.
+

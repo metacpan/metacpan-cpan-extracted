@@ -1,0 +1,77 @@
+
+
+                              Net::TCLink v3.4
+                             Perl Implementation
+                       copyright (C) TrustCommerce 2003
+                         http://www.trustcommerce.com
+                         developer@trustcommerce.com
+
+                              September 5, 2003
+
+I. DESCRIPTION
+
+  Net::TCLink is a thin client library to allow your e-commerce servers to
+connect to the TrustCommerce payment gateway easily and consistently.
+The protocol (which is the same across all platforms and languages) is
+well-documented in the Web Developer's Guide, so please consult it for
+any questions you may have about the protocol syntax itself.
+
+  If you are using Perl or ActivePerl on Win32, do not use this client.
+Please download the COM object from the Vault website instead.
+
+
+II. BUILD
+
+  You will need the OpenSSL libraries and header files installed on your 
+system to compile Net::TCLink.  You can download them from 
+http://www.openssl.org.  Many modern UNIX systems (including Red Hat 
+Linux 7.0 and above) come with the OpenSSL libraries pre-installed.
+
+  To build, you need only execute the following two commands:
+
+  $ perl Makefile.PL
+  $ make
+
+  Optionally, you may test the build by running the following:
+
+  $ make test
+
+
+III. INSTALLATION
+
+  If you wish to install globally (recommended), execute the following
+command as root:
+
+  # make install
+
+  If you do not have root priviledges on the machine, or do not wish to
+install Net::TCLink globally, you may still load the module manually from the
+blib directory where it is built.  Assuming the name of your test script is
+RunTrans.pl, use the following command line:
+
+  $ perl -Iblib/arch -Iblib/lib RunTrans.pl
+
+  You may wish to change "blib/arch" and "blib/lib" to be the full path to
+those locations, so that you may execute the command anywhere.
+
+  Or, you may insert the following code at the top of your script:
+
+use lib "blib/lib";
+use lib "blib/arch";
+
+   Again, you may prefer to use the full path name here.
+
+
+IV. USAGE
+
+  The included perl script 'test.pl' contains example code for the
+Net::TCLink Perl module.
+
+  Net::TCLink is very easy to use.  It consists of a single function call,
+send(), that takes a hash or a hash reference as its only parameter.  The
+hash contains the name/value pairs describing the transaction.  The return
+value is also a hash, containing the name/value pairs describing the
+transactions results.  Please refer to the TCDevGuide.txt or TCDevGuide.html
+in the doc folder for more information.
+
+

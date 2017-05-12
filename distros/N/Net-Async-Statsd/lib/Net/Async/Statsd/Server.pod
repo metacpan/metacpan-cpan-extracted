@@ -1,0 +1,112 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::Statsd::Server
+at lib/Net/Async/Statsd/Server.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::Statsd::Server - asynchronous server for Etsy's statsd protocol
+
+=head1 VERSION
+
+version 0.004
+
+=head1 SYNOPSIS
+
+ use Future;
+ use IO::Async::Loop;
+ use Net::Async::Statsd::Server;
+ my $loop = IO::Async::Loop->new;
+ $loop->add(my $statsd = Net::Async::Statsd::Server->new(
+   port => 3001,
+ ));
+ $statsd->bus->subscribe_to_event(
+  count => sub {
+   my ($ev, $k, $delta, $type) = @_;
+  }
+ );
+
+=head1 DESCRIPTION
+
+Provides an asynchronous server for the statsd API.
+
+=head1 METHODS
+
+All public methods return a L<Future> indicating when the write has completed.
+Since writes are UDP packets, there is no guarantee that the remote will
+receive the value, so this is mostly intended as a way to detect when
+statsd writes are slow.
+
+=head2 host
+
+Which host to listen on. Probably want '0.0.0.0' (set via L</configure>)
+here if you want to listen on all addresses.
+
+=head2 port
+
+The UDP port we'll accept traffic on. Use L</configure> to set it.
+
+=head2 configure
+
+Used for setting values.
+
+=head2 listening
+
+Resolves with the port number when the UDP server is listening.
+
+=head2 listen
+
+Establishes the underlying UDP socket.
+
+=head2 bus
+
+Returns the L<Net::Async::Statsd::Bus> instance for this server.
+
+This object exists purely for the purpose of dispatching events.
+
+=head2 listen_backlog
+
+Default listen backlog. Immutable, set to 4096 for no particular reason.
+
+=head2 type_for_char
+
+Badly-named lookup method - returns the type matching the given characters.
+
+=head2 on_recv
+
+Called if we receive data.
+
+=head2 on_recv_error
+
+Called if we had an error while receiving.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Net::Statsd> - synchronous implementation
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2014-2016. Licensed under the same terms as Perl itself.

@@ -1,0 +1,15 @@
+Revision history for Net-Shoutcast-Admin
+
+0.02  2008-03-19
+       Improvements, some documentation fixes, adding new methods, handle
+       a single listener properly by using XML::Simple's forceArray option.
+       Still a fair bit to do; the N::S::A::Song/Listener classes are overly
+       bloatly, I may re-implement them with Class::Accessor.
+       
+0.01  2008/02/12
+       Initial release - beta code, still very limited, but seems to work
+       so far :)
+
+
+
+$Id: Changes 315 2008-03-19 00:07:39Z davidp $

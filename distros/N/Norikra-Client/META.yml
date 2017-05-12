@@ -1,0 +1,39 @@
+---
+abstract: 'Client library for Norikra (https://github.com/tagomoris/norikra)'
+author:
+  - 'TAGOMORI Satoshi <tagomoris@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.6.6, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Norikra-Client
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Norikra::Client:
+    file: lib/Norikra/Client.pm
+    version: 0.03
+requires:
+  Data::MessagePack: 0
+  MessagePack::RPC::HTTP::Client: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/norikra/norikra-client-perl/issues
+  homepage: https://github.com/norikra/norikra-client-perl
+  repository: git://github.com/norikra/norikra-client-perl.git
+version: 0.03

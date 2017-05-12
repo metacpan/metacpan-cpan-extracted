@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/Net/Whois/Gateway/Client.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+Net-Whois-Gateway-Client-0.09.tar.gz
+script/workload.pl
+script/nwhois.pl
+t/01-client.t

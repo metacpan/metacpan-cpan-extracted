@@ -1,0 +1,9 @@
+Revision history for Perl extension Net::SMS::BulkSMS.
+
+1.02  Sun Dec 23 22:35:00 2007
+   - add Makefile.PL dependencies
+1.01  Sun May 01 21:20:00 2006
+   - add call to env_proxy() to allow use behind a firewall HTTP proxy gateway
+1.00  Wed Apr 13 08:21:17 2005
+   - original version
+

@@ -1,0 +1,31 @@
+prompt TEST_PROMPT_ONE
+    match /TEST_PROMPT_ONE$/
+
+prompt TEST_PROMPT_TWO
+    match /TEST_PROMPT_TWO$/
+
+prompt TEST_PROMPT
+    match /PROMPT>/
+
+macro TEST_MACRO_ONE
+    send TEST_MACRO_ONE
+    match /TEST_MACRO_ONE/
+
+macro TEST_MACRO_TWO
+    send TEST_MACRO_TWO
+    match /TEST_MACRO_TWO/
+
+macro TEST_PROMPT_ONE
+    send TEST_PROMPT_ONE
+
+macro TEST_PROMPT_TWO
+    send TEST_PROMPT_TWO
+    match TEST_PROMPT_TWO
+
+macro TEST_MACRO_PARAMS
+    send param %s param %s
+    match MATCH_ANY
+
+prompt MATCH_ANY
+    match /^.+$/
+

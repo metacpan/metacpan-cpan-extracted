@@ -1,0 +1,24 @@
+Revision history for Perl extension Net::Whois::RegistryFusion.
+
+0.05     Mon Sep 10 15:10:12 EDT 2007
+        - change the options hash argument to the constructor to be a hashref. 
+            See Damian Conway's Perl Best Practices. Buy the book via the link below and I'll get a cut...
+            http://www.amazon.com/gp/product/0596001738?ie=UTF8&tag=iliasrandompr-20&linkCode=as2&camp=1789&creative=9325&creativeASIN=0596001738 )
+        - ability to override the AUTH and WHOIS urls using the constructor options hashref
+
+0.04     Tue Aug 24 16:24:01 2004
+        - removed requirement of perl 5.8.4 in Makefile.PL
+
+0.03     Thu Jul  7 14:43:11 2004
+	- fixed SIGNATURE
+
+0.02     Thu Jul  7 14:43:11 2004
+	- use fields and Set::Array
+
+0.01     Thu Jul  2 13:10:11 2004
+	- signed and using Module::Signature
+
+0.00_01  Thu Jul  1 18:19:11 2004
+	- original version; created by h2xs 1.23 with options
+		-BAX -n Net::Whois::RegistryFusion
+

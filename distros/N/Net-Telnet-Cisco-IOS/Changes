@@ -1,0 +1,29 @@
+0.6beta
+*  Fixed uninitialized issue with getIntState()
+*  Fixed regex issue with findVLAN()
+*  Fixed return values with findVLAN()
+*  Added ATM, Dialer, and VirtualAccess interfaces to harmonizeInts() ( Thanks, Luca! )
+
+0.5beta:
+*  Added "route" option in getIPRoute
+*  Added method "privLevel"
+*  Added method "getNTP"
+*  Added "use strict" and "use vars" for portability
+*  Added more comments in the code
+*  Fixed return values of getCPU() when something goes wrong
+*  Added Loopback interface harmonizing
+
+0.4beta:
+*  Fixed getIntACL issue with uninitialized value.
+*  Removed whitespace from interfaces returned by harmonizeInts().
+*  Fixed REGEX issue with getItnARP() (Thanks, Charles!)
+*  Fixed REGEX issue with getIntState()
+*  Added config exit in disableInt()
+
+0.3beta:
+*  Added getIPRoute() method
+*  A little streamlining
+*  No major changes
+
+0.2beta:
+*  Initial release

@@ -1,0 +1,89 @@
+Implementation of the archive feature in Net::FTPServer
+-------------------------------------------------------
+Richard Jones, 14th Sept 2001.
+
+1. Background
+-------------
+
+Suppose the VFS contains a file and a directory called:
+
+drwxr-xr-x    4 rich     users        4096 Aug 26 14:05 dir
+-rw-r--r--    1 rich     users       28618 Sep  1 11:46 file
+
+When the administrator enables archive mode, users may request
+any of:
+
+RETR file		# Get the file in the normal way
+RETR file.gz		# Get the file gzip compressed
+RETR file.bz2		# Get the file bzip2 compressed
+RETR file.uue		# Get the file uuencoded
+RETR dir.tar		# Get the contents of the directory, in a tar archive
+RETR dir.zip		# Ditto, as a DOS ZIP file.
+RETR dir.tar.gz		# Ditto, as a gzip-compressed tar archive
+&c.
+
+The implementation, described below, is transparent to the
+underlying VFS (and hence works correctly with database-backed
+filesystems and so on).
+
+2. Filters and generators
+-------------------------
+
+A _filter_ is a compression or encoding program which can be applied
+to a file or a simple archive. Thus when "file.gz" is requested, a
+single filter (the external "gzip" program) is applied to the file.
+Most filters are implemented using external programs, thus allowing
+Net::FTPServer to support a wide range of compression formats and
+encodings (eg. uuencode).
+
+A _generator_ is a piece of code which creates an archive from a
+directory. Thus when "dir.tar" is requested, the tar generator is
+invoked which recurses over the directory structure and creates a tar
+file. Zip is also a generator. Generators only work on directories and
+are generally implemented using code internal to the FTP server.
+
+Up to one generator and zero or more filters may be used during any
+download.  Thus "RETR dir.tar.gz" invokes both the tar generator and
+the gzip filter. "RETR dir.tar" invokes the tar generator and no
+filters. "RETR dir.tar.gz.uue" invokes the tar generator and two
+filters.
+
+3. Modifications to RETR
+------------------------
+
+The implementation of the RETR command has been modified substantially
+to make archive mode work. The command now performs the following
+steps:
+
+* Attempt to find the requested filename.
+
+* If the requested filename is not found, see if the name matches any
+  filter extension, and if so, remove filter extensions one at a time
+  until either a file is found on disk matching the shortened name,
+  or else a directory is found on disk matching the shortened name plus
+  a valid generator extension.
+
+    For example: RETR dir.tar.gz is requested. "dir.tar.gz" doesn't
+    exist. "gz" is a filter extension. "dir.tar" doesn't exist as a
+    file, but "dir" exists as a directory and "tar" is a valid
+    generator extension.
+
+* Open data socket back to the client.
+
+* For each extension (there may be zero or more extensions found in
+  the second step) invoke the external filter program, dupping the
+  socket file descriptor.
+
+    After this step, we end up with a chain of external filter programs
+    like this:
+
+    "$sock" in		 +--------+	  +----------+       socket
+    _RETR_command  ===>  | gzip   |  ==>  | uuencode |  -->  to client
+			 +--------+	  +----------+
+
+    The ==> arrows are Unix pipes. --> is an AF_INET socket.
+
+* If the source is a simple file, then begin the transfer. However, if
+  the source is a directory + generator program, then the generator is
+  invoked which returns a fake $io object which is used instead of a file.
+  Other than that, the transfer continues as normal.

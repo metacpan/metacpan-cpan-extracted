@@ -1,0 +1,17 @@
+ANNOUNCE
+MANIFEST
+Makefile.PL
+README
+TODO
+BUGS
+CHANGES
+Net-Bind.spec
+Net-Bind.spec.PL
+lib/Net/Bind.pm
+lib/Net/Bind/Resolv.pm
+lib/Net/Bind/Utils.pm
+t/Resolv/01_resolver.t
+t/Resolv/02_extras.t
+t/Resolv/03_bad.t
+t/Resolv/04_comments.t
+t/TEST

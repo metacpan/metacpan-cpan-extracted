@@ -1,0 +1,56 @@
+#!/usr/bin/perl -wT
+
+# This example binds to a TCP port and waits for connections.
+# It then checks whether to allow the connection using request_init
+# and hosts_access. 
+#
+# nb: this code is not meant to show you how to write a daemon,
+#     only how to check whether a connection is allowed.
+#
+# 04-Nov-2002, George A. Theall
+
+
+##############################################################################
+use Net::TCPwrappers qw(RQ_DAEMON RQ_FILE request_init hosts_access fromhost);
+use Socket;
+use Sys::Syslog qw(openlog syslog setlogsock closelog);
+
+
+my $daemon_name = 'aserver';    # used in checking as well as logging access.
+my $port = 1234;                # port to which we bind (on all interfaces).
+
+
+# Open a connection to syslog.
+setlogsock('unix');
+openlog($daemon_name, 'pid', 'local2');
+
+
+# Bind to specified port.
+socket(SERVER, AF_INET, SOCK_STREAM, getprotobyname('tcp'));
+setsockopt(SERVER, SOL_SOCKET, SO_REUSEADDR, 1);
+my $addr = sockaddr_in($port, INADDR_ANY);
+bind(SERVER, $addr);
+listen(SERVER, SOMAXCONN);
+
+
+# Process each connection in an endless loop.
+while (accept(CLIENT, SERVER)) {
+    my($port, $client_addr) = sockaddr_in(getpeername(CLIENT));
+
+    # Check if client is allowed to connect.
+    my $req = request_init(RQ_DAEMON, $daemon_name, RQ_FILE, fileno(CLIENT));
+    fromhost($req);
+    if (hosts_access($req)) {
+        # Connection's allowed - print a simple message and close socket.
+        syslog("local2|info", "connection from %s allowed", inet_ntoa($client_addr));
+        print CLIENT "Hi there\n";
+        close(CLIENT);
+    }
+    else {
+        # Connection's denied - close socket.
+        close(CLIENT);
+        syslog("local2|warning", "access from %s denied", inet_ntoa($client_addr));
+    }
+}
+close(SERVER);
+closelog;

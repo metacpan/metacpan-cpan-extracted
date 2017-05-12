@@ -1,0 +1,85 @@
+1.20      Feb 07 2016
+
+    * spelling corrections from dsteinbrunner (closes #111859)
+
+1.19      Sep 15 2014
+
+    * bump HTTP::Message dependency to 5.814 (closes #90547)
+
+1.18      Sep 06 2013
+
+    * bump Crypt::DH::GMP dependency to 0.00011 (closes #88464)
+
+1.17      Apr 12 2013
+
+1.16      Apr 01 2013
+
+    * better fix for #78218 from vlyon
+
+1.15      Apr 01 2013
+
+    * URIFetch->fetch now returns decoded_content (closes #78218)
+
+1.14      Nov 09 2011
+
+1.13      Nov 06 2011
+
+    * Use/cache Last-modified: as a number, not a raw header string (closes #47349)
+
+    * Pay attention to charset on application/xrds+xml content-type (closes #41310)
+
+1.12      Oct 25 2011
+
+    * API change:  IndirectMessage->new(CODEREF)
+
+      CODEREF now needs to be able to also take 0 arguments and then
+      return a list of all URI parameter names in the request
+      (core protocol as of OpenID 2.0 needs this functionality)
+
+      Added IndirectMessage->all_parameters
+
+    * Use HTML::Parser for parsing HTML
+      Added OpenID::util::html_extract_linkmetas
+
+    * Fix YADIS discovery so that
+      (1) HTML parsing is not done on YADIS documents and
+      (2) meta/http-equiv tags are checked when there's
+          no YADIS document or x-xrds-location header
+
+1.11      Oct 22 2011
+
+    * Allow Plack::Request parameter objects for IndirectMessage
+
+1.030099_004 Oct 20 2011
+
+    * Improved HTML head extraction to skip CDATA and comments
+
+    * Fixed warning behavior of timing_indep_eq
+
+    * new comaintainer (Roger Crew)
+
+1.030099_003 Jan 01 2011
+
+    * Replace URL escaper with calls to URI::Escape (Robert Norris)
+
+    * Removed JSON encoder in favour of using JSON::encode_json directly in
+      N::O::Server and N::O::Consumer (Robert Norris)
+
+1.030099_002 Dec 07 2010
+
+    * Documentation tweaks (Robert Norris)
+
+    * Remove use of $& (Jess Robinson RT#63684)
+
+1.030099_001 Nov 06 2010
+
+    * Support for Apache2::Request (mod_perl 2) (Yitzchak Scott-Thoennes)
+
+    * Fix potential timing attack when checking signatures (Adam Sjøgren)
+      (see http://lists.openid.net/pipermail/openid-security/2010-July/001156.html)
+
+    * In Net::OpenID::Yadis, use the single-constant form of
+      "use constant" so we work under Perl 5.6 where the multi constant form
+      was not available.
+
+    * Initial version with stuff moved out of Net::OpenID::Consumer.

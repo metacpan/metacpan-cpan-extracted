@@ -1,0 +1,63 @@
+{
+   "abstract" : "Link Layer Topology Discovery layer object",
+   "author" : [
+      "GomoR <gomor_at_cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Frame-Layer-LLTD",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::Frame" : "0",
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Frame::Layer::LLTD" : {
+         "file" : "lib/Net/Frame/Layer/LLTD.pm",
+         "version" : "1.01"
+      },
+      "Net::Frame::Layer::LLTD::Discover" : {
+         "file" : "lib/Net/Frame/Layer/LLTD/Discover.pm"
+      },
+      "Net::Frame::Layer::LLTD::Emit" : {
+         "file" : "lib/Net/Frame/Layer/LLTD/Emit.pm"
+      },
+      "Net::Frame::Layer::LLTD::EmiteeDesc" : {
+         "file" : "lib/Net/Frame/Layer/LLTD/EmiteeDesc.pm"
+      },
+      "Net::Frame::Layer::LLTD::Hello" : {
+         "file" : "lib/Net/Frame/Layer/LLTD/Hello.pm"
+      },
+      "Net::Frame::Layer::LLTD::QueryResp" : {
+         "file" : "lib/Net/Frame/Layer/LLTD/QueryResp.pm"
+      },
+      "Net::Frame::Layer::LLTD::RecveeDesc" : {
+         "file" : "lib/Net/Frame/Layer/LLTD/RecveeDesc.pm"
+      },
+      "Net::Frame::Layer::LLTD::Tlv" : {
+         "file" : "lib/Net/Frame/Layer/LLTD/Tlv.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license.php"
+      ]
+   },
+   "version" : "1.01"
+}

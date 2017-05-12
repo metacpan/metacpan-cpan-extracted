@@ -1,0 +1,63 @@
+$Id: TODO,v 1.1 2003/09/28 11:50:44 rwmj Exp $
+
+Benchmarking. Run http://www.kegel.com/dkftpbench/index.html against
+the server and optimize it according to the results. I don't expect
+it to perform particularly well, but there are probably some obvious
+areas for improvement.
+
+Implement upload/download hooks and a default system similar to
+what glftpd can do.
+
+Current problems with this FTP server, as identified by http://cr.yp.to/ftp/:
+
+ * Understand \377\377 (equivalent to \377), \377\364 and \377\362
+   on the control connection [http://cr.yp.to/ftp/request.html].
+ * Implement ``Features:'' header in initial greeting
+   [http://cr.yp.to/ftp/greeting.html].
+ * Implement asynchronous ABOR, asynchronous STAT, asynchronous QUIT
+   [http://cr.yp.to/ftp/pipelining.html].
+ * Understand encoded \000 (equivalent to \012) in commands
+   [http://cr.yp.to/ftp/filesystem.html].
+ * Implement SPSV, EPRT [http://cr.yp.to/ftp/retr.html].
+ * NLST should list full pathnames, and also should escape \012 in filenames
+   [http://cr.yp.to/ftp/list.html - but I think djb has confused
+   \000 with \012 in his description].
+ * Implement EPLF [http://cr.yp.to/ftp/list/eplf.html].
+ * In HELP print server version, if appropriate
+   [http://cr.yp.to/ftp/syst.html]. [DONE]
+ * Implement correct quoting in PWD command response
+   [http://cr.yp.to/ftp/cwd.html#pwd].
+
+Implement EPRT and EPSV (see RFC 2428).
+
+Auto-compress files and directories on upload and download. Provide
+a hook to allow the range of compression functions to be increased.
+[Some of this is implemented].
+
+Regression tests for the following fixed bugs:
+
+* SIZE on non-readable files.
+* Zero-nodes.
+* SIZE /, MKD /, SIZE . and related funny things.
+* MLST /
+* NLST -al
+
+Tests for the following features:
+
+* SIGHUP - reload configuration & reopen files.
+* Illegal constructs in config file.
+* max clients.
+* Access control rules.
+* Ident (!)
+* Timezones.
+* max login attempts.
+* chdir message file.
+* alias.
+* cdpath.
+* allow site version command.
+* allow site exec command.
+* site command.
+* virtual hosts (HOST command).
+* command filter.
+* no authentication commands.
+* SITE CHECKSUM.

@@ -1,0 +1,9 @@
+Net::IP::RangeCompare Change log
+  4.024  Moved the code to Source Forge
+
+  4.025
+    Updated the version deps for:
+      Data::Range::Compare 
+      Data::IPV4::Range::Parse
+    Unit tests no longer use Storable
+      Seemed to faile on Mac OSX 8.x

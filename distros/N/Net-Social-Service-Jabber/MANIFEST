@@ -1,0 +1,6 @@
+Build.PL
+lib/Net/Social/Service/Jabber.pm
+MANIFEST			This list of files
+Makefile.PL
+META.yml
+t/00use.t

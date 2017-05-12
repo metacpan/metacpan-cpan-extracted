@@ -1,0 +1,111 @@
+<h2><a href="#">Inyección de código y Cross-site scripting</a></h2>
+<h3>SQL, HTML y Tag Nes</h3>
+<p>
+Nes gestiona de forma totalmente transparente la eliminación de código malicioso de las variables.
+</p>
+<p>
+Por defecto es filtrado el <i>HTML</i> y los <i>Tags Nes</i> de todas las variables de entorno (<b><i>*</i></b>) procedentes de formularios.
+</p>
+<p>
+Por defecto es filtrado el <i>HTML</i> y los <i>Tags Nes</i> de todas las variables (<b><i>$</i></b>).
+</p>
+<p>
+Por defecto es filtrado el <i>HTML</i> y los <i>Tags Nes</i> de todas las variables de Tablas y SQL (<b><i>@$</i></b>).
+</p>
+<p>
+Por defecto en <i>HTML</i> se permite el <i>Tag HTML &lt;br&gt;</i>.
+</p>
+<p>
+Por defecto se llama a <a href="http://search.cpan.org/~timb/DBI/DBI.pm#quote">DBI::quote</a> en todas las variables que formen parte de una sentencia SELECT en el <i>Tag sql</i>.
+</p> 
+
+<h3>Cambiar el comportamiento por defecto</h3>
+<p>
+Los tipos de variables <i><b>*</b></i>, <i><b>$</b></i> y <b>@$</b> admiten parámetros para cambiar este comportamiento:
+<pre>
+&#123;: $  ('var','yes_html','no_sql') :&#125;
+&#123;: *  ('q_var','yes_html','no_sql') :&#125;
+&#123;: @$ ('table.field','yes_html','no_sql') :&#125;
+
+</pre>
+Esto es, pasamos como parámetros las opciones de filtrado que deseeamos, y son:
+<p>
+<pre>
+no_sql   # no permitir SQL, llama a DBI::quote
+no_html  # no permitir Tag HTML
+no_br    # no permitir el Tag HTML &lt;br&gt;
+no_nes   # no permitir Tag Nes &#123;: :&#125;
+
+yes_sql  # permitir SQL, no filtrar con DBI::quote
+yes_html # permitir todos los Tags HTML
+yes_br   # permitir el Tag HTML &lt;br&gt;
+yes_nes  # permitir Tag Nes &#123;: :&#125;
+
+Permitir tags HTML concretos ( yes_tag_TAG ):
+
+yes_tag_B      # permitir el Tag HTML &lt;B&gt;&lt;/B&gt;
+yes_tag_strong # permitir el Tag HTML &lt;strong&gt;&lt;/strong&gt;
+...
+</pre>
+</p>
+<p>
+El formato es:
+<pre>
+&#123;: $  ('var',[lista del opciones en cualquier orden]) :&#125;
+
+</pre> 
+</p>
+<h3>Tags Nes</h3>
+<p>
+Si hacemos a una variable <i><b>yes_nes</b></i> no conseguiremos ejecutar el código que contenga
+ la variable. Por seguridad, por claridad, <b>NO es posible</b> ejecutar
+ código Nes desde una variable. El efecto de <i>no_nes</i> es que los Tags sean visibles, 
+ y de <i>yes_nes</i> es que desaparezcan. No queremos que hagan cosas como esta:
+<pre>
+http://nes.sourceforge.net/miniblog/es/?action=item&item=&#123;: include .htaccess :&#125;
+
+</pre>
+...o peores, ¿verdad?
+</p>
+<br><br>
+<h3>Archivos de configuración</h3>
+<p>
+Esta aplicación esta creada con Nes, como podéis ver el código fuente de está disponible
+ en tiempo real para poder ser visto por cualquiera. 
+</p>
+<p>
+Es importante mantener los datos sensibles separados de la aplicación como rutas 
+de directorios, contraseñas, etc.
+</p>
+<p>
+Los <a href="./?action=item&item=Archivo de configuración Nes">archivos de configuración</a> <a href="./?action=item&item=Archivo de configuración Nes">.nes.cfg</a> no sólo nos pueden resultar útiles como 
+herramienta de programación, también hacen nuestra aplicación más segura.
+</p>
+<p>
+Hay que impedir el acceso a estos archivos en nuestro .htaccess:
+<pre>
+ &lt;FilesMatch \.nes.cfg$&gt;
+    order deny,allow
+    deny from all
+ &lt;/FilesMatch&gt;
+ 
+</pre>
+
+<h3>Seguridad en Formularios</h3>
+<p>
+Ver:
+    <br>
+    Formularios: <a href="./?action=item&item=Formularios seguros">Formularios seguros</a>
+    <br>
+    Plugin: <a href="./?action=item&item=Plugin Forms">Forms</a>
+    <br>
+    Plugin: <a href="./?action=item&item=Plugin Captcha">Captcha</a>
+    <br>
+</p>
+<h3>PHP</h3>
+<p>
+NES filtra el los Tags Nes de los formularios del PHP con <i>include</i> o <i>Wrapper</i> 
+pero <b>NO el HTML y SQL</b>. Se presupone que el script PHP debe incorporar esos filtros.
+</p>
+
+

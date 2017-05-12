@@ -1,0 +1,43 @@
+Net-SMTPS version 0.05
+======================
+
+   This module implements a wrapper for Net::SMTP, enabling
+   over-SSL/STARTTLS support.  This module inherits all the methods from
+   Net::SMTP. You may use all the friendly options that came bundled with
+   Net::SMTP.  You can control the SSL usage with the options of new()
+   constructor method.  'doSSL' option is the switch, and, If you would
+   like to control detailed SSL settings, you can set SSL_* options that
+   are brought from IO::Socket::SSL. Please see the document of
+   IO::Socket::SSL about these options detail.
+
+   Just one method difference from the Net::SMTP, you may select SMTP AUTH
+   mechanism as the third option of auth() method.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Net::SMTP
+  IO::Socket::SSL
+  Authen::SASL
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2017 by Tomo.M
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

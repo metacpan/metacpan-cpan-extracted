@@ -1,0 +1,6 @@
+Net::Netflix version 0.05
+==================================
+
+This module was moved to a new namespae - WWW::Netflix. Please download 
+and install the new module.
+

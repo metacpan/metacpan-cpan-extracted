@@ -1,0 +1,99 @@
+Developers' TODO for Net::ICal
+
+$Id: TODO,v 1.12 2001/07/26 05:57:09 srl Exp $
+
+This is a no-particular-order list of things we need to make sure
+we do. It is not complete. If you'd like to work on one of these things,
+talk to the Reefknot developers' list <reefknot-devel@sourceforge.net>,
+or send your patches there in diff -u format. You probably want
+to read the iCalendar Bootstrap Guide at 
+http://reefknot.sourceforge.net/bootstrap-guide/t1.html . 
+
+Also: look at the Sourceforge Tracker for Reefknot 
+<http://sourceforge.net/projects/reefknot/> if you're looking for work
+to do. Also look at the sections of source code with comments containing
+"XXX", "TODO", or "FIXME".  The BUGS file in this archive should have
+a list that was current as of this release, but there are almost certainly
+bugs we haven't found.
+
+
+BUG REPORTS:
+
+Send us a bug report using the Sourceforge bug tracking system (see
+above for the URL). Bonus points for submitting a bug and a patch
+to fix the bug.
+
+
+TESTING: (good for beginning developers)
+
+Download Pod::Tests from CPAN and install it. Write tests
+for the modules. Tests that should pass but don't right now are
+particularly welcome, as are implementations of tests that
+are currently failing because they're not implemented. 
+
+To run embedded tests on a particular file, do something like this:
+
+$ perl Makefile.PL
+$ perl -Ilib t/embedded-Net-ICal-foo.t
+
+{Rinse, wash, repeat. Send us your patches.)
+
+
+DOCUMENTATION:  (also good if you're a new developer)
+
+- Grab any module, read it, understand it, and comment what's not clear
+to you. If you don't get it, there's a good chance that other people don't
+either (yet). Try to understand, ask other developers, and document
+what you learn in the code. 
+
+- In the $map initialization in _create methods, make sure each element
+is commented clearly with a reference to RFC2445. Elaborate on what each
+element's used for. Make sure the map contains all elements that can 
+possibly be part of the object type. See Calendar.pm for a small example.
+
+
+RESEARCH:
+
+- explain iTIP, iMIP, CAP, or any other IETF calendaring-related concept
+to the reefknot-devel@sourceforge.net list. Check the archives first.
+
+
+CODING:
+
+- grab any bug off the BUGS list and fix it. 
+- grab any bug off the BUGS list for Date::ICal and fix it. Net::ICal
+uses Date::ICal extensively.
+
+Major components:
+
+- VCALENDAR (half-done)
+- VALARM - (done? part-done?); see Alarm.pm.
+- VEVENT - in progress; see Event.pm. 
+- VTODO - in progress; see Todo.pm.
+- VJOURNAL - in progress; see Journal.pm.
+- VFREEBUSY - in progress; see Freebusy.pm.
+- VTIMEZONE - not yet functional; see Time.pm and Date::ICal.
+
+- handle METHOD, which is a property of a VCALENDAR that specifies
+whether this calendar is a request for an event, a response to a request,
+or what. See RFC 2446 (iTIP) and Calendar.pm's method property.
+Net::ITIP is probably what you want to look at; it's in the Reefknot
+CVS (see links from http://reefknot.sf.net).
+
+Other pieces, smaller subtasks of the above, roughly in priority order:
+
+- ATTACH: attachments for calendar components (4.8.1.1)
+- GEO and LOCATION: where meetings take place
+- PRIORITY: implement priorities for events, and sorting.
+- RESOURCES: implement resources needed.
+- STATUS: see 4.8.1.11: enumerate possible statuses for events. 
+ handle recurrences and exceptions of events - look at Recurrence.pm for a start
+- timestamps and change management (4.8.7)
+- request statuses (4.8.8.2)
+- make it possible for properties that occur more than once to be on the
+  same line (needed for e.g. CATEGORIES, 4.8.1.2)
+- allow x-props
+- allow x-params
+- do more error checking/recovery
+
+- i18n (mostly at the app level, not at the Net::ICal level)

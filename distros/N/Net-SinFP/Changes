@@ -1,0 +1,102 @@
+Revision history for Perl extension Net::SinFP.
+
+2.10 Sun Feb 15 18:01:08 CET 2015
+   - update: Kwalitee
+   - update: copyright notice
+
+2.09 Sun Mar 13 12:45:47 CET 2011
+   - bugfix: in pod for Net::SinFP::Consts
+   - new signatures (sinfp-20110125.db: 188 signatures)
+   - NOTE: this should be the last release in 2.xx branch
+
+2.08 Wed Jan 12 15:24:24 CET 2011
+   - update: new deformation masks
+   - update: improvements on passive fingerprinting analysis
+   => greetz to Goulag Parkinson, IpMorph rulez.
+   - update: copyright notice
+
+2.07 Fri Dec 24 14:21:08 CET 2010
+   - bugfix: padding vs payload issue for TCP options
+   - update: more verbose message on closed/filtered port
+   - update: copyritht notice
+   - update: mailing list link
+   - new signatures (sinfp-20101224.db: 158 signatures)
+
+2.06 Mon Dec 18 16:35:25 CET 2006
+   - bugfix: in passive mode, when a frame has no TCP layer, do not process it
+   - bugfix: in passive mode, when a user specifies -F, SinFP must use it
+   - pod: for Result.pm
+   - examples: now ships with example files in examples/ directory
+   - tests: more tests (pod consistency, pod coverage)
+   - new signatures (sinfp-20061218.db, 140 signatures)
+
+2.05 Sat Nov 18 12:40:41 CET 2006
+   - bugfix: due to changes in Net::Packet 3.xx, now requires version 3.2x
+   - new signatures (sinfp-20061118.db)
+
+2.04 Sun Nov  5 18:59:48 CET 2006
+   - Search.pm: new deformation mask added
+   - new signatures (sinfp-20061101.db)
+
+2.03 Sun Oct 29 21:57:05 CET 2006
+   - Search.pm: new deformation masks added
+   - sinfp.pl: default displaying of OS information updated, it is shorter now
+   - sinfp.pl: new parameter -C, to show complete OS information like old 
+               behaviour
+   - new signatures
+
+2.02 Mon Aug 28 19:56:45 CEST 2006
+   - bugfix: when analyzing an anonymized pcap file
+   - bugfix: test options length for P2 reply, not P3 reply
+   - new signatures
+
+2.01 Sun Jul  2 11:52:43 CEST 2006
+   - bugfix: when a target responds to P2, but to not P1, we craft 
+             a fake P1 reply
+   - update: display a warning when a signature is matched in a heuristic mode, 
+             but not enough TCP options were received from P2 for a considered 
+             reliable match
+   - new signatures
+
+2.00 Wed Jun 14 23:33:16 CEST 2006
+   - complete rewrite
+   - sinfp.db completely reworked
+   - new tests based on comparison between probe and response (TCP seq/ack 
+     comparison, IP ID value comparison)
+   - new matching algorithm, works like a search engine (a problem of finding 
+     intersection, by applying a deformation mask on keywords) much more 
+     efficient than in 1.xx branch
+   - passive fingerprinting much more acurate thanks to new matching algorithm
+   - possibility to launch P1P2P3 probes, or only P1P2 probes, or only P2 probe
+   - match IPv6 signatures against IPv4 ones
+   - API changes, not compatible with 1.xx version anymore
+   - DB schema changes, not compatible with 1.xx version anymore
+   - many bugfixes
+
+1.02 Wed May 31 18:50:03 CEST 2006
+   - bugfix: in RST response to a probe when it has some L7 data
+   - compatibility patches with upcoming Net::Packet 3.00
+
+1.01 Sat May 13 13:03:16 CEST 2006
+   - sinfp.db: new signatures, bugfix on some
+   - sinfp.db: now installs in the same directory as sinfp.pl, no need to 
+               be root anymore
+   - now uses Class::Gomor::Array instead of Hash
+
+1.00 Mon Mar 13 13:37:01 CET 2006
+   - sinfp.db: more signatures (IPv4 and IPv6 ones)
+   - sinfp.db: migration from DBD::SQLite 1.08 to 1.11
+   - Makefile.PL: now installs sinfp.db into /usr/local/share/sinfp when 
+                  installation is run as root
+   - Makefile.PL: sinfp.pl, np-anon-pcap.pl, np-read-anon.pl are installed into 
+                  /usr/local/bin if installation is run as root
+   - SinFP: algorithm to match OSFPs is now quicker (especially in passive mode)
+   - SinFP: algorithm to match OSFPs is now also a little better
+   - SinFP: bugfix when running in offline passive mode (now skip non IP frames)
+   - sinfp.pl: -k parameter to keep generated pcap file (default to not)
+               pcap files are especially useful for unknown fingerprints, send 
+               them to me ;) (use np-anon-pcap.pl to anonymize IPs)
+
+0.92 Mon Jun 20 23:43:53 CEST 2005
+   - first public release
+

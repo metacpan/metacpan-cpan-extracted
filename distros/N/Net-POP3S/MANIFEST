@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+META.json
+META.yml
+README
+t/pop3.t
+lib/Net/POP3S.pm

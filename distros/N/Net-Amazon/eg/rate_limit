@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+###########################################
+# rate_limit
+# Mike Schilli, 2004 (m@perlmeister.com)
+# Test rate-limiting
+#     rate_limit 0201360683
+###########################################
+use warnings;
+use strict;
+
+use Net::Amazon;
+use Net::Amazon::Request::ASIN;
+
+use Log::Log4perl qw(:easy);
+
+my $conf = q(
+  log4perl.category.Net.Amazon             = WARN, Screen
+
+  # To disable the rate limiting messages
+  #log4perl.category.Net.Amazon.RateLimit   = FATAL, Screen
+  #log4perl.additivity.Net.Amazon.RateLimit = 0
+
+  log4perl.appender.Screen          = Log::Log4perl::Appender::Screen
+  log4perl.appender.Screen.layout   = Log::Log4perl::Layout::PatternLayout
+  log4perl.appender.Screen.layout.ConversionPattern = %F{1} %L> %m %n
+);
+
+Log::Log4perl::init(\$conf);
+
+my $ua = Net::Amazon->new(
+    associate_tag => $ENV{AMAZON_ASSOCIATE_TAG},
+    token         => $ENV{AMAZON_TOKEN},
+    secret_key    => $ENV{AMAZON_SECRET_KEY},
+);
+
+die "usage: $0 asin\n(use 0201360683 as " .
+    "an example)\n" unless defined $ARGV[0];
+
+my $req = Net::Amazon::Request::ASIN->new(
+    asin  => $ARGV[0],
+);
+
+for(1..3) {
+      # Response is Net::Amazon::ASIN::Response
+    my $resp = $ua->request($req);
+
+    if($resp->is_success()) {
+        print $resp->as_string(), "\n";
+    } else {
+        print "Error: ", 
+              $resp->message(), "\n";
+    }
+}

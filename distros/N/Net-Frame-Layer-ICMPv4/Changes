@@ -1,0 +1,32 @@
+Revision history for Perl extension Net::Frame::Layer::ICMPv4.
+
+1.05 Tue Jan 20 19:51:44 CET 2015
+   - update: copyright notice
+   - update: Kwalitee
+
+1.04 Tue Jan 31 21:26:52 CET 2012
+   - bugfix: updated ICMPv4::TimeExceed, ICMPv4::DestUnreach 
+   and ICMPv4::Redirect to parse the unused and gateway fields and
+   correctly unpack IPv4 layer
+   => Thanks to Vince.
+   - update: copyright notice
+
+1.03 Sun May 31 15:21:07 CEST 2009
+   - UPDATE: payload is no more an attribute in ICMPv4 modules, it is 
+             handled in a generic way like any other layer
+   - UPDATE: icmpType is no more an attribute in ICMPv4 module, it is 
+             handled in a generic way like any other layer
+   - REMOVED: getPayloadLength() functions
+   - update: computeChecksum() and computeLengths() to reflect new computation 
+             scheme from Net::Frame::Simple
+   - update: copyright notice
+
+1.02 Sun Dec 17 17:17:41 CET 2006
+   - UPDATE: all layers moved to Net::Frame::Layer::* namespace
+
+1.01 Thu Dec 14 19:37:43 CET 2006
+   - bugfix: there is no more Utils.pm in Net::Frame
+
+1.00 Sun Dec 10 17:48:36 CET 2006
+   - first public release
+

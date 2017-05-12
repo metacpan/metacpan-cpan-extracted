@@ -1,0 +1,61 @@
+$TTL 1500
+
+foo.test.		3600	IN	SOA	ns1.foo.test. root.localhost. 2002021201 450 600 345600 300
+
+
+$GENERATE 50-70 $ CNAME $
+$GENERATE 1-70/6  $bla.${2,5,X}.foo PTR $
+;$GENERATE 1-70/6 $ TXT $
+
+
+
+		3600	IN	NS	ns1.foo.test.
+		3600	IN	NS	ns2.foo.test.
+				NS      belowdelegation.Something.VEry.Cased  
+
+		3600	IN	MX	100 bert.test.
+foo.test.		3600	IN	TXT	"Test domain"
+ns.foo.test.		3600	IN	A	10.0.0.1
+
+ns2.foo.test.	3600	IN	A	10.0.0.2
+www.foo.test.	3600	IN	CNAME	localhost2
+localhost2 CNAME	localhost
+belowdelegation.Something.VEry.Cased    3600 	TXT  "Below a delegation";
+belowdelegation.Something.VEry.Cased    3600 	A   10.0.2.3
+*.foo.test.		3600	IN 	A	10.0.0.3
+
+localhost.foo.test.	4200	IN	A	127.0.0.1
+A			A	10.0.2.3		; Should take all defaults...
+bert.test.		A	10.0.2.4		; should not end up in zone
+Something.VEry.Cased    NS      Very.Cased.As.Well
+Something.VEry.Cased    DS   42495  1  1  0ffbeba0831b10b8b83440dab81a2148576da9f6
+bla2			A 10.0.0.1
+bla2			A 10.0.0.2
+bla2			A 10.0.0.3
+
+asdf			TYPE500  \# 4  0A0000 01 
+
+
+; A query for b.b.c.d should return NXDOMAIN
+a.b.c.d			TXT  "Full MATCH"
+z.x.c.d			TXT  "Full MATCH"
+
+*.c.d                   TXT  "Wildcard MATCH"
+
+
+*.s.t.v		TXT "Wildcard MATCH"
+p.q.r.s.t.v		TXT "FULL MATCH"
+
+
+; The next RRs can not yet  (version 0.32) be parsed by Net::DNS::RR.pm 
+; !.s.t.v		TXT "FULL MATCH"
+; @.s.t.v		A 10.0.0.1 
+; ?.s.t.v		TXT "FULL MATCH"
+; (.s.t.v		TXT "FULL MATCH"
+2.s.t.v		TXT "FULL MATCH"
+3.s.t.v		TXT "FULL MATCH"
+4.s.t.v		TXT "FULL MATCH"
+5.s.t.v		TXT "FULL MATCH"
+6.s.t.v		TXT "FULL MATCH"
+
+;;unknown	  IN TYPE1234 \# 4  0A0000 01  

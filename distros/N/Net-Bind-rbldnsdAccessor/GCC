@@ -1,0 +1,3 @@
+#!/bin/sh
+
+gcc -DRBLDNSDF_JUST_TESTING -Irbldnsd -I/tmp/bind-9.3.2-P1/lib/isc/include -I/tmp/bind-9.3.2-P1/lib/dns/include -I/tmp/bind-9.3.2-P1/lib/isc/unix/include/ -I/tmp/bind-9.3.2-P1/lib/isc/nothreads/include $@

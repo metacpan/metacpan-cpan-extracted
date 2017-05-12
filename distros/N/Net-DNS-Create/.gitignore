@@ -1,0 +1,14 @@
+# Emacs:
+*~
+\#*
+# Perl:
+MANIFEST
+Build
+blib/
+_build/
+MYMETA.*
+META.*
+# Testing:
+t/tmp
+# If you run create.example:
+bind/

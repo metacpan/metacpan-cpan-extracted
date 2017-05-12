@@ -1,0 +1,5 @@
+1.01  Sat Nov 08 17:19:00 GMT 2008
+    - Move to Module::Install
+
+0.03  Thu Oct 12 16:36:00 BST 2006
+    - Initial Release

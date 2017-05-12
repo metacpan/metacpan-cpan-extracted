@@ -1,0 +1,4 @@
+Net::IMAP::Simple::NB
+=====================
+
+Provides a non-blocking interface to IMAP using Danga::Socket framework

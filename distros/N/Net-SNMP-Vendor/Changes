@@ -1,0 +1,7 @@
+Revision history for Perl extension Net::SNMP::Vendor.
+
+0.01   Mon Sep 24 12:00:00 2007
+  - First release
+
+0.01a  Tue Sep 25 11:10:00 2007
+  - Rebuild packet structure

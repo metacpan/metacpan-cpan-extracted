@@ -1,0 +1,24 @@
+# Configuration file
+
+RANDFILE               = $ENV::HOME/.rnd
+
+[ req ]
+default_bits           = 1024
+default_keyfile        = keyfile.pem
+distinguished_name     = req_distinguished_name
+attributes             = req_attributes
+prompt                 = no
+output_password        = mypass
+
+[ req_distinguished_name ]
+C                      = NZ
+ST                     = Test State or Province
+L                      = Test Locality
+O                      = Organization Name
+OU                     = Organizational Unit Name
+CN                     = Test Server
+emailAddress           = server@example.com
+
+[ req_attributes ]
+challengePassword              = A challenge password
+

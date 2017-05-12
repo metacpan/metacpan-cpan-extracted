@@ -1,0 +1,44 @@
+Revision history for Perl extension Net::Proxy::Type.
+
+0.09 Thu Mar 10 15:01:21 NOVT 2016
+      - include User-Agent header in HTTP requests to make some servers happy
+      - fix case where keyword may be searched not only in the header, but also in the part of the body
+
+0.08 Sat Jan  4 18:21:30 NOVT 2014
+      - add connect proxy support
+      - add get_all() and get_all_as_string() methods
+
+0.07 Mon Dec 3 22:30:31 2012
+      - fix for possible SIGPIPE
+      - fix for strict socks5 check
+      - check $! for EAGAIN in addition to EWOULDBLOCK
+
+0.06 Sun Oct 21 14:41:08 2012
+      - fix for `noauth' option for HTTP_PROXY
+      - HTTPS_PROXY type added
+      - `http_ver' option and $HTTP_VER variable added
+
+0.05 Thu Jun 14 17:24:32 2012
+      - fix for qw() deprication warning (rt #77815)
+
+0.04 Thu Jul 14 23:15:03 2011
+      - return connection time in list context
+      - more tests added
+
+0.03  Sun Jan 23 21:48:58 2011
+      - get_as_string() method added
+      - new options in the constructor:
+          url
+          keyword
+          noauth
+      - functionality related to the new options in the constructor
+
+0.02  Fri Nov 05 14:20:10 2010
+      - documentation bug fixes
+      - regexp to parse proxy address fixes
+      - %checkers in get() replaced by @checkers to support sorted order
+      - check mask parameter added to get() method
+
+0.01  Thu Nov 04 20:03:56 2010
+      - original version;
+

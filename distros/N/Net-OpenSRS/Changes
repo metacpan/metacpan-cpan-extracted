@@ -1,0 +1,21 @@
+0.01 Thu Feb 16 2006
+    - Initial release to CPAN.  Yay.
+
+0.02 Sat Apr 8 2006
+    - Allow countries to be two letter codes or the full country name.
+      Contributed by Sten Spans <sten@bit.nl>.
+
+0.03 Tue Sep 1 2009
+    - Ugly fix for Expat parser error due to spaces in an element name
+      in the OpenSRS renew domain response.
+
+0.04
+   -  Correct de-nastification to handle lists
+
+0.05 Sun Jun 27 16:54:23 EDT 2010
+   -  Correct de-nastification to handle single item dt_assoc
+      (eg belongs_to_rsp response)
+
+0.06 Thu Sep 16 00:21:06 EDT 2010
+   -  escape the XML special characters
+

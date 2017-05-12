@@ -1,0 +1,57 @@
+Revision history for Net-IRC3
+
+0.6	Tue Sep 23 12:42:11 CEST 2008
+        - deprecated this module, use AnyEvent::IRC in future!
+        - connect is done non blocking
+        - major semantic change: you can't reuse a connection object,
+          after the 'disconnect' event has been issued you have to recreate
+          it and reconnect the new object. All event handlers are cleared
+          after the 'disconnect' event has been issued too.
+        - major api change for channel_add and channel_remove
+        - added CTCP support
+        - implemented automatic pinging (on user request)
+          see Net::IRC3::Client::Connection::enable_ping
+
+0.5     Sun Mar 11 23:54:10 CET 2007
+        - added server password support
+        - fixed a bug with nick-changing
+        - added topic support
+        - fixed problem in prefix matching
+        - fixed a bug where channel_add was called with already
+          joined nicks, these duplicates are now prevented.
+        - found a bug in prefix_host with the tests
+        - added some tests
+        - disconnect now also does send channel_add/remove events
+        - enhanced connection handling a bit
+        - added connect and connect_error events to Net::IRC3::Connection
+        - fixed a bug where too many channel_remove events were generated on QUIT
+        - fixed case handling with channels
+        - added functionality to change the nick automatically
+          when it is already taken when registering an IRC connection.
+          (Net::IRC3::Client::Connection)
+        - added reply number <=> reply name mapping to Net::IRC3::Util
+          accessible through rfc_code_to_name
+        - added error event to Net::IRC3::Client::Connection
+        - fixed bugs in nick handling and added support for the NICK
+          change command in Net::IRC3::Client::Connection
+        - Net::IRC3::Client::Connection->channel_list now returns channel and nick
+          information in the servers cAsE.
+        - fixed a bug in send_srv and send_chan where messages
+          could have been sent twice.
+
+0.4     Tue Nov 28 17:13:01 CET 2006
+        - fixed broken PONG reply before 001
+        - made channel_list return an empty hash instead undef when no channel is joined
+
+0.3     Mon Jul 17 13:43:13 UTC 2006
+        - Refactored the code: Remove Client.pm, and make the connections
+          to standalone objects.
+        - Added nickname tracing for channels
+
+0.2     Sun Jul 16 12:58:06 CEST 2006
+        - Code got a little bit refactored and wrote documentation.
+          It seems ready for a first release.
+
+0.1     Sat Jul 15 23:46:49 UTC 2006
+        - First version, released on an unsuspecting world.
+

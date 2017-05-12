@@ -1,0 +1,269 @@
+#! /usr/bin/perl
+# vim: et sw=4
+
+use strict;
+use warnings;
+
+use YAML;
+
+$_ = '';
+
+sub set {
+    my ($h, $n, $v) = (\%_, @_);
+    while ($n =~ s#(.*?)/##) { $h = \ %{$h->{$1}}; }
+
+    $h->{$n} = $v;
+}
+
+sub flag_set {
+    my ($prefix, $num, %renames) = @_;
+
+    sub {
+        s/^\(?([^,)]*)\)?// || die "fl $prefix $_";
+
+        for my $tok (split /\|/, $1) {
+            if ($tok =~ /${prefix}_([A-Z_]+)/) {
+                set($renames{$1} || lc $1, 1);
+            } elsif ($tok =~ /[1-7]/) {
+                set($num || "NUM", $tok);
+            } elsif ($tok =~ /0L?/) {
+            } else {
+                die "fl($prefix) $tok $1 $_";
+            }
+        }
+    };
+}
+
+sub list {
+    my $hdr = shift;
+    my @lst = @_;
+
+    sub {
+        s/^\s*$hdr\(\s*// || die "missing $hdr";
+
+        for my $i (0 .. $#lst) {
+            $lst[$i]->();
+            (s/^,\s*// || die "missing comma") if $i != $#lst;
+        }
+
+        s/^\)\s*// || die "missing closep";
+    };
+}
+
+sub nest {
+    my ($name, $fn) = @_;
+
+    sub {
+        my $r = \ %{ $_{$name} };
+        local *_ = $r;
+        $fn->();
+    };
+}
+
+my %modes = qw/butt headbutt  tuch touch  stng sting  hugs crush  engl engulf
+    brea breathe  expl explode  tent tentacle  weap weapon  magc magic
+    none passive/;
+my %types = qw/phys physical  magm magicmissile  slee sleep
+    disn disintegration  elec electricity  drst poison  blnd blind
+    plys paralyze  drli drain  dren drainenergy  ston petrify  stck stick
+    sgld stealgold  sitm stealitem  sedu seduce  tlpt teleport  dgst digest
+    were lycanthropy  drdx poisondex  drco poisoncon  drin eatbrain
+    dise sickness  dcay decay  ssex succubus  halu hallucination  deth Death
+    pest Pestilence  famn Famine  slim slime  ench disenchant  corr corrode
+    clrc clericalspell  spel wizardspell  rbre randombreath  samu stealamulet
+    curs stealintrinsic/;
+
+sub attack {
+    sub {
+        if (s/^ATTK\(AT_(....), AD_(....), ([0-9]+)\s*,\s*([0-9]+)\)\s*//) {
+            push @{$_{attacks}}, { mode => $modes{lc $1} || lc $1,
+                type => $types{lc $2} || lc $2, damage => "${3}d${4}" };
+        }
+        elsif (s/^NO_ATTK\s*//) {
+        }
+        else {
+            die "expected attack $_";
+        }
+    };
+}
+
+sub i {
+    my ($name, %rw) = @_;
+    sub {
+        s/^\"?([^"),]*)\"?//;
+
+        my $v = $1;
+        $v =~ s/[A-Z]+_([A-Z_]+)/lc $1/e;
+        set($name, $rw{$v} || $v);
+    };
+}
+
+my $al = 'abcdefghijklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ@X\'&;:';
+my %gmap = map {$al =~ s/^(.)//; $_ => $1 } qw/ant blob cockatrice dog eye
+    feline gremlin humanoid imp jelly kobold leprechaun mimic nymph orc piercer
+    quadruped rodent spider trapper unicorn vortex worm xan light zruty angel
+    bat centaur dragon elemental fungus gnome giant jabberwock kop lich mummy
+    naga ogre pudding quantmech rustmonst snake troll umber vampire wraith xorn
+    yeti zombie human ghost golem demon eel lizard/;
+
+
+*parser = list(MON => i('name'), i('glyph', %gmap),
+    list(LVL => i('hitdice'), i('speed'), i('ac'), i('mr'), i('alignment')),
+    flag_set('G', 'rarity'),
+
+    list(A => attack, attack, attack, attack, attack, attack),
+
+    list(SIZ => i('weight', human => 1450, elf => 800, dragon => 4500),
+        i('nutrition'), sub { s/^0|sizeof\(.*?\)//; }, # extension
+        i('sound'), i('size', human => 'medium')),
+
+    nest('resist', flag_set('MR')), nest('_corpse', flag_set('MR')),
+
+    flag_set('M1'), flag_set('M2'), flag_set('M3'),
+
+    i('color', qw/domestic white lord magenta zap bright_blue silver gray
+        metal cyan gold yellow paper white leather brown wood brown/));
+
+my %allmons = ();
+
+my %blacklist = map {$_ => 1} 'Cerberus', 'beholder', 'baby shimmering dragon',
+    'shimmering dragon', 'vorpal jabberwock', 'vampire mage', 'Charon',
+    'long worm tail', 'Earendil', 'Elwing', 'Goblin King', 'High-elf';
+
+my %expand = (
+    # ac fine
+    acid           => 'acidic_corpse',
+    # alignment fine
+    amorphous      => 'is_amorphous',
+    amphibious     => 'is_amphibious',
+    animal         => 'is_animal',
+    breathless     => ['is_breathless', 'is_amphibious'],
+    carnivore      => 'is_carnivorous',
+    cling          => 'clings_to_ceiling',
+    close          => 'immobile_until_disturbed',
+    collect        => 'wants_wargear',
+    conceal        => 'hides_under_item',
+    covetous       => [qw/wants_amulet wants_quest_artifact wants_bell
+        wants_book wants_candelabrum/],
+    demon          => 'is_demon',
+    domestic       => 'food_makes_peaceful',
+    dwarf          => 'is_dwarf',
+    elf            => 'is_elf',
+    female         => 'is_always_female',
+    fly            => 'can_fly',
+    geno           => 'is_genocidable',
+    giant          => 'is_giant',
+    gnome          => 'is_gnome',
+    greedy         => 'wants_gold',
+    hell           => 'gehennom_exclusive',
+    herbivore      => 'is_herbivorous',
+    hide           => 'hides_on_ceiling',
+    hostile        => 'always_hostile',
+    human          => 'is_human',
+    humanoid       => 'humanoid_body',
+    infravisible   => 'infravision_detectable',
+    infravision    => 'has_infravision',
+    jewels         => 'wants_gems',
+    lgroup         => 'large_group',
+    lord           => 'is_rank_lord', #better eq, better combat
+    magic          => 'wants_magic_items',
+    male           => 'is_always_male',
+    merc           => 'is_mercenary', #throw gold, bugles make hostile
+    metallivore    => 'can_eat_metal',
+    mindless       => 'is_mindless', #does not register on telepathy
+    minion         => 'is_minion', #ignores sanctuary, hostile to - alignment
+    # mr fine?
+    nasty          => 'extra_nasty', #ignores webs, better eq, bonus XP
+    needpick       => 'tunnels_with_pick',
+    neuter         => 'is_genderless',
+    nocorpse       => 'never_drops_corpse',
+    noeyes         => 'lacks_eyes',
+    nogen          => 'not_randomly_generated',
+    nohands        => 'lacks_hands',
+    nohead         => 'lacks_head',
+    nohell         => 'absent_from_gehennom',
+    nolimbs        => 'lacks_limbs',
+    nopoly         => 'invalid_polymorph_target',
+    notake         => 'cannot_pickup_items',
+    nutrition      => 'corpse_nutrition',
+    omnivore       => ['is_herbivorous', 'is_carnivorous'],
+    orc            => 'is_orc',
+    oviparous      => 'lays_eggs',
+    peaceful       => 'always_peaceful',
+    pname          => 'has_proper_name',
+    pois           => 'poisonous_corpse',
+    prince         => 'is_rank_prince', # better equipment, combat, makes noise
+    regen          => 'regenerates_quickly',
+    rockthrow      => 'throws_boulders',
+    see_invis      => 'sees_invisible',
+    sgroup         => 'small_group',
+    slithy         => 'serpentine_body', # no feet, cannot #ride, messages
+    stalk          => 'follows_stair_users',
+    strong         => 'is_very_strong', # 18/** for polyself, double carrying
+    # uses twohanders, cannot be grappled
+    swim           => 'can_swim',
+    thick_hide     => 'has_thick_hide', # cannot be damaged with weapons
+    # of soft materials
+    tport          => 'has_teleportitis',
+    tport_cntrl    => 'has_teleport_control',
+    tunnel         => 'can_eat_rock',
+    undead         => 'is_undead',
+    uniq           => 'is_unique',
+    unsolid        => 'made_of_gas',
+    waitforu       => 'immobile_until_seen',
+    wallwalk       => 'ignores_walls',
+    wander         => 'is_wanderer', # sometimes acts confused
+    wantsamul      => 'wants_amulet',
+    wantsarti      => 'wants_quest_artifact',
+    wantsbook      => 'wants_book',
+    wantscand      => 'wants_candelabrum',
+    were           => 'is_lycanthrope',
+);
+
+sub process {
+    s#/\*.*?\*/# #sg;
+
+    # if SEDUCE is not defined, #1 is CLAW/PHYS(1d3), #3 is BITE/DRLI(2d6)
+    s/SEDUCTION_ATTACKS/A(ATTK(AT_BITE, AD_SSEX, 0, 0),
+        ATTK(AT_CLAW, AD_PHYS, 1, 3), ATTK(AT_CLAW, AD_PHYS, 1, 3),
+        NO_ATTK, NO_ATTK, NO_ATTK)/;
+
+    %_ = ();
+
+    parser();
+
+    for my $k (keys %expand) {
+        my $x = $_{$k};
+
+        if ($x) {
+            delete $_{$k};
+            my @dst = ref $expand{$k} ? @{$expand{$k}} : $expand{$k};
+
+            for my $d (@dst) {
+                $_{$d} = $x;
+            }
+        }
+    }
+
+    if ($_{glyph} eq 'm') {
+        delete $_{hides_on_ceiling};
+    }
+
+    if ($_{tunnels_with_pick}) {
+        delete $_{can_eat_rock};
+    }
+
+    if (grep { $_->{mode} eq 'weapon' } @{$_{attacks}}) {
+        $_{wants_wargear} = 1;
+    }
+
+    print Dump \%_ unless $blacklist{$_{name}};
+}
+
+while (defined (my $line = <>)) {
+    if ($line =~ /^    MON\(/) {
+        process if /^    MON\(/;
+        $_ = '';
+    }
+    $_ .= $line;
+}

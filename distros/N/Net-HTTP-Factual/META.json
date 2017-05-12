@@ -1,0 +1,46 @@
+{
+   "abstract" : "RESTful interface to Factual.com, using Spore",
+   "author" : [
+      "Andrew Grangaard <spazm@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300021, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-HTTP-Factual",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "Net::HTTP::Spore" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/spazm/Net-HTTP-Factual.git",
+         "web" : "http://github.com/spazm/Net-HTTP-Factual"
+      }
+   },
+   "version" : "0.122480"
+}
+

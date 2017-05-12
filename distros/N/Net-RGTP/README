@@ -1,0 +1,4 @@
+README for Net::RGTP
+
+This module provides a class to access RGTP bulletin board servers
+such as GROGGS at Cambridge University.

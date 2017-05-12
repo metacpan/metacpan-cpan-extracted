@@ -1,0 +1,15 @@
+Revision history for Perl extension Net::Connection::Simple.
+
+1.02  Wed May 24 14:45:00 2006
+	- Fixed the protocols() function, added HASHREF and ARRAY input support
+	- Removed time functions
+
+1.01  Tue Apr 25 11:55:00 2006
+	- Fixed minor doc error
+
+1.00  Tue Apr 18 16:32:00 2006
+	- Documentation cleaned up for initial release
+
+0.01  Tue Apr 18 16:22:08 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Net::Connection::Simple --skip-exporter

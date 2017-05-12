@@ -1,0 +1,248 @@
+#! /bin/env perl
+# -*- perl -*-
+
+# @Author: Tong SUN, (c)2002-2008, all right reserved
+# @Version: $Date: 2008/11/04 21:38:09 $ $Revision: 1.10 $
+# @HomeURL: http://xpt.sourceforge.net/
+
+# @CREDIT:
+# First draft in script from
+# http://www.geocities.com/SiliconValley/Horizon/9144/cdlwb007.html
+# By Sujit Pal, Concord, California, USA
+
+# {{{ POD, Intro: 
+
+=head1 NAME
+
+news-search - console-based newsgroup articles searcher.
+
+=head1 SYNOPSIS
+
+  news-search [options...] ngname [ngname...] [param=value...]
+
+Examples:
+
+  news-search --max_p=30 tor.housing Subject='rent|sublet|room|bdr|house|apt|apartment|condo' NoSubject='sale|FS'
+
+This search the default 'news' nntp server. Or, to specify an alternative one:
+
+  export NNTPSERVER=news.easysw.com
+  news-search --max_p=80 -v 'cups.*' Body='die|break|broke'
+
+Check out all the program options that you can use. E.g.,
+
+  news-search --headers='Newsgroups|Message-ID|Bytes' -nopbody alt.binaries.e-book.technical alt.binaries.e-books alt.binaries.e-book Subject='Java|JDBC|JNDI|JAXP|EJB|Servlet|Jsp|struts' NoSubject=Javascript
+
+=head1 DESCRIPTION
+
+This program is a console-based newsgroup articles searcher.
+
+=head1 COMMAND LINE ARGUMENTS
+
+Parameters passed from the command line are grouped into two categories,
+the optional program options, followed by mandatory searching arguments.
+
+The following searching arguments are supported.
+
+=over 4
+
+=item *
+
+ngname, newsgroup pattern to search. May have more than one newsgroups to
+search at once. May have wildcard ('*') in group name, eg, '*linux*'.
+
+=item *
+
+Subject=pattern, look in the Subject: line.
+
+=item *
+
+From=pattern, look for author in the From: line.
+
+=item *
+
+Body=pattern, look for pattern in article body.
+
+=back
+
+The pattern can be any Perl regular expressions.
+
+The above pattern match keyword can also be prefixed with 'No', e.g.,
+
+    NoSubject=pattern
+
+to ignore messages if pattern found in the Subject: line.
+
+=cut
+
+# }}} 
+
+# ############################################################## &ps ###
+# ................................................... Program starts ...
+
+
+# ============================================================== &us ===
+# ............................................................. Uses ...
+
+# -- global modules
+use strict;			# !
+use integer;			# !
+
+use Getopt::Long;
+use Pod::Usage;
+#require Data::Dumper;
+
+use News::Search;
+
+
+# ============================================================== &cs ===
+# ................................................. Constant setting ...
+my $VERSION = sprintf("%d.%02d", q$Revision: 1.10 $ =~ /(\d+)\.(\d+)/);
+
+
+# ============================================================== &gv ===
+# .................................................. Global Varibles ...
+
+
+# ############################################################## &ss ###
+# ................................................ Subroutions start ...
+
+# my handler for group starts ...
+sub my_group_handler {
+    my $newsgroup = shift;
+    print STDERR "\n\nSearching group '$newsgroup'\n\n";
+}
+
+# my handler for news message ...
+sub my_message_handler {
+    print STDERR ".";
+}
+
+# ============================================================== &sb ===
+# .................................................... Script begins ...
+
+# {{{ POD, Options: 
+
+=head1 OPTIONS
+
+=over 4
+
+=item -max_p=i
+
+Maximum number of posts to search (not return). Default is 10.
+
+=item -subpre=s
+
+The prefix string printed before printing the Subject.
+
+=item -subsuf=s
+
+The suffix string printed after printing the Subject.
+
+=item -headers=s
+
+Message headers to print.
+
+=item -phead
+
+Print message headers. Default is yes.
+May be turned off by prefixing the option with "no" or "no-".
+
+=item -pbody
+
+Print message body. Default is yes.
+May be turned off by prefixing the option with "no" or "no-".
+
+=item -verbose
+
+Be verbose. Default is no.
+
+=item -help|?
+
+Print a brief help message.
+
+=item -man
+
+Show the manual page.
+
+=back
+
+Options names may be abbreviated to uniqueness, case does not matter, and a
+single dash is sufficient, even for long option names.
+
+=cut
+
+# }}} 
+
+#
+# Handle command line arguments
+#
+die "\nnews-search - console-based newsgroup articles searcher\n".
+    "Use the options -help or -man to get more helps.\n"
+    if $#ARGV == -1;
+
+my %options =
+    (
+     max_p   => 10,		# maximum number of posts to search (not return)
+     subpre  => "Subject: ",	# prefix before printing the Subject
+     subsuf  => "\n",		# suffix after printing the Subject
+     headers => 'Date|From',	# message headers to print
+     phead   => 1,		# print message header?
+     pbody   => 1,		# print message body?
+     verbose => 0,
+);
+
+GetOptions(\%options,
+	   "max_p=i",
+	   'subpre=s',
+	   'subsuf=s',
+	   'headers=s',
+	   'phead!',
+	   'pbody!',
+	   'verbose!',
+	   'help|?',
+	   'man',
+    ) or pod2usage(2);
+pod2usage(1) if $options{help};
+pod2usage(-exitstatus => 0, -verbose => 2) if $options{man} or !@ARGV;
+
+#print STDERR "\n==>> \n" . Data::Dumper->Dump([\%options, \@ARGV]) . "==<< \n";
+
+# ============================================================ &pclp ===
+# .................................. process command line parameters ...
+
+my $ns = News::Search->
+    new( {
+	  msg_limit   => $options{max_p},
+	  msg_headers => $options{headers},
+	  verbose     => $options{verbose},
+	  on_group    => \&my_group_handler,
+	  on_message  => \&my_message_handler,
+      } );
+$ns->search_for(\@ARGV);
+
+my %newsarticles = $ns->SearchNewsgroups;
+print STDERR "\n";
+#print STDERR "\n==>> \n" . Data::Dumper->Dump([\%newsarticles]) . "==<< \n";
+
+# Dump found news postings
+foreach my $article (values %newsarticles) {
+    print "$options{subpre}$article->{SUBJECT}$options{subsuf}";
+    print join("\n",@{$article->{"HEADER"}}). "\n\n" if $options{phead};
+    print $article->{"BODY"}. "\n" if $options{pbody};
+}
+print "\n\n";
+
+=head1 AUTHOR
+
+SUN, Tong C<< <suntong at cpan.org> >>
+http://xpt.sourceforge.net/
+
+=head1 COPYRIGHT
+
+Copyright 2003-2008 Tong Sun, all rights reserved.
+
+This program is released under the BSD license.
+
+=cut
+

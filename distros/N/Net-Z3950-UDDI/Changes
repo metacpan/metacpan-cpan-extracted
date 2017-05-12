@@ -1,0 +1,73 @@
+Revision history for Perl extension Net::Z3950::UDDI.
+
+0.04  Tue May  4 12:07:10 BST 2010
+	- Improvements to documentation, including the inclusion of a
+	  "make z2uddi.pdf" rule and bin/pod2pdf to implement it.
+	- Downgrade required version of Data::Dumper.
+	- First public release (rather belatedly)
+
+0.03  Mon Dec 24 16:30:33 GMT 2007
+	- Support in the UDDI::HalfDecent module for the find_service,
+	  find_binding and find_tModel methods of UDDI.
+	- Support in the Z39.50 gateway for all four kinds of UDDI
+	  search, selected by attribute-type 15 which may take the
+	  value 1 (find_business), 2 (find_service), 3 (find_binding)
+	  or 4 (find_tModel).  For example, the PQF query:
+		@attr 1=4 @attr 15=2 %geo%
+	  will find services with "geo" in their name.
+	- New CQL relation modifiers /business, /server, /binding and
+	  /tModel corresponding to these BIB-1 attributes.  For
+	  example, the CQL query:
+		dc.title=/service %geo%
+	  will find services with "geo" in their name.
+	- Support for new BIB-1 extension attributes for specifying
+	  UDDI criteria that do not map to anything in BIB-1/GILS:
+		6000: search for specified businessKey
+		6001: search for specified serviceKey
+		6002: comma-separated bag of tModel
+	- New CQL indexes uddi.businessKey, uddi.serviceKey and
+	  uddi.tModelBag corresponding to these BIB-1 access points.
+	- Support for queries consisting of a tree of boolean ANDs
+	  (though OR is not supported) -- this makes it possible for a
+	  Z39.50 query to specify both serviceKey and tModelBag, as
+	  for example the Microsoft UDDI server requires in a
+	  find_binding()
+	- The UDDI::HalfDecent::Business class is replaced by the more
+	  generic UDDI::HalfDecent::Record, which may also represent
+	  services, bindings and tModels.
+	- The field() method of HalfDecent::Record is renamed xpath()
+	  to better reflect its behaviour, and documented
+	  accordingly.
+	- The v0.02 plugin system is simplified: each backend is
+	  implemented by a single plugin file in
+	  lib/Net/Z3950/UDDI/plugins rather than by both a database
+	  module in lib/Net/Z3950/UDDI/Database and a result-set
+	  module in lib/Net/Z3950/UDDI/ResultSet.  In practice, of
+	  course, back-end plugins are still likely to implement both
+	  of these classes, but that is a matter for each plugin to
+	  determine.
+
+0.02  Fri Dec 21 00:14:20 GMT 2007
+	- Initial pre-delivery to USGS.  Functions as a Z39.50, SRU
+	  and SRW server and gateways to a configurable set of UDDI
+	  registries, but at present supports only the find_business
+	  method.
+
+0.01  Mon Dec  3 13:52:45 2007
+	- original version; created by h2xs 1.23 with options
+		-X --name=Net::Z3950::UDDI --compat-version=5.8.0 --omit-constant --skip-exporter --skip-ppport
+
+TODO
+	- SOAP-fault extraction is still not general enough:
+	  running `UDDI_LOG=request,response perl -I ../lib ./uddihd
+	  -o uddi-version=3 http://registry.gbif.net/uddi/inquiry
+	  %geo%` yields only "UDDIException: f0: (UDDI Error)"
+	- UDDI searching on more fields
+	- Test suite
+	- Tutorial?
+	- Perhaps finish the "soap" back-end -- this started life
+	  as what was going to be the substrate for the UDDI
+	  support, but it became apparent that it wouldn't be
+	  robust enough.  If I finish it, though, it will be
+	  useful in its own right.
+

@@ -1,0 +1,96 @@
+Revision history for Perl 5 distribution Net-NSCA-Client
+
+0.009002 2011-10-24
+ [BUG FIXES]
+ - Changed the shebang for the send_nsca script so on install, it will be
+   set to the path of the perl this distribution was installed to.
+
+0.009001 2011-05-05
+ [BUG FIXES]
+ - The test t/live_server.t had a test at the beginning to test for the
+   exception of connecting to nothing. Since these error messages are not
+   the same always, the test is changed to just test for any exception.
+
+0.009 2011-05-02
+ [ENHANCEMENTS]
+ - A specific error message will occur if the remote server disconnects
+   early.
+ - Add a troubleshooting guide.
+ - Lots of new tests; very close to 100% coverage.
+
+ [BUG FIXES]
+ - An attribute was missing the lazy attribute and Moose 2.00 caused this
+   to make the tests fail. Added the lazy attribute.
+ - When the initialization_vector_length is changed in ServerConfig the new
+   value is honored.
+
+ [OTHER]
+ - Change all uses of Readonly to Const::Fast.
+ - Change all uses of Test::Exception to Test::Fatal.
+
+0.008 2010-08-30
+ [BUG FIXES]
+ - Actually sending a report was broken with a message about not being able
+   to clone something.
+
+0.007 2010-08-24
+ [ENHANCEMENTS]
+ - Allow communicating with NSCA servers that have been custom-compiled
+   with different packet constants.
+ - Check for data integrety when decoding packets.
+ - Fill empty space in packets with random alpha numeric data as the
+   standard NSCA client/server does.
+
+ [BUG FIXES]
+  - Remove test that failed when the data "didn't look random".
+
+ [OTHER]
+ - Change from Module::Install to Module::Build.
+
+0.006 2009-11-03
+ [BUG FIXES]
+ - Fixed an issue where the client would try to parse the initial packet
+   too early and throw an error about the UNIX timestamp not meeting a type
+   constraint.
+
+0.005 2009-11-01
+ [BUG FIXES]
+ - Finally fixed the test failures for t/send_nsca.t by requiring
+   Pod::Usage 1.36+ for the script.
+
+0.004 2009-10-31
+ [BUG FIXES]
+ - Modified t/send_nsca.t test so that the non-present required modules for
+   the utility will not cause the entire module to fail.
+
+0.003 2009-10-31
+ [ENHANCEMENTS]
+ - New bin/send_nsca utility. This is an emulation of the send_nsca utility
+   that comes with the NSCA package.
+
+ [OTHER]
+ - No longer use Test::Most in tests, as it was unnecessary.
+ - Use Data::Rand::Obscure instead of Crypt::Random for generation of
+   random IV.
+
+0.002 2009-10-08
+ [ENHANCEMENTS]
+ - Added a public constant $INITIALIZATION_VECTOR_LENGTH to
+   Net::NSCA::Client::InitialPacket.
+ - Added tests for many pieces of the objects and for packet reading and
+   creation.
+ - The initialization_vector attribute in Net::NSCA::Client::InitialPacket
+   is now always exactly 128 bytes.
+
+ [BUG FIXES]
+ - All Moose classes are now immutable.
+ - Creating a Net::NSCA::Client::InitialPacket without an IV would cause an
+   error since the default ended up being a Math::Pari object.
+
+ [OTHER]
+ - Added SEE ALSO section in Net::NSCA::Client.
+ - Fixed documentation in Net::NSCA::Client::DataPacket to specify all
+   required attributes.
+
+0.001 2009-10-01
+ - First release.

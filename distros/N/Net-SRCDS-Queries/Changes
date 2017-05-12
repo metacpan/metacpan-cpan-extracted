@@ -1,0 +1,18 @@
+Revision history for Net-SRCDS-Queries
+
+0.0.1  Mon May 18 22:49:28 2009
+       Initial release.
+
+0.0.2  Wed Jan 20 13:00:37 2010
+       add a2s_rules support.
+
+0.0.3  Tue Feb  2 17:49:26 2010
+       skip critic and coverage tests by default.
+       add method id2community_id().
+       try to supless other test fails.
+
+0.0.4  Mon Nov 30 23:41:23 2015
+       fix network test to fail.
+
+0.0.5  Tue Dec  1 15:27:29 2015
+       use emphemeral port by default.

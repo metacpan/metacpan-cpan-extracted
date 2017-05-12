@@ -1,0 +1,36 @@
+---
+name: Net-Tshark
+version: 0.04
+author: ["Zachary Blair <zblair@cpan.org>"]
+abstract: 'Interface for the tshark network capture utility'
+license: perl
+distribution_type: module
+generated_by: 'Zachary Blair'
+resources:
+  license: http://dev.perl.org/licenses/
+configure_requires:
+  ExtUtils::MakeMaker: 0
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test::More: 0
+requires:
+  File::Which: 0
+  IPC::Run: 0
+  List::MoreUtils: 0
+  List::Util: 0
+  XML::Simple: 0
+  perl: 5.8
+no_index:
+  directory:
+    - t
+provides:
+  Net::Tshark:
+    file: lib/Net/Tshark.pm
+    version: 0.04
+keywords:
+  - tshark
+  - Wireshark
+  - Capture
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

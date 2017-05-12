@@ -1,0 +1,22 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+README
+examples/ip_messenger.pl
+lib/Net/IPMessenger.pm
+lib/Net/IPMessenger/ClientData.pm
+lib/Net/IPMessenger/CommandLine.pm
+lib/Net/IPMessenger/EventHandler.pm
+lib/Net/IPMessenger/MessageCommand.pm
+lib/Net/IPMessenger/RecvEventHandler.pm
+lib/Net/IPMessenger/ToStdoutEventHandler.pm
+lib/Net/IPMessenger/Encrypt.pm
+lib/Net/IPMessenger/EncryptOption.pm
+t/00.load.t
+t/01.network.t
+t/pod-coverage.t
+t/pod.t
+t/metrics.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

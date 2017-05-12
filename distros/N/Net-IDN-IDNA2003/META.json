@@ -1,0 +1,53 @@
+{
+   "abstract" : "Internationalizing Domain Names in Applications (2003) (RFC 3490)",
+   "author" : [
+      "Claus Färber <CFAERBER@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-IDN-IDNA2003",
+   "no_index" : {
+      "directory" : [
+         "eg"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0,
+            "Test::NoWarnings" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::IDN::Nameprep" : "1.1",
+            "Net::IDN::Punycode" : "1"
+         }
+      }
+   },
+   "provides" : {
+      "Net::IDN::IDNA2003" : {
+         "file" : "lib/Net/IDN/IDNA2003.pm",
+         "version" : "1.000"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.000"
+}

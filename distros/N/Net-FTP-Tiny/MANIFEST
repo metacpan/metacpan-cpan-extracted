@@ -1,0 +1,19 @@
+.gitignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Net/FTP/Tiny.pm
+t/dependency.t
+t/get_cpan.at
+t/get_cpan_noip.at
+t/parse_ftp_url.t
+t/pod_cvg.t
+t/pod_syn.t
+t/setup_noip.pl
+t/upgraded.t
+t/use.t
+SIGNATURE    Added here by Module::Build

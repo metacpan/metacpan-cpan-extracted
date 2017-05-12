@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/svn/!svn/ver/90/trunk/src/Net-Canopy-BAM
+END
+MANIFEST
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/!svn/ver/32/trunk/src/Net-Canopy-BAM/MANIFEST
+END
+Makefile.PL
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/70/trunk/src/Net-Canopy-BAM/Makefile.PL
+END
+Changes
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/90/trunk/src/Net-Canopy-BAM/Changes
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/68/trunk/src/Net-Canopy-BAM/README
+END

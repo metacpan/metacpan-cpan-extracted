@@ -1,0 +1,5 @@
+  # here's two v2 keys
+ssh-dss AAAAAlkj2lkjalsdfkjlaskdfj234 foo@bar.com
+ssh-rsa AAAAAlkj2lkjalsdfkjlaskdfj234 bar@foo.com
+  # here comes a v1 key
+1024 35 1242342352342342342342222222225235463563463456345 quack@schmack.com

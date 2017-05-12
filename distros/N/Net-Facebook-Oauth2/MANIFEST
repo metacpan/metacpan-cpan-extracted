@@ -1,0 +1,12 @@
+Changes
+examples/Catalyst/Facebook.pm
+examples/CGI/facebook.pl
+lib/Net/Facebook/Oauth2.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.pod
+t/accesstoken.t
+t/Net-Facebook-Oauth2.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

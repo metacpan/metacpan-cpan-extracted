@@ -1,0 +1,10 @@
+0.011 Fri Sep 22 17:30:34 METDST 2000
+
+	Nothing chenged, but I had to change the version number to
+	retry the upload to CPAN, which failed because of a misconfiguration
+	of our local ftp server.
+
+0.01  Fri Sep 22 16:34:34 METDST 2000
+	
+	Initial release
+

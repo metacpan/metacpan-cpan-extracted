@@ -1,0 +1,25 @@
+AV_opt *    T_AVOPTREF
+HV_opt *    T_HVOPTREF
+
+INPUT
+T_AVOPTREF
+        if (SvOK($arg)) {
+	    if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV)
+		$var = (AV*)SvRV($arg);
+	    else
+		Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+			   ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+			   \"$var\");
+	}
+	else $var = 0
+
+T_HVOPTREF
+        if (SvOK($arg)) {
+	    if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVHV)
+		$var = (HV*)SvRV($arg);
+	    else
+		Perl_croak(aTHX_ \"%s: %s is not hash reference\",
+			   ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+			   \"$var\");
+	}
+	else $var = 0

@@ -1,0 +1,16 @@
+Revision history for Net-Amazon-Recommended
+
+v0.0.4    2015-06-23 01:33:25JST+0900 Asia/Tokyo
+    [Functional changes]
+        - Reflect login and rating scheme change at Amazon.
+
+v0.0.3    2013-04-18 00:15:40 Asia/Tokyo
+    [Non-functional changes]
+        - Add another missing prereq to Data::Section.
+
+v0.0.2    2013-04-16 00:18:04 Asia/Tokyo
+    [Non-functional changes]
+        - Add missing prereqs by test scripts, such as Test::Exception.
+
+v0.0.1    2013-04-14 16:37:15 Asia/Tokyo
+    - Initial release

@@ -1,0 +1,5 @@
+
+192.168.3.22/29	some spammer
+172.16.32.6	another spammer
+10.0.0.76/30	spam emailer
+9.8.7.2/31	2 slots

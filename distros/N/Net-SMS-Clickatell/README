@@ -1,0 +1,18 @@
+This is the README file for Net::SMS::Clickatell module.
+
+This module provides access to Clickattel SMS messaging service
+
+I tested this module on perl 5.8.0
+
+To install do
+
+perl Makefile.PL
+make
+make test
+make install
+
+Copyright (c) 2004 Roberto Alamos Moreno <ralamosm@cpan.org>.
+All rights reserved.  This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Clickatell is Copyright (c) 2004 Clickatell (Pty) Ltd: Bulk SMS Gateway

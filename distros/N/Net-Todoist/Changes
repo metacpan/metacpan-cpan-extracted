@@ -1,0 +1,22 @@
+Revision history for Perl extension Net-Todoist
+
+0.06    2014-08-19
+        - Improved the abstract (NAME section in pod)
+        - Added first paragraph to DESCRIPTION which explains what Todoist is.
+        - Added minimal SEE ALSO section
+        - Tweaked format of this file as per CPAN::Changes::Spec
+
+0.05    2014-03-27
+        - test fixes
+
+0.04    2010-11-07
+        - fix tests
+
+0.03    2010-11-06
+        - Test::More 0.88 for done_testing
+
+0.02    2010-10-30
+        - typo fix
+
+0.01    2010-10-13
+        - a start

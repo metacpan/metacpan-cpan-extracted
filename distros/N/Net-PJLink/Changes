@@ -1,0 +1,29 @@
+Revision history for Net-PJLink
+
+1.03    Tue, 02 May 2017 17:00:00 -0600
+	Fix bug preventing correct handling of multiple quick network replies.
+
+1.02    Wed, 20 Feb 2013 18:18:00 -0600
+	Fix bug preventing auth_password from being set in the constructor.
+	Minor documentation updates.
+
+1.01    Sun, 26 Sep 2010 17:30:00 -0600
+        Fix a bug in set_power.
+
+1.00    Mon, 12 Jul 2010 05:20:00 -0600
+        Documentation update. Version reflects RELEASE status.
+
+0.04    Thu, 03 Jun 2010 13:00:00 -0600
+        Explicitly test for OS support for Socket.pm features.
+        Minor documentation updates.
+
+0.03    Thu, 08 Apr 2010 10:00:00 -0600
+        Fixes a problem with tests not getting a plan.
+
+0.02    Thu, 02 Apr 2010 13:00:00 -0600
+        Several protocol fixes, including the get_class() and get_input_list()
+        commands. Much improved documentation and tests.
+
+0.01    Fri, 12 Mar 2010 11:00:00 -0600
+        First version, developed by testing against Panasonic PTFW100NTU projectors.
+

@@ -1,0 +1,24 @@
+Revision history for Perl extension Net::Kestrel.
+
+ 0.08 Dec 31 2011
+   - Fix defaulting of host attribute (Mike Eldridge)
+
+0.07 Nov 15 2011
+   - More POD improvements
+
+0.06 Nov 15 2011
+   - Fix typo in pod (Thanks Brian Cassidy)
+
+0.04
+    - Fix typo in repository (thanks Uwe Voelker)
+
+0.03
+    - Add timeout
+    - Print proper errors when connections fail and whatnot
+
+0.02
+    - A bit of code cleanup
+    - Timeouts for get and peek.
+
+0.01
+    - First version

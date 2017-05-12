@@ -1,0 +1,12 @@
+Revision history for Perl extension Net-OpenID-Connect-IDToken
+
+0.03 2015-07-26T09:31:02Z
+    - fixed `a_hash` to `at_hash`
+
+0.02 2013-11-10T03:51:53Z
+    - fixed missing dependency
+
+0.01 2013-11-01T17:09:56Z
+
+    - original version
+

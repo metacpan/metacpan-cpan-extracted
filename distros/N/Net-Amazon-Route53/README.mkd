@@ -1,0 +1,41 @@
+Perl Interface to Amazon's Route 53
+===================================
+
+The Net::Amazon::Route53 Perl module allows you to manage DNS
+records for your domains via Amazon's Route 53 service.
+
+For more information, visit http://aws.amazon.com/route53/.
+
+In order to use this module, you will need an Amazon account,
+you will need to have signed up for the Route 53 service, and
+you will need the "AWS id and key" associated with your account.
+
+You will then be able to perform the following operations, using
+either the module or the handy "route53" command-line utility.
+
+Implemented
+-----------
+
+- Use either ~/.aws-secrets or another keyfile for credentials
+- Use given key and id for credentials
+- Get list of hosted zones for the account
+- Create a new hosted zone, optionally waiting for the request to be completed
+- Delete a hosted zone, optionally waiting for the request to be completed
+- Get nameservers details for a hosted zone
+- List all records in a hosted zone
+- List records matching a name, type, ttl or values for a hosted zone
+- Delete a record matching a name, type, ttl or value for a hosted zone
+- Create a new record of given name, type, ttl and value(s) for a hosted zone
+- Create a "change record" option, which does a "delete" and a "create" action in one request: See Net::Amazon::Route53::ResourceRecordSet::Change.
+- Support retrieving more than 100 records at once in Net::Amazon::Route53::HostedZone::resource_record_sets
+
+To do
+-----
+
+- Support changing more than 100 records at once
+- Support deleting more than 100 records at once
+
+This software is copyright (c) 2011 by Marco Fontani.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

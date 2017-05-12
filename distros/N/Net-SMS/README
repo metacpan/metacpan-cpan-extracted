@@ -1,0 +1,375 @@
+
+Simplewire, Inc.
+Perl SMS Software Development Kit 2.6.4
+
+Contents
+----------------------------------------------------------------
+1. Release Notes
+2. Overview
+3. Modules
+4. Installation and Documentation
+5. Example Source Code
+6. Simplewire Developer Program
+7. Demo Message Credits (How Do I Send Live Messages?)
+8. Commercial Software License
+9. Sales and Technical Support
+
+Release Notes
+----------------------------------------------------------------
+
+2.6.4 - April 30, 2004
+
+    * Fixed backwards compatability bug with version <= 3.9.7
+      of the WMP Server.
+
+2.6.3 - April 5, 2004
+
+    * Fixed Carrier/Network List bug
+
+2.6.2 - February 12, 2004
+
+    * Fixed Unicode text message bug -- some platforms failed
+      to properly convert characters resulting in submission
+      errors.
+
+2.6.1 - January 25, 2004
+
+    * Fixed minor XML formatting bug.
+    
+    * Addded recv_text.pl example show how to receive incoming
+      SMS from Simplewire.
+      
+    * Added first version of the test suite.
+
+2.6.0 - July 21, 2003
+
+    * Added WAP push support.
+
+    * Added account() command to query network for real-time
+      credit balance.
+
+    * Methods submit(), query(), list(), account() all return
+      a true or false based on success() property.
+
+    * Implemented mobile originated SMS (receiving SMS) to support
+      version 2.0 and 2.5 of the WMP protocol.
+
+    * Verified and fixed all issues to verify module works in
+      both "-w" and "-Tw" modes.
+      
+    * Deprecated functions -> new equivalent functions
+      - msgSend() = submit()
+      - msgStatusSend() = query()
+      - carrierListSend() = list()
+      
+      - msgPin() = destAddr()
+      - msgCallback() = sourceAddr()
+      - proxyServer() = proxyHost()
+
+    * Backwards compatability broken on ServerName and ServerDomain
+      properties.  These will NOT effect normal use of the SDK even
+      if you previously used them.
+      
+    * Many other functions are renamed to adapt to new, upcoming
+      standards going to be introduced in version 3.x.x of the SDK.
+      All previously named functions are mapped to the new names
+      meaning all previous code is backwards-compatible.
+
+    * Fixed "unquoted string may conflict with future reserved word"
+      bug when Perl is run in -w or warning mode. 
+
+    * Added SSL support, see Secure property for more information
+      on how to use this new feature.
+      
+         $sms->secure(1);
+      
+    * Added debug output to help debug connection problems, network
+      settings, and general problems.
+      
+         $sms->debug(1);
+
+    * Deprecated ServerName, ServerDomain, and ServerPort.  Please
+      see RemoteHost and RemotePort.
+      
+    * Modified internal variables by renaming them:
+        ServerName, ServerDomain = RemoteHost
+        ServerPort = RemotePort
+        ServerFile = RemoteFile
+        Removed ServerProtocol since that is internally used.
+
+    * Modified RemotePort function to default to 0 which stands
+      for "unused".  If unchanged, SDK will connect over port
+      80 and if "secure" is true, then SDK will connect over
+      port 443.  However, any update of RemotePort will cause
+      the SDK to manually connect to that port.
+
+    * Modified default remote host to wmp.simplewire.com not
+      wmp-test.simplewire.com.
+      
+    * Modified remote file from /paging/rpc.xml to /wmp
+
+2.5.1 - June 6, 2003
+ 
+    * Fixed minor bug regarding carrier list character
+      translation.
+
+2.5.0 - June 1, 2003
+
+    * Added EMS (Enhanced Message Service) features.
+
+2.4.1 - October 26, 2001
+
+    * Added optFlash()
+    
+    * Added errorResolution()
+    
+    * Added methods that allow users to set image data in hex format
+      instead of only being able to specify using filenames.
+    
+    * Updated installation procedures
+    
+    * Changed 'SmartMsg' carrierlist hash attribute to 'SmartMsgID' to
+      match other SDKs.
+      
+    * Added proxyType()
+    
+    * Updated all example code
+    
+    * Updated perldoc manpage within SMS.pm
+
+2.4.0 - (2001-9-21)
+
+	* Added smart messaging. Updatated documentation.
+
+2.3.3 - August 21, 2001
+
+	* Removed 'pwd' commands from makefile for compatibility
+	  with Windows installation.
+
+2.3.2 - August 13, 2001
+
+	* Changed "UserName" to "Username" with lowercase 'n'.
+	  Added pass-through functions with old name
+	  for backward compatibility.
+	  - Updated documentation
+	  - Updated examples
+
+	* Restored code for deprecated 'synchronous' method for
+	  backward compatibilty. Method does nothing.
+
+	* Modified code for deprecated 'userAgent' method for
+	  backward compatibilty. Method returns empty string.
+
+	* Added reset method, Reset(). SMS member values
+	  are no longer set in the new() method. The new()
+	  method calls Reset(). User can now reset a SMS object
+	  instead of creating a new fresh object.
+	  - Updated documentation
+
+	* Renamed internal method 'xml' to 'toXML'.
+	  - Updated documentation
+
+	* Added responseXML() to get/set the response XML.
+	  This will not be documented.
+
+	* Added requestXML() to get/set the request XML.
+	  This will not be documented - at least, not at this time.
+
+	* Added a reminder in the documentation that the
+	  Unicode escape sequences are meant only for
+	  double-quoted strings.
+
+	* Added PublicChangeLog.txt
+	  - Modified release batch file to use PublicChangeLog.txt
+
+2.3.1 - July 31, 2001 (Beta Program)
+
+	* Renamed 'timeout' method to 'connectionTimeout'
+
+	* ServerPagingURL renamed to ServerFile
+
+	* Changed default ServerName from 'rpc' to 'wmp-test'.
+
+	* Changed default OptDelimiter from ":" to undefined
+
+	* DataCoding XML bug fixed
+
+2.3.0 - July 19, 2001 - (Developed as version 2.2.2)
+
+	* Unicode support added
+
+	* Custom Simplewire Unicode escape sequence added. \\X####
+
+	* MsgText and MsgFrom attributes are now sent as Unicode
+
+	* Deprecated synchronous
+
+	* Deprecated RPC loop
+
+	* Updated old error codes to new error codes
+
+	* Modified README
+
+	* Updated man page
+
+	* Added optDataCoding method
+
+	* Removed attributes: m_ServerFloor, m_ServerCeiling, m_Success.
+
+	* Added subscriber password support
+
+	* Revised examples
+
+2.2.1 - July 2, 2001
+
+	* Included module dependencies
+
+	* Automated module installation
+
+	* Updated release script
+
+2.2.0 - June 15, 2001
+
+	* Added serverPort function
+
+2.1.3 - April 27, 2001
+
+	* Deprecated User Agent for licensing
+
+	* Fixed minor EAGAIN macro error in SMS::HTTP on Red Hat 7.0
+
+	* Fixed entities bug while submitting XML to Simplewire 
+
+2.1.2 - April 16, 2001
+
+	* Windows compatibility with Active State Perl
+
+	* Add PPD Distribution For Active State Perl
+
+	* Fixed minor SMS::HTTP macro bug
+
+2.1.0 - April 14, 2001
+
+	* Added Carrier Recognition Functions
+
+	* Removed LWP::UserAgent dependency
+
+	* Added Lite SMS::HTTP library
+
+	* Improved performance by nearly 30%
+
+2.0.0 - March 24, 2001
+
+	* Removed SMS::Request and SMS::Response
+
+	* New interface and function names
+
+	* Added new redundancy with looping of WMP Servers
+
+	* Added MsgSendEx for easier sending of quick messages
+
+1.0.0 - October 5, 2000
+
+	* First public release
+
+Overview
+----------------------------------------------------------------
+The Simplewire Perl SMS Software Development Kit is a 100% pure
+Perl module. You can use it in nearly any Unix, Linux, or 
+Windows Perl programming environment. The kit has gone through 
+rigorous quality-assurance and testing to ensure a 
+comphrehensive and robust wireless messaging solution. In turn,
+the Perl SMS Software Development Kit delivers a scalable 
+business solution for high-performance, web based applications 
+in a variety of industries.
+
+The Perl SMS Software Development Kit connects your 
+application to, and works in conjunction with, the Simplewire
+Wireless Messaging Network. This network is the conduit through
+which customers are able to reach wireless users throughout the
+world. One may view the hundreds of networks to which you may
+send messages via Simplewire at http://coverage.simplewire.com/.
+
+Please read below for more information on the Simplewire
+Developer Program and purchasing a Commercial Software
+License.
+
+
+Modules
+----------------------------------------------------------------
+The Simplewire Perl SMS Software Development Kit is referenced
+by the Net::SMS package namespace.
+
+
+Installation and Documentation
+----------------------------------------------------------------
+The /docs directory contains the Perl SMS Software Development
+Kit Manual.  The manual is in Adobe Acrobat format (.PDF) and
+you will need the Adobe Acrobat Reader in order to view it. If
+you do not have the Adobe Acrobat Reader then you can get a
+free viewer by visiting http://www.adobe.com/.
+
+
+Example Source Code
+----------------------------------------------------------------
+The /examples directory contains comprehensive source code that
+demonstrates how to use the Perl SMS Software Development Kit
+in a variety of ways. You can use this code to quickly develop 
+and test your wireless messaging application.  There is a code 
+example for every major function in the Perl SMS Software 
+Development Kit.  There are also more programming resources 
+available at the Simplewire Developer Website at
+http://developers.simplewire.com/.
+
+
+Simplewire Developer Program
+----------------------------------------------------------------
+If you have not already done so, please join the free Simplewire
+Developer Program. The program offers you the opportunity to 
+create and quality-assure your wireless messaging application 
+before commercially releasing it. The program provides wireless 
+development tools and resources to help you get started at no 
+cost.
+
+Furthermore, you will gain access to an online account, from
+which you may manage all of your resources, as well as the
+Simplewire Virtual Mobile Phone, to which you may send free test
+messages online. To join the program, or for more information,
+visit http://devprogram.simplewire.com/.
+
+
+Demo Message Credits
+----------------------------------------------------------------
+In order to send live messages to actual mobile devices from 
+your Developer Account, you must purchase Demo Messages, in the
+form of credits, on the Simplewire Wireless Messaging Network.
+Please note that Demo Messages will include the "Simplewire 
+Evaluation" tag at the beginning of each message. All remaining
+Demo Message Credits will be automatically transferred to your 
+commercial account when you Go Live! In order to purchase Demo
+Message Credits, login to Your Account at 
+http://www.simplewire.com/account/, and click the "Demo It" 
+button.
+
+
+Commercial Software License
+----------------------------------------------------------------
+In order to eliminate the "Simplewire Evaluation" tag and gain 
+access to the full spectrum of features, you must upgrade to a 
+commercial account and Go Live!  You may do this by purchasing 
+a commercial license for the SMS Software Development Kit or an
+SMS Starter Package in the Simplewire Store located at
+http://www.simplewire.com/store/platform/.
+
+
+Sales and Technical Support
+----------------------------------------------------------------
+Technical support is offered for both developers and commercial
+users. One may submit problems, bug reports, incompatibilities,
+requests for change, or other comments at
+http://support.simplewire.com/.
+
+Sales support is offered for users interested in purchasing a
+commercial license or to answer any questions about Simplewire's
+products and services.  Submit sales inquiries to the Sales Team
+at http://www.simplewire.com/contact/sales/.

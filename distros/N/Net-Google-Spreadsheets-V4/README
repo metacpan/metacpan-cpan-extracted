@@ -1,0 +1,96 @@
+NAME
+
+    Net::Google::Spreadsheets::V4 - Google Sheets API v4 client
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+SYNOPSIS
+
+        use Net::Google::Spreadsheets::V4;
+        
+        my $gs = Net::Google::Spreadsheets::V4->new(
+            client_id      => "YOUR_CLIENT_ID",
+            client_secret  => "YOUR_CLIENT_SECRET",
+            refresh_token  => "YOUR_REFRESH_TOKEN",
+        
+            spreadsheet_id => "YOUR_SPREADSHEET_ID",
+        );
+        
+        my ($content, $res) = $gs->request(
+            POST => ':batchUpdate',
+            {
+                requests => [ ... ],
+            },
+        );
+
+    See also examples/import.pl for more complex code.
+
+DESCRIPTION
+
+    Net::Google::Spreadsheets::V4 is Google Sheets API v4 client
+
+METHODS
+
+ Class Methods
+
+  new(%args:Hash) :Net::Google::Spreadsheets::V4
+
+    Creates and returns a new Net::Google::Spreadsheets::V4 client
+    instance. Dies on errors.
+
+    %args is following:
+
+    client_id => Str
+
+    client_secret => Str
+
+    refresh_token => Str
+
+    spreadsheet_id => Str
+
+ Instance Methods
+
+  get_sheet(title|index|sheet_id => Str) :HashRef
+
+    Get Sheet object by title or index or sheet_id.
+
+  clear_sheet(sheet_id => Str)
+
+    Delete all data.
+
+  to_csv(Array)
+
+    Convert Array to CSV Str.
+
+AUTHOR
+
+    HIROSE Masaaki <hirose31@gmail.com>
+
+REPOSITORY
+
+    https://github.com/hirose31/Net-Google-Spreadsheets-V4
+
+        git clone https://github.com/hirose31/Net-Google-Spreadsheets-V4.git
+
+    patches and collaborators are welcome.
+
+SEE ALSO
+
+    https://developers.google.com/sheets/
+
+COPYRIGHT
+
+    Copyright HIROSE Masaaki
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

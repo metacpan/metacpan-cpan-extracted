@@ -1,0 +1,50 @@
+{
+   "abstract" => "The great new Net::Enum::DNSServer!",
+   "author" => [
+      "Stefan Certic <support@certic.info>"
+   ],
+   "dynamic_config" => 0,
+   "generated_by" => "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" => [
+      "artistic_2"
+   ],
+   "meta-spec" => {
+      "url" => "http=>//search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" => "2"
+   },
+   "name" => "Net-Enum-DNSServer",
+   "no_index" => {
+      "directory" => [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" => {
+      "build" => {
+         "requires" => {
+            "Test::More" => "0"
+         }
+      },
+      "configure" => {
+         "requires" => {
+            "ExtUtils::MakeMaker" => "0"
+         }
+      },
+      "runtime" => {
+         "requires" => {
+            "perl" => "5.006"
+         }
+      }
+   },
+   provides => {
+   'Net::Enum::DNSServer' => {
+    file    => 'lib/Net/Enum/DNSServer.pm',
+    version => '0.27_02',
+   },
+   'Net::Enum::DNS' => {
+    file    => 'lib/Net/Enum/DNS.pm',
+   },
+   },
+   "release_status" => "stable",
+   "version" => "0.01"
+}

@@ -1,0 +1,950 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Examples</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#net::z3950::asyncz_by_example">Net::Z3950::AsyncZ By Example</a></li>
+	<ul>
+
+		<li><a href="#introduction">Introduction</a></li>
+	</ul>
+
+	<li><a href="#basic.pl">basic.pl</a></li>
+	<ul>
+
+		<li><a href="#main_routine">Main Routine</a></li>
+		<li><a href="#subroutines">Subroutines</a></li>
+	</ul>
+
+	<li><a href="#basic_pretty.pl">basic_pretty.pl</a></li>
+	<ul>
+
+		<li><a href="#main_routine">Main Routine</a></li>
+		<li><a href="#subroutines">Subroutines</a></li>
+	</ul>
+
+	<li><a href="#more_pretty.pl">more_pretty.pl</a></li>
+	<ul>
+
+		<li><a href="#the_more_pretty_main_routine">the more_pretty Main Routine</a></li>
+		<li><a href="#the_more_pretty_format_function">the more_pretty format function</a></li>
+	</ul>
+
+	<li><a href="#options.pl">options.pl</a></li>
+	<li><a href="#raw.pl">raw.pl</a></li>
+	<li><a href="#marc_html.pl">MARC_HTML.pl</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<style = "text/css">
+code { font-family: sans-serif; font-weight:bold; }
+</style><p>
+</p>
+<hr />
+<h1><a name="net::z3950::asyncz_by_example">Net::Z3950::AsyncZ By Example</a></h1>
+<p>
+</p>
+<h2><a name="introduction">Introduction</a></h2>
+<p>Net::Z3950::AsyncZ adds an additional layer of asynchronous support to
+the Z3950 module through the use of multiple forked processes.
+Users may also find that it is a useful front end to Z3950.
+Detailed descriptions of the mechanics, objects, and methods of AsyncZ 
+can be found in the accompanying documentation:</p>
+<UL>
+<LI>
+ <A href="AsyncZ.html">AsyncZ.html</a>
+<LI>
+ <A href="Options.html">Options.html</a>
+<LI>
+ <A href="Report.html">Report.html</a>
+</UL><p>What follows are annotated versions of the example scripts. 
+I start with the <code>basic.pl</code>, which uses the the basics needed
+to run <code>AsyncZ</code>, and move up through the scripts, each of which adds
+features to the one previous in this order:&nbsp;&nbsp;
+<code>basic.pl, basic_pretty.pl, more_pretty.pl, options.pl</code></p>
+<p>Since each script builds upon the one previous, the only script which is
+quoted in full is <code>basic.pl</code>.  For subsequent scripts, I quote
+the code added to the predecessor.</p>
+<p>
+</p>
+<hr />
+<h1><a name="basic.pl">basic.pl</a></h1>
+<p>
+</p>
+<h2><a name="main_routine">Main Routine</a></h2>
+<pre>
+   use Net::Z3950::AsyncZ qw(isZ_Error);                        # [1]
+                                                        
+   my @servers = (                                      # [2]
+                [ 'amicus.nlc-bnc.ca', 210, 'NL'],      
+                ['bison.umanitoba.ca', 210, 'MARION'],
+                [ 'library.anu.edu.au', 210, 'INNOPAC' ],
+                ['130.17.3.75', 210, 'MAIN*BIBMAST'],                   
+                [ 'library.usc.edu', 2200,'unicorn'],
+                [ 'z3950.loc.gov', 7090, 'Voyager' ],
+                [ 'fc1n01e.fcla.edu', 210, 'FI' ],
+                [ 'axp.aacpl.lib.md.us', 210, 'MARION'],
+                [ 'jasper.acadiau.ca', 2200, 'UNICORN']
+          );</pre>
+<pre>
+  my $query = '  @attr 1=1003  &quot;Henry James&quot; ';  # [3]</pre>
+<pre>
+                                                 # [4] 
+  my $asyncZ = Net::Z3950::AsyncZ-&gt;new( servers=&gt;\@servers,query=&gt;$query,
+                                                cb=&gt;\&amp;output );  
+  showErrors($asyncZ);                           # [5]</pre>
+<pre>
+          exit;
+        
+          #------END MAIN------#</pre>
+<OL>
+<LI>
+Load <code>Net::Z3950::AsyncZ</code> and import <A href="AsyncZ.html#item_net%3a%3aasyncz%3a%3aisz_error">isZ_Error</a>,
+which is a class method that we will use in the error handling subroutine
+<code>showErrors()</code>.
+<LI>
+Create an array of servers to which we want to send our query.  This
+consists of an array of references to a three-element anonymous array:
+<code>$host, $port, and $database_name</code>.  This is the same
+structure which is used in <code>Net::Z3950</code>.
+<LI>
+Create a query.  This query uses the YAZ toolkit's PQN ('prefix') syntax. 
+<LI>
+Create a <code>Net::Z3950::AsyncZ</code> object, using named-parameters; in addition
+to passing <code>servers</code> and <code>query</code> into the
+contrcutor, we also pass in a reference to a callback function which
+will be called by <code>Net::Z3950::AsyncZ</code> whenever new records become
+available--it will be up to the callback function to output the records
+to terminal or browser.
+<LI>
+Call <code>showErrors</code>, a subroutine which will output error
+messages, in the event that some of the servers fail to respond or to
+return records.  We pass in the reference to the <code>Net::Z3950::AsyncZ</code>
+object, which <code>showErrors()</code> will need to access the errors.
+</OL><p>
+</p>
+<h2><a name="subroutines">Subroutines</a></h2>
+<dl>
+<dt><strong><a name="item_the_output_function">the output function</a></strong><br />
+</dt>
+<dd>
+<pre>
+          sub output {
+           my($index, $array) = @_;             # [1]
+           foreach my $line(@$array) {          # [2]
+             print &quot;$line\n&quot; if $line;          # [3]   
+            }
+           print &quot;\n--------\n\n&quot;;    
+          }</pre>
+</dd>
+</dl>
+<OL>
+<LI>
+Get the two parameters which AsyncZ passes to the output function, namely 
+the index of the server which is reporting back and a reference to
+an array of record data for the server.  This array will contain one or more records.<br>
+See <A href="AsyncZ.html#output_callback_(required)">Output Callback</A>
+in <code>AsyncZ.html</code>.
+<LI>
+Each array element represents a separate line of record output:  retrieve
+each line from the array.
+<LI>
+If the line is not null, print it.  (The check for a null line is a
+carry over from an earlier state of AsyncZ:  I don't think it's
+needed anymore but I keep it just in case.)
+</OL><dl>
+<dt><strong><a name="item_the_error%2dhandling_function">the error-handling function</a></strong><br />
+</dt>
+<dd>
+<pre>
+  sub showErrors {
+   my $asyncZ = shift;                  # [1]</pre>
+</dd>
+<dd>
+<pre>
+   print &quot;The following servers have not responded to your query: \n&quot;;</pre>
+</dd>
+<dd>
+<pre>
+   for(my $i=0; $i&lt; $asyncZ-&gt;getMaxErrors();$i++) {     # [2]
+          my $err = $asyncZ-&gt;getErrors($i);             # [3]
+          next if !isZ_Error($err);                     # [4]
+          print &quot;$servers[$i]-&gt;[0]\n&quot;;                  # [5]
+          print &quot;  $err-&gt;[0]-&gt;{msg}\n&quot; if $err-&gt;[0]-&gt;{msg};  # [6]
+          print &quot;  $err-&gt;[1]-&gt;{msg}\n&quot; if $err-&gt;[1]-&gt;{msg};  # [7]
+        }
+      
+  }</pre>
+</dd>
+</dl>
+<OL><LI>
+Get the reference to the <code>AsyncZ</code> object.<LI>
+Get the total number of errors reported and loop through them.<LI>
+For each server there are two possible errors,
+since for some servers we make a second attempt to get results if the
+first attempt fails.
+(See <A href ="AsyncZ.html#the_basic_mechanisms_of_net::asyncz"</code>Basic
+Mechanisms of Net::Z3950::AsyncZ</a>.)
+<code>$err</code> is a reference to an anonymous array which may hold 1 or 2 references
+to <code>Net:AsyncZ::ErrMsg</code> objects, which store all the necessary info
+about these errors.  (See <A href ="AsyncZ.html#net::asyncz::errmsg">Net::Z3950::AsyncZ::ErrMsg</a>)
+<br>
+So, get the errors array for the current index.<LI>
+Check to see whether in fact an error occurred--we
+may not have gotten any records back on the first attempt;
+consequently, we may have an error for attempt 1.  But we may have
+been successful on attempt 2 and so the first error is nullified.  Or we may
+have had an error on the first attempt which was fatal
+and so no second attempt was made. <code>isZ_Error</code> will tell us
+what happend.<LI>
+If we've got this far, then there's been some kind of error.
+So, let's tell our user the name of the server that failed
+to return results: we pick that up from the <code>@servers</code>
+array--[$server, $port, $database].<LI>- 7.
+Now we can make our own use of the <code>ErrMsg</code> objects.  The array
+reference <code>$err</code> holds two <code>ErrMsg</code> objects.
+<code>$err->[0]</code> is from attempt 1 and <code>$err->[1]</code> from attempt 2.
+We check to see if error messages have been saved in these
+object and if so, we print them.</OL><p>
+</p>
+<hr />
+<h1><a name="basic_pretty.pl">basic_pretty.pl</a></h1>
+<p><code>basic_pretty.pl</code> is an upgrade to <code>basic_pl</code>.  When you run
+<code>basic_pl</code>, you get a set of headers, which your user doesn't have
+to see, the records are run together, and the interspersed with 
+the records are various debugging messages.  <code>basic_pretty.pl</code>
+rectifies these problems.</p>
+<p>Instead of reprinting the entire <code>basic.pl</code>, let's look only at
+the changes.</p>
+<p>
+</p>
+<h2><a name="main_routine">Main Routine</a></h2>
+<pre>
+   use Net::Z3950::AsyncZ qw(:header :errors);  # [1]
+   use Net::Z3950::AsyncZ::Errors qw(suppressErrors);  # [2]
+        
+        .        .          .       .</pre>
+<pre>
+   my $asyncZ =
+     Net::Z3950::AsyncZ-&gt;new(servers=&gt;\@servers,query=&gt;$query,
+                   cb=&gt;\&amp;output,                          
+                   log=&gt;suppressErrors(),       # [3]             
+        );</pre>
+<dl>
+<dt></dt>
+<dd>
+1.  We import a number of subroutines from <code>Net::Z3950::AsyncZ</code> that will
+enable us to do something with both the headers and the errors
+directed to the user.
+</dd>
+<dd>
+<p>2. We import a subroutine from <code>Net::Z3950::AsyncZ::Errors</code> that will
+enable us to get rid of the interspersed debugging messages.</p>
+</dd>
+<dd>
+<p>3. We set <code>log</code> to <code>suppressErrors()</code> so that errors get suppressed.</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="subroutines">Subroutines</a></h2>
+<dl>
+<dt><strong><a name="item_basic_pretty_output_function">basic_pretty output function</a></strong><br />
+</dt>
+<dd>
+<pre>
+  sub output {
+   my($index, $array) = @_;</pre>
+</dd>
+<dd>
+<pre>
+   foreach my $line(@$array) {
+     return if noZ_Response($line);       # [1]
+     next if isZ_Info($line);             # [2]         
+     next if isZ_Header($line);           # [3]     
+     (print &quot;\nServer: &quot;, Z_serverName($line), &quot;\n&quot;), 
+             next                                   # [4]
+             if isZ_ServerName($line);              # [5]</pre>
+</dd>
+<dd>
+<pre>
+     print &quot;$line\n&quot; if $line;  
+    }</pre>
+</dd>
+<dd>
+<pre>
+   print &quot;\n--------\n\n&quot;;</pre>
+</dd>
+<dd>
+<pre>
+  }</pre>
+</dd>
+<dt></dt>
+<dd>
+1. <code>isZ_Info</code> removes headers.
+</dd>
+<dd>
+<p>2. So, too, does <code>isZ_Header</code></p>
+</dd>
+<dd>
+<p>3. <code>Z_serverName</code> checks to see if this is the header with the server's name in it</p>
+</dd>
+<dd>
+<p>4. If it is, then extract the server's name with <code>isZ_ServerName</code> and print it for the user's
+information</p>
+</dd>
+<p></p></dl>
+<dl>
+<dt><strong><a name="item_basic_pretty_error%2dhandling_function">basic_pretty error-handling function</a></strong><br />
+</dt>
+<dd>
+<pre>
+  sub showErrors {
+  my $asyncZ = shift;</pre>
+</dd>
+<dd>
+<pre>
+   # substitute some general statement for a
+   #  system level error instead of something
+   #  puzzling to the user like:  'illegal seek'
+  my $systemerr = 
+    &quot;A system error occurred on the server\n&quot;;    # [1]</pre>
+</dd>
+<dd>
+<pre>
+   print &quot;The following servers have not responded to your query: \n&quot;;</pre>
+</dd>
+<dd>
+<pre>
+   for(my $i=0; $i&lt; $asyncZ-&gt;getMaxErrors();$i++) {
+          my $err = $asyncZ-&gt;getErrors($i);   
+          next if !isZ_Error($err);         
+          print &quot;$servers[$i]-&gt;[0]\n&quot;;  
+          if($err-&gt;[0]-&gt;isSystem()) {                   # [2]
+                print $systemerr;               
+          }
+          else {                                       # [3]
+            print &quot;  $err-&gt;[0]-&gt;{msg}\n&quot; if $err-&gt;[0]-&gt;{msg};
+  }
+  if($err-&gt;[1] &amp;&amp; $err-&gt;[1]-&gt;isSystem()) {             # [4]
+        print $systemerr;                               
+  }
+  else {
+    print &quot;  $err-&gt;[1]-&gt;{msg}\n&quot;                         # [5]
+    if $err-&gt;[1]-&gt;{msg} &amp;&amp; $err-&gt;[1]-&gt;{msg} != $err-&gt;[0]-&gt;{msg};
+  }</pre>
+</dd>
+<dd>
+<pre>
+  }</pre>
+</dd>
+<dd>
+<pre>
+ }</pre>
+</dd>
+<dt></dt>
+<dd>
+1.  We create a general system-level error message because this time we are going to
+test for system level errors and print the general statement to screen
+instead of system level error messages which risk frustrating the user.
+</dd>
+<dd>
+<p>2.  We use the <code>Net::ErrMsg</code> object, naemly <code>$err-&gt;[0]-&gt;isSystem()</code>, to test for system-level errors
+and print the general message if it is system-level.</p>
+</dd>
+<dd>
+<p>3. If it isn't we ouput the error message for this error.</p>
+</dd>
+<dd>
+<p>4. We check first to make sure that <code>$err-&gt;[1]</code> exists: remember,
+<code>$err-&gt;[1]</code> is an error that occurs during the second attempt to query the server,
+and if the first time around we got a fatal (non-retryable) error, then we 
+will not have and <code>$err-&gt;[1]</code>.  If there is an <code>$err-&gt;[1]</code> and it's
+a system-level error, the print the general system message.</p>
+</dd>
+<dd>
+<p>5.  Otherwise, print the <code>$err-&gt;[1]</code> message. <strong>But only</strong> if it is not
+the same error and therefore the same message as the first time around.  
+Since there's no point in repeating it.</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="more_pretty.pl">more_pretty.pl</a></h1>
+<p>The script <code>more_pretty</code> illustrates the use of the <code>format</code> 
+option.</p>
+<p>
+</p>
+<h2><a name="the_more_pretty_main_routine">the more_pretty Main Routine</a></h2>
+<pre>
+   my $asyncZ =
+    Net::Z3950::AsyncZ-&gt;new(servers=&gt;\@servers,query=&gt;$query,cb=&gt;\&amp;output,
+                   format=&gt;\&amp;thisRecordRow,  # [1]
+                   log=&gt;suppressErrors()</pre>
+<pre>
+        );</pre>
+<dl>
+<dt></dt>
+<dd>
+1.  We set the <code>format</code> option to <code>thisRecordRow</code>, a subroutine which we will define
+later.
+</dd>
+<dd>
+<p>2.  <code>num_to_fetch</code> specifies how many records we want returned; the default is 5.</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="the_more_pretty_format_function">the more_pretty format function</a></h2>
+<pre>
+  use Text::Wrap qw($columns &amp;wrap);            # [1]</pre>
+<pre>
+  sub thisRecordRow {
+    my ($row) = @_;                             # [2]
+    $columns = 56;                              # [3]
+    my $field = $row-&gt;[1];  
+    my $indent = ' ' x 25;
+    $field = wrap(&quot;&quot;,$indent, $field)
+                   if length($field) &gt; 56;     # [4]
+    
+    return sprintf(&quot;%20s:  %s\n&quot;,                             
+      $Net::Z3950::AsyncZ::Report::MARC_FIELDS{$row-&gt;[0]}, $field);    # [5]</pre>
+<pre>
+   }</pre>
+<dl>
+<dt></dt>
+<dd>
+1. Load the <code>Text::Wrap</code> module and import  <code>$columns</code> and <code>&amp;wrap</code>.
+</dd>
+<dd>
+<p>2. Retrieve <code>$row</code> from <code>@_</code>.  This is a two element aanoymous array.
+<code>$row[0]</code> is a reference to the MARC tag for the current row, while 
+<code>$row[1]</code> is a reference to the record data for this row.</p>
+</dd>
+<dd>
+<p>3. Set the maximum number of columns for the record data to 56 (we are going to
+allow 20 for the field identifier). <code>%Net::Z3950::AsyncZ::Report::MARC_FIELDS</code>
+is a hash in which the MARC tags are the keys and the dentifier strings
+are the values:</p>
+</dd>
+<dd>
+<pre>
+        '050' =&gt; LC call number
+        245  =&gt; title</pre>
+</dd>
+<dd>
+<p>and so forth.  This topic is taken up in the <code>Net::Z3950::AsyncZ::Report</code>
+documentation.</p>
+</dd>
+<dd>
+<p>4. If the record data is longer than 56 characters, wrap it.</p>
+</dd>
+<dd>
+<p>5. Finish off our formatting of the line using <code>sprintf</code> and return the
+line to <code>Net::Report</code>.</p>
+</dd>
+<dd>
+<p>So instead of this:</p>
+</dd>
+<dd>
+<pre>
+   050     LC call number: LB1027.S3662 1969b
+   245     title:  The Schools and the challenge of innovation[by] H. Thomas James 
+   and others] With introd. by Sterling M. McMurrin.
+   260     publication:    New York,McGraw-Hill[1969]</pre>
+</dd>
+<dd>
+<p>We get this:</p>
+</dd>
+<dd>
+<pre>
+     LC call number: LB1027.S3662 1969b56
+              title: The Schools and the challenge of innovation[by] H.
+                         Thomas James [and others] With
+                         introd. by Sterling M.
+                         McMurrin.
+         publication: New York,McGraw-Hill[1969]</pre>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="options.pl">options.pl</a></h1>
+<pre>
+   use Net::Z3950::AsyncZ qw(:header :errors asyncZOptions); # [1]
+   use Net::Z3950::AsyncZ::Errors qw(suppressErrors);   
+                
+   my @servers = (
+                [ 'amicus.nlc-bnc.ca', 210, 'NL'],              
+                ['bison.umanitoba.ca', 210, 'MARION'],          
+                [ 'library.anu.edu.au', 210, 'INNOPAC' ],
+                ['130.17.3.75', 210, 'MAIN*BIBMAST'],                   
+                [ 'library.usc.edu', 2200,'unicorn'],
+                [ 'z3950.loc.gov', 7090, 'Voyager' ],
+                [ 'fc1n01e.fcla.edu', 210, 'FI' ],
+                [ 'axp.aacpl.lib.md.us', 210, 'MARION'],
+                [ 'jasper.acadiau.ca', 2200, 'UNICORN']
+          );</pre>
+<pre>
+   my @options = ();                                    # [2]</pre>
+<pre>
+   for(my $i = 0; $i &lt; @servers; $i++) {                
+      $options[$i] = asyncZOptions(num_to_fetch=&gt;1,     # [3]    
+                                   format=&gt;\&amp;thisRecordRow);  
+      $options[$i]-&gt;set_query('  @attr 1=1003  &quot;James Joyce&quot; ')
+                          if $i % 2 == 0;               # [4]
+   }
+       
+    $options[0]-&gt;set_GRS1();    # amicus        # [5] 
+    $options[0]-&gt;set_raw_on();                  # [6]
+    $options[0]-&gt;set_log('amicus.log');         # [7]
+    $options[1]-&gt;set_raw_on();                  # [8]
+    $options[5] = undef;  # z3950.loc.gov       # [9]</pre>
+<pre>
+    my $query = '  @attr 1=1003  &quot;Henry James&quot; ';  # [10]</pre>
+<pre>
+    my $asyncZ =
+            Net::Z3950::AsyncZ-&gt;new(servers=&gt;\@servers,query=&gt;$query,cb=&gt;\&amp;output,
+                           log=&gt;suppressErrors(),       # [11]
+                            options=&gt;\@options,         # [12]
+                            num_to_fetch=&gt;2             # [13]          
+                );  
+          showErrors($asyncZ);</pre>
+<pre>
+          exit;</pre>
+<pre>
+        
+          #------END MAIN------#</pre>
+<dl>
+<dt><strong><a name="item_%5b1%5d">[1]</a></strong><br />
+</dt>
+<dd>
+Import <code>asyncZOptions</code>, the class method which returns <code>Net::Z3950::AsyncZ::Option::_params</code> objects--
+where we can set options for each server separately.
+</dd>
+<p></p>
+<dt><strong><a name="item_%5b2%5d">[2]</a></strong><br />
+</dt>
+<dd>
+Create an array to hold the references to <code>_params</code> objects.
+</dd>
+<p></p>
+<dt><strong><a name="item_%5b3%5d">[3]</a></strong><br />
+</dt>
+<dd>
+Loop through the servers, creating a <code>_params</code> object for
+each.  Set <code>num_to_fetch=&gt;1</code> and <code>format=&gt;\&amp;thisRecordRow</code>
+for each server.
+</dd>
+<dd>
+<p><em>Note</em>:  When you create a <code>_params</code> object for a server, if the
+<code>num_to_fetch</code> and <code>format</code> options are not set, they will revert
+to the default values, which are 5 and plain text output, even if
+you later set these options in the <code>AsyncZ</code> constructor. <code>AsyncZ</code> constructor
+settings do not apply to <code>num_to_fetch</code> and <code>format</code> if you have
+previously created a <code>_params</code> object for the server in question.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_%5b4%5d">[4]</a></strong><br />
+</dt>
+<dd>
+For every 2nd server we'll ask for books about James Joyce.
+The odd number servers will use the query about Henry James at&nbsp;#10.
+Unlike the <code>num_to_fetch</code> and <code>format</code> options, a <code>query</code>
+set in the <code>AsyncZ</code> constructor will apply to any server which
+does not have a <code>query</code> set for it in a <code>_params</code> object.
+The rationale behind this is that you usually will be asking one
+question across all servers.
+</dd>
+<p></p>
+<dt><strong><a name="item_%5b5%5d">[5]</a></strong><br />
+</dt>
+<dd>
+We request GRS-1 records from amicus, The National Library of Canada,
+because this is their default <code>preferredRecordSyntax</code>.
+</dd>
+<p></p>
+<dt><strong><a name="item_%5b6%5d">[6]</a></strong><br />
+</dt>
+<dd>
+We ask to have the amicus records returned to us raw, because we might
+presumably branch off from our output function to a special handler for 
+raw GRS-1 records.  (Although in the case of the National Library of
+Canada GRS-1 records, our GRS-1 handler in <code>Net::Z3950::AsyncZ:Records</code>
+works fine.)
+</dd>
+<p></p>
+<dt><strong><a name="item_%5b7%5d">[7]</a></strong><br />
+</dt>
+<dd>
+Because of our special treatment of amicus records, we set a log to
+catch any error messages.  In the case of logs, the <code>log</code> setting
+in the <code>AsyncZ</code> constructor will apply to all servers unless a log
+is specifically set for it in it a server's <code>_params</code> object.  The rationale
+for this is that you probably would want one log file to cover
+all servers, except in special circumstances.
+</dd>
+<dd>
+<p>In the present case, only amicus will get a log; all the other servers
+will be governed by <code>log=&gt;suppressErrors()</code> in the <code>AsyncZ</code>
+constructor.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_%5b8%5d">[8]</a></strong><br />
+</dt>
+<dd>
+Since amicus doesn't always respond, let's get some
+raw output from another server, just for demonstration
+purposes:  $server[1] is bison.
+</dd>
+<p></p>
+<dt><strong><a name="item_%5b9%5d">[9]</a></strong><br />
+</dt>
+<dd>
+I <code>undef</code> z3950.loc.gov, Library of Congress.  This means
+that the Library of Congress record output will be govenred
+by the <code>AsyncZ</code> constructor and a default <code>_params</code> object
+which will be created for it.
+</dd>
+<p></p>
+<dt><strong><a name="item_%5b10%5d">[10]</a></strong><br />
+</dt>
+<dd>
+Set the query for any servers which don't have a query set in
+its &lt;_params&gt;.
+</dd>
+<p></p>
+<dt><strong><a name="item_%5b11%5d">[11]</a></strong><br />
+</dt>
+<dd>
+Suppress error logs for all servers which
+don't ask for error logs in their <code>_params</code> objects.
+</dd>
+<p></p>
+<dt><strong><a name="item_%5b12%5d">[12]</a></strong><br />
+</dt>
+<dd>
+Set <code>options=&gt;\@options</code>
+</dd>
+<p></p>
+<dt><strong><a name="item_%5b13%5d">[13]</a></strong><br />
+</dt>
+<dd>
+Fetch 2 records for any server which does not have a 
+<code>_params</code> object--in this case z3950.loc.gov, Library of Congress.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="raw.pl">raw.pl</a></h1>
+<p><code>raw.pl</code> illustrates how to access raw records which have not been filtered through 
+<code>Net::Z3950::Record::render()</code>.</p>
+<pre>
+   use Net::Z3950::AsyncZ qw(:header :errors asyncZOptions prep_Raw get_ZRawRec);  # [1]
+   use Net::Z3950::AsyncZ::Errors qw(suppressErrors);           
+   my @servers = (</pre>
+<pre>
+                ['bison.umanitoba.ca', 210, 'MARION'],
+                [ 'z3950.loc.gov', 7090, 'Voyager' ],
+                [ 'jasper.acadiau.ca', 2200, 'UNICORN']
+          );</pre>
+<pre>
+   
+  my @options = (               
+   asyncZOptions (raw=&gt;1,num_to_fetch=&gt;3, render=&gt;0), #[2]
+   asyncZOptions (raw=&gt;1,num_to_fetch=&gt;3, render=&gt;0),
+   asyncZOptions (raw=&gt;1,num_to_fetch=&gt;3, render=&gt;0),
+  );</pre>
+<pre>
+          my $query = '  @attr 1=1003  &quot;James Joyce&quot; ';  
+          my $asyncZ =
+            Net::Z3950::AsyncZ-&gt;new(servers=&gt;\@servers,query=&gt;$query,cb=&gt;\&amp;output,
+                           monitor=&gt;45, 
+                           maxpipes=&gt;2,    
+                           log=&gt;suppressErrors(),
+                           options =&gt; \@options,            
+                );  
+          
+          exit;
+        
+          #------END MAIN------#</pre>
+<pre>
+          sub output {
+           my($index, $array) = @_;
+           my $count=0;
+           return if noZ_Response($array=&gt;[0]); #[3]
+           my $recs = prep_Raw($array);         #[4]</pre>
+<pre>
+           while(($rec = get_ZRawRec($recs))) { #[5]
+             my $outfile = &quot;&gt; raw_${index}_$count&quot;;  #[6]
+             open OUTFILE, $outfile;
+             print OUTFILE $rec;
+             close OUTFILE;
+             $count++;
+           }
+          }</pre>
+<dl>
+<dt><strong>[1]</strong><br />
+</dt>
+<dd>
+Import functions from <code>AsyncZ</code> which are needed for error handling,
+reading headers, and handling unfiltered raw records
+</dd>
+<p></p>
+<dt><strong>[2]</strong><br />
+</dt>
+<dd>
+Create <code>_params</code> objects for each of the servers:  set <code>raw</code> to <code>true</code> and 
+<code>render</code> to <code>false</code>.
+</dd>
+<p></p>
+<dt><strong>[3]</strong><br />
+</dt>
+<dd>
+Check to make sure there has been a response:  no reponse headers will always consist
+of an array with one element.
+</dd>
+<p></p>
+<dt><strong>[4]</strong><br />
+</dt>
+<dd>
+Prepare the unfiltered records by passing them to prep_Raw().  This subroutine
+strips the headers from all the records in the current group, creates a single
+string from the array, and sets markers between each record.
+</dd>
+<p></p>
+<dt><strong>[5]</strong><br />
+</dt>
+<dd>
+Fetch one record at a time--get_ZRawRec()is a ``get_next'' type function, starting
+with the first record.
+</dd>
+<p></p>
+<dt><strong>[6]</strong><br />
+</dt>
+<dd>
+For this example, we'll write each record to a file:  so we create a file name for
+each record as it is fetched and write the output to the file.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="marc_html.pl">MARC_HTML.pl</a></h1>
+<p>This script demonstrates a number of things having to do with handling of HTML and MARC records.  In
+addition, it gives an example of the use of the option <code>Z3950_options</code> of the <code>_params</code> object.</p>
+<p>I reprint the script here, which is fully annotated, and give a few fuller explanations below.</p>
+<pre>
+        #!/usr/bin/perl</pre>
+<pre>
+        ##  This script demonstrates a number of things
+        ##      1. how to create you own MARC fields hash by adding fields to %$Net::Z3950::Report:all
+        ##      2. use of the Z3950_options _params option
+        ##      3. formatting HTML by starting with the default HTML row format
+        ##      4. use of utf8 for unicode output TO browser
+        ##</pre>
+<pre>
+        use Net::Z3950::AsyncZ qw(:header :errors asyncZOptions); 
+        use Net::Z3950::AsyncZ::Errors qw(suppressErrors);
+        use Net::Z3950::AsyncZ::Report;
+        use strict;</pre>
+<pre>
+        my @servers = (
+                        ['128.118.88.200',210,'catalog'],
+                        ['bison.umanitoba.ca', 210, 'MARION']</pre>
+<pre>
+                  );</pre>
+<pre>
+        
+        # [1] create hash of additional MARC fields</pre>
+<pre>
+        my %my_MARC_fields = (
+        651 =&gt; &quot;location&quot;,
+        654 =&gt; &quot;terms&quot;,
+        655 =&gt; &quot;genre&quot;,
+        656 =&gt; &quot;occupation&quot;,
+        760 =&gt; &quot;main series&quot;,
+        762 =&gt; &quot;subseries&quot;,
+        765 =&gt; &quot;original language&quot;,
+        767 =&gt; &quot;translation entry&quot;,
+        770 =&gt; &quot;supplement/special issue&quot;,
+        772 =&gt; &quot;supplement parent&quot;,
+        773 =&gt; &quot;host item entry&quot;,
+        774 =&gt; &quot;constituent unit&quot;,
+        775 =&gt; &quot;other edition&quot;,
+        776 =&gt; &quot;add. physical form&quot;,
+        777 =&gt; &quot;issued with&quot;,
+        780 =&gt; &quot;preceding&quot;,
+        785 =&gt; &quot;succeeding&quot;,
+        786 =&gt; &quot;data source&quot;,
+        787 =&gt; &quot;nonspecific rel.&quot;,
+        800 =&gt; &quot;personal name&quot;,
+        810 =&gt; &quot;corporate name&quot;,
+        811 =&gt; &quot;meeting name&quot;,
+        830 =&gt; &quot;uniform title&quot;
+        );</pre>
+<pre>
+        # [2] create a new hash which adds the additional MARC fields to %$Net::Z3950::AsyncZ::Report::all,
+        # ($Net::Z3950::AsyncZ::Report::all is a reference to %Net::Z3950::AsyncZ::Report::MARC_Fields_All</pre>
+<pre>
+        my %my_MARC_hash = (%$Net::Z3950::AsyncZ::Report::all, %my_MARC_fields);</pre>
+<pre>
+        # [3] set options for both servers
+        #   --assign \%my_MARC_hash to marc_userdef
+        #   --ask for full records, the default is brief, by setting the Z3950 option elementSetName =&gt;'f'.
+        #   The 'f' option is used by the Net::Z3950::ResultSet module.  We set this option by
+        #   using Z3950_options.  (Options set in the Manager are inherited by the other Z3950 modules.)
+        #  --set format to &amp;Net::Z3950::AsyncZ::Report::_defaultRecordRowHTML or else set HTML to true.</pre>
+<pre>
+        my @options = (
+                     asyncZOptions(
+                          num_to_fetch=&gt;8, format=&gt;\&amp;Net::Z3950::AsyncZ::Report::_defaultRecordRowHTML,
+                          marc_userdef=&gt;\%my_MARC_hash,Z3950_options=&gt;{elementSetName =&gt;'f'}),
+                      asyncZOptions(
+                          num_to_fetch=&gt;8, HTML=&gt;1,
+                          marc_userdef=&gt;\%my_MARC_hash)             
+        );</pre>
+<pre>
+        #  [4] set the utf8 option to true--you could also do that above in step 3
+        $options[0]-&gt;set_utf8(1);
+        $options[1]-&gt;set_utf8(1);</pre>
+<pre>
+        # [5] set the query
+        my $query = '  @attr 1=1016  &quot;Baudelaire&quot; ';  
+   
+        # [6] Output headers which notify the browser that this script is outputting utf8
+        print &quot;Content-type: text/html;charset=utf-8'\n\n&quot;;             
+        print '&lt;head&gt;&lt;META http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot;&gt;&lt;/head&gt;&lt;body&gt;', &quot;\n&quot;;</pre>
+<pre>
+        # [7] send out the query to the servers
+                  my $asyncZ =
+                    Net::Z3950::AsyncZ-&gt;new(servers=&gt;\@servers,query=&gt;$query,cb=&gt;\&amp;output,
+                                   options=&gt;\@options, #log=&gt;suppressErrors()
+                        );</pre>
+<pre>
+                  exit;</pre>
+<pre>
+                  #------END MAIN------#</pre>
+<pre>
+                  sub output {
+                   my($index, $array) = @_;</pre>
+<pre>
+        # [8] stipulate that the output stream is utf8--required!
+                   binmode(STDOUT, &quot;:utf8&quot;);</pre>
+<pre>
+        # [9] create a table structure for the rows of &lt;TD&gt;'s which are output by the
+        # default format subroutine</pre>
+<pre>
+                   my $table_started = 0;
+                   my $server_found= 0;
+                   print &quot;&lt;TABLE&gt;&lt;TR&gt;&lt;TD&gt;&quot;;
+                   foreach my $line(@$array) {
+                     return if noZ_Response($line);
+              
+                     next if isZ_Info($line);   # remove internal data                
+                     if (isZ_Header($line)) {
+                            print '&lt;tr&gt;&lt;td&gt;&amp;nbsp;&lt;td&gt;&amp;nbsp;&lt;/TABLE&gt;' if $table_started;
+                            $table_started = 1;</pre>
+<pre>
+        # [10] Add space around table elements and set the alignments for the columns
+                            print '&lt;TABLE cellspacing = &quot;6&quot; cellpadding=&quot;2&quot; border=&quot;0&quot; width = &quot;600&quot;&gt;';
+                            print '&lt;colgroup span=&quot;2&quot;&gt;&lt;COL ALIGN = &quot;RIGHT&quot; WIDTH=&quot;150&quot; VALIGN=&quot;TOP&quot;&gt;&lt;COL ALIGN=&quot;LEFT&quot;&gt;&lt;/COLGROUP&gt;';
+                            next;
+                     }
+                  
+                     my $sn = Z_serverName($line);
+                     if($sn &amp;&amp; ! $server_found) {                       
+                              print &quot;\n&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;Server: &quot;, $sn, &quot;&lt;/b&gt;&lt;br&gt;\n&quot;;
+                              $server_found = 1;        
+                     }
+ 
+        # [11] substitute a fancier style for the field names            
+                     $line =~ s/&lt;TD&gt;/&lt;TD NOWRAP style=&quot;color:blue&quot; align=&quot;right&quot;&gt;/i;
+                     print &quot;$line\n&quot; if $line;  
+                    }
+                  print &quot;&lt;/TABLE&gt;&quot;;
+                  }</pre>
+<dl>
+<dt><strong>[1]</strong><br />
+</dt>
+<dd>
+<code>%my_MARC_fields</code> is drawn from the Library of Congress MARC documentation.
+</dd>
+<p></p>
+<dt><strong>[2]</strong><br />
+</dt>
+<dd>
+It is added to <code>%Net::Z3950::AsyncZ::Report::MARC_FIELDS_ALL</code>, which is referenced
+by <code>$Net::Z3950::AsyncZ::Report::all</code> (and is not itself directly accessible).  We
+create this extended set of fields in order to get as much data as possible, since
+we are going to be setting <code>elementSetName</code> to 'f', asking for ``full'' as opposed to
+``brief'' records.
+</dd>
+<p></p>
+<dt><strong>[4]</strong><br />
+</dt>
+<dd>
+To use <code>utf8</code> support, you must have <code>MARC::Charset</code> installed; otherwise, this option will be ignored.
+</dd>
+<p></p>
+<dt><strong>[5]</strong><br />
+</dt>
+<dd>
+This query should get us some French accented characters with which to test out <code>utf8</code> support
+</dd>
+<p></p>
+<dt><strong><a name="item_%5b6%5d%2c_%5b8%5d">[6], [8]</a></strong><br />
+</dt>
+<dd>
+These steps notify the browser that it will be receiving a <code>utf8</code> stream and notify perl that it should
+output a <code>utf8</code> stream.  Unless you call <code>binmode(STDOUT,&quot;:utf8&quot;)</code>, perl will not output the <code>utf8</code>
+code.
+</dd>
+<p></p>
+<dt><strong><a name="item_%5b9%5d_%2d_%5b11%5d">[9] - [11]</a></strong><br />
+</dt>
+<dd>
+We will be using the default HTML format function, which outputs individual rows of data
+formatted for insertion into a table. Its structure is:
+</dd>
+<dd>
+<pre>
+                &lt;TD&gt;field name&lt;TD&gt;field data</pre>
+</dd>
+<dd>
+<p>The <code>output()</code> callback takes advantage of this formatting byt specifying HTML 
+attributes for the table and by reconstructing one of the &lt;TD&gt; tags.</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Myron Turner
+&lt;<a href="mailto:turnermm@shaw.ca">turnermm@shaw.ca</a>&gt;
+or &lt;<a href="mailto:mturner@ms.umanitoba.ca">mturner@ms.umanitoba.ca</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright 2003 by Myron Turner</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

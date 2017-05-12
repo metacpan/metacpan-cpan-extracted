@@ -1,0 +1,29 @@
+Revision history for Net-Amazon-S3-Policy
+
+0.1.6  Fri Aug 02 22:58:00 2013
+       Set dependency on minimum perl version 5.8, for Encoding
+
+0.1.5  Wed Jul 24 00:24:00 2013
+       Normalized test for base64.
+
+0.1.4  Mon Jul 22 22:04:00 2013
+       Avoid POD tests for non-author.
+       Changed input to Base64 encoding to raw bytes instead of Unicode.
+
+0.1.3  Sun Jul 21 16:43:00 2013
+       Added "SEE ALSO" section.
+       Made "DWIM" management more sane.
+       Fixed issue with POD encoding
+
+0.1.2  Thu Sep  4 02:56:00 2008
+       Put a requisite on JSON at least version 2.
+       Better sample.
+       Made Exporter happy for previous versions.
+
+0.1.1  Tue Sep  2 12:31:00 2008
+       Removed some bugs, made DWIM interpretation more DWIM
+       Added example.
+
+0.1.0  Mon Sep  1 18:00:25 2008
+       Initial release.
+

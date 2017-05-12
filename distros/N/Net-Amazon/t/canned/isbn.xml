@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ItemLookupResponse xmlns="http://webservices.amazon.com/AWSECommerceService/2007-01-15">
+  <Items>
+    <Item>
+      <ASIN>0439784549</ASIN>
+      <SalesRank>232</SalesRank>
+      <ItemAttributes>
+        <Author>J.K. Rowling</Author>
+        <Binding>Hardcover</Binding>
+        <Creator Role="Illustrator">Mary GrandPré</Creator>
+        <EAN>9780439784542</EAN>
+        <ISBN>0439784549</ISBN>
+        <Label>Scholastic, Inc.</Label>
+        <ListPrice>
+          <Amount>2999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$29.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Scholastic, Inc.</Manufacturer>
+        <NumberOfItems>1</NumberOfItems>
+        <NumberOfPages>652</NumberOfPages>
+        <PackageDimensions>
+          <Height Units="hundredths-inches">187</Height>
+          <Length Units="hundredths-inches">978</Length>
+          <Weight Units="hundredths-pounds">235</Weight>
+          <Width Units="hundredths-inches">636</Width>
+        </PackageDimensions>
+        <ProductGroup>Book</ProductGroup>
+        <PublicationDate>2005-07-16</PublicationDate>
+        <Publisher>Scholastic, Inc.</Publisher>
+        <ReadingLevel>Ages 9-12</ReadingLevel>
+        <ReleaseDate>2005-07-16</ReleaseDate>
+        <Studio>Scholastic, Inc.</Studio>
+        <Title>Harry Potter and the Half-Blood Prince (Book 6)</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>998</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$9.98</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>226</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$2.26</FormattedPrice>
+        </LowestUsedPrice>
+        <LowestCollectiblePrice>
+          <Amount>2999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$29.99</FormattedPrice>
+        </LowestCollectiblePrice>
+        <TotalNew>136</TotalNew>
+        <TotalUsed>301</TotalUsed>
+        <TotalCollectible>73</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+    </Item>
+  </Items>
+</ItemLookupResponse>

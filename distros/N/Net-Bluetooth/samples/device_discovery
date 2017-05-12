@@ -1,0 +1,17 @@
+use Net::Bluetooth;
+                                                                                                                   
+	#### list all remote devices in the area
+	my $device_ref = get_remote_devices();
+	foreach $addr (keys %$device_ref) {
+		print "Address: $addr Name: $device_ref->{$addr}\n";
+	}
+
+	#### Note: Windows will not immediately return the device name
+	#### if it is not already cached. Also there is no mechinism
+	#### to alert the system when it has acquired the device name.
+	#### Therefore you may have to call get_remote_devices() twice
+	#### before the name shows up. (Yeah it is lame, but even the 
+	#### samples that come with the Windows SDK show them putting
+	#### a Sleep() call in to get around the problem.
+
+	#### BlueZ does not have this issue.

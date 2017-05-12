@@ -1,0 +1,12 @@
+{: NES 1.0 include.cgi :}
+{: #
+  ----------------------------------------------------------------------
+    
+  NES 1.0 by Skriptke
+  Copyright 2009 - 2010 Enrique F. Castañón
+  Licensed under the GNU GPL.
+  http://nes.sourceforge.net/
+
+  ----------------------------------------------------------------------
+:}
+{: include test.nhtml :}

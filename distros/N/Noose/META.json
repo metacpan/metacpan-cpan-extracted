@@ -1,0 +1,74 @@
+{
+   "abstract" : "just enough object orientation to hang yourself",
+   "author" : [
+      "Mike Doherty <doherty@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300032, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Noose",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "inc",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::Damn" : "0",
+            "Scalar::Util" : "0",
+            "Storable" : "0",
+            "Sub::Name" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/doherty/Noose/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/doherty/Noose.git",
+         "web" : "https://github.com/doherty/Noose"
+      }
+   },
+   "version" : "0.001"
+}
+

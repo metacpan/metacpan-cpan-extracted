@@ -1,0 +1,5 @@
+Version 0.3, 2008-02-12, Nickolay Kovalev <nickola_code@nickola.ru>
+	- Fixed Solaris locking problem
+	- Optimization
+Version 0.2, 2007-07-16, Nickolay Kovalev <nickola_code@nickola.ru>
+	- Original version

@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+#
+# nc.sniffer.cgi
+# version 1.00, 5-6-06, michael@bizsystems.com
+#
+use strict;
+#use diagnostics;
+use lib qw(blib/lib);
+
+use Net::Connection::Sniffer::Report qw(
+	web_report
+);
+
+# EDIT the configuration to fit your site
+#
+my $wconf = {		# web configuration
+
+# location of statistics file
+# [REQUIRED]
+#
+	stats	=> '/var/run/nc.sniffer/nc.sniffer.stats',
+
+# location of web cache file, this must exist
+# and be writable by the web daemon
+# [RECOMMENDED]
+#
+	cache	=> './tmp/sniffer.cache',
+
+# statstistics update timeout
+# [OPTIONAL] default 15 seconds
+#
+	updto	=> 15,
+
+# cache or stats (if cache not activated above)
+# refresh every nnn seconds
+# default is 300 seconds
+# [OPTIONAL]
+#
+	refresh	=> 300,
+
+# update host:port
+#
+# format:
+#	port
+#   or
+#	host:port
+#   or
+#	ipaddr:port
+#
+# host defaults to 'localhost', 127.0.0.1
+# [REQUIRED]
+#
+	update	=> '127.0.0.1:10004',
+
+};
+
+web_report($wconf);

@@ -1,0 +1,17 @@
+Revision history for Net-SNMP-Poller
+
+0.05    2013/12/31
+        Bumping up version
+
+0.04    2013/12/31
+        Updating comments
+
+0.03    2013/1/31
+        Practicing writing unit test with mocked methods
+
+0.02    2012/12/23
+        Created test_deeply.pl because this module requires snmpd running on
+        target hosts and this assumption cannot be made on CPAN test machines.
+
+0.01    2012/12/19
+        Initial release.

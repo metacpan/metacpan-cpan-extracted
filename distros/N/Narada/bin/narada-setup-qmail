@@ -1,0 +1,278 @@
+#!/usr/bin/env perl
+use 5.010001;
+use warnings;
+use strict;
+use utf8;
+
+our $VERSION = 'v2.3.7';
+
+use FindBin;
+use lib "$FindBin::Bin/../lib/perl5";
+use Narada;
+use Narada::Config qw( get_config set_config );
+use File::Temp qw( tempfile );
+use Cwd qw( cwd );
+use Path::Tiny;
+
+
+main(@ARGV) if !caller;
+
+
+sub err { die "narada-setup-qmail: @_\n" }
+
+sub main {
+    die "Usage: narada-setup-qmail [--clean|--lock]\n"
+        if (@_ >  1)
+        || (@_ == 1 && $_[0] ne '--clean' && $_[0] ne '--lock');
+    my $clean = @_ && $_[0] eq '--clean';
+    my $lock  = @_ && $_[0] eq '--lock';
+
+    if ($clean) {
+        path('var/use/qmail')->remove;
+        for my $file (ls_qmail()) {
+            unlink $file                        or err "unlink($file): $!";
+        }
+        unlink '.lock.qmail';
+    }
+    else {
+        if (Narada::detect() eq 'narada') {
+            path('var/use/qmail')->touch;
+        }
+        if ($lock) {
+            lock_qmail();
+        }
+        else {
+            setup_qmail();
+        }
+    }
+
+    return;
+}
+
+sub lock_qmail {
+    my $cwd = cwd();
+    my $lock = "$cwd/.lock.qmail";
+    replacefile($lock, '|false');
+
+    my $temp = 'tmp/.qmail.symlink';
+    unlink $temp;
+    for my $qmail (ls_qmail()) {
+        symlink $lock, $temp                    or err "symlink($lock,$temp): $!";
+        rename $temp, $qmail                    or err "rename($temp,$qmail): $!";
+    }
+
+    return;
+}
+
+sub setup_qmail {
+    my $cwd = cwd();
+    my $lock = "$cwd/.lock.qmail";
+    my $temp = 'tmp/.qmail.symlink';
+    unlink $temp;
+
+    for my $file (ls('config/qmail')) {
+        # read from config/qmail/
+        my $data = get_config("qmail/$file");
+        $data =~ s/^[|]/|cd \Q$cwd\E || exit(100); /gmxs;
+        # write to var/qmail/
+        my $path = "$cwd/var/qmail/$file";
+        replacefile($path, $data);
+        # symlink at ~/.qmail-
+        my $qmail = "$ENV{HOME}/.qmail-$file";
+        if (! -e $qmail) {
+            symlink $path, $qmail               or err "symlink($path,$qmail): $!";
+        }
+        elsif (-l $qmail && _readlink($qmail) eq $lock) {
+            symlink $path, $temp                or err "symlink($path,$temp): $!";
+            rename $temp, $qmail                or err "rename($temp,$qmail): $!";
+        }
+        elsif (! (-l $qmail && _readlink($qmail) eq $path)) {
+            err "Conflict detected on $qmail";
+        }
+    }
+
+    # cleanup
+    for my $file (grep {! -f "config/qmail/$_"} ls('var/qmail')) {
+        unlink "var/qmail/$file"                or err "unlink(var/qmail/$file): $!";
+    }
+    unlink $lock;
+    for my $file (grep {! -f} ls_qmail()) {
+        unlink $file                            or err "unlink($file): $!";
+    }
+
+    return;
+}
+
+sub ls_qmail {
+    my $cwd = cwd();
+    my @files =
+        grep {-l && _readlink($_) =~ m{\A\Q$cwd\E/}xms}
+        map {"$ENV{HOME}/$_"}
+        grep { m/\A[.]qmail-/xms }
+        ls($ENV{HOME});
+    return @files;
+}
+
+sub replacefile {
+    my ($file, $data) = @_;
+    (my $dir = $file) =~ s{/[^/]+\z}{}xms;
+    my ($fh, $temp) = tempfile(DIR => $dir);
+    print {$fh} $data;
+    close $fh                                   or err "close($temp): $!";
+    rename $temp, $file                         or err "rename($temp,$file): $!";
+    return;
+}
+
+sub ls {
+    my ($dir) = @_;
+    opendir my $d, $dir                         or err "opendir($dir): $!";
+    my @files = grep { $_ ne q{.} && $_ ne q{..} } readdir $d;
+    closedir $d                                 or err "closedir($dir): $!";
+    return @files;
+}
+
+sub _readlink {
+    my ($link) = @_;
+    my $path = readlink $link                   or err "readlink($link): $!";
+    return $path;
+}
+
+
+1; # Magic true value required at end of module
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+narada-setup-qmail - install/remove project qmail configuration
+
+
+=head1 VERSION
+
+This document describes narada-setup-qmail version v2.3.7
+
+
+=head1 USAGE
+
+    narada-setup-qmail [--clean|--lock]
+
+
+=head1 DESCRIPTION
+
+Should be executed in project deploy directory (or Narada 1.x project root
+directory).
+
+Sync Narada project's qmail configuration with user's C<~/.qmail-*> files.
+
+When executed with C<--clean> option will remove all C<~/.qmail-*> files
+related to this project.
+
+When executed with C<--lock> option will setup all C<~/.qmail-*> files related
+to this project to exit with code which means that the delivery failed but
+should be tried again in a little while (soft error). To undo this effect run
+again without options or with C<--clean>.
+
+
+=head1 SYNTAX OF "config/qmail/files"
+
+Syntax of "config/qmail/files" is same as described in "man dot-qmail",
+but commands in project's qmail configuration will be executed in project's
+root directory instead of user's home directory. If config file have piped
+command (started with "|") it will be modified to
+"|cd /path/to/project || exit(100); " command will be added on-the-fly before
+user command, i.e. every command line in "config/qmail/file_with_command" like:
+
+|some_script some_opt;
+
+will turn into line in user's dir like:
+
+|cd /path/to/project || exit(100); some_script some_opt;
+
+
+=head1 DIAGNOSTICS
+
+=over
+
+=item C<< conflict detected on ~/.qmail-NAME >>
+
+This project have config/qmail/NAME, but ~/.qmail-NAME already exists and
+it isn't symlink to this project's var/qmail/NAME file.
+
+You should manually resolve this conflict by either renaming
+config/qmail/NAME file in this project or removing ~/.qmail-NAME.
+After that you should run narada-setup-qmail again.
+
+=back
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+        config/qmail/*
+        var/qmail/*
+        ~/.qmail-*
+        var/use/qmail
+        .lock.qmail
+
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/powerman/Narada/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software. The code repository is available for
+public review and contribution under the terms of the license.
+Feel free to fork the repository and submit pull requests.
+
+L<https://github.com/powerman/Narada>
+
+    git clone https://github.com/powerman/Narada.git
+
+=head2 Resources
+
+=over
+
+=item * MetaCPAN Search
+
+L<https://metacpan.org/search?q=Narada>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/dist/Narada>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Narada>
+
+=item * CPAN Testers Matrix
+
+L<http://matrix.cpantesters.org/?dist=Narada>
+
+=item * CPANTS: A CPAN Testing Service (Kwalitee)
+
+L<http://cpants.cpanauthors.org/dist/Narada>
+
+=back
+
+
+=head1 AUTHOR
+
+Alex Efros E<lt>powerman@cpan.orgE<gt>
+
+Nick Levchenko C<< <nick-lev@ya.ru> >>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2008- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

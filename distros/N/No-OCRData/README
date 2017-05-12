@@ -1,0 +1,13 @@
+This package deals with files that can be retrieved from Norwegian 
+banks, if you have proper agreements. In the good old days, these 
+files were generated mostly by scanning and OCRing paper, and for 
+that reason the service is still called "OCRGiro". The data 
+I've operated on has hardly been OCRed, but that is what they 
+to date emphasize... 
+
+The rest of the documentation is written in Norwegian, as I suspect 
+this module is of very little use if you do not read the language. 
+See also the LESMEG file.  
+
+For copyright and author information, see inline POD. 
+

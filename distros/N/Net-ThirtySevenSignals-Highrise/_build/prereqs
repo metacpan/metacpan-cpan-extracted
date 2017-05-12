@@ -1,0 +1,16 @@
+do{ my $x = {
+       'build_requires' => {
+                             'Test::More' => 0
+                           },
+       'conflicts' => {},
+       'requires' => {
+                       'perl' => '5.6.0',
+                       'URI' => 0,
+                       'LWP::UserAgent' => 0,
+                       'XML::Simple' => 0,
+                       'HTTP::Request' => 0,
+                       'Log::Log4perl' => 0
+                     },
+       'recommends' => {}
+     };
+$x; }

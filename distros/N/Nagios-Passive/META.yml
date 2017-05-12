@@ -1,0 +1,49 @@
+---
+abstract: "drop check results into nagios' spool dir"
+author:
+  - 'Danijel Tasov <data@cpan.org>'
+build_requires:
+  Test::More: '0'
+  Test::TempDir::Tiny: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Nagios-Passive
+provides:
+  Nagios::Passive:
+    file: lib/Nagios/Passive.pm
+    version: v0.4.0
+  Nagios::Passive::Base:
+    file: lib/Nagios/Passive/Base.pm
+  Nagios::Passive::BulkResult:
+    file: lib/Nagios/Passive/BulkResult.pm
+  Nagios::Passive::CommandFile:
+    file: lib/Nagios/Passive/CommandFile.pm
+  Nagios::Passive::Gearman:
+    file: lib/Nagios/Passive/Gearman.pm
+  Nagios::Passive::ResultPath:
+    file: lib/Nagios/Passive/ResultPath.pm
+  Nagios::Passive::Role::Tempfile:
+    file: lib/Nagios/Passive/Role/Tempfile.pm
+requires:
+  Class::Load: '0'
+  Crypt::Rijndael: '0'
+  File::Temp: '0'
+  Gearman::Client: '0'
+  MIME::Base64: '0'
+  Moo: '0'
+  MooX::HandlesVia: '0'
+  MooX::late: '0'
+  Nagios::Plugin: '0'
+  Types::Standard: '0'
+  perl: '5.010'
+  version: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/datamuc/Nagios-Passive
+version: v0.4.0

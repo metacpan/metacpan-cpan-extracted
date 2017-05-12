@@ -1,0 +1,14 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/NetHack/Logfile.pm
+lib/NetHack/Logfile/Entry.pm
+lib/NetHack/Logfile/Entry/32.pm
+lib/NetHack/Logfile/Entry/33.pm
+lib/NetHack/Logfile/Entry/34.pm
+lib/NetHack/Logfile/Util.pm
+t/001-basic.t
+t/002-3_2.t

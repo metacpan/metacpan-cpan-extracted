@@ -1,0 +1,50 @@
+---
+abstract: 'Some common classes to write async webservice clients'
+author:
+  - 'Gianni Ceccarelli <gianni.ceccarelli@net-a-porter.com>'
+build_requires:
+  Data::Printer: '0'
+  HTTP::Response: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Async-Webservice-Common
+no_index:
+  directory:
+    - t/lib
+recommends:
+  IO::Async::Loop: '0'
+  LWP::UserAgent: '0'
+  Net::Async::HTTP: '0'
+requires:
+  Carp: '0'
+  Config::Any: '0'
+  Encode: '0'
+  Future: '0.21'
+  HTTP::Request: '0'
+  HTTP::Request::Common: '0'
+  Moo: '1.001000'
+  Moo::Role: '0'
+  Scalar::Util: '0'
+  StackTrace::Auto: '0'
+  Throwable: '0'
+  Try::Tiny: '0'
+  Type::Library: '0'
+  Type::Params: '0'
+  Type::Utils: '0'
+  Types::Standard: '0'
+  Types::URI: '0'
+  namespace::autoclean: '0'
+  overload: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/NET-A-PORTER/Net-Async-Webservice-Common.git
+version: 1.0.2

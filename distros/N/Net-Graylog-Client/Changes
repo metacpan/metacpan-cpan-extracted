@@ -1,0 +1,9 @@
+0.3 2014-04-04
+  * Tidy up some pod
+  * use App::Basis::Config to hold targets
+  * use proper GELF format in line with http://www.graylog2.org/gelf#specs
+  * generated API.pm from the swagger docs from http://my_graylog_server:12900/api-browser
+0.2 2014-03-20 
+  * extra release as cpan rejected 0.1
+0.1 2014-03-20 
+  * initial CPAN release

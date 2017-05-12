@@ -1,0 +1,113 @@
+{: NES 0.9 ('none') :}
+{: # 
+    ----------------------------------------------------------------------------
+    
+        NES 0.9 beta by - Skriptke
+        Copyright 2009 - 2010 Enrique F. Castañón
+        Licensed under the GNU GPL.
+        http://sourceforge.net/projects/nes/
+        
+        Sample to use Nes;
+        
+    ----------------------------------------------------------------------------
+:}
+
+        <h2><a href="#">Ejemplos de include</a></h2>
+        <h3>Descripción</h3>
+        <p>  
+        Con <a href="./?action=item&item=Tag include (file)">include</a> podemos incluir casi
+         cualquier tipo de archivo; <i>HTML</i>, <i>PHP</i>, <i>PERL</i>, 
+         <i>PYTHON</i>, <i>NSQL</i>, <i>NHTML</i>, <i>SH</i>, <i>TXT</i>, etc.
+        </p>
+        <h3>Include PHP</h3>
+        <p>  
+        Muchas veces tenemos que incluir en nuestras páginas partes de código de
+         terceros; publicidad, estadísticas, etc. las más de las veces éstas vienen en <i>PHP</i>. 
+         Nes es compatible y permite incluir archivos <i>PHP</i> con sólo hacer esto:
+        <pre>
+        &#123;: include ('file.php') :&#125;
+        </pre>
+        </p>        
+        <p>
+        El siguiente es un script en PHP que muestra un calendario:
+        <div id="cuadro">
+        {: include ../../scripts/examples/calendar.php :}
+        </div>
+        <br>
+        Puedes incluir Tags Nes en cualquier parte del archivo PHP.
+        <br><br> 
+        Sólo se soporta el método GET.
+        </p>
+        <br><br>
+        <h3>Include Perl</h3>
+        <p> 
+        Cuando incluimos un script Perl con sentencias <i>print</i>, Nes redirige la salida.
+        <pre>
+        &#123;: include ('file.pl') :&#125;
+        </pre>        
+        <div id="cuadro">
+        {: include ../../scripts/examples/perl.pl :}
+        </div>
+        </p>          
+        <br><br>      
+        <h3>Include Python</h3>
+        <p> 
+        Ejemplo de Python.
+        <pre>
+        &#123;: include ('file.py') :&#125;
+        </pre>        
+        <div id="cuadro">
+        {: include ../../scripts/examples/python.py :}
+        </div>
+        </p>          
+        <br><br>   
+        <h3>Include SH</h3>
+        <p> 
+        También podemos incluir archivos de shell. El siguiente es un script en
+         SH que muestra el comando cal de unix:
+        <pre>
+        &#123;: include ('file.sh') :&#125;
+        </pre>        
+        <pre id="cuadro"><big><big>
+{: include ../../scripts/examples/cal.sh :}
+        </big></big></pre>
+        </p>        
+        <br><br>
+        <h3>Include nHTML</h3>
+        <p> 
+        Cuando incluimos un nhtml de Nes también se ejecuta su script.
+        <pre>
+        &#123;: include ('file.nhtml') :&#125;
+        </pre>        
+        <div id="cuadro">
+        {: include ../../scripts/examples/suerte.html :}
+        </div>
+        </p>          
+        <br><br>
+        <h3>Include HTML</h3>
+        <p> 
+        Se puede incluir cualquier archivo <i>HTML</i> normal tipo text/html.
+        <pre>
+        &#123;: include ('file.html') :&#125;
+        </pre>        
+        <div id="cuadro">
+        {: include ../../scripts/examples/solo_html.html :}
+        </div>
+        </p>   
+        <br><br>
+        <h3>Include TXT</h3>
+        <p> 
+        Cualquier archivo de texto plano (text/plain).
+        <pre>
+        &#123;: include ('file.txt') :&#125;
+        </pre>        
+        <div id="cuadro">
+        {: include ../../scripts/examples/archivo.txt :}
+        </div>
+        </p>  
+         <br>
+        <small>(Utiliza "Ver fuente" del menú superior para ver más detalles)</small>
+        <p>
+        Más sobre <a href="./?action=item&item=Tag include (file)">include</a>.
+        </p>
+ 

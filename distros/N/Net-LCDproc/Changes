@@ -1,0 +1,19 @@
+Changelog for Net-LCDproc
+
+0.104 2015-06-03T23:58:44Z
+  [ Bugfixes ]
+    - has_socket is called during DEMOLISH so make sure it is actually
+      there (Ioan Rogers)
+    - Fix a few metadata bugs in eg/music.pl (Ioan Rogers)
+
+  [ Other ]
+    - [Closes #3] namespace::sweep is now obsolete, switch to
+      namespace::clean. Thanks ETHER. (Ioan Rogers)
+    - Switch from semantic to basic versioning scheme
+
+0.1.3 2014-03-06T09:15:36Z
+  - Declare minimum required version of Moo (Ioan Rogers)
+
+0.1.2 2014-03-03T13:49:47Z
+  - Switched from Moose to Moo + Type::Tiny (Ioan Rogers)
+  - Updated minimum perl to v5.10.2 (Ioan Rogers)

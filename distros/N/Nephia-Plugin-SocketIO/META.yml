@@ -1,0 +1,43 @@
+---
+abstract: 'Nephia plugin socketio support'
+author:
+  - 'ytnobody <ytnobody@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.6.5, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Nephia-Plugin-SocketIO
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Nephia::Plugin::SocketIO:
+    file: lib/Nephia/Plugin/SocketIO.pm
+    version: 0.01
+  Nephia::Plugin::SocketIO::Assets:
+    file: lib/Nephia/Plugin/SocketIO/Assets.pm
+requires:
+  HTML::Escape: 0
+  Nephia: 0.80
+  PocketIO: 0
+  Sub::Recursive: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/nephia/Nephia-Plugin-SocketIO/issues
+  homepage: https://github.com/nephia/Nephia-Plugin-SocketIO
+  repository: git://github.com/nephia/Nephia-Plugin-SocketIO
+version: 0.01

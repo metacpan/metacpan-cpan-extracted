@@ -1,0 +1,20 @@
+Revision history for Perl extension Net::VKontakte::Standalone.
+
+0.11 Thu, 28 Feb 2013 21:50:43 +0400
+	- another rename (I promise, this is the last time)
+	- optional non-fatal errors
+	- new constructor syntax (compatible with the old one)
+	- minor POD fixes
+
+0.1 Tue, 15 Jan 2013 15:49:35 +0400
+	- first release
+	- error handling
+	- CAPTCHA support
+
+
+0.01  Sun Nov  4 21:46:21 2012
+	- original version; created by h2xs 1.23 with options
+		-X -b 5.8.0 -n VKontakte::API::Standalone
+	
+	- unreleased version
+

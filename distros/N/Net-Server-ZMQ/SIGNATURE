@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 02964207936cfed62c84c031383dcfad1333d4d7 Changes
+SHA1 05f21975ec398ed1f451a02585040afcee94f51d INSTALL
+SHA1 43b9ff0e21a8504c73194bee2acdd52769627608 LICENSE
+SHA1 481afd5a7a9588139a4e6f1d12e2caf25b44fd29 MANIFEST
+SHA1 363b015748e9d71410f8fd21a3b0ea841d3c17df MANIFEST.SKIP
+SHA1 0e9c4e96d639e640991984d0cb644a29fa662c64 META.json
+SHA1 709ae7a8b56c8f802ff49ffb9983ed3d5d7a9f1f Makefile.PL
+SHA1 9da67bc190d9a289508aa22ae51331469fc91360 README
+SHA1 8401b7cf97038fb41c0fdd0b7745fc5268854d67 bin/zmq-client
+SHA1 7128164558f4a72c0a1292b7c67346c1c99247fb dist.ini
+SHA1 46f3ca279489193205f319820b27c440a8607909 lib/Net/Server/ZMQ.pm
+SHA1 f12d224fae8d7cdfb0fa49e11adb71af25d293f3 t/00-load.t
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iF4EAREIAAYFAlTZMlgACgkQa4OHQAFM10cHgwD/d0i0SHJ3x7wXV/cTRM//Zodp
+yENoDeFkpZjLR76MkDcA/3YZqb/iWbE2FKivj7VxBGZ8gUEPGgO+CxKUjXbe7Otc
+=YC5v
+-----END PGP SIGNATURE-----

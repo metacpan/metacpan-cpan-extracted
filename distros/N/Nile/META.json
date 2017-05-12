@@ -1,0 +1,102 @@
+{
+   "abstract" : "Android Like Visual Web App Framework Separating Code From Design Multi Lingual And Multi Theme.",
+   "author" : [
+      "Ahmed Amin ELsheshtawy احمد امين الششتاوى <mewsoft@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Nile",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "Benchmark::Stopwatch" : "0",
+            "CGI::Carp" : "0",
+            "CGI::Simple" : "0",
+            "CSS::Minifier" : "0",
+            "Cache::Redis" : "0",
+            "Capture::Tiny" : "0",
+            "Crypt::RC4" : "0",
+            "DBI" : "0",
+            "DBI::Profile" : "0",
+            "DBI::ProfileDumper" : "0",
+            "Data::Dumper" : "0",
+            "Data::Validate::URI" : "0",
+            "DateTime" : "0",
+            "Devel::StackTrace" : "0",
+            "Devel::StackTrace::AsHTML" : "0",
+            "Devel::StackTrace::WithLexicals" : "0",
+            "Email::Address" : "0",
+            "Email::Date::Format" : "0",
+            "Email::Sender::Simple" : "0",
+            "Email::Simple" : "0",
+            "Email::Valid" : "0",
+            "Encode" : "0",
+            "File::Find::Rule" : "0",
+            "File::Slurp" : "0",
+            "HTML::Entities" : "0",
+            "HTML::Packer" : "0",
+            "HTTP::AcceptLanguage" : "0",
+            "HTTP::Headers" : "0",
+            "HTTP::Tiny" : "0",
+            "Hash::AsObject" : "0",
+            "IO::Compress::Gzip" : "0",
+            "IO::Uncompress::Gunzip" : "0",
+            "Import::Into" : "0",
+            "JavaScript::Minifier" : "0",
+            "Log::Tiny" : "0",
+            "MIME::Base64" : "3.11",
+            "MIME::Entity" : "0",
+            "Memcached::Client" : "0",
+            "Module::Load" : "0",
+            "Module::Runtime" : "0",
+            "MongoDB" : "0",
+            "MongoDB::MongoClient" : "0",
+            "MongoDB::OID" : "0",
+            "Moose" : "0",
+            "MooseX::Declare" : "0",
+            "MooseX::MethodAttributes" : "0",
+            "MooseX::NonMoose" : "0",
+            "PadWalker" : "0",
+            "Perl::Tidy" : "0",
+            "Plack::Builder" : "0",
+            "Plack::Middleware::Deflater" : "0",
+            "Redis" : "0",
+            "Scalar::Util" : "0",
+            "Search::Elasticsearch" : "0",
+            "Tie::IxHash" : "0",
+            "Time::HiRes" : "0",
+            "Time::Local" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0",
+            "XML::TreePP" : "0",
+            "namespace::autoclean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.55"
+}

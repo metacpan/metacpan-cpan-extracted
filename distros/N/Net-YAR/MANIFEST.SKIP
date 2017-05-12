@@ -1,0 +1,9 @@
+.cvsignore
+tgz
+Makefile$
+Makefile.old
+MANIFEST.bak
+blib
+pm_to_blib
+~$
+CVS

@@ -1,0 +1,59 @@
+v0.160530 - 2016-02-22
+    - Fixed memory leak by adding "weak_ref => 1" for attributes of type
+      Net::Amazon::Route53 and  Net::Amazon::Route53::HostedZone
+    - using Any::Moose
+    - fixed memory leak
+
+v0.123250 - 2012-11-20
+    - #7: fix undefined decode_entities in ::ResourceRecordSet::Change
+
+v0.122310 - 2012-08-18
+    - Changes by contributors:
+      - Retrieve more than 100 resource record sets at once (+test)
+      - Return NOOP status from atomic_update if the changeset is empty
+      - Paper over undefined TTL returned in some cases: set it to 0
+
+v0.113630 - 2011-12-29
+    - Changes by contributors:
+      - Fix templating error in Net::Amazon::Route53::_get_change_xml
+      - Fix POD documentation in Net::Amazon::Route53::ResourceRecordSet::Change
+      - Whitespace issues
+      - Give credit to contributors
+
+v0.113490 - 2011-12-15
+    - Batch updates/changes:
+      - batch_create
+      - batch_change
+    - Atomic updates of whole zones
+      - atomic_update
+
+v0.110310 - 2011-01-31
+    - Proper decoding of entities
+    - Fix: ttl check works now
+    - Comment no longer required
+    - Caller reference no longer required
+    - More contex info given on errors
+
+v0.110241 - 2011-01-24
+    - Dying (with error) in case the response is not a success
+    - route53 executable
+    - Fix if response does not match Amazon's examples
+      Empty <Config/> prevented displaying the zone list
+      Thanks to Šime Ramov for the bug report
+
+v0.110240 - 2011-01-24
+    - Added use_ok tests
+    - Better usage messages for bin/route53
+    - Fix for wildcard records: use \052
+
+v0.110090 - 2011-01-09
+    - Use either ~/.aws-secrets or another keyfile for credentials
+    - Use given key and id for credentials
+    - Get list of hosted zones for the account
+    - Create a new hosted zone, optionally waiting for the request to be completed
+    - Delete a hosted zone, optionally waiting for the request to be completed
+    - Get nameservers details for a hosted zone
+    - List all records in a hosted zone
+    - List records matching a name, type, ttl or values for a hosted zone
+    - Delete a record matching a name, type, ttl or value for a hosted zone
+    - Create a new record of given name, type, ttl and value(s) for a hosted zone

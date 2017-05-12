@@ -1,0 +1,55 @@
+Net-Autoconfig version 1.12.2
+===========================
+
+This is a module to allow the bulk upgrade and configuration
+of many network devices (switches, routers, probably firewalls)
+of any vendor (HP, Cisco, ...) in an automated fasion.  It uses
+templates and device configuration files for scriptable, consistent
+configurations.  It automatically discovers the vendor and model and does
+configrurations based on: 1) the hostname of the device, 2) the specific model,
+3) the model class, or 4) the basic vendor + device type.  User definable
+variables in the device file can be interpolated in the template commands
+at run-time, per device.  Logs using a syslog style.  It can be
+setup to log to the standard log locations (e.g. /var/log/),
+to the screen, or to a file in the current working directory.
+Configures devices in parallel (default 128, max 256) for quick
+upgrades and deployments.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Perl Version 5.10.0
+
+Other CPAN Modules
+    Expect                  =>  1.21
+    Log::Log4perl           =>  1.15
+    Log::Dispatch::Screen   =>  1.17
+
+Standard Perl Modules
+    Cwd
+    Data::Dumper
+    Net::Ping
+    Net::SNMP
+    version
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Kevin Ehlers <kevin@uoregon.edu>, University of Oregon.
+All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

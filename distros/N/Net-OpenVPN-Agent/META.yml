@@ -1,0 +1,32 @@
+---
+abstract: 'a resilient anonimizing user agent that provides IP and useragent masking, full logging capability using OpenVPN and log4perl.'
+author:
+  - 'David Farrell <davidnmfarrell@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-OpenVPN-Agent
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Encode: 0
+  HTTP::CookieJar: 0
+  HTTP::Tiny: 0
+  Log::Log4perl: 1.42
+  Net::OpenVPN::Launcher: 0.05
+  Test::More: 0
+  Test::Most: 0
+  URI: 0
+  YAML::XS: 0.41
+  utf8: 0
+version: 0.01

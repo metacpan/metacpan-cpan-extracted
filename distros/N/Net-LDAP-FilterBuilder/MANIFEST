@@ -1,0 +1,13 @@
+Changes
+examples/demo.pl
+lib/Net/LDAP/FilterBuilder.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/20-filter.t
+t/pod-coverage.t
+t/pod.t
+META.json                                Module JSON meta-data (added by MakeMaker)

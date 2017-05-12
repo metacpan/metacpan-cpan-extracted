@@ -1,0 +1,10 @@
+Revision history for Perl extension Net::IP::Match::XS.
+
+0.02  Tue Dec 21 06:33:43 2004
+	- original version; created by h2xs 1.23 with options
+		-A -b 5.6.1 Net::IP::CMatch
+        - was Net::IP::CMatch.
+
+0.03  Sat Dec 25 04:43:30 UTC 2004
+        - name change to Net::IP::Match::XS as perl suggestions
+          from modules@perl.org.

@@ -1,0 +1,28 @@
+version 0.43 (2011/05/26):
+
+    - added support for Net::Server by allowing the usage of
+      distinct filehandles for input and output
+      (patch by Alexei Znamensky)
+
+version 0.42 (2009/10/01):
+
+    - don't hangup when receiving abandonRequest in order to support
+      clients like Evolution which expect that the socket is still
+      alive after such a request (patch by Bill Lindley)
+
+version 0.4 (2007/10/27):
+
+	- added support for method "abandon"
+	- full request is now passed to methods
+	- compatibility with the changed behaviour of the 'use fields' 
+	  pragma in Perl 5.9.x (thanks to Peter Karman)
+
+version 0.3 (2005/12/22):
+
+	- added t/02-pod.t and t/03-podcoverage.t
+	- moved pm to lib/
+	- fixed POD error
+
+version 0.2 (2005/11/28):
+
+	- new

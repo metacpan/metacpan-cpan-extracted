@@ -1,0 +1,63 @@
+Some of the code in this directory runs the avail.cgi program to get the
+Nagios availability report.
+
+This code needs to be changed to set 
+
+  1 the Nagios server
+  2 the Authorised user
+
+to values appropriate for you.
+
+Code that needs changing is that which uses the 'local_cgi' tag in the constructor eg
+
+Nagios_Availability_Report-MTD
+Nagios_Availability_Report-MTD_chart
+ex4b
+ex4b_e
+ex5
+ex5c
+ex5c_last12hours
+ex5d
+host_down_report
+host_down_report_by_start_down_csv
+host_down_report_with_links
+load_month_avail_records
+sql_ex1
+sql_ex2
+svc_rep
+svc_rep_2
+svc_rep_3
+svc_rep_4
+
+eg perl -i.bak -pe 's/Nagios_Server/YOUR_SERVER/; s/Auth_Nagios_User/YOU/' host_down_report
+
+This code also needs changing. It gets the availability report from the CGI web page so
+it needs to have the authentication token of the Authorised User added after the username.
+
+ex1e
+ex1f
+ex5e
+
+eg eg perl -i.bak -pe 's/Nagios_Server/YOUR_SERVER/; s/Auth_Nagios_User/YOU/; s/Auth_PW/YourPW/' ex1e
+
+The code that does NOT need modifying is that which uses the 'dev_debug' tag in
+the constructor eg
+
+ex1
+ex1a
+ex1b
+ex1c
+ex1d
+ex2
+ex3
+ex4
+ex4a
+ex5_comp_by_hostname_down
+ex5_comp_by_hostname_up
+ex5_comp_by_max_downtime_down
+ex5_comp_by_max_downtime_up
+ex5a
+ex5a_Test
+ex5b
+ex_iterator
+  

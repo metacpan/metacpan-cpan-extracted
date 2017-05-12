@@ -1,0 +1,85 @@
+{
+   "abstract" : "Client library for Groonga httpd.",
+   "author" : [
+      "tokuhirom <tokuhirom@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.0.56",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Groonga-HTTP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.0.16"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Page" : "0",
+            "Furl" : "0",
+            "JSON::XS" : "0",
+            "Mouse" : "0",
+            "URI" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "File::Which" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0.98",
+            "Test::TCP" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Groonga::HTTP" : {
+         "file" : "lib/Net/Groonga/HTTP.pm",
+         "version" : "0.03"
+      },
+      "Net::Groonga::HTTP::Response" : {
+         "file" : "lib/Net/Groonga/HTTP/Response.pm"
+      },
+      "Net::Groonga::Pager" : {
+         "file" : "lib/Net/Groonga/Pager.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Net-Groonga-HTTP/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Net-Groonga-HTTP",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Net-Groonga-HTTP.git",
+         "web" : "https://github.com/tokuhirom/Net-Groonga-HTTP"
+      }
+   },
+   "version" : "0.03"
+}

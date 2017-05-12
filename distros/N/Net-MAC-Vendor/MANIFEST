@@ -1,0 +1,27 @@
+Changes
+examples/README
+extras/oui-20150808.txt
+extras/oui-20151113.txt
+extras/oui-small.txt
+INSTALL.SKIP
+lib/Net/MAC/Vendor.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+t/compile.t
+t/extract_oui_from_html.t
+t/fetch_oui.t
+t/fetch_oui_from_ieee.t
+t/load_cache.t
+t/normalize_mac.t
+t/oui.t
+t/parse_oui.t
+t/pod.t
+t/pod_coverage.t
+t/run.t
+t/test_manifest
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

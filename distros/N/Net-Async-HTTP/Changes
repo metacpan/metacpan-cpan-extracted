@@ -1,0 +1,302 @@
+Revision history for Net-Async-HTTP
+
+0.41    2016/06/03 19:00:47
+        [BUGFIXES]
+         * Ensure all kept-alive connections are properly closed when removing
+           an instance from its containing IO::Async::Loop
+
+0.40    2015/07/27 19:53:19
+        [CHANGES]
+         * Added 'on_ready' parameter to ->request method, for interacting
+           with the socket directly
+         * Allow optional restriction of connect family
+
+0.39    2015/07/13 15:34:29
+        [CHANGES]
+         * Allow additional HTTP request headers to be supplied when in URI
+           mode
+         * Add require_SSL parameter that forbids plaintext requests
+           (RT101498)
+         * Announce that a future version may set a default value for
+           max_connections_per_host higher than 1
+
+        [BUGFIXES]
+         * Ensure that fail_on_error also applies to legacy-style
+           on_response+on_error continuations (RT102022)
+         * Avoid use of undef in an error message printing a warning
+           (RT101459)
+
+0.38    2015/06/01 15:32:57
+        [CHANGES]
+         * More debug_printf() calls for better logging of connection-related
+           activity
+
+        [BUGFIXES]
+         * Ensure that failed connections are removed from the parent notifier
+           (RT102547)
+         * Make sure not to call length() on undefined values (RT102023)
+         * Ensure that the first request after connecting is only written
+           after the connection has been configured and has a notifier name
+
+0.37    2014/12/13 15:06:06
+        [CHANGES]
+         * Major refactoring of Net::Async::HTTP::Connection internal closure-
+           generation logic
+
+        [BUGFIXES]
+         * Cancel pending connect Futures if pipelining means an existing
+           connection can be reused; handles failures better (RT99142)
+         * Attempt to handle the case where $f->done itself throws an
+           exception by at least maintaining internal state (RT100066)
+
+0.36    2014/10/14 12:03:07
+        [CHANGES]
+         * Set the content of generated requests if a 'content' param is given
+           (RT97654)
+         * Store object-wide SSL params for convenience (RT98514)
+         * Clarify the final return value of the on_body_chunk handler
+           (RT98278)
+         * Nicer error message when a non-HTTP response header is received
+           (RT93231)
+
+        [BUGFIXES]
+         * 3xx responses without a Location header, and non-(GET|HEAD)
+           requests should not be redirected (RT98093)
+
+0.35    2014/03/30 20:58:34
+        [BUGFIXES]
+         * Reparse URI scheme after redirect, so host/port/SSLness are reset
+           correctly (RT94303)
+         * Requeue the next pending request after an HTTP/1.0-style EOF
+           (RT94304)
+         * Require at least Compress::Bzip2 2.10 to do bzip2 decompression
+        
+        Bugfixes sponsored by Cisco (http://www.cisco.com/)
+
+0.34    2014/03/27 18:26:43
+        [BUGFIXES]
+         * Don't attempt to reconnect ready queue items that already have a
+           pending connection attempt (RT92904)
+         * Don't close over $responder, thus avoiding a reference cycle leak
+           (RT93232 / RT92728)
+         * Avoid relying on strong forward references in Future, by creating
+           intentional cycles on pending Futures. Workaround for bugfix in
+           upcoming Future release.
+
+        Bugfixes sponsored by NET-A-PORTER (http://www.net-a-porter.com/)
+
+0.33    2014/01/22 23:48:40
+        [CHANGES]
+         * Include connection flieno in notifier_name in case of multiple
+           connections to a given host+port
+         * Use different Future failure operation names for timeout and
+           stall_timeout
+
+        [BUGFIXES]
+         * Zlib compression needs Compress::Raw::Zlib 2.057 or newer
+         * Ensure that unpipelined requests can be cancelled
+         * Ensure that other pending requests on a connection are also
+           errored out when connection receives EOF
+
+0.32    2013/11/19 14:09:18
+        [CHANGES]
+         * Optionally decode encoded content and set the Accept-Encoding
+           header of outbound requests. Currently defaults off, but may become
+           true in a later version.
+        
+        [BUGFIXES]
+         * Handle resolve/connect errors and pipeline queue flushing after
+           cancellation correctly
+
+0.31    2013/11/04 18:04:30
+        [CHANGES]
+         * Allow a plain string URI, upgrading it to a URI object (RT89269)
+         * Added ->POST shortcut method, similar to ->GET and ->HEAD
+         * Extract HTTP basic auth. information from the URL in an
+           HTTP::Request (RT89775)
+
+        [BUGFIXES]
+         * Remember to keep resetting the stall timer when receiving body
+           content
+         * Fix awkward race between stall_timer and ->cancel
+         * Note dependency on Test::Refcount
+
+0.30    2013/10/20 02:08:01
+        [CHANGES]
+         * Use Future->new->fail to return failing immediate Futures
+         * Ensure Future failures all use standard IO::Async style of
+           ($message, NAME, ...)
+
+        [BUGFIXES]
+         * Ensure that fail_on_error doesn't cause non-error responses to fail
+           (RT88996)
+
+0.29    2013/09/22 02:50:39
+        [CHANGES]
+         * Added 'on_body_write' callback
+         * Reordering of documentation to emphasise futures first
+
+        [BUGFIXES]
+         * Fix handling of chunk header when split across reads
+
+0.28    2013/09/13 20:40:14
+        [CHANGES]
+         * Rewrite back into being a subclass of IO::Async::Stream instead of
+           using IO::Async::Protocol::Stream
+         * IO::Async::Stream 0.59 allows stall timeout detection during writes
+           now as well
+
+        [BUGFIXES]
+         * Closed connections should drop the ready queue, so they don't
+           accidentally try to process a second request
+         * Failure handling of corrupted chunk headers during chunked transfer
+           encoding
+
+0.27    BUGFIXES:
+         * Ensure that $f->cancel on a request Future actually works properly
+
+0.26    CHANGES:
+         * Added 'stall_timeout', at least for read operations
+
+        BUGFIXES:
+         * Fix NaHTTP+NaHTTP::Server unit tests for minimum version
+           requirements
+
+0.25    BUGFIXES:
+         * Defend against ->setsockopt detecting SvPOK() of string values
+         * Test for both "Connection closed" and "Connection closed while
+           awaiting header" as OSes differ in behaviour
+
+0.24    CHANGES:
+         * Optionally set IP_TOS field in sockets
+         * Remember to pass 'SSL' parameter around for requests on 'https'
+           scheme
+
+0.23    BUGFIXES:
+         * Fix t/14conn-max.t failures - disable pipelining, wait for correct
+           peersock connection to become ready (it may not be [0])
+
+0.22    CHANGES:
+         * Allow more control over per-host concurrency; either a pool with a
+           limit, or boundless growth of concurrency
+
+0.21    CHANGES:
+         * Optional mode in which 4xx and 5xx HTTP errors are turned into
+           callback errors or Future failures
+         * Handle incoming 1xx informational responses
+         * Optionally set 'Expect' header for 100 Continue response
+
+0.20    CHANGES:
+         * Improvements to timeout and cancellation handling
+         * Updated for Future 0.12; pass 'return' argument to
+           Future::Utils::repeat
+         * Use newer IO::Async::OS->socketpair in unit tests
+
+0.19    CHANGES:
+         * Allow $http->do_request to return a Future object yielding the
+           eventual response
+         * Added convenient $http->GET and ->HEAD methods
+         * Many internal neatenings and rewrites to better support Futures
+
+0.18    CHANGES:
+         * Default host/port/SSLness from URL in HTTP::Request if given
+         * Set Connection: keep-alive by default
+         * Presume that HTTP/1.1 connections can keep-alive by default
+         * Attempt to limit the number of outstanding requests in flight per
+           connection; keep others in a queue
+
+        BUGFIXES:
+         * Pass the same timer object down redirects so the same overall
+           timeout is reused
+         * Fix memory leak by remembering to remove closed NaHTTP::Protocol
+           children from containing NaHTTP
+         * Correctly terminate requests to connections closed during write
+         * Handle trailing whitespace after Chunked encoding chunk size
+           (thanks David Leadbeater)
+
+0.17    CHANGES:
+         * Support optionally setting local host/port/addr (RT75431)
+         * Don't pipeline requests until the server is known to be at least
+           HTTP/1.1
+
+        BUGFIXES:
+         * Default request protocol to HTTP/1.1 so caller doesn't have to
+           (RT75830)
+         * http(s) port logic on numbers rather than protocol names (RT75615)
+         * Use more weaseling in timeout handlers to avoid cyclic reference
+           memory leak
+
+0.16    BUGFIXES:
+         * Work around HTTP::Message's non-trimming of linear whitespace
+           (RT72843)
+
+0.15    BUGFIXES:
+         * Better HTTP handling of "Connection: close" connections; close the
+           socket at the end of the response body or HEAD header.
+
+0.14    CHANGES:
+         * Per-request timeouts
+         * Default port to http/https if not supplied explicitly
+         * Fill in Response ->previous on redirects - RT72791
+         * Improvements to unit tests
+
+0.13    BUGFIXES:
+         * Handle redirect to https:// as well as http:// (RT71526)
+         * Fix use of conditional variable declaration that breaks on
+           Perl 5.14 (RT71545)
+         * Clean up connection cache after resolve, connect or SSL failures
+           (RT71530)
+
+0.12    BUGFIXES:
+         * Wait for connect to complete when pipelining multiple requests down
+           the same connection initially (RT66189)
+         * When serialising a request, handle a full protocol://authority URI
+           by splitting protocol/authority parts out of it
+
+0.11    BUGFIXES:
+         * Fix stalling t/12request-streaming.t test script that causes lots
+           of FAILs at test time
+
+0.10    CHANGES:
+         * Support streaming of request body content
+         * Support HTTP::Cookies object as a cookie jar
+         * Allow proxy_host and proxy_port as ->configure parameters, to set
+           defaults for requests
+
+0.09    CHANGES:
+         * Use IO::Async::Protocol->connect from 0.34
+
+0.08    CHANGES:
+         * Support streaming of response body content
+         * Support SSL if IO::Async::SSL is installed
+
+0.07    CHANGES:
+         * base on IO::Async::Protocol::Stream
+
+0.06    CHANGES:
+         * When POSTing content that isn't form data, expect to be given its
+           content type
+
+0.05    CHANGES:
+         * Added Test::Pod testing
+         * Created example wget-style script
+         * Documentation neatening
+         * More accurate 'requires' in Build.PL; hopefully to keep CPANTS
+           happy
+
+0.04    CHANGES:
+         * Added 'use warnings'
+         * Updated to IO::Async 0.21 style
+         * Various small documentation and test script updates
+
+0.03    CHANGES:
+         * Support server-local HTTP redirects
+
+0.02    CHANGES:
+         * Support HTTP redirects
+
+        BUGFIXES:
+         * Declare dependency on HTTP::Request and HTTP::Response
+
+0.01    First version, released on an unsuspecting world.
+

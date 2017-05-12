@@ -1,0 +1,3 @@
+GSSDP_TYPE_CLIENT            GSSDPClient           GObject  Net::SSDP::Client
+GSSDP_TYPE_RESOURCE_BROWSER  GSSDPResourceBrowser  GObject  Net::SSDP::ResourceBrowser
+GSSDP_TYPE_RESOURCE_GROUP    GSSDPResourceGroup    GObject  Net::SSDP::ResourceGroup

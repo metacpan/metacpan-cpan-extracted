@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<yazgfs>
+ <listen id="tcp8019">tcp:@:8019</listen>
+ <server listenref="tcp8019">
+  <cql2rpn>../etc/pqf.properties</cql2rpn>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../etc/zeerex.xml">
+   <xi:fallback>
+    <explain xmlns="http://explain.z3950.org/dtd/2.0/">
+     <serverInfo>
+      <host>localhost</host>
+      <port>8019</port>
+      <database>gbif</database>
+     </serverInfo>
+    </explain>
+   </xi:fallback>
+  </xi:include>
+ </server>
+</yazgfs>

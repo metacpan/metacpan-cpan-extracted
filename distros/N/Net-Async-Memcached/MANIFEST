@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/get-and-set.pl
+lib/Net/Async/Memcached.pm
+lib/Net/Async/Memcached/Client.pm
+t/00-pod.t
+t/00-use.t

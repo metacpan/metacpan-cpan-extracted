@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         NBU
+version:      0.95
+version_from: 
+installdirs:  site
+requires:
+    Curses:                        1.16
+    Date::Parse:                   2.27
+    Getopt::Std:                   1.02
+    IPC::Open2:                    1.01
+    Time::Local:                   1.11
+    XML::XPath:                    1.13
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

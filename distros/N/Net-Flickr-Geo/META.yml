@@ -1,0 +1,57 @@
+---
+name: Net-Flickr-Geo
+version: 0.72
+author:
+  - 'Aaron Straup Cope  E<lt>ascope@cpan.orgE<gt>'
+abstract: tools for working with geotagged Flickr photos
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Config::Simple: 0
+  Date::Calc: 0
+  Flickr::Upload: 1.31
+  GD: '>= 2.35'
+  Geo::Coordinates::DecimalDegrees: 0
+  Geo::Distance: 0
+  Geo::Geotude: '>=1.0'
+  HTTP::Request: 0
+  Image::Size: 0
+  Imager: '>= 0.62'
+  LWP::Simple: 0
+  LWP::UserAgent: 0
+  List::Util: 0
+  MIME::Base64: 0
+  Net::Flickr::API: '>= 1.67'
+  Net::ModestMaps: '>= 1.1'
+  POSIX: 0
+  URI: 0
+build_requires:
+  Test::Simple: '>= 0.47'
+provides:
+  Net::Flickr::Geo:
+    file: lib/Net/Flickr/Geo.pm
+    version: 0.72
+  Net::Flickr::Geo::GoogleMaps:
+    file: lib/Net/Flickr/Geo/GoogleMaps.pm
+    version: 0.72
+  Net::Flickr::Geo::ModestMaps:
+    file: lib/Net/Flickr/Geo/ModestMaps.pm
+    version: 0.72
+  Net::Flickr::Geo::ModestMaps::Marker:
+    file: lib/Net/Flickr/Geo/ModestMaps.pm
+  Net::Flickr::Geo::ModestMaps::MarkerSet:
+    file: lib/Net/Flickr/Geo/ModestMaps.pm
+  Net::Flickr::Geo::MultiMaps:
+    file: lib/Net/Flickr/Geo/MultiMaps.pm
+    version: 0.72
+  Net::Flickr::Geo::Pinwin:
+    file: lib/Net/Flickr/Geo/Pinwin.pm
+    version: 0.72
+  Net::Flickr::Geo::YahooMaps:
+    file: lib/Net/Flickr/Geo/YahooMaps.pm
+    version: 0.72
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

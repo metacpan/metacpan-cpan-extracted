@@ -1,0 +1,54 @@
+<?xml encoding="UTF-8"?>
+
+<!-- $Id: simple2zoom.rnc,v 1.10 2007/09/14 14:35:40 mike Exp $ -->
+
+<!-- Simple2ZOOM configuration XML is not in any namespace. -->
+
+<!ELEMENT client (authentication?,database*,search?)>
+
+<!ELEMENT authentication (#PCDATA)>
+
+<!ELEMENT database (zurl,resultsetid?,nonamedresultsets?,option*,
+                    charset?,search?,schema*,sutrs-record?,
+                    usmarc-record?,grs1-record?)>
+<!ATTLIST database
+  name CDATA #REQUIRED>
+
+<!ELEMENT zurl (#PCDATA)>
+
+<!ELEMENT resultsetid (#PCDATA)>
+
+<!ELEMENT nonamedresultsets EMPTY>
+
+<!ELEMENT charset (#PCDATA)>
+
+<!ELEMENT sutrs-record (field)*>
+
+<!ELEMENT usmarc-record (field)*>
+
+<!ELEMENT grs1-record (field)*>
+
+<!ELEMENT option (#PCDATA)>
+<!ATTLIST option
+  name CDATA #REQUIRED>
+
+<!ELEMENT search (querytype,map*)>
+
+<!ELEMENT querytype (#PCDATA)>
+
+<!ELEMENT map (index)?>
+<!ATTLIST map
+  use CDATA #REQUIRED>
+
+<!ELEMENT index (#PCDATA)>
+
+<!ELEMENT schema EMPTY>
+<!ATTLIST schema
+  oid CDATA #REQUIRED
+  sru CDATA #REQUIRED
+  format CDATA #REQUIRED
+  encoding CDATA #REQUIRED>
+
+<!ELEMENT field (#PCDATA)>
+<!ATTLIST field
+  xpath CDATA #REQUIRED>

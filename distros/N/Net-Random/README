@@ -1,0 +1,18 @@
+This module gets truly random data from online sources.  Or at least,
+they claim to be truly random.
+
+Note that because we are testing random data, the tests of how well-
+distributed the results are may occasionally fail.  If at first you
+don't succeed try, try, try again.
+
+The problem is explained here:
+  http://web.archive.org/web/20011027002011/http://dilbert.com/comics/dilbert/archive/images/dilbert2001182781025.gif
+
+To install, do the usual:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+You may use, modify and distribute this code under the same terms as you
+may use, modify and distribute perl itself.

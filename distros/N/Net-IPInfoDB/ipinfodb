@@ -1,0 +1,38 @@
+#!/usr/bin/perl -w
+
+use strict;
+use vars qw($opt_C $opt_V $opt_t);
+
+use Data::Dumper;
+use File::Basename qw(basename);
+use Net::IPInfoDB;
+use Getopt::Std qw(getopts);
+
+getopts("Ct:V");
+
+if ($opt_V) {
+    my $me = basename($0);
+    print "$me v$Net::IPInfoDB::VERSION\n";
+    exit;
+}
+
+$opt_t ||= $ENV{'IPINFODB_TOKEN'};
+
+die "Missing required option -t TOKEN\n" unless $opt_t;
+
+exit 0 unless @ARGV;
+
+my $meth = $opt_C ? 'get_city' : 'get_country';
+
+my $g = Net::IPInfoDB->new($opt_t);
+
+for (my $i = 0; $i < @ARGV; $i++) {
+    my $r = $g->$meth($ARGV[ $i ]);
+    for my $f ($r->fields) {
+        my $val = $r->$f;
+        printf "%s: %s\n", $f, $val
+            if defined $val;
+    }
+
+    print "-- \n" unless $i == (@ARGV - 1);
+}

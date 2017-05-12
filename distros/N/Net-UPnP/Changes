@@ -1,0 +1,100 @@
+Revision history for Perl extension UPnP.
+
+2014-10-16 Satoshi Konno <skonno@cybergarage.org>
+	* v1.4.3
+	* Added Build.PL for Module::Build.
+	* Updated MANIFEST and Makefile.PL.
+
+2013-12-27 Thomas Liske <thomas at fiasko-nw.net>
+	* Implement handling of chunked "Transfer-Encoding".
+
+2010-08-07 Satoshi Konno <skonno@cybergarage.org>
+	* Changed UPnP::AV::MediaServer::getcontentlist() to get contents from non standard UPnP/AV media servers.
+
+2009-07-27 Satoshi Konno <skonno@cybergarage.org>
+	* v1.4.2
+	* Added Net::UPnP::SetDebug().
+	* Fixed Net:UPnP::ControlPoint::search() not to use uninitialize value on the debug mode.
+	* Added two examples, upnpchk.pl and upnpavchk.pl, to check UPnP and UPnP/AV devices.
+
+2009-06-10 Tim Engler <engler at gmail.com>
+	* Fixed Net:UPnP::Device::getdescription() to use a non-greedy match.
+
+2009-02-13 miz <miz999 at gmail.com>
+	* Fixed Net:UPnP::HTTP::post() to convert the line feed to CRLF.
+
+2008-10-15 Satoshi Konno <skonno@cybergarage.org>
+	* v1.4.1
+	* Fixed a documentatin of Net::UPnP::AV::MediaRenderer.
+
+2008-10-13 Satoshi Konno <skonno@cybergarage.org>
+	* v1.4
+	* Added Net::UPnP::AV::MediaRenderer.
+	* Skipped v1.3 because I missed to upload the package. 
+	
+2008-05-13 Satoshi Konno <skonno@cybergarage.org>
+	* v1.2.4
+
+2008-05-07 Christian KrauBe
+	* Added Net::UPnP::GW::gettotalbytessent().
+
+2008-05-01 Satoshi Konno <skonno@cybergarage.org>
+	* Added Net::UPnP::GW::gettotalbytesrecieved().
+	* Added a sample to use Net::UPnP::GW::gettotalbytesrecieved() into exsample/upnpgwdump.pl.
+
+2006-03-13 Satoshi Konno <skonno@cybergarage.org>
+	* v1.2.1
+	* Added QueryResponse.pm to the package.
+
+2006-03-02 Satoshi Konno <skonno@cybergarage.org>
+        * v1.2
+        * Renamed Net::UPnP::Service::postcontrol() to postaction(). The postcontrol() will be deprecated.
+        * Added Net::UPnP::Service::postquery().
+        * Added Net::UPnP::GW::Gateway to control IGD, Internet Gateway devices, such as broad band routers.
+        * Added two example, upnpgwdump.pl and upnpgwtool, for Net::UPnP::GW.
+        * Changed upnpavdump.pl to specify the target media server.
+        * Fixed ActionResponse::getargumentlist() to remove extra attributes of the tag name.
+
+2006-01-17 Satoshi Konno <skonno@cybergarage.org>
+        * v1.1.3
+        * Changed postcontrol() in Net::UPnP::Service to create the absolute control url normally using the url base and the relative control url.
+        * Added '--search-title' option to selet the taget contents by the regular expression.
+
+2005-12-20 Satoshi Konno <skonno@cybergarage.org>
+        * v1.1.2
+        * Changed Net::UPnP.pm to get the abstract normally.
+
+2005-12-20 Satoshi Konno <skonno@cybergarage.org>
+        * v1.1.1
+        * Changed Net::UPnP::getdescription() to be able to specify the name.
+        * Added some Net::UPnP::get*() to get the description value of the specified name.
+        * Changed Net::Service::getdevicedescription() to be able to specify the name.
+        * Fixed a test case bug in t/UPnP.t.
+
+2005-12-10 Satoshi Konno <skonno@cybergarage.org>
+
+        * v1.1
+        * Added 'use warnings' to all packages.
+        * Changed to the package name from UPnP to Net::UPnP
+        * Chanded get*() in Service.pm to return '' instead of undef when the value is not defined.
+
+2005-12-09 Satoshi Konno <skonno@cybergarage.org>
+
+        * v1.0.3
+        * Changed UPnP::AV::Item, UPnP::Device and Changed UPnP::HTTPResponse to parse the pod correctly.
+
+2005-12-08 Satoshi Konno <skonno@cybergarage.org>
+
+        * v1.0.2
+        * Changed dms2vodcast.pl to add a option for MPEG4 output format such as 'ipod' and 'psp'.
+
+2005-12-07 Satoshi Konno <skonno@cybergarage.org>
+
+        * v1.0.1
+        * Changed dms2vodcast.pl upnpavdump.pl to parse all items in the content directory.
+        * Changed upnpavdump.pl to parse all items in the content directory.
+
+2005-12-06 Satoshi Konno <skonno@cybergarage.org>
+
+        * The first release.
+

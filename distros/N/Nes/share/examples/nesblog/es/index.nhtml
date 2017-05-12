@@ -1,0 +1,61 @@
+{: NES 1.0 ('../scripts/index.cgi') :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  Nes 1.03 by Skriptke
+  Copyright 2009 - 2010 Enrique Castañón
+  Licensed under the GNU GPL.
+
+  Sample:
+  http://nes.sourceforge.net/
+
+  Repository:
+  http://github.com/Skriptke/nes
+  
+  CPAN:
+  http://search.cpan.org/perldoc?Nes
+  
+  Sample to use Nes;
+     
+  Para este ejemplo se ha modificado una plantilla HTML de 
+  Luka Cvrk http://www.solucija.com/  
+        
+  -----------------------------------------------------------------------------
+:}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <link rel="stylesheet" href="../css/style.css" type="text/css" />
+    <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+    <title>{: $ title :}</title>
+</head>
+<body>
+    <div id="content"> 
+        {: include ('{: $ header :}') :} 
+        {: include ('{: $ intro  :}') :} 
+        <div id="left">
+            {: include ('{: $ content  :}') :}    
+            <br />
+            {: ~ ( $ show_comments ) {: include ('{: $ comments :}') :} :}
+        </div>
+        {: ~ ( $ show_right_panel )
+        <div id="right">
+            <small><b>Nes</b> {: * nes_ver :} {: * env_MOD_PERL :} is running.</small>
+            <hr />
+            <br />
+            {: include ('{: $ user_links :}') :} 
+            <br />
+            {: include ('{: $ top_articles :}') :}
+            <br />
+            {: include ('{: $ latest_articles :}') :} 
+            <br />
+            {: include ('{: $ latest_comments :}') :} 
+            <br />
+        </div>
+        :}
+        {: include ('{: $ footer :}') :}
+    </div>
+</body>
+</html>
+

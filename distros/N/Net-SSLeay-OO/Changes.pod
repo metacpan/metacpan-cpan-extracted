@@ -1,0 +1,52 @@
+
+=head1 WHAT'S NEW IN Net::SSLeay::OO
+
+All releases to date by SAMV.
+
+=head1 RELEASE 0.02, 10 Oct 2009
+
+This release fixes a couple of glaring bugs, and proves that the
+module now works even better than before by porting another of the
+examples scripts from Net::SSLeay!
+
+In detail:
+
+=over
+
+=item *
+
+F<COPYING.txt> is now included, to dot another legal I
+
+=item *
+
+A few functions which wouldn't have worked in L<Net::SSLeay::OO::SSL>
+are now not imported from L<Net::SSLeay>
+
+=item *
+
+One of which would just work if it was exported into the Context
+class, see L<Net::SSLeay::OO::Context/set_cert_and_key>.
+
+=item *
+
+The L<Net::SSLeay::OO::Context/accept> and
+L<Net::SSLeay::OO::Context/connect> methods now return the
+L<Net::SSLeay::OO::SSL> object, as advertised in the docs.
+
+=item *
+
+Work around an OpenSSL bug with client certificates and using
+C<set_verify> without passing a callback.
+
+=item *
+
+New old example: F<examples/sslecho.pl>
+
+=back
+
+=head1 RELEASE 0.01, 6 Oct 2009
+
+Check out the 'v0.01' tag from git if you are interested in the
+features of the first release.
+
+=cut

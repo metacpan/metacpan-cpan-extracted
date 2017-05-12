@@ -1,0 +1,41 @@
+Revision history for Net-Plurk
+
+0.11	Sat May 28 12:18:16 CST 2011
+	add get_plurk(), scripts/replurk.pl
+
+0.10	Fri May 27 22:59:28 CST 2011
+	use Plurk API 2 Beta now
+	see http://www.plurk.com/API/2 for details
+
+0.09    Mon Sep 13 12:11:47 CST 2010
+        update Makefile.PL
+        bugfix
+
+0.08    Thu May 27 16:07:35 CST 2010
+        update Makefile.PL
+
+0.07    Wed May 19 15:56:44 CST 2010
+        update Makefile.PL
+
+0.06    Thu May 13 09:52:41 CST 2010
+        add t/08-befan.pl
+        now follow() also takes nick_name 
+
+0.05    Tue May 11 14:51:29 CST 2010
+        add t/06-addplurk.t
+        add scirpts/folow.pl
+
+0.04    Thu May  6 15:43:29 CST 2010
+        add get_new_plurks()
+        add t/06-newplurks.t
+        add lib/Net/Plurk/Plurk.pm
+
+0.03    Fri Apr 30 16:17:55 CST 2010
+        add get_public_profile()
+
+0.02    Fri Apr 30 12:17:18 CST 2010
+        use Official API => http://www.plurk.com/API
+
+0.01    Mon Aug 24 15:11:50 CST 2009
+        First version, released on an unsuspecting world.
+

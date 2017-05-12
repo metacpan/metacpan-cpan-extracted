@@ -1,0 +1,9 @@
+Revision history for Number::Phone::CountryCode.
+
+0.02  Sat Feb 20 2009
+    - Makefile.PL: only require version 5.008
+    - add support for: India (IN), China (CN), Chad (TD)
+    - correct several phone codes
+
+0.01  Fri Feb 20 2009
+    - original version

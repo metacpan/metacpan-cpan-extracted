@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Net::Songkick;
+
+unless ($ENV{SONGKICK_API_KEY}) {
+  die "You need to set the SONGKICK_API_KEY environment variable\n";
+}
+
+my $user = shift || 'davorg';
+my $sk = Net::Songkick->new({
+  api_key => $ENV{SONGKICK_API_KEY}
+});
+
+my $evnts = $sk->get_upcoming_events({
+  user => $user,
+});
+
+print "\n";
+
+foreach (@$evnts) {
+  print $_->start->strftime('%A %d %B %Y'), "\n";
+  print ' ', $_->performance->[0]->artist->displayName;
+  print ' at ', $_->venue->displayName, "\n\n";
+}

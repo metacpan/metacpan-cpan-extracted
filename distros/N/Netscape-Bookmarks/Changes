@@ -1,0 +1,65 @@
+Revision history for Perl module Netscape::Bookmarks
+
+2.301 2016-01-13T19:01:07Z
+	* Freshen up the module
+
+2.02 - 2007-10-02
+	* Fixed up many distro problems. No need to upgrade.
+
+2.2_01 - 2002-09-23
+	* added Mozilla support
+
+2.1_03 - 2002-09-23
+	* converted tests to Test::Builder
+	* check a few values for definedness before using
+	them ( thanks to Shayne )
+    * start adding Mozilla support
+
+2.1_02 - 2002-05-26
+	* added a Visitor mechanism, and an introduce() function to
+	Category.pm.
+
+2.0_01 - 2002-01-05
+	* lots of code changes to make things more clear for those that
+	like to read the source ;)
+	* fixed a trailing whitespace error for link description output
+	* added a recurse() function that walks the tree and calls your
+	provided subroutine
+	* added a sort_elements() method to Category.  it has a default
+	sort or you can provide your own.  make sure you read the docs
+	on this one though!
+	* improved some assessor methods to also set values if you provide
+	an argument
+	* added some example scripts for various tasks
+
+1.5 - 2001-12-10
+	* fixed numerous documentation errors
+	* added a description() assessor method for Category.
+
+1.3 - 2001-05-13
+	* changed the Makefile to recurse into the other
+	directories.  the supporting modules were not
+	installing correctly in 1.2.  identified by
+	Heinz Kirchmann <kirchman@dfki.uni-kl.de>
+
+	* updated the POD in each module
+
+1.2 - 2001-04-05
+	* fixed disappearing link comment bug identified
+	by Daniel Hottinger <TheHotti@gmx.com>.
+
+0.92 - 2001-01-24
+	* minor doc fixes
+
+0.91 - 1999-12-24
+	* ALPHA ALPHA ALPHA! interfaces may still change!
+	* original version; created by h2xs 1.18
+	* this is the initial release.  the docs need a bit of
+	work and there are a few features to add, but this does
+	the stuff that i needed to do at the moment.
+	* the next thing to do is come up with an internal
+	representation that is portable - perhaps XML.  If all
+	bookmark formats can be reduced to the same XML, then
+	translation should be a cinch :)
+	* there is also a URI::Bookmarks module, but it doesn't
+	do aliases and separators.

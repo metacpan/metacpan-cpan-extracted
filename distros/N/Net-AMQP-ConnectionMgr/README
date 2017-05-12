@@ -1,0 +1,109 @@
+NAME
+    Net::AMQP::ConnectionMgr - Manages a AMQP connection
+
+SYNOPSIS
+      my $cmgr = Net::AMQP::ConnectionMgr->new('localhost', { });
+      my $channel = $cmgr->declare_channel
+        (sub {
+            my ($rmq, $channel) = @_;
+            my %exchange_options =
+              ( exchange_type => 'topic',
+                passive       => 0,
+                durable       => 1,
+                auto_delete   => 0,
+              );
+            $rmq->exchange_declare
+              ($channel, $exchange_name,
+               \%exchange_options, {});
+        });
+      $cmgr->with_connection_do
+        (sub {
+           my $rmq = shift;
+           $rmq->publish($channel, $routing_key, $body,
+                         \%message_options,
+                         \%message_props)
+         });
+
+DESCRIPTION
+    Usage of rabbitmq has two common expectations from the application
+    developer:
+
+    *   The connection is subject to being closed from the server at any
+        point, and the application should handle that disconnect gracefully.
+
+    *   The applications should always declare the resources they use for
+        every connection.
+
+    Complying to that expectation using only Net::AMQP::RabbitMQ is very
+    error-prone. This modules provides a simple way of handling it.
+
+METHODS
+    new($hostname, $options, $conn_class = Net::AMQP::RabbitMQ)
+        Initialize the object with the options. Does not necessarily start
+        the connection right away, but will transparently connect when
+        needed. The arguments to new are the same arguments for
+        Net::AMQP::RabbitMQ->connect.
+
+        The last argument is to allow you to dependency-inject a different
+        implementation for testing purposes or for using an alternative
+        implmentation.
+
+    with_connection_do($code, $retry = 1)
+        This will wrap the given coderef and execute it with the connection
+        as the first argument. This will also run the code within an eval
+        and catch rabbitmq errors and will automatically re-connect and
+        re-execute the code if the code dies.
+
+        The code, however, will only try that as many times as $retry_count
+        (which defaults to 1).
+
+        Note: This function doesn't pass any extra arguments. The point of
+        it is that you should use a closure to access any other data that
+        you need.
+
+    declare_channel($init_code)
+        Returns a new channel number in the rabbitmq connection.
+
+        It will call channel_open for you.
+
+        The argument is a code ref to additional setup that is necessary for
+        this channel, such as "consume" requests.
+
+        If the connection is open, the init_code will be executed right
+        away. Otherwise it will be deferred to when the connection is
+        actually established.
+
+        The init_code ref will be called again in case there is a
+        re-connect.
+
+        The arguments to the coderef will be the connection and the channel
+        number.
+
+    declare_resource($init_code)
+        Adds a resource declaration to this connection.
+
+        If the connection is open, the init_code will be executed right
+        away. Otherwise it will be deferred to when the connection is
+        actually established.
+
+        The init_code ref will be called again in case there is a
+        re-connect.
+
+        The arguments to the coderef will be the connection and the channel
+        number.
+
+COPYRIGHT
+    Copyright 2016 Bloomberg Finance L.P.
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+

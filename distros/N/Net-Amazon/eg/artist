@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+############################################################
+# artist artist_name
+# Mike Schilli <mschilli1@aol.com>, 2003
+############################################################
+
+use strict;
+use warnings;
+
+use Net::Amazon;
+use Net::Amazon::Request::Artist;
+
+die "usage: $0 artist\n(use Zwan as an example)\n" unless defined $ARGV[0];
+
+my $ua = Net::Amazon->new(
+    associate_tag => $ENV{AMAZON_ASSOCIATE_TAG},
+    token         => $ENV{AMAZON_TOKEN},
+    secret_key    => $ENV{AMAZON_SECRET_KEY},
+);
+
+my $req = Net::Amazon::Request::Artist->new(
+    artist  => $ARGV[0],
+);
+
+   # Response is of type Net::Amazon::Artist::Response
+my $resp = $ua->request($req);
+
+if($resp->is_success()) {
+    print $resp->as_string, "\n";
+} else {
+    print $resp->message, "\n";
+}

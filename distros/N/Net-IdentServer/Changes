@@ -1,0 +1,29 @@
+0.604: Sun Jun 29 2014
+   - one of the tests assumed certain ports would be closed when they really
+     might not be ; another test assumes this also, but port7 → port7 should
+     normally be closed.
+   - I definitely do want the build to fail on non /proc/net/tcp systems, but I
+     don't want reports about it.  I couldn't remember the syntax in 603 —
+     fixed in 604.
+
+0.603: Sun Jun 22 2014
+   - I thought BSD had a /proc/net/tcp ; but now that I think about
+     it.  it doesn't.  There's probably a great cross platform way
+     to look this stuff up, but I don't know it.  This is an easy
+     fix for now.
+
+0.602: Fri Jun 20 2014
+   - there's enough docbugs to increment this thing again.
+
+0.601: Fri Jun 20 2014
+   - just noticed I was going to use Net::IP, but didn't actually do
+     it...
+   - (and didn't put it in the Makefile.PL)
+
+0.60: Fri Jun 20 2014
+   - trying to resurrect this … maybe I should just use BINGOS’ POE
+     server
+   - redid the tests
+   - fixed up some strange old codes
+   - removed the strange config reader and re-exposed new() from
+     Net::Server

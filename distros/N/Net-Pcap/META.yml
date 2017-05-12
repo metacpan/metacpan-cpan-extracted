@@ -1,0 +1,30 @@
+---
+abstract: 'Interface to the pcap(3) LBL packet capture library'
+author:
+  - 'Sebastien Aperghis-Tramoni <sebastien@aperghis.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Pcap
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Socket: '0'
+  Sys::Hostname: '0'
+  Test::More: '0.45'
+  XSLoader: '0'
+  perl: '5.006001'
+resources:
+  repository: https://github.com/maddingue/Net-Pcap
+version: '0.18'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

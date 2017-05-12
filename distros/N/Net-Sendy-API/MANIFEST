@@ -1,0 +1,7 @@
+Changes
+lib/Net/Sendy/API.pm
+Makefile.PL
+MANIFEST
+README
+t/Sendy-API.t
+META.yml                                 Module meta-data (added by MakeMaker)

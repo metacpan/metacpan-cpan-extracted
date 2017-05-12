@@ -1,0 +1,47 @@
+Net/UKDomain/Nominet/Automaton version 1.07
+===========================================
+
+This perl module provides the functions you need to interface with
+the Nominet Automaton. The Nominet Automaton is the standard interface
+for the Nominet .UK domain registry. Through the Automaton you can
+register, modify and otherwise update domain registrations in the .UK
+name space.
+
+Only Nominet members who are also Nominet TAG holders can use this 
+module.
+
+You can refer to the pod file documentation for usage details.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Net::XWhois
+  Net::SMTP
+  Crypt::OpenPGP
+  LWP::UserAgent
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006,2007 Jason Clifford <jason@ukpost.com>
+			James Wade, perl@jameswade.net
+
+This module is licensed under the terms of the GNU General Public
+License version 2. A copy of the license is included with this
+module.
+
+The license grants to specific rights to use, copy and redistribute
+this module. These rights are subject to limits and restrictions
+and you must read the license to ensure you understand the terms before
+your copy of redistribute the software.
+

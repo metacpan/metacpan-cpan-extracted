@@ -1,0 +1,59 @@
+---
+abstract: 'client/server protocol implementation for lumberjack'
+author:
+  - 'Markus Benning <ich@markusbenning.de>'
+build_requires:
+  Test::Pod: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Lumberjack
+provides:
+  Net::Lumberjack:
+    file: lib/Net/Lumberjack.pm
+    version: '1.02'
+  Net::Lumberjack::Client:
+    file: lib/Net/Lumberjack/Client.pm
+    version: '1.02'
+  Net::Lumberjack::Frame:
+    file: lib/Net/Lumberjack/Frame.pm
+    version: '1.02'
+  Net::Lumberjack::Frame::Ack:
+    file: lib/Net/Lumberjack/Frame/Ack.pm
+    version: '1.02'
+  Net::Lumberjack::Frame::Compressed:
+    file: lib/Net/Lumberjack/Frame/Compressed.pm
+    version: '1.02'
+  Net::Lumberjack::Frame::Data:
+    file: lib/Net/Lumberjack/Frame/Data.pm
+    version: '1.02'
+  Net::Lumberjack::Frame::JSON:
+    file: lib/Net/Lumberjack/Frame/JSON.pm
+    version: '1.02'
+  Net::Lumberjack::Frame::WindowSize:
+    file: lib/Net/Lumberjack/Frame/WindowSize.pm
+    version: '1.02'
+  Net::Lumberjack::Reader:
+    file: lib/Net/Lumberjack/Reader.pm
+    version: '1.02'
+  Net::Lumberjack::Writer:
+    file: lib/Net/Lumberjack/Writer.pm
+    version: '1.02'
+requires:
+  Compress::Zlib: '0'
+  IO::Socket::INET6: '0'
+  IO::Socket::SSL: '0'
+  IO::String: '0'
+  JSON: '0'
+  Moose: '0'
+  perl: v5.8.5
+resources:
+  bugtracker: https://github.com/benningm/Net-Lumberjack/issues
+  repository: https://github.com/benningm/Net-Lumberjack
+version: '1.02'
+x_serialization_backend: 'YAML::Tiny version 1.69'

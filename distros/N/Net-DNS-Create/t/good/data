@@ -1,0 +1,36 @@
+# example.com.
+#
+=tons.of.stuff.example.com.:127.0.0.1:3600
+'_adsp._domainkey.example.com.:dkim=all:3600
+=www.example.com.:127.0.0.1:3600
+:www.example.com.:17:\005david\007example\003com\000\005david\006people\007example\003com\000:3600
+=smtp.example.com.:127.0.0.1:3600
+'bob.people.example.com.:For a *great* time call\072 555-1213:3600
+'david.people.example.com.:For a good time call\072 555-1212:3600
+&example.com.::ns1.example.com.:3600
+&example.com.::ns2.example.com.:3600
+&subdomain.example.com.::subdomain-ns.example.com.:3600
+@example.com.::mail.example.com.:0::3600
+@example.com.::smtp.example.com.:10::3600
+'example.com.:Weird characters\072 "hello"<script>$$)(*&^%$#@!~`[]{}\134|\072;"',./<>?\000\011\012:3600
+'example.com.:another different text record:3600
+'example.com.:v=spf1 mx -all:3600
+=example.com.:127.0.0.3:3600
+Zexample.com.:ns1.example.com.:some-email.example.com.:1234:28800:7200:2419200:3600:3600
+=mail.example.com.:127.0.0.2:3600
+=more.stuff.example.com.:127.0.0.1:3600
+:_carddavs._tcp.example.com.:33:\000\000\000\000\001\273\010calendar\007example\003com\000:3600
+=ns2.example.com.:127.0.0.1:3600
+Cwww3.example.com.:example.com.:3600
+Cexternal.example.com.:external.example.net.:3600
+=calendar.example.com.:127.0.0.1:3600
+'example._domainkey.example.com.:v=DKIM1; n=blah =20 Blah; g=*; k=rsa; p=THISISNOTAREALDOMAINKEYJUSTANEXAMPLENOREALLYBLAHBLAHBLAHDOMAINKEYDOMAINKEYDOMAINKEYTHISISNOTAREALDOMAINKEYJUSTANEXAMPLENOREALLYBLAHBLAHBLAHDOMAINKEYDOMAINKEYDOMAINKETHISISNOTAREALDOMAINKEYJUSTANEXAMPLENOREALLYBLAHBLAHBLAHDOMAINKEYDOMAINKEYDOMAINKETHISISNOTAREALDOMAINKEYJUSTANEXAMPLENOREALLYBLAHBLAHBLAHDOMAINKEYDOMAINKEYDOMAINKEYTHISISNOTAREALDOMAINKEY:3600
+=stuff.example.com.:127.0.0.1:3600
+=even.more.stuff.example.com.:127.0.0.1:3600
+=ns1.example.com.:127.0.0.1:3600
+Cwww2.example.com.:www.example.com.:3600
+:round-robin.example.com.:17:\005david\007example\003com\000\005david\006people\007example\003com\000:3600
+:round-robin.example.com.:17:\003bob\007example\003com\000\003bob\006people\007example\003com\000:3600
+=round-robin.example.com.:127.0.0.4:3600
+=round-robin.example.com.:127.0.0.5:3600
+

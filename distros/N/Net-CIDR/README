@@ -1,0 +1,10 @@
+
+To install Net::CIDR:
+
+perl Makefile.PL
+make
+make install
+
+Using RPM:
+
+rpm -ta Net-CIDR-{version}.tar.gz

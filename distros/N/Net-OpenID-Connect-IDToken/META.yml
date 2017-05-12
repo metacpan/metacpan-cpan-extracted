@@ -1,0 +1,49 @@
+---
+abstract: 'id_token generation / verification module'
+author:
+  - 'zentooo <zentooo@gmail.com<gt>'
+build_requires:
+  Test::Exception: '0.32'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-OpenID-Connect-IDToken
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::OpenID::Connect::IDToken:
+    file: lib/Net/OpenID/Connect/IDToken.pm
+    version: '0.03'
+  Net::OpenID::Connect::IDToken::Constants:
+    file: lib/Net/OpenID/Connect/IDToken/Constants.pm
+  Net::OpenID::Connect::IDToken::Exception:
+    file: lib/Net/OpenID/Connect/IDToken/Exception.pm
+requires:
+  Digest::SHA: '5.61'
+  Exporter::Constants: '0.03'
+  JSON::WebToken: '0.07'
+  MIME::Base64: '3.11'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/zentooo/Net-OpenID-Connect-IDToken/issues
+  homepage: https://github.com/zentooo/Net-OpenID-Connect-IDToken
+  repository: git://github.com/zentooo/Net-OpenID-Connect-IDToken.git
+version: '0.03'
+x_contributors:
+  - 'yokoe.naosuke <yokoe.naosuke@dena.jp>'
+  - 'aoneko <aoneko.ether@gmail.com>'
+  - 'Naosuke Yokoe <ankerasoy@gmail.com>'

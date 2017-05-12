@@ -1,0 +1,11 @@
+Revision history for Net-Radiator-Monitor
+
+0.021	Thu Aug 2 2012
+	Changed default port from 9084 to 9048.
+
+0.02	Thu Aug 2 2012
+	Changed null coalescing operator in constructor to something more friendly for pre-v5.10 Perl.
+
+0.01	Tue Jul 31 2012
+	First release to CPAN.
+

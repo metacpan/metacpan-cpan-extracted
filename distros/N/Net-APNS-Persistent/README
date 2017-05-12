@@ -1,0 +1,48 @@
+Net-APNS-Persistent version 0.01
+================================
+
+Net::APNS::Persistent - Send Apple APNS notifications over a persistent connection
+Net::APNS::Feedback - Retrieve data from Apple's APNS feedback service
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Class::Accessor
+  Net::SSLeay
+  Socket
+  Encode
+  JSON::XS
+  Test::More
+  Test::Exception
+  FindBin
+
+USAGE
+
+Please refer to the POD documentation in the perl modules themselves.
+
+SEE ALSO
+
+Homepage for this module:
+  http://github.com/aufflick/p5-net-apns-persistent
+
+Apple APNS documentation:
+  http://developer.apple.com/IPhone/library/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Introduction/Introduction.html
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Mark Aufflick
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.

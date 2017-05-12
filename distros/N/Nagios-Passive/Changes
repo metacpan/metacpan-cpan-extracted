@@ -1,0 +1,47 @@
+v0.4.0 2015-08-02T20:51:35+0200
+    * Remove Any::Moose in favor of Moo RT#96976
+    * Remove Test::TempDir in favor of Test::TempDir::Tiny RT#102227
+
+v0.3.6 2014-03-10T22:03:40+0100
+    * fix key padding (RT #93700)
+
+v0.3.5 2012-12-03T20:46:45+0100
+    * fix test
+
+v0.3.4 2012-07-17T01:10:54+0200
+    * gearman payload always starts with 'type=' (sni)
+
+v0.3.3 2012-01-21T22:02:52+0100
+    * added gearman backend
+
+v0.3.1 2012-01-14T17:20:42+0100
+    * documentation fixes
+
+v0.3.0 2012-01-13T00:27:11+0100
+    * add Nagios::Passive::BulkResult
+    * switch to Any::Moose
+
+v0.2.2 2009-12-10T23:24:32+0100
+    * better error handling while writing to pipe
+    * save some CPU cycles
+    * skip some tests where localtime doesn't behave as expected
+
+v0.2.1 2009-12-06T00:18:55+0100
+    * provide an add_output method
+      for this reason the default output of 'no output' has changed
+      to ''.
+
+v0.2 2009-11-27T12:52:13+0100
+    * Name Change: Nagios::Spool::Writer -> Nagios::Passive
+    * 2 Backends available:
+      * Nagios::Passive::ResultPath
+      * Nagios::Passive::CommandFile
+
+      Typically you just use the factory: Nagios::Passive->create
+
+v0.1.1 2009-11-20T18:21:26+0100
+    * added a basic test
+    * fixed documentation
+
+v0.1.0 2009-11-18T22:29:02+0100
+    * first release

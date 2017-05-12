@@ -1,0 +1,11 @@
+
+Net::ESMTP::Session		T_PTROBJ
+Net::ESMTP::Message		T_PTROBJ
+Net::ESMTP::Recipient	T_PTROBJ
+Net::ESMTP::EtrnNode		T_PTROBJ
+
+Net::ESMTP::HeaderOption	T_IV
+
+Net::ESMTP::Status		T_HVREF
+Net::ESMTP::Auth		T_PTROBJ
+

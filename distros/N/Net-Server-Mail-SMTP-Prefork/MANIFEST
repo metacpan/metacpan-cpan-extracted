@@ -1,0 +1,10 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Net/Server/Mail/SMTP/Prefork.pm
+t/00_compile.t
+META.yml
+MANIFEST

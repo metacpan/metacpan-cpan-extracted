@@ -1,0 +1,35 @@
+Number-Phone-IE version 0.01
+============================
+
+Number::Phone is a base class for parsing and dealing with phone numbers.
+
+Number::Phone::IE is a country-specific subclass of Number::Phone, providing
+support for the Irish phone system under country code 353.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Number::Phone
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005 by Dermot McNally <dermotm@gmail.com>
+and Tony Byrne. Based heavily on code from Number::Phone::UK by
+David Cantrell <david@cantrell.org.uk>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.

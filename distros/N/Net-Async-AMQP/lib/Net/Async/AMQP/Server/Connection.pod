@@ -1,0 +1,62 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::AMQP::Server::Connection
+at lib/Net/Async/AMQP/Server/Connection.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::AMQP::Server::Connection
+
+=head1 VERSION
+
+version 2.000
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=head2 protocol
+
+Returns the L<Net::Async::AMQP::Server::Protocol> instance, creating a new one if necessary.
+
+=head2 on_read
+
+Handle incoming data by passing through to the
+protocol instance.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Stream>
+
+L<close|IO::Async::Stream/close>, L<close_now|IO::Async::Stream/close_now>, L<close_when_empty|IO::Async::Stream/close_when_empty>, L<configure|IO::Async::Stream/configure>, L<connect|IO::Async::Stream/connect>, L<is_read_eof|IO::Async::Stream/is_read_eof>, L<is_write_eof|IO::Async::Stream/is_write_eof>, L<new_for_stdin|IO::Async::Stream/new_for_stdin>, L<new_for_stdio|IO::Async::Stream/new_for_stdio>, L<new_for_stdout|IO::Async::Stream/new_for_stdout>, L<on_read_high_watermark|IO::Async::Stream/on_read_high_watermark>, L<on_read_low_watermark|IO::Async::Stream/on_read_low_watermark>, L<on_read_ready|IO::Async::Stream/on_read_ready>, L<on_write_ready|IO::Async::Stream/on_write_ready>, L<push_on_read|IO::Async::Stream/push_on_read>, L<read_atmost|IO::Async::Stream/read_atmost>, L<read_exactly|IO::Async::Stream/read_exactly>, L<read_until|IO::Async::Stream/read_until>, L<read_until_eof|IO::Async::Stream/read_until_eof>, L<want_readready_for_read|IO::Async::Stream/want_readready_for_read>, L<want_readready_for_write|IO::Async::Stream/want_readready_for_write>, L<want_writeready_for_read|IO::Async::Stream/want_writeready_for_read>, L<want_writeready_for_write|IO::Async::Stream/want_writeready_for_write>, L<write|IO::Async::Stream/write>
+
+=item L<IO::Async::Handle>
+
+L<bind|IO::Async::Handle/bind>, L<close_read|IO::Async::Handle/close_read>, L<close_write|IO::Async::Handle/close_write>, L<new_close_future|IO::Async::Handle/new_close_future>, L<notifier_name|IO::Async::Handle/notifier_name>, L<read_fileno|IO::Async::Handle/read_fileno>, L<read_handle|IO::Async::Handle/read_handle>, L<set_handle|IO::Async::Handle/set_handle>, L<set_handles|IO::Async::Handle/set_handles>, L<socket|IO::Async::Handle/socket>, L<want_readready|IO::Async::Handle/want_readready>, L<want_writeready|IO::Async::Handle/want_writeready>, L<write_fileno|IO::Async::Handle/write_fileno>, L<write_handle|IO::Async::Handle/write_handle>
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Licensed under the same terms as Perl itself, with additional licensing
+terms for the MQ spec to be found in C<share/amqp0-9-1.extended.xml>
+('a worldwide, perpetual, royalty-free, nontransferable, nonexclusive
+license to (i) copy, display, distribute and implement the Advanced
+Messaging Queue Protocol ("AMQP") Specification').

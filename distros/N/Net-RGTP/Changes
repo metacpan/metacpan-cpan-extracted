@@ -1,0 +1,19 @@
+0.10  2005-07-18
+      post, item_is_full and item_has_grown methods;
+      more functions return undef and set $@ rather
+      than dying.
+
+0.05  2005-07-09
+      quick_item method; userid defaults to "guest";
+      client-nonce really is random
+
+0.03  2005-07-07
+      latest_seq method; misleading "text" key in
+      hashref returned by motd and item methods
+      renamed to "posts".
+
+0.02  2005-07-05
+      documentation fixes; directory structure cleanup
+
+0.01  2005-07-05
+      first release

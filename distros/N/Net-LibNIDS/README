@@ -1,0 +1,50 @@
+Net::LibNIDS version 0.14
+=========================
+
+This module embeds the libnids C library written by Rafal Wojtczuk 
+<nergal@avet.com.pl>. libnids is designed to do all lowlevel network code 
+required by a network intrusion detection system (whichis what NIDS stands 
+for). This module uses libnids to allow you to read the reassembled tcp stream 
+without any duplicates or incorrect order. That is, like a normal host would
+have seen the stream.
+
+Note that on AMD64 architecture machines the libnids library must not be 
+compiled with strict aliasing enabled.  For GCC, this means passing 
+-fno-strict-aliasing if you use -O2 or above.  Alternatively compile with -O1.
+
+Tests will fail if libnids is compiled with -O2 but this is not a bug with 
+Net::LibNIDS, as no callbacks are raised by libnids.  See:
+
+ - https://bugs.launchpad.net/ubuntu/+source/gcc-defaults/+bug/1072650
+ - https://bugs.gentoo.org/show_bug.cgi?id=505026
+ - http://tinyurl.com/nh9dych
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  libnids, libpcap, libnet, libgthread-2.0
+
+On Debian/Ubuntu, the following packages satisfy library dependencies:
+
+  libnids-dev
+  libpcap-dev
+  libnet1-dev
+  libglib2.0-dev (for gthread-2.0)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Arthur Bergman
+Updated 2010-14 David Cannings
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

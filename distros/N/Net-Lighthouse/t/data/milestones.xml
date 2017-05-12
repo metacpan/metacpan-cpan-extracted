@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<milestones type="array">
+  <milestone>
+    <created-at type="datetime">2009-08-27T02:07:15Z</created-at>
+    <due-on type="datetime">2009-08-31T00:00:00Z</due-on>
+    <goals>release 1st version</goals>
+    <goals-html>&lt;div&gt;&lt;p&gt;release 1st version&lt;/p&gt;&lt;/div&gt;</goals-html>
+    <id type="integer">48761</id>
+    <open-tickets-count type="integer">0</open-tickets-count>
+    <permalink>first-release</permalink>
+    <project-id type="integer">35918</project-id>
+    <tickets-count type="integer">0</tickets-count>
+    <title>first release</title>
+    <updated-at type="datetime">2009-08-27T02:07:15Z</updated-at>
+    <url>http://sunnavy.lighthouseapp.com/projects/35918/milestones/48761</url>
+    <user-name nil="true"/>
+  </milestone>
+</milestones>

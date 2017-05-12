@@ -1,0 +1,12 @@
+# # From https://github.com/github/gitignore/blob/master/Perl.gitignore
+blib/
+_build/
+cover_db/
+inc/
+Build
+Build.bat
+Makefile
+MYMETA.yml
+nytprof.out
+pm_to_blib
+MYMETA.json

@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::RADSWrappers.
+
+0.01  Thu Nov 12 20:22:09 2009
+	- original version; created by h2xs 1.23 with options
+		-X -n Net::RADSWrappers
+

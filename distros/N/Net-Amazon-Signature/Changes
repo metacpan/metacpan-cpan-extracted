@@ -1,0 +1,8 @@
+Revision history for Net-Amazon-Signature
+
+0.01    Nov 18 2005
+        First version.
+
+0.02    Nov 18 2005. Fixed some pod testing bug.
+
+0.03   I forgot to test with Test::Pod::Coverage, because I didn't have it installed. Fixed broken pod coverage test.

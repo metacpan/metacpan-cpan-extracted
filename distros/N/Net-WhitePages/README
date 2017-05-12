@@ -1,0 +1,55 @@
+NAME
+    Net::WhitePages - A Perl interface to the WhitePages.com API v1.0
+
+SYNOPSIS
+        use Net::WhitePages;
+
+        my $wp = Net::WhitePages->new(TOKEN => "12345");
+        my $res = $wp->find_person(lastname => "Wall", firstname => "Larry");
+
+DESCRIPTION
+    "Net::WhitePages" provides a simple perl wrapper for the whitepages.com
+    API (see http://developer.whitepages.com/ for details). The interface
+    matches the API exactly; see http://developer.whitepages.com/docs for a
+    description of it.
+
+    You'll need to have a whitepages.com API token to function; see
+    http://developer.whitepages.com/ for a sign-up link and terms of
+    service.
+
+    WhitePages.com places strict usage limitations, which this module does
+    not attempt to enforce.
+
+    Note that this currently only works for version 1.0 of the
+    WhitePages.com API.
+
+METHODS
+    find_person
+        Search by a person's name and location to find the person's complete
+        address and phone number. See
+        http://developer.whitepages.com/docs/Methods/find_person for more
+        details.
+
+    reverse_phone
+        Search by phone number to find the related name and address. See
+        http://developer.whitepages.com/docs/Methods/reverse_phone for
+        details.
+
+    reverse_address
+        Search by street address to find the related name and phone number.
+        See http://developer.whitepages.com/docs/Methods/reverse_address for
+        details.
+
+    Each method returns a serialized version of the results data; see
+    http://developer.whitepages.com/docs/docs/Responses/Results_Response for
+    details on it looks like.
+
+BUGS
+    Please report bugs via the RT queue at https://rt.cpan.org/.
+
+VERSION
+    1.05
+
+AUTHOR
+    Darren Chamberlain <darren@cpan.org>
+

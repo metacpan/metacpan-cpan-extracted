@@ -1,0 +1,95 @@
+NAME
+    Net::Amazon::Config - Manage Amazon Web Services credentials
+
+VERSION
+    version 0.002
+
+SYNOPSIS
+  Example
+         use Net::Amazon::Config;
+ 
+         # default location and profile
+         my $profile = Net::Amazon::Config->new->get_profile;
+ 
+         # use access key ID and secret access key with S3 
+         use Net::Amazon::S3;
+         my $s3 = Net::Amazon::S3->new(
+           aws_access_key_id     => $profile->access_key_id,
+           aws_secret_access_key => $profile->secret_access_key,
+         );
+
+  Config Format
+       default = johndoe
+       [johndoe]
+       access_key_id = XXXXXXXXXXXXXXXXXXXX
+       secret_access_key = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+       certificate_file = my-cert.pem
+       private_key_file = my-key.pem
+       ec2_keypair_name = my-ec2-keypair
+       ec2_keypair_file = ec2-private-key.pem
+       aws_account_id = 0123-4567-8901
+       canonical_user_id = <64-character string>
+
+DESCRIPTION
+    This module lets you keep Amazon Web Services credentials in a
+    configuration file for use with different tools that need them.
+
+USAGE
+  new()
+       my $config = Net::Amazon::Config->new( %params );
+
+    Valid %params entries include:
+
+    *   config_dir -- directory containing the config file (and the default
+        location for other files named in the config file). Defaults to
+        "$HOME/.amazon"
+
+    *   config_file -- defaults to "profiles.conf"
+
+    Returns an object or undef if no config file can be found.
+
+  config_path()
+       my $path = $config->config_path;
+
+    Returns the absolute path to the configuration file.
+
+  get_profile()
+       my $profile = $config->get_profile( $name );
+
+    If $name is omitted or undefined, returns the profile named in the
+    top-level key "default" in the config file. If the profile does not
+    exist, get profile returns undef or an empty list.
+
+ENVIRONMENT
+    *   NET_AMAZON_CONFIG -- absolute path to config file or file name
+        relative to the configuration directory
+
+    *   NET_AMAZON_CONFIG_DIR -- configuration directory
+
+SEE ALSO
+    *   About AWS Security Credentials: http://tinyurl.com/yh93cjg
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Net-Amazon-Config/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Net-Amazon-Config>
+
+      git clone https://github.com/dagolden/Net-Amazon-Config.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

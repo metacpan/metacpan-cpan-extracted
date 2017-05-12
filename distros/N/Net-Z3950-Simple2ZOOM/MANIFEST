@@ -1,0 +1,24 @@
+# $Id: MANIFEST,v 1.8 2007-08-31 12:00:02 mike Exp $
+
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+bin/simple2zoom
+etc/Makefile
+etc/README
+etc/ccl-qualifiers
+etc/init-script
+etc/nla.xml
+etc/simple2zoom.dtd
+etc/simple2zoom.rnc
+etc/simple2zoom.rng
+etc/simple2zoom.xsd
+etc/sru-auth
+etc/test.xml
+etc/yazgfs.xml
+lib/Net/Z3950/Simple2ZOOM.pm
+lib/Net/Z3950/Simple2ZOOM/Config.pod
+t/Net-Z3950-Simple2ZOOM.t
+META.yml                                 Module meta-data (added by MakeMaker)

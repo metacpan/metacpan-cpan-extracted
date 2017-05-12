@@ -1,0 +1,32 @@
+NAME
+    Net::SNMP::XS - speed up Net::SNMP by decoding in XS, with limitations
+
+SYNOPSIS
+     use Net::SNMP::XS;
+
+     # loading it is enough, there are no public symbols
+
+DESCRIPTION
+    This module tries to speed up Net::SNMP response packet decoding.
+
+    It does this by overriding a few selected internal method by (almost)
+    equivalent XS methods.
+
+    This currently reduces decode time by a factor of ten for typical bulk
+    responses.
+
+    There are currently the following limitations when using this module:
+
+    overriding internal functions might cause the module to malfunction with
+    future versions of Net::SNMP
+    error messages will be simpler/different
+    translation will be ignored (all values will be delivered "raw")
+    a moderately modern (>= C99) C compiler is required
+    only tested with 5.10, no intentions to port to older perls
+    duplicate OIDs are not supported
+    REPORT PDUs are not supported
+
+AUTHOR
+     Marc Lehmann <schmorp@schmorp.de>
+     http://home.schmorp.de/
+

@@ -1,0 +1,72 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::XMPP::Client
+at lib/Net/Async/XMPP/Client.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::XMPP::Client - asynchronous XMPP client based on L<Protocol::XMPP> and L<IO::Async::Protocol::Stream>.
+
+=head1 VERSION
+
+Version 0.003
+
+=head1 DESCRIPTION
+
+Provides XMPP client support under L<IO::Async>.
+
+This is a subclass of L<Net::Async::XMPP::Protocol>, so some of the documentation is there.
+
+See L<Protocol::XMPP> for more details on this implementation.
+
+=head1 METHODS
+
+=head2 login
+
+ $client->login(
+   host => 'talk.google.com',
+   jid  => 'foo@gmail.com',
+   password => 'blah',
+   on_connected => sub { warn "connected!" },
+ )
+
+Initiate a login with the given username and password.
+
+All available arguments are listed above.  If the client is already connected
+C<host> and C<on_connected> are ignored.  C<on_connected> gets passed the
+underlying protocol object.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Net::Async::XMPP::Protocol>
+
+L<authorise|Net::Async::XMPP::Protocol/authorise>, L<compose|Net::Async::XMPP::Protocol/compose>, L<configure|Net::Async::XMPP::Protocol/configure>, L<connect|Net::Async::XMPP::Protocol/connect>, L<deauthorise|Net::Async::XMPP::Protocol/deauthorise>, L<is_connected|Net::Async::XMPP::Protocol/is_connected>, L<is_loggedin|Net::Async::XMPP::Protocol/is_loggedin>, L<on_read|Net::Async::XMPP::Protocol/on_read>, L<on_starttls|Net::Async::XMPP::Protocol/on_starttls>, L<srv_lookup|Net::Async::XMPP::Protocol/srv_lookup>, L<srv_lookup_dns|Net::Async::XMPP::Protocol/srv_lookup_dns>, L<srv_lookup_resolver|Net::Async::XMPP::Protocol/srv_lookup_resolver>, L<subscribe|Net::Async::XMPP::Protocol/subscribe>, L<unsubscribe|Net::Async::XMPP::Protocol/unsubscribe>, L<xmpp|Net::Async::XMPP::Protocol/xmpp>
+
+=item L<IO::Async::Stream>
+
+L<close|IO::Async::Stream/close>, L<close_now|IO::Async::Stream/close_now>, L<close_when_empty|IO::Async::Stream/close_when_empty>, L<is_read_eof|IO::Async::Stream/is_read_eof>, L<is_write_eof|IO::Async::Stream/is_write_eof>, L<new_for_stdin|IO::Async::Stream/new_for_stdin>, L<new_for_stdio|IO::Async::Stream/new_for_stdio>, L<new_for_stdout|IO::Async::Stream/new_for_stdout>, L<on_read_high_watermark|IO::Async::Stream/on_read_high_watermark>, L<on_read_low_watermark|IO::Async::Stream/on_read_low_watermark>, L<on_read_ready|IO::Async::Stream/on_read_ready>, L<on_write_ready|IO::Async::Stream/on_write_ready>, L<push_on_read|IO::Async::Stream/push_on_read>, L<read_atmost|IO::Async::Stream/read_atmost>, L<read_exactly|IO::Async::Stream/read_exactly>, L<read_until|IO::Async::Stream/read_until>, L<read_until_eof|IO::Async::Stream/read_until_eof>, L<want_readready_for_read|IO::Async::Stream/want_readready_for_read>, L<want_readready_for_write|IO::Async::Stream/want_readready_for_write>, L<want_writeready_for_read|IO::Async::Stream/want_writeready_for_read>, L<want_writeready_for_write|IO::Async::Stream/want_writeready_for_write>, L<write|IO::Async::Stream/write>
+
+=item L<IO::Async::Handle>
+
+L<bind|IO::Async::Handle/bind>, L<close_read|IO::Async::Handle/close_read>, L<close_write|IO::Async::Handle/close_write>, L<new_close_future|IO::Async::Handle/new_close_future>, L<notifier_name|IO::Async::Handle/notifier_name>, L<read_fileno|IO::Async::Handle/read_fileno>, L<read_handle|IO::Async::Handle/read_handle>, L<set_handle|IO::Async::Handle/set_handle>, L<set_handles|IO::Async::Handle/set_handles>, L<socket|IO::Async::Handle/socket>, L<want_readready|IO::Async::Handle/want_readready>, L<want_writeready|IO::Async::Handle/want_writeready>, L<write_fileno|IO::Async::Handle/write_fileno>, L<write_handle|IO::Async::Handle/write_handle>
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2010-2014. Licensed under the same terms as Perl itself.

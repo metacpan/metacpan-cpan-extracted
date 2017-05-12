@@ -1,0 +1,22 @@
+Revision history for Perl extension Net::Ping::Network.
+
+1.62 Fr  Mar 19 19:45:21 2009
+	- Metering high resulotion PING Rountriptime added.
+	- Object is now in "Best Practise" aka "Perl::Critic" Style.
+	- performance has slightly increased, noticable when using lists of 10 or more hosts.
+	- Documentation has been updated. 
+
+1.60 Mon Sep 29 19:25:33 2008
+        - Fixing typos in documentation (sorry!)        
+        - Adding support for configuration of icmp packet-Size
+
+1.57 Mon Sep 29 11:15:35 2008
+        - 1.57 implementing RFC3021 Complaince (Using 31-Bit Prefixes on IPv4 Point-to-Point Links)        
+
+1.56 Mon Sep 09 10:11:08 2008
+        - 1.56 minor change in documentation
+	- Till 1.55 Net::Ping::Network was a simple collection of function,
+          to increase the performance of ICMP-availability checks by parallelization.
+          Now it has become an OOP-Modul with all the fancy stuff perl programmers love most.
+        - 1.00 stable class of functions to enhance ping-performance utilizing Net::Ping::External
+          to become more portable.  

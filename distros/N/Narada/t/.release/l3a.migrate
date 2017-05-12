@@ -1,0 +1,13 @@
+DEFINE2 ;
+upgrade true
+downgrade true
+
+VERSION 0.0.0
+; a
+VERSION l1
+; b+
+upgrade true
+RESTORE
+VERSION l2a
+; c
+VERSION l3

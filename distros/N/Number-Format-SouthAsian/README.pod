@@ -1,0 +1,41 @@
+=head1 NAME
+
+Number::Format::SouthAsian - format numbers in the South Asian style
+
+=head1 SYNOPSIS
+
+Formats numbers in the South Asian style. You can read more on Wikipedia here:
+
+    http://en.wikipedia.org/wiki/South_Asian_numbering_system
+
+The format_number() method has a words parameter which tells it to use
+words rather than simply separating the numbers with commas.
+
+    my $formatter = Number::Format::SouthAsian->new();
+    say $formatter->format_number(12345678);             # 1,23,45,678
+    say $formatter->format_number(12345678, words => 1); # 1.2345678 crores
+
+You can also specify words to new(), which has the effect of setting a
+default value to be used.
+
+    my $formatter = Number::Format::SouthAsian->new(words => 1);
+    say $formatter->format_number(12345678);             # 1.2345678 crores
+    say $formatter->format_number(12345678, words => 0); # 1,23,45,678
+
+You can also specify "decimals" to either new() or format_number(), which has
+the effect of rounding any decimals found. Note that this means slightly
+different things depending on wordiness.
+
+    my $rounding_formatter = Number::Format::SouthAsian->new(decimals => 2);
+    say $rounding_formatter->format_number(1234.5678); # 1,234.57
+    say $rounding_formatter->format_number(12345678, words => 1); # 1.23 crores
+
+=head1 Copyright
+
+Copyright (C) 2010 Lokku Ltd.
+
+=head1 Author
+
+Alex Balhatchet (alex@lokku.com)
+
+=cut

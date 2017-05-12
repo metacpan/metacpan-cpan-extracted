@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+etc/probe.pl
+lib/Net/Dropbox.pm
+t/author-00.t

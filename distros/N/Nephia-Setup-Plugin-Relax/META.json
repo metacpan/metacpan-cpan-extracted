@@ -1,0 +1,76 @@
+{
+   "abstract" : "Xslate(TTerse) + Otogiri + alpha",
+   "author" : [
+      "ytnobody <ytnobody@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.6.5",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Nephia-Setup-Plugin-Relax",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Nephia" : "0.86",
+            "Nephia::Setup::Plugin::Assets::Bootstrap" : "0.04",
+            "Nephia::Setup::Plugin::Assets::JQuery" : "0.03",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Nephia::Setup::Plugin::Relax" : {
+         "file" : "lib/Nephia/Setup/Plugin/Relax.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nephia/Nephia-Setup-Plugin-Relax/issues"
+      },
+      "homepage" : "https://github.com/nephia/Nephia-Setup-Plugin-Relax",
+      "repository" : {
+         "url" : "git://github.com/nephia/Nephia-Setup-Plugin-Relax.git",
+         "web" : "https://github.com/nephia/Nephia-Setup-Plugin-Relax"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "papix <mail@papix.net>"
+   ]
+}

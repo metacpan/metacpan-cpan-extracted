@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Net-ZooKeeper-Semaphore,
+version 0.02:
+
+  Distributed semaphores via Apache ZooKeeper
+
+This software is copyright (c) 2013 by Yandex LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

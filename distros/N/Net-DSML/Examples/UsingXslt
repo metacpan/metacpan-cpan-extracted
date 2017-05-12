@@ -1,0 +1,118 @@
+#!/usr/local/bin/perl 
+use XML::XSLT;
+use Net::DSML;
+use Net::DSML::Filter;
+use Net::DSML::Control;
+
+# 
+# Be sure to set up the first line to point to your perl executable location.
+#
+# Fill in the server, base, attribute and value variables with values that
+# match your configuration.
+# 
+my $server = "http://dsml.yourcompany.com:8080/dsml";
+my $base = "ou=people,dc=yourcompany,dc=com";
+my $attribute = "uid"; 
+my $value = "clif";
+
+#
+# search request
+#   
+   #
+   # Create the Net::DSML::Filter object
+   #
+   $webfilter = Net::DSML::Filter->new();
+
+   #
+   # Create the Net::DSM object
+   #
+   $webdsml = Net::DSML->new(  { url => $server } );
+   #
+
+   #
+   # list of attributes from the entry.
+   #
+   @name = ();
+
+   push(@name,"cn");
+   push(@name,"givenname");
+   push(@name,"objectClass");
+   push(@name,"sn");
+   push(@name,"title");
+   push(@name,"gecos");
+   push(@name,"uid");
+   push(@name,"homeDirectory");
+   push(@name,"uidNumber");
+
+   $webdsml->setBase( { base => $base } );
+
+   if ( !($webfilter->subString( { 
+             type =>"initial", 
+             attribute => $attribute, 
+             value => $value } )))
+   {
+      print "Filter error; ", $webfilter->error(), "\n";
+      exit;
+   }
+
+   #
+   # Examples of other filters
+   #
+   # $webfilter->equalityMatch( { attribute => $attribute, value => $value } );
+   # $webfilter->present( { attribute => $attribute } );
+   # $webfilter->greaterOrEqual( { attribute => $attribute, value => $value } );
+   # $webfilter->lessOrEqual( { attribute => $attribute, value => $value } );
+   #
+   # Complex filters
+   #
+   # $webfilter->and();
+   # $webfilter->equalityMatch( { attribute => $attribute, value => $value" } );
+   #$webfilter->not();
+   # $webfilter->equalityMatch( { attribute => $attribute, value => $value } );
+   #$webfilter->endnot();
+   # $webfilter->endand();
+
+
+   if ( !( $webdsml->search( { 
+           sfilter => $webfilter->getFilter(), 
+           attributes => \@name } ) ) )
+   {
+      print "Search error.", "\n";
+      print $webdsml->error, "\n";
+      exit;
+    }
+
+   if (!($webdsml->send()))
+   {
+      print "Search send request error.\n";
+      print $webdsml->error(),"\n";
+      exit;
+   }
+
+# get the return xml content, should be the status of the dsml request.
+$postData = $webdsml->content();
+
+open(OUT, ">>/tmp/dsml.xml");
+
+print(OUT $postData);
+
+close(OUT);
+
+$xsl = './html_1.xsl';
+$xmlfile = 'file:///tmp/dsml.xml';
+my $xslt = XML::XSLT->new ($xsl);
+$xslt->transform($xmlfile);
+
+open(OUT, ">>/tmp/dsml.html");
+print( OUT $xslt->toString);
+
+close(OUT);
+
+$xslt->dispose();
+
+
+
+            
+
+
+

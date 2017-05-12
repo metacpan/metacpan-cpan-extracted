@@ -1,0 +1,25 @@
+---
+abstract: 'SSH client module'
+author:
+  - 'Salvador FandiÃ±o <sfandino@yahoo.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-SSH-Any
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '1.302026'
+resources:
+  repository: https://github.com/salva/p5-Net-SSH-Any
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

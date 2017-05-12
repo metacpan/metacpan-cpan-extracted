@@ -1,0 +1,65 @@
+Net::AIM README 
+$Date: 2001/10/26 03:54:59 $
+
+
+Description:
+      This module is an implementation of the AOL Instant Messenger TOC 
+protocol.  I've written and rewritten almost all the code.  It works fairly
+and is pretty reliable. The intent for this version was to make an 
+easily usable module for creating AIM bots. At this point the
+code is pretty straight forward so it should be easily understandable 
+unlike the previous version.  
+
+
+Prerequisites:
+      Net::AIM requires Perl version 5.004 or higher to install and run.
+      Also IO::* is needed.
+
+The latest version of Perl can be found at:
+http://www.perl.com/CPAN/src/latest.tar.gz (for UNIX), or at
+http://www.perl.com/CPAN/ports/ for various non-Unix machines.
+
+
+Installation:
+   perl Makefile.PL
+   make
+   make install
+   pray
+
+   To make it run from this dir, just do the following:
+      ln -s . Net
+      ./aimtest <sn> <pass>
+
+
+Included Scripts:
+      A test script (aimtest) is included which is similiar to the Net::IRC 
+irctest script.  Ahhh who am I kidding it is practically irctest after 
+"perl -pi -e's/irc/aim/g'". Just run ./aimtest provided perl is located in 
+/usr/bin
+
+      Usage: ./aimtest <screenname> <password>
+
+
+Note:
+      After banging my head against the wall for quite some time I figured
+out that the module doesn't work if you have 'AIM' (in uppercase) in
+the agent/version info that is sent to the server.  So don't put it in 
+there!!!
+
+
+Copyright info:
+This module copyright (c) 1999 Aryeh Goldsmith <perlaim@aryeh.net>. 
+All rights reserved.  This program is free software; you can redistribute it 
+and/or modify it under the same terms as Perl itself.
+
+I hope to have current information about the project posted at:
+http://www.aryeh.net/Net-AIM/
+http://www.nodoubtyo.com/aimbots/
+
+If you would like to contribute to this project or would like to just send me
+some feedback please direct email to me at perlaim@aryeh.net.
+
+Thanx folks!   
+:a)
+
+aryeh 

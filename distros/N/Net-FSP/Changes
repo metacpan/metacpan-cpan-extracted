@@ -1,0 +1,23 @@
+Revision history for Net-FSP
+0.16    January 25th, 2009
+        Fixed an incompatibility with perl 5.6
+
+0.15    January 18th, 2009
+        Fixed a typo that slipped through.
+
+0.14    January 17th, 2009
+        Fixed README and Changes
+
+0.13    January 17th, 2009
+        Added support for FSP filehandles
+
+0.12    September 4th, 2008
+        Added Net::FSP::Entry, Net::FSP::File, Net::FSP::Dir, Net::FSP::Util.
+        Fixed some minor API issues.
+
+0.11    August 27, 2008
+        Second version. Fixed some documentation mistakes. Refactored some code.
+
+0.10    August 20, 2008
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,17 @@
+$Id: ToDo,v 1.22 2003/12/03 15:35:21 autarch Exp $
+
+Add more tests to the test suite; add SSH2 tests.
+
+Fixes to SSH2 implementation:
+    * get rid of dummy shell channel (if possible)
+    * more documentation
+    * anything currently marked XXX in the code
+
+Compatibility with NetScreen?
+
+Use non-blocking connect, like IO::Socket, to implement a
+connect Timeout.
+
+A proper scp client.
+
+Port forwarding.

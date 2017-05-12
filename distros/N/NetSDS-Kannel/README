@@ -1,0 +1,251 @@
+NAME
+    NetSDS::Kannel - Kannel SMS gateway API
+
+SYNOPSIS
+            #!/usr/bin/env perl
+        
+            use 5.8.0;
+            use warnings;
+            use strict;
+
+            use NetSDS::Kannel;
+
+            my $kannel = NetSDS::Kannel->new(
+                    sendsms_url    => 'http://localhost:1234/sendsms',
+                    sendsms_user   => 'sender',
+                    sendsms_passwd => 'secret',
+                    default_smsc   => 'esme-megafon',
+            );
+
+            $res = $kannel->send(
+                    from     => '1234',
+                    to       => '380672222111',
+                    text     => 'Hallo there!',
+                    smsc     => 'emse-mts',
+                    priority => 3,
+            );
+
+            1;
+
+DESCRIPTION
+    "NetSDS::Kannel" module provides API to Kannel SMS gateway.
+
+    To decrease innecessary problems we use a lot of predefined parameters
+    while sending and receiving messages via Kannel HTTP API. It's not so
+    flexible as direct HTTP processing but less expensive in development
+    time ;-)
+
+    This modules uses LWP to send messages and CGI.pm to process messages
+    from Kannel.
+
+CLASS API
+    new(%params) - class constructor
+        Constructor creates Kannel API handler and set it's configuration.
+        Most of these parameters may be overriden while object method calls.
+
+        Admin API parameters:
+
+        * admin_url - Kannel admin API URL
+
+        * admin_passwd - password to admin API
+
+        Sending SMS API parameters:
+
+        * sendsms_url - URL of Kannel sendsms HTTP API
+
+        * sendsms_user - user name for sending SMS
+
+        * sendsms_passwd - password for sending SMS
+
+        * dlr_url - base URL for DLR retrieving
+
+        * default_smsc - default SMSC identifier for sending SMS
+
+        * default_timeout - default sending TCP timeout
+
+OBJECT METHODS
+    send(%parameters) - send MT SM message to Kannel
+        This method allows to send SMS message via Kannel SMS gateway.
+
+        Parameters (mostly the same as in Kannel sendsms API):
+
+        * from - source address (overrides message)
+
+        * to - destination address (overrides message)
+
+        * text - message text (byte string)
+
+        * udh - user data header (byte string)
+
+        * charset - charset of text
+
+        * coding - 0 for GSM 03.38, 1 for binary, 2 for UCS2
+
+        * smsc - target SMSC (overrides default one)
+
+        * mclass - message class if necessary (0 for flash sms)
+
+        * validity - TTL for MO SM in minutes
+
+        * deferred - timeout for delayed delivery
+
+        Example:
+
+                $kannel->send_sms(
+                        from => '1234',
+                        to => '380672206770',
+                        text => 'Wake up!!!',
+                        smsc => 'nokia_modem',
+                );
+
+    receive($cgi) - receive MO or DLR from CGI object
+        This method provides import message structure from CGI request .
+        This method is just wrapper around "receive_mo()" and
+        "receive_dlr()" methods.
+
+        Message type (MO or DLR) recognized by "type" CGI parameter that may
+        be "mo" or "dlr".
+
+                my $cgi = CGI::Fast->new();
+                my %ret = $kannel->receive($cgi);
+
+    receive_mo($cgi) - import MO message from CGI object
+        This method provides import message structure from CGI request .
+
+        Imported MO message parameters returned as hash with the following
+        keys:
+
+        * smsc - Kannel's SMSC Id
+
+        * smsid - SMSC message ID
+
+        * from - subscriber's MSISDN
+
+        * to - service address (short code)
+
+        * time - SMS receive time
+
+        * unixtime SMS receive time as UNIX timestamp
+
+        * text - MO SM text
+
+        * bin - MO SM as binary string
+
+        * udh - SMS UDH (User Data Headers)
+
+        * coding - SMS encoding (0 - 7 bit GSM 03.38; 2 - UCS2-BE)
+
+        * charset - charset of MO SM text while receiving from Kannel
+
+        * binfo - SMPP "service_type" parameter for billing puroses
+
+    receive_dlr($cgi) - import message from CGI object
+        This method provides import message structure from CGI request .
+
+        "receive_dlr" method returns hash with the following keys:
+
+        * smsc - kannel SMSC id
+
+        * msgid - original MT SM message id for DLR identification
+
+        * smsid - SMSC message ID
+
+        * from - subscriber's MSISDN (phone number)
+
+        * to - service address (short code)
+
+        * time - delivery time
+
+        * unixtime - delivery time as UNIX timestamp
+
+        * dlr - DLR state
+
+        * dlrmsg - DLR message from SMSC
+
+        Example:
+
+                my $cgi = CGI->new();
+
+                my %dlr = $kannel->receive_dlr($cgi);
+
+                print "DLR received for MSISDN: " . $dlr{from};
+
+    make_dlr_url(%params) - prepare DLR URL
+        This method creates URI escaped string with URL template for DLR
+        notification.
+
+        Paramters: hash (dlr_url, msgid)
+
+        Returns: URI escaped DLR URL
+
+    make_meta(%params) - prepare SMPP optional TLV
+        This method creates URI escaped string with optional SMPP
+        tag-lenght-value (TLV) parameters to send them in "meta-data" CGI
+        paramter of Kannel's "sendsms" HTTP API.
+
+        Format of "meta-data" parameter value:
+
+                ?smpp?tag1=value1&tag2=value2&...tagN=valueN
+
+        Paramters: hash of TLV pairs
+
+        Returns: URI escaped string
+
+        Example:
+
+                my $meta = $self->make_meta(
+                        charging_id => '0',
+                );
+
+        This will return: %3Fsmpp%3Fcharging_id%3D0
+
+    status() - retrieve Kannel status
+    store_status() - retrieve message queue status
+        Not implemented yet.
+
+    shutdown() - bring down Kannel
+    suspend() - switch Kannel to 'suspended' state
+    isolate() - switch Kannel to 'isolated' state
+    resume() - resume Kannel to 'online' state
+    restart() - whole bearerbox restart
+    flush_dlr() - flush queued DLR if Kannel in 'suspended' state
+    reload_lists() - reload black/white lists
+    log_level($level) - change Kannel log-level
+    start_smsc($smsc) - switch on SMSC connection
+    stop_smsc($smsc) - switch off SMSC connection
+    add_smsc($smsc) - add new SMSC connection
+    remove_smsc($smsc) - remove SMSC connection
+
+EXAMPLES
+    See Nibelite kannel API
+
+SEE ALSO
+    * NetSDS::Class::Abstract - base NetSDS class
+    * <http://www.kannel.org/download/1.4.3/userguide-1.4.3/userguide.html>
+    - Kannel User Guide
+
+TODO
+    1. Add PPG support.
+
+    2. Add OTA support.
+
+AUTHOR
+    Michael Bochkaryov <misha@rattler.kiev.ua>
+
+LICENSE
+    Copyright (C) 2008-2009 Net Style Ltd.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+

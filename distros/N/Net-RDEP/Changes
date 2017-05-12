@@ -1,0 +1,13 @@
+Revision history for Perl extension Net::RDEP.
+
+0.01  Fri Sep 24 10:36:30 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -n Net::RDEP
+
+0.02  Fri Nov 12 13:39:45 EST 2004
+	- couple of minor tweaks
+
+0.03 Jun 21 11:58:31 EDT 2005
+	- updated typo in examples
+	- update RDEP.pm to re-send timeout with 'get'
+	- thanks to feedback from Shawn Romines @ Rackspace.com

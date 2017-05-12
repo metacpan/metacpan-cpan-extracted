@@ -1,0 +1,6 @@
+Before execute each scripts in "samples",
+you have to set environment variables:
+
+  $ export NET_NICOVIDEO_EMAIL="your-nicovideo@email.address"
+  $ export NET_NICOVIDEO_PASSWORD="and-password"
+

@@ -1,0 +1,36 @@
+bin/send_nsca
+Build.PL
+Changes
+lib/Net/NSCA/Client.pm
+lib/Net/NSCA/Client/Connection.pm
+lib/Net/NSCA/Client/Connection/TLS.pm
+lib/Net/NSCA/Client/DataPacket.pm
+lib/Net/NSCA/Client/InitialPacket.pm
+lib/Net/NSCA/Client/Library.pm
+lib/Net/NSCA/Client/ServerConfig.pm
+lib/Net/NSCA/Client/Troubleshooting.pod
+lib/Net/NSCA/Client/Utils.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/live_server.t
+t/run.t
+t/send_nsca.t
+t/tests/MyTest/Class.pm
+t/tests/MyTest/Net/NSCA/Client.pm
+t/tests/MyTest/Net/NSCA/Client/DataPacket.pm
+t/tests/MyTest/Net/NSCA/Client/InitialPacket.pm
+xt/clean-namespaces.t
+xt/consistent-version.t
+xt/critic-scripts.t
+xt/critic.t
+xt/kwalitee.t
+xt/manifest.t
+xt/perl-version.t
+xt/perlcriticrc
+xt/pod-coverage.t
+xt/pod.t
+SIGNATURE    Added here by Module::Build

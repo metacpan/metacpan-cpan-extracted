@@ -1,0 +1,54 @@
+=head1 NAME
+
+Net::IRC2::Parser - ...
+
+=head1 Functions
+
+=over
+
+=item new()
+
+=back
+
+=head1 AUTHOR
+
+Karl Y. Pradene, C<< <knotty@cpan.org>, irc://knotty@freenode.org/ >> 
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-net-irc2@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-IRC2>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 SEE ALSO
+
+Perl modules working with IRC connections: Net::IRC, POE::Component::IRC
+
+IRC Request For Comment 1459 L<http://www.ietf.org/rfc/rfc1459.txt?number=1459>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2005, Karl Y. Pradene <knotty@cpan.org> All rights reserved.
+
+This program is released under the following license: GNU General Public License, version 2
+
+This program is free software; you can redistribute it and/or modify it under the terms
+of the GNU General Public License version 2 as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program;
+if not, write to the 
+
+ Free Software Foundation,
+ Inc., 51 Franklin St, Fifth Floor,
+ Boston, MA  02110-1301 USA
+
+See L<http://www.fsf.org/licensing/licenses/gpl.html>
+
+=cut
+   

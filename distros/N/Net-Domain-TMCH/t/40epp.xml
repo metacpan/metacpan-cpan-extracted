@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+   <command>
+     <create>
+       <domain:create
+        xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+<domain:name>exampleone.tld</domain:name>
+<domain:registrant>jd1234</domain:registrant>
+         <domain:contact type="admin">sh8013</domain:contact>
+         <domain:contact type="tech">sh8013</domain:contact>
+         <domain:authInfo>
+<domain:pw>2fooBAR</domain:pw>
+         </domain:authInfo>
+       </domain:create>
+     </create>
+     <extension>
+       <launch:create
+        xmlns:launch="urn:ietf:params:xml:ns:launch-1.0"
+        type="application">
+<launch:phase>sunrise</launch:phase>
+         <smd:signedMark id="signedMark"
+          xmlns:smd="urn:ietf:params:xml:ns:signedMark-1.0">
+    <smd:id>0000001751376056503931-65535</smd:id>
+    <smd:issuerInfo issuerID="65535">
+      <smd:org>ICANN TMCH TESTING TMV</smd:org>
+      <smd:email>notavailable@example.com</smd:email>
+      <smd:url>http://www.example.com</smd:url>
+      <smd:voice>+32.000000</smd:voice>
+    </smd:issuerInfo>
+<smd:notBefore>2013-08-09T13:55:03.931Z</smd:notBefore>
+    <smd:notAfter>2017-07-23T22:00:00.000Z</smd:notAfter>
+    <mark:mark xmlns:mark="urn:ietf:params:xml:ns:mark-1.0">
+      <mark:trademark>
+<mark:id>00052013734689731373468973-65535</mark:id>
+        <mark:markName>Test &amp; Validate</mark:markName>
+        <mark:holder entitlement="owner">
+          <mark:org>Ag corporation</mark:org>
+          <mark:addr>
+            <mark:street>1305 Bright Avenue</mark:street>
+            <mark:city>Arcadia</mark:city>
+            <mark:sp>CA</mark:sp>
+            <mark:pc>90028</mark:pc>
+            <mark:cc>US</mark:cc>
+          </mark:addr>
+        </mark:holder>
+        <mark:contact type="agent">
+          <mark:name>Tony Holland</mark:name>
+          <mark:org>Ag corporation</mark:org>
+          <mark:addr>
+            <mark:street>1305 Bright Avenue</mark:street>
+            <mark:city>Arcadia</mark:city>
+            <mark:sp>CA</mark:sp>
+            <mark:pc>90028</mark:pc>
+            <mark:cc>US</mark:cc>
+          </mark:addr>
+          <mark:voice>+1.2025562302</mark:voice>
+          <mark:fax>+1.2025562301</mark:fax>
+          <mark:email>info@agcorporation.com</mark:email>
+        </mark:contact>
+        <mark:jurisdiction>US</mark:jurisdiction>
+        <mark:class>15</mark:class>
+        <mark:label>testandvalidate</mark:label>
+        <mark:label>test---validate</mark:label>
+        <mark:label>testand-validate</mark:label>
+        <mark:label>test-et-validate</mark:label>
+        <mark:label>test-validate</mark:label>
+        <mark:label>test--validate</mark:label>
+        <mark:label>test-etvalidate</mark:label>
+        <mark:label>testetvalidate</mark:label>
+        <mark:label>testvalidate</mark:label>
+        <mark:label>testet-validate</mark:label>
+<mark:goodsAndServices>guitar</mark:goodsAndServices>
+        <mark:regNum>1234</mark:regNum>
+<mark:regDate>2012-12-31T23:00:00.000Z</mark:regDate>
+      </mark:trademark>
+    </mark:mark>
+   <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+    <SignedInfo>
+     <CanonicalizationMethod
+  Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+     <SignatureMethod
+  Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+     <Reference URI="#smd1">
+      <Transforms>
+       <Transform
+  Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+      </Transforms>
+      <DigestMethod
+  Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+  <DigestValue>wgyW3nZPoEfpptlhRILKnOQnbdtU6ArM7ShrAfHgDFg=</DigestValue>
+     </Reference>
+    </SignedInfo>
+    <SignatureValue>
+  jMu4PfyQGiJBF0GWSEPFCJjmywCEqR2h4LD+ge6XQ+JnmKFFCuCZS/3SLKAx0L1w
+  QDFO2e0Y69k2G7/LGE37X3vOflobFM1oGwja8+GMVraoto5xAd4/AF7eHukgAymD
+  o9toxoa2h0yV4A4PmXzsU6S86XtCcUE+S/WM72nyn47zoUCzzPKHZBRyeWehVFQ+
+  jYRMIAMzM57HHQA+6eaXefRvtPETgUO4aVIVSugc4OUAZZwbYcZrC6wOaQqqqAZi
+  30aPOBYbAvHMSmWSS+hFkbshomJfHxb97TD2grlYNrQIzqXk7WbHWy2SYdA+sI/Z
+  ipJsXNa6osTUw1CzA7jfwA==
+    </SignatureValue>
+    <KeyInfo id="smd1">
+     <X509Data>
+     <X509Certificate>
+  MIIESTCCAzGgAwIBAgIBAjANBgkqhkiG9w0BAQsFADBiMQswCQYDVQQGEwJVUzEL
+  MAkGA1UECBMCQ0ExFDASBgNVBAcTC0xvcyBBbmdlbGVzMRMwEQYDVQQKEwpJQ0FO
+  TiBUTUNIMRswGQYDVQQDExJJQ0FOTiBUTUNIIFRFU1QgQ0EwHhcNMTMwMjA4MDAw
+  MDAwWhcNMTgwMjA3MjM1OTU5WjBsMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0Ex
+  FDASBgNVBAcTC0xvcyBBbmdlbGVzMRcwFQYDVQQKEw5WYWxpZGF0b3IgVE1DSDEh
+  MB8GA1UEAxMYVmFsaWRhdG9yIFRNQ0ggVEVTVCBDRVJUMIIBIjANBgkqhkiG9w0B
+  AQEFAAOCAQ8AMIIBCgKCAQEAo/cwvXhbVYl0RDWWvoyeZpETVZVVcMCovUVNg/sw
+  WinuMgEWgVQFrz0xA04pEhXCFVv4evbUpekJ5buqU1gmQyOsCKQlhOHTdPjvkC5u
+  pDqa51Flk0TMaMkIQjs7aUKCmA4RG4tTTGK/EjR1ix8/D0gHYVRldy1YPrMP+ou7
+  5bOVnIos+HifrAtrIv4qEqwLL4FTZAUpaCa2BmgXfy2CSRQbxD5Or1gcSa3vurh5
+  sPMCNxqaXmIXmQipS+DuEBqMM8tldaN7RYojUEKrGVsNk5i9y2/7sjn1zyyUPf7v
+  L4GgDYqhJYWV61DnXgx/Jd6CWxvsnDF6scscQzUTEl+hywIDAQABo4H/MIH8MAwG
+  A1UdEwEB/wQCMAAwHQYDVR0OBBYEFPZEcIQcD/Bj2IFz/LERuo2ADJviMIGMBgNV
+  HSMEgYQwgYGAFO0/7kEh3FuEKS+Q/kYHaD/W6wihoWakZDBiMQswCQYDVQQGEwJV
+  UzELMAkGA1UECBMCQ0ExFDASBgNVBAcTC0xvcyBBbmdlbGVzMRMwEQYDVQQKEwpJ
+  Q0FOTiBUTUNIMRswGQYDVQQDExJJQ0FOTiBUTUNIIFRFU1QgQ0GCAQEwDgYDVR0P
+  AQH/BAQDAgeAMC4GA1UdHwQnMCUwI6AhoB+GHWh0dHA6Ly9jcmwuaWNhbm4ub3Jn
+  L3RtY2guY3JsMA0GCSqGSIb3DQEBCwUAA4IBAQB2qSy7ui+43cebKUKwWPrzz9y/
+  IkrMeJGKjo40n+9uekaw3DJ5EqiOf/qZ4pjBD++oR6BJCb6NQuQKwnoAz5lE4Ssu
+  y5+i93oT3HfyVc4gNMIoHm1PS19l7DBKrbwbzAea/0jKWVzrvmV7TBfjxD3AQo1R
+  bU5dBr6IjbdLFlnO5x0G0mrG7x5OUPuurihyiURpFDpwH8KAH1wMcCpXGXFRtGKk
+  wydgyVYAty7otkl/z3bZkCVT34gPvF70sR6+QxUy8u0LzF5A/beYaZpxSYG31amL
+  AdXitTWFipaIGea9lEGFM0L9+Bg7XzNn4nVLXokyEB3bgS4scG6QznX23FGk
+    </X509Certificate>
+    </X509Data>
+    </KeyInfo>
+   </Signature>
+</smd:signedMark>
+       </launch:create>
+     </extension>
+<clTRID>ABC-12345</clTRID>
+   </command>
+</epp>

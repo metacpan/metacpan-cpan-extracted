@@ -1,0 +1,12 @@
+Changes
+IniConf.pm.diff
+MANIFEST
+Makefile.PL
+README
+lib/NIS/DBM.pm
+sample/Makefile
+sample/accounts.conf
+sample/ypdump
+sample/yppasswd
+sample/yppasswd_private.x
+test.pl

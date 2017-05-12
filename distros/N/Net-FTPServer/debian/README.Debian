@@ -1,0 +1,2 @@
+This is the debian package for the Net::FTPServer module.
+It was created by Chip Salzenberg <chip@debian.org> using dh-make-perl.

@@ -1,0 +1,194 @@
+README for Net::SMPP Perl module
+================================
+12.3.2001, Sampo Kellomaki <sampo@symlabs.com>
+7.7.2001,  added SMPP 4.0 support --Sampo
+28.9.2001, fleshed out the readme --Sampo
+29.4.2005, a small update --Sampo
+21.4.2006, upgrade to 1.10 --Sampo
+14.12.2008, added SMPP 5.0 support --Sampo
+24.6.2010,  upgraded to support more recent perls, probably breaking 5.005 and earlier --Sampo
+$Id: README,v 1.8 2006/04/21 20:14:03 sampo Exp $
+
+This readme describes version 1.14 of the module,
+implementing SMPP 3.4, SMPP 4.0, and SMPP 5.0.
+
+Version 1.14 attempts to be compatible with perl 5.10. This may cause
+earlier perls, uch as perl 5.005 to break. If you have old perl,
+you should try version 1.13 which explicitly tried to support them
+at the cost of not supporting newer perls (why did perl have to
+change in incompatible ways). At least 1.14 has been tested on 5.8.8.
+
+WARNING: Some of the V4.0 features have been tested against real
+  world SMSC. Version 3.4 has only been tested by author against the
+  module itself. However, the author is aware of more than 20
+  production sites using the code more or less successfully on basis
+  of SMPP-3.4 protocol. I guess Net::SMPP has passed the test of
+  time and is useful in production, though, no doubt, many
+  poorly tested features remain.
+
+Version 1.03 was in use for over two years by
+multiple sites, thus I guess some stability and correctness is
+implied. Current version as of 21.4.2006 is 1.10. Given that the
+release cycles have been in multiple years, people have asked if its
+maintained at all. Yes its maintained by me, but only to fix bugs. No
+new development has been done in ages. I guess this is a stable piece
+of software so not many updates are needed. If someone wants to start
+new big project to overhaul this code base and significantly add to
+it, you are welcome.
+
+Please, if you do not know what you are doing, don't ask me to teach
+how SMPP works. If you understand SMPP, please submit bug reports and
+preferrably patches. I am also very interested in success/failure
+reports on testing different features against real world SMSCs.
+
+Introduction
+------------
+
+Net::SMPP is an implementation of Short Message Peer to Peer protocol
+over TCP. This protocol is frequently used in the telecoms and mobile
+operator world to pass short messages between systems that implement
+the short message service (SMS). It is applicable to both european GSM
+and american CDMA based systems. The SMPP protocol is documented at
+
+	www.smpp.org
+
+This module aims at fully implementing version 3.4 of the
+protocol. This module also implements 4.0 and aims to support it fully
+as well. The 4.0 code is based on documentation freely obtained from
+Logica (i.e. not under NDA). (It seems 4.0 is only in use in Japan -
+the rest of the world seems to use 3.4.)
+
+Symlabs (www.symlabs.com) uses this module in real life product
+development. Despite our commercial objectives, we have decided
+to make this module available to public in the belief that
+
+- someone else will benefit from it and thus will
+  help us debug and improve it
+- we promote better sharing of information about
+  specifications and commonly encountered usage
+  patterns (which may not always be 100% in spec)
+- open distribution protects our client's interests
+
+We are committed to keep this module under license substantially
+similar to the one under which the present release is offered and hope
+this will encourage contribution from the community. If you need other
+licensing arrangements, we as copyright holders are willing to
+accommodate you.
+
+To build an entire solution takes much more than just this protocol
+module. We are specialists in integrating various internet and telco
+protocols and building whole solutions. For integration and support
+services, please contact symlabs@symlabs.com
+
+Getting
+-------
+
+	Download from cpan.org
+
+	OR
+
+	git clone git://zxid.org/smpp
+
+Building
+--------
+
+	perl Makefile.PL
+	make
+	make test
+	make install	# su to root prior to this, if needed
+
+Testing
+-------
+
+Make test target has not been properly developed yet.
+
+Check from smsc.pl and esme.pl that you are contacting appropriate
+server, such as localhost. Launch two windows and execute following
+commands
+
+	window1: ./smsc.pl
+	window2: while ./esme.pl; do echo -n '.'; done
+
+This tests
+	- v34 bind_transmitter
+	- v34 submit_sm
+	- v34 unbind
+
+Repeat
+
+	window1: ./smsc.pl 4
+	window2: while ./esme.pl 4; do echo -n '.'; done
+
+This tests the same functionality for version 4.0
+
+Benchmark
+	window1: ./smsc.pl
+	window2: ./esme-hammer.pl
+
+	# on U1 167MHz (psrinfo -v) with both processes on the same machine 
+	# I get ca. 130 synchronous submit - response pairs
+	# per second. Client seems to be slightly heavier than
+	# the server. This would seem to indicate that the encoding
+	# process is heavier than decoding (client needs to encode
+	# a big PDU and decode small one while server decodes big
+	# PDU and encodes small one). This test wa bound by CPU.
+	
+	# Same test over 100Mbps ethernet seems to be bound by
+	# round trip delay (because this test uses synchronous mode)
+	# and gives 135 sync submits. Test client: U2 (2x 296MHz)
+
+	# Same test over 100Mbps ethernet seems to be bound by
+	# round trip delay (because this test uses synchronous mode)
+	# and gives 100 sync submits. Test client: U5 (270MHz), happy
+
+	# Same test over 100Mbps ethernet seems to be bound by
+	# round trip delay (because this test uses synchronous mode)
+	# and gives 105 sync submits. Test client: U5 (270MHz), joder
+
+	# Same test over net with 2 clients (running on same U2). Server
+	# is reaching CPU saturation. This gives 240 sync submits/sec.
+
+	# Same test over net with 3 clients (running on U2 & U5). Server
+	# is reaching CPU saturation (84% User, 10% kernel). This
+	# gives 250 sync submits/sec.
+
+	# Same test over net with 4 clients (running on U2 & U5). Server
+	# is reaching CPU saturation (84% User, 10% kernel). This
+	# gives 272 sync submits/sec.
+
+	# Next test: 4 client boxes (2x U5, 1x U1 with 2 cpus)
+	time perl -e '$x = 5; for (1..$x) { fork && exec "./esme-hammer.pl 3 1000" } for (1..$x) { wait; }' 2>/dev/null
+	# User 83%, kernel 14%, 259 submits / sec (20 parallel clients)
+
+	time perl -e '$x = 25; for (1..$x) { fork && exec "./esme-hammer.pl 3 1000" } for (1..$x) { wait; }' 2>/dev/null
+	# User 82%, kernel 17%, 274 submits / sec (100 parallel clients)
+
+	time perl -e '$x = 250; for (1..$x) { fork && exec "./esme-hammer.pl 3 100" } for (1..$x) { wait; }' 2>/dev/null
+	# Fairly long ramp up time can be noticed. There is idle time on server CPU so
+	# probably clients are being saturated. On server the number of processes does
+	# not seem to go over 250. maxproc limit on server?
+	# 1000 parallel clients: there start to be some weird problems and truput for
+	# some clients drops to about 80 submits/sec and as low as 22..32 submits/sec
+	# Due to many figures not fully matching expectations (e.g. number of processes
+	# on the server never reached anywhere near 1000) these results can not be taken
+	# as conclusive.
+	
+	window1: ./smsc.pl
+	window2: ./bind-hammer.pl
+	# on U1 167MHz with both processes on the same machine 
+	# N.B. this benchmark causes the server to fork one
+	#      process per iteration of the test. 50% of the
+	#      CPU is spent in the kernel during the test.
+	# ca. 11 bind-submit-unbinds per second
+
+License
+-------
+
+Net::SMPP is copyright (c) 2001,2010 by Sampo Kellomaki (sampo@iki.fi),
+All rights reserved. Portions copyright (c) 2001-2005 by Symlabs
+(symlabs@symlabs.com), All rights reserved.  You may use
+and distribute Net::SMPP under same terms as perl itself.
+
+NET::SMPP COMES WITH ABSOLUTELY NO WARRANTY.
+
+--Sampo

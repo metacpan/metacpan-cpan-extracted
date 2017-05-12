@@ -1,0 +1,13 @@
+{
+  "clients" : {
+    "TrendyNewService" : {
+      "client_secret" : "boo",
+      "scopes" : {
+        "post_images" : true,
+        "track_location" : true,
+        "annoy_friends" : true,
+        "download_data" : false
+      }
+    }
+  }
+}

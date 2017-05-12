@@ -1,0 +1,28 @@
+---
+abstract: 'Generate Cisco ACL object groups'
+author:
+  - 'Oliver Gorwits C<< <oliver.gorwits@oucs.ox.ac.uk> >>'
+build_requires:
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Cisco-ObjectGroup
+no_index:
+  directory:
+    - inc
+    - t
+    - examples
+requires:
+  Class::Accessor: 0.25
+  Class::Data::Inheritable: 0
+  UNIVERSAL::require: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.01

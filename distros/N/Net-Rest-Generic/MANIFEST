@@ -1,0 +1,20 @@
+Changes
+lib/Net/Rest/Generic.pm
+lib/Net/Rest/Generic/Error.pm
+lib/Net/Rest/Generic/Utility.pm
+MANIFEST			This list of files
+t/00-load.t
+t/04-string.t
+t/07-request.t
+t/03-context.t
+t/boilerplate.t
+t/pod.t
+t/pod-coverage.t
+t/manifest.t
+t/02-defaults.t
+t/06-input.t
+t/05-error.t
+t/01-basic.t
+README
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,36 @@
+Net::Frame
+==========
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Perl v5.6.1
+   Bit::Vector
+   Class::Gomor
+   Net::IPv6Addr
+   Socket
+   Socket6 (optional if Socket module supports IPv6)
+
+GETTING HELP
+
+A mailing list is available for all questions concerning Net::Frame::*.
+Here is the link:
+https://www.secure-side.com/lists/mailman/listinfo/netframe
+
+COPYRIGHT AND LICENSE
+
+You may distribute this module under the terms of the Artistic license.
+See LICENSE.Artistic file in the source distribution archive.
+
+Copyright (c) 2006-2017, Patrice <GomoR> Auffret
+

@@ -1,0 +1,7 @@
+# The type can be either numeric or it may be either u (use), r
+# (relation), p (position), s (structure), t (truncation) or c
+# (completeness).
+
+ti       u=4 s=1
+au       u=1 s=1
+term     s=105

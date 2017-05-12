@@ -1,0 +1,17 @@
+abstract: detect supported authentication method of SSH server
+author: HIROSE Masaaki, C<< <hirose31@gmail.com> >>
+build_requires: 
+  Test::Base: 0
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Net-Scan-SSH-Server-SupportedAuth
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Net::SSH::Perl: 1.30
+  UNIVERSAL::require: 0
+version: 0.02

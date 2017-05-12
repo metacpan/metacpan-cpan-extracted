@@ -1,0 +1,28 @@
+Revision history for Net-Hadoop-Oozie
+
+0.109 2016-11-24 BURAK
+    - Remove the next as it can't be used to skip the iteration and causing weird errors in return.
+
+0.108 2016-11-24 CANRANGOU
+    - Turnoff the warning when shortcircuit is enabled
+
+0.107 2016-11-21 BURAK
+    - Add a short-circuit option to the callbacks
+
+0.106 2016-11-15 burak
+    - New helpers: oozie_version() & max_node_name_len()
+
+0.105 2016-11-15 burak
+    - Parent job meta data colelction for failed_workflows_last_n_hours() is now optional.
+
+0.104 2016-10-28 burak
+    - New method coordinators_on_the_same_path()
+
+0.103 2016-10-21 BURAK
+    - Fix the console url for the judge
+
+0.102 2016-10-13 BURAK
+    - New method suspended_coordinators()
+
+0.101 2016-09-26 BURAK
+    - Initial release.

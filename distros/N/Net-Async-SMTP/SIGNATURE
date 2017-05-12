@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 8cb2c06d3c4deb36d830cefbdcb462ffe3c322aa Changes
+SHA1 ad83973c44be19e5d49a7e668a5fb5d9bb26d8b0 INSTALL
+SHA1 8eb6780784b4f27857b84faef7368980e5600fbe LICENSE
+SHA1 750be2a9b3349753718b4fa5a3d4deb220cd2bc6 MANIFEST
+SHA1 1836253ecce179fda749cc28a06d0168c09604ce META.json
+SHA1 c2c6c364b4751b089c0cb18156f790945b0d9700 META.yml
+SHA1 cd2eae9df1b13a5bb3fc81db1d9a548b3f9a7b2e Makefile.PL
+SHA1 b9a90f29216ba74b586450dbcfb108d182b0af18 README
+SHA1 083b4681b73f0732550f85a79de117230bd62092 cpanfile
+SHA1 498fa81607ee1882b4c23d194d12af5c4b92067e dist.ini
+SHA1 44feb9078d7ad040fe8f0c093b3bf426793f30d7 examples/send.pl
+SHA1 4a183d7183af9eba0496294f9846f11e3b83a828 examples/synopsis.pl
+SHA1 cde4578cdb340a22361cc60ab6d8b6f7020d0b11 lib/Net/Async/SMTP.pm
+SHA1 097cf2484c3223d6b8f7b3fde1bfaf5b16870422 lib/Net/Async/SMTP/Client.pm
+SHA1 84f54c7959f7ba82df66b37f79daae90b0b33de8 lib/Net/Async/SMTP/Client.pod
+SHA1 5b7f3e0ce68e180cc0eb16a31ab9fcfd1937ad34 lib/Net/Async/SMTP/Connection.pm
+SHA1 e42d440e485e1853d2818a798bdad93c792adeba lib/Net/Async/SMTP/Connection.pod
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 dee61c91424556aaa7f0a24c4861270e8e1cd1f0 t/00-compile.t
+SHA1 c56cb3bc847e512dcec236c309f4e0b6455c3dc0 xt/author/test-eol.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 da6a6a0d2e3158aed0ba3e9de8c17df39607e8b4 xt/release/new-version.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 fd1fa776fca35fc8f1bdd24ee3fbaa1eca755a44 xt/release/synopsis.t
+SHA1 bbcd59d081d9940af5d43337ae85458075933829 xt/release/test-version.t
+SHA1 ec3f84bfd7a9ce3246e7592f4134100c6b5ce02b xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJTVdPkAAoJEFKElMNpjtyDiIUH/i9NHvsO7aTuz27N23i0lrkP
+8JQhIoJImENSiInHYvoSIpcmXZb2VzkSZE2ags3u7GsLkrzc+879Jsf7MN50yEKt
+PZ0RocCmqbLzp2N5uqerFSDnuGQV+2O0Mb/6d3mDjxaeIsgRUsFBs312cOxZOIO4
+29oXZwwFvdWnWjLIWh7WDZssmgOnB9Qe+SxQ9fiFwRTyahq9hAPaREeiFVYbbwtF
+m487mKgPd7PUbcHHcSq+rL6NvF4pH9skjM4IXoRNyC794g++TaPkcB5dNdYrEh56
+5C0OnzojK0ECtofBPcJaxD2oqVsYBfH68VUTuboMYdC749ROjQzgHXZ2BNrntAg=
+=vW1R
+-----END PGP SIGNATURE-----

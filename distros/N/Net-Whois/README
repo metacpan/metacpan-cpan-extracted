@@ -1,0 +1,26 @@
+README for Net::Whois Version 1.002.
+#	$Id: README,v 1.3 1999/08/13 22:13:05 dhudes Exp $	
+
+
+This is a Perl 5 module that retrieves and parses information from the
+'whois' databases. Currently, only domains .com, .edu, .net are supported.
+Forthcoming versions will support .mil, .gov, .arpa, and eventually other top-level domains. Additional classes to get POC/Handle, Host, and all the other
+things stored in the ARIN and 'InterNIC' whois databases and eventually
+the RIPE and others as well.
+
+If you are behind a firewall, you may not  be able to use this module.
+
+See the documentation in Whois.pm for instructions on how to use it.
+(perldoc Net::Whois also works, as does tkpod Net::Whois).
+
+Note that the Locale::Country module (part of the Locale-Codes
+distribution) is used to recognize spelled-out country names; if that
+module is not present, only two-letter country abbreviations will be
+recognized.
+
+This module was originally  written by Chip Salzenberg (chip@pobox.com)
+As of August, 1999, Dana Hudes (dhudes@hudes.org) and Chip Salzenberg
+are both maintaining. 
+Changes between v0.23 and v1.02 are exclusively the work of Dana Hudes.
+
+Thanks to Chip for writing the original version of this module.

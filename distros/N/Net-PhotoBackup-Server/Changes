@@ -1,0 +1,62 @@
+Revision history for Perl extension Net-PhotoBackup-Server
+
+0.11 2015-10-05T19:42:53Z
+
+    - Fix cpanfile's missing semicolons - thanks https://github.com/syohex ! 
+      https://github.com/PhotoBackup/server-perl/pull/1
+
+0.10 2015-10-04T20:45:00Z
+
+    - Minor. Convert to use Plack::Test for testing rather than running up a
+      daemon and making real HTTP requests. There were multiple failures on
+      http://www.cpantesters.org/author/D/DAVEWEBB.html#Net-PhotoBackup-Server for
+      OSX and some Linux/BSD architectures.
+      Using Plack::Test avoids any issues around forking and daemonising on
+      architectures which I can't easily test.
+
+0.09 2015-09-28T04:05:38Z
+
+    - Minor. Blind attempt to fix new testing failures reported by cpantesters.org for Darwin.
+      See http://www.cpantesters.org/cpan/report/4971e9a0-64d3-11e5-87d5-7a83b4e1cf47 for an example.
+      - Use 0.0.0.0, rather than 127.0.0.1 for testing HTTP.
+      - Wait for 2 seconds for server to start.
+      - Dump diagnostics for failing tests.
+ 
+0.08 2015-09-26T08:05:46Z
+
+    - Minor. Add autodie as a testing dependency. As reported by CPAN testers.
+
+0.07 2015-09-21T20:34:32Z
+
+    - Switch github repo from https://github.com/d5ve/p5-Net-PhotoBackup-Server
+      to https://github.com/PhotoBackup/server-perl as the module is now part
+      of that organisation.
+
+    - Use Pod::Markdown::Passthrough to allow us to edit README.md manually
+      independently of the module POD.
+
+0.06 2015-09-05T00:40:49Z
+
+    - Fix version number.
+
+0.05 2015-09-04T23:58:02Z
+
+    - Server now expects POST-ed password to be encoded.
+
+0.04 2015-09-04T23:48:09Z
+
+    - Replaced SHA256 with SHA512 as per PhotoBucket spec.
+
+0.03 2015-09-03T11:21:58Z
+
+    - Renamed scripts/ dir to script/ to get Module::Build::Tiny recognising it.
+
+0.02 2015-09-03T10:31:58Z
+
+    - No code changes, just poking about to get minil uploading to CPAN.
+
+0.01 2015-09-03T10:12:45Z
+
+    - Basic working version with minimal checking.
+    - TODO: Support for init.d scripts to keep it running.
+

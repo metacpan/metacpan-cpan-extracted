@@ -1,0 +1,67 @@
+use Net::Bluetooth;
+                                                                                                                         
+	#### About the sdp_search call:
+	#### The $addr argument is an address in the form of "00:00:00:00:00:00".
+	#### $addr can also be "localhost" which will search the local SDP server.
+	#### The second argument is the service ID to search for and is optional.
+	#### It is a string in the form of a 128 bit ID:
+	#### "00000000-0000-0000-0000-000000000000" or a 16 bit ID: "0000".
+	#### All service IDs must be in hexidecimal format.
+	#### The service ID can also be "0" which will search the public
+	#### services on the device. 
+	#### The third argument is the service name and is optional.
+
+	#### Different ways to search for a service:
+	#### Search for service 1101 (Serial Port) and do not specify a name.
+  	sdp_search($addr, "1101", "");
+
+	#### Search for services named "Imaging" and do not specify a service ID.
+  	sdp_search($addr, "", "Imaging");
+
+	#### Search for a service on the local SDP server.
+  	sdp_search("localhost", "12345678-1234-1234-123456789012", "");
+
+
+	#### Search for public services and do not specify a name.
+	#### Note, usually not every single device service is listed in the public group.
+  	sdp_search($addr, "0", "");
+  	sdp_search($addr, "", "");
+
+
+	#### Finally here is an exmaple of how I search for the serial port on my GPS device:
+
+	use Net::Bluetooth;
+
+	#### find  remote devices
+        my $device_ref = get_remote_devices();
+	#### Could retry here instead of exiting.
+	die "No devices found." unless(defined($device_ref));
+
+        my $gps_addr = "";
+	#### Loop through each device and find the one we want.
+        foreach $addr (keys %$device_ref) {
+		#### If the device name matches "BT GPS" grab the address.
+                $gps_addr = $addr if($device_ref->{$addr} =~ /^BT GPS/);
+        }
+
+	#### Could retry here instead of exiting.
+	die "BT GPS not found." unless(defined($gps_addr));
+
+
+	#### Search for the serial service (0x1101) on my GPS device.
+	#### The serial port is what mine uses to transfer GPS info.
+  	my @sdp_array = sdp_search($gps_addr, "1101", "");
+	die "No service records found" unless(defined(@sdp_array));
+                                                                                                                   
+	my $port = 0;
+	#### Loop through all the service records.
+  	#### foreach service record ....
+  	foreach $rec_ref (@sdp_array) {
+		#### Get the RFCOMM port number for the service.
+		if(exists($rec_ref->{RFCOMM})) {
+			$port = $rec_ref->{RFCOMM}; 
+			last;
+		}
+	}
+
+	die "No RFCOMM record found." unless($port > 0);

@@ -1,0 +1,47 @@
+* cleaner implementation
+
+  - current implementation is not pretty (craptastic even)
+
+  - probably mouse-based
+
+
+
+* optionally specify 'gold server'
+
+  - dc-specific gold server
+    - default global gold server
+    - no gold server specified = use current host
+
+  - one xfer per gold server, or use gold server as an ordinary source
+
+
+* use a single persistent connection to each host
+
+  - fork child processes for each scp/rsync command
+    - seems like a good place for GRID::Launcher
+
+
+
+
+* progress info
+
+  - report status of individual copies
+
+  - GRID::Shell can help with this
+    - GRID::Shell::Agent forks a process for rsync/scp
+
+
+
+* rename ?
+
+  - 'cascade copy' was probably a bad idea
+
+  - GRID-Copy ?
+    - google finds 21,200 for "grid copy"
+
+
+* dry run
+
+  - not sure how to do this
+
+  - find + md5 + Algorithm::Diff ?

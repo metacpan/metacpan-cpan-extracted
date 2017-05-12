@@ -1,0 +1,14 @@
+config.log
+localStuff.h
+Makefile
+Makefile.old
+Template/Makefile
+Template/Makefile.old
+ToolKit.c
+~$
+blib
+tmp
+\.o$
+\.bs$
+\.sav$
+\.yml$

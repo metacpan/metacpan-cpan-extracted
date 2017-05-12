@@ -1,0 +1,44 @@
+NetHack-NAOdash version 0.003
+=============================
+
+NetHack is a roguelike (a kind of video game) and NAO
+(http://alt.org/nethack/) is a popular NetHack public server.
+
+NetHack::NAOdash is a library that analyzes the games played by a user
+on NAO and extracts some statistics from them. One use case is
+answering the question "What should I play in NetHack now?". Besides
+NAO, it works on any NetHack installation that supports extended
+logfiles.
+
+This distribution also includes a web interface to the library
+(App::Web::NAOdash) and a command-line interface (App::NAOdash).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* File::Slurp
+* HTML::TreeBuilder
+* JSON::MaybeXS
+* Plack
+* Term::ANSIColor
+* Text::XLogfile
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

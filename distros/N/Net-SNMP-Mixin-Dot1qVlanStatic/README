@@ -1,0 +1,147 @@
+NAME
+    Net::SNMP::Mixin::Dot1qVlanStatic - mixin class for 802.1-Q static vlan
+    infos
+
+VERSION
+    Version 0.04
+
+SYNOPSIS
+      use Net::SNMP;
+      use Net::SNMP::Mixin qw/mixer init_mixins/;
+
+      my $session = Net::SNMP->session( -hostname  => 'foo.bar.com');
+      $session->mixer('Net::SNMP::Mixin::Dot1qVlanStatic');
+      $session->init_mixins;
+      snmp_dispatcher() if $session->nonblocking;
+      $session->init_ok();
+      die $session->errors if $session->errors;
+
+      my $vlan_ids2names = $session->map_vlan_static_ids2names();
+      foreach my $vlan_id ( keys %{$vlan_ids2names} ) {
+        printf "Vlan-Id: %4d  => Vlan-Name: %s\n",
+          $vlan_id, $vlan_ids2names->{$vlan_id};
+      }
+
+      # sorted by vlan_id
+      my $vlan_ids2ports = $session->map_vlan_static_ids2ports();
+      foreach my $vlan_id ( keys %{$vlan_ids2ports} ) {
+        printf "Vlan-Id: %4d\n", $vlan_id;
+        printf "\tTagged-Ports:     %s\n",
+          ( join ',', @{ $vlan_ids2ports->{$vlan_id}{tagged} } );
+        printf "\tUntagged-Ports:   %s\n",
+          ( join ',', @{ $vlan_ids2ports->{$vlan_id}{untagged} } );
+      }
+
+      # sorted by bridge_port
+      my $vlan_ports2ids = $session->map_vlan_static_ports2ids();
+      foreach my $bridge_port ( keys %{$vlan_ports2ids} ) {
+        printf "Bridge-Port: %4d\n", $bridge_port;
+        printf "\tTagged-Vlans:     %s\n",
+          ( join ',', @{ $vlan_ports2ids->{$bridge_port}{tagged} } );
+        printf "\tUntagged-Vlans:   %s\n",
+          ( join ',', @{ $vlan_ports2ids->{$bridge_port}{untagged} } );
+      }
+
+DESCRIPTION
+    A mixin class for vlan related infos from the dot1qVlanStaticTable
+    within the Q-BRIDGE-MIB. The mixin-module provides methods for mapping
+    between vlan-ids and vlan-names und relations between bridge-ports and
+    vlan-ids, tagged or untagged on these ports.
+
+MIXIN METHODS
+  OBJ->map_vlan_static_ids2names()
+    Returns a hash reference with statically configured vlan-ids as keys and
+    the corresponing vlan-names as values:
+
+      {
+        vlan_id => vlan_name,
+        vlan_id => vlan_name,
+        ... ,
+      }
+
+  OBJ->map_vlan_static_ids2ports()
+    Returns a hash reference with the vlan-ids as keys and tagged and
+    untagged port-lists as values:
+
+      {
+        vlan_id => {
+          tagged   => [port_list],
+          untagged => [port_list],
+        },
+
+        vlan_id => {
+          tagged   => [port_list],
+          untagged => [port_list],
+        },
+
+        ... ,
+      }
+
+  OBJ->map_vlan_static_ports2ids()
+    Returns a hash reference with the bridge-ports as keys and tagged and
+    untagged vlan-ids as values:
+
+      {
+        bridge_port => {
+          tagged   => [vlan_id_list],
+          untagged => [vlan_id_list],
+        },
+
+        bridge_port => {
+          tagged   => [vlan_id_list],
+          untagged => [vlan_id_list],
+        },
+
+        ... ,
+      }
+
+INITIALIZATION
+  OBJ->_init($reload)
+    Fetch basic Dot1Q Vlan related snmp values from the host. Don't call
+    this method direct!
+
+PRIVATE METHODS
+    Only for developers or maintainers.
+
+  _fetch_dot1d_base_num_ports($session)
+    Fetch dot1dBaseNumPorts from the dot1dBase group once during object
+    initialization.
+
+  _dot1d_base_num_ports_cb($session)
+    The callback for _fetch_dot1d_base_num_ports.
+
+  _fetch_dot1q_vlan_static_tbl_entries()
+    Fetch the vlan tag info for current vlans.
+
+  _dot1q_vlan_static_tbl_entries_cb($session)
+    The callback for _fetch_dot1q_vlan_static_tbl_entries_cb.
+
+SEE ALSO
+    Net::SNMP::Mixin::Dot1dBase for a mapping between ifIndexes and
+    dot1dBasePorts.
+
+REQUIREMENTS
+    Net::SNMP, Net::SNMP::Mixin
+
+BUGS, PATCHES & FIXES
+    There are no known bugs at the time of this release. However, if you
+    spot a bug or are experiencing difficulties that are not explained
+    within the POD documentation, please submit a bug to the RT system (see
+    link below). However, it would help greatly if you are able to pinpoint
+    problems or even supply a patch.
+
+    Fixes are dependant upon their severity and my availablity. Should a fix
+    not be forthcoming, please feel free to (politely) remind me by sending
+    an email to gaissmai@cpan.org .
+
+      RT: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-SNMP-Mixin-Dot1qVlanStatic
+
+AUTHOR
+    Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
+
+COPYRIGHT & LICENSE
+    Copyright 2008-2016 Karl Gaissmaier, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

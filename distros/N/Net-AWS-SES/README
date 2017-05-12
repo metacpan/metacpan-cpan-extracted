@@ -1,0 +1,261 @@
+NAME
+    Net::AWS::SES - Perl extension that implements Amazon Simple Email
+    Service (SES) client
+
+SYNOPSIS
+        use Net::AWS::SES;
+
+        my $ses = Net::AWS::SES->new(access_key => '....', secret_key => '...');
+        my $r = $ses->send(
+            From    => 'sherzodr@cpan.org',
+            To      => 'sherzodr@gmail.com',
+            Subject => 'Hello World from SES',
+            Body    => "Hello World"
+        );
+
+        unless ( $r->is_success ) {
+            die "Could not deliver the message: " . $r->error_message;
+        }
+
+        printf("Sent successfully. MessageID: %s\n", $r->message_id);
+
+        ######### sending attachments
+        my $msg = MIME::Entity->build();
+        my $r = $ses->send( $msg );
+
+DESCRIPTION
+    Implements Amazon Web Services' Simple Email Service (SES). Sess
+    <http://docs.aws.amazon.com/ses/latest/DeveloperGuide/Welcome.html> for
+    details and to sign-up for the service.
+
+GETTING STARTED
+    After you sign-up for AWS SES service you need to create an "IAM"
+    credentials and create an "access_key" and a "secret_key", which you
+    will be needing to interface with the SES. Do not forget to grant
+    permission to your "IAM" to use SES. Read
+    <http://docs.aws.amazon.com/ses/latest/DeveloperGuide/using-credentials.
+    html> for details.
+
+METHODS
+    I attempted to make the method names as Perlish as possible, as opposed
+    to direct copy/paste from the API reference. This way I felt you didn't
+    have to be familiar with the full API reference in order to use the
+    basic features of the service.
+
+    If you are avid AWS developer there is a "call()" method, which gives
+    you access to all the documented Query actions of the AWS SES. In fact,
+    that's what all the methods use to hide the complexity of the
+    request/response. There are few examples of the "call()" method in later
+    sections.
+
+    All the methods (including "call()") returns an instance of Response.
+    You should check if the the call is success by testing for "is_success"
+    attribute of the response. If you want to gain full access to the raw
+    parsed conents of the response *(which originally is in XML, but we
+    parse it into Perl hashref for you)*, "result" attribute is all you will
+    be needing. For the details see Response manual. Since "result()" is the
+    most important attribute of the resonse I will be giving you a sample
+    result data in JSON notation for your reference.
+
+  new(access_key => $key, secret_key => $s_key)
+  new(access_key => $key, secret_key => $s_key, from => 'default@from.address')
+    Returns a Net::AWS::SES instance. "access_key" and "secret_key"
+    arguments are required. "from" is optional, and can be overriden in
+    respective api calls. Must be your verified identity.
+
+  send( $msg )
+  send(%options)
+    Sends an email address and returns Response instance.
+
+    If the only argument is passed, it must be an instance of MIME::Entity.
+    Example:
+
+        $msg = MIME::Entity->build(
+            From    => 'sherzodr@cpan.org',
+            To      => 'sherzodr@example.com',
+            Subject => 'MIME msg from AWS SES',
+            Data    => "<h1>Hello world from AWS SES</h1>",
+            Type    => 'text/html'
+        );
+
+        $msg->attach(
+            Path     => File::Spec->catfile( 't', 'image.gif' ),
+            Type     => 'image/gif',
+            Encoding => 'base64'
+        );
+
+        $ses = Net::AWS::SES->new(....);
+        $r = $ses->send($msg);
+
+        unless ( $r->is_success ) {
+            die $r->error_message;
+        }
+
+    If you don't have MIME::Entity instance handy you may use the following
+    arguments to have AWS SES build the message for you (bold entries are
+    required): "From", To, Subject, Body, "Body_html", "ReturnPath". To send
+    e-mail to multiple emails just pass an arrayref to "To".
+
+    If "From" is missing it defaults to your default e-mail given to
+    "new()". Remember: this must be a verified e-mail. Example:
+
+        $r = $ses->send(
+            From    => 'sherzodr@cpan.org',
+            To      => 'sherzodr@example.com',
+            Subject => 'Hello World'
+            Body    => 'Hello World'
+        );
+        unless ( $r->is_success ) {
+            die $r->error_message;
+        }
+
+    You may provide an alternate html content by passing "Body_html" header.
+
+    "Charset" of the e-mail is set to 'UTF-8'. As of this writing I didn't
+    make any way to affect this.
+
+    Success calls also return a "message_id", which can be accessed using a
+    shortcut "$r-"message_id> syntax. See Response class.
+
+    Sample successful response looks like this in JSON:
+
+        {
+            "MessageId": "00000141344ce1a8-0664c3c5-e9a0-4b47-aa2e-12b0bdf6070e-000000"
+        }
+
+    Sample error response looks like as:
+
+        {
+            "Error": {
+                "Code":     "MessageRejected",
+                "Type":     "Sender",
+                "Message":  "Email address is not verified."
+            },
+            "xmlns":    "http://ses.amazonaws.com/doc/2010-12-01/",
+            "RequestId":"0d04b41a-20dd-11e3-b01b-51d07c103915"
+        }
+
+  verify_email($email)
+    Verifies a given $email with AWS SES. This results a verification e-mail
+    be sent from AWS to the e-mail with a verification link, which must be
+    clicked before this e-mail address appears in "From" header. Returns a
+    Response instance.
+
+    Sample successful response:
+
+        {}      # right, it's empty.
+
+  list_emails()
+    Retrieves list e-mail addresses. Returns Response instance.
+
+    Sample response:
+
+        {
+            "Identities": ["example@example.com", "sample@example.com"]
+        }
+
+  list_domains()
+    Retrieves list of domains. Returns Response instance.
+
+        {
+            "Identities": ["talibro.com", "lubebase.com"]
+        }
+
+  delete_email($email)
+  delete_domain($domain)
+    Deletes a given email or domain name from the SES. Once the identity is
+    deleted you cannot use it in your "From" headers. Returns Response
+    instance.
+
+    Sample response:
+
+        { }     # empty
+
+  get_quota()
+    Gets your quota. Returns Response instance.
+
+    Sample response:
+
+        {
+            "Max24HourSend":    "10000.0",
+            "MaxSendRate":      "5.0",
+            "SentLast24Hours":  "15.0"
+        }
+
+  get_statistics()
+    Gets your usage statistics. Returns Response instance.
+
+    Sample response:
+
+        "SendDataPoints" : {
+          "member" : [
+             {
+                "Rejects" : "0",
+                "Timestamp" : "2013-09-14T13:07:00Z",
+                "Complaints" : "0",
+                "DeliveryAttempts" : "1",
+                "Bounces" : "0"
+             },
+             {
+                "Rejects" : "0",
+                "Timestamp" : "2013-09-17T09:37:00Z",
+                "Complaints" : "0",
+                "DeliveryAttempts" : "2",
+                "Bounces" : "0"
+             },
+             {
+                "Rejects" : "0",
+                "Timestamp" : "2013-09-17T10:07:00Z",
+                "Complaints" : "0",
+                "DeliveryAttempts" : "4",
+                "Bounces" : "0"
+             },
+             # ..................
+          ]
+       }
+
+  get_dkim_attributes($email)
+  get_dkim_attributes($domain)
+        {
+            "DkimAttributes":[{
+                "entry":{
+                    "value": {
+                        "DkimEnabled":"true",
+                        "DkimTokens":["iz26kxoyadfasfsafdsafg42jjh33gpcm","adtzf6s4edagadsfasdfsafsafr7rhvcf2c","yybjqlduafasfsafdsfc3a33dzqyyfr"],
+                        "DkimVerificationStatus":"Success"
+                    },
+                    "key":"example@example.com"
+                }
+            }]
+        }
+
+ADVANCED API CALLS
+    Methods documented in this library are shortcuts for "call()" method,
+    which is a direct interface to AWS SES. So if there is an API call that
+    you need which does not have a shortcut here, use the "call()" method
+    instead. For example, instead of using "send($message)" as above, you
+    could've done:
+
+        my $response = $self->call( 'SendRawEmail', {
+            'RawMessage.Data' => encode_base64( $msg->stringify )
+        } );
+
+    Those of you who are familiar with SES API will notice that you didn't
+    have to pass any "Timestamp", "AccessKey", or sign your message with
+    your "SecretKey". This library does it for you. You just have to pass
+    the data that is documented in the SES API reference.
+
+SEE ALSO
+    JSON, MIME::Base64, Digest::HMAC_SHA1, LWP::UserAgent,
+    Net::AWS::SES::Response, XML::Simple
+
+AUTHOR
+    Sherzod B. Ruzmetov <sherzodr@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2013 by Talibro LLC <https://www.talibro.com>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.14.2 or, at
+    your option, any later version of Perl 5 you may have available.
+

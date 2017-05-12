@@ -1,0 +1,23 @@
+Contact me - jlawrenc@cpan.org - to have me add things to my Net::vCard todo list. :)
+
+0 - N and ADR
+
+ Make N and ADR return objects of Net::vCard::N and Net::vCard::ADR respectively
+
+1 - UTF-16
+
+ Apple's Evil Address Book can suddenly decide to poop out UTF-16. I don't know how to deal with that yet.
+
+2 - get/set methods
+
+ Right now we're just twiddling data in the hash - formal get/set methods created via AUTOLOAD is a better idea.
+
+3 - print methods
+
+ The reverse of the load_ methods
+
+4 - printFile
+
+ Naturally this will print out all the objects to a file via the print_ methods. :)
+
+

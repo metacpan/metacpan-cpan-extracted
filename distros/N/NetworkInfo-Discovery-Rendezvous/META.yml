@@ -1,0 +1,17 @@
+---
+name: NetworkInfo-Discovery-Rendezvous
+version: 0.06
+author:
+  - Sébastien Aperghis-Tramoni <sebastien@aperghis.net>
+abstract: NetworkInfo::Discovery extension to find Rendezvous services
+license: perl
+requires:
+  Carp: 0
+  Net::Rendezvous: 0.90
+  NetworkInfo::Discovery: 0.12
+  Test::More: 0
+provides:
+  NetworkInfo::Discovery::Rendezvous:
+    file: lib/NetworkInfo/Discovery/Rendezvous.pm
+    version: 0.06
+generated_by: Module::Build version 0.2611

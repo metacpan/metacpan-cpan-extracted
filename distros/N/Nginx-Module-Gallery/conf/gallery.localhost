@@ -1,0 +1,202 @@
+# This is virtual server example file for gallery
+# Copy content in virtual server config file or copy this file in
+# /etc/nginx/sites-available (aviable in some distrs) and enable this server
+
+server {
+    listen                  80;
+
+    server_name             gallery.localhost www.gallery.localhost;
+
+    # SAME EXAMPLE #############################################################
+
+    # Logs
+    access_log              /var/log/nginx/gallery.access.log;
+    error_log               /var/log/nginx/gallery.error.log;
+
+    # Option: enable compression
+    gzip                    on;
+    gzip_min_length         1000;
+    gzip_disable            msie6;
+    gzip_proxied            expired no-cache no-store private auth;
+
+    # Option: basic authorization
+#    auth_basic              "My Gallery";
+#    auth_basic_user_file    /etc/ngnix/users.htpasswd;
+
+    # Option: SSL
+#    ssl                     on;
+#    ssl_certificate         /etc/ssl/certs/ssl-cert-snakeoil.pem;
+#    ssl_certificate_key     /etc/ssl/private/ssl-cert-snakeoil.key;
+#    ssl_session_cache       shared:SSL:10m;
+#    ssl_session_timeout     10m;
+#    ssl_protocols           SSLv3 TLSv1;
+#    ssl_ciphers             ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:_EXP;
+#    ssl_prefer_server_ciphers on;
+
+    # VARIABLES ################################################################
+    # Remember: if you change some $..._PREFIX variable, you need change it`s
+    # rules (section RULES) too
+    ############################################################################
+
+    # Root path of your gallery. Set it please.
+    # Default: /usr/share/images
+    set $IMAGE_ROOT             "/home/rubin/Изображения";
+
+    # Max icon dimension. In pixels. All thumbnails well be resized to
+    # this dimension.
+    # Default: 100
+    set $ICON_MAX_DIMENSION     100;
+
+    # Max icon size. In bytes.
+    # Default: 131072
+    set $ICON_MAX_SIZE          131072;
+
+    # Icon comression level 0-100 for use in PNG.
+    # Default: 95
+    set $ICON_COMPRESSION_LEVEL 95;
+
+    # Icon quality level 0-9 for use in videos.
+    # Default: 0
+    set $ICON_QUALITY_LEVEL     0;
+
+    # Path for thumbnails cache.
+    # Default: /var/cache/gallery
+    set $CACHE_PATH             "/home/rubin/workspace/gallery/cache";
+
+    # Prefix for URI to response thumbnails from cache.
+    # Default: /abdd1ac22dcd41208fb629d24a8ea018
+    set $CACHE_PREFIX           "/abdd1ac22dcd41208fb629d24a8ea018";
+
+    # Mode for created thumbnails.
+    # Default: 0755
+    set $CACHE_MODE             "0755";
+
+    # Templates path.
+    # Default: /usr/local/gallery/templates
+    set $TEMPLATE_PATH          "/home/rubin/workspace/gallery/templates";
+
+    # Prefix for URI to response common icons.
+    # Default: /5e4a8c2055fc441e97dd21c1b33b72f8
+    set $ICONS_PREFIX           "/5e4a8c2055fc441e97dd21c1b33b72f8";
+
+    # Prefix for URI to response common MIME and other icons.
+    # Default: /4c65c292edec4b708679606990be8ce3
+    set $MIME_PREFIX            "/4c65c292edec4b708679606990be8ce3";
+
+    # Prefix for URI to response directory archive.
+    # Default: /5f6d2e769f32489d86546fa9c5068ca9
+    set $ARCHIVE_PREFIX         "/5f6d2e769f32489d86546fa9c5068ca9";
+
+
+    # RULES ####################################################################
+    # You don`t need edit this rules, except if you change some prefix variable
+    # (named $..._PREFIX in section VARIABLES).
+    # You can add you own rules for defaul icons.
+    ############################################################################
+
+    location /5e4a8c2055fc441e97dd21c1b33b72f8 {
+        location = /5e4a8c2055fc441e97dd21c1b33b72f8/favicon.png {
+            root /usr/share/icons/;
+            # You can add path to find you own favicon in your distro
+            try_files
+                /gnome/16x16/emblems/emblem-photos.png
+                /gallery/favicon.png
+                =404;
+        }
+        location = /5e4a8c2055fc441e97dd21c1b33b72f8/updir.png {
+            root /usr/share/icons/;
+            # You can add path to find you own updir image in your distro
+            try_files
+                /gnome/48x48/actions/edit-undo.png
+                /gallery/updir.png
+                =404;
+        }
+        location = /5e4a8c2055fc441e97dd21c1b33b72f8/folder.png {
+            root /usr/share/icons/;
+            # You can add path to find you own folder image in your distro
+            try_files
+                /gnome/48x48/places/folder.png
+                /gallery/folder.png
+                =404;
+        }
+        location = /5e4a8c2055fc441e97dd21c1b33b72f8/archive.png {
+            root /usr/share/icons/;
+            # You can add path to find you own folder image in your distro
+            try_files
+                /gnome/48x48/mimetypes/tar.png
+                /gallery/archive.png
+                =404;
+        }
+    }
+
+    # Send MIME icons directly from nginx
+    # Default prefix: 4c65c292edec4b708679606990be8ce3
+    # You can change this prefix if you have directory with same name
+    location /4c65c292edec4b708679606990be8ce3 {
+        rewrite /[a-z0-9]*/(.*) /$1 break;
+        root /usr/share/icons/;
+        try_files
+            /gallery/mimetypes/$uri
+            @gnome;
+    }
+    # Try get mime icons in gnome-collection
+    location @gnome {
+        root /usr/share/icons/;
+        try_files
+            /gnome/48x48/mimetypes/$uri
+            @gnome-mime;
+    }
+    location @gnome-mime {
+        rewrite /(.*) /gnome-mime-$1 break;
+        root /usr/share/icons/;
+        try_files
+            /gnome/48x48/mimetypes/$uri
+            @media;
+    }
+    # Try get mime icons by common media type
+    location @media {
+        rewrite /gnome-mime-([^-.]+)(-.*)? /$1.png break;
+        root /usr/share/icons/;
+        try_files
+            /gnome/48x48/mimetypes/$uri
+            /gallery/mimetypes/$uri
+            @media-x-generic;
+    }
+    location @media-x-generic {
+        rewrite /([^-.]+)(-.*)? /$1-x-generic.png break;
+        root /usr/share/icons/;
+        try_files
+            /gnome/48x48/mimetypes/$uri
+            /gallery/mimetypes/$uri
+            @unknown;
+    }
+    # Defaul MIME icon - unknown.png
+    location @unknown {
+        root /usr/share/icons/;
+        try_files
+            /gnome/48x48/mimetypes/unknown.png
+            /gallery/mimetypes/unknown.png
+            =404;
+    }
+
+    # Send thumbnails directly from nginx
+    # Default prefix: abdd1ac22dcd41208fb629d24a8ea018
+    # You can change this prefix if you have directory with same name
+    location /abdd1ac22dcd41208fb629d24a8ea018 {
+        rewrite /[a-z0-9]*/(.*) /$1 break;
+        root $CACHE_PATH$IMAGE_ROOT;
+    }
+
+    # Directory archive handler
+    location /5f6d2e769f32489d86546fa9c5068ca9 {
+        rewrite /[a-z0-9]*/(.*) /$1 break;
+        root $IMAGE_ROOT;
+        perl  Nginx::Module::Gallery::archive;
+    }
+
+    # Derectory index handler
+    location / {
+        root $IMAGE_ROOT;
+        perl  Nginx::Module::Gallery::index;
+    }
+}

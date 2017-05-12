@@ -1,0 +1,34 @@
+Net::SCP
+
+Copyright (c) 2000 Ivan Kohler.
+Copyright (c) 2000 Silicon Interactive Software Design.
+Copyright (c) 2000 Freeside Internet Services, LLC
+All rights reserved.
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+This module implements a Perl interface to scp.
+
+To install:
+        perl Makefile.PL
+        make
+        make test # nothing substantial yet
+        make install
+
+Documentation will then be available via `man Net:SCP' or `perldoc Net::SCP'
+
+Anonymous CVS access is available:
+  $ export CVSROOT=":pserver:anonymous@cleanwhisker.402.am:/home/cvs/cvsroot"
+  $ cvs login
+  (Logging in to anonymous@cleanwhisker.420.am)
+  CVS password: anonymous
+  $ cvs checkout Net-SCP
+as well as <http://www.420.am/cgi-bin/cvsweb/Net-SCP>.
+
+A mailing list for users and developers is available.  Send a blank message to
+<ivan-netssh-subscribe@420.am> to subscribe.
+
+Ivan Kohler <ivan-netscp_readme@420.am>
+
+$Id: README,v 1.4 2002-04-13 22:18:00 ivan Exp $
+

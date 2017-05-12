@@ -1,0 +1,8 @@
+README
+MANIFEST
+Makefile.PL
+ChangeLog
+Uncertainty.pm
+t/1_compile.t
+t/2_uncertain.t
+META.yml                                 Module meta-data (added by MakeMaker)

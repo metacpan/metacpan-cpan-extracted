@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<home route="/home" action="Home/Home/home" method="get" />
+<register route="/register" action="Accounts/Register/register" method="get" defaults="year=1900|month=1|day=23" />
+<post route="/blog/post/{cid:\d+}/{id:\d+}" action="Blog/Article/Post" method="post" />
+<browse route="/blog/{id:\d+}" action="Blog/Article/Browse" method="get" />
+<view route="/blog/view/{id:\d+}" action="Blog/Article/View" method="get" />
+<edit route="/blog/edit/{id:\d+}" action="Blog/Article/Edit" method="get" />

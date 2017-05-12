@@ -1,0 +1,35 @@
+
+=head1 NAME
+
+NetApp::Filer::Option -- OO Class for representing NetApp Filer options
+
+=head1 SYNOPSIS
+
+    use NetApp::Filer;
+
+    my $filer = NetApp::Filer->new({ ... });
+
+    my @options		= $filer->get_options;
+
+    my $options		= $filer->get_option( $name );
+
+    $filer->set_option(
+	name		=> $name,
+	value		=> $value,
+    );
+
+=head1 DESCRIPTION
+
+This class is used to encapsulate the NetApp Filer options.
+
+=head1 METHODS
+
+=head2 get_name
+
+Returns the name of the option.
+
+=head2 get_value
+
+Returns the value for the option.
+
+=cut

@@ -1,0 +1,904 @@
+=head1 Chapter 3. The LCDproc client language
+
+B<Table of Contents>
+
+=over
+
+=item Introduction
+
+=item Opening a session
+
+=item Command reference
+
+=over
+
+=item Basic stuff
+
+=item Screens and widgets
+
+=item Menu stuff
+
+=item Miscellaneous
+
+=back
+
+=item LCDd messages
+
+=back
+
+=head1 Introduction
+
+The LCDproc clients, for example lcdproc, connect over the network to
+LCDd. In their communication they use a protocol, often refered to as
+the "widget language". In this chapter the widget language will be
+discussed.
+
+=head1 Opening a session
+
+The essence of talking to LCDd is quite simple. First you will need to
+connect to the LCDproc port (usually 13666) on the correct IP address
+(by default localhost). Once you have established the connection you
+should say "hello", to let LCDd know you are a good guy. It will
+respond by telling some LCDproc data, like version and screen width and
+height. Now your session is open and you can start sending 'real'
+commands.
+
+LCDd can send a number of strings itself. As a response to your
+commands, it will usually send a "success" string, or a string starting
+with "huh" in case of any error. See further below for other strings
+sent by LCDd.
+
+You can test all these commands by opening a TCP/IP connection
+manually, like with:
+
+ telnet localhost 13666
+
+This way, you can check how the various commands work. It's in this
+case best to have no other clients. If you do have other clients, you
+will receive "listen" and "ignore" messages that will disturb your
+typing.
+
+=head1 Command reference
+
+In this section all commands and their parameters are listed, along
+with the responses you can expect. If you need a space or a special
+char in a string, you should quote the string with double quotes. If
+you need to use a double quote, escape it with a backslash. The listing
+is divided into subsections for
+
+=over
+
+=item 1.
+
+Basic stuff
+
+=item 2.
+
+Screens and widgets
+
+=item 3.
+
+Menu stuff
+
+=item 4.
+
+Miscellaneous
+
+=back
+
+=head2 Basic stuff
+
+=over
+
+=item B<hello>
+
+Opens the session with the LCDd server program. This command is
+required before other commands can be issued.
+
+The response will be a string in the format:
+
+C<connect I<C<parameter>>...>
+
+The client should read all parameters it needs and store their values.
+The following parameters are in use:
+
+=over
+
+=item C<LCDproc I<C<version>>>
+
+Indicates the version number of LCDd.
+
+=item C<protocol I<C<version>>>
+
+Indicates the widget language version number. This number is only
+changed when the language of a newer version has become incompatible
+with the previous version.
+
+=item C<wid I<C<int>>>
+
+Tells the client the width of the attached display device in
+characters.
+
+=item C<hgt I<C<int>>>
+
+Tells the client the height of the attached display device in
+characters.
+
+=item C<cellwid I<C<int>>>
+
+How many pixels is a character wide (space between character cells not
+included)
+
+=item C<cellhgt I<C<int>>>
+
+How many pixels is a character high (space between character cells not
+included)
+
+=item C<lcd>
+
+This word is NOT followed by a value ! Hey do we really need this word
+in the response string ?
+
+=back
+
+=item B<client_set C<-name I<C<name>>>>
+
+Sets attributes for the current client. The current client is the one
+from the connection that you send this command on, in other words:
+yourself.
+
+I<C<name>> is the client's name as visible to a user.
+
+=back
+
+=head2 Screens and widgets
+
+=over
+
+=item B<screen_add C<I<C<new_screen_id>>>>
+
+Adds a screen to be displayed. The screen will be identified by the
+string I<C<new_screen_id>>, which is used later when manipulating on
+the screen.
+
+=item B<screen_del C<I<C<screen_id>>>>
+
+Removes the screen identified by I<C<screen_id>> from the client's
+screens.
+
+=item B<screen_set C<I<C<screen_id>>> C<I<C<attributes>>...>>
+
+Sets attributes for the given screen. The following attributes exist:
+
+=over
+
+=item C<-name I<C<name>>>
+
+Sets the screen's name as visible to a user.
+
+=item C<-wid I<C<int>>> C<-hgt I<C<int>>>
+
+Sets the size of the screen in characters. If unset, the full display
+size is assumed.
+
+=item C<-priority I<C<pri_class>>>
+
+Sets the screen's priority. The following priority classes exist:
+
+=over
+
+=item C<hidden>
+
+The screen will never be visible
+
+=item C<background>
+
+The screen is only visible when no normal info screens exists
+
+=item C<info>
+
+normal info screen, default priority
+
+=item C<foreground>
+
+an active client
+
+=item C<alert>
+
+The screen has an important message for the user.
+
+=item C<input>
+
+The client is doing interactive input.
+
+=item I<C<int>>
+
+a positive integer that maps to priority classes above according to the
+mapping given in the table below.
+
+range
+
+priority
+
+1 - 64
+
+foreground
+
+65 - 192
+
+info
+
+193 - E<acirc>E<136>E<158>
+
+background
+
+=back
+
+LCDd will only show screens with the highest priority at that moment.
+So when there are three C<info> screens and one C<foreground> screen,
+only the C<foreground> screen will be visible. Only C<background>,
+C<info> and C<foreground> screens will rotate; higher classes do not
+rotate because their purpose is not suitable for rotation.
+
+=item C<-heartbeat { on | off | open }>
+
+Changes the heartbeat setting for this screen. If set to C<open>, the
+default, the client's heartbeat setting will be used.
+
+=item C<-backlight { on | off | toggle | open | blink | flash }>
+
+Changes the screen's backlight setting. If iset to the default value
+C<open>, the state will be determined by the client's setting. C<blink>
+is a moderately striking backlight variation, C<flash> is I<very>
+strinking.
+
+=item C<-duration I<C<value>>>
+
+A screen will be visible for this amount of time every rotation. The
+I<C<value>> is in eights of a second.
+
+=item C<-timeout I<C<value>>>
+
+After the screen has been visible for a total of this amount of time,
+it will be deleted. The I<C<value>> is in eights of a second. Currently
+the client will not be informed of the deletion (TODO?).
+
+=item C<-cursor { on | off | under | block}>
+
+Determines the visibility of a cursor. If C<on>, a cursor will be
+visible. Depending on your hardware, this will be a hardware or
+software cursor. The specified cursor shape (C<block> or C<under>)
+might not be available in which case an other cursor shape will be used
+instead. Default is C<off>.
+
+=item C<-cursor_x I<C<int>>> C<-cursor_y I<C<int>>>
+
+Set the cursor's x and y coordinates respectively. If not given, the
+cursor will be set to the leftmost (C<-cursor_x>) resp. topmost
+(C<-cursor_y>) position. Coordinates are always 1-based. So the default
+top-left corner is denoted by (1,1).
+
+=back
+
+=item B<widget_add C<I<C<screen_id>>> C<I<C<new_widget_id>>>
+C<I<C<widgettype>>> [C<-in I<C<frame_id>>>]>
+
+Adds a widget to the given screen. The I<C<new_widget_id>> sets the
+identifier for this widget. The optional C<-in I<C<frame_id>>> places
+the widget into the given frame. The following widget types exist:
+
+=over
+
+=item C<string>
+
+A simple text.
+
+=item C<title>
+
+A title bar on top of the screen.
+
+=item C<hbar>
+
+A horizontal bar.
+
+=item C<vbar>
+
+A vertical bar.
+
+=item C<icon>
+
+A predefined icon. For a list of valid names consult
+C<server/widget.c.>
+
+=item C<scroller>
+
+A variation of the string type that scrolls the text horizontally or
+vertically.
+
+=item C<frame>
+
+A frame with that can contain widgets itself. In fact a frame displays
+an other screen in it.
+
+=item C<num>
+
+A big number. They have a size of 3x4 characters. The special number 10
+is a colon, that you can use for a clock. This character is 1x4.
+
+=back
+
+=item B<widget_del C<I<C<screen_id>>> C<I<C<widget_id>>>>
+
+Deletes the given widget from the screen.
+
+=item B<widget_set C<I<C<screen_id>>> C<I<C<widget_id>>>
+C<I<C<widgettype_specific_parameters>>>>
+
+Sets parameters for a widget. Because not all widgets are created
+equal, the various widget types require different parameters.
+
+=over
+
+=item C<string>
+
+I<C<x>> I<C<y>> I<C<text>>
+
+Displays I<C<text>> at position (I<C<x>>,I<C<y>>).
+
+=item C<title>
+
+I<C<text>>
+
+Uses I<C<text>> as the title to display.
+
+=item C<hbar> , C<vbar>
+
+I<C<x>> I<C<y>> I<C<length>>
+
+Displays a horizontal (C<hbar>) resp. vertical (C<vbar>) starting at
+position (I<C<x>>,I<C<y>>) that is I<C<length>> pixels wide resp. high.
+
+=item C<icon>
+
+I<C<x>> I<C<y>> I<C<iconname>>
+
+Displays the icon I<C<iconname>> at position (I<C<x>>,I<C<y>>).
+
+=item C<scroller>
+
+I<C<left>> I<C<top>> I<C<right>> I<C<bottom>> I<C<direction>>
+I<C<speed>> I<C<text>>
+
+Displays a scroller spanning from position (I<C<left>>,I<C<top>>) to
+(I<C<right>>,I<C<bottom>>) scrolling I<C<text>> in horizontal (C<h>),
+vertical (C<v>) or marquee (C<m>) direction at a speed of I<C<speed>>,
+which is the number of movements per rendering stroke (8 times/second).
+
+=item C<frame>
+
+I<C<left>> I<C<top>> I<C<right>> I<C<bottom>> I<C<width>> I<C<height>>
+I<C<direction>> I<C<speed>>
+
+Sets up a frame spanning from (I<C<left>>,I<C<top>>) to
+(I<C<right>>,I<C<bottom>>) that is I<C<width>> columns wide and
+I<C<height>> rows high. It scrolls in either horizontal (C<h>) or
+vertical (C<v>) direction at a speed of I<C<speed>>, which is the
+number of movements per rendering stroke (8 times/second).
+
+=item C<num>
+
+I<C<x>> I<C<int>>
+
+Displays decimal digit I<C<int>> at the horizontal position I<C<x>>,
+which is a normal character x coordinate on the display. The special
+value 10 for I<C<int>> displays a colon.
+
+=back
+
+=back
+
+=head2 Menu stuff
+
+In this section all commands for creation, modification of menus and
+for interaction with them are described. Although keys may be used for
+other tasks they are listed here too.
+
+TODO: example for normal (static) menu structure.
+
+Menus may be even be used for wizards (the user is automatically guided
+through a number of configuration options) by virtue of the options
+-next and -prev. Here a complete example:
+
+	  client_set name Parenttest
+	  # to be entered on escape from test_menu (but overwritten
+	  # for test_{checkbox,ring})
+	  menu_add_item "" ask menu "Leave menus?" -is_hidden true
+	    menu_add_item "ask" ask_yes action "Yes" -next _quit_
+	    menu_add_item "ask" ask_no action "No" -next _close_
+ 
+	  menu_add_item "" test menu "Test"
+	    menu_add_item "test" test_action action "Action"
+	    menu_add_item "test" test_checkbox checkbox "Checkbox"
+	    menu_add_item "test" test_ring ring "Ring" -strings "one\ttwo\tthree"
+	    menu_add_item "test" test_slider slider "Slider" -mintext "" -maxtext "" -value "50"
+	    menu_add_item "test" test_numeric numeric "Numeric" -value "42"
+	    menu_add_item "test" test_alpha alpha "Alpha" -value "abc"
+	    menu_add_item "test" test_ip ip "IP" -v6 false -value "192.168.1.1"
+	    menu_add_item "test" test_menu menu "Menu"
+	    menu_add_item "test_menu" test_menu_action action "Submenu's action"
+ 
+	  # no successor for menus. Since test_checkbox and test_ring have their
+	  # own predecessors defined the "ask" rule will not work for them
+	  menu_set_item "" test -prev "ask"
+ 
+	  menu_set_item "test" test_action -next "test_checkbox"
+	  menu_set_item "test" test_checkbox -next "test_ring" -prev "test_action"
+	  menu_set_item "test" test_ring -next "test_slider" -prev "test_checkbox"
+	  menu_set_item "test" test_slider -next "test_numeric" -prev "test_ring"
+	  menu_set_item "test" test_numeric -next "test_alpha" -prev "test_slider"
+	  menu_set_item "test" test_alpha -next "test_ip" -prev "test_numeric"
+	  menu_set_item "test" test_ip -next "test_menu" -prev "test_alpha"
+	  menu_set_item "test" test_menu_action -next "_close_"
+ 
+	  menu_set_main ""
+	
+
+=over
+
+=item B<client_add_key [ C<-exclusively> | C<-shared> ]
+C<I<C<key>>>...>
+
+Tells the server that the current client wants to make use of the given
+key(s). If you reserve the key(s) in shared mode, other clients can
+still reserve these keys too. If you reserve the key(s) in exclusive
+mode no other client can reserve them again. Key(s) reserved in shared
+mode will only be returned when a screen of the current client is
+active. These keys can be used for interaction with a visible screen
+(default). Key(s) reserved in exclusive mode will be returned
+regardless of which screen is active. They can be used to trigger a
+special feature or to make a screen come to foreground. Note that you
+cannot reserve a key in exclusive mode when an other client has
+reserved it in shared mode.
+
+=item B<client_del_key C<I<C<key>>...>>
+
+Ends the reservation of the given key(s).
+
+=item B<menu_add_item C<I<C<menu_id>>> C<I<C<new_item_id>>>
+C<I<C<type>>> [C<I<C<options>>>]>
+
+Adds a new menu item to a menu. The main menu of a client, will be
+created automatically as soon as the client adds an item. This main
+menu has an empty id ("") and the name is identical to the name of the
+client. The options are described under menu_set_item below.
+
+=head2 Note:
+
+Some menu commands (B<menu_goto>) and options (C<-prev>, C<-next>)
+assume that I<C<menu_ids>> are I<unique> (at least within a clients
+menu hierarchy).
+
+B<menu item types>
+
+=over
+
+=item C<action>
+
+This item should trigger an action. It consists of simple text.
+
+=item C<checkbox>
+
+Consists of a text and a status indicator. The status can be on (Y),
+off (N) or gray (o).
+
+=item C<ring>
+
+Consists of a text and a status indicator. The status can be one of the
+strings specified for the item.
+
+=item C<slider>
+
+Is visible as a text. When selected, a screen comes up that shows a
+slider. You can set the slider using the cursor keys. When Enter is
+pressed, the menu returns.
+
+=item C<numeric>
+
+Allows the user to input an integer value. Is visible as a text. When
+selected, a screen comes up that shows the current numeric value, that
+you can edit with the cursor keys and Enter. The number is ended by
+selecting a 'null' input digit. After that the menu returns.
+
+=item C<alpha>
+
+Is visible as a text. When selected, a screen comes up that shows the
+current string value, that you can edit with the cursor keys and Enter.
+The string is ended by selecting a 'null' input character. After that
+the menu returns.
+
+=item C<ip>
+
+Allows the user to input an ip number (v4 or v6). When selected, a
+screen comes up that shows an ip number that can be edited - digit by
+digit - via left/right (switch digit) and up/down keys
+(increase/decrease).
+
+=item C<menu>
+
+This is a submenu. It is visible as a text, with an appended C<E<gt>>.
+When selected, the submenu becomes the active menu.
+
+=back
+
+=item B<menu_del_item C<I<C<menu_id>>> C<I<C<item_id>>>>
+
+Removes a menu item I<C<item_id>> from menu I<C<menu_id>>. The menu
+with the special id "" (i.e. the empty string) is the client's main
+menu.
+
+=item B<menu_set_item C<I<C<menu_id>>> C<I<C<item_id>>>
+C<I<C<item_specific_options>>>>
+
+Sets parameters for the menu item(s). Each item type knows different
+parameters.
+
+B<options for the various menu items>
+
+=over
+
+=item for all item types
+
+=over
+
+=item C<-text I<C<string>>>
+
+The visible text of the item.
+
+=item C<-is_hidden { true | false}> (false)
+
+If the item currently should not appear in a menu.
+
+=item C<-next I<C<successor_id>>>
+
+Sets the menu item to show after hitting the ENTER key when this item
+is active. This works for I<all> menu item types I<except menus> i.e.
+also for menu item types without an own screen e.g., checkbox, ring and
+action.
+
+B<Special values>
+
+=over
+
+=item C<_close_>
+
+Equivalent to C<-menu_result close>: Close the menu.
+
+=item C<_quit_>
+
+Equivalent to C<-menu_result quit>: Quit the menu system.
+
+=item C<_none_>
+
+Equivalent to C<-menu_result none>: Keep the item open.
+
+=back
+
+=item C<-prev I<C<predecessor_id>>>
+
+Sets the menu item to show after hitting the ESCAPE key when this Item
+is active. This works for I<all> menu item types i.e. also for menu
+item types without an own screen e.g., checkbox, ring and action.
+
+=head2 Note:
+
+If you define a predecessor for e.g., a checkbox and its parent menu
+too, the menu's predecessor is ignored in favor of the checkboxes one.
+
+This option accepts the same special values as the C<-next> option.
+
+=back
+
+=item C<action>
+
+=over
+
+=item C<-menu_result { none | close | quit}> (none)
+
+Sets what to do with the menu when this action is selected: none: the
+menu stays as it is; close: the menu closes and returns to a higher
+level; quit: quits the menu completely so you can foreground your app.
+
+=back
+
+=item C<checkbox>
+
+=over
+
+=item C<-value { off | on | gray }>
+
+Set the value of the item.
+
+=item C<-allow_gray { false | true}> (false)
+
+Sets if a grayed checkbox is allowed.
+
+=back
+
+=item C<ring>
+
+=over
+
+=item C<-value I<C<int>>> (0)
+
+Sets the index in the stringlist that is currently selected.
+
+=item C<-strings I<C<string>>> (empty)
+
+This single string should contain the strings that can be selected.
+They should be tab-separated (\t).
+
+=back
+
+=item C<slider>
+
+=over
+
+=item C<-value I<C<int>>> (0)
+
+Sets its current value.
+
+=item C<-mintext I<C<string>>> ("") , C<-maxtext I<C<string>>> ("")
+
+The texts at the left and right side of the slider.
+
+=item C<-minvalue I<C<int>>> (0) , C<-maxvalue I<C<int>>> (100)
+
+The minimum and maximum values of the slider.
+
+=item C<-stepsize I<C<int>>> (1)
+
+The stepsize of the slider. If you use 0, you can control the movement
+completely from your client.
+
+=back
+
+=item C<numeric>
+
+=over
+
+=item C<-value I<C<int>>> (0)
+
+Sets its current value.
+
+=item C<-minvalue I<C<int>>> (0) , C<-maxvalue I<C<int>>> (100)
+
+The minimum and maximum values that are allowed. If one of them is
+negative, the user will be able to enter negative numbers too.
+
+TODO: floats!
+
+=back
+
+=item C<alpha>
+
+=over
+
+=item C<-value I<C<string>>> ("")
+
+Sets its current value.
+
+=item C<-password_char I<C<string>>> ("")
+
+If used, instead of the typed characters, this character will be
+visible.
+
+=item C<-minlength I<C<int>>> (0) , C<-maxlength I<C<int>>> (10)
+
+Sets the minimum and maximum allowed lengths.
+
+=item C<-allow_caps { false | true }> (true) , C<-allow_noncaps { false
+| true }> (false) , C<-allow_numbers { false | true }> (false)
+
+(Dis)allow these groups of characters.
+
+=item C<-allowed_extra I<C<string>>> ("")
+
+The chars in this string are also allowed.
+
+=back
+
+=item C<ip>
+
+=over
+
+=item C<-value I<C<string>>> ("192.168.1.245")
+
+Set the value of the item, e.g. "192.168.1.245" (v4) or
+":::ffff:ffff:ffff:ffff:ffff" (v6).
+
+=item C<-v6 { false | true }> (false)
+
+Changes IP version from default v4.
+
+=back
+
+=item C<menu>
+
+This is a submenu. It is visible as a text, with an appended
+'C<E<gt>>'. When selected, the submenu becomes the active menu.
+
+=over
+
+=item C<-parent I<C<parentid>>>
+
+(Re)sets the parent of this menu. Parentid has to be of type menu. This
+function does not change any menu (neither the old nor the new parent)
+since this option is normally used with hidden menus. Otherwise use
+menu_add/del_item. Applying this option is equivalent to second
+argument of the menu_goto command.
+
+=back
+
+=back
+
+=item B<menu_goto C<I<C<menu_id>>> [C<I<C<parent_id>>>]>
+
+Changes current menu to I<C<menu_id>>. Depending on the configure
+option C<--enable-permissive-menu-goto> the client may switch to any
+(if enabled) or his menus only (if not enabled).
+
+=over
+
+=item I<C<menu_id>>
+
+The menu item to go to (any menu type e.g. an action or a menu).
+
+=item I<C<parent_id>>
+
+Resets the parent of I<C<menu_id>>. This optional parameter can be used
+to reuse a menu from different places (for wizards etc.). Use it with
+caution: This may lead to a messy menu structure in particular due to
+the fact that the menus are not changed !
+
+=back
+
+=item B<menu_set_main C<I<C<menu_id>>>>
+
+Sets the entry point into the menu system. Use this to make the server
+menu invisible. Note that you may only set the menu to your own clients
+menus unless the configure option C<--enable-permissive-menu-goto> is
+used. (See C<menuscreens.c> for the menu ids of the server menus.)
+
+=over
+
+=item I<C<menu_id>>
+
+The new main menu, restricted to the client's own menus. Special
+values:
+
+=over
+
+=item "" (i.e. the empty string)
+
+The client's main menu.
+
+=item C<_main_>
+
+Resets main to the "real" main menu.
+
+=back
+
+=back
+
+=back
+
+=head2 Miscellaneous
+
+=over
+
+=item B<backlight { C<on> | C<off> | C<toggle> | C<blink> | C<flash> }>
+
+Sets the client's backlight state.
+
+=item B<output { C<on> | C<off> | C<I<C<int>>> }>
+
+Sets the general purpose output on some display modules to this value.
+Use C<on> to set all outputs to high state, and C<off> to set all to
+low state. The meaning of the integer value depends on your specific
+device, usually it is a bit pattern describing the state of each output
+line.
+
+=item B<info>
+
+This command provides information about the driver.
+
+=item B<noop>
+
+This command does nothing and is always successful. Can be useful to be
+sent at regular intervals to make sure your connection is still alive.
+
+=item B<sleep C<I<C<int>>>>
+
+Sleep for the given number of seconds. I<C<int>> must be a positive
+integer in the range from 1 to 60.
+
+=head2 Note:
+
+This command is currently ignored on the server side.
+
+=back
+
+=head1 LCDd messages
+
+LCDd can send messages back to the client. These messages can be
+directly related to the last command, or generated for some other
+reason. Because messages can be generated at any moment, the client
+should read from the connection at regular intervals. A very simple
+client could simply ignore all received messages. Not reading the
+messages will cause trouble !
+
+=over
+
+=item C<success>
+
+This is the reponse to a command in case everything went ok.
+
+=item C<huh? error_description>
+
+This is the response to a command in case something has gone wrong. The
+description is not meant to be parsed, it's only meant for the
+programmer of the client. It might be that your command has only been
+partially executed, for example if you try to reserve 3 keys, and one
+fails. Your client might need to undo its actions completely.
+
+=item C<listen I<C<screen_id>>> , C<ignore I<C<screen_id>>>
+
+The screen with the I<C<screen_id>> given is now visible on the display
+(C<listen>) or it is not visible anymore on the display (C<ignore>).
+
+=item C<key I<C<key>>>
+
+This message will be sent if there was a keypress that should be
+delivered to the current client.
+
+=item C<menuevent I<C<event_type>> I<C<id>> [I<C<value>>]>
+
+The user did something with a client supplied menu. The type of event
+can be:
+
+=over
+
+=item C<select> (action)
+
+The item was activated.
+
+=item C<update> (checkbox, ring, numeric, alpha)
+
+The item was modified by the user, so LCDd sends an updated
+I<C<value>>.
+
+=item C<plus> (slider) , C<minus> (slider)
+
+The slider was moved to left (C<minus>) or right (C<plus>), so LCDd
+sends an updated I<C<value>>.
+
+=item C<enter>
+
+This item has been entered, which means it is currently active on the
+screen. The client could now for example update the value of the item.
+If it is a menu, it may be needed to update the values of the items in
+it too, because they may be visible too.
+
+=item C<leave>
+
+This item has been left, so it is currenly not the (main) active item
+anymore.
+
+=back
+
+Multiple messages may be generated by one action of the user.
+
+=back
+
+=cut
+

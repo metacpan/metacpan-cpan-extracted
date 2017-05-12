@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Net-DAAP-Server-AAC
+version:      0.01
+version_from: lib/Net/DAAP/Server/AAC.pm
+installdirs:  site
+requires:
+    MP4::Info:                     1.05
+    Net::DAAP::Server:             0.03
+    Test::More:                    0.32
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

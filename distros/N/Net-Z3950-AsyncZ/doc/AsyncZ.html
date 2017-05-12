@@ -1,0 +1,1823 @@
+<!-- 
+$Date: 2003/06/19 12:04:57 $
+$Id: AsyncZ.html,v 1.3 2003/06/19 12:04:57 tower Exp $
+$Revision: 1.3 $
+-->
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Net::Z3950::AsyncZ - Perl extension for the Z3950 module</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#abstract">ABSTRACT</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#apologia">Apologia</a></li>
+		<li><a href="#the_basic_mechanisms_of_net::z3950::asyncz">The Basic Mechanisms of Net::Z3950::AsyncZ</a></li>
+		<ul>
+
+			<li><a href="#the_basic_script">The Basic Script</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#constructor,_methods,_and_exports">Constructor, Methods, and Exports</a></li>
+	<ul>
+
+		<li><a href="#constructor">Constructor</a></li>
+		<ul>
+
+			<li><a href="#a_word_about_parameters_and_options">A Word about Parameters and Options</a></li>
+			<li><a href="#required_parameters_for_constructor">Required Parameters for Constructor</a></li>
+			<li><a href="#optional_parameters_for_constructor">Optional Parameters for Constructor</a></li>
+		</ul>
+
+		<li><a href="#methods">Methods</a></li>
+		<ul>
+
+			<li><a href="#object_methods">Object Methods</a></li>
+			<li><a href="#class_methods">Class Methods</a></li>
+		</ul>
+
+		<li><a href="#exported_names">Exported Names</a></li>
+		<ul>
+
+			<li><a href="#exports_from_net::z3950::asyncz">Exports from Net::Z3950::AsyncZ</a></li>
+			<li><a href="#exports_from_net::z3950::asyncz::errors">Exports from Net::Z3950::AsyncZ::Errors</a></li>
+			<li><a href="#exports_from_net::z3950::asyncz::errmsg">Exports from Net::Z3950::AsyncZ::ErrMsg</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#callback_functions">Callback Functions</a></li>
+	<ul>
+
+		<li><a href="#output_callback_(required)">Output Callback (required)</a></li>
+		<li><a href="#format_callback_(not_required)">Format Callback (not required)</a></li>
+	</ul>
+
+	<li><a href="#headers">Headers</a></li>
+	<ul>
+
+		<li><a href="#types_of_headers">Types of Headers</a></li>
+		<li><a href="#dealing_with_headers_in_the_callback_function">Dealing with Headers in the Callback Function</a></li>
+	</ul>
+
+	<li><a href="#errors">Errors</a></li>
+	<ul>
+
+		<li><a href="#net::z3950::asyncz::errors">Net::Z3950::AsyncZ::Errors</a></li>
+		<li><a href="#net::z3950::asyncz::errmsg">Net::Z3950::AsyncZ::ErrMsg</a></li>
+		<ul>
+
+			<li><a href="#net::z3950::asyncz::errmsg_object">Net::Z3950::AsyncZ::ErrMsg Object</a></li>
+			<li><a href="#net::z3950::asyncz_methods_for_errmsg_handling">Net::Z3950::AsyncZ methods for ErrMsg handling</a></li>
+			<li><a href="#net::z3950::asyncz::errmsg_methods_for_errmsg_handling">Net::Z3950::AsyncZ::ErrMsg methods for ErrMsg Handling</a></li>
+			<li><a href="#examples_of_net::z3950::asyncz::errmsg_error_handling">Examples of Net::Z3950::AsyncZ::ErrMsg Error Handling</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<style = "text/css">
+code { font-family: sans-serif; font-weight:bold; }
+</style><p>
+</p>
+<hr />
+<h1><a name="name">NAME</a></h1>
+<p>Net::Z3950::AsyncZ - Perl extension for the Z3950 module</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<dl>
+<dt><strong><a name="item_overview">Overview</a></strong><br />
+</dt>
+<dd>
+<pre>
+  use Net::Z3950::AsyncZ;
+  use Net::Z3950::AsyncZ qw(:record :headers :errors);
+  use Net::Z3950::AsyncZ qw(asyncZOptions isZ_MARC 
+                       isZ_GRS isZ_RAW isZ_DEFAULT
+                       noZ_Response isZ_Header
+                       isZ_ServerName Z_serverName);</pre>
+</dd>
+<dd>
+<pre>
+  my $asnycZ = Net::Z3950::AsyncZ-&gt;new(servers=&gt;\@servers, 
+                             query=&gt;$query,cb=&gt;\&amp;output);</pre>
+</dd>
+<dd>
+<pre>
+  my $asnycZ = Net::Z3950::AsyncZ-&gt;new(
+       servers=&gt;\@servers,  query=&gt;$query, timeout=&gt;$tm,
+                            num_to_fetch=&gt;$num,cb=&gt;\&amp;output,
+                            options=&gt;\@options, log=&gt;$log,
+                            format=&gt;\&amp;format,
+                            timeout_min=&gt;$min,
+                            interval=&gt;$interval,
+                            maxpipes =&gt;$max, 
+     );</pre>
+</dd>
+<dt><strong><a name="item_example_1">Example 1</a></strong><br />
+</dt>
+<dd>
+<pre>
+   my @servers =
+        (
+         [ 'amicus.nlc-bnc.ca', 210, 'NL'],
+         ['bison.umanitoba.ca', 210, 'MARION'],
+         [ 'library.anu.edu.au', 210, 'INNOPAC' ]
+         );
+   my $query = '  @attr 1=1003  &quot;Henry James&quot; ';  
+   my $asnycZ =
+      Net::Z3950::AsyncZ-&gt;new(servers=&gt;\@servers, query=&gt;$query,cb=&gt;\&amp;output);</pre>
+</dd>
+<dd>
+<p><code>\&amp;output</code> is a reference to a <a href="#output_callback_(required)">callback</a> function which outputs
+the records returned by the servers.  Basically, the callback function gets the
+records in the form of an array, in which each element of the array is a line of the
+record.  At the simplest level, you just loop through the array,
+printing each line and a <code>newline</code>.</p>
+</dd>
+<dt><strong><a name="item_example_2">Example 2</a></strong><br />
+</dt>
+<dd>
+<pre>
+   my $asnycZ =
+      Net::Z3950::AsyncZ-&gt;new(servers=&gt;\@servers, query=&gt;$query,
+                 cb=&gt;\&amp;output, log=&gt;&quot;errors.log&quot;, num_to_fetch=&gt;10);</pre>
+</dd>
+<dd>
+<p>Same as Example 1 but requesting 10 records from each server,
+instead of the default 5 and setting a log for debug error output.</p>
+</dd>
+<dt><strong><a name="item_example_3">Example 3</a></strong><br />
+</dt>
+<dd>
+<pre>
+   my @servers =
+        (
+         [ 'amicus.nlc-bnc.ca', 210, 'NL'],
+         ['bison.umanitoba.ca', 210, 'MARION'],
+         [ 'library.anu.edu.au', 210, 'INNOPAC' ]
+         );</pre>
+</dd>
+<dd>
+<pre>
+   my $query = '  @attr 1=1003  &quot;Henry James&quot; ';</pre>
+</dd>
+<dd>
+<pre>
+   my @options = (
+    asyncZOptions (num_to_fetch=&gt;5,log=&gt;bison_errors.log&quot;),  #amicus
+    asyncZOptions (num_to_fetch=&gt;10,
+           query=&gt;'  @attr 1=1003  &quot;James Joyce&quot; '),  # bison
+    undef            # library.anu.edu.au
+  );</pre>
+</dd>
+<dd>
+<pre>
+  $options[0]-&gt;set_GRS1();</pre>
+</dd>
+<dd>
+<pre>
+  my $asnycZ =
+      Net::Z3950::AsyncZ-&gt;new(servers=&gt;\@servers,
+            query=&gt;$query,cb=&gt;\&amp;output,
+            options=&gt;\@options,   
+            log=&gt;&quot;errors_main.log&quot;
+           );</pre>
+</dd>
+<dd>
+<p>Here we set options which apply to individual servers in the @options array. 
+<code>asyncZOptions</code> returns a reference to a <code>Net::Z3950::AsyncZ::Options::_params</code> object;
+we can pass into it options we want to set for individual servers.  We have
+not defined a <code>_params</code> object for library.anu.edu.au, so a default <code>_params</code>
+will be created for it.</p>
+</dd>
+<dd>
+<p>As you can see, we can set different queries for different servers;
+we can set separate logs, assuming we want to track errors separately--
+we can even suppress error reporting on an individual basis. 
+In the case of 'amicus', we have asked that the
+<code>preferredRecordSyntax</code> be set to <code>Net::Z3950::RecordSyntax::GRS1</code>,
+since the Natonal Library of Canada uses GRS-1 as its default output;
+we could also have done that in the call to <code>asyncZOptions</code>:
+</p>
+</dd>
+<dd>
+<pre>
+
+        asyncZOptions(preferredRecordSyntax=&gt;Net::Z3950::RecordSyntax::GRS1);</pre>
+</dd>
+<dd>
+<p>In addition to detailed logging of error messages, there's also error reporting aimed at
+the user, to inform users when records haven't been returned.  See <a href="#errors">Errors</a> below.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="abstract">ABSTRACT</a></h1>
+<p>Net::Z3950::AsyncZ adds additional asynchronous support for the Z3950 module through the use
+of multiple forked processes.</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Net::Z3950::AsyncZ adds an additional layer of asynchronous support for the Z3950 module through the use
+of multiple forked processes.  Users may also find that it provides a convenient 
+front end to Z3950.</p>
+<p>
+</p>
+<h2><a name="apologia">Apologia</a></h2>
+<p>My own experience with Z3950 async mode was that I could connect to servers
+and get back the number of records waiting to be fetched, but
+I was unable to retrieve the records themselves.</p>
+<p>The Z3950 documentation talks about this situation:</p>
+<pre>
+        when the connection is anychronous, the errcode() may
+        be zero, indicating simply that the record has not yet been fetched from
+        the server. In this case, the calling code should try again later. (How
+        much later? As a rule of thumb, after it's done ``something else'', such
+        as request another record or issue another search.)</pre>
+<p>The documentation promises to provide user code for asynchronous access at a later date, 
+and since synchronous access is apparently written on top of asynchronous code,
+the techniques for the async mode no doubt exist. But I searched the mailing list 
+archive and couldn't find anything relevant.  So, at the risk of carrying coals to
+Newcastle, I wrote AsyncZ.</p>
+<p>
+</p>
+<h2><a name="the_basic_mechanisms_of_net::z3950::asyncz">The Basic Mechanisms of Net::Z3950::AsyncZ</a></h2>
+<p>AsyncZ forks off <code>maxpipes</code> processes at a time. After these processes have returned
+and reported their results, or after a <code>timeout</code> period, the next set of <code>maxpipes</code>
+are forked off, and so forth. An Event loop is set in motion that enables AsyncZ to
+wait for results--either records or error messages--to return from the Z39.50 servers.
+Records are passed through, in the order in which they arrive, to a callback
+function (<code>cb</code>), which you supply and which outputs the records.</p>
+<p>Each of the forked processes, in turn, runs in its own Event loop while waiting for results
+to return from the server.  The two-fold purpose of these loops, local to each forked process,
+is:</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1] to help insure that a request
+to a server doesn't get swallowed up on the network and never return, causing a 
+script or program to hang;</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[2] to set a timeout on how 
+long you are prepared to wait for a response.</p>
+<p>The loop in the child process is not always enough in itself to prevent a script from
+hanging; for such cases you can set a <code>monitor</code> which will kill the main process
+after a timeout period.  See the discussion of <code>monitor</code> in <code>Options.pod</code>.</p>
+The loop in the child process is not always enough in itself to prevent a script from
+hanging; for such cases you can set a <code>monitor</code> which will kill the main process
+after a timeout period.  See the discussion of <a href="Options.html#item_monitor">monitor</a>
+in Options.html.<p>Various conditions may be responsible for the failure to receive records from a server. 
+In some circumstances, such as timing out, it may be worth a second try.
+In such cases AsyncZ will try the server a second time.  (I refer to these two
+tries as two cycles.)</p>
+<p>The constructor does not return a reference to Net::Z3950::AsyncZ until this
+two cycle process is completed. This reference gives you access to any
+errors which may have been reported, i.e. you can check to see why a
+server has not returned any records and provide error
+messages to the user as you see fit. In addition, you can keep an Error
+log with considerably more detailed error reporting; you can in fact
+keep a separate log for any one or combination of the servers you contact.</p>
+<p>Everything essentially proceeds from the constructor. Once you provide the constructor
+with a list of servers and a query (or queries), and a callback function to output
+your records, you have nothing to do except wait for the reference 
+which gives you access to the error messages.  You can exercise a great deal of control
+by setting options for both the parent process and any or all of its children.</p>
+<p>
+</p>
+<h3><a name="the_basic_script">The Basic Script</a></h3>
+<dl>
+<dt><strong><a name="item_%23_basic%2epl"># basic.pl</a></strong><br />
+</dt>
+<dd>
+<pre>
+   use Net::Z3950::AsyncZ qw(isZ_Error);</pre>
+</dd>
+<dd>
+<pre>
+   my @servers = (
+                [ 'amicus.nlc-bnc.ca', 210, 'NL'],
+                ['bison.umanitoba.ca', 210, 'MARION'],
+                [ 'library.anu.edu.au', 210, 'INNOPAC' ],
+                ['130.17.3.75', 210, 'MAIN*BIBMAST'],                   
+                [ 'library.usc.edu', 2200,'unicorn'],
+                [ 'z3950.loc.gov', 7090, 'Voyager' ],
+                [ 'fc1n01e.fcla.edu', 210, 'FI' ],
+                [ 'axp.aacpl.lib.md.us', 210, 'MARION'],
+                [ 'jasper.acadiau.ca', 2200, 'UNICORN']
+          );</pre>
+</dd>
+<dd>
+<pre>
+          my $query = '  @attr 1=1003  &quot;Henry James&quot; ';  
+          my $asyncZ = Net::Z3950::AsyncZ-&gt;new(servers=&gt;\@servers,query=&gt;$query,cb=&gt;\&amp;output);  
+          showErrors($asyncZ);</pre>
+</dd>
+<dd>
+<pre>
+          exit;</pre>
+</dd>
+<dd>
+<pre>
+          #------END MAIN------#</pre>
+</dd>
+<dd>
+<pre>
+          sub output {
+           my($index, $array) = @_;
+           foreach my $line(@$array) {
+             print &quot;$line\n&quot; if $line;  
+            }
+           print &quot;\n--------\n\n&quot;;    
+          }</pre>
+</dd>
+<dd>
+<pre>
+          sub showErrors {
+           my $asyncZ = shift;          
+           print &quot;The following servers have not responded to your query: \n&quot;;
+           for(my $i=0; $i&lt; $asyncZ-&gt;getMaxErrors();$i++) {
+                  my $err = $asyncZ-&gt;getErrors($i);
+                  next if !isZ_Error($err);       
+                  print &quot;$servers[$i]-&gt;[0]\n&quot;;                 
+                  print &quot;  $err-&gt;[0]-&gt;{msg}\n&quot; if $err-&gt;[0]-&gt;{msg};
+                  print &quot;  $err-&gt;[1]-&gt;{msg}\n&quot; if $err-&gt;[1]-&gt;{msg};
+                }              
+          }</pre>
+</dd>
+</dl>
+<p>You will notice that I have retained the @servers array used in Mike Taylor's sample scripts for
+the Net::Z3950 module, i.e. an array of references to 3-element arrays of servers, ports,
+and databases.</p>
+<p>When you run this script at the terminal, you will find several types of headers 
+and detailed error messages interspersed with the query results.   For a ``clean''
+output see <code>basic_pretty.pl</code>, which is included in the distribution.</p>
+<p>Also, see <a href="#errors">Errors</a> and <a href="#headers">Headers</a>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="constructor,_methods,_and_exports">Constructor, Methods, and Exports</a></h1>
+<p>
+</p>
+<h2><a name="constructor">Constructor</a></h2>
+<dl>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3anew">Net::Z3950::AsyncZ::new</a></strong><br />
+</dt>
+<dd>
+<pre>
+   my $asyncZ = Net::Z3950::AsyncZ-&gt;new(
+         servers=&gt;\@servers,     # array of references to servers in form: [ $host, $port, $database] 
+         query=&gt;$query,          # format depends on Z3950 querytype: defaults to 'prefix'   
+         timeout=&gt;25,            # total timeout in seconds for all processes
+         timeout_min=&gt;5,         # minumum timeout in secs to exit event loop if all processes are finished
+         interval=&gt;1,            # Event loop timer interval  
+         maxpipes =&gt; 4,          # maximum number of forks to be executed at one time 
+         log=&gt;undef,             # undef, name of log file to which extended error messages are written
+                                 # or Net::Z3950::AsyncZ::Errors::suppressErrors()
+         cb=&gt;\&amp;cb,               # callback function to which records will be sent as available 
+         format=&gt;\&amp;format,       # callback function to format individual lines of records
+         num_to_fetch=&gt;$num,     # number of records to fetch from each server
+         options=&gt;\@options,     # array of references to Net::Z3950::AsyncZ::Options::_params objects
+         monitor =&gt; 0            # timeout in seconds for a monitoring child process: if
+                                 # 0 no monitor is created  
+         );</pre>
+</dd>
+</dl>
+<p>
+</p>
+<h3><a name="a_word_about_parameters_and_options">A Word about Parameters and Options</a></h3>
+<p>AsyncZ::new() takes a set of named parameters.  Some of them, like <code>maxpipes</code> and 
+<code>timeout</code> apply to the overall functioning of Net::Z3950::AsyncZ, i.e. to the parent process.
+Others, like <code>num_to_fetch</code> and <code>format</code> can be set individually for each server in the
+<code>servers</code> array, i.e. for each child process.  Settings for the child processes are made using 
+the <code>options</code> parameter and the Net::Z3950::AsyncZ::Options::_params array. If a _params object
+does not exist for a child process, one is automatically created using default values. The indices of the <code>_params</code> array must be synchronized with the indices of
+the servers array.</p>
+<p>Options are treated fully in the separate Options documentation.</p>
+For the HTML documentation see: <A href="Options.html">Options.html</a><p>
+</p>
+<h3><a name="required_parameters_for_constructor">Required Parameters for Constructor</a></h3>
+<p>For every query sent to a server you must supply three required parameters:
+<code>servers</code>, <code>query</code>, and <code>cb</code>.  That is, you must supply an array reference to
+the server's $host, $port, and $database, you must supply the the query itself, and 
+finally a callback function, which is responsible for outputting the data returned
+from the Z39.50 server.  This is the minimal configuration, the one shown above 
+in <a href="#the_basic_script">The Basic Script</a>.</p>
+<p>
+</p>
+<h3><a name="optional_parameters_for_constructor">Optional Parameters for Constructor</a></h3>
+<p>The optional parameters have either default values or default behaviors.  
+Some of the optional parameters are exclusive to the functioning of 
+the parent process, for instance <code>timeout</code>
+and <code>interval</code>.  Others are for use only in the child processes, for instance 
+<code>format</code> and <code>num_to_fetch</code>, while <code>log</code> is used in both the parent
+and its children.</p>
+<p>
+</p>
+<h2><a name="methods">Methods</a></h2>
+<p>There are three kinds of methods in AsyncZ:</p>
+<dl>
+<dt><strong><a name="item_%5b1%5d_methods_to_set_options_for_net%3a%3az3950%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1]
+Methods to set options for Net::Z3950::AsyncZ::Options::_params objects</a></strong><br />
+</dt>
+<dt><strong><a name="item_%5b2%5d_methods_to_deal_with_errors_and_error_mess">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[2]
+Methods to deal with errors and error messages</a></strong><br />
+</dt>
+<dt><strong><a name="item_%5b3%5d_methods_to_handle_several_types_of_headers">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[3]
+Methods to handle several types of headers which AsyncZ attaches to records</a></strong><br />
+</dt>
+</dl>
+<p>
+</p>
+<h3><a name="object_methods">Object Methods</a></h3>
+<dl>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3ageterrors">Net::Z3950::AsyncZ::getErrors</a></strong><br />
+</dt>
+<dd>
+<pre>
+        $err_array_ref = $asyncZ-&gt;getErrors($index);</pre>
+</dd>
+<dl>
+<dt><strong><a name="item_params%3a">params:</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$index</code>: index of the server for which error inquiry is
+being made.  (See <code>servers=&gt;\@servers</code> parameter of <a href="#constructor">Constructor</a>)
+</dd>
+<p></p>
+<dt><strong><a name="item_return_value%3a">return value:</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$err_array_ref</code>:  a reference to an array of 
+two <code>Net::Z3950::AsyncZ::ErrMsg</code> objects or <code>undef</code>
+if the server pointed to by this <code>$index</code> had no errors.
+</dd>
+<dd>
+<p>This array reference must be tested using <a href="#item_isz_error"><code>isZ_Error()</code></a> to determine whether 
+it represents represent a valid error.  The two <code>ErrMsg</code> objects are referred to
+as $err_array_ref-&gt;[0] and $err_array_ref-&gt;[1].</p>
+</dd>
+<dd>
+<pre>
+        $err_array_ref-&gt;[0] references a ycle 1 error if it exists
+        $err_array_ref-&gt;[0] references a cycle 2 error if it exists</pre>
+</dd>
+<dd>
+<p>See <a href="#item_net%3a%3aasyncz%3a%3agetmaxerrors">Net::Z3950::AsyncZ::getMaxErrors</a>.</p>
+</dd>
+<p></p></dl>
+<dl>
+<dt></dt>
+<dd>
+&nbsp;
+</dd>
+<p></p></dl>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3agetmaxerrors">Net::Z3950::AsyncZ::getMaxErrors</a></strong><br />
+</dt>
+<dd>
+<pre>
+        $error_number = $asnycZ-&gt;getMaxErrors();</pre>
+</dd>
+<dl>
+<dt><strong>return value:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$error_number</code>:  the Maximum number of possible errors
+which have occurred for all servers during current session;  because of the two-cycle process,
+some errors reported in the first cycle are nullified by successful outcomes during the 
+second cycle; the class method <a href="#item_isz_error"><code>isZ_Error()</code></a> tests for whether a cycle 1 error has been
+nullified by a successful second attempt.  See <a href="#item_net%3a%3aasyncz%3a%3aisz_error">Net::Z3950::AsyncZ::isZ_Error</a>.
+</dd>
+<p></p></dl>
+<dl>
+<dt></dt>
+<dd>
+&nbsp;
+</dd>
+<p></p></dl>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3a_printerror">Net::Z3950::AsyncZ::_printError</a></strong><br />
+</dt>
+<dd>
+<pre>
+      $asnycZ-&gt;_printError($err)</pre>
+</dd>
+<dl>
+<dt><strong><a name="item_outputs_an_error_string_of_the_following_format%3a">outputs an error string of the following format:</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>[error_number] error_message Type_of_Error is_Retry_able</code>
+</dd>
+<p></p>
+<dt><strong><a name="item_for_example%3a">For example:</a></strong><br />
+</dt>
+<dd>
+<code>[111] Connection refused   NET</code>
+</dd>
+<p></p>
+<dt><strong><a name="item_or%3a">or:</a></strong><br />
+</dt>
+<dd>
+<code>[225] An error occurred when accessing the library database.   --Z3950 ERROR    --RETRY</code>
+</dd>
+<dd>
+<p>(This is an internal method I used for debugging but leave it here
+for its possible utility.)See <a href="#net::z3950::asyncz::errors">Net::Z3950::AsyncZ::Errors</a> for explanations 
+of error types, etc.</p>
+</dd>
+<p></p></dl>
+</dl>
+<dl>
+<dt></dt>
+<dd>
+&nbsp;
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h3><a name="class_methods">Class Methods</a></h3>
+<dl>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3aasynczoptions">Net::Z3950::AsyncZ::asyncZOptions</a></strong><br />
+</dt>
+<dd>
+<pre>
+        $params_ref = asyncZOptions([option_1=&gt;opt_1, option_2=&gt;opt_2, . . .option_n=&gt;opt_n]);</pre>
+</dd>
+<dl>
+<dt><strong>params:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;an optional list of
+named parameters which set the options for a child process.  When
+called without parameters, the <code>_params</code> object is created with a set of
+default values.  Unless you plan to override the default values, it's not
+necessary to call <code>asyncZOptions</code>: AsyncZ.pm will create 
+a default <code>_params</code> object for you.
+</dd>
+<dd>
+<p>There is a full range of accessor methods by which each option can be set
+and queried in the form of <code>$params_ref-&gt;set_option_1(value)</code>
+and <code>$value=$params_ref-&gt;get_option_1()</code>.  This makes it possible
+to set options dynamically.</p>
+</dd>
+<dd>
+<p>Options are treated fully in the separate Options documentation.</p>
+</dd>
+For HTML documentation see:  <A href="Options.html">Options.html</a><p></p>
+<dt><strong><a name="item_return%3a">return:</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$param_ref</code>:&nbsp;&nbsp;reference to a Net::Z3950::AsyncZ::Options::_params object.
+</dd>
+<dd>
+<p>Net::Z3950::AsyncZ::Options::_params objects are used internally by AsyncZ and hence treated as private.
+Creating a _params object directly by calling its <code>new</code> method is not recommended.
+See <a href="/Net/Z3950/AsyncZ/Options/_params.html">the Net::Z3950::AsyncZ::Options::_params manpage</a></p>
+</dd>
+<p></p></dl>
+</dl>
+<dl>
+<dt></dt>
+<dd>
+&nbsp;
+</dd>
+<p></p></dl>
+<dl>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_marc">Net::Z3950::AsyncZ::isZ_MARC</a></strong><br />
+</dt>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_grs">Net::Z3950::AsyncZ::isZ_GRS</a></strong><br />
+</dt>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_raw">Net::Z3950::AsyncZ::isZ_RAW</a></strong><br />
+</dt>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_default">Net::Z3950::AsyncZ::isZ_DEFAULT</a></strong><br />
+</dt>
+<dd>
+<pre>
+        $bool = isZ_&lt;TYPE&gt;</pre>
+</dd>
+<dl>
+<dt><strong>params:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$line</code>:
+current $line of record array
+</dd>
+<p></p>
+<dt><strong><a name="item_returns%3a">returns:</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$bool</code>:
+true if header $line designates that current record is of &lt;TYPE&gt;, otherwise false
+</dd>
+<p></p></dl>
+<p>These utilities test for the <em>type</em> of record which is currently being presented 
+to the callback function. Each record is sent to the callback prefaced with headers that provide information
+about the record, including its type. If you are querying a variety of servers,
+some might send back MARC records, others GRS-1.</p>
+<pre>
+        foreach my $line(@$array) {
+            isZ_MARC($line) and do_something(); 
+            isZ_GRS($line) and do_something_else();           
+                .       .       .
+                .       .       . 
+         }</pre>
+<p>See also <a href="#item_net%3a%3aasyncz%3a%3aisz_header">Net::Z3950::AsyncZ::isZ_Header</a> which tests for
+whether a $line is a type-header, as opposed to whether it designates a particular type of record</p>
+<p>Records are sent to the callback function as an array of lines in which records
+are separated from one other by a set of headers; you can determine the number of the current record
+by extracting the record number from its type-header using getZ_RecNum. 
+See <a href="#headers">Headers</a> and <a href="#getz_recnum">getZ_RecNum</a>.</p>
+</dl>
+<dl>
+<dt></dt>
+<dd>
+&nbsp;&nbsp;&nbsp;
+</dd>
+<p></p></dl>
+<dl>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_header">Net::Z3950::AsyncZ::isZ_Header</a></strong><br />
+</dt>
+<dd>
+<pre>
+        $bool = isZ_Header($line);</pre>
+</dd>
+<dd>
+<p>This function tests whether $line is a type-header (i.e. whether this is a USMARC reocord,
+GRS-1, etc).</p>
+</dd>
+<dl>
+<dt><strong>params:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$line</code>:
+current $line of record array
+</dd>
+<p></p>
+<dt><strong>returns:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$bool</code>:
+true if $line is a type-header, otherwise false
+</dd>
+<p></p></dl>
+</dl>
+<dl>
+<dt></dt>
+<dd>
+&nbsp;
+</dd>
+<p></p></dl>
+<dl>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3agetz_recnum">Net::Z3950::AsyncZ::getZ_RecNum</a></strong><br />
+</dt>
+<dd>
+<pre>
+        $recnum = getZ_RecNum($line)</pre>
+</dd>
+<dl>
+<dt><strong>params:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$line</code>:&nbsp;&nbsp;The current <code>$line</code> of the records array.
+</dd>
+<p></p>
+<dt><strong>returns:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$recnum</code>:&nbsp;&nbsp;The number
+of the current record in the Record Set, i.e. if there are 20 records
+matching the query, and you have asked for 5 at time, the record number is
+not one of five, but one of 20. You must first test the line to make sure it is a header:
+</dd>
+<dd>
+<pre>
+  if(isZ_Header($line)) {
+       print &quot;Recnum = &quot;, getZ_RecNum($line),&quot;\n&quot;;
+  }</pre>
+</dd>
+<p></p></dl>
+</dl>
+<dl>
+<dt></dt>
+<dd>
+&nbsp;
+</dd>
+<p></p></dl>
+<dl>
+<dt><strong><a name="item_getz_recsize">getZ_RecSize</a></strong><br />
+</dt>
+<dd>
+<pre>
+        $recsize = getZ_RecSize($index);</pre>
+</dd>
+<dl>
+<dt><strong><a name="item_param%3a">param:</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$index</code>:&nbsp;&nbsp;The <code>$index</code> of the server
+that has returned the records
+</dd>
+<p></p>
+<dt><strong>returns:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$recsize</code>:&nbsp;&nbsp;The number
+of records in the Record Set
+</dd>
+<p></p></dl>
+</dl>
+<dl>
+<dt></dt>
+<dd>
+&nbsp;
+</dd>
+<p></p></dl>
+<dl>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_error">Net::Z3950::AsyncZ::isZ_Error</a></strong><br />
+</dt>
+<dd>
+<pre>
+        $retv = isZ_Error($err_array_ref)</pre>
+</dd>
+<dl>
+<dt><strong>params:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$err_array_ref</code>:&nbsp;&nbsp;
+an array reference returned by  <code>Net::AscyncZ::getErrors</code> (the array holds
+two <code>Net::Z3950::AsyncZ::ErrMsg</code> objects).
+</dd>
+<dd>
+<p>Because of the two-cycle process, some errors reported in the first
+cycle are nullified by successful outcomes during the second cycle;
+this method tests for whether a cycle 1 error has been nullified by
+a successful second attempt.</p>
+</dd>
+<dd>
+<p>See <a href="#item_net%3a%3aasyncz%3a%3ageterrors">Net::Z3950::AsyncZ::getErrors</a>.</p>
+</dd>
+<p></p>
+<dt><strong>return:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$retv</code>:&nbsp;&nbsp;
+0 if not an error;&nbsp;&nbsp;&nbsp;1 if non-recoverable cycle 1 error;
+&nbsp;&nbsp;2 if cycle 2 error.
+</dd>
+<dd>
+<p>In other words, it returns <code>false</code>
+if there has been no error and <code>true</code> if there has been.  The type of true
+value it returns is used by <a href="#item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_nonretryable"><code>Net::Z3950::AsyncZ::isZ_nonRetryable</code></a> to
+determine whether this error was non-recoverable.</p>
+</dd>
+<p></p></dl>
+</dl>
+<dl>
+<dt></dt>
+<dd>
+&nbsp;
+</dd>
+<p></p></dl>
+<dl>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_nonretryable">Net::Z3950::AsyncZ::isZ_nonRetryable</a></strong><br />
+</dt>
+<dd>
+<pre>
+         $retv = isZ_Error($err);
+         $bool = isZ_nonRetryable($retv);         
+         $bool = isZ_nonRetryable(isZ_Error($err))</pre>
+</dd>
+<dl>
+<dt><strong>params:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$retv</code>:
+the return value from <a href="#item_isz_error"><code>isZ_Error</code></a>.
+</dd>
+<p></p>
+<dt><strong>return:</strong><br />
+</dt>
+<dd>
+<code>$bool</code>:
+true if $err is non-recoverable, otherwise false
+</dd>
+<p></p></dl>
+<p>This is a convenience method in which the idiom <a href="#item_isz_nonretryable"><code>isZ_nonRetryable(isZ_Error($err))</code></a>
+tests whether $err is a non-recoverable cycle 1 error.  Since such errors
+often occur at the system level, this enables you to side-step
+outputting what might be gobbledygook (e.g. ``illegal seek'') to the user:</p>
+<pre>
+              print &quot;There has been an error in contacting this server\n&quot;       
+                                    if isZ_nonRetryable(isZ_Error($err));</pre>
+<p>Since there are some non-recoverable cycle 1 errors which might be of interest to the
+user (e.g. ``connection refused'', which is identified as a network error), you might test
+whether it is also a system error:</p>
+<pre>
+              print &quot;There has been an error in contacting this server\n&quot;       
+                            if isZ_nonRetryable(isZ_Error($err)) &amp;&amp; $err-&gt;isSystem();</pre>
+</dl>
+<dl>
+<dt></dt>
+<dd>
+&nbsp;
+</dd>
+<p></p></dl>
+<dl>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_info">Net::Z3950::AsyncZ::isZ_Info</a></strong><br />
+</dt>
+<dd>
+<pre>
+        $bool = isZ_Info($line);</pre>
+</dd>
+<dl>
+<dt><strong>params:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$line</code>:
+current $line of record array
+</dd>
+<p></p>
+<dt><strong>returns:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$bool</code>:
+true if header $line contains internal data, otherwise false
+</dd>
+<p></p></dl>
+<p>See <a href="#headers">Headers</a>,&nbsp;&nbsp;<a href="#item_net%3a%3aasyncz%3a%3aisz_pid">Net::Z3950::AsyncZ::isZ_PID</a>,
+and <a href="#item_net%3a%3aasyncz%3a%3anoz_response">Net::Z3950::AsyncZ::noZ_Response</a>.</p>
+</dl>
+<dl>
+<dt></dt>
+<dd>
+&nbsp;&nbsp;&nbsp;
+</dd>
+<p></p></dl>
+<dl>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_pid">Net::Z3950::AsyncZ::isZ_PID</a></strong><br />
+</dt>
+<dd>
+<pre>
+        $bool = isZ_PID($line);</pre>
+</dd>
+<dl>
+<dt><strong>params:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$line</code>:
+current $line of record array
+</dd>
+<p></p>
+<dt><strong>returns:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$bool</code>:
+true if header $line contains pid of child process, otherwise false
+</dd>
+<dd>
+<p>The preferred method for testing for the PID header is <a href="#item_isz_info"><code>isZ_Info</code></a>.
+Therefore, <code>isZ_PID</code> is not explicitly exported and requires the
+full package name: Net::Z3950::AsyncZ::isZ_PID.</p>
+</dd>
+<p></p></dl>
+</dl>
+<dl>
+<dt></dt>
+<dd>
+&nbsp;&nbsp;&nbsp;
+</dd>
+<p></p></dl>
+<dl>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3anoz_response">Net::Z3950::AsyncZ::noZ_Response</a></strong><br />
+</dt>
+<dd>
+<pre>
+        $bool = noZ_Response($line);</pre>
+</dd>
+<dl>
+<dt><strong>params:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$line</code>:
+current $line of record array
+</dd>
+<p></p>
+<dt><strong>returns:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$bool</code>:
+true if header $line stipulates that there was no response from a server--
+i.e. that a child process returnsed without obtaining any records--otherwise false
+</dd>
+<p></p></dl>
+</dl>
+<dl>
+<dt></dt>
+<dd>
+&nbsp;&nbsp;&nbsp;
+</dd>
+<p></p></dl>
+<dl>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_servername">Net::Z3950::AsyncZ::isZ_ServerName</a></strong><br />
+</dt>
+<dd>
+<pre>
+        $bool = isZ_ServerName($line);</pre>
+</dd>
+<dl>
+<dt><strong>params:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$line</code>:
+current $line of record array
+</dd>
+<p></p>
+<dt><strong>returns:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$bool</code>:
+true if $line is a header with server's name, otherwise false
+</dd>
+<p></p></dl>
+</dl>
+<dl>
+<dt></dt>
+<dd>
+&nbsp;&nbsp;&nbsp;
+</dd>
+<p></p></dl>
+<dl>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3az_servername">Net::Z3950::AsyncZ::Z_ServerName</a></strong><br />
+</dt>
+<dd>
+<pre>
+        $server = isZ_ServerName($line);</pre>
+</dd>
+<dl>
+<dt><strong>params:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$line</code>:
+current $line of record array
+</dd>
+<p></p>
+<dt><strong>returns:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$server</code>:
+server's name if this $line is a header with server's name; otherwise <code>undef</code>.
+</dd>
+<p></p></dl>
+</dl>
+<dl>
+<dt></dt>
+<dd>
+&nbsp;&nbsp;&nbsp;
+</dd>
+<p></p></dl>
+<dl>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3adelz_header">Net::Z3950::AsyncZ::delZ_header</a></strong><br />
+</dt>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3adelz_pid">Net::Z3950::AsyncZ::delZ_pid</a></strong><br />
+</dt>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3adelz_servername">Net::Z3950::AsyncZ::delZ_serverName</a></strong><br />
+</dt>
+<dd>
+&nbsp;
+</dd>
+<dd>
+<p>These functions are used as follows:</p>
+</dd>
+<dd>
+<pre>
+          $line = delZ_header($line, $gmodifier, $subst);</pre>
+</dd>
+<dl>
+<dt><strong>params:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$line</code>:
+string or reference to a string: current <code>$line</code> of record data
+</dd>
+<dd>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$gmodifier</code>:
+boolean--if <code>true</code> then the <code>g</code> modfier is applied to substitutions: s///g</p>
+</dd>
+<dd>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$subst</code>:
+the value to be subtituted for the item being deleted</p>
+</dd>
+<p></p>
+<dt><strong>returns:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$line</code>:
+either string or reference to string, depending on whether a reference or a string
+was intially passed in paramter <code>$_[0]</code>.
+</dd>
+<p></p></dl>
+<dt></dt>
+<dd>
+These functions are used internally by AsyncZ but they can be a useful supplement to
+<a href="#item_isz_header"><code>isZ_Header</code></a>,<code>isZ_Server</code>, and <code>isZ_PID</code>; instead of testing
+for these headers, they enable you to either delete or substitute another string for
+them.
+</dd>
+<dd>
+<p>You might, for instance, find it useful to substitute the name of an institution for the name of
+a server:</p>
+</dd>
+<dd>
+<pre>
+        $line = delZ_serverName($line, 0, &quot;University of Manitoba Libraries&quot;);</pre>
+</dd>
+<p></p></dl>
+<dl>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3aprep_raw">Net::Z3950::AsyncZ::prep_Raw</a></strong><br />
+</dt>
+<dd>
+This function and <code>get_ZRawRec</code> are used to retrieve raw record data, which
+is returned when <code>raw</code> is set to true and <code>render</code> set to false in the
+<code>_params</code> array.
+</dd>
+<dd>
+<pre>
+        $recs = prep_Raw($array);</pre>
+</dd>
+<dl>
+<dt><strong>param:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$array</code>:
+reference to array of raw records passed into the callback function
+when
+</dd>
+<dd>
+<pre>
+                 render=&gt;0</pre>
+</dd>
+<p></p>
+<dt><strong>returns:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$recs</code>:
+reference to string representing all records in records array
+when <code>raw</code> is true and <code>render</code> is false.
+</dd>
+<p></p></dl>
+<p>This function ``preps'' an array of raw records for use with <code>get_ZRawRec</code>.
+To use this function and <code>get_ZRawRec</code> you must set <code>render=&gt;0</code> in the
+<code>options</code> array.</p>
+<dt><strong><a name="item_net%3a%3az3950%3a%3aasyncz%3a%3aget_zrawrec">Net::Z3950::AsyncZ::get_ZRawRec</a></strong><br />
+</dt>
+<dd>
+<pre>
+        $rec = get_ZRawRec($recs)</pre>
+</dd>
+<dl>
+<dt><strong>params:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$recs</code>:
+reference to a string representing array of record data
+</dd>
+<p></p>
+<dt><strong>returns:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$rec</code>:
+string representing the next record in array or <code>undef</code>
+if no record is available.
+</dd>
+<p></p></dl>
+<p><code>get_ZRawRec</code> behaves as a ``get-next'' function:  
+with each access of <code>get_ZRawRec</code>, the next record is returned and
+deleted from the string of records created in <code>prep_Raw</code>.</p>
+</dl>
+<p>
+</p>
+<h2><a name="exported_names">Exported Names</a></h2>
+<p>
+</p>
+<h3><a name="exports_from_net::z3950::asyncz">Exports from Net::Z3950::AsyncZ</a></h3>
+<dl>
+<dt><strong><a name="item_%40export_ok">@EXPORT_OK</a></strong><br />
+</dt>
+<dd>
+<pre>
+        asyncZOptions isZ_MARC isZ_GRS isZ_RAW isZ_Error isZ_nonRetryable isZ_Info 
+        isZ_DEFAULT noZ_Response isZ_Header isZ_ServerName Z_serverName getZ_RecNum
+        getZ_RecSize delZ_header delZ_pid delZ_serverName prep_Raw get_ZRawRec</pre>
+</dd>
+<dt><strong><a name="item_%3arecord">:record</a></strong><br />
+</dt>
+<dd>
+<pre>
+        isZ_MARC isZ_GRS isZ_RAW isZ_DEFAULT getZ_RecNum</pre>
+</dd>
+<dt><strong><a name="item_%3aerrors">:errors</a></strong><br />
+</dt>
+<dd>
+<pre>
+        isZ_Error isZ_nonRetryable</pre>
+</dd>
+<dt><strong><a name="item_%3aheader">:header</a></strong><br />
+</dt>
+<dd>
+<pre>
+        isZ_ServerName Z_serverName noZ_Response isZ_Header isZ_Info
+        delZ_header delZ_pid delZ_serverName isZ_Info</pre>
+</dd>
+</dl>
+<p>
+</p>
+<h3><a name="exports_from_net::z3950::asyncz::errors">Exports from Net::Z3950::AsyncZ::Errors</a></h3>
+<dl>
+<dt><strong><a name="item_%40export">@EXPORT</a></strong><br />
+</dt>
+<dd>
+<pre>
+        suppressErrors</pre>
+</dd>
+</dl>
+<p>
+</p>
+<h3><a name="exports_from_net::z3950::asyncz::errmsg">Exports from Net::Z3950::AsyncZ::ErrMsg</a></h3>
+<dl>
+<dt><strong>@EXPORT_OK</strong><br />
+</dt>
+<dd>
+<pre>
+        isSystem isNetwork isUnspecified isZ3950</pre>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="callback_functions">Callback Functions</a></h1>
+<p>For the record:  A callback is a function which you supply and which 
+AsyncZ calls upon as required.</p>
+<p>AsyncZ uses two callback functions.
+One handles the general output of records fetched from the
+servers queried.  The second formats individual lines of the record
+to your specifications.  The format callback is not required.</p>
+<p>
+</p>
+<h2><a name="output_callback_(required)">Output Callback (required)</a></h2>
+<dl>
+<dt><strong><a name="item_parameters%3a">parameters:</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$index</code>:
+index of the server to which the current records belong, i.e.
+the index of the server in the @servers array which you pass into
+the constructor:  <code>servers=&gt;\@servers</code>.
+</dd>
+<dd>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$array_ref</code>:
+array of records which have been returned from the server</p>
+</dd>
+<p></p></dl>
+<p>The output callback is called whenever records become available from one of
+the child processes.  The most basic callback would be something like this:</p>
+<pre>
+          sub output {
+           my($index, $array_ref) = @_;
+           foreach my $line(@$array_ref) {
+             print &quot;$line\n&quot; if $line;  
+            }
+           print &quot;\n--------\n\n&quot;;    
+          }</pre>
+<p><strong>Note:</strong>  It is important to note the sequence in which the parameters are passed
+to the callback:</p>
+<dl>
+<dt></dt>
+<dd>
+<pre>
+        my($index, $array_ref) = @_;</pre>
+</dd>
+</dl>
+<p>The array which is referenced by $array_ref contains all of the records fetched from
+the current server.  Each element of the array holds either one line of the record or one
+of the AsyncZ headers. The headers separate the records, while
+the format of the record and its lines depends up two
+factors:</p>
+<dl>
+<dt><strong><a name="item_the_type_of_record%3a">the type of record:</a></strong><br />
+</dt>
+<dd>
+MARC, RAW, GRS, etc.
+</dd>
+<p></p>
+<dt><strong><a name="item_the_format_function%3a">the format function:</a></strong><br />
+</dt>
+<dd>
+either the <a href="#format_callback_(not_required)">format callback</a>, or
+the default HTML or Plain Text method (if no format callback is specified)
+</dd>
+<p></p></dl>
+<p>Here is typical output from the default Plain Text method:</p>
+<pre>
+        &lt;!--jasper.acadiau.ca--&gt;
+        &lt;#--4498--&gt;
+        [MARC 4]
+        020     ISBN:   0472110101 (cloth : alk. paper)
+        050     LC call number: PS2123.A4 1999
+        100     author: James, Henry,1843-1916.Correspondence.Selections.
+        245     title:  Dear munificent friends :Henry James's letters to four women /edited by Susan E. Gunter.
+        260     publication:    Ann Arbor :University of Michigan Press,c1999.
+        300     description:    xxiv, 288 p. ;24 cm.
+        650     subject:        Authors, American19th centuryCorrespondence.
+        650     subject:        Authors, American20th centuryCorrespondence.
+        700     auth, illus, ed:        Gunter, Susan E.,1947-
+        &lt;!--130.17.3.75--&gt;
+        &lt;#--4518--&gt;
+        [MARC 5]
+        020     ISBN:   080066755
+        050     LC call number: G62.T7 1968
+        245     title:  Trends in geography;an introductory survey.Edited by Ronald U. Cooke and James H. Johnson.
+        250     edition:        [1st ed.]
+        260     publication:    Oxford,New York,Pergamon Press[1969]
+        300     description:    x, 287 p.illus.23 cm.
+        500     note:   Collection of essays originally presented at a conference organized by the University of London Institute of Education and held at University College London in 1968.
+        500     note:   Pergamon Oxford geographies.
+        650     subject:        Geography
+        700     auth, illus, ed:        Johnson, James Henry,1930-
+        700     auth, illus, ed:        Cooke, Ronald U.</pre>
+<p>The first three lines of each record are headers, indicating that
+you have encountered a new record. The headers hold the following information:</p>
+<pre>
+        Server name
+        pid of child process
+        type of record and record number.</pre>
+<p>At the very least you would probably want to ignore the headers and add a newline
+to separate one record from another. The set of class methods provided 
+by Net::Z3950::AsyncZ allows you to deal with the headers as you see fit:  you can ignore them,
+you can identify the record type and extract the record number, and you
+can extract the server name.</p>
+<p>If a server fails to return any records, the array will consist of one line of the
+following form:</p>
+<pre>
+        {!-- library.anu.edu.au --}</pre>
+<p>This line does not tell us which server has failed,
+only that one of the child processes has not returned any records.</p>
+<dl>
+<dt><strong><a name="item_using_the_%24index">Using the <code>$index</code></a></strong><br />
+</dt>
+<dd>
+While the server's name is given in the headers to each record, knowing
+the <code>$index</code> will enable you to track the servers you've queried. For
+instance, you might want to create an array with the names of the
+institutions at which servers are located, so that you can tell your
+users that the current record is a response from Acadia University in
+Wolfville, N.S., rather from jasper.acadiau.ca. Knowing the index in the
+callback enables you to do this.
+</dd>
+<p></p></dl>
+<p>See <a href="#headers">Headers</a> and <code>basic_pretty.pl</code>, included with the distribution,
+for some ways of testing for and handling headers.</p>
+<p>
+</p>
+<h2><a name="format_callback_(not_required)">Format Callback (not required)</a></h2>
+<dl>
+<dt><strong>parameters:</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$row</code>:
+&nbsp;a reference to a 2 element array:
+</dd>
+<dd>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$row-&gt;[0]</code>:
+ a MARC tag or the null string if there is no tag</p>
+</dd>
+<dd>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>$row-&gt;[1]</code>:
+ the field's data string</p>
+</dd>
+<p></p></dl>
+<p>Records are formatted one row at a time.  There are two default behaviors--
+plain text and HTML.  The plain text is as
+illustrated in <a href="#output_callback_(required)">Output Callback</a>:</p>
+<pre>
+        050     LC call number: PS2123.A4 1999
+        100     author: James, Henry,1843-1916.Correspondence.Selections.
+        245     title:  Dear munificent friends</pre>
+<p>The first column is a MARC tag, the second a string name for that tag, and the third
+is the field data.  The HTML default would ouput the following:</p>
+<pre>
+        &lt;tr&gt;&lt;td&gt;ISBN&lt;td&gt;0472110101 (cloth : alk. paper)
+        &lt;tr&gt;&lt;td&gt;LC call number&lt;td&gt;PS2123.A4 1999
+        &lt;tr&gt;&lt;td&gt;author&lt;td&gt;James, Henry,1843-1916.Correspondence.Selections.
+        &lt;tr&gt;&lt;td&gt;title&lt;td&gt;Dear munificent friends</pre>
+<p>In the HTML each field is placed within a &lt;td&gt;.  It would then be up to you, in your output callback,
+to complete the HTML by adding the &lt;TABLE&gt;. . .&lt;/TABLE&gt; tags and any attributes to those
+tags.  You could also, for instance, format the table using CSS.</p>
+<p>The functions which create this output are in Net::Z3950::AsyncZ::Report:</p>
+<pre>
+        sub _defaultRecordRowHTML {
+          my ($row) = @_;
+          return &quot;&lt;tr&gt;&lt;td&gt;&quot; . $MARC_FIELDS{$row-&gt;[0]} . &quot;&lt;td&gt;&quot; . $row-&gt;[1] . &quot;\n&quot;;  
+        }</pre>
+<pre>
+
+        sub _defaultRecordRow {
+          my ($row) = @_;
+          return  $row-&gt;[0] . &quot;\t&quot; . $MARC_FIELDS{$row-&gt;[0]} . &quot;:\t&quot; . $row-&gt;[1] . &quot;\n&quot;;    
+        }</pre>
+<p>You can specify your own row formatter using the <code>format</code> parameter of AsyncZ's constructor.
+It will always be passed the reference to a two element array, but if there is no MARC tag,
+then <code>$row-</code>[0]&gt; will be set to the null string and <code>$row-</code>[1]&gt; will hold whatever data
+is available.</p>
+<p><em>Tip:</em> The default row formatter is <code>_defaultRecordRow</code>. To make
+<code>_defaultRecordRowHTML</code> your default, set the constructor's <code>format</code> parameter
+to Net::Z3950::AsyncZ:Report::_defaultRecordRowHTML:</p>
+<pre>
+        format=&gt;\&amp;Net::Z3950::AsyncZ::Report::_defaultRecordRowHTML</pre>
+<p>
+</p>
+<hr />
+<h1><a name="headers">Headers</a></h1>
+<p>
+</p>
+<h2><a name="types_of_headers">Types of Headers</a></h2>
+<p>As noted under <a href="#output_callback_(required)">Output Callback</a> there are four
+types of headers:</p>
+<p>[1] server name:</p>
+<pre>
+        &lt;!--library.anu.edu.au--&gt;</pre>
+<p>[2] pid of the child function which accessed the server:</p>
+<pre>
+        &lt;#--13076--&gt;</pre>
+<p>[3] type of record and its record number:</p>
+<pre>
+        [MARC 2]</pre>
+<p>[4] failure of the child process to return any records:</p>
+<pre>
+        {!-- library.anu.edu.au --}</pre>
+<p>The first three headers occur at the start of each new record:</p>
+<pre>
+        &lt;!--library.anu.edu.au--&gt;
+        &lt;#--13076--&gt;
+        [MARC 2]
+        020     ISBN:   0060154497
+        100     author: Henry, James F.,1930-
+        245     title:  The manager's guide to resolving legal disputes
+        250     edition:        1st ed.
+        260     publication:    New York :Harper &amp; Row,c1985.
+        300     description:    v, 162 p. ;22 cm.</pre>
+<p>But the fourth header occurs as a single line by itself:</p>
+<pre>
+                {!-- library.anu.edu.au --}</pre>
+<p>This fourth header tells us that one of the servers failed to return records--but not which one failed.
+<code>library.anu.edu.au</code> 
+is not the server which failed to respond but the last server which <strong>did</strong> respond.
+(The reasons for this have to do with asynchononicity and shared memory.)</p>
+<p>
+</p>
+<h2><a name="dealing_with_headers_in_the_callback_function">Dealing with Headers in the Callback Function</a></h2>
+<p>The following methods, detailed in <code>Class Methods</code>, are used for 
+handling headers in the callback function:</p>
+<dl>
+<dt><strong><a name="item_isz_header">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;isZ_Header</a></strong><br />
+</dt>
+<dt><strong><a name="item_isz_info">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;isZ_Info</a></strong><br />
+</dt>
+<dt><strong><a name="item_noz_response">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;noZ_Response</a></strong><br />
+</dt>
+<dt><strong><a name="item_isz_servername">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;isZ_ServerName</a></strong><br />
+</dt>
+<dt><strong><a name="item_z_servername">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Z_ServerName</a></strong><br />
+</dt>
+<dt><strong><a name="item_getz_recnum">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;getZ_RecNum</a></strong><br />
+</dt>
+</dl>
+<p>Their use is demonstrated in the callback function from <code>basic_pretty.pl</code>:</p>
+<pre>
+
+          sub output {
+           my($index, $array) = @_;</pre>
+<pre>
+           foreach my $line(@$array) {
+             return if noZ_Response($line);
+             next if isZ_Info($line);   # remove internal data                
+             next if isZ_Header($line); # again remove internal data
+                                        # you could first test for type of output:
+                                        # isZ_MARC, etc. or extract the record number</pre>
+<pre>
+                                        # extract server name from header
+             (print &quot;\nServer: &quot;, Z_serverName($line), &quot;\n&quot;), next
+                     if isZ_ServerName($line);</pre>
+<pre>
+             print &quot;$line\n&quot; if $line;  
+            }</pre>
+<pre>
+           print &quot;\n--------\n\n&quot;;</pre>
+<pre>
+          }</pre>
+<pre>
+
+This produces the following result:</pre>
+<pre>
+        Server: bison.umanitoba.ca
+        050     LC call number: PS2124.H46
+        245     title:  Henry James review. --
+        260     publication:    [Louisville, KY :Dept. of English, University of Louisville/,1979-
+        300     description:    v. ;25-28 cm.
+        650     subject:        Ejournals -- UML
+        700     auth, illus, ed:        Fogel, Daniel Mark,1948-</pre>
+<pre>
+
+If you wanted to get the Record Number, you could replace</pre>
+<pre>
+        next if isZ_Header($line);</pre>
+<p>with</p>
+<pre>
+        $recnum = getZ_RecNum($line) if isZ_Header($line);</pre>
+<p>This may be useful when you are requesting additional records for the same
+query.  If you are getting 5 records at a time, in your second request
+to the server, the first of the records returned would be number 6.</p>
+<p>If you wanted toget rid of the MARC tags and the following white space you could put each
+line through this filter:</p>
+<pre>
+         $line =~ s/\d+\s+//;</pre>
+<p>Incorporating both these modifications would give us the following:</p>
+<pre>
+          sub output {
+           my($index, $array) = @_;
+           my $recnum = 1;</pre>
+<pre>
+           foreach my $line(@$array) {
+             return if noZ_Response($line);
+             next if isZ_Info($line);   # remove internal data   
+             if(isZ_Header($line)) {
+               print &quot;Record: &quot;, getZ_RecNum($line),&quot;\n&quot;;
+               next; 
+             }
+                                        # extract server name from header
+             (print &quot;\nServer: &quot;, Z_serverName($line), &quot;\n&quot;), next
+                     if isZ_ServerName($line);
+             $line =~ s/\d+\s+//;
+             print &quot;$line\n&quot; if $line;  
+            }</pre>
+<pre>
+           print &quot;\n--------\n\n&quot;;</pre>
+<pre>
+          }</pre>
+<p>
+</p>
+<hr />
+<h1><a name="errors">Errors</a></h1>
+<p>There are two sets of error messages in <code>AsyncZ</code>:</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;[1] detailed messages for debugging and tracking:
+&nbsp;&nbsp;these are handled by the <code>Net::Z3950::AsyncZ::Errors</code> module</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;[2] informational messages for the user:
+&nbsp;&nbsp;these are handled by <code>Net::Z3950::AsyncZ::ErrMsg</code></p>
+<dl>
+<dt></dt>
+<dd>
+&nbsp;
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="net::z3950::asyncz::errors">Net::Z3950::AsyncZ::Errors</a></h2>
+<p>The detailed messages contain a number of different kinds of information:</p>
+<pre>
+        1. a trace back 3 levels
+        2. server name and query string
+        3. Z3950 error messages where available
+        4. system error messages</pre>
+<p>Detailed errors are either sent to a file or to the terminal or are suppressed.
+How they are dealt with depends on the <code>log</code> options of <code>Net::AsnyncZ::new</code>
+and <code>Net::Z3950::AsyncZ::Options::_params</code>.  This means that you can have different 
+error reporting mechanisms for each of your servers as well as for the parent process.</p>
+<p>The default behavior is to write all error messages to the terminal.  To write them
+to a log file you set <code>log</code> to a filename:</p>
+<pre>
+        log=&gt;$filespec</pre>
+<p><strong>NOTE</strong>:  Do not open the file yourself.  All files are automatically opened and
+closed by <code>AsyncZ</code>.</p>
+<p>To suppress all errors you do the following:</p>
+<pre>
+        log=&gt;Net::Z3950::AsyncZ::Errors::suppressErrors()</pre>
+<p>Since <code>suppressErrors()</code> is exported, you can do this:</p>
+<pre>
+        use Net::Z3950::AsyncZ::Errors(suppressErrors); 
+        log=&gt;suppressErrors()</pre>
+<p>System error messages and Perl library messages are routinely sent to STDERR;
+<code>AsyncZ</code> sends its error messages to STDOUT.  This means that if you don't do
+do something to redirect the <code>AsyncZ</code> messages and you are operating in a web
+browser, the <code>AsyncZ</code> messages will go to the browser.</p>
+See <A href = "Options.html#item_log">the <b>log</b> option in Options.html</a><dl>
+<dt></dt>
+<dd>
+&nbsp;
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="net::z3950::asyncz::errmsg">Net::Z3950::AsyncZ::ErrMsg</a></h2>
+<p><code>AsyncZ</code> keeps a record of which processes have returned records and which have not.
+It also keeps track of the exit codes of each process.
+For each process which has not returned records,it creates a <code>Net::Z3950::AsyncZ::ErrMsg</code> object, 
+based on its exit code.  There is a separate set of <code>Net::Z3950::AsyncZ::ErrMsg</code> objects for 
+each of the two <code>AsyncZ</code> cycles (See <a href="#the_basic_mechanisms_of_net::z3950::asyncz">The Basic Mechanisms of Net::Z3950::AsyncZ</a>).
+A query which reported failure in the first cycle may have been successful in
+its second attempt. <a href="#item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_error"><code>Net::Z3950::AsyncZ::isZ_Error</code></a> returns true if a server has not
+returned any records, false if it has.</p>
+<p>
+</p>
+<h3><a name="net::z3950::asyncz::errmsg_object">Net::Z3950::AsyncZ::ErrMsg Object</a></h3>
+<dl>
+<dt><strong><a name="item_errno">errno</a></strong><br />
+</dt>
+<dd>
+<pre>
+        the error number</pre>
+</dd>
+<dt><strong><a name="item_msg">msg</a></strong><br />
+</dt>
+<dd>
+<pre>
+        the error string</pre>
+</dd>
+<dt><strong><a name="item_type">type</a></strong><br />
+</dt>
+<dd>
+<pre>
+        System, Network, Z3950, Success</pre>
+</dd>
+<dd>
+<p>See <a href="#net::z3950::asyncz::errmsg_methods_for_errmsg_handling">Net::Z3950::AsyncZ::ErrMsg methods for ErrMsg Handling</a></p>
+</dd>
+<dt><strong><a name="item_retry">retry</a></strong><br />
+</dt>
+<dd>
+returns true from <a href="#item_doretry"><code>doRetry</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_abort">abort</a></strong><br />
+</dt>
+<dd>
+returns true from <a href="#item_doabort"><code>doAbort</code></a>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h3><a name="net::z3950::asyncz_methods_for_errmsg_handling">Net::Z3950::AsyncZ methods for ErrMsg handling</a></h3>
+<p><code>Net::Z3950::AsyncZ</code> supplies four methods, two <a href="#object_methods">Object Methods</a>
+and two <a href="#class_methods">Class Methods</a>.</p>
+<dl>
+<dt><strong><a name="item_geterrors">getErrors</a></strong><br />
+</dt>
+<dd>
+<pre>
+        $err = $asyncZ-&gt;getErrors($index);</pre>
+</dd>
+<dd>
+<p>this method returns a reference to an array of two ErrMsg objects:</p>
+</dd>
+<dd>
+<pre>
+        [$errors[$index]-&gt;[0], $errors[$index]-&gt;[1]]</pre>
+</dd>
+<dd>
+<p>$index is the index of the server in the <code>servers=&gt;\@servers</code> array.</p>
+</dd>
+<dd>
+<p>See <a href="#item_net%3a%3az3950%3a%3aasyncz%3a%3ageterrors"><code>Net::Z3950::AsyncZ::getErrors</code></a>.</p>
+</dd>
+<dt><strong><a name="item_getmaxerrors">getMaxErrors</a></strong><br />
+</dt>
+<dd>
+<pre>
+        $error_number = $asnycZ-&gt;getMaxErrors();</pre>
+</dd>
+<dd>
+<p>the maximum possible errors encountered: some of these may not if fact be errors and therefore
+will not test <code>true</code> in <a href="#item_isz_error"><code>isZ_Error($err)</code></a></p>
+</dd>
+<dd>
+<p>See <a href="#item_net%3a%3az3950%3a%3aasyncz%3a%3agetmaxerrors"><code>Net::Z3950::AsyncZ::getMaxErrors</code></a></p>
+</dd>
+<dt><strong><a name="item_isz_error">isZ_Error</a></strong><br />
+</dt>
+<dd>
+<pre>
+        $retv = isZ_Error($err)</pre>
+</dd>
+<dd>
+<p>See <a href="#item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_error"><code>Net::Z3950::AsyncZ::isZ_Error</code></a></p>
+</dd>
+<dt><strong><a name="item_isz_nonretryable">isZ_nonRetryable</a></strong><br />
+</dt>
+<dd>
+<pre>
+        $bool = isZ_nonRetryable(isZ_Error($err))</pre>
+</dd>
+<dd>
+<p>See <a href="#item_net%3a%3az3950%3a%3aasyncz%3a%3aisz_nonretryable"><code>Net::Z3950::AsyncZ::isZ_nonRetryable</code></a></p>
+</dd>
+</dl>
+<p>
+</p>
+<h3><a name="net::z3950::asyncz::errmsg_methods_for_errmsg_handling">Net::Z3950::AsyncZ::ErrMsg methods for ErrMsg Handling</a></h3>
+<p><code>Net::Z3950::AsyncZ::ErrMsg</code> supplies eight object methods, which
+enable you to determine the general category under which an
+error falls and how serious it is. 
+They all return <code>true</code> or <code>false</code>.</p>
+<p>The basic syntax for all of these methods is:</p>
+<pre>
+        $err-&gt;method();</pre>
+<dl>
+<dt><strong><a name="item_issystem">isSystem</a></strong><br />
+</dt>
+<dd>
+These are ususally errors reported back from Perl or C library
+routines.  For instance:
+</dd>
+<dd>
+<pre>
+           Device or resource busy      
+           Too many users
+           Permission denied
+           Software caused connection abort
+           Invalid argument</pre>
+</dd>
+<dd>
+<p>An ``Invalid argument'' will often come back when a query
+fails and a library routine attempts to do
+something which can't be done without the return value</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_isnetwork">isNetwork</a></strong><br />
+</dt>
+<dd>
+These can be various problems, for instance:
+</dd>
+<dd>
+<pre>
+        Connection timed out
+        Network is down
+        Network is unreachable  
+        Connection refused</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_istryagain">isTryAgain</a></strong><br />
+</dt>
+<dd>
+<table cellspacing="0" cellpadding="0"><tr><td>This applies to two cases:
+<tr><td><td>[1] EAGAIN: the system error which returns a ``try again'' message 
+<tr><td><td>[2] a process which has been created but never gets far enough to
+<tr><td><td>    return an exit code, presumably because it has timed out.</table>
+</dd>
+<p></p>
+<dt><strong><a name="item_issuccess">isSuccess</a></strong><br />
+</dt>
+<dd>
+An error which answers <code>true</code> to <a href="#item_issuccess"><code>isSuccess</code></a> is one for which the
+exit code is 0, i.e. one in which the process ended without an
+error but did not return any records.
+</dd>
+<p></p>
+<dt><strong><a name="item_isunspecified">isUnspecified</a></strong><br />
+</dt>
+<dd>
+An Unspecified error is generally one which has been reported by the system
+but which I have not included among the errors worth reporting
+back to ordinary users. (You will, however, find them reported in the log file.)
+Even some of the errors which I do list might not be worth
+reporting back to the user (usually those answer <code>true</code> to <a href="#item_isz_nonretryable"><code>isZ_nonRetryable</code></a>.)
+</dd>
+<p></p>
+<dt><strong><a name="item_isz3950">isZ3950</a></strong><br />
+</dt>
+<dd>
+These are error messages returned from the Z3950 module.
+</dd>
+<p></p>
+<dt><strong><a name="item_doretry">doRetry</a></strong><br />
+</dt>
+<dd>
+Errors which are temporary and make retrying a worthwhile prospect
+</dd>
+<p></p>
+<dt><strong><a name="item_doabort">doAbort</a></strong><br />
+</dt>
+<dd>
+Fatal errors
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h3><a name="examples_of_net::z3950::asyncz::errmsg_error_handling">Examples of Net::Z3950::AsyncZ::ErrMsg Error Handling</a></h3>
+<p>A very basic routine for handling errors is demonstrated in <code>basic.pl</code>:</p>
+<pre>
+          sub showErrors {
+           my $asyncZ = shift;    # [1]
+      
+           print &quot;The following servers have not responded to your query: \n&quot;;
+           for(my $i=0; $i&lt; $asyncZ-&gt;getMaxErrors();$i++) {   
+                  my $err = $asyncZ-&gt;getErrors($i);           # [2]     
+                  next if !isZ_Error($err);                   # [3]     
+                  print &quot;$servers[$i]-&gt;[0]\n&quot;;                 
+                  print &quot;  $err-&gt;[0]-&gt;{msg}\n&quot; if $err-&gt;[0]-&gt;{msg};   # [4]
+                  print &quot;  $err-&gt;[1]-&gt;{msg}\n&quot; if $err-&gt;[1]-&gt;{msg};   # [5] 
+                }
+              
+          }</pre>
+<pre>
+
+        [1]  Get reference to the Net::Z3950::AsyncZ object
+        [2]  Get reference to array of ErrMsg Objects for index $i
+        [3]  Check to see whether this array holds a valid error
+        [4]  print the cycle 1 error if it exists (it should if you've gotten this far)
+        [5]  print the cycle 2 error if it exists (it will not, if cyle 1 was non-retryable)</pre>
+<p></p>
+<p>A more useful error routine is demonstrated in <code>basic_pretty.pl</code>:</p>
+<pre>
+          sub showErrors {
+           my $asyncZ = shift;</pre>
+<pre>
+                # substitute some general statement for a system level error instead
+                # of something puzzling to the user like:  'illegal seek'
+           my $systemerr = &quot;A system error occurred on the server\n&quot;;</pre>
+<pre>
+           print &quot;The following servers have not responded to your query: \n&quot;;</pre>
+<pre>
+           for(my $i=0; $i&lt; $asyncZ-&gt;getMaxErrors();$i++) {
+                  my $err = $asyncZ-&gt;getErrors($i);                      # [1]
+                  next if !isZ_Error($err);                              # [2]
+                  print &quot;$servers[$i]-&gt;[0]\n&quot;;                           # [3]
+                  if($err-&gt;[0]-&gt;isSystem()) {
+                        print $systemerr;                                 # [4]
+                  }
+                  else {
+                      print &quot;  $err-&gt;[0]-&gt;{msg}\n&quot; if $err-&gt;[0]-&gt;{msg};   # [5]
+                  }
+                  if($err-&gt;[1] &amp;&amp; $err-&gt;[1]-&gt;isSystem()) {
+                        print $systemerr;                                 # [6]
+                  }
+                  else {
+                      print &quot;  $err-&gt;[1]-&gt;{msg}\n&quot;                        # [7] 
+                        if $err-&gt;[1]-&gt;{msg} &amp;&amp; $err-&gt;[1]-&gt;{msg} != $err-&gt;[0]-&gt;{msg};</pre>
+<pre>
+                  }</pre>
+<pre>
+                }
+              
+          }</pre>
+<p>The first three steps are a repeat of <code>basic.pl</code>:</p>
+<pre>
+        [1]  Get reference to the Net::Z3950::AsyncZ object
+        [2]  Get reference to array of ErrMsg Objects for index $i
+        [3]  Check to see whether this array holds a valid error</pre>
+<p>Cycle 1 Error:</p>
+<pre>
+        [4] If this is a system-type error, print a non-specialist message 
+        [5] Otherwise, print the error message for this error</pre>
+<p>Cycle 2 Error:</p>
+<pre>
+        [6] If this is a system-type error, print a non-specialist message 
+        [7] Otherwise, print the error message for this error but only if
+            the cycle 2 error message is not the same as the cycle one message</pre>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Myron Turner
+&lt;<a href="mailto:turnermm@shaw.ca">turnermm@shaw.ca</a>&gt;
+or &lt;<a href="mailto:mturner@ms.umanitoba.ca">mturner@ms.umanitoba.ca</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright 2003 by Myron Turner</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+</p>
+
+</body>
+
+</html>

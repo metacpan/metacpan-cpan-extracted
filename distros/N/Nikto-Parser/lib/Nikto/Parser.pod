@@ -1,0 +1,298 @@
+=pod
+
+=head1 NAME
+
+Nikto::Parser - Parse nikto scan data with Perl
+
+=head1 VERSION
+
+This document describes Nikto::Parser version 1.00
+
+=head1 SYNOPSIS
+
+ my $np = new Nikto::Parser;
+
+ my $parser = $np->parse_file('nikto.xml');
+    #a Nikto::Parser Object
+
+ my $host = $parser->get_host('10.0.0.100');
+    #a Nikto::Parser::Host Object
+
+ my @ports = $host->get_all_ports();
+    # an Array of Nikto::Parser::Host::Port Objects
+
+ my $port = $host->get_port('80');
+    #a Nikto::Parser::Host::Port Object
+
+ my @items = $port->get_all_items(); 
+    # an Array of Nikto::Parser::Host::Port::Item Objects
+ 
+I<For a full listing of methods see the documentation corresponding to each object.>
+
+=head1 DESCRIPTION
+
+This module implements an interface to the information contained in a nikto
+scan. It is implemented by parsing the scan data using XML. This will enable
+anyone to utilizes nikto to quickly create fast and robust security tools
+for testing web applications in new ways.
+
+=head1 OVERVIEW
+
+This module provides a framework that makes it easy to retrieve information
+from nikto. Every nikto scan is based on two main sections of informations: the
+scan session, and the scan information of all hosts. The session information is
+be stored as a Nikto::Parser::Session object. This object contains its own
+methods to obtain the desired information. The same is true for any hosts that
+were scanned using the Nikto::Parser::Host object. There are two sub objects
+under Nikto::Parser::Host. One is the Nikto::Parser::Host::Port object which
+will be used to obtain information of a given webservice (banner, number of
+items tested, number of items found). The second is the Nikto::Parser::Host::Port::Item 
+object which contains the information about the vulnerability information.
+
+
+ Nikto::Parser                              -- Core parser
+ |
+ +--Nikto::Parser::Session                  -- Nikto scan session information
+ |  
+ +--Nikto::Parser::Host                     -- General host information
+ |  |
+ |  |--Nikto::Parser::Host::Port            -- Port information
+ |  |  |
+ |  |  +--Nikto::Parser::Host::Port::Item   -- Webserver or Vulnerability, information
+ |  |  |
+
+
+=head1 METHODS
+
+=head2 Nikto::Parser
+
+The main idea behind the core modules is, you will first parse the scan data
+then extract the information. Therefore, you should run parse_file or
+parse_scan then the you can use any of the subroutines provided by this module.
+
+=over 4
+
+=item B<parse_file($xml_file)>
+
+Parse a nikto XML file. This subroutine will return a Nikto::Parser will will contain the XML data.
+
+The XML files are generated from using the following command: 
+ 
+ nikto.pl -Format XML -o output.xml -host $IP
+
+=item B<parse_scan($nikto_dir,$scan_args,@ips)>
+
+Perform a nikto scan with Nikto::Parser. The results will be parsed once the scan is complete.
+
+<b NOTE: -Format can not be passed as an argument.>
+
+=item B<get_session()>
+
+Obtain the Nikto::Parser::Session object which contains the session scan information.
+
+=item B<get_host($ipaddr)>
+
+Obtain the Nikto::Parser::Host object which the host information.
+
+=item B<get_all_hosts()>
+
+Obtain an Array of Nikto::Parser::Host objects which contain host information.
+
+=back
+
+=head2 Nikto::Parser::Session
+
+This object contains the scan session information of the nikto scan.
+
+=over 4
+
+
+=item B<hoststest()>
+
+Returns the number of hosts that were tested.
+
+=item B<options()>
+
+Returns a string which contains the options passed to nikto for the scan.
+
+=item B<version()>
+
+Returns the version of nikto.
+
+=item B<nversion()>
+
+Returns the nikto XML version.
+
+=back
+
+=head2 Nikto::Parser::Host
+
+This object contains the information for a host.
+
+=over 4
+
+
+=item B<ip()>
+
+Returns a string which contains the ip of this host.
+
+=item B<hostname()>
+
+Returns a string which contains the hostname of this host.
+
+=item B<get_port($port)>
+
+Obtain a Nikto::Parser::Host::Port object which contains the port information.
+
+=item B<get_all_ports()>
+
+Obtain an Array of Nikto::Parser::Host::Port objects which contain port information.
+
+=back
+
+=head2 Nikto::Parser::Host::Port
+
+This object contains the information for a port.
+
+=over 4
+
+
+=item B<port()>
+
+Returns a string which contains the port number.
+
+=item B<banner()>
+
+Returns a string which contains the banner.
+
+=item B<start_scan_time()>
+
+Returns a string which contains the time that this port scan started.
+
+=item B<elasped_scan_time()>
+
+Returns a string which contains the amount of time in second that that it took to scan this port.
+
+=item B<end_scan_time()>
+
+Returns a string which contains the time that this port scan finished.
+
+=item B<siteip()>
+
+Returns a string which contains the site's ip.
+
+=item B<sitename()>
+
+Returns a string which contains the site's hostname.
+
+=item B<get_all_items()>
+
+Returns an Array of Nikto::Parser::Host::Port::Item objects which contain information about the port and/or vulnerabilities.
+
+=item B<items_tested()>
+
+Returns a string which contains the number of items that were tested during the nikto scan.
+
+=item B<items_found()>
+
+Returns a string which contains the number of items that were found during the nikto scan.
+
+=back
+
+=head2 Nikto::Parser::Host::Port::Item
+
+This object contains the information for port information or a vulnerability.
+
+=over 4
+
+=item B<id()>
+
+Returns the nikto ID for an item found.
+
+=item B<description()>
+
+Returns a description of the item.
+
+=item B<osvdbid()>
+
+Returns the OSVDB id for the item, if there is one. Otherwise, it returns undef.
+
+=item B<osvdblink()>
+
+Returns a description of the item.
+
+=item B<uri()>
+
+Returns the uri of the item.
+
+=item B<namelink()>
+
+Returns a link to the item using the hostname.
+
+=item B<iplink()>
+
+Returns a link to the item using the ip.
+
+=back 
+
+=head1 EXAMPLES
+
+
+Here is an example of parsing an XML file using Nikto::Parser:
+
+ my $npx = new Nikto::Parser;
+ my $parser = $npx->parse_file("nikto.xml");
+
+ foreach my $h ( $parser->get_all_hosts() ) {
+     print "ip: " . $h->ip . "\n";
+     foreach my $p ( $h->get_all_ports() ) {
+         print "port: " . $p->port . "\n";
+         print "banner: " . $p->banner . "\n";
+         foreach my $i ( $p->get_all_items ) {
+             print "Description:\n" . $i->description . "\n";
+         }
+     }   
+     print "---\n";
+ }   
+
+Here is an example of performing a nikto scan and then parsing
+the results with Nikto::Parser:
+
+ my $npx = new Nikto::Parser;
+
+ my @ips;
+ push(@ips,"127.0.0.1");
+
+ my $parser = $npx->parse_scan("/pentest/svn/nikto/", "", @ips);
+
+ foreach my $h ( $parser->get_all_hosts() ) {
+     print "ip: " . $h->ip . "\n";
+     foreach my $p (  $h->get_all_ports() ) {
+         print "port: " . $p->port . "\n";
+         print "banner: " . $p->banner . "\n";
+         foreach my $i ( $p->get_all_items ) {
+             print "Description:\n" . $i->description . "\n";
+         }
+     }    
+     print "---\n";
+
+ }   
+
+=head1 SEE ALSO
+
+ nikto, XML::LibXML and Object::InsideOut
+ 
+=head1 AUTHOR
+
+Joshua "Jabra" Abraham, S<E<lt>jabra AT spl0it DOT orgE<gt>>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2008 Joshua "Jabra" Abraham. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+

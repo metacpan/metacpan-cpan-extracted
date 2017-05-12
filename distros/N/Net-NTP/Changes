@@ -1,0 +1,27 @@
+Revision history for Perl extension Net::NTP.
+
+1.5  September 6, 2015
+   - Expose Net::NTP::Packet so it is more practical to delegate i/o to a
+     different code (Yann Kerhervé)
+   - Major code cleanups
+   - Fix decoding of 'precision' field (RT#46000, Charles-Francois Natali)
+
+1.4  January 1, 2015
+   - Add calculated 'Offset' and 'Delay' to response
+   - Fix ntp originate timestamp to be NTP epoch's
+   - Minor tweaks to improve timeouts
+   - Lower default timeout to 5 seconds
+   - Tiny refactor; make sure Time::HiRes is loaded
+
+1.3  June 4, 2011
+   - Use IO::Socket::INET6 if available (Martin v. Löwis, RT#38234)
+   - Don't reuse the "client timestamp" on all packets (Gordon M Lack, RT#38207)
+   - Remove unused variables
+   - Don't use `Carp`
+   - Don't require Perl 5.8 (Cosimo Streppone, RT#13206)
+   - Run perltidy and move files around a bit in the distribution
+
+
+1.2  February 25, 2004
+   - Last release by James G Willmore
+

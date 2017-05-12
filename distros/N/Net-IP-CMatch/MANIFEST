@@ -1,0 +1,9 @@
+Changes
+CMatch.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Net-IP-CMatch.t
+lib/Net/IP/CMatch.pm
+META.yml                                 Module meta-data (added by MakeMaker)

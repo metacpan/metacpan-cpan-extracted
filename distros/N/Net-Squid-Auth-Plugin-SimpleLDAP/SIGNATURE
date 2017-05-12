@@ -1,0 +1,64 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 0abba6b0380f119bdbf0047a94b35ef937782392 Changes
+SHA1 5b9fd5f7d9245ea27f68acb4d9ec943497f6c621 INSTALL
+SHA1 576d18486d0581b93313502783fafc9db1bd8de6 LICENSE
+SHA1 32bcbbb787808a121220ba4d804001f4202f208e MANIFEST
+SHA1 eba5d73d2f501d139d4378e609a5c8c613a499ac META.json
+SHA1 70272af84cf855a17dfdcd21f6aa6b42740d643a META.yml
+SHA1 39c72089aa5c61413a97b57540cd84882c374d05 Makefile.PL
+SHA1 6fcdc97253db505f76de23c5eb3d518223d52e90 README
+SHA1 f612dd9dcb1934b91d3da5b66ca392d54ef601f3 TODO
+SHA1 9f62f2081ace8435a7a084a427d528ff3fff30ea dist.ini
+SHA1 4ba1eab24adab3c5671b7aa32e6d3916ae80f640 lib/Net/Squid/Auth/Plugin/SimpleLDAP.pm
+SHA1 d603732a417106d2c61b725be51811ca6a553f60 t/00-compile.t
+SHA1 86cd488198ef1835477613f6a2256994986660aa t/00-load.t
+SHA1 dfc63c9c5b2ca26002042b2a0f78b071244015e5 t/000-report-versions-tiny.t
+SHA1 141b9cebd25ffb35b1cb3bcb33b000ac4694b9ae t/01-basic.t
+SHA1 8606046feaed5fe5a5ce4b7a59e28157d6ba2944 t/02-param.t
+SHA1 f214de96cfe8b70da71201ab8859bb32cbdafe1d t/author-critic.t
+SHA1 83e76fc461f9ad90ca938fd66da90839c807300b t/author-test-eol.t
+SHA1 48d42cc9f55d5ce8ae812dab536a9d17f1c3f98d t/release-dist-manifest.t
+SHA1 9e4c697537049f3151d38c81d5080be36b600771 t/release-distmeta.t
+SHA1 1a8271cbe0573142d9b8c21b21196d00d1046fe1 t/release-kwalitee.t
+SHA1 d10a4c4f4a6c10595f86bd7acf935ae72354f8d0 t/release-meta-json.t
+SHA1 978fcdcd038d17814e4a2429f19795a77894f1a1 t/release-minimum-version.t
+SHA1 b567cfd8c64cdcda2a465f38a1dc2fd971904ee4 t/release-mojibake.t
+SHA1 a95be7f18c2443b36947e6a2888ff14742899350 t/release-no-tabs.t
+SHA1 ecd6305379975ecc5ce20f4c3e76bfcfe462e2d4 t/release-pod-coverage.t
+SHA1 c3bec8aa8475c5ec46a0bad17a20d44d4ea1b1b8 t/release-pod-linkcheck.t
+SHA1 7eb3492f9c47f10f80d4f285e96536e9192026dc t/release-pod-syntax.t
+SHA1 451078f0a380624f2de349bf7b4c72a994427afc t/release-portability.t
+SHA1 97e0048f75aaab9d14ca2a9ad74465874f4d8dbc t/release-test-version.t
+SHA1 731040bf250fd7f91217bde7998666bc60ca8e90 t/release-unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAEBAgAGBQJP1QPvAAoJEMZvtcdxyp88JXwP/iUCpJmHvalUvzFnjK0rB5kX
+Na/ITcBaO2QBXtj1NBbaTc+a5SFGnvOvEICUGZhrDl4cs2ojByf4q4ja1Vy/ubie
+VUfl9QwUMxJdNntglyzHlHhMJYomKptgd7tX5KLXb45kDthQeFXOwKJvt4S2Y8vZ
++GSszVx3IuiR697JRQHJM2ohWJEEqfQxmGXVMcukp7D0rSvGMLj7lfVdqH0toS/N
+A3e7griu0cCNCN5yMudGRj8otierS9Fx2cupcmRhzQqxsvem+aQgJzjH4HUFa9SM
+uU2k7KCXH6g74o/mk0a9na1Ejr9tJ5qS+Yuygp/PP0XmZwaMnnoF9SymwSvmhLil
+LpabA/EO9dnNlfjNvkkdGJPWAGLDB54nO1wRIDhoGJ7aOtNv7TPvYiXVy3MDSF/2
+FAwZT9me2OJFM3JeOv4UHyZwAQSsjlvbvZY+GZeWxgdkGCZ0W0B1ZtDc65zU6GZc
+9d5stCmQQKvYfbYmBK9ypwSdU3mbOTBi1tr1xAUsu4qitTB8oDxRyvoe33YU2/FQ
+tNP++V2OAOok6BANHnU4SFMXCjjYZgoUNFON1sWMG1epdrZbAJVyya7OVhiHpWOm
+TFWL0LyOPwnO7B7E/zLpwtVtfCFZhx10FMpRVl+wCtBrUq2CEKRUdzv5TTY3iRcX
+UMFfv+1hcf8J/MLav8pj
+=lDHU
+-----END PGP SIGNATURE-----

@@ -1,0 +1,99 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+NetAddr::BridgeID - Object for BridgeIDs (priority/MAC combos)
+
+=head1 SYNOPSIS
+
+   use NetAddr::BridgeID;
+    
+   my $bid;
+   $bid = NetAddr::BridgeID->new( '2#00:11:22:aa:bb:cc' );
+   $bid = NetAddr::BridgeID->new( bridge_id => '60#0011.22AA.BBCC' );
+   
+   use NetAddr::MAC;
+   my $mac = NetAddr::MAC->new( mac => '0011.22AA.BBCC' );
+   
+   $bid = NetAddr::BridgeID->new( priority => '60', mac_obj => $mac );
+   $bid = NetAddr::BridgeID->new( priority => '60', mac => '0011.22AA.BBCC' );
+
+=head1 DESCRIPTION
+
+This object class simply creates a L<NetAddr::MAC>-like object, with a priority for
+STP Bridge IDs.
+
+=for Pod::Coverage BUILDARGS
+
+=head1 METHODS
+
+=head2 original
+
+The original bridge ID string, as it was passed to the constructor.  If it was passed
+in pieces (or if parts were left out), it will fill in the gaps to provide a full
+bridge ID
+
+=head2 bridge_id
+
+The bridge ID, with a Cisco-style MAC address (like C<0000.1111.2222>).
+
+=head2 priority
+
+The priority number.
+
+=head2 mac_obj
+
+The L<NetAddr::MAC> object tied to this one.
+
+=head2 NetAddr::MAC Methods
+
+All of the C<is_* / as_* / to_*> methods are "handled" to the main BridgeID object, so 
+you can access them directly.
+
+=head1 AVAILABILITY
+
+The project homepage is L<https://github.com/SineSwiper/NetAddr-BridgeID/wiki>.
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
+site near you, or see L<https://metacpan.org/module/NetAddr::BridgeID/>.
+
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Internet Relay Chat
+
+You can get live help by using IRC ( Internet Relay Chat ). If you don't know what IRC is,
+please read this excellent guide: L<http://en.wikipedia.org/wiki/Internet_Relay_Chat>. Please
+be courteous and patient when talking to us, as we might be busy or sleeping! You can join
+those networks/channels and get help:
+
+=over 4
+
+=item *
+
+irc.perl.org
+
+You can connect to the server at 'irc.perl.org' and join this channel: #distzilla then talk to this person for help: SineSwiper.
+
+=back
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests via L<L<https://github.com/SineSwiper/NetAddr-BridgeID/issues>|GitHub>.
+
+=head1 AUTHOR
+
+Brendan Byrd <BBYRD@CPAN.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Brendan Byrd.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

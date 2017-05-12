@@ -1,0 +1,60 @@
+Revision history for Net-Amazon-Signature-v4
+
+0.16	2017-04-28
+		- Stable release containing previous fixes
+
+0.15_03	2017-04-04
+		- Additional patch by Arthur Axel fREW Schmidt (GH#1):
+			- Use Time::Piece instead of DateTime for date formatting/parsing.
+			- Avoid parsing the date at all if the user allowed it to be defaulted.
+
+0.15_02	2017-03-31
+		- Additional patch by Steven Hartland (RT#100964):
+			- Ensures the Host header is always present, as its required.
+			- Sets the X-Amz-Content-Sha256 when we calculate the payload hash, as
+			  certain regions require it.
+			- Always sets X-Amz-Date to workaround Amazon implementation not
+			  abiding by the spec and requiring X-Amz-Date in some regions.
+
+0.15_01	2017-03-30
+		- Patch by Steven Hartland (RT#100964):
+			- Remove dependency on perl 5.10 features.
+			- Ensure a date is always present, using X-Amz-Date if present.
+			- Remove spaces between Credential, SignedHeaders and Signature in the
+			  header as per spec.
+			- Use \x0a line endings as per spec.
+		- Correctly declare test dependencies (ether) (RT#107308)
+		- Switch from File::Slurp to File::Slurper (ether) (RT#107310)
+
+0.14	2013-02-26
+		- Allow client-side content-sha256 calculation.
+
+0.13	2012-10-17
+		- Fixed edge-case on query string order after clarification from Amazon.
+
+0.12	2012-10-03
+		- Fixed documentation errors (ticket #79965)
+
+0.11	2012-09-13
+		- Added HTTP::Request prerequisite.
+
+0.10	2012-09-05
+		- Entire AWS test suite passes.
+		- Cleaner tests.
+
+0.08	2012-09-04
+		- Support for HTTPS requests. (ticket #79390)
+
+0.07	2012-08-29
+		- Almost all AWS tests pass.
+		- Fixed File::Slurp testing prerequisite.
+
+0.06	2012-08-28
+		- URI canonicalization to support "//", "." and ".." in URIs.
+
+0.05	2012-08-28
+		- Improved documentation.
+
+0.01	2012-08-26
+		- First version, released on an unsuspecting world.
+

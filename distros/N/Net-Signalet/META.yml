@@ -1,0 +1,52 @@
+---
+abstract: "Supervisor for server's launch-and-term synchronization with client's one"
+author:
+  - 'Yuuki Tsubouchi <yuuki@cpan.org>'
+build_requires:
+  Capture::Tiny: 0
+  Test::Fatal: 0
+  Test::More: 0
+  Test::Requires: 0
+  Test::SharedFork: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.6, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Signalet
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Net::Signalet:
+    file: lib/Net/Signalet.pm
+    version: 0.02
+  Net::Signalet::Client:
+    file: lib/Net/Signalet/Client.pm
+  Net::Signalet::Server:
+    file: lib/Net/Signalet/Server.pm
+  Net::Signalet::script:
+    file: lib/Net/Signalet/script.pm
+requires:
+  Net::IP::Minimal: 0
+  Term::ANSIColor: 0
+  parent: 0
+resources:
+  bugtracker: https://github.com/y-uuki/Net-Signalet/issues
+  homepage: https://github.com/y-uuki/Net-Signalet
+  repository: git://github.com/y-uuki/Net-Signalet.git
+version: 0.02
+x_contributors:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Yuuki Tsubouchi <yuki.tsubo@gmail.com>'

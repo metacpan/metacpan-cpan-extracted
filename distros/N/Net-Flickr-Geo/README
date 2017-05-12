@@ -1,0 +1,180 @@
+NAME
+    Net::Flickr::Geo - tools for working with geotagged Flickr photos
+
+SYNOPSIS
+    There is no synopsis. There is only documentation for provider specific
+    packages. Okay, I lied. There's a little bit below. But really, please
+    consult provider specific packaged for details.
+
+DESCRIPTION
+    Tools for working with geotagged Flickr photos.
+
+PROVIDERS
+  ModestMaps
+    Fetch maps using the Modest Maps ws-pinwin HTTP interface :
+
+     #
+     # Simple
+     #
+
+     my %opts = ();
+     getopts('c:i:', \%opts);
+
+     my $cfg = Config::Simple->new($opts{'c'});
+
+     $cfg->param("pinwin.photo_size", "Medium");
+     $cfg->param("modestmaps.filter", "atkinson");
+     $cfg->param("pinwin.upload", 1);
+        
+     my $fl = Net::Flickr::Geo::ModestMaps->new($cfg);
+     $fl->log()->add(Log::Dispatch::Screen->new('name' => 'scr', min_level => 'debug'));
+
+     my $map = $fl->mk_pinwin_map_for_photo($opts{'i'});
+     $fl->log()->info("wrote map to $map->[0]->[0]");
+
+     #
+     # Fancy
+     #
+
+     my %opts = ();
+     getopts('c:s:', \%opts);
+
+     my $cfg = Config::Simple->new($opts{'c'});
+
+     my $fl = Net::Flickr::Geo::ModestMaps->new($cfg);
+     $fl->log()->add(Log::Dispatch::Screen->new('name' => 'scr', min_level => 'info'));
+
+     my $data = $fl->mk_poster_map_for_photoset($opts{'s'});
+     $fl->log()->info(Dumper($data));
+
+     my $tiles = $fl->upload_poster_map($data->{'path'});
+     $fl->log()->info(Dumper($tiles));
+
+  YahooMaps
+    Fetch maps using the Yahoo! Maps Image API :
+
+     #
+     # Simple
+     #
+
+     my %opts = ();
+     getopts('c:i:', \%opts);
+
+     my $cfg = Config::Simple->new($opts{'c'});
+
+     my $fl = Net::Flickr::Geo::YahooMaps->new($cfg);
+     $fl->log()->add(Log::Dispatch::Screen->new('name' => 'scr', min_level => 'debug'));
+
+     my $map = $fl->mk_pinwin_map_for_photo($opts{'i'});
+     $fl->log()->info("wrote map to $map->[0]->[0]");
+
+     #
+     # Handy
+     #
+
+     my %opts = ();
+     getopts('c:s:', \%opts);
+
+     my $cfg = Config::Simple->new($opts{'c'});
+
+     my $fl = Net::Flickr::Geo::YahooMaps->new($cfg);
+     $fl->log()->add(Log::Dispatch::Screen->new('name' => 'scr', min_level => 'debug'));
+
+     my $map = $fl->mk_pinwin_maps_for_photoset($opts{'s'});
+
+     foreach my $data (@$map){
+            $fl->log()->info("wrote image/map to $data->[0]");
+     }
+
+  Google Maps
+    Fetch maps using the Google Maps Static Maps API :
+
+     #
+     # Simple
+     #
+
+     my %opts = ();
+     getopts('c:i:', \%opts);
+
+     my $cfg = Config::Simple->new($opts{'c'});
+
+     my $fl = Net::Flickr::Geo::GoogleMaps->new($cfg);
+     $fl->log()->add(Log::Dispatch::Screen->new('name' => 'scr', min_level => 'debug'));
+
+     $cfg->param("google.map_type", "mobile");
+
+     my $map = $fl->mk_pinwin_map_for_photo($opts{'i'});
+     $fl->log()->info("wrote map to $map->[0]->[0]");
+
+  MultiMaps
+    Fetch maps using the MultiMap Static Maps API :
+
+     #
+     # Simple
+     #
+
+     my %opts = ();
+     getopts('c:i:', \%opts);
+
+     my $cfg = Config::Simple->new($opts{'c'});
+
+     my $fl = Net::Flickr::Geo::MultiMaps->new($cfg);
+     $fl->log()->add(Log::Dispatch::Screen->new('name' => 'scr', min_level => 'debug'));
+
+     my $map = $fl->mk_pinwin_map_for_photo($opts{'i'});
+     $fl->log()->info("wrote map to $map->[0]->[0]");
+
+IMPORTANT
+    Versions 0.5 and higher are, essentially, not even a little bit
+    backwards compatible.
+
+    Please adjust your code and expectations accordingly. It shouldn't
+    happen again...
+
+VERSION
+    0.72
+
+DATE
+    $Date: 2008/08/03 17:08:39 $
+
+AUTHOR
+    Aaron Straup Cope <ascope@cpan.org>
+
+NOTES
+    All uploads to Flickr are marked with a content-type of "other".
+
+SEE ALSO
+    Net::Flickr::API
+
+    <http://developer.yahoo.com/maps/rest/V1/mapImage.html>
+
+    <http://www.multimap.com/share/documentation/openapi/1.2/web_service/sta
+    ticmaps.htm>
+
+    <http://code.google.com/apis/maps/documentation/staticmaps/index.html>
+
+    <http://modestmaps.com/>
+
+    <http://mike.teczno.com/notes/oakland-crime-maps/IX.html>
+
+    <http://www.aaronland.info/weblog/2007/07/28/trees/#delmaps_pm>
+
+    <http://www.aaronland.info/weblog/2007/06/08/pynchonite/#net-flickr-geo>
+
+    <http://www.aaronland.info/weblog/2007/06/08/pynchonite/#nfg_mm>
+
+    <http://flickr.com/photos/straup/sets/72157600321286227/>
+
+    <http://www.flickr.com/help/filters/>
+
+BUGS
+    Sure, why not.
+
+    Please report all bugs via <http://rt.cpan.org>
+
+LICENSE
+    Copyright (c) 2007-2008 Aaron Straup Cope. All Rights Reserved.
+
+    This is free software. You may redistribute it and/or modify it under
+    the same terms as Perl itself.
+

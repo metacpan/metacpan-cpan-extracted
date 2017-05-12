@@ -1,0 +1,30 @@
+---
+abstract: 'NetAddr::IP objects with deferred validation B<SEE DESCRIPTION BEFORE USING>'
+author:
+  - 'Robert Drake <rdrake@cpan.org>'
+build_requires:
+  Storable: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: NetAddr-IP-LazyInit
+requires:
+  Exporter: '0'
+  NetAddr::IP: '0'
+  NetAddr::IP::Util: '0'
+  overload: '0'
+  perl: v5.10.1
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/rfdrake/NetAddr-IP-LazyInit/issues
+  homepage: http://search.cpan.org/dist/NetAddr-IP-LazyInit
+  repository: git://github.com/rfdrake/NetAddr-IP-LazyInit.git
+version: '0.7'

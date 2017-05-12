@@ -1,0 +1,19 @@
+Changes
+demo/demo.pl
+demo/demo_actual.pl
+demo/demo_diamond.pl
+demo/demo_unseen.pl
+demo/demo_unseen_actual.pl
+lib/NEXT.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/actual.t
+t/actuns.t
+t/dynamically_scoped_regex_vars.t
+t/next.t
+t/stringify.t
+t/unseen.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

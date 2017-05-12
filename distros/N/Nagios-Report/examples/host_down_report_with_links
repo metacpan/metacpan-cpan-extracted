@@ -1,0 +1,100 @@
+#!/usr/bin/perl
+
+# $Id: host_down_report_with_links,v 1.2 2006-08-21 14:18:19+10 sh1517 Exp sh1517 $
+
+use strict ;
+
+use Nagios::Report ;
+use Getopt::Std ;
+
+use vars qw($opt_t) ;
+
+getopt 't' ;
+
+my $usage = <<USAGE ;
+
+$0 -t <timeperiod>
+
+Displays those hosts with less than 100% total time up during the timeperiod.
+
+timeperiod ::= today | yesterday   |
+           thisweek  | lastweek    |
+           thismonth | lastmonth   |
+           thisyear  | lastyear    |
+           last12hours    | last24hours        | last7days | last31days   |
+           last<days>days | last<hours>hours   | last<mins>min(ute)?(s)?  |
+           HHMM      | HH:MM       |
+           DD.MM.YY  | DD.MM.YYYY  | MM/DD/YY  | MM/DD/YYYY |
+           24hourtime date         |
+           date1 - date2           |
+           24hourtime date1 - 24hourtime date2 |
+           Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec (YYYY)?
+
+Timeperiods other than 'yesterday', 'lastweek', 'lastmonth' or 'lastyear' end now.
+
+Quote the timeperiod if it contains spaces ('time date').
+
+eg
+  $0 -t '07:00 01.12.2005'
+  $0 -t last7days
+  $0 -t last2hours
+  $0 -t '07:00 01.12.2005-07:00 02.12.2005'
+  $0 -t '01.12.2005 - 02.12.2005'
+  $0 -t 'Mar 2006'
+
+USAGE
+
+die $usage
+  unless $opt_t ;
+
+my $valid_time = qr<^(?:
+    today                                                                                   |
+    yesterday                                                                               |
+    this (?:week|month|year)                                                                |
+    last (?:week|24hours|12hours|7days|31days|\d+days?|\d+hours?|\d+min(ute)?s?)            |
+    (?: \d\d :? \d\d  \s+  \d\d? [./] \d\d? [./] \d\d? (?:\d\d)?)                           |
+    (?: \d\d :? \d\d)                                                                       |
+    (?: \d\d? [./] \d\d? [./] \d\d (?:\d\d)?)                                               |
+    (?: \d\d? [./] \d\d? [./] \d\d (?:\d\d)? \s* - \s* \d\d? [./] \d\d? [./] \d\d? (?:\d\d)?)                                   |
+    (?: \d\d :? \d\d \s+ \d\d? [./] \d\d? [./] \d\d (?:\d\d)? \s* - \s* \d\d :? \d\d \s+ \d\d? [./] \d\d? [./] \d\d (?:\d\d)?)  |
+    (?i: Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)                                   |
+    (?i: Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \s* \d{4}
+)$>x ;
+
+die $usage
+  unless $opt_t =~ /$valid_time/ ;
+
+my $x = Nagios::Report->new(q<local_cgi Nagios_Server Auth_Nagios_User>, [ qw(24x7) ], $opt_t)
+  or die "Can't construct Nagios::Report object." ;
+
+$x->mkreport(
+        [ qw(
+            HOST_NAME
+            PERCENT_TOTAL_TIME_UP
+            DOWN
+            UP
+            OUTAGE
+            AVAIL_URL
+           )
+           ],
+
+        sub { my %F = @_; my $u = $F{PERCENT_TOTAL_TIME_UP}; $u =~ s/%//; $u < 100 },
+        # sub { 1 },
+
+        &comp(alpha => 0, ascend => 0, fields => [qw(TOTAL_TIME_DOWN TOTAL_TIME_UNREACHABLE)]),
+
+        sub {    my $F = shift @_; 
+            my $d = $F->{TOTAL_TIME_DOWN} ;
+            my $u = $F->{TOTAL_TIME_UNREACHABLE} ;
+            $F->{TOTAL_TIME_DOWN_HMS}        = t2hms($d) ;
+            $F->{TOTAL_TIME_UNREACHABLE_HMS}    = t2hms($u) ;
+            qw(TOTAL_TIME_DOWN_HMS TOTAL_TIME_UNREACHABLE_HMS)
+        },
+
+        1,
+) ;
+
+
+
+$x->debug_dump(240, 2) ;
+                            # 240 chars is needed for the URLs.

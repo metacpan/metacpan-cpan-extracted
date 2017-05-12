@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00_compile.t
+t/01_response.t
+lib/Net/DNS/LivedoorDomain/DDNS.pm
+lib/Net/DNS/LivedoorDomain/DDNS/Response.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,99 @@
+
+ * Linux goa 2.6.29.1 #2 SMP Thu Apr 23 13:24:53 JST 2009 x86_64 GNU/Linux
+ * Intel(R) Pentium(R) Dual  CPU  E2180  @ 2.00GHz
+
+$ ./samples/benchmark/benchmark.pl
+155
+Net::IP::Match::Trie::XS
+            (warning: too few iterations for a reliable count)
+              Rate     cidr  regexp patricia       xs      bin      xs2     trie
+cidr       44643/s       --    -67%     -71%     -77%     -92%     -93%     -97%
+regexp    134529/s     201%      --     -11%     -31%     -77%     -78%     -90%
+patricia  151515/s     239%     13%       --     -22%     -74%     -76%     -88%
+xs        194805/s     336%     45%      29%       --     -66%     -69%     -85%
+bin       576923/s    1192%    329%     281%     196%       --      -8%     -56%
+xs2       625000/s    1300%    365%     312%     221%       8%       --     -52%
+trie     1304348/s    2822%    870%     761%     570%     126%     109%       --
+
+$ env NIMT_PP=1 ./samples/benchmark/benchmark.pl
+155
+Net::IP::Match::Trie::PP
+             Rate     cidr   regexp patricia       xs     trie      bin      xs2
+cidr      40323/s       --     -69%     -74%     -80%     -82%     -93%     -93%
+regexp   128205/s     218%       --     -16%     -36%     -42%     -79%     -79%
+patricia 152284/s     278%      19%       --     -24%     -31%     -75%     -75%
+xs       201342/s     399%      57%      32%       --      -9%     -66%     -66%
+trie     220588/s     447%      72%      45%      10%       --     -63%     -63%
+bin      600000/s    1388%     368%     294%     198%     172%       --      -0%
+xs2      600000/s    1388%     368%     294%     198%     172%       0%       --
+
+$ ./samples/benchmark/speedtest.pl
+Initialization time of test: 0.032882
+
+Networks: 1, IPs: 10000
+Test name              | Setup time | Run time | Total time | Errors
+-----------------------+------------+----------+------------+--------
+simple                 |    0.000   |  0.058   |    0.058   | n/a
+Net::IP::Match::XS     |    0.000   |  0.015   |    0.016   | 0
+Net::IP::Match::Regexp |    0.001   |  0.072   |    0.072   | 0
+Net::IP::Match::Trie   |    0.000   |  0.022   |    0.022   | 0
+
+Networks: 10, IPs: 10000
+Test name              | Setup time | Run time | Total time | Errors
+-----------------------+------------+----------+------------+--------
+simple                 |    0.000   |  0.085   |    0.085   | n/a
+Net::IP::Match::XS     |    0.000   |  0.022   |    0.022   | 0
+Net::IP::Match::Regexp |    0.001   |  0.091   |    0.093   | 0
+Net::IP::Match::Trie   |    0.000   |  0.023   |    0.023   | 0
+
+Networks: 100, IPs: 10000
+Test name              | Setup time | Run time | Total time | Errors
+-----------------------+------------+----------+------------+--------
+simple                 |    0.000   |  0.371   |    0.371   | n/a
+Net::IP::Match::XS     |    0.000   |  0.084   |    0.084   | 0
+Net::IP::Match::Regexp |    0.010   |  0.098   |    0.107   | 0
+Net::IP::Match::Trie   |    0.001   |  0.022   |    0.024   | 0
+
+Networks: 1000, IPs: 10000
+Test name              | Setup time | Run time | Total time | Errors
+-----------------------+------------+----------+------------+--------
+simple                 |    0.002   |  2.784   |    2.786   | n/a
+Net::IP::Match::XS     |    0.001   |  0.647   |    0.648   | 0
+Net::IP::Match::Regexp |    0.090   |  0.103   |    0.193   | 0
+Net::IP::Match::Trie   |    0.064   |  0.023   |    0.087   | 4
+
+$ env NIMT_PP=1 ./samples/benchmark/speedtest
+.pl
+Initialization time of test: 0.030923
+
+Networks: 1, IPs: 10000
+Test name              | Setup time | Run time | Total time | Errors
+-----------------------+------------+----------+------------+--------
+simple                 |    0.000   |  0.057   |    0.057   | n/a
+Net::IP::Match::XS     |    0.000   |  0.015   |    0.015   | 0
+Net::IP::Match::Regexp |    0.000   |  0.073   |    0.073   | 0
+Net::IP::Match::Trie   |    0.001   |  0.062   |    0.063   | 0
+
+Networks: 10, IPs: 10000
+Test name              | Setup time | Run time | Total time | Errors
+-----------------------+------------+----------+------------+--------
+simple                 |    0.000   |  0.083   |    0.083   | n/a
+Net::IP::Match::XS     |    0.000   |  0.021   |    0.021   | 0
+Net::IP::Match::Regexp |    0.001   |  0.093   |    0.094   | 0
+Net::IP::Match::Trie   |    0.007   |  0.063   |    0.069   | 0
+
+Networks: 100, IPs: 10000
+Test name              | Setup time | Run time | Total time | Errors
+-----------------------+------------+----------+------------+--------
+simple                 |    0.000   |  0.341   |    0.341   | n/a
+Net::IP::Match::XS     |    0.000   |  0.084   |    0.084   | 0
+Net::IP::Match::Regexp |    0.010   |  0.098   |    0.108   | 0
+Net::IP::Match::Trie   |    0.057   |  0.064   |    0.122   | 0
+
+Networks: 1000, IPs: 10000
+Test name              | Setup time | Run time | Total time | Errors
+-----------------------+------------+----------+------------+--------
+simple                 |    0.002   |  2.687   |    2.689   | n/a
+Net::IP::Match::XS     |    0.001   |  0.668   |    0.669   | 0
+Net::IP::Match::Regexp |    0.089   |  0.104   |    0.192   | 0
+Net::IP::Match::Trie   |   18.592   |  0.070   |   18.662   | 8

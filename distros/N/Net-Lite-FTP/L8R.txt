@@ -1,0 +1,37 @@
+#
+sub list {
+    my ($self)=@_;
+    my $sock=$self->{'Sock'};
+    my $socket;
+    my (@files);
+    my $q;
+    $q=$self->command("PASV");
+    $q=~/227 [^\d]*(\d+),(\d+),(\d+),(\d+),(\d+),(\d+)/ && do {
+        #print "I przyszlo $1 $2 $3 $4 $5 $6, port ",$5*256+$6,"\n";
+        my $port=$5*256+$6;
+        my $host="$1.$2.$3.$4";
+        #print " $host : $port \n";
+        $socket = Net::SSLeay::Handle->make_socket($host, $port);
+        print STDERR "Data link connected.. to $host at $port\n";
+    };
+    $self->command("LIST");
+
+    tie(*S2, "Net::SSLeay::Handle", $socket);
+    print STDERR "SSL for data connection enabled...\n";
+    $socket = \*S2;
+
+    while ($q=<$socket>) {
+        print STDERR "G: $q";
+	#IBM Style:
+        $q=~/([a-zA-Z0-9\.\_]+)\s+(\w+)\s+(\w+)\s+([a-zA-Z\#]+)\s+(\d+)\s+(\d+)\s+(\d+)/ && do {
+            my ($file,$sender,$class,$sth,$size,$date,$time)=($1,$2,$3,$4,$5,$6,$7);
+            print STDERR "Plik ($file) by sender($sender) of class($class) with size ($size)\n";
+            push @files,$file;
+        };
+    };
+    close $socket;
+    print STDERR "resp(end LIST) ",$self->response();
+    return \@files;
+
+};
+

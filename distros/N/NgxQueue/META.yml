@@ -1,0 +1,32 @@
+---
+abstract: "Simple double linked list based nginx's ngx-queue.h"
+author:
+  - 'Daisuke Murase <typester@cpan.org>'
+build_requires:
+  Devel::PPPort: 3.2
+  ExtUtils::MakeMaker: 6.36
+  Test::LeakTrace: 0.14
+  Test::More: 0.88
+configure_requires:
+  CPAN::Meta: 0
+  Devel::PPPort: 3.2
+  ExtUtils::MakeMaker: 6.36
+  ExtUtils::ParseXS: 2.21
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: NgxQueue
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  XSLoader: 0.02
+  perl: 5.008001
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

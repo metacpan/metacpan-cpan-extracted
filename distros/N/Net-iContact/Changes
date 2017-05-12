@@ -1,0 +1,9 @@
+Revision history for Net-iContact
+
+0.02	2007-11-30
+	stats.t and contacts.t had the wrong number of tests skipped when
+	the apiinfo file isn't provided.
+
+0.01    2007-11-29
+        First version, released on an unsuspecting world.
+

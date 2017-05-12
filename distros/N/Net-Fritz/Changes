@@ -1,0 +1,40 @@
+Revision history for perl distribution Net::Fritz
+
+v0.0.5 2017-04-05
+
+ - send all action parameters als SOAP strings
+   (prevents SOAP::Lite from mistaking UTF8 to be base64)
+ - brush up distribution
+   - add provided module versions to META.json/META.yml
+
+v0.0.4 2017-04-02
+
+ - cache network connections to speed up consecutive actions
+
+v0.0.3 2016-06-21
+
+ - bump LWP::UserAgent dependency to 6.00 because ssl_opts are needed
+ - re-enable author test for SSL connection
+ - brush up distribution
+   - add META.json
+   - declare minimum required Perl version
+   - add github repository links
+   - add github bugtracker link
+   - mark special tests as author tests
+
+v0.0.2 2016-06-17
+
+ - bugfix for "Experimental keys on scalar is now forbidden"
+   during tests under perl 5.24 (rt.cpan.org #115356)
+ - switch build to Dist::Zilla
+   - add $VERSION to every module
+   - fix some dependencies
+
+v0.0.1 2016-06-15
+
+ - Initial release
+
+v0.0.0 2015-07-25
+
+ - Start coding
+ 

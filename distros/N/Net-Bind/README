@@ -1,0 +1,72 @@
+This is an alpha release of the Net::Bind module package for perl5.
+
+This module provides an interface to various files related to the bind
+DNS daemon.  For this alpha release, there is only an interface for
+/etc/resolv.conf data - I wanted to provide a feel for the type of
+interface being developed.  Future releases will include interfaces
+for named.boot files, zone files, database dump files, and the new
+named.conf file (ala bind-8.x).  I expect to provide these other
+interfaces before it goes to beta release.  If you are interested in
+the future capabilities of this module, please take a look at what's
+here and provide feedback.
+
+WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!
+Think twice about using this module to modify important data.  At the
+very least make sure you have backup copies.
+
+WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!
+The method interface is currently in an evaluation phase.  Since the
+module is at an early stage of it's life, I'm not going to try too
+hard to provide for backward compatibility to older alpha versions.  I
+am, however, going to try to make all changes to the method interfaces
+before it reaches beta release.
+
+The following interfaces is provided with Net::Bind:
+    + Net::Bind::Resolv
+
+The following interfaces should be available before it goes to beta:
+    + Net::Bind::Boot	(named.boot)
+    + Net::Bind::Zone	(zone files)
+    + Net::Bind::Dump	(dump files generated from SIGINT of named)
+    + Net::Bind::Conf	(new bind-8 configuration file)
+(roughly in that order)
+
+To build and install the package execute the following commands:
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+I've tried to provide a strong set of regression tests.  I understand
+how important it is to have correctly generating DNS data.  If you
+look through the regression tests and notice anything missing or
+incorrect, please let me know.
+
+The TODO file has information on features that aren't present or
+complete yet.
+
+The CHANGES file has summary information on changes from release to
+release.
+
+The BUGS file has information on current implementation
+bugs/malfeatures.
+
+The current version has been developed and tested against 5.003_24.
+
+Check the documentation for the module for information on using the
+package.  Please let me know if run across something that needs to be
+documented better.
+
+Please contact me if you use this for anything non-trivial.  This is
+not for permission, it's so I can get some idea of what folks are
+using the package for other than trivial scripts.
+
+Copyright (c) 1997 Kevin Johnson <kjj@pobox.com>
+Copyright (c) 2001 Rob Brown <rob@roobik.com>.
+
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
+
+-------------
+
+Please report any bugs/suggestions to <rob@roobik.com>.

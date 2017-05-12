@@ -1,0 +1,1113 @@
+Aalborg University Library;a500.aub.auc.dk;2100;AUB01-AUBOLINE
+Abell Library Center Austin College;abell.austincollege.edu;2200;unicorn
+Aberdeen University;library.abdn.ac.uk;210;dynix
+Academy Library, Australian Defence Force Academy;libadfa.adfa.edu.au;7090;VOYAGER
+ACADIA (Acadia University);jasper.acadiau.ca;2200;UNICORN
+Africa Data Dissemination Service;152.61.128.13;2210;adds
+Amarillo College (DRA);hlc.actx.edu;210;MARION
+Ames Public Library -- Ames, Iowa (epixtech Dynix);dynix.ames.lib.ia.us;210;ZSERVER
+AMICUS;amicus.nlc-bnc.ca;210;NL
+Anne Arundel Cty. P. L.;axp.aacpl.lib.md.us;210;MARION
+Århus Kommunes Biblioteker;195.41.8.218;2100;S
+Arizona State University (INNOPAC);rock.lib.asu.edu;210;INNOPAC
+Arkansas Technical University (Endeavor);webvoyage.atu.edu;7090;VOYAGER
+Astronomy Database -- Smithsonian Astrophysical Observatory;adsabs.harvard.edu;210;AST
+Astrophysics Data System -- Smithsonian Astrophysical Observatory, Cambridge, MA;adsabs.harvard.edu;210;AST
+Astrophysics Data System -- Smithsonian Astrophysical Observatory, Cambridge, MA;adsabs.harvard.edu;210;INST
+Astrophysics Data System -- Smithsonian Astrophysical Observatory, Cambridge, MA;adsabs.harvard.edu;210;PHY
+Astrophysics Data System -- Smithsonian Astrophysical Observatory, Cambridge, MA;adsabs.harvard.edu;210;PRE
+AT&T Library Network;z3950.research.att.com;210;books CIC netlib russian
+Auburn University (Endeavor);pooh.lib.auburn.edu;7090;VOYAGER
+AURIGA - CeDoc (biblioteche della provincia di Modena);delphi.cedoc.mo.it;2210;default
+Austin College, Austin, Texas;abell.austinc.edu;2200;UNICORN
+Australian National University;library.anu.edu.au;210;INNOPAC
+Ballerup-Seminariet;193.162.227.226;210;Semibasen
+Bavarian State Libraries;193.174.96.24;31310;BVBSR011
+Baylor University Libraries;bearcat.baylor.edu;210;INNOPAC
+B.C. Electronic Library Network;meager.library.ubc.ca;210;ELN-serials
+Bedford Public Library;catalog.bedfordlibrary.org;210;Innopac
+Bell Laboratories Library Network;z3950.bell-labs.com;210;books
+Bell Laboratories Library Network;z3950.bell-labs.com;210;factbook
+Bell Laboratories Library Network;z3950.bell-labs.com;210;gils
+Bell Laboratories Library Network;z3950.bell-labs.com;210;netlib
+Bell Laboratories;z3950.bell-labs.com;210;factbook books netlib gils
+Bergen folkebibliotek;z3950.bergen.folkebibl.no;210;data
+Berry College,Mount Berry, GA;boysen.berry.edu;7090;VOYAGER
+BibHit;www.bibhit.dk;210;Default
+Biblioteca de Castilla y Leon;z3950.bcl.jcyl.es;210;AbsysBCL
+Biblioteca de Castilla y Leon;z3950.bcl.jcyl.es;210;AbsysCCFL
+Biblioteca Pública de Zaragoza, Spane;codos.aragob.es;5500;AbsysE
+Biblioteket for Ergo- & Fysioterapeutskolen København;bib.kbhfys.dk;210;HovedBase
+Biblioteket for Vejle By og Amt;195.215.203.98;2100;S
+Biblioteket i Herlev Kommune;bib.gladsaxe.dk;2101;H
+Biblioteksentralen, Norway;ludvig.bibsent.no;2100;AAR01
+Biblioteksentralen, Norway;ludvig.bibsent.no;2100;HAL01
+Biblioteksentralen, Norway;ludvig.bibsent.no;2100;OPP01
+Biblioteksentralen, Norway;ludvig.bibsent.no;2100;OST01
+Biblioteksentralen, Norway;ludvig.bibsent.no;2100;RAD01
+Biblioteksentralen, Norway;ludvig.bibsent.no;2100;RAE01
+Biblioteksentralen, Norway;ludvig.bibsent.no;2100;RIN01
+Biblioteksentralen, Norway;ludvig.bibsent.no;2100;RIS01
+Bibliothèque Nationale du Québec;www.biblinat.gouv.qc.ca;210;IRIS
+Bibliothèques de l'Université de Moncton (GEAC);eloize.umoncton.ca;210;ADVANCE
+Bibliothèque universitaire d'Angers;bubase.univ-angers.fr;210;BUANG
+BIBSYS;z3950.bibsys.no;2100;BIBSYS
+BIBSYS;z3950.bibsys.no;2100;PERI
+Birkerød Bibliotek;kraka.birkerod.bibnet.dk;2100;S
+Bishop's University, Canada;192.197.190.4;210;Advance
+Biz/ed;catalogue.bized.ac.uk;2105;bized
+Boston Athenaeum Library (Endeavor);www.bostonathenaeum.org;7090;VOYAGER
+Boston College (ALEPH);ecs100.bc.edu;9949;BCL01
+Boston College (Boston, MA);ecs100.bc.edu;9949;aleph
+Boston Public Library (Boston, MA);192.80.65.11;210;UnionCat
+Boston U.;128.197.130.200;210;INNOPAC
+Boulder Public Library, Boulder, CO;nell.boulder.lib.co.us;210;INNOPAC
+Brandeis University (ALEPH);alice.mainlib.brandeis.edu;9909;MBB01
+Brandeis University (Waltham, MA);alice.brandeis.edu;9909;MBB01
+Brescia University (Owensboro, KY);library.brescia.edu;7090;VOYAGER
+British Columbia Electronic Library Network (DRA);meager.library.ubc.ca;210;ELN-serials
+British Columbia Institute of Technology (INNOPAC);innopac.lib.bcit.ca;210;INNOPAC
+British Library;blpcz.bl.uk;21021;BLPC-ALL
+British Library;z3950.bl.uk;2020;mar
+British Library ZIP Services;z3950.bl.uk;2020;MAR 
+British Library ZIP Services;z3950.bl.uk;2020;SRIS
+Brock U.;139.57.128.23;210;INNOPAC
+Brown University;128.148.19.6;210;INNOPAC
+Brunel U.;library.brunel.ac.uk;2200;UNICORN
+Bucknell University -- Lewisburg,;Pa.;(DRA);library.bucknell.edu;210;MARION
+Bucknell University (Lewisburg, PA);libcat.bucknell.edu;2200;unicorn
+Burlington Public Library (Burlington, Iowa);ipserv33.burlington.lib.ia.us;210;ZSERVER
+Butler University (Indianapolis, IN);ruth.butler.edu;210;MARION
+California Institute of Technology (INNOPAC);clas.caltech.edu;210;INNOPAC
+California Institute of the Arts;alpha.calarts.edu;210;MARION
+California State Library;vax.lib.state.ca.us;210;marion
+California State U. Lib., Los Angeles;130.182.123.5;210;Innopac
+California State U. Lib., Pomona;134.71.50.31;210;Innopac
+California State U. Lib., San Francisco;130.212.18.200;210;Innopac
+California State U. Lib., San Jose;130.65.100.1;210;Innopac
+California State U. Lib., San Luis Obispo;129.65.20.27;210;Innopac
+California State U. Lib., San Marcos;144.37.1.4;210;Innopac
+California State U. Lib., Stanislaus;130.17.3.75;210;MAIN*BIBMAST
+California State University, Dominguez Hills;155.135.4.1;210;advance
+California State University, Fullerton (INNOPAC);opac.fullerton.edu;210;INNOPAC
+California State University, Fullerton;opac.fullerton.edu;210;INNOPAC
+California State University, Hayward (INNOPAC);library.csuhayward.edu;210;INNOPAC
+California State University, Hayward;library.csuhayward.edu;210;INNOPAC
+California State University, Monterey Bay (Endeavor);voyager.monterey.edu;7090;VOYAGER
+California State University, Monterey Bay;voyager.monterey.edu;7090;voyager
+California State University, Northridge;advance.csun.edu;210;advance
+California State University, Sonoma;130.157.13.169;210;MARION
+California State University, Stanislaus;130.17.3.75;210;advance
+Canada.;Dept.;of;Foreign Affairs and International Trade (INNOPAC) 198.103.104.100 210 INNOPAC
+Cape Library Cooperative (South Africa);testslis.pentech.ac.za;9909;aleph
+Carleton University (Ottawa,;Ont.);library7.library.carleton.ca;134.117.10.42 210 INNOPAC
+Carnegie Mellon University (SIRSI);webcat.library.cmu.edu;2200;UNICORN
+Carnegie-Stout Public Library (Dubuque, Iowa);209.207.35.6;210;SERVER
+Cedar Rapids Public Library (Cedar Rapids, Iowa);crpl.cedar-rapids.lib.ia.us;210;cedrap
+Center for Research Libraries;128.135.73.2;210;INNOPAC
+Central College (Pella, Iowa);lib.central.edu;210;INNOPAC
+Central Library System N1 Of Zelenograd;cbs.zelcom.ru;3001;liber
+Central Missouri State University;153.91.1.39;210;CMSU
+Central North Carolina Library Consortium;152.8.8.1;210;INNOPAC
+Central Scientific Agricultural Library of Russia;www.cnshb.ru;210;8589
+Central Scientific Agricultural Library of Russia;www.cnshb.ru;210;9095
+Central Scientific Agricultural Library of Russia;www.cnshb.ru;210;jour
+Central Scientific Agricultural Library of Russia;www.cnshb.ru;210;tbd1
+Central Texas College;www.ctcd.cc.tx.us;2200;UNICORN
+Centro de Informacion Biblioteca ITESM Campus Monterrey;itec.mty.itesm.mx;210;innopac
+Chinese University of Hong Kong;202.40.216.17;210;INNOPAC
+Chisholm Institute;alpha.chisholm.vic.edu.au;210;MARION
+Christchurch City Libraries -- Christchurch, New Zealand (DRA);library.ccc.govt.nz;210;MARION
+CIESIN/USDA Catalog;infoserver3.ciesin.org;6020;usda
+CISTI;cat.cisti.nrc.ca;210;INNOPAC
+Ciudad Alejandría;150.185.140.254;9999;bolivar
+Ciudad Alejandría;150.185.140.254;9999;correale
+Ciudad Alejandría;150.185.140.254;9999;ecotropicos
+Ciudad Alejandría;150.185.140.254;9999;eslared
+Ciudad Alejandría;150.185.140.254;9999;eventos-ula
+Ciudad Alejandría;150.185.140.254;9999;legula
+Ciudad Alejandría;150.185.140.254;9999;lgula
+Ciudad Alejandría;150.185.140.254;9999;ra
+Ciudad Alejandría;150.185.140.254;9999;ssaber
+Ciudad Alejandría;150.185.140.254;9999;ssalud
+Ciudad Alejandría;150.185.140.254;9999;vereda
+Clarke College (Dubuque, Iowa);wisdom.keller.clarke.edu;210;clarke
+Cleveland Public Library (Cleveland, OH);z3950.cpl.org;210;CPL
+Clive Public Library (Clive, Iowa);lib.ci.clive.ia.us;210;INNOPAC
+Colgate University;library.colgate.edu;210;INNOPAC
+College of the Holy Cross (Worcester,;Mass.);hcacad.holycross.edu 210 MARION
+College of William and Mary;lion.swem.wm.edu;2200;unicorn
+College o/t Holy Cross;hcacad.holycross.edu;210;MARION
+Colorado Alliance of Research Libraries;192.54.81.3;210;AIM
+Colorado Alliance of Research Libraries;192.54.81.3;210;ARA
+Colorado Alliance of Research Libraries;192.54.81.3;210;BEM
+Colorado Alliance of Research Libraries;192.54.81.3;210;CDE
+Colorado Alliance of Research Libraries;192.54.81.3;210;CSP
+Colorado Alliance of Research Libraries;192.54.81.3;210;DPL
+Colorado Alliance of Research Libraries;192.54.81.3;210;EST
+Colorado Alliance of Research Libraries;192.54.81.3;210;FTM
+Colorado Alliance of Research Libraries;192.54.81.3;210;LAM
+Colorado Alliance of Research Libraries;192.54.81.3;210;LUT
+Colorado Alliance of Research Libraries;192.54.81.3;210;MCC
+Colorado Alliance of Research Libraries;192.54.81.3;210;MIN
+Colorado Alliance of Research Libraries;192.54.81.3;210;NEL
+Colorado Alliance of Research Libraries;192.54.81.3;210;NEU
+Colorado Alliance of Research Libraries;192.54.81.3;210;NJC
+Colorado Alliance of Research Libraries;192.54.81.3;210;OTE
+Colorado Alliance of Research Libraries;192.54.81.3;210;PPC
+Colorado Alliance of Research Libraries;192.54.81.3;210;PUE
+Colorado Alliance of Research Libraries;192.54.81.3;210;RGU
+Colorado Alliance of Research Libraries;192.54.81.3;210;RRC
+Colorado Alliance of Research Libraries;192.54.81.3;210;STR
+Colorado Alliance of Research Libraries;192.54.81.3;210;TKO
+Colorado Alliance of Research Libraries;192.54.81.3;210;TRI
+Colorado Alliance of Research Libraries;192.54.81.3;210;WYO
+Colorado College (Colorado Springs, CO);tiger.cc.colorado.edu;192.70.253.5;210 INNOPAC
+Colorado School of Mines (INNOPAC);prospector.coalliance.org;210;INNOPAC
+Colorado State University, Fort Collins;catalog.library.colostate.edu;210;INNOPAC
+Columbia University -- New York, NY (NOTIS);tag1.cc.columbia.edu;210;LUCL
+Commonwealth Scientific and Industrial Research Organization (Australia);voyager.its.csiro.au;7090;VOYAGER
+Concordia University (concu);mercury.concordia.ca;210;Innopac
+Concordia University Wisconsin (INNOPAC);topcat.switchinc.org;210;INNOPAC
+Congreso de los Diputados, Spane;congreso.absysnet.com;2100;absysbcd
+Connecticut State University;csulib.ctstateu.edu;210;INNOPAC
+Consensus Omnium: Ural Library Corporate Network;oracle.usu.ru;210;gorn
+Consensus Omnium: Ural Library Corporate Network;oracle.usu.ru;210;lest
+Consensus Omnium: Ural Library Corporate Network;oracle.usu.ru;210;papers
+Consensus Omnium: Ural Library Corporate Network;oracle.usu.ru;210;publ
+Consensus Omnium: Ural Library Corporate Network;oracle.usu.ru;210;sonb
+Consensus Omnium: Ural Library Corporate Network;oracle.usu.ru;210;uapa
+Consensus Omnium: Ural Library Corporate Network;oracle.usu.ru;210;ugtu
+Consensus Omnium: Ural Library Corporate Network;oracle.usu.ru;210;uran
+Consensus Omnium: Ural Library Corporate Network;oracle.usu.ru;210;ureu
+Consensus Omnium: Ural Library Corporate Network;oracle.usu.ru;210;urgu
+COPAC;z3950.copac.ac.uk;2100;COPAC
+Copenhagen Business School;hermes.lib.cbs.dk;2100;S
+Cornerstone College (Grand Rapids, MI);198.62.73.72;210;INNOPAC
+Coventry University;194.66.58.1;210;MAIN*BIBMAST
+COWLNET Consortium -- Kansas (INNOPAC);cowlnet.sckans.edu;210;INNOPAC
+COWLNET Library Consortium;198.248.176.185;210;INNOPAC
+CSIC. CIRBIC, Spane;sauco.csic.es;9909;MAD01
+CSIRO (Commonwealth Scientific and Industrial Research Organisation;voyager.its.csiro.au;7090;voyager
+Curtin University of Technology;library.curtin.edu.au;210;marion
+Czech Elvil Databases;www.psp.cz;2100;eurovoc*cz
+Czech Elvil Databases;www.psp.cz;2100;eurovoc*de
+Czech Elvil Databases;www.psp.cz;2100;eurovoc*en
+Czech Elvil Databases;www.psp.cz;2100;sntisk*1
+Czech Elvil Databases;www.psp.cz;2100;sntisk*2
+Czech Elvil Databases;www.psp.cz;2100;sntisk*3
+Danish National Library of Science and Medicine (ALEPH);cosmos.dnlb.dk;9909;DNL01
+Danish National Library of Science & Medicine;cosmos.dnlb.dk;9909;Aleph
+Danmarks Statistiks Bibliotek og Information;129.142.53.66;210;Hovedbase
+Das Netzwerk von Bibliotheken und Informationsstellen in der Schweiz;opac.nebis.ch;9909;NEBIS
+Data Research Associates;dranet.dra.com;192.65.218.23;210 DREWDB GPIIAC IACEXP
+Data Research Associates;iac.dra.com;210;DREWDB
+Deakin University -- Geelong,;Vic.,;Australia;(INNOPAC) library.deakin.edu.au 210 INNOPAC
+Deakin University;library.deakin.edu.au;210;INNOPAC
+Deichmanske bibliotek;z3950.deich.folkebibl.no;210;data
+Demokritos;iris.lib.demokritos.gr;210;libertas
+Dept of Foreign Affairs & International Trade;LIB-BIB.DFAIT-MAECI.GC.CA;210;INNOPAC
+Des Moines Public (Des Moines, IA);161.210.213.100;210;INNOPAC
+Des Moines University Osteopathic Medical Center (INNOPAC);library.dmu.edu;210;INNOPAC
+Det Sønderjydske Landsbibliotek;152.95.54.52;2100;DSL
+Det Sønderjydske Landsbibliotek;152.95.54.52;2100;OPNØR
+Dianalund Bibliotek;152.95.54.52;2101;S
+DIMDI;z3950gw.dimdi.de;2020;GE79
+DIMDI;z3950gw.dimdi.de;2020;HN69
+DIMDI;z3950gw.dimdi.de;2020;KL97
+DIMDI;z3950gw.dimdi.de;2020;ME0A
+DIMDI;z3950gw.dimdi.de;2020;ME60
+DIMDI;z3950gw.dimdi.de;2020;MK77
+DIMDI;z3950gw.dimdi.de;2020;ML66
+DIMDI;z3950gw.dimdi.de;2020;SP97
+DIMDI;z3950gw.dimdi.de;2020;SPPP
+DIMDI;z3950gw.dimdi.de;2020;T165
+Drake University (Des Moines, IA);lib.drake.edu;210;MARION
+Drake University -- Des Moines, Iowa (DRA);lib.drake.edu;210;ducats lawlib
+Drexel University -- Philadelphia, PA (INNOPAC);innopac.library.drexel.edu;210;INNOPAC
+Drexel University (Philadelphia, PA);innopac.library.drexel.edu;210;INNOPAC
+DTV's Alis target;odin.dtv.dk;2100;DTV01
+Dublin City University;136.206.1.14;5210;adop
+Dublin City University (epixtech Dynix);library.dcu.ie;210;DCU
+Duke U.;ducatalog.lib.duke.edu;210;MARION
+Dundee University;library.dundee.ac.uk;210;DUNDEE
+Earth Sciences Information Centre--Ottawa, Canada (INNOPAC);geoinfo.gsc.nrcan.gc.ca;210;INNOPAC
+Earth Sciences Information Centre (Ottawa, ON);geoinfo.gsc.nrcan.gc.ca;210;INNOPAC
+Eastern College --;St.;Davids,;PA (SIRSI) 204.78.4.2 2200 UNICORN
+Eastern Sierra Geospatial Data Clearinghouse;169.228.127.6;210;WMRSFGDC
+Ecole des Hautes Etudes Commerciales Bibliotheque Myriam & J-Robert Ouimet;biblio.hec.ca;210;hec
+EcoleNormale Supérieure de Cachan;138.231.48.2;21210;ADVANCE
+EcoleNormale Supérieure de Cachan;138.231.48.2;21210;MAIN*BIBMAST
+École Polytechnique de Montréal Bibliothèque;advance.biblio.polymtl.ca;210;ADVANCE
+École Polytechnique de Montréal, Bibliothèque;cat.biblio.polymtl.ca;210;ADVANCE
+École Polytechnique de Montréal -- Quebec, Canada (GEAC);cat.biblio.polymtl.ca;210;ADVANCE
+Edge Hill University College;lib3.edgehill.ac.uk;210;MAIN*BIBMAST
+Edgewood College (Madison, WI);139.135.32.4;210;INNOPAC
+Edgewood College -- Madison, Wisconsin (INNOPAC);oscar.edgewood.edu;210;INNOPAC
+EEVL;www.eevl.ac.uk;2100;eevlacuk
+El Dorado County Library -- Placerville, California (DRA);hobbes.lib.el-dorado.ca.us;210;ELDDB
+Emory Library Catalog;library.cc.emory.edu;2200;unicorn
+Emory University (Atlanta, GA);lib.cc.emory.edu;2200;unicorn
+Emory University (SIRSI);libcat1.cc.emory.edu;2200;UNICORN
+Encyclopaedia Britannica Online;z3950.eb.com;210;XXDEFAULT
+Etobicoke Public Libraries -- Ontario, Canada (GEAC);207.6.48.99;210;ADVANCE
+European Legislative Virtual Library (ELVIL) -- Czech Republic;www.psp.cz;2100;sntisk*3 sntisk*3 sntisk*2 sntisk*1 eurovoc*en eurovoc*en eurovoc*cz eurovoc*dk eurovoc*nl eurovoc*fr eurovoc*de eurovoc*it eurovoc*pt eurovoc*es 
+Five Colleges Database;128.119.168.1;210;INNOPAC
+Flinders University (Adelaide, SA, Australia);library.flinders.edu.au;210;ZServer
+Florida Center for Library Automation;z3950.fcla.edu;210;AM
+Florida Center for Library Automation;z3950.fcla.edu;210;CF
+Florida Center for Library Automation;z3950.fcla.edu;210;FA
+Florida Center for Library Automation;z3950.fcla.edu;210;FI
+Florida Center for Library Automation;z3950.fcla.edu;210;FO
+Florida Center for Library Automation;z3950.fcla.edu;210;FS
+Florida Center for Library Automation;z3950.fcla.edu;210;GC
+Florida Center for Library Automation;z3950.fcla.edu;210;NF
+Florida Center for Library Automation;z3950.fcla.edu;210;QB
+Florida Center for Library Automation;z3950.fcla.edu;210;RE
+Florida Center for Library Automation;z3950.fcla.edu;210;RF
+Florida Center for Library Automation;z3950.fcla.edu;210;RF RE FO ST SR Eol Palmm MD QB QCQF QEQCQF RE
+Florida Center for Library Automation;z3950.fcla.edu;210;SF
+Florida Center for Library Automation;z3950.fcla.edu;210;SR
+Florida Center for Library Automation;z3950.fcla.edu;210;ST
+Florida Center for Library Automation;z3950.fcla.edu;210;UF
+Florida Center for Library Automation;z3950.fcla.edu;210;WF
+Florida Community Colleges (CCLA);ccla.lib.fl.us;210;marion
+Florida State Library;stafla.dlis.state.fl.us;210;MARION
+Folger Shakespeare Library;titus.folger.edu;7090;VOYAGER
+Fort Stockton Public Library;12.162.136.67;210;dynix
+Four Colleges Database (Amherst, Hampshire,;Mt.;Holyoke,;Smith) fclibr.library.umass.edu 128.119.168.1 210 INNOPAC
+Four Colleges Database (INNOPAC);fclibr.library.umass.edu;210;INNOPAC
+Francis Marion College (Florence, SC);vax.fmarion.edu;210;MARION
+Frederiksberg Bibliotek;131.165.177.76;2100;S
+Fundación Universitaria Manuela Beltrán, Columbia;unicornio.umb.edu.co;2200;Unicorn
+"Gagarinskaya" CLS - Moscow;catalog.cbs.org.ru;210;okio
+GBV, Common Library Network of the German States Bremen, Hamburg, Mecklenburg-Vorpommern, Niedersachsen, Sachsen-Anhalt, Schleswig-Holstein and Thüringen;z3950.gbv.de;20011;GVK
+GEOLIBR;geolibr.uiggm.nsc.ru;210;cat
+GEOLIBR;geolibr.uiggm.nsc.ru;210;geocat
+GEOLIBR;geolibr.uiggm.nsc.ru;210;sibgz
+George Mason University (Endeavor);majel.gmu.edu;7090;VOYAGER
+George Mason University (Fairfax, VA);majel.gmu.edu;7090;VOYAGER
+George Washington University (Washington, DC);161.253.225.10;210;unicorn
+Getty Center for the History of Art and the Humanities (INNOPAC);opac.pub.getty.edu;210;INNOPAC
+Gladsaxe Bibliotekerne;bib.gladsaxe.dk;2100;S
+Glasgow Caledonian University;atlas.gcal.ac.uk;210;Dynix
+Glasgow University;eleanor.lib.gla.ac.uk;210;INNOPAC
+Glostrup Library, Denmark;gb.glostrupbib.dk;2100;S
+Government Information Locator Service;z3950.research.att.com;210;GILS
+GPNTB;star.gpntb.ru;210;katb
+Grambling University (Grambling, LA);gopac.gram.edu;210;MARION
+Griffith University;library.gu.edu.au;21210;ADVANCE
+Grimes Public Library--Grimes, Iowa;www.grimes.lib.ia.us;210;main
+Grinnell College Libraries;cat.lib.grin.edu;210;innopac
+Grosse Pointe Public Library -- Grosse Pointe Farms, MI (INNOPAC);207.74.210.3;210;INNOPAC
+groucho.lib.rochester.edu;128.151.244.116;7090;voyager
+Hallingdalsbibliotekene, Oppegård bibliotek, Ringerike bibliotek;ludvig.bibsent.no;9999;HAL01
+Hallingdalsbibliotekene, Oppegård bibliotek, Ringerike bibliotek;ludvig.bibsent.no;9999;OPP01
+Hallingdalsbibliotekene, Oppegård bibliotek, Ringerike bibliotek;ludvig.bibsent.no;9999;RIN01
+Hamilton College -- New York, NY (VTLS);150.209.8.72;2100;clas01
+Handels- og IngeniørHøjskolens Bibliotek, Herning;delta.hih.dk;210;HovedBasen
+Harrington Library Consortium (Amarillo, TX);HLC.ACTX.EDU;210;MARION
+Harrington Library Consortium (DRA);hlc.actx.edu;210;MARION
+Hays Public Library -- Hays, Kansas (SIRSI);doyle.fhsu.edu;2200;UNICORN
+Helsingør Kommunes Biblioteker;193.162.157.130;2100;S
+Herning Centralbibliotek;hcb.bibnet.dk;2100;S
+History Data Service;dasun1.essex.ac.uk;210;HDS_Catalogue
+Hjørring Bibliotek;max.hjbib.dk;2100;S
+Hobro Bibliotek;nobis.njl.dk;210;S
+Høje-Taastrup Kommunes Biblioteker;tora.htk.dk;2100;S
+Hong Kong Academy of Performing Arts;202.40.151.2;210;INNOPAC
+Hong Kong Academy of Performing Arts (INNOPAC);lib.hkapa.edu;210;INNOPAC
+Hong Kong Baptist U.;hkbulib.hkbu.edu.hk;210;INNOPAC
+Hong Kong Institute of Education;202.45.44.1;210;INNOPAC
+Hong Kong Institute of Education (INNOPAC);library.ied.edu.hk;210;INNOPAC
+Hong Kong University of Science & Technology;ustlib.ust.hk;202.64.164.248;210 INNOPAC
+Hong Kong University of Science & Technology;ustlib.ust.hk;210;INNOPAC
+Hope International University -- Fullerton, CA (Endeavor);voyager.hiu.edu;7090;VOYAGER
+Hurst Public Library -- Hurst, Texas (SIRSI);webcat.ci.hurst.tx.us;2200;UNICORN
+Idaho State University (Endeavor);opac.isu.edu;7090;VOYAGER
+IDS Basel Bern;aleph.unibas.ch;9909;DSV01
+IDS Zürich Universitaet;biblio.unizh.ch;9909;uzh01
+Ikast Bibliotek;ikast.ikast.bibnet.dk;2100;S
+Illinois State Curriculum Center (GEAC);resources.uis.edu;210;cl_default
+Index Data Test Target;bagel.indexdata.dk;210;gils
+Index Data Test Target;bagel.indexdata.dk;210;marc
+IndexGeo - Eco Companion Catalogue;indexgeo.com.au;6668;dataset
+Indiana State University Consortium (Endeavor);luis.indstate.edu;7090;VOYAGER
+Indiana State University Consortium;libaix.indstate.edu;210;LUIS
+Indiana University (Bloomington, IN);es33.uits.indiana.edu;2200;unicorn
+Indiana University (SIRSI);es33.uits.indiana.edu;2200;UNICORN
+Innovative Interfaces VEGA;demo.iii.com;210;INNOPAC
+Institute of Child Health and Institute of Neurology, University College London;library.ion.ucl.ac.uk;2200;ICH
+Institute of Child Health and Institute of Neurology, University College London;library.ion.ucl.ac.uk;2200;ION
+Institute of Child Health and Institute of Neurology, University College London;library.ion.ucl.ac.uk;2200;UNICORN
+Institute of Technology, Tallaght;millennium.it-tallaght.ie;210;INNOPAC
+Iowa City Public;204.42.192.1;210;cl_default
+Iowa City Public Library (INNOPAC);alec.iowa-city.lib.ia.us;210;INNOPAC
+Iowa State;University.;American;Archives of Factual Film (epixtech HORIZON) sc1-web.lib.iastate.edu 230 aaff
+Iowa State University (Ames, IA);tag.iastate.edu;210;ICAT
+Iowa State University Parks Library;www.lib.iastate.edu;280;horizon
+Istanbul Bilgi University, Turkey;library.bilgi.edu.tr;210;INNOPAC
+Jeffersonville Township Public Library -- Jeffersonville, Indiana (GEAC);jtpl.jefferson.lib.in.us;210;cl_default
+Jewish Public Library (Montréal, PQ);199.243.180.72;3950;DEFAULT
+Johns Hopkins University;catalog.lib.jhu.edu;210;horizon
+Juridisk Institutbibliotek;www.jurkat.jur.ku.dk;210;Hovedkatalog
+Juridisk Laboratorium;www.jurkat.jur.ku.dk;212;Specialer
+Kanawha County Libraries;129.71.143.12;2200;UNICORN
+Kanawha County Public Library -- Charleston, WV (SIRSI);kcpl.kanawha.lib.wv.us;2200;UNICORN
+Kansas City P. L.;vax1.kcpl.lib.mo.us;210;MARION
+Katona Jozsef County Library;ntsrv1.kjmk.hu;2210;titles
+Kazan Library Network;libr-115d.ksu.ru;210;kfei
+Kazan Library Network;libr-115d.ksu.ru;210;kgmu
+Kazan Library Network;libr-115d.ksu.ru;210;kgpu
+Kazan Library Network;libr-115d.ksu.ru;210;kgsa
+Kazan Library Network;libr-115d.ksu.ru;210;khc_ran
+Kazan Library Network;libr-115d.ksu.ru;210;lsl_art
+Kazan Library Network;libr-115d.ksu.ru;210;lsl_book
+Kazan Library Network;libr-115d.ksu.ru;210;nb_rt
+Kazan Library Network;libr-115d.ksu.ru;210;rmbic
+Kazan Library Network;libr-115d.ksu.ru;210;rub_rt
+Keene State College;ksclib.keene.edu;210;INNOPAC
+Keene State University (Keene, NH);158.65.8.4;210;INNOPAC
+Kentucky Community Colleges;128.163.18.27;210;LUCC
+Kentucky Community Colleges (NOTIS);128.163.18.27;210;LUCC
+Keystone Library Network, Edinboro;klnapp2.sshe.edu;10190;VOYAGER
+King's College London (ALEPH);library.kcl.ac.uk;9929;KCL01
+King's College (London, England);yew.kcl.ac.uk;9909;KCL01
+King's College London;magnolia.kcl.ac.uk;9929;KCL01
+Knihovna Univerzity Pardubice, Czech Republic;library.upce.cz;210;knihovna
+Københavns Kommunes Biblioteker;soya.kkb.bib.dk;2100;ART
+Københavns Kommunes Biblioteker;soya.kkb.bib.dk;210;S
+KOBV - Kooperativer Bibliotheksverbund Berlin-Brandenburg;se.kobv.de;9909;KBVQS
+Koc University, Turkey;libunix.ku.edu.tr;210;INNOPAC
+Kolding Folkebibliotek;194.239.156.133;2100;S
+Krajska vedecka knihovna v Liberci;www.svkli.cz;8888;li_un_artic
+Krajska vedecka knihovna v Liberci;www.svkli.cz;8888;li_un_cat
+Krajska vedecka knihovna v Liberci;www.svkli.cz;8888;li_un_cat_sud
+Krajska vedecka knihovna v Liberci;www.svkli.cz;8888;li_un_scat
+Kriminalistisk Bibliotek;www.jurkat.jur.ku.dk;211;Biblioteket
+Kristiansand bibliotek and Vest-Agder fylkesbibliotek;www.kristiansand.folkebibl.no;9999;KRS01
+KUS-ALICE;www.agralin.nl;210;clcz3950
+Kvinfo;129.142.53.66;211;Kvinfo
+La Crosse Public Library -- La Crosse,;Wis.;(epixtech;Dynix) 204.145.232.65 210 Dynix
+La Trobe University Library;library.latrobe.edu.au;210;INNOPAC
+Lebanon Valley College (Hanover, PA);library.lvc.edu;210;UNICORN
+Leeds Metropolitan University;serapis.lmu.ac.uk;2200;unicorn
+Leeds University -- Leeds, England (INNOPAC);129.11.22.8;210;INNOPAC
+Leeds University (Leeds, England);lib.leeds.ac.uk;129.11.22.8;210 innopac
+Leeds University;lib.leeds.ac.uk;210;INNOPAC
+Lehigh University (Bethlehem, PA);asa.lib.lehigh.edu;128.180.2.47;210 UNICORN
+Lehigh University -- Bethlehem, Pennsylvania (SIRSI);asa.lib.lehigh.edu;210;UNICORN
+Lemvig Bibliotek;lemvbib.lemvigbib.dk;2100;S
+Lewis and Clark College (Portland, OR);library.lclark.edu;149.175.20.20;210 INNOPAC
+Lewis & Clark College -- Portland, Oregon (INNOPAC);library.lclark.edu;210;INNOPAC
+LIBIS-Net;cc2.kuleuven.ac.be;3000;xxdefault
+Library of Congress;z3950.loc.gov;7090;voyager
+Library of JINR;lib1.jinr.ru;3001;liber
+Library of Linquistic University of Nizhny Novgorod;194.190.185.3;210;amark
+LIBRIS;z3950.libris.kb.se;210;libr
+Lillehammer bibliotek;z3950.lillehammer.folkebibl.no;210;data
+Lingnan College (Hong Kong, China);lnclib.lnc.hk;210;INNOPAC
+LISWA (Western Australia);202.14.152.4;210;INNOPAC
+London Business School;pluto.london.edu;2200;UNICORN
+London School of Economics;blpes.lse.ac.uk;2200;unicorn
+Loras College -- Dubuque, Iowa (epixtech HORIZON);192.152.29.200;210;loras
+Lords College;192.152.29.200;210;loras
+Louisiana State Library;204.177.220.4;210;ILLSearch
+Louisiana State University (Baton Rouge, LA);130.39.131.82;210;LOLA
+Loyola University Chicago (Endeavor);pegasus.luc.edu;7090;VOYAGER
+Loyola University (Chicago, IL);canisius.loyno.edu;2200;UNICORN
+Loyola University (New Orleans, LA);pegasus.luc.edu;7090;voyager
+Loyola University, New Orleans (SIRSI);canisius.loyno.edu;2200;UNICORN
+LSSI;Z39.50;Gateway;pwl-sparc2.pwl.com 204.177.220.4 210 ILLSearch
+Lubbock City-County Library -- Lubbock, Texas (SIRSI);newlib.ci.lubbock.tx.us;2200;UNICORN
+Luther College Preus Library;books.luther.edu;210;innopac
+Macquarie University Library;mars.ocs.mq.edu.au;210;CL_DEFAULT
+Maharishi University of Management (Fairfield, IA);vax.mum.edu;210;MARION
+Maharishi University of Management -- Fairfield, Iowa (SIRS Mandarin);208.145.205.206;210;bibliographic
+Mala;142.231.40.7;2200;UNICORN
+Malaspina University-College Library;malad2.mala.bc.ca;2200;UNICORN
+Malaspina University-College Library -- MARLIN;malad2.mala.bc.ca;2200;unicorn
+MAPLIN;pls.chc.gov.mb.ca;210;MAIN*BIBMAST
+Marcial Pons Librero;marcialpons.absysnet.com;2101;ABSYSMP
+Marcial Pons Librero;marcialpons.absysnet.com;2101;ABSYSMPC
+Maricopa County Library District;156.42.152.1;210;MARION
+Marin County P. L.;199.88.71.7;210;INNOPAC
+Marmot Consortium (CO);z3950.marmot.org;210;ADA ASP BUD CMC CNW COR CRM DEL DUR EAG LEW GAR GUN MPL MPS MST MON PTH PTK PVS SMG SWL SUM THR VAI
+Marshall University Libraries;miles.marshall.edu;3950;DEFAULT
+Mary Institute/Country Day School --;St.;Louis,;Missouri (DRA) lib.micds.pvt.k12.mo.us 210 MARION
+Mary Wahington College;library.mwc.edu;3001;DEFAULT
+Massachusetts Institute of Technology (ALEPH);library.mit.edu;9909;MIT01
+Massachusetts Institute of Technology (Cambridge, MA);grammy.mit.edu;9909;MIT01
+McALISTER LIBRARY;library2.fuller.edu;210;Horizon
+McGill University -- Montreal, Canada (ALEPH);aleph.mcgill.ca;210;MUSE
+McGill University (Montréal, PQ);aleph.mcgill.ca;9929;MUSE
+MEDITERRANEAN AGRONOMIC INSTITUTE OF CHANIA;zorbas.maich.gr;210;ADVANCE
+Memorial University of Newfoundland;info.library.mun.ca;2200;UNICORN
+Memorial University Of Newfoundland (SIRSI Unicorn 98 test server);scamper.library.mun.ca;2200;UNICORN
+Memorial University of Newfoundland (St. John's, NF);info.library.mun.ca;134.153.15.13;2200 UNICORN
+Metro Boston Library Network;mbln.lib.ma.us;210;MARION
+Metropolitan Library System -- Oklahoma County,;Okla.;164.58.86.18;210 MLS BOOK AUDIO VIDEO SERIAL
+Metropolitan Toronto Reference Library (VTLS);199.71.64.7;2100;MTRL
+Michigan State University (East Lansing, MI);magic.lib.msu.edu;210;INNOPAC
+Michigan State University (INNOPAC);magic.lib.msu.edu;210;INNOPAC
+Middlebury College;myriad.middlebury.edu;210;MIDCAT
+Milwaukee Public Library (INNOPAC);countycat.mcfls.org;210;INNOPAC
+Minneapolis Public Library (INNOPAC);mplwebcat.mpls.lib.mn.us;210;INNOPAC
+Minnesota State Colleges and Universities/Project for Automated Library Services (MnSCU/PALS);www.pals.msus.edu;210;SYS
+Mississippi State U.;libserv.msstate.edu;210;XXDEFAULT
+Missouri Bibliographic Information User System (MOBIUS);laurel.lso.umsystem.edu;210;INNOPAC
+Missouri Bibliographic Information User System (MOBIUS) -- MERLIN Cluster (INNOPAC);laurel.lso.umsystem.edu;210;INNOPAC
+Missouri Southern University (Joplin, MO);tag.mssc.edu;210;
+Missouri Western State College (DRA);catalog.mwsc.edu;210;MWSENG
+Missouri Western University (St. Joseph, MO);150.200.1.6;210;MARION
+MnSCU/PALS;www.pals.msus.edu;210;pals
+Monash University;supply.cc.monash.edu.au;7090;VOYAGER
+Moravian Library in Brno;aleph.mzk.cz;9909;MZK01
+Morehead State University -- Morehead, KY (Endeavor);morehead.kcvl.org;10090;VOYAGER
+Morehead State University (Morehead, KY);morehead.kcvl.org;10090;voyager
+Morris Automated Information Network;main.morris.org;210;MARION
+Moscow Business Library;213.171.40.126;210;ibis
+Moscow Bussines Library;www.mgdb.ru;210;ibis
+Mount Allison University;library.mta.ca;210;marion
+MSU;www.lib.msu.ru;210;LMSU
+Municipal Library Consortium of St. Louis County USA;204.184.14.1;210;DEFAULT
+Murdoch University;134.115.152.130;210;Innopac
+Museum of Modern Art -- New York, NY (Endeavor);library.moma.org;7090;VOYAGER
+Museum of Modern Art (New York, NY);library.moma.org;7090;voyager
+NACSIS-CAT Z39.50 Gateway Server;157.1.18.114;210;BIB
+Nanyang Tecnological University of Singapore;alpha.ntu.edu.sg;210;marion
+Napier University Library;library.napier.ac.uk;210;Dynix
+Nashville Public Library (INNOPAC);waldo.nashv.lib.tn.us;210;INNOPAC
+Nashville Public (Nashville, TN);waldo.nashv.lib.tn.us;170.142.5.70;210 INNOPAC
+Nasjonalbiblioteket, Norway;z3950.nb.no;2100;Norbok
+Nasjonalbiblioteket, Norway;z3950.nb.no;2100;Norper
+Nasjonalbiblioteket, Norway;z3950.nb.no;2100;Sambok
+Nasjonalbiblioteket, Norway;z3950.nb.no;2100;Samper
+National Art Library;library1.nal.vam.ac.uk;210;Catalogue
+National Art Library;library1.nal.vam.ac.uk;210;Computer
+National Art Library -- UK (epixtech Dynix);library1.nal.vam.ac.uk;210;xxdefault
+National CJK Service, Australia;cjk.nla.gov.au;210;Innopac
+National Kaohsiung First University of Science;lib1.nkfust.edu.tw;210;INNOPAC
+National Library of Australia;ilms.nla.gov.au;210;NLA
+National Library of Canada (Ottawa, ON);amicus.nlc-bnc.ca;210;ANY
+National Library of Education, Denmark;art.dlh.dk;2100;S
+National Library of Medicine (Bethesda, MD);tegument.nlm.nih.gov;7090;voyager
+National Library of Medicine (Endeavor);tegument.nlm.nih.gov;7090;VOYAGER
+National Library of Medicine -- History of Medicine Collection;wwwihm.nlm.nih.gov;5042;DEFAULT
+National Library of Medicine -- MEDLINE (PUBMED) via Index Data, Denmark;muffin.indexdata.dk;9014;pubmed
+National Library of New Zealand;zed.natlib.govt.nz;210;pinz
+National Library of Poland;alpha.bn.org.pl;210;INNOPAC
+National Library of Poland (INNOPAC);alpha.bn.org.pl;210;INNOPAC
+National Library of Scotland (Endeavor);z3950.nls.uk;7290;VOYAGER
+National Library of Scotland;z3950.nls.uk;7090;voyager
+National Library of South Africa;natlib1.unisa.ac.za;210;INNOPAC
+National Library of Wales (GEAC);geacprif.llgc.org.uk;210;ADVANCE
+National Library of Wales;geacprif.llgc.org.uk;210;MAIN*BIBMAST
+National Sea Grant Library -- University of Rhode Island);nsgd.gso.uri.edu;6668;NSGL
+National University of Singapore;linc.nus.edu.sg;210;innopac
+Natural History Museum;unicorn.nhm.ac.uk;2200;UNICORN
+Natural Resources Canada.;132.156.35.177;210;INNOPAC
+Natural Resources Canada.;132.156.35.177;210;NTS
+Natural Resources;Canada.;Earth;Sciences Info Centre   132.156.35.177 210 INNOPAC GEOSCAN
+NEOS Consortium -- University of Alberta (DRA);dra.library.ualberta.ca;210;MARION
+NERC Centre for Ecology and Hydrology;cehlib.nbu.ac.uk;2200;CEH
+New Haven Free Public Library -- New Haven, CT (INNOPAC);204.60.178.132;210;INNOPAC
+Newton Public Library;161.210.99.100;2200;unicorn
+Newton Public Library -- Newton, Iowa (SIRSI);unicorn.newton.lib.ia.us;2200;UNICORN
+New York State Dept of Health;199.184.19.10;210;innopac
+New York State;Dept.;of;Health   199.184.19.10 210 INNOPAC
+New York State Library;149.10.64.55;2200;UNICORN
+New York State Library;nysl.nysed.gov;2200;unicorn
+New York State Library (SIRSI);unix11.nysed.gov;2200;UNICORN
+New York University;bobcat.nyu.edu;128.122.23.205;210 Advance
+New York University Libraries;bobcat.nyu.edu;210;ADVANCE
+Niagara University -- Niagara University, NY (epixtech Dynix);207.10.157.2;210;dynix
+NK Praha, Czech Republic;sigma.nkp.cz;9909;NKC01
+NNOUNB - 2;nf3000.nounb.sci-nnov.ru;2100;liber
+NNSACU Library;c191-62.jungle.sci-nnov.ru;210;bibl
+NNSLU Library;lunnlib.lunn.sci-nnov.ru;210;mark4
+NOAA/Coastal Services Center Library (SIRSI);unicorn.csc.noaa.gov;2200;UNICORN
+NOAA Coastal Services Center;www.csc.noaa.gov;2210;CSC_Products
+NOAA National Data Center;nedi1.nedi.gov;220;FDL
+NOAA National Data Center;nedi1.nedi.gov;220;JST
+NOAA National Data Center;nedi1.nedi.gov;220;LISD
+NOAA National Data Center;nedi1.nedi.gov;220;NCDC
+NOAA National Data Center;nedi1.nedi.gov;220;NGDC
+NOAA National Data Center;nedi1.nedi.gov;220;NMFS
+NOAA National Data Center;nedi1.nedi.gov;220;NODC
+NOAA National Data Center;nedi1.nedi.gov;220;NSIDC
+NOBLE College Libraries;134.241.60.2;210;cl_default
+NOBLE Public Libraries;134.241.60.1;210;cl_default
+North Carolina Central Database (INNOPAC);sheba.ncat.edu;210;INNOPAC
+North Carolina Central University (DRA);beta.nccu.edu;210;MARION
+North Carolina Central University (Durham, NC);mars2.adp.nccu.edu;210;MARION
+North Carolina Coastal Database (INNOPAC);uncclc.coast.uncwil.edu;210;INNOPAC
+North Carolina Coastal Library Consortium;152.20.26.1;210;INNOPAC
+North Carolina State University;ncsulib.lib.ncsu.edu;210;MARION
+North Carolina Western Database (INNOPAC);wncln.appstate.edu;210;INNOPAC
+North Central Texas College (SIRSI);www2.nctc.cc.tx.us;2200;UNICORN
+North of Boston Library Exchange--NOBLE (INNOPAC);innopac.noblenet.org;210;INNOPAC
+North Richland Hills Public Library;nrhcat.library.nrhtx.com;210;INNOPAC
+Northwestern University (Endeavor);zsrv.library.nwu.edu;11090;VOYAGER
+Northwestern University (Evanston, IL);zsrv.library.nwu.edu;11090;Voyager
+NOTIS Systems;frost.notis.com;210;DMED DWIL
+Notre Dame (Notre Dame, IN);lib1.nd.edu;9909;NDU01PUB DWIL
+Nottingham Trent University Library & Information Services;152.71.100.1;210;ADVANCE
+NOUNB (Main Catalog);194.190.182.90;211;gete
+NOUNB (Main Catalog);194.190.182.90;211;liber
+NOUNB (Main Catalog);194.190.182.90;211;liber.old
+NOUNB (Main Catalog);194.190.182.90;211;liber.test1
+NOUNB (Main Catalog);194.190.182.90;211;liber.test2
+NOUNB (Nizhny Novgorod);z3950.nounb.sci-nnov.ru;210;cat43
+Novanet,;Inc.;--;Nova Scotia, Canada (GEAC) novanet.ns.ca 210 ADVANCE
+NOVANET (Nova Scotia);novanet.ns.ca;2999;NOVANET
+Nova Scotia Agricultural College (Truro, NS);novanet.ns.ca;2999;NOVANET
+Nova Scotia Provincial Library;rs6000.nshpl.library.ns.ca;210;AVR
+Nova Scotia Provincial Library;rs6000.nshpl.library.ns.ca;210;CBR
+Nova Scotia Provincial Library;rs6000.nshpl.library.ns.ca;210;CEH
+Nova Scotia Provincial Library;rs6000.nshpl.library.ns.ca;210;CUR
+Nova Scotia Provincial Library;rs6000.nshpl.library.ns.ca;210;ECR
+Nova Scotia Provincial Library;rs6000.nshpl.library.ns.ca;210;NSP
+Nova Scotia Provincial Library;rs6000.nshpl.library.ns.ca;210;PAR
+Nova Scotia Provincial Library;rs6000.nshpl.library.ns.ca;210;SSR
+Nova Scotia Provincial Library;rs6000.nshpl.library.ns.ca;210;WCR
+NSU Library;z3950.nsu.ru;210;alice
+NSU Library;z3950.nsu.ru;210;gash
+Nykøbing Sjælland Bibliotek;152.95.54.52;2103;NYB
+OCLC First Search;Tikal.dev.oclc.org;210;A&H Search
+OCLC;z3950.oclc.org;210;ArticleFirst BiographyIndex ERIC GeoRef WorldCat
+Odense Centralbibliotek;oda.fynbib.dk;2100;S
+OEL SSMU;medlib.tomsk.ru;9998;MEDLIB
+OhioLINK Central Catalog (INNOPAC);olc1.ohiolink.edu;210;INNOPAC
+OhioLink;olc1.ohiolink.edu;210;INNOPAC
+Ohio State University (Columbus, OH);128.146.22.3;210;INNOPAC
+Ohio State University (INNOPAC);felix.us.ohio-state.edu;210;INNOPAC
+Oklahoma State University (NOTIS);139.78.100.19;20003;OPAC
+Oklahoma State University--Tulsa (DRA);lib.uct.edu;210;UCTPAC
+Okresní knihovna Tábor, Czech Republic;srv2000.vkta.cz;8888;un_cat
+Old Colony Library Network;colony.ocln.org;210;xxdefault
+Old Dominion University -- Norfolk, VA (INNOPAC);iii.lib.odu.edu;210;INNOPAC
+Ontario Legislative Library;geodata.ontla.on.ca;210;MAIN*BIBMAST
+Open corporate library system of Tchelyabinsk region;www.lib.susu.ac.ru;2101;chel_books
+Open corporate library system of Tchelyabinsk region;www.lib.susu.ac.ru;2101;chryl_books
+Open corporate library system of Tchelyabinsk region;www.lib.susu.ac.ru;2101;chryl_region
+Open corporate library system of Tchelyabinsk region;www.lib.susu.ac.ru;2101;kopeisk_books
+Open corporate library system of Tchelyabinsk region;www.lib.susu.ac.ru;2101;ozersk_books
+Open corporate library system of Tchelyabinsk region;www.lib.susu.ac.ru;2101;susu_aref
+Open corporate library system of Tchelyabinsk region;www.lib.susu.ac.ru;2101;susu_books
+Open corporate library system of Tchelyabinsk region;www.lib.susu.ac.ru;2101;susu_period
+Open Library Systems Center, Russia;z3950.ruslan.ru;210;NEWS
+Open University;library2.open.ac.uk;7090;voyager
+Oregon State University (INNOPAC);oasis.orst.edu;210;INNOPAC
+Ovid;z3950.ovid.com;2213;eric
+Ovid;z3950.ovid.com;2213;pmed
+Oxford University, U.K.;library.ox.ac.uk;210;ADVANCE
+Palmer College of Chiropractic--Davenport, Iowa (epixtech HORIZON);205.221.214.60;210;PALMER
+Palmer College of Chiropractic (IA);205.221.214.60;210;
+Panola College -- Carthage, Texas (SIRSI);207.80.138.5;2200;UNICORN
+Pasadena Public Library;205.184.70.3;210;ADVANCE
+Pennsylvania State U.;128.118.88.200;210;catalog
+Pennsylvania State University;psulias.psu.edu;210;CATALOG
+Pinellas Park Public Library (epixtech Dynix);207.22.149.67;210;zserver
+POLIS Z2Web gateway;bagel.indexdata.dk;9001;polis
+Portland State University;131.252.129.52;2200;UNICORN
+Princeton Public Library;catalog.princeton.lib.nj.us;210;INNOPAC
+PROmemoria;195.31.151.66;2100;cini
+PROmemoria;195.31.151.66;2100;civici
+PROmemoria;195.31.151.66;2100;guggenheim
+PROmemoria;195.31.151.66;2100;querini_oa
+PROmemoria;195.31.151.66;2100;querini_s
+prospector;208.178.237.47;210;INNOPAC
+Purdue University-Calmut Campus;voyapps.lib.purdue.edu;11390;voyager
+Purdue University Calumet (Endeavor);voyapps.lib.purdue.edu;11390;VOYAGER
+Purdue University (Endeavor);voyapps.lib.purdue.edu;10090;VOYAGER
+Purdue University-North Central Campus;voyapps.lib.purdue.edu;11490;voyager
+Purdue University-West Lafayette Campus;voyapps.lib.purdue.edu;10090;voyager
+Queen Margaret University College;unicorn.qmced.ac.uk;2200;unicorn
+Queen Mary, University of London;qmwlib4.library.qmul.ac.uk;2200;Unicorn
+Queensland University of Technology Library;libcat.qut.edu.au;210;INNOPAC
+Queen's University (Kingston, ON);wolfe.library.queensu.ca;7090;voyager
+Radford U.;137.45.212.100;210;INNOPAC
+Radford University (INNOPAC);rulib.runet.edu;210;INNOPAC
+Rancho Mirage Public Library;rmch.rmpl.lib.ca.us;210;MARION
+RDN;z3950.rdn.ac.uk;210;xxdefault
+Rensselaer Polytechnic Institute -- Troy, NY (INNOPAC);opac.lib.rpi.edu;210;INNOPAC
+Research Data Management Services;gis.rdms.udel.edu;6668;Delaware
+Research Libraries Group;rlg.stanford.edu;210;BIB CATALOG
+Research Libraries Group;zinc.rlg.org;210;SAM
+Research Library Olomouc;kat.vkol.cz;9909;SVK01
+Research Library Olomouc;kat.vkol.cz;9909;SVK02
+Réseau informatisé des bibliothèques gouvernementales du Québec (RIBG);www.ribg.gouv.qc.ca;210;Z3950S
+Ribe Folkebibliotek;194.192.21.25;2100;S
+Rice University (Houston, TX);alexandria.rice.edu;210;UNICORN
+Ringkøbing bibliotek;videbibl.videbaekkom.dk;2101;T
+River Bend Library System;ql.rbls.lib.il.us;210;cl_default
+RMIT University;advance.lib.rmit.edu.au;21210;Advance
+Rochester Institute of Technology Libraries;albert.rit.edu;210;INNOPAC
+Rødovre Bibliotek;131.165.163.137;210;S
+Roskilde University Library;hans.ruc.dk;2100;S
+Royal Institute of Technology, Stockholm;innopac.lib.kth.se;210;innopac
+Royal Library of Danmark;z3950.kb.dk;2100;BGF01 BHS01 DJM01 DRA01 GRB01 KAB01 KBB01 KBH01 KBK01 KDM01 KGL01 KUI01 KVF01 NIA01 SAB01
+Royal Library of Denmark;z3950.kb.dk;2100;BGF01
+Royal Library of Denmark;z3950.kb.dk;2100;BHS01
+Royal Library of Denmark;z3950.kb.dk;2100;DJM01
+Royal Library of Denmark;z3950.kb.dk;2100;DRA01
+Royal Library of Denmark;z3950.kb.dk;2100;GRB01
+Royal Library of Denmark;z3950.kb.dk;2100;KAB01
+Royal Library of Denmark;z3950.kb.dk;2100;KBB01
+Royal Library of Denmark;z3950.kb.dk;2100;KBH01
+Royal Library of Denmark;z3950.kb.dk;2100;KBK01
+Royal Library of Denmark;z3950.kb.dk;2100;KDM01
+Royal Library of Denmark;z3950.kb.dk;2100;KGL01
+Royal Library of Denmark;z3950.kb.dk;2100;KUI01
+Royal Library of Denmark;z3950.kb.dk;2100;KVF01
+Royal Library of Denmark;z3950.kb.dk;2100;NIA01
+Royal Library of Denmark;z3950.kb.dk;2100;SAB01
+Royal Melbourne Institute of Technology (Melbourne, VC, Australia);z3950.mds.rmit.edu.au;210;ziw
+Royal Northern College of Music;library.rncm.ac.uk;210;MAIN*BIBMAST
+RSUH (RGGU) library;194.85.21.41;210;liber
+RUSLANet;ruslan.ru;210;a_subj
+RUSLANet;ruslan.ru;210;bbk
+RUSLANet;ruslan.ru;210;business
+RUSLANet;ruslan.ru;210;con
+RUSLANet;ruslan.ru;210;corp
+RUSLANet;ruslan.ru;210;demo
+RUSLANet;ruslan.ru;210;disser
+RUSLANet;ruslan.ru;210;ebooks
+RUSLANet;ruslan.ru;210;elib
+RUSLANet;ruslan.ru;210;etu
+RUSLANet;ruslan.ru;210;history
+RUSLANet;ruslan.ru;210;mpl
+RUSLANet;ruslan.ru;210;mplsubtez
+RUSLANet;ruslan.ru;210;nlrsh
+RUSLANet;ruslan.ru;210;olsc
+RUSLANet;ruslan.ru;210;order
+RUSLANet;ruslan.ru;210;pa_avs
+RUSLANet;ruslan.ru;210;pa_books
+RUSLANet;ruslan.ru;210;pa_files
+RUSLANet;ruslan.ru;210;pa_pers
+RUSLANet;ruslan.ru;210;pa_serial
+RUSLANet;ruslan.ru;210;pa_slide
+RUSLANet;ruslan.ru;210;pa_subj
+RUSLANet;ruslan.ru;210;pa_video
+RUSLANet;ruslan.ru;210;pers
+RUSLANet;ruslan.ru;210;pgu
+RUSLANet;ruslan.ru;210;plain
+RUSLANet;ruslan.ru;210;rdf
+RUSLANet;ruslan.ru;210;rusmarc_demo
+RUSLANet;ruslan.ru;210;sbor
+RUSLANet;ruslan.ru;210;seretr
+RUSLANet;ruslan.ru;210;serial
+RUSLANet;ruslan.ru;210;spslb
+RUSLANet;ruslan.ru;210;spstu
+RUSLANet;ruslan.ru;210;studoc
+RUSLANet;ruslan.ru;210;suai
+RUSLANet;ruslan.ru;210;subscr
+RUSLANet;ruslan.ru;210;talk
+RUSLANet;ruslan.ru;210;temp
+RUSLANet;ruslan.ru;210;test
+RUSLANet;ruslan.ru;210;trainee
+RUSLANet;ruslan.ru;210;usmarc_demo
+RUSLANet;ruslan.ru;210;z3950
+Sacramento Public Library (INNOPAC);www.saclibrarycatalog.org;210;INNOPAC
+Salt Lake City Public Library;salty.slcpl.lib.ut.us;210;INNOPAC
+Samara State Univesity - Scientific Library;weblib.ssu.samara.ru;2100;books
+Samara State Univesity - Scientific Library;weblib.ssu.samara.ru;2100;order
+Samara State Univesity - Scientific Library;weblib.ssu.samara.ru;2100;org
+Samara State Univesity - Scientific Library;weblib.ssu.samara.ru;2100;person
+Samara State Univesity - Scientific Library;weblib.ssu.samara.ru;2100;serial
+Samara State Univesity - Scientific Library;weblib.ssu.samara.ru;2100;subj
+Samara State Univesity - Scientific Library;weblib.ssu.samara.ru;2100;subscr
+Samara State Univesity - Scientific Library;weblib.ssu.samara.ru;2100;test
+San Francisco State University (INNOPAC);opac.sfsu.edu;210;INNOPAC
+San Francisco State University;opac.sfsu.edu;210;INNOPAC
+San Joaquin Valley Library System;pac.sjvls.lib.ca.us;210;ZSERVER
+SBN - National Library Service;opac.sbn.it;2100;nopac
+SBNonline - National Library Service;opac.sbn.it;3950;nopac
+SBS - University of Siena, Italy;sbs2.unisi.it;9909;SBS01
+SCD de l'Université de Reims;scd.univ-reims.fr;8002;scdreims
+SCD de l'Université Lyon 3;193.52.199.5;21210;ADVANCE
+SCD de l'Université Lyon 3;193.52.199.5;21210;MAIN*BIBMAST
+Scottish Cultural Resources Access Network;www.scran.ac.uk;3950;default
+Seton Hall University Law Library;149.150.235.200;210;INNOPAC
+Seton Hall University Law Library (INNOPAC);149.150.235.200;210;INNOPAC
+Sheffield Hallam University -- Sheffield, UK (INNOPAC);opac.shu.ac.uk;210;INNOPAC
+SHLS, Illinois;207.63.246.34;210;Dynix
+Silkeborg Bibliotek;silkbib.bib.dk;2100;S
+Simon Fraser U.;troy.lib.sfu.ca;210;INNOPAC
+Simpson College;198.206.243.2;210;INNOPAC
+Sioux City Public Library -- Sioux City, Iowa (epixtech Dynix);scity.sc.lib.ia.us;210;ZSERVER
+Skælskør Bibliotek;152.95.54.52;2105;SKB
+Skive Library;192.38.140.10;2100;S
+SKL HotBack Site at NSTN;indy.nstn.ns.ca;2007;BOOKS CATALOG
+Slagelse Centralbibliotek;152.95.54.52;210;S
+Slovenska akademia vied, Bratislava;rlw.savba.sk;8888;un_cat
+Slovenska akademia vied, Bratislava;rlw.savba.sk;8888;un_epca
+SLS;ashley.sls.co.uk;210;WHI
+Social Science Information Gateway;sosig.ac.uk;2104;sosig
+Sonoma State University (DRA);libaxp.sonoma.edu;210;MARION region news00 finley
+Sonoma State University (Sonoma, CA);vax.sonoma.edu;210;MARION
+South Bank University;library.sbu.ac.uk;3210;SBU
+South Bank University -- UK (epixtech Dynix);library.sbu.ac.uk;210;Darcy
+South Dakota Library Network (PALS);purl.sdln.net;210;SYS
+South Florida Ecosystem;sflwww.er.usgs.gov;251;sflwwwmeta
+Species Analyst databases;129.237.201.230;210;zbigsources
+Spokane Public Library;199.237.16.22;210;MARION
+Spokane Public Library (DRA);199.237.16.22;210;MARION
+Spring Arbor College;leopard.arbor.edu;210;UNICORN
+Spring Arbor College--Spring Arbor,;Mich.;(SIRSI);leopard.arbor.edu 210 UNICORN
+Spring Hill College--Mobile, Alabama;library.shc.edu;2200;UNICORN
+SPSTL SB RAS - n/s;camelot.spsl.nsc.ru;2100;cat
+State Library of Iowa;server.silo.lib.ia.us;5000;statelib
+State Library of Louisiana;bserver.state.lib.la.us;204.177.220.4;210 ILLSearch
+State Library of Louisiana (epixtech HORIZON);bserver.state.lib.la.us;210;HORIZON
+State Library of South Australia;143.216.21.3;210;INNOPAC
+State Library of Victoria;slv950.slv.vic.gov.au;2010;dynix
+State of Iowa Libraries Online;server.silo.lib.ia.us;210;locator
+State University of New York at Binghamton (NOTIS);bingaixa.cc.binghamton.edu;20003;LXIR
+State University of New York at Stony Brook (NOTIS);librs.cc.sunysb.edu;20003;STARS
+Státní technická knihovna, Czech Republic;ultranet.stk.cz;8888;stk_un_cat
+Statsbiblioteket;vega.statsbiblioteket.dk;210;Horizon
+Stavanger bibliotek;bokbase.stavanger.folkebibl.no;9909;NOR01
+St. Edwards University -- Austin, Texas (SIRSI);libr.stedwards.edu;2200;UNICORN
+Steiermrkischen Landesbibliothek;one.stmk.gv.at;2100;miopac
+Stirling University;moray.stir.ac.uk;210;dynix
+St. Mary's University -- San Antonio, TX (epixtech Dynix);maria.stmarytx.edu;210;xxdefault
+Stockholm University (Endeavor);katalog.sub.su.se;7090;VOYAGER
+Stockholm University;katalog.sub.su.se;7090;voyager
+Stonehill College;lib.stonehill.edu;210;INNOPAC
+Stonehill College -- North Easton, Massachusetts (INNOPAC);lib.stonehill.edu;210;INNOPAC
+St. Paul Public Library (INNOPAC);alpha.stpaul.lib.mn.us;210;INNOPAC
+Strathclyde University -- Scotland (epixtech Dynix);130.159.64.152;210;HORIZON
+Struer Library;131.165.209.4;2100;S
+SUNY at Albany;169.226.1.120;21210;MAIN*BIBMAST
+Supreme Court of Canada;204.19.231.172;210;Z3950S
+Supreme Court of Canada (Best-Seller);catalog.sup.bestseller.com;210;Z3950S
+Svinninge Bibliotek;152.95.54.52;2102;SVB
+Swinburne University of Technology Library;lib.cc.swin.edu.au;210;ollie
+Syddansk Universitetsbibliotek;odin2.bib.sdu.dk;210;Horizon
+Syracuse University -- Syracuse, NY (Endeavor);summit.syr.edu;7090;VOYAGER
+Syracuse University (Syracuse, NY);summit.syr.edu;7090;voyager
+Tamkang University -- Tan-shui chen, Taiwan (VTLS);163.13.35.28;3000;DEFAULT
+Temple University (Philadelphia, PA);155.247.160.18;210;INNOPAC
+Temple University -- Philadelphia, PA (INNOPAC);155.247.160.18;210;INNOPAC
+Texas A&M University (College Station, TX);libcat.tamu.edu;7090;voyager
+Texas A & M University--Corpus Christi (INNOPAC);portal.tamucc.edu;210;INNOPAC
+Texas A&M University, Corpus Christi;portal.tamucc.edu;210;INNOPAC
+Texas A & M University Database (Endeavor);libcat.tamu.edu;7090;VOYAGER
+Texas Christian University;lib.tcu.edu;210;MARION
+Texas Health Science Consortium;ils.library.tmc.edu;210;UNICORN
+Texas State Library;204.65.32.20;2200;unicorn
+Texas State Library & Archives Commission;star.tsl.state.tx.us;2200;UNICORN
+Texas State Technical College -- Harlingen, Texas (SIRSI);161.109.138.190;2200;UNICORN
+Texas TRAIL service;minerva.tsl.state.tx.us;2100;texas-TexasDublinCore
+Texas Wesleyan University (SIRSI);lib.txwes.edu;2200;UNICORN
+The Aarhus School of Business;merkur.hha.dk;2100;hba01
+Theological Consortium of Greater Columbus (Endeavor);www.tcgc.capital.edu;7090;VOYAGER
+The Royal Library, Sweden;z3950.libris.kb.se;210;libr
+The University of Chicago Library;colossus.uchicago.edu;210;uofc
+Titech Digital Library;131.112.119.70;210;resource
+Tom Green County Library -- Texas (GEAC);204.66.32.252;210;MAIN*BIBMAST
+Tomsk Polytechnic University;proxy2.lib.tpu.ru;2100;book
+Tomsk Polytechnic University;proxy2.lib.tpu.ru;2100;demo
+Tomsk Polytechnic University;proxy2.lib.tpu.ru;2100;exfound
+Tomsk Polytechnic University;proxy2.lib.tpu.ru;2100;order
+Tomsk Polytechnic University;proxy2.lib.tpu.ru;2100;person
+Tomsk Polytechnic University;proxy2.lib.tpu.ru;2100;prd
+Tomsk Polytechnic University;proxy2.lib.tpu.ru;2100;subj
+Tomsk Polytechnic University;proxy2.lib.tpu.ru;2100;subscr
+Tomsk Polytechnic University;proxy2.lib.tpu.ru;2100;temp
+Tomsk Polytechnic University;proxy2.lib.tpu.ru;2100;tpu
+Tomsk Polytechnic University;proxy2.lib.tpu.ru;2100;ucat
+TPU;z3950.lib.tpu.ru;9999;BOOK
+Trinity College Dublin;library.tcd.ie;210;advance
+TriUniversity Group of Libraries;l1.uwaterloo.ca;7090;VOYAGER
+Trondheim folkebibliotek;z3950.trondheim.folkebibl.no;210;data
+Truman State University--Kirksville,;Mo.;(INNOPAC);lance.missouri.edu 210 INNOPAC
+Truman State University;lance.missouri.edu;210;INNOPAC
+Tulane University -- New Orleans, LA (Endeavor);voyager.tcs.tulane.edu;7090;VOYAGER
+Tulane University (New Orleans, LA);voyager.tcs.tulane.edu;7090;voyager
+Tulsa City County;198.207.222.1;210;TCCL
+Tulsa-City County Library (NOTIS);ns1.tccl.lib.ok.us;210;TCCL
+Tver Library Information Community;z39.library.tver.ru;210;NLR.TEST
+Tver Library Information Community;z39.library.tver.ru;210;RZHEV.KRAY
+Tver Library Information Community;z39.library.tver.ru;210;RZHEV.MAIN
+Tver Library Information Community;z39.library.tver.ru;210;RZHEV.PODP
+Tver Library Information Community;z39.library.tver.ru;210;TBS.MAIN
+Tver Library Information Community;z39.library.tver.ru;210;TORZH.KRAY
+Tver Library Information Community;z39.library.tver.ru;210;TORZH.MAIN
+Tver Library Information Community;z39.library.tver.ru;210;TORZH.PODP
+Tver Library Information Community;z39.library.tver.ru;210;TOUNB.KRAY
+Tver Library Information Community;z39.library.tver.ru;210;TOUNB.MAIN
+Tver Library Information Community;z39.library.tver.ru;210;TOUNB.PODP
+Tver Library Information Community;z39.library.tver.ru;210;TSTU.MAIN
+Tver Library Information Community;z39.library.tver.ru;210;TSTU.PODP
+Tver Library Information Community;z39.library.tver.ru;210;TVERMED.MAIN
+Tver Library Information Community;z39.library.tver.ru;210;TVERSU.MAIN
+Tver Library Information Community;z39.library.tver.ru;210;TVERSU.PODP
+Tver Library Information Community;z39.library.tver.ru;210;TVERSU.TEST
+Tver Library Information Community;z39.library.tver.ru;210;VVOL.KRAY
+Tver Library Information Community;z39.library.tver.ru;210;VVOL.MAIN
+Tver Library Information Community;z39.library.tver.ru;210;VVOL.PODP
+U Autonoma de Madrid;oruga.bibcen.uam.es;2200;unicorn
+UB-Braunschweig;ubsun01.biblio.etc.tu-bs.de;2020;bac
+UB-Braunschweig;ubsun01.biblio.etc.tu-bs.de;2020;opac
+UIGGM SB RAS - Bibliographic;z3950-2.uiggm.nsc.ru;210;geocat
+UIGGM SB RAS - Bibliographic;z3950-2.uiggm.nsc.ru;210;geocrf
+UIGGM SB RAS - Bibliographic;z3950-2.uiggm.nsc.ru;210;geotrn
+UIGGM SB RAS - Bibliographic;z3950-2.uiggm.nsc.ru;210;nsk
+UIGGM SB RAS - Bibliographic;z3950-2.uiggm.nsc.ru;210;sibgz
+U Laval;ariane.ulaval.ca;210;DIAPO
+U Laval;ariane.ulaval.ca;210;DIDAC
+U Laval;ariane.ulaval.ca;210;ULAV
+UNED, Spane;biblio15.uned.es;2200;unicorn
+UNILINC - Sydney;graeae.unilinc.edu.au;210;MARION
+Union Theological Seminary;12.4.242.230;210;Unicorn
+United States Military Academy West Point;129.29.90.240;210;INNOPAC
+United States Naval Academy Annapolis;131.121.188.1;210;INNOPAC
+United States Naval Academy, Annapolis (INNOPAC);library.nadn.navy.mil;210;INNOPAC
+Univ Carlos III de Madrid, Spane;biblioteca.uc3m.es;2200;unicorn
+Univ. Complutense de Madrid, Spane;cisne.sim.ucm.es;210;INNOPAC
+Univ. de Alcalá de Henares, Spane;biblio.uah.es;2200;unicorn
+Univ. de Alicante, Spane;gaudi.ua.es;2200;unicorn
+Univ de Jaén, Spane;www2.ujaen.es;210;AbsysE
+Univ. de La Laguna, Spane;193.145.120.49;210;AbsysE
+Univ. de las Islas Baleares, Spane;130.206.134.239;210;INNOPAC
+Univ. de Oviedo;pescal.uniovi.es;1316;any
+Universidad de Chile;biblios.dic.uchile.cl;210;BELLO
+Universidad de Chile;biblios.dic.uchile.cl;210;marion
+Universidad de Jaén--Jaén, Spain (Baratz);venzala.ujaen.es;210;Absyse
+Universidad del Sagrado Corazon;uscbib.sagrado.edu;2200;unicorn
+Universidad Pública de Navarra;brocar.unavarra.es;9999;libros
+Universidad Pública de Navarra;brocar.unavarra.es;9999;revistas
+Università di Firenze;opac.unifi.it;210;OPAC
+Universität Potsdam;141.89.36.196;2020;NEL
+Universitäts- und Landesbibliothek;134.99.136.10;2020;opac
+Université catholique de Louvain;bib.sia.ucl.ac.be;3520;DEFAULT
+Université de Montréal;atrium.bib.umontreal.ca;210;ADVANCE
+Université de Sherbrooke;catalo.biblio.usherb.ca;210;SIBUS
+Université Laval;ariane.ulaval.ca;132.203.250.33;210 ulav
+Université Laval (DRA);ariane.ulaval.ca;210;ULAV DIDAC DIAPO
+Université Libre de Bruxelles Online Catalog;www.cible.ulb.ac.be;2200;Unicorn
+University Center at Tulsa;lib.uct.edu;210;UCTPAC
+University College Cork;library.ucc.ie;210;INNOPAC
+University College, Galway;140.203.7.200;210;darcy
+University College, Galway--Ireland (epixtech Dynix);darcy.ucg.ie;210;Darcy
+University of Adelaide -- Australia;catalog.library.adelaide.edu.au;210;ANY
+University of Alabama, Huntsville;library.uah.edu;210;UNICORN
+University of Alabama, Huntsville (SIRSI);libsirsi.uah.edu;2200;UNICORN
+University of Alabama in Birmingham;scotty.mhsl.uab.edu;7090;VOYAGER
+University of Arizona (INNOPAC);sabio.library.arizona.edu;210;INNOPAC
+University of Arizona;sabio.library.arizona.edu;128.196.135.220;210 INNOPAC
+University of Arkansas, Fayetteville (INNOPAC);library.uark.edu;210;INNOPAC
+University of Auckland -- Auckland, New Zealand (Endeavor);voyager.auckland.ac.nz;7090;VOYAGER
+University of Bradford;library.brad.ac.uk;210;xxDefault
+University of Calgary (SIRSI);osiris.lib.ucalgary.ca;2200;UNICORN
+University of California, Berkeley;infocal.berkeley.edu;210;CATALOG PE
+University of California, Irvine (INNOPAC);antpac.lib.uci.edu;210;INNOPAC
+University of California MELVYL;melvyl.ucop.edu;210;CATALOG PE TEN
+University of California -- MELVYL System;melvyl.ucop.edu;210;CAT PE
+University of California, Riverside (INNOPAC);scotty.ucr.edu;210;INNOPAC
+University of California, San Francisco (INNOPAC);ucsfcat.library.ucsf.edu;210;INNOPAC
+University of Colorado, Boulder (INNOPAC);libraries.Colorado.EDU;210;INNOPAC
+University of Colorado, Colorado Springs (INNOPAC);library.uccs.edu;210;INNOPAC
+University of Connecticut Medical Library;lyman.uchc.edu;210;LYMAN
+University of Crete - Rethymnon Library;z3950.libr.uoc.gr;210;logios
+University of Crete - Rethymnon Library;z3950.libr.uoc.gr;210;ptolemeos_ii
+University of East Anglia Library;library.uea.ac.uk;210;default
+University of Edinburgh;catalogue.lib.ed.ac.uk;7090;voyager
+University of Edinburgh -- Scotland (Endeavor);catalogue.lib.ed.ac.uk;7090;VOYAGER
+University of Gent, Belgum;catserv.rug.ac.be;9909;RUG01
+University of Georgia (Endeavor);voyager.galib.uga.edu;7090;VOYAGER
+University of Hertfordshire;voyager.herts.ac.uk;7090;VOYAGER
+University of Hong Kong (INNOPAC);library.hku.hk;210;INNOPAC
+University of Houston (INNOPAC);library.uh.edu;210;INNOPAC
+University of Huddersfield;library.hud.ac.uk;210;HORIZON
+University of Hull;libsys.lib.hull.ac.uk;210;INNOPAC
+University of Illinois, Chicago;dra.ilcso.uiuc.edu;210;illinet_online
+University of Illinois, Chicago (NOTIS);owl.cc.uic.edu;210;UICOPAC1
+University of Illinois, Urbana-Champaign;dra.ilcso.uiuc.edu;210;illinet_online
+University of Iowa (ALEPH);ocean.lib.uiowa.edu;9949;UIOWA
+University of Iowa;ocean.lib.uiowa.edu;9949;INFOHAWK
+University of Kentucky;infokat.uky.edu;7090;voyager
+University of Lethbridge (INNOPAC);eureka.uleth.ca;210;INNOPAC
+University of London (INNOPAC);consull.ull.ac.uk;210;INNOPAC
+University of Massachusetts, Amherst;umlibr.library.umass.edu;128.119.168.2;210 INNOPAC
+University of Massachusetts at Amherst (INNOPAC);umlibr.library.umass.edu;210;INNOPAC
+University of Massachusetts Dartmouth (Endeavor);voyager.lib.umassd.edu;7090;VOYAGER
+University of Melbourne;library.unimelb.edu.au;210;INNOPAC
+University of Michigan, Dearborn (INNOPAC);wizard.umd.umich.edu;210;INNOPAC
+University of Michigan School of Business;141.211.227.11;210;INNOPAC
+University of Minitoba;falcon.cc.umanitoba.ca;210;MARION
+University of Minnesota, Morris (GEAC);library.mrs.umn.edu;210;cl_default
+University of Missouri (INNOPAC);laurel.lso.missouri.edu;210;INNOPAC
+University of Missouri;laurel.lso.missouri.edu;210;INNOPAC
+University of Montana;150.131.101.7;6668;UMT-NSDI
+University of Nebraska, Lincoln;129.93.16.3;210;INNOPAC
+University of Nebraska--Lincoln (INNOPAC);iris.unl.edu;210;INNOPAC
+University of Nebraska, Omaha;137.48.70.1;210;INNOPAC
+University of New Brunswick;131.202.3.22;210;unicorn
+University of New Brunswick (SIRSI);131.202.3.22;2200;UNICORN
+University of Newcastle Library, Australia;library.newcastle.edu.au;210;INNOPAC
+University of Newcastle Library;library.newcastle.edu.au;210;INNOPAC
+University of North Carolina at Greensboro (DRA);mickey.uncg.edu;210;MARION
+University of North Carolina, Chapel Hill;sidney.lib.unc.edu;210;MARION
+University of North Carolina, Greensboro;mickey.uncg.edu;210;MARION
+University of Northern Colorado (INNOPAC);source.unco.edu;210;INNOPAC
+University of Northern Iowa;134.161.20.21;210;INNOPAC
+University of Northern Iowa (INNOPAC);unistar.uni.edu;210;INNOPAC
+University of North Texas (INNOPAC);library.unt.edu;210;INNOPAC
+University of North Texas;library.unt.edu;210;INNOPAC
+University of Oklahoma;129.15.70.20;2200;unicorn
+University of Oklahoma (NOTIS);129.15.71.15;20003;OUOPAC
+University of Oregon (INNOPAC);janus.uoregon.edu;210;INNOPAC
+University of Oregon;janus.uoregon.edu;210;INNOPAC
+University of Patras;150.140.130.40;210;ADVANCE
+University of Pennsylvania (Endeavor);libdb.lib.upenn.edu;7090;VOYAGER
+University of Pennsylvania Law Library (INNOPAC);lola.law.upenn.edu;210;INNOPAC
+University of Pennsylvania;libdb.lib.upenn.edu;7090;voyager
+University of Piraeus Library;socrates.lib.unipi.gr;210;ptolemeos_ii
+University of Pittsburg (Endeavor);pittcat.pitt.edu;7090;VOYAGER
+University of Pittsburgh;pittcat.pitt.edu;7090;voyager
+University of Reading;vlsirsi.rdg.ac.uk;2200;UNICORN
+University of Rochester (Endeavor);groucho.lib.rochester.edu;7090;VOYAGER
+University of Rochester;groucho.lib.rochester.edu;7090;VOYAGER
+University of Saskatchewan (INNOPAC);sundog.usask.ca;210;INNOPAC
+University of Scranton;cat.uofs.edu;210;MARION
+University of Sheffield;vega.shef.ac.uk;5210;ADOP
+University of South Alabama (NOTIS);192.245.221.252;20003;LUMI
+University of South Australia Library;library.levels.unisa.edu.au;210;dynix
+University of South Carolina (NOTIS);129.252.41.98;20003;USCAN
+University of Southern Alabama;192.245.221.252;20003;LUMI
+University of Southern Queensland -- Australia (VTLS);virtua2.usq.edu.au;9001;DEFAULT
+University of Strathclyde;130.159.64.152;210;horizon
+University of Tampa -- Tampa, Florida (Endeavor);utopia.utampa.edu;7090;VOYAGER
+University of Technology, Sydney;orac.lib.uts.edu.au;210;INNOPAC
+University of Tennessee Knoxville Libraries;inca.lib.utk.edu;2026;horizon
+University of Texas, Arlington;pulse.uta.edu;7099;pulse
+University of Texas Southwestern Medical Center (SIRSI);medcat.library.swmed.edu;2200;UNICORN
+University of Texas, Tarlton Law Library;128.83.82.249;210;INNOPAC
+University of the Witwatersrand, South Africa;innopac.wits.ac.za;210;INNOPAC
+University of Victoria Law Library;voyager.law.uvic.ca;7590;voyager
+University of Victoria -- Victoria, BC (Endeavor);voyager.library.uvic.ca;7090;VOYAGER
+University of Victoria;voyager.library.uvic.ca;7090;voyager
+University of Virginia (SIRSI);virgo.lib.virginia.edu;2200;UNICORN
+University of Virginia;virgo.lib.virginia.edu;2200;UNICORN
+University of Wales -- Aberystwyth, UK (Endeavor);voyager.aber.ac.uk;7090;VOYAGER
+University of Western Australia;strife.library.uwa.edu.au;210;innopac
+University of Western Australia;strife.library.uwa.edu.au;210;INNOPAC
+University of Windsor;voyager.uwindsor.ca;10090;VOYAGER
+University of Wisconsin, Colleges (Endeavor);sundata.uwsp.edu;10090;VOYAGER
+University of Wisconsin--Eau Claire (Endeavor);voyager2.uwec.edu;7090;VOYAGER
+University of Wisconsin, Eau Claire;voyager2.uwec.edu;7090;voyager
+University of Wisconsin--Green Bay (Endeavor);hubvoydb.doit.wisc.edu;7390;VOYAGER
+University of Wisconsin, Green Bay;hubvoydb.doit.wisc.edu;7390;voyager
+University of Wisconsin--La Crosse (Endeavor);lavoyage.uwlax.edu;7090;VOYAGER
+University of Wisconsin, Lacrosse;lavoyage.uwlax.edu;7090;voyager
+University of Wisconsin--Madison (Endeavor);z3950.library.wisc.edu;210;madison
+University of Wisconsin, Madison;z3950.library.wisc.edu;210;voyager
+University of Wisconsin--Milwaukee (Endeavor);panizzi.lib.uwm.edu;7090;VOYAGER
+University of Wisconsin, Milwaukee;panizzi.lib.uwm.edu;7090;voyager
+University of Wisconsin--Oshkosh (Endeavor);hubvoydb.doit.wisc.edu;7190;VOYAGER
+University of Wisconsin, Oshkosh;hubvoydb.doit.wisc.edu;7190;voyager
+University of Wisconsin--Parkside (Endeavor);voyager.uwp.edu;7090;VOYAGER
+University of Wisconsin, Parkside;voyager.uwp.edu;7090;voyager
+University of Wisconsin--Platteville (Endeavor);hubvoydb.doit.wisc.edu;7090;VOYAGER
+University of Wisconsin--River Falls (Endeavor);sunny.dl.uwrf.edu;7090;VOYAGER
+University of Wisconsin, River Falls;sunny.dl.uwrf.edu;7090;voyager
+University of Wisconsin--Stevens Point (Endeavor);sundata.uwsp.edu;7090;VOYAGER
+University of Wisconsin, Stevens Point;sundata.uwsp.edu;7090;voyager
+University of Wisconsin--Stout (Endeavor);144.13.20.198;7090;VOYAGER
+University of Wisconsin--Superior (Endeavor);hubvoydb.doit.wisc.edu;7290;VOYAGER
+University of Wisconsin, Whitewater;140.146.128.142;7090;voyager
+University of Wisconsin--Whitewater (Endeavor);140.146.128.142;7090;VOYAGER
+University of Wollongong;130.130.68.;210;INNOPAC
+University of York;library.york.ac.uk;210;DYNIX
+Univ. Politécnica de Madrid, Spane;marte.biblioteca.upm.es;2200;unicorn
+Univ. Rey Juan Carlos, Spane;centauro.urjc.es;2200;unicorn
+U. of Alberta;129.128.5.180;210;Marion
+U of British Columbia;dra.library.ubc.ca;210;MARION
+U of Calgary;clavis.ucalgary.ca;2200;UNICORN
+U of California MELVYL;melvyl.ucop.edu;210;PE
+U of California - San Francisco;128.218.15.173;210;INNOPAC
+U of Colorado - Boulder;128.138.154.137;210;INNOPAC
+U of Crete School of Science;z3950.libh.uoc.gr;210;default
+U of Hull;library.hull.ac.uk;210;INNOPAC
+U of Manitoba;bison.umanitoba.ca;210;MARION
+U of Massachusetts at Amherst;128.119.168.2;210;INNOPAC
+U of Michigan, Dearborn;141.215.16.4;210;INNOPAC
+U of Michigan;tag1.lib.umich.edu;210;FLNT
+U of Michigan;tag1.lib.umich.edu;210;MCAT
+U of Minnesota;notistag.ais.umn.edu;210;LUMINA
+U of New Brunswick;quest.unb.ca;2200;unicorn
+U of Newcastle upon Tyne;advance.ncl.ac.uk;210;ADVANCE
+U of North Carolina - Chapel Hill;unclib.lib.unc.edu;210;MARION
+U of Northern Wales;147.143.2.5;210;INNOPAC
+U of Pennsylvania Law Library;130.91.144.191;210;INNOPAC
+U of Queensland;130.102.42.45;210;Innopac
+U of Saskatchewan;128.233.74.78;210;INNOPAC
+U of South Carolina;129.252.41.12;20006;USCAN
+U of Sydney;129.78.72.7;210;INNOPAC
+U of Texas - Austin;utcatz.lib.utexas.edu;210;zcat
+U of Toronto;utcat.library.utoronto.ca;210;MARION
+U of Wales, Bangor;library.bangor.ac.uk;210;INNOPAC
+U of Western Ontario;alpha.lib.uwo.ca;210;INNOPAC
+U of Wollongong;130.130.68.7;210;INNOPAC
+U.S. Geological Survey EROS Data Center;edcsns17.cr.usgs.gov;6675;AVHRR
+U.S. Geological Survey EROS Data Center;edcsns17.cr.usgs.gov;6675;CORONASATELLITEPHOTOGRAPHY
+U.S. Geological Survey EROS Data Center;edcsns17.cr.usgs.gov;6675;DOQ
+U.S. Geological Survey EROS Data Center;edcsns17.cr.usgs.gov;6675;HAZARDS
+U.S. Geological Survey EROS Data Center;edcsns17.cr.usgs.gov;6675;LANDSATETM/EDC
+U.S. Geological Survey EROS Data Center;edcsns17.cr.usgs.gov;6675;LANDSAT_MSS
+U.S. Geological Survey EROS Data Center;edcsns17.cr.usgs.gov;6675;LANDSAT_TM
+U.S. Geological Survey EROS Data Center;edcsns17.cr.usgs.gov;6675;MAPS
+U.S. Geological Survey EROS Data Center;edcsns17.cr.usgs.gov;6675;NAPP
+U.S. Geological Survey EROS Data Center;edcsns17.cr.usgs.gov;6675;NHAP
+U.S. Geological Survey geoscience data;geo-nsdi.er.usgs.gov;210;geology
+U.S. Geological Survey Library;igsrglib02.er.usgs.gov;5001;horizon
+U.S. Geological Survey Library;igsrglib02.er.usgs.gov;5001;usgs_mic
+USGS Water Information;water.usgs.gov;5555;usgswrd
+Utah State University;129.123.1.38;20003;OPAC
+Vanderbilt University;acorn.library.vanderbilt.edu;2200;ACORN
+Viborg Centralbibliotek;130.228.100.132;2100;DAN03_VCB
+Victoria University Library (Australia);library.vu.edu.au;210;INNOPAC
+Videbæk bibliotek;videbibl.videbaekkom.dk;2100;S
+Vigo County P. L.;vax1.vigo.lib.in.us;210;MARION
+Villanova University -- Villanova, PA (Endeavor);voyager.lib.vill.edu;7090;VOYAGER
+Villanova University (Villanova, PA);voyager.lib.vill.edu;7090;voyager
+Ville de Montréal;merlinweb.ville.montreal.qc.ca;2100;Z3950S
+Vinderup Bibliotek;www2.vinderup.dk;2100;S
+Virginia Commonwealth U.;128.172.2.40;20003;DCAT
+Viterbo College -- La Crosse,;Wis.;(INNOPAC);library.viterbo.edu 210 INNOPAC
+Vitus Bering. Teknisk - Merkantilt Bibliotek;80.198.130.37;210;Teknisk-Merkantilt-Bibliotek
+VK Olomouc, Czech Republic;alpha.svkol.cz;9909;SVK01
+VK Olomouc, Czech Republic;alpha.svkol.cz;9909;SVK02
+Vrije Universiteit;ubvucat.vu.nl;210;cl_default
+WAIS-based mail archive;bagel.indexdata.dk;8888;Default
+Washington (D.C.) Research Library Consortium;wrlcsun3.wrlc.org;7090;VOYAGER
+Washington State University (INNOPAC);griffin.wsu.edu;210;INNOPAC
+Washington University --;St.;Louis,;MO (INNOPAC) catalog.wustl.edu 210 INNOPAC
+Waterloo Public Library;134.161.236.21;210;innopac
+Waterloo Public Library -- Waterloo, Iowa (INNOPAC);unistar.uni.edu;210;INNOPAC
+Wayne State University (Detroit, MI);luis.wayne.edu;20003;DCAT
+Wellesley College;149.130.90.2;210;INNOPAC
+Wellesley College (INNOPAC);luna.wellesley.edu;210;INNOPAC
+Western North Carolina Library Network;152.10.28.1;210;INNOPAC
+Western Washington University;140.160.168.16;210;INNOPAC
+Western Washington University (INNOPAC);lis.wwu.edu;210;INNOPAC
+West Virginia State College -- Institute, WV (VTLS);library.wvsc.edu;9999;DEFAULT
+Wheeling Jesuit U.;192.188.131.54;2200;UNICORN
+Wildenthal Library Sul Ross State University;lobopac.sulross.edu;2200;unicorn
+Woods Hole Oceanographic Institution Library;cornelia.whoi.edu;7090;VOYAGER
+WoPEc;dbiref.kub.nl;9997;repref
+Worcester Polytechnic Institute -- Worcester, MA (Endeavor);endeavor.wpi.edu;7090;VOYAGER
+Wright State University (INNOPAC);wsuol2.wright.edu;210;INNOPAC
+Yale University;webpac.library.yale.edu;210;YALEOPAC
+Yaroslavl corporate library network;lib.yar.ru;210;clibrus
+Yaroslavl corporate library network;lib.yar.ru;210;cstirus
+Yaroslavl corporate library network;lib.yar.ru;210;ibce
+Yaroslavl corporate library network;lib.yar.ru;210;ygmarus
+Yaroslavl corporate library network;lib.yar.ru;210;ypurus
+Yaroslavl corporate library network;lib.yar.ru;210;ysurus
+Zentraler Katalog der Öffentlichen Bibliotheken in Brandenburg;www.oe-bibliotheken.brandenburg.de;2020;opac
+zetoc;zetoc.mimas.ac.uk;2121;ZETOC

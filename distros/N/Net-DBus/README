@@ -1,0 +1,126 @@
+                 Net::DBus
+                 =========
+
+Net::DBus provides a Perl XS API to the dbus inter-application
+messaging system. The Perl API covers the core base level 
+of the dbus APIs, not concerning itself yet with the GLib
+or QT wrappers. For more information on dbus visit the 
+project website at:
+
+  http://www.freedesktop.org/software/dbus/
+
+The homepage for Net::DBus is
+
+  http://search.cpan.org/dist/Net-DBus/
+
+Please report bugs at
+
+  https://rt.cpan.org/Public/Dist/Display.html?Name=Net-DBus
+
+The primary GIT repository for Net::DBus is
+
+  https://gitlab.com/berrange/perl-net-dbus
+
+This version operates against DBus 1.00, and later
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   sudo make install
+
+The makefile calls the C<pkg-config> script to determine the
+correct flags to pass to the compiler & linkers when building
+the XS part of the module. Thus, ensure pkg-config is in
+a directory listed by the $PATH environment. 
+
+The pkg-config program will likely find the DBus install in /usr
+provided by the base OS distribution, so if testing against an 
+alternate  install of DBus, set the C$PKG_CONFIG_PATH env 
+variable before generating the Makefile. For example, if your 
+dbus installation is in C<$HOME/usr/dbus-cvs-tip> , then to build
+and install against this version of DBus do
+
+   export PKG_CONFIG_PATH=$HOME/usr/dbus-cvs-tip/lib/pkg-config
+   perl Makefile.PL PREFIX=$HOME/usr/dbus-cvs-tip
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+------------
+
+In keeping with the C API, the Perl DBus implementation
+has minimal external dependancies:
+
+  Time::HiRes
+  XML::Twig
+  XML::Parser
+
+And to run the test suite:
+
+  Test::More
+  Test::Pod (optional, but recommended)
+  Test::Pod::Coverage (optional, but recommended)
+
+Although they are not part of the base Perl distribution, most 
+OS distributor will already provide addon packages containing
+these modules. Failing this, they are all available from CPAN
+http://search.cpan.org/
+
+EXAMPLES
+--------
+
+There are a number of example programs in the examples/
+subdirectory demonstrating use of the high level application
+developer APIs.
+
+  example-service.pl         - Providing a simple service
+  example-client.pl          - Talking to a remote service
+  example-signal-emitter.pl  - How to broadcast signals
+  example-signal-receiver.pl - How to receive signals
+  dump-object.pl             - Dump info about dbus objects
+  lshal.pl                   - Dump names of all HAL devices
+
+CONTRIBUTIONS
+-------------
+
+Contributions both simple bug fixes & new features are
+always welcome. Please send patches for bugs / features
+to the DBus mailing list, or file a bug against Net::DBus
+in the Perl bug tracker, or failing that send them directly
+to the author
+
+  Daniel Berrange <dan at berrange dot com>
+
+The preferred format for patches is that produced by the
+"git format-patch" command. Please use GIT if at all
+possible to ensure correct author attribution of your
+proposed change.
+
+COPYRIGHT AND LICENCE
+---------------------
+
+Copyright (C) 2004-2015 Daniel Berrange
+
+Net-DBus may be redistributed and/or modified under the terms of Perl itself.
+Either:
+
+a) the GNU General Public License as published by the Free
+   Software Foundation; either version 2, or (at your option) any
+   later version
+
+or
+
+b) the "Artistic License"
+
+
+See the file "LICENSE" for the full text of each license
+
+-- End
+

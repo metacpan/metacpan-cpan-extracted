@@ -1,0 +1,59 @@
+#!/opt/perl/bin/perl
+use strict;
+use AnyEvent::Impl::Perl;
+use AnyEvent;
+use Net::IRC3::Connection;
+$Net::IRC3::Client::DEBUG = 1;
+
+my $c = AnyEvent->condvar;
+
+my $con = Net::IRC3::Connection->new;
+
+
+my ($nick, $user, $real) = qw/BinDepp BinDepp depp/;
+
+# send IRC registration
+$con->send_msg (undef, "NICK", undef, $nick);
+$con->send_msg (undef, "USER", $real || $nick, $user || $nick, "*", "0");
+
+$con->reg_cb (irc_001 => sub {
+   my ($con) = @_;
+   $con->event ('welcome'); # emit a self defined event
+   1;
+});
+
+# display all irc messages for debugging
+$con->reg_cb ('irc_*' => sub { warn "DEBUG: " . join ('|', %{$_[1]}) . "\n"; 1; });
+
+# we register now a callback on our self defined event
+$con->reg_cb (welcome => sub {
+   my ($con) = @_;
+   $con->send_msg (undef, "PRIVMSG", "Hi!!!", "elmex");
+   1;
+});
+
+my $t;
+$t = AnyEvent->timer (after => 10, cb => sub {
+   $con->disconnect ("Timeout exceeded");
+   undef $t;
+});
+
+# lets 
+$con->reg_cb (
+   connect => sub {
+      warn "Connected! Yay!\n";
+      1;
+   },
+   connect_error => sub {
+      warn "Connection error: $_[1]\n";
+      1;
+   },
+   disconnect => sub {
+      warn "Oh, got a disconnect: $_[1], exiting...\n";
+      1;
+   }
+);
+
+$con->connect ("localhost", 6667);
+
+$c->wait;

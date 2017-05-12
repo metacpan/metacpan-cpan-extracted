@@ -1,0 +1,6 @@
+-*-Outline-*-
+
+* Retain ASN, MPLS data.
+* Retain DNS names.
+* See if more modern perl idioms do what we want in the case of
+  pipe/fork/exec producing ENOENT from exec.

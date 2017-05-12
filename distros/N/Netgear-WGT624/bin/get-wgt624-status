@@ -1,0 +1,210 @@
+#!/usr/bin/perl 
+
+use warnings;
+use strict;
+
+use Getopt::Long;
+use Pod::Usage;
+use Term::ReadKey;
+
+use Netgear::WGT624;
+
+# print_element - starts the router query object and passes results to user.
+sub print_element($$$$) {
+    my $username = shift;
+    my $password = shift;
+    my $address  = shift;
+    my $element = shift;
+
+    my $rtr = Netgear::WGT624->new();
+
+    $rtr->username($username);
+    $rtr->password($password);
+    $rtr->address($address);
+    
+    my $retries = 2;     # The number of times to try querying the router.
+    my $retval = undef;
+
+    # The first try seems to not return correct value in some cases,
+    # at least in early versions of this program with the command-line
+    # lwp client.  This retry code may be unecessary now, but I'm
+    # uneasy to get rid of it without thorough testing.
+    do {
+	$retval = $rtr->getStatus($element);
+	$retries--;
+    } while (!defined($retval) && $retries > 0);
+
+    if (defined($retval)) {
+	print $retval;
+    }
+}
+
+# get_pass_prompt - get password by user prompt.
+sub get_pass_prompt {
+    # Example of how to take password without echoing text
+    # taken from html page based on the Perl Cookbook,
+    # url http://ny.pm.org/Cookbook_Review.html accessed 
+    # Thu May 11 21:25:26 EDT 2006.
+    ReadMode('noecho');
+    print "router password -> ";
+    my $password = ReadLine(0);
+    chomp $password;
+    ReadMode(0);
+
+    return $password;
+}
+
+sub driver() {
+
+    # Values that we need from user.
+    my $username = undef;
+    my $password = undef;
+    my $address  = undef;
+    my $element  = undef;
+    
+    # Monitors if the user requests a man or help
+    # page on command line.
+    my $man = 0;
+    my $help = 0;
+
+    my $pwprompt = 0;
+
+    my $result = GetOptions ("username=s" => \$username,
+			     "password=s" => \$password,
+			     "address=s"  => \$address,
+			     "element=s"  => \$element,
+			     "pwprompt"   => \$pwprompt,
+			     "help|?"     => \$help,
+			     "man"        => \$man) or pod2usage(2);
+
+    pod2usage(1) if $help;
+    pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+
+    # If we don't have a password, and pwprompt has not been set,
+    # die with a warning about usage.
+    if (!defined($password) &&
+	($pwprompt != 1)) {
+	pod2usage(2);
+    }
+
+    # Can't define both pwprompt and password.
+    if (defined($password) &&
+	$pwprompt == 1) {
+	pod2usage(2);
+    }
+
+    # If we need to get a password by prompt, do it now.
+    if ($pwprompt) {
+	$password = get_pass_prompt;
+    }
+
+    # Fail if these elements are not specified on command
+    # line -- print usage message instead.
+    if (!defined($username) ||
+	!defined($address)  ||
+	!defined($element)) {
+	
+	# Print the SYNOPSIS section of perldoc if sufficient
+	# options are not specified.
+	pod2usage(2);
+    } else {
+	# We have necessary parameters passed to us,
+	# start querying the router and print results.
+	print_element($username, $password, $address, $element);
+    }
+
+
+}
+
+driver();
+
+=head1 NAME
+
+get-wgt624-status - Gets a status element from a Netgear WGT624 router
+by parsing the HTML status page.
+
+=head1 SYNOPSIS
+
+The following will print out a status element from the router:
+
+C<get-wgt624-status --username username --password password --address router_address --element element>
+
+Note that this is very insecure because anyone who can list the
+processes currently running on your computer can see your password!
+
+To get the status from the router without having to enter your
+password on the command line, try the following:
+
+C<get-wgt624-status --username username --pwprompt --address router_address --element element>
+
+Use the following to print this usage summary:
+
+C<get-wgt624-status --help>
+
+Use the following to print the full program documentation:
+
+C<get-wgt624-status --man>
+
+=head1 DESCRIPTION
+
+This program can be used to query Netgear's 108 Mbps Wireless Firewall
+Router, model WGT624 router for various statistics from the command
+line.  It was originally written because the WGT624 is unable to be
+queried via SNMP, which makes it less than ideal for many
+environments.  Rather than spending more money on an SNMP device, I
+wrote this script to provide a subset of the functionaliity that SNMP
+would offer.  Specifically, this program is currently able to list a
+number of elements about the utilization of the WGT624, as listed in
+the section L</"LISTABLE ELEMENTS FROM WGT624"> of this document.
+
+get-wgt624-status is useful for outputting information to shell
+scripts, or to programs like rrdtool and cacti for graphing.
+
+=head1 LISTABLE ELEMENTS FROM WGT624
+
+The following may be listed in the element field for output to the console:
+
+=over
+
+WAN_Status, WAN_TxPkts, WAN_RxPkts, WAN_Collisions, WAN_TxRate, WAN_RxRate,
+WAN_UpTime, LAN_Status, LAN_TxPkts, LAN_RxPkts, LAN_Collisions, LAN_TxRate,
+LAN_RxRate, LAN_UpTime, WLAN_Status, WLAN_TxPkts, WLAN_RxPkts, WLAN_Collisions,
+WLAN_TxRate, WLAN_RxRate, WLAN_UpTime
+
+=back
+
+Only one element may be specified per command, so if you want the WLAN
+transmit rate and the WLAN receive rate, you will have to type two
+separate commands to get this information.
+
+=head1 EXAMPLES
+
+If your router is at address 192.168.0.1, your username for the router is 
+"admin" and the password is "p4ssword", and you wanted to see the WLAN_RxRate,
+you could use the following command:
+
+C<get-wgt624-status --username admin --password p4ssword --address 192.168.0.1 --element WLAN_RxRate>
+
+=head1 SEE ALSO
+
+The perldoc for L<Netgear::WGT624>.
+
+=head1 AUTHOR
+
+get-wgt624-status was written by Justin S. Leitgeb
+<justin@phq.org>.  The author's home page is at http://justin.phq.org/.
+
+=head1 COPYRIGHT AND LICENSE
+
+This program is made available under the Artistic license, see the
+README file in the package with which it was distributed for more
+information.
+
+get-wgt624-status and related libraries are copyright 2006 Justin
+S. Leitgeb.
+
+All rights reserved.  This program is free software; you may
+redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

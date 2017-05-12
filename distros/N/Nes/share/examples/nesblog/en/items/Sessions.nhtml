@@ -1,0 +1,51 @@
+{: NES 1.0 none :}
+<h2><a href="#">Sessions</a></h2>
+<h3>session.nhtml</h3>
+<p> 
+We can create sessions with the object <i>session.nhtml</i>:
+<pre>
+  &#123;: include ( '&#123;: * cfg_obj_top_dir :&#125;/session.nhtml',
+               action,  &#123;: # default: get | create | del :&#125;
+               user,    &#123;: # if 'get' action: user :&#125;
+               expire   &#123;: # if 'get' action: expire :&#125;
+  :&#125;
+
+  Expire format:
+
+    time suffix: s: seconds, m: minutes h: hours d: days, M: months, y: years
+    30s = 30 seconds
+    12h = 12 hours
+    2y  = 2 years
+    ...
+    
+</pre>
+<h3>or in Perl</h3>
+<pre>
+    
+my $nes = Nes::Singleton->new();
+my $session = $nes->{'session'};
+
+# Create session:
+$session->create($user, $expire);
+
+# Get session:
+$user = $session->{'user'};
+
+# Delete session:
+$session->del;
+
+</pre>
+</p>
+
+<h3>Environment Variables</h3>
+<pre>
+    
+# Session is open
+&#123;: * nes_session_ok :&#125;
+
+# User name session
+&#123;: * nes_session_user :&#125;
+
+
+</pre>
+</p>

@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+#
+#   Example mail spooler
+#
+#   The purpose of this program is to receive emails as a spooler.
+#   The program will store them in a spool directory and handle them
+#   by calling the script $SPOOL_COMMAND.
+#
+#   The SPOOL_COMMAND will be passed a file name ($file$) with the
+#   mail being processed and a destination ($control->destination$)
+#   as passed by sendmail.
+#
+
+my $UNIX_SOCKET   = "/var/spooler/sock";
+my $SPOOL_DIR     = "/var/spooler";
+my $SPOOL_COMMAND = q{/usr/local/bin/sendsms -f $file$}
+                    . q{ -d $control->destination$};
+my $ADMIN_EMAIL   = "root";
+my $PID_FILE      = "/var/spooler/mailspooler.pid";
+my $DEBUG         = 1;
+my $LOOP_TIME     = 15;
+
+
+use strict;
+use Net::Spooler ();
+
+package MailSpooler;
+
+$MailSpooler::VERSION = '0.01';
+@MailSpooler::ISA = qw(Net::Spooler);
+
+sub ReadFile {
+    my($self, $socket, $fh, $file, $control) = @_;
+    my $line = <$socket>;
+    die "Missing destination" unless defined($line);
+    chomp $line;
+    $control->{'destination'} = $line;
+    $self->SUPER::ReadFile($socket, $fh, $file, $control);
+}
+
+sub Version ($) {
+    return "MailSpooler - A very simple mail spooler";
+}
+
+package main;
+
+my $server = MailSpooler->new({ 'spool-dir' => $SPOOL_DIR,
+				'spool-command' => $SPOOL_COMMAND,
+			        'localpath' => $UNIX_SOCKET,
+				'mode' => 'fork',
+				'admin' => $ADMIN_EMAIL,
+				'pidfile' => $PID_FILE,
+				'loop-timeout' => $LOOP_TIME,
+			        'debug' => $DEBUG},
+			      \@ARGV);
+
+eval { $server->Bind() };
+$server->Fatal("MailSpooler died: $@") if $@;
+$server->Fatal("Unexpected program termination");

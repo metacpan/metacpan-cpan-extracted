@@ -1,0 +1,125 @@
+2004-05-21  Gisle Aas <gisle@ActiveState.com>
+
+        * Versjon 1.08
+
+        * No::Dato::hverdag implementert.
+
+        * No::Dato::helligdager vil ikke legge til " (søndag)"
+          til navnet for helligdager som også er det.
+
+        * No::Dato: Dagnavnene har ikke stor forbokstav mer.
+
+        * No::Dato: Dokumentere mer presist hvordan 'helligdag'
+          skal forstås her.
+
+
+
+2003-10-06  Gisle Aas <gisle@ActiveState.com>
+
+        * Versjon 1.07
+
+        * No::PersNr patch fra Peter J. Acklam <pjacklam@online.no> slik
+          at den håndterer D- og H-nummer i tillegg til vanlige personnummer.
+
+
+
+1999-10-13  Gisle Aas <gisle@aas.no>
+
+        * Versjon 1.06
+
+        * No::Dato::tekstdato vil ikke bruke stor forbokstav i
+          månedsnavnet.
+
+        * No::PersNr patch fra Petter Reinholdtsen <pere@hungry.com> slik
+          at den håndterer genererte personnummer slik de gjør det ved UiTø.
+
+        * No::Telenor oppdatert til prisene som gjelder fra 1999-07-01
+
+        * Reformatert dokumentasjon
+
+
+
+1998-10-12  Gisle Aas <aas@sn.no>
+
+       	* Versjon 1.05
+
+	* Forenklet mod_11() funksjon.
+
+
+1998-04-01  Gisle Aas <aas@sn.no>
+
+	* Versjon 1.04
+
+	* No::PersonNr: Korrigert hånderingen av personer født etter
+          år 2000.  Vi får igjen problemer etter år 2054.  Ny kode
+          baser på opplysninger fra Erik Lie-Nielsen, som hadde
+          funnet fram et brev fra "Sentralkontoret for folkeregistrering".
+
+
+1998-03-27  Gisle Aas <aas@sn.no>
+
+	* Versjon 1.03
+
+	* Forenklinger av No::PersonNr.  Hovedsaken er enklere mod11
+	  algoritme fra Hallvard B Furuseth <h.b.furuseth@usit.uio.no>.
+
+	* Fjernet kommentar om helligdager fra No::Telenor.  I følge
+	  Tollef Fog Heen <t.f.heen@jus.uio.no> er disse ikke spesielle.
+
+
+1998-01-06  Gisle Aas <aas@sn.no>
+
+	* Versjon 1.02
+
+	* Funksjonene kontonr_ok og kontonr_f håndterer nå også gamle
+          7-sifrede postgironr.
+
+	
+1998-01-03  Gisle Aas <aas@sn.no>
+
+	* Versjon 1.01
+
+	* Returverdien til kontonr_ok() var manglet siste siffer.
+
+	* Ny funksjon kontonr_f()
+
+	* Forsøk på å håndtere personnr for personer født etter
+	  år 2000.
+
+
+1997-06-25  Gisle Aas <aas@sn.no>
+
+	* Versjon 1.00
+
+	* Oppdatering av dokumentasjon
+
+
+1997-02-24  Gisle Aas <aas@sn.no>
+
+	* Versjon 0.03
+
+	* Sjekk at datodelen i personnumre er en lovlig dato.
+
+	* kredittnr_ok() burde virke for flere korttyper nå.
+	  kredittnr_ok() returnerer korttypen istedenfor nummeret.
+
+	* rutiner for uc/lc av latin1 i No::Sort
+
+
+1997-02-17  Gisle Aas <aas@sn.no>
+
+	* Versjon 0.02
+
+	* Fra Hallvard B Furuseth: Støtte for B-nummer i No::PersonNr.
+
+	* Ny module sort sortering av norsk tekst No::Sort.
+
+	* Reimplementert mesteparten av No::KontoNr.
+
+	* Perl5.003 -w klaget over "$VERSION: possible typo".  Fikset.
+
+
+1997-02-07  Gisle Aas <aas@sn.no>
+
+	* Versjon 0.01
+

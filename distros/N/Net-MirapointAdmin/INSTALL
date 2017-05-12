@@ -1,0 +1,43 @@
+INSTALL - Mirapoint::Admin Perl module for using the Mirapoint Administrative
+	  Interface to Mail.
+
+Copyright (C) April 2nd, 2001, Mirapoint Inc. <proserv@mirapoint.com>
+
+Version: 2.4
+
+
+Prerequisites
+-------------
+
+Perl 5.6 anything starting from perl 5.005 probably will work
+
+For SSL Functionality:
+
+	OpenSSL 0.9.6		(available from www.openssl.org)
+	Net::SSLeay 1.25	(available from ftp.cpan.org)
+	IO::Socket::SSL 0.96	(available from ftp.cpan.org)
+
+Installing
+----------
+
+This release has only been tested on the following platforms:
+
+	Perl 5.8 on Windows PC under Cygwin (non-SSL only)
+	Perl 5.8.6 on Debian Linux Sarge
+
+Other UNIX implementations are probably ok, although not tested nor
+supported by Mirapoint Inc.
+
+To Install:
+
+	$ tar xzvf Net-MirapointAdmin-3.0.tar.gz 
+	$ cd Net-MirapointAdmin-3.0
+	$ perl Makefile.PL
+	$ make
+	$ su root
+	# make install
+
+If you wish to use the SSL functionality of the Net::MirapointAdmin module, 
+then you must first install a working IO::Socket::SSL (which has Net::SSLeay 
+as a pre-requisite).  If you are only handling cleartext connection, this
+module is un-necessary.

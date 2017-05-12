@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+README
+lib/Net/Squid/Purge.pm
+lib/Net/Squid/Purge/HTTP.pm
+lib/Net/Squid/Purge/Multicast.pm
+lib/Net/Squid/Purge/UDP.pm
+t/00-compile.t
+t/05-pod.t
+t/06-pod_coverage.t
+t/11-new.t
+t/12-usage.t

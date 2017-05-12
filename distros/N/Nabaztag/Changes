@@ -1,0 +1,15 @@
+Revision history for Nabaztag
+0.03    16 dec 2005
+	- Now use LWP::UserAgent in order to send the accept-language=fr
+	to make the rabbit run. 
+
+0.02    19 nov 2005
+        Complies with V1 of the API
+        New dependency: URI::Escape 
+        Refactored URL construction
+        Nabaztag can now fetch ear positions from hardware one
+        Added debug mode
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

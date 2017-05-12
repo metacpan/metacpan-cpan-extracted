@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-basic.t
+t/01-pod.t
+lib/Net/Tshark.pm
+lib/Net/Tshark/Packet.pm
+lib/Net/Tshark/Field.pm
+script/listen_for_http.pl

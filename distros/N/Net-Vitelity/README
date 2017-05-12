@@ -1,0 +1,56 @@
+Net-Vitelity
+
+This is an interface to the Vitelity API for wholesale DID (phone number)
+provisioning.  It is only useful if you have an account with Vitelity
+wholesale VoIP service.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::Vitelity
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Vitelity
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-Vitelity
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-Vitelity
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-Vitelity
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2012 Freeside Internet Services, Inc.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+ADVERTISEMENTS
+
+Need a complete, open-source back-office and customer self-service solution?
+The Freeside software includes Vitelity integration, CDR rating,
+invoicing, credit card and electronic check processing, integrated trouble
+ticketing, and customer signup and self-service web interfaces.
+
+http://freeside.biz/
+
+Development sponsored by Voice Carrier LLC.  If you need a hosted or on-site
+PBX, please visit http://www.voicecarrier.com/
+

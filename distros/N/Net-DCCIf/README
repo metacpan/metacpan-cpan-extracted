@@ -1,0 +1,14 @@
+Net::DCCIf
+-=-=-=-=-=
+
+This module is an interface to a DCC daemon - dccifd.
+
+The daemon speeds up dcc processing (no constantly launching the C program),
+and this interface simplifies access to that daemon.
+
+This code copies ideas from the dcc distributed dccif.pl script, but
+is a complete re-write of that code.
+
+This is free software, you may use it and redistribute it under the same
+terms as perl itself.
+-

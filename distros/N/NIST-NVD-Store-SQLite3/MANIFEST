@@ -1,0 +1,25 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+ignore.txt
+Makefile.PL
+README
+TODO
+lib/NIST/NVD/Store/SQLite3.pm
+t/00-load.t
+t/01-load-nvdcve.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/perlcriticrc
+t/critic.t
+t/sqlite3.t
+t/update.t
+t/insert.t
+t/query.t
+t/cwe.t
+t/verify.sh
+bin/convert-nvdcve
+t/data/cwec_v2.1.xml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

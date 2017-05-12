@@ -1,0 +1,98 @@
+{
+   "abstract" : "Interact with remote applications that use SAJAX.",
+   "author" : [
+      "Douglas Christopher Wilson <doug@somethingdoug.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-SAJAX",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Fatal" : 0,
+            "Test::MockObject" : 0,
+            "Test::More" : "0.41",
+            "Test::Requires" : "0.02",
+            "URI::Escape" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Class::Load" : 0,
+            "English" : 0,
+            "HTTP::Request::Common" : "5.814",
+            "JE" : "0.033",
+            "LWP::UserAgent" : "5.819",
+            "List::MoreUtils" : 0,
+            "Moose" : "0.77",
+            "MooseX::StrictConstructor" : "0.08",
+            "MooseX::Types::URI" : "0.02",
+            "URI" : "1.22",
+            "URI::QueryParam" : 0,
+            "namespace::clean" : "0.04",
+            "perl" : "5.008003"
+         }
+      }
+   },
+   "provides" : {
+      "Net::SAJAX" : {
+         "file" : "lib/Net/SAJAX.pm",
+         "version" : "0.107"
+      },
+      "Net::SAJAX::Exception" : {
+         "file" : "lib/Net/SAJAX/Exception.pm",
+         "version" : "0.107"
+      },
+      "Net::SAJAX::Exception::JavaScriptConversion" : {
+         "file" : "lib/Net/SAJAX/Exception/JavaScriptConversion.pm",
+         "version" : "0.107"
+      },
+      "Net::SAJAX::Exception::JavaScriptEvaluation" : {
+         "file" : "lib/Net/SAJAX/Exception/JavaScriptEvaluation.pm",
+         "version" : "0.107"
+      },
+      "Net::SAJAX::Exception::MethodArguments" : {
+         "file" : "lib/Net/SAJAX/Exception/MethodArguments.pm",
+         "version" : "0.107"
+      },
+      "Net::SAJAX::Exception::RemoteError" : {
+         "file" : "lib/Net/SAJAX/Exception/RemoteError.pm",
+         "version" : "0.107"
+      },
+      "Net::SAJAX::Exception::Response" : {
+         "file" : "lib/Net/SAJAX/Exception/Response.pm",
+         "version" : "0.107"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/dougwilson/perl5-net-sajax/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/dougwilson/perl5-net-sajax.git"
+      }
+   },
+   "version" : "0.107"
+}

@@ -1,0 +1,9 @@
+Changes
+README
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+Build.PL
+lib/Net/DAAP/Client/Auth.pm
+t/new.t

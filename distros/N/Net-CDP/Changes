@@ -1,0 +1,83 @@
+Revision history for Net::CDP
+=============================
+
+*** 0.09 Tue Aug 16 2005
+
+Resync libcdp with Gnulib.
+
+libtoolize libcdp.
+
+*** 0.08 Thu Jul 21 2005
+
+Fixed "decode errors" bug, where the packet after the error would return the
+decoding error instead.
+
+Added power consumption and management addresses TLVs. Experiment support
+for Appliance ID Query fields (deliberately not documented yet!).
+
+Use Gnulib so that libcdp can be built on wacky platforms.
+
+Cleaned up XS layer. Sanitized memory handling in the C layer.
+
+Munge internal croaks properly -- errors should always appear to come
+from the caller now.
+
+Various other minor bugfixes.
+
+*** 0.07 Tue Sep 2 2004
+
+Use Carp::Clan to manage error messages.
+
+Minor bugfix in Net::CDP::Manager::cdp_send error handling.
+
+Documentation cleanups.
+
+Turned most flags into named arguments. Warn if a deprecated feature is used
+(but we currently still accept them).
+
+Moved other flags into appropriate modules.
+
+Added ability to selectively disable recv and send methods.
+
+Added most voice VLAN TLVs.
+
+Added detection of port duplex mode.
+
+Removed AutoLoader because it wasn't worth it.
+
+Split the C code into (sort of) a separate library, configured with Autoconf
+rather than MakeMaker.
+
+Make cdp_get_ports manually check each port -- don't rely just on
+pcap_findalldevs.
+
+*** 0.06 Wed Jun 23 2004
+
+Handle 'get' magic properly.
+
+*** 0.05 Thu Jun  6 2004
+
+By default, ports will be opened in non-promiscuous mode and a multicast
+address will be added to them instead.
+
+*** 0.04 Wed Jun  9 2004
+
+Fixed checksum bug (again!).
+
+Removed unnecessary debugging output.
+
+*** 0.03 Tue Jun  8 2004
+
+Fixed my email address.
+
+Fixed checksum bug.
+
+*** 0.02 Fri Jun  4 2004
+
+Initial released version.
+
+*** 0.01 Sun Mar 21 2004
+
+Original version (unreleased).
+
+$Id: Changes,v 1.26 2005/08/16 11:52:30 mchapman Exp $

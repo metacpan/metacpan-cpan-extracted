@@ -1,0 +1,13 @@
+Revision history for Perl extension Net::Frame::Layer::SNMP.
+
+1.02 Fri Dec  9 17:48:36 EST 2016
+   - Fixed bug in pack() for agentAddr.
+   - Fixed bug in getLength - now uses pack() instead of raw().
+   - Updated _inetNtoa() to use N::F::L inet6Ntoa.
+
+1.01 Tue Mar 12 17:48:36 EST 2013
+   - Updated MANIFEST with new tests.
+   - Updated minor bug in varbinds().
+
+1.00 Tue Mar 12 17:48:36 EST 2013
+   - first public release

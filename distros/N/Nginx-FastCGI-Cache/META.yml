@@ -1,0 +1,28 @@
+---
+abstract: 'Conveniently manage the nginx fastcgi cache'
+author:
+  - 'David Farrell <sillymoos@cpan.org>'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0'
+  strict: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Nginx-FastCGI-Cache
+requires:
+  Carp: '0'
+  Digest::MD5: '0'
+  URI: '0'
+  feature: '0'
+  perl: v5.12.1
+  warnings: '0'
+resources:
+  homepage: https://github.com/sillymoose/nginx-fastcgi-cache
+  repository: https://github.com/sillymoose/nginx-fastcgi-cache.git
+version: '0.010'

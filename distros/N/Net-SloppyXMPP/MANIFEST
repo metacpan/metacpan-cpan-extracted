@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-SloppyXMPP.t
+lib/Net/SloppyXMPP.pm
+META.yml                                 Module meta-data (added by MakeMaker)

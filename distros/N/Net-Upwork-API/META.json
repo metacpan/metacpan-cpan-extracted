@@ -1,0 +1,155 @@
+{
+   "abstract" : "Perl bindings for Upwork API",
+   "author" : [
+      "Maksym Novozhylov <mnovozhilov@upwork.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "keywords" : [
+      "upwork"
+   ],
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Upwork-API",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.66",
+            "Test::Warn" : "0.21"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Socket::SSL" : "1.965",
+            "Net::OAuth" : "0.28"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Upwork::API" : {
+         "file" : "lib/Net/Upwork/API.pm",
+         "version" : "v1.2.2"
+      },
+      "Net::Upwork::API::Client" : {
+         "file" : "lib/Net/Upwork/API/Client.pm"
+      },
+      "Net::Upwork::API::Config" : {
+         "file" : "lib/Net/Upwork/API/Config.pm"
+      },
+      "Net::Upwork::API::Routers::Activities::Engagement" : {
+         "file" : "lib/Net/Upwork/API/Routers/Activities/Engagement.pm"
+      },
+      "Net::Upwork::API::Routers::Activities::Team" : {
+         "file" : "lib/Net/Upwork/API/Routers/Activities/Team.pm"
+      },
+      "Net::Upwork::API::Routers::Auth" : {
+         "file" : "lib/Net/Upwork/API/Routers/Auth.pm"
+      },
+      "Net::Upwork::API::Routers::Freelancers::Profile" : {
+         "file" : "lib/Net/Upwork/API/Routers/Freelancers/Profile.pm"
+      },
+      "Net::Upwork::API::Routers::Freelancers::Search" : {
+         "file" : "lib/Net/Upwork/API/Routers/Freelancers/Search.pm"
+      },
+      "Net::Upwork::API::Routers::Hr::Clients::Applications" : {
+         "file" : "lib/Net/Upwork/API/Routers/Hr/Clients/Applications.pm"
+      },
+      "Net::Upwork::API::Routers::Hr::Clients::Offers" : {
+         "file" : "lib/Net/Upwork/API/Routers/Hr/Clients/Offers.pm"
+      },
+      "Net::Upwork::API::Routers::Hr::Contracts" : {
+         "file" : "lib/Net/Upwork/API/Routers/Hr/Contracts.pm"
+      },
+      "Net::Upwork::API::Routers::Hr::Engagements" : {
+         "file" : "lib/Net/Upwork/API/Routers/Hr/Engagements.pm"
+      },
+      "Net::Upwork::API::Routers::Hr::Freelancers::Applications" : {
+         "file" : "lib/Net/Upwork/API/Routers/Hr/Freelancers/Applications.pm"
+      },
+      "Net::Upwork::API::Routers::Hr::Freelancers::Offers" : {
+         "file" : "lib/Net/Upwork/API/Routers/Hr/Freelancers/Offers.pm"
+      },
+      "Net::Upwork::API::Routers::Hr::Interviews" : {
+         "file" : "lib/Net/Upwork/API/Routers/Hr/Interviews.pm"
+      },
+      "Net::Upwork::API::Routers::Hr::Jobs" : {
+         "file" : "lib/Net/Upwork/API/Routers/Hr/Jobs.pm"
+      },
+      "Net::Upwork::API::Routers::Hr::Milestones" : {
+         "file" : "lib/Net/Upwork/API/Routers/Hr/Milestones.pm"
+      },
+      "Net::Upwork::API::Routers::Hr::Roles" : {
+         "file" : "lib/Net/Upwork/API/Routers/Hr/Roles.pm"
+      },
+      "Net::Upwork::API::Routers::Hr::Submissions" : {
+         "file" : "lib/Net/Upwork/API/Routers/Hr/Submissions.pm"
+      },
+      "Net::Upwork::API::Routers::Jobs::Profile" : {
+         "file" : "lib/Net/Upwork/API/Routers/Jobs/Profile.pm"
+      },
+      "Net::Upwork::API::Routers::Jobs::Search" : {
+         "file" : "lib/Net/Upwork/API/Routers/Jobs/Search.pm"
+      },
+      "Net::Upwork::API::Routers::Messages" : {
+         "file" : "lib/Net/Upwork/API/Routers/Messages.pm"
+      },
+      "Net::Upwork::API::Routers::Metadata" : {
+         "file" : "lib/Net/Upwork/API/Routers/Metadata.pm"
+      },
+      "Net::Upwork::API::Routers::Organization::Companies" : {
+         "file" : "lib/Net/Upwork/API/Routers/Organization/Companies.pm"
+      },
+      "Net::Upwork::API::Routers::Organization::Teams" : {
+         "file" : "lib/Net/Upwork/API/Routers/Organization/Teams.pm"
+      },
+      "Net::Upwork::API::Routers::Organization::Users" : {
+         "file" : "lib/Net/Upwork/API/Routers/Organization/Users.pm"
+      },
+      "Net::Upwork::API::Routers::Payments" : {
+         "file" : "lib/Net/Upwork/API/Routers/Payments.pm"
+      },
+      "Net::Upwork::API::Routers::Reports::Finance::Accounts" : {
+         "file" : "lib/Net/Upwork/API/Routers/Reports/Finance/Accounts.pm"
+      },
+      "Net::Upwork::API::Routers::Reports::Finance::Billings" : {
+         "file" : "lib/Net/Upwork/API/Routers/Reports/Finance/Billings.pm"
+      },
+      "Net::Upwork::API::Routers::Reports::Finance::Earnings" : {
+         "file" : "lib/Net/Upwork/API/Routers/Reports/Finance/Earnings.pm"
+      },
+      "Net::Upwork::API::Routers::Reports::Time" : {
+         "file" : "lib/Net/Upwork/API/Routers/Reports/Time.pm"
+      },
+      "Net::Upwork::API::Routers::Snapshot" : {
+         "file" : "lib/Net/Upwork/API/Routers/Snapshot.pm"
+      },
+      "Net::Upwork::API::Routers::Workdays" : {
+         "file" : "lib/Net/Upwork/API/Routers/Workdays.pm"
+      },
+      "Net::Upwork::API::Routers::Workdiary" : {
+         "file" : "lib/Net/Upwork/API/Routers/Workdiary.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/upwork/perl-upwork/issues"
+      },
+      "homepage" : "http://developers.upwork.com",
+      "repository" : {
+         "url" : "https://github.com/upwork/perl-upwork.git"
+      }
+   },
+   "version" : "v1.2.2",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

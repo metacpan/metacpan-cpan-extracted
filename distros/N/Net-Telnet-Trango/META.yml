@@ -1,0 +1,23 @@
+---
+name: Net-Telnet-Trango
+version: 0.05
+author:
+  - 'Andrew Fresh <andrew@cpan.org>'
+abstract: Perl extension for accessing the Trango telnet interface
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Net::Telnet: 0
+  perl: 5.6.1
+build_requires:
+  Test::More: 0
+dynamic_config: 1
+provides:
+  Net::Telnet::Trango:
+    file: lib/Net/Telnet/Trango.pm
+    version: 0.05
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,42 @@
+---
+name: Net-Gnip
+version: 0.3
+author:
+  - 'Simon Wistow <simon@thegestalt.org>'
+abstract: interact with Gnip
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  DateTime: 0
+  DateTime::Format::ISO8601: 0
+  DateTime::Format::Strptime: 0
+  LWP::UserAgent: 0
+  Test::More: 0
+  XML::LibXML: 0
+provides:
+  Net::Gnip:
+    file: lib/Net/Gnip.pm
+    version: 0.3
+  Net::Gnip::Activity:
+    file: lib/Net/Gnip/Activity.pm
+  Net::Gnip::Activity::Payload:
+    file: lib/Net/Gnip/Activity/Payload.pm
+  Net::Gnip::ActivityStream:
+    file: lib/Net/Gnip/ActivityStream.pm
+  Net::Gnip::Base:
+    file: lib/Net/Gnip/Base.pm
+  Net::Gnip::BaseStream:
+    file: lib/Net/Gnip/BaseStream.pm
+  Net::Gnip::Filter:
+    file: lib/Net/Gnip/Filter.pm
+  Net::Gnip::FilterStream:
+    file: lib/Net/Gnip/FilterStream.pm
+  Net::Gnip::Publisher:
+    file: lib/Net/Gnip/Publisher.pm
+  Net::Gnip::PublisherStream:
+    file: lib/Net/Gnip/PublisherStream.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

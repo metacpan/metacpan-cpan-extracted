@@ -1,0 +1,26 @@
+NAME
+
+    Net::Async::Tangence - use Tangence with IO::Async
+
+DESCRIPTION
+
+    This distribution provides concrete implementations of the Tangence
+    base classes, allowing either servers or clients to be written based on
+    IO::Async.
+
+    To implement a server, see Net::Async::Tangence::Server.
+
+    To implement a client, see Net::Async::Tangence::Client.
+
+    This module itself does not provide any code, and exists only to
+    provide the module $VERSION and top-level documentation.
+
+SEE ALSO
+
+      * Tangence - attribute-oriented server/client object remoting
+      framework
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -1,0 +1,35 @@
+Net-MRT version 0.01
+====================
+
+This module intended for decoding RFC6396 Multi-Threaded Routing Toolkit (MRT)
+Routing Information Export Format
+(refer to http://tools.ietf.org/html/rfc6396).
+
+Typical usage is to build IP to AS number reference table or other forms of
+BGP table analyzis in Perl.
+
+Public BGP routing table in MRT format available at RIPE:
+http://www.ripe.net/data-tools/stats/ris/ris-raw-data
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  No dependencies right now. Come back later.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 MaxiM Basunov <maxim.basunov@gmail.com>
+All rights reserved.
+
+This program is free software; you may redistribute it and/or
+modify it under the same terms as Perl itself.

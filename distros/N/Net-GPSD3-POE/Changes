@@ -1,0 +1,4 @@
+Revision history for Perl module Net::GPSD3::POE
+
+0.17 2011-04-10
+    - Split Net::GPSD3::PEO from Net::GPSD3 for lighter requirements in Net::GPSD3

@@ -1,0 +1,222 @@
+Revision history for Perl extension Net::DNSBL::MultiDaemon
+
+0.39  Mon Apr  7 16:14:14 PDT 2014
+	tighten checks on ipV4 address specs
+
+0.38  Mon Jan 27 11:59:58 PST 2014
+        modify Makefile.PL to bypass missing 'pod2text'
+
+0.37  Sun Dec 15 18:33:24 PST 2013
+	add cache loading for blacklist file(s)
+
+0.36  Sun Dec 15 09:42:22 PST 2013
+	add white/black list checking to !$notRHBL
+
+0.35  Fri Dec 13 18:07:14 PST 2013
+	fixed wrap around flaw in uniqueID()
+	add cache load for URBL Prepare tld's and white list
+
+0.34  Fri Jun 14 17:34:49 PDT 2013
+	add 'acceptmask' to RBL paramaters
+	add conditional URBL lookup conditioning
+
+0.33	Wed May 29 12:37:20 PDT 2013
+	made Geo::IP::PurePerl conditional with warning
+
+0.32  Mon Apr 29 19:40:55 PDT 2013
+	...not released...
+	add unique ID for remote DNS lookup instead of
+	using ID of question
+
+0.31  Sun Apr 28 08:01:28 PDT 2013	NOT RELEASED
+	Added RHBL functionality, add user defined Extensions
+
+0.30  Sun Oct 17 17:00:42 PDT 2010
+	Added optional caching for done to remote DNSBLs. Cache uses 
+	TTL of returned record (3600 in the case of in-addr.arpa PTR 
+	timeout). Cache size is variable and can be set by user.
+
+0.29  Sat Mar  6 13:53:45 PST 2010
+	Change SOA to return zone name instead of 'localhost' so that
+	stand alone operation returns the correct NS record
+
+	Updated rc.multi_dnsbl to return "bound to" IP address instead
+	of 127.0.0.1  ###WARNING### if this is set to all interfaces
+	'0.0.0.0' the NS record address will be bogus
+
+	Add standard 127.0.0.2 response to query for 127.0.0.1
+
+	Add standard A response for zone only lookup
+	Add standard NS response for zone only lookup
+
+0.28  Thu Mar  4 17:56:50 PST 2010
+	Clarify documentation about INCLUDE statement for multidnsbl.conf
+
+0.27  Thu Oct 22 18:50:33 PDT 2009
+	The extra AUTHORITY records returned from the originating host
+	are no longer included. Some DNSBL's with many mirrors caused
+	this section to overflow and return records that 'bind' would not
+	accept (i.e. longer than the allowed 512 UDP).
+	problem =>	zen.spamhaus.org
+
+0.26  Sun Nov 16 15:47:51 PST 2008
+	replace 'sub DO' with File::SafeDO in Utilities v0.09
+	to support INCLUDE keys in the configuration file
+
+  NOTE: rc.multi_dnsbl has been updated to use doINCLUDE
+	if you are using an old version of rc.multi_dnsbl and
+	wish to use the INCLUDE feature, you must update your
+	scripts.
+
+0.25  Sun Nov  9 15:01:48 PST 2008
+	correct documentation in Utilities v0.08
+	add 'acceptany' key to DNSBL codes to allow
+	any A record returned to be considered valid.
+
+0.24  Sat Nov  1 17:15:11 PDT 2008
+	adjust prerequsites list
+
+0.23  Wed Oct 15 15:03:50 PDT 2008
+	require Net::DNS::ToolKit version 0.41 or higher
+
+0.22  Sat Nov 17 16:43:10 PST 2007
+	add sub A1277 to Utilities v0.07
+
+	add GENERIC PTR rejection capability
+	see full description of configuration
+	in multi_dnsbl.conf.sample
+
+0.21  not released
+	set authority in answers to mirror that of answer from 
+	query responder.
+
+	add Recursion Allowed capability
+
+0.20  not released
+	add Authoratative Answer capability
+
+0.19  Fri Oct 20 17:45:55 PDT 2006
+	add 24 hour short term averaging for DNSBL prioritization
+
+0.18  Mon Sep 11 18:29:15 PDT 2006
+	'mkdir' updates for perl 5.0503 compatibility
+
+0.17  Fri Jun  2 13:15:29 PDT 2006
+	Documentation update
+
+0.16  Fri Apr 28 14:33:19 PDT 2006
+	Remove dependency on NetAddr::IP in Net::DNSBL::Utilities. 
+	Newer versions of NetAddr::IP only run on perl 5.6 or later 
+	and require Math::BigInt. In it's place, we will use
+	NetAddr::IP::Lite
+
+0.15  Tue Feb 22 22:18:52 PST 2005
+	Add support for IPv6 records in 'additional' section of answers
+	requires Net::DNS::ToolKit 0.24
+
+	Commentary:
+	Some DNSBL's are now including IPv6 AAAA records in the "additional"
+	section of the query response. Previous versions of MultiDaemon
+	hardwired an "A" response for all the records in that section. 
+	When an AAAA record was encountered, it would send a packet of the 
+	wrong length which would produce an "unexpected end of data" error
+	in the "named" daemon making the query. Note, that these records are 
+	returned by MultiDaemon to assist in tracking the origin of the Query 
+	though they are always unused since the MultiDaemon is seen by the 
+	client as being on it's underlying host and the glue records from
+	the true responding host are in this circumstance extra baggage.
+	This release checks for the presence of both A and AAAA records in 
+	the "additional" section and discards any other record types.
+
+0.14  Wed Oct  6 11:08:38 PDT 2004
+	update documentation
+
+0.13  Mon Aug  9 18:11:04 PDT 2004
+	Update rc.multi_dnsbl v1.05 to correct typo that caused
+	"Not a SCALAR reference at /etc/init.d/rc.multi_dnsbl line 118 (#1)"
+	error when using CountryCode blacklisting. 
+	"list2hash" not imported in /etc/init.d/rc.multi_dnsbl
+	Thanks to "Peter" <spamcannibal@legallybond.com> for spotting
+	those two errors.
+
+	Update Utilities::cntinit v0.03 to initialize counts for
+	Passed, WhiteList and BlackList (IGNORE,BLOCK) entries, 
+	update STAT sort to push above to bottom of list.
+
+	Update to count Passed, WhiteList and BlackList (IGNORE,BLOCK)
+	entries in stats file and print subtotal of rejects followed 
+	by WhiteList and Passed entries
+
+0.12  Wed Jun 23 16:46:38 PDT 2004
+	updated the documentation in multi_dnsbl.conf.sample
+	to clarify problems with the timeouts in sendmail when using
+ 	Net::DNSBL::MultiDaemon
+
+0.11  Fri Jun 18 13:07:14 PDT 2004
+	Change default SOA record to use TTL of 3600 
+	seconds for negative caching and set refresh, retry, to reasonable
+	values
+
+0.10  Sat Mar 20 14:34:51 PST 2004
+	change 'A' response for configured DNSBL's to always return
+	127.0.0.2 -- previous versions returned the 'A' record from
+	the responding DNSBL. This was inconsistent since different
+	DNSBL's don't necessarily use the same codes to specify their
+	rejection reason. Since the DNSBL configuration allows
+	parsing the individual codes for each zone, 127.0.0.2 allows
+	consistency in MultiDaemon's response and does not overlap
+	the return codes for in-addr.arpa, BLOCKED and BBC
+
+0.09  Fri Jan 16 15:09:32 PST 2004
+	updated Net::DNSBL::Utilities to 
+	print the totals at end of log file
+
+0.08  Wed Jan  7 11:08:30 PST 2004
+	Correct documentation on DEPENDENCIES to include 
+	Geo::IP::PurePerl and NetAddr::IP
+
+	update DNSBL's in config file to track Mail::Spamcannibal
+
+0.07  Mon Dec  8 18:34:26 PST 2003
+	Having a little cockpit trouble today :-) Left out the
+	initialization for response when no in-addr.arpa record is found.
+	The nscount and arcount passed through from the PTR record must be 
+	set to zero.
+
+0.06  Mon Dec  8 13:29:57 PST 2003
+	Oops! left perl diagnostics turned on in 0.05
+
+0.05  Mon Dec  8 13:13:12 PST 2003
+	in-addr.arpa queries did not accept SERVFAIL responses as 
+	as valid, just expected NXDOMAIN when reverse queries failed.
+	Logic corrected.
+
+0.04  Sun Dec  7 11:55:05 PST 2003
+	Oops! I neglected to import Net::DNSBL::Utilities::statinit
+	into Net::DNSBL::MultiDaemon so SIG{USR2} was causing a crash.
+
+0.03  Wed Nov 26 18:04:00 PST 2003
+
+	WARNING, you need to upgrade your rc.multi_daemon if this
+	if you have a previously installed version of this module.
+
+	split MultiDaemon into two modules so the utilities are 
+	available to new applications.
+
+	Created Net::DNSBL::Utilities
+
+	add logic to always allow 'IGNORE' block
+	add logic to always reject 'BLOCK' block
+	add logic to Block By Country
+	add logic to reject failed reverse DNS
+
+0.02  Sat Nov 22 16:03:59 PST 2003
+	sockaddr_in does not always ask for scalar arguments 
+	as expected on some perl/OS combinations, therefore
+	scalar arguments must be provided... in particular for 
+	the output of Net::DNS::ToolKit::get_ns which uses 
+	want_array (xs) to return scalar or array values.
+	Thanks to "Gary E. Miller" <gem@rellim.com> for spotting this bug.
+
+0.01  Fri Nov  7 11:18:07 PST 2003
+	initial release

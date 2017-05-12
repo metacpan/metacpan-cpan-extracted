@@ -1,0 +1,89 @@
+TYPEMAP
+Net_CDP			T_PTROBJ_SPECIAL
+Net_CDP_Packet		T_PTROBJ_SPECIAL
+Net_CDP_Address		T_PTROBJ_SPECIAL
+Net_CDP_Address_List	T_PTROBJ_SPECIAL_LIST
+Net_CDP_IPPrefix	T_PTROBJ_SPECIAL
+Net_CDP_IPPrefix_List	T_PTROBJ_SPECIAL_LIST
+
+UV			T_UV
+const char *		T_PV
+BOOL_UNDEF		T_BOOL_UNDEF
+U8_UNDEF		T_UV_UNDEF
+U16_UNDEF		T_UV_UNDEF
+U32_UNDEF		T_UV_UNDEF
+PV_UNDEF		T_PV_UNDEF
+
+INPUT
+T_PTROBJ_SPECIAL
+	SvGETMAGIC($arg);
+	if (SvROK($arg) && sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\"))
+		$var = ($type)SvIV(SvRV($arg));
+	else
+		croak(\"$var is not of type ${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")
+
+T_PTROBJ_SPECIAL_LIST
+	{
+		SvGETMAGIC($arg);
+		if (!SvOK($arg)) {
+			$var = NULL;
+		} else {
+			AV *av;
+			int i;
+			if (!SvROK($arg) || SvTYPE(SvRV($arg)) != SVt_PVAV)
+				croak(\"Invalid argument (must be undef or an array reference)\");
+			av = (AV *)SvRV($arg);
+			$var = cdp_llist_new(
+				(cdp_dup_fn_t)${(my $ntt=$ntype)=~s/_List$//;\$ntt}_dup,
+				(cdp_free_fn_t)${(my $ntt=$ntype)=~s/_List$//;\$ntt}_free
+			);
+			for (i = 0; i <= av_len(av); i++) {
+				SV **t = av_fetch(av, i, 0);
+				if (t) SvGETMAGIC(*t);
+				if (!t || !sv_derived_from(*t, \"${(my $ntt=$ntype)=~s/_/::/g;$ntt=~s/::List$//;\$ntt}\")) {
+					cdp_llist_free($var);
+					croak(\"Element %d is not of type ${(my $ntt=$ntype)=~s/_/::/g;$ntt=~s/::List$//;\$ntt}\", i);
+				}
+				cdp_llist_append(
+					$var,
+					${(my $ntt=$ntype)=~s/_List$//;\$ntt}_dup((${(my $ntt=$ntype)=~s/_List$//;\$ntt})SvIV((SV *)SvRV(*t)))
+				);
+			}
+		}
+	}
+
+T_BOOL_UNDEF
+	if (SvOK($arg)) {
+		$var = (uint8_t *)malloc(sizeof(uint8_t));
+		*$var = SvTRUE($arg);
+	} else
+		$var = NULL;
+	
+T_UV_UNDEF
+	if (SvOK($arg)) {
+		$var = (uint${my($u)=$ntype=~/U(\d+)_UNDEF/;\$u}_t *)
+			malloc(sizeof(
+				uint${my($u)=$ntype=~/U(\d+)_UNDEF/;\$u}_t
+			));
+		*$var = (uint${my($u)=$ntype=~/U(\d+)_UNDEF/;\$u}_t)SvUV($arg);
+	} else
+		$var = NULL;
+
+T_PV_UNDEF
+	{
+		STRLEN tmp;
+		$var = ($type)(SvOK($arg) ? SvPV_nomg($arg, tmp) : NULL);
+	}
+
+OUTPUT
+T_PTROBJ_SPECIAL
+	sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\", (void*)$var);
+
+T_BOOL_UNDEF
+	$arg = ($var ? boolSV(*$var) : &PL_sv_undef);
+
+T_UV_UNDEF
+	if ($var) { sv_setuv($arg, (UV)*$var); } else { $arg = &PL_sv_undef; }
+
+T_PV_UNDEF
+	if ($var) { sv_setpv($arg, $var); } else { $arg = &PL_sv_undef; }

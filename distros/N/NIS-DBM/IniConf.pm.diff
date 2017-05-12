@@ -1,0 +1,84 @@
+From: jgsmith@tamu.edu (James G. Smith)
+
+# The following diff will make IniConf a bit more forgiving on whitespace...
+# send replies to jgsmith@tamu.edu
+#
+*** IniConf.pm.orig	Wed Sep  1 14:09:04 1999
+--- IniConf.pm	Wed Sep  1 14:15:36 1999
+***************
+*** 236,248 ****
+    my $sect = shift;
+    my $parm = shift;
+  
+    if ($self->{nocase}) {
+      $sect = lc($sect);
+      $parm = lc($parm);
+    }
+!   my $val = defined($self->{v}{$sect}{$parm}) ?
+! 	    $self->{v}{$sect}{$parm} :
+! 	    $self->{v}{$self->{default}}{$parm};
+    if (ref($val) eq 'ARRAY') {
+      return wantarray ? @$val : join($/, @$val);
+    } else {
+--- 236,257 ----
+    my $sect = shift;
+    my $parm = shift;
+  
++   $sect =~ s/^\s+//;
++   $sect =~ s/\s+$//;
++   $sect =~ s/\s+/ /g;
++   $parm =~ s/^\s+//;
++   $parm =~ s/\s+$//;
++   $parm =~ s/\s+/ /g;
+    if ($self->{nocase}) {
+      $sect = lc($sect);
+      $parm = lc($parm);
+    }
+!   my $val = undef;
+!   if(exists $self->{v}{$sect}) {
+!     $val = defined($self->{v}{$sect}{$parm}) ?
+!            $self->{v}{$sect}{$parm} :
+!            $self->{v}{$self->{default}}{$parm};
+!   }
+    if (ref($val) eq 'ARRAY') {
+      return wantarray ? @$val : join($/, @$val);
+    } else {
+***************
+*** 268,273 ****
+--- 277,288 ----
+    my $parm = shift;
+    my @val  = @_;
+  
++   $sect =~ s/^\s+//;
++   $sect =~ s/\s+$//;
++   $sect =~ s/\s+/ /g;
++   $parm =~ s/^\s+//;
++   $parm =~ s/\s+$//;
++   $parm =~ s/\s+/ /g;
+    if (defined($self->{v}{$sect}{$parm})) {
+      if (@val > 1) {
+        $self->{v}{$sect}{$parm} = \@val;
+***************
+*** 329,334 ****
+--- 344,352 ----
+      }
+      elsif (/^\s*\[([^\]]+)\]\s*$/) {		# New Section
+        $sect = $1;
++       $sect =~ s/^\s+//;
++       $sect =~ s/\s+$//;
++       $sect =~ s/\s+/ /g;
+        $sect = lc($sect) if $nocase;
+        push(@{$self->{sects}}, $sect);
+        if ($sect =~ /(\S+)\s+(\S+)/) {		# New Group Member
+***************
+*** 347,352 ****
+--- 365,373 ----
+        }
+      }
+      elsif (($parm, $val) = /\s*(\S+)\s*=\s*(.*)/) {	# new parameter
++       $parm =~ s/^\s+//;
++       $parm =~ s/\s+$//;
++       $parm =~ s/\s+/ /g;
+        $parm = lc($parm) if $nocase;
+        $self->{pCMT}{$sect}{$parm} = [@cmts];
+        @cmts = ( );

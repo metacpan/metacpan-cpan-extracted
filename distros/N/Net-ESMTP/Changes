@@ -1,0 +1,16 @@
+Revision history for Perl extension ESMTP.
+
+0.0.1 Thu Dec 14 16:46:00 2004
+    - release version 0.2.1
+    - fix documentation spell mistakes (thanks to Sergey Skvortsov)
+
+0.02  Sun Jan 25 22:15:00 2003
+    - release version 0.02
+    - update Makefile.PL when libs contain -pthread argument
+    - fix smtp_strerror in multithreaded environment (for GNU libc strerror_r version)
+    - update to libesmtp 1.0.2 version (three new constants)
+
+0.01  Wed Jun 18 20:29:30 2003
+	- original version; created by h2xs 1.22 with options
+		/usr/include/libesmtp.h --skip-ppport --name ESMTP -- -lesmtp
+

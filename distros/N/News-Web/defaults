@@ -1,0 +1,27 @@
+our $STYLESHEET = "stylesheet.css";
+our $SERVER  = "news.killfile.org";
+our $USER   = "guest";
+our $PASS   = "guest";
+
+## html_head ( TITLE [, OPTIONS] )
+# Prints off a basic HTML header, with debugging information.  Extra
+# options are passed through to start_html.
+
+sub html_head { 
+  my $title = shift || $TITLE;
+  use CGI;   my $cgi = new CGI;
+  $cgi->start_html(-title => $title, -style => {'src'=>$STYLESHEET}, @_) . "\n";
+}
+
+## html_foot ( DEBUG [, OPTIONS] )
+# Prints off a basic HTML footer, with debugging information.
+
+sub html_foot { 
+  my $user = shift || $OPTIONS{user};
+  use CGI;   my $cgi = new CGI;
+  push @return, "<hr />", 
+	"<p align=right>Currently logged in as <i>$user</i><br />",
+        "<a href='setcookie.cgi'>Change This</a></p>";
+  push @return, $cgi->end_html(@_);
+  join("\n", @return, "");
+}

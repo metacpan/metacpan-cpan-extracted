@@ -1,0 +1,6 @@
+Revision history for Perl extension Net-DNS-Utility.
+
+0.01  Tue May  6 15:07:18 2008
+	- original version; created by h2xs 1.23 with options
+		-AX -n Net-DNS-Utility
+

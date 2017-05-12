@@ -1,0 +1,75 @@
+Revision history for Perl extension Net::Frame::Dump.
+
+1.14 Tue Dec  9 19:12:25 CET 2014
+   - BUGFIX: Dump::Online2: do not eat 100% and do not block for timeoutOnNext 
+             seconds when it is not REALLY needed. We had to remove the 
+             setnonblock option and to use pcap_dispatch i/o pcap_next_ex.
+             This should be the final bugfix...
+             There was also an infinite loop condition.
+   - new: Dump::Online2: maxRunTime() option to stop looping on next() forever 
+          when we do not want. Default to loop forever.
+
+1.13 Sun Dec  2 15:44:14 CET 2012
+   - BUGFIX: Dump::Online2: in non-blocking mode, we must handle our internal
+             received frame ring buffer. Many packets were missed because of
+             that.
+
+1.12 Tue Nov 13 20:15:19 CET 2012
+   - UPDATE: Dump::Online2: now uses IO::Select to avoid eating 100% CPU
+   - update: mailing list link
+
+1.11 Sun Nov 11 15:23:04 CET 2012
+   - bugfix: Dump::Online2 pod
+   - new: Dump::Online2: support for capture only mode
+   - new: examples for Dump::Online2
+
+1.10 Wed Sep 12 20:15:09 CEST 2012
+   - bugfix: Online: use SUPER::next() instead of next()
+   - update: error messages scheme changed
+   - update: copyright notice
+
+1.09 Mon Mar 28 19:33:24 CEST 2011
+   - new: added support for ERF data link type
+   - new: added support to append data to a pcap file in Writer mode
+   - bugfix: allows to sniff on an interface without IP address
+
+1.08 Sun Feb 20 17:51:58 CET 2011
+   - new: Net::Frame::Dump::Online2: non-blocking live capture
+   => If I had seen that sooner ...
+
+1.07 Thu Jan 13 11:17:12 CET 2011
+   - bugfix: stop() returns if in isSon()
+   - bugfix: stop() when _clean()
+   - update: _killTcpdump(), only KILL now
+   - update: you can send a SIGHUP to print pcap stats
+   - update: SIGINT & SIGTERM call _clean in parent process
+   - update: printStats() only print stats
+   - update: copyright notice
+
+1.06 Wed Jun 17 00:11:39 CEST 2009
+   - bugfix: isSon() and isFather() from Net::Frame::Dump::Online 
+     now truly return isSon() and isFather() ^^
+
+1.05 Sun May 31 16:43:22 CEST 2009
+   - new: NF_DUMP_LAYER_80211 link layer support
+   - new: NF_DUMP_LAYER_80211_RADIOTAP link layer support
+   - update: replaced croak()/carp() messages with warn()
+   - update: copyright notice
+
+1.04 Sun Apr 20 12:20:04 CEST 2008
+   - bugfix: do not return() when no IPv4 address is assigned in live capture
+   - update: mailing list URL, see README
+
+1.03 Sat Apr 19 18:51:49 CEST 2008
+   - new: added snaplen attribute in Net::Frame::Dump::Online
+
+1.02
+   - bugfix: license string (should be artistic, not Artistic)
+
+1.01 Sat Feb 16 18:02:37 CET 2008
+   - bugfix: no pcap_lookupnet() in setFilter()
+   - added NF_DUMP_LAYER_80211RADIO link layer support
+
+1.00 Sun Dec 17 17:53:51 CET 2006
+   - first public release
+

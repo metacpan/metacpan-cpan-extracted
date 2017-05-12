@@ -1,0 +1,48 @@
+{
+   "abstract" : "Postcode.nl Webshop API",
+   "author" : [
+      "Peter Stuifzand <peter@stuifzand.eu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-PostcodeNL-WebshopAPI",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::XS" : "2.33",
+            "LWP::UserAgent" : "6.04",
+            "URI::Template" : "0.16",
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "Net::PostcodeNL::WebshopAPI" : {
+         "file" : "lib/Net/PostcodeNL/WebshopAPI.pm",
+         "version" : "0.2"
+      },
+      "Net::PostcodeNL::WebshopAPI::Response" : {
+         "file" : "lib/Net/PostcodeNL/WebshopAPI/Response.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.2"
+}

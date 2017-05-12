@@ -1,0 +1,10 @@
+2016-10-12   1.4   Update calling convention in test
+
+2007-03-13   1.3   Bundle old version of DBM::Deep, cos version 1.0 ain't
+                     combatible with our old databases
+
+2006-08-25   1.2   Fixed test to work with fixed Number::Phone::UK
+
+2006-08-24   1.1   Updated dependencies to avoid buggy Number::Phone::UK. Doh!
+
+2006-08-23   1.0   Initial release

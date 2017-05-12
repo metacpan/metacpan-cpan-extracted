@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use IO::Async::Loop;
+use Net::Async::CassandraCQL;
+
+use Getopt::Long;
+use Future::Utils qw( fmap_void );
+use Socket qw( getnameinfo NI_NUMERICHOST NI_NUMERICSERV );
+
+GetOptions(
+   'host|h=s' => \(my $HOST = "localhost"),
+   'user|u=s' => \my $USERNAME,
+   'pass|p=s' => \my $PASSWORD,
+   'number|n=i' => \(my $PRIMARIES = 1),
+) or exit 1;
+
+my $loop = IO::Async::Loop->new;
+
+my $cass = Net::Async::CassandraCQL->new(
+   host      => $HOST,
+   username  => $USERNAME,
+   password  => $PASSWORD,
+   primaries => $PRIMARIES,
+);
+$loop->add( $cass );
+
+$cass->connect->get;
+
+$cass->configure(
+   on_node_up => sub {
+      my ( undef, $nodeid ) = @_;
+      print "NODE UP $nodeid\n";
+   },
+   on_node_down => sub {
+      my ( undef, $nodeid ) = @_;
+      print "NODE DOWN $nodeid\n";
+   },
+);
+
+$loop->run;

@@ -1,0 +1,36 @@
+NewsClipper.pl                        The main script
+MakeHandler.pl                        A utility to help users make new
+                                        handlers
+ConvertConfig.pl                      A utility for converting configuration
+                                        files for earlier versions of News
+                                        Clipper
+ConvertHandler.pl                     A utility for converting handlers for
+                                        earlier versions of News Clipper
+Makefile.PL                           The makefile script for installation
+NewsClipper.cfg                       A sample configuration file
+SampleFiles/sample.txt                A sample template file
+README                                Read this first
+MANIFEST                              This file
+CHANGES                               A change history
+DESIGN                                Documentation for the script's design
+userman.html                          An outdated user's manual
+NewsClipper/AcquisitionFunctions.pm   A module containing data gathering
+                                        functions, used by handlers.
+NewsClipper/Globals.pm                A module containing all the global
+                                        functions and constants.
+NewsClipper/Handler.pm                The base class for all handlers.
+NewsClipper/HTMLTools.pm              A module containing useful HTML
+                                        manipulation routines.
+NewsClipper/HandlerFactory.pm         Encapsulates the task of locating,
+                                        locally or remotely, a handler for a
+                                        News Clipper tag.
+NewsClipper/Cache.pm                  Implements the News Clipper cache
+NewsClipper/Parser.pm                 News Clipper's parser for HTML
+NewsClipper/TagParser.pm              News Clipper's parser for
+                                        <!--newsclipper...--> tags
+NewsClipper/Interpreter.pm            Executes News Clipper commands
+NewsClipper/Types.pm                  Contains built-in type information, as
+                                        well as support for making new types.
+NewsClipper/Server.pm                 Server base class
+NewsClipper/Server/MySQL.pm           MySQL interface to the handler server
+NewsClipper/Server/CGI.pm             CGI interface to the handler server

@@ -1,0 +1,68 @@
+{
+   "abstract" : "serve HTTP with C<IO::Async>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Async-HTTP-Server",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Request" : "0",
+            "IO::Async" : "0.54",
+            "IO::Async::Listener" : "0.61"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Response" : "0",
+            "IO::Async::Test" : "0",
+            "Test::Identity" : "0",
+            "Test::More" : "0.88",
+            "Test::Refcount" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Async::HTTP::Server" : {
+         "file" : "lib/Net/Async/HTTP/Server.pm",
+         "version" : "0.09"
+      },
+      "Net::Async::HTTP::Server::PSGI" : {
+         "file" : "lib/Net/Async/HTTP/Server/PSGI.pm",
+         "version" : "0.09"
+      },
+      "Net::Async::HTTP::Server::Protocol" : {
+         "file" : "lib/Net/Async/HTTP/Server/Protocol.pm",
+         "version" : "0.09"
+      },
+      "Net::Async::HTTP::Server::Request" : {
+         "file" : "lib/Net/Async/HTTP/Server/Request.pm",
+         "version" : "0.09"
+      },
+      "Plack::Handler::Net::Async::HTTP::Server" : {
+         "file" : "lib/Plack/Handler/Net/Async/HTTP/Server.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.09"
+}

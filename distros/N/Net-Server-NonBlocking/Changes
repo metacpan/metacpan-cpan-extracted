@@ -1,0 +1,9 @@
+Revision history for Perl extension Net::Server::NonBlocking.
+
+0.48  August 2003
+	- Fix cron bug
+
+0.01  Fri Dec  6 06:16:12 2002
+	- original version; created by h2xs 1.22 with options
+		-AXn Net::Server::NonBlocking -b 5.0.00503
+

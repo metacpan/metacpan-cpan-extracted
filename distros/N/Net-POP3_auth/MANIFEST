@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+POP3_auth.pm
+test.pl
+README
+eg/pop3-tester.pl

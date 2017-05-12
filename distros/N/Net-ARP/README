@@ -1,0 +1,62 @@
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+Net::ARP
+
+Programmed by Bastian Ballmann
+Web: http://www.codekid.net
+Mail: balle@codekid.net
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+---:[ Description
+
+This module is a Perl extension to create and send ARP packets and lookup
+local or remote mac addresses.
+You do not need to install any additional libraries like Libnet to compile 
+this extension. It uses kernel header files to create the packets.
+
+
+---:[ IMPORTANT NOTICE
+
+Version 1.0 will break with the API of PRE-1.0 versions, 
+because the return value of arp_lookup() and get_mac()
+will no longer be passed as parameter, but returned!
+I hope this decision is ok as long as we get a cleaner and more perlish API.
+
+
+---:[ Installation
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+---:[ Usage
+
+Please read the POD documentation: perldoc Net::ARP.
+If you've still any questions feel free to ask.
+
+
+---:[ Want to contribute?
+
+Please drop me a mail and if you want to submit patches please
+generate them using "diff -Nru" on the latest version or use the
+exellent github pull request feature!
+https://github.com/balle/Net-ARP
+
+There is also the possibility to use the CPAN bugtracker 
+https://rt.cpan.org
+
+Last but not least new code for new features should be commented 
+and I like test code ;)
+
+
+---:[ COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2013 by Bastian Ballmann
+
+This software is licensed under GPLv2
+

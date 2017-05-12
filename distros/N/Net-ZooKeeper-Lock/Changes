@@ -1,0 +1,12 @@
+Revision history for Net-ZooKeeper-Lock
+
+0.03    Sun Oct 28, 2012
+	New method lock_path() and ability to store arbitrary data in a node
+	added by Oleg Komarov.
+
+0.02    Mon Oct 31, 2011
+        Fix for 'create_prefix' option (it didn't work properly).
+
+0.01    Tue Oct 04, 2011
+        Initial release.
+

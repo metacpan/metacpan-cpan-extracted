@@ -1,0 +1,10 @@
+Changes
+Net-CIDR-Compare.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Net-CIDR-Compare.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Net/CIDR/Compare.pm

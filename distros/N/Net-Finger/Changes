@@ -1,0 +1,31 @@
+Revision history for Perl extension Net::Finger.
+
+1.0   Tue Dec 15 16:32:05 EST 1998
+	- Wrote it in about 30 minutes while staying late at work. Cleaned
+	  it up the next day for CPAN submission. See the BUGS section in
+	  the pod for the things I'd like to work into it sometime.
+
+1.01  Sun Dec 20 12:27:51 CST 1998
+	- Fixed a silly bug with apostrophes in quoted strings. Thanks
+	  muchly to James Mastros for pointing this out.
+
+1.02  Sometime on February 11th
+	- Chris Nandor, the Pudgemeister, pointed out that \r\n won't mean
+	  what I was using it to mean on a Mac. We now use \015\012.
+
+1.03  Wed Mar  3 12:33:45 EST 1999
+	- The inifitely studly Vladimir Pastukhov sent me a patch for the
+	  nifty "hostname:port" feature. Replaced the constant DEBUG stuff
+	  with the user-frobbable $Net::Finger::debug flag.
+
+1.04  Thu Mar  4 12:00:34 EST 1999
+	- The Pudgemeister does it again. Damn, am I stupid.
+
+1.05  Sat Jun 12 14:55:40 CDT 1999
+	- John Porter is wee. I am neen. Fixed a bug with $_ that I
+          deserve to be righteously slapped for. Thanks, John!
+
+1.06  Thu Nov  1 15:14:27 PST 2001
+	- Many thanks to Alan Burlison, who sent in a patch for a bug that
+	  inhibited verbose output when using the "@host" syntax.
+

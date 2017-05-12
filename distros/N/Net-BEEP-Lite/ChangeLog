@@ -1,0 +1,81 @@
+2004-04-22  David Blacka  <davidb@verisignlabs.com>
+
+	* release 0.06
+
+	* MANIFEST.SKIP: prevent old releases from getting into the
+	MANIFEST.
+
+	* lib/Net/BEEP/Lite/Session.pm (_read_frame): Allow for empty
+	frames.  This used to erroneously assume that if the frame payload
+	length was 0, there was no trailer.
+
+	* lib/Net/BEEP/Lite/Message.pm (add_frame, _decode_mime_entity):
+	suppress more "uninitialized value" warnings when there are no
+	MIME headers.
+
+2004-04-08  David Blacka  <davidb@verisignlabs.com>
+
+	* release 0.05
+
+2004-03-31  David Blacka  <davidb@verisignlabs.com>
+
+	* lib/Net/BEEP/Lite/Session.pm (_read_frame): Add read timeouts
+	(using alarm).  This should allow servers to shutdown idle
+	sessions and prevent peers from getting wedged by framing errors.
+
+2004-02-24  David Blacka  <davidb@verisignlabs.com>
+
+	* lib/Net/BEEP/Lite/Frame.pm (_parse_header): suppress
+	"uninitialized value" warnings, from Matthew Darwin <matthew -at-
+	mdarwin.ca>
+
+	* release 0.04
+
+2004-02-23  David Blacka  <davidb@verisignlabs.com>
+
+	* lib/Net/BEEP/Lite.pm (beep_connect): add "Socket" parameter,
+	from Matthew Darwin <matthew -at- mdarwin.ca>.
+
+2004-01-29  David Blacka  <davidb@verisignlabs.com>
+
+	* lib/Net/BEEP/Lite/Session.pm (close_session): set the 'sock'
+	member var. to undef to prevent calls to IO::Socket::is_connected
+	after the the socket is known to be closed.
+
+	* release 0.03
+	
+2003-10-06  David Blacka  <davidb@verisignlabs.com>
+
+	* lib/Net/BEEP/Lite.pm (_beep_listen_fork): Ignore SIGCHILDs
+	[oops].
+	
+
+2003-09-11  David Blacka  <davidb@verisignlabs.com>
+
+	* renamed to Net::BEEP::Lite.
+
+	* MgmtProfile.pm: better piggybacked data behavior: use
+	BaseProfile::start_channel_request, plus <profile> replies get
+	their data stowed in the session.  Also,
+	send_start_channel_request return a tuple of (channel_number,
+	message).
+
+	* Session.pm (recv_message, _recv_message, _recv_frame): add named
+	parameters to this chain of routines.  The only one so far is
+	"NoSEQ" which will surpress SEQ generation by _recv_frame.
+
+	* Session.pm (_tuning_reset): added.
+
+	* BaseProfile.pm: renamed startChannelData to
+	start_channel_request and changed the result semantics to a richer
+	set of options.
+
+2003-09-08  David Blacka  <davidb@verisignlabs.com>
+
+	* released version 0.01 (a beta release).
+
+2003-08-27  David Blacka  <davidb@verisignlabs.com>
+
+	* original version; created by h2xs 1.22 with options
+	  -AX -n Net::BeepLite
+

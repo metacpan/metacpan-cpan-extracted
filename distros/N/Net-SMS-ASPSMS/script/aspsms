@@ -1,0 +1,210 @@
+#!/usr/bin/env perl
+
+#----------------------------------------------------------------------------
+# aspsms version 0.1.6
+#----------------------------------------------------------------------------
+# Copyright (c) 2013 Jacques Supcik
+#----------------------------------------------------------------------------
+
+use strict;
+use warnings;
+use Carp;
+use Getopt::Long;
+use Net::SMS::ASPSMS;
+use Pod::Usage;
+use File::Basename;
+use Encode qw(decode encode);
+
+our $VERSION = '0.1.6';
+my %opt = ();
+
+foreach (qw(userkey password originator)) {
+    $opt{$_} = $ENV{'ASPSMS_' . uc($_)} if defined $ENV{'ASPSMS_' . uc($_)};
+}
+
+GetOptions(
+    \%opt,
+    qw(version help man encoding=s operation=s userkey=s password=s originator=s
+        recipient-phone-number=s)
+) or pod2usage(2);
+
+pod2usage(-verbose => 1) if ($opt{help});
+pod2usage(-verbose => 2) if ($opt{man});
+
+if ($opt{version}) {
+    print <<EOT;
+aspsms $VERSION
+
+Copyright (c) 2013, Jacques Supcik <supcik\@cpan.org>
+All rights reserved.
+EOT
+    exit;
+}
+
+if (not defined $opt{operation}) {
+    if (basename($0) =~ /^aspsms-(.*?)(?:\.pl)?$/) {
+        $opt{operation} = $1;
+    } elsif (defined $ARGV[0]) {
+        $opt{operation} = shift @ARGV;
+    } else {
+        $opt{operation} = 'send_text_sms';
+    }
+}
+$opt{operation} =~ s/-/_/g;
+$opt{encoding} = "UTF-8" if not defined $opt{encoding};
+
+my $sms = new Net::SMS::ASPSMS(
+    userkey  => $opt{userkey},
+    password => $opt{password},
+);
+
+sub show_credits {
+    $sms->show_credits();
+    printf "You still have %s units\n", $sms->result->{Credits};
+}
+
+sub send_text_sms {
+    my $message_data;
+    {
+        local $/;    # enable localized slurp mode
+        $message_data = decode($opt{encoding}, <STDIN>);
+    }
+
+    $sms->send_text_sms(
+        Recipient_PhoneNumber => $opt{'recipient-phone-number'},
+        Originator            => $opt{originator},
+        MessageData           => $message_data
+    );
+    printf "Result: %s\n", $sms->result->{ErrorDescription};
+}
+
+eval {
+    no strict qw(refs);
+    $opt{operation}->();
+};
+
+if ($@ =~ /^Undefined subroutine/) {
+    printf "Unknown operation: %s\n", $opt{operation};
+}
+
+__END__
+
+=head1 NAME
+
+aspsms - A simple script to ASPSMS services (using Net::SMS::ASPSMS)
+
+=head1 VERSION
+
+This document describes aspsms version 0.1.6
+
+=head1 SYNOPSIS
+
+  aspsms [option] ...
+
+  echo "Hello" | aspsms --userkey=MyUserKey --password=SecReT \
+                        --originator=Me     --recipient=+5150123456
+
+  export ASPSMS_USERKEY="MyUserKey"
+  export ASPSMS_PASSWORD="SecReT"
+  echo "Hello" | aspsms --originator=Me --recipient=+5150123456
+
+  aspsms --operation=show_credits
+
+  aspsms show_credits
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--help>
+
+Print a help message describing all of aspsms’s command-line options.
+
+=item B<--man>
+
+Prints the manual page of aspsms
+
+=item B<--version>
+
+Display the version of aspsms.
+
+=item B<--operation=OP>
+
+The operation to be done. Currently, only B<show-credits> and
+B<send-text-sms> are implemented. The option can also be taken from the
+file name (just make a symbolic link named C<aspsms-op> to the script
+(e.g. aspsms-send-text-sms). You can also give the operation as the
+first non-option argument (e.g. C<aspsms send-text-sms>)
+
+If no operation is specified, C<send-text-sms> is used by default.
+
+=item B<--encoding=ENCODING>
+
+When sending message using the B<send-text-sms>, the message is sopposed
+to en encoded using C<ENCODING>. Defaults: B<UTF-8>. Use B<ISO-8859-1> for
+latin1.
+
+=item B<--userkey=USER_KEY>
+
+The userkey can also be specified using the C<ASPSMS_USERKEY> environment
+variable. No default is offered.
+
+=item B<--password=PASSWORD>
+
+The password can also be specified using the C<ASPSMS_PASSWORD> environment
+variable. No default is offered
+
+=item B<--originator=ORIGINATOR>
+
+The originator can also be specified using the C<ASPSMS_ORIGINATOR> environment
+variable. No default is offered.
+
+=item B<--recipient-phone-number=PHONE_NUMBER>
+
+Note, you can also shorten this option as long as it is uniquely
+identified (e.g --recipient=...). No default is offered.
+
+=back
+
+=head1 DESCRIPTION
+
+There are no known bugs in this script. 
+Please report problems to Jacques Supcik C<< <supcik@cpan.org> >>.
+Patches are welcome.
+
+
+=head1 AUTHOR
+
+Jacques Supcik C<< <supcik@cpan.org> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2013, Jacques Supcik C<< <supcik@cpan.org> >>.
+All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+

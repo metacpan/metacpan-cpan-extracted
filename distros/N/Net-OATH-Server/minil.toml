@@ -1,0 +1,4 @@
+name = "Net-OATH-Server"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

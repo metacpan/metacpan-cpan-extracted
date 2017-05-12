@@ -1,0 +1,67 @@
+Revision history for Net::Nmsg
+
+0.17  Wed Mar  1 11:47:19 EST 2017
+    - JSON input/output support
+    - support for randomized interval beginnings
+    - proper output set_rate() support (rate objects garbage collected)
+
+0.15  Thu Mar 12 10:28:04 EDT 2015
+    - moved to Math::Int64 v0.51
+
+0.14  Thu Mar  5 15:18:39 EST 2015
+    - initialization of int64 module
+    - fixed calls to add_output_sock() and add_input_channel()
+    - fixed fetch for repeated field values
+    - fixed some input option settings
+
+0.13  Fri Feb 20 16:11:02 EST 2015
+    - fully integrated Math::Int64 and hex parsing
+    - added some exceptions for certain failure modes
+    - enabled environment variable control of debug (NET_NMSG_DEBUG)
+
+0.12  Fri Oct  3 16:17:23 EDT 2014
+    - fixed operator/group accessors for IO when done prior to
+      adding inputs/outputs
+    - added some sanity checks for unknown vendor id and message type
+    - fixed presentation format headers
+    - revamped examples based on SIE feedback
+
+0.11  Thu Mar 20 09:42:36 EDT 2014
+    - fixed some examples
+
+0.10  Wed Mar 19 14:12:45 EDT 2014
+    - migrated vendor 'ISC' to 'base' (ISC deprecated)
+    - fixed broadcast option for output sockets
+    - updated examples
+    - vendor/type render order in headers fixed
+
+0.09  Thu Jan 12 14:08:43 EST 2012
+    - correctly import some of the Math::Int64 routines
+    - doc tweaks
+
+0.08  Tue Oct 18 16:52:32 EDT 2011
+    - moved to lazy evaluation/creation of xs messages
+    - operator/group aliases updated
+    - enum/text conversions updated
+    - added encode examples
+
+0.07  Thu Oct 13 13:47:29 EDT 2011
+    - added tests for type coverage
+
+0.06  Mon Oct 10 18:00:06 EDT 2011
+    - added typemap support for double and bool
+
+0.05  Fri Oct  7 18:07:18 EDT 2011
+    - fixed some 64 bit typemap issues
+    - fixed thread/lock issue in message_to_pres()
+
+0.04  Mon Sep 20 17:43:06 EDT 2010
+    - tweaked socket handlers
+    - more examples
+
+0.02  Thu Aug 12 18:11:00 EDT 2010
+    - pcap fix
+    - added more examples
+
+0.01  Mon Jun 21 15:32:47 EDT 2010
+    - initial release

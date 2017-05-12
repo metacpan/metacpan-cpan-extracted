@@ -1,0 +1,49 @@
+Revision history for Perl module Net::ACME
+
+0.01 Mon Nov 14 2016
+- original port from cPanel
+
+0.02 Thu Nov 17 2016
+- Remove CryptX dependency
+
+0.03 Fri Nov 18 2016
+- Fix broken Crypt::JWT dependency, make Crypt::OpenSSL::RSA optional
+- Make http-01 challenge local handler create .well-known directory
+
+0.09 Thu Nov 24 2016
+- Finish porting cPanel tests
+- Remove Class::Accessor dependency
+- Add more documentation
+- Need to test CPAN installation
+
+0.091 Fri Nov 25 2016
+- Compatible with Perl 5.8+ (previously required 5.14+)
+- Fix a clobber of $@
+- Prevent clobber of $?
+- Remove XS dependencies from tests.
+- Add missing File::Slurp test dependency to Makefile.PL
+
+0.092 Sun Nov 27 2016
+- Remove vestigial Crypt::OpenSSL::RSA use()s in tests.
+  (They were breaking some test runs.)
+
+0.0921 Sun Nov 27 2016
+- Still another test fix (grr, DNS)
+
+0.0922 Wed Nov 30 2016
+- Trying once more to get a stable t/Net-ACME-HTTP.t
+- Avoid clobbering $@ in Perl 5.10 and 5.8.
+
+0.093 Mon Dec 19 2016
+- Remove Types::Serialiser dependency.
+
+0.094 Thu Dec 22 2016
+- Fixed MANIFEST (missing files broke tests)
+
+0.1 Tue Jan 03 2017
+- No more OpenSSL--we now go anywhere Perl goes!
+- ECDSA support!
+- Stronger warning about tls-sni-01 challenges. (Yowza, how’d that slip by??)
+
+0.11 Wed Feb 08 2017
+- Require bug-fixed Crypt::Perl version

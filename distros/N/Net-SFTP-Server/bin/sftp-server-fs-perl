@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+# use Carp 'verbose';
+# BEGIN { $Net::SFTP::Server::debug = -1 }
+
+use Net::SFTP::Server::FS;
+
+my $server = Net::SFTP::Server::FS->new(timeout => 15);
+$server->run;
+

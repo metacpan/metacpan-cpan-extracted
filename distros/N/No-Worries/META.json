@@ -1,0 +1,55 @@
+{
+   "abstract" : "coding without worries",
+   "author" : [
+      "Lionel Cons <lionel.cons@cern.ch>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "No-Worries",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Config" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Encode" : "0",
+            "Fcntl" : "0",
+            "HTTP::Date" : "0",
+            "IO::Handle" : "0",
+            "IO::Select" : "0",
+            "POSIX" : "0",
+            "Params::Validate" : "0",
+            "Sys::Hostname" : "0",
+            "Sys::Syslog" : "0",
+            "Time::HiRes" : "0",
+            "URI::Escape" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.4"
+}

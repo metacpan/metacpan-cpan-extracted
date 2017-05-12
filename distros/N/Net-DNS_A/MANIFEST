@@ -1,0 +1,10 @@
+Changes
+DNS_A.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Net-DNS_A.t
+lib/Net/DNS_A.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

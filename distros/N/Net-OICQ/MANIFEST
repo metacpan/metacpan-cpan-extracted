@@ -1,0 +1,17 @@
+Build.PL
+Changes
+Copyright
+MANIFEST
+META.yml
+Makefile.PL
+README
+RELEASE.utf8
+bin/qq
+demo1
+lib/Net/OICQ.pm
+lib/Net/OICQ/ClientEvent.pm
+lib/Net/OICQ/TextConsole.pm
+lib/Net/OICQ/Event.pm
+lib/Net/OICQ/ServerEvent.pm
+t/00-load.t
+win32qq

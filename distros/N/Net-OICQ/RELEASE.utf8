@@ -1,0 +1,84 @@
+### $Id: RELEASE.utf8,v 1.1 2007/06/09 03:40:24 tans Exp $
+Net::OICQ 1.4版   2007年6月6日
+再次重写登陆和信息处理程序。
+
+Net::OICQ 1.3版
+
+Net::OICQ 1.2版   2006年9月5日
+
+没有大的结构更动，只有一些小修改。
+
+
+Net::OICQ 1.0版   2006年8月8日
+
+新加的功能：
+0. 使用TCP登录服务器，支持HTTP代理。
+1. 初步支持群，查看群的资料，群聊。
+2. 可判断对方企图上传文件（还是不支持文件接收或传送）。
+
+大幅改写模块，使模块调用规范化。Net::OICQ用来登录和发送QQ命令，
+键盘输入产生Net::OICQ::ClientEvent object, 服务器答复产生
+Net::OICQ::ServerEvent object，然后用parse method解析后存入
+object。Net::OICQ::TextConsole完全从其他模块分离出来。
+
+请参考新加的demo1 Perl程序以了解模块调用方法和数据结构。
+
+
+Net::OICQ 0.9版   2005年1月3日
+
+一些小修补对付腾迅的新信息格式:
+
+get_msg子程序移到OICQ/ServerEvent.pm去，使用@MsgPrecursors和@AutoMsgPrecursors。
+
+$Net::OICQ::MsgPrecursor改为11字节。
+
+OICQ/TextConsole.pm增加两处过滤器处理用户信息中的0x00-0x1f控制字符。
+
+
+Net::OICQ 0.8版   2003年11月26日
+
+模块结构调整：
+
+加密算法放到Crypt::OICQ模块，这样别的模块也可以调用加密算法。Crypt::OICQ
+需要分别安装，请下载Crypt-OICQ-1.0.tgz然后安装：
+$ tar zxvf Crypt-OICQ-1.0.tgz
+$ cd Crypt-OICQ-1.0
+$ perl Makefile.PL
+$ make test
+$ su
+# make install
+
+新加的功能：
+
+1. 新命令/eval，让你即兴运行脚本，为所欲为。例如：
+/eval print $oicq->{Trash} 会打印腾迅服务器送给你的垃圾。
+注：$oicq是预先定义好的代表当前Net::OICQ object的变量
+
+2. 新增plugin子程序，允许自定义自动回复插件，用法如下：
+
+/plugin /xxxx/yyyy/zzzz.pl
+
+注：/xxxx/yyyy/zzzz.pl必须是Perl程序，包含如下子程序：
+    sub on_messages ($oicq, $her_id, $her_message)
+    sub on_login ($oicq, $her_id)
+
+3. 新增发话命令：/[号码] [要送出去的话] 可以马上发送，但不改缺省聊天对象
+
+4. 新增快捷使用好友号码功能，/f命令输出的序列号可用于命令中代替好友QQ号，例如：
+/10  设第10个好友的号为缺省聊天对象
+/get 10  读取第10个好友的个人资料
+/10 zzzzzzzzzzzzzzzzz 发单行话给第10个好友
+
+5. 新增显视对方QQ版本功能(16进制表达)
+
+修正的毛病：
+
+1. 修正了收发时间错误
+
+2. 解决模块在使用Perl 5.8版时的多字节字符问题
+
+3. $oicq->{PWMD5}改为$oicq->{PWKey},因为v2000c 1230b以后使用密码的双重MD5
+
+4. 解决perl oicq特色的“翁”毛病，让你看到对方使用的字体名
+
+5. 可执行文件名字改为q。旧名字oicq在cygwin下和OICQ目录名冲突。

@@ -1,0 +1,95 @@
+2.9       2015-02-19 11:12:30+00:00 Europe/London
+ - add receipt_timeout to TraceOnly, to support Net::Stomp 0.53
+
+2.8       2015-01-26 18:09:55+00:00 Europe/London
+ - add send_with_receipt to TraceOnly, require Net::Stomp 0.51
+
+2.7       2014-07-29 10:46:22+01:00 Europe/London
+ - use SingleEncoding (thanks sergeyromanov)
+
+2.6       2014-07-14 17:16:36+01:00 Europe/London
+ - require Net::Stomp 0.49
+ - move failover handling to Net::Stomp, now that we know it works
+
+2.5       2014-06-25 14:31:48+01:00 Europe/London
+ - fix race-condition on tracing: write to a temporary file, then
+   rename; this fixes some hard-to-reproduce problems when used in
+   conjunction with Plack::Handler::Stomp::NoNetwork, which would read
+   a new frame from disk before we've finished writing it
+
+2.4       2014-03-10 10:33:41 Europe/London
+ - RT #93698 fix dependency on newer List::Util for 'none' (thanks to
+   Andreas J. König who did the work of figuring out the version
+   before I even started looking into the problem)
+
+2.3       2014-03-04 11:12:56 Europe/London
+ - enable SSL connections, I had not noticed that there was no
+   sensible way to set them up via these helpers
+
+2.2       2014-02-25 15:03:27 Europe/London
+ - you can now specify which frame types TracerRole will dump
+
+ BREAKING CHANGES:
+ - only SEND and MESSAGE frames will be dumped by default, set
+   trace_types to [] to get the previous behaviour
+
+2.1       2013-10-09 11:56:21 Europe/London
+ - TraceOnly now emulates send_transactional as well as send
+
+2.0       2013-05-23 22:19:12 Europe/London
+ - TracerRole now allows you to specify the permissions for the
+   directories of dumped files
+ - fixed tests under Windows and other systems without POSIX file
+   permissions
+
+1.9       2013-05-16 17:36:57 Europe/London
+ - TracerRole now allows you to specify the permissions for the dumped
+   files
+
+1.8       2013-03-01 15:46:59 Europe/London
+ - ReadTrace::read_frame_from_* better detects broken or incomplete
+   frames in files (fixes RT #83320)
+
+1.7       2012-11-21 17:18:29 Europe/London
+ - ReadTrace::clear_destination no longer removes the trace directory,
+   it just empties it; this makes looking for files via
+   File::ChangeNotify much simpler
+ - ReadTrace::read_frame_from_filename returns nothing if the file
+   can't be parsed as a STOMP frame
+
+1.6       2012-10-24 15:28:25 Europe/London
+ - die if undef or '' is passed as a destination to ReadTrace's methods
+
+1.5       2012-10-19 17:00:42 Europe/London
+ - avoid a "defined-or", it's not strictly necessary and breaks ancient
+   perls
+
+1.4       2012-09-03 21:00:19 Europe/London
+ - lesson learned: never change your versioning scheme!
+
+1.3.1     2012-09-03 11:44:11 Europe/London
+ - ::TraceOnly broke ->connect, fixed now
+
+1.3       2012-09-03 11:37:23 Europe/London
+ - ->connect dies if the brokers returns an ERROR frame
+
+1.2       2012-07-12 17:46:58 Europe/London
+ - new method "clear_destination" on ReadTrace
+ - make TraceOnly really always trace
+ - accept destinations not starting with "/" in ReadTrace
+
+1.1       2012-07-10 12:10:01 Europe/London
+ - added ReconnectOnFailure, and moved some attributes around
+ - 'connect' can now be called multiple times, and is a no-op if we're
+   already connected
+
+ BREAKING CHANGES:
+ - 'tries_per_server' is gone (was not used)
+ - 'connect_retry_delay' is moved to the new role
+
+1.0       2012-03-24 11:02:54 Europe/London
+ - first non-devel release
+
+0.1_01    2012-03-14 11:49:53 Europe/London
+ - Initial release
+

@@ -1,0 +1,12 @@
+TYPEMAP
+uint16_t	T_IV
+
+
+INPUT
+T_IV
+    $var = ($type)SvIV($arg)
+
+
+OUTPUT
+T_IV
+    sv_setiv((SV*)$arg, $var);

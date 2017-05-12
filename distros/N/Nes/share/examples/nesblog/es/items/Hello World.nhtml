@@ -1,0 +1,102 @@
+<h2><a href="#">Hello World</a></h2>
+<p>
+<h3>Configuración .htaccess del directorio de instalación de NES</h3>
+<br>
+<pre>
+Options +ExecCGI
+AddHandler cgi-script .cgi .pl
+
+&lt;FilesMatch \.(nsql|nes.cfg)$&gt;
+  order deny,allow
+  deny from all
+&lt;/FilesMatch&gt; 
+</pre>    
+</p>
+<p>
+<h3>Configuración .htaccess de cada directorio donde se ejecutan las plantillas de NES.</h3>
+<br>
+<pre>
+AddHandler perl-nes .nhtml
+AddHandler perl-nes .nhtm
+
+# cambiar por el directorio de instalación de Nes
+Action perl-nes /cgi-bin/nes/dispatch.cgi
+
+&lt;FilesMatch \.(nsql|nes.cfg)$&gt;
+  order deny,allow
+  deny from all
+&lt;/FilesMatch&gt; 
+
+</pre>   
+Si deseamos que también se ejecute Nes con los archivos html/htm añadir:
+<pre>
+    
+ AddHandler perl-nes .html
+ AddHandler perl-nes .htm
+ 
+</pre>
+
+Con esta configuración se ejecutarán los script haciendo: <br> 
+http://sitio.com/archivo.nhtml <br>
+<br>
+Si deseamos hacer esto también: <br> 
+http://sitio.com/archivo.cgi <br>
+<br>
+Añadir:
+<pre>
+    
+Options +ExecCGI
+AddHandler cgi-script .cgi .pl
+</pre>    
+</p>
+<p>
+<h3>Archivos nhtml y cgi</h3>
+<br>
+<strong>hello.nhtml:</strong>
+<p>
+<pre>
+&#123;: NES 1.0 ('hello.cgi') :&#125;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Nes Hello World&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;b&gt;&#123;: $ var_hello :&#125;&lt;/b&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+
+</pre>
+</p>
+El archivo <i>nhtml</i> debe contener en la primera linea, primer carácter, el
+ script que se va a ejecutar, o nada y se mostrará como un archivo html más.
+<br>
+<br>
+<strong>hello.cgi:</strong>
+<p>
+<pre>
+use Nes;
+# Un objeto de la clase <a href="./?action=item&item=La clase Singleton">Singleton</a>
+my $nes = Nes::Singleton->new('hello.nhtml');
+
+# Una variable donde se guarda la información
+# que se va a mostrar en el html
+my $nes_tags = {};
+
+$nes_tags->{'var_hello'} = 'Hello World!';
+
+# las cosas que haga tu script
+# ...
+
+# Por último enviar los datos a mostrar a nes
+$nes->out(%$nes_tags);
+</pre>
+</p>
+<br>
+Poco más que esto es lo que se necesita aprender para hacer aplicaciones basadas
+en Nes.<br><br>
+Nes esta orientado al código HTML, por lo que apenas existen funciones o código
+a incluir en los script Perl, lo importante es saber que en vez  de hacer 
+print &ldquo;&lt;html&gt; lo que sea...&rdquo; definimos una variable en nuestro 
+script Perl y la mostramos en el <i>HTML</i> mediante el <i>Tag</i> &#123;: $ var :&#125;
+</p> 
+<br><br>

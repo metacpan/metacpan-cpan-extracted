@@ -1,0 +1,42 @@
+Revision history for Net-Prometheus
+
+0.05    2016/10/28 20:56:35
+        [CHANGES]
+         * Allow setting name prefix and extra labels on a process exporter
+         * Implement process scraping of other PIDs in the Linux collector
+
+        [BUGFIXES]
+         * Prometheus needs all the labelsets of every variable grouped
+           together; so rearrange the ->collect results
+
+0.04    2016/10/27 16:10:06
+        [CHANGES]
+         * Implement a process collector for Linux
+         * By default, attempt to load a process collector at construction
+           time
+         * Various documentation fixes
+
+        [BUGFIXES]
+         * Compatibility for perl 5.8.x by avoiding the "//" operator
+
+0.03    2016/10/26 18:23:27
+        [CHANGES]
+         * Implement Histogram metrics
+         * Allow value-returing callback functions on Gauges
+         * Added Metric Groups
+         * Document the register/unregister methods and the Collector
+           interface
+
+0.02    2016/10/26 00:30:25
+        [CHANGES]
+         * Many internal structure changes to support new features
+           + Exposed $metric->samples as a documented method
+           + Created Sample and MetricSamples types
+           + Prepare for true multimetric collectors
+         * Basic validation on metric/label names and values
+
+        [BUGFIXES]
+         * Ensure that label values with embedded NULs render correctly
+
+0.01    2016/10/24 18:40:03
+        First version, released on an unsuspecting world.

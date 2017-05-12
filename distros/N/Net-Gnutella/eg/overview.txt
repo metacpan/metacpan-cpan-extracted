@@ -1,0 +1,50 @@
+Net::Gnutella
+ |->add_handler
+ |->connections
+ |->dequeue
+ |->do_one_loop
+ |->new
+ |->new_client
+ |->new_server
+ |->queue
+ |->schedule
+ `->start
+
+/* Accepts connections of type Allow (GNUTELLA_CONNECT|GNUTELLA_REQUEST)
+ *
+ * Instantiates a Connection object
+ *
+ */
+Net::Gnutella::Server
+ `->new
+
+/* Perform a non-blocking connect to Server:Port
+ *
+ * If no Server is specified, attempt to auto-discover
+ *
+ * Returns a Net::Gnutella::Client object
+ */
+Net::Gnuetlla::Connection
+ |->add_handler # ESTABLISHED
+ |->connected   # 0=Not, 1=Outgoing, 2=Incoming, 3=Established, 4=HTTP, 5=Upload
+ |->forward     # ESTABLISHED $packet, $route
+ |->new
+ |->send_error  # HTTP - Disconnect after writing socket
+ |->send_file   # Upload - Disconnect after reading from fh fails
+ |->send_packet # ESTABLISHED
+ `->send_page   # HTTP - Disconnect after writing socket
+
+Net::Gnutella::Packet::Ping
+Net::Gnutella::Packet::Pong
+Net::Gnutella::Packet::Push
+Net::Gnutella::Packet::Query
+Net::Gnutella::Packet::Reply
+ |->format
+ |->parse
+ |->hops
+ |->msgid
+ `->ttl
+
+Net::Gnutella::HTTP::Download
+Net::Gnutella::HTTP::Upload
+

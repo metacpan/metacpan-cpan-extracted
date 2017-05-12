@@ -1,0 +1,53 @@
+Nagios-Plugin-SNMP version 1.2
+===============================
+
+This module extends Nagios::Plugin with methods to help developers
+writing SNMP plugins for Nagios.  It includes easy to use get() and
+walk() methods; it also overloads the getopts() method of Nagios::Plugin
+to include parsing and setting of these options:
+
+* --warning|-w: Warning threshold [optional]
+* --critical|-c: Warning threshold  [optional]
+* --hostname|-H: SNMP device to query
+* --port|-p: Port on remote device to connect to [default 161]
+* --snmp-local-ip: Local IP to bind to for outgoing requests
+* --snmp-version: SNMP version (1, 2c, 3)
+* --snmp-timeout: Connect timeout in seconds [default 15]
+* --snmp-debug: Turn on Net::SNMP debugging
+* --snmp-max-msg-size N: Set maximum SNMP message size in bytes
+* --rocommunity: Read-only community string for SNMP 1/v2c
+* --auth-username: Auth username for SNMP v3
+* --auth-password: Auth password for SNMP v3
+* --auth-protocol: Auth protocol for SNMP v3 (defaults to md5)
+
+This version supports delta processing and clustered queries 
+(see perldoc for more information).
+
+The module uses Net::SNMP for SNMP transport, so it works with
+SNMP version 1, 2c, and 3.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Nagios::Plugin
+  Net::SNMP
+
+COPYRIGHT AND LICENCE
+
+Released under the Lesser GNU Public License.
+
+Copyright (C) 2008 by Max Schubert (perldork @ webwizarddesign <.> com)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

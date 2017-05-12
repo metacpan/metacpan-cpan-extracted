@@ -1,0 +1,11 @@
+Revision history for Perl extension Net-SixXS
+
+v0.1.1 2015-12-25T19:02:59Z
+
+    - fix a documentation bug: there is a sample TIC server, too
+    - fix the test suite if AnyEvent is not installed
+
+v0.1.0 2015-08-21T11:26:24Z
+
+    - original version
+

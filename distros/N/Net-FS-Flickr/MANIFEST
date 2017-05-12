@@ -1,0 +1,12 @@
+bin/flickrfs
+Build.PL
+flickrfs
+lib/Net/FS/Flickr.pm
+lib/Net/FS/Flickr/Access.pm
+lib/Net/FS/Flickr/DefaultImage.pm
+MANIFEST			This list of files
+META.yml
+README
+Changes
+t/01use.t
+Makefile.PL

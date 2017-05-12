@@ -1,0 +1,255 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Net::MQTT::Simple;
+use Getopt::Long qw(GetOptions);
+
+$| = 1;
+
+my $usage = "Usage: man mqtt-simple ;-)\n";
+
+my @colors = qw(33;1 32;1 31;1 35;1 36;1 37;1 33 32 31 35 36); 
+
+GetOptions(
+    "h|host=s"          => \my $host,
+    "c|color!"          => \(my $color = -t STDOUT),
+    "raw"               => \my $raw,
+    "1|one"             => \my $one,
+    "count=i"           => \my $count,
+    "message-only"      => \my $message_only,
+    "s|t|subscribe=s"   => \my @topics,
+    "p|publish=s"       => \my $publish,
+    "r|retain"          => \my $retain,
+    "m|message=s"       => \my $message,
+    "d|datetime:s"      => \my $datetime,
+    "ssl"               => \my $ssl,
+    "insecure"          => \my $insecure,
+    "ca=s"              => \my $ca,
+    "cert=s"            => \my $cert,
+    "key=s"             => \my $key,
+    "e|except=s"        => \my @exceptions,
+) or die $usage;
+
+$host or die $usage;
+$datetime = "%Y-%m-%d %H:%M:%S" if defined $datetime and $datetime eq "";
+
+die "--ca, --cert, --key and --insecure require --ssl\n"
+    if ($ca or $cert or $key or $insecure) and not $ssl;
+
+die "--key requires --cert\n" if $key and not $cert;
+die "--cert requires --key\n" if $cert and not $key;
+
+require Net::MQTT::Simple::SSL if $ssl;
+my $class = $ssl ? "Net::MQTT::Simple::SSL" : "Net::MQTT::Simple";
+
+$ENV{MQTT_SIMPLE_SSL_CA}   = $ca   if $ca;
+$ENV{MQTT_SIMPLE_SSL_CERT} = $cert if $cert;
+$ENV{MQTT_SIMPLE_SSL_KEY}  = $key  if $key;
+$ENV{MQTT_SIMPLE_SSL_INSECURE} = 1 if $insecure;
+
+if ($one) {
+    die "--count and --one cannot be combined" if $count;
+    $count = 1;
+    $message_only = 1;
+}
+
+my $m = $class->new($host);
+
+defined $publish or @topics or die $usage;
+
+if (defined $publish) {
+    my $method = $retain ? "retain" : "publish";
+    if (defined $message) {
+        $m->$method($publish, $message);
+    } else {
+        while (defined (my $line = readline *STDIN)) {
+            chomp $line;
+            $m->$method($publish, $line);
+        }
+    }
+} elsif (defined $message) {
+    die "-m requires -p. $usage";
+} elsif ($retain) {
+    die "-r requires -p. $usage";
+}
+
+$_ = Net::MQTT::Simple::filter_as_regex($_) for @exceptions;
+
+
+if (@topics) {
+    my $i = 0;
+    my $ansi_reset = $color ? "\e[0m" : "";
+    my $iv = $color ? "\e[7m" : "^";  # inverse video or caret
+    my $pv = $color ? "\e[27m" : "";
+
+    for (@topics) {
+        my $ansi = $color ? "\e[$colors[ $i % @colors ]m" : "";
+        $i++;
+
+        $m->subscribe(
+            $_ => sub {
+                my ($topic, $message) = @_;
+                $topic =~ /$_/ and return for @exceptions;
+
+                utf8::encode($topic);
+                # $message is binary data so our output can have mixed encodings
+
+                unless ($raw) {
+                    s/([\0-\x1F])/$iv . chr(64 + ord $1) . $pv/ge
+                        for $topic, $message;
+                }
+
+                print POSIX::strftime($datetime . " ", localtime)
+                    if defined $datetime;
+
+                print "$ansi$topic$ansi_reset "
+                    unless $message_only;
+
+                print "$message\n";
+
+                exit if defined $count and --$count == 0;
+            });
+    }
+    $m->run;
+}
+
+__END__
+
+=head1 NAME
+
+mqtt-simple - Very simple MQTT implementation
+
+=head1 SYNOPSIS
+
+ mqtt-simple -h mqtt.example.org -c -s "sensors/#" -s "debug/#" -s "#"
+
+ mqtt-simple -h mqtt.example.org -p "example/unretained" -m "message"
+
+ mqtt-simple -h mqtt.example.org -r -p "example/retained" -m "message"
+
+ tail -f logfile | mqtt-simple -h mqtt.example.org -p "log/example"
+
+ mqtt-simple --ssl --insecure ...
+
+ mqtt-simple --ssl --ca ca.crt --cert client.crt --key client.key
+
+=head1 DESCRIPTION
+
+This is just a simple utility program. It doesn't do much. Specifically, all
+the QoS and username/password features are unsupported. Also, don't expect
+fancy error messages and such :-)
+
+=head1 COMMAND LINE OPTIONS
+
+=over 25
+
+=item -h --host
+
+MQTT server to connect to, required.
+
+=item -p --publish I<topic>
+
+Publish a message. Uses the message given with C<-m>, or will read lines from
+B<stdin>, and publish a message for each given line.
+
+=item -m --message I<message>
+
+Message to publish. Requires C<-p>.
+
+=item -r --retain
+
+Causes messages published with C<-p> to have the "retain" flag on.
+
+=item -s --subscribe I<filter>
+
+Subscribe to the given topic filter. Use the standard MQTT wildcards like
+C<+> and C<#>. Outputs matching published messages on B<stdout>. Can be given
+multiple times.
+
+=item -e --except I<filter>
+
+Suppress published messages that match I<filter>. Can be given multiple times.
+
+=item --count I<number>
+
+Quit after receiving I<number> messages.
+
+=item --message-only
+
+Output only the message values, without the topics.
+
+=item -1 --one
+
+Shortcut for C<--count 1 --message-only>.
+
+=item --color
+
+=item --no-color
+
+For each given C<-s>, print the matching topic in a different color. Note that
+the first matching topic will be used for color selection, so specify the
+topics with the most specific one first, the least specific one (like C<#>)
+last.
+
+Color is enabled by default if I<stdout> is a terminal.
+
+=item --raw
+
+Pass ASCII control characters unaltered. By default, they're replaced by C<^@>
+notation or, when C<--color> is enabled, reverse video characters. For example,
+an ASCII newline would be displayed as C<^J> unless C<--raw> is used.
+
+=item -d --datetime I<format>
+
+Prefix messages with a timestamp. Optionally, a I<format> for C<strftime> can
+be supplied.
+
+=back
+
+=head2 SSL options
+
+=over 25
+
+=item --ssl
+
+Use SSL instead of unencrypted connection.
+
+=item --insecure
+
+Disable SSL certificate validation. Useful for testing, bad idea in production.
+
+Overrides the environment variable C<MQTT_SIMPLE_SSL_INSECURE>.
+
+=item --ca I<path>
+
+The Certificate Authority to validate against. I<path> can be a file
+or a directory. If unspecified, IO::Socket::SSL attempts to use the system
+wide CA configuration.
+
+Overrides the environment variable C<MQTT_SIMPLE_SSL_CA>.
+
+=item --cert I<path>
+
+=item --key I<path>
+
+A client certificate with its key.
+
+Override the environment variables C<MQTT_SIMPLE_SSL_CERT> and
+C<MQTT_SIMPLE_SSL_KEY>.
+
+=back
+
+=head1 LICENSE
+
+Pick your favourite OSI approved license :)
+
+http://www.opensource.org/licenses/alphabetical
+
+=head1 AUTHOR
+
+Juerd Waalboer <juerd@tnx.nl>
+
+=head1 SEE ALSO
+
+L<Net::MQTT::Simple>
+

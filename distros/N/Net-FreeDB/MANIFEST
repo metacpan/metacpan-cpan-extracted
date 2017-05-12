@@ -1,0 +1,37 @@
+Changes
+FreeDB.xs.linux
+FreeDB.xs.win32
+FreeDB.pm
+FreeDBConnection.pm
+MANIFEST
+Makefile.PL
+README
+TODO
+lib/discid.h
+lib/freebsd.h
+lib/linux.h
+lib/myaspi32.h
+lib/scsidefs.h
+lib/toc.h
+lib/toctool.h
+lib/win32.h
+t/00-basic.t
+t/01-lscat.t
+t/02-query.t
+t/03-read.t
+t/04-unlink.t
+t/05-write.t
+t/06-discid.t
+t/07-log.t
+t/08-motd.t
+t/09-proto.t
+t/10-sites.t
+t/11-stat.t
+t/12-update.t
+t/13-validate.t
+t/14-ver.t
+t/15-whom.t
+t/16-get_local_disc_id.t
+t/17-get_local_disc_data.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

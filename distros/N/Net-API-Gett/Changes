@@ -1,0 +1,38 @@
+Revision history for Net-API-Gett
+
+1.06    2012-03-26
+        Fix ups for Moox::Types::MooseLike v0.03
+
+1.05    2012-02-28
+        @keedi fixed a failed test (due to internal Gett URL format change)
+
+1.04    2012-02-01
+        Reworked a patch from @keedi to chunk file uploads dynamically. This cuts 
+        RAM usage substantially.
+
+1.03    2012-01-10
+        Patch from @keedi to fix the getturl attribute on file objects.
+        Set MooX::Types::MooseLike to be version 0.02 (unreleased version 0.03 breaks API)
+
+1.02    2012-01-02
+        Fix for RT #73671 - Thanks to Alexander Ost for the report and patch
+
+1.01    2012-01-01
+        Fix test dependency failure (from CPAN testers) D'oh
+
+1.00    2011-12-31
+        Refactor to use better object encapsulation.
+
+0.02    2011-12-23
+        Integrate patch from keedi to allow object initialization 
+        with one of:
+            * access token
+            * refresh token, or,
+            * api key, email and password
+
+        Document change
+        Make build dependent on Moo 0.009013 which fixes CPAN test failures.
+
+0.01    2011-12-02
+        Initial release
+

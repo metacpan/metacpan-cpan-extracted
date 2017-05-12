@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 df34cf455eef15fdb3a6fbddf4f9171396f6e8de Changes
+SHA1 efeb668104b4a6737ae808f98ed8080a1ef89213 INSTALL
+SHA1 6b50b30fa6f8d063d96e32c9a81f3f82328925f7 LICENSE
+SHA1 c176a0baf5366b03cd0ea5d6004b3db9a949a1b1 MANIFEST
+SHA1 984092d3f8cf3293bd58c68a9b71e55952bdefbe META.json
+SHA1 713e7010218243c7ca8357be7a197aae968ed896 META.yml
+SHA1 3d60aa4b5d274d52a4244e9ff2bda4d78db7b2c5 Makefile.PL
+SHA1 c2b4f6931b7fd50f7a31abe88afb79f0511cddbb README
+SHA1 d092cbceb9fa972d703bd3131b933f16322bda5e cpanfile
+SHA1 891fa047e2d262a6539c943bcefc6d70bf737817 dist.ini
+SHA1 f2902b2764498f7ca83129e8f1e3de3c4f3b86ac examples/ls.pl
+SHA1 9d95ce5efe1185d3c3dbbadcb13846fcdc779df6 lib/Net/Async/HTTP/DAV.pm
+SHA1 30fcd7200be99a88b02165a60c8090f599e14da9 lib/Net/Async/HTTP/DAV.pod
+SHA1 65481f0b4b9d7a7b87bda93893a3bcee2bd2c6ea lib/Net/Async/HTTP/DAV/Response.pm
+SHA1 370f2fb2f413e68eaae129149305a7144e9e776a lib/Net/Async/HTTP/DAV/XML.pm
+SHA1 32050abbe3749b867d466e5862ca9beffb95e816 lib/Net/Async/HTTP/DAV/XML.pod
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 1968e8d1c4b29749885914f3c3e34822f3b15de6 t/00-compile.t
+SHA1 b214853e733c682dfb2a643c346bd6fd26868614 t/000-report-versions-tiny.t
+SHA1 91117bf28be2a2e5d4a7628eb4f0cef36465fc8a t/propfind-xml.t
+SHA1 f242e380d897f0430a668ea3f2938df75c0bef55 xt/author/test-eol.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/release/synopsis.t
+SHA1 bbcd59d081d9940af5d43337ae85458075933829 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJT71TiAAoJEFKElMNpjtyDcQ8H/3n1YBPLe7BSv4t3Sc0gkduA
+/82PIHwb9vIA/1+F/Ci7haVegDSjf/6HXdsFjYOk5H0VyZ4Ml1+l6o5ff53Kq86p
+Vqlhw8m0QunG63VJZdKmZs2xq1BBp37zF4/XdWJ/ttXIIqigevPtO5tiMPq56m3x
+laRfjdcUiST0NyM8X1WxM5c1PShKFV/lhVBsYhfiBa9JABauQBiCN1RB/z1M7lOR
+IF0fWJq4ZnVFSd4oSNF6y8ySyMWNO/h2dTI0je/v8LQxnCFTxrYapjyRTRqDg6mg
+WtuXZV7/QoOxxlF2EBHgcO66PdGzvUuARl4QDs2aYxu2FhCD2nbYSmSnpPUG9r8=
+=0ufX
+-----END PGP SIGNATURE-----

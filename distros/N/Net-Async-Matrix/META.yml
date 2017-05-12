@@ -1,0 +1,50 @@
+---
+abstract: 'use Matrix with L<IO::Async>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::Async::HTTP: '0.02'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Async-Matrix
+provides:
+  Net::Async::Matrix:
+    file: lib/Net/Async/Matrix.pm
+    version: '0.19'
+  Net::Async::Matrix::Room:
+    file: lib/Net/Async/Matrix/Room.pm
+    version: '0.19'
+  Net::Async::Matrix::Room::State:
+    file: lib/Net/Async/Matrix/Room/State.pm
+    version: '0.19'
+  Net::Async::Matrix::Utils:
+    file: lib/Net/Async/Matrix/Utils.pm
+    version: '0.19'
+recommends:
+  Convert::Color::HTML: '0'
+  Digest::HMAC_MD5: '0'
+  HTML::TreeBuilder: '5'
+  String::Tagged::HTML: '0'
+requires:
+  Data::Dump: '0'
+  Future::Utils: '0'
+  IO::Async::Notifier: '0.63'
+  JSON::MaybeXS: '0'
+  List::Util: '1.29'
+  Net::Async::HTTP: '0.36'
+  POSIX: '0'
+  String::Tagged: '0.12'
+  Struct::Dumb: '0'
+  URI: '0'
+resources:
+  IRC: irc://irc.perl.org/#io-async
+  license: http://dev.perl.org/licenses/
+version: '0.19'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,40 @@
+Revision history for Nodejs-Util
+
+0.006   2016-07-03 (PERLANCAR)
+
+        - Add 'path' option to nodejs_available().
+
+        - Add system_nodejs().
+
+
+0.005   2016-07-01 (PERLANCAR)
+
+        - Add nodejs_available().
+
+        - get_nodejs_path(): Add option 'all'.
+
+        - Adjust to IPC::System::Options 0.27 (backtick renamed to readpipe).
+
+
+0.004   2016-06-04 (PERLANCAR)
+
+	- Use IPC::System::Options 0.25's backtick() for proper
+	  shell-quoting on win32 [GH#1].
+
+
+0.003   2016-05-17 (PERLANCAR)
+
+	- Rename dist from Data-Sah-Util-JS to Nodejs-Util because there is
+	  currently nothing Data::Sah-specific about the code.
+
+
+0.002   2016-05-17 (PERLANCAR)
+
+        - Rename dist from Data-Sah-Util-JS to Nodejs-Util because there is no
+          Data::Sah-specific stuff in this.
+
+
+0.001   2016-05-17 (PERLANCAR)
+
+        - First release, split from Data-Sah to avoid code duplication (planning
+          to use this from Data-Sah-CoerceJS also).

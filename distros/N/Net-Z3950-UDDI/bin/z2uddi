@@ -1,0 +1,67 @@
+#!/usr/bin/perl -w
+
+# Run as follows, from development area:
+#	server$ cd /usr/local/src/mike/z2uddi/etc && perl -I ../lib ../bin/z2uddi config.yaml -f yazgfs.xml -S
+#	client$ zoomsh "open @:8019/gbif-debug" "find @attr 1=4 %geo%" "show 0 1" quit
+#	client$ wget "http://localhost:8019/gbif?version=1.1&operation=searchRetrieve&query=dc.title=/service%20geo%25&maximumRecords=2"
+
+use strict;
+use warnings;
+use Net::Z3950::UDDI;
+
+my $configFile = shift();
+if (!defined $configFile) {
+    print STDERR "Usage: $0 <configFile> [<YAZ-options>]\n";
+    exit 1;
+}
+
+my $handle = new Net::Z3950::UDDI($configFile);
+$handle->launch_server("z2uddi", @ARGV);
+
+
+=head1 NAME
+
+z2uddi - Z39.50-to-UDDI gateway server
+
+=head1 SYNOPSIS
+
+C<z2uddi>
+I<configFile>
+[
+I<YAZ-options>
+...
+]
+
+=head1 DESCRIPTION
+
+C<z2uddi> provides a gateway between Z39.50 (and the related protocols
+SRU and SRW) and UDDI, thereby forming a bridge between the two
+previously rather separate universes inhabited by library-oriented IR
+protocols and Web Services.
+
+It runs as a server, accepting and handling Z39.50, SRU and SRW
+connections, and fulfilling requests made using those protocols by
+reference to UDDI servers as specified in the configuration file.
+Details of how the server runs may be specified using standard YAZ
+command-line options -- such as C<-f> I<yazgfs.xml> to nominate a
+configuration of the YAZ GFS.  This is used to provide information
+including the mapping from CQL indexes to Z39.50 Type-1 use
+attributes, which is required for SRU and SRW to work in a useful way.
+
+=head1 SEE ALSO
+
+The C<Net::Z3950::UDDI> module, which does all the hard work.
+
+The standard YAZ command-line options are described in
+the YAZ manual's B<Application Invocation> section at:
+http://indexdata.com/yaz/doc/server.invocation.tkl
+
+The YAZ GFS configuration file is described in
+the YAZ manual's B<GFS Configuration and Virtual Hosts> section at:
+http://indexdata.com/yaz/doc/server.vhosts.tkl
+
+=head1 AUTHOR, COPYRIGHT AND LICENSE
+
+As for C<Net::Z3950::UDDI>.
+
+=cut

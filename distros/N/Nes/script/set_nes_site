@@ -1,0 +1,374 @@
+#!/usr/bin/perl
+
+# -----------------------------------------------------------------------------
+#
+#  Nes by Skriptke
+#  Copyright 2009 - 2010 Enrique Castanon
+#  Licensed under the GNU GPL.
+#
+#  CPAN:
+#  http://search.cpan.org/dist/Nes/
+#
+#  Sample:
+#  http://nes.sourceforge.net/
+#
+#  Repository:
+#  http://github.com/Skriptke/nes
+# 
+#  Version 1.03
+#
+#  set_nes_site
+#
+# -----------------------------------------------------------------------------
+
+our $VERSION = '1.0x';
+
+use strict;
+use File::ShareDir;
+use Getopt::Long;
+
+my $this_script = $0;
+$this_script =~ s/.*\///;
+
+my $cgi_dir    = '';
+my $iprefix    = '';
+my $dir_cfg    = '';
+my $use_copy   = '';
+my $from_exam  = '';
+my $to_exam    = '';
+my $php_wrap   = '';
+my $htm_wrap   = '';
+my $file_exits = ' already exists, please:'."\n".'q=quit, s=skip, r=rename. [q/s/r]:'; 
+my $conf_exits = ' already exists, please:'."\n".'q=quit, s=skip, r=rename , a=append, c=create sample. [q/s/r/a/c]:'; 
+
+usage() if ! @ARGV;
+                              
+GetOptions(
+  'iprefix=s'   => \$iprefix,
+  'cgi_dir=s'   => \$cgi_dir,
+  'use_copy!'   => \$use_copy,   
+  'dir_cfg=s'   => \$dir_cfg,
+  'php_wrap!'   => \$php_wrap,
+  'wrap_html!'  => \$htm_wrap,    
+  'from_exam=s' => \$from_exam,
+  'to_exam=s'   => \$to_exam,
+  'l!'          => \&exam_list,
+  'v!'          => \&version,  
+  'version'     => \&version,
+  'help'        => \&usage,
+) or usage();
+
+$cgi_dir =~ s/\/$//;
+$dir_cfg =~ s/\/$//;
+$to_exam =~ s/\/$//;
+
+check_param();
+
+act() if $cgi_dir;
+cfg() if $dir_cfg;
+exa() if $to_exam;
+
+exit;
+                 
+sub exa {
+  
+  print "Installing example $from_exam in $to_exam:\n";
+  
+  push(@INC,$iprefix) if $iprefix;
+  require Nes;
+  my $sharedir = File::ShareDir::dist_dir('Nes');
+  $sharedir .= '/examples/';
+  
+  die "$from_exam not exists\n" if ! -e $sharedir.$from_exam;
+  
+  my $response = '';
+  if ( -e $to_exam ) {
+    $response = ask($to_exam.$file_exits);
+    rename($to_exam,$to_exam.'.old.'.time) if $response =~ /^r/i;
+  }
+  
+  if ( $response !~ /^s/i ) {
+    use File::Copy::Recursive qw(dircopy);
+    dircopy($sharedir.$from_exam,$to_exam) || die "can not be copy $to_exam\n";
+  }
+  
+  print "Install example $from_exam in $to_exam Ok\n";
+  return;
+}
+
+sub act {
+  
+  print "Activating Nes in $cgi_dir:\n";
+
+  push(@INC,$iprefix) if $iprefix;
+  require Nes;
+  my $sharedir   = File::ShareDir::dist_dir('Nes').'/cgi-bin';
+  my $nesdir     = $cgi_dir.'/nes';  
+  my @link_files = ( '/plugin', '/obj', '/images' );
+  my @copy_files = ( '/dispatch.cgi', '/.htaccess' );    
+  
+  # Some Linux distributions are problems with symbolic in cgi-bin
+  if ( $use_copy ) {
+    push(@copy_files,@link_files);
+    @link_files = ();
+  }
+
+  my $response = '';
+  $response = ask($nesdir.$file_exits)                
+    if -d $nesdir;
+  rename($nesdir,$nesdir.'.old.'.time)                
+    if $response =~ /^r/i;
+  mkdir $nesdir || die "can not be created $nesdir\n" 
+    if $response !~ /^s/i;
+  chmod 0755, $nesdir
+    if $response !~ /^s/i;
+                                   
+  foreach my $file ( @link_files ) {
+    $response = '';
+    $response = ask($nesdir.$file.$file_exits)       
+      if -e $nesdir.$file;
+    rename($nesdir.$file,$nesdir.$file.'.old.'.time) 
+      if $response =~ /^r/i;
+    symlink($sharedir.$file,$nesdir.$file) || die "can not be created $sharedir$file $nesdir$file\n" 
+      if $response !~ /^s/i;
+  } 
+    
+  foreach my $file ( @copy_files ) {
+    $response = '';
+    $response = ask($nesdir.$file.$file_exits) 
+      if -e $nesdir.$file;
+    rename($nesdir.$file,$nesdir.$file.'.old.'.time) 
+      if $response =~ /^r/i;
+    if ( -d $sharedir.$file ) {
+      use File::Copy::Recursive qw(dircopy);
+      dircopy($sharedir.$file,$nesdir.$file) || die "can not be created $nesdir$file\n"
+        if $response !~ /^s/i;
+      chmod 0755, $nesdir.$file
+        if $response !~ /^s/i;
+    } else {
+      use File::Copy;
+      copy($sharedir.$file,$nesdir.$file) || die "can not be created $nesdir$file\n" 
+        if $response !~ /^s/i;
+      chmod 0755, $nesdir.$file
+        if $response !~ /^s/i && $file =~ /\.cgi$/;
+    }
+      
+    # add use lib for install Nes locally
+    if ( $file =~ /dispatch.cgi$/ && $iprefix && $response !~ /^s/i ) {
+      local_nes_lib($nesdir.'/dispatch.cgi');
+      chmod 0755, $nesdir.'/dispatch.cgi';
+    }
+  }
+  
+  print "Activated Nes in $cgi_dir Ok\n";
+  return;
+}
+
+sub cfg {
+
+  print "Configuring Nes for $dir_cfg:\n";
+  
+  my $file_htaccess = '/.htaccess';
+  my $configuration = '
+# ---------- Nes configuration --------------
+# exec cgis
+Options +ExecCGI
+AddHandler cgi-script .cgi .pl
+
+# Nes nhtml files
+AddHandler perl-nes .nhtml
+AddHandler perl-nes .nhtm
+
+# Nes nJS files
+AddHandler perl-nes .njs
+  ';
+  
+  $configuration .= '
+# HTML Wrapper
+AddHandler perl-nes .html
+AddHandler perl-nes .htm
+  ' if $htm_wrap;
+  
+  $configuration .= '
+# PHP Wrapper
+AddHandler perl-nes .php
+AddHandler perl-nes .nphp
+  ' if $php_wrap;  
+  
+  $configuration .= '
+# nes dispatcher
+Action perl-nes /cgi-bin/nes/dispatch.cgi
+
+# protected Nes configuration and other files
+<FilesMatch \.(nsql|nes.cfg)$>
+  order deny,allow
+  deny from all
+</FilesMatch>
+#---------------------------------------------
+  ';  
+  
+  my $response = '';
+  if ( -e $dir_cfg.$file_htaccess ) {
+    print "We recommend that you review the contents of $dir_cfg$file_htaccess\n";
+    print "by duplication of Nes configuration if response append\n";
+    print "or by the loss of htaccess options if response rename.\n";
+    $response = ask($dir_cfg.$file_htaccess.$conf_exits);
+    rename($dir_cfg.$file_htaccess,$dir_cfg.$file_htaccess.'.old.'.time) if $response =~ /^r/i;
+  }   
+  
+  my $target = $dir_cfg.$file_htaccess;
+  $target = $dir_cfg.$file_htaccess.'.'.time if $response =~ /^c/i;
+  if ( $response !~ /^s/i ) {
+    open(my $fh,'>>',$target) || die "can not open $target\n";
+    print $fh $configuration;
+    close $fh;
+  }
+  print "Created $target used manually configuration.\n" if $response =~ /^c/i;
+  
+  print "Configurated Nes for $dir_cfg Ok\n";
+  return;
+}
+
+sub exam_list {
+  
+  push(@INC,$iprefix) if $iprefix;
+  require Nes;
+  my $sharedir = File::ShareDir::dist_dir('Nes');
+  $sharedir .= '/examples';
+  
+  opendir( my $dir, $sharedir );
+  my @files = readdir($dir);
+  closedir($dir);
+  
+  print "\n  List of examples and utilities that can be intalled:\n\n";
+  foreach my $exam ( @files ) {
+    print "    $exam\n" if $exam !~ /\./;
+  }
+  print "\n";
+  
+  exit;
+}
+
+sub check_param {
+  
+  my $error = '';
+  
+  if ( $cgi_dir ) {
+    $error .= "cgi_dir=$cgi_dir must exist.\n"        
+      if ! -d $cgi_dir;
+    $error .= "cgi_dir=$cgi_dir require full path.\n" 
+      if $cgi_dir !~ /^\//;
+    $error .= "cgi_dir=$cgi_dir be called 'cgi-bin'\n"  
+      if $cgi_dir !~ /cgi-bin$/;
+  }
+  
+  if ( $dir_cfg ) {
+    $error .= "dir_cfg=$dir_cfg must exist. Create manually first this directory.\n" 
+      if ! -d $dir_cfg;
+    $error .= "dir_cfg=$dir_cfg require full path.\n" 
+      if $dir_cfg !~ /^\//;
+  }
+  
+  if ( $to_exam ) {
+    $error .= "to_exam=$to_exam require full path.\n" 
+      if $to_exam !~ /^\//;
+  }  
+
+  return if !$error;
+  
+  print $error;
+  usage();  
+  
+}
+
+sub local_nes_lib {
+  my $dispatch = shift;
+  my $use_lib  = "use lib '$iprefix';\nuse Nes;";
+  my $file     = '';
+  my $fh;
+
+  open(my $fh_r,'<',$dispatch) || die "can not be created $dispatch";
+  {
+    local $/ = undef;
+    $file = <$fh_r>;
+  }
+  close $fh_r;
+  $file =~ s/(\n\s*)use Nes;/$1$use_lib/s;
+  open(my $fh_w,'>',$dispatch) || die "can not be created $dispatch";
+  print $fh_w $file;
+  close $fh_w;
+
+}
+
+sub ask {
+  my $question = shift;
+  my $options  = $question;
+  $options =~ s/.*\[([^\]]*)\]\:$/$1/;
+  $options =~ s/\//\|/g;
+  
+  print $question;
+  while ( my $response = <STDIN> ) {
+    exit if $response =~ /^q/i;
+    return $response if $response =~ /^$options$/;
+    print $question;
+  }
+
+} 
+
+sub version {
+  
+  print << "EOF";
+$this_script for Nes version: $VERSION
+EOF
+  
+  exit;
+}
+
+sub usage {
+  
+  print << "EOF";
+Usage:
+
+$this_script OPTIONS
+
+  OPTIONS:
+  
+    --cgi_dir   : Active Nes in --cgi_dir=/full-path-to/cgi-bin 
+    -u          : Use copy instead of link for Nes lib in active
+    --modperl   : *** unimplemented *** add mod_perl support in active
+    --iprefix   : full-path-to Nes.pm dir if you used prefix in installation 
+    --dir_cfg   : Configure Nes for --dir_cfg=/full-path-to/root-www/dir
+    -p          : Add PHP Wrapper in configure
+    -w          : Add HTML Wrapper in configure
+    --from_exam : Install example name --from_exam=name
+    --to_exam   : Example destination --to_exam=/full-path-to/root-www/example
+    -l          : Get list of examples and utilities, ignore all other options       
+    -h          : Show this help, ignore all other options
+    -v          : Show version, ignore all other options
+
+Examples:
+
+  Active Nes in /usr/lib/cgi-bin:
+    $this_script --cgi_dir=/usr/lib/cgi-bin
+    
+  Configure Nes for directory /var/www/myweb:
+    $this_script --dir_cfg=/var/www/myweb
+    
+  Configure Nes for all site:
+    $this_script --dir_cfg=/var/www  
+        
+  Install hello world and test examples in /var/www/test_nes:
+    $this_script --from_exam=hello_nes --to_exam=/var/www/test_nes
+    
+If you install Nes locally add --iprefix in cgi_dir and from_exam options:
+
+  Active Nes in /usr/lib/cgi-bin and install Nes in /home/USER/share/perl/5.10
+    $this_script --cgi_dir=/usr/lib/cgi-bin --iprefix=/home/USER/share/perl/5.10
+    
+EOF
+
+  exit;
+}
+
+
+

@@ -1,0 +1,11 @@
+Revision history for Perl extension Net::AppNotifications
+
+0.03  Mon Apr 9 13:24:00 2012
+        - Cleanup Makefile.PL for bleadperl errors (RT:76426)
+
+0.02  Thu May 12 15:10:00 2011
+        - support extra notification parameters (Chisel Wright)
+        - minor build cleanups (Chisel Wright)
+
+0.01  Fri Jul 24 21:45:27 2009
+        - original version

@@ -1,0 +1,25 @@
+$ORIGIN .
+$TTL 86400	; 1 day
+example.org		IN SOA	kennedy.example.org. hostmaster.example.org. (
+				2014061900 ; serial
+				28800      ; refresh (8 hours)
+				7200       ; retry (2 hours)
+				604800     ; expire (1 week)
+				86400      ; minimum (1 day)
+				)
+			NS	ns2.example.net.
+			NS	kennedy.example.org.
+			NS	tara.example.org.
+			NS	illyria.example.org.
+			MX	10 kennedy.example.org.
+$ORIGIN example.org.
+home			A	183.68.21.31
+staging			CNAME	kadath.example.net.
+willow			A	179.199.7.2
+www			CNAME	home
+tara			A	109.174.1.145
+kennedy			A	146.121.6.227
+sameen			A	146.121.6.47
+illyria			A	146.121.0.115
+illyria			AAAA	2a02:70:4::44b
+spencer			A	119.74.162.14

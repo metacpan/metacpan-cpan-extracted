@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 7f14ff430845bc00abdbf7e4d131cc6de8da4694 Changes
+SHA1 5069bebc8c55abf29d40d0124298c98284ba630f MANIFEST
+SHA1 559a965abd26641974be87cfa7fcadd1ffabfafd META.json
+SHA1 60fa8474ea4b72b3c669eaa258380a5d2268ca12 META.yml
+SHA1 925258c5db183ce34622a44a172546b4b5cf15ac Makefile.PL
+SHA1 009893440fca623077ec23466cf99013a91db156 README
+SHA1 80de2a7501230fe8048d8db911bdb6aca80fa9d2 app.psgi
+SHA1 d1c684bfdc636d560b3d8965a4945bf7526dbb05 lib/App/NAOdash.pm
+SHA1 b4dda25e9ba830576cde5e7581c4806336809bcf lib/App/Web/NAOdash.pm
+SHA1 bc7d8714e954ac7ee5293ccb38ec7a18f30d8675 lib/NetHack/NAOdash.pm
+SHA1 70aa31be62289f6cdb58fd4fd5e81f35b8737db5 naodash
+SHA1 df89cedd8b3d63ab90c52e35cb5ded926a925c8b t/NetHack-NAOdash.t
+SHA1 fa4cca04d35b71b2c9a4d04e5977efb3868f88aa t/perlcritic.t
+SHA1 19d48dc9cb1480e88ed2f0e34f6a97fea61f2bfc t/perlcriticrc
+SHA1 0df5ceb800b82e7a20175dec7b003823999cce47 t/xlogfile
+SHA1 14568c6d98c9ddfcebd248ce6a7914396dbd2727 web/dash.css
+SHA1 40296b55f7a504bc276a6c7a1e8481a297942b1b web/dash.html
+SHA1 5219f67b826c0d123e6c78b695e2682e54cac8d0 web/index.html
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJWfwfSAAoJEMoENb5ewbNirkcQAKeLc05KJ9Dp9CqNjVhpa75l
+XZS6DFdrSSlufaEgx0gDtwScl4eMvdVaesOgzFhnNg2ZEnti9o/k90zZma6M51vy
+3GyQxjHSzKaxPnfMj/Xio46v+7G1XkPXr6Mg9JM7mT+e5ZNZABnQFtZAF6rU2+0t
+y58bszYSuDvvIhalZbych0VMqfSaYgZfCj6CVYFbBPRw3G8YpRvGOE0SX4ACqRXp
+7R7v9sRzNs3e+AKTOYhY7pVKkZGVZ1LE0Jw+7GrY2Ib0Vh3169iG9ngNwcm6QYYR
+JhxaJ4BFL8//IAapU/5lEdPDRoWnObh8YRlUCKt7JTWXgrtndmloO2sYw3YWXJo9
+HjNrRAhotRjgAU8J+EZ3ODQURFYY7htLinhsR7IP8qQZn1BDSH4YPAUcjkMvFEpZ
+BYQooMoCL7bphdaj48qaNKOYw7/KVHCPu+fFfxl2nSFQuJEXdsI6+qs8InJ2jAyt
+oicvcLYxg9c09qdn3gRXyjC40YDBjQ4KY4fE2yjGp6s0akB+CbOVNqBV2QqMInAp
+7s2tSAPSGcFMRpcMvXCSB3I3SuzzAp88/LR6H86i7+7PgpALRgGhnnuHtkNI8JZe
+T+ZnHwkoNjLRRtU48ALunhcVuCiBIA4NuFOJ51PgXlpxx0jl752WQfKSbZamakZT
+Pz7Q59uGXNdqqyrm0Twu
+=PaKU
+-----END PGP SIGNATURE-----

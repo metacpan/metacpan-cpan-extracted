@@ -1,0 +1,114 @@
+#!/usr/bin/perl
+# ----------------------------------------------------------------
+# A Mojo Web App as a NNexus entry point
+# Deyan Ginev, <d.ginev@jacobs-university.de>
+# GPLv3 code
+# ----------------------------------------------------------------
+use strict;
+use warnings;
+use Data::Dumper;
+use File::Basename;
+my $FILE_BASE;
+BEGIN {
+    $FILE_BASE = dirname(__FILE__);
+}
+if (-e $FILE_BASE."/../lib") {
+  use lib $FILE_BASE."/../lib";
+}
+
+use Mojolicious::Lite;
+use Mojo::JSON;
+use Mojo::IOLoop;
+use Mojo::ByteStream qw(b);
+
+use Encode;
+
+use NNexus::Job;
+use NNexus::DB;
+
+our $modern_mojo = ($Mojolicious::VERSION >= 4);
+# Configuration is server-level
+my $opts;
+if ($ARGV[0] && -e $ARGV[0]) {
+  print STDERR "\nBase Configuration to be read from: $ARGV[0]\n";
+  $opts = read_json_file($ARGV[0]);
+} else {
+  my ($INSTALLDIR) = grep(-d $_, map("$_/NNexus", @INC));
+  die "NNexus installation directory is not in Perl's \@INC!\n" unless $INSTALLDIR;
+  $opts = {
+    "dbms" => "SQLite",
+    "dbname" => "$INSTALLDIR/resources/database/snapshot.db",
+    "dbuser" => "nnexus",
+    "dbpass" => "nnexus",
+    "dbhost" => "localhost",
+  };
+}
+our $db = NNexus::DB->new(%$opts);
+
+$ENV{MOJO_HOME} = '.' unless defined $ENV{MOJO_HOME};
+$ENV{MOJO_MAX_MESSAGE_SIZE} = 10485760; # 10 MB file upload limit
+
+# Make signed cookies secure
+app->secrets(['NNexus auto-linking for the win!']);
+
+helper prepare_job => sub {
+  my ($self,%override) = @_;
+  my $get_params = $self->req->url->query->pairs || [];
+  my $post_params = $self->req->body_params->pairs || [];
+  if (scalar(@$post_params) == 1) {
+    $post_params = ['body' , $post_params->[0]];
+  } elsif (scalar(@$post_params) == 2 && ($post_params->[0] ne 'body')) {
+    $post_params = ['body' , $post_params->[0].$post_params->[1]];
+  }
+  my $parameters = { @$get_params, @$post_params };
+  # Currently , we only support :
+  $parameters->{format} //= 'html';
+  $parameters->{embed} //= 1;
+  $parameters->{function} //= 'linkentry';
+  $parameters->{domain} //= 'all';
+  
+  foreach my $key(keys %override) {
+    $parameters->{$key} = $override{$key};
+  }
+  $parameters->{'db'} = $db;
+  return NNexus::Job->new(%$parameters);
+};
+
+post '/' => sub {
+  my $job = $_[0]->prepare_job;
+  $job->execute;
+  $_[0]->render(json=>$job->response);
+};
+
+# Shortcut paths:
+post '/autolink' => sub {
+  my $job = $_[0]->prepare_job(function=>'linkentry');
+  $job->execute;
+  $_[0]->res->headers->header('Access-Control-Allow-Origin' => '*');
+  $modern_mojo ?
+    $_[0]->render(json=>$job->response) :
+    $_[0]->render_json($job->response,status=>200); 
+};
+post '/linkentry' => sub {
+  my $job = $_[0]->prepare_job(function=>'linkentry');
+  $job->execute;
+  $_[0]->res->headers->header('Access-Control-Allow-Origin' => '*');
+  $modern_mojo ?
+  $_[0]->render(json=>$job->response) :
+  $_[0]->render_json($job->response,status=>200); 
+};
+
+post '/indexentry' => sub {
+  my $job = $_[0]->prepare_job(function=>'indexentry');
+  $job->execute;
+  $_[0]->res->headers->header('Access-Control-Allow-Origin' => '*');
+  $modern_mojo ?
+  $_[0]->render(json=>$job->response) :
+  $_[0]->render_json($job->response,status=>200); 
+};
+
+
+
+app->start;
+
+__END__

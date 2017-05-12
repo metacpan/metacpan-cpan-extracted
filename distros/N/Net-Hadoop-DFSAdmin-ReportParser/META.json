@@ -1,0 +1,75 @@
+{
+   "abstract" : "Parser module for 'hadoop dfsadmin -report'",
+   "author" : [
+      "TAGOMORI Satoshi <tagomoris {at} gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.6.6",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Hadoop-DFSAdmin-ReportParser",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Hadoop::DFSAdmin::ReportParser" : {
+         "file" : "lib/Net/Hadoop/DFSAdmin/ReportParser.pm",
+         "version" : "0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tagomoris/Net-Hadoop-DFSAdmin-ReportParser/issues"
+      },
+      "homepage" : "https://github.com/tagomoris/Net-Hadoop-DFSAdmin-ReportParser",
+      "repository" : {
+         "url" : "git://github.com/tagomoris/Net-Hadoop-DFSAdmin-ReportParser.git",
+         "web" : "https://github.com/tagomoris/Net-Hadoop-DFSAdmin-ReportParser"
+      }
+   },
+   "version" : "0.3",
+   "x_contributors" : [
+      "TAGOMORI Satoshi <tagomoris@gmail.com>"
+   ]
+}

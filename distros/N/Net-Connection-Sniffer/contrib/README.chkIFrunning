@@ -1,0 +1,13 @@
+chkIFrunning.pl
+typical usage
+
+# rc.nc.sniffer
+*/5 * * * * /root/chkIFrunning.pl /var/run/nc.sniffer/nc.sniffer.pid /etc/rc.d/rc.nc.sniffer start
+
+or
+
+*/5 * * * * /root/chkIFrunning.pl /var/run/nc.sniffer/nc.sniffer.pid /usr/local/sbin/nc.sniffer.pl start
+
+or
+
+*/5 * * * * root /root/chkIFrunning.pl /var/run/nc.sniffer/nc.sniffer.pid /etc/rc.d/init.d/nc.sniffer start

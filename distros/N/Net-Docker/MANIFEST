@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+cpanfile
+dist.ini
+lib/Net/Docker.pm
+script/docker.pl
+t/docker-api.t
+t/docker-start.t
+t/release-pod-syntax.t

@@ -1,0 +1,291 @@
+{: NES 0.9 ('{: * cfg_plugin_top_dir :}/captcha.pl','none') :}
+{: #
+    ----------------------------------------------------------------------------
+    
+        NES 0.9 beta by - Skriptke
+        Copyright 2009 - 2010 Enrique F. Castañón
+        Licensed under the GNU GPL.
+        http://sourceforge.net/projects/nes/
+        
+        Sample to use Nes;
+        
+    ----------------------------------------------------------------------------
+:}
+
+<div id="comment"> 
+<a name="test1" id="test1"></a>
+<pre>
+(test1,ascii,,,,,,1m,5/1)
+
+nes_captcha_plugin_test1_error_last : {: *nes_captcha_plugin_test1_error_last :} &nbsp;
+nes_captcha_plugin_test1_error_fatal: {: *nes_captcha_plugin_test1_error_fatal :} &nbsp;
+nes_captcha_plugin_test1_attempts   : {: *nes_captcha_plugin_test1_attempts :} &nbsp;
+nes_captcha_plugin_test1_is_ok      : {: *nes_captcha_plugin_test1_is_ok :} &nbsp;
+       
+</pre>
+ <form name="formtest1" action="#test1">
+    {: # name,type,digits,noise,size,sig,spc,expire,attempts :}
+    {: & captcha (test1,ascii,,,,,,1m,5/1) 
+    <table width="100%">
+      <tr>
+        <td width="100%" align="center">
+        Teclea el código de seguridad
+        </td>
+      </tr>
+        <tr>
+        <td width="100%" align="center">
+        {: & captcha_code :}
+        </td>
+      </tr>
+        <tr>
+        <td width="100%" align="center">
+        <input type="text" name="test1"  size="8" />
+        </td>
+      </tr>
+      <tr>
+        <td width="100%" align="center">
+        {: ~ *nes_captcha_plugin_test1_error_fatal
+        <p align="center">
+        <big>Código de seguridad incorrecto<br></big> 
+        </p>
+        :}
+        <input type="hidden" name="item"  value="{: * q_item :}" />       
+        <input name="enviar" type="submit" value="Enviar" />
+        </td>
+      </tr>
+    </table>
+   :}
+</form>
+<pre>
+Fuente:
+
+&lt;form name="formtest1" action="#test1"&gt;
+    &#123;: # name,type,digits,noise,size,sig,spc,expire,attempts :&#125;
+    &#123;: & captcha (test1,ascii,,,,,,1m,5/1) 
+    &lt;table width="100%"&gt;
+      &lt;tr&gt;
+        &lt;td width="100%" align="center"&gt;
+        Teclea el código de seguridad
+        &lt;/td&gt;
+      &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td width="100%" align="center"&gt;
+        &#123;: & captcha_code :&#125; 
+        &lt;/td&gt;
+      &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td width="100%" align="center"&gt;
+        &lt;input type="text" name="test1"  size="8" /&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td width="100%" align="center"&gt;
+        &#123;: ~ *nes_captcha_plugin_fatal_error_test1
+        &lt;p align="center"&gt;
+        &lt;big&gt;Código de seguridad incorrecto&lt;/big&gt; 
+        &lt;/p&gt;
+        :&#125;
+        &lt;input type="hidden" name="item"  value="Plugin Captcha" /&gt;       
+        &lt;input name="enviar" type="submit" value="Enviar" /&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/table&gt;
+   :&#125;
+&lt;/form&gt;
+    
+</pre>
+</div>
+
+<br><br>
+<div id="comment">
+<a name="test1" id="test2"></a>  
+<pre>
+Podemos poner dos o más Captchas en el mismo formulario.
+(Salvo que se incluya en el Pugin Forms, que sólo admite uno)
+
+nes_captcha_plugin_test2a_error_last : {: *nes_captcha_plugin_test2a_error_last :} &nbsp;
+nes_captcha_plugin_test2a_error_fatal: {: *nes_captcha_plugin_test2a_error_fatal :} &nbsp;
+nes_captcha_plugin_test2a_attempts   : {: *nes_captcha_plugin_test2a_attempts :} &nbsp;
+nes_captcha_plugin_test2a_is_ok      : {: *nes_captcha_plugin_test2a_is_ok :} &nbsp;
+
+nes_captcha_plugin_test2b_error_last : {: *nes_captcha_plugin_test2b_error_last :} &nbsp;
+nes_captcha_plugin_test2b_error_fatal: {: *nes_captcha_plugin_test2b_error_fatal :} &nbsp;
+nes_captcha_plugin_test2b_attempts   : {: *nes_captcha_plugin_test2b_attempts :} &nbsp;
+nes_captcha_plugin_test2b_is_ok      : {: *nes_captcha_plugin_test2b_is_ok :} &nbsp;
+       
+
+</pre>
+<form name="formtest2" action="#test2">
+    <table width="100%">
+      {: & captcha (test2a,ascii,4,0,2,@,' ')
+      <tr>
+        <td width="100%" align="center">
+        Teclea el código de seguridad Uno
+        </td>
+      </tr>
+        <tr>
+        <td width="100%" align="center">
+        {: & captcha_code :} 
+        <input type="text" name="test2a"  size="8" />
+        {: ~ *nes_captcha_plugin_test2a_error_fatal
+        <p align="center">
+        * Código de seguridad Uno incorrecto<br> 
+        </p>
+        :}          
+        </td>
+      </tr>
+      :} 
+      {: & captcha (test2b,ascii,4,0,2,&nbsp;,@) 
+      <tr>
+        <td width="100%" align="center">
+        Teclea el código de seguridad Dos
+        </td>
+      </tr>
+        <tr>
+        <td width="100%" align="center">
+        {: & captcha_code :} 
+        <input type="text" name="test2b"  size="8" />
+        {: ~ *nes_captcha_plugin_test2b_error_fatal
+        <p align="center">
+        * Código de seguridad Dos incorrecto<br> 
+        </p>
+        :}               
+        </td>
+      </tr>
+      :}       
+      </tr>
+      <tr>
+        <td width="100%" align="center">      
+        <input type="hidden" name="item"  value="{: * q_item :}" />     
+        <input name="enviar" type="submit" value="Enviar" />
+        </td>
+      </tr>
+    </table>
+</form>
+  
+</div>
+<br><br>
+
+<div id="comment">
+<pre>
+(test3,ascii,,4,3,&amp;nbsp;,&amp;#9619;)
+</pre>
+    {: & captcha (test3,ascii,,4,3,&nbsp;,&#9619;) 
+    <table width="100%">
+      <tr>
+        <td width="100%" align="center">
+        </td>
+      </tr>
+        <tr>
+        <td width="100%" align="center">
+        {: & captcha_code :} 
+        </td>
+      </tr>
+    </table>
+   :}
+</div>
+<br><br>
+
+<div id="comment">
+<pre>
+(test4,ascii,,0,6)
+</pre>
+    {: & captcha (test4,ascii,,0,6) 
+    <table width="100%">
+      <tr>
+        <td width="100%" align="center">
+        </td>
+      </tr>
+        <tr>
+        <td width="100%" align="center">
+        {: & captcha_code :} 
+        </td>
+      </tr>
+    </table>
+   :}
+ 
+</div>
+<br><br>
+
+<div id="comment">
+<pre>
+(test5,ascii,4,0,12,&amp;nbsp;,&amp;#9619;)
+</pre>
+    {: & captcha (test5,ascii,4,0,12,&nbsp;,&#9619;) 
+    <table width="100%">
+      <tr>
+        <td width="100%" align="center">
+        </td>
+      </tr>
+        <tr>
+        <td width="100%" align="center">
+        {: & captcha_code :} 
+        </td>
+      </tr>
+    </table>
+   :}
+</div>
+<br><br>
+
+<div id="comment">
+<pre>
+(test6,ascii,5,,4,&amp;nbsp;,&amp;#9619;)
+</pre>
+    {: & captcha (test6,ascii,5,,4,&nbsp;,&#9619;) 
+    <table width="100%">
+      <tr>
+        <td width="100%" align="center">
+        </td>
+      </tr>
+        <tr>
+        <td width="100%" align="center">
+        {: & captcha_code :} 
+        </td>
+      </tr>
+    </table>
+   :}
+</div>
+<br><br>
+
+<div id="comment">
+<a name="test7" id="test7"></a>
+<pre>
+(test7,ascii,6,9,3,@,·)
+</pre>
+<form name="formtest7" action="#test7">
+    {: & captcha (test7,ascii,6,9,3,@,·) 
+    <table width="100%">
+      <tr>
+        <td width="100%" align="center">
+        Teclea el código de seguridad<br>
+        <small>Si consigues verlo :-)</small>
+        </td>
+      </tr>
+        <tr>
+        <td width="100%" align="center">
+        {: & captcha_code :} 
+        </td>
+      </tr>
+        <tr>
+        <td width="100%" align="center">
+        <input type="text" name="test7"  size="8" />
+        </td>
+      </tr>
+      <tr>
+        <td width="100%" align="center">
+        {: ~ *nes_captcha_plugin_test7_error_fatal
+        <p align="center">
+        <big>Código de seguridad incorrecto<br></big> 
+        </p>
+        :}         
+        <input type="hidden" name="item"  value="{: * q_item :}" />       
+        <input name="enviar" type="submit" value="Enviar" />
+        </td>
+      </tr>
+    </table>
+   :}
+</form>
+</div>
+<br><br>
+
+

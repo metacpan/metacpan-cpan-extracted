@@ -1,0 +1,32 @@
+--- 
+abstract: Nagios Result Distributor
+author: 
+  - Jose Luis Martinez (jlmartinez@capside.com)
+build_requires: 
+  Clone: 0
+  Crypt::Blowfish: 0
+  Crypt::CBC: 0
+  Parallel::Forker: 0
+  Test::Memory::Cycle: 0
+  Test::Simple: 0
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: gpl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: NRD-Daemon
+no_index: 
+  directory: 
+    - inc
+    - t
+recommends: 
+  Crypt::Blowfish: 0
+  Crypt::CBC: 0
+  JSON::XS: 0
+requires: 
+  JSON: 0
+  Net::CIDR: 0
+  Net::Server: 0
+  Scalar::Util: 0
+version: 0.04

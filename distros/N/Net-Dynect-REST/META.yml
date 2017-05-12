@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               Net-Dynect-REST
+version:            0.09
+abstract:           A REST implementation to communicate with Dynect
+author:
+    - James Bromberger <james@rcpt.to>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Crypt::SSLeay:        0
+    HTTP::Request::Common:  5.814
+    IO::Socket::SSL:      0
+    JSON:                 0
+    LWP::Protocol::https:  0
+    LWP::UserAgent:       0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

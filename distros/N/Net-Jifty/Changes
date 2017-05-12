@@ -1,0 +1,60 @@
+Revision history for Net-Jifty
+
+0.14    3 Jan 2011
+        Bump to Encode 2.41 to fix a test issue with encoded periods (Sartak)
+
+0.12    27 May 2009
+        Fix use of meta-attribute removed from triggers (Sartak)
+
+0.11    19 Feb 2009
+        Depend on Any::Moose instead of Moose
+
+0.10
+        Releng fixes
+        Use a predicate for has_config_file
+
+0.09
+        Hash::Merge and Path::Class are now depended-upon only if you want
+            cascading directory config
+
+0.08    Mon Nov 17 18:39:11 UTC-4 2008
+        added form_form_data_args method to support file uploads (ruz)
+        reworked documentation (ruz)
+
+0.07    Fri Aug 1 09:58:10 2008
+        Cache each action and model spec, add methods to retrieve them
+        Better support for multiple values for a single key
+        Make DateTime an optional dependency
+
+0.06    Mon Mar 17 13:15:09 2008
+        Add directory filters for use by applications and subclasses
+            Basically, each directory in your path can have a .jifty file
+            with config in it. Each file is Hash::Merge'd. This lets your
+            app have whatever context you want, based on where you are.
+        appname is no longer required
+        Add validate_action_args method and have ->act, ->create, etc use it
+            if the strict_arguments attribute is true
+                idea and proof of concept by John SJ Anderson
+
+0.05    Mon Dec 21 01:56:40 2007
+        Removed canonicalize_action and canonicalize_model
+        Allow search arguments to be arrayrefs, to facilitate using hashes for
+            them. e.g: 'id => [1, 5]' is equivalent to 'id => 1, id => 5'
+
+0.04    Mon Dec 7 15:28:23 2007
+        Work around an HTTP::Cookies bug with 'localhost'
+        Add support for /=/search/
+        Fixes to create and act
+
+0.03    Wed Nov 28 17:03:17 2007
+        Fix support for DELETE/PUT (patch by HANENKAMP)
+        Workaround for a Jifty redirect bug (patch by HANENKAMP)
+        Internals cleanups
+
+0.02    Wed Nov 21 16:45:38 2007
+        Support for config files
+        Some date/time and email methods
+
+0.01    Tue Nov 20 22:25:37 2007
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,106 @@
+=head1 NAME
+
+Net::ParSCP - Secure transfer of files between clusters via SSH
+
+=head1 SYNOPSIS
+
+  # One liner: transfers 'file' to all 
+  # the machines in cluster 'clu' but 'june'
+  $ perl -MNet::ParSCP \
+     -e 'parpush(sourcefile=>q{file}, destination=>q{clu-june:/tmp/})'
+
+
+=head1 DESCRIPTION
+
+Functions in this module are for the implementation of
+the script L<parpush>. 
+
+=head2 parpush
+
+The main function is C<parpush>:
+
+
+  ($okh, $pid) = parpush(
+    configfile  => $configfile,
+    destination => [ 'cluster1:/path1', 'cluster2:/path2' ],
+    scp         => $scp,
+    scpoptions  => $scpoptions,
+    sourcefile  => $sourcefile,
+  );
+
+only C<sourcefile> and C<destination> are required. The
+other arguments are optional.
+
+In a list context returns two hash references C<($okh, $pid)>.
+
+=over 2
+
+=item C<%$okh> 
+
+Is a hash with keys the names of the machines considered
+during the connections. The value is true (1) if all the connections
+with the corresponding machine were closed succesfully, false otherwise.
+
+=item  C<%$pid> 
+
+Is a hash with keys the names of the machines considered
+during the connection. The value is an anonymous list 
+with the process identifiers of the connections 
+(C<undef> if the fork failed) to that machine. 
+
+=back
+
+=head1 EXPORT
+
+  parpush
+  exec_cssh
+  help
+  version
+  usage 
+  $VERBOSE
+  $DRYRUN
+
+=head1 SEE ALSO
+
+=over 2
+
+
+=item * L<Set::Scalar>
+
+
+
+=item * Cluster ssh: cssh L<http://sourceforge.net/projects/clusterssh/>
+
+
+
+=item * Project C3 L<http://www.csm.ornl.gov/torc/C3/>
+
+
+
+=item * L<parpush>
+
+
+
+=item * L<Net::CascadeCopy>
+
+
+=back
+
+=head1 AUTHOR
+
+Casiano Rodriguez-Leon E<lt>casiano.rodriguez.leon@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+
+Copyright (C) 2009-2009 by Casiano Rodriguez-Leon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+
+
+=cut
+

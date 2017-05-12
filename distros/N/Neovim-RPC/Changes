@@ -1,0 +1,21 @@
+Revision history for Neovim-RPC
+
+0.2.0 2017-03-02
+  [ ENHANCEMENTS ]
+    - Switch from Future to Promises for promise stuff.
+
+  [ STATISTICS ]
+    - code churn: 12 files changed, 280 insertions(+), 21 deletions(-)
+
+0.1.0 2015-09-19
+  [ ENHANCEMENTS ]
+    - Now able to export API as a DSL.
+
+  [ STATISTICS ]
+    - code churn: 8 files changed, 102 insertions(+), 13 deletions(-)
+
+0.0.1 2015-09-16
+  - First version, unleashed on an unsuspecting world.
+
+  [ STATISTICS ]
+    - code churn: 20 files changed, 75 insertions(+), 2477 deletions(-)

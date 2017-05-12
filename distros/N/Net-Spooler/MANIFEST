@@ -1,0 +1,18 @@
+ChangeLog			Package history
+MANIFEST			This file
+MANIFEST.SKIP
+Makefile.PL			Makefile generator
+README
+examples/smsmail
+examples/sendsms
+examples/mailspooler
+examples/sms/README
+examples/sms/cf/mailer/sms.m4
+examples/sms/gen_cf
+examples/sms/sendmail.mc
+lib/Net/Spooler.pm		The spooler package
+lib/Net/Spooler/Test.pm
+t/base.t			Base test (loading the modules)
+t/process			Test script for processing a file
+t/server			Test spooler
+t/simple.t			Simple test

@@ -1,0 +1,47 @@
+Net-Google-Blogger
+
+This module suite provides interface to the Blogger service now run by
+Google. It's built in object-oriented fashion using Moose, which makes
+it easy to use and extend. It also utilizes newer style GData API for
+better compatibility. You can retrieve list of blogs for your account,
+add, update or delete entries.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Net::Google::Blogger
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Google-Blogger
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-Google-Blogger
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-Google-Blogger
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-Google-Blogger/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Egor Shipovalov
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

@@ -1,0 +1,24 @@
+=head1 NAME
+
+Net::Hotline - Perl libraries for the Hotline internet client
+
+=head1 SYNOPSIS
+
+    use Net::Hotline;
+
+=head1 DESCRIPTION
+
+The Net::Hotline module simply loads Net::Hotline::Client.  For more
+information on the Net::Hotline::Client module, please see its
+documentation.  For more information on Hotline, see
+http://www.hotlinesw.com/ 
+
+=head1 AUTHOR
+
+John C. Siracusa (siracusa@mindspring.com)
+
+=head1 COPYRIGHT
+
+Copyright(c) 1999 by John C. Siracusa.  All rights reserved.  This program is
+free software; you can redistribute it and/or modify it under the same terms
+as Perl itself.

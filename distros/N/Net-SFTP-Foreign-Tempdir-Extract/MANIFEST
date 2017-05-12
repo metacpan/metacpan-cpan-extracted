@@ -1,0 +1,18 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Net/SFTP/Foreign/Tempdir/Extract.pm
+lib/Net/SFTP/Foreign/Tempdir/Extract/File.pm
+t/001_load.t
+t/002_download.t
+t/003_extract.t
+t/004_extract-multi.t
+t/005_download_backup.t
+perl-Net-SFTP-Foreign-Tempdir-Extract.spec
+scripts/Net-SFTP-Foreign-Tempdir-Extract-file.zip
+scripts/Net-SFTP-Foreign-Tempdir-Extract-download-example.pl
+scripts/Net-SFTP-Foreign-Tempdir-Extract-File-example.pl
+META.yml                                 Module meta-data (added by MakeMaker)

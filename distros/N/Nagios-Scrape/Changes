@@ -1,0 +1,11 @@
+Revision history for Nagios-Scrape
+
+0.03    July 30, 2010
+        Added pod documentation to get pod-coverage tests to pass
+
+0.02    July 29, 2010
+        Fixed uninitialized variable error.
+
+0.01    July 28, 2010
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,41 @@
+Net-iContact
+
+Net::iContact is an implementation of the iContact API.
+FIXME: more documentation here!
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Net::iContact
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-iContact
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-iContact
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Net-iContact
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Net-iContact
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Ian Kilgore
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

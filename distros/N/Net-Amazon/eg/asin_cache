@@ -1,0 +1,46 @@
+#!/usr/bin/perl
+###########################################
+# asin_fetch
+# Mike Schilli, 2003 (m@perlmeister.com)
+# Fetch book info by ASIN
+#     asin_fetch 0201360683
+###########################################
+use warnings;
+use strict;
+
+use Net::Amazon;
+use Net::Amazon::Request::ASIN;
+use Cache::File;
+
+use Log::Log4perl qw(:easy);
+
+Log::Log4perl->easy_init({level => $INFO, layout => '%F{1}-%L: %m%n'});
+
+my $cache = Cache::File->new( 
+    cache_root        => '/tmp/mycache',
+    default_expires   => '10 sec',
+);
+
+my $ua = Net::Amazon->new(
+    associate_tag => $ENV{AMAZON_ASSOCIATE_TAG},
+    token         => $ENV{AMAZON_TOKEN},
+    secret_key    => $ENV{AMAZON_SECRET_KEY},
+    cache         => $cache,
+);
+
+die "usage: $0 asin\n(use 0201360683 as " .
+    "an example)\n" unless defined $ARGV[0];
+
+my $req = Net::Amazon::Request::ASIN->new(
+    asin  => $ARGV[0],
+);
+
+  # Response is Net::Amazon::ASIN::Response
+my $resp = $ua->request($req);
+
+if($resp->is_success()) {
+    print $resp->as_string(), "\n";
+} else {
+    print "Error: ", 
+          $resp->message(), "\n";
+}

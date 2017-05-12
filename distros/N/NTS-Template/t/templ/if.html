@@ -1,0 +1,22 @@
+bbb[% # TESTE COISA E TAL %]aaa
+bbb[% # TESTE COISA E TAL %]aaa
+bbb[% # TESTE COISA E TAL %]aaa
+bbb[% # TESTE COISA E TAL %]aaa
+[% IF a == "bbb" %]aaaaacerto[% END %]
+
+[% IF test1 %] ok, test1 [% END %]
+[% IF test2.test2 %] ok, test2.test2 [% END %]
+[% IF test1 == test2.test2 %] ok, test1 == test2.test2 [% END %]
+[% IF test1 == "ok" %] ok, test1 == "ok" [% END %]
+[% IF test3 == 1 %] ok, test3 [% END %]
+[% IF test1 AND test2.test2 AND test3 %] ok, test1 AND test2.test2 AND test3 [% END %]
+[% IF test1 OR test3 %] ok, test1 OR test3 [% END %]
+[% IF test1 == test3 %] ok, test1 == test3 [% ELSE %] fail [% END %]
+[% IF test1 != "fail" %] ok, test1 != "ok" [% ELSE %] fail [% END %]
+[% IF test2.test2 != "fail" %] ok, test2.test2 != "ok" [% ELSE %] fail [% END %]
+
+[% IF test1 == test3 %] ok, test1 == test3 
+[% ELSIF test2.test2 == test3 %] ok, test2.test2 == test3 
+[% ELSE %] fail [% END %]
+
+[% UNLESS test1 == "fail" %] fail, test == "fail" [% ELSE %] ok [% END %]

@@ -1,0 +1,41 @@
+=head1 NAME
+
+Net::SAJAX::VersionGuarantee - Information regarding module version numbering
+
+=head1 VERSION NUMBER FORMAT
+
+This module has a version number that is guaranteed to be in the following
+format: C<< m{\A \d+ \. \d{3} \z}msx >>. Please see L<perlre> for information
+on the regular expression format.
+
+  my ($major_version, $minor_version) = $Net::SAJAX::VERSION
+    =~ m{\A (\d+) \. (\d{3}) \z}msx;
+
+=head1 MAJOR VERSION CHANGE
+
+When the major version number changes (that is, the number to the left of the
+decimal point) it is almost guaranteed that there is breakage in the public
+API.
+
+=head1 AUTHOR
+
+Douglas Christopher Wilson, C<< <doug at somethingdoug.com> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2009 Douglas Christopher Wilson.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of either:
+
+=over 4
+
+=item * the GNU General Public License as published by the Free
+Software Foundation; either version 1, or (at your option) any
+later version, or
+
+=item * the Artistic License version 2.0.
+
+=back
+
+=cut

@@ -1,0 +1,389 @@
+#!/usr/bin/env perl
+use 5.010001;
+use warnings;
+use strict;
+use utf8;
+
+our $VERSION = 'v2.3.7';
+
+use FindBin;
+use lib "$FindBin::Bin/../lib/perl5";
+use Path::Tiny;
+use Narada;
+use Narada::Lock qw( exclusive_lock unlock_new shared_lock unlock );
+use App::migrate;
+use Getopt::Long qw( GetOptionsFromArray );
+
+use constant INITIAL_VERSION    => '0.0.0';
+use constant FULL_BACKUP        => path('.backup/full.tar');
+use constant USAGE              => <<'EOUSAGE';
+Usage:
+    narada-install [--allow-downgrade|-D] [--allow-restore|-R] [-f <file>] <ver>
+    narada-install [-f <file>] --path|-p <ver1> <ver2> <ver3> ...
+    narada-install --check|-c <file>
+    narada-install --help|-h
+EOUSAGE
+
+my $Last_backup;        # OPTIMIZATION delay copying last backup to drop exclusive_lock faster
+
+
+main(@ARGV) if !caller;
+
+
+sub err { die "narada-install: @_\n" };
+
+sub main {
+        ## no critic (RequireCarping)
+        my ($allow_downgrade, $allow_restore, @files) = (0, 0);
+        my ($is_path, $check, $is_help);
+        my ($prev_version, $next_version, $path);
+        GetOptionsFromArray(\@_,
+                'D|allow-downgrade'     => \$allow_downgrade,
+                'R|allow-restore'       => \$allow_restore,
+                'f=s@'                  => \@files,
+                'p|path'                => \$is_path,
+                'c|check=s'             => \$check,
+                'h|help'                => \$is_help,
+        ) or die USAGE;
+        if ($is_help) {
+                print USAGE;
+                return;
+        }
+        if (defined $check) {
+                die USAGE if @_ || $is_path || $allow_downgrade || $allow_restore || @files;
+                say "Checking $check";
+                App::migrate->new->load($check);
+                return;
+        }
+        if ($is_path) {
+                die USAGE if @_ <= 2;
+                $path           = [@_];
+                $prev_version   = $path->[0];
+                $next_version   = $path->[-1];
+                $allow_downgrade= 1;
+                $allow_restore  = 1;
+        }
+        else {
+                die USAGE if @_ != 1;
+                $next_version = $_[0];
+                $prev_version = INITIAL_VERSION;
+                if (path(q{.})->children(qr/\A(?![.]release\z|[.]backup\z|[.]lock)/ms)) {
+                        Narada::detect('narada');
+                        ($prev_version) = path('VERSION')->lines({chomp=>1});
+                }
+        }
+        if ($next_version eq $prev_version) {
+                return;
+        }
+
+        my $migrate = load($prev_version, $next_version, @files);
+        $path ||= get_path($migrate, $prev_version, $next_version);
+        check_path($migrate, $path, $allow_downgrade, $allow_restore);
+        migrate($migrate, $path);
+
+        return;
+}
+
+sub load {
+        my ($prev_version, $next_version, @files) = @_;
+        my $migrate = App::migrate->new;
+        if ($next_version ne INITIAL_VERSION) {
+                push @files, ".release/$next_version.migrate";
+        }
+        if (-f ".release/$prev_version.migrate") {
+                push @files, ".release/$prev_version.migrate";
+        }
+        for (@files) {
+                say "Loading $_";
+                $migrate->load($_);
+        }
+        return $migrate;
+}
+
+sub get_path {
+        my ($migrate, $prev_version, $next_version) = @_;
+        my @paths = $migrate->find_paths($prev_version, $next_version);
+        if (0 == @paths) {
+                err "Unable to find migration path from $prev_version to $next_version";
+        }
+        elsif (1 != @paths) {
+                err join "\n",
+                        'Found more than one upgrade path, run one of these commands to choose a path:',
+                        map {"\tnarada-install --path @{$_}"} @paths;
+        }
+        return $paths[0];
+}
+
+sub check_path {
+        my ($migrate, $path, $allow_downgrade, $allow_restore) = @_;
+        if ($allow_restore) {
+                $allow_downgrade = 1;
+        }
+        for my $step ($migrate->get_steps($path)) {
+                my $t = $step->{type};
+                my $is_down = $t eq 'downgrade' || $t eq 'after_downgrade';
+                err 'Downgrade required, use --allow-downgrade to continue'
+                        if $is_down && !$allow_downgrade;
+                err 'Restore from backup required, use --allow-restore to continue'
+                        if $t eq 'RESTORE' && !$allow_restore;
+                if ($t eq 'RESTORE') {
+                        my $f = path(".backup/full-$step->{next_version}.tar");
+                        err "Required backup not found: $f" if !$f->is_file;
+                }
+        }
+        return;
+}
+
+sub migrate {
+        my ($migrate, $path) = @_;
+
+        say 'Acquire exclusive lock ...';
+        exclusive_lock();
+        {
+                local $ENV{NARADA_SKIP_LOCK} = 1;
+                $Last_backup = undef;   # tests may call main() many times
+                $migrate->on(BACKUP     => \&_backup)
+                        ->on(RESTORE    => \&_restore)
+                        ->on(VERSION    => \&_version)
+                        ->on(error      => \&_error)
+                        ->run($path);
+        }
+        unlock_new();
+
+        shared_lock();
+        if ($Last_backup && !FULL_BACKUP->exists) {
+                path($Last_backup)->copy(FULL_BACKUP);
+        }
+        unlock();
+
+        return;
+}
+
+sub ask {
+        my ($msg, $match) = @_;
+        print $msg;
+        # TODO try IO::Prompter
+        ## no critic (ProhibitExplicitStdin)
+        while (<STDIN>) {
+                chomp;
+                return $_ if /$match/ms;
+                print $msg;
+        }
+        die "Interrupted by EOF\n";
+}
+
+sub _backup {
+        my ($step) = @_;
+        if ($step->{version} ne INITIAL_VERSION) {
+                if ($Last_backup) {
+                        path($Last_backup)->copy(FULL_BACKUP);
+                }
+                my $file = ".backup/full-$step->{version}.tar";
+                say "Backuping to $file";
+                system('narada-backup') == 0 or die "BACKUP failed\n";
+                $Last_backup = $file;
+                FULL_BACKUP->move($Last_backup);
+        }
+        return;
+}
+
+sub _restore {
+        my ($step) = @_;
+        my $file = ".backup/full-$step->{version}.tar";
+        say "Restoring from $file";
+        system('narada-restore', $file) == 0 or die "RESTORE failed\n";
+        return;
+}
+
+sub _version {
+        my ($step) = @_;
+        say "Migration to $step->{version} completed";
+        if ($step->{version} eq INITIAL_VERSION) {
+                path('VERSION')->remove;
+        }
+        else {
+                path('VERSION')->spew_utf8("$step->{version}\n");
+        }
+        return;
+}
+
+sub _error {
+        say q{};
+        say 'YOU NEED TO MANUALLY FIX THIS ISSUE RIGHT NOW';
+        my $prompt
+                = "Please choose what to do:\n"
+                . "  shell    - run $ENV{SHELL} (exit from it to return to this menu)\n"
+                . "  continue - continue migration (use if you have fixed this issue)\n"
+                . "  restore  - interrupt migration and RESTORE previous version from backup\n"
+                . 'Enter action [shell]: '
+                ;
+        while (1) {
+                my $ans = lc ask($prompt, qr/\A(?:shell|continue|restore|\s*)\z/msi);
+                if ($ans eq 'restore') {
+                        die "Migration failed\n";
+                }
+                elsif ($ans eq 'continue') {
+                        last;
+                }
+                else {
+                        system $ENV{SHELL};
+                }
+        }
+        return;
+}
+
+
+1; # Magic true value required at end of module
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+narada-install - migrate project to given version
+
+
+=head1 VERSION
+
+This document describes narada-install version v2.3.7
+
+
+=head1 USAGE
+
+    narada-install [--allow-downgrade|-D] [--allow-restore|-R] [-f <file>] <ver>
+    narada-install [-f <file>] --path|-p <ver1> <ver2> <ver3> ...
+    narada-install --check|-c <file>
+    narada-install --help|-h
+
+
+=head1 DESCRIPTION
+
+Should be executed in project deploy directory.
+
+Upgrade/downgrade your project in safe way:
+
+=over
+
+=item *
+
+It use Narada's exclusive lock to make sure no other code will run while
+migrating project's files or databases (to make this works as expected you
+must use Narada's shared lock around all your code which read or write any
+project's files or databases).
+
+=item *
+
+Before every migration it will automatically create new backup
+C<< .backup/full-<current_version>.tar >>.
+
+=item *
+
+If migration fail it will automatically restore previous version from backup.
+
+=item *
+
+Use L<App::migrate> file format to describe project migrations, which let you
+downgrade fast and without losing any data whenever possible.
+
+=back
+
+When called with option C<--check|-c> will check syntax of given migrate
+file and exit.
+
+It will try to load several migrate files, in this order:
+
+=over
+
+=item *
+
+file given using C<-f> option (if any)
+
+=item *
+
+C<< .release/<next_ver>.migrate >> where C<< <next_ver> >> is last
+parameter (if this file exists)
+
+=item *
+
+C<< .release/<prev_ver>.migrate >> where C<< <prev_ver> >> is current
+project version if called without C<--path> option and file C<VERSION>
+exists or first parameter after C<--path> option (if this file exists)
+
+=back
+
+Then it will try to find migration path from current version to given and
+execute it (or just execute given migration path if called with C<--path>
+option).
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+    .lock
+    .lock.new
+    .lock.bg
+    $NARADA_SKIP_LOCK
+    .backup/full.tar
+    .backup/full-*.tar
+    .release/*.migrate
+
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/powerman/Narada/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software. The code repository is available for
+public review and contribution under the terms of the license.
+Feel free to fork the repository and submit pull requests.
+
+L<https://github.com/powerman/Narada>
+
+    git clone https://github.com/powerman/Narada.git
+
+=head2 Resources
+
+=over
+
+=item * MetaCPAN Search
+
+L<https://metacpan.org/search?q=Narada>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/dist/Narada>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Narada>
+
+=item * CPAN Testers Matrix
+
+L<http://matrix.cpantesters.org/?dist=Narada>
+
+=item * CPANTS: A CPAN Testing Service (Kwalitee)
+
+L<http://cpants.cpanauthors.org/dist/Narada>
+
+=back
+
+
+=head1 AUTHOR
+
+Alex Efros E<lt>powerman@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2008- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+
+=cut

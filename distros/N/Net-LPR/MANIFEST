@@ -1,0 +1,8 @@
+Changes
+LPR.pm
+LPR.pod
+Makefile.PL
+MANIFEST
+README
+t/0001-basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

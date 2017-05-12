@@ -1,0 +1,16 @@
+Makefile.PL
+MANIFEST
+README
+BlueZ.xs
+MSWin.xs
+Bluetooth.pm
+test.pl
+typemap
+Changes
+samples/device_discovery
+samples/service_discovery
+samples/client_connection
+samples/server_and_service_registration
+samples/get_gps_data
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

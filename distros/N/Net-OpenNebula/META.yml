@@ -1,0 +1,28 @@
+---
+abstract: 'Access OpenNebula RPC via Perl.'
+author:
+  - 'Jan Gehring <jfried@rexify.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-OpenNebula
+requires:
+  Data::Dumper: '0'
+  RPC::XML: '0'
+  RPC::XML::Client: '0'
+  RPC::XML::ParserFactory: '0'
+  XML::Parser: '0'
+  XML::Simple: '0'
+  constant: '0'
+  strict: '0'
+  version: '0'
+  warnings: '0'
+version: 0.310.0
+x_serialization_backend: 'YAML::Tiny version 1.69'

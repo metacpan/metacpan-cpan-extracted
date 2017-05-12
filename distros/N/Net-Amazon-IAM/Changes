@@ -1,0 +1,38 @@
+
+0.05    2015-03-29
+        Alexandr Ciornii   * Distribution build fix (rt103150).
+        Igor Tsigankov     * More API provided methods added.
+
+0.04    2015-03-25
+        Igor Tsigankov     * Large refactoring 
+                           * A lot of new functionality added
+                           * Errors changed to be thrown or returned (return_errors attr)
+
+0.03    2015-03-22
+        Igor Tsigankov     * Forgot to recreate manifest, but new class was addedd :(
+
+0.02    2015-03-22
+        Igor Tsigankov     * Fixed POD to pass tests (RT103004)
+                           * Implemented list policies
+
+0.01    2015-03-22
+        Igor Tsigankov     First version. Following methods implemented:
+                           create_user
+                           delete_user
+                           get_user
+                           update_user
+                           add_user_to_group
+                           remove_user_from_group
+                           create_group
+                           get_group
+                           delete_group
+                           create_policy
+                           get_policy
+                           delete_policy
+                           put_user_policy
+                           get_user_policy
+                           delete_user_policy
+                           create_access_key
+                           delete_access_key
+                           list_access_keys
+                           list_user_policies

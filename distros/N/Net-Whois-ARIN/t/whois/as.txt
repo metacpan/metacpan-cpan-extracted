@@ -1,0 +1,35 @@
+
+OrgName:    Some Random Company
+OrgID:      SRC
+Address:    123 North Lincoln Street
+City:       Rochester
+StateProv:  NY
+PostalCode: 14646
+Country:    US
+
+ReferralServer: rwhois://whois.somerandomcompany.net:4321
+
+ASNumber:   1234
+ASName:     SOMERANDOM-SRC
+ASHandle:   AS1234
+Comment:
+RegDate:    1990-01-01
+Updated:    2007-02-19
+
+RTechHandle: FOO-BAR
+RTechName:   Foo Bar
+RTechPhone:  +1-360-555-1212
+RTechEmail:  ipadmin@somerandomcompany.net
+
+OrgAbuseHandle: ABUSE-SRC
+OrgAbuseName:   Abuse
+OrgAbusePhone:  +1-360-555-1212
+OrgAbuseEmail:  abuse@somerandomcompany.net
+
+OrgTechHandle: SOME-RANDOM
+OrgTechName:   Some Random Company
+OrgTechPhone:  +1-360-555-1212
+OrgTechEmail:  ipadmin@somerandomecompany.net
+
+# ARIN WHOIS database, last updated 2006-10-08 19:10
+# Enter ? for additional hints on searching ARIN's WHOIS database.

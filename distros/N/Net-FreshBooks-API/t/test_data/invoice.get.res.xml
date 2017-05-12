@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<response xmlns="http://www.freshbooks.com/api/" status="ok">
+    <invoice>
+        <invoice_id>00000000002</invoice_id>
+        <number>0000002</number>
+        <client_id>11</client_id>
+        <recurring_id/>
+        <organization>foobar</organization>
+        <first_name>Jack</first_name>
+        <last_name>Test</last_name>
+        <p_street1/>
+        <p_street2/>
+        <p_city/>
+        <p_state/>
+        <p_country/>
+        <p_code/>
+        <po_number/>
+        <status>draft</status>
+        <amount>5</amount>
+        <amount_outstanding>5</amount_outstanding>
+        <paid>0</paid>
+        <date>2009-01-01</date>
+        <notes/>
+        <terms/>
+        <discount>0</discount>
+        <url deprecated="true">https://hinuhinutest.freshbooks.com/inv/106252-2-80cad</url>
+        <auth_url deprecated="true">https://hinuhinutest.freshbooks.com/inv/106252-2-80cad-z</auth_url>
+        <links>
+            <client_view>https://hinuhinutest.freshbooks.com/inv/106252-2-80cad</client_view>
+            <view>https://hinuhinutest.freshbooks.com/inv/106252-2-80cad-z</view>
+            <edit>https://hinuhinutest.freshbooks.com/inv/106252-2-80cad-e</edit>
+        </links>
+        <lines>
+            <line>
+                <amount>1</amount>
+                <name>Test line 1</name>
+                <unit_cost>1</unit_cost>
+                <quantity>1</quantity>
+                <description/>
+                <tax1_name/>
+                <tax2_name/>
+                <tax1_percent/>
+                <tax2_percent/>
+            </line>
+            <line>
+                <amount>4</amount>
+                <name>Test line 2</name>
+                <unit_cost>2</unit_cost>
+                <quantity>2</quantity>
+                <description/>
+                <tax1_name/>
+                <tax2_name/>
+                <tax1_percent/>
+                <tax2_percent/>
+            </line>
+        </lines>
+    </invoice>
+</response>

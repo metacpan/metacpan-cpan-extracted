@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 375ba374595ab5f54c4acbf46cdad3a7945c4096 MANIFEST
+SHA1 5ba18863b0b1ca5245981cab6861a701038804a8 META.json
+SHA1 f19d665c429a20ee4022f2acfc4c235dfb7655a1 META.yml
+SHA1 b41b00612a1162ee5b144672f268dbde661fa0bc Makefile.PL
+SHA1 941ac764d251def9fb9c5e81574c87a1fddd9174 Readme.md
+SHA1 43c3fa3f2121cbe1c9d33ecf532de635868d08c1 bin/network_extractor.pl
+SHA1 ac556d5c9e45f7420c3933972ad566970d23b1ea lib/NetInfoExtractor/Interface.pm
+SHA1 1523aec81f910443891be03b5706eb855534345f lib/NetInfoExtractor/NameServer.pm
+SHA1 93f2109c9209dfa6784ad97238d2439ec9ffa357 lib/NetInfoExtractor/OpenPorts.pm
+SHA1 3056131f798ba7117eb7df640bb81cfc9c6212f1 lib/NetInfoExtractor/Report.pm
+SHA1 b8bafe394b08462e40fa80626fbc0992097aa4ae lib/NetInfoExtractor/Route.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJTZ5euAAoJEAwJr/TSy2CRicgH/isG9S+VQR2nVs51rla0uOx6
+c8pyNAn8CFcwGq4MaTb7f26JTfPqs3dtIBCwsaLBfx61KL2NV0Ichz8RV58Erlq4
+YI4XdcdrnEFou2Fu7Qmq3di2NQ66P3R/YZoDoRzdGLKvcQCrgPEoT6JPNWkTASv/
+WVsFzyj8J7xWeutvMm8qnmK1Sc6L3Ao7At30epi+1h8LYujU182zFEiwLd8tPw3v
+bg3JO0J6+UIaXMFMp1TqkhRXigF8JL429UNYMI+9qSMlpYg/buanUQg8Os5xtdx5
+IU87UcZo5fQS8AO3nQ9+1V0ZQQfYA6Z0YMdTVER/KIK9QRODCY68j8IXnG5bG+o=
+=TiB3
+-----END PGP SIGNATURE-----

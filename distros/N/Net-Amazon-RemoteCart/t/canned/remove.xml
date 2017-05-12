@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><ShoppingCartResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://xml.amazon.com/schemas3/dev-heavy.xsd">
+
+<Request><Args><Arg value="Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.2.1) Gecko/20030225" name="UserAgent"></Arg><Arg value="1RTFST5HY9JW6JC8WJEW" name="RequestID"></Arg><Arg value="true" name="sims"></Arg><Arg value="us" name="locale"></Arg><Arg value="104-0468881-3373551" name="CartId"></Arg><Arg value="remove" name="ShoppingCart"></Arg><Arg value="2yyCamdRF0g7ZCwe0r832oLeX/o=" name="Hmac"></Arg><Arg value="D1QS8OZAEP31QW" name="dev-t"></Arg><Arg value="webservices-20" name="t"></Arg><Arg value="xml" name="f"></Arg><Arg value="1" name="Item.4782061547674401391"></Arg></Args></Request>  <ShoppingCart>
+   <CartId>104-0468881-3373551</CartId>
+   <HMAC>2yyCamdRF0g7ZCwe0r832oLeX/o=</HMAC>
+   <PurchaseUrl>http://www.amazon.com/exec/obidos/shopping-basket?cart-id=104-0468881-3373551%26associate-id=webservices-20%26hmac=2yyCamdRF0g7ZCwe0r832oLeX%2Fo%3D</PurchaseUrl>
+   <Items>
+    <Item>
+
+     <ItemId>6192011163085299656</ItemId>
+     <ProductName>Ultra-Lounge: Tiki Sampler</ProductName>
+     <MerchantSku></MerchantSku>
+     <Asin>B00000IP2Z</Asin>
+     <Quantity>2</Quantity>
+     <ListPrice>USD 19.98</ListPrice>
+
+     <OurPrice>USD 16.99</OurPrice>
+    </Item>
+   </Items>
+   <SimilarProducts>
+    <Product>B000002UH7</Product>
+    <Product>B000002TZM</Product>
+    <Product>B00006I0D4</Product>
+
+    <Product>B000002U5V</Product>
+    <Product>B000002TWF</Product>
+   </SimilarProducts>
+  </ShoppingCart>
+</ShoppingCartResponse>

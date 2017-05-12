@@ -1,0 +1,17 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Net/SinaWeibo.pm
+lib/Net/SinaWeibo/OAuth.pm
+perlcritic.rc
+t/00compile.t
+t/00oauth.t
+t/01oauth.t
+t/api.t
+t/author-critic.t
+t/basic.t
+t/release-pod-syntax.t

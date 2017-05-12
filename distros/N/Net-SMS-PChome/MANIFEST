@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-SMS-PChome.t
+lib/Net/SMS/PChome.pm
+META.yml                                 Module meta-data (added by MakeMaker)

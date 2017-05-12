@@ -1,0 +1,141 @@
+<h2><a href="#">&#123;: * environment_variable :&#125;</a></h2>
+<h3>Descripción</h3> 
+<p> 
+El bloque se sustituye por el valor de <i>environment_variable</i> que es 
+ una variable del entorno Nes.
+</p>
+<p>
+Nes define como variables de entorno todas las del entorno CGI:
+<pre>
+&#123;: * env_SERVER_NAME :&#125; &#123;: * env_DOCUMENT_ROOT :&#125; etc.
+
+</pre>
+</p>
+<p>
+Se definen como variables de entorno los parámetros (<i>QUERY</i>) pasados en los
+ métodos POST y GET añadiendo '<i>q_</i>' al inicio del nombre de la variable:
+<pre>
+&#123;: * q_nombre_variable :&#125;
+
+</pre> 
+</p>
+<p>
+Se definen como variables de entorno las varibles del archivo de configuración como:
+<pre>
+&#123;: * cfg_nombre_variable :&#125;
+
+</pre>
+</p>
+<p>
+También se definen como variables de entorno algunos mensajes de error:
+<pre>
+&#123;: * nes_error_tipo_de_error :&#125;
+
+</pre>
+</p>
+<p>
+Los <a href="./?item=Plugin Forms">Plugins</a> definen su variable en la siguiente notación:
+<pre>
+&#123;: * nes_(plugin)_(variable) :&#125;
+&#123;: * nes_forms_plugin_form1_is_ok :&#125;
+
+</pre>
+</p>
+
+<h3>Otras variables</h3> 
+<p>
+Directorio actual: 
+<pre>
+&#123;: * nes_this_dir :&#125;
+
+</pre>
+Archivo actual:
+<pre>
+    
+&#123;: * nes_this_file :&#125;
+
+</pre>
+Versión de NES: 
+<pre>
+    
+&#123;: * nes_ver :&#125;
+
+</pre>
+Idioma: 
+<pre>
+    
+&#123;: * nes_accept_language :&#125;
+
+</pre>
+Sesión: 
+<pre>
+
+# Sesión abierta corectamente
+&#123;: * nes_session_ok :&#125;
+
+# Nombre de usuario de la sesion
+&#123;: * nes_session_user :&#125;
+
+</pre>
+</p>
+
+<h3>Seguridad</h3> 
+<p> 
+ Ver: <a href="./?item=Seguridad">Inyección de código y Cross-site scripting</a>.
+</p>
+
+<h3>Inclusión y anidamiento</h3> 
+No se permite la inclusión ni el anidamiento:
+<pre> 
+&#123;: * nes_var &#123;: * nes_var2 :&#125; :&#125; <- ERROR
+&#123;: * nes_var &#123;: $ var :&#125; :&#125;    <- ERROR
+
+</pre>
+Salvo comentarios
+<pre>
+    
+&#123;: * nes_var &#123;: # Los comentarios siempre se pueden incluir :&#125; :&#125;    <- Ok
+
+</pre>
+Pero por claridad se recomienda esta forma:
+<pre>
+    
+&#123;: * nes_var :&#125; &#123;: # comentario :&#125;
+
+</pre>
+</p>
+
+<p>
+<h3>Ejemplo</h3>
+<p>
+<strong>archivo.nhtml:</strong>
+<pre>
+&#123;: NES 1.0 ('archivo.pl') :&#125;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Nes sample/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;b&gt;&#123;: * env_HTTP_HOST :&#125;&lt;/b&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+
+</pre>
+
+<strong>archivo.pl:</strong>
+<pre>   
+use Nes;
+
+my $nes = Nes::Singleton->new('archivo.nhtml');
+
+$nes->out();
+
+</pre>
+
+<strong>Salida:</strong>
+<pre>   
+www.dominio.com
+</pre>
+
+</p>
+<br>

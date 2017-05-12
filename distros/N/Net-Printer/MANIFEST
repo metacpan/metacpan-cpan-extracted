@@ -1,0 +1,11 @@
+ChangeLog
+lib/Net/Printer.pm
+Makefile.PL
+MANIFEST
+LICENSE
+README
+TODO
+test.pl
+testprint.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

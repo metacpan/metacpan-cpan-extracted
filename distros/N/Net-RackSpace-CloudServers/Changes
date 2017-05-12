@@ -1,0 +1,62 @@
+Revision history for Net-RackSpace-CloudServers
+
+0.15 2016-05-15
+    use cache-bust uri for get_server
+    fix pod encoding
+    fix ::Server SYNOPSIS
+
+0.14 2011-05-18
+    Allows the user to choose either the US or UK endpoints
+
+0.13 2011-01-31
+    Stable release; tests pass on older Perl versions
+
+0.12_01 2011-01-14 1930 GMT
+    Developer release
+    Tests should pass on Perl 5.8.8
+
+0.12 2011-01-14 1845 GMT
+    Display response content on error
+    Added requirement for Crypt::SSLeay
+
+0.11 2010-11-20 1709 GMT
+    Fixed requirement for Carp
+
+0.10 2010-11-20 1709 GMT
+    Switched to Any::Moose
+    Added defaults for parameters which are no
+        longer strictly required
+    Optionally provide metadata and personality
+        when creating a new server
+
+0.09_40 2009-12-10 2124 GMT
+    Now able to create and delete backup images
+
+0.09_20 2009-11-23 1840 GMT
+    Added perl 5.10 as required
+
+0.09_00 2009-11-21 1712 GMT
+    Added server deletion, and script to do it
+    Corrected server creation
+
+0.08_00 2009-11-21 2241 GMT
+    Added Flavours class
+
+0.06_00 2009-07-20 2223 BST
+    Updated POD; Able to create server; re-releasing as test on CPAN
+
+0.05_00 2009-07-18 0923 BST
+    Updated POD; removed unneeded modules; releasing as test on CPAN
+
+0.04    2009-07-18 0913 BST
+    Able to list images; can change root password and server name
+
+0.03    2009-07-17 1530 BST
+    Refactored servers; changed to Net-RackSpace-CloudServers
+
+0.02    2009-07-16 1942 BST
+    Able to list servers and limits
+
+0.01    2009-07-16 1841 BST
+    First version, released on an unsuspecting world.
+

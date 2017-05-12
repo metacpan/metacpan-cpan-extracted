@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               Net-CSTAv3-Client
+version:            0.06
+abstract:           Perl implementation of the CSTA Phase 3 protocol as used by siemens clients
+author:
+    - Timo Schneider <timos@informatik.tu-chemnitz.de>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                 0
+    Convert::ASN1::asn1c:  0.04
+    ExtUtils::MakeMaker:  0
+    Test::More:           0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

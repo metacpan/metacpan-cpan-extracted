@@ -1,0 +1,40 @@
+Received: from flis.man.torun.pl (IDENT:105@tor.man.torun.pl [158.75.18.142])
+	by oryl.man.torun.pl (8.9.1/8.9.3) with ESMTP id OAA13378
+	for <makler@oryl.man.torun.pl>; Tue, 25 Jan 2000 14:33:32 +0100 (MET)
+Received: by flis.man.torun.pl (Postfix)
+	id 2D241736C4; Tue, 25 Jan 2000 14:33:32 +0100 (MET)
+Received: (qmail 22401 invoked by uid 60001); 25 Jan 2000 13:28:33 -0000
+Message-ID: <20000125132833.22400.qmail@localhost.localnet>
+Date: 25 Jan 00 05:28:32 PST
+From: Piotr Klaban <makler@man.torun.pl>
+To: <makler@man.torun.pl>
+Subject: test
+Cc: <makler@man.torun.pl>
+X-MSMail-Priority: High
+X-Priority: 1
+X-Subject: =?iso-8859-2?b?sea8tr/q?=
+Mime-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----MIMEFastPart-00--=_yNCG2864S68605ea2bb"
+Status: RO
+Content-Length: 20718
+Lines: 552
+
+This is a multi-part message in MIME format.
+
+------MIMEFastPart-00--=_yNCG2864S68605ea2bb
+Content-Type: multipart/alternative;
+	boundary="----MIMEFastPart-01--=_yNCG2864S687f297185"
+
+------MIMEFastPart-01--=_yNCG2864S687f297185
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+test mail sent
+
+____________________________________________________________________
+
+------MIMEFastPart-01--=_yNCG2864S687f297185--
+
+------MIMEFastPart-00--=_yNCG2864S68605ea2bb--
+

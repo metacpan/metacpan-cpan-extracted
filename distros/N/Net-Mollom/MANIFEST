@@ -1,0 +1,20 @@
+Build.PL
+Changes
+lib/Net/Mollom.pm
+lib/Net/Mollom/ContentCheck.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/01-constructor.t
+t/02-server_list.t
+t/03-verify_key.t
+t/04-check_content.t
+t/05-send_feedback.t
+t/06-get_image_captcha.t
+t/07-get_audio_captcha.t
+t/08-get_statistics.t
+t/09-check_captcha.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml
+META.json

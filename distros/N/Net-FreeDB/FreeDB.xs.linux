@@ -1,0 +1,82 @@
+// Copyright (c) 2014 David J. Shultz <dshultz@cpan.org>
+// This software is covered by the GPL.
+
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+#include "lib/discid.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+static int
+not_here(char *s)
+{
+    croak("%s not implemented on this architecture", s);
+    return -1;
+}
+
+static double
+constant(char *name, int len, int arg)
+{
+    errno = EINVAL;
+    return 0;
+}
+
+MODULE = Net::FreeDB		PACKAGE = Net::FreeDB		
+
+PROTOTYPES: ENABLE
+
+double
+constant(sv,arg)
+    PREINIT:
+	STRLEN		len;
+    INPUT:
+	SV *		sv
+	char *		s = SvPV(sv, len);
+	int		arg
+    CODE:
+	RETVAL = constant(s,len,arg);
+    OUTPUT:
+	RETVAL
+
+char*
+xs_discid(char* dev)
+    INIT:
+		char id[30];
+		struct discdata data;
+    CODE:
+		data = get_disc_id(dev);
+    POST_CALL:
+		if (data.num_of_trks == -1) {
+			RETVAL = "";
+		} else {
+			sprintf(id, "%08x", (unsigned int)data.discid);
+			RETVAL = id;
+		}
+    OUTPUT:
+		RETVAL
+
+SV*
+xs_discinfo(char* dev)
+    INIT:
+	int i;
+        char id[30];
+	struct discdata data;
+        HV* hash = newHV();
+        AV* tracks = newAV();
+    PPCODE:
+	data = get_disc_id(dev);
+
+	for (i = 0; i < (data.num_of_trks); i++) {
+		av_push(tracks, newSVnv(data.track_offsets[i]));
+	}
+	
+	sprintf(id, "%08x", (unsigned int)data.discid);
+	hv_store(hash, "ID", 2, newSVpv(id, 0), 0);
+	hv_store(hash, "NUM_TRKS", 8, newSVnv(data.num_of_trks), 0);
+	hv_store(hash, "TRACKS", 6, newRV_inc((SV*)tracks), 0);
+	hv_store(hash, "SECONDS", 7, newSVnv(data.seconds), 0);
+
+	XPUSHs(newRV((SV*)hash));
+

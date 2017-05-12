@@ -1,0 +1,36 @@
+Revision history for Perl extension Net::Drizzle
+
+0.07
+
+        - fixed null pointer exception(by kazuho++)
+        - fixed memory leak(valgrind++)
+        - fixed xs calling method(gfx++)
+        - remove version check in sub module
+        - avoid warnings
+
+0.06
+
+        - DRIZZLE_COLUMN_TYPE_DRIZZLE_VIRTUAL is removed at libdrizzle 0.4
+
+0.05
+
+        - added $con->events() for event frameworks
+
+0.04
+
+        - split XS code for each package
+
+0.03
+
+        - fixed packaging issue
+
+0.02
+
+        - updated docs
+        - use Text::MicroTemplate instead of TT for generating xs
+        - added N::D::Connection->close
+        - added N::D::Query->con
+        - fixed some typos in docs
+
+0.01    Wed Jun 10 14:51:58 2009
+        - original version

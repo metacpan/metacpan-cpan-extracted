@@ -1,0 +1,9 @@
+$args =
+{
+ message_type => MQTT_PUBCOMP,
+ message_id => 1234,
+}
+
+70 02 04d2
+
+PubComp/at-most-once 1234 

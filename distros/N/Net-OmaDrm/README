@@ -1,0 +1,101 @@
+NAME
+       Net::OmaDrm - Perl Module to encapsulate OMA DRM format for a media type
+
+	Open Mobile Alliance (OMA) is a standards body founded by telecommunication companies which develops open standards for the mobile phone industry. In order to ensure interoperability across all implementations for Digital Rights Management (DRM), the OMA provides DRM specifications so that content providers, operators and mobile phone manufacturers can easily integrate the DRM solution as smoothly as possible.
+
+	I have created Net::OmaDrm perl module so that content providers can format the content-type quickly.
+
+	This module supports the OMA DRM version 1.0 method of sending content to the handset. A device will declare the support for OMA-DRM by including one of the method which is provided by this module:
+
+           > Forward-lock
+               * Content-Type
+                   - application/vnd.oma.drm.message
+           > Combined delivery
+               * Content-Type
+                   - application/vnd.oma.drm.message
+                   - application/vnd.oma.drm.rights+xml
+               * o-ex:permission
+                   - o-dd:display
+                   - o-dd:play
+               * o-ex:constraint
+                   - o-dd:count
+                   - o-dd:interval
+
+          A detailed document of OMA-DRM can be found at:
+            http://www.openmobilealliance.org/release_program/drm_v1_0.html
+
+I tested this module on perl  v5.8.5.
+
+INSTALL
+	To install do the following:
+
+	perl Makefile.PL
+	make
+	make install
+
+The following a a perldoc of this module:
+
+SYNOPSIS
+         use Net::OmaDrm;
+
+         my $mydrm = Net::OmaDrm->new($basepath);
+         my $content= $mydrm->genForwardLock($content_name,$content_type);
+
+DESCRIPTION
+       This module will encapulate the media type to a multi-type content with OMA DRM standard.
+
+METHODS
+       new This method is used to create the OmaDrm object.
+
+           Usage:
+
+             my $mydrm = Net::OmaDrm->new($basepath);
+
+           The complete list of arguments is:
+
+             $basepath : This is the base path for the content.
+
+       genForwardLock
+           This method will generate the Forward Lock DRM with an input Media Type.
+
+           Usage:
+
+             my $content= $mydrm->genForwardLock($content_name,$content_type);
+
+           The complete list of arguments is:
+
+             $content_name : File name of the content.
+             $content_type : Content Type.
+
+       genCombinedDelivery
+           This method will generate multipart content with rights.
+
+           Usage:
+
+             my $content= $mydrm->genCombinedDelivery($content_name,$content_type,$interval,$count);
+
+           Example:
+
+             my $content= $mydrm->genCombinedDelivery("image.gif","image/gif",1,"");
+             my $content= $mydrm->genCombinedDelivery("image.gif","image/gif","","P30S");
+
+           The complete list of arguments is:
+
+             $content_name : File name of the content.
+             $content_type : Content Type.
+             $interval     : Interval that the content can play.
+             $count        : Number of time that the content can play.
+
+AUTHOR
+       Christopherus Goo <software@artofmobile.com>
+
+COPYRIGHT
+       Copyright (c) 2007 Christopherus Goo.  All rights reserved.  This software may be used and modified freely, but I do request that this copyright notice remain
+       attached to the file.  You may modify this module as you wish, but if you redistribute a modified version, please attach a note listing the modifications you
+       have made.
+
+       This software or the author arenârelated to OMA in any way.
+
+
+
+

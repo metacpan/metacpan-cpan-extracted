@@ -1,0 +1,131 @@
+2000-12-04  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Release 1.08.
+
+	* Add Event::Stats to PREREQ. (paul@miraclefish.com)
+
+2000-05-19  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Add Scalar::Util to PREREQ.
+
+2000-03-15  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Remove is_queued().
+
+	* Release 1.07.
+
+2000-03-13  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Tweak docs.
+
+	* Add *minimal* test suite.
+
+2000-03-10  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Release 1.06.
+
+	* Plugged in a path resolver.
+
+	* Fixed symbol table walker.
+
+	* Escape control characters.
+	
+	* :w <file> command.
+
+	* Display sizing was inconsistent.  Fixed.
+
+	* Release 1.05.
+
+	* Fleshed out vi-esque environment.  Added :help command.
+
+	* Lots of changes to !pi.
+
+	* Allow use of externally created socket (suggested by Graham Barr).
+
+2000-03-09  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Release 1.04.
+
+	* Added prototype introspector.
+
+	* Hooked up Storable.
+
+	* Release 1.03.
+
+	* Allow addition of new screens.
+
+2000-03-08  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Renamed to NetServer::Portal.
+
+2000-01-28  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Release 1.02.
+
+	* Manually change the height & width of screen with the 'z'
+ 	command.
+
+2000-01-26  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Sort by priority; unrestrict filter REx; update
+	docs (suggested by Jochen.Stenzel.gp@icn.siemens.de).
+
+1999-08-13  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Make minor changes for Time::Warp.
+
+1999-07-22  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Optionally support eval $arbitrary_perl_code from the user.
+
+1999-06-19  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Update for Event 0.42.
+
+1999-05-21  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Interactively set Event::DebugLevel.
+
+1999-03-30  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Release 0.96.
+
+1999-03-27  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Stats are no longer collected when nobody is watching.
+
+	* Sync with Event::Stats 0.5.
+
+1999-01-12  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Release 0.95.
+
+	* Update for Event-Stats.
+
+1998-12-25  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Update for Event 0.27.
+
+1998-11-20  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Release 0.93.
+
+	* Tweaks for Event 0.25.
+
+1998-09-16  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Explain how to interpret statistics.
+	
+	* Round the measurement interval to the nearest available
+ 	statistics interval.
+
+1998-09-11  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Release 0.90.
+
+1998-09-09  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Added an event editor.
+
+	* Fixed redraw problem (hopefully) by just redrawing the whole
+ 	screen every time.

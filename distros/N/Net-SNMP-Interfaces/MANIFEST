@@ -1,0 +1,10 @@
+Changes
+lib/Net/SNMP/Interfaces.pm
+lib/Net/SNMP/Interfaces/Details.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00_compile_nsi.t
+t/01_compile_nsid.t
+META.json                                Module JSON meta-data (added by MakeMaker)

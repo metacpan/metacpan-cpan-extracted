@@ -1,0 +1,3 @@
+TYPEMAP
+
+Nginx	T_PTROBJ

@@ -1,0 +1,142 @@
+Net-xFTP
+
+Net::xFTP is a wrapper class to combine common functions of Net::FTP, 
+Net::SSH2, and Net::SFTP, and now Net::FTPSSL, Net::FSP, Net::SFTP::Foreign, 
+and Net::OpenSSH all into a single set of functions allowing one to 
+switch seemlessly between the two without having to make non-trivial 
+code changes.  Only functionality common to all protocols has been 
+implemented here with the intent and invitation to add more functions 
+and features and maybe other *FTP-ish modules in the future.  The module has 
+also been re-implemented into a modular fashion allowing for the easy 
+addition of other protocols in the future.  The methods have been tested 
+and seem to work properly for normal cases.  Two Perl/Tk GUI applications 
+currently exist as wrappers around Net::xFTP:  ptkftp (file-transfer gui) 
+and jfm3 (graphical file-manager).
+
+PURPOSE
+
+I created this module when I had developed several web application 
+programs which FTP'd data to and from a central server via Net::FTP.  
+The client changed to a new remote server that required Net::SFTP.  Faced 
+with rewriting these programs without changing functionality (since for 
+some reason Net::FTP and Net::SFTP use slightly different methods and 
+conventions).  I decided instead to simply create a common module that 
+would use the same method calls to do the same things and allow me to 
+specify the protocol in a single place.  I also am the author of I<ptkftp>, 
+a Perl/Tk graphical user-interface to Net::FTP and Net::SFTP.  I now 
+intend to rewrite it to use Net::xFTP and greatly reduce and simplify 
+the code for that application.
+
+Hopelfully others will find this module useful.  Patches adding needed 
+functionality are welcome.  See the manpage for more detailed and up-
+to-date information.  
+
+SYNOPSIS
+
+	use Net::xFTP;
+
+	#Test for needed protocol module.
+	die "..This server connection needs Net::SFTP!" 
+		unless (Net::xFTP->haveModule('Net::SFTP'));
+
+	#Example 1:  Establish a new SFTP connection to a remote host.
+	$ftp = Net::xFTP->new('SFTP', "some.host.name", Debug => 0,
+			user => 'userid', password => 'opensesme')
+		or die "Cannot connect to some.host.name: $@";
+
+	#Example 2:  Establish a "local" (simulated connection) to self.
+	$ftp = Net::xFTP->new();  # -OR-
+	$ftp = Net::xFTP->new('Local');
+
+	#Change the current working directory on the remote host.
+	$ftp->cwd('/pub')  or die 
+		"Cannot change working directory ", $ftp->message();
+
+	#Get the current working directory on the remote host.
+	my $current_remote_path = $ftp->pwd();
+
+	#Get a list of files and subdirectories in "/pub".
+	my @filesAndSubfolders = $ftp->ls('/pub');
+
+	#Get a detailed (ls -l) list of files and subdirectories.
+	my @ls_l_details = $ftp->dir('/pub');
+
+	#Create a new subdirectory.
+	$ftp->mkdir('myownfolder')
+		or die "Cannot make subdirectory ", $ftp->message();
+
+	#Remove an empty subdirectory.
+	$ftp->rmdir('myownfolder')
+		or die "Cannot remove subdirectory ", $ftp->message();
+
+	#Get the contents of a file on the remote server.
+	$ftp->get('remote.file', 'local.file')
+		or die "get failed ", $ftp->message();
+
+	#Get the contents of a remote file and write to an open filehandle.
+	open FHANDLE, ">local.file" or die "Could not open local file ($!)";
+	print FHANDLE "A Header Line!\n";
+	flush FHANDLE;
+	$ftp->get('remote.file', *FHANDLE)
+		or die "get failed ", $ftp->message();
+	print FHANDLE "A Footer Line!\n";
+	close FHANDLE;
+
+	#Put a local file onto the remote server.
+	$ftp->put('local.file', 'remote.file')
+		or die "put failed ", $ftp->message();
+
+	#Read from a file handle putting the content in a remote file.
+	open FHANDLE "<local.file" or die "Could not open local file ($!)";
+	$ftp->put(*FHANDLE, 'remote.file')
+		or die "put failed ", $ftp->message();
+	close FHANDLE;
+
+	#Delete a remote file.
+	$ftp->delete('some.file')
+		or die "Cannot delete file ", $ftp->message();
+
+	#Rename a remote file.
+	$ftp->rename('oldfilename', 'newfilename')
+		or die "Cannot delete file ", $ftp->message();
+
+	#Change permissions of a remote file.
+	$ftp->chmod(755, 'some.file.or.dir')
+		or die "Cannot change permissions ", $ftp->message();
+
+	#Fetch the size of a remote file.
+	print "remote.file has ".$ftp->size('remote.file')." bytes.\n";
+
+	#Fetch the modification time of a remote file.
+	print "remote.file has ".$ftp->mdtm('remote.file')." bytes.\n";
+
+	#Copy a remote file to a new remote location.
+	$ftp->copy('remote.fileA','remote.fileB')
+		or die "Cannot copy the file ", $ftp->message();
+
+	#Move a remote file to a new remote location.
+	$ftp->move('old/path/old.filename', 'new/path/new.filename')
+		or die "Cannot move the file ", $ftp->message();
+
+	#Call a protocol-specific method.
+	$result = $ftp->method('timeout',100)
+
+	#Disconnect an existing connection.
+	$ftp->quit();
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 - 2015 Jim Turner
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

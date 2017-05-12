@@ -1,0 +1,123 @@
+<?xml version="1.0"?>
+<ItemLookupResponse xmlns="http://webservices.amazon.com/AWSECommerceService/2011-08-01">
+  <Items>
+    <Item>
+      <ASIN>B00005A46I</ASIN>
+      <SalesRank>40321</SalesRank>
+      <ItemAttributes>
+        <Artist>Anne Sofie von Otter</Artist>
+        <Artist>Elvis Costello</Artist>
+        <Binding>Audio CD</Binding>
+        <Brand>VON OTTER,ANNE SOFI</Brand>
+        <CatalogNumberList>
+          <CatalogNumberListElement>469530</CatalogNumberListElement>
+        </CatalogNumberList>
+        <EAN>0028946953020</EAN>
+        <EANList>
+          <EANListElement>0028946953020</EANListElement>
+        </EANList>
+        <ItemDimensions>
+          <Height Units="hundredths-inches">500</Height>
+          <Length Units="hundredths-inches">50</Length>
+          <Weight Units="hundredths-pounds">24</Weight>
+          <Width Units="hundredths-inches">575</Width>
+        </ItemDimensions>
+        <Label>Deutsche Grammophon</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>1798</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$17.98</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Deutsche Grammophon</Manufacturer>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <PackageQuantity>1</PackageQuantity>
+        <ProductGroup>Music</ProductGroup>
+        <ProductTypeName>ABIS_MUSIC</ProductTypeName>
+        <Publisher>Deutsche Grammophon</Publisher>
+        <ReleaseDate>2001-04-10</ReleaseDate>
+        <SKU>jp-bk-B00005A46I-2-1</SKU>
+        <Studio>Deutsche Grammophon</Studio>
+        <Title>For the Stars</Title>
+        <UPC>028946953020</UPC>
+        <UPCList>
+          <UPCListElement>028946953020</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>563</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$5.63</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>1</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.01</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>48</TotalNew>
+        <TotalUsed>71</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B00005A46I%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB00005A46I</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>QRZAsfNhtqQNI9ADf8nu5kDllU8kGf%2FLQv2K9IGZWelrhF6TlDolkuGtH5AlVOI%2FxbItDLC3SZK6mSfr5wQKLVSXB3NZohCkGdCToa8KY8A%3D</OfferListingId>
+            <Price>
+              <Amount>1337</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$13.37</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>461</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$4.61</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>26</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>0</MinimumHours>
+              <MaximumHours>0</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+      <Tracks>
+        <Disc Number="1">
+          <Track Number="1">No Wonder</Track>
+          <Track Number="2">Baby Plays Around</Track>
+          <Track Number="3">Go Leave</Track>
+          <Track Number="4">Rope</Track>
+          <Track Number="5">Don't Talk (Put Your Head On My Shoulder)</Track>
+          <Track Number="6">Broken Bicycles / Junk</Track>
+          <Track Number="7">The Other Woman</Track>
+          <Track Number="8">Like An Angel Passing Through My Room</Track>
+          <Track Number="9">Green Song</Track>
+          <Track Number="10">April After All</Track>
+          <Track Number="11">You Still Believe In Me</Track>
+          <Track Number="12">I Want To Vanish</Track>
+          <Track Number="13">For No One</Track>
+          <Track Number="14">Shamed Into Love</Track>
+          <Track Number="15">Just A Curio</Track>
+          <Track Number="16">This House Is Empty Now</Track>
+          <Track Number="17">Take It With Me</Track>
+          <Track Number="18">For The Stars</Track>
+        </Disc>
+      </Tracks>
+    </Item>
+  </Items>
+</ItemLookupResponse>

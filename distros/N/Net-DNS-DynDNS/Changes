@@ -1,0 +1,88 @@
+CHANGES
+-------
+
+  0.9993 - 01 Nov 2015
+
+      * POD fixes
+
+  0.9992 - 01 Nov 2015
+
+      * Merging POD and library files
+      * Adding documentation 
+      * Adding proxy support
+      * Allowing numerics in hostname validation.  Thanks to Keith Jones for pointing this out.  Fixes RT#108284
+
+  0.9991 - 22 Aug 2015
+
+      * Version numbers getting a little ridiculous.  
+      * Experimenting with adding more information in error messages.  Thanks to Jim Ziobro for patch. Fixed RT#100994
+      * Adding prelim support for changeip.com.  Thanks to Jim Ziobro for patch. Fixes RT#100950 
+
+  0.999 - 12 July 2014
+
+      * Experimenting with a different approach in Makefile.PL.  Trying to get "N/A" results on cpan testers instead of "UKNOWN".
+
+  0.999 - 12 July 2014
+
+      * Experimenting with a different approach in Makefile.PL.  Trying to get "N/A" results on cpan testers instead of "UKNOWN".
+
+  0.998 - 10 July 2014
+
+      * Added guards against older perls
+
+  0.997 - 5 July 2014
+
+      * Added more checks to allow for bad network responses
+
+  0.996 - 14 May 2014
+
+      * Added checks for internet connectivity to test suite to address RT 95607
+
+  0.995 - 17 February 2013
+
+      * Removed 'use feature' to improve cpan testing results
+      * Changed to Carp from die
+      * Changed formatting
+
+  0.99 - 14 February 2013
+
+      * Added more server side error messages
+
+  0.98 - 24 October 2012
+
+      * Fixed the definition of ip address to allow '0' as reported in RT 80338 by Jim Ziobro
+
+  0.97 - 3 September 2011
+
+      * Retired the system parameter
+      * Corrected error messages to http://dyn.com/support/developers/api/return-codes/ as reported in RT 70684 by mohy@smx.pair.com
+      * Fixed code to pass perlcritic -1
+      * Improved the test suite to hopefully catch more server side error messages and skip those tests
+      * Made the minimum version 5.10 allow 'given ... when' structure required by perlcritic
+
+  0.96 - 15 February 2011
+
+      * Allow customisation of the domain names used in Net::DNS::DynDNS.  The domain
+        names are manipulated via the Net::DNS::DynDNS->new() call.
+        Thanks to Mark <mohy@pair.com> for the patch.
+
+  0.95 - 6 September 2007
+
+      * Skip remaining tests if tests fail due to update abuse
+
+  0.94 - 5 September 2007
+
+      * Added dependency on Crypt::SSLeay
+
+  0.93 - 4 June 2006
+
+      * Re-added documentation that got wiped in 0.92
+
+  0.92 - 9 May 2006
+
+      * Now allowing hostnames with hyphens.  Thanks to Thomas Seeling who reported this bug
+
+  0.91 - 17 January 2005
+
+      * Added the update_allowed method.  Included a semi-working example of a 
+        dyndns.org agent in the examples directory 

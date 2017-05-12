@@ -1,0 +1,74 @@
+Revision history for Perl extension Net::AOLIM.
+
+0.01  Fri Jul 7
+	Initial beta release.
+
+0.1   Fri Jul 14
+	First public release on CPAN.  Documentation
+	and Makefiles added.
+
+0.11  Sun Jul 16
+	Re-release under a different name with minor changes to the
+	documentation.
+
+0.12  Sun Jul 16
+	Minor modification to fix a condition in which the server's
+	connection closing could cause an infinite loop.
+
+1.0   Sun Jan 8, 2001
+	Changed the client agent string to TOC1.0 to fix a problem
+	where connections were sometimes ignored.  Also changed the
+	default signon port to 5198 and the login port to 1234.
+
+1.1   Sat Mar 17, 2001
+	Changed the client agent string again, this time to what
+	seems like the "correct" format, which is
+		PROGRAM:$Version info$
+	Also added the ability to set a login timeout in case the
+	SIGN_ON packet never comes.
+
+1.2   Wed Dec 19, 2001
+	Fixed a bug in toc_chat_invite that made it ignore some of
+	its arguments.  This should fix various problems with
+	using this subroutine.  Thanks to Mike Golvach for pointing
+        this out.
+
+1.3   Mon Mar 11, 2002
+	Changed (defined @tci_buddies) to (@tci_buddies) in
+	toc_chat_invite.  Fixed a potential infinite loop in
+	set_srv_buddies involving an off-by-one error in a for() test.
+	Thanks to Bruce Winter for pointing this out.
+
+1.4   Sat Apr 27, 2002
+	Changed the way that Net::AOLIM sends the login command string
+	because AOL apparently changed their server software, breaking
+	the previous implementation.  The new method requires that only
+	the user agent string be in double quotes; all other fields
+	should not be quoted.  Note that this does not affect the user
+	interface at all---it's all handled internally.  Thanks to Bruce 
+	Winter, Fred Frey, Aryeh Goldsmith, and tik for help in tracking 
+	down and fixing this error.
+
+	Also added additional checks to read_sflap_packet so that if the
+	other end of the connection dies we don't go into an infinite
+	loop.  Thanks to Chris Nelson for pointing this out.
+
+1.5   Thu Oct 3, 2002
+	Added a very simple t/use.t test script that just makes sure
+	the module loads properly.
+
+1.6   Mon Jan 26, 2004
+        Patched around yet another undocumented "feature" of the TOC
+        protocol---namely, in order to successfully sign on, you must have
+        at least one buddy in your buddy list.  At sign-on, in the absence
+        of a real buddy list, Net::AOLIM inserts the current user as a
+        buddy in group "Me."  Don't bother removing this buddy, as it
+        doesn't really exist---as soon as you add any real buddies, this
+        one will go away.  Thanks to Galen Johnson and Jay Luker for
+        emailing with the symptoms.
+
+1.61  Tue Jul 27, 2004
+	Made a small change to the example.pl script to keep it from
+	dumping deref warnings.  Thanks to an anonymous person who sent
+	this suggestion through the CPAN bug tracking system.
+

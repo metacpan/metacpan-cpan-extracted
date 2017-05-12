@@ -1,0 +1,96 @@
+Revision history for Perl extension Net::Whois::IANA.
+
+0.41  Fri Mar 29 12:11:19 PDT 2013
+	- Fixed bug causing infinite loops when connecting to servers
+          (thanks to 
+        - Fixed example usage of ->cidr() method
+          (thanks to Jabra for noticing)
+        - Cleaned up example usage
+        - Padded some more error prone code
+
+0.40  Wed Mar 16 13:43:28 IST 2011
+	- Switch to Module::Build and Build.PL
+	- Major code cleanup
+	- Optimization of queries
+	- Introduction of autoloading
+
+0.30  Thu May 27 12:13:14 IDT 2010
+	- Bug fixing and patch incorporation after a long stagnation
+	- Update of whois parser according to changes accumulated
+
+0.23  Sun Nov 18 17:25:04 IST 2007
+	- fixed an error in lacnic parsing
+	- updated README and inline documentation
+	- updated email and copyright notice with the .pm
+
+0.22  Sat Nov 17 15:37:44 IST 2007
+	- fixed lacnic test and added a brnic test - Brasil addresses
+	  now use their own NIC server
+	- added some parsing for lacnic responses
+	- added heuristics to guess abuse report address
+	- incorporated some supplied patches
+	- introduced CREDITS file
+	- changed copyright notice as I distribute this module under my
+	  own company's name (the license remains the same)
+
+0.21  Wed Aug 24 11:32:50 IDT 2005
+	- fixed prerequisites
+
+0.2   Mon Aug 22 11:33:51 IDT 2005
+	- changed the data structure of the service to allow usage
+	  of reserve servers.
+	- added looping over lists of servers per server geographical
+	  group; ARIN reserve server is used already.
+	- added is_mine() method for IP beloning to a certain CIDR
+	  range using Bit::Vector
+	- fixed more failure responses.
+	- Bit::Vector added as prerequisite.
+	- updated README.
+	- created a TODO file.
+
+0.10  Thu Jun 23 12:35:17 IDT 2005
+	- fixed failed searches for RIPE, APNIC and AFRINIC
+	- fixed new permission denied response from RIPE
+	- fixed Query rate exceeded response from LACNIC
+	- added CIDR field and function
+	- converted LACNIC inetnum to cidr, and computed 
+	  inetnum range for it
+	- started using Net::CIDR
+	- trapped more cases of uninitialized values in query
+	  hash.
+
+0.09  Wed Jun 22 11:59:38 IDT 2005
+	- added a test for AFRINIC server
+
+0.08  Wed Jun 22 11:42:38 IDT 2005
+	- added support for the new AFRINIC server. See also
+	CAVEATS section of the manual.
+
+0.07  Wed Nov  3 09:22:48 IST 2004
+	- enhanced negative APNIC response - change
+	proposed by Celso Capao <celso.capao@gmail.com>
+
+0.06  Sun Oct 31 10:39:17 IST 2004
+	- removed a harmless "uninitialized value" warning
+	cause pointed by Jake Commander <jc1@ukfirst.com> .
+
+0.05  Tue Sep 28 10:45:17 IST 2004
+	- patched APNIC parsing response (patch submitted by
+	Anonymous <smallpond@juno.com>)
+
+0.04  Mon Feb 23 13:19:42 IST 2004
+	- moved arin as the last server to query because it
+	  contains too much information about IPs outside its
+	  own zone.
+
+0.03  Tue Oct 21 12:06:39 2003
+	- fixed the changed APNIC response parser.
+	  Thanks to Jason Heath for pointing that problem out.
+
+0.02  Tue Jul 15 11:41:18 2003
+	- fixed a few lines in test.
+
+0.01  Sun Jul 13 15:15:08 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n Net::Whois::IANA
+

@@ -1,0 +1,538 @@
+<?xml version="1.0"?>
+<ItemSearchResponse xmlns="http://webservices.amazon.com/AWSECommerceService/2011-08-01">
+  <Items>
+    <TotalResults>9</TotalResults>
+    <TotalPages>1</TotalPages>
+    <MoreSearchResultsUrl>http://www.amazon.com/gp/redirect.html?camp=2025&amp;creative=386001&amp;location=http%3A%2F%2Fwww.amazon.com%2Fgp%2Fsearch%3Fkeywords%3DZwan%26url%3Dsearch-alias%253Dpopular&amp;linkCode=xm2&amp;tag=blogdivebombo-20&amp;SubscriptionId=1V5JRJ4JQCSHB3NGG902</MoreSearchResultsUrl>
+    <Item>
+      <ASIN>B00007M84Q</ASIN>
+      <SalesRank>60843</SalesRank>
+      <ItemAttributes>
+        <Artist>Zwan</Artist>
+        <Binding>Audio CD</Binding>
+        <CatalogNumberList>
+          <CatalogNumberListElement>161</CatalogNumberListElement>
+          <CatalogNumberListElement>936248436-2</CatalogNumberListElement>
+          <CatalogNumberListElement>9362-48436-2</CatalogNumberListElement>
+        </CatalogNumberList>
+        <EAN>0093624843627</EAN>
+        <EANList>
+          <EANListElement>0093624843627</EANListElement>
+        </EANList>
+        <IsAdultProduct>0</IsAdultProduct>
+        <ItemDimensions>
+          <Weight Units="hundredths-pounds">21</Weight>
+        </ItemDimensions>
+        <Label>Reprise / Wea</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Original Language</Type>
+          </Language>
+        </Languages>
+        <ListPrice>
+          <Amount>1396</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$13.96</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Reprise / Wea</Manufacturer>
+        <MPN>9362-48436-2</MPN>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <PackageQuantity>1</PackageQuantity>
+        <PartNumber>9362-48436-2</PartNumber>
+        <ProductGroup>Music</ProductGroup>
+        <ProductTypeName>ABIS_MUSIC</ProductTypeName>
+        <PublicationDate>2003-02-07</PublicationDate>
+        <Publisher>Reprise / Wea</Publisher>
+        <ReleaseDate>2003-01-28</ReleaseDate>
+        <SKU>112172/10182653/10481862/00000002</SKU>
+        <Studio>Reprise / Wea</Studio>
+        <Title>Mary Star of the Sea</Title>
+        <UPC>093624843627</UPC>
+        <UPCList>
+          <UPCListElement>093624843627</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>175</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$1.75</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>1</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$0.01</FormattedPrice>
+        </LowestUsedPrice>
+        <LowestCollectiblePrice>
+          <Amount>999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$9.99</FormattedPrice>
+        </LowestCollectiblePrice>
+        <TotalNew>38</TotalNew>
+        <TotalUsed>156</TotalUsed>
+        <TotalCollectible>9</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>1</TotalOffers>
+        <TotalOfferPages>1</TotalOfferPages>
+        <MoreOffersUrl>http://www.amazon.com/gp/offer-listing/B00007M84Q%3FSubscriptionId%3D1V5JRJ4JQCSHB3NGG902%26tag%3Dblogdivebombo-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D386001%26creativeASIN%3DB00007M84Q</MoreOffersUrl>
+        <Offer>
+          <OfferAttributes>
+            <Condition>New</Condition>
+          </OfferAttributes>
+          <OfferListing>
+            <OfferListingId>XLuoRq4Et%2FA81njR5kZuZO4Y5%2Ff036JkqPM4vEWz44eI6G6Zf8JjRX8OjSmCl2g7wr1yoUlQYbTf815%2FwkzYs1UjWvV2IiTdehH5R4YTwfY%3D</OfferListingId>
+            <Price>
+              <Amount>1124</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$11.24</FormattedPrice>
+            </Price>
+            <AmountSaved>
+              <Amount>272</Amount>
+              <CurrencyCode>USD</CurrencyCode>
+              <FormattedPrice>$2.72</FormattedPrice>
+            </AmountSaved>
+            <PercentageSaved>19</PercentageSaved>
+            <Availability>Usually ships in 24 hours</Availability>
+            <AvailabilityAttributes>
+              <AvailabilityType>now</AvailabilityType>
+              <MinimumHours>24</MinimumHours>
+              <MaximumHours>24</MaximumHours>
+            </AvailabilityAttributes>
+            <IsEligibleForSuperSaverShipping>1</IsEligibleForSuperSaverShipping>
+          </OfferListing>
+        </Offer>
+      </Offers>
+      <Tracks>
+        <Disc Number="1">
+          <Track Number="1">Lyric</Track>
+          <Track Number="2">Settle Down</Track>
+          <Track Number="3">Declarations Of Faith</Track>
+          <Track Number="4">Honestly</Track>
+          <Track Number="5">El Sol</Track>
+          <Track Number="6">Of A Broken Heart</Track>
+          <Track Number="7">Ride A Black Swan</Track>
+          <Track Number="8">Heartsong</Track>
+          <Track Number="9">Endless Summer</Track>
+          <Track Number="10">Baby Let's Rock!</Track>
+          <Track Number="11">Yeah!</Track>
+          <Track Number="12">Desire</Track>
+          <Track Number="13">Jesus,I / Mary Star Of The Sea</Track>
+          <Track Number="14">Come With Me</Track>
+        </Disc>
+      </Tracks>
+    </Item>
+    <Item>
+      <ASIN>B000084HC0</ASIN>
+      <SalesRank>112896</SalesRank>
+      <ItemAttributes>
+        <Artist>Zwan</Artist>
+        <Binding>Audio CD</Binding>
+        <EAN>0093624260929</EAN>
+        <EANList>
+          <EANListElement>0093624260929</EANListElement>
+        </EANList>
+        <Format>Single</Format>
+        <Format>Import</Format>
+        <Label>Import [Generic]</Label>
+        <ListPrice>
+          <Amount>1299</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$12.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Import [Generic]</Manufacturer>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <ProductGroup>Music</ProductGroup>
+        <ProductTypeName>ABIS_MUSIC</ProductTypeName>
+        <Publisher>Import [Generic]</Publisher>
+        <ReleaseDate>2004-04-08</ReleaseDate>
+        <SKU>JUL11D04-223438</SKU>
+        <Studio>Import [Generic]</Studio>
+        <Title>Honestly</Title>
+        <UPC>093624260929</UPC>
+        <UPCList>
+          <UPCListElement>093624260929</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>1999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$19.99</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$9.99</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>7</TotalNew>
+        <TotalUsed>12</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+        <MoreOffersUrl>0</MoreOffersUrl>
+      </Offers>
+      <Tracks>
+        <Disc Number="1">
+          <Track Number="1">Honestly</Track>
+          <Track Number="2">Number Of The Beast</Track>
+          <Track Number="3">Freedom Aint What It Used To Be</Track>
+        </Disc>
+      </Tracks>
+    </Item>
+    <Item>
+      <ASIN>B00008K50F</ASIN>
+      <SalesRank>428280</SalesRank>
+      <ItemAttributes>
+        <Artist>Zwan</Artist>
+        <Binding>Audio CD</Binding>
+        <EAN>0054391667120</EAN>
+        <EANList>
+          <EANListElement>0054391667120</EANListElement>
+        </EANList>
+        <Format>Single</Format>
+        <Format>Import</Format>
+        <Label>Import [Generic]</Label>
+        <ListPrice>
+          <Amount>1299</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$12.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Import [Generic]</Manufacturer>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <ProductGroup>Music</ProductGroup>
+        <ProductTypeName>ABIS_MUSIC</ProductTypeName>
+        <Publisher>Import [Generic]</Publisher>
+        <ReleaseDate>2003-04-25</ReleaseDate>
+        <SKU>UB00008K50F</SKU>
+        <Studio>Import [Generic]</Studio>
+        <Title>Honestly / Number of the Beast</Title>
+        <UPC>054391667120</UPC>
+        <UPCList>
+          <UPCListElement>054391667120</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestUsedPrice>
+          <Amount>2487</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$24.87</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>0</TotalNew>
+        <TotalUsed>4</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+        <MoreOffersUrl>0</MoreOffersUrl>
+      </Offers>
+      <Tracks>
+        <Disc Number="1">
+          <Track Number="1">Honestly</Track>
+          <Track Number="2">Number of the Beast</Track>
+        </Disc>
+      </Tracks>
+    </Item>
+    <Item>
+      <ASIN>B00009N1U9</ASIN>
+      <SalesRank>437594</SalesRank>
+      <ItemAttributes>
+        <Artist>Zwan</Artist>
+        <Binding>Audio CD</Binding>
+        <EAN>0093624262428</EAN>
+        <EANList>
+          <EANListElement>0093624262428</EANListElement>
+        </EANList>
+        <Format>Single</Format>
+        <Format>Import</Format>
+        <Label>Wea International</Label>
+        <ListPrice>
+          <Amount>1299</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$12.99</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Wea International</Manufacturer>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <ProductGroup>Music</ProductGroup>
+        <ProductTypeName>ABIS_MUSIC</ProductTypeName>
+        <Publisher>Wea International</Publisher>
+        <ReleaseDate>2003-06-03</ReleaseDate>
+        <SKU>UB00009N1U9</SKU>
+        <Studio>Wea International</Studio>
+        <Title>Lyric / Nobody Cept You / Autumn Leaves</Title>
+        <UPC>093624262428</UPC>
+        <UPCList>
+          <UPCListElement>093624262428</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestUsedPrice>
+          <Amount>1665</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$16.65</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>0</TotalNew>
+        <TotalUsed>5</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+        <MoreOffersUrl>0</MoreOffersUrl>
+      </Offers>
+      <Tracks>
+        <Disc Number="1">
+          <Track Number="1">Lyric</Track>
+          <Track Number="2">Nobody 'cept You</Track>
+          <Track Number="3">Autumn Leaves</Track>
+        </Disc>
+      </Tracks>
+    </Item>
+    <Item>
+      <ASIN>B000084T5E</ASIN>
+      <SalesRank>740182</SalesRank>
+      <ItemAttributes>
+        <Artist>Zwan</Artist>
+        <Binding>Audio CD</Binding>
+        <EAN>0093624843610</EAN>
+        <EANList>
+          <EANListElement>0093624843610</EANListElement>
+        </EANList>
+        <Label>Reprise</Label>
+        <ListPrice>
+          <Amount>23649</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$236.49</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Reprise</Manufacturer>
+        <NumberOfDiscs>2</NumberOfDiscs>
+        <ProductGroup>Music</ProductGroup>
+        <ProductTypeName>ABIS_MUSIC</ProductTypeName>
+        <PublicationDate>2003</PublicationDate>
+        <Publisher>Reprise</Publisher>
+        <Studio>Reprise</Studio>
+        <Title>Mary Star of the Sea [CD &amp; DVD]</Title>
+        <UPC>093624843610</UPC>
+        <UPCList>
+          <UPCListElement>093624843610</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>4995</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$49.95</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>1985</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$19.85</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>1</TotalNew>
+        <TotalUsed>1</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+        <MoreOffersUrl>0</MoreOffersUrl>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B001CL8DWI</ASIN>
+      <ItemAttributes>
+        <Author>Klubbheads</Author>
+        <Author>Koen Groeneveld</Author>
+        <Author>Addy van der Zwan</Author>
+        <Author>Ralphi Rosario Feat. Linda Clifford</Author>
+        <Author>Avant Garde</Author>
+        <Author>Bobby Summer</Author>
+        <Author>Monsta</Author>
+        <Author>Lock &amp; Burns</Author>
+        <Author>Xtra Large</Author>
+        <Author>Harry "Choo Choo" Romero</Author>
+        <Binding>Audio CD</Binding>
+        <CatalogNumberList>
+          <CatalogNumberListElement>0128922ere</CatalogNumberListElement>
+        </CatalogNumberList>
+        <Creator Role="Performer">Klubbheads</Creator>
+        <Creator Role="Performer">Koen Groeneveld</Creator>
+        <Creator Role="Performer">Addy van der Zwan</Creator>
+        <Creator Role="Performer">Mike &amp; Charlie</Creator>
+        <Creator Role="Performer">TaleSpin</Creator>
+        <Creator Role="Performer">Blaze Feat. Palmer Brown</Creator>
+        <Creator Role="Performer">System F Feat. Marc Almond</Creator>
+        <Creator Role="Performer">Mr. Niceguy</Creator>
+        <Creator Role="Performer">Mory Klein</Creator>
+        <Creator Role="Performer">Blank &amp; Jones</Creator>
+        <Format>CD</Format>
+        <Format>Double CD</Format>
+        <Format>Import</Format>
+        <Label>Edel</Label>
+        <Languages>
+          <Language>
+            <Name>English</Name>
+            <Type>Unknown</Type>
+          </Language>
+        </Languages>
+        <Manufacturer>Edel</Manufacturer>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <ProductGroup>Music</ProductGroup>
+        <ProductTypeName>MUSIC_POPULAR</ProductTypeName>
+        <PublicationDate>2001</PublicationDate>
+        <Publisher>Edel</Publisher>
+        <Studio>Edel</Studio>
+        <Title>Update Desire 2.0 mixed by Klubbheads</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestUsedPrice>
+          <Amount>1940</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$19.40</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>0</TotalNew>
+        <TotalUsed>1</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+        <MoreOffersUrl>0</MoreOffersUrl>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B00007M8SN</ASIN>
+      <ItemAttributes>
+        <Artist>ZWAN</Artist>
+        <Binding>Audio CD</Binding>
+        <EAN>4943674040780</EAN>
+        <EANList>
+          <EANListElement>4943674040780</EANListElement>
+        </EANList>
+        <IsAdultProduct>0</IsAdultProduct>
+        <Label>WARNER MUSIC JAPAN</Label>
+        <Manufacturer>WARNER MUSIC JAPAN</Manufacturer>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <ProductGroup>Music</ProductGroup>
+        <ProductTypeName>ABIS_MUSIC</ProductTypeName>
+        <PublicationDate>2003-01-29</PublicationDate>
+        <Publisher>WARNER MUSIC JAPAN</Publisher>
+        <SeikodoProductCode>WPCR-11469</SeikodoProductCode>
+        <SKU>01-0707-2038</SKU>
+        <Studio>WARNER MUSIC JAPAN</Studio>
+        <Title>MARY STAR OF THE SEA</Title>
+      </ItemAttributes>
+      <OfferSummary>
+        <LowestNewPrice>
+          <Amount>3780</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$37.80</FormattedPrice>
+        </LowestNewPrice>
+        <LowestUsedPrice>
+          <Amount>3349</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$33.49</FormattedPrice>
+        </LowestUsedPrice>
+        <TotalNew>2</TotalNew>
+        <TotalUsed>1</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+        <MoreOffersUrl>0</MoreOffersUrl>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B00009NQZF</ASIN>
+      <SalesRank>1682713</SalesRank>
+      <ItemAttributes>
+        <Artist>Zwan</Artist>
+        <Binding>Vinyl</Binding>
+        <EAN>0054391666178</EAN>
+        <EANList>
+          <EANListElement>0054391666178</EANListElement>
+          <EANListElement>0005439166617</EANListElement>
+        </EANList>
+        <ListPrice>
+          <Amount>999</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$9.99</FormattedPrice>
+        </ListPrice>
+        <NumberOfDiscs>1</NumberOfDiscs>
+        <ProductGroup>Music</ProductGroup>
+        <ProductTypeName>ABIS_MUSIC</ProductTypeName>
+        <Title>Lyric [Vinyl]</Title>
+        <UPC>054391666178</UPC>
+        <UPCList>
+          <UPCListElement>054391666178</UPCListElement>
+          <UPCListElement>005439166617</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <TotalNew>0</TotalNew>
+        <TotalUsed>0</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+        <MoreOffersUrl>0</MoreOffersUrl>
+      </Offers>
+    </Item>
+    <Item>
+      <ASIN>B00008UVDM</ASIN>
+      <SalesRank>1652193</SalesRank>
+      <ItemAttributes>
+        <Binding>Audio CD</Binding>
+        <Creator Role="Performer">Zwan</Creator>
+        <EAN>0667342760629</EAN>
+        <EANList>
+          <EANListElement>0667342760629</EANListElement>
+        </EANList>
+        <Format>Single</Format>
+        <Format>Import</Format>
+        <Label>Wea</Label>
+        <ListPrice>
+          <Amount>1249</Amount>
+          <CurrencyCode>USD</CurrencyCode>
+          <FormattedPrice>$12.49</FormattedPrice>
+        </ListPrice>
+        <Manufacturer>Wea</Manufacturer>
+        <ProductGroup>Music</ProductGroup>
+        <ProductTypeName>ABIS_MUSIC</ProductTypeName>
+        <Publisher>Wea</Publisher>
+        <ReleaseDate>2002-11-04</ReleaseDate>
+        <Studio>Wea</Studio>
+        <Title>Honestly</Title>
+        <UPC>667342760629</UPC>
+        <UPCList>
+          <UPCListElement>667342760629</UPCListElement>
+        </UPCList>
+      </ItemAttributes>
+      <OfferSummary>
+        <TotalNew>0</TotalNew>
+        <TotalUsed>0</TotalUsed>
+        <TotalCollectible>0</TotalCollectible>
+        <TotalRefurbished>0</TotalRefurbished>
+      </OfferSummary>
+      <Offers>
+        <TotalOffers>0</TotalOffers>
+        <TotalOfferPages>0</TotalOfferPages>
+        <MoreOffersUrl>0</MoreOffersUrl>
+      </Offers>
+    </Item>
+  </Items>
+</ItemSearchResponse>

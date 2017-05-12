@@ -1,0 +1,3 @@
+0.01:
+	* For detecting and parsing Yadis Resource Descriptor, using
+          Net::Yadis::Discovery module

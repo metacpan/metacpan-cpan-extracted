@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Net-TextMessage-Canada
+version:            0.02
+abstract:           determine the email address for a mobile phone
+author:
+    - Luke Closs <cpan@5thplane.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Moose:       0.89
+    perl:        5.006
+    Test::More:  0
+resources:
+    repository:  http://github.com/lukec/net-textmessage-canada
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

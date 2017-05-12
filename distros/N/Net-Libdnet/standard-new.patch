@@ -1,0 +1,31 @@
+Index: Libdnet.xs
+===================================================================
+--- Libdnet.xs	(revision 41)
++++ Libdnet.xs	(working copy)
+@@ -34,7 +34,7 @@
+ #include "XSUB.h"
+ 
+ #include <stdio.h>
+-#include <dumbnet.h>
++#include <dnet.h>
+ 
+ #ifdef DNET_BLOB_H
+ typedef blob_t              Blob;
+Index: Makefile.PL
+===================================================================
+--- Makefile.PL	(revision 41)
++++ Makefile.PL	(working copy)
+@@ -3,10 +3,10 @@
+ #
+ use ExtUtils::MakeMaker;
+ 
+-my $libs = qx{dumbnet-config --libs 2>/dev/null}
+-   || ['-L/lib -L/usr/lib -L/usr/local/lib -ldumbnet'];
++my $libs = qx{dnet-config --libs 2>/dev/null}
++   || ['-L/lib -L/usr/lib -L/usr/local/lib -ldnet'];
+ 
+-my $inc = qx{dumbnet-config --cflags 2>/dev/null}
++my $inc = qx{dnet-config --cflags 2>/dev/null}
+    || '-I/include -I/usr/include -I/usr/local/include';
+ 
+ WriteMakefile(

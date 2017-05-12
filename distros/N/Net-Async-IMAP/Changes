@@ -1,0 +1,15 @@
+0.004     2013-11-07 20:19:47 Europe/London
+	New features:
+	* Now uses a separate Protocol::IMAP instance rather than subclassing
+	* Protocol::IMAP 0.004 support, allowing FETCH parsing
+
+0.003     2011-01-19 23:32:58 Europe/London
+	Support perl5.8 and update IO::Async minimum version required to 0.36 since we're relying on LineStream now.
+
+0.002     2011-01-05 03:07:40 Europe/London
+	Applied some suggested code changes from PEVANS, which among other things have cleaned up the transport handling and TLS upgrade.
+	Convert to use the IO::Async::Protocol::LineStream base class and dynamic on_read_line return for multiline handling.
+
+0.001     2010-12-29 02:31:57 Europe/London
+	Initial release to CPAN.
+

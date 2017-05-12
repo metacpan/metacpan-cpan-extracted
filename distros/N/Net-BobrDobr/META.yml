@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Net-BobrDobr
+version:             0.04
+abstract:            Using BobrDobr.ru service
+license:             ~
+author:              
+    - Artur Penttinen <artur+perl@niif.spb.su>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Digest::MD5:                   0
+    IO::File:                      0
+    LWP::UserAgent:                0
+    URI::Escape:                   0
+    XML::Simple:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

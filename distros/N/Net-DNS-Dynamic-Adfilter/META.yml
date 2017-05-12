@@ -1,0 +1,33 @@
+---
+abstract: 'A DNS ad filter'
+author:
+  - 'David Watson <dwatson@cpan.org>'
+build_requires:
+  Data::Dumper: 0
+  Net::DNS::Resolver: 0
+  Test::More: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-DNS-Dynamic-Adfilter
+requires:
+  Capture::Tiny: 0
+  LWP::Simple: 0
+  Moose: 0
+  Mozilla::CA: 0
+  Net::DNS: 0.74
+  Net::DNS::Dynamic::Proxyserver: 0
+  Storable: 0
+  Sys::HostIP: 0
+  perl: 5.010
+resources:
+  bugtracker: https://github.com/terminalfool/Net-DNS-Dynamic-Adfilter/issues
+  homepage: http://search.cpan.org/~dwatson/Net-DNS-Dynamic-Adfilter/
+  repository: git://github.com/terminalfool/Net-DNS-Dynamic-Adfilter.git
+version: 0.075

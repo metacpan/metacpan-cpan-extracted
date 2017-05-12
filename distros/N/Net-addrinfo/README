@@ -1,0 +1,57 @@
+		  The Perl  Net::addrinfo Extension Module
+
+Introduction:
+
+This Perl module is designed to implement and export functionality
+related to the POSIX getaddrinfo(3) system call. The Net::addrinfo
+data object is provided with field name accsessor functions, similarly
+named to the the C data structure definition in netdb.h. 
+
+Availability:
+
+   The most recent release of this module can be found bundled with
+   the latest DNSSEC-Tools distribution available from:
+
+	http://www.dnssec-tools.org/resources/download.html
+
+   This module should also be available through CPAN
+
+	http://www.cpan.org
+
+   (NOTE: it is proposed that this module be included in perl core release)
+
+Contact:
+
+   The following mailing list should be consider the primary support
+   mechanism for this module:
+
+	     dnssec-tools-users@lists.sourceforge.net mail list
+
+   For bugs use:
+
+	     dnssec-tools-bugs@lists.sourceforge.net mail list
+
+Release Notes:
+
+   The initial beta release of this extension module has been
+   developed against perl-5.8.8.
+
+   This module is modeled after 'Net::hostent' but has some
+   additional features and does not rely on Class::Struct.
+
+
+KNOWN BUGS:
+
+   No *known* bugs.
+
+Installation:
+
+   perl Makefile.PL
+   make
+   make test			(must have access to DNS)
+   make install			(requires root privilege)
+
+Documentation:
+
+   perldoc Net::addrinfo
+

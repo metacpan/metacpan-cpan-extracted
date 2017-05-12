@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::SPOCP.
+
+0.01  Sun Oct 12 20:44:35 2003
+	- original version; created by h2xs 1.21 with options
+		-X -n Net::SPOCP
+

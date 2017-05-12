@@ -1,0 +1,66 @@
+[
+    {
+        "user_id": "AF8ZB9A3BVA47BAF7A73",
+        "username": "jdoe",
+        "realname": "Jane Doe",
+        "email": "jdoe@example.com",
+        "status": "active",
+        "groups": [
+            {
+                "desc": "People with hardware tokens",
+                "name": "token_users"
+            },
+            {
+                "desc": "Admin users",
+                "name": "admin_users"
+            }
+        ],
+        "last_login": 1343921403,
+        "notes": "Some user note",
+        "phones": [
+            {
+                "phone_id": "DPFZRS9FB0D46QFTM899",
+                "number": "+15555550101",
+                "extension": "",
+                "name": "Jane's Mobile Phone",
+                "postdelay": null,
+                "predelay": null,
+                "type": "Mobile",
+                "capabilities": [
+                    "push",
+                    "sms"
+                ],
+                "platform": "Google Android",
+                "activated": true,
+                "sms_passcodes_sent": true
+            },
+            {
+                "phone_id": "DPFZRS9FB0D46QFTM899",
+                "number": "+15555550100",
+                "extension": "61837",
+                "name": "Jane's Office Phone",
+                "postdelay": 5,
+                "predelay": 6,
+                "type": "Landline",
+                "capabilities": [
+                    "phone"
+                ],
+                "platform": "unknown",
+                "activated": true,
+                "sms_passcodes_sent": false
+            }
+        ],
+        "tokens": [
+            {
+                "serial": "0", 
+                "token_id": "DHIZ34ALBA2445ND4AI2",
+                "type": "d1"
+            },
+            {
+                "serial": "Jane List",
+                "token_id": "AFZV874AA38AGFA28AVI",
+                "type": "h8"
+            }
+        ]
+    }
+]

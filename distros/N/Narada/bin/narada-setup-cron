@@ -1,0 +1,262 @@
+#!/usr/bin/env perl
+use 5.010001;
+use warnings;
+use strict;
+use utf8;
+
+our $VERSION = 'v2.3.7';
+
+use FindBin;
+use lib "$FindBin::Bin/../lib/perl5";
+use Narada;
+use Narada::Config qw( get_config set_config );
+use Path::Tiny;
+
+
+main(@ARGV) if !caller;
+
+
+sub err { die "narada-setup-cron: @_\n" }
+
+sub main {
+    die "Usage: narada-setup-cron [--clean]\n"
+        if (@_ >  1)
+        || (@_ == 1 && $_[0] ne '--clean');
+
+    if (@_) {
+        path('var/use/cron')->remove;
+        del_cron();
+    }
+    else {
+        if (Narada::detect() eq 'narada') {
+            path('var/use/cron')->touch;
+        }
+        my $c = path('config/crontab');
+        my @configs = map {m{\Aconfig/(.*)}ms} grep {$_->is_file}
+                 $c->is_dir ? $c->children : $c;
+        if (!@configs) {
+            del_cron();
+        }
+        else {
+            my $crontab = join "\n", map { get_config($_) } @configs;
+            $crontab = process($crontab);
+            set_cron($crontab);
+        }
+    }
+
+    return;
+}
+
+sub get_project_dir {
+    chomp (my $project_dir = `pwd`);
+    $project_dir !~ /\n/xms or err 'Project directory must not contain \\n';
+    return $project_dir;
+}
+
+sub process {
+    my ($crontab) = @_;
+    my $project_dir = get_project_dir();
+    $project_dir = quotemeta $project_dir;
+    $project_dir =~ s{\\([/,._-])}{$1}xmsg; # unquote safe chars for readability
+    $crontab =~ s/^(\s*(?!\#)(?:\S+\s+){5})/${1}cd $project_dir || exit; /xmsg;
+    return $crontab;
+}
+
+sub get_markers {
+    my $project_dir = get_project_dir();
+    my $start   = "# ENTER Narada: $project_dir";
+    my $end     = "# LEAVE Narada: $project_dir";
+    my $re      = qr/^\Q$start\E\n.*?^\Q$end\E(?:\n|\z)/xms;
+    return ($re, $start, $end);
+}
+
+sub get_user_crontab {
+    local $/ = undef;
+    # WORKAROUND    If user has no crontab then `crontab -l` output string
+    #               "no crontab for USERNAME". So we've to use `crontab -e`
+    #               instead, to get empty output in this case.
+    open my $cron, q{-|}, 'VISUAL=cat EDITOR=cat crontab -e'   or err "crontab -e: $!";
+    my $crontab = <$cron>;
+    close $cron                                     or err "crontab -e: $!";
+    return $crontab;
+}
+
+sub set_user_crontab {
+    my ($crontab) = @_;
+    open my $cron, q{|-}, 'crontab -'               or err "crontab -e: $!";
+    print {$cron} $crontab;
+    close $cron                                     or err "crontab -e: $!";
+    return;
+}
+
+sub force_last_cr {
+    my ($s) = @_;
+    if ($s =~ /[^\n]\z/xms) {
+        $s .= "\n";
+    }
+    return $s;
+}
+
+sub set_cron {
+    my ($crontab) = @_;
+    $crontab = force_last_cr($crontab);
+
+    my $user_crontab = get_user_crontab();
+    my ($re, $start, $end) = get_markers();
+    if ($user_crontab !~ /$re/xms) {
+        $user_crontab = force_last_cr($user_crontab);
+        $user_crontab .= "$start\n$end\n";
+    }
+
+    $user_crontab =~ s/$re/$start\n$crontab$end\n/xms;
+    set_user_crontab($user_crontab);
+    return;
+}
+
+sub del_cron {
+    my $user_crontab = get_user_crontab();
+    my ($re) = get_markers();
+    $user_crontab =~ s/$re//xms;
+    set_user_crontab($user_crontab);
+    return;
+}
+
+
+1; # Magic true value required at end of module
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+narada-setup-cron - synchronize project crontab with user crontab
+
+
+=head1 VERSION
+
+This document describes narada-setup-cron version v2.3.7
+
+
+=head1 USAGE
+
+    narada-setup-cron [--clean]
+
+
+=head1 DESCRIPTION
+
+Should be executed in project deploy directory (or Narada 1.x project root
+directory).
+
+Install/remove your Narada project's cron configuration.
+
+When executed without params add/update project's cron configuration found
+in "config/crontab" into user's crontab.
+
+When executed with --clean option or in case "config/crontab" doesn't exists
+will remove project's cron configuration from user's crontab.
+
+
+=head1 SYNTAX OF "config/crontab"
+
+Syntax of "config/crontab" is same as for system crontab, but commands in
+project's cron configuration will be executed in project's root directory
+instead of user's home directory. For this, the "cd /path/to/project ||
+exit;" command will be added on-the-fly before user command, i.e. every
+line in "config/crontab" like:
+
+    * * * * *    do something
+
+will turn into line in user's crontab like:
+
+    * * * * *    cd /path/to/project || exit; do something
+
+
+=head1 DIAGNOSTICS
+
+=over
+
+=item C<< project directory must not contain \n >>
+
+Project root directory used in BEGIN/END markers in crontab, which has
+line-based format and so directory name must not contain \n.
+
+Also project root directory used in "cd" command in crontab, which suffer
+from same limitation.
+
+=item C<< crontab -e: %s  >>
+
+Internal error, possible reason - user doesn't have access to system crontab.
+
+=back
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+        config/crontab/*
+        var/use/cron
+
+Narada 1.x project use C<config/crontab> instead of C<config/crontab/*>.
+
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/powerman/Narada/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software. The code repository is available for
+public review and contribution under the terms of the license.
+Feel free to fork the repository and submit pull requests.
+
+L<https://github.com/powerman/Narada>
+
+    git clone https://github.com/powerman/Narada.git
+
+=head2 Resources
+
+=over
+
+=item * MetaCPAN Search
+
+L<https://metacpan.org/search?q=Narada>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/dist/Narada>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Narada>
+
+=item * CPAN Testers Matrix
+
+L<http://matrix.cpantesters.org/?dist=Narada>
+
+=item * CPANTS: A CPAN Testing Service (Kwalitee)
+
+L<http://cpants.cpanauthors.org/dist/Narada>
+
+=back
+
+
+=head1 AUTHOR
+
+Alex Efros E<lt>powerman@cpan.orgE<gt>
+
+Nick Levchenko E<lt>nick-lev@ya.ruE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2008- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+
+=cut

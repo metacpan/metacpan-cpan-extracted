@@ -1,0 +1,72 @@
+Revision history for Net::Silk
+
+2.05  Thu Dec  1 13:02:29 EST 2016
+    - streamlined ipv4 bag support
+
+2.04  Thu Feb 25 12:43:08 EST 2016
+    - patched deprecated types for newer libsilk
+    - pmap get_range() returns range types
+    - consolidated range classes
+    - minor bug fixes
+
+2.03  Tue Feb 23 16:00:43 EST 2016
+    - cidr and range objects are now sortable
+    - updated pmap add() and add_all() to accept range/cidr objects
+    - updated wildcards to yield cidr/range objects
+    - added iter_ranges() to wildcards
+    - pmap bug fix accounting for length of default label
+    - cidr to range iter fix
+
+2.02  Tue Feb  2 10:43:36 EST 2016
+    - fixed import loop between RWRec and Site
+    - documentation tweaks
+
+2.01  Mon Feb  1 13:39:14 EST 2016
+    - fixed ipset interaction with cidr
+    - fixed ipset interaction with Net:Silk::Range and Net::Silk::CIDR
+    - documentation updates
+    - updated tests
+
+2.00  Fri Jan 29 15:29:38 EST 2016
+    - pmaps can now be built dynamically in addition to loaded from file
+    - added Net::Silk::Range and Net::Silk::CIDR
+    - added some bitwise operators
+    - added iter_ranges() to IPSet
+    - added iter_cidr() to Pmap
+    - various bug fixes
+    - documentation updates
+
+1.07  Fri Mar 13 13:55:53 EDT 2015
+    - wildcard now accepts IP objects
+    - fixed test counts for non-ipv6 enabled libsilk
+
+1.06  Thu Mar 12 10:15:58 EDT 2015
+    - silenced some site config tests when missing silk.conf
+    - switched to latest Math::Int128 that includes OS/X patch
+    - updated and fixed cardinality issues with wildcards and ipsets
+    - patch for iter_cidr() issue on some versions of libsilk
+
+1.05  Fri Mar  6 11:57:36 EST 2015
+    - removed an int128 conditional that was breaking things on OS/X
+    - various cleanup and bug fixes
+
+1.04  Wed Feb 18 11:26:40 EST 2015
+    - adjusted parsing order for numeric strings
+
+1.03  Tue Feb 17 15:46:40 EST 2015
+    - fixed MANIFEST
+
+1.02  Tue Feb 17 13:10:43 EST 2015
+    - full integration of Math::Int64 and Math::Int128
+    - refactored ip constructors
+    - streamlined bag key handling
+
+1.01  Fri Feb  6 13:48:07 EST 2015
+    - doc fix
+
+1.00  Fri Feb  6 13:36:11 EST 2015
+    - doc updates
+    - revamped filehandle open in Net::Silk::File
+
+0.01  Mon Sep 29 12:52:42 EDT 2014
+    - initial release

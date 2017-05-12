@@ -1,0 +1,437 @@
+
+=head1 NAME
+
+News::NNTP - NNTP client implementation
+
+=head1 SYNOPSIS
+
+ use News::NNTP;
+
+ my $nntp = News::NNTP->new({ 'server' => 'news.supernews.com' });
+
+ my $resp = $nntp->command('group news.software.nntp');
+
+=head1 DESCRIPTION
+
+Provides a low-level NNTP client implementation.
+
+"Low-level" means that you just send your NNTP commands as strings and get
+back responses, rather than hunting for the proper syntax for each command.
+It also means that the module does as little as possible to get in your way;
+most responses are simply returned to you to handle as you see fit.  You
+can parse things like overviews and active file entries in whatever way
+works for you.
+
+Large server responses, like XOVER and LIST ACTIVE responses, can be handled
+as they come off the wire, and not saved in-core by this module, if you want,
+and aren't parsed into massive data structures.  (Some other Perl NNTP
+impmementations can consume the system's entire memory and eventually crash
+just from doing an XOVER.)
+
+The module attempts to handle dropped connections (from an idle timeout on
+the server, for example) by transparently re-establishing the connection and
+restoring any necessary state (authentication, current group, etc).  So if
+you sit idle, the server drops the connection, and then you innocently send
+along a command, it can appear from your end as if the command just worked,
+without you needing to worry about whether the connection timed out.
+
+You can pass a username and password to the constructor, and the module will
+authenticate to the server when challenged to do so; however, in the spirit
+of not getting in your way, you can also just get back the 480 and then
+send AUTHINFO commands yourself.  In the latter case, the module will still
+remember your username and password for reconnecting later, if needed.
+
+=head1 METHODS
+
+=over 4
+
+=item B<new> ( server [, username, password ] )
+
+=item B<new> ( { options } )
+
+Creates an instance of a News::NNTP object and returns it.  A connection is
+opened to the server, and the initial banner response is retrieved.  If the
+socket connection fails, an exception is thrown; if you catch the exception
+you should have the error in $!.  If the connection succeeds but the server
+returns a 4xx or 5xx response (indicating that you won't be able to go any
+further), handling it is up to you (you'll get a valid object back).
+
+A server must be provided.  Other options can be provided as well; you can
+give the server, username, and password as regular arguments to the function,
+or pass a hashref with any of these options:
+
+  server - NNTP server name (required).
+  username - authentication for the server.
+  password - authentication for the server.
+  port - TCP port to connect on (default is 119).
+  connect_timeout - socket timeout, passed to IO::Socket::INET.
+  trace - a coderef to handle trace information (see below).
+  on_error - a coderef to handle fatal errors (see below).
+
+If a username and password are supplied, they will be used to authenticate
+to the server if any subsequent command returns a 480 response.  In that
+case, you won't get the 480 back, you will simply receive the response to
+your actual command.
+
+If you do not provide a username or password, and a 480 response is received,
+it will be returned to you and then you must handle it yourself.  In that
+case you can send AUTHINFO commands, and the username and password you use
+will be remembered for subsequent use after a dropped connection.
+
+=item B<command> ( command [, data ...] )
+
+=item B<command> ( command [, code ] )
+
+Send an NNTP command to the server.
+
+Returns true if the command succeeded (response code 1xx, 2xx, or 3xx), and
+false otherwise.
+
+The response code, message, and possibly data from a multiline response are
+stored so you can retrieve them using C<$nntp-E<gt>lastcode>,
+C<$nntp-E<gt>lastmsg>, C<$nntp-E<gt>lastresp>, and C<$nntp-E<gt>data>.
+
+If the command was GROUP, then as long as the selected group remains current,
+you can also retrieve the current group, article count, high-water mark,
+low-water mark, and current article pointer; see appropriate methods below.
+
+If the command returns multi-line output (ARTICLE, LIST ACTIVE, XOVER, etc),
+then the data returned is available in C<$nntp-E<gt>data>.  However, if you
+would prefer not to handle it that way, pass a coderef as the second argument
+to the method.  This code will be called repeatedly, once for each line in
+the response body, as it is read from the network, and then called with undef
+as the argument when the response is finished.  In this case, the data is NOT
+stored internally.  Note that CRLF pairs are turned into newlines.
+
+If the command was LIST OVERVIEW.FMT, the returned format will be stored for
+use when parsing overviews using ov_hashref().
+
+If the command requires multi-line input, you can provide it in the function
+call.  Any extra arguments after the command are used, in order, until there
+are no more.  Each argument is taken to be part of the input, and is sent in
+turn.  Linefeeds are turned into CRLF pairs for you, dot-stuffing is done,
+and you need not (and should not) end the input with a dot-CRLF sequence,
+as that is done for you as well.
+
+Each of the data arguments can be a simple scalar (taken as-is); a reference
+to a simple scalar (dereferenced and used); an arrayref (each item is taken
+and sent, and can be in any of the forms allowed here); or an iterator coderef.
+An iterator will be called repeatedly until it returns undef to indicate it is
+exhaused, and each returned value will be sent to the server as it is received
+(not stored up in memory, so if you have a large amount of data and don't want
+the module to store it all, this is the way to go).
+
+If you don't provide any multiline data at all, you'll get back the 3xx
+response and you'll be responsible for sending the data yourself using
+C<$nntp-E<gt>senddata>, or C<$nntp-E<gt>senddata_partial> and
+C<$nntp-E<gt>finish_partial>.
+
+=item B<data>
+
+Returns the multi-line response body from the last command that returned
+one.  This field is wiped out by any subsequent command that returns its
+own multi-line response, but NOT by other commands.  The data is returned
+as a reference to a list of lines.  Lines have trailing newlines (CRLF
+line terminators are turned into just newlines).
+
+After an ARTICLE command, the return value of C<$nntp-E<gt>data> can be passed
+directly to C<News::Article-E<gt>new>, if desired.
+
+=item B<lastcode>
+
+Returns the NNTP response code from the last command.  This is the
+three-digit code that begins the response line.  Refer to the NNTP spec
+to see what these mean.
+
+=item B<lastcodetype>
+
+Returns the first digit of the last NNTP response code received.  The first
+digit is used to determine success or failure of a command.  In general, 1xx
+indicates an informational response (for a HELP command, for example), 2xx is
+for success, 3xx is for partial success with further input expected, 4xx is
+for transient errors, and 5xx is for fatal errors.
+
+=item B<lastmsg>
+
+Returns the message portion of the last NNTP response.  This is the rest of
+the response line after the code is removed.
+
+=item B<lastresp>
+
+Returns the last NNTP response in full (code, space, message).
+
+=item B<lastcmd>
+
+Returns the last NNTP command you sent.
+
+=item B<curgroup>
+
+Returns the currently selected newsgroup, if any.
+
+=item B<curart>
+
+Returns the current article pointer (article number), if a group is selected.
+
+=item B<curgroup_count>
+
+Returns the (approximate) number of articles present in the current group, if
+a group is selected.  This is the count as indicated in the GROUP response,
+and is not guaranteed to be correct (if it is incorrect, the actual number
+of articles should be lower than this number).
+
+=item B<curgroup_lowater>
+
+Returns the current group's low-water mark, if a group is selected.  This is
+as returned in the GROUP response.
+
+=item B<curgroup_hiwater>
+
+Returns the current group's high-water mark, if a group is selected.  This is
+as returned in the GROUP response.
+
+=item B<overview_fmt>
+
+Returns a listref of fields in the server's overview format.  If you have
+done a LIST OVERVIEW.FMT command during the session, the stored result from
+that is used; if not, the default is returned, which will be I<wrong> if the
+server is not using the default (which is uncommon).
+
+=item B<drop>
+
+Close the NNTP connection and clean up.  This will also send a QUIT command
+to the server, if the connection is still open and valid.
+
+=item B<ov_hashref> ( line )
+
+Given a line from an overview, return a hashref of header/value pairs.
+The header names are all in lower-case.  If you've done LIST OVERVIEW.FMT
+during the session, the result from it will be used to parse the overview.
+If not, the default will be used, which will be I<wrong> if the server is
+not using the default -- which is uncommon, but it's still good practice
+to get this from the server.
+
+Entries with the :full suffix will I<not> have that suffix on the hash key,
+and the header name is removed from the value for you.  The article number
+is in the hash with the key NUMBER (all caps).
+
+(This must be called as an object method on an open session so the format
+from the server can be used.)
+
+=back
+
+=head1 CALLBACK METHODS
+
+These methods are used to set some callbacks for various purposes.
+
+=over 4
+
+=item B<on_error> ( code )
+
+Set a function to handle fatal errors.  If a fatal error occurs (one that
+would normally result in an exception being thrown), this function will be
+called with the error message as its argument.  You may also have a system
+error in $! if one existed.
+
+If your function doesn't die, but instead returns, the NNTP connection
+could still be left in an inconsistent or unpredictable state, so the
+connection is dropped, and whatever the module was trying to do will
+(probably) return undef, and $! should be preserved.
+
+This function does not catch all exceptions, just ones that would be
+thrown by this module itself as part of error handling.
+
+=item B<resphook> ( code )
+
+Set a function callback to be called with NNTP command responses.  The
+function will be called for each (single-line) NNTP response received, with
+the response as the argument.  Call with undef to remove the hook.
+
+=item B<trace> ( code )
+
+Set a function to be called with protocol trace information.  The passed
+function is called with incoming and outgoing NNTP commands and responses
+as an argument.  Outgoing messages are preceded with "-> ", and incoming
+with "<- ".  By default, nothing is done with trace messages.  Call with
+undef to remove the hook.
+
+=item B<trace_stderr> ( [ remove ] )
+
+Arrange for protocol trace messages to be printed to standard error.  This
+is just a convenience function that calls C<$nntp-E<gt>trace> with an
+appropriate callback function.  Call with a true argument to remove the
+trace hook.
+
+=back
+
+=head1 CONVENIENCE FUNCTIONS
+
+These convenience functions can be called as object methods, package methods,
+or directly as function calls, and can be imported from the module by the
+caller in the usual way.
+
+=over 4
+
+=item B<parse_date> ( date )
+
+Given a Date header from a Usenet article, parse it and return a unixtime.
+
+=item B<format_date> ( unixtime )
+
+Given a unixtime, return a formatted string suitable for use in a Date header.
+If no time is given, the current time is used.
+
+Note that this function currently depends on the strftime() library function
+supporting "%z", which has been specified for several years. I don't know
+how universally implemented this is, though; if it is a problem, let me know
+and I'll do an internal implementation.
+
+=item B<active_group> ( line )
+
+=item B<active_hiwater> ( line )
+
+=item B<active_lowater> ( line )
+
+=item B<active_count> ( line )
+
+Given a line from an active file, return either the newsgroup name, the
+high-water number, the low-water number, or the estimated article count
+(high minus low) from parsing the line.
+
+=item B<cmd_has_multiline_input> ( command )
+
+Return true if the given NNTP command expects multi-line input.
+
+=item B<cmd_has_multiline_output> ( command )
+
+Return true if the given NNTP command returns multi-line output.
+
+=back
+
+=head1 LESS-USED METHODS
+
+These probably aren't very useful, but here they are if you need them.
+
+=over 4
+
+=item B<server>
+
+=item B<username>
+
+=item B<password>
+
+=item B<port>
+
+=item B<connect_timeout>
+
+Return or set the corresponding fields (as passed to the constructor).  It is
+probably of limited value to set these values on an already-open connection,
+but you can pass a new value to be set if you want.
+
+=item B<sock>
+
+Returns the IO::Socket::INET object being used by this connection.  Note
+that you could do things to it that will confuse this module, so, you know,
+be careful.
+
+=back
+
+=head1 COMMAND AND RESPONSE METHODS
+
+These methods are used internally by C<$nntp-E<gt>command>, but are here if
+you really want them.  Here there be dragons.  You should probably look at
+the code if you think you want to use these methods.
+
+=over 4
+
+=item B<sendcmd> ( command )
+
+Send an NNTP command to the server.  You can then read the response using
+C<$nntp-E<gt>getresp>.  This method will transparently re-establish a dropped
+connection, but will not do any other magic like authenticating if needed,
+keeping track of group and article poiners, etc.  Returns true on success
+and false for failure -- note that this means success or failure of sending
+the command over the network, NOT the application-level success or failure
+of the NNTP command itself.
+
+If you use this, everything internal to this module that keeps track of the
+current state (group name, article pointer, etc) may end up in an inconsistent
+state.
+
+=item B<getresp>
+
+Read an NNTP response from the server.  This will populate lastcode, lastmsg,
+lastresp, and lastcodetype, but will not handle multi-line responses.  This
+is the most likely place a server-dropped connection will be detected, so it
+will also try to re-establish a dropped connection if necessary.
+
+=item B<getdata> ( [ code ] )
+
+Read a multi-line response body from the server.  If a coderef is passed, it
+will be called once for each line of the response, and then called with undef
+to indicate that it's finished.  Otherwise, an arrayref of lines is returned.
+
+=item B<senddata> ( data ... )
+
+Send multi-line data to the server.  Data arguments are specified as described
+for C<$nntp-E<gt>command>.
+
+=item B<senddata_partial> ( data )
+
+Each item from C<senddata> is passed to this function, which sends it to the
+server.  The (single) argument here must be a plain scalar.
+
+=item B<finish_partial>
+
+After sending multi-line data to the server using C<senddata_partial>, this
+method finishes the send, including sending the dot-CRLF sequence.  It must
+be called after using C<senddata_partial>, but C<senddata> calls it
+internally.
+
+=back
+
+=head1 STANDARD INPUT/OUTPUT CLIENT
+
+=over 4
+
+=item B<run_on_stdio>
+
+Creates an object, opens a connection, and attaches it to standard input and
+output.  Call as a static (package) method, a plain function, or as a method
+on an existing object (in which case that object is used).
+
+Thus:
+
+perl -MNews::NNTP -e 'News::NNTP::run_on_stdio("server","user","pass")'
+
+creates a connection on your terminal, like C<telnet news 119>.  Useful for
+testing purposes.
+
+=back
+
+=head1 STATUS
+
+I consider this code beta-quality, as not all features have been well
+tested.  Bugs are probably present.
+
+=head1 LIMITATIONS / TODO
+
+Pipelining of commands is not supported.
+
+If the server's initial response is 4xx or 5xx, responsibility is punted
+back to the caller.  There may be a better way to handle that.
+
+Reading articles line by line may not be the most efficient method possible.
+
+Regression tests are incomplete.
+
+Regression tests need a news server to connect to. They retrieve live data
+from the server to use for testing, so it's possible for them to fail through
+no fault of this module if the server returns bad data.
+
+=head1 AUTHOR
+
+Jeremy Nixon <jnixon@cpan.org>
+
+=head1 LICENSE
+
+This module is released under a BSD license.

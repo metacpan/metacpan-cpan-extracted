@@ -1,0 +1,14 @@
+Revision history for Net-HTTP-Factual
+
+0.122480  2012-09-04 12:08:06 PST8PDT
+    * v2 of factual API has been deprecated.  Release deprecated version while looking
+      into Net::HTTP::Spore OAuth support for v3.
+
+0.110030  2011-01-03 13:49:30 America/Los_Angeles
+    * update for version 0.3 of spore, no requires "base_url" instead of "api_base_url". Include both, for v0.2 and v0.3 compatability.  Please let me know if this works for you. :)
+    * switch from AutoPrereq to AutoPrereqs, as per DJBS.
+
+0.102900  2010-10-16 17:09:50 PST8PDT
+
+0.102890  2010-10-16 16:04:00 PST8PDT
+    * initial release

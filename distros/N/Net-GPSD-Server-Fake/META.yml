@@ -1,0 +1,19 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Net-GPSD-Server-Fake
+version:      0.16
+version_from: lib/Net/GPSD/Server/Fake.pm
+installdirs:  site
+requires:
+    Geo::Forward:                  0.09
+    Geo::Functions:                0.05
+    GPS::SpaceTrack:               0.11
+    IO::Socket::INET:              0
+    Net::GPSD::Point:              0.35
+    Net::GPSD::Satellite:          0.3
+    strict:                        0
+    Time::HiRes:                   0
+    vars:                          0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

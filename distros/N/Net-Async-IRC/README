@@ -1,0 +1,222 @@
+NAME
+
+    Net::Async::IRC - use IRC with IO::Async
+
+SYNOPSIS
+
+     use IO::Async::Loop;
+     use Net::Async::IRC;
+    
+     my $loop = IO::Async::Loop->new;
+    
+     my $irc = Net::Async::IRC->new(
+        on_message_text => sub {
+           my ( $self, $message, $hints ) = @_;
+    
+           print "$hints->{prefix_name} says: $hints->{text}\n";
+        },
+     );
+    
+     $loop->add( $irc );
+    
+     $irc->login(
+        nick => "MyName",
+        host => "irc.example.org",
+     )->get;
+    
+     $irc->do_PRIVMSG( target => "YourName", text => "Hello world!" );
+    
+     $loop->run;
+
+DESCRIPTION
+
+    This object class implements an asynchronous IRC client, for use in
+    programs based on IO::Async.
+
+    Most of the actual IRC message handling behaviour is implemented by the
+    parent class Net::Async::IRC::Protocol.
+
+    Most of the behaviour related to being an IRC client is implemented by
+    the parent class Protocol::IRC::Client.
+
+    The following documentation may make mention of these above two parent
+    classes; the reader should make reference to them when required.
+
+PARAMETERS
+
+    The following named parameters may be passed to new or configure:
+
+    nick => STRING
+
+    user => STRING
+
+    realname => STRING
+
+      Connection details. See also connect, login.
+
+      If user is not supplied, it will default to either $ENV{LOGNAME} or
+      the current user's name as supplied by getpwuid() or
+      Win32::LoginName().
+
+      If unconnected, changing these properties will set the default values
+      to use when logging in.
+
+      If logged in, changing the nick property is equivalent to calling
+      change_nick. Changing the other properties will not take effect until
+      the next login.
+
+    use_caps => ARRAY of STRING
+
+      Attempts to negotiate IRC v3.1 CAP at connect time. The array gives
+      the names of capabilities which will be requested, if the server
+      supports them.
+
+METHODS
+
+    The following methods documented with a trailing call to ->get return
+    Future instances.
+
+ connect
+
+       $irc = $irc->connect( %args )->get
+
+    Connects to the IRC server. This method does not perform the complete
+    IRC login sequence; for that see instead the login method. The returned
+    Future will yield the $irc instance itself, to make chaining easier.
+
+    host => STRING
+
+      Hostname of the IRC server.
+
+    service => STRING or NUMBER
+
+      Optional. Port number or service name of the IRC server. Defaults to
+      6667.
+
+    Any other arguments are passed into the underlying IO::Async::Loop
+    connect method.
+
+       $irc->connect( %args )
+
+    The following additional arguments are used to provide continuations
+    when not returning a Future.
+
+    on_connected => CODE
+
+      Continuation to invoke once the connection has been established.
+      Usually used by the login method to perform the actual login
+      sequence.
+
+       $on_connected->( $irc )
+
+    on_error => CODE
+
+      Continuation to invoke in the case of an error preventing the
+      connection from taking place.
+
+       $on_error->( $errormsg )
+
+ login
+
+       $irc = $irc->login( %args )->get
+
+    Logs in to the IRC network, connecting first using the connect method
+    if required. Takes the following named arguments:
+
+    nick => STRING
+
+    user => STRING
+
+    realname => STRING
+
+      IRC connection details. Defaults can be set with the new or configure
+      methods.
+
+    pass => STRING
+
+      Server password to connect with.
+
+    Any other arguments that are passed, are forwarded to the connect
+    method if it is required; i.e. if login is invoked when not yet
+    connected to the server.
+
+       $irc->login( %args )
+
+    The following additional arguments are used to provide continuations
+    when not returning a Future.
+
+    on_login => CODE
+
+      A continuation to invoke once login is successful.
+
+       $on_login->( $irc )
+
+ change_nick
+
+       $irc->change_nick( $newnick )
+
+    Requests to change the nick. If unconnected, the change happens
+    immediately to the stored defaults. If logged in, sends a NICK command
+    to the server, which may suceed or fail at a later point.
+
+IRC v3.1 CAPABILITIES
+
+    The following methods relate to IRC v3.1 capabilities negotiations.
+
+ caps_supported
+
+       $caps = $irc->caps_supported
+
+    Returns a HASH whose keys give the capabilities listed by the server as
+    supported in its CAP LS response. If the server ignored the CAP
+    negotiation then this method returns undef.
+
+ cap_supported
+
+       $supported = $irc->cap_supported( $cap )
+
+    Returns a boolean indicating if the server supports the named
+    capability.
+
+ caps_enabled
+
+       $caps = $irc->caps_enabled
+
+    Returns a HASH whose keys give the capabilities successfully enabled by
+    the server as part of the CAP REQ login sequence. If the server ignored
+    the CAP negotiation then this method returns undef.
+
+ cap_enabled
+
+       $enabled = $irc->cap_enabled( $cap )
+
+    Returns a boolean indicating if the client successfully enabled the
+    named capability.
+
+MESSAGE-WRAPPING METHODS
+
+    The following methods are all inherited from Protocol::IRC::Client but
+    are mentioned again for convenient. For further details see the
+    documentation in the parent module.
+
+    In particular, each method returns a Future instance.
+
+ do_PRIVMSG
+
+ do_NOTICE
+
+       $irc->do_PRIVMSG( target => $target, text => $text )->get
+    
+       $irc->do_NOTICE( target => $target, text => $text )->get
+
+    Sends a PRIVMSG or NOITICE command.
+
+SEE ALSO
+
+      * http://tools.ietf.org/html/rfc2812 - Internet Relay Chat: Client
+      Protocol
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

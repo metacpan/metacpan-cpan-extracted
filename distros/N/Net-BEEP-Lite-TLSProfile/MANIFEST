@@ -1,0 +1,12 @@
+beeplite-tlsprofile-license.txt
+Makefile.PL
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/1.t
+t/localhost-cert.pem
+t/localhost-key.pem
+t/localhost_ca-cacert.pem
+t/test_tls_echo_client.pl
+t/test_tls_echo_server.pl
+TLSProfile.pm

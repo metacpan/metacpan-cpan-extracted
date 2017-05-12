@@ -1,0 +1,50 @@
+NAME
+    Net::DPAP::Client - Connect to iPhoto shares (DPAP)
+
+SYNOPSIS
+      use Net::DPAP::Client;
+      my $client = Net::DPAP::Client->new;
+      $client->hostname($hostname);
+      my @albums = $client->connect;
+
+      foreach my $album (@albums) {
+        print $album->name, "\n";
+        foreach my $image (@{$album->images}) {
+          print "  ", $image->name, "\n";
+          my $thumbnail = $image->thumbnail;
+          my $hires = $image->hires;
+        }
+      }
+
+DESCRIPTION
+    This module provides a DPAP client. DPAP is the Digital Photo Access
+    Protocol and is the protocol that Apple iPhoto uses to share photos.
+    This allows you to browse shared albums, and download thumbnail and
+    hires versions of shared photos.
+
+    It currently doesn't support password-protected shares.
+
+METHODS
+  new
+    The constructor:
+
+      my $client = Net::DPAP::Client->new;
+      $client->hostname($hostname);
+
+  connect
+    Connect to the hostname:
+
+      my @albums = $client->connect;
+
+SEE ALSO
+    Net::DPAP::Client::Album, Net::DPAP::Client::Image.
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 2004-6, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

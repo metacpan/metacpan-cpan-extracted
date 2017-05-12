@@ -1,0 +1,43 @@
+NAME
+       Net::SMS::CDYNE − Perl REST client for CDYNE’s SMSNotify API
+
+SYNOPSIS
+         use Net::SMS::CDYNE;
+         my $client = Net::SMS::CDYNE−>new(api_key => '123−45−6790');
+         my $resp = $client−>simple_sms_send_with_postback(
+             PhoneNumber       => $to,
+             Message           => $msg,
+             StatusPostBackURL => $reply_url,
+         );
+         warn "Sent OK: " . ($resp−>success ? 'yes' : 'no');
+
+DESCRIPTION
+       Spec: https://secure.cdyne.com/downloads/SPECS_SMS−Notify2.pdf
+
+       Uses SecureREST API: https://sms2.cdyne.com/sms.svc/SecureREST/help
+
+METHODS
+        simple_sms_send
+
+        simple_sms_send_with_postback
+
+        advanced_sms_send
+
+        get_unread_incoming_messages
+
+        get_message_status_by_reference_id
+
+        get_message_status
+
+        cancel_message
+
+SEE ALSO
+       Net::SMS::CDYNE::Response
+
+AUTHOR
+       Mischa Spiegelmock <revmischa@cpan.org>
+
+LICENSE
+       This library is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+

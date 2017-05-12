@@ -1,0 +1,1062 @@
+
+=pod
+
+=head1 NAME
+
+Net::IP::RangeCompare - Perl extension for IP Range Comparisons
+
+=head1 SYNOPSIS
+
+  use Net::IP::RangeCompare;
+  my $obj=Net::IP::RangeCompare::Simple->new;
+
+  $obj->add_range('Tom','10.0.0.2 - 10.0.0.11');
+  $obj->add_range('Tom','10.0.0.32 - 10.0.0.66');
+  $obj->add_range('Tom','11/32');
+
+  $obj->add_range('Sally','10.0.0.7 - 10.0.0.12');
+  $obj->add_range('Sally','172.16/255.255.255');
+
+  $obj->add_range('Harry','192.168.2');
+  $obj->add_range('Harry','10.0.0.128/30');
+
+  $obj->compare_ranges; # optional
+
+        while(my ($common,%row)=$obj->get_row) {
+                print "\nCommon Range: ",$common,"\n";
+                my $tom=$row{Tom};
+                my $sally=$row{Sally};
+                my $harry=$row{Harry};
+                print "Tom: ",$tom
+                        ,' '
+                        ,($tom->missing ? 'not used' : 'in use')
+                        ,"\n";
+
+                print "Sally: ",$sally
+                        ,' '
+                        , ($sally->missing ? 'not used' : 'in use')
+                        ,"\n";
+
+                print "Harry: ",$harry,
+                        ' '
+                        ,($harry->missing ? 'not used' : 'in use')
+                        ,"\n";
+        }
+
+
+  Output: 
+
+  Common Range: 10.0.0.2 - 10.0.0.6
+  Tom: 10.0.0.2 - 10.0.0.11 in use
+  Sally: 10.0.0.2 - 10.0.0.6 not used
+  Harry: 10.0.0.2 - 10.0.0.127 not used
+
+  Common Range: 10.0.0.7 - 10.0.0.11
+  Tom: 10.0.0.2 - 10.0.0.11 in use
+  Sally: 10.0.0.7 - 10.0.0.12 in use
+  Harry: 10.0.0.2 - 10.0.0.127 not used
+
+  Common Range: 10.0.0.12 - 10.0.0.12
+  Tom: 10.0.0.12 - 10.0.0.31 not used
+  Sally: 10.0.0.7 - 10.0.0.12 in use
+  Harry: 10.0.0.2 - 10.0.0.127 not used
+
+  Common Range: 10.0.0.32 - 10.0.0.66
+  Tom: 10.0.0.32 - 10.0.0.66 in use
+  Sally: 10.0.0.13 - 172.15.255.255 not used
+  Harry: 10.0.0.2 - 10.0.0.127 not used
+
+  Common Range: 10.0.0.128 - 10.0.0.131
+  Tom: 10.0.0.67 - 10.255.255.255 not used
+  Sally: 10.0.0.13 - 172.15.255.255 not used
+  Harry: 10.0.0.128 - 10.0.0.131 in use
+
+  Common Range: 11.0.0.0 - 11.0.0.0
+  Tom: 11.0.0.0 - 11.0.0.0 in use
+  Sally: 10.0.0.13 - 172.15.255.255 not used
+  Harry: 10.0.0.132 - 192.168.1.255 not used
+
+  Common Range: 172.16.0.0 - 172.16.0.255
+  Tom: 11.0.0.1 - 192.168.2.0 not used
+  Sally: 172.16.0.0 - 172.16.0.255 in use
+  Harry: 10.0.0.132 - 192.168.1.255 not used
+
+  Common Range: 172.16.1.0 - 192.168.1.255
+  Tom: 11.0.0.1 - 192.168.2.0 not used
+  Sally: 172.16.1.0 - 192.168.2.0 not used
+  Harry: 10.0.0.132 - 192.168.1.255 not used
+
+  Common Range: 192.168.2.0 - 192.168.2.0
+  Tom: 11.0.0.1 - 192.168.2.0 not used
+  Sally: 172.16.1.0 - 192.168.2.0 not used
+  Harry: 192.168.2.0 - 192.168.2.0 in use
+
+=head1 DESCRIPTION
+
+Fast scalable ip range aggregation and summary tool kit.  Find intersections across multiple lists of IP ranges, fast. 
+
+Although similar in functionality to Net::CIDR::Compare, Net::Netmask and NetAddr::IP, Net::IP::RangeCompare is a completely range driven ip management and evaluation tool allowing more flexibility and scalability when dealing with the somewhat organic nature of IP-Ranges.
+
+If you have a large number of ipv4 ranges and need to inventory lists of ranges for intersections, this is the Module for you!
+
+=head2 Export list
+
+Net::IP::RangeCompare does not export anything by default.  The functions listed in this section can be imported by using the standard import syntax.
+
+Import example:
+
+  use Net::IP::RangeCompare qw(consolidate_ranges sort_ranges);
+
+To import all functions:
+
+  use Net::IP::RangeCompare qw(:ALL);
+
+Helper functions  :HELPER
+
+  use Net::IP::RangeCompare qw(:HELPER);
+
+  Imports the following:
+
+          hostmask
+          ip_to_int
+          int_to_ip
+          cidr_to_int
+	  size_from_mask 
+	  base_int 
+	  broadcast_int 
+	  cmp_int
+	  sort_quad
+	  sort_notations
+  	  add_one
+          sub_one
+
+Overlap functions :OVERLAP
+
+  use Net::IP::RangeCompare qw(:OVERLAP);
+
+  Imports the following:
+
+          get_common_range
+          get_overlapping_range
+	  grep_overlap
+	  grep_non_overlap
+
+Sort Functions :SORT
+
+  use Net::IP::RangeCompare qw(:SORT);
+
+  Imports the following:
+
+          sort_ranges
+          sort_largest_first_int_first
+          sort_smallest_last_int_first
+          sort_largest_last_int_first
+          sort_smallest_first_int_first
+
+Range processing functions :PROCESS
+
+  use Net::IP::RangeCompare qw(:PROCESS);
+
+  Imports the following:
+
+          consolidate_ranges
+          fill_missing_ranges
+          range_start_end_fill
+          range_compare
+          compare_row
+	  range_compare_force_cidr
+
+=head2 OO Methods
+
+This section defines the OO interfaces.
+
+=over 4
+
+=item * my $obj=Net::IP::RangeCompare->parse_new_range( '10/32' );
+
+Creates a new Net::IP::RangeCompare object.
+
+  Examples:
+  $obj=Net::IP::RangeCompare->parse_new_range('10');
+  $obj=Net::IP::RangeCompare->parse_new_range('10.0.0.0 - 10.0.0.0');
+  $obj=Net::IP::RangeCompare->parse_new_range('10/32');
+  $obj=Net::IP::RangeCompare->parse_new_range('10/255.255.255.255');
+  $obj=Net::IP::RangeCompare->parse_new_range('10.0.0.0','10.0.0.0');
+
+  All of the above will parse the same range: 
+    10.0.0.0 - 10.0.0.0
+
+  Notes:
+    When using a list syntax: start and end range are
+    assumed.  Using 2 arguments will not work as 
+    expected when the list consists of ip and cidr.
+
+  Example:
+
+    $obj=Net::IP::RangeCompare->parse_new_range('10.0.0.0',32);
+    Returns: 10.0.0.0 - 32.0.0.0
+
+    $obj=Net::IP::RangeCompare->parse_new_range(
+      '10.0.0.0'
+      ,'255.255.255.255
+    );
+    Returns: 10.0.0.0 - 255.255.255.255
+
+  If you wish to create an object from cidr boundaries
+  pass the argument as a single string.
+
+  Example:
+
+    $obj=Net::IP::RangeCompare->parse_new_range(
+      '10.0.0.0/32
+    );
+    Returns: 10.0.0.0 - 10.0.0.0
+
+
+  If you wish to create an object from an ip/mask
+  pass the argument as a single string.
+
+  Example: 
+
+    $obj=Net::IP::RangeCompare->parse_new_range(
+      '10.0.0.0/255.255.255'
+    );
+    Returns: 10.0.0.0 - 10.0.0.255
+
+=item * my $obj=Net::IP::RangeCompare->new(0,1);
+
+Creates a new Net::IP::RangeCompare object from 2 integers.  See: Net::IP::RangeCompare->parse_new_range for a more useful OO constructor.
+
+=item * my $int=$obj->first_int;
+
+Returns the integer that represents the start of the ip range
+
+=item * my $int=$obj->last_int;
+
+Returns the integer that represents the end of the ip range
+
+=item * my $first_ip=$obj->first_ip;
+
+Returns the first ip in the range.
+
+=item * my $last_ip=$obj->last_ip;
+
+Returns the last ip in the range;
+
+=item * if($obj->missing) { .. do something } else { .. do something else }
+
+If the value is true, this range is a filler representing an ip range that was not found.
+
+=item * if($obj->generated) { .. do something } else { .. do something else }
+
+If the value is true, this range was created internally by one of the following functions: fill_missing_ranges, range_start_end_fill, consolidate_ranges.  
+
+When a range is $obj->generated but not $obj->missing it represents a collection of overlapping ranges.
+
+=item * my $last_error=$obj->error;
+
+Returns the last error
+
+=item * my $total_ips=$obj->size;
+
+Returns the total number of ipv4 addresses in this range.
+
+=item * $obj->data->{some_tag}=$some_data; # sets the data
+
+=item * my $some_data=$obj->data->{some_tag}; # gets the data
+
+Returns an anonymous hash that can be used to tag this block with your data.  
+
+=item * my $notation=$obj->notation;
+
+Returns the ip range in the standard "x.x.x.x - x.x.x.x" notation.
+
+Simply calling the Net::IP::RangeCompare object in a string context will return the same output as using the $obj->notation Method.
+Example:
+
+  my $obj=Net::IP::RangeCompare->parse_new_range( '10.0.0.1/255' );
+  print $obj,"\n";
+  print $obj->notation,"\n";
+
+  Output:
+
+  10.0.0.0 - 10.255.255.255
+  10.0.0.0 - 10.255.255.255
+
+=item * my $cidr_notation=$obj->get_cidr_notation;
+
+Returns string representing all the cidrs in a given range.
+
+  Example a:
+
+    $obj=Net::IP::RangeCompare->parse_new_range('10/32');
+    print $obj->get_cidr_notation,"\n"
+
+    Output:
+    10.0.0.0/32
+
+
+  Example b:
+    $obj=Net::IP::RangeCompare->parse_new_range(
+      '10.0.0.0 10.0.0.4'
+    );
+    print $obj->get_cidr_notation,"\n"
+
+    Output:
+    10.0.0.0/30, 10.0.0.4/32
+
+=item * if($obj->overlap('10/32') { }
+
+Returns true if the 2 ranges overlap.  Strings are auto converted to Net::IP::RangeCompare Objects on the fly.
+
+=item * my $int=$obj->next_first_int;
+
+Fetches the starting integer for the next range;
+
+=item * my $int=$obj->previous_last_int;
+
+Returns an integer representing the first interger of the pervious range.
+
+=item * my ($range,$cidr_nota,$next)=$obj->get_first_cidr;
+
+Iterator function:
+
+  Returns the following
+  $range
+    First range on a cidr boundary in $obj
+  $cidr_ntoa
+    String containing the cidr format
+  $next
+    Next Range to process, undef when complete
+
+Example:
+
+    my $obj=Net::IP::RangeCompare->parse_new_range(
+      '10.0.0.0 - 10.0.0.4'
+    );
+    my ($first,$cidr_note,$next)=$obj->get_first_cidr;
+
+Example:
+
+    # this gets every range
+    my $obj=Net::IP::RangeCompare->parse_new_range(
+      '10.0.0.0 - 10.0.0.4'
+    );
+    my ($first,$cidr,$next);
+    $next=$obj;
+    while($next) {
+      ($first,$cidr,$next)=$next->get_first_cidr;
+      print "Range Notation: ",$first,"\n";
+      print "Cidr Notation : ",$cidr,"\n";
+    }
+
+    Output:
+    Range Notation: 10.0.0.0 - 10.0.0.3
+    Cidr Notation : 10.0.0.0/30
+    Range Notation: 10.0.0.4 - 10.0.0.4
+    Cidr Notation : 10.0.0.4/32
+
+=item * if($obj->is_cidr) { do something }
+
+This function can be used to check if a range represents a single cidr.
+
+=item * if($obj->is_range) { do something }
+
+This function can be used to check if a range contains multiple cidrs.
+
+=item * my $ipv4=$obj->nth(0);
+
+Returns the nth ipv4 address in the range.  Returns undef if the ip is out of the range.
+
+Example:
+
+  my $obj=Net::IP::RangeCompare->parse_new_range('10/24');
+  my $base=$obj->nth(0);
+  my $broadcast=$obj->nth(255);
+
+  print $base,"\n";
+  print $broadcast,"\n";
+
+  Output
+  10.0.0.0
+  10.0.0.255
+
+=item * my @list=$obj->base_list_int;
+
+Returns each start address as an integer for every cidr boundry.
+
+=item * my @list=$obj->base_list_ip;
+
+Returns each start address as an ipv4 quad for every cidr boundry.
+
+=item * my @list=$obj->broadcast_list_ip;
+
+Returns each end address as an ipv4 quad for every cidr boundry.
+
+=item * my @list=$obj->broadcast_list_int;
+
+Returns each end address as an integer for every cidr boundry.
+
+=item * my @list=$obj->netmask_int_list;
+
+Returns a netmask as an integer for every cidr in this range.
+
+=item * my @list=$obj->netmask_list;
+
+Returns a netmask as an ip in quad notation for every cidr in this range.
+
+=item * my $sub=$obj->enumerate(1-32);
+
+=item * my $sub=$obj->enumerate;
+
+Returns an anonymous subroutine that can be used to iterate through the entire range.  The iterator can be used to safely walk any range even 0/0.  Each iteration of $sub returns a new Net::IP::RangeCompare object or undef on completion.
+
+The default cidr to iterate by is "32".
+
+
+Example:
+
+  my $obj=Net::IP::RangeCompare->parse_new_range('10/30');
+  my $sub=$obj->enumerate;
+  while(my $range=$sub->()) {
+    print $range,"\n"
+  }
+  Output:
+  10.0.0.0 - 10.0.0.0
+  10.0.0.1 - 10.0.0.1
+  10.0.0.2 - 10.0.0.2
+  10.0.0.3 - 10.0.0.3
+
+  $sub=$obj->enumerate(31);
+  while(my $range=$sub->()) {
+    print $range,"\n"
+  }
+  Output:
+  10.0.0.0 - 10.0.0.1
+  10.0.0.2 - 10.0.0.3
+
+=item * my $sub=$obj->enumerate_size;
+
+=item * my $sub=$obj->enumerate_size(2);
+
+Returns an anonymous subruteen that can be used to walk the current range in ingrements of x ips.  Default value is 1.
+
+Example:
+
+  my $obj=Net::IP::RangeCompare->parse_new_range( '10.0.0.0 - 10.0.0.6' );
+
+  my $sub=$obj->enumerate_size;
+
+  print "Inc by 1\n";
+  while(my $range=$sub->()) {
+    print $range,"\n";
+  }
+
+  print "Inc by 3\n";
+  $sub=$obj->enumerate_size(3);
+  while(my $range=$sub->()) {
+    print $range,"\n";
+  }
+
+  Output:
+  Inc by 1
+  10.0.0.0 - 10.0.0.1
+  10.0.0.2 - 10.0.0.3
+  10.0.0.4 - 10.0.0.5
+  10.0.0.6 - 10.0.0.6
+
+  Inc by 3
+  10.0.0.0 - 10.0.0.3
+  10.0.0.4 - 10.0.0.6
+
+=item * if($obj_a->cmp_first_int($obj_b)==0) { }
+
+This function compares the first integer of 2 Net::IP::RangeCompare objects.
+
+Returns
+
+  0  if $obj_a->first_int==$obj_b->last_int
+  -1 if $obj_a->first_int<$obj_b->first_int
+  1  if $obj_a->first_int>$obj_b->first_int
+
+=item * if($obj_a->cmp_last_int($obj_b)==0) { }
+
+This function compares the last integer of 2 Net::IP::RangeCompare objects.
+
+Returns
+
+  0  if $obj_a->last_int==$obj_b->last_int
+  -1 if $obj_a->last_int<$obj_b->last_int
+  1  if $obj_a->last_int>$obj_b->last_int
+
+=item * if($obj->contiguous_check($obj_next)) { do something }
+
+Returns true if $obj_next dirrectly follows $obj
+
+=item * my $mod=$obj->mod_first_int($x);
+
+Returns the modulus if the first integer and $x.
+
+=item * my $cmp=$obj_a->cmp_ranges($obj_b);
+
+Compares 2 Net::IP::RangeCompare objects
+
+  Returns 0 if both ranges have the same first_int and last_int
+  Returns -1 if $obj_a->first_int starts before $obj_b->first_int
+    or if $obj_a and $obj_b have the same first_int
+       and $obj_a ends before $obj_b
+  Returns 1 if $obj_a->first_int starts after $obj_b->first_int
+    or if $obj_a and $obj_b have the same first_int
+       and $obj_a ends after $obj_b
+
+=back
+
+=head2 Helper functions
+
+=over 4
+
+=item * my $integer=ip_to_int('0.0.0.0');
+
+Converts an ipv4 address to an integer usable by perl
+
+=item * my $ipv4=int_to_ip(11);
+
+Converts integers to ipv4 notation
+
+=cut
+
+=item * my $hostmask=hostmask($netmask);
+
+Given a netmask (as an integer) returns the corresponding hostmask.
+
+=item * my $int=add_one($var);
+
+Returns $var incremented by 1
+
+=item * my $int=sub_one($var);
+
+Returns $var decremented by 1
+
+=item * my $size=size_from_mask($mask);
+
+Given a netmask ( as an integer ) returns the size of the network.
+
+=item * item my $base=base_int($ip_int,$mask_int);
+
+Returns the base address of an ip as an integer given the proper mask as an integer.
+
+=item * my $broadcast=broadcast_int($ip_int,$ip_mask);
+
+Returns the broadcast address as an integer given the proper mask and ip as integers.
+
+=item * my $netmask=cidr_to_int(32);
+
+Given a cidr(0 - 32) return the netmask as an integer.
+
+=item * my $reult=cmp_int(1,2);
+
+Returns the same thing as: 1 <=> 2
+
+=item * my @sorted_quads=sort sort_quad qw(10.0.0.1 10.0.0.10);
+
+Sorts ipv4 quad strings in ascending order
+
+=item * my @sorted=sort sort_notations qw(10/24 10/22 9/8 );
+
+Sorts ip notations in ascending order.  Carp::croak is called if a ranged cannot be parsed.
+
+Example:
+
+  my @sorted=sort sort_notations qw(10/24 10/22 9/8  8-11 );
+  print join("\n",@sorted),"\n";
+
+  Output:
+
+  8-11
+  9/8
+  10/24
+  10/22
+
+=back
+
+=head2 Overlap functions
+
+This section documents the functions used to find and compute range overlaps.
+
+=over 4
+
+=item * my $obj=get_common_range([$range_a,$range_b]);
+
+Returns an Net::IP::RangeCompare object representing the smallest common overlapping range.  Returns undef if no overlapping range is found.
+
+=cut
+
+=item * my $obj=get_overlapping_range( [ $range_a,$range_b, $range_c] );
+
+Returns an Net::IP::RangeCompare object that overlaps with the provided ranges
+
+=item * my $list=grep_overlap('10/24',\@list_of_ranges);
+
+=item * my $list=grep_overlap($range,\@list_of_ranges);
+
+Returns an array refrence of ranges that overlap with this range.
+
+=item * my $list=grep_non_overlap('10/24',\@list_of_ranges);
+
+=item * my $list=grep_non_overlap($range,\@list_of_ranges);
+
+Returns an array refrence of ranges that do not overlap with this range.
+
+=back
+
+=head2 Sort Functions
+
+This section describes the order in wich each function sorts a list of Net::IP::RangeCompare objects.
+
+All functions in this section use the following syntax modle
+
+Example: 
+  my @list=sort sort_largest_last_int_first @netiprangecomapre_objects;
+
+=over 4
+
+=item * my @list=sort sort_largest_last_int_first @list;
+
+Sorts by $obj->last_int in descending order
+
+=item * my @list=sort sort_smallest_first_int_first @list;
+
+Sorts by $obj->first_int in ascending order
+
+=item * my @list=sort sort_smallest_last_int_first @list;
+
+Sorts by $obj->last_int in ascending order
+
+=item * my @list=sort sort_largest_first_int_first @list;
+
+Sorts by $obj->first_int in descending order
+
+  sort_ranges
+    Sorts by 
+      $obj->first_int in ascending order
+      or
+      $obj->last_int in descending order
+
+=back
+
+=head2 Net::IP::RangeCompare list processing functions
+
+This section covers how to use the list and list of lists processing functions that do the actual comparison work.
+
+=over 4
+
+=item * my $list_ref=consolidate_ranges( \@list_of_netiprangeobjects );
+
+Given a list reference of Net::IP::RangeCompare Objects: Returns a consolidated list reference representing the input ranges.  The list input reference is depleted during the consolidation process.  If you want to keep the original list of ranges, make a copy of the list before passing it to consolidate_ranges.
+
+Example:
+
+  my $list=[];
+  push @$list,Net::IP::RangeCompare->parse_new_range('10/32');
+  push @$list,Net::IP::RangeCompare->parse_new_range('10/32');
+  push @$list,Net::IP::RangeCompare->parse_new_range('10/30');
+  push @$list,Net::IP::RangeCompare->parse_new_range('10/24');
+  push @$list,Net::IP::RangeCompare->parse_new_range('8/24');
+
+  my $list=consolidate_ranges($list);
+
+  while(my $range=shift @$list) {
+    print $range,"\n";
+  }
+
+  OUTPUT
+  8.0.0.0 - 8.0.0.255
+  10.0.0.0 - 10.0.0.255
+
+=item * my $ranges=fill_missing_ranges( \@consolidated_list );
+
+=item * my $ranges=fill_missing_ranges( \@list, consolidate_ranges=>1 );
+
+=item * my $ranges=fill_missing_ranges( \@list, consolidate_ranges=>0 );
+
+Given a consolidated list of Net::IP::RangeCompare objects, it returns a contiguous list reference of ranges.  All ranges generated by the fill_missing_ranges are $obj->missing==true and $obj->generated==true.
+
+Optional argument(s)
+
+  consolidate_ranges=>0||1
+    Default value 1 
+      Performs a consolidate_ranges on each list
+    Disalble consolidation 0
+      Skips the consolidate_ranges call
+
+Example:
+
+  my $list=[];
+  push @$list,Net::IP::RangeCompare->parse_new_range('10/32');
+  push @$list,Net::IP::RangeCompare->parse_new_range('10/32');
+  push @$list,Net::IP::RangeCompare->parse_new_range('10/30');
+  push @$list,Net::IP::RangeCompare->parse_new_range('10/24');
+  push @$list,Net::IP::RangeCompare->parse_new_range('8/24');
+
+  $list=fill_missing_ranges($list);
+
+  while(my $range=shift @$list) {
+    print $range,"\n";
+  }
+
+  OUTPUT
+  8.0.0.0 - 8.0.0.255
+  8.0.1.0 - 9.255.255.255
+  10.0.0.0 - 10.0.0.255
+
+=item * my $list=range_start_end_fill([$list_a,$list_b]);
+
+Given a list of lists of Net::IP::RangeCompare objects returns a list of list objects with the same start and end ranges.
+
+Example:
+
+  my $list_a=[];
+  my $list_b=[];
+
+  push @$list_a,Net::IP::RangeCompare->parse_new_range('10/24');
+  push @$list_a,Net::IP::RangeCompare->parse_new_range('10/25');
+  push @$list_a,Net::IP::RangeCompare->parse_new_range('11/24');
+
+  push @$list_b,Net::IP::RangeCompare->parse_new_range('7/24');
+  push @$list_b,Net::IP::RangeCompare->parse_new_range('8/24');
+
+  #to prevent strange results always consolidate first
+  $list_a=consolidate_ranges($list_a);
+  $list_b=consolidate_ranges($list_b);
+
+  my $list_of_lists=range_start_end_fill([$list_a,$list_b]);
+  my @name=qw(a b);
+  foreach my $list (@$list_of_lists) {
+    my $name=shift @name;
+    print '$list_',$name,"\n";
+    foreach my $range (@$list) {
+        print $range,"\n";
+    }
+  }
+
+Output:
+
+  $list_a
+  7.0.0.0 - 9.255.255.255
+  10.0.0.0 - 10.0.0.255
+  11.0.0.0 - 11.0.0.255
+  $list_b
+  7.0.0.0 - 7.0.0.255
+  8.0.0.0 - 8.0.0.255
+  8.0.1.0 - 11.0.0.255
+
+
+Notes:
+
+  To prevent strange results make sure each list is 
+  consolidated first.
+
+=item * my $sub=range_compare( [ $list_a, $list_b, $list_c] );
+
+=item * my $sub=range_compare( [ $list_a, $list_b, $list_c], consolidate_ranges=>1 );
+
+=item * my $sub=range_compare( [ $list_a, $list_b, $list_c ], consolidate_ranges=>0 );
+
+Compares a list of lists of Net::IP::RangeCompare objects
+
+Optional argument(s)
+
+  consolidate_ranges=>0||1
+    Default value 1 
+      Performs a consolidate_ranges on each list
+    Disalble consolidation 0
+      Skips the consolidate_ranges call
+
+Example:
+
+  my $list_a=[];
+  my $list_b=[];
+  my $list_c=[];
+
+  push @$list_a, Net::IP::RangeCompare->parse_new_range(
+    '10.0.0.0 - 10.0.0.1'
+    );
+  push @$list_a, Net::IP::RangeCompare->parse_new_range(
+    '10.0.0.2 - 10.0.0.5'
+    );
+
+
+  push @$list_b, Net::IP::RangeCompare->parse_new_range(
+    '10.0.0.0 - 10.0.0.1'
+    );
+  push @$list_b, Net::IP::RangeCompare->parse_new_range(
+    '10.0.0.3 - 10.0.0.4'
+    );
+  push @$list_b, Net::IP::RangeCompare->parse_new_range(
+    '10.0.0.4 - 10.0.0.5'
+    );
+
+  push @$list_c, Net::IP::RangeCompare->parse_new_range(
+    '10.0.0.0 - 10.0.0.1'
+    );
+  push @$list_c, Net::IP::RangeCompare->parse_new_range(
+    '10.0.0.3 - 10.0.0.3'
+    );
+  push @$list_c, Net::IP::RangeCompare->parse_new_range(
+    '10.0.0.4 - 10.0.0.5'
+    );
+
+  my $sub=range_compare([  $list_a,$list_b,$list_c] );
+
+  while(my ($common,$range_a,$range_b,$range_c)=$sub->()) {
+    print "\nCommon Range: ",$common,"\n";
+    print 'a: ',$range_a
+      ,' '
+      ,($range_a->missing ? 'not used' : 'in use')
+      ,"\n";
+    print 'b: ',$range_b
+      ,' '
+      ,($range_b->missing ? 'not used' : 'in use')
+      ,"\n";
+    print 'c: ',$range_c
+      ,' '
+      ,($range_c->missing ? 'not used' : 'in use')
+      ,"\n";
+  }
+
+  Output:
+
+  Common Range: 10.0.0.0 - 10.0.0.1
+  a: 10.0.0.0 - 10.0.0.1 in use
+  b: 10.0.0.0 - 10.0.0.1 in use
+  c: 10.0.0.0 - 10.0.0.1 in use
+
+  Common Range: 10.0.0.2 - 10.0.0.2
+  a: 10.0.0.2 - 10.0.0.5 in use
+  b: 10.0.0.2 - 10.0.0.2 not used
+  c: 10.0.0.2 - 10.0.0.2 not used
+
+  Common Range: 10.0.0.3 - 10.0.0.3
+  a: 10.0.0.2 - 10.0.0.5 in use
+  b: 10.0.0.3 - 10.0.0.5 in use
+  c: 10.0.0.3 - 10.0.0.3 in use
+
+  Common Range: 10.0.0.4 - 10.0.0.5
+  a: 10.0.0.2 - 10.0.0.5 in use
+  b: 10.0.0.3 - 10.0.0.5 in use
+  c: 10.0.0.4 - 10.0.0.5 in use
+
+=item * my $sub=range_compare_force_cidr(\@ranges,%args);
+
+=item * my $sub=range_compare_force_cidr(\@ranges);
+
+This is just a wrapper for range_compare, that returns the common ranges on cidr boundries, along with the cidr notation.
+
+Example:
+
+  my $ranges=[
+    [
+      map { $package_name->new(@{$_}[0,1]) }
+        [0,8]
+    ]
+
+    ,[
+      map { $package_name->new(@{$_}[0,1]) }
+        [0,1]
+        ,[3,4]
+        ,[4,5]
+    ]
+
+    ,[
+      map { $package_name->new(@{$_}[0,1]) }
+        [0,1]
+        ,[3,3]
+        ,[4,5]
+    ]
+  ];
+
+  my $sub=range_compare_force_cidr($ranges);
+  while(my ($common,$cidr,@cols)=$sub->()) {
+        print $common,', ',$cidr,"\n";
+        print join(', ',@cols),"\n\n";
+        last if --$max<=0;
+        ++$count;
+  }
+
+  Output
+
+  0.0.0.0 - 0.0.0.1, 0.0.0.0/31
+  0.0.0.0 - 0.0.0.8, 0.0.0.0 - 0.0.0.1, 0.0.0.0 - 0.0.0.1
+
+  0.0.0.2 - 0.0.0.2, 0.0.0.2/32
+  0.0.0.0 - 0.0.0.8, 0.0.0.2 - 0.0.0.2, 0.0.0.2 - 0.0.0.2
+
+  0.0.0.3 - 0.0.0.3, 0.0.0.3/32
+  0.0.0.0 - 0.0.0.8, 0.0.0.3 - 0.0.0.5, 0.0.0.3 - 0.0.0.3
+
+  0.0.0.4 - 0.0.0.5, 0.0.0.4/31
+  0.0.0.0 - 0.0.0.8, 0.0.0.3 - 0.0.0.5, 0.0.0.4 - 0.0.0.5
+
+  0.0.0.6 - 0.0.0.7, 0.0.0.6/31
+  0.0.0.0 - 0.0.0.8, 0.0.0.6 - 0.0.0.8, 0.0.0.6 - 0.0.0.8
+
+  0.0.0.8 - 0.0.0.8, 0.0.0.8/32
+  0.0.0.0 - 0.0.0.8, 0.0.0.6 - 0.0.0.8, 0.0.0.6 - 0.0.0.8
+
+=item * ($row,$cols,$next,$missing)=compare_row($data,undef,undef);
+
+=item * ($row,$cols,$next,$missing)=compare_row($data,$row,$cols);
+
+This function is used to iterate over a list of consolidated Net::IP::RangeCompare Objects. see: "range_compare" for a more practical iterator method.
+
+Example:
+
+  my $ranges=[
+    [
+      map { Net::IP::RangeCompare->parse_new_range(@{$_}[0,1]) }
+        [qw(10.0.0 10.0.0.1)]
+        ,[qw(10.0.0.2 10.0.0.5)]
+    ]
+
+    ,[
+      map { Net::IP::RangeCompare->parse_new_range(@{$_}[0,1]) }
+        [qw(10.0.0.0 10.0.0.1)]
+        ,[qw(10.0.0.3 10.0.0.4)]
+        ,[qw(10.0.0.4 10.0.0.5)]
+    ]
+
+    ,[
+      map { Net::IP::RangeCompare->parse_new_range(@{$_}[0,1]) }
+        [qw(10.0.0.0 10.0.0.1)]
+        ,[qw(10.0.0.3 10.0.0.3)]
+        ,[qw(10.0.0.4 10.0.0.5)]
+    ]
+  ];
+
+  my $data=[];
+  # consolidate ranges -- prevents odd results
+  while(my $list=shift @$ranges) {
+    push @$data,consolidate_ranges($list);
+  }
+  my ($row,$cols,$next);
+  while(1) {
+    ($row,$cols,$next)=compare_row($data,$row,$cols);
+    print join(', ',@$row),"\n";
+    last unless $next;
+  }
+  OUTPUT:
+  10.0.0.0 - 10.0.0.1, 10.0.0.0 - 10.0.0.1, 10.0.0.0 - 10.0.0.1
+  10.0.0.2 - 10.0.0.5, 10.0.0.2 - 10.0.0.2, 10.0.0.2 - 10.0.0.2
+  10.0.0.2 - 10.0.0.5, 10.0.0.3 - 10.0.0.5, 10.0.0.3 - 10.0.0.3
+  10.0.0.2 - 10.0.0.5, 10.0.0.3 - 10.0.0.5, 10.0.0.4 - 10.0.0.5
+
+=back
+
+=cut
+
+############################################
+#
+# End of the package
+1;
+
+############################################
+#
+# Helper package
+
+=head1 Net::IP::RangeCompare::Simple
+
+Helper Class that wraps the features of Net::IP::RangeCompare into a single easy to use OO instance.
+
+=over 4
+
+=cut
+
+=item * my $obj=Net::IP::RangeCompare::Simple->new;
+
+Creates new instance of Net::IP::RangeCompare::Simple->new;
+
+=item * $obj->add_range(key,range);
+
+Adds a new "range" to the "key". The command will croak if the key is undef or the range cannot be parsed.
+
+Example:
+
+  $obj->add_range('Tom','10.0.0.2 - 10.0.0.11');
+
+=item * my $list_ref=$obj->get_ranges_by_key(key);
+
+Given a key, return the list reference.  Returns undef if the key does not exist. Carp::croak is called if the key is undef.
+
+=item * $obj->compare_ranges;
+
+=item * $obj->compare_ranges(key,key,key);
+
+Used to initialize or re-initialize the compare process. When called with a key or a list of keys: The compare process excludes those columns.
+
+Example:
+
+  Given ranges from: Tom, Sally, Harry, Bob
+
+  $obj->compare_ranges(qw(Bob Sally));
+
+  The resulting %row from $obj->get_row would only contain keys 
+  for Tom and Harry.
+
+Notes:
+  If %row would be empty during $obj->get_row function call will 
+  croak.
+
+=item * while(my ($common,%row)=$obj->get_row) { do something }
+
+Returns the current row of the compare process.
+
+  $common
+    Represents the common range between all of the
+    source ranges in the current row.
+
+  %row
+    Represents the consolidated range from the 
+    relative source "key".
+
+Notes:
+
+  This function will croak if no ranges have been
+  added to the Net::IP::RangeCompare::Simple object.
+
+=item * my @keys=$s->get_keys;
+
+Returns the list of keys in this instance.
+
+=cut
+
+=back
+
+=head1 DEPENDENCIES
+
+Intersection computations are handled by: L<Data::Range::Compare> 
+
+IPV4 computations are handled by: L<Data::IPV4::Range::Parse>
+
+=head1 Source Forge Project
+
+If you find this software useful and wish to donate please see the project website.
+
+L<Net IP Range Compare|https://sourceforge.net/projects/netiprangecompa/>
+
+=head1 AUTHOR
+
+Michael Shipper 
+
+=head1 COPYRIGHT
+
+Copyright 2010 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Carp Data::IPV4::Range::Parse Data::Range::Compare
+
+=cut
+

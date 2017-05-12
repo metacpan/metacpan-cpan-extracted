@@ -1,0 +1,120 @@
+NAME
+    Net::Statsd::Server::Changes - Change history for Net::Statsd::Server
+
+  Changes in Net::Statsd::Server 0.19   26th February 2015
+      Just an update to the Changes file that was missed in 0.18.
+      0.18 and 0.19 are 100% the same release, except a Changes file.
+     
+  Changes in Net::Statsd::Server 0.18   26th February 2015
+      Fixed (removing it) useless and potentially problematic send call
+        towards clients. It was sending a timestamp. Statsd server shouldn't
+        even attempt to send anything back to clients.
+
+  Changes in Net::Statsd::Server 0.16    6th May 2014
+      Implemented new timer attributes: count_ps, median, sum_squares.
+
+      Release of 0.15 never happened.
+
+  Changes in Net::Statsd::Server 0.14   25th April 2014
+      Fixed problem with gauges that were erroneously deleted either
+        when deleteIdleStats was false, or deleteIdleStats was true
+        but deleteGauges was false.
+
+  Changes in Net::Statsd::Server 0.13   26th January 2014
+      Added support for Perl 5.8, so now Net::Statsd::Server should
+        in theory work on 5.8 too, thanks to RJBS for the related patch.
+        RJBS also reported N::S::S to work on Solaris.
+
+      Fixed RT#85165, now the code is indicated as Perl_5 licence.
+        Problem there was my failed understanding of the interaction
+        between hardcoded Makefile.PL and dzil.
+
+  Changes in Net::Statsd::Server 0.12  16th December 2013
+      Fixed (hopefully) problems reported by CPAN testers:
+        * Failing to setsockopt(SO_RCVBUF) is no more a fatal exception.
+          We will just continue and emit a warning instead.
+        * Some CPAN testers appear to have a running graphite on their
+          systems, so use a not so common port instead of 2003.
+
+  Changes in Net::Statsd::Server 0.11  13th December 2013
+      Added implementation for the following configuration directives:
+        deleteIdleStats, deleteGauges, deleteSets, prefixStats.
+        Both deleteTimers and deleteCounters were supposed to work
+        before 0.11 too.
+
+      Improved documentation. Should be clear now how to know what
+        options are actually supported and what options are not.
+
+      Improved integration tests. Now it's even easier to run
+        Net::Statsd::Server integration tests against the nodejs
+        version of statsd to verify full compatibility.
+
+  Changes in Net::Statsd::Server 0.10  10th February 2013
+      Fixed SO_RCVBUF on Mac OS X, where it's apparently not possible
+        to set SO_RCVBUF to more than 8Mb. If you're on OSX, I'd
+        like to get more reports about this.
+
+      Fixed integration test suite so that it always runs with the
+        correct interpreter ($^X) instead of /usr/bin/perl.
+        This should fix lots of CPAN testers failure reports.
+
+      Improved internal trim() function.
+
+  Changes in Net::Statsd::Server 0.09   29th January 2013
+      Fixed a few more nodejs-statsd compatibility bugs:
+        - non-legacy namespace code added a repeated 'stats.' level
+          that shouldn't be there
+        - underscode character ('_') is now correctly allowed as
+          part of a statsd metric.
+
+      Added an integration test suite, to verify end-to-end that
+        statsd server is behaving exactly as the nodejs version.
+        Being as near to 100% compatibility as possible has been
+        one of the main goals from the start.
+
+  Changes in Net::Statsd::Server 0.08   27th January 2013
+      Fixed CPAN testers failures reported for inexact floating point
+        comparison when testing standard deviation of timer results
+        in the test suite.
+
+  Changes in Net::Statsd::Server 0.07   23rd January 2013
+      Started converting the nodejs statsd test suite to TAP
+        test cases. Completed the conversion of the metrics processing
+        test cases. This uncovered two subtle bugs in the metrics class.
+
+      Fixed bug in calculation of percentile values threshold, due
+        to a difference in how Javascript's Math.round() and
+        Perl's int() work.
+
+      Fixed undefined value warning in the metrics processing during
+        the calculation of cumulative values for timers, due to
+        an off-by-one error.
+
+  Changes in Net::Statsd::Server 0.06   17th January 2013
+      Added new File backend.
+        It allows to flush all aggregated stats to a given log file.
+
+      Added keyFlush implementation.
+        Allows to have the top n% (keyFlush.percent) dumped to a
+        log file (keyFlush.log) or stdout every y seconds
+        (keyFlush.interval).
+
+  Changes in Net::Statsd::Server 0.05   16th January 2013
+      Improved UDP socket default settings to perform better.
+        In my tests, Net::Statsd::Server manages to successfully capture
+        almost twice the amount of UDP traffic (otherwise lost) than
+        the original node.js based statsd, with SO_RCVBUF = 8Mb.
+        I still have to experiment a bit more with this setting though.
+
+  Changes in Net::Statsd::Server 0.04   15th January 2013
+      Fixed statistics flush. When a flush is triggered, stats have
+        to be cleared. The flush code wasn't doing this previously.
+
+      Fixed management commands (:8126) to output correct JSON data
+        structures.
+
+      This is the first fully functional statsd server release.
+
+  Net::Statsd::Server 0.01 - 0.03            January 2013
+      First release on an unsuspecting world.
+

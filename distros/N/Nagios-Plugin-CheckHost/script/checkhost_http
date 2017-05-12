@@ -1,0 +1,4 @@
+#!/usr/bin/env perl
+
+use Nagios::Plugin::CheckHost::HTTP;
+Nagios::Plugin::CheckHost::HTTP->new->run;

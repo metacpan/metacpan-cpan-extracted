@@ -1,0 +1,177 @@
+0.22     2016-08-21
+
+- Added a Net::Works::Network->is_single_address method. This returns true if
+  the network contains just one single address. Requested byAlexander
+  Hartmaier. GH #17.
+
+
+0.21     2015-04-30
+
+- `new_from_integer` will now accept a `Math::BigInt` in addition to a
+  `Math::UInt128` or a standard Perl integer.
+
+
+0.20     2014-10-16
+
+- Added numeric & string comparison overloading to Net::Works::Network.
+
+- Added string comparison overloading to Net::Works::Address.
+
+
+0.19     2014-08-27
+
+- Fixed validation when a string with more than one slash (/) is passed to
+  Net::Works::Network->new_from_string.
+
+
+0.18     2014-07-08
+
+- Fixed warnings that would happen when trying to validate some bad data. This
+  could happen if you passed a string with no slash (/) to
+  Net::Works::Network->new_from_string.
+
+- Make all errors call Carp::confess instead of die for consistency.
+
+
+0.17     2014-07-03
+
+- The mask_length attribute (and related methods) in Net::Works::Network has
+  been renamed to prefix_length, which is more correct and consistent with the
+  terminology used for IPv6. The old names (and methods) are still available,
+  but will probably start warning in a future release. Fixes GH #8.
+
+- Require namespace::autoclean 0.16+ so our classes are not inflated from Moo
+  to Moose classes. Fixes GH #6.
+
+
+0.16     2013-12-25
+
+- The last address in the ::0/0 network was being returned as ::0 instead of
+  ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff.
+
+- The IPv6 address ::0 is now always stringified as "::0", not "::". However,
+  either will be parsed correctly when giving an address as a string to a
+  constructor.
+
+
+0.15     2013-12-23
+
+- If you passed a Math::Int128 number to Net::Works::Network->new_from_integer
+  and specified the ip version as 4, the object would still stringify as IPv6.
+
+
+0.14     2013-12-17
+
+- Docs were changed to only use IPv4 and IPv6 addresses from the documentation
+  address space in the docs. (Alexander Hartmaier)
+
+- Net::Works::Network objects now overload stringification. (Alexander
+  Hartmaier)
+
+- Added more reserved IPv4 and IPv6 networks to be removed from a given IP
+  range and included a list of all such networks in the docs.
+
+
+0.13     2013-08-22
+
+- Added two new Net::Works::Network methods: $network->contains() and
+  $network->split().
+
+
+0.12     2013-07-10
+
+- Converted to use Moo instead of Moose.
+
+- Switched bugtracker to GitHub.
+
+
+0.11     2013-06-24
+
+- Added $network->first_as_integer() and ->last_as_integer() methods. This is
+  an optimization so you don't have to write
+  $network->first()->as_integer(). Internally, the latter just turns an
+  integer into a Net::Works::Address object that you then get the same integer
+  out of.
+
+
+0.10     2013-06-20
+
+- The Net::Works::Network->range_as_subnets() method now takes a version
+  parameter so you can explicitly ask for IPv4 or IPv6.
+
+- Also fixed the license in the docs to match the LICENSE file in the repo
+  (same as Perl 5).
+
+
+0.09     2013-02-06
+
+- Documentation fixes
+
+
+0.08     2013-02-04
+
+- Fixed type constraints so they inline.
+
+
+0.07     2012-12-11
+
+- Removed all use of Data::Validate::IP and NetAddr::IP::Util.
+
+- Validate all data passed to the constructor.
+
+
+0.06     2012-12-07
+
+- Require Socket 1.99+. This fixes test failures with old version of Socket
+  that don't provide inet_ntop or inet_pton.
+
+
+0.05     2012-12-07
+
+- More internals rewrites for the sake of speed. We now use Math::Int128
+  instead of Math::BigInt. The former is way faster.
+
+- Net::Works::Network now has two constructors, new_from_string() and
+  new_from_integer(), just like Net::Works::Address. The new() method should
+  no longer be used.
+
+
+0.04     2012-12-04
+
+- Speed improvements for Net::Works::Network->range_as_subnets(). For most use
+  cases this won't matter but for our use at MaxMind we end up calling this a
+  lot so making it faster is a big win.
+
+
+0.03     2012-12-04
+
+- Work around a bug in Data::Validate::IP's is_ipv6 sub. It doesn't think '::'
+  is a valid IPv6 address. If you created a Net::Works::Network object with
+  this address it would treat it as an IPv4 address unless you explicitly
+  specified the version.
+
+
+0.02     2012-12-03
+
+- All changes in this release come from Greg Oschwald.
+
+- Major internals rewrite to speed things up. We no longer wrap NetAddr::IP
+  objects (but we do use NetAddr::IP::Util).
+
+- Net::Works::Network->mask_length() now returns the mask as passed to the
+  constructor, not the number of bits in the mask. The ->bits method returns
+  the number of bits in the mask (32 or 128).
+
+- The Network->netmask_as_integer() method no longer exists (use mask_length()
+  instead). The ->max_netmask_as_integer() method has been renamed to
+  ->max_mask_length().
+
+- Added Net::Works::Address->mask_length() and ->bits() (which always return
+  the same thing).
+
+- We use Socket::inet_ntop to stringify addresses.
+
+
+0.01     2012-11-28
+
+- First release upon an unsuspecting world.

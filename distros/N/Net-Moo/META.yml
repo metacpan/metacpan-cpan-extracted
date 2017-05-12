@@ -1,0 +1,36 @@
+---
+name: Net-Moo
+version: 0.11
+author:
+  - 'Aaron Straup Cope E<lt>ascope@cpan.orgE<gt>'
+abstract: OOP wrapper for the Moo.com API
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Config::Simple: 0
+  IO::String: 0
+  LWP::UserAgent: 0
+  Log::Dispatch: '>= 2.10'
+  XML::Writer: 0
+  XML::XPath: '>= 1.13'
+  perl: '>= 5.8.0'
+build_requires:
+  Digest::MD5: 0
+  Test::Simple: '>= 0.47'
+provides:
+  Net::Moo:
+    file: lib/Net/Moo.pm
+    version: 0.11
+  Net::Moo::Document:
+    file: lib/Net/Moo/Document.pm
+    version: 0.11
+  Net::Moo::Validate:
+    file: lib/Net/Moo/Validate.pm
+    version: 0.11
+  Net::Moo::Validator:
+    file: lib/Net/Moo/Validate.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

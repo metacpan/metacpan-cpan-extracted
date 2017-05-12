@@ -1,0 +1,36 @@
+Revision history for Perl extension NKTI::general.
+
+0.01  Thu Sep 15 02:18:51 2016
+	- original version; created by h2xs 1.23 with options
+		-AX -n NKTI::general
+
+0.09  Sun Apr 23 01:01:23 2017
+    - fix module NKTI::general::dbconnect
+
+0.10  Tue Apr 25 03:32:25 2017
+    - fix subroutine "based_length" in module NKTI::general::char::split
+    - add subroutine "cetak_pre" in module NKTI::general
+    - change name subroutine "get_dbconfig" to "get_dbconfig_php" in Module NKTI::general
+    - Remove module NKTI::general::connection::mysql and module NKTI::general::connection::sqlite
+      because same in module NKTI::general::dbconnect
+
+0.11  Tue Apr 25 16:04:53 2017
+    - fix subroutine "based_length" in module NKTI::general::char::split
+    - add subroutine "cetak_pre" in module NKTI::general
+    - change name subroutine "get_dbconfig" to "get_dbconfig_php" in Module NKTI::general
+    - Remove module NKTI::general::connection::mysql and module NKTI::general::connection::sqlite
+      because same in module NKTI::general::dbconnect
+    - Revision POD NKTI::general::dbconnect.
+
+0.12  Sun Apr 30 17:10:24 2017
+    - Revision POD NKTI::general::char::split
+    - Revision POD NKTI::general::dbconnect.
+    - Revision POD NKTI::general
+    - Fix several subroutine in NKTI::general.
+
+0.13  Fri May 05 07:46:20 2017
+    - Revision POD NKTI::general::char::split
+    - Revision POD NKTI::general::dbconnect.
+    - Revision POD NKTI::general
+    - Fix several subroutine in NKTI::general.
+    - Fix PDO NKTI::general

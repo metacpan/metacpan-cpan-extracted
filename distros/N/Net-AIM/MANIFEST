@@ -1,0 +1,9 @@
+AIM.pm
+AIM/Connection.pm
+AIM/Event.pm
+MANIFEST
+Makefile.PL
+PROTOCOL
+README
+TODO
+aimtest

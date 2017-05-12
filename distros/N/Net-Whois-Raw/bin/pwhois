@@ -1,0 +1,297 @@
+#!/usr/bin/env perl
+
+# PODNAME: phwois
+# ABSTRACT: Get Whois information of domains and IP addresses.
+
+use strict;
+use warnings;
+use Net::Whois::Raw;
+use Getopt::Long;
+use Encode;
+use Net::IDN::Punycode qw( :all );
+use utf8;
+
+my $help;
+my $do_strip;
+my $do_strip_more;
+my $do_checkfail;
+my $do_checkfail_more;
+my $debug = 0;
+my $timeout = 10;
+my $enable_caching;
+my @source_addresses;
+my $return_first;
+my $return_last;
+my $return_all;
+
+Getopt::Long::Configure( 'bundling', 'no_ignore_case' );
+
+GetOptions(
+    'help|h'           => \$help,
+    'strip|s'          => \$do_strip,
+    'checkfail|c'      => \$do_checkfail,
+    'debug|d+'         => \$debug,
+    'timeout|T=i'      => \$timeout,
+    'enable_caching|t' => \$enable_caching,
+    'src_addr|a=s@'    => \@source_addresses,
+    'return_first|F'   => \$return_first,
+    'return_last|L'    => \$return_last,
+    'return_all|A'     => \$return_all,
+) or die;
+
+if ($help || !@ARGV) {
+    print <<EOM;
+Usage:	$0 [ -s ] [ -c ] [ -d ] [ -T <timeout> ] [ -a <src_ip> ] [ -t ] [ -F | -L | -A ] <domain> [ <server> ]
+
+Switches:
+-s	attempt to strip the copyright message or disclaimer.
+-c	attempts to return an empty answer for failed searches.
+-T	set timeout for connection attempts
+-t	enables caching.
+-a	specify an ip address that should be used as source address
+-d	enables debugging messages.
+-F	returns results of the first query of recursive whois requests
+-L	returns results of the last query of recursive whois requests (the default)
+-A	returns results of the all queries of recursive whois requests
+EOM
+    exit;
+}
+
+$Net::Whois::Raw::DEBUG      = $debug;
+$Net::Whois::Raw::OMIT_MSG   = $do_strip     ? 1 : 0;
+$Net::Whois::Raw::CHECK_FAIL = $do_checkfail ? 1 : 0;
+$Net::Whois::Raw::TIMEOUT    = $timeout;
+@Net::Whois::Raw::SRC_IPS    = @source_addresses if @source_addresses;
+
+if ($enable_caching) {
+    if ($^O eq 'MSWin32') {
+        $Net::Whois::Raw::CACHE_DIR = $ENV{TEMP} || "C:\\temp";
+    }
+    else {
+        $Net::Whois::Raw::CACHE_DIR = $ENV{TMPDIR} || '/tmp';
+    }
+}
+else {
+    $Net::Whois::Raw::CACHE_DIR = undef;
+}
+
+my ( $input_cp, $output_cp ) = detect_encodings();
+
+my $dom = $ARGV[0];
+my $server = $ARGV[1];
+
+$dom = prepare_domain($dom, $input_cp);
+
+unless (validate_domain($dom)) {
+    print encode_output("\nIncorrect domain name:\n$dom\n", $output_cp);
+    exit -1;
+}
+
+$dom = to_punycode($dom);
+
+eval {
+    my ($result, $result_server);
+    my $which_whois =
+        $return_first ? 'QRY_FIRST' :
+        $return_all   ? 'QRY_ALL'   :
+        $return_last  ? 'QRY_LAST'  : '' ;
+
+    ($result, $result_server) =
+        Net::Whois::Raw::get_whois( $dom, $server, $which_whois );
+
+    if ($result and ref $result eq 'ARRAY') {
+        make_output($_->{text}, $_->{srv}, $output_cp) for @{$result};
+    }
+    elsif ($result) {
+        make_output($result, $result_server, $output_cp);
+    }
+    else {
+        print STDERR "Failed.\n";
+    }
+};
+
+if ($@) {
+    my $err = $@;
+
+    $err =~ s/\s+at \S+ line \d+\.$//;
+    print "\nWhois information could not be fetched:\n$err\n";
+    exit -1;
+}
+
+# Prepare and print output
+sub make_output {
+    my ($result, $server, $cp) = @_;
+
+    $result = encode_output( $result, $cp );
+
+    print "[$server]\n";
+    print $result, "\n";
+}
+
+# Encode output
+sub encode_output {
+    my ( $output, $cp ) = @_;
+
+    if ( $cp =~ /utf\-?8/ ) {
+        $output = encode_utf8( $output );
+    }
+    else {
+        $output = encode( $cp, $output );
+    }
+
+    return $output;
+}
+
+# Detect terminal input and output encodings
+sub detect_encodings {
+    my ( $input_cp, $output_cp );
+
+    if ( $^O =~ /Win/ ) {
+        # Read encoding from registry
+        require Win32API::Registry;
+        Win32API::Registry->import( qw( :ALL ) );
+
+        my ( $key, $type, $data );
+        RegOpenKeyEx( HKEY_LOCAL_MACHINE(), 'SYSTEM\\CurrentControlSet\\Control\\Nls\\CodePage', 0, KEY_READ(), $key )
+            or die "Can't read system encodings from registry: ".regLastError();
+        RegQueryValueEx( $key, 'ACP', [], $type, $data, [] )
+            or die "Can't read system encodings from registry: ".regLastError();
+        $input_cp = 'cp'.$data;
+        RegQueryValueEx( $key, 'OEMCP', [], $type, $data, [] )
+            or die "Can't read system encodings from registry: ".regLastError();
+        $output_cp = 'cp'.$data;
+    } else {
+        # Read encoding from environment
+        my $cp = $ENV{LANG};
+        if ( $cp ) {
+            $cp =~ s/^[a-z]{2}_[A-Z]{2}[.]//;
+        }
+        else {
+            $cp = 'utf-8';
+        }
+
+        $input_cp = $output_cp = lc $cp;
+    }
+
+    return $input_cp, $output_cp;
+}
+
+# Prepare domain name
+sub prepare_domain {
+    my ($dom, $input_cp) = @_;
+
+    # Decode command-line input
+    $dom = decode($input_cp, $dom);
+
+    # Lowercase latin and cyrillic characters
+    $dom =~ tr/A-ZА-ЯЁ\xAA\xA5\xB2\xAF/a-zа-яё\xBA\xB4\xB3\xBF/;
+
+    return $dom;
+}
+
+# Decode domain name to punycode if needed
+sub to_punycode {
+    my ($dom) = @_;
+
+    unless ($dom =~ /^[a-z0-9.\-]*$/) {
+        # Convert to Punycode
+        my @parts;
+        foreach my $part (split /\./, $dom) {
+            $part = 'xn--'.Net::IDN::Punycode::encode_punycode( $part )
+                unless $part =~ /^[a-z0-9.-]*$/;
+            push @parts, $part;
+        }
+        $dom = join('.', @parts);
+    }
+
+    return $dom;
+}
+
+# Validate domain name
+sub validate_domain {
+    my ($dom) = @_;
+
+    return 0 unless $dom;
+
+    $dom =~ /(.+?)\.([^.]+)$/;
+    my ($name, $tld) = ($1, $2);
+
+    # query with tld only
+    return 1 unless $name;
+
+    return 0 if $name =~ /^-/;
+    return 0 if $name =~ /-$/;
+    return 0 if $name =~ /^..--/ && $dom !~ /^xn--/;
+
+    # Only latin and cyrillic characters allowed now
+    # return 0 if $dom =~ m/[^-a-z0-9\.ёа-я\xAA\xBA\xB4\xB2\xB3\xAF\xBF\xA1\xA2]/;
+
+    return 1;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+phwois - Get Whois information of domains and IP addresses.
+
+=head1 VERSION
+
+version 2.99006
+
+=head1 SYNOPSIS
+
+	pwhois perl.com
+	pwhois gnu.org
+	pwhois -s police.co.il
+	pwhois -c there.is.no.tld.called.foobar
+	pwhois yahoo.com whois.networksolutions.com
+	pwhois -T 10 funet.fi
+
+etc etc.....
+
+=head1 DESCRIPTION
+
+Just invoke with a domain name, optionally with a whois server name.
+Switches:
+    B<-s> attempt to strip the copyright message or disclaimer.
+    B<-c> attempts to return an empty answer for failed searches.
+    B<-e> forces die if connection rate to server have been exceeded.
+    B<-T> set timeout for connection attempts
+    B<-t> enables caching.
+    B<-a> specify an ip address that should be used as source address
+    B<-d> enables debugging messages.
+    B<-F> returns results of the first query of recursive whois requests
+    B<-L> returns results of the last query of recursive whois requests (the default)
+    B<-A> returns results of the all queries of recursive whois requests
+
+=head1 NAME
+
+pwhois   - Perl written whois client
+
+=head1 AUTHORS
+
+Ariel Brosh B<schop@cpan.org>
+
+Current Maintainer: Walery Studennikov B<despair@cpan.org>
+
+=head1 SEE ALSO
+
+L<Net::Whois::Raw>.
+
+=head1 AUTHOR
+
+Alexander Nalobin <alexander@nalobin.ru>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2002-2017 by Alexander Nalobin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

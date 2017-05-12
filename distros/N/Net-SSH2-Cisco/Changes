@@ -1,0 +1,18 @@
+Revision history for Perl extension Net::SSH2::Cisco.
+
+0.03  Mon Oct 10 15:33:04 2016
+    - Fix ignore_warnings parameter and added warnings() sub.  Seems this 
+      was missing in Net::Telnet::Cisco so wasn't ported.  Thanks to 
+      Joe Knecht for both discovering the issue and testing the fix.
+    - Fix Timeout option deprecated in Net::SSH2 connect() method after 
+      version 0.58.
+    - Fix version compare for Socket module (for IPv6) with 'use version'.
+    - Fix some POD spelling.
+
+0.02  Fri Mar 11 13:33:33 2016
+    - updated send_wakeup to actually work with 'noflush' argument
+
+0.01  Tue Jun 30 19:33:38 2015
+    - original version; created by h2xs 1.23 with options
+        -v 0.01 -XAn Net::SSH2::Cisco
+

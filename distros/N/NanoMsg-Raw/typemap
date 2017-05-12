@@ -1,0 +1,26 @@
+perl_nn_int  T_PERL_NN_INT
+perl_nn_int_bool  T_PERL_NN_INT_BOOL
+perl_nn_messagebuf  T_PERL_NN_MESSAGEBUF
+
+OUTPUT
+
+T_PERL_NN_INT
+  if ($var < 0)
+    PERL_NN_SET_ERRNO;
+  else
+    sv_setiv($arg, (IV)$var);
+
+T_PERL_NN_INT_BOOL
+  if ($var < 0)
+    PERL_NN_SET_ERRNO;
+  else
+    $arg = &PL_sv_yes;
+
+T_PERL_NN_MESSAGEBUF
+  if ($var == NULL)
+    PERL_NN_SET_ERRNO;
+  else {
+    struct perl_nn_message *msg = perl_nn_upgrade_to_message(aTHX_ $arg);
+    msg->buf = $var;
+    msg->len = size;
+  }

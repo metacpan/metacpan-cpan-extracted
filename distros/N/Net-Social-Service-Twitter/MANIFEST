@@ -1,0 +1,7 @@
+Build.PL
+lib/Net/Social/Service/Twitter.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/00use.t
+Makefile.PL
+META.yml

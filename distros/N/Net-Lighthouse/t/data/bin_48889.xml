@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ticket-bin>
+  <default type="boolean" nil="true"/>
+  <id type="integer">48889</id>
+  <name>Open tickets</name>
+  <position type="integer">1</position>
+  <project-id type="integer">35918</project-id>
+  <query>state:open</query>
+  <shared type="boolean">true</shared>
+  <tickets-count type="integer">2</tickets-count>
+  <updated-at type="datetime">2009-08-21T10:02:21Z</updated-at>
+  <user-id type="integer">67166</user-id>
+</ticket-bin>

@@ -1,0 +1,24 @@
+---
+abstract: 'asynchronous http client for nginx-perl'
+author:
+  - 'Alexandr Gomoliako <zzz@zzz.org.ua>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Nginx-HTTP
+no_index:
+  directory:
+    - t
+    - inc
+    - eg
+requires:
+  HTTP::Parser2::XS: 0
+  Nginx::Perl: v1.1.13.1
+version: 0.04

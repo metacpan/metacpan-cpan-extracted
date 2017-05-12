@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2ab899e0ff8042a759d11aaa32963e3c12dac5dd MANIFEST
+SHA1 695c6046adb3acb694a9567cca99e257da8b4367 META.yml
+SHA1 df4da205900041602e843fe6c22f7bfb2f3ab440 Makefile.PL
+SHA1 0838dc3cc65ed7009cf70cf4e2fe606ee7bc15fa README
+SHA1 0812583aebc10909ea7855ac122a0ef32dae119c examples/download-accelerator.pl
+SHA1 a82be17b978859f3c961731501d15b658d494d96 examples/irssi-cpan-search.pl
+SHA1 7c9a3364262b38593c356e82854af2135dc7feac inc/Test/HTTP/Server.pm
+SHA1 61a6bf70998f87ea15698f6cb6d4d79c93a7d280 lib/Net/Curl/Simple.pm
+SHA1 905954908d33af8009c7dd0c12b00ae76024f83a lib/Net/Curl/Simple/Async.pm
+SHA1 69047ec32018f93342e4a33b3f57ab3ce98533a1 lib/Net/Curl/Simple/Async/AnyEvent.pm
+SHA1 875a7a460262fee84ab469f04f6a89e4ea062e5e lib/Net/Curl/Simple/Async/CoroEV.pm
+SHA1 1d215c49dc5d7cc2aa056dec652cd1b48b1a73f9 lib/Net/Curl/Simple/Async/EV.pm
+SHA1 ce897ddc2a6f725e3cb4f47f5df468f7b50d556f lib/Net/Curl/Simple/Async/Irssi.pm
+SHA1 8198638b3dd2a8f1a48e38a1ffb8fbbf78792c0c lib/Net/Curl/Simple/Async/POE.pm
+SHA1 e3cebb5bd6cfc9b89e82a66f3a745de1dedeccfe lib/Net/Curl/Simple/Async/Select.pm
+SHA1 634bd74b63cd2a1dd1c0089fb91848f5014ffdeb lib/Net/Curl/Simple/Form.pm
+SHA1 3424b5f10aa8654bf9648be107c68537ea090d01 lib/Net/Curl/Simple/UserAgent.pm
+SHA1 20a31b70274d832c4d623dd268ed638e4a1b6f78 lib/Net/Curl/Simple/examples.pod
+SHA1 564031d91f3a4ca8a7849b363d19559d91ed975f t/01-use.t
+SHA1 576a9640d35a0d888c9aefadb8e62683d364e435 t/02-version.t
+SHA1 61acc299c61f584020e7f50e902a3c91efc1352d t/10-simple.t
+SHA1 eaf2b42731c6a28152bf8796b763bb8a4baddf51 t/20-async-perl.t
+SHA1 03b3d2bd4e099d1d00c472c13607beff8fa1b02c t/21-async-anyevent.t
+SHA1 fdcd95bc6ed056c61338c99ef911769e3b5ff4d7 t/22-async-poe.t
+SHA1 f2160a1d8062eaecfb45f0d6b2a2e3d8c26cbe68 t/23-async-ev.t
+SHA1 b91f518dc6aa3e03da2b9881a7c3118de1f67d77 t/24-async-any.t
+SHA1 709193ab155263326c0d8788a2cfaf9e2564774a t/30-useragent-simple.t
+SHA1 130dc949578f3d7d5e2e4f63a3dc8902c33af1e8 t/40-coro-any.t
+SHA1 449917dff586b6e2f2fa0884a74d314c328755e7 t/41-coro-ev.t
+SHA1 db5820071dcaa9b7d4051359bb60e4608a6c1513 t/42-coro-anyevent.t
+SHA1 8c295091fc1cae9bfab444f5fdaffa421aebf2ae t/43-coro-select.t
+SHA1 d34a47051f6de7202fa81b057bf8b21e1ef46d5e t/90-pod.t
+SHA1 706b6f7091b7aac0a0364378ac3b379d7a1317df t/91-pod-coverage.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk3QONIACgkQdltEc8aiybm3xwCeMqhe5Wo1fQfPTI61YrqACorq
+xhoAoIzAjp0Vu0feY8uPBU/ZwOtByYae
+=5PUj
+-----END PGP SIGNATURE-----

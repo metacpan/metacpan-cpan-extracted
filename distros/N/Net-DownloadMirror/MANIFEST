@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-DownloadMirror.t
+lib/Net/DownloadMirror.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+
+
+

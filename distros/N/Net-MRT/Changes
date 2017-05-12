@@ -1,0 +1,71 @@
+Revision history for Perl extension Net::MRT.
+
+2014-01-14 0.04 MaxiM Basunov <maxim.basunov@gmail.com>
+    Improvements:
+        - NLRI fully decoded when MP_REACH_MLRI contain data in RFC4760 format
+
+    Bugfixes:
+        - Fixed case of multiple IPv6 addresses in MP_REACH_NLRI (RFC4760)
+
+2013-04-04 0.0303 MaxiM Basunov <mbasunov@noction.com>
+    Bugfixes:
+        - Now, refer to $Net::MRT::USE_RFC4760 on how MP_REACH_NLRI will be
+          decoded (as per RFC4760, RFC6396 or do not decode).
+
+2013-03-25 0.0302 MaxiM Basunov <maxim.basunov@gmail.com>
+    Bugfixes:
+        - Resolved bug with NEXT_HOP & AS_PATH kept between entries (collecting
+          all AS-Path and NEXT_HOP entries into first route entry)
+
+2013-02-14 0.0301 MaxiM Basunov <maxim.basunov@gmail.com>
+    Improvements:
+        - All sourcecode changed to UNIX file format
+
+    Bugfixes:
+        - Resolved bug with orig_time decode as signed integer
+
+2013-02-09 0.03 MaxiM Basunov <maxim.basunov@gmail.com>
+    Improvements:
+        - Decoding of BGP attributes:
+          * 7   AGGREGATOR
+          * 8   COMMUNITY
+          * 14  MP_REACH_NLRI (MRT-specific)
+        - Helper array to decode BGP ORIGIN Net::MRT::BGP_ORIGIN
+        - NEXT_HOP changed to array due to MP_REACH_NLRI
+        - Internal checks against buffer underflow
+        - Decoding PEER_INDEX_TABLE (type=13 subtype=1)
+
+    Bugfixes:
+        - originated_time changed to signed int (rfc6396)
+
+2013-02-07 0.0201 MaxiM Basunov <maxim.basunov@gmail.com>
+    Improvements:
+        - Adding Test::Deep to TEST_REQUIRES
+
+2013-02-07 0.02 MaxiM Basunov <maxim.basunov@gmail.com>
+    Improvements:
+        - Check for proper PerlIO via PerlIO_tell
+        - More functional tests for type=13
+
+    Bugfixes:
+        - Fixed memory leak on reference count
+        - Removed ntohl on NEXT_HOP attribute
+
+2013-02-03 0.01 MaxiM Basunov <maxim.basunov@gmail.com>
+    New features:
+        - Introducing module Net::MRT
+        - Decoding type MT_TABLE_DUMP (13) subtypes RIB_IPV4_UNICAST (2)
+          & RIB_IPV6_UNICAST (4)
+        - Decoding BGP attributes:
+          * 1	ORIGIN
+          * 2	AS_PATH (AS_SEQUENCE/AS_SET; MRT-specific)
+          * 3	NEXT_HOP (IPv4)
+          * 4	MULTI_EXIT_DISC
+          * 5	LOCAL_PREF
+          * 6	ATOMIC_AGGREGATE
+
+    Improvements:
+        - Huge improvements in brain.sys
+
+    Bugfixes:
+        - Fixed /dev/hands

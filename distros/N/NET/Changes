@@ -1,0 +1,9 @@
+Revision history for Perl extension NET::IPFilterSimple.
+
+0.01  Sun Feb 24 20:08:11 2008
+	- original version; created by h2xs 1.23 with options
+		-Ac NET::IPFilterSimple
+        - first public realease of NET::IPFilterSimple
+
+1.1.2 - fixed critical bug - now working correctly
+

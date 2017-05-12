@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+README.mkdn
+dist.ini
+lib/Net/HTTP/Spore/Middleware/Header.pm
+t/00-compile.t
+t/000-report-versions.t
+t/author-critic.t
+t/release-pod-coverage.t
+t/release-unused-vars.t
+xt/perlcritic.rc
+xt/perltidy.rc

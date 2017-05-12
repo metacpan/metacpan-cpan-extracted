@@ -1,0 +1,45 @@
+{
+   "abstract" : "module for parsing whois information",
+   "author" : [
+      "Ivan Sokolov <ivsokolov@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Whois-Parser",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Net::Whois::Raw" : "2",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Whois::Parser" : {
+         "file" : "lib/Net/Whois/Parser.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/regru/net-whois-parser"
+      }
+   },
+   "version" : "0.08"
+}

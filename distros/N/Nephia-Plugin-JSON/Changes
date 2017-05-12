@@ -1,0 +1,12 @@
+Revision history for Perl extension Nephia-Plugin-JSON
+
+0.03 2013-11-27T01:59:22Z
+    - feature : add "enable_api_status_header" attribute
+
+0.02 2013-10-17T12:34:39Z
+    - bug fix : add charset=UTF-8 into content-type
+
+0.01 2013-09-28T23:21:30Z
+
+    - original version
+

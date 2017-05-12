@@ -1,0 +1,20 @@
+Revision history for Perl extension NetStumbler::Wap.
+
+0.01  Tue May 11 09:14:05 2004
+	- Initial conversion to OO, and CPAN import
+0.02  Tue May 11 14:11:00 2004
+	- Added use warnings back in
+0.03  Wed May 12 16:00:00 2004
+	- changed version requirement to 5.8
+0.04  Thu May 13 08:00:00 2004
+	- removed perl version requirement for CPAN
+0.05  Wed Jan 5 08:00:00 2005
+	- fixed a bug with 2 function calls not referenceing self
+0.06  Sat Feb 13 10:00:00 2005
+	- fixed a bug with data load not working correctly
+0.07  Wed Feb 16 7:40:00 2005
+	- fixed the tests
+0.08  Wed Mar 2 7:34:00 2005
+	- removed Data::Dump dependancy
+0.09  Saturday Sep 15 9:13:00 2007
+ 	- fixed a line issue

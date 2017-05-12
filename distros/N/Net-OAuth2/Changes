@@ -1,0 +1,179 @@
+
+=== Version history of Net::OAuth2
+All changes by Mark Overmeer unless noted otherwise.
+
+version 0.63: Mon 18 Jan 13:51:55 CET 2016
+
+	Fixes:
+	- instagram does not like a Host header where port 443 is
+	  mentioned.  Do not use that port if it is the default for
+	  the protocol.  [Samuel Kaufman]
+
+version 0.62: Wed 11 Nov 12:29:40 CET 2015
+
+	Improvements:
+	- typo.  rt.cpan.org#104332 [Christopher Hoskin, Debian]
+	- added contributed examples/google-refresh [Andreas Hernitscheck]
+
+version 0.61: Mon Jun 30 08:53:41 CEST 2014
+
+	Fixes:
+	- another regresssion test t/10req.t failed due to hash order
+	  randomization.  [cpantesters]
+
+version 0.60: Thu Jun 26 09:46:53 CEST 2014
+
+	Fixes:
+	- regresssion test t/10req.t failed due to hash order randomization.
+	  [cpantesters] & rt.cpan.org#96731 [Andreas König]
+
+version 0.59: Tue Jun 24 23:56:23 CEST 2014
+
+	Fixes:
+	- do not send client_id and client_secret as parameters, because
+	  it will get refused by QQ Catalyst.
+	  rt.cpan.org#96454 [Scott Weisman]
+	- added 'state' passthru parameter to requests [Bas Bloemsaat]
+
+version 0.58: Wed May 28 23:17:09 CEST 2014
+
+	Improvements:
+	- generic accessor of ::AccessToken via attribute() [Sergey Lobanov]
+
+version 0.57: Mon Mar 24 09:33:07 CET 2014
+
+	Fixes:
+	- an update of an access-token may include a new refresh-token.
+	  rt.cpan.org#94131 [Joe Papperello]
+
+	Improvements:
+	- changed documentation style
+
+version 0.56: Wed Sep  4 11:50:48 CEST 2013
+
+	Fixes:
+	- auto_save option did not work: option processing typo
+	  rt.cpan.org#86824 [Hironori Yoshida]
+	- basic-auth header should not contain a \n
+	  rt.cpan.org#88409 [Anton Gerasimov]
+
+version 0.55: Tue Apr  2 16:13:33 CEST 2013
+	Fixes:
+	- refreshed token at each access.
+
+version 0.54: Thu Mar 28 10:55:51 CET 2013
+	Fixes:
+	- remove Build.PL
+
+	Improvements:
+	- rename demo/ into examples/psgi
+	- added t/30refresh.t by [Samuel Kaufman]
+	- Test::Mock::LWP::Dispatch is now optional, because it has a
+	  huge dependency tree via Moose.
+
+version 0.53: Mon Jan 28 12:01:26 CET 2013
+	Changes:
+	- default of token_scheme changed to standard compliant
+	  auth-header:Bearer
+	  rt.cpan.org#82878 [Shmuel Fomberg]
+	- refresh_token renamed to refresh_always.
+	  rt.cpan.org#82967 [Samuel Kaufman]
+
+	Fixes:
+	- data handling in update_token
+	  rt.cpan.org#82967 [Samuel Kaufman]
+
+	Improvements:
+	- add documentation to token_scheme
+	  rt.cpan.org#82878 [Shmuel Fomberg]
+
+version 0.52: Tue Jan 15 13:21:04 CET 2013
+	Fixes:
+	- mistake ::AccessToken::freeze() -> ::AccessToken::session_freeze()
+
+	Improvements:
+	- document how to use freeze and thaw.
+
+version 0.51: Tue Jan  8 11:52:17 CET 2013
+	Fixes:
+	- the new ::WebServer::authorize() was conceptionally broken.
+	  Corrected and documented how to be used.
+	  Flagged by rt.cpan.org#82556 [Shmuel Fomberg]
+
+	Improvements:
+	- more info in the demo
+	- improved documentation (still not sufficient)
+	- rename ::AccessToken::to_string() into ::to_json()  Old name
+	  still usable.
+	- add ::WebServer::autorize_response() for convenience.
+	- remove unused dependency on Test::Mock::LWP::Dispatch
+	- add ::AccessToken::session_freeze() and ::session_thaw()
+	  Requested by rt.cpan.org#82554 [Shmuel Fomberg]
+	- error when people use old $profile->authorize_url()
+
+version 0.50: Mon Jan  7 12:39:16 CET 2013
+
+	New maintainer: Mark Overmeer
+
+	Changes:
+	- Deprecate use of ::Client, in favor of ::Profile::*
+	- ::Profile::Base merged into ::Profile
+	- *_params() functions return a HASH (ref), not a list of pairs
+	- do not call authorize_url() to initiate the session, but
+	  authorize().
+
+	Fixes:
+	- added documentation, added regression tests
+
+	Improvements:
+	- merged/rewrote contributions by [nikopol], refresh
+	- merged/rewrote contributions by [Fukata], refresh
+	- merged/rewrote contributions by [Lamoz], the ::Profile::Password
+	- removed t/manifest and t/pod-coverage
+
+----- All changes below by Keith Grennan
+
+Revision history for Net-OAuth2
+
+0.01    Mon, 18 Oct 2010 18:29:17 UTC
+	Very basic v0.01, tested against 37Signals API
+
+0.02    Thu, 21 Oct 2010 02:20:39 UTC
+	Added support for Facebook Graph API, made demo generic with support
+	for both 37signals and Facebook
+
+0.03    Thu, 16 Dec 2010 16:58:37 UTC
+	Merged fix for client->site_url (https://github.com/keeth/Net-OAuth2/pull/1)
+
+0.04    Fri, 17 Dec 2010 02:04:31 UTC
+	Add missing build require (YAML)
+
+0.05    Thu, 23 Dec 2010 18:24:30 UTC
+	Merged param warning fix (https://github.com/keeth/Net-OAuth2/pull/2)
+
+0.06    Mon, 03 Jan 2011 18:49:06 UTC
+	Merged grant_type param (https://github.com/keeth/Net-OAuth2/issues#issue/3)
+
+0.07    Mon, 03 Jan 2011 18:49:06 UTC
+	Spec V2.15 / Google compatibility
+	* Add scope param to Client
+	* Always include grant_type param
+	* Have POST request send params in body rather than URL query string
+	* Allow user to specify name of access token query param in protected resource requests, 
+	since Google calls it oauth_token rather than access_token.  This can be passed to the 
+	client constructor as access_token_param => 'oauth_token'.
+	* Changed the default access_token_method to POST from GET
+	* Added a Google demo to the demo app that's included with the module package ( hosted at http://oauth2.kg23.com ).
+	
+0.08    Wed, 15 Jun 2011 18:15:00 UTC
+	Add bearer_token_scheme parameter to support the various techniques in
+	https://tools.ietf.org/html/draft-ietf-oauth-v2-bearer-02
+	The default technique is now the authorization header (Authorization: OAuth <access_token>)
+	Example values of this parameter:
+	auth-header (default, same as auth-header:OAuth)
+	auth-header:Bearer (custom scheme)
+	auth-header:OAuth2 (custom scheme)
+	uri-query (same as uri-query:oauth_token)
+	uri-query:my_token_param (custom param name)
+	form-body (same as form-body:oauth_token)
+	form-body:my_token_param (custom param name)

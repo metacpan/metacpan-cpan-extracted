@@ -1,0 +1,403 @@
+#!/usr/local/bin/perl
+#
+#  Build cron jobs from comments in files.
+#
+#  $Id: make_cron,v 1.5 2003-01-21 12:24:40-05 mprewitt Exp $
+#
+#  -----
+# Copyright (C) 2003 Chelsea Networks, under the GNU GPL.
+# make_cron comes with ABSOLUTELY NO WARRANTY. This is free software, and you are
+# welcome to redistribute it under certain conditions; see the COPYING file 
+# for details.
+# 
+# make_cron is free software; you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+# 
+# make_cron is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+# details.
+# 
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+use strict;
+use Net::NIS::Listgroup;
+use Cwd;
+use Getopt::Std;
+
+my $RSH = 'ssh';
+
+sub Usage {
+    my $error = shift;
+    print STDERR "Error: $error\n" if $error;
+
+    print STDERR <<EOF;
+$0 [ -vda ] [ -h host ] [ -T host ][ -u user ] [ -t time ] [ -u user ] file ...
+
+Take comments from the given list of files and installs cron jobs.
+Will attempt to install on all machines named in the comments.
+In the comment format description below, netgroup_expression may be of the
+form: \@netgroup_name or (\@netgroup_name -exclude_hostname1 -exclude_hostnameN)
+
+  #CRON: host        host_name  NIGHTLY  order_in_nightly_run
+  #CRON: host        host_name           cron_arguments           
+  #CRON: netgroup    netgroup_expression NIGHTLY  order_in_nightly_run]
+  #CRON: netgroup    netgroup_expression cron_arguments
+  #CRON: user        username
+
+$0 flags, in detail:
+
+  -v        show cronjobs as installing
+  -d        do not install; show only
+  -a        make sure all jobs have admutil controls for email, etc.
+  -h host   only install on host [host]
+  -t time   the time the nightly batch run should start
+  -u user   specify user to install as if running as root
+  -T host   override all hosts to host for testing
+
+Copyright (C) 2003 Chelsea Networks, under the GNU GPL.
+make_cron comes with ABSOLUTELY NO WARRANTY. This is free software, and you are
+welcome to redistribute it under certain conditions; see the COPYING file 
+for details.
+
+EOF
+
+    exit 255;
+}
+
+my %opts;
+getopts( "dvah:t:u:n:T:", \%opts ) ||
+    Usage( "Invalid options" );
+
+my $verbose = $opts{"v"};
+my $debug   = $opts{"d"};
+$verbose++ if $debug;
+my $admutil = $opts{"a"};
+my $dohost  = $opts{"h"};
+my $time    = $opts{"t"};
+my $thost   = $opts{"T"};
+
+$dohost =~ tr/A-Z/a-z/;
+
+$time = "0:01" unless $time;
+
+#
+#  Default user
+#
+my $user = $opts{"u"} || (getpwuid($<))[0];
+my $wuser = (getpwuid($<))[0];
+
+#
+#  Store information as follows:
+#
+#  $cron->{user}->{host}->{ cron }->[ min hour day mon weekday args ]
+#                       ->{ nightly }->{order}
+my $cron = {};
+my $cwd = cwd;
+
+#
+#  OK, now we are ready!;
+#
+foreach my $file ( @ARGV ) {
+    if ( -d $file ) {
+	print "Skipping directory \"$file\"....\n" if $verbose;
+	next;
+    }
+
+    die "Cannot open/read \"$file\". [$!]\n"
+	unless open( FILE, $file );
+
+    #
+    #  Convert file relative.
+    #
+    unless ( $file =~ m:^/: ) {
+	$file = "$cwd/$file";
+	$file =~ s://:/:g;
+	while ( $file =~ s:[^/]+/\.\./:: ) { 1 };
+    }
+    #
+    #  Storage units
+    #
+    my $tmpgroup;
+    my $tmpjob;
+    my $tmpuser;
+
+    while(<FILE>) {
+	my $command;
+	do {
+	    next unless s/^#CRON:\s*(\w+)\s*//;
+	    $command = $1;
+	};
+	s/#.*$//;
+
+	# netgroup or host
+	    #
+	    #  Build the job list
+	    #
+	if (($command eq 'netgroup') or
+	    $command eq 'host') {
+	    my ($day, @exclude, $host, $hostexpr, $hour, $ignore, $min, $mon, $weekday, @args);
+	    #
+	    # The value of $host is the netgroup name, here.
+	    #
+	    if ($command eq 'netgroup') {
+		do {
+		    /\(?(([^(].*?)(?=\))|(\@\w+))(.*)/;
+		    $hostexpr = $1;
+		    ($ignore, $min, $hour, $day, $mon, $weekday, @args ) = split /\s+/, $4;
+		    $min =~ s/\)//;
+		    $hostexpr =~ s/(\()|(\))|(\@)|(-)//g;
+		};
+		($host, @exclude) = split(/\s+/, $hostexpr);
+		my $hostref = listgroup($host);
+		die "$0: netgroup $host not found.\n" unless $hostref;
+		my @hosts = @{$hostref};
+		if (@exclude) {
+		    my $expr = join "|", @exclude;
+		    @hosts = grep !/$expr/, @hosts;
+		}
+		@hosts = ($thost) if $thost;
+		$tmpgroup->{$hostexpr} = \@hosts;
+	    } else {
+		($hostexpr, $min, $hour, $day, $mon, $weekday, @args ) = split;
+		$hostexpr = $thost if $thost;
+	    }
+	    
+	    if ( $min =~ /nightly/i ) {
+		die "Illegal value for nightly order \"$hour\" in file \"$file\".\n"
+		    if $hour =~ /\D/;
+		
+		#
+		#  Temporary storage.
+		#
+		push @{$tmpjob->{$hostexpr}->{nightly}}, [ $hour, $file, $day, $mon, $weekday, @args ];
+	    } else {
+		#
+		#  Check validity
+		#
+		die "Illegal value for job parm \"min\" ($min) in file \"$file\".\n"
+		    if $min !~ /^((\*)|(\d+[,\d]*)|(\d+-\d+))$/;
+		die "Illegal value for job parm \"hour\" ($hour) in file \"$file\".\n"
+		    if $hour !~ /^((\*)|(\d+[,\d]*)|(\d+-\d+))$/;
+		die "Illegal value for job parm \"day\" ($day) in file \"$file\".\n"
+		    if $day !~ /^((\*)|(\d+[,\d]*)|(\d+-\d+))$/;
+		die "Illegal value for job parm \"mon\" ($mon) in file \"$file\".\n"
+		    if $mon !~ /^((\*)|(\d+[,\d]*)|(\d+-\d+))$/;
+		die "Illegal value for job parm \"weekday\" ($weekday) in file \"$file\".\n"
+		    if $weekday !~ /^((\*)|(\d+[,\d]*)|(\d+-\d+))$/;
+		
+		#
+		#  Temporary storage.
+		#
+		push @{$tmpjob->{$hostexpr}->{cron}}, [ $min, $hour, $day, $mon, $weekday, $file, @args ];
+	    }
+	} elsif ( $command eq "user" ) {
+	    #
+	    #  Duplicate user?
+	    #
+	    die "Can't set user twice in same script.\n"
+		if $tmpuser;
+	    
+	    $tmpuser = (split)[0];
+	    die "Invalid user \"$tmpuser\"\n"
+		unless getpwnam($tmpuser);
+	    
+	} else {
+	    Usage( "Error in CRON comments in file \"$file\" ($command)\n" );
+	}
+    }
+    
+    #
+    #  Convert groups to hosts
+    #
+    foreach my $host ( keys %$tmpjob ) {
+	if ( exists $tmpgroup->{$host} ) {
+	    #
+	    #  Expand it out!
+	    #
+	    foreach my $grouphost ( @{$tmpgroup->{$host}} ) {
+		#
+		#  Is it real?
+		#
+		unless (gethostbyname( $grouphost )) {
+		    warn "Skipping invalid host \"$grouphost\" in group \"$host\".\n";
+		    next;
+		}
+		
+		foreach my $jobtype ( keys %{$tmpjob->{$host}} ) {
+		    push @{$tmpjob->{$grouphost}->{$jobtype}}, @{$tmpjob->{$host}->{$jobtype}};
+		}
+	    }
+	    delete $tmpjob->{$host};
+	} else {
+	    #
+	    #  Check to see the host if valid.
+	    #
+	    unless (gethostbyname( $host )) {
+		warn "Skipping invalid host \"$host\".\n";
+		next;
+	    }
+	}
+	
+	
+	#
+	#  If we're root, must have user definition in files, or -u option.
+	#
+	if ( $user eq "root" ) {
+	    die "No user defined in file \"$file\"\n"
+		unless $tmpuser;
+	} else {
+	    $tmpuser = $user;
+	}
+    }
+	
+    #
+    #  We've loaded it all in.  Now, assemble the real thing.
+    #
+    
+    foreach my $host ( keys %$tmpjob ) {
+	foreach my $type ( keys %{$tmpjob->{$host}} ) {
+	    push @{$cron->{$tmpuser}->{$host}->{$type}}, @{$tmpjob->{$host}->{$type}};
+	}
+    }
+}
+
+    
+unless ( %$cron ) {
+    print STDERR "Hmmm...nothing to do!\n";
+    exit 0;
+}
+
+#
+#  Are we root or that user?
+#
+foreach my $checkuser ( sort keys %$cron ) {
+    die "Cannot install as user other than self ($user) unless running as root.\n"
+	unless $debug || $wuser eq "root" || $user eq $wuser;
+}
+
+#
+#  Build our CRON output.
+#
+my ($crons, %uniq);
+foreach my $cuser ( sort keys %$cron ) {
+    foreach my $host ( sort keys %{$cron->{$cuser}} ) {
+	if ( exists $cron->{$cuser}->{$host}->{nightly} ) {
+	    #
+	    #  Make nightly CRON job.
+	    #
+	    my( $hour, $min ) = split(/:/, $time);
+	    push @{$cron->{$cuser}->{$host}->{cron}}, [ $min, $hour, "*", "*", "*", "/usr/local/etc/nightly/$cuser" ];
+	    $crons->{$host}->{$cuser}->{nightly} = "#!/bin/ksh\n";
+	    foreach my $job ( sort NIGHTLY @{$cron->{$cuser}->{$host}->{nightly}} ) {
+		my $jobstr = join( " ", @$job[1..$#{$job} ] );
+		my $key = "$host $cuser nightly $jobstr";
+		unless ($uniq{$key}) {
+		    $crons->{$host}->{$cuser}->{nightly} .= "$jobstr\n";
+		    $uniq{$key}++;
+		}
+	    }
+	}
+	if ( exists $cron->{$cuser}->{$host}->{cron} ) {
+	    foreach my $job ( sort CRON @{$cron->{$cuser}->{$host}->{cron}} ) {
+		my $key = join(" ", @$job);
+		unless ($uniq{"$host $cuser cron $key"}) {
+		    $crons->{$host}->{$cuser}->{cron} .= sprintf "%-4s %-4s %-4s %-4s %-4s  %s\n", $job->[0], $job->[1], $job->[2], $job->[3], $job->[4], join( " ", @$job[5..$#{$job}] );
+		    $uniq{"$host $cuser cron $key"}++;
+		}
+	    }
+	    
+	}
+    }
+    
+    
+#
+#  Print it?
+#
+    if ( $verbose ) {
+	foreach my $host ( keys %$crons ) {
+	    foreach my $cuser ( keys %{$crons->{$host}} ) {
+		next if $dohost && $host ne $dohost;
+		print "HOST $host, USER: $cuser\n";
+		if ( exists $crons->{$host}->{$cuser}->{cron} ) {
+		    print $crons->{$host}->{$cuser}->{cron};
+		}
+		if ( exists $crons->{$host}->{$cuser}->{nightly} ) {
+		    print "NIGHTLY job starts at: $time\n";
+		    print $crons->{$host}->{$cuser}->{nightly};
+		}
+	    }
+	}
+    }
+    
+    if ( $debug ) {
+	print "No work being done - debug flag set.\n";
+	exit 0;
+    }
+    
+#
+#  OK, do the install!
+#
+    foreach my $host ( keys %$crons ) {
+	foreach my $instuser ( keys %{$crons->{$host}} ) {
+	    next if $dohost && $host ne $dohost;
+	    #
+	    #  Do we need to become this user?
+	    #
+	    print "host $host, user $instuser...\n" if $verbose;
+	    my $suargs = 1
+		if $instuser ne $wuser;
+	    if ( exists $crons->{$host}->{$instuser}->{cron} ) {
+		#
+		#  Install the CRON job
+		#
+		print "  cron jobs...\n" if $verbose;
+		if ( $suargs ) {
+		    open( RSH, qq{| $RSH $host "su $instuser -c crontab"} ) ||
+			die "$RSH open failed - check error messages [$!]\n";
+		} else {
+		    open( RSH, qq{| $RSH $host crontab} ) ||
+			die "$RSH open failed - check error messages [$!]\n";
+		}
+		print RSH $crons->{$host}->{$instuser}->{cron};
+		close RSH ||
+		    die "$RSH close failed - check error messages [$!]\n";
+	    }
+	    if ( exists $crons->{$host}->{$instuser}->{nightly} ) {
+		#
+		#  Install the NIGHTLY job
+		#
+		print "  nightly job...\n" if $verbose;
+		system("$RSH $host 'rm -f /usr/local/etc/nightly/$instuser'");
+		if ( $suargs ) {
+		    open( RSH, qq{| $RSH $host "su $instuser -c 'cat > /usr/local/etc/nightly/$instuser; chmod 540 /usr/local/etc/nightly/$instuser'"} ) ||
+			die "copy of nightly failed - check error messages, directory may not exist [$!]\n";
+		} else {
+		    open( RSH, qq{| $RSH $host "cat > /usr/local/etc/nightly/$instuser; chmod 540 /usr/local/etc/nightly/$instuser'"}) ||
+			die "copy of nightly failed - check error messages, directory may not exist [$!]\n";
+		}
+		print RSH $crons->{$host}->{$instuser}->{nightly};
+		close RSH ||
+		    die "$RSH close failed - check error messages [$!]\n";
+	    }
+	}
+    }
+}
+
+
+sub CRON {
+    return $a->[3] <=> $b->[3] or
+	$a->[2] <=> $b->[2] or
+	    $a->[1] <=> $b->[1] or
+		$a->[0] <=> $b->[0] or
+		    $a->[4] <=> $b->[4];
+}
+
+sub NIGHTLY {
+    return $a->[0] <=> $b->[0] or
+	$a->[1] <=> $b->[1];
+}

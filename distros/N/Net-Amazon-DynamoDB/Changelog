@@ -1,0 +1,33 @@
+0.1.16	2012-11-06
+	* Fix from fayland for boken merge
+
+0.1.15	2012-11-05
+	* Added patches from fayland (fixed: no cache when undef result)
+	* Implemented consitent read attribute in batch_get_item()
+
+0.1.14	2012-10-10
+	* Enable process_all parameter for batch_get_item
+
+0.1.13	2012-05-06
+	* Overwrite argument for "max_retries" in main operations
+
+0.1.11	2012-04-23
+	* Included Amazons new BatchWriteItem operation
+
+0.1.9	2012-03-18
+	* Typo in credentials error handling
+
+0.1.8	2012-03-18
+	* Check expiration of credentials
+	* Added DateTime modules to build requirements
+
+0.1.7	2012-03-17
+	* Handle error in fetching credentials
+	* Added LWP::Protocol::https to build requirements
+
+0.1.5	2012-03-14
+	* Can now retry requests, if limit exceeded
+	* Can now iterate through query/scan results automatically to retreive all "pages"
+
+0.1.4	2012-03-11
+	* Improvided error handling

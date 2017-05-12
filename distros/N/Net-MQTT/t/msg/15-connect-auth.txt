@@ -1,0 +1,16 @@
+$args =
+{
+ message_type => MQTT_CONNECT,
+ client_id => 'mosquitto_sub_3926',
+ connect_reserved_flag => 1,
+ user_name => 'guest', user_name_flag => 1,
+ password => 'passw0rd', password_flag => 1,
+ dup => 1,
+}
+
+18 31 00 06  4d 51 49 73    64 70 03 c3  00 3c 00 12
+6d 6f 73 71  75 69 74 74    6f 5f 73 75  62 5f 33 39
+32 36 00 05  67 75 65 73    74 00 08 70  61 73 73 77
+30 72 64
+
+Connect/at-most-once,dup MQIsdp/3/mosquitto_sub_3926 user=guest pass=passw0rd 

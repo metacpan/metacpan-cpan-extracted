@@ -1,0 +1,225 @@
+#!/usr/bin/perl
+# program to analyze an mbox
+# and show how different RBL's would affect it.
+
+# Asher Blum <asher@wildspark.com> Fri May 7 2004
+# licensed under the same terms as Perl
+
+my $max_blockers_shown = 10;
+
+use strict;
+use Net::RBLClient;
+use Data::Dumper;
+my $rbl = Net::RBLClient->new( max_time => 5, max_hits => 8 );
+
+my @messages;
+my %block_freq;
+my $msg = '';
+#my %netblocks = read_netblocks('netblocks');
+my %netblocks = (
+    '210.0.0.0/7'     => 'APNIC-CIDR-BLK2',
+    '217.0.0.0/8'     => '217-RIPE',
+    '64.51.0.0/16'    => 'DSLNET-4',
+    '63.68.128.0/20'  => 'UU-63-68-128',
+    '217.32.0.0/16'   => 'UK-BT-20000920',
+    '206.13.0.0/17'   => 'PBI-NET',
+    '200.128.0.0/9'   => 'BRAZIL-BLK2',
+    '66.95.0.0/16'    => 'NASDSL-BLK2',
+    '216.40.192.0/14' => 'EVRY-BLK-6',
+);
+
+my %blocker_char; # character for each blocker
+my @blocker_chars = ( 'A' .. 'Z', 0 .. 9, 'a' .. 'z' );
+
+while(<>) {
+    if(/^From /) {
+        handle_msg($msg);
+        $msg = <>;
+    }
+    $msg .= $_;
+}
+
+my @blockers = sort {$block_freq{ $b } <=> $block_freq{ $a }} keys %block_freq;
+my $nblockers = @blockers;
+
+#print Dumper(\@blockers); exit 0;
+
+foreach my $message(@messages) {
+    my $block_string = '';
+    for(0..$nblockers) {
+        last if $_ >= $max_blockers_shown;
+        $block_string .= $message->{ blockers }{ $blockers[ $_ ] } ?
+        $blocker_chars[ $_ ] : '.';
+    }
+    printf("%-15.15s %30.30s %s %-16.16s\n",
+        $message->{ ip },
+        substr($message->{ hostname }, -30, 30),
+        $block_string,
+        $message->{ netblock },
+    );
+}
+
+print "\n";
+
+for(0..$nblockers) {
+    printf "%s %-30.30s %6d\n",
+    $blocker_chars[ $_ ],
+    $blockers[ $_ ],
+    $block_freq{ $blockers[ $_ ] },
+}
+      
+
+sub handle_msg {
+    my $msg = shift or return undef;
+    return undef if $msg =~ /From: root\@wildspark.com/;
+    my($h, $b) = split /\n\n/, $msg;
+    $h =~ s/\n\s+/ /g;
+    if($h =~ /Received:.*\[(\d+\.\d+\.\d+\.\d+)\].*by/) {
+        my $addr = $1;
+
+        $rbl->lookup($addr);
+        my @blockers = $rbl->listed_by;
+        #printf "%-16.16s  %s\n", $addr, $blockers;
+        $block_freq{ $_ } ++ for @blockers;
+
+        my $hostname = hostname($addr);
+        push @messages, {
+            ip        => $addr,
+            hostname  => $hostname,
+            blockers  => { map(($_ => 1), @blockers) },
+            netblock  => get_netblock($addr),
+        };
+        #printf("%-16.16s  %-16.16s  %s\n", $addr, get_netblock($addr), $hostname);
+    }
+    else {
+        #die" No match: $msg\n";
+        #warn "No match";
+    }
+}
+    
+sub get_netblock {
+    my $addr = shift;
+    foreach my $n(keys %netblocks) {
+        if(in_netblock($n, $addr)) {
+            return $netblocks{ $n };
+        }
+    }
+    return "x";
+    foreach my $registry qw( arin apnic ripe ){
+        my $res = `whois $addr\@whois.arin.net`;
+        return $1 if $res =~ /Netblock: (.+)/;
+    }
+    return "UNKNOWN";
+}
+
+sub in_netblock {
+    use Socket;
+    my($cidr, $addr) = @_;
+    #invoke with ('217.32.0.0/16', '128.222.123.0');
+    return undef unless $addr =~ /^(\d+)+\.(\d+)\.(\d+)\.(\d+)$/;
+    my $n = pack('C4', $1, $2, $3, $4);
+    return undef unless $cidr =~ m|^(\d+)+\.(\d+)\.(\d+)\.(\d+)/(\d+)$|;
+    my $block = pack('C4', $1, $2, $3, $4);
+    my $ones = $5;
+    my $zeros = 32 - $ones;
+    my $mask = pack('B32', '1' x $ones . '0' x $zeros);
+    #print "mask=" . inet_ntoa($mask); exit;
+    my $c1 = $block & $mask;
+    my $c2 = $n & $mask;
+    #print "c1=" . inet_ntoa($c1) . "  c2=" . inet_ntoa($c2) . "\n";
+    return 1 if $c1 eq $c2;
+    0;
+}
+
+sub read_netblocks {
+    my $fn = shift;
+    open F, "$fn" or die "Can't open $fn: $!";
+    my %n;
+    while(<F>) {
+        next unless /(\S+)\s+(\S+)/;
+        $n{ $1 } = $2;
+    }
+    close F;
+    return %n;
+}
+
+sub hostname {
+    my $address = shift;
+    my ($name,$aliases,$addrtype,$length,@addrs);
+    $name = 'TIMEOUT';
+    eval {
+        alarm 1;
+        local $SIG{ALRM} = sub { die "alarm\n" };
+        ($name,$aliases,$addrtype,$length,@addrs) =
+        gethostbyaddr(inet_aton($address), AF_INET);
+        alarm 0;
+    };
+    $name;
+}
+
+__END__
+
+=head1 NAME
+
+spamalyze - Apply multiple Realtime Blackhole Lists to all messages in an mbox
+
+=head1 SYNOPSIS
+
+    spamalyze myspam.mbox
+
+    spamalyze goodstuff.mbox
+
+    tail -3000 some.mbox | spamalzse
+
+=head1 DESCRIPTION
+
+Spamalyze reads in an mbox file containing multiple mail messages and looks up the originating server of each message on multiple Realtime Blackhole Lists.  Spamalyze uses L<Net::RBLClient>.
+
+Spamalyze lets you find out what the impact would be of filtering via various RBL's.
+
+The output report contains two sections.  The first section has one line per email message, showing:
+
+=over 4
+
+=item * Sending IP address
+
+=item * Sending hostname if any
+
+=item * Whether the IP is on a small list of possibly spammish netblocks
+
+=item * A list of letters representing RBL's which returned responses for this IP address
+
+=back
+
+The second section contains one line for each of the top RBL's.  That is, the RBL's which produced the most hits.  The RBL's are listed in decreasing order of hits.  Each line contains:
+
+=over 4
+
+=item * The letter assigned to the RBL - C<A> is the one with the most hits
+
+=item * The domain name of the RBL
+
+=item * The number of hits from the RBL
+
+=back
+
+
+=head1 OPTIONS
+
+No options.
+
+=head1 SEE ALSO
+
+L<Net::RBLClient(3)>
+
+=head1 AUTHOR
+
+Asher Blum E<lt>F<asher@wildspark.com>E<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2004 Asher Blum.  All rights reserved.
+This code is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

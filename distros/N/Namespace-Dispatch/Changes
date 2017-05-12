@@ -1,0 +1,20 @@
+Revision history for Perl extension Namespace::Dispatch
+
+0.07    Mon Feb  4 17:10:48 CST 2013
+        - Namespace::Dispatch::* are class methods and instance methods as well
+
+0.06    Mon Feb  4 14:11:45 CST 2013
+        - skip tests to be a Moose::Role if Moose is not installed
+
+0.05    Thu Jan 10 18:18:39 CST 2013
+        - support Class and Role in Moose
+
+0.04    Sun Jul 15 15:34.21 2012
+        - move subroutines out of import()
+
+0.02    Sat Apr  6 00:25:32 2012
+        - more documents
+        - add Modern::Perl and Try::Tiny as test requires
+
+0.01    Tue Apr  3 16:01:35 2012
+        - original version

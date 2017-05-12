@@ -1,0 +1,23 @@
+Revision history for Perl extension Net::HTTPS::NB.
+
+0.15  Thu Aug 25 23:42:24 NOVT 2016
+       - Add SNI support (gh #1)
+
+0.14  Wed Oct 14 19:08:57 NOVT 2015
+       - Fix reading of the chunked body
+       - Fix examples in the documentation
+       - Fix compatibility with IO::Socket::IP backend for IO::Socket::SSL
+
+0.13  Wed Jun 12 21:31:43 2013
+       - Fix for rt #85931: ability to specify SSL_* options
+
+0.12  Tue Jun  7 18:49:45 2011
+       - Test::More dependency added
+       - tests fixes: OpenBSD doesn't know how to connect to 0.0.0.0
+
+0.11  Mon May 23 13:54:47 2011
+      - Assign properly value to $HTTP_ERROR when socket connection fails
+      - Fixed typo in the test
+
+0.10  Sat May 21 12:02:35 2011
+      - original version

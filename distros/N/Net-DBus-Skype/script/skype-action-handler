@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Net::DBus::Skype;
+use Env qw(DEBUG VERBOSE);
+
+my $debug = $DEBUG || $VERBOSE || 0;
+
+my $skype = Net::DBus::Skype
+	->new({ debug => $debug })
+	->action( shift @ARGV )
+;
+
+1;
+
+__END__
+
+=head1 NAME
+
+skype-action-handler
+
+=head2 DESCRIPTION
+
+A small script that interfaces with Net::DBus::Skype. It pushes off the first arguement send on the command line to the C<-E<gt>action> method of the instance.
+
+=head2 EXAMPLE
+
+	skype-action-handler skype:echo123?call
+	skype-action-handler skype:EvanCarroll?chat
+	skype-action-handler callto:+15555555555
+	skype-action-handler tel:+15555555555

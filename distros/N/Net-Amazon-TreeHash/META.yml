@@ -1,0 +1,19 @@
+---
+abstract: 'Amazon Glacier TreeHash algorithm'
+author:
+  - 'Victor Efimov'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3624'
+license: Software::License::GPL_3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Amazon-TreeHash
+provides:
+  Net::Amazon::TreeHash:
+    file: lib/Net/Amazon/TreeHash.pm
+    version: 0.71
+requires:
+  Digest::SHA: 0
+version: 0.71

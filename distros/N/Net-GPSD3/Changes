@@ -1,0 +1,116 @@
+Revision history for Perl module Net::GPSD3
+
+TODO
+  - Support SUBFRAME objects better
+  - Add Tests for many GPS devices
+  - Add a capability for handlers to turn off watcher mode.
+  - Consolidate code between Net::GPSD3->watch and Net::GPSD::POE->session
+  - Figure out a better way to use the default handlers
+  - Review time vs. datetime
+    - Figure out if we can drop DateTime due to the load time.
+    - Figure out if we can make DateTime a runtime requirement.
+
+0.19 2011-12-29
+  - Added use strict and use warnings to all tests - RT 73612
+  - Fixed spec version
+
+0.18_2 2011-09-26
+  - Updated GPSD URL
+
+0.18 2011-09-26
+  - Fixed POLL method GPSD API change - RT 73489 ryan from presslab.us
+  - Dropped EXE_FILES section from Makefile.PL - RT 70414 - fschlich at cis.fu-berlin.de 
+  - Fixed spelling issues in pod - RT 70410 - fschlich at cis.fu-berlin.de
+
+0.17 2011-04-10
+  - Moved Net::GPSD3::POE to separate package
+
+0.16 2011-04-08
+  - Updated perl-Net-GPSD3-Handler.pl to use two handlers
+  - Updated POE interface based on feedback from Rocco Caputo <rcaputo@pobox.com>
+    - Switched from inline_states session to object_states session
+    - Added stop and shutdown capabilities
+    - Added POE methods pause and resume
+
+0.15 2011-04-05
+  - Added POE::Session capability
+    - Added Net::GPSD3::POE->session
+    - Updated tests
+    - Fixed Net::GPSD3->constructor to support inheritance
+    - Added POE script example
+  - Update script documentation
+
+0.14 2011-03-26
+  - Added Documentation and Examples
+  - Added poll->tpv alias for poll->fix method
+  - Updated support for GST object
+  - Updated perl-Net-GPSD3-poll.pl to show much more data
+  - Updated default handler changed tpv->time to tpv->timestamp
+
+0.13 2011-03-25
+  - Added poll->fix method
+  - Added poll->sky method
+  - Renamed internal method poll->fixes to _fixes
+  - Renamed internal method poll->skyviews to _skyviews
+  - Updated POLL documentation
+  - Added GST object support
+
+0.12 2011-03-24
+  - gpsd 2.96 protocol 3.4 support
+    - Do not expect the protocol to stabilize until gpsd 3.00
+  - Added support for new POLL interface
+  - Added support for SUBFRAME object
+  - Updated objects to support new W3C timestamp format
+  - Added RPM spec file to the distribution
+  - Updated tests for the new protocol 3.4
+  - Updated Net/GPSD3.pm
+    - Moved defaults into methods
+    - Added object caching in gpsd->cache method
+    - Removed the intersperse capability as redundant with caching
+  - Renamed example scripts
+  - Dropped strftime support (not backwards compatible!)
+
+0.11 2010-01-14
+  - gpsd protocol 3.3 support
+  - Moved to IO::Socket::INET6 to support both IPv4 and IPv6
+
+0.10 2010-01-01
+  - Updated GPS::Point minimum required version to 0.10
+
+0.09 2009-11-27
+  - Added DateTime to handler output
+
+0.08 2009-12-06
+  - API changed between gpsd versions 2.90dev and 2.90
+    - Added json=>true to ?WATCH request
+
+0.07 2009-11-22
+  - Support some changes in the protocol in 2.90dev.
+
+0.06 2009-10-03T5:34:00Z
+  - Satellite->reported property was dropped (now calculated)
+
+0.05 2009-09-28T18:31:00Z
+  - modified SKY->Satellites to reuse parent->constructor code.
+
+0.04 2009-09-26T23:03:00Z
+  - Documentation
+  - Changed satelliteObjects to Satellites (still have satellites)
+  - Changed DeviceObjects to Devices (still have devices)
+  - Added Error trapping and better messages
+
+0.03 2009-09-19T06:48:00Z
+  - Fixed up DEVICE package
+  - Fixed up ERROR package
+  - Refactored a bunch of the code to make testing easier
+  - Added more tests
+  - Added Example
+
+0.02 2009-09-16T00:20:00Z
+  - Documentation
+  - Updated SKY->satellites
+  - Added SKY->satelliteObjects
+  - Updated Makefile.PL -> prereq
+
+0.01 2009-04-14T18:58:54Z
+  - gpsd version 3.1 protocol

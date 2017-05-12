@@ -1,0 +1,8 @@
+Revision history for Perl extension Net::Server::Mail::ESMTP::AUTH.
+
+0.01  Sat Oct 16 01:10:47 2004
+      - original version
+
+0.02  Fri Oct 14 01:52:00 2016
+      - fixed AUTH LOGIN (RT #36226), thanks chr <chris at u- club.de>
+      - fixed pod abstract (RT #94160), thanks <NEILB _at_ cpan.org>

@@ -1,0 +1,13 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/Netx/WebRadio.pm
+t/001_load.t
+lib/Netx/WebRadio/Station/Shoutcast.pm
+t/002_load.t
+Makefile.PL
+Examples/README
+Examples/FileWriter/shoutcast_client.pl
+Examples/FileWriter/Netx/WebRadio/Station/Shoutcast/FileWriter.pm

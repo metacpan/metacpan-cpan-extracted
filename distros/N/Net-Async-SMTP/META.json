@@ -1,0 +1,76 @@
+{
+   "abstract" : "SMTP support for IO::Async",
+   "author" : [
+      "Tom Molesworth <tom@entitymodel.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Async-SMTP",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.48"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CPAN::Meta" : "2.120920",
+            "Encode" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON" : "0",
+            "List::Util" : "0",
+            "Module::Metadata" : "0",
+            "Test::More" : "0.88",
+            "Test::Pod" : "1.41",
+            "version" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Email::Simple" : "0",
+            "IO::Async::SSL" : "0.14",
+            "Net::LibResolv" : "0"
+         },
+         "requires" : {
+            "Future" : "0.24",
+            "IO::Async" : "0.54",
+            "IO::Async::Resolver::DNS" : "0.04",
+            "IO::Socket::SSL" : "0",
+            "Protocol::SMTP" : "0.001",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::Fatal" : "0.010",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-net-async-smtp at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Net-Async-SMTP"
+      },
+      "homepage" : "http://search.cpan.org/dist/Net-Async-SMTP/"
+   },
+   "version" : "0.002"
+}
+

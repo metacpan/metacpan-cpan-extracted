@@ -1,0 +1,12 @@
+--- #YAML:1.0
+name: Net-Lite-FTP
+version: 0.43
+version_from: VERSION
+author:
+  - Dariush Pietrzak <cpan@ghost.anime.pl>
+abstract: 
+license: perl
+requires:
+    Net::SSLeay::Handle:                     0.0
+generated_by: Eyck v1.01
+distribution_type: module

@@ -1,0 +1,25 @@
+---
+abstract: 'A compact and fast IP Address range filter'
+author:
+  - 'Dave Webb <Net-IPAddress-Filter@d5ve.com>'
+build_requires:
+  English: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-IPAddress-Filter
+requires:
+  Net::CIDR::Lite: 0
+  Set::IntervalTree: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-IPAddress-Filter
+  repository: https://github.com/d5ve/p5-Net-IPAddress-Filter.git
+version: 20140113

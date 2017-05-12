@@ -1,0 +1,10 @@
+Revision history for Perl module Net::Intermapper
+
+0.01 Mon Sep  27 22:12:00 2016
+    - original version; created by ExtUtils::ModuleMaker 0.55
+
+0.02 Mon Oct 03 21:40:00 2016
+    - Small fix for dependencies
+
+0.04 Sun Mar 19 01:30:00 2017
+    - Fix in User CSV sanity checks..

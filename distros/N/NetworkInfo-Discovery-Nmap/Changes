@@ -1,0 +1,8 @@
+Revision history for NetworkInfo-Discovery-Nmap
+
+0.02    2005.04.03
+        [TESTS] Corrected t/01api.t
+
+0.01    2004.11.16
+        First version, released on an unsuspecting world.
+

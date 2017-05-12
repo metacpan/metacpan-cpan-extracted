@@ -1,0 +1,83 @@
+=head1 NAME
+
+NKTI::general::char::split - The Perl Extension for split character.
+
+=head1 SYNOPSIS
+
+    use NKTI::general::char::split
+
+    # Example String :
+    my $string = 'I Think Debian';
+
+    # Splite based length :
+    my @split_len = NKTI::general::char::split->based_length($string, 1);
+
+    # Splite based char :
+    my @split_char = NKTI::general::char::split->based_char($string, " ", 0);
+
+    # Output "print Dumper \@split_len" :
+    $VAR1 = [
+              'I',
+              ' ',
+              'T',
+              'h',
+              'i',
+              'n',
+              'k',
+              ' ',
+              'D',
+              'e',
+              'b',
+              'i',
+              'a',
+              'n'
+            ];
+
+    # Output "print Dumper \@split_char" :
+    $VAR1 = [
+              'I',
+              'Think',
+              'Debian'
+            ];
+
+=head1 DESCRIPTION
+
+This module can split character with simple way and output of module in array data type.
+
+=head1 FOR INSTALL
+
+To use this module you can install module L<NKTI::general>.
+
+=head1 EXPLAIN SUBROUTINE base_length()
+
+    Parameter Modul :
+    ----------------------------------------
+    $string =>    String will be split.
+    $length =>    lenght of character for split.
+
+=cut
+
+=head1 EXPLAIN SUBROUTINE based_char()
+
+    Parameter Modul :
+    ----------------------------------------
+    $string         =>  String will be split.
+    $delimiter      =>  character for delimiter.
+    $join           =>  For merged.
+                        IF == 1 --> Split is then merged and the result is joined in the string data type,
+                        IF == 0 --> Split result in array data type.
+=cut
+
+=head1 AUTHOR
+
+Achmad Yusri Afandi, (linuxer08@gmail.com)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2016, Achmad Yusri Afandi, All Rights reserved.
+
+This is free software, licensed under:
+
+    The Artistic License 2.0 (GPL Compatible)
+
+=cut

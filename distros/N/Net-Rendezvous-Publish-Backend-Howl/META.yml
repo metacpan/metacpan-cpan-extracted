@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name: Net-Rendezvous-Publish-Backend-Howl
+version: 0.03
+author:
+  - Richard Clamp <richardc@unixbeard.net>
+abstract: interface to Porchdog software's Howl library
+license: perl
+requires:
+  Class::Accessor::Lvalue: 0
+  Net::Rendezvous::Publish: 0
+  Test::More: 0
+  perl: 5.006
+provides:
+  Net::Rendezvous::Publish::Backend::Howl:
+    file: lib/Net/Rendezvous/Publish/Backend/Howl.pm
+    version: 0.03
+generated_by: Module::Build version 0.25

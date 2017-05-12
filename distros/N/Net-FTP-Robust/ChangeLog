@@ -1,0 +1,43 @@
+
+===== version history for Net::FTP::Robust
+
+Alll changes made by Mark Overmeer, unless explicitly stated
+differently.
+
+version 0.08: Mon Feb  1 11:40:29 CET 2010
+	- fix downloading of empty files.
+	- fix load restart.
+
+version 0.07: Fri Dec 18 22:54:45 CET 2009
+	- fix situation where file got downloaded, but not published
+	  because other problems.
+	- fix downloading multiple parallel directories.
+
+version 0.06: Mon Nov 16 21:44:31 CET 2009
+	- Hum, change for Net::FTPSSL::Robust broke directory list
+
+version 0.05: Mon Nov 16 20:59:39 CET 2009
+	- change port option abbreviation to 'P', because 'p' was
+	  also used for the (more often used) 'password'.
+	- options processing for connection broken.
+
+version 0.04: Fri Nov 13 23:42:56 CET 2009
+	- make restart loading of a file overridable.
+	- do not cwd to '', but '/'
+	- solve problems with downloading whole ftp account
+
+version 0.03: Fri Nov 13 11:50:52 CET 2009
+	- errors on $ftp->cdup went unnoticed.
+	- changes to allow Net::FTPSSL::Robust to extend Net::FTP::Robust
+	  cleanly.
+
+version 0.02: Thu Jul 16 12:19:18 CEST 2009
+	- require Log::Report 0.25 because example uses new features.
+	- use File::Spec::curdir to replace explicit '.'
+	- INFO output about download speed now uses basename of file,
+	  and trace shows the long was (was reversed)
+	- remove paths names showed extra './' in fron of them. Removed.
+	- fix warning on empty files.
+
+version 0.01: Wed Jun 17 10:01:31 CEST 2009
+	- initial version

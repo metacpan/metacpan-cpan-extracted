@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Net-Download-Queue
+version: 0.04
+author:
+  - Johan Lindstrom <johanl@cpan.org>
+abstract: Download files with one or more workers.
+license: perl
+generated_by: Module::Build version 0.261, without YAML.pm

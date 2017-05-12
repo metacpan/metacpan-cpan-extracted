@@ -1,0 +1,23 @@
+---
+abstract: 'Spore Middleware to change the base_url on the fly'
+author:
+  - 'Tiago Peczenyj <tiago.peczenyj@gmail.com>'
+build_requires:
+  Module::Build: 0.3601
+  Test::MockObject: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-HTTP-Spore-Middleware-BaseUrl
+requires:
+  Moose: 0
+  Net::HTTP::Spore: 0
+  perl: 5.004
+version: 0.02

@@ -1,0 +1,11 @@
+Changes
+ARTISTIC
+MANIFEST
+Makefile.PL
+lib/Net/XWhois.pm
+test.pl
+TODO
+examples/creation_time
+examples/whois
+contribs/jon.p
+contribs/matt.p

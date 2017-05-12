@@ -1,0 +1,22 @@
+---
+name: Net-FS-Flickr
+version: 0.1
+author: ~
+abstract: store and retrieve files on Flickr
+license: perl
+requires:
+  Acme::Steganography::Image::Png: 0.05
+  File::Basename: 0
+  File::Temp: 0
+  Flickr::Upload: 0
+  LWP::Simple: 0
+  Test::More: 0
+provides:
+  Net::FS::Flickr:
+    file: lib/Net/FS/Flickr.pm
+    version: 0.1
+  Net::FS::Flickr::Access:
+    file: lib/Net/FS/Flickr/Access.pm
+  Net::FS::Flickr::DefaultImage:
+    file: lib/Net/FS/Flickr/DefaultImage.pm
+generated_by: Module::Build version 0.2611

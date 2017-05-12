@@ -1,0 +1,114 @@
+NAME
+    Net::HTTPTunnel - Create sockets that are tunnels through an HTTP 1.1
+    proxy
+
+SYNOPSIS
+    This is a module that creates sockets that are tunnels through an HTTP
+    1.1 proxy that supports the SSL CONNECT method. For more information on
+    this method, see "Tunneling TCP based protocols through Web proxy
+    servers" by Ari Luotonen.
+
+        use Net::HTTPTunnel;
+
+        $ht = Net::HTTPTunnel->new( 'proxy-host' => some.host.com
+                                    'proxy-port' => 80
+                                    'remote-host' => other.host.com
+                                    'remote-port' => 443 );
+
+    If successful, $ht will be a socket that acts as if it is connected
+    directly to remote-host:remote-port because all bits will be routed
+    untouched through the proxy.
+
+    The Net::HTTPTunnel constructor returns undef on an error.
+
+NOTES
+    Most proxies limit CONNECT tunnels to those which have either 443 or 563
+    as the destination port. If you are experiencing errors and are trying
+    to connect to a port other than one of those two, it is likely you are
+    running into such a problem. The only way around this (assuming you
+    cannot control the proxy settings) is to set up a listener on the remote
+    machine that you can then connect to any port through.
+
+    Unfortunately, this tunneling method only works for tcp connections.
+    There is no equivalent way of doing UDP connections. However, with a bit
+    of ingenuity such a scheme can certainly be devised---imagine again the
+    scenario of a TCP listener on the other end of the tunnel. One could
+    wrap the UDP packets in TCP, transport them through the tunnel, and
+    unwrap them at the other end with very little trouble.
+
+    More information on the HTTP protocol and tunneling can be found in the
+    Luotonen paper referenced above, as well as in RFCs 1945 and 2068.
+
+DESCRIPTION
+    The only member function in Net::HTTPTunnel not inherited from
+    IO::Socket::INET is the constructor new(). New takes the following
+    name-value pairs of arguments:
+
+    'remote-host' => 'some.host.com' [required] The system to which you want
+    the tunnel to connect.
+
+    'remote-port' => 563 [required] The port on that system. See note above
+    about port number selection.
+
+    'proxy-host' => 'some.host.com' [required] The proxy through which this
+    connection will be made.
+
+    'proxy-port' => 80 [required] The port on the proxy to which a
+    connection should be made.
+
+    'http-ver' => '1.1' [optional; default is 1.0] The version of HTTP
+    reported in the CONNECT request. There is no reason to change this
+    unless the proxy requires a different version.
+
+    'proxy-user' => 'foo' [optional] The username to use for proxy
+    authentication, if required.
+
+    'proxy-pass' => 'bar' [optional] The password for proxy authentication,
+    if required.
+
+    'user-agent' => 'baz' [optional] The user-agent string to pass along to
+    the HTTP proxy. If not specified, it will not be sent. If you are
+    worried about being spotted as an abberation in the server logs, perhaps
+    it is better to set this to something fairly tame like "Mozilla/4.0".
+
+    If the connection is successful, a socket will be returned. On error,
+    undef is returned instead.
+
+EXAMPLES
+    See SYNOPSIS, above.
+
+SEE ALSO
+    RFC 1945 --- "Hypertext Transfer Protocol -- HTTP/1.0"
+
+    RFC 2068 --- "Hypertext Transfer Protocol -- HTTP/1.1"
+
+    "Tunneling TCP based protocols through Web proxy servers" --- Ari
+    Luotonen.
+
+AUTHOR
+    Copyright (C) 2001 Riad Wahby <rsw@mit.edu> All rights reserved This
+    program is free software. You may redistribute it and/or modify it under
+    the same terms as Perl itself.
+
+HISTORY
+    0.1 Initial Release
+
+    0.2 Fixed two bugs, one which included an additional carriage return
+    with proxy authorization, and one which prevented the http-ver option
+    from being recognized.
+
+    0.3 Fixed the capitalization of the "Proxy-Authorization" header in case
+    a fascist proxy did case-sensitive header matching. Also, fixed some
+    mistakes in which \n\r was sent instead of \r\n.
+
+    0.4 Fixed a bug that would cause an instance of the module to assume
+    success on all subsequent connections once it had gotten its first
+    successful connection.
+
+    0.5 Changed the success test regexp so that "200 OK" is accepted as a
+    successful reply from the proxy, since some report this instead of "200
+    Connection established". Thanks to JoNO for pointing out this
+    discrepancy.
+
+    0.51 D'oh. Broken regexp.
+

@@ -1,0 +1,15 @@
+MANIFEST
+README.md
+LICENSE
+Changes
+Makefile.PL
+Eboks.pm
+bin/eboks2pop
+bin/eboks_dump
+t/01.t
+example/fetchmailrc
+example/procmailrc
+example/eboks2pop.debian
+example/eboks2pop.freebsd
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

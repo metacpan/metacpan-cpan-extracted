@@ -1,0 +1,546 @@
+=head1 NAME
+
+Net::FTP::Common - simplify common usages of Net::FTP
+
+=head1 SYNOPSIS
+
+ our %netftp_cfg = 
+    (Debug => 1, Timeout => 120);
+
+ our %common_cfg =    
+    (
+     # 
+     # The first 2 options, if not present, 
+     # lead to relying on .netrc for login
+     #
+     User => 'anonymous',           
+     Pass => 'tbone@cpan.org',      
+
+     #
+     # Other options
+     #
+
+
+     LocalFile => 'delete.zip'   # setup something for $ez->get
+     Host => 'ftp.fcc.gov',      # overwrite ftp.microsoft.com default
+     LocalDir   => '/tmp',
+     RemoteDir  => '/',          # automatic CD on remote machine to RemoteDir
+     Type => 'A'                 # overwrite I (binary) TYPE default
+     );
+
+  # NOTE WELL!!! one constructor arg is  passed by reference, the 
+  # other by value. This is inconsistent, but still it is A Good Thing.
+  # Believe me! I thought about this. And I have a good reason for it:
+  # This is to allow the least modification of legacy Net::FTP source code.
+
+  $ez = Net::FTP::Common->new(\%common_cfg, %netftp_config); 
+
+  # can we login to the machine?
+  # Note: it is NEVER necessary to first login before calling
+  # Net::FTP::Common API functions.                                
+  # This function is just for checking to see if a machine is up. 
+  # It is published as part of the API because I have found it 
+  # useful when writing FTP scripts which scan for the 
+  # first available FTP site to use for upload. The exact 
+  # call-and-return semantics for this function are described
+  # and justified below.
+
+  $ez->login or die "cant login: $@";
+
+  # Get a listing of a remote directory 
+ 
+  @listing =	$ez->ls; 
+
+  # Let's list a different directory, over-riding and changing the
+  # default directory
+ 
+  @listing =	$ez->ls(RemoteDir => '/pub/rfcs'); 
+
+  # Let's list the default dir on several hosts
+ 
+  @host_listings = map { $ez->ls(Host => $_) } @host_list
+
+  # Let's get the listings of several directories
+
+  @dir_listings  = map { $ez->ls(RemoteDir  => $_) } @dir_list;
+
+  # Let's get a detailed directory listing... (thanks Kevin!)
+ 
+  %listing =	$ez->dir; # Note this is a hash, not an array return value.
+
+  ### representative output
+
+            'test' => {
+                      'owner' => 'root',
+                      'month' => 'Jan',
+                      'linkTarget' => undef,
+                      'inode' => '1',
+                      'size' => '6',
+                      'group' => 'root',
+                      'yearOrTime' => '1999',
+                      'day' => '27',
+                      'perm' => '-rw-r--r--'
+                    },
+          'ranc' => {
+                      'owner' => 'root',
+                      'month' => 'Oct',
+                      'linkTarget' => undef,
+                      'inode' => '2',
+                      'size' => '4096',
+                      'group' => 'root',
+                      'yearOrTime' => '00:42',
+                      'day' => '31',
+                      'perm' => 'drwxr-xr-x'
+                    }
+
+  # Get a file from the remote machine
+
+  $ez->get(RemoteFile => 'codex.txt', LocalFile => '/tmp/crypto.txt');
+
+  # Get a file from the remote machine, specifying dir:
+  $ez->get(RemoteFile => 'codex.txt', LocalDir => '/tmp');
+
+  # NOTE WELL:  because the prior call set LocalFile, it is still a
+  # part of the object store. In other words this example will try
+  # to store the downloaded file in /tmp/tmp/crypto.txt.
+  # Better to say:
+
+  $ez->get(RemoteFile => 'codex.txt', LocalDir => '/tmp', LocalFile => '');
+
+
+  # Send a file to the remote machine (*dont* use put!)
+
+  $ez->send(RemoteFile => 'codex.txt');
+
+  # test for a file's existence on the remote machine (using =~)
+
+  @file = $ez->grep(Grep => qr/[A-M]*[.]txt/);
+
+
+  # test for a file on the remote machine (using eq)
+
+  $ez->exists(RemoteFile => 'needed-file.txt');
+
+  # note this is no more than you manually calling:
+  # (scalar grep { $_ eq 'needed-file.txt' } $ez->ls) > 0;
+
+  # Let's get all output written to STDERR to goto a logfile
+
+  my $ez = Net::FTP::Common->new( { %CFG, STDERR => $logfile }, %netftp_cfg);
+
+The test suite contains plenty of common examples.
+
+=head1 DESCRIPTION
+
+This module is intended to make the common uses of Net::FTP a
+one-line, no-argument affair. In other words, you have 100% programming with
+Net::FTP. With Net::FTP::Common you will have 95% configuration and 5%
+programming.  
+
+The way that it makes it a one-line affair is that the common
+pre-phase of login, cd, file type (binary/ascii) is handled for
+you. The way that it makes usage a no-argument affair is by pulling
+things from the hash that configured it at construction time. Should
+arguments be supplied to any API function, then these changes are applied to
+the hash of the object's state and used by any future-called API function
+which might need them.
+
+Usage of this module is intended to be straightforward and
+stereotyped. The general steps to be used are: 
+
+=over 4
+
+=item * use Net::FTP::Common
+
+=item * Define FTP configuration information 
+
+This can be inlined within the script but oftentimes this will be stored in a module for usage in many other scripts.
+
+=item * Use a Net::FTP::Common API function
+
+Note well that you NEVER have to login first. All API functions
+automatically log you in and change to the configured or 
+specified directory. However, sometimes it is useful to see if you can
+actually login before 
+attempting to do something else on an FTP site. This is the only time
+you will need the login() API method. 
+
+=back
+
+=head1 METHODS
+
+=head2  $ez = Net::FTP::Common->new($net_ftp_common_hashref, %net_ftp_hash)
+
+This method takes initialization information for L<Net::FTP::Common> as
+well as L<Net::FTP> and returns a new Net::FTP::Common object. 
+Though the calling convention may seem a bit inconsistent, it is
+actually the best API to support re-use of legacy 
+Net::FTP constructor calls. For example if you had a Net::FTP script
+which looked like this: 
+
+           use Net::FTP;
+
+           $ftp = Net::FTP->new("some.host.name", Debug => 0);
+           $ftp->login("anonymous",'me@here.there');
+           $ftp->cwd("/pub");
+           $ftp->get("that.file");
+           $ftp->quit;
+
+Here is all you would have to do to convert it to the Net::FTP::Common API:
+
+           use Net::FTP::Common;
+
+           $common_cfg = { Host => 'some.host.name', 
+			   User => 'anonymous',
+			   Pass => 'me@here.there',
+			   RemoteDir  => '/pub'
+			   }	
+
+           $ftp = Net::FTP::Common->new($common_cfg, Debug => 0);
+           $ftp->get("that.file");
+           $ftp->quit;
+
+
+=head2 $ez->Common(%config)
+
+This is hardly ever necessary to use in isolation as all public API methods
+will call this as their first step in processing your request. However, it is
+available should you wish to extend this module.
+
+=head2 $ez->GetCommon($config_key)
+
+Again, this is hardly ever necessary to use in isolation. However, it is
+available should you wish to extend this module.
+
+=head2 $ez->NetFTP(%netftp_config_overrides)
+
+This creates and returns a Net::FTP object. In this case, any overrides are 
+shuttled onward to the Net::FTP object as opposed to the configuration of the 
+Net::FTP::Common object.
+
+Also note that any overrides are preserved and used for all future calls.
+
+=head2 $ez->login(%override)
+
+This logs into an FTP server. C<%override> is optional. It relies on 2
+Common configuration options, C<User> and C<Pass>, which, if not present
+load to logging in via a .netrc file.
+
+Normal login with C<User> and C<Pass> are tested. .netrc logins are not.
+
+
+=head2 $ez->ls (%override)
+
+When given no arguments, C<ls()> uses Common configuration
+information to login to the ftp site, change directory and transfer
+type and then return an array of directory contents. You may only call
+this routine in array context and unlike Net::FTP, it returns a list
+representing the contents of the remote directory and in the case of
+no files, returns an empty array instead of (like Net::FTP) returning
+a 1-element array containing the element undef.
+
+You may give this function any number of configuration arguments to
+over-ride the predefined configuration options. For example:
+
+ my %dir;
+ my @dir =qw (/tmp /pub /gnu);
+ map { @{$dir{$_}} = $ftp->ls(RemoteDir => $_ ) } @dir;
+
+
+=head2 %retval = $ez->dir (%override)
+
+B<this function returns a hash NOT an array>
+
+When given no arguments, C<dir()> uses Common configuration
+information to login to the ftp site, change directory and transfer
+type and then return a hash of with detailed description of directory 
+contents. You may only call
+this routine and expect a hash back.
+
+You may give this function any number of configuration arguments to
+over-ride the predefined configuration options.  
+
+Here is the results of the example from the the test suite F<t/dir.t>:
+
+ my %retval = $ez->dir;
+
+          'incoming' => {
+                          'owner' => 'root',
+                          'month' => 'Jul',
+                          'linkTarget' => undef,
+                          'inode' => '2',
+                          'size' => '4096',
+                          'group' => 'root',
+                          'yearOrTime' => '2001',
+                          'day' => '10',
+                          'perm' => 'drwxrwxrwx'
+                        },
+
+          'holt' => {
+                      'owner' => 'holt',
+                      'month' => 'Jun',
+                      'linkTarget' => undef,
+                      'inode' => '2',
+                      'size' => '4096',
+                      'group' => 'daemon',
+                      'yearOrTime' => '2000',
+                      'day' => '12',
+                      'perm' => 'drwxr-xr-x'
+                    },
+          'SEEMORE-images' => {
+                                'owner' => 'mel',
+                                'month' => 'Aug',
+                                'linkTarget' => 'images',
+                                'inode' => '1',
+                                'size' => '6',
+                                'group' => 'lnc',
+                                'yearOrTime' => '20:35',
+                                'day' => '15',
+                                'perm' => 'lrwxrwxrwx'
+                              },
+          'dlr' => {
+                     'owner' => 'root',
+                     'month' => 'Sep',
+                     'linkTarget' => undef,
+                     'inode' => '2',
+                     'size' => '4096',
+                     'group' => 'root',
+                     'yearOrTime' => '1998',
+                     'day' => '11',
+                     'perm' => 'drwxr-xr-x'
+                   },
+          'fiser' => {
+                       'owner' => '506',
+                       'month' => 'May',
+                       'linkTarget' => undef,
+                       'inode' => '2',
+                       'size' => '4096',
+                       'group' => 'daemon',
+                       'yearOrTime' => '1996',
+                       'day' => '25',
+                       'perm' => 'drwxr-xr-x'
+                     },
+
+=head2 $ez->delete (%override)
+
+This method logins into the remote machine, changes to C<RemoteDir> and then 
+issues C<< $ftp->delete >> on C<RemoteFile>
+
+In the F<samples/delete-file> directory of the distribution 
+exists files called 
+F<upload.pl> and F<download.pl> which together with F<Login.pm> will log into 
+a system and upload or delete the F<upfile>
+
+=head2 $ez->mkdir (%override)
+
+Makes directories on remote FTP server. Will recurse if 
+C<< Recurse => 1 >> is
+in the object's internal state of overridden at method call time. 
+
+This function has no test case but a working example of its use is in 
+F<scripts/rsync.pl>. I use it to back up my stuff.
+
+=head2 $ez->exists (%override)
+
+This method
+uses the C<RemoteFile> option of object internal state (or override) to check for a
+file in a directory listing. This means a C<eq>, not regex match.
+
+=head2 $ez->grep(%override)
+
+
+This method uses the C<Grep> option of object internal state (or override) to check for a
+file in a directory listing. This means a regex, not C<eq> match.
+
+=head2 $ez->get(%override)
+
+IMPORTANT: C<LocalDir> must be set when you create a Net::FTP::Common object 
+(i.e, when you call Net::FTP::Common->new) or your Net::FTP::Common will
+default C<LocalDir> to "." and warn you about it.
+
+This method uses the C<RemoteFile>, C<LocalFile>, and C<LocalDir> options of object internal 
+state 
+(or override) to download a file. No slashes need be appended to the end of
+C<LocalDir>. If C<LocalFile> and C<LocalDir> arent defined, then the file
+is written to the current directory. C<LocalDir> must exist: 
+C<Net::FTP::Common> will not create it for you.
+
+All of the following have test cases and work:
+
+  LocalDir    LocalFile  Action
+  --------    ---------  ------
+  NULL        NULL       download to local dir using current dir
+  NULL        file       download to local dir using current dir but spec'ed file
+  dir         NULL       download to spec'ed dir using remote file name
+  dir         file       download to spec'ed dir using spec'ed file name
+
+C<NULL> is any Perl non-true value - C<0>, C<''>, C<undef>.
+
+=head2 $ez->send(%override)
+
+Sends a file. This API call B<must> be used instead of C<put>.
+
+=head1 TRAPS FOR THE UNWARY
+
+=head2 Beware of how to use grep
+
+  @file = $ez->grep(Grep => '[A-M]*[.]txt');
+  
+is correct
+
+  @file = $ez->grep('[A-M]*[.]txt');
+
+looks correct but is B<not> because you did not name the argument as you are 
+supposed to.
+
+
+Also note that the Net::FTP::Common login() function expects to be passed a
+hash, while the Net::FTP login() function expets to be passed a scalar.
+
+=head1 NOTES
+
+=head2 Sample usages
+
+A good example of Net::FTP::Common usage comes with your download:
+
+F<scripts/rsync.pl>
+
+Although this script
+requires L<AppConfig>, Net::FTP::Common in general does not... but go get
+L<AppConfig> anyway, it rocks the house.
+
+=head2 Talks
+
+A slide talk on Net::FTP::Common in HTML format is available at
+
+L<http://www.metaperl.org>
+
+
+=head2 TODO
+
+Definite things to do:
+
+=over 4
+
+=item * replace parsing in dir() with L<LWP>'s C<File::Listing::line()>
+
+=item * adding a warning about any keys passed that are not recognised 
+
+=item * support resumeable downloads
+
+=item * A harmless warning
+
+When a Net::FTP::Common object is goes out of scope, the following warning 
+is thrown by Net::FTP: 
+
+  Not a GLOB reference at Net/FTP.pm line 147.
+
+This is a harmless warning that I should fix some day. 
+
+=back
+
+Musings:
+
+=over 4
+
+=item * Cache directory listings?
+
+=item * parsing FTP list output
+
+This output is not standard. We did a fair job for most common Unixen, but
+if we aspire to the heights of an ange-ftp or other high-quality FTP
+client, we need something like they have in python:
+
+     L<http://freshmeat.net/redir/ftpparsemodule/20709/url_homepage/>
+
+
+=back
+
+=head2 Net::FTP FAQ
+
+Because I end up fielding so many Net::FTP questions, I feel it best to start a
+small FAQ.
+
+=head3 Trapping fatal exceptions
+
+L<http://perlmonks.org/index.pl?node_id=317408>
+
+=head2 SEE ALSO
+
+=over 4
+
+=item * L<http://lftp.yar.ru>
+
+=item * L<Net::FTP::Recursive>
+
+=item * L<Net::FTP::blat>
+
+=item * L<Tie::FTP>
+
+=back
+
+=head1 SUPPORT
+
+=head2 Mailing List
+
+L<http://tech.groups.yahoo.com/group/net-ftp-common/>
+
+=head1 DEVELOPMENT
+
+=head2 Repository
+
+L<http://github.com/metaperl/net-ftp-common/tree/master>
+
+=head1 AUTHOR
+
+T. M. Brannon <tbone@cpan.org>
+
+=head2 Acknowledgements
+
+=over 4
+
+=item * Eric M. Hillman
+
+he caught a debug message that was not tagged with the debug flag.
+
+=item * Kevin Evans
+
+dir() method contributed by Kevin Evans (kevin  a t  i n s i g h t dot-com)
+
+=item * Matthew Browning (matthewb on perlmonks)
+
+pointed out a problem with the dir() regexp which then led to me 
+plagiarizing a healthy section of File::Listing::line() from the LWP
+distro.
+
+=back
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2002-2009 Terrence Brannon. 
+
+=head2 License
+
+MIT License L<http://www.opensource.org/licenses/mit-license.php> -
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+  
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+
+
+
+=cut

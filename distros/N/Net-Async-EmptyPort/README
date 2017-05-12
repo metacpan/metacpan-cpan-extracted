@@ -1,0 +1,94 @@
+SYNOPSIS
+
+     use IO::Async::Loop;
+     use Net::Async::EmptyPort;
+    
+     my $loop = IO::Async::Loop->new;
+     my $ep = Net::Async::EmptyPort->new(
+        loop => $loop,
+     );
+    
+     # could take a while to start...
+     my $chosen_port = start_server_in_background();
+    
+     $ep->wait_port({ port => $chosen_port })->get;
+
+DESCRIPTION
+
+    This module is an asynchronous port of Net::EmptyPort. The interface is
+    different and thus simplified from the original. A couple of the
+    original methods are not implemented; specifically can_bind and
+    check_port. They are not hard to implement but I don't have a good idea
+    of why someone would use them.
+
+METHODS
+
+ empty_port
+
+     my $listen_future = $ep->empty_port({
+        host => '192.168.1.1',
+        port => 8000,
+        proto => 'tcp',
+     });
+
+    This method has no required arguments but accepts the following named
+    parameters:
+
+      * host
+
+      Defaults to 127.0.0.1
+
+      * port
+
+      Defaults to 0; which means the kernel will immediately provide an
+      open port. Alternately, if you provide a port Net::Async::EmptyPort
+      will try that port up through to port 65000.
+
+      * proto
+
+      Defaults to tcp; the other option is udp.
+
+    The return value is an IO::Async::Listener. The easiest way (though
+    this will introduce a race condition) to make it work like the original
+    is as follows:
+
+     $ep->empty_port->then(sub { Future->done(shift->read_handle->sockport) })
+
+    Then the Future will simply contain the port, though a better option is
+    to pass the actual listener or socket to whatever will use it if
+    possible.
+
+ wait_port
+
+     my $socket_future = $ep->wait_port({
+        port => 8080,
+        proto => 'tcp',
+        host => '192.168.1.1',
+        max_wait => 60,
+     });
+
+    This method takes the following named parameters:
+
+      * host
+
+      Defaults to 127.0.0.1
+
+      * port
+
+      Required.
+
+      * proto
+
+      Defaults to tcp; the other option is udp.
+
+      * max_wait
+
+      Defaults to 10 seconds. Set to -1 to wait indefinitely.
+
+    The return value is a Future containing an IP::Socket::IP. You can use
+    that for connecting, but unlike "empty_port" there is no race condition
+    here so it makes perfect sense to just use wait_port as a "blocker."
+
+    wait_port uses a basic exponential backoff to avoid quickly polling.
+    Eventually the backoff method will be configurable.
+

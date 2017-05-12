@@ -1,0 +1,21 @@
+---
+name: Net-Squid-Auth-Engine
+version: 0.04
+author:
+  - 'Luis Motta Campos <lmc@cpan.org>'
+abstract: External Credentials Authentication for Squid HTTP Cache
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Config::General: 2.38
+  IO::Handle: 0
+  Test::More: 0
+provides:
+  Net::Squid::Auth::Engine:
+    file: lib/Net/Squid/Auth/Engine.pm
+    version: 0.04
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

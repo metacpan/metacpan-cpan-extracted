@@ -1,0 +1,27 @@
+---
+abstract: 'interface to the API for Todoist (a to-do list service)'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Todoist
+requires:
+  JSON::XS: '0'
+  LWP::UserAgent: '0'
+  Test::More: '0.88'
+resources:
+  repository: https://github.com/neilbowers/perl-Net-Todoist.git
+version: '0.06'
+x_contributors:
+  - 'Neil Bowers <neil@bowers.com>'

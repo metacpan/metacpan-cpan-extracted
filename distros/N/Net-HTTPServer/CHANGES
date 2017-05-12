@@ -1,0 +1,148 @@
+1.1.1
+=====
+
+  - Forgot a file in the MANIFEST.
+
+1.1
+===
+
+  - Added most of the CGI environment variables into the Env hash.
+  - docroot now defaults to undef which turns off file serving.
+  - Added support for CGI via CaptureSTDOUT() and ProcessSTDOUT().
+  - Fixed bugs with / on directories.
+  - Added support for RegisterRegex.
+  - Fixed bug with _date and missing Sep(tember) entry in the date.
+  - Fixed bug with some error conditions.
+  - Added support for OPTIONS.
+
+1.0.2
+=====
+
+  - If you register a callback /some/path/index.foo, AND you set the index
+    list to include index.foo then /some/path/ will resolve to the callback.
+    Thanks to John Jones for this request.
+
+1.0.1
+=====
+
+  - Fixed Response to normalize the output so that the tests can come out the
+    same for each run.  Basically, cookies were printing out in a different
+    order then what was hard coded in the test.
+
+1.0
+===
+
+  - Added PHP style session support.
+  
+  - Moved to more object oriented model: object for request, object for reply.
+
+  - Added cookie support.
+
+0.9.4
+=====
+
+  - Fixed more of the required HTTP/1.1 headers.  Thanks again to Jamie Lockier.
+
+0.9.3
+=====
+
+  - Fixed bug in Windows support and nonblocking.  Turns out that ActivePerl
+    doesn't like the Blocking=>0 call in IO::Socket::INET creation, and 
+    my call to ioctl was wrong.  This should fix everyone who was having
+    problems.
+
+0.9.2
+=====
+
+  - Fixed bug with interaction with Internet Explorer.  I was parsing the
+    headers incorrectly.
+
+0.9.1
+=====
+
+  - Fixed directory listing code when the file name contains :.  This confused
+    Mozilla (and likely other browsers) thinking that everything before the :
+    was a protocol name (http:..).  Now we append the path of the request on
+    those files.
+
+0.9
+===
+  - Added support for Digest Authentication.
+
+  - Added more of the required HTTP/1.1 headers.  Added support for HEAD,
+    and TRACE.  Thanks to Jamie Lockier for pointing out those deficiencies.
+
+  - Added support for Basic Authentication.  Thanks to Alan Barclay for this
+    feature.
+
+  - Added the ability to present other tokens on the Server: line using the
+    AddServerTokens function. Thanks to Darren Chamberlain for this feature.
+
+0.8.1
+=====
+  - Big bug.  If you write too fast then sometimes syswrite returns undef
+    even though it was not *really* an error.  Use select to wait on this.
+    Hopefully this won't create more problems.
+
+0.8
+===
+  - Fixed but in writing.  If there was an error on write the server was
+    sent spinning into an endless loop.
+  - Fixed bug in win32 nonblocking.  Thanks to Bytewolf and dliouville
+    for finding this.
+
+0.7
+===
+  - Fixed IO::Socket::SSL interface problem.  Accessing multiple pages
+    would result in SSL errors about not having a context.  The lesson
+    for the day is: Forking does weird things.  In this case it
+    *appears* that the SSL part of the socket was being closed when we
+    sent the web page.  Much reading shows us the SSL_no_shutdown option
+    to close does not shutdown the SSL.  This seems to fix the problem.
+  - Reworked forking inner loop.  There were some performance issues.
+
+0.6.5
+=====
+  - Removed a rogue debug statement.
+
+0.6
+===
+  - Added code to detect a failed Start() and throw errors if Process()
+    was called.
+  - Fixed problem where a failed Start() would cause Stop() to crater
+    since the socket and selects might be undefined.
+
+0.5
+===
+  - Fixed bug with SSL support.  I had hard coded paths and a bad check
+    for the SSL options.
+
+0.4
+===
+  - Allow for the reponse to be a FileHandle that _send will read and send
+    in one go.  This should make serving files faster (at least big files).
+  - Fixed typo and mistake in logic with IO::Socket::SSL check.
+  
+0.3
+===
+  - Fixed logic to check for IO::Socket::SSL (didn't work very well with
+    Perl2Exe).
+  - Added tests for make test.
+  
+0.2
+===
+  - Fixed bug in read code where it would not finish reading a request.
+  - If IO::Socket::SSL is installed, you can run a secure server.
+  - Added a preforking server type "forking" (default is "single").  You can
+    confiugre the number of child processes via the numproc config option.
+
+0.1
+===
+  - Auto-find the mime.types in the module directories.
+  - Port scanning for embeded on the fly servers.
+  - Redirects directories without / to same dir with /:  foo/bar -> foo/bar/
+  - Lists directories
+  - Serves files
+  - Allow for registering of functions to URLs so that it gets called when
+    the URL is requested.
+

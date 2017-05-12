@@ -1,0 +1,19 @@
+---
+name: Net-Halo-Status
+version: 0.02
+author:
+  - 'Terje Bless <link@cpan.org>'
+abstract: Query Halo game server status.
+license: perl
+requires:
+  perl: 5.6.1
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Net::Halo::Status:
+    file: lib/Net/Halo/Status.pm
+    version: 0.02
+resources:
+  license: http://dev.perl.org/licenses/

@@ -1,0 +1,37 @@
+#$Id: README 355 2008-10-05 11:20:30Z zag $
+
+Net::RTorrent
+========================
+
+Net::RTorrent - Perl interface to rtorrent via XML-RPC.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires  Perl 5.005 or greater and libraries:
+
+* RPC::XML
+* Collection
+
+
+AUTHOR
+
+Zahatski Aliaksandr
+zag@cpan.org
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2008 Zahatski Aliaksandr
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

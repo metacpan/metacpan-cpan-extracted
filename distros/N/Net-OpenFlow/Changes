@@ -1,0 +1,8 @@
+Revision history for Perl extension OpenFlow.
+
+0.02  Wed Dec 18 15:39:28 2013
+	- Fixed Net::OpenFlow::Protocol
+
+0.01  Sat Sep 28 15:49:08 2013
+	- Initial release.
+

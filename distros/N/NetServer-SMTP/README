@@ -1,0 +1,44 @@
+
+README for NetServer::SMTP
+
+
+NetServer::SMTP is a perl module that implements a minimal SMTP server
+as perl RFC 821.
+
+<WARNING>
+   First alpha release -- work in progress!
+   Don't try to use this for anything mission-critical.
+   Found a bug? Let me know!
+</WARNING>
+
+NetServer::SMTP requires:
+
+* Perl 5.004 or later
+* The following modules:
+  -- IO::Socket (part of the standard distribution, or available from
+     CPAN)
+  -- NetServer::Generic
+  -- Mail::Internet (and related Mail-Utils)
+  -- Data::Dumper
+  -- FreezeThaw
+
+One example is included:
+
+  leafmail -- a simple mailserver that accepts connections and queues
+              incoming mail for delivery via a smarthost. (Local
+              delivery is not supported -- as yet).
+
+To install NetServer::SMTP, follow the usual Perl module installation
+practice, viz (probably as root):
+
+  cd SMTP
+  perl Makefile.PL
+  make
+  make install
+
+Problems, questions, brickbats or plaudits to: charlie@antipope.org
+
+Enjoy!
+
+
+-- Charlie Stross <charlie@antipope.org>

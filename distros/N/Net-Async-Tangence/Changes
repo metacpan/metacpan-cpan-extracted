@@ -1,0 +1,50 @@
+Revision history for Net-Async-Tangence
+
+0.14    2017/01/08 00:38:11
+        [BUGFIXES]
+         * Enable arrayification of Struct::Dumb instances while Devel::Cycle
+           is looking at them (RT119750)
+         * Add 'use lib ".";' to keep perl 5.24+ happy
+
+0.13    2015/10/28 21:09:06
+        [BREAKING CHANGES]
+         * Client API returns Futures
+         * Use Tangence 0.21's Future-returning ObjectProxy API
+
+0.12    2014/07/18 00:57:31
+        [CHANGES]
+         * Don't subclass from now-deprecated IO::Async::Protocol::Stream
+
+        [BUGFIXES]
+         * Prevent memory leak on disconnect by ensuring that C3 MRO is in
+           effect for "diamond-of-death" structure of ServerProtocol
+
+0.11    CHANGES:
+         * ->socketpair is now in IO::Async::OS not $loop
+
+0.10    CHANGES:
+         * Rewrite unit tests for Tangence 0.17
+         * Version-guard binary protocol-dependent unit tests so they degrade
+           gracefully in future
+
+0.09    CHANGES:
+         * Renamed ssh:// URL scheme to sshexec://
+         * Added sshunix:// URL scheme that allows directly connecting to a
+           UNIX socket on the server
+
+0.08    CHANGES:
+         * Renamed Net::Async::Tangence::Client->connect to ->connect_url so
+           it doesn't collide with IO::Async::Protocol's method
+         * More unit testing
+
+0.07    CHANGES:
+         * Updated for Tangence 0.07; no longer declares isa Tangence::Object
+           in over-the-wire introspection
+
+0.06    CHANGES:
+         * Updated for Tangence 0.06; provide tanfiles instead of in-source
+           package vars for metadata
+         * Use Test::Fatal instead of Test::Exception
+
+0.05    CHANGES:
+         * Split modules out from base Tangence distribution

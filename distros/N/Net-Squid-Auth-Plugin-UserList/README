@@ -1,0 +1,47 @@
+Net-Squid-Auth-Plugin-UserList
+
+This is the example plugin for Net::Squid::Auth::Engine. It provides the basic
+credential validation fucntionality expected from "serious" plugins, but
+without any security worries. It's single purpose is to provide an example
+implementation on the top of what other people can implement credential
+validation plugins for the Squid HTTP Cache external credential validation
+engine implemented by Net:Squid::Auth::Engine.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::Squid::Auth::Plugin::UserList
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Squid-Auth-Plugin-UserList
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-Squid-Auth-Plugin-UserList
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-Squid-Auth-Plugin-UserList
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-Squid-Auth-Plugin-UserList
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Luis Motta Campos
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

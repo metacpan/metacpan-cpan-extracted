@@ -1,0 +1,111 @@
+Mon Mar 31 08:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* NNML/Connection.pm: Sort message-id by increasing date for
+	  newnews.
+
+Sun Mar 30 20:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* nnmirror.PL: fixed sort order
+
+	* nnmirror.PL NNML/Connection.pm: added newnews emulation
+
+Mon Mar 24 10:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* Makefile.PL nnmirror.PL nnsync.PL overview.PL: Minor cleanup
+
+Sat Mar 22 16:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* nnsync.PL overview.PL NNML/Connection.pm NNML/Handle.pm: overview
+	  did fail when subject contained blanks
+
+Sat Mar 15 12:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* NNML/Connection.pm NNML/Group.pm: Fixed bug which caused the last
+	  two characters choped off upon posting
+
+Tue Mar  4 18:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* nnsync.PL: added 'ignore msgid option'
+
+Thu Feb 27 20:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* NNML/Connection.pm NNML/Handle.pm: Still needs a
+	  fixed Net::Cmd
+
+Thu Feb 27 16:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* MANIFEST nnsync.PL NNML/Active.pm NNML/Connection.pm
+	  NNML/Group.pm NNML/Handle.pm: Switched to Net::Cmd
+
+Fri Feb 21 17:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* Makefile.PL nnmirror.PL: It works!
+
+Fri Feb 21 13:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* MANIFEST Makefile.PL mm.PL nnmirror.PL NNML/Group.pm: nnsync
+	  starts to work
+
+Thu Feb 20 21:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* nnmirror.PL NNML/Active.pm NNML/Connection.pm NNML/Group.pm: With
+	  local connections, there are still bytes dopping out? A print
+	  statement in Net::Cmd::getline ovoids this!?
+
+Thu Feb 20 13:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* README mm.PL nnmirror.PL overview.PL NNML/Connection.pm: Now
+	  seems to work again!
+
+Thu Feb 20 11:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* NNML/Connection.pm: Added spooling.
+
+	* nnmirror.PL: newnews was called with wrong parameters
+
+Thu Feb 20 10:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* overview.PL: Fixed headermatching. Was not acored at beginning
+
+	* NNML/Active.pm: Stripped Log.
+
+	* Makefile.PL: Support for installation of 'mm'
+
+	* mm.PL: Added support for '-match'.
+
+Wed Feb 19 21:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* nnmirror.PL: Switched to Net:NNTP. Not tested yet!
+
+	* NNML/Connection.pm: Added XHDR and changed return code 225 to 221
+	  to make 'suck' happy. But tat was in vain. Write my own 'suck'
+	  now.
+
+	* Makefile.PL: Typo
+
+	* MANIFEST: Added mm and some sample config files.
+
+	* mm.PL: First try for a 'suck' equivalent.
+
+Mon Feb 10 20:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* MANIFEST Makefile.PL: Added changelog generation and wrapping
+
+Mon Feb 10 19:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* MANIFEST Makefile.PL README nnmirror.PL overview.PL
+	  NNML/Active.pm NNML/Auth.pm NNML/Connection.pm NNML/Group.pm:
+	  Switched to CVS
+
+Tue Nov  5 16:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* NNML/Active.pm: Sicherung vor Kai's XACCEPT Wuenschen
+
+Tue Nov  5 15:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* NNML/Connection.pm: Initial revision
+
+Thu Oct 17 07:00:00 1996 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* NNML/Active.pm: Initial revision
+

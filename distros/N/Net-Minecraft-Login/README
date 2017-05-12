@@ -1,0 +1,103 @@
+NAME
+    Net::Minecraft::Login - Basic implementation of the Minecraft Login
+    Protocol.
+
+VERSION
+    version 0.002000
+
+DESCRIPTION
+    This is a basic implementation of the Minecraft Login protocol as
+    described at <http://wiki.vg/Session#Login>
+
+      use Net::Minecraft::Login;
+
+      my $ua = Net::Minecraft::Login->new();
+
+      my $result = $ua->login(
+        user => 'Bob',
+        password => 'secret',
+      );
+      if( not $result->is_success ){
+        die $result;
+      }
+      say "Login for user " . $result->user . " succeeded";
+
+    Note, it presently does no explicit session stuff, only performs the
+    basic HTTP Request and returns the response as an object.
+
+CONSTRUCTOR ARGUMENTS
+    This section describes arguments that may be optionally passed to
+    "->new()", but as of the time of this writing, none are explicitly
+    required, and are offered only to give leverage to strange use cases (
+    and tests )
+
+      my $instance = Net::Minecraft::Login->new(
+        user_agent   => ... ,
+        http_headers => { ... },
+        http_engine  => HTTP::Tiny->new(),
+        login_server => 'https://somewhere.else.org/'
+        version      => 14, # IN THE FUTURE!
+      );
+
+    Additional Constructor arguments can also be found in
+    "Net::Minecraft::Role::HTTP"
+
+  "login_server"
+    HTTP Address to authenticate with.
+
+      type  : String
+      default : https://login.minecraft.net/
+
+  "version"
+    "Client" version.
+
+      type  : String
+      default : 13
+
+    This field indicates the version of the "Launcher". Minecraft may at
+    some future time produce an updated launcher, and indicate that this
+    specified version is out of date.
+
+    Mojang Minecraft Launchers will be required to download a newer version,
+    and users of "Net::Minecraft::Login" will either
+
+    a) Be required to update to a newer "Net::Minecraft::Login" that
+    supports the newer version and changes that implies
+    b) Assuming no "Login Protocol" Changes, only have to specify "version
+    =>" either to the constructor, or as an argument to "login"
+
+METHODS
+  "login"
+      signature: { user => String , password => String, version? => String }
+      return   : Any( Net::Minecraft::LoginResult , Net::Minecraft::LoginFailure )
+
+      my $result = $nmcl->login(
+        user   => 'notch',
+        password => 'jellybean',
+      );
+
+      if( not $result->is_success ){
+        say "$result";
+      } else {
+        say "Logged in!";
+      }
+
+    See "::LoginFailure" and "::LoginResult"
+
+ATTRIBUTES
+  "login_server"
+  "version"
+PRIVATE METHODS
+  "_do_request"
+      signature : ( String $base_uri, Hash[ String => String ] $parameters , Hash[ String => Any ] $config )
+      return    : Hash[ String => String ]
+
+AUTHOR
+    Kent Fredric <kentnl@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Kent Fredric <kentnl@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

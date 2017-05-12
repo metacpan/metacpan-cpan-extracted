@@ -1,0 +1,56 @@
+# $Id: trunc.hrm,v 1.2 2004/12/21 15:36:42 mike Exp $
+#
+# This file represents a set of human-readable MARC records (to be
+# translated into ISO 2709 format by "hrm2marc.pl") which allow us to
+# test the implementation of truncation in queries.  All test-data is
+# in the 250$a field (title) since searching this is almost
+# universally implemented.
+#
+# Searches that can usefully be executed against this set of records
+# include:
+#	@attr 1=4 @attr 5=100 fruit
+#	@attr 1=4 @attr 5=100 bat
+#	@attr 1=4 @attr 5=100 fruitbat
+#	@attr 1=4 @attr 5=100 uitba
+# And the same with attributes 5=1, 5=2 or 5=3 replacing 5=100.
+
+LDR 00366nam  22001698a 4500
+001     IDtRadMARC001
+250    _a fruitbat
+583    _a RadMARC
+       _b indexdata.com/RadMARC/trunc/001
+       _d 1
+       _e QFT
+       _i truncation
+       _x This is a specially created record for the RadioMARC project.  It exists to test the functionality of servers as regards truncation in queries.  Created by Mike Taylor <mike@indexdata.com>
+
+LDR 00366nam  22001698a 4500
+001     IDtRadMARC002
+250    _a fruit
+583    _a RadMARC
+       _b indexdata.com/RadMARC/trunc/002
+       _d 1
+       _e QFT
+       _i truncation
+       _x This is a specially created record for the RadioMARC project.  It exists to test the functionality of servers as regards truncation in queries.  Created by Mike Taylor <mike@indexdata.com>
+
+LDR 00366nam  22001698a 4500
+001     IDtRadMARC003
+250    _a bat
+583    _a RadMARC
+       _b indexdata.com/RadMARC/trunc/003
+       _d 1
+       _e QFT
+       _i truncation
+       _x This is a specially created record for the RadioMARC project.  It exists to test the functionality of servers as regards truncation in queries.  Created by Mike Taylor <mike@indexdata.com>
+
+LDR 00366nam  22001698a 4500
+001     IDtRadMARC004
+250    _a uitba
+583    _a RadMARC
+       _b indexdata.com/RadMARC/trunc/004
+       _d 1
+       _e QFT
+       _i truncation
+       _x This is a specially created record for the RadioMARC project.  It exists to test the functionality of servers as regards truncation in queries.  Created by Mike Taylor <mike@indexdata.com>
+

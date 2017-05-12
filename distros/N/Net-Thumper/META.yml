@@ -1,0 +1,24 @@
+---
+abstract: 'a rudimentary Pure Perl AMQP client'
+author:
+  - 'Sam Crawley <mutant@cpan.org>'
+build_requires:
+  Test::Class: 0.37
+  Test::MockObject: 1.20120301
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300005, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Thumper
+requires:
+  Moose: 1.21
+  Net::AMQP: 0.04
+  Try::Tiny: 0.11
+  perl: 5.10.1
+resources:
+  repository: https://github.com/Mutant/Net-Thumper.git
+version: 0.03

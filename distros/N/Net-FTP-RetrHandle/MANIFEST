@@ -1,0 +1,26 @@
+.cvsignore
+findmissing
+lib/CVS/Entries
+lib/CVS/Repository
+lib/CVS/Root
+lib/Net/CVS/Entries
+lib/Net/CVS/Repository
+lib/Net/CVS/Root
+lib/Net/FTP/CVS/Entries
+lib/Net/FTP/CVS/Repository
+lib/Net/FTP/CVS/Root
+lib/Net/FTP/RetrHandle.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+NEWS
+t/00compile.t
+t/10remote.t
+t/11tie.t
+t/bigtest.pl
+t/CVS/Entries
+t/CVS/Repository
+t/CVS/Root
+t/ftpconn.pl
+TODO
+META.yml                                 Module meta-data (added by MakeMaker)

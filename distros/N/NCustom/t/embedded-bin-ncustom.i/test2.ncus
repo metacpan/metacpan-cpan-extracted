@@ -1,0 +1,6 @@
+#!/usr/bin/perl
+
+open(OUT,">> $ENV{'HOME'}/stubs.log");
+print OUT "ncustom test2.ncus\n";
+close(OUT);
+

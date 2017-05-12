@@ -1,0 +1,36 @@
+---
+abstract: 'Perl Interface for accessing éç©ºæåº«'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  LWP::Online: 0
+  Test::More: 0.88
+  YAML: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-AozoraBunko
+provides:
+  Net::AozoraBunko:
+    file: lib/Net/AozoraBunko.pm
+    version: 0.05
+requires:
+  Carp: 0
+  Encode: 0
+  Getopt::Compact::WithCmd: 0.13
+  IO::String: 0
+  IO::Uncompress::Unzip: 0
+  LWP::UserAgent: 0
+  URI: 0
+  URI::Fetch: 0
+  Web::Scraper: 0
+  perl: v5.8.8
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/Net-AozoraBunko
+version: 0.05

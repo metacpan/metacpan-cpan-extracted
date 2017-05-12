@@ -1,0 +1,17 @@
+---
+name: NetStumbler-Wap
+version: 0.09
+author:
+  - 'Salvatore E. ScottoDiLuzio <lt>washu@olypmus.net<gt>'
+abstract: Module to determine Wireless NIC vendor based on MAC
+license: perl
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  NetStumbler::Wap:
+    file: lib/NetStumbler/Wap.pm
+    version: 0.09
+resources:
+  license: http://dev.perl.org/licenses/

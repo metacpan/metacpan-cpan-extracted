@@ -1,0 +1,10 @@
+Revision history for Perl extension Net::DNS_A.
+
+0.02  Sat Oct  4 08:00 2014
+	- Require Perl v5.8
+    - Only allow one async request at a time
+
+0.01  Fri Oct  3 22:08:31 2014
+	- original version; created by h2xs 1.23 with options
+		-A -n Net::DNS_A
+

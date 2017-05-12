@@ -1,0 +1,26 @@
+---
+name: Net-P0f
+version: 0.02
+author:
+  - Sébastien Aperghis-Tramoni <sebastien@aperghis.net>
+abstract: Perl wrapper for the P0f utility
+license: perl
+requires:
+  Net::Pcap: 0.04
+  Test::More: 0
+recommends:
+  Net::Pcap: 0.05
+provides:
+  Net::P0f:
+    file: lib/Net/P0f.pm
+    version: 0.02
+  Net::P0f::Backend::CmdFE:
+    file: lib/Net/P0f/Backend/CmdFE.pm
+    version: 0.02
+  Net::P0f::Backend::Socket:
+    file: lib/Net/P0f/Backend/Socket.pm
+    version: 0.02
+  Net::P0f::Backend::XS:
+    file: lib/Net/P0f/Backend/XS.pm
+    version: 0.02
+generated_by: Module::Build version 0.2609

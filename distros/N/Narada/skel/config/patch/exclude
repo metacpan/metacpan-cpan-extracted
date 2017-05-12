@@ -1,0 +1,11 @@
+\A\./var/
+\A\./tmp/
+\A\./service/.*/supervise(/|\z)
+\A\./doc/ChangeLog\z
+\A\./.hg
+\A\./.git
+/\.mc\.menu\z
+/perllocal\.pod\z
+~\z
+\.bak\z
+\.swp\z

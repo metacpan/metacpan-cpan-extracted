@@ -1,0 +1,23 @@
+Revision history for Net-SNMP-Mixin-Dot1qFdb
+0.06	Wed, 22 Jun 2016 17:22:57 +0200
+	bump version, newer tests, minor changes
+
+0.05	Fri, 17 Apr 2015 19:05:44 +0200
+	allow check for partial initialization
+
+0.04	Fri Sep 26 13:16:57 MEST 2008
+	inhibit undefined warnings for wrong table entries
+
+0.03	Fr 25. Apr 19:47:20 CEST 2008
+	small internal changes
+
+0.02	Mi 23. Apr 09:24:58 CEST 2008
+	First production release
+	grml, again Build.PL tweaks
+
+0.01_02 Mi 23. Apr 00:37:02 CEST 2008
+        Second developer release.
+
+0.01_01 ??
+        First developer release.
+

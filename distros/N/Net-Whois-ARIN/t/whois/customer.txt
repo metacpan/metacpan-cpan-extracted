@@ -1,0 +1,27 @@
+
+CustName:   Some Company
+Address:    1234 State Street
+City:       North Andover
+StateProv:  MA
+PostalCode: 01845
+Country:    US
+RegDate:    2004-05-07
+Updated:    2004-05-07
+
+NetRange:   10.0.0.0 - 10.0.0.255
+CIDR:       10.0.0.0/24
+NetName:    SOME-COMPANY-1
+NetHandle:  NET-10-0-0-0-24
+Parent:     NET-10-0-0-0-8
+NetType:    Reassigned
+Comment:
+RegDate:    2003-05-07
+Updated:    2003-05-07
+
+RAbuseHandle: JBLOW-ARIN
+RAbuseName:   Blow, Joe
+RAbusePhone:  +1-800-555-8080
+RAbuseEmail:  jblow@foobar.com
+
+# ARIN WHOIS database, last updated 2006-10-08 19:10
+# Enter ? for additional hints on searching ARIN's WHOIS database.

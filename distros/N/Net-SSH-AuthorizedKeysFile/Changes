@@ -1,0 +1,75 @@
+######################################################################
+Revision history for Perl extension Net::SSH::AuthorizedKeysFile
+######################################################################
+
+0.18  (03/27/2017)
+    (ms) L. Alberto Giménez reported empty print lines in case of 
+         Net::SSH::AuthorizedKeysFile running with Log::Log4perl
+         enabled. Fixed.
+
+0.17  (12/22/2014)
+    (ms) David Leon Gil added support for Ed25519 keys
+
+0.16  (01/31/2012)
+    (ms) Added support for ecdsa-* ssh-2 keys, requested by
+         Christian Ruppert.
+
+0.15  (02/16/2011)
+    (ms) No longer using $& to eliminate both real and imaginary
+         performance penalties.
+
+0.14  (12/20/2010)
+    (ms) Preserve order of options
+    (ms) Bug fix: Binary options no longer expand as xxx="1" in as_string()
+
+0.13  (2010/04/25)
+    (ms) Moved ssh1 and ssh2 docs to base class.
+    (ms) Added sanity check for files with extreme line lengths
+    (ms) Added convenience methods path_locate() and ssh_dir() to locate 
+         a user's .ssh dir and authorized_keys file on disk.
+    (ms) Added fingerprint method to parser base class, determining
+         a key's functional uniqueness.
+
+0.12  (2010/02/22)
+    (ms) Added test cases with weird keys
+    (ms) Deleting undefined/empty options to avoid warnings
+
+0.11  (2009/11/30)
+    (ms) Documentation fixes
+    (ms) Added github repo link to Makefile.PL
+
+0.10  2009/11/15
+    (ms) Complete rewrite of parsers and classes
+    (ms) No longer supporting multi-line keys
+
+0.06  2009/10/20
+    (ms) new() no longer reads the configuration file
+         automatically, read() must be called separately. This breaks
+         backward compatibility. Sorry, but it had to be fixed.
+  
+    (ms) Even odd cases of authorized_keys files are now handled 
+         correctly (but of course there could be even odder cases
+         that caused the parser to bail :)
+
+0.05  2009/08/07
+    (ms) Ignore empty lines
+    (ms) Allow multi-lines for ssh2 pubkeys
+    (ms) Fixes for more resilience towards mistyped authkey files
+
+0.04  2009/08/07
+    (ms) Allow mixed v1/v2 keys in a single authorized_keys file.
+
+0.03  2008/08/24
+    (ms) Rewrote entire parsing code to comply with ssh spec, thanks to 
+         Tobias Galitzien for the pointer.
+    (ms) Ignore comment lines in authorized_keys files
+    (ms) The 'email' field is now call 'comment' ('email' is still available 
+         for backwards compatibility, though).
+    (ms) Comments can now contain blanks and commas without tripping the
+         parser up.
+
+0.02  2005/12/23
+    (ms) Fixed dependencies
+
+0.01  2005/12/21
+    (ms) Where it all began.

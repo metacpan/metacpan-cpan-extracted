@@ -1,0 +1,98 @@
+1.4210: Tue Jan 06 2015
+   - found annoying memory leak from 2012 or whenever I found it (and then forgot about it)
+
+1.4210: Mon Jan 05 2015
+   - add a close() method and support early shutdown (useful in SIG{BLAH} = sub { $npe->close }
+
+1.4209: Mon Nov 17 2014
+   - timeouts will rarely (if ever) work — or do anything like what the user
+     expects to happen.  Changed docs and added forks.pm example
+
+1.4207: Tue Jun 07 2011
+   - added ->stats()
+
+1.4205: Fri Jul 30 2010
+   - accepted a patch from Jerry Litteer
+   - added tcp to the synopsis and examples/synopsis.pl
+
+1.4200: Wed Jul 14 2010
+   - got a patch from Daniel Roethlisberger regarding packets
+     without Ethernet encapsulation
+   - wrote some tests for it
+   - noted that we insert this fake encapsulation.
+
+1.4105: Fri Dec 25 2009
+   - added docs regarding the raw collector
+   - added the examples from the pod to an examples dir
+
+1.4100: Fri Dec 18 2009
+   - support for fast callbacks, NetPacket::decode() is kinda
+     slow since it involves a few function calls.  Per packet,
+     this adds up in a hurry.
+
+1.4000: Thu Jun 25 16:00:00 EDT 2009
+   - made {pcap} and {netmask} into accessor functions (get_pcap,
+     etc) and altered pods
+   - got the pods to pass t/pod.t
+   - t/pod_coverage.t passes
+   - got t/critic.t to pass
+   - renamed and moved a few things.
+   - to avoid the fact that loop() returns true forever at the
+     end of a packetfile, I've made loop() instead return the
+     number of processed packets (in cases where there was no
+     error) -- and undef or () when there was an error.
+   - added the new dev=>"file:lo.data" format to the pod
+   - added the dev=>"file:lo.data" test (t/31_)
+   - added the dev=>"file:eth0.data" test (t/31_)
+
+1.325: Thu Jun 25 08:41:37 EDT 2009
+   - adding patch from andk
+   - made sure this works under 5.6.1
+
+1.325: Fri Mar 27 18:28:59 EDT 2009
+   - gah, bug in the Makefile.PL, noticed it when I installed on
+     my new server.
+
+1.322: Thu Mar 26 06:36:05 EDT 2009
+   - There were a bunch of documentation bugs.
+   - I fixed some lousy Makefile.PL code
+
+1.321: Wed Mar 25 20:54:13 EDT 2009
+   - added chorny's META.yml stuff
+
+1.32: Wed Aug 13 13:49:19 EDT 2008
+    - woops, 'skip' device fails tests...
+
+1.31: Wed Aug 13 07:21:36 EDT 2008
+    - I dislike module::build, removed
+
+1.3: Wed Aug  6 07:00:43 EDT 2008
+    - Awesome.  t/07 had a naked (non eval"") use WWW::Mechanize,
+      even though it didn't use it.  So, CPAN testers rock.
+
+1.2: Tue Jul 29 14:42:08 EDT 2008
+    - typo in the pod
+    - bug in the module
+    - I'm not going to include the Makefile.PL anymore, it
+      causes problems.
+
+1.1: Mon Jul 28 06:42:14 EDT 2008
+    - error in the Build.PL, must set default for prompt() so the
+      smokers don't get an error.
+
+1.0: Wed Jul 23 18:41:34 EDT 2008
+    - built a tcp test [05], more trouble than you'd think... requires
+      root, my default gateway is on eth2, etc...
+    - added an icmp test [07]
+    - added a tcp+icmp test [10]
+      - same test one def filter [11]
+      - same test one ipv4 filter [11]
+    - added a tcp+icmp using two pcaps test [15]
+      - same, but interleaved
+      - same, but serialized
+    - documented this mess
+
+1.0: Wed Jul 23 09:45:24 EDT 2008
+    - I found this stuff pretty hard to do the first time,
+      knowing I'd want to do it all again without having to
+      re-learn it all, I wrote this.

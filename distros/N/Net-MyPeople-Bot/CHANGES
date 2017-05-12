@@ -1,0 +1,112 @@
+==================================================
+Changes from 2012-06-12 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.320 at 2013-06-12 05:56:33 +0000
+------------------------------------------
+
+  Change: 92aa7dac0f1c19048c0c98bc73706f6c5458ce02
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-12 14:55:55 +0000
+
+    Add mypeople-bot-buffer support.
+
+    see https://github.com/sng2c/mypeople-bot-buffer 
+
+  Change: a95f165c2185a3c3aabaf9fd645d8ab5fa5eb713
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-10 11:35:27 +0000
+
+    fix for a weird decoding.
+
+    had support for solved problem was ommitting string after first space
+    on server-side. 
+
+  Change: 7855cb23adfad65cd4280ba5b878acaff311f94d
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-07 17:59:44 +0000
+
+    fix bug - parsing json as utf8 
+
+  Change: 6a46791bde96726ab0f7b222f0739525e41330c7
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-07 17:19:44 +0000
+
+    support for utf8 
+
+  Change: 4d0c35b58dd6c4ca024694e7324612da8e5ff2d3
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-05 14:14:52 +0000
+
+    add README.md from POD 
+
+  Change: 44173947cdafc8422eafaedecd9ed390fe06e7af
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-05-30 13:56:44 +0000
+
+    update README.md 
+
+  Change: 71b6ffc644c91f10918e745dbbfa817d940bc4a2
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-05-30 13:56:10 +0000
+
+    update doc. 
+
+  Change: e0afa95c0c7618614a2686e9a5ad43c5f3a0387d
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-05-30 12:22:19 +0000
+
+    update README.md 
+
+  Change: 7079dfa034de543c5efbe13bd0afa6e13f612b44
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-05-30 12:18:20 +0000
+
+    version up to 0.200 
+
+  Change: f6c173b96ce25f32dd00e3cc2bf414f68980f914
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-05-30 12:12:11 +0000
+
+    more pod. 
+
+  Change: d07c5e2cafb4c4787d4b7df3cf4c599058933b90
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-05-29 18:02:08 +0000
+
+    remove GIT plugin in dist.ini 
+
+  Change: 0a4d91e923dc217d9ece7cdfcbec92fda81c6e54
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-05-29 17:59:48 +0000
+
+    fix bug 
+
+  Change: 05f9c6f103a87457482e0d9b28a55b2012d3f596
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-05-29 17:54:37 +0000
+
+    update documents 
+
+  Change: e13d3c11caf3b1ea795baf79b09cedbd18b2259e
+  Author: khs <sng2c@sng2c.vps.phps.kr>
+  Date : 2013-05-29 14:55:00 +0000
+
+    fix bug 
+
+  Change: a4f442d8a38ee9cda597f50184ebfd4a609d9d48
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-05-29 13:35:42 +0000
+
+    fix bug 
+
+  Change: b6ca529b93b41caf7a2403a4f10fbf9a59649cd0
+  Author: 김현승 <sng2nara@daumcorp.com>
+  Date : 2013-05-29 13:18:41 +0000
+
+    first commit 
+
+================
+End of releases.
+================

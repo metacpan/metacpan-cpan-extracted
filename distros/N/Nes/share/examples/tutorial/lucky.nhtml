@@ -1,0 +1,21 @@
+{: NES 1.0 ( 'lucky.pl' ) :}
+{: # 
+
+    lucky.nhtml
+
+    Descrition:
+       Shows a random number between min and max.
+
+    Usage:
+        {: include ( 'lucky.nhtml',
+                      min,    {: # optional, default 0 :}
+                      max     {: # optional, defautl 9 :}
+                   )
+        :}
+
+    Example, random number between 1 and 5: 
+        
+        {: include ( 'lucky.nhtml',1,5 ) :}
+
+:}
+{: $ number :}

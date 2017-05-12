@@ -1,0 +1,106 @@
+Revision history for Net-IPAddress-Util
+
+3.027   2016-04-13
+        Clean up versioning in docs & throughout
+
+3.026   2016-04-07
+        Respond better to unparseable arguments
+        Respond to undef() arguments early, instead of trying to parse them
+
+3.025   2016-03-30
+        Trying again to fix stringification of IPv6 addresses
+
+3.024   2016-03-30
+        Fix stringification of IPv6 addresses
+
+3.023   2015-03-21
+        Remove requirement for Perl 5.12, to see whether it'll work on vanilla 5.10
+
+3.022   2015-03-21
+        Solve some extreme edge cases that can arise due to unpacking 'U' and then packing 'C'
+
+3.021   2015-02-18
+        Wasn't properly identifying well-formed IPv6 addresses
+
+3.020   2015-01-??
+        Code beautifying for Kwalitee purposes
+
+3.019   2015-01-10
+        Code beautifying for Kwalitee purposes
+
+3.017   2014-09-29
+        Code beautifying for Kwalitee purposes
+
+3.016   2014-09-29
+        Code cleaning
+
+3.015   2014-09-29
+        Was not accepting integers bigger than 32 bits, regardless of $PROMOTE_N32 setting
+
+3.014   2014-09-27
+        Fix typo in documentation: s/to_str/as_str/smg;
+
+        Code cleaning on something that bizarrely appeared to work as desired
+        despite being written in a highly nasty way.
+
+3.013   2014-09-27
+        Fix RT #99174: IPv6 addresses with fewer than 4 digits per word handled wrong
+
+3.000   2013-11-01
+        Back to proper CPAN-friendly version numbers
+
+1.500   2013-10-31
+        Attempt to backport the 2.x speedups and fixes into a non-mop env.
+
+1.002   2012-06-09
+        Make it explicit that 5.010 is required. Start trying to make the
+        time trials smarter.
+
+1.001   2012-05-31
+        Try advancing some of the deps to see if that cures the spurious
+        test fails on what look like random architectures. This is unrelated
+        to the previous GMP / Pari stuff, and might be BigInt version related.
+
+1.000   2012-05-24
+        Move from ISA BigInt to HASA BigInt to try to solve the GMP / Pari
+        stuff once and for all.
+
+0.12    2011-03-26
+        Fix completely idiotic thinko in handling backend specification.
+
+0.11    2011-03-26
+        Try to solve weird issue with certain binary versions of GMP and Pari.
+
+0.10    2010-04-28
+        Fewer internal dependencies means fewer chances to use the wrong lib.
+
+0.09    2010-03-27
+        Try to be even more bullet-proof wrt the N32 bugs.
+
+0.08    2010-03-25
+        Add hopefully more-useful output to the diagnostic tests
+
+0.07    2010-03-25
+        Add more purely-diagnostic tests.
+        Hopefully fix weird $PROMOTE_N32 and ->as_n32() bug on Windows and BSD.
+
+0.06    2010-03-22
+        Add $PROMOTE_N32 and ->as_n32().
+        Hopefully fix a weird bug on *BSD systems.
+        Now at 76.2% coverage.
+
+0.05    2010-03-22
+        Make compatability API test better at surviving lack of Net::IPAddress
+
+0.04    2010-03-21
+        Added more tests for compatibility API. Now at 75.9% coverage.
+
+0.03    2010-03-21
+        Added tests for compatibility API.
+
+0.02    2010-03-21
+        Fixed bugs in ip2num() and num2ip(). Fixed distro name in Changes file.
+
+0.01    2010-03-21
+        First version, released on an unsuspecting world.
+

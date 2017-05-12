@@ -1,0 +1,26 @@
+---
+name: Net-RTP
+version: 0.09
+author:
+  - 'Nicholas J Humfrey, njh@cpan.org'
+abstract: Send and receive RTP packets (RFC3550)
+license: perl
+requires:
+  IO::Socket::INET: 1.20
+  Test::More: 0
+recommends:
+  IO::Socket::INET6: 2.51
+  IO::Socket::Multicast: 1.00
+  IO::Socket::Multicast6: 0.02
+  Socket6: 0.19
+  Test::Pod: 1.00
+build_requires:
+  Module::Build: 0.20
+provides:
+  Net::RTP:
+    file: lib/Net/RTP.pm
+    version: 0.09
+  Net::RTP::Packet:
+    file: lib/Net/RTP/Packet.pm
+    version: 0.05
+generated_by: Module::Build version 0.26

@@ -1,0 +1,56 @@
+{
+   "abstract" : "Token scheme definition framework for OAuth 2.0",
+   "author" : [
+      "Roger Crew <crew@cs.stanford.edu>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-OAuth2-Scheme",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA" : 0,
+            "MIME::Base64" : 0,
+            "Math::Random::MT::Auto" : 0,
+            "Thread::IID" : "0.04",
+            "URI::Escape" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cache::Memory" : 0,
+            "HTTP::Message::PSGI" : 0,
+            "HTTP::Request::Common" : 0,
+            "Plack::Request" : 0,
+            "Test::Exception" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-net-oauth2-scheme@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-OAuth2-Scheme"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/wrog/Net-OAuth2-Scheme.git",
+         "web" : "http://github.com/wrog/Net-OAuth2-Scheme"
+      }
+   },
+   "version" : "0.03"
+}
+

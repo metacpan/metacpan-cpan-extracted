@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+examples/server.cgi
+lib/Net/OpenID/Server.pm
+t/00-use.t

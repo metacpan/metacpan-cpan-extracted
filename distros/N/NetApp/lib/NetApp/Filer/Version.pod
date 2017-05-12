@@ -1,0 +1,61 @@
+
+=head1 NAME
+
+NetApp::Filer::Version -- OO Class for representing NetApp Filer versions
+
+=head1 SYNOPSIS
+
+    use NetApp::Filer;
+
+    my $filer = NetApp::Filer->new({ ... });
+
+    # The "version" is: NetApp Release 7.2.2: Sat Mar 24 20:38:59 PDT 2007
+
+    my $version = $filer->get_version;
+    # $version->isa("NetApp::Filer::Version")
+
+    print $version->get_release, "\n";
+    # prints "7.2.2"
+
+    print $version->get_date, "\n";
+    # prints "Sat Mar 24 20:38:59 PDT 2007"
+
+    print $version->get_string, "\n";
+    print "$version\n";
+    # Both print the same thing, the second one through operator overloading,
+    # namely the original, unparsed version string
+
+    print $version->get_version, "\n";
+    # prints "v7.2.2"
+
+=head1 DESCRIPTION
+
+This class is used to encapsulate the NetApp Filer version string, and
+provide access to the components of the string as a numeric release, a
+perl version, and a date string.
+
+=head1 METHODS
+
+=head2 get_release
+
+Returns the NetApp numerical release as a string, for example:
+
+    7.2.2
+
+=head2 get_date
+
+Returns the NetApp release date as a string, for example:
+
+    Sat Mar 24 20:38:59 PDT 2007
+
+=head2 get_string
+
+Returns the unparsed version string in it's entirety:
+
+    NetApp Release 7.2.2: Sat Mar 24 20:38:59 PDT 2007
+
+=head2 get_version
+
+Returns the NetApp release as a perl version object.
+
+=cut

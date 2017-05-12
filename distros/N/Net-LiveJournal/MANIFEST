@@ -1,0 +1,6 @@
+lib/Net/LiveJournal.pm
+lib/Net/LiveJournal/Entry.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/00-load.t

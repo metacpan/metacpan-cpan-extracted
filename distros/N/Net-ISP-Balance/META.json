@@ -1,0 +1,43 @@
+{
+   "abstract" : "Load balance among two or more ISP connections",
+   "author" : [
+      "Lincoln Stein <lincoln.stein@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-ISP-Balance",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::Netmask" : "0",
+            "Pod::Usage" : "0",
+            "perl" : "v5.8.0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::ISP::Balance" : {
+         "file" : "lib/Net/ISP/Balance.pm",
+         "version" : "1.25"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.25"
+}

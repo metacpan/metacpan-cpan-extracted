@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               Net-Azure-StorageClient
+version:            0.5
+abstract:           Windows Azure Storage Client
+author:
+    - Junnama Noda <junnama@alfasado.jp>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Digest::SHA:      0
+    HTTP::Date:       0
+    LWP::UserAgent:   0
+    Test::More:       0
+    URI::QueryParam:  0
+    XML::Simple:      0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,14 @@
+Revision history for Net-Finger-Server
+
+0.004     2013-10-06 22:51:16 America/New_York
+        - update metadata
+        - repackage with non-ancient dzil for great justice
+
+0.003     2008-10-06
+          improve -run
+
+0.002     2008-10-05
+          extend -run to allow @ISA alteration
+
+0.001     2008-10-05
+          first release

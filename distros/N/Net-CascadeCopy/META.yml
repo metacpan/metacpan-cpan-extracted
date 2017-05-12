@@ -1,0 +1,26 @@
+---
+abstract: 'Rapidly propagate (rsync/scp/...) files to many servers in multiple locations.'
+author:
+  - 'Alex White <VVu@geekfarm.org>'
+build_requires:
+  English: 0
+  Test::Differences: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-CascadeCopy
+requires:
+  Benchmark: 0
+  Log::Log4perl: 0
+  Mouse: 0
+  POSIX: 0
+  Proc::Queue: 0
+resources:
+  repository: http://github.com/wu/Net-CascadeCopy
+version: 0.2.6

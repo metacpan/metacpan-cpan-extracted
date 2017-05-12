@@ -1,0 +1,19 @@
+Revision history for Perl extension Net::Whois::IP.
+
+0.01  Tue Feb 11 13:35:58 2003
+	- original version; First release version
+0.03 Wed Mar 5 9:25:00 2003
+	- updated based on bug report for ip 199.4.199.0
+0.14 Thu Mar 6 10:17:00 2003
+	- added array of hashes for all responses for all queries run
+0.35 Mon Jun 30 10:15:40 2003
+ 	- added optional multiples flag which causes all response for a record
+	 to be returned in an array
+0.45 Tue Aug 12 10:11:43 2003
+	- added optional reference to an array to be based in.  This array
+	 will affect the search method and what are consider "stoppers" for
+	 records
+1.00 Tue Dec 6 12:55:22 2005
+	-no bug reports for a year... ready for release
+1.10 Mon Sep 6 8:55:33 2010
+	- added case-insensitive flag to pattern match for orgid

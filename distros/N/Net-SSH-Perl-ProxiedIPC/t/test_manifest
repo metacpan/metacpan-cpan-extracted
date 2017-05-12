@@ -1,0 +1,5 @@
+load.t
+pod.t
+pod_coverage.t
+prereq.t
+scratch.t

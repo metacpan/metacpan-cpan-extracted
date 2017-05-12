@@ -1,0 +1,45 @@
+Revision history for Perl extension Net::Google::DocumentsList
+
+0.09    Mon Sep 17 15:50:00 2012
+        - support for changes feed (thanks to Phillip Smith)
+        - support for metadata feed
+        - $item->add_acl with send_notification_emails => 'false' (thanks to Ray Norrish)
+
+0.08    Thu Apr 05 21:45:00 2012
+        - support for resumable upload (thanks to Ray Norrish)
+
+0.07    Fri Sep 16 14:00:00 2011
+        - fix spreadsheet export error (thanks to tvkids)
+
+0.06    Fri Aug 12 11:10:00 2011
+        - added ACL control with withKey option (thanks to Ray Norrish)
+        - translation seems to work now
+
+0.05    Sun Nov 28 19:30:00 2010
+        - fix exporting errors.
+        - publish does not work for now. (due to Google API failure)
+        - tlanslation does not work for now. (due to Google API failure)
+
+0.04    Thu Apr 22 19:00:00 2010
+        - added alternate attribute on item.
+
+0.03    Thu Apr 22 17:30:00 2010
+        - added root_items method to get items in 'root folder'.
+        - added resource_id parameter for items method.
+        - added fail-safe logics on delete and update method.
+
+0.02    Mon Mar 15 23:22:00 2010
+        - Update dependencies (Mouse 0.51, Net::Google::DataAPI 0.17)
+
+0.01    Sat Jan 16 22:22:00 2010
+        - now export works
+        - support for publishing revision
+        - support for translation
+        - support for copying items
+        - support for uploading items with convert=false (not tested)
+
+0.00_02 Tue Jan 05 22:10:10 2009
+        - fix POD typo (no code changes)
+
+0.00_01 Tue Jan 05 15:14:00 2009
+        - first developer release

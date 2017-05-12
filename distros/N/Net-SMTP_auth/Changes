@@ -1,0 +1,23 @@
+Revision history for Perl extension Net::SMTP_auth.
+
+0.08  Fri Jan 13 12:12:57 CET 2006
+        - added authentication via NTLM (James Fryman)
+
+0.07  Don Aug  7 18:23:51 CEST 2003
+        - After upgraing Net:SMTP to version 2.26 I noticed that
+          authentication was broken (the response of AUTH does not equal
+          CMD_OK anymore but CMD_MORE).
+        - PLEASE NOTE: Net::SMTP can handle authentication by its own.
+
+0.06  Fre Jul 11 18:36:37 CEST 2003
+	- changed MIME::Base64 function calls
+        - changed authentication to use Authen::SASL instead of
+          selfmade routines. I currently tested only CRAM-MD5, LOGIN
+          and PLAIN.
+          Can someone please provide me with a SMTP account on a 
+          maschine using DIGEST-MD5 or NTLM?
+
+0.05  Thu Jul 10 10:48:41 2003
+	- original version; created by h2xs 1.20 with options
+		-AXc -n Net::SMTP_auth
+

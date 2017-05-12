@@ -1,0 +1,16 @@
+Fri Oct  1 06:20:38 UTC 2010
+    - made compatible with < perl 5.10
+    - removed unnecessary quoting
+    - compose same type of attributes into a single 'has'
+    - Test::MockObject somehow crept in
+
+Wed Sep 22 04:58:54 UTC 2010    -   v0.102650
+    - require Test::More v0.94
+
+Fri Sep 17 22:38:34 UTC 2010    -   v0.102601
+    - replaced 'die' with 'confess' and updated message
+    - subtest now has a plan
+
+Fri Sep 17 07:34:34 UTC 2010    -   v0.102600
+    - initial release
+    - implemented 'answers'

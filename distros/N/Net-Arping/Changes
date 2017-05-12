@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::Arping.
+
+0.02  Tue Jul 30 16:06:16 2002
+	- original version; created by h2xs 1.21 with options
+		-A -n Net::Arping
+

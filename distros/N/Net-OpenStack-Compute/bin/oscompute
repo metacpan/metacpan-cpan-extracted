@@ -1,0 +1,347 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use v5.10;
+use App::Rad qw(MoreHelp);
+use Carp qw(croak);
+use JSON qw(from_json to_json);
+use LWP;
+use Pod::Select;
+use Net::OpenStack::Compute;
+
+# Need to set this for App::Rad which prints to STDOUT
+binmode STDOUT, ':encoding(UTF-8)';
+
+sub setup {
+    my $c = shift;
+
+    $c->register_commands({
+        server => 'perform server actions',
+        image  => 'perform image actions',
+        flavor => 'perform flavor actions',
+    });
+    $c->register(s => \&server, 'alias for server');
+    $c->register(i => \&image, 'alias for image');
+    $c->register(f => \&flavor, 'alias for flavor');
+
+    $c->more_help(_parse_pod());
+    $c->getopt('verbose|v', 'insecure', 'query|q=s');
+    $c->stash->{compute} = Net::OpenStack::Compute->new_from_env(
+        $c->options->{insecure} ? (verify_ssl => 0) : ()
+    );
+}
+
+App::Rad->run();
+
+sub server {
+    my $c = shift;
+    my $compute = $c->stash->{compute};
+    my @args = @{$c->argv};
+    my $sub_cmd = shift @args;
+    given ($sub_cmd) {
+        when ([undef, 'list']) { return _get_servers($c) }
+        when ([qw(show s)]) {
+            die "Usage: $0 server show <server>\n" unless @args == 1;
+            my $id = $args[0];
+            my $s = _get_server($c, $id);
+            return _to_json($s) if $c->options->{verbose};
+            return _format_servers($s);
+        }
+        when ([qw(create c)]) {
+            die "Usage: $0 server create <name> <flavor> <image>\n"
+                unless @args == 3;
+            my ($name, $flavor, $image) = @args;
+            my $s = $compute->create_server({
+                name => $name, flavorRef => $flavor, imageRef => $image});
+            return _to_json($s) if $c->options->{verbose};
+            return "Creating server $s->{id} with password $s->{adminPass}";
+        }
+        when ([qw(delete d rm)]) {
+            die "Usage: $0 server delete <server>\n" unless @args == 1;
+            my ($id) = @args;
+            my $s = _get_server($c, $id);
+            $compute->delete_server($s->{id});
+            return "Server $id has been marked for deletion.";
+        }
+        when ('rebuild') {
+            die "Usage: $0 server rebuild <server> <image-id>\n"
+                unless @args == 2;
+            my ($server_id, $image_id) = @args;
+            my $s = _get_server($c, $server_id);
+            $s = $compute->rebuild_server($s->{id}, { imageRef => $image_id });
+            return _to_json($s) if $c->options->{verbose};
+            return "Server $server_id is rebuilding.";
+        }
+        when ('resize') {
+            die "Usage: $0 server resize <server> <flavor-id>\n"
+                unless @args == 2;
+            my ($server_id, $flavor_id) = @args;
+            my $s = _get_server($c, $server_id);
+            $compute->resize_server($s->{id}, { flavorRef => $flavor_id });
+            return "Server $server_id is resizing.";
+        }
+        when ('reboot') {
+            die "Usage: $0 server reboot <server> [soft|hard]\n" unless @args;
+            my ($server_id, $type) = @args;
+            $type ||= 'SOFT';
+            my $s = _get_server($c, $server_id);
+            $compute->reboot_server($s->{id}, { type => $type });
+            return "Server $server_id is rebooting.";
+        }
+        when ([qw(password pass p)]) {
+            die "Usage: $0 server password <server> <password>\n"
+                unless @args == 2;
+            my ($server_id, $password) = @args;
+            my $s = _get_server($c, $server_id);
+            $compute->set_password($s->{id}, $password);
+            return "Changing password for $server_id to '$password'.";
+        }
+        default {
+            die "Supported server commands are list, show, create and delete."
+                . "\n";
+        }
+    }
+}
+
+sub image {
+    my $c = shift;
+    my $compute = $c->stash->{compute};
+    my @args = @{$c->argv};
+    my $sub_cmd = shift @args;
+    given ($sub_cmd) {
+        when ([undef, 'list']) { return _get_images($c) }
+        when ([qw(show s)]) {
+            die "Usage: $0 image show <id>\n" unless @args == 1;
+            my $img = $compute->get_image($args[0]);
+            return _to_json($img) if $c->options->{verbose};
+            return 'No such image' unless $img;
+            return _format_images($img);
+        }
+        when ([qw(create c)]) {
+            die "Usage: $0 image create <name> <server>\n" unless @args == 2;
+            my ($name, $server) = @args;
+            my $s = _get_server($c, $server);
+            $compute->create_image($s->{id}, { name => $name });
+            return "Snapshot of server $server has been scheduled.";
+        }
+        when ([qw(delete d rm)]) {
+            die "Usage: $0 image delete <id>\n" unless @args == 1;
+            my ($id) = @args;
+            $compute->delete_image($id);
+            return "Image $id has been marked for deletion.";
+        }
+        default {
+            die "Supported image commands are list, show, create and delete.\n";
+        }
+    }
+}
+
+sub flavor {
+    my $c = shift;
+    my $compute = $c->stash->{compute};
+    my @args = @{$c->argv};
+    my $sub_cmd = shift @args;
+    given ($sub_cmd) {
+        when ([undef, 'list']) { return _get_flavors($c) }
+        when ([qw(show s)]) {
+            die "Usage: $0 flavor show <id>\n" unless @args == 1;
+            my $flavor = $compute->get_flavor($args[0]);
+            die "No such flavor\n" unless $flavor;
+            return _to_json($flavor) if $c->options->{verbose};
+            return _format_flavors($flavor);
+        }
+        default {
+            die "Supported flavor commands are list, show, create and delete."
+                . "\n";
+        }
+    }
+}
+
+sub _get_server {
+    my ($c, $id) = @_;
+    die "Server id is missing.\n" unless defined $id;
+    my $compute = $c->stash->{compute};
+    my $s = $compute->get_server($id);
+    $s = $compute->get_servers_by_name($id)->[0] unless $s;
+    die "Server $id does not exist.\n" unless $s;
+}
+
+sub _get_servers {
+    my $c = shift;
+    my $compute = $c->stash->{compute};
+    my $q = $c->options->{query};
+    my $servers = $compute->get_servers(detail => 1, query => $q);
+    return _to_json($servers) if $c->options->{verbose};
+    return _format_servers(@$servers);
+}
+
+sub _get_images {
+    my $c = shift;
+    my $compute = $c->stash->{compute};
+    my $q = $c->options->{query};
+    my $images = $compute->get_images(detail => 1, query => $q);
+    return _to_json($images) if $c->options->{verbose};
+    return _format_images(@$images);
+}
+
+sub _get_flavors {
+    my $c = shift;
+    my $compute = $c->stash->{compute};
+    my $q = $c->options->{query};
+    my $flavors = $compute->get_flavors(detail => 1, query => $q);
+    return _to_json($flavors) if $c->options->{verbose};
+    return _format_flavors(@$flavors);
+}
+
+sub _format_servers {
+    my @servers = @_;
+    join "\n", map { join "\t", @$_{qw(id name status)}, _get_ip($_) } @servers;
+}
+
+sub _format_images {
+    my @images = @_;
+    join "\n", map { join "\t", @$_{qw(id name status)} } @images;
+}
+
+sub _format_flavors {
+    my @flavors = @_;
+    join "\n", map { join "\t", @$_{qw(id name ram)} } @flavors;
+}
+
+sub _get_ip {
+    my $server = shift;
+    for my $addr (map @{$server->{addresses}{$_} || []}, qw(public private)) {
+        return $addr->{addr} if $addr->{version} == 4;
+    }
+    return 'IP-MISSING';
+}
+
+# Warning, recursive magic ahead.
+sub _to_json {
+    ref $_[0] ? to_json($_[0], {pretty => 1}) : _to_json(from_json($_[0]))
+}
+
+sub _parse_pod {
+    my $parser = Pod::Select->new();
+    $parser->select('ARGUMENTS');
+    open my $out, '>', \my $output;
+    open my $this_file,  __FILE__;
+    $parser->parse_from_filehandle($this_file, $out);
+    # Skip the pod header, the first 2 lines
+    my @lines = split /\n/, $output;
+    return join "\n", @lines[2 .. $#lines];
+}
+
+# PODNAME: oscompute
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+oscompute
+
+=head1 VERSION
+
+version 1.1200
+
+=head1 SYNOPSIS
+
+    Usage: oscompute command [arguments]
+
+    Available Commands:
+        f           alias for flavor
+        flavor      perform flavor actions
+        help        show syntax and available commands
+        i           alias for image
+        image       perform image actions
+        s           alias for server
+        server      perform server actions
+
+    Examples:
+
+    # List all servers.
+    oscompute s
+
+    # Same thing.
+    oscompute server
+
+    # Same thing.
+    oscompute server list
+
+    # Show all details.
+    oscompute server -v list
+
+    # Show info for a particular server by id.
+    oscompute server show ec05b52e-f575-469c-a91e-7f0ddd4fab95
+
+    # Show info for a particular server by name.
+    oscompute server show bob
+
+    # Create a new server.
+    # Order of arguments are server create `name` `flavor` `image`
+    oscompute server create bob 1 11b2a5bf-590c-4dd4-931f-a65751a4db0e
+
+    # Delete a server.
+    oscompute server delete ec05b52e-f575-469c-a91e-7f0ddd4fab95
+
+    # Rebuild server bob with the given image.
+    oscompute server rebuild bob d54c514e-da74-4307-805a-423a06160f6c
+
+    # List all available images.
+    oscompute image list
+
+    # Create a snapshot image of a given server.
+    oscompute image create new-img-name bob
+
+=head1 DESCRIPTION
+
+This is a command line tool for interacting with the OpenStack Compute API.
+
+=head1 ARGUMENTS
+
+    Server commands:
+        server [list]
+        server show <server>
+        server create <name> <flavor> <image-id>
+        server delete <server>
+        server rebuild <server> <image-id>
+        server resize <server> <flavor-id>
+        server reboot <server> [soft|hard]
+        server password <server> <new-password>
+
+    Image commands:
+        image [list]
+        image show <image-id>
+        image create <name> <server>
+        image delete <image-id>
+
+    Flavor commands:
+        flavor [list]
+        flavor show <flavor-id>
+
+    Options:
+        --verbose|v   causes output to contain all info returned from the server
+        --insecure    turns off ssl verification
+        --query|q     provide a query string to append to your request
+
+    Notes:
+        Any <server> param can be a server id or a server name.
+        OSCOMPUTE_INSECURE env variable sets --insecure on all commands.
+        Run `man oscompute` to see examples and full documentation.
+
+=head1 AUTHOR
+
+Naveed Massjouni <naveedm9@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Naveed Massjouni.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

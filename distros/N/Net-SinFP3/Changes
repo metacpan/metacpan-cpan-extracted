@@ -1,0 +1,80 @@
+Revision history for Perl extension Net::SinFP3.
+
+1.23 Wed Nov 25 07:12:43 CET 2015
+   - FEATURE: removed local XS code to use Net::Write::Fast
+              => That means Support for Mac OS X.
+   - new: Worker::Single: can be used to fetch results as a Perl ARRAY
+   - bugfix: default values in Search::Active for Net::SinFP3::Result::Unknown object
+   - bugfix: DB::SinFP3: correctly clean prepared statements states on post()
+   - update: links: networecon.com is gone. Hail to metabrik.org.
+   - update: pod unification
+   - update: copyright notice
+
+1.22 Tue Apr  8 14:59:07 CEST 2014
+   - UPDATE: huge improvement on matching algorithm (from 3s to 0.5s)
+   - new: Output: preInit(), firstInit(), lastPost()
+   - update: Global: targetIpAsInt like others
+   - update: SinFP3.xs: randomize TCP source port per target IP/port
+   - update: SinFP3.xs: adjust pps, and prints advancement on packet to send
+   - bugfix: Input::SynScan: stops correctly $timeout seconds after 
+             end of send packets
+   - bugfix: Global: correctly write targetSubnet attribute
+
+1.21 Sun Dec  2 17:59:05 CET 2012
+   - PERFORMANCE: SinFP3.xs: sinfp3_tcp_synscan(): now can SynScan a /8 by
+                  taking less than 1GB of RAM.
+   - update: Input::Server: can use target and port attribute for binding
+   - update: sinfp3.pl: no more -dns-resolve arg
+   - update: sinfp3.pl: default to -active-2
+   - update: deps: removed dependance on Net::Write::Fast
+   - bugfix: Output::Simple: remove results with smaller matchScore to keep only
+             best ones
+   - bugfix: Output::Simple: on printing unknown results
+   - bugfix: Worker::Thread: when Perl not compiled with thread support
+
+1.20 Sun Nov 25 14:44:37 CET 2012
+   - NEW: Input::Server: runs as a daemon to answer requests coming from
+          clients. They must speak the SinFP3 protocol.
+   - NEW: Output::Simple: now default mode instead of Output::Console
+   - NEW: Input::SynScan: can be used to fingerprint target by just using the
+          SYN|ACK response to our SYN (one packet fingerprinting \o/)
+   - UPDATE: verbose mode 1 is now default. Many updates on log messages
+             levels.
+   - NEW: sinfp3.pl: -synscan-fingerprint argument
+   - new: sinfp3.pl: -version prints Perl modules version
+   - new: sinfp3.pl: -quiet to set verbose level 0
+   - new: sinfp3.pl: -passive to set to Mode::Passive and Search::Passive
+                     plugins
+   - new: integration of p0f-3.06b passive signatures into sinfp3.db
+   - update: Input::Sniff: must use Net::Frame::Dump 1.12 now
+   - bugfix: on -dns-reverse, moved to Search modules, when generating Results
+   - bugfix: Search::Passive: sets ip and port attributes for Results
+   - bugfix: Global: when -port argument has an invalid format
+   - bugfix: sinfp3.pl: usage help
+
+1.02 Thu Nov  8 17:21:54 CET 2012
+   - new: Mode::Active can take a Next::Frame object
+
+1.01 Tue Oct 23 15:12:22 CEST 2012
+   - new: -target parameter used for Input::ArpDiscover
+   - update: set a User-Agent for -update-db
+
+1.00 Fri Sep 21 15:33:18 CEST 2012
+   - improvement: added a score (easier to understand than matching masks)
+   - improvement: added patternTcpWScale and patternTcpOLength
+   - improvement: -4 parameter no more required
+     => new algo matches all signatures, and keeps the best matches
+   - improvement: 
+     => new algo matches all signatures (v4 and v6), and keeps the best
+   - improvement: new passive fingerprinting engine
+   - feature: multiple output modules are available
+   - feature: update database argument
+   - feature: now using Net::Frame modules
+   - feature: generated pcap file now contains hostname i/o IP
+   - feature: generate IPv6 anonymous pcap as with IPv4
+   - feature: auto-lookup IPv6 target MAC address
+   - update: P1 now uses TCP MSS option to avoid filtering device to 
+             drop packets without this option
+   - update: SQL database schema (OsVersionChildren table)
+   - update: sinfp.pl and sinfp.db becomes sinfp3.pl and sinfp3.db
+   - ... and lots of bug fixes

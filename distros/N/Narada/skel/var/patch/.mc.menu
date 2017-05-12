@@ -1,0 +1,16 @@
+
+d   narada-diff
+    cd ../..; narada-diff
+
+r   narada-release
+    cd ../..; narada-release
+
+s   narada-patch-remote && narada-patch && narada-patch-send
+    cd ../..; narada-patch-remote && narada-patch && narada-patch-send
+
+p   narada-patch
+    cd ../..; narada-patch
+
+u   narada-patch-pull
+    cd ../..; narada-patch-pull
+

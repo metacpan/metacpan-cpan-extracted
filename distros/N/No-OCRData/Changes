@@ -1,0 +1,28 @@
+2003-08-20 Kjetil Kjernsmo <kk@kjernsmo.net>
+	* Versjon 0.93
+
+	* Uh, glemte faktisk å endre versjonsnummer.... :-(
+
+
+2003-08-15 Kjetil Kjernsmo <kk@kjernsmo.net>
+	* Versjon 0.92
+
+	* Kontonummer kan ha ledende nuller, slik at *KONTO ikke bør
+	  trimmes av reduce(). 
+
+	* Egen sjekk på om *KONTO har annet 0, fjernes hvis kun 0 av reduce().
+
+2003-08-01 Kjetil Kjernsmo <kk@kjernsmo.net>
+	* Versjon 0.91
+
+	* La til en enkel test etter oppfordring. 
+
+2003-07-31 Kjetil Kjernsmo <kk@kjernsmo.net>
+	* Versjon 0.9	
+
+	* Første utgivelse
+
+	* Skrev dokumentasjon
+
+Prehistorisk Kjetil Kjernsmo <kjetikj@astro.uio.no>
+	* Skrev koden og satte den i produksjon for astronomi.no.

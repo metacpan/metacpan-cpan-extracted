@@ -1,0 +1,46 @@
+Net-HTTPS-Any
+
+This module will make an HTTPS connection using Net::SSLeay or ( Crypt::SSLeay
+and LWP), whatever is available on the current system.
+
+It is derived from Business::OnlinePayment::HTTPS.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::HTTPS::Any
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-HTTPS-Any
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-HTTPS-Any
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-HTTPS-Any
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-HTTPS-Any
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Freeside Internet Services, Inc. (http://freeside.biz)
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,18 @@
+     1 - message queueing/dequeuing
+     2 - remote file/dir open/close
+     4 - DESTROY and disconnect calls
+     8 - hexdumps of incomming packets
+    16 - hexdumps of outgoing packets
+    32 - _do_io, _conn_lost
+    64 - _set_error, _set_status
+   128 - on the fly transformations
+   256 - add timestamp and process id 
+   512 -
+  1024 - hexdump of sysreads
+  2048 - hexdump of syswrites
+  4096 - _rel2abs
+  8192 - mkpath
+ 16384 - put method
+ 32768 - recursive methods
+ 65536 - password login
+131072 - private backend

@@ -1,0 +1,46 @@
+---
+abstract: 'Access Cisco ACS functionality through REST API'
+author:
+  - hendrik.vanbelleghem@gmail.com
+build_requires: {}
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Cisco-ACS
+provides:
+  Net::Cisco::ACS:
+    file: lib/Net/Cisco/ACS.pm
+    version: '0.04'
+  Net::Cisco::ACS::Device:
+    file: lib/Net/Cisco/ACS/Device.pm
+    version: '0.03'
+  Net::Cisco::ACS::DeviceGroup:
+    file: lib/Net/Cisco/ACS/DeviceGroup.pm
+    version: '0.03'
+  Net::Cisco::ACS::Host:
+    file: lib/Net/Cisco/ACS/Host.pm
+    version: '0.03'
+  Net::Cisco::ACS::IdentityGroup:
+    file: lib/Net/Cisco/ACS/IdentityGroup.pm
+    version: '0.03'
+  Net::Cisco::ACS::User:
+    file: lib/Net/Cisco/ACS/User.pm
+    version: '0.04'
+requires:
+  IO::Socket::SSL: '2.0'
+  LWP::Protocol::https: '6.00'
+  LWP::UserAgent: '6.15'
+  MIME::Base64: '3.15'
+  Module::Build: '0.42'
+  Moose: '2.0'
+  URI: '1.71'
+  XML::Simple: '2.0'
+resources:
+  license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

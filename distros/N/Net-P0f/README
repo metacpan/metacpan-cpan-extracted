@@ -1,0 +1,44 @@
+Net-P0f
+=======
+
+DESCRIPTION
+
+    This module is a wrapper for the P0f utility. Tthree back-ends are 
+    provided, to make it work on the largest set of systems. 
+
+     o Command line front-end: You only need to install the P0f utility. 
+       Should work on all systems where P0f works. 
+
+     o Socket version: You only need to install the P0f utility. 
+       Works only on systems with Unix-socket support.
+
+     o XS version: You need the headers for the Pcap library (usually 
+       provided in a package called libpcap-devel), and of course a 
+       C compiler. 
+
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+
+    Alternatively, to install with Module::Build, you can use the 
+    following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2004 Sébastien Aperghis-Tramoni <sebastien@aperghis.net>
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.

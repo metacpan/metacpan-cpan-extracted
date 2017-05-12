@@ -1,0 +1,204 @@
+Net-XMPP-Client-GTalk
+
+
+SYNOPSIS
+
+This module provides an easy to use wrapper around the Net::XMPP class of modules for specific access to GTalk ( Both on Gmail and Google Apps ). 
+
+Example:
+
+This example connects to GTalk and waits for a chat message from someone. It replies to that person with the chat message that it received. 
+Additionally it will dump online buddies at regular intervals along with the contents of the message it receives.
+
+You can quit this program by sending it the chat message 'exit'.
+
+
+    use Net::XMPP::Client::GTalk    ;
+    use Data::Dump qw( dump )       ;
+
+    my $username ; # = '' ; Set GTalk username here [ WITHOUT '@gmail.com' ]. 
+    my $password ; # = '' ; Set GTalk password here.
+
+
+    unless( defined( $username ) and defined( $password ) ) { 
+	die( "SET YOUR GTALK USERNAME AND PASSWORD ABOVE!\n" ) ;
+    }
+
+    # See options for domain below in documentation for new.
+    my $ob = new Net::XMPP::Client::GTalk( 
+	USERNAME   =>  $username         ,
+	PASSWORD   =>  $password         ,
+	);
+
+
+    my $require_run = 1 ;
+    my $iteration   = 1 ;
+    while( $require_run ) { 
+
+	my $message = $ob->wait_for_message( 60 ) ;
+
+	unless( $message ) { 
+	    print "GOT NO MESSAGE - waiting longer\n" ;
+	}
+
+	if( $message->{ error } ) { 
+	    print "ERROR \n" ;
+	    next             ;
+	} else { 
+	    dump( $message ) ;
+	}
+
+	if( $message->{ message } eq 'exit' ) { 
+	    print "Asked to exit by " . $message->{ from } . "\n" ;
+	    $message->{ message } = 'Exiting ... ' ;
+	    $require_run = 0 ;
+	}
+
+	$ob->send_message( $message->{ from }, $message->{ message } ) ;
+
+	if( int( $iteration / 3 ) == ( $iteration / 3 ) ) { 
+	    my @online_buddies = @{ $ob->get_online_buddies() } ;
+	    dump( \@online_buddies ) ;
+	}
+
+	$iteration++ ;
+
+    }
+
+
+    exit() ;
+
+
+
+
+USAGE NOTES
+
+The NET::XMPP connection object is available through $object_of_Net_XMPP_Client_GTalk->{ RAW_CONNECTION } and can be used to call 
+all functions of the NET::XMPP class of modules ( listed below ). 
+
+It should be noted, however, that calling the SetCallBacks function on the NET::XMPP object will cause wait_for_message to fail. 
+SetCallBacks can be called indirectly through new as follows: 
+
+    my $ob = new Net::XMPP::Client::GTalk( 
+	USERNAME     =>  $username         ,
+	PASSWORD     =>  $password         ,
+	DOMAIN       => 'gmail.com'        ,           # [ OPTIONAL ] [ DEFAULT gmail.com - set if other such as google apps domain ]
+        SetCallBacks =>  { 
+                 message     =>  \&function ,
+                 presence    =>  \&function ,
+                 iq          =>  \&function ,
+                 send        =>  \&function ,
+                 receive     =>  \&function ,
+                 update      =>  \&function ,
+          }                                ,
+	RESOURCE     => 'My Chat Prog'     ,
+    ) ;
+
+Other than USERNAME and PASSWORD the other two parameters above are optional. 
+
+The presence_send function does NOT update the chat status. This is because the corresponding NET::XMPP functions do not work. 
+
+Additionally the following does NOT work and this module provides get_online_buddies as a work around. 
+
+    my $roster = $NET_XMPP_Connection->Roster();
+    my $user   = $roster->online( 'somebuddy@gmail.com' );
+
+The value of resource can be changed as shown above. 
+
+The connection to GTalk does not have to be explicitly disconnected as it is automatically done when this module object goes out of
+scope or when the program terminates. It is a BAD idea to do: $object_of_Net_XMPP_Client_GTalk->{ RAW_CONNECTION }->Disconnect();
+
+Modules from which you can use functions include: 
+
+    Net::XMPP             
+    Net::XMPP::Client
+    Net::XMPP::Connection
+    Net::XMPP::Debug
+    Net::XMPP::IQ
+    Net::XMPP::JID
+    Net::XMPP::Message
+    Net::XMPP::Namespaces
+    Net::XMPP::Presence
+    Net::XMPP::PrivacyLists
+    Net::XMPP::Protocol
+    Net::XMPP::Roster
+    Net::XMPP::Stanza
+
+
+THREADS: This module is NOT thread safe. To use it within a thread you need to require this module from within the thread. 
+
+WARNING: If the person you are sending a chat message to is not online then they will not receive an offline chat message, 
+however, if they come online before the program terminates they will receive the chat. 
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::XMPP::Client::GTalk
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-XMPP-Client-GTalk
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-XMPP-Client-GTalk
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-XMPP-Client-GTalk
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-XMPP-Client-GTalk/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Harish Madabushi
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

@@ -1,0 +1,19 @@
+
+NAME
+
+Net::Google::AuthSub::Once
+
+DESCRIPTION
+
+Get an AuthSub token that can be used for one request
+
+
+AUTHOR
+
+Peter Stuifzand <peter@stuifzand.eu>
+
+
+COPYRIGHT
+
+Copyright 2010 Peter Stuifzand
+

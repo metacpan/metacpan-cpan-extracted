@@ -1,0 +1,103 @@
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use Net::Evernote::Simple;
+use Sysadm::Install qw( slurp );
+use Digest::MD5 qw( md5_hex );
+
+my( $jpg_file ) = @ARGV;
+
+if( !defined $jpg_file ) {
+    die "usage: $0 jpg_file";
+}
+
+my $evernote = Net::Evernote::Simple->new(
+  # Obtain a developer token from Evernote and put it here
+    # dev_token => "XXX",
+);
+
+  # check if our client API version still works
+if( ! $evernote->version_check() ) {
+    die "Evernote API version out of date!";
+}
+
+my $note_store = $evernote->note_store();
+
+if( !$note_store ) {
+   die "getting notestore failed: $@";
+}
+
+  # retrieve all of our notebooks
+my $notebooks =
+   $note_store->listNotebooks( $evernote->dev_token() );
+
+my $notebook_guid;
+
+  # see if we can find one named "Recipes"
+for my $notebook ( @$notebooks ) {
+    if( $notebook->name() eq "Recipes" ) {
+        $notebook_guid = $notebook->guid();
+        last;
+    }
+}
+
+if( !defined $notebook_guid ) {
+    die "Notebook 'Recipes' not found";
+}
+
+my $data = Net::Evernote::Simple::EDAMTypes::Data->new();
+
+my $content = slurp $jpg_file;
+$data->body( $content );
+my $hash = md5_hex( $content );
+$data->bodyHash( $hash );
+$data->size( length $content );
+
+my $r = Net::Evernote::Simple::EDAMTypes::Resource->new();
+$r->data( $data );
+$r->mime( "image/jpeg" );
+$r->noteGuid( "" );
+
+my $note = Net::Evernote::Simple::EDAMTypes::Note->new();
+$note->title( "Our note title" );
+$note->resources( [$r] );
+$note->notebookGuid( $notebook_guid );
+
+my $enml = <<EOT;
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">
+<en-note>
+   <en-media type="image/jpeg" hash="$hash"/>
+</en-note>
+EOT
+
+$note->content( $enml );
+
+$note_store->createNote(
+   $evernote->dev_token(), $note );
+
+__END__
+
+=head1 NAME
+
+    note-jpg-add - Add a note with a JPG image to folder "Recipes"
+
+=head1 SYNOPSIS
+
+    note-jpg-add
+
+=head1 DESCRIPTION
+
+This test script illustrates how to find a notebook guid, add a note
+to it, and add a JPG image to the note.
+
+=head1 LEGALESE
+
+Copyright 2012 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2012, Mike Schilli <cpan@perlmeister.com>

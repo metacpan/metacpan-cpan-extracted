@@ -1,0 +1,41 @@
+{
+   "abstract" : "The great new Net::MeasuringBandwidth!",
+   "author" : [
+      "Ovidiu N.Tatar <ovn.tatar@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4203",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-MeasuringBandwidth",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::MeasuringBandwidth" : {
+         "file" : "lib/Net/MeasuringBandwidth.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01"
+}

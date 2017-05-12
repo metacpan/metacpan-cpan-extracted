@@ -1,0 +1,17 @@
+TODO list for Perl module Net::Sieve::Script
+
+* write doc
+- _trim method
+* _strip method
+* :over
+* swap rules
+* delete rule
+* add rule
+* find rule
+* add/find/swap/del actions
+* add/del conditions : swap is useless, find can use AllConds
+- chg alternate on order
+* vrfy RFC for match/case order
+* more tests case
+- manage comment rules
+* add rules_changeorder method

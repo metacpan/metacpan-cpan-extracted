@@ -1,0 +1,27 @@
+---
+abstract: Cross-platform Perl interface to "ping" utilities
+author:
+  - 'Alexandr Ciornii <alexchorny@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.78, CPAN::Meta::Converter version 2.131490'
+keywords:
+  - ping
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Ping-External
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Socket: 0
+resources:
+  repository: http://github.com/chorny/Net-Ping-External
+version: 0.15

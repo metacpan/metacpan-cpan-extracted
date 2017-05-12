@@ -1,0 +1,33 @@
+---
+abstract: 'represent a IPv4 address'
+author:
+  - 'Elmar S. Heeb <elmar@heebs.ch>'
+build_requires:
+  Dist::Zilla::Plugin::Test::Perl::Critic: '0'
+  Pod::Coverage::TrustPod: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: NetObj-IPv4Address
+requires:
+  Carp: '0'
+  Dist::Zilla: '0'
+  Dist::Zilla::Plugin::PodWeaver: '0'
+  List::MoreUtils: '0'
+  Moo: '0'
+  namespace::clean: '0'
+  overload: '0'
+  perl: '5.014'
+  strict: '0'
+  warnings: '0'
+version: '1.0'

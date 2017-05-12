@@ -1,0 +1,251 @@
+NAME
+    Net::YahooMessenger - Interface to the Yahoo!Messenger IM protocol
+
+SYNOPSIS
+            use Net::YahooMessenger;
+
+            my $yahoo = Net::YahooMessenger->new(
+                    id       => 'your_yahoo_id',
+                    password => 'your_password',
+            );
+            $yahoo->login or die "Can't login Yahoo!Messenger";
+            $yahoo->send('recipient_yahoo_id', 'Hello World!');
+
+DESCRIPTION
+    Net::YahooMessenger is a client class for connecting with the
+    Yahoo!Messenger server, and transmitting and receiving a message.
+
+    Since implement of a protocol is the result of analyzing and
+    investigating a packet, it has an inadequate place. However, it is
+    working as expected usually.
+
+METHODS
+    This section documents method of the Net::YahooMessenger class.
+
+  Net::YahooMessenger->new()
+
+    It should be called with following arguments (items with default value
+    are optional):
+
+            id            => yahoo id
+            password      => password
+            pre_login_url => url which refers to setting information.
+                             (default http://msg.edit.yahoo.com/config/)
+            hostname      => server hostname
+                             (default 'cs.yahoo.com)
+
+    Returns a blessed instantiation of Net::YahooMessenger.
+
+    Note: If you plan to connect with Yahoo!Japan(yahoo.co.jp), it sets up
+    as follows.
+
+            my $yahoo_japan = Net::YahooMessenger->new(
+                    pre_login_url => 'http://edit.my.yahoo.co.jp/config/',
+                    hostname      => 'cs.yahoo.co.jp',
+            );
+
+    *Since it connects with Yahoo!(yahoo.com), this procedure is unnecessary
+    in almost all countries.*
+
+  $yahoo->id([$yahoo_id])
+
+    This method gets or sets the present Yahoo Id.
+
+  $yahoo->password([$password])
+
+    This method gets or sets the present password.
+
+  $yahoo->login()
+
+    Call this after "new()" to logon the Yahoo!Messenger service.
+
+  $yahoo->send($yahoo_id, $message)
+
+    This method send an Instant-Message $message to the user specified by
+    $yahoo_id. A kanji code is Shift_JIS when including Japanese in
+    $message.
+
+  $yahoo->change_state($busy, $status_message)
+
+    This method sets the *status messages* for the current user. 'Status
+    message' is set by $status_message. 'Busy icon' is set by the numerical
+    value of $busy.
+
+    The $busy should be called with following arguments:
+
+            0 - I'm Available
+            1 - Busy
+            2 - Sleep
+
+  $yahoo->recv()
+
+    This method reads the message from a server socket and returns a
+    corresponding Event object. The Event object which will be returned is
+    as follows:
+
+            Net::YahooMessenger::InvalidLogin     - Invalid Login
+            Net::YahooMessenger::Login            - Succeeded in Login.
+            Net::YahooMessenger::GoesOnline       - Buddy has logged in.
+            Net::YahooMessenger::ReceiveMessage   - Message was received.
+            Net::YahooMessenger::ChangeState      - Buddy has change status.
+            Net::YahooMessenger::GoesOffline      - Buddy logged out.
+            Net::YahooMessenger::NewFriendAlert   - New Friend Alert.
+            Net::YahooMessenger::UnImplementEvent - Un-implemented event was received.
+
+    All event objects have the following attributes:
+
+    $event->from
+        Yahoo id which invoked the event.
+
+    $event->to
+        Yahoo id which should receive an event.
+
+    $event->body
+        The contents of an event. The message and state which were
+        transmitted.
+
+    $event->code
+        The event number on Yahoo Messenger Protocol.
+
+  $yahoo->get_connection()
+
+    This method returns a raw server socket. When connection has already
+    ended, the socket is returned, and when not connecting, it connects
+    newly.
+
+  $yahoo->set_event_hander($event_handler)
+
+    This method sets the Event handler for a specific Yahoo!Messenger server
+    event. $event_handler is the sub class of
+    Net::YahooMessenger::EventHandler.
+
+    Note: The event which can be overwritten should look at the method
+    signature of the Net::YahooMessenger::EventHandler manpage.
+
+  $yahoo->add_event_source($file_handle, $code_ref, $flag)
+
+    This method adds the file handle (event sauce) to supervise. The file
+    handle to add is specified by $file_handle. The code reference to the
+    processing to perform is specified by $code_ref.
+
+            C<$flag> eq 'r' - set when the file handle to add is an object for read.
+            C<$flag> eq 'w' - set when the file handle to add is an object for write.
+
+    By adding another handle (for example, STDIN), processing can be
+    performed based on those inputs. Usually, the server socket of
+    'Yahoo!Messenger server' is set as a candidate for surveillance.
+
+            ex:
+                    # The input of STDIN is transmitted to 'EXAMPLE_YAHOO_ID'.
+                    $yahoo->add_event_source(\*STDIN, sub {
+                            my $message = scalar <STDIN>;
+                            chomp $message;
+                            $yahoo->send('EXAMPLE_YAHOO_ID', $message);
+                    }, 'r');
+
+  $yahoo->start()
+
+    If you're writing a fairly simple application that doesn't need to
+    interface with other event-loop-based libraries, you can just call
+    start() to begin communicating with the server.
+
+EXAMPLE
+  Send message
+
+            #!perl
+            use Net::YahooMessenger;
+            use strict;
+
+            my $yahoo = Net::YahooMessenger->new;
+            $yahoo->id('yahoo_id');
+            $yahoo->password('password');
+            $yahoo->login or die "Can't login Yahoo!Messenger";
+
+            $yahoo->send('recipient_yahoo_id', 'Hello World!');
+            __END__
+
+  Change Status message
+
+            #!perl
+            use Net::YahooMessenger;
+            use strict;
+            use constant IN_BUSY => 1;
+
+            my $yahoo = Net::YahooMessenger->new(
+                    id       => 'yahoo_id',
+                    password => 'password',
+            );
+            $yahoo->login or die "Can't login Yahoo!Messenger";;
+
+            $yahoo->change_state(IN_BUSY, q{I'm very busy now!});
+            sleep 5;
+            __END__
+
+  Received message output to STDOUT
+
+            #!perl
+            use Net::YahooMessenger;
+            use strict;
+
+            my $yahoo = Net::YahooMessenger->new(
+                    id       => 'yahoo_id',
+                    password => 'password',
+            );
+            $yahoo->set_event_handler(new ToStdoutEventHandler);
+            $yahoo->login or die "Can't login Yahoo!Messenger";
+            $yahoo->start;
+
+            package ToStdoutEventHandler;
+            use base 'Net::YahooMessenger::EventHandler';
+            use strict;
+
+            sub ChangeState {}
+            sub GoesOffline {}
+            sub GoesOnline {}
+            sub UnImplementEvent {}
+
+            sub ReceiveMessage
+            {
+                    my $self = shift;
+                    my $event = shift;
+                    printf "%s: %s\n", $event->from, $event->body;
+            }
+            __END__
+
+  Connect to Yahoo!Japan Messege server
+
+            #!perl
+            use Net::YahooMessenger;
+            use strict;
+
+            my $yahoo = Net::YahooMessenger->new(
+                    pre_login_url => 'http://edit.my.yahoo.co.jp/config/',
+                    hostname      => 'cs.yahoo.co.jp',
+            );
+            $yahoo->id('yahoo_id');
+            $yahoo->password('password');
+            $yahoo->login or die "Can't login Yahoo!Messenger";
+
+            $yahoo->send('recipient_yahoo_id', 'Konnitiwa Sekai!');
+            __END__
+
+AUTHOR
+    Hiroyuki OYAMA <oyama@cpan.org> http://ymca.infoware.ne.jp/
+
+    From October 2003, this module is taken over and maintained by Tatsuhiko
+    Miyagawa the lt manpagemiyagawa@bulknews.netthe gt manpage
+
+    From September 2009, Emil Dragu <emil.dragu@webwave.ro> is comaintainer.
+
+SEE ALSO
+    <http://messenger.yahoo.co.jp/>, <http://ymca.infoware.ne.jp/>
+
+COPYRIGHT
+    Copyright (C) 2001 Hiroyuki OYAMA. Japan. All righits reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itsefl.
+
+    Please refer to the use agreement of Yahoo! about use of the
+    Yahoo!Messenger service.
+

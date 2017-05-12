@@ -1,0 +1,12 @@
+0.01  Thu Apr 10 16:47:36 2008
+	- original version;
+		-Net::SMS::VoipBuster
+0.02
+    - Some change in tests.
+
+0.03
+    - Validate parms
+
+0.04
+    - Resolve the problem in URL
+    - Manifest.PL ( correct modules )

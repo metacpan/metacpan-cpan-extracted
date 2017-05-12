@@ -1,0 +1,10 @@
+Revision history for Perl extension Net::Frame::Layer::LLTD.
+
+1.01 Wed Jan 14 07:28:05 CET 2015
+   - new: examples
+   - update: copyright notice
+   - update: Kwalitee
+
+1.00 Thu Mar 15 19:26:05 CET 2007
+   - first public release
+

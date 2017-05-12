@@ -1,0 +1,74 @@
+
+Revision history for sFlow.pm
+
+v. 0.02
+  + fix: sub _decodeEthernetFrameData, substr 24 not 20
+  - flowDataLength not in sample hash anymore
+  + fix: header size byte for substr must be mod 4 == 0
+
+v. 0.03
+  + offset for unpack to avoid substr
+  + single quotes in case no double quotes needed
+  + dereference data only once in subs
+  + Net::IP:bintoip() replaced
+
+v. 0.03X
+  + ether header decoding also in sFlow.pm (much faster!)
+  + agent ip fixed, N instead of B32
+  + undef added, line: ($sFlowSample->{$keyName}) = 
+    unpack("a$offset B32", $sFlowDatagramPacked);
+  + s/Labes/Label/
+
+v. 0.04X
+  + formatiing
+  + off by one error fixed
+  + some more bugs fixed
+
+v. 0.05
+  - removed chars from version
+  + binary header for debugging retured as well ($sFlowSample->{HeaderBin})
+  + LICENSE file added
+  + pod error fixed
+  + example script sFluxDebug.pl added
+  + check for vlan tag and add 4 bytes to length if present
+  + ARP header length returned as 64 byte
+
+v. 0.06
+  + add padding to datalength if smaller then 64Byte
+  + assume all packets type 'other' as 64 bytes
+  + ip v4 address decoding in samples fixed
+  + decode gateway - bugfix
+  + ether type constants added
+  + HeaderVer renamed to HeaderType
+  + HeaderType returns the corresponding ether type code
+
+v. 0.07
+  + bugfix - ifInOctets, ifInDiscards
+  + bugfix - $sFlowSample->{ifAdminStatus}, $sFlowSample->{ifOperStatus}
+    thanks wogri! :D
+  + bugfix - examples/sFluxDebug.pl in printing DestMac address
+
+v. 0.08
+  + localpref didn't exist pre v4
+  + sFlowAsPath{lengthAsList} = 1; for sflow <= v4
+  + some typos fixed
+  + boundary checks on values taken from datagram used as iterator
+  + boundary checks on values taken from datagram used as offset for unpack()
+    thanks ilja! :D
+
+v. 0.09
+  + bugfix - length values for strings must be multiple word size
+
+v. 0.10
+  + foundry enterprise type 1991 added, to decode foundry acl based samples
+
+v. 0.11
+  + sFluxDebug.pl can handle vlan tagged sflow packets now
+  + boundary checks eased a little... some things are allowed to be 0
+  + IPv6 address decoding fixed
+  + community list presentation changed
+    thanks ben! :D
+
+
+Elisa Jasinska <elisa.jasinska@ams-ix.net>
+2009/01/20

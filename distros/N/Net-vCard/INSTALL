@@ -1,0 +1,10 @@
+INSTALL NOTES FOR Net::vCard
+--------------------------------------
+
+Nothing unusual.
+
+ perl Makefile.PL
+ make
+ make test
+ make install
+

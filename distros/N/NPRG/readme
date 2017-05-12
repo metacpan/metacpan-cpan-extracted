@@ -1,0 +1,28 @@
+NPRG & Wingraph
+---------------
+
+This package contains two modules for creating and printing reports
+using Windows GDI and printer support.
+See documentation in .pod format in appropriate modules.
+You also need Alias module, available from CPAN.
+
+Installation is standart:
+
+perl Makefile.PL
+nmake
+nmake install
+
+Unfortunaly I don't seems any ways to create tests for this module.
+Edit example.pl file (enter you printer name) and try to run
+it. You must get tsta,emf file.
+
+This modules was tested under ActiveState Perl 5.6.0 distribution and
+under original Perl source distribution using
+Microsoft Visual C++ Version 12.00.8168 for 80x86.
+It seem that you do not encounter with 5.5.x versions of Perl
+and under earlier versions of MSVC++.
+
+Copyright 2000 Ivan Frolcov.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

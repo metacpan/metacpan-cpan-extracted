@@ -1,0 +1,27 @@
+#!/bin/bash
+
+#export SC_CONF='SC.conf-LOCAL'
+
+if [ $# -gt 0 ];
+then
+	HOST=$1
+	shift
+else
+	echo -n 'Target: '
+	read HOST
+fi
+
+if [ "-$CH_LEN" = "-" ];
+then
+	SC_LEN=3
+fi
+
+if [ "-$CH_TO" = "-" ];
+then
+    SC_TO=30
+fi
+	
+echo "Socks chain to $HOST : "
+
+telnet_over_socks_chain.pl -cmd "/usr/bin/telnet $@ localhost %PORT%" -t $HOST -rnd -l $SC_LEN -to $SC_TO
+

@@ -1,0 +1,9 @@
+
+1.1
+    - Added unread() to get list of unread messages
+    - Added message() to get the message along with flags
+    - Added message_info() to get the flags and message headers
+    - Made multiline responses work better
+
+1.0
+    - Initial Release

@@ -1,0 +1,36 @@
+Net-DNS-Check version 0.45
+===========================
+
+DESCRIPTION
+
+Net::DNS::Check is a collection of OOP Perl modules allowing easy 
+implementation of applications for domain name checking.
+
+The Net::DNS::Check was built to be as easy as possible to use and 
+highly configurable and flexible: it allow easy implementation 
+of your custom test and deeper configuration of what you want 
+to check and how. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ Net::DNS version 0.42 or greater
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Lorenzo Luconi Trombacchi - IIT-CNR
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+

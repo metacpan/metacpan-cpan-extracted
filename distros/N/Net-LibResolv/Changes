@@ -1,0 +1,13 @@
+Revision history for Net-LibResolv
+
+0.03    CHANGES:
+         * Support $h_errno for error reporting
+         * #include <sys/types.h> for OpenBSD
+
+0.02    CHANGES:
+         * Some OSes don't need to link against -lresolv; detect this in
+           Build.PL
+         * Provide type and class name<->ID value conversion functions
+
+0.01    First version, released on an unsuspecting world.
+

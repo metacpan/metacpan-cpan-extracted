@@ -1,0 +1,16 @@
+Revision history for Normalize
+
+0.31    Tue Feb 24 2009
+        Some changes in POD
+        Some fix in tests (change perl path)
+
+0.3    Mon Feb 23 2009
+        First public CPAN release
+        
+0.2    Mon Feb 23 2009
+        - fix normalize_to_min() with zero score values
+        - add arrayref support
+        
+0.1    Mon Feb 23 2009
+       Module birhday!        
+

@@ -1,0 +1,198 @@
+#!/usr/bin/perl -w
+
+# Although this file is bundled with Net::Chat::Daemon, it actually
+# doesn't use it at all (although I probably ought to change it to use
+# Net::Chat::Jabber). Instead, this is just a command-line utility
+# based on Net::Jabber. This is not a robust tool by any means; I
+# merely use it for testing.
+
+use Net::Jabber qw(Client);
+use Getopt::Long qw(:config no_ignore_case);
+use strict;
+
+my $hostname = "jabber.org";
+my $username = "sfink-test1";
+my $password = "secret";
+my $resource = "testresource";
+my $subject = '';
+my $verbose = 0;
+my $help = 0;
+my @file_attachments;
+my @attachments;
+
+GetOptions("hostname|host|H=s" => \$hostname,
+           "username|user|u=s" => \$username,
+           "password|p=s" => \$password,
+           "resource|r=s" => \$resource,
+           "subject|s=s" => \$subject,
+           "verbose|v" => \$verbose,
+           "attachment|a=s" => \@file_attachments,
+           "data|d=s" => \@attachments,
+           "help|h!" => \$help,
+           );
+
+$resource = $1 if $username =~ s!/(\w+)$!!;
+$hostname = $1 if $username =~ s!\@([^/]+)$!!;
+
+if ($help) {
+    print <<"END";
+Usage: $0 options... send|receive|add|dump
+Options:
+  --hostname=HOST | -H HOST       Jabber server to connect to
+  --username=USER | -u USER       The user to log into the server as
+  --password=PASS | -p PASS       Password to authenticate with
+  --resource=RSRC | -r RSRC       Resource to connect with
+  --subject=SUBJ | -s SUBJ        Subject of message to be sent (if applicable)
+  --verbose | -v                  Display additional status information
+  --attachment=FILE | -a FILE     Attach a file to the message (may be repeated)
+  --data=DATA | -d DATA           Attach the given data to the message (may be repeated)
+  --help | -h                     Display this message
+END
+    exit 0;
+}
+
+print "host=$hostname user=$username resource=$resource\n";
+
+my $Con = new Net::Jabber::Client(debugfile => 'stdout',
+                                  debuglevel => $verbose);
+
+my ($action, @args) = @ARGV;
+$action ||= "receive";
+
+$Con->SetCallBacks(message => \&handleMessage,
+                   presence => \&handlePresence)
+    if $action eq 'receive';
+
+$Con->Connect(hostname => $hostname);
+
+die "failed to connect to $hostname" unless $Con->Connected();
+
+print "We are connected to the server... ($!)\n";
+
+my @identity = (username => $username,
+                password => $password,
+                resource => $resource);
+
+my @result = $Con->AuthSend(@identity);
+print "auth status: " . join(" - ", @result) . "\n";
+
+if ($result[0] eq "401") {
+  @result = $Con->RegisterSend(@identity);
+  print "register status: " . join(" - ", @result) . "\n";
+  if ($result[0] eq 'ok') {
+      @result = $Con->AuthSend(@identity);
+      if ($result[0] ne 'ok') {
+          exit 1;
+      }
+  }
+}
+
+$Con->PresenceSend();
+
+# sub xml_escape {
+#   local $_ = shift;
+#   s/[\000-\011]//g;
+#   s/[\016-\037]//g;
+#   s/[\200-\377]//g;
+#   return $_;
+# #  XML::Parser::Expat->xml_escape(shift);
+# }
+
+sub xml_escape {
+  local $_ = shift;
+  s/\&/&amp;/g;
+  s/\</&lt;/g;
+  s/\>/&gt;/g;
+  s/([\000-\011\013\014\016-\037\200-\377])/sprintf("&#%d;", ord($1))/eg;
+  return $_;
+}
+
+if ($action eq 'send') {
+  my ($to, $message) = @args;
+  $to .= "\@$hostname" unless $to =~ /@/;
+  my $msg = new Net::Jabber::Message;
+  $msg->SetMessage(to => $to, subject => $subject, body => $message);
+  my $tree = $msg->{TREE};
+  my $attachments = $tree->add_child("attachments");
+  foreach my $attachment (@file_attachments) {
+    open(DATA, $attachment) or die "open $attachment: $!";
+    my $data = do { local $/; <DATA>; };
+    close DATA;
+
+    my $attach = $attachments->add_child("attachment");
+    $attach->add_child("type", 'file');
+    $attach->add_child("filename", $attachment);
+    $attach->add_child("data", xml_escape($data));
+  }
+  foreach my $attachment (@attachments) {
+    my $attach = $attachments->add_child("attachment");
+    $attach->add_child("type", 'data');
+    $attach->add_child("data", xml_escape($attachment));
+  }
+  $Con->Send($msg);
+  terminate();
+  exit 0;
+}
+
+if ($action eq 'add') {
+  my ($jid) = @args;
+  $Con->Subscription(type => "subscribe", to => $jid);
+  terminate();
+  exit 0;
+}
+
+if ($action eq 'dump') {
+  my ($jid) = @args;
+  use Data::Dumper;
+  print Dumper($Con->RosterGet());
+  terminate();
+  exit 0;
+}
+
+while (1) {
+  print "receiving...\n";
+  defined($Con->Process()) or terminate();
+}
+
+terminate();
+
+sub terminate {
+  $Con->Disconnect();
+  exit 0;
+}
+
+sub handleMessage {
+  my $sid = shift;
+  my $msg = shift;
+  my $src = $msg->GetFrom("jid")->GetUserID();
+  my $msgtxt = $msg->GetBody();
+  print "GOT MESSAGE: $msgtxt\n";
+  my $attachments = $msg->{TREE}->XPath("attachments");
+  if ($attachments) {
+    foreach my $node ($attachments->children()) {
+      my %attachment;
+      foreach ($node->children()) {
+        $attachment{$_->get_tag()} = $_->get_cdata();
+      }
+
+      print "Attachment type: $attachment{type}\n";
+      local $_ = $attachment{data};
+      s/^/= /g;
+      print;
+      print "\n";
+    }
+  }
+  $Con->MessageSend(to=>$msg->GetFrom(), subject=>"Build of $msgtxt",
+                    thread=>"$msg->GetThread()",type=>$msg->GetType(),
+                    body=>"response");
+}
+
+sub handlePresence {
+  my $sid = shift;
+  my $presence = shift;
+  my $from = $presence->GetFrom();
+  my $type = $presence->GetType();
+  my $show = $presence->GetShow();
+  my $status = $presence->GetStatus();
+  print "$from is now $show/$status\n";
+}

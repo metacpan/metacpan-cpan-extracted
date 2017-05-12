@@ -1,0 +1,29 @@
+
+Revision history for Net::IPTrie
+
+0.7   2010/08/20
+  - Require Scalar::Util >= 1.21
+
+0.6   2010/08/20
+  - Fixed Bug #60552 for Net-IPTrie: Memory leak if an IPTrie becomes unreferenced (thanks to Christian Ehrhardt)
+
+0.5.1 2010/08/12
+  - Fixed bug where a node's parent would not be found after the node was deleted
+  - Fixed IPv6 tests
+
+0.5  2009/08/10
+  - Removed requirement for version.pm
+
+0.4  2008/10/26
+  - Fixed to match the default route (0.0.0.0/0) - rt.cpan.org #38768
+  - Minor changes in POD documentation
+
+0.3  2007/11/26
+  - Fixed to accept all-zero prefixes (thanks to Ville Mattila)
+  - Fixes in POD documentation
+
+0.2  2007/10/10
+  - Added missing Makefile.PL and this file
+
+0.1  2007/10/08
+  Initial release.

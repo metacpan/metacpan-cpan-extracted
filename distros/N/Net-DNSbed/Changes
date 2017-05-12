@@ -1,0 +1,8 @@
+Revision history for Net-DNSbed
+
+0.01    2012-09-28
+        First version, based on DNSbed API 0.1
+
+0.02    2014-3-14
+        Add a method, checkZone with zone name
+

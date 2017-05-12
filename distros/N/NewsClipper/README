@@ -1,0 +1,283 @@
+News Clipper Version 1.32, Open Source
+http://newsclipper.sourceforge.net/
+
+News Clipper is an information integrator. It creates a custom web page from a
+template HTML file with special tags, replacing those tags with dynamic
+information acquired from the internet.
+
+This is the Open Source version of News Clipper.  You either got this in
+conjunction with a purchase of a commercial version, or in source-only form.
+If you got it the latter way, you can buy the commercial version which will
+get you: technical support, a nice user's manual, pre-compiled binaries, and
+free upgrades for a year. Visit http://www.newsclipper.com/ for more
+information.
+
+New in version 1.32:
+- Fixed more installation problems
+- Dropped DBI requirement during installation because it's really optional.
+- Changed commercial version so it can run on any operating system with the
+  same registration key. (Old keys will continue to work if on the same
+  operating system, but new ones will need to be issued if a new operating
+  system is needed.)
+- Made handler loading routines more robust to illegal characters in the
+  handler name.
+
+See the file CHANGES for a complete change history.
+
+
+DEVELOPMENT
+
+The News Clipper development website is hosted by SourceForge at
+http://newsclipper.sourceforge.net/ There are design documents there
+describing how News Clipper works, as well as planned enhancements, known
+bugs, etc.
+
+
+SUPPORT & DOCUMENTATION
+
+Support for News Clipper Open Source is provided through the News Clipper User
+and News Clipper Developer mailing lists. Instructions for joining are at
+http://newsclipper.sourceforge.net/
+
+'perldoc NewsClipper.pl' will give you an overview of the software. A complete
+user's manual is available with the purchase of the commercial version (see
+below).
+
+Also try running with the -d switch if you have problems, or see the FAQ at
+http://www.newsclipper.com/techsup.htm.
+
+Report bugs to bugreport@newsclipper.com
+
+
+PREREQUISITES
+
+- NOTE: This version of News Clipper uses a custom version of File::Cache. You
+  may encounter a warning during installation about a pre-existing
+  File/Cache.pm file. You can safely ignore this warning. Secondly, you will
+  need to install File::Spec version 0.82 or better.
+- If you do not have Perl installed on your system, download and install it
+  from http://www.perl.com/. You will need Perl version 5.004 or newer.
+- Windows users will need to install nmake if they do not already have it. It
+  can be downloaded from ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe
+- News Clipper requires the following packages:
+    TimeDate
+    Time-modules
+    URI
+    HTML::Parser
+    HTML::Tree
+    File::Cache
+    libwww
+    LockFile::Simple
+    Log::Agent
+    Log::Agent::Rotate
+  Be advised that these modules also require other modules:
+    URI requires MIME::Base64
+    HTML::Tree requires libwww and Font::AFM
+    libwww requires URI, MIME::Base64, HTML::Parser, and Net::FTP (in libnet).
+  In addition, Windows users will need to install the latest version of
+  libwin32, and RedHat Linux users should install a newer version of IO.
+
+  Windows users should use the ppm utility that comes with ActivePerl to
+  install these modules. Run "ppm", then type "install MODULE" for each
+  module, in the following order: MIME-Base64, libnet, Font-AFM,
+  Digest-MD5, URI, HTML-Parser, libwww-perl, TimeDate, Time-modules, HTML-Tree,
+  libwin32. There isn't a ppm version of the File::Cache
+  distribution yet. You'll have to install it manually from the URL below.
+
+  Non-Windows users should download and install the modules from the following
+  URLs, in order:
+
+  MIME-Base64-X.XX.tar.gz =>
+    http://www.perl.com/CPAN/modules/by-module/MIME/
+  libnet-X.XXXX.tar.gz =>
+    http://www.perl.com/CPAN/modules/by-module/Net/
+  Font-AFM-X.XX.tar.gz =>
+    http://www.perl.com/CPAN/modules/by-module/Font/
+  Digest-MD5-X.XX.tar.gz =>
+    http://www.perl.com/CPAN/modules/by-module/Digest/
+  URI-X.XX.tar.gz =>
+    http://www.perl.com/CPAN/modules/by-module/URI/
+  HTML-Parser-X.XX.tar.gz =>
+    http://www.perl.com/CPAN/modules/by-module/HTML/
+  libwww-perl-X.XX.tar.gz =>
+    http://www.perl.com/CPAN/modules/by-module/LWP/
+  TimeDate-X.XX.tar.gz =>
+    http://www.perl.com/CPAN/modules/by-module/Time/
+  Time-modules-XX.XXXXXX.tar.gz =>
+    http://www.perl.com/CPAN/modules/by-module/Time/
+  HTML-Tree-X.XX.tar.gz =>
+    http://www.perl.com/CPAN/modules/by-module/HTML/
+  IO-X.XX.tar.gz =>
+    http://www.perl.com/CPAN/modules/by-module/IO/
+  File-Cache-X.XX.tar.gz =>
+    http://www.perl.com/CPAN/modules/by-module/File/
+  LockFile-Simple-X.X.X.tar.gz =>
+    http://www.perl.com/CPAN/modules/by-module/LockFile/
+  Log-Agent-X.X.X.tar.gz =>
+    http://www.perl.com/CPAN/modules/by-module/Log/
+  Log-Agent-Rotate-X.X.X.tar.gz =>
+    http://www.perl.com/CPAN/modules/by-module/Log/
+  Storable-X.X.X.tar.gz =>
+    http://www.perl.com/CPAN/modules/by-module/Storable/
+
+
+INSTALLATION
+
+[Note that these instructions have worked for Windows in the past, but they
+have not been verified recently. Your mileage may vary.]
+- run "perl Makefile.PL"
+- On Unix-like systems, you have the option of installing News Clipper as a
+  single user, or system-wide. Install as a single user if you do not have
+  root access on your system, or if you do not want to make News Clipper
+  accessible to all the users on your system.
+
+  For a single user installation, you will have to specify the locations of
+  the News Clipper root directory, and the manual pages. You can create a
+  symbolic link from the binaries in the bin subdirectory to your ~/bin
+  directory, or augment your PATH environment variable to include the bin
+  subdirectory.  Likewise, you can specify a man page installation path that
+  is already in your MANPATH environment variable, or augment your MANPATH
+  environment variable.
+
+  For a system-wide installation, the installation program will install the
+  programs and man pages in the default perl locations. The system-wide
+  NewsClipper.cfg file should be placed in a location that is readable by all
+  users. (And make sure the permissions are set correctly.)
+- On Windows systems, you will need to specify a location where News Clipper
+  can store its handlers and configuration information. You will also need to
+  specify your time zone in one of the following formats.
+    Universal:  GMT, UT
+    US zones :  EST, EDT, CST, CDT, MST, MDT, PST, PDT
+    Military :  A to Z (except J)
+    Other    :  +HHMM or -HHMM
+    ISO 8601 :  +HH:MM, +HH, -HH:MM, -HH
+  For example, if you are in the Central Standard Time zone, you would enter
+  "CST"
+- run "make" or "nmake"
+- run "make install" or "nmake install"
+- Either copy NewsClipper.cfg to ~/.NewsClipper, or set the NEWSCLIPPER
+  environment variable as described in the CONFIGURING section below.
+
+
+UPGRADING FROM A PREVIOUS VERSION
+
+- In this distribution you will find a program called "ConvertHandler", which
+  will update any handlers you may have written for a previous version of News
+  Clipper. You should delete handlers you did not write from your handlers
+  directory -- new versions will be automatically be downloaded from the News
+  Clipper handler server.
+- During installation, Makefile.PL will attempt to find any existing
+  NewsClipper.cfg file you have and convert it to the current version using
+  the "ConvertConfig" application that comes with the distribution.
+- Run "ConvertConfig NewsClipper.cfg" from the command prompt to update any
+  other NewsClipper.cfg files you have.
+
+
+CONFIGURING
+
+- On Windows systems, the location of the configuration file is stored in the
+  registry.
+- On non-Windows systems, configuration information is first looked for in the
+  system-wide location specified by the NEWSCLIPPER environment variable. News
+  Clipper will then load the user's NewsClipper.cfg from $home/.NewsClipper.
+  Options that appear in the personal configuration file override those in the
+  system-wide configuration file.
+
+  This means that a user's configuration file can consist solely of
+    %config = (
+      'inputFiles' => ['input.txt'],
+      'outputFiles' => ['output.html'],
+    );
+- Each line in the News Clipper configuration file (NewsClipper.cfg) that
+  begins with a '#' is a comment that describes the option following it.
+- See "perldoc NewsClipper.pl" for a description of the configuration
+  parameters.
+
+
+TESTING
+
+- To run on Windows platforms, start a command prompt and change directories
+  to the SampleFiles directory included in the distribution. Run
+  "perl INSTALLDIR\bin\NewsClipper.pl"
+- To run on non-Windows platforms, change directories to the SampleFiles
+  directory included in the distribution. Run "INSTALLDIR/bin/NewsClipper.pl"
+  for a single-user installation, or something like "/usr/bin/NewsClipper.pl"
+  for a system-wide installation.
+
+This will cause News Clipper to process the input file specified in the
+NewsClipper.cfg file. (When you first install News Clipper, this will be a
+file located in the SampleFiles directory.) The first time you run News
+Clipper, News Clipper will download the handlers it needs. There is also some
+delay in contacting the handler server and the content provider. Please be
+patient.  Subsequent executions will be faster.
+
+The default installation processes a sample input file found in the
+"INSTALLDIR\SampleFiles" directory.  You can view the output file (located in
+"INSTALLDIR\SampleFiles\output.html") using your favorite web browser.
+
+
+ADDING DYNAMIC CONTENT TO YOUR SITE
+
+To see how News Clipper might add value to your web site, do the following:
+- Choose a web page to enhance.
+- Edit you configuration file so that the full path and filename of the file
+  is specified for the input file. (Optionally, you can change the output
+  file.)
+- Edit you input file using a text editor, or an HTML editor.
+- Choose a suitable location for the content, and then insert one of the
+  following News Clipper commands as an HTML comment:
+
+  <!--newsclipper
+    <input name=yahootopstories source=ap>
+    <filter name=map filter=hash2string
+             format='<a href="%{url}">%{headline}</a>'>
+    <filter name=limit number=10>
+    <output name=array numcols=1>
+  -->
+
+  <!--newsclipper
+    <input name=yahootopstories source=reuters>
+    <filter name=map filter=hash2string
+             format='<a href="%{url}">%{headline}</a>'>
+    <filter name=limit number=10>
+    <output name=array numcols=2>
+  -->
+
+  <!--newsclipper
+    <input name=yahootopstories source=sports>
+    <filter name=map filter=hash2string
+             format='%{url}: %{headline}'>
+    <filter name=limit number=10>
+    <output name=array numcols=1>
+  -->
+
+  <!--newsclipper
+    <input name=yahootopstories source=ap>
+    <filter name=map filter=hash2string
+             format='<a href="%{url}">%{headline}</a>'>
+    <filter name=limit number=10>
+    <output name=array numcols=1 prefix='--&gt;' suffix='<br>'>
+  -->
+
+- Run News Clipper to create the output file.
+- View the output file in your favorite browser.
+
+
+AVAILABILITY
+
+The latest open source version is always available at
+http://newsclipper.sourceforge.net/.
+
+
+PRIMARY AUTHOR
+David Coppit (david@coppit.org http://coppit.org/)
+Spinnaker Software (http://www.spinnakersoft.com/)
+
+
+COPYRIGHT & LICENSE
+
+Copyright 1997,1998,1999,2000 David Coppit (david@coppit.org,
+http://coppit.org/)
+
+This code is distributed under the GNU General Public License (GPL). See
+html://www.opensource.org/gpl-license.html and http://www.opensource.org/.

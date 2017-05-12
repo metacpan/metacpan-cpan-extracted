@@ -1,0 +1,53 @@
+
+=head1 NAME
+
+Net::SMS::MessageNet - Send SMS messages via the messagenet.com.au service
+
+=head1 SYNOPSIS
+
+  perl -MNet::SMS::MessageNet -e 'send_sms($user_name, $password, $phone_number, $message);'
+  perl -MNet::SMS::MessageNet -e 'Net::SMS::MessageNet->new($user_name, $password)->send($phone_number, $message);'
+
+=head1 DESCRIPTION
+
+This module allows sending sms messages via https to the messagenet.com.au service
+
+=head1 Functions
+
+=item new ( $username, $password )
+
+returns a new object for sending sms messages.  The username and password
+parameters are from your messagenet.com.au account.  A test account can be obtained
+from messagenet.com.au
+
+=item send ( $phone_number, $message )
+
+sends the contents of $message to the telephone number $phone_number.  $phone_number
+should to a fully qualified phone number including country code.  For example, an
+australian phone number may be '61412345678'.  A complete list of available services
+may be found at http://www.messagenet.com.au/dotnet/Lodge.asmx.  This module is only 
+currently implementing the LodgeSMSMessage interface.
+
+=item send_sms ( $username, $password, $phone_number, $message )
+
+a shortcut to calling new and send.  provided to allow greater ease of use for one liners. :)
+
+=head1 AUTHOR
+
+David Dick <ddick@cpan.org>
+
+=head1 PREREQUISITES
+
+Uses B<LWP>, B<HTTP::Cookies>, B<Net::HTTPS> and B<URI::Escape> modules.
+
+=head1 BUGS
+
+None known at this point
+ 
+=head1 COPYRIGHT
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+

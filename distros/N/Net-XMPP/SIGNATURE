@@ -1,0 +1,68 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 df9d4478aeb0726067e89c0b39e60fde144c9bfe Build.PL
+SHA1 31e9fe9e820b299bc1ad886bb8b2f9a5bc6fed1c CHANGES
+SHA1 e6382a2e4814837e0034b5b1fe6338d75068d7d8 LICENSE
+SHA1 9dce84efce5fa18537493b026406ba3f739c922d MANIFEST
+SHA1 893b592a8af5a75037f11a994f002dec7af86e89 META.json
+SHA1 99033f62f6906298044b114d52d38f08ebf3c8d8 META.yml
+SHA1 f6cdc9aca2ed3ed3025087acf96b8d24f89201fc Makefile.PL
+SHA1 7b62eb1f834045c9b03ade44efe90defce468357 README
+SHA1 56395324555c66964ac300f097d53c7282d3f884 examples/client.pl
+SHA1 4b002e8a47b1bd44d23847d9a2d0e6b1c06b62de examples/client_xpath.pl
+SHA1 c16b8372dbd21757991558632960eb7aa3c89970 lib/Net/XMPP.pm
+SHA1 20768db079f852d6161481455e7ccda70f746b7c lib/Net/XMPP/Client.pm
+SHA1 8e7431d2eb112107a3dcd70a2cabf43f7b9e84c8 lib/Net/XMPP/Connection.pm
+SHA1 047479b19cbf74d2ffead46ebdff4ec2e3e35598 lib/Net/XMPP/Debug.pm
+SHA1 ac1c71245bc41fb700c06d49de1bd3358ad7fd55 lib/Net/XMPP/IQ.pm
+SHA1 98db8b388f3340e789abfa59fdf24d771ee60555 lib/Net/XMPP/JID.pm
+SHA1 bdf3c970ef371d735d1271854bee99b12cb74320 lib/Net/XMPP/Message.pm
+SHA1 ffd4e9eadc6fcffd4a1788886093a2c107a5b89e lib/Net/XMPP/Namespaces.pm
+SHA1 6f4bfbf898a3743cd64ac8db9ec13c368c3d4ef1 lib/Net/XMPP/Presence.pm
+SHA1 c794b060f0e30325c1b3794743078d416b2c5792 lib/Net/XMPP/PrivacyLists.pm
+SHA1 9ccf9aa64258a1467868601c9fbb024076eaca54 lib/Net/XMPP/Protocol.pm
+SHA1 347303c860125d6cd3044d6fa6ba93cf4b2f9f3f lib/Net/XMPP/Roster.pm
+SHA1 91bb321744c1b53e7a371968ae732574dd7cfb8c lib/Net/XMPP/Stanza.pm
+SHA1 dadd2326dfff4d22dfc4870c672fd31a40dd86a8 t/1_load.t
+SHA1 b73dea8a5cd1bfbf15e3e8dfc2ea72a6c00bfa70 t/2_client_jabberd1.4.t
+SHA1 272852577847d66285daf113464f8594acea747b t/3_client_jabberd2.t
+SHA1 4dc9cd2d74671e7e256e6b3f8fd29725e1231c10 t/config/accounts.yml.copyme
+SHA1 176c999052912127b3b36cf3ec5b29af4721cb79 t/get_time_stamp.test
+SHA1 89dfece07866a72994f3760755d0c7b40e72f42f t/gtalk.t
+SHA1 132f93f7d927f6d5528cdb36b10e91474e0a02ac t/iq.t
+SHA1 e006af61529ff08cb8056ab114de7714a7e4a2e5 t/jid.t
+SHA1 a2de64e34bcf7eff51de3ef7998ce9710e8464b3 t/lib/Net/XMPP/Test/Utils.pm
+SHA1 e0dc5181e62285604bffb1d927b1c236ec3c92b9 t/memory_cycle.t
+SHA1 c1409d356ef5676ce8a7b2bc07a11f93089d9492 t/memory_leak.t
+SHA1 98e773d39e9c37ac09405e3923c1a97e16ca4ebe t/message.t
+SHA1 98c5a88b61cc930673c10731ab593323a8f2c0bc t/mytestlib.pl
+SHA1 47132a054b2bfd16ee7ca7c06741993bbbaebc88 t/node1.xml
+SHA1 50688b8dbfd86affd8c51e039df302440a89c597 t/node2.xml
+SHA1 f2ce8c701b89f828a042359b1653afe8c36c752b t/packet_iqauth.t
+SHA1 ce91609b363af5b7bdcb7b283d1eec2a43c83e0c t/packet_iqroster.t
+SHA1 12072726e79263ce927989c778bf895b11344641 t/presence.t
+SHA1 5950e466154e233344d0d0c86a69dfa19f3957af t/query_xxxxx.test
+SHA1 e1c0f8a99820422f6447eae77520656640230083 t/rawxml.t
+SHA1 fa5ed330ecc053f017cc75fc648b51e139b03ff9 t/roster.t
+SHA1 21ab9a1fb1118bc7331bbae053fd479d47838cf2 t/srv.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlSYjRMACgkQjJ7fFJrTQRfygQCdEoTJnZncBq0rghmjq1pgzaoI
+1AgAn1Nu0PgulGi8WSfxt9VSEpZoKo8J
+=fV2v
+-----END PGP SIGNATURE-----

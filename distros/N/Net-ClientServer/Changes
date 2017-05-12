@@ -1,0 +1,10 @@
+0.0007 Tuesday June 15 15:18:03 PDT 2010:
+    - Now creating stderr/pidfile if not explicitly set (but home is available)
+    - Pass forking option to ::Server
+
+0.0006 Tuesday June 15 14:49:11 PDT 20102:
+    - Attempt to connect to localhost if given an empty/wildcard host
+    - Beefed up documentation
+
+0.0005 Monday June 14 18:28:52 PDT 2010:
+    - Initial release

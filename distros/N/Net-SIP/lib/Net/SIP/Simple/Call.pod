@@ -1,0 +1,337 @@
+
+=head1 NAME
+
+Net::SIP::Simple::Call - call context for L<Net::SIP::Simple>
+
+=head1 SYNOPSIS
+
+  my $call = $simple->invite(...);
+  $call->reinvite(... );
+  $call->bye();
+
+=head1 DESCRIPTION
+
+This package manages the call context for L<Net::SIP::Simple>,
+e.g. (re-)invites on existing context etc.
+
+=head1 CONSTRUCTOR
+
+=over 4
+
+=item new ( CONTROL, CTX, \%ARGS )
+
+Creates a new L<Net::SIP::Simple::Call> object to control a call.
+Usually called from B<invite> in L<Net::SIP::Simple>.
+
+CONTROL is the L<Net::SIP::Simple> object managing the calls.
+
+CTX is either an existing L<Net::SIP::Endpoint::Context> or the
+SIP address of the peer which will be contacted in this call
+or a hash which can be used to create the context. 
+If no complete context is given missing information will be taken
+from C<$call> if called as C<$call->new>.
+
+%ARGS are used to describe the behavior of the call and will be
+saved in the object as the connection parameter. The following
+options are used in the connection parameter and can be given
+in %ARGS:
+
+=over 8
+
+=item leg
+
+Specifies which leg should be used for the call (default is first leg in dispatcher).
+
+=item sdp_on_ack
+
+If given and TRUE it will not send the SDP body on INVITE request,
+but on ACK. Mainly used for testing behavior of proxies in between
+the two parties.
+
+=item init_media
+
+Callback used to initialize media for the connection, see method B<rtp>
+in L<Net::SIP::Simple> and L<Net::SIP::Simple::RTP>.
+
+Callback will be invoked with the call C<$self> and the connection
+parameter as an argument (as hash reference).
+
+=item rtp_param
+
+Data for the codec used in the media specified by B<init_media> and
+for the initialization of the default SDP data. This is an array reference
+C<< [pt,size,interval,name] >> where B<pt> is the payload type, B<size> is the
+size of the payload and B<interval> the interval in which the RTP packets
+will be send. B<name> is optional and if given rtpmap and ptime entries will be added
+to the SDP so that the name is associated with the given payload type.
+The default is for PCMU/8000: C<< [0,160,160/8000] >>.
+
+=item sdp
+
+L<Net::SIP::SDP> object or argument for constructing this object.
+If not given  it will create an SDP body with one RTP audio connection
+unless it got first SDP data from the peer in which case it simply
+matches them.
+
+=item sdp_peer
+
+Holds the L<Net::SIP::SDP> body send by the peer. Usually not set in
+the constructor but can be accessed from callbacks.
+
+=item media_lsocks
+
+Contains a \@list of sockets for each media-line in the SDP. Each
+item in this list is either a single socket (in case of port range 1)
+or a \@list of sockets.
+
+If B<sdp> is provided this parameter has to be provided too, e.g.
+the package will not allocate the sockets described in the SDP packet.
+
+=item media_ssocks
+
+Sockets used for sending RTP data. If not given the socket for
+sending RTP is the same as for receiving RTP, unless B<asymetric_rtp>
+is specified.
+
+=item asymetric_rtp
+
+By default it will send the RTP data from the same port where it listens
+for the data. If this option is TRUE it will allocate a different port
+for receiving data. Mainly used for testing behavior of proxies in between
+the two parties.
+
+=item recv_bye
+
+Callback usable by B<invoke_callback> in L<Net::SIP::Util> which will be
+invoked, when the peer initiated the close of the connection using BYE
+or CANCEL.
+
+Argument for the callback will be a hash reference containing the connection
+parameter.
+
+=item send_bye
+
+Callback usable by B<invoke_callback> in L<Net::SIP::Util> which will be
+invoked, when the local side initiated the close of the connection using BYE
+or CANCEL.
+
+Argument for the callback will be a hash reference containing the connection
+parameter merged with the parameter from the B<bye> method.
+
+=item clear_sdp
+
+If TRUE the keys media_lsocks, media_ssocks, sdp and sdp_peer will be cleared
+on each new (re)INVITE request, so that it will allocate new sockets for RTP
+instead of reusing the existing.
+
+=item cb_final
+
+Callback usable by B<invoke_callback> in L<Net::SIP::Util> which will be
+invoked, when it received the final answer on locally created INVITE requests
+(e.g. when it established the call by sending the ACK).
+
+Callback will be invoked with C<< ( STATUS, SELF, %INFO ) >> where STATUS
+is either 'OK' or 'FAIL' ('OK' if final response meant success, else 'FINAL'),
+and %INFO contains more information, like C<< ( packet => packet ) >> for the 
+packet containing the final answer or C<< ( code => response_code ) >> in case 
+failures caused by an unsuccessful response.
+
+=item cb_preliminary
+
+Callback usable by B<invoke_callback> in L<Net::SIP::Util> which will be
+invoked, when it received a preliminary response on locally created INVITE.
+
+Callback will be invoked with C<< ( SELF, CODE, RESPONSE ) >> where
+CODE is the response code and RESPONSE the L<Net::SIP::Response> packet.
+
+=item cb_established
+
+Callback usable by B<invoke_callback> in L<Net::SIP::Util> which will be
+invoked, when it received the final answer on locally created INVITE requests.
+
+Callback will be invoked with C<< ( 'OK', SELF ) >>.
+
+=item cb_invite
+
+Callback usable by B<invoke_callback> in L<Net::SIP::Util> which will be
+invoked, when it received an INVITE request
+
+Callback will be invoked with C<< ( SELF, REQUEST ) >> where REQUEST
+is the L<Net::SIP::Request> packet for the INVITE.
+
+=item cb_dtmf
+
+Callback usable by B<invoke_callback> in L<Net::SIP::Util> which will be
+invoked, when it received an DTMF event.
+
+Callback will be invoked with C<< ( EVENT, DURATION ) >> where EVENT
+is the event ([0-9A-D*#]) and DURATION the duration in ms.
+
+Receiving DTMF needs to be supported by the active RTP handler set with 
+B<init_media>. All builtin handlers from L<Net::SIP::Simple::RTP> are supported.
+If no RTP handler is set up or if the RTP handler does not support DTMF
+sending no DTMF will be received without any warning.
+
+=item cb_notify
+
+Callback usable by B<invoke_callback> in L<Net::SIP::Util> which will be
+invoked, when it received an NOTIFY request
+
+Callback will be invoked with C<< ( SELF, REQUEST ) >> where REQUEST
+is the L<Net::SIP::Request> packet for the NOTIFY.
+
+=item sip_header
+
+A reference to a hash with additional SIP headers for the INVITE requests.
+
+=item call_on_hold
+
+This option causes the next SDP to have 0.0.0.0 as it's address to put
+this side of the call on hold (will not receive data). This is a one-shot
+option, e.g. needs to be set with B<set_param> or within B<reinvite>
+each time the call should be put on hold.
+
+=item ...
+
+More parameters may be specified and are accessible from the callbacks.
+For instance B<media_send_recv> in L<Net::SIP::Simple::RTP> uses a parameter
+B<cb_rtp_done>. See there.
+
+=back
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item cleanup
+
+Will be called to clean up the call. Necessary because callbacks etc can cause
+cyclic references which need to be broken.
+Calls B<rtp_cleanup> too.
+Works by invoking all callbacks which are stored as \@list in C<< $self->{call_cleanup} >>.
+
+This will called automatically at a clean end of a call (e.g. on BYE or CANCEL, either
+issued locally or received from the peer). If there is not clean end and one wants
+to destroy the call unclean one need to call this method manually.
+
+=item rtp_cleanup
+
+Cleanup of current RTP connection.
+Works be invoking all callbacks which are stored as \@list in C<< $self->{rtp_cleanup} >>
+(these callbacks are inserted by L<Net::SIP::Simple::RTP> etc).
+
+=item get_peer
+
+Returns peer of call, see B<peer> in L<Net::SIP::Endpoint::Context>.
+
+=item reinvite ( %ARGS )
+
+Creates a INVITE request which causes either the initial SDP session or an update of
+the SDP session (reinvite). %ARGS will merged with the connection parameter, see description
+on the constructor. 
+Additionally using B<resp40x> an B<auth> as a parameter here would make sense 
+if you want to habe full control about the authorization process.
+
+Sets up callback for the connection, which will invoke B<cb_final> once the final
+response for the INVITE was received and B<init_media> if this response was
+successful.
+
+If no B<cb_final> callback was given it will wait in the event loop until a final
+response was received. Only in this case it will also use the param
+B<ring_time> which specifies the time it will wait for a final response. If
+no final response came in within this time it will send a CANCEL request for
+this call to close it. In this case a callback specified with B<cb_noanswer>
+will be called after the CANCEL was delivered (or delivery failed).
+
+Returns the connection context as L<Net::SIP::Endpoint::Context> object.
+
+This method is called within B<invite> in L<Net::SIP::Simple> after creating the new
+L<Net::SIP::Simple::Call> object to create the first SDP session. Changes on the
+SDP session will be done by calling this method on the L<Net::SIP::Simple::Call>
+object C<$self>.
+
+=item cancel ( %ARGS )
+
+Closes a pending call by sending a CANCEL request.
+Returns true if call was pending and could be canceled.
+
+If %ARGS contains B<cb_final> it will be used as a callback and invoked once it gets
+the response for the CANCEL (which might be a response packet or a timeout).
+The rest of %ARGS will be merged with the connection parameter and given as an argument
+to the B<cb_final> callback (as hash reference).
+
+=item bye ( %ARGS )
+
+Closes a call by sending a BYE request.
+If %ARGS contains B<cb_final> it will be used as a callback and invoked once it gets
+the response for the BYE (which might be a response packet or a timeout).
+The rest of %ARGS will be merged with the connection parameter and given as an argument
+to the B<cb_final> callback (as hash reference).
+
+=item request ( METHOD, BODY, %ARGS )
+
+Will create a request with METHOD and BODY and wait for completion.
+If %ARGS contains B<cb_final> it will be used as a callback and invoked once it gets
+the response for the request (or timeout).
+The rest of %ARGS will be used to create request (mostly for request header, see
+L<Net::SIP::Endpoint::new_request>)
+
+=item dtmf ( EVENTS, %ARGS )
+
+Sends DTMF (dial tones) events to peer according to RFC2833 (e.g. as RTP
+events). 
+
+EVENTS is a string with the characters 0-9,A-D,*,#. These will be send as DTMF.
+Any other characters in the string will lead to a pause in sending DTMF (e.g.
+"123--#" will send "1","2,","3", then add to pauses and then send "#"). 
+
+In %ARGS one can specify a B<duration> in ms (default 100ms) and a callback
+B<cb_final> which is invoked with first argument 'OK', when all events are send. 
+If no B<cb_final> callback is given the method will return only when all events 
+are send.
+
+One can also overwrite the automatic detection of the DTMF method using
+B<methods> in %ARGS. Default is 'rfc2833,audio', with 'rfc2833' only one 
+enforces the use of RTP events, and if the peer does not support it it will
+croak. Setting to 'audio' will not fail from the client side, but the peer
+might not look for DTMF inband data if it expects RTP events.
+
+Sending DTMF needs to be supported by the active RTP handler set with
+B<init_media>. All builtin handlers from L<Net::SIP::Simple::RTP> are supported.
+If no RTP handler is set up or if the RTP handler does not support DTMF sending
+no DTMF will be received without any warning.
+
+=item receive ( ENDPOINT, CTX, ERROR, CODE, PACKET, LEG, FROM )
+
+Will be called from the dispatcher on incoming packets. ENDPOINT is the
+L<Net::SIP::Endpoint> object which manages the L<Net::SIP::Endpoint::Context> CTX
+calling context for the current call. ERROR is an errno describing the
+error (and 0|undef if no error). CODE is the numerical code from the packet if
+a response packet was received. PACKET is the incoming packet,
+LEG the L<Net::SIP::Leg> where it came in and FROM the C<< "ip:port" >> of the
+sender. For more details see documentation to B<set_callback> in
+L<Net::SIP::Endpoint::Context>.
+
+If the incoming packet is a BYE or CANCEL request it will close the call and
+invoke the B<recv_bye> callback.
+
+If it is INVITE or ACK it will make sure that the RTP sockets are set up.
+If receiving an ACK to the current call it will invoke the B<cb_established>
+callback and also the B<init_media> callback which cares about setting up
+the RTP connections (e.g produce and accept RTP traffic).
+
+=item set_param ( %ARGS )
+
+Changes param like B<init_media>, B<sdp_on_ack> on the current call. See the
+constructor. This is useful if call consists of multiple invites with different
+features.
+
+=item get_param ( @KEYS )
+
+Returns values for parameter @KEYS, pendant to B<set_param>
+If there is only one key it will return the value as scalar, on multiple
+keys it returns an array with all values.
+
+=back

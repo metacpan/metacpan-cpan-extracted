@@ -1,0 +1,2 @@
+#!/bin/sh
+exec socklog unix ../../var/log.sock 2>&1

@@ -1,0 +1,13 @@
+GET /session HTTP/1.1
+Host: localhost:8001
+User-Agent: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.7) Gecko/20040624 Debian/1.7-2
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Connection: keep-alive
+Cookie: NETHTTPSERVERSESSION=ea209023f1f3908dd9a39c256be04e55
+Authorization: Digest username="foo", realm="Test", nonce="MTA4ODcxNzg2Mzo5YmE3MWZjN2EzOGIzOWM5YWJhZjFiM2RkNjkyNTU4MQ==", uri="/session", algorithm=MD5, response="baa2e104080fb5964e0dfcc4cb2280ff", qop=auth, nc=00000002, cnonce="29d500603edc385b"
+Cache-Control: max-age=0
+
+

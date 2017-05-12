@@ -1,0 +1,47 @@
+
+=head1 NAME
+
+NetApp::Snapshot::Schedule -- OO class which represents a snapshot schedule
+
+=head1 SYNOPSIS
+
+    use NetApp::Filer;
+    use NetApp::Aggregate;
+    use NetApp::Volume;
+    use NetApp::Snapshot;
+
+    my $filer = NetApp::Filer->new({ .... });
+
+    my $volume = $filer->get_volume( $volname );
+
+    my $schedule = $volume->get_snapshot_schedule;
+
+    $volume->set_snapshot_schedule(
+        weekly		=> 0,
+        daily		=> 2,
+        hourly  	=> 4,
+        hourlist	=> [ 4, 8, 12, 16 ],
+    );
+
+=head1 DESCRIPTION
+
+This class encapsulates a snapshot schedule for an aggregate of volume.
+
+=head1 INSTANCE METHODS
+
+=head2 get_parent
+
+This method returns the parent object for the schedule, which is
+either a NetApp::Aggregate or NetApp::Volume object.
+
+=head2 get_weekly, get_daily, get_hourly
+
+These methods return the number of weekly, daily, or hourly snapshots
+in the schedule.
+
+=head2 get_hourlist
+
+This method returns a list of integers, each of which is one of the
+hours at which to create an hourly snapshot.
+
+=cut

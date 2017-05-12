@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<request method="test.test">
+    <foo>bar</foo>
+    <nesteds>
+        <nested>
+            <baz>bundy1</baz>
+        </nested>
+        <nested>
+            <baz>bundy2</baz>
+        </nested>
+    </nesteds>
+</request>

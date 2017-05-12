@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+lib/Net/NTP.pm
+README
+t/1.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,44 @@
+$Id: README,v 1.2 2007-08-31 11:58:41 mike Exp $
+
+This directory contains auxiliary files that are not part of
+Simple2ZOOM itself but which can be used to configure it, test
+configurations, start and stop it, etc.
+
+test.xml -- a sample Simple2ZOOM main configuration file, containing
+	minimal definitions of many different targets, useful for
+	development and testing.
+
+nla.xml -- the beginnings of a main configuration file suitable for
+	use by the National Library of Australia.
+
+simple2zoom.rnc -- Relax-NG Compact schema constraining the
+	main configuration file format.  (The format is described in
+	prose in the Net::Z3950::Simple2ZOOM::Config manual.)
+
+simple2zoom.rng, simple2zoom.xsd, simple2zoom.dtd -- automatically
+	generated schemas constraining the main configuration file
+	format using other constraint languages: Relax-NG XML, W3C
+	Schema and DTD (Document Type Definition).
+
+Makefile -- controls generation of the additional schemas from the
+	Relax-NG Compact master schema, and checks that test.xml
+	validates correctly.
+
+yazgfs.xml -- A YAZ GFS (Generic Frontend Server) configuration file,
+	as described at http://indexdata.com/yaz/doc/server.vhosts.tkl
+	Its purpose is to use the file ccl-qualifiers.
+
+ccl-qualifiers -- a simple set of CCL qualifiers indicating how
+	Simple2ZOOM (actually the YAZ GFS) should translate them in
+	the Type-1 attributes.  To enable CCL support, use the "-f
+	yazgfs.xml" command-line option.
+
+init-script -- a template for a startup/shutdown script that can be
+	used as part of a System-V style init configuration
+	(e.g. placed in the /etc/init.d directory of a Debian
+	GNU/Linux installation).  This WILL NEED EDITING to allow for
+	specific details of the installation.
+
+sru-auth -- a trivial example of a mod_perl or CGI script that can
+	perform Init authentication for Simple2ZOOM.
+

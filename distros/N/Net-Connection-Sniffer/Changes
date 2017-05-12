@@ -1,0 +1,169 @@
+Revision history for Perl extension Net::Connection::Sniffer
+
+0.36  Mon Jan 27 11:59:58 PST 2014
+        modify Makefile.PL to bypass missing 'pod2text'
+
+0.35  Wed Jun  5 14:08:42 PDT 2013
+	in Report v0.13
+	add chk_lock to test for other processes running coalesce
+	add load average testing to reduce CPU load to 70% max
+
+0.34  Sun Sep 25 17:43:53 PDT 2011
+	this time "really" fix the typo in dyn_bind documentation
+	Net::Connection::Sniffer::Report v0.12
+
+0.33  Sun Sep 25 17:29:13 PDT 2011
+	update type on dyn_bind documentation in
+	Net::Connection::Sniffer::Report v0.11
+
+0.32  Sun Sep 25 16:16:37 PDT 2011
+	removed dyn_bind from Net::Connection::Sniffer::Report v0.10
+
+0.31  Tue May 26 16:15:28 PDT 2009
+	add contrib/chkIFrunning.pl
+	a script to check if sniffer is running and restart if necessary
+
+0.30  Sat Mar  7 12:11:24 PST 2009
+	add compiler and linker flags to environment for various
+	shared "flags" and hosts that put "libpcap" in /usr/local
+	instead of /usr
+
+	clean up "char/u_char" casting differences in Sniffer.xs
+	for picky Solaris compiler
+
+0.29  Wed Feb 25 21:44:14 PST 2009
+	update get_if() to use Net::Interface 1.00x
+
+	remove early "use Devel::CheckLib" so that automated
+	test routines have a chance to find in the the Makefile.pl
+	prerequisites list.
+
+	add definitions of ETH_HLEN and IP_HDR
+	for systems that don't provide it
+
+	add "configure" script
+
+	remove dependency of Devel::CheckLib
+
+0.28  NOT RELEASED
+	correct dependencies in Makefile.PL
+
+	kill small memory leak
+
+0.27  Wed Oct 15 14:19:29 PDT 2008
+	include Devel::CheckLib version level
+	require Net::DNS::ToolKit verison 0.41 or higher
+
+0.26  Mon Oct  6 14:02:13 PDT 2008
+	include Devel::CheckLib in prereques
+
+0.25  Thu Oct  2 13:39:49 PDT 2008
+	add CPAN automated tester cutout if pcap lib is not installed
+
+0.24  Mon Jan 14 11:48:04 PST 2008
+	force timecheck every second, even if very busy
+	so that old IP's will expire
+
+0.23  Wed Apr 25 16:52:52 PDT 2007
+	add redundant DNS name reporting to compensate for occasional
+	missing rDNS entries for remote hosts
+
+0.22  Mon Apr  2 18:14:04 PDT 2007
+	add SOA lookup of hostname where DNS query result is NXDOMAIN
+
+0.21  Thu Dec 21 17:41:45 PST 2006
+	update documentation and report formatting in Report.pm v0.08
+
+0.20  Thu Dec 21 15:25:51 PST 2006
+	fix problem in Report.pm v0.07 where localhost is not updated
+	with a rem_update
+
+0.19  Wed Dec 20 18:10:49 PST 2006
+	NOT released
+
+	add remote statistics collection from remote hosts
+	with coalesced statistic reporting to 
+	Report.pm v0.06
+
+	Update documentation to reflect above.
+	add nc.sniffer.coalesc.cgi.sample
+	add nc.sniffer.dump.pl.sample
+
+0.18  Fri Oct 27 11:53:34 PDT 2006
+	add local $^W = 1; # use warnings
+	to nc.sniffer
+
+	add BUGS memo about known memory leak when
+	running under Perl 5.00503
+
+0.17  Sun Sep 10 13:42:39 PDT 2006
+	fix 'config' printout of sub check_run in
+	Sniffer.pm which did not expand array ref
+
+0.16  Sun Sep 10 03:09:29 PDT 2006
+	rename to get PAUSE to upload again
+
+0.15  Wed Sep  6 12:38:54 PDT 2006
+	add payload string match capability
+
+	add perl 5.0503 compability updates
+
+0.14  Sat Aug 19 14:01:08 PDT 2006
+	add test for zero length stat file in Report.pm v0.04
+
+	NetAddr::IP::Lite 0.06 / NetAddr::IP::Util 0.11
+	required for operation on Sparc
+
+0.13  Sat Jun  3 12:48:26 PDT 2006
+	add 'sub equal' to Util.pm v0.02
+
+	update Report v0.03 'by_cidr' so that it
+	does not truncate a single or last entry
+	from the stats hash
+
+0.12  Fri Jun  2 13:02:48 PDT 2006
+	Oops! missed another makefile prequisite entry
+
+0.11  Fri Jun  2 12:46:38 PDT 2006
+	Left prequisite Net::Interface
+	out of Makefile.PL
+
+0.10  Fri Jun  2 11:18:38 PDT 2006
+	Documentation update
+
+0.09  Thu Jun  1 10:38:33 PDT 2006
+	first release to CPAN
+
+	clean up documentation
+
+0.08  Wed May 31 17:45:13 PDT 2006
+	optimizations to reduce cpu cycles
+
+0.07  Tue May 30 19:06:03 PDT 2006
+	remove unused vars in Perl and C that are
+	pushed back and forth between xs <-> perl
+
+	change "B" accumulator from UV to NV
+
+	separate double / u_int32_t arithmetic into
+	individual pieces -- compiler appears to mis-align
+	variable addresses with with no warnings
+
+0.06  Mon May 29 13:16:44 PDT 2006
+	release of port to 'C'
+
+0.05  this and previous versions not released
+
+0.04  Fri May 19 18:08:00 PDT 2006
+	replace missing do_while in daemon v03
+
+0.03  Wed May 17 18:58:07 PDT 2006
+	further refinement ahead of conversion
+
+	deployed to test with bug
+
+0.02  Tue May 16 14:48:58 PDT 2006
+	rearrange stuff ahead of conversion of core to 'C'
+
+0.01  Sat May 13 19:30:43 PDT 2006
+	initial release

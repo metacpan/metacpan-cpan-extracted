@@ -1,0 +1,173 @@
+<?xml version="1.0" ?>
+<!DOCTYPE niktoscan SYSTEM "docs/nikto.dtd">
+<niktoscan options="-host hostnikto.txt -Format xml -output test1.xml" version="2.1.0" nxmlversion="1.1">
+<scandetails targetip="127.0.0.1" targethostname="localhost" targetport="80" targetbanner="Apache/2.2.9 (Ubuntu) PHP/5.2.6-bt0 with Suhosin-Patch" starttime="2009-09-02 2:00:02" sitename="http://localhost:80/" siteip="http://127.0.0.1:80/" hostheader="localhost">
+
+<item id="999100" osvdbid="0" osvdblink="http://osvdb.org/0" method="GET">
+<description>Non-standard header keep-alive returned by server, with contents: timeout=15, max=100</description>
+<uri><![CDATA[/]]></uri>
+<namelink><![CDATA[http://localhost:80/]]></namelink>
+<iplink><![CDATA[http://127.0.0.1:80/]]></iplink>
+</item>
+
+
+<item id="600050" osvdbid="0" osvdblink="http://osvdb.org/0" method="HEAD">
+<description>Apache/2.2.9 appears to be outdated (current is at least Apache/2.2.11). Apache 1.3.41 and 2.0.63 are also current.</description>
+<uri><![CDATA[/]]></uri>
+<namelink><![CDATA[http://localhost:80/]]></namelink>
+<iplink><![CDATA[http://127.0.0.1:80/]]></iplink>
+</item>
+
+
+<item id="699999" osvdbid="0" osvdblink="http://osvdb.org/0" method="HEAD">
+<description>Number of sections in the version string differ from those in the database, the server reports: 5.2.6.45.98.116.0 while the database has: 5.2.6. This may cause false positives.</description>
+<uri><![CDATA[/]]></uri>
+<namelink><![CDATA[http://localhost:80/]]></namelink>
+<iplink><![CDATA[http://127.0.0.1:80/]]></iplink>
+</item>
+
+
+<item id="999990" osvdbid="0" osvdblink="http://osvdb.org/0" method="GET">
+<description>Allowed HTTP Methods: GET, HEAD, POST, OPTIONS, TRACE </description>
+<uri><![CDATA[/]]></uri>
+<namelink><![CDATA[http://localhost:80/]]></namelink>
+<iplink><![CDATA[http://127.0.0.1:80/]]></iplink>
+</item>
+
+
+<item id="999979" osvdbid="877" osvdblink="http://osvdb.org/877" method="GET">
+<description>HTTP method ('Allow' Header): 'TRACE' is typically only used for debugging and should be disabled. This message does not mean the server is vulnerable to XST.</description>
+<uri><![CDATA[/]]></uri>
+<namelink><![CDATA[http://localhost:80/]]></namelink>
+<iplink><![CDATA[http://127.0.0.1:80/]]></iplink>
+</item>
+
+
+<item id="999971" osvdbid="877" osvdblink="http://osvdb.org/877" method="GET">
+<description>HTTP TRACE method is active, suggesting the host is vulnerable to XST</description>
+<uri><![CDATA[/]]></uri>
+<namelink><![CDATA[http://localhost:80/]]></namelink>
+<iplink><![CDATA[http://127.0.0.1:80/]]></iplink>
+</item>
+
+
+<item id="001213" osvdbid="48" osvdblink="http://osvdb.org/48" method="GET">
+<description>/doc/: The /doc/ directory is browsable. This may be /usr/doc.</description>
+<uri><![CDATA[/doc/]]></uri>
+<namelink><![CDATA[http://localhost:80/doc/]]></namelink>
+<iplink><![CDATA[http://127.0.0.1:80/doc/]]></iplink>
+</item>
+
+
+<item id="001406" osvdbid="561" osvdblink="http://osvdb.org/561" method="GET">
+<description>/server-status: This reveals Apache information. Comment out appropriate line in httpd.conf or restrict access to allowed hosts.</description>
+<uri><![CDATA[/server-status]]></uri>
+<namelink><![CDATA[http://localhost:80/server-status]]></namelink>
+<iplink><![CDATA[http://127.0.0.1:80/server-status]]></iplink>
+</item>
+
+
+<item id="003000" osvdbid="3268" osvdblink="http://osvdb.org/3268" method="GET">
+<description>/icons/: Directory indexing is enabled: /icons</description>
+<uri><![CDATA[/icons/]]></uri>
+<namelink><![CDATA[http://localhost:80/icons/]]></namelink>
+<iplink><![CDATA[http://127.0.0.1:80/icons/]]></iplink>
+</item>
+
+
+<item id="003584" osvdbid="3233" osvdblink="http://osvdb.org/3233" method="GET">
+<description>/icons/README: Apache default file found.</description>
+<uri><![CDATA[/icons/README]]></uri>
+<namelink><![CDATA[http://localhost:80/icons/README]]></namelink>
+<iplink><![CDATA[http://127.0.0.1:80/icons/README]]></iplink>
+</item>
+
+
+</scandetails>
+
+<scandetails targetip="127.0.0.1" targethostname="localhost" targetport="631" targetbanner="Apache/2.2.9 (Ubuntu) PHP/5.2.6-bt0 with Suhosin-Patch" starttime="2009-09-02 2:00:02" sitename="http://localhost:631/" siteip="http://127.0.0.1:631/" hostheader="localhost">
+
+<item id="999100" osvdbid="0" osvdblink="http://osvdb.org/0" method="GET">
+<description>Non-standard header keep-alive returned by server, with contents: timeout=15, max=100</description>
+<uri><![CDATA[/]]></uri>
+<namelink><![CDATA[http://localhost:631/]]></namelink>
+<iplink><![CDATA[http://127.0.0.1:631/]]></iplink>
+</item>
+
+
+<item id="600050" osvdbid="0" osvdblink="http://osvdb.org/0" method="HEAD">
+<description>Apache/2.2.9 appears to be outdated (current is at least Apache/2.2.11). Apache 1.3.41 and 2.0.63 are also current.</description>
+<uri><![CDATA[/]]></uri>
+<namelink><![CDATA[http://localhost:631/]]></namelink>
+<iplink><![CDATA[http://127.0.0.1:631/]]></iplink>
+</item>
+
+
+<item id="699999" osvdbid="0" osvdblink="http://osvdb.org/0" method="HEAD">
+<description>Number of sections in the version string differ from those in the database, the server reports: 5.2.6.45.98.116.0 while the database has: 5.2.6. This may cause false positives.</description>
+<uri><![CDATA[/]]></uri>
+<namelink><![CDATA[http://localhost:631/]]></namelink>
+<iplink><![CDATA[http://127.0.0.1:631/]]></iplink>
+</item>
+
+
+<item id="999990" osvdbid="0" osvdblink="http://osvdb.org/0" method="GET">
+<description>Allowed HTTP Methods: GET, HEAD, POST, OPTIONS, TRACE </description>
+<uri><![CDATA[/]]></uri>
+<namelink><![CDATA[http://localhost:631/]]></namelink>
+<iplink><![CDATA[http://127.0.0.1:631/]]></iplink>
+</item>
+
+
+<item id="999979" osvdbid="877" osvdblink="http://osvdb.org/877" method="GET">
+<description>HTTP method ('Allow' Header): 'TRACE' is typically only used for debugging and should be disabled. This message does not mean the server is vulnerable to XST.</description>
+<uri><![CDATA[/]]></uri>
+<namelink><![CDATA[http://localhost:631/]]></namelink>
+<iplink><![CDATA[http://127.0.0.1:631/]]></iplink>
+</item>
+
+
+<item id="999971" osvdbid="877" osvdblink="http://osvdb.org/877" method="GET">
+<description>HTTP TRACE method is active, suggesting the host is vulnerable to XST</description>
+<uri><![CDATA[/]]></uri>
+<namelink><![CDATA[http://localhost:631/]]></namelink>
+<iplink><![CDATA[http://127.0.0.1:631/]]></iplink>
+</item>
+
+
+<item id="001213" osvdbid="48" osvdblink="http://osvdb.org/48" method="GET">
+<description>/doc/: The /doc/ directory is browsable. This may be /usr/doc.</description>
+<uri><![CDATA[/doc/]]></uri>
+<namelink><![CDATA[http://localhost:631/doc/]]></namelink>
+<iplink><![CDATA[http://127.0.0.1:631/doc/]]></iplink>
+</item>
+
+
+<item id="001406" osvdbid="561" osvdblink="http://osvdb.org/561" method="GET">
+<description>/server-status: This reveals Apache information. Comment out appropriate line in httpd.conf or restrict access to allowed hosts.</description>
+<uri><![CDATA[/server-status]]></uri>
+<namelink><![CDATA[http://localhost:631/server-status]]></namelink>
+<iplink><![CDATA[http://127.0.0.1:631/server-status]]></iplink>
+</item>
+
+
+<item id="003000" osvdbid="3268" osvdblink="http://osvdb.org/3268" method="GET">
+<description>/icons/: Directory indexing is enabled: /icons</description>
+<uri><![CDATA[/icons/]]></uri>
+<namelink><![CDATA[http://localhost:631/icons/]]></namelink>
+<iplink><![CDATA[http://127.0.0.1:631/icons/]]></iplink>
+</item>
+
+
+<item id="003584" osvdbid="3233" osvdblink="http://osvdb.org/3233" method="GET">
+<description>/icons/README: Apache default file found.</description>
+<uri><![CDATA[/icons/README]]></uri>
+<namelink><![CDATA[http://localhost:631/icons/README]]></namelink>
+<iplink><![CDATA[http://127.0.0.1:631/icons/README]]></iplink>
+</item>
+
+
+</scandetails>
+
+</niktoscan>
+

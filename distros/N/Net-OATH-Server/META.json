@@ -1,0 +1,104 @@
+{
+   "abstract" : "Library for One Time Password Server",
+   "author" : [
+      "ritou <ritou.06@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-OATH-Server",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::OATH" : "v1.0.0",
+            "Class::Accessor::Fast" : "0.34",
+            "Convert::Base32" : "0.06",
+            "JSON::XS" : "3.01",
+            "Params::Validate" : "1.13",
+            "Plack" : "1.0031",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Crypt::OpenSSL::Random" : "0.04",
+            "Test::MockTime" : "0.13",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Net::OATH::Server" : {
+         "file" : "lib/Net/OATH/Server.pm",
+         "version" : "0.02"
+      },
+      "Net::OATH::Server::Lite" : {
+         "file" : "lib/Net/OATH/Server/Lite.pm"
+      },
+      "Net::OATH::Server::Lite::DataHandler" : {
+         "file" : "lib/Net/OATH/Server/Lite/DataHandler.pm"
+      },
+      "Net::OATH::Server::Lite::Endpoint::Login" : {
+         "file" : "lib/Net/OATH/Server/Lite/Endpoint/Login.pm"
+      },
+      "Net::OATH::Server::Lite::Endpoint::User" : {
+         "file" : "lib/Net/OATH/Server/Lite/Endpoint/User.pm"
+      },
+      "Net::OATH::Server::Lite::Error" : {
+         "file" : "lib/Net/OATH/Server/Lite/Error.pm"
+      },
+      "Net::OATH::Server::Lite::Login" : {
+         "file" : "lib/Net/OATH/Server/Lite/Login.pm"
+      },
+      "Net::OATH::Server::Lite::Model::User" : {
+         "file" : "lib/Net/OATH/Server/Lite/Model/User.pm"
+      },
+      "Net::OATH::Server::Lite::User" : {
+         "file" : "lib/Net/OATH/Server/Lite/User.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ritou/p5-net-oath-server/issues"
+      },
+      "homepage" : "https://github.com/ritou/p5-net-oath-server",
+      "repository" : {
+         "url" : "git://github.com/ritou/p5-net-oath-server.git",
+         "web" : "https://github.com/ritou/p5-net-oath-server"
+      }
+   },
+   "version" : "0.02"
+}

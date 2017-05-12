@@ -1,0 +1,27 @@
+Net::Gadu version 1.9
+====================
+
+Module for support Gadu-Gadu protocol.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+   
+DOCUMENTATION
+
+$man 3 Net::Gadu
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+  libgadu.so - part of EKG http://ekg.chmurka.net/
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002-2008 Marcin Krzyzanowski, http://hakore.com/
+Licence : Lesser General Public License v. 2.0

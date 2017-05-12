@@ -1,0 +1,9 @@
+lib/Net/MirapointAdmin.pm
+t/00_use.t
+t/01_low.t
+Makefile.PL
+MANIFEST
+INSTALL
+README
+LICENSE
+META.yml                                 Module meta-data (added by MakeMaker)

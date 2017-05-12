@@ -1,0 +1,43 @@
+---
+name: Net-Plazes
+version: 0.03
+author:
+  - 'Roger M Pettett <rpettett@cpan.org>'
+abstract: 'Net::Plazes - An interface to Plazes.net services'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 1.02
+  Class::Accessor: 0.31
+  English: 1.01
+  HTTP::Request: 5.814
+  LWP::UserAgent: 5.814
+  Lingua::EN::Inflect: 1.89
+  XML::LibXML: 1.66
+  base: 2.13
+  strict: 1.04
+  warnings: 1.06
+build_requires:
+  Test::More: 0.8
+  Test::Trap: 0.1.1
+provides:
+  Net::Plazes:
+    file: lib/Net/Plazes.pm
+    version: 0.03
+  Net::Plazes::Activity:
+    file: lib/Net/Plazes/Activity.pm
+    version: 0.03
+  Net::Plazes::Base:
+    file: lib/Net/Plazes/Base.pm
+    version: 0.03
+  Net::Plazes::Plaze:
+    file: lib/Net/Plazes/Plaze.pm
+    version: 0.03
+  Net::Plazes::User:
+    file: lib/Net/Plazes/User.pm
+    version: 0.03
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

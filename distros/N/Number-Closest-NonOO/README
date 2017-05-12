@@ -1,0 +1,30 @@
+SYNOPSIS
+
+     use Number::Closest::NonOO qw(find_closest_number find_farthest_number);
+     my $nums = find_closest_number(number=>3, numbers=>[1, 3, 5, 10], items => 2); # => [3, 1]
+    
+     $nums = find_farthest_number(number=>3, numbers=>[1, 3, 5, 10]); # => 10
+
+DESCRIPTION
+
+FAQ
+
+ How do I find closest numbers that are {smaller, larger} than specified
+ number?
+
+    You can filter (grep) your list of numbers first, for example to find
+    numbers that are closest and smaller or equal to 3:
+
+     my @nums = grep {$_ <= 3} 1, 3, 5, 2, 4;
+     my $res = find_closest_number(number => 3, numbers => \@nums);
+
+ How do I find unique closest number(s)?
+
+    Perform uniq() (see List::MoreUtils) on the resulting numbers.
+
+SEE ALSO
+
+    Number::Closest. Number::Closest::NonOO is a non-OO version of
+    Number::Closest, with some additional features: customize handling
+    NaN/Inf, find farthest number.
+

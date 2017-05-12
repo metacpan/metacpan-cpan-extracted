@@ -1,0 +1,9 @@
+[
+    {
+        "action": "user_update",
+        "description": "{\"notes\": \"OK\", \"realname\": \"Joe Smith\"}",
+        "object": "jsmith",
+        "timestamp": 1346172820,
+        "username": "admin"
+    }
+]

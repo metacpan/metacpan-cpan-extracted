@@ -1,0 +1,10 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Net-SMPP
+version:      1.19
+version_from: SMPP.pm
+installdirs:  site
+requires:
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

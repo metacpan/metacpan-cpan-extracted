@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-Amazon-S3-Tools.t
+lib/Net/Amazon/S3/Tools.pm
+COPYING
+COPYING.LESSER
+CREDITS
+s3acl
+s3get
+s3ls
+s3mkbucket
+s3put
+s3rmbucket
+s3rm

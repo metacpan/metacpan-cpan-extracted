@@ -1,0 +1,28 @@
+# -*-n3-*-
+
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix doap:    <http://usefulinc.com/ns/doap#> .
+@prefix asc:     <http://aaronland.info/ns/changefile/> .
+                                     
+<>
+        dc:identifier           "$Id: Changes,v 1.1 2007/09/02 17:58:02 asc Exp $" ;
+        dc:description          "Changes for Net::Flickr::Simile.pm" ;
+        dcterms:references      <http://aaronland.info/perl/net/flickr/simile/> .
+
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-Simile-0.1.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/simile/> ;
+
+        doap:Version    [
+                        doap:revision     "0.1" ;
+                        doap:created      "2005-09-03" ;
+                        ];
+        asc:changes     [
+                        asc:comment       "Initial release." ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/simile/>
+        a doap:Project ;
+        doap:download-page      "http://search.cpan.org/dist/Net-Flickr-Simile/" ;
+        doap:download-mirror    "http://aaronland.info/perl/net/flickr/simile/" .

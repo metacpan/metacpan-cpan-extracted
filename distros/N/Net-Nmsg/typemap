@@ -1,0 +1,37 @@
+# primary types
+
+Net::Nmsg                   T_PTROBJ
+Net::Nmsg::XS::msg          T_PTROBJ
+Net::Nmsg::XS::io           T_PTROBJ
+
+Net::Nmsg::XS::input        T_PTROBJ
+Net::Nmsg::XS::input_file   T_PTROBJ
+Net::Nmsg::XS::input_json   T_PTROBJ
+Net::Nmsg::XS::input_sock   T_PTROBJ
+Net::Nmsg::XS::input_pres   T_PTROBJ
+Net::Nmsg::XS::input_pcap   T_PTROBJ
+
+Net::Nmsg::XS::output       T_PTROBJ
+Net::Nmsg::XS::output_file  T_PTROBJ
+Net::Nmsg::XS::output_json  T_PTROBJ
+Net::Nmsg::XS::output_sock  T_PTROBJ
+Net::Nmsg::XS::output_pres  T_PTROBJ
+Net::Nmsg::XS::output_cb    T_PTROBJ
+Net::Nmsg::XS::rate         T_PTROBJ
+
+Net::Nmsg::XS::pcap         T_PTROBJ
+Net::Nmsg::XS::nmsg_pcap    T_PTROBJ
+
+nmsg_res                    T_IV
+nmsg_pcap_type              T_IV
+
+nmsg_msgmod_t               T_PTROBJ
+
+enum nmsg_res               T_IV
+nmsg_alias_e                T_IV
+nmsg_io_output_mode         T_IV
+nmsg_msgmod_field_type      T_IV
+
+_Bool                       T_BOOL
+uint32_t                    T_IV
+long int                    T_IV

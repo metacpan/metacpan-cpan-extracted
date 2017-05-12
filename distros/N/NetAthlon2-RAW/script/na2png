@@ -1,0 +1,96 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use Getopt::Std;
+use NetAthlon2::RAW;
+use File::Basename;
+use GD::Graph;
+use GD::Graph::lines;
+
+my (%opts, @data);
+$opts{'l'} = 4;
+$opts{'s'} = 600;
+$opts{'t'} = &File::Basename::basename($0, '.pl');
+$opts{'t'} =~ s/na2//;
+
+sub usage () {
+	printf "Usage: %s [-h] [-l width] [-s size] [-t type] <input file(s)>\n",
+		&File::Basename::basename($0, '.pl');
+	printf "\t-h\t\tThis help screen\n";
+	printf "\t-l <width>\tLine width (defaults to $opts{'l'})\n";
+	printf "\t-s <size>\tImage size (defaults to $opts{'s'})\n";
+	printf "\t-t <type>\tImage type (defaults to $opts{'t'})\n";
+	exit 0;
+}
+
+sub x_format {
+	my $value = shift;
+
+	return sprintf("%.2dh %2.2d\' %2.2d\"", int($value / 3600), int(($value % 3600) / 60), int($value % 60));
+}
+
+getopts('hl:s:t:', \%opts);
+
+&usage if ( $opts{'h'} || ! scalar @ARGV );
+
+{
+	no warnings "once";
+	$NetAthlon2::RAW::timeDelta = 5;
+}
+my $t = NetAthlon2::RAW->new ();
+
+die "Could not new NetAthlon2::RAW\n" if ( ! defined $t );
+
+foreach my $file ( @ARGV ) {
+	my $d = $t->parse($file);
+	die "Could not read return data from NetAthlon2::RAW::parse($file)\n"
+		if ( ! defined $d );
+
+	# save the data we want to graph
+	my (@c, @h, @s, @p, @t);
+	map {
+		push @t, $_->{'Elapsed Time'};
+		push @h, $_->{'Heart Rate'};
+		push @c, $_->{'Cadence'};
+		push @s, $_->{'Speed'} * 10;
+		push @p, $_->{'Watts'};
+	} @{$d->{'Check Points'}};
+	@data = ( [ @t ], [ @h ], [ @c ], [ @s ], [ @p ] );
+	my $y_max = $d->{'Max Watts'};
+ 
+	# Use GD to create the image file
+	my $img = new GD::Graph::lines((4 * $opts{'s'}/3), $opts{'s'});
+	$img->set(
+		x_label => 'Time (Minutes)',
+		x_min_value => 0,
+		x_max_value => $d->{'Sample Rate'} * scalar @{$d->{'Check Points'}},
+		x_number_format => \&x_format,
+		x_label_position => 1/2,
+		x_labels_vertical => 1,
+		y_label => 'Heart Rate (BPM) / Cadence (RPM) / Speed x 10 (MPH) / Power (Watts)',
+		y_min_value => 0,
+		y_max_value => $y_max,
+		x_tick_number => 8,
+		box_axis => 0,
+		line_width => $opts{'l'},
+		title => 'Performance Data over Time',
+		dclrs => [ 'red', 'purple', 'green', 'blue', ],
+		transparent => 0,
+	);
+	$img->set_text_clr('black');
+	$img->set_legend('Heart Rate', 'Cadence', 'Speed', 'Power');
+	my $gd = $img->plot(\@data) ||
+		die "Could not create GD object (" . $img->error . ")\n";
+
+	# Create the output file
+	my $format = $opts{'t'};
+	my $outfile = &File::Basename::basename($file, '.RAW') . '.' . $format;
+	open (OUT, ">$outfile") || die "Could not create file ($outfile)\n";
+	binmode OUT;
+	print OUT $gd->$format() ||
+		die "Could not write data to ($outfile)\n";
+	close OUT;
+}
+
+exit 0;

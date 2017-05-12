@@ -1,0 +1,44 @@
+#
+#	$Id: dictionary.aptis 45 2006-11-14 17:45:00Z lem $
+#
+
+VENDOR	Aptis	2637
+
+ATTRIBUTE	CVX-Identification		1	string Aptis
+ATTRIBUTE	CVX-VPOP-ID			2	integer Aptis
+ATTRIBUTE	CVX-SS7-Session-ID-Type		3	integer Aptis
+ATTRIBUTE	CVX-Radius-Redirect		4	integer Aptis
+ATTRIBUTE	CVX-IPSVC-AZNLVL		5	integer Aptis
+ATTRIBUTE	CVX-IPSVC-Mask			6	integer Aptis
+ATTRIBUTE	CVX-Multilink-Match-Info	7	integer Aptis
+ATTRIBUTE	CVX-Multilink-Group-Number	8	integer Aptis
+ATTRIBUTE	CVX-PPP-Log-Mask		9	integer Aptis
+
+ATTRIBUTE	CVX-Modem-Begin-Modulation	10	string Aptis
+ATTRIBUTE	CVX-Modem-End-Modulation	11	string Aptis
+ATTRIBUTE	CVX-Modem-Error-Correction	12	string Aptis
+ATTRIBUTE	CVX-Modem-Data-Compression	13	string Aptis
+ATTRIBUTE	CVX-Modem-Tx-Packets		14	integer Aptis
+ATTRIBUTE	CVX-Modem-ReTx-Packets		15	integer Aptis
+ATTRIBUTE	CVX-Modem-SNR			16	integer Aptis
+ATTRIBUTE	CVX-Modem-Local-Retrains	17	integer Aptis
+ATTRIBUTE	CVX-Modem-Remote-Retrains	18	integer Aptis
+ATTRIBUTE	CVX-Modem-Local-Rate-Negs	19	integer Aptis
+ATTRIBUTE	CVX-Modem-Remote-Rate-Negs	20	integer Aptis
+ATTRIBUTE	CVX-Modem-Begin-Recv-Line-Lvl	21	integer Aptis
+ATTRIBUTE	CVX-Modem-End-Recv-Line-Lvl	22	integer Aptis
+
+ATTRIBUTE	CVX-Primary-DNS			135	ipaddr Aptis
+ATTRIBUTE	CVX-Secondary-DNS		136	ipaddr Aptis
+ATTRIBUTE	CVX-Client-Assign-DNS		137	integer Aptis
+ATTRIBUTE	CVX-Multicast-Rate-Limit	152	integer Aptis
+ATTRIBUTE	CVX-Multicast-Client		155	integer Aptis
+ATTRIBUTE	CVX-Disconnect-Cause		195	integer Aptis
+ATTRIBUTE	CVX-Data-Rate			197	integer Aptis
+ATTRIBUTE	CVX-PreSession-Time		198	integer Aptis
+ATTRIBUTE	CVX-Assign-IP-Pool		218	integer Aptis
+ATTRIBUTE	CVX-Maximum-Channels		235	integer Aptis
+ATTRIBUTE	CVX-Data-Filter			242	string Aptis
+ATTRIBUTE	CVX-Idle-Limit			244	integer Aptis
+ATTRIBUTE	CVX-PPP-Address			253	ipaddr Aptis
+ATTRIBUTE	CVX-Xmit-Rate			255	integer Aptis

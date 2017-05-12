@@ -1,0 +1,46 @@
+---
+abstract: 'read and post from Posterous blogs'
+author:
+  - 'Simon Wistow, C<<simon@thegestalt.org >>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Posterous
+provides:
+  Net::Posterous:
+    file: lib/Net/Posterous.pm
+    version: 0.8
+  Net::Posterous::Comment:
+    file: lib/Net/Posterous/Comment.pm
+  Net::Posterous::Media:
+    file: lib/Net/Posterous/Media.pm
+  Net::Posterous::Media::Audio:
+    file: lib/Net/Posterous/Media/Audio.pm
+  Net::Posterous::Media::Image:
+    file: lib/Net/Posterous/Media/Image.pm
+  Net::Posterous::Media::Local:
+    file: lib/Net/Posterous/Media/Local.pm
+  Net::Posterous::Media::Video:
+    file: lib/Net/Posterous/Media/Video.pm
+  Net::Posterous::Object:
+    file: lib/Net/Posterous/Object.pm
+  Net::Posterous::Post:
+    file: lib/Net/Posterous/Post.pm
+  Net::Posterous::Site:
+    file: lib/Net/Posterous/Site.pm
+  Net::Posterous::Tag:
+    file: lib/Net/Posterous/Tag.pm
+requires:
+  Class::Accessor: 0.34
+  DateTime: 0
+  DateTime::Format::Strptime: 0
+  LWP::UserAgent: 0
+  Test::More: 0.06
+  XML::Simple: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.8

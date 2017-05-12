@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+README.xml
+Build.PL
+Makefile.PL
+lib/Net/Backpack.pm
+t/00-load.t
+t/Net-Backpack.t
+t/pod.t
+t/pod_coverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

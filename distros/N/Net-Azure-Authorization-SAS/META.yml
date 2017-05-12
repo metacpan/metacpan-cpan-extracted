@@ -1,0 +1,44 @@
+---
+abstract: 'A Token Generator of Shared Access Signature Autorization for Microsoft Azure '
+author:
+  - 'ytnobody <ytnobody@gmail.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.98'
+  Test::Time: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Azure-Authorization-SAS
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::Azure::Authorization::SAS:
+    file: lib/Net/Azure/Authorization/SAS.pm
+    version: '0.02'
+requires:
+  Carp: '0'
+  Class::Accessor::Lite: '0'
+  Digest::SHA: '0'
+  MIME::Base64: '0'
+  String::CamelCase: '0'
+  URI: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/ytnobody/p5-Net-Azure-Authorization-SAS/issues
+  homepage: https://github.com/ytnobody/p5-Net-Azure-Authorization-SAS
+  repository: git://github.com/ytnobody/p5-Net-Azure-Authorization-SAS.git
+version: '0.02'

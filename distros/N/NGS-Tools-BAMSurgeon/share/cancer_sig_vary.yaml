@@ -1,0 +1,180 @@
+---
+Acute Lymphoblastic Leukemia:
+    - 
+      Signature 1B: 0.658
+      Signature 2: 0.342
+ALL:
+    -
+      Signature 1B: 0.658
+      Signature 2: 0.342
+Acute Myeloid Leukemia:
+    -
+      Signature 1A: 0.019
+      Signature 1B: 0.981
+AML:
+    -
+      Signature 1A: 0.019
+      Signature 1B: 0.981
+Bladder Cancer:
+    -
+      Signature 1B: 0.142
+      Signature 2: 0.328
+      Signature 5: 0.146
+      Signature 13: 0.384
+Breast Cancer:
+    -
+      Signature 1B: 0.355
+      Signature 2: 0.249
+      Signature 3: 0.300
+      Signature 8: 0.038
+      Signature 13: 0.052
+      Signature R1: 0.006
+Cervical Cancer:
+    -
+      Signature 1B: 0.253
+      Signature 2: 0.747
+B-cell Chronic Lymphocytic Leukemia:
+    -
+      Signature 1B: 0.767
+      Signature 2: 0.066
+      Signature 9: 0.167
+CLL:
+    -
+      Signature 1B: 0.767
+      Signature 2: 0.066
+      Signature 9: 0.167
+Colorectal Cancer:
+    -
+      Signature 1B: 0.171
+      Signature 6: 0.367
+      Signature 10: 0.293
+      Signature R3: 0.169
+Esophageal Cancer:
+    -
+      Signature 1B: 0.480
+      Signature 2: 0.115
+      Signature 6: 0.138
+      Signature 17: 0.267
+Glioblastoma Multiforme:
+    -
+      Signature 1A: 0.250
+      Signature 11: 0.535
+      Signature U1: 0.215
+Glioma Low Grade:
+    -
+      Signature 1A: 0.092
+      Signature 5: 0.220
+      Signature 6: 0.028
+      Signature 14: 0.660
+Head and Neck Cancer:
+    -
+      Signature 1B: 0.249
+      Signature 2: 0.352
+      Signature 4: 0.348
+      Signature 7: 0.051
+Kidney Chromophobe:
+    -
+      Signature 1A: 0.174
+      Signature 6: 0.375
+      Signature U2: 0.451
+Kidney Clear Cell:
+    -
+      Signature 1B: 0.665
+      Signature 6: 0.041
+      Signature R2: 0.054
+      Signature R3: 0.240
+Kidney Papillary:
+    -
+      Signature 2: 0.157
+      Signature 5: 0.843
+Liver Cancer:
+    -
+      Signature 1B: 0.109
+      Signature 4: 0.187
+      Signature 6: 0.026
+      Signature 12: 0.278
+      Signature 16: 0.185
+      Signature 17: 0.032
+      Signature U2: 0.183
+Lung Adenocarcinoma:
+    -
+      Signature 1B: 0.091
+      Signature 2: 0.128
+      Signature 4: 0.610
+      Signature 5: 0.096
+      Signature R2: 0.075
+Lung Cancer Small Cell:
+    -
+      Signature 4: 0.928
+      Signature 15: 0.072
+Lung Squamous:
+    -
+      Signature 2: 0.186
+      Signature 4: 0.284
+      Signature 5: 0.362
+      Signature R2: 0.186
+Lymphoma B-cell:
+    -
+      Signature 1B: 0.463
+      Signature 2: 0.165
+      Signature 5: 0.097
+      Signature 9: 0.169
+      Signature 17: 0.106
+Medulloblastoma:
+    -
+      Signature 1A: 0.484
+      Signature 5: 0.222
+      Signature 8: 0.294
+Melanoma:
+    -
+      Signature 1B: 0.068
+      Signature 7: 0.862
+      Signature 11: 0.052
+      Signature R2: 0.018
+Myeloma:
+    -
+      Signature 2: 0.199
+      Signature 5: 0.801
+Neuroblastoma:
+    -
+      Signature 1B: 0.532
+      Signature 18: 0.468
+Ovarian Cancer:
+    -
+      Signature 1B: 0.366
+      Signature 3: 0.634
+Pancreatic Cancer:
+    -
+      Signature 1B: 0.499
+      Signature 2: 0.184
+      Signature 3: 0.160
+      Signature 6: 0.157
+Pilocytic Astrocytoma:
+    -
+      Signature 1B: 0.825
+      Signature 19: 0.175
+Prostate Cancer:
+    -
+      Signature 1A: 0.322
+      Signature 6: 0.102
+      Signature U1: 0.575
+Stomach Cancer:
+    -
+      Signature 1A: 0.223
+      Signature 2: 0.061
+      Signature 15: 0.215
+      Signature 17: 0.063
+      Signature 20: 0.237
+      Signature 21: 0.201
+Thyroid Cancer:
+    -
+      Signature 2: 0.397
+      Signature 5: 0.603
+Uterine Cancer:
+    -
+      Signature 1B: 0.107
+      Signature 2: 0.033
+      Signature 6: 0.137
+      Signature 10: 0.485
+      Signature 12: 0.066
+      Signature 14: 0.172

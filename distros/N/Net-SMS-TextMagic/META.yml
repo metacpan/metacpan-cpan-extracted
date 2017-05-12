@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               Net-SMS-TextMagic
+version:            1.00
+abstract:           Provides access to TextMagic SMS service API
+author:
+    - Matti Lattu <matti@lattu.biz>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    Test::Exception:  0.27
+requires:
+    Crypt::SSLeay:    0
+    Encode:           0
+    JSON:             0
+    LWP::UserAgent:   0
+    perl:             5.008006
+    Test::Exception:  0.27
+    URI::Escape:      0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

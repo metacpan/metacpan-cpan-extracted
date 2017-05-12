@@ -1,0 +1,111 @@
+=head1 SETTING AUTOMATIC AUTHENTICATION
+
+To use this script you have to set 
+automatic authentication via SSH between the source machine (your
+machine) and the other destiny machines.
+This section explains the simplified procedure. 
+
+SSH includes the ability to authenticate users using public keys. Instead of 
+authenticating the user with a password, the SSH server on the remote machine will
+verify a challenge signed by the user's I<private key> against its copy
+of the user's I<public key>. To achieve this automatic ssh-authentication
+you have to:
+
+=over 2
+
+=item * Generate a public key use the C<ssh-keygen> utility. For example:
+
+  local.machine$ ssh-keygen -t rsa -N ''
+
+The option C<-t> selects the type of key you want to generate.
+There are three types of keys: I<rsa1>, I<rsa> and I<dsa>.
+The C<-N> option is followed by the I<passphrase>. The C<-N ''> setting
+indicates that no passphrase will be used. This is useful when used 
+with key restrictions or when dealing with cron jobs, batch 
+commands and automatic processing which is the context in which this 
+module was designed.
+If still you don't like to have a private key without passphrase, 
+provide a passphrase and use C<ssh-agent> 
+to avoid the inconvenience of typing the passphrase each time. 
+C<ssh-agent> is a program you run once per login session and load your keys into.
+From that moment on, any C<ssh> client will contact C<ssh-agent>
+and no more passphrase typing will be needed.
+
+By default, your identification will be saved in a file C</home/user/.ssh/id_rsa>.
+Your public key will be saved in C</home/user/.ssh/id_rsa.pub>.
+
+=item * Once you have generated a key pair, you must install the public key on the 
+remote machine. To do it, append the public component of the key in
+
+           /home/user/.ssh/id_rsa.pub
+
+to file 
+
+           /home/user/.ssh/authorized_keys
+           
+on the remote machine.
+If the C<ssh-copy-id> script is available, you can do it using:
+
+  local.machine$ ssh-copy-id -i ~/.ssh/id_rsa.pub user@remote.machine
+
+Alternatively you can write the following command:
+
+  $ ssh remote.machine "umask 077; cat >> .ssh/authorized_keys" < /home/user/.ssh/id_rsa.pub
+
+The C<umask> command is needed since the SSH server will refuse to 
+read a C</home/user/.ssh/authorized_keys> files which have loose permissions.
+
+=item * Edit your local configuration file C</home/user/.ssh/config> (see C<man ssh_config> 
+in UNIX) and create a new section for C<GRID::Machine> connections to that host.
+Here follows an example:
+
+
+ ...
+
+ # A new section inside the config file: 
+ # it will be used when writing a command like: 
+ #                     $ ssh gridyum 
+
+ Host gridyum
+
+ # My username in the remote machine
+ user my_login_in_the_remote_machine
+
+ # The actual name of the machine: by default the one provided in the
+ # command line
+ Hostname real.machine.name
+
+ # The port to use: by default 22
+ Port 2048
+
+ # The identitiy pair to use. By default ~/.ssh/id_rsa and ~/.ssh/id_dsa
+ IdentityFile /home/user/.ssh/yumid
+
+ # Useful to detect a broken network
+ BatchMode yes
+
+ # Useful when the home directory is shared across machines,
+ # to avoid warnings about changed host keys when connecting
+ # to local host
+ NoHostAuthenticationForLocalhost yes
+
+
+ # Another section ...
+ Host another.remote.machine an.alias.for.this.machine
+ user mylogin_there
+
+ ...
+
+This way you don't have to specify your I<login> name on the remote machine even if it
+differs from your  I<login> name in the local machine, you don't have to specify the 
+I<port> if it isn't 22, etc. This is the I<recommended> way to work with C<GRID::Machine>.
+Avoid cluttering the constructor C<new>.
+
+=item * Once the public key is installed on the server you should be able to
+authenticate using your private key
+
+  $ ssh remote.machine
+  Linux remote.machine 2.6.15-1-686-smp #2 SMP Mon Mar 6 15:34:50 UTC 2006 i686
+  Last login: Sat Jul  7 13:34:00 2007 from local.machine
+  user@remote.machine:~$                                 
+

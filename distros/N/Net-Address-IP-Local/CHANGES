@@ -1,0 +1,23 @@
+# Legend:
+# --- = A new release
+#   + = Added a feature (in a backwards compatible way)
+#   ! = Changed something significant, or removed a feature
+#   * = Fixed a bug, or made a minor improvement
+
+--- 0.1.2 (2009-01-14 21:30)
+
+  * Declare our dependency on version.pm.
+
+--- 0.1.1 (2008-03-17 20:00)
+
+  * On IPv4-only systems, ensure that IO::Socket::INET is loaded properly by
+    the connected_to() method.
+  * Generate more expressive exception messages if public_ipv4()/public_ipv6()
+    methods are called without the respective IP version being supported.
+  * Made 'remote_address_ipv{4,6}_default' and 'remote_port_default' constants
+    completely overridable from Net::Address::IP::Local sub-classes.
+
+--- 0.1 (initial release) (2008-03-16 03:00)
+
+# $Id: CHANGES 24 2009-01-14 21:23:40Z julian $
+# vim:tw=79 sts=2 sw=2

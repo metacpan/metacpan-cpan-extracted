@@ -1,0 +1,584 @@
+=encoding utf-8
+=head1 NAME
+
+Net::Pcap::Easy - Net::Pcap is awesome, but it's difficult to bootstrap
+
+=head1 SYNOPSIS
+
+    use strict;
+    use warnings;
+    use Net::Pcap::Easy;
+
+    # all arguments to new are optoinal
+    my $npe = Net::Pcap::Easy->new(
+        dev              => "lo",
+        filter           => "host 127.0.0.1 and (tcp or icmp)",
+        packets_per_loop => 10,
+        bytes_to_capture => 1024,
+        promiscuous      => 0, # true or false
+
+        tcp_callback => sub {
+            my ($npe, $ether, $ip, $tcp, $header ) = @_;
+            my $xmit = localtime( $header->{tv_sec} );
+
+            print "$xmit TCP: $ip->{src_ip}:$tcp->{src_port}"
+             . " -> $ip->{dest_ip}:$tcp->{dest_port}\n";
+
+            print "\t$ether->{src_mac} -> $ether->{dest_mac}\n" if $SHOW_MAC;
+        },
+
+        icmp_callback => sub {
+            my ($npe, $ether, $ip, $icmp, $header ) = @_;
+            my $xmit = localtime( $header->{tv_sec} );
+
+            print "$xmit ICMP: $ether->{src_mac}:$ip->{src_ip}"
+             . " -> $ether->{dest_mac}:$ip->{dest_ip}\n";
+        },
+    );
+
+    1 while $npe->loop;
+
+=head1 DESCRIPTION
+
+This module is little more than a collection of macros and convenience
+functions.  L<Net::Pcap> does all the real work (of lifting libpcap into perl
+anyway).
+
+Every time I began to write a L<Net::Pcap> application, I had to go figure out
+all these little things all over again.  Most of the functions return C-style
+truth values (0 is ok, non-zero is a problem), installing a filter is
+un-obvious, how to disassemble the packet is a process of reading four or five
+pods (e.g. L<NetPacket::UDP>), etc...
+
+What I wanted was one POD that covered everything you need to know, and a
+wrapper that makes everything perl-esque.
+
+=head1 Net::Pcap::Easy METHODS
+
+There are a couple convenience functions available, two control functions, and
+various blessed-hash keys at your disposal.
+
+=head1 METHODS
+
+=over 4
+
+=item C<dev()>
+
+Returns the name of the device you're sniffing.
+
+=item C<pcap()>
+
+This returns the actual L<Net::Pcap> reference.  If you need to call a function
+from L<Net::Pcap> that requires a pcap object argument, this would be the object
+to pass.
+
+=item C<network()>
+
+Returns the network the device is on (as a text ip number, e.g., 192.168.1.0).
+
+=item C<netmask()>
+
+Returns the netmask of the device (as a text ip number, e.g., 255.255.255.0).
+
+=item C<cidr()>
+
+Returns the network of the device as a L<Net::Netmask> object, which string-interpolates to CIDR notation.
+
+=item C<raw_network()>
+
+This is the long (see L<pack|perlfunc/pack>'s "l") value of the network.
+
+=item C<raw_netmask()>
+
+This is the long (see L<pack|perlfunc/pack>'s "l") value of the netmask.
+
+=item C<is_local($ip_or_network)>
+
+Returns true when the first argument is an IP (as text) or network (as text or
+as a L<Net::Netmask> object) is "in" the listening network.  See L<Net::Netmask>
+for details on this.
+
+=item C<loop()>
+
+Call this over and over until your program is done listening.  It collects a
+number of packets equal to L</packets_per_loop> (see below) and passes each
+packet one at a time to any callbacks you've specified (see below).
+
+The function returns the number of packets processed (normally the same as
+L</packets_per_loop>), and therefore less than L</packets_per_loop> or 0 at the
+end of a packet file.
+
+It returns the empty list or the undef value in the case of an error.
+
+=item C<stats()>
+
+Returns a hash (or hashref) containing collection statistics.
+
+    {
+        drop   => 0, # packets missed by libpcap
+        ifdrop => 0, # packets missed by interface
+        recv   => 1, # packets captured
+    }
+
+=item C<new()>
+
+The details are in the L<OPTIONS|/OPTIONS> section below.
+
+=item C<close()>
+
+Close the pcap.  Intended to be useful from SIG/while loops like this.
+
+    $SIG{INT} = sub { $npe->close };
+    while( $npe->loop ) {
+        # ... blah
+    }
+
+=back
+
+=head1 OPTIONS
+
+L<Net::Pcap::Easy> takes a small number of options, each of which is purely
+optional, although it's recommended to specify as many as possible, particularly
+the device.
+
+The options can only be specified as arguments to the C<new()> method.
+
+=over 4
+
+=item C<dev>
+
+The device you wish to listen on, eth0, "Local Area Connection," etc.  It's a
+good idea to specify this device, but if you don't, L<Net::Pcap::Easy> will
+attempt to locate it with L<Net::Pcap>'s C<lookupdev()> method.  Odds are good
+that it won't find the device you want, your mileage may vary.
+
+    my $npe = Net::Pcap::Easy->new(
+        dev              => "eth0",
+        filter           => "icmp",
+        packets_per_loop => 10,
+
+        icmp_callback => sub { warn "ping or something!\n" },
+    );
+
+    1 while $npe->loop; # loop() returns 10, 10, 10, until you hit ^C
+    exit 0;
+
+If passed a special filename, C<"file:/path/name">, L<Net::Pcap::Easy> will try
+to open that file and read it as the device.  This will break functions like
+L</network>, L</netmask> and the raw versions -- their results are undefined.
+
+    bash$ tcpdump -c 6 -i lo -w lo.data
+
+    my $npe = Net::Pcap::Easy->new(
+        dev              => "file:./lo.data",
+        packets_per_loop => 3,
+        icmp_callback => sub { warn "ping or something!\n" },
+    );
+
+    1 while $npe->loop; # loop() returns 3 twice, then a 0
+    exit 0;
+
+=item C<packets_per_loop>
+
+The number of packets to capture on each loop.  Most likely, it's more efficient
+to capture more than one packet per loop.  But if you capture too many your
+program will seem to stutter.  Likely there's a nice balance somewhere.
+
+L<Net::Pcap::Easy> defaults to a value of C<32> packets per loop.  The minimum
+is C<1> and L<Net::Pcap::Easy> will silently discard values lower than C<1>,
+using the default PPL instead.
+
+=item C<bytes_to_capture>
+
+The number of bytes to capture from each packet.  Defaults to C<1024>.  The
+minimum is C<256> and L<Net::Pcap::Easy> will silently discard values lower than
+this, simply using the minimum instead.  If you really really want to capture
+less, you can change the minimum by setting C<$Net::Pcap::Easy::MIN_SNAPLEN> to
+whatever value you like.
+
+=item C<timeout_in_ms>
+
+Use this to set a timeout for the C<loop()> method (see below).  The default is
+C<0>, meaning: wait until I get my packets.  If you set this to some number
+greater than C<0>, the C<loop()> function may return before capturing the
+requested PPL.
+
+Note that this probably doesn't ever do anything useful.  The libpcap timeout
+doesn't have any useful relationship to actually timing out on most platforms.
+
+L<https://github.com/the-tcpdump-group/libpcap/issues/86> (et al).
+
+The simplest solution for this is to use L<forks>.  There is an example of this
+included in the distribution.
+
+L<https://github.com/jettero/net--pcap--easy/blob/master/examples/forks.pl>
+
+=item C<promiscuous>
+
+This is a boolean value (in the perl sense) indicating whether you wish to
+capture packets not intended for the listening interface.  The default is false.
+
+=item C<pcap>
+
+You can optionally build the L<Net::Pcap> object yourself.  Presumably you have
+something custom in mind if you choose to do this.  Choosing to do this will
+disable various features (like populating the network and netmask fields);
+
+=item C<*_callback>
+
+The captured packets are passed to code refs.  There are a variety of callback
+types to choose from.  Each callback must be a code ref.
+
+This is covered in more detail below.
+
+=back
+
+=head1 CALLBACKS
+
+Only one callback will get called for each packet.
+
+If a packet would match multiple callbacks it will try to call the most specific
+match first (whatever that might mean).  The callbacks are listed in order of
+preference.
+
+=over 4
+
+=item C<tcp_callback>
+
+The callback will receive as arguments:
+
+    my ($npe, $ether, $ip, $tcp, $header ) = @_;
+
+C<$npe> is the L<Net::Pcap::Easy> object, C<$ether> is a L<NetPacket::Ethernet>
+object, C<$ip> is a L<NetPacket::IP> object, C<$tcp> is a L<NetPacket::TCP>
+object and C<$header> is a L<Net::Pcap> header object.
+
+Each C<Net::Pcap> object contains the length of the entire packet C<{len}>, the
+length captured by the libpcap C<{caplen}>, and the timestamp from the packet header
+C<{tv_sec}>/C<{tv_usec}> — C<{tv_sec}> is seconds since the epoch (see:
+L<perlfunc/localtime>) and C<{tv_usec}> is microseconds since that second [I
+think].
+
+Each C<NetPacket> object contains a C<{data}> field that holds the data
+below the packet headers.  Unsurprisingly, the C<{dest_mac}> and C<{src_mac}>
+are available in the C<$ether> object, the C<{src_ip}> and C<{dest_ip}> are in
+the C<$ip> object and the C<{dest_port}> and C<{src_port}> are in the C<$tcp>
+object.
+
+Example:
+
+    tcp_callback => sub {
+        my ($npe, $ether, $ip, $tcp, $header ) = @_;
+
+        print "TCP: $ip->{src_ip}:$tcp->{src_port} -> $ip->{dest_ip}:$tcp->{dest_port}\n";
+        print "\t$ether->{src_mac} -> $ether->{dest_mac}\n" if $SHOW_MAC;
+    }
+
+=item C<udp_callback>
+
+The callback will receive as arguments:
+
+    my ($npe, $ether, $ip, $udp, $header ) = @_;
+
+This works exactly like the C<tcp_callback> except that instead of C<$tcp>, the
+callback is passed a C<$udp> argument that is a L<NetPacket::UDP> object.  The
+C<$udp> object has a C<{src_port}> and C<{dest_port}>, just like you'd expect.
+
+=item C<icmp_callback>
+
+The callback will receive as arguments:
+
+    my ($npe, $ether, $ip, $icmp, $header ) = @_;
+
+This callback is quite similar to the C<tcp_callback>/C<udp_callback>s, but the
+L<NetPacket::ICMP> object doesn't have ports.  See that page for details on
+parsing ICMP packets and/or use the more specific callbacks below, instead of
+parsing the C<{type}> by hand.
+
+Technically these ICMP are out of preference order (they should be above, not
+below the C<icmp_callback>).  However, they all receive identical arguments to
+the generic C<icmp_callback> ...
+
+Specific ICMP Callbacks: C<icmpechoreply_callback>, C<icmpunreach_callback>,
+C<icmpsourcequench_callback>, C<icmpredirect_callback>, C<icmpecho_callback>,
+C<icmprouteradvert_callback>, C<icmproutersolicit_callback>, C<icmptimxceed_callback>,
+C<icmpparamprob_callback>, C<icmptstamp_callback>, C<icmptstampreply_callback>,
+C<icmpireq_callback>, C<icmpireqreply_callback>
+
+=item C<igmp_callback>
+
+The callback will receive as arguments:
+
+    my ($npe, $ether, $ip, $igmp, $header ) = @_;
+
+Please see the L<NetPacket::IGMP> page for details on the C<$igmp> argument.
+
+=item C<ipv4_callback>
+
+The callback will receive as arguments:
+
+    my ($npe, $ether, $ip, $spo, $header ) = @_;
+
+C<$spo> is any of L<NetPacket::TCP>, L<NetPacket::UDP>, L<NetPacket::ICMP>,
+L<NetPacket::IGMP>, or C<undef> (see the default callback, below, for an example
+on parsing the C<$spo>).
+
+The biggest difference between the C<ipv4_callback> and the C<default_callback>
+is that you can say for sure the third argument is a L<NetPacket::IP> object.
+
+=item C<arp_callback>
+
+The callback will receive as arguments:
+
+    my ($npe, $ether, $arp, $header ) = @_;
+
+This callback is also quite similar to the
+C<tcp_callback>/C<udp_callback>/C<icmp_callback>s.  See the L<NetPacket::ARP>
+page for details on parsing ARP packets and/or use the more specific callbacks
+below, instead of parsing the C<{type}> by hand.
+
+Technically these ARP are out of preference order (they should be above, not
+below the C<arp_callback>).  However, they all receive identical arguments to
+the generic C<arp_callback> ...
+
+Specific ARP Callbacks: C<arpreply_callback>, C<arpreq_callback>,
+C<rarpreply_callback>, C<rarpreq_callback>
+
+=back
+
+=head1 OTHER_CALLBACKS
+
+=over 4
+
+=item C<ipv6_callback>
+
+The callback will receive as arguments:
+
+    my ($npe, $ether, $header ) = @_;
+
+There doesn't seem to be a C<NetPacket> decoder for this type of packet, so,
+this callback gets only the C<NetPacket::Ethernet> object.
+
+=item C<snmp_callback>
+
+The callback will receive as arguments:
+
+    my ($npe, $ether, $header ) = @_;
+
+There doesn't seem to be a C<NetPacket> decoder for this type of packet, so,
+this callback gets only the C<NetPacket::Ethernet> object.
+
+=item C<ppp_callback>
+
+The callback will receive as arguments:
+
+    my ($npe, $ether, $header ) = @_;
+
+There doesn't seem to be a C<NetPacket> decoder for this type of packet, so,
+this callback gets only the C<NetPacket::Ethernet> object.
+
+=item C<appletalk_callback>
+
+The callback will receive as arguments:
+
+    my ($npe, $ether, $header ) = @_;
+
+There doesn't seem to be a C<NetPacket> decoder for this type of packet, so,
+this callback gets only the C<NetPacket::Ethernet> object.
+
+=back
+
+=head1 DEFAULT CALLBACK
+
+=over 4
+
+=item C<default_callback>
+
+Anything not captured above will go to this callback if specified.  It receives
+a variety of arguments, differing based on the packet types.  There are seven
+types of calls it might receive:
+
+    my ($npe, $ether, $ip, $tcp, $header )  = @_; # TCP packets
+    my ($npe, $ether, $ip, $udp, $header )  = @_; # UDP packets
+    my ($npe, $ether, $ip, $icmp, $header ) = @_; # ICMP packets
+    my ($npe, $ether, $ip, $igmp, $header ) = @_; # IGMP packets
+    my ($npe, $ether, $ip, $header )        = @_; # other IP packets
+    my ($npe, $ether, $arp, $header )       = @_; # ARP packets
+    my ($npe, $ether, $header )             = @_; # everything else
+
+Example:
+
+    default_callback => sub {
+        my ($npe, $ether, $po, $spo, $header ) = @_;
+
+        if( $po ) {
+            if( $po->isa("NetPacket::IP") ) {
+                if( $spo ) {
+                    if( $spo->isa("NetPacket::TCP") ) {
+                        print "TCP packet: $po->{src_ip}:$spo->{src_port} -> ",
+                            "$po->{dest_ip}:$spo->{dest_port}\n";
+
+                    } elsif( $spo->isa("NetPacket::UDP") ) {
+                        print "UDP packet: $po->{src_ip}:$spo->{src_port} -> ",
+                            "$po->{dest_ip}:$spo->{dest_port}\n";
+
+                    } else {
+                        print "", ref($spo), ": $po->{src_ip} -> ",
+                            "$po->{dest_ip} ($po->{type})\n";
+                    }
+
+                } else {
+                    print "IP packet: $po->{src_ip} -> $po->{dest_ip}\n";
+                }
+
+            } elsif( $po->isa("NetPacket::ARP") ) {
+                print "ARP packet: $po->{sha} -> $po->{tha}\n";
+            }
+
+        } else {
+            print "IPv6 or appletalk or something... huh\n";
+        }
+    }
+
+=back
+
+=head1 FAST_CALLBACK
+
+The L<NetPacket> stuff is a little slow because it's object oriented and
+therefore involves many function calls.  If you have a need for something really
+fast, you can supply something to the C<loop()> function.  This will avoid all
+internal processing of the packet and you will be completely on your own
+regarding the packet processing.  Also, the C<loop()> will fail to return the
+number of processed packets since it didn't process any.
+
+Warning: The following is not "Easy" like the rest of this package and assumes
+knowledge of the network layers (2-Ethernet, 3-IPv4, 4-TCP/UDP)
+
+    1 while defined
+    # NOTE: defined, since loop returns 0 and undef on error
+
+    $npe->loop( sub {
+        my ($user_data, $header, $raw_bytes) = @_;
+
+        # $user_data is literally "user data"
+
+        # $header is like this:
+        # { caplen => 96, len => 98, tv_sec => 1245963414, tv_usec => 508250 },
+
+        print unpack("H*", $raw_bytes), "\n";
+
+        my $packet = $_[-1]; # this is the same as $raw_bytes, but I prefer
+                             # the word packet and rarely examin the other
+                             # elements of @_
+
+        # Calculating precisely what you need is quite a bit faster than
+        # decoding the whole packet -- although it's not exactly "Easy."  Say
+        # we're interested in IPv4 TCP and UDP packets only... The following
+        # assumes *Ethernet* and we don't check it!
+
+        my $l3protlen = ord substr $packet, 14, 1; # the protocol and length
+        my $l3prot    = $l3protlen & 0xf0 >> 2; # the protocol part
+
+        return unless $l3prot == 4; # return unless IPv4
+
+        my $l4prot = ord substr $packet, 23, 1; # the L4protocol
+
+        # return unless it's udp(17) or tcp(6)
+        return unless $l4prot == 6 or $l4prot == 17;
+
+        my $l3hlen= ($l3protlen & 0x0f) * 4; # number of 32bit words
+        my $l4 = 14 + $l3hlen; # the layer 4 data starts here
+
+        # my $src_ip = substr $packet, 26, 4; # these are netowrk order packed
+        # my $dst_ip = substr $packet, 30, 4; # but they're pretty easy to convert
+
+        # The ord of the individual bytes of an IP are what we usually
+        # see... join(".", map { ord $_} split "", "\xc0\xa8\x01\x01")
+        # gives 192.168.1.1
+
+        # Here, I'm only interestd in local network downloads
+        my $upload = 0;
+
+        if( substr($packet, 30, 2) eq "\xc0\xa8" ) { # 192.168.0.0/16x.x
+            # download direction
+
+            my $cust = ord(substr($packet, 32,1)) .'.'. ord(substr($packet, 33,1));
+            my $port = unpack 'n', substr $packet, $l4+0, 2; # src port
+
+            # On my network, in this sense, the last two bytes idenfity a "customer"
+            # the source port (on a download) is the port the protocol operates on.
+            # 80 for http, 110 for pop3, etc.  Unpack('n', blarg) gives the
+            # network order 2-byte port number as a Perl number.
+
+            _do_things($cust, $port);
+
+        } elsif( $upload ) {
+            # upload direction
+
+            my $cust = ord(substr($packet, 28,1)) .'.'. ord(substr($packet, 29,1));
+            my $port = unpack 'n', substr $packet, $l4+2, 2; # dst port
+
+            # In the upload direction, the protocol port is the dst port.
+
+            _do_things($cust, $port);
+        }
+
+    });
+
+=head1 CAVEAT
+
+Note, silly though this may seem, if the packets are received by a non-Ethernet
+device, they will be encapsulated in a fake Ethernet frame before being passed
+to the callbacks.  This design decision (or kludge) was chosen to help keep the
+module simple.
+
+=head1 AUTHOR
+
+Paul Miller C<< <jettero@cpan.org> >>
+
+I am using this software in my own projects...  If you find bugs, please
+please please let me know.  Actually, let me know if you find it handy at
+all.  Half the fun of releasing this stuff is knowing that people use it.
+
+If you see anything wrong with the callbacks, the docs, or anything:  Definitely
+let me know!  rt.cpan, irc, email, whatever.  Just let me know.
+
+=head2 Patches welcome!
+
+Please note that your patches should avoid changing the API for downstream
+users.  Sometimes this means making bad design decisions (e.g., sticking fake
+Ethernet headers on non-Ethernet frames).
+
+=over
+
+=item ANDK
+
+Fixed various things in the init functions.  See RT #47324.
+
+=item Daniel Roethlisberger
+
+Helped L<Net::Pcap::Easy> load non Ethernet frames.
+
+=item Jerry Litteer
+
+Needed Ethernet C<$header> information for his project, so he sent patches.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (c) 2009-2010 Paul Miller
+
+=head1 LICENSE
+
+This module is free software.  You can redistribute it and/or
+modify it under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=head1 SEE ALSO
+
+perl(1), L<Net::Pcap>, L<Net::Pcap>, L<Net::Netmask>, L<NetPacket::Ethernet>, L<NetPacket::IP>,
+L<NetPacket::ARP>, L<NetPacket::TCP>, L<NetPacket::UDP>, L<NetPacket::IGMP>, L<NetPacket::ICMP>

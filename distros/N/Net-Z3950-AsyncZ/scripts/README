@@ -1,0 +1,9 @@
+
+test_dbs.pl runs through the servers listed in DB.txt and prints out the
+server names, ports, and databases and the first line of the first record of each 
+successful hit.
+
+Run all scripts in this directory using 
+		perl <script>
+
+

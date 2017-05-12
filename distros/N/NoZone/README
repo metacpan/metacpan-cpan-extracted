@@ -1,0 +1,23 @@
+                  NoZone Readme
+                  =============
+
+NoZone is a tool for simplifying the management of Bind DNS
+Zone files, by eliminating the need to write them directly.
+NoZone defines a simple, structured configuration file, from
+which Bind DNS zone files are generated. For cases where there
+are many domains sharing the same basic DNS records, it will
+greatly reduce the duplication of information. Use of a higher
+level configuration format, protects the administrator from
+many of the potential pitfalls inherent in the archaic Bind
+zone format.
+
+NoZone is free software distributed under the terms of the
+GNU GPL license, version 3 or later.
+
+The master GIT repository for NoZone can be found at
+
+  https://gitorious.org/nozone
+
+Please file bugs at
+
+  https://rt.cpan.org/

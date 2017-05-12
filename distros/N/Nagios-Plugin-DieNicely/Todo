@@ -1,0 +1,6 @@
+TODO list for Perl module Nagios::Plugin::DieNicely
+
+ - Get the shortname of the module through Nagios::Plugin if it is beeing used
+ - Issue perl warnings to STDOUT, and possbily issue WARNING or CRITICAL
+
+

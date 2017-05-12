@@ -1,0 +1,60 @@
+Revision history for perl distribution Net-SAJAX
+
+0.107 2011-10-23
+ [OTHER]
+ - Change from Test::Exception to Test::Fatal.
+ - Use Class::Load for loading exception classes dynamically.
+
+0.106 2010-06-06
+ [BUG FIXES]
+ - The regular expression test no longer fails on Perl 5.11.0+
+   (hopefully it will work this time).
+
+0.105 2010-04-16
+ [BUG FIXES]
+ - The regular expression test no longer fails on Perl 5.11.0+.
+
+0.104 2010-01-25
+ [ENHANCEMENTS]
+ - Support for JavaScript Boolean object conversion.
+ - Support for JavaScript Date object conversion.
+ - Support for JavaScript String object conversion.
+
+ [BUG FIXES]
+ - Corrected typo in Makefile.PL that caused most of the dependencies to
+   not be listed.
+
+0.103 2010-01-24
+ [BUG FIXES]
+ - The Exception::JavaScriptConversion class was missing and so when
+   conversion to native Perl object failed, no usefull exception was
+   thrown.
+
+ [OTHER]
+ - More tests added for better code coverage.
+ - Bundled Module::Install updated to version 0.92.
+
+0.102 2009-08-21
+ [API CHANGES]
+ - Exceptions are no longer strings, but objects. The objects will
+   stringify to their former string representation.
+
+ [ENHANCEMENTS]
+ - Net::SAJAX has a new attribute "autoclean_garbage" that when set will
+   attempt to clean garbage from a SAJAX response due to bad server
+   programming.
+
+0.101 2009-08-15
+ [OTHER]
+ - Added forgotten dependency on Test::MockObject for the build process.
+
+0.100 2009-08-15
+ [API CHANGES]
+ - The method call now returns a Perl scalar instead of a JE object as
+   promised, and so should not break any code.
+
+ [OTHER]
+ - Added repository and homepage links to META.
+
+0.001 2009-08-14
+ - First release.

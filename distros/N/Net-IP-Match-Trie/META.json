@@ -1,0 +1,67 @@
+{
+   "abstract" : "Efficiently match IP addresses against IP ranges with Trie (prefix tree)",
+   "author" : [
+      "HIROSE Masaaki <hirose31@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.4, Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-IP-Match-Trie",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.022"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.030"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Devel::Cover" : "0",
+            "FindBin" : "0",
+            "Path::Class" : "0",
+            "Test::Base" : "0",
+            "Test::More" : "0.88",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hirose31/p5-net-ip-match-trie/issues"
+      },
+      "homepage" : "https://github.com/hirose31/p5-net-ip-match-trie",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hirose31/p5-net-ip-match-trie.git",
+         "web" : "https://github.com/hirose31/p5-net-ip-match-trie"
+      }
+   },
+   "version" : "1.00"
+}
+

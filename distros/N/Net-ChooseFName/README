@@ -1,0 +1,30 @@
+Net-ChooseFName version 0.01
+============================
+
+Choose a name of a file with a local copy of a net (e.g., FTP or HTTP)
+resource.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Ilya Zakharevich <ilyaz@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

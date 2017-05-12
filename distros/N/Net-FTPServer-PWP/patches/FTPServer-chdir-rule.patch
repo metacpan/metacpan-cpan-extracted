@@ -1,0 +1,107 @@
+*** FTPServer.pm-orig	Wed Oct 16 01:30:15 2002
+--- FTPServer.pm	Fri Oct 25 16:24:14 2002
+***************
+*** 833,838 ****
+--- 833,840 ----
+  
+  =item rename rule
+  
++ =item chdir rule
++ 
+  Access control rules.
+   
+  Access control rules are all specified as short snippets of
+***************
+*** 980,985 ****
+--- 982,991 ----
+  
+  Example: C<rename rule: $pathname !~ m(/.htaccess$)>
+  
++ Chdir rule. This rule controls which directories are acceptable to a CWD or CDUP.
++ 
++ Example: C<chdir rule: $pathname !~ m/private/>
++ 
+  =item chdir message file
+  
+  Change directory message file. If set, then the first time (per
+***************
+*** 4689,4698 ****
+      my $cmd = shift;
+      my $rest = shift;
+  
+!     my $new_cwd;
+  
+      # Look relative to the current directory first.
+!     if ($new_cwd = $self->_chdir ($self->{cwd}, $rest))
+        {
+  	$self->{cwd} = $new_cwd;
+  	$self->_chdir_message;
+--- 4695,4714 ----
+      my $cmd = shift;
+      my $rest = shift;
+  
+!     my $new_cwd = $self->_chdir ($self->{cwd}, $rest);
+! 
+!     # Access control
+!     unless ($new_cwd and $self->_eval_rule ("chdir rule",
+! 					    $new_cwd->pathname, 
+! 					    $new_cwd->filename, 
+! 					    $new_cwd->pathname))
+!       {
+! 	$self->reply (550, "CWD command denied by server configuration.");
+! 	return;
+!       }
+  
+      # Look relative to the current directory first.
+!     if ($new_cwd)
+        {
+  	$self->{cwd} = $new_cwd;
+  	$self->_chdir_message;
+***************
+*** 4726,4732 ****
+  	foreach (@cdpath)
+  	  {
+  	    if (($new_cwd = $self->_chdir ($self->{cwd}, $_)) &&
+! 		($new_cwd = $self->_chdir ($new_cwd, $rest)))
+  	      {
+  		$self->{cwd} = $new_cwd;
+  		$self->_chdir_message;
+--- 4742,4750 ----
+  	foreach (@cdpath)
+  	  {
+  	    if (($new_cwd = $self->_chdir ($self->{cwd}, $_)) &&
+! 		($new_cwd = $self->_chdir ($new_cwd, $rest)) &&
+! 		($self->_eval_rule ("chdir rule", $new_cwd->pathname, 
+! 				    $new_cwd->filename, $new_cwd->pathname)))
+  	      {
+  		$self->{cwd} = $new_cwd;
+  		$self->_chdir_message;
+***************
+*** 4745,4751 ****
+      my $cmd = shift;
+      my $rest = shift;
+  
+!     if (my $new_cwd = $self->_chdir ($self->{cwd}, ".."))
+        {
+  	$self->{cwd} = $new_cwd;
+  	$self->_chdir_message;
+--- 4763,4781 ----
+      my $cmd = shift;
+      my $rest = shift;
+  
+!     my $new_cwd = $self->_chdir ($self->{cwd}, "..");
+! 
+!     # Access control
+!     unless ($new_cwd and $self->_eval_rule ("chdir rule",
+! 					    $new_cwd->pathname, 
+! 					    $new_cwd->filename, 
+! 					    $new_cwd->pathname))
+!       {
+! 	$self->reply (550, "CWD command denied by server configuration.");
+! 	return;
+!       }
+! 
+!     if ($new_cwd)
+        {
+  	$self->{cwd} = $new_cwd;
+  	$self->_chdir_message;

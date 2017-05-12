@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<memberships type="array">
+  <membership>
+    <id type="integer">69274</id>
+    <user-id type="integer">67166</user-id>
+    <user>
+      <id type="integer">67166</id>
+      <job>coder</job>
+      <name>sunnavy</name>
+      <website>sunnavy.com</website>
+      <avatar-url>avatars/0001/6140</avatar-url>
+    </user>
+    <account>http://sunnavy.lighthouseapp.com</account>
+  </membership>
+</memberships>

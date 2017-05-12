@@ -1,0 +1,8 @@
+MANIFEST
+Makefile.PL
+bin/str
+lib/Net/Starnet/DataAccounting.pm
+t/doc.t
+t/info.t
+t/run.t
+README

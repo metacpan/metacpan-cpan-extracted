@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Net/SMTP/Bulk.pm
+lib/Net/SMTP/Bulk/AnyEvent.pm
+lib/Net/SMTP/Bulk/Coro.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml
+META.json

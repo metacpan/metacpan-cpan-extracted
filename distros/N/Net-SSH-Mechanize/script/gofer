@@ -1,0 +1,510 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+gofer - execute multiple ssh sessions in parallel
+
+=head1 SYNOPSIS
+
+    # This expects a list of host connection definitions on STDIN, 
+    # then executes the command or command defined in the arguments 
+    # on each:
+    echo =host1 =host2 | gofer [options] <commands>
+
+
+=head1 DESCRIPTION
+
+This script will log in and execute commands on remote ssh servers.
+
+It is WORK IN PROGRESS!  Expect rough edges.
+
+In simple terms, the format of the host connections on STDIN should be
+one or more terms like this:
+
+    ='<connection>' 'login'='<name>' 'password'='<password>' 'port'='<port>' 'hostname'='<hostname>'
+
+This is designed to be easy to parse using core Perl modules
+(specifically, 
+C<Text::ParseWords::parse_line(qr/\s*(=\s*|\s+)/, 0, $term)>).
+
+The first item must start with an equals character, and
+C< <connection> > indicates an (arbitrary) name for the connection.
+The other items can be omitted in certain circumstances. Only
+C<connection> is required in I<all> circumstances. Other
+name-value parameters can be added (they will be ignored).
+
+Multiple terms can be combined in one line, assuming the terms start
+with an equals character (i.e. no items contain unquoted spaces, such
+as C<'foo' ='bar'>).
+
+C<connection> is used as the default hostname passed to ssh if no
+explicit C<hostname> parameter is given.
+
+So if your .ssh/config defines connections to hosts with aliases
+C<foo> and C<bar>, you can use a concise form like this:
+
+    echo =foo =bar | gofer id
+
+Instead of requiring the longer equivalents:
+
+    echo -e "=foo\n=bar\n" | gofer id
+    echo -e "=foo 'hostname'='foo'\n=bar 'hostname'='bar'\n" | gofer id
+
+Both examples would run C<id> on both C<foo> and C<bar>.
+
+By default, you will be prompted for a password for each connection
+(whether or not you are sudoing or have ssh keys set up, etc.)  There
+are some ways to make this easier.
+
+First you can define keys and pass the C<--p=sudoing> option, which
+means you will only be prompted if the commands require a sudo.
+
+Second, you can pass a C<password> parameter:
+
+    echo -e "=foo 'password'='offsite'\n=bar 'password'='offsite'\n" | gofer 'sudo id'
+
+How this is interpreted can vary. By default the value is interpreted
+as a I<label> for the password (not the password itself!).  Then gofer
+will only prompt you to enter a password once for each label.
+
+The point of this is to avoid explicit passwords on the command line,
+whilst also avoiding having to type any more passwords than necessary.
+
+You can specify other interpretations for the C<password> parameter
+using the C<--password-broker> option.  These allow you to specify the
+password literally on the command line (not recommended in general),
+or in an obfuscated form (better).  The default is to prompt.
+
+
+=head1 EXAMPLE OUTPUT
+
+An example showing what you might get invoking:
+
+    echo =alpha password=xxx =beta password=xxx | gofer --file git-status.sh
+
+With C<~/.ssh/config> defining key authenticated access for hosts with
+aliases C<alpha> and C<beta>, and C<git-status.sh> containing:
+
+   # bla de bla
+
+   sudo cd /root/configuration; git status
+
+Then you might get output like the following:
+ 
+    password for xxx:
+    ----[ alpha ]-----------------------------------------------------------
+      # bla de bla
+
+      $ sudo "cd /root/configuration; git status"
+    # On branch WORK_IN_PROGRESS
+    nothing to commit (working directory clean)
+
+    ----(4s elapsed)
+
+    ----[ beta ]------------------------------------------------------------
+      # bla de bla
+
+      $ sudo "cd /root/configuration; git status"
+    # On branch BETA_LOCAL_MODS
+    # Changed but not updated:
+    #   (use "git add <file>..." to update what will be committed)
+    #
+    #	modified:   foo/src/stuff.h
+    #
+    no changes added to commit (use "git add" and/or "git commit -a")
+
+    ----(4s elapsed)
+
+    done
+
+=cut
+
+use strict;
+use warnings;
+use Getopt::Long qw(:config gnu_compat);
+use IO::File;
+use List::Util qw(first);
+use Text::ParseWords qw(parse_line);
+use FindBin '$Bin';
+use lib "$Bin/../local-lib/lib/perl5", "$Bin/../local-lib/lib/perl5/i486-linux-gnu-thread-multi", 
+    "$Bin/../lib";
+
+use Carp qw(croak);
+
+# Define the password policies, and the default
+my $default_password_policy = 'always';
+my %password_policies = (
+    always => sub { 1 }, # always get a password
+    sudoing => sub { shift }, # only get a password if we are sudoing
+    never => sub { 0 }, # never get a password
+);
+
+
+######################################################################
+
+
+
+sub slurp {
+    my ($file) = @_;
+    my $fh = IO::File->new($file)
+        or croak "failed to open $file: $!";
+    local $/;
+    return <$fh>;
+}
+
+
+# Prompt for a password, and read it directly from terminal (so that
+# we can also read from stdin).  This won't work on non-unix systems,
+# since they don't have /dev/tty.  I'm not sure what I should do
+# there, presumably use Win32::Console?
+# Adapted from
+# http://perldoc.perl.org/perlfaq5.html#How-can-I-read-a-single-character-from-a-file?--From-the-keyboard?
+# And http://www.perlmonks.org/?node_id=773803
+sub prompt {
+    my ($prompt) = @_;
+    my $phrase = '';
+
+    open my $tty, '<', '/dev/tty';
+    local $| = 1;
+    print $prompt;
+
+    Term::ReadKey::ReadMode('noecho', $tty);
+
+    while (1) {
+        my $c = Term::ReadKey::ReadKey(~0/2-1, $tty); 
+        # Windows workaround http://rt.cpan.org/Public/Bug/Display.html?id=27944
+
+        if ($c =~ /[\r\n]/) {
+            print "\n";
+            last;
+        }
+        elsif ($c eq "\b" || ord $c == 127) {
+            next unless length $phrase;
+            chop $phrase;
+        }
+        elsif (ord $c) {
+            $phrase .= $c;
+        }
+    }
+    Term::ReadKey::ReadMode('restore', $tty);
+    return $phrase;
+}
+
+
+# Stolen from Net::OpenSSH
+my $obfuscate = sub {
+    # just for the casual observer...
+    my $txt = shift;
+    $txt =~ s/(.)/chr(ord($1) ^ 47)/ges
+        if defined $txt;
+    $txt;
+};
+my $deobfuscate = $obfuscate;
+
+
+# Constructors for the various password broker functions
+my %password_brokers = (
+    # Just interprets the token as the password in plaintext.
+    # Maximally insecure.
+    plaintext => sub { 
+        return sub { shift },
+    },
+
+    # Interpret the token as a password obfuscated using $obfuscate
+    obfuscated => sub { $deobfuscate },
+
+    # Uses the token as a name to prompt the user for the *real* password.
+    prompt => sub {
+        require Term::ReadKey; # We must have this loaded.
+
+        # keep the passwords here
+        my %password_cache;
+
+        return sub {
+            my $token = shift;
+
+            if (defined $password_cache{$token}) {
+                return $password_cache{$token};
+            }
+
+            my $password = prompt "password for $token: ", echo => '*';
+
+            return $password_cache{$token} = $password;
+        };
+    },
+);
+
+
+
+# Split a string created by serialise_line into a name and an
+# attribute-value list. Note, this function should *not* leak sensitive
+# information, yet alone include passwords in error messages!
+#
+# Adapted from Cluster::Facts to avoid a dependency.
+sub deserialize {
+    my $line = shift;
+    my ($empty, $name, @values) = parse_line qr/\s*(=\s*|\s+)/, 0, $line;
+
+    # Perform some sanity checking
+    die "line does not start with '='\n"
+        if length $empty;
+
+    die "number of attribute values does not match number of keys"
+        if @values % 2;
+
+    # Count each key's frequency whilst converting to a hash
+    my %counts;
+    my %attrs = map {
+        $counts{$values[0]}++;
+        splice @values, 0 ,2;
+    } 1..@values/2;
+
+    # collect (quoted) names of duplicates
+    my @duplicates = map {
+        s/'/\\'/g; 
+        "'$_'";
+    } grep {
+        $counts{$_} > 1;
+    } keys %counts;
+    
+    die "duplicated keys\n"
+        if @duplicates;
+
+    return $name, \%attrs;
+}
+
+
+=head2 parse_map %options
+
+Parses a sequence of lines of the following form:
+
+    C<host   user:password@host:port>
+
+Returns an array of C<<($name => \%params)>> pairs, each defining a
+connection name and a parameter hash as accepted by
+C<<Net::SSH::Mechanize::ConnectParams->new>>, which can be passed
+directly to C<<Net::SSH::Mechanize::Multi->add>>.
+
+=cut
+
+sub parse_map {
+    my %params = @_;
+    my $password_broker = $params{password_broker};
+    my $credentials = $params{credentials};
+    my $will_sudo = $params{will_sudo};
+
+    my @map;
+    my $line_no = 0;
+    foreach my $str (@$credentials) {
+        foreach my $line (split '\n', $str) {
+            ++$line_no;
+            next if $line =~ /^\s*#/;
+            next if $line =~ /^\s*$/;
+
+            # Split lines into sub-expressions, assuming that each
+            # starts with a '=' preceded by white-space.
+            foreach (split /\s+(?==)/, $line) {
+
+                my ($name, $attrs) = eval {
+                    deserialize $_;
+                }
+                    or do {
+                        # Note: deserialize should be written to not divulge anything
+                        # specific, just a type of error.
+                        die "error parsing credentials, on line #$line_no: $@\n";
+                    };
+
+                # Decide whether we need to get a password, and if so, get one
+                my $password_policy = $attrs->{get_password} || $default_password_policy;
+                my $decider = $password_policies{$password_policy};
+                if (!$decider) {
+                    warn "unknown password policy '$password_policy', ignoring\n",
+                        "(known policies are: @{[keys %password_policies]})\n";
+                    $decider = $password_policies{$default_password_policy};
+                }
+                 
+                if ($decider->($will_sudo)) {
+                    # Obtain the real password from our broker, if one exists.
+                    # This allows us to perform whatever sort of prompting,
+                    # look-up, or decryption we need, in a customisable way.
+                    my $identifier = $attrs->{password} || $name;
+                    $attrs->{password} = $password_broker->($identifier);
+                }
+                else {
+                    # Remove password, to avoid distributing it unnecessarily
+                    delete $attrs->{password};
+                }
+
+                # A convenience: by default, assume the hostname is
+                # the name.
+                $attrs->{host} ||= $name;
+            
+                push @map, $name, $attrs;
+            }
+        }
+    }
+    
+
+    return @map;
+}
+
+
+sub compile_script {
+    my $sudos = 0;
+    my @steps;
+
+    foreach my $str (@_) {
+        foreach my $line (split '\n', $str) {
+            if ($line =~ /^\s*#/ || $line =~ /^\s*$/) {
+                push @steps, sub { "  $line\n" };
+                next;
+            }
+
+            chomp $line;
+            if ($line =~ s/^\s*sudo\s*//) {
+                
+                push @steps, sub { qq(  \$ sudo "$line"\n) };
+
+                push @steps, sub { 
+                    my $result = shift->sudo_capture($line);
+                    return "$result\n"
+                        if $result;
+                };
+
+                $sudos++;
+            }
+            else {
+                push @steps, sub { qq(  \$ $line\n) };
+                push @steps, sub {
+                    my $result = shift->capture($line);
+
+                    return "$result\n"
+                        if $result;
+                };
+            }
+        }
+    }
+
+    my $compiled = sub {
+        my $ssh = shift;
+        my @results;
+        eval {
+            foreach my $step (@steps) {
+                push @results, $step->($ssh);
+            }
+            1;
+        }
+        or do {
+            push @results, "$@"; 
+        };
+        return \@results;
+    };
+
+    return ($compiled, $sudos);
+}
+
+
+######################################################################
+
+my $commands;
+my $command_file;
+my @credentials;
+my $no_op;
+my $password_broker = 'prompt';
+my $login_timeout;
+GetOptions(
+    "--no-op|n" => \$no_op,
+    "--file|f=s" => sub {
+        (undef, $command_file) = @_;
+        die "no such file '$command_file'\n"
+            unless -f $command_file;
+
+        $commands = slurp $command_file;
+    },
+    "--password-broker|b=s" => sub {
+        (undef, $password_broker) = @_;
+        die "No such password broker '$password_broker'\n"
+            unless $password_brokers{$password_broker};
+    },
+    "--password-policy|p=s" => sub {
+        (undef, $default_password_policy) = @_;        
+        die "Unknown password policy '$default_password_policy'\n",
+            "(known policies are: @{[keys %password_policies]})\n"
+            unless $password_policies{$default_password_policy};
+    },
+    "--credentials-file|c=s" => sub {
+        my (undef, $credentials_file) = @_;
+        die "no such file '$credentials_file'\n"
+            unless -f $credentials_file;
+
+        @credentials = slurp $credentials_file;
+    },
+    "--login-timeout|t=i" => \$login_timeout,
+)
+    or die "failed to parse options, stopping\n";
+
+if ($command_file && @ARGV) {
+    die "can't accept arguments if --file is given\n"
+}
+else {
+    $commands = join " ", @ARGV;
+}
+
+
+# Construct the password broker.  This should generate an error if
+# there is any problem.
+$password_broker = $password_brokers{$password_broker}->();
+
+die "Please supply some commands\n"
+    unless $commands 
+        && $commands =~ /\S/;
+
+if ($no_op) {
+    # just print the command.
+    # FIXME print the hosts too?
+    print "$commands\n";
+    exit 0;
+}
+
+# Get credentials from STDIN if none already read
+@credentials
+    or @credentials = <STDIN>;
+
+# Compile the commands, find out if we need to prompt for passwords
+my ($script, $sudos) = compile_script $commands;
+
+# Parse the credentials, get passwords if required
+my %map = parse_map(
+    password_broker => $password_broker,
+    will_sudo => $sudos,
+    credentials => \@credentials,
+);
+
+
+# This module uses Moose and is a bit slow to start; don't start it
+# unless we get this far.
+require Net::SSH::Mechanize::Multi;
+
+my $manager = Net::SSH::Mechanize::Multi->new;
+
+$manager->constructor_defaults->{login_timeout} = 0+$login_timeout
+    if defined $login_timeout;
+
+$manager->add(%map);
+
+my $threads = $manager->in_parallel(keys %map => sub {
+    my ($name, $ssh) = @_;
+    my $start = time;
+
+    $ssh->login;
+    my $results = $script->($ssh);
+
+    print "----[ $name ]", '-'x(64 - length $name), "\n";
+    print @$results;
+    my $elapsed = time - $start;
+    print "----(${elapsed}s elapsed)\n\n";
+});
+
+$_->join for @$threads;
+
+print "done\n";

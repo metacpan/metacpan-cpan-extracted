@@ -1,0 +1,7 @@
+Revision history for Perl extension Net::DNS::QueryID
+
+0.02  Mon Jan 27 11:59:58 PST 2014
+        modify Makefile.PL to bypass missing 'pod2text'
+
+0.01  Fri Jan 20 19:39:22 PST 2012
+	alpha release

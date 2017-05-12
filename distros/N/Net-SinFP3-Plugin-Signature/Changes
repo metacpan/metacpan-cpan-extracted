@@ -1,0 +1,9 @@
+Revision history for Perl extension Net::SinFP3::Plugin::Signature.
+
+1.01 Sun Jan  4 17:40:35 CET 2015
+   - bugfix: searchSignatureIds() returns an ARRAYREF, not an HASHREF
+   - copyright: 2015
+
+1.00 Sun Nov 18 20:27:30 CET 2012
+   - first public release
+

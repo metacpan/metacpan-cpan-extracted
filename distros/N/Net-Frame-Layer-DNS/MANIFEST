@@ -1,0 +1,37 @@
+Changes
+lib/Net/Frame/Layer/DNS.pm
+lib/Net/Frame/Layer/DNS/Constants.pm
+lib/Net/Frame/Layer/DNS/Question.pm
+lib/Net/Frame/Layer/DNS/RR.pm
+lib/Net/Frame/Layer/DNS/RR/A.pm
+lib/Net/Frame/Layer/DNS/RR/AAAA.pm
+lib/Net/Frame/Layer/DNS/RR/CNAME.pm
+lib/Net/Frame/Layer/DNS/RR/HINFO.pm
+lib/Net/Frame/Layer/DNS/RR/MX.pm
+lib/Net/Frame/Layer/DNS/RR/NS.pm
+lib/Net/Frame/Layer/DNS/RR/PTR.pm
+lib/Net/Frame/Layer/DNS/RR/rdata.pm
+lib/Net/Frame/Layer/DNS/RR/SOA.pm
+lib/Net/Frame/Layer/DNS/RR/SRV.pm
+lib/Net/Frame/Layer/DNS/RR/TXT.pm
+LICENSE
+LICENSE.Artistic
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-use.t
+t/02-pod-coverage.t
+t/03-test-pod.t
+t/04-dns.t
+t/05-constants.t
+t/06-compare-name.t
+t/07-compare-number.t
+t/08-question.t
+t/09-rr.t
+t/10-rdata.t
+t/11-rr-rdata.t
+t/12-question-decode.t
+t/13-rr-decode.t
+t/14-rr-send.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

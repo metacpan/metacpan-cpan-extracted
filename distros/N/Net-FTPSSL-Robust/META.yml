@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Net-FTPSSL-Robust
+version:            0.05
+abstract:           download directories over FTP with SSL or TLS encryption
+author:
+    - Mark Overmeer
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Log::Report:       0.25
+    Net::FTP::Robust:  0.06
+    Net::FTPSSL:       0.18
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

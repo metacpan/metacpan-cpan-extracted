@@ -1,0 +1,58 @@
+Net::YAR Changes Log
+====================
+
+1.083 - 0212-05-11
+    * Less convoluted DomainCheck module VERSIONing
+
+1.082 - 2012-04-27
+    * Add yar params 'retry_max' and 'retry_interval' to allow custom retries in case of network failure.
+
+1.081 - 2012-04-26
+    * Fix old precedence bug with api_port passing.
+    * Update all tests for changes in required information.
+
+1.080 - 2012-04-26
+    * Change use_ssl to default to 1.
+    * Add ssl_verify_hostname (default 0).
+    * Pass method as part of the url.
+
+1.079 - 2011-05-11
+    * Add Net::YAR::DomainCheck module for "whois" failover
+
+1.078 - 2011-05-02
+    * Add support for failover modules in case of
+      temporary Registrar or Registry problems.
+
+1.077 - 2011-02-17
+    * Add ->host-> and ->dns-> chaining proxy support.
+
+1.076 - 2010-01-12
+    * Make sure JSON::encode for JSON 2.0 is used properly
+
+1.075 - 2009-05-21
+    * Add *_search_iter capabilities.
+    * Allow for optional LWP args.
+
+1.070 - 2008-06-04
+    * Allow for working with JSON 2 (as well as JSON 1) API.
+
+1.069 - 2008-01-09
+    * Add use_ssl option for https support.
+    * Make test suite pass with non-ote users.
+
+1.068 - 2007-11-02
+    * Add Unmapping option to JSON import to keep JSON::NotString from appearing.
+
+1.067 - 2007-04-05
+    * Pass authentication via cookies.
+    * Allow Makefile.PL to require at least one serialization library.
+
+1.065 - 2007-03-26
+    * Clean up log_file and log_obj options.
+
+0.049 - 2007-01-16
+    * Add more documentation and examples.
+
+0.048 - 2006-11-10
+    * First public release of FastDomain.Com API
+      client transport software.

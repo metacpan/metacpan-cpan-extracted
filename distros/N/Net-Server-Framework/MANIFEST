@@ -1,0 +1,27 @@
+bin/queue
+bin/spooler
+Changes
+db/registry.sql
+db/spool.sql
+db/user.sql
+etc/db.conf.default
+etc/queue.conf.default
+etc/spooler.conf.default
+lib/Net/Server/Framework.pm
+lib/Net/Server/Framework/Auth.pm
+lib/Net/Server/Framework/Client.pm
+lib/Net/Server/Framework/Config.pm
+lib/Net/Server/Framework/Crypt.pm
+lib/Net/Server/Framework/DB.pm
+lib/Net/Server/Framework/Errorcodes.pm
+lib/Net/Server/Framework/Format.pm
+lib/Net/Server/Framework/Spooler.pm
+lib/Net/Server/Framework/Validate.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

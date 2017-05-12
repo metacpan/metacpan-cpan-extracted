@@ -1,0 +1,173 @@
+ssh-broker-g3(1)                                                                                                         General Commands Manual                                                                                                        ssh-broker-g3(1)
+
+
+
+NAME
+       ssh-broker-g3 - Tectia Connection Broker - Generation 3
+
+SYNOPSIS
+       ssh-broker-g3 [-a, --broker-address= ADDR] [-f, --config-file= FILE] [-D, --debug= LEVEL] [-l, --debug-log-file= FILE] [--pid-file= FILE] [--exit] [--reconfig] [-h] [-V]
+
+DESCRIPTION
+       ssh-broker-g3 uses the Secure Shell version 2 protocol to communicate with a Secure Shell server.
+
+       You  can start the Connection Broker manually by using the ssh-broker-g3 command. This starts ssh-broker-g3 in the background and all following uses of sshg3, sftpg3, or scpg3 will connect via this instance of the Connection Broker instead of starting a new
+       Broker session.
+
+       If there is an ssh-broker-g3 process running in the run-on-demand mode, and the Connection Broker is started from the command line, the new ssh-broker-g3 process sends a message to the old ssh-broker-g3 process to change from the run-on-demand mode  to  the
+       background mode, keeping the Broker running after the clients disconnect.
+
+       The status of the running Connection Broker can be checked using the ssh-broker-ctl and ssh-broker-gui utilities.
+
+   AUTHENTICATION
+       The Connection Broker operates automatically as an authentication agent, storing user's public keys and forwarding the authentication over Secure Shell connections. Key pairs can be created with ssh-keygen-g3.
+
+       The Connection Broker can also serve OpenSSH clients as an authentication agent.
+
+       The public key pairs used for user authentication are by default stored in the $HOME/.ssh2 directory.  See Files below for more information.
+
+       The  Connection  Broker  automatically  maintains  and  checks  a  database  containing  the  public  host  keys used for authenticating Secure Shell servers. When logging in to a server host for the first time, the host's public key is stored in the user's
+       $HOME/.ssh2/hostkeys directory.  See Files below for more information.
+
+OPTIONS
+       The most important options of ssh-broker-g3 are the following:
+
+       -a, --broker-address=ADDR
+              Listens to Connection Broker connections on a local address ADDR.
+
+       -D, --debug=LEVEL
+              Sets the debug level string to LEVEL.
+
+       -f, --config-file=FILE
+              Reads the Connection Broker configuration file from FILE instead of the default location.
+
+       -l, --debug-log-file=FILE
+              Dumps debug messages to FILE.
+
+       --pid-file=FILE
+              Stores the process ID of the Connection Broker to FILE.
+
+       --exit Make the currently running Connection Broker exit. This will terminate all connections.
+
+       --reconfig
+              Re-reads the configuration file (ssh-broker-config.xml) and takes it into use.
+
+       -V, --version
+              Displays program version and exits.
+
+       -h, --help
+              Displays a short summary of command-line options and exits.
+
+ENVIRONMENT VARIABLES
+       The following optional environment variables are required in certain situations:
+
+       SSH_SECSH_BROKER=ADDRESS
+              This variable defines an address to a separate Tectia Connection Broker process to which a connection is made.
+
+              This variable becomes necessary to define the location of the Connection Broker process, if you are running it from a non-default location, or using a userID other than that of the ssh-broker-g3 process owner.
+
+FILES
+       ssh-broker-g3 uses the following files:
+
+       $HOME/.ssh2/ssh-broker-config.xml
+              This is the user-specific configuration file used by ssh-broker-g3 (and sshg3, scpg3, and sftpg3). The format of this file is described on the ssh-broker-config(5) man page.  This file does not usually contain any sensitive information, but the  rec‐
+              ommended permissions are read/write for the user, and not accessible for others.
+
+       $HOME/.ssh2/random_seed
+              This  file is used for seeding the random number generator. It contains sensitive data and its permissions should be read/write for the user and not accessible for others. This file is created the first time the program is run and it is updated auto‐
+              matically. You should never need to read or modify this file.
+
+       $HOME/.ssh2/identification
+              This file contains information on public keys and certificates used for user authentication when contacting remote hosts.
+
+              With Tectia Client G3, using the identification file is not necessary if all user keys are stored in the default directory and you allow all of them to be used for public-key and/or certificate authentication. If the identification file does not  ex‐
+              ist, the Connection Broker attempts to use each key found in the $HOME/.ssh2 directory. If the identification file exists, the keys listed in it are attempted first.
+
+              The identification file contains a list of private key filenames each preceded by the keyword IdKey (or CertKey). An example file is shown below:
+
+              IdKey       mykey
+
+              This directs the Connection Broker to use $HOME/.ssh2/mykey when attempting login using public-key authentication.
+
+              The  files  are  by default assumed to be in the $HOME/.ssh2 directory, but also a path to the key file can be given. The path can be absolute or relative to the $HOME/.ssh2 directory. If there is more than one IdKey, they are tried in the order that
+              they appear in the identification file.
+
+       $HOME/.ssh2/hostkeys
+              This is the user-specific default directory for storing the public keys of server hosts. You are prompted to accept new or changed keys automatically when you connect to a server, unless you have set strict-host-key-checking to yes  in  the  ssh-bro‐
+              ker-config.xml file. You should verify the key fingerprint before accepting new or changed keys.
+
+              When the host key is received during the first connection to a remote host (or when the host key has changed) and you choose to save the key, its filename is stored by default in hashed format. The hashed host key format is a security feature to make
+              address harvesting on the hosts difficult.
+
+              The storage format can be controlled with the filename-format attribute of the known-hosts element in the ssh-broker-config.xml configuration file. The attribute value must be plain or hash (default).
+
+              If you are adding the keys manually, the keys should be named with key_<port>_<host>.pub pattern, where <port> is the port the Secure Shell server is running on and <host> is the hostname you use when connecting to the server (for example, key_22_al‐
+              pha.example.com.pub).
+
+              If both hashed and plain-text format keys exist, the hashed format takes precedence.
+
+              Note  that the identification is different based on the host and port the client is connecting to. For example, the short hostname alpha is considered different from the fully qualified domain name alpha.example.com. Also a connection with an IP, for
+              example 10.1.54.1, is considered a different host, as is a connection to the same host but different port, for example alpha.example.com#222.
+
+       $HOME/.ssh2/hostkeys/salt
+              This is the initialization file for hashed host key names.
+
+       /opt/tectia/share/auxdata/ssh-broker-ng/ssh-broker-config-default.xml
+              This is the configuration file used by ssh-broker-g3 (and sshg3, scpg3, and sftpg3) that contains the factory default settings. It is not recommended to edit the file, but you can use it to view the default settings. The format of this  file  is  de‐
+              scribed on the ssh-broker-config(5) man page.
+
+       /etc/ssh2/ssh-broker-config.xml
+              This is the global (system-wide) configuration file used by ssh-broker-g3 (and sshg3, scpg3, and sftpg3). The format of this file is described on the ssh-broker-config(5) man page.
+
+       /etc/ssh2/hostkeys
+              If  a  host  key  is  not found in the user-specific $HOME/.ssh2/hostkeys directory, this is the next location to be checked for all users. Host key files are not automatically put here but they have to be updated manually by the system administrator
+              (root) or by using Tectia Manager.
+
+              If the administrator obtains the host keys by connecting to each host, the keys will be by default in the hashed format. In this case, also the administrator's $HOME/.ssh2/hostkeys/salt file has to be copied to the /etc/ssh2/hostkeys directory.
+
+       /etc/ssh2/hostkeys/salt
+              This is the initialization file for hashed host key names. The file has to be copied here manually by the same administrator that obtains the host keys.
+
+       /etc/ssh/ssh_known_hosts
+              This is the default system-wide file used by OpenSSH clients for storing the public key data of known server hosts. It is supported also by Tectia Client/Server.
+
+              If a host key is not found in the user-specific $HOME/.ssh/known_hosts file, this is the next location to be checked for all users.
+
+              The ssh_known_hosts file is never automatically updated by Tectia Client or ConnectSecure, since they store new host keys always in the Tectia user-specific directory $HOME/.ssh2/hostkeys.
+
+       $HOME/.ssh/known_hosts
+              This is the default user-specific file used by OpenSSH clients for storing the public key data of known server hosts. The known_hosts file is supported also by Tectia Client/Server.
+
+              The known_hosts file contains a hashed or plain-text format entry of each known host key and the port used on the server, in case it is non-standard (other than 22). For more information on the format of the known_hosts file, see the OpenSSH  sshd(8)
+              man page.
+
+              The known_hosts file is never automatically updated by Tectia Client or ConnectSecure, since they store new host keys always in the Tectia directory $HOME/.ssh2/hostkeys.
+
+       $HOME/.ssh2/authorized_keys (on the server host)
+              This directory is the default location used by Tectia Server for the user public keys that are authorized for login.
+
+              On Tectia Server on Windows, the default directory for user public keys is %USERPROFILE%\.ssh2\authorized_keys.
+
+       $HOME/.ssh2/authorization (on the server host)
+              This is the default file used by earlier versions of Tectia Server (sshd2) that lists the user public keys that are authorized for login. The file can be optionally be used with Tectia Server G3 (ssh-server-g3) as well.
+
+              On Tectia Server on Windows, the authorization file is by default located in %USERPROFILE%\.ssh2\authorization.
+
+              For information on the format of this file, see the ssh-server-g3(8) man page.
+
+       $HOME/.ssh/authorized_keys (on the server host)
+              This is the default file used by OpenSSH server (sshd) that contains the user public keys that are authorized for login.
+
+              For information on the format of this file, see the OpenSSH sshd(8) man page.
+
+AUTHORS
+       SSH Communications Security Corporation
+
+       For more information, see http://www.ssh.com.
+
+SEE ALSO
+       sshg3(1), scpg3(1), sftpg3(1), ssh-broker-config(5), ssh-broker-ctl(1), ssh-server-g3(8)
+
+
+
+                                                                                                                             21 January 2014                                                                                                            ssh-broker-g3(1)

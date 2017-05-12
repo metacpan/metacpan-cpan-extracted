@@ -1,0 +1,29 @@
+---
+abstract: 'information on a type of monster'
+author:
+  - "Stefan O'Rear, C<< <stefanor@cox.net> >>"
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: NetHack-Monster-Spoiler
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 0
+  MooseX::ClassAttribute: 0
+  MooseX::Role::Matcher: 0
+  YAML: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.05

@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Net-Stomp-Receipt
+version:             0.36
+abstract:            An extension to Net::Stomp (STOMP client) to allow transactional sends.
+license:             ~
+author:              
+    - Hugo Salgado <huguei@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Net::Stomp:                    0.34
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

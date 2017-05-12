@@ -1,0 +1,47 @@
+{
+   "abstract" : "Basic EC2 client",
+   "author" : [
+      "Mark Allen <mrallen1@yahoo.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-EC2-Tiny",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Socket::SSL" : "1.83",
+            "Moo" : "1.000008",
+            "Net::SSLeay" : "1.52",
+            "XML::Simple" : "2.20",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Net-EC2-Tiny@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Net-EC2-Tiny"
+      },
+      "homepage" : "https://metacpan.org/dist/Net-EC2-Tiny",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mrallen1/Net-EC2-Tiny.git",
+         "web" : "https://github.com/mrallen1/Net-EC2-Tiny"
+      }
+   },
+   "version" : "0.03"
+}
+

@@ -1,0 +1,25 @@
+---
+abstract: 'A universal WHOIS data extractor.'
+author:
+  - 'Roman M. Parparov <roman@parparov.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Whois-IANA
+provides:
+  Net::Whois::IANA:
+    file: lib/Net/Whois/IANA.pm
+    version: 0.41
+requires:
+  IO::Socket: 0
+  Net::CIDR: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.41

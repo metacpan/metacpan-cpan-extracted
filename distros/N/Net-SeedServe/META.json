@@ -1,0 +1,50 @@
+{
+   "abstract" : "Perl module for implementing a seed server.",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-SeedServe",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.39"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::All" : "0.33",
+            "Test::More" : "0",
+            "Time::HiRes" : "1.59",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Net::SeedServe" : {
+         "file" : "lib/Net/SeedServe.pm",
+         "version" : "v0.2.7"
+      },
+      "Net::SeedServe::Server" : {
+         "file" : "lib/Net/SeedServe/Server.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/shlomif/gimp-test-suite"
+      }
+   },
+   "version" : "v0.2.7"
+}

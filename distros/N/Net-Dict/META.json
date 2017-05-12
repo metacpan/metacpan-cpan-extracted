@@ -1,0 +1,57 @@
+{
+   "abstract" : "client API for accessing dictionary servers (RFC 2229)",
+   "author" : [
+      "Neil Bowers <neil@bowers.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Dict",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "package" : [
+         "Net::Dict::TestConfig"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::Differences" : "0.62",
+            "Test::More" : "0.88",
+            "Test::RequiresInternet" : "0.05"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AppConfig::Std" : "0",
+            "Carp" : "0",
+            "IO::Socket" : "0",
+            "Net::Cmd" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/neilbowers/Net-Dict"
+      }
+   },
+   "version" : "2.21",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

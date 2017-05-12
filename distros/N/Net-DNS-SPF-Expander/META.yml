@@ -1,0 +1,35 @@
+---
+abstract: "Expands DNS SPF records, so you don't have to."
+author:
+  - 'Amiri Barksdale <amiri@campusexplorer.com>'
+build_requires:
+  Data::Printer: '0'
+  Test::Differences: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-DNS-SPF-Expander
+requires:
+  IO::All: '0'
+  List::AllUtils: '0'
+  Moose: '0'
+  MooseX::Getopt: '0'
+  MooseX::Types::IO::All: '0'
+  Net::DNS::Resolver: '0'
+  Net::DNS::ZoneFile: '0'
+  Scalar::Util: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/amiri/Net-DNS-SPF-Expander/issues
+  repository: git://github.com/amiri/Net-DNS-SPF-Expander.git
+version: '0.018'
+x_serialization_backend: 'YAML::Tiny version 1.69'

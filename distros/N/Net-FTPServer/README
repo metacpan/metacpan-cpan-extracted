@@ -1,0 +1,487 @@
+$Id: README,v 1.11 2004/02/08 19:28:56 rwmj Exp $
+
+Biblio@Tech Net::FTPServer - A full-featured, secure, extensible
+and configurable Perl FTP server.
+
+Copyright (C) 2000 Biblio@Tech Ltd.,	Copyright (C) 2000-2003
+Unit 2-3, 50 Carnwath Road, London,	Richard Jones <rich@annexia.org>
+SW6 3EG, UK.				and other contributors.
+
+The server was written as part of the Biblio@Tech Schoolmaster.net
+project and was kindly released under the GNU General Public License
+(GPL). Please visit their website and encourage your local school or
+college to join up:
+
+http://www.bibliotech.net/	http://www.schoolmaster.net/
+
+Developers' page:	https://savannah.nongnu.org/projects/netftpserver/
+General information:	http://www.annexia.org/freeware/netftpserver/
+
+Major features of Net::FTPServer include:
+
+* Feature parity with wu-ftpd.
+* IP-based and IP-less virtual hosting.
+* Virtual filesystem allows the FTP server to serve files from a
+  SQL database.
+* Configurable and extensible in Perl.
+* <Perl> sections in ftpd.conf file.
+* Supports all the latest RFCs and Internet Drafts, including MLST,
+  MLSD, FEAT, OPTS, LANG.
+* Secure by design and implementation.
+* PAM authentication.
+* Resource limits.
+* Run standalone or from inetd.
+* Configurable server greetings and welcome messages.
+* Anonymous mode.
+* Run in chroot jail.
+* Sophisticated access control rules.
+* wu-ftpd style aliases and cdpath.
+* SITE EXEC (disabled by default).
+* Syslog logging.
+* Set TCP parameters.
+
+Missing features:
+
+* Upload/download quotas. (These will be added in the next major
+  release).
+
+---------------------------------------------
+** EXPERIMENTAL RELEASE! **
+---------------------------------------------
+
+The 1.100, 1.101, etc. versions of Net::FTPServer are experimental
+releases. This means that they may not work properly for you. If you
+just want a stable FTP server which works, use the stable versions
+(1.031, 1.032, 1.033, etc.)
+
+---------------------------------------------
+INSTALLATION, CONFIGURATION AND DOCUMENTATION
+---------------------------------------------
+
+Installation documentation is in the file "INSTALL".
+
+All other documentation is in the Net::FTPServer(3) man page. After
+installation, type:
+
+	man Net::FTPServer
+
+and read the section "INSTALLING AND RUNNING THE SERVER".
+
+---------------------------------------------
+SUPPORT AND MAILING LIST
+---------------------------------------------
+
+There is a mailing list for general discussion and announcements.  See
+the Savannah mailing list page for details:
+
+https://savannah.nongnu.org/mail/?group=netftpserver
+
+Bug reports, feature requests, and so on should be sent to the mailing
+list.
+
+---------------------------------------------
+CHANGE LOG
+---------------------------------------------
+
+Version 1.121: EXPERIMENTAL RELEASE.  
+
+
+Version 1.120: EXPERIMENTAL RELEASE.  Added PREREQ_PM to Makefile.PL
+so CPAN works (thanks to barbie at missbarbell dot co dot uk).  Fixed
+a few warnings (thanks David Wheeler, david at kineticode dot com).
+
+Version 1.119: EXPERIMENTAL RELEASE.  Added FTP proxy backend (highly
+experimental - please test). Patch from John Jetmore to open
+/etc/localtime in chroot environment.  All of the following from Yair
+Lenga: 'rotate log files' configuration.  open_data_connection fix for
+non-reusable sockets on SunOS.  'die' replaced with 'confess' in a few
+places to aid debugging.  Allow 'ftp data port' to be given as a
+service name, as well as a number.  'authentication_hook' may return
+-2 to avoid sleep.  Don't drop priviledges if 'ftp data port' is bound
+to a socket < 1024.  Send back GMT in MDTM command.  Various extra
+directives such as '%Y' can be included in log file names
+(undocumented?).
+
+Version 1.118: EXPERIMENTAL RELEASE. Moved to Savannah.nongnu.org.
+
+Version 1.117: EXPERIMENTAL RELEASE. Fix t/350filters.t uudecode
+syntax to comply with certain systems.
+
+Version 1.116: EXPERIMENTAL RELEASE. Incorporated a change from the
+FreeBSD port of Net::FTPServer - does not install with '-g root'
+(which is a Linux-ism). Thanks for petef at freebsd.org for the patch.
+Less strict regex for PORT command (spot by Brian.Freeman at
+eby-brown.com). Allow "make test" to pass when certain filter commands
+are missing. Fix t/350filters.t compress syntax to comply with
+certain systems (spot by Vicki Brown  vlb at cfcl.com). Allow name
+based port to be used for source port on the server endpoint for PORT
+mode transfers. (i.e., "ftp data port: ftp-data" works now.  This is
+required by some router/firewall configurations. - Rob Brown)
+Compatibility fixes for ExtUtils::MakeMaker (5.91, 6.03, 6.10_03).
+Other minor package/build/make/rpm/install changes.
+
+Version 1.115: EXPERIMENTAL RELEASE. Remove bootstrap code from spec
+file so rpm works again. (Broken since 1.112.)  Add "ftp data port"
+directive to allow server to comply closer with RFC 959 if the user
+wishes to do so.  But for security reasons, the default remains to use
+the high ephemeral port.  -- Rob
+
+Version 1.114: EXPERIMENTAL RELEASE. No new features. Bug fixes only.
+Fix t/150commands.t LANG test failure on some systems.  Avoid race
+condition in t/400sighup.t that can occur when client connects before
+SIGHUP is done restarting the server.  Fixed the RMD bug introduced
+from Luis' Darwin / Mac OS X "removing directoring" patch in 1.112.
+Now RMD works again for the "Full" personality.  -- Rob
+
+Version 1.113: EXPERIMENTAL RELEASE. Removed all XS code. Signal
+handlers are pure perl now even for older versions of perl < 5.7.
+Concept taken from Net::Server::SIG in order to avoid dangerous
+pitfalls of unsafe signal handling in older versions of perl. -- Rob
+
+Version 1.112: EXPERIMENTAL RELEASE. Avoids sleeping in Makefile.PL if
+you set NET_FTPSERVER_NO_SLEEP=1. If Perl version >= 5.7.2, then the
+XS-based safe signals code is disabled. These later Perl versions
+include safe signals, so it is not needed. Note to package
+maintainers: if using Perl >= 5.7.2, then Net::FTPServer is pure Perl
+code, no C. Allow non-alpha characters in SITE commands (feature
+requested by Brian Freeman). Luis Mun\~oz fixed a problem with
+removing directories on Darwin / Mac OS X. Luis also added the 'chdir
+rule' which allows finer control over what directories a user may
+change into. Allow the build to work if there is a different version
+of the server installed.  Changes by Rob Brown: 1) Reduce redundant
+code.  2) Allow easier overrides for Full and RO personalities.  (That
+whole "sub list" doesn't need to be copied.)  3) Avoid spewing
+warnings to the logs and showing garbage to the client for a race
+condition where the node has been removed between the time of the
+IO::Dir read and the time of the @array stashing.
+
+Version 1.111: EXPERIMENTAL RELEASE. Fixed a critical memory
+corruption error. Fixed and removed a faulty call to 'fcntl' which
+passed a parameter by value where a pointer was expected. (One symptom
+was that messages produced by the '-d' option in the system log could
+appear blank). Work around a bug in Perl 5.6.0 which was causing the
+SYST command (and possibly other commands) to fail at random because a
+regular expression match gave $1 a corrupted value.
+
+Version 1.110: EXPERIMENTAL RELEASE. Workaround for a bug in
+IE 6.2600.0000. This version of IE sends a leading 0 before
+the IP address in the PORT command (eg. PORT 0212,57,32,3,1,2).
+
+Version 1.109: EXPERIMENTAL RELEASE. Tested the FTP server on Perl
+5.00405, so changed the Makefile.PL to allow this version. (Note on
+this version of Perl there are various warnings caused by bugs in Perl
+itself -- ignore them).
+
+Version 1.108: EXPERIMENTAL RELEASE. Tests will now succeed even if
+certain optional packages are not installed, such as for example
+Archive::Zip and the "compress" command.
+
+Version 1.107: EXPERIMENTAL RELEASE. Last release was broken: I forgot
+to change the MANIFEST file. This release corrects that mistake.
+
+Version 1.106: EXPERIMENTAL RELEASE. Added a "debian/" directory.
+
+Version 1.105: EXPERIMENTAL RELEASE. The "Full" backend now has
+an additional option ("password file") to allow authentication
+against a flat password file instead of the normal PAM database.
+Documentation updates for Debian.
+
+Version 1.104: EXPERIMENTAL RELEASE. Security fix: NLST honours the
+"list rule" access control rule (thanks to Jamie Hill
+<<hill@cinergycom.com>). Removed a warning generated by calling
+getprotobyname. Don't overwrite the old configuration file. Added a
+"readlink" function to file-based file handles so that symbolic links
+can be displayed correctly.
+
+Version 1.103: EXPERIMENTAL RELEASE. Documentation updates (azazel).
+Install start-up scripts and ftpd.conf file automatically. Multiple
+fixes to RPM spec file. Additional roadmap docs.
+
+Version 1.102: EXPERIMENTAL RELEASE. Better handling of CPAN version
+numbers in subclasses. Load Digest::MD5 early so it works with chroot
+(thanks Peter Gordon for pointing out the bug). Added quit_hook (for
+Björn Großmann). Don't hard-code path to Perl interpreter in the
+scripts. Added roadmap. Added "class" directive. Advanced command
+filtering ("restrict command" directives). Ordinary and advanced
+command filtering no longer log you out. They just send back an error
+message. Allow limits to be set to -1 to indicate no limit.
+
+Version 1.101: EXPERIMENTAL RELEASE. post_command_hook now gets the
+command as an argument. Removed can_* functions from backends.  In
+ASCII mode, downloading a file ending in "\n0" would cause corruption:
+now fixed.
+
+Version 1.100: EXPERIMENTAL RELEASE. Various small bugs fixed by
+Rob. Fixed a bug in Full/RO personalities which would cause
+incorrectly formatted directory handles to be created in some
+circumstances. Doubled memory and process limits so that default
+install will work correctly on Alpha. Added archive mode: try
+downloading "file.gz" (gzipped version of "file" will be created on
+the fly); try downloading "dir.list.gz" (compressed directory listing
+will be created on the fly); lots of other novel and interesting uses
+of this feature: see section ARCHIVE MODE in manual. Documentation
+updates. More tests. Added "visit" member for recursing over
+directories.
+
+Version 1.031: Added missed tests to MANIFEST file. Added 'make
+check-manifest' rule to try to eliminate missing files in the
+future. Document that %C does not work inside welcome text or welcome
+file options. Added many more tests (there are now over 400 in
+all). Fixed anonymous login test.
+
+Version 1.030: Cleaned up server start of day messages. Fixed a nasty
+bug which prevented command line options from working some of the time
+(the bug was introduced in the last release). Workaround to keep
+/etc/protocols open across chroot (thanks to Abraham Ingersoll
+<abe@dajoba.com>). Handle QUIT and client termination the same way so
+there is a simpler exit path from a child process. Added more tests.
+Fixed handling of multiple line configuration file keys. Added
+<IncludeWildcard> directive for configuration files.
+
+Version 1.029: Solaris missing RLIMIT_NPROC fixed (?).  Further fixes
+for Perl 5.7.2: no longer opens /dev/null twice by accident. Cleaned
+up the way that command line arguments are handled and added the "-o"
+option which allows you to override configuration file values on the
+command line. "--help" information enhanced. Documentation updates.
+
+Version 1.028: Change directory to root ("/") when in daemon mode
+[Rob]. Various fixes and workarounds for Perl 5.7 [Rich]. Various
+changes to RPM spec file so that it works cleanly under all versions
+of Perl [dan at berrange dot com]. It has been reported to me that
+this version does not work on Solaris because of a seemingly minor bug
+(RLIMIT_NPROC is missing).  Unfortunately I don't have a suitable box
+to reproduce this on. Can anyone help with a patch please?
+
+Version 1.027: VFS only required to support relative forward seeks to
+simplify certain backends (thanks to Keith Turner for this patch).
+
+Version 1.026: New optional hook: system_error_hook added to allow
+backends to provide more error information than is provided by the
+normal "$!" (thanks to Keith Turner for this patch). Various changes
+to error log (SIGHUP now functions correctly for non-privileged
+backends) [Rob]. Allow error log to contain variable hostname [Rob].
+Safer untainting for log filenames [Rob]. Re-add DAEMON message
+logging code [Rob]. SIGTERM is handled safely and synchronously
+[Rob].
+
+Version 1.025: Changed version numbering system slightly from 1.0.25
+to 1.025 to allow version numbers to be compared [Rob]. Optimizations
+to safe signals code.
+
+Version 1.0.24: Added SITE SYNC command (needs optional File::Sync
+package from CPAN). Implemented safe signals (see
+doc/safesignals.txt).
+
+Version 1.0.23: In Full personality, load Authen::PAM before forking.
+Removed some race conditions involving allocating and deallocating
+memory in signal handlers. Removed a race condition where a file or
+directory is removed before being ``stat''ed. Tested under load with
+1-128 clients. Added ``error log'' configuration option.
+
+Version 1.0.22: Check for most recent version of IO-stringy installed
+before proceeding. Added xfer logging (Rob). Don't try to allocate or
+deallocate memory in SIGCHLD handler -- this was causing the parent
+process to crash under heavy load (Rob). Better way to avoid warning
+from loading Sys::Syslog (Rob). Better conditional loading of
+BSD::Resource (Rob). If using PAM, upgrade to version 0.12 from CPAN
+(Rich). Rob has reported that this version is now stable again under
+heavy load. If you have problems, please mail them to:
+ftpserver@annexia.org.
+
+Version 1.0.21: More documentation on <Perl>. Allow array assignments
+to %config/%host_config elements. Always check the return value from
+"close". Replace "lstat" with "stat" (better handling of symbolic
+links, hopefully). Packages Authen::PAM, BSD::Resource and Digest::MD5
+are now truly optional. If you have not installed these packages, the
+server should still work (albeit with limited functionality) and
+should warn you when it needs to do something which requires an
+external package. Corrected pod2man warnings about command line
+options not being enclosed in C<> or B<>.
+
+Version 1.0.19: Ignore SIGCHLD in child processes (thanks to
+Duane Powell for finding this bug). The code which parses the
+configuration file is more strict about illegal constructs such
+as using <Include> inside a <Host> section. You can use <Perl>
+sections to insert verbatim Perl code into your configuration
+files, just like with Apache.
+
+Version 1.0.18: Linux Magazine has an article about Net::FTPServer
+here: http://www.linux-mag.com/2001-05/toc.html . Avoid storing
+children hash within the child process to save memory. A better way
+to remove warnings printed when "syslog.ph" is loaded.
+
+Version 1.0.17: Replaced local function ``syslog'' with ``log'', since
+it clashes with certain versions of the ``Sys::Syslog'' module which
+try to import their own ``syslog'' function even if you tell them not
+to. Fixed dependencies in RPM spec file.
+
+Version 1.0.16: ``max clients'' configuration option allows you to
+limit the number of clients who may simultaneously connect [Rob]. You
+can also use ``%x'' in messages to refer to the maximum number of
+clients.  ``hide passwords in client log'' configuration option: if
+set, don't log PASS commands in the client log [Rich]. ``rename rule''
+allows fine-grained control of renaming files [Rob]. Fixed SIZE on a
+non-readable ASCII (TYPE A) file [Rob]. Fixed ``zero node'' bug
+(previously it was impossible to create a file or directory called
+``0'') [Rob]. Fixed a small bug with the ``list rule'' directive
+[Rob]. Fixed a problem with various places where using ``/'' as an
+argument would cause crash [Rob]. Remove HTMLLIBPODS rule in the
+Makefile [Rich]. The website is no more: the software will always be
+released first and only to CPAN from now on. To get notification of
+releases, please subscribe to the ftpserver mailing list.
+
+Version 1.0.15: Several patches from Rob which fix some warnings and
+bugs which would crash the server child process when a user did MKD /
+and other similarly bizarre commands. Also, MLST / now works. Common
+wildcard to regex and wildcard to SQL LIKE functions moved to parent
+class.
+
+Version 1.0.14: Documentation for /etc/ftpd.conf options moved into
+the manual page. This aids maintenance considerably.
+
+Version 1.0.12: This contains a small featurette suggested by Rob. You
+can now disable syslogging from the configuration file. During the
+automatic tests (make test), syslogging is now disabled by default.
+
+Version 1.0.11: If getpwuid or getgrgid cannot resolve a user ID /
+group ID into a username or group name, then we print "-" instead,
+rather than generating an annoying warning message. Thanks go to
+Elliot Finley and Matthias Ivers who both spotted the bug at about the
+same time!
+
+Version 1.0.10: Several patches from Rob which fix warnings and a bug
+which would crash the server child process when a user did SIZE . and
+similar.
+
+Version 1.0.9: Patch from Rob: ls -al, issued from the Windows command
+line FTP client, now gives a pretty listing. This also worksaround a
+number of other clients which like to issue (incorrect) commands like:
+NLST -al.
+
+Version 1.0.8: Don't use /etc/group directly -- use getgrent instead.
+
+Version 1.0.7: Keep /etc/group open across chroot.
+
+Version 1.0.6: initgroups fixed by Rich (thanks to Matthew Gabeler-Lee
+for pointing out the problem). Small changes to logging usernames by
+Rob.
+
+Version 1.0.4: A small patch from Rob Brown which avoids the server
+leaving zombie processes lying around in some situations.
+
+Version 1.0.3: This version contains patches to make the full server
+work correctly on OpenBSD. (Thanks to Azazel).
+
+Version 1.0.2: This contains some necessary bugfixes over the 1.0.0
+and 1.0.1 releases. Patch to this version if you had problems with
+those releases. (Thanks to Rob Brown for these fixes).
+
+Version 1.0.1: I've done next to nothing for this release, but Rob
+Brown has been at it again, producing a beautiful series of bug fixes
+and enhancements. In no particular order: Avoid hard coded "." and
+".." entries in directories. Logging is taint-clean in Perl
+5.005. Don't log out-of-band data into client log. Added ident (RFC
+1413) logging for increased security. Added "time zone" configuration
+file option so that dates and times can appear in zones other than
+GMT. Allow parent daemon to be restarted cleanly even if there are
+child daemons still left over from the previous process. Sending
+SIGHUP causes the parent process to cleanly restart, reload
+configuration files and reopen client logging file (this even works if
+the daemon has bound to a low-numbered port and dropped priviledges).
+
+Version 1.0.0: Fixed for this release by Rich: STOU now works. Listing
+files by wildcard now works in the "in memory" personality. Added
+STOR/STOU/APPE tests. Added LIST/NLST tests. Added SITE IDLE
+test. Added SITE VERSION test. Added REST test. Added RNFR/RNTO
+test. Added ABOR test.  Added "no authentication commands"
+configuration option.  Fixed for this release by Rob Brown: "Client
+logging" feature. Distinguish between sending TERM to the daemonized
+process and to the child processes. Implement ABOR-ted transfers using
+SIGURG. Added post_bind_hook. DoS attack avoided by reseting the alarm
+after read and before write. Abort if configuration file is
+missing. Added transfer_hook.
+
+Version 0.9.9: This fixes a nasty bug with uploading ASCII files. Also
+added: A fairly complete test suite [Rich]. A cute "in memory"
+personality [Rich]. Catch errors on ASCII STOR (upload) and report to
+the client [Rob Brown]. Eliminate the idle transfer DoS bug [Rob
+Brown]. Never reset the ALRM catcher to inifinity (alarm 0) [Rob
+Brown]. Pull all clients that are idle even mid-transfer [Rob Brown].
+Avoid timing out clients that are actively transfering [Rob
+Brown]. Missing files added to the MANIFEST [Rich].
+
+Version 0.9.8: In no particular order: Port numbers opened by the FTP
+server in passive mode can be configured in ranges from the
+configuration file (this should improve things if you run a firewall
+in front of your server). Removed extra spaces in "Entering Passive
+Mode" string. Code tidying. Add "print" method to IO::Blob - you can
+now upload ASCII files to the database. In STOR, error messages
+actually reflect error conditions. Fixed calls to
+syswrite(). Incomplete three-way TCP handshake no longer crashes the
+server. Add -P option on the command line to supply name of
+pidfile. Delete pidfile when main process dies. (Thanks to Rob Brown
+for the bulk of these fixes).
+
+Version 0.9.6: Fixed a bug with LISTing files in subdirectories
+(thanks to all @about-inc.com).
+
+Version 0.9.5: I fixed a raft of portability problems on Solaris
+2.7. However, there remains a problem that the Perl version I have on
+Solaris doesn't call initgroups(3) correctly when the process GID is
+changed, and hence doesn't drop privileges properly. This is beyond my
+experience to fix -- seemingly requiring deep changes to Perl itself?
+It also works OK on Linux and *BSD, and that's all that really
+concerns me anyway.
+
+Version 0.9.4: Fixed a few problems with older versions of PostgreSQL
+(versions <= 6.3).
+
+Version 0.9.3: Fixed compatibility problems with ncftp versions 2.4.3
+and 3.0.2. Mostly fixed MLST/MLSD commands. Added --help option. Fixed
+-V option.
+
+Version 0.9.2: Bug fixes and clean ups. 
+
+Version 0.9.1: Many documentation updates. Added easily customizable
+SITE commands.
+
+Version 0.9.0: Added a anonymous read-only FTP personality. With this
+personality, the FTP server contains no code which could be used to
+write, create directories, delete files, etc. The FTP server will also
+only accept anonymous logins, and contains no code for checking
+/etc/passwd or PAM. This is a candidate for a 1.0.0 release. Please
+download it, play with it, and send me your feedback.
+
+Version 0.8.4: Added the missing database schema. 
+
+Version 0.8.3: This version has a fairly complete example database
+back-end for those that wanted to see that.
+
+Version 0.8.0: This is a highly experimental release which adds a
+partially implemented database back-end. This is just for people
+interested in database back-ends to the FTP server.
+
+Version 0.7.2: This fixes a problem when the FTP server is run from
+inetd (thanks again to Matthew Gabeler-Lee).
+
+Version 0.7.1: This is a stable, high quality release. Several
+important bug fixes, including an important fix to access control
+rules (thanks to Matthew Gabeler-Lee for pointing this one out).
+
+Version 0.6.1: This release is highly experimental, but I did all of 5
+minutes of testing and it appeared to work for me. Changes: bug fixes
+and enhancements too numerous to mention. Major change: separated out
+the file access back-end to improve security (our database version now
+no longer contains redundant file access code). Included a few more
+documents.
+
+Version 0.5.1: This fixes a problem in Makefile.PL which prevented the
+program from building on some platforms.
+
+Version 0.5.0: This major release incorporates support for both
+IP-based and IP-less virtual hosting.
+
+Version 0.4.5: This version contains a few modifications for
+submission to CPAN.
+
+Version 0.4.4: First public release.

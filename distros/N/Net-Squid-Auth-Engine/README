@@ -1,0 +1,53 @@
+Net-Squid-Auth-Engine
+
+External Authentication Engine for the Squid HTTP Cache, implemented in Perl.
+
+This Module reads a configuration file and starts an infinite loop, reading a
+line from the STDIN, capturing the username and password from the line, passing
+it in to a plugin (defined by the configuration file) for validation, and
+printing "OK\n" or "ERR\n" to the STDOUT, to indicate that the credentials
+presented are or aren't valid.
+
+This package also provides an interface to the Squid HTTP Cache through the
+script squid-auth-engine, shipped with it. Please read the POD documentation in
+the script for information about how to use it to authenticate Squid users
+through an external credentials repository.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::Squid::Auth::Engine
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Squid-Auth-Engine
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-Squid-Auth-Engine
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-Squid-Auth-Engine
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-Squid-Auth-Engine
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Luis Motta Campos
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

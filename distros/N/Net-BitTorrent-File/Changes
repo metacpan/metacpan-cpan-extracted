@@ -1,0 +1,11 @@
+Revision history for Perl module Net::BitTorrent::File
+1.02 Sun Jul 24 14:15:00 2005
+	- Finaly got around to fixing the slurp mode bug that
+	everyone has been bugging me to fix for almost 2 years.
+
+1.01 Wed Oct  8 00:10:36 2003
+	- Forgot to change the requirements in Makefile.PL
+
+1.00 Tue Oct  7 20:43:17 2003
+	- Initial upload to CPAN
+

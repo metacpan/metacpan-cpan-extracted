@@ -1,0 +1,6 @@
+Revision history for Perl extension LotusAPI::Session.
+
+0.01  Fri Feb  7 14:52:51 2003
+	- original version; created by h2xs 1.21 with options
+		-n LotusAPI::Session -A -O -F -d -x c:\perl\dev\LotusAPI\Session\notessession.h
+

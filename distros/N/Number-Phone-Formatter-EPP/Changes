@@ -1,0 +1,11 @@
+Revision history for Number-Phone-Formatter-EPP
+
+0.03  2016-08-25
+    - bump min Number::Phone version requirement to 3.1 which is where
+      format_using() was first added.
+
+0.02  2016-08-23
+    - add missing copyright holder/year
+
+0.01  2016-08-23
+    - Initial release

@@ -1,0 +1,184 @@
+NAME
+
+    Net::Joker::DMAPI - interface to Joker's Domain Management API
+
+DESCRIPTION
+
+    An attempt at a sane wrapper around Joker's DMAPI (domain management
+    API).
+
+    Automatically logs in, and parses responses into something a bit more
+    usable as much as possible.
+
+SYNOPSIS
+
+        my $dmapi = Net::Joker::DMAPI->new(
+            username => 'bob@example.com',
+            password => 'hunter2',
+        );
+    
+        # Get whois details for a domain - returns parsed data structure
+        my $whois_details = $dmapi->query_whois({ domain => $domain });
+        my @nameservers = @{ $whos_details->{domain}{nameservers} };
+        
+        # can also use query_whois on contact handles
+        my $admin_handle_details = $dmapi->query_whois(
+            { contact => $whois_details->{domain}{admin_c} }
+        );
+        
+        my $current_balance = $dmapi->current_balance;
+    
+        my $tlds = $dmapi->available_tlds;
+
+ATTRIBUTES
+
+    username
+
+      Your Joker account username.
+
+    password
+
+      Your Joker account password
+
+    debug
+
+      Whether to omit debug messages; disabled by default, set to a true
+      value to enable. See also the logger attribute to which you can
+      provide a coderef which will be called with messages. If debug is
+      true, all messages will be output to STDOUT as well as passed to the
+      logger coderef (if provided).
+
+    logout_on_destroy
+
+      End the Joker session upon object destruction, 1 by default.
+
+    ua
+
+      An LWP::UserAgent object to use. One is constructed by default, so
+      you don't need to supply this unless you have a specific need to do
+      so.
+
+    dmapi_url
+
+      The URL to Joker's DMAPI. You won't need to provide this unless you
+      for some reason need to have requests go elsewhere; it defaults to
+      Joker's live DMAPI URL.
+
+    balance
+
+      The current balance of your Joker account; automatically updated each
+      time a response from the Joker API is received.
+
+    available_tlds_list
+
+      An arrayref of TLDs which are available to the reseller. Joker return
+      this in response to the login call, so this is populated after login;
+      it's recommended you access it via the available_tlds method (see
+      below) though, which will call login for you first then return the
+      list.
+
+    logger
+
+      A coderef to be used to log interactions with Joker; if this is
+      defined, the coderef provided is called with the log messages, so you
+      can log them however your application usually does.
+
+      The coderef will be called with two parameters - the log level
+      (debug, info, error), and the message.
+
+METHODS
+
+    login
+
+      Logs in to the Joker DMAPI, retrieves the Auth-Sid from the response,
+      and stores it in the auth_sid attribute for future requests. You
+      won't usually need to call this, as it will happen automatically if
+      you use the convenience methods, but if you want to poke at
+      do_request yourself, you'll need it.
+
+    do_request
+
+      Takes the method name you want to call, and a hashref of arguments,
+      calls the method, and returns the response.
+
+      For instance:
+
+        my $response = $dmapi->do_request('query-whois', { domain => $domain });
+
+      The response returned is as given by Joker's (inconsistent) API,
+      though; so you'll probably want to look for a suitable method in this
+      class which takes care of parsing the response and returning
+      something useful. If a method for the DMAPI method you wish to use
+      doesn't yet exist, contact me or submit a patch :) In particular,
+      some requests don't return the result, just an ID which you'll then
+      need to use to poll for the result.
+
+    available_tlds
+
+      Returns the list of TLDs which are available to the reseller to sell.
+
+    account_balance
+
+      Returns the current balance of your Joker account. The balance
+      attribute is automatically updated after every API call; this method
+      is simply provided to ensure you're logged in and return the balance
+      - useful if you want to monitor the balance from a Nagios plugin,
+      say, rather than just seeing what the balance was after making
+      another API call.
+
+    query_whois
+
+      A convenient method to call the DMAPI query_whois method, and return
+      the response after parsing it into something useful.
+
+          my $whois = $dmapi->query_whois({ domain => $domain });
+
+      The DMAPI accepts domain, contact or host, to look up domains,
+      contact handles or nameservers respectively.
+
+      The response is parsed into a data structure - for instance, the
+      domain's status, which is returned by Joker as domain.status, will be
+      found at $whois-{domain}{status}>. Nameservers are collated into a
+      hashref. Datetimes returned by Joker are automatically inflated to
+      DateTime objects.
+
+    expiry_date
+
+      Returns the expiry date for the given domain.
+
+        my $expires_datetime = $dmapi->expiry_date($domain);
+
+AUTHOR
+
+    David Precious <davidp@preshweb.co.uk>
+
+ACKNOWLEDGEMENTS
+
+    Tomasz Czepiel (@tczepiel)
+
+BUGS / FEATURE REQUESTS
+
+    If you've found a bug, or have a feature request or wish to contribute
+    a patch, this module is developed on GitHub - please feel free to raise
+    issues or pull requests against the repo at:
+    https://github.com/bigpresh/Net-Joker-DMAPI
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2014-17 David Precious.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+
+SEE ALSO
+
+    Joker's DMAPI documentation is at:
+    https://joker.com/faq/category/39/22-dmapi.html
+
+    WWW::Domain::Registry::Joker is another module for talking to Joker's
+    DMAPI, but hasn't been updated for some time and doesn't provide any
+    convenient methods or parsing of responses, just the basics.
+

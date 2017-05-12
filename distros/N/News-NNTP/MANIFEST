@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+README
+t/nntp.t
+lib/News/NNTP.pm
+lib/News/NNTP.pod

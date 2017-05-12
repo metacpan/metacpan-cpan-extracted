@@ -1,0 +1,61 @@
+{
+   "abstract" : "repeat loading Twitter statuses up to a certain point",
+   "author" : [
+      "Toshio Ito <toshioito@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Twitter-Loader",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "eg",
+         "inc"
+      ],
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42",
+            "Module::Build::Prereqs::FromCPANfile" : "0.02"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "0",
+            "Time::HiRes" : "0",
+            "Try::Tiny" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Identity" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0",
+            "Try::Tiny" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/debug-ito/Net-Twitter-Loader/issues"
+      },
+      "repository" : {
+         "url" : "git://github.com/debug-ito/Net-Twitter-Loader.git",
+         "web" : "https://github.com/debug-ito/Net-Twitter-Loader"
+      }
+   },
+   "version" : "0.04"
+}

@@ -1,0 +1,11 @@
+Revision history for Perl extension Net-Amazon-DynamoDB-HighlyAvailable
+
+0.03 2016-03-11T13:45:22Z
+    - added some missing dependencies to the cpanfile
+
+0.02 2016-03-05T01:35:53Z
+    - added a timeout attribute
+
+0.01 2015-11-02T21:54:49Z
+    - original version
+

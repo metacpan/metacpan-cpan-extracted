@@ -1,0 +1,9 @@
+Revision history for Perl extension Net::IPAddr::Find.
+
+0.02  Fri Oct  5 01:22:14 JST 2001
+	- Now this module is *deprecated*
+	  see NetAddr::IP::Find.
+
+0.01  Mon Jul  9 20:04:14 2001
+	- original version; created by h2xs 1.19
+

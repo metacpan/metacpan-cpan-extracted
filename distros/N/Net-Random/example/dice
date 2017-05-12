@@ -1,0 +1,14 @@
+# $Id: dice,v 1.2 2007/04/12 14:54:18 drhyde Exp $
+
+use strict;
+$^W = 1;
+
+use Net::Random;
+
+my $dice = Net::Random->new(
+    src => 'fourmilab.ch',
+    min => 1,
+    max => 6
+);
+
+print "You threw [".join(", ", $dice->get(10))."]\n";

@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Net-Traceroute-PurePerl
+version:             0.10
+abstract:            traceroute(1) functionality in perl via raw sockets
+license:             unknown
+generated_by:        ExtUtils::MakeMaker version 6.30_01
+author:              Tom Scanlan <tscanlan@openreach.com>, Andrew Hoying <ahoying@cpan.org
+distribution_type:   module
+requires:     
+    Net::Traceroute:               1.05
+meta-spec:
+    url: <http://module-build.sourceforge.net/META-spec-new.html>;
+    version: 1.1

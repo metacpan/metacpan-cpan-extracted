@@ -1,0 +1,65 @@
+2015-03-10  Graham Belll <g.bell@eaobservatory.org>
+
+	* lib/Number/Interval.pm: Release v0.07 to CPAN
+
+2011-11-09  Timothy Jenness  <tjenness@cpan.org>
+
+	* lib/Number/Interval.pm: Release v0.06 to CPAN
+
+2011-11-08  Timothy Jenness  <tjenness@cpan.org>
+
+	* lib/Number/Interval.pm: Fix intersection() to use inc_min and inc_max
+
+2010-12-03  Tim Jenness  <tjenness@cpan.org>
+
+	* lib/Number/Interval.pm: Release v0.05 to CPAN
+
+2009-08-18  Brad Cavanagh <brad.cavanagh@gmail.com>
+
+	* Interval.pm (sizeof): Add sizeof() method to return size of interval.
+
+	* Switched from ExtUtils::MakeMaker to Module::Build.
+
+2006-08-08  Tim Jenness  <tjenness@cpan.org>
+
+	* Interval.pm (contains): Fix case when max == min to make sure
+	that contains() only returns true if the value == max == min.
+	(copy):  Add copy constructor.
+
+2005-08-31  Tim Jenness  <tjenness@cpan.org>
+
+	* Interval.pm (intersection): bound+unbound was failing when the
+	two defined bounds were identical.
+
+2005-08-26  Tim Jenness  <tjenness@cpan.org>
+
+	* Interval.pm (intersection): Fix unbound+unbound intersections
+	(they were wrong when the intervals were bound in the same direction)
+
+2005-03-10  Tim Jenness  <tjenness@cpan.org>
+
+	* Interval.pm (stringify): Recognize that sometimes min == max
+	(contains): If min==max then $range->contains($max)
+	(stringify): Add positive definite setting to allow positive
+	ranges to be stringified without including the 0
+	(stringify): Use Interval Notation for the bound intervals
+
+2005-03-09  Tim Jenness  <tjenness@cpan.org>
+
+	* t/interval.t: Add new tests for == and !=
+
+	* Interval.pm (equate): Fix logic when using incmax/incmin flags
+	and when undefs are included
+
+2005-02-11  Tim Jenness  <tjenness@cpan.org>
+
+	---- VERSION 0.02 ----
+
+	* Interval.pm: Add inc_max and inc_min attributes. Interval can
+	now be inclusive (>= and <=).
+
+2005-02-10  Tim Jenness  <tjenness@cpan.org>
+
+	* Interval.pm: Always returns true for contains() if both bounds
+	are undefined.
+

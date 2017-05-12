@@ -1,0 +1,11 @@
+Revision history for Net::SNMP::EV
+
+0.12 Fri Apr 10 08:49:02 CEST 2009
+	- bollocks, don't ask.
+
+0.11 Fri Apr 10 07:32:23 CEST 2009
+	- fix testsuite loading the wrong module
+          (reported by Karl Gaissmaier).
+
+0.1  Mon Dec  3 18:26:50 CET 2007
+	- original version, a Glib::EV clone.

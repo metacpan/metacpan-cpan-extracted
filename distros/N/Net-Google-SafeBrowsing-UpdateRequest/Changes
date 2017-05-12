@@ -1,0 +1,20 @@
+Revision history for Net-Google-SafeBrowsing-UpdateRequest
+
+1.06    2007/08/06
+        Fix tests?
+
+1.05    2007/08/05
+        Fix automated tests?
+
+1.04    2007/08/05
+        Wrote some tests. Fixed Makefile.PL and dependencies.
+
+1.03    2007/08/03
+        Fixed tests
+
+1.02    2007/08/01
+        Added blocklist_updater to distribution
+
+1.01    2007/08/01
+        First version
+

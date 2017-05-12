@@ -1,0 +1,98 @@
+$Id: Changes,v 1.30 2005/11/14 10:35:49 mike Exp $
+
+Revision history for Perl extension Net::Z3950::RadioMARC.
+
+0.07  Mon Nov 14 10:35:31 GMT 2005
+	- Fix typo in documentation: the test() method's optional
+	  "token" paremter was previously documented as "record".
+	  Thanks to Jason Thomale <j.thomale@ttu.edu> for spotting and
+	  reporting this.
+	- Add META.yml to distribution.
+
+0.06  Wed Apr 27 11:43:16 BST 2005
+	- Add dependency on Net::Z3950::PQF to Makefile.PL.
+	- RadioMARC.pm now explicitly requires version 0.03 or better
+	  of the PQF parser, since the representation of term nodes
+	  changed between 0.02 and 0.03.
+
+0.05  Thu Mar  3 15:01:48 GMT 2005
+	- IndexMARC.pm now uses Net::Z3950::PQF to support a larger
+	  proportion of PQF.  In particular, truncation is now
+	  supported: left, right, and left-and-right as well as none.
+	  Also, simple booleans (AND, OR, NOT).  Does not yet
+	  correctly merge word-position information, but that doesn't
+	  matter much since the only use for that information is to
+	  implement proximity, which we don't have or need.
+	- New test-script, "t/03-truncation.t", for IndexMARC's
+	  truncation support.
+	- New test-script, "t/04-boolean.t", for IndexMARC's boolean
+	  operator support.
+	- No default output for tests that yield "notfound" status:
+	  this case is now silent unless a message-template is set for
+	  "notfound".
+	- The IndexMARC module's add() method now returns an opaque
+	  token representing the newly added record, which can be used
+	  to retrieve the record with fetch().   The RadioMARC
+	  module's add() method returns an array of the opaque tokens
+	  returned to it when adding its records to the MARC index.
+	- An opaque token returned from RadioMARC::add() may be passed
+	  into test() as the "record" element of the argument hash to
+	  specify which of the test-set records the query is intended
+	  to match.
+	- Added "etc/hrm2marc.pl" to the distribution, a simple script
+	  that transforms a human-readable representation of a MARC
+	  record into ISO 2709 format.
+	- Much better example script, "bathtest.pl", tests a server's
+	  compliance with the requirements of the Bath Profile.
+	- Clarifications to the documentation, based on Bill Moen's
+	  critique.
+	- Guard against test-set records and retrieved records that
+	  lack the identity field.  Similar care taken when comparing
+	  subfield values.
+	- Only log "found multiple records" if we have indeed done so!
+	- Support multiple comma-separated candidate identity-field in
+	  the "identityField" property.
+
+0.04  Fri Dec 17 11:41:26 GMT 2004
+	- Include a real sample radioactive MARC record.
+	- Better example scripts that run against The Z-Interop server
+	  at research.lis.unt.edu:2200/zinterop
+	- Allow the "identifyField" property to identify a control
+	  field (without subfield) as well as a subfield of a normal
+	  field.
+	- Honour the "delay" property.
+	- Tokenisation rules in IndexMARC.pm changed so that ",", ".",
+	  ":" and "/" are now all word-separators.
+	- The distribution now includes an "examples" directory that
+	  contains example scripts (and the records they need to check
+	  against).
+	- test() now returns just the status when called in scalar
+	  context.
+	- When a test succeeds, if no message is defined for the "ok"
+	  status then there is no output at all.  Previously, the
+	  output was "status='ok'" which made made it impossible to
+	  write silent-if-successful test scripts.
+
+0.03  Wed Dec  1 17:39:46 GMT 2004
+	- New "identityField" property may be set to indicate a field
+	  whose contents identify a record for purposes of comparison
+	  to see whether an expected record is in a result set.
+	- Better test-suite, including a rigorous work-out for the
+	  utility IndexMARC module.
+	- Many small corrections and clarifications in documentation.
+
+0.02  Tue Nov 23 17:40:22 GMT 2004
+	- First released version.
+
+0.01  Sat Nov 20 00:04:43 2004
+	- original version; created by h2xs 1.23 with options
+		-X Net::Z3950::RadioMARC
+
+
+### Still to do:
+	- Meaningful tests for the RadioMarc module itself
+	- Recognise "non-diagnostic failures" such as timeouts
+	- Skip tests against servers that are not even there
+	- Maybe have IndexMARC.pm parse fields more cleverly
+	- Link to an overview paper describing the approach
+

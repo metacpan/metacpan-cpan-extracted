@@ -1,0 +1,180 @@
+#!/usr/bin/env bash
+VERSION='v2.3.7'
+
+DETECT=$(perl -MNarada -E 'say Narada::detect(@ARGV)') || exit 1
+
+if [ -z "$NARADA_SKIP_LOCK" ]; then
+	echo "Acquire exclusive lock ..."
+	exec narada-lock-exclusive $0 "$@"
+fi
+
+
+if test "$DETECT" = "narada"; then
+	backup_dir='.backup'
+else
+	backup_dir='var/backup'
+	# compatibility with Narada before 0.9
+	[ -d config/backup ] || mkdir config/backup || exit 1
+	[ -f config/backup/exclude ] || cat >config/backup/exclude <<'EOF' || exit 1
+./var/.lock.new
+./tmp/*
+./var/backup/*
+./var/patch/.prev/*
+EOF
+	# compatibility with Narada before 1.2.0
+	perl -i -pe 's{var/patch/prev/}{var/patch/.prev/}' config/backup/exclude
+fi
+
+
+snap="${backup_dir}/snap"
+full="${backup_dir}/full.tar"
+incr="${backup_dir}/incr.tar"
+excl=(); while read; do excl+=( --exclude "$REPLY" ); done <config/backup/exclude
+
+
+_tar(){
+    tmp=/tmp/narada-backup.$$
+    TAR=`which gtar tar 2>/dev/null | head -n 1`
+    LANG= $TAR "$@" >$tmp 2>&1
+    status=$?
+    grep -v 'socket ignored' $tmp
+    rm $tmp
+    if test "$status" -eq 1; then
+	return 0 # ignore files which was changed while archiving
+    fi
+    return $status
+}
+
+narada-mysqldump                                                &&
+# if [ -f $snap -a -f $full ]; then
+#     mv $full $full.tmp                                          &&
+#     _tar -c -g $snap --anchored "${excl[@]}" -f $incr.tmp ./    &&
+#     mv $incr.tmp $incr                                          &&
+#     _tar -g /dev/null -A $incr -f $full.tmp
+# else
+    rm -f $snap $full $full.tmp $incr $incr.tmp                 &&
+    _tar -c -g $snap --anchored "${excl[@]}" -f $full.tmp ./
+# fi                                                              &&
+mv $full.tmp $full &&
+perl -MTime::HiRes=time,sleep -e '$a=time; sleep 1.01 + int($a) - $a' # make sure files modified after backup won't have same mtime on *BSD
+exit $?
+
+
+: <<'=cut'
+
+=encoding utf8
+
+=head1 NAME
+
+narada-backup - prepare consistent project backup
+
+
+=head1 VERSION
+
+This document describes narada-backup version v2.3.7
+
+
+=head1 USAGE
+
+    narada-backup
+
+
+=head1 DESCRIPTION
+
+Should be executed in project deploy directory (or Narada 1.x project root
+directory).
+
+At first run prepare full project backup in C<.backup/full.tar>.
+B<NOTE: Incremental backups was disabled in version 2.3.>
+On next runs prepare incremental backup in C<.backup/incr.tar> plus
+append it to full backup in C<.backup/full.tar> (using C<tar -A>).
+
+Because of used technique of quick full backup update, full backup will
+grow on each run. To keep file with full backup on reasonable size, you
+should force full backup from time to time.
+
+To force full backup you should remove C<.backup/full.tar> before running
+C<narada-backup>.
+
+Both full and incremental backups should be unpacked as incremental tar
+archives, see L<http://www.gnu.org/software/automake/manual/tar/Incremental-Dumps.html>.
+
+Before preparing backup will run C<narada-mysqldump>.
+
+Files and directories listed in C<config/backup/exclude> (use syntax suitable
+for tar's --exclude option) will not be included in backup.
+
+Will exit with non-zero exit status if backup process failed.
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+    config/backup/exclude
+    .backup/*
+
+
+=head1 COMPATIBILITY
+
+Narada 1.x project use C<var/backup/> instead of C<.backup/>.
+
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/powerman/Narada/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software. The code repository is available for
+public review and contribution under the terms of the license.
+Feel free to fork the repository and submit pull requests.
+
+L<https://github.com/powerman/Narada>
+
+    git clone https://github.com/powerman/Narada.git
+
+=head2 Resources
+
+=over
+
+=item * MetaCPAN Search
+
+L<https://metacpan.org/search?q=Narada>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/dist/Narada>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Narada>
+
+=item * CPAN Testers Matrix
+
+L<http://matrix.cpantesters.org/?dist=Narada>
+
+=item * CPANTS: A CPAN Testing Service (Kwalitee)
+
+L<http://cpants.cpanauthors.org/dist/Narada>
+
+=back
+
+
+=head1 AUTHOR
+
+Alex Efros E<lt>powerman@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2008- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+
+=cut

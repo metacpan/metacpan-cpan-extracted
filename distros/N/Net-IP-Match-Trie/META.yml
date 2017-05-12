@@ -1,0 +1,36 @@
+---
+abstract: 'Efficiently match IP addresses against IP ranges with Trie (prefix tree)'
+author:
+  - 'HIROSE Masaaki <hirose31@gmail.com>'
+build_requires:
+  Devel::Cover: 0
+  FindBin: 0
+  Module::Build::Tiny: 0.022
+  Path::Class: 0
+  Test::Base: 0
+  Test::More: 0.88
+  Test::Requires: 0
+configure_requires:
+  Module::Build::Tiny: 0.030
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.4, Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-IP-Match-Trie
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/hirose31/p5-net-ip-match-trie/issues
+  homepage: https://github.com/hirose31/p5-net-ip-match-trie
+  repository: https://github.com/hirose31/p5-net-ip-match-trie.git
+version: 1.00

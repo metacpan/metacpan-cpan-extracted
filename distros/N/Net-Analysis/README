@@ -1,0 +1,40 @@
+Net-Analysis version 0.41
+=========================
+
+This set of modules will assemble TCP streams from PCap network dumps. It also
+provides a flexible callback mechanism to let you easily write protocol
+analysers.
+
+You can invoke it directly, as follows:
+
+ $ perl -MNet::Analysis -e main help
+ $ perl -MNet::Analysis -e main TCP,v=1  t/t1_google.tcp
+ $ perl -MNet::Analysis -e main HTTP,v=1 t/t1_google.tcp
+ # perl -MNet::Analysis -e main TCP,v=1  "port 80"
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP
+  Net::Pcap
+  NetPacket
+  Params::Validate
+  Test::MockObject  - not strictly needed, but tests will fail without it
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by A. B. Worrall.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.

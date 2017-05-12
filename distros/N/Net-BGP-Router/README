@@ -1,0 +1,62 @@
+$Id: README,v 1.2 2003/06/01 23:40:05 unimlo Exp $
+
+**** NOTE: This is pre-alpha code!!!
+****    - Interface is not final yet!
+****    - Still lots of bugs! Need more testing!
+
+Net::BGP::Router version 0.04
+=============================
+
+The Net-BGP-Router distribution includes a BGP router based on Net::BGP
+which has support for multiple contexts and advanced policy routing
+based on Net::ACL.
+
+This module makes it posible to write a route-server with a policy
+configured using a Cisco-style configurationfile in a few lines of code.
+However, it still posible to make advanced dynamic policies that may
+depend on e.g. round-trip times, packet losses or link load.
+
+Any comments and feedback are more then welcome!
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Net::BGP
+  Net::ACL
+  Net::Patricia
+  List::Util
+
+For testning to be fully operational:
+
+  Test::More
+  Test::Harness
+  Test::Signature
+  Module::Signature
+
+All modules can be found on CPAN. Installing using the CPAN(+) enviroment
+are recomended for easy dependency resolution.
+
+
+SIGNATURE
+
+Fingerprint of my public key used to sign this module can be found on
+my homepage: http://www.martin.lorensen.dk/gpg.html
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Martin Lorensen, All rights reserved.  This program is free
+software; you can redistribute it and/or modify it under the same terms as
+Perl itself.

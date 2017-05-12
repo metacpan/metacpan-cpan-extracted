@@ -1,0 +1,47 @@
+Revision history for Number-Denominal
+
+1.107   2014-01-26
+        - Resolved Issue#1 (Illegal division by zero error)
+          https://github.com/zoffixznet/Number-Denominal/issues/1
+
+1.106   2014-01-25
+        - Fixed broken prereqs (requiring too high Carp version, when
+          it wasn't needed to be that high)
+
+1.105   2014-01-24
+        - Added missing test prereqs
+
+1.104   2014-01-23
+        - Fixed up some dzil meta resources
+
+1.103   2014-01-22
+        - Converted to dzil
+        - Fixed a test failing on Windows
+
+1.102   2014-01-16
+        - Fixed a test that was broken on Windows
+        - Fixed RT#92155: https://rt.cpan.org/Ticket/Display.html?id=92155
+          (denominal_list returned numbers without any info about the
+          units)
+
+1.101   2014-01-14
+        - Fixed RT#92145: https://rt.cpan.org/Ticket/Display.html?id=92145
+          (poor example in the POD)
+        - Fixed RT92146: #https://rt.cpan.org/Ticket/Display.html?id=92146
+          (new feature whishlist: precision limit)
+        - Added extra tests
+        - Refactored the code to be more maintanable
+
+1.004   2014-01-11
+        - Fixed POD grammatical error
+
+1.003   2013-12-31
+        - Fixed broken test prereqs
+        - Fixed SYNOPSIS error
+
+1.002   2013-12-30
+        - Made it a bit more obvious what the module actually does
+
+1.001   2013-12-30
+        - First version, released on an unsuspecting world.
+

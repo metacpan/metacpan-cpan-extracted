@@ -1,0 +1,35 @@
+Net/NetSend version 0.12
+====================================
+
+This module, Net::NetSend is a pure perl implementation of the net 
+send command on Windows. It can therefore be used on any platform. 
+It is used to send text messages to windows machines, on which 
+the message instantly pops up. 
+On the receiving Windows machine either the "Messenger Service" 
+("Nachrichtendienst") or winpopup.exe must be running, depending 
+on the used version of Windows.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	POSIX;
+	Socket;
+	IO::Handle;
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2005 Florian Greb
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

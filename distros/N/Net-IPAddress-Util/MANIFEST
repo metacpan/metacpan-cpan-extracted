@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+lib/Net/IPAddress/Util.pm
+lib/Net/IPAddress/Util/Range.pm
+lib/Net/IPAddress/Util/Collection.pm
+lib/Net/IPAddress/Util/Collection/Tie.pm
+t/00-load.t
+t/10-ip-address.t
+t/20-time-trials.t
+t/30-compat.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

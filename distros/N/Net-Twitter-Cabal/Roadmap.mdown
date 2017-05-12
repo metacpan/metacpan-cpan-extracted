@@ -1,0 +1,12 @@
+1. Configuration loading and parsing (done)
+2. Single cabal per process (done)
+3. Split long tweets <===
+4. Store and forward
+5. Cabal Management
+   * Admin users to manage authorisation via XMPP
+     + Cabal gets a subscribe request from an unknown peer, sends a message
+       to the admin users, who reply with ok/nok; first one wins (melo)
+   * Web interface
+6.  Multiple cabals per process
+7.  Plugins for other transports (IRC, etc)
+

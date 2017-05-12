@@ -1,0 +1,22 @@
+---
+abstract: 'API bindings for GraphSpace'
+author:
+  - 'Naveed Massjouni <naveedm9@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-GraphSpace
+requires:
+  JSON: 0
+  LWP::UserAgent: 0
+  Moose: 0
+resources:
+  bugtracker: http://github.com/ironcamel/Net-GraphSpace/issues
+  repository: git://github.com/ironcamel/Net-GraphSpace.git
+version: 0.0009

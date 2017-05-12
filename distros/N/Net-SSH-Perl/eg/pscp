@@ -1,0 +1,55 @@
+#!/usr/bin/perl -w
+# $Id: pscp,v 1.5 2001/08/07 18:21:38 btrott Exp $
+
+use strict;
+
+use Net::SSH::Perl;
+use Getopt::Std;
+use File::Basename;
+
+my %opts;
+getopts("c:l:P:vB21", \%opts);
+my($f1, $f2) = @ARGV;
+
+die "usage: pscp [options] f1 f2"
+    unless $f1 && $f2;
+
+my($fhost, $ffile, $thost, $tfile);
+if ($f1 =~ /:/) {
+    ($fhost, $ffile) = split /:/, $f1, 2;
+}
+elsif ($f2 =~ /:/) {
+    ($thost, $tfile) = split /:/, $f2, 2;
+}
+
+my %args;
+$args{interactive} = $opts{B} ? 0 : 1;
+$args{cipher} = $opts{c};
+$args{port} = $opts{P};
+$args{debug} = $opts{v};
+$args{protocol} = 2 if $opts{2};
+$args{protocol} = 1 if $opts{1};
+
+my $ssh = Net::SSH::Perl->new($fhost || $thost, %args);
+$ssh->login($opts{l});
+
+if ($fhost && $ffile) {
+    my($out, $err, $exit) = $ssh->cmd("cat $ffile");
+    die "Can't fetch $ffile: $err" if $err;
+
+    $f2 = basename $ffile if $f2 eq '.';
+
+    open FH, ">$f2" or die "Can't open $f2 for writing: $!";
+    print FH $out;
+    close FH or die "Can't close $f2: $!";
+}
+elsif ($thost) {
+    open FH, $f1 or die "Can't open $f1: $!";
+    my $c = do { local $/; <FH> };
+    close FH or die "Can't close $f1: $!";
+
+    $tfile = basename $f1 if !$tfile || $tfile eq '.';
+
+    my($out, $err, $exit) = $ssh->cmd("cat - >$tfile", $c);
+    die "Can't write file $tfile: $err" if $err;
+}

@@ -1,0 +1,22 @@
+---
+abstract: 'This module provides an interface to an RCON (remote console) server. RCON is typically implemented by game servers to allow servers admins to control their game servers without direct access to the machine the server is running on. This module is based on the spec detailed here, https://developer.valvesoftware.com/wiki/Source_RCON_Protocol'
+author:
+  - 'Chris Handwerker <chris.handwerker@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-RCON
+requires:
+  IO::Socket::INET: '1.18'
+resources:
+  bugtracker: https://github.com/chandwer/Net-RCON/issues
+  homepage: https://github.com/chandwer/Net-RCON
+  repository: https://github.com/chandwer/Net-RCON.git
+version: '1.0'

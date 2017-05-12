@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-Whois-RegistryFusion.t
+lib/Net/Whois/RegistryFusion.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE

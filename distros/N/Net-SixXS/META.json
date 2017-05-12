@@ -1,0 +1,97 @@
+{
+   "abstract" : "interface to the SixXS.org services",
+   "author" : [
+      "Peter Pentchev <roam@ringlet.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-SixXS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MooseX::Role::JSONObject" : "v0.1.0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Net::SixXS" : {
+         "file" : "lib/Net/SixXS.pm",
+         "version" : "v0.1.1"
+      },
+      "Net::SixXS::Data::Tunnel" : {
+         "file" : "lib/Net/SixXS/Data/Tunnel.pm",
+         "version" : "v0.1.1"
+      },
+      "Net::SixXS::Diag" : {
+         "file" : "lib/Net/SixXS/Diag.pm",
+         "version" : "v0.1.1"
+      },
+      "Net::SixXS::Diag::MainDebug" : {
+         "file" : "lib/Net/SixXS/Diag/MainDebug.pm",
+         "version" : "v0.1.1"
+      },
+      "Net::SixXS::Diag::None" : {
+         "file" : "lib/Net/SixXS/Diag/None.pm",
+         "version" : "v0.1.1"
+      },
+      "Net::SixXS::TIC::Client" : {
+         "file" : "lib/Net/SixXS/TIC/Client.pm",
+         "version" : "v0.1.1"
+      },
+      "Net::SixXS::TIC::Server" : {
+         "file" : "lib/Net/SixXS/TIC/Server.pm",
+         "version" : "v0.1.1"
+      },
+      "Net::SixXS::TIC::Server::AnyEvent" : {
+         "file" : "lib/Net/SixXS/TIC/Server/AnyEvent.pm",
+         "version" : "v0.1.1"
+      },
+      "Net::SixXS::TIC::Server::Inetd" : {
+         "file" : "lib/Net/SixXS/TIC/Server/Inetd.pm",
+         "version" : "v0.1.1"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.1.1",
+   "x_authority" : "cpan:ROAM",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

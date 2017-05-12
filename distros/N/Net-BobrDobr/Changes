@@ -1,0 +1,12 @@
+Revision history for Perl extension Net::BobrDobr.
+
+0.01  Wed Jun  4 08:58:38 2008
+      - original version; created by h2xs 1.23 with options
+	-AcXek -n Net::BobrDobr
+
+0.02  Fri Jun 06 12:27:34 2008
+      - first working version.
+
+0.04  Mon Jun 09 11:05:25 2008
+      - now, if api and/or secret keys of bobrdobr-service available,
+	skip all tests.

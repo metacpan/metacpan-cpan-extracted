@@ -1,0 +1,17 @@
+0.002000
+ [Added / runtime requires]
+ - Moo::Role
+
+ [Changed / build requires]
+ - Module::Build 0.4003 → 0.4203
+
+ [Changed / configure requires]
+ - Module::Build 0.4003 → 0.4203
+
+ [Changed / test requires]
+ - Test::More 0.98 → 1.001002
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+

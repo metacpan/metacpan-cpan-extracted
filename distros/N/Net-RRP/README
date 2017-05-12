@@ -1,0 +1,19 @@
+There are Net::RRP files. See RFC 2832 for more details.
+
+use IO::Socket::SSL;
+my $socket = new IO::Socket::SSL ( ... );
+my $protocol = new Net::RRP::Protocol ( socket => $socket );
+
+my $request  = new Net::RRP::Request::Add();
+my $entity   = new Net::RRP::Entity::Domain();
+
+$entity->setAttribute ( 'DomainName' => 'test.ru' );
+$entity->setAttribute ( 'NameServer' => [ 'ns1.test.ru', 'ns2.test.ru' ] );
+
+$request->setEntity   ( $entity );
+$request->setOption   ( Period => 10 );
+
+$protocol->sendRequest ( $request );
+my $response = $protocol->getResponse ();
+
+die unless $request->isSuccessResponse ( $response );

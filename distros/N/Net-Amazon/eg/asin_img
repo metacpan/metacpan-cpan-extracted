@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+###########################################
+# asin_img - Fetch an ASIN's image
+# Mike Schilli, 2003 (m@perlmeister.com)
+###########################################
+use warnings;
+use strict;
+
+use CGI qw(:all);
+use CGI::Carp qw(fatalsToBrowser);
+use Net::Amazon;
+use Net::Amazon::Request::ASIN;
+
+my $ua = Net::Amazon->new(
+    associate_tag => $ENV{AMAZON_ASSOCIATE_TAG},
+    token         => $ENV{AMAZON_TOKEN},
+    secret_key    => $ENV{AMAZON_SECRET_KEY},
+);
+
+die "usage: $0 asin=0201360683\n" 
+    unless param('asin');
+
+my $req = Net::Amazon::Request::ASIN->new(
+    asin  => param('asin')
+);
+
+my $resp = $ua->request($req);
+
+print redirect(
+     $resp->properties->{ImageUrlLarge});

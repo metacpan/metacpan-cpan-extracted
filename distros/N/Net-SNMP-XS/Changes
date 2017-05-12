@@ -1,0 +1,44 @@
+Revision history for Perl extension Net::SNMP::XS
+
+1.32  Wed Dec  7 12:56:41 CET 2016
+	- work around a bug in perl 5.20 (and probably later) where
+          undef array elements become null pointers in the array.
+          this caused segmentation faults on illegal/unsupported ASN.1
+          types.
+
+1.31  Thu Oct 23 17:57:44 CEST 2014
+	- change dependency check to not include a version,
+          as the Net::SNMP version number isn't monotonically increasing.
+
+1.3   Thu Sep 18 04:51:17 CEST 2014
+	- fix a potential leak.
+
+1.2   Tue Jan 25 20:26:50 CET 2011
+	- fix a bug where the internal message cache wouldn't be refreshed
+          when perl reuses SVs, causing runtime errors and possibly crashes.
+	- remove harmless/unused debugging code.
+
+1.1   Thu Jul 29 04:50:46 CEST 2010
+	- provide optimised _buffer_append/put - this should speed up
+          message encoding and fixes a number of bugs in snmpv3 handling
+          caused by this module.
+	- fix illegal ASN.1 type handling in process_sv.
+        - minor _buffer_get optimisations.
+
+1.0   Wed May  5 22:36:27 CEST 2010
+	- implement the last missing bit, which I forgot, and broke
+          snmpv3.
+        - use a slightly slower, but more robust way of fetching/storing
+          the buffer state for the parser.
+
+0.03  Sun Apr 12 02:48:00 CEST 2009
+	- support leading_dot setting.
+	- add xs replacement for oid_base_match.
+	- add xs replacement for oid_lex_sort, _index_cmp (only with glibc).
+
+0.02  Sat Apr 11 06:21:38 CEST 2009
+	- first CPAN release.
+
+0.01  Wed Apr  8 07:07:51 CEST 2009
+	- original version; cloned from Convert::Scalar.
+

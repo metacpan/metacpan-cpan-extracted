@@ -1,0 +1,12 @@
+MANIFEST
+README
+Makefile.PL
+Syncupdates.pm
+Syncupdates/Message.pm
+Syncupdates/Response.pm
+t/01_Message.t
+t/03_Syncupdates.t
+t/04_Response.t
+t/test_object.txt
+examples/sup_client.pl
+examples/sup_ping.pl

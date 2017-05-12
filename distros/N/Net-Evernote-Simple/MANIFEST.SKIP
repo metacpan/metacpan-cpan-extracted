@@ -1,0 +1,9 @@
+blib
+^Makefile$
+^Makefile.old$
+CVS
+.gitignore
+.git
+MANIFEST.bak
+MYMETA.*
+adm

@@ -1,0 +1,36 @@
+---
+abstract: 'interface to online Jifty applications'
+author:
+  - 'Shawn M Moore, C<< <sartak at bestpractical.com> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::MockObject: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Jifty
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Any::Moose: 0.04
+  Cwd: 0
+  DateTime: 0
+  Email::Address: 0
+  Encode: 2.41
+  Hash::Merge: 0
+  LWP::UserAgent: 0
+  Path::Class: 0
+  Term::ReadKey: 0
+  URI: 0
+  YAML: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.14

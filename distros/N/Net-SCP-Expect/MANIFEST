@@ -1,0 +1,13 @@
+CHANGES
+Makefile.PL
+MANIFEST
+META.yml
+README
+SIGNATURE
+Expect.pm
+t/attributes.t
+t/glob.t
+t/signature.t
+t/string_parse.t
+itest/README
+itest/itest.pl

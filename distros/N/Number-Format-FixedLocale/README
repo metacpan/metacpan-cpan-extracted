@@ -1,0 +1,56 @@
+NAME
+    Number::Format::FixedLocale - a Number::Format that ignores the system
+    locale
+
+VERSION
+    version 1.121780
+
+SYNOPSIS
+        use Number::Format::FixedLocale;
+        my $f = Number::Format::FixedLocale->new(
+            -mon_thousands_sep => '.',
+            -mon_decimal_point => ',',
+            -int_curr_symbol   => 'EUR',
+            -n_cs_precedes     => 0,
+            -p_cs_precedes     => 0,
+        );
+        print $f->format_price( -45208.23 ); # "-45.208,23 EUR"
+
+DESCRIPTION
+    Number::Format is a very useful module, however in environments with
+    many systems it can be a liability due to the fact that it gathers its
+    default settings from the system locale, which can lead to surprising
+    results when formatting numbers in production.
+
+    Number::Format::FixedLocale is a sub-class of Number::Format that
+    contains only a slightly modified constructor, which will only use a
+    fixed set of en_US default settings. Thus any results from this module
+    will be predictable no matter how the system it is being run on is
+    configured.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Number-Format-FixedLoc
+    ale>. You will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/wchristian/number-format-fixedlocale>
+
+      git clone https://github.com/wchristian/number-format-fixedlocale.git
+
+AUTHOR
+    Christian Walde <walde.christian@googlemail.com>
+
+COPYRIGHT AND LICENSE
+    Christian Walde has dedicated the work to the Commons by waiving all of
+    his or her rights to the work worldwide under copyright law and all
+    related or neighboring legal rights he or she had in the work, to the
+    extent allowable by law.
+
+    Works under CC0 do not require attribution. When citing the work, you
+    should not imply endorsement by the author.
+

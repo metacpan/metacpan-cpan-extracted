@@ -1,0 +1,256 @@
+NAME
+    Net::Starnet::DataAccounting - interface to the SDA protocol
+
+SYNOPSIS
+        use constant SDA_UPDATE_TIME 60;
+        my $sda = Net::Starnet::DataAccounting->new(
+            user => $user,
+            pass => $pass,
+            verbose => $VERBOSE,
+            login  => \&login,
+            logout => \&logout,
+            update => \&update,
+            (defined($hostname) ? ( host => $hostname ) : ()),
+            (defined($server) ? ( server => $server ) : ()),
+        );
+        my $connected = $sda->login();
+        if ($connected)
+        {
+            $SIG{INT} = $SIG{TERM} = sub {
+                $sda->logout();
+                exit 0;
+            };
+            while ($connected)
+            {
+                sleep SDA_UPDATE_TIME;
+                $connected = $sda->update();
+            }
+            my $disconnected = $sda->logout();
+        }
+
+DESCRIPTION
+    The Net::Starnet::DataAccounting module provides an interface to the
+    protocol used by the Starnet Data Accounting System. It allows
+    simple login, logout and health checking.
+
+METHODS
+    Net::Starnet::DataAccounting->new(
+            host    => $yourhostname,
+            server  => $remotehostname,
+            port    => $remoteport,
+            user    => $username,
+            pass    => $password,
+            client  => $clientname,
+            login   => \&login,
+            logout  => \&logout,
+            update  => \&update,
+            verbose => $verbose,
+            )
+
+        Creates a new SDA connection. Host and server should be either
+        IPs or hostnames. Port is a port number, user and pass are the
+        appropriate username and password. Client is a custom client
+        string for the connection to use.
+
+        Login, logout and update are routines that will be called after
+        an attempt to send the appropriate message. The routines in
+        question will be passed two parameters: the SDA object and the
+        text response from the server (decoded).
+
+        Verbose determines whether debugging information will be shown.
+
+    $sda->verbose($value|)
+        If given a parameter, sets the verbosity. Returns the verbosity
+        in all cases.
+
+    $sda->login()
+        Directs the SDA object to attempt to connect to the server.
+        Calls the login routine specified on construction after the
+        attempt is made.
+
+    $sda->logout()
+        Directs the SDA object to attempt to disconnect to the server.
+        Calls the logout routine specified on construction after the
+        attempt is made.
+
+    $sda->update()
+        Directs the SDA object to attempt to update the client's status
+        on the server. Calls the update routine specified on
+        construction after the attempt is made. This function should be
+        called every two minutes or so; ideally more frequently.
+
+PROTOCOL NOTES
+    At the basic level, SDA clients operate by sending a line of text to
+    the server and receiving a line of text in response.
+
+  Data Encoding
+    The lines bandied between the client and server are encoded using a
+    very simple algorithm. The offset of a given byte in the buffer,
+    modulo 7, is added to the ASCII value of the byte in question.
+
+    Decoding is thus the reverse. A suitable regular expression,
+    assuming $i is initialised to 0 on entry, would be:
+
+        s/(.)/chr ord($1)-$i++%7/eg;
+
+    And, in fact, that is the regexp this program makes use of.
+
+  Request Line Contents
+    The general form of the request line is:
+
+        /^$type $user $pass $ip 0 $client $/
+        /^(\d) ([a-zA-Z_]) (\d{6}) ($ip_RE) 0 (\S+) $/
+
+    The type indicates the type of command the client is attempting to
+    execute. It is a single digit. The appropriate values are:
+
+        1 - login
+        2 - logout
+        3 - update
+
+    The username is a string, typically a maximum of 8 characters and
+    only containing [a-zA-Z0-9]. The username is partially case
+    sensitive. In a given session, you should use consistent casing
+    since the server pays attention to it. If you attempt to use two
+    sessions with the same casing simultaneously, you will receive an
+    'Already logged on' error. Modifying the case of arbitrary letters
+    resolves that, thus enabling one to login in multiple locations.
+
+    Empirically, the password is a numeric sequence, 6 digits long. This
+    is to enable SDA to hook into the Starnet StarCom package (the
+    password is also used as a phone external dial-out code).
+
+    The IP is the IP of the machine to which you would like your data
+    quota to be used by. This does not have to be the machine from which
+    you run the client, although it typically is.
+
+    It is unknown what the '0' indicates.
+
+    The client string is an arbitrary string indicating the client name
+    and version (typically). Think of it as the USER_AGENT variable in
+    CGI.
+
+    These fields are all separated by a space and there is a space at
+    the end as well.
+
+    The client only ever sends these lines. Thus the communication
+    protocol can be easily abstracted to merely sending an integer to a
+    generic sda_send() routine and returning the response line (decoded,
+    natch).
+
+  Response Line Contents
+        /^(\d)\s(\d)\s.*$/
+
+    The response line format varies slightly according to operation.
+
+   Login Event
+    In the event of a login (type 1) event, the server returns:
+
+        /^$type $success $code $msg$/
+        /^(\d) (\d) (\d) (.*)$/
+
+    Type is 1 - login.
+
+    Success is either 0 or 1, indicating failure or success
+    respectively.
+
+    The code depends on the success. If successful, then the code is 0.
+
+    In event of an error the code is one of the following values:
+
+        1 - Incorrect username or password
+        2 - unknown
+        3 - No quota available
+        4 - Already connected
+
+    Errors 1 and 3 are unrecoverable. In the event of error 1, you
+    should see your administrator, or re-enter your username and
+    password. Error 3 indicates that your administrator needs to add
+    more to your data limit.
+
+    Error 4 merely indicates that you're already connected and should be
+    regarded as identical to a successful login.
+
+    It is unknown what an error of type 2 indicates.
+
+   Logout Event
+    In the event of a login (type 2) event, the server returns:
+
+        /^$type $success $quota $msg$/
+        /^(\d) (\d) (-1|\d+\.\d{3}) (.*)$/
+
+    Type is 2 - logout.
+
+    Success is either 0 or 1, indicating failure or success
+    respectively.
+
+    I am yet to be able to invoke a failure.
+
+    The only two responses I have been able to invoke are:
+
+        %.3f Mb Quota_Remaing
+        -1 Logoff_Confirmed
+
+    where $quota is the -1 or %.3f and $msg is the rest. And, yes, they
+    did misspell 'Remaining'.
+
+   Update Event
+    In the event of a update (type 3) event, the server returns:
+
+        /^$type $success $msg$/
+        /^(\d) (\d) (.*)$/
+
+    Type is 3 - update.
+
+    Success is either 0 or 1, indicating failure or success
+    respectively. In the event of a failure, try to logout.
+
+    In a successful update, the message is composed of:
+
+        0 Quota 24.423Mb; Used 4.523Mb
+
+    Naturally, where the quantities are relevant to your session.
+
+    In an unsuccessful update, I have only invoked a 'User Not Found'
+    error. This happens when a user tries to update but isn't actually
+    logged in (or doesn't exist anyway). The message looks like this:
+
+        Health Check Deny: User Not Found
+
+    Other situations are, as of yet, unknown.
+
+AUTHOR
+    Iain Truskett <spoon@cpan.org> <http://eh.org/~koschei/>
+
+    Please report any bugs, or post any suggestions, to either the
+    mailing list at <perl-sda@dellah.anu.edu.au> (email
+    <perl-sda-subscribe@dellah.anu.edu.au> to subscribe) or directly to
+    the author at <spoon@cpan.org>
+
+BUGS
+    Probably doesn't work well on EBCDIC systems due to the
+    encoding/decoding process.
+
+PLANS
+    I intend to have the module returning an appropriate response object
+    which can be queried for its contents so that parsing the response
+    line is rendered unnecessary. The object will either be overloaded
+    so code using the existing interface doesn't fall over or a
+    parameter will be added to the new() call.
+
+COPYRIGHT
+    Copyright (c) 2001 Iain Truskett. All rights reserved. This program
+    is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
+
+        $Id: DataAccounting.pm,v 1.2 2002/02/03 14:29:05 koschei Exp $
+
+ACKNOWLEDGEMENTS
+    I would like to thank TBBle for his initial research into the
+    protocol, Starnet for providing such a dodgy protocol, and Bruceo
+    and JT for providing incentive to actually bother to write this
+    program.
+
+SEE ALSO
+    <http://www.starnetsystems.com.au/>
+

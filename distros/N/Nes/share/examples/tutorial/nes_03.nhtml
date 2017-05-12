@@ -1,0 +1,9 @@
+{: NES 1.0 ('script_03.pl') :}
+<html>
+  <head>
+    <title>Nes Tutorial</title>
+  </head>
+  <body>
+  <b>{: $ var_hello :}</b>
+  </body>
+</html>

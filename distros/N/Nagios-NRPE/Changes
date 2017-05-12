@@ -1,0 +1,7 @@
+0.002 2014-04-15
+ - Fix kwalitee errors
+ - Build.PL add Test::Podcoverage to build requirements
+ - add license to all *.pl and *.pm files
+
+0.001 2013-01-10
+ - First release.

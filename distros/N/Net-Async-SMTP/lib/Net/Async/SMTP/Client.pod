@@ -1,0 +1,161 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::SMTP::Client
+at lib/Net/Async/SMTP/Client.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::SMTP::Client - sending email with IO::Async
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+ #!/usr/bin/env perl
+ use strict;
+ use warnings;
+ use IO::Async::Loop;
+ use Net::Async::SMTP::Client;
+ use Email::Simple;
+ my $email = Email::Simple->create(
+ 	header => [
+ 		From    => 'someone@example.com',
+ 		To      => 'other@example.com',
+ 		Subject => 'NaSMTP test',
+ 	],
+ 	attributes => {
+ 		encoding => "8bitmime",
+ 		charset  => "UTF-8",
+ 	},
+ 	body_str => '... text ...',
+ );
+ my $loop = IO::Async::Loop->new;
+ $loop->add(
+ 	my $smtp = Net::Async::SMTP::Client->new(
+ 		domain => 'example.com',
+ 	)
+ );
+ $smtp->connected->then(sub {
+ 	$smtp->login(
+ 		user => '...',
+ 		pass => '...',
+ 	)
+ })->then(sub {
+ 	$smtp->send(
+ 		to   => 'someone@example.com',
+ 		from => 'other@example.com',
+ 		data => $email->as_string,
+ 	)
+ })->get;
+
+=head1 DESCRIPTION
+
+Provides basic email sending capability for L<IO::Async>, using
+the L<Protocol::SMTP> implementation.
+
+See L<Protocol::SMTP/DESCRIPTION> for a list of supported features
+and usage instructions.
+
+=head1 METHODS
+
+=head2 connection
+
+Establishes or returns the TCP connection to the SMTP server.
+
+=over 4
+
+=item * If we had a host, we'll connect directly.
+
+=item * If we have a domain, then we'll do an MX lookup on it.
+
+=item * If we don't have either, you'll probably just see errors
+or unresolved futures.
+
+=back
+
+Returns the L<Future> representing the connection. Attach events via
+methods on L<Future> such as C<on_done>, C<then> etc.
+
+See also: L</connected>
+
+=head2 mx_lookup
+
+Looks up MX records for the given domain.
+
+Returns a L<Future> which will resolve to the list of records found.
+
+=head2 configure
+
+Overrides L<IO::Async::Notifier> C<configure> to apply SMTP-specific config.
+
+=head2 connected
+
+Returns the L<Future> indicating our SMTP connection.
+
+Resolves to a L<Net::Async::SMTP::Connection> instance on
+success.
+
+=head2 ssl_parameters
+
+Returns any defined SSL parameters as passed to the constructor
+or L</configure>.
+
+=head2 login
+
+Attempts login, connecting first if required.
+
+Returns a L<Future> which will resolve with this instance when the login completes.
+
+=head2 send
+
+Attempts to send message(s), connecting first if required.
+
+If this server requires login, you'll need to call L</login> yourself.
+
+See L<Protocol::SMTP::Client/send>.
+
+Returns a L<Future>.
+
+=head1 METHODS - Accessors
+
+=head2 port
+
+Returns the port used for communicating with the server,
+or undef for default (25).
+
+=head2 host
+
+Returns the host we're going to connect to.
+
+=head2 domain
+
+Returns the domain used for the email server.
+
+=head2 auth
+
+Returns the auth method used for server authentication.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2012-2014. Licensed under the same terms as Perl itself.

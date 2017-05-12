@@ -1,0 +1,11 @@
+t/00_load.t
+README
+lib/Net/DNS/Nameserver/Trivial.pm
+Makefile.PL
+example/etc/dns.ini
+example/etc/dom.ini
+example/README.txt
+example/lib/perl/Net/DNS/Nameserver/Trivial.pm
+example/bin/tdns.pl
+MANIFEST
+Changes

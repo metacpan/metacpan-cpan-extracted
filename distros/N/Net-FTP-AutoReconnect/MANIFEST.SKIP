@@ -1,0 +1,11 @@
+~$
+\#$
+,v$
+\.bak$
+\.old$
+^Makefile$
+^Net-FTP-RetrHandle
+blib
+junk
+mirs.*
+MIRRORED.BY

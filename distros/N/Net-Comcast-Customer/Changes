@@ -1,0 +1,17 @@
+Revision history for Net-Comcast-Customer
+
+1.2     Mon Sep 3 2012
+        add another paragraph to the summary documentation
+        make the "Maximum GB" value configurable via max_gb() accessor
+        adjust for Comcast's HTML updates
+        don't print debug info if $used is zero
+
+1.1     Sat May 19 2012
+        add resource metadata (links to homepage, git repository)
+        documentation updates
+        print comcast-data output on one line
+        bump WWW::Mech user-agent version to something more modern
+
+1.0     Mon Sep 5 2011
+        First version, released on an unsuspecting world.
+

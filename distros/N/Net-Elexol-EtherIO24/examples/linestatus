@@ -1,0 +1,125 @@
+#!/usr/bin/perl
+#
+# Very simple utility to see or set line status and direction on
+# Elexol Ether I/O 24 boards.
+#
+
+use strict;
+use Getopt::Long;
+use Net::Elexol::EtherIO24;
+
+Getopt::Long::Configure("require_order", "pass_through");
+
+my $help = 0;
+my $debug = 0;
+my $addr = '';
+my $disp_group = 0;
+
+if(!GetOptions(
+	'help' => \$help,
+	'debug=i' => \$debug,
+	'addr=s' => \$addr,
+	'group!' => \$disp_group,
+) || $help) {
+	my $h_group = ($disp_group?"do":"don't");
+	print <<EOT;
+Usage: $0 --addr=<addr> [options] [commands]
+
+Options:
+
+--debug=<n>	     Enable debugging output from the Elexol library
+
+--addr=<addr>	   Specify the address of the target Elexol board
+--[no]group	     When printing line numbers, use group naming
+			(eg, Line 0 is A1) [$h_group]
+
+Commands: [cmd]<line>
+
+ ('line' means either a number 0..23, or name, "A1" to "C8")
+
+[+]                    Enable a line
+-                      Disable a line
+i                      Set a line for output
+o                      Set a line for input
+
+EOT
+	exit 1;
+}
+
+if(!$addr || $addr eq '') {
+	print STDERR "ERROR: Specify a target with --addr\n";
+	exit 1;
+}
+
+system("ping -c 1 $addr >/dev/null 2>&1"); # wake it up
+
+Net::Elexol::EtherIO24->debug($debug);
+my $eio = Net::Elexol::EtherIO24->new(
+	target_addr => $addr,
+	threaded => 1,
+);
+
+if(!$eio) {
+	print STDERR "ERROR: Can't create new EtherIO24 object for $addr: ".Net::Elexol::EtherIO24->error."\n";
+	exit 1;
+}
+
+
+sub print_lines($) {
+	my $eio = shift;
+
+	my @g = ('A', 'B', 'C');
+	for my $line (0..23) {
+		my $l = $line;
+		$l = sprintf "%s%d", $g[$line/8], ($line%8)+1 if($disp_group);
+		printf "%2.2s:%s:%s ",
+			$l,
+			($eio->get_line_dir($line)?'I':'O'),
+			($eio->get_line($line)?'X':'-');
+		print "\n" if(!(($line+1)%8));
+	}
+}
+
+while(my $inp = shift) {
+	# 'line' = A1 etc or 0..23
+
+	# line = enable line
+	# +line = enable line
+	# -line = disable line
+	# iline = set for input
+	# oline = set for output
+
+	$inp =~ tr/a-z/A-Z/; # turn all to caps
+	my $cmd = 'set';
+	$cmd = 'set' if($inp =~ /^[+\-]/);
+	$cmd = 'dir' if($inp =~ /^[IO]/);
+
+	my $val = 1;
+	$val = 0 if($inp =~ /^[\-O]/);
+
+	$inp =~ s/^[+\-IO]//; # strip cmds
+
+	my $line;
+	if($inp =~ /^([A-C])([0-7])/) {
+		$line = 0 if($1 eq 'A');
+		$line = 8 if($1 eq 'B');
+		$line = 16 if($1 eq 'C');
+		$line += ($2-1);
+	} elsif($inp =~ /^[0-2]?[0-9]$/ && $inp < 24) {
+		$line = $inp;
+	} else {
+		print "ERROR: \"$inp\" is not a valid line\n";
+	}
+
+	if($cmd eq 'set') {
+		$eio->set_line($line, $val);
+	} elsif($cmd eq 'dir') {
+		$eio->set_line_dir($line, $val);
+	}
+}
+$eio->indirect_write_send; # flush pending writes
+
+print_lines($eio);
+
+$eio->close;
+

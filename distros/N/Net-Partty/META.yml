@@ -1,0 +1,18 @@
+abstract: Partty.org! interface
+author: Kazuhiro Osawa <ko@yappo.ne.jp>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Net-Partty
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Carp: 0
+  Class::Accessor::Fast: 0
+  IO::Select: 0
+  IO::Socket::Telnet: 0
+version: 0.03

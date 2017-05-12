@@ -1,0 +1,6 @@
+Build.PL
+README
+t/t_treehash.t
+lib/Net/Amazon/TreeHash.pm
+MANIFEST			This list of files
+META.yml

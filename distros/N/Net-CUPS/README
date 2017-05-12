@@ -1,0 +1,51 @@
+Net::CUPS README
+================
+
+Net::CUPS is an interface to the Common Unix Printing System API.
+
+Previous versions of this module attempted to provide a Perl interface
+layer similar to the C interface of CUPS.  This was fine for power users,
+but most people were not looking for this type of interface.
+
+This module has now been converted to use an object oriented paradigm
+to facilitate quicker development and ease of use.
+
+The Common Unix Printing System can be found at http://www.cups.org.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   *) Common Unix Printing System (CUPS) - http://www.cups.org
+
+The Makefile.PL will test for the version of the CUPS you have installed
+and die if an appropriate version is not found.  This is due to the way
+the module had to be coded to handle various variables and functions.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2003-2005 D. Hageman <dhageman@dracken.com>
+Copyright (C) 2006-2009 Dracken Technology, Inc. (http://www.dracken.com/)
+
+SPECIAL THANKS
+
+Sven-Haegar Koch <haegar@sdinet.de> has graciously provided patches
+to fix issues and make improvements to Net::CUPS.
+
+Mark Gannon <mark@truenorth.nu> has provided patches to add quite a bit of
+additional functionality to Net::CUPS.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+CUPS, the Common UNIX Printing System, the CUPS logo, and ESP Print Pro 
+are the trademark property of Easy Software Products.

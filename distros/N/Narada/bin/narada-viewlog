@@ -1,0 +1,281 @@
+#!/usr/bin/env perl
+use 5.010001;
+use warnings;
+use strict;
+use utf8;
+
+our $VERSION = 'v2.3.7';
+
+use FindBin;
+use lib "$FindBin::Bin/../lib/perl5";
+use Narada;
+use List::Util qw( min any );
+
+use constant BAD_INODE => -1;
+use constant TAIL_BLOCK => 8192;
+use constant TAIL_LINES => 20;
+
+my ($Prev_date, $Multiline) = (q{}, 1);
+my %Level = (err=>0,warn=>1,notice=>2,info=>3,debug=>4);
+
+
+main(@ARGV) if !caller;
+
+
+sub err { die "narada-viewlog: @_\n" };
+
+sub main {
+    Narada::detect();
+    my ($opt, @files) = parse_opt(@_);
+    if (@files) {
+        for (@files) {
+            cat($opt, $_);
+        }
+    }
+    else {
+        tail($opt, 'var/log/current');
+    }
+    return;
+}
+
+sub parse_opt {
+    my ($simple, $complex, $default) = qw( dtmfliph LR tmli );
+    my %opt = map {$_=>1} map {split //xms,substr $_,1} grep {m/\A-[$simple]+\z/xms} @_;
+    if (!keys %opt) {
+        %opt = map {$_=>1} split //xms, $default;
+    }
+    @_ = grep {!m/\A-[$simple]+\z/xms} @_;
+    while (@_ && $_[0] =~ /\A-([$complex])\z/xms) {
+        shift;
+        $opt{$1} = shift;
+    }
+    die "Usage: narada-viewlog [-d] [-t] [-m] [-f] [-l] [-i] [-p] [-L LEVEL] [-R REGEX] [logfile ...]\n"
+        if $opt{h} || any {!defined} values %opt;
+    return (\%opt, @_);
+}
+
+sub cat {
+    my ($opt, $file) = @_;
+    open my $f, '<', $file or err "open: $!";
+    while (<$f>) {
+        print_line($opt, $_);
+    }
+    close $f or err "close: $!";
+    return;
+}
+
+sub tail {
+    my ($opt, $file) = @_;
+    my $prev_inode = BAD_INODE;
+    my $fh;
+    while (1) {
+        my $inode = (stat $file)[1];
+        if (!$inode) {
+            next;
+        }
+        elsif ($inode != $prev_inode) {
+            if (!open $fh, '<', $file) {    ## no critic (RequireBriefOpen)
+                warn "open: $!\n";
+            } else {
+                if ($prev_inode == BAD_INODE) {
+                    seek $fh, offset_lastlines($fh, TAIL_LINES), 2 or err "seek: $!";
+                }
+                else {
+                    warn "\n$file reopened, continue...\n\n";
+                }
+                $prev_inode = $inode;
+            }
+        }
+        else {
+            while (<$fh>) {
+                print_line($opt, $_);
+            }
+        }
+    } continue { sleep 1 }
+    return;
+}
+
+sub offset_lastlines {
+    my ($fh, $lines) = @_;
+    seek $fh, -min(-s $fh, TAIL_BLOCK), 2 or err "seek: $!";
+    my @lines = <$fh>;
+    shift @lines;
+    splice @lines, 0, -$lines;
+    return -length join q{}, @lines;
+}
+
+sub print_line { ## no critic (ProhibitExcessComplexity)
+    my ($opt, $line) = @_;
+    my $r_time   = qr/(\d\d\d\d-\d\d-\d\d)_(\d\d:\d\d:\d\d)[.](\d+)/xms;
+    my $r_faclvl = qr/(\w+)[.](\w+)/xms;
+    my $r_idpid  = qr/([^\[]+)\[(\d+)\]/xms;
+    if ($line !~ m{\A$r_time\s$r_faclvl:[^\[]*\s$r_idpid:\s(.*)\z}xms) {
+        if ($Multiline) {
+            $line =~ s/\A$r_time\s//xms;
+            print $line;
+        }
+    }
+    else {
+        my ($date, $time, $msec, $facility, $level, $ident, $pid, $msg)
+            = ($1,$2,$3,$4,$5,$6,$7,$8);
+        $Multiline = 0;
+        return if $opt->{L} && $Level{lc $level} > $Level{lc $opt->{L}};
+        return if $opt->{R} && $msg !~ /$opt->{R}/xms;
+        $Multiline = 1;
+        my (@p);
+        if ($opt->{d}) {
+            push @p, sprintf '%s', $date;
+        }
+        elsif ($opt->{t} && $Prev_date ne $date) {
+            printf "=== %s\n", $date;
+            $Prev_date = $date;
+        }
+        ## no critic (ProhibitPostfixControls)
+        if ($opt->{t} && $opt->{m}) {
+            push @p, sprintf '%s.%05d', $time, $msec;
+        }
+        else {
+            push @p, sprintf '%s',   $time if $opt->{t};
+            push @p, sprintf '%05d', $msec if $opt->{m};
+        }
+        if ($opt->{f} && $opt->{l}) {
+            push @p, sprintf '%s.%-6s', $facility, $level;
+        }
+        else {
+            push @p, sprintf '%s', $facility if $opt->{f};
+            push @p, sprintf '%6s', $level   if $opt->{l};
+        }
+        if ($opt->{i} && $opt->{p}) {
+            push @p, sprintf '%s[%d]', $ident, $pid;
+        }
+        else {
+            push @p, sprintf '%s', $ident if $opt->{i};
+            push @p, sprintf '[%d]', $pid if $opt->{p};
+        }
+        if (@p) {
+            printf '%s: %s', join(q{ }, @p), $msg;
+        } else {
+            print $msg;
+        }
+    }
+    return;
+}
+
+
+1; # Magic true value required at end of module
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+narada-viewlog - log viewer for project based on Narada framework
+
+
+=head1 VERSION
+
+This document describes narada-viewlog version v2.3.7
+
+
+=head1 USAGE
+
+    narada-viewlog [-d] [-t] [-m] [-f] [-l] [-i] [-p] [-L LEVEL] [-R REGEX] [logfile ...]
+
+
+=head1 DESCRIPTION
+
+Should be executed in project deploy directory (or Narada 1.x project root
+directory).
+
+Output logs in ease to read format (control output fields and can filter
+log records).
+
+If C<logfile> param(s) used output these files, else work like
+`tail -F var/log/current`.
+
+To select which fields should be included in output (use C<-tmli> by default):
+
+  [-d] date
+  [-t] time
+  [-m] time microseconds
+  [-f] facility
+  [-l] log level
+  [-i] ident
+  [-p] pid
+
+To filter log records:
+
+  [-L LEVEL] minimum log level (debug->info->notice->warn->err)
+  [-R REGEX] regexp to filter log records (in multiline records 
+             will apply to first line only)
+
+If option -t used without -d, will output date on separate line on date change.
+Will remove duplicate date/time (added by syslog) from output.
+Strip prefix in multiline records for second and next lines.
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+narada-viewlog requires no configuration files or environment variables.
+
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/powerman/Narada/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software. The code repository is available for
+public review and contribution under the terms of the license.
+Feel free to fork the repository and submit pull requests.
+
+L<https://github.com/powerman/Narada>
+
+    git clone https://github.com/powerman/Narada.git
+
+=head2 Resources
+
+=over
+
+=item * MetaCPAN Search
+
+L<https://metacpan.org/search?q=Narada>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/dist/Narada>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Narada>
+
+=item * CPAN Testers Matrix
+
+L<http://matrix.cpantesters.org/?dist=Narada>
+
+=item * CPANTS: A CPAN Testing Service (Kwalitee)
+
+L<http://cpants.cpanauthors.org/dist/Narada>
+
+=back
+
+
+=head1 AUTHOR
+
+Alex Efros  E<lt>powerman@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2008- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+
+=cut

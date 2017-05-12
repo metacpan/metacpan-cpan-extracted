@@ -1,0 +1,44 @@
+Revision history for Perl extension Net::Frame::Simple.
+
+1.08 Sun  7 May 14:23:24 CEST 2017
+   - bugfix: correctly computeLengths() when encapsulating IP within IP
+   - update: copyright notice
+
+1.07 Wed  5 Oct 18:53:36 CEST 2016
+   - bugfix: https://rt.cpan.org/Ticket/Display.html?id=118234
+             dump() correctly handles payload
+
+1.06 Fri Jan 23 07:32:52 CET 2015
+   - new: truncated attribute
+   - update: copyright notice
+   - update: Kwalitee
+
+1.05  Wed Jan 25 22:48:18 CET 2012
+   - UPDATE: %Next variable population removed. Must be done from
+   developer's own layer 7 modules.
+   - bugfix: check when capture length is smaller than content length
+   - update: copyright notice
+
+1.04 Sun May 31 15:29:26 CEST 2009
+   - UPDATE: removed old computation scheme (see 1.03 changes)
+   - update: copyright notice
+
+1.03 Sun Nov  9 22:59:08 CET 2008
+   - new: made computeLengths() and computeChecksums() generic for all protocols
+   - new: $NoComputeLengths and $NoComputeChecksums global variables to disable
+          respective computations
+   - WARNING: this new computation scheme does not apply to:
+              IPv{4|6}, ICMPv{4|6}, TCP, UDP
+     => Because the old computation scheme stills apply.
+
+1.02 Thu Dec 21 23:48:44 CET 2006
+   - NEW: support for ICMPv6
+   - bugfix: get padding for IPv6
+
+1.01 Sun Dec 17 17:30:19 CET 2006
+   - UPDATE: all layers moved to Net::Frame::Layer::* namespace
+   - new: support for IPv6 layer (computeLengths(), computeChecksums())
+
+1.00 Sat Dec  9 19:38:13 CET 2006
+   - first public release
+

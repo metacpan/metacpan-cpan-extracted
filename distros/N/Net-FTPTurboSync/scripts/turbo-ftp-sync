@@ -1,0 +1,240 @@
+#!/usr/bin/perl -w
+# Copyright (c) 2011 Daneel S. Yaitskov <rtfm.rtfm.rtfm@gmail.com.>. 
+
+# All rights reserved.
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+
+# turbo-ftp-sync - a script moves changes of files and folders of a local
+# machine to a remote one via FTP very fast with minimum network traffic.
+
+require 5.8.0;
+
+use strict;
+use warnings;
+
+use Net::FTPTurboSync;
+use Net::FTPTurboSync::PrgOpts;
+use Net::FTPTurboSync::MyFtp;
+use Net::FTPTurboSync::UploadedFiles;
+use Net::FTPTurboSync::FactoryOfRemoteObjects;
+use Net::FTPTurboSync::TurboPutCommand;
+
+STDOUT->autoflush(1);
+STDERR->autoflush(1);
+
+$Net::FTPTurboSync::PrgOpts::theOpts = Net::FTPTurboSync::PrgOpts->new(\@ARGV);
+my $theOpts = $Net::FTPTurboSync::PrgOpts::theOpts;
+my $dbh = DBI->connect("dbi:SQLite:dbname=$theOpts->{dbpath}", "", "")
+    or die "Cannot create or open db '$theOpts->{dbpath}'";
+
+$dbh = Net::FTPTurboSync::UploadedFiles->new($dbh);
+
+$dbh->deployScheme() if $theOpts->{newDB};
+
+my $ftpc = undef;
+$ftpc = Net::FTPTurboSync::MyFtp->connection() if !$theOpts->{buildDB};
+
+print "\nBuilding local file tree.\n" if !$theOpts->{doquiet};
+
+my ($ldirs, $lfiles) = Net::FTPTurboSync->buildlocaltree();
+
+if ($theOpts->{buildDB}) {
+    Net::FTPTurboSync->fillDb ( $dbh, $ldirs, $lfiles);    
+    exit;
+}
+
+print "\nBuilding remote file tree.\n" if !$theOpts->{doquiet};
+
+my ($rdirs, $rfiles) = Net::FTPTurboSync->buildremotetree($ftpc, $dbh);
+
+if (!$ftpc->isConnected) {
+    print "\nReconnect to server.\n" if !$theOpts->{doquiet};
+    $ftpc = Net::FTPTurboSync::MyFtp->connection();
+    foreach my $rdir (values(%$rdirs)) {
+        $rdir->{ftp} = $ftpc;
+    }
+    foreach my $rfile (values(%$rfiles)) {
+        $rfile->{ftp} = $ftpc;
+    }    
+} 
+
+print "\nStarting synchronization.\n" if !$theOpts->{doquiet};
+
+my $factory = Net::FTPTurboSync::FactoryOfRemoteObjects->new($ftpc, $dbh);
+
+my $cmd = Net::FTPTurboSync::TurboPutCommand->new($factory, $lfiles, $ldirs, $rfiles,  $rdirs);
+$cmd->dosync();
+
+print "Done.\n" if !$theOpts->{doquiet};
+print "Quitting FTP connection.\n" if $theOpts->{dodebug};
+
+$ftpc->quit();
+exit 0;
+
+=pod
+
+=head1 NAME
+
+turbo-ftp-sync - a script moves changes of files and folders of a local
+machine to a remote one via FTP very fast with minimum network traffic.
+
+=head1 SYNOPSIS
+
+turbo-ftp-sync [ options ] [ <localdir> <remoteURL> ]
+
+=head1 DESCRIPTION
+
+The script synchronizes files and folder on an FTP server with local ones via
+usual FTP protocol. The advantage of this script over usual FTP client is it
+doesn't upload all data every time but only once. 
+
+Its secret is that it doesn't ask a FTP server about last modification date and
+current size of each file. These information is stored in local SQLite db.
+Therefore this program doesn't explore folder tree of a remote host. It acts
+blindly. You can interrupt a process of this program in any time and you will
+not lose changes which you already uploaded.
+
+The program can move changes only one direction from a local machine to remote
+one. If a file was changed on a remote machine and a local one then the program
+overwrite the remove version of the file by the local one.
+
+turbo-ftp-sync.pl is based on sources of ftpsync.pl program.
+Christoph Lechleitner is the initial author of ftpsync.pl (ftpsync@ibcl.at)
+
+=head1 OPTIONS
+
+=over 
+
+=item <localdir>
+
+local directory, by default is current one(.)
+
+=item <remoteUrl>
+
+full FTP URL 
+
+  ftp://[ftpuser[:ftppasswd]@]ftpserver/ftpdir 
+
+ftpdir is relative, so
+
+  ftp://[ftpuser[:ftppasswd]@]ftpserver// for absolute paths
+
+=item -c | -C 
+
+like -i, but then prompts whether to actually do work
+
+=item -d | -D  
+
+turns debug output (including verbose output) on
+
+=item -f | -F
+
+flat operation, no subdir recursion
+
+=item -h | -H
+
+prints out this help text
+
+=item -i | -I
+
+forces info mode, only telling what would be done
+
+=item -n | -N
+
+no deletion of obsolete files or directories
+
+=item -l | -L
+
+follow local symbolic links as if they were directories
+
+=item -q | -Q
+
+turns quiet operation on
+
+=item -b | -B
+
+build DB only - i.e don't upload data to remote host.  For example you have
+alread upload an archive to a remote host and extracted it. Then the remove copy
+of data equals to local one. And reuploading all data yet another time with this
+script is redundant.
+
+  # Instead.
+  turbo-ftp-sync.pl db=db.db wroot ftp://ftp.com//
+
+  # Use
+  turbo-ftp-sync.pl -b db=db.db wroot 
+  # here you change something in wroot folder
+  turbo-ftp-sync.pl db=db.db wroot ftp://ftp.com//
+
+=item -v | -V
+
+turnes verbose output on
+
+=item maxerrors
+
+if not 0 then program exit with nonzero code.
+
+=item cfg
+
+read parameters and options from file defined by value.
+
+=item ftpserver
+
+defines the FTP server, defaults to "localhost".
+
+=item ftpuser
+
+defines the FTP user, defaults to "ftp".
+
+=item db
+
+defines the file where info about uploaded files is stored.
+
+=item ftppasswd
+
+defines the FTP password, defaults to "anonymous".
+
+=item ignoremask
+
+defines a regexp to ignore certain files, like .svn
+
+=back 
+
+=head1 EXAMPLE of using maxerrors feature
+
+It allow to self terminate process if it was encountered definite number failure
+attempts to upload a file or a dir. Usually such situation means your free ftp
+server bans you.  And it bases on experiency the better decision is to termitate
+program with error.  But it's the end. We don't surrender! We've foreseen that.
+
+  while : ; do 
+    turbo-ftp-sync.pl db=db.db wroot ftp://ftp.com// && break ; 
+  done
+
+=head1 VERSION
+
+0.6    
+
+=head1 AUTHOR
+
+Daneel S. Yaitskov <rtfm.rtfm.rtfm@gmail.com>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2011, Daneel S. Yaitskov <rtfm.rtfm.rtfm@gmail.com>
+
+All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 SCRIPT CATEGORIES
+
+Networking
+Web    
+
+=cut
+
+
+

@@ -1,0 +1,13 @@
+New DAAP features
+ * updates
+ * authentication
+
+Refactoring
+ * more classes (databases, playlists?, songs, etc.) instead of data structures
+ * turn DMAP structures into objects
+
+More in the distribution
+ * include itunes shell sample program
+ * TESTS!  MORE TESTS!
+ * ultimately, server code
+

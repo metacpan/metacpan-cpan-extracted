@@ -1,0 +1,67 @@
+---
+abstract: 'plugin to handle SinFP3 database signatures'
+author:
+  - 'GomoR <gomor_at_metabrik.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-SinFP3-Plugin-Signature
+provides:
+  Net::SinFP3::Ext::DBI:
+    file: lib/Net/SinFP3/Ext/DBI.pm
+  Net::SinFP3::Ext::DBI::IpVersion:
+    file: lib/Net/SinFP3/Ext/DBI/IpVersion.pm
+  Net::SinFP3::Ext::DBI::Os:
+    file: lib/Net/SinFP3/Ext/DBI/Os.pm
+  Net::SinFP3::Ext::DBI::OsVersion:
+    file: lib/Net/SinFP3/Ext/DBI/OsVersion.pm
+  Net::SinFP3::Ext::DBI::OsVersionChildren:
+    file: lib/Net/SinFP3/Ext/DBI/OsVersionChildren.pm
+  Net::SinFP3::Ext::DBI::OsVersionFamily:
+    file: lib/Net/SinFP3/Ext/DBI/OsVersionFamily.pm
+  Net::SinFP3::Ext::DBI::PatternBinary:
+    file: lib/Net/SinFP3/Ext/DBI/PatternBinary.pm
+  Net::SinFP3::Ext::DBI::PatternTcpFlags:
+    file: lib/Net/SinFP3/Ext/DBI/PatternTcpFlags.pm
+  Net::SinFP3::Ext::DBI::PatternTcpMss:
+    file: lib/Net/SinFP3/Ext/DBI/PatternTcpMss.pm
+  Net::SinFP3::Ext::DBI::PatternTcpOLength:
+    file: lib/Net/SinFP3/Ext/DBI/PatternTcpOLength.pm
+  Net::SinFP3::Ext::DBI::PatternTcpOptions:
+    file: lib/Net/SinFP3/Ext/DBI/PatternTcpOptions.pm
+  Net::SinFP3::Ext::DBI::PatternTcpWScale:
+    file: lib/Net/SinFP3/Ext/DBI/PatternTcpWScale.pm
+  Net::SinFP3::Ext::DBI::PatternTcpWindow:
+    file: lib/Net/SinFP3/Ext/DBI/PatternTcpWindow.pm
+  Net::SinFP3::Ext::DBI::Signature:
+    file: lib/Net/SinFP3/Ext/DBI/Signature.pm
+  Net::SinFP3::Ext::DBI::SignatureP:
+    file: lib/Net/SinFP3/Ext/DBI/SignatureP.pm
+  Net::SinFP3::Ext::DBI::SystemClass:
+    file: lib/Net/SinFP3/Ext/DBI/SystemClass.pm
+  Net::SinFP3::Ext::DBI::Vendor:
+    file: lib/Net/SinFP3/Ext/DBI/Vendor.pm
+  Net::SinFP3::Output::AddSignature:
+    file: lib/Net/SinFP3/Output/AddSignature.pm
+  Net::SinFP3::Output::AddSignatureP:
+    file: lib/Net/SinFP3/Output/AddSignatureP.pm
+  Net::SinFP3::Output::Export:
+    file: lib/Net/SinFP3/Output/Export.pm
+  Net::SinFP3::Output::ExportP:
+    file: lib/Net/SinFP3/Output/ExportP.pm
+  Net::SinFP3::Plugin::Signature:
+    file: lib/Net/SinFP3/Plugin/Signature.pm
+    version: '1.01'
+requires:
+  Class::DBI: '0'
+  Net::SinFP3: '0'
+  perl: v5.6.1
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+version: '1.01'

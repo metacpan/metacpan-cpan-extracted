@@ -1,0 +1,73 @@
+DESCRIPTION
+
+The Net::Hotline modules implement a Hotline interface in Perl. Currently,
+this includes only Net::Hotline::Client.  Hotline is an internet
+client/server system that's sort of a cross between IRC and a traditional
+BBS.  See http://www.hotlinesw.com/ for more information.
+
+PREREQUISITES
+
+Net::Hotline has been tested with perl version 5.6.1, MacPerl 5.2.0r4,
+and Hotline server versions 1.2.1 and 1.2.3.  It should work fine on any
+version of Perl 5 and any 1.2.x version of Hotline, however.
+
+INSTALLATION
+
+The standard incantations should work:
+
+	perl Makefile.PL
+	make
+	make install
+
+Here are a few common variations on that theme:
+
+* If you don't want to (or can't) install in the system-wide directories,
+  you can use PREFIX to install elsewhere.  Example:
+
+	perl Makefile.PL PREFIX=~/perl
+	make
+	make install
+
+  You'll probably have to create some dummy directories before this works.
+  Just look at the error messages and create the directories it says it
+  can't find.
+
+* If you're installing on a classic Mac OS system, simply duplicate the
+  folder hierarchy inside the distribution's "lib" folder in your MacPerl
+  folder. For example, "lib/Net/Hotline/Protocol/Packet.pm" would be
+  copied to "<Your MacPerl Folder>/lib/Net/Hotline/Protocol/Packet.pm"
+  (You'll have to create any nonexistent folders in the path)
+
+  I'm not sure how to AutoSplit in MacPerl, so what I've been doing is
+  commenting out three lines in "Client.pm" to disable AutoLoading.  The
+  lines are:
+
+          31: use AutoLoader 'AUTOLOAD';
+        1488: __END__
+
+  Just add a "#" character to the beginning of those lines.
+
+EXAMPLES
+
+There are two example scripts in the "Examples" directory.
+
+1. "hlftp.pl" is a simple command line FTP-like Hotline client included
+   to demonstrate Net::Hotline::Client's "blocking task mode" (read the
+   documentation for an explanation).  Its operation should be familiar
+   to anyone who's used ncftp or the regular Unix ftp client.
+
+2. "hibot.pl" is a very simple Hotline "bot" included to demonstrate
+   Net::Hotline::Client's "event loop mode" (again, RTFM).  It works a
+   lot like hlftp.pl in terms of connecting to servers.  Log the bot
+   onto your local Hotline server an message it with the text "help"
+   for more information.
+
+BUG REPORTING
+
+Send bug reports to John C. Siracusa (siracusa@mindspring.com)
+
+COPYRIGHT
+
+Copyright(c) 1998-2002 by John C. Siracusa.  All rights reserved.  This
+program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

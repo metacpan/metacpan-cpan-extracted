@@ -1,0 +1,351 @@
+
+=head1 NAME
+
+NetApp::Filer -- OO Class for managing NetApp Filer devices
+
+=head1 SYNOPSIS
+
+    use NetApp::Filer;
+
+    my $filer 		= NetApp::Filer->new({
+        hostname	=> $hostname_of_nasfiler,
+        ssh_identity	=> "/path/to/ssh/identify/file",
+    });
+
+    my $filer 		= NetApp::Filer->new({
+        hostname	=> $hostname_of_nasfiler,
+	protocol	=> 'telnet',
+	telnet_password => $telnet_password,
+    });
+
+=head1 DESCRIPTION
+
+This class implements methods for communication with a NetApp Filer
+device.  Both ssh and telnet are supported, but only ssh is really
+recommended.  NetApp doesn't support concurrent access via telnet, and
+the error checking using ssh is far more robust.  Not to mention, you
+can configure secure access via ssh without using passwords, but
+telnet access will always require a password.
+
+=head1 METHODS
+
+=head2 Filer Specific Methods
+
+=head3 new( $args_ref )
+
+This method takes a hash reference of arguments, and returns a
+NetApp::Filer object to be used to communicate with the specified
+filer.
+
+The arguments are as follows:
+
+    NetApp::Filer->new({
+	# Required arguments
+	hostname	=> $hostname,
+	# Optional arguments
+	username	=> $username,
+	ssh_identify	=> $ssh_identity,
+	ssh_command	=> [ @ssh_command ],
+        protocol	=> 'ssh' | 'telnet',
+        telnet_password => $telnet_password,
+        telnet_timeout  => $telnet_timeout,
+        cache_enabled	=> 0 || 1,
+	cache_expiration => $cache_expiration,
+    });
+
+=over
+
+=item (required) hostname
+
+The value of this argument is a string, which is the hostname of the
+filer to connect to.
+
+=item (optional) username
+
+The username to use for communication.  Defaults to 'root'.
+
+=item (optional) ssh_identify
+
+The ssh identify file to use for ssh communication.  If not specified
+then ssh will be invoked without the -i argument, and will use
+whatever default identify file is setup for the current user.
+
+In practice, this argument will almost always be required, but the
+code allows it to be optional.
+
+If the specified file doesn't exist, then a fatal exception is raised.
+
+=item (optional) ssh_command
+
+An array reference representing the ssh command to be used to
+communication.  Defaults to just ['ssh'].
+
+Don't use this argument to specify the identity via -i.  Instead, use
+the ssh_identify argument.  If you need to specify certain ssh
+options, for example StrictHostKeyChecking, then use this argument.
+For example:
+
+    my $filer 		= NetApp::Filer->new({
+        hostname	=> $somenasfiler,
+	ssh_command	=> [qw( ssh -o StrictHostKeyChecking=no )],
+    });
+
+=item (optional) protocol
+
+This option is a string, either 'ssh' or 'telnet'.  The default, and
+recommended, protocol is ssh.  While telnet is supported, only one
+concurrent root telnet session per filer is allowed, and the error
+checking over telnet is far less robust than ssh.
+
+=item (optional) telnet_password
+
+This option is a string, and specified the root password to use when
+connecting via telnet.  Note that password based ssh connectivity is
+not supported, and telnet access, while supported, is not recommended.
+The author uses the telnet support for only one thing: installing the
+ssh keys, and configuring ssh access.
+
+=item (optional) cache_enabled
+
+NOTE: The caching mechanism is considered experimental.  For one
+thing, it depends on using a patched version of Memoize::Expire, which
+is still not yet available on CPAN.  Use with caution.
+
+This option has a boolean value, and is used to disable the internal
+caching of the results of several API calls.  By default, the cache is
+disabled.  If enabled, then the result of any of the following
+NetApp::Filer methods will be cached, using Memoize:
+
+    get_aggregate
+    get_volume
+    get_qtree
+
+To enable caching of these API calls, set cache_enabled to a true
+value.  The cached values will expire (see the next option), unless
+the expiration value is set to 0.
+
+=item (optional) cache_expiration
+
+This option is an integer, and is the number of seconds to cache
+results of the above API calls.  The default value is 10 seconds.
+Setting this value to 0 will prevent the cached values from expiring
+at all.
+
+=back
+
+=head3 get_version
+
+Returns a NetApp::Filer::Version object.
+
+=head3 get_licenses
+
+Returns a list of NetApp::Filer::License objects, each of which
+represents a single licensed service on the filer.  Note that if the
+service is "not licensed", it is ignored.  Only services with active
+of expired licensed are returned.
+
+=head3 get_license( $service )
+
+Returns a single NetApp::Filer::License object for the specified service.
+
+=head3 add_license( $code )
+
+Adds a license using the specified code.  Returns a boolean value only.
+
+=head3 delete_license( $service )
+
+Deleted the license for the specified service.  Returns a boolean value only.
+
+=head2 Aggregate Specific Methods
+
+=head3 get_aggregate_names
+
+Returns a list of strings, each of which is the name of an aggregate
+on the filer.
+
+=head3 get_aggregates
+
+Returns a list of NetApp::Aggregate objects, each of which represents
+an aggregate on the filer.
+
+=head3 get_aggregate( $name )
+
+Returns a single NetApp::Aggregate object for the specified aggregate
+name.
+
+=head3 create_aggregate( %args )
+
+Create an aggregate using the specified arguments, and returns the
+NetApp::Aggregate object that represents it.  The arguments are as
+follows:
+
+    my $aggregate = $filer->create_aggregate(
+	# Required arguments
+	name		=> $name,
+	# Optional arguments
+	raidtype	=> 'raid0' | 'raid4' | 'raid_dp',
+	raidsize	=> $raidsize,
+	disktype	=> 'ATA' | 'FCAL' | 'LUN' | 'SAS' | 'SATA' | 'SCSI',
+	diskcount	=> $diskcount,
+	disksize	=> $disksize,
+	rpm		=> $rpm,
+	language	=> $language,
+	snaplock	=> 'Compliance' | 'Enterprise',
+	mirrored	=> 1,		# -m
+	traditional	=> 1,		# -v
+	force		=> 1,		# -f
+	disks		=> [
+	    # To specify a single set of disks:
+	    'disk1', 'disk2', ....
+	    # To specify two sets of disks:
+	    [ 'disk1', 'disk2', .... ],
+	    [ 'diskn', 'disktn+1', .... ],
+	],	
+    );
+
+=head3 destroy_aggregate( %args )
+
+Destroy an aggregate using the specified arguments.  The arguments are
+as follows:
+
+    $filer->destroy_aggregate(
+	# Required arguments
+	name		=> $name,
+    );
+
+=head2 Volume Specific Methods
+
+=head3 get_volume_names
+
+Returns a list of strings, each of which is the name of a volume on
+the filer.
+
+=head3 get_volumes
+
+Returns a list of NetApp::Volume objects, each of which represents a
+volume on the filer.
+
+=head3 get_volume( $name )
+
+Returns a single NetApp::Volume object for the specified volume name.
+
+=head2 Qtree Specific Methods
+
+=head3 get_qtree_names
+
+Returns a list of strings, each of which is the name of a qtree on the
+filer.
+
+=head3 get_qtrees
+
+Returns a list of NetApp::Qtree objects, each of which represents a
+single qtree on the filer.
+
+=head3 get_qtree( $name )
+
+Returns a single NetApp::Qtree object for the specified qtree
+name. The name must in the form of a pathname, for example:
+
+    /vol/volume_name/qtree_name
+
+The qtree_name is optional if querying the object for a volume's qtree.
+
+=head3 create_qtree( %args )
+
+Creates a qtree on the filer.  The arguments are as follows:
+
+    $filer->create_qtree(
+	# Required arguments
+	name		=> $name,
+	# Optional arguments
+	mode	      	=> $mode,
+	security	=> 'unix' | 'ntfs' | 'mixed',
+	oplocks		=> 0 | 1,
+    );
+
+=over
+
+=item (required) name
+
+The name of the qtree to create.
+
+=item (optional) mode
+
+The UNIX mode bits to use when creating the qtree.
+
+=item (optional) security
+
+The security of the qtree.  This must be one of: unix, ntfs, or mixed.
+
+=item (optional) oplocks
+
+This option specified whether or not oplocks are to be enabled on the
+qtree.  The value is interpreted in a boolean context, true meaning
+"enabled" and false meaning "disabled".
+
+=back
+
+=head2 Snapmirror Specific Methods
+
+=head3 set_snapmirror_state( $state )
+
+Sets the snapmirror state on the filer to the specified value, which
+must be either of the strings "off" or "on".
+
+=head3 get_snapmirror_state
+
+Returns a string, either "off" or "on", indicating whether or not
+snapmirror is turned off or on for this filer.
+
+=head3 get_snapmirrors
+
+Returns a list of NetApp::Snapmirror objecte, each of which represents
+a single snapmirror relationship on the filer.
+
+=head2 Export Specific Methods
+
+There is one general purpose method to retrieve all of the NFS exports
+on a filer, and 4 special purpose ones that make it easy to see the
+difference between the contents of /etc/exports, and the live exports
+reported by "exportfs".
+
+=head3 get_exports
+
+Returns a list of NetApp::Filer::Export objects, each of which
+represents an NFS export on the filer.
+
+=head3 get_permanent_exports
+
+Returns a list of NetApp::Filer::Export objects, each of which
+represents a permanent export, which is one found in the /etc/exports
+file.
+
+=head3 get_temporary_exports
+
+Returns a list of NetApp::Filer::Export objects, each of which
+represents a temporary export, which is one NOT found in the
+/etc/exports file.  Temporary exports are ones created manually, using
+"exportfs -io", or by using the "exportfs -b" option to fence clients,
+or any other command which creates a live NFS export that has not yet
+been written to /etc/exports, and which will not survive a reboot of
+the filer.
+
+=head3 get_active_exports
+
+Returns a list of NetApp::Filer::Export objects, each of which
+represents a active export.  Active exports are those reported by the
+"exportfs" command.  They can be permanent, if they are found in
+/etc/exports, or temporary, if created by hand.
+
+=head3 get_inactive_exports
+
+Returns a list of NetApp::Filer::Export objects, each of which
+represents a inactive export.  An inactive export is a permanent
+export found in /etc/exports, but which is NOT found in the list of
+active exports reported by "exportfs".  If the options of a permanent
+export are changed, but not saved to /etc/exports (eg. re-export
+something with "exportfs -io"), then the active, temporary export for
+that same path, and the inactive, permanent export in /etc/exports can
+both exist concurrently.
+
+=cut

@@ -1,0 +1,296 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+# ABSTRACT: Perl script for decoding MQTT messages from IP packets
+# PODNAME: net-mqtt-trace
+
+
+use strict;
+
+use Net::MQTT::Constants;
+use Net::MQTT::Message;
+use Net::Pcap;
+use Time::HiRes;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my $verbose = 1;
+my $print_link = 0;
+my $print_ip = 0;
+my $print_tcp = 0;
+my $print_mqtt = 1;
+my $count = -1;
+my $snaplen = 65535;
+my $promisc = 0;
+my $timeout = 0;
+my $help;
+my $man;
+GetOptions('help|?' => \$help,
+           'man' => \$man,
+           'link+' => \$print_link,
+           'ip+' => \$print_ip,
+           'tcp+' => \$print_tcp,
+           'mqtt+' => \$print_mqtt,
+           'count=i' => \$count,
+           'snaplen=i' => \$snaplen,
+           'promisc!' => \$promisc,
+           'timeout=i' => \$timeout,
+           'quiet!' => sub { $verbose = 0 },
+           'verbose+' => \$verbose,
+          ) or pod2usage(2);
+pod2usage(1) if ($help);
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+my $dev = shift || pod2usage(2);
+
+my $glob = {};
+$glob->{t} = Time::HiRes::time;
+
+my $pcap;
+my $err;
+if ($dev =~ /\.tcp$/) {
+  # seems to be a file
+  # assume the filter was provide to the tcpdump command
+  $pcap = Net::Pcap::open_offline($dev, \$err);
+  $err and die 'Net::Pcap::open_offline failed: '.$err;
+} else {
+  # seems to be a device
+  my $net;
+  my $mask;
+  Net::Pcap::lookupnet($dev, \$net, \$mask, \$err);
+  $err and die 'Net::Pcap::lookupnet failed: '.$err;
+
+  $pcap = Net::Pcap::open_live($dev, $snaplen, $promisc, $timeout, \$err);
+  $err and die 'Net::Pcap::open_offline failed: '.$err;
+
+  my $filter;
+  Net::Pcap::compile($pcap, \$filter, 'tcp and port 1883', 1, $mask);
+  $err and die 'Net::Pcap::compile failed: '.$err;
+
+  Net::Pcap::setfilter($pcap, $filter);
+}
+print STDERR "Processing $dev\n" if ($verbose);
+
+Net::Pcap::loop($pcap, $count, \&packet, "");
+Net::Pcap::close($pcap);
+printf STDERR
+  "Elapsed processing time: %.02f\n", Time::HiRes::time - $glob->{t}
+  if ($verbose);
+
+END {
+  if (defined $glob->{count}->{total}) {
+    print STDERR "Trace contained ", $glob->{count}->{total}, " packets\n"
+      if ($verbose);
+    if ($verbose>1) {
+      printf STDERR "%-10s %s\n", qw/Type Count/;
+      foreach (sort keys %{$glob->{count}}) {
+        next if ($_ eq 'total');
+        printf STDERR "%-10s %d\n", $_, $glob->{count}->{$_};
+      }
+    }
+  }
+}
+
+sub packet {
+  my ($user, $hdr, $pkt) = @_;
+
+  $glob->{start} = $hdr->{tv_sec}+$hdr->{tv_usec}/1000000
+    unless (exists $glob->{start});
+  $glob->{end} = ($hdr->{tv_sec}+$hdr->{tv_usec}/1000000);
+  my $time = $glob->{end} - $glob->{start};
+  $glob->{count}->{total}++;
+  printf(STDERR
+         "Packet: %4d len=%-4d t=%-6.4f\n",
+         $glob->{count}->{total}, $hdr->{len}, $time) if ($print_link);
+
+  my ($mac_dst, $mac_src, $type, $ip) = unpack("a6 a6 n a*",$pkt);
+
+  printf STDERR "Mac: %s %s 0x%04x\n",
+    (unpack 'H6', $mac_dst), (unpack 'H6', $mac_src), $type if ($print_link>1);
+  my ($tcp, $proto, $src, $dst);
+
+  if ($type == 0x0800) {
+
+    my $byte;
+    ($byte, $proto, $src, $dst)  = unpack 'C x8 C x2 a4 a4', $ip;
+    my $ip_ver = ($byte&0xf0) >> 4;
+    my $ip_len = ($byte&0xf) << 2;
+    if ($ip_ver != 4) {
+      warn " not IPv4\n";
+      return;
+    }
+
+    $tcp = substr $ip, $ip_len;
+
+  } elsif ($type == 0x86dd) {
+
+    my ($byte, $ip_len);
+    ($byte, $ip_len, $proto, $src, $dst) = unpack 'C x3 n C x1 a16 a16', $ip;
+    my $ip_ver = ($byte&0xf0) >> 4;
+    if ($ip_ver != 6) {
+      warn " not IPv6\n";
+      return;
+    }
+
+    $tcp = substr $ip, 40;
+
+  } else {
+    warn " not IPv4 or IPv6 protocol\n";
+    return;
+  }
+
+  unless ($proto == 6) {
+    warn " not TCP\n";
+    return;
+  }
+
+  my ($srcp, $dstp, $data_offset) = unpack("n n x4 x4 C",$tcp);
+  my $key = $src.':'.$srcp.'!'.$dst.':'.$dstp;
+  my $length = ($data_offset&0xf0) >> 2;
+  my $payload = substr $tcp, $length;
+
+  my $src_str = (unpack 'H*', $src).':'.$srcp;
+  $src_str =~ s/^0+//;
+  my $dst_str = (unpack 'H*', $dst).':'.$dstp;
+  $dst_str =~ s/^0+//;
+  printf STDERR "TCP: src=%s dst=%s len=%d\n",
+    $src_str, $dst_str, length($payload) if ($print_tcp);
+
+  # filter should have been applied but just in case
+  unless ($srcp == 1883 || $dstp == 1883) {
+    warn " not MQTT\n";
+    return;
+  }
+
+  return unless (length $payload);
+
+  my $saved = delete $glob->{save}->{$key};
+  if (defined $saved) {
+    print STDERR "Restoring ", (unpack 'H*', $saved), "\n" if ($print_mqtt>2);
+    $payload = $saved.$payload;
+  }
+
+  print STDERR "Payload: ", (unpack 'H*', $payload), "\n" if ($print_mqtt>1);
+
+  my $mqtt = Net::MQTT::Message->new_from_bytes($payload, 1);
+  $glob->{save}->{$key} = $payload if (defined $payload && $payload ne '');
+  return unless ($mqtt);
+  print "MQTT: ", $mqtt->string, "\n" if ($print_mqtt);
+  $glob->{count}->{message_type_string($mqtt->message_type)}++;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+net-mqtt-trace - Perl script for decoding MQTT messages from IP packets
+
+=head1 VERSION
+
+version 1.163170
+
+=head1 SYNOPSIS
+
+  net-mqtt-trace [options] {dev|dumpfile}
+
+  # live decode
+  # decode MQTT packets that are visible on the interface eth0
+  net-mqtt-trace eth0
+
+  # batch decode
+  # sniff 100 MQTT packets from eth0 and write them to mqtt.tcp
+  # then later decode MQTT messages from tcpdump file
+  tcpdump -w mqtt.tcp -i eth0 -c 100 -s 4096 tcp and port 1883
+  net-mqtt-trace mqtt.tcp
+
+=head1 DESCRIPTION
+
+This script is an MQTT message decoder for IP packets.  Packets can be
+decoded live by sniffing traffic on a network interface or they can be
+batched processed by reading them from a tcpdump file.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-help>
+
+Print a brief help message.
+
+=item B<-man>
+
+Print the manual page.
+
+=item B<-verbose>
+
+Include more verbose output.  By default, the start and end of
+processing produce a little output.  This option turns on further
+output including a summary of the counts of different packets decoded.
+
+=item B<-quiet>
+
+Remove even the basic verbose output.
+
+=item B<-link>
+
+Print link layer - assumed to be Ethernet - information.  This option
+may be repeated to get further output.
+
+=item B<-ip>
+
+Print ip layer information.  This option may be repeated to get
+further output.
+
+=item B<-tcp>
+
+Print TCP layer information.  This option may be repeated to get
+further output.
+
+=item B<-mqtt>
+
+Print MQTT message information.  This option may be repeated to get
+further output.
+
+=item B<-count NNN>
+
+Stop processing after the given number of packets.  The default is to
+process all packets.
+
+=item B<-snaplen NNN>
+
+Maximum length of data to capture for each packet.  Default is 65535.
+This is only used when capturing directly from a device.
+
+=item B<-promisc>
+
+Turn on promiscuous mode.  Default is off.  This is only used when
+capturing directly from a device.
+
+=item B<-timeout NNN>
+
+The read timeout in milliseconds.  Default is 0 (no timeout).  This is
+only used when capturing directly from a device.
+
+=back
+
+=head1 SEE ALSO
+
+Net::MQTT::Message(3), Net::Pcap(3), tcpdump(8)
+
+=head1 AUTHOR
+
+Mark Hindess <soft-cpan@temporalanomaly.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Mark Hindess.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,9 @@
+Revision history for Net-LDAP-Makepath
+
+1.0.1	2010-06-26/03:50
+		-Update the required modules.
+		-Minor POD naming correction.
+
+1.0.0	2008-05-06/19:30
+		Initial release.
+

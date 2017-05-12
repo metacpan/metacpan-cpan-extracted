@@ -1,0 +1,11 @@
+Revision history for Net-Duowan-DNS
+
+1.2.0    2013/11/26
+       To work with the new DNS API 1.2
+
+1.1    2013/07/26
+       Some bugs fixed, like url_encode and empty hostname
+
+1.0    2013/07/25
+       First version, Perl client for Duowan's CloudNS API
+

@@ -1,0 +1,85 @@
+<h2><a href="#">Nes 1.00 Release</a></h2>
+<h3>Qué puede hacer por ti Nes</h3>
+<p>
+Con Nes puedes hacer lo mismo o más que con cualquier otro sistema de plantillas
+solo que <b>mucho más rápido</b> y  <b>mucho más fácil</b>. El tiempo es el recurso
+más valioso.
+</p>
+<p>
+Algunas de las características de Nes:
+</p>
+<h3>Simplicidad</h3>
+<p> 
+Nes dispone de <b><a href="./?action=item&item=Nes Tags">únicamente diez Tags</a></b> para 
+incluir en el HTML, y <b><a href="./?action=item&item=La clase Singleton">un sólo objeto</a></b>
+con <b><a href="./?action=item&item=La clase Singleton">un único método</a></b> que instanciar 
+en Perl. Podrás empezar a trabajar con Nes en horas, y no en semanas o meses 
+como en otros sistemas.
+</p> 
+
+<h3>Seguridad</h3>
+<p> 
+Gestión transparente de <a href="./?action=item&item=Seguridad">inyección de código y cross-site scripting</a>.
+Plugins para crear 
+<a href="./?action=item&item=Formularios seguros">formularios seguros</a>; <a href="./?action=item&item=Plugin Forms">Forms</a> y <a href="./?action=item&item=Plugin Captcha">Captcha</a>.
+</p> 
+
+<h3>Objetos</h3>
+<p> 
+<a href="./?action=item&item=Paradigma Nes">Paradigma</a> orientado a <a href="./?action=item&item=Objetos">objetos</a>
+ que te permitirá reutilizar tu código o usar librerías de terceros. Los Objetos son la 
+ característica principal Nes y que lo hace distinto a otros sistemas.
+</p> 
+
+<h3>Orientado al HTML</h3>
+<p> 
+Nes está orientado al HTML y no al código Perl. Esto significa que apenas exporta funciones 
+Perl, y que además de simplificar, supone que los <a href="./?action=item&item=Objetos">Objetos Nes</a>
+pueden contener también código HTML, Javascript, CSS, Ajax, etc. incluso PHP, o una mezcla.
+</p> 
+
+<h3>Wrapper</h3>
+<p> 
+Soporte total de <a href="./?action=item&item=Nes como  Wrapper">PHP Wrapper</a>. Puedes 
+utilizar Nes como Wrapper para añadir funcionalidad a otros tipos
+como HTML, o en PHP para intercambiar información.
+</p> 
+
+<h3>mod_perl</h3>
+<p> 
+Compatibilidad con <a href="./?action=item&item=mod_perl">mod_perl</a>.
+</p> 
+
+<h3>Sesiones</h3>
+<p> 
+Creación y <a href="./?action=item&item=Sesiones">gestión de sesiones</a> de usuario.
+</p> 
+
+<h3>Plugins</h3>
+<p> 
+Se le puede añadir funcionalidad a Nes mediante <a href="./?action=item&item=Plugins">Plugins</a>
+que puedes crear tu mismo o usar los de terceros.
+</p> 
+
+<h3>PHP y otros</h3>
+<p> 
+Para insertar partes de código PHP en Nes sólo hay que teclear un Tag, Nes permite
+la <a href="./?action=item&item=Incluir PHP y otros">inserción en tus plantillas de script</a> 
+en otros lenguajes distintos a Perl sin escribir una sola linea de código Perl.
+Además la mayoría de ellos pueden contener Tags Nes y se tratados como 
+plantillas de Nes.
+</p> 
+
+<h3>SQL</h3>
+<p> 
+Puedes insertar sentencias <a href="./?action=item&item=Tag sql (SQL SELECT)">SQL SELECT</a> 
+en tus plantillas directamente.
+</p> 
+
+<h3>Archivos de configuración</h3>
+<p> 
+Nes provee de <a href="./?action=item&item=Archivo de configuración Nes">archivos de configuración</a> 
+( .nes.cfg ) al estilo de los .htaccess que podrás utilizar también para tus script.
+</p> 
+
+

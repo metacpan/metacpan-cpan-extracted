@@ -1,0 +1,48 @@
+NAME
+    Net::SSDP - Simple Service Discovery Protocol implementation
+
+SYNOPSIS
+      use Glib;
+      use Net::SSDP;
+
+      my $mainloop = Glib::MainLoop->new;
+      my $client = Net::SSDP::Client->new($mainloop->get_context);
+
+      my $browser = Net::SSDP::ResourceBrowser->new($client);
+
+      $browser->signal_connect('resource-available' => sub {
+          my ($browser, $usn, $locations) = @_;
+          print "Resource $usn became available";
+      });
+
+      $browser->signal_connect('resource-unavailable' => sub {
+          my ($browser, $usn) = @_;
+          print "Resource $usn became unavailable";
+      });
+
+      $browser->set_active(1);
+
+      $mainloop->run;
+
+DESCRIPTION
+    This module is an implementation of the Simple Service Discovery
+    Protocol (SSDP). It allows network clients to discover and announce
+    network services. SSDP is the basis of Universal Plug and Play (UPnP).
+
+SEE ALSO
+    Net::SSDP::Client
+
+    Net::SSDP::ResourceBrowser
+
+    Net::SSDP::ResourceGroup
+
+AUTHOR
+    Florian Ragwitz <rafl@debian.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2009 Florian Ragwitz
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License Version 2.1, February 1999
+

@@ -1,0 +1,53 @@
+Revision history for Perl extension Number::Continuation.
+
+0.05  2016-03-15  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.04_04  2016-03-14  <schubiger@cpan.org>
+
+ - Add metadata repository link.
+
+ - Update license link.
+
+0.04_03  2016-02-25  <schubiger@cpan.org>
+
+ - Skip documentation tests for non-release testing.
+
+0.04_02  2016-02-05  <schubiger@cpan.org>
+
+ - Test calling conventions of continuation().
+
+0.04_01  2016-01-28  <schubiger@cpan.org>
+
+ - Major code refactoring.
+
+ - Amend documentation slightly.
+
+ - Validation of arguments is now handled by Params::Validate.
+
+ - Use the "boolean" pragma for true/false values.
+
+ - Do no longer recommend Test::Pod and Test::Pod::Coverage.
+
+ - Adjust indentation and omit diagnostic for test file.
+
+0.04 Sun Mar  2 16:26:32 CET 2008
+
+ - Added validation routine for input.
+
+0.03 Tue Feb 13 18:02:07 CET 2007
+
+ - Avoiding expensive copy of @_ to an array with more readable
+   name when entering continuation(). When processing a large
+   array with continuation() this change should allow for a 
+   remarkable speed increase (untested).
+
+0.02 Mon Feb 12 01:47:24 CET 2007
+
+ - The Pod explaining the syntax of continuation() contained
+   too many escaping backslashes which I didn't spot initially.
+
+0.01 Sun Feb 11 20:09:30 CET 2007
+
+ - Initial version.

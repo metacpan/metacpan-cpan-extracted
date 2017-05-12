@@ -1,0 +1,13 @@
+Revision history for Perl extension NetAddr::IP::Obfuscate.
+
+0.01  Wed Jun 22 15:22:28 2005
+	- original version; created by h2xs 1.23 with options
+		-XAn NetAddr::IP::Obfuscate
+
+0.02  Fri Jun 24 14:06:00 2005
+	- Got rid of File::Slurp, after I noticed differences
+	in STDIN handling between 9999.01 and 9999.09. Replaced
+	with my own _file_slurp and _file_burp. Not quite as
+	fast, but one less dependency. Changed "STDIN" argument
+	to "-" to be more like Perl's own open.
+

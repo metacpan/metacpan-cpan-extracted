@@ -1,0 +1,58 @@
+{
+   "abstract" : "Simple interface for Amazon DynamoDB",
+   "author" : [
+      "Ulrich Kautz <uk@fortrabbit.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Amazon-DynamoDB",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Cache" : 0,
+            "Cache::Memory" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : 0,
+            "DateTime::Format::HTTP" : 0,
+            "DateTime::Format::Strptime" : 0,
+            "DateTime::TimeZone" : 0,
+            "DateTime::TimeZone::Local" : 0,
+            "Digest::SHA" : 0,
+            "HTTP::Request" : 0,
+            "JSON" : 0,
+            "LWP::ConnCache" : 0,
+            "LWP::Protocol::https" : 0,
+            "LWP::UserAgent" : 0,
+            "Moose" : "1",
+            "Net::Amazon::AWSSign" : 0,
+            "Time::HiRes" : 0,
+            "XML::Simple" : 0,
+            "perl" : "5.010000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.1.16"
+}

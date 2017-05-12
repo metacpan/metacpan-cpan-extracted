@@ -1,0 +1,36 @@
+Revision history for Net::Nessus::REST
+
+0.6 Tue, 08 Mar 2016
+- first actual tests against a live Nessus server
+- fix get_scan_details() method (Denis Joiret)
+- correctly fix list_scanners() method (Todd Bruner)
+- add stop_scan() method (Todd Bruner)
+
+0.5.2 Sat, 26 Feb 2016
+- fix retrieval of scan history (Denis Joiret)
+
+0.5.1 Sat, 06 Feb 2016
+- fix import_policy() method (Asgeir Aegisson)
+- keep pod and kwalitee tests for author only (fix #111699)
+
+0.5 Sun, 31 Jan 2016
+* add multiple policy management methods (Asgeir Aegisson)
+* change list_plugin_families return value, for consistency (Asgeir Aegisson)
+* additional documentation fixes (Asgeir Aegisson)
+* use versioned dependency on LWP::UserAgent for delete() method usage
+
+0.4 Sun, 12 Jul 2015
+* fix breakage in download_scan() method,
+  introduced by my fault in previous release
+* fix a few documentation issues in synopsis
+
+0.3 Mon, 06 Jul 2015
+* added scanner ID query functionality (Fabrice Durand)
+* allow to return report content as a string instead of a file (Fabrice Durand)
+* fix scanners list method (Todd Bruner)
+
+0.2 Sat, 14 Feb 2015
+* added plugin query functionality (Todd Bruner)
+
+0.1 Mon, 22 Dec 2014
+* initial release

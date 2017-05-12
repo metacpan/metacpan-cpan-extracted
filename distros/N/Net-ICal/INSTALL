@@ -1,0 +1,108 @@
+Net-ICal Installation Instructions
+==================================
+
+#########################################################################
+Note, this is ALPHA QUALITY SOFTWARE, and versions after 0.12alpha have a
+different interface than .11. Read the documentation for individual
+classes for more information. It's not finished yet; if it breaks, you
+get to keep both pieces.
+#########################################################################
+
+OVERVIEW FOR THE IMPATIENT
+==========================
+
+For best results, you should be running Perl 5.6.1. It's the latest
+stable version, and it's what the developers use. This module
+*will not work* under Perl 5.005.
+
+Obtain Class::MethodMapper
+
+      $ perl -MCPAN -e 'install Class::MethodMapper'
+
+Obtain Date::Calc
+
+      $ perl -MCPAN -e 'install Date::Calc'
+
+Obtain Date::ICal
+
+      $ perl -MCPAN -e 'install Date::ICal'
+
+Install the integrated Perl 5 modules into
+
+    a) your existing Perl system under 
+       /path/to/existing/perl/area/lib/site_perl/Net/:
+
+      $ perl Makefile.PL
+      $ make
+      $ make test
+      $ make install
+
+    b) a private area of your own under
+       /path/to/your/perl/area/lib/site_perl/Net/:
+
+      $ perl Makefile.PL PREFIX=/path/to/private/perl/area/
+      $ make
+      $ make test
+      $ make install
+
+
+DETAILED DESCRIPTION
+====================
+
+1. Requirements
+   ------------
+
+     Perl 5.005 or greater is required.
+
+     Class::MethodMapper and Date::Calc are required.  These can be obtained 
+     via CPAN (http://www.cpan.org/).  Alternatively, if you have the CPAN
+     module installed use:
+     	$ perl -MCPAN -e 'install Class::MethodMapper'
+     	$ perl -MCPAN -e 'install Date::Calc'
+     	$ perl -MCPAN -e 'install Date::ICal'
+     
+2. Configuring the source
+   ----------------------
+
+     Configure the ePerl sources via standard MakeMaker procedure 
+     for building the Perl 5 interface modules:
+
+        $ [/path/to/bin/]perl Makefile.PL [PREFIX=/path/to/private/perl/area/]
+
+3. Build the object files
+   ----------------------
+
+     Now you are ready to run the build process. Start it with a simple
+     ``Make'' call:
+
+        $ make
+
+4. Run the Test suite
+   ------------------
+
+     You can now run a test suite which will check if the programs work
+     correctly before they get finally installed. I highly recommend you to do
+     this step, even it is optional and not really required.
+     
+        $ make test
+
+    (SPECIAL NOTE FOR 0.14: tests are failing; we know this, and it's okay.
+    see TODO for how you can help.)
+
+5. Installation
+   ------------
+     
+     Finally install Net-ICal
+
+        $ make install
+
+6. Cleanup
+   -------
+
+     Now cleanup the source tree to make it a vanilla distribution again.
+
+        $ make distclean
+
+
+
+(with thanks to the eperl project for inspiration with the INSTALL file)

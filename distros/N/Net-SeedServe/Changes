@@ -1,0 +1,37 @@
+Revision history for Perl extension Net::SeedServe.
+
+0.2.7   2016-04-11
+    - Fix tests' parallelisation by getting rid of a common status_file
+    pathname.
+        - see HARNESS_OPTIONS='j9' ./Build test
+
+0.2.6   2015-12-29
+    - Made reading the status file more robust.
+
+0.2.5   2015-12-28
+    - Update away from old E-mail address.
+
+0.2.4   2014-01-31
+    - The abstract should be on one line.
+        - https://rt.cpan.org/Ticket/Display.html?id=92623
+        - Thanks to NEILB for the report.
+
+0.2.3   2014-01-31
+    - Add the Mercurial repository to the Build.PL (and META.yml).
+
+0.2.2   2014-01-31
+    - Add LICENSE file (CPANTS).
+    - Add minimum version of perl to Build.PL.
+
+0.2.1   2006-10-29
+    - Added the Build.PL file (to have license meta-data, etc.) The Makefile.PL
+    is now auto-generated from it.
+    - Added the pod.t and pod-coverage.t test files and made sure
+    there's full POD:
+        - Some API methods were documented - others were converted to be
+        internal (start with underscore).
+    - Added the Gimp-Test-Harness.pl example in the examples/ directory.
+
+0.2.0   2005-02-21
+    - First released version.
+

@@ -1,0 +1,28 @@
+
+Feb 21 2001:
+
+Finally the VSA packing/unpacking works with 3Com equipment. Ian Smith
+contributed  code to  unpack  VSAs  coming from  the  3Com. Quan  Choi
+reported   useful   information   regarding   the  encoding   of   the
+VSAs.  According  to  Quan,  3Com  packs the  VSAs  according  to  the
+following structure:
+
+   0                   1                   2                   3
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |     Type      |  Length       |            Vendor-Id
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        Vendor-Id (cont)           |      Sub-Attribute Type       
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+          Sub-Attribute Type       |        Payload...             |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+Which is fine,  as RFC-2138 does not mandate  any particular structure
+for the Vendor-Specific payload.
+
+Thanks to both Ian and Quan for the help.
+
+luismunoz@cpan.org
+
+$Id: README.3COM 7 2003-01-08 03:42:41Z lem $
+

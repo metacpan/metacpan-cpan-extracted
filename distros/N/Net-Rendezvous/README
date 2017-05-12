@@ -1,0 +1,23 @@
+This is Net::Rendezvous, a set of perl modules to utilize mDNS for service
+discovery.
+
+Requirements: 
+	perl >= 5.6.0
+	Net::DNS >= 0.44
+
+Install the library by running these commands:
+
+   perl Makefile.PL
+   make
+   make install
+
+Please report any bugs/suggestions to George Chlipala <george@walnutcs.com>
+
+All files contained in this installation are Copyright (c) 1995-2003
+George Chlipala unless otherwise specified. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify it under 
+the same terms as Perl itself.
+
+
+

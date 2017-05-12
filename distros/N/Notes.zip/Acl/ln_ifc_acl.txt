@@ -1,0 +1,56 @@
+MODULE =    Notes::Acl   PACKAGE = Notes::Acl
+
+PROTOTYPES: DISABLE
+
+DESTROY( a )
+
+save( a )
+
+full_entry_namelist( a )
+
+entries_by_name( a, ... )
+      entries
+
+add_entries_by_name( a, ... )
+      add_entries
+add_persons_by_name
+      add_persons
+add_servers_by_name
+      add_servers
+add_groups_by_name
+      add_groups
+
+add_fullaccess_entries_by_name
+      add_fullaccess_entries
+add_fullaccess_persons_by_name
+      add_fullaccess_persons
+add_fullaccess_servers_by_name
+      add_fullaccess_servers
+add_fullaccess_groups_by_name
+      add_fullaccess_groups
+
+remove_entries_by_name( a, ... )
+      remove_entries
+rename_entries_by_name( a, ... )
+      rename_entries
+
+
+
+
+full_role_namelist( a )
+full_v2_priviliges_namelist =  1
+
+add_roles_by_name( a, ... )
+      add_roles
+add_v2_priviliges_by_name
+      add_v2_priviliges
+
+remove_roles_by_name( a, ... )
+      remove_roles
+remove_v2_priviliges_by_name
+      remove_v2_priviliges
+
+rename_roles_by_name
+      rename_roles
+rename_v2_priviliges_by_name
+      rename_v2_priviliges

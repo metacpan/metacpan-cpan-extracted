@@ -1,0 +1,9 @@
+p  { font-family: Verdana,Arial; }
+a  { font-family: Verdana,Arial; }
+td { font-family: Verdana,Arial; 
+     font-size: x-small; background: #FFFFF0 }
+th { font-family: Verdana,Arial; 
+     font-weight: bolder; background: #F0FFEE }
+h1,h2,h3,h4 { font-family: Verdana,Arial; text-align: center }
+li { font-family: Verdana,Arial; font-size: x-small }
+code { font-weight: bold }

@@ -1,0 +1,77 @@
+NAME
+
+Net::LastFM::Submission - Perl interface to the Last.fm Submissions Protocol
+
+SYNOPSIS
+
+	use Net::LastFM::Submission;
+	
+	my $submit = Net::LastFM::Submission->new(
+		'user'      => 'net_lastfm',
+		'password'  => '12',
+	);
+	
+	$submit->handshake;
+	
+	$submit->submit(
+		'artist' => 'Artist name',
+		'title'  => 'Track title',
+		'time'   => time - 10*60, # 10 minutes ago
+	);
+	
+	$submit->now_playing(
+		'artist' => 'Artist name',
+		'title'  => 'Track title',
+	);
+
+DESCRIPTION
+
+The module provides a simple Perl interface to the Last.fm Submissions Protocol (current version is 1.2.1).
+
+The Last.fm Submissions Protocol is designed for the submission of now-playing and recent historical track data to Last.fm user profiles (aka 'Scrobbling').
+
+http://www.lastfm.ru/api/submissions
+
+See exmaples/*
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+	perldoc Net::LastFM::Submission
+
+You can also look for information at:
+
+	RT, CPAN's request tracker
+		http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-LastFM-Submission
+	
+	CPANTS, CPAN Testing Service
+		http://cpants.perl.org/dist/overview/Net-LastFM-Submission
+	
+	AnnoCPAN, Annotated CPAN documentation
+		http://annocpan.org/dist/Net-LastFM-Submission
+	
+	CPAN Ratings
+		http://cpanratings.perl.org/d/Net-LastFM-Submission
+	
+	Search CPAN
+		http://search.cpan.org/dist/Net-LastFM-Submission/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Anatoly Sharifulin
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

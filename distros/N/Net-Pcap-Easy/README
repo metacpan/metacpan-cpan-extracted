@@ -1,0 +1,26 @@
+
+Net::Pcap does the job, but it's confusing and difficult to operate.  This
+module solves that problem in a relatively general way.
+
+I wanted a way to build libpcap filters really quickly.  It shouldn't take two
+hours to crank one out, particularly since I imagine they all kinda look the
+same.  So, I wrote this to simplify writing sniffers really quickly.
+
+use strict;
+use warnings;
+use Net::Pcap::Easy;
+
+my $npe = Net::Pcap::Easy->new(
+    dev              => "lo",
+    filter           => "host 127.0.0.1 and icmp",
+    packets_per_loop => 10,
+    bytes_to_capture => 1024,
+
+    icmp_callback => sub {
+        my ($npe, $ether, $ip, $icmp) = @_;
+
+        print "ICMP: $ether->{src_mac}:$ip->{src_ip} -> $ether->{dest_mac}:$ip->{dest_ip}\n";
+    },
+);
+
+1 while $npe->loop;

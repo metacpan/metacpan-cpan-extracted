@@ -1,0 +1,17 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Net/Bamboo.pm
+lib/Net/Bamboo/Build.pm
+lib/Net/Bamboo/Plan.pm
+lib/Net/Bamboo/Project.pm
+t/00-compile.t
+t/bamboo.t
+t/projects
+t/release-eol.t
+t/release-pod-syntax.t
+t/results-cantaloupe
+t/results-orange

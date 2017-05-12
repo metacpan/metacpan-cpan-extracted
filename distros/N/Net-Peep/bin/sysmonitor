@@ -1,0 +1,80 @@
+#!/usr/bin/perl
+
+require 5.00503;
+
+use Net::Peep::Client::Sysmonitor;
+
+$sysmonitor = new Net::Peep::Client::Sysmonitor;
+$SIG{'INT'} = $SIG{'TERM'} = sub { $sysmonitor->shutdown(); exit 0; };
+$sysmonitor->Start();
+
+__END__
+
+=head1 NAME
+
+Sysmonitor - Client application for Peep: The Network Auralizer.
+
+=head1 SYNOPSIS
+
+Sysmonitor is a client for Peep which monitors system performance
+statistics such as uptime, load, memory usage, etc. and translates
+them into a Peep "state".
+
+States are broadcast to the Peep server, peepd, which then translates
+the state into an aural signal such as running water or a chirping
+bird.
+
+This application is a part of Peep and requires that the Peep Perl
+modules have been installed.
+
+=head1 COMMAND-LINE OPTIONS
+
+system supports the following command-line options:
+
+    --loadsound=[STRING]  
+    --usersound=[STRING]
+    --loadloc=[STRING]
+    --userloc=[STRING]
+    --maxload=[NUMBER]
+    --maxuser=[NUMBER]
+    --sleep=[NUMBER]      The amount of time to sleep (in seconds) between iterations
+                          of checking system functions
+
+In addition, the following options are common to all Peep clients:
+
+    --config=[PATH]       Path to the configuration file to use
+    --debug=[NUMBER]      Enable debugging. (Def:  0)
+    --nodaemon            Do not run in daemon mode
+    --pidfile=[PATH]      The file to write the pid out to (Def: /var/run/sysmonitor.pid)
+    --output=[PATH]       The file to log logparser output to (Def: stderr)
+    --noautodiscovery     Disables autodiscovery and enables the server and port options
+    --server=[HOST]       The host (or IP address) to connect to
+    --port=[PORT NO]      The port to use
+    --silent              Does not produce output.  To eliminate all output,
+                          either the debug option should be set to 0 or
+                          an output file should be specified.
+    --help                Prints a simple help message
+
+=head1 EXAMPLES
+
+sysmonitor
+
+sysmonitor --help
+
+sysmonitor --nodaemon --noautodiscovery --server=localhost --port=2001
+
+sysmonitor --nodaemon --config=$HOME/peep.conf --debug=9 
+
+=head1 AUTHOR
+
+Michael Gilfix <mgilfix@eecs.tufts.edu> Copyright (C) 2000
+
+Collin Starkweather <collin.starkweather@colorado.edu>
+
+=head1 SEE ALSO
+
+perl(1), peepd(1), Net::Peep::Client, Net::Peep::Client::Sysmonitor,
+peepd.
+
+http://peep.sourceforge.net
+

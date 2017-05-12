@@ -1,0 +1,227 @@
+#!/usr/local/bin/perl
+
+# Copyright (C) 2007 by Mark Atwood <mark@fallenpegasus.com>.
+#
+# This module is not an official Amazon product or service.  Information
+# used to create this module was obtained only from publicly available
+# information, mainly from the published Amazon documentation.
+#
+# This module is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published
+# by the Free Software Foundation, either version 2.1 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# and the GNU Lesser General Public License along with this program.
+# If not, see <http://www.gnu.org/licenses/>.
+
+use warnings;
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use Net::Amazon::S3;
+use Net::Amazon::S3::Bucket;
+use Getopt::ArgvFile qw/argvFile/;
+use File::HomeDir;
+
+my $aws_access_key_id = $ENV{AWS_ACCESS_KEY_ID};
+my $aws_secret_access_key = $ENV{AWS_ACCESS_KEY_SECRET};
+my $opt_verbose =0;
+my $opt_help =0;
+my $opt_man =0;
+my $opt_secure =0;
+
+# get the options from the users ~/.s3-tools file, if it exists
+my $users_config = File::HomeDir->my_home() . '/.s3-tools';
+if (-e $users_config) {
+    unshift @ARGV, '@' . $users_config;
+}
+argvFile();
+
+GetOptions('help|?' => \$opt_help, 'man' => \$opt_man,
+	   'verbose+' => \$opt_verbose,
+	   'access-key=s' => \$aws_access_key_id,
+	   'secret-key=s' => \$aws_secret_access_key,
+	   'secure' => \$opt_secure,
+	   )
+    or pod2usage(2);
+pod2usage(1) if $opt_help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $opt_man;
+
+my $s3p = { aws_access_key_id => $aws_access_key_id,
+	    aws_secret_access_key => $aws_secret_access_key };
+$s3p->{secure} = $opt_secure
+    if ($opt_secure);
+my $s3 = Net::Amazon::S3->new($s3p);
+($s3) or die("$0: fail Net::Amazon::S3: $!, stopped");
+
+my $bkts = make_bucketlist();
+foreach my $b (@{$bkts}) {
+    next unless $b->{itemkey};
+    print $b->{bucketobject}->get_key($b->{itemkey})->{value};
+}
+
+sub make_bucketlist
+{
+    my @B;
+    my ($bn, $ik, $b);
+    foreach my $arg (@ARGV) {
+	$b = undef;
+	$b->{arg} = $arg;
+	($bn, $ik) = split('/', $arg, 2);
+	$b->{bucketname} = $bn;
+	$b->{itemkey} = $ik
+	    if ($ik);
+	$b->{bucketobject} = $s3->bucket($bn);
+	push @B, $b;
+    }
+    return \@B;
+}
+
+__END__
+
+=head1 NAME
+
+s3get - Retrieve contents of S3 items
+
+=head1 SYNOPSIS
+
+s3get [options]
+
+s3get [options] [ bucket/item ...]
+
+ Options:
+   --access-key    AWS Access Key ID
+   --secret-key    AWS Secret Access Key
+ Environment:
+   AWS_ACCESS_KEY_ID
+   AWS_ACCESS_KEY_SECRET
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=item B<--verbose>
+
+Output what is being done as it is done.
+
+=item B<--access-key> and B<--secret-key>
+
+Specify the "AWS Access Key Identifiers" for the AWS account.
+B<--access-key> is the "Access Key ID", and B<--secret-key> is
+the "Secret Access Key".  These are effectively the "username" and
+"password" to the AWS account, and should be kept confidential.
+
+The access keys MUST be specified, either via these command line
+parameters, or via the B<AWS_ACCESS_KEY_ID> and
+B<AWS_ACCESS_KEY_SECRET> environment variables.
+
+Specifying them on the command line overrides the environment
+variables.
+
+=item B<--secure>
+
+Uses SSL/TLS HTTPS to communicate with the AWS service, instead of
+HTTP.
+
+=back
+
+=head1 ENVIRONMENT VARIABLES
+
+=over 8
+
+=item B<AWS_ACCESS_KEY_ID> and B<AWS_ACCESS_KEY_SECRET>
+
+Specify the "AWS Access Key Identifiers" for the AWS account.
+B<AWS_ACCESS_KEY_ID> contains the "Access Key ID", and
+B<AWS_ACCESS_KEY_SECRET> contains the "Secret Access Key".  These are
+effectively the "username" and "password" to the AWS service, and
+should be kept confidential.
+
+The access keys MUST be specified, either via these environment
+variables, or via the B<--access-key> and B<--secret-key> command line
+parameters.
+
+If the command line parameters are set, they override these
+environment variables.
+
+=back
+
+=head1 CONFIGURATION FILE
+
+The configuration options will be read from the file C<~/.s3-tools> if it
+exists.  The format is the same as the command line options with one option
+per line.  For example, the file could contain:
+
+    --access-key <AWS access key>
+    --secret-key <AWS secret key>
+    --secure
+
+This example configuration file would specify the AWS access keys and that a
+secure connection using HTTPS should be used for all communications.
+
+=head1 DESCRIPTION
+
+Retrieves S3 items, and outputs them to stdout.
+
+=head1 BUGS
+
+Report bugs to Mark Atwood L<mark@fallenpegasus.com>.
+
+Occasionally the S3 service will randomly fail for no externally
+apparent reason.  When that happens, this tool should retry, with a
+delay and a backoff.
+
+Access to the S3 service can be authenticated with a X.509
+certificate, instead of via the "AWS Access Key Identifiers".  This
+tool should support that.
+
+It might be useful to be able to specify the "AWS Access Key
+Identifiers" in the user's C<~/.netrc> file.  This tool should support
+that.
+
+Errors and warnings are very "Perl-ish", and can be confusing.
+
+Trying to access an item that does not exist or is not accessable by
+the user generates less than helpful error messages.
+
+Trying to retrieve a bucket instead of an item is silently skipped.
+
+=head1 TODO
+
+  option to write to files instead of stdout
+  option to write to paths instead of stdout
+  option to write to a tar file stream, for multiple items
+  option to write extended file attributes based on S3 & HTTP metadata
+  option to have a progress bar
+
+=head1 AUTHOR
+
+Written by Mark Atwood L<mark@fallenpegasus.com>.
+
+Many thanks to Wotan LLC L<http://wotanllc.com>, for supporting the
+development of these S3 tools.
+
+Many thanks to the Amazon AWS engineers for developing S3.
+
+=head1 SEE ALSO
+
+These tools use the L<Net::Amazon:S3> Perl module.
+
+The Amazon Simple Storage Service (S3) is documented at
+L<http://aws.amazon.com/s3>.
+
+=cut

@@ -1,0 +1,18 @@
+<changeset>
+  <body>#{unprocessed body}</body>
+  <body-html>#{processed HTML body}</body-html>
+  <changed-at type="datetime">2007-03-21T21:45:23Z</changed-at>
+  <changes type="yaml">--- 
+  - - M
+    - /trunk/test/unit/changeset_test.rb
+  - - M
+    - /trunk/app/models/changeset.rb
+  - - M
+    - /trunk/db/schema.rb
+
+  </changes>
+  <project-id type="integer">2</project-id>
+  <revision>983</revision>
+  <title>rick committed changeset [983]</title>
+  <user-id type="integer">1</user-id>
+</changeset>

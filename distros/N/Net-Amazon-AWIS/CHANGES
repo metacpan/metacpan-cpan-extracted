@@ -1,0 +1,28 @@
+Revision history for Perl module Net::Amazon::AWIS:
+
+0.34 Wed Sep  3 23:18:05 BST 2008
+	- add history method
+
+0.33 Wed Jan 16 08:05:33 GMT 2008
+     - perltidy
+     - fix to work with the new version of web service
+     - remove search as that is now another service
+
+0.32 Sun Mar 19 17:25:57 GMT 2006
+     - fixes as AWIS now requires using an AWS Access Key ID and a
+       Secret Access Key to calculate a signature, and the web service URL
+       and namespace URI have changed (patch by KCIVEY)
+
+0.31 Thu Jul  7 09:32:57 BST 2005
+     - fix due to XML namespace change, add a count option to crawl()
+       (thanks to mah)
+     - update the tests
+     - added pod coverage test
+
+0.30 Thu April 10 12:22:54 EST 2005
+     - fix minor POD issue
+     - oops, used DateTime::Format::StrpTime when I really meant
+       DateTime::Format::Strptime (spotted by Mike Castle)
+
+0.29 Thu Mar 17 22:42:04 EST 2005
+     - initial release

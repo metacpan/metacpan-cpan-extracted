@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-Dev-Tools-SyslogMessage.t
+lib/Net/Dev/Tools/SyslogMessage.pm
+examples/test1.pl

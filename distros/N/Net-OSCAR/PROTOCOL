@@ -1,0 +1,9 @@
+Our extensions to the OSCAR protocol:
+
+
+We store the following data in the SSI (buddylist) type 4 (visibility) TLV
+chain:
+	0x100: text of the user's profile
+	0x101: checksum of the user's buddy icon
+	0x102: timestamp of the user's buddy icon
+	0x103: length of the user's buddy icon

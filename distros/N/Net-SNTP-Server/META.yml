@@ -1,0 +1,23 @@
+---
+abstract: 'Perl Module SNTP Server based on L<RFC4330|https://tools.ietf.org/html/rfc4330>'
+author:
+  - "Athanasios Garyfalos <garyfalos@cpan.org\x02>"
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-SNTP-Server
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: 5.006
+resources: {}
+version: 0.06

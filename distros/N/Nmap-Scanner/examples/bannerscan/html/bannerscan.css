@@ -1,0 +1,178 @@
+body
+{
+ margin:0px;
+ padding:0px;
+ background:#AAAAAA;
+ color:white;
+ font-family:arial,helvetica,sans-serif;
+ font-size:12px;
+ text-align:left; 
+}
+a:link{
+ color:#EFD396;
+ text-decoration:none;
+}
+a:visited{
+ color:#EFD396;
+ text-decoration:none;
+}
+a:hover{
+ color:#EFD396;
+ text-decoration:underline;
+}
+a:active{
+ color:#EFD396;
+ text-decoration:none;
+}
+
+div#container{
+ width:100%;
+ position:relative;
+}
+div#header{
+ text-align:center;
+ height:13px;
+}
+
+div#header h1{
+ text-transform:lowercase;
+ font-size:10px;
+ font-weight:normal;
+ letter-spacing:6px;
+ display:inline;
+}
+
+div#intro, div#hostlist, div#host, div#footer{
+color:white;
+padding: 0px 10px 10px 10px;
+/*text-align:justify;*/
+}
+
+div#container p{
+margin:10px 0px 0px 0px;
+}
+
+div#container div#intro h3{
+color:red;
+font:bold 12px verdana,sans-serif;
+}
+
+div#intro{
+position:relative;
+top:10px;
+text-align:center;
+height:13px;
+}
+
+div#intro p{
+margin: 10px 0px 10px 0px;
+color:blue;
+}
+
+div#intro p:before {
+content:"::: ";
+font-weight:bold;
+font-family:verdana,sans-serif;
+color:blue;
+font-weight:bold;
+}
+
+div#intro p:after {
+content:" :::";
+font-weight:bold;
+font-family:verdana,sans-serif;
+color:blue;
+font-weight:bold;
+}
+
+div#hostlist{
+position:absolute;
+top:100px;
+left:10px;
+padding:0px;
+overflow:auto;
+margin-left:10px;
+margin-top:20px;
+font-size:14px;
+}
+
+div#hostlist h3{
+font-size:14px;
+text-align:left;
+}
+
+div#hostlist a{
+font-size:14px;
+text-align:left;
+margin-left:10px;
+letter-spacing:2pt;
+}
+
+
+div#host{
+position:relative;
+top:100px;
+left:250px
+padding:0px;
+overflow:auto;
+margin-left:250px;
+margin-top:20px;
+width:700px
+}
+
+div#host h3{
+color:blue;
+font-size:14px;
+}
+
+div#host p{
+color:white;
+font-size:12px;
+}
+
+div#host strong{
+color:#000070;
+font-size:12px;
+position:absolute;
+left:80px;
+}
+
+div#host tr{
+color:white;
+}
+
+div#host tr.tr1{
+color:#616161;
+}
+
+div#host tr.tr2{
+color:#000070;
+}
+
+div#host table{
+width:400px;
+border:1px;
+border-style:dashed;
+border-color:white;
+}
+
+div#footer{
+padding-top:50px;
+padding-bottom:10px;
+text-align:center;
+}
+
+div#footer h3{
+padding-top:50px;
+padding-bottom:30px;
+font-size:10px;
+height:14px;
+text-align:center;
+}
+
+
+div#footer a{
+font:bold 12px verdana,sans-serif;
+}
+
+

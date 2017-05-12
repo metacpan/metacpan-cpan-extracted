@@ -1,0 +1,24 @@
+TYPEMAP
+unsigned		T_UV
+unsigned int		T_UV
+unsigned long		T_UV
+unsigned short		T_UV
+unsigned char		T_UV
+size_t			T_UV
+
+U32			T_UV
+U16			T_UV
+U8			T_UV
+Result			T_UV
+
+#############################################################################
+INPUT
+T_UV
+	$var = ($type)SvUV($arg);
+	if ($var != SvUV($arg)) {
+		warn (\"${Package}::$func_name - $var argument truncated\");
+	}
+#############################################################################
+OUTPUT
+T_UV
+	sv_setuv($arg, (UV)$var);

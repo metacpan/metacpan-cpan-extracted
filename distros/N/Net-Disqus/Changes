@@ -1,0 +1,14 @@
+Revision history for Net-Disqus
+
+1.19      2011-04-29 07:23:18 Asia/Jakarta
+    Fix for missing Test::Exception in prerequisites
+
+1.18      2011-04-28 11:48:07 Asia/Jakarta
+    Fixed missing prerequisites 
+
+1.17      2011-04-25 05:39:55 Asia/Jakarta
+    Fix for the Interfaces.pm module, all is in order now.
+    
+
+1.16      2011-04-25 04:39:25 Asia/Jakarta
+    The interface.json file got removed in favor as including it as a module

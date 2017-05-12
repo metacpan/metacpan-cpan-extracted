@@ -1,0 +1,467 @@
+#! /usr/local/bin/perl -w
+
+use strict;
+
+use POSIX;
+use News::Scan;
+
+my $Posters;
+my $Articles = 0;
+my $Volume = 0;
+
+my $HVol = 0;
+my $HLns = 0;
+
+my $BVol = 0;
+my $BLns = 0;
+
+my $OVol = 0;
+my $OLns = 0;
+
+my $SVol = 0;
+my $SLns = 0;
+
+## subs
+sub in_kb {
+    my $val = shift;
+
+    sprintf "%.1f", ($val / 1024);
+}
+
+sub commify {
+    local $_ = shift;
+
+    1 while s/^(-?\d+)(\d\d\d)/$1,$2/;
+
+    $_;
+}
+
+sub places {
+    my $acc = shift;
+    my $val = shift;
+
+    sprintf "%.${acc}f", $val
+}
+
+sub median {
+    my @values = sort { $a <=> $b } @_;
+    my $n = @values;
+
+    if ($n % 2 == 1) {
+        return $values[$n / 2];
+    }
+    else {
+        return places 1, ($values[$n / 2] + $values[$n/2 - 1]) / 2;
+    }
+}
+
+sub mode {
+    my %scores;
+
+    local $_;
+    for (@_) {
+        $scores{$_}++;
+    }
+
+    my @scores = sort { $scores{$b} <=> $scores{$a} } keys %scores;
+    my $high = $scores[0];
+    my $freq = $scores{$high};
+
+    my $i = 0;
+    for (@scores) {
+        if ($scores{$_} != $freq) {
+            splice @scores, $i;
+            last;
+        }
+
+        $i++;
+    }
+
+    if (@scores == 1) {
+        return ($high, $freq);
+    }
+    elsif (@scores == 2) {
+        return (join(" and ", @scores), $freq);
+    }
+    else {
+        my $last = pop @scores;
+        my $ret;
+
+        $ret = join ", ", @scores;
+        $ret .= ", and $last";
+
+        return ($ret, $freq);
+    }
+}
+
+sub stdev {
+    my @values = @_;
+    my $avg = shift;
+
+    my $n = @values;
+    my $sum = 0;
+
+    local $_;
+    for (@values) {
+        $sum += ($_ - $avg) ** 2;
+    }
+
+    places(1, sqrt($sum / $n));
+}
+
+sub print_header {
+    my $scan = shift;
+
+    my $group    = $scan->name;
+    my $period   = $scan->period;
+    my $quote_re = $scan->quote_re;
+    my $earliest = strftime "%d %b %Y %H:%M:%S", gmtime($scan->earliest);
+    my $latest   = strftime "%d %b %Y %H:%M:%S", gmtime($scan->latest);
+
+    print <<EOF;
+From: Greg Bacon <gbacon\@cs.uah.edu>
+Newsgroups: $group
+Subject: New posters to $group
+
+Following is a summary of articles from new posters spanning a $period day
+period, beginning at $earliest GMT and ending at
+$latest GMT.
+
+Notes
+=====
+
+    - A line in the body of a post is considered to be original if it
+      does *not* match the regular expression /$quote_re/.
+    - All text after the last cut line (/^-- \$/) in the body is
+      considered to be the author's signature.
+    - The scanner prefers the Reply-To: header over the From: header
+      in determining the "real" e-mail address and name.
+    - Original Content Rating (OCR) is the ratio of the original content
+      volume to the total body volume.
+    - Find the News-Scan distribution on the CPAN!
+      <URL:http://www.perl.com/CPAN/modules/by-module/News/>
+    - Please send all comments to Greg Bacon <gbacon\@cs.uah.edu>.
+    - Copyright (c) 1998 Greg Bacon.  All Rights Reserved.
+      Verbatim copying and redistribution is permitted without royalty;
+      alteration is not permitted.  Redistribution and/or use for any
+      commercial purpose is prohibited.
+
+EOF
+}
+
+sub totals {
+    my $scan = shift;
+
+    my $old = $scan->posters;
+    my $posters = $Posters;
+    my $num_posters = scalar keys %$posters;
+    my $ppct = places 1, ($num_posters / scalar(keys(%$old)) * 100);
+
+    my $num_articles = $Articles;
+    my $apct = places 1, ($Articles / $scan->articles * 100);
+
+    my $total_volume = in_kb $Volume;
+    my $vpct = places 1, ($Volume / $scan->volume * 100);
+
+    my $hdr_volume   = in_kb $HVol;
+    my $hdr_lines    = commify $HLns;
+
+    my $body_volume  = in_kb $BVol;
+    my $body_lines   = commify $BLns;
+
+    my $orig_volume  = in_kb $OVol;
+    my $orig_lines   = commify $OLns;
+
+    my $sig_volume   = in_kb $SVol;
+    my $sig_lines    = commify $SLns;
+
+    my $ocr = sprintf "%.3f", ($OVol / $BVol);
+
+    print <<EOTotals;
+Totals
+======
+
+Posters:  $num_posters ($ppct% of all posters)
+Articles: $num_articles ($apct% of all articles)
+Volume generated: $total_volume kb ($vpct% of total volume)
+    - headers:    $hdr_volume kb ($hdr_lines lines)
+    - bodies:     $body_volume kb ($body_lines lines)
+    - original:   $orig_volume kb ($orig_lines lines)
+    - signatures: $sig_volume kb ($sig_lines lines)
+
+Original Content Rating: $ocr
+
+EOTotals
+}
+
+sub avgs {
+    my $scan = shift;
+
+    my $posters = $Posters;
+    my $num_posters = scalar keys %$posters;
+    my $posts_avg = places 1, ($Articles / $num_posters);
+
+    my @posts_by_poster = map { $_->articles } values %$posters;
+    my $pmed = median @posts_by_poster;
+    my($pmode, $pmode_score) = mode @posts_by_poster;
+    my $psd = stdev @posts_by_poster, ($scan->articles / $num_posters);
+
+    my $num_articles = $Articles;
+
+    my $msg = places 1, ($Volume / $num_articles);
+
+    my $hdr = places 1, ($HVol / $num_articles);
+    my $hdr_lines = places 1, ($HLns / $num_articles);
+
+    my $body = places 1, ($BVol / $num_articles);
+    my $body_lines = places 1, ($BLns / $num_articles);
+
+    my $orig = places 1, ($OVol / $num_articles);
+    my $orig_lines = places 1, ($OLns / $num_articles);
+
+    my $sig = places 1, ($SVol / $num_articles);
+    my $sig_lines = places 1, ($SLns / $num_articles);
+
+    print <<EOAvgs;
+Averages
+========
+
+Posts per poster: $posts_avg
+    median: $pmed post@{[$pmed == 1 ? "" : "s"]}
+    mode:   $pmode post@{[$pmode == 1 ? "" : "s"]} - $pmode_score poster@{[$pmode_score == 1 ? "" : "s"]}
+    s:      $psd post@{[$psd == 1 ? "" : "s"]}
+Message size: $msg bytes
+    - header:     $hdr bytes ($hdr_lines lines)
+    - body:       $body bytes ($body_lines lines)
+    - original:   $orig bytes ($orig_lines lines)
+    - signature:  $sig bytes ($sig_lines lines)
+
+EOAvgs
+}
+
+sub top_posters {
+    my $scan = shift;
+    my @top;
+    my $top_total;
+    local $_;
+
+    my $posters = $Posters;
+
+    ## by posts
+    print <<EOBanner;
+Top 10 Posters by Number of Posts
+=================================
+
+         (kb)   (kb)  (kb)  (kb)
+Posts  Volume (  hdr/ body/ orig)  Address
+-----  --------------------------  -------
+
+EOBanner
+
+    @top = ( map  { $_->[0] }
+             sort { $b->[1] <=> $a->[1] }
+             map  { [ $_, $_->articles ] }
+             values %$posters )[0 .. 9];
+
+    $top_total = 0;
+    for (@top) {
+        last unless defined $_;
+
+        my $vol = sprintf "%5.1f (%5.1f/%5.1f/%5.1f)",
+                          $_->volume / 1024,
+                          $_->header_volume / 1024,
+                          $_->body_volume / 1024,
+                          $_->orig_volume / 1024;
+
+        printf "%5d  %26s  %s\n", $_->articles, $vol,
+               $_->attrib;
+
+        $top_total += $_->articles;
+    }
+
+    printf "\nThese posters accounted for %.1f%% of all articles.\n",
+        100 * $top_total / $scan->articles;
+
+    ## by volume
+    print <<EOBanner;
+
+Top 10 Posters by Volume
+========================
+
+  (kb)   (kb)  (kb)  (kb)
+Volume (  hdr/ body/ orig)  Posts  Address
+--------------------------  -----  -------
+
+EOBanner
+
+    @top = ( map  { $_->[0] }
+             sort { $b->[1] <=> $a->[1] }
+             map  { [ $_, $_->volume ] }
+             values %$posters )[0 .. 9];
+
+    $top_total = 0;
+    for (@top) {
+        last unless defined $_;
+
+        my $vol = sprintf "%5.1f (%5.1f/%5.1f/%5.1f)",
+                          $_->volume / 1024,
+                          $_->header_volume / 1024,
+                          $_->body_volume / 1024,
+                          $_->orig_volume / 1024;
+
+        printf "%26s  %5d  %s\n", $vol, $_->articles,
+               $_->attrib;
+
+        $top_total += $_->volume;
+    }
+
+    printf "\nThese posters accounted for %.1f%% of the total volume.\n",
+        100 * $top_total / $scan->volume;
+
+    ## top OCR
+    print <<EOBanner;
+
+Top 10 Posters by OCR (minimum of three posts)
+==============================================
+
+         (kb)    (kb)
+OCR      orig /  body  Posts  Address
+-----  --------------  -----  -------
+
+EOBanner
+
+    @top = ( sort { $b->[1] <=> $a->[1] }
+             map  { [ $_, ($_->orig_volume / $_->body_volume) ] }
+             grep { $_->articles >= 3 }
+             values %$posters )[0 .. 9];
+
+    for (@top) {
+        last unless defined $_;
+
+        printf "%.3f  (%5.1f /%5.1f)  %5d  %s\n",
+               $_->[1], $_->[0]->orig_volume / 1024,
+               $_->[0]->body_volume / 1024,
+               $_->[0]->articles, $_->[0]->attrib;
+    }
+
+    ## bottom OCR
+    print <<EOBanner;
+
+Bottom 10 Posters by OCR (minimum of three posts)
+=================================================
+
+         (kb)    (kb)
+OCR      orig /  body  Posts  Address
+-----  --------------  -----  -------
+
+EOBanner
+
+    @top = ( sort { $a->[1] <=> $b->[1] }
+             map  { [ $_, ($_->orig_volume / $_->body_volume) ] }
+             grep { $_->articles >= 3 }
+             values %$posters )[0 .. 9];
+
+    for (reverse @top) {
+        next unless defined $_;
+
+        printf "%.3f  (%5.1f /%5.1f)  %5d  %s\n",
+               $_->[1], $_->[0]->orig_volume / 1024,
+               $_->[0]->body_volume / 1024,
+               $_->[0]->articles, $_->[0]->attrib;
+    }
+
+    my $total    = scalar keys %$posters;
+    my $eligible = scalar grep { $_->articles >= 3 } values %$posters;
+    my $pct      = sprintf "%d", 100 * $eligible / $total;
+
+    my $str      = $eligible == 1
+                   ? "One poster ($pct%)"
+                   : "$eligible posters ($pct%)";
+
+    print "\n$str had at least three posts.\n\n";
+}
+
+sub top_xposts {
+    my $scan = shift;
+    my @top;
+    my $posters = $Posters;
+    local $_;
+
+    print <<EOBanner;
+
+Top 10 Crossposters
+===================
+
+Articles  Address
+--------  -------
+
+EOBanner
+
+    @top = ( sort { $b->[1] <=> $a->[1] }
+             map  { [ $_, $_->crossposts ] }
+             values %$posters )[0 .. 9];
+
+    for (@top) {
+        next unless defined $_;
+
+        printf "%8d  %s\n", $_->[1], $_->[0]->attrib;
+    }
+}
+
+sub print_stats {
+    my $scan = shift;
+
+    totals   $scan;
+    avgs     $scan;
+    top_posters $scan;
+    top_xposts  $scan;
+}
+
+## main
+
+my $dump = shift || die "Usage: $0 <dumpfile>\n";
+my $scan;
+
+{
+    my $VAR1;  ## from the Data::Dumper output
+
+    open DUMP, $dump or die "$0: failed open $dump: $!\n";
+    local $/;
+
+    my $data = <DUMP>;
+    $scan = eval $data;
+    die "$0: Error evaluating dumpfile: $@\n" if $@;
+
+    close DUMP;
+}
+
+$Posters = $scan->posters;
+
+## take out the old posters as we find them
+open OLD, "posters" or die "Failed open posters: $!\n";
+
+while (<OLD>) {
+    chomp;
+    delete $Posters->{$_};
+}
+
+## grab some info
+for (values %$Posters) {
+    $Articles += $_->articles;
+    $Volume += $_->volume;
+
+    $HVol += $_->header_volume;
+    $HLns += $_->header_lines;
+
+    $BVol += $_->body_volume;
+    $BLns += $_->body_lines;
+
+    $OVol += $_->orig_volume;
+    $OLns += $_->orig_lines;
+
+    $SVol += $_->sig_volume;
+    $SLns += $_->sig_lines;
+}
+
+print_header $scan;
+print_stats  $scan;

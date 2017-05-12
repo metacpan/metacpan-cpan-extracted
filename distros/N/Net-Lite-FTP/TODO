@@ -1,0 +1,43 @@
+
+Poprawic keepalive dla control-connection.(jak to robi lftp?)
+Dorobic to:
+	<--- 227 Entering Passive Mode (192,168,15,10,119,58)
+	---- Address returned by PASV seemed to be incorrect and has been fixed
+	---- Connecting data socket to (193.202.117.33) port 30522
+
+
+Poprawic:
+	resp(end LIST) Use of uninitialized value in print at Net/Lite/FTP.pm line 339.
+	Sending: CWD /BACKUP/TFS
+	SRV Response: 250 CWD command successful.
+	RECV: 250 CWD command successful.
+	Sending: PASV
+	SRV Response: 227 Entering Passive Mode (87,99,120,70,18,118).
+	RECV: 227 Entering Passive Mode (87,99,120,70,18,118).
+	PASV port is 4726 ( 87.99.120.70 )
+	Data link connected.. to 87.99.120.70 at 4726
+	Sending: NLST
+	SRV Response: 534 Policy requires SSL.
+	resp(end LIST) Use of uninitialized value in print at Net/Lite/FTP.pm line 339.
+	Sending: PASV
+	SRV Response: 227 Entering Passive Mode (87,99,120,70,18,119).
+	RECV: 227 Entering Passive Mode (87,99,120,70,18,119).
+	PASV port is 4727 ( 87.99.120.70 )
+	Data link connected.. to 87.99.120.70 at 4727
+	Sending: NLST /
+	SRV Response: 534 Policy requires SSL.
+	resp(end LIST) Use of uninitialized value in print at Net/Lite/FTP.pm line 339.
+	Fri Aug 12 12:47:45 2011:27857|KOMA.BCK| Idling.../koma.ftp.assecobs.pl|1 0,0|0
+	Sending: CWD /BACKUP/TFS
+	SRV Response: 250 CWD command successful.
+	RECV: 250 CWD command successful.
+	Sending: PASV
+	SRV Response: 227 Entering Passive Mode (87,99,120,70,18,120).
+	RECV: 227 Entering Passive Mode (87,99,120,70,18,120).
+	PASV port is 4728 ( 87.99.120.70 )
+	Data link connected.. to 87.99.120.70 at 4728
+	Sending: NLST
+	SRV Response: 534 Policy requires SSL.
+	resp(end LIST) Use of uninitialized value in print at Net/Lite/FTP.pm line 339.
+przynajmniej info o bledzie 5xx do logu.
+

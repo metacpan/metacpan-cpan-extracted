@@ -1,0 +1,62 @@
+{
+   "abstract" : "mixin framework for Net::SNMP",
+   "author" : [
+      "Karl Gaissmaier <karl.gaissmaier (at) uni-ulm.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-SNMP-Mixin",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "Net::SNMP" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::SNMP" : "0",
+            "Package::Generator" : "0.102",
+            "Package::Reaper" : "0.102",
+            "Scalar::Util" : "1.18",
+            "Sub::Exporter" : "0.978",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::SNMP::Mixin" : {
+         "file" : "lib/Net/SNMP/Mixin.pm",
+         "version" : "0.14"
+      },
+      "Net::SNMP::Mixin::System" : {
+         "file" : "lib/Net/SNMP/Mixin/System.pm",
+         "version" : "0.14"
+      },
+      "Net::SNMP::Mixin::Util" : {
+         "file" : "lib/Net/SNMP/Mixin/Util.pm",
+         "version" : "0.14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.14",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

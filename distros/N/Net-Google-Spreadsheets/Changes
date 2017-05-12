@@ -1,0 +1,61 @@
+Revision history for Perl extension Net::Google::Spreadsheets
+
+0.1501  Mon Apr 30 09:05:00 2012
+        - update link URLs for documentations by google (#76767)
+
+0.15    Fri Apr 06 22:20:00 2012
+        - follow Net::Google::DataAPI changes and fix broken test
+
+0.14    Sun Aug 15 13:15:00 2010
+        - less dependencies
+
+0.13    Tue Aug 10 10:30:00 2010
+        - change default feed URL to use SSL, since Google is returning those now (thanks to dwc)
+
+0.12    Sun Jun 07 13:00:00 2010
+        - fixed getting table error (thanks to sartak)
+        - added documentations on tables, rows (thanks to siguc)
+        - fixed num_rows property of Table was not working (thanks to Yan Wong, #57540)
+
+0.11    Thu Apr 22 16:10:00 2010
+        - added documentation on deleteing items (thanks to siguc)
+
+0.10    Mon Mar 15 23:49:00 2010
+        - update dependencies (Mouse 0.51, Net::Google::DataAPI 0.17)
+
+0.09    Sun Mar 07 23:27:00 2010
+        - Fix spreadsheet key changes (thanks to Colin Magee)
+
+0.08    Thu Dec 31 19:20:30 2009
+        - follow Net::Google::DataAPI changes
+        - update POD
+
+0.07    Fri Dec 22 22:53:34 2009
+        - now uses Net::Google::DataAPI
+        - AuthSub and OAuth support via Net::Google::DataAPI
+        - now uses Any::Moose
+
+0.06    Thu Aug 20 23:21:35 2009
+        - Refactored internals
+
+0.06_01 Mon Arg 16 16:01:27 2009
+        - Supports Google Spreadsheets API version 3.0
+        - Add table and record feeds supports
+        - Better error handlings (no more redirects, captures xml parse error, and more)
+        - Refactored internals
+
+0.05    Sun Aug 15 09:47:50 2009
+        - Fix Moose attribute problem #48627 (thanks to Eric Celeste, IMALPASS)
+
+0.04    Wed Apr 15 09:22:59 2009
+        - Updated POD (thanks to Mr. Grue)
+
+0.03    Sun Apr 05 13:22:21 2009
+        - param method for Net::Google::Spreadsheets::Row (thanks to Mr. Grue)
+
+0.02    Sat Apr 04 22:32:40 2009
+        - Crypt::SSLeay dependency
+        - Better error message on login failure (thanks to Mr. Grue)
+
+0.01    Tue Dec 16 23:52:25 2008
+        - original version

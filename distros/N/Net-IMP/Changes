@@ -1,0 +1,227 @@
+0.633 2016/06/17
+- make imp-pcap-filter compatible with newer Net::PcapWriter, RT#111376
+- disable warnings in imp-relay about experimental smartwatch 
+0.632 2015/02/23
+- fix test in case Net::SSLeay is not installed
+0.631 2015/02/20
+- Allow extended information with IMP_DENY too.
+  Update Filter and Cascade to use extended information in IMP_LOG
+  and IMP_DENY.
+0.630 2015/02/20
+- Documentation update API. Allow extended information with IMP_LOG.
+0.629 2014/01/12
+- fix smartmatch warnings with perl 5.19.7
+- fix test failure str2cfg with perl 5.19.7 (stringification of regex
+  changed again)
+0.628 2014/01/11
+- fix case in ProtocolPinning, when for streaming data last rule for
+  direction was matched, match could have been longer and no max_unbound
+  was defined for dir. In this case it did not strip the matched data
+  from the buffer. This problem caused no harm but only a warning with
+  perl >= 5.16
+0.627 2013/12/12
+- bin/imp-pcap-filter.pl skipped first packet of udp connection
+0.626 2013/10/09
+- ProtocolPinning: support for IMP_PAUSE/IMP_CONTINUE if max_unbound undef
+0.625 2013/10/07
+- ProtocolPinning: fix bug for streaming mode if data call contained more data
+  then necessary to match last rule in dir and other dir had unfinshed match
+  on last rule
+0.624 2013/10/05
+- ProtocolPinning:
+  - fix bug for streaming mode if data call contained more data then necessary
+    to match last rule in dir (died with "buffer should be empty").  
+  - Added some more test and optimizations
+0.623 2013/09/23
+- ProtocolPinning now has support for packet types.
+  Contrary to stream types a rule must match whole packet, no more and no less.
+  Configuration keys allow_dup and allow_reorder for unreliable packet
+  transports like UDP.
+0.622 2013/09/16
+- Bugfix Cascade
+0.621 2013/07/16
+- rewrite of Net::IMP::Cascade for hopefully less bugs and better design
+0.620 2013/07/03
+- don't call callback with no results
+0.619 2013/06/28
+- with analyzer->busy(dir,busy) the data provider might notify the analyzer,
+  that it is busy at the moment, mostly because forwarding data is stalled.
+0.618 2013/06/27
+- added IMP_REPLACE_LATER as a promise to replace a range of data later and
+  thus let the data provider save space. Added way to not send optional
+  returns types like IMP_PAUSE, IMP_REPLACE_LATER if data provider does not
+  provide them
+0.617 2013/06/24
+- added IMP_FATAL return value to let analyzer propagate internal problems.
+  Added support in bin/* data providers
+0.616 2013/06/21
+- added IMP_DATA_TYPES function to Net::IMP to get all registered data types
+0.615 2013/06/20
+- various bug fixes and enhancements imp-relay
+- defined standard interface where plugins can integrate into data providers
+  event loop (e.g. asynchronous dns lookups..) and integrate it into imp-relay
+- various documentation updates
+0.614 2013/06/13
+- fix dependencies on modules in t/01_load.t
+0.613 2013/06/12
+- updated documentation for Net::IMP to clear up terminologie.
+  Introduce definition of 'data provider'.
+- added IMP_PAUSE and IMP_CONTINUE result types for flow control between
+  analyzer and data provider.
+0.612 2013/04/25
+- Cascade - don't send eof twice
+0.611 2013/03/08
+- make test t/07_pcap_relay.t depend on Net::PcapWriter 0.7
+0.61 2013/03/06
+- support for UDP in bin/imp-pcap-filter
+- support for packet types in Net::IMP::Filter
+- support for packet types in Net::IMP::Pattern
+- added new plugin Net::IMP::Example::IRCShout
+- added new plugin Net::IMP::Example::LogServerCertificate
+0.60 2013/02/19
+- replace can now replace empty data, like to add data at eof
+0.59 2013/01/18
+- fix Cascade::get_interface
+- Net::IMP::Debug - let re_use DEBUG_RX variable from other lib too
+- use Data::Dumper::Sortkeys in tests to make comparing results more reliable
+0.58 2013/01/16
+- fixed t/01_load which still tried to test for Net::IMP::HTTP_AddXHeader
+0.57 2013/01/15
+- removed Net::IMP::HTTP_AddXHeader, it is now as Example::AddXHeader inside
+  Net::IMP::HTTP
+- Net::IMP::Base::get_interface interprets empty return types as caller
+  supports any return type
+0.56 2013/01/11
+- small fix for Net::IMP::Base::get_interface
+0.55 2013/01/10
+- new function Net::IMP::IMP_DATA to simplify definition of new data types
+- reworked documentation in Net::IMP
+- Net::IMP::Base 
+  - instead of method interface now methods get_interface and set_interface
+  - no internal handling of adaptors, instead set_interface returns new factory
+    based on adaptor if necessary for the data type
+0.54 2013/01/07
+- stream type now -1
+- put factory into Net::IMP::Base, arguments for factory are not given directly
+  to analyzer anymore but need to be accessed using factory_args
+- better documentation, clearer distinction what are global, factory or analyzer
+  methods
+- support interfaces with dtype/rtype instead of global dtypes/rtypes.
+  decision which interface to use inside factory
+0.53 2012/12/28
+- allow other streaming data types, with number<0.
+  support these types inside Cascade
+0.52 2012/12/20
+- Cascade: allow and ignore (pre)pass for parts of data packets (e.g.
+  packetized, not streamed data), as long as it is not followed by a
+  replacement for other parts of packet
+- update documentation regarding non-stream data
+0.51 2012/12/11
+- fix Cascade::USED_RTYPES to return dualvar constants for rtypes instead
+  of strings
+0.50 2012/12/10
+- make Cascade data type aware:
+  - forward type into parts
+  - no concatinating or splitting of buffers unless they are IMP_DATA_STREAM
+- fix t/01_load.t
+0.49 2012/12/10
+- Cascade: save parts, so that analyzer->USED_RTYPES can be queried 
+  anytime about the computed rtypes 
+- make t/01_load.t depend on Net::Inspect>=0.24 for HTTP_AddXFooHeader
+0.48 2012/12/4
+- SUPPORTED_DTYPES -> supported_dtypes
+- modify supported_dtypes API to make it possible to restrict used types
+  in plugin and to associate type identifier strings with numbers.
+- document USED_RTYPES and supported_dtypes API
+0.47 2012/12/4
+- interface changes on data: data should be '' not undef on eof and offset
+  should be 0 not undef if no gap is given. Makes it easier to implement
+  in non-perl environments.
+- support for different data types (stream, packet).
+  Each plugin must declare the supported types, default only stream.
+  Should make it easier for datagram protocols or if one already knows the
+  structure of the data (e.g. http request, http body...)
+0.46 2012/12/3
+- fixed bin/imp-pcap-filter.pl to work with Net::Pcap 0.17 (changed API)
+- fixed include of Net::PcapWriter in Net::IMP::SessionLog
+0.45 2012/9/21
+- Net::IMP::ProtocolPinning: bugfix for special pattern/data combo
+0.44 2012/9/19
+- Net::IMP::ProtocolPinning: added test with look-ahead pattern and explain
+  rxlen for this case.
+0.43 2012/9/17
+- more fixes to bin/*.pl
+- test for bin/imp-pcap-filter.pl
+- make IMP_MAXOFFSET -1 to avoid problems on 32bit systems
+0.42 2012/9/17
+- fix bin/*.pl - they referred to old Utils, IMP_ constants...
+0.41 2012/9/17
+- remove Net::IMP::ADD_CSPHeader from cpan distribution, because it depends
+  on a not yet released module WWW::CSP. Net::IMP::ADD_CSPHeader is still
+  available from github
+- enhanced documentation
+0.40 2012/9/14
+- Net::IMP::ProtocolPinning: cleanup code, make deny messages more detailed
+0.39 2012/9/11
+- Net::IMP::ProtocolPinning: consider eof a protocol violation, if there are
+  still open rules in this direction
+0.38 2012/9/11
+- Net::IMP::ProtocolPinning: fix protocol violation on data from wrong
+  side if there is only a rule for the other side
+0.37 2012/9/11
+- Net::IMP::Base - make undef value work in cfg2str, str2cfg
+0.36 2012/9/11
+- Net::IMP::ProtocolPinning:
+  - reverted 0.34 and make consecutive rules for the direction work
+  - enhanced documentation, especially for ceveats with regex
+0.35 2012/9/11
+- Net::IMP::ProtocolPinning - make back references like (\w)\1 work, by not
+  putting the regex in another group and thus changing the meaning of \1
+0.34 2012/9/11
+- Net::IMP::ProtocolPinning::validate_cfg enforces, that no mergable rules
+  (e.g. consecutive rules for same direction or more than one rule for
+  each dir but ignore_order) are allowed
+0.33 2012/9/10
+- Net::IMP::ProtocolPinning can now deal with regexes like /foo(bar)?/.
+  It will no longer stop on the first match and thus depend on the
+  chunking of the data, but try to match up to rxlen. Matched
+  data will be passed immediatly.
+0.32 2012/9/10
+- Net::IMP::Base::validate_cfg returns error if it gets (unexpected) args
+- make t/06_cfg2str.t work with perl versions < 5.14
+0.31 2012/9/7
+- fix IMP_MAXOFFSET for 32bit systems
+0.30 2012/9/5
+- fix integer in dualvar IMP_LOG_*, was mostly 3 :(
+0.29 2012/9/5
+- fix typo in IMP_LOG_EMERG
+0.28 2012/9/5
+- fixed EXPORT_TAGS for IMP_LOG_*
+0.27 2012/9/5
+- added in 0.26 forgotten IMP_LOG_ERR
+0.26 2012/9/5
+- defined constants for IMP_LOG levels, similar to syslog levels
+0.25 2012/9/4
+- fix str2cfg/cfg2str escaping, add test
+0.24 2012/9/3
+- added validate_cfg method to various modules
+0.23 2012/8/31
+- added author and copyright to *.pm
+- make rules definition more verbose in ProtocolPinning by using hash not array,
+  call max_open now max_unbound
+- str2cfg, cfg2str now operate on hashes not hash refs
+- documentation updates
+0.22 2012/8/31
+- doku fixes
+0.21 2012/8/31
+- fixes for cfg2str
+- doku fix
+0.2  2012/8/31
+- IMP_ACCTFLD -> IMP_ACCTFIELD
+- various internal renamings and comment changes in ProtocolPinning for better
+  understanding of code and usage
+- cfg2str and str2cfg methods in Base to aid in using config from string
+- cfg2str and str2cfg redefined in ProtocolPinning because of deeper config,
+  remove old stringification for rules and max_open
+0.1 2012/7/30
+- initial release

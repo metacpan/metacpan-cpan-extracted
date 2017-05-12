@@ -1,0 +1,38 @@
+# This is a list of ccTLD and ccSLD
+
+# http://en.wikipedia.org/wiki/.ac
+ac
+com.ac
+net.ac
+gov.ac
+org.ac
+mil.ac 
+
+ad
+
+# http://en.wikipedia.org/wiki/.ae
+ae
+co.ae
+net.ae
+gov.ae
+ac.ae
+sch.ae
+org.ae
+mil.ae
+pro.ae
+name.ae
+
+# http://en.wikipedia.org/wiki/.af
+af
+com.af
+edu.af
+gov.af
+net.af
+org.af
+
+ag
+com.ag
+org.ag
+net.ag
+co.ag
+nom.ag

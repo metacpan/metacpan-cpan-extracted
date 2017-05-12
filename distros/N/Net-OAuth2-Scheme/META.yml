@@ -1,0 +1,30 @@
+---
+abstract: 'Token scheme definition framework for OAuth 2.0'
+author:
+  - 'Roger Crew <crew@cs.stanford.edu>'
+build_requires:
+  Cache::Memory: 0
+  HTTP::Message::PSGI: 0
+  HTTP::Request::Common: 0
+  Plack::Request: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-OAuth2-Scheme
+requires:
+  Digest::SHA: 0
+  MIME::Base64: 0
+  Math::Random::MT::Auto: 0
+  Thread::IID: 0.04
+  URI::Escape: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-OAuth2-Scheme
+  repository: git://github.com/wrog/Net-OAuth2-Scheme.git
+version: 0.03

@@ -1,0 +1,26 @@
+severity = brutal
+exclude = ValuesAndExpressions::ProhibitEmptyQuotes ValuesAndExpressions::RequireInterpolationOfMetachars ErrorHandling::RequireCarping NamingConventions::Capitalization ValuesAndExpressions::RequireConstantVersion
+
+[Miscellanea::RequireRcsKeywords]
+keywords = Revision
+
+[InputOutput::RequireCheckedSyscalls]
+functions = open opendir read readline readdir close closedir print
+
+
+[Documentation::RequirePodSections]
+# - no SUBROUTINES/METHODS (replaced by PACKAGE/OBJECT methods as applicable)
+# - no CONFIGURATION/DIAGNOSTICS/DEPENDENCIES/INCOMPATIBILITIES/BUGS (useful for main module only)
+lib_sections = NAME | SYNOPSIS | VERSION | DESCRIPTION | AUTHOR | LICENSE AND COPYRIGHT
+
+[Documentation::PodSpelling]
+spell_command = aspell --lang=en list
+stop_words = Straton API Accessors filehandles filehandle ie IPs CLI whitelist Whitelist TODO Equeter perldoc CPAN's AnnoCPAN CPAN Storoz arrayref Linux' BSD's SOLARIS GCC perl Solaris IP ROADMAP Cancerbero bugfixes
+
+[Variables::ProhibitPackageVars]
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = t/perltidyrc
+
+[TestingAndDebugging::ProhibitNoWarnings]
+allow_with_category_restriction = 1

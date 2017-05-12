@@ -1,0 +1,43 @@
+<CreditNote>
+  <Reference>[% reference %]</Reference>
+  <Type>[%- IF type == 'pay' %]ACCPAYCREDIT[%- ELSE %]ACCRECCREDIT[%- END %]</Type>
+  <Status>[% status || 'DRAFT' %]</Status>
+  [%- IF currency %]<CurrencyCode>[% currency %]</CurrencyCode>[%- END %]
+  <Contact>
+    [%- IF contact.contact_id %]
+    <ContactID>[% contact.contact_id %]</ContactID>
+    [%- ELSE %]
+    [%- IF contact.company %]
+    <Name>[% contact.company %]</Name>
+    <FirstName>[% contact.firstname %]</FirstName>
+    <LastName>[% contact.lastname %]</LastName>
+    [%- ELSE %]
+    <Name>[% contact.firstname %] [% contact.lastname %]</Name>
+    [%- END %]
+    <EmailAddress>[% contact.email %]</EmailAddress>
+    [%- END %]
+    [%- IF type == 'pay' %]
+    <IsSupplier>true</IsSupplier>
+    [%- ELSE %]
+    <IsCustomer>true</IsCustomer>
+    [%- END %]
+  </Contact>
+  <Date>[% date %]</Date>
+  [%- IF fullypaidondate %]
+  <FullyPaidOnDate>[% fullypaidondate %]</FullyPaidOnDate>
+  [%- ELSE %]
+  <DueDate>[% duedate %]</DueDate>
+  [%- END %]
+  <LineAmountTypes>[% lineamounttypes %]</LineAmountTypes>
+  <LineItems>
+  [%- FOREACH line IN lineitems %]
+    <LineItem>
+      <Description>[% line.desc %]</Description>
+      <Quantity>[% line.quantity %]</Quantity>
+      <UnitAmount>[% line.amount %]</UnitAmount>
+      <AccountCode>[% line.account %]</AccountCode>
+      <Tracking>[% line.tracking %]</Tracking>
+    </LineItem>
+  [%- END %]
+  </LineItems>
+</CreditNote>

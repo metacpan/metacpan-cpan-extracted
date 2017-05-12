@@ -1,0 +1,10 @@
+CHANGES
+INSTALL
+LICENSE
+MANIFEST
+Makefile.PL
+README
+examples/sFluxDebug.pl
+sFlow.pm
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

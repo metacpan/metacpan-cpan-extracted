@@ -1,0 +1,10 @@
+#!perl
+
+use strict;
+use warnings;
+use Net::DNS::SPF::Expander;
+
+my $expander = Net::DNS::SPF::Expander->new_with_options();
+$expander->write;
+
+1;

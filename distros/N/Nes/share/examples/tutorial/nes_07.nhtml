@@ -1,0 +1,16 @@
+{: NES 1.0 ( 'script_07.pl' ) :}
+<html>
+  <head>
+    <title>Nes Tutorial</title>
+  </head>
+  <body>
+    <table border="1">
+    {: @ users
+      <tr>
+        <td> {: @$ users.name  :} </td>
+        <td> {: @$ users.email :} </td>
+      </tr>
+    :}
+    </table>
+  </body>
+</html>

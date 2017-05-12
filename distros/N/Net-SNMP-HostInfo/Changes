@@ -1,0 +1,57 @@
+Changes to Net::SNMP::HostInfo
+==============================
+
+** 0.04 2003-10-06
+
+Expanded the documentation for the Net::SNMP::HostInfo constructor.
+
+Fixed small errors in the documentation for the ipRouteTable
+and ipNetToMediaTable methods.
+
+Fixed an error in the constructor that caused the creation
+of Net::SNMP::HostInfo objects using the Session argument
+to fail.
+
+** 0.03 2003-10-04
+
+Added the Decode option to the Net::SNMP::HostInfo constructor.
+When true, certain objects will be returned as a decoded value.
+Currently these are:
+    ipForwarding
+    tcpRtoAlgorithm
+    ipNetToMediaType
+    ipRouteType
+    ipRouteProto
+    tcpConnState
+Additionally, when Decode is true, ethernet addresses of the form
+0x010203040506 will be changed to the form 01-02-03-04-05-06.
+
+Changed the table methods ipAddrTable, ipNetToMediaTable, ipRouteTable,
+tcpConnTable, and udpTable to use a shared function to retrieve
+their contents.
+
+The table contents are now returned in sorted order.
+The method used to sort the tables does not need any additional
+SNMP queries performed, so sorted tables are now the default.
+
+Removed a spurious Data::Dumper printout from the ipRouteTable function. Oops.
+
+** 0.02 2003-09-28
+
+Added the Session parameter to the Net::SNMP::HostInfo constructor
+to allow a Net::SNMP::HostInfo object to be created using an existing
+Net::SNMP session:
+
+    $hostinfo = Net::SNMP::HostInfo->new(Session => $session);
+
+instead of
+
+    $hostinfo = Net::SNMP::HostInfo->new(Hostname => $hostname,
+                                         Community => $community);
+
+Add the session method to the Net::SNMP::HostInfo object to allow
+the user to access the current Net::SNMP session.
+
+** 0.01 2003-05-12
+	    
+Original version.

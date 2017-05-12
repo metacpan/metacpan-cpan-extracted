@@ -1,0 +1,35 @@
+---
+abstract: 'Icecast2 Server API'
+author:
+  - 'Pavel R3VoLuT1OneR Zhytomirsky <r3volut1oner@gmail.com>'
+build_requires:
+  Test::Fatal: 0
+  Test::MockModule: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300025, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Icecast2
+no_index:
+  file:
+    - README.pod
+requires:
+  Carp: 0
+  LWP::UserAgent: 0
+  Moo: 0
+  MooX::Types::MooseLike::Base: 0
+  PHP::HTTPBuildQuery: 0
+  Safe::Isa: 0
+  Sub::Quote: 0
+  XML::Simple: 0
+resources:
+  bugtracker: http://github.com/R3VoLuT1OneR/Net-Icecast2/issues
+  repository: http://github.com/R3VoLuT1OneR/Net-Icecast2
+version: 0.005

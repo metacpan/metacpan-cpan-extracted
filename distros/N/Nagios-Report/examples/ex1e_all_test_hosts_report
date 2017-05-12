@@ -1,0 +1,28 @@
+
+                          Test
+
+HOST_NAME                 TIME_UP_SCHEDULED  %_TIME_UP_SCHEDULE %_KNOWN_TIME_UP_SC TIME_UP_UNSCHEDULE %_TIME_UP_UNSCHEDU %_KNOWN_TIME_UP_UN TOTAL_TIME_UP      %_TOTAL_TIME_UP
+                          %_KNOWN_TIME_UP    TIME_DOWN_SCHEDULE %_TIME_DOWN_SCHEDU %_KNOWN_TIME_DOWN_ TIME_DOWN_UNSCHEDU %_TIME_DOWN_UNSCHE %_KNOWN_TIME_DOWN_ TOTAL_TIME_DOWN
+                          %_TOTAL_TIME_DOWN  %_KNOWN_TIME_DOWN  TIME_UNREACHABLE_S %_TIME_UNREACHABLE %_KNOWN_TIME_UNREA TIME_UNREACHABLE_U %_TIME_UNREACHABLE %_KNOWN_TIME_UNREA
+                          TOTAL_TIME_UNREACH %_TOTAL_TIME_UNREA %_KNOWN_TIME_UNREA TIME_UNDETERMINED_ %_TIME_UNDETERMINE TIME_UNDETERMINED_ %_TIME_UNDETERMINE TOTAL_TIME_UNDETER
+                          %_TOTAL_TIME_UNDET AVAIL_URL          TREND_URL
+16_Mort_St_Optus_router_P 0                  0.000%             0.000%             2045127            100.000%           100.000%           2045127            100.000%
+                          100.000%           0                  0.000%             0.000%             0                  0.000%             0.000%             0
+                          0.000%             0.000%             0                  0.000%             0.000%             0                  0.000%             0.000%
+                          0                  0.000%             0.000%             0                  0.000%             0                  0.000%             0
+                          0.000%             http://nms/nagios/ http://nms/nagios/
+Adelaide_State_Office_DES 0                  0.000%             0.000%             2045127            100.000%           100.000%           2045127            100.000%
+                          100.000%           0                  0.000%             0.000%             0                  0.000%             0.000%             0
+                          0.000%             0.000%             0                  0.000%             0.000%             0                  0.000%             0.000%
+                          0                  0.000%             0.000%             0                  0.000%             0                  0.000%             0
+                          0.000%             http://nms/nagios/ http://nms/nagios/
+Adelaide_State_Office_Opt 0                  0.000%             0.000%             2045127            100.000%           100.000%           2045127            100.000%
+                          100.000%           0                  0.000%             0.000%             0                  0.000%             0.000%             0
+                          0.000%             0.000%             0                  0.000%             0.000%             0                  0.000%             0.000%
+                          0                  0.000%             0.000%             0                  0.000%             0                  0.000%             0
+                          0.000%             http://nms/nagios/ http://nms/nagios/
+Albany_DEST_router        0                  0.000%             0.000%             2039937            99.746%            99.746%            2039937            99.746%
+                          99.746%            0                  0.000%             0.000%             290                0.014%             0.014%             290
+                          0.014%             0.014%             0                  0.000%             0.000%             4900               0.240%             0.240%
+                          4900               0.240%             0.240%             0                  0.000%             0                  0.000%             0
+                          0.000%             http://nms/nagios/ http://nms/nagios/

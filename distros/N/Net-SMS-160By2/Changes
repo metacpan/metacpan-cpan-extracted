@@ -1,0 +1,15 @@
+Revision history for Net-SMS-160By2
+
+0.04    Mon Dec 15 21:53 2014
+        Fixed sending SMS as www.160By2.com changed its logic.
+
+0.03    Fri Feb 15 22:50 2013
+        Added required additional params and debug mode enabled
+
+0.02    Mon Feb 11 14:00 2013
+        Fixed login/sending sms from 160by2.com due to site layout changes
+
+0.01    Sat Dec 4 21:30 2010
+        First version, released on an unsuspecting world.
+        It works only for Indian mobile numbers as of now.
+

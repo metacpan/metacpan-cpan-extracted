@@ -1,0 +1,22 @@
+{: NES 1.0 ('./test.cgi','{: * cfg_plugin_top_dir :}/debug_info.pl') :}
+{: #
+  ----------------------------------------------------------------------
+    
+  NES 1.0 by Skriptke
+  Copyright 2009 - 2010 Enrique F. Castañón
+  Licensed under the GNU GPL.
+  http://nes.sourceforge.net/
+        
+  test.nhtml
+
+  ----------------------------------------------------------------------
+:}
+<html>
+  <head>
+    <title>Test Nes Installation</title>
+  </head>
+  <body>
+    <p><b>{: $ hello :}</b></p>
+{: include ./testi.nhtml :}
+  </body>
+</html>

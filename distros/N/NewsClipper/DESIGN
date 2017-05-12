@@ -1,0 +1,56 @@
+This document helps you (and me) understand the architecture of this script.
+Hopefully it will help you get jump-started when you want to make
+modifications.
+
+
+MAJOR MODULES
+
+NewsClipper.pl: the main program. Creates a NewsClipper::Parser to parse the
+input file and create the output. Manages configuration before the script
+starts.
+
+NewsClipper::Globals: All the global values and functions
+
+NewsClipper::Parser: Encapsulates the parsing of the template file. Parses an
+input file, looking for a newsclipper tag.
+
+NewsClipper::TagParser: Encapsulates the parsing of the News Clipper command
+to get the individual commands. The commands are then sent to the Interpreter.
+
+NewsClipper::Interpreter: Receives commands from the Parser. It tries to fill
+in the default filters and output handlers as specified by the input handler,
+if necessary. It then creates a HandlerFactory object, which it uses to create
+an instance of the handler needed for each command. It then calls the
+handler's Get, Filter, or Output routine as dictated by the type of command.
+
+NewsClipper::HandlerFactory: Encapsulates the process of finding and/or
+updating a handler for a given tag. Tries to load a handler for a given tag
+first locally, and then via the network (if the user okays it). 
+
+NewsClipper::Handler: The base class for handlers. Has a generic "new", Get,
+Filter, Output, and GetUpdateTimes that can be inherited by most handlers.
+Also sets up the handler-specific state cache.
+
+NewsClipper::AcquisitionFunctions: An API of useful functions for grabbing data
+from the internet. This is used by handler writers. The base function is
+GetUrl, which talks to the cache to see if it is possible to reuse recently
+acquired HTML files.
+
+NewsClipper::Cache: Encapsulates the task of caching HTML files acquired by
+GetUrl.  Implements "CachedDataUsable", which checks the old output file to
+see if we can reuse the old data given the current time and update time
+criteria specified by the handler. 
+
+NewsClipper::HTMLTools: An API of useful functions for manipulating HTML. Used
+by handler writers.
+
+NewsClipper::Types: Contains type information used by Interpretor to check the
+validity of News Clipper command sequences. Also provides support for making
+new types.
+
+NewsClipper::Server: The superclass interface to the server. Actual
+implementations for talking to the server derive from this
+
+NewsClipper::Server::CGI: A CGI interface to the handler server
+
+NewsClipper::Server::MySQL: A MySQL interface to the handler server

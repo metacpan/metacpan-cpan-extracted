@@ -1,0 +1,78 @@
+{
+   "abstract" : "Perl modules for MQTT Protocol (http://mqtt.org/)",
+   "author" : [
+      "Mark Hindess <soft-cpan@temporalanomaly.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-MQTT",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Pod::No404s" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Getopt::Long" : "0",
+            "IO::Select" : "0",
+            "IO::Socket::INET" : "0",
+            "Module::Pluggable" : "0",
+            "Pod::Usage" : "0",
+            "Time::HiRes" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         },
+         "suggests" : {
+            "Net::Pcap" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/beanz/net-mqtt-perl/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/Net-MQTT/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/beanz/net-mqtt-perl.git",
+         "web" : "https://github.com/beanz/net-mqtt-perl"
+      }
+   },
+   "version" : "1.163170",
+   "x_serialization_backend" : "JSON::XS version 3.01"
+}
+

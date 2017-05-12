@@ -1,0 +1,60 @@
+{
+   "abstract" : "A fast IP address filter from ipfilter.dat",
+   "author" : [
+      "Dave Webb <Net-IPAddress-Filter-IPFilterDat@d5ve.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-IPAddress-Filter-IPFilterDat",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::IPAddress::Filter" : "20121117",
+            "Scalar::Util" : "0",
+            "base" : "0",
+            "constant" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "English" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Net-IPAddress-Filter-IPFilterDat@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-IPAddress-Filter-IPFilterDat"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/d5ve/p5-Net-IPAddress-Filter-IPFilterDat.git",
+         "web" : "https://github.com/d5ve/p5-Net-IPAddress-Filter-IPFilterDat"
+      }
+   },
+   "version" : "20121119.02"
+}
+

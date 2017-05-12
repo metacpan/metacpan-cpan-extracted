@@ -1,0 +1,31 @@
+---
+abstract: 'Perl interface to rtorrent via XML-RPC.'
+author:
+  - 'Zahatski Aliaksandr, E<lt>zag@cpan.orgE<gt>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-RTorrent
+provides:
+  Net::RTorrent:
+    file: lib/Net/RTorrent.pm
+    version: 0.11
+  Net::RTorrent::DItem:
+    file: lib/Net/RTorrent/DItem.pm
+    version: 0.01
+  Net::RTorrent::Downloads:
+    file: lib/Net/RTorrent/Downloads.pm
+    version: 0.01
+  Net::RTorrent::Socket:
+    file: lib/Net/RTorrent/Socket.pm
+    version: 0.06
+requires:
+  Collection: 0.43
+  RPC::XML: 0.63
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.11

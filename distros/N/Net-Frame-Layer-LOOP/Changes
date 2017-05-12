@@ -1,0 +1,9 @@
+Revision history for Perl extension Net::Frame::Layer::LOOP.
+
+1.01 Wed Jan 14 07:32:50 CET 2015
+   - update: copyright notice
+   - update: Kwalitee
+
+1.00 Sat Mar 31 12:29:49 CEST 2007
+   - first public release
+

@@ -1,0 +1,10 @@
+Revision history for Perl extension Nephia-Plugin-ResponseHandler
+
+0.02 2013-12-27T03:15:05Z
+    - feature : add 'content_type' handling logic for default hashref handler
+    - enhance : add documentation for default handler
+
+0.01 2013-09-28T23:24:52Z
+
+    - original version
+

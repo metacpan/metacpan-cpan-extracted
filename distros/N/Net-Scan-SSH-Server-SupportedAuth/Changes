@@ -1,0 +1,8 @@
+Revision history for Net-Scan-SSH-Server-SupportedAuth
+
+0.02  2007-05-19
+  * fixed pod.
+  * rename some test script.
+
+0.01  2007-05-18
+  * Initial release.

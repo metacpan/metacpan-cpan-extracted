@@ -1,0 +1,112 @@
+#!perl -w
+
+
+use strict;
+use lib qw(lib);
+use JSON::Any;
+
+my $CONFIG = ".twitter_config";
+
+
+binmode STDOUT, ":utf8";
+
+
+# Get the tokens from the command line, a config file or wherever
+my %tokens  = get_tokens();
+my $app     = Twitter->new(%tokens);
+
+# Check to see we have a consumer key and secret
+unless ($app->consumer_key && $app->consumer_secret) {
+    die "You must go get a consumer key and secret from App\n";
+}
+
+# If the app is authorized (i.e has an access token and secret)
+# Then look at a restricted resourse
+get_dms($app) if $app->authorized;
+
+# right, we need to get their access stuff
+print "STEP 1: REQUEST TWITTER AUTHORIZATION FOR THIS APP\n";
+print "\tURL : ".$app->get_authorization_url( callback => 'oob' )."\n";
+print "\n-- Please go to the above URL and authorize the app";
+print "\n-- It will give you a code. Please type it here: ";
+my $verifier = <STDIN>; print "\n";
+chomp($verifier); $verifier =~ s!(^\s*|\s*$)!!g;
+$app->verifier($verifier);
+
+my ($access_token, $access_token_secret) = $app->request_access_token();
+
+print "You have now authorized this app.\n";
+print "Your access token and secret are:\n\n";
+print "access_token=$access_token\n";
+print "access_token_secret=$access_token_secret\n";
+print "\n";
+if (-f $CONFIG) {
+    save_tokens($app);
+    print "You should note these down but they have also been saved in $CONFIG\n\n";
+} else {
+    print "You should note these down or put them in $CONFIG with your consumer key and secret\n\n";
+}
+
+get_dms($app);
+
+
+sub get_dms {
+	my $dms = JSON::Any->jsonToObj($app->get_dms);
+	foreach my $dm (@$dms) {
+		chomp(my $sender = $dm->{sender}->{screen_name});
+		chomp(my $text   = $dm->{text});
+		print "--\n$sender said \"$text\"\n";
+	}
+	exit(0);
+}
+
+
+sub get_tokens {
+    my %tokens = Twitter->load_tokens($CONFIG);
+    while (@ARGV && $ARGV[0] =~ m!^(\w+)\=(\w+)$!) {
+        $tokens{$1} = $2;
+        shift @ARGV;
+    }
+    return %tokens;
+}
+
+sub save_tokens {
+    my $app     = shift;
+    my %tokens = $app->tokens;
+    Twitter->save_tokens($CONFIG, %tokens);
+}
+
+
+package Twitter;
+
+use strict;
+use base qw(Net::OAuth::Simple);
+
+
+sub new {
+    my $class  = shift;
+    my %tokens = @_;
+    return $class->SUPER::new( tokens => \%tokens,
+                               protocol_version => '1.0a',
+                               urls   => {
+                                    authorization_url => 'http://api.twitter.com/oauth/authorize',
+                                    request_token_url => 'http://api.twitter.com/oauth/request_token',
+                                    access_token_url  => 'http://api.twitter.com/oauth/access_token',
+                               });
+}
+
+sub get_dms {
+	my $self = shift;
+	my $form = shift || "json";
+	my $url  = "http://api.twitter.com/1/direct_messages.${form}";
+	return $self->_make_restricted_request($url, 'GET');
+}
+
+sub _make_restricted_request {
+    my $self     = shift;
+    my $response = $self->make_restricted_request(@_);
+    return $response->content;
+}
+
+
+1;

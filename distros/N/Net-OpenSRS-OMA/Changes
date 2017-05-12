@@ -1,0 +1,16 @@
+Revision history for Perl extension Net::OpenSRS::OMA.
+
+0.02 Thu February 9, 2012
+  Copy of 0.01_02
+  
+  For general use
+  
+0.01_02  Mon February 7, 2012
+  In test script, ignore bad SSL cert on test server
+
+  User agent string used by LWP should be same as client string used with API
+
+0.01_01  Wed February 1, 2012
+  Original version.  Practically perfect in every respect, will probably 
+  never need updating.
+

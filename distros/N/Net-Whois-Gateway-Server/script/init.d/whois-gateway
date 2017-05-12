@@ -1,0 +1,52 @@
+#!/bin/sh
+#
+# whois-gateway:		Whois Gateway daemon
+# 
+# chkconfig: 345 85 15
+# description: Whois Gateway daemon
+#
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+start() 
+{
+
+	echo -n "Starting whois-gateway-d: "
+
+	daemon --user=whois-gateway /usr/bin/whois-gateway-d start >/dev/null 2>&1 &
+
+        echo
+}
+
+stop() 
+{
+        echo -n "Shutting down whois-gateway-d: "
+
+	/usr/bin/whois-gateway-d stop >/dev/null 2>&1
+
+	killall whois-gateway-d >/dev/null 2>&1
+
+        echo
+}
+
+[ -f /usr/bin/whois-gateway-d ] || echo '/usr/bin/whois-gateway-d does not exists!!!'
+
+# See how we were called.
+case "$1" in
+  start)
+	start
+        ;;
+  stop)
+	stop
+        ;;
+  restart)
+	stop
+	start
+	;;
+  *)
+        echo $"Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit 0

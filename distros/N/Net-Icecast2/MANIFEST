@@ -1,0 +1,15 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Net/Icecast2.pm
+lib/Net/Icecast2/Admin.pm
+lib/Net/Icecast2/Mount.pm
+t/00-base.t
+t/01-net-icecast2.t
+t/02-net-icecast2-admin.t
+t/03-net-icecast2-mount.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

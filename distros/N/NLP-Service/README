@@ -1,0 +1,101 @@
+NAME
+    NLP::Service
+
+SYNOPSIS
+    NLP::Service is a RESTful web service based off Dancer to provide
+    natural language parsing for English.
+
+VERSION
+    0.02
+
+METHODS
+    run()
+        The "run()" function starts up the NLP::Service, and listens to
+        requests. It currently takes no parameters. It makes sure that the
+        NLP Engines that are being used are loaded up before the web service
+        is ready.
+
+        It takes a hash as an argument with the following keys:
+
+        force   Forces the loading of all NLP models before doing anything.
+                The value expected is anything that is not 0 or undef, to be
+                able to do this. Example,
+
+                "NLP::Service::run(force => 1);"
+
+        config  Takes in a configuration for the internal service
+                implementation. Currently the implementation is using
+                Dancer, and all of these keys correspond to Dancer::Config.
+                For more details, refer to Dancer config for the acceptable
+                values. Example,
+
+                "NLP::Service::run(config => { logger => 'console' });"
+
+    load_models()
+        The "load_models()" function creates all the required NLP models
+        that are supported. This is internally called by the "run()"
+        function, so the user does not explicitly need to call them. It is
+        useful however, for explicit loading of the models, if the models
+        need to be used in unit tests or elsewhere.
+
+        In void context it returns nothing, but in scalar context returns
+        the number of models that were loaded, and in list context returns a
+        hash with the keys being model names and the values being the actual
+        references to the perl objects that represent the models. This is
+        rarely necessary for the user to be using.
+
+        It takes a single argument which is a boolean to forcibly load the
+        parsers or not. By default the lazy load option is assumed unless
+        explicitly set by the user. For example,
+        NLP::Service::load_models(1) for forced loading and
+        "NLP::Service::load_models()" for lazy loading.
+
+RESTful API
+    Multiple formats are supported in the API. Most notably they are XML,
+    YAML and JSON. The URIs need to end with ".xml", ".yml" and ".json" for
+    XML, YAML and JSON, respectively.
+
+    GET */nlp/models.(json|xml|yml)*
+        Returns an array of loaded models. These are the model names that
+        will be used in the other RESTful API URI strings.
+
+    GET */nlp/languages.(json|xml|yml)*
+        Returns an array of supported languages. Default is "en" for
+        English.
+
+    GET */nlp/info.(json|xml|yml)*
+        Returns a hashref of details about the NLP tool being used.
+
+    GET/POST */nlp/relations.(json|xml|yml)*
+        The user can get a list of all the english grammatical relations
+        supported by the NLP backend.
+
+    GET/POST */nlp/parse/$model.(json|xml|yml)*
+        The user can make GET or POST requests to the above URI constructed
+        by the user or their programs. The $model corresponds to one of the
+        available models such as "en_pcfg", "en_factored", etc. The list of
+        supported models are returned by the GET request to
+        "/nlp/models.(json|xml|yml)" URI.
+
+        The return value is a Part of Speech tagged variation of the input
+        parameter *data*.
+
+        The parameters needed are as follows:
+
+        data
+          One of the parameters expected is *data* which should contain the
+          text that needs to be parsed and whose NLP formation of
+          Part-of-Speech tagging needs to be returned.
+
+    GET/POST */nlp/parse.(json|xml|yml)*
+        This performs the same function as above, but picks the default
+        model which is "en_pcfg". It expects the same parameters as above.
+
+COPYRIGHT
+    Copyright (C) 2011. Vikas Naresh Kumar <vikas@cpan.org>
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+    Started on 25th March 2011.
+

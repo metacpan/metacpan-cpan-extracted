@@ -1,0 +1,19 @@
+Artistic
+Build.PL
+Changes
+examples/cisco-trunks.pl
+lib/Net/SNMP/Mixin/CiscoDot1qVlanStaticTrunks.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/02-class-mixer.t
+t/03-session-mixer.t
+t/04-live-class-mixer.t
+t/05-live-session-mixer.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

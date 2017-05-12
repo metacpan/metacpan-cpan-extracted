@@ -1,0 +1,14 @@
+{: NES 1.0 none :}
+<html>
+  <head>
+    <title>Nes Tutorial</title>
+  </head>
+  <body>
+  {: ~ ( * q_var eq 'Hello' ) <b>Hello Tutorial</b> :}
+  {: ~ ( * q_var == 1 )       <b>var is 1</b> :}
+  {: ~ ( * q_var =~ /^N/ )    <b>{: * q_var :} begins with N</b> :}
+  {: ~ ( * q_var =~ /lucky/ )
+      {: include ('lucky.nhtml',1,10 ) :}
+  :}
+  </body>
+</html>

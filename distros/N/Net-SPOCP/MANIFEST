@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+SPOCP.pm
+SPOCP/Protocol.pm
+SPOCP/SExpr.pm
+SPOCP/SExpr/Parser.y
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

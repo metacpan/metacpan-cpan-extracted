@@ -1,0 +1,46 @@
+Net-Wireless-802_11-WPA-CLI
+
+This is a module for making use of wpa_cli for controlling
+wpa_supplicant.
+
+This module was originally named 'WPA::CLI', but was renamed
+to bring it inline with some other stuff I've been working on.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::Wireless::802_11::WPA::CLI
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Wireless-802_11-WPA-CLI
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-Wireless-802_11-WPA-CLI
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-Wireless-802_11-WPA-CLI
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-Wireless-802_11-WPA-CLI
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 Zane C. Bowers-Hadley
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

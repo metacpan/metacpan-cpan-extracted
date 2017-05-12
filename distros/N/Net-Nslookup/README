@@ -1,0 +1,83 @@
+NAME
+    Net::Nslookup - Provide nslookup(1)-like capabilities
+
+SYNOPSIS
+      use Net::Nslookup;
+      my @addrs = nslookup $host;
+
+      my @mx = nslookup(type => "MX", domain => "perl.org");
+
+DESCRIPTION
+    "Net::Nslookup" provides the capabilities of the standard UNIX command
+    line tool nslookup(1). "Net::DNS" is a wonderful and full featured
+    module, but quite often, all you need is `nslookup $host`. This module
+    provides that functionality.
+
+    "Net::Nslookup" exports a single function, called "nslookup". "nslookup"
+    can be used to retrieve A, PTR, CNAME, MX, NS, SOA, TXT, and SRV
+    records.
+
+      my $a  = nslookup(host => "use.perl.org", type => "A");
+
+      my @mx = nslookup(domain => "perl.org", type => "MX");
+
+      my @ns = nslookup(domain => "perl.org", type => "NS");
+
+      my $name = nslookup(host => "206.33.105.41", type => "PTR");
+
+      my @srv = nslookup(term => "_jabber._tcp.gmail.com", type => "SRV");
+
+    "nslookup" takes a hash of options, one of which should be *term*, and
+    performs a DNS lookup on that term. The type of lookup is determined by
+    the *type* argument. If *server* is specified (it should be an IP
+    address, or a reference to an array of IP addresses), that server(s)
+    will be used for lookups.
+
+    If only a single argument is passed in, the type defaults to *A*, that
+    is, a normal A record lookup.
+
+    If "nslookup" is called in a list context, and there is more than one
+    address, an array is returned. If "nslookup" is called in a scalar
+    context, and there is more than one address, "nslookup" returns the
+    first address. If there is only one address returned, then, naturally,
+    it will be the only one returned, regardless of the calling context.
+
+    *domain* and *host* are synonyms for *term*, and can be used to make
+    client code more readable. For example, use *domain* when getting NS
+    records, and use *host* for A records; both do the same thing.
+
+    *server* should be a single IP address or a reference to an array of IP
+    addresses:
+
+      my @a = nslookup(host => 'example.com', server => '4.2.2.1');
+
+      my @a = nslookup(host => 'example.com', server => [ '4.2.2.1', '128.103.1.1' ])
+
+    By default, when doing CNAME, MX, and NS lookups, "nslookup" returns
+    names, not addresses. This is a change from versions prior to 2.0, which
+    always tried to resolve names to addresses. Pass the *recurse => 1* flag
+    to "nslookup" to have it follow CNAME, MX, and NS lookups. Note that
+    this usage of "recurse" is not consistent with the official DNS meaning
+    of recurse.
+
+        # returns soemthing like ("mail.example.com")
+        my @mx = nslookup(domain => 'example.com', type => 'MX');
+
+        # returns soemthing like ("127.0.0.1")
+        my @mx = nslookup(domain => 'example.com', type => 'MX', recurse => 1);
+
+    SOA lookups return the SOA record in the same format as the `host` tool:
+
+        print nslookup(domain => 'example.com', type => 'SOA');
+        dns1.icann.org. hostmaster.icann.org. 2011061433 7200 3600 1209600 3600
+
+TIMEOUTS
+    Lookups timeout after 15 seconds by default, but this can be configured
+    by passing *timeout => X* to "nslookup".
+
+DEBUGGING
+    Pass *debug => 1* to "nslookup" to emit debugging messages to STDERR.
+
+AUTHOR
+    darren chamberlain <darren@cpan.org>
+

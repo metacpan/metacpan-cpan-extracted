@@ -1,0 +1,33 @@
+0.31      2013-09-20 11:16:13 America/New_York
+  * BUG FIX: 0.30 would send sampled timers using an incorrect format.
+
+0.30      2013-09-19 20:38:23 EST5EDT
+  * Add 'gauge' and 'set_add' methods to support statsd gauges and sets.
+
+0.22      2013-07-06 14:41:13 EST5EDT
+  * Depend on Etsy::StatsD 1.001. This fixes a bug which would sometimes
+    cause corrupted partial metrics to be sent (thanks Ricardo Signes and
+    Steve Sanbeg).
+  * Fix tests to pass with Etsy::StatsD 1.001.
+
+0.21      2013-06-13 17:48:49 America/New_York
+  * Allow setting a callback that will be used to emit a warning when a
+    timer is destroyed unexpectedly. Idea courtesy of rjbs.
+
+0.20      2013-06-12 17:15:47 America/New_York
+  * Use Moo. This makes the code a little more manageable and has a
+    negligible impact on speed.
+  * Don't run failure-prone "live" tests on install or CPANtesters, add a
+    set of non-live tests.
+  * Add the ability to re-target the metric of a timer between starting and
+    finishing it.
+
+0.11      2013-06-03 15:28:30 America/New_York
+  * Make timers report their times in ms like they should
+
+0.10      2013-05-19 21:33:44 EST5EDT
+  * First public release.
+
+0.03
+  * Internal Shutterstock release
+  * Extracted from Shutterstock::Statsd

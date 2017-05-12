@@ -1,0 +1,17 @@
+Revision history for Net-CardDAVTalk
+
+0.05    Wed Feb 15 16:51 2017
+  - depend on List::MoreUtils, it's not always an included battery
+
+0.04    Wed Feb 15 10:31 2017
+  - added ACL support from FastMail
+
+0.03    Tue May  3 09:38 2016
+  - added dependencies to satisfy tests
+
+0.02
+  - added POD
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

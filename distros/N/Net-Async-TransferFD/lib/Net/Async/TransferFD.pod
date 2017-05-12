@@ -1,0 +1,153 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::TransferFD
+at lib/Net/Async/TransferFD.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::TransferFD - support for transferring handles between
+processes via socketpair
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+ use feature qw(say);
+ my $loop = IO::Async::Loop->new;
+ my $proc = IO::Async::Process->new(
+   code => sub { ... },
+   fd3 => { via => 'socketpair' },
+ );
+ $loop->add(my $control = Net::Async::TransferFD->new(
+   handle => $proc->fd(3),
+   on_fh => sub {
+     my $h = shift;
+     say "New handle $h - " . join '', <$h>;
+   }
+ ));
+ $control->send(\*STDIN);
+
+=head1 DESCRIPTION
+
+Uses SCM_RIGHTS to pass an open handle from one process to another.
+Typically used to hand a network socket off to another process, for
+example an accept loop in one process dispatching incoming connections
+to other active processes.
+
+=head1 METHODS
+
+=head2 outgoing_packet
+
+Convert a list of handles to a cmsghdr struct suitable for
+transferring to another process.
+
+Returns the encoded cmsghdr struct.
+
+=head2 recv_fds
+
+Receive packet containing FDs.
+
+Takes a single coderef which will be called with two
+parameters.
+
+Returns $self.
+
+=head2 send_queued
+
+If we have any FDs queued for sending, bundle them into a packet
+and send them over. Will close the FDs once the send is complete.
+
+Returns $self.
+
+=head2 read_pending
+
+Reads any pending messages, converting to FDs
+as appropriate and calling the on_fh callback.
+
+Returns $self.
+
+=head2 accept_fds
+
+Attempts to accept the given FDs from the remote.
+
+Will call L</on_fh> for each received file descriptor after reopening.
+
+=head2 on_fh
+
+Calls the configured filehandle method if provided (via L</configure>(C<on_fh>)).
+=cut
+
+sub on_fh {
+	my ($self, $fh) = @_;
+	$self->{on_fh}->($fh) if $self->{on_fh};
+	$self
+}
+
+sub configure {
+	my $self = shift;
+	my %args = @_;
+
+	$self->{on_fh} = delete $args{on_fh} if exists $args{on_fh};
+
+	if(exists $args{handle}) {
+		my $h = delete $args{handle};
+		if($h->isa('IO::Async::Handle')) {
+			$self->{handle} = $h;
+			$self->handle->configure(
+				on_write_ready => $self->curry::weak::send_queued,
+				on_read_ready => $self->curry::weak::read_pending,
+			);
+		} else {
+			$self->add_child(
+				$self->{handle} = IO::Async::Handle->new(
+					handle => $h,
+					on_write_ready => $self->curry::weak::send_queued,
+					on_read_ready => $self->curry::weak::read_pending,
+				)
+			);
+		}
+		$self->handle->want_writeready(0);
+		$self->handle->want_readready(1);
+	};
+	$self->SUPER::configure(%args);
+}
+
+=head2 send
+
+Sends the given FDs to the remote, returning a L<Future> which will resolve once
+all FDs have been transferred.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Socket::MsgHdr> - we use this to do all the real work
+
+=item * L<File::FDpasser> - another implementation
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2011-2015. Licensed under the same terms as Perl itself.

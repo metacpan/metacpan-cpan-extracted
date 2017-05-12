@@ -1,0 +1,18 @@
+Changes
+lib/NET/MitM.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-kwalitee.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/mitm.t
+samples/client.pl
+samples/clients.pl
+samples/echo_server.pl
+samples/http_mitm.pl
+samples/mitm.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

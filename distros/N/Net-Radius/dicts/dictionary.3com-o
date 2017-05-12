@@ -1,0 +1,1396 @@
+# 3Com specific values contributed by Jim Harle - Minor tweaks by lem
+
+#
+# dictionary.usr	USR Robotics dictionary.
+#
+#		Taken from the dictionary included with the USR RADIUS server,
+#		and adjusted a bit.
+#
+# Version:	@(#)dictionary.usr  1.10  11-Nov-1998  miquels@cistron.nl
+#
+#
+# This dictionary must be loaded _after_ a standard dictionary, as it
+# contains extensions specific to USR
+
+VENDOR USR 429
+
+#
+#	USR specific attributes
+#
+
+ATTRIBUTE	Prompt			64	integer
+VALUE		Prompt	No-Echo			0
+VALUE		Prompt	Echo			1
+
+ATTRIBUTE	Multi-Link-Flag		126	integer
+ATTRIBUTE	Char-Noecho		250	integer
+
+#
+#	USR specific Integer Translations
+#
+
+VALUE		Termination-Action	Manage-Resources	2
+
+VALUE		Service-Type		Authenticate-User	8
+VALUE		Service-Type		Dialback-NAS-User	9
+
+VALUE		Acct-Status-Type	Modem-Start		4
+VALUE		Acct-Status-Type	Modem-Stop		5
+VALUE		Acct-Status-Type	Cancel			6
+
+VALUE		Multi-Link-Flag		True			1
+VALUE		Multi-Link-Flag		False			0
+
+#	USR specific Authentication Types
+
+VALUE		Acct-Authentic		None			0
+VALUE		Acct-Authentic		Remote			3
+VALUE		Acct-Authentic		RADIUS			4
+VALUE		Acct-Authentic		MNET			5
+VALUE		Acct-Authentic		KCHAP			6
+VALUE		Acct-Authentic		TACACS			7
+VALUE		Acct-Authentic		Realm			8
+VALUE		Acct-Authentic		Local			9
+VALUE		Acct-Authentic		File			10
+VALUE		Acct-Authentic		Local-VPN		11
+
+#
+#	USR Extensions: USR Vendor-Specific stuff.
+#
+#	For now in NMC format (whatever that stands for), though the
+#	normal vendor-specific format would work just as well.
+#
+#
+
+VENDOR USR 429
+
+VENDORATTR USR USR-Last-Number-Dialed-Out	0x0066	string
+VENDORATTR USR USR-Last-Number-Dialed-In-DNIS	0x00E8	string
+VENDORATTR USR USR-Last-Callers-Number-ANI	0x00E9	string
+VENDORATTR USR USR-Channel			0xBF38	integer 
+VENDORATTR USR USR-Event-Id			0xBFBE	integer
+VENDORATTR USR USR-Event-Date-Time		0xBF2F	date
+VENDORATTR USR USR-Call-Start-Date-Time		0xBFF7	date
+VENDORATTR USR USR-Call-End-Date-Time		0xBFF6	date
+VENDORATTR USR USR-Default-DTE-Data-Rate	0x005E	integer
+VENDORATTR USR USR-Initial-Rx-Link-Data-Rate	0xBF2D	integer
+VENDORATTR USR USR-Final-Rx-Link-Data-Rate	0xBF2C	integer
+VENDORATTR USR USR-Initial-Tx-Link-Data-Rate	0x006A	integer
+VENDORATTR USR USR-Final-Tx-Link-Data-Rate	0x006B	integer
+VENDORATTR USR USR-Chassis-Temperature		0xBF31	integer
+VENDORATTR USR USR-Chassis-Temp-Threshold	0xBE84	integer
+VENDORATTR USR USR-Actual-Voltage		0xBF32	integer
+VENDORATTR USR USR-Expected-Voltage		0xBF33	integer
+VENDORATTR USR USR-Power-Supply-Number		0xBF34	integer
+VENDORATTR USR USR-Card-Type			0xBE85	integer
+VENDORATTR USR USR-Chassis-Slot			0xBF39	integer
+VENDORATTR USR USR-Sync-Async-Mode		0x0067	integer
+VENDORATTR USR USR-Originate-Answer-Mode	0x0068	integer
+VENDORATTR USR USR-Modulation-Type		0x006C	integer
+VENDORATTR USR USR-Connect-Term-Reason		0x009B	integer
+VENDORATTR USR USR-Failure-to-Connect-Reason	0x0069	integer
+VENDORATTR USR USR-Equalization-Type		0x006F	integer
+VENDORATTR USR USR-Fallback-Enabled		0x0070	integer
+VENDORATTR USR USR-Connect-Time-Limit		0xBFE7	integer
+VENDORATTR USR USR-Number-of-Rings-Limit	0xBFE6	integer
+VENDORATTR USR USR-DTE-Data-Idle-Timout		0x0048	integer
+VENDORATTR USR USR-Characters-Sent		0x0071	integer
+VENDORATTR USR USR-Characters-Received		0x0072	integer
+VENDORATTR USR USR-Blocks-Sent			0x0075	integer
+VENDORATTR USR USR-Blocks-Received		0x0076	integer
+VENDORATTR USR USR-Blocks-Resent		0x0077	integer
+VENDORATTR USR USR-Retrains-Requested		0x0078	integer
+VENDORATTR USR USR-Retrains-Granted		0x0079	integer
+VENDORATTR USR USR-Line-Reversals		0x007A	integer
+VENDORATTR USR USR-Number-Of-Characters-Lost	0x007B	integer
+VENDORATTR USR USR-Number-of-Blers		0x007D	integer
+VENDORATTR USR USR-Number-of-Link-Timeouts	0x007E	integer
+VENDORATTR USR USR-Number-of-Fallbacks		0x007F	integer
+VENDORATTR USR USR-Number-of-Upshifts		0x0080	integer
+VENDORATTR USR USR-Number-of-Link-NAKs		0x0081	integer
+VENDORATTR USR USR-DTR-False-Timeout		0x00BE	integer
+VENDORATTR USR USR-Fallback-Limit		0x00BF	integer
+VENDORATTR USR USR-Block-Error-Count-Limit	0x00C0	integer
+VENDORATTR USR USR-DTR-True-Timeout		0x00DA	integer
+VENDORATTR USR USR-Security-Login-Limit		0xBEDE	integer
+VENDORATTR USR USR-Security-Resp-Limit		0xBEFA	integer
+VENDORATTR USR USR-DTE-Ring-No-Answer-Limit	0xBF17	integer
+VENDORATTR USR USR-Back-Channel-Data-Rate	0x007C	integer
+VENDORATTR USR USR-Simplified-MNP-Levels	0x0099	integer
+VENDORATTR USR USR-Simplified-V42bis-Usage	0x00C7	integer
+VENDORATTR USR USR-Mbi_Ct_PRI_Card_Slot		0x0184	integer
+VENDORATTR USR USR-Mbi_Ct_TDM_Time_Slot		0x0185	integer
+VENDORATTR USR USR-Mbi_Ct_PRI_Card_Span_Line	0x0186	integer
+VENDORATTR USR USR-Mbi_Ct_BChannel_Used		0x0187	integer
+VENDORATTR USR USR-Physical-State		0xBE77	integer
+VENDORATTR USR USR-Packet-Bus-Session		0xBF14	integer
+VENDORATTR USR USR-Server-Time			0xF000	date
+
+# 0xBE5D-0xBE63 sent with Event-Id 79
+VENDORATTR USR USR-Channel-Connected-To		0xBE5D	integer
+VENDORATTR USR USR-Slot-Connected-To		0xBE5E	integer 
+VENDORATTR USR USR-Device-Connected-To		0xBE5F	integer
+VENDORATTR USR USR-NFAS-ID			0xBE60	integer
+VENDORATTR USR USR-Q931-Call-Reference-Value	0xBE61	integer
+VENDORATTR USR USR-Call-Event-Code		0xBE62	integer
+VENDORATTR USR USR-DS0				0xBE63	integer
+# DS0s sent with Event-Id 77,78
+VENDORATTR USR USR-DS0s				0xBE64	string
+# Gateway-IP-Address sent with Event-Id 71,72
+VENDORATTR USR USR-Gateway-IP-Address		0xBE66	ipaddr
+
+
+#
+# These are CCA Radius attributes
+#
+VENDORATTR USR USR-PW_USR_IFilter_IP		0x9000	string
+VENDORATTR USR USR-PW_USR_IFilter_IPX		0x9001	string
+VENDORATTR USR USR-PW_USR_OFilter_IP		0x9003	string
+VENDORATTR USR USR-PW_USR_OFilter_IPX		0x9004	string
+VENDORATTR USR USR-PW_USR_OFilter_SAP		0x9005	string
+VENDORATTR USR USR-PW_VPN_ID			0x9006	string
+VENDORATTR USR USR-PW_VPN_Name			0x9007	string
+VENDORATTR USR USR-PW_VPN_Neighbor		0x9008	string
+VENDORATTR USR USR-PW_Framed_Routing_V2		0x9009	string
+VENDORATTR USR USR-PW_VPN_Gateway		0x900a	string
+VENDORATTR USR USR-PW_Tunnel_Authentication	0x900b	string
+VENDORATTR USR USR-PW_Index			0x900c	string
+VENDORATTR USR USR-PW_Cutoff			0x900d	string
+VENDORATTR USR USR-PW_Packet			0x900e	string
+VENDORATTR USR USR-Primary_DNS_Server		0x900f	ipaddr
+VENDORATTR USR USR-Secondary_DNS_Server		0x9010	ipaddr
+VENDORATTR USR USR-Primary_NBNS_Server		0x9011	ipaddr
+VENDORATTR USR USR-Secondary_NBNS_Server	0x9012	ipaddr
+VENDORATTR USR USR-Syslog-Tap			0x9013	integer
+VENDORATTR USR USR-Chassis-Call-Slot		0x9019	integer
+VENDORATTR USR USR-Chassis-Call-Span		0x901A	integer
+VENDORATTR USR USR-Chassis-Call-Channel		0x901B	integer
+VENDORATTR USR USR-Keypress-Timeout		0x901C	integer
+VENDORATTR USR USR-Unauthenticated-Time		0x901D	integer
+VENDORATTR USR USR-Connect-Speed		0x9023	integer
+VENDORATTR USR USR-Framed_IP_Address_Pool_Name	0x9024	string
+VENDORATTR USR USR-MP-EDO			0x9025	string	
+
+#
+# Pilgrim attributes
+# 
+VENDORATTR USR USR-Bearer-Capabilities		0x9800	integer
+VENDORATTR USR USR-Speed-Of-Connection		0x9801	integer
+VENDORATTR USR USR-Max-Channels			0x9802	integer
+VENDORATTR USR USR-Channel-Expansion		0x9803	integer
+VENDORATTR USR USR-Channel-Decrement		0x9804	integer
+VENDORATTR USR USR-Expansion-Algorithm		0x9805	integer
+VENDORATTR USR USR-Compression-Algorithm	0x9806	integer
+VENDORATTR USR USR-Receive-Acc-Map		0x9807	integer
+VENDORATTR USR USR-Transmit-Acc-Map		0x9808	integer
+VENDORATTR USR USR-Compression-Reset-Mode	0x980a	integer
+VENDORATTR USR USR-Min-Compression-Size		0x980b	integer
+VENDORATTR USR USR-IP				0x980c	integer
+VENDORATTR USR USR-IPX				0x980d	integer
+VENDORATTR USR USR-Filter-Zones			0x980e	integer
+VENDORATTR USR USR-Appletalk			0x980f	integer
+VENDORATTR USR USR-Bridging			0x9810	integer
+VENDORATTR USR USR-Spoofing			0x9811	integer
+VENDORATTR USR USR-Host-Type			0x9812	integer
+VENDORATTR USR USR-Send-Name			0x9813	string
+VENDORATTR USR USR-Send-Password		0x9814	string
+VENDORATTR USR USR-Start-Time			0x9815	integer
+VENDORATTR USR USR-End-Time			0x9816	integer
+VENDORATTR USR USR-Send-Script1			0x9817	string
+VENDORATTR USR USR-Reply-Script1		0x9818	string
+VENDORATTR USR USR-Send-Script2			0x9819	string
+VENDORATTR USR USR-Reply-Script2		0x981a	string
+VENDORATTR USR USR-Send-Script3			0x981b	string
+VENDORATTR USR USR-Reply-Script3		0x981c	string
+VENDORATTR USR USR-Send-Script4			0x981d	string
+VENDORATTR USR USR-Reply-Script4		0x981e	string
+VENDORATTR USR USR-Send-Script5			0x981f	string
+VENDORATTR USR USR-Reply-Script5		0x9820	string
+VENDORATTR USR USR-Send-Script6			0x9821	string
+VENDORATTR USR USR-Reply-Script6		0x9822	string
+VENDORATTR USR USR-Terminal-Type		0x9823	string
+VENDORATTR USR USR-Appletalk-Network-Range	0x9824	integer
+VENDORATTR USR USR-Local-IP-Address		0x9825	string
+VENDORATTR USR USR-Routing-Protocol		0x9826	integer
+VENDORATTR USR USR-Modem-Group			0x9827	integer
+VENDORATTR USR USR-Modem-Training-Time		0x9842	integer
+VENDORATTR USR USR-Interface-Index		0x9843	integer
+VENDORATTR USR USR-MP-MRRU			0x982f	integer
+
+VENDORATTR USR USR-SAP-Filter-In		0x9002	string
+VENDORATTR USR USR-MIC				0x9014	string
+VENDORATTR USR USR-Log-Filter-Packets		0x9017	string
+VENDORATTR USR USR-VPN-Encrypter		0x901e	integer
+VENDORATTR USR USR-Re-Chap-Timeout		0x9020	integer
+VENDORATTR USR USR-Tunnel-Switch-Endpoint	0x9868	string
+
+VENDORATTR USR USR-IP-SAA-Filter		0x9870	integer
+VENDORATTR USR	Initial-Modulation-Type		0x0923	integer
+VENDORATTR USR USR-VTS-Session-Key		0x9856	string
+VENDORATTR USR USR-Orig-NAS-Type		0x9857	string
+VENDORATTR USR USR-Call-Arrival-Time		0x9858	integer
+VENDORATTR USR USR-Call-End-Time		0x9859	integer
+VENDORATTR USR USR-Tunnel-Auth-Hostname		0x986b	string
+VENDORATTR USR USR-Acct-Reason-Code		0x986c	integer
+VENDORATTR USR USR-Supports-Tags		0x9889	integer
+VENDORATTR USR USR-HARC-Disconnect-Code		0x988b	integer
+VENDORATTR USR USR-RMMIE-Status			0x01cd	integer
+VENDORATTR USR USR-RMMIE-Last-Update-Event	0x0901	integer
+VENDORATTR USR USR-RMMIE-x2-Status		0x0909	integer
+VENDORATTR USR USR-RMMIE-Planned-Disconnect	0x090a	integer
+VENDORATTR USR USR-VPN-GW-Location-Id		0x901f	string
+VENDORATTR USR USR-CCP-Algorithm		0x9021	integer
+VENDORATTR USR USR-ACCM-Type			0x9022	integer
+VENDORATTR USR USR-Local-Framed-IP-Addr		0x9026	ipaddr
+VENDORATTR USR USR-IPX-Routing			0x9828	integer
+VENDORATTR USR USR-IPX-WAN			0x9829	integer
+VENDORATTR USR USR-IP-RIP-Policies		0x982a	integer
+VENDORATTR USR USR-IP-RIP-Simple-Auth-Password	0x982b	string
+VENDORATTR USR USR-IP-RIP-Input-Filter		0x982c	string
+VENDORATTR USR USR-IP-Call-Input-Filter		0x982d	string
+VENDORATTR USR USR-IPX-RIP-Input-Filter		0x982e	string
+VENDORATTR USR USR-IPX-Call-Input-Filter	0x9830	string
+VENDORATTR USR USR-AT-Input-Filter		0x9831	string
+VENDORATTR USR USR-AT-RTMP-Input-Filter		0x9832	string
+VENDORATTR USR USR-AT-Zip-Input-Filter		0x9833	string
+VENDORATTR USR USR-AT-Call-Input-Filter		0x9834	string
+VENDORATTR USR USR-ET-Bridge-Input-Filter	0x9835	string
+VENDORATTR USR USR-IP-RIP-Output-Filter		0x9836	string
+VENDORATTR USR USR-IP-Call-Output-Filter	0x9837	string
+VENDORATTR USR USR-IPX-RIP-Output-Filter	0x9838	string
+VENDORATTR USR USR-IPX-Call-Output-Filter	0x9839	string
+VENDORATTR USR USR-AT-Output-Filter		0x983a	string
+VENDORATTR USR USR-AT-RTMP-Output-Filter	0x983b	string
+VENDORATTR USR USR-AT-Zip-Output-Filter		0x983c	string
+VENDORATTR USR USR-AT-Call-Output-Filter	0x983d	string
+VENDORATTR USR USR-ET-Bridge-Output-Filter	0x983e	string
+VENDORATTR USR USR-ET-Bridge-Call-Output-Filter	0x983f	string
+VENDORATTR USR USR-IP-Default-Route-Option	0x9840	integer
+VENDORATTR USR USR-MP-EDO-HIPER			0x9841	string
+VENDORATTR USR USR-Tunnel-Security		0x9844	integer
+VENDORATTR USR USR-Port-Tap			0x9845	integer
+VENDORATTR USR USR-Port-Tap-Format		0x9846	integer
+VENDORATTR USR USR-Port-Tap-Output		0x9847	integer
+VENDORATTR USR USR-Port-Tap-Facility		0x9848	integer
+VENDORATTR USR USR-Port-Tap-Priority		0x9849	integer
+VENDORATTR USR USR-Port-Tap-Address		0x984a	ipaddr
+VENDORATTR USR USR-MobileIP-Home-Agent-Address	0x984b	ipaddr
+VENDORATTR USR USR-Tunneled-MLPP		0x984c	integer
+VENDORATTR USR USR-Multicast-Proxy		0x984d	integer
+VENDORATTR USR USR-Multicast-Receive		0x984e	integer
+VENDORATTR USR USR-Multicast-Forwarding		0x9850	integer
+VENDORATTR USR USR-IGMP-Query-Interval		0x9851	integer
+VENDORATTR USR USR-IGMP-Maximum-Response-Time	0x9852	integer
+VENDORATTR USR USR-IGMP-Robustness		0x9853	integer
+VENDORATTR USR USR-IGMP-Version			0x9854	integer
+VENDORATTR USR USR-Callback-Type		0x986a	integer
+VENDORATTR USR USR-Request-Type			0xf001	integer
+VENDORATTR USR USR-RMMIE-Num-Of-Updates		0x01ce	integer
+VENDORATTR USR USR-RMMIE-Manufacturer-ID	0x01df	integer
+VENDORATTR USR USR-RMMIE-Product-Code		0x01e0	string
+VENDORATTR USR USR-RMMIE-Serial-Number		0x01e1	string
+VENDORATTR USR USR-RMMIE-Firmware-Version	0x01e2	string
+VENDORATTR USR USR-RMMIE-Firmware-Build-Date	0x01e3	string
+VENDORATTR USR USR-Call-Arrival-in-GMT		0xbe52	date
+VENDORATTR USR USR-Call-Connect-in-GMT		0xbe51	date
+VENDORATTR USR USR-Call-Terminate-in-GMT	0xbe50	date
+VENDORATTR USR USR-IDS0-Call-Type		0xbe4f	integer
+VENDORATTR USR USR-Call-Reference-Number	0xbe7d	integer
+VENDORATTR USR USR-CDMA-Call-Reference-Number	0x0183	integer
+VENDORATTR USR USR-Mobile-IP-Address		0x088e	ipaddr
+VENDORATTR USR USR-IWF-IP-Address		0x03f4	ipaddr
+VENDORATTR USR USR-Called-Party-Number		0x0890	string
+VENDORATTR USR USR-Calling-Party-Number		0x088f	string
+VENDORATTR USR USR-Call-Type			0x0891	integer
+VENDORATTR USR USR-ESN				0x0892	string
+VENDORATTR USR USR-IWF-Call-Identifier		0x0893	integer
+VENDORATTR USR USR-IMSI				0x0894	string
+VENDORATTR USR USR-Service-Option		0x0895	integer
+VENDORATTR USR USR-Disconnect-Cause-Indicator	0x0896	integer
+VENDORATTR USR USR-Mobile-NumBytes-Txed		0x0897	integer
+VENDORATTR USR USR-Mobile-NumBytes-Rxed		0x0898	integer
+VENDORATTR USR USR-Num-Fax-Pages-Processed	0x0899	integer
+VENDORATTR USR USR-Compression-Type		0x089a	integer
+VENDORATTR USR USR-Call-Error-Code		0x089b	integer
+VENDORATTR USR USR-Modem-Setup-Time		0x089c	integer
+VENDORATTR USR USR-Call-Connecting-Time		0x089d	integer
+VENDORATTR USR USR-Connect-Time			0x089e	integer
+VENDORATTR USR USR-RMMIE-Last-Update-Time	0x0900	integer	
+VENDORATTR USR USR-RMMIE-Rcv-Tot-PwrLvl		0x0902	integer
+VENDORATTR USR USR-RMMIE-Rcv-PwrLvl-3300Hz	0x0903	integer
+VENDORATTR USR USR-RMMIE-Rcv-PwrLvl-3750Hz	0x0904	integer
+VENDORATTR USR USR-RMMIE-PwrLvl-NearEcho-Canc	0x0905	integer
+VENDORATTR USR USR-RMMIE-PwrLvl-FarEcho-Canc	0x0906	integer
+VENDORATTR USR USR-RMMIE-PwrLvl-Noise-Lvl	0x0907	integer
+VENDORATTR USR USR-RMMIE-PwrLvl-Xmit-Lvl	0x0908	integer
+VENDORATTR USR USR-Framed-IPX-Route		0x9027	ipaddr
+VENDORATTR USR USR-MPIP-Tunnel-Originator	0x9028	ipaddr
+VENDORATTR USR USR-IGMP-Routing			0x9855	integer
+VENDORATTR USR USR-Rad-Multicast-Routing-Ttl	0x9860	integer
+VENDORATTR USR USR-Rad-Multicast-Routing-Rate-Limit	0x9861	integer
+VENDORATTR USR USR-Rad-Multicast-Routing-Protocol	0x9862	integer
+VENDORATTR USR USR-Rad-Multicast-Routing-Boundary	0x9863	string
+VENDORATTR USR USR-Rad-Dvmrp-Metric		0x9864	integer
+VENDORATTR USR USR-Chat-Script-Name		0x9865	string
+VENDORATTR USR USR-CUSR-hat-Script-Rules	0x9866	string
+VENDORATTR USR USR-Rad-Location-Type		0x9867	integer
+VENDORATTR USR USR-OSPF-Addressless-Index	0x9869	integer
+VENDORATTR USR USR-DNIS-ReAuthentication	0x9875	integer
+VENDORATTR USR USR-NAS-Type			0xf002	integer
+VENDORATTR USR USR-Auth-Mode			0xf003	integer
+
+# The VSAs for these definitions seems missing...
+
+# VENDORVALUE USR USR-Character-Echo	Echo-On		0
+# VENDORVALUE USR USR-Character-Echo	Echo-Off	1
+# VENDORVALUE USR USR-RIPV2		Off		0
+# VENDORVALUE USR USR-RIPV2		On		1
+
+VENDORVALUE USR USR-Syslog-Tap		Off		0
+VENDORVALUE USR USR-Syslog-Tap		On-Raw		1
+VENDORVALUE USR USR-Syslog-Tap		On-Framed	2
+VENDORVALUE USR USR-Syslog-Tap		Unknown		4294967295
+
+#	Event Indentifiers
+
+VENDORVALUE USR USR-Event-Id	Module-Inserted			6
+VENDORVALUE USR USR-Event-Id	Module-Removed			7
+VENDORVALUE USR USR-Event-Id	PSU-Voltage-Alarm		8
+VENDORVALUE USR USR-Event-Id	PSU-Failed			9
+VENDORVALUE USR USR-Event-Id	HUB-Temp-Out-of-Range		10
+VENDORVALUE USR USR-Event-Id	Fan-Failed			11
+VENDORVALUE USR USR-Event-Id	Watchdog-Timeout		12
+VENDORVALUE USR USR-Event-Id	Mgmt-Bus-Failure		13
+VENDORVALUE USR USR-Event-Id	In-Connection-Est		14
+VENDORVALUE USR USR-Event-Id	Out-Connection-Est		15
+VENDORVALUE USR USR-Event-Id	In-Connection-Term		16
+VENDORVALUE USR USR-Event-Id	Out-Connection-Term		17
+VENDORVALUE USR USR-Event-Id	Connection-Failed		18
+VENDORVALUE USR USR-Event-Id	Connection-Timeout		19
+VENDORVALUE USR USR-Event-Id	DTE-Transmit-Idle		20
+VENDORVALUE USR USR-Event-Id	DTR-True			21
+VENDORVALUE USR USR-Event-Id	DTR-False			22
+VENDORVALUE USR USR-Event-Id	Block-Error-at-Threshold	23
+VENDORVALUE USR USR-Event-Id	Fallbacks-at-Threshold		24
+VENDORVALUE USR USR-Event-Id	No-Dial-Tone-Detected		25
+VENDORVALUE USR USR-Event-Id	No-Loop-Current-Detected	26
+VENDORVALUE USR USR-Event-Id	Yellow-Alarm			27
+VENDORVALUE USR USR-Event-Id	Red-Alarm			28
+VENDORVALUE USR USR-Event-Id	Loss-Of-Signal			29
+VENDORVALUE USR USR-Event-Id	Rcv-Alrm-Ind-Signal		30
+VENDORVALUE USR USR-Event-Id	Timing-Source-Switch		31
+VENDORVALUE USR USR-Event-Id	Modem-Reset-by-DTE		32
+VENDORVALUE USR USR-Event-Id	Modem-Ring-No-Answer		33
+VENDORVALUE USR USR-Event-Id	DTE-Ring-No-Answer		34
+VENDORVALUE USR USR-Event-Id	Pkt-Bus-Session-Active		35
+VENDORVALUE USR USR-Event-Id	Pkt-Bus-Session-Congestion	36
+VENDORVALUE USR USR-Event-Id	Pkt-Bus-Session-Lost		37
+VENDORVALUE USR USR-Event-Id	Pkt-Bus-Session-Inactive	38
+VENDORVALUE USR USR-Event-Id	User-Interface-Reset		39
+VENDORVALUE USR USR-Event-Id	Gateway-Port-Out-of-Service	40
+VENDORVALUE USR USR-Event-Id	Gateway-Port-Link-Active	41
+VENDORVALUE USR USR-Event-Id	Dial-Out-Login-Failure		42
+VENDORVALUE USR USR-Event-Id	Dial-In-Login-Failure		43
+VENDORVALUE USR USR-Event-Id	Dial-Out-Restricted-Number	44
+VENDORVALUE USR USR-Event-Id	Dial-Back-Restricted-Number	45
+VENDORVALUE USR USR-Event-Id	User-Blacklisted		46
+VENDORVALUE USR USR-Event-Id	Attempted-Login-Blacklisted	47
+VENDORVALUE USR USR-Event-Id	Response-Attempt-Limit-Exceeded 48
+VENDORVALUE USR USR-Event-Id	Login-Attempt-Limit-Exceeded	49
+VENDORVALUE USR USR-Event-Id	Dial-Out-Call-Duration		50
+VENDORVALUE USR USR-Event-Id	Dial-In-Call-Duration		51
+VENDORVALUE USR USR-Event-Id	Pkt-Bus-Session-Err-Status	52
+VENDORVALUE USR USR-Event-Id	NMC-AutoRespnse-Trap		53
+VENDORVALUE USR USR-Event-Id	Acct-Server-Contact-Loss	54
+VENDORVALUE USR USR-Event-Id	Yellow-Alarm-Clear		55
+VENDORVALUE USR USR-Event-Id	Red-Alarm-Clear			56
+VENDORVALUE USR USR-Event-Id	Loss-Of-Signal-Clear		57
+VENDORVALUE USR USR-Event-Id	Rcv-Alrm-Ind-Signal-Clear	58
+VENDORVALUE USR USR-Event-Id	Incoming-Connection-Established 59
+VENDORVALUE USR USR-Event-Id	Outgoing-Connection-Established 60
+VENDORVALUE USR USR-Event-Id	Incoming-Connection-Terminated	61
+VENDORVALUE USR USR-Event-Id	Outgoing-Connection-Terminated	62
+VENDORVALUE USR USR-Event-Id	Connection-Attempt-Failure	63
+VENDORVALUE USR USR-Event-Id	Continuous-CRC-Alarm		64
+VENDORVALUE USR USR-Event-Id	Continuous-CRC-Alarm-Clear	65
+VENDORVALUE USR USR-Event-Id	Physical-State-Change		66
+VENDORVALUE USR USR-Event-Id	Gateway-Network-Failed		71
+VENDORVALUE USR USR-Event-Id	Gateway-Network-Restored	72
+VENDORVALUE USR USR-Event-Id	Packet-Bus-Clock-Lost		73
+VENDORVALUE USR USR-Event-Id	Packet-Bus-Clock-Restored	74
+VENDORVALUE USR USR-Event-Id	D-Channel-In-Service		75
+VENDORVALUE USR USR-Event-Id	D-Channel-Out-of-Service	76
+VENDORVALUE USR USR-Event-Id	DS0s-In-Service			77
+VENDORVALUE USR USR-Event-Id	DS0s-Out-of-Service		78
+VENDORVALUE USR USR-Event-Id	T1/T1PRI/E1PRI-Call-Event	79
+VENDORVALUE USR USR-Event-Id	Psu-Incompatible		80
+VENDORVALUE USR USR-Event-Id	T1,T1-E1/PRI-Call-Arrive-Event	81
+VENDORVALUE USR USR-Event-Id	T1,T1-E1/PRI-Call-Connect-Event	82
+VENDORVALUE USR USR-Event-Id	T1,T1-E1/PRI-Call-Termina-Event	83
+VENDORVALUE USR USR-Event-Id	T1,T1-E1/PRI-Call-Failed-Event	84
+VENDORVALUE USR USR-Event-Id	DNS-Contact-Lost		85
+VENDORVALUE USR USR-Event-Id	NTP-Contact-Lost		86
+VENDORVALUE USR USR-Event-Id	NTP-Contact-Restored		87
+VENDORVALUE USR USR-Event-Id	IPGW-Link-Up			88
+VENDORVALUE USR USR-Event-Id	IPGW-Link-Down			89
+VENDORVALUE USR USR-Event-Id	NTP-Contact-Degraded		90
+VENDORVALUE USR USR-Event-Id	In-Connection-Failed		91
+VENDORVALUE USR USR-Event-Id	Out-Connection-Failed		92
+VENDORVALUE USR USR-Event-Id	Application-ProcessorReset	93
+VENDORVALUE USR USR-Event-Id	DSP-Reset			94
+VENDORVALUE USR USR-Event-Id	Changed-to-Maint-Srvs-State	95
+VENDORVALUE USR USR-Event-Id	Loop-Back-cleared-on-channel	96
+VENDORVALUE USR USR-Event-Id	Loop-Back-on-channel		97
+VENDORVALUE USR USR-Event-Id	Telco-Abnormal-Response		98
+VENDORVALUE USR USR-Event-Id	DNS-Contact-Restored		99
+VENDORVALUE USR USR-Event-Id	DNS-Contact-Degraded		100
+VENDORVALUE USR USR-Event-Id	RADIUS-Accounting-Restored	101
+VENDORVALUE USR USR-Event-Id	RADIUS-Accounting-Group-Restore	102
+VENDORVALUE USR USR-Event-Id	RADIUS-Accounting-Group-Degrade	103
+VENDORVALUE USR USR-Event-Id	RADIUS-Accounting-Group-NonOper	104
+VENDORVALUE USR USR-Event-Id	T1/T1-E1/PRI-InCall-Fail-Event	119
+VENDORVALUE USR USR-Event-Id	T1/T1-E1/PRI-OutCall-Fail-Event	120
+VENDORVALUE USR USR-Event-Id	RMMIE-Retrain-Event		121
+VENDORVALUE USR USR-Event-Id	RMMIE-Speed-Shift-Event		122
+VENDORVALUE USR USR-Event-Id	CDMA-Call-Start			191
+VENDORVALUE USR USR-Event-Id	CDMA-Call-End			192
+
+VENDORVALUE USR USR-Card-Type	SlotEmpty			1
+VENDORVALUE USR USR-Card-Type	SlotUnknown			2
+VENDORVALUE USR USR-Card-Type	NetwMgtCard			3
+VENDORVALUE USR USR-Card-Type	DualT1NAC			4
+VENDORVALUE USR USR-Card-Type	DualModemNAC			5
+VENDORVALUE USR USR-Card-Type	QuadModemNAC			6
+VENDORVALUE USR USR-Card-Type	TrGatewayNAC			7
+VENDORVALUE USR USR-Card-Type	X25GatewayNAC			8
+VENDORVALUE USR USR-Card-Type	DualV34ModemNAC			9
+VENDORVALUE USR USR-Card-Type	QuadV32DigitalModemNAC		10
+VENDORVALUE USR USR-Card-Type	QuadV32AnalogModemNAC		11
+VENDORVALUE USR USR-Card-Type	QuadV32DigAnlModemNAC		12
+VENDORVALUE USR USR-Card-Type	QuadV34DigModemNAC		13
+VENDORVALUE USR USR-Card-Type	QuadV34AnlModemNAC		14
+VENDORVALUE USR USR-Card-Type	QuadV34DigAnlModemNAC		15
+VENDORVALUE USR USR-Card-Type	SingleT1NAC			16
+VENDORVALUE USR USR-Card-Type	EthernetGatewayNAC		17
+VENDORVALUE USR USR-Card-Type	AccessServer			18
+VENDORVALUE USR USR-Card-Type	486TrGatewayNAC			19
+VENDORVALUE USR USR-Card-Type	486EthernetGatewayNAC		20
+VENDORVALUE USR USR-Card-Type	DualRS232NAC			22
+VENDORVALUE USR USR-Card-Type	486X25GatewayNAC		23
+VENDORVALUE USR USR-Card-Type	ApplicationServerNAC		25
+VENDORVALUE USR USR-Card-Type	ISDNGatewayNAC			26
+VENDORVALUE USR USR-Card-Type	ISDNpriT1NAC			27
+VENDORVALUE USR USR-Card-Type	ClkedNetMgtCard			28
+VENDORVALUE USR USR-Card-Type	ModemPoolManagementNAC		29
+VENDORVALUE USR USR-Card-Type	ModemPoolNetserverNAC		30
+VENDORVALUE USR USR-Card-Type	ModemPoolV34ModemNAC		31
+VENDORVALUE USR USR-Card-Type	ModemPoolISDNNAC		32
+VENDORVALUE USR USR-Card-Type	NTServerNAC			33
+VENDORVALUE USR USR-Card-Type	QuadV34DigitalG2NAC		34
+VENDORVALUE USR USR-Card-Type	QuadV34AnalogG2NAC		35
+VENDORVALUE USR USR-Card-Type	QuadV34DigAnlgG2NAC		36
+VENDORVALUE USR USR-Card-Type	NETServerFrameRelayNAC		37
+VENDORVALUE USR USR-Card-Type	NETServerTokenRingNAC		38
+VENDORVALUE USR USR-Card-Type	X2524ChannelNAC			39
+VENDORVALUE USR USR-Card-Type	WirelessGatewayNac		42
+
+VENDORVALUE USR USR-Card-Type	EnhancedAccessServer		44
+VENDORVALUE USR USR-Card-Type	EnhancedISDNGatewayNAC		45
+
+VENDORVALUE USR USR-Card-Type	DualT1NIC			1001
+VENDORVALUE USR USR-Card-Type	DualAlogMdmNIC			1002
+VENDORVALUE USR USR-Card-Type	QuadDgtlMdmNIC			1003
+VENDORVALUE USR USR-Card-Type	QuadAlogDgtlMdmNIC		1004
+VENDORVALUE USR USR-Card-Type	TokenRingNIC			1005
+VENDORVALUE USR USR-Card-Type	SingleT1NIC			1006
+VENDORVALUE USR USR-Card-Type	EthernetNIC			1007
+VENDORVALUE USR USR-Card-Type	ShortHaulDualT1NIC		1008
+VENDORVALUE USR USR-Card-Type	DualAlogMgdIntlMdmNIC		1009
+VENDORVALUE USR USR-Card-Type	X25NIC				1010
+VENDORVALUE USR USR-Card-Type	QuadAlogNonMgdMdmNIC		1011
+VENDORVALUE USR USR-Card-Type	QuadAlogMgdIntlMdmNIC		1012
+VENDORVALUE USR USR-Card-Type	QuadAlogNonMgdIntlMdmNIC	1013
+VENDORVALUE USR USR-Card-Type	QuadLsdLiMgdMdmNIC		1014
+VENDORVALUE USR USR-Card-Type	QuadLsdLiNonMgdMdmNIC		1015
+VENDORVALUE USR USR-Card-Type	QuadLsdLiMgdIntlMdmNIC		1016
+VENDORVALUE USR USR-Card-Type	QuadLsdLiNonMgdIntlMdmNIC	1017
+VENDORVALUE USR USR-Card-Type	HSEthernetWithV35NIC		1018
+VENDORVALUE USR USR-Card-Type	HSEthernetWithoutV35NIC		1019
+VENDORVALUE USR USR-Card-Type	DualHighSpeedV35NIC		1020
+VENDORVALUE USR USR-Card-Type	QuadV35RS232LowSpeedNIC		1021
+VENDORVALUE USR USR-Card-Type	DualE1NIC			1022
+VENDORVALUE USR USR-Card-Type	ShortHaulDualE1NIC		1023
+VENDORVALUE USR USR-Card-Type	BellcoreLongHaulDualT1NIC	1025
+VENDORVALUE USR USR-Card-Type	BellcoreShrtHaulDualT1NIC	1026
+VENDORVALUE USR USR-Card-Type	SCSIEdgeServerNIC		1027
+
+VENDORVALUE USR USR-Default-DTE-Data-Rate	110-BPS		1
+VENDORVALUE USR USR-Default-DTE-Data-Rate	300-BPS		2
+VENDORVALUE USR USR-Default-DTE-Data-Rate	600-BPS		3
+VENDORVALUE USR USR-Default-DTE-Data-Rate	1200-BPS	4
+VENDORVALUE USR USR-Default-DTE-Data-Rate	2400-BPS	5
+VENDORVALUE USR USR-Default-DTE-Data-Rate	4800-BPS	6
+VENDORVALUE USR USR-Default-DTE-Data-Rate	7200-BPS	7
+VENDORVALUE USR USR-Default-DTE-Data-Rate	9600-BPS	8
+VENDORVALUE USR USR-Default-DTE-Data-Rate	12K-BPS		9
+VENDORVALUE USR USR-Default-DTE-Data-Rate	14.4K-BPS	10
+VENDORVALUE USR USR-Default-DTE-Data-Rate	16.8-BPS	11
+VENDORVALUE USR USR-Default-DTE-Data-Rate	19.2K-BPS	12
+VENDORVALUE USR USR-Default-DTE-Data-Rate	38.4K-BPS	13
+VENDORVALUE USR USR-Default-DTE-Data-Rate	75-BPS		14
+VENDORVALUE USR USR-Default-DTE-Data-Rate	450-BPS		15
+VENDORVALUE USR USR-Default-DTE-Data-Rate	UNKNOWN-BPS	16
+VENDORVALUE USR USR-Default-DTE-Data-Rate	57.6K-BPS	17
+VENDORVALUE USR USR-Default-DTE-Data-Rate	21.6K-BPS	18
+VENDORVALUE USR USR-Default-DTE-Data-Rate	24K-BPS		19
+VENDORVALUE USR USR-Default-DTE-Data-Rate	26K-BPS		20
+VENDORVALUE USR USR-Default-DTE-Data-Rate	28K-BPS		21
+VENDORVALUE USR USR-Default-DTE-Data-Rate	115K-BPS	22
+
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	110-BPS		1
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	300-BPS		2
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	600-BPS		3
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	1200-BPS	4
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	2400-BPS	5
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	4800-BPS	6
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	7200-BPS	7
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	9600-BPS	8
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	12000-BPS	9
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	14400-BPS	10
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	16800-BPS	11
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	19200-BPS	12
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	38400-BPS	13
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	75-BPS		14
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	450-BPS		15
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	UNKNOWN-BPS	16
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	57600-BPS	17
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	21600-BPS	18
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	24000-BPS	19
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	26400-BPS	20
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	28800-BPS	21
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	115200-BPS	22
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	31200-BPS	23
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	33600-BPS	24
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	25333-BPS	25
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	26666-BPS	26
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	28000-BPS	27
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	29333-BPS	28
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	30666-BPS	29
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	32000-BPS	30
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	33333-BPS	31
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	34666-BPS	32
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	36000-BPS	33
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	37333-BPS	34
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	38666-BPS	35
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	40000-BPS	36
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	41333-BPS	37
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	42666-BPS	38
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	44000-BPS	39
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	45333-BPS	40
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	46666-BPS	41
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	48000-BPS	42	
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	49333-BPS	43	
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	50666-BPS	44
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	52000-BPS	45	
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	53333-BPS	46	
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	54666-BPS	47	
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	56000-BPS	48	
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	57333-BPS	49	
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	58666-BPS	50	
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	60000-BPS	51	
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	61333-BPS	52	
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	62666-BPS	53	
+VENDORVALUE USR USR-Initial-Rx-Link-Data-Rate	64000-BPS	54	
+
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	110-BPS		1
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	300-BPS		2
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	600-BPS		3
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	1200-BPS	4
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	2400-BPS	5
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	4800-BPS	6
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	7200-BPS	7
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	9600-BPS	8
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	12000-BPS	9
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	14400-BPS	10
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	16800-BPS	11
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	19200-BPS	12
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	38400-BPS	13
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	75-BPS		14
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	450-BPS		15
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	UNKNOWN-BPS	16
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	57600-BPS	17
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	21600-BPS	18
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	24000-BPS	19
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	26400-BPS	20
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	28800-BPS	21
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	115200-BPS	22
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	31200-BPS	23
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	33600-BPS	24
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	25333-BPS	25
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	26666-BPS	26
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	28000-BPS	27
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	29333-BPS	28
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	30666-BPS	29
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	32000-BPS	30
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	33333-BPS	31
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	34666-BPS	32
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	36000-BPS	33
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	37333-BPS	34
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	38666-BPS	35
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	40000-BPS	36
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	41333-BPS	37
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	42666-BPS	38
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	44000-BPS	39
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	45333-BPS	40
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	46666-BPS	41
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	48000-BPS	42	
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	49333-BPS	43	
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	50666-BPS	44
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	52000-BPS	45	
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	53333-BPS	46	
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	54666-BPS	47	
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	56000-BPS	48	
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	57333-BPS	49	
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	58666-BPS	50	
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	60000-BPS	51	
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	61333-BPS	52	
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	62666-BPS	53	
+VENDORVALUE USR USR-Final-Rx-Link-Data-Rate	64000-BPS	54	
+
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	110-BPS		1
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	300-BPS		2
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	600-BPS		3
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	1200-BPS	4
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	2400-BPS	5
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	4800-BPS	6
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	7200-BPS	7
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	9600-BPS	8
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	12000-BPS	9
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	14400-BPS	10
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	16800-BPS	11
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	19200-BPS	12
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	38400-BPS	13
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	75-BPS		14
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	450-BPS		15
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	UNKNOWN-BPS	16
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	57600-BPS	17
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	21600-BPS	18
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	24000-BPS	19
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	26400-BPS	20
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	28800-BPS	21
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	115200-BPS	22
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	31200-BPS	23
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	33600-BPS	24
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	25333-BPS	25
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	26666-BPS	26
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	28000-BPS	27
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	29333-BPS	28
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	30666-BPS	29
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	32000-BPS	30
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	33333-BPS	31
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	34666-BPS	32
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	36000-BPS	33
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	37333-BPS	34
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	38666-BPS	35
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	40000-BPS	36
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	41333-BPS	37
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	42666-BPS	38
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	44000-BPS	39
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	45333-BPS	40
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	46666-BPS	41
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	48000-BPS	42	
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	49333-BPS	43	
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	50666-BPS	44
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	52000-BPS	45	
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	53333-BPS	46	
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	54666-BPS	47	
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	56000-BPS	48	
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	57333-BPS	49	
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	58666-BPS	50	
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	60000-BPS	51	
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	61333-BPS	52	
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	62666-BPS	53	
+VENDORVALUE USR USR-Initial-Tx-Link-Data-Rate	64000-BPS	54	
+
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	110-BPS		1
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	300-BPS		2
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	600-BPS		3
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	1200-BPS	4
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	2400-BPS	5
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	4800-BPS	6
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	7200-BPS	7
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	9600-BPS	8
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	12000-BPS	9
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	14400-BPS	10
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	16800-BPS	11
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	19200-BPS	12
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	38400-BPS	13
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	75-BPS		14
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	450-BPS		15
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	UNKNOWN-BPS	16
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	57600-BPS	17
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	21600-BPS	18
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	24000-BPS	19
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	26400-BPS	20
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	28800-BPS	21
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	115200-BPS	22
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	31200-BPS	23
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	33600-BPS	24
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	25333-BPS	25
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	26666-BPS	26
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	28000-BPS	27
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	29333-BPS	28
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	30666-BPS	29
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	32000-BPS	30
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	33333-BPS	31
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	34666-BPS	32
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	36000-BPS	33
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	37333-BPS	34
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	38666-BPS	35
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	40000-BPS	36
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	41333-BPS	37
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	42666-BPS	38
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	44000-BPS	39
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	45333-BPS	40
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	46666-BPS	41
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	48000-BPS	42	
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	49333-BPS	43	
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	50666-BPS	44
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	52000-BPS	45	
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	53333-BPS	46	
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	54666-BPS	47	
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	56000-BPS	48	
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	57333-BPS	49	
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	58666-BPS	50	
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	60000-BPS	51	
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	61333-BPS	52	
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	62666-BPS	53	
+VENDORVALUE USR USR-Final-Tx-Link-Data-Rate	64000-BPS	54	
+
+# Value Connect Speed  /* Added by Krish */
+
+VENDORVALUE USR USR-Connect-Speed  NONE		0 
+VENDORVALUE USR USR-Connect-Speed  300_BPS	1 
+VENDORVALUE USR USR-Connect-Speed  1200_BPS	2 
+VENDORVALUE USR USR-Connect-Speed  2400_BPS	3 
+VENDORVALUE USR USR-Connect-Speed  4800_BPS	4 
+VENDORVALUE USR USR-Connect-Speed  7200_BPS	5 
+VENDORVALUE USR USR-Connect-Speed  9600_BPS	6 
+VENDORVALUE USR USR-Connect-Speed  12000_BPS	7 
+VENDORVALUE USR USR-Connect-Speed  14400_BPS	8 
+VENDORVALUE USR USR-Connect-Speed  16800_BPS	9
+VENDORVALUE USR USR-Connect-Speed  19200_BPS	10 
+VENDORVALUE USR USR-Connect-Speed  21600_BPS	11 
+VENDORVALUE USR USR-Connect-Speed  28800_BPS	12 
+VENDORVALUE USR USR-Connect-Speed  38400_BPS	13 
+VENDORVALUE USR USR-Connect-Speed  57600_BPS	14 
+VENDORVALUE USR USR-Connect-Speed  44000_BPS	27 
+VENDORVALUE USR USR-Connect-Speed  45333_BPS	28 
+VENDORVALUE USR USR-Connect-Speed  46666_BPS	29 
+VENDORVALUE USR USR-Connect-Speed  48000_BPS	30 
+VENDORVALUE USR USR-Connect-Speed  49333_BPS	31 
+VENDORVALUE USR USR-Connect-Speed  50666_BPS	32 
+VENDORVALUE USR USR-Connect-Speed  52000_BPS	33 
+VENDORVALUE USR USR-Connect-Speed  53333_BPS	34 
+VENDORVALUE USR USR-Connect-Speed  54666_BPS	35 
+VENDORVALUE USR USR-Connect-Speed  56000_BPS	36 
+VENDORVALUE USR USR-Connect-Speed  57333_BPS	37 
+VENDORVALUE USR USR-Connect-Speed  64000_BPS	38 
+VENDORVALUE USR USR-Connect-Speed  25333_BPS	39 
+VENDORVALUE USR USR-Connect-Speed  26666_BPS	40
+VENDORVALUE USR USR-Connect-Speed  28000_BPS	41 
+VENDORVALUE USR USR-Connect-Speed  115200_BPS	15 
+VENDORVALUE USR USR-Connect-Speed  288000_BPS	16
+VENDORVALUE USR USR-Connect-Speed  75_1200_BPS	17 
+VENDORVALUE USR USR-Connect-Speed  1200_75_BPS	18
+VENDORVALUE USR USR-Connect-Speed  24000_BPS	19
+VENDORVALUE USR USR-Connect-Speed  26400_BPS	20
+VENDORVALUE USR USR-Connect-Speed  31200_BPS	21
+VENDORVALUE USR USR-Connect-Speed  33600_BPS	22
+VENDORVALUE USR USR-Connect-Speed  33333_BPS	23
+VENDORVALUE USR USR-Connect-Speed  37333_BPS	24
+VENDORVALUE USR USR-Connect-Speed  41333_BPS	25
+VENDORVALUE USR USR-Connect-Speed  42666_BPS	26
+VENDORVALUE USR USR-Connect-Speed  29333_BPS	42 
+VENDORVALUE USR USR-Connect-Speed  30666_BPS	43
+VENDORVALUE USR USR-Connect-Speed  32000_BPS	44 
+VENDORVALUE USR USR-Connect-Speed  34666_BPS	45 
+VENDORVALUE USR USR-Connect-Speed  36000_BPS	46 
+VENDORVALUE USR USR-Connect-Speed  38666_BPS	47 
+VENDORVALUE USR USR-Connect-Speed  40000_BPS	48 
+VENDORVALUE USR USR-Connect-Speed  58666_BPS	49 
+VENDORVALUE USR USR-Connect-Speed  60000_BPS	50 
+VENDORVALUE USR USR-Connect-Speed  61333_BPS	51 
+VENDORVALUE USR USR-Connect-Speed  62666_BPS	52 
+
+# End of Connect-Speed / * Added by Krish */
+
+VENDORVALUE USR USR-Sync-Async-Mode		Asynchronous	1
+VENDORVALUE USR USR-Sync-Async-Mode		Synchronous	2
+
+VENDORVALUE USR USR-Originate-Answer-Mode Originate_in_Originate_Mode	1
+VENDORVALUE USR USR-Originate-Answer-Mode Originate_in_Answer_Mode	2
+VENDORVALUE USR USR-Originate-Answer-Mode Answer_in_Originate_Mode	3
+VENDORVALUE USR USR-Originate-Answer-Mode Answer_in_Answer_Mode		4
+
+VENDORVALUE USR USR-Modulation-Type usRoboticsHST			1
+VENDORVALUE USR USR-Modulation-Type ccittV32				2
+VENDORVALUE USR USR-Modulation-Type ccittV22bis				3
+VENDORVALUE USR USR-Modulation-Type bell103				4
+VENDORVALUE USR USR-Modulation-Type ccittV21				5
+VENDORVALUE USR USR-Modulation-Type bell212				6
+VENDORVALUE USR USR-Modulation-Type ccittV32bis				7
+VENDORVALUE USR USR-Modulation-Type ccittV23				8
+VENDORVALUE USR USR-Modulation-Type negotiationFailed			9
+VENDORVALUE USR USR-Modulation-Type bell208b				10
+VENDORVALUE USR USR-Modulation-Type v21FaxClass1			11
+VENDORVALUE USR USR-Modulation-Type v27FaxClass1			12
+VENDORVALUE USR USR-Modulation-Type v29FaxClass1			13
+VENDORVALUE USR USR-Modulation-Type v17FaxClass1			14
+VENDORVALUE USR USR-Modulation-Type v21FaxClass2			15
+VENDORVALUE USR USR-Modulation-Type v27FaxClass2			16
+VENDORVALUE USR USR-Modulation-Type v29FaxClass2			17
+VENDORVALUE USR USR-Modulation-Type v17FaxClass2			18
+VENDORVALUE USR USR-Modulation-Type v32Terbo				19
+VENDORVALUE USR USR-Modulation-Type v34					20
+VENDORVALUE USR USR-Modulation-Type vFC					21
+VENDORVALUE USR USR-Modulation-Type v34plus				22
+VENDORVALUE USR USR-Modulation-Type x2					23
+VENDORVALUE USR USR-Modulation-Type v110				24
+VENDORVALUE USR USR-Modulation-Type v120				25
+VENDORVALUE USR USR-Modulation-Type x75					26
+VENDORVALUE USR USR-Modulation-Type asyncSyncPPP			27
+VENDORVALUE USR USR-Modulation-Type clearChannel			28
+VENDORVALUE USR USR-Modulation-Type x2client				29
+VENDORVALUE USR USR-Modulation-Type x2symmetric				30
+VENDORVALUE USR USR-Modulation-Type piafs				31
+VENDORVALUE USR USR-Modulation-Type x2version2				32
+VENDORVALUE USR USR-Modulation-Type v90Analog				33
+VENDORVALUE USR USR-Modulation-Type v90Digital				34
+VENDORVALUE USR USR-Modulation-Type v90AllDigital			35
+
+VENDORVALUE USR	Initial-Modulation-Type usRoboticsHST			1
+VENDORVALUE USR	Initial-Modulation-Type ccittV32			2
+VENDORVALUE USR	Initial-Modulation-Type ccittV22bis			3
+VENDORVALUE USR	Initial-Modulation-Type bell103				4
+VENDORVALUE USR	Initial-Modulation-Type ccittV21			5
+VENDORVALUE USR	Initial-Modulation-Type bell212				6
+VENDORVALUE USR	Initial-Modulation-Type ccittV32bis			7
+VENDORVALUE USR	Initial-Modulation-Type ccittV23			8
+VENDORVALUE USR	Initial-Modulation-Type negotiationFailed		9
+VENDORVALUE USR	Initial-Modulation-Type bell208b			10
+VENDORVALUE USR	Initial-Modulation-Type v21FaxClass1			11
+VENDORVALUE USR	Initial-Modulation-Type v27FaxClass1			12
+VENDORVALUE USR	Initial-Modulation-Type v29FaxClass1			13
+VENDORVALUE USR	Initial-Modulation-Type v17FaxClass1			14
+VENDORVALUE USR	Initial-Modulation-Type v21FaxClass2			15
+VENDORVALUE USR	Initial-Modulation-Type v27FaxClass2			16
+VENDORVALUE USR	Initial-Modulation-Type v29FaxClass2			17
+VENDORVALUE USR	Initial-Modulation-Type v17FaxClass2			18
+VENDORVALUE USR	Initial-Modulation-Type v32Terbo			19
+VENDORVALUE USR	Initial-Modulation-Type v34				20
+VENDORVALUE USR	Initial-Modulation-Type vFC				21
+VENDORVALUE USR	Initial-Modulation-Type v34plus				22
+VENDORVALUE USR	Initial-Modulation-Type x2				23
+VENDORVALUE USR	Initial-Modulation-Type v110				24
+VENDORVALUE USR	Initial-Modulation-Type v120				25
+VENDORVALUE USR	Initial-Modulation-Type x75				26
+VENDORVALUE USR	Initial-Modulation-Type asyncSyncPPP			27
+VENDORVALUE USR	Initial-Modulation-Type clearChannel			28
+VENDORVALUE USR	Initial-Modulation-Type x2client			29
+VENDORVALUE USR	Initial-Modulation-Type x2symmetric			30
+VENDORVALUE USR	Initial-Modulation-Type piafs				31
+VENDORVALUE USR	Initial-Modulation-Type x2version2			32
+VENDORVALUE USR	Initial-Modulation-Type v90Analogue			33
+VENDORVALUE USR	Initial-Modulation-Type v90Digital			34
+VENDORVALUE USR	Initial-Modulation-Type v90AllDigital			35
+
+VENDORVALUE USR USR-Connect-Term-Reason	dtrDrop				1
+VENDORVALUE USR USR-Connect-Term-Reason	escapeSequence			2
+VENDORVALUE USR USR-Connect-Term-Reason	athCommand			3
+VENDORVALUE USR USR-Connect-Term-Reason	carrierLoss			4
+VENDORVALUE USR USR-Connect-Term-Reason	inactivityTimout		5
+VENDORVALUE USR USR-Connect-Term-Reason	mnpIncompatible			6
+VENDORVALUE USR USR-Connect-Term-Reason	undefined			7
+VENDORVALUE USR USR-Connect-Term-Reason	remotePassword			8
+VENDORVALUE USR USR-Connect-Term-Reason	linkPassword			9
+VENDORVALUE USR USR-Connect-Term-Reason	retransmitLimit			10
+VENDORVALUE USR USR-Connect-Term-Reason	linkDisconnectMsgReceived	11
+VENDORVALUE USR USR-Connect-Term-Reason	noLoopCurrent			12
+VENDORVALUE USR USR-Connect-Term-Reason	invalidSpeed			13
+VENDORVALUE USR USR-Connect-Term-Reason	unableToRetrain			14
+VENDORVALUE USR USR-Connect-Term-Reason	managementCommand		15
+VENDORVALUE USR USR-Connect-Term-Reason	noDialTone			16
+VENDORVALUE USR USR-Connect-Term-Reason	keyAbort			17
+VENDORVALUE USR USR-Connect-Term-Reason	lineBusy			18
+VENDORVALUE USR USR-Connect-Term-Reason	noAnswer			19
+VENDORVALUE USR USR-Connect-Term-Reason	voice				20
+VENDORVALUE USR USR-Connect-Term-Reason	noAnswerTone			21
+VENDORVALUE USR USR-Connect-Term-Reason	noCarrier			22
+VENDORVALUE USR USR-Connect-Term-Reason	undetermined			23
+VENDORVALUE USR USR-Connect-Term-Reason	v42SabmeTimeout			24
+VENDORVALUE USR USR-Connect-Term-Reason	v42BreakTimeout			25
+VENDORVALUE USR USR-Connect-Term-Reason	v42DisconnectCmd		26
+VENDORVALUE USR USR-Connect-Term-Reason	v42IdExchangeFail		27
+VENDORVALUE USR USR-Connect-Term-Reason	v42BadSetup			28
+VENDORVALUE USR USR-Connect-Term-Reason	v42InvalidCodeWord		29
+VENDORVALUE USR USR-Connect-Term-Reason	v42StringToLong			30
+VENDORVALUE USR USR-Connect-Term-Reason	v42InvalidCommand		31
+VENDORVALUE USR USR-Connect-Term-Reason	none				32
+VENDORVALUE USR USR-Connect-Term-Reason	v32Cleardown			33
+VENDORVALUE USR USR-Connect-Term-Reason	dialSecurity			34
+VENDORVALUE USR USR-Connect-Term-Reason	remoteAccessDenied		35
+VENDORVALUE USR USR-Connect-Term-Reason	loopLoss			36
+VENDORVALUE USR USR-Connect-Term-Reason	ds0Teardown			37
+VENDORVALUE USR USR-Connect-Term-Reason	promptNotEnabled		38
+VENDORVALUE USR USR-Connect-Term-Reason	noPromptingInSync		39
+VENDORVALUE USR USR-Connect-Term-Reason	nonArqMode			40
+VENDORVALUE USR USR-Connect-Term-Reason	modeIncompatible		41
+VENDORVALUE USR USR-Connect-Term-Reason	noPromptInNonARQ		42
+VENDORVALUE USR USR-Connect-Term-Reason	dialBackLink			43
+VENDORVALUE USR USR-Connect-Term-Reason	linkAbort			44
+VENDORVALUE USR USR-Connect-Term-Reason	autopassFailed			45
+VENDORVALUE USR USR-Connect-Term-Reason	pbGenericError			46
+VENDORVALUE USR USR-Connect-Term-Reason	pbLinkErrTxPreAck		47
+VENDORVALUE USR USR-Connect-Term-Reason	pbLinkErrTxTardyACK		48
+VENDORVALUE USR USR-Connect-Term-Reason	pbTransmitBusTimeout		49
+VENDORVALUE USR USR-Connect-Term-Reason	pbReceiveBusTimeout		50
+VENDORVALUE USR USR-Connect-Term-Reason	pbLinkErrTxTAL			51
+VENDORVALUE USR USR-Connect-Term-Reason	pbLinkErrRxTAL			52
+VENDORVALUE USR USR-Connect-Term-Reason	pbTransmitMasterTimeout		53
+VENDORVALUE USR USR-Connect-Term-Reason	pbClockMissing			54
+VENDORVALUE USR USR-Connect-Term-Reason	pbReceivedLsWhileLinkUp		55
+VENDORVALUE USR USR-Connect-Term-Reason	pbOutOfSequenceFrame		56
+VENDORVALUE USR USR-Connect-Term-Reason	pbBadFrame			57
+VENDORVALUE USR USR-Connect-Term-Reason	pbAckWaitTimeout		58
+VENDORVALUE USR USR-Connect-Term-Reason	pbReceivedAckSeqErr		59
+VENDORVALUE USR USR-Connect-Term-Reason	pbReceiveOvrflwRNRFail		60
+VENDORVALUE USR USR-Connect-Term-Reason	pbReceiveMsgBufOvrflw		61
+VENDORVALUE USR USR-Connect-Term-Reason	rcvdGatewayDiscCmd		62
+VENDORVALUE USR USR-Connect-Term-Reason	tokenPassingTimeout		63
+VENDORVALUE USR USR-Connect-Term-Reason	dspInterruptTimeout		64
+VENDORVALUE USR USR-Connect-Term-Reason	mnpProtocolViolation		65
+VENDORVALUE USR USR-Connect-Term-Reason	class2FaxHangupCmd		66
+VENDORVALUE USR USR-Connect-Term-Reason	hstSpeedSwitchTimeout		67
+VENDORVALUE USR USR-Connect-Term-Reason	tooManyUnacked			68
+VENDORVALUE USR USR-Connect-Term-Reason	timerExpired			69
+VENDORVALUE USR USR-Connect-Term-Reason	t1Glare				70
+VENDORVALUE USR USR-Connect-Term-Reason	priDialoutRqTimeout             71
+VENDORVALUE USR USR-Connect-Term-Reason	abortAnlgDstOvrIsdn             72
+VENDORVALUE USR USR-Connect-Term-Reason	normalUserCallClear             73
+VENDORVALUE USR USR-Connect-Term-Reason	normalUnspecified               74
+VENDORVALUE USR USR-Connect-Term-Reason	bearerIncompatibility           75
+VENDORVALUE USR USR-Connect-Term-Reason	protocolErrorEvent              76
+VENDORVALUE USR USR-Connect-Term-Reason	abnormalDisconnect              77
+VENDORVALUE USR USR-Connect-Term-Reason	invalidCauseValue               78
+VENDORVALUE USR USR-Connect-Term-Reason	resourceUnavailable             79
+VENDORVALUE USR USR-Connect-Term-Reason	remoteHungUpDuringTraining	80
+VENDORVALUE USR USR-Connect-Term-Reason	trainingTimeout			81
+VENDORVALUE USR USR-Connect-Term-Reason	incomingModemNotAvailable	82
+VENDORVALUE USR USR-Connect-Term-Reason	incomingInvalidBearerCap	83
+VENDORVALUE USR USR-Connect-Term-Reason	incomingInvalidChannelID	84
+VENDORVALUE USR USR-Connect-Term-Reason	incomingInvalidProgInd          85
+VENDORVALUE USR USR-Connect-Term-Reason	incomingInvalidCallingPty	86
+VENDORVALUE USR USR-Connect-Term-Reason	incomingInvalidCalledPty        87
+VENDORVALUE USR USR-Connect-Term-Reason	incomingCallBlock               88
+VENDORVALUE USR USR-Connect-Term-Reason	incomingLoopStNoRingOff         89
+VENDORVALUE USR USR-Connect-Term-Reason	outgoingTelcoDisconnect         90
+VENDORVALUE USR USR-Connect-Term-Reason	outgoingEMWinkTimeout           91
+VENDORVALUE USR USR-Connect-Term-Reason	outgoingEMWinkTooShort          92
+VENDORVALUE USR USR-Connect-Term-Reason	outgoingNoChannelAvail          93
+VENDORVALUE USR USR-Connect-Term-Reason	dspReboot               	94
+VENDORVALUE USR USR-Connect-Term-Reason	noDSPRespToKA           	95
+VENDORVALUE USR USR-Connect-Term-Reason	noDSPRespToDisc         	96
+VENDORVALUE USR USR-Connect-Term-Reason	dspTailPtrInvalid               97
+VENDORVALUE USR USR-Connect-Term-Reason	dspHeadPtrInvalid               98
+
+VENDORVALUE USR USR-Failure-to-Connect-Reason dtrDrop			 1
+VENDORVALUE USR USR-Failure-to-Connect-Reason escapeSequence		 2
+VENDORVALUE USR USR-Failure-to-Connect-Reason athCommand		 3
+VENDORVALUE USR USR-Failure-to-Connect-Reason carrierLoss		 4
+VENDORVALUE USR USR-Failure-to-Connect-Reason inactivityTimout		 5
+VENDORVALUE USR USR-Failure-to-Connect-Reason mnpIncompatible		 6
+VENDORVALUE USR USR-Failure-to-Connect-Reason undefined			 7
+VENDORVALUE USR USR-Failure-to-Connect-Reason remotePassword		 8
+VENDORVALUE USR USR-Failure-to-Connect-Reason linkPassword		 9
+VENDORVALUE USR USR-Failure-to-Connect-Reason retransmitLimit		 10
+VENDORVALUE USR USR-Failure-to-Connect-Reason linkDisconnectMsgRec	 11
+VENDORVALUE USR USR-Failure-to-Connect-Reason noLoopCurrent		 12
+VENDORVALUE USR USR-Failure-to-Connect-Reason invalidSpeed		 13
+VENDORVALUE USR USR-Failure-to-Connect-Reason unableToRetrain		 14
+VENDORVALUE USR USR-Failure-to-Connect-Reason managementCommand		 15
+VENDORVALUE USR USR-Failure-to-Connect-Reason noDialTone		 16
+VENDORVALUE USR USR-Failure-to-Connect-Reason keyAbort			 17
+VENDORVALUE USR USR-Failure-to-Connect-Reason lineBusy			 18
+VENDORVALUE USR USR-Failure-to-Connect-Reason noAnswer			 19
+VENDORVALUE USR USR-Failure-to-Connect-Reason voice			 20
+VENDORVALUE USR USR-Failure-to-Connect-Reason noAnswerTone		 21
+VENDORVALUE USR USR-Failure-to-Connect-Reason noCarrier			 22
+VENDORVALUE USR USR-Failure-to-Connect-Reason undetermined		 23
+VENDORVALUE USR USR-Failure-to-Connect-Reason v42SabmeTimeout		 24
+VENDORVALUE USR USR-Failure-to-Connect-Reason v42BreakTimeout		 25
+VENDORVALUE USR USR-Failure-to-Connect-Reason v42DisconnectCmd		 26
+VENDORVALUE USR USR-Failure-to-Connect-Reason v42IdExchangeFail		 27
+VENDORVALUE USR USR-Failure-to-Connect-Reason v42BadSetup		 28
+VENDORVALUE USR USR-Failure-to-Connect-Reason v42InvalidCodeWord	 29
+VENDORVALUE USR USR-Failure-to-Connect-Reason v42StringToLong		 30
+VENDORVALUE USR USR-Failure-to-Connect-Reason v42InvalidCommand		 31
+VENDORVALUE USR USR-Failure-to-Connect-Reason none			 32
+VENDORVALUE USR USR-Failure-to-Connect-Reason v32Cleardown		 33
+VENDORVALUE USR USR-Failure-to-Connect-Reason dialSecurity		 34
+VENDORVALUE USR USR-Failure-to-Connect-Reason remoteAccessDenied	 35
+VENDORVALUE USR USR-Failure-to-Connect-Reason loopLoss			 36
+VENDORVALUE USR USR-Failure-to-Connect-Reason ds0Teardown		 37
+VENDORVALUE USR USR-Failure-to-Connect-Reason promptNotEnabled		 38
+VENDORVALUE USR USR-Failure-to-Connect-Reason noPromptingInSync		 39
+VENDORVALUE USR USR-Failure-to-Connect-Reason nonArqMode		 40
+VENDORVALUE USR USR-Failure-to-Connect-Reason modeIncompatible		 41
+VENDORVALUE USR USR-Failure-to-Connect-Reason noPromptInNonARQ		 42
+VENDORVALUE USR USR-Failure-to-Connect-Reason dialBackLink		 43
+VENDORVALUE USR USR-Failure-to-Connect-Reason linkAbort			 44
+VENDORVALUE USR USR-Failure-to-Connect-Reason autopassFailed		 45
+VENDORVALUE USR USR-Failure-to-Connect-Reason pbGenericError		 46
+VENDORVALUE USR USR-Failure-to-Connect-Reason pbLinkErrTxPreAck		 47
+VENDORVALUE USR USR-Failure-to-Connect-Reason pbLinkErrTxTardyACK	 48
+VENDORVALUE USR USR-Failure-to-Connect-Reason pbTransmitBusTimeout	 49
+VENDORVALUE USR USR-Failure-to-Connect-Reason pbReceiveBusTimeout	 50
+VENDORVALUE USR USR-Failure-to-Connect-Reason pbLinkErrTxTAL		 51
+VENDORVALUE USR USR-Failure-to-Connect-Reason pbLinkErrRxTAL		 52
+VENDORVALUE USR USR-Failure-to-Connect-Reason pbTransmitMasterTimeout	 53
+VENDORVALUE USR USR-Failure-to-Connect-Reason pbClockMissing		 54
+VENDORVALUE USR USR-Failure-to-Connect-Reason pbReceivedLsWhileLinkUp	 55
+VENDORVALUE USR USR-Failure-to-Connect-Reason pbOutOfSequenceFrame	 56
+VENDORVALUE USR USR-Failure-to-Connect-Reason pbBadFrame		 57
+VENDORVALUE USR USR-Failure-to-Connect-Reason pbAckWaitTimeout		 58
+VENDORVALUE USR USR-Failure-to-Connect-Reason pbReceivedAckSeqErr	 59
+VENDORVALUE USR USR-Failure-to-Connect-Reason pbReceiveOvrflwRNRFail	 60
+VENDORVALUE USR USR-Failure-to-Connect-Reason pbReceiveMsgBufOvrflw	 61
+VENDORVALUE USR USR-Failure-to-Connect-Reason rcvdGatewayDiscCmd	 62
+VENDORVALUE USR USR-Failure-to-Connect-Reason tokenPassingTimeout	 63
+VENDORVALUE USR USR-Failure-to-Connect-Reason dspInterruptTimeout	 64
+VENDORVALUE USR USR-Failure-to-Connect-Reason mnpProtocolViolation	 65
+VENDORVALUE USR USR-Failure-to-Connect-Reason class2FaxHangupCmd	 66
+VENDORVALUE USR USR-Failure-to-Connect-Reason hstSpeedSwitchTimeout	 67
+VENDORVALUE USR USR-Failure-to-Connect-Reason tooManyUnacked		 68
+VENDORVALUE USR USR-Failure-to-Connect-Reason timerExpired		 69
+VENDORVALUE USR USR-Failure-to-Connect-Reason t1Glare			 70
+VENDORVALUE USR USR-Failure-to-Connect-Reason priDialoutRqTimeout	 71
+VENDORVALUE USR USR-Failure-to-Connect-Reason abortAnlgDstOvrIsdn	 72
+VENDORVALUE USR USR-Failure-to-Connect-Reason normalUserCallClear	 73
+VENDORVALUE USR USR-Failure-to-Connect-Reason normalUnspecified		 74
+VENDORVALUE USR USR-Failure-to-Connect-Reason bearerIncompatibility      75
+VENDORVALUE USR USR-Failure-to-Connect-Reason protocolErrorEvent	 76
+VENDORVALUE USR USR-Failure-to-Connect-Reason abnormalDisconnect	 77
+VENDORVALUE USR USR-Failure-to-Connect-Reason invalidCauseValue		 78
+VENDORVALUE USR USR-Failure-to-Connect-Reason resourceUnavailable	 79
+VENDORVALUE USR USR-Failure-to-Connect-Reason remoteHungUpDuringTraining 80
+VENDORVALUE USR USR-Failure-to-Connect-Reason trainingTimeout		 81
+VENDORVALUE USR USR-Failure-to-Connect-Reason incomingModemNotAvailable	 82
+VENDORVALUE USR USR-Failure-to-Connect-Reason incomingInvalidBearerCap	 83
+VENDORVALUE USR USR-Failure-to-Connect-Reason incomingInvalidChannelID	 84
+VENDORVALUE USR USR-Failure-to-Connect-Reason incomingInvalidProgInd	 85
+VENDORVALUE USR USR-Failure-to-Connect-Reason incomingInvalidCallingPty	 86
+VENDORVALUE USR USR-Failure-to-Connect-Reason incomingInvalidCalledPty	 87
+VENDORVALUE USR USR-Failure-to-Connect-Reason incomingCallBlock		 88
+VENDORVALUE USR USR-Failure-to-Connect-Reason incomingLoopStNoRingOff	 89
+VENDORVALUE USR USR-Failure-to-Connect-Reason outgoingTelcoDisconnect	 90
+VENDORVALUE USR USR-Failure-to-Connect-Reason outgoingEMWinkTimeout	 91
+VENDORVALUE USR USR-Failure-to-Connect-Reason outgoingEMWinkTooShort	 92
+VENDORVALUE USR USR-Failure-to-Connect-Reason outgoingNoChannelAvail	 93
+VENDORVALUE USR USR-Failure-to-Connect-Reason dspReboot			 94
+VENDORVALUE USR USR-Failure-to-Connect-Reason noDSPRespToKA		 95
+VENDORVALUE USR USR-Failure-to-Connect-Reason noDSPRespToDisc		 96
+VENDORVALUE USR USR-Failure-to-Connect-Reason dspTailPtrInvalid		 97
+VENDORVALUE USR USR-Failure-to-Connect-Reason dspHeadPtrInvalid		 98
+
+VENDORVALUE USR USR-Simplified-MNP-Levels	none			1
+VENDORVALUE USR USR-Simplified-MNP-Levels	mnpLevel3		2
+VENDORVALUE USR USR-Simplified-MNP-Levels	mnpLevel4		3
+VENDORVALUE USR USR-Simplified-MNP-Levels	ccittV42		4
+VENDORVALUE USR USR-Simplified-MNP-Levels	usRoboticsHST		5
+VENDORVALUE USR USR-Simplified-MNP-Levels	synchronousNone		6
+VENDORVALUE USR USR-Simplified-MNP-Levels	mnpLevel2		7
+VENDORVALUE USR USR-Simplified-MNP-Levels	mnp10			8
+VENDORVALUE USR USR-Simplified-MNP-Levels	v42Etc			9
+VENDORVALUE USR USR-Simplified-MNP-Levels	mnp10Etc		10
+VENDORVALUE USR USR-Simplified-MNP-Levels	lapmEtc			11
+VENDORVALUE USR USR-Simplified-MNP-Levels	v42Etc2			12
+VENDORVALUE USR USR-Simplified-MNP-Levels	v42SRej			13
+VENDORVALUE USR USR-Simplified-MNP-Levels	piafs			14
+
+VENDORVALUE USR USR-Simplified-V42bis-Usage	none			1
+VENDORVALUE USR USR-Simplified-V42bis-Usage	ccittV42bis		2
+VENDORVALUE USR USR-Simplified-V42bis-Usage	mnpLevel5		3
+
+VENDORVALUE USR USR-Equalization-Type		Long			1
+VENDORVALUE USR USR-Equalization-Type		Short			2
+
+VENDORVALUE USR USR-Fallback-Enabled		Disabled		1
+VENDORVALUE USR USR-Fallback-Enabled		Enabled			2
+
+VENDORVALUE USR USR-Back-Channel-Data-Rate	450BPS			1
+VENDORVALUE USR USR-Back-Channel-Data-Rate	300BPS			2
+VENDORVALUE USR USR-Back-Channel-Data-Rate	None			3
+
+VENDORVALUE USR USR-Device-Connected-To		None			1
+VENDORVALUE USR USR-Device-Connected-To		isdnGatew		2
+VENDORVALUE USR USR-Device-Connected-To		quadModem		3
+
+VENDORVALUE USR USR-Call-Event-Code		notSupported		1
+VENDORVALUE USR USR-Call-Event-Code		setup			2
+VENDORVALUE USR USR-Call-Event-Code		usrSetup		3
+VENDORVALUE USR USR-Call-Event-Code		telcoDisconnect		4
+VENDORVALUE USR USR-Call-Event-Code		usrDisconnect		5
+VENDORVALUE USR USR-Call-Event-Code		noFreeModem		6
+VENDORVALUE USR USR-Call-Event-Code		modemsNotAllowed	7
+VENDORVALUE USR USR-Call-Event-Code		modemsRejectCall	8
+VENDORVALUE USR USR-Call-Event-Code		modemSetupTimeout	9
+VENDORVALUE USR USR-Call-Event-Code		noFreeIGW		10
+VENDORVALUE USR USR-Call-Event-Code		igwRejectCall		11
+VENDORVALUE USR USR-Call-Event-Code		igwSetupTimeout		12
+VENDORVALUE USR USR-Call-Event-Code		noFreeTdmts		13
+VENDORVALUE USR USR-Call-Event-Code		bcReject		14
+VENDORVALUE USR USR-Call-Event-Code		ieReject		15
+VENDORVALUE USR USR-Call-Event-Code		chidReject		16
+VENDORVALUE USR USR-Call-Event-Code		progReject		17
+VENDORVALUE USR USR-Call-Event-Code		callingPartyReject	18
+VENDORVALUE USR USR-Call-Event-Code		calledPartyReject	19
+VENDORVALUE USR USR-Call-Event-Code		blocked			20
+VENDORVALUE USR USR-Call-Event-Code		analogBlocked		21
+VENDORVALUE USR USR-Call-Event-Code		digitalBlocked		22
+VENDORVALUE USR USR-Call-Event-Code		outOfService		23
+VENDORVALUE USR USR-Call-Event-Code		busy			24
+VENDORVALUE USR USR-Call-Event-Code		congestion		25
+VENDORVALUE USR USR-Call-Event-Code		protocolError		26 
+VENDORVALUE USR USR-Call-Event-Code		noFreeBchannel		27
+VENDORVALUE USR USR-Call-Event-Code		inOutCallCollision	28
+VENDORVALUE USR USR-Call-Event-Code		inCallArrival		29
+VENDORVALUE USR USR-Call-Event-Code		outCallArrival		30
+VENDORVALUE USR USR-Call-Event-Code		inCallConnect		31
+VENDORVALUE USR USR-Call-Event-Code		outCallConnect		32
+
+VENDORVALUE USR USR-HARC-Disconnect-Code	No-Error		0
+VENDORVALUE USR USR-HARC-Disconnect-Code	No-Carrier		1
+VENDORVALUE USR USR-HARC-Disconnect-Code	No-DSR			2
+VENDORVALUE USR USR-HARC-Disconnect-Code	Timeout			3
+VENDORVALUE USR USR-HARC-Disconnect-Code	Reset			4
+VENDORVALUE USR USR-HARC-Disconnect-Code	Call-Drop-Req		5
+VENDORVALUE USR USR-HARC-Disconnect-Code	Idle-Timeout		6
+VENDORVALUE USR USR-HARC-Disconnect-Code	Session-Timeout		7
+VENDORVALUE USR USR-HARC-Disconnect-Code	User-Req-Drop		8
+VENDORVALUE USR USR-HARC-Disconnect-Code	Host-Req-Drop		9
+VENDORVALUE USR USR-HARC-Disconnect-Code	Service-Interruption	10
+VENDORVALUE USR USR-HARC-Disconnect-Code	Service-Unavailable	11
+VENDORVALUE USR USR-HARC-Disconnect-Code	User-Input-Error	12
+VENDORVALUE USR USR-HARC-Disconnect-Code	NAS-Drop-For-Callback	13
+VENDORVALUE USR USR-HARC-Disconnect-Code	NAS-Drop-Misc-Non-Error	14
+VENDORVALUE USR USR-HARC-Disconnect-Code	NAS-Internal-Error	15
+VENDORVALUE USR USR-HARC-Disconnect-Code	Line-Busy		16
+VENDORVALUE USR USR-HARC-Disconnect-Code	RESERVED		17
+VENDORVALUE USR USR-HARC-Disconnect-Code	RESERVED		18
+VENDORVALUE USR USR-HARC-Disconnect-Code	Tunnel-Term-Unreach	19
+VENDORVALUE USR USR-HARC-Disconnect-Code	Tunnel-Refused		20
+VENDORVALUE USR USR-HARC-Disconnect-Code	Tunnel-Auth-Failed	21
+VENDORVALUE USR USR-HARC-Disconnect-Code	Tunnel-Session-Timeout	22
+VENDORVALUE USR USR-HARC-Disconnect-Code	Tunnel-Timeout		23
+VENDORVALUE USR USR-HARC-Disconnect-Code	RESERVED		24
+VENDORVALUE USR USR-HARC-Disconnect-Code	Radius-Res-Reclaim	25
+VENDORVALUE USR USR-HARC-Disconnect-Code	DNIS-Auth-Failed	26
+VENDORVALUE USR USR-HARC-Disconnect-Code	PAP-Auth-Failure	27
+VENDORVALUE USR USR-HARC-Disconnect-Code	CHAP-Auth-Failure	28
+VENDORVALUE USR USR-HARC-Disconnect-Code	PPP-LCP-Failed		29
+VENDORVALUE USR USR-HARC-Disconnect-Code	PPP-NCP-Failed		30
+VENDORVALUE USR USR-HARC-Disconnect-Code	Radius-Timeout		31
+
+VENDORVALUE USR USR-CCP-Algorithm		NONE			1
+VENDORVALUE USR USR-CCP-Algorithm		Stac			2
+VENDORVALUE USR USR-CCP-Algorithm		MS			3
+VENDORVALUE USR USR-CCP-Algorithm		Any			4
+
+VENDORVALUE USR USR-Tunnel-Security		None			0
+VENDORVALUE USR USR-Tunnel-Security		Control-Only		1
+VENDORVALUE USR USR-Tunnel-Security		Data-Only		2
+VENDORVALUE USR USR-Tunnel-Security		Both-Data-and-Control	3
+
+VENDORVALUE USR USR-RMMIE-Status	notEnabledInLocalModem		1
+VENDORVALUE USR USR-RMMIE-Status	notDetectedInRemoteModem	2
+VENDORVALUE USR USR-RMMIE-Status	ok				3
+
+VENDORVALUE USR USR-RMMIE-x2-Status	notOperational			1
+VENDORVALUE USR USR-RMMIE-x2-Status	operational			2
+VENDORVALUE USR USR-RMMIE-x2-Status	x2Disabled			3
+VENDORVALUE USR USR-RMMIE-x2-Status	v8Disabled			4
+VENDORVALUE USR USR-RMMIE-x2-Status	remote3200Disabled		5
+VENDORVALUE USR USR-RMMIE-x2-Status	invalidSpeedSetting		6
+VENDORVALUE USR USR-RMMIE-x2-Status	v8NotDetected			7
+VENDORVALUE USR USR-RMMIE-x2-Status	x2NotDetected			8
+VENDORVALUE USR USR-RMMIE-x2-Status	incompatibleVersion		9
+VENDORVALUE USR USR-RMMIE-x2-Status	incompatibleModes		10
+VENDORVALUE USR USR-RMMIE-x2-Status	local3200Disabled		11
+VENDORVALUE USR USR-RMMIE-x2-Status	excessHighFrequencyAtten	12
+VENDORVALUE USR USR-RMMIE-x2-Status	connectNotSupport3200		13
+VENDORVALUE USR USR-RMMIE-x2-Status	retrainBeforeConnection		14
+
+VENDORVALUE USR USR-RMMIE-Planned-Disconnect	none			  1
+VENDORVALUE USR USR-RMMIE-Planned-Disconnect	dteNotReady		  2
+VENDORVALUE USR USR-RMMIE-Planned-Disconnect	dteInterfaceError	  3
+VENDORVALUE USR USR-RMMIE-Planned-Disconnect	dteRequest		  4
+VENDORVALUE USR USR-RMMIE-Planned-Disconnect	escapeToOnlineCommandMode 5
+VENDORVALUE USR USR-RMMIE-Planned-Disconnect	athCommand		  6
+VENDORVALUE USR USR-RMMIE-Planned-Disconnect	inactivityTimeout	  7
+VENDORVALUE USR USR-RMMIE-Planned-Disconnect	arqProtocolError	  8
+VENDORVALUE USR USR-RMMIE-Planned-Disconnect	arqProtocolRetransmitLim  9
+VENDORVALUE USR USR-RMMIE-Planned-Disconnect	invalidComprDataCodeword  10
+VENDORVALUE USR USR-RMMIE-Planned-Disconnect	invalidComprDataStringLen 11
+VENDORVALUE USR USR-RMMIE-Planned-Disconnect	invalidComprDataCommand	  12
+
+VENDORVALUE USR USR-RMMIE-Last-Update-Event	none			1
+VENDORVALUE USR USR-RMMIE-Last-Update-Event	initialConnection	2
+VENDORVALUE USR USR-RMMIE-Last-Update-Event	retrain			3
+VENDORVALUE USR USR-RMMIE-Last-Update-Event	speedShift		4
+VENDORVALUE USR USR-RMMIE-Last-Update-Event	plannedDisconnect	5
+
+VENDORVALUE USR USR-Request-Type Access-Request			1
+VENDORVALUE USR USR-Request-Type Access-Accept			2
+VENDORVALUE USR USR-Request-Type Access-Reject			3
+VENDORVALUE USR USR-Request-Type Accounting-Request		4
+VENDORVALUE USR USR-Request-Type Accounting-Response		5
+VENDORVALUE USR USR-Request-Type Access-Password-Change		7
+VENDORVALUE USR USR-Request-Type Access-Password-Ack		8
+VENDORVALUE USR USR-Request-Type Access-Password-Reject		9
+VENDORVALUE USR USR-Request-Type Access-Challenge		11
+VENDORVALUE USR USR-Request-Type Status-Server			12
+VENDORVALUE USR USR-Request-Type Status-Client			13
+VENDORVALUE USR USR-Request-Type Resource-Free-Request		21
+VENDORVALUE USR USR-Request-Type Resource-Free-Response		22
+VENDORVALUE USR USR-Request-Type Resource-Query-Request		23
+VENDORVALUE USR USR-Request-Type Resource-Query-Response	24
+VENDORVALUE USR USR-Request-Type Disconnect-User		25
+VENDORVALUE USR USR-Request-Type NAS-Reboot-Request		26
+VENDORVALUE USR USR-Request-Type NAS-Reboot-Response		27
+VENDORVALUE USR USR-Request-Type Tacacs-Message			253
+VENDORVALUE USR USR-Request-Type Reserved			255
+
+VENDORVALUE USR USR-PW_Framed_Routing_V2	Off		0
+VENDORVALUE USR USR-PW_Framed_Routing_V2	On		1
+
+VENDORVALUE USR USR-Syslog-Tap			Off		0
+VENDORVALUE USR USR-Syslog-Tap			Raw		1
+VENDORVALUE USR USR-Syslog-Tap			Framed		2
+
+VENDORVALUE USR USR-Speed-Of-Connection		Auto		0
+VENDORVALUE USR USR-Speed-Of-Connection		56		1
+VENDORVALUE USR USR-Speed-Of-Connection		64		2
+VENDORVALUE USR USR-Speed-Of-Connection		Voice		3
+
+VENDORVALUE USR USR-Expansion-Algorithm		Constant	1
+VENDORVALUE USR USR-Expansion-Algorithm		Linear		2
+
+VENDORVALUE USR USR-Compression-Algorithm	None		0
+VENDORVALUE USR USR-Compression-Algorithm	Stac		1
+VENDORVALUE USR USR-Compression-Algorithm	Ascend		2
+VENDORVALUE USR USR-Compression-Algorithm	Microsoft	3
+VENDORVALUE USR USR-Compression-Algorithm	Auto		4
+
+VENDORVALUE USR USR-Compression-Reset-Mode	Auto			0
+VENDORVALUE USR USR-Compression-Reset-Mode	Reset-Every-Packet	1
+VENDORVALUE USR USR-Compression-Reset-Mode	Reset-On-Error		2
+
+VENDORVALUE USR USR-Filter-Zones		enabled		1
+VENDORVALUE USR USR-Filter-Zones		disabled	2
+
+VENDORVALUE USR USR-Bridging			enabled		1
+VENDORVALUE USR USR-Bridging			disabled	2
+
+VENDORVALUE USR USR-Appletalk			enabled		1
+VENDORVALUE USR USR-Appletalk			disabled	2
+
+VENDORVALUE USR USR-Spoofing			enabled		1
+VENDORVALUE USR USR-Spoofing			disabled	2
+
+VENDORVALUE USR USR-Routing-Protocol		Rip1		1
+VENDORVALUE USR USR-Routing-Protocol		Rip2		2
+
+VENDORVALUE USR USR-IPX-Routing			none		0
+VENDORVALUE USR USR-IPX-Routing			send		1
+VENDORVALUE USR USR-IPX-Routing			listen		2
+VENDORVALUE USR USR-IPX-Routing			respond		3
+VENDORVALUE USR USR-IPX-Routing			all		4
+
+VENDORVALUE USR USR-IPX-WAN			enabled		1
+VENDORVALUE USR USR-IPX-WAN			disabled	2
+
+VENDORVALUE USR USR-IP-Default-Route-Option	enabled		1
+VENDORVALUE USR USR-IP-Default-Route-Option	disabled	2
+
+VENDORVALUE USR USR-IP-RIP-Policies		SendDefault	0x0
+VENDORVALUE USR USR-IP-RIP-Policies		SendRoutes	0x2
+VENDORVALUE USR USR-IP-RIP-Policies		SendSubnets	0x4
+VENDORVALUE USR USR-IP-RIP-Policies		AcceptDefault	0x8
+VENDORVALUE USR USR-IP-RIP-Policies		SplitHorizon	0x10
+VENDORVALUE USR USR-IP-RIP-Policies		PoisonReserve	0x20
+VENDORVALUE USR USR-IP-RIP-Policies		FlashUpdate	0x40
+VENDORVALUE USR USR-IP-RIP-Policies		SimpleAuth	0x80
+VENDORVALUE USR USR-IP-RIP-Policies		V1Send		0x100
+VENDORVALUE USR USR-IP-RIP-Policies		V1Receive	0x200
+VENDORVALUE USR USR-IP-RIP-Policies		V2Receive	0x400
+VENDORVALUE USR USR-IP-RIP-Policies		Silent		0x80000000
+
+VENDORVALUE USR USR-Callback-Type Normal			1
+VENDORVALUE USR USR-Callback-Type ANI				2
+VENDORVALUE USR USR-Callback-Type Static			3
+VENDORVALUE USR USR-Callback-Type Dynamic			4
+
+VENDORVALUE USR USR-Request-Type Access-Request			1
+VENDORVALUE USR USR-Request-Type Access-Accept			2
+VENDORVALUE USR USR-Request-Type Access-Reject			3
+VENDORVALUE USR USR-Request-Type Accounting-Request		4
+VENDORVALUE USR USR-Request-Type Accounting-Response		5
+
+# The next three non standard packet types are used by
+# US Robotics Security/Accounting Server (likely to support
+# password changes through the NAS)
+
+VENDORVALUE USR USR-Request-Type Access-Password-Change		7
+VENDORVALUE USR USR-Request-Type Access-Password-Ack		8
+VENDORVALUE USR USR-Request-Type Access-Password-Reject		9
+
+VENDORVALUE USR USR-Request-Type Access-Challenge		11
+VENDORVALUE USR USR-Request-Type Status-Server			12
+VENDORVALUE USR USR-Request-Type Status-Client			13
+
+# Non standard packet types used by NetServer to implement
+# resource management and NAS reboot conditions
+
+VENDORVALUE USR USR-Request-Type Resource-Free-Request		21
+VENDORVALUE USR USR-Request-Type Resource-Free-Response		22
+VENDORVALUE USR USR-Request-Type Resource-Query-Request		23
+VENDORVALUE USR USR-Request-Type Resource-Query-Response	24
+VENDORVALUE USR USR-Request-Type Disconnect-User		25
+VENDORVALUE USR USR-Request-Type NAS-Reboot-Request		26
+VENDORVALUE USR USR-Request-Type NAS-Reboot-Response		27
+
+# This value is used for Tacacs Plus translation
+
+VENDORVALUE USR USR-Request-Type Tacacs-Message			253
+VENDORVALUE USR USR-Request-Type Reserved			255
+
+VENDORVALUE USR USR-NAS-Type 3Com-NMC				0
+VENDORVALUE USR USR-NAS-Type 3Com-NETServer			1
+VENDORVALUE USR USR-NAS-Type 3Com-HiPerArc			2
+VENDORVALUE USR USR-NAS-Type TACACS+-Server			3
+VENDORVALUE USR USR-NAS-Type 3Com-SA-Server			4
+VENDORVALUE USR USR-NAS-Type Ascend				5
+VENDORVALUE USR USR-NAS-Type Generic-RADIUS			6
+VENDORVALUE USR USR-NAS-Type 3Com-NETBuilder-II			7
+
+VENDORVALUE USR USR-Auth-Mode Auth-3Com				0
+VENDORVALUE USR USR-Auth-Mode Auth-Ace				1
+VENDORVALUE USR USR-Auth-Mode Auth-Safeword			2
+VENDORVALUE USR USR-Auth-Mode Auth-UNIX-PW			3
+VENDORVALUE USR USR-Auth-Mode Auth-Defender			4
+VENDORVALUE USR USR-Auth-Mode Auth-TACACSP			5
+VENDORVALUE USR USR-Auth-Mode Auth-Netware			6
+VENDORVALUE USR USR-Auth-Mode Auth-Skey				7
+VENDORVALUE USR USR-Auth-Mode Auth-EAP-Proxy			8
+VENDORVALUE USR USR-Auth-Mode Auth-UNIX-Crypt			9

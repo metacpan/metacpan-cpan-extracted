@@ -1,0 +1,16 @@
+.cvsignore
+Build.PL
+Changes
+lib/Normalize.pm
+MANIFEST
+README
+t/00-load.t
+t/01use.t
+t/02new.t
+t/03normalize_to_min.t
+t/04normalize_to_max.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml

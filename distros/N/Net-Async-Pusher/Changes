@@ -1,0 +1,9 @@
+Revision history for Net-Async-Pusher
+
+0.001     2016-12-25 19:49:46+08:00 Asia/Kuala_Lumpur
+	New features:
+	* Support for private channels:
+	https://pusher.com/docs/client_api_guide/client_private_channels
+
+0.001     2015-02-15 20:26:30+00:00 Europe/London
+	Initial CPAN release

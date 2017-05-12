@@ -1,0 +1,46 @@
+Revision history for Perl extension Net::IDN::Nameprep
+
+1.102 (2015-06-01)
+	- FIXES: #104799 [PATCH] add encoding directive to POD
+	- re-package with updated metadata
+
+1.101 (2011-12-08)
+	- FIXES: #72615 faulty data in Build.PL causes a lack of
+	  meta files, which breaks carton.
+
+1.100 (2010-05-31)
+	- support for stored strings (new AllowUnassigned parameter)
+	  patch by Loïc Etienne
+
+1.000 (2009-01-20)
+	- split ::Nameprep into separate module (again):
+	  IDNAbis will not use Nameprep, so it's better to keep
+	  the Nameprep module separate.
+	- clean-up
+	- release as 1.000
+
+Revision history for Perl extension Net::IDN::Encode (excerpt)
+
+...
+0.99_20091216 Wed Dec 16 00:00:00 2009
+	- switch to Module::Build
+	- switch to Github, remove svn:keywords, add .gitignore
+
+	- use ASCII in POD, fixes FAILs with perl 5.6.x
+	- add examples in eg/
+...
+0.99_20071012 Fri Oct 12 12:00:00 2007
+	- complete rewrite of Net::IDN::Nameprep,
+	  uses Unicode::Stringprep
+	- no more Net::IDN::Nameprep::Mapping
+ 	- no more Net::IDN::Nameprep::Prohibited
+...
+
+Revision history for Perl extension Net::IDN::Nameprep.
+
+0.02  Wed Oct 31 07:18:02 JST 2001
+	- Fixed bug which mapping returns multiple character
+	- Added more tests
+
+0.01  Wed Oct 31 04:43:12 2001
+	- original version; created by h2xs 1.19

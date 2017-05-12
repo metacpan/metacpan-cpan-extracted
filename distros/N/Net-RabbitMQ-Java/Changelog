@@ -1,0 +1,11 @@
+version 2.030102 (2011-10-12):
+
+    - added GPLv2, Apache and MPL licence texts
+    - minor code cleanup
+    - fixed POD glitches
+    - added MQPORT environment variable for tests
+    - prevent multiple initialization
+
+version 2.030101 (2011-02-12):
+
+    - new

@@ -1,0 +1,23 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-FTPTurboSync.t
+lib/Net/FTPTurboSync.pm
+scripts/turbo-ftp-sync
+lib/Net/FTPTurboSync.pm
+lib/Net/FTPTurboSync/FileLeaf.pm
+lib/Net/FTPTurboSync/PrgOpts.pm
+lib/Net/FTPTurboSync/MyFtp.pm
+lib/Net/FTPTurboSync/UploadedFiles.pm
+lib/Net/FTPTurboSync/FileObject.pm
+lib/Net/FTPTurboSync/MixLocal.pm
+lib/Net/FTPTurboSync/LocalFile.pm
+lib/Net/FTPTurboSync/MixRemote.pm
+lib/Net/FTPTurboSync/RemoteFile.pm
+lib/Net/FTPTurboSync/FileNode.pm
+lib/Net/FTPTurboSync/RemoteDir.pm
+lib/Net/FTPTurboSync/LocalDir.pm
+lib/Net/FTPTurboSync/TurboPutCommand.pm
+lib/Net/FTPTurboSync/FactoryOfRemoteObjects.pm
+META.yml                                 Module meta-data (added by MakeMaker)

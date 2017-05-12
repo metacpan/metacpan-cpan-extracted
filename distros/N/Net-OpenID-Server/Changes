@@ -1,0 +1,143 @@
+1.09      Nov 09 2011
+
+1.030099_002 Jan 01 2011
+
+    * Remove unusued _eurl function (Robert Norris)
+
+    * Made 'assoc_handle' argument optional for indirect requests per
+      http://openid.net/specs/openid-authentication-2_0.html#anchor27
+      (Mario Domgoergen)
+
+    * Added example CGI program (Robert Norris)
+ 
+    * Documentation tweaks (Robert Norris)
+ 
+1.030099_001 Nov 06 2010
+
+    * Use Crypt::DH::GMP over Crypt::DH for speed (Robert Norris)
+
+    * Set mode and claimed_id before redirect to setup in checkid_immediate.
+      Without this some implementations (Movable Type) do not have enough
+      context to understand what the client is trying to do (Adam Sjøgren)
+
+    * Fix potential timing attack when checking signatures (Adam Sjøgren)
+      (see http://lists.openid.net/pipermail/openid-security/2010-July/001156.html)
+
+    * Support HMAC-SHA256 signatures (Adam Sjøgren)
+    
+    * Merge get_args and post_args into single 'args' parameter. get_args &
+      post_args remain as deprecated parameters (Martin Atkins, Robert Norris)
+
+1.02:
+
+    * _mode_checkid(): Pass 'ns' through setup_map.
+      (reported and fixed by Sergey Homenkow.)
+
+    * signed_return_url(): verify and remove 'realm', if provided.
+      (reported and fixed by Sergey Homenkow.)
+
+    * "10.2.1. In Response to Immediate Requests" (Negative Assertions)
+        OpenID2 return 'mode=setup_needed' and 'ns',
+        OpenID1 return 'mode=id_res' and 'user_setup_url'.
+        (reported and fixed by Sergey Homenkow.)
+
+	* "8.2.4. Unsuccessful Response Parameters" (Establishing Associations)
+        "If the OP does not support a session type or association type, it MUST
+        respond with a direct error message indicating that the association
+        request failed." (reported and fixed by Sergey Homenkow.)
+
+    * Fix our openid.signed list to be consistent with what we
+        actually sign when empty fields are present.
+        Reported and fixed by Igor Gariev <gariev@hotmail.com>.
+
+    * Don't include op_endpoint in 1.1 assertion messages.
+
+1.01:
+
+	* OpenID 2.0 support from kazeburo from mixi.jp.
+
+0.13: 2007-09-09
+
+	* remove test's non-used/non-declared "use" of DSA modules.
+	  makes test in auto-testers now.  also remove dead/old tests.
+
+0.12: 2007-09-03
+
+	* make ->err method return false when no error:
+	  http://rt.cpan.org/Ticket/Display.html?id=29109
+
+	* doc fix: http://rt.cpan.org/Ticket/Display.html?id=29110
+
+        * doc fix in abstract (was previously copy/pasted from the
+	consumer module)
+
+0.11: (2007-04-16) - after year+ of being in svn, but not released. :)
+
+	* basic support for OpenID extensions (2006-03-13)
+
+0.10: (2005-09-01)
+        * fix up old docs which mentioned the ancient public_key and
+	  private_key parameters
+
+	* fix some warnings in make test.  (Tatsuhiko Miyagawa)
+
+0.09:
+	* version 1.1 of the protocol, with 1.0 as a "compat" option
+	  (where both 1.0 and 1.1 response keys are sent) compat is either
+	  on, off, or unspecified, in which case it's on by default for
+	  one month
+
+0.08:
+        * security fix, as pointed out by meepbear: check_authentication
+	  shouldn't honor signature verification requests using
+	  assoc_handles that were given out in associate requests.  that
+	  means that we must be able to distinguish (internally) handles
+	  that were given out to "dumb" consumbers (stateless) vs. ones we
+	  gave out in associate requests.
+
+	  for more information, see:
+	      http://lists.danga.com/pipermail/yadis/2005-July/001144.html
+0.07:
+	* openid.mode=cancel support
+
+        * invalidate_handle support
+
+	* fix a call to error_page that should've been _error_page
+
+	* _secret_of_handle now only takes an assoc_handle, not
+	  also an assoc_type, as an assoc_handle should always
+	  self-imply its type
+
+0.06:
+	* make rand_chars public
+
+	* remove old DSA-based code
+
+	* test suite for new DH/HMAC-based code
+
+0.05:
+        * start implementing the new DH + HMAC-SHA1 spec, instead
+	  of being DSA-based.  The DSA code is still working for now,
+	  and it'll do either protocol, but it'll be removed in time.
+
+0.04:
+	* add "signed_return" method and docs
+
+	* require Convert::PEM 0.07, which was always required,
+	  but I forgot its version number before
+
+	* add "redirect_for_setup" option on handle_page and docs
+
+0.03:
+        * stupid push_url_arg bugfix
+
+	* more tests
+
+0.02:
+        * checkid_immediate vs checkid_setup mode (handle_page can return
+	  $type of "setup")
+
+0.01:
+        * initial release.  test suite works.  no example app yet.
+
+	* requires Crypt::DSA or Crypt::OpenSSL::DSA

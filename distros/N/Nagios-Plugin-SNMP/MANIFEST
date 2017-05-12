@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+examples/check_bluecoat_net.pl
+lib/Nagios/Plugin/SNMP.pm
+t/Nagios-Plugin-SNMP.t

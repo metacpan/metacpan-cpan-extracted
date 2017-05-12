@@ -1,0 +1,98 @@
+---
+abstract: 'Nagios plugin to check over HTTP.'
+author:
+  - 'Douglas Christopher Wilson <doug@somethingdoug.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  HTTP::Response: 0
+  HTTP::Status: 5.817
+  Test::Exception: 0
+  Test::MockObject: 0
+  Test::More: 0.94
+  Test::Trap: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Nagios-Plugin-OverHTTP
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  Nagios::Plugin::OverHTTP:
+    file: lib/Nagios/Plugin/OverHTTP.pm
+    version: 0.16
+  Nagios::Plugin::OverHTTP::Formatter:
+    file: lib/Nagios/Plugin/OverHTTP/Formatter.pm
+    version: 0.16
+  Nagios::Plugin::OverHTTP::Formatter::Nagios::Auto:
+    file: lib/Nagios/Plugin/OverHTTP/Formatter/Nagios/Auto.pm
+    version: 0.16
+  Nagios::Plugin::OverHTTP::Formatter::Nagios::Version2:
+    file: lib/Nagios/Plugin/OverHTTP/Formatter/Nagios/Version2.pm
+    version: 0.16
+  Nagios::Plugin::OverHTTP::Formatter::Nagios::Version3:
+    file: lib/Nagios/Plugin/OverHTTP/Formatter/Nagios/Version3.pm
+    version: 0.16
+  Nagios::Plugin::OverHTTP::Library:
+    file: lib/Nagios/Plugin/OverHTTP/Library.pm
+    version: 0.16
+  Nagios::Plugin::OverHTTP::Middleware:
+    file: lib/Nagios/Plugin/OverHTTP/Middleware.pm
+    version: 0.16
+  Nagios::Plugin::OverHTTP::Middleware::PerformanceData:
+    file: lib/Nagios/Plugin/OverHTTP/Middleware/PerformanceData.pm
+    version: 0.16
+  Nagios::Plugin::OverHTTP::Middleware::StatusPrefix:
+    file: lib/Nagios/Plugin/OverHTTP/Middleware/StatusPrefix.pm
+    version: 0.16
+  Nagios::Plugin::OverHTTP::Parser:
+    file: lib/Nagios/Plugin/OverHTTP/Parser.pm
+    version: 0.16
+  Nagios::Plugin::OverHTTP::Parser::Standard:
+    file: lib/Nagios/Plugin/OverHTTP/Parser/Standard.pm
+    version: 0.16
+  Nagios::Plugin::OverHTTP::PerformanceData:
+    file: lib/Nagios/Plugin/OverHTTP/PerformanceData.pm
+    version: 0.16
+  Nagios::Plugin::OverHTTP::Response:
+    file: lib/Nagios/Plugin/OverHTTP/Response.pm
+    version: 0.16
+requires:
+  Carp: 0
+  Const::Fast: 0
+  Data::Validate::Domain: 0.02
+  Data::Validate::URI: 0.05
+  English: 0
+  Env::Path: 0.04
+  Getopt::Long::Descriptive: 0
+  HTML::Strip: 1.04
+  HTTP::Request: 5.827
+  HTTP::Status: 5.817
+  IPC::System::Simple: 0.13
+  LWP::UserAgent: 0
+  Moose: 0.74
+  Moose::Role: 0.74
+  MooseX::Clone: 0.05
+  MooseX::Getopt: 0.43
+  MooseX::StrictConstructor: 0.08
+  MooseX::Types: 0.08
+  MooseX::Types::Moose: 0
+  Regexp::Common: 2.119
+  Scalar::Util: 1.19
+  Try::Tiny: 0.04
+  URI: 0
+  namespace::clean: 0.04
+  perl: 5.8.1
+resources:
+  homepage: http://github.com/dougwilson/perl5-nagios-plugin-overhttp/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/dougwilson/perl5-nagios-plugin-overhttp.git
+version: 0.16

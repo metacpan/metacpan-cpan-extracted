@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<!DOCTYPE testns [
+	<!ELEMENT testns (server*)>
+	<!-- Root element  has required IP and PORT attribute        -->
+	<!ELEMENT server (qname?)>
+	<!ATTLIST server ip  CDATA #REQUIRED>
+	<!ATTLIST server port  CDATA #REQUIRED>
+	<!-- A server has answers for a number of possible QNAME QTYPE questions -->
+
+
+        <!-- A QNAME should be fully specified -->
+	<!ELEMENT qname (qtype*)>
+
+        <!ATTLIST qname name CDATA #REQUIRED>
+	<!ELEMENT qtype (ans*,aut*,add*)>
+        <!ATTLIST qtype type CDATA #REQUIRED>
+        <!ATTLIST qtype rcode CDATA #REQUIRED>
+        <!ATTLIST qtype aa (1|0)  #REQUIRED>
+        <!ATTLIST qtype ra (1|0)  #REQUIRED>
+        <!ATTLIST qtype ad (1|0)  #REQUIRED>
+        <!ATTLIST qtype delay CDATA "0" >
+
+	<!--  Each of these contain one RR. -->
+	<!ELEMENT ans (#PCDATA) >
+	<!ELEMENT aut (#PCDATA) >
+	<!ELEMENT add (#PCDATA) >
+]>
+
+
+
+<testns>
+<server ip="127.0.0.1" port="5354">
+
+  <qname name="bla.foo">
+    <qtype type="TXT" rcode="NOERROR"  aa="1" ra="0" ad="1" delay="2">
+      <ans>
+bla.foo.		3600	IN	TXT	"TEXT"
+  </ans>
+      <ans>
+bla.foo.		3600	IN	TXT	"Other text"  
+</ans>
+    </qtype>
+
+    <qtype type="ANY" rcode="FORMERR"  aa="1" ra="0" ad="0" >
+
+      </qtype>
+
+
+    <qtype type="A" rcode="NOERROR"  aa="1" ra="0" ad="1">   
+
+<!-- hier --> <!-- include="t/testconf2.xml" --> <!-- daar -->
+
+    </qtype>
+
+  </qname>
+
+
+</server>
+
+
+
+
+<server ip="127.0.0.1" port="5355">
+
+  <qname name="bla.foo">
+
+    <qtype type="TXT" rcode="NXDOMAIN"  aa="0" ra="1" ad="1" >
+      <ans>
+bla.foo.		3600	IN	TXT	"TEXT"
+  </ans>
+      <ans>
+bla.foo.		3600	IN	TXT	"From port 5355"
+  </ans>
+      <aut></aut>
+      <add></add>
+    </qtype>
+
+
+    <qtype type="A" rcode="NOERROR"  aa="1" ra="0" ad="1" >   
+      <ans>
+bla.foo.		3600	IN	A 10.0.0.1
+  </ans>
+      <ans>
+bla.foo.		3600	IN	A 10.0.0.2
+  </ans>
+      <ans>
+bla.foo.		3600	IN	A 10.0.0.3
+  </ans>
+      <aut></aut>
+      <add>
+
+bla.foo.		3600	IN	A 10.0.0.3
+</add>
+    </qtype>
+
+  </qname>
+
+
+</server>
+
+
+
+
+</testns>
+
+
+
+
+

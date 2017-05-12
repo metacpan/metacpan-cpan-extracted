@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+eg/standalone_dht.pl
+lib/Net/BitTorrent/DHT.pm
+lib/Net/BitTorrent/DHT/Bucket.pm
+lib/Net/BitTorrent/DHT/Node.pm
+lib/Net/BitTorrent/DHT/RoutingTable.pm
+lib/Net/BitTorrent/DHT/Tracker.pm
+minil.toml
+t/00_compile.t
+t/02_standalone.t
+META.yml
+MANIFEST

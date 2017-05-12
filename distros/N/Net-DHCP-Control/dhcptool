@@ -1,0 +1,129 @@
+#!/usr/local/bin/perl
+
+use Net::DHCP::Control::Failover 'failover_statename';
+use MIME::Base64;
+use Getopt::Std;
+use Carp;
+
+
+my %auth = (key_name => 'omkey',
+	    key_type => 'hmac-md5',
+	    key => MIME::Base64::decode_base64("K/E3ho1EbqGk1mYPNpiIcmpuR/rFG6T689HHGI78ekM="),
+	   );
+
+
+my %host = (
+#	    primary => 'flotsam.net.isc.upenn.edu',
+	    primary => 'noc-2003-ist.NET.ISC.UPENN.EDU',
+#	    secondary => 'jetsam.net.isc.upenn.edu',
+	    secondary => 'noc-2003-dmr.net.isc.upenn.edu',
+	   );
+
+getopts('a:t:n:') or usage();
+$opt_a or usage();
+
+if ($opt_a eq 'status') { 
+  show_status();
+} elsif ($opt_a eq 'change_state') { 
+  usage() unless defined $opt_t && defined $opt_n; 
+  usage() unless exists $host{$opt_t};
+  usage() unless defined failover_statename($opt_n);
+  change_state(auth => \%auth); 
+} elsif ($opt_a eq 'ipstats') { 
+  die "not implemented\n";
+} else { 
+  usage();
+}
+
+sub show_status {
+  for my $what (keys %host) {
+    printf "%9s: %12s\n", $what, get_state(host => $host{$what}, 
+					   auth => \%auth,
+					  );
+  }
+}
+
+sub get_state {
+  my (%opts) = @_;
+  my $fo = $opts{handle} 
+  || Net::DHCP::Control::Failover::State->new(host => $opts{host}, %{$opts{auth}},
+				 attrs => { name => "dhcp.net.isc.upenn.edu" },
+				 )
+  || return failover_statename(0);
+  my $state = $fo->get("local-state");
+  defined($state)
+    or die "Couldn't get failover local state: $Net::DHCP::Control::STATUS";
+  failover_statename($state);
+}
+
+my %legal_transition;
+BEGIN {
+  $legal_transition{recover}  = {target => 'shutdown', 
+				 peer => 'partner down',
+				};
+  $legal_transition{shutdown} = {target => 'normal',
+				 peer => 'normal',
+				};
+  $legal_transition{'partner down'} = {target => 'communications interrupted', 
+				       peer => 'unavailable',
+				      };
+}
+
+sub change_state {
+  my %opts = @_;
+  my (%state, %handle);
+  my $target = $opt_t;
+  my $new_state = $opt_n;
+  my %map;
+  $map{target} = $target;
+  $map{peer}   = $target eq 'primary' ? 'secondary' : 'primary';
+  
+  print "changing state\n";
+  for my $what (qw(target peer)) {
+    $handle{$what} =  Net::DHCP::Control::Failover::State->new(host => $host{$map{$what}},
+						  %{$opts{auth}},
+						  attrs => { name => "dhcp.net.isc.upenn.edu" },
+						 );
+    $state{$what} = get_state(handle => $handle{$what});
+    printf "%9s: %12s\n", $what, $state{$what};
+  }
+  
+  if ($state{target} eq $new_state) {
+    warn "target is already in state '$new_state'
+no change made\n";
+    exit 0;
+  }
+
+  my $required_current_state = $legal_transition{$new_state}
+    or die "invalid new state\n";
+  for my $what (qw(target peer)) {
+    unless ($state{$what} eq $required_current_state->{$what}) {
+      die "To transit the target to state $new_state, 
+the $what must be in state $required_current_state->{$what}.
+But it is in state $state{$what} instead.\n";
+    }
+  }
+
+ set_state(handle => $handle{target}, state => failover_statename($new_state));
+}
+
+sub set_state {
+  my %opts = @_;
+  my $fo = $opts{handle} 
+    || Net::DHCP::Control::Failover::State->new(host => $opts{host}, 
+						%{$opts{auth}},
+						attrs => { name => "dhcp.net.isc.upenn.edu" },
+						)
+	|| die "Couldn't create failover-state object: $Net::DHCP::Control::STATUS";
+  $fo->set("local-state", $opts{state}) 
+    or die "Couldn't set local state: $Net::DHCP::Control::STATUS";
+}
+
+
+sub usage {
+  warn <<EOM;
+usage: $0 -a status
+       $0 -a change_state -t primary|secondary -n recover|normal|'partner down'
+EOM
+  exit 1;
+}

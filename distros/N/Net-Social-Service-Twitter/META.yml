@@ -1,0 +1,18 @@
+---
+name: Net-Social-Service-Twitter
+version: 0.1
+author: []
+abstract: handle friends from Twitter for Net::Social
+license: unknown
+requires:
+  Net::Social: 0
+  Net::Twitter: 1.06
+  Test::More: 0.62
+provides:
+  Net::Social::Service::Twitter:
+    file: lib/Net/Social/Service/Twitter.pm
+    version: 0.1
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

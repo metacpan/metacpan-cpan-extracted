@@ -1,0 +1,45 @@
+Net-SAJAX version 0.107
+=======================
+
+See the individual module documentation for more information
+
+INSTALLATION
+------------
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    perl Build
+    perl Build test
+    perl Build install
+
+SUPPORT AND DOCUMENTATION
+-------------------------
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::SAJAX
+
+You can also look for information at:
+
+*   [RT, CPAN's request tracker](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-SAJAX)
+
+*   [AnnoCPAN, Annotated CPAN documentation](http://annocpan.org/dist/Net-SAJAX)
+
+*   [CPAN Ratings](http://cpanratings.perl.org/d/Net-SAJAX)
+
+*   [Search CPAN](http://search.cpan.org/dist/Net-SAJAX)
+
+COPYRIGHT AND LICENCE
+---------------------
+
+Copyright 2009-2010 Douglas Christopher Wilson
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of either:
+
+*   the GNU General Public License as published by the Free Software Foundation;
+    either version 1, or (at your option) any later version, or
+*   the Artistic License version 2.0.
+

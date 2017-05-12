@@ -1,0 +1,16 @@
+Revision history for Net-Proxy-Connector-tcp_balance
+
+0.005     2017-01-19 18:28:32+00:00 UTC
+          - update meta resources
+
+0.004     2017-01-19 17:59:33+00:00 UTC
+          - fixed bug where socket filehandles are left open when all hosts are not responding
+
+0.003     2015-10-29 13:24:25-05:00 America/Chicago
+          - Added sort option
+
+0.002     2011-09-27 14:21:20 America/Chicago
+          - Updating errors in documentation.
+
+0.001     2011-09-26 12:13:32 America/Chicago
+          - Initial release.

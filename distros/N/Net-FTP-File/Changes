@@ -1,0 +1,25 @@
+Revision history for Perl extension Net::FTP::File.
+
+0.06  Wed Apr 22 20:46:14  2009
+    - perltidy .pm
+    - rt 39180
+    - rt 45216
+    - rt 39181 (not really a module problem, added web server redirect)
+
+0.05  Thu Nov 17 21:28:06 2005
+        - fixed 0.04 issue with *multiple* spaces 
+
+0.04  Thu Nov 17 10:47:34 2005
+        - fixed issue with dir_hash and filenames with spaces
+ 
+0.03  Fri Aug 26 18:35:00 2005
+        - fixed issue with VERSION() that conflicted with UNIVERSAL's VERSION functionality
+
+0.02  Fri Apr 22 22:58:47 2005
+        - moved a couple var declarations to the top so the source looked nicer
+        - added touch() and empty() methods
+        - made move() not allow the same file in both arguments
+
+0.01  Mon Mar 28 20:47:34 2005
+	- original version; created by h2xs 1.22 with options
+		-AXc -n Net::FTP::File

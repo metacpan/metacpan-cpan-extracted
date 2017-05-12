@@ -1,0 +1,196 @@
+
+=head1 NAME
+
+Net::ENUM - E.164 NUmber Mapping
+
+
+
+=head1 SYNOPSIS
+
+  use Net::ENUM;
+
+  my $net_enum = Net::ENUM->new(
+    { udp_timeout => 5, ... }
+  );
+
+  # returns contact of first NAPTR entry (after sorting by 'order') the RegEx
+  # is already done!
+  my $contact_1 = $net_enum->get_enum_address( '+123 456-789' );
+  # or with vanity
+  my $contact_1 = $net_enum->get_enum_address( '+1 ad ilm-puz' );
+
+  # the same as above, but get the first 'sip' entry
+  my $contact_2 = $net_enum->get_enum_address( '+123 456-789', 'order', 'sip' );
+
+  # returns an array with all NAPTR entries (each a hash) sorted by 'name'
+  my @contact_array = $net_enum->get_enum_address( '+123 456-789', 'name' );
+  
+  # error output
+  if ( $net_enum->{'enum_error'} ) {
+    print $net_enum->{'enum_error'};
+  }
+  else {
+    # if there is a second entry in the array ([1]) this will print:
+    # 9.8.7.6.5.4.3.2.1.e164.arpa
+    print $contact_array[1]->{'name'};
+  }
+
+
+
+=head1 DESCRIPTION
+
+This module is used to get the wanted NAPTR or Internet address of a given ENUM.
+
+It can also be used to get nameservers (NS) of a domain, transform a phone
+number into a e164.arpa-domain and to translate a vanity into a phone number.
+
+
+
+=head1 CONSTRUCTOR
+
+=over 4
+
+=item new ( [ ARGS, VANITY ] )
+
+This creates a new Net::ENUM object.
+
+ARGS is a hashref. Its keys and values are the same as %args of
+L<Net::DNS::Resolver>->new(%args). ARGS can overwrite Net::ENUM default values!
+
+VANITY is a hashref. The keys are the letters and their values are the
+corresponding numbers. Example (default): { 'abc' => 2, 'def' => 3, ...,
+'wxyz' => 9 }. If the hashref is empty no vanity translation will be done. If
+VANITY is undefined the default/standard vanity will be used.
+
+=back
+
+
+
+=head1 METHODS
+
+=over 4
+
+=item get_enum_address ( NUMBER [ , SORTBY, MEDIA ] )
+
+NUMBER is a qualified international phone number (can have vanity) starting with '+'.
+
+SORTBY sorts NAPTR based on this attribute, defaults to 'order' (= lowest to
+highest order, for same order lowest preference first).
+
+MEDIA is the NAPTR media to return ('sip', 'tel', 'email', ...), defaults to
+return all types.
+
+Return:
+
+=over 4
+
+=item *
+
+If an array is wanted it returns an array with all sorted NAPTR entries, each
+one in a hash. Keys in the hash are:
+flags, ttl ,name, service, rdata, preference, rdlength, regexp, order, type,
+class, replacement
+
+=item *
+
+If a string is wanted it returns a string with the Internet protocol address of
+the first NAPTR entry (after sorting and selecting media). The RegEx was applied
+on the NUMBER.
+
+=item *
+
+<undef> on error/if no entry was found. The error message is stored
+in $self->{'enum_error'}.
+
+=back
+
+
+
+=item get_nameservers ( DOMAIN )
+
+DOMAIN must be a full qualified domain. In our case it should look like:
+9.8.7.6.5.4.3.2.1.e164.arpa
+
+Return:
+
+=over 4
+
+=item *
+
+An arrayref with nameservers found for this domain.
+
+=item *
+
+<undef> if no nameserver was found. The returned error message is stored
+in $self->{'enum_error'}.
+
+=back
+
+
+
+=item number_to_domain ( NUMBER )
+
+NUMBER can be a phone number in format: +123 456-789, +1ad ilm-puz or a
+e164.arpa domain.
+
+Return:
+
+=over 4
+
+=item *
+
+The e164.arpa domain of NUMBER. In our example:
+9.8.7.6.5.4.3.2.1.e164.arpa
+
+=item *
+
+<undef> on error. The error message is stored in $self->{'enum_error'}.
+
+=back
+
+
+
+=item translate_vanity ( NUMBER )
+
+NUMBER is a phone number with or without vanity. Examples: +123 456-789,
++1ad ilm-puz. All letters from /a-z/i (default) will be translated into
+their corresponding numbers. Modifying the hashref $self->{'vanity'} modifies
+the translation (see also L</CONSTRUCTOR>).
+
+Return:
+
+=over 4
+
+=item *
+
+The NUMBER is translated in place, so you really don't need a return value. In
+case NUMBER was a string and not a scalar this function also returns the
+translated NUMBER.
+
+=back
+
+=back
+
+
+
+=head1 PREREQUISITES
+
+This module requires the C<strict> and the C<Net::DNS> module to work.
+
+
+
+=head1 SEE ALSO
+
+L<perl(1)>, L<Net::DNS>, L<Net::DNS::Resolver>
+
+
+
+=head1 COPYRIGHT
+
+This module is Copyright (C) 2010 by Detlef Pilzecker.
+
+All Rights Reserved.
+
+This module is free software. It may be used, redistributed and/or modified
+under the same terms as Perl itself.
+

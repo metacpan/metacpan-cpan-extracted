@@ -1,0 +1,50 @@
+NAME
+    Number::Extreme - Helper for keeping track of extreme values of objects
+
+SYNOPSIS
+      use Number::Extreme;
+
+      # a bunch of objects with the "high" attribute.
+      my $id = 0;
+      my @objects = map { { id => $id++, high => $_ } } shuffle (1..100);
+
+      # create a highest-high tracker, which extracts "high" from given objects
+      my $highest_high = Number::Extreme->max(sub { $_->{high} });
+
+      # test the values
+      $highest_high->test($_) for @objects;
+
+      # now you have the highest high
+      warn $highest_high;
+
+      # and the object of that high
+      warn $highest_high->current->{id};
+
+DESCRIPTION
+    Number::Extreme provides simple utility for a common task: tracking
+    highest or lowest value of an attribute of objects, while keeping track
+    of which object is of the extreme value.
+
+  METHODS
+    $class->max($extractor)
+    $class->min($extractor)
+        Helper constructors for creating max/min tracker. $extractor takes
+        $_ as the object to be tested, and returns the attribute to be
+        compared.
+
+    $class->amax($array)
+    $class->amin($array)
+        Helper constructors for tracking max/min values of an arrayref.
+        "test()" should be called with the array index.
+
+    $obj->test($o)
+        Update the tracker with new incoming object.
+
+AUTHOR
+    Chia-liang Kao <clkao@clkao.org>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO

@@ -1,0 +1,31 @@
+---
+abstract: 'Client for the ScientiaMobile cloud webservice'
+author:
+  - 'Alessandro Ranellucci <aar@cpan.org>'
+build_requires:
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-WURFL-ScientiaMobile
+requires:
+  Digest::MD5: 0
+  Exception::Class: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  List::Util: 0
+  Module::Load: 0
+  Moo: 0
+  Moo::Role: 0
+  Plack::Request: 0
+  Try::Tiny: 0
+  URI::Escape: 0
+  constant: 0
+version: 1.0.3

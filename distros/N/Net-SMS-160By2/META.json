@@ -1,0 +1,46 @@
+{
+   "abstract" : "Send SMS using your 160By2 account!",
+   "author" : [
+      "Mohan Prasad Gutta <mohanprasadgutta@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.78, CPAN::Meta::Converter version 2.132661",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-SMS-160By2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "HTML::Form" : "0",
+            "POSIX" : "0",
+            "Test::More" : "0",
+            "WWW::Mechanize" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.04"
+}

@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<xsd:schema targetNamespace="http://www.dhl.com"  
+	xmlns:dhl="http://www.dhl.com/datatypes"  
+	xmlns="http://www.dhl.com" xmlns:dct="http://www.dhl.com/DCTRequestdatatypes"  
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="unqualified">
+	<xsd:import namespace="http://www.dhl.com/datatypes"
+		schemaLocation="datatypes.xsd" />
+		<xsd:import namespace="http://www.dhl.com/DCTRequestdatatypes"
+		schemaLocation="DCTRequestdatatypes.xsd" />
+	
+
+    <xsd:element name="DCTRequest">
+    	<xsd:complexType>
+    		<xsd:sequence>
+    			<xsd:choice minOccurs="1" maxOccurs="1">
+    				<xsd:element name="GetQuote">
+						<xsd:annotation>
+							<xsd:documentation>Root element of Capability request
+							</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="Request" type="dhl:Request" />
+								<xsd:element name="From" type="dct:DCTFrom" minOccurs="1"  />
+								<xsd:element name="BkgDetails" minOccurs="1"
+									type="dct:BkgDetailsType" />
+								<xsd:element name="To" minOccurs="1" type="dct:DCTTo" />
+								<xsd:element name="Dutiable" minOccurs="0" type="dct:DCTDutiable" />
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+    				<xsd:element name="GetCapability">
+						<xsd:annotation>
+							<xsd:documentation>Root element of Capability request
+							</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="Request" type="dhl:Request" />
+								<xsd:element name="From" type="dct:DCTFrom" minOccurs="1"  />
+								<xsd:element name="BkgDetails" minOccurs="1"
+									type="dct:BkgDetailsType" />
+								<xsd:element name="To" minOccurs="1" type="dct:DCTTo" />
+								<xsd:element name="Dutiable" minOccurs="0" type="dct:DCTDutiable" />
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+    			</xsd:choice>
+    		</xsd:sequence>
+    	</xsd:complexType>
+    </xsd:element>
+
+</xsd:schema>

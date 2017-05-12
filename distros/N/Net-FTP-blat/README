@@ -1,0 +1,27 @@
+Net/FTP/blat version 0.02
+===========================
+
+Adds two methods, slurp and blat, to Net::FTP.  Slurp and blat
+are like get and put except they work with scalar variables instead of
+local files.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Net::FTP
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 David Nicol
+(this work is derived from work by Graham Barr.)
+

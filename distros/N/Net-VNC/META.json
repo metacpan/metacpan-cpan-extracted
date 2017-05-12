@@ -1,0 +1,46 @@
+{
+   "abstract" : "A simple VNC client",
+   "author" : [
+      "Leon Brocard acme@astray.com",
+      "Chris Dolan clotho@cpan.org",
+      "Maurice Castro maurice@ipexchange.com.au"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-VNC",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Fast" : 0,
+            "Crypt::DES" : 0,
+            "Image::Imlib2" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Net::VNC" : {
+         "file" : "lib/Net/VNC.pm",
+         "version" : "0.40"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.40"
+}

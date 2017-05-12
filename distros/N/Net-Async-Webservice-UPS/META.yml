@@ -1,0 +1,66 @@
+---
+abstract: 'Implementation of UPS Online Tools API in Perl'
+author:
+  - 'Gianni Ceccarelli <gianni.ceccarelli@net-a-porter.com>'
+  - 'Sherzod B. Ruzmetov <sherzodr@cpan.org>'
+build_requires:
+  Data::Printer: '0'
+  File::Temp: '0'
+  HTTP::Response: '0'
+  Sub::Override: '0'
+  Test::Deep: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  Time::HiRes: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Async-Webservice-UPS
+no_index:
+  directory:
+    - t/lib
+recommends:
+  CHI: '0'
+  IO::Async::Loop: '0'
+  LWP::UserAgent: '0'
+  Net::Async::HTTP: '0'
+requires:
+  Carp: '0'
+  DateTime::Format::ISO8601: '0'
+  DateTime::Format::Strptime: '0'
+  Encode: '0'
+  Error::TypeTiny: '0'
+  File::Spec: '0'
+  Future: '0'
+  HTTP::Request: '0'
+  List::AllUtils: '0'
+  MIME::Base64: '0'
+  Module::Runtime: '0'
+  Moo: '0'
+  Net::Async::Webservice::Common: '0'
+  Scalar::Util: '0'
+  Scope::Upper: '0'
+  Sub::Exporter: '0'
+  Task::Weaken: '0'
+  Try::Tiny: '0'
+  Type::Library: '0'
+  Type::Params: '0'
+  Type::Utils: '0'
+  Types::DateTime: '0'
+  Types::Standard: '1.000003'
+  Types::URI: '0'
+  XML::Simple: '0'
+  namespace::autoclean: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/NET-A-PORTER/Net-UPS.git
+version: 1.1.4

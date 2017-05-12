@@ -1,0 +1,74 @@
+{
+   "abstract" : "Perl module to execute SSH sessions with Putty in batch mode",
+   "author" : [
+      "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-SSH-Putty",
+   "no_index" : {
+      "directory" : [
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Moo" : "2.000001",
+            "Types::Standard" : "1.000005",
+            "feature" : "0",
+            "namespace::clean" : "0.25",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Moose" : "2.1405",
+            "Test::Moose" : "2.1405",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::SSH::Putty" : {
+         "file" : "lib/Net/SSH/Putty.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/glasswalk3r/net-ssh-putty/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/glasswalk3r/net-ssh-putty.git",
+         "web" : "https://github.com/glasswalk3r/net-ssh-putty"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+}
+

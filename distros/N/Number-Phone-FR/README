@@ -1,0 +1,47 @@
+
+Number::Phone::FR - Phone number information for France
+
+
+This perl module provides data for the Number::Phone module for France.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+DEPENDENCIES
+
+- Number::Phone
+
+(see META.yml for latest information)
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command:
+
+- in english:
+
+    perldoc Number::Phone::FR
+
+- en français:
+
+    perldoc -L fr Number::Phone::FR
+
+You can also view the documentation of the latest release online:
+
+    https://metacpan.org/module/Number::Phone::FR
+
+
+COPYRIGHT & LICENCE
+
+Copyright (C) 2010-2011 Olivier Mengué
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5 itself.

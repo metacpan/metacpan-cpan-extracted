@@ -1,0 +1,37 @@
+Net::IPFromZip version 0.01
+===========================
+
+SYNOPSIS
+
+use Net::IPFromZip qw/reverse/;
+
+#looks for files in local dir or in /usr/local/share/GeoIP
+my \@ips = reverse("59715"); #enter zip code, returns list of associated ips in <30 seconds
+
+
+#or
+\@ips = reverse("/path/to/some/other/csv/file", "59715"); #recommended
+
+INSTALLATION
+
+cpan Net::IPFromZip
+
+You know what to do
+
+DEPENDENCIES
+
+This module requires Geo::IP, and the Geo::IP free downloadable databases found here (https://www.maxmind.com/en/opensource) or download the .csv.zip file from github.com/jk33/reverse-geo-ip
+
+Also the Text::CSV_XS module is required
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2015 by John Kennedy
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

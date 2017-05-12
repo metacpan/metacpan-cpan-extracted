@@ -1,0 +1,58 @@
+version 0.96: Sat Feb 28 12:26:00 CDT 2008
+	- [Jesse Vincent] Updated MakeFile.PL to allow automated CPAN installation.
+
+version 0.95: Sat Mar 17 22:11:00 CDT 2007
+	- [George Chlipala] Updated Net::Bonjour::Entry to handle special 
+          characters, e.g. period and space, in DNS names. Updated 
+	  Makefile.PL to include license and abstract information.
+
+version 0.92: Sat Mar 17 19:27:00 CDT 2007
+	- [George Chlipala] Renamed to Net::Bonjour and added legacy 
+          support for Net::Rendezvous
+
+version 0.91: Sat Mar 17 17:43:00 CDT 2007
+	- [bmat] Fixed bug #25292: Converting _txtdata to _attr truncates 
+	  if more than 1 equals sign
+	- [George Chlipala] other cleanup in Entry.pm
+
+version 0.90: Mon Dec 27 16:20:00 CDT 2004
+
+	- [George Chlipala] Added service and protocol functions.
+	  Added all_services function based on enumerate_services function by 
+	  Sébastien Aperghis-Tramoni. General code clean up.
+
+version 0.86: Sat Mar 06 13:30:00 CDT 2004
+
+	- [George Chlipala] Fixed test #3 (t/3-enterprise.t).
+
+version 0.85: Fri Mar 05 20:00:00 CDT 2004
+
+	- [George Chlipala] updated 'application' method in base object to 
+	  use current domain setting.  Fixed tradition DNS discovery method.
+	  Added third test (3-enterprise.t). This test will test against the
+	  ftp entries at zeroconf.org
+
+version 0.80: Wed Mar 03 21:00:00 CDT 2004
+
+	- [George Chlipala] Setup test directory and moved test.pl to t/use.t
+	  Setup t/entry.t test.  Added discover function to Net::Rendezvous.
+	  Added META.yml file.  Added support for traditional DNS based service 
+	  discovery and ability to set discovery domain.
+
+version 0.70 Tue Feb 17 10:00:00 CDT 2004 
+
+	- [Dan Sully] General code clean up and added basic test script 
+	  (test.pl).
+	- [George Chlipala] Added support to export DNS records (dnsrr) and
+	  all_attrs method for Net::Rendezvous::Entry objects. 
+
+version 0.51: Web Feb 11 10:31:00 CDT 2004
+
+	- [George Chlipala] Fixed POD documentation for Net::Rendezvous, added
+	  trademark disclaimer, added URLs in README, and updated examples in 
+	  Net::Rendezvous and Net::Rendezvous::Entry PODs.
+
+version 0.50: Tue Feb 10 20:16:00 CDT 2004
+
+	- [George Chlipala] Initial release.
+

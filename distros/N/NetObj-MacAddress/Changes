@@ -1,0 +1,14 @@
+Revision history for NetObj::MacAddress
+
+1.0.2   2017-03-10
+        - eliminate dependencies on Moo and namespace::clean
+          while still retaining ability to extend as (foreign)
+          Moo class
+        - minor documentation changes
+
+1.0.1   2015-04-30
+        - support Perl 5.10.1 and above
+        - allow explicit mention of binary attribute name in constructor
+
+1.0     2015-04-10 06:57:34Z
+        - first release to the CPAN

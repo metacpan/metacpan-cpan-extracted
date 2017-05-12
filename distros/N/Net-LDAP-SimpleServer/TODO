@@ -1,0 +1,7 @@
+TODO
+
+- implement other methods
+- encrypting passwords
+  http://www.openldap.org/faq/data/cache/347.html
+- different auth mechanisms: ssl/tls, sasl
+- user-trees (define subtree(s) to hold user(s))

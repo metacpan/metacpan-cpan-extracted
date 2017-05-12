@@ -1,0 +1,148 @@
+#!/usr/bin/perl -w
+use strict;
+
+use lib "lib";
+
+$|=1;
+
+my $testing = 0;
+
+use Net::Radius::Dictionary;
+use Net::Radius::PacketOrdered;
+use Net::Inet qw(pack_sockaddr_in unpack_sockaddr_in inet_ntoa inet_aton);
+use Net::UDP;
+use Net::Gen;
+use Data::Dumper;
+use warnings;
+use Fcntl;
+
+my $mysecret = "proxyserver";
+my $myport = 11812;
+
+my $serveraddr = "127.0.0.1";
+my $serverport = 1812;
+my $serversecret = "radiuserver";
+
+sub rewrite {
+  my($username) = (shift);
+  my($realm);
+
+  print " + Rewrite User-Name \n";
+  print "    + FROM: " . $username . "\n";
+  if( $username =~ /\@/ ) {
+    ($username,$realm) = split(/\@/, $username);
+    $realm = "\@$realm";
+  }
+
+  #====================================
+  # rewrite username here if needed
+  #====================================
+
+  print "    + TO: " . $username . $realm . "\n";
+  return( $username . $realm );
+}
+
+
+# subroutine to make string of 16 random bytes
+sub bigrand() {
+        pack "n8",
+                rand(65536), rand(65536), rand(65536), rand(65536),
+                rand(65536), rand(65536), rand(65536), rand(65536);
+}
+
+
+# START
+
+if( $#ARGV eq 4 ) {
+  $mysecret = $ARGV[0];
+  $myport = $ARGV[1];
+  $serveraddr = $ARGV[2];
+  $serverport = $ARGV[3];
+  $serversecret = $ARGV[4];
+}
+
+printf "%-16s %-24s %-20s %-20s \n",
+  "proxy    ->", "port: $myport", "secret: $mysecret", " ";
+printf "%-16s %-24s %-20s %-20s \n",
+  "server   ->", "port: $serverport", "secret: $serversecret", "addr: $serveraddr";
+
+my $dict = new Net::Radius::Dictionary "dictionary"
+    or die "Couldn't read dictionary: $!";
+
+# Set up the network socket (must have radius in /etc/services)
+my $s = new Net::UDP { thisport => $myport } or die $!;
+$s->bind or die "Couldn't bind: $!";
+$s->fcntl(F_SETFL, $s->fcntl(F_GETFL,0) | O_NONBLOCK)
+    or die "Couldn't make socket non-blocking: $!";
+
+my $server = pack_sockaddr_in( $serverport, inet_aton($serveraddr));
+
+while(1) {
+    my ($rec, $whence);
+
+    # Wait for a packet
+    my $nfound = $s->select(1, 0, 1, undef);
+
+    if ($nfound > 0) {
+
+        $rec = $s->recv(undef, undef, $whence);
+        my($family, $port, $addr) = unpack_sockaddr_in($whence);
+        my $p = new Net::Radius::PacketOrdered $dict, $rec;
+
+        print "### RECEIVED PACKET:\n";
+        $p->dump;
+
+        if( $p->code eq 'Access-Request' ) {
+
+            print " + Access-Request packet type recieved. (" . $p->identifier . ")\n";
+
+            my($plaintext) = $p->password( $mysecret );
+            $p->set_identifier(10);
+            $p->set_authenticator( bigrand );
+            $p->set_password( $plaintext, $serversecret);
+            $p->set_attr('User-Name', rewrite( $p->attr('User-Name') ), 1 );
+            $p->set_attr('Proxy-State' => inet_ntoa($addr) . ":$port:" . unpack("h*",$p->authenticator));
+
+            print "### RESENDING PACKET:\n";
+            $p->dump;
+            print "### user:".$p->attr('User-Name')." pass:". $p->password( $serversecret ) ." ###\n";
+
+            $s->sendto( $p->pack, $server);
+
+            print " + Access-Request packet type sent. (" . $p->identifier . ")\n";
+
+        } elsif( $p->code eq 'Access-Accept' || $p->code eq 'Access-Reject' ) {
+
+            print " + " . $p->code . " packet type recieved. (" . $p->identifier . ")\n";
+
+            if( defined $p->attr('Proxy-State') ) {
+                my($caddr,$cport,$cauth) = split(/:/, $p->attr('Proxy-State'));
+
+                print "### RESENDING PACKET TO CLIENT:\n";
+                printf "%-12s %-22s %-12s %-20s \n",
+                    "client  ->", "addr: $caddr", "port: $cport", "auth: $cauth";
+                print "#################################\n";
+
+                my($client) = pack_sockaddr_in($cport, inet_aton($caddr));
+                # remove latest proxy-state
+                $p->unset_attr('Proxy-State', $p->attr('Proxy-State'));
+                $p->set_authenticator(pack("h*",$cauth));
+
+                $s->sendto(auth_resp($p->pack, $mysecret), $client);
+
+                print " + " . $p->code . " packet type sent. (" . $p->identifier . ")\n";
+            } else {
+                print " - Proxy-State missing!\n";
+            }
+        } else {
+            print " - Unexpected packet type recieved.\n";
+        }
+    }
+}
+
+
+
+
+
+
+

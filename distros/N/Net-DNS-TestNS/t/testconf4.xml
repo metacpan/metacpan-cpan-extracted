@@ -1,0 +1,87 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE testns SYSTEM "testns.dtd">
+<!-- 
+    
+    This xml document has been generated using transform-conf.xsl 
+    
+    $Id: master2simple.xsl,v 1.1.2.1 2004/10/14 09:54:03 olaf Exp $
+    
+    tranform-conf.xsl is used to tranform the configuration files that
+    came with version 1.06 of Net::DNS::TestNS to the version introduced
+    with Net::DNS::TestNS 1.07
+    
+  -->
+
+<testns version="1.0">
+<server ip="127.0.0.1" port="5354">
+	<qname name="bla.foo">
+		<qtype type="TXT" delay="1">
+		<header>
+			<rcode value="NOERROR"/><aa value="1"/><ra value="0"/><ad value="1"/>
+		</header>
+      <ans>
+bla.foo.		3600	IN	TXT	"TEXT"
+  </ans>
+      <ans>
+bla.foo.		3600	IN	TXT	"Other text"  
+</ans>
+    
+		</qtype><qtype type="ANY" delay="0">
+		<header>
+			<rcode value="FORMERR"/><aa value="1"/><ra value="0"/><ad value="0"/>
+		</header>
+
+      
+		</qtype><qtype type="A" delay="0">
+		<header>
+			<rcode value="NOERROR"/><aa value="1"/><ra value="0"/><ad value="1"/>
+		</header>   
+
+  
+
+    
+		</qtype>
+</qname>
+
+</server>
+
+<server ip="127.0.0.1" port="5355">
+	<qname name="bla.foo">
+		<qtype type="TXT" delay="0">
+		<header>
+			<rcode value="NXDOMAIN"/><aa value="0"/><ra value="1"/><ad value="1"/>
+		</header>
+      <ans>
+bla.foo.		3600	IN	TXT	"TEXT"
+  </ans>
+      <ans>
+bla.foo.		3600	IN	TXT	"From port 5355"
+  </ans>
+      <aut/>
+      <add/>
+    
+		</qtype><qtype type="A" delay="0">
+		<header>
+			<rcode value="NOERROR"/><aa value="1"/><ra value="0"/><ad value="1"/>
+		</header>   
+      <ans>
+bla.foo.		3600	IN	A 10.0.0.1
+  </ans>
+      <ans>
+bla.foo.		3600	IN	A 10.0.0.2
+  </ans>
+      <ans>
+bla.foo.		3600	IN	A 10.0.0.3
+  </ans>
+      <aut/>
+      <add>
+
+bla.foo.		3600	IN	A 10.0.0.3
+</add>
+    
+		</qtype>
+</qname>
+
+</server>
+
+</testns>

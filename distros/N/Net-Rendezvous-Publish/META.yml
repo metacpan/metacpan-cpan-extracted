@@ -1,0 +1,22 @@
+---
+name: Net-Rendezvous-Publish
+version: 0.04
+author:
+  - Richard Clamp <richardc@unixbeard.net>
+abstract: publish Rendezvous services
+license: perl
+requires:
+  Class::Accessor::Lvalue: 0
+  Module::Pluggable: 0
+  perl: 5.006
+build_requires:
+  Test::More: 0
+provides:
+  Net::Rendezvous::Publish:
+    file: lib/Net/Rendezvous/Publish.pm
+    version: 0.04
+  Net::Rendezvous::Publish::Backend::Null:
+    file: lib/Net/Rendezvous/Publish/Backend/Null.pm
+  Net::Rendezvous::Publish::Service:
+    file: lib/Net/Rendezvous/Publish/Service.pm
+generated_by: Module::Build version 0.25

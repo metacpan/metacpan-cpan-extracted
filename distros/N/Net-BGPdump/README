@@ -1,0 +1,45 @@
+Net-BGPdump
+===========
+
+Net::BGPdump is a perl binding to libbgpdump.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+SOURCE CODE
+
+The official distribution lives here:
+
+https://tools.netsa.cert.org/confluence/display/tt/Net-BGPdump
+
+The package is also available via the CPAN:
+
+http://search.cpan.org/dist/Net-BGPdump/
+
+
+DEPENDENCIES
+
+This module requires the presense of libbgpdump.
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Carnegie Mellon University
+
+Use of the Net-BGPdump library and related source code is subject to the
+terms of the following licenses:
+
+GNU Public License (GPL) Rights pursuant to Version 2, June 1991
+Government Purpose License Rights (GPLR) pursuant to DFARS 252.227.7013
+
+NO WARRANTY
+
+See GPL.txt and LICENSE.txt for more details.

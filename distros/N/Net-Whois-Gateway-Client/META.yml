@@ -1,0 +1,24 @@
+---
+name: Net-Whois-Gateway-Client
+version: 0.12
+author:
+  - |-
+    Pavel Boldin	<davinchi@cpan.org>
+    Sergey Kotenko	<graykot@gmail.com>
+abstract: Interface to Net::Whois::Gateway::Server
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Storable: 0
+  bytes: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Net::Whois::Gateway::Client:
+    file: lib/Net/Whois/Gateway/Client.pm
+    version: 0.12
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

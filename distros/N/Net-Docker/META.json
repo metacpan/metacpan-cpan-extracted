@@ -1,0 +1,68 @@
+{
+   "abstract" : "Interface to the Docker API",
+   "author" : [
+      "Peter Stuifzand <peter@stuifzand.eu>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.3, Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Docker",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.036"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::HTTP" : "0",
+            "JSON" : "0",
+            "LWP::Protocol::http::SocketUnixAlt" : "0",
+            "LWP::UserAgent" : "0",
+            "Moo" : "1.002000",
+            "URI" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pstuifzand/docker-perl/issues"
+      },
+      "homepage" : "https://github.com/pstuifzand/docker-perl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pstuifzand/docker-perl.git",
+         "web" : "https://github.com/pstuifzand/docker-perl"
+      }
+   },
+   "version" : "0.002005",
+   "x_contributors" : [
+      "Peter Stuifzand <peter.stuifzand@gmail.com>",
+      "chenryn <rao.chenlin@gmail.com>",
+      "moltar <moltar@moltar.net>"
+   ]
+}
+

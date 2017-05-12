@@ -1,0 +1,692 @@
+DNSEXT                                                           J. Reid
+Internet-Draft                                                Telnic Ltd
+Intended status: Standards Track                             J. Schlyter
+Expires: January 5, 2009                                        Kirei AB
+                                                                B. Timms
+                                                              Telnic Ltd
+                                                            July 4, 2008
+
+
+                      
+The RKEY DNS Resource Record
+
+                    
+<draft-reid-dnsext-rkey-00.txt>
+
+
+Status of this Memo
+
+   By submitting this Internet-Draft, each author represents that any
+   applicable patent or other IPR claims of which he or she is aware
+   have been or will be disclosed, and any of which he or she becomes
+   aware will be disclosed, in accordance with Section 6 of BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF), its areas, and its working groups.  Note that
+   other groups may also distribute working documents as Internet-
+   Drafts.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   The list of current Internet-Drafts can be accessed at
+   http://www.ietf.org/ietf/1id-abstracts.txt.
+
+   The list of Internet-Draft Shadow Directories can be accessed at
+   http://www.ietf.org/shadow.html.
+
+   This Internet-Draft will expire on January 5, 2009.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Reid, et al.             Expires January 5, 2009                [Page 1]
+
+ 
+Internet-Draft        The RKEY DNS Resource Record             July 2008
+
+
+Abstract
+
+   A DNS Resource record which can be used to encrypt NAPTR records is
+   described in this document.
+
+
+Table of Contents
+
+   1.  Terminology  . . . . . . . . . . . . . . . . . . . . . . . . .  3
+   2.  Introduction . . . . . . . . . . . . . . . . . . . . . . . . .  4
+   3.  Definition of RKEY Resource Record . . . . . . . . . . . . . .  5
+   4.  Security Considerations  . . . . . . . . . . . . . . . . . . .  6
+   5.  IANA Considerations  . . . . . . . . . . . . . . . . . . . . .  7
+   6.  Acknowledgements . . . . . . . . . . . . . . . . . . . . . . .  8
+   7.  References . . . . . . . . . . . . . . . . . . . . . . . . . .  9
+     7.1.  Normative References . . . . . . . . . . . . . . . . . . .  9
+     7.2.  Informative References . . . . . . . . . . . . . . . . . . 10
+   Authors' Addresses . . . . . . . . . . . . . . . . . . . . . . . . 11
+   Intellectual Property and Copyright Statements . . . . . . . . . . 12
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Reid, et al.             Expires January 5, 2009                [Page 2]
+
+ 
+Internet-Draft        The RKEY DNS Resource Record             July 2008
+
+
+1. Terminology
+
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in BCP 14, RFC2119
+   [refs.RFC2119].
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Reid, et al.             Expires January 5, 2009                [Page 3]
+
+ 
+Internet-Draft        The RKEY DNS Resource Record             July 2008
+
+
+2. Introduction
+
+
+   The DNS protocol is defined in RFC1034 [refs.RFC1034], RFC1035
+   [refs.RFC1035] and clarified in RFC2181 [refs.RFC2181].  The scope
+   for using DNS KEY Resource Records was limited in RFC3445
+   [refs.RFC3445] to keys used by the Domain Name System Security
+   Extensions (DNSSEC) which is defined in RFC4033 [refs.RFC4033],
+   RFC4034 [refs.RFC4034] and RFC4035 [refs.RFC4035].  The original KEY
+   RR used sub-typing to store both DNSSEC keys and arbitrary
+   application keys.  Storing both DNSSEC and application keys with the
+   same record type is a mistake so RFC3445 removed application keys
+   from the KEY record by redefining the Protocol Octet field in the KEY
+   RR Data.  This means that any other uses of keying material in the
+   DNS need to define a new RRtype and mnemonic.
+
+   Although this document advocates the introduction of a new resource
+   record specifically to provide this type of information for keys that
+   encrypt NAPTR records [refs.RFC3403], it can be used for more
+   generalised encryption of DNS resource records.  A scheme for
+   encrypting NAPTR records is outlined in draft-timms-encrypt-naptr
+   [I-D.timms-enum-encrypt].
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Reid, et al.             Expires January 5, 2009                [Page 4]
+
+ 
+Internet-Draft        The RKEY DNS Resource Record             July 2008
+
+
+3. Definition of RKEY Resource Record
+
+
+   The RKEY RR uses an IANA-assigned type code and is used as resource
+   record for storing keys which encrypt NAPTR records.  The RDATA for
+   an RKEY RR consists of flags, a protocol octet, the algorithm number
+   octet, and the public key itself.  The format is as follows:
+
+   RKEY RDATA format
+
+
+                       1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |              flags            |   protocol    |   algorithm   |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                                                               /
+   /                        public key                             /
+   /                                                               /
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+   All bits of the flags field are reserved and MUST be zero.  The
+   protocol field MUST be set to 1.  The algorithm and public key fields
+   are identical to the definitions used in RFC4034 [refs.RFC4034].
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Reid, et al.             Expires January 5, 2009                [Page 5]
+
+ 
+Internet-Draft        The RKEY DNS Resource Record             July 2008
+
+
+4. Security Considerations
+
+
+   The format and correct usage of DNSSEC keys is not changed by this
+   document and no new security considerations are introduced.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Reid, et al.             Expires January 5, 2009                [Page 6]
+
+ 
+Internet-Draft        The RKEY DNS Resource Record             July 2008
+
+
+5. IANA Considerations
+
+
+   IANA is requested to issue a new type code and mnemonic for the
+   proposed resource record.  No other IANA services are required by
+   this document.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Reid, et al.             Expires January 5, 2009                [Page 7]
+
+ 
+Internet-Draft        The RKEY DNS Resource Record             July 2008
+
+
+6. Acknowledgements
+
+
+   The authors would like to thank Klaus Malorny, Lawrence Conroy and
+   Roy Arends for their constructive suggestions to this document and
+   for helping to identify potential uses for the proposed record type.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Reid, et al.             Expires January 5, 2009                [Page 8]
+
+ 
+Internet-Draft        The RKEY DNS Resource Record             July 2008
+
+
+7. References
+
+
+7.1. Normative References
+
+
+   [I-D.timms-enum-encrypt]
+              Timms, B., Reid, J., and J. Schlyter, "IANA Registration
+              for Encrypted ENUM", draft-timms-enum-encrypt-00 (work in
+              progress), November 2007.
+
+   [refs.RFC1034]
+              Mockapetris, P., "DOMAIN NAMES - CONCEPTS AND FACILITIES",
+              RFC 1034, November 1987.
+
+   [refs.RFC1035]
+              Mockapetris, P., "Domain names - implementation and
+              specification", STD 13, RFC 1035, November 1987.
+
+   [refs.RFC1123]
+              Braden, R., "Requirements for Internet Hosts --
+              Application and Support", RFC 1123, October 1989.
+
+   [refs.RFC2181]
+              Elz, R. and R. Bush, "Clarifications to the DNS
+              Specification", RFC 2181, July 1997.
+
+   [refs.RFC3403]
+              Mealling, M., "Dynamic Delegation Discovery System (DDDS)
+              Part Three: The Domain Name System (DNS) Database",
+              RFC 3403, October 2002.
+
+   [refs.RFC3445]
+              Massey, D. and S. Rose, "Limiting the Scope of the KEY
+              Resource Record (RR)", RFC 3445, December 2002.
+
+   [refs.RFC3986]
+              Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+              Resource Identifier (URI): Generic Syntax", STD 66,
+              RFC 3986, January 2005.
+
+   [refs.RFC4033]
+              Arends, R., Austein, R., Larson, M., Massey, D., and S.
+              Rose, "DNS Security Introduction and Requirements",
+              RFC 4033, March 2005.
+
+   [refs.RFC4034]
+              Arends, R., Austein, R., Larson, M., Massey, D., and S.
+              Rose, "Resource Records for the DNS Security Extensions",
+              RFC 4034, March 2005.
+
+
+
+Reid, et al.             Expires January 5, 2009                [Page 9]
+
+ 
+Internet-Draft        The RKEY DNS Resource Record             July 2008
+
+
+   [refs.RFC4035]
+              Arends, R., Austein, R., Larson, M., Massey, D., and S.
+              Rose, "Protocol Modifications for the DNS Security
+              Extensions", RFC 4035, March 2005.
+
+7.2. Informative References
+
+
+   [refs.RFC2026]
+              Bradner, S., "The Internet Standards Process -- Revision
+              3", RFC 2026, BCP 9, October 1996.
+
+   [refs.RFC2119]
+              Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", RFC 2119, BCP 14, March 1997.
+
+   [refs.RFC3761]
+              Faltstrom, P. and M. Mealling, "The E.164 to Uniform
+              Resource Identifiers (URI) Dynamic Delegation  Discovery
+              System (DDDS) Application (ENUM)", RFC 3761, April 2004.
+
+   [refs.RFC3833]
+              Atkins, D. and R. Austein, "Threat Analysis of the Domain
+              Name System (DNS)", RFC 3833, August 2004.
+
+   [refs.RFC3978]
+              Bradner, S., "IETF Rights in Contributions", BCP 78,
+              RFC 3978, March 2005.
+
+   [refs.RFC3979]
+              Bradner, S., "Intellectual Property Rights in IETF
+              Technology", BCP 79, RFC 3979, March 2005.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Reid, et al.             Expires January 5, 2009               [Page 10]
+
+ 
+Internet-Draft        The RKEY DNS Resource Record             July 2008
+
+
+Authors' Addresses
+
+   Jim Reid
+   Telnic Ltd
+   6 Langside Court
+   Bothwell, SCOTLAND
+   United Kingdom
+
+   Phone: +44 20 7467 6400
+   Email: jim@telnic.org
+
+
+   Jakob Schlyter
+   Kirei AB
+   PO Box 53204
+   Goteborg, SE 40016
+   Sweden
+
+   Phone: +46 31 787 8007
+   Email: jakob@kirei.se
+
+
+   Ben Timms
+   Telnic Ltd
+   37 Percy Street
+   London, W1T 2DJ
+   United Kingdom
+
+   Phone: +44 20 7467 6450
+   Email: btimms@telnic.org
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Reid, et al.             Expires January 5, 2009               [Page 11]
+
+ 
+Internet-Draft        The RKEY DNS Resource Record             July 2008
+
+
+Full Copyright Statement
+
+   Copyright (C) The IETF Trust (2008).
+
+   This document is subject to the rights, licenses and restrictions
+   contained in BCP 78, and except as set forth therein, the authors
+   retain all their rights.
+
+   This document and the information contained herein are provided on an
+   "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+   OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY, THE IETF TRUST AND
+   THE INTERNET ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS
+   OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF
+   THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+   WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+
+Intellectual Property
+
+   The IETF takes no position regarding the validity or scope of any
+   Intellectual Property Rights or other rights that might be claimed to
+   pertain to the implementation or use of the technology described in
+   this document or the extent to which any license under such rights
+   might or might not be available; nor does it represent that it has
+   made any independent effort to identify any such rights.  Information
+   on the procedures with respect to rights in RFC documents can be
+   found in BCP 78 and BCP 79.
+
+   Copies of IPR disclosures made to the IETF Secretariat and any
+   assurances of licenses to be made available, or the result of an
+   attempt made to obtain a general license or permission for the use of
+   such proprietary rights by implementers or users of this
+   specification can be obtained from the IETF on-line IPR repository at
+   http://www.ietf.org/ipr.
+
+   The IETF invites any interested party to bring to its attention any
+   copyrights, patents or patent applications, or other proprietary
+   rights that may cover technology that may be required to implement
+   this standard.  Please address the information to the IETF at
+   ietf-ipr@ietf.org.
+
+
+
+
+
+
+
+
+
+
+
+Reid, et al.             Expires January 5, 2009               [Page 12]

@@ -1,0 +1,118 @@
+INSTALLATION INSTRUCTIONS
+=========================
+
+Download and extract tarball before running
+these commands in its base directory:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+For RPM installation, download tarball before
+running these commands in your _topdir:
+
+  rpm -ta SOURCES/Net-DNAT-*.tar.gz
+  rpm -ih RPMS/noarch/perl-Net-DNAT-*.rpm
+
+
+PREREQUISITES
+=============
+
+When running "perl Makefile.PL" or "make test",
+you may notice that some modules are required
+before it will install correctly, namely:
+
+  Net::Server
+  IO::Multiplex
+  mod_perl
+
+These can all be obtained from CPAN:
+
+http://search.cpan.org/
+
+
+EXAMPLE CONFIGURATION
+=====================
+
+HARDWARE:
+
+
+  \  |     |  /
+   \_|_____|_/
+   /         \
+  |           |
+  | INTERNET  |
+  |           |
+   \_________/
+        |
+        |
+  ======|========= Firewall ================
+        |
+   _____|_____ Public Interface  (x.x.x.x)
+  |           |
+  | Net::DNAT |
+  |___________|
+     |         Private Interface (10.0.0.1)
+     |
+     |   _________________________
+     \__| Apache::DNAT (10.0.0.2) |
+     |  |_________________________|
+     |
+     |   _________________________
+  H  \__| Apache::DNAT (10.0.0.3) |
+  U  |  |_________________________|
+  B  |
+     |   _________________________
+     \__| Apache::DNAT (10.0.0.4) |
+     |  |_________________________|
+     |
+     |   _________________________
+     \__| Apache::DNAT (10.0.0.5) |
+        |_________________________|
+
+
+SOFTWARE (Public):
+
+#!/usr/bin/perl
+# Program: dnat.pl
+# Run this at startup on the box with both
+# the public and the private interfaces.
+
+use strict;
+use Net::DNAT;
+
+my $pools = {
+  main => [ "10.0.0.2", "10.0.0.3" ],
+  banner => "10.0.0.4",
+  devel =>  "10.0.0.5:8080",
+};
+
+my $site2pool = {
+  "site.com"     => "main",
+  "www.site.com" => "main",
+  "banner.site.com" => "banner",
+  "dev.site.com" => "devel",
+};
+
+run Net::DNAT
+  port => 80,
+  pools => $pools,
+  default_pool => "main",
+  host_switch_table => $site2pool,
+  ;
+
+
+SOFTWARE (Private):
+
+# Install these lines into the httpd.conf
+# of the boxes with the private interface.
+PerlModule Apache::DNAT
+PerlInitHandler Apache::DNAT
+
+
+EXAMPLES
+========
+
+See demo/* from the distribution for some
+working examples.

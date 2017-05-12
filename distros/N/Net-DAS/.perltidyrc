@@ -1,0 +1,5 @@
+-pbp            # -pbp is an abbreviation for the parameters in the book Perl Best Practices by Damian Conway
+-l=117          # PBP sets max line length to 78, but thats too short for this century so x1.5 = 117
+-nst            # set to no standard out
+-b              # fix inline file
+-bext='/'       # backup to .bak but delete if no errors

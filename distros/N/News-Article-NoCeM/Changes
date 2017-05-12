@@ -1,0 +1,30 @@
+Revision history for Perl extension News::Article::NoCeM
+
+0.08  Sat Jun 24 03:53:39 CST 2006
+	- getting married today :D
+	- indicate that it's encoding with SHA1
+	Patch submitted by: tskirvin@killfile.org
+
+0.07  Thu Apr  7 22:33:21 CST 2005
+	- correct the version
+
+0.06  Thu Apr  7 15:13:21 CST 2005
+	- support calling ihave() in issue()
+	Requested by: gslin
+
+0.05  Thu Apr  7 14:21:33 CST 2005
+	- nuke msgid before call add_message_id()
+	- add more tests, now 1..4
+
+0.04  Mon Dec 20 21:55:42 CST 2004
+	- fix wrong format in sign()
+	Noticed by: Alica.bbs@bbs.hs.ntnu.edu.tw
+
+0.03  Tue Dec  7 16:33:54 CST 2004
+	- add manpage
+
+0.02  Mon Dec  6 10:01:56 CST 2004
+	- main implementation completed without documantation
+
+0.01  Sat Dec  4 21:11:45 CST 2004
+	- original released version, using code from newslib

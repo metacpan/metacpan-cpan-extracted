@@ -1,0 +1,40 @@
+Net-Rexster-Client version 0.0.2
+
+Net::Rexster::Client (see under http://search.cpan.org/~shoheik/)
+
+One of the graphDB problem is that each graphDB has dialect and 
+if you switch the database, you need to rewrite the code to adapt to the replaced db. 
+Rexster(https://github.com/tinkerpop/rexster/wiki) is REST server for graph DBs 
+which provides common interface for multiple graphDBs, so that the client of graphdb won't care which db is used. 
+It enables us to use the same query to get/create/delete the nodes/edges even the graphDB is changed.
+
+Net::Rexster::Cient is for Perl + GraphDB user.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012, Shohei Kameda
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

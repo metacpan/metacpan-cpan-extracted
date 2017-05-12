@@ -1,0 +1,193 @@
+---
+abstract: 'Nagios plugin for checking POP3 Servers'
+author:
+  - 'Patrick Donelan <pdonelan@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102342, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Nagios-Plugin-POP3
+requires:
+  Mail::POP3Client: 0
+  Nagios::Plugin: 0
+  perl: 5.006
+resources:
+  bugtracker: http://github.com/pdonelan/Nagios-Plugin-POP3/issues
+  homepage: http://github.com/pdonelan/Nagios-Plugin-POP3/tree
+  repository: git://github.com/pdonelan/Nagios-Plugin-POP3.git
+version: 1.001
+x_Dist_Zilla:
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@PDONELAN/GatherDir'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@PDONELAN/MetaYAML'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@PDONELAN/ExecDir'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@PDONELAN/ShareDir'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@PDONELAN/License'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@PDONELAN/MetaJSON'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::ReadmeFromPod
+      name: '@PDONELAN/ReadmeFromPod'
+      version: 0.14
+    -
+      class: Dist::Zilla::Plugin::EOLTests
+      name: '@PDONELAN/EOLTests'
+      version: 0.02
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@PDONELAN/PodCoverageTests'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@PDONELAN/PodSyntaxTests'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::PortabilityTests
+      name: '@PDONELAN/PortabilityTests'
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::CompileTests
+      name: '@PDONELAN/CompileTests'
+      version: 1.101800
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@PDONELAN/Manifest'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@PDONELAN/PruneCruft'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@PDONELAN/ManifestSkip'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@PDONELAN/ExtraTests'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@PDONELAN/PkgVersion'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: '@PDONELAN/PodWeaver'
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@PDONELAN/NextRelease'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@PDONELAN/AutoPrereqs'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::MinimumPerl
+      name: '@PDONELAN/MinimumPerl'
+      version: 0.02
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: '@PDONELAN/Git::NextVersion'
+      version: 1.102810
+    -
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: '@PDONELAN/GithubMeta'
+      version: 0.10
+    -
+      class: Dist::Zilla::Plugin::Bugtracker
+      name: '@PDONELAN/Bugtracker'
+      version: 1.102670
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@PDONELAN/MetaConfig'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@PDONELAN/MakeMaker'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::CheckChangeLog
+      name: '@PDONELAN/CheckChangeLog'
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: '@PDONELAN/CheckChangesHasContent'
+      version: 0.003
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@PDONELAN/TestRelease'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@PDONELAN/ConfirmRelease'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@PDONELAN/UploadToCPAN'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::UpdateGitHub
+      name: '@PDONELAN/UpdateGitHub'
+      version: 0.0014
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@PDONELAN/@Git/Check'
+      version: 1.102810
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@PDONELAN/@Git/Commit'
+      version: 1.102810
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@PDONELAN/@Git/Tag'
+      version: 1.102810
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: '@PDONELAN/@Git/Push'
+      version: 1.102810
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.102342
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.102342

@@ -1,0 +1,9 @@
+ChangeLog               Change log 
+MANIFEST                This file
+Makefile.PL             Makefile maker
+whois.pl                A simple whois client example with debugging enabled
+lib/Net/Whois/Proxy.pm	The Whois proxy library
+LICENSE                 This modules LICENSE policy
+t/00basic.t             A Simple test
+t/01domain.t            Another Simple test
+META.yml                                 Module meta-data (added by MakeMaker)

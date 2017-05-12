@@ -1,0 +1,89 @@
+{
+   "abstract" : "Client library for APNs that support the extended format.",
+   "author" : [
+      "xaicron <xaicron {@} cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-APNs-Extended",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Mock::Guard" : "0.08",
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0",
+            "JSON::XS" : "0",
+            "Net::SSLeay" : "0",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Net::APNs::Extended" : {
+         "file" : "lib/Net/APNs/Extended.pm",
+         "version" : "0.12"
+      },
+      "Net::APNs::Extended::Base" : {
+         "file" : "lib/Net/APNs/Extended/Base.pm"
+      },
+      "Net::APNs::Extended::Feedback" : {
+         "file" : "lib/Net/APNs/Extended/Feedback.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/xaicron/p5-Net-APNs-Extended/issues"
+      },
+      "homepage" : "https://github.com/xaicron/p5-Net-APNs-Extended",
+      "repository" : {
+         "url" : "git://github.com/xaicron/p5-Net-APNs-Extended.git",
+         "web" : "https://github.com/xaicron/p5-Net-APNs-Extended"
+      }
+   },
+   "version" : "0.12",
+   "x_contributors" : [
+      "Syohei YOSHIDA <syohex@gmail.com>",
+      "Colin Kuskie <colink@perldreamer.com>",
+      "xaicron <xaicron@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,10 @@
+This is an -*- indented-text -*- file
+
+* Add some sort of 'post-resolve' method. This would allow for
+  functions that would fix the response in some way, such as adding
+  authority RRs.
+
+* Testing must be added, as a few resolver methods will be shipped
+  along with this module.
+
+$Id: TODO,v 1.2 2002/10/23 04:43:58 lem Exp $

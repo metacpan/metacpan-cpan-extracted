@@ -1,0 +1,8 @@
+Revision history for Net-SNTP-Server
+
+0.05    2015-10-9/7:24:19 pm
+        Fifth version, modifying git hub repo.
+
+0.06    2015-11-5/12:16:19 pm
+        Sixth version, modifying constants in /lib/Net/SNTP/Server line 123
+	due to failing CPAN test case.

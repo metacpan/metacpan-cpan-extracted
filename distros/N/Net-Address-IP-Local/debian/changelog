@@ -1,0 +1,23 @@
+net-address-ip-local-perl (0.1.2) unstable; urgency=low
+
+  * Declare non-Debian dependency on version.pm.
+
+ -- Julian Mehnle <julian@mehnle.net>  Wed, 14 Jan 2009 21:16:13 +0000
+
+net-address-ip-local-perl (0.1.1) unstable; urgency=low
+
+  * On IPv4-only systems, ensure that IO::Socket::INET is loaded properly by
+    the connected_to() method.
+  * Generate more expressive exception messages if public_ipv4()/public_ipv6()
+    methods are called without the respective IP version being supported.
+  * Made 'remote_address_ipv{4,6}_default' and 'remote_port_default' constants
+    completely overridable from Net::Address::IP::Local sub-classes.
+
+ -- Julian Mehnle <julian@mehnle.net>  Mon, 17 Mar 2008 19:51:01 +0000
+
+net-address-ip-local-perl (0.1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Julian Mehnle <julian@mehnle.net>  Sun, 16 Mar 2008 01:48:41 +0000
+

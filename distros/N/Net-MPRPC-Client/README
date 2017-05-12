@@ -1,0 +1,84 @@
+NAME
+    Net::MPRPC::Client - Synchronous MessagePack RPC client
+
+SYNOPSIS
+        use Net::MPRPC::Client;
+    
+        my $client = Net::MPRPC::Client->new(
+            host => '127.0.0.1',
+            port => 4423,
+        );
+    
+        # or unix socket:
+        my $client = Net::MPRPC::Client->new(
+            host => 'unix/',
+            port => '/tmp/mprpc.sock',
+        );
+    
+        # call method "echo" with argument "foo bar"
+        my $res = $client->call( echo => "foo bar" )
+            or die $client->error;
+
+DESCRIPTION
+    This module is a simple synchronous MessagePack-RPC client, designed to
+    use in synchronous application (e.g. prefork server) For asynchronous
+    version of this module, take a look at AnyEvent::MPRPC::Client.
+
+METHODS
+  new(%parameters)
+        my $client = Net::MPRPC::Client->new(
+            host => '127.0.0.1',
+            port => 4423,
+        );
+    
+        # or unix socket:
+        my $client = Net::MPRPC::Client->new(
+            host => 'unix/',
+            port => '/tmp/mprpc.sock',
+        );
+
+    Create and return client object. Available parameters are:
+
+    *   host => 'Str' (Required)
+
+        MessagePack-RPC server's hostname to connect. If you want to use
+        unix domain socket, this parameter should be "unix/".
+
+    *   port => 'Int | Str' (Required)
+
+        MessagePack-RPC server's port or UNIX socket path to connect.
+
+    *   timeout => 'Int'
+
+        Timeout (second) to connect. Default value is 30 seconds.
+
+  call($method, $parameter)
+        my $res = $client->call( echo => "foo bar" )
+            or die $client->error;
+
+    Call RPC method and return result.
+
+    If remote server return some errors, this method return undef. You can
+    get error message by "error" method. When something other error (network
+    error or etc) occurred, this method throw exception.
+
+  error()
+    Return error messages. Return empty string when there's no error.
+
+  connect
+  disconnect
+    Connect to and disconnect from server. This method automatically called
+    from "call" method.
+
+AUTHOR
+    Daisuke Murase <typester@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2011 by KAYAC Inc.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-OpenSRS-OMA.t
+lib/Net/OpenSRS/OMA.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,34 @@
+Revision history for Perl extension NoSQL::PL2SQL::Simple.
+
+0.01  Mon Nov 26 20:58:29 2012
+	- original version; created by h2xs 1.23 with options
+		-XAn NoSQL::PL2SQL::Simple
+
+0.10  Tue Dec  4 17:22:17 2012
+	- Beta Release
+
+0.20  Tue Jan 22 12:49:57 EST 2013
+	- Added keyValues() method for many-to-one and many-to-many
+	  relationships
+
+0.21  Tue Mar  5 19:35:02 EST 2013
+	- Added newobject() method and modified constructor
+	  to accomodate changes in NoSQL::PL2SQL.
+
+0.22  Fri May  3 19:46:28 EDT 2013
+	- Added delete() method
+	- Rewrote documentation (should be coherent now)
+
+0.23  Tue May  7 22:56:03 EDT 2013
+	- Fixed a problem where empty query requests sometimes 
+	  returns a single undefined element
+	- delete() can now be called via an instance or object
+	- keyValues()->clear() can now be called with an argument
+	- Added CAVEATS to documentation
+
+0.24  Wed May  8 16:34:58 EDT 2013
+	- The following two statements should work identically:
+	     $instance->record( $object => $newobject )
+	     $instance->record( $object->SQLObjectID => $newobject )
+
+	  Refactored (using recursion) the record() method

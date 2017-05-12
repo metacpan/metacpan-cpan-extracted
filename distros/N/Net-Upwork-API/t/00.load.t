@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+use strict;
+use Test::More tests => 29;
+use lib qw(lib);
+
+use_ok('Net::Upwork::API');
+use_ok('Net::Upwork::API::Config');
+use_ok('Net::Upwork::API::Client');
+use_ok('Net::Upwork::API::Routers::Auth');
+use_ok('Net::Upwork::API::Routers::Messages');
+use_ok('Net::Upwork::API::Routers::Snapshot');
+use_ok('Net::Upwork::API::Routers::Metadata');
+use_ok('Net::Upwork::API::Routers::Payments');
+use_ok('Net::Upwork::API::Routers::Workdays');
+use_ok('Net::Upwork::API::Routers::Workdiary');
+use_ok('Net::Upwork::API::Routers::Activities::Engagement');
+use_ok('Net::Upwork::API::Routers::Activities::Team');
+use_ok('Net::Upwork::API::Routers::Freelancers::Profile');
+use_ok('Net::Upwork::API::Routers::Freelancers::Search');
+use_ok('Net::Upwork::API::Routers::Jobs::Profile');
+use_ok('Net::Upwork::API::Routers::Jobs::Search');
+use_ok('Net::Upwork::API::Routers::Organization::Companies');
+use_ok('Net::Upwork::API::Routers::Organization::Teams');
+use_ok('Net::Upwork::API::Routers::Organization::Users');
+use_ok('Net::Upwork::API::Routers::Hr::Contracts');
+use_ok('Net::Upwork::API::Routers::Hr::Engagements');
+use_ok('Net::Upwork::API::Routers::Hr::Interviews');
+use_ok('Net::Upwork::API::Routers::Hr::Jobs');
+use_ok('Net::Upwork::API::Routers::Hr::Milestones');
+use_ok('Net::Upwork::API::Routers::Hr::Submissions');
+use_ok('Net::Upwork::API::Routers::Hr::Clients::Applications');
+use_ok('Net::Upwork::API::Routers::Hr::Clients::Offers');
+use_ok('Net::Upwork::API::Routers::Hr::Freelancers::Applications');
+use_ok('Net::Upwork::API::Routers::Hr::Freelancers::Offers');

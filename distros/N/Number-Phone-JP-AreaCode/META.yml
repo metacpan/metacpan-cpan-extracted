@@ -1,0 +1,45 @@
+---
+abstract: 'Utilities for Japanese area code of phone'
+author:
+  - 'moznion <moznion@gmail.com>'
+build_requires:
+  Test::Deep: 0
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Number-Phone-JP-AreaCode
+no_index:
+  directory:
+    - t
+    - xt
+    - author
+    - eg
+provides:
+  Number::Phone::JP::AreaCode:
+    file: lib/Number/Phone/JP/AreaCode.pm
+    version: 20131201.2
+  Number::Phone::JP::AreaCode::Data::Address2AreaCode:
+    file: lib/Number/Phone/JP/AreaCode/Data/Address2AreaCode.pm
+  Number::Phone::JP::AreaCode::Data::AreaCode2Address:
+    file: lib/Number/Phone/JP/AreaCode/Data/AreaCode2Address.pm
+requires:
+  Encode: 2.57
+  Lingua::JA::Numbers: 0
+  Lingua::JA::Regular::Unicode: 0
+  parent: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/moznion/Number-Phone-JP-AreaCode/issues
+  homepage: https://github.com/moznion/Number-Phone-JP-AreaCode
+  repository: git://github.com/moznion/Number-Phone-JP-AreaCode.git
+version: 20131201.2
+x_contributors:
+  - 'ytnobody <ytnobody@gmail.com>'

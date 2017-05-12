@@ -1,0 +1,23 @@
+Revision history for Perl extension Net::Flow.
+
+1.001	Wed Mar  6 17:25:21 EST 2013
+	- Allow less frequent export of template information
+	- Make supplying header values maintained by the module optional
+
+1.000	Tue Feb 12 11:54:13 EST 2013
+	- [rt.cpan.org #58066] IPFIX options templates encoded incorrectly
+	- change IE names in comments to match IANA
+	- Use standard IE (210) for padding when decoding v5.
+	- perltidy example code
+
+0.05	Fri Feb 08 14:25:38 EST 2013
+	- [rt.cpan.org #56300] Sequence Numbers wrong for IPFIX
+	- [rt.cpan.org #56302] Sequence Numbers wrong for NetFlow version 9
+
+0.04  Thu Dec 04 12:28:04 2008
+	- It fixed the bug related IPFIX Enterprise Information Element Type Field
+
+0.03  Fri Mar 21 02:27:08 2008
+	- It supports IPFIX Variable Length Type Field.
+	- It supports IPFIX Enterprise Information Element Type Field.
+	- It supports IPFIX Template Withdraw.

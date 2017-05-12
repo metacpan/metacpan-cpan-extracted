@@ -1,0 +1,9 @@
+The usual module dance
+
+    % perl Build.PL
+    % ./Build
+    % ./Build test
+    % sudo ./Build install
+
+
+

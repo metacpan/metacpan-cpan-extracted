@@ -1,0 +1,20 @@
+Revision history for Net-SNMP-Mixin-Dot1dStp
+
+0.04	Wed, 22 Jun 2016 18:55:34 +0200
+	added init_ok checks
+	added tests
+	minor build changes
+
+0.03	Mon Jun 23 16:56:31 MEST 2008
+	added push_error for better error handling
+
+	check for dot1dStpProtocolSpecification if STP is running
+
+	changed get_table to get_entries for better error messages
+
+0.02	Fr 25. Apr 13:59:30 CEST 2008
+	changed internal data structure
+
+0.01_01 Do 24. Apr 14:21:04 CEST 2008
+        First developer release.
+

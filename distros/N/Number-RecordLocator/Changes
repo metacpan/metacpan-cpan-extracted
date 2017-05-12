@@ -1,0 +1,16 @@
+Revision history for Number-RecordLocator
+
+0.005
+	Support for 64 bit platforms from Satoshi Tanimoto 
+		<tanimoto.satoshi@gmail.com>                             
+
+0.004 Fri Nov 28 12:21:18 EST 2008
+    * Patch to add 'canonicalize' method 
+        From: Sterling Hanenkamp <sterling@hanenkamp.com>                                                                                                           
+0.003  Actually, that fix was from MARKSTOS. Sorry for the misattribution
+
+0.002  jjore pointed out a stray "use YAML" 
+
+0.0.1  Sat Apr 29 21:01:52 2006
+       Initial release.
+

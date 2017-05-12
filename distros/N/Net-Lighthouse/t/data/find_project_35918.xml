@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <archived type="boolean">false</archived>
+  <created-at type="datetime">2009-08-21T10:02:21Z</created-at>
+  <default-assigned-user-id type="integer" nil="true"></default-assigned-user-id>
+  <default-milestone-id type="integer" nil="true"></default-milestone-id>
+  <description>test for sd</description>
+  <description-html>&lt;div&gt;&lt;p&gt;test for sd&lt;/p&gt;&lt;/div&gt;</description-html>
+  <hidden type="boolean">false</hidden>
+  <id type="integer">35918</id>
+  <license nil="true"></license>
+  <name>sd</name>
+  <open-tickets-count type="integer">1</open-tickets-count>
+  <permalink>sd</permalink>
+  <public type="boolean">false</public>
+  <send-changesets-to-events type="boolean">true</send-changesets-to-events>
+  <updated-at type="datetime">2009-08-24T05:46:52Z</updated-at>
+  <open-states-list>new,open</open-states-list>
+  <closed-states-list>resolved,hold,invalid</closed-states-list>
+  <open-states>new/f17  # You can add comments here
+open/aaa # if you want to.</open-states>
+  <closed-states>resolved/6A0 # You can customize colors
+hold/EB0     # with 3 or 6 character hex codes
+invalid/A30  # 'A30' expands to 'AA3300'</closed-states>
+</project>

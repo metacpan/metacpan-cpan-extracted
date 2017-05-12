@@ -1,0 +1,45 @@
+{
+   "abstract" : "access WMI classes using WinRM",
+   "author" : [
+      "Dmitry Karasik <dmitry@karasik.eu.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-WinRM",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::NTLM" : "1.05",
+            "Data::UUID" : "0",
+            "IO::Lambda" : "0.25",
+            "LWP" : "0",
+            "XML::Simple" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.00"
+}

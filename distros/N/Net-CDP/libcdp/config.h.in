@@ -1,0 +1,194 @@
+/* config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* Define to 1 if your system has a GNU libc compatible `calloc' function, and
+   to 0 otherwise. */
+#undef HAVE_CALLOC
+
+/* Define to 1 if you have the declaration of `strdup', and to 0 if you don't.
+   */
+#undef HAVE_DECL_STRDUP
+
+/* Define to 1 if you have the declaration of `strerror_r', and to 0 if you
+   don't. */
+#undef HAVE_DECL_STRERROR_R
+
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
+/* Define to 1 if you have the <linux/ethtool.h> header file. */
+#undef HAVE_ETHTOOL_H
+
+/* Define to 1 if you have the <fcntl.h> header file. */
+#undef HAVE_FCNTL_H
+
+/* Define if <inttypes.h> exists and doesn't clash with <sys/types.h>. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <libnet.h> header file. */
+#undef HAVE_LIBNET_H
+
+/* Define to 1 if you have the `pcap' library (-lpcap). */
+#undef HAVE_LIBPCAP
+
+/* Define to 1 if you have the <linux/sockios.h> header file. */
+#undef HAVE_LINUX_SOCKIOS_H
+
+/* Define to 1 if your system has a GNU libc compatible `malloc' function, and
+   to 0 otherwise. */
+#undef HAVE_MALLOC
+
+/* Define to 1 if you have the `memcpy' function. */
+#undef HAVE_MEMCPY
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the `memset' function. */
+#undef HAVE_MEMSET
+
+/* Define to use multicasting */
+#undef HAVE_MULTICAST
+
+/* Define to 1 if you have the <netinet/if_ether.h> header file. */
+#undef HAVE_NETINET_IF_ETHER_H
+
+/* Define to 1 if you have the <netpacket/packet.h> header file. */
+#undef HAVE_NETPACKET_PACKET_H
+
+/* Define to 1 if you have the <net/if.h> header file. */
+#undef HAVE_NET_IF_H
+
+/* Define to 1 if you have the <pcap.h> header file. */
+#undef HAVE_PCAP_H
+
+/* Define to 1 if you have the `pcap_setnonblock' function. */
+#undef HAVE_PCAP_SETNONBLOCK
+
+/* Define if you have a working <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the `strdup' function. */
+#undef HAVE_STRDUP
+
+/* Define to 1 if you have the `strerror' function. */
+#undef HAVE_STRERROR
+
+/* Define to 1 if you have the `strerror_r' function. */
+#undef HAVE_STRERROR_R
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/inttypes.h> header file. */
+#undef HAVE_SYS_INTTYPES_H
+
+/* Define to 1 if you have the <sys/ioctl.h> header file. */
+#undef HAVE_SYS_IOCTL_H
+
+/* Define to 1 if you have the <sys/socket.h> header file. */
+#undef HAVE_SYS_SOCKET_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#undef HAVE_SYS_TIME_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <sys/utsname.h> header file. */
+#undef HAVE_SYS_UTSNAME_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 to disable assertions */
+#undef NDEBUG
+
+/* Define to 1 if your C compiler doesn't accept -c and -o together. */
+#undef NO_MINUS_C_MINUS_O
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define to 1 if the C compiler supports function prototypes. */
+#undef PROTOTYPES
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define to 1 if strerror_r returns char *. */
+#undef STRERROR_R_CHAR_P
+
+/* Version number of package */
+#undef VERSION
+
+/* Define like PROTOTYPES; this can be used by system headers. */
+#undef __PROTOTYPES
+
+/* Define to rpl_calloc if the replacement function should be used. */
+#undef calloc
+
+/* Define to empty if `const' does not conform to ANSI C. */
+#undef const
+
+/* Define to rpl_free if the replacement function should be used. */
+#undef free
+
+/* Define to `__inline__' or `__inline' if that's what the C compiler
+   calls it, or to nothing if 'inline' is not supported under any name.  */
+#ifndef __cplusplus
+#undef inline
+#endif
+
+/* Define to rpl_malloc if the replacement function should be used. */
+#undef malloc
+
+/* Define to the type u16 should expand to. */
+#undef s16
+
+/* Define to the type u32 should expand to. */
+#undef s32
+
+/* Define to the type u64 should expand to. */
+#undef s64
+
+/* Define to the type u8 should expand to. */
+#undef s8
+
+/* Define to `unsigned' if <sys/types.h> does not define. */
+#undef size_t
+
+/* Define to the type u16 should expand to. */
+#undef u16
+
+/* Define to the type u32 should expand to. */
+#undef u32
+
+/* Define to the type u64 should expand to. */
+#undef u64
+
+/* Define to the type u8 should expand to. */
+#undef u8

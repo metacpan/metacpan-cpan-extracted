@@ -1,0 +1,305 @@
+#!/usr/bin/perl -w
+# $Id: psftp,v 1.7 2003/12/03 15:39:44 autarch Exp $
+
+use strict;
+
+use Net::SFTP;
+use Getopt::Long;
+
+my %opts;
+Getopt::Long::Configure('no_ignore_case');
+GetOptions(\%opts, "C", "v");
+
+my($host) = @ARGV;
+die "usage: psftp [options] hostname" unless $host;
+
+my %args = (ssh_args => []);
+$args{debug} = 1 if $opts{v};
+push @{ $args{ssh_args} }, compression => 1 if $opts{C};
+
+print "Connecting to $host...\n";
+my $sftp = Net::SFTP->new($host, %args);
+
+my $shell = Net::SFTP::Shell->new($sftp);
+$shell->shell;
+
+package Net::SFTP::Shell;
+use strict;
+
+use File::Basename;
+use File::Spec::Functions qw( catdir catfile );
+use Text::ParseWords qw( shellwords );
+use Term::ReadLine;
+
+use Net::SFTP::Constants qw(
+    SSH2_FILEXFER_ATTR_PERMISSIONS
+    SSH2_FILEXFER_VERSION );
+use Net::SFTP::Attributes;
+
+sub new {
+    my $class = shift;
+    my $sftp  = shift;
+    my $shell = bless { sftp => $sftp }, $class;
+    $shell->init(@_);
+}
+
+sub shell {
+    my $shell = shift;
+
+    my $term = Term::ReadLine->new('Perl SFTP');
+    my $odef = select STDERR;
+    $| = 1;
+    select STDOUT;
+    $| = 1;
+    select $odef;
+
+    $shell->process_pwd;
+    while () {
+        last unless defined ($_ = $term->readline("sftp> "));
+        s/^\s+//;
+        next if /^$/;
+        $_ = 'h' if /^\s*\?/;
+        my @line;
+        if (/^(?:q(?:uit)?|byte|exit)$/i) {
+            last;
+        }
+        elsif (/./) {
+            @line = shellwords($_);
+            next unless @line;
+        }
+        my $cmd = "process_" . shift @line;
+        eval { $shell->$cmd(@line); };
+        $shell->mywarn($@) if $@;
+    }
+}
+
+sub pwd { $_[0]->{pwd} }
+
+sub init {
+    my $shell = shift;
+    my $sftp = $shell->{sftp};
+    my %param = @_;
+    $shell->{pwd} = $param{Pwd};
+    unless ($shell->{pwd}) {
+        $shell->{pwd} = $sftp->do_realpath(".");
+    }
+    $shell;
+}
+
+use vars qw( $AUTOLOAD );
+sub AUTOLOAD {
+    my($cmd) = $AUTOLOAD;
+    return if $cmd =~ /DESTROY/;
+    my $shell = shift;
+    $cmd =~ s/.*::process_//;
+    $shell->mywarn("Unknown command '$cmd'. Type '?' for help.");
+}
+
+sub make_absolute {
+    my($piece, $pwd) = @_;
+    $piece =~ m!^/! ? $piece : catdir($pwd, $piece);
+}
+
+sub process_h {
+    my($shell, @arg) = @_;
+    $shell->mywarn("usage: h"), return if @arg;
+    print
+q{Available commands:
+cd path                          Change remote directory to 'path'
+h,?                              Display this help text
+get remote-path [local-path]     Download file 'remote-path'
+ls [path]                        Display remote directory listing
+mkdir path                       Create remote directory
+put local-path [remote-path]     Upload file 'local-path'
+pwd                              Display remote working directory
+q[uit],exit                      Quit the psftp shell
+rename old-path new-path         Rename remote file
+rmdir path                       Remove remote directory 'path'
+rm path                          Remove remote file 'path'
+version                          Display SFTP version
+}
+}
+
+sub process_get {
+    my($shell, @arg) = @_;
+    my $sftp = $shell->{sftp};
+    $shell->mywarn("usage: get remote [local]"), return unless @arg;
+    $arg[0] = make_absolute($arg[0], $shell->{pwd});
+    $arg[1] = basename($arg[0]) unless $arg[1];
+    print "Downloading $arg[0] to $arg[1]\n";
+    $shell->{sftp}->get($arg[0], $arg[1]);
+}
+
+sub process_put {
+    my($shell, @arg) = @_;
+    $shell->mywarn("usage: put local remote"), return unless @arg == 2;
+    print "Uploading $arg[0] to $arg[1]\n";
+    $shell->{sftp}->put($arg[0], $arg[1]);
+}
+
+sub process_ls {
+    my($shell, @arg) = @_;
+    $shell->mywarn("usage: ls [path]"), return unless @arg < 2;
+    $shell->{sftp}->ls($arg[0] || $shell->{pwd},
+        sub { print $_[0]->{longname}, "\n" });
+}
+
+sub process_cd {
+    my($shell, @arg) = @_;
+    my $sftp = $shell->{sftp};
+    $shell->mywarn("usage: cd path"), return unless @arg == 1;
+    my $path = make_absolute($arg[0], $shell->{pwd});
+    my $real = $sftp->do_realpath($path) or return;
+    my $a = $sftp->do_stat($real) or return;
+    $shell->mywarn("Can't change directory: Can't check target"), return
+        if !($a->flags & SSH2_FILEXFER_ATTR_PERMISSIONS);
+    $shell->{pwd} = $real;
+}
+
+sub process_mkdir {
+    my($shell, @arg) = @_;
+    $shell->mywarn("usage: mkdir path"), return unless @arg == 1;
+    my $a = Net::SFTP::Attributes->new;
+    $a->flags( $a->flags | SSH2_FILEXFER_ATTR_PERMISSIONS );
+    $a->perm(0777);
+    $shell->{sftp}->do_mkdir(make_absolute($arg[0], $shell->{pwd}), $a);
+}
+
+sub process_rmdir {
+    my($shell, @arg) = @_;
+    $shell->mywarn("usage: rmdir path"), return unless @arg == 1;
+    $shell->{sftp}->do_rmdir(make_absolute($arg[0], $shell->{pwd}));
+}
+
+sub process_rename {
+    my($shell, @arg) = @_;
+    $shell->mywarn("usage: rename oldpath newpath"), return unless @arg == 2;
+    $shell->{sftp}->do_rename(make_absolute($arg[0], $shell->{pwd}),
+        make_absolute($arg[1], $shell->{pwd}));
+}
+
+sub process_rm {
+    my($shell, @arg) = @_;
+    $shell->mywarn("usage: rm path"), return unless @arg == 1;
+    $shell->{sftp}->do_remove(make_absolute($arg[0], $shell->{pwd}));
+}
+
+sub process_pwd { print "Remote working directory: $_[0]->{pwd}\n" }
+
+sub process_version {
+    print "SFTP protocol version ", SSH2_FILEXFER_VERSION, "\n";
+}
+
+sub mywarn {
+    my($shell, $what) = @_;
+    print $what, "\n";
+}
+
+__END__
+
+=head1 NAME
+
+psftp - Perl secure file transfer client
+
+=head1 SYNOPSIS
+
+psftp [B<-v>] [B<-C>] I<hostname>
+
+=head1 DESCRIPTION
+
+I<psftp> is an interactive SFTP client written in Perl, using the
+I<Net::SFTP> libraries. It is very similar in functionality to
+the I<sftp> program that is part of both OpenSSH and ssh2.
+Because it is built upon the SSH implementation in I<Net::SSH::Perl>,
+it supports many features of SSH, such as public key authentication
+and compression. I<psftp> (and SFTP in general) requires the use
+of the SSH2 protocol; thus, you must have the necessary libraries
+installed in order to use SSH2 in I<Net::SSH::Perl>.
+
+On startup, I<psftp> logs into the specified I<hostname>, then
+enters an interactive command mode. The supported list of commands
+is below in I<INTERACTIVE COMMANDS>.
+
+=head1 OPTIONS
+
+I<psftp> supports the following options:
+
+=over 4
+
+=item -C
+
+Enables compression (via the I<compression> option to the
+I<Net::SSH::Perl> constructor).
+
+=item -v
+
+Enables debugging messages, both in I<Net::SFTP> and in
+I<Net::SSH::Perl>, via the I<debug> options to the constructors.
+
+=back
+
+=head1 INTERACTIVE COMMANDS
+
+In interactive mode, I<psftp> understands a subset of the commands
+supported by I<sftp>. Commands are case insensitive.
+
+=head2 cd I<path>
+
+Change remote directory to I<path>.
+
+=head2 exit / quit
+
+Quit sftp.
+
+=head2 get I<remote-path> [I<local-path>]
+
+Retrieve the file I<remote-path> and store it in the local
+machine. If the local path name is not specified, it is given
+the same leaf name it has on the remote machine. Copies the
+remote file's full permission and access times, as well.
+
+=head2 h / ?
+
+Display help screen.
+
+=head2 ls [I<path>]
+
+Display remote directory listing of either I<path> or current
+working remote directory if I<path> is unspecified.
+
+=head2 mkdir I<path>
+
+Create remote directory specified by I<path>.
+
+=head2 put I<local-path> I<remote-path>
+
+Upload the file I<local-path> and store it on the remote
+machine. Copies the local file's full permission and access
+times, as well.
+
+=head2 pwd
+
+Display remote working directory.
+
+=head2 rename I<oldpath> I<newpath>
+
+Rename remote file from I<oldpath> to I<newpath>.
+
+=head2 rmdir I<path>
+
+Remove remote directory specified by I<path>.
+
+=head2 rm I<path>
+
+Remove remote file specified by I<path>.
+
+=head2 version
+
+Show SFTP version.
+
+=head1 AUTHOR & COPYRIGHTS
+
+Please see the Net::SSH::Perl manpage for author, copyright,
+and license information.
+
+=cut

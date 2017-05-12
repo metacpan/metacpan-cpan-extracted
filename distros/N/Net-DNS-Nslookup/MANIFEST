@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Net/DNS/Nslookup.pm
+t/Nslookup.t

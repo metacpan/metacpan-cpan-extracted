@@ -1,0 +1,69 @@
+INSTALLING
+
+    After unzipping and untarring the distribution directory, you install
+    the library by running these commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+NAME
+    `Net::ICQV5CD' - Module to crypt/decrypt ICQ protocol V5 packets.
+
+SYNOPSIS
+     use Net::ICQV5CD;
+
+     $packet = "000102030405060708090A0B0C0D0E0F101112131415161718";
+     $packet = pack("H*",$packet);
+  
+     $packet = ICQV5_CRYPT_PACKET($packet);
+     $packet = ICQV5_DECRYPT_PACKET($packet);
+
+DESCRIPTION
+    This module provides set of functions to crypt/decrypt ICQ V5 packets.
+
+IMPORTED FUNCTIONS/VARS
+  @ICQV5_CRYPT_TABLE
+
+    ICQ V5 Crypt Table
+
+  $checkcode = ICQV5_GET_PACKET_CHECKCODE($packet)
+
+    Function that will return packet checkcode. If you don't know what is
+    checkcode this fucntion will not be useful for you.
+
+  $scheckcode = ICQV5_SCRAMBLE_CHECKCODE($checkcode)
+
+    Function that will return packet scrabmled checkcode. If you don't know
+    what is checkcode this fucntion will not be useful for you.
+
+  $dscheckcode = ICQV5_DESCRAMBLE_CHECKCODE($checkcode)
+
+    Function that will return packet descrabmled checkcode. If you don't
+    know what is checkcode this fucntion will not be useful for you.
+
+  $crypted_packet = ICQV5_CRYPT_PACKET($packet)
+
+    Function that crypt incoming packet by ICQ V5 algorithm. This is most
+    usable function. Packet must coming as string.
+
+  $decrypted_packet = ICQV5_DECRYPT_PACKET($packet)
+
+    Function that decrypt incoming packet by ICQ V5 algorithm. This is most
+    usable function. Packet must coming as string.
+
+DISCLAIMERS
+    I am in no way affiliated with Mirabilis!
+
+    This module was made without any help from Mirabilis or their consent.
+    No reverse engineering or decompilation of any Mirabilis code took place
+    to make this program.
+
+COPYRIGHT
+    Copyright (c) 2000-2001 Sergei A. Nemarov (admin@tapor.com). All rights
+    reserved. This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+    http://www.tapor.com/NetICQ/
+

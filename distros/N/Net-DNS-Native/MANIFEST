@@ -1,0 +1,21 @@
+bstree.h
+Changes
+lib/Net/DNS/Native.pm
+Makefile.PL
+MANIFEST			This list of files
+Native.xs
+mysemaphore.h
+ppport.h
+pthreads-win32/include/pthread.h
+pthreads-win32/include/sched.h
+pthreads-win32/include/semaphore.h
+pthreads-win32/lib/x64/libpthread.a
+pthreads-win32/lib/x86/libpthread.a
+queue.h
+README
+t/01_use.t
+t/02_dns.t
+t/03_segfault.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

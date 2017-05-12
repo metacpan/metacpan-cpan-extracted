@@ -1,0 +1,8 @@
+Revision history for Perl extension Net::IP::Resolver
+
+0.02 Mon  4 Sep 2006
+	- Moved from old CVS to new SVN repository
+	- Modernised tests and packaging
+
+0.01 Tue 10 Apr 2005
+	- Created the initial dist

@@ -1,0 +1,144 @@
+NAME
+    Net::BitTorrent::File - Object for manipulating .torrent files
+
+SYNOPSIS
+      use Net::BitTorrent::File
+
+      # Empty N::BT::File object, ready to be filled with info
+      my $torrent = new Net::BitTorrent::File;
+
+      # Or, create one from a existing .torrent file
+      my $fromfile = new Net::BitTorrent::File ('somefile.torrent');
+
+      $torrent->name('Some_File_to_distribute.tar.gz');
+      $torrent->announce('http://address.of.tracker:6695');
+      # etc.
+
+      print $torrent->name()."\n";
+      # would print "Some_File_to_distribute.tar.gz" in this case.
+
+DESCRIPTION
+    This module handles loading and saveing of .torrent files as well as
+    providing a convenient way to store torrent file info in memory. Most
+    users of the module will most likely just call the new method with the
+    name of a existing torrent file and use the data from that.
+
+USAGE
+    The same method is used for setting and retrieving a value, and the
+    methods have the same name as the key in the torrent file, such as
+    "name()", and "announce()". If the method is called with no arguments or
+    a undefined value, then the current value is returned, otherwise its set
+    to the value passed in.
+
+    There are two methods for generating info based on torrent data, but not
+    stored within the torrent itself. These are "gen_info_hash()" and
+    "gen_pieces_array()". You can use the methods "info_hash()" and
+    "pieces_array()" to return the calculated values after calling there
+    respective "gen_X()" methods.
+
+    "info_hash()" returns the SHA1 hash of the info portion of the torrent
+    which is used in the bittorrent protocol.
+
+    "pieces_array()" returns a array ref of the pieces field of the torrent
+    split into the individual 20 byte SHA1 hashes. For further details on
+    what exactly these are used for, see the docs for the bittorrent
+    protocol mentioned in the SEE ALSO section.
+
+  Methods
+    * new( [$filename] )
+        Creates a new Net::BitTorrent::File object, and if a filename is
+        supplied will call the load method with that filename.
+
+    * load( $filename )
+        Loads the file passed into it and generates the "info_hash" and
+        "pieces_array" propertys.
+
+    * save( $filename )
+        Saves the torrent to *$filename*. Note that "info_hash" and
+        "pieces_array" are not saved to the torrent file and must be
+        regenerated when the torrent is loaded (but the "load()" method does
+        this for you anyway).
+
+    * info_hash( [$new_value] )
+        When called with no arguments returns the *info_hash* value,
+        otherwise it sets it to the value in *$new_value*. Note: Its very
+        unlikely anyone will be using to set the value of *info_hash*,
+        rather you should populate all the info fields then call
+        "gen_info_hash()" to set this property.
+
+    * gen_info_hash( )
+        Calculates the SHA1 hash of the torrents *info* field and stores
+        this in the *info_hash* property which can be retrieved using the
+        "info_hash()" method.
+
+    * pieces_array( [$new_array] )
+        When called with no arguments returns a array ref whose values are
+        the SHA1 hashes contained in the *pieces* property. To set this
+        value, do not use this method, rather use the "gen_pieces_array()"
+        method, after setting the *pieces* property.
+
+    * gen_pieces_array( )
+        Divides the *pieces* property into its component 20 byte SHA1
+        hashes, and stores them as a array ref in the *pieces_array*
+        property.
+
+    * name( [$value] )
+        When called with no arguments returns the *name* propertys current
+        value, else it sets it to *$value*. If this value is changed, the
+        *info_hash* property needs to be regenerated.
+
+    * announce( [$value] )
+        When called with no arguments returns the *announce* propertys
+        current value, else it sets it to *$value*.
+
+    * piece_length( [$value] )
+        When called with no arguments returns the *piece_length* propertys
+        current value, else it sets it to *$value*. If this value is
+        changed, the *info_hash* property needs to be regenerated.
+
+    * length( [$value] )
+        When called with no arguments returns the *length* propertys current
+        value, else it sets it to *$value*. If this value is changed, the
+        *info_hash* property needs to be regenerated.
+
+    * pieces( [$value] )
+        When called with no arguments returns the *pieces* propertys current
+        value, else it sets it to *$value*. If this value is changed, the
+        *info_hash* and *pieces_array* propertys need to be regenerated.
+
+    * files( [$value] )
+        When called with no arguments returns the *files* propertys current
+        value, else it sets it to *$value*. *$value* should be a array ref
+        filled with hash refs containing the keys *path* and *length*. If
+        this value is changed, the *info_hash* property needs to be
+        regenerated.
+
+    * info( [$value] )
+        When called with no arguments returns the *info* propertys current
+        value, else it sets it to *$value*. *$value* should be a hash ref
+        containing the keys *files*, *pieces*, *length*, *piece_length*, and
+        *name*. If this value is changed, the *info_hash* property needs to
+        be regenerated.
+
+BUGS
+    None that I know of yet.
+
+SUPPORT
+    Any bugs/suggestions/problems, feel free to send me a e-mail, I'm
+    usually glad to help, and enjoy hearing from people using my code. My
+    e-mail is listed in the AUTHOR section.
+
+AUTHOR
+            R. Kyle Murphy
+            orclev@rejectedmaterial.com
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    Convert::Bencode, http://bitconjurer.org/BitTorrent/protocol.html
+

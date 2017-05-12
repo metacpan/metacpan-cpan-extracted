@@ -1,0 +1,20 @@
+Changes
+gen_doc
+INSTALL.SKIP
+lib/Net/Telnet/Netgear.pm
+lib/Net/Telnet/Netgear/Packet.pm
+lib/Net/Telnet/Netgear/Packet/Native.pm
+lib/Net/Telnet/Netgear/Packet/String.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/base.t
+t/default_values.t
+t/exceptions.t
+t/packet_gen.t
+t/packet_sending.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,83 @@
+# NAME
+
+Net::Ostrich - Perl interface to Ostrich
+
+# VERSION
+
+version 0.01
+
+# SYNOPSIS
+
+    my $no = Net::Ostrich->new(host => '172.16.49.130', port => 2223);
+
+    my $stats = $no->stats;
+    
+
+    my $pong = $no->ping;
+
+# DESCRIPTION
+
+Net::Ostrich is a perl interface to [ostrich](https://github.com/twitter/ostrich)'s
+administrative web service.
+
+# ATTRIBUTES
+
+## client
+
+The [LWP::UserAgent](http://search.cpan.org/perldoc?LWP::UserAgent) client used by Net::Ostrich.  Provided in case you need
+to change any settings, such as the proxy.
+
+## host
+
+The hostname to which we'll be connecting to talk to Ostrich
+
+## path
+
+The path where Ostrich resides.  Defaults to '/'.  This will be appended
+after the port, so it's important that it begin and end with a /.
+
+## port
+
+The port on which we'll be contacting Ostrich
+
+# METHODS
+
+## gc
+
+Force a garbage collection cycle.
+
+## ping
+
+Ping the server.
+
+## quiesce
+
+Close any listening sockets, stop accepting new connections, and shutdown the
+server as soon as the last client connection is done.
+
+## reload
+
+Reload the server config file for any services that support it (most do not).
+
+## shutdown
+
+Immediately shutdown the server.
+
+## stats
+
+Fetch stats.  Grabs them as JSON and returns the decoded JSON structure.
+
+## threads
+
+Fetch thread information.  Grabs them as JSON and returns the decoded JSON structure.
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Infinity Interactive, Inc.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

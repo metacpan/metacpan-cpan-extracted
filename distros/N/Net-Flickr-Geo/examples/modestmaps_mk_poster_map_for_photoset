@@ -1,0 +1,44 @@
+# -*-cperl-*-
+# $Id: modestmaps_mk_poster_map_for_photoset,v 1.4 2008/06/20 16:35:31 asc Exp $
+
+use strict;
+
+use Getopt::Std;
+use Config::Simple;
+use Net::Flickr::Geo::ModestMaps;
+use Data::Dumper;
+
+{
+        &main();
+        exit;
+}
+
+sub main {
+        
+        my %opts = ();
+        getopts('c:s:', \%opts);
+
+        my $cfg = Config::Simple->new($opts{'c'});
+
+        $cfg->param("pinwin.photo_size", "Medium");
+        $cfg->param("modestmaps.zoom", 19);
+
+        # add yer photo to exclude here...
+
+        # $cfg->param("pinwin.skip_photos", [309585630, 309591123, 310181385, 310248460, 310239912, 313446323]);
+        # $cfg->param("pinwin.ensure_tags", ['austin']);
+
+        $cfg->param("modestmaps.method", "extent");
+        $cfg->param("modestmaps.bleed", "2");
+
+        $cfg->param("modestmaps.provider", 'MICROSOFT_AERIAL');
+
+        $cfg->param("modestmaps.filter", "atkinson");
+        $cfg->param("modestmaps.timeout", (60 * 60) * 2);
+
+        my $fl = Net::Flickr::Geo::ModestMaps->new($cfg);
+        $fl->log()->add(Log::Dispatch::Screen->new('name' => 'scr', min_level => 'info'));
+
+        my $data = $fl->mk_poster_map_for_photoset($opts{'s'});
+        $fl->log()->info(Dumper($data));
+}

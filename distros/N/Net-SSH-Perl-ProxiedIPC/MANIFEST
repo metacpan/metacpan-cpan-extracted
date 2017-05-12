@@ -1,0 +1,14 @@
+Changes
+lib/Net/SSH/Perl/ProxiedIPC.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+MYMETA.yml
+README
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/prereq.t
+t/scratch.t
+t/test_manifest

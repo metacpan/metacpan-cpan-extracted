@@ -1,0 +1,2 @@
+ecdsa-sha2-nistp521 AAAAAlkj2lkjalsdfkjlaskdfj234 foo@bar.com
+ecdsa-sha512-nistp521 AAAAAlkj2lkjalsdfkjlaskdfj234 bar@foo.com

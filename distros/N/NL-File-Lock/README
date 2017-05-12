@@ -1,0 +1,92 @@
+NAME
+    NL::File::Lock - File locking (based on lockfiles)
+
+SYNOPSIS
+            use NL::File::Lock;
+
+            # We will create locks for that file:
+            my $filename = 'test_file.txt';
+
+            # Writing all lockfiles to '/tmp' directory:
+            &NL::File::Lock::init('/tmp');
+            # If no 'NL::File::Lock::init' called - all lockfiles
+            # will be at the same directorys as files
+
+            # ---
+            # Lock for writing (only one process can write)
+            # 'timeout' - time to wait lock
+            # 'time_sleep' - time to sleep between locking retrys
+            if (&NL::File::Lock::lock_write($filename, { 'timeout' => 10, 'time_sleep' => 0.1 } )) {
+                    # File locked
+                    # ... code ...
+                    &NL::File::Lock::unlock($filename);
+            }
+            else {
+                    # Unable to lock file
+            }
+
+            # ---
+            # Lock for reading (many processes can read)
+            # 'timeout' - time to wait lock
+            # 'time_sleep' - time to sleep between locking retrys
+            if (&NL::File::Lock::lock_read($filename, { 'timeout' => 10, 'time_sleep' => 0.1 } )) {
+                    # File locked
+                    # ... code ...
+                    &NL::File::Lock::unlock($filename);
+            }
+            else {
+                    # Unable to lock file
+            }
+
+DESCRIPTION
+    This module is used to easy and portable file locking.
+
+EXAMPLES
+            # ---
+            # Lock for writing (only one process can write)
+            my $filename = 'test_file.txt';
+            # 'timeout' - time to wait lock
+            # 'time_sleep' - time to sleep between locking retrys
+            if (&NL::File::Lock::lock_write($filename, { 'timeout' => 10, 'time_sleep' => 0.1 } )) {
+                    print "+Locked EX (write)...\n";
+                    sleep(5);
+                    &NL::File::Lock::unlock_not_unlink($filename);
+                    print "-UnLocked for some time...\n";
+                    sleep(5);
+                    if (&NL::File::Lock::lock_write($filename, { 'timeout' => 10, 'time_sleep' => 0.1 } )) {
+                            print "+Locked EX (write)...\n";
+                            sleep(5);
+                            &NL::File::Lock::unlock($filename);
+                            print "-UnLocked forever...\n";
+                            sleep(5);
+                    }
+                    else { print "Unable to lock EX (write) again...\n"; }
+            }
+            else { print "Unable to lock EX (write)...\n"; }
+
+            # ---
+            # Lock for reading (many processes can read)
+            my $filename = 'test_file.txt';
+            # 'timeout' - time to wait lock
+            # 'time_sleep' - time to sleep between locking retrys
+            if (&NL::File::Lock::lock_read($filename, { 'timeout' => 10, 'time_sleep' => 0.1 } )) {
+                    print "+Locked SH (read)...\n";
+                    sleep(5);
+                    &NL::File::Lock::unlock_not_unlink($filename);
+                    print "-UnLocked for some time...\n";
+                    sleep(5);
+                    if (&NL::File::Lock::lock_read($filename, { 'timeout' => 10, 'time_sleep' => 0.1 } )) {
+                            print "+Locked SH (read)...\n";
+                            sleep(5);
+                            &NL::File::Lock::unlock($filename);
+                            print "-UnLocked forever...\n";
+                            sleep(5);
+                    }
+                    else { print "Unable to lock SH (read) agian...\n"; }
+            }
+            else { print "Unable to lock SH (read)...\n"; }
+
+AUTHOR
+     Nickolay Kovalev, http://resume.nickola.ru
+     Email: nickola_code@nickola.ru
+

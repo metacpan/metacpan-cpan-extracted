@@ -1,0 +1,36 @@
+---
+abstract: 'Implements MyPeople-Bot.'
+author:
+  - 'khs <sng2nara@gmail.com>'
+build_requires:
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-MyPeople-Bot
+requires:
+  Data::Dumper: 0
+  Data::Printer: 0
+  Encode: 0
+  File::Util: 0
+  HTTP::Request::Common: 0
+  JSON: 0
+  LWP::Protocol::https: 0
+  LWP::UserAgent: 0
+  Log::Log4perl: 0
+  Moose: 0
+  URI::Escape: 0
+  namespace::autoclean: 0
+  perl: 5.010
+  utf8: 0
+resources:
+  homepage: https://github.com/sng2c/net-mypeople-bot
+  repository: git://github.com/sng2c/net-mypeople-bot.git
+version: 0.320

@@ -1,0 +1,10 @@
+Build.PL
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Net/HTTP/Spore/Middleware/DefaultParams.pm
+t/default-params.t

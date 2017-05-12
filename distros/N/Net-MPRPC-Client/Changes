@@ -1,0 +1,7 @@
+Revision history for Perl extension Net::MPRPC::Client
+
+0.02  2011-03-25T13:03:18+09:00
+      - added missing dependency: Test::TCP
+
+0.01  2011-03-23T12:43:37+09:00
+      - initial version

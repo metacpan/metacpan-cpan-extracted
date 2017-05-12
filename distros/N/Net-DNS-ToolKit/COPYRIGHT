@@ -1,0 +1,5 @@
+
+Feel free to remove the 'extra_docs' library when creating distro's
+avoid issues with conflicting copyright language in the RFC documents.
+
+Michael Robinton michael@bizsystems.com

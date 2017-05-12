@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               Net-Parliament
+version:            0.03
+abstract:           Scrape data from parl.gc.ca
+author:
+    - Luke Closs <cpan@5thplane.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    HTML::ElementTable:  0
+    HTML::TableExtract:  0
+    HTML::TreeBuilder:   0
+    IO::All:             0
+    Moose:               0
+    Test::More:          0
+    XML::Simple:         0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

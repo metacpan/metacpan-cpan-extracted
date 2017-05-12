@@ -1,0 +1,8 @@
+$args =
+{
+ message_type => MQTT_DISCONNECT,
+}
+
+e0 00
+
+Disconnect/at-most-once

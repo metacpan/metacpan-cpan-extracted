@@ -1,0 +1,1069 @@
+Revision history for Perl extension Net::SSLeay.
+
+???
+	Patch from Alexander Bluhm to enable RSA_get_key_parameters with
+	LibreSSL. Again.
+	Fixed memory leak in X509_get_subjectAltNames. Reported and patched by Jim Westfall.
+	Added . to lib path in Makefile.PL to accommodate people who are using a perl with -Ddefault_inc_excludes_dot.
+	Fixed build failure if engine support not present. Patch from Paul Green.
+	Improvements to  get_my_thread_id to work around possibility of ERRSV not being defined eg on OpenWRT.
+	
+1.80	 2017-01-05
+	 Patch from Steffen Ulrich that fixed unexpected changes in the
+	 control flow of the Perl program which seemed to be triggered by the
+	 ticket key callback. Thanks Steffen.
+
+1.79	 2017-01-03
+	Patch to fix a few inline variable declarations that cause errors for
+	older compilers. From Andy Grundman. Thanks.
+	Patch: Generated C code is not compatible with MSVC, AIX cc,
+	probably others. Added some PREINIT blocks and replaced 2 cases of INIT with
+	PREINIT. From Andy Grundman. Thanks.
+	Patch to fix: Fails to compile if the OpenSSL library it's built
+	against has compression support compiled out. From Stephan
+	Wall. Thanks.
+	Added RSA_get_key_parameters() to return a list of pointers to RSA key
+	internals.
+	Patch to fix some documentation typos courtesy gregor herrmann.
+	RSA_get_key_parameters() is now only available prior OpenSSL 1.1.
+	Testing with openssl-1.1.0b.
+
+1.78	 2016-08-13
+	 Fixed broken OCSP code and tests. Broken since 1.75. Patched by
+	 Steffen Ullrich. Thanks.
+
+1.77	 2016-08-01
+	 Fixed incorrect size to memset in tlsext_ticket_key_cb_invoke.
+
+1.76	 2016-07-31
+	 Replaced bzero with memset. Bzero not present on windows.
+
+1.75  2016-07-31
+     Compatibility with OpenSSL 1.1, tested with openssl-1.1.0-pre5:
+     - Conditionally remove threading locking code, not needed in 1.1
+     - Rewrite code that accesses inside X509_ATTRIBUTE struct.
+     - SSL_CTX_need_tmp_RSA, SSL_CTX_set_tmp_rsa,
+       SSL_CTX_set_tmp_rsa_callback, SSL_set_tmp_rsa_callback support
+       not available in 1.1.
+     - SSL_session_reused is now native
+     - SSL_get_keyblock_size modifed to use new API
+     - OCSP functions modified to use new API under 1.1
+     - SSL_set_state removed with 1.1
+     - SSL_get_state and SSL_state are now equivalent and available in all
+       versions
+     - SSL_CTX_v2_new removed
+     - SESSION_set_master_key removed with 1.1. Code that previously used
+       SESSION_set_master_key must now set $secret in the session_secret
+       callback set with SSL_set_session_secret_cb
+     - With 1.1, $secret in the session_secret
+       callback set with SSL_set_session_secret_cb can be changed to alter
+       the master key (required by EAP-FAST).
+     Added a function EC_KEY_generate_key similar to RSA_generate_key and a
+     function EVP_PKEY_assign_EC_KEY similar to EVP_PKEY_assign_RSA. Using
+     these functions it is easy to create and use EC keys in the same way as
+     RSA keys. Patch provided by Steffen Ullrich. Thanks Steffen.
+     Testing with LibreSSL 2.4.1, with compatibility patch from Steffen
+     Ullrich. Thanks Steffen.
+     Patch from Steffen Ulrich provides  support for cross context (and cross process)
+     session sharing using the stateless TLS session tickets. It uses the
+     SSL_CTX_set_tlsext_ticket_key_cb function to manage the encryption and
+     decryption of the tickets but provides a more simplified
+     interface. Includes new function CTX_set_tlsext_ticket_getkey_cb.
+     To not conflict with the OpenSSL name in case the more complex interface
+     will be implemented ever the current simplified interface is called
+     slightly different: CTX_set_tlsext_ticket_*get*key_cb. 
+     Added documentation about downloading latest version from SVN.
+     Added missing Module/install files to SVN.
+
+1.74 2016-04-12
+     README.OSX was missing from the distribution
+
+1.73 2016-04-11
+     Added X509_get_X509_PUBKEY. Patch supplied by GUILHEM. Thanks.
+     Added README.OSX with instructions on how to build for recent OS X.
+     Added info about using OPENSSL_PREFIX to README.Win32.
+     Added comments in POD about installation documentation.
+     Added '/usr/local/opt/openssl/bin/openssl' to Openssl search path for
+     latest version of  OSX homebrew openssl. Patch from Shoichi Kaji.
+
+1.72 2015-09-22
+     Fixed a problem where SvPVx_nolen was undefined in some versions of
+     perl. Reported by Karen Etheridge. Replaced with SvPV_nolen.
+     Fixed a cast warning on Darwin reported by Karen Etheridge. 
+
+1.71 2015-09-18
+     Patch from Ben Kaduk: Conditionalise support for MD4, MD5.
+     Added support for linking libraries in /usr/local/lib64 for some flavours
+     of Linux like RH Tikanga. 
+     Fixes to X509_check_host, X509_check_ip, SSL_CTX_set_alpn_protos, and
+     SSL_set_alpn_protos so they will compile on MSVC and AIX cc. Thanks to
+     AGRUNDMA.
+     Fixed typos in documentation for X509_NAME_new and X509_NAME_hash
+     incorrect version 1.45 instead of 1.55 given.
+     Version number in META.yml is now quoted per request from Satoshi Yagi.
+     
+
+1.70 2015-06-26
+     Patch from Alexander Bluhm: The new OpenSSL 1.0.2 X509_check_* functions are not available in
+     current LibreSSL.  So disable them in SSLeay.xs.
+     Fixed a problem with building against OSX homebrew's openssl. Patch from
+     Shoichi Kaji.
+     Removed a test in t/local/33_x509_create_cert.t which fails due to
+     changes in 1.0.1n and later
+
+1.69 2015-06-04
+     Testing with OpenSSL 1.0.2, 1.0.2a. OK.
+     Completed LibreSSL compatibility with the kind assistance of Alexander
+     Bluhm.
+     Improved compatibility with OpenSSL 1.0.2a as suggested by Petr Pisar.
+     Added the X509_check_* functions introduced in OpenSSL 1.0.2, contributed
+     by Carsten Gaebler.
+     Added support for X509_V_FLAG_TRUSTED_FIRST constant, patch from Gisle Aas.
+     Patch allows get_keyblock_size to work correctly with 
+     OpenSSL 1.0.1 and later versions. Contributed by Heikki Vatiainen.
+
+1.68 2015-01-24
+     Fixed a problem on OSX when macports openssl 1.x is installed: headers from
+     macport were found but older OSX openssl libraries were linked, resulting
+     in "Symbol not found: _EVP_MD_do_all_sorted".
+     Added notes about runtime error "no OPENSSL_Applink", when calling
+     Net::SSLeay::P_PKCS12_load_file.
+
+
+1.67 2015-01-17
+     Improvements to inc/Module/Install/PRIVATE/Net/SSLeay.pm to handle the
+     case whe there are muliple OPENSSLs installed. Patch from HBRAND
+     Fixed a documentation error in get_peer_cert_chain, reported by tejas.
+     Fixed a problem with building on Windows that prevented correct OpenSSL
+     directory detection with version 1.0.1j as delivered with Shining Light OpenSSL.
+     Fixed a problem with building on Windows that prevented finding MT or MD
+     versions of SSL libraries.
+     Updated doc in README.Win32 to build with Microsoft Visual Studio 2010 Express.
+     Added Windows crypt32 library to Windows linking as some compilers/platforms seem to
+     require it and it is innocuous otherwise. For Steve Hay.
+     Fixed a failure in t/external/20_cert_chain.t where some platforms do not
+     have HTTPS in /etc/services. Reported and patched by Gisle Aas.
+     Recent 1.0.2 betas have dropped the SSLv3_method function. 
+     This patch leaves out the function on newer versions, much the same as
+     the SSLv2 deprecation is handled. Patch from Tom Molesworth.
+     Fix the ALPN test, which was incorrectly failing on OpenSSL due to the
+     LibreSSL check (earlier versions bailed out before that line).Patch from
+     Tom Molesworth. 
+
+1.66 2014-08-21
+     Fixed compile problem with perl prior to 5.8.8, similar to
+     RT#76267. Reported by Graham Knop.
+     Fixed a problem with Socket::IPPROTO_TCP on early perls.
+     After discussions with the community and the original author Sampo
+     Kellomaki, the license conditions have been changed to "Perl Artisitic
+     License 2.0".
+
+
+1.65  2014-07-14
+     Added note to doc to make it clear that X509_get_subjectAltNames returns a
+     packed binary IP address for type 7 - GEN_IPADD.
+     Improvements to SSL_OCSP_response_verify to compile under non c99
+     compilers. Requested by MERIJNB.
+     Port to Android, contributed by Brian Fraser. Includes Android specific
+     version of RSA_generate_key.
+     Added LibreSSL support, patch provided by Alexander Bluhm. Thanks!
+     Patch that fixes the support for SSL_set_info_callback and adds
+     SSL_CTX_set_info_callback and SSL_set_state. Support for these functions is
+     necessary to either detect renegotiation or to enforce
+     renegotiation. Contributed by Steffen Ullrich. Thanks!
+     Fixed a problem with SSL_set_state not available on some early OpenSSLs,
+     patched by Steffen Ullrich. Thanks!
+     Removed arbitrary size limits from calls to tcp_read_all in tcpcat() and
+     http_cat().
+     Removed unnecessary Debian_SPANTS.txt from MANIFEST. Again.
+
+1.64 2014-06-11
+     Fixes for test ocsp.t. Test now does not fail if HTTP::Tiny is not
+     installed.
+     Fixed repository in META.yml.
+     Fixed a problem with SSL_get_peer_cert_chain: if the SSL handshake
+     results in an anonymous authentication, like ADH-DES-CBC3-SHA,
+     get_peer_cert_chain will not return an empty list, but instead return the
+     SSL object. Reported and fixed by Steffen
+     Ullrich. Thanks.
+     Fixed a problem where patch
+     https://git.openssl.org/gitweb/?p=openssl.git;a=commit;h=3009244da47b989c4cc59ba02cf81a4e9d8f8431
+     caused a failed test in t/local/33_x509_create_cert.t.
+
+1.63 2014-05-19
+     Fixed error in version number in META.yml
+
+1.62 2014-05-19
+     Improvements to OCSP support: It turns out that some CA (like Verisign)
+     sign the OCSP response with the CA we have in the trust store and don't
+     attach this certifcate in the response.  But OpenSSL by itself only
+     considers the certificates included in the response and
+     SSL_OCSP_response_verify added the certificates in the chain too.
+     Now, we also add the trusted CA from the store which
+     signed the lowest chain certificate, at least if we could not verify the
+     OCSP response without doing it. Patch from Steffen
+     Ullrich. Thanks.
+     Fixed some compiler warnings.
+
+1.61 2014-05-12
+     Changes calloc to Newx and free to Safefree, otherwise there might be
+     problems because calloc is done from a different memory pool than free (depends
+     on the build options for perl, but seen on Windows). Patch from Steffen
+     Ullrich. Thanks.
+
+
+1.60 2014-05-10
+     Fixed a typo in an error message. Patch from gregor herrmann. Thanks.
+     Fixed a problem with building with openssl that does not support
+     OCSP. Also fixed some newly introduced warnings
+     if compiled with -Wall. Patch from Steffen Ullrich. Thanks.
+     fix build-failure on most Debian architectures:
+     SSLeay.xs: In function 'XS_Net__SSLeay_OCSP_response_results':
+     SSLeay.xs:5602:3: error: format not a string literal and no format
+     arguments. Patch from  gregor herrmann.
+     
+
+1.59 2014-05-10
+     Fixed local/30_error.t, so that tests do not fail if diagnostics are
+     enabled.
+     Fixed error messages about undefined strings used with length or
+     split. Reported and patched by Peter Heuchert.
+     Improvements to configuration of OPTIMIZE flags, to prevent overriding
+     of perls expected optimization flags. Caution: HPUX aCC optimize options are special.
+     SSL_peek() now returns openssl error code as second item when called in
+     array context, same as SSL_read. Patch from Andreas Mohr.
+     Fixed some warnings.
+     Added support for tlsv1.1 tlsv1.2 via $Net::SSLeay::ssl_version. Patch
+     from Andreas Mohr.
+     Improve examples in 'Using other perl modules based on
+     Net::SSLeay'. Patched by Andreas Mohr.
+     Added support for OCSP. Patched by Steffen Ullrich. Thanks!
+     Added missing t/external/ocsp.t
+
+1.58 2014-01-15
+     Always use size_t for strlen() return value, requested by Alexander Bluhm.
+     t/external/20_cert_chain.t was missing from dist.
+     Version number in META.yml was incorrect
+     Improvements to test t/external/20_cert_chain.t to provoke following bug:
+     Fixed crash due to SSL_get_peer_cert_chain incorrectly free'ing the chain
+     after use.
+     Fixed a problem when compiling against openssl where OPENSSL_NO_EC is set.
+
+1.57 2014-01-09
+     Fixed remaining problems with test suite: pod coverage and kwalitee tests
+     are only enabled with RELEASE_TESTING=1
+
+1.56 2014-01-08
+     Fixed a typo in documentation of BEAST Attack, patched by gregor
+     herrmann.
+     Added LICENSE file copied form OpenSSL distribution to prevent complaints
+     from various versions of kwalitee.
+     Adjusted license: in META.yml to be 'openssl'
+     Adds support for the basic operations necessary to support ECDH for PFS,
+     e.g. EC_KEY_new_by_curve_name, EC_KEY_free and SSL_CTX_set_tmp_ecdh.
+     Improvements to t/handle/external/50_external.t to handle the case when a
+     test connection was not possible. Patched by Alexandr Ciornii.
+     Added support for ALPN TLS extension. Patch from Lubomir Rintel. Tested
+     with openssl-1.0.2-stable-SNAP-20131205.
+     Fix an use-after-free error. Patch from Lubomir Rintel.
+     Fixed a problem with  Invalid comparison on OBJ_cmp result in
+     t/local/36_verify.t. Contributed by paul.
+     Added support for get_peer_cert_chain(). Patch by Markus Benning.
+     Fixed a bug that could cause stack faults: mixed up PUTBACK with SPAGAIN in ssleay_RSA_generate_key_cb_invoke()
+     a final PUTBACK is needed here. A second issue is also fixed:
+     cb->data defaults to &PL_sv_undef but throught the code you do not check
+     against &PL_sv_undef, just NULL. 
+     To avoid passing the 3rd optional arg at all, do not create it. This fixes all the 
+     cb->data checks and wrong refcounts on &PL_sv_undef. Patched by Reini Urban.
+     Deleted support for SSL_get_tlsa_record_byname: it is not included in
+     OpenSSL git master. 
+
+1.55 2013-06-08
+     Added support for TLSV1_1 and TLSV1_2 methods with SSL_CTX_tlsv1_1_new(),
+     SSL_CTX_tlsv1_2_new(), TLSv1_1_method() and TLSv1_2_method(), where
+     available in the underlying openssl.
+     Added CRL support functions X509_CRL_get_ext(), X509_CRL_get_ext_by_NID(),
+     X509_CRL_get_ext_count(). Patch from Franck Youssef.
+     Fixed a problem which could cause content with a value of '0' to not be
+     correctly encoded by do_httpx3 and friends. Reported by Victor Efimov via
+     RT.
+     Added support for SSL_get_tlsa_record_byname() required for DANE support in
+     openssl-1.0.2 and later. SSL_get_tlsa_record_byname() was added to
+     OpenSSL with the financial assistance of .SE.
+     Testing with openssl-1.0.2-stable-SNAP-20130521.
+     Added X509_NAME_new and X509_NAME_hash, patched by Franck Youssef.
+     Fixed a number of typos in pod file thanks to dsteinbrunner.
+
+1.54 2013-03-23
+     t/data/testcert_cdp.crt.pem_dump and t/data/testcert_cdp.crt.pem were
+     missing from MANIFEST.
+     Added MANIFEST to svn
+     Improvement to test 07_sslecho.t so that if set_cert_and_key fails we
+     can tell why.
+
+1.53 2013-03-22
+     Added support for SSL_export_keying_material where present (ie in OpenSSL
+     1.0.1 and later).
+     Changed t/handle/external/50_external.t to use www.airspayce.com instead of
+     perldition.org, who no longer have an https server.
+     Patch to fix a crash: P_X509_get_crl_distribution_points on an
+     X509 certificate with values in the CDP extension which do not have an
+     ia5 string will cause a segmentation fault when accessed. Patch from
+     Robert Duncan.
+     Change in t/local/32_x509_get_cert_info.t to not use
+     Net::SSLeay::ASN1_INTEGER_get, since it works differntly on 32 and 64 bit platforms.
+     Updated author and distribution location details to airspayce.com
+
+
+1.52 2013-01-09
+     Rebuild package with gnu format tar, to prevent problems with unpacking
+     on other systems such as old Solaris,
+
+1.51 2012-12-14
+     Fixed a problem where SSL_set_SSL_CTX is not available with
+     OpenSSL < 0.9.8f. Reported by Paul.
+
+1.50 2012-12-13 
+     Fixed a problem where t/handle/external/50_external.t would crash if any
+     of the test sites were not contactable.
+     Now builds on VMS. Patch kindly supplied by Craig A. Berry.
+     Fixed a few compiler warnings in SSLeay.xs.  Most of them
+     are just signed/unsigned pointer mismatches but there is one that actually
+     fixes returning what would be an arbitrary value off the stack from
+     get_my_thread_id if it happened to be called in a non-threaded build.
+     Patch kindly supplied by Craig A. Berry.
+     Added README.VMS, contributed by Craig A. Berry.
+     Added SSL_set_tlsext_host_name, SSL_get_servername,
+     SSL_get_servername_type, SSL_CTX_set_tlsext_servername_callback for
+     server side Server Name Indication (SNI) support. Patched by kmx.
+     Further mods for VMS building supplied by Craig A. Berry.
+     Fixed a problem with C++ comments preventing builds on AIX and
+     HPUX. Patched by Gisle Aas.
+     perdition.org not available for tests, changed to www.airspayce.com
+     Added SSL_FIPS_mode_set
+     Improvements to test suite so it succeeds with and without FIPS mode
+     enabled. Patch supplied by Petr Pisar.
+     Added documentation, warning not to pass UTF-8 data in the content
+     argument to post_https. Reported by Jason Terry.
+
+1.49 2012-09-25
+     Fixed problem where on some platforms test t/local/07_tcpecho.t would
+     bail out if it could not bind port 1212. Now now tries a number of ports to bind to until
+     successful.
+     Improvements to  unsigned casting contributed by Reini Urban.
+     Improvements to Net::SSLeay::read to make it easier to use with non-blocking IO:
+      contributed by James Marshall:  It modifies
+      Net::SSLeay::read() to return the result from SSL_read() as the second
+      return value, if Net::SSLeay::read() is called in list context.  Its
+      behavior should be unchanged if called in scalar or void context.  This
+      result code seems to be required for full support of non-blocking I/O,
+      since users need to handle SSL_ERR_WANT_READ, SSL_ERROR_WANT_WRITE, etc.
+      Fixed a problem where t/local/kwalitee.t fails with
+       Module::CPANTS::Analyse 0.86. Patch from Paul.
+      Fixed a number of typos patched by Giles.
+      Fixed a compiler warning from Compiling with gcc-4.4 and -Wall, patched by Giles.	
+      Fixed problems with get_https4: documentation was wrong, $header_ref was
+       not correctly set and $server_cert was not returned.
+      Fixed a problem that could cause a Perl exception about no blength
+      method on undef. Reported by "Stephen J. Smith via RT". https://rt.cpan.org/Ticket/Display.html?id=79309 
+      Added documentation about how to mitigatxe various SSL/TLS
+     vulnerabilities.
+     Fixed problem reported by Mike Doherty: SSL_MODE_* are defined in ssl.h, 
+     and should be available as constants, but I do not see them listed in constants.h
+
+1.48 2012-04-25
+     Removed unneeded Debian_CPANTS.txt from MANIFEST.
+     Fixed incorrect documentation about the best way to call CTX_set_options.
+     Fixed problem that caused Undefined subroutine utf8::encode @
+     t/local/33_x509_create_cert.t (on perl 5.6.2). Thanks to kmx.
+     In examples and pod documentations, changed #!/usr/local/bin/perl to #!/usr/bin/perl.
+     t/local/06_tcpecho.t now tries a number of ports to bind to until
+     successful.
+
+1.47 2012-04-04
+     Fixed overlong lines in pod, patch from Salvatore Bonaccorso, Debian Perl
+     Group
+     Fixed spelling errors in pod, patch from Salvatore Bonaccorso, Debian Perl
+     Group
+     Fixed extra "garbage" files in 1.46 tarball. Patch from kmx.
+     Fixed incorrect fail reports on some 64 bit platforms. Patch from paul.
+     Fix to avoid FAIL reports from cpantesters with missing openssl
+     Use my_snprintf from ppport.h to prevent link failures with perl 5.8 and
+     earlier when compiled with MSVC.
+
+1.46 2012-04-03
+     Fixed a problem reported by Atoomic: 
+      When bootstrapping Net::SSleay ( with DynaLoader ) if you override the SIG{DIE} signal, using 
+      Net::SSLeay will result in an error.
+      Recreated META.yml, added META.yml to dist
+      Fixed typo: the word "corresponding" was mis-spelled as "coresponding"
+       throughout the POD. Patched by kmx.
+      Updated META.yml to include repository and bugtracker
+     Constants cleanup - removing non existing constants (perhaps from pre-0.9.6 era) - kmx
+     Automatic constants.c generation via helper_script/regen_openssl_constants.pl - kmx
+     Future changes in constants now under better control via
+     t/local/21_constants.t - kmx
+     Added missing new files
+     Reordering @EXPORT_OK (constants first, functions next) - kmx
+     Adding missing 51 constants to @EXPORT_OK + test to keep it in sync - kmx
+     Instructions "howto add new constant" added to helper_script/regen_openssl_constants.pl - kmx
+     NEWLY INTRODUCED CONSTANTS:
+     - Net::SSLeay::ASN1_STRFLGS_ESC_CTRL
+     - Net::SSLeay::ASN1_STRFLGS_ESC_MSB
+     - Net::SSLeay::ASN1_STRFLGS_ESC_QUOTE
+     - Net::SSLeay::ASN1_STRFLGS_RFC2253
+     - Net::SSLeay::ERROR_WANT_ACCEPT
+     - Net::SSLeay::EVP_PKS_DSA
+     - Net::SSLeay::EVP_PKS_EC
+     - Net::SSLeay::EVP_PKS_RSA
+     - Net::SSLeay::EVP_PKT_ENC
+     - Net::SSLeay::EVP_PKT_EXCH
+     - Net::SSLeay::EVP_PKT_EXP
+     - Net::SSLeay::EVP_PKT_SIGN
+     - Net::SSLeay::EVP_PK_DH
+     - Net::SSLeay::EVP_PK_DSA
+     - Net::SSLeay::EVP_PK_EC
+     - Net::SSLeay::EVP_PK_RSA
+     - Net::SSLeay::MBSTRING_ASC
+     - Net::SSLeay::MBSTRING_BMP
+     - Net::SSLeay::MBSTRING_FLAG
+     - Net::SSLeay::MBSTRING_UNIV
+     - Net::SSLeay::MBSTRING_UTF8
+     - Net::SSLeay::OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION
+     - Net::SSLeay::OP_CISCO_ANYCONNECT
+     - Net::SSLeay::OP_CRYPTOPRO_TLSEXT_BUG
+     - Net::SSLeay::OP_LEGACY_SERVER_CONNECT
+     - Net::SSLeay::OP_NO_TLSv1_1
+     - Net::SSLeay::OP_NO_TLSv1_2
+     - Net::SSLeay::OP_SINGLE_ECDH_USE
+     - Net::SSLeay::OP_TLS_BLOCK_PADDING_BUG
+     - Net::SSLeay::X509_V_FLAG_CHECK_SS_SIGNATURE
+     - Net::SSLeay::X509_V_FLAG_EXTENDED_CRL_SUPPORT
+     - Net::SSLeay::X509_V_FLAG_POLICY_MASK
+     - Net::SSLeay::X509_V_FLAG_USE_DELTAS
+     - Net::SSLeay::X509_V_OK
+     - Net::SSLeay::XN_FLAG_COMPAT
+     - Net::SSLeay::XN_FLAG_DN_REV
+     - Net::SSLeay::XN_FLAG_DUMP_UNKNOWN_FIELDS
+     - Net::SSLeay::XN_FLAG_FN_ALIGN
+     - Net::SSLeay::XN_FLAG_FN_LN
+     - Net::SSLeay::XN_FLAG_FN_MASK
+     - Net::SSLeay::XN_FLAG_FN_NONE
+     - Net::SSLeay::XN_FLAG_FN_OID
+     - Net::SSLeay::XN_FLAG_FN_SN
+     - Net::SSLeay::XN_FLAG_MULTILINE
+     - Net::SSLeay::XN_FLAG_ONELINE
+     - Net::SSLeay::XN_FLAG_RFC2253
+     - Net::SSLeay::XN_FLAG_SEP_COMMA_PLUS
+     - Net::SSLeay::XN_FLAG_SEP_CPLUS_SPC
+     - Net::SSLeay::XN_FLAG_SEP_MASK
+     - Net::SSLeay::XN_FLAG_SEP_MULTILINE
+     - Net::SSLeay::XN_FLAG_SEP_SPLUS_SPC
+     - Net::SSLeay::XN_FLAG_SPC_EQ
+     A number of tests were present in svn, but missing from MANIFEST, and
+        were therefore not included in the dist. Added.
+     NEWLY INTRODUCED FUNCTIONS:
+     - Net::SSLeay::ASN1_INTEGER_free
+     - Net::SSLeay::ASN1_INTEGER_get
+     - Net::SSLeay::ASN1_INTEGER_new
+     - Net::SSLeay::ASN1_INTEGER_set
+     - Net::SSLeay::EVP_PKEY_assign_RSA
+     - Net::SSLeay::EVP_PKEY_bits
+     - Net::SSLeay::EVP_PKEY_free
+     - Net::SSLeay::EVP_PKEY_new
+     - Net::SSLeay::EVP_PKEY_size
+     - Net::SSLeay::EVP_get_cipherbyname
+     - Net::SSLeay::OPENSSL_add_all_algorithms_conf
+     - Net::SSLeay::OPENSSL_add_all_algorithms_noconf
+     - Net::SSLeay::OpenSSL_add_all_algorithms
+     - Net::SSLeay::PEM_get_string_PrivateKey
+     - Net::SSLeay::PEM_get_string_X509_CRL
+     - Net::SSLeay::PEM_get_string_X509_REQ
+     - Net::SSLeay::PEM_read_bio_PrivateKey
+     - Net::SSLeay::PEM_read_bio_X509
+     - Net::SSLeay::PEM_read_bio_X509_REQ
+     - Net::SSLeay::P_ASN1_INTEGER_get_dec
+     - Net::SSLeay::P_ASN1_INTEGER_get_hex
+     - Net::SSLeay::P_ASN1_INTEGER_set_dec
+     - Net::SSLeay::P_ASN1_INTEGER_set_hex
+     - Net::SSLeay::P_ASN1_STRING_get
+     - Net::SSLeay::P_X509_CRL_add_revoked_serial_hex
+     - Net::SSLeay::P_X509_CRL_get_serial
+     - Net::SSLeay::P_X509_CRL_set_serial
+     - Net::SSLeay::P_X509_REQ_add_extensions
+     - Net::SSLeay::P_X509_REQ_get_attr
+     - Net::SSLeay::P_X509_add_extensions
+     - Net::SSLeay::P_X509_copy_extensions
+     - Net::SSLeay::P_X509_get_crl_distribution_points
+     - Net::SSLeay::P_X509_get_ext_key_usage
+     - Net::SSLeay::P_X509_get_key_usage
+     - Net::SSLeay::P_X509_get_netscape_cert_type
+     - Net::SSLeay::P_X509_get_pubkey_alg
+     - Net::SSLeay::P_X509_get_signature_alg
+     - Net::SSLeay::P_PKCS12_load_file
+     - Net::SSLeay::X509V3_EXT_print
+     - Net::SSLeay::X509_CRL_digest
+     - Net::SSLeay::X509_CRL_free
+     - Net::SSLeay::X509_CRL_get_issuer
+     - Net::SSLeay::X509_CRL_get_lastUpdate
+     - Net::SSLeay::X509_CRL_get_nextUpdate
+     - Net::SSLeay::X509_CRL_get_version
+     - Net::SSLeay::X509_CRL_new
+     - Net::SSLeay::X509_CRL_set_issuer_name
+     - Net::SSLeay::X509_CRL_set_lastUpdate
+     - Net::SSLeay::X509_CRL_set_nextUpdate
+     - Net::SSLeay::X509_CRL_set_version
+     - Net::SSLeay::X509_CRL_sign
+     - Net::SSLeay::X509_CRL_sort
+     - Net::SSLeay::X509_CRL_verify
+     - Net::SSLeay::X509_EXTENSION_get_critical
+     - Net::SSLeay::X509_EXTENSION_get_data
+     - Net::SSLeay::X509_EXTENSION_get_object
+     - Net::SSLeay::X509_NAME_ENTRY_get_data
+     - Net::SSLeay::X509_NAME_ENTRY_get_object
+     - Net::SSLeay::X509_NAME_add_entry_by_NID
+     - Net::SSLeay::X509_NAME_add_entry_by_OBJ
+     - Net::SSLeay::X509_NAME_add_entry_by_txt
+     - Net::SSLeay::X509_NAME_cmp
+     - Net::SSLeay::X509_NAME_digest
+     - Net::SSLeay::X509_NAME_entry_count
+     - Net::SSLeay::X509_NAME_get_entry
+     - Net::SSLeay::X509_NAME_print_ex
+     - Net::SSLeay::X509_REQ_add1_attr_by_NID
+     - Net::SSLeay::X509_REQ_digest
+     - Net::SSLeay::X509_REQ_free
+     - Net::SSLeay::X509_REQ_get_attr_by_NID
+     - Net::SSLeay::X509_REQ_get_attr_by_OBJ
+     - Net::SSLeay::X509_REQ_get_attr_count
+     - Net::SSLeay::X509_REQ_get_pubkey
+     - Net::SSLeay::X509_REQ_get_subject_name
+     - Net::SSLeay::X509_REQ_get_version
+     - Net::SSLeay::X509_REQ_new
+     - Net::SSLeay::X509_REQ_set_pubkey
+     - Net::SSLeay::X509_REQ_set_subject_name
+     - Net::SSLeay::X509_REQ_set_version
+     - Net::SSLeay::X509_REQ_sign
+     - Net::SSLeay::X509_REQ_verify
+     - Net::SSLeay::X509_certificate_type
+     - Net::SSLeay::X509_digest
+     - Net::SSLeay::X509_get_ext_count
+     - Net::SSLeay::X509_get_pubkey
+     - Net::SSLeay::X509_get_serialNumber
+     - Net::SSLeay::X509_get_version
+     - Net::SSLeay::X509_issuer_and_serial_hash
+     - Net::SSLeay::X509_issuer_name_hash
+     - Net::SSLeay::X509_new
+     - Net::SSLeay::X509_pubkey_digest
+     - Net::SSLeay::X509_set_issuer_name
+     - Net::SSLeay::X509_set_pubkey
+     - Net::SSLeay::X509_set_serialNumber
+     - Net::SSLeay::X509_set_subject_name
+     - Net::SSLeay::X509_set_version
+     - Net::SSLeay::X509_sign
+     - Net::SSLeay::X509_subject_name_hash
+     - Net::SSLeay::X509_verify
+     - Net::SSLeay::d2i_X509_CRL_bio
+     - Net::SSLeay::d2i_X509_REQ_bio
+     - Net::SSLeay::d2i_X509_bio
+     - Net::SSLeay::set_tlsext_host_name
+     - Net::SSLeay::CTX_set_next_protos_advertised_cb
+     - Net::SSLeay::CTX_set_next_proto_select_cb
+     - Net::SSLeay::P_next_proto_negotiated
+     - Net::SSLeay::P_next_proto_last_status
+     Fixed a problem with multiple Safefree of GLOBAL_openssl_mutex when run
+     under apache2+mod_perl on recent Debain distros. Removed END and
+     openssl_threads_cleanup() since they can be called during thread
+     destruction, and not necessarily at process exit time.
+     Added missing helper_script/regen_openssl_constants.pl to MANIFEST. Add
+     MANIFEST to svn.
+     Fixed reported errors about try to plan twice in 21_constants.t on some platforms.
+     Removed MANIFEST from svn, improve possibility to use Module::Install in Net-SSleay 
+     distribution in usual way. new target for make manifest
+     Fix 2 issues with CTX_use_PKCS12_file
+      1/ leaking memory - missing EVP_PKEY_free + X509_free
+      2/ pkcs12 filesize limitation
+     Fixed problems with regenerating scripts in Makefile.PL
+     Added missing dependencies for SSLeay.o to Makefile.PL
+     Added missing test files to svn
+     Fixed calling convention for Net::SSLeay::get_shared_ciphers + test + doc update
+     Added coding guidelines to SSLeay.xs
+     Fix for serial number issue.
+     Major patch to refactor callback code to make it more extensible and
+     remove duplicate code. Thanks to kmx.
+     Fixed a problem in  t/local/07_sslecho.t when running on 
+     openssl-0.9.6
+     Fixed pod parsing errors reported by Olivier Mengué
+     Better prevention of leaking SVs in the new callback stuff
+     Debug messages in SSLeay.xs can be enabled by: perl Makefile.PL DEFINE=-DSHOW_XS_DEBUG
+     Fixing X509_NAME_oneline (calling OPENSSL_free at the right place)
+     Fixed a problem with crashing when run under apache2+modssl+modperl on
+     Debian Wheezy. Now detects if it is running under ModPerl and uses ModSSLs
+     thread locking instead.
+     Added more debg printing. Enable with
+     	   perl Makefile.PL DEFINE=-DSHOW_XS_DEBUG
+     Added NPN support, thanks to kmx
+     Added t/local/40_npn_support.t tests for new NPN support
+     Fixed some compiler warnings. Courtesy kmx.
+     Fixed a problem with Win32 detection. Courtesy kmx.
+
+1.45 2012-02-25
+     Added mising doc for SESSION_cmp. Patch by paul.
+
+1.44 2012-02-25
+     Added missing t/data/binary-test.file to MANIFEST
+
+1.43 2012-02-24
+    Fixed some typos. Patched by Neil Bowers.
+    SSLeay.pm convenience functions now call Net::SSLeay::initialize that
+    initializes the SSL library at most once. 
+    Patch from kmx to protect SSLeay_add_ssl_algorithms from multiple loads
+    and reentrancy in multi-threaded perls.
+    Patch from kmx to add reentrancy protection for callbacks in
+    multithreading.
+    Updated ppport.h, fixed some complaints from ppport.h
+    Fixed a problem with CTX_use_PKCS12_file on Windows, since the file was
+    not opened in binary mode. Reported by kmx.
+    Added resources line for SVN repository to Makefile. Suggested by kmx.
+    Fixed complaints unders some windows compilers about cast from pointer to integer of
+    different size. Suggested by kmx.
+    Added thread safety and dynamic locking. This should complete thread
+    safety work, making Net::SSLeay completely thread-safe. Patches by kind
+    assistance of kmx.
+    Improvements to openssl backwards compatibility. Now build with versions
+    back to 0.9.6. With extreme thanks to kmx.
+    Improvements to documentation, thanks to kmx.
+    SUMMARY OF NEWLY INTRODUCED FUNCTIONS:
+    - Net::SSLeay::initialize
+    - Net::SSLeay::SSLeay
+    - Net::SSLeay::SSLeay_version
+    - Net::SSLeay::CIPHER_get_name
+    - Net::SSLeay::ASN1_TIME_new
+    - Net::SSLeay::ASN1_TIME_free
+    - Net::SSLeay::ASN1_TIME_set
+    - Net::SSLeay::P_ASN1_TIME_get_isotime
+    - Net::SSLeay::P_ASN1_TIME_set_isotime
+    - Net::SSLeay::P_ASN1_TIME_put2string
+    - Net::SSLeay::OpenSSL_add_all_digests
+    - Net::SSLeay::P_EVP_MD_list_all
+    - Net::SSLeay::EVP_get_digestbyname
+    - Net::SSLeay::EVP_MD_type
+    - Net::SSLeay::EVP_MD_size
+    - Net::SSLeay::EVP_MD_CTX_md
+    - Net::SSLeay::EVP_MD_CTX_create
+    - Net::SSLeay::EVP_MD_CTX_destroy
+    - Net::SSLeay::EVP_DigestInit
+    - Net::SSLeay::EVP_DigestInit_ex
+    - Net::SSLeay::EVP_DigestUpdate
+    - Net::SSLeay::EVP_DigestFinal
+    - Net::SSLeay::EVP_DigestFinal_ex
+    - Net::SSLeay::EVP_Digest
+    - Net::SSLeay::SHA1
+    - Net::SSLeay::SHA256
+    - Net::SSLeay::SHA512
+    - Net::SSLeay::EVP_sha1
+    - Net::SSLeay::EVP_sha512
+    Fixed a problem with set_proxy where the password was not properly
+    set. The code to do this went missing at some stage. Reported by Ulrich
+    Weber via RT.
+    Further improvements to testing time functions. 
+    Added t/local/37_asn1_time.t
+    Added various digest functions, documentation and tests
+    Removed debug from P_ASN1_TIME_get_isotime. Courtesy kmx.
+    Remove unnecessary warnings about Random number generator not
+    seeded. Courtesy kmx.
+    Fixed an error in 04_basic.t triggered if Test::Exception not present.
+    Added documentation for many CTX_ functions. Courtesy kmx.
+    Fixed mionor typos in SSLeay.xs. Courtesy kmx.
+    Moved documentation to new lib/Net/SSLeay.pod. Courtesy kmx.
+    Additions to documentation in pod. Courtesy kmx.
+    Fixed some incorrect return types from SSL_set_options
+    SSL_CTX_set_options. Courtesy kmx.
+    Further documentation in pod. Courtesy kmx.
+    Small fixes to XS code + one new trivial function SSL_CIPHER_get_name
+    And one more thing - 02_pod_coverage.t is turned ON passing all tests - 
+    never ever allow a new function without at least a short doc. Courtesy
+    kmx.
+    Removed 2 unnecessary 'local $[;' from SSLeay.pm
+ 
+1.42	 2011-10-03
+    Fixed incorrect documentation of how to enable CRL checking. Patched
+    by Steffen_Ullrich.
+    Fixed incorrect letter in Sebastien in Credits. Patch by Neil Bowers.
+    Reversed order of the Changes file to be reverse chronological. Patch by
+    Neil Bowers.
+    Fixed a a compile error when building on Windows with MSVC6. reported and
+    patched by "Andrew J. Savige via RT".
+
+1.41    2011-09-25
+    Fixed incorrect const signatures for 1.0 that were causing warnings. 
+    Patches provided by "Douglas
+    Christopher Wilson via RT". Now have clean compile with 0.9.8a through 1.0.0.
+1.40    2011-09-23
+    Fixed incorrect argument type in call to SSL_set1_param
+    Fixed a number of issues with pointer sizes, patched by "Douglas
+    Christopher Wilson via RT". Removed redundant pointer cast tests from t/
+    Added Perl version requirements to SSLeay.pm
+1.39    2011-09-21
+    Downgraded Module::Install to 0.93 since 1.01 was causing problems in
+    the Makefile. Reported by Albert Chin.
+1.38    2011-09-16
+    - Fixed a problem with  various symbols that only became
+    available in OpenSSL 0.9.8 such as X509_VERIFY_PARAM and
+    X509_POLICY_NODE, causing build failures with older versions of
+    OpenSSL. Patched by paul.
+1.37    2011-09-16
+    - Added X509_get_fingerprint, contributed by Thierry Walrant (with
+    minor changes die to the fact that stricmp is not avialable. Cert
+    types must be lowercase. Also added test to 07_sslecho.t
+    - Added suport for SSL_CTX_set1_param, SSL_set1_param,
+    selected X509_VERIFY_PARAM_* OBJ_* functions. Added new test
+    t/local/36_verify.t
+    - Fixed the prototype for randomize(), it missed one arg, and errors
+    are reported with perl 5.10.1 on Windows
+    - Fixed an uninitialized value warning in $Net::SSLeay::proxyauth,
+    reported by Andrey Rikov.
+    - Update so net-ssleay will compile if SSLV2 is not present. Patch
+    from Chris Butler.
+    - Fixed a problem where sslcat (and possibly other functions) expect RSA keys and will not
+    load DSA keys for client certificates. Reported and patched by "Jesse
+    DeFer via RT"
+        - Removed SSL_CTX_v2_new and SSLv2_method() for OpenSSL 1.0 and later.
+    - Added CTX_use_PKCS12_file contributed by "Andrew A. Budkin".
+1.36 30.01.2010
+    - Fix problems with building on GNU/kFreeBSD, to do with use of pack
+    instread of sockaddr_in. Patched by Debian Perl Group. (Closes RT#40144)
+    - Fixed a compile problem in t/local/ptr_cast_test.c for some gcc
+    versions. Reported by "Ryan McGuigan via RT". (Closes RT#52525)
+    - Improved OpenSSL detection on Win32/strawberry perl. Patch provided
+    by kmx. (Closes RT#49287)
+    - Fix test failures on some 64-bit platforms. (Closes RT#53585)
+    - Make X509_NAME_get_text_by_NID return its result without a trailing NUL.
+    Patched by Steffen Ullrich. (Closes RT#35754)
+    - SSL_set_session_secret_cb required for EAP-FAST is now enabled for both
+    SSL_F_SSL_SET_HELLO_EXTENSION and
+    SSL_F_SSL_SET_SESSION_TICKET_EXT. The name of this #define
+    changed after 0.9.8i. SSL_set_hello_extension is not available after
+    0.9.8i.
+    - Added SSL_CTX_get_client_CA_list sk_X509_NAME_free sk_X509_NAME_num
+    sk_X509_NAME_value SSL_get_client_CA_list, from patch provided by
+    Joerg Schneider
+    - Added EVP_add_digest and EVP_sha256 (if available)
+    - Improve documentation on callback functions.
+    - Stop looping forever when writing to broken connections. Patched by
+    Martin Mares. (Closes RT#44170)
+    - Patches from "Martijn van Beers via RT" to add SSL_SENT_SHUTDOWN
+    and SSL_RECEIVED_SHUTDOWN, remove broken URLs,
+    and to fix some documentation issues.
+    - Various changes to build with OpenSSL 1.0 beta1:
+    SSL_SESSION_cmp has been removed
+    return type of SSL_CTX_sessions changed in an ugly way
+    - Fixed a build problem reported by SISYPHUS:
+    On Windows Vista64, ActivePerl 5.10.0 (build 1004, x64), running 'nmake
+    test', the process hangs forever when it comes to building the test
+    executable (as the executable fails to build).
+    - Applied patch from ecmenifee in to improve handling of errors in
+    ssl_write_all. (Closes RT#48132)
+    - Patch to permit compile and testing on OS/2 submitted by Ilya
+    Zakharevich.
+    - Fixed compile problems with openssl-1.0.0-beta3 due to MD2 now being
+    optional. Reported by paul [...] city-fan.org.
+    - Fixed compile problems with openssl-0.9.7 and earlier with undefined
+    symbol EVP_sha256. Reported by paul [...] city-fan.org.
+    - Fixed a typo reported by Dan Dascalescu.
+    - added RIPEMD160 digest function.  Patch provided by dkg.
+
+1.35 25.07.2008
+    - Fix test plan for autoload.t if Test::Exception isn't available.
+    - Skip rsa_generate_key.t if Test::Exception isn't available.
+
+1.34 24.07.2008
+    - Fixed problem with X509_get_subjectAltNames, where some types of Alt
+    Name (eg DIRNAMEs) were not properly handled, resulting in seg faults.
+    Reported by Achim Grolms.
+    - Added support for ENGINE_load_builtin_engines and
+    ENGINE_register_all_complete in order to enable built-in OpenSSL
+    crypto engines for hardware acceleration etc.
+    - Added support for ENGINE_by_id and ENGINE_set_default, required
+    to enable Sun crypto acceleration
+
+1.33_01 14.02.2008
+    - Fixed a compile problem with inc_paths /usr/kerberos/include
+    in inc/Module/Install/PRIVATE/Net/SSLeay.pm. Reported by "J. Nick
+    Koston via RT"
+    - Added optional support for SSL_set_hello_extension,
+        SSL_set_session_secret_cb to support various extension patches from
+        a patch to openssl-0.9.9-dev contributed by Jouni Malinen.
+        See wpa_supplicant/patches/openssl-0.9.9-session-ticket.patch in the
+        latest (git) version 0.6 and later of wpa_suplicant at
+        http://hostap.epitest.fi/. These additions are ifdefed to
+        SSL_F_SSL_SET_HELLO_EXTENSION which is added by the patch
+        Tested with openssl-SNAP-20070816.
+        - Added SSL_SESSION_set_master_key and SSL_get_keyblock_size.
+        - Added all SSL_OP_* options flags present in 0.9.9
+        - Fixed a bug in SSL_set_tmp_dh
+        - Doc improvements in README.Win32
+    - Fixed a problem with proxy connections: open_proxy_tcp_connection
+    was stopping after the first \n from the proxy,
+    but instead should have looked for
+    $CRLF . $CRLF to find the beginning of the SSL content
+    - Fixed missing / on /usr/kerberos/include, reported by several people
+    - removed bacus.pt from host list in t/handle/external/10_destroy.t,
+    since it seems no longer to respond. Reported by tco2.
+    - changed t/handle/external/10_destroy.t so this list of URIs to be
+    tested can be configured with environment variable SSLEAY_URIS, a
+    colon separated list of host names. Suggested by tco2.
+    - changed t/handle/external/50_external.t and t/external/08_external.t
+    so this list of sites to be
+    tested can be configured with environment variable SSLEAY_SITES, a
+    colon separated list of host names. Suggested by tco2.
+    - Fixed doucumentation in README of how to use OPENSSL_PREFIX
+    environment variable to control the location of openssl. Reported by
+    "Quanah Gibson-Mount via RT".
+    - Don't use Module::Installs auto_install.
+    - Bind NID_ and GEN_ constants.
+    - Default to not running external tests.
+
+1.32 03.08.2007
+    - Don't let the tests die when something unexpected happens. Just BAIL_OUT.
+    - Some Win32 improvements.
+
+1.31_02 14.07.2007
+    - Fix linking problems on Windows. Tested with VC++ 6.0, Shining Light
+    0.9.7L on Windows Server 2003 with ActivePerl 5.8.8.820. Also tested
+    with OpenSSL 0.9.8e compiled from source.
+    - Unable to get working systems when compiling with MS Visual Studio
+    Express 2005. Contributions requested. This may be relevant:
+      http://www.itwriting.com/blog/?postid=261&replyto=2542
+    - Fixed a number of minor compile warnings on Windows
+    - Updated README.Win32 to define building procedures on Windows
+    - Fixed incorrect test failure reports in 08_external.
+    - Add parens to function calls in Makefile.PL to prevent
+    warnings with some perls.
+    - Tested on Sparc Solaris 8, Sparc Solaris 10, OpenSuSE 10.2 x64,
+    OpenSuSE 10.0 x86, FreeBSD 6.0 x86, Ubuntu 6.10, Fedora Core 6 x86
+    - Changed type of SSL_set_info_callback args to stop compiler warnings
+    on Windows
+    - Removed auto_include from Makefile.PL
+    - Removed build_requires('Test::NoWarnings') from Makefile.PL
+    - Testing with Strawberry Perl on Windows XP SP2, added doc to
+    README.Win32
+    - Testing with Perl CamelPack 5.8.7 on Windows XP SP2,added doc to
+    README.Win32
+    - Added optional support for SSL_set_hello_extension,
+    SSL_set_session_secret_cb to support various extension patches from 
+    a patch to openssl-0.9.9-dev contributed by Jouni Malinen. 
+    See wpa_supplicant/patches/openssl-0.9.9-session-ticket.patch in the
+    latest (git) version 0.6 and later of wpa_suplicant at 
+    http://hostap.epitest.fi/. These additions are ifdefed to 
+    SSL_F_SSL_SET_HELLO_EXTENSION which is added by the patch
+    Tested with openssl-SNAP-20070816.
+    - Added SSL_SESSION_set_master_key and SSL_get_keyblock_size.
+    - Added all SSL_OP_* options flags present in 0.9.9
+    - Fixed a bug in SSL_set_tmp_dh
+    - Doc improvements in README.Win32
+1.31_01 02.07.2007
+    - Only bind X509_STORE_set_trust #if OPENSSL_VERSION_NUMBER >= 0x0090800fL
+    - Removed %Filenum_Objects from Net::SSLeay::Handle so unused handles will be freed.
+    - Use ppport.h.
+    - improved openssl path guessing, forcing openssl path now
+            requires the -path flag (caution: incompatible flag change)
+            Path guessing works on windows too.
+            mikem, with patches from Stas Bekman
+    - Added /usr/sfw/bin/openssl to path guessing for Open Solaris,
+    suggested by Igor Boehme.
+    - Fixed a problem with X509_get_subjectAltNames not working when the
+    subjectAltNAmes are the first extension. Reported by Achim Grolms
+
+1.30  21.12.2005
+    - Fixed the MD5 function for hashsums containing \0
+    - Fixed some compile warnings with recent gcc.
+    - Fixed do_httpx3:
+      + Don't add additional Host: headers if it's already given
+      + Omit the :$port suffix for standard ports
+      + Thanks to ivan-cpan-rt@420.am
+    - Limit the chunk size when reading with tcp_read_all to 0x1000.
+      This fixes various rt tickets.
+    - Added patch to allow session caching
+    - Mike McCauley and Florian Ragwitz maintain this module now
+1.25  18.8.2003
+    - added tcpecho.pl and tcpcat.pl to MANIFEST
+    - fixed some further bugs with TCP read all, etc.
+    - fixed some const char pointer warnings
+1.24  25.6.2003
+        - write_partial() return value patch from
+          Kim Minh Kaplan <kmkaplan@selfoffice._com>
+      3.8.2003
+        - applied version check fix to Net::SSLeay::Handle.pm
+          from Jason Rhinelander <jason@gossamer-threads._com>
+      17.8.2003
+    - new features: http and raw tcp support
+    - fixed apparent STDIO vs. sysread bug in proxy connect
+1.23  13.6.2003
+    - some minor tweaks by many, mainly for RH build
+    - memory leak and cleanup patches from Marian Jancar <mjancar@suse._cz>
+1.22  8.1.2003
+    - proxy auth fix from Bill.Muller@@ubsw_..com
+      18.2.2003
+    - RAND patch from Toni Andjelkovic <toni@soth._at>
+1.21  6.9.2002
+    - Patch by Mike McCauley mikem@open.com_.au
+      19.9.2002
+    - applied patch from Tim Engler <tim@burntcouch_.com>
+      30.10.2002,
+        - perl-5.8/gcc-3.2 patch on Makefile.PL from
+      Joern_Hoos@@notes.uni-paderborn._de, lucho@@galix._com,
+      bellis@@saberlogic._com, and simonclewer@@superquote._com
+1.20  16.8.2002
+    - Additional patch by Peter Behroozi <peter@@fhpwireless_.com> --Sampo
+    - Patch by Mike McCauley mikem@open.com_.au
+1.19  10.8.2002-16.8.2002
+    - Added SSL_peek patch to ssl_read_until from 
+          Peter Behroozi <peter@@fhpwireless_.com> --Sampo
+    - Improved Windows instructions per Marcel Bucher <marcle@bucher._cc>
+1.18  15.6.2002
+    - applied minor patch by Mark Veltzer <mark@@veltzer._org> to Makefile.PL
+1.17  8.6.2002
+    - further fixes for Net::SSLeay::Handle from jbowlin@@_linklint.org
+    - improved README.Win32 and added RECIPE.Win32 from
+      Hermann Kelley <hkelley@@secmon._com>
+1.16  17.4.2002-22.5.2002
+        - applied patch to fix CTX_set_default_passwd_cb() contributed
+          by Timo Kujala <timo.kujala@@intellitel_.com>, --Sampo
+    - similar patch by Chris Ridd <chris.ridd@messagingdirect.com>
+    - applied patch to add various API functions by mikem@open.com_.au
+    - 5.005_03 compat fix for Handle.pm from Jim Mintha <jim@@ic._uva.nl>
+1.15  3.4.2002
+        - added `use bytes' from Marcus Taylor <marcus@@semantico_.com>
+          This avoids unicode/utf8 (as may appear in some XML docs)
+          from fooling the length comuptations.
+    - Dropped support for perl5.005_03 because I do not have opportunity 
+          to test it. --Sampo
+1.14  25.3.2002
+    - added code to Makefile.PL to verify that the same C compiler
+      is used for both perl and openssl
+    - added code to Makefile.PL to support aCC on HPUX. Detective
+      work contributed by Marko Asplund.
+    - added peer certificate support to hilevel API, inspired
+      by mock@@_obscurity.org 
+1.13  13.2.2002
+    - eliminated initializing random numbers using /etc/passwd per
+      comments by Matt Messier <matt@@securesw_.com>
+    - tested against openssl-0.9.6c
+1.12  6.1.2002
+    - cosmetic fix to socket options from
+          Kwindla Hultman Kramer <kwindla@@allafrica_.com>
+1.11  14.12.2001,
+    - Added proxy support to Net::SSLeay::Handle, too
+1.10  7.12.2001,
+    - Added proxy support by Bruno De Wolf <bruno.dewolf@@pandora._be>
+1.09  20.8.2001,
+    - fixed Makefile.PL (computation of bin_path) and test.pl ($perl
+      use before defined) per Gordon Lack <gml4410@@_ggr.co.uk>
+      11.9.2001,
+    - Patch by Jeremy Mates <jmates@@_mbt.washington.edu> to make Handle.pm
+      more acceptable for older perls
+      25.9.2001,
+    - systematically implemented many of the newer functions of
+      openssl API (per popular request and for completeness)
+1.08  25.4.2001,
+    - applied 64 bit fixes by Marko Asplund <aspa@@kronodoc._fi>
+      17.7.2001,
+    - applied error codes and SSL_*_method patch by Noel Burton-Krahn
+          <noel@burton-krahn.com> via aspa
+    - warning cleanups by Jared Allison <jallison@@UU_.NET>
+    - do last loop fixes from Jim Bowlin <bowlin@@_mindspring.com>
+    - Fixed extra-newline-if-header-already-contained-newline problem
+      reported by Sean McMurray <smcmurray@verio.net> (first reported by
+      Yuao TANIGAWA <yuao@@_www.infosite.ne.jp> but not fixed by me back
+      then for some reason, my bad)
+    - Added ability to set client certificate for https_cat and sslcat
+      as suggested by Avi Ben-Harush <avib@@_atomica.com>
+    - created do_https2 with more rational calling sequence
+      18.7.2001,
+    - numerous windows oriented fixes from Eric A Selber
+      <eselber@@_briefcase.com>
+    - bumped OpenSSL version requirement to 0.9.6b and tested
+    - merged in Net::SSLeay::Handle by Jim Bowlin <jbowlin@@_linklint.org>
+1.07  18.4.2001,
+    - TLSv1 support by Stephen C. Koehler <koehler@@securecomputing_.com>
+1.06  7.4.2001, --Sampo
+    - fixed ssl_read_all bug where `0' input was mistaken for EOF.
+    - openssl-0.9.6a fixes (e.g. random number generator init)
+    - various minor fixes subnitted by fellow netters (sorry, I lost track
+      of your names so I do not name the contributors here)
+1.05  31.1.1999, --Sampo
+    - fixed test cert creation (lack of symlinks, reported
+          by schinder@@_pobox.com)
+    - callbacks fixed and tested to work
+    - added Authentication examples
+    - added couple more X509_STORE_CTX family functions
+1.04  31.1.1999, Sampo Kellomaki <sampo@@_iki._fi>
+    - Backward incompatible changes in OpenSSL API mean that 1.04 will
+      drop support for SSLeay and all OpenSSL versions prior
+      to 0.9.2b release. Thanks guys!
+    - Detected errors in OpenSSL-0.9.2b/ssl/ssl.h - see patch in README
+    - Reordered arguments of several functions to track OpenSSL-0.9.2b
+      changes. This also changes the order of args in corresponding
+      perl functions. You have been warned!
+        - SSL_use_certificate_ASN1(s,d,len)  // swapped d and len
+    - WARNING: Possibly fatal verify_callback parameter list issue
+      is still standing
+    - cleaned up many macros that used to access ctx->session directly,
+      OpenSSL-0.9.2b defines thes macros properly so I use them now.
+    - Added SSL_ctrl() and SSL_CTX_ctrl()
+    - Added SSL_get_options(), SSL_CTX_get_options(),
+      SSL_CTX_set_cipher_list()
+    - Removed SSL_add_session(), SSL_remove_session(),
+          and SSL_flush_sessions() per #if 0 in ssl.h, line 667
+    - Updated paths in various utility programs
+    - Upgraded version number detection logic in Makefile.PL
+    - Added -rsaref flag to Makefile.PL. This allows linking against rsaref
+    30.7.1999, final squeeze to get this out --Sampo
+    - upgrade to OpenSSL-0.9.3a
+    - upper case all header names so keys of the hash returned
+      from get_https are predictible
+    - fixed get_https and post_https so they don't do shutdown
+      anymore. This used to cause headaches when connection
+      renegotiation happened.
+    - applied ssl_read_CRLF patch by Clinton Wong <clintdw@@netcom._com>
+    - ActivePerl diffs from anton@@_genua.de applied,
+      but not tested.
+1.03  4.1.1999, Sampo Kellomaki <sampo@@iki._fi>
+    - Merged URI encoding patch to make_form
+      from Joe Rhett <jrhett@@navigist._com>
+    - changed sslcat, ssl_read_all, ssl_write_all to return error messages
+      as second member of list. Functions continue to behave the old way
+      if scalar return value is used (they check this with wantarray).
+      Change was suggested by Joe Rhett.
+    - changed $trace levels so that 0 does not produce any output
+    - changed get_https and put_https to fake error 900 in $response
+      return field
+    - changed print_errs and some other internals to return textual
+      errors instead of error count
+    - changed SSLeay.xs comments from #if 0 to #define REM. This will
+      hopefully make it easier to compile with some vendor compilers
+    - Added version detection code for OpenSSL-0.9.1c and checked
+      build
+1.02  8.7.1998, Sampo Kellomaki <sampo@@iki._fi>
+    - Added SSL_(CTX)?_set_options and associated constants
+    - Slight clean-ups
+1.01  23.6.1998, Sampo Kellomaki <sampo@@iki_.fi>
+    - made Makefile.PL check SSLeay version and to be more CPAN kosher
+    - changed build instructions to build outside perl source tree
+    - added random number initialization using /dev/urandom (if available)
+    - made ssl_write_all accept references, this is more memory efficient
+1.00  19.6.1998, Sampo Kellomaki <sampo@@_iki.fi>
+    - overhauled to SSLeay-0.9.0
+    - renamed cat to sslcat
+    - added lots of convenience functions, like get_https
+    - added couple of X509 routines
+    - improved tests and documentation
+    - fixed callbacks (but found that old callbacks dont work)
+0.04  19.7.1996 Fixed some 0.6.1 incompatibilities, namely removed
+      #include <ssl_locl.h>, fixed typo in SSL_get_cerificate, fixed
+      the return type of the same. --Sampo
+0.03  Renamed everything Net::SSLeay
+0.02  Trial with SSL.pm name
+0.01  Thu Jun 27 03:56:00 1996
+    - original version; created by h2xs 1.16
+#EOF

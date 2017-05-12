@@ -1,0 +1,194 @@
+NAME
+    Net::SNMP::Mixin::Dot1dStp - mixin class for 802.1D spanning tree
+    information
+
+VERSION
+    Version 0.04
+
+SYNOPSIS
+      use Net::SNMP;
+      use Net::SNMP::Mixin;
+
+      my $session = Net::SNMP->session( -hostname => 'foo.bar.com' );
+      $session->mixer('Net::SNMP::Mixin::Dot1dStp');
+      $session->init_mixins;
+
+      snmp_dispatcher();
+      $session->init_ok();
+      die $session->errors if $session->errors;
+
+      my $stp_group = $session->get_dot1d_stp_group;
+
+      printf "TopoChanges:    %d\n", $stp_group->{dot1dStpTopChanges};
+      printf "ThisRootPort:   %d\n", $stp_group->{dot1dStpRootPort};
+      printf "ThisRootCost:   %d\n", $stp_group->{dot1dStpRootCost};
+      printf "ThisStpPrio:    %d\n", $stp_group->{dot1dStpPriority};
+      printf "RootBridgeMAC:  %s\n",
+        $stp_group->{dot1dStpDesignatedRootAddress};
+      printf "RootBridgePrio: %d\n",
+        $stp_group->{dot1dStpDesignatedRootPriority};
+
+      my $stp_ports = $session->get_dot1d_stp_port_table;
+      foreach my $port ( sort { $a <=> $b } keys %$stp_ports ) {
+        my $enabled = $stp_ports->{$port}{dot1dStpPortEnable};
+        next unless defined $enabled && $enabled == 1;
+
+        printf "----------- STP Port: %d ---------\n", $port;
+        printf "PState:      %d\n", $stp_ports->{$port}{dot1dStpPortState};
+        printf "PStateStr:   %d\n",
+          $stp_ports->{$port}{dot1dStpPortStateString};
+        printf "PPrio:       %d\n",
+          $stp_ports->{$port}{dot1dStpPortPriority};
+        printf "PCost:       %d\n",
+          $stp_ports->{$port}{dot1dStpPortPathCost};
+        printf "PDesigCost:  %d\n",
+          $stp_ports->{$port}{dot1dStpPortDesignatedCost};
+        printf "DBridgePrio: %d\n",
+          $stp_ports->{$port}{dot1dStpPortDesignatedBridgePriority};
+        printf "DBridgeMAC:  %d\n",
+          $stp_ports->{$port}{dot1dStpPortDesignatedBridgeAddress};
+        printf "DPortPrio:   %d\n",
+          $stp_ports->{$port}{dot1dStpPortDesignatedPortPriority};
+        printf "DPortNr:     %d\n",
+          $stp_ports->{$port}{dot1dStpPortDesignatedPortNumber};
+      }
+
+DESCRIPTION
+    This mixin reads data from the dot1dStp group out of the BRIDGE-MIB.
+    Normally it's implemented by those bridges that support the Spanning
+    Tree Protocol.
+
+MIXIN METHODS
+  OBJ->get_dot1d_stp_group()
+    Returns the dot1dStp group as a hash reference:
+
+      {
+        dot1dStpProtocolSpecification   => INTEGER,
+        dot1dStpPriority                => INTEGER,
+        dot1dStpTimeSinceTopologyChange => TIME_TICKS,
+        dot1dStpTopChanges              => COUNTER,
+        dot1dStpRootCost                => INTEGER,
+        dot1dStpRootPort                => INTEGER,
+        dot1dStpMaxAge                  => TIMEOUT,
+        dot1dStpHelloTime               => TIMEOUT,
+        dot1dStpHoldTime                => INTEGER,
+        dot1dStpForwardDelay            => TIMEOUT,
+        dot1dStpBridgeMaxAge            => TIMEOUT,
+        dot1dStpBridgeHelloTime         => TIMEOUT,
+        dot1dStpBridgeForwardDelay      => TIMEOUT,
+        dot1dStpDesignatedRoot          => BridgeId,
+        dot1dStpDesignatedRootPriority => INTEGER,
+        dot1dStpDesignatedRootAddress  => MacAddress,
+      }
+
+    The dot1dStpDesignatedRoot is a BridgeId struct of priority and
+    MacAddress. The mixin method splits this already into
+    dot1dStpDesignatedRootPriority and dot1dStpDesignatedRootAddress for
+    your convenience.
+
+  OBJ->get_dot1d_stp_port_table()
+    Returns the dot1dStpPortTable as a hash reference. The keys are the
+    dot1d STP port numbers for which this entry contains Spanning Tree
+    Protocol management information:
+
+      {
+        INTEGER => { # dot1dStpPort 
+
+          dot1dStpPortPriority           => INTEGER,
+          dot1dStpPortState              => INTEGER,
+          dot1dStpPortStateString        => String,
+          dot1dStpPortEnable             => INTEGER,
+          dot1dStpPortPathCost           => INTEGER,
+          dot1dStpPortDesignatedRootId   => BridgeId,
+          dot1dStpPortDesignatedCost     => INTEGER,
+          dot1dStpPortDesignatedBridgeId => BridgeId,
+          dot1dStpPortDesignatedPort     => PortId,
+          dot1dStpPortForwardTransitions => COUNTER,
+
+          # dot1dStpPortDesignatedRootId is a struct (BridgeId) of
+          # priority and MacAddress
+          #
+          dot1dStpPortDesignatedRootPriority => INTEGER,
+          dot1dStpPortDesignatedRootAddress  => MacAddress,
+
+          # dot1dStpPortDesignatedBridgeId is a struct (BridgeId) of
+          # priority and MacAddress
+          #
+          dot1dStpPortDesignatedBridgePriority => INTEGER,
+          dot1dStpPortDesignatedBridgeAddress  => MacAddress,
+
+          # dot1dStpPortDesignatedPort is a struct (PortId) of
+          # priority and bridge port number
+          #
+          dot1dStpPortDesignatedPortPriority => INTEGER,
+          dot1dStpPortDesignatedPortNumber   => INTEGER,
+
+          },
+
+        ... ,
+      }
+
+    The structs BridgeId and PortId are already splitted by this mixin
+    method into the relevant values for your convenience.
+
+    The dot1dStpPort has the same value as the dot1dBasePort and isn't
+    necessarily the ifIndex of the switch.
+
+    See also the Net::SNMP::Mixin::Dot1dBase for a mixin to get the mapping
+    between the ifIndexes and the dot1dBasePorts if needed.
+
+INITIALIZATION
+  OBJ->_init($reload)
+    Fetch the dot1dSTP related snmp values from the host. Don't call this
+    method direct!
+
+PRIVATE SUBROUTINES
+  _fetch_dot1d_stp_group($session)
+    Fetch the local system data from the dot1dStp tree once during object
+    initialization.
+
+  _dot1d_stp_group_cb($session)
+    The callback for _fetch_dot1d_stp_group.
+
+  _fetch_dot1d_stp_port_tbl($session)
+    Fetch the dot1dStpPortTable once during object initialization.
+
+  _dot1d_stp_port_tbl_cb($session)
+    The callback for _fetch_dot1d_stp_port_tbl().
+
+  _unpack_bridge_id($bridgeId)
+    Split a bridge id in priority and MAC address. Returns a list of
+    (bridgePrio, bridgeMac).
+
+  _unpack_bridge_port_id($bridgePortId)
+    Split a bridge port id in priority and bridge port number. Returns a
+    list of (portPrio, portNumber).
+
+SEE ALSO
+    Net::SNMP::Mixin::Dot1dBase
+
+REQUIREMENTS
+    Net::SNMP, Net::SNMP::Mixin
+
+BUGS, PATCHES & FIXES
+    There are no known bugs at the time of this release. However, if you
+    spot a bug or are experiencing difficulties that are not explained
+    within the POD documentation, please submit a bug to the RT system (see
+    link below). However, it would help greatly if you are able to pinpoint
+    problems or even supply a patch.
+
+    Fixes are dependant upon their severity and my availablity. Should a fix
+    not be forthcoming, please feel free to (politely) remind me by sending
+    an email to gaissmai@cpan.org .
+
+      RT: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-SNMP-Mixin-Dot1dStp
+
+AUTHOR
+    Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
+
+COPYRIGHT & LICENSE
+    Copyright 2008-2016 Karl Gaissmaier, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

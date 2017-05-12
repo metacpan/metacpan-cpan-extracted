@@ -1,0 +1,226 @@
+
+SIMPLEWIRE, INC. SMS SOFTWARE DEVELOPMENT KIT EVALUATION LICENSE
+----------------------------------------------------------------
+
+SIMPLEWIRE IS WILLING TO LICENSE SMS SOFTWARE DEVELOPMENT KIT
+VERSION, VERSION 2 SOFTWARE TO YOU ONLY UPON THE CONDITION THAT
+YOU ACCEPT ALL OF THE TERMS CONTAINED IN THIS LICENSE AGREEMENT 
+("AGREEMENT"). PLEASE READ THE TERMS AND CONDITIONS OF THIS 
+LICENSE CAREFULLY. BY INSTALLING THIS SOFTWARE, YOU ACCEPT
+THE TERMS AND CONDITIONS OF THIS LICENSE AGREEMENT. IF YOU ARE 
+NOT WILLING TO BE BOUND BY ITS TERMS, DO NOT INSTALL OR USE 
+THIS SOFTWARE.
+
+1.0 DEFINITIONS 
+
+"Licensed Software" means the SMS Software Development Kit, 
+Version 2 Software in binary form, any other machine readable 
+materials (including, but not limited to, libraries, source 
+files, header files, and data files) and any user manuals, 
+programming guides and other documentation provided to Licensee
+by Simplewire, Inc. under this Agreement.
+
+2.0 LIMITED LICENSE
+
+Simplewire, Inc. grants to Licensee, a non-exclusive, 
+non-transferable, royalty-free and limited license to use 
+Licensed Software internally for the purposes of evaluation 
+only. No license is granted to Licensee for any other purpose. 
+Licensee may not sell, rent, loan or otherwise encumber or transfer
+Licensed Software in whole or in part, to any third party.
+
+3.0 LICENSE RESTRICTIONS
+
+3.1 Licensee may not duplicate Licensed Software other than 
+for a single copy of Licensed Software for archival purposes 
+only. Licensee agrees to reproduce any copyright and other 
+proprietary right notices on any such copy.
+
+3.2 Except as otherwise provided by law, Licensee may not 
+modify or create derivative works of the Licensed Software, 
+or reverse engineer, disassemble or decompile binary portions 
+of the Licensed Software, or otherwise attempt to derive the 
+source code from such portions.
+
+3.3 No right, title, or interest in or to Licensed Software, 
+any trademarks, service marks, or trade names of Simplewire 
+or Simplewire’s licensors is implied or granted under this Agreement.
+
+3.4 Licensee shall have no right to use the Licensed Software 
+for any commercial use whatsoever.
+
+4.0 NO SUPPORT
+
+Simplewire, Inc. is under no obligation to support Licensed 
+Software or to provide Licensee with updates or error corrections 
+(collectively "Software Updates"). If Simplewire, Inc., at its 
+sole option, supplies Software Updates to Licensee, the Software 
+Updates will be considered part of Licensed Software, and subject 
+to the terms of this Agreement.
+
+5.0 TERM AND TERMINATION OF AGREEMENT
+
+5.1 This Agreement will commence on the date on which Licensee 
+receives Licensed Software (the "Effective Date") and will expire 
+60 days from the Effective Date, unless terminated earlier as 
+provided below.
+
+5.2 Either party may terminate this Agreement upon ten (10) 
+days written notice to the other party. However, Simplewire 
+may terminate this Agreement immediately should any Licensed 
+Software become, or in Simplewire’s opinion be likely to become, 
+the subject of a claim of infringement of a patent, trade secret or
+copyright.
+
+5.3 Simplewire may terminate this Agreement immediately should 
+Licensee materially breach any of its provisions or take any 
+action in derogation of Simplewire’s rights to the Confidential 
+Information licensed to Licensee or if Simplewire believes Licensee's 
+use of the Licensed Software corrupts or otherwise interferes with 
+Simplewire's and/or any wireless carrier's computer system or other 
+operating business system.
+
+5.4 Upon termination or expiration of this Agreement, Licensee will
+immediately cease use of and destroy Licensed Software and any 
+copies thereof and provide Simplewire, Inc. a written statement 
+certifying that Licensee has complied with the foregoing obligations.
+
+5.5 Licensee's obligations under this Agreement will survive and 
+remain in effect after termination or expiration hereof.
+
+6.0 CONFIDENTIAL INFORMATION 
+
+6.1 For purposes of this Agreement, "Confidential Information" 
+means: (i)any information, including information regarding any 
+source code or binary code which Simplewire does not make publicly
+available and which Simplewire discloses to Licensee related to 
+Licensed Software; and (ii) the terms, conditions, and existence 
+of this Agreement. Licensee may not disclose Confidential 
+Information or use it except for the purposes specified in this
+Agreement. Licensee will protect the confidentiality of Confidential
+Information to the same degree of care, but no less than reasonable
+care, as Licensee uses to protect its own Confidential Information.
+Licensee's obligations regarding Confidential Information will 
+expire no less than five (5) years from the date of receipt of the
+Confidential Information, except for information regarding 
+Simplewire source code which will be protected in perpetuity. 
+Licensee agrees that Licensed Software contains trade secrets of
+Simplewire.
+
+6.2 Notwithstanding any provisions contained in this Agreement
+concerning nondisclosure and non-use of the Confidential 
+Information, the nondisclosure obligations of Section 6.1 will not
+apply to any portion of Confidential Information that a Licensee
+can demonstrate in writing is: (i) now, or hereafter through no act
+or failure to act on the part of Licensee becomes, generally known
+to the general public; (ii) hereafter rightfully furnished to 
+Li(ii) hereafter rightfully furnished to Licensee by a third party
+without restriction on disclosure.
+
+6.3 Licensee must restrict access to Confidential Information to 
+its employees or contractors with a need for this access to perform
+their employment or contractual obligations and who have agreed
+in writing to be bound by a confidentiality obligation which 
+incorporates the protections and restrictions substantially as set
+forth in this Agreement.
+
+7.0 DISCLAIMER OF WARRANTY
+
+7.1 Licensee acknowledges that Licensed Software may contain 
+errors. Licensee represents that the licensed software is not 
+designed or intended for use in the design, construction, 
+operation or maintenance of any nuclear facility ("High Risk 
+Activities"). Simplewire disclaims any express or implied warranty 
+of fitness for such uses. Licensee represents and warrants to 
+Simplewire that it will not use, distribute or license the 
+Licensed Software for High Risk Activities.
+
+7.2 LICENSED SOFTWARE IS PROVIDED "AS IS". ALL EXPRESS OR IMPLIED
+CONDITIONS, REPRESENTATIONS, AND WARRANTIES, INCLUDING ANY IMPLIED
+WARRANTY OF MERCHANTABILITY, SATISFACTORY QUALITY, FITNESS FOR A
+PARTICULAR PURPOSE, OR NON-INFRINGEMENT, ARE DISCLAIMED, EXCEPT TO
+THE EXTENT THAT SUCH DISCLAIMERS ARE HELD TO BE LEGALLY INVALID.
+
+8.0 LIMITATION OF LIABILITY 
+
+8.1 Licensee will indemnify and hold Simplewire (and its past, 
+present, and future officers, agents, contractors, joint venturers,
+employees, and directors (collectively the "Indemnified Parties"))
+harmless from any claims based on or related to Licensee's use of
+the Licensed Software. Licensee also indemnifies and holds the 
+Indemnified Parties harmless from any claims that later versions or
+releases of any Licensed Software furnished to Licensee are 
+incompatible with the Licensed Software provided to Licensee
+under this Agreement.
+
+8.2 Licensee shall have the sole responsibility to protect 
+adequately and backup Licensee's data and/or equipment used in
+connection with the Licensed Software. Licensee shall not claim 
+against Simplewire for lost data, re-run time, inaccurate output,
+work delays or lost profits resulting from Licensee' use of the 
+Licensed Software.
+
+8.3 Licensee acknowledges that Simplewire is under no obligation
+to release the Licensed Software as a product of Simplewire.
+
+8.4 Neither party will be liable for any indirect, punitive, 
+special, incidental or consequential damage in connection with or
+arising out of this Agreement (including loss of business, 
+revenue, profits, use, data or other economic advantage), 
+however it arises, whether for breach or in tort, even if that
+party has been previously advised of the possibility of such damage.
+
+9.0 GENERAL TERMS 
+
+9.1 This Agreement will be governed by laws of the State of 
+Michigan, U.S.A., and controlling U.S. federal law. The courts of
+Michigan (including the Federal District Court for the Eastern 
+District of Michigan) shall be the exclusive venue for resolution
+of any dispute under this agreement. The Licensee consents to the
+jurisdiction of the Michigan courts set out above and to any form 
+of service (including by fax and/or email), if said service 
+communicates actual knowledge of any related proceeding to the 
+Licensee. The U.N. Convention for the International Sale of Goods
+and the choice of law rules of any jurisdiction will not apply.
+This Agreement will be interpreted and performed in the English
+language.
+
+9.2 Licensed Software and technical data delivered under this 
+Agreement are subject to U.S. export control laws and may be 
+subject to export or import regulations in other countries. 
+Licensee agrees to comply strictly with all such laws and 
+regulations and acknowledges that it has the responsibility to 
+obtain such licenses to export, re-export or import as may be 
+required after delivery to Licensee. Licensee agrees to cooperate
+fully with any official or unofficial audit or inspection that
+relates to export controls. Licensee shall obtain any licenses
+and permits which are required by any nation to possess or use the
+Licensed Software.
+
+9.3 It is understood and agreed that, notwithstanding any other
+provision of this Agreement, Licensee's breach of the provisions
+of Section 3 and 6 of this Agreement will cause Simplewire
+irreparable damage for which recovery of money damages would be
+inadequate, and that Simplewire will therefore be entitled to seek
+timely injunctive relief to protect Simplewire’s rights under this
+Agreement in addition to any and all remedies available at law.
+
+9.4 Licensee may not assign or otherwise transfer any of its
+rights or obligations under this Agreement, without the prior
+written consent of Simplewire. Simplewire may assign this
+Agreement.
+
+9.5 Any tax, levy, or other governmental charge, which may be
+assessed against any party, and which is related to this 
+Licensee's possession or use of the Licensed Software, will be
+paid by Licensee.
+
+9.6 This Agreement is the parties' entire agreement relating to
+its subject matter. It supersedes all prior or contemporaneous
+oral or written communications, proposals, conditions, 
+representations and warranties and prevails over any conflicting
+or additional terms of any quote, order, acknowledgment, or other
+communication between the parties relating to its subject matter
+during the term of this Agreement. No modification to this 
+Agreement will be binding, unless in writing and signed by an
+authorized representative of each party.

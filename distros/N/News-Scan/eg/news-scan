@@ -1,0 +1,42 @@
+#! /usr/local/bin/perl -w
+
+use strict;
+
+use Data::Dumper 'DumperX';
+use News::Scan;
+
+my %aliases = (
+    'gbacon@hiwaay.net' => 'gbacon@cs.uah.edu',
+);
+
+my @exclude = (
+    'perlfaq-suggestions\@(?:.*\.)?perl\.com',
+);
+
+my $HOME = $ENV{HOME} || '/';
+my $spool = "$HOME/spool/comp.lang.perl.misc";
+my $scan = new News::Scan Group   => 'comp.lang.perl.misc',
+                          Spool   => $spool,
+                          Period  => 7,
+                          Aliases => \%aliases,
+                          Exclude => \@exclude,
+                          From    => 'spool';
+
+unless (defined $scan) {
+    die "$0: Failed to create News::Scan object!\n";
+}
+elsif ($scan->error) {
+    die "$0: Error: " . $scan->error . "\n";
+}
+
+$scan->scan;
+if ($scan->error) {
+    die "$0: Error: " . $scan->error . "\n";
+}
+
+$Data::Dumper::Indent = 0;  ## minimal whitespace
+$Data::Dumper::Purity = 1;  ## get correct topology at any cost
+
+print DumperX $scan;
+
+exit;

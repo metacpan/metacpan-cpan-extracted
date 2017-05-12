@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+MySQL.pm
+README
+t/0.load.t
+t/1.password32.t
+script/mysql.pl
+META.yml                                 Module meta-data (added by MakeMaker)

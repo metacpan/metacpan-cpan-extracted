@@ -1,0 +1,49 @@
+Revision history for Perl extension Net::NetSend.
+
+0.01  Wed Aug 11 23:16:54 2004
+	- original version; created by h2xs 1.21 with options
+		-AXn Net::NetSend
+		
+0.02  Wed Aug 11 23:46:51 2004
+	- bugfix last message of multi block message
+	- check MBM text packet return codes for success
+
+0.04  Thu Aug 12 00:24:13 2004
+	- check restriction of 4022 chars maximum message length
+	- Warnings AF_INET / SOCK_STREAM eliminated
+	- check MBM END packet return codes
+	- extra function for error checking in SMB return packets
+	- sendMsg now returns success/error code
+	
+0.05  Thu Aug 12 17:34:58 2004
+	- abort if session request fails
+	- set $@ if error occurs
+	- change some global vars to local ones
+	
+0.06  Thu Aug 12 17:48:14 2004
+	- comment cleanup
+	- add flexible debug messages	
+
+0.07  Fri Aug 13 13:12:19 2004
+	- useless "no strict" outcommented	
+	- fixed a bug that happened when splitting messages containing newlines
+	- added documentation
+	
+0.08  Fri Aug 13 15:52:52 2004
+	- added contact information
+	- bugix for error handling $@
+	- module renamed to Net::NetSend
+	- argument count check
+
+0.10  Fri Aug 13 17:18:05 2004
+	- POD documentation
+
+0.11  Sun Nov 11 15:04:28 2004
+	- max message size 4000 characters
+	- error message improvements
+	- bugfix for accumulating error texts
+	- extended documentation
+
+0.12  Sun Feb 20 17:03:34 2005
+	- method to lookup netbios name by IP address added
+	- minor code adjustments

@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 39f2dd45a30fba2ea69ebc3c662c4d0139e077a0 Changes
+SHA1 bcf25151d01a207955dbab3ecdbd872ff9cbac04 LICENSE
+SHA1 da476733d715cb45714819a1eae49d666e7d61ec MANIFEST
+SHA1 e2033556804f0c0efc260cf6fb5826c0af78ca0b META.json
+SHA1 9004d1291a79fd00f90697d89b11c02d377b3ccd META.yml
+SHA1 30bcc492bc87d08af1bf8438ba42b2e880d1a39b Makefile.PL
+SHA1 3704806c4e2ee40935aa87a8198ca675a3f2d0bc README
+SHA1 6e75818089c5c529287e5daee294cdcf85147ca2 doc/example.pl
+SHA1 afff7c14e5fe8cb0b0ae56a5067544f22f12efc6 lib/Net/SMS/Cellsynt.pm
+SHA1 eb3a6fbe44440bbd230cbbf8a07a4e50ec01f5ee t/distribution.t
+SHA1 ae5678c075d0bcb93fdf7c892738b91cf0f32790 t/input.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJUu4bGAAoJEFDVLxLOThOZyIwQAMvHwFUcrVRqBeubn74UK/om
+OwpTh0ljl7dk6VvanBWhwpVCAIGfFGzF02S8u5p613VsNd1PzrfgwOOa2kEW0yBS
+lmrvWVgW01TacGT0tu2wQQ0uc4af3aollJjHhHjs9KLwHXWT9V4bm3lMj097WIuR
+dmRvpvxud8/cg/j8ar4haU9IZB2QNgrjWcH8fSS6avfFtlZpQVI5cDwpWbmhrx+R
+Q6ZQxM/G/JaOFiVVK3BcE1NRZsiNGlBDeW8s+BSZ5qS1p2Z6m1u/iuc9u9gRck5r
+wDZzMrWlU292nXd4CyM0uWywzzhTSCpi9mjOPuQGJmlmeBJVPeWoR/FjXaFXW22F
+99QnhTG0mXU0nZkhFO0+VDpc+I2MJpmStHYoPzK07toeZ5lFhdhKWfgIyakks+5X
+xJzEINYfWvgB4x782KrgkO1iHEG5F6P6k9RD6RHjMVfHwzUIGp6c1142weLoCwdL
+qkXtisf8XRJZQ5wENavAIJBrunWmnZlV6I8l+avSMDuMDhyqOmPusZIOEPgx0ro0
+93FmzCwyhY4w8iaF9YThrinemdLXg8O/pmP4awRCsbOJ1ggHegBhDF25vD/bJmp6
+QEjIk8FIhtJLmrhD7IhLFSbxW2Md3vX3ksepKOAgs/zhDnMmSOb0xvNzeyfzLVCD
+pLoKb2VOFEmbQNa6nzH9
+=4ABp
+-----END PGP SIGNATURE-----

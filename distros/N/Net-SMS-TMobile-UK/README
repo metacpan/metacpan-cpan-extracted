@@ -1,0 +1,47 @@
+Net-SMS-TMobile-UK
+
+T-Mobile is a major mobile network. Their UK Website allows the sending of 
+'webtext' messages which are an SMS sent from the users mobile number and 
+charged against their mobile phone account. This module allows the sending
+of these messages - ideal if you pay for a bundle of SMS messages in advance.
+
+Please note that this module is nothing to do with T-Mobile, and will probably
+stop working should T-Mobile ever change the method for sms submission.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Net::SMS::TMobile::UK
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-SMS-TMobile-UK
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-SMS-TMobile-UK
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Net-SMS-TMobile-UK
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Net-SMS-TMobile-UK
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007,2008 Ben Charlton
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,246 @@
+# -*-n3-*-
+
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix doap:    <http://usefulinc.com/ns/doap#> .
+@prefix asc:     <http://aaronland.info/ns/changefile/> .
+
+<>
+        dc:identifier           "$Id: Changes,v 1.22 2009/08/02 17:16:12 asc Exp $" ;
+        dc:description          "Changes for Net::Flickr::API.pm" ;
+        dcterms:references      <http://aaronland.info/perl/net/flickr/api/> .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-API-1.7.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/api/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/api/Net-Flickr-API-1.69.tar.gz>;
+
+        doap:Version    [
+                        doap:revision     "1.7" ;
+                        doap:created      "2010-12-22" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Removed fancy versioning for dependencies" ;
+                        asc:update        "Require Flickr::API 1.04";
+                        asc:bugfix        "When setting up log dispatcher, check the return value not $!";
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-API-1.69.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/api/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/api/Net-Flickr-API-1.68.tar.gz>;
+
+        doap:Version    [
+                        doap:revision     "1.69" ;
+                        doap:created      "2009-08-02" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Add a wrapper method around Flickr::Upload" ;
+                        asc:update        "Require Flickr::API 1.02";
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-API-1.68.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/api/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/api/Net-Flickr-API-1.67.tar.gz>;
+
+        doap:Version    [
+                        doap:revision     "1.68" ;
+                        doap:created      "2008-02-08" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Require Flickr::API 0.9" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-API-1.67.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/api/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/api/Net-Flickr-API-1.66.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.67" ;
+                        doap:created      "2007-09-03" ;
+                        ];
+        asc:changes     [
+                        asc:addition      "Added 'get_auth' method" ;
+                        asc:addition      "Added 'get_auth_nsid' method" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-API-1.66.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/api/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/api/Net-Flickr-API-1.65.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.66" ;
+                        doap:created      "2007-08-01" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Don't bother calling 'string_value' on API errors; pointless and causes problems (RT#28576)" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-API-1.65.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/api/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/api/Net-Flickr-API-1.64.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.65" ;
+                        doap:created      "2007-05-31" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "That would be 'undef' $self not 'unself' $self..." ;
+                        asc:comment       "Added MANIFEST.SKIP" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-API-1.64.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/api/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/api/Net-Flickr-API-1.63.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.64" ;
+                        doap:created      "2006-12-08" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Fixed a syntax error :-(" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-API-1.63.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/api/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/api/Net-Flickr-API-1.62.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.63" ;
+                        doap:created      "2006-11-19" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Replaced all calls to $xml->findvalue() with $xml->find()->string_value() to account for XML::XPath::Literal string overloading" ;
+                        asc:update        "Trap calls to Flickr::API->execute_method()" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-API-1.62.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/api/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/api/Net-Flickr-API-1.61.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.62" ;
+                        doap:created      "2006-10-19" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Added _parse_results_xml; updated parse_api_call accordingly" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-API-1.61.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/api/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/api/Net-Flickr-API-1.6.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.61" ;
+                        doap:created      "2006-09-06" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Typo in error reporting" ;
+                        asc:bugfix        "Typo in method name" ;
+                        asc:update        "Added retry attempts if API is full-on disabled - if these fail THE PACKAGE WILL exit()" ;
+                        asc:update        "Updated POD" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-API-1.6.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/api/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/api/Net-Flickr-API-1.5.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.6" ;
+                        doap:created      "2006-09-01" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix        "Fix the fixes, dammit. Sorry about that folks... basically everything between (and including) 1.4 and 1.5x is a complete clusterfuck" ;
+                        asc:bugfix        "Load XML::LibXML so that it... you know, works" ;
+                        asc:update        "Pass method args and XML response to log->verbose()" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-API-1.5.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/api/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/api/Net-Flickr-API-1.5_01.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.5" ;
+                        doap:created      "2006-08-25" ;
+                        ];
+        asc:changes     [
+                        asc:update       "Bless as 1.5" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-API-1.5_01.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/api/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/api/Net-Flickr-API-1.4.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.5_01" ;
+                        doap:created      "2006-08-23" ;
+                        ];
+        asc:changes     [
+                        asc:update       "Enforce user defined 'api_handler' config option. THIS CHANGE IS NOT BACKWARDS COMPATIBLE." ;     
+                        asc:bugfix       "Back out changes from dev branch that were accidentally committed." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-API-1.4.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/api/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/api/Net-Flickr-API-1.3.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.4" ;
+                        doap:created      "2006-08-18" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix       "Ensure api signature is generated correctly" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-API-1.3.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/api/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/api/Net-Flickr-API-1.2.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.3" ;
+                        doap:created      "2006-06-22" ;
+                        ];
+        asc:changes     [
+                        asc:addition     "Added reporting handler" ;
+                        asc:update       "Require Flickr::API 0.09; require 'api_handler' config parameter" ;
+                        asc:update       "Convert Changes file to N3" ;
+                        asc:update       "Updated POD" ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-API-1.2.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/api/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/api/Net-Flickr-API-1.1.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.2" ;
+                        doap:created      "2005-12-17" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix       "ARGH. Return 1 like, you know, a module should." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-API-1.1.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/api/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/flickr/api/Net-Flickr-API-1.0.tar.gz>; 
+
+        doap:Version    [
+                        doap:revision     "1.1" ;
+                        doap:created      "2005-09-25" ;
+                        ];
+        asc:changes     [
+                        asc:bugfix       "Fixed POD typos." ;
+                        ] .
+
+<http://aaronland.info/perl/net/delicious/Net-Flickr-API-1.0.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/api/> ;
+
+        doap:Version    [
+                        doap:revision     "1.0" ;
+                        doap:created      "2005-09-25" ;
+                        ];
+        asc:changes     [
+                        asc:comment       "Initial release." ;
+                        ] .
+
+<http://aaronland.info/perl/net/flickr/api/>
+        a doap:Project ;
+        doap:download-page      "http://search.cpan.org/dist/Net-Flickr-API/" ;
+        doap:download-mirror    "http://aaronland.info/perl/net/flickr/api/" .

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="urn:logevent" xmlns:impl="urn:logevent" xmlns:intf="urn:logevent" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+<!--WSDL created by Apache Axis version: 1.2.1
+Built on Jun 14, 2005 (09:15:57 EDT)-->
+ <wsdl:types>
+  <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:logevent">
+   <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+   <complexType name="LogEventInfo">
+    <sequence>
+     <element name="acknowledged" type="xsd:int"/>
+     <element name="alert" type="xsd:boolean"/>
+     <element name="elementId" type="xsd:int"/>
+     <element name="eventId" type="xsd:int"/>
+     <element name="message" nillable="true" type="xsd:string"/>
+     <element name="severity" type="xsd:int"/>
+     <element name="source" nillable="true" type="xsd:string"/>
+     <element name="timestamp" type="xsd:long"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOfLogEventInfo">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="impl:LogEventInfo[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+  </schema>
+ </wsdl:types>
+
+   <wsdl:message name="ackAlertResponse">
+
+      <wsdl:part name="ackAlertReturn" type="xsd:boolean"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="ackAlertRequest">
+
+      <wsdl:part name="eventId" type="xsd:int"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="clrAlertRequest">
+
+      <wsdl:part name="eventId" type="xsd:int"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="clrAlertResponse">
+
+      <wsdl:part name="clrAlertReturn" type="xsd:boolean"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getLogEventsRequest">
+
+      <wsdl:part name="severity" type="xsd:int"/>
+
+      <wsdl:part name="includingHigherSeverity" type="xsd:boolean"/>
+
+      <wsdl:part name="startTime" type="xsd:long"/>
+
+      <wsdl:part name="endTime" type="xsd:long"/>
+
+      <wsdl:part name="acknowledgeStatus" type="xsd:int"/>
+
+      <wsdl:part name="eventType" type="xsd:int"/>
+
+      <wsdl:part name="elementId" type="xsd:int"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getEventByIdRequest">
+
+      <wsdl:part name="id" type="xsd:int"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getLogEventsResponse">
+
+      <wsdl:part name="getLogEventsReturn" type="impl:ArrayOfLogEventInfo"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getEventByIdResponse">
+
+      <wsdl:part name="getEventByIdReturn" type="impl:LogEventInfo"/>
+
+   </wsdl:message>
+
+   <wsdl:portType name="LogEventIf">
+
+      <wsdl:operation name="getEventById" parameterOrder="id">
+
+         <wsdl:input name="getEventByIdRequest" message="impl:getEventByIdRequest"/>
+
+         <wsdl:output name="getEventByIdResponse" message="impl:getEventByIdResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getLogEvents" parameterOrder="severity includingHigherSeverity startTime endTime acknowledgeStatus eventType elementId">
+
+         <wsdl:input name="getLogEventsRequest" message="impl:getLogEventsRequest"/>
+
+         <wsdl:output name="getLogEventsResponse" message="impl:getLogEventsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="ackAlert" parameterOrder="eventId">
+
+         <wsdl:input name="ackAlertRequest" message="impl:ackAlertRequest"/>
+
+         <wsdl:output name="ackAlertResponse" message="impl:ackAlertResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="clrAlert" parameterOrder="eventId">
+
+         <wsdl:input name="clrAlertRequest" message="impl:clrAlertRequest"/>
+
+         <wsdl:output name="clrAlertResponse" message="impl:clrAlertResponse"/>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="LogEventIfServiceSoapBinding" type="impl:LogEventIf">
+
+      <wsdlsoap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="getEventById">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getEventByIdRequest">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:logevent"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getEventByIdResponse">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:logevent"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getLogEvents">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getLogEventsRequest">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:logevent"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getLogEventsResponse">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:logevent"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="ackAlert">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="ackAlertRequest">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:logevent"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="ackAlertResponse">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:logevent"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="clrAlert">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="clrAlertRequest">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:logevent"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="clrAlertResponse">
+
+            <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:logevent"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="LogEventIfService">
+
+      <wsdl:port name="LogEventIfService" binding="impl:LogEventIfServiceSoapBinding">
+
+         <wsdlsoap:address location="http://localhost:80/prizm/nbi/LogEventIfService"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>

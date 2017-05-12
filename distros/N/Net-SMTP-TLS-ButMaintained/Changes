@@ -1,0 +1,55 @@
+Revision history for Net-SMTP-TLS-ButMaintained
+
+0.24    May 12, 2013
+    typo fix
+
+0.23    May 12, 2013
+    deprecated notice: please use Net::SMTPS instead.
+
+0.22    May 11, 2013
+    Correct envelope sender & recipient format by Matt Simerson (GH #2)
+
+0.21    Dec 5th, 2012
+    fix "invalid SSL_version specified at IO/Socket/SSL..." by Nick S. Knutov
+
+0.20    Jul 3rd, 2012
+    fix hardcoding TLSv1 by Stuart Henderson
+
+0.19    Jun 17th, 2012
+    fix Misuse of IO::Socket::SSL (RT 77865, by Christopher Orsolits)
+
+0.18    Jun 20th, 2011
+    FIX NOTESTS
+
+0.17    May 25th, 2011
+    clean continuation lines after connect (RT 68403, thanks to Chris Baker)
+
+0.16    Apr 23th, 2011
+    from %S to %s in auth_PLAIN (RT 67608, thanks to khaled.blah)
+
+0.15    Apr 8th, 2011
+    remove $VERSION inside code
+
+0.14    Apr 8th, 2011
+    version up
+
+0.13    Jan 1st, 2011
+    a real go
+
+0.13_01    Nov 13th, 2010
+    bug fixes (RT 33031)
+
+0.10    Dec 28th, 2005
+    First version, released on an unsuspecting world.
+	Lots of stuff that could be done for future versions, such as better
+	tests, and better documentation.
+
+0.11	Jan 5th, 2006
+	POD tests are a nuisance, removed. Also, per Michal Ludwig's
+	suggestion, TLS is not forced, but is now turned on/off by a flag.
+
+0.12	Jan 17th, 2006
+	Tomek Zielinski kindly submitted patches to improve RFC compliance
+	as well as adhere more closely to Net::SMTP's interface. Having spoken
+	to the author of Net::SMTP, I'm planning to go back to the plan of
+	inheriting from there once some changes have been made to Net::CMD.

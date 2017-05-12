@@ -1,0 +1,19 @@
+
+README for Net::NISplusTied
+---------------------------
+
+The Net::NISplusTied allows you to treat NIS+ tables as if they were perl
+hashes, using tie() semantics.  It has cultural links to Rick Harris
+(Rik.Harris@fulcrum.com.au) NISperl module, although the design goals were
+different.  All you can do with Net::NISplusTied is to manipulate NIS+ tables.
+ 
+If you need faithful NIS+ API implementation, consider using NISperl
+instead.  The assumption was that one would rarely need to create and delete
+NIS+ tables and groups from perl, at least not often enough to be seriously
+inconvenienced by having to invoke shell NIS+ commands.
+
+Thanks to SlipNet Inc. (www.slip.net) for sponsoring the development.
+
+--
+Ilya Ketris <ilya@gde.to>
+

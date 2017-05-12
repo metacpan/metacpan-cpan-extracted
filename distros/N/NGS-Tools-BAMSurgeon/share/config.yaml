@@ -1,0 +1,54 @@
+---
+tumour_name: "test"
+working_dir: '/path/to/working/dir'
+somatic_profile: "/path/to/somatic.yaml"
+germline_profile: "/path/to/germ_mut.yaml"
+bam: 'test.bam'
+sex: 'M'
+gpercent: 0.7
+seed: 12345
+# parameters for choosing mutations to spike in
+indel_minlen: 1
+indel_maxlen: 90
+indel_types: 'INS,DEL'
+sv_minlen: 3000
+sv_maxlen: 30000
+sv_types: 'DUP,INV'
+phasing: 0
+redochrs: 'all'
+# defined mutations to be chosen from
+vcf_file:
+# tune mutation rates of genomic regions by their replication time
+rep_time_effect: 1
+# trinucleotide signature of tumour
+signatures:
+    Signature 1A: 0.92
+    Signature 9: 0.08
+# if the above 'signatures' dictionary not specified, the 'cancer' dictionary below will be used
+cancer: 
+    name: Prostate Cancer
+    mut_vary: 0
+    sig_vary: 0
+# parameters for generating vaf
+minvaf: 1
+maxvaf: 1
+vafbeta1: 2.0
+vafbeta2: 2.0
+reference: "/path/to/ref/hs37d5.fa"
+loci: "/path/to/loci"
+stages:
+    splitbam: 1
+    preparef: 1
+    pickgermmut: 1
+    germsim: 1
+    generatecallable: 1
+    picksomaticmut: 1
+    picktrinucleotides: 1
+    splitsubclones: 1
+    somaticsim: 1
+    makevcf: 1
+    extractleafs: 1
+    mergephases: 1
+    mergechromosomes: 1
+    mergefinal: 1
+    allelecount: 1

@@ -1,0 +1,49 @@
+Revision history for Net-DNS-CloudFlare-DDNS
+
+v0.63.1   2016-03-28
+ - Test with TravisCI
+ - use new interface of CloudFlare::Client
+ - update dist.ini
+ - Move to github
+ - switch to V-string
+ - Fix previous version changelog
+ - Changes to work with Pod::Weave / Test::Synopsis properly
+
+0.06_3    2014-10-02
+ - Fix more bugs
+ - Bits and bobs
+ - Update repo info - git repo split
+
+0.06_2    2014-08-26
+ - Fix bugs
+
+0.06_1    2014-08-19
+ - Moo -> Moose
+ - add no indirect 'fatal'
+ - Zone IDs are updated per each batch of updates so online changes to DNS
+   don't cause problems
+ - Failures are handled per DNS record update
+ - Rewrite to be resilient and fault tolerant. Failures of any expected type
+   handled without dying
+ - Rewrite to use CloudFlare::Client
+ - Use IP lookup services in a random order
+ - Use Dist::Zilla to build
+
+0.06    2013-03-06
+ - Lower depenency versions
+
+0.05    2013-11-13
+ - Fix docs
+ - Prettify code
+
+0.04    2013-11-06
+ - Sort out POD properly
+
+0.03    2013-11-06
+ - Split into Net::DNS::CloudFlare::DDNS
+
+0.02    2013-10-30
+ - Added -v switch
+
+0.01    2013-10-30
+ - Part of DDFlare

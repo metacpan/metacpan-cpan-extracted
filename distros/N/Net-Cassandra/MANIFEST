@@ -1,0 +1,22 @@
+bin/build_cassandra.pl
+CHANGES
+examples/simple.pl
+lib/Net/Cassandra.pm
+lib/Net/Cassandra/Backend/Cassandra.pm
+lib/Net/Cassandra/Backend/Constants.pm
+lib/Net/Cassandra/Backend/Thrift.pm
+lib/Net/Cassandra/Backend/Thrift/BinaryProtocol.pm
+lib/Net/Cassandra/Backend/Thrift/BufferedTransport.pm
+lib/Net/Cassandra/Backend/Thrift/FramedTransport.pm
+lib/Net/Cassandra/Backend/Thrift/HttpClient.pm
+lib/Net/Cassandra/Backend/Thrift/MemoryBuffer.pm
+lib/Net/Cassandra/Backend/Thrift/Protocol.pm
+lib/Net/Cassandra/Backend/Thrift/Server.pm
+lib/Net/Cassandra/Backend/Thrift/Socket.pm
+lib/Net/Cassandra/Backend/Thrift/Transport.pm
+lib/Net/Cassandra/Backend/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

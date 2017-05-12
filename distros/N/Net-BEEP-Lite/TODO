@@ -1,0 +1,13 @@
+High Priority:
+
+  * Better error condition checking.  The BEEP standard describes a
+    number of conditions to check for that will result in an aborted
+    session.  Currently, the package only checks for a few of them.
+
+  * Improve the MIME handling in Message.  It is currently very lame.
+
+Low(er) Priority:
+
+  * various SASL profiles.
+
+  * a multiple message send method.

@@ -1,0 +1,63 @@
+Number::Spice groups functions for converting plain decimal numbers to/from
+the shortened Spice syntax, i.e. a decimal number followed by a literal suffix
+representing some unit.
+
+Number::Spice was written to support the number format used in the syntax
+for netlists for the spice electrical circuit simulator. This number
+format is also used in other applications, even in different fields.
+Number::Spice can be used to any purpose, and does not require the
+installation of the spice simulator.
+
+Spice syntax provides a shortcut for writing down numbers in scientific 
+notation, by appending a suffix to the value which corresponds to a
+numeric multiplier. The following table lists the minimal suffices and
+the corresponding multiplier:
+
+	T	1.0E12
+	G	1.0E9
+	MEG	1.0E6
+	X	1.0E6
+	K	1.0E3
+	M	1.0E-3
+	MIL	2.54E-5 (i.e. 1/1000 inch)
+	U	1.0E-6
+	N	1.0E-9
+	P	1.0E-12	
+	F	1.0E-15
+	A	1.0E-18
+
+REQUIREMENTS
+
+perl 5.004_04 or greater is needed
+
+AVAILABILITY
+
+The latest version of this package is available for download from a CPAN
+(Comprehensive Perl Archive Network) site near you at
+
+	http://www.perl.com/CPAN/authors/id/W/WI/WIMV/
+
+or from my FTP site:
+
+	ftp://ftp.esat.kuleuven.ac.be/pub/micas/verhaege/perl/CPAN/WIMV/
+
+INSTALLATION
+
+You would install Number::Spice like you would install any other module,
+by running these commands
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+AUTHOR
+
+Wim Verhaegen <wim.verhaegen@ieee.org>
+
+COPYRIGHT
+
+Copyright (c) 2000 Wim Verhaegen. All rights reserved. 
+This program is free software; you can redistribute
+and/or modify it under the same terms as Perl itself.
+

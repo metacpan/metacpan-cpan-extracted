@@ -1,0 +1,18 @@
+Revision history for Perl module Nagios::Plugin::Simple
+
+0.06 2011-01-18
+  - Added spec file to distribution
+0.05 2009-10-11
+  - changed perl -e 'xxx' to perl -e "xxx" so that tests work on Win32
+0.04 2008-10-29
+  - POD issue
+  - Documentation
+0.03 2008-10-29
+  - added status, code and codes methods
+  - changed all methods to call status method
+0.02 2008-10-01
+  - ok() no longer gives undef warning
+  - Documentation
+  - Updated tests
+0.01 2008-10-01
+  - original version

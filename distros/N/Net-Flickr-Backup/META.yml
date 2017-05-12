@@ -1,0 +1,35 @@
+---
+abstract: 'OOP for backing up your Flickr photos locally'
+author:
+  - 'Aaron Straup Cope E<lt>ascope@cpan.orgE<gt>'
+build_requires:
+  Test::Simple: 0.47
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Flickr-Backup
+provides:
+  Net::Flickr::Backup:
+    file: lib/Net/Flickr/Backup.pm
+    version: 3.1
+requires:
+  Date::Format: 2.22
+  Date::Parse: 2.27
+  Encode: 2.09
+  File::Find::Rule: 0
+  IO::AtomicFile: 2.101
+  IO::Scalar: 0
+  Image::MetaData::JPEG: 0.15
+  LWP::Simple: 1.38
+  Memoize: 0
+  Net::Flickr::RDF: 2.2
+  Sys::Hostname: 0
+  Text::Unidecode: 0.04
+  perl: v5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 3.1

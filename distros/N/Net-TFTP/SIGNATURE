@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 5399494c9236e02bb609829f4075482def484f26 ChangeLog
+SHA1 a9352dbecbffdaf29cde1f2d58b3847fd2659d43 MANIFEST
+SHA1 c793957fbee32179e289a2b60098de470928db76 META.json
+SHA1 0527b8f8e881b8f4b63c7bedfd24b60674a946a6 META.yml
+SHA1 f9d8a6e97b84526cb0074b595b16913aff3eb746 Makefile.PL
+SHA1 9044bc5ec03ee5bee19c8b9c5c68a6a05f6fcb83 README
+SHA1 9efc7a893d595aec06a1f635937e6453d1848ec5 TFTP.pm
+SHA1 bf8966b89de40e8c1200ea7a12a831d1a77f78bf t/00-load.t
+SHA1 b62e4dd85e37ad5293d3cbc58930be6ceb5eaba4 t/01-get.t
+SHA1 10b3eb59c4a04696f21a30a85701b18227431e1b t/02-new.t
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/files/directory/empty
+SHA1 e04ff2983499c33b1597bd03d23b30ec20d78a61 t/files/source
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCAAGBQJYsNI8AAoJEF0awSLzqjNN3IQP/iBhLdbXQpYKKzzVqAnyfu2L
+TMKfJPCg2+DQnt4si97hxOSsVuy02chIYyDjOMDbyhSEivVBbR1SvY4EV4Ubb5HI
+snTLgjM+Iz/GVrrPHh44lHs+X1afzT5IEM57Ny8Xo/1Jnn5rk/MvKmZtFhWXn012
+ocWm/7z1gXySRJQPM9Zuxpl/mbUqObz5gsXYwIRwTE7yK8BDf5va0ZhnUI9wTCG/
+X72jUkBaFHrSG01iYlKeru/LM6VwwdQY3BSaq/GbHHZ1qrEqJe6Hu16brpyJPsrX
+VUTpcSaOEv/UNSObBqXBMu6R7lBjCHzGuUAn6b7gJKUBRGbh0IfKvvoMyoJF2/aC
+NhCHCRlSJeIvlwNF9P5ZzsTY12pYF9XzXqV7zEs0LJsr/lhYdb9bRkvFJBUf6vmv
+lvskd6Lk6Zwe+udAnM0tEp6apXz0UYkMcGse47d6NCOwPXdJWB65vOkO4M9ZKVIY
+3TPuYG8DOx3eX+Zo0gIbIi763c8zDhCHo6YPrBjdgda+HqbagWfEQOsTo+U+iSw/
+xqHdndGvhKyQ4abuP0rc6iVHTgrLp+3jGKsJVCUVwmkVlHgnMjGAmMxxIe4GEUpa
+jRCVfJKDoARhjCrFaDTntUIeoFuPs6efNBGilnHbDeG+C4Hn24TXjwjWhblDQhTY
+zY83P9ibLK1tlUOx6JVX
+=k1rr
+-----END PGP SIGNATURE-----

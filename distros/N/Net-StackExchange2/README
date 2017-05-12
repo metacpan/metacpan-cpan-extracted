@@ -1,0 +1,69 @@
+Net-StackExchange2-
+
+This module is a perl wrapper to the stack exchange api. It mostly has a one to one mapping with the api methods documented here : http://api.stackexchange.com/docs
+
+The following StackExchange entities/types are supported (They are described in above url):
+
+Answers
+Badges
+Comments
+Events
+Info
+Posts
+Privileges
+Questions
+Revisions
+Search
+Suggested-Edits
+Tags
+Users
+
+Network Methods:
+Access-Tokens
+Applications
+Errors
+Filters
+Inbox
+Notifications
+Sites
+Users
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::StackExchange2
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-StackExchange2
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-StackExchange2
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-StackExchange2
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-StackExchange2/
+
+
+LICENSE AND COPYRIGHT
+Copyright 2013 Gideon Israel Dsouza.
+
+This library is distributed under the freebsd license:
+
+L<http://opensource.org/licenses/BSD-3-Clause> 
+See FreeBsd in TLDR : L<http://www.tldrlegal.com/license/bsd-3-clause-license-(revised)>

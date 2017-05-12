@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+bin/find-openid-server.pl
+cpanfile
+examples/sample-server.pl
+lib/Net/OpenID/Consumer/Lite.pm
+t/00_compile.t
+xt/001_mixi.t
+xt/002_ssl_check.t
+xt/02_perlcritic.t
+META.yml
+MANIFEST

@@ -1,0 +1,42 @@
+# -*- perl -*-
+#
+#   $Id: server,v 1.1.1.1 1999/07/27 00:37:34 joe Exp $
+#
+#   This example implements a very simple spooler by using the
+#   "process" script. When a client connects and passes a file,
+#   then a number is read from the file and written into process.res.
+#
+
+require 5.004;
+use strict;
+
+use lib qw(blib/arch blib/lib);
+
+
+$| = 1;
+
+use Net::Spooler::Test ();
+use IO::Socket ();
+
+package TestSpooler;
+
+use vars qw($VERSION @ISA);
+
+$VERSION = '0.01';
+@ISA = qw(Net::Spooler::Test);
+
+
+sub Version ($) {
+    return "TestSpooler - A very simple spooler";
+}
+
+
+package main;
+
+my $server = TestSpooler->new({ 'pidfile' => 'none' }, \@ARGV);
+
+eval { $server->Bind() };
+print STDERR "Unexpected return from Bind().\n"
+    if (!$server->Done());
+
+print STDERR "Server died: $@\n" if $@;

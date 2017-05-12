@@ -1,0 +1,625 @@
+AOLIM(3)              User Contributed Perl Documentation             AOLIM(3)
+
+
+
+NNAAMMEE
+       Net::AOLIM - Object-Oriented interface to the AOL Instant Messenger TOC
+       client protocol
+
+SSYYNNOOPPSSIISS
+       The really short form:
+
+           use Net::AOLIM;
+           $aim = Net::AOLIM->new('username' => $user,
+                                  'password' => $pass,
+                                  'callback' => \&handler);
+
+           $aim->signon;
+
+           $aim->toc_send_im($destuser, $message);
+
+NNOOTTEESS
+       Error conditions will be stored in $main::IM_ERR, with any arguments to
+       the error condition stored in $main::IM_ERR_ARGS.
+
+       The hash %Net::AOLIM::ERROR_MSGS contains english translations of all
+       of the error messages that are either internal to the module or partic-
+       ular to the TOC protocol.
+
+       Errors may take arguments indicating a more specific failure condition.
+       In this case, they will either be stored in $main::IM_ERR_ARGS or they
+       will come from the server ERROR message.  To insert the arguments in
+       the proper place, use a construct similar to:
+
+           $ERROR = $Net::AOLIM::ERROR_MSGS{$IM_ERR};
+           $ERROR =~ s/\$ERR_ARG/$IM_ERR_ARGS/g;
+
+       This assumes that the error code is stored in $IM_ERR and the error
+       argument is stored in $IM_ERR_ARGS.
+
+       All methods will return undef on error, and will set $main::IM_ERR and
+       $main::IM_ERR_ARGS as appropriate.
+
+       It seems that TOC servers won't acknowledge a login unless at least one
+       buddy is added before toc_init_done is sent.  Thus, as of version 1.6,
+       Net::AOLIM will add the current user to group "Me" if you don't create
+       your buddy list before calling _s_i_g_n_o_n_(_).  Don't bother removing this if
+       you have added your buddies; it'll automagically disappear.
+
+DDEESSCCRRIIPPTTIIOONN
+       This section documents every member function of the Net::AOLIM class.
+
+       $$NNeett::::AAOOLLIIMM-->>_n_e_w_(_)
+
+       This is the Net::AOLIM Constructor.
+
+       It should be called with following arguments (items with default values
+       are optional):
+
+           'username' => login
+           'password' => password
+           'callback' => \&callbackfunction
+           'server' => servername (default toc.oscar.aol.com)
+           'port' => port number (default 1234)
+           'allow_srv_settings' => <1 | 0> (default 1)
+           'login_server' => login server (default login.oscar.aol.com)
+           'login_port' => login port (default 5198)
+           'login_timeout' => timeout in seconds to wait for a response to the
+                              toc_signon packet.  Default is 0 (infinite)
+           'aim_agent' => agentname (max 200 char)
+                       Default is AOLIM:$Version VERSION$
+                       There have been some reports that changing this
+                       may cause TOC servers to stop responding to signon
+                       requests
+
+       callback is the callback function that handles incoming data from the
+       server (already digested into command plus args).  This is the meat of
+       the client program.
+
+       allow_srv_settings is a boolean that dictates whether the object should
+       modify the user configuration on the server.  If allow_srv_settings is
+       false, the server settings will be ignored and will not be modified.
+       Otherwise, the server settings will be read in and parsed, and will be
+       modified by calls that modify the buddy list.
+
+       aim_agent is the name of the client program as reported to the TOC
+       server
+
+       Returns a blessed instantiation of Net::AOLIM.
+
+       $$aaiimm-->>_s_i_g_n_o_n_(_)
+
+       Call this after calling "new()" and after setting initial buddy list-
+       ings with "add_buddies()", "im_permit()", "im_deny()", "im_per-
+       mit_all()", and "im_deny_all()" as necessary.
+
+       Returns undef on failure, setting $main::IM_ERR and $main::IM_ERR_ARGS
+       as appropriate.  Returns 0 on success.
+
+       This function is also called every time we receive a SIGN_ON packet
+       from the server.  This is because we are required to react in a spe-
+       cific way to the SIGN_ON packet, and this method contains all necessary
+       functionality.  We should only receive SIGN_ON while connected if we
+       have first received a PAUSE (see the _TT_OO_CC((77)) documentation included with
+       this package for details of how PAUSE works).
+
+       $$aaiimm-->>_r_e_a_d___s_f_l_a_p___p_a_c_k_e_t_(_)
+
+       This method returns data from a single waiting SFLAP packet on the
+       server socket.  The returned value is the payload section of the SFLAP
+       packet which is completely unparsed.
+
+       Most users will never need to call this method.
+
+       For more information, see RROOLLLLIINNGG YYOOUURR OOWWNN below and the _TT_OO_CC((77)) man-
+       page.
+
+       $$aaiimm-->>sseenndd__ssffllaapp__ppaacckkeett(($$ttyyppee,, $$ddaattaa, $formatted, $noterm)
+
+       This method sends an SFLAP packet to the server.
+
+       $type is one of the SFLAP types (see _TT_OO_CC((77))).
+
+       $data is the payload to send.
+
+       If $formatted evaluates to true, the data is assumed to be the com-
+       pletely formed payload of the SFLAP packet; otherwise, the payload will
+       be packed as necessary.  This defaults to 0.  In either case, the
+       header is prepended to the payload.
+
+       If $noterm evaluates to true, the payload will not be terminated with a
+       '\0'.  Otherwise, it will be terminated.  If $formatted is true, this
+       option is ignored and no null is appended.  This defaults to 0.
+
+       Most users will never need to use this method.
+
+       For more information, see _TT_OO_CC((77)) and RROOLLLLIINNGG YYOOUURR OOWWNN below.
+
+       $$aaiimm-->>_s_r_v___s_o_c_k_e_t_(_)
+
+       This method returns a reference to the socket to which the server is
+       connected.  It must be dereferenced before it can be used.  Thus:
+
+       "$foo = $aim->srv_socket();" "recv($$foo, $recv_buffer, $length,
+       $flags);"
+
+       Most users will never need to directly access the server socket.
+
+       For more information, see the _TT_OO_CC((77)) manpage and RROOLLLLIINNGG YYOOUURR OOWWNN
+       below.
+
+       $$aaiimm-->>ppww__rrooaasstt(($$ppaasssswwoorrdd))
+
+       This method returns the 'roasted' version of a password.  A roasted
+       password is the original password XORed with the roast string 'Tic/Toc'
+       (which is repeated until the length is the same as the password
+       length).
+
+       This method is called automatically in $aim->signon.  Most users will
+       never need this method.
+
+       For more information, see the _TT_OO_CC((77)) manpage and RROOLLLLIINNGG YYOOUURR OOWWNN
+       below.
+
+       $$aaiimm-->>nnoorrmm__uunnaammee(($$uusseerrnnaammee))
+
+       This method returns the 'normalized' version of a username.  A normal-
+       ized username has all spaces removed and is all lowercase.  All user-
+       names sent to the server should be normalized first if they are an
+       argument to a TOC command.
+
+       All methods in this class automatically normalize username arguments to
+       the server; thus, most users will never use this method.
+
+       For more information, see the _TT_OO_CC((77)) manpage and RROOLLLLIINNGG YYOOUURR OOWWNN
+       below.
+
+       $$aaiimm-->>ttoocc__ffoorrmmaatt__mmssgg(($$ccoommmmaanndd[[,, $$aarrgg11[[,, aarrgg22[[,, ......]]]]]]))
+
+       This method formats a message properly for sending to the TOC server.
+       That is, it is escaped and quoted, and the fields are appended with
+       spaces as specified by the protocol.
+
+       Note that all methods in this class automatically format messages
+       appropriately; most users will never need to call this method.
+
+       See _TT_OO_CC((77)) and RROOLLLLIINNGG YYOOUURR OOWWNN below.
+
+       $$aaiimm-->>ttoocc__ffoorrmmaatt__llooggiinn__mmssgg(($$ccoommmmaanndd[[,, $$aarrgg11[[,, aarrgg22[[,, ......]]]]]]))
+
+       This method formats a login message properly for sending to the TOC
+       server.  That is, all fields are escaped, but only the user_agent field
+       is quoted.  Fields are separated with spaces as specified in the TOC
+       protocol.
+
+       Note that the login procedure calls this function automatically; the
+       user will probably never need to use it.
+
+       See _TT_OO_CC((77)) and RROOLLLLIINNGG YYOOUURR OOWWNN below.
+
+       $$aaiimm-->>ttoocc__sseenndd__iimm(($$uunnaammee,, $$mmssgg, $auto)
+
+       This method sends an IM message $msg to the user specified by $uname.
+       The third argument indicates whether or not this IM should be sent as
+       an autoreply, which may produce different behavior from the remote
+       client (but has no direct effect on the content of the IM).
+
+       $$aaiimm-->>aadddd__bbuuddddiieess(($$ggrroouupp,, $$bbuuddddyy11[, $buddy2[, ...]])
+
+       This method, which should only be called bbeeffoorree _ss_ii_gg_nn_oo_nn_((_)), adds buddies
+       to the initial local buddy list in group $group.  Once "signon()" is
+       called, use add_online_buddies instead.
+
+       $$aaiimm-->>aadddd__oonnlliinnee__bbuuddddiieess(($$ggrroouupp,, $$bbuuddddyy11[, $buddy2[, ...]])
+
+       This method takes the same arguments as "add_buddies()", but is
+       intended for use after "signon()" has been called.
+
+       If allow_srv_settings is true (see "new()"), it will also set the set-
+       tings on the server to the new settings.
+
+       $$aaiimm-->>rreemmoovvee__oonnlliinnee__bbuuddddiieess(($$bbuuddddyy11[[,, $$bbuuddddyy22[[,, ......]]]]))
+
+       Removes all arguments from the buddy list (removes from all groups).
+
+       If allow_srv_settings is true (see "new()"), it will also set the set-
+       tings on the server to the new settings.
+
+       $$aaiimm-->>ccuurrrreenntt__bbuuddddiieess((\\%%bbuuddddyyhhaasshh))
+
+       This method fills the hash referenced by "\%buddyhash" with the cur-
+       rently stored buddy information.  Each key in the returned hash is the
+       name of a buddy group, and the corresponding value is a list of the
+       members of that group.
+
+       $$aaiimm-->>_c_u_r_r_e_n_t___p_e_r_m_i_t_s_(_)
+
+       This method takes no arguments.  It returns the current 'permit' list.
+
+       $$aaiimm-->>_c_u_r_r_e_n_t___d_e_n_i_e_s_(_)
+
+       This method takes no arguments.  It returns the current 'deny' list.
+
+       $$aaiimm-->>iimm__ppeerrmmiitt(($$uusseerr11[[,, $$uusseerr22[[,, ......]]]]))
+
+       This method should only be called bbeeffoorree _ss_ii_gg_nn_oo_nn_((_)).  It adds all argu-
+       ments to the current permit list and deletes the current deny list.  It
+       also sets the permit mode to 'permit some'.
+
+       If you would like to do this while online, use the "add_im_permit()"
+       method instead.
+
+       $$aaiimm-->>iimm__ddeennyy(($$uusseerr11[[,, $$uusseerr22[[,, ......]]]]))
+
+       This method should only be called bbeeffoorree _ss_ii_gg_nn_oo_nn_((_)).  It adds all argu-
+       ments to the current deny list and deletes the current permit list.  It
+       also sets the permit mode to 'deny some'.
+
+       If you would like to do this while online, use the "add_im_permit()"
+       method instead.
+
+       $$aaiimm-->>aadddd__iimm__ppeerrmmiitt(($$uusseerr11[[,, $$uusseerr22[[,, ......]]]]))
+
+       This is the method that should be called if you are online and wish to
+       add users to the permit list.  It will, as a consequence, delete the
+       current deny list and set the current mode to 'permit some'.
+
+       $$aaiimm-->>aadddd__iimm__ddeennyy(($$uusseerr11[[,, $$uusseerr22[[,, ......]]]]))
+
+       This is the method that should be used if you are online and wish to
+       add users to the deny list.  It will, as a consequence, delete the cur-
+       rent permit list and set the current mode to 'deny some'.
+
+       $$aaiimm-->>_i_m___d_e_n_y___a_l_l_(_)
+
+       This method should be called only bbeeffoorree _ss_ii_gg_nn_oo_nn_((_)).  It will delete both
+       the permit and deny list and set the mode to 'deny all'.
+
+       $$aaiimm-->>_i_m___p_e_r_m_i_t___a_l_l_(_)
+
+       This method should be called only bbeeffoorree _ss_ii_gg_nn_oo_nn_((_)).  It will delete both
+       the permit and deny list and set the mode to 'permit all'.
+
+       $$aaiimm-->>_a_d_d___i_m___d_e_n_y___a_l_l_(_)
+
+       This is the method that should be used if you are online and wish to go
+       into 'deny all' mode.  It will also delete both the permit and deny
+       lists.
+
+       $$aaiimm-->>_a_d_d___i_m___p_e_r_m_i_t___a_l_l_(_)
+
+       This is the method that should be used if you are online and wish to go
+       into 'permit all' mode.  It will also delete both the permit and deny
+       lists.
+
+       $$aaiimm-->>ttoocc__eevviill(($$uusseerr,, $$aannoonn))
+
+       This method will apply 'evil' to the specified user $user.  If $anon
+       evaluates to true, the evil will be done anonymously.
+
+       $$aaiimm-->>ttoocc__cchhaatt__jjooiinn(($$eexxcchhaannggee,, $$rroooomm__nnaammee))
+
+       This method will join the chat room specified by $exchange and
+       $room_name.  Currently, the only valid value for $exchange is 4.
+
+       See the _TT_OO_CC((77)) manpage included with this package for more information
+       on chatting.
+
+       $$aaiimm-->>ttoocc__cchhaatt__sseenndd(($$rroooommiidd,, $$mmeessssaaggee))
+
+       This method will send the message $message to the room $roomid (which
+       should be the room ID provided by the server in response to a
+       toc_chat_join or toc_accept_invite).
+
+       You will receive this message back from the server as well, so your UI
+       does not have to handle this message in a special way.
+
+       $$aaiimm-->>ttoocc__cchhaatt__wwhhiissppeerr(($$rroooommiidd,, $$ddssttuusseerr, $message)
+
+       This method sends the message $message to $dstuser in the room $roomid.
+
+       The server will nnoott send you a copy of this message, so your user
+       interface should have a special case for displaying outgoing whispers.
+
+       $$aaiimm-->>ttoocc__cchhaatt__eevviill(($$rroooommiidd,, $$ddssttuusseerr, $anon)
+
+       This will apply evil to the user $dstuser in room $room.  If $anon
+       evaluates to true, it will be applied anonymously.
+
+       Please note that this functionality is currently disabled by the TOC
+       servers.
+
+       $$aaiimm-->>ttoocc__cchhaatt__iinnvviittee(($$rroooommiidd,, $$mmssggtteexxtt, $buddy1[, $buddy2[, ...]])
+
+       This method will invite all users "$buddy1..$buddyN" to room $roomid
+       with invitation text $msgtext.
+
+       $$aaiimm-->>ttoocc__cchhaatt__lleeaavvee(($$rroooommiidd))
+
+       This method will notify the server that you have left room $roomid.
+
+       $$aaiimm-->>ttoocc__cchhaatt__aacccceepptt(($$rroooommiidd))
+
+       This method accepts a chat invitation to room $roomid.  You do not have
+       to send a "toc_chat_join()" message if you have been invited and accept
+       with this method.
+
+       $$aaiimm-->>ttoocc__ggeett__iinnffoo(($$uusseerrnnaammee))
+
+       This method requests info on user $username.  See _TT_OO_CC((77)) for more
+       information on what the server returns.
+
+       $$aaiimm-->>ttoocc__sseett__iinnffoo(($$iinnffoo))
+
+       This method sets the information for the current user to the ASCII text
+       (HTML formatted) contained in $info.
+
+       $$aaiimm-->>ttoocc__sseett__aawwaayy(($$mmssgg))
+
+       This method sets or unsets the away message.  If $msg is undefined,
+       away is unset.  Otherwise, away is set with the message in $msg.
+
+       $$aaiimm-->>ttoocc__ggeett__ddiirr(($$uusseerrnnaammee))
+
+       This method sends a request to the server for directory information on
+       $username.  See _TT_OO_CC((77)) for information on what the server will return.
+
+       $$aaiimm-->>ttoocc__sseett__ddiirr(($$uusseerriinnffoo))
+
+       This method sets the information on the current user to the string pro-
+       vided as $userinfo.  See _TT_OO_CC((77)) for more information on the format of
+       the $userinfo string.
+
+       $$aaiimm-->>ttoocc__ddiirr__sseeaarrcchh(($$sseeaarrcchhssttrr))
+
+       This method will search the directory using $searchstr.  See _TT_OO_CC((77)) for
+       more information on how this string should look.
+
+       $$aaiimm-->>ttoocc__sseett__iiddllee(($$sseeccoonnddss))
+
+       This method sets the number of seconds that the client has been idle.
+       If it is 0, the idle is cleared.  Otherwise, the idle is set and the
+       server will continue to count up the idle time (thus, you need only
+       call "idle()" once in order to become idle).
+
+       $$aaiimm-->>uuii__aadddd__ffhh(($$ffiilleehhaannddllee,, \\&&ccaallllbbaacckk))
+
+       This method will add a filehandle to the "select()" loop that will be
+       called with "ui_dataget()".  If information is found to be on that
+       filehandle, the callback will be executed.  It is the responsibility of
+       the callback to read the data off the socket.
+
+       AAss aallwwaayyss,, tthhee uussee ooff bbuuffffeerreedd IIOO oonn ffiilleehhaannddlleess bbeeiinngg _ss_ee_ll_ee_cc_tt_((_))eedd iiss
+       uunnrreelliiaabbllee aatt bbeesstt..  AAvvooiidd tthhee uussee ooff _rr_ee_aa_dd_((_)),, <<FFHH>>,, aanndd _pp_rr_ii_nn_tt_((_));;
+       iinnsstteeaadd,, uussee _ss_yy_ss_rr_ee_aa_dd_((_)) aanndd _ss_yy_ss_ww_rr_ii_tt_ee_((_))
+
+       $$aaiimm-->>uuii__ddeell__ffhh(($$ffiilleehhaannddllee))
+
+       The filehandle $filehandle will be removed from the "select()" loop and
+       it will no longer be checked for input nor its callback activated.
+
+       $$aaiimm-->>_u_i___a_l_l___f_h_(_)
+
+       This method returns a list of all filehandles currently in the
+       "select()" loop.
+
+       $$aaiimm-->>uuii__eexxiissttss__ffhh(($$ffiilleehhaannddllee))
+
+       This method will return true if $filehandle is in the select loop.
+       Otherwise, it will return undefined.
+
+       $$aaiimm-->>uuii__sseett__ccaallllbbaacckk((\\&&ccaallllbbaacckk))
+
+       This method will change the callback function for the server socket to
+       the method referenced by \&callback.  This allows you to change the
+       callback from the one specified when the object was created.  (Imagine
+       the possibilities--dynamically created callback functions using
+       "eval()"... mmmm...)
+
+       $$aaiimm-->>uuii__ggeett__ccaallllbbaacckk(($$ffiilleehhaannddllee))
+
+       This method returns a reference to the callback associated with $file-
+       handle, or the callback associated with the server socket if $filehan-
+       dle is undefined.
+
+       $$aaiimm-->>uuii__ddaattaaggeett(($$ttiimmeeoouutt))
+
+       This is the workhorse method in this object.  When this method is
+       called, it will go through a single "select()" loop to find if any
+       filehandles are ready for reading.  If $timeout is defined, the
+       "select()" timeout will be that number of seconds (fractions are OK).
+       Otherwise, "select()" will block.
+
+       For each filehandle that is ready for reading, this function will call
+       the appropriate callback function.  It is the responsibility of the
+       callback to read the data off the filehandle and handle it appropri-
+       ately.  The exception to this rule is the server socket, whose data
+       will be read and passed to the server socket callback function.  All
+       pasrsing of data from the server into edible chunks will be done for
+       you before the server socket callback function is called.  From there,
+       it is up to to the client program to parse the server responses appro-
+       priately.  They will be passed such that each field in the server
+       response is one argument to the callback (the number of arguments will
+       be correct).  For more information on the information coming from the
+       server, see _TT_OO_CC((77)).
+
+       This method returns undef on an error (including errors from callbacks,
+       which should be signified by returning undef) and returns the number of
+       filehandles that were read otherwise.
+
+RROOLLLLIINNGG YYOOUURR OOWWNN
+       This section deals with usage that deals directly with the server con-
+       nection and bypasses the ui_* interface and/or the toc_* interface.  If
+       you are happy calling ui_dataget et al., do not bother reading this
+       section.  If, however, you plan not to use the provided interfaces, or
+       if you want to know more of what is going on, continue on.
+
+       First of all, if you do not plan to use the provided interface to the
+       server socket, you will need to be able to access the server socket
+       directly.  In order to do this, use $aim->srv_socket:
+
+           $srv_sock = $aim->srv_socket;
+
+       This will return a ppooiinntteerr to the socket.  You will need to dereference
+       it in order to use it.
+
+       In general, however, even if you are rolling your own, you will proba-
+       bly not need to use "recv()" or the like.  "read_sflap_packet()" will
+       handle unwrapping the data coming from the server and will return the
+       payload of the packet as a single scalar.  Using this will give you the
+       data coming from the server in a form that you can "split()" to get the
+       message and its arguments.  In order to facilitate such splitting,
+       %Net::AOLIM::SERVER_MSG_ARGS is supplied.  For each valid server mes-
+       sage, $Net::AOLIM::SERVER_MSG_ARGS{$msg} will return one less than the
+       proper number of splits to perform on the data coming from the server.
+       The intended use is such:
+
+           ($msg, $rest) = split(/:/, $aim->read_sflap_packet(), 2);
+           @msg_args = split(/:/, $rest, $Net::AOLIM::SERVER_MSG_ARGS{$msg});
+
+       Now you have the server message in $msg and the arguments in @msg_args.
+
+       To send packets to the server without having to worry about making
+       SFLAP packets, use "send_sflap_packet()".  If you have a string to send
+       to the server (which is not formatted), you would use:
+
+           $aim->send_sflap_packet($SFLAP_TYPE_DATA, $message, 0, 0);
+
+       The SFLAP types (listed in _TT_OO_CC((77)) are:
+
+           $SFLAP_TYPE_SIGNON
+           $SFLAP_TYPE_DATA
+           $SFLAP_TYPE_ERROR
+           $SFLAP_TYPE_SIGNOFF
+           $SFLAP_TYPE_KEEPALIVE
+
+       Most of the time you will use $SFLAP_TYPE_DATA.
+
+       If you want to roll your own messages, read the code for
+       "send_sflap_packet()" and you should be able to figure it out.  Note
+       that the header is always supplied by "send_sflap_packet()".  Specify-
+       ing "formatted" will only make "send_sflap_data()" assume that $message
+       is a preformatted payload.  Specifying $noterm will prevent
+       "send_sflap_packet()" from adding a trailing '\0' to the payload.  If
+       it is already formatted, "send_sflap_packet" will ignore $noterm.
+
+       Messages sent to the server should be escaped and formatted properly as
+       defined in _TT_OO_CC((77)).  "$aim->toc_format_msg" will do just this; supply it
+       with the TOC command and the arguments to the TOC command (each as sep-
+       arate strings) and it will return a single string that is formatted
+       appropriately.
+
+       All usernames sent as TOC command arguments must be normalized (see
+       _TT_OO_CC((77))).  "$aim->norm_uname()" will do just this.  Make sure to normal-
+       ize usernames before passing them as arguments to "$aim->toc_for-
+       mat_msg()".
+
+       "pw_roast" performs roasting as defined in _TT_OO_CC((77)).  It is not very
+       exciting.  I do not see why it is that you would ever need to do this,
+       as "$aim->signon()" handles this for you (and the roasted password is
+       stored in "$aim->{'roastedp'}").  However, if you want to play with it,
+       there it is.
+
+EEXXAAMMPPLLEESS
+       See the file _e_x_a_m_p_l_e_._p_l for an example of how to interact with this
+       class.
+
+FFIILLEESS
+       _e_x_a_m_p_l_e_._p_l
+
+           A sample client that demonstrates how this object could be used.
+
+SSEEEE AALLSSOO
+       See also _TT_OO_CC((77)).
+
+AAUUTTHHOORR
+       Copyright 2000-02 Riad Wahby <rrssww@@jjffeett..oorrgg> All rights reserved This
+       program is free software.  You may redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+HHIISSTTOORRYY
+       00..0011
+
+           Initial Beta Release. (7/7/00)
+
+       00..11
+
+           First public (CPAN) release. (7/14/00)
+
+       00..1111
+
+           Re-release under a different name with minor changes to the
+           documentation. (7/16/00)
+
+       00..1122
+
+           Minor modification to fix a condition in which the server's
+           connection closing could cause an infinite loop.
+
+       11..00
+
+           Changed the client agent string to TOC1.0 to fix a problem where
+           connections were sometimes ignored.  Also changed the default signon
+           port to 5198 and the login port to 1234.
+
+       11..11
+
+           Changed the client agent string again, this time to what seems
+           like the "correct" format, which is
+                   PROGRAM:$Version info$
+           Also added the ability to set a login timeout in case the SIGN_ON
+           packet never comes.
+
+       11..22
+
+           Fixed a bug in toc_chat_invite that made it ignore some of its
+           arguments.  This should fix various problems with using this
+           subroutine.  Thanks to Mike Golvach for pointing this out.
+
+       11..33
+
+           Changed (defined @tci_buddies) to (@tci_buddies) in toc_chat_invite.
+           Fixed a potential infinite loop in set_srv_buddies involving an
+           off-by-one error in a for() test.  Thanks to Bruce Winter for
+           pointing this out.
+
+       11..44
+
+           Changed the way that Net::AOLIM sends the login command string
+           because AOL apparently changed their server software, breaking the
+           previous implementation.  The new method requires that only the
+           user agent string be in double quotes; all other fields should not
+           be quoted.  Note that this does not affect the user interface at
+           all---it's all handled internally.  Thanks to Bruce Winter, Fred
+           Frey, Aryeh Goldsmith, and tik for help in tracking down and
+           fixing this error.
+
+           Also added additional checks to read_sflap_packet so that if the
+           other end of the connection dies we don't go into an infinite
+           loop.  Thanks to Chris Nelson for pointing this out.
+
+       11..55
+
+           Added a very simple t/use.t test script that just makes sure
+           the module loads properly.
+
+       11..66
+
+           Patched around yet another undocumented "feature" of the TOC
+           protocol---namely, in order to successfully sign on, you must have
+           at least one buddy in your buddy list.  At sign-on, in the absence
+           of a real buddy list, Net::AOLIM inserts the current user as a
+           buddy in group "Me."  Don't bother removing this buddy, as it
+           doesn't really exist---as soon as you add any real buddies, this
+           one will go away.  Thanks to Galen Johnson and Jay Luker for
+           emailing with the symptoms.
+
+       11..6611
+
+          Made a small change to the example.pl script to keep it from
+          dumping deref warnings.  Thanks to an anonymous person who sent
+          this suggestion through the CPAN bug tracking system.
+
+
+
+perl v5.8.3                       2004-07-27                          AOLIM(3)

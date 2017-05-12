@@ -1,0 +1,65 @@
+{
+   "abstract" : "IPMessenger-Bot building framework",
+   "author" : [
+      "hayajo <hayajo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.2, Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131490",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-IPMessenger-Bot",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.021"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::IPMessenger" : "0.14",
+            "Term::ANSIColor" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Net::EmptyPort" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hayajo/p5-Net-IPMessenger-Bot/issues"
+      },
+      "homepage" : "https://github.com/hayajo/p5-Net-IPMessenger-Bot",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hayajo/p5-Net-IPMessenger-Bot.git",
+         "web" : "https://github.com/hayajo/p5-Net-IPMessenger-Bot"
+      }
+   },
+   "version" : "0.05"
+}
+

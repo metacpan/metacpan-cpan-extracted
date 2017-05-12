@@ -1,0 +1,35 @@
+This code is made available under the same terms as Perl itself.
+
+dapple is a DAAP library for Perl.  DAAP is the protocol built
+on top of HTTP that Apple's iTunes 4 uses to share music.  Most
+responses to DAAP requests contain a binary DMAP structure.
+
+This distribution contains:
+
+  Net::DAAP::Client  - code to talk to a DAAP server
+
+You must have the LWP module set installed to use this code.
+
+  ***
+  ***  This is an incomplete release.  There are missing features.
+  ***  See the TODO file for future plans.  Expect new releases fast
+  ***  until 0.5 or so.
+
+To install these modules, follow these steps:
+  % perl Makefile.PL
+  % make
+  % make test
+  % make install
+
+Be sure to check out examples/itshell, a commandline client for
+downloading from iTunes servers.
+
+This code was originally written by Nathan Torkington, based on DAAP
+reverse-engineering work by Todd Larason.  Other contributors are
+listed in the AUTHORS file.
+
+Please send your feedback (and patches!)  to C<< <dapple AT
+torkington.com> >>.
+
+Version 0.1 released May 13, 2003.
+Version 0.2 released May 23, 2003.  Public.

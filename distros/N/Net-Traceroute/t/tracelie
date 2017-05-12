@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Helper for the pipe stuff.  Not nearly as thorough as it could be,
+# as the real traceroute has very bursty output that has triggered
+# read bugs in the dark past.
+
+cat <<_EOF_
+ 1  66.92.73.1  22.227 ms  24.444 ms  23.090 ms
+ 2  69.17.83.201  18.365 ms  21.828 ms  20.156 ms
+ 3  69.17.87.24  47.690 ms  46.479 ms  46.524 ms
+ 4  206.223.119.120  56.538 ms  76.455 ms  59.301 ms
+ 5  207.210.142.17  70.135 ms  69.110 ms  68.556 ms
+ 6  207.210.142.234  68.756 ms  69.293 ms  68.872 ms
+ 7  18.168.0.23  69.316 ms  71.269 ms  70.829 ms
+ 8  18.4.7.65  69.758 ms  69.793 ms  69.594 ms
+ 9  128.30.0.254  69.043 ms  68.092 ms  68.846 ms
+10  128.52.32.80  71.539 ms  68.564 ms  69.101 ms
+_EOF_

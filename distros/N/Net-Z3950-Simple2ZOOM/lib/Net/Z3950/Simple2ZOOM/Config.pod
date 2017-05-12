@@ -1,0 +1,325 @@
+# $Id: Config.pod,v 1.15 2007-09-14 14:41:50 mike Exp $
+
+use strict;
+use warnings;
+
+=head1 NAME
+
+Net::Z3950::Simple2ZOOM::Config - configuration file for the Simple2ZOOM gateway
+
+=head1 SYNOPSIS
+
+ <client>
+   <authentication>http://some.url/{user}/pwd={pass}<authentication>
+   <database name="srubooks">
+     <zurl>http://z3950.loc.gov:7090/voyager</zurl>
+     <option name="sru">get</option>
+     <charset>marc-8</charset>
+     <search>
+       <querytype>cql</querytype>
+       <map use="4"><index>title</index></map>
+       <map use="1003"><index>creator</index></map>
+     </search>
+   </database>
+ </client>
+
+=head1 DESCRIPTION
+
+The universal Swiss Army Gateway C<simple2zoom> is configured by a
+single file, named on the command-line, and expressed in XML.  This
+file specifies which back-end databases are supported, how the
+back-ends are contacted, what character-sets they provide records in,
+and how to map Z39.50 searches to CQL.
+
+The structure of the file is pretty simple.
+
+=head2 Top Level
+
+=over 4
+
+=item <client>
+
+The top-level element is <client>.  It contains a single optional
+<authentication> element, any number of <database> elements and a
+single optional <search> element.  The second of these specifies how
+to interpret requests to search in the configured databases; the last
+provides query mapping specifications for dynamically specified
+databases.
+
+=item <authentication>
+
+This element contains a URL template, specifying the address of an
+HTTP authentication server.  The template must include the special
+strings C<{user}> and C<{pass}>, which are substituted with the
+username and password supplied in the Init request, if any.  The
+resulting URL is actioned and the result examined: any successful
+response (HTTP status 200) indicates that the username/password
+combination is acceptable, and that the session can continue; any
+other response (e.g. 401 Authorization Required) results in the Init
+request being refused with BIB-1 diagnostic 1014 (Init/AC:
+Authentication System error).
+
+If the <authentication> element is omitted from the configuration, no
+authentication credentials are required, and any that are provided are
+ignored.
+
+(A trivial example of an authentication server script is included in
+the Simple2ZOOM distribution, as C<etc/sru-auth>.)
+
+=item <database>
+
+The <database> element carries a C<name> attribute specifying the
+Z39.50 database name by which is it is known to clients.  It contains
+several complex elements, and is discussed in more detail below.
+
+=item <search>
+
+Each <search> element, whether contained within a specific <database>
+(see below)
+or at the top level, consists of a single mandatory <querytype>
+element followed by any number of <map>s.  The content of <querytype>
+indicates the type of query that should be sent to the back-end
+server, with Simple2ZOOM reposible for translating incoming queries as
+required into that format.  At present, the only supported value is
+C<cql>.
+
+=item <map>
+
+Each <map> element carries a C<use> attribute, which is the
+numeric value of BIB-1 use attribute to be supported, and optionally
+contains a single <index> element which in turn contains the name of
+the corresponding CQL index.  Type-1 searches against the specified
+BIB-1 access point are mapped to CQL searches against the specified
+index.
+
+If the <index> is omitted within a <map>, then the generated CQL query
+term has no index specified.  This can be useful for BIB-1 attributes
+such as 1016 (any) and 1035 (anywhere).
+
+=back
+
+=head2 Databases
+
+The <database> element which describes each database contains the
+following elements in the specified order.
+
+In general, <database> entries are of two kinds: those connecting
+through to a Z39.50 database will have no <search> element, since no
+query mapping is necessary to translate an incoming Type-1 query; but
+those connecting to an SRU or SRW database will have a <search>
+element with <querytype> set to C<cql> and containing information on
+how to map from specified BIB-1 use attributes to CQL indexes.
+
+=over 4
+
+=item <zurl>
+
+Contains the target address of the
+back-end database (e.g. C<tcp:z3950.indexdata.com/gils> or
+C<http://z3950.loc.gov:7090/voyager>).
+
+=item <resultsetid>
+
+Optional.  If provided, it must take one of the following values, and
+if it is omitted then the value C<fallback> is assumed:
+
+=over 4
+
+=item C<id>
+
+When queries are received that include references to existing
+result-sets, these are translated into result-set references using the
+C<cql.resultSetId> index.  It is an error if the server does not
+support this facility.
+
+=item C<search>
+
+References to existing result-sets are rewritten as resubmissions of
+the query.  This works on all servers, but does not reliably give
+precisely correct results if the database is updated between searches.
+
+=item C<fallback>
+
+Result-set references are used when supported, but resubmissions of
+prior queries are used when this facility is unavailable.
+
+=back
+
+=item <nonamedresultsets>
+
+This is optional.  If provided, it is empty and indicates that the
+back-end database does not support named result sets.
+
+=item <option>
+
+There may be any number of these.
+Each <option> element carries a C<name> attribute and contains a
+corresponding value.  These are ZOOM options which are applied to the
+connection when it is first created, and can be used to control, for
+example, the desired C<elementSetName> or C<schema> of the records
+provided by the back-end.  A particularly important option is C<sru>,
+which may be set to C<get>, C<post> or C<soap> to request vanilla SRU,
+SRU over POST and SRW respectively.
+
+=item <charset>
+
+Optional.  Contains the name of the character-set in which the
+back-end target supplies records (e.g. C<marc-8>)
+
+=item <search>
+
+Optional.  Provides specifications for how to search the database,
+exactly like the top-level <search> element described above.
+
+=item <schema>
+
+Optional and repeatable: each element indicates special handling for
+when records are requested in a particular schema.  See below.
+
+=item <sutrs-record>, <usmarc-record>, <grs1-record>.
+
+Optional.  Provides specifications for how to construct records in the
+relevant syntaxes when they are requested by clients.  
+
+The format is the same in all cases: the specification contains a list
+of <field> elements, each of which has an C<xpath> attribute and
+textual content.  Records are built by accessing the data addressed by
+the specified XPath expressions, and encoding each as an element
+addressed as specified by the element content.  The interpretation of
+the content is different for different record-syntaxes:
+
+=over 4
+
+=item SUTRS
+
+The content is ignored.
+
+=item USMARC
+
+The content indicates a MARC field by a string consisting of the
+following parts, in order: a three-digit field number; optionally a
+slash followed by the first indicator; optionally another slash
+followed by the second indicator; optionally a dollar sign followed by
+a subfield tag.  In other words, MARC field specifications much match
+the regular expression C</^\d\d\d(/w)?(/w?)(\$\w)?$/>.  It is
+impossible to specify the second indicator without the first, but a
+subfield may be specified along with zero, one or two indicators.
+
+As usual, a few examples are worth any amount of explanation:
+
+	001
+	260$c
+	500$a
+	100/1$a
+	245/1/0$a
+
+=item GRS-1
+
+The content indicates an address within a GRS-1 record in the form of
+one or more consecutive (type,value) pairs, each enclosed in
+parentheses.  For example, C<(1,14)> would indicate an element of
+type 1 (tagSet-M) with value 14 (localControlNumber).  A longer path
+such as C<(3,admin)(2,6)> indicates an abstract field (tagSet-G
+element 6) within an "admin" sub-record.
+
+=back
+
+=back
+
+=head2 Schemas
+
+Each <schema> element is empty, but carries the following attributes,
+which are used to provide records to Z39.50 clients in MARC formats.
+
+=over 4
+
+=item oid
+
+Mandatory.  This is the OID of a Z39.50 record-syntax which is to be
+handled by schema mapping.  Requests in this database for this
+record-syntax are handled as specified.
+Example value: C<1.2.840.10003.5.10>
+
+=item sru
+
+Mandatory.  This is the URI of an SRU/W schema which is requested from
+the SRU or SRW back-end in order to fulfill the request.
+Example value: C<info:srw/schema/1/marcxml-v1.1>
+
+=item format
+
+Optional.  Indicates which of the MARC variants is in use, so that the
+record can be formatted correctly.  Defaults to C<MARC21> if omitted.
+Example values: C<MARC21>, C<USMARC>, C<UNIMARC>
+
+=item encoding
+
+Optional.  Indicates which character-set to use for the formatted
+record.  Defaults to C<UTF-8> if omitted.
+Example values: C<UTF-8>, <MARC-8>
+
+=back
+
+B<NOTE> that in its current form this schema-mapping only works for
+the specific though common combination of Z39.50 front-end, SRU
+back-end and MARC record syntax.
+
+=head1 CONFIGURATION FILE SCHEMA
+
+The Simple2ZOOM distribution includes, in the C<etc> directory, an XML
+schema which can be used to validate configuration files.  This schema
+is provided in four formats:
+
+=over 4
+
+=item simple2zoom.rnc
+
+Relax-NG compact format: a simple, elegant, terse and wholly
+comprehensible XML constraint language that you don't even need to
+learn in order to understand.  This is the master version: the others
+are automatically generated from it.
+
+=item simple2zoom.rng
+
+Relax-NG XML format: the world seems to have this zany fetish that
+everything must be specified in XML, so Relax-NG has an XML syntax
+that corresponds trivially with the much nicer compact syntax.  The
+principle value of this is that C<xmllint> understands it.
+
+=item simple2zoom.dtd
+
+An old-fashioned DTD (document type definition).
+
+=item simple2zoom.xsd
+
+If you must.
+
+=back
+
+Use whichever you like.  For example,
+
+ xmllint --relaxng simple2zoom.rng --noout test.xml
+ xmllint --dtdvalid simple2zoom.dtd --noout test.xml
+ xmllint --schema simple2zoom.xsd --noout test.xml
+
+=head1 SEE ALSO
+
+The C<simple2zoom> program.
+
+The C<Net::Z3950::Simple2ZOOM> module.
+
+=head1 AUTHOR
+
+Mike Taylor E<lt>mike@indexdata.comE<gt>
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Index Data.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+
+1;

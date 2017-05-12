@@ -1,0 +1,6 @@
+1.10 - Module not fully completed.
+     - Changed Name to Net::ICQV5.
+     - Module now uses ICQ V5 Protocol to talk with server.
+     - miror bigs fixed
+       
+1.0  - First Release.

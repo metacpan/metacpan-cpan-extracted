@@ -1,0 +1,28 @@
+<h2><a href="#">Formularios seguros</a></h2>
+<h3>En que se basa la seguridad de los formularios Nes</h3>
+<br>
+<p>
+    Si fuésemos a crear un robot para enviar post con estupendas ofertas de todo
+     tipo de productos milagrosos, o incluso con buenas intenciones, lo primero 
+     que deberíamos hacer  es visitar la página del formulario y ver y guardar 
+     los campos, para luego hacer algo así:
+     <br><br>
+    http://nes.sourceforge.net/miniblog/es/sign.html?nombre=elnombre&comentario=elcomentario&enviar=enviar
+    <br><br>
+    Esto con nuestro sistema no funcionará nunca.
+    <br><br>
+    Puedes crear tu formulario como lo harías con cualquier otro, con tus nombres
+     de campos normales para que el código de tu aplicación sea legible, 
+     posteriormente mediante unos tags de nes &#123;: & obfuscated nombre_del_campo :&#125; 
+     puedes ofuscar los campos de manera que nunca tengan el mismo nombre, 
+     cada vez que se cargue la página, el nombre de los campos cambiará.
+    <br><br>
+    Opcionalmente se le puede añadir un catpcha.
+    <br><br>
+    Plugin: <a href="./?action=item&item=Plugin Forms">Forms</a>
+    <br><br>
+    Plugin: <a href="./?action=item&item=Plugin Captcha">Captcha</a>
+    <br><br>
+    Se puede ver un ejemplo aquí:
+    <a href="./add_comment.html?action=item&item=Formularios seguros">comentario</a>
+ </p>

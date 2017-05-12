@@ -1,0 +1,50 @@
+#!/usr/bin/perl
+#
+# nc.sniffer.dump.pl
+# version 1.00, 12-4-06, michael@bizsystems.com
+#
+use strict;
+#use diagnostics;
+use lib qw(blib/lib);
+
+use Net::Connection::Sniffer::Report qw(
+	rqst_dump
+	chkcache
+	chk_wconf
+);
+
+# EDIT the configuration to fit your site
+#
+my $coalconf = {		# coalesce configuration
+
+# location of statistics file
+# [REQUIRED]
+#
+	stats	=> '/var/run/nc.sniffer/nc.sniffer.stats',
+
+# statstistics update timeout
+# [OPTIONAL] default 15 seconds
+#
+	updto	=> 30,
+
+# update host:port
+#
+# format:
+#	port
+#   or
+#	host:port
+#   or
+#	ipaddr:port
+#
+# host defaults to 'localhost', 127.0.0.1
+# [REQUIRED]
+#
+	update	=> '127.0.0.1:10004',
+
+};
+
+my $txt = chk_wconf($coalconf);
+unless (chkcache($coalconf->{stats})) {
+  $txt = rqst_dump($coalconf->{update},$coalconf->{stats},300,$coalconf->{updto});
+}
+print $txt,"\n";

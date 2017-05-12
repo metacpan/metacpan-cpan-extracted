@@ -1,0 +1,7 @@
+=head1 USAGE
+
+=head1 SYNOPSIS
+
+ files-wanted.pl --since-last-run > file-wanted.dat
+ files-wanted.pl --all-specified  > file-wanted.dat
+ files-wanted.pl --days-old 7     > file-wanted.dat # UNIMPLEMENTED!

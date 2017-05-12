@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Net-Squid-Purge
+version: 0.1
+author:
+  - Nick Gerakines <nick@socklabs.com>
+abstract: Send purge requests to squid easily
+license: perl
+generated_by: Module::Build version 0.2612, without YAML.pm

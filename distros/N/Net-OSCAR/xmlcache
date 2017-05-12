@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+
+use Data::Dumper;
+
+eval {
+	require XML::Parser;
+};
+exit 0 if $@;
+
+my $xmlparser = new XML::Parser(Style => "Tree");
+
+my $xmlfile = "lib/Net/OSCAR/XML/Protocol.xml";
+open(XMLFILE, $xmlfile) or die "Couldn't open $xmlfile: $!";
+my $xml = join("", <XMLFILE>);
+close XMLFILE;
+my $xmlparse = $xmlparser->parse($xml) or die "Couldn't parse XML from $xmlfile: $@";
+
+open(OUT, ">lib/Net/OSCAR/XML/Protocol.parsed-xml") or die "Couldn't open lib/Net/OSCAR/XML/Protocol.parsed-xml for writing: $!\n";
+print OUT Data::Dumper->Dump([$xmlparse], ["xmlparse"]);
+close OUT;

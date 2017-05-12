@@ -1,0 +1,12 @@
+Build.PL
+conf/smppserver.conf
+lib/NetSDS/App/SMPP.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+scripts/smppqproc
+scripts/smppserver
+t/01_load.t
+t/02_pod.t
+t/03_pod_coverage.t

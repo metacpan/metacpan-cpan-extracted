@@ -1,0 +1,17 @@
+Revision history for Perl extension Net::MCMP.
+
+0.01  Sun Apr 20 16:35:02 2014
+	- original version; created by h2xs 1.23 with options
+		-AX Net::MCMP
+0.02  Sun Apr 21 13:43:02 2014
+	- added INFO and DUMP commands
+0.03  Sun Apr 21 15:20:00 2014
+	- fixed tests quantity
+0.04  Sun Apr 21 15:30:00 2014
+	- updated minimum perl version to 5.6
+0.05  Mon Apr 22 00:31:12 2014
+	- documented error and has_errors method
+0.07 Tue Apr 27 00:00:00 2014
+	- updated call to have content-type 
+0.08 Tue Jun 07 00:00:00 2014
+	- removed duplicate validation 

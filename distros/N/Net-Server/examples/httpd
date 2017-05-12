@@ -1,0 +1,125 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+httpd - Simple http daemon
+
+=head1 SYNOPSIS
+
+    # customize options in sub configure_hook
+
+    ./httpd
+
+=cut
+
+use strict;
+use warnings;
+use base qw(Net::Server::HTTP);
+
+__PACKAGE__->run;
+exit;
+
+###----------------------------------------------------------------###
+
+sub default_server_type { 'PreFork' }
+sub default_port { '8080' }
+#sub default_port { ['8443/SSL', '8080'] } # if you want a secure server
+#sub SSL_key_file  { '/path/to/secure.key' }
+#sub SSL_cert_file { '/path/to/secure.crt' }
+
+# set up some server parameters
+sub configure_hook {
+    my $self = shift;
+    my $prop = $self->{'server'};
+
+#    $prop->{user}     = 'nobody'; # user to run as
+#    $prop->{group}    = 'nobody'; # group to run as
+
+    my $root = $self->{'server_root'} ||= "/var/www";
+    $self->{document_root} = "$root/htdocs";
+    $self->{default_index} = [ qw(index.html index.htm main.htm) ];
+    $self->{access_log}    = "$root/access.log";
+#    $prop->{log_file}      = "$root/error.log";
+#    $prop->{setsid}        = 1;        # daemonize
+
+    $self->{mime_types}    = {
+        html => 'text/html',
+        htm  => 'text/html',
+        gif  => 'image/gif',
+        jpg  => 'image/jpeg',
+    };
+    $self->{mime_default} = 'text/plain';
+}
+
+sub post_configure_hook {
+    my $self = shift;
+
+    open(ACCESS, ">>". $self->{access_log}) || die "Couldn't open ACCESS: $!";
+    my $old = select ACCESS;
+    $| = 1;
+    select $old;
+}
+
+sub send_error {
+    my ($self, $n, $msg) = @_;
+    $self->send_status($n);
+    print "Content-type: text/html\r\n\r\n";
+    print "<h1>Error $n</h1><h3>$msg</h3>";
+}
+
+sub process_http_request {
+    my $self = shift;
+
+    my $uri = $ENV{'PATH_INFO'} || '';
+    if ($uri =~ /[\ \;]/) {
+        return $self->send_error(400, "Malformed URL");
+    }
+    $uri =~ s/%(\w\w)/chr(hex($1))/eg;
+    1 while $uri =~ s|^\.\./+||; # can't go below doc root
+    my $path = "$self->{document_root}$uri";
+
+    # see if there's an index page
+    if (-d $path) {
+        my $_path;
+        foreach (@{ $self->{'default_index'} }){
+            next if !-e "$path/$_";
+            $_path = "$path/$_";
+            last;
+        }
+        $path = $_path || return $self->send_error(403, "Directory listing not supported");
+    }
+    if (! -e $path) {
+        warn "File not found: $path\n";
+        return $self->send_error(404, "File Not Found");
+    }
+
+# work in progress to allow for an easy exec_cgi
+#    if ($path =~ /\.cgi/ && -x $path) {
+##        my $pid = fork;
+##        return $self->send_501("Couldn't exec: $!") if ! defined $pid;
+#        $ENV{'SCRIPT_NAME'} = $uri;
+#        do $path;
+#
+#        #require IPC::Open2;
+#        #warn "here\n";
+#        #$self->{'server'}->{'client'}->autoflush(1);
+#        #my $pid = IPC::Open2::open2(my $out, $self->{'server'}->{'client'}, $uri) || $self->send_501("Couldn't exec: $!");
+#        #warn "Parent--------\n".`ls -l /proc/$$/fd`;
+#        ##my $pid = open(my $out, '-|', $uri) || $self->send_501("Couldn't exec: $!");
+#        #print <$out>;
+##        waitpid $pid, 0;
+#        warn "Back\n";
+#        return;
+#    }
+
+    # spit out the static content
+    open(my $fh, '<', $path) || return $self->send_501("Can't open file [$!]");
+    my $type = $path =~ /([^\.]+)$/ ? $1 : '';
+    $type = $self->{'mime_types'}->{$type} || $self->{'mime_default'};
+    print "Content-type: $type\r\n\r\n";
+    print $_ while read $fh, $_, 8192;
+    close $fh;
+}
+
+1;
+

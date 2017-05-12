@@ -1,0 +1,18 @@
+Revision history for Net::LDNS
+
+0.75 2015-04-07
+ - Add method to get/set source IP address on resolvers.
+ - Do SvGETMAGIC on SVs we get from outside.
+ - Packets created from wireformat were not properly cloned.
+ - Remove checks that did more harm than good (SvOK does not process get magic).
+
+0.74 2015-03-23
+ - A number of memory leaks plugged.
+
+0.73 2015-03-19
+ - Thread safety.
+
+0.71 2015-02-18
+ - Ship the ldns code with the module rather than relying on an externally installed library.
+
+0.70 2014-10-27

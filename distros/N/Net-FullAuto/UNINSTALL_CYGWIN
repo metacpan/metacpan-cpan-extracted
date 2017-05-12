@@ -1,0 +1,39 @@
+####################
+# TO REMOVE CYGWIN #
+####################
+
+# Note: these instructions apply ONLY to the
+#       installation of Cygwin on Microsoft
+#       Windows based systems.
+
+cygrunsrv -L (to see list of all running services)
+
+cygrunsrv -E sshd
+
+cygrunsrv -R sshd
+
+cygrunsrv -E cron
+
+cygrunsrv -R cron
+
+cygrunsrv -E cygserver
+
+cygrubsrv -R cygserver
+
+delete the folder c:\cygwin and all its sub-folders
+
+remove the Environment Variable CYGWIN
+
+edit the Environment path accordingly
+
+Start...Run... regedit and delete these two registry trees
+
+"HKEY_CURRENT_USER_Software_Cygwin"
+
+"HKEY_LOCAL_MACHINE_Software_Cygwin"
+
+Go to Control Panel, Category View, Performance and Maintenance, Administrative Tools, Computer Management.
+or click Start...Run...compmgmt.msc
+delete the sshd user if it exists in the "System Tools" - "Local Users and Groups" - "Users" section.
+
+

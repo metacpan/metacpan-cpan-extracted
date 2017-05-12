@@ -1,0 +1,25 @@
+---
+abstract: 'create and inject packets fast'
+author:
+  - 'GomoR <gomor_at_cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Write-Fast
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DynaLoader: '0'
+  Exporter: '0'
+  Time::Interval: '0'
+  perl: '5.006001'
+version: '0.18'

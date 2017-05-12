@@ -1,0 +1,498 @@
+$Id: Changes,v 1.77 2006/05/08 10:55:26 mike Exp $
+
+Revision history for Perl extension Net::Z3950.
+
+0.51  Mon May  8 11:55:19 BST 2006
+	- Deprecation in favour of ZOOM-Perl.
+	- Fix some compiler warnings.
+	- Fix typo in documentation (thanks to Kimmo Valtonen).
+
+0.50  Wed Jul 27 13:28:03 BST 2005
+	- Correct the ResultSet::present() fix that was supposed to be
+	  in the previous release: that code inadvertently always
+	  returned undef in asynchronous mode.
+	- "ywpriv.h" now #undefines "list", which the Perl development
+	  header files inexplicably and inexcusably #define to
+	  "Perl_list".
+	- "ywpriv.h" now #undefines "open", which Solaris 9 #defines
+	  (I really can't believe this) to "open64".  Maybe Sun would
+	  like me to go round their place and dump a load of _my_ crap
+	  in _their_ workspace?
+	- New querytype "cql" can be used to pass CQL queries,
+	  untranslated, straight through to the server.  Use like:
+		$conn->search(cql => "au=(kernighan and richie)")
+
+0.49  Thu Apr 21 11:06:02 BST 2005
+	- Change to the ResultSet::present() API in asynchronous mode:
+	  returns 1 if new requests were queued, 0 if all of the
+	  requested records had already been queued.  (No changes to
+	  its usage in synchronous mode.)
+	- yazwrap/send.c no longer includes <yaz/log.h> (not needed,
+	  generates warning)
+
+0.48  Tue Apr 19 22:36:45 2005
+	- Patches supplied by Jan Bauer Nielsen <jbn@dtv.dk> to
+	  interpret otherInformation packets, in search responses,
+	  containing a search-info report of subquery counts.
+	- Patches supplied by Myron Turner <mturner@Ms.UManitoba.CA>
+	  to protect the Net::Z3950 module against certain classes of
+	  badly-behaved server.
+	- Bring "samples/multiplex.pl" up to date, illustrating the
+	  use of this module to run sequences of queries against
+	  multiple servers in parallel.
+
+0.47  Tue Jan  4 22:15:07 2005
+	- The "connection refused" condition is now handled more
+	  gracefully, so that there is no error message emitted by
+	  Event.pm, just an undefined value returned and $! set to
+	  ECONNREFUSED.
+	- Improve many of the comments on this subject.
+
+0.46  Mon Nov 22 23:42:40 2004
+	- Use the MARC::Record module for rendering MARC records
+	  instead of the older, unsupported and possibly buggy
+	  MARC.pm.
+
+	  WARNING: This change is backwards incompatible, but that
+	  incompatibility will only affect you if you're relying on
+	  the precise formatting of $rec->render() on MARC records.
+
+0.45  Mon Nov  1 09:13:51 2004
+	- Support for "charset" and "language" options added by Adam
+	  Dickmeiss.
+
+0.44  Fri May  7 18:00:54 2004
+	Note that this release consists entirely of
+	backwards-incompatible changes to new functionality introduced
+	in 0.43, the previous release.  If you use Scan, then all your
+	Scan code must change; if you do not use Scan, then this
+	release will not affect you at all.
+	- Change scan-option names to be ZOOM-compliant.
+	- Introduce a new enumeration, Net::Z3950::ScanStatus
+	- Add a new class, Net::Z3950::ScanSet, representing the
+	  results of a Scan operation.  This is compliant with the
+	  ZOOM Abstract API, and supports much nicer client code than
+	  the previous release:
+		$ss = $conn->scan('@attr 1=1003 kern');
+		$status = $ss->status();
+		print $ss->errmsg()
+		    if $status == Net::Z3950::ScanSet::Failure;
+		$count = $ss->size();
+		($term, $hits) = $ss->term(0);
+	  The scanResponse APDU, which used to be returned from the
+	  scan() method, is still available via the scanResponse()
+	  method, but there is no reason for new code to call this.
+	- Complete rewrite of the sample client "scan.pl" to use the
+	  new API.
+
+0.43  Thu May  6 14:19:56 2004
+	- Add support for Scan, using code contributed by Jan Bauer
+	  Nielsen <jbn@dtv.dk>, somewhat tidied up.  Use it like this:
+		$apdu = $conn->scan('@attr 1=1003 kern');
+		$status = $apdu->scanStatus();
+		if ($status == 6) print Dumper($apdu->diag());
+		$count = $apdu->numberOfEntriesReturned();
+		$term = $apdu->entries()->[0]->termInfo()->term()->general();
+		$hits = $apdu->entries()->[0]->termInfo()->globalOccurrences();
+	  Subsequent releases will support more corners of the Scan
+	  specification (e.g. displayTerm and friends), and present a
+	  much nicer API with a ZOOM-like ScanSet object.  See
+		http://zoom.z3950.org/api/zoom-1.4.html#3.6
+	- Included in the "samples" directory is a simple scanning
+	  client program, "scan.pl".
+
+0.42  Wed Mar 31 13:06:09 2004
+	- Add support for Unix-domain sockets: use "unix" as the
+	  hostname, and the path to the socket file as the port, in
+	  the connection constructor.  Like this:
+		$conn = new Net::Z3950::Connection("unix", "/tmp/socket");
+
+0.41  Wed Mar 17 13:33:43 2004
+	- When Net::Z3950::Manager::wait() times out, it now returns
+	  an undefined value rather than, as in v0.40, the timeout
+	  value.  This code is now tested, thanks to Rick Jansen.
+	- Minor changes to some of the logic in ResultSet.pm
+
+0.40  Tue Mar 16 13:57:33 2004
+	- A timeout may be set for a Net::Z3950::Manager's wait() by
+	  setting that manager's "timeout" option to the maximum
+	  number of seconds to wait.  Donald Knuth once wrote,
+	  "Beware: this code has not been tested, only proved
+	  correct."  _This_ code improves on Knuth in that it has been
+	  neither tested _nor_ proved correct.  However, I give you my
+	  solemn promise that I think it probably works, as likely as
+	  not.
+
+0.39  Fri Dec 19 16:08:35 2003
+	- Recognise record-syntax names such as "USMARC" as well as
+	  enumerators such as Net::Z3950::RecordSyntax::USMARC, in
+	  accordance with what's specified in v1.4 of the ZOOM AAPI.
+	  Such names are recgonised case- and hyphen-insensitively, so
+	  "GRS-1" and "grs1" are equivalent.
+	- Add "XML" as an alias for the "TEXT_XML" record-syntax.
+	- Handle the ZOOM AAPI's standard options "pass" and "group"
+	  in preference to the old options "password" and "groupid"
+	  (although these are still also recognised, for the benefit
+	  of old applications.)
+	- Handle the ZOOM AAPI's standard option "async" in preference
+	  to the old "type" with _value_ "async" (although that's
+	  still also recognised, for the benefit of old applications.)
+	- Makefile.PL includes support for and instructions about
+	  building against a YAZ in a non-standard place ("non-root
+	  install").
+	- Another slight refinement to samples/simple.pl's
+	  diagnostics.
+	- Documentation for diagnostic methods now includes a link to
+	  the BIB-1 diagnostics web-page.
+
+0.38  Fri Oct 24 13:28:42 2003
+	- Fix a silly bug in Net::Z3950::Record::OPAC::rawdata(),
+	  spotted by Kristina Long.  It was trying to return $$this,
+	  like the opaque-array-of-bytes record-types such as USMARC,
+	  whereas in fact $this is itself a Perl structure
+	  representing the record.
+	- Add a kludge to patch over anti-social behaviour from
+	  servers that sometimes return USMARC records when asked for
+	  OPAC records: the returned record is wrapped in an otherwise
+	  empty OPAC record structure.
+
+0.37  Tue Sep 16 15:14:40 2003
+	- Remove a pair of extraneous declarations (copied from
+	  "yaz/include/yaz/z-opac.h" for reference) at the end of
+	  translateHoldingsAndCirc().  On recent GCC versions, such as
+	  mine, they were pointless but harmless; but older versions,
+	  such as the one in Debian/stable, croak if you mix
+	  statements and declarations.
+	- Improve behaviour when a server unilaterally closes the
+	  connection while we're waiting for a Init response.
+	  Previously, this would cause a segmentation fault; now you
+	  get errno set to 104 (ECONNRESET) which is pretty close.
+	- Improve the OPAC record renderer in Z3950/Record.pm so that
+	  it walks more of the OPAC-record structure.  As well as
+	  being prettier, this is better documentation-by-example of
+	  how to use the record structure.
+
+0.36  Fri Sep 12 23:47:00 2003
+	- Add support for the OPAC record syntax: OPAC records are now
+	  translated into self-describing Perl data-structures,
+	  blessed into the class Net::Z3950::Record::OPAC.  There is a
+	  rudimentary renderer included in that class, but
+	  sophisticated applications will want to deal with the data
+	  structure itself.  To see it in action, use something like:
+		$ perl samples/simple.pl alpha.calarts.edu 210 \
+			MARION fruit preferredRecordSyntax 35
+	  WARNING: for some servers, e.g. troy.lib.sfu.ca:210/innopac,
+	  you MUST request elementSetName "F", otherwise you'll just
+	  be fed USMARC records whatever your preferredRecordSyntax.
+	- Deal better with unrecognised or malformed APDUs from the
+	  server, e.g. library.ucfv.bc.ca:2200/unicorn when asked 
+	  for the USMARC record found by "@attr 1=4 time".  Now, the
+	  operation fails with diagnostic code 1001 (Malformed APDU).
+	- Change all <mike@tecc.co.uk> addresses to
+	  <mike@indexdata.com>.  (This change is well overdue, since I
+	  changed jobs seven months ago!)
+	- Fix reference for PQF in the YAZ manual.
+
+0.35  Fri Jun 27 10:48:03 2003
+	- Fix all non-US MARC record-types to return raw data from the
+	  rawdata() method rather than, as before, the render()
+	  method.
+	- Add a new delete() method to Net::Z3950::ResultSet
+
+0.34  Mon May 12 10:17:07 2003
+	- Slightly more robust cleanup in Manager::forget()
+	- Make samples/simple.pl a little less simple(!) by making a
+	  manager so that pre-connection options such as
+	  authentication parameters can be set.
+	- In Makefile.PL, LIBS and INC are now both set via yaz-config,
+	  so you don't need to mess with that file before building.
+	  (Adam Dickmeiss)
+	- The INC is now inherited by yazwrap/Makefile.PL, so that
+	  this file also does not need to be edited.  (Adam Dickmeiss)
+	- CCFLAGS is no longer set in the yazwrap directory.  I only
+	  did that in order to add "-Wall", which is pleasant luxury
+	  but not really necessary; and doing so caused problems as
+	  other, default, components of that setting were discarded on
+	  some platforms.  (Adam Dickmeiss)
+	- Add support for the MAB record syntax, thanks to Heiko
+	  Jansen <JANSEN@hbz-nrw.de>
+
+0.33  Thu Apr  3 09:10:16 2003
+	- Add explicit statement of GPL licence.
+	  No code changes at all.
+
+0.32  Tue Jan 21 16:46:23 2003
+	- Remove the old, unnecessary and confusing code that patched
+	  around the absence of cs_look() and cs_rcvconnect() in YAZ.
+	  In fact, they've both been there since version 1.8 (the one
+	  that introduced ZOOM-C), fourteen months ago.  This change
+	  cleans up the code and fixes an intermittent error that Dave
+	  Mitchell had run into.  You now need v1.8 of YAZ or newer.
+
+0.31  Wed Nov 27 12:40:50 2002
+	- Add command-line options to samples/simple.pl
+	- Add samples/canonical.pl
+	- Change the default element-set names in Manager.pm to be
+	  upper-case "F" and "B" rather than "f" and "b", as specified
+	  in section 3.6.2 (Composition Specification, Comp-spec
+	  Omitted) of the standard.
+		http://lcweb.loc.gov/z3950/agency/markup/08.html#3.6.2
+	  Even though a clarification makes it clear that element-set
+	  names should be treated case-insensitively.
+		http://lcweb.loc.gov/z3950/agency/clarify/esncase.html
+	- Formally deprecate the non-working records() method of the
+	  ResultSet class.
+	- When a new Connection object can't be made because of Init
+	  being refused (rather than due to a lower-level error such
+	  as ECONNREFUSED), $! is set to the distinguished value -1.
+		(Dave Mitchell)
+	- Neater code for connection-closing.
+		(Dave Mitchell)
+	- Fake up a diagnostic record (BIB-1 error 3, "unsupported
+	  search") for servers which illegally fail to include
+	  diagnostic records in the result of a failed search.
+		(Dave Mitchell)
+	- Added #include "XSUB.h" to the yazwrap directory's private
+	  code, which means it now does The Right Thing when compiling
+	  against a Perl build with the MULTIPLICITY flag set.  This
+	  means that we now build and run under cygwin on Windows 2000
+		(Dave Mitchell)
+	- Add new option "namedResultSets", initially true, which if
+	  set false caters for brain-damaged servers by always using
+	  the same result-set name, "default", thereby invalidating
+	  previous ResultSet objects.
+		(Dave Mitchell)
+	- Documentation tweaks.
+
+0.30  Fri Jul 19 13:55:45 2002
+	Today's release is brought to you entirely by Dave Mitchell
+	<davem@fdgroup.com>, who has done an astonishing amount of
+	really useful work on Net::Z3950.  Thanks, Dave!
+
+	- Added the present() method and "prefetch" option to optimise
+	  multiple calls of record() in synchronous mode.
+	- Made $conn->close() actually clean up and close the connection
+	- Fixed memory leak in receive.c, decodeAPDU()
+	- Added functions to decode close request/response APDUs.
+	- Really do add ability to set custom exception-handler via
+	  "die_handler" option -- I [Mike] did it wrong last time.
+	- Changed all print()s to die()s, which can be caught as
+	  exceptions.
+	- Commented out a debugging warn()
+	- Added a dummy "test" target to yazwrap/Makefile.PL to stop
+	  it complaining during "make test" [At last! -- Mike]
+	- Removed "debug => 5" from watcher creators.
+	- Updated the synchronous synopsis:
+	  * Replaced use of records() with record(), since the former
+	    is deprecated.
+	  * Added error-checking, so that people who cut-and-paste the
+	    synposis start off with good habits.
+	  * Added $conn->close(), so people know this doesn't happen
+	    automatically.
+
+0.29  Fri May 17 17:07:53 2002
+	- Add ability to set custom exception-handler via
+	  'die_handler' option.
+	- Fix dereference-undef bug occurring when performing a second
+	  search on a connection without having fetched any records
+	  following the first search.
+	- Cope with servers which lie about the number of records in
+	  their present responses (the cads!)
+	- Fix to correctly translate OIDs in which one or more
+	  components is "0".
+		All of these changes are due to Dave Mitchell
+		<davem@fdgroup.com> -- thanks, Dave!
+
+0.28  Wed Feb 27 17:28:26 2002
+	- Change representation of OIDs from blessed reference to
+	  array of intergers to Boring Old String (dot-separated
+	  numbers).  Resulting tweaks elsewhere in the module, e.g. in
+	  GRS::render()
+	- Fix Tutorial's incorrect description of the GRS-1 record
+	  structure.  How come no-one noticed this gross error in all
+	  the time it was there?
+	- Minor fixes to the APDU class's documentation (but you
+	  shouldn't be reading that anyway :-)
+	- Fix the top-level documentation file (index.html) to use the
+	  same stylesheet as all the API documentation.
+
+0.27  Mon Feb 11 12:59:05 2002
+	- Incorporate a patch from Adam <adam@indexdata.dk> to allow
+	  Net::Z3950 to work against servers that don't support named
+	  result sets.  Ah, so simple, so elegant!
+
+0.26  Fri Feb  8 16:06:15 2002
+	- OK.  This time I have _really_ fixed connecting to work
+	  properly either synchronously or asynchronously, and
+	  slightly clarified some of the event-handling code while I
+	  was at it.  In particular, ECONNREFUSED is handled properly
+	  now.
+	- Add AUTHOR and ABSTRACT to my Makefile.PL, as recommended in
+	  passing by R. Geoffrey Avery's Lightning Talk _h2xs has
+	  eXceeded its Stay_, at
+	  http://www.platypiventures.com/perl/present/tpc5modules/004.html
+
+0.25  Tue Jan 29 15:56:48 2002
+	- Remove some obsolete comments (documenting bugs that are now
+	  fixed!)
+	- Fix type mismatch in encode_APDU() -- we've been getting
+	  away with it until now because sizeof(size_t)==sizeof(int)
+	  on most systems, but not on the 64-bit DEC Alpha OSF/1.
+	- Fix daft-but-harmless bug in yazwrap/receive.c's setString()
+	  functions, in which we return the value of a void function.
+	  Most compilers DWIM, but not all.
+	- Add explicit casts to (char*) in yazwrap/receive.c where I'd
+	  been assuming the conversion from unsigned char*.  Ho hum.
+
+0.24  Wed Jan 23 11:39:32 2002
+	- Fix a truly stupid bug which prevents synchronous connection
+	  from working.  I missed this in 0.23 because the test script
+	  -- unlike almost every other Net::Z3950 program -- uses
+	  asynchronous connection.  D'oh!
+
+0.23  Tue Jan 22 16:11:41 2002
+	- Handle surrogate diagnostics (e.g. bad element set name).
+	- Finally fix that stupid "No rule to make target `pure_all'"
+	  message that "make test" always used to produce in the
+	  yazwrap directory.
+	- Add support for retrieving HTML records: new record-syntax
+	  enumeration TEXT_HTML, and a new record-type class
+	  Net::Z3950::Record::HTML.
+	- Fix hanging on ECONNREFUSED.
+
+0.22  Fri Oct 19 16:37:44 2001
+	- Add rudimentary ("straight through") support for the OPAC
+	  record syntax.
+	- Fix URLs for perl.z3950.org to omit obsolete /nz/ directory.
+	- Fix "make clean" in doc directory to remote the Z3950
+	  subdirectory.
+	- Fix documentation stylesheet to match perl.z3950.org
+
+0.21  Thu Oct 18 14:29:06 2001
+	- Fix samples/multiplex.pl not to die when one server fails a
+	  search - it just prints and error message now.
+	- Get rid of stupid "field `DESTROY' not defined" messages.
+
+0.20  Fri Oct 12 17:12:04 2001
+	- Add name() method to the Net::Z3950::Connection class.
+	- Add the wherewithal for asynchronous operations to invoke
+	  callbacks when they complete
+	- Fix staggeringly stupid bug in which the synchronous
+	  search() method would always expect an initResponse, so that
+	  you couldn't call search() twice on one connection.
+	- Add support for the UNIMARC record syntax (required by Bath)
+	- Remove the stupid and implemented records() method from the
+	  Connection class.
+	- Implement CCL qualifiers, specified in "ccl.qual" file.
+	- Improve diagnostics from APDU assembly.
+	- Fix a rather silly bug where records, once fetched, were
+	  cached irrespective of their element-set name, so that
+	  record fetched as 'b' and then as 'f' would appear brief.
+	- Revamp the "samples" directory: all examples now work(!)
+	- Add ZOOM references to the documentation.
+	- Minor fixes to documentation, comments, etc.
+
+	  (This major revision - indicated by the increment of the
+	  first-decimal-place version number - was largely motivated
+	  by the October 2001 ZIG meeting's tutorial, for which I
+	  prepared a simple multiplexing client, and was surprised at
+	  how hard it turned out to be.)
+
+0.14  Wed Jul 18 13:25:06 2001
+	- Add support for retrieving XML records: new record-syntax
+	  enumerations TEXT_XML and APPLICATION_XML, and a new
+	  record-type class Net::Z3950::Record::XML.
+	- Minor fixes to documentation, comments, etc.
+
+0.13  Fri Jun 22 09:30:55 2001
+	- In yazwrap/util.c, change socklen_t to size_t since the
+	  former does not seem to be defined on all platforms.  In
+	  particular, Solaris 2.6 uses a size_t* for the last argument
+	  to getsockopt().
+
+0.12  Wed Feb 21 16:47:03 2001
+	- Change my email address and web-page in the README.
+	- Add conditionally-compiled debugging code to Yaz-wrapper.
+	- Add rudimentary support for rendering MARC records and
+	  remove the MARC-related apology from the tutorial.
+	- Add note to README about "make test" error message.
+	- Add note to README about support options, including the
+	  Net::Z3950 mailing list.
+
+0.11  Fri Feb  9 11:31:34 2001
+	- Fix Net::Z3950::ResultSet->record() to work correctly in
+	  synchronous mode (i.e. wait for the record to become
+	  available before returning.)
+	- Add rawdata() method to the various Net::Z3950::Record::*
+	  classes: we now have a distinction between render() and
+	  rawdata(), concepts which were previously mulched in
+	  together very unhelpfully.
+	- Add Tutorial.
+	- FIRST PUBLIC RELEASE ON CPAN
+
+0.10  Wed Nov 29 16:39:47 2000
+	- Change module name from Z3950 to Net::Z3950
+
+0.04  Fri Sep 22 17:51:28 2000
+	- Fix so that diagnostics are available after search failure.
+	- Add trivial "straight through" support for USMARC and some
+	  of the related record syntaxes.
+	- Support for OID-typed fields in GRS-1 records.
+	- Change default database to "Default" (it had the profoundly
+	  unhelpful default of "hardwired-databaseName"!)
+	- Modify the internal class hierarchy to make MARC support
+	  hang together more easily (yazwrap library now returns
+	  ...::Record::<RS> objects instead of ...::APDU::<RS>)
+	- Improve diagnostics when low-level translation of C objects
+	  into Perl objects fails.
+
+0.03  Thu Jun 29 15:38:33 2000
+	- First version to be held in CVS at indexdata.dk
+	- Add CVS identification headers where they're missing, fix
+	  some that lacked the trailing $-sign (duh.)
+	- Fix the search() and records() wrapper methods so that much
+	  simpler single-threaded clients can be easily written.
+
+0.02  Tue Jun 27 21:28:56 2000
+	- Make the $port argument optional in the Z3950::Connection
+	  constructor.
+	- Add support for mnchar* (T_MNPV) to the typemap file: this
+	  is a Maybe-Null PV, into which undefined values may be
+	  passed yielding null pointers.
+	- Add samples/fetch1.pl, which actually works (unlike the
+	  other scripts in the samples directory, which are written to
+	  a pre-0.1 version of the interface.)
+	- Remove obsolete bits of the README file.
+
+0.01  Tue May 23 09:20:30 2000
+	- Originally created by h2xs 1.19
+	- 0.01 was the first numbered version.  Earlier versions were
+	  never assigned numbers as they never got outside the
+	  author's house; this is the first one that was sent to Index
+	  Data.
+
+--
+
+To be done:
+	- ### Fix so that when one of the Connection objects
+	  associated with an asynchronous Manager can't connect,
+	  $mgr->wait() returns a reference to that Connection, and
+	  arranges for $conn->op() to return Net::Z3950::Op::Error,
+	  and leaves things in a state whereby wait() can be
+	  successfully re-invoked to continue the concurrent
+	  operations of the remaining Connections.  This is
+	  potentially tricky to implement and test, and will only be
+	  used by a small proportion of applications, so I am not
+	  letting it delay release of other new functionality.
+	- ### Fix test.pl to work against either local or remote server.
+	- ### Make managers drop references to closed connections.
+	- ### Make $mgr->wait() finish when there are no connections left.
+	- ### Do away with the "async" option, probably.  Here's what
+		it actually does when turned on (the default):
+		- Connection::new() waits for an Init response before
+		  returning.
+		- ResultSet::present() (and hence ResultSet::record())
+		  waits for for a Present response before returning.
+		See also the comment on the Connection::search()
+		method.
+

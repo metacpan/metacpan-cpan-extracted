@@ -1,0 +1,25 @@
+Net-SMS-MyTMN
+
+Send SMS trough MyTMN
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Net::SMS::MyTMN
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Miguel Santinho
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

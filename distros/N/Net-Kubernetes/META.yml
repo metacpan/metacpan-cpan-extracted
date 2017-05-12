@@ -1,0 +1,128 @@
+---
+abstract: "An object oriented interface to the REST API's provided by kubernetes"
+author:
+  - 'Dave Mueller <dave@perljedi.com>'
+build_requires:
+  File::Temp: '0'
+  File::stat: '0'
+  HTTP::Response: '0'
+  Test::Deep: '0'
+  Test::Fatal: '0'
+  Test::Mock::Wrapper: '0.18'
+  Test::Spec: '0'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Kubernetes
+provides:
+  Net::Kubernetes:
+    file: lib/Net/Kubernetes.pm
+    version: '1.03'
+  Net::Kubernetes::Exception:
+    file: lib/Net/Kubernetes/Exception.pm
+    version: '1.03'
+  Net::Kubernetes::Namespace:
+    file: lib/Net/Kubernetes/Namespace.pm
+    version: '1.03'
+  Net::Kubernetes::Resource:
+    file: lib/Net/Kubernetes/Resource.pm
+    version: '1.03'
+  Net::Kubernetes::Resource::Endpoint:
+    file: lib/Net/Kubernetes/Resource/Endpoint.pm
+    version: '1.03'
+  Net::Kubernetes::Resource::Event:
+    file: lib/Net/Kubernetes/Resource/Event.pm
+    version: '1.03'
+  Net::Kubernetes::Resource::Node:
+    file: lib/Net/Kubernetes/Resource/Node.pm
+    version: '1.03'
+  Net::Kubernetes::Resource::Pod:
+    file: lib/Net/Kubernetes/Resource/Pod.pm
+    version: '1.03'
+  Net::Kubernetes::Resource::ReplicationController:
+    file: lib/Net/Kubernetes/Resource/ReplicationController.pm
+    version: '1.03'
+  Net::Kubernetes::Resource::Role::HasPods:
+    file: lib/Net/Kubernetes/Resource/Role/HasPods.pm
+    version: '1.03'
+  Net::Kubernetes::Resource::Role::Spec:
+    file: lib/Net/Kubernetes/Resource/Role/Spec.pm
+    version: '1.03'
+  Net::Kubernetes::Resource::Role::State:
+    file: lib/Net/Kubernetes/Resource/Role/State.pm
+    version: '1.03'
+  Net::Kubernetes::Resource::Secret:
+    file: lib/Net/Kubernetes/Resource/Secret.pm
+    version: '1.03'
+  Net::Kubernetes::Resource::Service:
+    file: lib/Net/Kubernetes/Resource/Service.pm
+    version: '1.03'
+  Net::Kubernetes::Resource::ServiceAccount:
+    file: lib/Net/Kubernetes/Resource/ServiceAccount.pm
+    version: '1.03'
+  Net::Kubernetes::Role::APIAccess:
+    file: lib/Net/Kubernetes/Role/APIAccess.pm
+    version: '1.03'
+  Net::Kubernetes::Role::ResourceCreator:
+    file: lib/Net/Kubernetes/Role/ResourceCreator.pm
+    version: '1.03'
+  Net::Kubernetes::Role::ResourceFactory:
+    file: lib/Net/Kubernetes/Role/ResourceFactory.pm
+    version: '1.03'
+  Net::Kubernetes::Role::ResourceFetcher:
+    file: lib/Net/Kubernetes/Role/ResourceFetcher.pm
+    version: '1.03'
+  Net::Kubernetes::Role::ResourceLister:
+    file: lib/Net/Kubernetes/Role/ResourceLister.pm
+    version: '1.03'
+  Net::Kubernetes::Role::SecretBuilder:
+    file: lib/Net/Kubernetes/Role/SecretBuilder.pm
+    version: '1.03'
+  Net::Kunbernetes::Exception::BadRequest:
+    file: lib/Net/Kubernetes/Exception.pm
+    version: '1.03'
+  Net::Kunbernetes::Exception::ClientException:
+    file: lib/Net/Kubernetes/Exception.pm
+    version: '1.03'
+  Net::Kunbernetes::Exception::Conflict:
+    file: lib/Net/Kubernetes/Exception.pm
+    version: '1.03'
+  Net::Kunbernetes::Exception::NotFound:
+    file: lib/Net/Kubernetes/Exception.pm
+    version: '1.03'
+requires:
+  Clone: '0'
+  Cpanel::JSON::XS: '0'
+  File::Slurp: '0'
+  HTTP::Request: '0'
+  JSON::MaybeXS: '0'
+  LWP::UserAgent: '0'
+  MIME::Base64: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::Aliases: '0'
+  Syntax::Feature::Try: '0'
+  Throwable::Error: '0'
+  Time::HiRes: '0'
+  URI: '0'
+  YAML::XS: '0'
+  perl: v5.18.0
+  syntax: '0'
+resources:
+  homepage: https://github.com/perljedi/net_kubernetes
+  repository: https://github.com/perljedi/net-kubernetes.git
+version: '1.03'
+x_contributors:
+  - 'Christopher Pruden <cdpruden@liquidweb.com>'
+  - 'Dave <dave@perljedi.com>'
+  - 'Dave Mueller <dmueller@liquidweb.com>'
+  - 'Kevin Johnson <kcavemanj@gmail.com>'

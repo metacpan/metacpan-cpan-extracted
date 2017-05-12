@@ -1,0 +1,78 @@
+#!/usr/bin/perl -w
+use strict;
+
+use lib "lib";
+
+$|=1;
+
+my $testing = 0;
+
+use Data::Dumper;
+use Net::Radius::Dictionary;
+use Net::Radius::PacketOrdered;
+use Net::Inet qw(pack_sockaddr_in unpack_sockaddr_in inet_ntoa inet_aton);
+use Net::UDP;
+use Net::Gen;
+use warnings;
+use Fcntl;
+
+my $secret = "radiuserver";
+my $addr   = "127.0.0.1";
+my $port   = "1812";
+my $user   = "";
+my $pass   = "";
+
+my $sequence = -1;
+
+my $dict = new Net::Radius::Dictionary "dictionary"
+    or die "Couldn't read dictionary: $!";
+
+if( $#ARGV eq 4 ) {
+    $secret = $ARGV[0];
+    $addr   = $ARGV[1];
+    $port   = $ARGV[2];
+    $user   = $ARGV[3];
+    $pass   = $ARGV[4];
+}
+
+printf "%-16s %-24s %-20s %-20s \n",
+    "server  ->", "addr: $addr", "port: $port", "secret: $secret";
+printf "%-16s %-24s %-20s \n",
+    "user    ->", "user: $user", "pass: $pass";
+
+
+# Set up the network socket (must have radius in /etc/services)
+my $s = new Net::UDP or die $!;
+$s->bind or die "Couldn't bind: $!";
+$s->fcntl(F_SETFL, $s->fcntl(F_GETFL,0) | O_NONBLOCK)
+    or die "Couldn't make socket non-blocking: $!";
+
+my $server = pack_sockaddr_in($port, inet_aton($addr));
+
+my $p = new Net::Radius::PacketOrdered $dict;
+$p->set_code('Access-Request');
+$p->set_identifier(10);
+$p->set_authenticator(rand(10));
+$p->set_attr('Proxy-State'  => 'ah, proxy!');
+$p->set_attr('User-Name', $user);
+$p->set_password($pass, $secret);
+
+$p->set_attr('Proxy-State'  => 'some proxy state here');
+$p->set_attr('Proxy-State'  => 'all those proxies ...');
+$p->set_attr('Proxy-State'  => 'more proxies');
+$p->set_attr('Proxy-State'  => 'last proxy');
+
+$p->dump;
+
+# testing removing attributes by slot and by name/value
+$p->unset_attr_slot('4');
+$p->unset_attr('Proxy-State'  => 'some proxy state here');
+
+$p->dump;
+
+$s->sendto($p->pack, $server);
+
+
+
+
+

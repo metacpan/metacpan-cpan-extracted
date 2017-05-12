@@ -1,0 +1,28 @@
+---
+abstract: 'Update server IP address setting for MyPeople Bot API. '
+author:
+  - 'khs <sng2nara@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-MyPeople-Bot-IPUpdator
+requires:
+  Getopt::Mini: 0
+  LWP::Simple: 0
+  Log::Log4perl: 0
+  Moose: 0
+  WWW::Mechanize: 0
+  namespace::autoclean: 0
+  strict: 0
+  utf8: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/sng2c/net-mypeople-bot-ipupdator
+  repository: git://github.com/sng2c/net-mypeople-bot-ipupdator.git
+version: 0.002

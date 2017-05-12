@@ -1,0 +1,22 @@
+Add additional commands
+
+Make a decoder for the pipe command
+
+Make sure that last_error is used wherever it can be and should be.
+
+Make sure that things that fail don't evaluate true if at all possible.
+
+See what other tests need to be added to the test suite.  The framework is there, but there need to be more tests of the different commands.
+
+Make the _decode_lines be able to take a line without a "\n" at the end.
+
+make tests for new subs:
+	set_defaultopmode
+	set_baseid
+	set_suid
+	freq
+	freq_writescan
+	ipconfig
+	reset
+
+$RedRiver: TODO,v 1.3 2009/07/31 21:44:33 andrew Exp $

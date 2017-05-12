@@ -1,0 +1,121 @@
+Implementation of "safe signals" in Net::FTPServer
+--------------------------------------------------
+Richard Jones, 31st July 2001.
+
+[Note added 19th July 2002 by RWMJ:
+
+ Perl 5.8.0 has been released, and is expected to become widely
+ used soon. The code has now been modified so it switches between
+ using my XS safe signals code and pure Perl depending on whether
+ the Perl version in use is < or >= 5.7.2.]
+
+1. Background - the Problem
+---------------------------
+
+Perl 5.7 implements a new feature, so called "safe signals". About
+time too! In previous versions of Perl, signals are anything but
+safe. Suppose you have a typical signal handler like this from the
+Perl manual pages:
+
+      $SIG{CHLD} = sub { wait };
+
+This handler is wrong in a number of respects, not least because it
+doesn't call "wait" often enough. But most importantly, this signal
+handler could be called at any time. There are two problems with
+this:
+
+* Lots of C library calls aren't reentrant. If Perl happens to be
+  in the middle of a "malloc" (for example) when the signal handler
+  is invoked, then you'll get a core dump, if you're lucky, or
+  memory corruption, if you're not.
+
+* Perl itself isn't reentrant. If the Perl interpreter is in the
+  middle of executing something when the signal handler is called,
+  then you'll get similar problems. Generally the result will be
+  a core dump.
+
+This isn't much of a problem in typical, low load programs. Chances
+are your typical program spends most of its time waiting on system
+calls, and it's quite safe to receive a signal during a system call,
+because neither the C library, nor the Perl interpreter will be
+running.
+
+However, in Net::FTPServer under load, it is a *big* problem.
+
+2. Perl 5.7's safe signals
+--------------------------
+
+In Perl >= 5.7, signals are not executed asynchronously. Instead,
+signals are queued in the Perl interpreter and are executed at
+safe "sequence points" (roughly corresponding to a ";" semicolon
+in the code) between statements. This ensures that signal handlers
+can run safely without the reentrancy problems outlined above.
+
+3. Net::FTPServer safe signals
+------------------------------
+
+Net::FTPServer is not in the position where we can force people to
+upgrade to Perl 5.7. We want to support Perl 5.00503 for the foreseeable
+future.
+
+The only way to provide safe signals in Net::FTPServer was to include
+a tiny piece of C code which enqueues the asynchronous signals and
+then allows Perl to test for signals at a safe, synchronous point in
+the code.
+
+The C code FTPServer.xs actually handles the three problematical
+signals (SIGCHLD, SIGHUP and SIGURG). This code is straightforward.
+
+The Perl function _check_signals needs to be called periodically. Its
+job is to check for any outstanding signals and run their handlers
+synchronously. This function is called in just four places:
+
+* In the main "accept" loop of the parent process (see below).
+* In the command loop of the child process, just after a command has
+  been read.
+* In the store loop while files are being uploaded, to check for SIGURG.
+* In the retrieve loop while files are being downloaded, to check for
+  SIGURG.
+
+The only difficult case is the "accept" loop. Normally, Net::FTPServer
+would do something like this in the parent:
+
+  for (;;)
+  {
+    my $sock = $control_socket->accept;
+
+    # Fork off a child process to handle new "$sock" connection.
+  }
+
+If we simply add a call to _check_signals then we get:
+
+  for (;;)
+  {
+    my $sock = $control_socket->accept;
+
+    $self->_check_signals;
+
+    # Fork off a child process to handle new "$sock" connection.
+  }
+
+However, this doesn't work very well. A particular problem is that
+when a signal is received, it doesn't actually interrupt the "accept"
+call. Hence the only time that signals are ever processed is when
+a new connection is accepted. This could cause zombie children to
+be left hanging around for much longer than acceptable, and it's
+also a real problem when you send SIGHUP to restart the process.
+There could be a long delay after sending the SIGHUP before the
+process actually restarts.
+
+So this code instead uses select(2) to check every few seconds for
+a signal. This works well and doesn't cause any significant load on
+the processor.
+
+4. Safe signals - the Future
+----------------------------
+
+We will continue to use this implementation of safe signals until:
+
+* Someone comes up with a better way to do it, or:
+* Everyone has migrated to Perl 5.8, and earlier versions are
+  considered obsolete.

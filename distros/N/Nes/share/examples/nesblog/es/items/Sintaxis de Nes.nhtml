@@ -1,0 +1,115 @@
+<h2><a href="#">Sintaxis de Nes</a></h2>
+<h3>Bloques</h3>
+<p> 
+Las instrucciones de Nes están formadas por <i>bloques</i> encerrados entre llaves,
+ las llaves para abrir y cerrar un bloque son respectivamente:
+<pre>
+&#123;:  y  :&#125;
+
+</pre>
+</p> 
+<h3>Tags</h3>
+<p>
+Los <i>Tags</i> son la palabra/símbolo que precede a las llaves de abrir el bloque.
+ De forma genérica llamaremos <i>Tags</i> a todo el bloque, similar a lo que hacemos con los <i>Tag HTML</i>.
+ Y de forma general la sintaxis de Nes es:
+<pre>
+llave_abrir tag (parámetros) [HTML] llave_cerrar
+</pre>
+<b>tag</b> Puede ser:
+<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<b><a href="./?action=item&item=Tag comentario">#</a></b> comentario<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<b><a href="./?action=item&item=Tag $ (variable)">$</a></b> variable<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<b><a href="./?action=item&item=Tag * (environment_variable)">*</a></b> variable de entorno<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<b><a href="./?action=item&item=Tag ~ (expresión)">~</a></b> expresión<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<b><a href="./?action=item&item=Tag sql (SQL SELECT)">sql</a></b> SQL SELECT<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<b><a href="./?action=item&item=Tag @ (table)">@</a></b> tabla de datos<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<b><a href="./?action=item&item=Tag @ (table)">@$</a></b> campo de una tabla de datos<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<b><a href="./?action=item&item=Tag include (file)">include</a></b> incluir un archivo<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<b><a href="./?action=item&item=Tag NES ver (file)">NES</a></b> NES<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<b><a href="./?action=item&item=Plugins">&</a></b> Plugin<br>
+<br>
+<b>Parámetros</b>:
+<br>
+<br>
+Los parámetros requieren paréntesis cuando hay más de uno o existen espacios,
+ además si hay espacios es necesario comillas simples, las comillas dobles están
+ reservadas para futuras versiones y no se deben usar para evitar incompatibilidades.
+<br>
+<br>
+Si los parámetros incluyen comillas, éstas deben ir precedidas de una barra
+ invertida (<i>\'</i>). Se pueden incluir comas en los parámetros sin necesidad 
+ de barra pero éstas deben ir siempre encerrados entre comillas (<i>','</i>)
+<br>
+<br>
+<b>HTML</b>:
+<br>
+<br>
+Es el código HTML que se incluirá en algunos <i>Tags</i>.
+<br>
+<br>
+<b>Ejemplos</b>:
+<p>
+<i>Tag</i> que usamos para mostrar el contenido de una variable:
+<pre>
+&#123;: $ ( variable ) :&#125;
+
+</pre>
+</p>
+<p>
+Los espacios en la mayoría de los casos no son necesarios, pero por claridad se recomienda su uso:
+<br>
+<pre>
+&#123;:$(variable):&#125;
+
+</pre>
+</p>
+<p>
+Se permite abreviar de la siguiente manera:
+<br>
+<pre>
+&#123;: $ ( 'variable' ) :&#125;
+&#123;: $ ( variable ) :&#125;
+&#123;: $ variable :&#125; 
+&#123;: $variable :&#125;
+
+Las cuatro formas tienen el mismo significado.
+</pre>
+</p>
+<p>
+Los paréntesis no son necesarios siempre que no haya espacios entre los parámetros:
+<br>
+<pre>
+&#123;: ~ $variable &lt;p&gt;código HTML&lt;/p&gt :&#125; <- *innecesarios
+
+&#123;: ~ ( $ variable1 == $ variable2 ) &lt;p&gt;código HTML&lt;/p&gt :&#125; <- *necesarios
+</pre>
+</p>
+<p>
+Uso de comillas y comas en los parámetros:
+<br>
+<pre>
+&#123;: include ('file.html','The \'Title\'','one, two and three') :&#125; 
+</pre>
+</p>
+<p>
+Todos los <i>Tags</i> salvo <a href="./?action=item&item=Tag NES ver (file)">NES</a> pueden ocupar varias lineas:
+<br>
+<pre>
+&#123;: #
+        
+        Si <i>variable</i> devuelve true 
+        se mostrará "código HTML"
+        
+:&#125;
+&#123;: ~ ( $ variable ) 
+        &lt;p&gt;código HTML&lt;/p&gt;
+:&#125;
+</pre>
+</p>
+<p>
+
+<br>
+</p>
+

@@ -1,0 +1,11 @@
+Revision history for Perl extension Net::XRC.
+
+0.02  Mon Feb 11 14:10:14 PST 2013
+        - Don't attempt to verify certificate of xrc.everyone.net, fixing use
+          with LWP 6.0+ (closes: CPAN#79919)
+        - Disable tests since we have no current test account
+
+0.01  Sun Aug  7 03:53:08 2005
+	- original version; created by h2xs 1.23 with options
+		-X -b 5.5.0 -n Net::XRC -v 0.01
+

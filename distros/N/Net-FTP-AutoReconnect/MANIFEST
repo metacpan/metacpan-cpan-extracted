@@ -1,0 +1,6 @@
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+lib/Net/FTP/AutoReconnect.pm
+t/00compile.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,46 @@
+{
+   "abstract" : "Implementation of a set of utilities to help in developing Amazon web service modules in Perl.",
+   "author" : [
+      "Gonzalo Barco <gbarco uy at gmail com, no spaces>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Amazon-Utils",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "HTTP::Message" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "XML::Simple" : "0",
+            "perl" : "5.010000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.21"
+}

@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Nagios/Check/Email/Sender.pm
+readme.md
+scripts/check_email_sender.pl

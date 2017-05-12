@@ -1,0 +1,168 @@
+<?xml version="1.0"?>
+<!DOCTYPE oscar SYSTEM "Protocol.dtd">
+
+<oscar>
+	<!-- TLV definitions are needed for bootstrapping TLV support -->
+	<define name="TLV">
+		<word name="type" />
+		<data length_prefix="word" name="data" />
+	</define>
+	<define name="subtyped_TLV">
+		<word name="type" />
+		<byte name="subtype" />
+		<data length_prefix="byte" name="data" />
+	</define>
+
+
+	<!-- Simple primitives -->
+	<define name="just_byte"><byte name="x" /></define>
+	<define name="just_word"><word name="x" /></define>
+	<define name="just_dword"><dword name="x" /></define>
+	<define name="just_data"><data name="x" /></define>
+
+	<!-- Fixed values -->
+	<define name="fixed_value"><word>123</word></define>
+	<define name="fixed_value_data"><data>foo</data></define>
+
+	<!-- Length prefixes, counts -->
+	<define name="length_prefix"><data length_prefix="word" name="x" /></define>
+	<define name="vax_prefix"><data length_prefix="word" prefix_order="vax" name="x" /></define>
+	<define name="repeated_data"><word count="-1" name="x" /></define>
+	<define name="fixed_width_data"><data length="10" name="x" /><data name="y" /></define>
+	<define name="default_generate_data"><data default_generate="yes" length_prefix="word" /></define>
+	<define name="null_terminated_data"><data name="foo" null_terminated="yes" /><data name="bar" /></define>
+	<define name="null_separated_array"><data name="foo" count="-1" null_terminated="yes" /></define>
+	<define name="null_pad_data"><data name="foo" length="10" pad="0" /></define>
+	<define name="count_prefix_data">
+		<word count_prefix="byte" name="foo" />
+		<word name="bar" />
+	</define>
+	<define name="complex_count_prefix">
+		<data count="-1" name="foo">
+			<data length_prefix="word" name="bar" />
+			<data count_prefix="word" name="baz">
+				<data length_prefix="word" name="buzz" />
+			</data>
+		</data>
+	</define>
+
+	<!-- Count and Length -->
+	<define name="count_len"><data count="-1" length="1" name="foo" /></define>
+
+	<!-- TLVs -->
+	<define name="basic_tlv">
+		<tlvchain>
+			<tlv type="1"><word name="x" /></tlv>
+			<tlv type="2"><word name="y" /></tlv>
+		</tlvchain>
+	</define>
+	<define name="data_tlv">
+		<tlvchain><tlv type="1"><data name="x" /></tlv></tlvchain>
+	</define>
+	<define name="data_prefix_tlv">
+		<tlvchain><tlv type="1"><data length_prefix="word" name="x" /></tlv></tlvchain>
+	</define>
+	<define name="subdata_tlv">
+		<tlvchain subtyped="yes"><tlv type="1" subtype="1"><data name="x" /></tlv></tlvchain>
+	</define>
+	<define name="subdata_prefix_tlv">
+		<tlvchain subtyped="yes"><tlv type="1" subtype="1"><data length_prefix="word" name="x" /></tlv></tlvchain>
+	</define>
+	<define name="length_tlv">
+		<tlvchain length="7">
+			<tlv type="1"><data name="x" /></tlv>
+		</tlvchain>
+		<data name="y" />
+	</define>
+	<define name="named_tlv">
+		<tlvchain>
+			<tlv type="1" name="foo"><data name="x" /></tlv>
+			<tlv type="2" name="bar"><data name="y" /></tlv>
+		</tlvchain>
+	</define>
+	<define name="named_only_tlv">
+		<tlvchain><tlv type="1" name="foo" /></tlvchain>
+	</define>
+	<define name="complex_data_tlv">
+		<tlvchain>
+			<tlv type="1">
+				<data name="foo" length="3" />
+				<word name="bar" />
+				<dword>1793</dword>
+				<byte name="baz" />
+			</tlv>
+			<tlv type="2">
+				<data name="buzz" />
+			</tlv>
+		</tlvchain>
+	</define>
+	<define name="subtyped_tlv">
+		<tlvchain subtyped="yes">
+			<tlv type="1" subtype="1" name="foo"><word name="x" /></tlv>
+			<tlv type="1" subtype="2" name="bar"><word name="y" /></tlv>
+		</tlvchain>
+	</define>
+	<define name="count_prefix_tlv">
+		<tlvchain count_prefix="word">
+			<tlv type="1"><data name="x" /></tlv>
+			<tlv type="2"><data name="y" /></tlv>
+		</tlvchain>
+	</define>
+	<define name="count_type_tlv">
+		<tlvchain>
+			<tlv type="1" count="-1" name="x">
+				<data name="y" />
+			</tlv>
+		</tlvchain>
+	</define>
+	<define name="count_subtype_tlv">
+		<tlvchain subtyped="yes">
+			<tlv type="1" subtype="1" count="-1" name="x">
+				<data name="y" />
+			</tlv>
+		</tlvchain>
+	</define>
+	<define name="default_generate_tlv">
+		<tlvchain>
+			<tlv type="1" default_generate="yes" />
+		</tlvchain>
+	</define>
+
+	<!-- Buddy Trikill -->
+	<define name="im_footer_test">
+                <tlvchain>
+                        <tlv type="2">
+                                <tlvchain>
+                                        <tlv type="1281">
+                                                <word>257</word>
+                                                <word>257</word>
+                                        </tlv>
+                                </tlvchain>
+                        </tlv>
+                </tlvchain>
+	</define>
+
+
+	<!-- ref -->
+	<define name="ref_foo"><word name="foo" /></define>
+	<define name="ref_bar"><word name="bar" /></define>
+	<define name="ref"><ref name="ref_foo" /><ref name="ref_bar" /></define>
+
+	<!-- SNAC -->
+	<define name="snac" family="1" subtype="2"><data /></define>
+
+	<!-- enum -->
+	<define name="enum">
+		<enum type="word" name="metasyntax">
+			<edef name="foo" value="1" />
+			<edef name="bar" value="2" />
+			<edef name="baz" value="3" />
+		</enum>
+	</define>
+	<define name="enum_default">
+		<enum type="byte" name="icecream">
+			<edef name="chocolate" value="1" />
+			<edef name="vanilla" value="2" default="yes" />
+		</enum>
+	</define>
+</oscar>

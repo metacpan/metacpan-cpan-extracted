@@ -1,0 +1,18 @@
+Net::Rackspace::CloudFiles is a client library for working with a Rackspace Cloud Files account.
+
+INSTALLATION
+
+To install this module type the following:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+COMMENTS / BUGS
+
+Please report comments and bugs to one of us:
+
+William Wolf <throughnothing@gmail.com>
+Naveed Massjouni <ironcamel@gmail.com>

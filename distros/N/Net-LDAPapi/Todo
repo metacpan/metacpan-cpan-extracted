@@ -1,0 +1,15 @@
+#############################################
+#   Net::LDAPapi - TODO List                #
+#                                           #
+#   Last Modified                           #
+#   Date:  Wed Aug 20 15:27:19 PST 2007     #
+#############################################
+
+Platforms:
+- Test on windows
+
+LDAPv3 API Support:
+- Test against Mozilla C SDK
+
+Package:
+- Update examples to be compliant with version 3.0 builds

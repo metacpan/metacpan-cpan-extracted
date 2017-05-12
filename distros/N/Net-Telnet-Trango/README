@@ -1,0 +1,339 @@
+NAME
+    Net::Telnet::Trango - Perl extension for accessing the Trango telnet
+    interface
+
+SYNOPSIS
+      use Net::Telnet::Trango;
+      my $t = new Net::Telnet::Trango ( Timeout => 5 );
+
+      $t->open( Host => $ap ) or die "Error connecting: $!";
+
+      $t->login('password') or die "Couldn't log in: $!";
+
+      # Do whatever
+
+      $t->exit;
+      $t->close;
+
+DESCRIPTION
+    Perl access to the telnet interface on Trango APs and SUs.
+
+    A handy feature is that it will parse the output from certain commands
+    that is in the format "[key1] value1 [key2] value2" and put those in a
+    hashref that is returned. This makes using the output from things like
+    sysinfo very easy to do.
+
+  EXPORT
+    None
+
+METHODS
+  new - Creates a new Net::Telnet::Trango object.
+        new([Options from Net::Telnet,]
+            [Decode => 0,]);
+
+    Same as new from Net::Telnet but sets the default Trango Prompt:
+    '/[\$#]>\s*\Z/'
+
+    It also takes an optional parameter 'Decode'. If not defined it defaults
+    to 1, if it is set to 0, it will not decode the output and instead
+    return a reference to an array of the lines that were returned from the
+    command.
+
+ACCESSORS
+    These are usually only set internally.
+
+  firmware_version - returns the firmware version
+    Returns the firmware version if available, otherwise undef.
+
+    It should be available after a successful open().
+
+  host_type - return the type of host you are connected to.
+    returns the type of host from the login banner for example M5830S or
+    M5300S.
+
+    Should be available after a successful open().
+
+  is_connected - Status of the connection to host.
+    returns 1 when connected, undef otherwise.
+
+  logged_in - Status of being logged in to the host.
+    returns 1 after a successful login(), 0 if it failed and undef if
+    login() was never called.
+
+  login_banner - The banner when first connecting to the host.
+    returns the banner that is displayed when first connected at login. Only
+    set after a successful open().
+
+  last_lines - The last lines of output from the last cmd().
+    returns, as an array ref, the output from the last cmd() that was run.
+
+  last_error - A text output of the last error that was encountered.
+    returns the last error reported. Probably contains the last entry in
+    last_lines.
+
+ALIASES
+  bye - alias of exit()
+    Does the same as exit()
+
+  restart - alias of reboot()
+    Does the same as reboot()
+
+  save_systemsetting - alias of save_ss()
+    Does the same as save_ss()
+
+COMMANDS
+    Most of these are just shortcuts to "cmd(String => METHOD)", as such
+    they accept the same options as "cmd()". Specifically they take a named
+    paramater "args", for example: "tftpd(args => 'on')" would enable tftpd
+
+  tftpd - The output from the tftpd command
+    Returns a hash ref of the decoded output from the command.
+
+    Also see enable_tftpd() and disable_tftpd() as those check that it was
+    successfully changed.
+
+  ver - The output from the ver command
+    Returns a hash ref of the decoded output from the command.
+
+  sysinfo - The output from the sysinfo command
+    Returns a hash ref of the decoded output from the command.
+
+  exit - Exits the connection
+    exits the command session with the Trango and closes the connection
+
+  reboot - Sends a reboot command
+    reboots the Trango and closes the connection
+
+  reset <all|0..2> - Sends a reset command
+    resets settings to default
+
+  remarks - Set or retrieve the remarks.
+    Takes an optional argument, which sets the remarks. If there is no
+    argument, returns the current remarks.
+
+      my $old_remarks = $t->remarks();
+      $t->remarks($new_remarks);
+
+  sulog - The output from the sulog command
+    Returns an array ref of hashes containing each log line.
+
+  save_sudb - saves the sudb
+    Returns true on success, undef on failure
+
+  syslog - The output from the sulog command
+    Returns a hashref of the output from the syslog command
+
+  pipe - the pipe command
+    Returns the output from the pipe command
+
+  maclist - retrieves the maclist
+    Returns the output from the maclist command
+
+  maclist_reset - resets the maclist.
+    No useful output.
+
+  eth_link - eth link command
+    Returns the output from the eth link command
+
+    This command seems to cause some weird issues. It often will cause the
+    command after it to appear to fail. I am not sure why.
+
+  su_info - gets the su info
+    Returns information about the SU.
+
+    You need to pass in the $suid and it will return the info for that suid.
+
+      $t->su_info($suid);
+
+  su_testrflink - tests the RF Link to an su
+      $t->su_testrflink($suid|'all');
+
+  save_ss - saves the config.
+    Returns 1 on success, undef on failure.
+
+  set_baseid - sets baseid
+        $t->set_baseid($baseid);
+
+  set_suid - sets baseid
+        $t->set_suid($baseid);
+
+  set_defaultopmode - sets default opmode
+        $t->set_defaultopmode(ap|su);
+
+  opmode - sets or returns the opmode
+        $t->opmode([ap y|su y]);
+
+  freq - sets or returns the freq
+        $channel = '11 v';
+        $t->freq([$channel]);
+
+  freq_writescan - sets the freq writescan
+        $channels = '11 v 11 h 12 v 12 h';
+        $t->freq_writescan($channels);
+
+  freq_scantable - returns the freq scantable
+        $channels = $t->freq_scantable();
+        # now $channels eq '11 v 11 h 12 v 12 h';
+
+  open - Open a connection to a Trango AP.
+    Calls Net::Telnet::open() then makes sure you get a password prompt so
+    you are ready to login() and parses the login banner so you can get
+    host_type() and firmware_version()
+
+  login - Login to the AP.
+    Calls open() if not already connected, then sends the password and sets
+    logged_in() if successful
+
+  parse_login_banner - Converts the login_banner to something useful.
+    Takes a login banner (what you get when you first connect to the Trango)
+    or reads what is already in login_banner() then parses it and sets
+    host_type() and firmware_version() as well as login_banner()
+
+  linktest - Link test to SU
+    linktest('suid'[, 'pkt len, bytes'[, '# of pkts'[, '# of cycles']]]);
+
+    Returns a hash reference to the results of the test
+
+  su_password - Set the password on SUs connected to the AP.
+    su_password('new_password'[, 'suid']) If no suid is specified, the
+    default is "all".
+
+      $t->su_password('good_pass', 5);
+
+  ipconfig - Change IP configuration
+    ipconfig( 'new_ip', 'new_subnet', 'new_gateway' )
+
+      $t->ipconfig( '10.0.1.5', '255.255.255.0', '10.0.1.1' );
+
+  su_ipconfig - Change IP configuration on SUs connected to the AP.
+    su_ipconfig( 'suid', 'new_ip', 'new_subnet', 'new_gateway' )
+
+      $t->su_ipconfig( 5, '10.0.1.5', '255.255.255.0', '10.0.1.1' );
+
+  sudb_view - Returns the output from the sudb view command
+    returns a reference to an array of hashes each containing these keys
+    'suid', 'su2su', 'type', 'cir', 'mir' and 'mac'
+
+  sudb_add - Adds an su to the sudb
+    Takes the following paramaters
+
+        suid : numeric,
+        type : (reg|pr)
+        cir  : numeric,
+        mir  : numeric,
+        mac  : Almost any format, it will be reformatted,
+
+    and returns true on success or undef otherwise.
+
+      $t->sudb_add($suid, 'reg', $cir, $mir, $mac);
+
+    You should save_sudb() after calling this, or your changes will be lost
+    when the AP is rebooted.
+
+  sudb_delete - removes an su from the sudb
+    Takes either 'all' or the suid of the su to delete and returns true on
+    success or undef otherwise.
+
+      $t->sudb_delete($suid);
+
+    You should save_sudb() after calling this, or your changes will be lost
+    when the AP is rebooted.
+
+  sudb_modify - changes the su information in the sudb
+    Takes either the suid of the su to change as well as what you are
+    changing, either "cir, mir or su2su" and returns true on success or
+    undef otherwise.
+
+    cir and mir also take a value to set the cir/mir to.
+
+    su2su takes a group id parameter that is in hex.
+
+      $t->sudb_modify($suid, 'cir', 512);
+
+    You should save_sudb() after calling this, or your changes will be lost
+    when the AP is rebooted.
+
+  enable_tftpd - enable the TFTP server
+    runs "tftpd(args => 'on')" and makes sure that Tftpd is now 'listen'ing
+
+  disable_tftpd - disable the TFTP server
+    runs "tftpd(args => 'off')" and makes sure that Tftpd is now 'disabled'
+
+  cmd - runs a command on the AP.
+    This does most of the work. At the heart, it calls Net::Telnet::cmd()
+    but it also does some special stuff for Trango.
+
+    Normally returns the last lines from from the command
+
+    If you are using this, rather than one of the "easy" methods above, you
+    probably want to read through the source of this module to see how some
+    of the other commands are called.
+
+    In addition to the Net::Telnet::cmd() options, it also accepts these:
+
+    *decode* - if this is true, then it will send the output lines to
+    _decode_lines() and then returns the decoded output
+
+    *no_prompt* - if this is true, it does not wait for a prompt, so you are
+    not stuck waiting for something that will never happen.
+
+    *cmd_disconnects* - if this is true, it then sets logged_in() to false,
+    then it will close() the connection and set is_connected() to false
+
+    *expect* - if this is set (usually to 'Success.') it will check for that
+    in the last line of output and if it does not, will return undef because
+    the command probably failed
+
+    *args* - a string containing the command line options that are passed to
+    the command
+
+        $t->cmd( String => 'exit', no_prompt => 1, cmd_disconnects => 1 );
+
+SEE ALSO
+    Trango Documentation -
+    <http://www.trangobroadband.com/support/product_docs.htm>
+
+    Net::Telnet
+
+TODO
+    There are still a lot of commands that are not accessed directly. If you
+    call them (as cmd("command + args") or whatever) and it works, please
+    send me examples that work and I will try to get it incorporated into
+    the next version of the script.
+
+    I also want to be able to parse the different types of output from
+    commands like su, sudb all and anything else that would be better
+    available as a perl datastructure.
+
+AUTHOR
+    Andrew Fresh <andrew@rraz.net>
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Net::Telnet::Trango
+
+    You can also look for information at:
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Net-Telnet-Trango>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Net-Telnet-Trango>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Telnet-Trango>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Net-Telnet-Trango>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005,2006,2007 by Andrew Fresh
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

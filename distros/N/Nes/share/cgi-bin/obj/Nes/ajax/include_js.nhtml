@@ -1,0 +1,30 @@
+{: NES 1.0 none :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  Nes 1.03 by Skriptke
+  Copyright 2009 - 2010 Enrique Castanon
+  Licensed under the GNU GPL.
+
+  Sample:
+  http://nes.sourceforge.net/
+
+  CPAN:
+  http://search.cpan.org/dist/Nes/
+
+  Repository:
+  http://github.com/Skriptke/nes
+   
+  DOCUMENTATION:
+  perldoc Nes::Obj::include_js
+ 
+  -----------------------------------------------------------------------------
+:}
+<script type="text/javascript">
+  var js_{: * q_include_js_param_2 :} = document.createElement("script");
+  js_{: * q_include_js_param_2 :}.type = "text/javascript";
+  js_{: * q_include_js_param_2 :}.src = "{: * q_include_js_param_1 :}";
+  if (document.getElementsByTagName('head')[0]) { setTimeout("document.body.appendChild(js_{: * q_include_js_param_2 :});",{: ~ (!*q_include_js_param_3)0:}{: ~ (*q_include_js_param_3){: * q_include_js_param_3 :}:}); }
+</script>
+
+

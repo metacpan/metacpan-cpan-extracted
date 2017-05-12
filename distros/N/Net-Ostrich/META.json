@@ -1,0 +1,47 @@
+{
+   "abstract" : "Perl interface to Ostrich",
+   "author" : [
+      "Cory G Watson <gphat@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300001, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Ostrich",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::XS" : 0,
+            "LWP::UserAgent" : 0,
+            "Moose" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0,
+            "strict" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/iinteractive/net-ostrich",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/iinteractive/net-ostrich.git",
+         "web" : "https://github.com/iinteractive/net-ostrich"
+      }
+   },
+   "version" : "0.01"
+}
+

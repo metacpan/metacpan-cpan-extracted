@@ -1,0 +1,146 @@
+#!/usr/bin/perl
+
+use strict;
+
+use Data::Dumper;
+use Getopt::Long qw(GetOptions);
+use Net::WhitePages;
+
+# ----------------------------------------------------------------------
+# Option parsing
+# ----------------------------------------------------------------------
+my %opts = (
+    'token'     => $ENV{'WHITEPAGES_TOKEN'},
+    'output'    => 'text',
+    'extra'     => 0,
+    'apt'       => '',
+    'areacode'  => '',
+    'city'      => '',
+    'firstname' => '',
+    'house'     => '',
+    'lastname'  => '',
+    'metro'     => '',
+    'phone'     => '',
+    'state'     => '',
+    'street'    => '',
+    'zip'       => '',
+    'debug'     => undef,
+);
+
+GetOptions(\%opts,
+    'token|t=s',
+    'output|O=s',
+    'extra|extras|x!',
+    'debug!',
+    'apt=s',
+    'areacode=s',
+    'city=s',
+    'firstname=s',
+    'house=s',
+    'lastname=s',
+    'metro=s',
+    'phone=s',
+    'state=s',
+    'street=s',
+    'zip=s',
+);
+
+# ----------------------------------------------------------------------
+# Start the work
+# ----------------------------------------------------------------------
+my $wp = Net::WhitePages->new(TOKEN => $opts{'token'}, DEBUG => $opts{'debug'});
+my $search_method;
+my @search_params;
+
+if (@ARGV) {
+    $opts{'phone'} = "@ARGV";
+    $opts{'phone'} =~ s/^\s*//;
+    $opts{'phone'} =~ s/\s*$//;
+}
+
+if ($opts{'phone'}) {
+    $search_method = 'reverse_phone';
+    @search_params = qw(phone state);
+}
+elsif ($opts{'lastname'}) {
+    $search_method = 'find_person';
+    @search_params = qw(firstname lastname house street city
+                        state zip areacode metro);
+}
+elsif ($opts{'street'}) {
+    $search_method = 'reverse_address';
+    @search_params = qw(house apt street city state zip areacode);
+}
+else {
+    die "Missing search criteria\n";
+}
+
+if ($opts{'debug'}) {
+    local $" = ", ";
+    warn "Searching with '$search_method', using fields '@search_params'\n";
+}
+
+#warn "Searching via '$search_method' with ", Dumper(\%opts);
+my $res = $wp->$search_method(map { $_ => $opts{$_ } } @search_params);
+
+if ($res->{'result'}->{'type'} eq 'error') {
+    print "Ooops: $res->{'result'}->{'message'}\n";
+    exit 9;
+}
+
+#print Dumper($res) if $opts{'debug'};
+
+#print "output type = '$opts{'output'}'\n";
+if ($opts{'output'} eq 'text') {
+    for (my $i = 0; $i < @{ $res->{'listings'} }; ) {
+        my $l = $res->{'listings'}->[$i];
+
+        if ($l->{'people'} && @{ $l->{'people'} }) {
+            print "Name: ", join "; ", map { "$_->{'lastname'}, $_->{'firstname'}" } @{ $l->{'people'} };
+            print "\n";
+        }
+
+        if ($l->{'business'} && (my $n = $l->{'business'}->{'businessname'})) {
+            print "Business: $n\n";
+        }
+
+        if (my $ns = $l->{'phonenumbers'}) {
+            print "Phone Numbers: ", join "; ", map { $_->{'fullphone'} } @$ns;
+            print "\n";
+        }
+
+        if (my $a = $l->{'address'}) {
+            my @bits;
+            push @bits, $a->{'fullstreet'}    if $a->{'fullstreet'};
+            push @bits, $a->{'city'}    if $a->{'city'};
+            push @bits, $a->{'state'}   if $a->{'state'};
+            if ($a->{'zip'}) {
+                push @bits, $a->{'zip4'} ? "$a->{'zip'}-$a->{'zip4'}" : $a->{'zip'};
+            }
+            push @bits, $a->{'country'} if $a->{'country'};
+
+            local $" = ", ";
+            print "Address: @bits\n" if @bits;
+        }
+
+        if (my $g = $l->{'geodata'}) {
+            print "Geolocation: $g->{'longitude'}, $g->{'latitude'}\n";
+        }
+
+        if ($opts{'extra'} && $l->{'listingmeta'} && (my $x = $l->{'listingmeta'}->{'moreinfolinks'})) {
+            for my $n (values %$x) {
+                print "$n->{'linktext'}: $n->{'url'}\n";
+            }
+        }
+
+        unless (++$i == @{ $res->{'listings'} }) {
+            print "\n";
+        }
+    }
+}
+
+else {
+    die "$opts{'output'} output unimplemented\n"
+}
+
+

@@ -1,0 +1,58 @@
+-> running `basic':
+ 0. init.................. pass
+ 1. begin................. pass
+ 2. options............... pass
+ 3. put_get............... pass
+ 4. put_get_utf8_segment.. pass
+ 5. mkcol_over_plain...... pass
+ 6. delete................ pass
+ 7. delete_null........... pass
+ 8. mkcol................. pass
+ 9. mkcol_again........... pass
+10. delete_coll........... pass
+11. mkcol_no_parent....... pass
+12. mkcol_with_body....... pass
+13. finish................ pass
+<- summary for `basic': of 14 tests run: 14 passed, 0 failed. 100.0%
+-> running `copymove':
+ 0. init.................. pass
+ 1. begin................. pass
+ 2. copy_init............. pass
+ 3. copy_simple........... pass
+ 4. copy_overwrite........ pass
+ 5. copy_cleanup.......... pass
+ 6. copy_coll............. pass
+ 7. move.................. pass
+ 8. move_coll............. pass
+ 9. move_cleanup.......... pass
+10. finish................ pass
+<- summary for `copymove': of 11 tests run: 11 passed, 0 failed. 100.0%
+-> running `props':
+ 0. init.................. pass
+ 1. begin................. pass
+ 2. propfind_invalid...... pass
+ 3. propfind_invalid2..... FAIL (PROPFIND with invalid namespace declaration in body (see FAQ) got 207 response not 400)
+ 4. propfind_d0........... pass
+ 5. propinit.............. pass
+ 6. propset............... FAIL (PROPPATCH on `/litmus/prop': 501 Not Implemented)
+ 7. propget............... SKIPPED
+ 8. propmove.............. SKIPPED
+ 9. propget............... SKIPPED
+10. propdeletes........... SKIPPED
+11. propget............... SKIPPED
+12. propreplace........... SKIPPED
+13. propget............... SKIPPED
+14. propnullns............ SKIPPED
+15. propget............... SKIPPED
+16. prophighunicode....... SKIPPED
+17. propget............... SKIPPED
+18. propvalnspace......... SKIPPED
+19. propwformed........... pass
+20. propinit.............. pass
+21. propmanyns............ FAIL (PROPPATCH on `/litmus/prop': 501 Not Implemented)
+22. propget............... FAIL (No value given for property {kappa}somename)
+23. propcleanup........... pass
+24. finish................ pass
+-> 12 tests were skipped.
+<- summary for `props': of 13 tests run: 9 passed, 4 failed. 69.2%
+See debug.log for network/debug traces.

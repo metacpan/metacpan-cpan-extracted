@@ -1,0 +1,11 @@
+Changes
+FileShare.pm
+Makefile.PL
+MANIFEST
+README
+TODO
+Test/Simple.pm
+test.pl
+examples/client_automated.pl
+examples/client_interactive.pl
+examples/server.pl

@@ -1,0 +1,13 @@
+What it is:
+
+	Module Net::Dnet (incomplete, pre-alpha), an future add-on
+	to the Net-ext bundle from me.  Only for systems with DECnet
+	phase IV or phase V support.  It's only here because it escaped
+	as part of `net-ext-a8' (which was a work-in-progress drop).
+	This separate distribution is just to finish superseding the
+	entries in the module list for CPAN.pm so that the older files can
+	be deleted.
+
+
+
+Anyway, bug reports & feature requests to me (spider@Orb.Nashua.NH.US).

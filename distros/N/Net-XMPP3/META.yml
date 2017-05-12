@@ -1,0 +1,46 @@
+--- #YAML:1.0
+name: Net-XMPP3
+version: 1.02
+author:
+  - guruperl
+abstract: XMPP3 Support Library
+license: lgpl
+resources:
+  license: |-
+    http://opensource.org/licenses/artistic-license.php
+requires:
+  Digest::SHA1: 1.02
+  XML::Stream: 1.22
+provides:
+  Net::XMPP3:
+    file: lib/Net/XMPP3.pm
+    version: 1.02
+  Net::XMPP3::Client:
+    file: lib/Net/XMPP3/Client.pm
+  Net::XMPP3::Connection:
+    file: lib/Net/XMPP3/Connection.pm
+  Net::XMPP3::Debug:
+    file: lib/Net/XMPP3/Debug.pm
+  Net::XMPP3::IQ:
+    file: lib/Net/XMPP3/IQ.pm
+  Net::XMPP3::JID:
+    file: lib/Net/XMPP3/JID.pm
+  Net::XMPP3::Message:
+    file: lib/Net/XMPP3/Message.pm
+  Net::XMPP3::Namespaces:
+    file: lib/Net/XMPP3/Namespaces.pm
+  Net::XMPP3::Presence:
+    file: lib/Net/XMPP3/Presence.pm
+  Net::XMPP3::PrivacyLists:
+    file: lib/Net/XMPP3/PrivacyLists.pm
+  Net::XMPP3::Protocol:
+    file: lib/Net/XMPP3/Protocol.pm
+  Net::XMPP3::Roster:
+    file: lib/Net/XMPP3/Roster.pm
+  Net::XMPP3::Stanza:
+    file: lib/Net/XMPP3/Stanza.pm
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: |-
+    http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,21 @@
+exclude  = Miscellanea::RequireRcsKeywords
+severity = 1
+
+[BuiltinFunctions::ProhibitStringyEval]
+allow_includes = 1
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | VERSION | SYNOPSIS | DESCRIPTION | METHODS | DEPENDENCIES | BUGS AND LIMITATIONS | AUTHOR | LICENSE AND COPYRIGHT
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print
+
+[NamingConventions::Capitalization]
+package_exemptions = pack
+
+[TestingAndDebugging::RequireUseStrict]
+severity = 5
+
+[TestingAndDebugging::RequireUseWarnings]
+severity = 5

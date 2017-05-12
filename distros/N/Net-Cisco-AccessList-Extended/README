@@ -1,0 +1,159 @@
+NAME
+    Net::Cisco::AccessList::Extended - Generate Cisco extended access-lists
+
+VERSION
+    This document refers to version 1.01 of
+    Net::Cisco::AccessList::Extended.
+
+SYNOPSIS
+     use Net::Cisco::AccessList::Extended;
+     my $l = Net::Cisco::AccessList::Extended->new('INCOMING_LIST');
+ 
+     $l->push({
+         access  => 'permit',
+         proto   => 'ip',
+         src_og  => 'friendly_net',
+         dst_og  => 'local_net',
+     });
+ 
+     print $l->dump, "\n";
+     # prints the access-list commands to STDOUT, something like:
+ 
+     access-list INCOMING_LIST extended permit ip object-group friendly_net object-group local_net
+
+DESCRIPTION
+    Use this module to manage the presentation of Cisco Extended Access
+    Lists. List entries are pushed into the object in a simple parmaterized
+    fashion, and you can then dump the list in a format that is parsable by
+    Cisco devices.
+
+    Support is included for list entries that reference Object Groups (as
+    used by more recent PIX OS and FWSM software versions).
+
+IMPORTANT NOTE
+    This module's error checking is only concerned with syntactic
+    correctness. It makes no judgement of the *semantic correctness* of your
+    list entries.
+
+    For instance, newer FWSM systems use netmasks specified in terms of host
+    address network masks (e.g. 255.255.255.0), whereas older systems use
+    wildcard bits (e.g. 0.0.0.255). "Net::Cisco::AccessList::Extended" will
+    not check that you use the correct type of mask, or even that your mask
+    isn't something completely inappropriate (e.g. "cabbages").
+
+METHODS
+  "Net::Cisco::AccessList::Extended->new"
+    Each access list that you manage must be created through this method,
+    which takes one parameter, the name of the access list.
+
+    On success this method returns a newly instatiated
+    "Net::Cisco::AccessList::Extended" object. Lucky you.
+
+  "push"
+    Use this method to add an access list entry (sometimes called an Access
+    Control Entry by Cisco documentation) to the end of an access list. In
+    case it is not obvious, access lists are ordered, so *pushing* an entry
+    means it is added to the *end* of the list.
+
+    Parameters are all passed within a single hash reference argument. Which
+    keys of that hash you populate will depend on the Access Control Entry
+    (hereafter, ACE) that you are appending to the access list. Logic within
+    the module should check that you are syntactically correct, but for
+    brevity of this documentation you are referred to the many Cisco manuals
+    containing ACE syntax usage guidelines.
+
+    Possible keys and values are as follows:
+
+    "access"
+        This parameter is required and dictates whether the ACE will be a
+        *permit* or *deny* rule, with the following values being interpreted
+        as meaning "permit":
+
+         Permit | permit | 1
+
+        Any other value in this slot is taken to be a request for a "deny"
+        statement.
+
+    "proto" or "proto_og"
+        Network protocol. As mentioned above, it is your responsibility to
+        enter something that the Cisco device will parse (e.g. a recognised
+        protocol name or IANA assigned number, or protocol object group).
+        This parameter is required.
+
+    "src_ip", "src_mask" or "src_og"
+        Source network. Various combinations of these three keys are
+        permitted. Omitting them all results in the keyword "any" being
+        used. Only providing the "src_ip" is allowed, as well as providing
+        both the "src_ip" and "src_mask". *Alterntively* you may specify an
+        object group in the "src_og" slot.
+
+    "src_svc_op", "src_svc", "src_svc_hi" or "src_svc_og"
+        Source port(s). Again, various combinations of these keys are
+        permitted. A service (aka *port*) object group is used by *only*
+        filling the "src_svc_og" slot. Otherwise, "src_svc_op" is required
+        and is the service operator (e.g. "gt", "eq", etc). "src_svc" is the
+        service name or IANA assigned port number, and if the operator is
+        "range" then the upper port boundary must be provided in the
+        "src_svc_hi" slot.
+
+    "dst_ip", "dst_mask" or "dst_og"
+        These keys function identically to their "src_" counterparts, but of
+        course control the production of destination network address fields.
+
+    "dst_svc_op", "dst_svc", "dst_svc_hi" or "dst_svc_og"
+        These keys function identically to their "src_" counterparts, but of
+        course control the production of destination service fields.
+
+    "icmp" or "icmp_og"
+        Any value in this slot will be appended to the ACE, so that you can
+        limit the match to a particular ICMP message type if the rule's
+        protocol is "icmp". Use "icmp_og" if your value is the name of an
+        icmp object group.
+
+    On success this method returns its own object. On failure this module
+    will "die".
+
+  "dump"
+    This method generates and returns the access list as it would look in a
+    Cisco configuration file.
+
+    The returned value is a scalar, with embedded newline characters and no
+    terminating newline, so you will need to append that as required. Note
+    that when submitting this to, for example, a Net::Appliance::Session
+    session via "cmd()", a newline will be automatically appended by that
+    method.
+
+    Fully compatible Cisco commands are produced on the fly from the data
+    stored in the "Net::Cisco::AccessList::Extended" object, so you can
+    "dump" and "push" repeatedly to your heart's content.
+
+DIAGNOSTICS
+    "missing parameter for list name"
+        You have not provided the required parameter to "new()", see
+        "METHODS".
+
+    Various other "missing..." or "cannot..." messages
+        These are generated by the internal syntax checking routine, which
+        will alert you to conflicting parameters passed to the "push" object
+        method.
+
+DEPENDENCIES
+    Other than the contents of the standard Perl distribution, you will need
+    the following:
+
+    *   Class::Accessor::Fast (bundled with Class::Accessor)
+
+    *   List::MoreUtils
+
+SEE ALSO
+    Net::Cisco::ObjectGroup, Net::Appliance::Session
+
+AUTHOR
+    Oliver Gorwits "<oliver.gorwits@oucs.ox.ac.uk>"
+
+COPYRIGHT & LICENSE
+    Copyright (c) The University of Oxford 2008.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

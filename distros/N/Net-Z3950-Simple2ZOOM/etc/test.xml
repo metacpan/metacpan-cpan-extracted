@@ -1,0 +1,167 @@
+<client>
+  <!-- We don't want this except when testing authenticator
+	<authentication>http://resolver.indexdata.com/mod_perl/sru-auth?user={user}&amp;pass={pass}</authentication>
+  -->
+  <database name="ammem">
+    <zurl>http://memory.loc.gov:80/cgi-bin/sru2.0/ammem</zurl>
+    <option name="sru">get</option>
+    <option name="timeout">120</option>
+    <search>
+      <querytype>cql</querytype><!-- specifies what back-end expects to see; incoming PQF is assumed -->
+      <map use="4">
+        <index>title</index>
+      </map>
+      <map use="1016">
+      </map>
+    </search>
+  </database>
+
+  <database name="ppoc">
+    <zurl>http://memory.loc.gov:80/cgi-bin/sru2.0/ppoc</zurl>
+    <option name="sru">get</option>
+    <option name="timeout">120</option>
+    <search>
+      <querytype>cql</querytype>
+      <map use="4">
+        <index>title</index>
+      </map>
+      <map use="1016"/>
+    </search>
+  </database>
+
+  <database name="test">
+    <zurl>localhost:9999/Default</zurl>
+    <option name="preferredRecordSyntax">USMARC</option>
+    <charset>marc-8</charset>
+  </database>
+
+  <database name="books">
+    <zurl>z3950.loc.gov:7090/voyager</zurl>
+    <option name="preferredRecordSyntax">USMARC</option>
+    <charset>marc-8</charset>
+  </database>
+
+  <database name="srubooks">
+    <zurl>http://z3950.loc.gov:7090/voyager</zurl>
+    <option name="sru">get</option>
+    <!-- Force version 1.1 as older YAZ Proxy builds reject v1.2 -->
+    <option name="sru_version">1.1</option>
+    <charset>marc-8</charset>
+    <search>
+      <querytype>cql</querytype>
+      <map use="4"><index>title</index></map>
+      <map use="1003"><index>creator</index></map>
+    </search>
+    <schema oid="1.2.840.10003.5.10"
+            sru="info:srw/schema/1/marcxml-v1.1"
+            format="MARC21" encoding="UTF-8"/>
+  </database>
+
+  <database name="testsru">
+    <zurl>http://localhost:9999/Default</zurl>
+    <option name="sru">get</option>
+    <search>
+      <querytype>cql</querytype>
+      <map use="4">
+	  <index>title</index>
+      </map>
+    </search>
+  </database>
+
+  <!--
+	We provide four different ways to access the same ZeeRex
+	server: using Type-1 queries over Z39.50, CQL over Z39.50,
+	Type-1 over SRU (an Index Data-specific protocol extension)
+	and CQL over SRU.  All of these should work for searching; all
+	but CQL over Z39.50 for scanning.
+  -->
+  <database name="zeerex-z3950-pqf">
+    <zurl>localhost:8018/IR-Explain---1</zurl>
+  </database>
+
+  <database name="zeerex-z3950-cql">
+    <zurl>localhost:8018/IR-Explain---1</zurl>
+    <search>
+      <querytype>cql</querytype>
+      <map use="4"><index>dc.title</index></map>      
+    </search>
+  </database>
+
+  <database name="zeerex-sru-pqf">
+    <zurl>http://localhost:8018/IR-Explain---1</zurl>
+    <option name="sru">get</option>
+  </database>
+
+  <database name="zeerex-sru-cql">
+    <zurl>http://localhost:8018/IR-Explain---1</zurl>
+    <option name="sru">get</option>
+    <search>
+      <querytype>cql</querytype>
+      <map use="4"><index>dc.title</index></map>      
+    </search>
+  </database>
+
+  <database name="gils">
+    <zurl>tcp:localhost:9999/default</zurl>
+    <!-- nonamedresultsets/ -->
+    <sutrs-record>
+     <field xpath="Control-Identifier"/>
+     <field xpath="Title"/>
+     <field xpath="Originator"/>
+     <field xpath="Local-Subject-Index"/>
+     <field xpath="Spatial-Domain"/>
+     <field xpath="Date-of-Last-Modification"/>
+    </sutrs-record>
+    <usmarc-record>
+     <!-- ### These mappings are probably completely wrong -->
+     <field xpath="Control-Identifier">001</field>
+     <field xpath="Title">245$a</field>
+     <field xpath="Originator">100$a</field>
+     <field xpath="Local-Subject-Index">600$a</field>
+     <field xpath="FieldThatIsNotThere">600$b</field>
+     <field xpath="Date-of-Last-Modification">260$c</field>
+     <field xpath="Abstract/Comments">999$a</field>
+     <field xpath="'MARC record formatted by Simple2ZOOM'">999$z</field>
+    </usmarc-record>
+    <grs1-record>
+     <field xpath="Control-Identifier">(1,14)</field>
+     <field xpath="Title">(2,1)</field>
+     <field xpath="Originator">(2,2)</field>
+     <field xpath="Local-Subject-Index">(2,21)</field>
+     <field xpath="FieldThatIsNotThere">(3,should-not-appear)</field>
+     <field xpath="Date-of-Last-Modification">(3,admin)(1,16)</field>
+     <field xpath="Abstract/Comments">(3,admin)(2,6)</field>
+     <field xpath="'GRS-1 record formatted by Simple2ZOOM'">(2,sw)</field>
+    </grs1-record>
+  </database>
+
+  <database name="srugils">
+    <zurl>http://localhost:9999/default</zurl>
+    <resultsetid>search</resultsetid>
+    <option name="sru">get</option>
+    <search>
+      <querytype>cql</querytype>
+      <map use="4"><index>dc.title</index></map>      
+    </search>
+    <schema oid="1.2.840.10003.5.10"
+            sru="info:srw/schema/1/marcxml-v1.1"
+            format="MARC21" encoding="UTF-8"/>
+  </database>
+
+  <database name="gsafd">
+    <zurl>http://alcme.oclc.org/srw/search/GSAFD</zurl>
+    <option name="sru">get</option>
+    <search>
+      <querytype>cql</querytype>
+      <map use="4"><index>dc.title</index></map>      
+    </search>
+  </database>
+
+  <search>
+    <querytype>cql</querytype>
+    <map use="4"><index>dc.title</index></map>
+    <map use="1016"><index>any</index></map>
+    <map use="1035"/>
+  </search>
+
+</client>

@@ -1,0 +1,51 @@
+--- #YAML:1.0
+general:
+  config_version: '$RedRiver: update_trango.yaml,v 1.3 2007/02/06 23:00:31 andrew Exp $'
+  firmware_path: firmware
+  password: trango
+FPGA:
+  M5830S:
+    cksum: 53544B3E
+    file_cksum: 61
+    file_name: Access5830_AP_SU_2p0r7/v04092700.hex
+    file_size: 260026
+    ver: '04092700'
+  M5300S-FSU: &1
+    cksum: 4EC29742
+    file_cksum: BB
+    file_name: Fox_FPGA_050705_02/Fox_FPGA_050705_02.hex
+    file_size: 195306
+    ver: '05070502'
+  M5800S-FSU: *1
+Firmware:
+  M5300S-FSU:
+    cksum: 8087E54F
+    file_cksum: 40
+    file_name: FSU_2p0r2_Firmware/fsu53_2p0r2H0003D05121201.s19
+    file_size: 578518
+    ver: FSU 2p0r2H0003D05121201
+  M5800S-FSU:
+    cksum: 5D5D0876
+    file_cksum: 1F
+    file_name: FSU_2p0r2_Firmware/fsu58_2p0r2H0003D05121201.s19
+    file_size: 578486
+    ver: FSU 2p0r2H0004D05121201
+  M5830S AP:
+    cksum: 8B61198D
+    file_cksum: A7
+    file_name: Access5830_AP_SU_2p0r7/ap_2p0r7H8002D07010207.s19
+    file_size: 882814
+    ver: AP 2p0r7H8002D07010207
+  M5830S SU:
+    cksum: 83D75A29
+    file_cksum: D3
+    file_name: Access5830_AP_SU_2p0r7/su_2p0r7H0002D07010207.s19
+    file_size: 581694
+    ver: SU 2p0r7H0002D07010207
+hosts:
+  - name: 192.168.206.222-223
+  - name: 192.168.207.2
+  - name: 192.168.208.2
+    password: different_password
+  - name: 192.168.209.2-200
+

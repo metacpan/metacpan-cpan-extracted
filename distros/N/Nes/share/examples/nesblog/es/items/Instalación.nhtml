@@ -1,0 +1,131 @@
+<h2><a href="#">Instalación</a></h2>
+<h3>Requiere los módulos</h3>
+<pre>
+    
+  Obligatorio:
+    Crypt::CBC
+    Crypt::Blowfish
+    IO::String
+    IO::File
+     
+  Para PHP Wrapper o mod_perl:
+    Env::C
+    IPC::Run
+    
+  Para mysql u otros:
+    DBI
+    DBD::mysql
+    DBD::Pg
+    DBD:: ...
+    
+  Para la utilidad nes_site:
+    File::ShareDir
+    File::Copy::Recursive
+    
+</pre>
+<p>
+* Recomendamos que se instalen todos los módulos.
+</p>
+<h3>Instalar como root</h3>
+<pre>
+    
+  perl Makefile.PL
+  make
+  make test
+  make install
+  
+</pre>
+
+<h3>Instalar localmente</h3>
+<pre>
+    
+  perl Makefile.PL PREFIX=/home/USER/dir
+  make
+  make test
+  make install
+  
+</pre>
+<p>
+ * Cambia /home/USER/dir por tu particular path
+</p>
+
+<h3>Configuración</h3>
+<p>
+Nes requiere la canfiguración de tu cgi-bin y del .htaccess
+de cada directorio que contiene plantillas Nes.
+</p>
+<p>
+Para activar y configurar Nes usa la utilidad: <i><b>set_nes_site</b></i>
+</p>
+
+<h3>Configurar</h3>
+<p>
+Ejemplos:
+</p>
+<pre>
+  Activar Nes en /usr/lib/cgi-bin:
+    set_nes_site --cgi_dir=/usr/lib/cgi-bin
+    
+  Configurar Nes para el directorio /var/www/myweb:
+    set_nes_site --dir_cfg=/var/www/myweb
+    
+  Configurar Nes para todo el sitio:
+    set_nes_site --dir_cfg=/var/www  
+        
+  Instalar ejemplos hello world y test en /var/www/test_nes:
+    set_nes_site --from_exam=hello_nes --to_exam=/var/www/test_nes
+    
+  Más ayuda:
+    set_nes_site --help    
+
+</pre>
+<p>
+  * Cambia /usr/lib/cgi-bin y /var/www por tu particular path
+</p>
+
+<h3>Configurar localmente</h3>
+<p>
+Para configurar Nes localmente, busca el path de Nes.pm y añade
+<i>iprefix</i> en las opciones <i>cgi_dir</i> y <i>from_exam</i>.
+</p>
+<p>
+Ejemplos:
+</p>
+<pre>
+  Activar Nes en /usr/lib/cgi-bin:
+    set_nes_site --cgi_dir=/usr/lib/cgi-bin --iprefix=/home/USER/path-to-Nes
+    
+  Más ayuda:
+    set_nes_site --help      
+
+</pre>
+<p>
+* Change /usr/lib/cgi-bin and /home/USER/path-to-Nes for you particular path
+</p>
+<h3>Test de la instalación</h3>
+<pre>
+    
+  Activar Nes en cgi-bin:
+    set_nes_site --cgi_dir=/full-path-to/cgi-bin
+  * incluye la opción --iprefix para una configuración local.
+    
+  Instalar ejemplos hello world y test en el directorio test_nes:
+    set_nes_site --from_exam=hello_nes --to_exam=/full-path-to/root-www/test_nes
+  * incluye la opción --iprefix para una configuración local.
+
+</pre>
+<p>
+* cambia /full-path-to... por tu particular path
+</p>
+<pre>
+  Test:
+    http://yousite/test_nes/hello.nhtml
+      Tienes que ver "Hello World!" en ésta página
+      
+    http://yousite/test_nes/test.nhtml
+      Tienes que ver "Hello Nes!" y algunas varialbes Nes.
+
+</pre>
+<p>
+Asegurate que el test es correcto comprobando que tu error.log no contiene errores.
+</p>

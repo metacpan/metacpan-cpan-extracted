@@ -1,0 +1,45 @@
+{: NES 1.0 none :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  Nes 1.03 by Skriptke
+  Copyright 2009 - 2010 Enrique Castañón
+  Licensed under the GNU GPL.
+
+  Sample:
+  http://nes.sourceforge.net/
+
+  CPAN:
+  http://search.cpan.org/dist/Nes/
+
+  Repository:
+  http://github.com/Skriptke/nes
+
+  -----------------------------------------------------------------------------
+:}
+<div id="cuadro2">
+<center>
+{: ~ ( ! * nes_session_ok ) 
+    {: include ('{: * cfg_obj_form :}/secure_login.nhtml',
+                "
+                  script_handler   => '{: * nes_this_dir :}/../scripts/lib.cgi',
+                  function_handler => 'check_user_login',
+                  out_page         => './?action=profile',
+                  msg_name         => 'Nombre',
+                  msg_pass         => 'Contraseña',
+                  form_name        => 'fnb_login',
+                  captcha_name     => 'cnb_login',
+                  id_form          => 'fnb_id',
+                  msg_remember     => 'Recordar sessión',
+                  msg_legend       => '&nbsp;&#8226; Conectarse &#8226;&nbsp;', 
+                  msg_login        => 'Entrar',                   
+                "
+               )         
+    :}
+
+:}
+{: ~ ( * nes_session_ok )
+ Logged in as: {: * nes_session_user :}
+:}
+</center>
+</div> 

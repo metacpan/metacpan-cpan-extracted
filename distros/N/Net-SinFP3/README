@@ -1,0 +1,54 @@
+Net::SinFP3
+===========
+
+   Go to http://www.metabrik.org/sinfp3/ to know more.
+
+INSTALLATION
+
+   To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   sudo ./Build install
+
+DEPENDENCIES
+
+   This module requires these other modules and libraries:
+
+   Perl v5.6.1
+   Class::Gomor
+   Data::Dumper
+   DBD::SQLite
+   DBI
+   Digest::MD5
+   File::Glob
+   FindBin
+   Frontier::Client
+   IO::Socket::INET
+   IO::Socket::INET6
+   IO::Select
+   LWP::UserAgent
+   Net::Frame
+   Net::Frame::Device
+   Net::Frame::Dump
+   Net::Frame::Layer::IPv6
+   Net::Frame::Layer::SinFP3
+   Net::Frame::Simple
+   Net::Libdnet
+   Net::Netmask
+   Net::Write
+   Parallel::ForkManager
+   POSIX
+   Socket
+   Socket6
+   Time::Interval
+   Net::Write::Fast
+
+COPYRIGHT AND LICENSE
+
+   You may distribute this module under the terms of the Artistic license.
+   See LICENSE.Artistic file in the source distribution archive.
+
+   Copyright (c) 2011-2015, Patrice <GomoR> Auffret
+

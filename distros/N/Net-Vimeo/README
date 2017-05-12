@@ -1,0 +1,84 @@
+NAME
+    Net::Vimeo - Make requests via OAuth to Vimeo Advanced API
+
+VERSION
+    Version 0.000004
+
+SYNOPSIS
+        use Net::Vimeo;
+
+        my $vimeo = Net::Vimeo->new( consumer_key => 'xxxx', consumer_secret => 'yyyy' );
+    
+        # First you need to get the authorization URL
+        # If you need permission to upload a video, send the 
+        # permission paramether, otherwise you will only have read permission
+        my $vimeo_oauth_url = $vimeo_oauth->get_authorization_url( permission => 'write' );
+
+        # Get the oauth_verifier from that url and
+        # exchange the request tokens with acces tokens
+        $vimeo->get_access_token( { verifier => 'oauth_verifier' } );
+
+        # Now you are authorized....you can start playing
+        my $request_params = {
+            method      => 'vimeo.activity.userDid',
+            user_id     => 'someuserid',
+            page        => 1,
+            per_page    => 10,
+            format      => 'json',
+        };
+
+        my $result = $vimeo->make_api_request( 'GET', $request_params);
+
+METHODS
+    make_api_request($method, $request_params)
+        After you have your access tokens via OAuth you can start making
+        requests to Vimeo Advanced API. Arguments necessary to make the call
+        to Vimeo Advanced API are: $method which is a string representing
+        the HTTP method needed for your request. The second one is the api
+        request params, you can find the needed params on Vimeo Advanced API
+        documentation.
+
+            $vimeo->make_api_request( 'GET', $request_params);
+
+AUTHOR
+    Mirela Iclodean, "<imirela at cpan.org>"
+
+SEE ALSO
+    Net::Vimeo::OAuth
+
+BUGS
+    Please report any bugs or feature requests to "bug-net-vimeo at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Vimeo>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Net::Vimeo
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Vimeo>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Net-Vimeo>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Net-Vimeo>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Net-Vimeo/>
+
+LICENSE AND COPYRIGHT
+    Copyright 2014 Mirela Iclodean.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0).
+

@@ -1,0 +1,11 @@
+Article.pm
+FormArticle.pm
+AutoReply.pm
+FormReply.pm
+MANIFEST
+Makefile.PL
+README
+t/basics.t
+t/form.t
+t/autoreply.t
+t/formreply.t

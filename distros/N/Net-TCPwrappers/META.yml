@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name: Net-TCPwrappers
+version: 1.11
+author:
+  - George A. Theall, E<lt>theall@tifaware.comE<gt>
+  - |-
+    Currently maintained by James FitzGibbon, E<lt>jfitz@CPAN.orgE<gt>.
+abstract: Perl interface to tcp_wrappers.
+license: perl
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+provides:
+  Net::TCPwrappers:
+    file: lib/Net/TCPwrappers.pm
+    version: 1.11
+generated_by: Module::Build version 0.2607

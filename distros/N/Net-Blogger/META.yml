@@ -1,0 +1,66 @@
+---
+name: Net-Blogger
+version: 1.02
+author:
+  - 'Christopher H. Laco <claco@chrislaco.com>'
+abstract: |-
+  an OOP-ish interface for accessing a weblog via
+  the Blogger XML-RPC API.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CGI: '>= 0'
+  Carp: '>= 0'
+  Digest::MD5: '>= 0'
+  Error: '>= 0'
+  HTTP::Cookies: '>= 0'
+  SOAP::Lite: '>= 0.55'
+  URI: '>= 0'
+build_requires:
+  Term::ReadKey: '>= 0'
+  Test::Simple: '>= 0.47'
+provides:
+  Net::Blogger:
+    file: lib/Net/Blogger.pm
+    version: 1.02
+  Net::Blogger::API::Core:
+    file: lib/Net/Blogger/API/Core.pm
+    version: 1.0
+  Net::Blogger::API::Extended:
+    file: lib/Net/Blogger/API/Extended.pm
+    version: 1.0
+  Net::Blogger::Engine::Base:
+    file: lib/Net/Blogger/Engine/Base.pm
+    version: 1.0
+  Net::Blogger::Engine::Blogger:
+    file: lib/Net/Blogger/Engine/Blogger.pm
+    version: 1.0
+  Net::Blogger::Engine::Manila:
+    file: lib/Net/Blogger/Engine/Manila.pm
+    version: 1.0
+  Net::Blogger::Engine::Movabletype:
+    file: lib/Net/Blogger/Engine/Movabletype.pm
+    version: 1.0
+  Net::Blogger::Engine::Movabletype::mt:
+    file: lib/Net/Blogger/Engine/Movabletype/mt.pm
+    version: 1.0
+  Net::Blogger::Engine::Radio:
+    file: lib/Net/Blogger/Engine/Radio.pm
+    version: 1.0
+  Net::Blogger::Engine::Slash:
+    file: lib/Net/Blogger/Engine/Slash.pm
+    version: 1.0
+  Net::Blogger::Engine::Slash::slashcode:
+    file: lib/Net/Blogger/Engine/Slash/slashcode.pm
+    version: 1.0
+  Net::Blogger::Engine::Userland:
+    file: lib/Net/Blogger/Engine/Userland.pm
+    version: 1.0
+  Net::Blogger::Engine::Userland::metaWeblog:
+    file: lib/Net/Blogger/Engine/Userland/metaWeblog.pm
+    version: 1.0
+generated_by: Module::Build version 0.28
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

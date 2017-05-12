@@ -1,0 +1,5 @@
+LIBRARY "Object"
+EXPORTS
+  boot_Notes__Object
+  _boot_Notes__Object = boot_Notes__Object
+  

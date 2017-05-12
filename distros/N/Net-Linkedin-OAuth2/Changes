@@ -1,0 +1,6 @@
+Revision history for Perl extension Linkedin::OAuth2.
+
+0.01  Tue Oct 27 18:19:06 2015
+	- original version; created by h2xs 1.23 with options
+		-AX Linkedin::OAuth2
+

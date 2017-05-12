@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+############################################################
+# mp3 artist_name
+# Christopher Boumenot <boumenot+na@gmail.com, 2009
+############################################################
+
+use strict;
+use warnings;
+
+#use Log::Log4perl qw(:easy);
+#Log::Log4perl->easy_init($INFO);
+
+use Net::Amazon;
+use Net::Amazon::Request::MP3Downloads;
+
+die "usage: $0 artist\n(use 'Hand in My Pocket' as an example)\n" unless defined $ARGV[0];
+
+my $ua = Net::Amazon->new(
+    associate_tag => $ENV{AMAZON_ASSOCIATE_TAG},
+    token         => $ENV{AMAZON_TOKEN},
+    secret_key    => $ENV{AMAZON_SECRET_KEY},
+    max_pages   => 1,
+);
+
+my $req = Net::Amazon::Request::MP3Downloads->new(
+    title => $ARGV[0],
+);
+
+   # Response is of type Net::Amazon::MP3::Response
+my $resp = $ua->request($req);
+
+if($resp->is_success()) {
+    print $resp->as_string, "\n";
+} else {
+    print $resp->message, "\n";
+}

@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Net/WOT.pm
+t/00-compile.t
+t/api.t
+t/author-critic.t
+t/create_link.t
+t/get_reputation.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

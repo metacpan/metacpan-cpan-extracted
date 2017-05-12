@@ -1,0 +1,10 @@
+Changes
+Lite.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/base.t
+t/more.t
+t/pod.t
+t/podcov.t

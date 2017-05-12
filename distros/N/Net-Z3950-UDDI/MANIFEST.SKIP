@@ -1,0 +1,15 @@
+.gitignore
+CVS
+archive
+bin/CVS
+bin/googletest
+bin/short-test
+bin/soaptest
+bin/sru2uddi.php
+bin/udditest
+bin/wsdltest
+lib/CVS
+lib/Net/CVS
+lib/Net/Z3950/CVS
+t/CVS
+z2uddi.pdf

@@ -1,0 +1,5 @@
+Sgg_session	T_PTROBJ
+Sgg_http	T_PTROBJ
+const unsigned char *	T_PV
+uin_t	T_UV
+unsigned long	T_UV

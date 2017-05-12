@@ -1,0 +1,87 @@
+{
+   "abstract" : "Easy OO access to the FreshBooks.com API",
+   "author" : [
+      "Edmund von der Burg <evdb@ecclestoad.co.uk>",
+      "Olaf Alders <olaf@wundercounter.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-FreshBooks-API",
+   "no_index" : {
+      "directory" : [
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Hooks::EndOfScope" : "0.09",
+            "Carp" : "0",
+            "Clone" : "0",
+            "Data::Dump" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "Lingua::EN::Inflect" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Net::OAuth::Simple" : "0",
+            "Params::Validate" : "0",
+            "Path::Class" : "0",
+            "Scalar::Util" : "0",
+            "URI" : "0",
+            "WWW::Mechanize" : "0",
+            "XML::LibXML" : "0",
+            "XML::Simple" : "0",
+            "base" : "0",
+            "namespace::autoclean" : "0.11",
+            "parent" : "0.224",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DateTime" : "0",
+            "File::Slurp" : "0",
+            "Sub::Override" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Simple" : "0.98",
+            "Test::WWW::Mechanize" : "0",
+            "Test::XML" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/oalders/Net-FreshBooks-API/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Net-FreshBooks-API",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/oalders/net-freshbooks-api.git",
+         "web" : "https://github.com/oalders/net-freshbooks-api"
+      }
+   },
+   "version" : "0.24"
+}
+

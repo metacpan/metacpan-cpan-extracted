@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+
+
+use strict ;
+
+use Nagios::Report ;
+
+my $hostname_re = shift @ARGV ;
+$hostname_re
+  or die <<USAGE;
+$0 <hostname | hostname_pattern>
+
+Extracts Nagios Availability report data for host(s) matching the regex argument.
+eg $0 ^Alb
+USAGE
+
+my $host_re = qr/$hostname_re/ 
+  or die "Can't compile hostname regex '$hostname_re'." ;
+
+my $x = Nagios::Report->new(q<web_page Nagios_Server Auth_Nagios_User Auth_PW>, [q<24x7 Optus_DEST_SLA_hours>])
+  or die "Can't construct Nagios::Report object." ;
+
+
+							# Only display these fields in this order.
+my @these_fields = qw(
+  HOST_NAME
+  TOTAL_TIME_DOWN
+  PERCENT_TOTAL_TIME_DOWN
+  PERCENT_TOTAL_TIME_UP
+  AVAIL_URL
+) ;
+
+$x->mkreport(
+							# Display these fields only (in the order of the list)
+
+
+		\@these_fields,
+							# Record selector
+
+
+		sub { my %F = @_; my $h = $F{HOST_NAME}; $h =~ /$host_re/ },
+
+							# Sort order
+
+		# sub { my %f = @_; package Nagios::Report; $a->[$f{HOST_NAME}] cmp $b->[$f{HOST_NAME}] }
+) ;
+
+$x->debug_dump(290, 4) ;

@@ -1,0 +1,55 @@
+use Net::Bluetooth;
+
+	#### Create a RFCOMM server
+
+	#### Create a new socket object, this is basically calling
+	#### the systems socket() call and setting some variable.
+	#### The argument can be either "RFCOMM" or "L2CAP".
+	my $server_obj = Net::Bluetooth->newsocket("L2CAP");
+	die "Socket could not be created!" unless(defined($server_obj));
+	print "after socket\n";
+
+	#### Bind to port 1
+	if($server_obj->bind(5) != 0) {
+		#### Could try another port instead of exiting.
+		die "bind error: $!\n";
+	}
+                                                                                                                   
+	print "after bind\n";
+	#### Listen with a backlog of 2
+	if($server_obj->listen(2) != 0) {
+		die "listen error: $!";
+	}
+	print "after listen\n";
+                                                                                                                   
+	#### Register a service
+	#### $server_obj must be a open and bound socket
+	#### The second option is the service ID.
+	#### The third option is the service name.
+	#### The fourth option is the service description.
+	my $service_obj = Net::Bluetooth->newservice($server_obj, "1101", "GPS", "GPS");
+	print "new service\n";
+	unless(defined($service_obj)) {
+		die "Could not register service!";
+	}
+                                                                                                                   
+	#### accept a client connection
+	$client_obj = $server_obj->accept();
+	unless(defined($client_obj)) {
+		die "client accept failed: $!";
+	}
+                                                                                                                   
+	#### Create a Perl filehandle for reading and writing
+	#### The filehandle should work with any Perl call that
+	#### does not use the sockaddr struct.
+	*CLIENT = $client_obj->perlfh();
+	foreach(1 .. 1000) {
+		print CLIENT "stuff";
+	}
+
+	#### close client connection
+	close(CLIENT);
+	#### stop advertising service
+	$service_obj->stopservice();
+	#### close server connection
+	$server_obj->close();

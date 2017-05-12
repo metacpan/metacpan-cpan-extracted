@@ -1,0 +1,9 @@
+lib/Net/NIS/Netgroup.pm		Perl interface to the package
+Netgroup.xs			Perl extension
+t/00-load.t			Basic test: Module loadable?
+t/01-call.t			More tests
+Makefile.PL			MakeMaker make file
+MANIFEST			This list of files
+README				Pseudo-Readme
+ChangeLog			Change log
+META.yml                                 Module meta-data (added by MakeMaker)

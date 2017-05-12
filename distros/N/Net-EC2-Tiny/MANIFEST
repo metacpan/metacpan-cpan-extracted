@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Net/EC2/Tiny.pm
+t/00-load.t
+t/01-basic.t
+weaver.ini

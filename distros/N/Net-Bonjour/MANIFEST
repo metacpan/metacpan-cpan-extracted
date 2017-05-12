@@ -1,0 +1,16 @@
+ChangeLog
+MANIFEST			This File
+Makefile.PL			Perl MakeMaker Makefile
+README
+demo/demo.pl
+demo/list.cgi
+demo/all_services.pl
+lib/Net/Bonjour.pm
+lib/Net/Bonjour/Entry.pm
+lib/Net/Rendezvous.pm
+lib/Net/Rendezvous/Entry.pm
+t/1-use.t
+t/2-entry.t
+t/3-rendezvous.t
+t/4-enterprise.ot
+META.yml                                Module meta-data (added by MakeMaker)

@@ -1,0 +1,31 @@
+0.205	Mon, 28 Oct 2013 10:19:00 -0400 dfs
+
+	Use explicit TXT and A queries rather than "ANY" queries.  Some
+	DNS servers do not answer ANY queries.
+
+0.204	Tue, 06 Jun 2013 15:05:00 -0400 dfs
+
+	Add "lookup_keys" optional parameter to query_ip.
+
+	Support TXT lookups as well as A lookups.
+
+	Fix deprecation warning (CPAN ticket #85790)
+
+0.201	Thu, 04 Mar 2010 14:35:34 -0500 dmo
+
+	Change "actual_hit" answer string to "actual_hits" arrayref of hits to
+        preserve all 'normal' mode results.
+
+0.200	Mon, 22 Feb 2010 16:12:37 -0500	dfs
+
+	Add "return_all" option to query_ip.  This returns all DNSBLs, even
+	those that were not hit.  Allows you to get more info back from the
+	resolver as to why a DNSBL was not hit.
+
+	Fix misleading examples in POD.
+
+	Convert incorrect build_requires to test_requires in Makefile.PL
+
+0.100	Thu, 18 Feb 2010 10:56:30 -0500	dfs
+
+	First usable version.

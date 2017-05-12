@@ -1,0 +1,59 @@
+Revision history for Perl extension Net-IP-Match-Bin.
+
+0.01  Wed Sep 30 22:24:45 2009
+	- original version; created by h2xs 1.23 with options
+		-A -n Net-IP-Match-XS2
+
+0.01  Tue Oct 20 22:00:00 2009
+	- original version; created from Net-IP-Match-XS2
+
+0.02  Wed Oct 21 22:00:00 2009
+	- added Perl alternative.
+	- added bench mark result.
+
+0.03  Thu Oct 22 00:00:00 2009
+	- little bit speed-up Perl alt. verson.
+
+0.04  Sat Nov 14 00:00:00 2009
+	- Fix mem leak at add().
+	- Fix _add() for registering ARRAY data.
+
+0.05  Tue Nov 17 00:00:00 2009
+	- Fix Makefile.PL which cannot compile XS.
+	- little Fix document
+
+0.06  Wed Dec  1 16:50:00 2010
+	- Fix Bin.xs, lib/Net/IP/Match/Bin/Perl.pm for /32-net bug.
+		Thanks, Oliver Paukstadt.
+
+0.07  Thu Apr 18 01:18:00 2013
+	- Fix Bin.xs for supress compiler warnings.
+	- Fix Makefile.PL for silly compile checking.
+
+0.08  Thu Apr 23 23:54:34 2013
+	- Fix Bin.xs for _WIN32 compile errors.
+
+0.09  Thu May  5 20:00:01 2013
+	- Fix Bin.xs parse_ip hazardus when invalid data.
+	- Add add_range(), list(), clean() methods.
+	- some document fixes.
+
+0.10  Thu May  9 12:00:01 2013
+	- Fix Bin.xs for invalid net addition.
+	- Fix _clean() for parformance flaw.
+
+0.11  Thu May 14 00:00:05 2013
+	- Remove ~Bin/Perl.pm pure-Perl module dependence.
+
+0.12  Fri Sep 27 01:00:00 2013
+	- now add()/add_range() returns the object itself when success.
+	.. enabling usage like, $obj->add(\@nets)->list.
+
+0.13  Fri Sep 27 21:10:00 2013
+	- Fix add()/add_range() that was destructive when arguments
+	.. were ARRAY.
+
+0.14  Thu Aug  7 15:00:00 2014
+	- Fix add() for Hash-ref arguments.
+	- match_ip() can match CIDR not just an IP.
+

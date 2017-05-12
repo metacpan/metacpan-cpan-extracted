@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Nagios-Plugin-Simple
+version:             0.06
+abstract:            Simple and Minimalistic Nagios Plugin Package
+license:             ~
+author:              
+    - Michael R. Davis (account=>perl,tld=>com,domain=>michaelrdavis)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Test::Simple:                  0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

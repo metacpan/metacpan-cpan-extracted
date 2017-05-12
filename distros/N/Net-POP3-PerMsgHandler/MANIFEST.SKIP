@@ -1,0 +1,13 @@
+.bak
+.old
+.DS_Store
+.exists
+.svn
+.swp
+errors.err
+Makefile$
+tar.gz$
+tar$
+^pod/
+script/pod2html.pl
+config.yml

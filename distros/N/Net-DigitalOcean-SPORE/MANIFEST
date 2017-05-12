@@ -1,0 +1,13 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.pod
+digital_ocean.json
+dist.ini
+lib/Net/DigitalOcean/Spore.pm
+t/release-eol.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

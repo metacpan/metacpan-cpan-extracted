@@ -1,0 +1,22 @@
+README
+------
+
+Some of these demonstration scripts may require additional modules.
+
+
+FILES
+-----
+named
+ - Supposed to be a drop-in replacement for bind's /usr/sbin/named
+ - (Conf file stuff not working yet.)
+
+named.forwarder
+ - Simple name server that forwards requests to another name server.
+ - It keeps the time to live (TTL) of the responses in a cache.
+
+named.dbmcache
+ - Uses a dbmfile for the TTL cache.
+
+mysql/README
+ - Working example of SQL backend resolver.
+ - Requires DBI and DBD::mysql to be installed.

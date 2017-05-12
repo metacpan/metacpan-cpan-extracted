@@ -1,0 +1,250 @@
+2004-06-30 18:05  arturaz
+
+	* Chat.pm (1.20), README (1.6), t/1.t (1.12):
+	  * Version bump to 0.71.  * Doc updates in Chat.pm.
+
+2004-06-27 23:04  arturaz
+
+	* Chat.pm (1.19):
+	  Chat.pm
+
+		  * Corrected nick collision avasion code, t seems ok right
+	  now. Still, it's a
+			  bit broken, so i would like ideas how to fix it
+	  :)
+
+2004-06-27 00:07  arturaz
+
+	* Chat.pm (1.18), t/1.t (1.11):
+	  Chat.pm
+
+		  * Added nick collision evasion. However due to that all
+	  module broke. Need
+			  to fix it.
+
+	  t/1.t
+
+		  * Added tests related to unicast socket.
+
+2004-06-25 22:37  arturaz
+
+	* MANIFEST (1.2), t/1.t (1.10):
+	  t/1.t
+
+		  * Somewhat better testing system using alarm.
+
+2004-06-25 20:35  arturaz
+
+	* Chat.pm (1.17):
+	  Chat.pm
+
+		  * removed =head3 channels doc tag.
+
+2004-06-25 19:07  arturaz
+
+	* Changes (1.8), README (1.5):
+	  README
+
+		  * Added link to BerliOS project page.
+
+2004-06-25 18:43  arturaz
+
+	* Chat.pm (1.16), README (1.4), Vypress_Proto.txt (1.2):
+	  Chat.pm
+
+		  * Unicast fully functional.
+		  * New sub: usend_chan
+		  * Version bump to 0.70.
+
+	  README
+
+		  * Version bump to 0.70.
+
+2004-06-25 18:16  arturaz
+
+	* Chat.pm (1.15), t/1.t (1.9):
+	  Chat.pm
+
+		  * New method: mass_to.
+		  * New sub: usend.
+		  * New variable: $vyc->{uc_fail} (see new()).
+		  * Unicast almost fully implemented, public channels left.
+
+	  t/1.t
+
+		  * New test for mass_to.
+
+2004-06-25 01:23  arturaz
+
+	* Changes (1.7), Chat.pm (1.14), t/1.t (1.8):
+	  Chat.pm
+
+		  * F: debug. More human-readable and verbose output on
+	  level 2.
+
+2004-06-24 23:51  arturaz
+
+	* Changes (1.6), Chat.pm (1.13), t/1.t (1.7):
+	  Chat.pm
+
+		  * join renamed to CORE::join.
+
+	  t/1.t
+
+		  * Added tests plan.
+
+2004-06-24 23:45  arturaz
+
+	* Changes (1.5), README (1.3): README
+
+		  * Version bump to 0.62
+
+2004-06-24 23:43  arturaz
+
+	* Changes (1.4), Chat.pm (1.12), t/1.t (1.6):
+
+	  Chat.pm
+
+		  * Version bump to 0.62.
+
+	  t/1.t
+
+		  * localip assigment to 127.0.0.1
+
+2004-06-24 00:10  arturaz
+
+	* Changes (1.3):
+
+	  Changes
+
+		  * Readded file to CVS repository
+
+2004-06-24 00:05  arturaz
+
+	* Chat.pm (1.11), README (1.2): README
+
+		  * Written a readme.
+
+	  Chat.pm
+
+		  * Updated a email link on documentation.
+
+	  Changes
+
+		  * Renamed Changelog to Changes
+
+2004-06-24 00:01  arturaz
+
+	* Chat.pm (1.10): Chat.pm
+
+		  * Fix link on recv in documentation.
+
+2004-06-18 22:16  arturaz
+
+	* Changes (1.2): Changes
+
+		  * Removed it; will ge using cvs2cl utility.
+
+2004-06-18 22:13  arturaz
+
+	* Chat.pm (1.9): Chat.pm
+
+		  * Adding bunch of stuff that i forgot.
+		  * Version bump to 0.60.
+		  * New subs: change_in_channels, get_chans.
+		  * New method for polling info: readsock().
+		  * Doc updates to make links.
+
+2004-06-18 21:49  arturaz
+
+	* Chat.pm (1.8), t/1.t (1.5): Chat.pm
+
+		  * Hopefully fixed private chats.
+		  * Redesigned channels structure.
+		  * Added ip variable to each user.
+		  * A _lot_ of bugfixes.
+
+2004-06-18 15:26  arturaz
+
+	* Chat.pm (1.7): Chat.pm
+
+		  * $self->{sign_topic} variable. See new(). Used on
+	  topic();
+
+2004-06-18 14:16  arturaz
+
+	* t/1.t (1.4): t/1.t
+
+		  * info_ack and spoofed info_ack tests.
+
+2004-06-18 14:10  arturaz
+
+	* Chat.pm (1.6), t/1.t (1.3): Chat.pm	* Privates fixed.	*
+	  TODO: unicast support, modify structure on $self->{channels} and
+	  {users}:	       $self->{channels} = {
+	  '#Main' => {				  'topic' => 'some topic',
+					'users' => [
+		      'john',
+	  'paul'				  ]			  }
+			}		$self->{users} = {
+	      'john' => {			      channels => [
+				    '#Main'
+	  ],				  ip => '1.2.3.4'
+		}		}		We'll need this for
+	  unicasting. Thing about something similar for private
+	    chats.
+
+	  t/1.t   * Commented pchat and pme tests. These doesn't work :(
+
+2004-06-18 01:29  arturaz
+
+	* Chat.pm (1.5), t/1.t (1.2): Chat.pm
+
+	  * Private chats are still broken.  * Subs: add_to_channel,
+	  delete_from_channel, add_to_private, delete_from_private *
+	  Changed channels structure, TODO: change channel topic structure.
+	   * Fixed bug where you got added to same channel twice.  *
+	  Fiddled a LOT with recognise().  * Added basic p* support in
+	  recognise (which is still broken).  * Modified on_chan to support
+	  either 2 or 3 args.
+
+	  t/1.t
+
+	  * Changed some tests.  * Added tests related to p*.
+
+2004-06-18 00:10  arturaz
+
+	* Chat.pm (1.4): Chat.pm
+
+	  * New methods: pjoin(), ppart(), pchat(), pme(), on_priv() * Vim
+	  specs in top of file.
+
+2004-06-17 23:35  arturaz
+
+	* Chat.pm (1.3): Chat.pm
+
+	  * Changed encoding to UTF-8.
+
+2004-06-17 23:25  arturaz
+
+	* Chat.pm (1.2): 0.50	Thu Jun 17 23:25:00 2004
+	  - Chat.pm 			      * renamed send_info
+	  to info_ack.				      * added info_ack
+	  arguments.				 * code cleanup.
+			       * documentation cleanup.
+		     * changes to new():
+	  * send_info variable;				   * host
+	  variable;
+
+2004-06-17 20:42  arturaz
+
+	* Changes (1.1.1.1), README (1.1.1.1), Chat.pm (1.1.1.1), MANIFEST
+	  (1.1.1.1), Makefile.PL (1.1.1.1), Vypress_Proto.txt (1.1.1.1),
+	  t/1.t (1.1.1.1): * Initial CVS release.
+
+2004-06-17 20:42  arturaz
+
+	* Changes (1.1), README (1.1), Chat.pm (1.1), MANIFEST (1.1),
+	  Makefile.PL (1.1), Vypress_Proto.txt (1.1), t/1.t (1.1): Initial
+	  revision
+

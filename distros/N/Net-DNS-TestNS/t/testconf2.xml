@@ -1,0 +1,18 @@
+<!-- begin testconf2.xml -->
+
+      <ans>
+bla.foo.		3600	IN	A 10.0.0.1
+  </ans>
+      <ans>
+bla.foo.		3600	IN	A 10.0.0.2
+  </ans>
+      <ans>
+bla.foo.		3600	IN	A 10.0.0.3
+  </ans>
+      <aut></aut>
+      <add>
+
+bla.foo.		3600	IN	A 10.0.0.3
+</add>
+
+<!--  end testconf2.xml -->

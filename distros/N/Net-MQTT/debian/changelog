@@ -1,0 +1,73 @@
+libnet-mqtt-perl (1.143260-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Mark Hindess (Debian Packages) <soft-debian@temporalanomaly.com>  Sat, 22 Nov 2014 18:59:54 +0000
+
+libnet-mqtt-perl (1.142010-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Mark Hindess (Debian Packages) <soft-debian@temporalanomaly.com>  Sun, 20 Jul 2014 13:33:15 +0100
+
+libnet-mqtt-perl (1.142001-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Mark Hindess (Debian Packages) <soft-debian@temporalanomaly.com>  Sat, 19 Jul 2014 12:41:51 +0100
+
+libnet-mqtt-perl (1.130190-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Sat, 19 Jan 2013 09:23:43 +0000
+
+libnet-mqtt-perl (1.123440-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Sun,  9 Dec 2012 15:23:47 +0000
+
+libnet-mqtt-perl (1.112330-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Sun, 21 Aug 2011 18:24:34 +0100
+
+libnet-mqtt-perl (1.112320-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Sat, 20 Aug 2011 22:41:19 +0100
+
+libnet-mqtt-perl (1.110400-1) unstable; urgency=low
+
+  * Fix topic test to work on perl 5.8 and older.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Wed,  9 Feb 2011 19:24:51 +0000
+
+libnet-mqtt-perl (1.110390-1) unstable; urgency=low
+
+  * Fix inadvertent removal of header bytes when checking incomplete
+    messages.
+  * Error checking when decoding short messages.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Tue,  8 Feb 2011 22:33:18 +0000
+
+libnet-mqtt-perl (1.110200-1) unstable; urgency=low
+
+  * Minor improvements to sample scripts.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Thu, 20 Jan 2011 23:13:32 +0000
+
+libnet-mqtt-perl (1.110170-1) unstable; urgency=low
+
+  * Fix pack syntax error.  Thanks to CPAN Testers.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Mon, 17 Jan 2011 19:58:17 +0000
+
+libnet-mqtt-perl (1.110160-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Sun, 16 Jan 2011 13:20:17 +0000

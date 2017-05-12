@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+test.pl
+lib/Net/SSH/W32Perl.pm
+lib/Net/SSH/W32Perl/SSH2.pm

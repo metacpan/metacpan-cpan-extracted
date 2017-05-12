@@ -1,0 +1,25 @@
+---
+abstract: 'Basic EC2 client'
+author:
+  - 'Mark Allen <mrallen1@yahoo.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-EC2-Tiny
+requires:
+  IO::Socket::SSL: 1.83
+  Moo: 1.000008
+  Net::SSLeay: 1.52
+  XML::Simple: 2.20
+  perl: 5.014
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-EC2-Tiny
+  homepage: https://metacpan.org/dist/Net-EC2-Tiny
+  repository: git://github.com/mrallen1/Net-EC2-Tiny.git
+version: 0.03

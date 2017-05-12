@@ -1,0 +1,24 @@
+---
+abstract: 'The great new Net::Twitpic!'
+author:
+  - 'Yusuke Sugiyama <ally@blinkingstar.net>'
+build_requires:
+  HTTP::Request::Common: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Net::OAuth: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Twitpic
+provides:
+  Net::Twitpic:
+    file: lib/Net/Twitpic.pm
+    version: 0.01
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

@@ -1,0 +1,17 @@
+Changes
+gen/gen_constants_ssh2.pl
+lib/Net/OpenSSH/Compat.pm
+lib/Net/OpenSSH/Compat/SSH2.pm
+lib/Net/OpenSSH/Compat/SSH2/Constants.pm
+lib/Net/OpenSSH/Compat/SSH2/Poll.pm
+lib/Net/OpenSSH/Compat/Perl.pm
+lib/Net/OpenSSH/Compat/SSH.pm
+Makefile.PL
+MANIFEST
+README
+t/Net-OpenSSH-Compat.t
+t/Net-SSH.t
+t/Net-SSH-Perl.t
+examples/conditional_loading.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

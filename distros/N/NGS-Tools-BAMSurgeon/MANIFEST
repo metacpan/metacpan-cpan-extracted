@@ -1,0 +1,25 @@
+bin/bamsurgeon
+bin/generate_signature.pl
+bin/germline.pl
+bin/get_coverage.R
+bin/make_yaml_het.pl
+Build.PL
+lib/NGS/Tools/BAMSurgeon.pm
+lib/NGS/Tools/BAMSurgeon/Germline.pm
+lib/NGS/Tools/BAMSurgeon/Helper.pm
+lib/NGS/Tools/BAMSurgeon/Merge.pm
+lib/NGS/Tools/BAMSurgeon/Somatic.pm
+MANIFEST			This list of files
+share/cancer_mut_vary.yaml
+share/cancer_sig_vary.yaml
+share/cancer_sigmut.yaml
+share/config.yaml
+share/germ_mut.yaml
+share/imputed_byref.csv
+share/replicationtime_mutationrate.csv
+share/signatures.txt
+share/somatic.yaml
+share/template.yaml
+t/00-bamsurgeon.t
+META.yml
+META.json

@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+test.pl
+lib/Net/uFTP/FTP.pm
+lib/Net/uFTP/SFTP.pm
+lib/Net/uFTP.pm

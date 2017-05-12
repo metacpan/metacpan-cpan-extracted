@@ -1,0 +1,102 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Net::DNSBL::Client;
+
+sub usage
+{
+	print "Usage: $0 ip_address dnsbl...\n";
+	print "\nEach dnsbl is of the form:  zone[:type:data]\n";
+}
+
+if (scalar(@ARGV) < 2) {
+	usage();
+	exit(1);
+}
+
+my $ipaddr = shift;
+
+my $dnsbls = [];
+
+foreach my $dnsbl (@ARGV) {
+	if ($dnsbl =~ /^([^:]+):([^:]+):([^:]+)/) {
+		push(@$dnsbls, {domain => $1,
+				type => $2,
+				data => $3});
+	} else {
+		push(@$dnsbls, {domain => $dnsbl, type => 'normal'});
+	}
+}
+
+my $c = Net::DNSBL::Client->new();
+$c->query_ip($ipaddr, $dnsbls, {return_all => 1});
+my $ans = $c->get_answers();
+if (scalar(@$ans) == 0) {
+	print "No hits.\n";
+	exit(0);
+}
+
+my $nhits = 0;
+# Display hits first, then misses.
+foreach my $entry ((grep { $_->{hit} } @$ans), (grep { !$_->{hit} } @$ans)) {
+	my $domain = $entry->{domain};
+	my $type   = $entry->{type};
+	my $data   = $entry->{data};
+	my $name;
+	if ($type ne 'normal') {
+		$name = "$domain ($type:$data)";
+	} else {
+		$name = "$domain (normal)";
+	}
+	if ($entry->{hit}) {
+		print "HIT:  $name: " . join(', ', @{$entry->{actual_hits}} ) . "\n";
+		$nhits++;
+	} else {
+		my $rcode = $entry->{replycode};
+		print "MISS: $name: $rcode\n"
+	}
+}
+
+exit($nhits);
+
+
+__END__
+
+=head1 NAME
+
+dnsblcheck - Command-line tool for checking IP addresses against DNSBLs.
+
+=head1 SYNOPSIS
+
+dnsblcheck I<ip_address> I<dnsbl1> [I<dnsbl2>...]
+
+=head1 DESCRIPTION
+
+Given an IP address and a list of DNSBL zones, dnsblcheck checks each
+zone for the IP address and prints a list of hits.
+
+Each I<dnsbl> entry is either a simple domain name (for example,
+I<zen.spamhaus.org>) or a domain:type:data triple (for example,
+I<zen.spamhaus.org:match:127.0.0.4> or I<dnsbl.tld:mask:8>).  See
+the Net::DNSBL::Client documentation for details about
+I<match> and I<mask> zones.
+
+=head1 EXIT VALUE
+
+The program's exit value is the number of DNSBLs that were hit.
+
+=head1 AUTHOR
+
+Dianne Skoll <dfs@roaringpenguin.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2010 Roaring Penguin Software
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+
+

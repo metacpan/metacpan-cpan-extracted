@@ -1,0 +1,73 @@
+
+Net::Radius::PacketOrdered testing notes. o_authsrv is a configurable radius
+proxy, o_authclient is a configurable client.
+
+================
+running server
+=================
+
+tested with FreeRadius 0.9.2
+
+If you are going to use exactly those values in here to test, you need
+to configure your server first.
+
+add below line to file "realms":
+        
+        adsl03.domain.com	LOCAL
+        
+add below lines to file "users":
+
+        SomeUser Auth-Type := Local, User-Password == "letSomeUserin"
+
+        a2305abc Auth-Type := Local, User-Password == "testing"
+	        Service-Type = Framed-User,
+        	Framed-Protocol = PPP,
+	        Framed-IP-Address = 192.168.10.13,
+        	Framed-IP-Netmask = 255.255.255.255
+
+add below line to file "clients.conf"
+
+        client 127.0.0.1 {
+	        secret		= radiuserver
+        	shortname	= localhost
+	        nastype         = other    # or, your own type
+        }
+
+start your FreeRadius with "radiusd -X" for verbose output.
+
+=================
+running proxies
+================
+
+The best thing to observe results of testing - to be able to see
+packets as they pass through proxies - is to start proxies, with below
+lines, in their own terminals (Multi-GNOME-Terminal is handy), next to
+each other. That way you will be able to see how Proxy-State is added
+and removed by each proxy without touching any other Proxy-State
+fields, which is important protocol requirement.
+ 
+  o_authsrv
+  o_authsrv proxySECONDserver 11912 127.0.0.1 11812 proxyserver
+  o_authsrv proxyFIRSTserver 16000 127.0.0.1 11912 proxySECONDserver
+
+===========
+client
+===========
+
+run client with
+
+  o_authclient proxyFIRSTserver 127.0.0.1 16000 "SomeUser@adsl03.domain.com" letSomeUserin 
+
+and/or with
+
+  o_authclient proxyFIRSTserver 127.0.0.1 16000 "a2305abc@adsl03.domain.com" testing
+
+=========
+result
+=========
+
+"Accept-Accept" should be received by the client, with all Proxy-State
+attributes correctly added and removed as the packet goes 
+
+   client <=> proxy1 <=> proxy2 <=> proxy <=> server
+

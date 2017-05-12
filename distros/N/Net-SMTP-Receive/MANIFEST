@@ -1,0 +1,8 @@
+Receive.pm
+Receive.pod
+Makefile.PL
+MANIFEST
+README
+CHANGELOG
+example_daemon.pl
+META.yml                                 Module meta-data (added by MakeMaker)

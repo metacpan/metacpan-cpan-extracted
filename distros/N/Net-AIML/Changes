@@ -1,0 +1,14 @@
+Revision history for Net-AIML
+0.0.5	2007-12-23
+		Fix Borked dist
+0.0.4	2007-12-23
+		- Remove Author Test
+0.0.3  2007-10-22
+       - Fixed percritic.t per jrockway on #perl++
+
+0.0.2  2007-05-13
+	   Change the simple example, clean up packaging, and add tests for kwalitee and pod
+	
+0.0.1  Sat Jul 22 16:08:53 2006
+       Initial release.
+

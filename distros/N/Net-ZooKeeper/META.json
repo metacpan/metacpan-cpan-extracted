@@ -1,0 +1,47 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-ZooKeeper",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mark-5/p5-net-zookeeper/issues"
+      },
+      "homepage" : "https://github.com/mark-5/p5-net-zookeeper",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mark-5/p5-net-zookeeper.git",
+         "web" : "https://github.com/mark-5/p5-net-zookeeper"
+      }
+   },
+   "version" : "0.41"
+}

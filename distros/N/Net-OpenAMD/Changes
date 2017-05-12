@@ -1,0 +1,28 @@
+Revision history for Net-OpenAMD
+
+0.1.1  Fri Jul 16 21:47:39 2010
+       Fix tests so they pass, mostly by not overriding the default and 
+         just using https://api.hope.net/api/
+
+0.1.0  Tue Jul 13 22:20:41 2010
+       The API is producing useful data so grab that to use for testing.
+       That means I can test with what the API provides not just what 
+         the docs claim.
+       Test with Test::Deep to be able to have passing tests 
+           without knowing the actual data.
+
+0.0.3  Mon Jul 12 17:15:51 2010
+       better handling of bad JSON from the API (just report, no fixing)
+       actually add query strings properly to the request uri
+       more cleanup
+       fix tests for /location
+       generate helper subs
+
+0.0.2  Tue Jun 29 22:35:10 2010
+       Tests that pass against http://api.hope.net as well as a local server.
+       No auth yet, but we will see.
+
+0.0.1  Thu Jun 24 14:43:47 2010
+       Initial release.
+
+$AFresh1: Changes,v 1.9 2010/07/17 11:48:28 andrew Exp $

@@ -1,0 +1,62 @@
+Revision history for Perl extension Net::Write.
+
+1.10 Wed Mar  4 07:15:18 CET 2015
+   - bugfix: fallback on using Socket::GetAddrInfo for getaddrinfo()
+
+1.09 Sun Feb 15 18:06:48 CET 2015
+   - update: EUID 0 check is done at open() call instead of new() call
+   - bugfix: take inet_pton() and getaddrinfo() from Socket if available, or from Socket6
+   - tests: added tests 02 and 03 to test if inet_pton() and N:W:L3 open() are working
+
+1.08 Fri Jan 23 07:53:16 CET 2015
+   - bugfix: on setting AF_INET6(), and makes Socket6 module optional
+   => thanks to Vince
+   - update: copyright notice
+   - update: Kwalitee
+
+1.07 Sun Sep  2 18:42:02 CEST 2012
+   - bugfix: returns true when _check() is ok
+
+1.06 Sat Sep  1 12:45:09 CEST 2012
+   - update: better error handling scheme
+   - update: copyright notice
+
+1.05 Wed Jun 10 20:37:44 CEST 2009
+   - bugfix: removed a warning on AF_INET6 constant declaration
+   - update: copyright notice
+
+1.04 Sun Oct 19 17:47:11 CEST 2008
+   - bugfix: IP_HDRINCL with IPv6 under Linux 2.6.x
+
+1.03 Fri Mar 21 17:20:00 CET 2008
+   - added support for IP_HDRINCL with IPv6 raw sockets (Linux only)
+   => in fact, it should have worked before, but it appears to be a regression
+
+1.02 Tue Feb 19 12:11:21 CET 2008
+   - bugfix: due to Socket6 update, AF_INET6 definition has changed
+
+1.01 Sun Feb 17 19:08:15 CET 2008
+   - update: portability patches for other Unix systems (untested), concerning 
+             IP_HDRINCL constants and the like
+   - update: license string (lc(Artistic)), to make CPANTS happy
+
+1.00 Sun Nov 26 19:41:54 CET 2006
+   - NEW: now a pure Perl module. You MUST have libpcap 0.9.x, or WinPcap 3.1
+   - UPGRADE: all constants have moved to Layer.pm
+   - examples: examples for all layers
+   - test: Test::Pod, Test::Pod::Coverage
+
+0.83 Sun Oct 29 14:31:31 CET 2006
+   - bugfix: in Layer2.pm, added require IO::Socket
+
+0.82 Sat May  6 18:07:16 CEST 2006
+   - bugfix: call to debugPrint() renamed to cgDebugPrint()
+
+0.81 Mon May  1 20:38:00 CEST 2006
+   - now uses Class::Gomor::Array instead of Hash
+   - bugfix: send() returns undef on failure, true otherwise
+   - some minor code optimizations to improve speed (mostly on send())
+
+0.80 Sun Mar 19 13:39:59 2006
+   - first public release
+

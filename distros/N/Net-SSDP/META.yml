@@ -1,0 +1,30 @@
+---
+abstract: 'Simple Service Discovery Protocol implementation'
+author:
+  - 'Florian Ragwitz <rafl@debian.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.89
+configure_requires:
+  ExtUtils::Depends: 0
+  ExtUtils::MakeMaker: 6.42
+  ExtUtils::PkgConfig: 0
+  Glib: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-SSDP
+no_index:
+  directory:
+    - ext
+    - inc
+    - t
+requires:
+  Glib: 0
+  parent: 0
+resources:
+  license: http://opensource.org/licenses/lgpl-license.php
+version: 0.02

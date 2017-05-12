@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+Newsrc.pm
+README
+t/Newsrc.t
+t/fodder
+t/no-int.t
+t/use-int.t
+META.yml                                 Module meta-data (added by MakeMaker)

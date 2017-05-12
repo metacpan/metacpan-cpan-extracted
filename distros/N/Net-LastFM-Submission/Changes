@@ -1,0 +1,35 @@
+Revision history for Net-LastFM-Submission
+
+0.64 2009-05-02 19:50
+	Edit POD and add POD to examples/*
+
+0.63 2009-05-02 16:30
+	Support an existing PoCo::Client::HTTP into PoCo::Net::LastFM::Submission (version 0.23). RT #45436 (thanks Martijn van Beers)
+	Add examples/poe_client.pl
+	Test suite (t/01-new.t and t/02-api.t)
+	Fix small bugs in Net::LastFM::Submission and edit POD
+
+0.62 2009-04-21 19:46
+	Support a job_id into PoCo::Net::LastFM::Submission (version 0.22)
+
+0.61 2009-04-21 12:33
+	Add encode_data and remove _encode
+
+0.6  2009-04-10 23:22
+	Fix documentation
+
+0.5  2009-04-10 15:13
+	Add POE::Component::Net::LastFM::Submission and support generate requests and parse response.
+	Add examples/poe.pl.
+
+0.4  2009-02-08 00:22
+	Fix POD
+
+0.3  2009-02-06 16:43
+	Add dependecies, add examples/ut8.pl, add grep with encode
+
+0.2  2009-02-05 00:20
+	Edit POD manual
+
+0.1  2009-02-04 18:05
+	First version

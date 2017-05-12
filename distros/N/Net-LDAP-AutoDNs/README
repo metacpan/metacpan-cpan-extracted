@@ -1,0 +1,62 @@
+Net-LDAP-AutoDNs
+
+Automatically make some default decisions some LDAP DNs and scopes.
+
+Currently supported methodes are environmental and hostname.
+
+use Net::LDAP::AutoDNs;
+
+my $obj = Net::LDAP::AutoDNs->new();
+
+print $obj->{users}."\n";
+print $obj->{usersScope}."\n";
+print $obj->{dns}."\n";
+print $obj->{dnsScope}."\n";
+print $obj->{groups}."\n";
+print $obj->{groupsScope}."\n";
+print $obj->{home}."\n";
+print $obj->{homeScope}."\n";
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+/DEV/LDAP
+
+The FreeBSD kernel module for this can be found at
+http://eesdp.org/eesdp/ldap-kmod.html .
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::LDAP::AutoDNs
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-LDAP-AutoDNs
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-LDAP-AutoDNs
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-LDAP-AutoDNs
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-LDAP-AutoDNs
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Zane C. Bowers
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,25 @@
+Revision history for Net-LDAP-AutoDNs
+
+0.2.2	2010-06-26/03:40
+		-Add "Sys::Hostname" as a required module.
+
+0.2.1	2010-05-26/07:40
+		-Correct spelling of methods in the config.
+		-Now only handles stuff for /dev/ldap/ if it can actually open the device.
+		-Now requires a /dev/ldap entry not be equal to "".
+
+0.2.0	2010-05-08/04:00
+		-Add EESDP compatibility.
+
+0.1.0	2009-12-02/19:00
+		-/dev/ldap support added and it is now the default.
+
+0.0.2	2009-10-31/15:00
+		-Remove the sysctl stuff for the time being until I write that actual module.
+
+0.0.1	2009-10-26/0:30
+		-Correct 'dhcp' and 'dns'.
+		-Correct removal of the last part of the hostname.
+
+0.0.0	2008-06-22
+		-Initial release.

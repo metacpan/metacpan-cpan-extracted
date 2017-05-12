@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+bin/syslogd-sendtest.pl
+bin/syslogd-simple.pl
+t/00-Net-Syslogd.t
+t/02-pod-coverage.t
+t/03-test-pod.t
+test.pl
+lib/Net/Syslogd.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

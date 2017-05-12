@@ -1,0 +1,16 @@
+Build.PL
+CHANGES
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/rules
+INSTALL
+lib/Net/DNS/Resolver/Programmable.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+TODO
+SIGNATURE    Added here by Module::Build

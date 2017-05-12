@@ -1,0 +1,67 @@
+==================================================
+Changes from 2016-04-27 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.004 at 2017-04-27 08:51:45 +0000
+------------------------------------------
+
+  Change: 88263608c5b2e238603a9882ea9fb37bcc7a071d
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-04-27 10:50:39 +0000
+
+    Mock OTServ in test
+
+    Previously, we were using medivia.org as otservlist.org lists it as
+    one of the oldest servers with good uptimes. It's now offline though,
+    thus the move to launching a mock OTServ locally to test against.
+
+    This was triggered by issues #2 and #1. 
+
+------------------------------------------
+version 0.003 at 2016-12-25 11:57:38 +0000
+------------------------------------------
+
+  Change: 6049bd8e41b2ad063099c0ae9bc39f691eb0bab0
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-12-25 12:57:38 +0000
+
+    Merge pull request #2 from manwar/add-minimum-perl-version
+
+    Add minimum perl version using dzil pluggin [MinimumPerlFast] 
+
+  Change: 9ec1f52335e81cc6daccf5d0a6cc1cbba99f7cbf
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-12-25 12:56:22 +0000
+
+    Added recv timeouts and skip if offline 
+
+  Change: 0afcdcced76d26813bbfb34122e69aec6fd15cb4
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2016-12-24 17:29:39 +0000
+
+    Add minimum perl version using dzil pluggin [MinimumPerlFast] 
+
+------------------------------------------
+version 0.002 at 2016-12-24 14:05:10 +0000
+------------------------------------------
+
+  Change: a738d79e0e03a2406170691a0e8a6e0cfa474f61
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-12-24 15:05:10 +0000
+
+    Added better error handling and fixed failing test 
+
+------------------------------------------
+version 0.001 at 2016-10-11 00:40:59 +0000
+------------------------------------------
+
+  Change: 01653e0135c305d9f8d8ebec75a9cd8ba2b9be23
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-10-11 02:40:59 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

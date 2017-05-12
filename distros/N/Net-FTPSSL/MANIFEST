@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+LICENSE
+MANIFEST
+README
+t/00-basic.t
+t/05-readonly.t
+t/10-complex.t
+t/20-certificate.t
+t/test_file.tar.gz
+FTPSSL.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

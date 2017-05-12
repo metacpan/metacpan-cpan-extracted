@@ -1,0 +1,863 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use Term::ReadKey;
+use Net::CyanChat;
+use Getopt::Long;
+
+####################################################
+# Globals                                          #
+####################################################
+
+my $cfg = {
+	host   => "cho.cyan.com", # Server hostname
+	port   => 1812,           # Server port
+	nick   => "",             # Our nickname
+	auth   => 0,              # 1 = The server's accepted our login
+	buffer => "",             # Framebuffer-like thing.
+	prompt => "",             # Current prompt text in MainLoop.
+};
+my $opt = { # Getopt Options
+	help   => 0,     # --help
+	server => undef, # --server (host:port fmt)
+	host   => undef,   # --host
+	port   => undef,   # --port
+	mono   => 0,       # --monochrome
+};
+my $cc = undef; # CC object
+
+# On Win32, make an effort to emulate ANSI colors.
+if ($^O =~ /win(32|64)/i) {
+	eval {
+		require Win32::Console::ANSI;
+	};
+	if ($@) {
+		# Not installed probably. Force mono mode.
+		$opt->{mono} = 1;
+	}
+}
+
+my $co = {
+	prompt => "\e[30;47m", # Black on white
+	text   => "\e[0m",    # Silver
+	user   => "\e[37;1m", # White
+	cyan   => "\e[36;1m", # Cyan
+	guest  => "\e[33m",   # Yellow
+	server => "\e[32;1m", # Lime
+	client => "\e[31;1m", # Red
+	pvt    => "\e[35;1m", # Magenta
+	clear  => "\e[0m",    # Clear
+};
+our $VERSION = '0.01';
+
+# Get our terminal size.
+my $size = {
+	w => 0,
+	h => 0,
+};
+{
+	my ($w,$h,undef,undef) = GetTerminalSize();
+	$size->{w} = $w;
+	$size->{h} = $h;
+}
+
+# Get any command-line options.
+GetOptions (
+	"help|h|?"          => \$opt->{help},
+	"server|s=s"        => \$opt->{server},
+	"host|h=s"          => \$opt->{host},
+	"port|p=i"          => \$opt->{port},
+	"monochrome|mono|m" => \$opt->{mono},
+);
+{
+	if ($opt->{help}) {
+		die &usage();
+	}
+	if (defined $opt->{server}) {
+		if ($opt->{server} =~ /:/) {
+			my ($host,$port) = split(/:/, $opt->{server}, 2);
+			if ($port !~ /^\d+$/) {
+				die "Invalid port format in given --server!";
+			}
+			$cfg->{host} = $host;
+			$cfg->{port} = $port;
+		}
+		else {
+			$cfg->{host} = $opt->{server};
+			$cfg->{port} = 1812;
+		}
+	}
+	if (defined $opt->{host}) {
+		$cfg->{host} = $opt->{host};
+	}
+	if (defined $opt->{port}) {
+		$cfg->{port} = $opt->{port};
+	}
+	if ($opt->{mono}) {
+		# Going monochrome.
+		foreach my $color (keys %{$co}) {
+			$co->{$color} = "";
+		}
+	}
+}
+
+
+sub usage {
+	return <<"EOF"
+Usage: tcc [--server --host --port --monochrome]
+
+Options:
+
+  --server <hostname>[:port]
+  -s <hostname>[:port]
+    Define the hostname and port of the CyanChat server to connect to.
+    Given only a hostname, port defaults to 1812. The default hostname
+    is "cho.cyan.com".
+    Ex: --server cho.cyan.com:1813
+        --server cho.cyan.com
+
+  --host <hostname>
+  -h <hostname>
+    Define the hostname of the CyanChat server to connect to.
+    The default is "cho.cyan.com".
+    Ex: --host cho.cyan.com
+
+  --port <port>
+  -p <port>
+    Define the port that the CyanChat server is listening on. The default
+    is to use port 1812.
+    Ex: --port 1812
+
+  --monochrome
+  --mono
+  -m
+    Use this flag to disable the ANSI color codes. Not all terminal emulators
+    support ANSI colors. If your terminal has trouble displaying the program
+    normally, use the --monochrome option.
+
+  --help
+  -h
+  -?
+    Show this document.
+
+Author:
+
+  Noah Petherbridge
+  http://www.kirsle.net/
+EOF
+}
+
+#####################################################
+# Print the client headers                          #
+#####################################################
+&clear();
+
+print <<HEADER;
+$co->{cyan}Perl Terminal CyanChat Client $co->{client}v$VERSION$co->{clear}
+Your terminal dimensions are $co->{guest}$size->{w}x$size->{h}$co->{clear}.
+
+Your CyanChat server is set to $co->{server}$cfg->{host}$co->{clear} port $co->{server}$cfg->{port}$co->{clear}.
+If this is not correct, type "$co->{server}server$co->{clear}" at the prompt.
+
+To connect, just hit $co->{server}Return$co->{clear} at the prompt.
+For more options, type $co->{server}help$co->{clear}.
+
+$co->{client}Note:$co->{clear} At any time after connecting to the server, type
+the command $co->{server}/help$co->{clear} for additional help.
+
+HEADER
+
+# Startup menu.
+&startup();
+
+######################################################
+# Boot Mode: Startup and Configuration Menus         #
+######################################################
+
+# Main Menu Accepter
+sub startup {
+	my $prompting = 1;
+
+	while ($prompting) {
+		print "$co->{server}Main Menu [connect]>$co->{clear} ";
+		chomp (my $choice = <STDIN>);
+		$choice = "connect" unless length $choice;
+
+		if ($choice =~ /help/) {
+			# Getting help.
+			&mainHelp();
+		}
+		elsif ($choice =~ /server/) {
+			# Changing the hostname.
+			&changeHostname();
+		}
+		elsif ($choice =~ /^c$/ || $choice =~ /connect/i) {
+			# Connect!
+			&doConnect();
+		}
+		else {
+			print "$co->{client}Unknown command. Type \"connect\" to connect to CyanChat.$co->{clear}\n";
+		}
+	}
+}
+
+# Typing "help" at the Main Menu
+sub mainHelp {
+	&clear();
+	print "$co->{cyan}Help - Main Menu$co->{clear}\n\n"
+		. "$co->{guest}Command  -  Description$co->{clear}\n"
+		. "$co->{server}server$co->{clear}   - Change the CyanChat server host and port to connect to\n"
+		. "$co->{server}connect$co->{clear}  - Connect to CyanChat\n"
+		. "$co->{server}help$co->{clear}     - Display this screen\n\n";
+	return;
+}
+
+# Typing "server" at the Main Menu
+sub changeHostname {
+	print "$co->{server}Set CC Hostname [cho.cyan.com]>$co->{clear} ";
+	chomp (my $host = <STDIN>);
+
+	print "$co->{server}CC Server Port [1812]>$co->{clear} ";
+	chomp (my $port = <STDIN>);
+
+	$host = "cho.cyan.com" unless length $host;
+	$port = 1812 unless length $port;
+
+	print "$co->{client}Setting CC server as $host:$port$co->{clear}\n\n";
+	$cfg->{host} = $host;
+	$cfg->{port} = $port;
+	return;
+}
+
+# Typing "connect" at the Main Menu
+sub doConnect {
+	print "\n"
+		. "$co->{client}Connecting to $cfg->{host}:$cfg->{port}...$co->{clear}\n";
+
+	# Connect.
+	$cc = new Net::CyanChat (
+		host  => $cfg->{host},
+		port  => $cfg->{port},
+		proto => 1,
+	);
+
+	# Set handlers.
+	$cc->setHandler (Connected      => \&on_connected);
+	$cc->setHandler (Disconnected   => \&on_disconnected);
+	$cc->setHandler (Welcome        => \&on_welcome);
+	$cc->setHandler (Message        => \&on_message);
+	$cc->setHandler (Private        => \&on_private);
+	$cc->setHandler (WhoList        => \&on_wholist);
+	$cc->setHandler (Chat_Buddy_In  => \&on_join);
+	$cc->setHandler (Chat_Buddy_Out => \&on_left);
+	$cc->setHandler (Name_Accepted  => \&on_name_accepted);
+	$cc->setHandler (Error          => \&on_error);
+
+	# Connect.
+	$cc->connect();
+
+	# Enter main loop.
+	&mainLoop();
+}
+
+######################################################
+# Main Program Loop                                  #
+######################################################
+
+# Main Event Loop
+sub mainLoop {
+	my $buffer = $cfg->{buffer};
+	my $prompt = $cfg->{prompt};
+	my @history = ();
+	my $backtrack = -1;
+
+	ReadMode(4);
+	while (1) {
+		# See if our terminal dimensions have changed.
+		my ($w,$h,undef,undef) = GetTerminalSize();
+		my $resized = 0;
+		if ($w != $size->{w} || $h != $size->{h}) {
+			$resized = 1;
+			$size->{w} = $w;
+			$size->{h} = $h;
+		}
+
+		# Has the buffer changed?
+		if ($cfg->{buffer} ne $buffer || $cfg->{prompt} ne $prompt || $resized) {
+			# Redraw the window.
+			&clear();
+
+			# Show the appropriate prompt label based on state.
+			my $label = "Message"; # Default.
+			if ($cfg->{auth} != 1) {
+				$label = "Login Nickname";
+			}
+
+			$cfg->{prompt} =~ s/\[[AB]$//ig;
+			my $input = $cfg->{prompt};
+			if (length $input > ($size->{w} - length($label))) {
+				my $start = length($input) - ($size->{w} - length($label));
+				my $end   = length($input);
+				$input = substr($cfg->{prompt}, $start, $end);
+			}
+
+			print "$co->{cyan}$label>$co->{clear} $input\n";
+
+			# Draw the buffer.
+			print "$cfg->{buffer}\n";
+
+			# Keep track of it.
+			$buffer = $cfg->{buffer};
+			$prompt = $cfg->{prompt};
+		}
+
+		# Read keys.
+		if (my $key = ReadKey(-1)) {
+			# Check the ordinal.
+			my $ord = ord($key);
+			$key =~ s/\[[AB]$//;
+
+			# Handle special keys.
+			if ($ord == 10 || $ord == 13) {
+				# Submitting (Return key sends 10 on *nix, 13+10 on Windows)
+				if (length $cfg->{prompt} > 0) {
+					&sendCommand($cfg->{prompt});
+					push (@history,$cfg->{prompt});
+					$backtrack = -1;
+					$cfg->{prompt} = '';
+				}
+			}
+			elsif ($ord == 127 || $ord == 8) {
+				# Backspace (sends 127 on *nix, 8 on Windows)
+				if (length $cfg->{prompt} == 0) {
+					# Bell.
+					print "\a";
+				}
+				else {
+					$cfg->{prompt} = substr($cfg->{prompt}, 0, (length($cfg->{prompt}) - 1));
+				}
+			}
+			elsif ($ord == 27) {
+				# Up arrow. Cycle through history.
+				if ($backtrack == -1) {
+					$backtrack = scalar(@history) - 1;
+				}
+				$cfg->{prompt} = $history[$backtrack] unless $backtrack == -2;
+				$backtrack--;
+			}
+			elsif ($ord == 3) {
+				# Hit Ctrl+C
+				ReadMode(0);
+				exit(0);
+			}
+			else {
+				# Just typing.
+				$cfg->{prompt} .= $key;
+			}
+		}
+
+		$cc->do_one_loop();
+	}
+}
+
+######################################################
+# Handle Command Inputs from Main Event Loop         #
+######################################################
+
+# The user has typed something and hit Enter. Process it.
+sub sendCommand {
+	my $line = shift;
+	return if length $line == 0;
+
+	# Built-in commands.
+	if ($line =~ /^\/(quit|exit)/i) {
+		# /quit: Quit.
+		ReadMode(0);
+		exit(0);
+	}
+	elsif ($line =~ /^\/(help|\?)/i) {
+		# /help: Help.
+		&showHelp();
+	}
+	elsif ($line =~ /^\/alias/i) {
+		# /aliases: Show aliases to commands.
+		&showAliases();
+	}
+	elsif ($line =~ /^\/nick (.+?)$/i) {
+		my $nick = $1;
+
+		# Validate their nick.
+		if (length $nick > 20) {
+			&add_buffer ("$co->{client}\[ChatClient\]$co->{text} Your nickname must be less than 20 characters long.$co->{clear}\n");
+		}
+		elsif ($nick =~ /\|/ || $nick =~ /\,/) {
+			&add_buffer ("$co->{client}\[ChatClient\]$co->{text} Your nickname can't contain a pipe \"|\" or comma.$co->{clear}\n");
+		}
+		else {
+			# Try it.
+			$cfg->{nick} = $nick;
+			$cc->login ($nick);
+		}
+	}
+	elsif ($line =~ /^\/(logout|logoff|leave|part)/i) {
+		# Must be logged in!
+		if ($cfg->{auth} == 1) {
+			# Leave the room.
+			$cfg->{auth} = 0;
+			$cfg->{nick} = '';
+			$cc->logout();
+		}
+		else {
+			&add_buffer ("$co->{client}\[ChatClient\]$co->{text} You are not in the chat room yet!$co->{clear}\n");
+		}
+	}
+	elsif ($line =~ /^\/(?:msg|w) (?:\"|\')([^\"\']+?)(?:\"|\') (.+?)$/i || $line =~ /^\/(?:msg|w) ([^\s]+?) (.+?)$/i) {
+		# Must be logged in!
+		if ($cfg->{auth} == 1) {
+			my $to = $1;
+			my $msg = $2;
+			my $fullName = $cc->getUsername($to);
+			if (!defined $fullName) {
+				# Doesn't exist.
+				&add_buffer ("$co->{client}\[ChatClient\]$co->{text} The user $to doesn't seem to exist in chat.$co->{clear}\n");
+			}
+			else {
+				# Send private.
+				&add_buffer ("$co->{client}\[ChatClient\]$co->{pvt} Private message sent to [$fullName]:$co->{text} $msg$co->{clear}\n");
+				$cc->sendPrivate ($fullName, $msg) or &add_buffer("$co->{client}Couldn't send message to $fullName!$co->{clear}\n");
+			}
+		}
+		else {
+			&add_buffer ("$co->{client}\[ChatClient\]$co->{text} You must be signed in to do that!$co->{clear}\n");
+		}
+	}
+	elsif ($line =~ /^\/(names|who)/i) {
+		# /names: Enumerate the Who List.
+		&showWhoList();
+	}
+	else {
+		# If they're not logged in, they're probably setting their nick.
+		if ($cfg->{auth} != 1) {
+			# Validate the nick.
+			if (length $line > 20) {
+				# Too long.
+				&add_buffer ("$co->{client}\[ChatClient\]$co->{text} Your nickname must be less than 20 characters long.$co->{clear}\n");
+			}
+			elsif ($line =~ /\|/ || $line =~ /\,/) {
+				# Invalid symbols.
+				&add_buffer ("$co->{client}\[ChatClient\]$co->{text} Your nickname can't contain a pipe \"|\" or comma.$co->{clear}\n");
+			}
+			else {
+				# Try to log in as this.
+				$cc->login($line);
+				$cfg->{nick} = $line;
+			}
+		}
+		else {
+			# Just sending a message.
+			$cc->sendMessage($line);
+		}
+	}
+}
+
+# User has typed /help: Show the help.
+sub showHelp {
+	my $help = [
+		"/names"            => "List the names of the chatters",
+		"/msg <nick> <msg>" => "Send a private message to <nick> (quote nick if it contains spaces)",
+		"/nick <nick>"      => "Change your nickname",
+		"/part"             => "Leave the chat room",
+		"/aliases"          => "List the aliases to these commands",
+		"/quit"             => "Kill the chat client (will show a 'disconnect' event to other users)",
+		"/help"             => "Display this help information",
+	];
+	$help = [ reverse(@{$help}) ];
+
+	for (my $i = 0; $i < scalar @{$help}; $i += 2) {
+		my $command = $help->[$i + 1];
+		my $desc    = $help->[$i];
+
+		&add_buffer ("$co->{client}\[ChatClient\]$co->{cyan} $command$co->{text} => $desc$co->{clear}\n");
+	}
+
+	&add_buffer ("$co->{client}\[ChatClient\]$co->{server} The following commands are supported:$co->{clear}\n");
+}
+
+# User has typed /aliases: Show aliases.
+sub showAliases {
+	my $aliases = [
+		"/names" => "/who",
+		"/part"  => "/leave, /logout, /logoff",
+		"/msg"   => "/w",
+		"/quit"  => "/exit",
+		"/help"  => "/?",
+	];
+	$aliases = [ reverse(@{$aliases}) ];
+
+	for (my $i = 0; $i < scalar @{$aliases}; $i += 2) {
+		my $command = $aliases->[$i + 1];
+		my $desc    = $aliases->[$i];
+
+		&add_buffer ("$co->{client}\[ChatClient\]$co->{cyan} $command$co->{text} => $co->{server}$desc$co->{clear}\n");
+	}
+
+	&add_buffer ("$co->{client}\[ChatClient\]$co->{server} The following are the command aliases:$co->{clear}\n");
+}
+
+# User has typed /names: Show who list.
+sub showWhoList {
+	my $names = $cc->getBuddies();
+
+	# Each nickname can have 20 characters. See how many columns we can have.
+	my $cols = int($size->{w} / 24);
+
+	# Organize the nicks.
+	my @nicks = ();
+	foreach my $special (keys %{$names->{special}}) {
+		push (@nicks,$special);
+	}
+	foreach my $normal (keys %{$names->{who}}) {
+		push (@nicks,$normal);
+	}
+
+	my $pl1 = scalar(@nicks) == 1 ? "is" : "are";
+	my $pl2 = scalar(@nicks) == 1 ? "" : "s";
+
+	my $x = 0;
+	my $text = "$co->{pvt}There $pl1 " . (scalar(@nicks)) . " chatter$pl2 online:$co->{clear}\n";
+	foreach my $name (@nicks) {
+		$x++;
+		my $fullName = $cc->getUsername($name);
+		my ($level) = $fullName =~ /^(\d)/;
+		my $color = &levelToColor($level);
+		$name = "[$name]";
+		$name .= " " until length $name == 22;
+		$name = "$co->{$color}$name$co->{clear}";
+		$text .= " $name ";
+		if ($x >= $cols) {
+			$x = 0;
+			$text .= "\n";
+		}
+	}
+	$text .= "\n";
+
+	&add_buffer ($text);
+}
+
+######################################################
+# Major Subroutines                                  #
+######################################################
+
+# In main program execution, any line that needs to be added
+# to the dialog space in the program needs to go through this
+# method. This method handles all the calculations for how many
+# lines and characters to show. Anything directly printed to
+# the terminal will be lost very quickly.
+sub add_buffer {
+	my $text = shift;
+
+	# The new text has to go in front of the buffer.
+	my $buffer = $text . $cfg->{buffer};
+
+	# Read each raw character into an array that can't be
+	# bigger than the maximum 2D space available in the terminal.
+	my @cells = ();
+	my $limit = ($size->{h} - 2) * $size->{w};
+	for (my $i = 0; $i < length $buffer; $i++) {
+		last if scalar(@cells) > $limit;
+		my $char = substr($buffer, $i, 1);
+		push (@cells, $char);
+	}
+
+	# Now that we have all raw characters into a "grid",
+	# limit the number of lines.
+	my $gridded = join("",@cells);
+	my @lines = split(/\n/, $gridded);
+	my @show = ();
+
+	# Some lines might be too wide and get wrapped around. In this case,
+	# find the long lines and push them off to an array.
+	my $extra_lines = 0;
+	for (my $i = 0; $i < scalar(@lines) && $i < ($size->{h} - 2); $i++) {
+		# We need to get an accurate representation of the length.
+		# To do so, we need to remove all ANSI characters.
+		my $line = $lines[$i];
+		foreach my $color (keys %{$co}) {
+			$line =~ s/\Q$co->{$color}\E//g;
+		}
+
+		# Is this line too big?
+		if (length $line > $size->{w}) {
+			# With NO ANSI chars, this line is too big. It will wrap
+			# around to multiple lines. Find out how many.
+			my $copy = $line;
+			while (length $copy > $size->{w}) {
+				$copy = substr($copy, $size->{w}, length($copy));
+				$extra_lines++;
+			}
+		}
+		push (@show,$lines[$i]);
+	}
+
+	# Too many items?
+	my @final = ();
+	for (my $i = 0; $i < scalar(@show) && $i < ($size->{h} - 2 - $extra_lines); $i++) {
+		push (@final,$show[$i]);
+	}
+
+	# @final is the array of lines we're intending to print. Some lines
+	# are too long and will be auto-wrapped by the terminal. Count how many
+	# lines are effectively being written.
+	my $lines_printed = 0;
+	for (my $i = 0; $i < scalar(@final); $i++) {
+		my $line = $final[$i];
+
+		# We need an accurate measurement of how long this line seriously is.
+		# So, strip out all ANSI escape sequences.
+		foreach my $color (keys %{$co}) {
+			$line =~ s/\Q$co->{$color}\E//g;
+		}
+
+		# Is this line gonna be wrapped?
+		if (length $line > $size->{w}) {
+			my $copy = $line;
+			while (length $copy > $size->{w}) {
+				$copy = substr($copy, $size->{w}, length($copy));
+				$lines_printed++;
+			}
+			$lines_printed++;
+		}
+		else {
+			$lines_printed++;
+		}
+	}
+
+	# Scalar(@final) + $extra_lines should be equal to ($size->{h} - 2),
+	# so @final + $extra_lines == 22 on a standard 80x24 terminal size.
+	#
+	# $lines_printed contains the number of lines effectively written to
+	# the terminal, taking into account automatic character wrapping.
+
+	# There's a good possibility that less stuff was written to the terminal
+	# than what it can actually hold. We want the Message Input line to stay
+	# flush against the top of the window at all times. Thus, pad the buffer
+	# with empty lines until the screen is filled.
+	for (my $i = $lines_printed; $i < ($size->{h} - 2); $i++) {
+		push (@final,"");
+	}
+
+	$cfg->{buffer} = join("\n",@final); # . "\n"
+}
+
+######################################################
+# Net::CyanChat Handler Callbacks                    #
+######################################################
+
+# Connected
+sub on_connected {
+	my $self = shift;
+
+	print "$co->{client}Connection established!$co->{clear}\n";
+}
+
+# Disconnected
+sub on_disconnected {
+	my $self = shift;
+
+	print "$co->{client}Error: connection to server has been interrupted!\n";
+	ReadMode(0);
+	exit(0);
+}
+
+# Error
+sub on_error {
+	my ($self,$code,$text) = @_;
+
+	&add_buffer ("$co->{server}\[ChatServer\]$co->{text} $text$co->{clear}\n");
+}
+
+# Welcome / Lobby Message
+sub on_welcome {
+	my ($self,$msg) = @_;
+
+	# Handle this in the buffer.
+	my $text = "$co->{server}\[ChatServer\]$co->{text} $msg$co->{clear}\n";
+	&add_buffer ($text);
+}
+
+# Broadcasted Message
+sub on_message {
+	my ($self,$info) = @_;
+
+	my $color = &levelToColor ($info->{level});
+	my $text = "$co->{$color}\[$info->{nick}\]$co->{text} $info->{message}$co->{clear}\n";
+	&add_buffer ($text);
+}
+
+# Private Message
+sub on_private {
+	my ($self,$info) = @_;
+
+	my $color = &levelToColor ($info->{level});
+	my $text = "$co->{client}\[ChatClient\]$co->{pvt} Private message from $co->{$color}\[$info->{nick}\]$co->{text} "
+		. "$info->{message}$co->{clear}\n";
+	&add_buffer ($text);
+}
+
+# Wholist Updated
+sub on_wholist {
+	# Show the names.
+	&showWhoList();
+}
+
+# User Joined
+sub on_join {
+	my ($self,$info) = @_;
+
+	my $color = &levelToColor ($info->{level});
+	my $text = "$co->{server}\\\\\\\\\\$co->{$color}\[$info->{nick}\]$co->{text} $info->{message}"
+		. "$co->{server}/////$co->{clear}\n";
+	&add_buffer ($text);
+}
+
+# User Left
+sub on_left {
+	my ($self,$info) = @_;
+
+	my $color = &levelToColor ($info->{level});
+	my $text = "$co->{server}/////$co->{$color}\[$info->{nick}\]$co->{text} $info->{message}"
+		. "$co->{server}\\\\\\\\\\$co->{clear}\n";
+	&add_buffer ($text);
+}
+
+# Name Accepted
+sub on_name_accepted {
+	my $self = shift;
+
+	# Name's been accepted.
+	$cfg->{auth} = 1;
+}
+
+######################################################
+# Utility Subroutine                                 #
+######################################################
+
+# This handles the clearing of the terminal.
+sub clear {
+	# Detect the OS.
+	if ($^O =~ /win(32|64)/i) {
+		# We want to `cls`
+		system("cls");
+	}
+	elsif ($^O =~ /nix/i) {
+		# A Unix-like system probably has `cls`
+		my @path = split(/:/,$ENV{PATH});
+		foreach my $p (@path) {
+			if (-e "$p/clear") {
+				system("$p/clear");
+			}
+		}
+	}
+	else {
+		# Just insert 1000 newlines.
+		print "\n" x 1000;
+	}
+}
+
+# This takes a CC auth level and returns the name of a
+# key from our colors hash.
+sub levelToColor {
+	my $level = shift;
+
+	if ($level == 0) {
+		return "user";
+	}
+	elsif ($level == 1) {
+		return "cyan";
+	}
+	elsif ($level == 2) {
+		return "server";
+	}
+	elsif ($level == 4) {
+		return "guest";
+	}
+	else {
+		return "client";
+	}
+}
+__END__
+
+=head1 NAME
+
+tcc - Terminal CyanChat Client
+
+=head1 USAGE
+
+  tcc [--server --host --port --monochrome]
+
+=head1 DESCRIPTION
+
+This is a demonstration script for a CyanChat client program. It runs at the
+command line using only ASCII characters and ANSI color codes (no toolkits like
+Curses are necessary).
+
+It clears the screen on each refresh which might cause some flickering in certain
+terminal emulators. It has its problems but the point is it's just some code to
+demonstrate how to use Net::CyanChat as a client module.
+
+=head1 REQUIREMENTS
+
+  Term::ReadKey
+  Getopt::Long
+  Win32::Console::ANSI (optional)
+
+C<Win32::Console::ANSI> is only necessary when running this script under MS
+Windows, but is optional. If the module can't be loaded, the script defaults to
+monochrome mode (which isn't nearly as pretty).
+
+=head1 OPTIONS
+
+From C<tcc --help>:
+
+  --server <hostname>[:port]
+  -s <hostname>[:port]
+    Define the hostname and port of the CyanChat server to connect to.
+    Given only a hostname, port defaults to 1812. The default hostname
+    is "cho.cyan.com".
+    Ex: --server cho.cyan.com:1813
+        --server cho.cyan.com
+
+  --host <hostname>
+  -h <hostname>
+    Define the hostname of the CyanChat server to connect to.
+    The default is "cho.cyan.com".
+    Ex: --host cho.cyan.com
+
+  --port <port>
+  -p <port>
+    Define the port that the CyanChat server is listening on. The default
+    is to use port 1812.
+    Ex: --port 1812
+
+  --monochrome
+  --mono
+  -m
+    Use this flag to disable the ANSI color codes. Not all terminal emulators
+    support ANSI colors. If your terminal has trouble displaying the program
+    normally, use the --monochrome option.
+
+  --help
+  -h
+  -?
+    Show this document.
+
+=head1 AUTHOR
+
+Noah Petherbridge -- Same guy who wrote Net::CyanChat.
+
+=head1 LICENSE
+
+Released under the same terms as Net::CyanChat.
+
+=cut

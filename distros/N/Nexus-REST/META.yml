@@ -1,0 +1,38 @@
+---
+abstract: "Thin wrapper around Nexus's REST API"
+author:
+  - 'Gustavo L. de M. Chaves <gnustavo@cpan.org>'
+build_requires:
+  Test::More: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Nexus-REST
+recommends:
+  HTTP::Status: 0
+  Net::Netrc: 0
+requires:
+  Carp: 0
+  Data::Util: 0
+  HTML::TreeBuilder: 0
+  HTTP::Status: 0
+  JSON: 0
+  MIME::Base64: 0
+  Net::Netrc: 0
+  REST::Client: 0
+  URI: 0
+  URI::Escape: 0
+  perl: 5.010
+  strict: 0
+  utf8: 0
+  warnings: 0
+resources:
+  homepage: https://metacpan.org/module/Nexus::REST
+  repository: https://github.com/gnustavo/Nexus-REST.git
+version: 0.001

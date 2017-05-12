@@ -1,0 +1,109 @@
+=head1 NAME
+
+kibozerc - documentation on configuration files for News::Archive
+
+=head1 DESCRIPTION
+
+News::Archive scripts are locally configured with the ~/.kibozerc file, or
+whatever file is set at run-time.  This file is a parsable perl script
+that offers local configuration.  
+
+=head2 Necessary Keys
+
+=over 4
+
+=item $KIBOZEDIR = ""; 
+
+Should be set to a valid directory where the kiboze files can be stored.
+
+=item $LOCALNAME = "";
+
+The hostname that should be added to the Path: and Xref: of all articles
+archived in the News::Archive object.
+
+=back
+
+=head2 Optional Keys
+
+=over 4
+
+=item $DB_TYPE
+
+The database type that we will use for storing the history file and such.
+Defaults to DB_File; you may want to set this to SDBM_File if that isn't
+installed.
+
+=item %SERVERS
+
+A hash of server/newsrc pairs to keep track of downloaded information.
+Defaults to { $ENV{'NEWSSERVER'} => "$KIBOZEDIR/newsrc" }.  This file has
+to be populated.
+
+=item $MAXARTS
+
+Maximum number of articles for kiboze.pl to get per-run; defaults to 1000.
+
+=item $TITLE
+
+Web page title.
+
+=item $HTMLHEAD
+
+A coderef to call for HTML headers.  Defaults within each script.
+
+=item $HTMLFOOT
+
+A coderef to call for HTML footers.  Defaults within each script.
+
+=item $STYLESHEET
+
+A stylesheet to load with $HTMLHEAD.
+
+=back
+
+=head1 SAMPLE FILE 
+
+  $STYLESHEET   = "stylesheet.css";               # Per-directory basis.
+  $KIBOZEDIR    = "/home/tskirvin/news/cmi";      # Where to put the files?
+  $DB_TYPE      = "DB_File";                      # What kind of database?
+  %SERVERS      = (
+        "news.ks.uiuc.edu"  =>  "$KIBOZEDIR/newsrc",
+                  );
+  $MAXARTS      = 10000;
+  $ARCHIVEGROUP = "";
+  $LOCALNAME    = "archive.killfile.org";
+  $TITLE        = "cmi.*";
+  $DEBUG        = 0;
+
+=head1 NOTES
+
+Remember that a different configuration files can generally be selected
+with the '-c' option.
+
+=head1 TODO
+
+Make something to auto-configure a base kibozerc file.
+
+=head1 SEE ALSO
+
+C<News::Archive>
+
+C<kiboze.pl>, C<mbox2news.pl>, C<newsrecurse.pl>
+
+=head1 AUTHOR
+
+Tim Skirvin <tskirvin@killfile.org>
+
+=head1 HOMEPAGE
+
+B<http://www.killfile.org/~tskirvin/software/news-archive/>
+
+=head1 LICENSE
+
+This code may be redistributed under the same terms as Perl itself.
+
+=head1 COPYRIGHT
+
+Copyright 2003-2004, Tim Skirvin.
+
+=cut

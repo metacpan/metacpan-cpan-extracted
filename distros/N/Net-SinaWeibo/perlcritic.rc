@@ -1,0 +1,57 @@
+[Variables::ProtectPrivateVars]
+  severity = 5
+
+[ValuesAndExpressions::ProhibitMixedBooleanOperators]
+  severity = 5
+[Subroutines::ProhibitAmpersandSigils]
+  severity = 5
+[Objects::ProhibitIndirectSyntax]
+  severity = 5
+[NamingConventions::ProhibitAmbiguousNames]
+  forbid = abstract bases contract last left no record right second set
+  severity = 5
+[NamingConventions::Capitalization]
+  severity = 5
+
+[Modules::RequireExplicitPackage]
+  severity = 5
+[ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions]
+  severity = 5
+[ClassHierarchies::ProhibitExplicitISA]
+  severity = 5
+[ClassHierarchies::ProhibitOneArgBless]
+  severity = 5
+
+[Modules::ProhibitMultiplePackages]
+  severity = 2
+
+[CodeLayout::RequireConsistentNewlines]
+  severity = 5
+[ControlStructures::ProhibitUnreachableCode]
+  severity = 5
+[Miscellanea::ProhibitUselessNoCritic]
+  severity = 5
+[Modules::RequireEndWithOne]
+  severity = 5
+[Subroutines::ProhibitManyArgs]
+  max_arguments = 5
+  severity = 5
+[ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
+  severity = 5
+[Variables::ProhibitUnusedVariables]
+  severity = 5
+[BuiltinFunctions::ProhibitStringyEval]
+  allow_includes = 1
+[CodeLayout::ProhibitTrailingWhitespace]
+    severity = 5
+[-Subroutines::ProhibitSubroutinePrototypes]
+[-InputOutput::ProhibitTwoArgOpen]
+[-InputOutput::ProhibitBarewordFileHandles]
+[TestingAndDebugging::ProhibitNoStrict]
+allow=refs
+[TestingAndDebugging::RequireUseStrict]
+severity = 2
+equivalent_modules = Any::Moose
+[TestingAndDebugging::RequireUseWarnings]
+severity = 2
+equivalent_modules = Any::Moose

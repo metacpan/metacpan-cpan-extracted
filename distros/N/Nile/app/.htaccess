@@ -1,0 +1,42 @@
+# Don't show directory listings for URLs which map to a directory.
+Options -Indexes -MultiViews
+
+# Follow symbolic links in this directory.
+Options +FollowSymLinks
+
+#Note that AllowOverride Options and AllowOverride FileInfo must both be in effect for these directives to have any effect, i.e. AllowOverride All in httpd.conf
+Options +ExecCGI
+AddHandler cgi-script cgi pl 
+
+# Set the default handler.
+DirectoryIndex index.cgi index.html index.shtml
+
+# save this file as UTF-8 and enable the next line for utf contents
+#AddDefaultCharset UTF-8
+
+# REQUIRED: requires mod_rewrite to be enabled in Apache.
+# Please check that, if you get an "Internal Server Error".
+RewriteEngine On
+
+#RewriteBase /auction
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# force use www with http and https so http://domain.com redirect to http://www.domain.com
+#add www with https support - you have to put this in .htaccess file in the site root folder
+# skip local host
+RewriteCond %{HTTP_HOST} !^localhost
+# skip IP addresses
+RewriteCond %{HTTP_HOST} ^([a-z.]+)$ [NC]
+RewriteCond %{HTTP_HOST} !^www\. 
+RewriteCond %{HTTPS}s ^on(s)|''
+RewriteRule ^ http%1://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# if query string empty, then set the url GET variables to the query_string
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
+#RewriteCond %{QUERY_STRING} =""
+#RewriteRule ^(.*)$ ?$1 [L,QSA]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !=/favicon.ico
+RewriteRule ^(.*)$ index.cgi [L,QSA]

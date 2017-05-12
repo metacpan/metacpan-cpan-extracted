@@ -1,0 +1,10 @@
+Revision history for Perl extension Number::Phone::RO.
+
+1.000 2016-05-15T00:08+01:00
+ - Mark as stable
+
+0.002 2015-11-28T16:33+01:00
+ - Query http://portabilitate.ro/ for operator information and expose it.
+
+0.001 2015-05-30T23:30+03:00
+ - Initial release

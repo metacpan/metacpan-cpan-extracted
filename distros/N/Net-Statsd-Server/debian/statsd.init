@@ -1,0 +1,93 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:        statsd
+# Required-Start:  $network $remote_fs $syslog
+# Required-Stop:   $network $remote_fs $syslog
+# Default-Start:   2 3 4 5
+# Default-Stop: 
+# Short-Description: Statsd, UDP metric collection daemon
+### END INIT INFO
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+. /lib/lsb/init-functions
+
+DAEMON=/opt/statsd/bin/statsd
+PIDFILE=/var/run/statsd.pid
+
+test -x $DAEMON || exit 5
+
+# Unused now
+if [ -r /etc/default/statsd ]; then
+	. /etc/default/statsd
+fi
+
+LOCKFILE=/var/lock/statsd
+
+lock_statsd() {
+	if [ -x /usr/bin/lockfile-create ]; then
+		lockfile-create $LOCKFILE
+		lockfile-touch $LOCKFILE &
+		LOCKTOUCHPID="$!"
+	fi
+}
+
+unlock_statsd() {
+	if [ -x /usr/bin/lockfile-create ] ; then
+		kill $LOCKTOUCHPID
+		lockfile-remove $LOCKFILE
+	fi
+}
+
+RUNASUSER=root
+UGID=$(getent passwd $RUNASUSER | cut -f 3,4 -d:) || true
+DAEMON_OPTS="/opt/statsd/bin/localConfig.js"
+
+case $1 in
+	start)
+		log_daemon_msg "Starting statsd daemon" "statsd"
+		if [ -z "$UGID" ]; then
+			log_failure_msg "user \"$RUNASUSER\" does not exist"
+			exit 1
+		fi
+		lock_statsd
+  		start-stop-daemon --start --background --quiet --oknodo \
+			--make-pidfile --pidfile $PIDFILE \
+			--startas $DAEMON -- $DAEMON_OPTS &
+		status=$?
+		unlock_statsd
+		log_end_msg $status
+  		;;
+	stop)
+		log_daemon_msg "Stopping statsd daemon" "statsd"
+  		start-stop-daemon --stop --quiet --oknodo --pidfile $PIDFILE
+		log_end_msg $?
+		rm -f $PIDFILE
+  		;;
+	restart|force-reload)
+		$0 stop && sleep 2 && $0 start
+  		;;
+	try-restart)
+		if $0 status >/dev/null; then
+			$0 restart
+		else
+			exit 0
+		fi
+		;;
+	reload)
+		log_daemon_msg "Reloading configuration of statsd daemon" "statsd"
+		statsd_pids=$(pgrep statsd)
+		for p in $statsd_pids ; do
+			kill -HUP $p
+                done
+		exit 3
+		;;
+	status)
+		status_of_proc $DAEMON "Statsd daemon"
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart|try-restart|force-reload|status}"
+		exit 2
+		;;
+esac

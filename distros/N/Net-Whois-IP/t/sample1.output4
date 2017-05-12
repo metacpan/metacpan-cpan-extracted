@@ -1,0 +1,108 @@
+144.134.121.81 
+AU
+|Address| ==> Melbourne Victoria, 3000 
+|CIDR| ==> 144.134.0.0/16  
+|City| ==>   
+|Comment| ==>   
+|Country| ==> AU 
+|NameServer| ==> SY-DNS02.TMNS.NET.AU 
+|NetHandle| ==> NET-144-134-0-0-1 
+|NetName| ==> TELECOMAU4 
+|NetRange| ==> 144.134.0.0 - 144.134.255.255  
+|NetType| ==> Direct Assignment 
+|OrgID| ==> TELSTR 
+|OrgName| ==> Telstra  
+|Parent| ==> NET-144-0-0-0-0 
+|RegDate| ==> 1990-12-10 
+|StateProv| ==>   
+|TechEmail| ==> addressing@telstra.net  
+|TechHandle| ==> SA842-ARIN 
+|TechName| ==> Telstra IP Registry, Shadi  
+|TechPhone| ==> +61 396385495 
+|Updated| ==> 2002-08-09 
+------------------------
+
+209.73.229.163 
+US
+|AbuseEmail| ==> abuse@allresearch.com  
+|AbuseHandle| ==> ABUSE83-ARIN 
+|AbuseName| ==> Abuse  
+|AbusePhone| ==> +1-212-965-1900 
+|Address| ==> 424 Broadway 3rd floor 
+|CIDR| ==> 209.73.229.160/27  
+|City| ==> New York 
+|Comment| ==>   
+|Country| ==> US 
+|NetHandle| ==> NET-209-73-229-160-1 
+|NetName| ==> IP005056-209-73-229 
+|NetRange| ==> 209.73.229.160 - 209.73.229.191  
+|NetType| ==> Reassigned 
+|OrgID| ==> ALLRE 
+|OrgName| ==> AllResearch, inc.  
+|OrgTechEmail| ==> support@allresearch.com 
+|OrgTechHandle| ==> SUPPO17-ARIN 
+|OrgTechName| ==> Support  
+|OrgTechPhone| ==> +1-212-965-1900 
+|Parent| ==> NET-209-73-192-0-1 
+|PostalCode| ==> 10013 
+|RegDate| ==> 2002-11-19 
+|StateProv| ==> NY 
+|Updated| ==> 2002-11-19 
+------------------------
+
+12.247.14.56 
+US
+|Address| ==> 400 Interpace Parkway 
+|CIDR| ==> 12.0.0.0/8  
+|City| ==> Parsippany 
+|Comment| ==> For abuse issues contact abuse@att.net 
+|Country| ==> US 
+|NameServer| ==> CMTU.MT.NS.ELS-GMS.ATT.NET 
+|NetHandle| ==> NET-12-0-0-0-1 
+|NetName| ==> ATT 
+|NetRange| ==> 12.0.0.0 - 12.255.255.255  
+|NetType| ==> Direct Allocation 
+|OrgAbuseEmail| ==> abuse@att.net 
+|OrgAbuseHandle| ==> ATTAB-ARIN 
+|OrgAbuseName| ==> ATT Abuse  
+|OrgAbusePhone| ==> +1-919-319-8130 
+|OrgID| ==> ATTW 
+|OrgName| ==> AT&T WorldNet Services  
+|OrgTechEmail| ==> help@ip.att.net 
+|OrgTechHandle| ==> IPSWI-ARIN 
+|OrgTechName| ==> IP SWIP  
+|OrgTechPhone| ==> +1-888-613-6330 
+|Parent| ==>   
+|PostalCode| ==> 07054 
+|RegDate| ==> 1983-08-23 
+|StateProv| ==> NJ 
+|TechEmail| ==> help@ip.att.net  
+|TechHandle| ==> DK71-ARIN 
+|TechName| ==> Kostick, Deirdre  
+|TechPhone| ==> +1-919-319-8249 
+|Updated| ==> 2002-08-23 
+------------------------
+
+200.52.173.3 
+MX
+|% Types of queries are| ==> POCs, ownerid, CIDR blocks, IP 
+|address| ==> 44900 - Guadalajara - Ja 
+|changed| ==> 20030303 
+|country| ==> MX 
+|created| ==> 20030303 
+|e-mail| ==> nic_tech@MEGACABLE.COM.MX 
+|inetnum| ==> 200.52.160/19 
+|inetnum-up| ==> 200.52/15 
+|nic-hdl| ==> NIT 
+|owner| ==> MegaCable SA de CV 
+|owner-c| ==> NIT 
+|ownerid| ==> MX-MSCV17-LACNIC 
+|person| ==> NIC TECH 
+|phone| ==> +52 33 37500029 [] 
+|responsible| ==> NIC TECH 
+|status| ==> reallocated 
+|tech-c| ==> NIT 
+------------------------
+
+66.138.141.241 
+US

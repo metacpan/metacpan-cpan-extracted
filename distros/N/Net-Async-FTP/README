@@ -1,0 +1,343 @@
+NAME
+    `Net::Async::FTP' - use FTP with `IO::Async'
+
+SYNOPSIS
+     use IO::Async::Loop;
+     use Net::Async::FTP;
+
+     my $loop = IO::Async::Loop->new();
+
+     my $ftp = Net::Async::FTP->new();
+     $loop->add( $ftp );
+
+     $ftp->connect(
+        host => "ftp.example.com",
+     )->then( sub {
+        $ftp->login(
+           user => "username",
+           pass => "password",
+        )
+     })->then( sub {
+        $ftp->retr(
+           path => "README.txt",
+        )
+     })->then( sub {
+        my ( $data ) = @_;
+        print "README.txt says:\n";
+        print $data;
+     })->get;
+
+DESCRIPTION
+    This object class implements an asynchronous FTP client, for use in
+    IO::Async-based programs.
+
+    The code in this module is not particularly complete. It contains a
+    minimal implementation of a few FTP commands, not even the full minimal
+    set the RFC suggests all clients should support. I am releasing it
+    anyway, because it is still useful as it stands, and could easily
+    support extra commands being added if anyone would find it useful.
+
+    The (undocumented) `do_command()' method provides a generic base for the
+    currently-implemented commands, and would be the basis for new commands.
+
+    As they say so often in the open-source world; Patches Welcome.
+
+CONSTRUCTOR
+  $ftp = Net::Async::FTP->new( %args )
+    This function returns a new instance of a `Net::Async::FTP' object. As
+    it is a subclass of `IO::Async::Stream' its constructor takes any
+    arguments for that class.
+
+METHODS
+  $ftp->connect( %args ) ==> ()
+    Connects to the FTP server. Takes the following arguments:
+
+    host => STRING
+            Hostname of the server
+
+    service => STRING or INT
+            Optional. Service name or port number to connect to. If not
+            supplied, will use `ftp'.
+
+    family => INT
+            Optional. Socket family to use. Will default to whatever
+            `getaddrinfo()' returns if not supplied.
+
+    on_connected => CODE
+            Optional when returning a Future. Continuation to call when
+            connection is successful.
+
+             $on_connected->()
+
+    on_error => CODE
+            Optional when returning a Future. Continuation to call on an
+            error.
+
+             $on_error->( $message )
+
+  $ftp->login( %args ) ==> ()
+    Sends a `USER' and optionally `PASS' command. Takes the following
+    arguments:
+
+    user => STRING
+            Username for the `USER' command
+
+    pass => STRING
+            Password for the `PASS' command if required
+
+    on_login => CODE
+            Optional when returning a future. Continuation to invoke on
+            successful login.
+
+             $on_login->()
+
+    on_error => CODE
+            Optional when returning a future. Continuation to invoke on an
+            error.
+
+             $on_error->( $message )
+
+  $ftp->rename( %args ) ==> ()
+    Renames a file on the remote server. Takes the following arguments
+
+    oldpath => STRING
+            Path to file to rename
+
+    newpath => STRING
+            Desired new path for the file
+
+    on_done => CODE
+            Optional when returning a future. Continuation to invoke on
+            success.
+
+             $on_done->()
+
+    on_error => CODE
+            Optional. Continuation to invoke on an error.
+
+             $on_error->( $message )
+
+  $ftp->dele( %args ) ==> ()
+    Deletes a file on the remote server. Takes the following arguments
+
+    path => STRING
+            Path to file to delete
+
+    on_done => CODE
+            Optional when returning a future. Continuation to invoke on
+            success.
+
+             $on_done->()
+
+    on_error => CODE
+            Optional. Continuation to invoke on an error.
+
+             $on_error->( $message )
+
+  $ftp->list( %args ) ==> $list
+    Runs a `LIST' command on a path on the remote server; which requests
+    details on the file, or contents of the directory. Takes the following
+    arguments
+
+    path => STRING
+            Path to `LIST'
+
+    on_list => CODE
+            Optional when returning a future. Continuation to invoke on
+            success. Is passed a list of lines from the `LIST' result in a
+            single string.
+
+             $on_list->( $list )
+
+    on_error => CODE
+            Optional. Continuation to invoke on an error.
+
+             $on_error->( $message )
+
+    The `list_parsed' method may be easier to use as it parses the lines.
+
+  $ftp->list_parsed( %args ) ==> @list
+    Runs a `LIST' command on a path on the remote server; and parse the
+    result lines. Takes the following arguments
+
+    path => STRING
+            Path to `LIST'
+
+    on_list => CODE
+            Optional when returning a future. Continuation to invoke on
+            success. Is passed a list of files from the `LIST' result, one
+            line per element.
+
+             $on_list->( @list )
+
+    on_error => CODE
+            Optional. Continuation to invoke on an error.
+
+             $on_error->( $message )
+
+    The `@list' array will be passed a list of `HASH' references, each
+    formed like
+
+    name => STRING
+            The filename
+
+    type => STRING
+            A single character; `f' for files, `d' for directories
+
+    size => INT
+            The size in bytes
+
+    mtime => INT
+            The item's last modify timestamp, as a UNIX epoch time
+
+    mode => INT
+            The access mode, as a number
+
+  $ftp->nlist( %args ) ==> $list
+    Runs a `NLST' command on a path on the remote server; which requests a
+    list of filenames in a directory. Takes the following arguments
+
+    path => STRING
+            Path to `NLST'
+
+    on_list => CODE
+            Optional when returning a future. Continuation to invoke on
+            success. Is passed a list of names from the `NLST' result in a
+            single string.
+
+             $on_list->( $list )
+
+    on_error => CODE
+            Optional. Continuation to invoke on an error.
+
+             $on_error->( $message )
+
+    The `namelist' method may be easier to use as it splits the lines.
+
+  $ftp->namelist( %args ) ==> @names
+    Runs a `NLST' command on a path on the remote server; which requests a
+    list of filenames in a directory. Takes the following arguments
+
+    path => STRING
+            Path to `NLST'
+
+    on_names => CODE
+            Optional when returning a future. Continuation to invoke on
+            success. Is passed a list of names from the `NLST' result in a
+            list, one name per entry
+
+             $on_name->( @names )
+
+    on_error => CODE
+            Optional. Continuation to invoke on an error.
+
+             $on_error->( $message )
+
+  $ftp->retr( %args ) ==> $content
+    Retrieves a file on the remote server. Takes the following arguments
+
+    path => STRING
+            Path to file to retrieve
+
+    on_data => CODE
+            Optional when returning a future. Continuation to invoke on
+            success. Is passed the contents of the file as a single string.
+
+             $on_data->( $content )
+
+    on_error => CODE
+            Optional. Continuation to invoke on an error.
+
+             $on_error->( $message )
+
+  $ftp->stat( %args ) ==> @stat
+    Runs a `STAT' command on a path on the remote server; which requests
+    details on the file, or contents of the directory. Takes the following
+    arguments
+
+    path => STRING
+            Path to `STAT'
+
+    on_stat => CODE
+            Optional when not returning a future. Continuation to invoke on
+            success. Is passed a list of lines from the `STAT' result, one
+            line per element.
+
+             $on_stat->( @stat )
+
+    on_error => CODE
+            Optional. Continuation to invoke on an error.
+
+             $on_error->( $message )
+
+    The `stat_parsed' method may be easier to use as it parses the lines.
+
+  $ftp->stat_parsed( %args ) ==> @stat
+    Runs a `STAT' command on a path on the remote server; and parse the
+    result lines. Takes the following arguments
+
+    path => STRING
+            Path to `STAT'
+
+    on_stat => CODE
+            Optional when returning a future. Continuation to invoke on
+            success. Is passed a list of lines from the `STAT' result, one
+            line per element.
+
+             $on_stat->( @stat )
+
+    on_error => CODE
+            Optional. Continuation to invoke on an error.
+
+             $on_error->( $message )
+
+    The `@stat' array will be passed a list of `HASH' references, each
+    formed like
+
+    name => STRING
+            The filename
+
+    type => STRING
+            A single character; `f' for files, `d' for directories
+
+    size => INT
+            The size in bytes
+
+    mtime => INT
+            The item's last modify timestamp, as a UNIX epoch time
+
+    mode => INT
+            The access mode, as a number
+
+    If `STAT' is invoked on a file, then `@stat' will contain a single
+    reference to represent it. If invoked on a directory, the `@stat' will
+    start with a reference about the directory itself (whose name will be
+    `.'), then one per item in the directory, in the order the server
+    returned the lines.
+
+  $ftp->stor( %args ) ==> ()
+    Stores a file on the remote server. Takes the following arguments
+
+    path => STRING
+            Path to file to store
+
+    data => STRING
+            New contents for the file
+
+    on_stored => CODE
+            Optional when returning a future. Continuation to invoke on
+            success.
+
+             $on_stored->()
+
+    on_error => CODE
+            Optional. Continuation to invoke on an error.
+
+             $on_error->( $message )
+
+SEE ALSO
+    *   http://tools.ieft.org/html/rfc959 - FILE TRANSFER PROTOCOL (FTP)
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

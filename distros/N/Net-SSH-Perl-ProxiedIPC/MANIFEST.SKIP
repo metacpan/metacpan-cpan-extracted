@@ -1,0 +1,10 @@
+~$
+\.bak$
+\.old$
+\#
+.git*
+blib*
+Makefile$
+\.DS_Store
+\ANet-
+.releaserc

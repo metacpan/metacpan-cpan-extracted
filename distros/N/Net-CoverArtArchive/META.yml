@@ -1,0 +1,28 @@
+---
+abstract: 'Query the coverartarchive.org'
+author:
+  - 'Oliver Charles <oliver@musicbrainz.org>'
+  - 'Brian Cassidy <bricas@cpan.org>'
+build_requires:
+  File::Find::Rule: 0.33
+  Test::More: 0.90
+  Try::Tiny: 0.11
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-CoverArtArchive
+requires:
+  JSON::Any: 1.29
+  LWP::UserAgent: 6.03
+  Moose: 2.0402
+  namespace::autoclean: 0.13
+resources:
+  bugtracker: http://tickets.musicbrainz.org/browse/CAA
+  homepage: https://github.com/metabrainz/CoverArtArchive
+  repository: https://github.com/metabrainz/CoverArtArchive.git
+version: 1.02

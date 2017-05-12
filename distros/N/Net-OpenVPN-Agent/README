@@ -1,0 +1,34 @@
+Net-OpenVPN-Agent
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::OpenVPN::Agent
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-OpenVPN-Agent
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-OpenVPN-Agent
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-OpenVPN-Agent
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-OpenVPN-Agent/
+
+
+

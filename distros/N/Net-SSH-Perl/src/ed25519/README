@@ -1,0 +1,5 @@
+Code from https://github.com/rdeker/ed25519.git
+which is a fork from https://github.com/orlp/ed25519.git
+
+The fork has updates from a more recent SUPERCOP implementation,
+which is what the OpenSSH implementation is based on.

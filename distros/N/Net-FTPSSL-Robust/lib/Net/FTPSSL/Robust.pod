@@ -1,0 +1,94 @@
+=head1 NAME
+
+Net::FTPSSL::Robust - download files over FTP
+
+=head1 INHERITANCE
+
+ Net::FTPSSL::Robust
+   is a Net::FTP::Robust
+
+ Net::FTPSSL::Robust
+   is a Exporter
+
+=head1 SYNOPSIS
+
+ use Net::FTPSSL;          # will publish some constants
+ use Net::FTPSSL::Robust;  # more constants
+
+ my $ftp = Net::FTPSSL::Robust->new
+  ( Host     => $host
+  , Security => SECURITY_TLS
+  );
+
+ # Further, see Net::FTP::Robust
+
+=head1 DESCRIPTION
+
+This module is specialized in (on the moment only) downloading large
+data-sets (gigabytes) via FTP over an encrypted connection. It uses
+Net::FTPSSL for the encryption and Net::FTP::Robust for the
+logic.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Net::FTPSSL::Robust-E<gt>B<new>(OPTIONS)
+
+Use to connect to one ftp-server.
+All OPTIONS are passed to Net::FTPSSL method C<new()>. These options
+all start with capitals.
+
+ -Option  --Default
+  Security  SECURITY_TLS
+  useSSL    <false>
+
+=over 2
+
+=item Security => SECURITY_TLS|SECURITY_SSL
+
+Replaces the C<useSSL> option for Net::FTPSSL.  The constants are
+exported.
+
+=item useSSL => BOOLEAN
+
+When true SSL is used, otherwise TLS. This is the only Net::FTPSSL
+option which starts with a lower-case. Usable, but deprecated: please
+use 
+
+=back
+
+=back
+
+=head2 Download
+
+=head1 DETAILS
+
+=head2 Comparison
+
+Net::FTPSSL implements the FTP protocol over encrypted connections.
+C<Net::FTPSLL::Robust> adds retries and logging, to retrieve
+data which takes hours to download, sometimes over quite instable
+connections.  It uses Log::Report which can connect to various logging
+frameworks for its messages.
+
+=head2 Limitations
+
+See L<Net::FTP::Robust/Limitations>.
+
+=head1 SEE ALSO
+
+This module is part of Net-FTPSSL-Robust distribution version 0.05,
+built on August 22, 2011. Website: F<http://perl.overmeer.net>.  See also L<Net::FTP>.
+
+=head1 COPYRIGHTS
+
+Copyrights of the perl code and the related documentation by
+2009-2011 by Mark Overmeer. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

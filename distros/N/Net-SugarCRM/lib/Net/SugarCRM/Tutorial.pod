@@ -1,0 +1,431 @@
+=head1 NAME
+
+Net::SugarCRM::Tutorial - Net::SugarCRM Overview
+
+=head1 DESCRIPTION
+
+The Net::SugarCRM module is a module to provision entries in SugarCRM via REST methods.
+
+All the examples provided here were using the SugarCRM version 6.2.1. See the Sugar Developer
+Guide for more info
+L<http://developers.sugarcrm.com/docs/OS/6.2/-docs-Developer_Guides-Sugar_Developer_Guide_6.2.0-Sugar_Developer_Guide_6.2.1_html.html#9000412>
+
+=head2 Prerrequisites
+
+Prerequisite: Anyone using this module is supposed to have an understanding (to certain extent)
+on how SugarCRM works, the different modules that exist in Sugar and how they tie together,
+and of course a bit of perl :-)
+
+=head2 Attributes and modules
+
+The list of attributes for each module (Contacts, Leads, Accounts, ...), can be found in your
+SugarCRM distribution under modules/$MODULE/vardefs.php, that is to see all the relevant
+information of the Contacts module, please consult modules/Contacts/vardefs.php. You can use
+these attributes names during the creation and you receive them back as hash values when
+you get the module info.
+
+Because of how the internals of SugarCRM work you can only query on the module attributes
+that are in the SQL tables. That is for the Contacts module only the names that are in the
+B<contacts> table and B<contacts_cstm> table. As an example, the email1 attribute can be
+found in the module/Leads/vardefs.php, that means that you can create an entry with that
+value as follows:
+
+  my $s = Net::SugarCRM->new(url=>$Test::url, restuser=>$Test::login, restpasswd=> $Test::pass);
+  my $lead_entry = {
+       email1 => 'batman@justiceleague.org',
+       salutation => 'Mr',
+       first_name => 'Bruce',
+       last_name => 'Wayne',
+       title => 'Detective',
+       account_name => 'Justice League of America',
+       department => 'Gotham city dep',
+       phone_work => '+1123123123',
+       website => 'http://justiceleagueofamerica.org',
+  };
+  my $leadid = $s->create_lead($lead_entry);
+
+This will work as well (you should get ):
+
+  my $mail = $s->get_lead_attribute($leadid, 'email1')
+
+But because email1 is not in the leads table, this won't work:
+
+  # This does not work
+  my $query = 'email1 = "batman@justiceleague.org"';
+  my $leads = $s->get_leads($query);
+
+Instead you can use (which is specifically for the email case)
+
+  my $leads = $s->get_leads_from_mail($mail);
+
+For the mail attribute some special methods have been implemented like B<get_leads_from_mail>
+and similar ones.
+
+=head2 About target lists (prospect lists)
+
+To access the normal functionality of this module you need to specify the following attributes:
+
+=over 4
+
+=item * url
+
+This is the REST url of your SugarCRM installation. For example 
+B<http://localhost/sugarcrm/service/v4/rest.php>. Throughout this document we will use it
+as $Test::url
+
+=item * restuser
+
+This is the username which has privileges to create, query, delete the
+entries of the modules. For example B<admin>. In this document we will use it as $Test::login
+
+=item * restpasswd
+
+This is the password of the restuser. In this document we will use it as $Test::pass
+
+=back
+
+If you want to be able to use campaigns module and marketing email distribution as a mail
+template and be able to resend emails (normally forbidden by the internals of SugarCRM,
+and specifically by registry in the campaign_logs table) you need to be able to delete
+some entries of the campaign_logs table. That can only be done (or more precisely, I was
+only be able to do it with direct access to the tables via SQL. That means that to access this
+functionality you need to specify also:
+
+=over 4
+
+=item * dsn
+
+The DBI interface, something like 'DBI:mysql:database=sugarcrm;host=localhost'.
+In this document you will find it as $Test::testdsn
+
+=item * dbuser
+
+This is the user used for login for the dsn.
+
+=item * dbpassword
+
+This is the password used for login into the database.
+
+=back
+
+Ok, now let's go on to the example
+
+=head1 WORKFLOW
+
+We will set up a simple example for a web registration were the workflow is as follows:
+
+=over 4
+
+=item * Demo Registration
+
+A user registers via web for demo of the product. The relevant lead entry is created
+in SugarCRM and a demo user is created in LDAP.
+
+=item * Email notification
+
+After the registry we send the user an email with the relevant login information.
+
+=item * Use applies to the product
+
+After a while the user applies for the product, we convert the lead entry into
+an Account, a Contact and an Opportunity
+
+=back
+
+=head1 EXAMPLE
+
+=head2 Creation of the sugarcrm object
+
+Example creation of the SugarCRM object
+
+ package Test;
+ our $login='admin';
+ our $pass='adminpass';
+ our $url='http://localhost/sugarcrm/service/v4/rest.php';
+ our $testdsn='DBI:mysql:database=sugarcrm;host=localhost';
+ our $testdbuser='sugarcrm';
+ our $testdbpass='pass';
+
+ package MyPackage;
+ my $s = Net::SugarCRM->new(url=>$Test::url, restuser=>$Test::login, restpasswd=> $Test::pass,
+	dsn => $Test::testdsn, dbuser => $Test::testdbuser, dbpassword => $Test::testdbpass
+ );
+
+
+=head2 Creation of lead entry
+
+Suppose that you got your entry from your web site as a hash, and you want to create a Lead
+entry. In this example we create an ldap entry and store the initial password also in the CRM.
+This allows the channel manager to edit the initial email, and be able to insert the password.
+During the first login the user will be requested to change the password. For this to work
+you need to add through the Studio interface the attribute initial_password in the Leads module.
+
+ my $lead_entry = {
+       email1 => 'batman@justiceleague.org',
+       salutation => 'Mr',
+       first_name => 'Bruce',
+       last_name => 'Wayne',
+       title => 'Detective',
+       account_name => 'Justice League of America',
+       department => 'Gotham city dep',
+       phone_work => '+1123123123',
+       website => 'http://justiceleagueofamerica.org',
+       initial_password_c => _generate_random_pass(),
+ };
+ # We assume that there is a custom attribute called "initial_password" in the Leads module.
+ # You can create it with the Studio interface 
+ my $leadid = $s->create_lead($lead_entry);
+ # Example creation of ldap entry
+ # ... create_entry_in_ldap($lead_entry);
+
+=head2 Send of welcome email
+
+Create a campaign called "Demo Campaign", a prospect list called "Demo Users", and
+marketing email called "Demo Use send password". Be careful this will delete statistics
+of previous emails sent to this lead and/or email.
+
+ package Test;
+ our $testcampaign='Demo Campaign';
+ our $testprospectlist='Demo users';
+ our $testemailmarketing='Demo User send password';
+ 
+ package MyPackage;
+ 
+ my $attrs = {
+	campaign_name => $Test::testcampaign,
+	emailmarketing_name => $Test::testemailmarketing, 
+	prospectlist_name => $Test::testprospectlist, 
+	related_type => 'Leads',
+	related_id => $leadid,
+	email => 'batman@justiceleague.org',
+ };
+ $s->send_prospectlist_marketing_email_force($attrs);
+
+=head2 Convert the lead to Account, Contact and Opportunity.
+
+ We will get some of the attributes of the lead, and complement them with some
+ other info that we probably gather from the web (this is not very efficient
+ you should rather get the lead entry and access the hash directly, but
+ this is a bit more ilustrative)
+
+ my $leadid = $s->get_unique_lead_id_from_mail('batman@justiceleague.org');
+ my $account_attrs = {
+       name => $s->get_lead_attribute($leadid, 'account_name'),
+       description => 'DC Comics is special...',
+       website => $s->get_lead_attribute($leadid, 'website'),
+ };
+ my $accountid = $s->create_account($account_entry);
+ my $contact_entry = {
+       email1 => $s->get_lead_attribute($leadid, 'email1'),
+       salutation => $s->get_lead_attribute($leadid, 'salutation'),
+       first_name => $s->get_lead_attribute($leadid, 'first_name'),
+       last_name => $s->get_lead_attribute($leadid, 'last_name'),
+       title => $s->get_lead_attribute($leadid, 'title'),
+       department => $s->get_lead_attribute($leadid, 'department'),
+       phone_work => $s->get_lead_attribute($leadid, 'phone_work'),
+       account_id => $accountid,
+ };
+ my $contactid = $s->create_contact($contact_entry);
+ my $opportunity_entry = {
+       name => 'My incredible opportunity',
+       description => 'This is the former DC Comics is special...',
+       amount => '12345',
+       sales_stage => 'Prospecting',
+       date_closed => '2011-12-31',
+       account_id => $accountid,
+ };
+ my $opportunityid = $s->create_opportunity($opportunity_entry);
+
+And now let's close the lead
+
+ my $new_leadattrs = {
+       account_id => $accountid,
+       opportunity_id => $opportunity_id,
+       contact_id => $contactid,
+       status => 'Converted',
+       converted => 1,
+ };
+
+=head2 Add a note
+
+Now let's think that you want to add a note to the opportunity:
+
+ my $note_attrs = {
+    name => 'test note',
+    description => 'Also a test note descr',
+    parent_type => 'Opportunities',
+    parent_id => $opportunityid,
+    contact_id => $contactid,
+ };
+ $s->create_note($note_attrs);
+
+
+=head2 Tests
+
+You can find more examples in the test section of the module. Specifically the t/*.t files,
+customize the t/lib/defaults.pl file with the suitable SugarCRM url and login information
+and set the environment variables TEST_AUTHOR_SUGAR to run the tests, if you set the variable
+to DEBUG you will get a lot of debug information.
+
+ export TEST_AUTHOR_SUGAR=1
+
+or
+
+ export TEST_AUTHOR_SUGAR=DEBUG
+
+Please review the tests before you run them, specifically if you are using a production
+SugarCRM.
+
+
+=head1 EXAMPLE ARCHITECTURE
+
+We describe here an example architecture that we use for our product.
+The basic restrictions of the design are:
+
+=over 4
+
+=item * Security.
+
+The website should not have direct access to our customer data (SugarCRM)
+
+=item * Philosophy.
+
+Where possible use OpenSource software, and if possible use perl
+
+=back
+
+The outcome of the design was:
+
+=over 4
+
+=item * Web site
+
+Web site with wordpress. Any new partner or customer that registers via a web form
+sents a message to an ActiveMQ queue with a publish/subscription queue.
+
+=item * MOM
+
+The Apache ActiveMQ for queueing up the messages.
+
+=item * Provision Module
+
+Our provisioning module with the logic to create leads, accounts, contacts and opportunities. The technologies used were L<Any::Event> as the event module, L<Net::STOMP::Client>, and <Net::SugarCRM>
+
+=item * Customer database
+
+As the CRM we use SugarCRM
+
+=back
+
+  ----------------------
+ |                      |
+ |  website (wordpress) |
+ |                      |
+  ----------------------
+            |
+            | Publish new requests into queue (lead creation, customer creation)
+            |
+            v
+  ----------------------
+ |                      |
+ |   Apache ActiveMQ    |
+ |                      |
+  ----------------------
+            ^
+            | Subscribe to queue (lead creation, customer creation)
+            |
+            v
+  ----------------------
+ |  Net::STOMP::Client  |
+ |                      |
+ |                      |
+ |   Any::Event module  |
+ |                      |
+ |                      |
+ |   Net::SugarCRM      |
+  ----------------------
+            |
+            | Create Lead, Contact, Account, Opportunity (depending on the message received)
+            |
+            v
+  ----------------------
+ |                      |
+ |   SugarCRM           |
+ |                      |
+  ----------------------
+
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Net::SugarCRM
+
+    perldoc Net::SugarCRM::Tutorial
+
+=head2 LOGGING
+
+The module uses L<Net::Log4perl>. By default the log level is set to ERROR. An easy way
+to increase the log level is running this in your script:
+
+ use Log::Log4perl;
+ use Net::SugarCRM;
+ if(!Log::Log4perl->initialized()) {
+    Log::Log4perl->easy_init($Log::Log4perl::DEBUG);
+ }
+
+=head2 More information
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-SugarCRM>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Net-SugarCRM>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Net-SugarCRM>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Net-SugarCRM/>
+
+=item * Our project web page
+
+L<http://theqvd.com/>
+
+=back
+
+=head1 AUTHOR
+
+Nito Martinez, C<< <Nito at Qindel.ES> >>
+
+L<http://www.qindel.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2011 Nito Martinez.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; version 2 dated June, 1991 or at your option
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+A copy of the GNU General Public License is available in the source tree;
+if not, write to the Free Software Foundation, Inc.,
+59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+
+=cut

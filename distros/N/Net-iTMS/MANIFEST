@@ -1,0 +1,17 @@
+Build.PL
+ChangeLog
+INSTALL
+lib/Net/iTMS.pm
+lib/Net/iTMS/Album.pm
+lib/Net/iTMS/Artist.pm
+lib/Net/iTMS/Error.pm
+lib/Net/iTMS/Genre.pm
+lib/Net/iTMS/Request.pm
+lib/Net/iTMS/Search.pm
+lib/Net/iTMS/Search/Advanced.pm
+lib/Net/iTMS/Song.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/use.t

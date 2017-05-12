@@ -1,0 +1,91 @@
+Revision history for Perl extension Net::FTP::Recursive.
+
+1.0  Tue Jan 21 09:08:15 2003
+    - original version; created by h2xs 1.22 with options
+        -X -v 1.0 -n Net::FTP::Recursive
+
+1.1  Added rdir and rls methods.
+
+1.4 Added code to handle symlinks a little better.
+
+1.5  -Fixed bug that caused an infinite loop when a directory was unreachable.
+     -Added rdelete method.
+     -Added RemoveRemoteFiles and RemoveLocalFiles options.
+
+1.6
+    -Fixed problems on some platforms where empty directories would
+     cause problems.  Specifically, an undef would get passed around
+     and cause havoc when methods were called on them.  Seen only on
+     Windows platforms, as far as I know.
+    -Fixed a bug with symlinks, where a symlink referring to a directory
+     would not take you back to the original directory when doing a
+     cdup.  Now it manually retrieves the path first and cwd's back
+     to that dir.
+    -Added code to test for cycles and to be smart and make symlinks
+     wherever possible.  This is only used when the SymlinkFollow option
+     to rget is used.  It obviously will not be fully functional under
+     Windows (no symlinks), but the cycle elimination should work.
+    -Added options for allowing for the matching or omission
+     of certain filenames.
+    -Added code to make sure that files accessed through a
+     symlink will not be deleted if RemoveRemoteFiles is
+     set.  If the files will be deleted elsewhere in the
+     tree via a directory, then they will obviously still be
+     deleted.
+
+1.7
+     -Fixed rdir when used with symlinks.  Now it should note cycles
+      and not follow them.
+     -Reduced the # of redundant calls to $ftp->pwd and on getting the
+      local pwd.
+     -Removed some debugging info that I had put in to debug v1.6.
+     -Made SymlinkLink superceded by the other options if
+      given.  This was to allow for the meaningful use of
+      SymlinkLink in concert with either SymlinkFollow or
+      SymlinkCopy.
+
+1.8
+     -Implemented return codes for all methods.
+     -Added some memory management code to hopefully help save
+      memory when recursing.
+     -Backported the module so that it should run ok on anything perl
+      5 or greater.  Basically, I just changed the "our"s to use vars.
+     -Now using the Cwd module to get the current working directory
+      on the client machine, for platform independence.
+
+1.9
+     -Fixed bug in creation of FTP object.  It will now return undef
+      if Net::FTP->new returns undef, rather than croaking.
+     -All "<variable> = undef;" lines have been changed to
+      "undef <variable>;" as the former doesn't seem to work on
+      some (every?) platforms now.
+
+1.10
+     -Added "CheckSizes" option that will compare the remote filesize
+      with the local file size before deleting.
+
+1.11
+     -Added "CheckSizes" option to the rput method.
+
+2.00
+
+     -Changed the version number to fix indexing on CPAN.
+      (Not sure if this is gonna work).
+     -Added carping for when the rls/rdir functions are not
+      given FileHandles.
+     -Added "PrintType" option to rls and rdir.
+
+2.01
+
+     -rput no longer relies on an external program to determine the list
+      of files to transfer.  It now uses opendir and readdir.
+     -Code cleanup, everywhere.
+
+2.03
+
+    -Fixed the bug whereby files that evaluated to false would not be
+     transmitted correctly.
+
+2.04
+
+    -Fixed the division bug for some of the error messages.

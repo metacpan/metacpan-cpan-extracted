@@ -1,0 +1,5 @@
+host = smtp.gmail.com
+port = 587
+user = faylandblog@gmail.com
+pass = xxxxxx
+to   = fayland@gmail.com

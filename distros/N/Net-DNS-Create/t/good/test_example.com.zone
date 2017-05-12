@@ -1,0 +1,35 @@
+$TTL  3600
+tons.of.stuff                  in a     127.0.0.1
+_adsp._domainkey               in txt   "dkim=all"
+www                            in a     127.0.0.1
+www                            in rp    david david.people
+smtp                           in a     127.0.0.1
+david.people                   in txt   "For a good time call: 555-1212"
+bob.people                     in txt   "For a *great* time call: 555-1213"
+@                              in ns    ns1
+@                              in ns    ns2
+@                              in mx    0 mail
+@                              in mx    10 smtp
+@                              in txt   "v=spf1 mx -all"
+@                              in txt   "Weird characters: \"hello\"<script>$$)(*&^%$#@!~`[]{}\\|:;\"',./<>?\000\011\012"
+@                              in txt   "another different text record"
+@                              in a     127.0.0.3
+@                              in soa   ns1 some-email ( 1234 28800 7200 2419200 3600 )
+mail                           in a     127.0.0.2
+more.stuff                     in a     127.0.0.1
+_carddavs._tcp                 in srv   0 0 443 calendar
+ns2                            in a     127.0.0.1
+www3                           in cname @
+external                       in cname external.example.net.
+calendar                       in a     127.0.0.1
+example._domainkey             in txt   ("v=DKIM1; n=blah =20 Blah; g=*; k=rsa; p=THISISNOTAREALDOMAINKEYJUSTANEXAMPLENOREALLYBLAHBLAHBLAHDOMAINKEYDOMAINKEYDOMAINKEYTHISISNOTAREALDOMAINKEYJUSTANEXAMPLENOREALLYBLAHBLAHBLAHDOMAINKEYDOMAINKEYDOMAINKETHISISNOTAREALDOMAINKEYJUSTANEXAMPLENOREALLYBLAHBL"
+                                         "AHBLAHDOMAINKEYDOMAINKEYDOMAINKETHISISNOTAREALDOMAINKEYJUSTANEXAMPLENOREALLYBLAHBLAHBLAHDOMAINKEYDOMAINKEYDOMAINKEYTHISISNOTAREALDOMAINKEY")
+stuff                          in a     127.0.0.1
+even.more.stuff                in a     127.0.0.1
+ns1                            in a     127.0.0.1
+www2                           in cname www
+subdomain                      in ns    subdomain-ns
+round-robin                    in rp    david david.people
+round-robin                    in rp    bob bob.people
+round-robin                    in a     127.0.0.4
+round-robin                    in a     127.0.0.5

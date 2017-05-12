@@ -1,0 +1,6 @@
+Revision history for Perl extension LotusAPI::Replication.
+
+0.01  Tue Feb 25 14:56:32 2003
+	- original version; created by h2xs 1.21 with options
+		-a -n LotusAPI::Replication
+

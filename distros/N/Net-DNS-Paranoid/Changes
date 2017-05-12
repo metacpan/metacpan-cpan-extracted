@@ -1,0 +1,24 @@
+Revision history for Perl extension Net::DNS::Paranoid
+
+0.08 2015-09-30T07:01:36Z
+
+    - fixed test case
+
+0.07
+
+    - fixed deps
+
+0.06
+
+    - more better dist packaging
+
+0.05
+
+    - better dist packaging
+
+0.04
+
+    - split dist from LWPx::ParanoidHandler
+
+0.01    Sun Sep 16 15:24:51 2012
+    - original version

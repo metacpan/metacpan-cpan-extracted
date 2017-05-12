@@ -1,0 +1,4 @@
+0.02  Fixed bug where there was no way to compare if a date was equal to
+      another date.
+      
+0.01  Initial Release

@@ -1,0 +1,45 @@
+Revision history for Net-WebSocket-Server
+
+0.3.4   2016-01-27
+        Ignore mid-handshake connections for pings and ->connections() list;
+        provide $conn->is_ready() interface to accomodate this.
+
+0.3.3   2015-08-08
+        Minor adjustments to test to fix Cygwin timeout issue.
+
+0.3.2   2015-06-05
+        Bugfixes for SIGPIPE and socket reuse.
+
+0.3.1   2014-09-16
+        Minor adjustments to tests to fix Win32 timeout issue.
+
+0.3.0   2014-09-07
+        Added tick and shutdown events to Server.  Added support for watching
+        extra filehandles for readability / writability.
+
+0.2.2   2013-10-26
+        Added control over max_payload_size via
+        connection->new(max_send_size => ...).
+
+0.2.1   2013-09-06
+        Switched from getnameinfo() to sock->peerhost() to support older
+        systems.
+
+0.2.0   2013-09-03
+        Bugfixes to better support SSL and IPv6; added SSL examples to
+        documentation.
+
+0.1.3   2013-06-06
+        Minor adjustments to tests to fix BSD timeout issue.
+
+0.1.2   2013-06-04
+        Minor bugfixes; adjustment in tests to help track down BSD timeout
+        issue.
+
+0.1.1   2013-06-04
+        Minor adjustments to documentation and tests.
+
+0.1.0   2013-05-20
+        Initial version of Net::WebSocket::Server, built to be a
+        straightforward WebSocket server for Perl without all the extra
+        baggage of larger frameworks or event engines.

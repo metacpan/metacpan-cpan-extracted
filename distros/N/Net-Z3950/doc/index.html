@@ -1,0 +1,77 @@
+<HTML>
+ <HEAD>
+  <TITLE>Net::Z3950 - Perl extension for talking to Z39.50 servers</TITLE>
+  <LINK rel="stylesheet" type="text/css" href="style.css">
+ </HEAD>
+ <BODY>
+  <H1>Net::Z3950 - Perl extension for talking to Z39.50 servers</H1>
+
+  <H2>Why a Documentation Directory?</H2>
+  <P>
+  For a while, I experimented with having the HTML form of the POD
+  documents living alongside the Perl source, but that turns out to be
+  Hard To Do right - you end up fighting the MakeMaker - so I decided
+  it wasn't worth the effort, and moved all the documentation into
+  this separate directory, where the building of the HTML is
+  controlled by a simple Makefile.
+
+  <H2>User Documents</H2>
+  <P>
+  The bulk of the documentation is from the PODs in the source files:
+  it is intended to provide everything that a user of the Net::Z3950 module
+  could need to know.
+  <P>
+  It should be read in the following order:
+  <UL>
+   <LI><A href="Z3950.html">Net::Z3950 module overview</A>
+   <LI><A href="Z3950/Tutorial.html">Tutorial</A>
+   <LI><A href="Z3950/Manager.html">The Net::Z3950::Manager class</A>
+   <LI><A href="Z3950/Connection.html">The Net::Z3950::Connection class</A>
+   <LI><A href="Z3950/ResultSet.html">The Net::Z3950::ResultSet class</A>
+   <LI><A href="Z3950/Record.html">The Net::Z3950::Record class</A>
+   <LI>Standard options <B>(NOT YET)</B>
+   <LI><A href="Z3950/APDU.html">The Net::Z3950::APDU class</A>
+	<I>(Don't bother reading this)</I>
+  </UL>
+  <P>
+  Yes, it's ridiculous that I need to provide this hand-maintained
+  index.  What I should clearly do is have the SEE ALSO section of the
+  top-level Net::Z3950 overview manual link to all the other manuals
+  describing specific data types.  Unfortunately (can you believe this?)
+  I can't find any construct in POD which converts to a simple relative
+  link in HTML.
+  <P>
+  Other things that may be worth reading:
+  <UL>
+   <LI>Thoughts about <A href="gui.html">putting a GUI on Net::Z950/Perl
+	applications</A>
+   <LI>Notes about <A href="todo.html">work still to be done</A>
+  </UL>
+
+  <H2>Developer Documents</H2>
+  <P>
+  There are a few additional bits and pieces that may be of interest
+  to people who want to develop the module further:
+  <UL>
+   <LI><A href="visit.html">Early documentation</A> written on
+	the bus and plane to visit Index Data in Denmark, and
+	including some notes added during the discussions there, of
+	which the most interesting are the revised interface
+	sketches.  <B>Please understand that this is out of date, and
+	of historical interest only</B>
+   <LI>A list of the <A href="Albums">music</A> that I listened
+	to while I was writing it.  (OK, I admit it has a lot of
+	mid-seventies semi-metal crud in it.  That's because I did the
+	work in my office at home, which has an old-fashioned
+	turntable in it, and gives me a rare opportunity to revive my
+	teen years with the aid of all that obsolete vinyl that's
+	gathering dust in the corner.  Also, if I were coming over all
+	sentimental, I might comment on how certain songs on the Chris
+	De Burgh album present an achingly resonant insight into the
+	ephemerality of human life, the noble tragedy of the world's
+	continuous losses as people grow old and die, and the human
+	condition generally.  But hey, this is supposed to be a
+	technical document, so I won't mention any of that stuff.)
+  </UL>
+ </BODY>
+<HTML>

@@ -1,0 +1,4 @@
+26 September 2002
+- Test scripts for all modules
+- Implementations for write, log, proto, stat, ver, update and whom
+- Enhance fdlscat.PL for mp3

@@ -1,0 +1,11 @@
+To Do List for Net::Printer
+---------------------------
+
+* If connection to printer fails, try sending to lpr/lpd as last
+  resort.  Make this option configurable (like Failover => "Yes") for
+  example. 
+
+* Have test.pl use $PRINTER environment variable
+
+* Switch to use Net::LPR
+

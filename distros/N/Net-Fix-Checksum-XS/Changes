@@ -1,0 +1,9 @@
+Revision history for Perl extension Net::Fix::Checksum::XS.
+
+0.02  Wed Jul 23 07:42:34 2015
+	- Documentation fixes
+
+0.01  Wed Jul 29 05:23:06 2015
+	- original version; created by h2xs 1.23 with options
+		-A -n Net::Fix::Checksum::XS --compat-version 5.8.0
+

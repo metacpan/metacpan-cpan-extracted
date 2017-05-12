@@ -1,0 +1,113 @@
+#!/usr/bin/perl
+
+use NetServer::Generic;
+
+# minimal http server (HTTP/0.9):
+
+sub url_to_file($) {
+   # for a given URL, turn it into an absolute pathname
+   my ($u) = shift ;    # incoming URL fragment from GET request
+   my ($f) = "";        # file pathname to return
+   my ($htbase) = "/usr/local/etc/httpd/docs/";
+   my ($htdefault) = "index.html";
+   chop $u;
+   if ($u eq "/") {
+       $f = $htbase . $htdefault;
+       return $f;
+   } else {
+       if ($u =~ m|^/.+|) {
+           $f = $htbase;  chop $f;
+           $f .= $u;
+       } elsif ($u =~ m|[^/]+|) {
+           $f = $htbase . $u;
+       }
+       if ($u =~ m|.+/$|) {
+           $f .= $htdefault;
+       }
+       if ($f =~ /\.\./) {
+           my (@path) = split("/", $f);
+           my ($buff, $acc) = "";
+           shift @path;
+           while ($buff = shift @path) {
+               my ($tmp) = shift @path;
+               if ($tmp ne '..') {
+                   unshift @path, $tmp;
+                   $acc .= "/$buff";
+               }
+           }
+           $f = $acc;
+       }
+   }
+   return $f;
+}
+
+my ($http) = sub {
+    while (defined ($tmp = <STDIN>)) {
+        chomp $tmp;
+        if ($tmp =~ /^GET\s+(.*)$/i) {
+	    my ($getfile) = url_to_file($1);
+            print STDERR "Sending $getfile\n";
+            my ($in) = new IO::File();
+            if ($in->open("<$getfile") ) {
+                $in->autoflush(1);
+                print STDOUT "Content-type: text/html\n\n";
+                while (defined ($line = <$in>)) {
+                    print STDOUT $line;
+                }
+            } else {
+                print STDOUT "404: File not found\n\n";
+            }
+        }
+        return 0;
+    }
+};                           
+
+my (%config) =  ("port" => 9000, 
+                 "callback" => $http, 
+                 "hostname" => "antipope.demon.co.uk" 
+                );
+my ($foo) = new NetServer::Generic(%config);
+
+my ($allowed) = ['.*antipope\.org', 
+                 '.*easynet\.co\.uk' ];
+
+my ($forbidden) = [ '194\.205\.10\.2'];
+
+$foo->allowed($allowed);
+$foo->forbidden($forbidden);
+print "Server started\n";
+$foo->run();
+
+__END__
+
+=pod
+
+=head1 shttpd -- a trivial HTTP server
+
+This is not a real web server, although it might turn into one
+eventually!
+
+You will need to modify %config (specifically the hostname) before
+it will do anything useful. You may also need to modify the
+B<allowed> and B<forbidden> anonymous arrays; these are given to
+provide an example of simple access control to a server.
+
+B<shttpd> understands a single HTTP command:
+
+  GET I<filename>
+
+It looks for files in B<$htbase> (defined in B<url_to_file()>, the 
+subroutine that maps HTTP requests to absolute pathnames). If a
+trailing slash is encountered, it appends B<$htdefault> (currently
+set to I<index.html>).
+
+If the file is not found, it returns a 404: File not found response --
+otherwise it assumes the file is HTML and sends it(!). This may not
+be what you want to do if the file is I<not> HTML, so take care.
+
+B<shttpd> doesn't understand CGI scripts, relative URLs, or just about
+anything. However, it serves as a skeleton which can easily be
+extended to add these features.
+
+
+

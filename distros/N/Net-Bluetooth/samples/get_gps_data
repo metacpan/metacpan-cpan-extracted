@@ -1,0 +1,60 @@
+use Net::Bluetooth;
+$| = 1;
+
+#### This program connects to a specific GPS device
+#### and continuously prints out data received.
+
+#### List all remote devices in the area.
+my $device_ref = get_remote_devices();
+die "No devices found!\n" unless(defined($device_ref));
+
+my $g_addr = undef;
+#### Search for my GPS device and set the address.
+#### My GPS device is named "BT GPS" so I just match
+#### against that. You could match against your devices 
+#### name just hardcode the address.
+foreach $addr (keys %$device_ref) {
+	$g_addr = $addr if($device_ref->{$addr} =~ /BT GPS/i);
+	#### Print out all the devices for fun
+        print "Address: $addr Name: $device_ref->{$addr}\n";
+}
+die "GPS not found\n" unless(defined($g_addr));
+
+my $port = 0;
+#### Search for the serial port service.
+#### This is what my GPS device uses to transfer data.
+#### The serial port UUID is 0x1101.
+my @sdp_array = sdp_search($g_addr, "1101", "");
+foreach $rec_ref (@sdp_array) {
+        foreach $key (keys %$rec_ref) {
+		#### Set the RFCOMM port
+		$port = $rec_ref->{$key} if($key =~ /RFCOMM/);
+		#### Print out all attributes for fun
+                print "Key: $key Value: $rec_ref->{$key}\n";
+        }
+}
+
+die "Service not found!\n" if($port == 0);
+
+#### Create a socket and connect to the device.
+my $obj = Net::Bluetooth->newsocket("RFCOMM");
+die "socket error: $!\n" unless(defined($obj));
+die "connect error: $!\n" if($obj->connect($g_addr, $port) != 0);
+
+#### Create a Perl filehandle for reading and writing.
+*SERVER = $obj->perlfh();
+my $amount = 1;
+#### Loop until user exits program. 
+while($amount > 0) {
+	$amount = read(SERVER, $buf, 512);
+	#### Parse the GPGGA string and print values we want.
+	if($buf =~ /\$GPGGA,(.+?)\n/) {
+		my $gps_string = $1;
+		my ($lat, $lng, $alt) = (split(/\,/, $gps_string))[1, 3, 8];
+		print "Latitude:   $lat\n";
+		print "Longitude:  $lng\n";
+		print "Altitude:   $alt\n";
+		print "\n\n";
+	}
+}
+close(SERVER);

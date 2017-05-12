@@ -1,0 +1,21 @@
+Net::Discident 1.0.1
+====================
+Net::Discident is a simple interface to the discident.com DVD identification
+service.
+
+
+Dependencies
+------------
+- Perl v5.10 or better
+- Modern::Perl
+- HTTP::Lite
+- JSON
+
+
+Copyright and license
+---------------------
+Copyright (c) 2011 Mark Norman Francis <norm@cackhanded.net> 
+and Steve Marshall <steve@nascentguruism.com>.
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

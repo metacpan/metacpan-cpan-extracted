@@ -1,0 +1,25 @@
+
+;
+; $Id: test.db.brokenbrackets 454 2005-07-06 13:38:31Z olaf $ 
+; Test.db to test parser functionality.
+
+
+
+$TTL 1500
+
+foo.test.		3600	IN	SOA	ns1.foo.test. root.localhost. 2002021201 450 600 345600 300
+
+
+
+		3600	IN	NS	ns1.foo.test.
+		3600	IN	NS	ns2.foo.test.
+				NS      belowdelegation.Something.VEry.Cased  
+
+		3600	IN	MX	100 bert.test.
+foo.test.		3600	IN	TXT	"Test domain"
+a.b.c.d			TXT  "Full MATCH"
+z.x.c.d			TXT  (( "Multiple line f.nny"
+	                        "<xml> typed </xml"
+				"text resource record"
+				)
+

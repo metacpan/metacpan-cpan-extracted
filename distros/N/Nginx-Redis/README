@@ -1,0 +1,62 @@
+NAME
+    Nginx::Redis - asynchronous redis client for nginx-perl
+
+SYNOPSIS
+        use Nginx::Redis;
+    
+        ngx_redis '127.0.0.1:6379', ['GET', 'mykey'], sub {
+            my ($reply) = @_;
+        
+            unless ($reply) {
+                warn "error: no reply from redis\n";
+                return;
+            }
+        
+            # $reply = ['$', 'myvalue']
+        };
+
+DESCRIPTION
+    Fast asynchronous redis client for nginx-perl that supports pipelining
+    and doesn't provide any command-bound interface. You can use it for
+    almost any feature of redis. Currently it doesn't support pub/sub-like
+    flow though.
+
+    Nginx::Redis relies on Redis::Parser::XS to parse reply messages. So you
+    have to install it as well.
+
+EXPORT
+        ngx_redis
+        ngx_redis_client
+        ngx_redis_request
+
+FUNCTIONS
+    ngx_redis "$ip:$port:$auth:$timeout", ['GET', 'mykey'], sub { };
+        Encodes and sends request to the redis server specified by
+        "$ip:$port". If password is specified in $auth then AUTH command
+        will precede.
+
+        Calls back with reply in $_[0]. Format of the reply described in
+        Redis::Parser::XS.
+
+        On error calls back without any arguments. Tries to reconnect on the
+        next request.
+
+        Every connection is cached forever.
+
+        Example:
+
+            ngx_redis '127.0.0.1', ['PING'], sub {
+                my ($reply) = @_;
+                
+                # $reply = ['+', 'PONG']
+            };
+
+AUTHOR
+    Alexandr Gomoliako <zzz@zzz.org.ua>
+
+LICENSE
+    Copyright 2011 Alexandr Gomoliako. All rights reserved.
+
+    This module is free software. It may be used, redistributed and/or
+    modified under the same terms as nginx itself.
+

@@ -1,0 +1,39 @@
+Revision history for Net-Async-UWSGI
+
+0.006     2015-03-22 15:25:14+00:00 Europe/London
+	No new features.
+
+	Test fixes:
+	* Disable on Win32 again
+
+0.005     2015-02-03 19:46:35+00:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Added some more default messages for IANA-assigned HTTP status codes,
+	http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
+
+0.004     2014-12-30 12:15:18+00:00 Europe/London
+	No new features.
+
+	Test fixes:
+	* Win32 fails due to missing functions in the Socket API, so attempt
+	to prevent installation there via Dist::Zilla::Plugin::AssertOS.
+	Haven't tested this on a windows system, just looking for a minimal-effort
+	way to avoid spurious test failures here.
+
+0.003     2014-12-28 19:04:10+00:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* Write failure would warn(), replaced with debug_printf since this is
+	common when clients disconnect partway through writing the response
+	* Invalid JSON would throw an exception, this is now caught and reported
+	via ->debug_printf only.
+
+0.002     2014-08-25 13:55:12+01:00 Europe/London
+	New features:
+	* Accessor for request body
+
+0.001     2014-08-23 16:19:56+01:00 Europe/London
+	Initial CPAN release

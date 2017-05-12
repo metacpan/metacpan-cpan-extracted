@@ -1,0 +1,628 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>No Title</title>
+<link rev="made" href="mailto:root@sundial.(none)" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#setting_options">Setting Options</a></li>
+	<ul>
+
+		<li><a href="#types_of_options">Types of Options</a></li>
+		<li><a href="#net__z3950__asyncz__new">Net::Z3950::AsyncZ::new</a></li>
+		<li><a href="#net__z3950__asyncz__options___params">Net::Z3950::AsyncZ::Options::_params</a></li>
+		<li><a href="#row_formatting_priorities">Row Formatting Priorities</a></li>
+		<li><a href="#methods_for_setting__params_options">Methods for Setting _params Options</a></li>
+		<ul>
+
+			<li><a href="#get_set_methods">get/set methods</a></li>
+			<li><a href="#net__z3950__asyncz__option___params__option">Net::Z3950::AsyncZ::Option::_params::option</a></li>
+			<li><a href="#net__z3950__asyncz__option___params__validoption">Net::Z3950::AsyncZ::Option::_params::validOption</a></li>
+			<li><a href="#net__z3950__asyncz__option___params__invalidoption">Net::Z3950::AsyncZ::Option::_params::invalidOption</a></li>
+			<li><a href="#net__z3950__asyncz__option___params__test">Net::Z3950::AsyncZ::Option::_params::test</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<style = "text/css">
+code { font-family: sans-serif; font-weight:bold; }
+</style><p>
+</p>
+<hr />
+<h1><a name="setting_options">Setting Options</a></h1>
+<p><code>Net::AsycnZ</code> sets options by means of named parameters for both the parent process
+and each of its child processes.  Options for the parent are set in <code>Net::AsycnZ-&gt;new</code>.
+Options for the child processes are set via the <a href="#item_options"><code>options</code></a> parameter of <code>Net::AsycnZ-&gt;new</code>;
+the value of this parameter must be an array of <code>Net::Z3950::AsyncZ::Options::_params</code>
+objects.</p>
+<p>If a <code>_params</code> object doesn't exist for a child process, <code>Net::AsycnZ-&gt;new</code>
+will create it with a set of default options.  There will always be a <code>_params</code>
+object for every server in the <a href="#item_servers"><code>servers</code></a> array, and they are cross-indexed, that is
+<code>$_params_object[0]</code> is used for <code>$server[0]</code>, etc.  So, if you are creating your
+own array of <code>_params</code> objects, you must keep this parallelism in mind.</p>
+<p>
+</p>
+<h2><a name="types_of_options">Types of Options</a></h2>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1]
+Options set in <code>Net::Z3950::AsyncZ::new</code> which control the parent process
+and selected features of the child processes for which no alternatives
+are present: the alternatives are set as indicated in [2] and [3].</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[2]
+Options set in a <code>Net::Z3950::AsyncZ:Options::_params</code> object: this is returned
+by <code>Net::Z3950::AsyncZ::asyncZOptions()</code>.  There is one <code>_params</code> object
+for each server:  if you  don't create one, it is created for you with
+the default values. If you don't create a <code>_params</code> object for
+a server, then <a href="#item_log"><code>log</code></a> and <a href="#item_query"><code>query</code></a> options set in the <code>AsyncZ</code>
+constructor will be used. The rationale behind this is that you usually will
+be asking one question across all servers and will usually be using only
+one log file for debugging.</p>
+<p>But in all other cases where it is possible
+to set an option for the child in both the <code>AsyncZ</code> constructor or
+<code>_params</code>, the <code>_params</code> setting will be used.  At the moment this affects
+the <a href="#item_format"><code>format</code></a> and <a href="#item_num_to_fetch"><code>num_to_fetch</code></a> options.</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[3]
+Options set in the <code>Net::Z3950::Manager</code> by using the <a href="#item_z3950_options"><code>Z3950_options</code></a>
+option of the <code>_params</code> object.  These take precedence over any others
+and must be passed in with the first <code>_params</code> object, that is, <code>$_params_object[0]</code>,
+because AsyncZ uses only one <code>Net::Z3950::Manager</code>. The Manager
+is created when setting up the first server passed into the constructor.</p>
+<dl>
+<dt><strong><a name="item_note_3a">Note:</a></strong><br />
+</dt>
+<dd>
+Default values for options are shown to the right of the <code>=&gt;</code>operator:
+</dd>
+<dd>
+<pre>
+        HTML=&gt;0</pre>
+</dd>
+<dd>
+<p>In some instances, the <em>type</em> of variable is shown and defaults detailed in commentary:</p>
+</dd>
+<dd>
+<pre>
+        format=&gt;\&amp;format</pre>
+</dd>
+<dd>
+<p></p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="net__z3950__asyncz__new">Net::Z3950::AsyncZ::new</a></h2>
+<dl>
+<dt><strong><a name="item_cb">cb</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>cb=&gt;\&amp;cb</code>
+&nbsp;&nbsp;&nbsp;callback function to which records will be sent as available.
+See <a href="#output_callback__required_">Output Callback</a>.
+</dd>
+<p></p>
+<dt><strong><a name="item_format">format</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>format=&gt;\&amp;format</code>
+&nbsp;&nbsp;&nbsp;callback function to format individual lines of records.
+See <a href="#format_callback__not_required_">Format Callback</a>.
+If you create a <code>_params</code>
+object for a server and do not set its <a href="#item_format"><code>format</code></a> option, then the default
+<a href="#item_format"><code>format</code></a> will be used, even if you set the <a href="#item_format"><code>format</code></a> option of the 
+<code>AsyncZ</code> constructor to another value.
+</dd>
+<p></p>
+<dt><strong><a name="item_interval">interval</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>interval=&gt;1</code>
+&nbsp;&nbsp;&nbsp;Event loop timer interval in seconds:  This controls how frequently AsyncZ checks to
+see if servers have responded and if the <a href="#item_timeout"><code>timeout</code></a> period is up.
+</dd>
+<p></p>
+<dt><strong><a name="item_log">log</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>log=&gt;undef</code>
+&nbsp;&nbsp;&nbsp;controls how extended error messages are handled.  There are two sets of
+error messages--those handled through Net::Z3950::AsyncZ::ErrMsg and which are
+meant for the user and those meant for debugging. The latter are generated by both
+AsyncZ and the Perl library and can accumlulate at a rapid clip. AsyncZ writes 
+its debugging messages to STDOUT, while those coming from library
+routines almost always go to STDERR.  There are 3 options for <a href="#item_log"><code>log</code></a>.
+</dd>
+<dd>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1] <code>undef</code>, the default, in which case  all debugging messages
+go to the terminal, and those written to STDOUT will end up in a browser if you are
+on the web.</p>
+</dd>
+<dd>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[2]<code>log=&gt;Net::Z3950::AsyncZ::Errors::suppressErrors()</code> (or <code>log=&gt;suppressErrors()</code>
+if you import the function)--in which case these messages will be suppressed</p>
+</dd>
+<dd>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[3]<code>log=&gt;$filespec</code>,
+in which case all of these messages will go to the file specified
+in <code>$filespec</code></p>
+</dd>
+<dd>
+<p>The <code>Net::Z3950::AsyncZ::Options::_param</code> object also has a <a href="#item_log"><code>log</code></a> option--which means that you can
+specify a log file for each child process--ie. for each server queried--
+while keeping a separate one for the parent.  Or you can set up a system where parent
+and child_1 write to log.1, while child_2 and child_3 write to log.2, etc.</p>
+</dd>
+<dd>
+<p><em>Note</em>:  All error logs are automatically opened and closed. 
+<em>Do <strong>NOT</strong> open or close them yourself!</em></p>
+</dd>
+<dd>
+<p>Do <strong>NOT</strong> open or close log files yourself!</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_maxpipes">maxpipes</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>maxpipes=&gt;4</code>
+&nbsp;&nbsp;&nbsp;maximum number of forks to be executed at one time--the greater
+the number the more resources are used--both of memory and cpu.
+</dd>
+<p></p>
+<dt><strong><a name="item_monitor">monitor</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>monitor=&gt;0</code>
+&nbsp;&nbsp;&nbsp;timeout in seconds for a monitoring child process, or 0,
+in which case a monitor is not set.
+</dd>
+<dd>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The monitor is a child process which
+runs a timer and kills the parent process, if it exceeds the timeout period.
+You run the monitor only if your software hangs.
+An orderly shutdown of all runnning processes is put into effect,
+the purpose of which is to prevent the development of zombie processes and to
+release all shared memory.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_num_to_fetch">num_to_fetch</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>num_to_fetch-&gt;5</code>
+&nbsp;&nbsp;&nbsp;number of records to fetch; this setting will be used
+only if you have not created a <code>_params</code> object. This means that if you
+create <code>_params</code> object for the server and do not set its <a href="#item_num_to_fetch"><code>num_to_fetch</code></a>
+option, then <a href="#item_num_to_fetch"><code>num_to_fetch</code></a> will default to 5 even if you have set another value
+for <a href="#item_num_to_fetch"><code>num_to_fetch</code></a> in the <code>AsyncZ</code> constructor.
+</dd>
+<p></p>
+<dt><strong><a name="item_options">options</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>options=&gt;\@options</code>
+&nbsp;&nbsp;&nbsp;reference to an array of references to <a href="#net__z3950__asyncz__options___params">Net::Z3950::AsyncZ::Options::_params</a> objects.
+Each reference is obtained from a call to <a href="#net__z3950__asyncz__asynczoptions">Net::Z3950::AsyncZ::asyncZOptions</a>.  For instance:
+</dd>
+<dd>
+<pre>
+        @options = (
+                asyncZOptions(option_1=&gt;opt_1,option_2=&gt;opt_2, . . .),
+                undef,
+                asyncZOptions(option_1=&gt;opt_1,option_2=&gt;opt_2, . . .)
+                );</pre>
+</dd>
+<dd>
+<p>This array parallels the <a href="#item_servers"><code>servers</code></a> array:</p>
+</dd>
+<dd>
+<pre>
+        @servers = (
+                [$host_1, $port_1, $database_1],
+                [$host_2, $port_2, $database_2],
+                [$host_3, $port_3, $database_3]
+                );</pre>
+</dd>
+<dd>
+<p><code>$options[0]</code> is used for <code>$server[0]</code> and <code>$options[2]</code> for <code>$server[2]</code>.  If a
+<code>_params</code> object is not found or if it is not defined, as for $server[1],
+then a default <code>_params</code> object is created for the server.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_query">query</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>query=&gt; undef</code>
+&nbsp;&nbsp;&nbsp;the query string:  its format depends on Z3950 querytype
+and defaults to 'prefix' (as in <code>Net::Z3950</code>).  You can set
+a separate Z3950 querytype for each query, or you can change the querytype
+for all servers by using <a href="#item_z3950_options"><code>Z3950_options</code></a>.
+</dd>
+<dd>
+<p>If you create a <code>_params</code> for a server but do not set the <a href="#item_query"><code>query</code></a> option
+in <code>_params</code>, then this <a href="#item_query"><code>query</code></a> will be used.  This means that you can
+set one <a href="#item_query"><code>query</code></a> for all of your servers without having to re-set it for
+each of the <code>_params</code> objects you create.  But if you create
+a <code>_params</code> with a different <a href="#item_query"><code>query</code></a>, then the query set in <code>_params</code>
+will be used.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_servers">servers</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>servers=&gt;\@servers</code>
+&nbsp;&nbsp;&nbsp;array of references to servers in form: [ $host, $port, $database]
+</dd>
+<dd>
+<p>&nbsp;&nbsp;&nbsp;See <a href="#item_options"><code>options</code></a> above and <code>AsyncZ.pod: &quot;The Basic Script&quot;</code>.</p>
+</dd>
+See also <a href="AsyncZ.html#the_basic_script">basic.pl</a><p></p>
+<dt><strong><a name="item_swap_attempts">swap_attempts</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>swap_attempts=&gt;5</code>
+&nbsp;&nbsp;&nbsp;the number of times that a swap check will be done before exiting;
+see <a href="#item_swap_check"><code>swap_check</code></a> for details.
+</dd>
+<p></p>
+<dt><strong><a name="item_swap_check">swap_check</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>swap_check=&gt;0</code>
+&nbsp;&nbsp;&nbsp;the number of seconds between checks for swapping activity--
+used when querying a great number of servers and requesting large amounts of data. It
+instructs AsyncZ to sleep for <a href="#item_swap_check"><code>swap_check</code></a> number of seconds before processing any
+further connections.  If you are attempting to process too much data for the size of your RAM,
+the system will have to swap out of memory into the swap space on your disk; too much swapping causes 
+loss of data and disk ``thrashing''--i.e. repeated disk access--and will overburden the system.
+When <a href="#item_swap_check"><code>swap_check</code></a> is set, AsyncZ will check for signs of swap activity; if it finds swap
+activity it will go to sleep for the number of seconds set in <a href="#item_swap_check"><code>swap_check</code></a> and then re-check
+for <a href="#item_swap_attempts"><code>swap_attempts</code></a> number of times.  If the swap activity continues beyond this number
+of checks, AsyncZ dies.  For large throughput, you will probably want to set the monitor,
+and to set it for a long period of time, for instance, 3000 seconds.  This means that
+you can set <a href="#item_swap_check"><code>swap_check</code></a> to a period of 10,20, 30 seconds.  The values you set on these
+variables will depend on your own system memory resources and the amount of data you 
+are processing.  
+<em>Note:</em>  This has been tested only on Linux but should also work
+on Unix, at least on Solaris.
+</dd>
+<p></p>
+<dt><strong><a name="item_timeout">timeout</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>timeout=&gt;25</code>
+&nbsp;&nbsp;&nbsp;total timeout in seconds for all processes to complete their work.
+</dd>
+<p></p>
+<dt><strong><a name="item_timeout_min">timeout_min</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>timeout_min=&gt;5</code>
+&nbsp;&nbsp;&nbsp;minumum timeout in secs to exit Event loop if all processes are finished;
+a security blanket to make sure all processes get a chance to report their
+results to the parent process before exiting the loop.
+</dd>
+<p></p></dl>
+<dl>
+<dt></dt>
+<dd>
+&nbsp;&nbsp;&nbsp;
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="net__z3950__asyncz__options___params">Net::Z3950::AsyncZ::Options::_params</a></h2>
+<p>Where a <code>_param</code> option duplicates an <code>AsyncZ::new</code> option, consult the 
+<code>AsyncZ::new</code> description for more details.</p>
+<dl>
+<dt><strong><a name="item_html">HTML</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>HTML=&gt;0</code>
+&nbsp;&nbsp;&nbsp;if true use default HTML formatting for records, if false format as plain text;
+see <a href="#row_formatting_priorities">Row Formatting Priorities</a>.
+</dd>
+<p></p>
+<dt><strong><a name="item_z3950_options">Z3950_options</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>Z3950_options=&gt;undef</code>
+&nbsp;&nbsp;&nbsp;reference to hash of additional Z3950 options.
+</dd>
+<dd>
+<p>These options are passed to the Z3950 Manager and
+take precedence over <code>_param</code> options and options set in 
+<code>Net::Z3950::AsyncZ-&gt;new</code>.&nbsp;&nbsp;
+<a href="#item_z3950_options"><code>Z3950_options</code></a> makes it possible to implement Z3950 options which may not be specifically
+accounted for in any of the options to the AsyncZ module.  For instance, to ask for
+``full'' as opposed to ``brief'' records (which is the Z3950 default):</p>
+</dd>
+<dd>
+<pre>
+        @options = (asyncZOptions(Z3950_options=&gt;{elementSetName =&gt;'f'}) &lt;, (asyncZOptions(. . .), . . &gt;);</pre>
+</dd>
+<dd>
+<p><em>Note:</em> To use this option, it must appear in the first <code>_params</code> object of the <code>_params</code> array,
+<code>$options[0]</code>, as in the above example.  It is ignored in any subsequent uses.  This
+means that you cannot set these options on a per-server basis;  they apply
+across to board to all the servers you are querying. In the above exmaple, for instance, 
+you could not ask for brief records from some servers and full from others.</p>
+</dd>
+<dd>
+<p>See <a href="#types_of_options">Types of Options</a></p>
+</dd>
+<p></p>
+<dt><strong>cb</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>cb=&gt;\&amp;cb</code>
+&nbsp;&nbsp;&nbsp;reference to callback function to which records will be sent as available
+</dd>
+<p></p>
+<dt><strong>format</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>format=&gt;\&amp;format</code>
+&nbsp;&nbsp;&nbsp;reference to a callback function that formats each row of a record
+</dd>
+<p></p>
+<dt><strong>interval</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>interval=&gt;5</code>      
+&nbsp;&nbsp;&nbsp;timer interval for this forked process.  See <a href="#item_interval"><code>interval</code></a>
+above under <code>Net::Z3950::AsyncZ::new</code>.
+</dd>
+<p></p>
+<dt><strong>log</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>log=&gt;undef</code>   	       
+&nbsp;&nbsp;&nbsp;controls how extended error messages are handled for this
+child process. A separate log file can be opened for each process.
+</dd>
+<dd>
+<p><em>Note</em>:  All error logs are automatically opened and closed.</p>
+</dd>
+<dd>
+<p>See <a href="#item_log"><code>log</code></a> above under <code>Net::Z3950::AsyncZ::new</code>.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_marc_fields">marc_fields</a></strong><br />
+</dt>
+<dt><strong><a name="item_marc_subst">marc_subst</a></strong><br />
+</dt>
+<dt><strong><a name="item_marc_userdef">marc_userdef</a></strong><br />
+</dt>
+<dt><strong><a name="item_marc_xcl">marc_xcl</a></strong><br />
+</dt>
+<dd>
+These options are fully described and illustrated in Report.pod
+under the heading ``MARC Bibliographic Format''.
+</dd>
+<br>
+For the HTML version goto <A href="Report.html#marc_bibliographic_format">MARC Bibliographic Format</a>
+in Report.html.<p></p>
+<dt><strong>num_to_fetch</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>num_to_fetch=&gt;5</code>      
+&nbsp;&nbsp;&nbsp;number of records to fetch from this server.
+</dd>
+<p></p>
+<dt><strong><a name="item_pipetimeout">pipetimeout</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>pipetimeout=&gt;20</code>    
+&nbsp;&nbsp;&nbsp;timeout in seconds for this child process
+</dd>
+<p></p>
+<dt><strong><a name="item_preferredrecordsyntax">preferredRecordSyntax</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>preferredRecordSyntax=&gt;Net::Z3950::RecordSyntax::USMARC</code>
+&nbsp;&nbsp;&nbsp;the Z3950 preferredRecordSyntax for this child process
+</dd>
+<p></p>
+<dt><strong>query</strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>query=&gt;undef</code>
+&nbsp;&nbsp;&nbsp;the query for this process
+</dd>
+<p></p>
+<dt><strong><a name="item_querytype">querytype</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>querytype=&gt;'prefix'</code>      
+&nbsp;&nbsp;&nbsp;Z3950 querytype for this child process; it can be set to'ccl', or 'ccl2rpn'.
+</dd>
+<p></p>
+<dt><strong><a name="item_raw">raw</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>raw=&gt;0</code>
+&nbsp;&nbsp;&nbsp;(boolean) if true the raw record data for this process is returned; its format
+is dependent on the <a href="#item_render"><code>render</code></a> option.
+</dd>
+<p></p>
+<dt><strong><a name="item_render">render</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>render=&gt;1</code>
+&nbsp;&nbsp;&nbsp;(boolean) if <code>true</code> the raw record data for this process is returned filtered
+through the Z3950 <code>Record::render</code> function; this is the default.  If <code>false</code> the
+raw data is returned unfiltered in its original state.  The unfiltered raw data can
+be read using <code>Net::Z3950::AsyncZ::prep_Raw</code> and <code>Net::AsyncZ::get_ZRawRec</code>.
+</dd>
+<p></p>
+<dt><strong><a name="item_startrec">startrec</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>startrec=&gt;1</code>      
+&nbsp;&nbsp;&nbsp;number of the record with which to start result from Record Set.
+</dd>
+<p></p>
+<dt><strong><a name="item_utf8">utf8</a></strong><br />
+</dt>
+<dd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>utf8=&gt;0</code>      
+&nbsp;&nbsp;&nbsp;when set to <code>true</code> conversions will be made to <code>utf8/unicode</code>
+characters from the character codes used in MARC records to represent non-latin1
+and accented latin1 chatacters.  When ouputting <a href="#item_utf8"><code>utf8</code></a>, you must call <code>binmode</code>
+on the ouput stream, for example:
+
+</dd>
+<dd>
+<pre>
+
+        binmode(STDOUT, &quot;:utf8&quot;);</pre>
+</dd>
+<dd>
+<p>When outputting to a browser, you should also notify the browser:</p>
+</dd>
+<dd>
+<pre>
+        print &quot;Content-type: text/html;charset=utf-8'\n\n&quot;;             
+        print '&lt;head&gt;&lt;META http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot;&gt;&lt;/head&gt;&lt;body&gt;';</pre>
+</dd>
+<dd>
+<p>See the sample script: <code>MARC_HTML.pl</code>.</p>
+</dd>
+<dd>
+<p><em>Note:</em>  To use <a href="#item_utf8"><code>utf8</code></a> you must have the <code>MARC::Charset</code> module installed.  Otherwise,
+the <a href="#item_utf8"><code>utf8</code></a> option will be ignored.</p>
+</dd>
+<p></p></dl>
+<dl>
+<dt></dt>
+<dd>
+&nbsp;
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="row_formatting_priorities">Row Formatting Priorities</a></h2>
+<p>If more than one option is set that affects the formatting of a record's rows, the following
+priority squence is in effect:</p>
+<pre>
+                raw, format, HTML, plaintext (default)</pre>
+<dl>
+<dt></dt>
+<dd>
+&nbsp;
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="methods_for_setting__params_options">Methods for Setting _params Options</a></h2>
+<p>
+</p>
+<h3><a name="get_set_methods">get/set methods</a></h3>
+<p><code>Net::Z3950::AsyncZ::Options::_params</code> provides a full range of <code>get_option</code> / <code>set_option</code> methods,
+enabling the dynamic setting of option values.</p>
+<pre>
+        $_params_object-&gt;set_HTML(0);
+        $num_to_fetch = $_params_object-&gt;get_num_to_fetch();</pre>
+<p>In addition there are functions for setting options with fixed values:</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Function
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Equivalent
+</p>
+<pre>
+
+      set_marc_xtra()           set_marc_fields($Net::Z3950::AsyncZ::Report::xtra)    
+      set_marc_all()            set_marc_fields($Net::Z3950::AsyncZ::Report::all)
+      set_marc_std()            set_marc_fields($Net::Z3950::AsyncZ::Report::std)
+      set_raw_on()              set_raw(1)
+      set_raw_off()             set_raw(0)
+      set_plaintext()           set_HTML(0)
+      set_HTML()                set_HTML(1)
+      set_prefix()              set_querytype('prefix')
+      set_ccl=&gt;()               set_querytype('ccl')
+      set_GRS1()                set_preferredRecordSyntax(Net::Z3950::RecordSyntax::GRS1)
+      set_USMARC()              set_preferredRecordSyntax(Net::Z3950::RecordSyntax::USMARC)</pre>
+<p>The get/set methods guarantee that you have in fact set or queried the option you are interested in
+and, in the case of the fixed value options, that you have set it to the value required.  You don't
+have to be concerned that a meaningless hash key will spring into existence through misspelling:</p>
+<pre>
+        $_params_object = asyncZoptions(leg=&gt;Error.LOG, num_to_fish=&gt;3);</pre>
+<p>In the case of the some of the fixed value methods, one advantage is the obvious simplicity of calling <code>set_GRS1()</code> instead of
+<code>set_preferredRecordSyntax(Net::Z3950::RecordSyntax::USMARC)</code>.</p>
+<p>
+</p>
+<h3><a name="net__z3950__asyncz__option___params__option">Net::Z3950::AsyncZ::Option::_params::option</a></h3>
+<p>This method works to both get and set values.</p>
+<pre>
+          $value = $_params_obj-&gt;option('option');
+          $old_options_ref = $_params_obj-&gt;option(option=&gt;value,option=&gt;value,option=&gt;value. . . );</pre>
+<p><strong>params</strong></p>
+<pre>
+        in get mode:    'option' to be queried
+        in set mode:     list of option=&gt;value pairs to be set (or %hash)</pre>
+<p><strong>returns</strong>
+</p>
+<pre>
+
+        in get mode:    $value of option being queried
+        in set mode:    $old_options_ref -- reference to a hash of  option=&gt;value pairs
+                                            which have been replaced by list or %hash</pre>
+<p>
+</p>
+<h3><a name="net__z3950__asyncz__option___params__validoption">Net::Z3950::AsyncZ::Option::_params::validOption</a></h3>
+<pre>
+        $bool = $_params_obj-&gt;validOption('option');</pre>
+<p>
+</p>
+<h3><a name="net__z3950__asyncz__option___params__invalidoption">Net::Z3950::AsyncZ::Option::_params::invalidOption</a></h3>
+<pre>
+        $bool = $_params_obj-&gt;invalidOption('option');</pre>
+<p>Both of the above methods will enable you to determine whether an option you choose to
+set is a valid option.  Useful when using <code>Net::Z3950::AsyncZ::Option::_params::option</code>.</p>
+<pre>
+        $option = 'num_to_fetch';
+        $_params_obj-&gt;validOption($option) ? $_params_obj-&gt;option($option=&gt;3) :
+                                 die &quot;invalid option: $option&quot;;</pre>
+<p>
+</p>
+<h3><a name="net__z3950__asyncz__option___params__test">Net::Z3950::AsyncZ::Option::_params::test</a></h3>
+<pre>
+        $_params_obj-&gt;test();</pre>
+<p>Calling this function will print a listing of <em>defined</em> options and values for 
+<code>$_params_obj</code>.</p>
+<dl>
+<dt></dt>
+<dd>
+&nbsp;
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Myron Turner
+&lt;<a href="mailto:turnermm@shaw.ca">turnermm@shaw.ca</a>&gt;
+or &lt;<a href="mailto:mturner@ms.umanitoba.ca">mturner@ms.umanitoba.ca</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright 2003 by Myron Turner</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
+<br><br><br>
+</body>
+
+</html>

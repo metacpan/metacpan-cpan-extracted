@@ -1,0 +1,271 @@
+=head1 NAME
+
+Net::DAV::LockManager - Provides support for WebDAV locking
+
+
+=head1 VERSION
+
+This document describes Net::DAV::LockManager version 1.305.
+
+
+=head1 SYNOPSIS
+
+    use Net::DAV::LockManager;
+
+    my $mgr = Net::DAV::LockManager->new();
+    if ( my $lock = $mgr->lock({ 'path' => '/foo/bar', 'owner' => 'fred' }) ) {
+        # Fred has access.
+        # Fred changes file.
+        $mgr->unlock({
+            'path' => '/foo/bar', 'owner' => 'fred', 'token' => $lock->{'token'}
+        });
+    }
+
+=head1 DESCRIPTION
+
+The C<Net::DAV::LockManager> class provides the ability to handle resource locking
+in the style needed by WebDAV. It does not perform OS-level locking, but only
+locking in the mind of the LockManager.
+
+The current implementation only supports exlusive locking. However, it does
+support indirect locks and expiration of locks. It also maintains the lock
+tokens and manages ownership independent of OS-level ownership.
+
+=head1 INTERFACE 
+
+=head2 new()
+
+Create a new C<Net::DAV::LockManager> object to manage locking.
+
+=head2 can_modify( $hashref )
+
+Return true if the path supplied in the hash ref can be modified by the user
+specified in the hash ref. The hash ref supplies the following named parameters.
+
+=over 4
+
+=item path
+
+Required parameter specifying the path as a string.
+
+=item owner
+
+Required parameter specifying the user that wishes to modify the resource.
+
+=item token
+
+Optional parameter specifying the token returned when the resource (or an
+ancestor) was locked. This parameter may be either a single token as a string
+or an array reference containing token strings.
+
+=back
+
+=head2 lock( $hash_ref )
+
+Lock the path supplied in the hash ref based on the parameters in the hash
+ref.
+
+=over 4
+
+=item path
+
+Required parameter specifying the path as a string.
+
+=item owner
+
+Required parameter specifying the user that wishes to lock the resource.
+
+=item timeout
+
+Optional parameter specifying a number of seconds in the future to expire the
+lock. This is considered a request and the the actual timeout may be different.
+
+If not supplied, a default timeout of 15 minutes is used.
+
+=item depth
+
+Optional parameter specifying the depth the locking effect. As per the WebDAV
+specification RFC 4918, two values are accepted I<0> and I<infinity>. A value
+of I<0> applies only to the specified resource. The depth of I<infinity>
+applies to a collection and all of its descendants.
+
+The default value of this parameter is I<infinity>.
+
+=item scope
+
+Optional parameter specifying the scope of the lock. The WebDAV specification
+supports two values: I<exclusive> and I<shared>. The C<LockManager> only
+supports I<explusive> at this time.
+
+The default value is I<exclusive>.
+
+=item token
+
+Optional parameter specifying the token returned when an ancestor of the the
+specified resource was locked. This parameter may be either a single token as
+a string or an array reference containing token strings.
+
+=back
+
+Returns a C<Net::DAV::Lock> object describing the lock on success and C<undef>
+on failure.
+
+=head2 refresh_lock( $hash_ref )
+
+Updates the timeout value on the lock specified by the supplied hash ref. The
+hash ref contains the following named parameters.
+
+=over 4
+
+=item path
+
+Required parameter specifying the path as a string.
+
+=item owner
+
+Required parameter specifying the user that wishes to lock the resource. This
+name must match the owner of the lock.
+
+=item token
+
+Required parameter specifying the token returned when the resource (or an
+ancestor) was locked. This parameter may be either a single token as a string
+or an array reference containing token strings.
+
+=item timeout
+
+Optional parameter specifying a number of seconds in the future to expire the
+lock. This is considered a request and the the actual timeout may be different.
+
+If not supplied, a default timeout of 15 minutes is used.
+
+=back
+
+Returns a C<Net::DAV::Lock> object describing the lock on success and C<undef>
+on failure.
+
+=head2 unlock( $hash_ref )
+
+Unlock the resource specified by the hash ref. The hash ref specifies the 
+resource to unlock and the credentials needed to access it. The named
+parameters in the hash are
+
+=over 4
+
+=item path
+
+Required parameter specifying the path as a string.
+
+=item owner
+
+Required parameter specifying the user that wishes to lock the resource. This
+name must match the owner of the lock.
+
+=item token
+
+Required parameter specifying the token returned when the resource was locked.
+This parameter may be either a single token as a string or an array reference
+containing token strings.
+
+=back
+
+Returns true on success, false otherwise.
+
+=head2 find_lock( $hash_ref )
+
+Find the lock that pretects the resource listed in $hash_ref. Returns the
+C<Net::DAV::Lock> object representing the lock, or C<undef> if none is found.
+
+The hash reference contains the path to the resource that we want to check.
+
+=over 4
+
+=item path
+
+Required parameter specifying the path as a string.
+
+=back
+
+=head2 list_all_locks( $hash_ref )
+
+List all the locks that pretect the resource listed in $hash_ref. Returns an
+array of C<Net::DAV::Lock> objects representing the locks.
+
+The hash reference contains the path to the resource that we want to check.
+
+=over 4
+
+=item path
+
+Required parameter specifying the path as a string.
+
+=back
+
+=head1 DIAGNOSTICS
+
+Most of the methods perform parameter validation and C<die> on error. This is
+based on the idea that this is a mostly internal module that should be being
+called from non-user code. Therefore, it is the client code's responsibility
+to get the parameters right.
+
+=over 4
+
+=item C<< Parameter should be a hash reference. >>
+
+All methods of this class take a hash reference to support named and optional
+parameters.
+
+=item C<< Missing required '%s' parameter. >>
+
+The specified parameter was required but not supplied,
+
+=item C<< Not a clean path >>
+
+C<LockManager> only supports absolute paths that have no C<..> or C<.> segments
+and do not end in C</>.
+
+=item C<< Not a valid owner name. >>
+
+The specified user name does not look like a username.
+
+=item C<< '%s' is not a supported value for scope. >>
+
+At present, C<LockManager> only supports the I<exclusive> scope for locking.
+
+=item C<< '%s' is not a supported value for depth. >>
+
+According to RFC 4918, the only supported depth values are I<0> and I<infinity>.
+
+=item C<< '%s' is not a supported value for timeout. >>
+
+Only integer timeout values are supported.
+
+=back
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+ModName requires no configuration files or environment variables.
+
+=head1 DEPENDENCIES
+
+None.
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+=head1 AUTHOR
+
+G. Wade Johnson  C<< wade@cpanel.net >>
+Erin Schoenhals  C<< erin@cpanel.net >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2010, cPanel, Inc. All rights reserved.
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.

@@ -1,0 +1,52 @@
+Installing this distribution of the NBU modules themselves involves the
+usual incantations:
+	tar zxf NBU-???.tar.Z
+	cd NBU-???
+	perl Makefile.PL
+	make
+	make test
+where ??? is the distribution of which you are now the proud owner.
+
+In many environments the underlying NetBackup tools are executable by root
+only.  The NBU module checks to see if it has execute access to the binaries
+and, if not, prefixes every binary invocation with a call to sudo which it
+expects to find in /usr/local/bin/sudo.
+
+If you are unable to, or prefer not to, install the modules right away, you
+can test them by making sure the directory where the distribution was unpacked
+is included in your Perl path.  Assuming you unpacked in your home directory you
+could use this:
+	export PERLLIB=$HOME/NBU-???/lib:$HOME/NBU-???/blib/lib
+otherwise simply go for it:
+	make install
+
+Often times system administrators prefer to keep the locally added Perl modules
+away from the main distribution.  One way to affect this is to run the
+"perl Makefile.PL" with a few directory overrides.  For example:
+	perl Makefile.PL LIB=/usr/local/lib/perl5 \
+			INSTALLSCRIPT=/usr/local/bin \
+			INSTALLMAN1DIR=/usr/local/man/man1 \
+			INSTALLMAN3DIR=/usr/local/man/man3
+Then, to gain access to the utilities, make sure /usr/local/bin is in your
+PATH, /usr/local/lib/perl5 is in your PERLLIB path and /usr/local/man is in your MANPATH.
+
+Making local modifications in these modules is strongly discouraged, instead
+please consider making your contributions available to the author so they can
+be included in future releases.  If you want to create test distribution of
+your own however, you can simply alter the VERSION variable in Makefile.PL,
+re-create the Makefile itself and issues the command:
+	make dist
+
+As of $Date: 2007/09/24 17:15:17 $, NBU and/or its scripts and examples require the following
+additional modules from cpan:
+	Getopt::Std
+	IPC::Open2
+	Date::Parse
+	Time::Local
+	Curses
+	XML::XPath::XMLParser
+	XML::XPath
+
+To date the author has not first hand tested the installation in a Windows
+environment so if you find yourself stuck there, please contact him at:
+	pwinkeler@pbnj-solutions.com

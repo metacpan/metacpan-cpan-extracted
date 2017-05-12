@@ -1,0 +1,25 @@
+---
+name: Net-Random-QRBG
+version: 0.02
+author:
+  - 'Brent Garber <overlordq@gmail.com>'
+abstract: Gather random data from the QRBG Service
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: '>= 1.08'
+  Config: 0
+  IO::Socket::INET: '>= 1.31'
+  List::Util: '>= 1.21'
+  bytes: '>= 1.03'
+build_requires:
+  Test::More: 0
+provides:
+  Net::Random::QRBG:
+    file: lib/Net/Random/QRBG.pm
+    version: 0.02
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,8 @@
+[main]
+     server: talk.google.com
+       port: 5222
+ conference: conference.talk.google.com
+   username: user_here
+   password: password_here
+test_forum1: perl_njb1
+test_forum2: perl_njb2

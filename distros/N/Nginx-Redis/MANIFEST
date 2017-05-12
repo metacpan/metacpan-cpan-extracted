@@ -1,0 +1,14 @@
+Changes
+eg/redis.js
+eg/redis/conf/nginx-perl.conf
+eg/redis/lib/Redis.pm
+lib/Nginx/Redis.pm
+Makefile.PL
+MANIFEST			This list of files
+MYMETA.json
+MYMETA.yml
+README
+t/03-redis.t
+t/04-redis_transactions.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

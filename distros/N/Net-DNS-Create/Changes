@@ -1,0 +1,26 @@
+Net::DNS::Create (1.0.0)
+
+  * Add support for multiple As and RPs.
+  * Handle singular NS records like we claim to in the docs.
+  * Fix backslashes being lost in TXT records.
+
+ -- David Caldwell <david@porkrind.org>  Sun, 07 Dec 2014 12:56:48 -0800
+
+Net::DNS::Create (0.11.0)
+
+  * Route53, Bind: Quote weird characters properly in TXT records.
+
+ -- David Caldwell <david@porkrind.org>  Thu, 18 Sep 2014 13:20:58 -0700
+
+Net::DNS::Create (0.10.0)
+
+  * Route53: List the name servers that Amazon assigns when creating a zone.
+  * Route53: List the name servers when doing list_files().
+
+ -- David Caldwell <david@porkrind.org>  Thu, 03 Oct 2013 10:37:00 -0700
+
+Net::DNS::Create (0.9.0)
+
+  * Initial version on CPAN.
+
+ -- David Caldwell <david@porkrind.org>  Fri, 14 Jun 2013 21:58:34 -0700

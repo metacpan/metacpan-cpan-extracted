@@ -1,0 +1,4 @@
+name = "Net-APNS-Simple"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Net-IP-RangeCompare
+version:             4.025
+abstract:            Perl extension for IP Range Comparisons
+license:             ~
+author:              
+    - Michael Shipper
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Data::IPV4::Range::Parse:      0.05
+    Data::Range::Compare:          1.03
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

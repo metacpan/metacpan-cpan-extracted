@@ -1,0 +1,15 @@
+Revision history for Net-Domain-ES-ccTLD
+
+0.05
+		- added a number of tests
+		- moved the map table upon import
+
+0.04	stop using DATA
+
+0.03    removing whitespaces on names.
+
+0.02    chomp on while loop.
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

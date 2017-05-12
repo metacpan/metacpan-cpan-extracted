@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-GrowlClient.t
+lib/Net/GrowlClient.pm
+META.yml                                 Module meta-data (added by MakeMaker)

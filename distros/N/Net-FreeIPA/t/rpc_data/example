@@ -1,0 +1,23 @@
+$cmds{simple_version}{cmd}="env";
+$cmds{simple_version}{result}={api_version => "0.1.2"};
+
+$cmds{version_1}{cmd}="1 env";
+$cmds{version_1}{result}={api_version => "1.1.2"};
+
+$cmds{version_2}{cmd}="2 env";
+$cmds{version_2}{result}={api_version => "2.1.2"};
+
+$cmds{version_2_param}{cmd}="2 env api_version";
+$cmds{version_2_param}{result}={api_version => "2.1.3"};
+
+$cmds{version_3}{cmd}="3 env";
+$cmds{version_3}{result}={api_version => "3.1.2"};
+
+$cmds{version_3_paramreg}{cmd}="3 env api.*";
+$cmds{version_3_paramreg}{result}={api_version => "3.1.3"};
+
+$cmds{version_4}{cmd}="4 env";
+$cmds{version_4}{result}={api_version => "4.1.2"};
+
+$cmds{version_4_optreg}{cmd}="4 env version=.*";
+$cmds{version_4_optreg}{result}={api_version => "4.1.3"};

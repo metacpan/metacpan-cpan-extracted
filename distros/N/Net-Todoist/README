@@ -1,0 +1,190 @@
+NAME
+    Net::Todoist - interface to the API for Todoist (a to-do list service)
+
+VERSION
+    version 0.06
+
+SYNOPSIS
+        use Net::Todoist;
+    
+        my $nt = Net::Todoist->new( token => $token );
+    
+        # or use login to get the token
+        my $nt = Net::Todoist->new();
+        my $user = $nt->login($email, $pass) or die "login failed: " . $nt->errstr;
+        # or use register to set the token
+        my $nt = Net::Todoist->new();
+        my $user = $nt->register(
+            email => $email,
+            full_name => 'Fayland Lam',
+            password  => 'guessitplz',
+            timezone  => "GMT +8:00"
+        ) or die "Can't register: " . $nt->errstr;
+    
+        ## updateUser
+
+DESCRIPTION
+    This module provide an interface to the API for the Todoist
+    <http://todoist.com/>. Todoist is a to-do list service that can be
+    accessed from a web interface or dedicated desktop or mobile clients.
+    The basic service is free, but you can pay to get additional features.
+
+    Read <http://todoist.com/API/help> for more details.
+
+  METHODS
+   CONSTRUCTION
+        my $nt = Net::Todoist->new( token => $token );
+
+    *   token (optional)
+
+        the API token from <http://todoist.com>
+
+    *   ua_args
+
+        passed to LWP::UserAgent
+
+    *   ua
+
+        LWP::UserAgent or WWW::Mechanize instance
+
+   login
+        my $user = $nt->login($email, $pass) or die "login failed: " . $nt->errstr;
+
+    you don't need call ->login if you pass the token in the ->new
+
+   getTimezones
+        my @timezone = $nt->getTimezones();
+
+    Returns the timezones Todoist supports.
+
+   register
+        my $user = $nt->register(
+            email => $email,
+            full_name => 'Fayland Lam',
+            password  => 'guessitplz',
+            timezone  => "GMT +8:00"
+        ) or die "Can't register: " . $nt->errstr;
+
+   updateUser
+        my $user = $nt->updateUser(
+            email => $email,
+            full_name => 'Fayland Lam',
+            password  => 'guessitplz',
+            timezone  => "GMT +8:00"
+        ) or die "Can't update: " . $nt->errstr;
+
+   getProjects
+        my @projects = $nt->getProjects;
+
+   getProject
+        my $project = $nt->getProject($project_id);
+
+   addProject
+        my $project = $nt->addProject(
+            name => $name, # required
+            color => $color, # optional
+            indent => $indent, # optional
+            order => $order, # optional
+        ) or die "Can't addProject: " . $nt->errstr;
+
+   updateProject
+        my $project = $nt->updateProject(
+            project_id => $project_id, # required
+        
+            name => $name, # optional
+            color => $color, # optional
+            indent => $indent, # optional
+        ) or die "Can't updateProject: " . $nt->errstr;
+
+   deleteProject
+        my $is_deleted_ok = $self->deleteProject($project_id) or die "Connection issue: " . $nt->errstr;
+
+   getLabels
+        my @labels = $nt->getLabels or die "Can't get labels: " . $nt->errstr;
+
+   updateLabel
+        my $update_ok = $nt->updateLabel(
+            old_name => $old_name, # required
+            new_name => $new_name, # required
+        ) or die "Can't updateLabel: " . $nt->errstr;
+
+   deleteLabel
+        my $is_deleted_ok = $self->deleteLabel($name) or die "Connection issue: " . $nt->errstr;
+
+   getUncompletedItems
+        my @items = $nt->getUncompletedItems($project_id) or die "Can't getUncompletedItems: " . $nt->errstr;
+        # js_date is optional, bool
+        $nt->getUncompletedItems($project_id, $js_date);
+
+   getCompletedItems
+        my @items = $nt->getCompletedItems($project_id) or die "Can't getCompletedItems: " . $nt->errstr;
+        # js_date is optional, bool
+        $nt->getCompletedItems($project_id, $js_date);
+
+   getItemsById
+        my @items = $nt->getItemsById( [210873,210874] ) or die "Can't getItemsById: " . $nt->errstr;
+        # js_date is optional, bool
+        $nt->getItemsById( \@item_ids, $js_date);
+
+   addItem
+        my $item = $nt->addItem(
+            project_id => $project_id, # required
+            content => $content, # required
+            date_string => $date_string, # optional
+            priority => $priority, # optional
+            js_date => $js_date, # optional
+        ) or die "Can't addProject: " . $nt->errstr;
+
+   updateItem
+        my $item = $nt->updateItem(
+            id => $item_id, # required
+        
+            content => $content, # optional
+            date_string => $date_string, # optional
+            priority => $priority, # optional
+            indent => $indent, # optional
+            item_order => $item_order, # optional
+            js_date => $js_date, # optional
+        ) or die "Can't updateProject: " . $nt->errstr;
+
+   updateOrders
+        my $update_ok = $nt->updateOrders( $project_id, \@item_ids ) or die "Can't updateOrders: " . $nt->errstr;
+
+   updateRecurringDate
+        # js_date is optional
+        my @items = $nt->updateRecurringDate( \@item_ids, $js_date )
+            or die "Can't updateRecurringDate: " . $nt->errstr;
+
+   deleteItems
+        my $is_deleted = $nt->deleteItems(@item_ids);
+        my $is_deleted = $nt->deleteItems(\@item_ids);
+
+   completeItems
+        # in_history is optional, default as 1
+        my $is_ok = $nt->completeItems(\@item_ids, $in_history) or die "Can't completeItems: " . $nt->errstr;
+
+   uncompleteItems
+        my $is_ok = $nt->uncompleteItems(@item_ids);
+        my $is_ok = $nt->uncompleteItems(\@item_ids);
+
+   query
+        my @items = $nt->query(
+            queries => ["2007-4-29T10:13","overdue","p1","p2"], # required
+            as_count => 0, # optional
+            js_date  => 0, # optional
+        )
+
+SEE ALSO
+    <http://todoist.com> - home page for Todoist.
+
+    <http://todoist.com/API/help> - documentation for the API.
+
+AUTHOR
+    Fayland Lam <fayland@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Fayland Lam.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

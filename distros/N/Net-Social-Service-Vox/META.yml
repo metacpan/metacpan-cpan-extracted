@@ -1,0 +1,21 @@
+---
+name: Net-Social-Service-Vox
+version: 0.1
+author:
+  - 'Simon Wistow <simon@thegestalt.org>'
+abstract: a Vox plugin for Net::Social
+license: unknown
+requires:
+  IO::Scalar: 0
+  LWP::Simple: 0
+  Net::Social: 0
+  Test::More: 0.62
+  XML::XPath: 0
+provides:
+  Net::Social::Service::Vox:
+    file: lib/Net/Social/Service/Vox.pm
+    version: 0.1
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

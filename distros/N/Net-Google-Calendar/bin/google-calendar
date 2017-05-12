@@ -1,0 +1,209 @@
+#!perl -w
+
+##
+#
+# Please note that, for the time being, 
+# this is really just an example app
+#
+##
+
+use strict;
+use Data::Dumper;
+use Net::Google::Calendar;
+use Net::Google::Calendar::Calendar;
+use Net::Google::Calendar::WebContent;
+use Data::ICal::Entry::Event;
+use Date::ICal;
+
+my $url = shift || die "You must pass a feed url\n";
+
+
+
+
+#my $pe = Net::Google::Calendar::Person->new();
+#$pe->email('simon@thegestalt.org');
+#$pe->name('Simon Wistow');
+
+#$e->who($pe);
+
+#my $pf = Net::Google::Calendar::Person->new();
+#$pf->email('rich@slag.org');
+#$pf->name('Richard Marr');
+#$e->who($pf, $pe);
+
+#print $e->as_xml;
+
+#exit 0;
+
+
+
+
+#my %wc      = ( 
+#	url => 'http://thegestalt.org/simon/images/camouflage.png', 
+#	width => '100', 
+#	height => '80', 
+#	type => 'image/png' 
+#);
+#my $content = Net::Google::Calendar::WebContent->new( 
+#	title => 'testing', 
+#	href => 'http://thegestalt.org', 
+#	webContent => \%wc
+#);
+#$content->webContent(%wc);
+#$e->add_link($content);
+#print $e->as_xml;
+
+my $content = Net::Google::Calendar::WebContent->new(
+	title      => 'DateTime Gadget (a classic!)',
+    href       => 'http://www.google.com/favicon.ico',
+	webContent => {
+		url    => 'http://google.com/ig/modules/datetime.xml',
+		width  => 300,
+		height => 136,
+        type   => 'application/x-google-gadgets+xml',
+		prefs  => { color => 'green' },
+	}
+);
+#print $content->as_xml;
+#$e->add_link($content);
+#print $e->as_xml;
+
+#my $cal = Net::Google::Calendar->new( url => $url );
+my $cal = Net::Google::Calendar->new();
+
+my $u = shift;
+my $p = shift;
+my $token = shift;
+
+$cal->login($u, $p) || die "Couldn't log in: $@\n";
+#$cal->auth($u, $token);
+
+#my $new_cal = Net::Google::Calendar::Calendar->new();
+#$new_cal->title("Testing New Calendar");
+#$new_cal->summary("A new calendar for testing");
+#print "**** Before ****\n".$new_cal->as_xml;
+#my $cal_tmp = $cal->add_calendar($new_cal);
+#if (defined $cal_tmp) {
+#	print "**** After ****\n".$cal_tmp->as_xml;
+#} else {
+#	die "Couldn't add_calendar: $@\n";
+#}
+
+#$cal_tmp->title("Updating New Calendar");
+#$cal_tmp = $cal->update_calendar($cal_tmp) || die "Couldn't update calendar\n";
+#$cal_tmp->title =~ m!Updating!  || die "Calendar not updated\n"; 
+
+my $e = Net::Google::Calendar::Entry->new();
+$e->title("Title");
+$e->content("My content");
+my $d = DateTime->now->truncate( to => 'day'  );
+#$e->when($d, $d, 1);
+$e->when(DateTime->now, DateTime->now() + DateTime::Duration->new( hours => 48 ), 1);
+
+
+#print $e->as_xml;
+$cal->add_entry($e) || die "Couldn't add entry $@";
+print $e->as_xml;
+exit 0;
+
+if (1 || (@ARGV && $ARGV[0] eq 'list')) {
+	for ($cal->get_calendars()) {
+		print $_->title."\n";
+		print $_->id."\n\n";
+		if ($_->title =~ /New Calendar/) {
+			$cal->delete_calendar($_, 1) || print "FAIL: $@\n";
+		}
+	}
+	exit;
+}
+
+my @calendars = $cal->get_calendars;
+my ($c) = grep { $_->title =~ m!default!i } $cal->get_calendars;
+#die "Couldn't get cal\n" unless defined $c;
+$c = $calendars[0];
+$cal->set_calendar($c);
+
+if (!@ARGV) {
+	print "Getting events\n";
+    for ($cal->get_events()) {
+		#print Dumper $_->as_xml;
+		#next;
+		print $_->title."\n";
+		print $_->id."\n";
+		my ($start, $finish) = $_->when();
+		print "${start}-${finish}\n";
+		#print $_->content->body;
+		print "\n*****\n\n";
+	}
+    exit;
+} 
+
+
+my $title = shift;
+
+
+my $entry = Net::Google::Calendar::Entry->new();
+$entry->title($title);
+$entry->content("My content");
+#$entry->location('London, England');
+#$entry->transparency('transparent');
+#$entry->status('confirmed');
+$entry->when(DateTime->now, DateTime->now() + DateTime::Duration->new( hours => 6 ) );
+
+#my $author = Net::Google::Calendar::Person->new();
+#$author->name('Foo Bar');
+#$author->email('foo@bar.com');
+#$entry->author($author);
+
+my $recurrence = Data::ICal::Entry::Event->new();
+
+use DateTime::Event::Recurrence;
+use Date::ICal;
+use DateTime::Format::ICal;
+
+my $last_day_of_the_month = DateTime::Event::Recurrence->monthly( days => -1 );
+$recurrence->add_properties(
+               dtstart   => DateTime::Format::ICal->format_datetime(DateTime->now),
+               rrule     => DateTime::Format::ICal->format_recurrence($last_day_of_the_month),
+);
+
+#$entry->recurrence($recurrence);
+
+#print STDERR $entry->as_xml."\n\n\n*********************\n\n";
+#exit;
+
+print "Before=".scalar($cal->get_events())."\n";
+
+$cal->add_entry($entry);
+die "Couldn't add event: $@\n" unless defined $entry;
+
+print "After=".scalar($cal->get_events())."\n";
+
+#die $entry->as_xml;
+
+$entry->content('Updated');
+
+#print "Update\n";
+#$tmp = $cal->update_entry($tmp) || die "Couldn't update ".$tmp->id.": $@\n";
+$cal->update_entry($entry) || die "Couldn't update ".$entry->id.": $@\n";
+print "Updated=".scalar($cal->get_events())."\n";
+
+#print $tmp->as_xml;
+
+
+	
+for ($cal->get_events()) {
+#        print $_->title."\n";
+#        print $_->id."\n";
+#        my ($start, $finish) = $_->when();
+#        print "${start}-${finish}\n";
+#        #print $_->content->body;
+#        print "\n*****\n\n";
+		$cal->delete_entry($_);
+#        # print $_->as_xml;
+}
+
+print "Delete\n";
+#$cal->delete_entry($entry) || die "Couldn't delete ".$entry->id.": $@\n";
+print "Delete=".scalar($cal->get_events())."\n";
+

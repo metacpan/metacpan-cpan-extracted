@@ -1,0 +1,28 @@
+Revision history for Perl extension Net::SloppyXMPP.
+
+0.06  Tue May 19 05:18:00 2009
+  - Fixed regex in "process_read_buffer" to handle multiline.
+    - Also changed from "if" to "while" to process more within a tick.
+
+0.05  Tue May 19 03:59:00 2009
+  - Added type="normal" to outgoing message.
+    - "type" was previously not set.
+
+0.04  Mon Feb 16 00:55:00 2009
+  - Added "ping" and "pong".
+    - Also added attribute "pingfreq" for "new".
+
+0.03  Sun Feb 15 18:36:00 2009
+  - Fixed "message" chunking and encoding issue.
+    - Large messages would not pass correctly.
+
+0.02  Sat Feb 14 17:11:00 2009
+	- Added "message" function.
+	- Added "message_callback" to "new".
+	- Fixed dependency-related bug for a line of code
+		requiring Megagram::ResolveSRV when "usesrv"
+		is disabled specifically.
+
+0.01  Fri Feb  6 00:38:49 2009
+	- original version; created by h2xs 1.23 with options
+		-XAn Net::SloppyXMPP

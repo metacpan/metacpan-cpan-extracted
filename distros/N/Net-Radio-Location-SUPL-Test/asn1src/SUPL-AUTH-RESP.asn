@@ -1,0 +1,22 @@
+SUPL-AUTH-RESP DEFINITIONS AUTOMATIC TAGS ::= 
+BEGIN 
+ 
+EXPORTS SUPLAUTHRESP; 
+ 
+IMPORTS StatusCode 
+  FROM ULP-Components; 
+ 
+SUPLAUTHRESP ::= SEQUENCE { 
+  sPCAuthKey    SPCAuthKey OPTIONAL, 
+  keyIdentity3  KeyIdentity3 OPTIONAL, 
+  statusCode    StatusCode OPTIONAL, 
+  ...} 
+ 
+SPCAuthKey ::= CHOICE { 
+  shortKey  BIT STRING(SIZE (128)), 
+  longKey   BIT STRING(SIZE (256)), 
+  ...} 
+ 
+KeyIdentity3 ::= BIT STRING(SIZE (128)) 
+ 
+END 

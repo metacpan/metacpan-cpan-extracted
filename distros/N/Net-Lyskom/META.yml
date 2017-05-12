@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Net-Lyskom
+version:            1.2
+abstract:           Perl module used to talk to LysKOM servers.
+author:
+    - A. U. Thor <a.u.thor@a.galaxy.far.far.away>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    perl:        5.008
+    Test::More:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

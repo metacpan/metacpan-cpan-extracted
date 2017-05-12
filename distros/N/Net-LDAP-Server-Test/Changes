@@ -1,0 +1,98 @@
+Revision history for Net-LDAP-Server-Test
+
+0.22 10 Dec 2016
+ - missing from CPAN. No code changes, just re-release of 0.21 with version bump.
+
+0.21 19 July 2016
+ - fix for INET6 via Shawn Moore https://rt.cpan.org/Ticket/Display.html?id=116304
+
+0.20 01 July 2016
+ - use Net::LDAP::SID instead of custom methods
+
+0.19 30 April 2013
+ - patches from chorny @github patching Windows hanging bug (RT #84836)
+
+0.18 14 March 2013
+ - RT 83905 - server->stop() with waitpid+kill may take a second or two to
+   work, so check+sleep for 10 seconds before returning.
+
+0.17 2 Feb 2013
+ - fix regression introduced in 0.16 via
+   4896a0418ecf704723d91b9d8efae662c0260e79 (issue RT 80360)
+
+0.16 25 Oct 2012
+ - RT 80360 - return correct LDAP constant if entry does not exist Patch
+   from Joni Salonen.
+ - RT 80377 - return correct LDAP constant for variety of conditions.
+   Patches from Rafael Porres Molina.
+
+0.15 21 Sept 2012
+ - RT 79776 - Net::LDAP >= 0.44 causes stop() to hang indefinitely. Added
+   an alarm() workaround to kill() the problem pid if waitpid() hangs.
+
+0.14 27 July 2012
+ - RT 78612 - search scope patch from Thomas Sibley
+
+0.13 17 April 2012
+ - RT 76270 - attributes add/delete/replace 
+
+0.12 27 Jan 2012
+ - added stop() method in response to
+   https://rt.cpan.org/Ticket/Display.html?id=69615 removed DESTROY()
+   method since it was a no-op.
+ - RT 74425 - conditional debug output
+ - RT 74416 - allow for instantiating with an existing socket object
+ - RT 74461 - return requested attributes in auto_schema mode
+
+0.11 04 June 2011
+ - fixes for Net::LDAP::Server 0.43, per patch from RT
+   https://rt.cpan.org/Ticket/Display.html?id=68577
+
+0.10 15 June 2010
+ - ditch the pseudo-sleep() delay in forking child, instead using a pipe()
+   check. Patch from David Leadbeater via
+   https://rt.cpan.org/Public/Bug/Display.html?id=56987
+ - quiet line noise when primaryGroupID not used. Patch from Ted Katseres
+   via https://rt.cpan.org/Public/Bug/Display.html?id=58337
+
+0.09 17 Feb 2010
+ - wrap print to $socket handle in {} braces for perl 5.6.x
+ - rewrite _sid2string() and _string2sid() with better pack/unpack magic.
+   Thanks to David Lowe.
+
+0.08_01 23 Jan 2009
+ - dev release with some debugging on to help out Net::LDAP::Class
+
+0.08 26 Aug 2009
+ - make debugging messages optional with LDAP_DEBUG env var
+ - add support for Net::LDAP::Control (specifically,
+   Net::LDAP::Control::Paged)
+
+0.07 31 July 2008
+ - fix auto SID stuff in active_directory mode to correctly pack/unpack on
+   all systems.
+
+0.06 22 July 2008
+ - reverse member/memberOf logic in AD mode to reflect how AD actually
+   works.
+
+0.05 21 July 2008
+ - add active_directory mode
+ - change test port from 8080 to 10636
+
+0.04 10 July 2008
+ - bump mock sleep time at server fork() time to allow for some test
+   failures.
+
+0.03 9 July 2008
+ - new() now takes key/value pairs rather than single $data arg
+ - added auto_schema feature to enable add/update/delete with in-memory
+   Net::LDAP::Entry objects in server.
+
+0.02 4 Feb 2008
+ - no code changes, just bumped version to reflect patch accepted for
+   Net::LDAP::Server.
+
+0.01 12 Oct 2007
+ - First version, released on an unsuspecting world.
+

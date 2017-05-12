@@ -1,0 +1,361 @@
+#!/usr/bin/perl
+
+use 5.008;
+use strict;
+use warnings 'all';
+
+###########################################################################
+# METADATA
+our $AUTHORITY = 'cpan:DOUGDUDE';
+our $VERSION   = '0.009002';
+
+###########################################################################
+# MODULES
+use Carp qw(confess);
+use Const::Fast qw(const);
+use English qw(-no_match_vars);
+use Getopt::Long 2.33 ();
+use Net::NSCA::Client 0.001;
+use Pod::Usage 1.36;
+
+###########################################################################
+# PRIVATE CONSTANTS
+const my %ENCRYPTION_METHOD => (
+	0 => 'none',
+	1 => 'xor',
+);
+const my $EXIT_SUCCESS => 0;
+const my $EXIT_FAILURE => 3;
+const my $INPUT_FIELD_COUNT => 4;
+const my %OPTION_AS_NAME => (
+	H  => 'remote_host',
+	p  => 'remote_port',
+	to => 'timeout',
+);
+
+###########################################################################
+# RUN PROGRAM
+exit run();
+
+sub run {
+	# Variables to hold configuration
+	my $configuration_file;
+	my $input_delimiter = "\t";
+
+	# Make a command line parser
+	my $args_parser = Getopt::Long::Parser->new(config => [qw(
+		auto_help auto_version
+	)]);
+
+	# Argument specification
+	my @arg_spec = (
+		'c=s' => \$configuration_file,
+		'd=s' => \$input_delimiter,
+		'H=s',
+		'p=i',
+		'to=i',
+	);
+
+	my %args;
+
+	# Parse the arguments
+	if (!$args_parser->getoptions(\%args, @arg_spec)) {
+		# Parsing the arguments failed for some reason
+		exit $EXIT_FAILURE;
+	}
+
+	# Construct the client arguments from the command line options
+	my @client_args = map { $OPTION_AS_NAME{$_} => $args{$_} } keys %args;
+
+	# Read the configuration file
+	if (defined $configuration_file) {
+		# Get the password and encryption method from the configuration file
+		my ($password, $encryption_method) = _read_configuration_file($configuration_file);
+
+		if ($encryption_method ne 'none') {
+			# Set the password and encryption method on the client
+			push @client_args,
+				encryption_password => $password,
+				encryption_type     => $encryption_method;
+		}
+	}
+
+	# Create the client
+	my $nsca = Net::NSCA::Client->new(@client_args);
+
+	# Read from STDIN (or files)
+	chomp(my $line = <>);
+
+	# Send the report
+	$nsca->send_report(_parse_line_to_send_report_options(
+		$line,
+		input_delimiter => $input_delimiter
+	));
+
+	return $EXIT_SUCCESS;
+}
+
+###########################################################################
+# PRIVATE FUNCTIONS
+sub _read_configuration_file {
+	my ($file_name) = @_;
+
+	# Open the file for reading
+	open my $file, '<', $file_name
+		or confess sprintf 'Unable to open configuation file %s: %s',
+			$file_name, $ERRNO;
+
+	# Slurp in the file by lines
+	my @lines = <$file>;
+
+	# Close the file
+	close $file
+		or confess sprintf 'Unable to close %s: %s',
+			$file_name, $ERRNO;
+
+	# Key-value pairs found in the file will be stored here
+	my %config_info;
+
+	# Process each line of the file looking for a key-value pair
+	LINE: foreach my $line (@lines) {
+		chomp $line;
+
+		# Skip comments and blank lines
+		next LINE if $line =~ m{\A [#\000] | \A \z}msx;
+
+		if ($line =~ m{\A ([^=]+) = (.+) \z}msx) {
+			# Found a key-value pair
+			my ($key, $value) = ($1, $2);
+
+			if (!exists $config_info{$key}) {
+				# Add the key-value pair if it was not added already
+				$config_info{$key} = $value;
+			}
+		}
+	}
+
+	if (!exists $config_info{password}) {
+		# The password is missing from the configuration file
+		confess sprintf 'Missing password from the configuration file %s',
+			$file_name;
+	}
+
+	if (!exists $config_info{encryption_method}) {
+		# The encryption method is missing from the configuration file
+		confess sprintf 'Missing encryption method from the configuration file %s',
+			$file_name;
+	}
+	elsif (!exists $ENCRYPTION_METHOD{$config_info{encryption_method}}) {
+		# The encryption method is unsupported
+		confess sprintf 'The encryption method %s in %s is unsupported at this time',
+			$config_info{encryption_method}, $file_name;
+	}
+
+	# Return the password and encryption method
+	return $config_info{password}, $ENCRYPTION_METHOD{$config_info{encryption_method}};
+}
+
+sub _parse_line_to_send_report_options {
+	my ($line, %args) = @_;
+
+	# Get the input delimiter
+	my $delimiter = $args{input_delimiter};
+
+	if (!defined $delimiter) {
+		confess 'An input delimiter must be provided to read_stdin()';
+	}
+
+	# Get the different values from the line
+	my ($hostname, $service, $status, $message)
+		= split m{$delimiter}msx, $line, $INPUT_FIELD_COUNT;
+
+	# Return a HASH of the format for Net::NSCA::Client->send_report
+	return (
+		hostname => $hostname,
+		message  => $message,
+		service  => $service,
+		status   => $status,
+	);
+}
+
+__END__
+
+=head1 NAME
+
+send_nsca - Send reports to NSCA just like send_nsca in NSCA 2.7.2
+
+=head1 VERSION
+
+This documentation refers to version 0.009002
+
+=head1 DESCRIPTION
+
+This utility is made to mimic the functionality and usage of the send_nsca
+program distributed with NSCA 2.7.2, but use the L<Net::NSCA::Client|Net::NSCA::Client>
+Perl library.
+
+=head1 USAGE
+
+  ./send_nsca [-H host_name] [-p port] [-to timeout] [-d delim] [-c config_file]
+
+  Options:
+    -H         The host name of the NSCA server (default to localhost)
+    -p         The port number of the NSCA server (defaults to 5667)
+    -to        The timeout when talking to the NSCA server in seconds (defaults to 10)
+    -d         The input delimiter (defaults to tab)
+    -c         The path to the configuration file
+    --help     Usage message
+    --version  Display version of the program
+
+  The program then waits for input on STDIN until the first new line character.
+  The input should be in the following format:
+
+    Nagios Service Host<TAB>Nagios Service Description<TAB>Status Number<TAB>Plugin Output
+
+  The <TAB> represents the tab character and should be change to which ever
+  dimilimter is specified.
+
+=head1 OPTIONS
+
+=head2 C<-H>
+
+This switch takes the host name of the NSCA server. If not specified, then
+C<localhost> is used.
+
+=head2 C<-p>
+
+This switch takes the port number of the NSCA server. If not specified, then
+the default NSCA port 5667 is used.
+
+=head2 C<-to>
+
+This switch specifies the timeout when communicating with the NSCA server in
+seconds. If not specified, the timeout will be 10 seconds.
+
+=head2 C<-d>
+
+This switch takes a string that will be used as the input delimiter. If not
+specified, then will default to a tab. See L</Input Delimiter> for details
+on what this does.
+
+=head2 C<-c>
+
+This switch takes the path to a configuration file. See L</Configuration File>
+for details on the content of the file.
+
+=head2 C<--help>
+
+This switch will cause the help message to be shown.
+
+=head2 C<--version>
+
+This switch will cause the version to be displayed.
+
+=head1 CONFIGURATION
+
+=head2 Configuration File
+
+This program can be configured through the specification of a configuration
+file using the L</-c> switch. The configuration file is a plain text file,
+in which lines starting with an octothorpe (C<< # >>) are comments and ignored
+and otherwise contain name-value pairs in the following format:
+
+  name=value
+
+There should be no spaces around the equal sign (C<< = >>) unless you
+specifically want the spaces to be included in the variable name or value.
+The value will also exclude no white space, and so all characters up to the new
+line at the end will be included in the value.
+
+The following names are required in the file:
+
+=head3 password
+
+The value should be the password as set in the NSCA server.
+
+=head3 encryption_type
+
+The value should be the encryption type as set in the NSCA server. The value
+must be a number as specified in the NSCA configuration format. The following
+numbers are valid for this program:
+
+=head4 0
+
+This specifies no encryption.
+
+=head4 1
+
+This specified XOR encryption.
+
+=head2 Input Delimiter
+
+The input delimiter is what separates the different values coming in on the
+program input (C<STDIN>). The default is the tab character, unless changed
+by the use of the L</-d> switch.
+
+=head1 EXIT STATUS
+
+The following exit codes are produced by this application:
+
+=head2 0
+
+This code indicates no errors were encountered and the packet was sent to the
+NSCA server. The NSCA protocol does not provide receipt confirmation, so it is
+not guaranteed that the server got the packet.
+
+=head2 2
+
+This code indicates that a required Perl module was not found on the system.
+Please refer to the STDERR stream for details of the message.
+
+=head2 3
+
+This code indicates that an error occurred in the processing of the request.
+Please refer to the STDERR stream for details of the message.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item * L<Carp|Carp>
+
+=item * L<Const::Fast|Const::Fast>
+
+=item * L<English|English>
+
+=item * L<Getopt::Long|Getopt::Long> 2.33
+
+=item * L<Net::NSCA::Client|Net::NSCA::Client> 0.001
+
+=back
+
+=head1 AUTHOR
+
+Douglas Christopher Wilson, C<< <doug at somethingdoug.com> >>
+
+=head1 BUGS AND LIMITATIONS
+
+Please report any bugs or feature requests to C<bug-net-nsca-client at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-NSCA-Client>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+I highly encourage the submission of bugs and enhancements to my modules.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2009 Douglas Christopher Wilson.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of either:
+
+=over 4
+
+=item * the GNU General Public License as published by the Free
+Software Foundation; either version 1, or (at your option) any
+later version, or
+
+=item * the Artistic License version 2.0.
+
+=back

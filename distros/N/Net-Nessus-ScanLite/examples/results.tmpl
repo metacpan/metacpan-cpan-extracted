@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Nessus scan test</title>
+</head>
+
+
+
+<table  border="1"  >
+	<tr><th align=left>Host</th<td><tmpl_var name=remote_addr></td> </tr>
+	<tr><th align=left>Duration</th<td><tmpl_var name=duration></td> </tr>
+	<tr><th align=left>Plugins</th<td><tmpl_var name=plugin_set></td> </tr>
+	<tmpl_if error>
+        	<tr><th align=left>Errors</th<td><tmpl_var name=error></td></tr>
+	</tmpl_if>
+
+</table>
+
+<table border=1 width="90%">
+  <tr><th colspan=3 align=left>Info: <tmpl_var name="total_info"></th></tr>
+ <tmpl_if total_info> 
+  <tr><th>Id</th><th>Port</th><th>Description</th></tr>
+  	<tmpl_loop info>
+		<tr>
+
+		<td valign=top><tmpl_var name=scanid></td>
+       		 <td valign=top><tmpl_var name=port></td>
+		<td><pre><tmpl_var name=description></pre></td>
+		</tr>
+   	</tmpl_loop>
+  </tmpl_if>
+
+  <tr><th colspan=3 align=left>Holes: <tmpl_var name="total_holes"></th></tr>
+  <tmpl_if total_holes>
+  	<tr><th>Id</th><th>Port</th><th>Description</th></tr>
+  	<tmpl_loop holes>
+       		 <tr>
+       		 <td valign=top><tmpl_var name=scanid></td>
+       		 <td valign=top><tmpl_var name=port></td>
+       		 <td><pre><tmpl_var name=description></pre></td>
+       		 </tr>
+   	</tmpl_loop>
+  </tmpl_if>
+
+</table>
+
+<script language="javascript">
+hideStatus();
+</script>
+
+</body>
+
+</html>
+

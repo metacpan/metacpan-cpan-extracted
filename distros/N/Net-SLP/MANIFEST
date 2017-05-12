@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+SLP.xs
+ppport.h
+README
+t/Net-SLP.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Net/SLP.pm
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,52 @@
+NAME
+    Nagios::Plugin::DieNicely - Die in a Nagios output compatible way
+
+SYNOPSIS
+      use Nagios::Plugin::DieNicely;
+
+      ... your plugin code goes here ...
+
+      use Nagios::Plugin::DieNicely 'WARNING';
+
+      ... now if you die, you will get a Nagios WARNING state ...
+
+DESCRIPTION
+    When your Nagios plugins, or the modules that they use raise an
+    exception with *die*, *croak* or *confess*, the exception gets lost, and
+    Nagios treats the output as an UNKNOWN state with no output from the
+    plugin, as STDERR gets discarded by Nagios.
+
+    This module overrides perl's default behaviour of using exit code 255
+    and printing the error to STDERR (not Nagios friendly). Just using for
+    exit code 2 (Nagios CRITICAL), and outputing the error to STDOUT with
+    "CRITICAL - " prepended to the exception. Note that you can change the
+    CRITICAL for WARNING, or even OK (not recommended)
+
+USE
+    Just *use* the module. If you want a Nagios error code other that
+    CRITICAL, then use the module passing one of: *WARNING*, *OK*,
+    *UNKNOWN*. *CRITICAL* can be passed too (just for completeness).
+
+      use Nagios::Plugin::DieNicely 'WARNING';
+      use Nagios::Plugin::DieNicely 'UNKNOWN';
+      use Nagios::Plugin::DieNicely 'CRITICAL';
+      use Nagios::Plugin::DieNicely 'OK';
+
+TODO
+     - Get the shortname of the module through Nagios::Plugin if it is beeing used
+     - Issue perl warnings to STDOUT, and possbily issue WARNING or CRITICAL
+
+AUTHOR
+        Jose Luis Martinez
+        CPAN ID: JLMARTIN
+        CAPSiDE
+        jlmartinez@capside.com
+        http://www.pplusdomain.net
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

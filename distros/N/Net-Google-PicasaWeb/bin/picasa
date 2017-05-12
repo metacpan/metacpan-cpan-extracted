@@ -1,0 +1,122 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+# PODNAME: picasa
+# ABSTRACT: master command for the Picasa Web scripts
+
+use FindBin;
+use Pod::Usage;
+
+sub next_command() {
+    return unless @ARGV;
+    for my $i ( 0 .. $#ARGV) {
+        last if $ARGV[$i] eq '--';
+        if ($ARGV[$i] !~ /^-/) {
+            return splice @ARGV, $i, 1;
+        }
+    }
+}
+
+our $command;
+sub dispatch(&) {
+    my ($code) = @_;
+    
+    return sub {
+        local @ARGV = @ARGV;
+        local $command = next_command;
+        $code->();
+    };
+}
+
+sub run(@) {
+    my ($command, @args) = @_;
+    return sub {
+        exec("$FindBin::Bin/picasa-".$command, @args, @ARGV);
+    };
+}
+
+sub just($) {
+    my $code = shift;
+    $code->();
+}
+
+sub on($$) {
+    return unless $command;
+    my ($test_command, $run) = @_;
+    if (ref $test_command eq 'ARRAY') {
+        for my $test_command (@{ $test_command }) {
+            just $run if $command eq $test_command;
+        }
+    }
+
+    else {
+        just $run if $command eq $test_command;
+    }
+}
+
+just dispatch {
+    on [ 'get', 'fetch' ] => dispatch {
+        on [ 'photo', 'photos' ] => run 'get', '--kind', 'photo';
+        on [ 'album', 'albums' ] => run 'get', '--kind', 'album';
+        just run 'get', '--kind', 'album';
+    };
+
+    on [ qw( list ls ) ] => dispatch {
+        on [ 'photo', 'photos' ]     => run 'list', '--kind', 'photo';
+        on [ 'album', 'albums' ]     => run 'list', '--kind', 'album';
+        on [ 'tag', 'tags' ]         => run 'list', '--kind', 'tag';
+        on [ 'comment', 'comments' ] => run 'list', '--kind', 'comment';
+        just run 'list', '--kind', 'album';
+    };
+
+    on [ qw( help ) ] => dispatch {
+        on [ 'get', 'fetch' ] => run 'get', '--help';
+        on [ 'list', 'ls' ]   => run 'list', '--help';
+        pod2usage(1);
+    };
+};
+
+__END__
+
+=pod
+
+=head1 NAME
+
+picasa - master command for the Picasa Web scripts
+
+=head1 VERSION
+
+version 0.12
+
+=head1 SYNOPSIS
+
+  picasa [command] [options]
+
+  Commands:
+    get albums             download albums for a user or search
+    get photos             download photos matching an album or search
+
+    list albums            get a list of albums for a user or search
+    list photos            get a list of albums for a user or search
+    list tags              get a list of tags for a user, album, or photo
+    list comments          get a list of comments for a user, album, or photo
+
+    help [command]         get detailed help for the named command
+
+=head1 NAME
+
+picasa - master command for the Picasa Web scripts
+
+=head1 AUTHOR
+
+Andrew Sterling Hanenkamp <hanenkamp@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Andrew Sterling Hanenkamp.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

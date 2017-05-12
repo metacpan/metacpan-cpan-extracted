@@ -1,0 +1,8 @@
+Changes for Net::SenderBase
+
+1.01
+    - Minor fix to not die if senderbase adds new keys to the results
+
+1.00
+    - Initial Release
+

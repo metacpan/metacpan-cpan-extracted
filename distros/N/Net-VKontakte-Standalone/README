@@ -1,0 +1,34 @@
+Net-VKontakte-Standalone version 0.11
+=====================================
+
+This module is a wrapper for easy calling of Vkontakte API methods.
+It is able to automatically log in the user and allow any required
+permissions.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+URI (core)
+Carp (core)
+WWW::Mechanize
+JSON 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Krylov Ivan
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

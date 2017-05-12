@@ -1,0 +1,35 @@
+#!/usr/bin/env perl
+
+{
+    package Nour::Example::Script;
+
+    use Moose;
+    use namespace::autoclean;
+    use strict; use warnings;
+
+    with 'Nour::Script';
+
+    sub run {
+        my ( $self, %args ) = @_;
+
+        $self->info( 'i would call $self->db but then it would try to connect to a non-existent database' );
+        $self->debug( 'args were:', \%args );
+        $self->debug( 'config is:', $self->config );
+    }
+
+    1;
+}
+
+BEGIN {
+    use File::Basename 'dirname';
+    use File::Spec::Functions qw/catdir splitdir/;
+
+    my @base = ( splitdir( dirname( __FILE__ ) ), '..' );
+    my $lib = join '/', @base, 'lib';
+    unshift @INC, $lib;
+}
+
+my $script = new Nour::Example::Script;
+$script->run( just => 'an example' );
+
+1;

@@ -1,0 +1,34 @@
+Net-Analysis-Listener-HTTPClientPerf version 0.01
+=================================================
+
+This module generates pretty postscript pictures of client side web traffic.
+
+To see one, run 'make test' below, and then have a look at the file out.ps.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Net::Analysis
+  PostScript::Simple
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005 by Adam B. Worrall (worrall@cpan.org)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,98 @@
+Revision history for Perl extension Net::CIDR::Lite.
+
+0.21  Wed Mar 28 14:34:18 2007
+    - Fix RT Tickets:
+    - 14535: Fix spanner clean() docs (reported by carbon at pobox.com).
+    - 25898: Undef dereference with empty object (patch by Adam Tomason).
+    - 30777: Add short_list_range() method (patch by Josef Kutej).
+    - 48308: clean() or list() before add() causes error (reported by David Cawley).
+    - 50042: spanner add() did not accept non-object (patch by Tomo.M).
+    - 52571: "::" not accepted as valid IPv6 address (reported by Tim Wilde).
+0.20  Sun Feb 12 01:00:00 2006
+    - Fix error message on mask values.
+0.19  Sat Jan 30 01:00:00 2006
+    - Allow net mask of zero.
+0.18  Sat May 20 01:00:00 2005
+    - Documented bin_find().
+    - Added pod tests. Watch my kwalitee go up! Woohoo!
+0.17  Wed May 18 12:00:00 2005
+    - Fixed last fix and corresponding test.
+0.16  Wed May 18 10:00:00 2005
+    - Fixed divide by zero on find with empty spanner.
+      Reported by jgmyers via rt.cpan.org.
+    - Fixed pod errors.
+0.15  Wed Apr 16 13:00:00 2003
+    - Fixed # of tests in test.pl. Thanks to CPAN testers.
+    - Squelched '-w' warning about doubly declared lexical variable.
+      Thanks to Jan Pieter Cornet.
+0.14  Mon Jul 14 09:00:00 2002
+    - Fixed list_range for '0.0.0.0/32' (and '::0/32').
+      Besides, I needed to get past lucky version 13.
+0.13  Mon Jul 14 02:30:00 2002
+    - internal _add_bit method was never meant to overflow, but previous
+      fix made it necessary, but it wasn't doing it correctly, so I
+      had to change the internal data structure to store N+1 bytes
+      (5 bytes for 32 bit IPv4, and 17 bytes for IPv6), and change the
+      rest of the program to deal with it.
+0.12  Sun Jul 14 22:00:00 2002
+    - Fixed off by one error on end of range in list_range method.
+      found by Allen Smith. added test.
+    - binary find was not working when target address was beginning
+      of a range. Also found by Allen Smith. added another test.
+0.11  Mon Apr 15 21:05:00 2002
+    - Fixed infinite loop in list() when 0.0.0.0/x was given as an address.
+      found by Allen Smith. added test.
+0.10  Tue Nov 27 09:05:00 2001
+    - Allow whitespace around '-' in add_range. So that what I posted
+      in a dead newsgroup on Usenet will actually work :-)
+    - Document add_any() method.
+0.09  Mon Nov 26 21:05:00 2001
+    - Fixed warning in add_range().
+0.08  Mon Nov 26 10:05:00 2001
+    - Fixed docs.
+0.07  Wed Oct 31 10:05:00 2001
+    - Lifted some code from Array::IntSpan and tweaked it for my
+      purposes to do a binary search on a find() if the (# of IP addresses)/(the
+      # of ranges) is below some percentage (default 4%). The initial
+      search setup is still O(n*log(n)) for the sort, but it can speed up
+      subsequent searches for IP addresses. I haven't benchmarked
+      any of this, so for you Benchmark fanatics who use this module,
+      let me know some stats, please :-)
+    - Added binary search capability to N::C::L find method.
+    - Fixed NCL::Span find method (never trust version 1 of this stuff).
+0.06  Tue Oct 30 10:05:00 2001
+    - Add find methods, one for ip lookup within a single cidr object, and
+      another as an Array::IntSpan style lookup, but for looking up addresses
+      in labeled cidr objects. Both are moderately inefficient for looking up
+      single ip addresses multiple times, but the latter is fairly efficient
+      at looking up many ip addresses all at once.
+0.05  Thu Oct 25 10:05:00 2001
+    - Changed some unpack/pack code to use vec(). Thanks to Tye
+      for the knowledge and know-how (especially on how to efficiently use
+      the little-endian vec function on a big-endian string).
+      Unpack/pack w/operations on strings is sometimes faster
+      than the vec() method for some strings, but probably not
+      in the common case.
+0.04  Tue Oct 23 18:05:00 2001
+    - bug in add_range() wasn't entering the end ip correctly.
+    - added list_range() function. Not sure if its useful since
+      it doesn't output ranges in CIDR netblocks. Could be changed
+      if desired, let me know either way.
+0.03  Tue Oct 23 17:05:00 2001
+    - _compress_ipv6() was not stripping leading zeros within a block.
+0.02  Tue Oct 23 14:45:00 2001
+    - Do addition with pseudo-bit manipulation (thanks to Tye for
+      initial idea, may go to complete binary operations in the future).
+    - Added IPv6 support.
+    - Clean up null nodes on 'as you go' on contiguous ranges (thanks
+      again to Tye for the idea and directly lifted code).
+    - Added more methods to simulate functionality of Net::CIDR and then
+      some (e.g. added add_range() function). Still don't have
+      octets function.
+0.01  Tue Oct 16 09:26:01 2001
+    - Basic idea to use a hash to store the ranges improves speed
+      over Net::CIDR ( O(n*n) vs. O(n*log(n)) for you big O fans).
+      (created in answer to a 'challenge' posted by Dominus on perlmonks).
+	- original version; created by h2xs 1.21 with options
+		-A -X -n Net::CIDR::Lite
+

@@ -1,0 +1,6 @@
+TYPEMAP
+Net_DNS_Native*	T_Net_DNS_Native
+
+INPUT
+T_Net_DNS_Native
+	$var = INT2PTR($type, SvIV(SvRV($arg)));

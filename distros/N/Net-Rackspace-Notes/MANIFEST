@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/racknotes
+dist.ini
+lib/Net/Rackspace/Notes.pm
+t/01-basic.t

@@ -1,0 +1,31 @@
+Revision history for Net-Async-ControlChannel
+
+0.005     2014-08-04 21:17:30+01:00 Europe/London
+	No new features
+
+	Bug fixes:
+	* on_listen_error is now required in the ->listen call, ensure we
+	handle this by failing the ->listening Future
+
+0.004     2013-10-22 00:13:54 Europe/London
+	No new features
+
+	Bug fixes:
+	* Delay connection notification until after the new client is set up,
+	allowing the server to send welcome messages
+
+0.003     2013-09-24 07:37:28 Europe/London
+	No new features
+
+	Test fixes:
+	* Updated Dist::Zilla::Plugin::Test::Compile as described in RT88890,
+	thanks to CHORNY for reporting
+
+0.002     2013-09-20 05:55:04 Europe/London
+	No new features
+
+	Dependency fixes:
+	* Include IO::Async in cpanfile
+
+0.001     2013-09-19 06:55:14 Europe/London
+	Initial CPAN release

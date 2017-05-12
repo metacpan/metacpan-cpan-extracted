@@ -1,0 +1,51 @@
+---
+abstract: 'Client library for Hadoop WebHDFS and HttpFs'
+author:
+  - 'TAGOMORI Satoshi <tagomoris {at} gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  Test::Deep: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Hadoop-WebHDFS
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::Hadoop::WebHDFS:
+    file: lib/Net/Hadoop/WebHDFS.pm
+    version: '0.8'
+requires:
+  Furl: '0'
+  JSON: '0'
+  JSON::XS: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  Try::Tiny: '0'
+  URI: '0'
+resources:
+  bugtracker: https://github.com/tagomoris/Net-Hadoop-WebHDFS/issues
+  homepage: https://github.com/tagomoris/Net-Hadoop-WebHDFS
+  repository: git://github.com/tagomoris/Net-Hadoop-WebHDFS.git
+version: '0.8'
+x_contributors:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'TAGOMORI Satoshi <tagomoris@gmail.com>'
+  - 'Burak Gürsoy <burakgursoy@gmx.net>'
+  - 'Burak Gursoy <burak@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

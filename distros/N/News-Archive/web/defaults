@@ -1,0 +1,21 @@
+$STYLESHEET   = "stylesheet.css";		# Per-directory basis.
+$KIBOZEDIR    = "/home/tskirvin/news/kiboze2";	# Where to put the files?
+$DB_TYPE      = "DB_File";			# What kind of database?
+%SERVERS      = (
+      # "news.meat.net"	    => 	"$KIBOZEDIR/newsrc-meat",
+	"news.killfile.org" =>  "$KIBOZEDIR/newsrc-kf",
+      "news.ks.uiuc.edu"  =>  "$KIBOZEDIR/newsrc-ks",
+		);
+$MAXARTS      = 1000;
+$ARCHIVEGROUP = "";
+$LOCALNAME    = "archive.killfile.org";
+$TITLE        = "kiboze posts";
+$DEBUG        = 0;
+
+$HTMLHEAD     = \&html_head_style;
+ 
+sub html_head_style { 
+  my $title = shift || $TITLE;
+  use CGI;   my $cgi = new CGI;
+  $cgi->start_html(-title => $title, -style => {'src'=>$STYLESHEET}, @_) .  "\n";
+}

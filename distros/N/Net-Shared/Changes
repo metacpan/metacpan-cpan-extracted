@@ -1,0 +1,46 @@
+Revision history for Perl extension Net::Shared.
+
+0.30       Wed Apr  29 01:39:58 2002
+                - added 3 examples (local.pl, ssrpt_s.pl/ssrpt_c.pl, fork_ex.pl)
+                - redid documentation
+                - cleaned out older versions
+
+0.25       Thu Apr  25 13:55:47 2002
+                - Moved private method inflate_data from local/remote to handler
+
+0.24       Mon Apr  22 21:37:02 2002
+                - Renamed several private methods
+
+0.23       Wed Apr  17 20:15:31 2002
+                - Added response to the %config hash
+
+0.22       Mon Apr  15 16:20:22 2002
+                - Added methods get_data and store_data
+
+0.21       Fri Apr  12 18:45:13 2002
+                - Fixed a warning dealing with $sock->connected
+
+0.20       Thu Apr  11 12:13:22 2002
+                - Finished interface redesign
+
+0.17       Wed Feb  11 04:18:31 2002
+               - Pod fixes
+
+0.16       Wed Feb   6 03:43:54 2002
+               - Increased modularity
+
+0.15       Tue Jan  22 22:20:34 2002
+               - Started increasing modularity to allow for subclassing
+
+0.12-0.14  Mon Jan  7  05:23:22 2002
+               - Performance patches
+
+0.05-0.11  Thu Dec  27 23:48:13 2001
+               - Cross platform issues resolved
+
+0.01-0.04  Sat Dec  15 23:34:44 2001
+               - Various security patches
+
+0.01       Thu Dec  6  17:16:03 2001
+	       - original version
+

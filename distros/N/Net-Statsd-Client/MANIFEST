@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+README.md
+cpanfile
+dist.ini
+lib/Net/Statsd/Client.pm
+lib/Net/Statsd/Client/Timer.pm
+t/basic.t
+t/lib/TestStatsd.pm
+t/live.t
+t/timer.t
+t/warning_callback.t

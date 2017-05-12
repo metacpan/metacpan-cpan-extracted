@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Net/OpenSRS/Email_APP.pm
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

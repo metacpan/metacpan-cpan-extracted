@@ -1,0 +1,4 @@
+Current TODOs for Net::FileShare are as follows
+	Fri 28 23:57:00 2003
+	- Considering a bandwidth throttle for servers
+	- Also, i've been considering the prospect of adding a source routing function for servers

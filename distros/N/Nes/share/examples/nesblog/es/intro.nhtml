@@ -1,0 +1,25 @@
+{: NES 1.0 none :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  Nes 1.03 by Skriptke
+  Copyright 2009 - 2010 Enrique Castañón
+  Licensed under the GNU GPL.
+
+  Sample:
+  http://nes.sourceforge.net/
+
+  CPAN:
+  http://search.cpan.org/dist/Nes/
+
+  Repository:
+  http://github.com/Skriptke/nes
+
+  -----------------------------------------------------------------------------
+:}        
+        <div id="intro">
+            <p align=center>
+            Sample to use Nes; Un potente sistema de plantillas para la Web en Perl.<br>
+            <small><small>Esta Web es un ejemplo de uso de Nes, usa <a href="./?{: $ link_source :}">Ver fuente</a> para ver como está hecha.</small></small>
+            </p>
+        </div> 

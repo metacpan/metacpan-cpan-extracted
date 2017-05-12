@@ -1,0 +1,6 @@
+blf_ctx *					T_PTROBJ
+const u_char *					T_PV
+struct chacha_ctx *				T_PTROBJ
+u_char *					T_PV
+u_int						T_UV
+Crypt::OpenSSH::ChachaPoly			T_PTROBJ

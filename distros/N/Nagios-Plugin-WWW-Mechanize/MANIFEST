@@ -1,0 +1,18 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Nagios/Plugin/WWW/Mechanize.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/lib/Nagios/Plugin.pm
+t/lib/WWW/Mechanize.pm
+t/new.t
+t/timer.t

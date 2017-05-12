@@ -1,0 +1,12 @@
+name: Cabal Test
+description: A Lovely Cabal
+jid: cabal-test@jabber.org
+password: oooooook
+twitter: cabal_test
+twitterpw: fooooooo
+accept:
+    ajid@jabber.org: foo
+    another@livejournal.com: bar
+avatar: cabal-avatar.png
+url: http://example.com/mycabal
+

@@ -1,0 +1,40 @@
+Net::Write
+==========
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Perl v5.6.1
+   Class::Gomor
+   Net::Pcap
+   Socket
+   Socket6 (if Socket does not support INET6 and getaddrinfo)
+   Socket::GetAddrInfo (optional, in case Socket/Socket6 fails for getaddrinfo)
+
+You MUST have libpcap 0.9.x or WinPcap 3.1 in order for layer 2 sending 
+to work, as of Net::Write 1.00.
+
+TESTED OK AGAINST
+
+   FreeBSD 6.1-RELEASE - Perl 5.8.8
+   Linux 2.6.x (Gentoo) - Perl 5.8.8
+   Windows XP SP2 - Perl 5.8.8
+   OpenBSD 3.8 - Perl 5.8.6
+
+COPYRIGHT AND LICENSE
+
+You may distribute this module under the terms of the Artistic license.
+See LICENSE.Artistic file in the source distribution archive.
+
+Copyright (c) 2006-2015, Patrice <GomoR> Auffret
+

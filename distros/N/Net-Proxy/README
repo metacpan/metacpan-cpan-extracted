@@ -1,0 +1,15 @@
+Net::Proxy
+----------
+
+This module is a framework for creating various kinds of network
+proxies in a very simple way.
+
+A proxy is a program that transfer data across a network boundary between
+a client and a server. Net::Proxy introduces the concept of "connectors",
+which abstract the server part (connected to the client) and the client
+part (connected to the server) of the proxy.
+
+This makes it very easy to implement specific techniques to cross a
+given network boundary, possibly by using a proxy on one side of the
+network fence, and a reverse-proxy on the other side of the fence.
+

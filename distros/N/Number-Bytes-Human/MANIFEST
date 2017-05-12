@@ -1,0 +1,22 @@
+Makefile.PL
+MANIFEST                        This list of files
+README
+Changes
+
+Human.pm
+
+t/01use.t
+t/02basic.t
+t/03large.t
+t/04base1000.t
+t/05zero.t
+t/06si.t
+t/07unit.t
+t/08base1M.t
+t/10parse_args.t
+t/20oo.t
+t/90pod.t
+t/98pod-coverage.t
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

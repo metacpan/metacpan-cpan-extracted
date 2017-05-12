@@ -1,0 +1,65 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 50be11dd7bb12efe831d4b7a559ed3b33190a404 Changes
+SHA1 36b7c397836f3bcbcf526758c77d325187c695f8 MANIFEST
+SHA1 709e2b0e18ec5de177cb2d88dd909d25092f964e META.yml
+SHA1 1499d5bc7df0298829a4f9dd707b3da9205dd909 Makefile.PL
+SHA1 c81101bd55268fcde93b4b17902b868ce3529b61 README
+SHA1 50c4d3b294728b5c8e544c7eb86d8c6d6dac76ee examples/client.pl
+SHA1 4a8be3d61ce776c0aaf2cc7b6e380984b3c27e32 lib/Net/TacacsPlus.pm
+SHA1 710893cc17d801ae4959c8268962d4c4f7dd3437 lib/Net/TacacsPlus/Client.pm
+SHA1 5d24ade54d0407dea13edfe8ca53dab860cc5b03 lib/Net/TacacsPlus/Constants.pm
+SHA1 4841da4d844dbf015e16ae4e4c35793d7dd6a274 lib/Net/TacacsPlus/Packet.pm
+SHA1 d1400de3f2f089a889bf1fee71464d1e880e78c5 lib/Net/TacacsPlus/Packet/AccountReplyBody.pm
+SHA1 0ddfa63bcab36d08f88d70433b2114a103418b50 lib/Net/TacacsPlus/Packet/AccountRequestBody.pm
+SHA1 76bd2e478818cf7e42b3d8ff2468c96df075a8f5 lib/Net/TacacsPlus/Packet/AuthenContinueBody.pm
+SHA1 08a1241f5a938c857794ccdfe423b0c20524792f lib/Net/TacacsPlus/Packet/AuthenReplyBody.pm
+SHA1 60bd1e0247018e4467bed0d1c3da8917bd7cf357 lib/Net/TacacsPlus/Packet/AuthenStartBody.pm
+SHA1 ce39485b9cd8ab7660efe14b3aae1dfa46bdf6fc lib/Net/TacacsPlus/Packet/AuthorRequestBody.pm
+SHA1 4abb9c92bcee76c18fe24051537242fa5f1d666d lib/Net/TacacsPlus/Packet/AuthorResponseBody.pm
+SHA1 602979926688fca6e4c59d22ce9b6529864cf07c lib/Net/TacacsPlus/Packet/Header.pm
+SHA1 41533fbd463e42d2ecf1e119eca910c16809d13e t/01-distribution.t
+SHA1 b2c309068359819c0e02e1c22e75c6795225c89f t/02-Net-TacacsPlus.t
+SHA1 7b23eae4b74fefcb4baa786af98a91023416e505 t/03-Net-TacacsPlus-Client.t
+SHA1 6e845db1a2926439a962bf9ea6a6d9e3c7159060 t/04-Packet.t
+SHA1 47c517941dc4556ff24f39b02f6b883afff3e1ed t/05-AccountReplyBody.t
+SHA1 36ee7333591a24883a3742ad61279c5d3dfa0d7a t/06-AccountRequestBody.t
+SHA1 ce4544e71601f15ee2d09b50029fd0da52576ce6 t/07-AuthenContinueBody.t
+SHA1 942dc4ee3153f8b04fa24d7ea0a530dc41dc55d4 t/08-AuthenReplyBody.t
+SHA1 b58771a1126cd96234447f8ced120281a66da7e4 t/09-AuthenStartBody.t
+SHA1 8aba1308fba6312b2dd57fedf249158185a801cb t/10-AuthorRequestBody.t
+SHA1 aa91febb380486bdc70b60542e4a4e99fe3f4aa9 t/11-AuthorResponseBody.t
+SHA1 a4f2c71ab4c08b2f23699dabd7c87f990235ad2f t/12-Net-TacacsPlus-Constant.t
+SHA1 3a8fa081129a583da1dec4b5882e815f350a497b t/pod-coverage.t
+SHA1 1c2221234c6e97bd628d78e90052efb1a794e6ec t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAEBAgAGBQJOD7PXAAoJEGN8PvITkwmbbgMP/A6hxEMF67KogM2ZmuJt0wpX
+5iu6gbaxGHVaLD6ApFHkv1iswNJM8kwixeb9qY1AuL9ChfNjkT7r6wuhAhlF6IR9
+k+e08cVvJTjb1fbSkdkDLkiHeE0zUAgKDd8viamnWFm6Cg0HzS8RCVcyCEftJoTn
+PCy3yAbZt6OrLkOyew5mV0WU6nlBQ9VlORj5WF/N2kx+uoCvF1U3YTtYTfQwfxkk
+PVYtAtCi5c1OAawIBmRLuPigoJB608fcDeRkr2R4FXm6CUeRguugB62TL2aytPS1
+aDqODH/ZbUziSJ0LK9UF6gwmX6QrNRDZh/5fN1J7b1GesqN1AJXtQsEdUWsxCB3I
+dduLmOA0wFzadUWUzmdfWyEoGE+z7+RuOJruqVMFSG5SRjHZgIJVnqZMkYR3zL8n
+6DWUSoL9NYguuzVFST0nDru4UfTJIlKsF5VrC8U8QzxAsOJsfnqIeYk7wT4M6a85
+rcV1+DG3VSQltxvEDJH5UEVgbuZlNlJ5DvdlQFqdQ08YaYv329/mx56yUSCIpsWm
+kr+WOMREPKlisrZJcekSslaWCRFUx/B5pY6Jelce8tRx6M+VBuGuQDRsGwod4b8f
+6JWtbJgSPxQoGiA+dBWRa3sbtxATKKMSExe9EC8Hzqyf2NTRLOJyXDvfU3q56Uhd
+wwvvwdm6uRvn19PWHC8n
+=BrY4
+-----END PGP SIGNATURE-----

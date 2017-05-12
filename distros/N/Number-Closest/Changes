@@ -1,0 +1,4 @@
+Revision history for Number-Closest
+
+0.06 Patch for result depending on order of numbers in list - RT #106811 (Gene Sullivan)
+0.05 Maintainer release

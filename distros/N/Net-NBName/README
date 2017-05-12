@@ -1,0 +1,33 @@
+Net::NBName
+===========
+
+DESCRIPTION
+
+Net::NBName is a class that allows you to perform simple NetBIOS Name
+Service Requests in your Perl code. It performs these NetBIOS operations over
+TCP/IP using Perl's built-in socket support.
+
+I've currently implemented two NBNS requests: the node status request
+and the name query request. The node status request can be used to query
+the NetBIOS name table of a remote host; the name query request can be
+used to establish the ip address of a NetBIOS name.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires only the standard Socket module.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002, 2003, 2004, 2005, 2006 James Macfarlane
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

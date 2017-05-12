@@ -1,0 +1,21 @@
+---
+abstract: 'DigitalOcean SPORE REST Client'
+author:
+  - 'Matt Finkel <fffinkel@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-DigitalOcean-SPORE
+requires:
+  Dir::Self: 0
+  Moose: 0
+  Net::HTTP::Spore: 0.06
+  namespace::autoclean: 0
+version: 0.002
+x_authority: cpan:FFFINKEL

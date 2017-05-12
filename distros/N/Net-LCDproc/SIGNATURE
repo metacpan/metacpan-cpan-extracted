@@ -1,0 +1,72 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 91dacb16ca837829b8afe8c5e62f93c2bb08c9aa Build.PL
+SHA1 6f71dec9f687808e1733ee079a06bca7530a3ac2 Changes
+SHA1 8659e4f44660079d72e8bfce057f21de5330db5a LICENSE
+SHA1 097ebd9383de23486b122f015f15ddff115fd84a MANIFEST
+SHA1 eafce0202d7331e90737d11c5d1034aa08809300 META.json
+SHA1 00e7579672a29a14193f8a93731c96c2f07451fa dist.ini
+SHA1 001576ba78638d4c4ad6b55ba2a84479db591239 doc/lcdproc_protocol.pod
+SHA1 8d9ba4d336850dcf37cdde2db6dffad4ffa53c53 eg/clock.pl
+SHA1 ea907358daee2de97310debae82ae9f625bd8414 eg/errors.pl
+SHA1 c61007d8a5e114c21dc4d554c5f776f1a3fc9ea5 eg/music.pl
+SHA1 392507dbdf5f2be5b8803636659d6608a3b5aa22 lib/Net/LCDproc.pm
+SHA1 df7499315894303ef54db749e8f62f19c21ec3c4 lib/Net/LCDproc/Error.pm
+SHA1 42734b0737e17151b5b95a9bcfab73db866cdc97 lib/Net/LCDproc/Role/Widget.pm
+SHA1 86d8f1a0a5d1987c081b2d230d9e8000f39e62f2 lib/Net/LCDproc/Screen.pm
+SHA1 e3369df3438b0be8a94c2dea1cc3d20151133b5b lib/Net/LCDproc/Widget.pm
+SHA1 e306834e8c46953b03c65ebf512f336bf869dd78 lib/Net/LCDproc/Widget/Frame.pm
+SHA1 2d2996516247ff218112ef4d80abb0552cb96660 lib/Net/LCDproc/Widget/HBar.pm
+SHA1 773163f08405fa7e0704de52e3f7f4067c88c7d0 lib/Net/LCDproc/Widget/Icon.pm
+SHA1 eeac081aa78f9a9f5499e2edd7941ffda44ca8c1 lib/Net/LCDproc/Widget/Num.pm
+SHA1 5c099d6a66866198447802199b9c00ae02cae011 lib/Net/LCDproc/Widget/Scroller.pm
+SHA1 7b7d69457c3622ccb53bbc2bc17ee84ef5e551c5 lib/Net/LCDproc/Widget/String.pm
+SHA1 05f0a4ebfa90d9281f1c691303e32a2c75379a37 lib/Net/LCDproc/Widget/Title.pm
+SHA1 61492c494c88a6630fd22afc45b0f34f3e4384ef lib/Net/LCDproc/Widget/VBar.pm
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 f9c60d8c0166bb8812cca8d782b6436a8240b5a3 t/00-compile.t
+SHA1 745d036245e16fe69f75e79362fcce149d95f6d7 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 4bc1eecd3e56855e188f7571d2f4adb88c72aac8 t/1_widgets.t
+SHA1 2a043c50795e9a44c1e032e85c44a0bcf5b330f8 xt/author/eol.t
+SHA1 8e869399e7b0de75dc3b1b01126f82fd0d1bc6b8 xt/author/no-tabs.t
+SHA1 199b3d456352d36185a3f28aaf40efb0475dacab xt/release/cpan-changes.t
+SHA1 d1d7aad8e90f60da78b7872043c416a032472490 xt/release/meta-json.t
+SHA1 bae663945a4380ca95a6ba5d8f5e42d2946e0629 xt/release/minimum-version.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 4146b75714ac972231d12d4fb93e764817a5eb0b xt/release/pod-linkcheck.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 a14318f6af8ac0d80aa575d08776795a43f4d25e xt/release/portability.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/release/synopsis.t
+SHA1 c24bd14c3f36a6c2208efea4e5695351e2fa904a xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJVb5S/AAoJEOpmRc2kYGBPhcQP+QEX1j8DjWObRjEzCK+pdI1/
+hUCzsxPRUbt8P5EOb8qAKuBl1wElfRK5cbJQujpe/w+dK3MRkALcGWzKjMUBxE+J
+Q+FQ6BNEWw4m4sI5uoJit10ib7TUQoQoOP6J1vJxJGj+v70zXMT9lagmJNlODdaE
+lRFdP6puRlmlKiAqwNNTZt4oHGLF9GDMPOOwG3cTG5IJr/PtRip7OuhdeA6i1ud+
+Uc1C5p84VNzQpN8i/ztVNpAjghVZsXvz499wO4KHMca2id2rOzgm+2vy91ZKJflH
+9V6s98PlNFnIl0OyQ8m9ziHGchxAJ+qcvJgm1r0vSfS+fCqX+KY0YV8p1JdDKdib
+OMtxM5nZsrtxqT53jM9yH1gyJwgbnX4u0gEtURKS6Z9P9gBdtKW5mcAhqC0e2qxa
+jZ820DVg6QGt1FeLyqYcG+MrpuHYUNGDAHAG5hafy61K5hwq/QGB+7etJOs6PKJ0
+UK/SDx/eTcYT8pdl4/qlqO2s1yAoScVj/NPfEcm3izrigWZuh9wmBz0X4xYAk78H
+SbPkDiyPLuk8OXp3rsO+Zt4lmfwjtmTZ4m6foEaguc5g0XJs7T4ok2b6HpRyFdlJ
+5WD4EfNlDr+flSW+sXZ+LA0ILLZycgNHmsQVgMNrRXydmvQbUD7LtLPoe1jr+7JW
+r/Ylpo57ZkXDdUuXKTbM
+=Fa61
+-----END PGP SIGNATURE-----

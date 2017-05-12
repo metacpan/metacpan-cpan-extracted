@@ -1,0 +1,11 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+check_max_len.pl
+dist.ini
+lib/Net/MyPeople/Bot.pm
+t/01-basic.t
+test.pl

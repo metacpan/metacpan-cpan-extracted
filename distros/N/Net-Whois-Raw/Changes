@@ -1,0 +1,694 @@
+Revision history for Perl module Net::Whois::Raw.
+
+2.99006  Feb 1 2017 Alexander Nalobin
+    - pwhois script approves IDN domains (ɢoogle.com)
+
+2.99005  Jan 26 2017 Oleg Gavrin
+     - speed optimizations
+
+2.99004    2017 Vadiml Likhota
+    - fix whois for .LA
+
+2.99003  Nov 22 2016 Oleg Gavrin, Christian Walde, Vadim Likhota, Alexander Nalobin
+    - maintanance tool for Data.pm
+    - a lot of new gTLDs whois servers added and fixed
+    - "not found" patterns fixed
+    - new tlds .NG, *.TH, .ID
+    - fix whois for .AU, .TH
+
+2.99002  Oct 17 2016 Alexander Nalobin, Vadim Likhota, Anton Chuvashev
+    - get rid of unused DBI dependency
+    - whois.iana.org for tld only query
+    - new tlds .RADIO.AM, .RADIO.FM, .SHOP, .SHOPPING, .GAMES
+    - new tld .HELP
+
+2.99001  Aug 01 2016 Vadim Likhota
+    - new tlds .PROMO, .ART, .FORUM
+    - fix whois for .JOBS, .LA, .MOBI
+    - set default whois whois.nic.TLD
+
+2.99    Jul 05 2016 Andrey Voyshko
+    - new tlds .GROUP
+
+2.98    Jun 22 2016 Anton Chuvashev
+    - new tlds .TUBE
+
+2.97    Jun 06 2016 Vadim Likhota
+    - fix whois for .NET.RU, .ORG.RU, .PP.RU
+    - new zones .STORE, .VIP
+
+2.96    Mar 31 2016 Anton Chuvashev
+    - new tlds .GAME, .PROMO
+
+2.95    May 24 2016 Alexander Nalobin
+    - new tld .VIP
+    - Update ZA, PRIV.AT whois, not available/exceed sentences thanx to @zdm
+
+2.94    Mar 31 2016 Alexander Nalobin
+    - new tlds .CAFE, .QA
+    - new 'not found' message of whois-dub.mm-registry.com
+
+2.93    Mar 06 2016 Vadim Likhota
+    - fix whois for .CC, .RU.NET, .COM.RU, .EXNET.RU, *.RU & *.SU geodomains
+    - new tlds .CLOUD, .BET, .PET, .AUTO, .CAR, .CARS, .BEST, .BROKER, .CAREER, .COURSES, .EARTH, .FILM, .FOREX, .MEN, .SRL, .STUDY, .FAMILY, .LIVE, .STUDIO
+
+2.92    Feb 10 2016  Vadim Likhota
+    - fix clear disclaimer for .ME, .MOBY .NAME, and .ORG
+    - fix whois for .OOO, .LA, .PRO and .PW
+    - new tlds .CONTACT, .FAN, .PID and .REALTY
+
+2.91    Oct 28 2015 Vadim Likhota
+    - even more new tlds of whois.centralnic.com
+
+2.89, 2.90    Oct 27 2015 Alexander Nalobin
+    - more new tlds of whois.centralnic.com
+
+2.88    Oct 27 2015 Alexander Nalobin
+    - new tld .SITE
+
+2.87    Sep 28 2015 Alexander Nalobin & Hugo Salgado
+    - basic IPv6 server support
+
+2.86    Sep 01 2015 Alexander Nalobin
+    - QRY_LAST/QRY_FIRST caching issue fix
+
+2.85    Jul 09 2015 Alexander Nalobin
+    - new tld .PRESS
+
+2.84    Mar 27 2015 Alexander Nalobin
+    - new tld .TATAR
+
+2.83    Mar 24 2015 Alexander Nalobin
+    - Fix getting whois of ARIN IP addresses
+    - Fix .sh и .pro "not found" patterns
+
+2.82    Jan 23 2015 Alexander Nalobin
+    - whois.jprs.jp whois server's encoding is UTF-8
+
+2.81    Jan 21 2015 Igor Zhuk
+    - new tld .MOSCOW
+
+2.80    Dec 03 2014 Alexander Nalivayko
+    - new tld .OOO
+
+2.79    Oct 18 2014 Dmitriy Shamatrin
+    - Added possibility to specify list of ips for selected whois servers
+    - Refactored logic for @SRC_IPS
+
+2.78    Oct 07 2014 Alexander Nalobin
+    - new tld .МОСКВА ( XN--80ADXHKS )
+
+2.77    Jul 17 2014 Dmitriy Seluzhitskiy
+    - new tld .WIEN
+
+2.76    Jul 2 2014 Alexander Nalobin
+    - hide internet dependent tests
+
+2.75    Jul 2 2014 Alexander Nalobin
+    - deps fix
+
+2.74    Jul 1 2014 Alexander Nalobin
+    - tests cleaning
+
+2.73    Jun 25 2014 Dmitriy Seluzhitskiy
+    - new tlds of http://uniregistry.com
+
+2.72    Jun 17 2014 Dmitriy Seluzhitskiy
+    - new tlds of http://mm-registry.com
+
+2.71    Jun 03 2014 Dmitriy Seluzhitskiy
+    - Add whois for .PW
+
+2.70    Jun 02 2014 Alexander Nalobin
+    - RT#96078 Fixed LANG handling in pwhois script
+
+2.69    May 27 2014 Dmitriy Seluzhitskiy
+    - change whois for .орг
+
+2.68    May 21 2014 Dmitriy Seluzhitskiy
+    - new tlds of donuts.co
+
+2.67    May 08 2014 Dmitriy Seluzhitskiy
+    - new tlds .LUXURY
+
+2.66    May 08 2014 Dmitriy Seluzhitskiy
+    - new tlds of United TLD Holdco Ltd (http://rightside.co)
+
+2.65    Apr 24 2014 Dmitriy Seluzhitskiy
+    - new tlds .CLUB
+
+2.64    Apr 22 2014 Dmitriy Seluzhitskiy
+    - new tlds .PINK .RED .SHIKSHA .KIM .BLUE
+
+2.63    Apr 17 2014 Dmitriy Seluzhitskiy
+    - Add whois.nic.build for .BUILD
+
+2.62    Apr 16 2014 Dmitriy Seluzhitskiy
+    - Add whois.dot-kiwi.com for .KIWI
+
+2.61    Apr 02 2014 Dmitriy Seluzhitskiy
+    - Add zones for whois.uniregistry.net
+
+2.60    Mar 21 2014 Dmitriy Shamatrin
+    - Added query suffix
+    - Added timeout to 02-internet.t for hangs prevention
+
+2.59    Mar 12 2014 Dmitriy Seluzhitskiy
+    - Fixed .domains whois error
+
+2.58    Mar 12 2014 Dmitriy Seluzhitskiy
+    - Add whois servers for gtld: .berlin
+
+2.57    Feb 25 2014 Victor Efimov
+    - Fix whois server for .BZ
+
+2.56    Feb 25 2014 Anton Chuvashev
+    - new tlds XN--D1ACJ3B, XN--80ASWG, XN--80ASEHDB
+
+2.55    Feb 24 2014 Alexander Nalobin
+    - RT#91930 Boilerplate stripping
+
+2.54    Feb 18 2014 Dmitriy Seluzhitskiy
+    - Add whois server for gtld, managed by Sugar Glen, LLC (http://donuts.co)
+
+2.53    Feb 07 2014 Alexander Nalobin
+    - TODAY whois server added
+
+2.52    Jan 24 2014 Alexander Nalobin
+    - Handling exceed limits of whois.name.com
+      and in recursive queries ( set $CHECK_EXCEED = 2 )
+
+2.51    Jan 16 2014 Victor Efimov
+    - RT#60339 fixed regexp for parsing .TJ web whois
+    - RT#64960 extend regexp for ReferralServer parsing (for recursive whois)
+    - Several timeout/alarm issues:
+        Fix race-condition between ALRM handler cleared and
+          alarm timer cleared (could result process to exit with signalal - i.e.
+          not possible to catch as die(), and no destructions called).
+        Fix action-at-distance - we were clearing alarm timer to zero, if alarm is
+          not used (i.e if TIMEOUT zero).
+        Substract time spent in request from outer alarm
+    - Fixed: unicode whois was damaging when using caching
+        Under POSIX systems pwhois now uses TMPDIR env, not TEMP.
+
+2.50    Jan 13 2014 Alexander Nalobin
+    - Handling exceed limits of whois.nic.cz
+    - IO whois updated.
+    - BY whois added.
+
+2.49    Dec 13 2013 Victor Efimov
+    - IN.NET, HR whois server added
+    - AC whois server fixed
+
+2.48    Sep 19 2013 Walery Studennikov
+    - Fixed encoding for com.ua domains
+
+2.47    Sep 13 2013 Timur Nozadze
+    - Fixed "not found" parsing form whois.centralnic.com
+
+2.46    Feb 12 2013 Alexander Nalobin
+    - Fixed TJ web whois (broken html)
+
+2.45    Jan 31 2013 Alexander Nalobin
+    - Using whois.netcom.cm for CM instead of web whois
+    - TV whois server updated
+    - BZ web whois updated
+    - MU, IN, CN web whois removed
+
+2.44    Jan 11 2013 Alexander Nalobin
+    - IPv6 whois support with Regexp::IPv6
+
+2.43    Aug 21 2012    gleecology
+    - IPv6 whois support
+
+2.42    Jul 11 2012    Alexander Nalobin
+    - utf8 encoding fix
+
+2.41    Mar 14 2012    Timur Nozadze
+    - Case-insensitive match for "not found" messages
+
+2.40    Jan 31 2012    Alex Bykov
+    - Now you can redefine SOCK_CLASS::getline method as you want
+    - require_once for Data::Dumper
+
+2.39    Dec 26 2011     Walery Studennikov
+        - internet tests updated
+    - Net::Whois::Raw::Data addons / updates, thanx to Guillaume
+
+2.38    Dec 09 2011     Walery Studennikov
+        - Confess instead of die to simplify error tracing
+
+2.37    Nov 24 2011     Walery Studennikov
+        - Fixed whois server address for *.ua domains
+
+2.36    Oct 25 2011     Ilya Chesnokov
+        - Fixed regexp for .PRO whois check
+
+2.35    Sep 06 2011     Ilya Chesnokov
+        - Added whois server for .XXX zone
+        - Fixed BZ whois (restored whois.belizenic.bz server)
+
+2.34    Aug 01 2011     Ilya Chesnokov
+        - Added whois server for .IN.UA zone
+
+2.33    Jul 29 2011     Ilya Chesnokov
+        - Added whois server for .CO.UA zone
+
+2.32    May 19 2011     Timur Nozadze
+        - Deleted whitespaces removing from the whois result
+
+2.31    Feb 28 2011     Ilya Chesnokov
+        - Added whois server for .SO zone
+
+2.30    Feb 09 2011     Walery Studennikov
+        - confess -> die :: no need to die such verbosely
+
+2.29    Jan 31 2011     Walery Studennikov
+        - Further migration from whois.relcom.ru to whois.nic.ru
+
+2.28    Jan 24 2011     Walery Studennikov
+        - whois.relcom.ru is no more. Using whois.nic.ru instead.
+        - Removed crutches for whois.relcom.ru / www_whois
+
+2.27    Nov 11 2010     Timur Nozadze
+        - Added domain name validation in pwhois
+        - Updated some 'not found' string
+
+2.26    Oct 06 2010     Timur Nozadze
+        - Fixed problem with passing server parameter from command line in pwhois
+        - Fixed problem with encoding detection in pwhois on Windows
+        - Added convertation to punycode in pwhois
+
+2.25    Sep 02 2010     Ilya Chesnokov
+        - And then again to www_whois (but to another URL)
+
+2.24    Sep 01 2010     Ilya Chesnokov
+        - For .BZ domains whois server changed from www_whois to whois.belizenic.bz
+
+2.23    Aug 25 2010    Walery Studennikov
+    - Fixed problem with tests for .TJ domains
+
+2.22    Apr 26 2010    Walery Studennikov
+    - Fixed $CACHE_TIME parameter documentation
+        - Fixed .CM zone processing
+        - Added real whois server for .KG zone
+
+2.21    Apr 20 2010     Ilya Chesnokov
+        - Added whois servers for zones: .MD, .GD, .HT, .IM, .KI, .LC, .TRAVEL, .FM, .CO
+        - Fixed whois servers for zones: .LA, .SB, .VN
+        - Fixed %strip hash for .CX, .MU, .NL, .TL
+        - Added .CM zone
+
+2.20    Apr 01 2010    Walery Studennikov
+    - $Net::Whois::Raw::USE_CNAMES option removed (who needs it??)
+    - Crutch for rechecking RELCOM-domains through WWW
+        - added 'not found' string for .kg domains
+
+2.19    Mar 26 2010    Walery Studennikov
+    - Exceed patterns updated for whois.eu
+    - Fixed whois_config (CHECK_EXCEED support)
+
+2.18    Mar 25 2010    Walery Studennikov
+    - Coro tests are turned off by default
+
+2.17    Feb 24 2010    Roman V. Nikolaev
+    - external hooks support: whois_query_sockparams, whois_query_socket, whois_query_ua
+
+2.16    Feb 24 2010    Alexander Ponomarev
+    - fixed 'www whois' test
+
+2.15    Feb 1 2010    Andrey Suslov
+    - added more tests to MANIFEST
+
+2.14    Feb 1 2010    Andrey Suslov
+    - search DNS-servers in .org, .biz, .name zones through
+      a whois-server of appropriate zone
+
+2.13    Jan 17 2010    Andrey Suslov
+    - fixed 'v-string' portability warning
+      (Ticket https://rt.cpan.org/Public/Bug/Display.html?id=53084)
+
+2.12    Dec 8 2009    Walery Studennikov
+    - now we require perl 5.8.1 and Encode
+
+2.11    Dec 1 2009    David T Dzhanaev
+    - fixed 02-internet.t tests broken when no connection
+      (Ticket https://rt.cpan.org/Public/Bug/Display.html?id=41712)
+    - fixed Cache broken in taint mode
+      (Ticket https://rt.cpan.org/Public/Bug/Display.html?id=47216)
+
+2.10    Nov 30 2009    David T Dzhanaev
+    - fixed -A param in pwhois
+      (Ticket https://rt.cpan.org/Public/Bug/Display.html?id=52144)
+
+2.09    Nov 26 2009    David T Dzhanaev
+    - support geographic domains for .RU and .SU zones
+
+2.08    Nov 24 2009    David T Dzhanaev
+    - multiple ccTLD zones added
+    - fixed case-sensitive search for an appropriate whois
+
+2.07    Nov 24 2009     Walery Studennikov
+    - support for cyrillic .RF domain
+    - fixes for multilingual TLDs
+
+2.06    Oct 22 2009     Ilya Chesnokov
+    - added internal answer postprocessing
+
+2.05    Sep 21 2009     Ilya Chesnokov, Vadim Likhota
+    - fix for .MN zone
+    - fixes for COM.UA ORG.UA KIEV.UA BIZ.UA zones
+    - add zone PP.UA
+
+2.04    Sep 16 2009    Walery Studennikov
+    - Support for list of whois servers which has no idn support
+
+2.03    Sep 10 2009    Andrey Kuzmin
+    - add five zones: COM.UA ORG.UA KIEV.UA BIZ.UA NOV.RU
+
+2.02    Aug 28 2009
+    - fix for twocows (by DAVINCHI)
+    - fix for "perl spits out an error if $res_srv is undefined" (by Ian Stuart)
+
+2.01    May 14 2009    Walery Studennikov
+    - support exceed pattern for .ws
+
+2.00    Mar 31 2009     Walery Studennikov, Vadim Likhota
+        - core now uses unicode (MAJOR CHANGE!!!!)
+        - all the data in Net::Whois::Raw::Data are counterchecked
+        - duplicating 'strip_whois' and 'check_existance' functions are deleated from Net::Whois::Raw::Common,
+          now only the data from Net::Whois::Raw::Data are used instead of them
+        - now flags OMIT_MSG and CHECK_FAIL supports only true and false values.
+          Support for OMIT_MSG == 2 and CHECK_FAIL == 2 was dropped.
+    - fixes for .CN and .VN domains
+
+1.67    Mar 30 2009    Alexey Sharipov
+    - fixed caching issues
+
+1.66    Mar 26 2009     Walery Studennikov
+    - fixed tests
+
+1.65    Mar 25 2009     Walery Studennikov
+        - add whois server for .TEL domains
+    - SPB.RU and MSK.RU zones are removed from www_whois
+
+1.64    Feb 25 2009     Vadim Likhota, Walery Studennikov
+        - add www.nic.tj whois via www_whois_query (now whois.nic.tj not work)
+
+1.63    Feb 09 2009    Walery Studennikov
+    - turn off test for www_whois_query for 'nic.ac'. It fails too often
+
+1.62    Feb 04 2009    Walery Studennikov
+    - fixed getting whois info via HTTP from nic.ac
+
+1.61    Jan 27 2009     Vadim Likhota, Walery Studennikov
+        - add whois.nic.name for .NS query for .name domains in addition for whois.nsiregistry.net
+    - add Test::More to module requirements
+    - add colourable user agent to satisfy http://nic.ac/
+
+1.60    Nov 14 2008    Walery Studennikov
+    - pwhois script rewritten (use Getopt::Long)
+    - small bugfixes + code layout foxes
+
+1.59    Nov 14 2008    ivan baktsheev
+    - now client can offer his own dns resolver and smart local socket selection
+    - added option to change default socket
+    - added "banned" message from internic
+
+1.58    Nov 07 2008     Walery Studennikov
+    - Added .BZ support (www_whois)
+
+1.57    Aug 11 2008     Walery Studennikov
+    - Removed annoying warning from Net/Whois/Raw.pm
+
+1.56    Jul 31 2008     Pavel Odintsov
+        - .vn support fixed
+        - HTTP POST requests fixed
+
+1.54    Jun 28 2008    Matsui Shinsuke
+    - .ac support added
+
+1.53    Mar 31 2008    Sergey Kotenko
+    - fixed warnings on cache writing
+
+1.52    Mar 26 2008     Walery Studennikov
+        - .asia support added
+
+1.51    Mar 12 2008     Sergey Kotenko
+        - test 02-internet.t fixed to work correctly on MS Windows.
+
+1.50    Mar 11 2008    Sergey Kotenko
+    - version bounce due to a large refactoring
+    - some more code moved to Net::Whois::Raw::Common
+    - new caching mechanism
+    - tests writen for Net::Whois::Raw::Common
+        - tests writen for checking the correctness of whois-servers
+
+1.43    Feb 29 2008    Sergey Kotenko
+    - common code moved to Net::Whois::Raw::Common. Can be used by other modules.
+
+1.42    Feb 25 2008    Sergey Kotenko
+    - added whois server (http) for .VN
+
+1.41    Feb 08 2008    Sergey Kotenko
+    - added %Net::Whois::Raw::POSTPROCESS
+
+1.40    Feb 04 2008    Sergey Kotenko
+    - fixed parsing of excessive querying for whois.ripn.net
+
+1.39    Nov 22 2007    Walery Studennikov
+    - added strip patterns for whois.nordnet.net
+
+1.38    Nov 21 2007    Walery Studennikov
+    - added strip patterns for whois.dotster.com
+
+1.37    Nov 20 2007    Walery Studennikov
+    - added strip patterns for whois.godaddy.com, whois.paycenter.com.cn, whois.enom.com
+
+1.36    Nov 15 2007    Walery Studennikov
+    - update documentation (setup variables description)
+    - change "use vars" to "our" in Net::Whois::Raw::Data
+    - start to build postprocessing framework (added %Net::Whois::Raw::Data::postprocess)
+
+1.35    Nov 06 2007    Walery Studennikov
+    - strip copyright notices for .mobi domains
+
+1.33    Oct 10 2007    Walery Srudennikov
+    - added whois servers for many CentralNIC TLDs in New::Whois::Raw::Data
+
+1.32    Sep 07 2007    Walery Srudennikov
+    - added support for WHOIS requests for any object (not only for domain),
+      for example, WHOIS requests for registrars now supported
+
+1.31    Sep 06 2007    Walery Studennikov
+    - fexes in pwhois caused by today's module changes
+
+1.30    Sep 06 2007    Walery Studennikov
+    - Carp::confess instead of die when can't connect
+    - Don't use Exporter anymore; revised export list (can cause some incompatibilities, so version number bumped)
+
+1.24    Aug 15 2007    Walery Studennikov
+    - More descriptive error message when can't create socket
+
+1.23    May 22 2007
+    - Added $DEBUG initialization (Walery Studennikov)
+    - Path for obtaining complete WHOIS info for .name domains (Yulia Shtyrjakova)
+
+1.22    May 16 2007    Walery Studennikov
+    - Removed legacy RACE encoding support
+    - Default cache time set to 60 minutes
+    - Fixed timeout behaviour. Now timeouts are more robust
+      (Ticket http://rt.cpan.org/Ticket/Display.html?id=27097)
+    - Small refactoring
+
+1.21    Apr 13 2007    Danil Krivopustov
+    - fixes for Net::Whois::Raw::Data
+
+1.20    Nov 18 2006    Walery Studennikov
+    - !INTERFACE CHANGE: CACHE_TIME now specifies time in minutes,
+      not in hours. Hours are too rough for some applications. Sorry :(
+    - Bumped version number for the above reason
+
+1.14    Aug 24 2006    Doug Barton
+    - Addons to Net::Whois::Raw::Data
+
+1.13    Aug 20 2006    Doug Barton
+    - Addons + restyling of Net::Whois::Raw::Data
+
+1.12    Aug 16 2006    Roman Filippov
+    - changed whois server for .gs
+
+1.11    Aug 10 2006
+    - changed whois server for .aero (Danil Krivopustov)
+    - added fail check for whois.melbourneit.com (Yulia Shtyrjakova)
+
+1.10    Jul 30 2006    K. J. Cheetham
+    - addons to %Net::Whois::Raw::Data::exceed hash
+
+1.09    Jul 27 2006    Reto Grossenbacher
+    - fixed strip patterns for yesterday's changes
+
+1.08    Jul 26 2006    Reto Grossenbacher
+    - changed WHOIS servers for .CH and .LI domains
+
+1.07    Apr 12 2006    Martin Lee
+    - replaced .JP whois server address
+
+1.06    Apr 03 2006    Walery Studennikov
+    - fix manual page for pwhois script
+
+1.05    Apr 03 2006    Walery Studennikov
+    - added new options to pwhois script
+
+1.04    Mar 22 2006    Bram
+    - added whois.eu server
+
+1.03    Mar 21 2006    David Parry
+    - change whois server name for .CA
+
+1.02    Feb 04 2006    Walery Studennikov
+    - change version numbering scheme
+    - change pynycode names of IDN names
+
+1.1.2    Jan 18 2006    Walery Studennikov
+    - switch .spb.ru and .msk.ru to HTTP
+
+1.1.1    Jan 18 2006    Walery Studennikov
+    - fix WHOIS-over-HTTP: added missing function koi2win,
+
+1.1.0    Jan 16 2006    Walery Studennikov
+    - improved obtaining WHOIS of IP addresses.
+      Patterns for recursive WHOIS queries were borrowed
+      from Net::Whois::IP. Many thanks to Net::Whois::IP author Ben Schmitz
+
+1.0.1    Jan 13 2006    Danil Krivopustov <KrivopustovDA@regtime.net>
+    - fixed obtaining WHOIS of IP addresses (split_domname function)
+
+1.0.0    Jan 11 2006    Walery Studennikov
+    - new major release: added obtaining WHOIS results via HTTP:
+      now .IN and .KZ domains are queried via HTTP by default.
+      To force querying other domain via HTTP you should provide
+      server name 'www_whois'
+
+0.99  Jan 10 2006    Walery Studennikov
+    - added whois server for .KZ
+
+0.98  Sep 19 2005    Bernd Ahlers <b.ahlers@ba-net.org>
+    - small typo fixes
+
+0.97  Jul 26 2005    Bernd Ahlers <b.ahlers@ba-net.org>
+    - update for DENIC whois server
+
+0.96  Jun 28 2005    Walery Studennikov
+    - ???
+
+0.95  May 16 2005    Walery Studennikov
+    - new parameter "-a" (source ip address) in pwhois script
+
+0.94  Apr 26 2005    Marc Jauvin
+    - TIMEOUT implementation fix
+
+0.93  Apr 13 2005    Walery Studennikov
+    - updated WHOIS server for AU zone
+
+0.92  Mar 28 2005    Walery Studennikov
+    - new fail check patterns
+
+0.91  Mar 04 2005    Walery Studennikov
+    - fixed bug (introduced in v0.90) that caused fault of DNS server whois queries
+    - new test for DNS servers whois
+
+0.90  Mar 03 2005    Walery Studennikov
+    - total rewrite / restructuring of module
+    - new exported function: get_whois
+
+0.43  Feb 04 2005    Walery Studennikov
+    - new options (exported variables): @SRC_IPS, $CHECK_EXCEED
+
+0.42  Jan 11 2005    Sun Guonian
+    - update hostname of CN whois server
+
+0.41  Dec 17 2004    Luis Moreno
+    - fix caching when using a particular whois server in whois function
+
+0.40  Dec 09 2004    Walery Studennikov
+    - add fail pattern for whois.dns.be
+
+0.39  Oct 29 2004    Walery Studennikov
+    - more fixes for Raw.pm that ensures that we do not get confused when
+      looking up a domain which has many entries in the whois database
+      (for WHOIS.CRSNIC.NET)
+
+0.38  Sep 23 2004    Walery Studennikov
+    - fixed recursive whois requests for .ws domains
+    - strip patterns for whois.directnic.com
+    - fix strip mechanism in case of recusive whois requests
+
+0.37  Aug 11 2004    Walery Studennikov
+    - fixed recursive whois requests for .tv domains
+
+0.36  Jul 22 2004    Richard Poole
+    - fix for Raw.pm that ensures that we do not get confused when
+      looking up a domain which has many entries in the whois database
+      (for WHOIS.CRSNIC.NET)
+
+0.35  Jun 29 2004    Walery Studennikov
+    - fix of regexp pattern in check_existance
+
+0.34  May 18 2004    Richard Poole
+    - new whois server in Data.pm - whois.centralnic.com
+
+0.33  Apr 21 2004    Walery Studennikov
+    - new whois server in Data.pm - whois.regtime.net
+
+0.32  Apr 07 2004    IVAN
+    - small fix allows the module to work under 5.005
+
+0.31  Mar 19 2004    Walery Studennikov
+    - more robust recursive whois queries
+
+0.30  Mar 15 2004    Walery Studennikov
+    - added strip rules for whois.dns.be
+
+0.29  Feb 24 2004    Walery Studennikov
+    - fixed extra rules which strips the copyright message or disclaimer
+    - removed pwhois.PL. "pwhois" is shipped now instead.
+    - data structures in Net/Whois/Raw/Data.pm reformatted
+    - new strip patterns for whois.crsnic.net
+
+
+0.28  Feb 20 2004    Alex Kapranoff
+    - fixed documentation for pwhois.PL
+
+0.27  Feb 10 2004    Alex Kapranoff
+    - patch to check availability of .info and .biz domains
+
+0.26  Jan 09 2004    Walery Studennikov
+    - added recursive whois requests for .cc domains
+    - fixed recursive whois requests for whois.crsnic.net
+
+0.25  Nov 21 2003    Walery Studennikov
+    - fixed multilingual domains whois via whois.melbourneit.com server
+    - whois_config function for setting config variables
+      (if setting imported variables $OMIT_MSG, $CHECK_FAIL etc.
+      doesn't work for some reason, for example because of
+      namespace problems in mod_perl scripts)
+
+0.24  Nov 18 2003    Walery Studennikov
+    - fixed whois server for .org domains and add new whois servers
+      for multilingual domains
+    - fixed recursive whois requests for .org domains
+    - new fail-check and strip patterns added
+    - more verbose error messages
+    - added support for third level domains
+    - some bugfixes
+
+0.23  Mar 25 2003
+    - only exports &whois by default, the other variables are exportable still.
+    - incorporated new whois servers ( thanks Toni Mueller <support@oeko.net> )
+    - now tests the main tlds
+    - added some more regexen to strip out disclaimers and such ( for $OMIT_MSG > 2 ).
+    - moved %servers to %Net::Whois::Raw::Data::servers
+
+0.01  Jul 05 2000
+    - original version; created by h2xs 1.19

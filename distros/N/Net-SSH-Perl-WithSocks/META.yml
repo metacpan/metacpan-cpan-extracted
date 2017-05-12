@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Net-SSH-Perl-WithSocks
+version:            0.02
+abstract:           Connect to an SSH host through a TCP proxy
+author:
+    - Jennie Rose Evers-Corvina <seven@nanabox.net>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    IO::Socket::Socks:  0
+    IPC::PerlSSH:       0
+    Net::SSH::Perl:     0
+resources:
+    repository:  https://github.com/briandfoy/Net-SSH-Perl-WithSocks
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

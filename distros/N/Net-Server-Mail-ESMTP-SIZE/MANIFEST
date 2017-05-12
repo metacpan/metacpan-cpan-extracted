@@ -1,0 +1,12 @@
+Changes
+lib/Net/Server/Mail/ESMTP/SIZE.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/001_load.t
+t/002_size.t
+t/pod.t
+t/podcoverage.t
+Todo
+META.yml                                 Module meta-data (added by MakeMaker)

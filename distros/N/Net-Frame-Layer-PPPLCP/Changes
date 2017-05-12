@@ -1,0 +1,9 @@
+Revision history for Perl extension Net::Frame::Layer::PPPLCP.
+
+1.01 Wed Jan 14 07:45:16 CET 2015
+   - update: copyright notice
+   - update: Kwalitee
+
+1.00 Sun Apr  1 19:11:29 CEST 2007
+   - first public release
+

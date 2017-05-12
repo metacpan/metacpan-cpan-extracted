@@ -1,0 +1,414 @@
+NAME
+    Net::MovableType - light-weight MovableType client
+
+SYNOPSIS
+      use Net::MovableType;
+      my $mt = new Net::MovableType('http://mt.handalak.com/cgi-bin/xmlrpc');
+      $mt->username('user');
+      $mt->password('secret');
+      $mt->blogId(1);
+
+      my $entries = $mt->getRecentPosts(5);
+      while ( my $entry = shift @$entries ) {
+        printf("[%02d] - %s\n\tURI: %s\n",
+               $entry->{postid}, $entry->{title}, $entry->{'link'} )
+      }
+
+DESCRIPTION
+    Using *Net::MovableType* you can post new entries, edit existing
+    entries, browse entries and users blogs, and perform most of the
+    features you can perform through accessing your MovableType account.
+
+    Since *Net::MovableType* uses MT's *remote procedure call* gateway, you
+    can do it from any computer with Internet connection.
+
+PROGRAMMING INTERFACE
+    *Net::MovableType* promises an intuitive, user friendly, Object Oriented
+    interface for managing your web sites published through MovableType.
+    Most of the method names correspond to those documented in MovableType's
+    Programming Interface Manual.
+
+  CREATING MT OBJECT
+
+    Before you start doing anything, you need to have a *MovableType* object
+    handy. You can create a *MovableType* object by calling "new()" -
+    constructor method:
+
+        $mt = new MovableType('http://mt.handalak.com/cgi-bin/mt-xmlrpc.cgi');
+        # or
+        $mt = new MovableType('http://author.handalak.com/rsd.xml');
+        # or even..
+        $mt = new MovableType('/home/sherzodr/public_html/author/rsd.xml');
+
+    Notice, you need to pass at least one argument while creating *MT*
+    object, that is the location of your either mt-xmlrpc.cgi file, or your
+    web site's rsd.xml file. Default templates of *MT* already generate
+    rsd.xml file for you. If they don't, you should get one from
+    http://www.movabletype.org/
+
+    If your rsd.xml file is available locally, you should provide a full
+    path to the file instead of providing it as a URL. Reading the file
+    locally is more efficient than fetching it over the Web.
+
+    Giving it a location of your rsd.xml file is preferred, since it will
+    ensure that your "blogId()" will be set properly. Otherwise, you will
+    have to do it manually calling "blogId()" (see later).
+
+    It is very important that you get this one right. Otherwise,
+    *Net::MovableType* will know neither about where your web site is nor
+    how to access them.
+
+    *MovableType* requires you to provide valid username/password pair to do
+    most of the things. So you need to tell *MovableType* object about your
+    username and passwords, so it can use them to access the resources.
+
+    You can login in two ways; by either providing your *username* and
+    *password* while creating *MT* object, or by calling "username()" and
+    "password()" methods after creating *MT* object:
+
+        # creating MT object with valid username/password:
+        $proxy = 'http://mt.handalak.com/cgi-bin/mt-xmlrpc.cgi';
+        $mt = new MovableType($proxy, 'author', 'password');
+
+        # or
+        $mt = new MovableType($proxy);
+        $mt->username('author');
+        $mt->password('password');
+
+    "username()" and "password()" methods are used for both setting username
+    and password, as well as for retrieving username and password for the
+    current logged in. Just don't pass it any arguments should you wish to
+    use for the latter purpose.
+
+  DEFINING A BLOG ID
+
+    Defining a blog id may not be necessary if you generated your
+    *Net::MovableType* object with an rsd.xml file. Otherwise, read on.
+
+    As we will see in subsequent sections, most of the *MovableType*'s
+    methods operate on specific web log. For defining a default web log to
+    operate on, after setting above *username* and *password*, you can also
+    set your default blog id using "blogId()" method:
+
+        $mt->blogId(1);
+
+    To be able to do that, you first need to know your blog id. There are no
+    documented ways of retrieving your blog id, except for investigating the
+    URL of your MovableType account panel. Just login to your MovableType
+    control panel (through mt.cgi script). In the first screen, you should
+    see a list of your web logs. Click on the web log in question, and look
+    at the URL of the current window. In my case, it is:
+
+        http://mt.handalak.com/cgi-bin/mt?__mode=menu&blog_id=1
+
+    Notice *blog_id* parameter? That's the one!
+
+    Wish you didn't have to go through all those steps to find out your blog
+    id? *Net::MovableType* provides "resolveBlogId()" method, which accepts
+    a name of the web log, and returns correct blogId:
+
+        $blog_id = $mt->resolveBlogId('lost+found');
+        $mt->blogId($blog_id);
+
+    Another way of retrieving information about your web logs is to get all
+    the lists of your web logs by calling "getUsersBlogs()" method:
+
+        $blogs = $mt->getUsersBlogs();
+
+    "getUsersBlogs()" returns list of blogs, where each blog is represented
+    with a hashref. Each hashref holds such information as *blogid*,
+    *blogName* and *url*. Following example lists all the blogs belonging to
+    the current logged in user:
+
+        $blogs = $mt->getUsersBlogs();
+        for $b ( @$blogs ) {
+            printf("[%02d] %s\n\t%s\n", $b->{blogid}, $b->{blogName}, $b->{url})
+        }
+
+  POSTING NEW ENTRY
+
+    By now, you know how to login and how to define your blog_id. Now is a
+    good time to post a new article to your web log. That's what "newPost()"
+    method is for.
+
+    "newPost()" expects at least a single argument, which should be a
+    reference to a hash containing all the details of your new entry. First,
+    let's define a new entry to be posted on our web log:
+
+        $entry = {
+            title       => "Hello World from Net::MovableType",
+            description => "Look ma, no hands!"
+        };
+
+    Now, we can pass above "$entry" to our "newPost()" method:
+
+        $mt->newPost($entry);
+
+    In the above example, *description* field corresponds to Entry Body
+    field of MovableType. This is accessible from within your templates
+    through *MTEntryBody* tag. MovableType allows you to define more entry
+    properties than we did above. Following is the list of all the
+    attributes we could've defined in our above "$entry":
+
+    dateCreated
+        *Authored Date* attribute of the entry. Format of the date should be
+        in *ISO.8601* format
+
+    mt_allow_comments
+        Should comments be allowed for this entry
+
+    mt_allow_pings
+        should pings be allowed for this entry
+
+    mt_convert_breaks
+        Should it use "Convert Breaks" text formatter?
+
+    mt_text_more
+        Extended entry
+
+    mt_excerpt
+        Excerpt of the entry
+
+    mt_keywords
+        Keywords for the entry
+
+    mt_tb_ping_urls
+        List of track back ping urls
+
+    Above entry is posted to your MT database. But you still don't see it in
+    your weblog, do you? It's because, the entry is still not published.
+    There are several ways of publishing an entry. If you pass a true value
+    to "newPost()" as the second argument, it will publish your entry
+    automatically:
+
+        $mt->newPost($entry, 1);
+
+    You can also publish your post by calling "publishPost()" method.
+    "publishPost()", however, needs to know *id* of the entry to publish.
+    Our above "newPost()", luckily, already returns this information, which
+    we've been ignoring until now:
+
+        my $new_id = $mt->newPost($entry);
+        $mt->publishPost($new_id);
+
+    You can also publish your post later, manually, by simply rebuilding
+    your web log from within your MT control panel.
+
+  ENTRY CATEGORIES
+
+    *MovableType* also allows entries to be associated with specific
+    category, or even with multiple categories. For example, above "$entry",
+    we just published, may belong to category "Tutorials".
+
+    Unfortunately, structure of our "$entry" doesn't have any slots for
+    defining its categories. This task is performed by a separate procedure,
+    "setPostCategories()".
+
+    "setPostCategories()" expects two arguments. First should be *postid* of
+    the post to assign categories to, and second argument should either be a
+    name of the primary category, or a list of categories in the form of an
+    arrayref. In the latter case, the first category mentioned becomes
+    entry's primary category.
+
+    For example, let's re-post our above "$entry", but this time assign it
+    to "Tutorials" category:
+
+        $new_id = $mt->newPost($entry, 0);  # <-- not publishing it yet
+        $mt->setPostCategories($new_id, "Tutorials");
+        $mt->publishPost($new_id);
+
+    We could also assign a single entry to multiple categories. Say, to both
+    "Tutorials" and "Daily Endeavors". But say, we want "Daily Endeavors" to
+    be the primary category for this entry:
+
+        $new_id = $mt->newPost($entry, 0);  # <-- not publishing it yet
+        $mt->setPostCategories($newPid, ["Daily Endeavors", "Tutorials"]);
+        $mt->publishPost($new_id);
+
+    Notice, in above examples we made sure that "newPost()" method didn't
+    publish the entry by passing it false value as the second argument. If
+    we published it, we again would end up having to re-publish the entry
+    after calling "setPostCategories()", thus wasting unnecessary resources.
+
+  BROWSING ENTRIES
+
+    Say, you want to be able to retrieve a list of entries from your web
+    log. There couple of ways for doing this. If you just want titles of
+    your entries, consider using "getRecentPostTitles()" method.
+    "getRecentPostTitles()" returns an array of references to a hash, where
+    each hashref contains fields *dateCreated*, *userid*, *postid* and
+    *title*.
+
+    "getRecentPostTitles()" accepts a single argument, denoting the number
+    of recent entries to retrieve. If you don't pass any arguments, it
+    defaults to *1*:
+
+        $recentTitles = $mt->getRecentPostTitles(10);
+        for my $post ( @$resentTitles ) {
+            printf("[%03d] %s\n", $post->{postid}, $post->{title})
+        }
+
+    Remember, even if you don't pass any arguments to
+    "getRecentPostTitles()", it still returns an array of hashrefs, but this
+    array will hold only one element:
+
+        $recentTitle = $mt->getRecentPostTitles();
+        printf("[%03d] %s\n", $recentTitles->[0]->{postid}, $recentTitles->[0]->{title});
+
+    Another way of browsing a list of entries, is through "getRecentPosts()"
+    method. Use of this method is identical to above-discussed
+    "getRecentPostTitles()", but this one returns a lot more information
+    about each post. It can accept a single argument, denoting number of
+    recent entries to retrieve.
+
+    Elements of the returned hash are compatible with the "$entry" we
+    constructed in earlier sections.
+
+  RETREIVING A SINGLE ENTRY
+
+    Sometimes, you may want to retrieve a specific entry from your web log.
+    That's what "getPost()" method does. It accepts a single argument,
+    denoting an id of the post, and returns a hashref, keys of which are
+    compatible with the "$entry" we built in earlier sections (see POSTING
+    NEW ENTRY):
+
+        my $post = $mt->getPost(134);
+        printf("Title: %s (%d)\n", $post->{title}, $post->{postid});
+        printf("Excerpt: %s\n\n", $post->{mt_excerpt} );
+        printf("BODY: \n%s\n", $post->{description});
+        if ( $post->{mt_text_more} ) {
+            printf("\nEXTENDED ENTRY:\n", $post->{mt_text_more} );
+        }
+
+  EDITING ENTRY
+
+    Editing an entry means to re-post the entry. This is done almost the
+    same way as the entry has been published. "editPost()" method, which is
+    very similar in use to "newPost()", but accepts a *postid* denoting the
+    id of the post that you are editing. Second argument should be a
+    hashref, describing fields of the entry. Structure of this hashref was
+    discussed in earlier sections (see POSTING NEW ENTRY):
+
+        $mt->editPost($postid, $entry)
+
+  DELETING ENTRY
+
+    You can delete a specific entry from your database (and weblog) using
+    "deletePost()" method. "deletePost()" accepts at least one argument,
+    which is the id of the post to be deleted:
+
+        $mt->deletePost(122);   # <-- deleting post 122
+
+    By default entries are deleted form the database, not from your web log.
+    They usually fade away once your web log is rebuilt. However, it may be
+    more desirable to remove the entry both from the database and from the
+    web site at the same time.
+
+    This can be done by passing a true value as the second argument to
+    "deletePost()". This ensures that your pages pertaining to the deleted
+    entry are rebuilt:
+
+        $mt->deletePost(122, 1); # <-- delet post 122, and rebuilt the web site
+
+  UPLOADING
+
+    With *Net::MovableType*, you can also upload files to your web site.
+    Most common use of this feature is to associate an image, or some other
+    downloadable file with your entries.
+
+    *Net::MovableType* provides "upload()" method, which given a file
+    contents, uploads it to your web site's archives folder. On success,
+    returns the URL of the newly uploaded file.
+
+    "upload()" method accepts either a full path to your file, or a
+    reference to its contents. Second argument to upload() should be the
+    file's name. If you already provided file's full path as the first
+    argument, *Net::MovableType* resolves the name of the file
+    automatically, if it's missing.
+
+    If you passed the contents of the file as the first argument, you are
+    required to provide the name of the file explicitly.
+
+    Consider the following code, which uploads a logo.gif file to your web
+    site:
+
+        $url = $mt->upload('D:\images\logo.gif');
+
+    Following example uploads the same file, but saves it as "my-log.gif",
+    instead of "logo.gif":
+
+        $url = $mt->upload('D:\images\logo.gif', 'my-logo.gif');
+    
+    Following example downloads a file from some remote location, using
+    LWP::Simple, and uploads it to your web site with name "image.jpeg":
+
+        use LWP::Simple;
+
+        $content = get('http://some.dot.com/image.jpeg');
+        $url = $mt->upload( \$content, 'image.jpeg' )
+
+ERROR HANDLING
+    If you noticed, we didn't even try to check if any of our remote
+    procedure calls succeeded. This is to keep the examples as clean as
+    possible.
+
+    For example, consider the following call:
+
+        $new_id = $mt->newPost($entry, 1);
+
+    There is no guarantee that the above entry is posted, nor published. You
+    username/password might be wrong, or you made a mistake while defining
+    your *mt-xmlrpc* gateway? You may never know until its too late.
+
+    That's why you should always check the return value of the methods that
+    make a remote procedure call.
+
+    All the methods return true on success, "undef" otherwise. Error message
+    from the latest procedure call is available by calling "errstr()" static
+    class method. Code of the error message (not always as useful) can be
+    retrieved through "errcode()" static class method:
+
+        $new_id = $mt->newPost($entry, 1);
+        unless ( defined $new_id ) {
+            die $mt->errstr
+        }
+
+    or just:
+
+        $new_id = $mt->newPost($entry, 1) or die $mt->errstr;
+
+    If you are creating your *MovableType* object with an rsd.xml file, you
+    should also check the return value of "new()":
+
+        $mt = new Net::MovableType($rsd_url);
+        unless ( defined $mt ) {
+            die "couldn't create MT object with $rsd_url: " . Net::MovableType->errstr
+        }
+
+TODO
+    Should implement a caching mechanism
+
+    Manual is still not complete, more methods are left to be documented
+    properly
+
+CREDITS
+    Following people have contributed to the library with their suggestions
+    and patches. The list may not be complete. Please help me with it.
+
+    Atsushi Sano
+        For rsd.xml and "newMediaObject()" support.
+
+COPYRIGHT
+    Copyright (C) 2003, Sherzod B. Ruzmetov. All rights reserved.
+
+    This library is a free software, and can be modified and distributed
+    under the same terms as Perl itself.
+
+AUTHOR
+    Sherzod Ruzmetov <sherzodr AT cpan.org>
+
+    http://author.handalak.com/
+
+SEE ALSO
+    the Net::Blogger manpage
+

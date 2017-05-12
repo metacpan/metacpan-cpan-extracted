@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<app>
+    <config></config>
+    <route>route.xml</route>
+    <log_file>log.pm</log_file>
+    <action_name>action,route,cmd</action_name>
+    <default_route>/Home/Home/home</default_route>
+    <charset>utf-8</charset>
+    <theme>default</theme>
+    <lang>en-US</lang>
+    <lang_param_key>lang</lang_param_key>
+    <lang_cookie_key>lang</lang_cookie_key>
+    <lang_session_key>lang</lang_session_key>
+    <lang_file>general</lang_file>
+</app>
+
+<admin>
+    <user>admin_user</user>
+    <password>admin_pass</password>
+</admin>
+
+<db_connect>1</db_connect>
+<dbi>
+    <dsn></dsn>
+    <driver>mysql</driver>
+    <host>localhost</host>
+    <port>3306</port>
+    <name>auctions</name>
+    <user>auctions</user>
+    <pass>auctions</pass>
+    <attr>
+    </attr>
+</dbi>
+
+<settings>
+    <table>AuctionConfig</table>
+    <name>name</name>
+    <value>value</value>
+</settings>
+
+<module>
+    <home>
+        <header>home</header>
+        <footer>footer</footer>
+    </home>
+</module>
+
+<plugin>
+    <email>
+        <transport>Sendmail</transport>
+        <sendmail>/usr/sbin/sendmail</sendmail>
+    </email>
+
+    <session>
+        <autoload>1</autoload>
+        <key>nile_session_key</key>
+        <expire>1 year</expire>
+        <cache>
+            <driver>File</driver>
+            <root_dir></root_dir>
+            <namespace>session</namespace>
+        </cache>
+        <cookie>
+            <path>/</path>
+            <secure></secure>
+            <domain></domain>
+            <httponly></httponly>
+        </cookie>
+    </session>
+
+    <cache>
+        <autoload>0</autoload>
+        <cache>
+            <driver>File</driver>
+            <root_dir></root_dir>
+            <namespace>cache</namespace>
+        </cache>
+    </cache>
+
+    <cache_redis>
+        <server>localhost:6379</server>
+        <namespace>cache:</namespace>
+        <default_expires_in>2592000</default_expires_in>
+    </cache_redis>
+
+    <mongodb>
+        <host>localhost:</host>
+        <db_name></db_name>
+        <username></username>
+        <password></password>
+    </mongodb>
+
+    <redis>
+        <server>localhost:6379</server>
+        <sock></sock>
+        <password></password>
+        <name></name>
+        <reconnect>60</reconnect>
+        <every>1000000</every>
+        <encoding></encoding>
+    </redis>
+
+    <memcached>
+        <servers>localhost:11211</servers>
+        <namespace></namespace>
+    </memcached>
+
+    <elasticsearch>
+        <nodes>localhost:9200</nodes>
+    </elasticsearch>
+
+</plugin>

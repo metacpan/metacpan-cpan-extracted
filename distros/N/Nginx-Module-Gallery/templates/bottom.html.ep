@@ -1,0 +1,21 @@
+    </article>
+    <footer>
+        Help:
+        <ul>
+            <li>
+                Right click on image and choose "Save object as..."
+                to save fullsize image on local disk.
+            </li>
+            <li>
+                Use updir link ".." to move up to directory tree.
+            </li>
+            <li>
+                Click on virtual archive file in begin of index
+                (with same name as current directory)
+                to download all directory files and subdirectories
+                by one archive file.
+            </li>
+        </ul>
+    </footer>
+</body>
+</html>

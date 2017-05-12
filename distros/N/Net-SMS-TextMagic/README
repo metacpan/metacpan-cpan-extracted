@@ -1,0 +1,32 @@
+Net-SMS-TextMagic version 1.00
+==============================
+
+Access to TextMagic SMS service
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+    JSON
+    LWP::UserAgent
+    URI::Escape
+    Encode
+    Crypt::SSLeay or IO::Socket::SSL
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 Matti Lattu <matti@lattu.biz>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+

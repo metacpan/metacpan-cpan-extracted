@@ -1,0 +1,133 @@
+# ABSTRACT: transformate
+# PODNAME: transformate
+
+use Modern::Perl;
+use Getopt::Long;
+use POSIX qw(getcwd);
+use Net::NodeTransformator;
+use autodie;
+
+our $VERSION = '0.105'; # VERSION
+
+my $host = 'localhost';
+my $port = 12345;
+my $sock;
+my $engine = 'jade';
+my $cbor;
+my $yaml;
+my $json;
+my $data;
+my $list;
+
+GetOptions(
+	"host=s" => \$host,
+	"port=s" => \$port,
+	"sock=s" => \$sock,
+	"engine=s" => \$engine,
+	"cbor=s" => \$cbor,
+	"yaml=s" => \$yaml,
+	"json=s" => \$json,
+	"list" => \$list,
+) or die "usage: $0 [--host <hostname>] [--port <tcp port>] [--sock <unix socket>] [--list] [--engine <engine name>] [--cbor <cbor file>] [--yaml <yaml file>] [--json <json file>] [<input file>]\n";
+
+if ($sock) {
+	$host = 'unix/';
+	$port = $sock;
+}
+
+my $nnt = Net::NodeTransformator->new("$host:$port");
+
+if ($list) {
+	say $nnt->transform('list');
+	exit;
+}
+
+if ($cbor) {
+	require CBOR::XS;
+	open CBOR, $cbor;
+	$data = CBOR::XS::decode_cbor(join '' => <CBOR>);
+	close CBOR;
+}
+
+if ($yaml) {
+	require YAML::Any;
+	$data = YAML::Any::LoadFile($yaml);
+}
+
+if ($json) {
+	require JSON::Any;
+	open JSON, $json;
+	$data = JSON::Any->new->jsonToObj(join '' => <JSON>);
+	close JSON;
+}
+
+my $inp = join '' => <>;
+
+print $nnt->transform($engine, $inp, $data);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+transformate - transformate
+
+=head1 VERSION
+
+version 0.105
+
+=head1 SYNOPSIS
+
+transformate [options] <input file>
+
+If no input file is given, standard input is used.
+
+=head1 NAME
+
+transformate - client for transformator
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<--host> I<arg> hostname to connect to
+
+=item C<--port> I<arg> tcp port
+
+=item C<--sock> I<arg> unix domain socket path
+
+=item C<--engine> I<arg> engine name
+
+=item C<--cbor> I<arg> path to a CBOR file
+
+=item C<--yaml> I<arg> path to a YAML file
+
+=item C<--json> I<arg> path to a JSON file
+
+=item C<--list> just return a list of available engine, sorted by output format
+
+=back
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+https://github.com/zurborg/libnet-nodetransformator-perl/issues
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+David Zurborg <zurborg@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014 by David Zurborg.
+
+This is free software, licensed under:
+
+  The ISC License
+
+=cut

@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3efbb4a1dd74b2694777c278f1603f6ae828ee18 Changes
+SHA1 33ddc83f283f8b5cc8b905207823f8741de92039 INSTALL
+SHA1 6b50b30fa6f8d063d96e32c9a81f3f82328925f7 LICENSE
+SHA1 96a1f1295983157bba22575648b923339b2b6135 MANIFEST
+SHA1 975bfb86867d14a6311e0044ccbf6aa0c2cf899b META.json
+SHA1 374efefed4190685cfbcbe173830e022515877d7 META.yml
+SHA1 6d63f692432e28e6e57aed7ede3d078ce26c75c4 Makefile.PL
+SHA1 54f2a115b6901153aa2f4caf2a853e3c8a24462b README
+SHA1 333331b182152a6dfd83f538c5e252babd4a5e5c bin/spore
+SHA1 ca318d9f69315b429b80e65ef253e9ed2a933a87 cpanfile
+SHA1 3d817e973290f8c01c5f39d48a5f696c22de23c1 dist.ini
+SHA1 de86acbd00ea2b5ffbaf4f08b6c9ab9549be0665 lib/Net/Async/SPORE.pm
+SHA1 173663165e4714ce31cebfbf70b68ba2dac43a52 lib/Net/Async/SPORE/Definition.pm
+SHA1 65552ac65dc4b38c8ac9a7d48c428287c992a3f3 lib/Net/Async/SPORE/Loader.pm
+SHA1 a22ac3d8794bbea64a585bf73c86067d7a846a0c lib/Net/Async/SPORE/Request.pm
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 d76ee2dcb7519cadd465499fae4a2b23176623ee t/00-compile.t
+SHA1 137441198054bcbd98e6bb4cbfcab479921ce036 t/000-report-versions-tiny.t
+SHA1 8b7d3e0eea23ebf8fee432c6ce0e14b3b6689a65 t/load.t
+SHA1 6103a1196a3f8468bd3ae29ecc1979b07d0c8c1c t/sample.json
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/release/synopsis.t
+SHA1 bbcd59d081d9940af5d43337ae85458075933829 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJT+UeqAAoJEFKElMNpjtyD/xcH/0OUb8xpiOyEKuwSK6XY0WUr
+YwkQc3nNQuQQNc0UGbLZrtBvgX4hC9HsQ3N2QSfvNTXINim3fPHoYJT4CSoRsX+2
+HfnNKSYE5jT1zolgwNYTpU7+nB7kRnpEbMH6izYhBnHcJCOYrlP9fuFQ58fbRREZ
+ouwB0OYLdD1Z3+Ufl8cqu2JKpRWWk0Gg7jtfHAK0BFDNjJcJEoelAH15ZR2dNZUD
+a4mUBhEUI8IB/bSVm66rgtjxsvNhhs/sIorXz6iqGHCqp/q5QMwLhZ9Njr+KtNIc
+mpqpuYNVvU58XwOs2SPXLQTv/KpqscsLoSL5ip44BdPA/6Gg7MngJ1Gk9bnpEaU=
+=Z194
+-----END PGP SIGNATURE-----

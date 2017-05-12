@@ -1,0 +1,33 @@
+---
+abstract: 'Pure perl API for Proxmox virtualisation'
+author:
+  - 'Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@bytefoundry.com.au>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0'
+  Test::Trap: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Proxmox-VE
+requires:
+  Carp: '0'
+  HTTP::Headers: '0'
+  HTTP::Request::Common: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/mrproper/proxmox-ve-api-perl
+  repository: https://github.com/mrproper/proxmox-ve-api-perl.git
+version: '0.32'
+x_author_pledge:
+  version: 1

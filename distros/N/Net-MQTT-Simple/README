@@ -1,0 +1,31 @@
+NAME
+    Net::MQTT::Simple - Minimal MQTT version 3 interface
+
+DOCUMENTATION
+    https://metacpan.org/pod/mqtt-simple
+    https://metacpan.org/pod/Net::MQTT::Simple
+    https://metacpan.org/pod/Net::MQTT::Simple::SSL
+
+INSTALLATION
+    To install this module type the following:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    or use "cpan Net::MQTT::Simple" on the command line to automate the
+    process.
+
+MANUAL INSTALLATION
+    If you can't use the CPAN installer, you can actually install this
+    module by creating a directory "Net/MQTT" and putting "Simple.pm" in it.
+    Please note that this method does not work for every Perl module and
+    should be used only as a last resort on systems where proper installers
+    are not available.
+
+    To view the list of @INC paths where Perl searches for modules, run
+    "perl -V". This list includes the current working directory (".").
+    Additional include paths can be specified in the "PERL5LIB" environment
+    variable; see perlenv.
+

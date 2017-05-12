@@ -1,0 +1,12 @@
+.perlcriticrc
+Changes
+MANIFEST
+Makefile.PL
+OneLiner.pm
+OneLiner.pod
+README
+t/05_load_them.t
+t/07_send_one.t
+t/critic.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

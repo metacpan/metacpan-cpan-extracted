@@ -1,0 +1,40 @@
+Revision history for Net-Mollom
+
+0.09    2012-05-21
+    + Allow more <undef>s for optional values
+    + Use new Mollom test domain during tests
+    + Handle communication failures better in some tests
+
+0.08    2010-09-11
+    + Prevent infinite recursion when every API call tells us we should refresh our server list
+
+0.07    2009-08-20
+    + Documented use of session_id() to maintain state with Mollom when you use another process or object.
+    + allow session_id to be passed to check_content()
+    + using exceptions from Exception::Class for errors, not just croak()
+
+0.06    2009-04-28
+    + Drop Module::Build::Smolder since configure_requires seems to still trip up some testers
+    + Remove left over vestige of Squirrel in helper module.
+    + added warnings attribute to silence helpful, but slightly annoying carp's
+    + using Moose's make_immutable to give some speed up
+    + added attempt_limit attribute to control how many times we try to refresh our server list before giving up.
+
+0.05    2009-04-08
+    + Remove old Makefile.PL that was confusing installers because it didn't list our new pre-reqs
+
+0.04    2009-04-04
+    + tests now skip if we can't get data back from Mollom (now there are no failures if run offline)
+    + use Module::Build::Smolder to make it easier to smoke test
+    + Use Any::Moose instead of Squirrel
+
+0.03    2009-03-02
+    + added check_captcha() method
+
+0.02    2009-03-01
+    + Remove blib/ from MANIFEST
+
+0.01    2009-03-01
+        First version, released on an unsuspecting world.
+
+

@@ -1,0 +1,23 @@
+#!/usr/local/bin/perl
+
+use strict;
+use Net::Amazon;
+use Data::Dumper; # for debugging
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($DEBUG);
+
+my $ua = Net::Amazon->new(
+    associate_tag => $ENV{AMAZON_ASSOCIATE_TAG},
+    token         => $ENV{AMAZON_TOKEN},
+    secret_key    => $ENV{AMAZON_SECRET_KEY},
+);
+
+# Get a request object
+my $response = $ua->search(exchange => 'Y04Y3424291Y2398445');
+
+if($response->is_success()) {
+    my $result = $response->result();
+    print $result->ExchangeEndDate(), "\n";
+} else {
+        print "Error: ", $response->message(), "\n";
+}

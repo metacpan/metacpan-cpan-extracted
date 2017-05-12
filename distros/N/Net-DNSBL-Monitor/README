@@ -1,0 +1,283 @@
+NAME
+    Net::DNSBL::Monitor - Monitor DNSBL response
+
+SYNOPSIS
+      use Net::DNSBL::Monitor qw(
+            run
+            plaintxt
+            htmltxt
+            plainresp
+            htmlresp
+      );
+
+      ($dnsblcnts,$responses)=run(\%config,$NonBlockSock,$sockaddr_in);
+      $text = plaintxt(\%config,\%dnsblcnts);
+      $html = htmltxt(\%config,\%dnsblnts);
+      $text = plainresp(\%responses);
+      $html = htmlresp(\$config,\%responses);
+
+DESCRIPTION
+    Net::DNSBL::Monitor is the Perl module that can be used to check when
+    ranges of IP addresses have been blacklisted. Net::DNSBL::Monitor
+    generates a statistical report for the DNSBL's interrogated and provides
+    an individual report for each IP address found in a DNSBL. The module is
+    used to implement the reporting script dnsblmon.
+
+CONFIGURATION FILE
+    With the addition of a few elements, the configuration file for dnsblmon
+    shares a common format with the Mail::SpamCannibal sc_BLcheck.pl script,
+    and Net::DNSBL::Statistics config file, facilitating common maintenance
+    of DNSBL's for your MTA installation.
+
+    The sample configuration file monitor.conf.sample is heavily commented
+    with the details for each configuration element.
+
+    A useful list of DNSBL zones for the config file (put together by
+    "Andrey V. Stolyarov" <croco-gnu@openwall.com>) maybe found in the
+    contrib directory "zones4config.file".
+
+SYSTEM SIGNALS
+    dnsblmon responds to the following system signals:
+
+    * TERM
+      Script is terminated.
+
+PERL MODULE DESCRIPTION - Script Implementation
+    Net::DNSBL::Monitor provides most of the functions that implement
+    dnsblmon which is a script that collects statistics and responses for a
+    list of IP address interrogated against a list of DNSBL's
+
+dnsblmon usage
+    How to use dnsblmon
+
+    Syntax: dnsblmon path/to/config.file or dnsblmon -t path/to/config.file
+    dnsblmon -w path/to/config.file
+
+            dnsblmon path/to/config.file -r -s
+            dnsblmon path/to/config.file -s -r
+
+            dnsblmon path/to/config.file \
+                    -r path/outfile1 \
+                    -s path/outfile2
+
+    Normally dnsblmon prints an IP report sorted by "comment" and IP of the
+    DNSBL's interrogated with their reply results for each IP address.
+
+    The 'comment' field may contain html markup text.
+
+      i.e.  commenta
+              1.2.3.4  127.0.0.3  zen.spamhaus.org
+                       127.0.0.5  dnsbl.sorbs.net
+              1.2.3.5  127.0.0.5  dnsbl.sorbs.net
+
+            commentb
+              3.4.5.6 127.0.0.2 bl.spamcannibal.org
+
+    With the (-s) switch, dnsblmon prints a sorted list (by count) of the
+    DNSBL's interrogated with their reply count, percentage of the total
+    count, and any comments from the DNSBL's 'comment' key field in the
+    config file.
+
+    The 'comment' field may contain html markup text.
+
+      i.e.
+      44 100.0%  TOTAL IP's interrogated
+      41  93.2%  UNION of all results
+      34  77.3%  dnsbl.sorbs.net comment
+      ........
+
+    The -t switch will print a start and stop time to STDOUT
+
+      i.e.
+      # start: Fri Jan  4 17:46:44 2008
+      # stop : Fri Jan  4 17:58:21 2008
+
+    The -w switch will put the output into an HTML table without the <table>
+    statement </table>., a commment as above and with an <a href="...">dnsbl
+    name</a> statement replacing the dnsbl name if the 'url' key is present
+    in the config file.
+
+    The -r and -s switchs are position dependent output designators.
+
+      -r    REPORT output designator
+      -s    STATISTICS output designator
+
+      as follows:
+
+      -r -s would produce the report on STDOUT and the statistics
+            on STDERR.
+      -s -r would produce the statistics on STDOUT and the 
+            report on STDERR.
+
+      -s outfile1 -r outfile2 would write the statistics and report
+            to outfile1 and outfile2 respectively.
+
+    Other combinations are possible. Switches are order dependent but not
+    positionally dependent with respect to other switches
+
+dnsblmon input file format
+    The input file format for dnsblmon consists of an address element block
+    in the form used by NetAddr::IP followed by a 'comment field'. The
+    report generated will be sorted on the 'comment field', then by IP
+    address.
+
+      i.e.          input format
+
+      1.2.3.4       single host IP belonging to XYZ
+      2.3.4.5/24    A class C belonging to ABC hosting
+      etc...
+
+Net::DNSBL::Monitor FUNCTIONS
+    * ($dnsblcnts,$responses)=run(\%config,$NonBlockSock,$sockaddr_in);
+        Returns the total number of IP's interrogated (IP list less white
+        listed items) and a hash of DNSBL names and their respective SPAM
+        reply counts or equivalent for 'in-addr.arpa' and GENERIC.
+
+          input:   config pointer,
+                   non-blocking socket descriptor,
+                   sockaddr_in for local DNS host
+
+          returns: pointer to dnsbl count hash
+                   pointer to response hash
+
+        The dnsbl count hash will have two added keys:
+
+                TOTAL   the total number of interrogations less whitelist
+                UNION   the total number of spam 'hits'
+
+        The response hash will be of the form:
+
+          $response = {
+                '1.2.3.4'       => {
+                        'COMMENT'       => 'text from comment field for IP range',
+                        'bl.xyz.com'    => '127.0.0.2',
+                        'bl.abc.net'    => '127.0.0.5',
+                },
+                etc...
+          };
+
+          HINTs:   use Net::NBsocket qw( open_udbNB sockaddr_in );
+                   use Net::DNS::ToolKit qw( get_ns );
+
+                   my $sock = open_udpNB();
+                   my $sockaddr_in = sockaddr_in(53, scalar get_ns());
+
+    * $text = plaintxt($config,\%dnsbls);
+        Generate a plain text report of the form:
+
+          44 100.0%  TOTAL IP's interrogated
+          41  93.2%  UNION of all results
+          34  77.3%  dnsbl.sorbs.net comment
+          22  50.0%  GENERIC comment
+          13  29.5%  in-addr.arpa comment
+          11  25.0%  cbl.abuseat.org comment
+          9   20.5%  list.dsbl.org comment
+          2    4.5%  dnsbl.njabl.org comment
+          1    2.3%  bl.spamcannibal.org comment
+          0    0.0%  dynablock.njabl.org comment
+
+          input:        configuration pointer,
+                        dnsbl count hash pointer
+          returns:      text buffer
+
+        The 'comment' comes from the config file 'comment' key field for
+        each specified DNSBL or is blank if there is no 'comment' key.
+
+    * $html = htmltxt($config,\%dnsbls);
+        Generate a report as above but with <tr><td></td></tr> table markup.
+        The <table></table> tags are not generated. If there is a 'url' key
+        field in the respective DNSBL config entry, the DNSBL name is
+        provide with <a href="url">DNSBL</a> tags with the specified 'url'
+        as the 'href' value.
+
+          input:        configuration pointer,
+                        dnsbl count hash pointer
+          returns:      html text buffer
+
+        A one line example corresponding to the text line above:
+
+          34  77.3% dnsbl.sorbs.net 
+
+          with a 'comment' key of: 127.0.0.2,5,7,8,9,10,12
+          and a 'url' key of:      http://www.au.sorbs.net/using.shtml
+
+          <tr class=dnsbl><td align=right>34</td>
+            <td align=right>77.3%</td>
+            <td align=left><a 
+             href="http://www.au.sorbs.net/using.shtml">dnsbl.sorbs.net</a></td>
+            <td align=left>127.0.0.2,5,7,8,9,10,12</td>
+          </tr>
+
+    * $text = plainresp(\%response);
+        Generate a plain text report of the form:
+
+          comment string 1      
+            ipaddr1  response code  dnsbl
+                     response code  dnsbl
+                     response code  dnsbl
+            ipaddr2  response code  dnsbl
+
+          comment string 2
+            ipaddr3  response code  dnsbl
+
+          etc...
+ 
+          input:        response hash pointer
+          returns:      text buffer
+
+    * $html = htmlresp(\%config,\%response);
+        Generate a report as above but with <tr><td></td></tr> table markup.
+        The <table></table> tags are not generated.
+
+          input:        config hash pointer
+                        response hash pointer
+          returns:      html text buffer
+
+        A one line example corresponding to the text line above:
+
+          34  77.3% dnsbl.sorbs.net 
+
+          with a 'comment' key of: 127.0.0.2,5,7,8,9,10,12
+          and a 'url' key of:      http://www.au.sorbs.net/using.shtml
+
+          <tr class=dnsbl><td align=right>34</td>
+            <td align=right>77.3%</td>
+            <td align=left><a 
+             href="http://www.au.sorbs.net/using.shtml">dnsbl.sorbs.net</a></td>
+            <td align=left>127.0.0.2,5,7,8,9,10,12</td>
+          </tr>
+
+Monitor Web Page HOWTO
+    Read the "contrib/HOWTO" document that describes the scripts used with
+    'cron' to auto generate web pages for the statistics reports
+
+EXPORT_OK
+            run
+            plaintxt
+            htmltxt
+            plainresp
+            htmlresp
+
+AUTHOR
+    Michael Robinton, michael@bizsystems.com
+
+COPYRIGHT
+    Copyright 2008-2014, Michael Robinton. This program is free software;
+    you can redistribute it and/or modify it under the terms of the GNU
+    General Public License as published by the Free Software Foundation;
+    either version 2 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+SEE ALSO
+    the Mail::SpamCannibal manpage, the Net::DNS::Codes manpage, the
+    Net::DNS::ToolKit manpage, the Net::DNSBL::MultiDaemon manpage the
+    NetAddr::IP manpage
+

@@ -1,0 +1,129 @@
+Revision history for Net-STOMP-Client:
+
+2.3	Tue Jan 31 2017
+	* Allow underscores in failover URIs (RT#119869).
+
+2.2	Thu Nov 28 2013
+	* Fixed failover parsing (RT#87025).
+	* Improved virtual host documentation in the tutorial (RT#90069).
+
+2.1	Wed Jun  5 2013
+	* Now preserving $@ in object destructor.
+	* Fixed Net::STOMP::Client::Auth import bug.
+
+2.0	Fri Dec 14 2012
+	* Major code refactoring, see README.2.x for more information.
+	* Cleanup code to please Perl::Critic.
+	* Removed support for blocking I/O, only non-blocking I/O is supported.
+	* Now using the No::Worries and Params::Validate modules from CPAN.
+	* Added STOMP 1.2 support.
+	* Added the queue_message() and send_message() methods for convenience.
+	* Added optional authentication support via Authen::Credential.
+	* Promoted to 2.0 after successful testing.
+
+1.8	Thu Sep 27 2012
+	* Ignore I/O errors after we have successfully sent the DISCONNECT frame.
+	* Added support for non-blocking I/O, this is now the default I/O mode.
+
+1.7	Mon Jul  2 2012
+	* Improved SSL support by handling situations where select()
+	  claims that there is nothing to read although there is.
+
+1.6	Mon Jun 25 2012
+	* Net::STOMP::Client::Frame: minor encoding speed improvements.
+	* Net::STOMP::Client: the disconnect() method now handles receipts.
+	* Preserve $@ when calling Encode::encode() or Encode::decode().
+
+1.5	Tue Feb 28 2012
+	* Improved the documentation wrt failover support id (RT#74738).
+	* Added a server() method to access the CONNECTED frame's server header.
+
+1.4	Fri Jan 27 2012
+	* Improved the documentation wrt subscription id (RT#73060).
+	* Improved ActiveMQ failover URI support.
+
+1.3	Wed Nov 23 2011
+	* Fixed our use of isa() (RT#71520).
+	* Added support for Messaging::Message (this module is optional).
+	* Improved error handling.
+
+1.2	Tue Sep 27 2011
+	* Net::STOMP::Client::Frame: the frame parsing, decoding and encoding
+	  code is now documented and can be used outside of this module.
+	* Improved frame debugging to really show what has been sent/received.
+	* Net::STOMP::Client::Frame: removed the debug() method.
+	* Fixed typo (RT#69417).
+	* Improved session id handling in cases where the session header is
+	  missing from the CONNECTED frame (it is optional wrt the spec).
+	* Net::STOMP::Client: the send() method can now take a body reference.
+
+1.1	Fri Jun 24 2011
+	* Net::STOMP::Client::Frame: added a body_reference() method
+	  to avoid string copies when manipulating large bodies.
+	* Greatly improved the overall performance (~4 times faster),
+	  mainly by reducing string copies, improving frame parsing
+	  and minimizing syscalls in the I/O layer.
+	* Added several methods to Net::STOMP::Client to get better
+	  performance, see the "EFFICIENT I/O" section of the tutorial.
+
+1.0	Tue May 10 2011
+	* Promoted to 1.0 after successful testing.
+	* The API is now stable.
+	* The module $VERSION variables now contain the package version
+          (RT#67227).
+
+0.9.7	Tue May  3 2011
+	* Fixed spurious test errors.
+	* Documented how to get strict STOMP 1.1 compliance.
+
+0.9.6	Mon Apr  4 2011
+	* Added headers backslash escaping for STOMP 1.1.
+	* Added some example scripts in the "eg" directory.
+	* Finished STOMP 1.1 support according to final specification.
+	* Improved frame checking.
+	* Added a socket() method giving access to the socket used.
+	* Added support for frame body printing while debugging.
+
+0.9.5	Fri Dec 17 2010
+	* Made login and passcode optional in the CONNECT frame.
+	* Net::STOMP::Client->wait_for_frames() now uses a high-res timer.
+	* Added Net::STOMP::Client::Tutorial.
+	* Improved STOMP 1.1 support to match the latest draft specification.
+
+0.9.4	Wed Oct  6 2010
+	* Added STOMP 1.1 support (experimental).
+	* Changed encoding handling in Net::STOMP::Client::Frame to be
+	  compatible with STOMP 1.1
+	* Added Net::STOMP::Client::Peer to keep track of peer information.
+	* Added Net::STOMP::Client::Protocol to isolate protocol information.
+	* Added more tests, some optionally using a broker connection.
+	* Improved the documentation.
+
+0.9.3	Tue Jul 20 2010
+	* Rewrote the I/O layer to make it more robust.
+
+0.9.2	Mon Jun  7 2010
+	* The timeout option now allows the control of different operations
+	  (such as waiting for the initial CONNECTED frame or waiting to
+	  be able to send an outgoing frame) independently.
+	* Added some UTF-8 support, see the Net::STOMP::Client::Frame
+	  module documentation for more information.
+
+0.9.1	Tue Jun  1 2010
+	* Now performs a better socket cleanup when disconnecting.
+	* Net::STOMP::Client->wait_for_frames() now handles more precisely
+	  the timeout option: if integer, it should wait for at least this
+	  number of seconds and should not block for more than this number
+	  of seconds plus one.
+	* All STOMP methods now support a timeout option that specifies the
+	  maximum time that can be used to send the frame.
+
+0.9	Mon Mar 29 2010
+	* Net::STOMP::Client::Frame is now less strict about header names.
+	* Net::STOMP::Client->new() now uses its timeout option to set the
+	  IO::Socket::INET Timeout option (unless it already exists).
+
+0.8	Mon Mar  1 2010
+	* This module has been initially released on CPAN as Net::STOMP
+	  but has later been renamed to Net::STOMP::Client to avoid a
+	  naming conflict.

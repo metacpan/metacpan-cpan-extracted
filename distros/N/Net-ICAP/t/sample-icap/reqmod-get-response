@@ -1,0 +1,14 @@
+ICAP/1.0 200 OK
+Date: Mon, 10 Jan 2000  09:55:21 GMT
+Server: ICAP-Server-Software/1.0
+Connection: close
+ISTag: "W3E4R7U9-L2E4-2"
+Encapsulated: req-hdr=0, null-body=231
+
+GET /modified-path HTTP/1.1
+Host: www.origin-server.com
+Via: 1.0 icap-server.net (ICAP Example ReqMod Service 1.1)
+Accept: text/html, text/plain, image/gif
+Accept-Encoding: gzip, compress
+If-None-Match: "xyzzy", "r2d2xxxx"
+

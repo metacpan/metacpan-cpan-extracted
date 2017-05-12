@@ -1,0 +1,19 @@
+---
+abstract: 'details about UN numbers'
+author:
+  - 'John Tantalo <john.tantalo@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Number-UN
+requires:
+  JSON: 2.53
+  Path::Class: 0.25
+version: 0.003

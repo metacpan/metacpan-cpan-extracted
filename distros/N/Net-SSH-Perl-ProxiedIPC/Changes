@@ -1,0 +1,9 @@
+
+0.02 - Sun Jul 17 00:06:46 2011
+	* Clean up the distribution
+	* Nerf the tests until we can figure out how to connect
+	to a machine to test it
+
+0.01 Mon Apr 11 10:21:00 PDT 2011
+  - Initial version
+

@@ -1,0 +1,55 @@
+Net-SNMP-Util
+
+The Module C<Net::SNMP::Util> gives you functions of SNMP getting operation
+interfaces using Net::SNMP.
+
+Module Net::SNMP is a great module. That it's OO, having non-blocking mode and
+convenient callback, flexible to implement for any aspects. Though that, I
+wanted function to access several hosts at the same time and treat responses
+data with common and simple way.
+
+This is a reason why I made this module.
+Have an ease way to watch traffics or health of devices on your networks!!
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::SNMP::Util
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-SNMP-Util
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-SNMP-Util
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-SNMP-Util
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-SNMP-Util/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011- t.onodera
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

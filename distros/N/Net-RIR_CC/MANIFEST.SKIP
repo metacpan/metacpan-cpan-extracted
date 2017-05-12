@@ -1,0 +1,9 @@
+.git
+blib
+pm_to_blib
+MYMETA.*
+Makefile.old
+Makefile$
+Net.*gz
+Net.*tar
+MANIFEST.bak

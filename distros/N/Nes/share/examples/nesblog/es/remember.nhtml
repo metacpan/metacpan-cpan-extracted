@@ -1,0 +1,64 @@
+{: NES 1.0 none :}
+{: #
+  -----------------------------------------------------------------------------
+    
+  Nes 1.03 by Skriptke
+  Copyright 2009 - 2010 Enrique Castañón
+  Licensed under the GNU GPL.
+
+  Sample:
+  http://nes.sourceforge.net/
+
+  CPAN:
+  http://search.cpan.org/dist/Nes/
+
+  Repository:
+  http://github.com/Skriptke/nes
+
+  -----------------------------------------------------------------------------
+:}
+<a name="form_remember"></a>
+<div id="cuadro2">
+<center>{: ~ ( ! * nes_session_ok ) 
+    {: include ('{: * cfg_obj_form :}/multi_step.nhtml',
+                "
+                  msg_legend       => '&nbsp;&#8226; Recordar Contraseña &#8226;&nbsp;',
+                  form_name        => 'fnb_reme',
+                  captcha_name     => 'cnb_reme',
+                  id_form          => 'fnb_id',
+                  captcha_atempts  => '3/5',   
+                  show_captcha     => 1, 
+                  table_width      => '90%',
+                  action_form      => '',
+                  msg_submit       => 'Enviar',
+                  txt_captcha      => '<center><br>Por último introduce el código de seguridad:<br></center>',
+                  msg_error_form   => '<center>Los siguientes campos no son válidos:<br><br></center>',
+                  msg_captcha      => '',
+                  out_page         => './?action=remember',
+
+                  steps  => 
+                      [  
+                        [   
+                          { 
+                            begin    => '<br>*DEMO* no está implementado, vamos que no funciona.<br><br>',
+                            name     => 'name', 
+                            msg      => 'Nombre:',
+                            type     => 'text',
+                            size     => 12,
+                            check    => '0,50',
+                          },
+                          { 
+                            name     => 'email', 
+                            msg      => 'Email:',
+                            type     => 'text',
+                            size     => 12,
+                            check    => '0,50,/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i',
+                          },                             
+                        ],  
+                      ],
+                "
+               )         
+    :}
+:} {: ~ ( * nes_session_ok ) Logged in as: {: * nes_session_user :} :}
+</center>
+</div> 

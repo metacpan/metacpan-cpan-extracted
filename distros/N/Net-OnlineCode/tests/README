@@ -1,0 +1,66 @@
+Extended Tests for Net::OnlineCode packages
+
+These tests are not that well suited for the regular Perl installation
+tests, so I'm splittng them out here. These scripts are set up to be
+run from this directory. If you want to run them from elsewhere and
+have not yet installed the packages, you will need to use perl's -I
+flag to tell it where to find the libraries, eg:
+
+ $ perl -I/path/to/Net/OnlineCode/lib <scriptname>
+
+
+I also had a problem running the scripts here if I had an old version
+of the libraries installed, eg:
+
+ Net::OnlineCode object version 0.02 does not match bootstrap
+ parameter 0.03 at /usr/lib/perl/5.14/DynaLoader.pm line 207.
+
+I wasn't able to track down the source of the problem, but installing
+the new version of the library made the problem go away.
+
+Stuff that is here (including args):
+
+* bipartite.pl
+
+  Deprecated testing script
+
+* mindecoder.pl [mblocks=2]
+
+  Minimal decoder script. Just solves the graph. Displays:
+
+  checkblock number (done flag): which nodes were solved by this block
+
+* promises.pl [-d | -s seed] [mblocks=100] [trials=1]
+
+  Tests claims made in the original paper. Normally uses a random seed, but
+  this can be overridden with options:
+
+  -d       uses a "deterministic" seed value (all nulls)
+
+  -s seed  you specify the seed value
+
+* probdist.pl
+
+  Shows some info about probability distribution tables and e, q and F
+  values for some different parameters.
+
+* codec.pl [blocksize=4] [seed]
+
+  Full coder/decoder test. Uses a small string and passes it through both
+  then displays the decoded output
+
+* smoker.pl [blocksize=20]
+
+  Calls codec.pl for a fixed number of trials and reports any trials that
+  don't display the correct output. Prints the seed value for failure
+  cases.
+
+* rng.pl
+
+  Does a basic statistical test on the output of the RNG object to
+  test the quality of the generated random numbers.
+
+* fisher-yates.pl
+
+  Basic tests on Fisher-Yates shuffle routine in Net::OnlineCode
+

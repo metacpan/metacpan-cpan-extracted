@@ -1,0 +1,215 @@
+=head1 NAME
+ 
+Net::Twitch::Oauth2 - a simple Perl wrapper around Twitch OAuth v2.0 protocol
+ 
+=head1 SYNOPSIS
+ 
+    use CGI;
+    my $cgi = CGI->new;
+     
+    use Net::Twitch::Oauth2;
+     
+    my $twitch = Net::Twitch::Oauth2->new(
+        application_id => 'your_application_id', 
+        application_secret => 'your_application_secret',
+        callback => 'http://yourdomain.com/twitch/callback'
+    );
+     
+    ###get authorization URL for your application
+    my $url = $twitch->get_authorization_url(
+        scope => ['user_read'],
+    );
+     
+    ####now redirect to this url
+    print $cgi->redirect($url);
+     
+    ##once user authorizes your application twitch will send him/her back to your application
+    ##to the callback link provided above
+     
+    ###in your callback block capture verifier code and get access_token
+     
+    my $twitch = Net::Twitch::Oauth2->new(
+        application_id => 'your_application_id',
+        application_secret => 'your_application_secret',
+        callback => 'http://yourdomain.com/twitch/callback'
+    );
+     
+    my $access_token = $twitch->post_access_token(code => $cgi->param('code'));
+    ###save this token in database or session
+     
+    ##later on your application you can use this verifier code to comunicate
+    ##with twitch on behalf of this user
+     
+    my $twitch = Net::Twitch::Oauth2->new(
+        access_token => $access_token
+    );
+     
+    my $info = $twitch->get(
+        'https://api.twitch.tv/kraken/user' ##Twitch API URL
+    );
+     
+    print $info->as_json;
+ 
+=head1 DESCRIPTION
+ 
+Net::Twitch::Oauth2 gives you a way to simply access Twitch.tv Oauth 2.0 protocol
+ 
+For more information please see example folder shipped with this Module
+ 
+=head1 SEE ALSO
+ 
+For more information about Twitch Oauth 2.0 API
+ 
+Please Check
+L<http://dev.twitch.tv>
+ 
+=head1 USAGE
+ 
+=head2 C<Net::Twitch::Oauth2-E<gt>new( %args )>
+ 
+Pass args as hash. C<%args> are:
+ 
+=over 4
+ 
+=item * C<application_id >
+ 
+Your application id as you get from twitch developers platform
+when you register your application
+ 
+=item * C<application_secret>
+ 
+Your application secret id as you get from twitch developers platform
+when you register your application
+ 
+=back
+ 
+=head2 C<$twitch-E<gt>get_authorization_url( %args )>
+ 
+Return an Authorization URL for your application, once you receive this
+URL redirect user there in order to authorize your application
+ 
+=over 4
+ 
+=item * C<scope>
+ 
+['user_read',...]
+ 
+Array of Extended permissions as described by twitch Oauth2.0 API
+you can get more information about scope/Extended Permission from
+http://dev.twitch.tv
+ 
+=item * C<callback>
+ 
+callback URL, where twitch will send users after they authorize
+your application
+ 
+=back
+ 
+=back
+ 
+=head2 C<$twitch-E<gt>post_access_token( %args )>
+ 
+Returns access_token string
+One arg to pass
+ 
+=over 4
+ 
+=item * C<code>
+ 
+This is the verifier code that twitch sends back to your
+callback URL once user authorize your app, you need to capture
+this code and pass to this method in order to get access_token
+ 
+Verifier code will be presented with your callback URL as code
+parameter as the following
+ 
+http://your-call-back-url.com?code=234er7y6fdgjdssgfsd...
+ 
+When access token is returned you need to save it in a secure
+place in order to use it later in your application
+ 
+=back
+ 
+=head2 C<$twitch-E<gt>get( $url,$args )>
+ 
+Send get request to twitch and returns response back from twitch
+ 
+=over 4
+ 
+=item * C<url>
+ 
+Twitch API URL as string
+ 
+=item * C<$args>
+ 
+hashref of parameters to be sent with graph API URL if required
+ 
+=back
+ 
+The response returned can be formatted as the following
+ 
+=over 4
+ 
+=item * C<$responseE<gt>as_json>
+ 
+Returns response as json object
+ 
+=item * C<$responseE<gt>as_hash>
+ 
+Returns response as perl hashref
+ 
+=back
+ 
+For more information about twitch API, please check
+http://dev.twitch.tv
+ 
+=head2 C<$twitch-E<gt>post( $url,$args )>
+ 
+Send post request to twitch API, usually to post something
+ 
+=over 4
+ 
+=item * C<url>
+ 
+Twitch API URL as string
+ 
+=item * C<$args>
+ 
+hashref of parameters to be sent with twitch API URL
+ 
+=back
+ 
+For more information about twitch API, please check
+http://dev.twitch.tv
+ 
+=head1 INSTALLATION
+ 
+To install this module type the following:
+ 
+   perl Makefile.PL
+   make
+   make test
+   make install
+ 
+=head1 DEPENDENCIES
+ 
+This module requires these other modules and libraries:
+ 
+  Jason::Any
+  LWP::UserAgent
+  URI::Escape
+ 
+=head1 AUTHOR
+
+Ronald J. Reed, E<lt>rjreed67@gmail.comE<gt>
+Based on Net::Facebook::Oauth2 module by Mahmoud A. Mehyar, E<lt>mamod.mehyar@gmail.comE<gt>
+ 
+=head1 COPYRIGHT AND LICENSE
+ 
+Copyright (C) 2014 by Ronald J. Reed
+ 
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+ 
+=cut

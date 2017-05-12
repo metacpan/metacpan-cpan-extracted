@@ -1,0 +1,100 @@
+
+As of version 1.52, Net::Radius includes the "packet tests". Those
+packet tests consist of RADIUS packets captured in various production
+environments and passed through Net::Radius, to see how it fares with
+real-world data.
+
+Ideally, every bug report about Net::Radius related to the dialog with
+a given network device, should include a proper packet capture that
+allows for the reproduction of the problem. This also allows the
+implementation of regression tests that will insure that packets will
+be decoded properly in later versions of this distribution.
+
+To be useful, a packet capture must include the complete (binary) RADIUS
+packet(s) in one or more files. Also, the following information would
+be of help:
+
+* RADIUS Secret and Auhenticator, if applicable and known
+
+* Name, version and relevant information about the device producing
+  the packet
+
+* Relevant dictionary entries to properly decode the packet
+  attributes. This is specially important with Vendor-Specific
+  Attributes
+
+* If you're including more than a single packet, please specify what
+  each one should contain
+
+If the packet dump is being provided as part of a bug report, a
+concise explanation about why the Net::Radius handling of the packet
+is incorrect and what the correct or expected result is. If you have
+references to document this further, please provide them as
+well. Packet dumps from other RADIUS server doing "the right thing"
+are worth extra points.
+
+If you want to contribute with the production of more packet tests,
+please consider the following:
+
+* Devices not currently included in the packet tests are
+  welcome. Exotic, old or obsoleted devices are even more welcome (Any
+  PortMaster 2 or 3 out there?)
+
+* Ideally, try to provide at least one sample packet of each type that
+  your device is able to send (ie, Access-Request, Accounting-Request,
+  etc)
+
+* Packet dumps will be copied straight into the distribution - You're
+  responsible for safeguarding any private or restricted information
+  on the packets, such as the RADIUS secret, user names or passwords,
+  IP addresses, etc.
+
+HOW TO PRODUCE A PACKET DUMP
+
+Packet dumps can be produced with any tool whose output is supported
+by wireshark (formerly, ethereal), which is then used to extract the
+packet payload and build the corresponding test. My recommendation is
+to use the tcpdump utility, available in many operating systems. There
+are other compatible utilities that can store captured packets as raw
+binary files, which can be compressed and sent via email or attached
+to a bug report.
+
+By way of example, let's say that the RADIUS server is located at IP
+address 10.0.0.1, serving requests in the UDP ports 1812 and 1813 for
+authentication and accounting respectively, while the device whose
+dialog we want to capture, uses IP address 10.0.0.5. Packets from the
+device to the server could be captured using the following command (in
+a single line):
+
+tcpdump -s 0 -c 1 -w radius.dump -e 'src host 10.0.0.5 and dst host
+  10.0.0.1 and udp and portrange 1812-1813'
+
+Of course, the machine must have an interface connected so that
+traffic can be sniffed, whose name may have to be specified. Note that
+only one packet is being captured (-c option) although you could
+capture more that this.
+
+Likewise, response packets from the RADIUS server to the device can be
+captured with the following command:
+
+tcpdump -s 0 -c 1 -w radius.dump -e 'src host 10.0.0.1 and dst host
+  10.0.0.5 and udp and portrange 1812-1813'
+
+tcpdump has a nice and extensive manual page that explains all of its
+options. Please take a look at it so that you understand independently
+what the incantations I've provided above actually do or conversely,
+whether there is something else you may need to do in your environment
+to acurately record the information you want.
+
+IMPORTANT: Remember that full packets are needed for proper
+testing. Make sure your captures include all of the packet
+payload. Including only the packet headers make for a very poor test
+input. In the examples above, the -s option takes care of this.
+
+The commands disussed above will capure packets to/from the relevant
+devices, leavig them in the file radius.dump that you can now
+send. Remember to record and include the useful information mentioned
+in the first part of these instructions.
+
+If you want to provide the source file for the tests directly, please
+take a look at the file packets/README

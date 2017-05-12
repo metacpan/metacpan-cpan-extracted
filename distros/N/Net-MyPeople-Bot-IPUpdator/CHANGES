@@ -1,0 +1,41 @@
+==================================================
+Changes from 2012-06-04 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2013-06-04 01:22:27 +0000
+------------------------------------------
+
+  Change: 8744aa866956084a8d788999a8e043587c26b474
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-04 10:22:08 +0000
+
+    update README.md 
+
+  Change: df48d9173036d2373946cbd526281a05bccae026
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-04 10:21:06 +0000
+
+    move getting new ip from CLI to Module 
+
+  Change: 31daa2acdbcaeba4459d96d8312bf776ac902936
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-03 14:55:44 +0000
+
+    update doc 
+
+  Change: 7773a62788f8cbfc3a5e67c842f3fb5886bd8c37
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-03 14:40:12 +0000
+
+    first commit 
+
+  Change: abd0eac1887299b2ab3584fa08964f0ffdb6e3a0
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-03 14:36:25 +0000
+
+    first commit 
+
+================
+End of releases.
+================

@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Net/Presto.pm
+lib/Net/Presto/Statement.pm
+minil.toml
+t/00_compile.t
+t/01_basic.t
+t/02_statement.t
+META.yml
+MANIFEST

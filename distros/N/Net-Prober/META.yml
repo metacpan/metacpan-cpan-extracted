@@ -1,0 +1,31 @@
+---
+abstract: 'Probes network hosts for downtime, latency, etc...'
+author:
+  - 'Cosimo Streppone <cosimo@cpan.org>'
+build_requires:
+  LWP::Online: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Prober
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Digest::MD5: '0'
+  IO::Socket::INET: '0'
+  IO::Socket::SSL: '0'
+  IO::Socket::UNIX: '0'
+  LWPx::ParanoidAgent: '0'
+  Net::Ping: '2.34'
+  Sys::Syslog: '0'
+  perl: '5.010'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Prober
+  repository: git://github.com/cosimo/perl5-net-prober.git
+version: '0.16'

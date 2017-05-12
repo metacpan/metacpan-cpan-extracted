@@ -1,0 +1,294 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::AMQP::Channel
+at lib/Net/Async/AMQP/Channel.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::AMQP::Channel - represents a single channel in an MQ connection
+
+=head1 VERSION
+
+version 2.000
+
+=head1 SYNOPSIS
+
+ use IO::Async::Loop;
+ use Net::Async::AMQP;
+ my $loop = IO::Async::Loop->new;
+ $loop->add(my $amqp = Net::Async::AMQP->new);
+ $amqp->connect(
+   host => 'localhost',
+   username => 'guest',
+   password => 'guest',
+ )->then(sub {
+  shift->open_channel->publish(
+   type => 'application/json'
+  )
+ });
+
+=head1 DESCRIPTION
+
+Each Net::Async::AMQP::Channel instance represents a virtual channel for
+communicating with the MQ server.
+
+Channels are layered over the TCP protocol and most of the common AMQP frames
+operate at channel level - typically you'd connect to the server, open one
+channel for one-shot requests such as binding/declaring/publishing, and a further
+channel for every consumer.
+
+Since any error typically results in a closed channel, it's not recommended to
+have multiple consumers on the same channel if there's any chance the Basic.Consume
+request will fail.
+
+=head1 METHODS
+
+=head2 confirm_mode
+
+Switches confirmation mode on for this channel.
+In confirm mode, all messages must be ACKed
+explicitly after delivery.
+
+Note that this is an irreversible operation - once
+confirm mode has been enabled on a channel, closing that
+channel and reopening is the only way to turn off confirm
+mode again.
+
+Returns a L<Future> which will resolve with this
+channel once complete.
+
+ $ch->confirm_mode ==> $ch
+
+=head2 nowait_from_args
+
+If we have a C<wait> argument, then return the inverse of that.
+
+Otherwise, return zero.
+
+=head2 exchange_declare
+
+Declares a new exchange.
+
+Returns a L<Future> which will resolve with this
+channel once complete.
+
+ $ch->exchange_declare(
+  exchange   => 'some_exchange',
+  type       => 'fanout',
+  autodelete => 1,
+ ) ==> $ch
+
+=head2 exchange_bind
+
+Binds an exchange to another exchange. This is a RabbitMQ-specific extension.
+
+=head2 queue_declare
+
+Returns a L<Future> which will resolve with the new L<Net::Async::AMQP::Queue> instance,
+the number of messages in the queue, and the number of consumers.
+
+ $ch->queue_declare(
+  queue      => 'some_queue',
+ ) ==> ($q, $message_count, $consumer_count)
+
+=head2 publish
+
+Publishes a message on this channel.
+
+Returns a L<Future> which will resolve with the
+channel instance once the server has confirmed publishing is complete.
+
+ $ch->publish(
+  exchange => 'some_exchange',
+  routing_key => 'some.rkey.here',
+  type => 'some_type',
+ ) ==> $ch
+
+Some named parameters currently accepted - note that this list is likely to
+expand in future:
+
+=over 4
+
+=item * ack - we default to ACK mode, so set this to 0 to turn off explicit server ACK
+on message routing/delivery
+
+=item * immediate - if set, will cause a failure if the message could not be routed
+immediately to a consumer
+
+=item * mandatory - if set, will require that the message ends up in a queue (i.e. will
+fail messages sent to an exchange that do not have an appropriate binding)
+
+=item * content_type - defaults to application/binary
+
+=item * content_encoding - defaults to undef (none)
+
+=item * timestamp - the message timestamp, defaults to epoch time
+
+=item * expiration - use this to set per-message expiry, see L<https://www.rabbitmq.com/ttl.html>
+
+=item * priority - defaults to undef (none), use this to take advantage of RabbitMQ 3.5+ priority support
+
+=item * reply_to - which queue to reply to (used for RPC, default undef)
+
+=item * correlation_id - unique message ID (used for RPC, default undef)
+
+=item * delivery_mode - whether to persist message (default 1, don't persist - set to 2 for persistent, see also "durable" flag for queues)
+
+=back
+
+=head2 qos
+
+Changes QOS settings on the channel. Probably most
+useful for limiting the number of messages that can
+be delivered to us before we have to ACK/NAK to
+proceed.
+
+Returns a L<Future> which will resolve with the
+channel instance once the operation is complete.
+
+ $ch->qos(
+  prefetch_count => 5,
+  prefetch_size  => 1048576,
+ ) ==> $ch
+
+=head2 ack
+
+Acknowledge a specific delivery.
+
+Returns a L<Future> which will resolve with the
+channel instance once the operation is complete.
+
+ $ch->ack(
+  delivery_tag => 123,
+ ) ==> $ch
+
+=head2 nack
+
+Negative acknowledgement for a specific delivery.
+
+Returns a L<Future> which will resolve with the
+channel instance once the operation is complete.
+
+ $ch->nack(
+  delivery_tag => 123,
+ ) ==> $ch
+
+=head2 reject
+
+Reject a specific delivery.
+
+Returns a L<Future> which will resolve with the
+channel instance once the operation is complete.
+
+ $ch->nack(
+  delivery_tag => 123,
+ ) ==> $ch
+
+Example output:
+
+		'method_id' => 40,
+		'reply_code' => 404,
+		'class_id' => 60,
+		'reply_text' => 'NOT_FOUND - no exchange \'invalidchan\' in vhost \'vhost\''
+
+=head2 on_close
+
+Called when the channel has been closed.
+
+=head2 send_frame
+
+Proxy frame sending requests to the parent
+L<Net::Async::AMQP> instance.
+
+=head2 close
+
+Ask the server to close this channel.
+
+Returns a L<Future> which will resolve with the
+channel instance once the operation is complete.
+
+ $ch->close(
+  code => 404,
+  text => 'something went wrong',
+ ) ==> $ch
+
+=head2 push_pending
+
+=head2 remove_pending
+
+Removes a coderef from the pending event handler.
+
+Returns C< $self >.
+
+=head2 next_pending
+
+Retrieves the next pending handler for the given incoming frame type (see L<Net::Async::AMQP::Utils/amqp_frame_type>),
+and calls it.
+
+Takes the following parameters:
+
+=over 4
+
+=item * $frame - the frame itself
+
+=back
+
+Returns $self.
+
+=head1 METHODS - Accessors
+
+=head2 amqp
+
+The parent L<Net::Async::AMQP> instance.
+
+=head2 bus
+
+Event bus. Used for sharing channel-specific events.
+
+=head2 future
+
+The underlying L<Future> for this channel.
+
+Will resolve to the L<Net::Async::Channel> instance once the channel is open.
+
+=head2 id
+
+This channel ID.
+
+=head2 closed
+
+Returns true if the channel has been closed, 1 if not (which could mean it is either not yet open,
+or that it is open and has not yet been closed by either side).
+
+=head2 closure_protection
+
+Helper method for marking any outstanding requests as failed when the channel closes.
+
+Takes a L<Future>, returns a L<Future> (probably the same one).
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Licensed under the same terms as Perl itself, with additional licensing
+terms for the MQ spec to be found in C<share/amqp0-9-1.extended.xml>
+('a worldwide, perpetual, royalty-free, nontransferable, nonexclusive
+license to (i) copy, display, distribute and implement the Advanced
+Messaging Queue Protocol ("AMQP") Specification').

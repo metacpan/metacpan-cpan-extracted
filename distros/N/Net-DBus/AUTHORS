@@ -1,0 +1,25 @@
+    Net::DBus - Perl APIs for DBus
+    ==============================
+
+Net::DBus is written by 
+
+    Daniel Berrange <dan-at-berrange-dot-com>
+
+With patches, contributions & suggestions gratefully received 
+from
+
+    Carlos Garnacho <carlosg-at-gnome-dot-org>
+    Emmanuele Bassi <ebassi-at-gmail-dot-com>
+    Olivier Blin <oblin-at-mandriva-dot-com>
+    Jack <ms419-at-freezone-dot-co-dot-uk>
+    Dave Belser <dbelser-at-aerosat-dot-com>
+    Stefan Pfetzing <dreamind@dreamind.de>
+    Pavel Strashkin <pavel.strashkin@gmail.com>
+    Mathieu Bridon <bochecha@fedoraproject.org>
+    Frank Szczerba <frank@szczerba.net>
+    Manuel Reimer <manuel.reimer@gmx.de>
+    Xavier Guimard <x.guimard@free.fr>
+
+    [...send patches to get your name here!]
+
+-- End

@@ -1,0 +1,68 @@
+Net::Libdnet
+============
+
+DESCRIPTION
+
+This is a Perl interface for libdnet.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Note that "make tests" fakes running the tests. Running them for
+real is dangerous: you should do this only if you know what you
+are doing.
+
+The real tests require having a configured and connected ethernet
+interface, with a default route over its (primary, not cloned) IP
+address. They reversibly modify interface configurations, the ARP
+table and the routing table. 
+
+WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!
+
+Do not run the real tests unless you are sure you do not harm your
+configuration or other people! I decline any responsibility whatsoever
+for what damage you make by running these tests.
+
+WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!
+
+This being said, you need to set the environment variable REAL_TESTS
+and have root privileges to run the non-faked tests.
+
+UBUNTU/DEBIAN USERS
+
+You will have to apply ubuntu-new.patch like the following:
+
+   $ cd Net-Libdnet-X.YY
+   $ patch -p0 < ubuntu-new.patch
+
+To revert back to standard configuration:
+
+   $ patch -p0 < standard-new.patch
+
+If you use an old version of Ubuntu/Debian (don't know which version),
+you'll have to use ubuntu-old.patch and standard-old.patch files instead.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Perl v5.6.1
+   libdnet
+   Class::Gomor
+
+libdnet may be obtained from http://libdnet.sourceforge.net/.
+
+COPYRIGHT AND LICENSE
+
+You may distribute this module under the terms of the BSD license.
+See LICENSE file in the source distribution archive.
+
+Copyright (c) 2004, Vlad Manilici
+Copyright (c) 2008-2012, Patrice <GomoR> Auffret
+

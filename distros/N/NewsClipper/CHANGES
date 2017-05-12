@@ -1,0 +1,571 @@
+New in version 1.32:
+- Fixed more installation problems (Thanks to Craig Brockmeier
+  <craig@phillips66.ppco.com>)
+- Dropped DBI requirement during installation because it's really optional.
+- Changed commercial version so it can run on any operating system with the
+  same registration key. (Old keys will continue to work if on the same
+  operating system, but new ones will need to be issued if a new operating
+  system is needed.)
+- Made handler loading routines more robust to illegal characters in the
+  handler name.
+
+New in version 1.31:
+- Fixed a couple installation problems (Server files weren't being installed.)
+
+New in version 1.30:
+- Fixed a bug in detection of incompatible configuration file.
+- Removed cacheimages option processing code from NewsClipper.pl, and put it
+  in the cacheimages handler.
+- Added DBI and DBD::mysql module requirements to Makefile.PL. (Forgot to add
+  them in version 1.28)
+- "Server is down" warning is now shown only once for each run.
+- Fixed a bugs in handler server connect timeouts and retries.
+- -C now also gives the option to clear the debug and run logs.
+- Direct database connections are now used only if DBI and DBD::mysql are
+  available. Otherwise, the older (and slower) web-based connections are used.
+- Fixed unhelpful warning when invalid handler names are used.
+- Added support for emailing output files (Thanks to Lee Adler
+  <appraiser@flinet.com> for the suggestion)
+- Mail::Sendmail is now required if you use the email feature.
+
+New in version 1.29:
+- The Log::Agent and Log::Agent::Rotate packages are now required
+- Debug information is now sent to a log file determined by the debug_log_file
+  configuration parameter.
+- Information about the execution of News Clipper is stored in the file
+  determined by the run_log_file configuration parameter.
+- Errors are now saved in the run log, which prevents private information
+  about the News Clipper commands from being printed in the HTML comments. (An
+  HTML message tells you to look in the log file.)
+- New "lprint" function can be used within handlers to print to the run log.
+- The new max_number_of_log_files and max_log_file_size configuration
+  parameters control the rotation of log files.
+- "tagText" configuration value allows users to set the comment keyword that
+  indicates News Clipper commands
+- "makeOutputFilesExecutable" configuration value allows users to set whether
+  or not the output files should be made executable
+- ConvertConfig.pl now saves updated config files even if a .bak file already
+  exists. New backups are saved as .bak2, .bak3. etc.
+- The amount of time to hold a lock and the amount of time to wait for a lock
+  are now based on the scriptTimeout value.
+- Updated Makefile.PL to use Win32::TieRegistry instead of older
+  Win32::Registry.
+- Makefile.PL now determines old installation directory for single-user
+  installations.
+- Fixed a use of unitialized value warning in HandlerFactory.pm.
+- Standardized config options to use_this_style instead of thisStyle or
+  thisstyle.
+
+New in version 1.28:
+- New handler check now uses direct database connection instead of CGI
+  scripts. (Five times faster)
+- The lockfile is now explicitly cleaned up. (May help prevent stale locks.)
+- Added -H flag to override home directory location
+- Modified -C flag to remove handler-specific state and News Clipper state,
+  and to exit immediately afterwards
+- Fixed a URL handling bug in ConvertHandler
+- Added check in ConvertHandler to suggest that RunHandler be used instead of
+  NewsClipper::HandlerFactory::Create
+- News Clipper should now only remove the old output file if the new one was
+  created successfully.
+- modulepath can now contain multiple paths separated by whitespace
+- Fixed a bug where a newly downloaded handler update would not reload
+  correctly.
+- StripAttributes bug fixed: now recognizes attributes with empty quotes like
+  alt=""
+- Arguments to News Clipper are now treated as -e commands. This allows
+  "NewsClipper slashdot" to be run to fetch and print slashdot headlines.
+- Debug output now correctly says the script name is "NewsClipper" instead of
+  "NewsClipper2" (on compiled versions)
+- Compiled versions now have the default @INC set in modulepath during
+  installation, allowing NC to find externally installed Perl modules.
+
+New in version 1.27:
+- Modified NewsClipper.cfg to use a local URL for the imagecache to help News
+  Clipper work "out of the box"
+- Cause of "undefined value in File::Cache" bug found and repaired
+
+New in version 1.26:
+- Added -P flag to pause after completion.
+
+New in version 1.25:
+- Added LOCAL_TIME_ZONE option to timezone specifications, which causes the
+  local time zone to be used. (Thanks to Gerhard Wiesinger
+  <e9125884@student.tuwien.ac.at> for the suggestion and reminder to implement
+  this feature.)
+- Re-implemented caching to use a different persistence mechanism. (This
+  should finally squash the dreaded undefined value in File::Cache error.)
+
+New in version 1.24:
+- Added a lockfile (~/.NewsClipper/lock) that prevents more than one copy of
+  News Clipper from running at the same time. (LockFile::Simple module now
+  required.)
+- Faster verification of handler type during counting of number of installed
+  acquisition handlers (affects commercial versions only)
+- Decreased dependence on handler server during couting of number of installed
+  acquisition handlers (affects commercial versions only)
+- Installation no longer requires "make NewsClipper_Cleanup" step
+- Installation now automatically converts older configuration files.
+- Added ExtractTables function to HTMLTools. (Thanks to Chris Pimlott
+  <pimlottc@null.net> for the initial implementation and idea.)
+- Non-fatal errors while contacting the handler server are now printed in the
+  output as HTML comments.
+- A few speed improvements.
+
+New in version 1.23:
+- Fixed MakeHandler.pl so that it doesn't insert comment characters ("#") into
+  the syntax information. (bugfix)
+
+New in version 1.22:
+- Added a check to make sure that an incompatible handler will not be loaded
+  and used.
+- Improved error reporting during replacement of old output file with new one.
+
+New in version 1.21:
+- Fixed a bug in error message reporting
+- Expanded the arguments to the handler subroutines ProcessAttributes,
+  FilterType, OutputType, GetUpdateTimes, and GetDefaultHandlers, providing
+  attribute information and data. [This should be backwards compatible with
+  existing handlers which do not expect or use the new data.]
+- Fixed a bug where a newly downloaded update to a handler would not be used
+  until the next execution of News Clipper.
+- Added use of socketTries through more of the code (not just when fetching
+  remote data).
+- Added "forNewsClipperVersion" attribute to NewsClipper.cfg
+- Updated ConvertHandler and ConvertConfig to detect the version of the
+  handler or NewsClipper.cfg, and only apply the changes that are necessary to
+  bring it up to the current version.
+- Added FTP code which somehow didn't get into version 1.20.
+- Added support for type names containing spaces.
+
+New in version 1.20:
+- Support for FTPing output files (Thanks to Rob Saunders for the suggestion.)
+  This allows users who don't have shell access to their web server to run
+  News Clipper on a local machine, and send the output files to the web
+  server.
+- News Clipper will check last modified dates before downloading content from
+  the remote server.
+- Fixed bug where <? ... > directives were stripped out erroneously. (Thanks
+  to Kwon Soon Son <kss@kldp.org> for the bug report.)
+- Improved image caching.
+- Fixed a bug in HTMLTools::StripAttributes. (Thanks to Paco Hope
+  <paco@paco.to> for finding the bug.)
+- New "lastupdated" handler gets time data was last updated for a News Clipper
+  input command.
+- New "dumpdata" output handler will dump the type signature and values
+  for the data.
+- <!-- newsclipper startcomment --> ... <!-- newsclipper endcomment --> can
+  now be used to mark blocks of HTML that will be removed from the output
+  during processing. This is useful for putting "dummy" content right after a
+  News Clipper command during input file design to take up space.
+- News Clipper now checks that remote content has changed before downloading
+  information that has expired from the cache.
+- Added -C flag to clear the News Clipper cache.
+- Reworked cache to use File::Cache module. (This should fix problems related
+  to missing cache files.)
+- Restructured the code to make it more understandable. Commented every
+  function. 
+- Added "socketTries" option to configuration, which specifies the number of
+  times News Clipper should try to get data from the server before giving up.
+  This defaults to 3. (Implemented by Ludovic Drolez <ldrolez@usa.net>)
+- Modified GetHtml, GetLinks, and GetImages to generate correct links when the
+  source web page uses <base href="..."> (Thanks to Dominique ROUSSEAU
+  <rousseau@neuronnexion.fr> for the initial implementation.)
+- Fixed a couple (more) bugs in the "check if the cached data needs to be
+  updated" function.
+- Improved error message reporting.
+- Added versioning information to prevent accidental download of handlers that
+  can break the input files.
+- Handler-specific configuration information is now separated in the
+  NewsClipper.cfg file.
+- ConvertConfig-1.20.pl and ConvertHandler-1.20.pl help to convert config
+  files and handler to the new style.
+- Fixed a bug in HTMLsubstr
+- Significantly improved API for handler writers:
+  - Each handler has its own configuration information in the user's
+    NewsClipper.cfg file. This information can be accessed from within the
+    handler through the %handlerconfig hash.
+  - The comment block has been replaced with a hash, which will help with the
+    automated processing of the handler.
+  - "Maintainer_Name", "Maintainer_Email", and "Language" fields have been
+    added.
+  - A new "CATEGORY" field says what category the handler belongs. 
+  - A new "FOR NEWSCLIPPER VERSION" field tells what version of News Clipper
+    the handler was built for. This helps accidental download of incompatible
+    handlers.
+  - Version numbers have been updated so that you can indicate when a change
+    will break people's input files, when a change adds functionality, and
+    when a change fixes a bug.
+  - You can save values between runs using $self->{'state'}, which is just a
+    File::Cache object. ($self->{'state'}->set('key','value'), then
+    $self->{'state'}->get('key'))
+  - Types have changed substantially:
+    - FilterType and OutputType return a "type signature", like "@($ | %)",
+      which means "an array of either scalars or hashes". @($ & %Slashdot)
+      means an array of at least one scalar and at least one Slashdot hash.
+    - A hunk of data matches a type signature if the structure matches, and
+      any subtype relationships hold. For example, a type signature of @($ |
+      %) would be matched by a data strcuture whose type signature is @($URL),
+      %@Myarray(%), and @Myarray($URL & %Slashdot), but not by @(@). 
+    - Everything in the data structure is a reference -- even scalars. 
+    - Each new data value is blessed, not the whole data structure.
+    - Data values don't have to be bless as "String", "Array", or "Hash". 
+    - However, any new types introduced should be related to the others
+      with the MakeSubtype function: MakeSubtype('Slashdot','HASH');
+  - There's a new API function called TypesMatch(), which takes a data
+    reference and a types signature, and returns 1 if the data matches the
+    signature.
+  - dprint() can be used to send output as <!-- DEBUG: ... --> messages in
+    debug mode.
+  - error() can be used to output errors about invalid arguments, etc.
+  - Default handlers are now specified as real News Clipper commands, like
+    this: 
+      <filter name=map filter=highlight words=linux>
+      <output name=array>
+  - FilterType and OutputType now provide the $data and $attributes as
+    arguments, so you can return a different type signature depending on
+    parameters such as "style".
+  - ComputeURL should now be used to compute the URL from the attributes.
+  - You should never have to check the type of $grabbedData -- News Clipper
+    will do that automatically.
+  - A RunHandler API function was added, which takes the handler name, type of
+    handler, data, and attributes. It will automatically check for correct
+    types.
+  - Some "use" statements are no longer needed.
+
+New in version 1.17:
+- A parsing bug in <a href> links was found (and fixed!) by Ludovic Drolez
+  (Ludovic Drolez <ldrolez@usa.net>)
+- The way the configuration information is loaded has changed:
+  - On non-Windows machines, News Clipper always loads the system-wide
+    configuration file NEWSCLIPPER/NewsClipper.cfg, where NEWSCLIPPER is the
+    path specified by the NEWSCLIPPER environment variable.
+  - Per-user configuration information is then loaded from
+    $home/.NewsClipper/NewsClipper.cfg, or the file specified with the -c
+    option.
+  - Personal config files can now override system-wide configuration
+    information on an item-by-item basis. This means that the user's config
+    file doesn't have to have "$ENV{TZ}", imgcache settings, proxy settings,
+    etc. if all they want to do is override the timeout values.
+- Fixed a bug where cached data would not be used if a HTTP request failed.
+  Thanks to Vadim Strizhevsky <vadim@optonline.net> for finding the bug.
+- Fixed a bug in checking version information for update of handlers.
+- Consolidated common code into NewsClipper::Globals (dprint, DEBUG, etc.)
+  Added a few useful functions to improve code and output message readability
+  (dequote, reformat).
+- Improved timeout handling, so that errors get propagated correctly, and the
+  script exits with the correct value. (Thanks to Ludovic Drolez
+  <ldrolez@usa.net> for finding the bug.) Hopefully News Clipper works
+  correctly in makefiles now.
+- Fixed a potential bug in NewsClipper::HTMLTools::HTMLsubstr
+
+New in version 1.16:
+- Updated compiler-related code
+- Changed licensing code.
+- Updated README instructions
+- Improved installation instructions
+- Improved installation script
+- Changed numbering scheme to X.YZ, where X is the major version number, Y is
+  increased with each functionality enhancement, and Z is increased with each
+  bugfix release for a given Y.
+- NOTE: The open source version will lead the commercial version in releases.
+  The "official" version number will be the commercial version.
+
+New in version 1.0104:
+- Fixed a performance bug in the Trial version code (HandlerFactory.pm).
+- -h now prints version and registration information
+
+New in version 1.0102:
+- Fixed the brain-dead non-monotonically increasing version numbering :)
+- Fixed a bug in input file validation, when "STDIN" is used as the file.
+  (Thanks to Jamie Wall <jwall@webpeak.com> for finding it)
+- Fixed a bug with -c. (Thanks to morbus@disobey.com for helping to find it)
+- Fixed a bug that occurs when checking for new versions and the handler
+  server is down. (Thanks to tg@linuxmafia.org for helping to find it.)
+- Fixed a typo in the NewsClipper.cfg file: maxcachesize is in MB, not bytes.
+- Updated the template to work with the new yahootopstories handler.
+- Made Makefile.PL for unix installations interactive instead of specifying
+  everything on the command line.
+
+New in version 1.0001:
+- Code modified to point to the new handler server at handlers.newsclipper.com
+  (instead of newsclipper.binaryresearch.net).
+- Fixed typo in MakeHandler.pl (\\&main::dprint, not \&main::dprint)
+- Added licensing code:
+  - email and regKey in NewsClipper.cfg,
+  - key verification in NewsClipper.pl
+  - handler counting code in HandlerFactory.pm
+  - Nag in output for trial version
+- Clarified a few error messages.
+
+New in version 1.00:
+- Significantly faster update of out-of-date handlers.
+- Anti-abuse measures implemented to help reduce unnecessary load on the
+  handler server.
+- Added types to the handlers and News Clipper commands, which helps catch
+  errors.
+- A new name, new web page, fancy compiled versions, a nice user's manual, a
+  dedicated server, and improved technical support. (Well, most of that's for
+  the commercial version. Non-commercial users only get the name, web page,
+  and server :)
+
+-------------- History before Daily Update became News Clipper --------------
+
+New in version 7.1: 
+- You can now specify "STDIN" and "STDOUT" as the input and output files in
+  DailyUpdate.cfg. This allows you to use Daily Update as a filter, piping the
+  data to and from it. You can also use a file name and STDOUT to force DU to
+  output to standard output.
+- Debugging mode is now activated using the -d switch. It outputs lots of
+  useful information that can help you nail down problems you might have.
+- Some speed improvements.
+- Date::Manip has been replaced by Time::CTime and Time::ParseDate, which are
+  a lot faster. 
+
+New in version 7.0: 
+- This is a major rewrite, with a new syntax and improved support for web
+  developers.
+- See the file MIGRATING for hints on how to move to the new version from
+  older versions, and how to upgrade handlers you've written.
+- None of the old handlers work. You'll have to download the new ones and
+  migrate the ones you've written yourself but haven't submitted to me.
+- Improved caching
+- New, separated input, filtering, and output commands. This means you'll have
+  to update your input files to reflect the new syntax.
+- New and improved MakeHandler.pl
+- -v for verbose output
+- Added StripAttributes HTMLsubstr TrimOpenTags functions to HTMLTools.
+- Added day of the week and timezone support to handler update times.
+- New web support for browsing handlers
+- Daily Update mailing list
+- Now Daily Update prints a message if it times out.
+- When a handler fails, a comment is inserted in the output instead of
+  printing it to visible HTML.
+- Miscellaneous bug fixes
+- Miscellaneous bugs introduced. :) (I reworked a lot of the code.)
+
+New in version 6.1:
+- Miscellaneous bug fixes and improvements to GetText, GetLinks, and
+  GetImages.
+- Added -v (verbose output) support.
+- Setup changed so -I isn't necessary when running as a CGI program.
+- Message now displayed when Daily Update times out.
+- Output file now automatically chmod'd to 755. (Executable in case you call
+  server-side scripts like I do.)
+
+New in version 6.02:
+- Added return values for those of you who like to use makefiles to build web
+  pages.
+- Added documentation for MakeHandler.pl.
+- Bug fixed in output columns function. (Thanks to Craig Brockmeier
+  <craig@seurat.ppco.com> for finding it.)
+- I've revamped the configuration and install procedure to make it more
+  amenable to site-wide installation. DailyUpdate.cfg is looked for in
+  ~/.DailyUpdate, and handlers are installed in the first directory specified
+  by handlerlocations in DailyUpdate.cfg. (~/.DailyUpdate by default.) You'll
+  need to fix up your handlerLocations variable if you're upgrading from a
+  previous version. (Thanks to John Goerzen <jgoerzen@complete.org> for his
+  invaluable input.)
+- Added support for proxies requiring passwords. (Thanks to Kevin D.
+  Clark <kclark@cabletron.com>.)
+- Fixed a bug in HTMLTools.pm. (Thanks to Mark Harburn
+  <Mark.Harburn@durham.ac.uk>).
+
+New in version 6.01:
+- Added -r switch to force proxies to reload cached data during data
+  acquisition. (Thanks to Gerhard Wiesinger <e9125884@student.tuwien.ac.at>)
+- Fixed a couple of minor bugs.
+- Improved installation to automatically set #! line and set INSTALLDIRECTORY
+  in DailyUpdate.pl.
+- Configuration doesn't have to be in the same directory as the DailyUpdate.pl
+  file. (You can leave the DailyUpdate.cfg file in the install directory, and
+  move the DailyUpdate.pl file wherever you want, like cgi-bin.)
+- During automatic installation, handlers are now put in the install
+  directory, not the directory of the currently running DailyUpdate.pl script.
+
+New in version 6.0:
+- Sorry about the big version jump. I had to do it because I switched over to
+  the standard Perl numbering scheme. (5.2 becomes 5.02, which is less than
+  5.1). Maybe some of these features will justify the leap. :)
+- Now the installation mimicks the usual "perl Makefile.PL;make;make install"
+  of perl modules.
+- The script now supports multiple input and output files in the configuration
+  file.
+- Changed the syntax from <dailyupdate...> to <!--dailyupdate...--> so that
+  WYSIWYG editors won't croak on the 'unknown' tag.
+- Moved HTML-related functionality from AcquisitionFunctions.pm to
+  HTMLTools.pm, and added function StripTags.
+- Fixed 2 bugs in MakeLinksAbsolute. (Thanks to Kazuo Moriwaka
+  <kankun@osa.att.ne.jp> and Phillip Gersekowski
+  <philg@toonews.c-link.com.au>)
+- Enhanced Handler to work better in the face of bad data acquisition and
+  filtering.
+- Added OutputList to OutputFunctions.pm, which allows you to set the format
+  and number of columns when printing out lists.
+
+New in version 5.1:
+- Update times are now set by the handlers by overriding GetUpdateTimes. (The
+  default is 2,5,8,11,14,17,20,23.) Users can also customize the update times
+  in the configuration file, if they don't like the ones given by the
+  handlers. Modified MakeHandler.pl to support this.
+- Fixed a caching bug that would cause (a) multiple copies of some data when a
+  tag is used more than once on the same page, and (b) reuse of cached data
+  even when the style has been changed.
+- Added -a flag for automatic download of handlers.
+- Added -n flag to check for new versions of handlers.
+- Fixed prerequisites.
+- Removed use of the deprecated HTML::Parse in AcquisitionFunctions.pm
+
+New in version 5.0.2:
+- Fixed data caching.
+- MakeHandler.pl now stores the URL in the comment block.
+- Created POD documentation in DailyUpdate.pl
+- Fixed a problem with the loading of configuration information
+
+New in version 5.0.1:
+- Fixed a bug in MakeHandler.pl
+- Improved error checking for missing Perl modules when installing new
+  handlers.
+
+New in version 5.0: This is a major rewrite.
+- Handlers, implemented as Perl classes, are now used instead of the schemas
+  of previous versions. The GetHtml, GetText, OutputTwoColumn,
+  OutputUnorderedList, etc. functions are now part of two APIs that can be
+  used by handler writers: DailyUpdate::AcquisitionFunctions, and
+  DailyUpdate::OutputFunctions.
+- No handlers are distributed with Daily Update.  Instead, the user is
+  prompted for permission to install them as necessary. This makes using a new
+  tag easy -- just put it in your input file, run Daily Update once manually,
+  and tell it to download the handler.
+- The handlers are real Perl, instead of the pseudo Perl used in the schemas.
+  This increases the difficulty of adding new tags, but gives people a lot
+  more flexibility. To help things, I've included a script "MakeHandler.pl"
+  which will create a prototype handler based on user inputs.
+- GetText now uses HTML::FormatText.
+- Tags are now of the syntax <dailyupdate name=X>
+
+New in version 4.6:
+- Added notification support for new versions.
+- Added -c flag for user-specified configuration file. Dropped use of POSIX
+  (for NT compatibility.)
+- Fixed a bug in relative to absolute link conversion.  (Thanks to C. Harald
+  Koch <chk@amdur.com>)
+- URLs can now be of the format "file://...".
+- Added GetImages acquisition function (thanks to Tanner Lovelace
+  <lovelace@cs.unc.edu>).
+- Now the %attributes hash can be referenced in the URL or tag name of a
+  schema--added <unitedmediacomic> tag to illustrate its use.
+- Made changes to the config file to support better schema design.
+- Added "How to Write Schemas" page at
+  http://www.cs.virginia.edu/~dwc3q/code/writeschemas.html.
+- Moved to URI from URI::URL, which is now deprecated.
+
+New in version 4.5:
+- Added acquisition function GetHtml.
+- Added -i and -o flags for input and output files.
+- Now reads old html file only once (faster). 
+- Added "always" schema time option.
+- Now checks script directory for configuration file.
+- Miscellaneous bug fixes, new data sources, and minor enhancements.
+
+New in version 4.4:
+- Separated configuration from main script (yea!).
+- Fixed "uninitialized variable" warnings.
+- Created user-submitted schemas webpage at
+  http://www.cs.virginia.edu/~dwc3q/code/schemas.html.
+- Added more data acquisition schemas.
+
+New in version 4.3:
+- Added Infoworld, and Adam@Home.
+- Changed date & time handlers to take any valid strftime format string, and
+  made url attribute to weather mandatory.
+- Changed CoolSite to use their logo.
+- Script only dumps to screen if called as a cgi script.
+- Added default values to date, time, and OutputListOrColumns.
+
+New in version 4.2:
+- Added "linuxtoday", and "time".
+- Modified GetText & GetLinks to take "^" and "\$" signifying start and end of
+  file.
+- Added proxy support.
+- Fork is now disabled on Windows platforms.
+- Moved from HTML::Parse to HTML::Parser.
+
+New in version 4.1:
+- Added "User Friendly" and "Freshmeat" support.
+- Fixed Slashdot so that it takes a style.
+- Changed it to use LWP instead of my own HTTP sockets stuff.
+
+New in version 4.0:
+- This is a total rewrite, resulting in a modular, extensible script that is
+  half the size of the previous version.
+
+New in version 3.5.4:
+- Added Peanuts (Thanks to Alvaro Herrera <alvherre@enlaces.c5.cl>)
+- Also fixed the news from the AP.
+
+New in version 3.5.2:
+- Fixed a bug in the routine to detect if we need to update the data.
+
+New in version 3.5.1:
+- Improved calculation of when cached data should be used. Hopefully it's
+  less buggy.
+
+New in version 3.5:
+- Added support for Slashdot. Did a major cleanup of the code.
+
+New in version 3.4.6:
+- Fixed script to work with new Calvin and Hobbes webpage.
+- Improved algorithms for changing relative URLs to absolute in headlines.
+
+New in version 3.4.5:
+- More enhanced parsing of weather.
+
+New in version 3.4.4:
+- Fixed Dr. Science and Sports.
+- Enhanced parsing of weather.
+
+New in version 3.4.2:
+- Fixed a bug in the weather processing code.
+
+New in version 3.4.1:
+- Fixed the extra line in the headlines
+
+New in version 3.4:
+- Updated DailyUpdate to work with the new CNN/SI homepage.
+
+New in version 3.3.3:
+- Updated DailyUpdate to work with the new Yahoo headlines format
+
+New in version 3.3.1:
+- Fixed dilbert to handle absolute & relative URLs for the image.
+
+New in version 3.3.1:
+- Fixed dilbert to work with the new Dilbert Zone format
+
+New in version 3.3:
+- Added Calvin and Hobbes
+- Fixed a bug that caused nothing to be output for the first use of the tags.
+
+New in version 3.2.1:
+- Finally fixed the timeouts to work correctly.
+
+New in version 3.2:
+- Thanks to Christian Blair for helping to make the script more robust.
+
+New in version 2.9:
+- Thanks to Bob Anzlovar for the addition of the Dr. Science question of the
+  day.
+- He also changed the script to "use Socket" instead of "require socket.ph".
+  I agree with his thinking on this, however users of older versions of Perl
+  will have to do some comment work on the geturl procedure. In a couple of
+  versions I'm going to stop backward support, since Perl 5 is the way to go...
+
+New in version 2.8:
+- In this version I've commented out the telnet for weather and replaced it
+  with an html grab, which seems much faster. For those people who need the
+  weather thrice daily (and have a fast connection) or who can't get the
+  forecast they need from
+  http://cirrus.sprl.umich.edu/wxnet/states/states.html, put the telnet
+  command in line 173 back in and remove the wwwgrab line. Then comment out
+  the weather site and remove the comments for a telnet weathersite.

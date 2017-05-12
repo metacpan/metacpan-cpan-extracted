@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Net::DBus::Skype;
+use Env qw(DEBUG VERBOSE);
+
+my $debug = $DEBUG || $VERBOSE || 0;
+
+my $skype = Net::DBus::Skype
+	->new({ debug => $debug })
+	->raw_skype( 'CALL ' . shift @ARGV )
+;
+
+1;
+
+__END__
+
+=head1 NAME
+
+skype-simple-dialer
+
+=head2 DESCRIPTION
+
+A small script that interfaces with Net::DBus::Skype. It pushes off the first arguement send on the command line to the C<-E<gt>raw_skype> call method of the instance.
+
+=head2 EXAMPLE
+
+	skype-simple-dialer +1123456789

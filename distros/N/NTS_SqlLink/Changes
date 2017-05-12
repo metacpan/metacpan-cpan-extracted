@@ -1,0 +1,7 @@
+Revision history for Perl extension NTS::SqlLink.
+
+2.0   Sun Dec 14 22:00:03 BRST 2003
+    - fix bugs
+
+< 2.0
+    - Old version: Ananke::SqlLink

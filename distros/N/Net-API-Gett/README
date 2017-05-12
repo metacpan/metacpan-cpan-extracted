@@ -1,0 +1,53 @@
+Net-API-Gett
+
+Gett (http://ge.tt) is a clutter-free file sharing service that allows its users to 
+share up to 2 GB of files for free.  They recently implemented a REST API; this is a 
+binding for the API. See http://ge.tt/developers for full details and how to get an
+API key.
+
+Version: 1.05
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::API::Gett
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-API-Gett
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-API-Gett
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-API-Gett
+
+    Search CPAN
+        https://metacpan.org/module/Net::API::Gett
+
+    Git Hub
+        https://github.com/mrallen1/Net-API-Gett
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Mark Allen
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

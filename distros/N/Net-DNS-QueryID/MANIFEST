@@ -1,0 +1,12 @@
+Artistic
+Changes
+Copying
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+QueryID.pm
+t/notbusy.t
+t/random.t
+t/wrapover.t
+META.yml                                 Module meta-data (added by MakeMaker)

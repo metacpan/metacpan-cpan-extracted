@@ -1,0 +1,66 @@
+
+=head1 NAME
+
+Examples - A file that describes the files in the Examples directory.
+
+=over 4
+
+=item B<AddEntry>
+
+The file AddEntry shows how to add an entry into a LDAP directory
+using DSML.
+
+=item B<Compare>
+
+The file Compare shows how to compare attributes in an entry in a 
+LDAP directory using DSML.
+
+=item B<DeleteEntry>
+
+The file DeleteEntry shows how to delete an entry from a LDAP directory
+using DSML.
+
+=item B<ModRDN>
+
+The file ModRDN shows how to do a modrdn on an entry in a LDAP 
+directory using DSML.
+
+=item B<ModifyEntry>
+
+The file ModifyEntry shows how to modify attributes on an entry in a 
+LDAP directory using DSML.
+
+=item B<Ping>
+
+The file Ping shows how to Ping a LDAP directory using DSML. 
+This will all the user to detect if a LDAP directory server has 
+DSML enabled.
+
+=item B<RootDSE>
+
+The file RootDSE shows how to query the rootDSE of a LDAP directory
+using DSML.
+
+=item B<SearchEntry>
+
+The file SearchEntry shows how to search for an entry in a LDAP 
+directory using DSML.
+
+=item B<StackOperations>
+
+The file StackOperations shows how to stack different operations, like
+adds, deletes, compares, into one batch request that will be sent to 
+a LDAP directory using DSML.
+
+=item B<UsingXslt>
+
+The file UsingXslt shows how to search for an entry in a LDAP 
+directory using DSML and then how to use XSLT to parse the XML
+date into a html page.
+
+=item B<html_1.xsl>
+
+The file html_1.xsl is a XSLT control file that is used by the 
+UsingXslt file.
+
+=back

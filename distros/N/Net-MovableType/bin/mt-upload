@@ -1,0 +1,107 @@
+#!/usr/bin/perl
+
+# mt-upload,v 1.2 2003/07/29 12:40:48 sherzodr Exp
+
+use strict;
+use Net::MovableType;
+use Config::Simple;
+use File::Basename;
+
+
+# Turning STDOUT buffering off
+#
+$| = 1;
+
+
+#
+# defining variables
+#
+my %config = ();    # <-- keeps the configuration file contents
+my $file   = shift; # <-- file to upload
+my $dir    = shift; # <-- remote directory to upload into
+my $url    = "";    # <-- url of the uploaded file
+
+
+unless ( $file && $dir ) {
+    die "Usage: $0 <file> <remote_directory>\n"
+}
+
+
+#
+# initializing configuration file
+#
+init_config(\%config);
+
+
+
+#
+# creating MT object
+#
+my $mt = new MT( $config{Proxy}, $config{User}, $config{Password} );
+unless ( defined $mt ) {
+    die MT->errstr
+}
+
+
+#
+# uploading the file
+#
+$url = $mt->upload( $file, catfile($dir, basename($file)) );
+
+unless ( $url ) {
+    die "couldn't upload: " . $mt->errstr . "\n"
+}
+
+print "File: $file\nURL: $url->{url}\nUploaded Successfully!\n";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub catfile {
+    require File::Spec;
+    return File::Spec->catfile(@_)
+}
+
+
+
+
+
+
+
+sub init_config {
+    my $config = shift;
+
+    #
+    # we require values of HOME and EDITOR varaibles set
+    #
+    unless ( $ENV{HOME} && $ENV{EDITOR} ) {
+        die "'HOME' and 'EDITOR' environmental variables are not yet\n"
+    }
+
+    require Config::Simple;
+
+    my $cfg_file = catfile($ENV{HOME}, '.mt.cfg');
+    unless ( -e $cfg_file ) {
+        die "Configuration file, '$cfg_file' is missing\n"
+    }
+    Config::Simple->import_from($cfg_file, $config);
+    unless ( $config->{Proxy} && $config->{User} && $config->{Password} ) {
+        die "Required fields are missing in the configuration file\n"
+    }
+}
+
+
+

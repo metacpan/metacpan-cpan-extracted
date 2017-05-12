@@ -1,0 +1,64 @@
+AUTHOR
+    * Vincenzo Zocca <Vincenzo@Zocca.com>
+
+
+COPYRIGHT
+    * Copyright 2002, Vincenzo Zocca.
+    * See LICENSE section for usage and distribution rights.
+
+
+BUILDING
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Net::FreeDB2 modules in short
+    *  Easy FreeDB/CDDB file handling.
+    * Connect to FreeDB/CDDB servers.
+    * Using both CDDBP and HTTP protocols.
+    * With HTTP proxy support (user and password).
+    * Read Net::FreeDB2 (3) as introduction.
+
+
+Description
+    * This distribution first of all contains the Net::FreeDB2 Perl module hierarchy. These
+      modules are intended to make the access to FreeDB/CDDB servers easier by abstraction
+      of the FreeDB/CDDB protocols and mechanisms.
+    * Secondly, a few programs (fdcdi, fdlscat, fdmotd, fdoggenc, fdquery, fdrip and
+      fdsites) are provided to illustrate the usage of the FreeDB Perl module hierarchy.
+    * Net::FreeDB2 is another FreeDB/CDDB access class hierarchy. The basics are similar
+      to the other FreeDB/CDDB Perl modules.
+      However, in the writers opinion, the details differ enough for it to have a certain
+      right of existence. It's organization is inspired by Net::LDAP. 
+
+
+Prerequisites
+    * cdparanoia to read audio tracks.
+    * Error module for exception handling.
+    * LWP::UserAgent module for HTTP support.
+    * HTTP::Request module for HTTP support.
+    * IO::Socket::INET module for CDDBP support. 
+
+
+LICENSE
+
+This file is part of the FreeDB module hierarchy for Perl by
+Vincenzo Zocca.
+
+The FreeDB module hierarchy is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2 of
+the License, or (at your option) any later version.
+
+The FreeDB module hierarchy is distributed in the hope that it will
+be useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with the FreeDB module hierarchy; if not, write to
+the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+Boston, MA 02111-1307 USA
+

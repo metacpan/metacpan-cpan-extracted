@@ -1,0 +1,8 @@
+Changes
+Build.PL
+Makefile.PL
+MANIFEST
+README
+t/01use.t
+lib/Net/Halo/Status.pm
+META.yml

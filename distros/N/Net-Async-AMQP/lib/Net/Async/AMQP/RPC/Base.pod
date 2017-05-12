@@ -1,0 +1,151 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::AMQP::RPC::Base
+at lib/Net/Async/AMQP/RPC/Base.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::AMQP::RPC::Base - base class for client and server RPC handling
+
+=head1 VERSION
+
+version 2.000
+
+=head1 DESCRIPTION
+
+This is used internally by L<Net::Async::AMQP::RPC::Server> and 
+L<Net::Async::AMQP::RPC::Client>, see those classes for details.
+
+=head2 mq
+
+Returns the L<Net::Async::AMQP> instance.
+
+=head2 queue_name
+
+Returns a L<Future> which resolves to the queue name once the queue has been declared.
+
+=head2 routing_key
+
+The routing key used for publishing. Defaults to the empty string.
+
+=head2 exchange
+
+The exchange messages should be published to (or queues bound to).
+
+=head2 future
+
+Helper method for instantiating a L<Future>.
+
+=head2 _add_to_loop
+
+Called when this instance is added to a L<IO::Async::Loop>. Requires both an
+L</mq> instance and a valid L</exchange> name.
+
+=head2 connected
+
+Returns a L<Future> which resolves once the underlying L<Net::Async::AMQP> connection
+is established.
+
+=head2 client_queue
+
+Sets up a queue for an RPC client.
+
+=head2 server_queue
+
+Sets up a queue for an RPC server.
+
+=head2 reply
+
+Publishes a reply to an RPC message.
+
+Expects the following:
+
+=over 4
+
+=item * reply_to - which queue to deliver to
+
+=item * correlation_id - the ID to use for this message
+
+=item * type - message type
+
+=item * payload - message content
+
+=item * content_type - what's in the message
+
+=item * content_encoding - any encoding layers
+
+=back
+
+=head2 consumer
+
+Activates a consumer. Resolves when the consumer is running.
+
+=head2 on_message
+
+Called when there's a message. Receives the L<Net::Async::AMQP::Channel> followed by some named parameters:
+
+=over 4
+
+=item * type
+
+=item * payload - scalar containing the raw binary data for this message
+
+=item * consumer_tag - which consumer tag received this message
+
+=item * delivery_tag - the delivery information for L<Net::Async::AMQP::Channel/ack>
+
+=item * routing_key - routing key used for this message
+
+=item * properties - any properties for the message
+
+=item * headers - custom headers
+
+=back
+
+See L<Net::Async::AMQP::Queue/consumer> for more details (including the contents of C<properties> and C<headers>).
+
+=head2 process_message
+
+Abstract method for message processing. Will receive the following named parameters:
+
+The base implementation here will raise an exception. Override this in your subclass
+to do something more useful.
+
+=head2 consumer_channel
+
+Returns a L<Future> which resolves to the L<Net::Async::AMQP::Channel> used for the consumer.
+
+=head2 publisher_channel
+
+Returns a L<Future> which resolves to the L<Net::Async::AMQP::Channel> used for the publisher.
+
+=head2 active
+
+Returns a L<Future> which resolves when the underlying MQ connection is ready for use.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Licensed under the same terms as Perl itself, with additional licensing
+terms for the MQ spec to be found in C<share/amqp0-9-1.extended.xml>
+('a worldwide, perpetual, royalty-free, nontransferable, nonexclusive
+license to (i) copy, display, distribute and implement the Advanced
+Messaging Queue Protocol ("AMQP") Specification').

@@ -1,0 +1,57 @@
+Net-Amazon-Glacier
+
+This module implements the full Amazon Glacier API 2012-06-01, current as of
+2014. It can be used to manage Glacier vaults and upload archives to them.
+Amazon states "Amazon Glacier is an extremely low-cost storage service
+that provides secure and durable storage for data archiving and backup. In order
+to keep costs low, Amazon Glacier is optimized for data that is infrequently
+accessed and for which retrieval times of several hours are suitable. With
+Amazon Glacier, customers can reliably store large or small amounts of data for
+as little as $0.01 per gigabyte per month, a significant savings compared to
+on-premises solutions."
+
+Module originally written by Tim Nordenfur, C<< <tim at gurka.se> >>.
+Bugs, suggestions and fixes contributed by Victor Efimov and Kevin Goess.
+File operations and multipart uploads written by Gonzalo Barco C<< <gbarco uy at gmail dot com, no spaces> >>
+Maintained by Gonzalo Barco C<< <gbarco uy at gmail dot com, no spaces> >>
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::Amazon::Glacier
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Amazon-Glacier
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Net-Amazon-Glacier
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Net-Amazon-Glacier
+
+    Search CPAN
+        http://search.cpan.org/dist/Net-Amazon-Glacier/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Tim Nordenfur
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

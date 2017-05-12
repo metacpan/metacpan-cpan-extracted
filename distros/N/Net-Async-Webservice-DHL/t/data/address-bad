@@ -1,0 +1,40 @@
+POST https://xmlpitest-ea.dhl.com/XMLShippingServlet
+
+<?xml version="1.0" encoding="utf-8"?>
+<x0:DCTRequest xmlns:x0="http://www.dhl.com">
+  <GetCapability>
+    <Request>
+      <ServiceHeader>
+        <MessageTime>2014-09-16T14:54:30</MessageTime>
+        <MessageReference>                  1410879270</MessageReference>
+        <SiteID>testid</SiteID>
+        <Password>testpass</Password>
+      </ServiceHeader>
+    </Request>
+    <From>
+      <CountryCode>GB</CountryCode>
+      <Postalcode>SE7 7RU</Postalcode>
+      <City>London</City>
+    </From>
+    <BkgDetails>
+      <PaymentCountryCode>GB</PaymentCountryCode>
+      <Date>2014-09-16</Date>
+      <ReadyTime>PT14H54M</ReadyTime>
+      <DimensionUnit>CM</DimensionUnit>
+      <WeightUnit>KG</WeightUnit>
+      <IsDutiable>N</IsDutiable>
+      <NetworkTypeCode>AL</NetworkTypeCode>
+    </BkgDetails>
+    <To>
+      <CountryCode>GB</CountryCode>
+      <Postalcode>XX7 6YY</Postalcode>
+      <City>NotExisting</City>
+    </To>
+    <Dutiable>
+      <DeclaredCurrency>GBP</DeclaredCurrency>
+      <DeclaredValue>100</DeclaredValue>
+    </Dutiable>
+  </GetCapability>
+</x0:DCTRequest>
+
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><res:DCTResponse xmlns:res='http://www.dhl.com' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation= 'http://www.dhl.com DCT-Response.xsd'><GetCapabilityResponse><Response><ServiceHeader><MessageTime>2014-09-16T16:54:30.713+01:00</MessageTime><MessageReference>                  1410879270</MessageReference><SiteID>testid</SiteID></ServiceHeader></Response><Note><Condition><ConditionCode>3021</ConditionCode><ConditionData>The destination country GB location postal code XX7 6YY or City NotExisting is invalid. Please check the destination country location details.</ConditionData></Condition></Note></GetCapabilityResponse></res:DCTResponse>

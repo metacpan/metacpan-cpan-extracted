@@ -1,0 +1,12 @@
+example/check_email_and_mx.pl
+t/00-load.t
+t/01-fail.t
+t/02-pass.t
+t/03-valid.t
+t/04-full.t
+lib/Net/validMX.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)
+README                                   Module README created from pod2text

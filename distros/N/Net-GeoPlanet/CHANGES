@@ -1,0 +1,13 @@
+#
+# Revision history for Net::GeoPlanet
+#
+
+0.2 Fri Nov 28 10:48:03 EST 2008
+	- Added full support for version 1 of the API
+	- Added documentation for the module
+	- Added regression tests
+	- location() function has been renamed places()
+	- Removed dependency on XML::Simple
+
+0.1 Fri Jul 18 09:50:01 EST 2008
+	- Initial release

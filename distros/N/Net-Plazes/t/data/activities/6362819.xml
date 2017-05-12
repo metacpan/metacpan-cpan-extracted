@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<activity>
+  <created_at type="datetime">2008-08-14T19:46:33Z</created_at>
+  <device>plazer</device>
+  <id>6362819</id>
+  <plaze_id type="integer">131865</plaze_id>
+  <status></status>
+  <user_id type="integer">245211</user_id>
+  <scheduled_at type="datetime">2008-08-14T21:46:33+02:00</scheduled_at>
+  <plaze>
+    <address>BERGFINKSV&#196;GEN 4</address>
+    <category>home</category>
+    <city>VEJBYSTRAND</city>
+    <country_code>SE</country_code>
+    <created_at type="datetime">2008-01-01T00:01:32Z</created_at>
+    <has_free_wifi type="boolean">false</has_free_wifi>
+    <id>131865</id>
+    <link></link>
+    <name>Home</name>
+    <state></state>
+    <timezone>Europe/Copenhagen</timezone>
+    <updated_at type="datetime">2008-01-01T00:01:32Z</updated_at>
+    <zip_code>260 83</zip_code>
+    <latitude type="float">56.3123016725981</latitude>
+    <longitude type="float">12.7752783187227</longitude>
+    <country>Sweden</country>
+    <picture_url></picture_url>
+  </plaze>
+  <user>
+    <created_at type="datetime">2007-10-04T10:47:26Z</created_at>
+    <full_name>Morris Packer</full_name>
+    <id>245211</id>
+    <updated_at type="datetime">2008-07-29T16:14:34Z</updated_at>
+    <name>morris</name>
+    <avatar_url>http://plazes.com/pictures/05d4985197bb76135e08203dfdbca325-medium.jpg</avatar_url>
+  </user>
+</activity>

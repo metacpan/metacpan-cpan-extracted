@@ -1,0 +1,14 @@
+Revision history for Perl extension Net-APNS-Simple
+
+0.03 2016-12-15T02:12:45Z
+
+    - Changed to use Crypt::PK::ECC instead of external command `openssl`.
+
+0.02 2016-12-09T00:51:27Z
+
+    - Add ssl connection keepalive.
+
+0.01 2016-12-02T06:16:29Z
+
+    - original version
+

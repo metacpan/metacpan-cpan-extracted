@@ -1,0 +1,70 @@
+Net-RTP
+=======
+
+This is a pure perl implementation of 
+Real-time Transport (RTP) Protocol (RFC3550).
+
+The Net::RTP module is used to send a receive RTP packets.
+
+The Net::RTP::Packet module is used to parse the RTP packet headers. 
+It may be used totally independently of Net::RTP if you want to handle
+sending and receiving packets yourself.
+
+
+INSTALLATION
+------------
+
+	I use Module::Build to build and install the module.
+	To install this module type the following:
+	
+		perl Build.PL
+		./Build
+		./Build test
+		
+	And then as root:
+	
+		./Build install
+
+	Module::Build is available in the debian package:
+
+		libmodule-build-perl
+
+
+DEPENDENCIES
+------------
+
+	This module requires the IO::Socket::Multicast perl module,
+	which in-turn requires IO::Interface. 
+	
+	You will also need one of the following super-class modules:
+		
+		IO::Socket::Multicast6 (IPv4 and IPv6 unicast and multicast)
+		IO::Socket::Multicast (IPv4 unicast and multicast)
+		IO::Socket::INET6 (IPv4 and IPv6 unicast)
+		IO::Socket::INET (IPv4 unicast)
+		
+
+INCLUDED TOOLS
+--------------
+
+	rtpstats.pl - Displays packet statistics for an RTP session
+	rtpsend-pcmu.pl - Send an audio file as an u-law RTP session
+	rtplosslog.pl - Log packet loss for a RTP session every minute
+	rtpdump.pl - Parse and display incoming RTP packet headers
+
+
+AUTHOR
+------
+
+	Nicholas J Humfrey, njh@cpan.org
+
+
+COPYRIGHT AND LICENSE
+---------------------
+
+	Copyright (C) 2006 University of Southampton
+
+	This library is free software; you can redistribute it and/or modify it
+	under the same terms as Perl itself, either Perl version 5.005 or, at
+	your option, any later version of Perl 5 you may have available.
+

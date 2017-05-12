@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 18de50069179a66f2c7d95b97a6680e755cae311 Build.PL
+SHA1 91e34855a25fbd6e2546f80944eeda8ba66e32df Changes
+SHA1 1309c5bc950d6d1df18220502647c8e5ca3afd94 LICENSE
+SHA1 02ad6e80ad8159a7f17c74f5d4f30e04d587f7c6 MANIFEST
+SHA1 c8446ac0075053f7122abd019c050a68a4bd3560 META.json
+SHA1 acdc4b52c336e34116fc423e41d0a30cb57ef446 META.yml
+SHA1 c36ac3e7c2e98721cd4110972afe394ec8a7b42f Makefile.PL
+SHA1 a87566f0c784efc2cc1ef70d5999ec0576fbc13b README
+SHA1 2e929caa246ac03a30e8333616f6f8973a9a7c45 lib/Net/IDN/Nameprep.pm
+SHA1 d2abc42c82f13fb54a186b17f9d3cc2e11b78b6d t/00use.t
+SHA1 b0f67b92afa9b0b553d84924e5d2f97f41c2b5c9 t/nameprep_vec.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBCAAGBQJVbLqMAAoJEIS+srvgrWBmmHkH/0jdoXfI75yJ0+waTSreFNhH
+Q0Xqss8iRomG/yBXVHETSGh/9X9coEdgVmFH1xRLMTYo++ZYX0Fmdt52u5mEDmFo
+luhG0eVUp3n67DqOVzpeS0Rbq7aG2GgyUWtS9C5J5qvqRb55hJG7+rDr70H8rDKY
+KtYza5aeSfjEQmJ0hFNTUTZn/P4NkXhMvbJq0ERYmgCtxhrzwmHAIBCIeBPgDT1K
+X0uGWLO3fRRbOydTVAt2XcBPSHSFbPVU3rVXroKbio79Ou2S9JAy8lNr9C65LFMD
+TlGVfsT+K8H5J9vI3D1W5oXRewL8N7XG9o4NqYNIUl+tzcR7Dw4deka8Ikct08c=
+=c1do
+-----END PGP SIGNATURE-----

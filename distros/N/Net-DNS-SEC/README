@@ -1,0 +1,188 @@
+Net::DNS::SEC - DNSSEC extensions to Net::DNS
+=============================================
+
+	
+1. DESCRIPTION
+   -----------
+
+This module is designed as an extension the Net::DNS package
+(http://www.net-dns.org/). 
+
+The module implements the cryptographic signature generation and
+verification functions that are relevant for DNSSEC operations.
+
+**
+**		***************
+**		**  WARNING  **
+**		***************
+**	THE USE AND/OR HANDLING OF STRONG ENCRYPTION TECHNOLOGIES IS
+**	PROHIBITED OR SEVERELY RESTRICTED IN MANY TERRITORIES.
+**	PLEASE BE SURE THAT YOU FULLY UNDERSTAND THE LEGAL POSITION
+**	IN YOUR COUNTRY BEFORE ATTEMPTING TO INSTALL THIS MODULE OR
+**	ANY OF THE PREREQUISITE CRYPTOGRAPHY PACKAGES.
+**
+
+Net::DNS::SEC also provides a class for handling keysets.
+Keysets are administrative files used by the BIND tools for key
+maintenance tasks.  Net::DNS::SEC::Keyset provides an abstract
+interface for doing fun things with them.
+
+See also the 'pod' documentation in: 
+	Net::DNS::RR::DNSKEY
+	Net::DNS::RR::DS
+	Net::DNS::RR::NSEC
+	Net::DNS::RR::NSEC3
+	Net::DNS::RR::RRSIG
+	Net::DNS::SEC::Private
+and for the use of SIG0 see:
+	Net::DNS::Packet (sign_sig0)
+	Net::DNS::RR::SIG
+
+
+2. AVAILABILITY
+   ------------
+
+You can get the latest version of Net::DNS::SEC from the
+Comprehensive Perl Archive Network (CPAN):
+
+	http://search.cpan.org/dist/Net-DNS-SEC/
+
+or through
+
+	http://www.net-dns.org/
+
+Additionally a subversion repository is made available through
+
+	http://www.net-dns.org/svn/net-dns-sec/
+
+The version on the "trunk" (http://www.net-dns.org/svn/net-dns-sec/trunk)
+is the version that is targeted for next release.
+
+Please note that the SVN version at any given moment may be broken.
+
+
+3. PREREQUISITES
+   -------------
+
+This package relies on Net-DNS version 1.01 or later which has
+features specifically designed to support Net::DNS::SEC.
+
+The availability of prerequisites for Net::DNS::SEC is tested at
+installation time.  These are the packages that need to be
+available:
+
+	Crypt::OpenSSL::Bignum
+	Crypt::OpenSSL::DSA
+	Crypt::OpenSSL::RSA
+	File::Spec
+	MIME::Base64
+	Test::More
+
+Optional packages extend the repertoire of encryption algorithms.
+Version incompatibilities are reported at installation time, which
+may be corrected following installation.
+
+	Crypt::OpenSSL::EC
+	Crypt::OpenSSL::ECDSA
+	Digest::GOST
+	Digest::SHA
+
+
+4. INSTALLATION
+   ------------
+
+Please install any modules mentioned in the PREREQUISITES section
+above.  When you run "perl Makefile.PL", Perl should complain if
+any of the required modules is missing.
+
+To build this module, run the following commands:
+
+	tar xvzf Net-DNS-SEC-?.??.tar.gz
+	cd  Net-DNS-SEC-?.??
+	perl Makefile.PL
+	make 
+	make test
+	make install
+
+'make test' will do some tests that should all succeed once all
+dependencies are satisfied. Please report failures during the
+test phase.
+
+Alternatively, install the package using CPAN:
+
+	perl -MCPAN -e shell;
+	cpan> install Net::DNS::SEC
+
+
+5. MAINTENANCE
+   -----------
+
+Please use the CPAN request tracker to report bugs in the
+extensions.  The request tracker is available through:
+
+ https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-DNS-SEC
+
+
+6. STAYING UP TO DATE
+   ------------------
+
+Announcements about Net::DNS::SEC will be published on 
+http://www.net-dns.org/blog/. An RSS feed is available.
+
+
+7. DEMOS
+   -----
+
+demo/getkeyset.pl	A small demonstration program that will
+			fetch the keyset for a specified domain,
+			store the keys and print DS RRs to STDOUT.
+
+demo/key2ds		Reads the key data from STDIN and prints
+			the corresponding DS record on STDOUT.
+			Contributed by Miek Gieben
+
+demo/make-signed-keyset	Creates a self-signed keyset from a BIND
+			public key specified on the command line.
+			Contributed by Wes Griffin
+
+
+8. ACKNOWLEDGEMENTS
+   ----------------
+
+Thanks Ian Robertson, T.J. Mather, and Mike McCauley for their support
+and help with the Crypt::OpenSSL::[RSA|DSA|EC] modules.
+
+Mike McCauley created Crypt::OpenSSL::ECDSA specifically for this
+development.
+
+  
+9. COPYRIGHT
+   ---------
+
+Authorship of individual components and significant contributions is shown
+in the copyright notice attached to the relevant documentation. Copyright
+in all components is retained by their respective authors.
+
+
+10. LICENSE
+    -------
+
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted, provided
+that the above copyright notice appear in all copies and that both that
+copyright notice and this permission notice appear in supporting
+documentation, and that the name of the author not be used in advertising
+or publicity pertaining to distribution of the software without specific
+prior written permission.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+
+------------------------------------------------------------------------------
+$Id: README 1378 2015-07-14 07:50:38Z willem $

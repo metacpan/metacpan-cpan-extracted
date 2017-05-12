@@ -1,0 +1,59 @@
+{
+   "abstract" : "interface to the WHMCS billing and support system",
+   "author" : [
+      "Fayland Lam <fayland@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-WHMCS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Moo" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/fayland/perl-Net-WHMCS.git",
+         "web" : "https://github.com/fayland/perl-Net-WHMCS"
+      }
+   },
+   "version" : "0.08",
+   "x_contributors" : [
+      "Michael Schout <mschout@gkg.net>",
+      "Neil Bowers <neil@bowers.com>"
+   ]
+}
+
